@@ -113,3 +113,87 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: Medium-High
   - High-ticket potential: High in combination with the service stack
 - Next action: Prototype a controlled unsupported-instrument onboarding loop where generated converters cannot enter production until schema validation and source-to-output field-map review pass; use this as the long-tail adapter factory behind the deterministic Allotropy parsers.
+
+### NatLabRockies/ALchemist
+- Repository: https://github.com/NatLabRockies/ALchemist
+- Commit / revision: 02c7a6eaa5a8e75bb65d0292b9b8d9a5e08301cf
+- Date discovered: 2026-09-19
+- What it contains: A low-attention but unusually complete active-learning and Bayesian-optimization platform for chemical/materials experiments. It has a headless Python session API, BoTorch/scikit-learn surrogate models, qEI/qPI/qUCB and variance-oriented acquisition strategies, multi-objective/Pareto tooling, a broad DoE suite, a FastAPI REST layer, React web UI, desktop GUI, WebSocket live monitoring, interoperable JSON sessions, and a staged experiment work queue for autonomous reactor/lab workflows.
+- Why it matters: It supplies the missing experiment-selection/orchestration layer above hardware-control systems such as PyLabRobot. The inspected revision contains a real ordered/thread-safe ExperimentQueue with per-item state/reason/completion/failure, REST endpoints, web monitoring, unit tests, and durable suggested-vs-actual provenance. The latest commit specifically added per-experiment provenance joined by ProvenanceId; model code excludes that provenance metadata from the feature matrix, reducing a subtle data-leakage risk.
+- Commercial possibilities: Closed-loop experimental optimization product for chemical, catalysis, battery, materials, and biotech R&D; paid deployment that connects a customer's existing instruments to an auditable optimization queue; campaign-optimization service; or an optimization layer paired with PyLabRobot/device adapters and the existing instrument-normalization stack. High-value buyers can justify implementation fees when each experiment is expensive or slow.
+- Build-time savings: Roughly 4-9 months for Bayesian optimization/DoE, session management, API/UI, autonomous queueing, provenance, and monitoring infrastructure; potentially more when paired with existing hardware integrations.
+- Evidence inspected: Repository metadata (8 stars, BSD-3-Clause); exact latest commit metadata; README.md; recursive source tree; alchemist_core/queue.py and queue-related code search; api/routers/experiments.py; alchemist_core/session.py; audit/provenance code search; tests/unit/core/test_experiment_queue.py, test_session_queue_delegation.py, test_provenance.py; React queue/monitoring hooks/tests. The repository is packaged to PyPI and has CI/test workflows.
+- License / rights: BSD-3-Clause.
+- Reuse classification: Directly reusable subject to BSD-3-Clause notice/attribution conditions and third-party dependency licenses.
+- Scores:
+  - Technical value: Very High
+  - Commercial value: Very High
+  - Rarity: High
+  - Completeness: Very High
+  - Build-time saved: Very High
+  - Data advantage: Medium
+  - High-ticket potential: Very High
+- Next action: Connect ALchemist's staged experiment queue to a PyLabRobot simulator or supported instrument workflow and demonstrate one closed-loop optimization campaign with suggested-vs-actual provenance and a reproducible audit trail.
+
+### Noel-Research-Group/Robochem_Flex
+- Repository: https://github.com/Noel-Research-Group/Robochem_Flex
+- Commit / revision: 672240f184846af3e2014802aea29645de562fb2
+- Date discovered: 2026-09-19
+- What it contains: A modular self-driving chemistry laboratory stack covering physical device designs plus control/optimization software. The control framework combines a Streamlit UI, OmniPlatypus hardware control for pumps/valves/sensors/analytics, RoBrains Bayesian/evolutionary optimization, and LAMAS spectral analysis. The repository also includes CAD/firmware/PCB resources, example campaign configs, a dry-run mode, package-level LICENSE/NOTICE files, and substantial unit-test code.
+- Why it matters: This is not just an optimizer or robot SDK; it is a permissively licensed reference for the whole autonomous chemistry loop from hardware through analytics and optimization. RoBrains contains single/multi-objective BoTorch optimization, batched BO, categorical embeddings, multi-fidelity and multi-task optimization, human-in-the-loop communications, custom surrogates/acquisitions, and explicit tests for platform/HITL/assistant paths. LAMAS adds tested spectroscopy/deconvolution code. Recreating this vertical integration would be slow and hardware-specific.
+- Commercial possibilities: Implementation/support offering for academic and industrial flow-chemistry labs; low-cost autonomous reaction-optimization deployments; a reference hardware/software kit for process-development groups; or selected Apache-licensed optimization/analytics components reused in a narrower validated laboratory product. It can also inform hardware adapters beneath ALchemist or other optimization layers.
+- Build-time savings: Approximately 6-12+ months of hardware/software integration, experiment-control, optimization, spectral-analysis, and GUI work if the target workflow aligns with the supported modules.
+- Evidence inspected: Repository metadata (43 stars, Apache-2.0); exact latest commit metadata; root README and Apache licensing statement; Control Software/README.md; recursive tree; RoBrains README; RoBrains source search for SingleBayesianOptiBackend and multi-fidelity/batched variants; tests/test_bayes_opti_Platform.py, test_bayes_opti_HITL.py, test_bayes_opti_ASSISTANT.py, test_dummy_HITL.py; LAMAS implementation/test tree. README documents a CS0_dryrun campaign for testing without hardware.
+- License / rights: Apache-2.0 with NOTICE files present in inspected software subpackages.
+- Reuse classification: Directly reusable subject to Apache-2.0/NOTICE requirements and third-party dependency/hardware-component licenses.
+- Scores:
+  - Technical value: Very High
+  - Commercial value: High
+  - Rarity: Very High
+  - Completeness: High
+  - Build-time saved: Very High
+  - Data advantage: Medium
+  - High-ticket potential: Very High
+- Next action: Run the documented dry-run campaign and isolate the smallest commercially useful stack (optimization + one analytics/device path) before considering real hardware; separately review physical safety/validation requirements for any automated chemical execution.
+
+### BattModels/ElyteAgent
+- Repository: https://github.com/BattModels/ElyteAgent
+- Commit / revision: 415ddd6b3b29bef324b1f10d8fc0ac3feb4f3569
+- Date discovered: 2026-09-19
+- What it contains: A zero-star MIT-licensed autonomous battery-electrolyte experimentation stack. ElyteOS coordinates device control, inventory, scheduling, database storage and visualization, while ElyteAgent uses four LangGraph agents for natural-language design-space creation, inventory/solubility feasibility checking, hardware execution/error recovery, and closed-loop experiment selection. The repository includes real pump/valve/balance/potentiostat/thermometer/camera control modules and a candidate optimizer that ranks compositions by a UCB-like nearest-neighbor surrogate before passing them through the inventory/feasibility solver.
+- Why it matters: Battery-electrolyte R&D is a narrow, expensive vertical where experiment throughput and formulation feasibility directly affect development cost. This repository provides both a commercially interesting orchestration pattern and substantial device/domain code rather than a generic agent demo. The inspected optimizer enforces solvent simplex/salt bounds and inventory feasibility; the experiment tool layer performs connection checks, solvent mixing, balance/density measurement, conductivity measurement, temperature measurement, retries/stateful resumption, and result storage.
+- Commercial possibilities: Battery R&D electrolyte optimization workbench; paid automation/integration for labs using compatible hardware; clean separation of formulation proposal, feasibility, execution and recovery for a high-value vertical; or reuse of MIT-licensed planning/orchestration concepts inside a safer simulator-first optimization service. Best fit is a high-ticket implementation/pilot rather than mass-market SaaS.
+- Build-time savings: Roughly 3-6 months of battery-specific orchestration, formulation-feasibility, device-control, and closed-loop optimization work; more if the buyer's hardware overlaps the provided Clio/SALSA-style stack.
+- Evidence inspected: Repository metadata (0 stars, MIT); exact revision; README.md; recursive source tree; src/Agent/BeysianOptimization.py; src/Agent/Experiment_Tools.py. The optimizer implements candidate generation, normalization, UCB ranking and pulp_solve_sorted feasibility checks. The experiment tools call actual Equipment_Control modules for pumps, valves, balance, potentiostat, thermometer and camera. Important limitation: the inspected viscosity routine has the real measurement block commented out and currently assigns a placeholder value, so viscosity automation must not be treated as production-ready. No dedicated pytest suite was found in the inspected code search. Bundled database/log/generated-session artifacts were deliberately not inspected or retained.
+- License / rights: MIT for repository code. Hardware/vendor SDK or instrument bindings may carry their own terms and must be checked separately before redistribution/deployment.
+- Reuse classification: Directly reusable code subject to MIT terms, with third-party hardware/SDK rights and physical-lab validation handled separately.
+- Scores:
+  - Technical value: Very High
+  - Commercial value: High
+  - Rarity: Very High (0-star functioning vertical stack)
+  - Completeness: Medium-High
+  - Build-time saved: High
+  - Data advantage: Medium
+  - High-ticket potential: Very High
+- Next action: Isolate the planner/feasibility/orchestration path from physical hardware and validate it on a fully synthetic electrolyte campaign; only then audit each hardware routine and safety interlock before any real-world execution.
+
+### ulfsri/lab-etl
+- Repository: https://github.com/ulfsri/lab-etl
+- Commit / revision: a45d56849a924f8ce9034b15085c704118777252
+- Date discovered: 2026-09-19
+- What it contains: A one-star MIT laboratory ETL library focused on materials-property and fire-science instruments. It converts heterogeneous instrument exports into Apache Parquet while preserving file-level and column-level metadata. The inspected revision has concrete parsers for Bruker FTIR, Deatak cone calorimetry, FAA microscale combustion calorimetry, FOX heat-flow meter, and NETZSCH STA formats, plus CI, docs and parser tests.
+- Why it matters: It is a standards-neutral complement to the Allotrope-based stack. Each parser emits schema-enforced Arrow/Parquet data while retaining instrument-specific metadata, units and source hashes, avoiding dependence on Allotrope ASM content for these workflows. The code's metadata helper stores table/column metadata directly in Arrow schemas, and tests write parsed tables to Parquet. This is useful for materials/safety labs whose instruments fall outside the biotech-heavy parser coverage found earlier.
+- Commercial possibilities: Fixed-fee instrument-data migration/normalization for materials, fire-safety and industrial labs; Parquet-based scientific data lake ingestion; legacy thermal/FTIR/calorimetry archive conversion; or an alternate output backend behind the existing lab-data gateway when customers want open Parquet rather than ASM JSON.
+- Build-time savings: Roughly 1-3 months for the represented instrument parsers, metadata conventions and Parquet/schema plumbing; potentially more for customers with historical archives in exactly these formats.
+- Evidence inspected: Repository metadata (1 star, MIT); exact latest default-branch revision; README.md; recursive source tree; parser modules and sizes; src/labetl/util.py metadata helper via code search; parser uses of set_metadata; tests/test_faa_mcc_parser.py and tests/test_netzsch_sta_parser.py showing Parquet writes; CI/LICENSE files in tree.
+- License / rights: MIT. Instrument file formats, vendor trademarks, and any bundled fixtures should still be reviewed independently if redistributed.
+- Reuse classification: Directly reusable subject to MIT terms; separately confirm rights for any third-party sample/fixture data used outside testing.
+- Scores:
+  - Technical value: High
+  - Commercial value: Medium-High
+  - Rarity: High
+  - Completeness: High for its narrow instrument set
+  - Build-time saved: High
+  - Data advantage: Medium-High
+  - High-ticket potential: High in targeted industrial/materials labs
+- Next action: Add these parsers as a Parquet-oriented branch of the existing instrument-normalization pilot and test whether they cover a buyer segment not well served by the Allotropy/ASM route.
