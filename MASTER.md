@@ -12,6 +12,17 @@ Cross-lane shortlist of the strongest validated discoveries. This is the positiv
 
 ## Current leaders — 2026-09-19
 
+### kodekinetics79/opstrax-enterprise-build
+- Commit: `fec2ba1432d6f8b4ba4c48be3d58e7e096819045`.
+- Rights: No public repository license. On 2026-09-19 the user stated they hold separate permission covering **commercial modification and deployment**. Treat as permissioned direct reuse for the user's projects; do not assume redistribution/sublicensing or third-party rights unless separately granted.
+- Score: **29/30** — A5, B5, C5, D5, E5, F4.
+- Inspected capability: Production-oriented logistics platform with an unusually deep detention/recovery subsystem: one-time consumed geofence Entry/Exit events, job/driver/customer attribution, later-of(appointment, arrival) billable clock, pre-expiry notices, customer-vs-tenant rule cards, fail-closed detention pricing, immutable SHA-linked evidence bundles, AP-style approval, exactly-once detention billing, double-approval prevention and shareable evidence packets; PostgreSQL migrations, .NET services and integration tests exercise the real event→dwell→price→approval path.
+- Buyer/problem: Freight-payment, shipper, broker and carrier teams need physical-truth evidence for detention/accessorial money decisions; invoice text alone cannot prove dwell, notice timing, free-time consumption or billable entitlement.
+- Monetization path: First-class physical-evidence/recovery subsystem inside Freight Audit Acceptance Lab / Freight Recovery; shipper-side unsupported-charge validation plus carrier/broker-side recoverable detention evidence, with recurring assurance and optional success fees on uniquely attributable realized recovery.
+- First paid wedge: Add Opstrax geofence/appointment/detention evidence to one customer-authorized blind freight population and measure how many incumbent detention/accessorial decisions are unsupported, missed or falsely flagged.
+- Why it beats alternatives: Most freight audit repositories compare documents. Opstrax connects real-world movement/appointment events to contract rules, notice state, immutable evidence, approval and exactly-once billing—the hardest part of proving time-based accessorial entitlement.
+- Current strategic role: **#1 overall hunter discovery once permission unlocked.** Pair with Warp Agent MCP for live shipment/invoice/BOL/POD evidence, Open TMS for operational substrate, Qatoto/Kareya for controlling-rate truth/rerating, and the v8+ acceptance/recovery engine for blind comparison and settlement attribution.
+
 ### qx04222/openrental
 - Commit: `013637e77fa9e11ce6aca32fb6218154d7265122`.
 - Rights: Apache-2.0; commercially reusable subject to license/notice obligations.
