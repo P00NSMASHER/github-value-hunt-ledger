@@ -218,3 +218,10 @@ Repositories, ideas, and combinations investigated and rejected or deprioritized
 - Reason rejected: Four-file browser CRUD/quotation demo with no LICENSE, no backend/versioning/provenance/tests and only simple route/weight/category/per-kg semantics. Does not improve Qatoto/Kareya.
 - Evidence: Full small project structure inspected.
 - Revisit trigger: Substantive backend, provenance/versioning, tests and clear rights are added.
+
+### indy-viberr/stowaway — proprietary benchmark; no reuse
+- Repository / source: https://github.com/indy-viberr/stowaway @ `9dc69e05769bd0c33aa59b3e898ec025897797dd`
+- Date: 2026-09-19
+- Reason rejected: The repository contains a useful synthetic freight-audit/fraud benchmark concept, but its license is explicitly proprietary/confidential evaluation-only and prohibits use, copying, reproduction, modification and derivatives without permission. Public GitHub visibility does not create reuse rights.
+- Evidence: Hunter inspection verified the license plus a synthetic 51-invoice corpus, POD images, planted anomalies and answer key. No code or dataset from the repository is being copied into the commercial stack.
+- Revisit trigger: Only if the rights-holder grants a permissive/commercial license. Generic industry problem categories such as duplicate billing, stale fuel-week selection, carrier mismatch, linehaul variance and missing POD may be independently implemented from public domain knowledge in the MIT benchmark suite.
