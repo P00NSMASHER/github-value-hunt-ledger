@@ -300,3 +300,55 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - High-ticket potential: 7.8/10 as parcel expansion
 - Combination opportunities: Freight Recovery assurance core + EasyPost claim/refund state adapter + recovery-attribution ledger; map approved/credited outcomes to realized recovery only after account credit/payment proof.
 - Next action: Keep parcel as phase 2. Build initial LTL/FTL acceptance-test product first; add EasyPost when a customer has an authorized EasyPost shipment population.
+
+
+### aiparallel0/freight-audit — rights-clean freight benchmark + audit-engine donor
+- Repository: https://github.com/aiparallel0/freight-audit
+- Commit / revision: e7869162cf9cb23f6d520a0cd71f87cf973d8c28
+- Date discovered: 2026-09-19
+- What it contains: MIT-licensed, zero-star freight-audit codebase with a tested rate-confirmation + carrier-invoice + POD matching engine, integer-cents money handling, client-configurable rules/vocabulary/layouts, OCR pipeline, synthetic freight-document generator, benchmark scorer, API/review tooling and explicit PII-free sample loads. The five committed scenarios include a clean invoice, linehaul overcharge + duplicate fuel, unauthorized liftgate, billed detention unsupported by POD timestamps, and POD-proven detention that was not billed.
+- Rare / undernoticed value: The benchmark design is unusually honest. Its docs report 100% field/total/line-amount accuracy only on its known synthetic freight layout, but an out-of-distribution CORD-v2 test produced about 40% raw total legibility, 8% generic-layout total extraction and 4% line-amount recall. Rather than hiding this, the repository treats format-specific layout calibration and OCR-provider substitution as required production work. That failure data is more valuable to v7 than a polished demo claiming generic OCR is solved.
+- Likely buyer / user: Internal benchmark/QA team for Freight Recovery v7; freight-audit vendors and shippers validating extraction/matching behavior.
+- Painful problem: A freight-assurance product can have correct rerating logic and still invent dollars if OCR/document extraction silently accepts bad fields. This repo supplies a reproducible way to measure that layer and concrete freight challenge cases with rate-confirmation/invoice/POD truth.
+- Monetization mechanism: Not a standalone business recommendation. Use its benchmark corpus and evaluation patterns to harden the paid Freight Audit Acceptance Test and demonstrate measured extraction/audit reliability before customer pilots.
+- Build-time / data advantage: Likely 1–3 months saved across freight-specific sample generation, image rendering, OCR regression scoring, configurable document layouts, matching rules and review semantics.
+- Evidence inspected: MIT LICENSE; README; docs/BENCHMARKS.md; docs/REPORT.md; synth benchmark/generator/scorer/dataset adapters; test_benchmark.py; sample loads 001–005; matching/reporting architecture. Repository explicitly states samples are synthetic and PII-free.
+- Concrete benchmark cases:
+  - clean rate confirmation + invoice + POD;
+  - linehaul billed above agreement plus duplicate fuel line;
+  - unauthorized accessorial;
+  - detention billed but POD lacks timestamps => block/review rather than assert;
+  - POD shows 4.25h onsite, 2h free time, $80/hr agreed detention but invoice omits detention => candidate recoverable revenue.
+- License / rights: MIT code and committed synthetic sample data under repository license. External CORD-v2 benchmark retains CC-BY-4.0 attribution requirements.
+- Reuse classification: Directly reusable subject to MIT terms; preserve attribution and keep external-dataset licenses separate.
+- Why non-obvious: Zero stars and generic repo name obscure a serious freight-specific benchmark/evaluation system. The strongest contribution is not the SaaS scaffold; it is the falsifiable, cents-based freight document/audit test harness plus explicit evidence that generic OCR performs poorly out of distribution.
+- Scores:
+  - Technical value: 9.2/10
+  - Commercial value: 8.8/10
+  - Rarity: 9.3/10
+  - Completeness: 9.0/10 as benchmark/audit donor
+  - Build-time saved: 8.8/10
+  - Data advantage: 8.5/10 for safe benchmark coverage
+  - High-ticket potential: 8.5/10 as assurance-enabling infrastructure
+- Combination opportunities: Freight Recovery v7 gold-truth harness + Assay confidence gate + Zerox/invoice extraction pipeline + this repo's rendered freight benchmark. Add its five challenge cases to the acceptance-test regression suite, then extend with duplicate invoice, stale/superseded rate, partial settlement, reclass/reweigh, fuel-index date, missing POD and ambiguous accessorial cases.
+- Next action: Import the MIT synthetic sample corpus/benchmark specification into the ChatGPT Freight Recovery benchmark library and adapt the v7 acceptance harness so extraction confidence and audit-rule correctness are measured separately.
+
+### indy-viberr/stowaway — proprietary benchmark concepts only / do not reuse
+- Repository: https://github.com/indy-viberr/stowaway
+- Commit / revision: 9dc69e05769bd0c33aa59b3e898ec025897797dd
+- Date discovered: 2026-09-19
+- What it contains: Synthetic freight audit/fraud demo with 51 invoices, planted anomalies, generated POD scan images and an answer key; its pipeline test asserts exact recovery of the planted answer key.
+- Why it matters: Confirms useful generic benchmark dimensions such as duplicate billing/accessorials, stale fuel-week selection, carrier authority/name mismatch, linehaul variance, missing/unsigned POD and consignee mismatch.
+- Evidence inspected: LICENSE; synthetic-data notice; answer_key.json; generation script; truth/pipeline tests. No dataset/code was copied into our stack.
+- License / rights: Explicit proprietary/confidential evaluation-only license: no use/copy/reproduction/modification/derivatives without permission.
+- Reuse classification: **Do not reuse code or data.** High-level industry problem categories may be independently implemented from public freight-domain knowledge.
+- Why non-obvious: Public GitHub visibility could easily be mistaken for open-source permission; the LICENSE explicitly says otherwise.
+- Scores:
+  - Technical value: 7.5/10 as conceptual reference
+  - Commercial value: 2.0/10 under current rights
+  - Rarity: 8.0/10
+  - Completeness: 7.5/10 conceptually
+  - Build-time saved: 0/10 reusable
+  - Data advantage: 0/10 usable
+  - High-ticket potential: 0/10 as-is
+- Next action: Do not revisit or import unless license/permission changes. Cover equivalent generic cases independently in the MIT v7 benchmark suite.
