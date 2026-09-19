@@ -254,6 +254,27 @@ Cross-lane shortlist of the strongest validated discoveries. This is the positiv
 - Buyer/problem: Broadband operators need a bridge from legacy CWMP to USP without unrelated management stacks.
 - Monetization: Dual-stack migration/conformance lab or managed controller service.
 
+### srthck/trustmesh
+- Commit: `5a93d70b37aafecaf61a5bc0296eaf831e5504ac`.
+- Rights: MIT; external payment-network/scheme policy content remains separately governed and must not be assumed reusable merely because the engine is MIT.
+- Score: **29/30** — A4, B5, C5, D5, E5, F5.
+- Inspected capability: Deterministic evidence-decisioning control plane that decomposes a claim into proof obligations, applies admissibility/authority/independence/temporal/deadline/contradiction gates, emits ACCEPT/REVIEW/CONTEST with versioned traces, preserves blocking evidence and fails safe to REVIEW on exceptions. Its next-best-evidence optimizer filters unavailable, duplicate-source, late or non-impactful evidence actions and re-runs the real adjudicator counterfactually before recommending what evidence to obtain next.
+- Buyer/problem: Recovery/claims/compliance teams frequently know a case is incomplete but cannot consistently prove why, what evidence is legally/operationally independent, or which missing item is most likely to change the decision before a deadline.
+- Monetization path: Evidence-readiness and next-evidence layer inside high-value recovery, claims, ScopeSignal, CaptureBrief and compliance workflows; sell the domain outcome rather than a generic policy engine.
+- First paid wedge: Run a historical recovery/dispute diagnostic and produce a deterministic blocker + next-best-evidence queue, without submitting or altering any live claim.
+- Why it beats alternatives: Rules engines can decide on supplied facts and case systems can hold documents; TrustMesh adds explicit proof obligations, conflict/admissibility gates, immutable replayable decision traces and counterfactual evidence acquisition. It is therefore a reusable assurance primitive rather than another workflow shell.
+
+### aiparallel0/freight-audit
+- Commit: `e7869162cf9cb23f6d520a0cd71f87cf973d8c28`.
+- Rights: MIT for code and committed synthetic/PII-free sample corpus; external CORD-v2 benchmark material remains CC BY 4.0 and requires separate attribution/handling.
+- Score: **28/30** — A4, B4, C5, D5, E5, F5.
+- Promotion rationale: not an independent business leader; uniquely important benchmark/evaluation component in the highest-priority freight-assurance stack.
+- Inspected capability: Freight-specific rate-confirmation + carrier-invoice + POD audit harness using integer-cents money, configurable layouts/rules/vocabulary, OCR, synthetic freight-document generation, benchmark scoring and review tooling. The committed five cases cover clean billing, linehaul overcharge + duplicate fuel, unauthorized liftgate, billed detention without adequate POD evidence, and POD-supported earned detention omitted from billing.
+- Buyer/problem: An audit engine can have correct rerating logic and still manufacture recovery dollars if document extraction silently fails. The repository supplies falsifiable freight-specific extraction and rule fixtures rather than generic OCR demonstrations.
+- Monetization path: QA/gold-truth infrastructure for the paid Freight Audit Acceptance Test and incumbent-auditor bake-off; use measured error/abstention rates to define which fields can drive automated dollars.
+- First paid wedge: Run the synthetic corpus plus a customer-authorized blind invoice/rate/POD sample and report extraction accuracy separately from audit-rule accuracy and incumbent missed dollars.
+- Why it beats alternatives: Its docs expose poor out-of-distribution OCR performance instead of hiding it, forcing format-specific calibration and review. That negative evidence is strategically more useful than another polished demo claiming document extraction is solved.
+
 ## Demoted from MASTER this run
 - `Fajendagba/Construction-Change-Order-Engine@60f5ab99bfb97647039e6cec280c246a10f8a856`: valuable clean-room state/budget reference but no license and now materially surpassed by rights-clean OpenTakeoff + BIMChange-Agent for ScopeSignal's implemented evidence layers. Keep only as inspect/reference in COMBINATIONS/REJECTED.
 - `D-ivy/renewables_indexes@fe31ab507987a38cc9c042cd745d89546b6f25c0`: useful clean-room renewable/BESS screening methodology, but no license plus incomplete visible reproducibility no longer meets the elite positive-training-set bar. Revisit only on clear rights or a reproducible licensed successor.
