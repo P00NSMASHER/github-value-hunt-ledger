@@ -72,3 +72,24 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 10/10
   - High-ticket potential: 8/10
 - Next action: Run a controlled sample across 10 hospitals and approximately 20 high-volume CPT/HCPCS codes to quantify how much historical price depth is actually present, how consistently changes can be reconstructed, and which failure modes remain; use that evidence to define a paid competitive-intelligence pilot.
+
+### sputhenofficial/claimjumper
+- Repository: https://github.com/sputhenofficial/claimjumper
+- Commit / revision: `c45b0080ab68b8e04f0e5d61302d31f1714519ec`
+- Date discovered: 2026-09-19
+- What it contains: One-star MIT Next.js/TypeScript vertical slice for medical-denial triage. It ingests a PNG EOB/remittance into a strict structured schema, routes denied service lines into appeal/corrected-claim/patient-bill/write-off/human-review lanes, applies code-enforced safety invariants after model triage, deterministically computes deadline/urgency/priority ordering, produces cited appeal or corrected-claim work artifacts, requires human approval before export, and never performs payer-facing submission. The inspected tree includes substantial pipeline/UI/API code plus broad Vitest coverage for ingest, invariants, prioritization, drafting, route composition, queue behavior, and export filtering.
+- Why it matters: This is unusually complete low-attention workflow infrastructure for converting raw denials into a prioritized, reviewable revenue-recovery queue rather than another static RCM dashboard. The strongest reusable design is the separation of probabilistic extraction/triage from deterministic safety controls: contractual-obligation adjustments are prevented from becoming patient-bill recommendations, risky CARC 197 write-offs and low-confidence decisions are forced to human review, and draft failures do not drop the underlying work item. That architecture maps well to a high-value denial-recovery product where errors can create financial/compliance harm.
+- Commercial possibilities: Build a `Denial Recovery Work Queue` for smaller RCM vendors, specialty groups, multi-site practices, or outsourced billing teams: import remittance/EOB data, rank unresolved denial dollars by evidence and urgency, assemble cited appeal/correction packets, and track human-approved outcomes. A paid historical-denial scan or per-location SaaS pilot is more defensible initially than autonomous claims action. Contingency/shared-savings pricing could be explored only against client-verified realized recovery, not the model's `recovery_probability` score.
+- Build-time savings: Estimated 4-8 weeks for the denial schema, human-review UX, pipeline seams, cited drafting/export flow, deterministic safety layer, prioritization framework, and regression-test substrate. Production work remains substantial: ERA/835 or billing-system ingestion, persistence/multitenancy, authentication/RBAC, audit logging, HIPAA/security controls, payer-specific rules, outcome calibration, and enterprise integrations.
+- Evidence inspected: Repository metadata; exact commit/tree; root MIT `LICENSE`; README limitations and architecture; `package.json`; `lib/pipeline/invariants.ts`; `lib/pipeline/prioritize.ts`; `tests/invariants.test.ts`; `tests/prioritize.test.ts`; `tests/triage-draft-route.test.ts`; test-directory inventory. The bundled sample is explicitly described as demo/synthetic data; no real patient data or credentials were inspected.
+- License / rights: MIT. Direct code reuse is permitted subject to preservation of the copyright/license notice. Healthcare code reuse does not validate medical-billing, payer, HIPAA, or deadline rules; those must be independently verified before customer use.
+- Reuse classification: Directly reusable
+- Scores:
+  - Technical value: 8/10
+  - Commercial value: 9/10
+  - Rarity: 8/10
+  - Completeness: 7/10
+  - Build-time saved: 8/10
+  - Data advantage: 3/10
+  - High-ticket potential: 9/10
+- Next action: Replace the demo PNG-only intake with a synthetic ERA/835 fixture and an independently verified payer/rule table, then benchmark routing precision, evidence completeness, deadline correctness, and recovered-dollar prioritization against labeled historical denial cases. Treat the current hard-coded 5-day receipt presumption + 120-day deadline and model-generated recovery probabilities as uncalibrated until validated for the specific payer/workflow.
