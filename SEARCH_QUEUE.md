@@ -21,13 +21,15 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Metrics: extraction field accuracy; Assay auto-accept coverage/false accepts/reviewer touches; finding precision; false-positive dollars; dollar-weighted recall; clean-invoice accuracy; proof-readiness; abstention; unique incumbent-missed dollars; realized incremental recovery.
 - Done when: every asserted dollar reconstructs to exact source/revision/clause and later settlement evidence; any unresolved extraction, entitlement, identity, contradiction or allocation ambiguity = **$0 asserted recovery**.
 
-## P0 — ScopeSignal v2: entitlement-to-dollar after 2D registration is solved enough
+## P0 — ScopeSignal v3: downstream entitlement after consensus revision/BCF transport
 - Best hunters: 04, 17, 38, 42, 45.
-- Known stack: `MassingCloud/massing-pdf` for 2D registration/changed regions/markup migration + OpenTakeoff quantities + BIMChange-Agent IFC evidence.
-- **Stop generic PDF-diff, takeoff and IFC-diff searches.** Search only the commercial-evidence layer: drawing/spec/RFI/submittal linkage, subcontract scope/exclusion, notice timing, field directive/PCO/change-event lineage and cost/schedule entitlement.
-- Concrete queries/signatures: `RFI drawing revision change event cost code`, `subcontract scope exclusion change order notice`, `PCO RFI submittal linkage`, `construction change entitlement evidence workflow`, `drawing revision quantity delta contract clause`.
-- Validation: 20 rights-clean revision pairs with translation/scale/reorder/crop/moved-only annotations, then one customer-authorized revision through exact quantity + exact clause/evidence + reviewer decision.
-- Done when: revision registration error is separately measured from quantity error and entitlement error; no visual change alone becomes compensable.
+- Known stack: Massing PDF primary 2D registration + Apache-2.0 `joedanields/CaD-Track` as an independent vector/raster correspondence comparator + OpenTakeoff quantities + BIMChange-Agent IFC evidence + MPL-2.0 `@ifc-lite/bcf` for BCF 2.1/3.0 issue/viewpoint interchange.
+- **Stop generic PDF-diff, CAD-diff, takeoff, IFC-diff and BCF searches.** The unresolved commercial layer is drawing/spec/RFI/submittal linkage, subcontract scope/exclusions, notice timing, field directive/PCO/change-event lineage and cost/schedule entitlement.
+- Concrete queries/signatures: `RFI drawing revision change event cost code`, `subcontract scope exclusion change order notice`, `PCO RFI submittal linkage`, `construction change entitlement evidence workflow`, `drawing revision quantity delta contract clause`, `construction notice deadline change event entitlement`.
+- Detector benchmark: 20 rights-clean vector/raster revision pairs spanning translation, rescale/DPI, reorder, crop, moved-only annotations and extraction-density imbalance. Measure Massing and CaD-Track separately plus disagreement/consensus; disagreement routes to review.
+- BCF benchmark: round-trip one known changed IFC GlobalId through BCF 3.0 and at least one independent viewer while retaining viewpoint, source finding ID and review status.
+- Commercial validation: one customer-authorized finding through exact quantity + controlling clause/spec/RFI/submittal/notice evidence + reviewer compensability decision.
+- Done when: registration/correspondence error is separately measured from quantity error and entitlement error; a visual/model change or BCF issue **never** becomes compensable by itself.
 
 ## P0 — Recovery proof: vendor-neutral restore evidence rather than more backup tools
 - Best hunters: 14, 15, 40, 42, 47.
@@ -122,7 +124,7 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 
 ## Resolved / deprioritized directions
 - Generic freight TMS, generic rating engines, OCR, X12, subset-sum/reconciliation, entity resolution and generic XLS importers: sufficiently covered.
-- Generic PDF drawing diff, construction takeoff and IFC diff: covered by massing-pdf + OpenTakeoff + BIMChange-Agent.
+- Generic PDF/CAD drawing diff, construction takeoff, IFC diff and BCF interchange: covered enough by Massing PDF + CaD-Track + OpenTakeoff + BIMChange-Agent + IFC-lite BCF; prove downstream entitlement instead.
 - Generic SAM/regulatory wrappers: covered enough; prove packet correctness/currentness.
 - Generic backup managers, compliance collectors and action-governance frameworks: covered enough; prove restore/evidence/remediation truth.
 - Generic industrial protocol libraries and generic NETCONF/gNMI implementations: covered enough; build external compatibility matrices.
