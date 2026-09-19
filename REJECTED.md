@@ -97,3 +97,17 @@ Repositories, ideas, and combinations investigated and rejected or deprioritized
 - Reason rejected: Useful legacy job-shop workflow reference, but no license was detected, the desktop/Tkinter implementation is old, and its FIFO/LIFO/SPT/LPT scheduling heuristics are not differentiated enough to justify active product search when modern permissive optimization stacks exist.
 - Evidence: Hunter 45 inspected the terminal revision, launch path and documented orders/machines/Gantt/heuristic workflows.
 - Revisit trigger: Revisit only for clean-room UX/domain discovery after a real small-manufacturer scheduling buyer is identified; do not reuse source absent permission.
+
+### Jinotaer/Multi-Tenant-Laundry-Shop-Management-System as direct code foundation
+- Repository / source: https://github.com/Jinotaer/Multi-Tenant-Laundry-Shop-Management-System
+- Date: 2026-09-19
+- Reason rejected: Despite a broad multi-tenant laundry SaaS implementation, the README explicitly labels the application proprietary and “All rights reserved.” The fact that Laravel is MIT does not grant reuse rights to the application source. Its likely ACV is also lower than the current top opportunities.
+- Evidence: Hunter 01 inspected the repository metadata, exact revision and README covering tenant isolation, roles, orders, payments, invoices, subscriptions, analytics and the explicit proprietary-software notice.
+- Revisit trigger: Only if the rights-holder grants a commercial/open-source license or a materially higher-value B2B linen/route-service wedge is validated independently; otherwise use only non-copyrightable clean-room workflow ideas.
+
+### taskfleetai/fieldfleet as a competing hosted SaaS foundation
+- Repository / source: https://github.com/taskfleetai/fieldfleet
+- Date: 2026-09-19
+- Reason rejected: Technically exceptional construction/restoration field-operations breadth, but the project is under Elastic License 2.0 and explicitly prohibits offering FieldFleet itself to third parties as a hosted or managed service without a commercial agreement. It is therefore unsuitable as the code base for a competing proprietary SaaS under the current hunt assumptions.
+- Evidence: Hunter 02 inspected the exact revision and README feature/deployment/license matrix, including the hosted/managed-service restriction.
+- Revisit trigger: A separate commercial license is obtained, or only independently reimplemented workflow requirements are needed for a lawful clean-room product.
