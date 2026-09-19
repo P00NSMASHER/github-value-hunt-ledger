@@ -92,3 +92,45 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 8/10
   - High-ticket potential: 10/10
 - Next action: Do not copy code. Translate only the product lessons into CaptureBrief requirements: evidence-backed decision rooms, conservative P-win ranges, SAM/SOW citation maps, async proposal jobs, consultant/client tenancy, and explicit production-auth boundaries; pair those independently implemented ideas with permissively licensed ingestion such as AwardLens/MindPetal.
+
+### GovCon-One/govconone
+- Repository: https://github.com/GovCon-One/govconone
+- Commit / revision: f698f4eca3055715848315bb13ee94cf8cdea527
+- Date discovered: 2026-09-19
+- What it contains: A zero-star but unusually complete MIT-licensed federal capture SaaS substrate: live SAM.gov API and bulk-CSV ingestion, scheduled synchronization, D1/R2/Vectorize data and search, auth and organization tenancy, billing and BYOK support, saved solicitations, solicitation hydration with bounded attachment processing, structured package extraction for requirements/key dates/deliverables/evaluation criteria/reps-and-certs/submission instructions, deterministic and AI bid/no-bid analysis with evidence guardrails, compliance-first proposal starters and matrices, document embeddings, proposal editing/export infrastructure, migrations, deployment scripts, and tests.
+- Why it matters: This is the strongest directly reusable product-layer accelerator found in this lane so far. Unlike the unlicensed PursuitDesk blueprint, GovCon ONE exposes a permissively licensed implementation of much of the CaptureBrief workflow after raw opportunity retrieval. Its solicitation hydration path treats source documents as untrusted data, validates extracted structures, falls back deterministically, persists source documents, and turns solicitation text into traceable requirements and proposal context instead of a generic summary.
+- Commercial possibilities: Reuse or selectively graft the hydration, package-extraction, tenancy, BYOK, proposal-editor, billing, and compliance-matrix pieces into CaptureBrief; pair them with AwardLens for historical award/incumbent intelligence and a pricing layer for a premium pursuit decision room sold to small/midsize federal contractors and fractional GovCon consultants.
+- Build-time savings: Very High — estimated 3-6 months of SaaS product, solicitation-ingestion/hydration, compliance extraction, auth/tenancy, billing, proposal workflow, and Cloudflare deployment work.
+- Evidence inspected: Repository metadata and exact `prod` commit; root contents; actual MIT `LICENSE`; `package.json` with build/typecheck/test/deploy and D1 migration scripts; `src/domain.ts` deterministic BID/REVIEW/NO_BID scorer, evidence/citation rules, safe JSON normalization, and deadline/clearance risk handling; `tests/domain.test.ts`; `src/ai.ts` provider/BYOK support, embeddings, deterministic proposal fallback and evidence-backed proposal prompt; `src/hydrate.ts` Zod package schema, bounded document hydration, deterministic `shall/must` and evaluation extraction, reps-and-certs gates, injection-resistant extraction prompt, source-document storage and chunk embeddings; `src/sam.ts` search evidence; `tests/security.test.ts` search evidence; migration list through tenancy, hydration, org documents/matching, billing, saved solicitations, proposal editor, and security.
+- License / rights: MIT license verified in the repository at the inspected revision. SAM.gov and any external model/API services retain their own terms. Example/development configuration values are not production credentials and were not collected.
+- Reuse classification: Directly reusable subject to MIT terms and upstream service/data terms.
+- Scores:
+  - Technical value: 10/10
+  - Commercial value: 10/10
+  - Rarity: 10/10
+  - Completeness: 9/10
+  - Build-time saved: 10/10
+  - Data advantage: 8/10
+  - High-ticket potential: 10/10
+- Next action: Run a narrow CaptureBrief spike using the solicitation hydration/package-extraction and proposal-editor path first, pair it with AwardLens historical evidence, and test the deterministic extraction/compliance matrix against a small current sample of public SAM solicitations before adopting its AI layer wholesale.
+
+### mgifford/federal-contracting-skills
+- Repository: https://github.com/mgifford/federal-contracting-skills
+- Commit / revision: b40e99728bf35f05c42f9c5d7c6d47158630b246
+- Date discovered: 2026-09-19
+- What it contains: A dense MIT-licensed acquisition-domain toolkit covering USASpending, GSA CALC+ ceiling rates, BLS OEWS wages, GSA Per Diem, SAM.gov, eCFR, Federal Register, and Regulations.gov, plus orchestration workflows for SOW/PWS creation, FFP/LH-T&M/cost-reimbursement IGCEs, FAR Part 10 market research, Other Transaction cost analysis, and federal grant budgets. The detailed skills include calculation formulas, API paths, known data-quality pitfalls, scope rules, confidence/boundary guidance, and document-production workflows rather than only high-level prompts.
+- Why it matters: It supplies much of the missing “Pursuit Economics” domain layer between CaptureBrief's opportunity qualification and an actual price/capture decision. The FFP workflow ages lagged BLS wages, builds fringe/overhead/G&A/profit layers, benchmarks against CALC+ percentiles, and prices travel; the market-research workflow handles agency-vs-government-wide scopes, top-award sample bias, vendor concentration limits, UEI duplication, negative obligations, and comparable-award pulls. Those details are expensive to rediscover correctly.
+- Commercial possibilities: Add premium CaptureBrief modules for should-cost and pricing-rationale reports, rate validation, comparable-award and vendor-market analysis, capture-budget scenarios, and evidence-backed price-to-win context. The fastest wedge is an assisted per-pursuit pricing/economics report rather than another opportunity-search subscription.
+- Build-time savings: High — estimated 2-4 months of federal pricing, market-research, API-recipe, and acquisition-domain research, even before productizing the workflows.
+- Evidence inspected: Repository metadata and exact main commit/tree; actual MIT `LICENSE`; recursive tree containing the API/reference and orchestration skill library; `README.md` architecture/capability map and explicit AI-boundary positioning; `skills/igce-builder-ffp/SKILL.md` with SOW/PWS decomposition, BLS aging, layered wrap-rate formulas, low/mid/high scenarios, CALC+ JSON paths and percentile checks, travel math, and FAR references; `skills/market-research-builder/SKILL.md` with USASpending filter construction, NAICS/PSC validation, government-wide vs agency scoping, count endpoints, prior-award sampling caveats, vendor landscape/concentration logic, negative-obligation handling, and UEI deduplication cautions.
+- License / rights: MIT license verified in the repository at the inspected revision. Federal APIs/data and third-party services retain their own terms and freshness constraints. Example burden factors and scenario defaults are workflow defaults, not universal contractor economics and should not be hard-coded as customer truth.
+- Reuse classification: Directly reusable subject to MIT terms and upstream-source terms.
+- Scores:
+  - Technical value: 8/10
+  - Commercial value: 10/10
+  - Rarity: 9/10
+  - Completeness: 9/10 for acquisition-domain workflow coverage
+  - Build-time saved: 9/10
+  - Data advantage: 9/10
+  - High-ticket potential: 10/10
+- Next action: Build a CaptureBrief “Pursuit Economics” report that combines AwardLens historical awards/incumbents with these pricing and market-research workflows; make burden assumptions customer-configurable, live-validate current CALC+/BLS response fields, and present benchmarks as evidence/ranges rather than a guaranteed price-to-win.
