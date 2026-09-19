@@ -295,6 +295,77 @@ Cross-lane shortlist of the strongest validated discoveries. This is the positiv
 - First paid wedge: Feed a small set of synthetic failed controls into approved remediation playbooks; harmless action can auto-run, production/destructive action requires human approval, unapproved action blocks, and a subsequent re-test must produce fresh evidence.
 - Why it beats alternatives: Evidence collectors prove a state and generic workflow tools can execute actions; CAGE links deterministic authorization, human gating and evidence export into the missing operational loop while preserving error/unknown semantics.
 
+### BestKylin2001/Freight-Rate-Sheet-Generator
+- Commit: `78f3b86a2a4a25d9abf11d4addc2feea10667352`.
+- Rights: MIT for repository code; carrier/customer rate sheets remain separately authorized commercial data.
+- Score: **24/30** — A4, B4, C4, D4, E3, F5.
+- Promotion rationale: promoted at the normal threshold because it is the first permissive implementation found that directly closes the highest-priority freight stack's messy-XLS tariff-ingestion gap; production hardening is still required.
+- Inspected capability: OpenPyXL/Pandas pipeline that discovers header rows, normalizes heterogeneous carrier/port/destination labels, handles aliases, Excel serial/string dates and formula value reads, and emits canonical ocean-rate records with POL, carrier, destination, effective/expiry dates and container-price fields.
+- Buyer/problem: Freight audit/payment teams cannot deterministically rerate customer shipments until messy rate workbooks become reviewed, effective-dated tariff facts.
+- Monetization path: Rate-sheet digitization/onboarding bundled into the freight-recovery service; the importer feeds Assay/FactGate-style review, Qatoto versioning and Kareya rerating.
+- First paid wedge: Normalize one customer-authorized historical XLS rate-card set, preserve cell-level provenance and rerate a frozen invoice population.
+- Why it beats alternatives: Generic OCR/table parsers do not encode spreadsheet-specific alias/date/formula behavior, while the deeper carrier-specific references found this run have no reuse license. This one is lawful, narrow and immediately stack-compatible.
+
+### MassingCloud/massing-pdf
+- Commit: `36794b3c54fcfd62e3a0d2d5984cfc45cac83340`.
+- Rights: MIT; PDF/OCR/browser dependencies and customer drawings remain separately governed.
+- Score: **29/30** — A4, B5, C5, D5, E5, F5.
+- Inspected capability: Browser-side construction drawing review engine with calibrated takeoff, structured markups and a revision-comparison core that performs coarse-to-fine old/new sheet registration, optional scale correction, changed-region scoring and transform-aware markup migration; E2E tests cover translation recovery, unchanged/changed sheets, severity ordering and migration verdicts.
+- Buyer/problem: GCs and specialty contractors lose expensive review time and change-order evidence when sheet drift, scale changes and stale markups are mistaken for true scope changes.
+- Monetization path: ScopeSignal's 2D revision-evidence core; sell a fixed-price revision audit first, then quantity/entitlement/change-order workflow per project.
+- First paid wedge: One issued old/new drawing pair → aligned revision clouds + migrated-markup review queue, with analyst time and false-positive rate measured before attaching dollars.
+- Why it beats alternatives: It directly attacks revision registration and markup carry-forward—the missing step between raw PDF diff and defensible commercial scope change—and is materially stronger than simple OCR/pixel-diff baselines.
+
+### cybertec-postgresql/pg_hardstorage
+- Commit: `b47541b7e1cea69ce6ec63b26e154eb25fc4ca91`.
+- Rights: Apache-2.0; PostgreSQL/storage/KMS/container dependencies and customer backups remain separately governed.
+- Score: **29/30** — A4, B5, C5, D5, E5, F5.
+- Inspected capability: PostgreSQL 15–18 backup/PITR system with a dedicated verifier that restores a candidate into a disposable sandbox, boots PostgreSQL, runs `pg_verifybackup` and `pg_amcheck --all`, and records a signed pass/fail verdict into manifest/audit evidence; Docker is implemented and a Firecracker backend exists behind a build tag.
+- Buyer/problem: SaaS/MSPs/regulated teams may have green backup jobs yet still lack independent evidence that a chosen recovery point boots and passes database-integrity checks.
+- Monetization path: Managed recurring recovery-proof service layered into the compliance/resilience stack.
+- First paid wedge: Restore one recent backup/PITR target in isolation and deliver artifact identity, recovery target/duration, official integrity checks, application checks and signed verdict.
+- Why it beats alternatives: Generic backup monitors prove job completion; pg_hardstorage binds actual PITR execution, corruption checks and signed evidence in one rights-clean path.
+
+### tonytonycoder11/stripe-connect-reckon
+- Commit: `deb30aabfed84c7b0b2e5ae28c92cc9f85f79193`.
+- Rights: MIT; Stripe API/service terms and customer authorization remain separate.
+- Score: **29/30** — A5, B5, C4, D5, E5, F5.
+- Inspected capability: Read-only Stripe Connect marketplace financial-controls engine that reconciles connected-account balances, payouts, refunds, disputes, events and platform/app state; detects failed payouts, unreconciled refunds, event gaps, negative-balance/reserve/dispute exposure and adds forecasting, alerts, reports, history and monitoring integrations. Direct source inspection confirmed the Stripe adapter performs list/retrieve reads rather than transactional writes.
+- Buyer/problem: Marketplace CFO/controller/finance-ops teams can lose cash or spend days on manual reconciliation when payout/refund/event state drifts across Stripe and the application ledger.
+- Monetization path: Fixed-price Marketplace Money Safety Audit followed by recurring read-only financial-controls monitoring priced by connected-account, transaction or GMV tier.
+- First paid wedge: Connect read-only authorized Stripe/app-state sources, quantify unresolved money-state exposure and deliver a reconciled exception report without touching payouts.
+- Why it beats alternatives: It is an independent assurance plane that can prove value without replacing the buyer's payment stack or joining the money-moving write path, sharply reducing pilot friction.
+
+### suoten/ProtoForge
+- Commit: `7c61b10d9ae406224c86741d9c0a450b561b40ca`.
+- Rights: MIT for repository code; industrial protocol standards, optional libraries, vendor marks/patents and customer traces remain separate.
+- Score: **29/30** — A5, B5, C5, D5, E5, F4.
+- Inspected capability: Multi-protocol industrial simulation/testing platform with virtual-device templates, fault injection, recording/replay, test plans/reports, metrics, RBAC, persistence and deployment tooling. Deep inspection confirmed a substantive IEC 60870-5-104 state machine—APCI I/S/U frames, STARTDT/STOPDT/TESTFR, ASDU monitor/control types, select-before-operate, general interrogation, clock sync, sequence windows/timers—and current Modbus socket/edge-case tests.
+- Buyer/problem: Industrial gateway/SCADA/OEM integration teams need repeatable pre-cutover validation without monopolizing scarce PLC/RTU hardware or discovering protocol failures in production.
+- Monetization path: Fixed-price gateway regression/interoperability pack followed by managed protocol-lab subscriptions or integration support.
+- First paid wedge: Model 3–10 authorized device types, exercise normal + disconnect/timeout/write/fault cases and deliver a reproducible compatibility/evidence matrix.
+- Why it beats alternatives: It packages simulator breadth, fault/replay and reporting into a rights-clean acceptance-lab substrate rather than another single-protocol library; protocol-by-protocol external validation remains mandatory.
+
+### clicon/clixon-controller
+- Commit: `36ecc0fd8787750978652495a39d0d01db2c7474`.
+- Rights: Apache-2.0; vendor/customer YANG models and extensions remain separate rights surfaces.
+- Score: **28/30** — A4, B5, C5, D4, E5, F5.
+- Inspected capability: Active NETCONF/YANG multi-device controller with device lifecycle, candidate/running-style state, validation/commit transactions, locking, templates/groups, device profiles and Python service APIs. Extensive tests cover dead connections, timeouts, lock/commit failures, rollback/revert, NACM, services and transaction progress.
+- Buyer/problem: Telecom/network automation teams need to prove multi-device change semantics before controller/NMS migrations touch production routers.
+- Monetization path: Controller migration acceptance service using synthetic and independent NETCONF/YANG endpoints rather than selling raw protocol plumbing.
+- First paid wedge: Replay one OpenConfig service/config workflow across controlled endpoints and report validate/lock/commit/rollback/disconnect/timeout behavior before cutover.
+- Why it beats alternatives: The difficult reusable asset is transaction coordination and failure semantics across devices; paired with notconf/Netopeer2/gnmic it becomes a high-value evidence lab rather than a standalone controller demo.
+
+### novonordisk-research/OptiHPLCHandler
+- Commit: `96399dcddc1457a5b942f61585b9e8fcf78b9a72`.
+- Rights: BSD-3-Clause for repository code; Waters Empower/API/customer installation rights remain separate prerequisites.
+- Score: **29/30** — A4, B5, C5, D5, E5, F5.
+- Inspected capability: Actively maintained Python SDK for Waters Empower Web API that authenticates, reads/modifies instrument methods, enumerates projects/nodes/systems/plates, constructs sample-set methods, posts methods with audit-trail messages and issues runs; source, tests, CI and executable analytical-development notebooks cover robustness, stability, linearity and multi-vial workflows.
+- Buyer/problem: Pharma/biotech analytical-development and QC labs already own powerful CDS infrastructure but still spend expert time manually constructing method variants/sample sets and bespoke integrations.
+- Monetization path: Fixed-price 'automate one assay/stability/robustness workflow in your existing Empower estate' implementation, followed by validated workflow packs/support.
+- First paid wedge: Use a mock/synthetic Empower workflow to define prerequisites, then automate one customer-authorized assay workflow while preserving Empower as the system of record and measuring manual touches removed.
+- Why it beats alternatives: It compresses specialized vendor-CDS integration and embeds real analytical-development workflow knowledge without trying to replace the customer's validated chromatography system.
+
 ## Demoted from MASTER this run
 - `Fajendagba/Construction-Change-Order-Engine@60f5ab99bfb97647039e6cec280c246a10f8a856`: valuable clean-room state/budget reference but no license and now materially surpassed by rights-clean OpenTakeoff + BIMChange-Agent for ScopeSignal's implemented evidence layers. Keep only as inspect/reference in COMBINATIONS/REJECTED.
 - `D-ivy/renewables_indexes@fe31ab507987a38cc9c042cd745d89546b6f25c0`: useful clean-room renewable/BESS screening methodology, but no license plus incomplete visible reproducibility no longer meets the elite positive-training-set bar. Revisit only on clear rights or a reproducible licensed successor.
