@@ -480,3 +480,54 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - High-ticket potential: 8.7/10 as credibility/QA layer
 - Combination opportunities: Real adjudicated cases + MIT synthetic semantic cases + Cointab arithmetic benchmark + rate-con OCR gate + customer-specific blind gold truth. This gives v7 four distinct QA layers: extraction, arithmetic/rating, freight semantics, and real-world adjudicated reasoning.
 - Next action: Continue adding modern public audit cases when transaction-level facts are sufficiently specific, but keep them distinct from current customer data and current commercial rate authority.
+
+
+### august-andersen/tabular-reconciliation-eval — MIT freight rounding/scope benchmark
+- Repository: https://github.com/august-andersen/tabular-reconciliation-eval
+- Commit / revision: 3ed898457f71839d207880996cefad8b50e1300a
+- Date discovered: 2026-09-19
+- What it contains: MIT evaluation suite for exception-blindness in tabular reconciliation. Its T3 logistics carrier-settlement task reconciles ~500 carrier invoice lines against shipment manifests, computes per-shipment fuel, individually rounds accessorials using a declared rounding method, and applies a $0.02 dispute tolerance. Source/test inspection shows a frontier model repeatedly failed 16/17 checks because it summed raw fuel first and rounded only at invoice scope rather than rounding each shipment first.
+- Rare / undernoticed value: This is a high-leverage freight-specific QA case where an auditor can be nearly perfect yet still make a deterministic pennies-level error that flips a payment/dispute decision. The benchmark explicitly models rounding method and rounding scope as business rules, not generic formatting.
+- Likely buyer / user: Freight Recovery v8 internal QA, FAP implementation/acceptance testing, finance/AP systems that aggregate shipment-level charges.
+- Painful problem: Global rounding assumptions can create systematic false disputes or missed variances across high invoice volume; invoice-level totals can look plausible while violating the controlling calculation scope.
+- Monetization mechanism: Strengthens the paid Acceptance Test by detecting subtle implementation/configuration errors in incumbent/challenger systems and preventing false-positive dispute labor.
+- Build-time / data advantage: Saves weeks of designing/verifying a realistic carrier-settlement edge-case corpus and supplies a proven failure mechanism.
+- Evidence inspected: MIT metadata; README T3 design/results; T3 instruction.md; deterministic build_inputs.py; verifier test_outputs.py. The original generated task data need not be copied to reproduce the generic rounding invariant.
+- License / rights: MIT.
+- Reuse classification: Directly reusable subject to MIT; v8 independently implemented its own smaller rounding-scope regression fixture.
+- Why non-obvious: One GitHub star and framed as a general data-science eval, but the freight task directly exposes a production-relevant settlement failure.
+- Scores:
+  - Technical value: 9.2/10
+  - Commercial value: 8.9/10
+  - Rarity: 9.2/10
+  - Completeness: 9.0/10 as a rounding/scope benchmark
+  - Build-time saved: 8.5/10
+  - Data advantage: 8.0/10
+  - High-ticket potential: 8.8/10 as assurance infrastructure
+- Combination opportunities: Add contract-defined rounding_method + rounding_scope to rate_rule/rating_component; score exact cents and dispute-threshold classification in the challenge tier. Pair with RulesEngine and the blind FAP bake-off so a challenger cannot pass by matching dollars approximately.
+- Next action: Keep the independently authored v8 regression where per-shipment banker's rounding settles the invoice but aggregate rounding creates a false $0.04 dispute; extend to accessorial-specific and minimum/rate-break boundary rounding.
+
+### NexusFeed/nexusfeed-mcp — optional verifiable LTL fuel-data adapter
+- Repository: https://github.com/NexusFeed/nexusfeed-mcp
+- Commit / revision: 5fe18953bd4e9e5b68b9ff4f46b0462800f5e13c
+- Date discovered: 2026-09-19
+- What it contains: MIT Python MCP client for a commercial NexusFeed backend. The LTL client exposes normalized carrier fuel-surcharge data and carrier metadata, with response verifiability fields such as source timestamp, extraction confidence, source evidence URL, extraction method and freshness TTL. README claims current/history coverage across major LTL carriers; inspected client code currently calls commercial /v1/ltl/fuel-surcharge and /v1/ltl/carriers endpoints. Accessorial endpoint exists in the client but is explicitly marked COMING SOON.
+- Rare / undernoticed value: A low-star ready-made adapter pattern for pulling volatile carrier fuel data with source/freshness/confidence metadata rather than treating a scraped percentage as timeless truth.
+- Likely buyer / user: Optional v8 external-truth connector for customers whose contracts explicitly reference carrier-published fuel tables.
+- Painful problem: Carrier fuel pages are often dynamic and version-sensitive; stale or low-confidence data can create incorrect dispute claims.
+- Monetization mechanism: Reduces integration/maintenance burden for fuel validation inside continuous shadow assurance; not itself the commercial wedge.
+- Build-time / data advantage: Potentially weeks of carrier-page extraction/normalization maintenance if the commercial service is licensed.
+- Evidence inspected: MIT repo metadata; README; mcp_server/tools/ltl.py; freight_audit_workflow prompt. No API key or paid data was accessed.
+- License / rights: Client wrapper is MIT. NexusFeed backend/data service is explicitly commercial and governed separately; requires API access/terms. The client license does not grant data-service rights.
+- Reuse classification: Client reusable under MIT; backend/data only under commercial authorization. Treat its published carrier data as corroborating evidence, not customer contract entitlement.
+- Why non-obvious: One-star repo with a narrow MCP wrapper, but the verifiability envelope is useful for v8 source provenance. Limitation: accessorial service is not implemented yet in inspected client.
+- Scores:
+  - Technical value: 7.8/10
+  - Commercial value: 7.5/10
+  - Rarity: 8.2/10
+  - Completeness: 6.5/10
+  - Build-time saved: 7.5/10
+  - Data advantage: 7.5/10 if commercially licensed
+  - High-ticket potential: 6.5/10 as supporting infrastructure
+- Combination opportunities: Optional adapter into the external-truth layer: raw source URL + timestamp + confidence + freshness → tariff-authority gate → customer contract formula. Never use carrier-published fuel data without proving customer incorporation/effective date.
+- Next action: Keep optional, not core. Prefer direct carrier/EIA sources for benchmark/reference and use NexusFeed only if a customer pilot justifies commercial API cost.
