@@ -126,3 +126,10 @@ Cross-lane shortlist of the strongest validated discoveries.
 - Inspected capability: Full TR-069/CWMP ACS with session/provisioning decisions, Get/Set parameter flows, downloads/firmware, reboot/factory-reset/transfer-complete paths, authentication modes, deployment assets and substantial integration fixtures/tests.
 - Buyer/problem: Regional ISPs/WISPs and CPE vendors still carry legacy CWMP fleets that are operationally costly to provision, test and migrate.
 - Monetization path: Managed ACS modernization, regression lab or TR-069-to-newer-management migration service. Technically strong and rights-clean; current buyer urgency and market size need explicit validation before outranking freight/GovCon/construction opportunities.
+
+### Tamil-Venthan/Rekvia
+- Commit: `158d199e4f08041e587a70926f2ed22d17511431`.
+- Rights: MIT; verified from the repository LICENSE. Government tax data/rules and taxpayer data remain separate from the software license.
+- Inspected capability: Deterministic Indian GST purchase-register ↔ GSTR-2B reconciliation with configurable aliases/tolerance, GSTIN validation, tax-head checks, occurrence-indexed exact matching that avoids Cartesian duplicate inflation, a GSTIN-scoped fuzzy invoice pass that prevents reusing the same 2B row twice, exception/risk classification, ITC/RCM fields and multi-sheet Excel reporting. The tree also contains sample files and a small pytest suite.
+- Buyer/problem: Indian SMEs, accounting firms and shared-services teams must reconcile books against GSTR-2B to identify missing/mismatched supplier documents and avoid incorrect or missed input-tax-credit treatment. Current GST guidance continues to advise reconciliation, but the Invoice Management System changes the operational workflow around accepted/rejected/pending records, so this revision is not a complete 2026 compliance engine.
+- Monetization path: Fast fixed-price GST reconciliation diagnostic or accountant workstation, followed by recurring exception-management service. Do not market “recovered ITC” or automate filing from this code until current IMS/GSTR-2B rule versions and edge cases are independently validated.
