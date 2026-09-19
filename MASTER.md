@@ -12,6 +12,11 @@ Cross-lane shortlist of the strongest validated discoveries.
 ## Current leaders
 ## Seeded validated findings — 2026-09-19
 
+### qx04222/openrental
+- Commit: 013637e77fa9e11ce6aca32fb6218154d7265122
+- Rights: Apache-2.0; commercially reusable subject to license/notice obligations.
+- Why it is here: One-star but unusually complete equipment-rental ERP with fleet/availability, tiered and contract pricing, deposits treated correctly as liabilities, invoicing/receivables, maintenance, reporting and offline field inspections. A rare permissively licensed vertical system that can collapse months of rental-specific product work and support a hosted or managed offering.
+
 ### DominicFinn/open_tms
 - Commit: 93d8c2b8ff78373ff69bb7ea546743e4703628b1
 - Rights: MIT; directly reusable subject to license terms.
