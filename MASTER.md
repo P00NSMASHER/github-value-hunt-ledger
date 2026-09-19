@@ -275,6 +275,26 @@ Cross-lane shortlist of the strongest validated discoveries. This is the positiv
 - First paid wedge: Run the synthetic corpus plus a customer-authorized blind invoice/rate/POD sample and report extraction accuracy separately from audit-rule accuracy and incumbent missed dollars.
 - Why it beats alternatives: Its docs expose poor out-of-distribution OCR performance instead of hiding it, forcing format-specific calibration and review. That negative evidence is strategically more useful than another polished demo claiming document extraction is solved.
 
+### sandialabs/DREAMS
+- Commit: `3eb6c6089eadf09a4bf99961faac11a76ef30ca0`.
+- Rights: MIT; OpenDSS plus feeder/input datasets and customer models retain their own terms.
+- Score: **29/30** — A4, B5, C5, D5, E5, F5.
+- Inspected capability: Distribution-planning software with substantive OpenDSS-based nodal hosting-capacity and quasi-static time-series analysis, including per-node DER capacity searches, configurable power-flow constraints, parallel evaluation and dedicated hosting-capacity/QSTS tests.
+- Buyer/problem: Utilities, DER/storage developers and interconnection engineers need defensible feeder-level hosting-capacity evidence rather than a coarse capacity map when deciding where a project can connect or which constraint binds.
+- Monetization path: Fixed-price feeder/portfolio hosting-capacity diagnostic followed by recurring interconnection screening and scenario/planning support.
+- First paid wedge: Run one rights-clean synthetic/customer-authorized OpenDSS feeder through nodal hosting-capacity/QSTS analysis and deliver constraint-by-constraint capacity thresholds plus a reproducible report.
+- Why it beats alternatives: It closes the electrical-analysis middle layer between site/queue intelligence and utility engineering decisions. Unlike a published hosting-capacity map, it can test a customer-owned feeder under explicit voltage/thermal constraints; unlike the broader GPL OMF alternative, the code is permissively reusable.
+
+### google/cybernetic-agent-governance-engine
+- Commit: `50b12e7d983db0e3d7faf206ac6aa600294f33ac`.
+- Rights: Apache-2.0; dependencies/services and customer remediation actions remain separately governed.
+- Score: **28/30** — A4, B5, C5, D4, E5, F5.
+- Inspected capability: Deterministic governance/enforcement engine for consequential automated actions with allow/deny/require-approval/defer/narrow/pause outcomes, signed decision/evidence records and an implemented OSCAL Assessment Results bridge. The inspected exporter preserves evidence links/content-address metadata and maps execution errors to explicit `error` state rather than treating blind spots as compliant.
+- Buyer/problem: Continuous-compliance and automation products can detect failures but still need a safe, reviewable mechanism for deciding which remediation may run automatically, which needs approval and which must halt.
+- Monetization path: Managed detect→govern→remediate→re-prove service layered onto Evidentia/restore-proof or regulated automation workflows.
+- First paid wedge: Feed a small set of synthetic failed controls into approved remediation playbooks; harmless action can auto-run, production/destructive action requires human approval, unapproved action blocks, and a subsequent re-test must produce fresh evidence.
+- Why it beats alternatives: Evidence collectors prove a state and generic workflow tools can execute actions; CAGE links deterministic authorization, human gating and evidence export into the missing operational loop while preserving error/unknown semantics.
+
 ## Demoted from MASTER this run
 - `Fajendagba/Construction-Change-Order-Engine@60f5ab99bfb97647039e6cec280c246a10f8a856`: valuable clean-room state/budget reference but no license and now materially surpassed by rights-clean OpenTakeoff + BIMChange-Agent for ScopeSignal's implemented evidence layers. Keep only as inspect/reference in COMBINATIONS/REJECTED.
 - `D-ivy/renewables_indexes@fe31ab507987a38cc9c042cd745d89546b6f25c0`: useful clean-room renewable/BESS screening methodology, but no license plus incomplete visible reproducibility no longer meets the elite positive-training-set bar. Revisit only on clear rights or a reproducible licensed successor.
