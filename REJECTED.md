@@ -139,3 +139,10 @@ Repositories, ideas, and combinations investigated and rejected or deprioritized
 - Reason rejected: The codebase is broad and active, but BSL 1.1 Additional Use terms explicitly exclude offering a paid hosted/embedded competing product. Individual versions change to Apache-2.0 after their stated two-year change period, so current code is not a rights-clean immediate hosted foundation.
 - Evidence: Hunter 35 inspected exact revision `8fd5286dd676753bb37324eb395be0df14980356`, root licensing and live workflow/capability docs that also distinguish mocked/thin activation from implemented state logic.
 - Revisit trigger: Revisit a specific old revision after its Apache change date or obtain commercial permission; otherwise use only lawful clean-room workflow comparisons.
+
+### ediflow-lib/core bundled X12 definitions as automatically MIT-cleared standards data
+- Repository / source: https://github.com/ediflow-lib/core
+- Date: 2026-09-19
+- Reason rejected: The repository's parser/infrastructure software is MIT, but the bundled X12 004010 package contains standards-derived transaction structures, code lists and syntax rules. This run did not establish independent provenance or redistribution authorization for those standards-derived data assets. A repository-level MIT license is not enough evidence to assume third-party standards content is cleared for commercial redistribution.
+- Evidence: Hunter 03 inspected exact revision `9a631a4104711bf5ac81c96d4b725c8698b4d799`, the root MIT license and the bundled X12 package describing broad 004010 transaction coverage including 204/210/214/990/810/820/824/997.
+- Revisit trigger: An explicit provenance/license statement establishes lawful redistribution of the generated/bundled X12 definitions. Until then, parser infrastructure may be evaluated separately, but the standards-definition corpus must remain rights-unresolved and outside the commercial dependency chain.
