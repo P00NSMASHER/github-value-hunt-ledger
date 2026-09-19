@@ -531,3 +531,30 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - High-ticket potential: 6.5/10 as supporting infrastructure
 - Combination opportunities: Optional adapter into the external-truth layer: raw source URL + timestamp + confidence + freshness → tariff-authority gate → customer contract formula. Never use carrier-published fuel data without proving customer incorporation/effective date.
 - Next action: Keep optional, not core. Prefer direct carrier/EIA sources for benchmark/reference and use NexusFeed only if a customer pilot justifies commercial API cost.
+
+
+### srthck/trustmesh — proof-obligation / next-best-evidence control-plane donor
+- Repository: https://github.com/srthck/trustmesh
+- Commit / revision: 5a93d70b37aafecaf61a5bc0296eaf831e5504ac
+- Date discovered: 2026-09-19
+- What it contains: MIT evidence-decisioning control plane originally built for payment disputes. Deep source inspection confirmed explicit proof obligations, blocking-evidence analysis, evidence graphs, versioned adjudication/policy layers, deadline-aware evidence-action optimization, duplicate-evidence filtering, counterfactual supportive/contradictory outcomes, deterministic ranking/replay traces, and a UI/API layer that answers “what evidence is preventing a stronger decision?” and “what should be acquired next?”
+- Rare / undernoticed value: 0-star repository with unusually mature **proof-readiness and next-best-evidence** mechanics. The valuable layer is not payment-domain policy; it is the architecture that prevents a system from turning an incomplete case into an asserted financial decision and directs analysts toward the highest-value missing proof.
+- Likely buyer / user: Freight Recovery v8 operator console, freight-audit/FAP implementation QA, recovery analysts and dispute teams.
+- Painful problem: Once a freight discrepancy is identified, analysts waste time manually figuring out which missing document/fact would make the finding defensible. Generic audit tools often surface “missing evidence” without prioritizing the next evidence acquisition or checking deadline feasibility/duplication.
+- Monetization mechanism: Reduce analyst touches/time per validated finding; accelerate claim-ready cases; suppress false disputes; strengthen paid Acceptance Tests and continuous shadow assurance.
+- Build-time / data advantage: High. Likely saves 1–3 months of designing proof-obligation, evidence-gap, deadline, trace/replay and evidence-action optimization infrastructure.
+- Evidence inspected: MIT metadata; trustmesh/application/evidence_gaps.py; engine/proof_obligation.py; optimizer/policy.py; extensive optimizer/adjudication test suite including blocking-obligation targeting, no-action state, deterministic ranking, dependency-depth prioritization, deadline infeasibility, duplicate/unavailable evidence filtering, supportive/contradictory counterfactuals, immutable original cases, explicit heuristic calibration notices and replay integrity.
+- License / rights: MIT repository code. **Do not reuse its Visa/Razorpay/payment-network policy content as freight entitlement policy.** Freight obligation/action definitions must be independently domain-specific and source-backed.
+- Reuse classification: Structural code/patterns reusable under MIT; payment-domain rules/policy are not adopted as freight policy.
+- Why non-obvious: Repo name and domain suggest payment disputes rather than transportation; the reusable commercial value is the general proof/readiness optimizer beneath the payment examples.
+- Scores:
+  - Technical value: 9.4/10
+  - Commercial value: 9.2/10
+  - Rarity: 9.5/10
+  - Completeness: 9.2/10 as proof/readiness architecture
+  - Build-time saved: 9.1/10
+  - Data advantage: 6.5/10
+  - High-ticket potential: 9.0/10 as part of v8
+- Combination opportunities: Freight Recovery v8 finding → freight-native blocking obligations → ranked evidence action → re-evaluate finding without mutating the original decision. Key freight actions include controlling rate document/amendment, BOL, signed POD, lumper receipt, dwell timestamps, weight ticket, contract-defined fuel evidence, carrier identity, credit memo/remittance allocation and incumbent audit export.
+- Validation result: An independently authored freight-native optimizer now passes 10 tests. Missing lumper support recommends lumper receipt; missing detention proof recommends dwell timestamps; stale historical authority recommends controlling rate evidence; ambiguous settlement recommends remittance allocation; missing incumbent output recommends incumbent export; expired deadline returns no feasible action; duplicate evidence is filtered; rankings/traces replay deterministically. Heuristic outcome priors are explicitly labeled uncalibrated and never described as probability of recovery.
+- Next action: Integrate the freight-native optimizer into v8 core/API/UI as “What evidence do we need next?” while preserving the invariant that evidence recommendations never change finding or recovery dollars by themselves.
