@@ -274,3 +274,29 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - High-ticket potential: 9.2/10 as enterprise wedge
 - Combination opportunities: Freight Recovery v6 + D365 export/API adapter + recovery-attribution ledger. Preserve D365 reason codes/tolerances but independently score dollar-weighted recall/precision and missed recovery.
 - Next action: Define a D365-compatible canonical mapping for freight_bill, carrier_invoice, match_reason, tolerance, audit_master, load/shipment, expected charge and variance. A customer pilot should demonstrate value *after* native reconciliation, not duplicate it.
+
+
+### EasyPost/easypost-python — parcel claim/refund recovery adapter
+- Repository: https://github.com/EasyPost/easypost-python
+- Commit / revision: d0dd20d900e38ee954af6e6c1c4ea2aaba96cda6
+- Date discovered: 2026-09-19
+- What it contains: Official MIT Python SDK from EasyPost. Source inspection verified first-class Claim create/list/retrieve/cancel operations and Shipment Refund create/list/retrieve/pagination, with VCR-backed tests exercising real API request/response shapes. Current EasyPost documentation defines claim lifecycle statuses including submitted, in_review, approved, approved_partial, rejected, cancelled and needs_action, plus evidence attachments and requested/approved amounts. Shipping refunds expose submitted/refunded/rejected states and shipment/tracking linkage.
+- Rare / undernoticed value: It supplies a tested recovery-action and recovery-state adapter for parcel shipments rather than only audit/detection logic. EasyPost's Carrier Claims Program also publicly describes automated eligible carrier claims and successful reimbursements applied as account credits.
+- Likely buyer / user: Parcel shippers already using EasyPost; e-commerce/fulfillment operations; later parcel-recovery expansion of the freight assurance product.
+- Painful problem: Even a correct parcel finding is not money until a valid claim/refund is submitted, adjudicated and credited. This connector provides concrete state transitions and IDs for that downstream lifecycle.
+- Monetization mechanism: Continuous parcel assurance plus optional success fee on confirmed credits/refunds. Keep this as an expansion path rather than the initial LTL/FTL dependency.
+- Build-time / data advantage: Likely saves several weeks of parcel refund/claim API plumbing, pagination/state handling and tests.
+- Evidence inspected: Official GitHub metadata/MIT license; claim_service.py; refund_service.py; test_claim.py; test_refund.py; current EasyPost claims/refunds/carrier-claims documentation.
+- Important limitations: Claims/refunds are available only within EasyPost-supported/account-authorized workflows and have carrier/program eligibility rules. A refund or approved claim is not equivalent to a freight invoice overcharge recovery. Parcel billing retrieval remains a separate problem.
+- License / rights: MIT SDK. API/customer/shipment data and carrier program terms remain separate.
+- Reuse classification: Directly reusable subject to MIT terms; customer/API use only with authorization.
+- Scores:
+  - Technical value: 8.5/10
+  - Commercial value: 8.3/10
+  - Rarity: 8.0/10
+  - Completeness: 8.7/10 for supported parcel recovery actions
+  - Build-time saved: 8.0/10
+  - Data advantage: 7.0/10 with authorized accounts
+  - High-ticket potential: 7.8/10 as parcel expansion
+- Combination opportunities: Freight Recovery assurance core + EasyPost claim/refund state adapter + recovery-attribution ledger; map approved/credited outcomes to realized recovery only after account credit/payment proof.
+- Next action: Keep parcel as phase 2. Build initial LTL/FTL acceptance-test product first; add EasyPost when a customer has an authorized EasyPost shipment population.
