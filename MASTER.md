@@ -19,6 +19,7 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Buyer/problem: shippers, brokers, carriers and freight-payment teams need physical proof for detention/accessorial decisions rather than invoice text alone.
 - Monetization / first paid wedge: physical-evidence layer inside Freight Recovery; run one authorized blind shipment population and quantify missed/unsupported detention dollars.
 - Why it wins: connects real-world movement and appointment events to entitlement, evidence, approval and billing—the hardest part of time-based accessorial recovery.
+- Implementation proof: permissioned Opstrax semantics have now been integrated into Freight Recovery v10 core v1.0. Full suite passes **55/55 tests**; the physical-truth demo proves a 3-hour dwell with 2 free hours at $75/hour supports exactly $75 expected detention and converts a $150 billed line into a $75 validated overcharge with SHA-linked evidence.
 
 ### DominicFinn/open_tms
 - Commit: `93d8c2b8ff78373ff69bb7ea546743e4703628b1`.
