@@ -39,7 +39,7 @@ jobs:
                   continue
               path.write_text(current.rstrip() + '\n\n' + marker + '\n' + addition.strip() + '\n')
               changed.append(rel)
-          Path('.catalog_append_changed').write_text('\n'.join(changed))
+          Path('.catalog_append_changed').write_text('\n'.join(changed) + ('\n' if changed else ''))
           PY
       - name: Commit catalog updates
         shell: bash
@@ -50,7 +50,7 @@ jobs:
           fi
           git config user.name 'github-value-hunt-bot'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          while IFS= read -r file; do git add "$file"; done < .catalog_append_changed
+          while IFS= read -r file || [ -n "$file" ]; do git add "$file"; done < .catalog_append_changed
           git commit -m 'Catalog compliance and recovery proof findings'
           git pull --rebase origin main
           git push
