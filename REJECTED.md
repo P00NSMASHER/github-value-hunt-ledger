@@ -115,6 +115,15 @@ Cross-lane rejection/deprioritization memory. This file intentionally keeps the 
 - Reason: detailed promotion semantic model exists, but license restricts use to connection with/use of Databricks Services.
 - Revisit trigger: target product is explicitly Databricks-native and agreement-compatible.
 
+## Stale deterministic authority — do not use as current legal/eligibility truth
+
+### bedrocka-ventures/bedrocka-tools-calc — SBA size-standard path
+- Commit: `7723112b433f6ca9351bddaf0c37248e673356db`.
+- Rights: MIT, but rights cleanliness does not make outdated decision logic safe.
+- Reason: inspected federal-contracting receipts logic uses a three-year average and user-supplied thresholds. Current 13 CFR §121.104 generally uses the most recent five completed fiscal years for firms in business five or more years, subject to exceptions, and affiliate receipts matter. A deterministic stale eligibility result is worse than an explicit unresolved state.
+- Disposition: do not use its result path as current SBA authority. Rebuild from versioned official SBA/eCFR sources with effective dates, exception handling, affiliation inputs and fail-closed source-integrity checks.
+- Revisit trigger: repository updates to the current official rule set and adds version/effective-date/provenance plus regression tests against official examples.
+
 ## Demoted / surpassed
 
 ### Fajendagba/Construction-Change-Order-Engine
