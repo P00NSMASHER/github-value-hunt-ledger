@@ -10,90 +10,88 @@ Integrator-owned queue for the next highest-value searches.
 
 ## Priority leads
 
-### P0 — freight rate-contract ingestion with reusable rights
+### P0 — freight contract-source extraction + clause entitlement
 - Best lanes: Hunter 03, 17, 42.
-- Search for: MIT/Apache/BSD carrier-rate sheet parsers; tariff/rate-card normalization; freight class/CWT/zone tables; fuel-surcharge schedules; accessorial clause extraction; contract effective-date/version logic; deterministic rerating test suites.
-- Concrete queries/families: `freight rate card parser LICENSE`, `carrier tariff parser MIT`, `CWT rate table parser`, `accessorial audit`, `fuel surcharge table parser`, `X12 210 contract rate match`, `freight invoice rerating`.
-- Evidence gap: `Apeiron-OpenGrace/apeiron_bridge` proves the capability exists but has no detected license. Find a rights-clean equivalent or public standards/data path before copying implementation.
-- Done when: A permissively licensed implementation or a clean authoritative specification can parse representative borderless/transposed/weight-break rate sheets into a versioned canonical model with tests.
+- Search/validate: Rights-clean or independently specified parsing of real carrier/forwarder XLS/PDF rate sheets into the now-validated Qatoto/Kareya rate model; borderless/transposed tables; multi-page zones; CWT/weight breaks; accessorial/fuel clauses; amendments; contract effective dates; reviewer/source-hash workflow; explicit ambiguity states.
+- Concrete queries/families: `freight rate sheet xlsx parser MIT`, `carrier tariff PDF parser Apache`, `accessorial clause extraction freight`, `CWT rate table parser`, `fuel surcharge schedule parser`, `rate confirmation parser license`, `freight contract effective date parser`.
+- Evidence gap: `sengtha/Kareya-Silo` now supplies Apache-2.0 deterministic tariff/rerating logic and `vidyesh95/qatoto-backend` supplies MIT authorship/versioning/supersession controls. The missing P0 is getting messy customer/carrier source documents into those structures without silently inventing terms, then proving contractual entitlement for each recovery rule.
+- Done when: Representative borderless/transposed/weight-break rate sheets round-trip into a versioned canonical rate model with source references, reviewer confirmation and fail-closed ambiguity; at least one accessorial clause can be tied to an exact invoice finding.
 
 ### P0 — freight recovery validation corpus and settlement proof
 - Best lanes: Hunter 03, 07, 30, 36, 42.
-- Search for: Realistic but lawfully reusable synthetic/public freight invoice + contract + shipment fixtures; duplicate/accessorial/fuel/weight/zone examples; carrier credit/remittance/EDI 820 or ERP settlement evidence; dispute/claim state machines.
-- Concrete queries/families: `freight audit fixtures`, `EDI 210 820 test`, `carrier invoice dispute`, `freight payment audit test data`, `shipping invoice overcharge dataset`, `accessorial duplicate charge tests`.
-- Evidence gap: Current stack can find discrepancies, but the strongest paid offering needs a reproducible contract-to-finding-to-credit chain and false-positive benchmarks.
-- Done when: We can run at least 20 lawful benchmark cases with expected recoverable amount, evidence source and verified settlement state.
+- Search for: Realistic but lawfully reusable synthetic/public freight invoice + contract + shipment fixtures; duplicate/accessorial/fuel/weight/zone cases; carrier credit/remittance/EDI 820 or ERP settlement evidence; dispute/claim state machines; booked-rate lineage.
+- Concrete queries/families: `freight audit fixtures`, `EDI 210 820 test`, `carrier invoice dispute`, `freight payment audit test data`, `shipping invoice overcharge dataset`, `accessorial duplicate charge tests`, `freight credit memo test`.
+- Evidence gap: The rights-clean rate engine/control plane is now strong enough that validation quality is the bottleneck. We still need a reproducible contract→finding→dispute→credit chain with false-positive/ambiguity tests.
+- Done when: At least 20 lawful benchmark cases have exact expected recoverable amount, applicable rate/contract revision, evidence source, ambiguity behavior and settlement state; ambiguous cases produce $0 asserted recovery.
 
-### P0 — ScopeSignal revision/drawing-diff layer
+### P0 — ScopeSignal 2D revision + entitlement-to-dollar benchmark
 - Best lanes: Hunter 04, 17, 38, 42.
-- Search for: Apache/MIT/BSD IFC/PDF/CAD revision comparison, drawing registration, symbol/object correspondence, RFI/submittal-to-drawing links, quantity-delta attribution, sheet revision clouds/change markers.
-- Concrete queries/families: `construction drawing diff Apache`, `IFC revision compare`, `PDF plan revision detection MIT`, `RFI submittal drawing change`, `BIM diff open source`.
-- Evidence gap: OpenTakeoff now provides rights-clean calibrated quantities. The missing differentiator is proving which revision/change caused which measurable quantity delta and linking it to entitlement evidence.
-- Avoid: More generic takeoff engines unless they uniquely solve revision correspondence.
-- Done when: A rights-clean component or validated clean-room method maps old/new plan elements and produces reproducible quantity deltas with provenance.
+- Search/validate: Rights-clean 2D PDF/CAD registration and revision correspondence; sheet revision clouds/change markers; symbol/object correspondence; RFI/submittal-to-drawing links; contract-scope entitlement; quantity-delta attribution.
+- Concrete queries/families: `PDF plan revision detection MIT`, `construction drawing registration Apache`, `RFI submittal drawing change`, `CAD revision compare open source`, `construction entitlement change order parser`.
+- Evidence gap: `bimchange-agent` now closes much of the IFC revision-correspondence problem and OpenTakeoff supplies calibrated 2D quantities. The remaining differentiator is cross-format/2D revision matching and proving that an observed quantity change is contractually compensable.
+- Avoid: More generic takeoff or IFC-diff engines unless they materially beat the current evidence/held-out benchmark.
+- Done when: One old/new IFC case and one old/new PDF plan case preserve revision/element identity through quantity delta, contract/spec evidence and human-reviewed proposed dollar impact.
 
-### P0 — CaptureBrief authoritative identity + award-history benchmark
+### P0 — CaptureBrief identity, packet completeness + regulatory-currency benchmark
 - Best lanes: Hunter 05, 18, 42.
-- Search/validate: UEI/CAGE/recipient identity joins across SAM.gov and USAspending; amendment/history handling; PIID/IDV relationships; set-aside/competition evidence; authoritative code tables; opportunity attachment provenance.
-- Concrete queries/families: `SAM UEI USAspending entity resolution`, `CAGE UEI recipient crosswalk`, `PIID IDV award join`, `SAM opportunity amendment history`.
-- Evidence gap: `capture-mcp-server` + official USAspending are strong, but we need measured join precision and a compact canonical evidence contract.
-- Done when: Ten current solicitations yield a manually verified opportunity → entity → historical awards/incumbent → competition/set-aside packet with explicit source timestamps.
+- Search/validate: UEI/CAGE/recipient joins across SAM.gov/USAspending; PIID/IDV lineage; opportunity amendment/attachment completeness; exact cited FAR/DFARS clause/prescription resolution; Acquisition.gov agency deviations/FAR Overhaul applicability; source timestamps/hashes.
+- Concrete queries/families: `SAM UEI USAspending entity resolution`, `CAGE UEI recipient crosswalk`, `PIID IDV award join`, `SAM opportunity amendment history`, `Acquisition.gov agency deviation API`, `FAR overhaul deviation`.
+- Evidence gap: `capture-mcp-server`, official USAspending, `cliwant/mcp-sam-gov` and `1102tools-dev/federal-contracting-mcps` now cover most source plumbing. What remains is measured correctness across identity joins, complete solicitation packets and regulatory currency.
+- Done when: Ten current solicitations yield a manually verified opportunity→entity→award/incumbent→competition/set-aside→clause/prescription→current-deviation packet with explicit source timestamp/hash and scored false joins/unresolved states.
 
-### P0 — continuous compliance / restore-proof paid-pilot validation
+### P0 — continuous compliance paid-pilot evidence package
 - Best lanes: Hunter 14, 15, 40, 42.
-- Search/validate: Evidentia collector inventory and multitenancy/auth boundaries; catalog provenance; restore-drill end-to-end report artifacts; permissive Veeam/cloud snapshot/backup adapters; mappings to OSCAL controls.
-- Concrete queries/families: `restore validation Apache backup evidence`, `Veeam restore test open source`, `OSCAL evidence collector`, `disaster recovery evidence API`, `backup restore compliance report`.
-- Evidence gap: The software stack is unusually complete, but the fastest paid wedge and exact evidence package need one reproducible end-to-end benchmark.
-- Done when: A synthetic/public SSP/POA&M package is converted, one live disposable restore drill produces evidence, and that evidence lands in a versioned control package with measured manual correction time.
+- Search/validate: Attestful collector auth scopes/read-only guarantees, pagination/rate-limit/failure semantics, standards/catalog provenance; Evidentia tenancy/auth boundaries; restore-drill report artifacts; permissive backup/cloud-snapshot adapters where they add buyer value; OSCAL control mapping.
+- Concrete queries/families: `OSCAL evidence collector permissions`, `restore validation Apache backup evidence`, `disaster recovery evidence API`, `cloud evidence collector read only`, `backup restore compliance report`.
+- Evidence gap: Attestful materially resolves the generic collector-discovery gap. The key unanswered question is whether one low-risk evidence bundle plus real restore proof can be packaged into a compelling, reproducible paid outcome.
+- Done when: Top-10 collector permission scopes are inventoried; one synthetic AWS/GitHub bundle plus one disposable restore lands in a versioned control package; manual correction time and missing-evidence rate are measured.
 
 ### P1 — GST GSTR-2B/IMS current-rule benchmark
 - Best lanes: Hunter 47, 31, 42, 18.
-- Search/validate: Current official GSTN/GSTR-2B and Invoice Management System record states; accepted/rejected/pending behavior; credit/debit-note effects; amendments; ineligible/reversal cases; current downloadable schemas; accountant-grade synthetic/public test fixtures.
+- Search/validate: Current official GSTN/GSTR-2B and Invoice Management System record states; accepted/rejected/pending behavior; credit/debit-note effects; amendments; ineligible/reversal cases; current downloadable schemas; accountant-grade synthetic/public fixtures.
 - Concrete queries/families: `GSTR-2B IMS reconciliation open source`, `GST invoice management system parser`, `GSTR2B accepted rejected pending schema`, `ITC reconciliation tests`, `GSTN GSTR-2B JSON parser MIT`.
-- Evidence gap: `Tamil-Venthan/Rekvia` is a strong MIT reconciliation engine, but its matching core predates a full 2026 IMS-aware control model. Current GST guidance still advises books↔GSTR-2B reconciliation, while IMS changes which records flow to 2B and how recipient actions affect ITC.
-- Done when: A versioned test corpus covers exact/fuzzy/duplicate matching plus IMS accepted/rejected/pending, amendments, credit notes and ineligible/reversal cases with authoritative rule citations; no monetary “recovery” claim is produced unless human/accountant review confirms eligibility.
+- Evidence gap: `Tamil-Venthan/Rekvia` is a strong MIT reconciliation engine, but its matching core is not a complete 2026 IMS-aware control model.
+- Done when: A versioned corpus covers exact/fuzzy/duplicate matching plus IMS states, amendments, credit notes and ineligible/reversal cases with authoritative rule citations; no monetary recovery is asserted without human/accountant eligibility review.
 
 ### P1 — GoldenMatch vs Dedupe entity-resolution benchmark
 - Best lanes: Hunter 18, 16.
 - Search/validate: Public or synthetic vendor/company/property datasets with labeled duplicates; incremental cluster stability; merge/split recovery; provenance completeness; auto-link precision at conservative thresholds.
 - Evidence gap: GoldenMatch may be a better identity-control plane, while Dedupe is more established. Do not replace one with the other from README claims.
-- Done when: Same benchmark and scoring protocol runs both libraries plus exact/fuzzy baseline and records precision/recall, cluster stability and provenance behavior.
+- Done when: Same benchmark runs both libraries plus exact/fuzzy baseline and records precision/recall, cluster stability and provenance behavior.
 
-### P1 — TR-069 to USP/TR-369 modernization path
+### P1 — TR-069→USP production/migration validation
 - Best lanes: Hunter 35, 42.
-- Search for: Permissively licensed USP/TR-369 controller/agent stacks; current migration tooling; BBF data-model licensing/redistribution terms; ACS/CPE regression/conformance harnesses; current ISP pain/pricing evidence.
-- Concrete queries/families: `TR-369 USP controller Apache`, `USP agent MIT Broadband Forum`, `TR-069 migration USP`, `CWMP conformance test open source`, `BBF data model license`.
-- Evidence gap: FreeACS is technically strong, but a modern managed-service thesis needs a credible migration successor and resolved standards-content rights.
-- Done when: We can build a rights-clean lab that demonstrates CWMP provisioning plus a documented migration/conformance path to a current management standard.
+- Search/validate: Oktopus tenant isolation/fleet scale/dependency health; OB-USP-Agent + agent-sim concurrency; CWMP↔USP migration/state mapping; BBF data-model licensing/redistribution; current ISP buyer pain/pricing evidence.
+- Concrete queries/families: `Oktopus USP scale test`, `TR-069 USP migration mapping`, `USP controller multi tenant`, `BBF data model license`, `TR-369 conformance test`.
+- Evidence gap: The rights-clean successor stack now exists (`Oktopus/oktopus` + official `BroadbandForum/obuspa` + `OktopUSP/agent-sim`). Stop generic controller/agent discovery; prove production boundaries and commercial urgency.
+- Done when: A rights-clean lab demonstrates CWMP and USP workflows on concurrent simulated devices with explicit migration fixtures, tenant isolation evidence and resolved data-model rights.
 
-### P1 — warehouse slotting ROI portability
-- Best lanes: Hunter 13, 38, 39.
-- Search for: MIT/Apache travel-path/slotting optimizers, ABC/XYZ + cube/weight/ergonomic constraints, ERP-agnostic CSV adapters, benchmark datasets and labor-dollar calculators.
-- Concrete queries/families: `warehouse slotting optimization MIT`, `putaway optimizer OR-Tools`, `warehouse travel distance slotting`, `SKU velocity bin assignment`.
-- Evidence gap: `agritheory/inventory_tools` is promising but ERPNext-centered. Need a portable advisory-mode benchmark proving measurable travel/labor reduction.
-- Done when: A synthetic/public warehouse benchmark shows before/after travel distance, capacity violations and estimated labor savings without requiring ERPNext write-back.
-
-### P1 — structured e-invoice rules/version provenance
+### P1 — structured e-invoice conformance/version provenance
 - Best lanes: Hunter 42, 07, 31.
-- Search/validate: Official EN16931/Peppol conformance corpora; ruleset/version metadata; XRechnung/Factur-X/ZUGFeRD updates; artifact redistribution terms; deterministic rule IDs and effective dates.
-- Evidence gap: `hupe1980/en16931` is technically strong, but commercial audit/compliance claims require authoritative version tracking and rights-clean test artifacts.
-- Done when: Each validation result can cite parser version, ruleset ID/effective date, source artifact and exact failing business rule across a public conformance corpus.
+- Search/validate: Official EN16931/Peppol conformance corpora; ruleset/version metadata; XRechnung/Factur-X/ZUGFeRD updates; artifact redistribution terms; deterministic rule IDs/effective dates; cross-check `hupe1980/en16931`, `MuhDur/invoicekit` and `attestwire/en16931`.
+- Evidence gap: Multiple rights-clean implementations now exist. The priority is correlated-error reduction and authoritative ruleset/version provenance, not another parser.
+- Done when: Same public corpus is run through at least two independent implementations/reference validators and each result cites parser version, ruleset/effective date, source artifact and exact failing business rule.
 
 ### P2 — lab automation rights/runtime + evidence pilot
 - Best lanes: Hunter 20, 21, 40.
-- Search/validate: Vendor SDK/runtime licensing for the highest-value `galago-tools` drivers; simulated or public instrument endpoints; GLAS failure/persistence behavior; OpenAPI-to-SiLA2 generated-adapter conformance; Flowcept provenance across instrument + analysis tasks.
-- Evidence gap: The permissive cross-repository stack is technically unusually strong, but commercial deployment depends on per-instrument vendor/runtime rights and hardware validation. The integration economics also need one concrete cell-level before/after benchmark.
-- Done when: One simulated/lawfully accessible instrument plus one OpenAPI service execute a multi-step workflow through the control plane, with reproducible Flowcept lineage, measured integration hours and a documented rights/runtime matrix for every component used.
+- Search/validate: Vendor SDK/runtime licensing for the highest-value `galago-tools` drivers; simulated/public instrument endpoints; GLAS failure/persistence behavior; OpenAPI-to-SiLA2 conformance; Flowcept provenance across instrument + analysis tasks.
+- Evidence gap: The permissive stack is unusually strong, but deployment depends on per-instrument rights/hardware validation and one concrete cell-level economics benchmark.
+- Done when: One simulated/lawfully accessible instrument plus one OpenAPI service execute a multi-step workflow with reproducible Flowcept lineage, measured integration hours and a rights/runtime matrix.
 
-### P2 — rights-clean industrial edge management around Modbus/OPC-UA
-- Best lanes: Hunter 12, 15, 40.
-- Search for: Fleet management, TLS/cert rotation, remote config, store-and-forward and audit logging around permissive Modbus↔OPC-UA gateways; avoid generic protocol libraries already surpassed by `serhmarch/modbusua`.
-- Evidence gap: Core bridge is strong; commercial product needs secure multi-site lifecycle management rather than another protocol demo.
-- Done when: A permissive stack can provision/update/observe multiple simulated gateways and preserve configuration/evidence history securely.
+### P2 — semiconductor equipment interoperability wedge
+- Best lanes: Hunter 12, 40, 43.
+- Search/validate: Permissive higher-level GEM/E87/E90/E94/E116 workflow layers around MIT `mkjeff/secs4net`; host/equipment simulators; conformance fixtures; standards-content rights; buyer pricing for OEM/fab integration labs.
+- Concrete queries/families: `SECS GEM simulator MIT`, `E87 E90 E94 open source`, `SECS II conformance tests`, `GEM equipment simulator Apache`, `semiconductor equipment integration test harness`.
+- Evidence gap: `secs4net` supplies a mature rights-clean SECS-II/HSMS base, while the richer higher-level workflow reference found is proprietary. Determine whether a lawful standards/customer-spec path can turn it into a high-ticket interoperability service without recreating too much.
+- Done when: A rights-clean host↔equipment harness runs representative sessions/messages and an independently specified higher-level GEM workflow with measurable integration/testing value.
 
 ## Resolved / deprioritized directions
-- Generic freight/TMS discovery is no longer a priority; `open_tms` and the newly cataloged domain references are sufficient. Hunt the rate-contract, exact audit-rule and settlement gaps instead.
-- Generic construction takeoff search is deprioritized; `Kentucky-ai/opentakeoff` is a strong rights-clean measurement base. Focus on revision correspondence and entitlement.
-- Generic SAM.gov feed wrappers are deprioritized; `sam-search`, `capture-mcp-server` and official USAspending cover the core acquisition/history substrate. Focus on identity precision and decision evidence.
+- Generic freight/TMS discovery is deprioritized. `open_tms` is sufficient for product context; `Kareya-Silo` now supplies Apache freight rating and Qatoto supplies MIT rate-card provenance/versioning. Hunt source-document extraction, clause entitlement and settlement validation instead.
+- The search for a rights-clean freight tariff/rerating core is resolved by `sengtha/Kareya-Silo`; the search for rights-clean rate authoring/supersession controls is resolved by the Qatoto freight subsystem.
+- Generic construction takeoff and generic IFC-diff discovery are deprioritized. OpenTakeoff + BIMChange-Agent cover the strongest current rights-clean measurement/revision layers; focus on 2D correspondence and entitlement.
+- Generic SAM.gov feed/regulation wrapper searches are deprioritized. `sam-search`, `capture-mcp-server`, official USAspending, `cliwant/mcp-sam-gov` and `1102tools-dev/federal-contracting-mcps` cover the source substrate; focus on correctness benchmarks.
+- Generic compliance-collector search is deprioritized after `clay-good/attestful`; focus on minimum scopes, provenance and paid-pilot evidence quality.
+- Generic TR-369 controller/agent discovery is deprioritized after Oktopus + OB-USP-Agent + agent-sim. Focus on scale, tenancy, migration fixtures and rights around BBF data models.
+- Generic warehouse slotting/layout discovery is deprioritized after `agritheory/inventory_tools` + `gokhanozden/gabak`; the next step is a neutral CSV benchmark with measured travel/labor ROI.
 - Generic RPA platforms are deprioritized after `lorisunjunbin/petp`; only hunt orchestration when it closes a specific high-value vertical workflow or security gap.
-- Generic academic CVRP/route-optimization hunts are deprioritized. `dparo/master-thesis` is a useful MIT exact-pricing benchmark but depends on CPLEX, while the no-license multi-trip references are clean-room only. Revisit routing only when tied to a specific buyer dataset and a measured advantage over permissive OR-Tools/modern baselines.
+- Generic academic CVRP/route-optimization hunts are deprioritized. Revisit routing only when tied to a specific buyer dataset and measured advantage over permissive modern baselines.
