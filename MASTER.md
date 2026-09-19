@@ -51,3 +51,13 @@ Cross-lane shortlist of the strongest validated discoveries.
 - Commit: 60f5ab99bfb97647039e6cec280c246a10f8a856
 - Rights: No license detected; inspect/learn/clean-room only unless permission is established.
 - Why it is here: Concrete construction-domain reference for change-order state transitions, budget impacts, auditability, and event-driven workflows that can inform ScopeSignal.
+
+### superzero11/OpenFarm
+- Commit: 884a61567dd0d149214090baf9edebc533a2a0df
+- Rights: BSD-3-Clause for repository code; third-party model and satellite/data-source terms require separate verification.
+- Why it is here: Low-attention but unusually complete precision-ag substrate: PostGIS/FastAPI/Celery field platform plus real Sentinel-2 vegetation-index processing and FTW-based automatic field-boundary detection. It can compress months of geospatial/backend/worker work for a managed crop-health, field-onboarding or agronomy-monitoring product.
+
+### D-ivy/renewables_indexes
+- Commit: fe31ab507987a38cc9c042cd745d89546b6f25c0
+- Rights: No license detected; inspect/learn/clean-room only unless permission is established. Upstream/derived dataset rights must be separately verified.
+- Why it is here: 0-star national renewable-site screening artifact with committed CONUS resource × wholesale-price × revenue layers, negative-price/volatility features and spatial smoothing. Even though direct reuse is blocked and the visible build scripts are not fully reproducible, the data model and screening methodology expose a commercially useful clean-room blueprint for renewable/BESS development intelligence.
