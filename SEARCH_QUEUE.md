@@ -8,26 +8,27 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Do not rediscover solved generic infrastructure. Promote evidence that closes a concrete commercial or validation gap.
 - Public visibility is not a reuse grant. No-license sources remain inspect/clean-room only.
 
-## P0 — Freight Recovery v7 blind auditor bake-off + contractual truth
+## P0 — Freight Recovery v8 blind auditor bake-off + contractual truth
 - Best hunters: 03, 17, 30, 36, 42, 47.
 - Goal: turn the current freight stack into an independent acceptance test for an incumbent freight-audit/FAP/ERP process, then monetize only verified incremental misses and realized recovery.
-- Build/validate with the known stack: `open_tms` + Kareya + Qatoto + Assay + `aiparallel0/freight-audit` synthetic corpus + the CC-BY rate-confirmation benchmark + X12 210/820 + Etherlabs/subset_sum + Warp read-only evidence. Do **not** hunt more generic TMS/OCR/X12/reconciliation engines.
-- Search only for the remaining truth problem: rights-clean carrier/customer XLS/PDF tariff and rate-confirmation importers; CWT/weight-break/zone/container/W-M/minimum/fuel tables; accessorial entitlement/trigger clauses; amendments/supersession/effective dates; source page/cell/bbox; and incumbent-auditor/D365/nShift-style export/reason-code schemas.
+- Build/validate with the known stack: `open_tms` + Kareya + Qatoto + Assay + `aiparallel0/freight-audit` synthetic corpus + the CC-BY rate-confirmation benchmark + TrustMesh proof gating + X12 210/820 + Etherlabs/subset_sum + Warp read-only evidence. Do **not** hunt more generic TMS/OCR/X12/reconciliation engines.
+- Search only for the remaining truth problem: rights-clean carrier/customer XLS/PDF tariff and rate-confirmation importers; CWT/weight-break/zone/container/W-M/minimum/fuel tables; accessorial entitlement/trigger clauses; amendments/supersession/effective dates; source page/cell/bbox; and incumbent-auditor/D365/SAP/Oracle/nShift-style export/reason-code schemas.
 - Concrete queries: `freight tariff xlsx parser source cell MIT`, `carrier rate sheet accessorial clause parser Apache`, `CWT zone rate table effective date`, `ocean rate sheet container surcharge parser`, `freight audit export reason code variance`, `freight payment audit master export`, dependencies/importers behind maintained rating/FAP projects.
 - Required benchmark: 20+ synthetic cases plus one customer-authorized blind population containing invoices, controlling rate/accessorial authority, shipment/POD evidence and the incumbent's findings/decisions for the same population. Freeze source evidence and create gold truth **before** viewing incumbent results.
-- Metrics: dollar-weighted recall, finding precision, false-positive dollars, clean-invoice accuracy, rule-family recall, evidence completeness, abstention quality, unique missed dollars and realized incremental recovery.
-- Done when: every asserted dollar reconstructs to exact source/revision/clause and later settlement evidence. Any unresolved extraction, entitlement, identity or allocation ambiguity = **$0 asserted recovery**.
+- Metrics: extraction field accuracy; calibrated auto-accept coverage vs false accepts/reviewer touches; dollar-weighted recall; finding precision; false-positive dollars; clean-invoice accuracy; proof-readiness accuracy; rule-family recall; evidence completeness; abstention quality; unique missed dollars and realized incremental recovery.
+- Done when: every asserted dollar reconstructs to exact source/revision/clause and later settlement evidence. Any unresolved extraction, entitlement, identity, contradiction or allocation ambiguity = **$0 asserted recovery**.
 
 ## P0 — Freight proof-obligation + next-best-evidence control plane
 - Best hunters: 03, 19, 40, 47.
 - Validate `srthck/trustmesh` as a domain-neutral proof/readiness layer for freight findings: mandatory proof obligations, admissibility/authority/independence/temporal gates, contradiction handling, deadline state, immutable trace and next-best-evidence acquisition.
 - Do not reuse payment-network policy content as freight policy. Map freight requirements independently: controlling rate authority, shipment identity, service/accessorial trigger, delivery/POD evidence, calculation, dispute deadline and settlement proof.
 - Required cases: complete claim; missing controlling rate; conflicting POD timestamps; duplicated/non-independent evidence; expired deadline; evidence action that changes REVIEW→contestable; evidence action that cannot change outcome.
-- Done when: a freight finding can deterministically explain why it is claim-ready or REVIEW, identify the highest-value missing evidence, and never turn an incomplete claim into recoverable dollars.
+- Done when: a freight finding deterministically explains why it is claim-ready or REVIEW, identifies the highest-value missing evidence, and never turns an incomplete claim into recoverable dollars.
 
 ## P0 — CaptureBrief authoritative packet benchmark
 - Best hunters: 05, 18, 42.
 - Validate—not generic-search—DATA Act broker UEI/DUNS/legal/DBA/parent semantics, PIID/referenced-IDV lineage, SAM amendments/attachments, USAspending incumbent history, exact FAR/DFARS prescriptions and current Acquisition.gov/deviation context.
+- Clean-room acceptance-gate requirements from CivicProof may be converted into independent tests: no stored artifact/hash => no claim; quoted support must be locatable; unresolved upstream source is not “not found”; high-risk findings require explicit multi-source support.
 - Search only for a missing authoritative identity/award semantic or packet artifact.
 - Done when: 10 current solicitations produce manually verified opportunity→entity/parent→award/incumbent→competition/set-aside→clause/prescription→current-deviation packets with measured false joins and unresolved conflicts.
 
@@ -37,11 +38,19 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Search/validate only rights-clean PDF/CAD old/new registration/object correspondence, revision-cloud/change-marker extraction, RFI/submittal↔drawing linkage and contract-scope entitlement evidence.
 - Done when: one held-out IFC and one PDF-plan revision preserve object/revision identity through quantity delta + exact contract/spec evidence + human-approved commercial impact.
 
-## P0 — continuous-compliance restore-proof pilot
+## P0 — continuous-compliance restore-proof + governed remediation pilot
 - Best hunters: 14, 15, 40, 42, 47.
-- Validate Attestful collector scopes/read-only guarantees/pagination/failures, Evidentia evidence binding, restore-drill/RestoreLab fidelity, evidence freshness and OSCAL mapping.
-- Search only for concrete missing proof: PITR/content fidelity, cryptographic binding to config/environment or a buyer-required backup provider.
-- Done when: synthetic AWS/GitHub evidence + disposable PostgreSQL restore lands in one versioned package; injected restore failure and missing evidence remain non-pass.
+- Validate Attestful collector scopes/read-only guarantees/pagination/failures, Evidentia evidence binding, restore-drill/RestoreLab fidelity, evidence freshness/OSCAL mapping, then `google/cybernetic-agent-governance-engine` as the post-failure authorization layer.
+- Required remediation cases: harmless corrective action ALLOW/autorun; production/destructive action REQUIRE_APPROVAL; denied/unapproved action remains blocked; unknown/error evidence never becomes compliant; successful remediation must be followed by a fresh re-test rather than inferred success.
+- Search only for concrete missing proof: PITR/content fidelity, cryptographic binding to config/environment or a buyer-required backup/remediation provider.
+- Done when: synthetic AWS/GitHub evidence + disposable PostgreSQL restore lands in one versioned package, injected failures remain non-pass, remediation authorization is evidenced, and only a successful re-test changes control state.
+
+## P1 — grid hosting-capacity + resilience benchmark
+- Best hunters: 11, 23, 40, 42, 45.
+- Validate MIT `sandialabs/DREAMS` hosting-capacity/QSTS on rights-clean synthetic feeders, then pair with SHIFT feeder synthesis and ERAD hazard→asset→network→restoration analysis. Stop generic hazard-map and generic OpenDSS-repo discovery.
+- Required cases: deliberately planted voltage limit, thermal limit, DER capacity boundary, time-series violation, hazard-caused asset failures and known restoration ordering. Compare DREAMS thresholds against planted synthetic ground truth; use OMF only as GPL-separated behavioral comparison if needed.
+- Search only for authoritative/right-cleared fragility/hazard inputs, interconnection/hosting-capacity validation corpora or concrete buyer export formats.
+- Done when: 25–50 synthetic feeders produce reproducible capacity constraints plus hazard/restoration outcomes without making real-world claims from synthetic topology.
 
 ## P1 — field-service proof-to-cash leakage benchmark
 - Best hunters: 02, 32, 33, 37, 45.
@@ -81,6 +90,7 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Generic freight TMS/rating, OCR, X12, reconciliation/subset-sum and entity-resolution discovery: sufficiently covered. Work truth, proof readiness, incumbent comparison and settlement attribution.
 - Generic construction takeoff/IFC diff: covered by OpenTakeoff + BIMChange-Agent.
 - Generic SAM/regulatory wrappers: covered enough; validate authoritative packet completeness/currency.
-- Generic compliance collectors/restore tools: covered enough; validate evidence fidelity and paid-pilot packaging.
+- Generic compliance collectors/restore tools/action-governance frameworks: covered enough after Attestful + Evidentia + restore-drill/RestoreLab + CAGE; prove the closed remediation loop.
+- Generic grid hazard maps/OpenDSS wrappers: deprioritized after ERAD + SHIFT + DREAMS; validate engineering truth and buyer workflow.
 - Generic field-service CRUD/dispatch, workforce schedulers, lab-control frameworks, TR-369 stacks and warehouse slotting: covered enough; prove ROI/correctness or find a truly missing vertical rule/integration.
 - Generic RPA, generic optimization libraries and academic CVRP searches: stop unless tied to a named buyer problem and a missing layer in an active combination.
