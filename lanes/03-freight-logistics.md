@@ -92,3 +92,46 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 4.5/10
   - High-ticket potential: 8.7/10
 - Next action: Prototype the audit control plane by reusing only the Warp rate/tariff and invoice/payment schemas around the existing freight-audit rules; add explicit rate-card version provenance and recovery-evidence fields, then run the current synthetic audit/payment benchmarks before deciding whether any additional Warp UI modules are worth importing.
+
+
+### bwllaming/matrix-paper
+- Repository: https://github.com/bwllaming/matrix-paper
+- Commit / revision: current main inspected 2026-09-19 (exact tree inspected via GitHub; use latest pinned commit before reuse).
+- Date discovered: 2026-09-19
+- What it contains: MIT-licensed open research dataset of anonymized UBL invoice documents prepared in collaboration with Kuehne+Nagel for business-document understanding. README explicitly states sensitive identifiers and structured data were pseudonymized/randomized while preserving document structure; includes invoice XML and ground-truth transport references.
+- Why it matters: This is one of the rare clearly intentional, anonymized, real-world logistics invoice corpora found on GitHub. It is useful for validating invoice parsing, EN16931/UBL normalization, reference extraction and evidence provenance on documents derived from real operational material.
+- Commercial possibilities: Use as a safe real-world extraction/normalization benchmark for the freight recovery stack; do not treat it as a recovery corpus because matching contract/rate authority, shipment truth and settlement records are not present.
+- Build-time savings: Weeks of benchmark-data acquisition/cleaning for real-world invoice structure.
+- Evidence inspected: Repository README; MIT license metadata; data/ground_truth.json; representative UBL invoice XML.
+- License / rights: Repository states MIT. Dataset publication is explicit and anonymization is described by the authors. Preserve license/citation terms.
+- Reuse classification: Directly reusable for benchmarking subject to MIT/citation obligations; not sufficient to assert recoverable dollars.
+- Scores:
+  - Technical value: 8.5/10
+  - Commercial value: 7.5/10
+  - Rarity: 9.2/10
+  - Completeness: 6.5/10 for freight audit, high for invoice extraction
+  - Build-time saved: 7.5/10
+  - Data advantage: 9.0/10
+  - High-ticket potential: 5.0/10 as a dataset; higher as stack validation
+- Next action: Import a representative subset into the ChatGPT Freight Recovery benchmark library and run EN16931/UBL extraction/reference-linking tests. Do not label any variance as recoverable without matching rate authority and shipment evidence.
+
+### RojaJoseph/Trucking-Management-System — signed rate-confirmation samples
+- Repository: https://github.com/RojaJoseph/Trucking-Management-System
+- Commit / revision: current main inspected 2026-09-19.
+- Date discovered: 2026-09-19
+- What it contains: A TMS rate-confirmation extraction project whose repository tree includes signed broker PDFs named for Allen Lund, BlueGrace and Stevens Transport; README describes them as “three real document formats.”
+- Why it matters: Potentially valuable real-world layout coverage for rate-confirmation extraction.
+- Commercial possibilities: None unless provenance/permission is established; do not use the customer/broker paperwork itself for commercial benchmarking or audit claims.
+- Build-time savings: Could inform layout coverage only after a lawful/permissioned sample is established.
+- Evidence inspected: README and repository tree/filenames only. The signed PDFs were intentionally not opened or imported because the repo provides no clear anonymization/consent statement and no repository license.
+- License / rights: No LICENSE found in repository metadata at inspection. Public visibility does not establish reuse rights. Real signed broker/customer documents may contain confidential commercial terms or personal/business identifiers.
+- Reuse classification: Quarantined / do not import or reproduce. Inspect high-level repository structure only unless explicit publication rights or anonymization are established.
+- Scores:
+  - Technical value: 6.0/10
+  - Commercial value: 0/10 until rights/provenance established
+  - Rarity: 8.0/10
+  - Completeness: 3.0/10 for our use
+  - Build-time saved: 0/10 under current rights
+  - Data advantage: 0/10 usable
+  - High-ticket potential: 0/10 as-is
+- Next action: Prefer clearly licensed/anonymized research corpora or customer-provided documents. Do not revisit these signed PDFs unless the repository later adds an explicit license/provenance/anonymization statement.
