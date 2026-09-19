@@ -1,149 +1,143 @@
 # COMBINATIONS
 
-Cross-repository product and capability combinations. Keep only combinations that are materially more valuable than their components alone; superseded versions should be replaced rather than duplicated.
+Cross-repository product and capability combinations. Keep only combinations that are materially more valuable than their components alone; superseded versions are replaced rather than duplicated.
 
-## Entry format
-### Combination
-- Components:
-- Combined capability:
-- Why the combination is stronger:
-- Likely buyer / user:
-- Build-time saved:
-- Rights / license constraints:
-- Validation step:
-- Status:
+## Combination rules
+- Preserve exact component revisions and rights boundaries.
+- A combination is commercial only when the joined capability solves a named buyer problem and has a falsifiable validation step.
+- Data/source rights are independent from repository-code rights.
+- Unknown, contradictory or insufficient evidence must remain unknown/review; it must never be converted into a positive claim or dollar amount.
 
 ## Active combinations — 2026-09-19
 
-### Freight recovery v8 — blind auditor bake-off + proof-obligation + incremental settlement proof
-- Components: truth engine `DominicFinn/open_tms@93d8c2b8ff78373ff69bb7ea546743e4703628b1` + `sengtha/Kareya-Silo@a43eedea03add0728eadfc1f8ea35cc3ca6867cc` + `vidyesh95/qatoto-backend@4f5f270f6ba5ef3ed4b230716997ccea049ce408` + structured invoices `hupe1980/en16931@894a3e0d36dea6d3dc086d066881d9a691b20882` + unstructured extraction `sutasmantas/invoice-extraction-pipeline@337cac1fc43af32652683b353cb1cab3c765eb8b`/`getomni-ai/zerox@91bbb20c50de86067670aa13833afa1b8a73c22e` + calibrated acceptance `OmarFaig/Assay@821303935ef2855908a9a9bd1efd4c33f9cd39d2` + deterministic rules `microsoft/RulesEngine@5650f93f843865610240e0498b26b68b477a3920` + identity GoldenMatch/Dedupe + freight-specific benchmark `aiparallel0/freight-audit@e7869162cf9cb23f6d520a0cd71f87cf973d8c28` + rate-confirmation extraction benchmark `ehs9nino/traffic-ocr-llm-benchmark@f4cccc066c544b072ace6b98f070c2dd590209f0` + proof/readiness engine `srthck/trustmesh@5a93d70b37aafecaf61a5bc0296eaf831e5504ac` + X12 `apimeister/x12-types@e8238385d9f4a8a21b6e4525f5ab3acc7bed3978` + settlement primitives `europeanplaice/subset_sum@62fe41b4c8f5d287d1904f573a9594cac254d340` and/or `Etherlabs-dev/multi-processor-reconciliation@2f9397fbe56a76abeee42a01a37536ad1811a806` + authorized live evidence `warpfreight/warp-agent-mcp@1850556032b465a0c24839e28564687462067323` + operator/UI donor `wearewarp/warp-tools@0646e7491771b7f5ddd2934fcac6e8ecb566c7fd` + optional lineage `OpenLineage/OpenLineage@e248b98e3146ff4437df76fcb07c83913d41f727` + enterprise behavior target `MicrosoftDocs/dynamics-365-unified-operations-public@b81257fa8c6f2e0599f477653b740f4565649276` + optional parcel recovery `EasyPost/easypost-python@d0dd20d900e38ee954af6e6c1c4ea2aaba96cda6`.
-- Combined capability: Freeze customer-owned contract/rate authority, shipment/service evidence and invoices; create an independent gold truth before viewing the incumbent auditor/FAP/ERP result; calibrated extraction and deterministic rerating produce candidate findings; TrustMesh-style proof obligations then gate controlling-rate authority, shipment identity, accessorial trigger, evidence independence/contradictions, deadline and settlement readiness; compare the incumbent against gold truth; request only the next evidence that can actually change a blocked decision; convert only unique verified misses into disputes; and trace them through credit/refund/820 evidence to uniquely allocated realized recovery.
-- Why the combination is stronger: v7 established “audit the auditor.” v8 closes two remaining credibility gaps: a rights-clean freight-specific falsifiable benchmark that separates extraction error from audit-rule error, and a deterministic proof-obligation/next-evidence layer that prevents a mathematically plausible variance from becoming a claim before its evidence is complete. This is materially stronger than adding another OCR model or freight matcher.
-- External policy validation: GSA's current 2026 Transportation Handbook explicitly says it is a best practice to **audit your auditor** and independently verify origin/destination, freight class, mileage, fuel surcharge, applicable one-time-only/contract/tender rate, accessorials, accurate weight, total billed vs total charged, signed delivery receipts, BOLs and weight tickets. It also requires retention of the quotation/tender/contract establishing special rates and duplicate-payment controls. This supports the architecture but is not an endorsement of this product.
-- Competitive benchmark update: Loop's September 1, 2026 Long-Horizon Freight AuditBench shows that “benchmark freight-audit AI” itself is no longer unique. v8 stays one level more neutral: it evaluates the **customer's incumbent process** against a blind customer-owned truth set, scores false-positive dollars as well as missed dollars, and follows unique misses to realized settlement.
-- Likely buyer / user: CFO/controllers, VP Supply Chain/Transportation, freight-payment/AP leaders and procurement teams at shippers with meaningful freight spend that already have or are selecting an audit/FAP process.
-- Current buyer-trigger validation: public 2026 signals show this decision window exists in practice. An enterprise retailer publicly described a current FAP RFI→RFP and new-provider implementation; Rockwell Automation publicly referenced a Cass Freight Audit and Payment provider transition alongside a TMS implementation. J.Crew and O'Reilly public roles show dedicated freight-payment/FAP ownership but do not alone prove an active provider switch. Treat such signals as timing/category evidence only, not consent to contact or proof of poor incumbent performance.
-- Commercial offer: fixed-price Freight Audit Acceptance Test/vendor bake-off first; continuous shadow assurance second; optional success fee only on **incremental realized recovery** uniquely attributable to findings the incumbent did not already identify.
-- Build-time saved: Very high—many months across TMS, rate modeling/versioning, extraction/calibration, freight-specific QA, proof readiness, live evidence, operator workflow, X12/remittance, settlement attribution and provenance.
-- Rights / license constraints: Core software is permissive as cataloged. The rate-confirmation benchmark is CC BY 4.0 and v8 uses only its rate-confirmation subset; unrelated pseudonymized driver/CDL material is unnecessary and should not be used. Microsoft documentation is CC-BY-4.0. Customer contracts/rates, incumbent outputs and live records require authorization. X12-derived metadata/fixtures require independent provenance. TrustMesh's MIT engine does not make external payment-network policy content reusable as freight policy; freight proof obligations must be independently defined.
-- Truth/benchmark requirements: gold truth is created independently of incumbent output. Preserve source document/hash/page/cell/clause, accepted/reviewed field evidence, calculation trace, proof-obligation state, dispute state and settlement allocation. Any unresolved extraction, contract entitlement, shipment fact, identity match, evidence contradiction or settlement allocation ambiguity yields **$0 asserted recovery**.
-- Required cases: `aiparallel0/freight-audit` clean/overcharge+duplicate-fuel/unauthorized-accessorial/detention-evidence cases plus stale/superseded rate, weight/dimensional/rate-break boundary, fuel-date error, ambiguous clause, missing controlling rate, conflicting POD timestamps, duplicate/non-independent evidence, expired deadline, partial settlement, one-to-many/many-to-many credit, duplicate/near-tie remittance and unsupported mapping.
-- Benchmark metrics: extraction field accuracy; Assay auto-accept coverage vs false accepts/reviewer touches; dollar-weighted recall; finding precision; false-positive dollars; clean-invoice accuracy; rule-family recall; evidence completeness/reproducibility; proof-readiness accuracy; abstention quality; incremental missed dollars; realized incremental recovery.
-- Benchmark sampling update: maintain two separately reported tiers. **Production tier** is a representative frozen customer population and is the only tier allowed to support observed sample leakage/economic inference; it must include verified clean invoices so false positives and clean-invoice accuracy are measurable. **Challenge tier** is deliberately enriched with rare/hard edge cases for rule coverage, abstention and regression testing. Never blend the tiers or extrapolate challenge-set error prevalence/dollars to customer-wide savings.
-- Public cross-document regression update: the explicitly public Pysar demo packet for LOAD-45892 links invoice INV-2026-4521, rate confirmation RC-2026-7834, BOL BOL-2026-33218 and PO-88412. It exposes $225 lumper plus $150 detention above base rate/fuel, but the controlling rate confirmation requires a lumper receipt and gives 2 free detention hours before $75/hour; the visible packet lacks the lumper receipt and dwell timestamps. v8 therefore correctly records $375 **identified review exposure, $0 validated variance, $0 asserted recovery**. This is the intended proof-obligation behavior, not a claimed real-world overcharge.
-- Tariff-authority update: public carrier tariffs/fuel schedules are corroborating authority only when the customer's controlling agreement incorporates them. Preserve the exact tariff/item revision effective on the shipment date; current published rules must not be retroactively substituted for historical freight, and customer-specific pricing exceptions override general rules where applicable.
-- Recovery attribution: exclude pre-existing claims, incumbent findings, auto-issued credits, projected savings, rejected findings and unresolved settlements. Fee base = uniquely allocated cash/credit/refund actually realized from a v8-unique validated finding.
-- Validation step: one customer-authorized blind population where incumbent findings are available. Freeze invoices/rates/shipment evidence first, create gold truth without looking at incumbent results, then compare. First decisive KPI = **verified dollars incumbent missed − false-positive dollars introduced by v8**; second = actually realized incremental recovery.
-- Adapter/onboarding update: preserve the vendor-neutral import contract for Dynamics 365 SCM, SAP TM/S/4HANA, Oracle OTM and generic FAP/BPO exports. Dynamics freight-bill/invoice match records are incumbent-run evidence; SAP freight settlement documents + carrier invoices/disputes provide expected-vs-submitted context; Oracle payment invoices + shipments + vouchers provide invoice/shipment/settlement feeds. These adapters lower pilot friction while keeping v8 independent of the incumbent system.
-- Implementation checkpoint 2026-09-19: runnable v8 core has reached **v0.8 with 39 passing tests**. Since v0.7, it added canonical rate-authority normalization/resolution: shipment-specific rate confirmations, amendments/quotes, contracts/tenders/customer rate cards and incorporated public tariffs are effective-dated and scope-aware; same-precedence overlap fails closed; each money rule requires source locator, extraction confidence, human validation and explicit rounding policy; indexed fuel/CWT/accessorial/full-density rules have rule-specific proof requirements. v0.7 functionality remains intact: public-demo fail-closed audit, clean-invoice blind scoring, FMCSA/EIA corroboration, rounding-scope regression, freight-native next-best-evidence, NMFTA 13-tier density/HSL gate, CWT minimum/weight-break/deficit rating, settlement attribution and DRAFT_NOT_SENT hashed dispute packets.
-- Status: **Highest-priority commercial strategy.** Largest remaining blocker is one authorized customer sample containing controlling rate/accessorial truth + shipment evidence + invoices + incumbent findings/decisions for the same population.
+### 1. Freight Recovery v9 — blind incumbent-auditor bake-off + rights-clean XLS tariff intake + proof-to-settlement
+- Components: `DominicFinn/open_tms@93d8c2b8ff78373ff69bb7ea546743e4703628b1` + `sengtha/Kareya-Silo@a43eedea03add0728eadfc1f8ea35cc3ca6867cc` + `vidyesh95/qatoto-backend@4f5f270f6ba5ef3ed4b230716997ccea049ce408` + XLS intake `BestKylin2001/Freight-Rate-Sheet-Generator@78f3b86a2a4a25d9abf11d4addc2feea10667352` + structured invoices `hupe1980/en16931@894a3e0d36dea6d3dc086d066881d9a691b20882` + unstructured extraction `getomni-ai/zerox@91bbb20c50de86067670aa13833afa1b8a73c22e` + calibrated acceptance `OmarFaig/Assay@821303935ef2855908a9a9bd1efd4c33f9cd39d2` + rules `microsoft/RulesEngine@5650f93f843865610240e0498b26b68b477a3920` + identity GoldenMatch/Dedupe + benchmark `aiparallel0/freight-audit@e7869162cf9cb23f6d520a0cd71f87cf973d8c28` + proof/readiness `srthck/trustmesh@5a93d70b37aafecaf61a5bc0296eaf831e5504ac` + authorized live evidence `warpfreight/warp-agent-mcp@1850556032b465a0c24839e28564687462067323` + X12/settlement primitives already cataloged.
+- Combined capability: customer-authorized rate workbook/PDF + shipment/POD/BOL + invoice → reviewed/versioned controlling tariff → deterministic rerating → evidence-gated finding → blind incumbent comparison → dispute packet → credit/refund/remittance attribution → realized recovery.
+- New advantage this run: the messy-XLS rate-card gap is no longer purely hypothetical. BestKylin supplies a permissive baseline for header discovery, aliases, Excel dates/formula values and canonical ocean-rate output. No-license carrier-specific parsers remain clean-room requirements only for multi-origin/destination, add-on/base tables and included/excluded surcharge cases.
+- Buyer: CFO/controller, VP Transportation/Supply Chain, freight-payment/AP leaders and 3PL finance teams with material freight spend.
+- First paid wedge: fixed-price Freight Audit Acceptance Test on a frozen customer population; optional success fee only on uniquely attributable realized cash/credits the incumbent did not already identify.
+- Rights: core listed code is permissive as cataloged. Customer contracts/rates and incumbent decisions require authorization. No-license carrier parser source/data is not reused. X12-derived metadata/fixtures require independent provenance.
+- Required benchmark discipline: production population and challenge corpus are separately reported; gold truth is frozen before incumbent outputs are opened; clean invoices are included; unresolved extraction, controlling-rate authority, entitlement, shipment identity, contradiction or settlement allocation yields **$0 asserted recovery**.
+- Validation: at least 20 challenge cases plus one representative customer-authorized production population. First decisive KPI = verified dollars incumbent missed minus false-positive dollars introduced; second = realized incremental recovery.
+- Status: **#1 commercial strategy.** Remaining P0 is customer-authorized PDF/accessorial authority + an incumbent-comparison/settlement population, not generic TMS/OCR/XLS discovery.
 
-### CaptureBrief verified procurement intelligence + authoritative identity/regulatory currency
-- Components: `MindPetal/sam-search@019b31dca0f980e79117a7c559777cb357a2a385` + `blencorp/capture-mcp-server@e91ce243cd6a62e9c2a55609d34a187fca89703b` + `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964` + `fedspendingtransparency/data-act-broker-backend@76dcae4ccbf6951223608bc1d8fd0c5b03da5d68` + `cliwant/mcp-sam-gov@aaaaa70dcb6a08cf43cb40ece26b79d6d21c2463` + `1102tools-dev/federal-contracting-mcps@c3a137ace72dacca8026752820375dc957badc57` + GoldenMatch/Dedupe/Splink where needed + RulesEngine + optional OpenLineage.
-- Combined capability: Current opportunity ingest → solicitation evidence → authoritative UEI/DUNS/legal/DBA/parent identity semantics → PIID/IDV/award lineage and incumbent/competition intelligence → exact FAR/DFARS clause/prescription evidence → current agency-deviation/FAR-Overhaul context → explainable bid/no-bid/readiness packet.
-- Why the combination is stronger: The DATA Act broker adds the government's own upstream recipient/award normalization semantics, reducing dependence on fuzzy-name heuristics. Regulatory and award conclusions remain attached to current authoritative sources rather than becoming generic RAG output.
-- Likely buyer / user: Federal primes/subcontractors, proposal/capture consultants, outsourced BD/compliance teams and specialist GovCon research firms.
-- Build-time saved: Very high—months of source integration, award/entity lineage, regulatory retrieval and evidence packaging.
-- Rights / license constraints: SAM/Capture/Regulatory tools are MIT as cataloged; USAspending and DATA Act broker are CC0-1.0. Government-source applicability and changing rules remain contextual and human-reviewed.
-- Validation step: Ten current solicitations must yield manually verified opportunity→entity→parent→award/incumbent→competition/set-aside→clause/prescription→current-deviation packets. Explicitly score false joins, unresolved identity conflicts and stale-source handling. Add independently authored evidence-gate tests inspired by CivicProof: no stored source/hash or unlocatable quotation support means no accepted claim; no direct CivicProof code reuse absent a license.
-- Status: High-priority CaptureBrief architecture. Stop generic SAM/fuzzy-identity wrapper discovery; validate packet completeness, join correctness and fail-closed evidence acceptance.
+### 2. ScopeSignal v2 — registered 2D/IFC revision → quantity delta → entitlement evidence
+- Components: 2D revision core `MassingCloud/massing-pdf@36794b3c54fcfd62e3a0d2d5984cfc45cac83340` + quantity engine `Kentucky-ai/opentakeoff@6ff9cc355e60d6312c0c82e2ddac56cb212cc394` + IFC revision evidence `delongwangshu49-hub/bimchange-agent@cd7fd6e6522e060b7847f0daaed00979097da7dd` + Zerox/Docling for contract/spec intake + RulesEngine + evidence/proof gates.
+- Combined capability: old/new sheet registration with translation/scale correction and markup migration → structured changed regions/model elements → measured quantity delta → controlling contract/spec clause → reviewer-approved compensability and commercial-impact packet.
+- Why stronger: Massing-pdf closes the missing 2D registration problem that raw pixel/OCR diff could not. A drawing difference still does **not** become compensable until entitlement evidence is present.
+- Buyer: specialty contractors, GCs, BIM/VDC, quantity surveyors, estimators and change/claims teams.
+- First paid wedge: one issued revision pair with aligned redlines + migrated-markup review queue + quantity delta; measure review time/false positives before attaching dollars.
+- Rights: Massing-pdf/BIMChange are MIT; OpenTakeoff Apache-2.0. Customer drawings/contracts remain customer data.
+- Validation: 20 rights-clean synthetic/public revision pairs spanning translation, scale, reorder, crop and moved-only annotations; then one customer-authorized pair through exact clause/quantity evidence.
+- Status: Strong. Next gap is entitlement-to-dollar proof, not generic PDF diff.
 
-### ScopeSignal drawing/model-to-dollar change evidence
-- Components: `Kentucky-ai/opentakeoff@6ff9cc355e60d6312c0c82e2ddac56cb212cc394` + `delongwangshu49-hub/bimchange-agent@cd7fd6e6522e060b7847f0daaed00979097da7dd` + Zerox/Docling for unstructured contract/spec intake + RulesEngine; no-license `Fajendagba/Construction-Change-Order-Engine@60f5ab99bfb97647039e6cec280c246a10f8a856` contributes clean-room workflow requirements only.
-- Combined capability: IFC old/new correspondence with deterministic evidence + calibrated 2D quantities + contract/spec extraction → versioned entitlement trigger → human-reviewed quantity delta and proposed commercial/schedule impact.
-- Why the combination is stronger: BIMChange-Agent covers rights-clean IFC correspondence and OpenTakeoff provides defensible 2D measurement; entitlement remains a separate proof gate so a geometric change is not automatically treated as compensable.
-- Likely buyer / user: Specialty subcontractors, GCs, BIM/VDC, quantity surveyors, estimators and project-controls/claims teams.
-- Build-time saved: Very high across IFC revision matching, plan measurement, evidence and review.
-- Rights / license constraints: OpenTakeoff is Apache-2.0; BIMChange-Agent/RulesEngine/Zerox are MIT; Fajendagba remains inspect-only.
-- Validation step: One held-out IFC revision and one PDF-plan revision must preserve element/revision identity through quantity delta and exact contract/spec evidence. Human approval is mandatory before any dollar claim.
-- Status: Strong. Remaining gaps are 2D cross-revision correspondence and entitlement-to-dollar validation, not generic takeoff/IFC discovery.
+### 3. Compliance/resilience v3 — collect → restore/PITR → govern remediation → re-prove
+- Components: Attestful collectors + `Polycentric-Labs/evidentia@0e0bc8bac7d8e4b71f729ac488fd3b47273f5531` + `RamazanKara/restore-drill@dea374da3b340f53b798112eee82bd7ed1224572` + PostgreSQL proof engine `cybertec-postgresql/pg_hardstorage@b47541b7e1cea69ce6ec63b26e154eb25fc4ca91` + optional `backupdrill/cli@401954dd01d1141d81eda488ddf30c7d08b0f0e9`/`iacosta3994/restic-drill@0e11db6339fc86f87239b259827f6848a69886f7` adapters + remediation governor `google/cybernetic-agent-governance-engine@50b12e7d983db0e3d7faf206ac6aa600294f33ac`.
+- Combined capability: evidence collection → normalized control state → real isolated restore/PITR → database/content/application checks → signed verdict → allow/deny/require-approval remediation decision → fresh re-test/evidence.
+- Why stronger: pg_hardstorage supplies unusually hard proof: actual recovery plus `pg_verifybackup`/`pg_amcheck` and signed verdict. This moves the product beyond “backup job succeeded.”
+- Buyer: regulated SaaS, MSP/MSSP, platform/SRE teams, cyber-insurance/compliance consultants.
+- First paid wedge: fixed-price Recovery Readiness Audit on one backup/recovery point, then recurring independent drills.
+- Rights: permissive as cataloged; backup/customer data and cloud/provider terms separate.
+- Validation: vendor-neutral evidence schema containing artifact identity, target, duration, structural/logical checks, app invariants, content hashes, limitations and signer; reproduce on PostgreSQL plus one non-Postgres/object-storage path.
+- Status: High-value challenger; now validation/packaging constrained, not tool-discovery constrained.
 
-### Compliance modernization + restore-proof + governed remediation
-- Components: `clay-good/attestful@c445095952d6e1ca27eadc638b1bfe96e8f5f00d` + `williamzujkowski/oscalize@39c283b54e14b71df72e1b8327b593f560adcbe6` + `Polycentric-Labs/evidentia@0e0bc8bac7d8e4b71f729ac488fd3b47273f5531` + `RamazanKara/restore-drill@dea374da3b340f53b798112eee82bd7ed1224572` + optional PostgreSQL/Restic worker `techdev-lab/restorelab@24716864885b7201511a7d18d1754a0609a729d5` + remediation governor `google/cybernetic-agent-governance-engine@50b12e7d983db0e3d7faf206ac6aa600294f33ac`.
-- Combined capability: Read-oriented cloud/SaaS evidence collection → OSCAL conversion/control mapping → normalized/signed evidence and gap state → disposable restore execution → deterministic allow/deny/require-approval/defer/narrow/pause decision for an approved remediation → fresh re-test → versioned evidence of the resulting state.
-- Why the combination is stronger: Previous versions proved a control failure or restore result but stopped before safe action. CAGE closes the operational loop without turning detection into uncontrolled automation: errors remain explicit, risky actions can require approval, blocked actions stay blocked, and remediation does not become “compliant” until a fresh evidence-producing re-test succeeds.
-- Likely buyer / user: FedRAMP/ATO consultants, SOC 2/ISO/NIST programs, regulated SaaS and MSP/MSSP/SRE/platform teams.
-- Build-time saved: Potentially 9–18 months across collection, evidence/control mapping, restore proof, approval/governance state, action receipts and standards export.
-- Rights / license constraints: Attestful/Evidentia/restore components are permissive as cataloged and CAGE is Apache-2.0; bundled framework/catalog content, cloud APIs, backup tools and each customer remediation target retain separate terms/permissions. Only customer-authorized remediation actions may execute.
-- Validation step: synthetic AWS/GitHub evidence + disposable PostgreSQL restore must land in one versioned control package. Inject a failed restore; a harmless remediation may auto-run, a production/destructive remediation must require approval, an unapproved action must remain blocked, and only a successful fresh re-test may change the control to pass.
-- Status: Strong standalone challenger. Generic compliance-collector/governance discovery is now low-yield; prove the closed loop and paid-pilot packaging.
+### 4. Marketplace Settlement Reliability OS — execute correctly + independently detect money-state drift
+- Components: rights-clean execution/accounting semantics from `spree/spree@65839390ae2048a491de948364c93edf310ef478` plus previously cataloged MIT marketplace split-payment/double-entry substrate + independent read-only assurance `tonytonycoder11/stripe-connect-reckon@deb30aabfed84c7b0b2e5ae28c92cc9f85f79193`.
+- Combined capability: seller earning/reversal/payout state + concurrency/ambiguous-provider handling + independent read-only Stripe/app-state reconciliation for failed payouts, event gaps, refund mismatches, negative balances, reserve/dispute exposure and forecasting.
+- Why stronger: the assurance plane can be sold without replacing the customer's payment execution path, dramatically lowering pilot friction while still targeting direct financial exposure.
+- Buyer: marketplace CFO/controller/finance-ops/risk and engineering teams using Stripe Connect.
+- First paid wedge: Marketplace Money Safety Audit using read-only authorized data; report unresolved exposure and reconciliation exceptions, then convert to recurring monitoring.
+- Rights: Spree BSD-3-Clause; stripe-connect-reckon MIT; provider terms/customer authorization separate.
+- Validation: synthetic fault corpus with known failed payouts, refund-state mismatches, missing events, negative-balance trajectories, reserve exposure and dispute spikes; score precision/recall, time-to-detection and false-alert burden.
+- Status: **New high-priority challenger.** Strong first-revenue shape, but not yet evidence-backed enough to displace freight.
 
-### Field-service proof-to-cash assurance
-- Components: `proforcetech/phparm@a691ebfdea93a20f9de5f8a076430c859f299255` + `OCA/field-service@a43cb4800917c921eaa2e9b3c5eb059044ce7b55` + `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` + RulesEngine. No-license septic/pool/FSM systems contribute vertical clean-room requirements only.
-- Combined capability: Agreement/warranty entitlement → recurring/service order → technician capacity/replan → QR/photo/signature/document proof → labor/parts/expense capture → invoice → exception/revenue-leakage evidence.
-- Why the combination is stronger: `phparm` gives permissive proof/entitlement mechanics; OCA demonstrates a mature cross-module agreement→equipment/warranty→parts/time→signature→billing chain; RosterSpec makes replans explainable and minimum-disruption. The sellable outcome is recovered/protected service revenue, not generic dispatch software.
-- Likely buyer / user: Equipment service, HVAC, facilities/janitorial, industrial maintenance and Odoo field-service operators.
-- Build-time saved: High—months of FSM, contract, evidence, billing and replan semantics.
-- Rights / license constraints: phparm MIT, RosterSpec Apache-2.0. OCA field-service is AGPL-family and should be deployed only with deliberate AGPL compliance; otherwise use it as requirements/behavioral reference for an independent permissive implementation. No-license vertical systems remain inspect/clean-room only.
-- Validation step: Synthetic 100-work-order leakage corpus with entitled agreement work, warranty, billable extras, missing signature/proof, missing time/parts and completed-but-unbilled cases. Require exact evidence for every recoverable amount and zero false recovery on entitled/warranty work.
-- Status: New high-value service-first cluster; validate leakage dollars and buyer willingness-to-pay before building a replacement FSM.
+### 5. Industrial interoperability acceptance lab
+- Components: simulator/fault/replay plane `suoten/ProtoForge@7c61b10d9ae406224c86741d9c0a450b561b40ca` + multi-vendor client/gateway comparator Apache PLC4X + Logix/EtherNet/IP digital-twin candidate `joyautomation/nautilus@ee970ebc12edd894fdab4f83d557cef100cbf986` + independent device/client implementations such as OpENer/EIPScanner where standards-rights boundaries are satisfied.
+- Combined capability: model customer-authorized industrial endpoints → normal/fault/disconnect/timeout/write/replay scenarios → independent-client comparison → reproducible compatibility/evidence matrix before plant cutover.
+- Buyer: industrial gateway/SCADA vendors, machine builders, system integrators, OEM QA and plant OT teams.
+- First paid wedge: fixed-price gateway regression pack for 3–10 device types and three verified protocol families.
+- Rights: ProtoForge MIT and PLC4X Apache-2.0; protocol standards, vendor marks/patents and third-party libraries remain separate. OpENer itself warns of separate ODVA technology/mark obligations.
+- Validation: start with Modbus TCP, IEC-104 and OPC UA using external clients; only market protocol coverage that passes reproducible cross-implementation tests.
+- Status: New strong B2B cluster. Stop broad protocol-library hunting; validate protocol-by-protocol commercial reliability.
 
-### Workforce schedule assurance + minimum-disruption repair
-- Components: `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` + `rodrigo-arenas/pyworkforce@ca4892502d2d92cc996c9fde96293ff90b560426` + clean-room operational invariants from no-license `davescalante/LCC-WFM@d11905dafb7dced6e889c4f3f9c491863770f4f6`.
-- Combined capability: Demand/coverage requirement → baseline staffing/rostering → verify an existing published schedule → diagnose infeasibility with stable rule codes → apply/verify minimum-disruption repairs around hard locks → report coverage, paid hours/overtime and assignment churn.
-- Why the combination is stronger: Generic optimizers are easy to find; the difficult operational problem is safely repairing the schedule people already have when callouts or demand shifts occur. RosterSpec closes that gap and pyworkforce provides conventional staffing/rostering primitives.
-- Likely buyer / user: Contact centers/BPOs, fulfillment, field-service operations and WFM vendors.
-- Build-time saved: High across solver primitives, verification, explainability and repair semantics.
-- Rights / license constraints: RosterSpec Apache-2.0; pyworkforce MIT; LCC-WFM inspect-only.
-- Validation step: Replay one synthetic/customer-owned week of callouts and compare manual/current repairs to minimum-disruption verified repairs on uncovered intervals, overtime/paid hours and reassignment count.
-- Status: Strong assurance product; deprioritize generic scheduler discovery and validate ROI/replan correctness.
+### 6. Network management-plane migration acceptance
+- Components: `clicon/clixon-controller@36ecc0fd8787750978652495a39d0d01db2c7474` + dense synthetic device plane `notconf/notconf@cc2499d2a859aa76a3ec3a265ec7c36f2d5ea07e` + independent reference server `CESNET/netopeer2@5be28a93e783b41d1c284c1275c9b24237d0454d` + current gNMI probe/control plane `openconfig/gnmic@ce0d4173630ae73fe9cfe124ce8d564fa3b69c5e`.
+- Combined capability: model YANG/OpenConfig estate → replay validate/lock/commit/rollback/disconnect/timeout plus Get/Set/Subscribe workflows across synthetic and independent endpoints → machine-readable migration compatibility report.
+- Buyer: telecom operators, MSPs, NMS/OSS/controller vendors and network automation integrators.
+- First paid wedge: fixed-price controller/NMS migration preflight on one representative service/config workflow before production cutover.
+- Rights: Clixon/gnmic Apache-2.0; notconf/Netopeer2 BSD-3-Clause. Vendor YANG models/content remain separately licensed.
+- Validation: identical OpenConfig fixture across 10–100 notconf endpoints and Netopeer2; retain semantic disagreements as regression cases rather than treating any single implementation as the standards oracle.
+- Status: Strong new difficult-integration service wedge.
 
-### Vendor-neutral lab automation + calibration/replay/data-evidence fabric
-- Components: `sciencecorp/galago-tools@7ddf68c7bb7eda0243f6466cfbd6b97fdcfcf782` + `PyLabRobot/pylabrobot@c3c59eebf45c4f6bb2fc78dbfd30f6e458653494` + `labiium/pytestlab@8b7f873e29457f05dee7af0de698e27985c98a33` + `siemens/pydcc@34174f8fc2625c32e6b7a3525d21d88af608ac24` + `swisscatplus/glas@764f79daabad5abc48ffe10c4b60db2f9270c8f9` + `ORNL/flowcept@c000b10ea49659af6c5821b61918f3893bd46a92` + `hdkim99/OperandoMerge@06d2ca8e9b0dfc2683c8ca77b19a1ab6f1623b92` + optional `qpillars/openapi-to-sila2@eff6e33e72be003eac3dd57e66333dac4e0a48e5`.
-- Combined capability: Mixed-vendor/legacy gateways + cross-vendor hardware abstraction + SCPI record/replay/simulation and bench CI + cryptographic digital calibration-certificate gate + shared scheduling/orchestration + scientifically correct asynchronous instrument data fusion + run provenance.
-- Why the combination is stronger: The stack now covers not just control but **can this instrument legally/technically run, can its commands be regression-tested without occupying hardware, and can every resulting value be traced/aligned without fabricating events?** That is a much stronger validation product than a lab dashboard.
-- Likely buyer / user: Electronics/RF/medical-device verification, biotech/pharma R&D, CROs, calibration/metrology labs and automation integrators.
-- Build-time saved: Very high; potentially many months across device/runtime integration, replay, calibration evidence, scheduling and provenance.
-- Rights / license constraints: Components are permissive as cataloged; vendor SDKs/firmware/SCPI docs, DCC examples and instrument-specific runtimes/data require individual review.
-- Validation step: Synthetic SCPI bench records a known-good run, replay catches an injected state regression, PyDCC allows/reviews/blocks based on calibration evidence, OperandoMerge aligns continuous/stepwise/event channels with deliberate clock offsets and Flowcept reconstructs the run lineage.
-- Status: Strong high-ticket integration/validation opportunity, likely slower sales than freight but technically differentiated.
+### 7. Lab/instrument automation + analytical-development evidence fabric
+- Components: `labiium/pytestlab@8b7f873e29457f05dee7af0de698e27985c98a33` + `sciencecorp/galago-tools@7ddf68c7bb7eda0243f6466cfbd6b97fdcfcf782` + `PyLabRobot/pylabrobot@c3c59eebf45c4f6bb2fc78dbfd30f6e458653494` + `ORNL/flowcept@c000b10ea49659af6c5821b61918f3893bd46a92` + high-value vendor lane `novonordisk-research/OptiHPLCHandler@96399dcddc1457a5b942f61585b9e8fcf78b9a72`; optional NIST `rmellipse@79daadef817c892e0366cd748279665c6f1f8dd3` for correlated metrology uncertainty.
+- Combined capability: vendor/device control + hardware-independent replay/simulation + assay/sample-set/method generation inside an existing CDS + workflow provenance and optional recalculable uncertainty chain.
+- Why stronger: OptiHPLC adds a specific, high-budget analytical-development workflow rather than another generic lab framework; Flowcept preserves run lineage and PyTestLab makes regression evidence reproducible.
+- Buyer: pharma/biotech analytical-development/QC labs, CROs, instrument integrators and research cores.
+- First paid wedge: automate one existing Empower robustness/stability/assay workflow while preserving Empower as system of record; measure expert touches removed and reproducibility.
+- Rights: listed code permissive as cataloged; vendor runtime/API/instrument licenses and customer methods/data remain separate.
+- Validation: mock/synthetic Empower flow first, then customer-authorized hardware/CDS validation. Do not imply vendor certification.
+- Status: Strong service-first vertical; buyer access is the main friction.
 
-### Grid hosting-capacity + resilience decision stack
-- Components: hosting/QSTS `sandialabs/DREAMS@3eb6c6089eadf09a4bf99961faac11a76ef30ca0` + resilience `NLR-Distribution-Suite/erad@735f7a6baa9fe24878a986a3425bf6d55ad556c3` + synthetic feeder generation `NatLabRockies/shift@10ac70edd0fde15a322bc280be28451f76a4c834` + customer-authorized or rights-clean public hazard/topology data; optional explicitly CC-BY decision vocabulary from `azmartone67/dchub-backend@ce0b5a0063bcfb9050aa5b9cf309833d2dee12ad` only within the scope of its separate data license.
-- Combined capability: Generate or ingest a distribution feeder → calculate nodal DER hosting-capacity/QSTS thresholds under explicit voltage/thermal constraints → apply wind/flood/wildfire/earthquake hazards → asset-specific fragility/failure → network consequence → restoration/hardening and interconnection-priority evidence.
-- Why the combination is stronger: SHIFT supplies a rights-clean synthetic feeder path when private utility topology is unavailable; DREAMS adds the electrical-capacity layer needed to answer “how much DER can connect and what binds?”; ERAD answers “what fails under hazard and what restoration consequence follows?” Together they support a site/feeder diligence product rather than separate capacity and hazard maps.
-- Likely buyer / user: Distribution utilities, DER/solar/storage developers, interconnection engineers, engineering consultancies, insurers/lenders, microgrid/critical-facility planners and infrastructure investors.
-- Build-time saved: Very high—months across feeder synthesis, OpenDSS hosting-capacity/QSTS, hazard/fragility, network consequence and restoration analysis.
-- Rights / license constraints: DREAMS is MIT; ERAD and SHIFT are BSD-3-Clause. OpenDSS, hazard datasets, OSM/other geodata, fragility sources, ForeFIRE and customer feeder models retain their own terms. GPL OMF may be used only in a deliberate GPL-compatible comparison/service boundary, not casually mixed into the permissive core.
-- Validation step: generate 25–50 synthetic feeders with planted voltage/thermal hosting limits and known damage/restoration conditions. Require DREAMS capacity thresholds to match synthetic ground truth within declared tolerances, then run hazards and measure affected assets/service consequence/restoration order. Do not make real-world capacity/safety claims from synthetic topology.
-- Status: New high-ticket engineering/decision cluster with a rights-clean core. Next question is engineering validation and buyer urgency, not more generic OpenDSS or hazard-map discovery.
+### 8. CaptureBrief verified procurement intelligence
+- Components: `MindPetal/sam-search@019b31dca0f980e79117a7c559777cb357a2a385` + `blencorp/capture-mcp-server@e91ce243cd6a62e9c2a55609d34a187fca89703b` + `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964` + `fedspendingtransparency/data-act-broker-backend@76dcae4ccbf6951223608bc1d8fd0c5b03da5d68` + `cliwant/mcp-sam-gov@aaaaa70dcb6a08cf43cb40ece26b79d6d21c2463` + identity/rules/evidence layers.
+- Combined capability: current opportunity → authoritative recipient/parent/award identity → incumbent/competition history → exact clause/prescription/deviation evidence → explainable bid/no-bid/readiness packet.
+- Buyer: federal primes/subs and capture/proposal consultants.
+- First paid wedge: manually verified 10-opportunity evidence packet benchmark.
+- Rights: MIT/CC0 as cataloged; applicability/currentness remains contextual and human-reviewed.
+- Validation: no stored source/hash or locatable support means no accepted high-risk claim; unresolved upstream source remains unresolved, not “not found.”
+- Status: High-priority architecture; generic SAM/fuzzy-wrapper discovery is exhausted.
 
-### Warehouse slotting + layout ROI engine
+### 9. Field-service proof-to-cash assurance
+- Components: `proforcetech/phparm@a691ebfdea93a20f9de5f8a076430c859f299255` + `TheGringo-ai/cmms-normalize@dd0c752f6e0da0506ffb95ea6832c66dae81eb92` + scheduling/repair `RosterSpec` + evidence/rules layer.
+- Combined capability: normalize heterogeneous work-order history → prove scheduled/entitled field visit → capture QR/photo/work evidence → detect missed SLA/out-of-scope/unbilled work → route repair/exception without fabricating fields.
+- Buyer: janitorial/facilities contractors and multi-site maintenance operators.
+- First paid wedge: normalize one export and quantify missed/unprovable/out-of-entitlement work plus baseline SLA/backlog metrics.
+- Rights: phparm/cmms-normalize MIT; customer work-order data requires authorization.
+- Validation: three synthetic/customer-authorized CMMS export shapes must preserve labor/status/date semantics and fail closed on non-work-order files.
+- Status: Strong niche wedge; regulated PTW/LOTO/MOC semantics remain clean-room/authoritative-source work.
+
+### 10. Workforce schedule assurance
+- Components: `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` + existing workforce/dispatch datasets/adapters where lawful.
+- Combined capability: verify published roster → explain infeasibility → generate and re-solve minimum-disruption repair around locked work.
+- Buyer: contact centers, fulfillment, healthcare ops and field service.
+- First paid wedge: replay historical callouts and compare coverage, paid hours/overtime and assignment churn against manual repairs.
+- Rights: Apache-2.0 core.
+- Validation: historical/synthetic ground truth with independent oracle checks.
+- Status: Strong algorithmic assurance wedge; no need for more generic schedulers.
+
+### 11. Grid hosting + resilience decision stack
+- Components: SHIFT-style feeder generation + `sandialabs/DREAMS@3eb6c6089eadf09a4bf99961faac11a76ef30ca0` + `NLR-Distribution-Suite/erad@735f7a6baa9fe24878a986a3425bf6d55ad556c3`.
+- Combined capability: synthetic/customer feeder → hosting/QSTS constraints → hazard-induced asset failure → network consequence → restoration/hardening priority.
+- Buyer: utilities, DER/storage developers, engineering consultants and insurers.
+- First paid wedge: one rights-clean feeder with planted hosting and damage cases; produce constraint thresholds and restoration priorities.
+- Rights: code permissive as cataloged; feeder/hazard/fragility data have separate provenance.
+- Validation: independent OpenDSS/engineering truth checks before any interconnection or resilience claim.
+- Status: Technically compelling, slower enterprise sale than freight.
+
+### 12. Warehouse movement-to-slotting ROI
 - Components: `agritheory/inventory_tools@dd1e07d98eb81b2388acb922ce9ae3397a5af7ac` + `gokhanozden/gabak@711856814856e1730bd3be1cc7e4468ceca4fd5d`.
-- Combined capability: Inventory movement heat + dimensional fit/capacity + executable SKU/bin recommendations, independently evaluated against pick-list tours and alternate layouts/path models.
-- Why the combination is stronger: Inventory Tools recommends what to move; GABAK gives an ERP-independent simulator to prove travel reduction before operational disruption.
-- Likely buyer / user: Distributors, 3PL warehouses, light manufacturers, warehouse consultants and ERPNext partners.
-- Build-time saved: High.
-- Rights / license constraints: Both MIT; ERPNext/Frappe dependencies apply only where integrated.
-- Validation step: Neutral CSV geometry + pick-list benchmark comparing current vs suggested slotting/layout with capacity violations, travel savings and labor assumptions exposed.
-- Status: Technical discovery largely resolved; next question is measured ROI and willingness-to-pay.
+- Combined capability: ERP movement heat + dimensional/capacity fit → slotting recommendation → layout/path simulation → travel/labor ROI evidence.
+- Buyer: warehouses/DCs, especially ERPNext operators.
+- First paid wedge: fixed-price re-slotting diagnostic.
+- Rights: MIT; ERP/customer movement data separate.
+- Validation: neutral CSV geometry + pick-list benchmark exposing capacity violations, travel savings and labor assumptions.
+- Status: Discovery largely resolved; prove ROI/willingness-to-pay.
 
-### TR-069 → USP dual-stack modernization and regression lab
-- Components: `freeacs/freeacs@f4c5d056ac6c247e0757de20acacd6046fd0ef0d` + `OktopUSP/oktopus@e1f07d71a93c4169421f2e94ce6605746ece37ad` + `BroadbandForum/obuspa@59028beba21471d19bd3842ef2632ceb6ca8c7fc` + `OktopUSP/agent-sim@d90b08dfa59276f28dfcc18cb35c522f356227a5`.
-- Combined capability: Legacy CWMP ACS + unified CWMP/USP controller + modern USP agent + simulated USP fleet for migration rehearsal, interoperability, regression and load testing.
-- Why the combination is stronger: Complete rights-clean technical bridge from legacy management through modern device-side USP plus simulation.
-- Likely buyer / user: Regional ISPs/WISPs, broadband/CPE OEMs and telecom QA/certification labs.
-- Build-time saved: Many months.
-- Rights / license constraints: FreeACS MIT, Oktopus/agent-sim Apache-2.0, OB-USP-Agent BSD-3-Clause; BBF data-model/specification redistribution and vendor firmware terms remain separate.
-- Validation step: Reproduce CWMP Get/Set/download and USP Get/Set/Operate/Notify over multiple transports with concurrent simulated agents, migration fixtures and tenant-isolation evidence.
-- Status: Rights-clean path exists; focus on scale/tenancy/buyer urgency, not more controller discovery.
+### 13. TR-069 → TR-369 migration/conformance lab
+- Components: `freeacs/freeacs@f4c5d056ac6c247e0757de20acacd6046fd0ef0d` + rights-clean current CPE simulator `softov/cwmp-sim@5fa8fd830bba178310febb9e62d87df17ce9a306` + `OktopUSP/oktopus@e1f07d71a93c4169421f2e94ce6605746ece37ad` + BSD OB-USP-Agent + Apache agent simulation assets already cataloged.
+- Combined capability: deterministic legacy CWMP fleet/session fixture → equivalent USP controller/agent fixture → behavioral migration gap report.
+- Buyer: regional ISPs/WISPs, ACS/controller vendors and CPE OEMs.
+- First paid wedge: provisioning-change/migration preflight across BOOT/periodic/Get/Set/download/diagnostic plus equivalent USP operations.
+- Rights: FreeACS MIT, cwmp-sim BSD-3-Clause, Oktopus Apache-2.0; BBF/vendor data-model/spec assets remain separate.
+- Validation: 50–100 simulated CPE identities and differential lifecycle cases.
+- Status: Rights-clean legacy endpoint gap is now closed enough for a pilot; stop generic USP/CWMP discovery.
 
-### GST input-tax reconciliation and exception recovery
-- Components: `Tamil-Venthan/Rekvia@158d199e4f08041e587a70926f2ed22d17511431` + RulesEngine + GoldenMatch/Dedupe + authoritative GST/GSTR-2B/IMS rules and taxpayer-owned purchase-register data.
-- Combined capability: Duplicate-safe purchase-register↔GSTR-2B matching, supplier identity normalization, versioned eligibility/control rules and human-reviewed exception workflow.
-- Why the combination is stronger: Rekvia supplies a functioning vertical reconciliation core while rules and entity identity are separable from changing tax policy.
-- Likely buyer / user: Indian SMEs, accounting firms and finance shared-services teams.
-- Build-time saved: Medium-high.
-- Rights / license constraints: Software components permissive as cataloged; government rules/data, taxpayer records and portal access are separate. No automated filing/recovery claim without current-rule validation and human review.
-- Validation step: Versioned corpus covering exact/fuzzy/duplicate, credit/debit notes, IMS accepted/rejected/pending, amendments and ineligible/reversal cases with accountant review.
-- Status: Strong recovery-category challenger but below freight until 2026 IMS coverage and buyer economics are measured.
-
-### Field onboarding + crop monitoring
-- Components: `superzero11/OpenFarm@884a61567dd0d149214090baf9edebc533a2a0df` + `RS-iCM/RSCM` at its cataloged revision.
-- Combined capability: Derive/ingest field boundaries and crop/non-crop masks, then run recurring vegetation-index, soil, weather and alert workflows inside a deployable field platform.
-- Why the combination is stronger: RSCM helps bootstrap labels/boundaries while OpenFarm supplies the operational PostGIS/worker/Sentinel-2/alert workflow.
-- Likely buyer / user: Crop insurers, agricultural lenders, agronomy firms, specialty-crop managers and land-use monitoring programs.
-- Build-time saved: Potentially 9–15 months for a focused MVP.
-- Rights / license constraints: OpenFarm BSD-3-Clause and RSCM MIT at inspected revisions; data/model/source terms remain separate.
-- Validation step: Lawful 50–100-field benchmark comparing boundaries/masks against known polygons and alert precision/stability.
-- Status: Strong technical agriculture combination but below faster-cash leaders until paid demand is proven.
+### 14. GST input-tax reconciliation assurance
+- Components: `Tamil-Venthan/Rekvia@158d199e4f08041e587a70926f2ed22d17511431` + deterministic evidence/rule/versioning layers.
+- Combined capability: Purchase Register↔GSTR-2B duplicate-safe matching → discrepancy/risk classification → reviewed exception evidence.
+- Buyer: Indian SMEs/accounting firms.
+- First paid wedge: fixed-price reconciliation diagnostic; recurring exception service only after current IMS/GSTR rules are independently validated.
+- Rights: MIT code; taxpayer/government-rule data separate.
+- Validation: accountant-reviewed monetary outcomes on current rule set; never infer recovered ITC from a mismatch alone.
+- Status: Credible but below freight until current-rule and realized-value validation is complete.
