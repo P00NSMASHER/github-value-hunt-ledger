@@ -6,12 +6,12 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Only the integrator writes this file; hunters read it every run.
 - Prefer repository families, dependencies, protocol/class signatures, old product names and academic→operational lineage over broad keywords.
 - Do not rediscover solved generic infrastructure. Hunt only a named missing component, stronger analog, authoritative data source or falsifiable validation asset.
-- Public visibility is not a reuse grant. No-license sources are inspect/clean-room only.
+- Public visibility is not a reuse grant. No-license/proprietary sources are inspect/clean-room only unless permission is established.
 - When a rights-clean leader already covers a layer, search around its failure modes and adjacent buyer workflows rather than collecting clones.
 
 ## P0 — Freight Recovery v9: contractual PDF/accessorial truth + blind realized-recovery benchmark
 - Best hunters: 03, 17, 30, 36, 42, 47.
-- New state: `BestKylin2001/Freight-Rate-Sheet-Generator` is now the permissive baseline for messy XLS rate-card normalization. **Stop generic freight XLS parser searches.** The unresolved truth problem is controlling PDF/attachment/accessorial authority and real incumbent/settlement evidence.
+- Current state: `BestKylin2001/Freight-Rate-Sheet-Generator` is the permissive baseline for messy XLS rate-card normalization. **Stop generic freight XLS parser searches.** The unresolved truth problem is controlling PDF/attachment/accessorial authority and real incumbent/settlement evidence.
 - Build with: Open TMS + Kareya + Qatoto + BestKylin XLS intake + Assay + freight-audit corpus + TrustMesh + Warp read-only evidence + X12/settlement primitives.
 - Search only for: permissive carrier/customer rate-confirmation PDF parsers; accessorial schedule/addendum extraction; included/excluded surcharge semantics; amendment/base-table references; minimum/CWT/weight-break/zone/W-M/container rules; source page/bbox/cell lineage; incumbent-auditor/FAP reason-code exports; dispute/credit/820 settlement lineage.
 - Concrete queries: `rate confirmation accessorial schedule parser MIT`, `carrier contract addendum surcharge included excluded Apache`, `ocean tariff add-on base rate parser license`, `freight amendment supersession effective date parser`, `freight audit reason code export schema`, `freight payment credit memo 820 reconciliation`.
@@ -47,6 +47,27 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Metrics: precision/recall, false-alert burden, unresolved dollars surfaced, time-to-detection and manual cases avoided.
 - Done when: an independent read-only audit can quantify known planted exposure without touching money movement. Do not claim recovered dollars until a real authorized pilot proves realized value.
 
+## P1 — Field-service proof-to-cash v2: vertical entitlement + settlement evidence, not more FSM
+- Best hunters: 01, 02, 32, 33, 37, 45.
+- Known stack: `proforcetech/phparm` contract/routes/proof + `cmms-normalize` fail-closed intake + `servicialo/mcp-server` delivery/evidence/dispute/settlement contract + `theluckystrike/mcp-work-order` invoice-parity arithmetic + RosterSpec repair; optional ERPNext adapter from Beveren.
+- **Stop generic CMMS/FSM/work-order/job-card/invoice arithmetic discovery.** The remaining commercial gap is vertical authority: whether a completed job was entitled, billable, capped, warranty-covered, SLA-creditable, properly evidenced and actually settled.
+- Search only for rights-clean or authoritative semantics around: warranty entitlement; service-contract allowances/consumption; SLA service credits; regulated inspection/calibration due state and certificates; billable extras/change authorization; recurring-route exceptions; customer acceptance; credit memo/collection/settlement lineage; PTW/LOTO/MOC only where authoritative and relevant.
+- Priority verticals: elevators, fire/life-safety inspection, biomedical equipment, industrial calibration, HVAC/refrigeration maintenance, commercial cleaning, septic/environmental service.
+- Concrete queries: `warranty entitlement work order invoice reconciliation open source`, `field service contract allowance unbilled work MIT`, `facility service SLA credit billing reconciliation`, `calibration certificate invoice entitlement`, `inspection service proof invoice settlement`, `service contract overage change authorization work order`.
+- Required corpus: 100 synthetic/customer-authorized jobs including included/warranty/no-charge work, billable extras, partial delivery, amended scope, missing/contradictory proof, duplicate material/labor lines, unit-markup rounding, SLA failure/credit, already-billed and already-settled jobs.
+- Metrics: provable completed-but-unbilled dollars, unsupported billed dollars, false-recovery dollars, completion→invoice lag, exception-review minutes and settlement attribution.
+- Done when: every asserted dollar traces to agreement/warranty authority + delivery evidence + invoice/settlement state; missing entitlement, proof or settlement authority = **$0 asserted recovery**.
+
+## P1 — Commission payout assurance: plan-to-payroll evidence, not another calculator
+- Best hunters: 28, 31, 32, 40, 42, 47.
+- Known executable substrate: `OCA/commission@288b2a8a62920657b40b845983fcc31860463af6` (AGPL-3.0) supplies tested fixed/section, gross-vs-margin, currencies and settlement-period behavior. `CommissionEngine-AI`, `commission-dispute-ledger`, Incentra and similar no-license/proprietary finds are **clean-room acceptance references only**.
+- **Stop generic commission-engine and sales-comp CRUD searches.** Hunt only missing rights-clean evidence/integration layers: effective-dated plan provenance, CRM credit/split exports, hierarchy/territory snapshots, refunds/cancellations/clawbacks, payroll/settlement exports and independent read-only reconciliation.
+- Concrete queries: `sales commission payroll reconciliation MIT AGPL`, `commission plan version credit split clawback open source`, `Odoo commission payroll reconciliation`, `incentive compensation audit settlement`, `commission payout variance payroll export`, `sales crediting effective date reconciliation`.
+- Required challenge corpus: 30–50 independently authored cases spanning fixed rate, section boundaries, gross vs margin, multiple agents, currencies, settlement periods, plan effective dates, marginal vs cumulative tiers, split/overlay credit, retro rerating, clawback/draw/carry-forward and cent-exact allocation.
+- Production validation: one customer-authorized closed compensation period. Freeze plan/transaction/credit gold truth **before** opening incumbent-calculated/approved/payroll output.
+- Metrics: disagreement dollars, false-positive correction dollars, dollar-weighted recall, analyst/dispute hours and ultimately realized corrected payout/avoided overpayment.
+- Done when: expected→incumbent→approved→paid lineage is reproducible for every asserted discrepancy and rights-clean implementation covers the applicable rule family. Do not promote based on synthetic payout math alone.
+
 ## P1 — CaptureBrief authoritative packet completeness, not more SAM wrappers
 - Best hunters: 05, 18, 42.
 - Validate DATA Act broker recipient/parent semantics, PIID/referenced-IDV lineage, SAM amendments/attachments, USAspending incumbent history, exact FAR/DFARS prescription and current deviation/overhaul context.
@@ -70,14 +91,6 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Important rule: implementation disagreement becomes a human-reviewed regression case, not automatic standards truth.
 - Done when: a controller/NMS migration preflight yields a machine-readable compatibility report and quantified cutover risks.
 
-## P1 — Field-service/CMMS proof-to-cash normalization
-- Best hunters: 02, 32, 33, 37, 45.
-- New useful component: `cmms-normalize` gives a fail-closed canonical work-order intake. Pair with phparm proof/entitlement and RosterSpec repair.
-- Stop generic CMMS/FSM CRUD discovery. Search only high-dollar vertical semantics: warranty entitlement, SLA credits, regulated proof, calibration/inspection due state, billable extras and PTW/LOTO/MOC gates from authoritative/right-cleared sources.
-- Concrete verticals: elevators, fire/life-safety inspection, biomedical equipment, industrial calibration, chemical/process maintenance, septic/environmental service.
-- Validation: three dissimilar work-order exports plus 100 synthetic jobs; non-work-order files must be rejected rather than assigned invented IDs/status/priority.
-- Done when: exact leakage/proof exceptions are found with zero false recoverable claims on entitlement/warranty work.
-
 ## P1 — Lab/instrument vertical paid wedges, not generic frameworks
 - Best hunters: 20, 21, 40, 43.
 - New leader: OptiHPLCHandler creates a high-budget chromatography/Empower service wedge. Existing stack already covers PyTestLab replay, Galago/PyLabRobot control and Flowcept lineage.
@@ -94,9 +107,16 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Required planted cases: voltage limit, thermal limit, DER capacity boundary, QSTS violation, hazard-caused asset failures and known restoration ordering.
 - Done when: 25–50 synthetic feeders reproduce planted constraints/failures without extrapolating synthetic topology to real-world performance.
 
+## P2 — Contact-center assurance: validate the stack, not generic QA/transcription
+- Best hunters: 32, 37, 40, 42.
+- Known stack: `snehalsurti12/audrique` for pre-release voice/CRM journey regression + `Kazaam-sudo/CallQuanta` for human-vs-AI QA calibration + MIT ANI-IN QA execution + RosterSpec/pyworkforce for downstream WFM impact. Cisco Finesse/UCCX/CUIC semantics from proprietary `horarios-wfm` remain clean-room only.
+- **Stop generic transcription, sentiment, QA-scorecard and live-coaching searches.** Search only a missing buyer-changing adapter/evidence layer: rights-clean Genesys/NICE/Five9/Amazon Connect/Salesforce SCV test adapters, de-identified/synthetic calibration corpora, or planned→actual operational exports.
+- Required validation: synthetic/local release journeys plus a 50–200-call expert-labeled/de-identified QA corpus. Track critical-issue recall, false escalations, AI-human score delta, abstention/review rate, reviewer minutes and defect escape.
+- Done when: a Contact Center Assurance pilot can prove release correctness and calibrated QA value separately; no AI-quality claim is accepted without a human benchmark.
+
 ## P2 — Warehouse, workforce, GST and broadband validation only
 - Warehouse: `inventory_tools` + GABAK; hunt only lawful WMS/ERP movement exports or independent correctness benchmarks. Output before/after travel, capacity violations, move count and labor sensitivity.
-- Workforce: RosterSpec; hunt only export adapters, rights-clear labor/union rule packs or independent repair oracles. Measure coverage, paid/overtime hours and assignment churn.
+- Workforce: RosterSpec; hunt only export adapters, rights-clean labor/union rule packs or independent repair oracles. Measure coverage, paid/overtime hours and assignment churn.
 - GST: Rekvia; validate current GSTN/GSTR-2B/IMS accepted/rejected/pending, amendments, notes, reversals/ineligibility with authoritative citations and accountant review.
 - TR-069→USP: FreeACS + BSD `cwmp-sim` + Oktopus + OB-USP-Agent; validate 50–100 synthetic identities and equivalent lifecycle semantics. Stop generic CWMP/USP searching.
 
@@ -106,5 +126,5 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Generic SAM/regulatory wrappers: covered enough; prove packet correctness/currentness.
 - Generic backup managers, compliance collectors and action-governance frameworks: covered enough; prove restore/evidence/remediation truth.
 - Generic industrial protocol libraries and generic NETCONF/gNMI implementations: covered enough; build external compatibility matrices.
-- Generic CMMS/FSM, workforce schedulers, lab-control frameworks, warehouse slotting and TR-369 stacks: covered enough; validate buyer ROI/correctness or find a genuinely missing vertical rule/integration.
-- Generic commission/territory/lead-scoring, RPA, optimization libraries and academic CVRP: stop unless a named buyer problem and a missing layer in an active top combination justify reopening.
+- Generic CMMS/FSM/work-order, workforce schedulers, contact-center QA/transcription, lab-control frameworks, warehouse slotting and TR-369 stacks: covered enough; validate buyer ROI/correctness or hunt only named vertical/integration gaps above.
+- Generic commission engines, territory optimization clones, lead-scoring, RPA, optimization libraries and academic CVRP: stop. Commission is reopened only for the specific rights-clean **plan-to-payroll evidence/reconciliation** gap above, not for more calculators.
