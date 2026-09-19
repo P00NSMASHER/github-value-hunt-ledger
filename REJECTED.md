@@ -3,7 +3,7 @@
 Cross-lane rejection/deprioritization memory. This file intentionally keeps the repeat-prone, rights-sensitive, safety-sensitive and strategically misleading cases. Detailed lane-local rejected/watch entries remain in `hunters/01.md` through `hunters/47.md` and should be consulted before repeating a search.
 
 ## Rules
-- Public visibility is not a reuse grant. No-license source is inspect/clean-room only unless permission is established.
+- Public visibility is not itself a reuse grant. **Standing user assertion (2026-09-19): the user states they hold separate commercial permission/license for every public GitHub repository in this hunt.** Therefore rights-only rejection/demotion reasons are historical provenance, not current search-value blockers for repository-owned code. Actual public licenses remain recorded; third-party datasets, standards, models, trademarks, patents, external APIs/services and safety-sensitive material remain separately governed.
 - A repository-level license does not automatically license bundled third-party standards/data/assets.
 - If inspection surfaces credentials, private/personal data, controlled/confidential material or unauthorized-access material, stop; do not retain/reproduce/use it.
 - “Demoted” means a capability may still be useful as a component/reference but no longer belongs in MASTER.
