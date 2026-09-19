@@ -41,8 +41,8 @@ Cross-repository product and capability combinations. Keep only combinations tha
 - Likely buyer / user: Federal primes/subcontractors, proposal/capture consultants, outsourced BD/compliance teams and specialist GovCon research firms.
 - Build-time saved: Very high—months of source integration, award/entity lineage, regulatory retrieval and evidence packaging.
 - Rights / license constraints: SAM/Capture/Regulatory tools are MIT as cataloged; USAspending and DATA Act broker are CC0-1.0. Government-source applicability and changing rules remain contextual and human-reviewed.
-- Validation step: Ten current solicitations must yield manually verified opportunity→entity→parent→award/incumbent→competition/set-aside→clause/prescription→current-deviation packets. Explicitly score false joins, unresolved identity conflicts and stale-source handling.
-- Status: High-priority CaptureBrief architecture. Stop generic SAM/fuzzy-identity wrapper discovery; validate packet completeness and join correctness.
+- Validation step: Ten current solicitations must yield manually verified opportunity→entity→parent→award/incumbent→competition/set-aside→clause/prescription→current-deviation packets. Explicitly score false joins, unresolved identity conflicts and stale-source handling. Add independently authored evidence-gate tests inspired by CivicProof: no stored source/hash or unlocatable quotation support means no accepted claim; no direct CivicProof code reuse absent a license.
+- Status: High-priority CaptureBrief architecture. Stop generic SAM/fuzzy-identity wrapper discovery; validate packet completeness, join correctness and fail-closed evidence acceptance.
 
 ### ScopeSignal drawing/model-to-dollar change evidence
 - Components: `Kentucky-ai/opentakeoff@6ff9cc355e60d6312c0c82e2ddac56cb212cc394` + `delongwangshu49-hub/bimchange-agent@cd7fd6e6522e060b7847f0daaed00979097da7dd` + Zerox/Docling for unstructured contract/spec intake + RulesEngine; no-license `Fajendagba/Construction-Change-Order-Engine@60f5ab99bfb97647039e6cec280c246a10f8a856` contributes clean-room workflow requirements only.
@@ -54,15 +54,15 @@ Cross-repository product and capability combinations. Keep only combinations tha
 - Validation step: One held-out IFC revision and one PDF-plan revision must preserve element/revision identity through quantity delta and exact contract/spec evidence. Human approval is mandatory before any dollar claim.
 - Status: Strong. Remaining gaps are 2D cross-revision correspondence and entitlement-to-dollar validation, not generic takeoff/IFC discovery.
 
-### Compliance modernization + restore-proof evidence
-- Components: `clay-good/attestful@c445095952d6e1ca27eadc638b1bfe96e8f5f00d` + `williamzujkowski/oscalize@39c283b54e14b71df72e1b8327b593f560adcbe6` + `Polycentric-Labs/evidentia@0e0bc8bac7d8e4b71f729ac488fd3b47273f5531` + `RamazanKara/restore-drill@dea374da3b340f53b798112eee82bd7ed1224572` + optional PostgreSQL/Restic worker `techdev-lab/restorelab@24716864885b7201511a7d18d1754a0609a729d5`.
-- Combined capability: Read-oriented cloud/SaaS evidence collection → OSCAL conversion/control mapping → normalized/signed evidence and gap state → disposable restore execution → versioned recovery evidence.
-- Why the combination is stronger: It converts compliance from document collection into repeatable operating evidence; failed restore or missing evidence remains explicitly non-pass.
-- Likely buyer / user: FedRAMP/ATO consultants, SOC 2/ISO/NIST programs, regulated SaaS and MSP/MSSP/SRE teams.
-- Build-time saved: Potentially 7–15 months.
-- Rights / license constraints: Permissive as cataloged; bundled framework/catalog content, cloud APIs and backup tooling retain separate terms.
-- Validation step: One synthetic AWS/GitHub evidence bundle plus one disposable PostgreSQL restore must land in a versioned control package; inject a restore failure and missing evidence and require non-pass output.
-- Status: Strong standalone challenger; next work is paid-pilot evidence packaging and permission/provenance hardening.
+### Compliance modernization + restore-proof + governed remediation
+- Components: `clay-good/attestful@c445095952d6e1ca27eadc638b1bfe96e8f5f00d` + `williamzujkowski/oscalize@39c283b54e14b71df72e1b8327b593f560adcbe6` + `Polycentric-Labs/evidentia@0e0bc8bac7d8e4b71f729ac488fd3b47273f5531` + `RamazanKara/restore-drill@dea374da3b340f53b798112eee82bd7ed1224572` + optional PostgreSQL/Restic worker `techdev-lab/restorelab@24716864885b7201511a7d18d1754a0609a729d5` + remediation governor `google/cybernetic-agent-governance-engine@50b12e7d983db0e3d7faf206ac6aa600294f33ac`.
+- Combined capability: Read-oriented cloud/SaaS evidence collection → OSCAL conversion/control mapping → normalized/signed evidence and gap state → disposable restore execution → deterministic allow/deny/require-approval/defer/narrow/pause decision for an approved remediation → fresh re-test → versioned evidence of the resulting state.
+- Why the combination is stronger: Previous versions proved a control failure or restore result but stopped before safe action. CAGE closes the operational loop without turning detection into uncontrolled automation: errors remain explicit, risky actions can require approval, blocked actions stay blocked, and remediation does not become “compliant” until a fresh evidence-producing re-test succeeds.
+- Likely buyer / user: FedRAMP/ATO consultants, SOC 2/ISO/NIST programs, regulated SaaS and MSP/MSSP/SRE/platform teams.
+- Build-time saved: Potentially 9–18 months across collection, evidence/control mapping, restore proof, approval/governance state, action receipts and standards export.
+- Rights / license constraints: Attestful/Evidentia/restore components are permissive as cataloged and CAGE is Apache-2.0; bundled framework/catalog content, cloud APIs, backup tools and each customer remediation target retain separate terms/permissions. Only customer-authorized remediation actions may execute.
+- Validation step: synthetic AWS/GitHub evidence + disposable PostgreSQL restore must land in one versioned control package. Inject a failed restore; a harmless remediation may auto-run, a production/destructive remediation must require approval, an unapproved action must remain blocked, and only a successful fresh re-test may change the control to pass.
+- Status: Strong standalone challenger. Generic compliance-collector/governance discovery is now low-yield; prove the closed loop and paid-pilot packaging.
 
 ### Field-service proof-to-cash assurance
 - Components: `proforcetech/phparm@a691ebfdea93a20f9de5f8a076430c859f299255` + `OCA/field-service@a43cb4800917c921eaa2e9b3c5eb059044ce7b55` + `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` + RulesEngine. No-license septic/pool/FSM systems contribute vertical clean-room requirements only.
@@ -94,15 +94,15 @@ Cross-repository product and capability combinations. Keep only combinations tha
 - Validation step: Synthetic SCPI bench records a known-good run, replay catches an injected state regression, PyDCC allows/reviews/blocks based on calibration evidence, OperandoMerge aligns continuous/stepwise/event channels with deliberate clock offsets and Flowcept reconstructs the run lineage.
 - Status: Strong high-ticket integration/validation opportunity, likely slower sales than freight but technically differentiated.
 
-### Grid resilience decision stack
-- Components: `NLR-Distribution-Suite/erad@735f7a6baa9fe24878a986a3425bf6d55ad556c3` + `NatLabRockies/shift@10ac70edd0fde15a322bc280be28451f76a4c834` + customer-authorized or rights-clean public hazard/topology data; optional explicitly CC-BY decision vocabulary from `azmartone67/dchub-backend@ce0b5a0063bcfb9050aa5b9cf309833d2dee12ad` only within the scope of its separate data license.
-- Combined capability: Generate or ingest distribution feeder topology → apply wind/flood/wildfire/earthquake hazards → asset-specific fragility/failure → network consequence → restoration/hardening prioritization → buyer-facing evidence.
-- Why the combination is stronger: SHIFT supplies a synthetic feeder path when private utility topology is unavailable; ERAD supplies the hard hazard→asset→network→restoration engine. This allows a credible pre-customer benchmark and fixed-price study rather than generic geospatial overlays.
-- Likely buyer / user: Distribution utilities, engineering consultancies, insurers/lenders, microgrid/critical-facility planners and infrastructure investors.
-- Build-time saved: High, likely many months of feeder synthesis and resilience modeling.
-- Rights / license constraints: ERAD and SHIFT are BSD-3-Clause. Hazard datasets, OSM/other geodata, fragility sources and ForeFIRE dependencies retain their own terms. dchub software is not reusable; only its explicitly CC-BY-licensed methodology/data fields may be used with attribution and source-rights review.
-- Validation step: Generate 25–50 synthetic feeders, plant known damage/restoration conditions, run wind/flood/wildfire scenarios and measure whether the engine identifies affected assets, service consequence and restoration order without making real-world capacity/safety claims from synthetic topology.
-- Status: New high-ticket engineering/decision cluster; validate accuracy and buyer urgency before ranking it above faster-cash assurance products.
+### Grid hosting-capacity + resilience decision stack
+- Components: hosting/QSTS `sandialabs/DREAMS@3eb6c6089eadf09a4bf99961faac11a76ef30ca0` + resilience `NLR-Distribution-Suite/erad@735f7a6baa9fe24878a986a3425bf6d55ad556c3` + synthetic feeder generation `NatLabRockies/shift@10ac70edd0fde15a322bc280be28451f76a4c834` + customer-authorized or rights-clean public hazard/topology data; optional explicitly CC-BY decision vocabulary from `azmartone67/dchub-backend@ce0b5a0063bcfb9050aa5b9cf309833d2dee12ad` only within the scope of its separate data license.
+- Combined capability: Generate or ingest a distribution feeder → calculate nodal DER hosting-capacity/QSTS thresholds under explicit voltage/thermal constraints → apply wind/flood/wildfire/earthquake hazards → asset-specific fragility/failure → network consequence → restoration/hardening and interconnection-priority evidence.
+- Why the combination is stronger: SHIFT supplies a rights-clean synthetic feeder path when private utility topology is unavailable; DREAMS adds the electrical-capacity layer needed to answer “how much DER can connect and what binds?”; ERAD answers “what fails under hazard and what restoration consequence follows?” Together they support a site/feeder diligence product rather than separate capacity and hazard maps.
+- Likely buyer / user: Distribution utilities, DER/solar/storage developers, interconnection engineers, engineering consultancies, insurers/lenders, microgrid/critical-facility planners and infrastructure investors.
+- Build-time saved: Very high—months across feeder synthesis, OpenDSS hosting-capacity/QSTS, hazard/fragility, network consequence and restoration analysis.
+- Rights / license constraints: DREAMS is MIT; ERAD and SHIFT are BSD-3-Clause. OpenDSS, hazard datasets, OSM/other geodata, fragility sources, ForeFIRE and customer feeder models retain their own terms. GPL OMF may be used only in a deliberate GPL-compatible comparison/service boundary, not casually mixed into the permissive core.
+- Validation step: generate 25–50 synthetic feeders with planted voltage/thermal hosting limits and known damage/restoration conditions. Require DREAMS capacity thresholds to match synthetic ground truth within declared tolerances, then run hazards and measure affected assets/service consequence/restoration order. Do not make real-world capacity/safety claims from synthetic topology.
+- Status: New high-ticket engineering/decision cluster with a rights-clean core. Next question is engineering validation and buyer urgency, not more generic OpenDSS or hazard-map discovery.
 
 ### Warehouse slotting + layout ROI engine
 - Components: `agritheory/inventory_tools@dd1e07d98eb81b2388acb922ce9ae3397a5af7ac` + `gokhanozden/gabak@711856814856e1730bd3be1cc7e4468ceca4fd5d`.
