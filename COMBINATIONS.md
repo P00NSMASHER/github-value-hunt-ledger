@@ -88,14 +88,15 @@ Cross-repository product and capability combinations. Keep only combinations tha
 - Validation: no stored source/hash or locatable support means no accepted high-risk claim; unresolved upstream source remains unresolved, not “not found.”
 - Status: High-priority architecture; generic SAM/fuzzy-wrapper discovery is exhausted.
 
-### 9. Field-service proof-to-cash assurance
-- Components: `proforcetech/phparm@a691ebfdea93a20f9de5f8a076430c859f299255` + `TheGringo-ai/cmms-normalize@dd0c752f6e0da0506ffb95ea6832c66dae81eb92` + scheduling/repair `RosterSpec` + evidence/rules layer.
-- Combined capability: normalize heterogeneous work-order history → prove scheduled/entitled field visit → capture QR/photo/work evidence → detect missed SLA/out-of-scope/unbilled work → route repair/exception without fabricating fields.
-- Buyer: janitorial/facilities contractors and multi-site maintenance operators.
-- First paid wedge: normalize one export and quantify missed/unprovable/out-of-entitlement work plus baseline SLA/backlog metrics.
-- Rights: phparm/cmms-normalize MIT; customer work-order data requires authorization.
-- Validation: three synthetic/customer-authorized CMMS export shapes must preserve labor/status/date semantics and fail closed on non-work-order files.
-- Status: Strong niche wedge; regulated PTW/LOTO/MOC semantics remain clean-room/authoritative-source work.
+### 9. Field-service proof-to-cash assurance v2 — entitlement → proof → invoice parity → settlement
+- Components: contract/service-route layer `proforcetech/phparm@a691ebfdea93a20f9de5f8a076430c859f299255` + fail-closed normalization `TheGringo-ai/cmms-normalize@dd0c752f6e0da0506ffb95ea6832c66dae81eb92` + neutral service/evidence/dispute/settlement protocol `servicialo/mcp-server@5cc669d667f650f454bfaeb9236a88a540475219` + invoice-parity component `theluckystrike/mcp-work-order@5ea2600d0adf50e7f79b4af12b2be76fc51924d2` + schedule repair `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d`; optional ERPNext adapter `Beveren-Software-Inc/Field_Service_Management@ab6d56d1069882326475f256d09cc63236eddec1`.
+- Combined capability: normalize completed work → bind to controlling agreement/warranty/entitlement → prove delivery from required evidence → derive invoice lines from the same captured labor/material source → detect completed-but-unbilled work, unsupported charges, rounding/markup drift and SLA exceptions → preserve dispute/collection state.
+- Why stronger this run: Servicialo separates delivery, evidence, acceptance and financial settlement, while mcp-work-order adds a concrete regression for minor-unit/unit-markup invoice parity. The product can now test proof-to-cash continuity rather than merely finding missing visits.
+- Buyer: janitorial/facilities, equipment-service, inspection/calibration and other recurring field-service operators where completed work and contract entitlement frequently diverge from billing.
+- First paid wedge: replay 100 completed customer-authorized work orders against contract/warranty state and invoices; quantify provable completed-but-unbilled value, unsupported billed value, completion→invoice lag and arithmetic drift.
+- Rights: phparm/cmms-normalize/mcp-work-order MIT; Servicialo/RosterSpec Apache-2.0; Beveren is AGPL-3.0 and optional. Customer contracts/work orders/photos/GPS/invoices require authorization and appropriate privacy handling.
+- Validation discipline: include entitled/warranty/no-charge jobs, missing proof, partial delivery, amended scope, duplicated lines, unit-markup rounding and already-settled cases. Missing entitlement, insufficient proof or ambiguous settlement = **$0 asserted recovery**.
+- Status: Materially stronger direct-money niche. Stop generic FSM/CMMS/work-order CRUD discovery; hunt only vertical entitlement and settlement evidence that can change dollars.
 
 ### 10. Workforce schedule assurance
 - Components: `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` + existing workforce/dispatch datasets/adapters where lawful.
@@ -141,3 +142,12 @@ Cross-repository product and capability combinations. Keep only combinations tha
 - Rights: MIT code; taxpayer/government-rule data separate.
 - Validation: accountant-reviewed monetary outcomes on current rule set; never infer recovered ITC from a mismatch alone.
 - Status: Credible but below freight until current-rule and realized-value validation is complete.
+
+### 15. Commission payout assurance — blind plan-to-payroll acceptance test
+- Components: rights-clear executable settlement substrate `OCA/commission@288b2a8a62920657b40b845983fcc31860463af6` (AGPL-3.0) + independently authored plan-version/credit/split/clawback test cases derived only from technology-neutral behavior documented in no-license/proprietary references such as `The-Thought-Magician/commission-dispute-ledger@d848a728205c0d3f557767fa4d7765ae2a04acd6` and `hvs-finmarkai/CommissionEngine-AI@1c2ddb5e1cd13ddfe49d78d793cf2056e98d86b3` + evidence/provenance gates from the shared assurance stack.
+- Combined capability: freeze customer-owned plan/version/rep/territory/transaction facts → independently calculate supported fixed/section/margin settlement cases → extend with clean-room quota/split/accelerator/clawback fixtures → compare expected vs incumbent-calculated vs approved vs payroll-paid amounts with a replayable discrepancy trace.
+- Buyer: enterprise RevOps, sales-comp, finance/controller and payroll teams with large variable-compensation spend and costly payout disputes.
+- First paid wedge: fixed-price Commission Payout Acceptance Test over one closed compensation period; gold truth is frozen before incumbent output is opened, then disagreement dollars and reviewer/dispute labor are measured.
+- Rights: OCA execution code is AGPL-3.0 and requires compliance if deployed/modified as a networked service. The no-license/proprietary references are **inspect/learn/clean-room only**; their source/tests are not copied. Customer comp plans, CRM transactions and payroll data require authorization and strict handling.
+- Validation: 30–50 synthetic cases spanning fixed rates, section boundaries, gross vs margin, multiple agents, currencies, settlement periods, effective-date boundaries, cumulative vs marginal tiers, split/overlay credit, retro rerating, clawback/draw/carry-forward and cent-exact allocation; then one customer-authorized closed period.
+- Status: **High-value direct-money challenger, not yet a MASTER leader.** It resembles freight's audit-the-auditor economics, but buyer-data integration and realized payout-correction evidence remain unproven.
