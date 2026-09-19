@@ -223,3 +223,54 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 5.0/10 with authorized customer integration
   - High-ticket potential: 7.2/10 as an enterprise connector
 - Next action: Keep as an optional ERPNext/ClickPost adapter reference. Do not promote into the v5 core until an actual invoice/billing reconciliation path is implemented and tested.
+
+
+### wearewarp/warp-tools — permissive freight-operations shell
+- Repository: https://github.com/wearewarp/warp-tools
+- Commit / revision: 0646e7491771b7f5ddd2934fcac6e8ecb566c7fd
+- Date discovered: 2026-09-19
+- What it contains: MIT monorepo with functioning standalone logistics apps for invoice/payment tracking, document vault, rate management/RFQs, shipment management/Mini-TMS, carrier management, load dispatch, detention/demurrage calculation, rate-confirmation generation and other operations. Source inspection confirmed concrete schemas/APIs rather than README-only claims: invoice tracker has freight/fuel/detention/accessorial/lumper line types and carrier-payment status including disputed; rate management has lane/carrier contract+spot rates, effective/expiry dates, rate source, customer tariffs, RFQ responses and awarded rates; Mini-TMS has quote→booked→dispatched→in_transit→delivered→invoiced→paid→closed plus BOL/POD/rate-confirmation/invoice document linkage; document vault tracks load/carrier/customer-linked BOL/POD/rate-confirmation/invoice/weight/lumper evidence.
+- Rare / undernoticed value: Only ~1 star at inspection despite a broad, coherent, modern freight back-office surface. It materially reduces CRUD/UI/schema work around the recovery engine and comes from the same Warp ecosystem as the live-evidence connector.
+- Likely buyer / user: Internal operators of the freight-recovery service, smaller shippers/3PLs wanting a self-hosted evidence workspace, or an embedded operations layer around the audit/recovery core.
+- Painful problem: The audit math is only one part of the product; teams also need rate/RFQ history, load identity, document completeness, invoice/payment state and an operator queue. Rebuilding all of that from scratch would waste months.
+- Monetization mechanism: Use as the internal/operator shell supporting paid audits, continuous assurance and recovery case management rather than selling the generic tools themselves.
+- Build-time / data advantage: Likely 2–5 months saved across freight-specific UI, schemas, REST routes and operational workflows.
+- Evidence inspected: Root README/architecture; MIT metadata; invoice-tracker README/schema/seed; rate-management README/schema/seed; shipment-management README/schema; document-vault schema; detention calculator README.
+- Important limitation: The apps are primarily standalone with their own SQLite databases. The architecture says they are designed to connect/share a database, but integration is not complete. They do not themselves implement the deterministic billed-vs-entitled recovery engine or settlement attribution.
+- License / rights: MIT for repository code. Any live customer/carrier data remains separately controlled.
+- Reuse classification: Directly reusable subject to MIT terms, best as UI/workflow/schema donor.
+- Scores:
+  - Technical value: 9.0/10
+  - Commercial value: 8.8/10
+  - Rarity: 9.1/10
+  - Completeness: 8.8/10 as operations shell
+  - Build-time saved: 9.1/10
+  - Data advantage: 5.5/10
+  - High-ticket potential: 8.6/10 when combined with recovery core
+- Combination opportunities: Freight Recovery v6 + Warp Agent MCP live evidence + Warp Tools operator shell. Map awarded RFQ/carrier rate → shipment → BOL/POD/rate-confirmation/invoice → finding → dispute → carrier payment/credit.
+- Next action: Do not merge all apps blindly. Extract the shared canonical entities/UX needed for recovery: rate_authority, shipment, evidence_document, carrier_invoice, finding, dispute, settlement and recovery_attribution. Preserve the fail-closed audit engine as a separate service.
+
+### MicrosoftDocs/dynamics-365-unified-operations-public — native freight-reconciliation semantics
+- Repository: https://github.com/MicrosoftDocs/dynamics-365-unified-operations-public
+- Commit / revision: b81257fa8c6f2e0599f477653b740f4565649276
+- Date discovered: 2026-09-19
+- What it contains: Current CC-BY-4.0 Dynamics 365 Supply Chain Management documentation defining native TMS freight reconciliation: system-generated freight bill/estimated cost versus carrier invoice, manual and automatic matching, mandatory/optional match fields, tolerance limits, audit masters, overpayment/underpayment reason codes, split reconciliation reasons, approval and posting. Related docs also describe TMS rate engines and small-parcel carrier API integration.
+- Rare / undernoticed value: This is not another freight-audit codebase; it is the documented behavior of a major ERP/TMS buyer environment. It tells us what an enterprise customer already has and therefore what our product must complement rather than duplicate.
+- Likely buyer / user: Dynamics 365 shippers, AP/freight-payment teams, 3PLs and implementation partners.
+- Painful problem: Native reconciliation can match freight bills and invoices, but buyers still need independent assurance, historical leakage testing, evidence quality, cross-system/carrier normalization, benchmark scoring and recovery attribution.
+- Monetization mechanism: Sell an external acceptance-test/assurance layer that exports/imports D365 freight bills/invoices/reason codes, independently rerates them, identifies missed/false findings and tracks incremental realized recoveries.
+- Build-time / data advantage: Saves weeks of reverse-engineering enterprise freight-payment semantics and gives a concrete integration/compatibility target.
+- Evidence inspected: Current Microsoft freight-reconciliation documentation, freight bill type/audit master/tolerance/reason-code behavior, auto-match example and current TMS rate-engine/small-parcel docs.
+- License / rights: Documentation repository is CC-BY-4.0. Dynamics product/APIs and customer data remain governed separately.
+- Reuse classification: Directly reusable documentation/reference with attribution; implementation should be independently built around supported exports/APIs.
+- Why non-obvious: The strongest commercial implication is negative: do not pitch “invoice matching” alone to D365 customers because it is already native. Pitch independent accuracy/recovery assurance and evidence.
+- Scores:
+  - Technical value: 8.3/10
+  - Commercial value: 9.2/10
+  - Rarity: 8.6/10
+  - Completeness: 9.0/10 for D365 reconciliation behavior
+  - Build-time saved: 7.8/10
+  - Data advantage: 4.0/10
+  - High-ticket potential: 9.2/10 as enterprise wedge
+- Combination opportunities: Freight Recovery v6 + D365 export/API adapter + recovery-attribution ledger. Preserve D365 reason codes/tolerances but independently score dollar-weighted recall/precision and missed recovery.
+- Next action: Define a D365-compatible canonical mapping for freight_bill, carrier_invoice, match_reason, tolerance, audit_master, load/shipment, expected charge and variance. A customer pilot should demonstrate value *after* native reconciliation, not duplicate it.
