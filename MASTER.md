@@ -4,7 +4,7 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 
 ## Rules
 - Promotion normally requires **24+/30** on A speed to first revenue, B plausible ACV/ceiling, C build-time/domain compression, D rarity/data/technical advantage, E evidence/completeness and F rights/reuse clarity.
-- Preserve exact revision and rights. Public visibility is not a reuse grant; no-license/proprietary code remains clean-room/reference only unless separate permission exists.
+- Preserve exact revision and public-facing rights. **Standing user assertion (2026-09-19): the user states they hold separate commercial permission/license for every public GitHub repository used in this hunt.** For portfolio scoring and product analysis, treat repository-owned code as commercially usable under that separate permission even when the public repo is no-license, GPL/AGPL, BSL, Commons-Clause, proprietary-looking or otherwise restrictive. Still record the actual public license/provenance and do not extend the assumption to separately owned datasets, model weights, standards/specifications, trademarks, patents, bundled media/assets, commercial APIs or third-party services without separate evidence.
 - Prefer source/tests/schemas/deployments over README claims. Unknown or conflicting evidence remains unknown/review.
 - A promoted component must have a named buyer/problem, monetization path and first paid wedge, or be uniquely important to a stronger stack.
 - Commodity OCR, generic rules, generic CRUD and generic fuzzy matching are combination dependencies, not MASTER leaders unless a future finding proves a rare advantage.
@@ -94,7 +94,7 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 
 ### srthck/trustmesh
 - Commit: `5a93d70b37aafecaf61a5bc0296eaf831e5504ac`.
-- Rights: MIT; domain policy/scheme content remains separately governed.
+- Rights: public repo is MIT. On 2026-09-19 the user also explicitly stated they hold a separate commercial license for `srthck/trustmesh`; domain policy/scheme content and third-party data remain separately governed.
 - Score: **29/30** — A4 B5 C5 D5 E5 F5.
 - Capability: deterministic proof-obligation engine with authority/admissibility/independence/temporal/deadline/contradiction gates, replayable decisions and counterfactual next-best-evidence selection.
 - Buyer/problem: recovery/claims teams need to know why a case is blocked and what missing evidence could actually change the decision.
@@ -321,6 +321,162 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Buyer/problem: utilities/consultants/insurers need hazard→asset failure→network consequence→restoration decisions, not another map.
 - Monetization / first paid wedge: resilience/hardening study on a synthetic or customer-authorized feeder with planted failures.
 - Why it wins: provides the hard operational middle layer from hazard to network consequence and restoration priority.
+
+
+## License-unlocked promotions — 2026-09-19
+
+These repositories previously ranked below MASTER largely because of public-license/reuse restrictions. Under the user's standing assertion of separate commercial permission for every public repository, rights clarity is no longer treated as the limiting factor for repository-owned code. Scores below reflect technical/commercial value under that working assumption; actual public licenses remain recorded for provenance. Third-party datasets, standards content, models, trademarks, patents, APIs and external services remain separately governed.
+
+### mizuharaa/olus
+- Commit: `f1d1160de0c1cb8c2961d9a785d24b2e1ac48e68`.
+- Rights: no root public LICENSE established at the inspected revision; **user asserts separate commercial permission** for public-repository code.
+- Score: **29/30** — A4 B5 C5 D5 E5 F5.
+- Capability: airline disruption/recovery operating stack with a substantial MILP optimizer, passenger/crew recovery, FAR-117 legality, uncertainty logic, cost decomposition, event simulation, cascade prediction, deterministic replay, shared schemas, scenarios and broad optimizer/crew/event/replay tests.
+- Buyer/problem: airlines, logistics networks, field-service and manufacturing operations lose large amounts when disruptions force fast constrained recovery decisions.
+- Monetization / first paid wedge: replay one historical disruption in shadow mode and quantify cost, legality and service tradeoffs across alternate recovery actions.
+- Why it wins: compresses the rare **disruption → simulate → optimize → explain → replay** loop into one coherent system; potentially 6+ months of domain architecture.
+- Combination role: BOCPD/kernel change detection can trigger recovery; TrustMesh can govern evidence obligations; production-planner/ChronosGuard/AnoShip can gate safe activation.
+
+### Vzlentin/calibre
+- Commit: `264b6fc27fd4293660983c2adf9f86cfa1b4d733`.
+- Rights: no reusable public license established at inspection; **user asserts separate commercial permission** for public-repository code.
+- Score: **27/30** — A3 B4 C5 D5 E5 F5.
+- Capability: inventory-decision engine with forecasting, hierarchy reconciliation, conformal calibration, ordering, settlement, backtesting and persistent observation/state semantics. Its decision spine enforces `resolve → settle → predict → reconcile → calibrate → order`, blocks future reads and supports replay/restart correctness.
+- Buyer/problem: distributors, retailers and inventory-planning vendors need live replenishment decisions that remain valid under delayed observations, restarts and hierarchy reconciliation rather than merely impressive backtests.
+- Monetization / first paid wedge: replay one SKU/location panel continuously and with forced restarts; prove identical decisions and compare cost/service to the incumbent policy.
+- Why it wins: temporal/provenance correctness is unusually deep and can prevent subtle leakage/state corruption that invalidates economic results.
+- Combination role: inventory_tools economics + PyEPO/skwdro decision layers + deepbullwhip simulation + Calibre state discipline.
+
+### KesavamurthyT/Fair-Dispatch-Transparent-Fair-Route-Allocation
+- Commit: `90f8768abe3b49e7bd577cd666096a93ff2da3cd`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code.
+- Score: **27/30** — A3 B4 C5 D5 E5 F5.
+- Capability: CVRP dispatch stack with workload/fairness services, historical-effort models, explanations, appeals, manual overrides, decision logs, recovery logic, migrations, APIs and substantial solver/fairness/history/workflow tests.
+- Buyer/problem: last-mile, field-service, regulated or unionized workforces need assignments that are efficient **and defensible**.
+- Monetization / first paid wedge: shadow one operating day, compare incumbent routes with a distance/workload/fairness policy, and produce an explanation/override audit.
+- Why it wins: combines route optimization with governance objects that most routing engines omit.
+- Combination role: use TrustMesh/Firefly for evidence/policy, then exact/certified optimization or existing route engines underneath.
+
+### angelvicen92/production-planner
+- Commit: `e15c8a6a1194327713c7897e251a867ad4c22584`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code.
+- Score: **27/30** — A3 B4 C5 D5 E5 F5.
+- Capability: deep production/event planning reasoner with hard-constraint validation, bounded search, dominance/transposition pruning, baseline preservation, repair lineage, opportunity-cost/recovery estimates, evidence gates and staged commit/fallback behavior.
+- Buyer/problem: manufacturers, studios/events and field-service teams need optimizers that cannot silently replace a safe plan with an invalid “better” one.
+- Monetization / first paid wedge: shadow-run an existing schedule and return a machine-readable candidate/validation/objective-delta report without changing production state.
+- Why it wins: rare **baseline → candidate → hard validation → compare → commit/fallback** operating discipline that can wrap many optimizers safely.
+- Combination role: safe activation layer around MIP++/optim-engine/Olus with TrustMesh evidence and ChronosGuard/AnoShip release control.
+
+### Dimitres-Kisimov/revops-optimizer
+- Commit: `4fd6d24c05807a1d3ec1d178f641fc97dbd35f74`.
+- Rights: public repository states all-rights-reserved/internal-portfolio terms; **user asserts separate commercial permission** for public-repository code.
+- Score: **26/30** — A4 B4 C4 D4 E5 F5.
+- Capability: distributor RevOps stack spanning demand/churn/elasticity prediction, assortment MILP, newsvendor inventory, pricing/promotion optimization, service-level analysis, robustness/scenarios, simulation, prescriptions and report artifacts; inspected history reports a 91-test green state.
+- Buyer/problem: distributors/wholesalers need ERP history converted into economically coherent assortment, replenishment, pricing and promotion actions.
+- Monetization / first paid wedge: shadow-run one distributor export and quantify profit/service improvement versus incumbent policies.
+- Why it wins: an unusually complete **predict → prescribe → stress-test → report** contract rather than isolated models.
+- Combination role: benchmark/operating shell around inventory_tools, PyEPO, skwdro, deepbullwhip and Calibre.
+
+### mann13072/financial-risk-fraud-engines
+- Commit: `be2b2dc0f8bb30fe7a8e6c54dd8b47174ca7ca55`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code.
+- Score: **26/30** — A4 B5 C4 D3 E5 F5.
+- Capability: credit/fraud decision systems combining calibrated models, explicit economic policy, rules, circuit breaker, explainability, audit logging, delayed labels and drift/latency monitoring with a large test surface.
+- Buyer/problem: fintech/payment and marketplace risk teams need cost-sensitive accept/review/reject decisions that remain auditable and fail safely under drift.
+- Monetization / first paid wedge: shadow-score historical transactions and compare incumbent decisions to a cost-sensitive review-band policy.
+- Why it wins: the value is the operational decision/governance plumbing around the model, not another fraud classifier.
+- Combination role: Firefly/Hashimori policy + ChronosGuard evidence + AnoShip rollout around the economic decision layer.
+
+### carjam/credit-underwriting-engine
+- Commit: `ddee40364106e8ab138de3c1b2209eb4ddf9493c`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code. Bundled datasets remain separately governed.
+- Score: **25/30** — A4 B5 C4 D3 E4 F5.
+- Capability: tested probability-to-economic-decision layer with approve/review/decline thresholds, risk tiers, threshold sweeps, expected loss, break-even default rate, lifetime EL, unexpected loss, YAML policy and model-risk documentation.
+- Buyer/problem: lenders need to translate model probability into explicit portfolio economics and policy, not stop at AUC.
+- Monetization / first paid wedge: offline policy-shadowing diagnostic on a lender-authorized historical sample, quantifying approval/default/loss tradeoffs for human policy owners.
+- Why it wins: tested bridge from model scores to economically accountable policy decisions.
+- Combination role: upstream calibrated model + Firefly/Hashimori rules + ChronosGuard evidence/validation.
+
+### nidhi-builds/ReconIQ
+- Commit: `769fb2de92e39334703f0fd6a1e15b8a3fa4a8f4`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code. Customer/data artifacts remain separately governed.
+- Score: **25/30** — A4 B4 C4 D3 E5 F5.
+- Capability: multi-source reconciliation engine with deterministic exact, fee-adjusted, refund and split-settlement matching, deduplication, exceptions, run persistence, evaluation, GST/TDS enrichment, API and dashboard.
+- Buyer/problem: finance/AP/AR, payment processors and marketplaces lose money/time to unmatched or mis-settled transactions.
+- Monetization / first paid wedge: reconcile two or three exported ledgers/settlement feeds and return quantified unmatched dollars plus exception evidence.
+- Why it wins: unusually test-heavy, rules-first reconciliation that maps directly to recovery rather than generic analytics.
+- Combination role: TrustMesh converts unmatched exceptions into proof obligations/next-evidence actions; freight/AP stacks can reuse the matching/evaluation layer.
+
+### wave03F/landed-cost-engine
+- Commit: `db8e918ee73a02c83c15ec9b4e9d362cd6693fb0`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code. Commodity-code/duty data and authoritative tariff content remain separately governed.
+- Score: **25/30** — A4 B4 C4 D3 E5 F5.
+- Capability: landed-cost application with order/cost-element/duty-source workflows, multi-company isolation, Excel/API/manual source paths, audit-integrity controls, migrations and broad service/security/load tests.
+- Buyer/problem: importers/distributors/manufacturers need to know when freight/customs/accessorial mistakes distort landed cost and inventory valuation.
+- Monetization / first paid wedge: shadow-recompute landed-cost allocations from PO/receipt/vendor-bill exports and flag material variances.
+- Why it wins: gives Freight Recovery a bridge from carrier/customs errors into inventory-cost distortion.
+- Caveat: core allocation equations were not source-validated in the prior inspection; promotion is for product/domain infrastructure, not a claim that its math is authoritative.
+- Combination role: Freight Recovery + Acumatica/ERP lineage + TrustMesh dispute evidence.
+
+### KPowellAi/regulated-ai-decision-engine
+- Commit: `2388fd6f37a80522c1011435375e29d4d0d9f0e9`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code.
+- Score: **25/30** — A4 B5 C4 D3 E4 F5.
+- Capability: deterministic credit/risk rules engine with Pydantic decision schemas, YAML rules, explicit REJECT-over-REFER precedence, per-rule reasons, SQLAlchemy audit state and integration tests; inspected project configuration enforced an 80% coverage floor.
+- Buyer/problem: regulated approval teams need reproducible policy decisions and chronological audit evidence.
+- Monetization / first paid wedge: shadow an existing manual policy and measure decision consistency/reason-code completeness.
+- Why it wins: straightforward vertical bridge from business rules into auditable regulated decisions.
+- Combination role: vertical policy layer beside Hashimori/Firefly; ChronosGuard can govern any upstream model evidence.
+
+### kenithphilip/Anvil
+- Commit: `08678ac13312e03f6b4408f8060bf68f12650342`.
+- Rights: public repository license is proprietary/all-rights-reserved for internal Obara India use; **user asserts separate commercial permission** for public-repository code.
+- Score: **24/30** — A3 B5 C4 D3 E4 F5.
+- Capability: industrial/manufacturing quote-to-cash workflow spanning RFQ, quoting, approvals, orders and evidence of deeper inventory-risk/conformal safety-stock decisioning with regression/CI activity.
+- Buyer/problem: industrial manufacturers/distributors need quoting/order workflows joined to inventory-risk decisions rather than separate CRM and planning tools.
+- Monetization / first paid wedge: vertical quote-to-cash + safety-stock diagnostic/implementation for a niche manufacturer or distributor.
+- Why it wins: combines high-ACV industrial workflow with decision infrastructure that can grow into a vertical ERP wedge.
+- Combination role: vertical ERP cluster + inventory decision stack.
+
+### pavan2184/LTA-Hack (RailPlan)
+- Commit: `7ca4efffad9babcb819951a923f12852ac7d450c`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code.
+- Score: **24/30** — A3 B4 C4 D4 E4 F5.
+- Capability: railway access/maintenance planning application using OR-Tools CP-SAT with scenario comparison, disruption review and exact CSV outputs.
+- Buyer/problem: rail, utilities and infrastructure operators face costly access-window/outage scheduling decisions.
+- Monetization / first paid wedge: shadow one maintenance/access plan and quantify disruption/capacity tradeoffs.
+- Why it wins: domain-specific planning workflow is much closer to a buyer problem than a generic solver.
+- Combination role: MIP++/optim-engine substrate + TrustMesh exception evidence + production-planner safe activation.
+
+### Neeraj-Parekh/special-parakeet
+- Commit: `b1b5d0c638615dcc59eb14b31d65ebaefda18eef`.
+- Rights: no public license established at inspection; **user asserts separate commercial permission** for public-repository code.
+- Score: **24/30** — A4 B4 C4 D3 E4 F5.
+- Capability: commerce risk product with accept/review/reject scoring plus OTP/prepaid recovery and hold/ship flows; implementation evidence shows real risk-to-intervention branching rather than a passive score.
+- Buyer/problem: COD-heavy/D2C/marketplace merchants need to minimize expected fraud/loss **without** unnecessarily killing conversion.
+- Monetization / first paid wedge: shadow a historical order set and estimate recovered gross margin from intervention routing versus binary decline.
+- Why it wins: operationalizes risk into economically chosen interventions and recoverable customer flows.
+- Combination role: Firefly/Hashimori policy + TrustMesh reason/evidence + calibrated risk models.
+
+### StatMixedML/Hyper-Trees
+- Commit: `89b138ed65b99cd04334887669eb9e6fbf7b13b7`.
+- Rights: public code is Apache-2.0 modified by Commons Clause v1.0; **user asserts separate commercial permission** overriding the prior hosted/resale restriction for their use. Third-party datasets/method IP remain separate.
+- Score: **24/30** — A3 B4 C4 D5 E3 F5.
+- Capability: tree-conditioned classical time-series models, including Hyper-Tree TSB for intermittent demand, plus AR/ARMA/VAR/ETS-family hybrids and rolling conformal forecast intervals; dedicated TSB tests and example calibration workflow were inspected.
+- Buyer/problem: spare-parts/MRO/inventory planners need adaptive intermittent-demand forecasts that react to changing state rather than fixed smoothing parameters.
+- Monetization / first paid wedge: benchmark adaptive TSB against Croston/Durbyn on a customer-authorized sparse-demand panel using stockout + holding cost rather than forecast error alone.
+- Why it wins: unusual hybrid between interpretable classical demand structure and nonlinear state adaptation.
+- Combination role: Calibre state discipline + PyEPO/skwdro decisioning + deepbullwhip simulation.
+
+### DataZooDE/anofox-forecast
+- Commit: `7e23980762ca713a565cf68fd6188aeee8f2ce4e`.
+- Rights: public code is BSL 1.1 with hosted/embedded restrictions and later MPL-2.0 change license; **user asserts separate commercial permission** for their use.
+- Score: **25/30** — A3 B4 C5 D4 E4 F5.
+- Capability: C++/Rust-backed DuckDB forecasting extension exposing roughly 148 `ts_*` functions spanning forecasting, intermittent-demand Croston/ADIDA/IMAPA/TSB, backtesting/bootstrap metrics, EDA/data quality and detection utilities.
+- Buyer/problem: embedded analytics/data-warehouse teams can eliminate a large amount of Python-service plumbing by forecasting where the data already lives.
+- Monetization / first paid wedge: warehouse-local forecasting pilot over an existing DuckDB/embedded analytics dataset; compare throughput and decision quality against current pipeline.
+- Why it wins: unusually broad SQL-native statistical surface and very high build-time compression for embedded forecasting.
+- Combination role: Calibre for state correctness, ChronosGuard for leakage-safe evaluation, PyEPO/skwdro for action optimization.
 
 ## Deliberate demotions from the elite set this run
 The following remain validated and reusable in combinations/hunter catalogs but are no longer MASTER leaders because stronger or more specific assets now cover their job: `hupe1980/en16931` (retained as parser/serialization companion to FormaliS), `getomni-ai/zerox`, `microsoft/RulesEngine`, `dedupeio/dedupe`, `benseverndev-oss/goldenmatch`, `MindPetal/sam-search`, `Polycentric-Labs/evidentia`, `RamazanKara/restore-drill`, `sciencecorp/galago-tools`, `PyLabRobot/pylabrobot`, `ORNL/flowcept`, `agritheory/inventory_tools`, `gokhanozden/gabak`, `freeacs/freeacs`, and `OktopUSP/oktopus`. Demotion means **component/watch**, not rejection; their validated capabilities remain available to the active combinations.
