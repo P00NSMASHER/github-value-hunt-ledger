@@ -574,3 +574,17 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Commercial consequence: v8 now exposes both density_scale_class and asserted_class. asserted_class remains null unless source evidence proves full-density applicability; HSL or unknown applicability => REVIEW_ZERO_ASSERTION.
 - Build/validation result: Independently authored LTL classification gate passes 5 boundary/applicability tests, including the public 48×40×48, 800-lb example (15.0 pcf → class 70) and fail-closed HSL/unknown-item cases.
 - Next action: Integrate the gate into the v8 challenge tier and customer intake. For production, accept customer-authorized ClassIT+/carrier/item evidence or controlling tariff proof; do not scrape/recreate the proprietary NMFC commodity catalog.
+
+
+### emoss08/Trenova — detention-policy challenge oracle
+- Repository: https://github.com/emoss08/Trenova
+- Commit / revision: `95fcf816562025ad9af864ded4a5fce8a555bd65`
+- Date discovered / revalidated: 2026-09-19
+- What it contains: Current TMS implementation with a broad detention-policy model covering clock-start basis, multiple late-arrival rules, pickup/delivery/pay free-time overrides, billing increments, Up/Down/Nearest/Exact rounding, flat-vs-tiered rates, per-stop/day/shipment caps, layover conversion, notification requirements/unnotified behavior, approval thresholds, immutable policy snapshots/calculation traces and append-only hash-chained detention evidence.
+- Why it matters: It exposes policy dimensions that can make a physically correct Opstrax dwell calculation commercially wrong if the customer's contract uses different detention semantics. It is therefore an excellent independent challenge oracle for v10 policy compatibility.
+- Evidence inspected: Current PostgreSQL/SQLite detention-policy migrations, repository metadata and LICENSE.
+- License / rights: `FSL-1.1-ALv2`. Current versions may be used for permitted purposes but **not for a competing commercial product/service with the same or substantially similar functionality** until the future Apache-2.0 conversion date for that version. Do not embed/copy Trenova code into Freight Recovery under the current FSL terms.
+- Reuse classification: Inspect/compare/independently reauthor generic policy tests only. No direct competing-product code reuse.
+- Commercial value: High as a negative-test oracle; low as a directly reusable component under current rights.
+- New v10 result: Freight Recovery v10.2 now has an independently authored policy-parity gate. If the customer's policy requires unsupported semantics (for example round-up, arrival-only clock, different pickup/delivery free time, tiered rates, required-notice suppression, layover conversion or per-day/per-shipment caps), the Opstrax path returns `REVIEW_ZERO_ASSERTION` instead of silently applying its own algorithm.
+- Next action: Keep Trenova out of the runtime stack. Add any newly observed policy dimensions as rights-clean challenge cases and only automate money after exact policy parity is proven.
