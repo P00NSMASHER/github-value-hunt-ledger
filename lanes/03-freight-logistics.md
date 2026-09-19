@@ -135,3 +135,26 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 0/10 usable
   - High-ticket potential: 0/10 as-is
 - Next action: Prefer clearly licensed/anonymized research corpora or customer-provided documents. Do not revisit these signed PDFs unless the repository later adds an explicit license/provenance/anonymization statement.
+
+
+### siddhartha-devops/Cointab-data-analysis- — courier billing verification benchmark
+- Repository: https://github.com/siddhartha-devops/Cointab-data-analysis-
+- Commit / revision: 393cf592000d0a136b44b67b4c107d6d6507ff15
+- Date discovered: 2026-09-19
+- What it contains: Public Cointab Software Private Limited Data Analyst hiring challenge implementing a “real-life scenario” for an anonymized ecommerce Company X. The package links order/SKU truth, warehouse-to-customer pincode zones, courier billed weights/zones/amounts, and a zone/weight-slab rate card at order/AWB grain. It is therefore a rare compact end-to-end invoice/rate/operational-truth benchmark, although public evidence does not establish that the rows are a live customer ledger.
+- Why it matters: It exercises the exact core freight-recovery invariant we need: reconstruct contractual/expected cost from customer-side operational truth and compare it against billed carrier cost. Unlike many freight demos, the dataset contains independent weight/zone truth rather than only invoice rows.
+- Commercial possibilities: Internal benchmark for the freight-recovery engine; use it to validate deterministic rating, zone/weight reconciliation, evidence-linked variance reporting and abstention. Do not market its discrepancies as real customer recoveries.
+- Build-time savings: Medium-high for benchmark/evaluation work; eliminates weeks of constructing a realistic order-to-invoice reconciliation corpus.
+- Evidence inspected: Challenge README; rates.csv; SKU master; pincode-zone mapping; order report; courier invoice; author final output; author solution code; independent recomputation performed 2026-09-19.
+- Independent recomputation: 124 orders audited; 22 correctly charged; 79 billed above independently recomputed expected charge; 23 billed below expected; aggregate candidate overbilling INR 4,426.60; aggregate underbilling INR 575.10; net billed-above-expected INR 3,851.50; 65 zone mismatches; 60 weight-slab mismatches. Largest single billed-above-expected variance observed was INR 342.50.
+- License / rights: Repository metadata did not expose a clear LICENSE file at inspection despite the challenge being publicly distributed. Treat raw files/code as inspect/evaluate only unless source rights are clarified. Derived independently recomputed factual metrics may be retained internally with provenance.
+- Reuse classification: Benchmark/reference only under current rights evidence; do not redistribute source package.
+- Scores:
+  - Technical value: 8.7/10
+  - Commercial value: 8.3/10
+  - Rarity: 9.0/10
+  - Completeness: 9.1/10 as a parcel/courier billing benchmark
+  - Build-time saved: 8.2/10
+  - Data advantage: 8.8/10
+  - High-ticket potential: 6.5/10 directly; high as validation substrate
+- Next action: Use the derived benchmark as a regression gate for the Freight Recovery v4 canonical model, then keep searching for an explicitly anonymized real operational package containing invoice + contract/rate authority + shipment/BOL/POD from the same transaction.
