@@ -133,3 +133,17 @@ Cross-lane shortlist of the strongest validated discoveries.
 - Inspected capability: Deterministic Indian GST purchase-register ↔ GSTR-2B reconciliation with configurable aliases/tolerance, GSTIN validation, tax-head checks, occurrence-indexed exact matching that avoids Cartesian duplicate inflation, a GSTIN-scoped fuzzy invoice pass that prevents reusing the same 2B row twice, exception/risk classification, ITC/RCM fields and multi-sheet Excel reporting. The tree also contains sample files and a small pytest suite.
 - Buyer/problem: Indian SMEs, accounting firms and shared-services teams must reconcile books against GSTR-2B to identify missing/mismatched supplier documents and avoid incorrect or missed input-tax-credit treatment. Current GST guidance continues to advise reconciliation, but the Invoice Management System changes the operational workflow around accepted/rejected/pending records, so this revision is not a complete 2026 compliance engine.
 - Monetization path: Fast fixed-price GST reconciliation diagnostic or accountant workstation, followed by recurring exception-management service. Do not market “recovered ITC” or automate filing from this code until current IMS/GSTR-2B rule versions and edge cases are independently validated.
+
+### sciencecorp/galago-tools
+- Commit: `7ddf68c7bb7eda0243f6466cfbd6b97fdcfcf782`.
+- Rights: Apache-2.0; individual vendor SDK/runtime licenses remain separate.
+- Inspected capability: Standardized gRPC instrument gateway framework with concrete adapters/server implementations for a broad mixed-vendor lab fleet, shared base/CLI/communications layers and explicit support for legacy 32-bit Windows instrument environments. Driver breadth is unusual, although hardware-backed tests are thinner than the device list and each adapter still requires commissioning/validation.
+- Buyer/problem: Biotech/pharma labs, CROs, core facilities and integrators lose weeks of engineering each time proprietary instrument software or vendor-specific SDKs must be incorporated into an automated workflow.
+- Monetization path: Vendor-neutral instrument edge gateway/appliance plus setup, validation and enterprise support, priced per instrument/cell/lab. Strong technical leverage; sales and deployment are likely enterprise/services-led rather than instant self-serve.
+
+### ORNL/flowcept
+- Commit: `c000b10ea49659af6c5821b61918f3893bd46a92`.
+- Rights: MIT; external brokers/frameworks retain their own licenses/terms.
+- Inspected capability: Runtime provenance/lineage infrastructure for scientific and AI workflows with annotations/adapters, streaming, persistence/query, CLI/settings and integrations including Dask, MLflow and TensorBoard, backed by API/adapter/agent/persistence tests.
+- Buyer/problem: Scientific and regulated R&D teams often cannot reconstruct exactly which code, task, configuration, input and output produced an experimental result across heterogeneous compute and instrument workflows.
+- Monetization path: Experiment-evidence/reproducibility layer sold as managed deployment or embedded component, strongest when paired with lab-instrument control and scheduler infrastructure rather than as a generic observability dashboard.
