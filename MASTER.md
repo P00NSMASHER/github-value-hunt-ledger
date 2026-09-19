@@ -147,3 +147,10 @@ Cross-lane shortlist of the strongest validated discoveries.
 - Inspected capability: Runtime provenance/lineage infrastructure for scientific and AI workflows with annotations/adapters, streaming, persistence/query, CLI/settings and integrations including Dask, MLflow and TensorBoard, backed by API/adapter/agent/persistence tests.
 - Buyer/problem: Scientific and regulated R&D teams often cannot reconstruct exactly which code, task, configuration, input and output produced an experimental result across heterogeneous compute and instrument workflows.
 - Monetization path: Experiment-evidence/reproducibility layer sold as managed deployment or embedded component, strongest when paired with lab-instrument control and scheduler infrastructure rather than as a generic observability dashboard.
+
+### proforcetech/phparm
+- Commit: `a691ebfdea93a20f9de5f8a076430c859f299255`.
+- Rights: MIT; directly reusable subject to license terms.
+- Inspected capability: Zero-star line-of-business platform with implemented customers/estimates/work orders/invoices/time/dispatch plus a recurring-service route subsystem: service routes, stops, visits, visit photos, QR-gated field execution, centralized visit-state transitions, completion-photo guards, audit writes and contract-entitlement consumption. Internal docs describe multiple service verticals, but only implemented modules are treated as shipped.
+- Buyer/problem: Janitorial and facility-service contractors lose margin when recurring visits are missed, cannot be proved, consume the wrong contract entitlement, or out-of-scope work never becomes billable evidence.
+- Monetization path: Managed commercial-cleaning/facility-service operations product centered on proof-of-service and contract leakage, priced per site/crew plus onboarding/migration. Highest-confidence next validation is an end-to-end contract→route→QR/photo proof→entitlement→invoice/exception test plus tenant/auth review.
