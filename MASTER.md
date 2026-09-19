@@ -21,13 +21,24 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Why it wins: connects real-world movement and appointment events to entitlement, evidence, approval and billing—the hardest part of time-based accessorial recovery.
 - Implementation proof: permissioned Opstrax semantics are integrated into Freight Recovery v10 core v1.2. Full suite passes **66/66 tests**; the policy-parity firewall refuses unsupported detention policy semantics with `REVIEW_ZERO_ASSERTION`, while the physical-truth regression proves a 3-hour dwell with 2 free hours at $75/hour supports exactly $75 expected detention and converts a $150 billed line into a $75 validated overcharge with SHA-linked evidence.
 
+### emoss08/Trenova
+- Commit: `95fcf816562025ad9af864ded4a5fce8a555bd65`.
+- Rights: the public repository revision is FSL-1.1-ALv2, but on 2026-09-19 the user stated they hold a separate commercial license for this exact revision. Treat commercial integration for the user's project as authorized; do not infer redistribution, sublicensing, hosted-service or other rights beyond that separate agreement.
+- Score: **29/30** — A5 B5 C5 D5 E4 F5.
+- Capability: unusually complete trucking money/workflow plane spanning shipments/dispatch, rate agreements and rate confirmations, versioned RateCon parsing rules/fixtures, auto-rating, detention policy/evidence/notice/tiering/caps, billing queue rerating and rate-departure leakage, inbound EDI 210 carrier-invoice matching with variance tolerance/audit/reconciliation, disputes/adjustments/settlement, documents, reporting, RBAC and tenant controls.
+- Buyer/problem: Freight Recovery needs one coherent transaction/evidence/settlement state machine around its independent audit math, not another disconnected parser or calculator.
+- Monetization / first paid wedge: commercial operating substrate inside the Freight Audit Acceptance Test and managed recovery workflow; keep independent evidence/rerating oracles around it to prevent circular truth.
+- Why it wins: it directly covers several hard policy/workflow dimensions that previously forced `REVIEW_ZERO_ASSERTION`, while also collapsing TMS, billing, carrier-settlement, document and reporting plumbing into one freight-native system.
+- Implementation proof: Freight Recovery v11 core v1.0 commercially integrates the licensed detention-policy and inbound carrier-invoice matching semantics while preserving separate physical-truth and policy/calculation hashes. Regression suite passes **85/85 tests**. Artifact: `freight-v11-core-v1.0-trenova-integrated.zip`.
+- Caveat: Trenova describes itself as pre-release/source-available software; exact production deployment, redistribution and hosted-service rights remain governed by the user's separate commercial agreement.
+
 ### DominicFinn/open_tms
 - Commit: `93d8c2b8ff78373ff69bb7ea546743e4703628b1`.
 - Rights: MIT.
 - Capability: active freight/TMS/WMS substrate with shipment, carrier, EDI, reporting, tenancy, deployment and financial/logistics workflows.
 - Buyer/problem: freight-payment, shipper and 3PL teams need operational truth and workflow around audit/recovery.
 - Monetization / first paid wedge: operational substrate for the paid freight-audit acceptance test rather than a standalone generic TMS launch.
-- Why it wins: broad logistics plumbing already exists, so differentiated engineering can stay focused on evidence, rerating and recovery.
+- Why it still matters: broad MIT logistics plumbing remains useful as an independent rights-clean comparator/reference, but the licensed Trenova revision now supersedes it as the primary commercial freight workflow substrate.
 
 ### sengtha/Kareya-Silo
 - Commit: `a43eedea03add0728eadfc1f8ea35cc3ca6867cc`.
