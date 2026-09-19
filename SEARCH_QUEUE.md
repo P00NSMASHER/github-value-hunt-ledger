@@ -31,14 +31,15 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Commercial validation: one customer-authorized finding through exact quantity + controlling clause/spec/RFI/submittal/notice evidence + reviewer compensability decision.
 - Done when: registration/correspondence error is separately measured from quantity error and entitlement error; a visual/model change or BCF issue **never** becomes compensable by itself.
 
-## P0 — Recovery proof: vendor-neutral restore evidence rather than more backup tools
+## P0 — Recovery proof v4: application truth + external anchoring, not more hash chains
 - Best hunters: 14, 15, 40, 42, 47.
-- Known leaders: `pg_hardstorage` + restore-drill + Evidentia + CAGE; BackupDrill/restic-drill are useful adapters/comparators.
-- **Stop generic backup/restore-tool discovery.** Search only missing proof primitives or buyer-required engines: application invariants, immutable/signed drill evidence, object-storage content fidelity, RTO/RPO observation, alternate databases, cyber-insurance evidence formats.
-- Concrete queries: `restore drill signed evidence application invariant`, `backup recovery verification object checksum audit`, `PITR drill RTO evidence`, `database restore verification compliance report`.
-- Build a neutral schema: artifact identity/hash, backup/recovery point, isolated target, start/end/duration, structural checks, logical checks, app checks, object hashes, limitations, signer, evidence references.
-- Validation: map pg_hardstorage plus one non-Postgres/object-storage path into the same schema and inject cases where backup metadata is green but recovery/content/application checks fail.
-- Done when: a fixed-price Recovery Readiness Audit can issue a defensible pass/review/fail without trusting the backup product's own success flag.
+- Known stack: `pg_hardstorage` + restore-drill + Evidentia + CAGE + Apache-2.0 `allthingsN/openwright` for signed Merkle checkpoints/inclusion proofs and explicit insufficient-evidence semantics. `forevidence/provenance-seal` is a useful independent comparator; Apache TrustMCP surfaces are optional if buyers need scoped signed evidence exchange.
+- **Stop generic backup managers, evidence ledgers, Merkle/hash-chain/signing libraries and trust-center shells.** OpenWright/Provenance Seal cover the generic proof-integrity layer well enough. Search only buyer-changing gaps: application invariants after restore, independent external anchoring/time-existence proof, object-storage content fidelity, alternate database engines, RTO/RPO observation, and insurer/auditor evidence formats.
+- Concrete queries: `restore drill application invariant signed evidence`, `backup recovery verification object checksum audit`, `PITR drill RTO evidence`, `external timestamp anchor evidence ledger`, `database restore verification compliance report`, `cyber insurance recovery test evidence`.
+- Build a neutral schema: artifact identity/hash, backup/recovery point, isolated target, start/end/duration, structural checks, logical checks, app checks, object hashes, evidence/event IDs, checkpoint/anchor, limitations, signer, crosswalk hash and evidence references.
+- Required adversarial proof cases: mutate/delete/reorder an event, forge a `satisfied` result, alter the control crosswalk hash, use a stale checkpoint, truncate the tail, drop evidence and present an unanchored rewritten chain. Unanchored history must not be described as independent proof of existence/time.
+- Validation: map pg_hardstorage plus one non-Postgres/object-storage path into the same schema; inject cases where backup metadata is green but recovery/content/application checks fail. Missing/dropped evidence remains REVIEW/INSUFFICIENT, never pass.
+- Done when: a fixed-price Recovery Readiness Audit can issue a defensible pass/review/fail without trusting the backup product's own success flag, and every signed conclusion is reproducible from the underlying evidence set.
 
 ## P0 — Marketplace Money Safety Audit benchmark
 - Best hunters: 27, 31, 40, 42.
@@ -126,7 +127,7 @@ Integrator-owned queue for the highest-value unresolved searches and validation 
 - Generic freight TMS, generic rating engines, OCR, X12, subset-sum/reconciliation, entity resolution and generic XLS importers: sufficiently covered.
 - Generic PDF/CAD drawing diff, construction takeoff, IFC diff and BCF interchange: covered enough by Massing PDF + CaD-Track + OpenTakeoff + BIMChange-Agent + IFC-lite BCF; prove downstream entitlement instead.
 - Generic SAM/regulatory wrappers: covered enough; prove packet correctness/currentness.
-- Generic backup managers, compliance collectors and action-governance frameworks: covered enough; prove restore/evidence/remediation truth.
+- Generic backup managers, evidence ledgers/hash-chain/signing libraries, compliance collectors and action-governance frameworks: covered enough; prove real restore/application truth, external anchoring and remediation/re-proof.
 - Generic industrial protocol libraries and generic NETCONF/gNMI implementations: covered enough; build external compatibility matrices.
 - Generic CMMS/FSM/work-order, workforce schedulers, contact-center QA/transcription, lab-control frameworks, warehouse slotting and TR-369 stacks: covered enough; validate buyer ROI/correctness or hunt only named vertical/integration gaps above.
 - Generic commission engines, territory optimization clones, lead-scoring, RPA, optimization libraries and academic CVRP: stop. Commission is reopened only for the specific rights-clean **plan-to-payroll evidence/reconciliation** gap above, not for more calculators.
