@@ -30,4 +30,23 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Next action:
 
 ## Findings
-_No findings yet._
+### pengyulong/InvoiceAuditAgent
+- Repository: https://github.com/pengyulong/InvoiceAuditAgent
+- Commit / revision: b53902513902fab91ddd7143585d898cf0ce869b
+- Date discovered: 2026-09-19
+- What it contains: Contract/invoice audit project with Vue/FastAPI-oriented architecture, OCR/LLM design documents, frontend/backend/deploy folders, tests, and deployment documentation.
+- Why it matters: The concept and repository structure overlap directly with contract-to-invoice cross-checking, but the README itself says core functionality is still incomplete, so this is more useful as a design reference than a ready engine.
+- Commercial possibilities: Architecture/reference material for AP audit and contract/invoice matching; not currently a strong direct-reuse candidate.
+- Build-time savings: Low-Medium until deeper code inspection proves the backend is more complete than the README status suggests.
+- Evidence inspected: README.md marks core functionality, AI integration, tests, and deployment as pending; root contains backend/frontend/tests/docs/deployment material.
+- License / rights: No repository license detected.
+- Reuse classification: Inspect / learn / clean-room implementation only unless permission is established.
+- Scores:
+  - Technical value: Medium
+  - Commercial value: Medium-High conceptually
+  - Rarity: Low-Medium
+  - Completeness: Low-Medium
+  - Build-time saved: Low-Medium
+  - Data advantage: Low
+  - High-ticket potential: Medium
+- Next action: Deprioritize unless backend inspection reveals functioning audit logic not reflected in the README; favor mature permissive components instead.
