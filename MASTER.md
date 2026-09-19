@@ -19,7 +19,7 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Buyer/problem: shippers, brokers, carriers and freight-payment teams need physical proof for detention/accessorial decisions rather than invoice text alone.
 - Monetization / first paid wedge: physical-evidence layer inside Freight Recovery; run one authorized blind shipment population and quantify missed/unsupported detention dollars.
 - Why it wins: connects real-world movement and appointment events to entitlement, evidence, approval and billing—the hardest part of time-based accessorial recovery.
-- Implementation proof: permissioned Opstrax semantics are integrated into Freight Recovery v10 core v1.2. Full suite passes **66/66 tests**; the policy-parity firewall refuses unsupported detention policy semantics with `REVIEW_ZERO_ASSERTION`, while the physical-truth regression proves a 3-hour dwell with 2 free hours at $75/hour supports exactly $75 expected detention and converts a $150 billed line into a $75 validated overcharge with SHA-linked evidence.
+- Implementation proof: the permissioned Opstrax semantics remain the physical-truth plane in Freight Recovery v11. The full v11 suite passes **85/85 tests**. A new bridge freezes Opstrax dwell facts into a physical-only SHA, then lets the separately licensed Trenova policy plane calculate money under the controlling contract, avoiding circular proof. The original 3-hour/2-free-hour/$75 regression remains intact.
 
 ### emoss08/Trenova
 - Commit: `95fcf816562025ad9af864ded4a5fce8a555bd65`.
