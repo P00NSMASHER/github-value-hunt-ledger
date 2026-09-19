@@ -113,3 +113,45 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 4/10
   - High-ticket potential: 9/10
 - Next action: Spike only the AP + PO + receiving crates behind a recovery-service boundary and perform a focused tenant-isolation/security review before considering the HTTP layer production-ready for multi-tenant hosting.
+
+### amrzainmubarak/reconforge-erp
+- Repository: https://github.com/amrzainmubarak/reconforge-erp
+- Commit / revision: b61ea56bb9c135fda12546e173795af3c243e4fb
+- Date discovered: 2026-09-19
+- What it contains: One-star MIT-licensed Python reconciliation/audit platform with a concrete governed AP slice plus broader financial-control infrastructure. The AP implementation has supplier, purchase-order, posted-receipt, supplier-invoice and three-way-match lifecycles; exact monetary storage in integer minor units and exact quantity representations; stable variance reason codes; an exception queue; optimistic row versions; idempotency; separation-of-duties checks; atomic audit/outbox writes; backup/restore coverage; SQLite and PostgreSQL repositories; API routes; and a Postgres schema with forced row-level security and tenant-aware parent foreign keys. The three-way matcher recomputes receipt quantity, PO price, and line-total variances, moves invoices to Matched/Exception, opens or resolves a control exception, and requires a passed match plus independent approver before invoice approval.
+- Why it matters: Existing lane findings cover AP transaction substrate, anomaly detection, and veto controls, but ReconForge adds a rare audit/control-plane substrate: deterministic exception routing, atomic evidence/outbox semantics, SoD, exact-money invariants, backup/restore behavior, and tested multi-tenant Postgres boundaries. The live-Postgres integration test creates two tenants, exercises the full maker/checker PO→receipt→invoice→match→approval lifecycle for one, and verifies the other tenant sees no suppliers or invoices. That substantially compresses the unglamorous control engineering needed before a high-value recovery product can safely ingest customer accounting exports.
+- Commercial possibilities: Use the reconciliation/exception/evidence layers as the control plane beneath AP or freight recovery: import GL/AP/PO/receipt exports, run deterministic recovery tests, route exceptions by financial impact, preserve auditable evidence, and sell continuous-controls/recovery diagnostics or a finance-close exception cockpit. The broader stock-to-GL/reconciliation orientation also creates an adjacent inventory/WIP leakage-audit path without needing to build the entire controls framework from scratch.
+- Build-time savings: Approximately 2-5 months for the finance-control, exception, audit/outbox, exact-money, Postgres tenancy, and recovery-workflow substrate; less if only the AP matcher is reused because StateSet/invoice-lens already cover part of that domain.
+- Evidence inspected: Repository metadata; latest inspected commit; root `LICENSE`; recursive tree; `reconforge/application/payables.py`; `reconforge/infrastructure/sqlite_payables.py` including the full three-way-match and approval path; `tests/test_payables.py`; `tests/test_postgres_payables.py` including forced-RLS/cross-tenant-FK assertions and the optional live two-tenant lifecycle test; source/search evidence for `reconforge/infrastructure/postgres_payables.py`, API routes, architecture/current-state docs, changelog, exception queue, audit/outbox and exact-decimal migrations. Source tests cover pass/exception cases, stale-version rejection, creator-vs-approver SoD, rollback on audit/outbox failure, backup/restore preservation, tenant scoping, exact quantities, and Postgres contract parity.
+- License / rights: MIT at the inspected revision. Direct reuse is permitted subject to the MIT notice; bundled dependency licenses should still be checked before redistribution.
+- Reuse classification: Directly reusable.
+- Scores:
+  - Technical value: 9.5/10
+  - Commercial value: 9/10
+  - Rarity: 9/10
+  - Completeness: 9/10
+  - Build-time saved: 9.5/10
+  - Data advantage: 3/10
+  - High-ticket potential: 9/10
+- Next action: Isolate the Postgres AP/reconciliation + exception/evidence/outbox modules behind the recovery-service boundary and run an independently authored synthetic multi-tenant GL/AP/PO/receipt corpus through them; keep the repository's stated boundary explicit that statutory AP posting, tax, payment execution, and ERP writeback are not implemented.
+
+### anshpatel017/SpendGuard-
+- Repository: https://github.com/anshpatel017/SpendGuard-
+- Commit / revision: 160332410d015ff719e52fb71e1fd4871a3eb01c
+- Date discovered: 2026-09-19
+- What it contains: Zero-star Python procurement-spend anomaly project with unusually substantive and tested detection logic. The deeply inspected duplicate detector uses exact duplicate grouping plus amount/date blocking, supplier-name identity confirmation, a Fellegi-Sunter EM model with priors that resist inventing a duplicate class on clean data, far-apart look-alike reference pairs for non-match probabilities, transitive grouping of triplicates, per-field match weights, policy/evidence metadata, and repeat-amount-at-risk calculations. Its split-purchase detector finds minimal sub-threshold runs that cross an approval threshold inside a policy window and ranks them by timing, item homogeneity, identical rates, and number of parts. Its price-inflation detector uses robust log-price statistics, measurable bulk/time controls, robust residual z-scores and an Isolation Forest as a non-authoritative second opinion, while explicitly documenting weak F1 and better ranking performance rather than hiding the limitation. The repository also contains ingestion, case storage, policy retrieval and read-only agent tools plus a sizable test suite.
+- Why it matters: This is one of the more sophisticated low-attention open implementations found for the specific leakage patterns that matter in AP/procurement recovery: fuzzy duplicates, approval-threshold splitting and price inflation. The duplicate tests assert deterministic results, tolerance boundaries, triplicate clustering, low false-positive behavior on clean recurring-contract data, and at least 0.90 precision / 0.75 recall on the project's synthetic injected dataset. Those synthetic numbers are not customer-ready claims, but the test design and clean-room algorithms can materially improve an evidence-ranked recovery engine beyond simple exact-duplicate rules.
+- Commercial possibilities: Use the inspected concepts to build a recovery-candidate ranking layer on top of the permissively licensed AP substrate already in this lane: exact/near duplicate payments or invoices, split-purchase circumvention candidates, and statistically unusual price lines, each carrying money-at-risk plus machine-readable evidence for human confirmation. This is especially useful for retrospective AP audits where PO/receipt data is incomplete and transaction-ledger patterns must generate the initial recovery queue.
+- Build-time savings: Approximately 4-8 weeks of anomaly-detection design, blocking/linkage, evidence shaping, synthetic injection/evaluation and boundary-test work if independently reimplemented; direct code reuse is not currently available because no license was found.
+- Evidence inspected: Repository metadata and exact commit; recursive tree; README/status; `backend/src/spendguard/detectors/d1_duplicates.py`; `d2_splits.py`; `d3_inflation.py`; `backend/tests/test_d1.py`; backend test inventory; commit message for the current revision. Inspection also confirmed the README's Investigator/Verifier work is not yet present as completed source at this revision, so this finding is based on the implemented detectors/tools rather than future agent claims.
+- License / rights: No repository license detected: GitHub license metadata is null, no LICENSE appeared in the inspected tree, and a direct fetch of `LICENSE` returned 404. Copyright therefore remains with the author by default.
+- Reuse classification: Inspect / learn / clean-room implementation only unless permission or a license is established.
+- Scores:
+  - Technical value: 8.5/10
+  - Commercial value: 8.5/10
+  - Rarity: 9/10
+  - Completeness: 7/10
+  - Build-time saved: 7.5/10
+  - Data advantage: 3/10
+  - High-ticket potential: 8.5/10
+- Next action: Reimplement only the valuable detector concepts against an independently authored schema and synthetic holdout corpus, then compare incremental dollars-at-risk found over invoice-lens/dedupe baselines; do not copy the unlicensed code and do not market the repository's synthetic precision/recall or price-ranking figures as real-world accuracy.
