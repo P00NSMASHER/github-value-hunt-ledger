@@ -113,3 +113,66 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: High once paired with customer invoice/order/rate/evidence history
   - High-ticket potential: Very High
 - Next action: Run a clean-room spike that maps freight entities and evidence into this pipeline: carrier/vendor identity, invoice number, PRO/BOL, service date, billed line, expected line, rate-source hash, discrepancy rule, reviewer decision, and recovery-state output. Keep its documented gaps in place for the first pilot: no ERP payment write-back, no reviewer authentication, and no cross-tenant deployment until separately hardened.
+
+### opensanctions/yente
+- Repository: https://github.com/opensanctions/yente
+- Commit / revision: 3bc1b14ea884aba9f0728d67b76a461f5339dc59
+- Date discovered: 2026-09-19
+- What it contains: Production-grade asynchronous FastAPI entity search/matching infrastructure used as the open-source core of the OpenSanctions API. It supports people, companies, vessels, custom watchlists, company-registry/KYB data, FollowTheMoney schemas, configurable scoring, Elasticsearch/OpenSearch candidate retrieval, on-prem deployment, OpenTelemetry instrumentation, benchmark fixtures, validation tooling, Docker packaging, and a substantial pytest suite.
+- Why it matters: Unlike general-purpose deduplication libraries, yente is already shaped for operational KYC/KYB/watchlist-style matching where noisy names, company records, identifiers, sanctions entities, and custom datasets need low-latency candidate generation plus explainable scoring. It can provide a hardened entity-search service around vendor/carrier/company matching without sending customer queries outside the customer's infrastructure.
+- Commercial possibilities: (1) Private vendor/KYB matching layer for onboarding and contractor qualification; (2) entity screening/enrichment infrastructure for PermitPlate/CaptureBrief/freight customer records; (3) on-prem matching service for buyers with confidentiality restrictions; (4) custom internal watchlist matching when customer-supplied data is used instead of licensed OpenSanctions data.
+- Build-time savings: Very High — likely 2-4 months for API, search-provider abstraction, entity schemas, matching/scoring plumbing, observability, indexing, benchmarking, and self-host deployment.
+- Evidence inspected: Exact latest commit; README; actual MIT LICENSE; recursive source tree; yente/scoring.py; tests/test_match.py search results; candidate-generation benchmark and validation-report directories; Dockerfile and CI/security workflows. The tree includes multi-megabyte positive/negative benchmark fixtures and active tests around matching behavior and candidate search. README explicitly separates the MIT code license from commercial licensing of OpenSanctions datasets.
+- License / rights: Code is MIT. OpenSanctions datasets have separate licensing and may require a commercial data license; do not assume the code license grants rights to the data. Customer-owned/custom datasets can avoid that dependency if lawful.
+- Reuse classification: Directly reusable for the software under MIT terms; dataset reuse requires separate rights review.
+- Scores:
+  - Technical value: Very High
+  - Commercial value: Very High as regulated-B2B matching infrastructure
+  - Rarity: Medium (established project, but unusually complete for this lane)
+  - Completeness: Very High
+  - Build-time saved: Very High
+  - Data advantage: Very High when paired with licensed/custom corporate datasets
+  - High-ticket potential: Very High
+- Next action: Benchmark yente versus Entify on carrier/vendor/company-name resolution and determine whether yente should become the low-latency screening/search service while Entify remains the batch cleanup/stewardship layer.
+
+### zentity-io/zentity
+- Repository: https://github.com/zentity-io/zentity
+- Commit / revision: ecddfab82b68379d223beac108714a92831a4dba
+- Date discovered: 2026-09-19
+- What it contains: An Apache-2.0 Elasticsearch plugin for deterministic entity resolution directly over existing indices. It defines entity models, attributes, matchers, resolvers, multi-index mappings, recursive/transitive resolution, and REST endpoints, with large core Job/Query implementations, integration tests, Maven packaging, and CI that tests against many Elasticsearch versions.
+- Why it matters: zentity solves a different operational problem than Dedupe/Entify: real-time, transitive resolution across already-indexed heterogeneous data without forcing a separate batch dedupe/reindex workflow. That is valuable when PermitPlate, CaptureBrief, freight, or customer systems already sit in Elasticsearch and need to resolve aliases across multiple sources on demand.
+- Commercial possibilities: (1) Real-time company/vendor/property identity graph over Elasticsearch-backed products; (2) cross-index carrier/customer/company resolution in data-heavy SaaS; (3) investigative/entity-search feature where multi-hop identities matter; (4) low-friction add-on for customers already standardized on Elasticsearch.
+- Build-time savings: High — likely 1-3 months for model DSL, transitive query planning, multi-index resolution, plugin/API packaging, and cross-version compatibility work.
+- Evidence inspected: Exact latest commit; README; actual Apache-2.0 LICENSE and NOTICE; recursive source tree; CI matrix; source includes ~58 KB resolution/Job.java and ~46 KB resolution/Query.java plus model classes; tests include JobTest and Elasticsearch ResolutionActionIT integration coverage.
+- License / rights: Apache License 2.0 with NOTICE/attribution and modified-file obligations; Elasticsearch itself and any distribution/plugins used in deployment require separate compatibility/terms review.
+- Reuse classification: Reusable with Apache-2.0 license conditions.
+- Scores:
+  - Technical value: High
+  - Commercial value: High when an Elasticsearch-native path exists
+  - Rarity: High
+  - Completeness: Very High
+  - Build-time saved: High
+  - Data advantage: High when federating multiple customer indices
+  - High-ticket potential: High indirectly
+- Next action: Prototype a carrier/vendor entity model across invoice, rate-card, shipment, and ERP indices; compare latency and explainability against the Entify/Splink batch path before choosing an architecture.
+
+### conjuncts/gmft
+- Repository: https://github.com/conjuncts/gmft
+- Commit / revision: ac7ef5e73e3977bfe60b6ffd80356b7be32f4532
+- Date discovered: 2026-09-19
+- What it contains: Focused PDF table-detection and structure-extraction library built on Microsoft's Table Transformer plus PyPDFium2. It detects tables, reconstructs implicit structure, handles multi-column headers, spanning cells and rotated tables, exports to pandas/CSV/JSON/HTML/Markdown/LaTeX, and can expose crops/bounding boxes for a downstream OCR/vision step. The repository includes CI, extensive reference outputs, sample PDFs, comparison data, tests against expected bounding boxes/dataframes, notebooks, and current Python packaging.
+- Why it matters: Zerox is a broad vision/document ingestion layer, but freight invoices, rate sheets, tariffs, bid tabs, policy schedules, and government notices often fail specifically at dense tabular structure. gmft can serve as a deterministic/high-throughput table-first extractor before invoking a more expensive vision model, while preserving row/column semantics needed for audit evidence.
+- Commercial possibilities: (1) Freight rate-card/invoice table extraction feeding deterministic recovery rules; (2) contract schedule and pricing-table extraction for ScopeSignal/compliance workflows; (3) bulk financial/document-table normalization service; (4) hybrid ingestion pipeline that routes born-digital tables through gmft and scanned/image tables through OCR/vision.
+- Build-time savings: High — likely 1-2 months for table detection, structural reconstruction, dataframe export, geometry handling, and regression fixtures.
+- Evidence inspected: Exact latest commit; README; actual MIT LICENSE; recursive tree; current pyproject/CI; data/test/references contains large expected table/CSV/position fixtures; test/formatters/tatr/test_full.py asserts table bounding boxes and dataframe output. README discloses limitations including no OCR, false positives/negatives, and merged-cell issues rather than treating benchmarks as universal accuracy guarantees.
+- License / rights: MIT for gmft. Its default dependency stack includes PyPDFium2/Transformers/PyTorch; dependency/model/data licenses require normal review. The separate optional PyMuPDF support repository is AGPL-3.0 and should not be silently substituted into a proprietary product without accepting those obligations.
+- Reuse classification: Directly reusable subject to MIT and dependency/model-license terms; avoid the separate AGPL PyMuPDF integration unless deliberately chosen.
+- Scores:
+  - Technical value: High
+  - Commercial value: Very High as a document-table component
+  - Rarity: Medium
+  - Completeness: Very High
+  - Build-time saved: High
+  - Data advantage: High once table rows are linked to source-page geometry/evidence
+  - High-ticket potential: High indirectly
+- Next action: Add gmft to the freight-document benchmark: run born-digital carrier invoices/rate sheets through gmft first, fall back to Zerox/vision only when confidence/structure checks fail, and measure line-item accuracy plus processing cost.
