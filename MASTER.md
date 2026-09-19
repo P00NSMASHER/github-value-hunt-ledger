@@ -19,7 +19,7 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Buyer/problem: shippers, brokers, carriers and freight-payment teams need physical proof for detention/accessorial decisions rather than invoice text alone.
 - Monetization / first paid wedge: physical-evidence layer inside Freight Recovery; run one authorized blind shipment population and quantify missed/unsupported detention dollars.
 - Why it wins: connects real-world movement and appointment events to entitlement, evidence, approval and billing—the hardest part of time-based accessorial recovery.
-- Implementation proof: permissioned Opstrax semantics have now been integrated into Freight Recovery v10 core v1.0. Full suite passes **55/55 tests**; the physical-truth demo proves a 3-hour dwell with 2 free hours at $75/hour supports exactly $75 expected detention and converts a $150 billed line into a $75 validated overcharge with SHA-linked evidence.
+- Implementation proof: permissioned Opstrax semantics are integrated into Freight Recovery v10 core v1.2. Full suite passes **66/66 tests**; the policy-parity firewall refuses unsupported detention policy semantics with `REVIEW_ZERO_ASSERTION`, while the physical-truth regression proves a 3-hour dwell with 2 free hours at $75/hour supports exactly $75 expected detention and converts a $150 billed line into a $75 validated overcharge with SHA-linked evidence.
 
 ### DominicFinn/open_tms
 - Commit: `93d8c2b8ff78373ff69bb7ea546743e4703628b1`.
@@ -123,6 +123,25 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Buyer/problem: BIM/VDC/change teams need exact changed model elements before quantity/commercial impact.
 - Monetization / first paid wedge: IFC revision-evidence module inside ScopeSignal.
 - Why it wins: preserves element-level before/after evidence instead of treating model difference as a visual annotation only.
+
+### finnertallon-png/contract-deadline-agent
+- Commit: `c891f5ff391abc58b874675783a7ff2c3775c7bb`.
+- Rights: MIT; customer contracts remain confidential/customer-controlled and legal applicability still requires human review.
+- Score: **28/30** — A4 B5 C5 D5 E4 F5.
+- Capability: construction/commercial contract deadline extraction with clause provenance, structured trigger+duration semantics, human-supplied trigger dates, SharePoint/Outlook reconciliation and fail-closed date handling. Exact tests prove strict parsing, idempotent create/update/delete behavior, trigger-date recomputation and explicit refusal of unsupported business-day/month/hour arithmetic.
+- Buyer/problem: contractors and claims/change teams can lose otherwise valid change recovery when notice/cure/priced-claim clocks are buried in contracts or guessed incorrectly.
+- Monetization / first paid wedge: fixed-price change-notice preservation audit on one contract plus active RFI/change log, then recurring per-project deadline monitoring.
+- Why it wins: closes ScopeSignal's claim-preservation gap without pretending the software decides legal applicability; unsupported timing semantics remain visible gaps rather than invented due dates.
+
+### alanbld/utf8proj
+- Commit: `92d96268159035cc2b53a34467dab6c64d1f0a98`.
+- Rights: dual MIT / Apache-2.0 at the user's option.
+- Score: **28/30** — A4 B4 C5 D5 E5 F5.
+- Promotion rationale: uniquely important deterministic schedule-evidence component for ScopeSignal rather than a generic project-management product.
+- Capability: explainable CPM scheduling with FS/SS/FF/SF + lag, deterministic resource leveling, calendars, status-date/progress/EVM, diagnostics, renderers and Microsoft Project import. The pinned revision specifically fixes `.mpp` PhysicalPercentComplete/PercentageComplete preservation with expanded tests.
+- Buyer/problem: change/claims teams need reproducible schedule-impact evidence; opaque scheduler output or dropped progress fields can manufacture false delay conclusions.
+- Monetization / first paid wedge: normalize one customer-authorized baseline/update schedule, reproduce critical-path/progress state, then attach only reviewer-approved schedule impact to a ScopeSignal change packet.
+- Why it wins: versionable deterministic schedules and explicit diagnostics create a much better audit trail than another Gantt UI; it does not itself prove entitlement or compensable delay.
 
 ### GSA/srt-fbo-scraper
 - Commit: `fbdfa86a2bce4323a5afacda04f083698cab02e1`.
