@@ -378,3 +378,80 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - High-ticket potential: 7.8/10 as QA infrastructure
 - Combination opportunities: Rate-con benchmark → Zerox/invoice-extraction-pipeline → Assay confidence gate → canonical rate_authority/rate_rule → deterministic rerating. Score load-ID exactness, total-rate exactness, pickup/dropoff identity and extraction abstention separately before allowing rate authority into the gold-truth pipeline.
 - Next action: Add a v7 rate-authority extraction scorecard and require a configurable confidence threshold; incorrect or low-confidence rate authority must force review and $0 asserted recovery.
+
+
+### Etherlabs-dev/multi-processor-reconciliation — ambiguity-safe settlement matcher
+- Repository: https://github.com/Etherlabs-dev/multi-processor-reconciliation
+- Commit / revision: 2f9397fbe56a76abeee42a01a37536ad1811a806
+- Date discovered: 2026-09-19
+- What it contains: MIT reconciliation engine with immutable canonical financial records, source/account/currency/type hard controls, amount/date tolerances, reference-aware scoring, duplicate-input detection, refund/reversal classification, explicit ambiguous-candidate states, bounded split-payment matching, discrepancies and input fingerprints; supported by tests and benchmark code.
+- Rare / undernoticed value: Its most valuable feature for Freight Recovery is not payment-processor connectivity; it is disciplined refusal to invent matches. Multiple near-equal candidates or multiple valid split groups are explicitly marked ambiguous instead of forced into a settlement allocation.
+- Likely buyer / user: Internal v7 settlement/recovery-attribution service.
+- Painful problem: Carrier credits/refunds often arrive later and may aggregate several findings. A recovery company can accidentally overstate its success fee if a credit is guessed onto the wrong finding, if a refund was already expected, or if several valid allocations exist.
+- Monetization mechanism: Enables defensible success-fee billing by proving which realized credits/refunds can be uniquely tied to v7-unique findings; unresolved allocations remain fee-ineligible.
+- Build-time / data advantage: Likely 1–2 months saved across canonical financial normalization, ambiguity controls, split-payment logic, idempotency/fingerprints and reconciliation tests.
+- Evidence inspected: MIT metadata; matching.py; models.py; matching tests; benchmark structure. Source inspection confirmed exact-reference, fee-aware, refund/reversal, amount/date-window and bounded split matching.
+- License / rights: MIT.
+- Reuse classification: Directly reusable subject to MIT terms; adapters must be rewritten for freight settlement records.
+- Why non-obvious: Only a few stars and positioned around Stripe/PayPal/Square/ACH, but the reconciliation semantics are directly applicable to freight credits/remittances.
+- Scores:
+  - Technical value: 9.1/10
+  - Commercial value: 9.0/10
+  - Rarity: 8.8/10
+  - Completeness: 8.8/10 for conservative allocation
+  - Build-time saved: 8.2/10
+  - Data advantage: 5.0/10
+  - High-ticket potential: 9.0/10 as success-fee integrity layer
+- Combination opportunities: recovery_attribution ledger + carrier credit memo/remittance ingest + this matcher. Strict reference/currency/type checks first; bounded split only after; ambiguity => unresolved and $0 fee eligible.
+- Next action: Use as implementation donor for the freight-specific settlement-attribution harness already created; add carrier invoice/credit/remittance references as stronger match evidence than amount/date alone.
+
+### europeanplaice/subset_sum — deterministic many-to-many recovery allocation
+- Repository: https://github.com/europeanplaice/subset_sum
+- Commit / revision: 62fe41b4c8f5d287d1904f573a9594cac254d340
+- Date discovered: 2026-09-19
+- What it contains: MIT subset-sum/reconciliation library with Rust/Python surfaces, one-to-many, many-to-one and bounded many-to-many transaction matching, exact matching, configurable tolerance and tests. Its own agent skill explicitly says the numeric solver—not an LLM—must be the source of truth, strict matching should run before tolerance, and confirmed numeric matches must be separated from hypotheses.
+- Rare / undernoticed value: Freight credits can collapse several invoice adjustments into one payment/credit memo or apply one correction across multiple remittance lines. Deterministic subset decomposition is a better foundation than LLM reasoning for that allocation problem.
+- Likely buyer / user: Internal v7 recovery-attribution/reconciliation engine.
+- Painful problem: Many-to-many settlement creates a combinatorial matching problem; guessing by narrative/reference text can misattribute success fees.
+- Monetization mechanism: Protects contingency economics by supporting auditable, numeric allocation of realized recovery to findings.
+- Build-time / data advantage: Saves weeks of deterministic subset/reconciliation work and provides tested group-matching primitives.
+- Evidence inspected: MIT license metadata; reconciliation.rs; Python tests; dpss-reconcile operating skill.
+- License / rights: MIT.
+- Reuse classification: Directly reusable subject to MIT terms.
+- Why non-obvious: Tiny generic numeric project, but it solves a high-value freight settlement edge case more directly than most logistics repositories.
+- Scores:
+  - Technical value: 8.9/10
+  - Commercial value: 8.8/10
+  - Rarity: 8.7/10
+  - Completeness: 8.6/10 for numeric many-to-many matching
+  - Build-time saved: 7.8/10
+  - Data advantage: 3.0/10
+  - High-ticket potential: 8.8/10 as attribution infrastructure
+- Combination opportunities: Use after exact-reference matching. Integer minor units + bounded group sizes + unique-solution requirement; do not allow combinatorial match alone to establish entitlement.
+- Next action: Integrate only as a numeric candidate generator under v7; require independent reference/provenance evidence or unique bounded solution before setting allocation_status=resolved.
+
+### apimeister/x12-types — freight invoice + remittance transaction primitives
+- Repository: https://github.com/apimeister/x12-types
+- Commit / revision: e8238385d9f4a8a21b6e4525f5ab3acc7bed3978
+- Date discovered: 2026-09-19
+- What it contains: Apache-2.0 Rust X12 transaction-set types/parsers with freight-relevant test fixtures including X12 210 Motor Carrier Freight Details and Invoice plus X12 820 Payment Order/Remittance Advice. The test corpus also covers transportation status/order families such as 204/214 alongside many business transaction types.
+- Rare / undernoticed value: Gives v7 typed/tested EDI primitives on both sides of the money chain: carrier billing (210) and payment/remittance (820), reducing dependence on OCR/CSV for customers already exchanging EDI.
+- Likely buyer / user: Enterprise shippers, 3PLs and freight-payment teams with EDI feeds; internal v7 ingestion layer.
+- Painful problem: To prove realized recovery, v7 needs to connect original freight billing to later remittance/adjustment evidence. EDI 210 + 820 parsing provides a structured enterprise path.
+- Monetization mechanism: Faster enterprise onboarding and more reliable settlement proof for continuous assurance.
+- Build-time / data advantage: Saves weeks to months of X12 schema/parser work and gives test examples for freight invoice and remittance transaction families.
+- Evidence inspected: Apache-2.0 metadata; v005010 820 docs/tests; committed X12 210 test fixture and broader transportation transaction fixtures.
+- Important limitation: X12 syntax/types do not solve customer-specific trading-partner mappings, semantic provenance, or recovery attribution by themselves. Some test examples originate from third-party open sample sources whose provenance should remain attributed.
+- License / rights: Apache-2.0 for repository code. Treat external sample fixture provenance separately.
+- Reuse classification: Directly reusable code subject to Apache-2.0; fixtures reviewed individually for source attribution.
+- Why non-obvious: Generic X12 library rather than logistics product, but directly shortens freight bill/remittance ingestion.
+- Scores:
+  - Technical value: 9.0/10
+  - Commercial value: 8.7/10
+  - Rarity: 8.5/10
+  - Completeness: 8.5/10 for X12 parsing primitives
+  - Build-time saved: 8.5/10
+  - Data advantage: 5.0/10
+  - High-ticket potential: 8.8/10 as enterprise integration enabler
+- Combination opportunities: X12 210 -> carrier_invoice; X12 820 -> settlement/remittance; then Etherlabs/subset-sum allocation -> recovery_attribution.
+- Next action: Define exact canonical field mappings for 210 invoice numbers/amounts/references and 820 remittance reference/amount/adjustment elements before customer EDI onboarding.
