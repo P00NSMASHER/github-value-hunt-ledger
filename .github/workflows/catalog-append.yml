@@ -1,0 +1,50 @@
+name: Catalog append helper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/catalog_append_payload.json'
+
+permissions:
+  contents: write
+
+jobs:
+  append:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Append catalog payload idempotently
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('.github/catalog_append_payload.json').read_text())
+          marker = payload['marker']
+          changed = []
+          for rel, addition in payload['append'].items():
+              path = Path(rel)
+              current = path.read_text()
+              if marker in current:
+                  continue
+              path.write_text(current.rstrip() + '\n\n' + marker + '\n' + addition.strip() + '\n')
+              changed.append(rel)
+          Path('.catalog_append_changed').write_text('\n'.join(changed))
+          PY
+      - name: Commit catalog updates
+        shell: bash
+        run: |
+          if [ ! -s .catalog_append_changed ]; then
+            echo 'Nothing new to append.'
+            exit 0
+          fi
+          git config user.name 'github-value-hunt-bot'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          while IFS= read -r file; do git add "$file"; done < .catalog_append_changed
+          git commit -m 'Catalog compliance and recovery proof findings'
+          git push
