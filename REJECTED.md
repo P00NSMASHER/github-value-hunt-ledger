@@ -146,3 +146,75 @@ Repositories, ideas, and combinations investigated and rejected or deprioritized
 - Reason rejected: The repository's parser/infrastructure software is MIT, but the bundled X12 004010 package contains standards-derived transaction structures, code lists and syntax rules. This run did not establish independent provenance or redistribution authorization for those standards-derived data assets. A repository-level MIT license is not enough evidence to assume third-party standards content is cleared for commercial redistribution.
 - Evidence: Hunter 03 inspected exact revision `9a631a4104711bf5ac81c96d4b725c8698b4d799`, the root MIT license and the bundled X12 package describing broad 004010 transaction coverage including 204/210/214/990/810/820/824/997.
 - Revisit trigger: An explicit provenance/license statement establishes lawful redistribution of the generated/bundled X12 definitions. Until then, parser infrastructure may be evaluated separately, but the standards-definition corpus must remain rights-unresolved and outside the commercial dependency chain.
+
+## Run 11 additions / demotions
+
+### Fajendagba/Construction-Change-Order-Engine — demoted from MASTER
+- Repository / source: https://github.com/Fajendagba/Construction-Change-Order-Engine
+- Date: 2026-09-19
+- Reason rejected/deprioritized: No license was detected. Its change-order state/budget concepts remain useful clean-room requirements, but rights-clean OpenTakeoff + BIMChange-Agent now provide materially stronger implemented evidence layers for ScopeSignal.
+- Evidence: Existing catalog inspection established concrete workflow concepts but no reuse grant; current combination no longer depends on this code.
+- Revisit trigger: Explicit permissive/commercial reuse rights plus implementation/tests that materially outperform the current rights-clean stack.
+
+### D-ivy/renewables_indexes — demoted from MASTER
+- Repository / source: https://github.com/D-ivy/renewables_indexes
+- Date: 2026-09-19
+- Reason rejected/deprioritized: No license detected and visible build path is not fully reproducible. The committed screening artifacts/methodology remain useful clean-room research, but they no longer meet the elite positive-training-set standard.
+- Evidence: Prior inspection found national resource×price×revenue layers and volatility/negative-price features, but rights and reproducibility remain unresolved.
+- Revisit trigger: Clear reuse/data rights and a reproducible build or a licensed successor with equivalent national screening depth.
+
+### Andalusia-Data-Science-Team/QA-for-call-center — safety quarantine
+- Repository / source: https://github.com/Andalusia-Data-Science-Team/QA-for-call-center @ `fd4c22995809ff78568dad18856fede665fa4ff1`
+- Date: 2026-09-19
+- Reason rejected: The public README advertises a credential-bearing database configuration artifact and no license was established. The project also appears tied to a clinical contact-center environment. The potentially sensitive configuration artifact was deliberately not opened, copied, preserved or tested.
+- Evidence: High-level README/project metadata only; inspection stopped before credential-bearing content.
+- Revisit trigger: A sanitized revision is published with explicit reuse rights and clearly synthetic/public test material.
+
+### Nemesysco/QA7-SDK as a reusable QA engine
+- Repository / source: https://github.com/Nemesysco/QA7-SDK @ `649017cf59b7e60571df311a1c668dcc3d0827bc`
+- Date: 2026-09-19
+- Reason rejected: No reuse license established; old opaque vendor-SDK style repository with insufficient transparent source/test evidence compared with better MIT contact-center QA substrates.
+- Evidence: Repository metadata/README and age/runtime requirements; no binary reverse engineering was performed.
+- Revisit trigger: Explicit open-source/commercial reuse license plus auditable source/tests.
+
+### robawtic/heijunka as the workforce-assurance core
+- Repository / source: https://github.com/robawtic/heijunka @ `14559d42a08f011467261383cc533fb447529c7b`
+- Date: 2026-09-19
+- Reason rejected/deprioritized: MIT and operationally interesting, but the inspected fallback objective can minimize positive assignment weights and therefore prefer zero assignments unless coverage is otherwise forced. RosterSpec is a stronger current assurance/repair foundation because it treats verification, hard locks, coverage priority and repair validity explicitly.
+- Evidence: Hunter source inspection of fallback objective semantics and current tests.
+- Revisit trigger: Objective/coverage semantics are corrected and regression tests prove required staffing cannot collapse to a zero-assignment optimum.
+
+### shafeehhecker/HaulSync as a freight invoice-reconciliation engine
+- Repository / source: https://github.com/shafeehhecker/HaulSync @ `0d6fd34b21c1e09309ea155cc29ca06c2242e307`
+- Date: 2026-09-19
+- Reason rejected/deprioritized: MIT workflow shell is useful for RFQ→award→shipment→POD→invoice lineage, but inspected invoice routes are CRUD and do not support the stronger README claim of billed-vs-quote/contract reconciliation. Open TMS/Kareya/Qatoto already provide the stronger audit core.
+- Evidence: Prisma schema plus RFQ, shipment and invoice route inspection.
+- Revisit trigger: Real invoice comparison/rerating logic and tests are implemented. Until then keep only as optional workflow-schema donor.
+
+### clickpost-tech/clickpostERP as a freight-audit engine
+- Repository / source: https://github.com/clickpost-tech/clickpostERP @ `7808a6dbc25a4698acff7acd14c1a8704777f0c7`
+- Date: 2026-09-19
+- Reason rejected/deprioritized: MIT ERPNext integration has meaningful carrier recommendation, shipment/AWB, tracking webhook and sales-invoice linkage, but source inspection did not find the advertised freight invoice reconciliation path. It is an optional connector, not a recovery core.
+- Evidence: carrier/shipment APIs, custom shipment script, webhook and invoice linkage inspected; most doctype tests are scaffolding.
+- Revisit trigger: Actual billed-vs-expected reconciliation is committed and tested, or a pilot specifically needs ERPNext/ClickPost intake.
+
+### ifte110/Ocean-Freight-Rates direct reuse
+- Repository / source: https://github.com/ifte110/Ocean-Freight-Rates @ `cd0b2a3cfa818f083992654e1d9611833c9fc7d3`
+- Date: 2026-09-19
+- Reason rejected: No LICENSE found and the workbook/database/notebook appear to originate from a third-party data-science exercise. Public visibility does not establish reuse rights. Binary data were not inspected/extracted.
+- Evidence: Root metadata/README only; domain concepts include port/equipment normalization, effective windows and surcharge logic.
+- Revisit trigger: Explicit rights are established. Otherwise recreate any useful benchmark cases independently with synthetic ports/rates.
+
+### ShakthiW/canton-research freight engine
+- Repository / source: https://github.com/ShakthiW/canton-research @ `4f74ba2b8d8808313e19c4cf0e0e6df645796fc8`
+- Date: 2026-09-19
+- Reason rejected: No license detected; deterministic-looking freight calculations include fallback estimated cube/default divisors and broad optimistic/conservative multipliers that are inappropriate for evidence-grade billed-vs-contracted recovery. Kareya/Qatoto materially surpass it.
+- Evidence: Inspected chargeable-weight/minimum/air-sea-courier logic and fallback behavior.
+- Revisit trigger: Clear rights plus rigorous source-backed freight tests and removal of guessed values from recovery decisions.
+
+### mohammedrasulkhan09-arch/route-wise-rate-card-manager
+- Repository / source: https://github.com/mohammedrasulkhan09-arch/route-wise-rate-card-manager @ `fa71892ba44a5c53212b7dec64796c6fac436716`
+- Date: 2026-09-19
+- Reason rejected: Four-file browser CRUD/quotation demo with no LICENSE, no backend/versioning/provenance/tests and only simple route/weight/category/per-kg semantics. Does not improve Qatoto/Kareya.
+- Evidence: Full small project structure inspected.
+- Revisit trigger: Substantive backend, provenance/versioning, tests and clear rights are added.
