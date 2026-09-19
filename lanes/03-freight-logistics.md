@@ -158,3 +158,25 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 8.8/10
   - High-ticket potential: 6.5/10 directly; high as validation substrate
 - Next action: Use the derived benchmark as a regression gate for the Freight Recovery v4 canonical model, then keep searching for an explicitly anonymized real operational package containing invoice + contract/rate authority + shipment/BOL/POD from the same transaction.
+
+
+### warpfreight/warp-agent-mcp
+- Repository: https://github.com/warpfreight/warp-agent-mcp
+- Commit / revision: 1850556032b465a0c24839e28564687462067323
+- Date discovered: 2026-09-19
+- What it contains: MIT-licensed, actively maintained MCP/API client for Warp's production freight network. Source and manifest expose live quote, multi-carrier LTL option, booking, tracking/event history, lane history, booking history, quote history, delivered-shipment invoice retrieval, and shipment-document retrieval including BOL/POD/customs. The client implementation calls authenticated production freight invoice/document endpoints, while tests deliberately avoid real booking/charges. Its read-only freight-review workflow requires explicit source labels, comparability evidence, preserves negative savings, rejects duplicate shipment IDs, excludes unknown/mismatched requirements, separates quote opportunities from final-invoice differences, and explicitly refuses to call a difference realized savings.
+- Why it matters: This closes a major integration gap in Freight Recovery v4. For a customer-authorized Warp account, one connector can provide the transactional chain around a shipment—quote/booking history, tracking events, invoice, and BOL/POD documents—without asking the customer to manually export each artifact. It does not replace contractual truth for arbitrary carriers, but it can supply live source evidence and a model for other TMS/carrier connectors.
+- Commercial possibilities: Authorized live-data connector for freight-audit acceptance testing; compare accepted Warp quote to final invoice and delivery evidence; audit accessorial/supporting-document consistency; use quote/book/document/invoice lineage as one reference integration for a broader multi-carrier recovery service.
+- Build-time savings: High. Likely saves 1-3 months of production-grade quote/booking/document/invoice integration, auth/error handling, operator workflow, and evidence-comparison plumbing for Warp-connected customers.
+- Evidence inspected: README; machine-readable manifest; exact latest commit; src/client.ts invoice/document/quote/book paths; src/tools.ts get_invoice/get_documents registration; src/workflows.ts evidence/comparability rules; test/e2e.mjs; test/freight-review.mjs; test/refund.mjs. No live shipment was booked and no customer data was accessed.
+- License / rights: MIT repository code. Live Warp/customer shipment, quote, invoice and document data remain account-authorized customer data governed separately by Warp/customer terms and privacy obligations. Access requires authentication. Do not treat live market quotes as contract entitlement or historical invoice differences as realized recovery.
+- Reuse classification: Directly reusable subject to MIT terms for software; live data only with customer authorization.
+- Scores:
+  - Technical value: 9.4/10
+  - Commercial value: 9.5/10
+  - Rarity: 9.5/10
+  - Completeness: 9.1/10 for one-network transaction evidence
+  - Build-time saved: 9.0/10
+  - Data advantage: 8.5/10 when customer-authorized
+  - High-ticket potential: 9.3/10 as a connector inside freight assurance/recovery
+- Next action: Add a Warp adapter to the v4 canonical intake contract mapping quote_id/order_id/shipment_id → accepted quote → invoice → events → BOL/POD. First validation must be read-only on an authorized account: retrieve an already-delivered shipment and prove exact source lineage without booking, disputing, paying, or contacting any carrier.
