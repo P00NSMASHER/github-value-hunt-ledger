@@ -1,0 +1,176 @@
+name: Append Hunt 03 Freight Findings
+
+on:
+  push:
+    paths:
+      - '.github/workflows/hunt03-run11-append.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  append-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Append validated catalog entries
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH="${GITHUB_REF_NAME}"
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git reset --hard "origin/$BRANCH"
+          if grep -q 'adonayjunior/port-billing-tariffs — MIT tiered terminal billing oracle' hunters/03.md; then
+            echo 'Entries already present; no-op.'
+            exit 0
+          fi
+          cat >> hunters/03.md <<'CATALOG_EOF'
+
+### adonayjunior/port-billing-tariffs — MIT tiered terminal billing oracle
+- URL: https://github.com/adonayjunior/port-billing-tariffs
+- Exact commit / revision: `feb1cd5db183fa45047660f5e2e5f4d8ba966fd4`
+- Date inspected: 2026-09-19
+- Status: strong / Master contender
+- What it contains: A generic .NET terminal-billing engine with effective-dated `TariffRate` records for gate-in, gate-out, storage and container handling, plus a separate `DemurrageTariffPlan` that combines free days with contiguous escalating daily tiers. The domain rejects invalid ranges, gaps, overlaps, nonpositive rates and nonfinal open-ended tiers; a rate selector requires exactly one effective rate for a service/date. Inspected tests exercise free-time boundaries and tier arithmetic, including zero through day 5, then escalating charges across later tiers.
+- Rare or undernoticed value: Rights-clean independent terminal/accessorial arithmetic is much rarer than generic freight rating. This gives a second deterministic oracle for port storage/demurrage/handling that can challenge the primary stack rather than merely echo it.
+- Likely buyer / user: Importers, NVOCCs, forwarders, terminal-billing teams and freight-audit/payment vendors.
+- Painful problem: Terminal charges are highly sensitive to free-time boundaries, tier transitions and effective dates; a small rule error can manufacture or miss recoverable dollars.
+- Monetization mechanism: Fixed-price terminal-charge diagnostic, managed overcharge recovery, or an embedded deterministic port-charge module.
+- Likely first paid wedge: Customer-authorized terminal tariff schedule plus container event history plus billed charge lines -> recomputed expected storage/demurrage/handling -> evidence-linked discrepancy report.
+- Build-time or data advantage: Roughly 1–3 months of terminal-billing domain/invariant/test work compressed, with unusually useful tier-boundary tests for an independent oracle.
+- Concrete evidence inspected: actual root `LICENSE`; `src/PortBilling.Domain/Tariffs/DemurrageTariffPlan.cs`; `tests/PortBilling.Domain.Tests/DemurrageTariffPlanTests.cs`; exact revision and commit metadata. Repository documentation states the terminal/rates are generic/fictitious rather than copied from a proprietary operator.
+- License / rights: MIT verified from the actual repository LICENSE. Fictitious/synthetic tariff examples can be used as software tests; real customer/carrier/terminal schedules still require their own authorization and provenance.
+- Reuse classification: Directly reusable under MIT notice requirements.
+- Recovery-safety caveat: The inspected demurrage plan repository behaves like one current plan rather than a historically versioned authority, and a closed final tier can leave later days unpriced. A recovery implementation must bind every charge to the controlling version/effective window and route uncovered days to REVIEW/$0 rather than silently stopping or inventing a rate.
+- Why it is not already obvious / crowded: Tiny generic port-billing repository with value concentrated in the domain invariants/tests rather than a polished freight-audit product.
+- Combination opportunities: Authorized external accessorial schedule -> Qatoto/Trenova versioned authority -> port-billing as independent terminal-charge calculator -> aiparallel/open_tms discrepancy -> four13-style dispute/settlement lineage. It also forms a lawful synthetic benchmark family with the same author's gate/TOS projects.
+- Value score: A 4/5; B 4/5; C 4/5; D 4/5; E 5/5; F 5/5 = **26/30**.
+- Next action: Add a synthetic benchmark with effective-date changes, weekend/working-day variants, open-ended and deliberately uncovered final tiers; require version provenance and REVIEW/$0 for any unpriced period.
+
+### Aryapd021/DemurrageOS — two-clock container fee engine reference
+- URL: https://github.com/Aryapd021/DemurrageOS
+- Exact commit / revision: `329d9209ed6e5de5089da9739307cd5913287c16`
+- Date inspected: 2026-09-19
+- Status: watch / strong clean-room reference
+- What it contains: A substantial TypeScript/PostgreSQL container-charge platform with tariff entities, container events, charge/exposure records, audit/outbox infrastructure, worker queues, document/import routes and a financial engine modeling DPD_DIRECT, CFS and DPD_CFS clocks. `TariffEngine.getTariffForDate` selects effective-dated tariffs; `FreeTimeEngine` chooses discharge, CFS gate-in or fallback-event anchors; charge calculation uses Decimal-based money utilities and records calculation inputs/tariff version.
+- Rare or undernoticed value: The useful domain idea is the two-clock interpretation of container free time and fallback from direct-port delivery into CFS, a class of event semantics that generic `days × rate` engines omit.
+- Likely buyer / user: Importers, customs-house agents, NVOCCs, forwarders and demurrage/detention audit teams.
+- Painful problem: Wrong event clock selection can dominate the dollar result even when the rate itself is correct.
+- Monetization mechanism: Clean-room container free-time/exposure diagnostic or an event-interpretation module feeding managed recovery.
+- Likely first paid wedge: Customer-authorized container event history + controlling tariff -> explain which clock controls free time and calculate reviewable exposure before invoice/payment.
+- Build-time or data advantage: Roughly 2–4 months of container-event, tariff, job/audit and operational application design guidance.
+- Concrete evidence inspected: exact commit/tree; `apps/api/src/services/financial/charge-calculation.ts`; repository test inventory including `financial.test.ts`; Prisma/application structure. Repository claims of production-readiness/test completeness were treated as repository claims rather than independently executed proof.
+- License / rights: No root LICENSE file was present at the inspected revision; no reuse grant established.
+- Reuse classification: Inspect / learn / clean-room only unless permission is established.
+- Recovery-safety caveat: The inspected calculator can fall back from a missing CFS gate-in to discharge/fallback timestamps, selects an effective tariff without visible carrier/port/container/service scope in that function, uses current wall-clock time internally, and prices simple daily rates. Those behaviors are not acceptable as recovery authority without stronger scoping, deterministic `as_of`, event-evidence requirements and fail-closed REVIEW/$0 behavior.
+- Why it is not already obvious / crowded: Newly built low-attention demurrage platform whose value is hidden in event-clock/application structure, but its README is much stronger than its current rights posture.
+- Combination opportunities: Opstrax physical truth + clean-room DemurrageOS clock semantics + Qatoto/Trenova tariff version authority + MIT port-billing tier arithmetic -> evidence-backed detention/demurrage discrepancy.
+- Value score: A 4/5; B 4/5; C 5/5; D 4/5; E 5/5; F 1/5 = **23/30**.
+- Next action: Recreate the DPD/CFS/fallback clock cases synthetically with explicit missing-event hard negatives; do not copy source absent a license.
+
+### ritickchahar/Web-Scrapers — Hapag-Lloyd tariff PDF discovery/extraction reference
+- URL: https://github.com/ritickchahar/Web-Scrapers
+- Exact commit / revision: `13803dd53ec8e0eeb7cd61aefcbc0ca96a4ccd1a`
+- Date inspected: 2026-09-19
+- Status: watch / clean-room and rights-check only
+- What it contains: Within the Hapag-Lloyd subdirectory, a pipeline stores public tariff-PDF links by region/country, downloads PDFs, extracts text with PyPDF2, asks a model for structured liner/port/currency/effective/expiry/free-day/day-type/equipment/tier data, and persists tariffs, container types and charge buckets (`start_day`, `end_day`, `rate`, `rate_unit`) in SQLite.
+- Rare or undernoticed value: It is one of the few public-code examples found that starts from an external carrier tariff-document source rather than assuming the accessorial schedule is already normalized. The schema directly targets the P0 missing-authority lane: effective windows, free-time type and escalating charge buckets.
+- Likely buyer / user: Ocean shippers, NVOCCs, forwarders and freight-audit/payment vendors.
+- Painful problem: A billed-vs-contracted engine cannot recover terminal/carrier D&D if it cannot lawfully locate, version and prove the controlling external schedule/addendum.
+- Monetization mechanism: Clean-room public-source tariff registry and change-monitor feeding a reviewed freight recovery product; not direct reuse of this scraper or third-party tariff documents.
+- Likely first paid wedge: For a customer-authorized lane/carrier set, maintain source URLs/hashes/effective dates for applicable public schedules, require analyst confirmation, then rerate only against verified authoritative facts.
+- Build-time or data advantage: Roughly 1–2 months of source-discovery/schema requirements and a useful concrete target for free-time/tier extraction.
+- Concrete evidence inspected: `Hapag-Lloyd/src/extraction/process_tarffic_pdfs.py`; `Hapag-Lloyd/src/database/database.py`; exact commit and recursive tree. The extraction currently sends model output directly to persistence and does not provide the source-location/evidence gates required by this stack.
+- License / rights: No root repository LICENSE was present at the inspected revision. A linked/mentioned license elsewhere is not treated as a grant for this project. Publicly reachable carrier PDFs also remain subject to their own copyright/terms and are not assumed redistributable.
+- Reuse classification: Inspect / learn / clean-room only. Do not copy the code or republish tariff documents/values without a valid basis.
+- Safety note: The same multi-purpose repository tree exposes unrelated folders suggesting personal-email and leak-oriented scraping material; those files were deliberately not opened, mined or preserved. Inspection was limited to the freight tariff subdirectory and repository metadata.
+- Why it is not already obvious / crowded: Freight tariff capability is buried inside a miscellaneous scraper collection and has essentially no product framing.
+- Combination opportunities: Independently implemented public/customer-authorized source registry -> A-Jatin/Assay/TrustMesh source lineage -> Qatoto/Trenova version authority -> Kareya/port-billing rerating -> discrepancy/settlement proof. Model extraction must remain advisory until source-grounded review.
+- Value score: A 3/5; B 4/5; C 4/5; D 5/5; E 3/5; F 1/5 = **20/30**.
+- Next action: Hunt for an explicitly licensed public-tariff source monitor/parser; meanwhile implement only the generic source-URL/hash/effective-date registry from first principles and require verified document lineage before any dollar finding.
+
+### adonayjunior/tos-integration-service — MIT TOS event normalization/dedup harness
+- URL: https://github.com/adonayjunior/tos-integration-service
+- Exact commit / revision: `770d671df9111893c4af2b39250ab4f461020cec`
+- Date inspected: 2026-09-19
+- Status: watch
+- What it contains: A generic Spring Boot/Groovy webhook service that maps an explicitly invented TOS event shape into a canonical `TerminalEvent`, normalizes event-code synonyms and container numbers, parses/rejects timestamps, deduplicates retries by `messageId`, and publishes through an abstraction designed for in-memory or Kafka/RabbitMQ implementations. The repository reports 21 tests including HTTP round trips for valid, duplicate, unknown-event and missing-field cases.
+- Rare or undernoticed value: A lawful, explicitly non-proprietary test/integration substrate for terminal-event evidence. It helps test whether billing/recovery logic survives source vocabulary variation and webhook retries without double-counting events.
+- Likely buyer / user: Terminal/port integration teams, NVOCCs, forwarders and freight software vendors.
+- Monetization mechanism: Paid TOS integration implementation when a pilot needs it; otherwise benchmark infrastructure rather than a standalone product.
+- Likely first paid wedge: Normalize one authorized terminal event feed into a canonical event stream that downstream free-time/billing logic can consume idempotently.
+- Build-time or data advantage: Several weeks to 1–2 months of event-normalization/dedup/integration plumbing.
+- Concrete evidence inspected: exact initial commit, README, build/test inventory and actual MIT LICENSE content contained in the commit. The README explicitly says the event vocabulary/message shape are invented and not copied from a proprietary TOS.
+- License / rights: MIT verified from the repository commit/license content.
+- Reuse classification: Directly reusable under MIT notice requirements; real TOS adapters/message definitions require separate authorization and terms review.
+- Why it is not already obvious / crowded: Very small generic integration repo; freight-recovery value emerges only when paired with terminal billing and event-based free-time evidence.
+- Combination opportunities: TOS event normalization -> Opstrax/TrustMesh evidence lineage -> port-billing/Qatoto/Trenova tariff authority -> container-charge discrepancy. Also useful as a synthetic source in CI.
+- Value score: A 2/5; B 3/5; C 4/5; D 4/5; E 4/5; F 5/5 = **22/30**.
+- Next action: Keep as a benchmark/integration watch; do not displace Opstrax. Pull forward only if a paid pilot needs webhook/TOS normalization.
+
+### adonayjunior/port-gate-ops-api — MIT terminal gate-event lifecycle
+- URL: https://github.com/adonayjunior/port-gate-ops-api
+- Exact commit / revision: `3054c33af1b509ffc0794fa82c0a53001e738840`
+- Date inspected: 2026-09-19
+- Status: watch / deprioritized
+- What it contains: A generic container-terminal gate API implementing appointment scheduling, check-in windows/grace, complete/cancel/expire transitions, container-number validation and an in-memory persistence/application layer. README evidence reports 27 tests across domain/application behavior and explicit endpoint exercises.
+- Rare or undernoticed value: A simple lawful generator/reference for the physical gate events that start/stop certain storage/detention clocks; useful primarily in a synthetic event-to-charge benchmark.
+- Likely buyer / user: Port/terminal software teams and integration vendors.
+- Monetization mechanism: Integration/implementation services if a customer lacks normalized gate events; not a primary recovery product.
+- Likely first paid wedge: Convert authorized appointment/check-in/complete events into the canonical evidence model used by the detention/demurrage calculator.
+- Build-time or data advantage: Several weeks of terminal-gate state-machine/test scaffolding.
+- Concrete evidence inspected: README and exact commit/repository structure; project presents itself as generic rather than modeled on a proprietary terminal system.
+- License / rights: Repository documentation identifies MIT; production adoption should verify/preserve the actual license notice at the selected revision before copying code.
+- Reuse classification: Reusable if/when the MIT grant is confirmed from the actual license file; otherwise keep to inspect/learn. Real terminal event feeds remain separately authorized data.
+- Why it is not already obvious / crowded: Tiny one-purpose backend; current freight P0 already has a stronger physical-evidence leader, so its value is mostly independent synthetic test infrastructure.
+- Combination opportunities: Pair with `tos-integration-service` and `port-billing-tariffs` to create a fully fictional MIT-style terminal lifecycle -> tariff -> charge benchmark.
+- Value score: A 2/5; B 3/5; C 4/5; D 3/5; E 4/5; F 5/5 = **21/30**.
+- Next action: Deprioritize unless a paid pilot needs terminal gate ingestion or a synthetic port-charge fixture family.
+
+### thepiamboys/freight-forwarding — simple ERPNext free-time/rate schema
+- URL: https://github.com/thepiamboys/freight-forwarding
+- Exact commit / revision: `e69412d1ef2fd8ab97d01621815b68e19f4c2d60`
+- Date inspected: 2026-09-19
+- Status: rejected / deprioritized
+- What it contains: An ERPNext freight-forwarding add-on whose `FF Rate Freetime` child table stores port, separate demurrage/detention/storage free days, simple per-day rates, currency and notes.
+- Reason not retained: No repository LICENSE was found, and the inspected schema lacks the historical effective-date/version authority, tier ladders, source provenance and tests needed to improve the current recovery stack. It is dominated by Kareya/Qatoto/Trenova and the newly found MIT port-billing engine.
+- Concrete evidence inspected: README, recursive tree/license check, `freight_forwarding/doctype/ff_rate_freetime/ff_rate_freetime.json`, exact revision.
+- License / rights: No project reuse grant established.
+- Reuse classification: Inspect / learn / clean-room only; no code reuse selected.
+- Value score: A 2/5; B 3/5; C 3/5; D 2/5; E 3/5; F 2/5 = **15/30**.
+- Next action: Do not re-search unless versioned/tiered tariff logic and a clear license are added.
+
+### tritaptheduc/logistics-freight-audit — MIT but assumption-driven audit sibling
+- URL: https://github.com/tritaptheduc/logistics-freight-audit
+- Exact commit / revision: `635594f7bf541e4bb184872ba21c32535a01139c`
+- Date inspected: 2026-09-19
+- Status: rejected / deprioritized
+- What it contains: An MIT ocean-freight audit analytics project with synthetic data, BigQuery SQL and dashboard/reporting around duplicate invoices, base-rate variance, fuel, weight and demurrage/free-time checks.
+- Reason not retained: It is an adjacent sibling of the already-cataloged, stronger `tritaptheduc/Freight_Audit_Project`. The inspected audit logic uses simplified/hardcoded demurrage assumptions rather than versioned controlling tariff authority, so it is unsafe as a recoverable-dollar oracle and adds little beyond the sibling's better synthetic generator.
+- Concrete evidence inspected: README/project tree and actual root MIT LICENSE at exact revision.
+- License / rights: MIT verified for the software; synthetic/example assumptions are not contractual truth.
+- Reuse classification: Code is reusable under MIT, but no core recovery component is selected because the logic is dominated by stronger existing findings.
+- Value score: A 2/5; B 3/5; C 3/5; D 2/5; E 3/5; F 5/5 = **18/30**.
+- Next action: Do not revisit unless the project replaces generic/hardcoded penalty assumptions with source-backed versioned tariffs and independent evidence tests.
+
+### lambertpatr/Port-Logistics-Dwell-Time-Analytics
+- URL: https://github.com/lambertpatr/Port-Logistics-Dwell-Time-Analytics
+- Exact commit / revision: `a55a4e69b057e4c62273e9ee0d0de309f14be274`
+- Date inspected: 2026-09-19
+- Status: rejected / deprioritized
+- What it contains: A Python port-logistics analytics/dashboard project generating vessel, berth, container, rail and corridor datasets plus dwell/demurrage metrics, Excel and HTML outputs.
+- Reason not retained: The current code still procedurally generates the records even though the latest commit renames comments from “synthesizing” to “ingesting/ETL,” creating an evidence/provenance inconsistency. No root LICENSE was present, and the project provides neither controlling tariff authority nor billed-vs-contracted reconciliation.
+- Concrete evidence inspected: exact latest commit diff, recursive tree and generated-data/analytics source inventory. Large generated CSV/XLSX artifacts were not mined or treated as real public operational data.
+- License / rights: No reuse grant established at the inspected revision; generated data provenance should not be inferred from branding/comments.
+- Reuse classification: No source/data reuse selected.
+- Value score: A 1/5; B 2/5; C 2/5; D 2/5; E 2/5; F 1/5 = **10/30**.
+- Next action: Do not re-search unless a clear license plus independently sourced/public-data provenance or deterministic contract-comparison logic is added.
+CATALOG_EOF
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add hunters/03.md
+          git commit -m 'catalog: add Hunt 03 freight findings'
+          git push origin "$BRANCH"
