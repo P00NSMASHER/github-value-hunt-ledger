@@ -7,8 +7,6 @@ jobs:
   append:
     if: "${{ github.event.head_commit.message == 'Run value-hunt catalog append 2' }}"
     runs-on: ubuntu-latest
-    env:
-      PAYLOAD_B64: "IyMjIExvbmV3b2xmLTAvU21hcnQtRmFybS1GaWVsZC1JbnRlbGxpZ2VuY2UtUGxhdGZvcm0KLSBVUkw6IGh0dHBzOi8vZ2l0aHViLmNvbS9Mb25ld29sZi0wL1NtYXJ0LUZhcm0tRmllbGQtSW50ZWxsaWdlbmNlLVBsYXRmb3JtCi0gRXhhY3QgY29tbWl0IC8gcmV2aXNpb246IGA0ZWFhNTUwYzkyZDA0NmU2NTgyNzU3OGNlOGEzNjc1YTgyYTlmMDIxYAotIERhdGUgaW5zcGVjdGVkOiAyMDI2LTA5LTE5Ci0gU3RhdHVzOiByZWplY3RlZCAvIHNhZmV0eSBxdWFyYW50aW5lCi0gV2hhdCBpdCBjb250YWluczogUHVibGljLWZhY2luZyBzbWFydC1mYXJtIHBsYXRmb3JtIGNsYWltaW5nIGZpZWxkIHBvbHlnb25zLCB3ZWF0aGVyLCBzb2lsIGhpc3RvcnksIGNyb3Agc3VpdGFiaWxpdHksIGlycmlnYXRpb24vRVQsIFNlbnRpbmVsLWRlcml2ZWQgTkRWSSwgZmVydGlsaXplci9wZXN0IGFsZXJ0cyBhbmQgUG9zdEdJUy1iYWNrZWQgZmFybSBvcGVyYXRpb25zLgotIFdoeSByZWplY3RlZCAvIHF1YXJhbnRpbmVkOiBJbnNwZWN0aW9uIHdhcyBpbnRlbnRpb25hbGx5IHN0b3BwZWQgYmVjYXVzZSB0aGUgcHVibGljIFJFQURNRSBleHBvc2VkIGNyZWRlbnRpYWwtbGlrZSBjb25maWd1cmF0aW9uIG1hdGVyaWFsLiBObyBjcmVkZW50aWFsL2F1dGhlbnRpY2F0aW9uIHZhbHVlcyB3ZXJlIHJldGFpbmVkLCByZXByb2R1Y2VkIG9yIHRlc3RlZCwgYW5kIG5vIGF0dGVtcHQgd2FzIG1hZGUgdG8gdXNlIHRoZW0uIFNhZmV0eSB0YWtlcyBwcmlvcml0eSBvdmVyIHRlY2huaWNhbC9jb21tZXJjaWFsIGV2YWx1YXRpb24uCi0gTGljZW5zZSAvIHJpZ2h0czogTm90IGFzc2Vzc2VkIGFmdGVyIHF1YXJhbnRpbmU7IHB1YmxpYyB2aXNpYmlsaXR5IGRvZXMgbm90IGVzdGFibGlzaCByZXVzZSByaWdodHMuCi0gUmV1c2UgY2xhc3NpZmljYXRpb246IEV4Y2x1ZGVkIGZyb20gaHVudCB1bmxlc3MgYSBmdXR1cmUgc2FuaXRpemVkIHJldmlzaW9uIHJlbW92ZXMgZXhwb3NlZCBhdXRoZW50aWNhdGlvbiBtYXRlcmlhbCBhbmQgY2xlYXIgbGljZW5zaW5nIGlzIGVzdGFibGlzaGVkLgotIENvbWJpbmF0aW9uIG9wcG9ydHVuaXRpZXM6IE5vbmUgcmV0YWluZWQuCi0gTmV4dCBhY3Rpb246IERvIG5vdCByZXZpc2l0IHRoZSBhZmZlY3RlZCByZXZpc2lvbi4KCiMjIyBuaWtldGFyb3JhL0tyaXNoaU5ldHJhCi0gVVJMOiBodHRwczovL2dpdGh1Yi5jb20vbmlrZXRhcm9yYS9LcmlzaGluZXRyYQotIEV4YWN0IGNvbW1pdCAvIHJldmlzaW9uOiBgMjFlYjZjMGE1ODk1YTk5MWViMWZiZTBlM2JiMzdjMmU5NDVhYmY4NWAKLSBEYXRlIGluc3BlY3RlZDogMjAyNi0wOS0xOQotIFN0YXR1czogcmVqZWN0ZWQgLyBkZXByaW9yaXRpemVkCi0gV2hhdCBpdCBjb250YWluczogSW5kaWEtZm9jdXNlZCBGYXN0QVBJL1JlYWN0IGFncmljdWx0dXJlIHBsYXRmb3JtIHdpdGggU2VudGluZWwtMS8yIGZlYXR1cmUgZXh0cmFjdGlvbiwgY3JvcCBjbGFzc2lmaWNhdGlvbiwgd2VhdGhlciwgc29pbC1tb2lzdHVyZSBlc3RpbWF0aW9uLCBpcnJpZ2F0aW9uL2Fkdmlzb3J5IGVuZHBvaW50cywgbXVsdGlsaW5ndWFsIHZvaWNlIHRvb2xpbmcgYW5kIG1hcmtldHBsYWNlL2Rhc2hib2FyZCBsYXllcnMuCi0gV2h5IHJlamVjdGVkOiBUaGUgYnJvYWQgUkVBRE1FIHN1cmZhY2UgaXMgbm90IG1hdGNoZWQgYnkgc3VmZmljaWVudGx5IGRlZXAgYWdyb25vbWljIGRlY2lzaW9uIGxvZ2ljIHRvIGJlYXQgdGhlIGV4aXN0aW5nIE9wZW5GYXJtL0ZUVy9B Z3JpYm91bmQvUmljZW1hcHBlci9weUNyb3BXYXQvQXF1YUNyb3Agc3RhY2suIFRoZSBpbnNwZWN0ZWQgaXJyaWdhdGlvbiBpbXBsZW1lbnRhdGlvbiByZWR1Y2VzIHRoZSBkZWNpc2lvbiB0byBmaXhlZCBzb2lsLW1vaXN0dXJlIGJhbmRzICg+PTcwIG5vIGlycmlnYXRpb24sID49NTAgbW9uaXRvciwgb3RoZXJ3aXNlIGltbWVkaWF0ZSBpcnJpZ2F0aW9uKSByYXRoZXIgdGhhbiBhIGNhbGlicmF0ZWQgRVQvc29pbC13YXRlci9jcm9wLXN0YWdlIG1vZGVsLiBObyByb290IExJQ0VOU0Ugd2FzIHByZXNlbnQgYXQgdGhlIGluc3BlY3RlZCByZXZpc2lvbi4KLSBMaWtlbHkgYnV5ZXIgLyB1c2VyOiBGYXJtLW1hbmFnZW1lbnQgb3IgYWdyaWN1bHR1cmFsIGFkdmlzb3J5IHVzZXJzLCBidXQgbm8gZGlmZmVyZW50aWF0ZWQgY29tbWVyY2lhbCB3ZWRnZSBzdXJ2aXZlcyBjb21wYXJpc29uIHdpdGggc3Ryb25nZXIgcmV0YWluZWQgYXNzZXRzLgotIEJ1aWxkLXRpbWUgb3IgZGF0YSBhZHZhbnRhZ2U6IExpbWl0ZWQ7IHBlcmhhcHMgd2Vla3Mgb2YgaW50ZWdyYXRpb24vVUkgcmVmZXJlbmNlLCBub3QgdGhlIDIrIG1vbnRocyBvZiByYXJlIGRvbWFpbi9kYXRhIGNvbXByZXNzaW9uIHRhcmdldGVkIGJ5IHRoaXMgaHVudC4KLSBDb25jcmV0ZSBldmlkZW5jZSBpbnNwZWN0ZWQ6IEV4YWN0IGxhdGVzdCBjb21taXQ7IFJFQURNRS9wcm9qZWN0IGFyY2hpdGVjdHVyZTsgYGFncmljdWx0dXJlL2Fkdmlzb3J5L2lycmlnYXRpb24ucHlgOyBjb2RlIHNlYXJjaCBmb3IgU2VudGluZWwvbW9pc3R1cmUvaXJyaWdhdGlvbiBmbG93OyBmYWlsZWQgcm9vdCBMSUNFTlNFIGxvb2t1cC4KLSBMaWNlbnNlIC8gcmlnaHRzOiBObyByb290IExJQ0VOU0UgZXN0YWJsaXNoZWQ7IFBBU1RJUy1SL1NlbnRpbmVsL1NhcnZhbS9vdGhlciB1cHN0cmVhbSBkYXRhIGFuZCBzZXJ2aWNlcyBoYXZlIHNlcGFyYXRlIHRlcm1zLgotIFJldXNlIGNsYXNzaWZpY2F0aW9uOiBJbnNwZWN0L2xlYXJuL2NsZWFuLXJvb20gb25seSBhYnNlbnQgYSB2YWxpZCBsaWNlbnNlOyBkbyBub3QgcmV1c2UgdXBzdHJlYW0gZGF0YXNldHMgd2l0aG91dCB0aGVpciBvd24gcmlnaHRzIHJldmlldy4KLSBWYWx1ZSBzY29yZTogQSAyLzUsIEIgMy81LCBDIDIvNSwgRCAyLzUsIEUgMy81LCBGIDEvNSA9ICoqMTMvMzAqKi4KLSBDb21iaW5hdGlvbiBvcHBvcnR1bml0aWVzOiBOb25lIHRoYXQgaW1wcm92ZXMgdGhlIGN1cnJlbnQgYWdyaWN1bHR1cmUgc3RhY2s7IHRoZSBvbmx5IHVzZWZ1bCBsZXNzb24gaXMgdG8gYXZvaWQgcmVwbGFjaW5nIHZhbGlkYXRlZCB3YXRlci1iYWxhbmNlIGxvZ2ljIHdpdGggc2ltcGxlIG1vaXN0dXJlIHRocmVzaG9sZHMuCi0gTmV4dCBhY3Rpb246IERvIG5vdCByZXZpc2l0IHVubGVzcyBpdCBhZGRzIGEgY2xlYXIgbGljZW5zZSBwbHVzIGZpZWxkLXZhbGlkYXRlZCBFVC9jcm9wLXN0YWdlL3NvaWwtd2F0ZXIgZGVjaXNpb24gbG9naWMgb3IgYSB1bmlxdWVseSB2YWx1YWJsZSBsYXdmdWwgZGF0YXNldC4K"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -18,8 +16,36 @@ jobs:
         run: |
           git pull --ff-only
           if ! grep -q '^### Lonewolf-0/Smart-Farm-Field-Intelligence-Platform$' hunters/24.md; then
-            printf '\n' >> hunters/24.md
-            printf '%s' "$PAYLOAD_B64" | base64 -d >> hunters/24.md
+            cat >> hunters/24.md <<'EOF'
+
+          ### Lonewolf-0/Smart-Farm-Field-Intelligence-Platform
+          - URL: https://github.com/Lonewolf-0/Smart-Farm-Field-Intelligence-Platform
+          - Exact commit / revision: `4eaa550c92d046e65827578ce8a3675a82a9f021`
+          - Date inspected: 2026-09-19
+          - Status: rejected / safety quarantine
+          - What it contains: Public-facing smart-farm platform claiming field polygons, weather, soil history, crop suitability, irrigation/ET, Sentinel-derived NDVI, fertilizer/pest alerts and PostGIS-backed farm operations.
+          - Why rejected / quarantined: Inspection was intentionally stopped because the public README exposed credential-like configuration material. No credential/authentication values were retained, reproduced or tested, and no attempt was made to use them. Safety takes priority over technical/commercial evaluation.
+          - License / rights: Not assessed after quarantine; public visibility does not establish reuse rights.
+          - Reuse classification: Excluded from hunt unless a future sanitized revision removes exposed authentication material and clear licensing is established.
+          - Combination opportunities: None retained.
+          - Next action: Do not revisit the affected revision.
+
+          ### niketarora/KrishiNetra
+          - URL: https://github.com/niketarora/KrishiNetra
+          - Exact commit / revision: `21eb6c0a5895a991eb1fbe0e3bb37c2e945abf85`
+          - Date inspected: 2026-09-19
+          - Status: rejected / deprioritized
+          - What it contains: India-focused FastAPI/React agriculture platform with Sentinel-1/2 feature extraction, crop classification, weather, soil-moisture estimation, irrigation/advisory endpoints, multilingual voice tooling and marketplace/dashboard layers.
+          - Why rejected: The broad README surface is not matched by sufficiently deep agronomic decision logic to beat the existing OpenFarm/FTW/Agribound/Ricemapper/pyCropWat/AquaCrop stack. The inspected irrigation implementation reduces the decision to fixed soil-moisture bands rather than a calibrated ET/soil-water/crop-stage model. No root LICENSE was present at the inspected revision.
+          - Likely buyer / user: Farm-management or agricultural advisory users, but no differentiated commercial wedge survives comparison with stronger retained assets.
+          - Build-time or data advantage: Limited; perhaps weeks of integration/UI reference, not the 2+ months of rare domain/data compression targeted by this hunt.
+          - Concrete evidence inspected: Exact latest commit; README/project architecture; `agriculture/advisory/irrigation.py`; code search for Sentinel/moisture/irrigation flow; failed root LICENSE lookup.
+          - License / rights: No root LICENSE established; PASTIS-R/Sentinel/Sarvam/other upstream data and services have separate terms.
+          - Reuse classification: Inspect/learn/clean-room only absent a valid license; do not reuse upstream datasets without their own rights review.
+          - Value score: A 2/5, B 3/5, C 2/5, D 2/5, E 3/5, F 1/5 = **13/30**.
+          - Combination opportunities: None that improves the current agriculture stack; the only useful lesson is to avoid replacing validated water-balance logic with simple moisture thresholds.
+          - Next action: Do not revisit unless it adds a clear license plus field-validated ET/crop-stage/soil-water decision logic or a uniquely valuable lawful dataset.
+          EOF
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
