@@ -352,3 +352,29 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 0/10 usable
   - High-ticket potential: 0/10 as-is
 - Next action: Do not revisit or import unless license/permission changes. Cover equivalent generic cases independently in the MIT v7 benchmark suite.
+
+
+### ehs9nino/traffic-ocr-llm-benchmark — CC-BY rate-confirmation extraction gate
+- Repository: https://github.com/ehs9nino/traffic-ocr-llm-benchmark
+- Commit / revision: f4cccc066c544b072ace6b98f070c2dd590209f0
+- Date discovered: 2026-09-19
+- What it contains: CC BY 4.0 research benchmark with 15 synthetic/anonymized rate-confirmation images plus structured ground truth for load number, pickup/dropoff locations and times, total rate and rate-per-mile. It also contains pseudonymized driver/CDL research data, but that subset is not needed for Freight Recovery.
+- Rare / undernoticed value: It creates a clean, independent gate specifically for the document that establishes commercial intent before billing. Most invoice-OCR benchmarks do not test whether the accepted/negotiated rate confirmation itself was extracted correctly.
+- Likely buyer / user: Internal QA for Freight Recovery v7; vendors benchmarking OCR/vision extraction of freight rate confirmations.
+- Painful problem: A perfect invoice parser still produces wrong recovery dollars if the controlling rate confirmation is misread. Rate amount, lane, load identity and timing must be validated upstream of any rerating.
+- Monetization mechanism: Benchmark infrastructure for the paid Freight Audit Acceptance Test; use it to substantiate extraction reliability and identify format-specific calibration needs.
+- Build-time / data advantage: Saves weeks of creating rate-confirmation image fixtures and manually labeling freight-specific commercial fields.
+- Evidence inspected: README; CC BY 4.0 LICENSE; rate_confirmations/annotations/ratecon_ground_truth.json; DOI-backed dataset description.
+- License / rights: CC BY 4.0. Commercial sharing/adaptation allowed with attribution and indication of changes. Do not use driver/CDL subset for re-identification or biometric reconstruction; v7 does not need that subset.
+- Reuse classification: Directly reusable with attribution; restrict v7 use to rate-confirmation benchmark subset.
+- Why non-obvious: Only ~1 GitHub star, academic framing, but directly tests one of the highest-risk v7 inputs.
+- Scores:
+  - Technical value: 8.8/10
+  - Commercial value: 8.2/10
+  - Rarity: 9.1/10
+  - Completeness: 8.5/10 for rate-con extraction
+  - Build-time saved: 8.2/10
+  - Data advantage: 8.5/10
+  - High-ticket potential: 7.8/10 as QA infrastructure
+- Combination opportunities: Rate-con benchmark → Zerox/invoice-extraction-pipeline → Assay confidence gate → canonical rate_authority/rate_rule → deterministic rerating. Score load-ID exactness, total-rate exactness, pickup/dropoff identity and extraction abstention separately before allowing rate authority into the gold-truth pipeline.
+- Next action: Add a v7 rate-authority extraction scorecard and require a configurable confidence threshold; incorrect or low-confidence rate authority must force review and $0 asserted recovery.
