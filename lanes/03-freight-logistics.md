@@ -180,3 +180,46 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 8.5/10 when customer-authorized
   - High-ticket potential: 9.3/10 as a connector inside freight assurance/recovery
 - Next action: Add a Warp adapter to the v4 canonical intake contract mapping quote_id/order_id/shipment_id → accepted quote → invoice → events → BOL/POD. First validation must be read-only on an authorized account: retrieve an already-delivered shipment and prove exact source lineage without booking, disputing, paying, or contacting any carrier.
+
+
+### shafeehhecker/HaulSync
+- Repository: https://github.com/shafeehhecker/HaulSync
+- Commit / revision: 0d6fd34b21c1e09309ea155cc29ca06c2242e307
+- Date discovered: 2026-09-19
+- What it contains: MIT-licensed self-hosted logistics operations shell with a real RFQ/quote award model, quote-linked shipments, tracking events, authenticated POD upload/storage, and shipment-linked invoice records/statuses. The Prisma schema gives a clean RFQ → awarded quote → shipment → POD → invoice lineage.
+- Why it matters: Useful rights-clean workflow/data-model donor for preserving accepted commercial intent and delivery evidence around a freight audit. However, source inspection does NOT support the README's stronger “invoice reconciliation” claim: the inspected invoice route creates/updates invoice CRUD records and does not compare billed freight against the awarded quote, POD, or contract.
+- Commercial possibilities: Reuse selected RFQ/award/shipment/POD schema and UI concepts as a lightweight customer evidence portal around Freight Recovery v5; do not adopt it as the audit engine.
+- Build-time savings: Medium, roughly 3-6 weeks for RFQ/quote/shipment/POD/invoice workflow scaffolding if needed.
+- Evidence inspected: README; MIT license metadata; backend/prisma/schema.prisma; backend/src/routes/rfq.js; backend/src/routes/shipments.js; backend/src/routes/invoices.js.
+- License / rights: MIT for repository code; customer operational data remains separately controlled.
+- Reuse classification: Directly reusable workflow shell subject to MIT terms; README invoice-reconciliation claim downgraded as unimplemented in inspected backend.
+- Scores:
+  - Technical value: 7.4/10
+  - Commercial value: 7.2/10
+  - Rarity: 6.8/10
+  - Completeness: 6.5/10
+  - Build-time saved: 7.2/10
+  - Data advantage: 3.0/10
+  - High-ticket potential: 7.0/10 when combined with the v5 audit core
+- Next action: Borrow only the accepted-quote→shipment→POD lineage pattern if Open TMS/Warp do not already cover it more cleanly. Do not spend search time on its invoice module unless new reconciliation code lands.
+
+### clickpost-tech/clickpostERP
+- Repository: https://github.com/clickpost-tech/clickpostERP
+- Commit / revision: 7808a6dbc25a4698acff7acd14c1a8704777f0c7
+- Date discovered: 2026-09-19
+- What it contains: MIT ERPNext integration for ClickPost with carrier master sync, carrier recommendation/selection, shipment creation, AWB registration, shipment sync, tracking webhooks, and shipment-to-sales-invoice linkage. The implementation contains meaningful B2B shipment orchestration and fallback-to-alternate-carrier behavior.
+- Why it matters: Potential ERP-side connector pattern for getting carrier allocation, AWB and tracking truth into a recovery product. Source inspection did not locate implemented freight invoice reconciliation despite the README saying the integration covers it; the inspected code is centered on shipment creation/tracking rather than billed-vs-expected audit.
+- Commercial possibilities: ERPNext/ClickPost intake connector or clean integration reference for shipment/AWB/tracking evidence; not a replacement for deterministic rerating or invoice audit.
+- Build-time savings: Medium for ERPNext/ClickPost integration, low for the core recovery engine.
+- Evidence inspected: README; MIT license metadata; APIs carrier.py and shipment.py; custom_scripts/shipment.py; shipment webhook; sales-invoice linkage. Most generated doctype test files are scaffolding rather than substantive audit tests.
+- License / rights: MIT repository code; ClickPost API/customer data terms are separate.
+- Reuse classification: Directly reusable integration plumbing subject to MIT terms; invoice-reconciliation capability unverified/unimplemented in inspected source.
+- Scores:
+  - Technical value: 7.6/10
+  - Commercial value: 7.3/10
+  - Rarity: 7.2/10
+  - Completeness: 7.0/10 for shipment integration, low for audit
+  - Build-time saved: 7.5/10 for ERPNext connector work
+  - Data advantage: 5.0/10 with authorized customer integration
+  - High-ticket potential: 7.2/10 as an enterprise connector
+- Next action: Keep as an optional ERPNext/ClickPost adapter reference. Do not promote into the v5 core until an actual invoice/billing reconciliation path is implemented and tested.
