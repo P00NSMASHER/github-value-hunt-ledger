@@ -178,12 +178,6 @@ Cross-lane shortlist of the strongest validated discoveries. This is the positiv
 - Buyer/problem: Janitorial/facility-service contractors lose margin when recurring visits are missed, unprovable, consume the wrong entitlement or out-of-scope work never becomes billable evidence.
 - Monetization: Proof-of-service + contract-leakage vertical wedge priced per site/crew plus onboarding/migration.
 
-### qx04222/openrental
-- Commit: `013637e77fa9e11ce6aca32fb6218154d7265122`.
-- Rights: Apache-2.0.
-- Inspected capability: Complete equipment-rental vertical operating system; retained as a benchmark for the kind of low-attention vertical OS future hunters should prioritize.
-- Buyer/problem and monetization: Equipment-rental operators; hosted/managed deployment, migration and support.
-
 ### Tamil-Venthan/Rekvia
 - Commit: `158d199e4f08041e587a70926f2ed22d17511431`.
 - Rights: MIT; government tax rules/data and taxpayer data are separate.
