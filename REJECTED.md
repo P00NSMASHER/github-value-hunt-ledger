@@ -1,264 +1,181 @@
 # REJECTED
 
-Repositories, ideas, and combinations investigated and rejected or deprioritized.
+Cross-lane rejection/deprioritization memory. This file intentionally keeps the repeat-prone, rights-sensitive, safety-sensitive and strategically misleading cases. Detailed lane-local rejected/watch entries remain in `hunters/01.md` through `hunters/47.md` and should be consulted before repeating a search.
 
-## Entry format
-### Name
-- Repository / source:
-- Date:
-- Reason rejected:
-- Evidence:
-- Revisit trigger:
+## Rules
+- Public visibility is not a reuse grant. No-license source is inspect/clean-room only unless permission is established.
+- A repository-level license does not automatically license bundled third-party standards/data/assets.
+- If inspection surfaces credentials, private/personal data, controlled/confidential material or unauthorized-access material, stop; do not retain/reproduce/use it.
+- “Demoted” means a capability may still be useful as a component/reference but no longer belongs in MASTER.
 
-## Seeded rejected / deprioritized — 2026-09-19
+## Safety / rights quarantine — do not re-open casually
+
+### icdev-ai/icdev GovCon modules
+- Reason: an inspected GovCon file carried explicit U.S. DoD CUI / SP-CTI restricted-distribution marking. A root Apache-2.0 license does not nullify controlled-information concerns.
+- Disposition: do not preserve, propagate or build from the marked material.
+- Revisit trigger: authoritative rights-holder/government evidence establishes the marking is erroneous or unrestricted reuse is authorized.
+
+### Em1lyK/ctrebate_recon
+- Reason: inspection surfaced a credential-like/authentication query value in a source URL; inspection stopped. No repository license was established independently.
+- Disposition: quarantined; no value was retained or tested.
+- Revisit trigger: sanitized revision + explicit reuse rights; restart only from that clean revision.
+
+### Andalusia-Data-Science-Team/QA-for-call-center
+- Commit: `fd4c22995809ff78568dad18856fede665fa4ff1`.
+- Reason: README advertised a credential-bearing database configuration artifact; no reusable license established and project appeared tied to a clinical contact-center environment.
+- Disposition: do not inspect credential-bearing material.
+- Revisit trigger: sanitized licensed revision with clearly synthetic/public fixtures.
+
+### ansh-guptaa/LastMileSaathi
+- Commit encountered: `ae9e4d2196aedc2b822838a44dd713566318b009`.
+- Reason: commit-history inspection surfaced published authentication material. No credential/value was retained, reproduced or used; repository also had no reusable license.
+- Revisit trigger: later sanitized/licensed revision only, without historical secret inspection.
+
+### SmartRateCon/smart-ratecon
+- Reason: freight RateCon project with GPL/copy-left constraints and a committed environment/config artifact that created unnecessary secret-handling risk during inspection.
+- Disposition: do not use the sensitive artifact; do not treat as a permissive freight foundation.
+- Revisit trigger: sanitized revision plus a clear product architecture that can comply with GPL and materially beats the MIT A-Jatin RateCon leader.
+
+### VedantVAchole/freight-accessorial-agent
+- Commit: `4834…` as cataloged in Hunter 03.
+- Reason: no reusable license and source presentation relied on named-counterparty/internal/undocumented operational knowledge rather than a rights-clear public rule source.
+- Disposition: clean-room only; do not turn apparently internal carrier knowledge into product authority.
+- Revisit trigger: explicit permission/license plus independently authoritative public/customer-owned rule sources.
+
+## Freight / recovery false leads and dominated assets
 
 ### Tetrixx-SG/freight-audit-intelligence
-- Repository / source: https://github.com/Tetrixx-SG/freight-audit-intelligence
-- Date: 2026-09-19
-- Reason rejected: Not a functioning software asset in the inspected root; the repository is primarily methodology, use-case, competitive-landscape, integration, ROI, and positioning documents. No license detected. Do not treat marketing claims such as accuracy figures as validated product capability.
-- Evidence: Root contents contain README.md, methodology/, use-cases/, integrations/, competitive-landscape/, resources/, and roi-framework.md rather than an application/codebase.
-- Revisit trigger: Use only as market/research context if a future run independently verifies specific claims from primary sources.
+- Reason: methodology/use-case/ROI/static research repository rather than a functioning audit engine; no license detected.
+- Revisit trigger: executable tested audit software under clear rights.
 
-### rosshettel/permit_scraper
-- Repository / source: https://github.com/rosshettel/permit_scraper
-- Date: 2026-09-19
-- Reason rejected: The name is misleading for PermitPlate purposes; it monitors recreation.gov permits and Washington ferry reservations, not municipal building/construction permits.
-- Evidence: README explicitly describes recreation/enchantment permits and ferry reservations.
-- Revisit trigger: Only if we need generic availability-monitoring patterns, not building-permit lead generation.
+### freightbill/freightbill
+- Reason: static Eleventy article/documentation site despite code-heavy snippets; not a functioning freight-audit product and no license found.
+- Revisit trigger: executable tested engine is published under clear rights.
 
-### pengyulong/InvoiceAuditAgent as direct-reuse engine
-- Repository / source: https://github.com/pengyulong/InvoiceAuditAgent
-- Date: 2026-09-19
-- Reason rejected: Direct-reuse priority is low because its README marks core functionality, AI integration, tests, and deployment as incomplete, and no license was detected. It remains a design/reference candidate.
-- Evidence: README development checklist plus root project structure.
-- Revisit trigger: Backend inspection reveals substantial functioning audit logic not reflected in the README, or a license is added.
+### sinchana-g7/RateDrift
+- Reason: compelling rate-creep positioning, but inspected repo was frontend/README while described workflow lived externally; no license.
+- Revisit trigger: backend workflow, durable historical comparison tests and clear license appear.
 
-## Integrator rejection memory — 2026-09-19
+### shafeehhecker/HaulSync as invoice-reconciliation engine
+- Reason: useful freight workflow/application, but inspection did not substantiate a deterministic contract-vs-invoice reconciliation engine strong enough to displace the active stack.
+- Revisit trigger: tested rerating/entitlement/settlement logic is added.
 
-### icdev-ai/icdev GovCon modules — quarantine
-- Repository / source: https://github.com/icdev-ai/icdev
-- Date: 2026-09-19
-- Reason rejected: The repository root is Apache-2.0, but an inspected GovCon source file carried explicit U.S. Department of Defense CUI / SP-CTI restricted-distribution marking. A repository license does not nullify controlled-information handling concerns. The hunt must not preserve, propagate or build from potentially controlled material.
-- Evidence: Hunter 05 stopped substantive inspection after the file-level marking was observed in the GovCon module.
-- Revisit trigger: Only authoritative evidence from the rights-holder/government establishes that the markings are erroneous or the material is cleared for unrestricted public reuse.
-
-### freightbill/freightbill as a software component
-- Repository / source: https://github.com/freightbill/freightbill
-- Date: 2026-09-19
-- Reason rejected: Search results look code-heavy because the articles embed detailed freight-audit snippets, but the inspected repository is a static Eleventy documentation site, not a functioning audit product. No license was found.
-- Evidence: Root/site structure and article content on rerating/accessorial/EDI methods; latest commit describes the static site.
-- Revisit trigger: Revisit only if executable, tested audit software is added with clear reuse rights. Otherwise use independently verified concepts only as checklist material.
-
-### sinchana-g7/RateDrift as an implemented freight-audit engine
-- Repository / source: https://github.com/sinchana-g7/RateDrift
-- Date: 2026-09-19
-- Reason rejected: Compelling “rate creep” positioning, but the inspected repository contains frontend/README material while the described n8n/model/memory workflow is external and not committed. No license was found.
-- Evidence: Root/package/application inspection plus README architecture description.
-- Revisit trigger: Backend workflow code, tests, durable historical comparison logic and a clear license are committed.
-
-### ihoward40/SintraPrime-Unified deadline engine
-- Repository / source: https://github.com/ihoward40/SintraPrime-Unified
-- Date: 2026-09-19
-- Reason rejected: Although MIT-licensed and surrounded by substantial application code, the legal deadline subsystem uses hard-coded generic federal-rule offsets, a simplistic holiday table and deadline arithmetic that is not sufficiently authoritative/jurisdiction-aware for consequential legal use.
-- Evidence: Hunter 09 inspected `docket/deadline_tracker.py`, related monitoring structures and tests.
-- Revisit trigger: A future revision replaces deadline math with authoritative, versioned rules including court/local-rule applicability and rigorous calendaring tests.
-
-### CodeCatalyst-nx/Code_Catalyst as a routing product foundation
-- Repository / source: https://github.com/CodeCatalyst-nx/Code_Catalyst
-- Date: 2026-09-19
-- Reason rejected: The functioning OR-Tools CVRP script is useful as a compact example but has no detected license, no test suite and little differentiated value beyond directly using permissively licensed OR-Tools with a domain-specific model.
-- Evidence: Hunter 34 inspected `route_optimizer.py` and searched for tests without finding pytest/unittest coverage.
-- Revisit trigger: A license, meaningful real-world constraint set, benchmark advantage or tested dispatch workflow is added.
-
-### qa-audit-portal current revision
-- Repository / source: https://github.com/mdjahidhasansst-pixel/qa-audit-portal
-- Date: 2026-09-19
-- Reason rejected: MIT rights are clean, but the current repository is only early Next.js/Prisma setup; README merge-conflict remnants and a “Sprint 1 environment setup” commit do not support claims of a functioning contact-center QA product.
-- Evidence: Hunter 37 inspected latest commit, README and project structure.
-- Revisit trigger: Real QA scorecards, sampling/calibration, adjudication/appeals or analytics are implemented and tested.
-
-### TNRIS/weather-alerts-parser for new product work
-- Repository / source: https://github.com/TNRIS/weather-alerts-parser
-- Date: 2026-09-19
-- Reason rejected: Rights are friendly, but the implementation is a Python-2-era legacy weather-alert parser whose API/format assumptions are obsolete relative to current NWS/CAP/GeoJSON tooling.
-- Evidence: Hunter 23 inspected metadata/history and staleness.
-- Revisit trigger: Only for legacy format archaeology; do not spend active search time on it for a new system.
-
-### dsalgador/master-thesis as a near-term inventory-routing product foundation
-- Repository / source: https://github.com/dsalgador/master-thesis
-- Date: 2026-09-19
-- Reason rejected: The joint inventory-routing formulation is academically interesting, but the implementation is an older TensorFlow/Gym research stack under GPL-3.0 and does not provide near-production build compression compared with modern forecasting plus deterministic optimization baselines.
-- Evidence: Hunter 43 inspected the exact revision, thesis/experiment structure, environment dependency and GPL status.
-- Revisit trigger: A specific buyer supplies an inventory-routing dataset/problem where joint replenishment-and-routing materially outperforms simpler modern deterministic baselines and GPL use is acceptable or the method is independently reimplemented.
-
-### paulkastel/JobShopPRO as a product/code foundation
-- Repository / source: https://github.com/paulkastel/JobShopPRO
-- Date: 2026-09-19
-- Reason rejected: Useful legacy job-shop workflow reference, but no license was detected, the desktop/Tkinter implementation is old, and its FIFO/LIFO/SPT/LPT scheduling heuristics are not differentiated enough to justify active product search when modern permissive optimization stacks exist.
-- Evidence: Hunter 45 inspected the terminal revision, launch path and documented orders/machines/Gantt/heuristic workflows.
-- Revisit trigger: Revisit only for clean-room UX/domain discovery after a real small-manufacturer scheduling buyer is identified; do not reuse source absent permission.
-
-### Jinotaer/Multi-Tenant-Laundry-Shop-Management-System as direct code foundation
-- Repository / source: https://github.com/Jinotaer/Multi-Tenant-Laundry-Shop-Management-System
-- Date: 2026-09-19
-- Reason rejected: Despite a broad multi-tenant laundry SaaS implementation, the README explicitly labels the application proprietary and “All rights reserved.” The fact that Laravel is MIT does not grant reuse rights to the application source. Its likely ACV is also lower than the current top opportunities.
-- Evidence: Hunter 01 inspected the repository metadata, exact revision and README covering tenant isolation, roles, orders, payments, invoices, subscriptions, analytics and the explicit proprietary-software notice.
-- Revisit trigger: Only if the rights-holder grants a commercial/open-source license or a materially higher-value B2B linen/route-service wedge is validated independently; otherwise use only non-copyrightable clean-room workflow ideas.
-
-### taskfleetai/fieldfleet as a competing hosted SaaS foundation
-- Repository / source: https://github.com/taskfleetai/fieldfleet
-- Date: 2026-09-19
-- Reason rejected: Technically exceptional construction/restoration field-operations breadth, but the project is under Elastic License 2.0 and explicitly prohibits offering FieldFleet itself to third parties as a hosted or managed service without a commercial agreement. It is therefore unsuitable as the code base for a competing proprietary SaaS under the current hunt assumptions.
-- Evidence: Hunter 02 inspected the exact revision and README feature/deployment/license matrix, including the hosted/managed-service restriction.
-- Revisit trigger: A separate commercial license is obtained, or only independently reimplemented workflow requirements are needed for a lawful clean-room product.
-
-### Em1lyK/ctrebate_recon — safety quarantine
-- Repository / source: https://github.com/Em1lyK/ctrebate_recon
-- Date: 2026-09-19
-- Reason rejected: During source inspection a credential-like/authentication query value was observed embedded in a source URL. Inspection was stopped. The value was not retained, reproduced, tested or used. No repository license was detected independently of the safety issue.
-- Evidence: Hunter 47 logged the quarantine without preserving the sensitive-looking value.
-- Revisit trigger: Only if the owner publishes a sanitized revision and explicit reuse rights are established; review must restart from the clean revision rather than historical content.
-
-### VeeamHub/veeam-vscan-security as a reusable implementation
-- Repository / source: https://github.com/VeeamHub/veeam-vscan-security
-- Date: 2026-09-19
-- Reason rejected: The public repository is useful documentation/product evidence for scanning mounted backup restore points, but source-level inspection found docs/examples/assets rather than the application source/test suite implied by the product description. MIT applies only to what is actually published; it does not make unpublished product source reusable.
-- Evidence: Hunter 14 inspected exact revision `ded6d26d26065a76cbd22234af7c6ff0536bf63b`, root/tree contents and release material describing Veeam Data Integration API plus Trivy/Grype/Jadi behavior.
-- Revisit trigger: A real source adapter/test suite is published under permissive terms, or a separate permissive Veeam restore-mount implementation is found.
-
-### rabbittrix/BSS-OSS-Rust-Ecosystem as ordinary Apache-2.0 product substrate
-- Repository / source: https://github.com/rabbittrix/BSS-OSS-Rust-Ecosystem
-- Date: 2026-09-19
-- Reason rejected: Per-crate metadata can look permissive, but the root licensing adds commercial authorization/donation requirements for TMF crates and a proprietary commercial license for other components. It should not be treated as normal Apache-2.0 reusable code for a competing commercial product.
-- Evidence: Hunter 35 inspected exact revision `7ad417c2590d5a843302f7dbfa163e5e774ed63d`, the root license and concrete TMF638/641/640/702/639 implementation surfaces.
-- Revisit trigger: Explicit commercial authorization/license is obtained. Until then, prefer Apache-2.0 `netweave`/Oktopus or independently reimplement requirements.
-
-### kundanvarma/genalpha-bss as current competing hosted-SaaS code base
-- Repository / source: https://github.com/kundanvarma/genalpha-bss
-- Date: 2026-09-19
-- Reason rejected: The codebase is broad and active, but BSL 1.1 Additional Use terms explicitly exclude offering a paid hosted/embedded competing product. Individual versions change to Apache-2.0 after their stated two-year change period, so current code is not a rights-clean immediate hosted foundation.
-- Evidence: Hunter 35 inspected exact revision `8fd5286dd676753bb37324eb395be0df14980356`, root licensing and live workflow/capability docs that also distinguish mocked/thin activation from implemented state logic.
-- Revisit trigger: Revisit a specific old revision after its Apache change date or obtain commercial permission; otherwise use only lawful clean-room workflow comparisons.
+### ClickPostERP as freight-audit core
+- Reason: connector/workflow value exists, but it is not the deterministic invoice-reconciliation/rerating core search results could imply.
+- Revisit trigger: exact rated-vs-billed math + authority/proof tests become first-class.
 
 ### ediflow-lib/core bundled X12 definitions as automatically MIT-cleared standards data
-- Repository / source: https://github.com/ediflow-lib/core
-- Date: 2026-09-19
-- Reason rejected: The repository's parser/infrastructure software is MIT, but the bundled X12 004010 package contains standards-derived transaction structures, code lists and syntax rules. This run did not establish independent provenance or redistribution authorization for those standards-derived data assets. A repository-level MIT license is not enough evidence to assume third-party standards content is cleared for commercial redistribution.
-- Evidence: Hunter 03 inspected exact revision `9a631a4104711bf5ac81c96d4b725c8698b4d799`, the root MIT license and the bundled X12 package describing broad 004010 transaction coverage including 204/210/214/990/810/820/824/997.
-- Revisit trigger: An explicit provenance/license statement establishes lawful redistribution of the generated/bundled X12 definitions. Until then, parser infrastructure may be evaluated separately, but the standards-definition corpus must remain rights-unresolved and outside the commercial dependency chain.
+- Commit: `9a631a4104711bf5ac81c96d4b725c8698b4d799`.
+- Reason: parser/infrastructure is MIT, but bundled X12 transaction structures/code lists are standards-derived and independent redistribution provenance was not established.
+- Disposition: evaluate parser code separately; keep standards-definition corpus outside commercial dependency chain until rights are established.
+- Revisit trigger: explicit lawful redistribution/provenance statement for the generated/bundled definitions.
 
-## Run 11 additions / demotions
+### stowaway freight benchmark as commercial corpus
+- Reason: technically useful synthetic freight benchmark, but implementation/license is proprietary/evaluation-only.
+- Disposition: do not copy code/data; independently author equivalent acceptance cases.
+- Revisit trigger: permissive/commercial license granted.
 
-### Fajendagba/Construction-Change-Order-Engine — demoted from MASTER
-- Repository / source: https://github.com/Fajendagba/Construction-Change-Order-Engine
-- Date: 2026-09-19
-- Reason rejected/deprioritized: No license was detected. Its change-order state/budget concepts remain useful clean-room requirements, but rights-clean OpenTakeoff + BIMChange-Agent now provide materially stronger implemented evidence layers for ScopeSignal.
-- Evidence: Existing catalog inspection established concrete workflow concepts but no reuse grant; current combination no longer depends on this code.
-- Revisit trigger: Explicit permissive/commercial reuse rights plus implementation/tests that materially outperform the current rights-clean stack.
+### BestKylin no-license carrier-specific parser analogs
+- Reason: deeper carrier-specific workbooks/parsers surfaced useful failure modes but lacked reusable rights.
+- Disposition: requirements only: multi-origin/destination expansion, add-on→base references, included/excluded surcharge text, special-parser precedence, destination-vs-transit semantics and workbook-bound behavior must be independently implemented/tested.
+- Revisit trigger: rights change.
 
-### D-ivy/renewables_indexes — demoted from MASTER
-- Repository / source: https://github.com/D-ivy/renewables_indexes
-- Date: 2026-09-19
-- Reason rejected/deprioritized: No license detected and visible build path is not fully reproducible. The committed screening artifacts/methodology remain useful clean-room research, but they no longer meet the elite positive-training-set standard.
-- Evidence: Prior inspection found national resource×price×revenue layers and volatility/negative-price features, but rights and reproducibility remain unresolved.
-- Revisit trigger: Clear reuse/data rights and a reproducible build or a licensed successor with equivalent national screening depth.
+## Commercial-rights traps
 
-### Andalusia-Data-Science-Team/QA-for-call-center — safety quarantine
-- Repository / source: https://github.com/Andalusia-Data-Science-Team/QA-for-call-center @ `fd4c22995809ff78568dad18856fede665fa4ff1`
-- Date: 2026-09-19
-- Reason rejected: The public README advertises a credential-bearing database configuration artifact and no license was established. The project also appears tied to a clinical contact-center environment. The potentially sensitive configuration artifact was deliberately not opened, copied, preserved or tested.
-- Evidence: High-level README/project metadata only; inspection stopped before credential-bearing content.
-- Revisit trigger: A sanitized revision is published with explicit reuse rights and clearly synthetic/public test material.
+### Jinotaer/Multi-Tenant-Laundry-Shop-Management-System
+- Commit: `cc0f11d322e7e5a80628001cec3255a68914f2fd`.
+- Reason: broad multi-tenant app, but README explicitly labels application proprietary/all rights reserved. Laravel being MIT does not license the application.
+- Revisit trigger: rights-holder grants open/commercial reuse rights.
 
-### Nemesysco/QA7-SDK as a reusable QA engine
-- Repository / source: https://github.com/Nemesysco/QA7-SDK @ `649017cf59b7e60571df311a1c668dcc3d0827bc`
-- Date: 2026-09-19
-- Reason rejected: No reuse license established; old opaque vendor-SDK style repository with insufficient transparent source/test evidence compared with better MIT contact-center QA substrates.
-- Evidence: Repository metadata/README and age/runtime requirements; no binary reverse engineering was performed.
-- Revisit trigger: Explicit open-source/commercial reuse license plus auditable source/tests.
+### taskfleetai/fieldfleet
+- Reason: strong construction/restoration FSM breadth but Elastic License 2.0 prohibits offering FieldFleet itself as a hosted/managed competing service without commercial agreement.
+- Revisit trigger: separate commercial license or independently reimplemented requirements only.
 
-### robawtic/heijunka as the workforce-assurance core
-- Repository / source: https://github.com/robawtic/heijunka @ `14559d42a08f011467261383cc533fb447529c7b`
-- Date: 2026-09-19
-- Reason rejected/deprioritized: MIT and operationally interesting, but the inspected fallback objective can minimize positive assignment weights and therefore prefer zero assignments unless coverage is otherwise forced. RosterSpec is a stronger current assurance/repair foundation because it treats verification, hard locks, coverage priority and repair validity explicitly.
-- Evidence: Hunter source inspection of fallback objective semantics and current tests.
-- Revisit trigger: Objective/coverage semantics are corrected and regression tests prove required staffing cannot collapse to a zero-assignment optimum.
+### rabbittrix/BSS-OSS-Rust-Ecosystem
+- Commit: `7ad417c2590d5a843302f7dbfa163e5e774ed63d`.
+- Reason: root licensing adds commercial authorization/donation requirements for TMF crates and proprietary terms for other components despite permissive-looking per-crate metadata.
+- Revisit trigger: explicit commercial authorization.
 
-### shafeehhecker/HaulSync as a freight invoice-reconciliation engine
-- Repository / source: https://github.com/shafeehhecker/HaulSync @ `0d6fd34b21c1e09309ea155cc29ca06c2242e307`
-- Date: 2026-09-19
-- Reason rejected/deprioritized: MIT workflow shell is useful for RFQ→award→shipment→POD→invoice lineage, but inspected invoice routes are CRUD and do not support the stronger README claim of billed-vs-quote/contract reconciliation. Open TMS/Kareya/Qatoto already provide the stronger audit core.
-- Evidence: Prisma schema plus RFQ, shipment and invoice route inspection.
-- Revisit trigger: Real invoice comparison/rerating logic and tests are implemented. Until then keep only as optional workflow-schema donor.
+### kundanvarma/genalpha-bss current revisions
+- Commit: `8fd5286dd676753bb37324eb395be0df14980356`.
+- Reason: BSL 1.1 Additional Use terms exclude a paid competing hosted/embedded product until version-specific change dates.
+- Revisit trigger: use a specific revision only after its Apache change date or obtain commercial permission.
 
-### clickpost-tech/clickpostERP as a freight-audit engine
-- Repository / source: https://github.com/clickpost-tech/clickpostERP @ `7808a6dbc25a4698acff7acd14c1a8704777f0c7`
-- Date: 2026-09-19
-- Reason rejected/deprioritized: MIT ERPNext integration has meaningful carrier recommendation, shipment/AWB, tracking webhook and sales-invoice linkage, but source inspection did not find the advertised freight invoice reconciliation path. It is an optional connector, not a recovery core.
-- Evidence: carrier/shipment APIs, custom shipment script, webhook and invoice linkage inspected; most doctype tests are scaffolding.
-- Revisit trigger: Actual billed-vs-expected reconciliation is committed and tested, or a pilot specifically needs ERPNext/ClickPost intake.
+### Step Function DNP3 implementation
+- Reason: technically strong but license terms prohibit/limit commercial production use for the intended product shape.
+- Revisit trigger: separate commercial permission or use only independently authored interoperability requirements.
 
-### ifte110/Ocean-Freight-Rates direct reuse
-- Repository / source: https://github.com/ifte110/Ocean-Freight-Rates @ `cd0b2a3cfa818f083992654e1d9611833c9fc7d3`
-- Date: 2026-09-19
-- Reason rejected: No LICENSE found and the workbook/database/notebook appear to originate from a third-party data-science exercise. Public visibility does not establish reuse rights. Binary data were not inspected/extracted.
-- Evidence: Root metadata/README only; domain concepts include port/equipment normalization, effective windows and surcharge logic.
-- Revisit trigger: Explicit rights are established. Otherwise recreate any useful benchmark cases independently with synthetic ports/rates.
+### gameguild-gg/gameguild marketplace settlement subsystem
+- Commit: `0f52022ade885b4489d1d10bda8a3e731be2135e`.
+- Reason: unusually strong settlement/refund/entitlement lineage, but no repository license despite “open source” wording.
+- Disposition: clean-room property-test/reference material only.
+- Revisit trigger: valid license/permission.
 
-### ShakthiW/canton-research freight engine
-- Repository / source: https://github.com/ShakthiW/canton-research @ `4f74ba2b8d8808313e19c4cf0e0e6df645796fc8`
-- Date: 2026-09-19
-- Reason rejected: No license detected; deterministic-looking freight calculations include fallback estimated cube/default divisors and broad optimistic/conservative multipliers that are inappropriate for evidence-grade billed-vs-contracted recovery. Kareya/Qatoto materially surpass it.
-- Evidence: Inspected chargeable-weight/minimum/air-sea-courier logic and fallback behavior.
-- Revisit trigger: Clear rights plus rigorous source-backed freight tests and removal of guessed values from recovery decisions.
+### DataBricks retail promotion schema outside Databricks use
+- Reason: detailed promotion semantic model exists, but license restricts use to connection with/use of Databricks Services.
+- Revisit trigger: target product is explicitly Databricks-native and agreement-compatible.
 
-### mohammedrasulkhan09-arch/route-wise-rate-card-manager
-- Repository / source: https://github.com/mohammedrasulkhan09-arch/route-wise-rate-card-manager @ `fa71892ba44a5c53212b7dec64796c6fac436716`
-- Date: 2026-09-19
-- Reason rejected: Four-file browser CRUD/quotation demo with no LICENSE, no backend/versioning/provenance/tests and only simple route/weight/category/per-kg semantics. Does not improve Qatoto/Kareya.
-- Evidence: Full small project structure inspected.
-- Revisit trigger: Substantive backend, provenance/versioning, tests and clear rights are added.
+## Demoted / surpassed
 
-### indy-viberr/stowaway — proprietary benchmark; no reuse
-- Repository / source: https://github.com/indy-viberr/stowaway @ `9dc69e05769bd0c33aa59b3e898ec025897797dd`
-- Date: 2026-09-19
-- Reason rejected: The repository contains a useful synthetic freight-audit/fraud benchmark concept, but its license is explicitly proprietary/confidential evaluation-only and prohibits use, copying, reproduction, modification and derivatives without permission. Public GitHub visibility does not create reuse rights.
-- Evidence: Hunter inspection verified the license plus a synthetic 51-invoice corpus, POD images, planted anomalies and answer key. No code or dataset from the repository is being copied into the commercial stack.
-- Revisit trigger: Only if the rights-holder grants a permissive/commercial license. Generic industry problem categories such as duplicate billing, stale fuel-week selection, carrier mismatch, linehaul variance and missing POD may be independently implemented from public domain knowledge in the MIT benchmark suite.
+### Fajendagba/Construction-Change-Order-Engine
+- Commit: `60f5ab99bfb97647039e6cec280c246a10f8a856`.
+- Reason: no license; rights-clean Massing/OpenTakeoff/BIMChange stack now materially surpasses it.
+- Revisit trigger: permissive rights + implementation/tests that beat current ScopeSignal stack.
 
-## Run 11 new rejection / supersession memory
+### quanshuyang/cad-diff-agent
+- Commit: `386200f2fe04566fa794e44e3ebb7231fc18352e`.
+- Reason: MIT and useful baseline, but Massing PDF + CaD-Track now cover ScopeSignal registration/correspondence more deeply.
+- Revisit trigger: independently validated correspondence/move-vs-change capability materially exceeds current pair.
 
-### tejasladhe24/freight-rate-sheet-extractor — clean-room behavior reference only
-- Repository / source: https://github.com/tejasladhe24/freight-rate-sheet-extractor @ `a9ec8dc20d0d301f5c7cb3ef2f07bfe5675187ac`
-- Date: 2026-09-19
-- Reason rejected/deprioritized: The implementation exposes valuable carrier-specific rate-sheet behaviors, but no repository LICENSE/reuse grant was found. A bundled `documents/` directory was deliberately not inspected because third-party tariff rights/provenance were not established.
-- Evidence: Source inspection established carrier detection, schema/header aliases, multi-origin/destination expansion, add-on/base references and included/excluded surcharge handling without using the bundled documents.
-- Revisit trigger: Explicit reuse rights are added. Until then, recreate only source-independent behaviors with synthetic/customer-authorized fixtures and use the MIT BestKylin importer as the reusable baseline.
+### D-ivy/renewables_indexes
+- Commit: `fe31ab507987a38cc9c042cd745d89546b6f25c0`.
+- Reason: valuable site-screening methodology/data but no license and incomplete visible reproducibility.
+- Revisit trigger: clear code/data rights and reproducible build or licensed successor.
 
-### blindner984-coder/speditions-tool — no-license ugly-workbook reference
-- Repository / source: https://github.com/blindner984-coder/speditions-tool @ `139bc95b8b7c532f69a436afa30973f1caece3bb`
-- Date: 2026-09-19
-- Reason rejected/deprioritized: No license was found. The strongest value is bug-history evidence for special-parser precedence, pathological worksheet dimensions/OOM, destination-vs-transit semantics and surcharge-column handling rather than reusable source. The repository's `data/` directory was deliberately not inspected because provenance/private-data status was not established.
-- Evidence: Recent commit history and relevant source paths only.
-- Revisit trigger: Clear reuse rights appear. Otherwise keep the failure families as independently authored synthetic regression cases.
+### robawtic/heijunka as workforce-assurance core
+- Commit: `14559d42a08f011467261383cc533fb447529c7b`.
+- Reason: fallback objective can prefer zero assignments unless coverage is forced; RosterSpec is stronger on verification/repair semantics.
+- Revisit trigger: corrected objective/coverage semantics with regression tests.
 
-### stepfunc/dnp3 — technically deep but commercial/production use restricted
-- Repository / source: https://github.com/stepfunc/dnp3 @ `73a227ac59c94e130253e7bf9eb7db6264dbba78`
-- Date: 2026-09-19
-- Reason rejected: The Rust DNP3 implementation is substantial, but the inspected license explicitly restricts default use to non-commercial/non-production contexts and requires a separate Step Function license for commercial or production use; benchmark publication is also constrained.
-- Evidence: Root license plus workspace/source inspection showing master/outstation, TCP/UDP/serial, FFI and test/performance surfaces.
-- Revisit trigger: Obtain a separate commercial license or find a maintained permissive master+outstation implementation. Do not incorporate or publish benchmark results from this implementation under the current terms.
+### khayaklap/inventory-rl
+- Commit: `38ad9dffc7caaa8b9fbdc0a5a376d8cf7fb49e07`.
+- Reason: no license, single-SKU scope and own results show simpler baselines can beat the more complex RL path; commercially dominated by deterministic/decision-focused alternatives.
+- Revisit trigger: licensed multi-SKU/capacity result with robust out-of-sample economic advantage.
 
-### quanshuyang/cad-diff-agent as ScopeSignal core — surpassed
-- Repository / source: https://github.com/quanshuyang/cad-diff-agent @ `386200f2fe04566fa794e44e3ebb7231fc18352e`
-- Date: 2026-09-19
-- Reason rejected/deprioritized: MIT and useful as a lawful baseline, but its PDF render/alignment/pixel-diff/OCR/text-diff pipeline is now materially surpassed for ScopeSignal's central problem by MIT `MassingCloud/massing-pdf`, which has stronger registration, scale handling and transform-aware markup migration. Retain only as an independent regression baseline/synthetic-corpus source.
-- Evidence: Source/tests and synthetic drawing pairs were inspected; no rights problem exists, this is a portfolio deduplication decision.
-- Revisit trigger: It gains materially stronger cross-page/entity correspondence, movement-vs-change suppression or validation that outperforms massing-pdf on held-out revision pairs.
+### TNRIS/weather-alerts-parser
+- Commit: `c692ebbbabd40b912e3c8375fc2490385ae2df8b`.
+- Reason: rights-friendly but Python-2-era/API assumptions are obsolete versus current NWS/CAP/GeoJSON tooling.
+- Revisit trigger: legacy-format archaeology only.
 
-### cooper-group-uol-robotics/masslynx_sdk_public — vendor SDK packaging is not a reuse shortcut
-- Repository / source: https://github.com/cooper-group-uol-robotics/masslynx_sdk_public @ `91a93bf0bbc79081cbdd34bf9f40bfab9fd91403`
-- Date: 2026-09-19
-- Reason rejected: The repository is only a packaging scaffold around the official Waters SDK; its README says the underlying SDK cannot be redistributed by the authors and must be obtained separately through Waters registration/approval. No repository reuse license was detected.
-- Evidence: README/metadata only; no vendor SDK content was copied or retained.
-- Revisit trigger: A customer already has lawful Waters SDK access and specifically needs packaging help. Otherwise prefer rights-clean independent alternatives such as Apache-2.0 OpenWRaw where technically/legal appropriate.
+### edgego/device-console
+- Commit: `106d1668d34ec33bf20763eaebed7f05b69ecf57`.
+- Reason: Apache-2.0 but inspected tree was mainly deployment manifests rather than a distinct device control-plane implementation; dominated by Edgehog/Kura.
+- Revisit trigger: executable application/control-plane source appears.
+
+### thin-edge/opc-ua-demo-server
+- Commit: `4e9bd6819fb31ceaa9ba37a98ee506e033fa79ba`.
+- Reason: permissive but shallow relative to existing independent OPC UA peers; no meaningful conformance/fault-test advantage.
+- Revisit trigger: substantial conformance/reconnect/failure test layer added.
+
+## Misleading README / incomplete implementation
+
+### qa-audit-portal current revision
+- Reason: MIT rights are clean but current repository is early Next.js/Prisma setup with merge-conflict/Sprint-1 remnants, not a functioning contact-center QA product.
+- Revisit trigger: real scorecards, calibration/adjudication and analytics implemented/tested.
+
+### pengyulong/InvoiceAuditAgent
+- Reason: README itself marks core audit, AI, tests and deployment incomplete; no license detected.
+- Revisit trigger: substantive functioning backend plus clear license.
+
+### VeeamHub/veeam-vscan-security as reusable implementation
+- Commit: `ded6d26d26065a76cbd22234af7c6ff0536bf63b`.
+- Reason: public repository contains useful docs/examples/assets, not the full product source/test suite implied by product description; MIT applies only to what is actually published.
+- Revisit trigger: real source adapter/test suite published permissively.
+
+### retail-ecommerce/promoengine-biz-suite
+- Commit: `d1c13a2acac51d3090ed420cebc34d7fb4a03be2`.
+- Reason: stale, sprawling Java framework; no self-contained tested promotion engine or reusable license validated.
+- Revisit trigger: newer licensed branch with isolated promotion execution module/tests.
+
+## Policy
+Do not add a weak repository to this file merely because it was rejected once. Lane-local low-value misses belong in their hunter catalog. Add here when a find is likely to be rediscovered, has a misleading surface, contains a rights/safety trap, or was formerly important enough that future hunters need to know why it is no longer preferred.
