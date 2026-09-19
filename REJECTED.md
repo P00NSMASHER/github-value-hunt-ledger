@@ -105,6 +105,12 @@ Cross-lane rejection/deprioritization memory. This file intentionally keeps the 
 - Reason: technically strong but license terms prohibit/limit commercial production use for the intended product shape.
 - Revisit trigger: separate commercial permission or use only independently authored interoperability requirements.
 
+### rtlabs-com/p-net as a permissive PROFINET core
+- Commit: `ca4f37c5d66b5378a8cf9349b9084df0612043da`.
+- Reason: technically strong PROFINET Device stack, but the project is GPLv3 with a separate commercial license and explicitly positions commercial products as needing that license. It is not an MIT/Apache drop-in merely because the source is public.
+- Disposition: GPL-compatible/reference/test use only unless the intended product has the appropriate commercial grant; keep PROFINET technology/trademark/certification obligations separate.
+- Revisit trigger: commercial rights are obtained for the intended architecture, or a maintained permissive implementation with comparable state/test depth appears.
+
 ### gameguild-gg/gameguild marketplace settlement subsystem
 - Commit: `0f52022ade885b4489d1d10bda8a3e731be2135e`.
 - Reason: unusually strong settlement/refund/entitlement lineage, but no repository license despite “open source” wording.
@@ -176,6 +182,12 @@ Cross-lane rejection/deprioritization memory. This file intentionally keeps the 
 - Reason: README itself marks core audit, AI, tests and deployment incomplete; no license detected.
 - Revisit trigger: substantive functioning backend plus clear license.
 
+### RestoreVerify/restoreverify
+- Commit inspected: `ba9e…` as cataloged in Hunter 15.
+- Reason: polished recovery-verification surface but critical functions are placeholders: inspected health logic always returns healthy, backup validation always succeeds and benchmark/verification paths do not provide the adversarial restore truth the product description implies.
+- Disposition: do not use it as recovery proof or as evidence that a backup restored correctly.
+- Revisit trigger: real restore execution + failing negative fixtures + application/content invariants are implemented and independently reproducible.
+
 ### VeeamHub/veeam-vscan-security as reusable implementation
 - Commit: `ded6d26d26065a76cbd22234af7c6ff0536bf63b`.
 - Reason: public repository contains useful docs/examples/assets, not the full product source/test suite implied by product description; MIT applies only to what is actually published.
@@ -185,6 +197,19 @@ Cross-lane rejection/deprioritization memory. This file intentionally keeps the 
 - Commit: `d1c13a2acac51d3090ed420cebc34d7fb4a03be2`.
 - Reason: stale, sprawling Java framework; no self-contained tested promotion engine or reusable license validated.
 - Revisit trigger: newer licensed branch with isolated promotion execution module/tests.
+
+## Rights/engineering ambiguity — do not let a useful domain idea become an authority claim
+
+### nrivasdatafy/api_nodal_capacity
+- Commit inspected: `fe98…` as cataloged in Hunter 11.
+- Reason: repository presentation described a useful nodal-capacity API and referenced MIT, but no root license grant was established at the inspected revision. Public visibility/README wording is not sufficient reuse authority.
+- Disposition: inspect/clean-room only; do not ship source or market its calculations as an engineering oracle.
+- Revisit trigger: explicit repository license plus reproducible electrical validation against known feeder cases.
+
+### grid-gent
+- Reason: the inspected “MIT License” artifact was only a tiny/nonstandard placeholder rather than a valid grant, and the electrical model was too simplified to establish AC power-flow/hosting-capacity truth.
+- Disposition: reject as both a rights and engineering-authority foundation.
+- Revisit trigger: valid license + independent power-flow validation + substantive test corpus.
 
 ## Policy
 Do not add a weak repository to this file merely because it was rejected once. Lane-local low-value misses belong in their hunter catalog. Add here when a find is likely to be rediscovered, has a misleading surface, contains a rights/safety trap, or was formerly important enough that future hunters need to know why it is no longer preferred.
