@@ -113,3 +113,45 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 8/10
   - High-ticket potential: 10/10
 - Next action: Write a clean-room drawing-diff specification and benchmark using lawfully obtained sample revisions; preserve only high-level behavioral requirements, not source code. The strongest product combination is CADMorph-style drawing deltas -> qto quantity deltas -> evidence-grounded ScopeSignal review -> change-order state/budget workflow.
+
+### wllmtrng/p6flow
+- Repository: https://github.com/wllmtrng/p6flow
+- Commit / revision: 637c12ec610aefda957b3964f993804176d2c9bd
+- Date discovered: 2026-09-19
+- What it contains: A functioning Python/DuckDB Primavera P6 XER ingestion and normalization library that emits typed, Snowflake-loadable Parquet tables plus a manifest. The code includes a streaming/tokenizer layer, typed DDL generation, schema inference and validation, calendar/UDF logic, topological loading by foreign-key dependencies, per-table output, CLI/batch scripts, schema-drift tooling, a synthetic XER fixture, and substantial tests. Its robustness suite locks in fixes for real-world exporter quirks such as encoding/BOM problems, empty table blocks, reserved/duplicate column names, trailing cells, literal nulls, and byte-faithful row provenance. Optional warehouse columns preserve source XER name, SHA-256, publish/export timestamps, and the original `%R` record text for auditability.
+- Why it matters: ScopeSignal currently has strong contract, drawing and quantity evidence, but schedule impact is still a major missing commercial dimension. P6 XER is a common handoff format for construction schedules; this gives a ready-made schedule-data spine that can normalize baseline and update exports into queryable tables with source provenance. The most valuable downstream use is not merely schedule viewing but evidence-backed revision comparison: detect changes in activities, relationships, WBS, calendars, float and dates, then tie those schedule deltas to RFIs, drawing changes, daily records and proposed change orders.
+- Commercial possibilities: Add a schedule-impact module to ScopeSignal. Ingest baseline/current XER exports, version every normalized table, diff TASK/TASKPRED/PROJWBS/CALENDAR and related records, surface materially changed activities/logic, and attach them to the same evidence ledger used for contract/drawing/quantity scope changes. A higher-ticket claims product can build human-reviewed time-impact/EOT evidence packages from those dated schedule states rather than trying to make unsupported legal conclusions automatically.
+- Build-time savings: Estimated 1-2 months for robust XER parsing, typed normalization, provenance and warehouse output; potentially 2-4 months when the avoided edge-case/regression work is included.
+- Evidence inspected: Repository metadata showing 0 stars/1 fork and LGPL-3.0; exact latest commit and tree; README architecture; src/p6flow/loader.py typed DuckDB loader and dependency ordering; src/p6flow/tokenizer.py/schema.py/output.py/calendar.py/UDF modules in the source tree; tests/test_robustness.py, test_calendar.py, test_inference.py, test_load.py, test_udf.py and test_validate.py; CI/publish workflow and synthetic fixture. The robustness tests explicitly preserve source SHA-256 and raw XER rows and cover multiple real-world parser failures.
+- License / rights: GNU LGPL-3.0 verified in the repository. Reuse is conditional rather than permissive: comply with LGPL requirements, especially for modified library code and conveyed combined works. The generated schema is described as being code-generated from an Oracle EPPM database schema, so the rights/provenance of generated schema metadata should be reviewed separately before redistributing that artifact commercially.
+- Reuse classification: Copyleft / conditional reuse under LGPL-3.0; safe architecture/data-interface inspiration for a clean-room implementation if a permissive-only stack is preferred.
+- Scores:
+  - Technical value: 9/10
+  - Commercial value: 9/10
+  - Rarity: 9/10
+  - Completeness: 8/10
+  - Build-time saved: 8/10
+  - Data advantage: 7/10
+  - High-ticket potential: 10/10
+- Next action: Benchmark two lawfully obtained XER revisions from the same project and prove a traceable schedule-delta report. Do not call it delay causation or entitlement automatically; attach changed activities/logic to the existing ScopeSignal evidence graph for human review.
+
+### EffortEdutech/contract-diary-platform
+- Repository: https://github.com/EffortEdutech/contract-diary-platform
+- Commit / revision: 6d3a9ad292e702100d133095bb03362ab38638dc
+- Date discovered: 2026-09-19
+- What it contains: A substantial MIT-licensed React/Supabase construction contract administration application with 0 stars/0 forks. The source tree contains BOQ import/edit/reporting, programme versions and CSV import, daily work diaries, offline diary/photo capture and sync, weather observations, delay-event suggestions for EOT review, document/version registers, contract authority/locking, member/RBAC flows, progress-claim CRUD/workflow, claim items linked to BOQ items, cumulative quantity/retention calculations, paid/approved/rejected states, and PDF/report builders. The database/schema history contains explicit delay-event, diary-to-BOQ, programme, BOQ, claim and document relationships. The code is much larger than a README/demo, although automated test coverage appears light relative to its surface area.
+- Why it matters: This fills the field-evidence gap in the current ScopeSignal stack. Drawing/model deltas and contract analysis become more defensible when connected to contemporaneous site records: diary entries, photos, weather/work stoppage observations, BOQ quantities, programme activities, claim history and document versions. Its claim service also demonstrates a working BOQ-linked cumulative progress-claim workflow rather than generic invoice CRUD.
+- Commercial possibilities: Reuse selected MIT components and data-model ideas to build a 'site evidence -> change/claim' layer for ScopeSignal: mobile/offline daily records, photos and weather observations link to schedule/BOQ items; material stoppages create review candidates; ScopeSignal then combines that record with contract clauses, drawing/IFC deltas and P6 schedule changes to draft a human-reviewed change/EOT evidence packet. This is particularly valuable for subcontractors and GCs that lose entitlement because field evidence is fragmented.
+- Build-time savings: Estimated 2-4 months for offline diary/photo capture, BOQ/programme linking, claims workflow, report/PDF plumbing and Supabase-backed role/data patterns, assuming selective reuse rather than wholesale adoption.
+- Evidence inspected: Repository metadata showing MIT, 0 stars/0 forks and a deployed homepage; exact latest commit/tree; verified LICENSE; database and dated schema inventory; frontend package/source tree; frontend/src/services/claimService.js with BOQ-linked items, cumulative quantities, draft/submitted/approved/rejected/paid workflow and summaries; frontend/src/components/diary/DelayEventSuggestion.js with explicit work-stoppage thresholds and affected-activity aggregation; offline storage/sync, photo, weather, programme, BOQ, report and PDF modules visible in the tree; limited test files noted in the source tree.
+- License / rights: MIT repository license verified. Jurisdiction-specific legal/business assumptions must not be transplanted blindly: for example the claim service hard-codes a 5% retention default described as being 'as per CIPAA.' Treat such defaults as product-specific configuration requiring local legal/contract validation. External Supabase/other dependency terms still need normal production review.
+- Reuse classification: Directly reusable under MIT terms for repository code, with jurisdiction-specific rules replaced by configurable/validated contract rules.
+- Scores:
+  - Technical value: 8/10
+  - Commercial value: 9/10
+  - Rarity: 9/10
+  - Completeness: 7/10
+  - Build-time saved: 9/10
+  - Data advantage: 7/10
+  - High-ticket potential: 9/10
+- Next action: Extract only the field-evidence data model/workflows first—diary, photo, weather/stoppage, BOQ/programme links and claim state—not the whole application. Connect those records to p6flow schedule revisions and ScopeSignal's deterministic contract-evidence gate, then validate the end-to-end packet on a synthetic construction change scenario.
