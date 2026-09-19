@@ -19,7 +19,7 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Buyer/problem: shippers, brokers, carriers and freight-payment teams need physical proof for detention/accessorial decisions rather than invoice text alone.
 - Monetization / first paid wedge: physical-evidence layer inside Freight Recovery; run one authorized blind shipment population and quantify missed/unsupported detention dollars.
 - Why it wins: connects real-world movement and appointment events to entitlement, evidence, approval and billing—the hardest part of time-based accessorial recovery.
-- Implementation proof: the permissioned Opstrax semantics remain the physical-truth plane in Freight Recovery v11. The full v11 suite passes **85/85 tests**. A new bridge freezes Opstrax dwell facts into a physical-only SHA, then lets the separately licensed Trenova policy plane calculate money under the controlling contract, avoiding circular proof. The original 3-hour/2-free-hour/$75 regression remains intact.
+- Implementation proof: the permissioned Opstrax semantics remain the physical-truth plane in Freight Recovery v12. The full v12 suite passes **100/100 tests**. Opstrax dwell facts are frozen into a physical-only SHA before the licensed Trenova/authority plane calculates money, so the runtime cannot prove itself. The original 3-hour/2-free-hour/$75 regression remains intact.
 
 ### emoss08/Trenova
 - Commit: `95fcf816562025ad9af864ded4a5fce8a555bd65`.
@@ -29,7 +29,7 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Buyer/problem: Freight Recovery needs one coherent transaction/evidence/settlement state machine around its independent audit math, not another disconnected parser or calculator.
 - Monetization / first paid wedge: commercial operating substrate inside the Freight Audit Acceptance Test and managed recovery workflow; keep independent evidence/rerating oracles around it to prevent circular truth.
 - Why it wins: it directly covers several hard policy/workflow dimensions that previously forced `REVIEW_ZERO_ASSERTION`, while also collapsing TMS, billing, carrier-settlement, document and reporting plumbing into one freight-native system.
-- Implementation proof: Freight Recovery v11 core v1.0 commercially integrates the licensed detention-policy and inbound carrier-invoice matching semantics while preserving separate physical-truth and policy/calculation hashes. Regression suite passes **85/85 tests**. Artifact: `freight-v11-core-v1.0-trenova-integrated.zip`.
+- Implementation proof: Freight Recovery v12 core v1.0 commercially integrates the licensed detention-policy, rate-agreement/accessorial-version semantics and inbound carrier-invoice matching while preserving separate physical-truth, authority-lineage, calculation and settlement hashes. The new cross-document graph handles base agreement → amendment/addendum → incorporated tariff lineage, explicit rule supersession and fail-closed ambiguity. Partial credits/refunds/remittances now accumulate conservatively and feed a final recovery certificate. Regression suite passes **100/100 tests**. Artifact: `freight-v12-core-v1.0-authority-settlement.zip`.
 - Caveat: Trenova describes itself as pre-release/source-available software; exact production deployment, redistribution and hosted-service rights remain governed by the user's separate commercial agreement.
 
 ### DominicFinn/open_tms
