@@ -30,4 +30,23 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Next action:
 
 ## Findings
-_No findings yet._
+### microsoft/RulesEngine
+- Repository: https://github.com/microsoft/RulesEngine
+- Commit / revision: 5650f93f843865610240e0498b26b68b477a3920
+- Date discovered: 2026-09-19
+- What it contains: Production-oriented .NET rules engine that stores business rules/workflows outside core application logic, compiles/evaluates expressions, caches rules, supports actions, and returns structured rule-result trees.
+- Why it matters: Deterministic, explainable rules are critical for audit/recovery, compliance, eligibility, pricing, approvals, and exception workflows where a pure LLM approach is hard to defend.
+- Commercial possibilities: Reusable decision layer for freight audit, AP recovery, permit lead qualification, GovCon eligibility/qualification, and any B2B workflow requiring customer-editable policies.
+- Build-time savings: High for rule storage, compilation, execution, result trees, actions, caching, and extensibility.
+- Evidence inspected: README.md; src/RulesEngine/RulesEngine.cs showing workflow loading, rule cache/compiler, expression parsing, action factory, and async rule execution.
+- License / rights: MIT.
+- Reuse classification: Directly reusable subject to MIT terms.
+- Scores:
+  - Technical value: High
+  - Commercial value: High as shared infrastructure
+  - Rarity: Medium
+  - Completeness: Very High
+  - Build-time saved: High
+  - Data advantage: Low by itself
+  - High-ticket potential: High indirectly
+- Next action: Compare .NET integration cost against language-native alternatives, but preserve the architecture pattern of explicit deterministic rules plus explainable results.
