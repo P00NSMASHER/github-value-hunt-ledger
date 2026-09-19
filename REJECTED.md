@@ -83,3 +83,17 @@ Repositories, ideas, and combinations investigated and rejected or deprioritized
 - Reason rejected: Rights are friendly, but the implementation is a Python-2-era legacy weather-alert parser whose API/format assumptions are obsolete relative to current NWS/CAP/GeoJSON tooling.
 - Evidence: Hunter 23 inspected metadata/history and staleness.
 - Revisit trigger: Only for legacy format archaeology; do not spend active search time on it for a new system.
+
+### dsalgador/master-thesis as a near-term inventory-routing product foundation
+- Repository / source: https://github.com/dsalgador/master-thesis
+- Date: 2026-09-19
+- Reason rejected: The joint inventory-routing formulation is academically interesting, but the implementation is an older TensorFlow/Gym research stack under GPL-3.0 and does not provide near-production build compression compared with modern forecasting plus deterministic optimization baselines.
+- Evidence: Hunter 43 inspected the exact revision, thesis/experiment structure, environment dependency and GPL status.
+- Revisit trigger: A specific buyer supplies an inventory-routing dataset/problem where joint replenishment-and-routing materially outperforms simpler modern deterministic baselines and GPL use is acceptable or the method is independently reimplemented.
+
+### paulkastel/JobShopPRO as a product/code foundation
+- Repository / source: https://github.com/paulkastel/JobShopPRO
+- Date: 2026-09-19
+- Reason rejected: Useful legacy job-shop workflow reference, but no license was detected, the desktop/Tkinter implementation is old, and its FIFO/LIFO/SPT/LPT scheduling heuristics are not differentiated enough to justify active product search when modern permissive optimization stacks exist.
+- Evidence: Hunter 45 inspected the terminal revision, launch path and documented orders/machines/Gantt/heuristic workflows.
+- Revisit trigger: Revisit only for clean-room UX/domain discovery after a real small-manufacturer scheduling buyer is identified; do not reuse source absent permission.
