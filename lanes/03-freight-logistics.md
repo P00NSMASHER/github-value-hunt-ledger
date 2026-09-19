@@ -576,15 +576,13 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Next action: Integrate the gate into the v8 challenge tier and customer intake. For production, accept customer-authorized ClassIT+/carrier/item evidence or controlling tariff proof; do not scrape/recreate the proprietary NMFC commodity catalog.
 
 
-### emoss08/Trenova — detention-policy challenge oracle
+### emoss08/Trenova — commercially licensed freight operating/policy plane
 - Repository: https://github.com/emoss08/Trenova
 - Commit / revision: `95fcf816562025ad9af864ded4a5fce8a555bd65`
-- Date discovered / revalidated: 2026-09-19
-- What it contains: Current TMS implementation with a broad detention-policy model covering clock-start basis, multiple late-arrival rules, pickup/delivery/pay free-time overrides, billing increments, Up/Down/Nearest/Exact rounding, flat-vs-tiered rates, per-stop/day/shipment caps, layover conversion, notification requirements/unnotified behavior, approval thresholds, immutable policy snapshots/calculation traces and append-only hash-chained detention evidence.
-- Why it matters: It exposes policy dimensions that can make a physically correct Opstrax dwell calculation commercially wrong if the customer's contract uses different detention semantics. It is therefore an excellent independent challenge oracle for v10 policy compatibility.
-- Evidence inspected: Current PostgreSQL/SQLite detention-policy migrations, repository metadata and LICENSE.
-- License / rights: `FSL-1.1-ALv2`. Current versions may be used for permitted purposes but **not for a competing commercial product/service with the same or substantially similar functionality** until the future Apache-2.0 conversion date for that version. Do not embed/copy Trenova code into Freight Recovery under the current FSL terms.
-- Reuse classification: Inspect/compare/independently reauthor generic policy tests only. No direct competing-product code reuse.
-- Commercial value: High as a negative-test oracle; low as a directly reusable component under current rights.
-- New v10 result: Freight Recovery v10.2 now has an independently authored policy-parity gate. If the customer's policy requires unsupported semantics (for example round-up, arrival-only clock, different pickup/delivery free time, tiered rates, required-notice suppression, layover conversion or per-day/per-shipment caps), the Opstrax path returns `REVIEW_ZERO_ASSERTION` instead of silently applying its own algorithm.
-- Next action: Keep Trenova out of the runtime stack. Add any newly observed policy dimensions as rights-clean challenge cases and only automate money after exact policy parity is proven.
+- Date revalidated/integrated: 2026-09-19
+- Rights: public revision is FSL-1.1-ALv2; user states they hold a separate commercial license for this exact revision. Treat commercial use in the user's project as authorized under that separate agreement; do not infer redistribution/sublicensing/hosted-service scope beyond it.
+- What it contains: deep trucking TMS money/workflow infrastructure including versioned rate agreements and accessorial-term snapshots, RateCons/document parsing, detention policy snapshots/calculation traces, billing rerate/rate-departure logic, inbound EDI 210 carrier-invoice matching, invoice adjustments/credit-memo lineage, carrier settlement, reporting, tenancy/RBAC and document workflows.
+- Why it matters: this revision now supplies executable freight-native policy/workflow semantics rather than merely serving as a negative-test oracle. Its rate-agreement version model also directly informs v12's base-agreement → amendment/addendum → accessorial lineage.
+- Integration result: Freight Recovery v12 uses the licensed Trenova semantics alongside independent Opstrax physical truth and Kareya/Qatoto/benchmark comparators. v12 adds cross-document authority graph validation, explicit accessorial rule supersession, incorporated-tariff lineage, partial settlement proof and a final realized-recovery certificate.
+- Validation: v12 core passes **100/100 tests**. Base DET $100 → amendment $125 → billed $150 = $25 validated; later $25 credit memo = $25 realized/fee-eligible with separate authority, calculation, settlement and recovery-certificate hashes.
+- Next action: stop hunting another generic TMS/policy engine. Hunt real external accessorial/addendum acquisition plus real incumbent/settlement adapters and an authorized blind customer population.
