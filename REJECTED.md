@@ -225,3 +225,40 @@ Repositories, ideas, and combinations investigated and rejected or deprioritized
 - Reason rejected: The repository contains a useful synthetic freight-audit/fraud benchmark concept, but its license is explicitly proprietary/confidential evaluation-only and prohibits use, copying, reproduction, modification and derivatives without permission. Public GitHub visibility does not create reuse rights.
 - Evidence: Hunter inspection verified the license plus a synthetic 51-invoice corpus, POD images, planted anomalies and answer key. No code or dataset from the repository is being copied into the commercial stack.
 - Revisit trigger: Only if the rights-holder grants a permissive/commercial license. Generic industry problem categories such as duplicate billing, stale fuel-week selection, carrier mismatch, linehaul variance and missing POD may be independently implemented from public domain knowledge in the MIT benchmark suite.
+
+## Run 11 new rejection / supersession memory
+
+### tejasladhe24/freight-rate-sheet-extractor — clean-room behavior reference only
+- Repository / source: https://github.com/tejasladhe24/freight-rate-sheet-extractor @ `a9ec8dc20d0d301f5c7cb3ef2f07bfe5675187ac`
+- Date: 2026-09-19
+- Reason rejected/deprioritized: The implementation exposes valuable carrier-specific rate-sheet behaviors, but no repository LICENSE/reuse grant was found. A bundled `documents/` directory was deliberately not inspected because third-party tariff rights/provenance were not established.
+- Evidence: Source inspection established carrier detection, schema/header aliases, multi-origin/destination expansion, add-on/base references and included/excluded surcharge handling without using the bundled documents.
+- Revisit trigger: Explicit reuse rights are added. Until then, recreate only source-independent behaviors with synthetic/customer-authorized fixtures and use the MIT BestKylin importer as the reusable baseline.
+
+### blindner984-coder/speditions-tool — no-license ugly-workbook reference
+- Repository / source: https://github.com/blindner984-coder/speditions-tool @ `139bc95b8b7c532f69a436afa30973f1caece3bb`
+- Date: 2026-09-19
+- Reason rejected/deprioritized: No license was found. The strongest value is bug-history evidence for special-parser precedence, pathological worksheet dimensions/OOM, destination-vs-transit semantics and surcharge-column handling rather than reusable source. The repository's `data/` directory was deliberately not inspected because provenance/private-data status was not established.
+- Evidence: Recent commit history and relevant source paths only.
+- Revisit trigger: Clear reuse rights appear. Otherwise keep the failure families as independently authored synthetic regression cases.
+
+### stepfunc/dnp3 — technically deep but commercial/production use restricted
+- Repository / source: https://github.com/stepfunc/dnp3 @ `73a227ac59c94e130253e7bf9eb7db6264dbba78`
+- Date: 2026-09-19
+- Reason rejected: The Rust DNP3 implementation is substantial, but the inspected license explicitly restricts default use to non-commercial/non-production contexts and requires a separate Step Function license for commercial or production use; benchmark publication is also constrained.
+- Evidence: Root license plus workspace/source inspection showing master/outstation, TCP/UDP/serial, FFI and test/performance surfaces.
+- Revisit trigger: Obtain a separate commercial license or find a maintained permissive master+outstation implementation. Do not incorporate or publish benchmark results from this implementation under the current terms.
+
+### quanshuyang/cad-diff-agent as ScopeSignal core — surpassed
+- Repository / source: https://github.com/quanshuyang/cad-diff-agent @ `386200f2fe04566fa794e44e3ebb7231fc18352e`
+- Date: 2026-09-19
+- Reason rejected/deprioritized: MIT and useful as a lawful baseline, but its PDF render/alignment/pixel-diff/OCR/text-diff pipeline is now materially surpassed for ScopeSignal's central problem by MIT `MassingCloud/massing-pdf`, which has stronger registration, scale handling and transform-aware markup migration. Retain only as an independent regression baseline/synthetic-corpus source.
+- Evidence: Source/tests and synthetic drawing pairs were inspected; no rights problem exists, this is a portfolio deduplication decision.
+- Revisit trigger: It gains materially stronger cross-page/entity correspondence, movement-vs-change suppression or validation that outperforms massing-pdf on held-out revision pairs.
+
+### cooper-group-uol-robotics/masslynx_sdk_public — vendor SDK packaging is not a reuse shortcut
+- Repository / source: https://github.com/cooper-group-uol-robotics/masslynx_sdk_public @ `91a93bf0bbc79081cbdd34bf9f40bfab9fd91403`
+- Date: 2026-09-19
+- Reason rejected: The repository is only a packaging scaffold around the official Waters SDK; its README says the underlying SDK cannot be redistributed by the authors and must be obtained separately through Waters registration/approval. No repository reuse license was detected.
+- Evidence: README/metadata only; no vendor SDK content was copied or retained.
+- Revisit trigger: A customer already has lawful Waters SDK access and specifically needs packaging help. Otherwise prefer rights-clean independent alternatives such as Apache-2.0 OpenWRaw where technically/legal appropriate.
