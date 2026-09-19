@@ -72,3 +72,45 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 9/10
   - High-ticket potential: 8/10
 - Next action: Run a 25-jurisdiction mirror/change-detection benchmark on public municipal codes, record clone/diff reliability and update latency, and define a normalized alert schema containing jurisdiction, code version, section citation, old/new text hash, change type, source URL, controlling definitions, and cross-references.
+
+### Vaquill-AI/open-us-law
+- Repository: https://github.com/Vaquill-AI/open-us-law
+- Commit / revision: `2f7aeb85a434a54a351ac44e3c188fec318f78ba`
+- Date discovered: 2026-09-19
+- What it contains: An active Python ingestion and normalization project for US primary law. The inspected tree contains executable pipelines for federal sources, state statutes, regulations, court rules, and constitutions, plus a machine-readable coverage/provenance manifest. The actual eCFR parser uses streaming XML parsing for large titles, emits normalized JSONL with stable IDs, hierarchy, authority/source fields and official eCFR URLs, and clears processed elements to control memory. `coverage.yml` is a substantive publication gate: a jurisdiction is dump-eligible only after a section-count floor and human `coverage_verified` review, and each jurisdiction records its official source, bulk source, source tier, access quirks, citation scheme, and audit notes. The project's published v2026.08 snapshot reports 2,978,617 sections across 229 files spanning statutes, regulations, court rules, agency guidance, constitutions, and additional federal materials, normalized to a common Parquet schema.
+- Why it matters: Building and maintaining a cross-jurisdiction primary-law corpus is normally dominated by source-specific acquisition, normalization, citation identity, provenance, and completeness work. This repository supplies unusually broad source adapters plus an explicit human-verified coverage model. Combined with the existing municipal-code finding, it could supply the federal/state layer of a source-linked regulatory change graph rather than another generic legal-search UI.
+- Commercial possibilities: Build a cited federal/state regulatory-change and obligation-monitoring service for multi-state regulated businesses, insurers, compliance consultants, law firms, and corporate legal teams. Customers could maintain jurisdiction/topic watchlists, receive section-level change alerts, trace authority and cross-references, and route changed obligations into compliance workflows. A particularly strong combination is Open US Law for federal/state primary law plus `KnitSecurity/municode-pp-cli` for local municipal codes, producing a unified federal-state-local change radar.
+- Build-time savings: Approximately 6–12+ months for source connectors, normalized legal records, stable citation/ID handling, provenance, bulk-source ingestion, and jurisdiction-by-jurisdiction coverage auditing.
+- Evidence inspected: Actual Apache-2.0 `LICENSE`; repository metadata and exact latest commit; root tree; `README.md`; `scripts/` directory; substantive federal and state-statute ingester trees; deep inspection of `scripts/federal/parse_ecfr_streaming.py`; and deep inspection of `coverage.yml`. The coverage manifest explicitly warns that raw section counts do not prove completeness and requires human verification before publication. No broad automated test suite was observed in the inspected root/tree and code-search pass, so production QA should not be inferred from corpus breadth alone.
+- License / rights: The code repository has an actual Apache-2.0 license and is commercially reusable subject to its terms. The project publisher describes the distributed dataset/compilation as CC BY 4.0 and primary-law text as government-edict/public-law material; those statements do not make the Apache code license a blanket license for every upstream or ancillary source. Preserve official-source provenance and independently evaluate source-specific terms/rights for non-statutory materials, court rules, guidance, publisher formatting, and access-restricted sources before commercial redistribution.
+- Reuse classification: Directly reusable for code; dataset reuse should follow the published dataset license and source-specific provenance/rights.
+- Scores:
+  - Technical value: 9/10
+  - Commercial value: 10/10
+  - Rarity: 10/10
+  - Completeness: 8/10
+  - Build-time saved: 10/10
+  - Data advantage: 10/10
+  - High-ticket potential: 9/10
+- Next action: Build a 10-jurisdiction versioned mirror/diff benchmark using official-source-backed corpora, measure section-ID stability, freshness, and coverage, and define a unified federal-state-local change schema with the existing Municode finding.
+
+### cyanheads/courtlistener-mcp-server
+- Repository: https://github.com/cyanheads/courtlistener-mcp-server
+- Commit / revision: `5dfa7622c80b39433f52af9b1ac7b91a16f20523`
+- Date discovered: 2026-09-19
+- What it contains: An active TypeScript MCP server that wraps CourtListener/RECAP into 14 typed legal-research tools. The inspected implementation covers full-text opinion search/retrieval, citation lookup and citation-network traversal, federal RECAP docket search and entry retrieval, parties/attorneys, judges/courts, appellate oral arguments/transcripts, and federal judicial financial disclosures. The actual docket-search tool validates inputs before consuming rate-limited upstream calls, supports court/party/date/cursor filtering, returns docket metadata plus parties, attorneys, firms and sample filing metadata/storage URLs, and explicitly surfaces RECAP's partial-coverage limitation. The repository includes a dedicated security test and substantial per-tool tests for dockets, opinions, citations, judges, parties, oral arguments, financial disclosures, court lookup, and related service behavior.
+- Why it matters: Court-data integration is deceptively expensive because opinions, citation graphs, docket data, judges, disclosures, pagination, rate limits, and partial-coverage semantics all behave differently. This low-attention repository turns that heterogeneity into a typed, tested interface suitable for agentic legal research or a persistent litigation-intelligence layer. It saves the integration work while preserving important limitations instead of pretending RECAP is complete PACER coverage.
+- Commercial possibilities: Build a source-linked litigation/precedent monitoring product for law firms, insurers, litigation-finance teams, corporate legal departments, or diligence teams: saved party/case/court watches, new-docket and filing alerts, citation-network changes, judge background, and judicial financial-disclosure/recusal research. Combined with `Vaquill-AI/open-us-law` and `KnitSecurity/municode-pp-cli`, it can add case law and federal docket intelligence to a federal-state-local primary-law graph.
+- Build-time savings: Approximately 2–4 months of CourtListener/RECAP API integration, schema normalization, cursor pagination, citation resolution, judge/disclosure normalization, rate-limit handling, and tool-level testing.
+- Evidence inspected: Actual Apache-2.0 `LICENSE`; repository metadata; exact latest commit and release diff; `README.md`; `src/` and MCP tool trees; deep inspection of `src/mcp-server/tools/definitions/search-dockets.tool.ts`; root tests tree; and the substantive `tests/tools/` suite containing dedicated tests for docket, opinion, citation, judge, party, oral-argument, financial-disclosure, and court-search tools. The latest commit moves the release to 0.7.1 with stricter inputs/output schemas and updated deployment/runtime plumbing.
+- License / rights: Actual repository license is Apache-2.0, so the code is commercially reusable subject to license terms. Upstream CourtListener/RECAP data, hosted documents/audio, API terms, authentication requirements, and rate limits are separate from this code license. RECAP is crowd-sourced and incomplete by court/date, and the inspected server intentionally does not fetch documents marked unavailable without PACER/RECAP access; a commercial product must preserve those coverage caveats rather than imply complete federal-docket coverage.
+- Reuse classification: Directly reusable code; upstream data/content remains subject to CourtListener/RECAP terms and source-specific rights/coverage.
+- Scores:
+  - Technical value: 9/10
+  - Commercial value: 9/10
+  - Rarity: 8/10
+  - Completeness: 9/10
+  - Build-time saved: 8/10
+  - Data advantage: 8/10
+  - High-ticket potential: 9/10
+- Next action: Add a small persistent watch/snapshot layer and benchmark 20 representative public federal cases for docket/opinion/citation/disclosure chaining, source-link integrity, rate-limit behavior, and known RECAP coverage gaps before positioning it as litigation intelligence rather than a PACER replacement.
