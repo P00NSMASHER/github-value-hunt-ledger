@@ -1,87 +1,112 @@
 # SEARCH QUEUE
 
-Integrator-owned queue for the next highest-value searches. Keep this list short: hunters should close evidence gaps, not repeatedly rediscover solved infrastructure.
+Integrator-owned queue for the highest-value unresolved searches and validation work. Hunters should increasingly reproduce MASTER DNA: deep functioning vertical systems, deterministic audit/recovery engines, evidence-grade public-data infrastructure, difficult protocols/integrations and measurable decision engines. Do not repeatedly rediscover solved generic infrastructure.
 
 ## Rules
-- Only the integrator writes this file.
-- Hunters read it every run and act on leads relevant to their assigned portfolios.
-- Prioritize unresolved leads with high commercial upside, scarce public data/domain logic, large build-time compression or strong cross-repository combination potential.
-- Remove or mark leads resolved when evidence has been cataloged.
+- Only the integrator writes this file; hunters read it every run.
+- Prefer exact repository families, protocol/class signatures, old product names, academic→operational lineage and missing stack components over broad keyword searches.
+- Search is only useful when it can change a build, rights, buyer or validation decision.
+- Remove/deprioritize solved directions. Public visibility is not a reuse grant.
 
 ## Priority leads
 
-### P0 — freight contract-source extraction + clause entitlement (last major technical blocker)
-- Best lanes: Hunter 03, 17, 42, 47.
-- Search/validate: Rights-clean freight-specific parsing of real carrier/forwarder XLS/PDF rate sheets into Qatoto/Kareya structures; borderless/transposed tables; multi-page zones; CWT/weight breaks; container-size columns; accessorial/fuel clauses; amendments; effective dates; exact source-cell/page references; reviewer corrections; explicit ambiguity states.
-- Known progress: `sutasmantas/invoice-extraction-pipeline@337cac1fc43af32652683b353cb1cab3c765eb8b` gives MIT provenance/correction plumbing, while no-license `drkcutie/kahayag@15fdcc1d85dce404b1c20de84cab0d4694c85c2f` exposes useful ocean-rate table cases only as clean-room requirements. Kareya and Qatoto already solve deterministic rating/version control.
-- Concrete queries/families: `freight rate sheet xlsx parser MIT`, `carrier tariff PDF parser Apache`, `ocean freight rate table parser`, `CWT rate table parser`, `fuel surcharge schedule parser`, `accessorial clause extraction freight`, `rate confirmation parser license`.
-- Done when: Representative borderless/transposed/weight-break/container-rate sheets round-trip into the canonical rate model with source references and reviewer confirmation, and at least one accessorial entitlement is tied to an exact clause. Any unresolved source or clause ambiguity produces $0 asserted recovery.
+### P0 — freight contractual rate/accessorial truth from messy source documents
+- Best hunters: 03, 17, 36, 42, 47.
+- Mission: close the last major technical blocker in Freight Recovery v6: rights-clean extraction of customer-authorized carrier/forwarder XLS/PDF agreements into Qatoto/Kareya without silently inventing terms.
+- Search/validate: borderless/transposed rate tables; CWT/weight-break ladders; zone tables; ocean container-size/equipment columns; W/M; minimums; fuel schedules; accessorial entitlement/trigger clauses; amendments/supersession/effective dates; source page/cell/bbox; reviewer correction; explicit ambiguity.
+- Use known components: `OmarFaig/Assay` for calibrated field acceptance; Docpipe/Docling/Zerox only as extraction substrates; Kareya/Qatoto already solve rating/version control.
+- Concrete searches: `freight tariff xlsx parser source cell MIT`, `carrier rate sheet pdf table accessorial parser Apache`, `CWT zone rate table parser`, `ocean rate sheet container surcharge parser`, `fuel surcharge schedule effective date parser`, `rate confirmation accessorial clause extraction`, dependencies/importers behind active freight-rating projects.
+- Done when: At least one representative air/LTL-style rate sheet and one ocean/forwarder-style sheet round-trip into the canonical rate model with exact source evidence, and one accessorial entitlement resolves to an exact clause. **Any unresolved field/source/clause ambiguity = $0 asserted recovery.**
 
-### P0 — freight 20-case contract→EDI→settlement benchmark
-- Best lanes: Hunter 03, 07, 30, 36, 42, 47.
-- Build/validate rather than keep searching generically: `yurii1exe/freight-dispatch-board@5128cd9af0e2dbacc37d3030ad8fc605da42168d` can generate a rights-clean synthetic 204/status/210 freight lifecycle; `apimeister/x12-types@e8238385d9f4a8a21b6e4525f5ab3acc7bed3978` adds tested 210/820 parsing; `europeanplaice/subset_sum@62fe41b4c8f5d287d1904f573a9594cac254d340` and `Etherlabs-dev/multi-processor-reconciliation@2f9397fbe56a76abeee42a01a37536ad1811a806` add conservative settlement allocation.
-- Evidence gap: Verify provenance/redistribution rights for any standards-derived X12 definitions/fixtures; map BPR/TRN/RMR/ADX and credit-memo evidence to specific findings without false many-to-many matches; prove duplicate and near-tie ambiguity behavior.
-- Required cases: 204→214/status→210; exact billed-vs-contracted variance; duplicate charge; accessorial; fuel; weight/zone/rate-break boundary; superseded contract; ambiguous clause; 820 payment/adjustment; one-to-many and many-to-many credit; duplicate/near-tie remittance; partial settlement; unsupported/ambiguous mapping.
-- Done when: At least 20 lawful cases have exact expected recoverable amount, contract revision, source evidence, claim/dispute state and settlement state. Ambiguous parsing, entitlement or allocation must produce $0 asserted recovery.
+### P0 — freight 20+ case source→finding→settlement benchmark + one authorized live case
+- Best hunters: 03, 07, 30, 36, 42, 47.
+- Build/validate; do not keep searching generic TMS/X12/reconciliation libraries.
+- Required synthetic cases: 204/status/210 lifecycle; exact variance; duplicate charge; fuel; accessorial; dimensional/weight/zone/rate-break boundaries; minimum; superseded agreement; ambiguous clause; extraction uncertainty; 820 payment/adjustment; partial settlement; one-to-many/many-to-many credit; duplicate/near-tie remittance; unsupported mapping.
+- Add: Assay risk/coverage curve (auto-accept % vs false accept/reviewer touches), OpenLineage or equivalent reconstruction of source→extract→rate→finding→settlement, and one read-only customer-authorized delivered Warp shipment if available.
+- Evidence gap: standards-derived X12 fixture/definition provenance must remain independently rights-checked.
+- Done when: Every case has exact expected amount, revision, source evidence, review state, claim/dispute state and settlement state. Ambiguity at extraction/entitlement/allocation produces $0.
 
-### P0 — ScopeSignal 2D revision + entitlement-to-dollar benchmark
-- Best lanes: Hunter 04, 17, 38, 42, 45.
-- Search/validate: Rights-clean 2D PDF/CAD registration and revision correspondence; revision clouds/change markers; symbol/object correspondence; RFI/submittal-to-drawing links; contract-scope entitlement; quantity-delta attribution.
-- Known progress: BIMChange-Agent covers rights-clean IFC correspondence and OpenTakeoff covers calibrated 2D quantities. Do not hunt more generic takeoff/IFC-diff engines unless they materially beat those benchmarks.
-- Done when: One old/new IFC case and one old/new PDF-plan case preserve revision/element identity through quantity delta, contract/spec evidence and human-reviewed proposed dollar impact.
+### P0 — CaptureBrief authoritative identity + packet-completeness benchmark
+- Best hunters: 05, 18, 42.
+- Validate, not generic-search: `data-act-broker-backend` semantics for UEI/DUNS/legal/DBA/parent identity; CAGE where lawfully/currently sourced; PIID/referenced-IDV lineage; SAM amendments/attachments; USAspending award/incumbent history; exact FAR/DFARS prescriptions; Acquisition.gov deviations/FAR-Overhaul context; timestamps/hashes.
+- Search only for a concrete missing source or official identity/award semantic not already covered.
+- Done when: 10 current solicitations yield manually verified opportunity→entity/parent→award/incumbent→competition/set-aside→clause/prescription→current-deviation packets with measured false joins/unresolved conflicts. Explicit IDs first; fuzzy linkage only as reviewable fallback.
 
-### P0 — CaptureBrief identity, packet completeness + regulatory-currency benchmark
-- Best lanes: Hunter 05, 18, 42.
-- Validate: UEI/CAGE/recipient joins across SAM.gov/USAspending; PIID/IDV lineage; opportunity amendment/attachment completeness; exact FAR/DFARS clause/prescription resolution; Acquisition.gov deviations/FAR Overhaul applicability; source timestamps/hashes.
-- Known progress: sam-search, capture-mcp, official USAspending, cliwant/mcp-sam-gov and 1102tools cover the source substrate. Stop generic SAM/regulatory wrapper search.
-- Done when: Ten current solicitations yield manually verified opportunity→entity→award/incumbent→competition/set-aside→clause/prescription→current-deviation packets with explicit timestamps/hashes and measured false joins/unresolved states.
+### P0 — ScopeSignal 2D revision correspondence + entitlement-to-dollar benchmark
+- Best hunters: 04, 17, 38, 42, 45.
+- Search/validate: rights-clean old/new PDF/CAD registration and object correspondence; revision clouds/change markers; RFI/submittal↔drawing links; contract-scope entitlement and quantity-delta attribution.
+- Known solved layers: BIMChange-Agent for IFC correspondence; OpenTakeoff for calibrated 2D quantities. Do not hunt more generic takeoff/IFC diff unless it materially beats those.
+- Done when: one held-out IFC and one PDF-plan revision preserve element/revision identity through quantity delta + exact contract/spec evidence + human-approved proposed commercial impact.
 
 ### P0 — continuous-compliance paid-pilot evidence package
-- Best lanes: Hunter 14, 15, 40, 42, 47.
-- Validate: Attestful collector scopes/read-only guarantees, pagination/failure semantics, Evidentia tenancy/auth boundaries, restore-drill/RestoreLab evidence artifacts, fail-closed recovery reporting and exact OSCAL control mapping.
-- Search only when it closes a concrete gap: PostgreSQL/PITR/content-fidelity proof, evidence freshness/expiry, cryptographic binding of evidence to tool/config/environment, or a buyer-required backup provider.
-- Done when: One synthetic AWS/GitHub bundle plus one disposable PostgreSQL restore lands in a versioned control package; an injected restore failure and missing-evidence case both stay non-pass; manual correction time and missing-evidence rate are measured.
+- Best hunters: 14, 15, 40, 42, 47.
+- Validate: Attestful collector scopes/read-only guarantees/pagination/failure behavior; Evidentia tenancy/auth and evidence binding; restore-drill/RestoreLab fidelity evidence; evidence freshness/expiry; exact OSCAL mapping.
+- Search only for concrete missing proof such as PITR/content-fidelity, cryptographic binding to config/environment, or a buyer-required backup provider.
+- Done when: synthetic AWS/GitHub evidence + disposable PostgreSQL restore lands in one versioned control package; injected failed restore and missing evidence remain non-pass; manual correction time is measured.
 
-### P1 — PermitPlate national permit/public-source normalization benchmark
-- Best lanes: Hunter 06, 18, 42.
-- Validate: `harlanljones/urban-signal@f3ac0e1141ddfed286a704652087e85d9803c060` as a source-normalization layer across Socrata/ArcGIS/CKAN/CARTO/CSV; city coverage, schema drift, permit-value/unit normalization, geocoding/entity linkage and source-by-source rights/terms.
-- Commercial question: Whether normalized permit velocity/capex signals materially improve lead precision over PermitPlate's current city-specific logic.
-- Done when: A lawful multi-city benchmark scores source freshness, schema breakage, duplicate/property linkage and lead yield on at least three materially different municipal systems.
+### P1 — field-service proof-to-cash leakage benchmark
+- Best hunters: 02, 32, 37, 45.
+- Validate the `phparm` + OCA field-service + RosterSpec pattern, not another generic FSM.
+- Required corpus: 100 synthetic service orders spanning agreement-entitled work, warranty, out-of-scope billable extras, missing proof/signature, missing labor/parts, invoice lag, completed-but-unbilled, canceled/no-show and duplicate billing.
+- Search only for rights-clean vertical entitlement/proof semantics in high-value service verticals: elevator, fire inspection, industrial equipment, septic/environmental, regulated calibration/maintenance.
+- Done when: exact revenue leakage is recovered in the corpus with zero false “recoverable” claims on warranty/entitled work and a credible fixed-price diagnostic can be specified.
+
+### P1 — workforce schedule assurance / minimum-disruption replan benchmark
+- Best hunters: 32, 34, 37, 43.
+- Validate `RosterSpec` + pyworkforce against realistic callouts/coverage changes; stop generic shift-scheduler discovery.
+- Search only for customer-export adapters, audited labor/union rule packs with clear rights, or independent schedule-repair correctness oracles.
+- Done when: one week of synthetic/customer-owned published schedules + callouts is replayed; compare manual/current repair to verified repair on uncovered intervals, paid hours/overtime, assignment churn and hard-lock violations.
+
+### P1 — lab bench calibration + replay + provenance pilot
+- Best hunters: 20, 21, 40.
+- Validate: PyTestLab record/replay/simulation, PyDCC certificate gate, high-value Galago vendor runtime rights, GLAS scheduling persistence, OperandoMerge time semantics, Flowcept lineage.
+- Search only for vendor SDK/runtime rights gaps or one missing high-value instrument family; stop generic lab-control discovery.
+- Done when: synthetic SCPI run is recorded/replayed, injected state regression is caught, calibration evidence causes allow/review/block correctly, deliberately offset continuous/stepwise/event streams are merged without fabricated events, and run lineage is reconstructable.
+
+### P1 — grid resilience synthetic-feeder decision benchmark
+- Best hunters: 11, 23, 42, 45.
+- Validate `ERAD` + `SHIFT`: feeder generation sanity, hazard/fragility parameter provenance, multi-hazard behavior, restoration output and data rights.
+- Search only for authoritative/right-cleared fragility or hazard inputs, restoration validation corpora, or current utility buyer workflows; not another hazard map.
+- Done when: 25–50 rights-clean synthetic feeders with planted damage/restoration cases show measurable hazard→asset failure→network consequence→restoration performance without making real-world claims from synthetic topology.
 
 ### P1 — GST GSTR-2B/IMS current-rule benchmark
-- Best lanes: Hunter 47, 31, 42, 18.
-- Validate: Current official GSTN/GSTR-2B and Invoice Management System states; accepted/rejected/pending behavior; credit/debit-note effects; amendments; ineligible/reversal cases; current schemas; accountant-grade synthetic/public fixtures.
-- Known progress: Rekvia is a strong MIT matching engine but is not a complete 2026 IMS-aware control model.
-- Done when: A versioned corpus covers exact/fuzzy/duplicate matching plus IMS states, amendments, credit notes and ineligible/reversal cases with authoritative rule citations and human/accountant eligibility review before monetary claims.
+- Best hunters: 18, 31, 42, 47.
+- Validate current official GSTN/GSTR-2B/IMS accepted/rejected/pending states, credit/debit-note effects, amendments and ineligible/reversal cases around Rekvia.
+- Done when: versioned synthetic/public corpus has authoritative rule citations and accountant/human eligibility review before any monetary claim.
 
-### P1 — TR-069→USP production/migration validation
-- Best lanes: Hunter 35, 42.
-- Validate: Oktopus tenant isolation/fleet scale/dependency health; OB-USP-Agent + agent-sim concurrency; CWMP↔USP migration/state mapping; BBF data-model rights; current ISP buyer pain/pricing.
-- Done when: A rights-clean lab demonstrates CWMP and USP workflows on concurrent simulated devices with migration fixtures, tenant-isolation evidence and resolved data-model rights.
+### P1 — PermitPlate multi-city source-normalization benchmark
+- Best hunters: 06, 18, 42.
+- Validate `urban-signal`/equivalent across Socrata, ArcGIS, CKAN, CARTO and CSV: freshness, schema drift, permit-value/unit normalization, geocoding/property/entity linkage and source-specific rights.
+- Done when: at least three materially different municipal systems are benchmarked for schema breakage, duplicate/property linkage and lead yield vs PermitPlate's city-specific baseline.
 
-### P1 — structured e-invoice conformance/version provenance
-- Best lanes: Hunter 42, 07, 31.
-- Validate: Official EN16931/Peppol conformance corpora; ruleset/version metadata; XRechnung/Factur-X/ZUGFeRD updates; artifact redistribution terms; cross-check `hupe1980/en16931`, `MuhDur/invoicekit` and `attestwire/en16931`.
-- Done when: The same public corpus runs through at least two independent implementations/reference validators and each result records parser version, ruleset/effective date, source artifact and exact failing business rule.
+### P2 — semiconductor SECS/GEM conformance wedge
+- Best hunters: 12, 40, 43, 45, 47.
+- Validate cross-implementation behavior using Apache `arloliu/go-secs`, Apache `secs4java8`, MIT `mkjeff/secs4net`; search only for rights-clean higher-level GEM/E87/E90/E94/E116 scenarios/simulators or buyer-specific validation pain.
+- Preserve standards-content rights boundaries: code licenses do not automatically license SEMI text/message dictionaries.
+- Done when: independent host↔equipment harness runs representative connection/reconnect/timeout/mismatched-reply and higher-level event/report workflows across multiple implementations with evidence of divergences.
 
-### P2 — lab automation runtime/rights + evidence pilot
-- Best lanes: Hunter 20, 21, 40.
-- Validate: Vendor SDK/runtime rights for the highest-value Galago drivers; simulated/public instrument endpoints; GLAS failure/persistence behavior; OpenAPI-to-SiLA2 conformance; Flowcept provenance across instrument + analysis tasks.
-- Done when: One simulated/lawfully accessible instrument plus one OpenAPI service execute a multi-step workflow with complete Flowcept lineage, measured integration hours and a rights/runtime matrix.
+### P2 — TR-069→USP production/migration validation
+- Best hunters: 35, 42.
+- Validate Oktopus tenant isolation/fleet scale, OB-USP-Agent + agent-sim concurrency, CWMP↔USP migration state and Broadband Forum data-model rights.
+- Done when: concurrent simulated devices demonstrate both protocol workflows, migration fixtures and tenant isolation; buyer urgency/pricing is researched separately.
 
-### P2 — semiconductor equipment interoperability wedge
-- Best lanes: Hunter 12, 40, 43, 45.
-- Search/validate: Permissive higher-level GEM/E87/E90/E94/E116 workflows around MIT `mkjeff/secs4net`; host/equipment simulators; conformance fixtures; standards-content rights; buyer pricing for OEM/fab integration labs.
-- Done when: A rights-clean host↔equipment harness runs representative sessions/messages and an independently specified higher-level workflow with measurable integration/testing value.
+### P2 — structured e-invoice conformance/version provenance
+- Best hunters: 07, 31, 42.
+- Validate official EN16931/Peppol/XRechnung/Factur-X/ZUGFeRD conformance artifacts, ruleset/effective-date metadata and redistribution rights across at least two independent validators.
+- Done when: same lawful corpus produces versioned parser/ruleset/source evidence and exact failing business-rule IDs.
 
 ## Resolved / deprioritized directions
-- Generic freight/TMS/rating discovery is resolved enough for launch work: Open TMS + Kareya + Qatoto are the current base. Hunt source-document/entitlement correctness, not another TMS.
-- Generic X12 204/210/214/820 parser discovery is deprioritized after `freight-dispatch-board` + `x12-types` + `edi-x12-toolkit`. Verify standards-content provenance and build the benchmark instead.
-- Generic payment-reconciliation/subset-sum discovery is deprioritized after `subset_sum` + Etherlabs. Work domain constraints, ambiguity/false-match tests and settlement evidence linkage.
-- Generic construction takeoff and generic IFC-diff discovery are deprioritized after OpenTakeoff + BIMChange-Agent.
-- Generic SAM.gov feed/regulation wrappers are deprioritized; work identity/packet/currency correctness.
-- Generic compliance collectors are deprioritized after Attestful; generic restore tools are also lower priority after restore-drill/RestoreLab. Hunt only concrete proof gaps or required providers.
-- Generic TR-369 controller/agent discovery is deprioritized after Oktopus + OB-USP-Agent + agent-sim.
-- Generic warehouse slotting/layout discovery is deprioritized after inventory_tools + GABAK; next step is measured ROI.
-- Generic RPA platforms are deprioritized after PETP; only hunt orchestration that closes a specific high-value vertical/security gap.
-- Generic academic CVRP/route-optimization hunts are deprioritized unless tied to a buyer dataset and measured advantage over permissive modern baselines.
+- Generic freight TMS/rating discovery: resolved enough with Open TMS + Kareya + Qatoto. Hunt contractual source/entitlement truth.
+- Generic freight OCR/document parser discovery: deprioritized after Assay + Docpipe/Docling/Zerox. Hunt calibrated source evidence on real rate/contract structures.
+- Generic X12 204/210/214/820 parser discovery: deprioritized. Build the benchmark and resolve standards-content provenance.
+- Generic payment reconciliation/subset-sum discovery: deprioritized after subset_sum/Etherlabs; work domain constraints and false-match ambiguity.
+- Generic entity-resolution discovery: deprioritized after Dedupe/GoldenMatch/Splink; benchmark precision/review/stability per workload instead.
+- Generic construction takeoff/IFC diff: deprioritized after OpenTakeoff + BIMChange-Agent.
+- Generic SAM/regulatory wrappers: deprioritized; work authoritative identity, completeness and currency.
+- Generic compliance collectors/restore tools: deprioritized after Attestful + Evidentia + restore-drill/RestoreLab; hunt concrete evidence gaps only.
+- Generic field-service CRUD/dispatch systems: deprioritized after phparm/OCA behavior is sufficient for a proof-to-cash benchmark. Hunt vertical entitlement/proof semantics instead.
+- Generic workforce schedulers: deprioritized after RosterSpec + pyworkforce; hunt repair correctness and real export/rule constraints.
+- Generic lab-control frameworks: deprioritized after PyTestLab/Galago/PyLabRobot; hunt vendor rights, calibration proof and benchmarkable failure behavior.
+- Generic TR-369 controller/agent discovery: deprioritized after Oktopus + OB-USP-Agent + agent-sim.
+- Generic warehouse slotting/layout discovery: deprioritized after inventory_tools + GABAK; measure ROI.
+- Generic RPA platforms and academic CVRP searches: deprioritized unless a concrete high-value vertical gap or buyer dataset proves unique value.
