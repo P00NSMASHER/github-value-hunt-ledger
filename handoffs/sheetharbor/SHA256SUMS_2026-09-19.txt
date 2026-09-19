@@ -1,7 +1,9 @@
 # SheetHarbor release-control hashes — 2026-09-19
 # SHA-256  filename
 24308c0a88d1265769ced5b59814021f6314f9eaa7e895063a98fb902f8e7ef6  SheetHarbor_Release_Manifest_v0.1.0.xlsx
+# SUPERSEDED: v0.1.0-alpha Maker Economics contained an incorrect golden expected value (production formula was unchanged).
 1f906ce2de8678c8c4997f380600c6d01895815a38379b186f291c334fb81be0  SheetHarbor_Maker_Economics_Scenario_Inventory_v0.1.0-alpha.xlsx
+6cbe8c34232c9eac2894277ca8adb9ea90ef435af7f5365f3572e56343956366  SheetHarbor_Maker_Economics_Scenario_Inventory_v0.1.1-alpha.xlsx
 b289019dbf6c129d640a7b431ab52f3431f9f6d5bf0ead387b309341005631ba  SheetHarbor_Candle_Economics_v0.2.0-alpha.xlsx
 94d69ceecf4f894ddacc8ae36f882dde25a918072aa7b802f2b9039a4631a94c  SheetHarbor_FDM_3D_Printing_Economics_v0.2.0-alpha.xlsx
 384108221ab99173f91c54d7b5cacbf1c24212b76ea07d05cd56c168fe37bc8d  SheetHarbor_Embroidery_Economics_v0.2.0-alpha.xlsx
