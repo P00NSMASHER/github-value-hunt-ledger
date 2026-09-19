@@ -111,3 +111,31 @@ Repositories, ideas, and combinations investigated and rejected or deprioritized
 - Reason rejected: Technically exceptional construction/restoration field-operations breadth, but the project is under Elastic License 2.0 and explicitly prohibits offering FieldFleet itself to third parties as a hosted or managed service without a commercial agreement. It is therefore unsuitable as the code base for a competing proprietary SaaS under the current hunt assumptions.
 - Evidence: Hunter 02 inspected the exact revision and README feature/deployment/license matrix, including the hosted/managed-service restriction.
 - Revisit trigger: A separate commercial license is obtained, or only independently reimplemented workflow requirements are needed for a lawful clean-room product.
+
+### Em1lyK/ctrebate_recon — safety quarantine
+- Repository / source: https://github.com/Em1lyK/ctrebate_recon
+- Date: 2026-09-19
+- Reason rejected: During source inspection a credential-like/authentication query value was observed embedded in a source URL. Inspection was stopped. The value was not retained, reproduced, tested or used. No repository license was detected independently of the safety issue.
+- Evidence: Hunter 47 logged the quarantine without preserving the sensitive-looking value.
+- Revisit trigger: Only if the owner publishes a sanitized revision and explicit reuse rights are established; review must restart from the clean revision rather than historical content.
+
+### VeeamHub/veeam-vscan-security as a reusable implementation
+- Repository / source: https://github.com/VeeamHub/veeam-vscan-security
+- Date: 2026-09-19
+- Reason rejected: The public repository is useful documentation/product evidence for scanning mounted backup restore points, but source-level inspection found docs/examples/assets rather than the application source/test suite implied by the product description. MIT applies only to what is actually published; it does not make unpublished product source reusable.
+- Evidence: Hunter 14 inspected exact revision `ded6d26d26065a76cbd22234af7c6ff0536bf63b`, root/tree contents and release material describing Veeam Data Integration API plus Trivy/Grype/Jadi behavior.
+- Revisit trigger: A real source adapter/test suite is published under permissive terms, or a separate permissive Veeam restore-mount implementation is found.
+
+### rabbittrix/BSS-OSS-Rust-Ecosystem as ordinary Apache-2.0 product substrate
+- Repository / source: https://github.com/rabbittrix/BSS-OSS-Rust-Ecosystem
+- Date: 2026-09-19
+- Reason rejected: Per-crate metadata can look permissive, but the root licensing adds commercial authorization/donation requirements for TMF crates and a proprietary commercial license for other components. It should not be treated as normal Apache-2.0 reusable code for a competing commercial product.
+- Evidence: Hunter 35 inspected exact revision `7ad417c2590d5a843302f7dbfa163e5e774ed63d`, the root license and concrete TMF638/641/640/702/639 implementation surfaces.
+- Revisit trigger: Explicit commercial authorization/license is obtained. Until then, prefer Apache-2.0 `netweave`/Oktopus or independently reimplement requirements.
+
+### kundanvarma/genalpha-bss as current competing hosted-SaaS code base
+- Repository / source: https://github.com/kundanvarma/genalpha-bss
+- Date: 2026-09-19
+- Reason rejected: The codebase is broad and active, but BSL 1.1 Additional Use terms explicitly exclude offering a paid hosted/embedded competing product. Individual versions change to Apache-2.0 after their stated two-year change period, so current code is not a rights-clean immediate hosted foundation.
+- Evidence: Hunter 35 inspected exact revision `8fd5286dd676753bb37324eb395be0df14980356`, root licensing and live workflow/capability docs that also distinguish mocked/thin activation from implemented state logic.
+- Revisit trigger: Revisit a specific old revision after its Apache change date or obtain commercial permission; otherwise use only lawful clean-room workflow comparisons.
