@@ -46,6 +46,13 @@ Integrator-owned queue for the next highest-value searches.
 - Evidence gap: The software stack is unusually complete, but the fastest paid wedge and exact evidence package need one reproducible end-to-end benchmark.
 - Done when: A synthetic/public SSP/POA&M package is converted, one live disposable restore drill produces evidence, and that evidence lands in a versioned control package with measured manual correction time.
 
+### P1 — GST GSTR-2B/IMS current-rule benchmark
+- Best lanes: Hunter 47, 31, 42, 18.
+- Search/validate: Current official GSTN/GSTR-2B and Invoice Management System record states; accepted/rejected/pending behavior; credit/debit-note effects; amendments; ineligible/reversal cases; current downloadable schemas; accountant-grade synthetic/public test fixtures.
+- Concrete queries/families: `GSTR-2B IMS reconciliation open source`, `GST invoice management system parser`, `GSTR2B accepted rejected pending schema`, `ITC reconciliation tests`, `GSTN GSTR-2B JSON parser MIT`.
+- Evidence gap: `Tamil-Venthan/Rekvia` is a strong MIT reconciliation engine, but its matching core predates a full 2026 IMS-aware control model. Current GST guidance still advises books↔GSTR-2B reconciliation, while IMS changes which records flow to 2B and how recipient actions affect ITC.
+- Done when: A versioned test corpus covers exact/fuzzy/duplicate matching plus IMS accepted/rejected/pending, amendments, credit notes and ineligible/reversal cases with authoritative rule citations; no monetary “recovery” claim is produced unless human/accountant review confirms eligibility.
+
 ### P1 — GoldenMatch vs Dedupe entity-resolution benchmark
 - Best lanes: Hunter 18, 16.
 - Search/validate: Public or synthetic vendor/company/property datasets with labeled duplicates; incremental cluster stability; merge/split recovery; provenance completeness; auto-link precision at conservative thresholds.
@@ -72,6 +79,12 @@ Integrator-owned queue for the next highest-value searches.
 - Evidence gap: `hupe1980/en16931` is technically strong, but commercial audit/compliance claims require authoritative version tracking and rights-clean test artifacts.
 - Done when: Each validation result can cite parser version, ruleset ID/effective date, source artifact and exact failing business rule across a public conformance corpus.
 
+### P2 — lab automation rights/runtime + evidence pilot
+- Best lanes: Hunter 20, 21, 40.
+- Search/validate: Vendor SDK/runtime licensing for the highest-value `galago-tools` drivers; simulated or public instrument endpoints; GLAS failure/persistence behavior; OpenAPI-to-SiLA2 generated-adapter conformance; Flowcept provenance across instrument + analysis tasks.
+- Evidence gap: The permissive cross-repository stack is technically unusually strong, but commercial deployment depends on per-instrument vendor/runtime rights and hardware validation. The integration economics also need one concrete cell-level before/after benchmark.
+- Done when: One simulated/lawfully accessible instrument plus one OpenAPI service execute a multi-step workflow through the control plane, with reproducible Flowcept lineage, measured integration hours and a documented rights/runtime matrix for every component used.
+
 ### P2 — rights-clean industrial edge management around Modbus/OPC-UA
 - Best lanes: Hunter 12, 15, 40.
 - Search for: Fleet management, TLS/cert rotation, remote config, store-and-forward and audit logging around permissive Modbus↔OPC-UA gateways; avoid generic protocol libraries already surpassed by `serhmarch/modbusua`.
@@ -83,3 +96,4 @@ Integrator-owned queue for the next highest-value searches.
 - Generic construction takeoff search is deprioritized; `Kentucky-ai/opentakeoff` is a strong rights-clean measurement base. Focus on revision correspondence and entitlement.
 - Generic SAM.gov feed wrappers are deprioritized; `sam-search`, `capture-mcp-server` and official USAspending cover the core acquisition/history substrate. Focus on identity precision and decision evidence.
 - Generic RPA platforms are deprioritized after `lorisunjunbin/petp`; only hunt orchestration when it closes a specific high-value vertical workflow or security gap.
+- Generic academic CVRP/route-optimization hunts are deprioritized. `dparo/master-thesis` is a useful MIT exact-pricing benchmark but depends on CPLEX, while the no-license multi-trip references are clean-room only. Revisit routing only when tied to a specific buyer dataset and a measured advantage over permissive OR-Tools/modern baselines.
