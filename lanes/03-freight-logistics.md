@@ -455,3 +455,28 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - High-ticket potential: 8.8/10 as enterprise integration enabler
 - Combination opportunities: X12 210 -> carrier_invoice; X12 820 -> settlement/remittance; then Etherlabs/subset-sum allocation -> recovery_attribution.
 - Next action: Define exact canonical field mappings for 210 invoice numbers/amounts/references and 820 remittance reference/amount/adjustment elements before customer EDI onboarding.
+
+
+### U.S. GAO adjudicated freight cases — real historical benchmark layer
+- Sources: Official GAO transportation decisions including B-135992 (1961), B-130579 (1957), B-129646 (1957), B-152744 (1964), B-134575 (1958), B-148611 (1962), B-202596 (1982), and B-211465 (1983).
+- Date discovered / packaged: 2026-09-19
+- What it contains: Eight real, publicly adjudicated freight-payment disputes with government bills of lading, carrier billing facts, rate/tariff/tender issues, shipment weights and/or official overcharge/recovery amounts. This is intentionally separated from current commercial benchmarks because the tariff/regulatory context is historical.
+- Rare / undernoticed value: Unlike synthetic freight datasets, these are real payment disputes with independently adjudicated outcomes. They validate durable audit semantics: minimum-weight errors, wrong rate authority, alternate lower route/rate, service-entitlement mismatch, commodity/classification logic, tender-vs-tariff selection, disputed weight basis and evidence burden.
+- Strongest cents-level case: GAO B-135992. Published facts show a shipment actually weighing 21,793 lb, carrier billing construction charging an equivalent 28,931 lb, a $2.11/100-lb rate and proper 24,000-lb volume minimum. Independent arithmetic: (28,931 - 24,000) / 100 × 2.11 = $104.0441; GAO reported a $104.05 overcharge.
+- Other published amounts captured: B-130579 $571.25 refund; B-129646 $109.42 initial recovery plus $88.58 additional recovery; B-152744 $122.20 overcharge; B-134575 $1,034.02 overpayment collected; B-148611 $45.96 overcharge. Cases whose public summary does not expose a complete recoverable amount are explicitly fail-closed at $0 asserted recovery in the benchmark.
+- Likely buyer / user: Internal v7 benchmark/QA; enterprise prospects evaluating whether the truth engine handles real-world tariff/entitlement reasoning beyond simple line arithmetic.
+- Painful problem: Synthetic benchmarks can overfit modern normalized schemas. Real adjudicated cases demonstrate that actual leakage often depends on rate authority, service entitlement, routing, classification and evidentiary sufficiency.
+- Monetization mechanism: Strengthens credibility of the paid Freight Audit Acceptance Test by showing the truth engine is regression-tested on both modern freight fixtures and real adjudicated cases.
+- Evidence inspected: Official GAO decision pages; numeric facts were paraphrased into an independent benchmark. No historical tariff text was republished.
+- Rights / provenance: U.S. Government public decision records used as factual source material. Preserve source URLs/case IDs. Historical rates/rules are not current commercial authority.
+- Reuse classification: Real public benchmark facts / independently encoded test cases. Do not use old rates as current pricing.
+- Scores:
+  - Technical value: 9.0/10
+  - Commercial value: 8.8/10
+  - Rarity: 9.4/10
+  - Completeness: 8.3/10 across the eight cases
+  - Build-time saved: 7.5/10
+  - Data advantage: 9.0/10 as real adjudicated evidence
+  - High-ticket potential: 8.7/10 as credibility/QA layer
+- Combination opportunities: Real adjudicated cases + MIT synthetic semantic cases + Cointab arithmetic benchmark + rate-con OCR gate + customer-specific blind gold truth. This gives v7 four distinct QA layers: extraction, arithmetic/rating, freight semantics, and real-world adjudicated reasoning.
+- Next action: Continue adding modern public audit cases when transaction-level facts are sufficiently specific, but keep them distinct from current customer data and current commercial rate authority.
