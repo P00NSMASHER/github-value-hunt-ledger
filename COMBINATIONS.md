@@ -44,3 +44,13 @@ Cross-repository product and capability combinations.
 - Rights / license constraints: Zerox and RulesEngine are MIT. Construction-Change-Order-Engine has no license, so only independently reimplemented concepts may be used absent permission.
 - Validation step: Find permissively licensed RFI/submittal/document-diff components and test one end-to-end synthetic scope-change case.
 - Status: Strong concept; upstream detection component still incomplete.
+
+### Field-onboarding + crop-monitoring stack
+- Components: superzero11/OpenFarm + RS-iCM/RSCM.
+- Combined capability: Automatically derive/ingest field boundaries and crop/non-crop masks, then run recurring vegetation-index, soil, weather and alert workflows inside a deployable field-operations platform.
+- Why the combination is stronger: RSCM attacks the expensive label/bootstrap problem, while OpenFarm supplies the missing operational system around it: PostGIS field records, workers, Sentinel-2 processing, boundary detection, alerts and field workflows. Together they can turn a region with weak customer field data into a monitorable portfolio much faster than building both model and platform from scratch.
+- Likely buyer / user: Crop insurers, agricultural lenders, agronomy firms, specialty-crop managers, ag retailers/input distributors and land-use monitoring programs.
+- Build-time saved: Potentially 9–15 months of remote-sensing, geospatial-backend, worker and field-onboarding scaffolding for a focused MVP.
+- Rights / license constraints: OpenFarm is BSD-3-Clause and RSCM is MIT at the inspected revisions. Sentinel-2/STAC endpoints, FTW checkpoint/model, example datasets and other third-party data/model terms require separate verification.
+- Validation step: Select a lawful 50–100-field benchmark, compare generated boundaries/crop masks against known polygons, then measure whether the combined system produces stable per-field index histories and useful alert precision without manual field setup.
+- Status: Strong new agriculture combination; best immediate differentiator is automatic portfolio onboarding followed by exception-driven scouting rather than another generic farm dashboard.
