@@ -154,3 +154,52 @@ Cross-lane shortlist of the strongest validated discoveries.
 - Inspected capability: Zero-star line-of-business platform with implemented customers/estimates/work orders/invoices/time/dispatch plus a recurring-service route subsystem: service routes, stops, visits, visit photos, QR-gated field execution, centralized visit-state transitions, completion-photo guards, audit writes and contract-entitlement consumption. Internal docs describe multiple service verticals, but only implemented modules are treated as shipped.
 - Buyer/problem: Janitorial and facility-service contractors lose margin when recurring visits are missed, cannot be proved, consume the wrong contract entitlement, or out-of-scope work never becomes billable evidence.
 - Monetization path: Managed commercial-cleaning/facility-service operations product centered on proof-of-service and contract leakage, priced per site/crew plus onboarding/migration. Highest-confidence next validation is an end-to-end contract→route→QR/photo proof→entitlement→invoice/exception test plus tenant/auth review.
+
+### sengtha/Kareya-Silo
+- Commit: `a43eedea03add0728eadfc1f8ea35cc3ca6867cc`.
+- Rights: Apache-2.0; commercial carrier rates are not bundled and customer/carrier rate data remain separately controlled.
+- Inspected capability: Deterministic freight-forwarding tariff/rating substrate with effective-dated carrier/mode/service/origin/destination tariffs, weight bands, minimums, buy/sell rates, disbursements and per-kg/per-CBM/W-M/container/shipment/document/piece/percent bases. Tests cover volumetric divisors, W/M, rate-break boundaries, minimums, fuel, margin and overlap rejection using synthetic rates.
+- Buyer/problem: Freight recovery and forwarder quote products need an exact canonical rating engine before they can defend billed-vs-contracted discrepancies.
+- Monetization path: Core rerating engine inside the freight recovery product or a separate rate-control/quote module for forwarders. This materially closes the prior P0 freight logic gap; messy PDF/XLS contract ingestion remains.
+
+### vidyesh95/qatoto-backend — provider freight-rate subsystem
+- Commit: `4f5f270f6ba5ef3ed4b230716997ccea049ce408`.
+- Rights: MIT.
+- Inspected capability: Provider-owned, versioned freight rate cards with origin/destination/mode/currency/effective windows, break ladders, minimum billable weight/volume, minimum charge, transit ranges and explicit volumetric divisors. Authenticated organization identity controls authorship/provenance; tests reject spoofed provider/source identity, invalid effective dates/divisors/floor bands and oversized ladders; supersession is audited.
+- Buyer/problem: Parsed rate sheets are dangerous if authorship, effective dates, supersession and validation are weak. Freight audit buyers need immutable, attributable tariff versions before recoverable dollars are asserted.
+- Monetization path: Rate-authoring/versioning control plane paired with Kareya rerating and Open TMS invoice/EDI workflows. The two components together sharply reduce freight build risk.
+
+### delongwangshu49-hub/bimchange-agent
+- Commit: `cd7fd6e6522e060b7847f0daaed00979097da7dd`.
+- Rights: MIT.
+- Inspected capability: Shipped offline-first IFC4 old/new revision comparison with normalized deterministic change records, old/new evidence selectors, conservative geometry classification, relationship changes, 3D context, JSON/HTML export, Windows release, generated/held-out revision pairs and traceability checks. Optional AI explanation is downstream of deterministic evidence.
+- Buyer/problem: Scope/change-order products need to prove which model elements changed across revisions before translating them into quantity and commercial impact.
+- Monetization path: Rights-clean IFC revision-evidence module for ScopeSignal or a standalone BIM revision review product. It closes the IFC correspondence gap; entitlement and dollar impact still require human-reviewed contract evidence.
+
+### clay-good/attestful
+- Commit: `c445095952d6e1ca27eadc638b1bfe96e8f5f00d`.
+- Rights: MIT for code; bundled OSCAL/CIS-derived framework/catalog content requires separate provenance/redistribution review.
+- Inspected capability: OSCAL-native compliance evidence acquisition with implemented AWS/Azure/GCP and SaaS/platform collectors, scanning/assessment logic, CLI, Docker and air-gap material. The AWS path implements sessions/optional role assumption, retries/timeouts and concrete evidence collection for IAM, CloudTrail, Config, GuardDuty, Security Hub and Access Analyzer.
+- Buyer/problem: Continuous-compliance products are only valuable if they can repeatedly acquire evidence from customer systems, not just store or summarize it.
+- Monetization path: Collector layer beneath the Evidentia/restore-proof managed compliance stack. This materially reduces the remaining integration burden for a paid pilot.
+
+### cliwant/mcp-sam-gov
+- Commit: `aaaaa70dcb6a08cf43cb40ece26b79d6d21c2463`.
+- Rights: MIT; government-source currency/applicability remains contextual and human-reviewed.
+- Inspected capability: 152 read-only federal/SLED procurement/spending/regulatory tools. The inspected FAR path resolves exact FAR/DFARS clauses and prescriptions from versioned eCFR XML, builds cited compliance matrices, rejects stale/blank/future/hollow sources, distinguishes not-found from outages and surfaces FAR Overhaul/agency-deviation caveats; the release reports a 3,568-case fault-injection gate.
+- Buyer/problem: Capture/proposal teams need evidence-grade clause and prescription research, not hallucinated procurement-law summaries.
+- Monetization path: Premium CaptureBrief compliance/readiness layer paired with award history and Acquisition.gov deviation evidence.
+
+### OktopUSP/oktopus
+- Commit: `e1f07d71a93c4169421f2e94ce6605746ece37ad`.
+- Rights: Apache-2.0; protocol/specification/dependency assets require normal review.
+- Inspected capability: Unified TR-369 USP Controller plus TR-069/CWMP ACS in Go with USP 1.2/1.3 protobuf, MQTT/STOMP/WebSocket transports, CWMP ACS modules, NATS bridges, OB-USP-Agent launch assets, containers and protocol tests.
+- Buyer/problem: Regional broadband operators need a credible bridge from legacy CWMP estates to modern USP without operating unrelated management stacks.
+- Monetization path: Dual-stack migration/conformance lab or managed controller service. Paired with official BSD OB-USP-Agent and Apache agent-sim, it resolves the earlier rights-clean successor gap; fleet-scale/tenant production validation remains.
+
+### gokhanozden/gabak
+- Commit: `711856814856e1730bd3be1cc7e4468ceca4fd5d`.
+- Rights: MIT.
+- Inspected capability: Warehouse-layout optimizer that imports real/generated pick lists, evaluates pick tours, compares layout/pathfinding alternatives, runs batch design experiments and uses evolution-strategy search. Aisle-center and visibility-graph path models account for obstacle clearance/picker size.
+- Buyer/problem: Warehouses need quantified travel-distance evidence before disruptive re-slotting or layout changes.
+- Monetization path: Fixed-price warehouse layout/slotting ROI study or advisory engine. Combined with `agritheory/inventory_tools`, it supplies the missing ERP-agnostic baseline/ROI side of a services-led optimization wedge.
