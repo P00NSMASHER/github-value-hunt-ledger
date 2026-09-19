@@ -1,133 +1,120 @@
 # SEARCH QUEUE
 
-Integrator-owned queue for the highest-value unresolved searches and validation work. Hunters should reproduce MASTER DNA: complete vertical systems, deterministic audit/recovery engines, evidence-grade public-data infrastructure, difficult integrations/protocols, rare decision engines and service-first B2B wedges. Search is useful only when it can change a build, rights, buyer or validation decision.
+Integrator-owned queue for unresolved searches and validation. Hunters should reproduce MASTER DNA: complete vertical operating systems, deterministic audit/recovery engines, evidence-grade public-data infrastructure, standards/protocol implementations, difficult integrations, rare decision engines and service-first B2B wedges. Search is useful only when it can change a build, rights, buyer, benchmark or money decision.
 
 ## Rules
-- Only the integrator writes this file; hunters read it every run.
-- Prefer repository families, dependencies, protocol/class signatures, old product names and academic→operational lineage over broad keywords.
-- Do not rediscover solved generic infrastructure. Hunt only a named missing component, stronger analog, authoritative data source or falsifiable validation asset.
-- Public visibility is not a reuse grant. No-license/proprietary sources are inspect/clean-room only unless permission is established.
-- When a rights-clean leader already covers a layer, search around its failure modes and adjacent buyer workflows rather than collecting clones.
+- Prefer repository families, dependencies, protocol/class/file signatures, old product names and academic→operational lineage over broad keywords.
+- Once a rights-clean leader covers a layer, hunt its failure modes and adjacent buyer evidence instead of collecting clones.
+- Public visibility is not a reuse grant. No-license/proprietary sources are clean-room/reference only unless permission is established.
+- A new candidate should normally score 24+/30 to challenge MASTER. Novelty without stronger evidence is not a reason to promote.
+- Every consequential assertion must be reconstructable to its source/revision/evidence; uncertainty routes to review, not optimism.
 
-## P0 — Freight Recovery v9: contractual PDF/accessorial truth + blind realized-recovery benchmark
+## P0 — Freight Recovery v10: accessorial/addendum authority + blind realized-recovery proof
 - Best hunters: 03, 17, 30, 36, 42, 47.
-- Current state: `BestKylin2001/Freight-Rate-Sheet-Generator` is the permissive baseline for messy XLS rate-card normalization. **Stop generic freight XLS parser searches.** The unresolved truth problem is controlling PDF/attachment/accessorial authority and real incumbent/settlement evidence.
-- Build with: Open TMS + Kareya + Qatoto + BestKylin XLS intake + Assay + freight-audit corpus + TrustMesh + Warp read-only evidence + X12/settlement primitives.
-- Search only for: permissive carrier/customer rate-confirmation PDF parsers; accessorial schedule/addendum extraction; included/excluded surcharge semantics; amendment/base-table references; minimum/CWT/weight-break/zone/W-M/container rules; source page/bbox/cell lineage; incumbent-auditor/FAP reason-code exports; dispute/credit/820 settlement lineage.
-- Concrete queries: `rate confirmation accessorial schedule parser MIT`, `carrier contract addendum surcharge included excluded Apache`, `ocean tariff add-on base rate parser license`, `freight amendment supersession effective date parser`, `freight audit reason code export schema`, `freight payment credit memo 820 reconciliation`.
-- Clean-room requirements already harvested: multi-origin/multi-destination expansion; add-on↔base references; reefer filters; included/not-included surcharge text; special-parser precedence; million-row workbook bounds; destination-vs-transit semantics. Do not copy no-license source/data.
-- Required production benchmark: one customer-authorized representative frozen population containing controlling rate/accessorial authority, shipment/POD/BOL evidence, invoices, incumbent findings/decisions and later credits/refunds/remittances for the same population. Gold truth is created **before** incumbent outputs are opened.
-- Required challenge corpus: 20+ cases spanning clean invoices, overcharge/duplicate fuel, unauthorized accessorial, supported/unsupported detention, stale/superseded rates, CWT/weight-break/minimum boundaries, fuel dates, ambiguous clauses, missing authority, conflicting POD, duplicates/non-independent evidence, deadlines, partial and many-to-many settlements.
-- Metrics: extraction field accuracy; Assay auto-accept coverage/false accepts/reviewer touches; finding precision; false-positive dollars; dollar-weighted recall; clean-invoice accuracy; proof-readiness; abstention; unique incumbent-missed dollars; realized incremental recovery.
-- Done when: every asserted dollar reconstructs to exact source/revision/clause and later settlement evidence; any unresolved extraction, entitlement, identity, contradiction or allocation ambiguity = **$0 asserted recovery**.
+- Current solved-enough layers: generic TMS (`open_tms`), XLS rate normalization (BestKylin), RateCon extraction (`A-Jatin/freight-ratecon-extraction`), provider/version control (Qatoto), rerating (Kareya), structured invoices (FormaliS/EN16931), physical detention evidence (permissioned Opstrax), transaction evidence (Warp), calibrated extraction (Assay), proof obligations (TrustMesh), freight challenge corpus (`aiparallel0/freight-audit`).
+- **Stop:** generic freight TMS, OCR, generic RateCon parser, generic XLS parser, generic X12 parser, generic fuzzy matching and generic rules searches.
+- Search only for money-changing missing authority/evidence: accessorial schedules outside the RateCon; amendments/addenda that reference base tariffs; included/excluded surcharge semantics; minimum/CWT/weight-break/zone/container/WM special rules; cell/page/bbox lineage; FAP/incumbent reason-code exports; dispute/credit/820/credit-memo settlement lineage; read-only authorized carrier/payment evidence.
+- Concrete queries/signatures: `freight accessorial addendum base tariff effective date parser`, `rate confirmation attachment surcharge included excluded`, `carrier amendment supersedes base rate schedule`, `freight audit reason code export`, `freight credit memo claim settlement 820 reconciliation`, `detention appointment geofence proof invoice credit`.
+- Required challenge corpus: 20+ cases with clean invoice, linehaul overcharge, duplicate fuel, unauthorized accessorial, supported/unsupported detention, stale/superseded rate, CWT/weight-break/minimum boundary, fuel-date rule, ambiguous clause, missing authority, conflicting POD/geofence, deadline, duplicate/non-independent evidence, partial settlement and many-to-many credit.
+- Required production benchmark: one customer-authorized frozen shipment population containing controlling contract/rate/accessorial authority, appointment/geofence/POD/BOL evidence as applicable, invoices, incumbent findings/decisions and later credits/refunds/remittances. **Freeze gold truth before opening incumbent output.**
+- Metrics: extraction accuracy, auto-accept false accepts, reviewer touches, finding precision, false-positive dollars, dollar-weighted recall, proof readiness, unique incumbent-missed dollars and realized incremental recovery.
+- Done when: every asserted dollar reconstructs to exact authority/revision/evidence and later settlement; unresolved authority/identity/contradiction/allocation = **$0 asserted recovery**.
 
-## P0 — ScopeSignal v3: downstream entitlement after consensus revision/BCF transport
-- Best hunters: 04, 17, 38, 42, 45.
-- Known stack: Massing PDF primary 2D registration + Apache-2.0 `joedanields/CaD-Track` as an independent vector/raster correspondence comparator + OpenTakeoff quantities + BIMChange-Agent IFC evidence + MPL-2.0 `@ifc-lite/bcf` for BCF 2.1/3.0 issue/viewpoint interchange.
-- **Stop generic PDF-diff, CAD-diff, takeoff, IFC-diff and BCF searches.** The unresolved commercial layer is drawing/spec/RFI/submittal linkage, subcontract scope/exclusions, notice timing, field directive/PCO/change-event lineage and cost/schedule entitlement.
-- Concrete queries/signatures: `RFI drawing revision change event cost code`, `subcontract scope exclusion change order notice`, `PCO RFI submittal linkage`, `construction change entitlement evidence workflow`, `drawing revision quantity delta contract clause`, `construction notice deadline change event entitlement`.
-- Detector benchmark: 20 rights-clean vector/raster revision pairs spanning translation, rescale/DPI, reorder, crop, moved-only annotations and extraction-density imbalance. Measure Massing and CaD-Track separately plus disagreement/consensus; disagreement routes to review.
-- BCF benchmark: round-trip one known changed IFC GlobalId through BCF 3.0 and at least one independent viewer while retaining viewpoint, source finding ID and review status.
-- Commercial validation: one customer-authorized finding through exact quantity + controlling clause/spec/RFI/submittal/notice evidence + reviewer compensability decision.
-- Done when: registration/correspondence error is separately measured from quantity error and entitlement error; a visual/model change or BCF issue **never** becomes compensable by itself.
-
-## P0 — Recovery proof v4: application truth + external anchoring, not more hash chains
-- Best hunters: 14, 15, 40, 42, 47.
-- Known stack: `pg_hardstorage` + restore-drill + Evidentia + CAGE + Apache-2.0 `allthingsN/openwright` for signed Merkle checkpoints/inclusion proofs and explicit insufficient-evidence semantics. `forevidence/provenance-seal` is a useful independent comparator; Apache TrustMCP surfaces are optional if buyers need scoped signed evidence exchange.
-- **Stop generic backup managers, evidence ledgers, Merkle/hash-chain/signing libraries and trust-center shells.** OpenWright/Provenance Seal cover the generic proof-integrity layer well enough. Search only buyer-changing gaps: application invariants after restore, independent external anchoring/time-existence proof, object-storage content fidelity, alternate database engines, RTO/RPO observation, and insurer/auditor evidence formats.
-- Concrete queries: `restore drill application invariant signed evidence`, `backup recovery verification object checksum audit`, `PITR drill RTO evidence`, `external timestamp anchor evidence ledger`, `database restore verification compliance report`, `cyber insurance recovery test evidence`.
-- Build a neutral schema: artifact identity/hash, backup/recovery point, isolated target, start/end/duration, structural checks, logical checks, app checks, object hashes, evidence/event IDs, checkpoint/anchor, limitations, signer, crosswalk hash and evidence references.
-- Required adversarial proof cases: mutate/delete/reorder an event, forge a `satisfied` result, alter the control crosswalk hash, use a stale checkpoint, truncate the tail, drop evidence and present an unanchored rewritten chain. Unanchored history must not be described as independent proof of existence/time.
-- Validation: map pg_hardstorage plus one non-Postgres/object-storage path into the same schema; inject cases where backup metadata is green but recovery/content/application checks fail. Missing/dropped evidence remains REVIEW/INSUFFICIENT, never pass.
-- Done when: a fixed-price Recovery Readiness Audit can issue a defensible pass/review/fail without trusting the backup product's own success flag, and every signed conclusion is reproducible from the underlying evidence set.
-
-## P0 — Marketplace Money Safety Audit benchmark
-- Best hunters: 27, 31, 40, 42.
-- Known leader: `tonytonycoder11/stripe-connect-reckon` read-only assurance; Spree + existing permissive split-payment/double-entry components provide execution/accounting semantics.
-- Search only for independent rights-clean marketplace/platform ledger adapters and settlement evidence around **Adyen for Platforms, PayPal marketplace/payouts, Mangopay or other major platform-money rails**, preferably read-only reconciliation rather than payment execution.
-- Concrete queries: `marketplace payout reconciliation read only MIT`, `connected account ledger settlement audit`, `seller payout failed reconciliation open source`, `platform balance reserve dispute monitor`.
-- Required synthetic faults: failed payout; ambiguous provider result; event gap; duplicate event; refund/app-state mismatch; cumulative partial refund rounding; negative-balance trajectory; reserve exposure; dispute spike; seller reversal/clawback; cross-currency settlement.
-- Metrics: precision/recall, false-alert burden, unresolved dollars surfaced, time-to-detection and manual cases avoided.
-- Done when: an independent read-only audit can quantify known planted exposure without touching money movement. Do not claim recovered dollars until a real authorized pilot proves realized value.
-
-## P1 — Field-service proof-to-cash v2: vertical entitlement + settlement evidence, not more FSM
-- Best hunters: 01, 02, 32, 33, 37, 45.
-- Known stack: `proforcetech/phparm` contract/routes/proof + `cmms-normalize` fail-closed intake + `servicialo/mcp-server` delivery/evidence/dispute/settlement contract + `theluckystrike/mcp-work-order` invoice-parity arithmetic + RosterSpec repair; optional ERPNext adapter from Beveren.
-- **Stop generic CMMS/FSM/work-order/job-card/invoice arithmetic discovery.** The remaining commercial gap is vertical authority: whether a completed job was entitled, billable, capped, warranty-covered, SLA-creditable, properly evidenced and actually settled.
-- Search only for rights-clean or authoritative semantics around: warranty entitlement; service-contract allowances/consumption; SLA service credits; regulated inspection/calibration due state and certificates; billable extras/change authorization; recurring-route exceptions; customer acceptance; credit memo/collection/settlement lineage; PTW/LOTO/MOC only where authoritative and relevant.
-- Priority verticals: elevators, fire/life-safety inspection, biomedical equipment, industrial calibration, HVAC/refrigeration maintenance, commercial cleaning, septic/environmental service.
-- Concrete queries: `warranty entitlement work order invoice reconciliation open source`, `field service contract allowance unbilled work MIT`, `facility service SLA credit billing reconciliation`, `calibration certificate invoice entitlement`, `inspection service proof invoice settlement`, `service contract overage change authorization work order`.
-- Required corpus: 100 synthetic/customer-authorized jobs including included/warranty/no-charge work, billable extras, partial delivery, amended scope, missing/contradictory proof, duplicate material/labor lines, unit-markup rounding, SLA failure/credit, already-billed and already-settled jobs.
-- Metrics: provable completed-but-unbilled dollars, unsupported billed dollars, false-recovery dollars, completion→invoice lag, exception-review minutes and settlement attribution.
-- Done when: every asserted dollar traces to agreement/warranty authority + delivery evidence + invoice/settlement state; missing entitlement, proof or settlement authority = **$0 asserted recovery**.
-
-## P1 — Commission payout assurance: plan-to-payroll evidence, not another calculator
-- Best hunters: 28, 31, 32, 40, 42, 47.
-- Known executable substrate: `OCA/commission@288b2a8a62920657b40b845983fcc31860463af6` (AGPL-3.0) supplies tested fixed/section, gross-vs-margin, currencies and settlement-period behavior. `CommissionEngine-AI`, `commission-dispute-ledger`, Incentra and similar no-license/proprietary finds are **clean-room acceptance references only**.
-- **Stop generic commission-engine and sales-comp CRUD searches.** Hunt only missing rights-clean evidence/integration layers: effective-dated plan provenance, CRM credit/split exports, hierarchy/territory snapshots, refunds/cancellations/clawbacks, payroll/settlement exports and independent read-only reconciliation.
-- Concrete queries: `sales commission payroll reconciliation MIT AGPL`, `commission plan version credit split clawback open source`, `Odoo commission payroll reconciliation`, `incentive compensation audit settlement`, `commission payout variance payroll export`, `sales crediting effective date reconciliation`.
-- Required challenge corpus: 30–50 independently authored cases spanning fixed rate, section boundaries, gross vs margin, multiple agents, currencies, settlement periods, plan effective dates, marginal vs cumulative tiers, split/overlay credit, retro rerating, clawback/draw/carry-forward and cent-exact allocation.
-- Production validation: one customer-authorized closed compensation period. Freeze plan/transaction/credit gold truth **before** opening incumbent-calculated/approved/payroll output.
-- Metrics: disagreement dollars, false-positive correction dollars, dollar-weighted recall, analyst/dispute hours and ultimately realized corrected payout/avoided overpayment.
-- Done when: expected→incumbent→approved→paid lineage is reproducible for every asserted discrepancy and rights-clean implementation covers the applicable rule family. Do not promote based on synthetic payout math alone.
-
-## P1 — CaptureBrief authoritative packet completeness, not more SAM wrappers
+## P0 — CaptureBrief v4: prove packet completeness and exact clause applicability on live solicitations
 - Best hunters: 05, 18, 42.
-- Validate DATA Act broker recipient/parent semantics, PIID/referenced-IDV lineage, SAM amendments/attachments, USAspending incumbent history, exact FAR/DFARS prescription and current deviation/overhaul context.
-- Search only missing authoritative packet semantics or supplier/eligibility evidence that materially affects a bid/no-bid decision.
-- Acceptance rules: no stored source/hash or locatable support → no accepted high-risk claim; unresolved upstream source ≠ “not found”; identity conflict remains unresolved.
-- Done when: 10 current solicitations produce manually verified opportunity→entity/parent→award/incumbent→competition/set-aside→clause/prescription/deviation packets with false joins measured.
+- Known stack: official GSA packet/history ingestion + official Acquisition.gov FAR DITA + USAspending + DATA Act broker identity/award semantics + capture-mcp + mcp-sam-gov.
+- **Stop:** generic SAM wrappers, generic procurement chatbots, generic USAspending clients, generic FAR search wrappers.
+- Search only for missing authoritative semantics that can change a bid/no-bid or compliance decision: SAM amendments/related notices/attachments, solicitation-package completeness, PIID↔referenced-IDV lineage, parent/recipient edge cases, agency deviations, class deviations, FAR overhaul transitions, set-aside/eligibility evidence, official supplier exclusions/suspension/registration state and machine-readable proposal fill-ins.
+- Concrete queries/signatures: `sam.gov attachment amendment history official parser`, `acquisition.gov deviation XML DITA FAR fill-in`, `PIID referenced IDV award lineage official`, `SAM UEI parent deactivation historical`, `federal class deviation machine readable clause`.
+- Required benchmark: 10 current solicitations manually verify opportunity→attachment packet/history→entity/parent→incumbent/award→competition/set-aside→clause/prescription/deviation. Measure false joins, missing attachments and stale/unsupported claims.
+- Hard acceptance: no stored source/hash or locatable source support → no accepted high-risk claim; unresolved source is not “not found.”
 
-## P1 — Industrial interoperability acceptance: validate ProtoForge rather than collect protocols
-- Best hunters: 12, 35, 40, 43, 45.
-- Known stack: ProtoForge simulator/fault/replay + PLC4X comparator + Nautilus/OpENer/EIPScanner where rights fit.
-- **Stop broad protocol-library searches.** Hunt only independent implementations or customer-like fixtures needed to falsify advertised support in the top three paid protocol families.
-- First matrix: Modbus TCP, IEC 60870-5-104 and OPC UA. For EtherNet/IP, separately track ODVA technology/mark obligations and do not treat source-code licenses as standards-rights grants.
-- Required cases: handshake/session lifecycle, reconnect, timeout, malformed frame, read/write, type/address error, fault injection, recording/replay and independent-client parity.
-- Done when: only externally validated protocol families appear in a sellable gateway regression pack.
+## P0 — Recovery Proof v5: reproduce Probavi, then hunt buyer proof gaps only
+- Best hunters: 14, 15, 40, 42, 47.
+- Known stack: Probavi multi-engine restore + pg_hardstorage PostgreSQL deep oracle + BackupDrill app invariants + restic-drill byte fidelity + evidence/crosswalk layer + CAGE remediation governance.
+- **Stop:** generic backup managers, generic restore scripts, generic Merkle/hash-chain/signing libraries, generic trust-center shells.
+- Search only for gaps that change buyer trust: independent external anchoring/time-existence proof, object-storage content fidelity, engine-specific logical/physical invariants, RTO/RPO observation, insurer/auditor evidence formats, application invariants and restore paths absent from Probavi.
+- Concrete queries: `restore drill application invariant signed evidence`, `PITR RTO evidence cyber insurance`, `backup object checksum restore verification`, `external timestamp anchor recovery evidence`, `database restore proof auditor report`.
+- Validation: reproduce one PostgreSQL and one non-SQL/object-storage path from a fresh environment; inject green-backup/bad-restore, stale data, corrupt content and failed app-invariant cases. A locally signed chain must never be described as independent proof of historical existence/time without an external anchor.
+- Done when: a fixed-price Recovery Readiness Audit can issue reproducible pass/review/fail from underlying evidence without trusting the backup product’s own success flag.
 
-## P1 — Network management-plane migration acceptance
-- Best hunters: 35, 40, 42.
-- Known stack: Clixon Controller + notconf + Netopeer2 + gnmic.
-- **Stop generic NETCONF/gNMI client/server hunting.** Search only device-model rights gaps, OpenConfig/vendor YANG compatibility fixtures, controller transaction failure cases, or gNOI/P4 operations missing from the current lab.
-- Required fixture: one identical OpenConfig service/config across 10–100 notconf endpoints plus Netopeer2; exercise validate/lock/commit/rollback/disconnect/timeout and gnmic Get/Set/Subscribe.
-- Important rule: implementation disagreement becomes a human-reviewed regression case, not automatic standards truth.
-- Done when: a controller/NMS migration preflight yields a machine-readable compatibility report and quantified cutover risks.
+## P0 — ScopeSignal v3: entitlement/notice/change-event evidence after revision detection
+- Best hunters: 04, 17, 38, 42, 45.
+- Known stack: Massing PDF + CaD-Track + OpenTakeoff + BIMChange + BCF transport.
+- **Stop:** generic PDF/CAD/IFC/BCF diff, generic takeoff and another visual-overlay tool.
+- Search only: subcontract scope/exclusions; RFI/submittal/drawing linkage; field directives; PCO/change-event lineage; notice timing/deadline; schedule impact; cost-code/labor/material support; customer acceptance/denial reason.
+- Concrete queries: `construction RFI drawing revision change event cost code`, `subcontract scope exclusion change order notice`, `PCO RFI submittal entitlement`, `construction notice deadline compensable change`, `change event labor material evidence`.
+- Validation: 20 rights-clean revision pairs plus one customer-authorized change through exact quantity + controlling clause/spec/RFI/submittal/notice + reviewer compensability decision. A detected change never becomes compensable by itself.
 
-## P1 — Lab/instrument vertical paid wedges, not generic frameworks
+## P1 — Marketplace Money Safety: expand beyond Stripe only if read-only assurance is real
+- Best hunters: 27, 31, 40, 42.
+- Known leader: `stripe-connect-reckon`.
+- Search only rights-clean/read-only reconciliation adapters or evidence semantics for Adyen for Platforms, PayPal marketplaces/payouts, Mangopay or similarly material platform-money rails. Avoid payment-execution libraries unless they add a unique assurance invariant.
+- Queries: `marketplace payout reconciliation read only MIT`, `connected account settlement audit open source`, `seller payout refund reserve dispute reconciliation`, `platform ledger failed payout monitor`.
+- Required planted faults: failed payout, duplicate/missing event, refund/app-state mismatch, partial-refund rounding, negative balance, reserve exposure, dispute spike, seller reversal/clawback and FX settlement.
+- Done when: an independent read-only audit quantifies planted exposure without touching money movement; real recovered dollars require an authorized pilot.
+
+## P1 — Lab/instrument data normalization + installed-base modernization
 - Best hunters: 20, 21, 40, 43.
-- New leader: OptiHPLCHandler creates a high-budget chromatography/Empower service wedge. Existing stack already covers PyTestLab replay, Galago/PyLabRobot control and Flowcept lineage.
-- Search only one of: another major CDS/LIMS/instrument estate with a rights-clean API bridge and clear buyer workflow; a unique legacy installed-base bridge; or a missing evidence/calibration layer that changes a paid pilot.
-- Priority analog families: Chromeleon/OpenLab/CDS APIs, Tecan/Hamilton legacy runtimes, microscopy/TEM, mass-spec vendor-independent raw ingestion, semiconductor metrology uncertainty/DCC.
-- Do not treat vendor SDK/runtime access as granted by an OSS adapter license.
-- Validation: mock/synthetic flow first; then customer-authorized runtime/hardware. Measure expert touches/time removed and preserve audit/run lineage.
-- Done when: a specific “automate one assay/workflow” fixed-price offer has exact prerequisites and reproducible evidence.
+- New leader: `Benchling-Open-Source/allotropy` closes the broad instrument-file normalization layer; existing leaders cover PyTestLab replay and Empower automation.
+- **Stop:** generic lab framework, generic SCPI, generic LIMS CRUD searches.
+- Search only one of: a major installed CDS/LIMS/instrument estate with a rights-clean API bridge; a difficult legacy runtime bridge; a calibration/evidence standard that changes a paid pilot; or instrument-file families missing from Allotropy with a clear high-budget buyer.
+- Priority families/signatures: `STARLIMS checkin checkout source control API`, `Hamilton VENUS trace parser`, `Chromeleon API sample sequence`, `OpenLab CDS API`, `mass spec vendor neutral raw parser`, `digital calibration certificate DCC verification`.
+- Validation: parser goldens and mock/synthetic flow first, then authorized runtime/hardware. Measure expert touches/time removed; preserve exact source/run provenance. Do not imply vendor certification.
 
-## P1 — Grid hosting/resilience engineering truth
-- Best hunters: 11, 23, 40, 42, 45.
-- Validate DREAMS + SHIFT + ERAD; stop generic hazard-map/OpenDSS-wrapper discovery.
-- Search only authoritative/right-cleared fragility/hazard inputs, independent hosting-capacity validation corpora and concrete utility/developer export formats.
-- Required planted cases: voltage limit, thermal limit, DER capacity boundary, QSTS violation, hazard-caused asset failures and known restoration ordering.
-- Done when: 25–50 synthetic feeders reproduce planted constraints/failures without extrapolating synthetic topology to real-world performance.
+## P1 — Field-service Proof-to-Cash: vertical entitlement, not more FSM
+- Best hunters: 01, 02, 32, 33, 37, 45.
+- Known stack: phparm + Servicialo + fail-closed normalization + invoice parity + RosterSpec.
+- **Stop:** generic CMMS/FSM/work-order/job-card/invoice arithmetic.
+- Search only vertical authority around warranty entitlement, service-contract allowance consumption, SLA credits, calibration/inspection certificates, billable extras/change authorization, customer acceptance, recurring-route exception and settlement/credit lineage.
+- Priority verticals: fire/life-safety inspection, biomedical equipment, industrial calibration, HVAC/refrigeration, elevators, commercial cleaning, environmental/septic service.
+- Queries: `warranty entitlement work order invoice reconciliation open source`, `service contract allowance unbilled work`, `SLA credit field service billing`, `calibration certificate invoice entitlement`, `inspection proof settlement credit memo`.
+- Done when: 100-job benchmark proves every dollar through authority + delivery proof + invoice/settlement; ambiguity = $0 asserted recovery.
 
-## P2 — Contact-center assurance: validate the stack, not generic QA/transcription
+## P1 — Commission Payout Assurance: plan-to-payroll evidence, especially insurance statements
+- Best hunters: 28, 31, 32, 40, 42, 47.
+- Executable substrate: OCA/commission. Proprietary/no-license ICM and insurance-agency repositories remain clean-room acceptance references only.
+- **Stop:** generic commission calculators and sales-comp CRUD.
+- Search only rights-clean: effective-dated plan provenance, CRM credit/split exports, hierarchy/territory snapshots, carrier-statement imports, refunds/cancellations/clawbacks, payroll/settlement exports and independent read-only reconciliation.
+- Queries: `insurance carrier commission statement reconciliation open source`, `sales commission payroll reconciliation MIT AGPL`, `commission plan version credit split clawback`, `commission payout variance payroll export`.
+- Required challenge corpus: 30–50 independently authored cases covering fixed/section, marginal/cumulative tiers, effective plans, split/overlay, retro rerating, clawback/draw/carry-forward, refunds and cent-exact allocation.
+- Production validation: one customer-authorized closed compensation period, truth frozen before incumbent/payroll output.
+
+## P1 — Industrial interoperability: external falsifiers, not more protocol count
+- Best hunters: 12, 35, 40, 43, 45.
+- Known stack: ProtoForge + PLC4X + mature independent protocol peers such as Pymodbus; separate IEC-104/OPC-UA peers already cataloged.
+- **Stop:** broad protocol-library collection.
+- Search only customer-like fixtures or independent implementations needed to falsify Modbus TCP, IEC-104 and OPC UA support, plus standards-rights/mark obligations that change sellability.
+- Required cases: session lifecycle, reconnect, timeout, malformed frame, read/write, type/address error, fault injection and replay.
+- Done when: only cross-implementation-validated families appear in a paid compatibility pack.
+
+## P1 — Network management migration: model/transaction gaps only
+- Best hunters: 35, 40, 42.
+- Known stack: Clixon + notconf + Netopeer2 + gnmic.
+- **Stop:** generic NETCONF/gNMI client/server searches.
+- Search only YANG/OpenConfig rights/compatibility fixtures, controller transaction failure cases, gNOI/P4 operational gaps or multi-vendor model drift that changes migration risk.
+- Validation: one identical OpenConfig service/config across 10–100 endpoints; validate/lock/commit/rollback/disconnect/timeout + gNMI Get/Set/Subscribe. Disagreement is a review case, not standards truth.
+
+## P1 — Grid hosting/resilience: authoritative inputs and independent benchmark, not more maps
+- Best hunters: 11, 22, 23, 40, 42, 45.
+- Known leaders: DREAMS + ERAD; CommonGrid/deployment-gap-model/Mazzap/os-climate physrisk are valuable adjacent data/impact candidates.
+- **Stop:** generic OpenDSS wrappers, generic hazard maps, generic renewable siting UIs.
+- Search only rights-cleared fragility/hazard inputs, independent hosting-capacity validation corpora, utility/developer export formats and evidence that connects site/queue intelligence to a paid engineering decision.
+- Required planted cases: voltage limit, thermal limit, DER boundary, QSTS violation, hazard-caused failures and known restoration ordering.
+
+## P2 — Warehouse decision economics
+- Best hunters: 27, 43, 45, 46.
+- Known stack: inventory_tools + GABAK; PyEPO and skwdro are promising decision-focused/robust layers.
+- Search only if it can beat a deterministic slotting/layout or inventory baseline on **dollars/service/regret**, not forecast accuracy.
+- Benchmark: same demand/order data, ordinary forecast/basestock versus PyEPO/skwdro decision policy; report holding cost, shortage cost, service level, travel/labor and disruption cost.
+- Stop broad forecasting/slotting/warehouse simulation discovery.
+
+## P2 — Contact-center assurance adapters + calibration
 - Best hunters: 32, 37, 40, 42.
-- Known stack: `snehalsurti12/audrique` for pre-release voice/CRM journey regression + `Kazaam-sudo/CallQuanta` for human-vs-AI QA calibration + MIT ANI-IN QA execution + RosterSpec/pyworkforce for downstream WFM impact. Cisco Finesse/UCCX/CUIC semantics from proprietary `horarios-wfm` remain clean-room only.
-- **Stop generic transcription, sentiment, QA-scorecard and live-coaching searches.** Search only a missing buyer-changing adapter/evidence layer: rights-clean Genesys/NICE/Five9/Amazon Connect/Salesforce SCV test adapters, de-identified/synthetic calibration corpora, or planned→actual operational exports.
-- Required validation: synthetic/local release journeys plus a 50–200-call expert-labeled/de-identified QA corpus. Track critical-issue recall, false escalations, AI-human score delta, abstention/review rate, reviewer minutes and defect escape.
-- Done when: a Contact Center Assurance pilot can prove release correctness and calibrated QA value separately; no AI-quality claim is accepted without a human benchmark.
+- Known stack: Audrique + CallQuanta + permissive QA/WFM layers; Five9 and Amazon Connect adapters now exist.
+- **Stop:** generic transcription, sentiment, QA-scorecard and live-coaching searches.
+- Search only missing buyer-changing adapters/evidence for NICE/Genesys/Five9/Amazon Connect/Salesforce SCV, de-identified/synthetic calibration corpora or planned→actual operational exports.
+- Validation: synthetic release journeys plus 50–200 expert-labeled/de-identified calls; report critical-issue recall, false escalation, AI-human score delta and reviewer minutes.
 
-## P2 — Warehouse, workforce, GST and broadband validation only
-- Warehouse: `inventory_tools` + GABAK; hunt only lawful WMS/ERP movement exports or independent correctness benchmarks. Output before/after travel, capacity violations, move count and labor sensitivity.
-- Workforce: RosterSpec; hunt only export adapters, rights-clean labor/union rule packs or independent repair oracles. Measure coverage, paid/overtime hours and assignment churn.
-- GST: Rekvia; validate current GSTN/GSTR-2B/IMS accepted/rejected/pending, amendments, notes, reversals/ineligibility with authoritative citations and accountant review.
-- TR-069→USP: FreeACS + BSD `cwmp-sim` + Oktopus + OB-USP-Agent; validate 50–100 synthetic identities and equivalent lifecycle semantics. Stop generic CWMP/USP searching.
-
-## Resolved / deprioritized directions
-- Generic freight TMS, generic rating engines, OCR, X12, subset-sum/reconciliation, entity resolution and generic XLS importers: sufficiently covered.
-- Generic PDF/CAD drawing diff, construction takeoff, IFC diff and BCF interchange: covered enough by Massing PDF + CaD-Track + OpenTakeoff + BIMChange-Agent + IFC-lite BCF; prove downstream entitlement instead.
-- Generic SAM/regulatory wrappers: covered enough; prove packet correctness/currentness.
-- Generic backup managers, evidence ledgers/hash-chain/signing libraries, compliance collectors and action-governance frameworks: covered enough; prove real restore/application truth, external anchoring and remediation/re-proof.
-- Generic industrial protocol libraries and generic NETCONF/gNMI implementations: covered enough; build external compatibility matrices.
-- Generic CMMS/FSM/work-order, workforce schedulers, contact-center QA/transcription, lab-control frameworks, warehouse slotting and TR-369 stacks: covered enough; validate buyer ROI/correctness or hunt only named vertical/integration gaps above.
-- Generic commission engines, territory optimization clones, lead-scoring, RPA, optimization libraries and academic CVRP: stop. Commission is reopened only for the specific rights-clean **plan-to-payroll evidence/reconciliation** gap above, not for more calculators.
+## Global stop list
+Do not spend hunter cycles on: another generic CRM/ERP shell, generic RAG/chatbot, generic invoice OCR, generic workflow/RPA, generic X12 parser, generic entity matcher, generic rules engine, generic hash ledger, generic backup manager, generic field-service CRUD, generic commission calculator, generic PDF diff, generic protocol library or generic weather/map dashboard **unless the new repository contains a rare domain-specific invariant, authoritative data source, difficult integration, independently testable algorithm or monetizable acceptance/recovery workflow that materially beats the existing leaders.**
