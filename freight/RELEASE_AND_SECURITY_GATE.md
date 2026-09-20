@@ -20,6 +20,26 @@ Every buyer-facing release must include:
 
 Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduced from committed source and tied to a release/provenance record.
 
+## Deployment evidence addendum — 2026-09-20
+
+Live connected-provider evidence for `freightleak-audit` is recorded in:
+- `freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json`
+- `freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.md`
+- `freight/INCIDENT_TABLETOP_2026-09-20.md`
+
+Current deployment facts:
+- Netlify SSO team login required for **all** visitors: **CONFIG PROVEN**.
+- Netlify Forms: **0**.
+- Netlify environment variables: **0**.
+- Netlify team members: **1**.
+- Netlify team MFA enforcement: **not enforced**.
+- No Freight backend/data plane was discovered in Vercel, Render, Floot, Replit, AppDeploy, or Supabase.
+- Cross-tenant isolation: **UNPROVEN / not testable yet** because no Freight multi-tenant customer data plane was discovered.
+- Parser sandboxing: **UNPROVEN / not testable yet** because no production Freight parser runtime was discovered.
+- Deployment-specific incident tabletop: **completed — PASS WITH MATERIAL GAPS**, not a live incident.
+
+These findings do not upgrade missing tenant/parser controls to PASS.
+
 ## P0 — before a paid pilot with confidential buyer data
 
 ### Repository/supply-chain
@@ -37,10 +57,11 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 
 ### Customer data
 - [ ] Buyer authorization is documented for the actual engagement.
+- [ ] Netlify team MFA is enforced before confidential buyer data is accepted.
 - [x] Pilot data-room code rejects sources not marked read-only.
 - [x] Buyer/business-unit scope is carried through source manifests, findings, authority, truth, incumbent submission/output, settlement events, recovery certificates and buyer reports.
 - [x] Proof-layer cross-buyer/BU/shipment negative tests exist.
-- [ ] Cross-tenant negative tests pass against the **actual production database/object-store/API authorization layer** used for customer data.
+- [ ] Cross-tenant negative tests pass against the **actual production database/object-store/API authorization layer** used for customer data. Current evidence: no Freight multi-tenant data plane was discovered, so this remains unproven rather than passed.
 - [x] Source manifests require positive retention days; buyer-specific retention/deletion/export terms still must be agreed per engagement.
 - [x] CENSUS/SCOPE/PROOF lifecycle entries derive from the source manifest and retention scope.
 - [x] Delete attempts cannot become `DELETE_CONFIRMED` without explicit external confirmation evidence; ambiguous outcomes remain `DELETE_UNKNOWN`.
@@ -55,8 +76,8 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [x] Archives are rejected rather than recursively unpacked.
 - [x] XML DTD/entity constructs are rejected before downstream parsing.
 - [x] Spreadsheet formula-leading text can be neutralized on derived exports without mutating source evidence.
-- [ ] Downstream parser CPU/time/memory limits are enforced in the actual deployment runtime.
-- [ ] Downstream parsers execute in a low-privilege sandbox with no ambient production credentials or unintended network access.
+- [ ] Downstream parser CPU/time/memory limits are enforced in the actual deployment runtime. Current evidence: no production Freight parser runtime was discovered.
+- [ ] Downstream parsers execute in a low-privilege sandbox with no ambient production credentials or unintended network access. Current evidence: no production Freight parser runtime was discovered.
 - [ ] Untrusted document text is proven unable to grant tool/control-plane authority in the deployed workflow.
 
 ### Blind pilot / proof chain
@@ -88,15 +109,16 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [ ] production audit-store service authorization, external immutability/WORM controls and alerting;
 - [ ] customer-specific integration secrets held outside source;
 - [x] documented incident-response / breach-decision runbook with machine-checked containment, recovery, exposure-resolution and notification-authorization closure rules;
-- [ ] deployed contact tree/on-call/alerting plus completed tabletop or production incident exercise evidence;
+- [x] deployment-specific incident tabletop completed against the discovered Netlify Freight deployment;
+- [ ] deployed contact tree/on-call/alerting plus live-environment incident exercise evidence;
 - [x] deterministic zero-customer-data technical/commercial diligence ZIP with per-entry SHA-256 and generated provenance/SBOM/unsigned attestation;
 - [ ] buyer-specific completed security questionnaire and externally supplied diligence artifacts.
 
 ## Current claim boundary
 
-The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload, a deterministic zero-customer-data diligence bundle, rights evidence consistency gates and a documented fail-closed incident-response decision model**.
+The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload, a deterministic zero-customer-data diligence bundle, rights evidence consistency gates, a documented fail-closed incident-response decision model, Netlify deployment access-control configuration evidence, and a completed deployment-specific tabletop**.
 
-It does **not** prove executed rights documents have been supplied/reviewed, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, the incident plan has been exercised against the deployed environment, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
+It does **not** prove executed rights documents have been supplied/reviewed, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, Netlify team MFA is enforced, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, live on-call/alerting incident operations exist, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
 
 ## Commercial launch rule
 
