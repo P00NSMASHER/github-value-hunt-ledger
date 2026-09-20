@@ -91,3 +91,49 @@ For each opportunity record:
 - Monetization: fixed diagnostic + shared avoided/recovered leakage where outcome evidence supports it + recurring entitlement monitoring.
 - Score: **28/30** — A5 B4 C5 D4 E5 F5.
 - Next validation: freeze source authority and expected eligibility before viewing incumbent RMA/credit decisions; quantify unsupported credits, valid rejected claims and review time.
+
+<!-- INTEGRATOR-R12-2026-09-19T2231-0400 -->
+## New opportunity challengers — 2026-09-19 22:31 ET
+
+### Telecom Revenue Assurance — CDR rerating + bilateral interconnect settlement
+- Sources: `pialmmh/billing-dotnetcore@ec9e0abacce7e80b3a34d2d89b929ee5db946209` + `surendersara1/D-NBS_PySpark@dfa941279d318bd698e2e5c756be81331a854eb3` + buyer-authorized CDR/rate-plan/settlement evidence.
+- Buyer/problem: MVNOs, carriers, wholesale/interconnect finance and revenue-assurance teams lose margin in rate-plan provenance, billed-duration/rounding, reseller/interconnect and missing/mismatched-leg settlement errors.
+- First paid wedge: one closed-period read-only rerating and bilateral reconciliation diagnostic, with synthetic negative controls before touching customer data.
+- Monetization: fixed diagnostic + recurring monthly assurance + optional recovery/shared-savings only after settlement evidence.
+- Score: **28/30** — A5 B5 C5 D5 E4 F4. Evidence is one point short of elite only because the two engines have not yet been run together on an independently authored corpus/customer period; third-party telecom data/standards remain separate.
+- Defensibility: money-bearing CDR semantics plus source-snapshot/checksum reproducibility and skew-resistant bilateral matching, not generic anomaly detection.
+- Next validation: synthetic carrier A/B ledger with prefix/rate changes, duration rounding, clock drift, missing legs, hot keys and FX, followed by one authorized closed period.
+
+### Healthcare Revenue Integrity Diagnostic — adjudication replay + 837↔835 reconciliation
+- Sources: `aurelianware/cloudhealthoffice@85c8e18146d168ad2f4e30fbcfe6e90af0bfdb58` + `vitthalhumbe/ciphercrew-claimcraft@8b61f1b7e6cc8e86ff56011267e0da8e263401f3` + `nyimbi/AppGen-X@d3cf2829702ee414e0d7b64b03fa300ae5173abb` as control-surface reference.
+- Buyer/problem: health plans, TPAs, RCM/payment-integrity vendors and provider revenue-cycle teams need to separate financially wrong adjudication from contractual adjustments, patient responsibility and correctly pended/unsupported states.
+- First paid wedge: synthetic/redacted or customer-authorized closed-period diagnostic replaying selected claims against independent benefit/fee/COB/prior-auth/duplicate/payment controls and reconciling 837 submissions to 835 outcomes.
+- Monetization: fixed diagnostic -> recurring payment-integrity monitoring/case workflow; no autonomous coverage/payment decisions.
+- Score: **27/30** — A4 B5 C5 D5 E4 F4. Data access, payer-specific authority, code-set rights and regulatory/privacy validation make first revenue heavier than freight/telecom despite exceptional domain compression.
+- Integrity rule: billed-minus-paid is **not** recoverable leakage by default. Contractual adjustments, patient responsibility, benefit design and payer policy authority must be proven before a dollar is classified.
+- Next validation: fully synthetic 837→adjudication→835 corpus covering fee, COB, duplicate, eligibility, prior-auth, bundling, deductible/coinsurance, corrected-claim and no-remittance cases.
+
+### Queue Materialization Intelligence — leakage-safe project completion ranking
+- Sources: `owgreen-dev/grid-crunch@5f0c9a074d928b79caa792a84e8e92de1b2df3f2` + `savabs/queue_attrition@daf180778383b8675e252346e771a4e754f0558d` after production/evaluation calibration parity is fixed + independently acquired LBNL/EIA/ISO data.
+- Buyer/problem: renewable/BESS developers, infrastructure investors/lenders, equipment vendors and data-center/site teams need to separate likely-to-materialize interconnection projects from queue noise without leakage-driven false precision.
+- First paid wedge: fixed portfolio/ISO queue underwriting screen reporting evidence-backed completion rank/probability, expected MW and uncertainty with explicit regime limitations.
+- Monetization: fixed diagnostic -> recurring queue monitor/data API.
+- Score: **28/30** — A5 B5 C5 D5 E4 F4. Upstream data rights and post-FERC-Order-2023 regime validation remain gating.
+- Defensibility: immutable historical labels/validation discipline, honest negative-feature results and a prospective prediction ledger that cannot be rewritten after outcomes.
+- Next validation: independently reproduce the historical benchmark from current lawful LBNL/EIA inputs and make the live prediction path exactly match the calibrated out-of-time estimator contract.
+
+### Utility Revenue Assurance — meter → tariff → invoice → payment
+- Sources: `adipras/tirta-saas-backend@79053de1629098969abe8254defececc9a114acb` + `navariltd/utility-billing@380f6305350e4f7d90e745d48e2360170001a4db` + buyer-authorized meter/rate/invoice/payment exports.
+- Buyer/problem: water cooperatives, municipal/private utilities and utility-billing outsourcers can lose revenue or overbill through meter continuity, progressive blocks, rate-period errors, duplicate invoices, partial-payment and adjustment failures.
+- First paid wedge: read-only Meter-to-Cash Assurance diagnostic on one billing period.
+- Monetization: fixed diagnostic + recurring exception monitoring/implementation.
+- Score: **25/30** — A4 B4 C5 D4 E4 F4.
+- Next validation: synthetic corpus with meter rollover/continuity, estimated-vs-actual reads, progressive blocks, mid-period rate changes, duplicate invoice, billing adjustment, partial payment and overpayment cases.
+
+### Reviewed Identity Registry / Safe Writeback Service — cross-cutting implementation wedge
+- Sources: `cmdrvl/canon@45e9702ba7f3874c073134c1a6fb74500232b6a1` + `ChelseaKR/constituent-reconciler@dbc09d25baec026027e65a0f8d21930509e2dd8e`; optional `datasciencecampus/pprl_toolkit@b278afdcf37d557a06d058e5d164d6e4d373a87a` where plaintext pooling is unacceptable.
+- Buyer/problem: MDM/data-governance, procurement/AP, CRM and regulated data-integration teams need reviewed canonical identity that is versioned, replayable and safe to write back rather than opaque one-off fuzzy matches.
+- First paid wedge: multi-source vendor/customer/constituent reconciliation delivering a reviewed versioned registry and controlled writeback plan.
+- Monetization: implementation + recurring registry compilation/review/managed hygiene.
+- Score: **28/30** — A5 B4 C5 D5 E5 F4. Crowded MDM procurement lowers ceiling/speed versus direct-dollar recovery, but the governance/replay boundary is unusually strong.
+- Next validation: synthetic multi-source corpus through candidate generation → human review → registry promotion → pinned runtime lookup → writeback → correction/split → exact replay; runtime behavior may change only on promoted versions.
