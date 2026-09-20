@@ -13,7 +13,7 @@ from freight.data_lifecycle import (
     retention_due,
     verify_item,
 )
-from freight.pilot_package import SourceEntry, build_data_room_manifest
+from freight.pilot_package import DataRoomManifest, SourceEntry
 
 
 def H(text):
@@ -21,19 +21,24 @@ def H(text):
 
 
 def room():
-    return build_data_room_manifest(
-        "buyer-a",
-        "bu-a",
-        [
-            SourceEntry(
-                "invoice-1","buyer-a","bu-a","invoice",H("invoice"),
-                True,True,False,2,
-            ),
-            SourceEntry(
-                "authority-1","buyer-a","bu-a","authority",H("authority"),
-                True,True,False,5,
-            ),
-        ],
+    entries=(
+        SourceEntry(
+            "invoice-1","buyer-a","bu-a","invoice",H("invoice"),
+            True,True,False,2,
+        ),
+        SourceEntry(
+            "authority-1","buyer-a","bu-a","authority",H("authority"),
+            True,True,False,5,
+        ),
+    )
+    return DataRoomManifest(
+        buyer_id="buyer-a",
+        business_unit="bu-a",
+        engagement_id="ENG-LIFECYCLE",
+        launch_authorization_hash=H("launch-authorization"),
+        launch_authorization_valid_until="2026-10-20",
+        entries=entries,
+        manifest_hash=H("data-room"),
     )
 
 
