@@ -1,55 +1,34 @@
-MARKER: <!-- INTEGRATOR-R11-SAAS-REVENUE-2026-09-20T0102-0400 -->
+MARKER: <!-- INTEGRATOR-R11-LABOR-PAYROLL-2026-09-20T0106-0400 -->
 
 === APPEND COMBINATIONS.md ===
-## SaaS Revenue Integrity v1 — contract state -> entitlement/access -> metered usage -> invoice parity -> money state
-- Core components: `Mima-N/gitlab_mrr_pipeline_dbt@e43562f48a9bf70e58383f453ababd6bbe342f36` for Salesforce↔Zuora contract/subscription drift + `geminimir/meterguard@9147d6fdf9fd8ee8761d732e956fc0a8c86989bd` for local-usage↔Stripe pre-invoice reconciliation and late-event/idempotent correction + optional entitlement/access checks from `Mayreeobi/SaaS-User-Access-vs-Billing-Reconciliation-System@9b5bbd9c28538d5533031889fe4abba57a20bb66` / `Wondermove-Inc/saaslens@10a93ea490d1d7d98df041b368d04d292096c7f5` + Recurso/Summae/provider/bank evidence for later journal/settlement truth.
-- Buyer/problem: usage-based B2B SaaS controllers, RevOps and billing engineering teams can have a correct Stripe integration yet still underbill/overbill because CRM contract state, entitlement/access, metered events, reported usage and the closed invoice disagree at different boundaries.
-- First paid wedge: **SaaS Revenue Integrity Acceptance Test** on one customer-owned closed/open billing period. Independently seed/reconcile contract/start/term/churn state, entitlement, product usage, Stripe-reported quantity and invoice dollars; quantify orphaned revenue, duplicate/missing units, overcharge/refund exposure and analyst reconciliation time.
-- Critical evidence boundary: MeterGuard's ADR targets 0% quantity drift at invoice finalization, but the inspected current validator exits success when either absolute drift is zero **or percentage drift is within epsilon**. That is adequate for an open-period pre-invoice health check, not proof of the stronger finalization invariant. Do not market final invoice parity until an independent fixture verifies exact quantity and dollar equality after the finalization boundary.
-- Hard invariant: CRM close, subscription activation, entitlement/access, usage event, provider-reported quantity, invoice issuance, journal posting and cash settlement are distinct facts. Missing authority or ambiguous cross-system identity remains REVIEW, not recovered revenue.
-- Validation: seeded cases for orphaned closed-won, wrong start/term/MRR, zombie churn, duplicate usage IDs, late events inside/outside watermark, Stripe 429/5xx/retry, `local > Stripe`, `Stripe > local`, partial replay, finalization and post-close credit note. Require exact final quantity and independently recomputed invoice-dollar parity.
-
-## SaaS License True-Up / Renewal Savings — adjacent FinOps wedge
-- Use `Wondermove-Inc/saaslens@10a93ea490d1d7d98df041b368d04d292096c7f5` as the installed schema/workflow substrate linking subscription spend/seats, assignments, `lastUsedAt`, employment termination, payment/card records, renewals and audit logs.
-- Buyer / first paid wedge: IT/FinOps/procurement; reconcile authorized subscription contracts + payment/card records + SSO/app usage + HR termination state to quantify unused-seat spend, offboarded-user licenses, duplicate/unmatched SaaS payments and renewal candidates.
-- Boundary: usage inactivity is evidence for review/optimization, not automatic proof a license may be removed; contract commitments, shared/service accounts and business-critical access require owner approval.
-- Status: monetizable adjacent P1/P2 wedge, but below freight/AP/commission until one customer true-up demonstrates realized savings.
+## Labor-to-Payroll Assurance v2 — roster -> physical actuals -> approved OT -> payroll -> settlement
+- Add `WilfredTinega/Upande-TA@af15de1fb844afd81221829c3be07dba8b5d98df` as a rare installed-base biometric actual-time adapter between planned schedule truth and payroll posting. Pair RosterSpec/minimum-disruption schedule truth -> customer-authorized ZKTeco/ERPNext check-in events -> Upande overtime/Additional Salary linkage -> existing payroll-reconciliation/accounting/payment evidence.
+- Buyer/problem: ERPNext/Frappe employers using biometric clocks face missed/duplicate punches, overnight-shift ambiguity, direction errors and approved-vs-paid overtime drift that can become payroll leakage or review labor.
+- First paid wedge: **Biometric Time-to-Payroll Acceptance Audit** on one closed period. Freeze device/check-in facts, shift assignment, manager-approved OT, Additional Salary/payroll output and later payment; report exceptions with source lineage rather than silently correcting payroll.
+- Critical boundary from source inspection: Upande's direction normalizer intentionally writes `log_type` directly with `frappe.db.set_value`, bypassing document validation, linked-attendance guards and duplicate checks for the flip itself. Its heuristic can turn a trailing IN into OUT or the first all-OUT scan into IN. That is useful repair logic, but **a repaired direction is inferred state, not physical ground truth**.
+- Hard invariant: automatic direction repairs must remain separately labeled `inferred/repaired`; they cannot by themselves establish compensable hours or a recoverable payroll discrepancy. Hard-dollar findings require corroborating shift/policy/approval/payroll/payment authority.
+- Validation: synthetic fixtures for duplicate punch, lost scan, overnight shift, trailing IN, all-OUT, employee/device remap, OT overlap/cancellation and a deliberately misleading scan sequence. Compare raw-only, repaired and independently adjudicated truth; measure false payroll-dollar creation as a first-class failure metric.
 
 === APPEND COMPONENTS.md ===
-## SaaS revenue-integrity components — post-checkpoint
-
-### geminimir/meterguard — Stripe usage parity / correction substrate
-- Revision: `9147d6fdf9fd8ee8761d732e956fc0a8c86989bd`.
-- Integrator score after source-level recheck: **28/30 — A5 B5 C5 D5 E3 F5**. Hunter score was 29/30; evidence/completeness is reduced one point because the strongest finalization-parity claim is documented/demoed more strongly than it is enforced by the inspected validator/tests.
-- Rights: MIT repository code. Stripe APIs/terms/trademarks and customer usage/billing data remain separately governed.
-- Capability inspected: real reconciler reads local counters and Stripe usage summaries, persists diff reports, raises `investigate`, creates pending corrections/alerts, and tracks parity metrics. ADR defines idempotent delta writes, late-event/watermark handling, rate-limit retry and a 0%-at-finalization target.
-- Important implementation caveat: current `demo/stripe-test-clocks/validate.sh` accepts either absolute zero drift **or** drift within epsilon, so it proves an open-period tolerance check rather than exact finalized-invoice parity. Reconciler correction behavior is also asymmetric: `Stripe > local` can generate suggested local adjustments while `local > Stripe` raises manual review. Both directions need an independent seeded oracle before money claims.
-- Integration: central engine in SaaS Revenue Integrity v1; upstream Mima-style contract/subscription truth, downstream invoice/journal/settlement truth.
-- Promotion gate: independent corpus must prove duplicate/late/replayed events, provider retries, both drift directions and exact final quantity+dollar parity across finalization. Keep out of MASTER until then.
-
-### Mima-N/gitlab_mrr_pipeline_dbt — CRM↔billing contract-state drift layer
-- Revision: `e43562f48a9bf70e58383f453ababd6bbe342f36`.
-- Integrator score under standing repository-code permission: **26/30 — A5 B5 C4 D3 E4 F5**. Actual public repository had no visible root license; provenance remains recorded, but public-license category is not a value penalty under the user's separate permission assertion.
-- Capability: deterministic Salesforce opportunity↔Zuora subscription reconciliation for orphaned won opportunities, start/close-date drift, MRR/term mismatches and active-billing-vs-CRM-churn states with severity/annualized impact.
-- Integration / next action: use only as the upstream cross-system truth layer; independently seed the CRM/billing mismatch matrix and keep synthetic README dollars out of commercial proof.
+### WilfredTinega/Upande-TA — biometric actual-time / overtime-to-payroll bridge
+- Revision: `af15de1fb844afd81221829c3be07dba8b5d98df`.
+- Integrator score after source-level recheck: **27/30 — A5 B4 C5 D5 E3 F5**. Hunter score was 28/30; evidence/completeness is reduced because the check-in normalizer deliberately mutates direction with direct DB writes that bypass normal document validation/linked-attendance/duplicate guards, making independent provenance essential.
+- Rights: MIT repository code. ZKTeco hardware/PUSH SDK, Node-RED, ERPNext/Frappe services, customer biometric/time records and labor/payroll policy remain separately governed.
+- Capability inspected: duplicate check-in prevention on normal inserts; shift-aware/overnight grouping and heuristic direction normalization; overtime period/overlap checks; linked submitted `Additional Salary` creation and cancellation for bulk overtime.
+- Important caveat: the overtime override bypasses some native duplicate-date/overtime-type/max-hours checks for bulk-generated slips and trusts precomputed amounts. The formula/policy is not labor-law authority. Repaired check-in direction and precomputed OT amount must be independently approved/validated before payroll-dollar conclusions.
+- Integration: Labor-to-Payroll Assurance v2; RosterSpec planned state -> raw biometric facts -> labeled repair/adjudication -> OT approval -> Additional Salary/payroll -> accounting/payment proof.
+- Promotion gate: pass a synthetic adversarial clock corpus with no false compensable-hours creation and prove expected->actual->approved->paid lineage on an authorized closed period. Keep out of MASTER until then.
 
 === APPEND OPPORTUNITIES.md ===
-## SaaS Revenue Integrity Acceptance Test
-- Core: CRM/contract-state reconciliation -> entitlement/access check where applicable -> MeterGuard-style metered-usage/provider parity -> invoice -> independent ledger/settlement evidence.
-- Buyer: usage-based B2B SaaS controllers, RevOps and billing engineering.
-- First paid wedge: one-period read-only/shadow acceptance test before or across invoice close, with source-linked missing/duplicate usage, contract-state mismatch, invoice-dollar drift and remediation queue.
-- Revenue path: fixed acceptance test -> recurring pre-close monitoring -> recovery/refund-control work on validated exceptions.
-- Why it matters: it is a direct-money analog of freight audit with a much easier authorization surface, but promotion depends on exact finalization proof rather than epsilon/demo claims.
-
-## SaaS License True-Up & Renewal Savings Audit
-- Core: SaaSLens subscription/payment/user/access schema + customer-owned SSO/app-usage/HR/contract evidence.
-- Buyer: IT, FinOps, procurement and controllers.
-- First paid wedge: one renewal cohort or top 20 SaaS vendors; quantify unused-seat spend, offboarded-user licenses and duplicate/unmatched payments, with human approval before any access change.
-- Revenue path: fixed audit -> recurring renewal calendar/true-up monitoring; realized savings tracked only after contract/vendor action is confirmed.
+## Biometric Time-to-Payroll Acceptance Audit
+- Core: planned roster + immutable/raw biometric events + shift-aware exception/adjudication + approved overtime + payroll artifact + payment evidence.
+- Buyer: ERPNext/Frappe employers, payroll service firms and multi-site operators with ZKTeco-style clocks.
+- First paid wedge: one closed payroll period; quantify missing/duplicate punches, inferred-direction exceptions, approved-but-unpaid OT, unsupported OT and payroll-review time.
+- Revenue path: fixed diagnostic -> recurring pre-payroll exception assurance -> broader labor/payroll reconciliation.
+- Safety/integrity: biometric/person records are customer-controlled sensitive data; use only explicitly authorized customer data. Automated scan-direction repair is never sufficient evidence by itself for a wage/payment conclusion.
 
 === APPEND SEARCH_QUEUE.md ===
-## SaaS revenue-integrity refinement from Hunter 28
-- **Usage billing:** stop generic metering/Stripe wrapper discovery. Differential-test `geminimir/meterguard@9147d6fdf9fd8ee8761d732e956fc0a8c86989bd` on an independently seeded billing period with duplicate IDs, late events inside/outside watermark, 429/5xx, both drift directions, replay and invoice finalization. Require **exact final quantity and independently recomputed invoice dollars** after finalization; an epsilon-success health check is not sufficient.
-- **Quote/contract-to-billing drift:** use `Mima-N/gitlab_mrr_pipeline_dbt@e43562f48a9bf70e58383f453ababd6bbe342f36` as the current mismatch taxonomy for orphaned won business, date/MRR/term drift and zombie subscriptions. Search only for hard source/version/identity or settlement gaps, not another RevOps dashboard.
-- **SaaS license true-up:** `Wondermove-Inc/saaslens@10a93ea490d1d7d98df041b368d04d292096c7f5` closes much of the schema/workflow gap. Next search should target authoritative contract-seat/renewal terms, SSO/provider deprovision evidence and confirmed vendor credit/savings outcome — not another spend dashboard.
-- **MASTER restraint:** MeterGuard clears the numerical promotion bar but remains a COMPONENT/combination challenger until exact finalized-invoice parity is independently proven. Mima and SaaSLens remain stack components/opportunities rather than overlapping MASTER leaders.
+## Labor-to-payroll refinement from Hunter 32
+- Use `WilfredTinega/Upande-TA@af15de1fb844afd81221829c3be07dba8b5d98df` as the current biometric installed-base adapter, but treat its direct-DB direction repair as **inference requiring review/corroboration**, not source truth. Build a synthetic adversarial corpus around duplicate/lost scans, overnight shifts, trailing IN/all-OUT, remaps and OT overlap/cancellation; measure false compensable-hour and false payroll-dollar creation.
+- Search next only for authoritative time-clock event provenance, manager exception approval/receipt, payroll-provider posted/paid evidence and current customer/labor-policy authority. Stop generic attendance/payroll CRUD and generic biometric integrations unless they add an independently verifiable device-event or settlement invariant.
+- Keep Upande at COMPONENT/combination level despite clearing 24; promote only if the repair/adjudication layer proves no false-money behavior and one authorized closed-period trace reaches paid payroll.
