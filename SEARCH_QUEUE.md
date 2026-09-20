@@ -9,7 +9,8 @@ Integrator-owned search and validation direction. Updated 2026-09-20. The portfo
 - Never inspect, retain, test, authenticate with or use credentials/auth material, private/personal/confidential data, vulnerabilities or accidentally exposed secrets. Record sanitized metadata only.
 - No padding. A run with no new validated find is acceptable.
 - Prefer MASTER DNA: complete vertical operating systems; deterministic audit/recovery; authoritative data/evidence infrastructure; standards/protocol acceptance; difficult installed-base integration; optimization/decision engines; service-first B2B wedges with measurable outcomes.
-- Reuse the benchmark-supported search skills when applicable: **first-party production-source triangulation**; **ingestion invariant-triad intersection**; **acceptance-path transition inspection**. Do not treat a method as proof; every candidate still needs independent verification.
+- Reuse benchmark-supported search skills when applicable: **first-party production-source triangulation**; **ingestion invariant-triad intersection**; **acceptance-path transition inspection**; **fail-open boundary archaeology**. Do not treat a method as proof; every candidate still needs independent verification.
+- For any verifier/auditor/source-health engine, explicitly hunt missing/stale/ambiguous evidence, parser/environment faults, empty-success states and selection fallbacks. PASS/VERIFIED must remain closed unless the exact required evidence survives those negative paths.
 
 ## 1. Freight Recovery — P0: prove incremental settled money
 Hunt only what can change EXP-001: controlling addendum/accessorial/tariff authority, amendment/supersession/incorporation lineage, incumbent/FAP reason-code output, correction/rebill chronology and final credit/refund/812/820/remittance allocation. Prioritize archived product names, carrier/customer rate-authority classes, amendment tables, adjustment transaction types and settlement-reference schemas.
@@ -38,23 +39,23 @@ Search only the remaining evidence-to-paid gaps: prime↔sub incorporation/flow-
 ## 5. Recovery Proof — P0/P1: test the verifier, not the backup job
 Run EXP-004 before broadening the stack. Search only missing negative controls or engine/application invariants: wrong-but-restorable content, missing WAL/binlog/history, stale proof, corrupt object, service-up/data-wrong, trust/revocation failure, total-host-loss or credential-boundary failure.
 
-Apply **acceptance-path transition inspection** to any new verifier: find the exact state transition that marks recovery trusted/passed and prove negative controls keep it closed.
+Apply both **acceptance-path transition inspection** and **fail-open boundary archaeology** to any new verifier: find the exact state transition that marks recovery trusted/passed; then prove missing evidence, stale/newer-unreadable proof, sandbox/environment faults, corruption and UNKNOWN/SKIP states cannot unlock it.
 
 **Stop:** backup status tools, generic restore scripts, hash chains/signing libraries or dashboards without independently falsifiable recovery-state tests.
 
 ## 6. CaptureBrief / Government acquisition intelligence — P0/P1
-Use **first-party production-source triangulation** and **ingestion invariant-triad intersection**. Hunt only authoritative supplement/deviation successor sources, source-currentness/effective/supersession metadata, solicitation packet/amendment completeness and forecast→actual lineage. Freeze forecasts before actual notices/awards resolve.
+Use **first-party production-source triangulation**, **ingestion invariant-triad intersection** and fail-open checks on feed health. Hunt only authoritative supplement/deviation successor sources, source-currentness/effective/supersession metadata, solicitation packet/amendment completeness and forecast→actual lineage. Freeze forecasts before actual notices/awards resolve.
 
 **Stop:** generic SAM wrappers, FAR/RAG search, award dashboards and speculative recompete scoring without out-of-time validation.
 
 ## 7. Installed-Base Lab / Sequencing Operations — P1
-The new priority is the concrete sequencing profile in EXP-007: `S4 Clarity workflow state -> Illumina InterOp operational metrics -> provenance`, using synthetic/dummy or explicitly authorized non-PHI data. Search only missing Clarity workflow/EPP compatibility, instrument-run identity/handoff semantics, vendor-version bridges and operational failure/replay evidence.
+The priority is the concrete sequencing profile in EXP-007: `S4 Clarity workflow state -> Illumina InterOp operational metrics -> provenance`, using synthetic/dummy or explicitly authorized non-PHI data. Search only missing Clarity workflow/EPP compatibility, instrument-run identity/handoff semantics, vendor-version bridges and operational failure/replay evidence.
 
 For broader scientific benches, keep `labscript` for tightly timed deterministic experiments, PyMoDAQ for flexible scan/log workflows and ophyd-async for EPICS/Tango facility migration, but treat them as components unless a specific buyer-installed gap appears.
 
 **Stop:** generic LIMS, another laboratory orchestration framework, protocol DSL or device abstraction library unless it closes a named installed-base handoff. Do not touch sequence reads/PHI for this operations wedge.
 
-## 8. Insurance Subrogation Recovery — P1 new direct-money lane
+## 8. Insurance Subrogation Recovery — P1 direct-money lane
 Use `sidnov6/recoupe` only as workflow/quantum/evaluation scaffolding. Search for **authoritative, versioned, current** subrogation/fault/limitations/policy-rule sources or implementations, exact jurisdiction/effective-date/supersession semantics, policy-language precedence and closed-claim settlement evidence. Apply first-party/authority triangulation where official sources exist.
 
 EXP-011 is the gate: unknown jurisdiction, missing rule, conflicting rule or illustrative/default rule must remain REVIEW / $0 asserted recovery. No generic fallback may create hard-dollar opportunity.
@@ -63,6 +64,8 @@ EXP-011 is the gate: unknown jurisdiction, missing rule, conflicting rule or ill
 
 ## 9. Money-State Integrity / Payments — P1
 Strengthen EXP-010 rather than collecting more payment cores. Differential-test operational events against independent accounting/close truth. Use `fintechcore` only as a challenger/reference until automated tests prove ledger balance, idempotency races, refunds/reversals, outbox loss, replayed webhooks, provider unknown-result and settlement consistency.
+
+Apply fail-open archaeology to provider ambiguity and settlement selection: timeout/unknown-result, missing settlement rows, partial allocations and stale provider states must not silently become paid/reconciled.
 
 **Search gaps:** bank/provider settlement evidence, ambiguous many-to-many allocation, dispute/chargeback lifecycle and hard failure fixtures that current leaders cannot represent.
 
@@ -81,7 +84,7 @@ Search only customer-configuration import, namespace/type migration, secure sess
 **Stop:** generic Modbus/OPC/PLC clients, protocol libraries and simulators unless they expose a new hard operational invariant or buyer acceptance case.
 
 ## 12. Permit / Public-Data Intelligence — P1
-Apply the **ingestion invariant triad**: heterogeneous source topology + immutable first/last/version/diff history + explicit source-run success/partial/failure truth. Use PermitBuild as current permit benchmark and Curatore-v2 as acquisition-forecast analog. Hunt only jurisdiction gaps, semantic field QA, identity/version continuity and enrichments that materially change a buyer decision.
+Apply the **ingestion invariant triad**: heterogeneous source topology + immutable first/last/version/diff history + explicit source-run success/partial/failure truth. Use PermitBuild as current permit benchmark and Curatore-v2 as acquisition-forecast analog. Hunt only jurisdiction gaps, semantic field QA, identity/version continuity and enrichments that materially change a buyer decision. Red-team empty-success/parser-suppression paths before trusting a source-health state.
 
 **Stop:** permit lead maps, mutable upsert scrapers, property aggregators with placeholder data and connector-count projects without semantic QA/run truth.
 
