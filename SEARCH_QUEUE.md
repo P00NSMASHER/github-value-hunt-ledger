@@ -9,26 +9,33 @@ Integrator-owned search and validation direction. Updated 2026-09-20. The portfo
 - Never inspect, retain, test, authenticate with or use credentials/auth material, private/personal/confidential data, vulnerabilities or accidentally exposed secrets. Record sanitized metadata only.
 - No padding. A run with no new validated find is acceptable.
 - Prefer MASTER DNA: complete vertical operating systems; deterministic audit/recovery; authoritative data/evidence infrastructure; standards/protocol acceptance; difficult installed-base integration; optimization/decision engines; service-first B2B wedges with measurable outcomes.
-- Reuse benchmark-supported search skills when applicable: **first-party production-source triangulation**; **ingestion invariant-triad intersection**; **acceptance-path transition inspection**; **fail-open boundary archaeology**; **decision-claim -> runtime-side-effect trace**. Do not treat a method as proof; every candidate still needs independent verification.
+- Reuse benchmark-supported search skills when applicable: **first-party production-source triangulation**; **ingestion invariant-triad intersection**; **acceptance-path transition inspection**; **fail-open boundary archaeology**; **decision-claim -> runtime-side-effect trace**; **authority-origin / invariant-set consistency**. Do not treat a method as proof; every candidate still needs independent verification.
 - For any verifier/auditor/source-health engine, explicitly hunt missing/stale/ambiguous evidence, parser/environment faults, empty-success states and selection fallbacks. PASS/VERIFIED must remain closed unless the exact required evidence survives those negative paths.
 - For any claimed decision-changing mechanism, trace **public API/dispatch -> executable body -> actual state/output/control-flow side effect -> semantic test**. Metrics, labels, enums, post-processing and no-throw tests do not establish that a policy is enforced at runtime.
+- For any money/value or trust claim, identify **who authored/authorizes each input**, then compare the evidence/admissibility set used by validity logic with the set used by aggregates, reports and billing. A record rejected/unknown in one module may not silently count as trusted proof or confirmed value in another.
 
 ## 1. Freight Recovery — P0: prove incremental settled money
 Hunt only what can change EXP-001: controlling addendum/accessorial/tariff authority, amendment/supersession/incorporation lineage, incumbent/FAP reason-code output, correction/rebill chronology and final credit/refund/812/820/remittance allocation. Prioritize archived product names, carrier/customer rate-authority classes, amendment tables, adjustment transaction types and settlement-reference schemas.
 
-**Next search questions:** Can an external authority source prove which rule actually controlled on shipment date? Can incumbent output be ingested without contaminating frozen truth? Can later settlement be uniquely attributed to a validated finding?
+**Mandatory money trace:** controlling authority -> independently calculated expected charge -> uniquely identified economic claim -> reviewer/adjudication state -> dispute/correction -> issued credit/refund/remittance -> realized settlement. Diagnostic findings are not additive money. Overlapping findings must collapse onto one economic delta or remain separately non-additive. WARN/BLOCK/REVIEW/POTENTIAL states contribute **$0 confirmed and $0 realized recovery**.
+
+**Next search questions:** Can an external authority source prove which rule actually controlled on shipment date? Can incumbent output be ingested without contaminating frozen truth? Can later settlement be uniquely attributed to one validated claim without duplicate-value paths?
+
+**Independent falsifiers:** prefer hand-derived literal goldens, `justicebajaj161/Freight-Audit-Console@c2d4c07310a77e20ee21a74fc96d49df783c2e3a`, `WRBriska/InvoiceAudit@bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c` and other authority-independent oracles. `aiparallel0/freight-audit@e7869162...` is now a **negative-control anti-pattern only**, not gold truth or a savings/value oracle.
 
 **Stop:** generic TMS, OCR, EDI libraries, rate parsers, entity matchers, freight dashboards, invoice anomaly models and repricers unless they add a rare authority/settlement invariant that materially beats the current stack. Missing authority = REVIEW / $0.
 
 ## 2. AP Leakage Assurance — P0: three-way exception -> resolved financial outcome
 Use the current three-way reconciliation core plus structured-invoice, identity, proof and settlement components. Search for immutable ERP source identifiers, blanket/service-PO receipt semantics, credit/debit memo lineage, remittance allocation and hard partial-receipt edge cases. Route strong AP findings into the sparse finance/AP catalog.
 
-**Validation before more hunting:** build EXP-002 with duplicate invoice, partial/missing receipt, PO ambiguity, quantity/price/tax drift, fuzzy false match, credit memo and partial settlement.
+**Validation before more hunting:** build EXP-002 with duplicate invoice, partial/missing receipt, PO ambiguity, quantity/price/tax drift, fuzzy false match, credit memo and partial settlement. Apply authority-origin consistency to ensure unresolved PO/receipt/tax evidence cannot enter recoverable-dollar aggregates.
 
 **Stop:** AP OCR/RPA, generic anomaly dashboards and invoice-workflow CRUD.
 
 ## 3. Partner / Commission Payout Assurance — P0/P1
 Search only authoritative plan-version/assignment sources, retroactivity semantics, provider settlement/unknown-result evidence and payroll/payment reconciliation needed for EXP-003. Prefer code paths that explicitly separate accrual, review, reversal, clawback, payable, payout intent and settled state.
+
+**Authority test:** imported `approved`, `paid`, `verified` or commission-status fields are not authoritative merely because they are named that way; trace who created them and whether later aggregation/payment logic uses the same accepted claim set.
 
 **Stop:** commission calculators, affiliate dashboards and payout wrappers without reversal/settlement truth.
 
@@ -40,12 +47,14 @@ Search only the remaining evidence-to-paid gaps: prime↔sub incorporation/flow-
 ## 5. Recovery Proof — P0/P1: test the verifier, not the backup job
 Run EXP-004 before broadening the stack. Search only missing negative controls or engine/application invariants: wrong-but-restorable content, missing WAL/binlog/history, stale proof, corrupt object, service-up/data-wrong, trust/revocation failure, total-host-loss or credential-boundary failure.
 
-Apply both **acceptance-path transition inspection** and **fail-open boundary archaeology** to any new verifier: find the exact state transition that marks recovery trusted/passed; then prove missing evidence, stale/newer-unreadable proof, sandbox/environment faults, corruption and UNKNOWN/SKIP states cannot unlock it.
+Apply **acceptance-path transition inspection**, **fail-open boundary archaeology**, and **authority-origin / invariant-set consistency**. Find the exact trusted/pass transition; distinguish independently measured restore/content evidence from caller-authored `verified`/`ok` metadata; prove that a record excluded from chain/validity logic cannot still enter RPO/RTO or green evidence summaries.
 
 **Stop:** backup status tools, generic restore scripts, hash chains/signing libraries or dashboards without independently falsifiable recovery-state tests.
 
 ## 6. CaptureBrief / Government acquisition intelligence — P0/P1
-Use **first-party production-source triangulation**, **ingestion invariant-triad intersection** and fail-open checks on feed health. Hunt only authoritative supplement/deviation successor sources, source-currentness/effective/supersession metadata, solicitation packet/amendment completeness and forecast→actual lineage. Freeze forecasts before actual notices/awards resolve.
+Use **first-party production-source triangulation**, **ingestion invariant-triad intersection** and fail-open checks on feed health. Hunt only authoritative supplement/deviation successor sources, source-currentness/effective/supersession metadata, solicitation packet/amendment completeness and forecast->actual lineage. Freeze forecasts before actual notices/awards resolve.
+
+**Authority-currentness rule:** a first-party-looking repository and a recent Git commit are not sufficient evidence of current substantive authority. Reconcile repository content against the currently responsible official publication/source and preserve effective/supersession dates.
 
 **Stop:** generic SAM wrappers, FAR/RAG search, award dashboards and speculative recompete scoring without out-of-time validation.
 
@@ -66,7 +75,7 @@ EXP-011 is the gate: unknown jurisdiction, missing rule, conflicting rule or ill
 ## 9. Money-State Integrity / Payments — P1
 Strengthen EXP-010 rather than collecting more payment cores. Differential-test operational events against independent accounting/close truth. Use `fintechcore` only as a challenger/reference until automated tests prove ledger balance, idempotency races, refunds/reversals, outbox loss, replayed webhooks, provider unknown-result and settlement consistency.
 
-Apply fail-open archaeology to provider ambiguity and settlement selection: timeout/unknown-result, missing settlement rows, partial allocations and stale provider states must not silently become paid/reconciled. Apply **decision-claim -> runtime-side-effect trace** to any advertised reversal, retry, settlement or approval mode so a named state or test file is not mistaken for an enforced money transition.
+Apply fail-open archaeology to provider ambiguity and settlement selection: timeout/unknown-result, missing settlement rows, partial allocations and stale provider states must not silently become paid/reconciled. Apply **decision-claim -> runtime-side-effect trace** to any advertised reversal, retry, settlement or approval mode. Apply **authority-origin / invariant-set consistency** so self-authored provider status or excluded ledger rows cannot leak into close/settlement summaries.
 
 **Search gaps:** bank/provider settlement evidence, ambiguous many-to-many allocation, dispute/chargeback lifecycle and hard failure fixtures that current leaders cannot represent.
 
@@ -87,7 +96,9 @@ Search only customer-configuration import, namespace/type migration, secure sess
 **Stop:** generic Modbus/OPC/PLC clients, protocol libraries and simulators unless they expose a new hard operational invariant or buyer acceptance case.
 
 ## 12. Permit / Public-Data Intelligence — P1
-Apply the **ingestion invariant triad**: heterogeneous source topology + immutable first/last/version/diff history + explicit source-run success/partial/failure truth. Use PermitBuild as current permit benchmark and Curatore-v2 as acquisition-forecast analog. Hunt only jurisdiction gaps, semantic field QA, identity/version continuity and enrichments that materially change a buyer decision. Red-team empty-success/parser-suppression paths before trusting a source-health state.
+Apply the **ingestion invariant triad**: heterogeneous source topology + immutable first/last/version/diff history + explicit source-run success/partial/failure truth. Use PermitBuild as current permit benchmark and Curatore-v2 as acquisition-forecast analog. Hunt only jurisdiction gaps, semantic field QA, identity/version continuity and enrichments that materially change a buyer decision.
+
+Red-team empty-success/parser-suppression paths and **opaque-upstream health**. A downstream app showing green sync/health is not evidence of freshness/completeness when the authoritative collectors are external or uninspectable; require timestamps/watermarks, expected-vs-received coverage and explicit DEGRADED/PARTIAL/STALE semantics.
 
 **Stop:** permit lead maps, mutable upsert scrapers, property aggregators with placeholder data and connector-count projects without semantic QA/run truth.
 
