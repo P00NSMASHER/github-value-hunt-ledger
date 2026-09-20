@@ -24,15 +24,25 @@ class IngestPolicy:
     max_file_bytes: int = 25_000_000
     max_text_line_chars: int = 1_000_000
     max_edi_segment_chars: int = 5_000
+    max_csv_field_chars: int = 65_536
+    max_csv_rows: int = 250_000
+    max_csv_cells_per_row: int = 2_000
+    max_csv_total_cells: int = 5_000_000
     allowed_extensions: tuple[str, ...] = (".pdf", ".csv", ".xml", ".edi", ".x12")
 
     def __post_init__(self):
-        if self.max_file_bytes <= 0:
-            raise ValueError("max_file_bytes must be positive")
-        if self.max_text_line_chars <= 0:
-            raise ValueError("max_text_line_chars must be positive")
-        if self.max_edi_segment_chars <= 0:
-            raise ValueError("max_edi_segment_chars must be positive")
+        positive_limits = {
+            "max_file_bytes": self.max_file_bytes,
+            "max_text_line_chars": self.max_text_line_chars,
+            "max_edi_segment_chars": self.max_edi_segment_chars,
+            "max_csv_field_chars": self.max_csv_field_chars,
+            "max_csv_rows": self.max_csv_rows,
+            "max_csv_cells_per_row": self.max_csv_cells_per_row,
+            "max_csv_total_cells": self.max_csv_total_cells,
+        }
+        for name, value in positive_limits.items():
+            if value <= 0:
+                raise ValueError(f"{name} must be positive")
 
 
 @dataclass(frozen=True)
@@ -67,6 +77,46 @@ def _safe_leaf_filename(filename: str) -> bool:
 
 def _decode_text(data: bytes) -> str:
     return data.decode("utf-8-sig", errors="strict")
+
+
+def _text_line_too_long(text: str, limit: int) -> bool:
+    """Check physical text lines without materializing a split-lines list."""
+    for line in io.StringIO(text):
+        if len(line.rstrip("\r\n")) > limit:
+            return True
+    return False
+
+
+def _inspect_csv(text: str, policy: IngestPolicy, reasons: list[str]) -> None:
+    """Stream logical CSV rows and enforce explicit resource/shape bounds."""
+    row_count = 0
+    total_cells = 0
+    try:
+        reader = csv.reader(io.StringIO(text, newline=""))
+        for row in reader:
+            row_count += 1
+            if row_count > policy.max_csv_rows:
+                reasons.append("csv_row_limit_exceeded")
+                return
+
+            row_cells = len(row)
+            if row_cells > policy.max_csv_cells_per_row:
+                reasons.append("csv_cells_per_row_limit_exceeded")
+                return
+
+            total_cells += row_cells
+            if total_cells > policy.max_csv_total_cells:
+                reasons.append("csv_total_cells_limit_exceeded")
+                return
+
+            if any(len(cell) > policy.max_csv_field_chars for cell in row):
+                reasons.append("csv_field_too_long")
+                return
+    except csv.Error:
+        # Python's csv parser has implementation-level limits and can reject
+        # malformed/oversized records before our per-field check runs. The
+        # boundary must still emit a typed REJECT instead of throwing.
+        reasons.append("csv_parse_error")
 
 
 def inspect_input(
@@ -111,16 +161,16 @@ def inspect_input(
                     reasons.append("xml_entity_rejected")
                 if "\x00" in text:
                     reasons.append("nul_byte_rejected")
-                if any(len(line) > policy.max_text_line_chars for line in text.splitlines()):
+                if _text_line_too_long(text, policy.max_text_line_chars):
                     reasons.append("text_line_too_long")
             elif ext == ".csv":
                 text = _decode_text(data)
                 if "\x00" in text:
                     reasons.append("nul_byte_rejected")
-                if any(len(line) > policy.max_text_line_chars for line in text.splitlines()):
+                if _text_line_too_long(text, policy.max_text_line_chars):
                     reasons.append("text_line_too_long")
-                # Parse once to reject malformed UTF-8/CSV without executing formulas.
-                list(csv.reader(io.StringIO(text)))
+                if not reasons:
+                    _inspect_csv(text, policy, reasons)
             elif ext in {".edi", ".x12"}:
                 text = _decode_text(data)
                 if "\x00" in text:
