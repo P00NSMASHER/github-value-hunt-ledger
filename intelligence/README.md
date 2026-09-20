@@ -154,3 +154,30 @@ The policy is advisory. A named blocker in a P0 experiment can override the gene
 Pull requests recompute and validate all intelligence products without requiring hand-maintained generated files.
 
 After a qualifying push to `main`, the workflow refreshes generated intelligence and commits it with a skip-CI marker. This prevents the dashboard drift that occurred when search runs advanced but the learning report remained stale.
+
+
+## V3 empirical-learning layer
+
+V3 adds measurement structures that prevent several common research-system errors:
+
+- **Canonical query families** — `query_families.jsonl` gives reusable query hypotheses stable `QF:...` IDs while preserving literal queries in each run.
+- **Fractional outcome attribution** — `ATTRIBUTION_REPORT.md` splits realized value across multiple origin runs instead of crediting the same dollars in full to every strategy. This is accounting attribution, not causal proof.
+- **Measurement debt** — `MEASUREMENT_PLAN.md` tracks how many additional measured runs/deep inspections are needed before each strategy can be compared credibly.
+- **Candidate negative training** — `NEGATIVE_TRAINING_REPORT.md` separates controlled rejection/watch reasons from detailed free-form evidence.
+- **Search-surface analytics** — `SURFACE_REPORT.md` measures which discovery surfaces participate in useful runs without pretending multi-surface runs are isolated experiments.
+- **MASTER registry integrity** — the registry now treats `MASTER.md` as authoritative and CI fails if elite promotion counts drift to zero or disagree with the file.
+- **Graph provenance** — query-family, search-surface, candidate and outcome provenance are added to the derived graph.
+
+### V3 prospective run contract
+
+New runs should use `schema_version: 3` and record:
+
+1. `strategy_id`;
+2. `query_family` plus canonical `query_family_id`;
+3. literal `queries` and `search_surfaces`;
+4. candidate/deep-inspection/retention/promotion denominators;
+5. candidate dispositions using a controlled `reason_code_standard` plus detailed `reason_detail`;
+6. capability/experiment deltas;
+7. durable evidence path.
+
+Do not fabricate missing history to make the dashboard look complete. Measurement debt is preferable to invented denominators.
