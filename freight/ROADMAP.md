@@ -45,7 +45,8 @@ Internal commercialization controls now completed:
 - fail-closed incident-response runbook + closure/notification evidence model + tabletop template;
 - Technology Intelligence validation CI pinned to immutable Actions and read-only, with write permission isolated to a main-only persistence job;
 - live Netlify deployment evidence addendum for `freightleak-audit`, including SSO config, zero Forms/env-vars, provider inventory, fail-closed tenant/parser status and completed incident tabletop;
-- final deployment-aware Pilot Launch Gate that prevents a READY buyer from bypassing deployment/data-handling security.
+- final deployment-aware Pilot Launch Gate that prevents a READY buyer from bypassing deployment/data-handling security;
+- structured separate-environment evidence manifest/validator that removes the self-asserted manual-pilot exception.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -64,6 +65,8 @@ Technology Intelligence workflow now separates read-only validation from main-on
 Deployment evidence collected 2026-09-20: Netlify SSO-all is configured, but **Netlify team MFA is not enforced**, no Freight multi-tenant backend/data plane was discovered, and no production parser runtime was discovered. Cross-tenant isolation and parser sandboxing therefore remain **unproven**, not passed.
 
 Current launch classification: **Netlify deployed customer-data pilot = BLOCKED**; **separate controlled environment = CONDITIONAL pending evidence**. The protected Netlify site is a demo/control shell until those gates change.
+
+The separate/manual route stays **CONDITIONAL** until a VERIFIED environment manifest proves MFA, encryption, scoped access, read-only ingestion, retention/deletion, Netlify data exclusion, and any applicable tenant/parser controls.
 
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
