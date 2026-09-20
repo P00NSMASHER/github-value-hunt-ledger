@@ -14,6 +14,7 @@ The bundle contains:
 - security/data-handling and release/security gates;
 - rights registry + rights evidence manifest/promotion rules + release manifest;
 - incident-response runbook + tabletop template;
+- deployment-security evidence addendum + completed Netlify-specific tabletop;
 - deterministic release provenance;
 - exact component inventory;
 - partial CycloneDX 1.6 SBOM;
@@ -49,7 +50,7 @@ The repository bundle intentionally does not contain:
 - executed license/permission documents;
 - buyer-specific contracts/DPAs/security questionnaires;
 - external signing keys/signatures;
-- deployed incident/tabletop evidence;
+- live incident evidence beyond the recorded tabletop;
 - customer notification/legal advice;
 - production SOC/SIEM or WORM exports.
 
