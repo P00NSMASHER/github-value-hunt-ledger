@@ -50,9 +50,27 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 - adamleap02/PermitBuild -> IMPLEMENTS CAP-012.
 - CAP-002 + CAP-012 -> ENABLES Permit-to-Development Opportunity Intelligence -> TESTED_BY EXP-009.
 
-### Lab Automation
+### Lab Automation / Sequencing Operations
 - Benchling-Open-Source/allotropy -> IMPLEMENTS CAP-013.
-- CAP-013 -> ENABLES Installed-Base Lab Automation / Governed Campaign Shadow Audit -> TESTED_BY EXP-007.
+- SemaphoreSolutions/s4-clarity-lib@ad577fff3a3c4c93f4bb898940a0b45268c7dbe7 -> IMPLEMENTS CAP-017.
+- Illumina/interop@015a85ec100c7a770ed0e27ce7fadc6230a38208 -> IMPLEMENTS CAP-017.
+- ORNL/Flowcept -> STRENGTHENS CAP-013 and CAP-017 through provenance/evidence lineage.
+- labscript-suite/labscript-suite + labscript-devices -> CHALLENGES/STRENGTHENS deterministic scientific execution under the broader lab opportunity without displacing the installed-base integration leaders.
+- CAP-013 + CAP-017 -> ENABLES Installed-Base Lab Automation / Sequencing Operations Evidence / Governed Campaign Shadow Audit -> TESTED_BY EXP-007.
+
+### Insurance Subrogation Recovery
+- sidnov6/recoupe@60e0e02bec789ab505752dacfecdd76438aacd48 -> IMPLEMENTS a deterministic subrogation workflow/quantum/evaluation substrate but DEPENDS_ON independently authoritative current rule/policy sources before hard-dollar use.
+- CAP-001 + CAP-006 + CAP-007 + Recoupe deterministic quantum/workflow -> ENABLES Insurance Subrogation Recovery Diagnostic -> TESTED_BY EXP-011.
+- Recoupe illustrative/default jurisdiction rule data -> CHALLENGES the opportunity's authority boundary; unknown/conflicting authority must remain REVIEW/$0 rather than silently default.
+
+### Revenue Decision Assurance
+- GiovanniGatti/talos@41fae94f941ea36fccddd395e86cd5662002e3cb -> STRENGTHENS constrained-capacity/booking-horizon policy evaluation.
+- Dimitres-Kisimov/revops-optimizer + Talos -> ENABLES a broader shadow-mode Revenue Decision Assurance concept; no production-economic claim is accepted without held-out replay against simple/incumbent baselines.
+
+### Money-State / Payment Integrity
+- amrit-kumar/fintechcore@b27a22890e8b5173d2a97be512a198a4564ed425 -> CHALLENGES/STRENGTHENS CAP-016 with append-only ledger, idempotency, settlement and independent reconciliation semantics.
+- The Fintechcore test-deferred ADR -> LIMITS its maturity; it remains a reference/challenger until automated invariant/race/refund/reversal/outbox tests exist.
+- CAP-006 + CAP-016 -> ENABLES Money-State Integrity / Close Assurance -> TESTED_BY EXP-010.
 
 ### Industrial Pre-FAT
 - Gaskony-Ignition/module-plc-emulator -> IMPLEMENTS CAP-014.
@@ -62,9 +80,6 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 - owgreen-dev/grid-crunch -> IMPLEMENTS CAP-015.
 - savabs/queue_attrition -> STRENGTHENS CAP-015.
 - CAP-015 -> ENABLES Queue Materialization Intelligence.
-
-### Cross-vertical Close Assurance
-- CAP-006 + CAP-016 -> ENABLES Money-State Integrity / Close Assurance -> TESTED_BY EXP-010.
 
 ## Graph maintenance rule
 Every MASTER promotion must answer:
