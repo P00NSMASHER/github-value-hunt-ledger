@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.4 candidate
+## Current checkpoint — v15.4
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -27,13 +27,15 @@ Internal commercialization controls now completed:
 - rights-operability registry;
 - repository workflow hardening and pinned CI.
 
+The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
+
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
 ## Next 24 hours — make the asset diligence-ready
 
 ### P0
-1. **DONE:** v15 / v15.1 / v15.2 / v15.3 commercialization and machine-gate PRs merged after CI.
-2. **DONE:** canonical Freight Recovery v15.3 release identity recorded in `freight/RELEASE_MANIFEST.md`.
+1. **DONE:** v15 / v15.1 / v15.2 / v15.3 / v15.4 commercialization, proof and commercial-ops PRs merged after CI.
+2. **DONE:** canonical Freight Recovery v15.4 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. Produce a release manifest with:
    - source commit;
    - exact component revisions;
@@ -42,7 +44,7 @@ Internal commercialization controls now completed:
    - checksums;
    - known limitations.
 4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
-5. **DONE when v15.4 CI passes:** full synthetic readiness → qualification → blind proof → persistent settlement → report rehearsal runs from committed code; this is technical validation only, not external customer proof.
+5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
 
 ### Stop
 - no new generic freight repositories;
@@ -51,8 +53,8 @@ Internal commercialization controls now completed:
 
 ## Next 7 days — make the paid pilot boring to buy
 
-1. Turn the Data Readiness Diagnostic into a repeatable checklist/report template.
-2. Produce a sample blind-pilot report with the four required totals:
+1. **DONE:** Data Readiness Diagnostic is machine-scored with a repeatable delivery specification.
+2. **DONE:** proof-derived pilot report template and synthetic sample semantics cover:
    - reviewed discrepancy;
    - validated finding;
    - challenger-only validated;
