@@ -29,6 +29,8 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [x] CI dependencies are version-pinned.
 - [x] Commercial/runtime/comparator components are represented in the rights registry with exact revisions.
 - [x] Deterministic control-file hashes + component inventory can be regenerated in CI via `freight/release_provenance.py`.
+- [x] Deterministic CycloneDX 1.6-shaped SBOM is generated for pinned Freight repository components + direct pinned CI Python dependencies.
+- [x] Deterministic unsigned in-toto/DSSE-shaped attestation payload is generated and verified in CI; repository output intentionally contains no signature.
 - [ ] Separate executed permission/license documents are stored in the actual buyer/acquirer diligence room.
 
 ### Customer data
@@ -38,6 +40,10 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [x] Proof-layer cross-buyer/BU/shipment negative tests exist.
 - [ ] Cross-tenant negative tests pass against the **actual production database/object-store/API authorization layer** used for customer data.
 - [x] Source manifests require positive retention days; buyer-specific retention/deletion/export terms still must be agreed per engagement.
+- [x] CENSUS/SCOPE/PROOF lifecycle entries derive from the source manifest and retention scope.
+- [x] Delete attempts cannot become `DELETE_CONFIRMED` without explicit external confirmation evidence; ambiguous outcomes remain `DELETE_UNKNOWN`.
+- [x] Source observations distinguish `PRESENT`, `VERIFIED_EMPTY`, and `UNAVAILABLE`; `VERIFIED_EMPTY` requires completeness evidence.
+- [x] Buyer/BU-scoped append-only audit records are hash chained and detect mutation/reordering within the supplied record set.
 - [x] Sources explicitly marked as containing credentials/secrets are rejected from the evidence room.
 
 ### Parsing/untrusted inputs
@@ -70,19 +76,20 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [ ] independent verifier identity with read-only evidence permission;
 - [ ] sandbox/isolation for untrusted code and parsers;
 - [ ] central kill switch/budget limit;
-- [ ] signed release/provenance;
-- [ ] full SPDX/CycloneDX-equivalent SBOM if required by buyer diligence;
+- [ ] externally signed release/provenance using an approved signing identity/key;
+- [x] deterministic CycloneDX-shaped SBOM for current pinned repo components + direct CI dependencies;
+- [ ] complete deployment/transitive SBOM if required by buyer diligence;
 - [ ] backup/restore drill;
-- [ ] audit logging and alerting;
+- [ ] production audit-log persistence, access control and alerting; application-level append-only hash-chain logic is implemented;
 - [ ] customer-specific integration secrets held outside source;
 - [ ] incident-response and breach-notification runbook;
 - [ ] completed security questionnaire / external diligence package.
 
 ## Current claim boundary
 
-The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests and deterministic release/component provenance**.
+The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, tamper-evident application audit records, deterministic release/component provenance, a standards-shaped CycloneDX SBOM and an unsigned in-toto/DSSE payload**.
 
-It does **not** prove a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, transport/storage encryption is configured for a specific buyer, provenance is signed, or any external security certification exists.
+It does **not** prove a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, deletion was executed by a real storage provider, transport/storage encryption is configured for a specific buyer, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
 
 ## Commercial launch rule
 
