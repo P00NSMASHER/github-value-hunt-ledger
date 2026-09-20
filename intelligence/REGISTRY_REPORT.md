@@ -2,13 +2,13 @@
 
 Generated directly from the hunter Markdown corpus; no monolithic registry file is round-tripped through the GitHub connector.
 
-- Repository observations: **1,756**
-- Unique repositories: **1,673**
-- Unique repository/revision keys: **1,681**
-- Observations beyond the first occurrence of a repo/revision: **75 (4.3%)**
+- Repository observations: **1,760**
+- Unique repositories: **1,676**
+- Unique repository/revision keys: **1,684**
+- Observations beyond the first occurrence of a repo/revision: **76 (4.3%)**
 - Repo/revision records with unknown revision: **82**
 - Repositories appearing in more than one catalog/file: **64**
-- Hunter Markdown files scanned: **55**
+- Hunter Markdown files scanned: **56**
 - Current MASTER-promoted repositories: **0**
 - Current MASTER-promoted exact repo/revisions: **0**
 
@@ -19,8 +19,8 @@ MASTER counts below come from `MASTER.md`; all other buckets come from hunter-ca
 | Bucket | Repo/revision records |
 |---|---:|
 | master | 0 |
-| strong | 637 |
-| watch | 462 |
+| strong | 639 |
+| watch | 463 |
 | rejected | 390 |
 | quarantined | 36 |
 | unknown | 156 |
@@ -31,6 +31,7 @@ MASTER counts below come from `MASTER.md`; all other buckets come from hunter-ca
 |---|---|---:|---:|---|
 | GSA/open-gsa-redesign | 494b1312e9c6436474840befe6e1964da15932b3 | 7 | 2 | strong, unknown |
 | Beveren-Software-Inc/Field_Service_Management | ab6d56d1069882326475f256d09cc63236eddec1 | 3 | 3 | strong, watch |
+| OmarRao/r3vp | 404f7f7aaed5b9fbc39506622175d87e628b3054 | 3 | 3 | rejected, strong |
 | ahmadpiran/restoredrill | 4afc9e8864688a6151c25e8d6cc5370332feecad | 3 | 2 | strong, watch |
 | danieltamas/fortified | c677ef30f750e1cc0b761dd9eed3bab2b40d18f4 | 3 | 3 | strong |
 | databricks-industry-solutions/lakehouse-industry-data-models | 0157d62384960d2e0efafdaf3e7c9f9062cdcc28 | 3 | 3 | rejected, watch |
@@ -48,7 +49,6 @@ MASTER counts below come from `MASTER.md`; all other buckets come from hunter-ca
 | MassingCloud/massing-pdf | 36794b3c54fcfd62e3a0d2d5984cfc45cac83340 | 2 | 2 | strong |
 | MuhDur/invoicekit | 8a9e8d74e23ab97742d56d1dfabe77a9330ec61e | 2 | 2 | strong, watch |
 | ND3404/construction-change-order-rfi-analytics | 93522c5b59738d7147e7a50a8c7052b8537d210f | 2 | 2 | watch |
-| Nandanhegde1/govai-contracts | d419e9f42bf7fae6fc465800b431eceffaec6148 | 2 | 1 | strong, unknown |
 
 ## Interpretation
 
