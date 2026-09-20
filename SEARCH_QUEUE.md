@@ -60,21 +60,23 @@ Use PMIS for agreement-BOQ/rate/cumulative/certification authority; Nirman for a
 **Stop:** generic pay-app/RA-bill CRUD, takeoff/diff and internal payment labels.
 
 ## 5. Recovery Proof — P0/P1 / EXP-004
-**Bottleneck:** independently authoritative denominator, identity-correct census, versioned proof-policy authority and verifier self-test.
+**Bottleneck:** independently authoritative denominator, identity-correct census, versioned proof-policy currentness, typed proof admission and verifier self-test.
 
 Treat recovery coverage as four governed planes: **OBSERVATIONS -> IDENTITY AUTHORITY -> SCOPE -> PROOF**. Preserve raw cloud/control-plane, endpoint/EDR and scanner/network observations immutably; canonical workload identity is a revisable interpretation. A contradictory concurrently fresh strong identifier is a hard non-merge state, not another weighted feature. Hostname/IP/MAC evidence may propose a relationship but may not overrule conflicting cloud instance/agent/device authority.
 
 **Mandatory identity corpus before signing the expected-subject denominator:** same hostname + same public IP + different fresh cloud instance IDs => `IDENTITY_CONFLICT`; same cloud instance + rotated EDR agent => allowed relationship with rotation history; weak-only hostname/scanner evidence => `AMBIGUOUS_REVIEW`; two canonicals claiming the same hard ID => duplicate-authority conflict; source outage/partial collection => `UNOBSERVED/PARTIAL` and non-green denominator. Require durable terminal states such as `MATCHED`, `AMBIGUOUS_REVIEW`, `IDENTITY_CONFLICT`, `SOURCE_DISAGREEMENT`, and `UNOBSERVED/PARTIAL` before scope publication.
 
-Now bind the resulting proof decision to a **versioned authority envelope**. Use `foundriesio/aktualizr-lite@1d089b006295cd924b3c87337679fef7295e4329` and `uptane/aktualizr@e5118a74874c0561ebac57560c667c18b19d984b` only as cross-domain trust-model oracles: trusted root/role -> subject obligation -> evidence catalog -> coherent snapshot versions -> freshness -> highest-seen anti-rollback state. They do not supply recovery-policy substance.
+Bind the resulting proof decision to a **versioned authority envelope**. Use `foundriesio/aktualizr-lite@1d089b006295cd924b3c87337679fef7295e4329` and `uptane/aktualizr@e5118a74874c0561ebac57560c667c18b19d984b` as cross-domain currentness/rollback oracles only. Add `carabiner-dev/ampel@5cf19bc2786cbd73a8423383a966fbf842222d23` as a proof-admission accelerator for signer binding, policy expiry, explicit PASS/FAIL/SKIP and signed result output; add `in-toto/in-toto@e352b43ad7cb8915d84c36d791aa61346152a0a3` for authorized-functionary thresholds/artifact agreement. Preserve Sigstore's recurring signed-but-wrong-predicate failure class as a defensive negative oracle and require current exact predicate/type checks. None of these defines recovery-policy substance.
 
-**Mandatory proof-authority negatives:** `tampered_policy_metadata`; `expired_policy_metadata`; `policy_version_rollback`; `snapshot_mix`; `wrong_authority_role`. A valid evidence hash under stale/mixed/wrong-role policy is non-green even when the underlying restore is technically successful.
+**Mandatory proof-admission negatives:** `tampered_policy_metadata`; `expired_policy_metadata`; `policy_version_rollback`; `snapshot_mix`; `wrong_authority_role`; `wrong_predicate_type`; `threshold_shortfall`; `skip_exit_zero`. A cryptographically valid evidence object is non-green when policy is stale/mixed, the signer role is wrong, the requested evidence type is absent, threshold is incomplete or semantic result is SKIP—even if the wrapper process exits successfully.
 
 Then run missing expected subject, stale inventory, silent disappearance, scope-selector mismatch, aggregate-mask, service-up/data-wrong, rc=0/wrong-value, proof-sink failure, cleanup failure and deliberately broken verifier across PostgreSQL plus one dual-plane workload.
 
-**Search only:** exact stable-identity conflict handling, collector-run completeness/provenance, tombstones/exclusions or signed snapshot provenance if this matrix exposes a missing component. `apurvtyagi/security-asset-correlator@36aef11...` remains a useful component/negative oracle because its weighted matcher can still merge contradictory hard IDs; `opsmill/infrahub-sync@76ab2b...` is useful collector provenance, not identity authority.
+**Do next:** wrap one actual EXP-004 restore-proof artifact in the integrated admission matrix. One fresh coherent correct bundle should become PROVEN; all eight negatives must fail for the intended reason. Durable publication should emit a current in-toto SVR v0.2-style summary carrying exact policy ResourceDescriptors/digests and point to the deeper signed proof bundle. `SVR/VSA` is a summary/index, not replacement evidence.
 
-**Stop:** broad asset-inventory/CMDB/recovery-framework or OTA/update-framework search. First-match, confidence-only, “highest score wins” identity logic and signature-only currentness claims are negative-control material, not denominator/proof authority.
+**Search only:** exact stable-identity conflict handling, collector-run completeness/provenance, tombstones/exclusions or a concrete proof-admission/currentness gap exposed by the matrix. Do not search another generic attestation/update framework before the integrated test.
+
+**Stop:** broad asset-inventory/CMDB/recovery-framework or OTA/update-framework search. First-match, confidence-only, “highest score wins” identity logic, signature-only currentness, process-exit-as-PASS and signed-but-wrong-type evidence are negative-control material, not denominator/proof authority.
 
 ## 6. CaptureBrief — P0/P1 / EXP-006
 **Bottleneck:** lossless packet/history authority, not another SAM wrapper.
@@ -154,7 +156,7 @@ Do not spend the wildcard slot on a familiar saturated family solely because it 
 - Generic freight systems, reconciliation engines, OCR/rating components.
 - Generic AP matchers/OCR/RPA before EXP-002.
 - Generic commission calculators/statement parsers.
-- Generic backup frameworks, broad CMDB/asset-inventory matching and additional OTA/update frameworks before the EXP-004 identity/coverage/authority matrix.
+- Generic backup frameworks, broad CMDB/asset-inventory matching and additional OTA/update/attestation frameworks before the EXP-004 identity/coverage/currentness/typed-admission matrix.
 - Generic construction pay-app CRUD before EXP-005.
 - Generic SAM/FAR wrappers before EXP-006.
 - Broad lab frameworks and chromatography-converter hunting before EXP-007 bounded tests.
