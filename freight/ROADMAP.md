@@ -40,7 +40,10 @@ Internal commercialization controls now completed:
 - deterministic unsigned in-toto/DSSE-shaped attestation payload ready for external signing;
 - persistent buyer/BU-scoped SQLite audit store with immutable UPDATE/DELETE triggers and serialized appends;
 - semantic backup/restore drill across audit + settlement state;
-- deterministic zero-customer-data buyer/acquirer diligence ZIP with per-entry checksums.
+- deterministic zero-customer-data buyer/acquirer diligence ZIP with per-entry checksums;
+- evidence-backed rights promotion manifest/validator that prevents hosted/SaaS/assignment/change-of-control claims without verified executed-evidence metadata;
+- fail-closed incident-response runbook + closure/notification evidence model + tabletop template;
+- Technology Intelligence validation CI pinned to immutable Actions and read-only, with write permission isolated to a main-only persistence job.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -52,6 +55,8 @@ v15.6 Freight CI run `35524672964` passed the full Freight suite, controlled-pil
 
 v15.7 Freight CI run `35525286692` passed the full Freight suite plus deterministic provenance, CycloneDX SBOM and unsigned DSSE generation/verification.
 
+Technology Intelligence workflow now separates read-only validation from main-only write persistence and pins checkout/setup-python to immutable SHAs.
+
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
 ## Next 24 hours — make the asset diligence-ready
@@ -60,7 +65,7 @@ v15.7 Freight CI run `35525286692` passed the full Freight suite plus determinis
 1. **DONE:** v15 through v15.7 commercialization, proof, adaptive-authorization, commercial-learning, pilot-security, lifecycle/audit and supply-chain diligence PRs merged after CI.
 2. **DONE:** canonical Freight Recovery v15.7 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
-4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
+4. **DONE internally:** rights evidence manifest + fail-closed promotion validator. **OPEN externally:** attach/verify the actual executed Trenova/Opstrax permission documents and resolve hosted/SaaS/change-of-control scope.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
 
 ### Stop
@@ -112,7 +117,7 @@ Subject to explicit user approval for outreach/data access:
    - **DONE internally:** rights registry + partial SBOM + deterministic diligence ZIP;
    - **OPEN externally:** signed provenance/trusted timestamp;
    - **DONE internally:** data-retention/deletion semantics;
-   - **OPEN:** incident-response operating plan/evidence;
+   - **DONE internally:** incident-response/breach-decision runbook + machine closure/notification rules; **OPEN externally:** deployed contact tree/alerting and completed tabletop or incident exercise evidence;
    - **DONE internally:** semantic reference backup/restore proof;
    - **OPEN deployment-specific:** access-control/cross-tenant, backup scheduling/RPO/RTO and production audit-service evidence.
 7. Keep success-fee attribution subordinate to the settlement proof engine.
