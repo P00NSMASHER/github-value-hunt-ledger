@@ -342,3 +342,84 @@ No repository code, provider mutation or credentialed external action was execut
 **REFERRALS:** No new referral. The existing external provider/system-of-record readback referral remains precise; this run adds evidence that live smoke alone still leaves the ambiguity gap open.
 
 **NEXT TEST:** Find a lawful public component or evidence record with a **controlled post-dispatch response-loss seam** against a real provider/sandbox, where the original action is externally visible after restart and a read-only lookup proves convergence without a second money effect. If none exists after repeated targeted runs, treat the absence itself as durable negative knowledge and shift toward building a safe qualification harness rather than hunting indefinitely.
+
+## 2026-09-20 — Shadow run 6
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** A verifier-passable upgrade exists in a low-attention repository whose test harness performs a real provider-sandbox money mutation, deliberately suppresses the response only after provider commit, persists/quarantines the ambiguous local state, then uses a later read-only provider observation to converge without issuing a second mutation. Literal OS process restart is a separate proof obligation and must not be inferred from a fresh recovery invocation.
+
+**DISCOVERY METHODS:**
+1. Direct problem search for post-dispatch response loss, payment/refund reconciliation, provider idempotency and ambiguous outcomes.
+2. Code/invariant search for `drop response after commit`, `SIMULATED_LOST_RESPONSE`, stable provider idempotency, recovery-blocked/unknown states and retrieve-before-retry logic.
+3. Real-environment/fault-seam search for Stripe test-mode/sandbox integration tests that wrap the production provider adapter, mutate first, throw second, then reconcile from provider state.
+
+**BEST CANDIDATE + URL + EXACT REVISION:** `mileswallace06/peanutgalleryfinal` — https://github.com/mileswallace06/peanutgalleryfinal — `ebe3df6ad36b159e26d11adda7498c99a801d9c5`.
+
+**IMPLEMENTED:**
+- `base44/shared/stripeCancelProvider.js` is the shared production Stripe cancellation adapter. It retrieves the exact PaymentIntent first; cancellable states are canceled using a supplied stable Stripe idempotency key, already-canceled state returns success without a second cancel, captured/succeeded state fails closed, and retrieve/cancel network uncertainty maps to `unknown`.
+- `base44/shared/abortCanaryOrchestrator.js` begins a durable cancel action before provider entry, carries the stable Stripe idempotency identity, invokes the provider outside Postgres, records `succeeded|failed|unknown`, and fail-closes unknown/failed results into `recovery_blocked` state rather than releasing the reservation.
+- On a later invocation with `recovery_blocked=true`, the orchestrator resolves the pre-existing action, skips `begin_cancel`, reuses the original action/idempotency identity, calls the provider adapter once, and records the reconciled result. The provider adapter itself retrieves first, so an externally canceled PaymentIntent is observed as already canceled with no second cancel API call.
+- The schema makes ambiguity durable rather than cosmetic: payment bindings include `cancel_requested`, `cancel_unknown`, `cancel_failed`, `canceled`; payment actions include `pending`, `in_flight`, `succeeded`, `failed`, `unknown`, a unique Stripe idempotency key, leasing/crash-recovery fields and partial unique indexes preventing concurrent pending cancel/capture/refund actions per purchase.
+
+**REAL PROVIDER TEST / EXTERNAL EVIDENCE:**
+- `tests/abort-canary-real-stripe.test.mjs` explicitly targets the same production routing seam and production provider adapter. It creates real Stripe **TEST-mode** manual-capture PaymentIntents (`livemode=false`). Its observability wrapper first awaits the real adapter's successful cancel and only then throws `SIMULATED_LOST_RESPONSE`; therefore the external provider mutation has occurred before the application loses the response.
+- T3 then verifies the first invocation becomes `cancel_unknown`, `recovery_blocked`, binding=`cancel_unknown`, with exactly one real cancel. A second invocation uses a **fresh adapter instance**, reads the persisted authority/action state, retrieves Stripe's actual PaymentIntent state, observes `canceled`, clears recovery blocking, resolves the incident and asserts **zero additional cancel calls** plus one provider retrieve.
+- T1/T2 separately assert one real cancel, provider readback and replay with no additional provider mutation. The checked-in certification manifest records `real-Stripe abort 92/92` and describes the exact suite as “lost-response reconcile without recancel”; it also explicitly limits certification to Stripe test mode and keeps the canary flag OFF for production/live money.
+- A sibling real-Stripe capture harness independently contains the same mutate-then-throw fault shape (`throwAfterCapture` after successful provider capture), which is useful evidence that the pattern is not unique to cancellation, although this run's verifier claim remains scoped to cancellation.
+
+**SOURCE / TEST / SCHEMA / HISTORY VERIFICATION:**
+- Production adapter source verified: `base44/shared/stripeCancelProvider.js`.
+- Orchestration/recovery source verified: `base44/shared/abortCanaryOrchestrator.js`.
+- Real-provider test source verified: `tests/abort-canary-real-stripe.test.mjs`.
+- Durable-state schema verified: `database/authority_v1/001_schema.sql`.
+- Revision-bound certification record verified: `src/docs/AUTHORITY_V1_CANARY_CERTIFICATION.md`.
+- History independently shows commit `d2fe443b40e07bbc79bbfc20a1bcea45d6f1081f` on 2026-08-31 with message **“Implement real Stripe checkout abort functionality”** introducing the real-Stripe abort test path; current inspected HEAD is `ebe3df6ad36b159e26d11adda7498c99a801d9c5` dated 2026-09-17.
+- Repository metadata at inspection: 0 stars / 0 forks; GitHub public license metadata is null.
+
+**CLAIMED / PLANNED / UNKNOWN:**
+- The strongest run hypothesis is only **partially** proven. T3 is a real Stripe test-mode post-dispatch response-loss + later-provider-readback/no-recancel proof, but the second phase is a later invocation with a fresh adapter inside the same test process; it is **not** a literal OS process kill/restart test.
+- The 92/92 certification result is a checked-in, self-authored certification record. I did not find a separate machine-readable raw P0-01P result artifact at the exact revision, and the credentialed suite was not independently rerun in this shadow pass.
+- The canary route is explicitly flag-OFF and live Stripe is explicitly **not certified**. No real customer money, real customer data, bank settlement, recovered dollars or ROI is proven.
+- Public repository licensing is `no detected public license`; the user's standing separate commercial-code authorization is the repository-code working assumption only and does not extend to Stripe services/data.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:75b1280a0e8433519728c59ceea4b819bca5c0cd0fcb64312102e1d45f3fd1bf`, binding exact revision to:
+- `tests/abort-canary-real-stripe.test.mjs` — Git blob `e23c824c0c3a935a27de8d94b7d6810a68016dd5`
+- `base44/shared/stripeCancelProvider.js` — `7ecf1d11bdf9daf3868b343702dbde64aea608d6`
+- `base44/shared/abortCanaryOrchestrator.js` — `0f691315e5d7f6a0c2412ad0fdbd762643b3474a`
+- `database/authority_v1/001_schema.sql` — `1853674c35c3d2554a071cbb0dd527f6c9a0cd74`
+- `src/docs/AUTHORITY_V1_CANARY_CERTIFICATION.md` — `46382f8eebe9e223369ea9b1bed661660d448f76`
+- feature-lineage commit `d2fe443b40e07bbc79bbfc20a1bcea45d6f1081f`.
+No repository code, Stripe mutation, credentials, contacts, spend or commitments were executed by this shadow run.
+
+**COMPARATORS / FALSIFIERS:**
+- `nidhi1603/proofcart@52d978bb4c2e5f4f9db4446d90c949ee14a0b1a4` implements a strong dropped-response-after-create simulator and a real Stripe test-mode rail, but its README explicitly says the dangerous dropped-response proof is deterministic/local and the live demo **skips** the response-drop test to avoid a second real charge. It also explicitly says a real OS process kill/restart is not tested. This makes it a good architecture comparator but weaker external evidence than the selected candidate.
+- Run-5 `revaly-co/RAP-sdk@b0c7f0e80042f654155d72c7663340f46985865e` has stronger multi-language checked-in live-provider smoke evidence and cleaner Apache-2.0 provenance, but its dangerous `OutcomeUnknown` row is explicitly skipped because no deterministic live trigger exists. PeanutGallery closes that specific gap for Stripe cancellation by mutating a real test-mode object, suppressing the response after success, and reconciling later without recanceling.
+- The closest cheaper alternative is a normal durable command table + one provider idempotency key + retrieve-before-retry worker. The selected candidate's extra value is the concrete real-provider ambiguity certification path, not the general architecture alone.
+
+**RED-TEAM OBJECTION:** The repository is easy to over-promote because “fresh adapter on second invocation” can sound like “process restart.” It is not. The harness preserves durable Postgres state across two calls but does not kill and restart the runtime process around the provider boundary. The 92/92 claim is self-authored and was not independently rerun here; live Stripe remains uncertified; the production canary is flag-OFF; and cancellation of an uncaptured test PaymentIntent is economically safer than proving a refund or captured-charge correction after money has settled. Evidence that would reverse these limits: a committed runner that terminates the application process immediately after the real provider mutation, restarts against the same durable DB, performs read-only provider reconciliation, proves no second mutation, and emits a revision-bound machine-readable attestation.
+
+**INDEPENDENT VERIFIER VERDICT:** **PASS_WITH_LIMITS.** On the frozen evidence packet, the narrow claim passes: this exact revision contains a production-shared Stripe test-mode cancellation path where a real provider mutation completes, the response is deliberately lost afterward, the application durably records an unknown/recovery-blocked state, and a later fresh recovery invocation observes provider state and resolves without a second cancel. The verifier **does not** accept stronger wording such as “OS crash/restart proven,” “live-money certified,” “bank-settled,” “independently attested 92/92,” or “production enabled.” No sensitive-source material was used.
+
+**A-F SCORE (proposed only, after verifier):** **26/30 — A4 / B5 / C5 / D5 / E4 / F3.**
+- A4: a provider-outcome qualification audit can be sold as a bounded sandbox/read-only reliability engagement without moving live money.
+- B5: duplicate money effects and unresolved provider ambiguity are high-value payments/recovery risks.
+- C5: compresses durable action state, idempotency, incident quarantine, provider readback, concurrency controls and qualification-harness design.
+- D5: a zero-star repository with a real-provider mutate-then-lose-response test and no-second-mutation reconciliation is unusually rare.
+- E4: source/test/schema/history plus a checked-in certification manifest are strong, but the 92/92 result was not independently rerun and literal process restart is missing.
+- F3: no detected public license, production canary remains OFF and live Stripe is uncertified; standing commercial repository-code authorization does not solve external-service operability.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments/billing engineering lead, fintech platform owner, or Controller/RevOps team operating refunds, cancellations or corrective money actions.
+- Pain: network/process failures after provider commit create the worst retry ambiguity—teams cannot tell whether to retry, quarantine or reconcile, and a wrong choice can duplicate a refund/charge or strand an obligation.
+- First paid wedge: a **Payment Mutation Ambiguity Certification** for one existing Stripe/test-provider workflow. Instrument the real sandbox path, persist the command before dispatch, intentionally suppress the response after a safe test-mode mutation, verify durable UNKNOWN quarantine, perform a later read-only provider observation and certify no duplicate effect. Deliver a failure matrix plus the exact rows that remain unproven; do not touch live money in the first engagement.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** This materially upgrades runs 4-5. Auths supplies the stronger generic durable `OutcomeUnknown`/bounded-capacity state model; RAP supplies multi-runtime live-smoke/readback evidence; PeanutGallery supplies the missing **real Stripe test-mode post-dispatch response suppression → durable unknown → later provider readback → zero second mutation** example. The combined target stack is now much more concrete, but a literal process-kill restart and externally sourced contract/bank authority remain open.
+
+**SEARCH EFFORT / COST PROXIES:** 3 materially different discovery modes; about 8 targeted public search formulations; 3 serious candidates/comparators inspected; exact source/test/schema/history and repository metadata verified; roughly 45 connector/tool calls including shadow-memory reads and evidence freezing; 0 untrusted-repository code executions, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** `SK-COM-003` transferred to a second distinct shadow run and is now eligible for separate Skill Promoter review, but remains **LOCAL**. Refine the external-outcome ladder: tier 5 should split into **5A = real-provider post-dispatch response suppression + later fresh-invocation readback + no second mutation** and **5B = literal process termination/restart across the boundary + durable-state recovery + provider readback + no second mutation**. This run reaches 5A, not 5B. Do not let “new adapter instance” silently become “process restart.”
+
+**REFERRALS:** No new cross-lane referral. Existing provider/system-of-record readback referrals remain valid; this run partially answers them with a concrete Stripe test-mode pattern rather than creating a duplicate referral.
+
+**NEXT TEST:** Find or build evidence for **tier 5B**: a lawful public test/certification that kills the process immediately after a real sandbox/provider mutation, restarts against the same durable state, performs read-only provider reconciliation and proves zero duplicate money effects. Separately, test whether the same pattern exists for refunds/credits after captured money rather than only cancellation of an uncaptured PaymentIntent.
