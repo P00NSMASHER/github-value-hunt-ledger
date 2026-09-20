@@ -42,3 +42,17 @@ The packet intentionally excludes internal analyst-cost, delivery-budget and tar
 The packet inherits launch remediation from `freight/launch_brief.py` and source semantics from `freight/pilot_package.py` / `PILOT_DATA_ROOM.md`.
 
 Editing the packet cannot close a launch blocker. The underlying evidence must change and the machine launch gate must be rerun.
+
+## Next layer — Pilot Charter
+
+The Activation Packet is the buyer-safe handoff, but it does not freeze a
+specific engagement.
+
+`freight/pilot_charter.py` binds the activation hash to the exact engagement
+scope, fee, date range, carriers/modes, buyer truth owner, buyer action approver
+and operating acknowledgments.
+
+A blocked/conditional launch may become **PRELAUNCH_ACCEPTED**, but only a
+machine-READY launch can become **KICKOFF_AUTHORIZED**.
+
+The charter never authorizes carrier/vendor contact or money-moving action.
