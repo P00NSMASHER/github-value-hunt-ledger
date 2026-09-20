@@ -2,13 +2,13 @@
 
 Generated directly from the hunter Markdown corpus; no monolithic registry file is round-tripped through the GitHub connector.
 
-- Repository observations: **1,760**
-- Unique repositories: **1,676**
-- Unique repository/revision keys: **1,684**
+- Repository observations: **1,763**
+- Unique repositories: **1,679**
+- Unique repository/revision keys: **1,687**
 - Observations beyond the first occurrence of a repo/revision: **76 (4.3%)**
 - Repo/revision records with unknown revision: **82**
 - Repositories appearing in more than one catalog/file: **64**
-- Hunter Markdown files scanned: **56**
+- Hunter Markdown files scanned: **57**
 - Current MASTER-promoted repositories: **0**
 - Current MASTER-promoted exact repo/revisions: **0**
 
@@ -19,7 +19,7 @@ MASTER counts below come from `MASTER.md`; all other buckets come from hunter-ca
 | Bucket | Repo/revision records |
 |---|---:|
 | master | 0 |
-| strong | 639 |
+| strong | 642 |
 | watch | 463 |
 | rejected | 390 |
 | quarantined | 36 |
