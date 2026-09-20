@@ -116,4 +116,4 @@ Report four separate totals:
 3. challenger-only validated dollars;
 4. uniquely attributable realized dollars.
 
-Never collapse these into one "savings" number.
+Never collapse these into one "savings" number. The canonical report template is `freight/PILOT_REPORT_TEMPLATE.md`; `freight/pilot_reporting.py` derives the totals from the frozen proof objects. Fee-eligible realized dollars are reported separately from buyer savings and incumbent-known findings are automatically excluded from fee eligibility when the ledger is bound to the frozen incumbent output.

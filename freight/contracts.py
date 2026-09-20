@@ -324,8 +324,16 @@ def open_incumbent_output(
 
 
 class RecoveryLedger:
-    def __init__(self, truth: TruthManifest):
+    def __init__(self, truth: TruthManifest, incumbent: IncumbentOutput | None = None):
+        if incumbent is not None:
+            if incumbent.truth_hash != truth.truth_hash:
+                raise ValueError("incumbent output is not bound to this truth manifest")
+            if incumbent.population_hash != truth.population_hash:
+                raise ValueError("incumbent output is not bound to this population")
         self._findings = {finding.finding_id: finding for finding in truth.findings}
+        self._incumbent_finding_ids = (
+            frozenset(incumbent.finding_ids) if incumbent is not None else frozenset()
+        )
         self._allocations: dict[str, list[SettlementAllocation]] = {
             finding_id: [] for finding_id in self._findings
         }
@@ -372,7 +380,8 @@ class RecoveryLedger:
         allocated = min(event.amount_cents, remaining)
 
         disqualified = (
-            event.incumbent_preidentified
+            finding.finding_id in self._incumbent_finding_ids
+            or event.incumbent_preidentified
             or event.automatic_credit
             or event.preexisting_credit
         )
