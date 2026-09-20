@@ -3,7 +3,7 @@
 Integrator-owned search and validation direction. Updated 2026-09-20. **Experiment bottlenecks, independent falsification, source authority and outcome evidence outrank repository count.** This file is current direction, not history; older overrides remain in Git history and hunter catalogs.
 
 ## Operating rules for all 14 workstreams
-- Review `intelligence/ALLOCATOR_LEARNING_REPORT.md` before coordinated cycles. V10 may move at most one slot among experiment/coverage/adjacency after sufficient attributed evidence; measurement, verification and wildcard remain protected. Manual overrides must be explicit and do not train the automatic portfolio learner.
+- Review `intelligence/ALLOCATOR_LEARNING_REPORT.md` before coordinated cycles. V10 may move at most one slot among experiment/coverage/adjacency after sufficient attributed evidence; measurement, verification and wildcard remain protected. Manual overrides must be explicit and do not train the automatic portfolio learner. **Current report has 0 attributed assignment runs and no role with sufficient evidence, so no portfolio-capacity shift is justified yet.**
 - Start each coordinated cycle from `intelligence/HUNT_PLAN.md`; preserve the V9 slot assignment/provenance unless an explicit higher-priority experiment need overrides it.
 - Check coverage/saturation/adjacency/measurement reports, but quotas never override technical or commercial value.
 - Deduplicate by repository + exact revision + capability.
@@ -52,11 +52,17 @@ Use PMIS for agreement-BOQ/rate/cumulative/certification authority; Nirman for a
 **Stop:** generic pay-app/RA-bill CRUD, takeoff/diff and internal payment labels.
 
 ## 5. Recovery Proof — P0/P1 / EXP-004
-**Bottleneck:** independently authoritative denominator plus verifier self-test.
+**Bottleneck:** independently authoritative denominator, identity-correct census and verifier self-test.
 
-Freeze separate CENSUS / SCOPE / PROOF planes. Run missing expected subject, stale inventory, silent disappearance, scope-selector mismatch, aggregate-mask, service-up/data-wrong, rc=0/wrong-value, proof-sink failure, cleanup failure and deliberately broken verifier across PostgreSQL plus one dual-plane workload.
+Treat recovery coverage as four governed planes: **OBSERVATIONS -> IDENTITY AUTHORITY -> SCOPE -> PROOF**. Preserve raw cloud/control-plane, endpoint/EDR and scanner/network observations immutably; canonical workload identity is a revisable interpretation. A contradictory concurrently fresh strong identifier is a hard non-merge state, not another weighted feature. Hostname/IP/MAC evidence may propose a relationship but may not overrule conflicting cloud instance/agent/device authority.
 
-**Search only:** stable multi-source inventory identity, tombstones/exclusions or snapshot provenance if the matrix exposes a real missing component.
+**Mandatory identity corpus before signing the expected-subject denominator:** same hostname + same public IP + different fresh cloud instance IDs => `IDENTITY_CONFLICT`; same cloud instance + rotated EDR agent => allowed relationship with rotation history; weak-only hostname/scanner evidence => `AMBIGUOUS_REVIEW`; two canonicals claiming the same hard ID => duplicate-authority conflict; source outage/partial collection => `UNOBSERVED/PARTIAL` and non-green denominator. Require durable terminal states such as `MATCHED`, `AMBIGUOUS_REVIEW`, `IDENTITY_CONFLICT`, `SOURCE_DISAGREEMENT`, and `UNOBSERVED/PARTIAL` before scope publication.
+
+Then run missing expected subject, stale inventory, silent disappearance, scope-selector mismatch, aggregate-mask, service-up/data-wrong, rc=0/wrong-value, proof-sink failure, cleanup failure and deliberately broken verifier across PostgreSQL plus one dual-plane workload.
+
+**Search only:** exact stable-identity conflict handling, collector-run completeness/provenance, tombstones/exclusions or signed snapshot provenance if this matrix exposes a missing component. `apurvtyagi/security-asset-correlator@36aef11...` is a useful component/negative oracle because its weighted matcher can still merge contradictory hard IDs; `opsmill/infrahub-sync@76ab2b...` is useful collector provenance, not identity authority.
+
+**Stop:** broad asset-inventory/CMDB/recovery-framework search. First-match, confidence-only or “highest score wins” identity logic is negative-control material, not denominator authority.
 
 ## 6. CaptureBrief — P0/P1 / EXP-006
 **Bottleneck:** lossless packet/history authority, not another SAM wrapper.
@@ -68,13 +74,17 @@ Live SAM fixture `W50S8B-26-Q-A016` proved: same filename can mean different `re
 **Stop:** generic SAM/FAR dashboards. Search only successor/deviation authority or a concrete history-loss gap.
 
 ## 7. Installed-Base Lab / Sequencing — P1 / EXP-007
-**Bottleneck:** durable external execution receipt under pre-confirmation ambiguity.
+**Bottleneck:** durable external execution receipt under pre-confirmation ambiguity, with client restart separated from server-lifetime restart.
 
-Current MADSci SiLA path does not make client `action_id` equal the server-assigned CommandExecutionUUID; correlation is in memory only after the SDK call returns. Test seven branches: provably not accepted; accepted/effect started but confirmation lost; confirmation then crash before receipt persistence; persisted APPLIED; authoritative NOT_APPLIED; client restart while execution identity remains valid; server restart/lifetime expiry.
+Current MADSci SiLA path does not make client `action_id` equal the server-assigned CommandExecutionUUID; correlation is in memory only after the SDK call returns. Current `sila2` 0.14.0 documentation exposes `ClientObservableCommandInstance(..., execution_uuid, lifetime_of_execution=...)`, so a **client-only restart** is now a concrete rebind test when the CommandExecutionUUID was durably captured and the same server execution lifetime remains authoritative. Official SiLA semantics make `ServerUUID` stable across server lifetimes while CommandExecutionUUID is lifetime-scoped; same ServerUUID after server restart therefore does not make an old command receipt valid.
+
+**Execute seven branches:** provably not accepted => `SAFE_TO_REISSUE`; accepted/effect may have started but confirmation lost => `RECONCILIATION_REQUIRED`; confirmation received but client dies before durable receipt => `RECONCILIATION_REQUIRED`; durable receipt + positive same-operation readback => `CONFIRMED_APPLIED`; durable receipt + bounded authoritative NOT_APPLIED => `SAFE_TO_REISSUE`; client process restart with valid persisted receipt/server lifetime => reconstruct/query the same operation, no redispatch; server restart or execution-lifetime expiry => `RECONCILIATION_REQUIRED`, never infer NOT_APPLIED.
+
+Persist at minimum `(client_intent_id, intent_hash, server_uuid, feature_fqi, command_identifier, command_execution_uuid, lifetime_of_execution, receipt_received_at, receipt_durable_at, client_runtime_version, sila_runtime_version, reconciliation_state, last_authoritative_readback_at)`. Pin the exact SiLA runtime during acceptance; do not transfer semantics from legacy `sila2` to the actively maintained UniteLabs lineage without a fresh matrix.
 
 Use `auths-dev/auths-proof@34fa1f33...` only as a transfer oracle for the alternative pattern “stable pre-dispatch business reference + provider-searchable metadata + idempotency + read-only reconciliation”; require equivalent device/server semantics before transferring it.
 
-**Stop:** broad lab-device/orchestrator discovery until the ambiguity matrix runs.
+**Stop:** broad lab-device/orchestrator discovery until the real process-kill/rebind ambiguity matrix runs. Stable endpoint/server identity is not operation identity.
 
 ## 8. Insurance Subrogation — P1 / EXP-011
 Search only authoritative versioned jurisdiction/policy rules, precedence, limitations/fault effective periods and closed-claim settlement evidence. Missing/conflicting/superseded authority = REVIEW / $0. Stop generic claims AI/demand-letter tooling.
@@ -125,7 +135,7 @@ Do not spend the wildcard slot on a familiar saturated family solely because it 
 - Generic freight systems, reconciliation engines, OCR/rating components.
 - Generic AP matchers/OCR/RPA before EXP-002.
 - Generic commission calculators/statement parsers.
-- Generic backup frameworks before EXP-004.
+- Generic backup frameworks **and broad CMDB/asset-inventory matching** before the EXP-004 identity/coverage matrix.
 - Generic construction pay-app CRUD before EXP-005.
 - Generic SAM/FAR wrappers before EXP-006.
 - Broad lab frameworks before EXP-007 ambiguity execution.
