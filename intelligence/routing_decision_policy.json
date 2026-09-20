@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "score_tolerance": 0.000001,
+  "max_exact_workers": 16,
+  "guardrails": [
+    "V14 is evidence-only and must not modify worker routing or execution claims.",
+    "The chosen routing must be independently re-solved from routing_candidates.jsonl.",
+    "Pair criticality is the global score loss when the chosen pair is forbidden and the full matching is re-optimized.",
+    "Local next-best scores are descriptive and may exceed the chosen local edge because the chosen route optimizes the global matching.",
+    "No causal regret claim is allowed; V14 preserves feasible alternatives for later matched experiments."
+  ]
+}
