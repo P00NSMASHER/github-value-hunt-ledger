@@ -8,6 +8,21 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 PRIORITY_ORDER={"P0":0,"P1":1,"P2":2}
+ACTION_ORDER={
+    "deployment_team_mfa_not_enforced": 10,
+    "deployment_evidence_missing": 20,
+    "deployment_evidence_expired": 21,
+    "deployment_access_control_not_proven": 22,
+    "deployment_sso_not_required": 23,
+    "customer_data_plane_not_discovered": 30,
+    "cross_tenant_isolation_not_proven": 40,
+    "parser_sandbox_not_proven": 50,
+    "buyer_authorization_missing": 60,
+    "controlling_authority_not_reconstructable": 70,
+    "separate_environment_evidence_manifest_missing": 80,
+    "separate_environment_evidence_not_verified": 81,
+    "separate_environment_evidence_expired": 82,
+}
 
 @dataclass(frozen=True)
 class Action:
@@ -65,7 +80,7 @@ def build_brief(decision:dict)->Brief:
         by_code[code]=_lookup(code,False)
     for code in decision.get("conditions",[]):
         by_code.setdefault(code,_lookup(code,True))
-    actions=tuple(sorted(by_code.values(),key=lambda a:(PRIORITY_ORDER.get(a.priority,99),a.category,a.code)))
+    actions=tuple(sorted(by_code.values(),key=lambda a:(PRIORITY_ORDER.get(a.priority,99),ACTION_ORDER.get(a.code,999),a.category,a.code)))
     status=decision.get("status","UNKNOWN")
     route=decision.get("route","UNKNOWN")
     if status=="READY":
