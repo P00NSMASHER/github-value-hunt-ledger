@@ -793,3 +793,82 @@ No untrusted repository code, provider mutation, credentials, contacts, spend or
 **REFERRALS:** No new referral. Existing external-provider/system-of-record referrals already cover the unresolved provider-truth edge.
 
 **NEXT TEST:** Find one refund/payout path where a **pre-dispatch durable business action identity is sufficient to rediscover the exact provider effect after immediate post-effect process death**, a genuinely new process proves no duplicate mutation, and that same effect later reaches terminal payout/balance/bank evidence.
+
+## 2026-09-20 — Shadow run 12
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** The run-11 compensation-descriptor gap can be closed without a provider-side search endpoint if the client durably persists the exact semantic request plus a stable provider idempotency identity **before dispatch**, and the provider’s replay contract can return the original outcome. The strongest public evidence should also independently prove the resulting external effect count; however, replay-window expiry and literal process death must remain separate proof obligations.
+
+**DISCOVERY METHODS:**
+1. Direct domain search for post-effect failure, restart, idempotency replay, refund/payout recovery and terminal provider evidence.
+2. Code-signature search for `SIGKILL`, response-loss-after-commit, fsync-before-send, stable idempotency keys, retrieve/reconcile and exact external-effect counting.
+3. Deliberate low-attention search through one-star/zero-star reliability repositories whose names do not advertise billing, then exact source/evidence/history inspection.
+4. Comparator traversal against real-process internal-wallet crash recovery and mock-rail SIGKILL harnesses to separate external rediscovery proof from process-kill proof.
+
+**BEST NEW COMPONENT + URL + EXACT REVISION:** `winsznx/keeperhub-flightcheck` — https://github.com/winsznx/keeperhub-flightcheck — `1d0142d2e401872ffe020b2a4110d85be31e0750`.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `agent/src/runstore.ts` persists and `fsync`s the run record **before the outbound execution request**. The record binds run ID, unique challenge, chain/canary, intended operation, canonical request body, body hash and deterministic idempotency key.
+- The idempotency key is derived from the semantic work identity rather than held only in memory. The canonical body bytes are persisted so recovery can replay a value-identical request even when the original response never yielded an execution ID.
+- Recovery is explicitly bounded by the provider’s replay horizon. `assertResumable()` refuses automatic replay after the configured 24-hour idempotency window because the provider may have forgotten the prior response and a second execution could then occur. Durable local state therefore does not silently outlive provider-side dedupe semantics.
+- `runFlightcheck()` loads the persisted record on resume, skips preflight simulation, reuses the exact body/key, and treats an idempotent replay as recovery of the prior result rather than creation of a new action.
+
+**REVISION-BOUND EXTERNAL EVIDENCE:**
+- `agent/tests/fault-injection.ts` states and implements a non-mock fault: it sends the real KeeperHub contract-call request, waits for the real HTTP response after server-side work completed, drains/discards it, then throws. It deliberately loses the immediate replay response too, causing the first invocation to end with no execution ID or transaction hash in local state.
+- A second independent invocation resumes the same run from the persisted record. The checked-in `evidence/recovery/fault-injection.json` records two broadcast requests, `idempotentReplay: true`, a recovered execution/transaction identity and exactly **one** matching Base Sepolia canary event for the run’s unique challenge.
+- The same artifact independently verifies the public-chain receipt as success and binds the emitted event, challenge, chain ID and sender back to the run; its agreement section records KeeperHub completion, public transaction landing and independent event match as all true.
+- Commit `18e4adb4284a3eb11c64b84e7ee66f7281f7c10a` explicitly says the live fault-injection was rerun before recording and passed with “two broadcast attempts, one successful execution carrying the challenge.” Current exact HEAD is `1d0142d2e401872ffe020b2a4110d85be31e0750`.
+- Repository metadata at inspection: public, 1 star / 0 forks, MIT license. No exact-HEAD workflow runs were returned by the GitHub Actions query, so no green-CI claim is made.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:f6e9ba2d07cb91819e82b2d8adc2021b658dc3f7b62b2b678d318cb4512eb6eb`, binding the exact revision to:
+- `agent/src/runstore.ts` — Git blob `4fbe06b132b54aeef1cc6bac9e549d94440587a7`
+- `agent/tests/fault-injection.ts` — `7a40bb9753bae1cdd886a21982a98353f738e3e5`
+- `evidence/recovery/fault-injection.json` — `bd4b054397edc80e2a2f80c8b4f05e70135c5c6c`
+- `LICENSE` — `d08c87a4f86146842ca208114854acec66150819`
+- live-fault-evidence history commit `18e4adb4284a3eb11c64b84e7ee66f7281f7c10a`.
+No repository code, external mutation, credentials, contacts, spend or commitments were executed in this shadow run.
+
+**CRITICAL FALSIFICATION / TIER RESULT:**
+- This does **not** close tier-5B or tier-5C-B for money. The recovery phase is a second `runFlightcheck()` invocation inside the same Node process/script; no literal OS process death/restart occurs around the external effect.
+- The external action is a sponsored zero-value contract-call on Base Sepolia, not a cash refund, charge or payout. The public-chain success receipt proves an external effect but not monetary settlement economics.
+- The exact-one proof counts successful canary event logs for the run’s unique challenge. It strongly proves one successful external effect, but it would not count a hypothetical duplicate transaction that reverted before emitting that event.
+- Provider rediscovery is time-bounded: after the 24-hour replay window, this exact design deliberately refuses replay because identical key/body may execute again. Thus “durable identity” must always be evaluated together with the provider’s dedupe-retention horizon.
+- The evidence bundle is self-authored and was not independently rerun in this shadow pass.
+
+**COMPARATORS / FALSIFIERS:**
+- `strale-io/strale@2a65ffd66d5a5416a21bbdaac1505e2d0c41489a` has a strong literal-SIGKILL/PostgreSQL test around an internal wallet debit. A child process drives the real route, dies after the debit, and a reservation reconciler refunds exactly once; a second reconciler pass refunds nothing. It is stronger on actual process-death proof but weaker on this run’s missing edge because no external provider effect must be rediscovered.
+- `Mustaqeem-Rafi/interlock@523ec30551b58de9fbad5ed6b0e3cf2f7c93876f` has an impressive real-process SIGKILL matrix and durable ledger, but its own recording notes say v0.1 is validated against a **mock rail** and the live Razorpay adapter is not present. It therefore cannot displace real external-effect evidence.
+- Prior `az-said/Interlock@822ec54692b30e1fdce04b55dfab62d0b56a60b2` remains materially stronger for direct-money tier-5B because it combines a real Stripe test refund with literal process death/new-process recovery. KeeperHub’s incremental value is narrower: it demonstrates that a **pre-dispatch exact request/idempotency identity can itself be the provider-rediscovery anchor even when no provider object ID was observed**.
+
+**SPECIALIST PASSES:**
+- **CODE INSPECTOR:** verified canonical-request/idempotency derivation, fsync-before-send ordering, bounded replay-window enforcement and resume behavior.
+- **EXTERNAL-EVIDENCE ANALYST:** verified the checked-in response-loss artifact, external chain receipt/event agreement and one-event ground-truth count.
+- **HISTORY/RIGHTS ANALYST:** pinned exact HEAD, evidence-lineage commit, 1-star/0-fork metadata and MIT license; no exact-HEAD Actions run was available.
+- **COMMERCIAL ANALYST:** mapped the pattern to qualification of ambiguous money mutations rather than treating the zero-value canary itself as a payments product.
+- **RED-TEAM/VERIFIER:** separately challenged process-boundary strength, money terminality, idempotency-window expiry and the exact-one event-count semantics before scoring.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The frozen packet supports the narrow claim that this exact revision persists and fsyncs a stable semantic request/idempotency identity before dispatch, deliberately loses a real external response, later replays that same identity, and has checked-in public-chain evidence that the recovery converged to one successful external effect. The verifier rejects literal crash/restart, direct-money settlement, tier-5B/5C-B, generic provider exactly-once guarantees and safety beyond the provider’s replay window. No sensitive-source material was used.
+
+**A-F SCORE (proposed only, after verifier):** **25/30 — A3 / B3 / C5 / D5 / E5 / F4.**
+- A3: the direct wedge is a reliability qualification pattern rather than a ready-made revenue-recovery product.
+- B3: external-effect ambiguity is economically important, but the checked-in action is zero-value testnet work rather than money movement.
+- C5: strongly compresses pre-dispatch identity design, canonical request persistence, fsync ordering, safe replay cutoffs and independent external-effect verification.
+- D5: a one-star repository with real response-loss injection plus checked-in external-chain one-effect evidence is rare.
+- E5: implementation, machine-readable run artifact, public-chain verification details and history all support the narrow claim.
+- F4: MIT and testnet boundaries are clear; operational value depends on each target provider’s idempotency/replay contract and retention window.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments/platform reliability lead, fintech engineering team or AI-agent platform owner whose tools can trigger money-like external effects.
+- Pain: teams often persist “intent” but cannot prove that the persisted pre-send identity is actually enough to recover the original provider outcome if the effect happens and the response is lost.
+- First paid wedge: **Idempotency Recovery Qualification** for one provider sandbox/test flow. Persist and fsync the exact authorized action identity before dispatch, deliberately suppress the post-effect response, recover only through the same provider identity, independently count external effects, and explicitly test the provider replay-window expiry. For a money rail, keep the initial engagement test/sandbox-only and do not call it settlement certification unless the same action reaches terminal economic evidence.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Run 11 exposed the compensation-descriptor birth gap; this run supplies a concrete counter-pattern: the provider result ID need not be known before dispatch if a stable, exact pre-dispatch identity can retrieve the original result by provider replay. Run 10’s durability-horizon lesson now extends beyond transient locks to **provider idempotency retention**: a locally durable command may still become unsafe to replay after the provider forgets its dedupe record. This strengthens the qualification architecture but does not supersede Interlock’s literal process-kill money evidence or Flames-up’s payout terminality evidence.
+
+**SEARCH EFFORT / COST PROXIES:** Four materially different discovery modes; three serious candidate/comparator paths deep-inspected; source/evidence/history/rights and exact-revision workflow status checked; roughly three dozen search/read/tool operations; 0 untrusted-repository code executions, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Extend `SK-COM-003` with a **provider replay-window cliff check**. A durable pre-dispatch identity is only as replay-safe as the provider’s dedupe-retention contract. Record the provider’s idempotency horizon as part of the action evidence; before expiry, exact-body/key replay may be a valid rediscovery mechanism even without lookup-by-business-key, but after expiry automatic replay must fail closed or switch to another authoritative read path. Also distinguish **provider rediscovery by exact replay** from ordinary provider lookup: both can close the compensation-descriptor birth gap, but only if their validity horizon is explicit and tested.
+
+**REFERRALS:** No new referral. Existing external-provider/system-of-record referrals already target the remaining direct-money settlement intersection; this run adds a reusable rediscovery primitive rather than a new lane handoff.
+
+**NEXT TEST:** Find one **cash refund or payout** where the pre-dispatch semantic identity and its provider-validity horizon are durable, a literal post-effect process death occurs, a genuinely new process rediscoveries the exact effect with no duplicate, and that same effect later reaches terminal provider balance/payout/bank evidence.
