@@ -58,7 +58,11 @@
       "replacement_days_low": 30,
       "replacement_days_high": 90,
       "duplicate_of": null,
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "metadata_status": "unavailable",
+        "profile_source": "historical HUNTER-13 spool did not capture structured repository metadata"
+      }
     },
     {
       "repository": "JayySap/ShiftGaurd",
@@ -74,7 +78,11 @@
       "replacement_days_low": 3,
       "replacement_days_high": 10,
       "duplicate_of": null,
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "metadata_status": "unavailable",
+        "profile_source": "historical HUNTER-13 spool did not capture structured repository metadata"
+      }
     },
     {
       "repository": "Payroll-Engine/PayrollEngine.Template.Regulation.Country",
@@ -90,7 +98,11 @@
       "replacement_days_low": 10,
       "replacement_days_high": 25,
       "duplicate_of": null,
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "metadata_status": "unavailable",
+        "profile_source": "historical HUNTER-13 spool did not capture structured repository metadata"
+      }
     }
   ],
   "best_result": "PayrollEngine supplies the missing temporal rule-authority pattern for CAP-009: a rule version is selected by effective date plus knowledge/creation cutoff, and work-time validation can resolve date-effective constraints. Combined with RosterSpec this can produce source/version-backed schedule proof rather than static compliance settings. ShiftGuard is a concrete negative oracle showing why hard-coded numbers and warnings are insufficient.",
