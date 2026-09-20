@@ -317,3 +317,27 @@ Every new prospective hunt should use `schema_version: 3`.
 - Record capability and experiment deltas explicitly.
 - Preserve no-find runs: they are legitimate denominator evidence when the search was genuinely executed.
 - Do not treat fractional outcome attribution as causal proof; it exists to prevent double-counting realized value across multi-origin discoveries.
+
+
+## Search-run v4 normalized measurement contract
+
+Every new prospective search should use `schema_version: 4`.
+
+- Keep the exact literal `queries`.
+- Persist the reusable `query_family` and canonical `query_family_id`.
+- Assign one primary controlled `search_objective_id` from `intelligence/search_objectives.json`.
+- Record every search surface actually used; reporting will normalize surface labels into stable families without deleting the exact labels.
+- For every inspected candidate, use `reason_code_standard` from `intelligence/reason_codes.json` and preserve the evidence-bearing explanation in `reason_detail`.
+- Record denominators even for no-find runs; a bounded no-find is valid evidence.
+- Do not fabricate historical SHAs or search counts to reduce revision/measurement debt.
+- Keep objective, query family and strategy distinct: the objective is *what uncertainty you are trying to reduce*; the QF is *the concrete search hypothesis*; the strategy is *how you search/verify it*.
+
+### Matched benchmark conditions
+
+When `measurement_quality: "benchmark"` under V4:
+- use only frozen task text from `benchmark/BENCHMARK_TASKS.md`;
+- do not read `BENCHMARK_GOLD.md` before freezing the result;
+- record `benchmark_task_ids`, `evaluation_set_id` and `comparison_group_id`;
+- keep sibling strategy conditions independent until frozen;
+- no-find and correct-reject results are valid outcomes;
+- matched benchmark evidence improves strategy comparison but does not substitute for realized customer/engineering outcomes.

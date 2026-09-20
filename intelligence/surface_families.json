@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "families": [
+    {
+      "surface_family_id": "SURFACE_FAMILY:github-repository-search",
+      "name": "GitHub repository search",
+      "description": "Repository-name/description discovery and category-level GitHub search."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:github-code-search",
+      "name": "GitHub code search",
+      "description": "Code/signature/symbol search used to discover candidates by implementation evidence."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:github-source-inspection",
+      "name": "GitHub source inspection",
+      "description": "Pinned source, tests, schemas, CI, exact-head and implementation inspection after a candidate is known."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:github-history-archaeology",
+      "name": "GitHub history archaeology",
+      "description": "Commit, issue, release, regression and historical-source archaeology."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:ecosystem-adjacency",
+      "name": "Ecosystem and analogy adjacency",
+      "description": "Organization, framework, sibling-project, comparator and structural-analogy traversal."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs",
+      "name": "First-party documentation",
+      "description": "Official vendor/government documentation used to establish authority, semantics or constraints."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:private-ledger",
+      "name": "Private ledger",
+      "description": "Existing hunt corpus, deduplication and prior evidence."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation",
+      "name": "Synthetic/local validation",
+      "description": "Synthetic acceptance corpora, local persistence/concurrency probes and generated adversarial fixtures."
+    },
+    {
+      "surface_family_id": "SURFACE_FAMILY:other",
+      "name": "Other/uncategorized",
+      "description": "Surface not yet mapped to a stable family; creates taxonomy debt."
+    }
+  ]
+}

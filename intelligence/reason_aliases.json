@@ -1,0 +1,19 @@
+{
+  "exact-line-allocation-graph-capacity-conservation-reload-revalidation": "authority_lineage_verified",
+  "service-and-blanket-semantics-but-product-level-lineage-collapse": "interesting_but_not_load_bearing",
+  "low-attention-HES-to-invoice-lineage-seller-side-narrow-tests": "interesting_but_not_load_bearing",
+  "provider-inquiry-unknown-state-one-shot-refund-signed-delta-compensating-ledger": "state_transition_verified",
+  "refund-confirmation-reversal-entry-settlement-dedup": "state_transition_verified",
+  "independent-bank-transaction-reconciliation-plane": "independent_negative_control",
+  "multi-engine-semantic-restore-signed-evidence-explicit-subject-completeness-gate": "state_transition_verified",
+  "postgres-rabbitmq-dual-plane-semantic-recovery-tamper-chain-fail-closed-cleanup": "state_transition_verified",
+  "validation-query-exit-zero-false-green-and-cleanup-error-swallowed": "fail_open_boundary",
+  "same-action-readback-on-lost-response-unknown-fail-closed-but-retry-loophole": "unsafe_retry_or_idempotency",
+  "real-vendor-run-id-but-weak-ambiguous-post-handling-no-behavior-tests": "no_semantic_tests",
+  "madsci-shaped-physics-sim-harness-no-ambiguity-regression-found": "no_semantic_tests",
+  "postcondition-self-validates-command-mutated-local-state": "circular_evaluation",
+  "tested-progress-to-claim-bridge-but-no-independent-measurement-approval-and-alternate-line-mutation-bypasses": "authority_location_bypass",
+  "approved-unbilled-selector-exists-but-current-bill-path-creates-and-later-approves-its-own-measurement-book": "authority_location_bypass",
+  "caller-authored-bill-economics-free-text-measurement-reference-and-unguarded-lifecycle-transitions": "authority_location_bypass",
+  "startup-cancels-active-workflow-with-fresh-result-id-before-physical-reconciliation-then-retry-can-create-fresh-action-id": "unsafe_retry_or_idempotency"
+}
