@@ -275,3 +275,70 @@ No repository code or provider mutation was executed in this shadow run.
 **REFERRALS:** No new cross-lane referral; existing provider/system-of-record readback referrals already ask the correct structural question and should not be duplicated.
 
 **NEXT TEST:** Find a candidate with **checked-in, revision-bound external outcome evidence**—for example a real-provider qualification attestation or integration artifact proving crash-after-dispatch → restart → read-only convergence with no duplicate money effect—or falsify whether public repositories expose enough lawful evidence to distinguish this from well-designed but still unqualified recovery code.
+
+## 2026-09-20 — Shadow run 5
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** A stronger external-outcome component should contain revision-bound evidence from a real provider or provider sandbox showing an ambiguous post-dispatch money action, process restart, read-only provider reconciliation and no duplicate effect. Merely documenting this recovery design or proving it against a simulator is insufficient.
+
+**DISCOVERY METHODS:**
+1. Direct problem search for `OutcomeUnknown`, refund/payment idempotency, reconciliation and provider readback.
+2. Code-invariant search for crash/restart, response-loss, stable idempotency and retrieve/reconcile paths.
+3. External-evidence search for live/sandbox smoke suites, qualification attestations, CI artifacts and checked-in run records rather than README claims.
+4. Comparator inspection of synthetic restart/no-duplicate harnesses and ambiguous-withdrawal recovery code to separate architectural quality from external proof.
+
+**BEST CANDIDATE + URL + EXACT REVISION:** `revaly-co/RAP-sdk` — https://github.com/revaly-co/RAP-sdk — `b0c7f0e80042f654155d72c7663340f46985865e`.
+
+**IMPLEMENTED:**
+- Six server-side SDK runtimes implement a failover contract that classifies an uncertain after-send transport failure as `OutcomeUnknown` rather than guessing toward “safe,” performs no automatic resubmission, and exposes bounded read-only reconciliation by merchant transaction identity.
+- Reconciliation returns `Found` or `NotFoundYet`; absence is explicitly not treated as proof that the original action did not occur.
+- Stage-4 CI contains six language-specific live contract-smoke jobs, environment-scoped provider credentials, fail-closed secret requirements and a staging-only `pre-dispatch` fault seam.
+
+**EXTERNAL / REVISION-BOUND EVIDENCE:**
+- `docs/adr/024-stage4-contract-smoke-environment.md` is a checked-in implementation/evidence record for live staging smoke. It records the stage-4 build commit lineage, six-language live runs, real validation/auth/fault rows and `reconcile Found/NotFoundYet` behavior. History independently shows merge commit `e1410c2ed9a23068bfca2f9c49328921e88f4f19` adding the six live suites and pipeline jobs.
+- `docs/prod-sandbox-validation.md` is stronger external evidence: it records a 2026-07-25 run against `https://api.revaly.co` through the production edge using a sandbox-scoped merchant key and released v0.4.1 artifacts across all six languages. The checked-in record reports **39 passed / 0 failed / 8 skipped**, with approved and declined charges, 400 classification, `reconcile Found(Approved)`, real-404 `NotFoundYet` and secondary read surfaces.
+- The same evidence record explicitly states that no language retried or resubmitted and that the reconcile helper was the only loop.
+- Apache-2.0 public licensing is reported at the exact inspected revision; repository metadata shows 0 stars / 0 forks, so this was low-attention despite substantive live-provider evidence.
+
+**CRITICAL FALSIFICATION:** The exact row this run was trying to prove is **not externally proven**. The production-sandbox record explicitly marks `charge-outcome-unknown` as **SKIP — no deterministic live trigger / preflight-only**. The staging fault seam is `pre-dispatch`, which is useful for proving `not_processed` but cannot prove crash-after-provider-effect ambiguity. Searches for `post-dispatch`, response-loss/restart and crash reconciliation did not surface a live test in this repository. Thus RAP-sdk proves live provider classification + read-only reconciliation, but not **crash-after-dispatch → restart → no duplicate effect**.
+
+**EVIDENCE / HISTORY PACKET:**
+- `docs/prod-sandbox-validation.md` — Git blob `ac4f402ee4a57e1b7b3449e3e648d665ee2d40a6`
+- `docs/adr/024-stage4-contract-smoke-environment.md` — `06d40d78dbd47676fe8d80339752dbd27cc7149f`
+- `.github/workflows/pipeline.yml` — `cd50d183fd6ea15523717bebb4ce3ef37eb34690`
+- `docs/failover-contract.md` — `8d8ebd4a94d062c47193f06719dfd53417dec618`
+- `languages/typescript/smoke/contract.smoke.ts` — `747b4f475eee4b91c665ad581d3a36c98d482dc0`
+- Stage-4 merge lineage: `e1410c2ed9a23068bfca2f9c49328921e88f4f19`.
+No repository code, provider mutation or credentialed external action was executed in this shadow run.
+
+**COMPARATORS:**
+- `mastra-ai/mastra@fbce7580675247e5b4986637463f4328ceb77f34` has an excellent refund-recovery integration test: durable attempt registry, stable idempotency, synthetic “drop after commit,” process recovery and provider-truth reconciliation with an assertion against duplicate refund. The decisive limitation is that the inspected Stripe transport is synthetic, so it proves the crash invariant more directly than RAP but not against an external provider.
+- `Layr-Labs/d-inference@d78ae77efaad100ad59d7ea35487a09085f04889` correctly recognizes an ambiguous Stripe Connect transfer window and records an unconfirmed state rather than simply restoring balance. The inspected recovery path is more operator/manual and did not provide checked-in external restart/readback/no-duplicate proof.
+
+**RED-TEAM OBJECTION:** RAP's checked-in evidence is unusually concrete, but it remains self-authored evidence. Historical workflow-run IDs referenced in the docs are no longer retrievable through the current GitHub Actions API (consistent with run-retention limits), and the production-sandbox evidence itself discloses that the separate harness's v0.4.1 working-copy upgrade was not pushed at run time. More importantly, the live environment could not deterministically trigger the post-send ambiguity row. It would be incorrect to combine the repository's excellent `OutcomeUnknown` design with its live smoke evidence and silently conclude that a real-provider crash/restart recovery was proven.
+
+**INDEPENDENT VERIFIER VERDICT:** **PASS_WITH_LIMITS** on the narrow claim that this exact revision contains implementation, history and checked-in live-provider/sandbox evidence for safe failure classification plus read-only reconciliation across six runtimes. **FAIL / NOT PROVEN** for the stronger run hypothesis: there is no revision-bound live proof of post-dispatch response loss or crash → restart → read-only convergence → no duplicate money effect. No sensitive-source material was used.
+
+**A-F SCORE (proposed only, after verifier):** **25/30 — A3 / B4 / C4 / D4 / E5 / F5.**
+- A3: commercially useful as a qualification/reconciliation pattern, but not a drop-in money-recovery product.
+- B4: avoiding duplicate charges/refunds and misclassified failover has direct financial value, though this SDK is tied to a particular provider contract.
+- C4: compresses six-runtime error taxonomy, bounded reconcile semantics and live qualification machinery.
+- D4: live production-edge sandbox evidence plus explicit unknown-state semantics is uncommon in a zero-star SDK repository.
+- E5: source, smoke suites, CI wiring, ADR history and checked-in real-environment evidence are unusually strong; the missing ambiguity row is disclosed rather than hidden.
+- F5: Apache-2.0, public provenance and explicit operational/environment boundaries are clean.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments-platform engineering lead, merchant reliability team or finance-systems owner integrating a processor/failover path.
+- Pain: payment clients often confuse network failure with non-effect, then retry unsafely or cannot prove which recovery behavior has actually been exercised against a real environment.
+- First paid wedge: an **External Reconciliation Qualification Harness** for one existing money-moving API. It remains read-only/recommend-only in this shadow context: enumerate failure classes, bind a stable business id, prove live `Found/NotFoundYet` readback, record which rows cannot be triggered safely, and refuse to certify crash recovery until a controlled post-dispatch response-loss test exists.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** RAP-sdk supplies something run 4's Auths candidate lacked: checked-in evidence that real external provider/sandbox classification and read-only reconciliation were actually exercised. Auths supplies the stronger durable crash/`OutcomeUnknown` state machine. Together they define a much better qualification target, but they do **not** close the proof gap because the real-environment RAP run skipped `OutcomeUnknown` and the Auths real-provider route was unqualified.
+
+**SEARCH EFFORT / COST PROXIES:** 4 materially different discovery modes; 3 serious candidates deep-inspected; source/tests/protocol shape/history/live-evidence records verified at exact revisions; no untrusted code execution, provider writes, contacts, spend or commitments.
+
+**LOCAL LESSON:** Add an **external-outcome evidence ladder** when evaluating money recovery: (1) mock/unit retry semantics; (2) synthetic provider + restart/no-duplicate; (3) real provider/sandbox smoke; (4) revision-bound external readback evidence; (5) controlled post-dispatch ambiguity + restart + no-duplicate proof. Do not collapse tiers 3–4 into tier 5. This discriminator succeeded once and remains lane-local.
+
+**REFERRALS:** No new referral. The existing external provider/system-of-record readback referral remains precise; this run adds evidence that live smoke alone still leaves the ambiguity gap open.
+
+**NEXT TEST:** Find a lawful public component or evidence record with a **controlled post-dispatch response-loss seam** against a real provider/sandbox, where the original action is externally visible after restart and a read-only lookup proves convergence without a second money effect. If none exists after repeated targeted runs, treat the absence itself as durable negative knowledge and shift toward building a safe qualification harness rather than hunting indefinitely.
