@@ -10,6 +10,7 @@ Prove whether the challenger finds **defensible, incremental freight leakage** t
 
 Before data transfer:
 - define buyer entity/business unit;
+- create the pilot source/data-room manifest (`freight/PILOT_DATA_ROOM.md` / `freight/pilot_package.py`);
 - define date range and included carriers/modes;
 - define exact invoice population selection rule;
 - define allowed data sources and retention;
@@ -38,7 +39,7 @@ Fail the readiness gate if:
 - the incumbent output cannot remain sealed;
 - later outcome evidence is impossible to observe.
 
-## Stage 2 — Freeze population
+## Stage 2 — Freeze population and seal incumbent source
 
 Create a manifest containing:
 - buyer + BU;
@@ -48,7 +49,7 @@ Create a manifest containing:
 - population-selection query/rule;
 - manifest SHA-256.
 
-No row may silently enter or leave after freeze. Any change creates a new population/version.
+No row may silently enter or leave after freeze. Any change creates a new population/version. After the population is frozen, seal the incumbent source SHA-256 against the same buyer/BU and population hash **before buyer-owned truth is frozen/opened**.
 
 ## Stage 3 — Freeze buyer-owned truth
 
@@ -64,6 +65,8 @@ The challenger may use multiple independent comparators, but no component may ce
 ## Stage 4 — Open incumbent output
 
 Only after Stage 3:
+- open the incumbent output from the **previously sealed source**;
+- verify buyer/BU, population hash and sealed-source hash still match;
 - record incumbent output hash/version;
 - compare finding identity, reason and dollars;
 - classify:
@@ -117,3 +120,15 @@ Report four separate totals:
 4. uniquely attributable realized dollars.
 
 Never collapse these into one "savings" number. The canonical report template is `freight/PILOT_REPORT_TEMPLATE.md`; `freight/pilot_reporting.py` derives the totals from the frozen proof objects. Fee-eligible realized dollars are reported separately from buyer savings and incumbent-known findings are automatically excluded from fee eligibility when the ledger is bound to the frozen incumbent output.
+
+
+## Stage 7 — Package integrity
+
+Before the final buyer report, build one pilot-package hash binding:
+- source/data-room manifest;
+- frozen population;
+- buyer-owned truth;
+- sealed incumbent submission;
+- opened incumbent output.
+
+This proves deterministic content binding and application order. It is **not** independent historical timestamp attestation.
