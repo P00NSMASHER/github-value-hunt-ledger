@@ -232,3 +232,26 @@ Every new prospective hunt should use `schema_version: 4` and persist:
 - durable evidence location
 
 Matched benchmark runs additionally require task/set/comparison metadata.
+
+
+## V5 search-seed compiler
+
+V5 closes the loop between what the system has learned and what hunters search next.
+
+Generated products:
+- `search_seeds.jsonl` — stable ranked search hypotheses.
+- `SEARCH_SEEDS.md` — human-readable seed packets with query templates, verification gates and stop conditions.
+- `SEED_PERFORMANCE.md` — empirical seed-level yield once V5 runs accumulate.
+- `seed_metrics.json` — seed inventory/performance metadata.
+
+`tools/ti_seed_compiler.py` creates three seed types:
+1. **capability_gap** — converts the adaptive policy's highest-information capability gaps into concrete searches;
+2. **positive_dna_transfer** — extracts load-bearing implementation signatures from MASTER leaders and searches for those invariants in unrelated verticals;
+3. **strategy_measurement** — pairs under-measured strategies with real capability gaps so exploration also reduces measurement debt.
+
+New prospective runs should use `schema_version: 5` and record:
+- `seed_mode: generated` plus one or more `seed_ids` when using generated hypotheses;
+- `seed_mode: manual_hypothesis` for a hunter-authored bounded hypothesis;
+- `seed_mode: free_exploration` with an empty `seed_ids` list for deliberate wildcard exploration.
+
+Seed priority is advisory. It cannot override domain-specific search gates, safety rules, source authority or experiment stop conditions. Seed performance is not used to penalize a hypothesis until it has at least 3 measured runs and 10 deep inspections.

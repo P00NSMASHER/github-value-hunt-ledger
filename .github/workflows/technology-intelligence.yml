@@ -76,6 +76,10 @@ jobs:
         run: python tools/ti_report.py
       - name: Recompute cautious adaptive search policy
         run: python tools/ti_policy.py
+      - name: Compile ranked next-hunt search seeds
+        run: python tools/ti_seed_compiler.py
+      - name: Validate V5 search seeds and seed attribution
+        run: python tools/ti_seed_validate.py
       - name: Build measurement-debt plan
         run: python tools/ti_measurement_plan.py
       - name: Build matched strategy measurement campaign
@@ -128,6 +132,10 @@ jobs:
         run: python tools/ti_report.py
       - name: Recompute cautious adaptive search policy
         run: python tools/ti_policy.py
+      - name: Compile ranked next-hunt search seeds
+        run: python tools/ti_seed_compiler.py
+      - name: Validate V5 search seeds and seed attribution
+        run: python tools/ti_seed_validate.py
       - name: Build measurement-debt plan
         run: python tools/ti_measurement_plan.py
       - name: Build matched strategy measurement campaign
@@ -170,7 +178,11 @@ jobs:
                   intelligence/measurement_plan.json \
                   intelligence/measurement_campaign.json \
                   intelligence/candidate_learning_metrics.json \
-                  intelligence/surface_metrics.json
+                  intelligence/surface_metrics.json \
+                  intelligence/search_seeds.jsonl \
+                  intelligence/SEARCH_SEEDS.md \
+                  intelligence/SEED_PERFORMANCE.md \
+                  intelligence/seed_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
