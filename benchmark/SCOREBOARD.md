@@ -13,16 +13,16 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | 3 | 16-22 | 4 | 2 | 2 | 23.0 | 24.5 | 0 | 0 | Experiment |
 | 4 | 23-29 | 4 | 4 | 4 | 24.75 | 24.25 | 0 | 0 | Control |
 | 5 | 30-36 | 4 | 4 | 4 | 24.25 | 24.75 | 0 | 0 | Experiment |
-| 6 | 37-43 | 3 | 4 | 3 | 25.0 | 25.0 | 0 | 0 | Tie |
+| 6 | 37-43 | 4 | 4 | 4 | 25.0 | 25.0 | 0 | 0 | Tie |
 | 7 | 44-50 | 5 | 3 | 3 | 24.33 | 24.67 | 0 | 0 | Experiment |
 
 ## Experiment-wide matched metrics
-- Matched tasks scored: **19** — 09, 10, 11, 16, 17, 23, 24, 25, 26, 30, 31, 32, 33, 37, 38, 39, 44, 45, 46.
-- Control matched mean: **24.47/25**.
-- Experiment matched mean: **24.68/25**.
-- Mean paired difference (Experiment - Control): **+0.21**.
+- Matched tasks scored: **20** — 09, 10, 11, 16, 17, 23, 24, 25, 26, 30, 31, 32, 33, 37, 38, 39, 40, 44, 45, 46.
+- Control matched mean: **24.50/25**.
+- Experiment matched mean: **24.70/25**.
+- Mean paired difference (Experiment - Control): **+0.20**.
 - Median paired difference: **0.0**.
-- Pairwise task win / tie / loss for Experiment: **4 / 11 / 4**.
+- Pairwise task win / tie / loss for Experiment: **4 / 12 / 4**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
 - No-find results: **0 Control / 0 Experiment** among scored results.
 - Approximate search effort per validated STRONG result: **Control ~10–11 reported search/deep-inspection units; Experiment ~11–12**. Directional only because result files mix query counts, discovery modes, triage counts and deep inspections. Task 26 again shows the Experiment arm spending more inspection effort to reach the same full task score; Task 46 shows that extra red-team effort can also improve rejection calibration.
@@ -70,6 +70,7 @@ Scores below preserve all previously scored results and add newly completed unsc
 | 38 | EXPERIMENT | 25 | 5/5/5/5/5 | `davidlarrimore/curatore-v2@d4e42ac14450a58f84035c31db11b0399713a653` | No | No | Exact target plus successful invariant-triad transfer; verifier also found the APFS unexpected-shape→empty-result false-green risk. |
 | 39 | CONTROL | 25 | 5/5/5/5/5 | `Gaskony-Ignition/module-plc-emulator@518f56b55566d7e20f19ce64003cdae45a08edc8` | No | No | Exact target; L5K import, canonical Rockwell namespace, UDT/AOI/array/BOOL semantics, typed OPC-UA nodes and fidelity tests were inspected with live-hardware/opt-in-test limits preserved. |
 | 39 | EXPERIMENT | 25 | 5/5/5/5/5 | `Gaskony-Ignition/module-plc-emulator@518f56b55566d7e20f19ce64003cdae45a08edc8` | No | No | Exact target with stronger three-invariant intersection and history archaeology; negative NodeId assertions and explicit withdrawal of unverified L5X support improved calibration. |
+| 40 | CONTROL | 25 | 5/5/5/5/5 | `OPCFoundation/UA-.NETStandard@37b552254e8da434514c87d8185c1595c03c4063` | No | No | Exact official target; reconnect-gated services, subscription republish/transfer recovery, TCP-chaos survival, migration tooling and exact-head regression history are source/test verified with hardware-specific readiness kept separate. |
 | 40 | EXPERIMENT | 25 | 5/5/5/5/5 | `OPCFoundation/UA-.NETStandard@37b552254e8da434514c87d8185c1595c03c4063` | No | No | Exact official target with migration/reconnect/subscription regression coverage and defect archaeology; current post-head V2 destructive-restart deadlock evidence was found and used to narrow readiness claims rather than ignored. |
 | 44 | CONTROL | 25 | 5/5/5/5/5 | `vncwr/backwyn@57f4b8afc3d9ce14f2a35febc802536cfa816839` | No | No | Exact target; scratch restore, corruption/staleness/unverified-state negatives and successful exact-revision CI checked. |
 | 44 | EXPERIMENT | 24 | 4/5/5/5/5 | `cybertec-postgresql/pg_hardstorage@b47541b7e1cea69ce6ec63b26e154eb25fc4ca91` | No | No | Strong equivalent with scratch restore, corruption/fail-open controls and truthful unknown/latest semantics; one discovery point withheld because it stops short of booted-DB/application invariants and explicit age-based stale-proof semantics. |
@@ -88,8 +89,8 @@ Scores below preserve all previously scored results and add newly completed unsc
 - **Promoted to SEARCH_SKILLS:** `Ingestion invariant-triad intersection`, supported by Experiment Tasks **37 and 38**; Tasks **39 and 40** generalize the method into broader executable-invariant intersection without creating a duplicate central skill.
 - **Promoted to SEARCH_SKILLS:** `Protocol-regression archaeology for pre-FAT systems`, independently supported by Experiment Tasks **39 and 40**.
 - **Promoted to SEARCH_SKILLS:** `Fail-open boundary archaeology`, independently supported by Experiment Tasks **44 and 45** and now reinforced by reject-case Task **46**.
-- **Eligible and promoted this cycle:** `Decision-claim → runtime-side-effect trace`, independently supported by Experiment Tasks **25 and 26**. Both tasks showed that names, metrics, post-processing and test-file labels can overstate whether a claimed decision mechanism actually changes runtime execution.
+- **Promoted this cycle:** `Decision-claim → runtime-side-effect trace`, independently supported by Experiment Tasks **25 and 26**. Both tasks showed that names, metrics, post-processing and test-file labels can overstate whether a claimed decision mechanism actually changes runtime execution.
 - Not yet separately promoted: Pair 4 state-machine + audit-log conjunction (Task 23 only); Pair 4 perturbation+hard-invariant scheduling (Task 24 only); Pair 4 censored-state→latent-state→control handoff (Task 26 only); Pair 5 descendant-cluster→canonical-spec pivot (Task 31 only); Pair 5 metrology traceability intersection (Task 33 only); Pair 7 contract→negative-vector→differential-implementation triangulation (Task 45 only); Pair 7 authority-origin/invariant-set consistency (Task 46 only); Pair 3 three-layer money-invariant verification (Task 17 only).
 
 ## Experiment-wide conclusion
-Too early for a winner claim. Across **19 matched tasks**, Experiment has a small mean advantage (**24.68 vs 24.47**), while the **median paired difference remains 0** and task-level outcomes are **4 wins, 11 ties and 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is demonstrably producing reusable methods that transfer across domains, including a newly validated decision-claim→runtime-side-effect trace, but it continues to consume at least comparable and probably somewhat higher search effort. The evidence still does **not** justify declaring the experimental architecture the winner; continue until substantially more matched tasks are available or the full 50-task benchmark completes.
+Too early for a winner claim. Across **20 matched tasks**, Experiment has a small mean advantage (**24.70 vs 24.50**), while the **median paired difference remains 0** and task-level outcomes are **4 wins, 12 ties and 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is demonstrably producing reusable methods that transfer across domains, including a newly validated decision-claim→runtime-side-effect trace, but it continues to consume at least comparable and probably somewhat higher search effort. The evidence still does **not** justify declaring the experimental architecture the winner; continue until substantially more matched tasks are available or the full 50-task benchmark completes.
