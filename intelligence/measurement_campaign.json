@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "protocol": "benchmark/STRATEGY_MEASUREMENT_PROTOCOL.md",
+  "gold_file_prohibited_pre_freeze": "benchmark/BENCHMARK_GOLD.md",
+  "recommended_strategy_conditions": [
+    {
+      "strategy_id": "STRAT:acceptance-path-transition-inspection",
+      "strategy_name": "Acceptance-path transition inspection",
+      "evaluation_set_id": "EVAL:verification-boundaries",
+      "benchmark_task_id": "12",
+      "task": "Find a real restore-verification platform that executes recoveries across heterogeneous data systems and emits independently checkable evidence rather than trusting backup-success status.",
+      "comparison_group_id": "CMP:verification-boundaries:task-12",
+      "matched_strategy_ids": [
+        "STRAT:fail-open-boundary-archaeology",
+        "STRAT:acceptance-path-transition-inspection",
+        "STRAT:evaluation-target-independence"
+      ],
+      "runs_needed": 0,
+      "inspections_needed": 10,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
+      "strategy_name": "Authority-origin / invariant-set consistency",
+      "evaluation_set_id": "EVAL:authority-currentness",
+      "benchmark_task_id": "09",
+      "task": "Find an official first-party machine-readable U.S. federal acquisition-rule source that preserves clause/provision structure, fill-ins and revision/change provenance.",
+      "comparison_group_id": "CMP:authority-currentness:task-09",
+      "matched_strategy_ids": [
+        "STRAT:first-party-production-source-triangulation",
+        "STRAT:rule-period-authority-version-audit",
+        "STRAT:authority-origin-invariant-set-consistency"
+      ],
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
+      "strategy_name": "Capability-Conjunction Search + Claim Tracing",
+      "evaluation_set_id": "EVAL:operational-conjunctions",
+      "benchmark_task_id": "16",
+      "task": "Find a deep airline-disruption/recovery engine covering constrained optimization, passenger/crew recovery, legality, uncertainty, simulation and deterministic replay.",
+      "comparison_group_id": "CMP:operational-conjunctions:task-16",
+      "matched_strategy_ids": [
+        "STRAT:capability-conjunction-search-claim-tracing",
+        "STRAT:decision-claim-runtime-side-effect-trace",
+        "STRAT:evaluation-target-independence"
+      ],
+      "runs_needed": 3,
+      "inspections_needed": 14,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:cross-source-emergence-triangulation",
+      "strategy_name": "Cross-source emergence triangulation",
+      "evaluation_set_id": "EVAL:agent-lineage-governance",
+      "benchmark_task_id": "28",
+      "task": "Find a persistent self-improving agent harness that can turn repeated failures/tactics into durable memories, skills and subagents with rollback or refinement history.",
+      "comparison_group_id": "CMP:agent-lineage-governance:task-28",
+      "matched_strategy_ids": [
+        "STRAT:paper-research-artifact-production-descendant",
+        "STRAT:cross-source-emergence-triangulation",
+        "STRAT:acceptance-path-transition-inspection"
+      ],
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
+      "strategy_name": "Decision-claim -> runtime-side-effect trace",
+      "evaluation_set_id": "EVAL:operational-conjunctions",
+      "benchmark_task_id": "16",
+      "task": "Find a deep airline-disruption/recovery engine covering constrained optimization, passenger/crew recovery, legality, uncertainty, simulation and deterministic replay.",
+      "comparison_group_id": "CMP:operational-conjunctions:task-16",
+      "matched_strategy_ids": [
+        "STRAT:capability-conjunction-search-claim-tracing",
+        "STRAT:decision-claim-runtime-side-effect-trace",
+        "STRAT:evaluation-target-independence"
+      ],
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:evaluation-target-independence",
+      "strategy_name": "Evaluation-Target Independence",
+      "evaluation_set_id": "EVAL:verification-boundaries",
+      "benchmark_task_id": "12",
+      "task": "Find a real restore-verification platform that executes recoveries across heterogeneous data systems and emits independently checkable evidence rather than trusting backup-success status.",
+      "comparison_group_id": "CMP:verification-boundaries:task-12",
+      "matched_strategy_ids": [
+        "STRAT:fail-open-boundary-archaeology",
+        "STRAT:acceptance-path-transition-inspection",
+        "STRAT:evaluation-target-independence"
+      ],
+      "runs_needed": 3,
+      "inspections_needed": 16,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:fail-open-boundary-archaeology",
+      "strategy_name": "Fail-open boundary archaeology",
+      "evaluation_set_id": "EVAL:verification-boundaries",
+      "benchmark_task_id": "12",
+      "task": "Find a real restore-verification platform that executes recoveries across heterogeneous data systems and emits independently checkable evidence rather than trusting backup-success status.",
+      "comparison_group_id": "CMP:verification-boundaries:task-12",
+      "matched_strategy_ids": [
+        "STRAT:fail-open-boundary-archaeology",
+        "STRAT:acceptance-path-transition-inspection",
+        "STRAT:evaluation-target-independence"
+      ],
+      "runs_needed": 4,
+      "inspections_needed": 16,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:first-party-production-source-triangulation",
+      "strategy_name": "First-party production-source triangulation",
+      "evaluation_set_id": "EVAL:authority-currentness",
+      "benchmark_task_id": "09",
+      "task": "Find an official first-party machine-readable U.S. federal acquisition-rule source that preserves clause/provision structure, fill-ins and revision/change provenance.",
+      "comparison_group_id": "CMP:authority-currentness:task-09",
+      "matched_strategy_ids": [
+        "STRAT:first-party-production-source-triangulation",
+        "STRAT:rule-period-authority-version-audit",
+        "STRAT:authority-origin-invariant-set-consistency"
+      ],
+      "runs_needed": 3,
+      "inspections_needed": 13,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:ingestion-invariant-triad-intersection",
+      "strategy_name": "Ingestion invariant-triad intersection",
+      "evaluation_set_id": "EVAL:ingestion-protocol",
+      "benchmark_task_id": "37",
+      "task": "Find a permit/property ingestion plane with connectors across municipal data systems, immutable permit versions/diffs and explicit semantic field-mapping QA.",
+      "comparison_group_id": "CMP:ingestion-protocol:task-37",
+      "matched_strategy_ids": [
+        "STRAT:ingestion-invariant-triad-intersection",
+        "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+        "STRAT:first-party-production-source-triangulation"
+      ],
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:paper-research-artifact-production-descendant",
+      "strategy_name": "Paper -> research artifact -> production descendant",
+      "evaluation_set_id": "EVAL:agent-lineage-governance",
+      "benchmark_task_id": "28",
+      "task": "Find a persistent self-improving agent harness that can turn repeated failures/tactics into durable memories, skills and subagents with rollback or refinement history.",
+      "comparison_group_id": "CMP:agent-lineage-governance:task-28",
+      "matched_strategy_ids": [
+        "STRAT:paper-research-artifact-production-descendant",
+        "STRAT:cross-source-emergence-triangulation",
+        "STRAT:acceptance-path-transition-inspection"
+      ],
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+      "strategy_name": "Protocol-regression archaeology for pre-FAT systems",
+      "evaluation_set_id": "EVAL:ingestion-protocol",
+      "benchmark_task_id": "37",
+      "task": "Find a permit/property ingestion plane with connectors across municipal data systems, immutable permit versions/diffs and explicit semantic field-mapping QA.",
+      "comparison_group_id": "CMP:ingestion-protocol:task-37",
+      "matched_strategy_ids": [
+        "STRAT:ingestion-invariant-triad-intersection",
+        "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+        "STRAT:first-party-production-source-triangulation"
+      ],
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "matched_overlap": 2
+    },
+    {
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
+      "strategy_name": "Rule-period / authority-version audit",
+      "evaluation_set_id": "EVAL:authority-currentness",
+      "benchmark_task_id": "09",
+      "task": "Find an official first-party machine-readable U.S. federal acquisition-rule source that preserves clause/provision structure, fill-ins and revision/change provenance.",
+      "comparison_group_id": "CMP:authority-currentness:task-09",
+      "matched_strategy_ids": [
+        "STRAT:first-party-production-source-triangulation",
+        "STRAT:rule-period-authority-version-audit",
+        "STRAT:authority-origin-invariant-set-consistency"
+      ],
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "matched_overlap": 2
+    }
+  ],
+  "matched_comparison_groups": [
+    {
+      "comparison_group_id": "CMP:authority-currentness:task-09",
+      "evaluation_set_id": "EVAL:authority-currentness",
+      "benchmark_task_id": "09",
+      "task": "Find an official first-party machine-readable U.S. federal acquisition-rule source that preserves clause/provision structure, fill-ins and revision/change provenance.",
+      "strategy_ids": [
+        "STRAT:authority-origin-invariant-set-consistency",
+        "STRAT:first-party-production-source-triangulation",
+        "STRAT:rule-period-authority-version-audit"
+      ]
+    },
+    {
+      "comparison_group_id": "CMP:verification-boundaries:task-12",
+      "evaluation_set_id": "EVAL:verification-boundaries",
+      "benchmark_task_id": "12",
+      "task": "Find a real restore-verification platform that executes recoveries across heterogeneous data systems and emits independently checkable evidence rather than trusting backup-success status.",
+      "strategy_ids": [
+        "STRAT:acceptance-path-transition-inspection",
+        "STRAT:evaluation-target-independence",
+        "STRAT:fail-open-boundary-archaeology"
+      ]
+    },
+    {
+      "comparison_group_id": "CMP:operational-conjunctions:task-16",
+      "evaluation_set_id": "EVAL:operational-conjunctions",
+      "benchmark_task_id": "16",
+      "task": "Find a deep airline-disruption/recovery engine covering constrained optimization, passenger/crew recovery, legality, uncertainty, simulation and deterministic replay.",
+      "strategy_ids": [
+        "STRAT:capability-conjunction-search-claim-tracing",
+        "STRAT:decision-claim-runtime-side-effect-trace",
+        "STRAT:evaluation-target-independence"
+      ]
+    },
+    {
+      "comparison_group_id": "CMP:agent-lineage-governance:task-28",
+      "evaluation_set_id": "EVAL:agent-lineage-governance",
+      "benchmark_task_id": "28",
+      "task": "Find a persistent self-improving agent harness that can turn repeated failures/tactics into durable memories, skills and subagents with rollback or refinement history.",
+      "strategy_ids": [
+        "STRAT:acceptance-path-transition-inspection",
+        "STRAT:cross-source-emergence-triangulation",
+        "STRAT:paper-research-artifact-production-descendant"
+      ]
+    },
+    {
+      "comparison_group_id": "CMP:ingestion-protocol:task-37",
+      "evaluation_set_id": "EVAL:ingestion-protocol",
+      "benchmark_task_id": "37",
+      "task": "Find a permit/property ingestion plane with connectors across municipal data systems, immutable permit versions/diffs and explicit semantic field-mapping QA.",
+      "strategy_ids": [
+        "STRAT:first-party-production-source-triangulation",
+        "STRAT:ingestion-invariant-triad-intersection",
+        "STRAT:protocol-regression-archaeology-for-pre-fat-systems"
+      ]
+    }
+  ]
+}

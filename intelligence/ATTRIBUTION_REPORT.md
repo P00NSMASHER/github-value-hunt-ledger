@@ -1,6 +1,6 @@
 # OUTCOME ATTRIBUTION REPORT
 
-This is an accounting attribution layer, **not a causal claim**. When an outcome cites multiple origin search runs, realized value is split equally across those unique runs. Each run remains an assisted contributor. Surface-level credit is split again across the surfaces used by that run.
+This is an accounting attribution layer, **not a causal claim**. Multi-origin outcomes split value across unique origin runs; surface credit is then split across exact surfaces and independently across unique normalized surface families.
 
 - Valid outcomes: **1**
 - Outcomes with attributable search origins: **1**
@@ -11,9 +11,15 @@ This is an accounting attribution layer, **not a causal claim**. When an outcome
 |---|---:|---:|---:|---:|---:|---|
 | STRAT:acceptance-path-transition-inspection | 1 | 1.00 | 0.00 | $0 | $0 | 0.0–0.0 |
 
+## Objective attribution
+
+| Objective | Assisted outcomes | Outcome eq. | Revenue credit |
+|---|---:|---:|---:|
+| OBJ:exactly-once-settlement | 1 | 1.00 | $0 |
+
 ## Attribution guardrails
 
 - Equal-touch credit prevents the same realized dollars from being counted in full for every origin run.
-- Assisted-outcome counts are useful for lineage; fractional value credit is useful for accounting; neither proves causal contribution.
-- Do not infer that a strategy causes revenue until controlled or repeated outcome evidence exists.
-- Outcome values remain zero/null unless directly evidenced in OUTCOMES.md / outcomes.jsonl.
+- Strategy/query/objective/surface credits are accounting views over the same outcome; do not sum across dimensions.
+- Assisted-outcome counts and fractional credits do not prove causal contribution.
+- Matched benchmark comparisons are the preferred evidence for search-method differences; real outcomes remain the highest-value evidence.

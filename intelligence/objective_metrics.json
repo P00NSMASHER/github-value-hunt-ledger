@@ -1,0 +1,89 @@
+{
+  "rows": [
+    {
+      "search_objective_id": "OBJ:completeness-proof",
+      "name": "Completeness proof",
+      "runs": 3,
+      "deep_inspected": 11,
+      "retained_count": 5,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:authority-lineage",
+      "name": "Authority lineage",
+      "runs": 2,
+      "deep_inspected": 6,
+      "retained_count": 6,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:ambiguity-reconciliation",
+      "name": "Ambiguity reconciliation",
+      "runs": 2,
+      "deep_inspected": 5,
+      "retained_count": 4,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:exactly-once-settlement",
+      "name": "Exactly-once settlement",
+      "runs": 2,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 1.0
+    },
+    {
+      "search_objective_id": "OBJ:independent-evaluation",
+      "name": "Independent evaluation",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:unclassified",
+      "name": "Unclassified",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:identity-lineage",
+      "name": "Identity and correlation lineage",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    }
+  ],
+  "unclassified_runs": 1
+}

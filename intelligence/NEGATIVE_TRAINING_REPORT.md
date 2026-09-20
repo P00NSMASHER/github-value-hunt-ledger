@@ -1,11 +1,12 @@
 # NEGATIVE TRAINING / CANDIDATE LEARNING REPORT
 
-Candidate-level dispositions are the bridge between broad discovery and cheap triage. This report measures what the system is rejecting, retaining and still failing to encode consistently.
+Candidate dispositions are normalized into controlled reason categories while the original evidence-bearing reason text remains preserved in the source run.
 
 - Structured candidate dispositions: **19**
-- Candidate records using controlled reason codes: **2**
-- Candidate records using free-form/custom reason codes: **17**
-- Unique custom reason strings: **17**
+- Direct controlled reasons: **2**
+- Legacy reasons normalized through reviewed aliases: **17**
+- Unmapped custom reasons: **0**
+- Unique unmapped custom reason strings: **0**
 
 ## Disposition mix
 
@@ -15,38 +16,30 @@ Candidate-level dispositions are the bridge between broad discovery and cheap tr
 | watch | 7 |
 | rejected_or_negative | 5 |
 
-## Controlled reasons observed
+## Controlled reason distribution
+
+| Reason | Count | Alias-normalized |
+|---|---:|---:|
+| state_transition_verified | 5 | 4 |
+| authority_location_bypass | 3 | 3 |
+| interesting_but_not_load_bearing | 2 | 2 |
+| unsafe_retry_or_idempotency | 2 | 2 |
+| no_semantic_tests | 2 | 2 |
+| authority_lineage_verified | 1 | 1 |
+| independent_negative_control | 1 | 1 |
+| fail_open_boundary | 1 | 1 |
+| circular_evaluation | 1 | 1 |
+| needs_exactly_once_reconciliation | 1 | 0 |
+
+## Remaining unmapped legacy reasons
 
 | Reason | Count |
 |---|---:|
-| state_transition_verified | 1 |
-| needs_exactly_once_reconciliation | 1 |
-
-## Free-form reasons that should eventually map to controlled reasons
-
-| Reason | Count |
-|---|---:|
-| exact-line-allocation-graph-capacity-conservation-reload-revalidation | 1 |
-| service-and-blanket-semantics-but-product-level-lineage-collapse | 1 |
-| low-attention-HES-to-invoice-lineage-seller-side-narrow-tests | 1 |
-| provider-inquiry-unknown-state-one-shot-refund-signed-delta-compensating-ledger | 1 |
-| refund-confirmation-reversal-entry-settlement-dedup | 1 |
-| independent-bank-transaction-reconciliation-plane | 1 |
-| multi-engine-semantic-restore-signed-evidence-explicit-subject-completeness-gate | 1 |
-| postgres-rabbitmq-dual-plane-semantic-recovery-tamper-chain-fail-closed-cleanup | 1 |
-| validation-query-exit-zero-false-green-and-cleanup-error-swallowed | 1 |
-| same-action-readback-on-lost-response-unknown-fail-closed-but-retry-loophole | 1 |
-| real-vendor-run-id-but-weak-ambiguous-post-handling-no-behavior-tests | 1 |
-| madsci-shaped-physics-sim-harness-no-ambiguity-regression-found | 1 |
-| postcondition-self-validates-command-mutated-local-state | 1 |
-| tested-progress-to-claim-bridge-but-no-independent-measurement-approval-and-alternate-line-mutation-bypasses | 1 |
-| approved-unbilled-selector-exists-but-current-bill-path-creates-and-later-approves-its-own-measurement-book | 1 |
-| caller-authored-bill-economics-free-text-measurement-reference-and-unguarded-lifecycle-transitions | 1 |
-| startup-cancels-active-workflow-with-fresh-result-id-before-physical-reconciliation-then-retry-can-create-fresh-action-id | 1 |
+| — | 0 |
 
 ## Learning policy
 
-- V3 search runs should use `reason_code_standard` for machine learning and `reason_detail` for the precise technical explanation.
-- Never discard the detailed reason text: standardized categories are for aggregation, not a substitute for evidence.
-- A frequently observed rejection reason can become a cheap prefilter only after confirming that it does not suppress rare high-value discoveries.
-- Track false negatives explicitly whenever a candidate initially filtered out is later promoted.
+- V4 runs use `reason_code_standard` for aggregation and `reason_detail` for precise technical evidence.
+- Reviewed aliases normalize old runs without rewriting their source history.
+- A frequent rejection reason becomes a cheap prefilter only after false-negative audits show it does not suppress unusual high-value discoveries.
+- Record false-negative rescues explicitly when a previously rejected/dominated candidate later becomes strong or MASTER.

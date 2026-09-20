@@ -1,0 +1,682 @@
+{
+  "unknown_revision_observations": 82,
+  "unique_repositories_with_unknown_revision": 82,
+  "status_counts": {
+    "rejected": 18,
+    "unknown": 28,
+    "strong": 19,
+    "quarantined": 3,
+    "watch": 14
+  },
+  "source_state_counts": {
+    "current": 82
+  },
+  "master_catalog_gaps": [
+    {
+      "repository": "emoss08/Trenova",
+      "revision": "95fcf816562025ad9af864ded4a5fce8a555bd65"
+    },
+    {
+      "repository": "GSA/GSA-Acquisition-DFARS",
+      "revision": "7e609f791af9cc6d8e7d75a7b05c83b1f62c0cb8"
+    }
+  ],
+  "top_priority": [
+    {
+      "repository": "BroadbandForum/usp-data-models",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong component**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "BroadbandForum/usp-test",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "CANopenNode/CANopenNode",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "OPCFoundation/UA-.NETStandard",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "OpenCommissioning/OC_TcPnScanner",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong family upgrade**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "OpenEtherCATsociety/SOEM",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong component**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "TcHaxx/TcPnScanner",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "eclipse-kura/kura",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong",
+      "priority_score": 10
+    },
+    {
+      "repository": "eclipse-wakaama/wakaama",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "ethercrab-rs/ethercrab",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "flownexus-lwm2m/flownexus",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "frappe/erpnext",
+      "source_catalog": "hunters/16-run11-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / 27/30**",
+      "priority_score": 10
+    },
+    {
+      "repository": "industrial-aiops/industrial-aiops",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "leducp/KickCAT",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "localhots/SimulaTR69",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender component**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "opcua-lads/lads-server-collection",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "openconfig/kne",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender component**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "openconfig/ondatra",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "systerel/S2OPC",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong / Master contender**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "BroadbandForum/cwmp-xml-tools",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch \u2014 migration tooling**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "CANopenNode/CANopenLinux",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "IoTKETI/IPE-LWM2M",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch \u2014 rare bridge**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "OpenAutomationTechnologies/openPOWERLINK_V2",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "OpenEtherCATsociety/SOES",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "SiemensIndustryPL/OpennessProfinetEditor",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "f0rw4rd/hartip",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "f0rw4rd/profinet-py",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "imdtouch/EthernetIP-Simulator",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "libremfg/PackML-MQTT-Simulator",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "optim-enterprises-bv/ac-client",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "pasrom/profinet-rs",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "shensi8312/secsgem-driver",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch \u2014 early bridge concept**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "tokeyjs/TinySECSGem",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "ANI-IN/Call-Center-Intelligence-System",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "AstorisTheBrave/Rostra",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Emma-V/support-triage",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Five9DeveloperProgram/Five9-Agent-Sup-REST-API-Python-Pack",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "GenesysCloudBlueprints/cx-as-code-cicd-gitactions-blueprint",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Hesper-Labs/owly",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Kazaam-sudo/CallQuanta",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Kim-Hakseong/NOKTRA-secsgem-workbench",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Madhumitha-28/enterprise-contact-center-platform",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "OCA/field-service",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Tests/history",
+      "source_catalog": "hunters/04-run12-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "TheBarrelExploit/call-quality-analyzer",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Yogeshwaran-Kumar/VerticalQA",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "andrewawilley/Five9-Agent-Sup-REST-API-Python-Pack",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": "superseded** \u2014 MIT earlier lineage; use newer Five9DeveloperProgram fork unless this original diverges with unique tests.",
+      "priority_score": 7
+    },
+    {
+      "repository": "aws-samples/amazon-connect-contactcenterops",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "aws-samples/connect-contact-flow-comparison-github-action",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "aws-samples/contact-lens-for-amazon-connect-data-gathering-mechanism",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "aws-samples/sample-amazon-connect-resource-mapper",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "camunda-community-hub/camunda-nice-cxone-connector",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "composio-community/support-skills",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "froblerom/opssphere",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "giangdang12378/Call-Center-Analytics",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "reyan145/dbt-contact-center-analytics",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "salesforce/scv-partner-telephony-quickstart",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "service-cloud-voice/ServiceCloudVoiceLambdas",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "snehalsurti12/audrique",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "toqitahamid/kova-commerce",
+      "source_catalog": "hunters/28.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "valcondotcom87/svcdesk",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Andalusia-Data-Science-Team/QA-for-call-center",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "quarantined",
+      "status": "QUARANTINED / rejected** \u2014 README advertised credential-bearing database configuration. That material was deliberately not opened, copied or preserved. Do not revisit absent a sanitized public release; user license assertion does not change this safety boundary.",
+      "priority_score": 5
+    },
+    {
+      "repository": "DWwoo1/EFEM_GEM300",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "quarantined",
+      "status": "rejected / safety quarantine",
+      "priority_score": 5
+    },
+    {
+      "repository": "Frank-KunLi/openACS",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected / deprioritized**.",
+      "priority_score": 5
+    },
+    {
+      "repository": "LT-aitools/QAlert-call-center-improvement",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 React/Vite UI prototype with no substantive QA/calibration/persistence engine.",
+      "priority_score": 5
+    },
+    {
+      "repository": "MiguelGalleg05/contact_center_analytics",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 small Pandas/SQLite/Power BI assessment, commodity analytics, no license established.",
+      "priority_score": 5
+    },
+    {
+      "repository": "NHSE/Secs-Gem-Simulator",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected / deprioritized**.",
+      "priority_score": 5
+    },
+    {
+      "repository": "Nemesysco/QA7-SDK",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 opaque old proprietary-style SDK with no transparent tested source advantage; binaries were not reverse-engineered.",
+      "priority_score": 5
+    },
+    {
+      "repository": "Saskatoontimberman/contact_center-speech-ai-analytics",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 essentially transcription only; no verified QA/compliance/coaching workflow.",
+      "priority_score": 5
+    },
+    {
+      "repository": "ShinLiX/shift_schedule",
+      "source_catalog": "hunters/32.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected / dominated**",
+      "priority_score": 5
+    },
+    {
+      "repository": "ansh-guptaa/LastMileSaathi",
+      "source_catalog": "hunters/46.md",
+      "source_state": "current",
+      "status_bucket": "quarantined",
+      "status": "quarantined / safety rejection**",
+      "priority_score": 5
+    },
+    {
+      "repository": "api-evangelist/replicant",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 README explicitly says no software; API research stub only.",
+      "priority_score": 5
+    },
+    {
+      "repository": "brhamsalih/helpdesk-sale-quotation",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 thin Odoo ticket\u2192quotation bridge without entitlement/proof/pricing-authority/settlement depth; no license established. Dominated by OCA field-service + Servicialo.",
+      "priority_score": 5
+    },
+    {
+      "repository": "cindygnaedinger/contact-center-analytics",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 early fictional BigQuery/Looker scaffold; no assurance engine.",
+      "priority_score": 5
+    },
+    {
+      "repository": "freightbill/freightbill",
+      "source_catalog": "hunters/03.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected as implementation authority; useful terminology/negative fixture only**.",
+      "priority_score": 5
+    },
+    {
+      "repository": "gythialy/j60870",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "watch / deprioritized**.",
+      "priority_score": 5
+    },
+    {
+      "repository": "luckyshine2026/acscloud",
+      "source_catalog": "hunters/35.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected / deprioritized**.",
+      "priority_score": 5
+    },
+    {
+      "repository": "madhuramsundararaj/Support-Ticket-Analytics",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 portfolio analytics; target-leakage lesson is already better covered by Emma-V. No license established.",
+      "priority_score": 5
+    },
+    {
+      "repository": "mdjahidhasansst-pixel/qa-audit-portal",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 MIT Sprint-1 scaffolding; no substantive scorecard/calibration/sampling/appeal engine yet. Revisit only after real domain implementation/tests.",
+      "priority_score": 5
+    },
+    {
+      "repository": "mitre/profinet",
+      "source_catalog": "hunters/12.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected / deprioritized for this lane**.",
+      "priority_score": 5
+    },
+    {
+      "repository": "mrmoeve/support-operations-dashboard",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 polished mock-data Next.js UI without real connector/backend/SLA engine/tests; no license established.",
+      "priority_score": 5
+    },
+    {
+      "repository": "saibhavaniyedla/AI-Customer-Support-Ticket-Triage-RL-Environment",
+      "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "rejected** \u2014 MIT wrapper around one-step synthetic priority classification; no real ticket/queue/SLA/sequential-operations model.",
+      "priority_score": 5
+    }
+  ]
+}

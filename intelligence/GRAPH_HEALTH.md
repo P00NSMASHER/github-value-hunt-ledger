@@ -1,10 +1,12 @@
 # GRAPH HEALTH REPORT
 
 - Curated edges: **132**
-- Derived attribution edges: **110**
+- Derived attribution edges: **162**
 - Capability nodes: **19**
 - Query-family nodes: **12**
-- Search-surface nodes touched: **29**
+- Search-objective nodes touched: **7**
+- Exact search-surface nodes touched: **29**
+- Normalized surface-family nodes touched: **8**
 - Capabilities touched by measured search runs: **10**
 
 ## Highest-priority capability gaps
@@ -26,8 +28,8 @@
 
 ## Graph policy
 
-- High gap score means **information value**, not commercial priority.
-- Prefer searches that close a named missing edge in an active experiment over searches that add another similar implementation.
-- Query-family and surface nodes preserve discovery provenance without pretending those edges are causal.
-- A capability with many repositories but no experiment or outcome edge is a research cluster, not yet a validated asset.
+- Query families belong to broader objectives; exact surfaces belong to normalized surface families.
+- These provenance edges explain how knowledge was found; they are not causal proof that a strategy/surface produced the outcome.
+- Prefer searches that close a named missing edge in an active experiment over another similar implementation.
+- A capability with many repositories but no experiment/outcome edge remains a research cluster.
 - Independent challengers and negative controls can be more valuable than a second implementation of the same mechanism.

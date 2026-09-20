@@ -1,5 +1,5 @@
 {
-  "method": "equal_touch_across_unique_origin_runs; surface credit additionally split across surfaces used by each credited run",
+  "method": "equal_touch_across_unique_origin_runs; exact-surface and unique-surface-family credit split within each credited run",
   "causal_claim": false,
   "valid_outcomes": 1,
   "outcomes_with_attributable_origins": 1,
@@ -49,6 +49,18 @@
       "assisted_outcome_count": 1
     }
   ],
+  "by_objective": [
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "OBJ:exactly-once-settlement",
+      "assisted_outcome_count": 1
+    }
+  ],
   "by_surface": [
     {
       "fractional_outcome_equivalents": 0.3333333333333333,
@@ -78,6 +90,28 @@
       "engineering_days_saved_low_credit": 0.0,
       "engineering_days_saved_high_credit": 0.0,
       "id": "SURFACE:synthetic-acceptance-corpus",
+      "assisted_outcome_count": 1
+    }
+  ],
+  "by_surface_family": [
+    {
+      "fractional_outcome_equivalents": 0.5,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE_FAMILY:private-ledger",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.5,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE_FAMILY:synthetic-local-validation",
       "assisted_outcome_count": 1
     }
   ],
