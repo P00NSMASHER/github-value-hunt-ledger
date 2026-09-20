@@ -40,6 +40,7 @@ Human-readable current graph connecting repository/data evidence to capabilities
 - Summae -> IMPLEMENTS CAP-016 accounting/close truth.
 - Wingcaster -> STRENGTHENS internal effective-contract→rating→invoice→allocation→reconciliation loop but DEPENDS_ON external contract and bank truth.
 - `NotAbdelrahmanelsayed/paymob_integration@8999a6799c5673ad49471224ad0f8012a447495d` -> STRENGTHENS CAP-018/CAP-016 with Pending-on-ambiguity, provider inquiry recovery, durable refund-request intent, signed/independently fetched child refund evidence and compensating ledger entries.
+- `az-said/Interlock@822ec54692b30e1fdce04b55dfab62d0b56a60b2` -> STRENGTHENS CAP-016 with exact-revision Stripe test-mode evidence for post-effect process death, new-process recovery, one durable correction identity and later one-time provider-accounting application to a paid invoice; CHALLENGES any claim that provider-native accounting application equals bank settlement or that the framework uniquely owns the money outcome, because the published handwritten baseline ties it.
 - BlackPigIndustries/threvo-actions shadow evidence -> CHALLENGES/strengthens governed consequential-action architecture but DEPENDS_ON retained live-provider qualification; current inspected provider cases remain NOT_EXERCISED.
 - CAP-006+016+018+019 -> ENABLES OPP Money-State Integrity -> TESTED_BY EXP-010.
 
@@ -83,6 +84,7 @@ Human-readable current graph connecting repository/data evidence to capabilities
 - S4 Clarity + scilifelab EPPs + samplesheet-parser + Illumina InterOp -> IMPLEMENT/STRENGTHEN CAP-017.
 - Flowcept/HELIOS -> STRENGTHEN provenance/governance.
 - `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` -> STRENGTHENS CAP-017 with same-action readback after a lost dispatch response and explicit `UNKNOWN` on unresolved result lookup, while CHALLENGING any system-wide exactly-once claim because generic workflow retry can create a fresh ActionRequest/ULID without mandatory physical reconciliation.
+- `Opentrons/opentrons@03b991fb263b97b6bb767ce311ca56e103d635e4` -> STRENGTHENS CAP-017 with external vendor `run_id` plus restart-persistent run/action/command state; CHALLENGES naive SAFE_TO_REISSUE because the run-control action ID is server-generated and play/resume can begin before the action row is persisted, so missing action history is weaker than proof of non-application.
 - `AD-SDL/ot2_module@39ffdfdb...` + `RoryMB/simlab@5ae0641...` -> TEST-HARNESS candidates for vendor-run identity and simulated actuation; `di-omics/plr-lab-robot@0b062298...` -> NEGATIVE_CONTROL for self-validating command-mutated local state.
 - CAP-013+017 -> ENABLES OPP Installed-Base Lab Automation -> TESTED_BY EXP-007 actuated-but-response-lost/retry/restart acceptance case.
 
