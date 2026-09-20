@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "claim_soft_sla_minutes": 75,
+  "claim_hard_expiry_minutes": 150,
+  "work_steal_ticket_ttl_minutes": 120,
+  "work_steal_backups_per_expired_ticket": 2,
+  "min_backup_score_ratio": 0.75,
+  "min_worker_dispatch_events_for_response_label": 3,
+  "min_claimed_events_for_latency_label": 2,
+  "exclude_work_steal_from_v13_routing_learning": true,
+  "ticket_clock": "git_commit_time",
+  "guardrails": [
+    "Primary dispatch tickets become stale before they become ineligible.",
+    "A primary ticket cannot be work-stolen before its hard expiry.",
+    "Work stealing creates bounded generated standby tickets and never auto-claims work.",
+    "V11 one-active-claim-per-worker and one-active-claim-per-slot rules remain authoritative.",
+    "Work-steal claims do not train the V13 primary-routing learner.",
+    "Unknown legacy ticket age is never guessed.",
+    "A backup worker must satisfy the configured minimum routing-score ratio.",
+    "Dispatch tickets never authorize external actions beyond the bounded hunt assignment."
+  ]
+}

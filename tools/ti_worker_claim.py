@@ -4,47 +4,97 @@ from datetime import datetime, timezone
 from ti_common import INTEL, load_jsonl
 from ti_execution import build_execution_state
 
+def now_dt():
+    return datetime.now(timezone.utc)
+
 def now_iso():
-    return datetime.now(timezone.utc).isoformat().replace("+00:00","Z")
+    return now_dt().isoformat().replace("+00:00","Z")
+
+def parse_ts(value):
+    if not value:
+        return None
+    dt=datetime.fromisoformat(str(value).replace("Z","+00:00"))
+    return dt.astimezone(timezone.utc) if dt.tzinfo else None
 
 def short_hash(text):
     return hashlib.sha256(text.encode()).hexdigest()[:12]
 
+def choose_packet(worker,steal=False,dispatch_ticket=None):
+    primary=load_jsonl("dispatch_claim_packets.jsonl")
+    steals=load_jsonl("work_steal_claim_packets.jsonl") if (INTEL/"work_steal_claim_packets.jsonl").exists() else []
+    pool=steals if steal else primary
+    if dispatch_ticket:
+        pool=primary+steals
+        matches=[x for x in pool if x.get("worker_id")==worker and x.get("dispatch_ticket_id")==dispatch_ticket]
+    else:
+        matches=[x for x in pool if x.get("worker_id")==worker]
+    if not matches:
+        kind="work-steal" if steal else "primary"
+        raise SystemExit(f"no current {kind} dispatch packet for {worker}")
+    matches.sort(key=lambda x:(int(x.get("steal_rank") or 0),x.get("slot_id") or "",x.get("dispatch_ticket_id") or ""))
+    return matches[0]
+
 def main():
-    p=argparse.ArgumentParser(description="Claim the V12-routed slot for one registered worker in a local checkout.")
+    p=argparse.ArgumentParser(description="Claim one current V15 dispatch ticket for a registered worker.")
     p.add_argument("--worker",required=True)
     p.add_argument("--lease-minutes",type=int)
+    p.add_argument("--steal",action="store_true",help="claim the highest-ranked eligible standby work-steal ticket")
+    p.add_argument("--dispatch-ticket",help="claim one exact current primary or work-steal ticket")
     args=p.parse_args()
 
-    routes={x["worker_id"]:x for x in load_jsonl("worker_routing.jsonl")}
-    packets={x["worker_id"]:x for x in load_jsonl("worker_claim_packets.jsonl")}
-    route=routes.get(args.worker)
-    if not route: raise SystemExit(f"unknown worker {args.worker}")
-    if route["route_status"]=="LOCKED":
-        print(json.dumps({"status":"ALREADY_CLAIMED","route":route},indent=2)); return
-    if route["route_status"]!="ROUTED":
-        raise SystemExit(f"worker {args.worker} is not routed: {route['route_status']}")
-
+    packet=choose_packet(args.worker,args.steal,args.dispatch_ticket)
     states,_,_=build_execution_state(write=False)
-    state={x["slot_id"]:x for x in states}[route["slot_id"]]
+    state_by_slot={x["slot_id"]:x for x in states}
+    active=[
+      x for x in states
+      if x.get("worker_id")==args.worker and x.get("status") in {"CLAIMED","RUNNING","CLAIMED_SUPERSEDED","RUNNING_SUPERSEDED"}
+    ]
+    if active:
+        raise SystemExit(f"worker {args.worker} already has active claim {active[0].get('claim_id')}")
+    state=state_by_slot.get(packet["slot_id"])
+    if not state:
+        raise SystemExit(f"unknown slot {packet['slot_id']}")
     policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
     if state["status"] not in set(policy.get("claimable_states") or []):
-        raise SystemExit(f"routed slot is no longer claimable: {state['status']}")
+        raise SystemExit(f"dispatch slot is no longer claimable: {state['status']}")
 
-    packet=packets[args.worker]
-    ts=now_iso()
-    seed=f"{ts}|{args.worker}|{packet['slot_id']}|{packet['assignment_id']}|{packet['routing_generation_id']}"
+    now=now_dt()
+    eligible=parse_ts(packet.get("eligible_at") or packet.get("issued_at"))
+    hard=parse_ts(packet.get("hard_expire_at"))
+    if eligible and now<eligible:
+        raise SystemExit("dispatch ticket is not eligible yet")
+    if hard and now>hard:
+        raise SystemExit("dispatch ticket has hard-expired")
+
+    ts=now.isoformat().replace("+00:00","Z")
+    seed=f"{ts}|{args.worker}|{packet['slot_id']}|{packet['dispatch_ticket_id']}"
     claim_id="CLAIM:"+short_hash(seed)
     event={
       "event_id":"EXEC:"+short_hash("CLAIM|"+seed),
-      "event_type":"CLAIM","timestamp":ts,"slot_id":packet["slot_id"],"claim_id":claim_id,"worker_id":args.worker,
-      "assignment_id":packet["assignment_id"],"allocator_generation_id":packet["allocator_generation_id"],
-      "portfolio_policy_generation_id":packet["portfolio_policy_generation_id"],"work_item_id":packet["work_item_id"],
-      "assignment_slot_role":packet["assignment_slot_role"],"assignment_work_kind":packet["assignment_work_kind"],
-      "assignment_source_id":packet["assignment_source_id"],"assignment_score":packet["assignment_score"],
+      "event_type":"CLAIM",
+      "timestamp":ts,
+      "slot_id":packet["slot_id"],
+      "claim_id":claim_id,
+      "worker_id":args.worker,
+      "claim_schema_version":int(packet.get("claim_schema_version") or 15),
+      "assignment_id":packet["assignment_id"],
+      "allocator_generation_id":packet["allocator_generation_id"],
+      "portfolio_policy_generation_id":packet["portfolio_policy_generation_id"],
+      "work_item_id":packet["work_item_id"],
+      "assignment_slot_role":packet["assignment_slot_role"],
+      "assignment_work_kind":packet["assignment_work_kind"],
+      "assignment_source_id":packet["assignment_source_id"],
+      "assignment_score":packet["assignment_score"],
       "lease_minutes":args.lease_minutes or int(policy.get("default_lease_minutes",120)),
-      "routing_generation_id":packet["routing_generation_id"],"worker_profile_generation_id":packet["worker_profile_generation_id"],
-      "routing_score":packet["routing_score"]
+      "routing_mode":"generated",
+      "routing_generation_id":packet["routing_generation_id"],
+      "worker_profile_generation_id":packet["worker_profile_generation_id"],
+      "routing_learning_generation_id":packet.get("routing_learning_generation_id"),
+      "routing_score":packet["routing_score"],
+      "dispatch_ticket_id":packet["dispatch_ticket_id"],
+      "dispatch_generation_id":packet["dispatch_generation_id"],
+      "dispatch_kind":packet.get("dispatch_kind") or "primary",
+      "parent_dispatch_ticket_id":packet.get("parent_dispatch_ticket_id")
     }
     path=INTEL/"execution_events"/f"{packet['slot_id']}.jsonl"
     with path.open("a",encoding="utf-8") as f:

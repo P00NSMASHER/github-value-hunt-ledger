@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 from collections import Counter
+from datetime import datetime, timezone
 from ti_common import INTEL, load_jsonl
 
 policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
@@ -9,8 +10,15 @@ dispatch_history=load_jsonl("dispatch_ticket_history.jsonl") if (INTEL/"dispatch
 dispatch_by_id={x.get("dispatch_ticket_id"):x for x in dispatch_history if x.get("dispatch_ticket_id")}
 legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
 min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
+min_v15_claim_schema=int(dispatch_policy.get("minimum_v15_claim_schema_version",15))
 worker_registry=json.loads((INTEL/"worker_registry.json").read_text(encoding="utf-8")) if (INTEL/"worker_registry.json").exists() else {"workers":[]}
 registered_workers={w["worker_id"] for w in worker_registry.get("workers",[])}
+def parse_ts(value):
+    if not value:
+        return None
+    dt=datetime.fromisoformat(str(value).replace("Z","+00:00"))
+    return dt.astimezone(timezone.utc) if dt.tzinfo else None
+
 alloc=load_jsonl("hunt_allocations.jsonl")
 states=load_jsonl("execution_state.jsonl")
 claims=load_jsonl("execution_claim_history.jsonl")
@@ -48,6 +56,9 @@ for n,c in enumerate(claims,1):
             ticket=dispatch_by_id.get(did)
             if not ticket:
                 raise SystemExit(f"execution_claim_history.jsonl:{n}: generated claim missing historical dispatch ticket")
+            ticket_schema=int(ticket.get("ticket_schema_version") or 0)
+            if ticket_schema>=15 and claim_schema<min_v15_claim_schema:
+                raise SystemExit(f"execution_claim_history.jsonl:{n}: V15 ticket requires schema {min_v15_claim_schema}+ claim")
             exact={
               "worker_id":c.get("worker_id"),"slot_id":c.get("slot_id"),"assignment_id":c.get("assignment_id"),
               "allocator_generation_id":c.get("allocator_generation_id"),"portfolio_policy_generation_id":c.get("portfolio_policy_generation_id"),
@@ -56,8 +67,20 @@ for n,c in enumerate(claims,1):
               "routing_learning_generation_id":c.get("routing_learning_generation_id"),
               "dispatch_generation_id":c.get("dispatch_generation_id")
             }
+            if ticket_schema>=15:
+                exact["dispatch_kind"]=c.get("dispatch_kind")
+                exact["parent_dispatch_ticket_id"]=c.get("parent_dispatch_ticket_id")
             drift=[k for k,v in exact.items() if ticket.get(k)!=v]
-            if drift: raise SystemExit(f"execution_claim_history.jsonl:{n}: dispatch history drift {','.join(drift)}")
+            if drift:
+                raise SystemExit(f"execution_claim_history.jsonl:{n}: dispatch history drift {','.join(drift)}")
+            if ticket_schema>=15:
+                claimed=parse_ts(c.get("claimed_at"))
+                eligible=parse_ts(ticket.get("eligible_at") or ticket.get("issued_at"))
+                hard=parse_ts(ticket.get("hard_expire_at"))
+                if claimed and eligible and claimed<eligible:
+                    raise SystemExit(f"execution_claim_history.jsonl:{n}: claim before dispatch eligibility")
+                if claimed and hard and claimed>hard:
+                    raise SystemExit(f"execution_claim_history.jsonl:{n}: claim after dispatch hard expiry")
         elif c.get("routing_mode")=="manual_override":
             if not str(c.get("route_override_reason") or "").strip():
                 raise SystemExit(f"execution_claim_history.jsonl:{n}: manual override missing reason")
@@ -113,6 +136,11 @@ for n,r in enumerate(runs,1):
                 raise SystemExit(f"search_runs.jsonl:{n}: V14 run dispatch_generation_id mismatch")
             if r.get("routing_learning_generation_id")!=c.get("routing_learning_generation_id"):
                 raise SystemExit(f"search_runs.jsonl:{n}: V14 routing_learning_generation_id mismatch")
+            if int(r.get("schema_version") or 0)>=15:
+                if r.get("dispatch_kind")!=c.get("dispatch_kind"):
+                    raise SystemExit(f"search_runs.jsonl:{n}: V15 dispatch_kind mismatch")
+                if r.get("dispatch_parent_ticket_id")!=c.get("parent_dispatch_ticket_id"):
+                    raise SystemExit(f"search_runs.jsonl:{n}: V15 dispatch parent mismatch")
         elif r.get("route_override_reason")!=c.get("route_override_reason"):
             raise SystemExit(f"search_runs.jsonl:{n}: V14 override reason mismatch")
     try:

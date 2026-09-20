@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V15 Dispatch Backpressure Record",
+  "type": "object",
+  "required": [
+    "dispatch_ticket_id",
+    "worker_id",
+    "slot_id",
+    "lifecycle_state"
+  ],
+  "properties": {
+    "dispatch_ticket_id": {
+      "type": "string",
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "worker_id": {
+      "type": "string"
+    },
+    "slot_id": {
+      "type": "string",
+      "pattern": "^SLOT-[0-9]{2}$"
+    },
+    "lifecycle_state": {
+      "enum": [
+        "PENDING",
+        "STALE",
+        "EXPIRED",
+        "CLAIMED",
+        "RUNNING",
+        "COMPLETE",
+        "FAILED_TERMINAL",
+        "FAILED_RETRYABLE",
+        "RELEASED",
+        "LEGACY_UNTIMED"
+      ]
+    },
+    "age_minutes": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "claim_latency_minutes": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    }
+  },
+  "additionalProperties": true
+}

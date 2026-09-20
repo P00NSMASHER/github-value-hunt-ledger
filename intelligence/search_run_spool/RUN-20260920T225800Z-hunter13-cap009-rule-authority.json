@@ -5,12 +5,23 @@
   "hunter_role": "HUNTER-13 / Revenue Leverage",
   "strategy_id": "STRAT:rule-period-authority-version-audit",
   "query_family": "workforce schedule hard-lock verification + effective-dated current labor/domain rule authority + rule provenance",
-  "query_family_id": "QF:workforce-hard-lock-effective-dated-rule-authority-provenance",
+  "query_family_id": "QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
   "search_objective_id": "OBJ:current-rule-authority",
   "measurement_quality": "prospective",
-  "lane_ids": ["REVENUE-LEVERAGE", "WORKFORCE-SCHEDULING"],
-  "seed_nodes": ["CAP-009", "EXP-008"],
-  "search_surfaces": ["GitHub repository search", "GitHub code/source/tests", "official labor-law sources", "official Payroll Engine documentation"],
+  "lane_ids": [
+    "REVENUE-LEVERAGE",
+    "WORKFORCE-SCHEDULING"
+  ],
+  "seed_nodes": [
+    "CAP-009",
+    "EXP-008"
+  ],
+  "search_surfaces": [
+    "GitHub repository search",
+    "GitHub code/source/tests",
+    "official labor-law sources",
+    "official Payroll Engine documentation"
+  ],
   "queries": [
     "schedule minimum rest hard constraint labor law effective date version",
     "workforce compliance 32 consecutive hours rest source tests",
@@ -26,8 +37,12 @@
   "recall_rescue_used": false,
   "stop_reason": "The assigned CAP-009 authority gap was reduced to an implementable architecture and adversarial corpus: PayrollEngine supplies effective/knowledge-time rule selection, while ShiftGuard falsifies static compliance-label assumptions. Broader generic scheduler search stopped because RosterSpec already owns the solver/verifier plane.",
   "new_capability_ids": [],
-  "strengthened_capability_ids": ["CAP-009"],
-  "experiment_ids": ["EXP-008"],
+  "strengthened_capability_ids": [
+    "CAP-009"
+  ],
+  "experiment_ids": [
+    "EXP-008"
+  ],
   "candidate_dispositions": [
     {
       "repository": "Payroll-Engine/PayrollEngine + Payroll-Engine/PayrollEngine.Backend",
@@ -35,13 +50,19 @@
       "status": "strong-component",
       "reason_code_standard": "state_transition_verified",
       "reason_detail": "Runtime regulation selection combines Created knowledge cutoff and ValidFrom effective date; executable fixtures cover temporal boundaries; Timesheet validation resolves rule data at WorkTimeDate. Strong authority substrate, not a scheduler or statutory corpus.",
-      "capability_ids": ["CAP-009"],
+      "capability_ids": [
+        "CAP-009"
+      ],
       "novelty_ordinal": 5,
       "evidence_ordinal": 4,
       "replacement_days_low": 30,
       "replacement_days_high": 90,
       "duplicate_of": null,
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "metadata_status": "unavailable",
+        "profile_source": "historical HUNTER-13 spool did not capture structured repository metadata"
+      }
     },
     {
       "repository": "JayySap/ShiftGaurd",
@@ -49,13 +70,19 @@
       "status": "negative-oracle",
       "reason_code_standard": "independent_negative_control",
       "reason_detail": "Hard-coded BC-labeled settings lack authority/version provenance; 32h weekly rest is approximated by total hours; violating draft shifts are still persisted and test exits successfully; current official BC rules contradict some encoded semantics.",
-      "capability_ids": ["CAP-009"],
+      "capability_ids": [
+        "CAP-009"
+      ],
       "novelty_ordinal": 3,
       "evidence_ordinal": 4,
       "replacement_days_low": 3,
       "replacement_days_high": 10,
       "duplicate_of": null,
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "metadata_status": "unavailable",
+        "profile_source": "historical HUNTER-13 spool did not capture structured repository metadata"
+      }
     },
     {
       "repository": "Payroll-Engine/PayrollEngine.Template.Regulation.Country",
@@ -63,23 +90,31 @@
       "status": "watch",
       "reason_code_standard": "interesting_but_not_load_bearing",
       "reason_detail": "Template encodes authority-source documentation, validFrom updates, annual/mid-year change workflow and regression verification, but is not itself a current jurisdictional rule corpus.",
-      "capability_ids": ["CAP-009"],
+      "capability_ids": [
+        "CAP-009"
+      ],
       "novelty_ordinal": 3,
       "evidence_ordinal": 3,
       "replacement_days_low": 10,
       "replacement_days_high": 25,
       "duplicate_of": null,
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "metadata_status": "unavailable",
+        "profile_source": "historical HUNTER-13 spool did not capture structured repository metadata"
+      }
     }
   ],
   "best_result": "PayrollEngine supplies the missing temporal rule-authority pattern for CAP-009: a rule version is selected by effective date plus knowledge/creation cutoff, and work-time validation can resolve date-effective constraints. Combined with RosterSpec this can produce source/version-backed schedule proof rather than static compliance settings. ShiftGuard is a concrete negative oracle showing why hard-coded numbers and warnings are insufficient.",
   "durable_evidence_path": "hunters/32-run11-2026-09-20.md",
-  "notes": "Canonical append to intelligence/search_runs.jsonl should be reconciled by the integrator from this spool record if required; no central synthesis files were edited by the hunter.",
+  "notes": "Canonical append to intelligence/search_runs.jsonl should be reconciled by the integrator from this spool record if required; no central synthesis files were edited by the hunter. Integrator normalization: malformed source claim ID CLAIM:13b20260920222550 was deterministically normalized to CLAIM:2668c9456429; original remains in Git history.",
   "benchmark_task_ids": [],
   "comparison_group_id": "CAP-009-rule-authority",
   "evaluation_set_id": "EXP-008-rule-authority-corpus",
   "seed_mode": "generated",
-  "seed_ids": ["SEED:gap:cap-009"],
+  "seed_ids": [
+    "SEED:gap:cap-009"
+  ],
   "adjacency_mode": "none",
   "adjacency_ids": [],
   "adjacency_types": [],
@@ -95,13 +130,13 @@
   "assignment_work_kind": "capability_gap",
   "assignment_source_id": "SEED:gap:cap-009",
   "assignment_score": 90.65,
-  "execution_claim_id": "CLAIM:13b20260920222550",
+  "execution_claim_id": "CLAIM:2668c9456429",
   "execution_slot_id": "SLOT-03",
   "execution_worker_id": "HUNTER-13",
   "routing_mode": "generated",
   "routing_generation_id": "ROUTING:ff524bcab4b2",
   "worker_profile_generation_id": "WORKERS:dde32346eaff",
-  "routing_score": null,
+  "routing_score": 15.878,
   "dispatch_ticket_id": "DISPATCH:2b72e0a3e66e",
   "dispatch_generation_id": "DISPATCHGEN:3c7a1c700fc4",
   "routing_learning_generation_id": "ROUTELEARN:3427dfe228b7",

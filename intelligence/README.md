@@ -596,3 +596,35 @@ New generated search runs use `schema_version: 14` and carry:
 - `routing_learning_generation_id`.
 
 This makes route provenance durable from V12/V13 routing -> V14 dispatch -> V11 execution -> V10/V13 learning.
+
+
+## V15 dispatch backpressure and work stealing
+
+V15 measures whether routed research capacity actually turns into claimed work.
+
+Primary dispatch tickets are now time-aware:
+- soft-stale after **75 minutes**;
+- hard-expire after **150 minutes**;
+- timestamps are derived from the generating Git commit time rather than an untracked wall-clock write;
+- legacy V14 tickets without issuance time remain historical and are never assigned guessed ages.
+
+Generated products:
+- `dispatch_backpressure.jsonl` — lifecycle state and claim latency for current primary tickets;
+- `worker_dispatch_response_metrics.jsonl` — worker claim-rate / latency evidence;
+- `DISPATCH_BACKPRESSURE.md` — human-readable pressure report;
+- `work_steal_tickets.jsonl` — bounded standby tickets for hard-expired work;
+- `work_steal_claim_packets.jsonl` — claim-ready backup packets;
+- `WORK_STEAL_QUEUE.md` — current standby takeover options;
+- `dispatch_backpressure_metrics.json` — machine-readable summary.
+
+Work stealing is conservative:
+- it starts only after the primary ticket hard-expires;
+- it never auto-claims work;
+- at most 2 backup tickets are generated per expired primary;
+- backup routing score must be at least 75% of the original primary score;
+- V11 one-worker / one-slot active-claim rules still win;
+- steal tickets themselves expire after 120 minutes.
+
+Schema-v15 generated runs record `dispatch_kind: primary | work_steal`. Work-steal runs also record `dispatch_parent_ticket_id`.
+
+V13 deliberately excludes work-steal runs from primary-route specialization learning. Worker response timing is measured separately so slow/unclaimed routing can be improved without pretending the backup worker proves the original route was good or bad.
