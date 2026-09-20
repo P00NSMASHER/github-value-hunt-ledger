@@ -26,6 +26,7 @@ DOC_PATHS=(
     "freight/DATA_READINESS_DIAGNOSTIC.md",
     "freight/PILOT_PROTOCOL.md",
     "freight/PILOT_LAUNCH_GATE.md",
+    "freight/PILOT_LAUNCH_BRIEF.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json",
     "freight/PILOT_DATA_ROOM.md",
