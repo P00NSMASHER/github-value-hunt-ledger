@@ -5,13 +5,17 @@ external evidence; ambiguous results remain DELETE_UNKNOWN.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, replace
+import re
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Iterable
 
 from freight.contracts import canonical_hash
 from freight.pilot_package import DataRoomManifest
+
+
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 class LifecycleState(str, Enum):
@@ -50,6 +54,11 @@ class SourceObservationReceipt:
     status: ObservationStatus
     observation_hash: str
     completeness_evidence_hash: str | None = None
+
+
+def _require_sha256(name: str, value: str | None) -> None:
+    if value is None or not SHA256_RE.fullmatch(value):
+        raise ValueError(name + " must be lowercase SHA-256")
 
 
 def _parse_utc(value: str) -> datetime:
@@ -135,8 +144,7 @@ def _transition(
 
 
 def request_delete(item: LifecycleItem, request_hash: str) -> LifecycleItem:
-    if not request_hash:
-        raise ValueError("delete request evidence hash required")
+    _require_sha256("delete request evidence hash", request_hash)
     return _transition(
         item,
         expected_states={LifecycleState.PRESENT, LifecycleState.DELETE_UNKNOWN},
@@ -146,8 +154,7 @@ def request_delete(item: LifecycleItem, request_hash: str) -> LifecycleItem:
 
 
 def confirm_delete(item: LifecycleItem, confirmation_hash: str) -> LifecycleItem:
-    if not confirmation_hash:
-        raise ValueError("external deletion confirmation hash required")
+    _require_sha256("external deletion confirmation hash", confirmation_hash)
     return _transition(
         item,
         expected_states={LifecycleState.DELETE_REQUESTED, LifecycleState.DELETE_UNKNOWN},
@@ -157,6 +164,8 @@ def confirm_delete(item: LifecycleItem, confirmation_hash: str) -> LifecycleItem
 
 
 def mark_delete_unknown(item: LifecycleItem, evidence_hash: str | None = None) -> LifecycleItem:
+    if evidence_hash is not None:
+        _require_sha256("delete unknown evidence hash", evidence_hash)
     return _transition(
         item,
         expected_states={LifecycleState.DELETE_REQUESTED},
@@ -191,10 +200,11 @@ def observe_source(
     completeness_evidence_hash: str | None = None,
 ) -> SourceObservationReceipt:
     _parse_utc(observed_at)
-    if not evidence_hash:
-        raise ValueError("observation evidence hash required")
-    if status is ObservationStatus.VERIFIED_EMPTY and not completeness_evidence_hash:
-        raise ValueError("VERIFIED_EMPTY requires completeness evidence")
+    _require_sha256("observation evidence hash", evidence_hash)
+    if status is ObservationStatus.VERIFIED_EMPTY:
+        _require_sha256("VERIFIED_EMPTY completeness evidence", completeness_evidence_hash)
+    elif completeness_evidence_hash is not None:
+        _require_sha256("completeness evidence hash", completeness_evidence_hash)
 
     body = {
         "schema": 1,
