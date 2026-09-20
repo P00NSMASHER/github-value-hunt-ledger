@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-09-20",
+  "evidence_type": "deployment_security",
+  "target": {
+    "provider": "Netlify",
+    "project_name": "freightleak-audit",
+    "site_id": "4884fe92-34bc-411c-8fc4-202744c7e161",
+    "team_id": "6aa9bbfacf14195400307f86",
+    "primary_url": "https://freightleak-audit.netlify.app",
+    "plan": "nf_team_dev"
+  },
+  "access_control": {
+    "status": "CONFIG_PROVEN",
+    "sso_team_login_required": true,
+    "sso_scope": "all",
+    "password_required": false,
+    "team_members_count": 1,
+    "team_mfa_enforced": false,
+    "forms_count": 0,
+    "environment_variable_count": 0,
+    "claim_boundary": "Netlify configuration proves deployment-level visitor access policy only; it does not prove application-level tenant isolation."
+  },
+  "deployment_inventory": {
+    "netlify_freight_projects": 1,
+    "vercel_teams": 0,
+    "render_workspaces": 0,
+    "floot_freight_projects": 0,
+    "replit_freight_apps": 0,
+    "appdeploy_freight_apps": 0,
+    "supabase_freight_projects": 0,
+    "status": "NO_DISCOVERED_FREIGHT_BACKEND_OR_DATA_PLANE",
+    "notes": [
+      "The only discovered Freight deployment is the Netlify project above.",
+      "The only connected Supabase project discovered was Facility Bid Watch Validation, not Freight.",
+      "No Freight project was found in AppDeploy, Replit, Floot, Vercel, or Render."
+    ]
+  },
+  "cross_tenant_isolation": {
+    "status": "UNPROVEN_NO_MULTI_TENANT_DATA_PLANE_DISCOVERED",
+    "data_plane_id": null,
+    "distinct_tenant_probe_count": 0,
+    "negative_cross_tenant_probe_passed": false,
+    "claim_boundary": "SSO gating is not cross-tenant isolation. No customer database/object store/API authorization plane was discovered, so an A-vs-B tenant isolation test could not be executed."
+  },
+  "parser_sandbox": {
+    "status": "UNPROVEN_NO_PARSER_RUNTIME_DISCOVERED",
+    "runtime_provider": null,
+    "parser_surface_discovered": false,
+    "cpu_limit_evidence_ref": null,
+    "memory_limit_evidence_ref": null,
+    "time_limit_evidence_ref": null,
+    "network_isolation_evidence_ref": null,
+    "credential_isolation_evidence_ref": null,
+    "claim_boundary": "No production parser runtime could be tied to the Netlify deployment, so CPU/memory/time/network/credential sandboxing cannot be represented as proven."
+  },
+  "observation_constraints": {
+    "source_linkage": "UNAVAILABLE",
+    "source_linkage_reason": "No freightleak-audit linkage was found in the private ledger; the connected desktop that could contain local Netlify source metadata was offline.",
+    "unauthenticated_black_box_probe": "NOT_COMPLETED",
+    "unauthenticated_black_box_probe_reason": "Browser automation lacked credits; generic web access could not reach the protected host; container DNS resolution was unavailable.",
+    "deployment_record": "NOT_VERIFIED",
+    "deployment_record_reason": "A 24-character value inferred from the branch-version hostname returned 404 from the Netlify deploy reader and was discarded as evidence."
+  },
+  "findings": [
+    {
+      "id": "DEP-SEC-001",
+      "severity": "P0_BEFORE_CONFIDENTIAL_CUSTOMER_DATA",
+      "title": "Netlify team MFA is not enforced",
+      "status": "OPEN",
+      "evidence": "Netlify team configuration reports enforce_mfa=not_enforced."
+    },
+    {
+      "id": "DEP-SEC-002",
+      "severity": "P0_BEFORE_MULTI_TENANT_CUSTOMER_DATA",
+      "title": "Cross-tenant isolation is not proven",
+      "status": "OPEN",
+      "evidence": "No Freight customer data plane was discovered; zero dual-tenant negative probes were possible."
+    },
+    {
+      "id": "DEP-SEC-003",
+      "severity": "P0_BEFORE_PRODUCTION_PARSER_USE",
+      "title": "Parser sandboxing is not proven",
+      "status": "OPEN",
+      "evidence": "No production parser runtime was discovered or linked to the Netlify deployment."
+    },
+    {
+      "id": "DEP-SEC-004",
+      "severity": "P1",
+      "title": "Unauthenticated black-box SSO/access probe is not independently captured",
+      "status": "OPEN",
+      "evidence": "Platform configuration says SSO required for all, but independent HTTP/browser evidence could not be collected with available tools."
+    }
+  ]
+}
