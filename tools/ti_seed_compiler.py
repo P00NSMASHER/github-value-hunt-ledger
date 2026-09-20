@@ -10,6 +10,24 @@ RUNS = [x for x in load_jsonl("search_runs.jsonl") if x.get("measurement_quality
 OBJECTIVES_CFG = json.loads((INTEL / "search_objectives.json").read_text(encoding="utf-8"))
 OBJECTIVE_IDS = {x["search_objective_id"] for x in OBJECTIVES_CFG.get("objectives", [])}
 
+SATURATION_BY_CAP = {
+    x["label"]: x for x in load_jsonl("research_neighborhoods.jsonl")
+    if x.get("neighborhood_type") == "capability"
+} if (INTEL / "research_neighborhoods.jsonl").exists() else {}
+
+def saturation_adjust(cid):
+    row=SATURATION_BY_CAP.get(cid) or {}
+    status=row.get("status","INSUFFICIENT")
+    adjustment={
+        "INSUFFICIENT":0,
+        "PRODUCTIVE":5,
+        "BALANCED":0,
+        "SATURATING":-12,
+        "SATURATED":-25
+    }.get(status,0)
+    return status, adjustment, row.get("recommended_action","MEASURE_MORE")
+
+
 HIGH_SIGNAL = [
     "effective-dated","supersession","append-only","exactly-once","fail-closed",
     "negative control","negative controls","reversal","idempotency","immutable",
@@ -202,7 +220,8 @@ for gap in POLICY.get("priority_capability_gaps",[])[:10]:
     exp_bonus,exp_ids=experiment_bonus(cid)
     seed_id=f"SEED:gap:{cid.lower()}"
     base=min(95,55+5*int(gap.get("gap_score") or 0)+exp_bonus-2*int(gap.get("run_attention") or 0))
-    priority=max(1,min(100,base+perf_adjust(seed_id)))
+    sat_status,sat_adjust,sat_action=saturation_adjust(cid)
+    priority=max(1,min(100,base+perf_adjust(seed_id)+sat_adjust))
     seeds.append({
       "seed_id":seed_id,
       "seed_type":"capability_gap",
@@ -212,7 +231,10 @@ for gap in POLICY.get("priority_capability_gaps",[])[:10]:
       "capability_ids":[cid],
       "experiment_ids":exp_ids,
       "source_nodes":[cid],
-      "why_now":f"{cid} is a current high-information gap (gap score {gap.get('gap_score')}, prior run attention {gap.get('run_attention')}). Missing piece: {c.get('missing_piece') or 'unspecified'}.",
+      "saturation_status":sat_status,
+      "saturation_adjustment":sat_adjust,
+      "saturation_action":sat_action,
+      "why_now":f"{cid} is a current high-information gap (gap score {gap.get('gap_score')}, prior run attention {gap.get('run_attention')}). Saturation: {sat_status} ({sat_adjust:+d} priority). Missing piece: {c.get('missing_piece') or 'unspecified'}.",
       "required_signatures":sigs,
       "query_templates":query_templates(sigs),
       "search_surfaces":["GitHub code search","GitHub repository search","source/tests/schema/history","author/org adjacency"],
@@ -262,6 +284,9 @@ for m in sorted(MASTER,key=lambda x: (-(x["score"] or 0),x["repo"])):
         break
 
 gaps=[s for s in seeds if s["seed_type"]=="capability_gap"]
+non_saturated_gaps=[s for s in gaps if s.get("saturation_status")!="SATURATED"]
+if non_saturated_gaps:
+    gaps=non_saturated_gaps
 zero=[x for x in POLICY.get("strategy_allocation",[]) if int(x.get("runs") or 0)==0]
 for i,row in enumerate(zero[:3]):
     if not gaps:
@@ -324,6 +349,7 @@ for s in seeds[:15]:
       f"- Strategy: {s['strategy_id']}",
       f"- Objective: {s['search_objective_id']}",
       f"- Capability/experiment: {', '.join(s['capability_ids']+s['experiment_ids']) or 'cross-domain exploration'}",
+      f"- Saturation/status: {s.get('saturation_status','n/a')} / adjustment {s.get('saturation_adjustment',0):+d} / action {s.get('saturation_action','n/a')}",
       f"- Why now: {s['why_now']}",
       f"- Required signatures: {', '.join(s['required_signatures']) or 'none generated'}",
       "- Query templates:"
