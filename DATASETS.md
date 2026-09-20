@@ -98,3 +98,34 @@ Do not store credentials, tokens, private/personal data, or raw accidental secre
 - Value score: **28/30** — A4 B4 C5 D5 E5 F5.
 - Combination: RateCon extraction + Assay acceptance + Qatoto/Kareya authority/rerating + settlement attribution.
 - Next action: extend only with independently authored customer-authorized accessorial/addendum and settlement cases; do not treat synthetic fixtures as proof of real-world recovery.
+
+<!-- INTEGRATOR-R12-2026-09-19T2231-0400 -->
+### owgreen-dev/grid-crunch — leakage-safe interconnection-queue outcome pipeline
+- Repository / source: https://github.com/owgreen-dev/grid-crunch
+- Exact revision: `5f0c9a074d928b79caa792a84e8e92de1b2df3f2`.
+- Dataset / pipeline: reproducible competing-risks/survival pipeline over independently acquired LBNL interconnection-queue history with fixed-horizon labels, strict `as_of <= entry_date` leakage contracts, temporal/out-of-cohort evaluation, calibration/lift, within-ISO testing and EIA-860M built-project corroboration.
+- Coverage / freshness / format: historical U.S. interconnection-queue evidence; the repository intentionally does not redistribute the full LBNL workbook. Post-2021/post-FERC-Order-2023 cohorts are not yet fully observable at five-year horizons, so regime transfer is explicitly unproven.
+- Evidence inspected: exact tree/commit, model/label/decision-log architecture, benchmark methodology, tests/CI and documented negative-feature experiments in hunter 11. Published benchmark values remain repository evidence until independently reproduced.
+- Published rights: MIT for repository software. LBNL Queued Up, EIA-860M, HIFLD, gridstatus/ISO feeds and other upstream datasets retain independent rights/redistribution terms.
+- Standing permission posture: repository-owned code/content commercially authorized; no extension to upstream public datasets.
+- Buyer / problem: renewable/BESS developers, lenders/investors, equipment vendors and data-center/site teams need evidence-backed project-materialization ranking rather than queue counts or leakage-prone predictions.
+- Product use: Queue Materialization Intelligence portfolio screen and historical validation backbone.
+- Build/data advantage: roughly 4–8 months of censoring/label design, leakage controls, temporal validation, calibration and cross-source verification; negative results also prevent wasted feature engineering.
+- Value score: **29/30** — A5 B5 C5 D5 E5 F4.
+- Combination: historical scorer -> prospective snapshot/prediction ledger -> expected-MW/competition layer -> site/hosting engineering.
+- Next action: reproduce from independently downloaded current lawful LBNL/EIA inputs; freeze an out-of-time scorer and keep all buyer-facing claims explicit about the pre-Order-2023 evidence regime.
+
+### savabs/queue_attrition — content-addressed live queue archive + prospective prediction ledger
+- Repository / source: https://github.com/savabs/queue_attrition
+- Exact revision: `daf180778383b8675e252346e771a4e754f0558d`.
+- Dataset / pipeline: daily/content-addressed multi-ISO queue snapshots, normalized request identities, historical cohorts/base rates, prospective prediction registry with fixed resolution deadlines, health/diff tooling and shared-frailty portfolio uncertainty.
+- Coverage / freshness / format: live/recurring queue-state archive and append-only future-outcome ledger. Important inspected caveat: evaluation uses isotonic calibration while the current production `predict_active.py` path appeared to write raw pipeline probabilities; parity is not yet proven.
+- Evidence inspected: source tree, snapshot data, model/predict/registry/frailty/CI code and exact revision recorded in hunter 11.
+- Published rights: no root public LICENSE established at the inspected revision; repository-owned code covered by the user's separate-permission posture. ISO/gridstatus/source data retain independent terms.
+- Standing permission posture: repository-owned code/content commercially authorized; no extension to captured upstream queue data.
+- Buyer / problem: same Queue Materialization Intelligence buyers need immutable live history and prospectively falsifiable calls that cannot be rewritten after outcomes arrive.
+- Product use: prospective evidence layer after grid-crunch historical validation; not yet production probability authority.
+- Build/data advantage: roughly 4–7 months of queue snapshotting/versioning, identity resolution, prediction registry and portfolio-dependence design.
+- Value score: **26/30** — A5 B5 C5 D5 E3 F3 at inspection because live calibration parity and upstream data-rights diligence remain unresolved.
+- Combination: grid-crunch historical scorer -> queue_attrition live snapshots/prediction ledger -> correlated expected-MW/tail-risk reporting.
+- Next action: force the live scorer to use the exact estimator/calibration contract validated out of time, freeze model/version/features and allow the append-only registry to accumulate genuinely prospective evidence before marketing calibrated live probabilities.
