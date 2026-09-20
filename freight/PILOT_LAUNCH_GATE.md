@@ -25,6 +25,8 @@ Reasons:
 - No Freight customer data plane has been discovered.
 - If multi-tenant storage/API is later used, tenant isolation is still unproven.
 - If a production parser is later used, parser sandboxing is still unproven.
+- The collected Netlify snapshot is time-bounded through **2026-09-27** and must
+  be recollected earlier after relevant access/deployment changes.
 
 The current Netlify project is therefore a **protected demo/control shell**, not
 an approved confidential-customer-data plane.
@@ -42,8 +44,17 @@ It now requires a structured environment evidence manifest governed by:
 The repository currently contains only a DRAFT template, so the route remains
 CONDITIONAL.
 
-Only a VERIFIED manifest with all applicable evidence references may unlock the
-controlled manual pilot route.
+Only a VERIFIED manifest may unlock the controlled manual pilot route. VERIFIED
+now means:
+- evidence references have matching lowercase SHA-256 receipts;
+- the environment has a configuration fingerprint;
+- verifier role + verification date are recorded;
+- the validity window is no more than 90 days;
+- the evidence has not expired at launch time.
+
+The separate route is deliberately independent of the current Netlify snapshot:
+an expired Netlify observation blocks the Netlify route, not an independently
+verified separate environment.
 
 ## Why this improves commercialization
 
@@ -71,6 +82,7 @@ Current Netlify customer-data route:
 PYTHONPATH=. python freight/pilot_launch_gate.py \
   freight/fixtures/readiness_ready.json \
   --data-path current \
+  --as-of-date 2026-09-20 \
   --expect BLOCKED
 ```
 
@@ -81,6 +93,7 @@ PYTHONPATH=. python freight/pilot_launch_gate.py \
   freight/fixtures/readiness_ready.json \
   --data-path separate \
   --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json \
+  --as-of-date 2026-09-20 \
   --expect CONDITIONAL
 ```
 

@@ -1,4 +1,5 @@
 from copy import deepcopy
+from hashlib import sha256
 from pathlib import Path
 
 from freight.deployment_security_evidence import load_current
@@ -21,6 +22,11 @@ DEPLOYMENT=load_current(ROOT)
 SEPARATE_TEMPLATE=load_environment(
     ROOT/"freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json"
 )
+AS_OF="2026-09-21"
+
+
+def H(value:str)->str:
+    return sha256(value.encode()).hexdigest()
 
 
 def readiness(**overrides):
@@ -48,21 +54,28 @@ def verified_separate_environment():
     e["evidence_status"]="VERIFIED"
     e["environment_id"]="manual-pilot-env-001"
     e["environment_evidence_ref"]="diligence-room/manual-pilot-env-001"
+    e["environment_evidence_sha256"]=H("environment-evidence")
+    e["environment_configuration_sha256"]=H("configuration-snapshot")
     e["provider_or_host"]="controlled-host-001"
+    e["verified_by_role"]="security-reviewer"
+    e["verified_at"]="2026-09-20"
+    e["valid_until"]="2026-10-20"
     for name,control in e["controls"].items():
         control["value"]=True
         control["evidence_ref"]="evidence/"+name
+        control["evidence_sha256"]=H("control-"+name)
     return e
 
 
-def decide(request, *, dep=None, ready=None, separate=None):
+def decide(request, *, dep=None, ready=None, separate=None, as_of=AS_OF):
     return evaluate_launch(
         readiness=ready or readiness(),
         component_registry=REGISTRY,
         rights_manifest=RIGHTS,
-        deployment_evidence=dep or DEPLOYMENT,
+        deployment_evidence=dep if dep is not None else DEPLOYMENT,
         request=request,
         separate_environment_evidence=separate,
+        as_of_date=as_of,
     )
 
 
@@ -72,6 +85,15 @@ def test_buyer_readiness_does_not_override_current_deployment_security():
     assert d.route is LaunchRoute.DEPLOYED_PILOT_BLOCKED
     assert "deployment_team_mfa_not_enforced" in d.blockers
     assert "customer_data_plane_not_discovered" in d.blockers
+
+
+def test_stale_current_deployment_evidence_blocks_current_route():
+    d=decide(
+        LaunchRequest(DataPath.CURRENT_DEPLOYMENT),
+        as_of="2026-09-28",
+    )
+    assert d.status is LaunchStatus.BLOCKED
+    assert "deployment_evidence_expired" in d.blockers
 
 
 def test_not_ready_buyer_routes_back_to_diagnostic_before_deployment_logic():
@@ -137,6 +159,27 @@ def test_verified_separate_environment_can_enable_manual_pilot():
     )
     assert d.status is LaunchStatus.READY
     assert d.route is LaunchRoute.CONTROLLED_MANUAL_BLIND_PILOT
+
+
+def test_expired_netlify_snapshot_does_not_block_independent_separate_environment():
+    d=decide(
+        LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT),
+        separate=verified_separate_environment(),
+        as_of="2026-09-28",
+    )
+    assert d.status is LaunchStatus.READY
+    assert "deployment_evidence_expired" not in d.blockers
+
+
+def test_expired_separate_environment_becomes_conditional():
+    e=verified_separate_environment()
+    d=decide(
+        LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT),
+        separate=e,
+        as_of="2026-10-21",
+    )
+    assert d.status is LaunchStatus.CONDITIONAL
+    assert "separate_environment_evidence_expired" in d.conditions
 
 
 def test_malformed_separate_environment_blocks_instead_of_self_asserting():

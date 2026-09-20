@@ -42,17 +42,17 @@ jobs:
       - name: Controlled-pilot rights evidence gate
         run: PYTHONPATH=. python freight/rights_evidence.py --stage pilot
       - name: Validate collected deployment security evidence
-        run: PYTHONPATH=. python freight/deployment_security_evidence.py
+        run: PYTHONPATH=. python freight/deployment_security_evidence.py --as-of-date 2026-09-20 --expect FRESH
       - name: Canonical freight gap register
         run: PYTHONPATH=. python freight/gap_registry.py --list-active-search
       - name: Ready-pilot diagnostic fixture
         run: PYTHONPATH=. python freight/readiness.py freight/fixtures/readiness_ready.json
       - name: Current deployment customer-data launch remains blocked
-        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path current --expect BLOCKED
+        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path current --as-of-date 2026-09-20 --expect BLOCKED
       - name: Validate separate environment evidence template
-        run: PYTHONPATH=. python freight/separate_environment_evidence.py freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --expect CONDITIONAL
+        run: PYTHONPATH=. python freight/separate_environment_evidence.py freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --as-of-date 2026-09-20 --expect CONDITIONAL
       - name: Separate environment remains conditional without evidence
-        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path separate --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --expect CONDITIONAL
+        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path separate --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --as-of-date 2026-09-20 --expect CONDITIONAL
       - name: Full synthetic commercial rehearsal
         run: PYTHONPATH=. python freight/synthetic_rehearsal.py
       - name: Generate deterministic release provenance
