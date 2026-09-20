@@ -31,6 +31,8 @@ DOC_PATHS=(
     "freight/SECURITY_AND_DATA_HANDLING.md",
     "freight/RELEASE_AND_SECURITY_GATE.md",
     "freight/SBOM_AND_ATTESTATION.md",
+    "freight/PERSISTENT_AUDIT_AND_BACKUP.md",
+    "freight/BUYER_DILIGENCE_BUNDLE.md",
     "freight/COMPONENT_RIGHTS_REGISTRY.json",
     "freight/RELEASE_MANIFEST.md",
 )
