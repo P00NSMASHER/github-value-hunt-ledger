@@ -1,4 +1,4 @@
-# V11 execution events
+# V14 execution events
 
 Each slot has its own optional append-only JSONL log under this directory:
 
@@ -11,7 +11,7 @@ If a slot log does not exist, the current assignment is AVAILABLE.
 For connector-driven execution, claiming is an optimistic-concurrency operation:
 
 1. Fetch the slot event file if it exists.
-2. Confirm the generated execution board says the slot is claimable.
+2. Confirm the generated execution board says the slot is claimable and, for routed work, confirm `DISPATCH_BOARD.md` contains the exact worker/slot ticket.
 3. Append exactly one `CLAIM` event.
 4. Update the file using the exact blob SHA returned by the fetch.
 
@@ -21,7 +21,7 @@ Do not rewrite or delete old events. Append only.
 
 ## Events
 
-- `CLAIM` — acquire the exact assignment snapshot and a lease.
+- `CLAIM` — acquire the exact assignment snapshot and a lease. New claims are schema 14 and must be either dispatch-bound `generated` claims or explicit `manual_override` claims.
 - `HEARTBEAT` — extend a live lease. It cannot revive an expired lease.
 - `START` — mark active execution.
 - `COMPLETE` — close the claim and name the V11 `search_run_id` carrying telemetry.
@@ -48,3 +48,17 @@ A COMPLETE event is valid only if its `search_run_id` exists and that run record
 - V10 assignment role, work kind, source ID and score.
 
 This makes successful execution inseparable from telemetry delivery.
+
+
+## V14 dispatch binding
+
+For routed work, copy the exact current packet from `intelligence/dispatch_claim_packets.jsonl` into the CLAIM event. Generated claims are rejected if any dispatch/routing/assignment field drifts.
+
+If a worker intentionally claims a different slot, set:
+- `claim_schema_version: 14`;
+- `routing_mode: "manual_override"`;
+- a non-empty `route_override_reason`.
+
+Do not fabricate a dispatch ticket for a manual override.
+
+Pre-V14 claim IDs listed in `intelligence/dispatch_policy.json` remain valid historical events.
