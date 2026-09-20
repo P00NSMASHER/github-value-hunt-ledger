@@ -16,5 +16,6 @@
   "unexpected_failure_modes": [],
   "search_policy_consequence": null,
   "evidence_location": "path-or-link-to-evidence",
-  "notes": null
+  "notes": null,
+  "search_credit_weights": null
 }
