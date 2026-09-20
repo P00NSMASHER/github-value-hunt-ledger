@@ -548,3 +548,24 @@ The entries below were re-scored under the standing commercial-permission postur
 - Buyer/problem: hydrovac/excavation/liquid-waste operators can complete and document work yet miss disposal/time/material charges or carry jobs/manifests that never reach billing.
 - Monetization / first paid wedge: fixed-price 100–1,000 job-to-invoice leakage audit, followed by recurring proof-to-cash monitoring.
 - Why it beats alternatives: it is a complete vertical operating chain that directly joins compliance/disposal evidence to billable money rather than generic FSM CRUD.
+
+<!-- INTEGRATOR-R11-LATE-2026-09-19T2032-0400 -->
+## Late-run promotions — recovery and commission assurance
+
+### mehdi-arfaoui/Stronghold — recoverability-as-code evidence contracts
+- Exact revision: `776fe21f159bcab9e4333c716c8ac11cd6329a91`.
+- Score: **29/30** — A5 B5 C5 D5 E4 F5.
+- Rights: AGPL-3.0 publicly; repository-owned code treated as commercially permitted under the user's standing assertion. AWS/service data and dependencies remain separate.
+- Concrete capability: declarative per-service recovery contracts, read-only infrastructure discovery, dependency/recovery chains, append-only measured test evidence and deterministic RTO/RPO/evidence-level/chain-coverage/SPOF verdicts with explicit MET/VIOLATED/UNKNOWN semantics. CI can fail enforced violations while preserving UNKNOWN when evidence is insufficient.
+- Buyer/problem: SaaS/platform/MSP/regulated teams need to know whether measured recovery evidence actually proves service-level RTO/RPO promises rather than whether a backup job exists.
+- Monetization / first paid wedge: recoverability diagnostic that maps critical services to explicit contracts, ingests real drill evidence and produces machine-checkable proof gaps; recurring managed proof follows.
+- Why it beats alternatives: it is the policy/evidence decision layer above restore engines and refuses to invent RTO/RPO when measured evidence is missing.
+
+### kleegr/sales-commission-manager — commission attribution-to-settlement control plane
+- Exact revision: `5fe802dba9b3a1c322995d4ccc73cb40922ab34d`.
+- Score: **29/30** — A5 B5 C5 D5 E5 F4. F reflects separately governed provider APIs/customer records, not the absence of a public license.
+- Rights: no public LICENSE found; repository-owned code treated as commercially permitted under the standing user assertion. GoHighLevel/provider APIs and customer records remain separate.
+- Concrete capability: deterministic plan snapshots, dated assignments, product/rule attribution, receipts/refunds, payout batches/entries/events, integer-money calculations, hold/release, reversals, partial settlement/carry-forward, audit/integration events and tests for attribution/refund/cancel/exact awards.
+- Buyer/problem: RevOps/finance/payroll teams face underpayment, overpayment and disputes from stale plan versions, split attribution, reversals and payout-state drift.
+- Monetization / first paid wedge: blind Commission Payout Acceptance Test on one closed month with customer-owned CRM/plan/payment/refund/payroll truth frozen before incumbent output.
+- Why it beats alternatives: it spans entitlement through settlement and payout reconciliation rather than stopping at commission calculation.

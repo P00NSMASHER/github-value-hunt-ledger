@@ -152,3 +152,16 @@ These sections supersede the same-named earlier versions where they conflict; ol
 - Combined capability: customer-authorized ESI/device model -> software ESC/network/topology -> independent master comparisons -> state/PDO/SDO/mailbox/DC/wire-break/recovery matrix -> hardware spot-check -> pre-commissioning evidence pack.
 - Buyer / wedge: EtherCAT OEMs, robotics/motion/machine builders and controls integrators; fixed-price regression/preflight before plant cutover or formal certification.
 - Caveat: agreement among implementations is evidence, not a substitute for controlling EtherCAT specifications/certification/vendor requirements.
+
+<!-- INTEGRATOR-R11-LATE-2026-09-19T2032-0400 -->
+### Recovery Proof v7.1 — add recoverability policy above drill evidence
+- Add `mehdi-arfaoui/Stronghold@776fe21f159bcab9e4333c716c8ac11cd6329a91` above the v7 restore/evidence stack. Redrill/Probavi/pg_hardstorage/BackupDrill/RestoreLab produce measured evidence; Stronghold evaluates service-level RTO/RPO, evidence level, dependency-chain coverage and SPOF policy; SiVa validates portable timestamp/signature trust.
+- Product effect: the stack now separates `a restore happened` from `the evidence proves the declared service recovery contract`. UNKNOWN remains UNKNOWN when measured proof is absent.
+- Validation: neutral evidence adapter from at least two restore engines into the same Stronghold service contract; plant one RTO miss, one RPO miss, one stale proof, one incomplete recovery chain and one missing SPOF assertion and require deterministic verdicts.
+
+### Commission Payout Assurance v2 — plan snapshot -> attribution -> reversal -> settlement
+- Primary executable backbone: `kleegr/sales-commission-manager@5fe802dba9b3a1c322995d4ccc73cb40922ab34d`; independent calculation comparator OCA/commission; adversarial plan cases from the existing acceptance corpus; ERPNext adapter `codepromaxtech/erpnext_crm_commission_engine@be40f779410969cb87d8eddb31c1c0e3053b90d7` where relevant.
+- Combined capability: freeze effective plan/assignment and CRM credit truth -> independently calculate awards -> apply receipts/refunds/cancellations/holds -> reconcile payout approval, partial settlement/carry-forward and payroll/provider outcome -> quantify underpayment, overpayment and unsupported payout dollars.
+- Buyer / wedge: RevOps, finance, sales compensation and payroll; fixed-price closed-period Commission Payout Acceptance Test before any recurring monitoring.
+- Blind rule: freeze customer source facts and independent expected results before viewing incumbent payroll output. Ambiguous credit ownership, missing plan authority or unknown settlement result contributes $0 to corrected-dollar claims until resolved.
+- Validation: 40 cases spanning fixed/tiered, split/overlay, effective-plan changes, retroactivity, refund/cancel/clawback, partial receipt, hold/release, unknown provider result, partial payout and carry-forward; then one authorized closed period.

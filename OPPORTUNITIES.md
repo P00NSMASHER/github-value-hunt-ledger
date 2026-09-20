@@ -70,3 +70,15 @@ For each opportunity record:
 - Monetization: implementation/validation engagement -> recurring automation/governance platform.
 - Score: **26/30** — A3 B5 C5 D5 E4 F4; sales cycle and scientific/equipment integration remain heavier than freight/recovery.
 - Next validation: plain optimizer vs HELIOS-governed optimizer on a rights-clean closed-loop fixture.
+
+<!-- INTEGRATOR-R11-LATE-2026-09-19T2032-0400 -->
+### Commission Payout Acceptance Test — newly elevated direct-money challenger
+- Sources: Kleegr commission control plane + OCA/commission comparator + adversarial commission corpus + buyer-specific CRM/payroll/ERP source adapters.
+- Buyer/problem: RevOps/finance/payroll organizations need independent proof of underpayment, overpayment, stale-plan attribution, refund/clawback and settlement errors.
+- First paid wedge: one closed-month blind plan-to-payroll acceptance test; customer truth and independent expected output freeze before incumbent payroll is opened.
+- Monetization: fixed diagnostic + recurring monitoring/reconciliation; corrected-dollar economics only after source and settlement proof.
+- Score: **29/30** — A5 B5 C5 D5 E5 F4.
+- Next validation: vendor-neutral 40-case corpus followed by one authorized closed period.
+
+### Recoverability-as-Code / Recovery Proof SLA — strengthened
+- Stronghold now supplies the missing service-level policy evaluator above Redrill/Probavi/pg_hardstorage/BackupDrill/RestoreLab measured evidence, while SiVa supplies trust/revocation validation. This materially improves the existing Recovery Proof SLA opportunity without changing its first wedge: prove one to three critical services end-to-end, then sell recurring proof freshness.
