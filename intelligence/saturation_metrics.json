@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "measured_runs": 12,
+  "neighborhood_count": 22,
+  "status_counts": {
+    "INSUFFICIENT": 22
+  },
+  "sufficient_neighborhoods": 0,
+  "saturated_neighborhoods": 0,
+  "saturating_neighborhoods": 0,
+  "thresholds": {
+    "min_runs": 5,
+    "min_deep_inspections": 20,
+    "min_dispositions_for_duplicate_ratio": 10,
+    "min_first_seen_observations": 10
+  }
+}
