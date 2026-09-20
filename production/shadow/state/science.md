@@ -289,3 +289,37 @@ CONFIDENCE: **HIGH that provider-queryable business identity transfers into scie
 - A stable client idempotency key plus read-only command lookup is insufficient when the client forgets the key on reload/crash.
 - Mock/provider-boundary tests do not establish that the actual instrument-side receipt store is crash-persistent.
 - Look for same-repository durable outbox/materializer code before assuming the missing persistence layer must be invented from scratch.
+
+## 2026-09-20 — Run 11 evidence-backed update
+
+### H3 refinement — durable unknown-effect tombstones can close the caller crash half, but manual attestation is not authoritative reconciliation
+STATUS: **SUPPORTED BY AN INDEPENDENT LOW-ATTENTION ROBOT RUNTIME; FULL LEVEL 3 STILL UNVERIFIED.**
+
+SUPPORTING EVIDENCE:
+- `SUSTechWLA/tangying-robot-agent-os@774bd2a2f4035dbe48f9016a88af1cb6fb4096ae` carries stable `command_id`, `task_id`, `idempotency_key`, fencing and world/task revision fields in its public robot command schema.
+- `RuntimeJournal.begin()` is explicitly a durable reservation **before a backend may produce side effects**. The JSON journal uses temp-write + flush/fsync + atomic replace + parent-directory fsync; write failure prevents backend execution and latches safety.
+- A regression simulates process loss from inside `backend.execute()` after the backend has been entered. Reopening the same journal and resubmitting the same command executes the new backend zero times, returns `EXECUTION_OUTCOME_UNKNOWN`, and preserves the E-stop latch.
+- A separate physical-adapter regression models “driver lost response after sending motion.” The runtime records `EXECUTION_OUTCOME_UNKNOWN`, persists the latch, restarts, rejects a fresh command/key while unresolved, and asserts the movement count remains exactly one.
+- Known physical failure is deliberately distinguished from ambiguous outcome: `TARGET_UNREACHABLE` does not latch unknown state and a later retry can succeed.
+- Local recovery is deliberately attended and auditable. It copies the original journal to an fsynced recovery record, marks pending keys reconciled with operator/reason, and preserves those old keys as unknown tombstones rather than making them replayable.
+
+CONTRARY EVIDENCE:
+- The recovery path does not authoritatively query a device/system-of-record to determine whether the interrupted physical command actually happened. Operator attestation restores liveness but leaves the original effect unresolved.
+- No inspected durable join maps the command/business effect to a provider-native execution ID that can be re-queried after restart.
+- The repository's own safety checklist says it has **no completed physical acceptance result** for the XLeRobot path; the strongest crash-window evidence is software/fake-transport/plugin testing rather than a reproduced hardware-in-loop process kill.
+- Current history also contains explicit operational/maturity caveats, including large-ledger performance problems and a recent integration-candidate note; this is not production-maturity proof.
+
+LESSON IMPACT:
+- Add a new LOCAL refinement: **an unresolved-effect tombstone is a first-class safety primitive**. After ambiguous dispatch, safe recovery may clear a global stop while permanently retaining the old idempotency/effect identity as non-replayable. This prevents “manual reset accidentally makes the old command retryable.”
+- This pattern complements, but does not replace, the Run-9/10 provider-queryable identity lesson. Tangying supplies durable pre-dispatch custody + post-crash replay blocking; BioModStack supplies a scientific read-only key→command→receipt path. The missing Level-3 implementation is the binding between those halves plus real provider persistence.
+- One direct task for the tombstone refinement only: keep LOCAL. Do not edit global `SEARCH_SKILLS.md`.
+
+NEXT TEST:
+Find or implement one scientific gateway that combines a Tangying-style durable pre-dispatch tombstone with a BioModStack-style provider-queryable command/receipt path, then kill the process after provider acceptance and prove restart resolves the original physical effect through read-only provider evidence with **zero second mutation**.
+
+CONFIDENCE: **HIGH that permanent unresolved-effect tombstones are useful for crash safety; MEDIUM that the remaining provider reconciliation join is available publicly in one scientific implementation.**
+
+### Failed-search memory added
+- A manual/operator recovery acknowledgement is not the same as authoritative physical outcome reconciliation; treat it as a liveness decision, not proof that the original effect succeeded or failed.
+- Print/job systems with a `client_job_id` can still be false positives when “completed” is only self-reported by the browser/client after the print call rather than read from the printer/spooler system of record.
+- Industrial callback systems with idempotent task IDs remain near-matches until crash persistence and authoritative device-side status lookup are proven at the same identity boundary.
