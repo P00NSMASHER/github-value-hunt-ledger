@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.7
+## Current checkpoint — v15.8 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -37,7 +37,10 @@ Internal commercialization controls now completed:
 - PRESENT / VERIFIED_EMPTY / UNAVAILABLE source-observation receipts;
 - buyer/BU-scoped append-only audit hash chain;
 - deterministic CycloneDX 1.6-shaped partial SBOM;
-- deterministic unsigned in-toto/DSSE-shaped attestation payload ready for external signing.
+- deterministic unsigned in-toto/DSSE-shaped attestation payload ready for external signing;
+- persistent buyer/BU-scoped SQLite audit store with immutable UPDATE/DELETE triggers and serialized appends;
+- semantic backup/restore drill across audit + settlement state;
+- deterministic zero-customer-data buyer/acquirer diligence ZIP with per-entry checksums.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -78,7 +81,7 @@ v15.7 Freight CI run `35525286692` passed the full Freight suite plus determinis
 5. **PARTIAL DONE:** fail-closed pre-parser negative tests cover PDF/XML/EDI/X12/CSV, archives, size/segment bounds and CSV formula neutralization. OS/container parser sandbox/resource limits remain deployment work.
 6. **PARTIAL DONE:** proof/source/package layers now carry buyer+BU scope with cross-scope negative tests. The actual customer data service/database/object-store still requires deployment-specific cross-tenant tests.
 7. Record reviewer hours, invoice count, fixed fee, delivery cost and turnaround in each externally evidenced engagement outcome so buyer-level margin/effort can be calibrated.
-8. **DONE internally:** CENSUS/SCOPE/PROOF lifecycle, delete requested/unknown/confirmed, present/verified-empty/unavailable receipts, and scoped audit hash-chain semantics are tested. **OPEN externally:** real provider deletion receipts, persistent audit-store authorization/immutability and alerting in the deployment environment.
+8. **ADVANCED internally:** CENSUS/SCOPE/PROOF lifecycle, source receipts, persistent scoped audit reference storage and semantic audit+settlement restore drills are tested. **OPEN externally:** real provider deletion receipts, production audit-service authorization/WORM/alerting, deployed backup schedule/geographic redundancy and measured RPO/RTO.
 
 ## Next 30 days — prove willingness to pay and one real outcome
 
@@ -106,12 +109,12 @@ Subject to explicit user approval for outreach/data access:
 4. Productize only integrations requested by multiple paying customers.
 5. Introduce automation only where it reduces reviewer touches without increasing false-dollar risk.
 6. Build the minimum enterprise diligence package:
-   - rights/SBOM;
-   - signed provenance;
-   - data-retention/deletion policy;
-   - incident-response plan;
-   - backup/restore evidence;
-   - access-control/cross-tenant test evidence.
+   - **DONE internally:** rights registry + partial SBOM + deterministic diligence ZIP;
+   - **OPEN externally:** signed provenance/trusted timestamp;
+   - **DONE internally:** data-retention/deletion semantics;
+   - **OPEN:** incident-response operating plan/evidence;
+   - **DONE internally:** semantic reference backup/restore proof;
+   - **OPEN deployment-specific:** access-control/cross-tenant, backup scheduling/RPO/RTO and production audit-service evidence.
 7. Keep success-fee attribution subordinate to the settlement proof engine.
 
 ## Priority model
