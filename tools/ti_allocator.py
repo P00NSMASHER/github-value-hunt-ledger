@@ -195,6 +195,34 @@ for e in EXPERIMENTS:
       }
     })
 
+# Fallback verifier for active search hypotheses when no live experiment is READY/RUNNING.
+if not any(c.get("work_kind")=="independent_verification" for c in candidates):
+    seed_pool=[s for s in SEEDS if s.get("seed_type") in {"capability_gap","coverage_gap","positive_dna_transfer"}]
+    seed_pool=sorted(seed_pool,key=lambda s:(-(float(s.get("priority") or 0)),s.get("seed_id") or ""))
+    if seed_pool:
+        s=seed_pool[0]
+        candidates.append({
+          "work_item_id":work_id("verify-seed",s["seed_id"]),
+          "work_kind":"independent_verification",
+          "source_id":"VERIFY:"+s["seed_id"],
+          "title":"Independent verification — "+s["seed_id"],
+          "final_score":float(CFG["scoring"]["verification_base"]),
+          "score_components":{"verification_base":CFG["scoring"]["verification_base"],"fallback_target":"top_active_search_hypothesis"},
+          "strategy_id":"STRAT:evaluation-target-independence" if "STRAT:evaluation-target-independence" in strategy_alloc else None,
+          "search_objective_id":"OBJ:independent-evaluation",
+          "capability_ids":[],
+          "experiment_ids":[],
+          "coverage_gap_ids":s.get("coverage_gap_ids") or [],
+          "adjacency_root":None,
+          "instructions":{
+            "why_now":"No READY/RUNNING experiment currently needs a dedicated verifier, so use reserved verification capacity to independently challenge the highest-ranked active search hypothesis before it becomes accepted positive training.",
+            "queries":s.get("query_templates") or [],
+            "search_surfaces":s.get("search_surfaces") or [],
+            "verification_gate":"Use an independent implementation, first-party authority, hand-authored fixture, negative control or contradictory source. Do not count the target repository's own claims as independent proof.",
+            "stop_conditions":["Do not duplicate the discovery agent's inspection path.","Preserve disagreement and uncertainty rather than forcing a PASS."]
+          }
+        })
+
 # One explicit wildcard candidate.
 candidates.append({
   "work_item_id":"WORK:wildcard:rare-weird",
