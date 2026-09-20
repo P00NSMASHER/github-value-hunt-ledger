@@ -1,7 +1,8 @@
 """Deterministic release provenance and component inventory for Freight Recovery.
 
-This generator hashes committed control files and the rights registry. It does
-not provide a cryptographic signature or replace a full SPDX/CycloneDX SBOM.
+This generator hashes committed Freight control files and the rights registry.
+It does not provide a cryptographic signature. A deterministic CycloneDX-shaped
+inventory is generated separately by freight/sbom.py.
 """
 from __future__ import annotations
 
@@ -14,14 +15,26 @@ from pathlib import Path
 
 REVISION_RE = re.compile(r"^[0-9a-f]{40}$")
 CONTROL_PATHS = (
+    "freight/audit_ledger.py",
+    "freight/commercial_learning.py",
     "freight/contracts.py",
+    "freight/data_lifecycle.py",
+    "freight/deal_economics.py",
+    "freight/gap_registry.py",
     "freight/input_guard.py",
+    "freight/outcome_adapter.py",
     "freight/pilot_package.py",
     "freight/pilot_reporting.py",
     "freight/readiness.py",
+    "freight/release_attestation.py",
     "freight/release_gate.py",
+    "freight/release_provenance.py",
+    "freight/sbom.py",
     "freight/settlement_store.py",
+    "freight/synthetic_rehearsal.py",
     "freight/COMPONENT_RIGHTS_REGISTRY.json",
+    "freight/GAP_REGISTER.json",
+    "intelligence/domain_search_policies.json",
     "production/requirements-ci.txt",
     ".github/workflows/freight-contracts.yml",
 )
