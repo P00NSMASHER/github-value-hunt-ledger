@@ -90,10 +90,12 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 - CodeMaru-Dreamine/Dreamine.Gem@82604d6f03c1e95e0558de5c757989b27cd4a3d6 -> STRENGTHENS CAP-014 with a second stateful industrial protocol family: host/equipment E30/GEM behavior over HSMS/TCP, frozen-profile state, alarms/events/remote commands/spooling/error behavior. It DEPENDS_ON separately governed SEMI standards/current equipment profiles and is not itself conformance proof.
 - CAP-014 -> ENABLES Industrial Pre-FAT / Virtual Commissioning -> TESTED_BY EXP-008.
 
-### Prediction Credibility
+### Prediction Credibility / Infrastructure Outcomes
 - owgreen-dev/grid-crunch -> IMPLEMENTS CAP-015.
 - savabs/queue_attrition -> STRENGTHENS CAP-015.
+- DATA Saki et al. harmonized EAGLE-I + NWS VTEC v2 (`10.5281/zenodo.22651795`) -> CHALLENGES/VALIDATES infrastructure weather/outage/recovery predictions with a fresh 2015–2024 observational outcome benchmark plus missingness/recovery sensitivity; harmonized-v2 reuse rights remain unresolved and must be confirmed before commercial redistribution/use beyond permitted analysis.
 - CAP-015 -> ENABLES Queue Materialization Intelligence.
+- The outage/warning dataset enables a separate historical falsification loop for storm/outage risk and recovery models but is not itself causal evidence or a new commercial opportunity until rights and held-out reproduction are resolved.
 
 ### Verifier-gated research production
 - ThousandBirdsInc/chidori@223bb8779f63822c3e63a9a4347dda7483a02158 -> CHALLENGES/STRENGTHENS the staged verifier-gated production architecture with mediated side-effect journaling, no-live replay, divergence detection and crash/pause resume. No reusable CAP node is promoted yet because the shadow evaluation was non-authoritative, tests were inspected rather than independently rerun and filesystem/S3 lease semantics are advisory.
