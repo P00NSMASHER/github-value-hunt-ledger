@@ -70,3 +70,67 @@ Append-only shadow log. These findings are NOT authoritative MASTER promotions.
 **REFERRALS:** None this run. The best next question remains inside the commercial lane rather than AI/science.
 
 **NEXT TEST:** Find an independent repository or lawful public technical artifact that closes this candidate’s missing edge: production-grade contract/rate authority ingestion or settlement-grounded outcome evidence for subscription billing, then test whether its authority model can be combined with this engine without silently treating missing amendments/exceptions as current truth.
+
+## 2026-09-20 — Shadow run 2
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** The highest-value next component will make subscription-billing authority itself versioned/immutable or will produce exact settlement/credit evidence linking a corrective money movement to the original obligation. Combining that with run 1's leakage detector should close the gap between “suspected leakage” and an auditable correction.
+
+**DISCOVERY METHODS:**
+1. Direct problem search for subscription billing, contract pricing, amendments, effective dates, credit notes, refunds and settlement/reconciliation.
+2. Code/invariant search for immutable/effective-dated contract versions, source-of-truth ownership, supersession, idempotency, ledger reversals, credit-note evidence and negative money controls.
+3. Deliberate low-attention discovery, prioritizing zero/low-star operational billing repositories and then comparing them against a mature commodity system.
+
+**BEST CANDIDATE + URL + EXACT REVISION:** `michaelayoade/dotmac_sub` — https://github.com/michaelayoade/dotmac_sub — `fdc85559d9677480090596f88009d2d3eed29e56`.
+
+**IMPLEMENTED:**
+- `billing.contracts` turns an accepted commercial commitment or authorized service change into an immutable `BillingContractVersion` plus lines, with structural source kind/id/version, effective half-open intervals, contracted price/currency, cadence, proration, tax/discount terms, actor/reason/correlation and supersession lineage.
+- The model distinguishes `shadow` from `authoritative` financial records. Shadow rows are expressly forbidden from producing financial effect; the owner returns authoritative state only after the canonical source-of-truth migration state reaches cut-over/complete.
+- Entitlement/history lookup fails closed on missing contracts, shadow versions and gaps in authoritative interval coverage rather than treating absence as entitlement.
+- Contract changes supersede rather than rewrite history. Effective-version resolution uses half-open boundaries, rejects out-of-order versions/mixed currencies/duplicate charge components and requires idempotency.
+- The billing correction plane applies issued credit notes to specific invoices, records exact ledger and consumption-ledger evidence, supports application reversal, restores invoice/credit balances on reversal, and uses scoped idempotency keys plus row locking to prevent duplicate or concurrent over-application.
+
+**TESTED / EVIDENCE IN SOURCE:**
+- `tests/test_billing_contracts.py` verifies shadow authority, one-version idempotent replay, contiguous supersession with old price preserved, line lineage across versions, exact effective-boundary resolution, cadence round-trip, mixed-currency rejection, out-of-order rejection, duplicate-line rejection, idempotency-key requirement and transaction-boundary controls.
+- `tests/test_credit_notes.py` verifies invoice balance reduction, exact ledger linkage, application reversal through `reversal_of_entry_id`, restored balances, idempotent reversal, `SELECT ... FOR UPDATE` of credit-note and invoice rows, over-application rejection, one-row replay and HTTP 409 when an idempotency key is reused for a different confirmation.
+- Dedicated migrations add credit-application evidence, credit-note lifecycle evidence and a legacy balance-invariant backfill, showing the correction model is carried through schema evolution rather than only test fixtures.
+- `tests/test_subscription_billing_cadence.py` explicitly exercises contract-derived billing cadence as source-of-truth with offer pricing as fallback-only.
+- Repository history is active and the exact inspected HEAD is a signed/verified GitHub merge commit dated 2026-09-20; the relevant billing-contract path has substantive prior evolution rather than being introduced only by the version-bump HEAD.
+
+**CLAIMED / PLANNED / UNKNOWN:**
+- The load-bearing limitation is explicit in source: the versioned billing-contract owner is presently an **expand-and-shadow migration plane**. Current shadow rows are review evidence and must not drive real money until a cut-over gate is passed.
+- UNKNOWN: whether the inspected deployment has completed that cut-over anywhere; whether every negotiated amendment/exception is captured; whether any historical customer population has been independently reconciled; realized recovered dollars and ROI.
+- UNKNOWN: third-party Splynx/provider feeds and external data/API rights. The user's standing commercial authorization applies to repository-owned public code, not third-party systems/data.
+- GitHub exposes no public repository-license metadata at this revision; treat rights provenance as `no detected public license`, while applying the user's separate commercial-code authorization assumption for this analysis.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:389ee6adf32452a7f4da461c30bbd4efe2883a9bd4c68fdc529b63b9b412cca2`, binding exact revision to these inspected paths: `app/services/billing/contracts.py`, `app/models/billing_contract.py`, `tests/test_billing_contracts.py`, `app/services/billing/credit_notes.py`, `tests/test_credit_notes.py`, `alembic/versions/293_credit_application_evidence.py`, `alembic/versions/294_credit_note_lifecycle_evidence.py`, `alembic/versions/346_credit_note_legacy_balance_backfill.py`, and `tests/test_subscription_billing_cadence.py`. No repository code was executed.
+
+**COMPARATORS:**
+- `cboxdk/laravel-billing@ac3305f2a857baf5208a1170387f7771dba40ca7` is a strong low-attention MIT component. Its tests verify effective-dated catalog versions and subscriber grandfathering; refund tests verify credit-note tax reversal, ledger reversal, gateway money movement with a scoped idempotency key, no over-refund, retry no-op and a recorded gateway settlement. It is cleaner as a reusable billing library, but its authority model is primarily catalog-price pinning rather than the selected candidate's customer-specific immutable commercial-contract chain. Its current HEAD also fixes a CI configuration that had prevented the suite from running for a period, so historical green-CI assumptions require caution.
+- `getlago/lago@53082583d6bf65f54717bebd41cea8f47e8601a4` is the mature commodity reference: a highly adopted AGPL usage-billing platform with subscriptions, pricing, metering, payments and invoicing. It is important as the “simpler/commonplace alternative” check, but it does not by itself invalidate the narrower value here: explicit customer-contract authority lineage joined to reversible correction evidence.
+
+**RED-TEAM OBJECTION:** The candidate can be over-promoted if “versioned billing contract” is silently read as “production-authoritative customer contract.” The implementation itself says the opposite today: this owner is shadowing, and shadow rows must not affect money. A sophisticated architecture with excellent tests is not evidence of recovered cash, complete contract ingestion or successful cut-over. The closest cheaper alternative is a mature billing platform plus a controlled contract table and credit-note workflow. Evidence that would reverse this objection: a cut-over revision/test proving invoice generation consumes authoritative contract versions, a frozen authorized historical contract/order population showing complete amendment coverage, and an end-to-end accepted leakage case whose correction is traced from contract authority to invoice delta to posted credit/refund/settlement.
+
+**INDEPENDENT VERIFIER VERDICT:** **PASS_WITH_LIMITS** on the narrow claim that this exact revision implements and tests (a) an explicit, fail-closed versioned billing-contract authority migration plane and (b) idempotent, reversible credit-note-to-ledger correction evidence. The verifier does **not** certify that the contract plane is currently production-authoritative, that third-party feeds are complete, or that any dollars have been recovered. No sensitive-source material was used.
+
+**A-F SCORE (proposed only, after verifier):** **26/30 — A3 / B5 / C5 / D5 / E5 / F3.**
+- A3: a read-only authority/correction diagnostic can be piloted quickly, but production integration is materially heavier than run 1's standalone rules.
+- B5: contract/billing authority and correction assurance can touch direct revenue, refunds, receivables and audit controls.
+- C5: compresses substantial contract-versioning, temporal correctness, idempotency, ledger-correction and migration knowledge.
+- D5: the combination of source-of-truth migration semantics + half-open immutable contract history + exact reversible correction evidence is unusually rich for a zero-star repository.
+- E5: strong source/models/tests/migrations/history evidence, with the shadow-vs-authoritative limitation explicitly encoded rather than hidden.
+- F3: no detected public license metadata, current contract authority is shadow-only, and external integration/data boundaries remain unresolved; standing user commercial authorization is assumed only for repository-owned code.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: billing/finance systems owner, Controller/CFO, or revenue-assurance lead at a subscription/telecom-style company with negotiated terms, plan changes and credit/refund workflows.
+- Pain: mutable catalog/account/subscription state makes it difficult to prove what a customer actually contracted to pay at a historical moment and whether a correction truly reversed the right receivable once.
+- First paid wedge: a read-only **Contract-to-Correction Audit** over one closed period. Reconstruct customer-specific terms into immutable versions, compare those terms to issued invoices, then trace accepted discrepancies through existing credit-note/refund/ledger evidence without posting money automatically. Measure unresolved-authority rate, false-positive review load, accepted correction dollars and time to produce audit evidence.
+
+**COMBINATION WITH SHADOW RUN 1:** `dotmac_sub` supplies two missing layers around `Etherlabs-dev/revenue_leakage_system`: authoritative-term lineage (once cut over) before the expected-vs-actual rule engine, and correction/ledger evidence after a finding is accepted. The prospective stack becomes **contract authority → fail-closed leakage decision → human acceptance → idempotent credit/refund/ledger correction → realized-outcome verification**. The current shadow status means the first edge must still be proven before this can be called a production recovery loop.
+
+**SEARCH EFFORT / COST PROXIES:** 3 materially different discovery modes; roughly 9 public search/query formulations; 2 serious low-attention candidates deep-inspected plus 1 mature commodity comparator; source/tests/schema/history inspection at exact revisions; approximately 40 external tool calls including required shadow-memory reads; 0 untrusted-repository code executions and 0 external commitments.
+
+**LOCAL LESSON:** Run 1's local skill transferred: authority/freshness/evidence terms again outperformed generic billing searches. Adding `supersede`, `source of truth`, `credit note`, `reversal_of_entry_id`, `idempotency` and explicit shadow/authoritative states exposed a stronger missing-edge component. This is a second distinct successful application of the underlying authority-aware search principle inside the commercial shadow lane, but it remains lane-local because shadow hunters cannot globalize skills.
+
+**NEXT TEST:** Find or falsify the **cut-over/outcome edge**: a production-shaped path where immutable customer-contract versions actually become invoice/rating authority and an accepted discrepancy can be followed through posted adjustment/refund/settlement to a reconciled receivable without silently defaulting missing terms.
