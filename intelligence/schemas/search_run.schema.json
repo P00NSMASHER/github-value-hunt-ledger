@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v12",
+  "title": "Technology Intelligence Search Run v14",
   "type": "object",
   "required": [
     "search_run_id",
@@ -636,6 +636,33 @@
         "number",
         "null"
       ]
+    },
+    "dispatch_ticket_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "dispatch_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DISPATCHGEN:[a-f0-9]{12}$"
+    },
+    "routing_learning_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ROUTELEARN:[a-f0-9]{12}$"
+    },
+    "route_override_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "additionalProperties": true,
@@ -815,11 +842,15 @@
               "generated",
               "manual_override"
             ]
+          },
+          "routing_mode": {
+            "const": "generated"
           }
         },
         "required": [
           "schema_version",
-          "allocation_mode"
+          "allocation_mode",
+          "routing_mode"
         ]
       },
       "then": {
@@ -828,6 +859,53 @@
           "routing_generation_id",
           "worker_profile_generation_id",
           "routing_score"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 14
+          },
+          "routing_mode": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "schema_version",
+          "routing_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "dispatch_ticket_id",
+          "dispatch_generation_id",
+          "routing_learning_generation_id",
+          "routing_generation_id",
+          "worker_profile_generation_id",
+          "routing_score"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 14
+          },
+          "routing_mode": {
+            "const": "manual_override"
+          }
+        },
+        "required": [
+          "schema_version",
+          "routing_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "route_override_reason"
         ]
       }
     }
