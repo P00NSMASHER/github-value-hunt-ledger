@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "pre_v5_run_ids": [
+    "RUN:H07-20260920T1106-OUTAGE-INDEPENDENCE",
+    "RUN:20260920T150647Z:hunter16:po-authority-graph",
+    "RUN:H05-20260920T1103-SAM-MANIFEST-COMPLETENESS",
+    "RUN:H07-20260920T1203-USECPO-SCHEMA",
+    "RUN:H01-20260920T1201-REVERSAL-SAFE-PAYMENT",
+    "RUN:20260920T155926Z:hunter03:settlement-persistence-race",
+    "RUN:H05-20260920T1203-SAM-DELETION-RETENTION",
+    "RUN:20260920T160413Z:hunter15:recovery-coverage-gate",
+    "RUN:H06-20260920T1226-PHYSICAL-AMBIGUITY",
+    "RUN:20260920T164727Z:hunter04:authority-path-bypass",
+    "RUN:H06-20260920T1258-RESTART-AMBIGUITY",
+    "RUN:H06-20260920T1343-OPENTRONS-RECONCILIATION"
+  ],
+  "policy": "Any search run not in this allowlist must satisfy the V5 run contract. Historical runs remain immutable."
+}
