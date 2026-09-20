@@ -63,8 +63,12 @@ Human-readable current graph connecting repository/data evidence to capabilities
 - `WiseOpsTeam/mneme@e595986e6efb3988e1d64ad0bba7d9761f123786` -> NEGATIVE_CONTROL / INVALIDATES process-exit-as-semantic-proof assumption.
 - nearai/pg-backup verifier mutation history -> STRENGTHENS verifier-self-test.
 - `foundriesio/aktualizr-lite@1d089b006295cd924b3c87337679fef7295e4329` -> STRENGTHENS CAP-007 with independent C++ tamper/expiry/stale-authority tests; `uptane/aktualizr@e5118a74874c0561ebac57560c667c18b19d984b` -> STRENGTHENS role-separated authority plus anti-rollback/version semantics. These are cross-domain trust-model oracles, not recovery-policy correctness evidence.
-- CAP-010 now requires CENSUS + SCOPE to define the expected-subject denominator before PROOF can establish coverage; CAP-007 now requires the final proof to cite a snapshot-consistent, non-expired, non-rollback obligation/evidence authority bundle.
-- CAP-007+010 -> ENABLES OPP Recovery Proof -> TESTED_BY EXP-004 recovery-coverage-authority/scoped expected-subject/broken-verifier/proof-policy-authority matrix.
+- `carabiner-dev/ampel@5cf19bc2786cbd73a8423383a966fbf842222d23` -> STRENGTHENS CAP-007 with signer-bound evidence admission, policy expiry, explicit PASS/FAIL/SKIP and signed result-attestation output; it also CHALLENGES process-exit-as-proof because default CLI success can represent SKIP unless semantic result/`--fail-skip` is enforced.
+- `in-toto/in-toto@e352b43ad7cb8915d84c36d791aa61346152a0a3` -> STRENGTHENS CAP-007 with authorized-functionary sets, distinct thresholds and artifact agreement; DEPENDS_ON external/currentness authority for rollback/revocation semantics.
+- current `sigstore/cosign` + `sigstore/policy-controller` exact-predicate checks and their recurring historical signed-but-wrong-type false-positive class -> NEGATIVE_CONTROL / STRENGTHENS CAP-007 typed-evidence admission. Preserve only the defensive invariant and patched/current behavior, not exploit mechanics.
+- in-toto SVR v0.2 -> COMBINES_WITH CAP-007 as an interoperable result envelope containing subject/verifier/policy descriptors; it is a concise result, not the complete reproducibility/proof bundle.
+- CAP-010 now requires CENSUS + SCOPE to define the expected-subject denominator before PROOF can establish coverage; CAP-007 now requires a snapshot-consistent non-expired non-rollback authority bundle plus authorized signer/functionary threshold, exact evidence type and explicit semantic PASS before PROVEN.
+- CAP-007+010 -> ENABLES OPP Recovery Proof -> TESTED_BY EXP-004 recovery-coverage/scoped-subject/broken-verifier/currentness/typed-admission matrix.
 
 ### CaptureBrief / Government acquisition
 - GSA FAR/DFARS + SAM/Data Services + USAspending + DATA Act + deviation sources -> IMPLEMENT CAP-011.
