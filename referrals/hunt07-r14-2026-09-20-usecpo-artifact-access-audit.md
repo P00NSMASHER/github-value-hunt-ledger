@@ -16,6 +16,7 @@ Close the remaining EXP-012 artifact-byte gate for the current official USECPO v
 - Dataset license in current federal catalog metadata: `https://creativecommons.org/licenses/by/4.0/` (CC BY 4.0).
 - Current v2 ZIP download URL: `https://data.openei.org/files/6458/Outage_Dataset_R1.zip`.
 - Current v2 guidelines download URL: `https://data.openei.org/files/6458/Guideline_OEDI_Updated.docx`.
+- A direct browser-like fetch of the exact guideline resource returned HTTP `Last-Modified: Thu, 24 Apr 2025 22:05:06 GMT`. This is useful resource-version evidence but is not a cryptographic content identity.
 - Current federal metadata describes the v2 archive as containing aggregated outage data, merged outage data, and event-correlated data.
 - Data.gov's DOE metrics report dated 2026-08-31 confirms both direct URLs were being downloaded in August 2026, so these are current live resource identities rather than stale catalog-only names.
 
@@ -57,6 +58,7 @@ No change to the first paid wedge: Grid Resilience Calibration / Acceptance Audi
 
 ## Negative knowledge
 - A live catalog download URL is not the same as byte-level schema verification.
+- HTTP `Last-Modified` is provenance/version evidence, not a content hash.
 - OEDI's public S3 data lake existence does not prove every standard submission is mirrored there.
 - A browser successfully receiving OOXML bytes is not equivalent to parsing the document.
 - Search-engine snippets or descriptor tables must not be used to guess current header casing, timezones, sentinels, thresholds, or ID namespace.
@@ -65,9 +67,9 @@ No change to the first paid wedge: Grid Resilience Calibration / Acceptance Audi
 - CAPABILITY DELTA: CAP-015's evaluator contract is unchanged but better bounded: resource identity/currentness/rights are now current-verified, while byte semantics remain explicitly gated.
 - GRAPH EDGE: strengthens `USECPO -> CAP-015 -> EXP-012` provenance without pretending to close the schema-byte edge.
 - RADAR SIGNAL: outcome-priced grid decision intelligence gets evidence-discipline support, no score increase.
-- EXPERIMENT IMPACT: freeze resource URLs/release timestamp now; defer loader semantics that depend on unverified bytes.
+- EXPERIMENT IMPACT: freeze resource URLs/release timestamp and guideline `Last-Modified` now; defer loader semantics that depend on unverified bytes.
 - COMMERCIAL IMPACT: no new product; reduces risk of a false-green calibration audit caused by guessed schema/time semantics.
-- NEGATIVE KNOWLEDGE: do not substitute platform/data-lake assumptions for exact artifact evidence.
+- NEGATIVE KNOWLEDGE: do not substitute platform/data-lake assumptions or HTTP validators for exact artifact evidence.
 
 ## Next highest-value question
 Can an official first-party response expose the current v2 ZIP/DOCX bytes (or cryptographic hashes plus a byte-identical mirror) so header/timezone/sentinel/threshold/event-ID namespace semantics can be frozen and EXP-012 executed without guessing?
