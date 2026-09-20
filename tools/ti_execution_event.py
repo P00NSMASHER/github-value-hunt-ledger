@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 import argparse, hashlib, json
 from datetime import datetime, timezone
-from pathlib import Path
 from ti_common import INTEL, load_jsonl
 from ti_execution import build_execution_state
 
+def now_dt():
+    return datetime.now(timezone.utc)
+
 def now_iso():
-    return datetime.now(timezone.utc).isoformat().replace("+00:00","Z")
+    return now_dt().isoformat().replace("+00:00","Z")
+
+def parse_ts(value):
+    if not value:
+        return None
+    dt=datetime.fromisoformat(str(value).replace("Z","+00:00"))
+    return dt.astimezone(timezone.utc) if dt.tzinfo else None
 
 def short_hash(text):
     return hashlib.sha256(text.encode()).hexdigest()[:12]
@@ -18,8 +26,22 @@ def append_event(slot,event):
         f.write(json.dumps(event,ensure_ascii=False)+"\n")
     return path
 
+def select_dispatch(worker,slot,steal=False,dispatch_ticket=None):
+    primary=load_jsonl("dispatch_claim_packets.jsonl") if (INTEL/"dispatch_claim_packets.jsonl").exists() else []
+    backups=load_jsonl("work_steal_claim_packets.jsonl") if (INTEL/"work_steal_claim_packets.jsonl").exists() else []
+    if dispatch_ticket:
+        pool=primary+backups
+        matches=[x for x in pool if x.get("worker_id")==worker and x.get("slot_id")==slot and x.get("dispatch_ticket_id")==dispatch_ticket]
+    else:
+        pool=backups if steal else primary
+        matches=[x for x in pool if x.get("worker_id")==worker and x.get("slot_id")==slot]
+    if not matches:
+        return None
+    matches.sort(key=lambda x:(int(x.get("steal_rank") or 0),x.get("dispatch_ticket_id") or ""))
+    return matches[0]
+
 def main():
-    p=argparse.ArgumentParser(description="Append one local V14 execution event. Commit/push atomically after review.")
+    p=argparse.ArgumentParser(description="Append one local V15 execution event. Commit/push atomically after review.")
     sub=p.add_subparsers(dest="cmd",required=True)
     for name in ["claim","heartbeat","start","complete","fail","release"]:
         sp=sub.add_parser(name)
@@ -28,6 +50,8 @@ def main():
         if name=="claim":
             sp.add_argument("--lease-minutes",type=int)
             sp.add_argument("--manual-override-reason")
+            sp.add_argument("--steal",action="store_true")
+            sp.add_argument("--dispatch-ticket")
         if name=="heartbeat":
             sp.add_argument("--extend-minutes",type=int)
         if name=="complete":
@@ -38,7 +62,8 @@ def main():
     args=p.parse_args()
 
     policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
-    states,claims,_=build_execution_state(write=False)
+    dispatch_policy=json.loads((INTEL/"dispatch_policy.json").read_text(encoding="utf-8")) if (INTEL/"dispatch_policy.json").exists() else {}
+    states,_,_=build_execution_state(write=False)
     state={x["slot_id"]:x for x in states}.get(args.slot)
     if not state:
         raise SystemExit(f"unknown slot {args.slot}")
@@ -47,10 +72,13 @@ def main():
     if args.cmd=="claim":
         if state["status"] not in set(policy.get("claimable_states") or []):
             raise SystemExit(f"slot {args.slot} is not claimable: {state['status']}")
+        active=[
+          x for x in states
+          if x.get("worker_id")==args.worker and x.get("status") in {"CLAIMED","RUNNING","CLAIMED_SUPERSEDED","RUNNING_SUPERSEDED"}
+        ]
+        if active:
+            raise SystemExit(f"worker {args.worker} already has active claim {active[0].get('claim_id')}")
         alloc={x["slot_id"]:x for x in load_jsonl("hunt_allocations.jsonl")}[args.slot]
-        dispatch_packets=load_jsonl("dispatch_claim_packets.jsonl") if (INTEL/"dispatch_claim_packets.jsonl").exists() else []
-        dispatch=next((x for x in dispatch_packets if x.get("worker_id")==args.worker and x.get("slot_id")==args.slot),None)
-        dispatch_policy=json.loads((INTEL/"dispatch_policy.json").read_text(encoding="utf-8")) if (INTEL/"dispatch_policy.json").exists() else {}
         lease=args.lease_minutes or int(policy.get("default_lease_minutes",120))
         seed=f"{ts}|{args.slot}|{args.worker}|{alloc['assignment_id']}"
         cid="CLAIM:"+short_hash(seed)
@@ -58,7 +86,7 @@ def main():
           "event_id":"EXEC:"+short_hash("CLAIM|"+seed),
           "event_type":"CLAIM","timestamp":ts,"slot_id":args.slot,
           "claim_id":cid,"worker_id":args.worker,
-          "claim_schema_version":int(dispatch_policy.get("minimum_claim_schema_version",14)),
+          "claim_schema_version":int(dispatch_policy.get("minimum_v15_claim_schema_version",15)),
           "assignment_id":alloc["assignment_id"],
           "allocator_generation_id":alloc["allocator_generation_id"],
           "portfolio_policy_generation_id":alloc["portfolio_policy_generation_id"],
@@ -72,12 +100,23 @@ def main():
         if args.manual_override_reason:
             event["routing_mode"]="manual_override"
             event["route_override_reason"]=args.manual_override_reason
+            event["dispatch_kind"]=None
+            event["parent_dispatch_ticket_id"]=None
         else:
+            dispatch=select_dispatch(args.worker,args.slot,args.steal,args.dispatch_ticket)
             if not dispatch:
-                raise SystemExit("no current generated dispatch ticket for this worker/slot; use --manual-override-reason to claim explicitly")
+                raise SystemExit("no matching current V15 dispatch packet; use --steal, --dispatch-ticket, or --manual-override-reason")
+            now=now_dt()
+            eligible=parse_ts(dispatch.get("eligible_at") or dispatch.get("issued_at"))
+            hard=parse_ts(dispatch.get("hard_expire_at"))
+            if eligible and now<eligible:
+                raise SystemExit("dispatch ticket is not eligible yet")
+            if hard and now>hard:
+                raise SystemExit("dispatch ticket has hard-expired")
             for key in [
               "dispatch_ticket_id","dispatch_generation_id","routing_generation_id",
-              "worker_profile_generation_id","routing_learning_generation_id","routing_score"
+              "worker_profile_generation_id","routing_learning_generation_id","routing_score",
+              "dispatch_kind","parent_dispatch_ticket_id"
             ]:
                 event[key]=dispatch.get(key)
             event["routing_mode"]="generated"
