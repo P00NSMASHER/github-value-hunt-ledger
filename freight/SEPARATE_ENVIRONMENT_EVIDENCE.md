@@ -16,7 +16,8 @@ READY from an operator checkbox or boolean.
 
 ## Base controls required for VERIFIED status
 
-Every separate environment must prove, with evidence references:
+Every separate environment must prove, with an evidence reference **and
+lowercase SHA-256 receipt** for each applicable control:
 
 - MFA enforced;
 - encryption at rest;
@@ -30,16 +31,22 @@ Every separate environment must prove, with evidence references:
 The environment must also have:
 
 - a unique environment ID;
-- a diligence-room evidence root reference;
-- an identified provider/host.
+- a diligence-room evidence root reference + SHA-256;
+- a configuration-snapshot SHA-256;
+- an identified provider/host;
+- a verifier role;
+- `verified_at` and `valid_until` ISO dates.
+
+A verification window longer than **90 days** stays CONDITIONAL. Expired
+evidence stays CONDITIONAL and must be recollected/reverified.
 
 ## Conditional controls
 
 ### If the environment is multi-tenant
-Cross-tenant isolation must be `PROVEN` with an evidence reference.
+Cross-tenant isolation must be `PROVEN` with an evidence reference + SHA-256.
 
 ### If a parser runtime is used
-Parser sandboxing must be `PROVEN` with references for:
+Parser sandboxing must be `PROVEN` with evidence reference + SHA-256 pairs for:
 
 - CPU limit;
 - memory limit;
@@ -53,8 +60,10 @@ Parser sandboxing must be `PROVEN` with references for:
 Structurally valid planning record. The launch gate remains **CONDITIONAL**.
 
 ### VERIFIED
-All applicable controls and evidence references are present. Only then may the
-separate/manual route become **READY**.
+All applicable controls have evidence references + SHA-256 receipts, the
+configuration snapshot is fingerprinted, verifier metadata is present, and the
+evidence is still inside its validity window. Only then may the separate/manual
+route become **READY**.
 
 ## Current state
 
