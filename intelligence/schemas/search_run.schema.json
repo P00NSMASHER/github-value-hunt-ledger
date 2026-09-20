@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v10",
+  "title": "Technology Intelligence Search Run v11",
   "type": "object",
   "required": [
     "search_run_id",
@@ -583,6 +583,27 @@
         "number",
         "null"
       ]
+    },
+    "execution_claim_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^CLAIM:[a-f0-9]{12}$"
+    },
+    "execution_slot_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^SLOT-[0-9]{2}$"
+    },
+    "execution_worker_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Za-z0-9_.:-]{2,64}$"
     }
   },
   "additionalProperties": true,
@@ -722,6 +743,32 @@
           "assignment_work_kind",
           "assignment_source_id",
           "assignment_score"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 11
+          },
+          "allocation_mode": {
+            "enum": [
+              "generated",
+              "manual_override"
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "allocation_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "execution_claim_id",
+          "execution_slot_id",
+          "execution_worker_id"
         ]
       }
     }
