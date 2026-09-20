@@ -18,6 +18,8 @@ Integrator-owned search and validation direction. Updated 2026-09-20. **Experime
 ## 1. Freight Recovery — P0: prove incremental settled money
 **Stage gate:** EXP-001.
 
+**Commercialization freeze:** until EXP-001 starts, freight discovery receives at most a small maintenance/rescue budget. No broad repository collection. A new freight hunt must name the exact missing authority, connector, negative-control or settlement edge it is trying to close.
+
 Hunt only for controlling addendum/accessorial/tariff authority, amendment/incorporation/supersession lineage, incumbent/FAP reason-code output, correction/rebill chronology, and final credit/refund/812/820/remittance allocation.
 
 **Mandatory trace:** controlling authority → independent expected charge → unique economic claim → review/adjudication → dispute/correction → issued adjustment → allocated settlement. WARN/BLOCK/REVIEW/POTENTIAL = **$0 confirmed and $0 realized**. Overlapping findings collapse to one economic delta or remain non-additive.
