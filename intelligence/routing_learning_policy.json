@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "eligible_measurement_quality": [
+    "prospective",
+    "benchmark"
+  ],
+  "eligible_routing_modes": [
+    "generated"
+  ],
+  "min_global_generated_completions": 12,
+  "min_worker_context_runs": 3,
+  "min_worker_context_deep_inspections": 8,
+  "min_worker_context_outcome_runs": 2,
+  "min_context_baseline_runs": 5,
+  "min_context_distinct_workers": 2,
+  "min_abs_residual": 0.1,
+  "shrinkage_prior_runs": 5,
+  "adjustment_scale_points_per_utility": 10,
+  "max_positive_adjustment": 3,
+  "max_negative_adjustment": 2,
+  "calibration_min_runs": 8,
+  "context_dimensions": [
+    "role",
+    "work_kind",
+    "strategy",
+    "objective",
+    "experiment"
+  ],
+  "guardrails": [
+    "Only completed V11 claims with MATCHED telemetry and schema-v12+ generated routing may train automatic routing.",
+    "Manual overrides, unrouted work, retrospective runs, active claims, and invalid outcomes never train routing adjustments.",
+    "Worker adjustments require matched task-context evidence; raw worker averages are diagnostic only.",
+    "Missing evidence produces zero adjustment, never a penalty.",
+    "Positive and negative learned adjustments are bounded independently.",
+    "Routing-learning residuals are observational and must not be described as causal worker-quality estimates.",
+    "Outcome-linked signals update the learner when outcomes arrive; prior routing decisions are not rewritten."
+  ]
+}
