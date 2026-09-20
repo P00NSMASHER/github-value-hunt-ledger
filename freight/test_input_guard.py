@@ -1,3 +1,7 @@
+import csv
+
+import pytest
+
 from freight.input_guard import (
     IngestPolicy,
     InputStatus,
@@ -63,3 +67,62 @@ def test_zip_extension_is_rejected_even_without_zip_magic():
     result = inspect_input("bundle.zip", b"not-an-archive")
     assert result.status is InputStatus.REJECT
     assert "archive_inputs_not_supported" in result.reasons
+
+
+def test_csv_field_limit_is_explicit_and_fails_closed():
+    policy = IngestPolicy(max_csv_field_chars=16)
+    result = inspect_input("invoice.csv", b"12345678901234567,ok\n", policy)
+    assert result.status is InputStatus.REJECT
+    assert "csv_field_too_long" in result.reasons
+
+
+def test_csv_parser_error_is_typed_reject():
+    previous_limit = csv.field_size_limit()
+    try:
+        csv.field_size_limit(32)
+        policy = IngestPolicy(
+            max_csv_field_chars=64,
+            max_text_line_chars=128,
+        )
+        result = inspect_input("invoice.csv", b"A" * 40 + b",ok\n", policy)
+    finally:
+        csv.field_size_limit(previous_limit)
+
+    assert result.status is InputStatus.REJECT
+    assert "csv_parse_error" in result.reasons
+
+
+def test_csv_cells_per_row_limit_fails_closed():
+    policy = IngestPolicy(max_csv_cells_per_row=3)
+    result = inspect_input("invoice.csv", b"a,b,c,d\n", policy)
+    assert result.status is InputStatus.REJECT
+    assert "csv_cells_per_row_limit_exceeded" in result.reasons
+
+
+def test_csv_logical_row_limit_fails_closed():
+    policy = IngestPolicy(max_csv_rows=2)
+    result = inspect_input("invoice.csv", b"a,b\n1,2\n3,4\n", policy)
+    assert result.status is InputStatus.REJECT
+    assert "csv_row_limit_exceeded" in result.reasons
+
+
+def test_csv_total_cell_limit_fails_closed():
+    policy = IngestPolicy(max_csv_total_cells=5)
+    result = inspect_input("invoice.csv", b"a,b,c\n1,2,3\n", policy)
+    assert result.status is InputStatus.REJECT
+    assert "csv_total_cells_limit_exceeded" in result.reasons
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    [
+        "max_csv_field_chars",
+        "max_csv_rows",
+        "max_csv_cells_per_row",
+        "max_csv_total_cells",
+    ],
+)
+def test_csv_policy_limits_must_be_positive(field_name):
+    kwargs = {field_name: 0}
+    with pytest.raises(ValueError, match=f"{field_name} must be positive"):
+        IngestPolicy(**kwargs)
