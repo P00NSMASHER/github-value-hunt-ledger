@@ -1,15 +1,15 @@
 {
-  "unknown_revision_observations": 82,
-  "unique_repositories_with_unknown_revision": 82,
+  "unknown_revision_observations": 85,
+  "unique_repositories_with_unknown_revision": 85,
   "status_counts": {
+    "unknown": 31,
     "rejected": 18,
-    "unknown": 28,
     "strong": 19,
     "quarantined": 3,
     "watch": 14
   },
   "source_state_counts": {
-    "current": 82
+    "current": 85
   },
   "master_catalog_gaps": [
     {
@@ -335,6 +335,14 @@
       "priority_score": 7
     },
     {
+      "repository": "Josh-Gi3r/stablecoin-payroll",
+      "source_catalog": "hunters/01-run15-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
       "repository": "Kazaam-sudo/CallQuanta",
       "source_catalog": "hunters/37.md",
       "source_state": "current",
@@ -351,6 +359,14 @@
       "priority_score": 7
     },
     {
+      "repository": "LQVCohan/cohan-restaurant-app",
+      "source_catalog": "hunters/01-run15-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
       "repository": "Madhumitha-28/enterprise-contact-center-platform",
       "source_catalog": "hunters/37.md",
       "source_state": "current",
@@ -361,6 +377,14 @@
     {
       "repository": "OCA/field-service",
       "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Raunak-Sarmacharya/LocalCooksCommunity",
+      "source_catalog": "hunters/01-run15-2026-09-20.md",
       "source_state": "current",
       "status_bucket": "unknown",
       "status": null,

@@ -2,15 +2,15 @@
 
 Pinned revisions are essential for reproducible technical intelligence. This report prioritizes records whose repository identity is known but whose inspected revision is not recoverable from the hunter catalog.
 
-- Unknown-revision observations: **82**
-- Unique repositories with unknown revision: **82**
+- Unknown-revision observations: **85**
+- Unique repositories with unknown revision: **85**
 - Current MASTER promotions without matching exact hunter-catalog observation: **2**
 
 ## Unknown revision mix
 
 | Bucket | Count |
 |---|---:|
-| unknown | 28 |
+| unknown | 31 |
 | strong | 19 |
 | rejected | 18 |
 | watch | 14 |
@@ -59,17 +59,17 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | Five9DeveloperProgram/Five9-Agent-Sup-REST-API-Python-Pack | hunters/37.md | current | unknown | 7 |
 | GenesysCloudBlueprints/cx-as-code-cicd-gitactions-blueprint | hunters/37.md | current | unknown | 7 |
 | Hesper-Labs/owly | hunters/37.md | current | unknown | 7 |
+| Josh-Gi3r/stablecoin-payroll | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
 | Kazaam-sudo/CallQuanta | hunters/37.md | current | unknown | 7 |
 | Kim-Hakseong/NOKTRA-secsgem-workbench | hunters/12.md | current | unknown | 7 |
+| LQVCohan/cohan-restaurant-app | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
 | Madhumitha-28/enterprise-contact-center-platform | hunters/37.md | current | unknown | 7 |
 | OCA/field-service | hunters/37.md | current | unknown | 7 |
+| Raunak-Sarmacharya/LocalCooksCommunity | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
 | Tests/history | hunters/04-run12-2026-09-20.md | current | unknown | 7 |
 | TheBarrelExploit/call-quality-analyzer | hunters/37.md | current | unknown | 7 |
 | Yogeshwaran-Kumar/VerticalQA | hunters/37.md | current | unknown | 7 |
 | andrewawilley/Five9-Agent-Sup-REST-API-Python-Pack | hunters/37.md | current | unknown | 7 |
-| aws-samples/amazon-connect-contactcenterops | hunters/37.md | current | unknown | 7 |
-| aws-samples/connect-contact-flow-comparison-github-action | hunters/37.md | current | unknown | 7 |
-| aws-samples/contact-lens-for-amazon-connect-data-gathering-mechanism | hunters/37.md | current | unknown | 7 |
 
 ## MASTER catalog provenance gaps
 
