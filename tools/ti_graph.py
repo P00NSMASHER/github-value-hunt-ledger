@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 import hashlib
 from collections import Counter, defaultdict
-from ti_common import INTEL, load_jsonl, write_jsonl
+from ti_common import (
+    INTEL,
+    canonical_query_family,
+    load_jsonl,
+    outcome_search_weights,
+    write_jsonl,
+)
 
 caps = load_jsonl("capabilities.jsonl")
 runs = load_jsonl("search_runs.jsonl")
 outs = load_jsonl("outcomes.jsonl")
 curated = load_jsonl("edges.jsonl")
+query_families = load_jsonl("query_families.jsonl")
 
 def edge_id(a, t, b):
     return "EDGE:" + hashlib.sha1((a + "|" + t + "|" + b).encode()).hexdigest()[:12]
@@ -14,12 +21,12 @@ def edge_id(a, t, b):
 derived = []
 seen = set()
 
-def add(a, t, b, evidence):
+def add(a, t, b, evidence, **extra):
     key = (a, t, b)
     if key in seen:
         return
     seen.add(key)
-    derived.append({
+    edge = {
         "edge_id": edge_id(a, t, b),
         "from": a,
         "type": t,
@@ -27,13 +34,20 @@ def add(a, t, b, evidence):
         "confidence": "high",
         "evidence_ref": evidence,
         "provenance": "derived_structured_event"
-    })
+    }
+    edge.update(extra)
+    derived.append(edge)
 
 for r in runs:
     rid = r["search_run_id"]
     sid = r.get("strategy_id")
+    qid = canonical_query_family(r)
+
     if sid:
         add(sid, "PRODUCED", rid, "intelligence/search_runs.jsonl")
+    if qid:
+        add(qid, "PRODUCED", rid, "intelligence/search_runs.jsonl")
+
     for cid in r.get("new_capability_ids", []):
         add(rid, "PRODUCED", cid, "intelligence/search_runs.jsonl")
     for cid in r.get("strengthened_capability_ids", []):
@@ -48,8 +62,15 @@ for r in runs:
 
 for o in outs:
     oid = o["outcome_id"]
-    for rid in o.get("origin_search_ids", []):
-        add(rid, "PRODUCED", oid, "intelligence/outcomes.jsonl")
+    weights = outcome_search_weights(o)
+    for rid, weight in weights.items():
+        add(
+            rid,
+            "PRODUCED",
+            oid,
+            "intelligence/outcomes.jsonl",
+            credit_weight=weight
+        )
     for cid in o.get("contributing_capability_ids", []):
         add(cid, "CONTRIBUTED_TO", oid, "intelligence/outcomes.jsonl")
     if o.get("experiment_id"):
@@ -91,25 +112,40 @@ for c in caps:
     }
 
 priority = sorted(caps, key=lambda c: (-support[c["capability_id"]]["gap_score"], c["capability_id"]))[:12]
+
+credit_edge_total = sum(
+    float(e.get("credit_weight") or 0)
+    for e in derived
+    if e.get("to", "").startswith("OUT:")
+)
+
 lines = [
     "# GRAPH HEALTH REPORT", "",
     f"- Curated edges: **{len(curated)}**",
     f"- Derived attribution edges: **{len(derived)}**",
+    f"- Query-family nodes: **{len(query_families)}**",
     f"- Capability nodes: **{len(caps)}**",
-    f"- Capabilities touched by measured search runs: **{sum(1 for c in caps if attention[c['capability_id']] > 0)}**", "",
+    f"- Capabilities touched by measured search runs: **{sum(1 for c in caps if attention[c['capability_id']] > 0)}**",
+    f"- Total weighted search->outcome edge credit: **{credit_edge_total:.2f}**", "",
     "## Highest-priority capability gaps", "",
     "| Capability | Evidence | Components | Run attention | Experiments | Gap score | Missing piece |",
     "|---|---|---:|---:|---:|---:|---|"
 ]
 for c in priority:
     s = support[c["capability_id"]]
-    lines.append(f"| {c['capability_id']} — {c['name']} | {c.get('evidence_state')} | {s['components']} | {s['attention']} | {s['experiments']} | {s['gap_score']} | {c.get('missing_piece') or '—'} |")
+    lines.append(
+        f"| {c['capability_id']} — {c['name']} | {c.get('evidence_state')} | {s['components']} | "
+        f"{s['attention']} | {s['experiments']} | {s['gap_score']} | {c.get('missing_piece') or '—'} |"
+    )
+
 lines += [
     "", "## Graph policy", "",
-    "- High gap score means **information value**, not commercial priority.",
+    "- Search-to-outcome edges carry fractional credit; weights for one outcome sum to 1.00.",
+    "- Query families and search strategies are separate nodes: a strong literal family does not automatically validate the strategy that happened to use it.",
+    "- High gap score means information value, not commercial priority.",
     "- Prefer searches that close a named missing edge in an active experiment over searches that add another similar implementation.",
-    "- A capability with many repositories but no experiment or outcome edge is a research cluster, not yet a validated asset.",
     "- Independent challengers and negative controls can be more valuable than a second implementation of the same mechanism.", ""
 ]
+
 (INTEL / "GRAPH_HEALTH.md").write_text("\n".join(lines), encoding="utf-8")
-print(f"derived_edges={len(derived)}")
+print(f"derived_edges={len(derived)} weighted_outcome_credit={credit_edge_total:.2f}")
