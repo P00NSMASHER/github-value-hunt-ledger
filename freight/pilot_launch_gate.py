@@ -1,0 +1,234 @@
+"""Final launch gate for Freight Recovery paid pilot execution.
+
+This module composes buyer/data readiness, pilot rights operability, and
+deployment-security evidence. A READY buyer does not imply the current
+deployment is safe for confidential customer data.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from dataclasses import asdict, dataclass
+from enum import Enum
+from pathlib import Path
+
+from freight.deployment_security_evidence import validate_evidence
+from freight.readiness import ReadinessAssessment, ReadinessStatus, assess_readiness, from_dict
+from freight.release_gate import validate_registry
+from freight.rights_evidence import validate_rights_evidence
+
+
+class DataPath(str, Enum):
+    CURRENT_DEPLOYMENT = "CURRENT_DEPLOYMENT"
+    SEPARATE_CONTROLLED_ENVIRONMENT = "SEPARATE_CONTROLLED_ENVIRONMENT"
+
+
+class LaunchStatus(str, Enum):
+    BLOCKED = "BLOCKED"
+    CONDITIONAL = "CONDITIONAL"
+    READY = "READY"
+
+
+class LaunchRoute(str, Enum):
+    DATA_READINESS_DIAGNOSTIC = "DATA_READINESS_DIAGNOSTIC"
+    DEPLOYED_PILOT_BLOCKED = "DEPLOYED_PILOT_BLOCKED"
+    DEPLOYED_BLIND_PILOT = "DEPLOYED_BLIND_PILOT"
+    SEPARATE_ENVIRONMENT_PENDING = "SEPARATE_ENVIRONMENT_PENDING"
+    CONTROLLED_MANUAL_BLIND_PILOT = "CONTROLLED_MANUAL_BLIND_PILOT"
+
+
+@dataclass(frozen=True)
+class LaunchRequest:
+    data_path: DataPath
+    requires_multi_tenant_data_plane: bool = False
+    requires_parser_runtime: bool = False
+    separate_environment_controls_verified: bool = False
+    separate_environment_evidence_ref: str | None = None
+
+
+@dataclass(frozen=True)
+class LaunchDecision:
+    status: LaunchStatus
+    route: LaunchRoute
+    blockers: tuple[str, ...]
+    conditions: tuple[str, ...]
+    warnings: tuple[str, ...]
+
+
+def _required_text(value: str | None) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def evaluate_launch(
+    *,
+    readiness: ReadinessAssessment,
+    component_registry: dict,
+    rights_manifest: dict,
+    deployment_evidence: dict,
+    request: LaunchRequest,
+) -> LaunchDecision:
+    blockers: list[str] = []
+    conditions: list[str] = []
+    warnings: list[str] = []
+
+    if readiness.status is not ReadinessStatus.READY:
+        blockers.extend(readiness.blockers)
+        conditions.extend(readiness.conditions)
+        return LaunchDecision(
+            LaunchStatus.BLOCKED,
+            LaunchRoute.DATA_READINESS_DIAGNOSTIC,
+            tuple(blockers),
+            tuple(conditions),
+            tuple(warnings),
+        )
+
+    registry_errors, registry_warnings = validate_registry(
+        component_registry,
+        stage="pilot",
+    )
+    rights_errors, rights_warnings = validate_rights_evidence(
+        component_registry,
+        rights_manifest,
+        stage="pilot",
+    )
+    blockers.extend(registry_errors)
+    blockers.extend(rights_errors)
+    warnings.extend(registry_warnings)
+    warnings.extend(rights_warnings)
+
+    deployment_errors = validate_evidence(deployment_evidence)
+    blockers.extend("deployment_evidence_invalid:" + x for x in deployment_errors)
+
+    if blockers:
+        return LaunchDecision(
+            LaunchStatus.BLOCKED,
+            LaunchRoute.DEPLOYED_PILOT_BLOCKED,
+            tuple(blockers),
+            tuple(conditions),
+            tuple(warnings),
+        )
+
+    if request.data_path is DataPath.CURRENT_DEPLOYMENT:
+        access = deployment_evidence.get("access_control") or {}
+        inventory = deployment_evidence.get("deployment_inventory") or {}
+        tenant = deployment_evidence.get("cross_tenant_isolation") or {}
+        parser = deployment_evidence.get("parser_sandbox") or {}
+
+        if access.get("status") != "CONFIG_PROVEN":
+            blockers.append("deployment_access_control_not_proven")
+        if access.get("sso_team_login_required") is not True:
+            blockers.append("deployment_sso_not_required")
+        if access.get("team_mfa_enforced") is not True:
+            blockers.append("deployment_team_mfa_not_enforced")
+
+        if inventory.get("status") == "NO_DISCOVERED_FREIGHT_BACKEND_OR_DATA_PLANE":
+            blockers.append("customer_data_plane_not_discovered")
+
+        if request.requires_multi_tenant_data_plane:
+            if tenant.get("status") != "PROVEN":
+                blockers.append("cross_tenant_isolation_not_proven")
+
+        if request.requires_parser_runtime:
+            if parser.get("status") != "PROVEN":
+                blockers.append("parser_sandbox_not_proven")
+
+        if blockers:
+            return LaunchDecision(
+                LaunchStatus.BLOCKED,
+                LaunchRoute.DEPLOYED_PILOT_BLOCKED,
+                tuple(blockers),
+                tuple(conditions),
+                tuple(warnings),
+            )
+
+        return LaunchDecision(
+            LaunchStatus.READY,
+            LaunchRoute.DEPLOYED_BLIND_PILOT,
+            (),
+            (),
+            tuple(warnings),
+        )
+
+    if request.data_path is DataPath.SEPARATE_CONTROLLED_ENVIRONMENT:
+        if not request.separate_environment_controls_verified:
+            conditions.append("separate_data_environment_controls_not_verified")
+        if not _required_text(request.separate_environment_evidence_ref):
+            conditions.append("separate_data_environment_evidence_ref_missing")
+
+        if conditions:
+            return LaunchDecision(
+                LaunchStatus.CONDITIONAL,
+                LaunchRoute.SEPARATE_ENVIRONMENT_PENDING,
+                (),
+                tuple(conditions),
+                tuple(warnings),
+            )
+
+        return LaunchDecision(
+            LaunchStatus.READY,
+            LaunchRoute.CONTROLLED_MANUAL_BLIND_PILOT,
+            (),
+            (),
+            tuple(warnings),
+        )
+
+    raise ValueError("unsupported data path")
+
+
+def _load(path: str | Path) -> dict:
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("readiness_json")
+    parser.add_argument(
+        "--data-path",
+        choices=("current", "separate"),
+        default="current",
+    )
+    parser.add_argument("--requires-multi-tenant", action="store_true")
+    parser.add_argument("--requires-parser", action="store_true")
+    parser.add_argument("--separate-controls-verified", action="store_true")
+    parser.add_argument("--separate-evidence-ref")
+    parser.add_argument("--expect", choices=("BLOCKED", "CONDITIONAL", "READY"))
+    args = parser.parse_args()
+
+    readiness_input = from_dict(_load(args.readiness_json))
+    readiness = assess_readiness(readiness_input)
+    root = Path(__file__).resolve().parents[1]
+
+    request = LaunchRequest(
+        data_path=(
+            DataPath.CURRENT_DEPLOYMENT
+            if args.data_path == "current"
+            else DataPath.SEPARATE_CONTROLLED_ENVIRONMENT
+        ),
+        requires_multi_tenant_data_plane=args.requires_multi_tenant,
+        requires_parser_runtime=args.requires_parser,
+        separate_environment_controls_verified=args.separate_controls_verified,
+        separate_environment_evidence_ref=args.separate_evidence_ref,
+    )
+
+    decision = evaluate_launch(
+        readiness=readiness,
+        component_registry=_load(root / "freight/COMPONENT_RIGHTS_REGISTRY.json"),
+        rights_manifest=_load(root / "freight/RIGHTS_EVIDENCE_MANIFEST.json"),
+        deployment_evidence=_load(
+            root / "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json"
+        ),
+        request=request,
+    )
+    payload = asdict(decision)
+    payload["status"] = decision.status.value
+    payload["route"] = decision.route.value
+    print(json.dumps(payload, indent=2))
+
+    if args.expect and decision.status.value != args.expect:
+        raise SystemExit(
+            f"expected launch status {args.expect}, got {decision.status.value}"
+        )
+
+
+if __name__ == "__main__":
+    main()
