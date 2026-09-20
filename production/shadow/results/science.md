@@ -217,7 +217,6 @@ Revision date: 2026-09-18
 Public license: MIT  
 Repository attention at inspection: ~2 stars / 0 forks  
 Evidence snapshot id: `shadow-science-20260920-bo-mcp-56d590b`
-
 ### Frozen evidence manifest
 - `packages/bo-mcp-server/src/bo_mcp_server/idempotency.py` blob `6ae9bff5c80d8309a89aa402651308bd90f34409`;
 - `packages/bo-mcp-server/src/bo_mcp_server/storage/models.py` blob `1156604c372a934eaa2044a95b8a362f64b29fde`;
@@ -327,7 +326,6 @@ Revision date: 2026-07-22
 Public license: **none detected in repository metadata/tree**  
 Repository attention at inspection: 2 stars / 1 fork  
 Evidence snapshot id: `shadow-science-20260920-opentrons-flex-2639016`
-
 ### Frozen evidence manifest
 - `src/unitelabs/opentrons_flex/io/labware_state.py` blob `c064b167806158b5149683ee918c799e4c8b2ace`;
 - `src/unitelabs/opentrons_flex/io/labware_movement.py` blob `40bfcc59ea36a30ae452ab384727b85b818e49b6`;
@@ -409,3 +407,119 @@ A new LOCAL extension of the execution-seam skill succeeds once: **search physic
 - source/test/history/standard traversals: ~20;
 - external GitHub/web reads: ~30;
 - untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 5
+
+### Hypothesis
+A second independent physical executor should validate the `physical-effect closure` search lesson only if it distinguishes **pre-actuation rejection** from **post-actuation uncertainty**, blocks ordinary motion after an ambiguous physical effect, and requires fresh device/readback evidence or explicit physical reconciliation before trust is restored. A correlated command/event ID that exists only in process memory does not satisfy durable cross-process command identity.
+
+### Discovery modes
+1. **Direct problem search:** laboratory robot/instrument crash recovery, ambiguous command completion, device readback, unknown state and reconciliation.
+2. **Executor-invariant search:** `recovery_required`, `position_uncertain`, `mark_actuated`, `UNKNOWN`, action/result IDs, result polling, homing gates, state serialization and restart persistence.
+3. **Ecosystem/analog comparison:** contrasted PyLabRobot's device-driver semantics with MADSci's durable workcell orchestration + SiLA observable-command layer and NIST AFL automation patterns.
+4. **History archaeology:** followed the September 8, 2026 PyLabRobot VSpin/Access2 driver upgrade that introduced the explicit semantic state machine and recovery behavior.
+
+Deep inspection was limited to `PyLabRobot/pylabrobot` and `AD-SDL/MADSci`; `usnistgov/AFL-automation` was triaged as a scientific-automation comparator. No untrusted repository code was executed.
+
+### Best candidate
+**PyLabRobot/pylabrobot — Agilent VSpin + Access2 state/recovery kernel**  
+Canonical URL: https://github.com/PyLabRobot/pylabrobot  
+Exact revision: `697272d3591da6e5be1fcf70448479904e326904`  
+Revision date: 2026-09-19  
+Public license: MIT  
+Repository attention at inspection: 537 stars / 194 forks  
+Evidence snapshot id: `shadow-science-20260920-pylabrobot-vspin-697272d`
+
+### Frozen evidence manifest
+- `pylabrobot/agilent/vspin/_state.py` blob `db24590aaaa7fc4391e47a6487a7bcb8ef1598a7`;
+- `pylabrobot/agilent/vspin/vspin.py` blob `9ef7a6c3c46d1d1b60979887c7f64b892e17433a`;
+- `pylabrobot/agilent/vspin/access2.py` blob `b70275a3a9908cef239063e6f11689a59537882a`;
+- `pylabrobot/agilent/vspin/vspin_tests.py` blob `216b60e0d5d526e9b7c0fcf98f67496c0f55aa35`;
+- `pylabrobot/agilent/vspin/access2_tests.py` blob `25fb6818765522b7c50ad6c522555f8c4f40fd71`;
+- `pylabrobot/events/bus.py` blob `f31bd65eee2c9e7fc6afba9f8a997e631cd56293`;
+- `docs/user_guide/agilent/vspin/state-machine.md` blob `8f85341d31f41633d6ff2b12f56820fe7d22c0f1`;
+- `LICENSE` blob `a5f97475174013facefefa03917b53e507ea0c7f`;
+- history commit `f8894b6e7d27ed734ae35bf849759d2e2f926145` (2026-09-08), “Upgrade Agilent VSpin and Access2 protocol drivers (#1227),” introduced the inspected state-machine/recovery family; current head retains it.
+- comparator: `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0`, especially `workcell_engine.py`, `action_types.py`, `sila_node_client.py` and SiLA command-execution tests/spec.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced VSpin/Access2 guarded operations from state schema through actuation markers, failure handling, readiness checks and tests.
+- **SYSTEMS/SCIENCE VALIDATOR:** checked that the state machine maps to real centrifuge/loader concepts and fresh controller queries rather than a UI-only status layer; inspected documentation boundaries around plate-resource truth.
+- **ECOSYSTEM ANALYST:** compared PyLabRobot's executor-local semantics with MADSci's persistent workflow/action model and SiLA observable-command correlation.
+- **COMMERCIAL ANALYST:** evaluated the failure mode as a recoverability/duplicate-effect problem rather than a generic automation feature.
+- **RED-TEAM / VERIFIER:** independently challenged cross-process durability, physical exactly-once claims, event identity and recovery reset semantics before accepting a STRONG_COMPONENT verdict.
+
+### Load-bearing claims
+**VERIFIED / TESTED IN SOURCE CORPUS**
+- VSpin and Access2 define explicit semantic machine-state schemas. Both contain a sticky `recovery_required` flag; Access2 additionally records transfer direction/phase and last confirmed teachpoint, while VSpin separately tracks connection, initialization, homing and current activity.
+- A `TransitionToken` distinguishes whether a guarded workflow crossed the physical actuation boundary and whether position became uncertain. If a command fails before actuation, prior operation state is restored. If it fails or is cancelled after actuation, the driver marks recovery required and invalidates uncertain position knowledge (`vspin.at_bucket=None` or `Access2.last_teachpoint=None`).
+- Ordinary VSpin motion is rejected unless connected, initialized, homed, idle and `recovery_required == False`. Access2's readiness path similarly refuses operation while recovery is required and then queries fresh controller status for faults/initialization/homing.
+- The Access2 transfer path records phase progression and performs physical status checks around source plate presence, grip, destination motion, release and park. Documentation explicitly warns that after a post-actuation failure the physical plate may no longer match PLR's recorded resource assignment and instructs the operator to establish actual arm/plate/rotor/interlock positions before recovery.
+- Documentation states that neither `setup()` nor reconnecting the same driver clears the recovery flag, and there is no public reset that simply declares an interrupted transfer safe.
+- Regression tests cover post-actuation motion failure/cancellation and assert recovery-required/uncertain-position state. VSpin tests also assert a concurrent follow-on/stop path raises “requires recovery” once the owning operation fails after actuation.
+- PyLabRobot's structured event layer generates a per-operation UUID and correlated `started/completed/failed` lifecycle events. Tests assert the same operation ID reaches the terminal event.
+- Public code is MIT licensed, and the repository has a conventional pytest corpus.
+
+**IMPORTANT LIMITS / FALSIFIED OVERCLAIMS**
+- The VSpin/Access2 semantic recovery state is **session memory**, not a durable crash ledger. A new process constructs a default state; no inspected serializer/persistent store was found for `VSpinMachineState`/`Access2MachineState`.
+- The event bus explicitly describes itself as synchronous and in-process. Its operation UUID is useful correlation metadata, but persistence is delegated to subscribers and the ID is not a durable idempotency/business-effect key.
+- Therefore a process death after physical actuation can erase the local `recovery_required` flag. Reinitialization/homing may re-establish some controller state, but this packet does not prove a restart-safe “ambiguous physical effect remains quarantined until reconciled” contract for resource/plate identity.
+- Physical exactly-once is not established. The strong behavior is **fail-closed within the live driver session after known post-actuation failure**, not universal crash-safe dedupe.
+- The VSpin/Access2 upgrade is very recent (September 8, 2026); the repository is mature overall, but this specific semantic-recovery layer has limited field-history at the pinned date.
+
+### Comparator result — MADSci exposes the complementary half-gap
+`AD-SDL/MADSci` has a durable Workcell layer and stable `ActionRequest.action_id`. Its workcell state is persisted in Valkey, and if action dispatch throws before a response is received, the engine deliberately keeps the same action ID and queries `get_action_result()` because the remote action may have been created. After result-query retries are exhausted, MADSci emits `ActionStatus.UNKNOWN` rather than fabricating success. These are strong orchestration semantics.
+
+However, the current SiLA node client tracks observable commands in an in-process `_running_commands` map; querying an untracked action ID returns `UNKNOWN`, and that client advertises no action-history capability. At the workcell layer, `UNKNOWN` ultimately marks the workflow failed. A later failed-workflow resubmission can therefore create a new physical action unless the underlying device/system-of-record independently resolves the old command. MADSci has the durable workflow half; PyLabRobot VSpin/Access2 has the richer executor-local physical-recovery half. Neither independently closes the full cross-process physical-effect contract.
+
+### Independent RED-TEAM / VERIFIER pass
+Verifier input excluded the proposed score and used only the frozen source/test/schema/history packet above.
+
+**Verdict: PASS_WITH_LIMITS.**
+
+Reasons to pass:
+1. The actuation-boundary distinction is implemented in source and tested, not a README claim.
+2. Recovery-required state is sticky during the live session and ordinary motion checks explicitly reject operation until recovery conditions are addressed.
+3. Fresh controller readback is part of readiness/recovery reasoning, and the documentation explicitly distinguishes software resource assignments from physical truth.
+4. The implementation is independent of the prior Opentrons-Flex stack and therefore provides a second implementation-family signal for physical-effect closure.
+
+Strongest objections / limits:
+1. **Cross-process durability fails the original strongest hypothesis.** Recovery state and operation identity are in memory; after process loss, neither supplies a durable business-effect record that proves what physical command might have executed.
+2. **Event correlation is not idempotency.** `operation_id` is generated in-process for telemetry and has no inspected provider/device dedupe semantics.
+3. **Readback cannot always reconstruct plate identity.** Controller status can establish motion/fault/home facts, but the docs correctly warn that physical plate location may diverge from the resource model after interrupted transfer.
+4. **No independent hardware execution in this run.** Tests and documentation were inspected; no vendor device was exercised.
+5. **Popularity reduces rarity.** PyLabRobot itself is established; the unusual signal is the newly added actuation-aware recovery semantics, not repository obscurity.
+
+The verifier therefore passes this as a **STRONG_COMPONENT physical-recovery reference pattern**, but rejects any claim that it completes durable physical exactly-once or the full Run-4 next-test requirement.
+
+### Proposed score
+A) speed to first revenue: **4/5** — the semantics can anchor a focused instrument-driver/workcell failure audit.  
+B) customer value / ceiling: **4/5** — preventing unsafe retries, plate-state corruption and recovery guesswork is valuable, though this driver family is narrower than a full lab OS.  
+C) build/domain compression: **5/5** — real device protocol handling plus actuation-aware state machines, transfer phases, fresh status queries and regression tests encode substantial domain work.  
+D) rarity/advantage: **4/5** — the pattern is unusual, but the repository is established and the key layer is recent.  
+E) evidence/completeness: **3/5** — excellent source/tests/docs/history for live-session recovery, but the decisive crash-persistence boundary is absent and hardware was not independently exercised.  
+F) rights/operability: **5/5** — MIT license and broad Python lab-automation ecosystem.  
+**Total: 25/30 — STRONG_COMPONENT inside shadow; no central promotion is made.**
+
+### Commercial / research implication
+The strongest product concept becomes more specific: a **Scientific Instrument Uncertainty Firewall / Recovery Audit**. For each physically mutating operation, persist one business-effect ID before dispatch; bind it to the workflow step and native device/protocol execution ID; record `NOT_SENT / SENT_OUTCOME_UNKNOWN / SUCCEEDED / FAILED_NO_EFFECT / NEEDS_RECONCILIATION`; and require device-specific readback or operator-confirmed physical state before allowing a new command after ambiguity. PyLabRobot supplies a strong executor-local state-machine pattern; MADSci supplies a strong orchestration/action-ID pattern; BO-MCP supplies campaign idempotency/provenance. The missing reusable kernel is the durable bridge among all three.
+
+### Search lesson outcome
+LOCAL-2 now has a **second independent implementation-family success**, but the success is narrower than the original durability target. The high-signal invariant generalizes: distinguish failure **before vs after actuation**, retain an unresolved/recovery state after post-actuation failure, invalidate uncertain position knowledge, and block ordinary motion until fresh evidence restores confidence. This is now eligible for STAGED consideration inside shadow evaluation, but it must retain an explicit warning that in-memory recovery flags and telemetry UUIDs do not satisfy crash-safe physical-effect identity.
+
+New negative lesson: orchestration durability and executor recovery are frequently split across layers. Search them separately, then inspect the handoff: a durable workflow ID with an in-memory device command map is still unsafe after process loss, while a strong device recovery state with no persistent operation identity also loses uncertainty on restart.
+
+### VALUE HANDOFF
+1. **Capability delta:** a second executor family confirms actuation-aware recovery as a reusable scientific-control primitive; MADSci adds the complementary durable workflow/action-ID side.
+2. **Graph edge:** conceptually sharpens the missing link between BO-MCP campaign integrity and Opentrons-Flex physical uncertainty closure into a durable `workflow step ↔ business effect ↔ native device command ↔ readback/reconciliation` record.
+3. **Radar signal:** independent PyLabRobot and Opentrons-Flex implementations now support an emerging **scientific physical-effect integrity** category beneath generic lab orchestration.
+4. **Experiment impact:** the next falsifiable prototype is no longer “find any recovery state”; it is to crash between device write and acknowledgement, restart the process, and prove the same durable effect record prevents blind redispatch until native readback/reconciliation resolves the outcome.
+5. **Commercial impact:** upgrades the audit wedge from generic recovery review to a concrete cross-layer qualification: identify every operation whose workflow ID, device command ID, physical-state evidence and retry policy cannot be joined after restart.
+6. **Negative knowledge:** session-sticky recovery flags, event UUIDs and durable workflow records are each insufficient alone; the value sits in their cross-process binding.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate inspections: 2, plus one comparator triage;
+- source/test/schema/history traversals: ~22;
+- external GitHub/web reads/searches: ~30;
+- reproducible untrusted-repository code executions: 0 (source/test/history inspection only).
