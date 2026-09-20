@@ -119,6 +119,17 @@
         "string",
         "null"
       ]
+    },
+    "search_credit_weights": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
     }
   },
   "additionalProperties": true
