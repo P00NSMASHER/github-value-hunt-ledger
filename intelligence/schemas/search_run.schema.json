@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v2",
+  "title": "Technology Intelligence Search Run v3",
   "type": "object",
   "required": [
     "search_run_id",
@@ -242,6 +242,13 @@
         "string",
         "null"
       ]
+    },
+    "query_family_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^QF:[a-z0-9-]+$"
     }
   },
   "additionalProperties": true
