@@ -134,3 +134,71 @@ Append-only shadow log. These findings are NOT authoritative MASTER promotions.
 **LOCAL LESSON:** Run 1's local skill transferred: authority/freshness/evidence terms again outperformed generic billing searches. Adding `supersede`, `source of truth`, `credit note`, `reversal_of_entry_id`, `idempotency` and explicit shadow/authoritative states exposed a stronger missing-edge component. This is a second distinct successful application of the underlying authority-aware search principle inside the commercial shadow lane, but it remains lane-local because shadow hunters cannot globalize skills.
 
 **NEXT TEST:** Find or falsify the **cut-over/outcome edge**: a production-shaped path where immutable customer-contract versions actually become invoice/rating authority and an accepted discrepancy can be followed through posted adjustment/refund/settlement to a reconciled receivable without silently defaulting missing terms.
+
+## 2026-09-20 — Shadow run 3
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** A higher-value direct-money component will prove the entire internal economic chain, not merely one layer: effective-dated contract authority must select rating, billing close must consume rated facts into an issued receivable, settlement must be idempotently allocated, and reconciliation must prove the resulting money state. This should outperform repositories that only model authority or only validate settlement evidence.
+
+**DISCOVERY METHODS:**
+1. Direct repository/domain search for subscription billing, contract invoicing, credit/refund and reconciliation engines.
+2. Code/invariant search for `contract_version_id`, effective intervals, rated usage, invoice lines, payment allocation, idempotency, append-only corrections and reconciliation checks.
+3. Obscure-name/low-attention discovery: followed financial code hidden inside unrelated public products/context platforms rather than relying on billing-oriented repository names. This surfaced serious candidates with 0 stars and rich internal finance subsystems.
+
+**BEST CANDIDATE + URL + EXACT REVISION:** `cyber-entrepreneur/wingcaster` — https://github.com/cyber-entrepreneur/wingcaster — `0d97a4ab8310d68b109e3a11ebdeda5eb3d3c829`.
+
+**IMPLEMENTED:**
+- `rating/engine.js` resolves an **ACTIVE**, effective-dated customer contract version for the metered timestamp, then resolves an ACTIVE effective-dated price version from that contract's meter components. The immutable rating payload pins contract version, price version, meter facts, model/tier/dimension inputs, billable units and amount.
+- The rating path is append-only: corrections create new rated facts rather than mutating prior economic facts.
+- `period-close.js` implements an idempotent 12-step close. It refuses to advance while usage is unmetered or active metered usage lacks a rating, snapshots rated facts, assembles/drafts the invoice, verifies totals, approves/issues the invoice, marks the billing period invoiced and only then finalizes it.
+- `payment-allocation.js` records received payments with deterministic command idempotency and optional provider/provider-event deduplication, maintains unapplied cash, locks invoices in stable order, writes both payment→invoice and invoice→payment allocation evidence, transitions receivables through PART_PAID/PAID, and can reverse prior allocation state.
+- The reconciliation engine contains explicit blocking checks spanning ledger balance, usage/rating, invoice-line/rated-usage equivalence, contract/currency consistency, and payment-allocation mirrors. Critical drift can block billing close rather than merely create a dashboard warning.
+
+**TESTED / HISTORY:**
+- `runner-billed-green.test.js` is the strongest evidence: on PostgreSQL it seeds a rated case, runs `rateMeteredUsage`, opens and closes a billing period through FINAL, verifies one invoice, records a payment, allocates the exact invoice balance, runs the full reconciliation suite, and requires every non-error reconciliation check to be GREEN.
+- Separate rating, append-only, period-close and reconciliation suites are present; the search also exposed dedicated R040–R046 and R080–R083 reconciliation groups.
+- Finance history is staged rather than one-shot: the rating engine first entered in the verified 2026-08-19 Stage 5 commit, with later vendor-economics/reconciliation work on 2026-08-21; current repository HEAD is a verified GitHub commit dated 2026-09-20.
+
+**CLAIMED / PLANNED / UNKNOWN:**
+- This proves an **internal accounting/reconciliation loop**, not bank or payment-processor truth. `recordPayment` may bind provider/provider-event identity, but the inspected evidence does not independently read back settlement from a PSP/bank before declaring the internal payment record authoritative.
+- Contract versions are operationally authoritative inside the engine once ACTIVE, but the inspected packet does not prove how signed customer amendments enter that table or whether all exceptions are captured.
+- The end-to-end test uses repository-generated fixtures and the same system's reconciliation checks; it demonstrates strong invariant coherence but is not an independent economic oracle and does not prove recovered revenue, production precision or customer adoption.
+- GitHub reports `license: null` and no root LICENSE was found. Record public rights as `no detected public license`; for this hunt only, the user's standing separate commercial-code permission remains the working repository-code assumption.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:d33da4ed4c5b25cc3d64b33e064680c75238ffcf7152557b44f7f2acbaa4bd65`, binding exact revision plus:
+- `backend/src/fin/rating/engine.js` — Git blob `26b00ca28f04fb31cbd4ea7b5feced73837e440e`
+- `backend/src/fin/billing/period-close.js` — `6d35212e474061f87c62c2ebe61fb7e98f04890a`
+- `backend/src/fin/billing/payment-allocation.js` — `8d55727c0d796df625c6cf4f1f56a211bb82fa04`
+- `backend/src/fin/reconciliation/checks.js` — `2911955fb0438143bd9146f86b33f38df8040b92`
+- `backend/src/fin/reconciliation/runner-billed-green.test.js` — `ad2d3eaf91e049816564c42489b23d06ab047c46`
+No repository code was executed.
+
+**COMPARATORS:**
+- `UnlikeOtherAI/UnlikeOtherAuthenticator@102b16ccd900418b36fa846c90daa75cb48a7587` is a close second and publicly MIT-licensed. Its source materializes forward-only customer contract versions into custom/manual tariffs, calculates invoices from the effective contract version, hashes calculation evidence including contract version and metering/credit snapshots, freezes invoice evidence after calculation, and records idempotent PAYMENT/REFUND/WRITE_OFF events. Its database tests are excellent. The decisive limitation for this hypothesis is that the inspected contract-invoice settlement source is explicitly **MANUAL**; it therefore proves receivable-state accounting better than provider-grounded outcome truth.
+- `yvgude/lean-ctx@613e95ff64a69845a61b0025065d18a214039b53` has a sophisticated content-addressed settlement-evidence verifier with explicit Baseline/Price/Contract/Quality/Attribution/PeriodCompletion/CustomerApproval roles and out-of-band trust anchors. Its own source expressly says it does **not** validate contracts, calculate prices, issue invoices or mutate settlement state. That makes it valuable as an evidence-oracle component but a direct falsification of the idea that settlement evidence alone closes the money loop.
+
+**RED-TEAM / INDEPENDENT VERIFIER VERDICT:** **PASS_WITH_LIMITS.** On the frozen packet, the narrow claim is supported: this exact revision implements and tests an internal chain from effective-dated ACTIVE contract/price selection → append-only rating → gated billing close/invoice issue → idempotent payment allocation → all-green reconciliation. The verifier specifically rejects stronger wording such as “processor-settled,” “bank-reconciled,” “customer-contract complete,” or “recovered revenue.” The strongest objection is circular authority: contract rows, payment records and reconciliation facts are largely produced or accepted inside the same system. External signed-contract ingestion and PSP/bank readback are not independently proven.
+
+**A-F SCORE (proposed only, after verifier):** **26/30 — A3 / B5 / C5 / D5 / E5 / F3.**
+- A3: a read-only trace/reconciliation diagnostic is sellable without moving money, but integrating all source systems is heavier than a single leakage rule service.
+- B5: contract-to-receivable integrity touches billing correctness, cash application, collections and close controls.
+- C5: compresses a large amount of temporal rating, invoice state-machine, idempotency, allocation and reconciliation engineering.
+- D5: a tested effective-contract→rating→invoice→payment→reconciliation chain is unusually rich in a zero-star public repository.
+- E5: source, integration tests, invariant checks and staged history strongly support the narrow internal-loop claim.
+- F3: operational surface is broad and public licensing is absent; external contract/provider authority remains unresolved even under the user's separate repository-code permission assumption.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: Controller/CFO, billing-platform owner or revenue-assurance lead at a usage/subscription business with negotiated pricing and nontrivial cash application.
+- Pain: finance teams can prove pieces of the chain but cannot cheaply answer one question end-to-end: “Which contract version priced this usage, which receivable did it create, what cash/credit settled it, and do all independent ledgers still agree?”
+- First paid wedge: a read-only **Revenue-to-Receivable Trace Audit** over one closed period. Reconstruct contract/rate authority, freeze rated usage and invoice evidence, trace payment/credit allocation, then return only broken invariants and unresolved authority gaps. Measure dollars with broken provenance, unreconciled receivables, duplicate/over-applied cash prevented and analyst hours saved.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** This closes most of the internal outcome edge around the run-1/run-2 stack. `dotmac_sub` remains stronger for explicit commercial-contract provenance/migration; `Etherlabs-dev/revenue_leakage_system` remains stronger for fail-closed expected-vs-actual leakage decisions; Wingcaster supplies a tested **rating → receivable → cash-allocation → reconciliation** backbone. Combined shape: **contract authority → leakage decision → accepted correction → rated/issued receivable → idempotent cash/credit allocation → reconciliation proof**. The remaining high-value gap is external authority/readback, not another internal billing engine.
+
+**SEARCH EFFORT / COST PROXIES:** 3 materially different discovery modes; 3 serious candidates deep-inspected; source/tests/history verified at exact revisions; 67 external connector/tool calls including required shadow-memory reads and repository writes, plus one local manifest-hash computation; 0 untrusted-repository code executions, contacts, spend or commitments.
+
+**LOCAL LESSON:** `SK-COM-001` transferred for a third distinct shadow run: authority/effective-date/idempotency terms again outperformed generic billing keywords. A new lane-local refinement also worked once: require a single integration test that crosses **authority → rating → invoice → settlement → reconciliation**, then inspect the source at each transition rather than awarding completeness from module names. This refinement remains LOCAL after one success and is not promoted to shared search skills.
+
+**REFERRALS:** No new cross-lane referral; the existing provider/system-of-record readback referral already captures the remaining gap and should not be duplicated.
+
+**NEXT TEST:** Find or falsify an external-authority bridge: a component that binds signed/order-system contract amendments and PSP/bank settlement readback into immutable evidence, so the internal closed loop cannot declare itself correct using only its own contract and payment records.
