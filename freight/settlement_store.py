@@ -76,8 +76,8 @@ class SettlementStore:
         self,
         path: str | Path,
         *,
-        buyer_id: str = "TEST_BUYER",
-        business_unit: str = "TEST_BU",
+        buyer_id: str,
+        business_unit: str,
         busy_timeout_ms: int = 5000,
     ):
         self.path = str(path)
