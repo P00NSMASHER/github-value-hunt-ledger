@@ -1,122 +1,187 @@
 #!/usr/bin/env python3
 import json, math
 from collections import defaultdict
-from pathlib import Path
+from datetime import datetime
+from ti_common import INTEL, load_jsonl, normalize_run_time
 
-ROOT=Path(__file__).resolve().parents[1]
-INTEL=ROOT/"intelligence"
+runs = [r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective", "benchmark"}]
+outs = load_jsonl("outcomes.jsonl")
+strategies = {x["strategy_id"]: x for x in load_jsonl("search_strategies.jsonl")}
+aliases = json.loads((INTEL / "strategy_aliases.json").read_text(encoding="utf-8")) if (INTEL / "strategy_aliases.json").exists() else {}
 
-def load(name):
-    p=INTEL/name
-    if not p.exists(): return []
-    return [json.loads(x) for x in p.read_text(encoding="utf-8").splitlines() if x.strip()]
+def canonical_strategy(sid):
+    s = strategies.get(sid)
+    if s and s.get("parent_strategy_id"):
+        return s["parent_strategy_id"]
+    return aliases.get(sid, sid)
 
-runs=load("search_runs.jsonl")
-outs=load("outcomes.jsonl")
-strats={x["strategy_id"]:x for x in load("search_strategies.jsonl")}
+def parse_day(value):
+    if not value:
+        return None
+    text = str(value)[:10]
+    try:
+        return datetime.fromisoformat(text).date()
+    except Exception:
+        return None
 
-def wilson(k,n,z=1.96):
-    if not n: return None
-    p=k/n
-    den=1+z*z/n
-    center=(p+z*z/(2*n))/den
-    half=z*math.sqrt((p*(1-p)+z*z/(4*n))/n)/den
-    return max(0,center-half),min(1,center+half)
+days = [parse_day(normalize_run_time(r)) for r in runs]
+days += [parse_day(o.get("date")) for o in outs]
+days = [d for d in days if d]
+reference_day = max(days) if days else None
+OUTCOME_LAG_DAYS = 14
 
-out_by_run=defaultdict(list)
+def wilson(k, n, z=1.96):
+    if not n:
+        return None
+    p = k / n
+    den = 1 + z*z/n
+    center = (p + z*z/(2*n)) / den
+    half = z * math.sqrt((p*(1-p) + z*z/(4*n)) / n) / den
+    return max(0, center-half), min(1, center+half)
+
+def fmt_rate(k, n):
+    if not n:
+        return "—"
+    lo, hi = wilson(k, n)
+    return f"{k/n:.1%} [{lo:.1%}, {hi:.1%}]"
+
+out_by_run = defaultdict(list)
 for o in outs:
-    for rid in o.get("origin_search_ids",[]): out_by_run[rid].append(o)
+    for rid in o.get("origin_search_ids", []):
+        out_by_run[rid].append(o)
 
-groups=defaultdict(lambda:{"runs":[]})
+groups = defaultdict(list)
+query_groups = defaultdict(list)
 for r in runs:
-    if r.get("measurement_quality") not in {"prospective","benchmark"}: continue
-    if r.get("deep_inspected") is None: continue
-    groups[("strategy",r["strategy_id"])]["runs"].append(r)
-    groups[("query",r.get("query_family","unknown"))]["runs"].append(r)
+    groups[canonical_strategy(r.get("strategy_id"))].append(r)
+    query_groups[r.get("query_family") or "unknown"].append(r)
 
-def fmt_rate(k,n):
-    if not n: return "—"
-    lohi=wilson(k,n)
-    return f"{k/n:.1%} [{lohi[0]:.1%}, {lohi[1]:.1%}]"
+def outcome_eligible(run):
+    if not reference_day:
+        return False
+    day = parse_day(normalize_run_time(run))
+    return bool(day and (reference_day - day).days >= OUTCOME_LAG_DAYS)
 
-def summarize(label,rs):
-    n_runs=len(rs)
-    candidates=sum((r.get("candidate_count") or 0) for r in rs)
-    inspected=sum((r.get("deep_inspected") or 0) for r in rs)
-    retained=sum((r.get("retained_count") or 0) for r in rs)
-    promoted=sum((r.get("master_promoted_count") or 0) for r in rs)
-    new_caps=sum(len(r.get("new_capability_ids") or []) for r in rs)
-    exp_runs=sum(1 for r in rs if r.get("experiment_ids"))
-    outcome_objs=[]
-    seen=set()
+def summarize(label, rs):
+    inspected = sum((r.get("deep_inspected") or 0) for r in rs)
+    candidates = sum((r.get("candidate_count") or 0) for r in rs)
+    retained = sum((r.get("retained_count") or 0) for r in rs)
+    promoted = sum((r.get("master_promoted_count") or 0) for r in rs)
+    novel_runs = sum(1 for r in rs if r.get("new_capability_ids"))
+    experiment_runs = sum(1 for r in rs if r.get("experiment_ids"))
+    search_bearing_runs = sum(1 for r in rs if (r.get("candidate_count") or 0) > 0 or (r.get("deep_inspected") or 0) > 0)
+
+    outcome_objects = []
+    seen = set()
     for r in rs:
-        for o in out_by_run.get(r["search_run_id"],[]):
-            if o["outcome_id"] not in seen: outcome_objs.append(o); seen.add(o["outcome_id"])
-    valid_out=[o for o in outcome_objs if o.get("result")!="INVALID"]
-    passed=sum(1 for o in valid_out if o.get("result")=="PASSED")
-    revenue=sum((o.get("revenue_usd") or 0) for o in valid_out)
-    value=sum((o.get("customer_value_usd") or 0) for o in valid_out)
-    days_low=sum((o.get("engineering_days_saved_low") or 0) for o in valid_out)
-    days_high=sum((o.get("engineering_days_saved_high") or 0) for o in valid_out)
-    evidence="sufficient" if n_runs>=5 and inspected>=20 else "insufficient"
+        for o in out_by_run.get(r["search_run_id"], []):
+            if o.get("outcome_id") not in seen:
+                seen.add(o.get("outcome_id"))
+                outcome_objects.append(o)
+    valid = [o for o in outcome_objects if o.get("result") != "INVALID"]
+    passed = sum(1 for o in valid if o.get("result") == "PASSED")
+    eligible = [r for r in rs if outcome_eligible(r)]
+    eligible_with_outcome = sum(1 for r in eligible if any(o.get("result") != "INVALID" for o in out_by_run.get(r["search_run_id"], [])))
+
+    revenue = sum((o.get("revenue_usd") or 0) for o in valid)
+    value = sum((o.get("customer_value_usd") or 0) for o in valid)
+    days_low = sum((o.get("engineering_days_saved_low") or 0) for o in valid)
+    days_high = sum((o.get("engineering_days_saved_high") or 0) for o in valid)
+
     return {
-      "label":label,"runs":n_runs,"candidates":candidates,"inspected":inspected,
-      "retained":retained,"promoted":promoted,"new_caps":new_caps,"exp_runs":exp_runs,
-      "outcomes":len(valid_out),"passed":passed,"revenue":revenue,"value":value,
-      "days_low":days_low,"days_high":days_high,"evidence":evidence
+        "label": label,
+        "runs": len(rs),
+        "search_bearing_runs": search_bearing_runs,
+        "candidates": candidates,
+        "inspected": inspected,
+        "retained": retained,
+        "promoted": promoted,
+        "novel_runs": novel_runs,
+        "experiment_runs": experiment_runs,
+        "outcomes": len(valid),
+        "passed_outcomes": passed,
+        "eligible_runs": len(eligible),
+        "eligible_with_outcome": eligible_with_outcome,
+        "revenue": revenue,
+        "value": value,
+        "days_low": days_low,
+        "days_high": days_high,
+        "sufficient": len(rs) >= 5 and inspected >= 20
     }
 
-strategy_rows=[]
-query_rows=[]
-for (kind,label),g in groups.items():
-    s=summarize(label,g["runs"])
-    (strategy_rows if kind=="strategy" else query_rows).append(s)
+strategy_rows = [summarize(k, v) for k, v in groups.items()]
+query_rows = [summarize(k, v) for k, v in query_groups.items()]
 
-def score(row):
-    if row["evidence"]!="sufficient": return -1
-    i=max(row["inspected"],1)
-    return (row["promoted"]/i)*3 + (row["new_caps"]/i)*2 + (row["outcomes"]/max(row["runs"],1))*2 + min(row["revenue"]/10000,2)
+def rank_score(row):
+    if not row["sufficient"]:
+        return -1
+    i = max(row["inspected"], 1)
+    run_n = max(row["runs"], 1)
+    return (
+        3.0 * row["promoted"] / i +
+        2.0 * row["novel_runs"] / run_n +
+        1.5 * row["experiment_runs"] / run_n +
+        2.0 * row["outcomes"] / run_n +
+        min(row["revenue"] / 10000, 2.0)
+    )
 
-strategy_rows.sort(key=score,reverse=True)
-query_rows.sort(key=score,reverse=True)
+strategy_rows.sort(key=lambda x: (-rank_score(x), x["label"]))
+query_rows.sort(key=lambda x: (-rank_score(x), x["label"]))
 
-lines=[
-"# LEARNING REPORT","",
-"Generated from prospective/benchmark search runs and explicitly linked outcomes. Retrospective anecdotes are excluded from yield denominators.","",
-f"- Measured search runs: **{sum(x['runs'] for x in strategy_rows)}**",
-f"- Structured outcomes: **{len(outs)}**",
-"",
-"## Strategy performance","",
-"| Strategy | Runs | Inspected | Retained precision | MASTER yield | Capability novelty | Experiment conversion | Outcomes | Realized revenue | Evidence |",
-"|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+lines = [
+    "# LEARNING REPORT", "",
+    "Generated from prospective and benchmark search runs. Retrospective anecdotes are excluded from yield denominators.", "",
+    f"- Measured runs: **{len(runs)}**",
+    f"- Search-bearing runs: **{sum(1 for r in runs if (r.get('candidate_count') or 0) > 0 or (r.get('deep_inspected') or 0) > 0)}**",
+    f"- Structured outcomes: **{len(outs)}**",
+    f"- Outcome-lag window: **{OUTCOME_LAG_DAYS} days**; recent runs are not counted as outcome failures.", "",
+    "## Strategy performance", "",
+    "| Strategy | Runs | Inspected | Retained precision | MASTER yield | New-capability run rate | Experiment run rate | Outcomes | Outcome conversion* | Evidence |",
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|"
 ]
 for x in strategy_rows:
-    lines.append(f"| {x['label']} | {x['runs']} | {x['inspected']} | {fmt_rate(x['retained'],x['inspected'])} | {fmt_rate(x['promoted'],x['inspected'])} | {fmt_rate(x['new_caps'],x['inspected'])} | {fmt_rate(x['exp_runs'],x['runs'])} | {x['outcomes']} | ${x['revenue']:,.0f} | {x['evidence']} |")
-if not strategy_rows: lines.append("| — | 0 | 0 | — | — | — | — | 0 | $0 | insufficient |")
+    outcome_conv = fmt_rate(x["eligible_with_outcome"], x["eligible_runs"])
+    lines.append(
+        f"| {x['label']} | {x['runs']} | {x['inspected']} | {fmt_rate(x['retained'],x['inspected'])} | "
+        f"{fmt_rate(x['promoted'],x['inspected'])} | {fmt_rate(x['novel_runs'],x['runs'])} | "
+        f"{fmt_rate(x['experiment_runs'],x['runs'])} | {x['outcomes']} | {outcome_conv} | "
+        f"{'sufficient' if x['sufficient'] else 'insufficient'} |"
+    )
+if not strategy_rows:
+    lines.append("| — | 0 | 0 | — | — | — | — | 0 | — | insufficient |")
 
-lines += ["","## Query-family performance","",
-"| Query family | Runs | Inspected | Retained precision | MASTER yield | Capability novelty | Outcomes | Evidence |",
-"|---|---:|---:|---:|---:|---:|---:|---|"]
+lines += [
+    "", "*Outcome conversion only uses runs old enough to clear the lag window.", "",
+    "## Query-family performance", "",
+    "| Query family | Runs | Inspected | Retained precision | MASTER yield | New-capability run rate | Outcomes | Evidence |",
+    "|---|---:|---:|---:|---:|---:|---:|---|"
+]
 for x in query_rows:
-    lines.append(f"| {x['label']} | {x['runs']} | {x['inspected']} | {fmt_rate(x['retained'],x['inspected'])} | {fmt_rate(x['promoted'],x['inspected'])} | {fmt_rate(x['new_caps'],x['inspected'])} | {x['outcomes']} | {x['evidence']} |")
-if not query_rows: lines.append("| — | 0 | 0 | — | — | — | 0 | insufficient |")
+    lines.append(
+        f"| {x['label']} | {x['runs']} | {x['inspected']} | {fmt_rate(x['retained'],x['inspected'])} | "
+        f"{fmt_rate(x['promoted'],x['inspected'])} | {fmt_rate(x['novel_runs'],x['runs'])} | "
+        f"{x['outcomes']} | {'sufficient' if x['sufficient'] else 'insufficient'} |"
+    )
+if not query_rows:
+    lines.append("| — | 0 | 0 | — | — | — | 0 | insufficient |")
 
-lines += ["","## Policy","",
-"- Do not automatically expand or retire a strategy until evidence is sufficient (>=5 measured runs and >=20 deep inspections).",
-"- Prefer strategies that create independently verified capabilities or useful experiments, not merely high retained counts.",
-"- Realized outcomes outrank predicted repository scores.",
-"- Keep an exploration budget for high-novelty strategies even when short-run precision is low.",
-"- A failed outcome is training data; it should reduce confidence in the assumptions it tested, not be deleted.",
-"",
-"## Realized value traced through the loop",""]
-valid=[o for o in outs if o.get("result")!="INVALID"]
-rev=sum((o.get("revenue_usd") or 0) for o in valid)
-val=sum((o.get("customer_value_usd") or 0) for o in valid)
-lo=sum((o.get("engineering_days_saved_low") or 0) for o in valid)
-hi=sum((o.get("engineering_days_saved_high") or 0) for o in valid)
-lines += [f"- Revenue: **${rev:,.0f}**",f"- Customer value: **${val:,.0f}**",f"- Observed engineering compression: **{lo:g}–{hi:g} engineer-days**",""]
+valid = [o for o in outs if o.get("result") != "INVALID"]
+revenue = sum((o.get("revenue_usd") or 0) for o in valid)
+customer_value = sum((o.get("customer_value_usd") or 0) for o in valid)
+days_low = sum((o.get("engineering_days_saved_low") or 0) for o in valid)
+days_high = sum((o.get("engineering_days_saved_high") or 0) for o in valid)
 
-out="\n".join(lines)
-path=INTEL/"LEARNING_REPORT.md"
-path.write_text(out,encoding="utf-8")
-print(path)
+lines += [
+    "", "## Policy", "",
+    "- Do not claim a strategy is superior until it has at least 5 measured runs and 20 deep inspections.",
+    "- Keep explicit exploration; low-frequency strange discoveries must not be optimized away by short-run precision.",
+    "- Realized outcomes outrank predicted repository scores.",
+    "- An internal engineering or validation run with zero candidates can still strengthen a capability or experiment, but it does not enter candidate-yield denominators.",
+    "- Failed and partial outcomes remain training data.", "",
+    "## Realized value traced through the loop", "",
+    "- Revenue: **$" + format(revenue, ",.0f") + "**",
+    "- Customer value: **$" + format(customer_value, ",.0f") + "**",
+    f"- Observed engineering compression: **{days_low:g}–{days_high:g} engineer-days**", ""
+]
+(INTEL / "LEARNING_REPORT.md").write_text("\n".join(lines), encoding="utf-8")
+print(INTEL / "LEARNING_REPORT.md")
