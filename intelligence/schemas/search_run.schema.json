@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v14",
+  "title": "Technology Intelligence Search Run v15",
   "type": "object",
   "required": [
     "search_run_id",
@@ -663,6 +663,24 @@
         "string",
         "null"
       ]
+    },
+    "dispatch_kind": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "primary",
+        "work_steal",
+        null
+      ]
+    },
+    "dispatch_parent_ticket_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
     }
   },
   "additionalProperties": true,
@@ -906,6 +924,48 @@
       "then": {
         "required": [
           "route_override_reason"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 15
+          },
+          "routing_mode": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "schema_version",
+          "routing_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "dispatch_kind"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 15
+          },
+          "dispatch_kind": {
+            "const": "work_steal"
+          }
+        },
+        "required": [
+          "schema_version",
+          "dispatch_kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "dispatch_parent_ticket_id"
         ]
       }
     }
