@@ -24,10 +24,12 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 
 ### Repository/supply-chain
 - [x] Freight GitHub Actions are pinned to full immutable commit SHAs.
+- [x] Technology Intelligence validation workflow uses immutable Action SHAs + read-only contents permission; only the main-only persistence job receives contents:write.
 - [x] Workflow payload writers reject absolute paths and parent traversal.
 - [x] Workflow writers can touch only explicit allowed files/prefixes.
 - [x] CI dependencies are version-pinned.
 - [x] Commercial/runtime/comparator components are represented in the rights registry with exact revisions.
+- [x] Rights status promotion is fail-closed: separately licensed components cannot be represented as resolved for hosted/SaaS/assignment/change-of-control without verified diligence-room evidence metadata + SHA-256.
 - [x] Deterministic control-file hashes + component inventory can be regenerated in CI via `freight/release_provenance.py`.
 - [x] Deterministic CycloneDX 1.6-shaped SBOM is generated for pinned Freight repository components + direct pinned CI Python dependencies.
 - [x] Deterministic unsigned in-toto/DSSE-shaped attestation payload is generated and verified in CI; repository output intentionally contains no signature.
@@ -85,15 +87,16 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [x] file-backed scoped reference audit persistence with immutable SQL triggers;
 - [ ] production audit-store service authorization, external immutability/WORM controls and alerting;
 - [ ] customer-specific integration secrets held outside source;
-- [ ] incident-response and breach-notification runbook;
+- [x] documented incident-response / breach-decision runbook with machine-checked containment, recovery, exposure-resolution and notification-authorization closure rules;
+- [ ] deployed contact tree/on-call/alerting plus completed tabletop or production incident exercise evidence;
 - [x] deterministic zero-customer-data technical/commercial diligence ZIP with per-entry SHA-256 and generated provenance/SBOM/unsigned attestation;
 - [ ] buyer-specific completed security questionnaire and externally supplied diligence artifacts.
 
 ## Current claim boundary
 
-The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload and a deterministic zero-customer-data diligence bundle**.
+The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload, a deterministic zero-customer-data diligence bundle, rights evidence consistency gates and a documented fail-closed incident-response decision model**.
 
-It does **not** prove a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
+It does **not** prove executed rights documents have been supplied/reviewed, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, the incident plan has been exercised against the deployed environment, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
 
 ## Commercial launch rule
 

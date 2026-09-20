@@ -25,6 +25,10 @@ def test_current_release_provenance_is_deterministic():
     assert a["provenance_hash"]
     assert "freight/contracts.py" in a["control_file_hashes"]
     assert "production/requirements-ci.txt" in a["control_file_hashes"]
+    assert "freight/rights_evidence.py" in a["control_file_hashes"]
+    assert "freight/incident_response.py" in a["control_file_hashes"]
+    assert "freight/RIGHTS_EVIDENCE_MANIFEST.json" in a["control_file_hashes"]
+    assert ".github/workflows/technology-intelligence.yml" in a["control_file_hashes"]
 
 
 def test_invalid_component_revision_fails_closed():

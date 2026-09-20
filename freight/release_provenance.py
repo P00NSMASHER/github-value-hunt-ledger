@@ -25,6 +25,7 @@ CONTROL_PATHS = (
     "freight/deal_economics.py",
     "freight/gap_registry.py",
     "freight/input_guard.py",
+    "freight/incident_response.py",
     "freight/outcome_adapter.py",
     "freight/pilot_package.py",
     "freight/pilot_reporting.py",
@@ -32,14 +33,17 @@ CONTROL_PATHS = (
     "freight/release_attestation.py",
     "freight/release_gate.py",
     "freight/release_provenance.py",
+    "freight/rights_evidence.py",
     "freight/sbom.py",
     "freight/settlement_store.py",
     "freight/synthetic_rehearsal.py",
     "freight/COMPONENT_RIGHTS_REGISTRY.json",
+    "freight/RIGHTS_EVIDENCE_MANIFEST.json",
     "freight/GAP_REGISTER.json",
     "intelligence/domain_search_policies.json",
     "production/requirements-ci.txt",
     ".github/workflows/freight-contracts.yml",
+    ".github/workflows/technology-intelligence.yml",
 )
 
 

@@ -48,3 +48,21 @@ def test_tampered_bundle_entry_is_rejected(tmp_path):
 
     with pytest.raises(ValueError,match="differs from current checkout|hash/size mismatch"):
         verify_diligence_bundle(root,tampered)
+
+
+def test_bundle_contains_rights_and_incident_diligence(tmp_path):
+    from pathlib import Path
+    root=Path(__file__).resolve().parents[1]
+    bundle=tmp_path/"bundle.zip"
+    build_diligence_bundle(root,bundle)
+    with zipfile.ZipFile(bundle) as zf:
+        names=set(zf.namelist())
+        manifest=json.loads(zf.read("BUNDLE_MANIFEST.json"))
+    expected={
+        "freight/RIGHTS_DILIGENCE.md",
+        "freight/RIGHTS_EVIDENCE_MANIFEST.json",
+        "freight/INCIDENT_RESPONSE.md",
+        "freight/INCIDENT_TABLETOP_TEMPLATE.md",
+    }
+    assert expected.issubset(names)
+    assert expected.issubset({row["path"] for row in manifest["entries"]})

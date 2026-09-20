@@ -33,17 +33,24 @@ on:
       - ".github/workflows/technology-intelligence.yml"
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: technology-intelligence-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build-intelligence:
+  validate:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
 
@@ -80,8 +87,59 @@ jobs:
       - name: Check generated text for whitespace errors
         run: git diff --check
 
+  persist-generated:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.actor != 'github-actions[bot]'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+
+      - name: Refresh main before generation
+        shell: bash
+        run: git pull --ff-only origin main
+      - name: Sync source-of-truth registries
+        run: python tools/ti_sync.py
+      - name: Recompute repository registry metrics
+        run: python tools/ti_registry.py
+      - name: Measure revision and catalog provenance debt
+        run: python tools/ti_revision_debt.py
+      - name: Canonicalize query families and objectives
+        run: python tools/ti_query_families.py
+      - name: Derive attribution graph
+        run: python tools/ti_graph.py
+      - name: Measure instrumentation quality
+        run: python tools/ti_quality.py
+      - name: Learn from candidate dispositions
+        run: python tools/ti_candidate_learning.py
+      - name: Compute fractional outcome attribution
+        run: python tools/ti_attribution.py
+      - name: Aggregate reusable search objectives
+        run: python tools/ti_objectives.py
+      - name: Rebuild learning report
+        run: python tools/ti_report.py
+      - name: Recompute cautious adaptive search policy
+        run: python tools/ti_policy.py
+      - name: Build measurement-debt plan
+        run: python tools/ti_measurement_plan.py
+      - name: Build matched strategy measurement campaign
+        run: python tools/ti_measurement_campaign.py
+      - name: Analyze normalized search-surface yield
+        run: python tools/ti_surface.py
+      - name: Validate technology-intelligence system
+        run: python tools/ti_validate.py
+      - name: Check generated text for whitespace errors
+        run: git diff --check
+
       - name: Persist generated intelligence on main
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -115,5 +173,5 @@ jobs:
                   intelligence/surface_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
-            git push
+            git push origin HEAD:main
           fi

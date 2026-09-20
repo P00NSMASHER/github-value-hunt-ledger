@@ -12,7 +12,8 @@ The bundle contains:
 - data-readiness and pilot protocols;
 - pilot data-room/report/audit-lifecycle documentation;
 - security/data-handling and release/security gates;
-- rights registry and release manifest;
+- rights registry + rights evidence manifest/promotion rules + release manifest;
+- incident-response runbook + tabletop template;
 - deterministic release provenance;
 - exact component inventory;
 - partial CycloneDX 1.6 SBOM;
@@ -40,3 +41,18 @@ The ZIP is deterministic and tamper-checked against the current repository
 checkout. It does not turn unsigned provenance into signed provenance, partial
 SBOM coverage into complete deployment inventory, or repository tests into a
 security certification.
+
+
+## Evidence still supplied outside this ZIP
+
+The repository bundle intentionally does not contain:
+- executed license/permission documents;
+- buyer-specific contracts/DPAs/security questionnaires;
+- external signing keys/signatures;
+- deployed incident/tabletop evidence;
+- customer notification/legal advice;
+- production SOC/SIEM or WORM exports.
+
+Those items belong in the actual controlled diligence room. The rights evidence
+manifest may reference them by location + SHA-256 after they are supplied and
+verified.
