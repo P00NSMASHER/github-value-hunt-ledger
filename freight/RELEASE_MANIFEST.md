@@ -124,6 +124,33 @@ The repository now contains a fail-closed incident decision model and runbook:
 
 This is **not** proof of a deployed SOC/IR program, staffed on-call rotation, buyer-specific notification procedure or completed tabletop against the production environment.
 
+## Deployment security evidence addendum — 2026-09-20
+
+Live connected-provider inventory identified one Freight deployment:
+- Netlify project: `freightleak-audit`
+- Site ID: `4884fe92-34bc-411c-8fc4-202744c7e161`
+- Netlify SSO team login required for all visitors: **CONFIG PROVEN**
+- Netlify Forms: **0**
+- Netlify environment variables: **0**
+- Team members: **1**
+- Team MFA enforcement: **not enforced**
+
+No Freight backend/data plane was discovered in Vercel, Render, Floot, Replit,
+AppDeploy, or Supabase.
+
+Therefore:
+- cross-tenant isolation remains **UNPROVEN** because no multi-tenant Freight data plane was available for dual-tenant negative testing;
+- parser sandboxing remains **UNPROVEN** because no production Freight parser runtime was discovered;
+- a deployment-specific Netlify incident tabletop was completed with outcome **PASS WITH MATERIAL GAPS**;
+- Netlify team MFA is an open **P0 before confidential customer data** item.
+
+Canonical evidence:
+- `freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json`
+- `freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.md`
+- `freight/INCIDENT_TABLETOP_2026-09-20.md`
+
+This addendum is deployment evidence, not a security certification.
+
 ## Commercial state
 
 Freight Recovery v15.8 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, audit/backup reference-hardened, deterministic-diligence packaged, rights-evidence gated, incident-response documented and research-CI supply-chain hardened; EXP-001 remains externally unproven**.
@@ -162,13 +189,13 @@ The repository now demonstrates:
 
 1. first authorized real buyer population through actual later settlement;
 2. actual executed Trenova/Opstrax permission documents attached/verified in the controlled diligence room and required scope resolved;
-3. production DB/object-store/API cross-tenant authorization evidence;
-4. production parser sandbox / CPU-memory-time-network isolation evidence;
+3. production DB/object-store/API cross-tenant authorization evidence once a real Freight multi-tenant data plane exists;
+4. production parser sandbox / CPU-memory-time-network/credential isolation evidence once a real Freight parser runtime exists;
 5. deployed audit-store service authorization + external immutability/WORM/alerting if required;
 6. external signing identity/trusted timestamp and any buyer-required full transitive deployment SBOM;
 7. deployed backup scheduling/retention/geographic redundancy with measured RPO/RTO;
-8. buyer-specific security questionnaire, encryption/configuration and retention terms;
-9. deployed incident contact tree/on-call/alerting plus completed tabletop or production incident exercise evidence;
+8. Netlify team MFA enforcement before confidential buyer data, plus buyer-specific security questionnaire, encryption/configuration and retention terms;
+9. deployed incident contact tree/on-call/alerting plus live-environment incident exercise evidence; a Netlify-specific tabletop is now recorded;
 10. any external certification/attestation a buyer requires.
 
 ## Engineering / search freeze
