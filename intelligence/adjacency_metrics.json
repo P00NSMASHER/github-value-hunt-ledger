@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "root_count": 42,
+  "hypothesis_count": 279,
+  "by_type": {
+    "distinctive_symbol": 42,
+    "organization_siblings": 37,
+    "contributor_lineage": 42,
+    "fork_descendants": 37,
+    "commit_lineage": 42,
+    "dependency_upstream": 42,
+    "consumer_downstream": 37
+  },
+  "measured_hypotheses": 0,
+  "performance_thresholds": {
+    "hypothesis": {
+      "min_runs": 3,
+      "min_inspections": 10
+    },
+    "type": {
+      "min_runs": 5,
+      "min_inspections": 20
+    }
+  }
+}
