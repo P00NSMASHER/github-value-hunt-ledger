@@ -1067,3 +1067,113 @@ Evidence count: **2 distinct tasks**. This is now STAGED-eligible inside shadow 
 - source/test/schema/history traversals: ~25;
 - external GitHub reads/searches: ~40;
 - untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 11
+
+### Hypothesis
+A low-attention embodied/robot execution runtime may already implement the caller-side half of Level-3 effect integrity more rigorously than public lab middleware: durably reserve command/effect identity before side effects, preserve an unresolved effect across process death, and forbid replay even after attended recovery. The hypothesis does not claim Level 3 unless the same effect can later be resolved from authoritative device/system-of-record evidence without a second physical command.
+
+### Discovery modes
+1. **Direct scientific/protocol search:** instrument servers, SiLA observable commands, robot/LIMS job identity and recovery semantics.
+2. **Code/invariant search:** `idempotency_key`, `command_id`, journal-before-execute, `EXECUTION_OUTCOME_UNKNOWN`, process-loss tests, fsync/atomic persistence, and restart replay blocking.
+3. **Adjacent external-effect search:** warehouse-control/device tasks and browser-to-printer job identity/status to test whether other physical domains provide provider-queryable completion evidence.
+4. **Low-attention/history archaeology:** recent low-star robot runtimes, feature-introducing commit history, and explicit physical-acceptance/maturity documentation.
+
+Serious inspection centered on `SUSTechWLA/tangying-robot-agent-os`, with `bitdreamit/laravel-qz-tray` as a negative comparator and `brettljausn-ai/openwcs` as a bounded triage comparator. No untrusted repository code was executed.
+
+### Best candidate
+**SUSTechWLA/tangying-robot-agent-os — durable unknown-effect tombstone / crash barrier**  
+Canonical URL: https://github.com/SUSTechWLA/tangying-robot-agent-os  
+Exact revision: `774bd2a2f4035dbe48f9016a88af1cb6fb4096ae`  
+Public license: MIT  
+Repository attention at inspection: 3 stars / 0 forks  
+Evidence snapshot id: `shadow-science-20260920-tangying-unknown-tombstone-774bd2a`
+
+### Frozen evidence manifest
+- `robot/gateway/tangying_robot_gateway/journal.py` blob `bb3d51b2fcc5cfda59682611d1ee8a106652f238`;
+- `robot/gateway/tangying_robot_gateway/service.py` blob `9e7e6ce923779862d7a10f159065bbcb2b3c91f9`;
+- `robot/gateway/tests/test_service.py` blob `c0c7623eff7987b60ea995b58256e0910a810404`;
+- `robot/gateway/tests/test_plugin_execution_outcome.py` blob `cb4acfdccb2255e51436a9f4b87fefe6c3069905`;
+- `robot/gateway/tangying_robot_gateway/local_recovery.py` blob `c7686382f65d2df3d1b7aee6eed77f04fcdc4ed7`;
+- `proto/robot/v1/robot.proto` blob `1881e37a46686fe664cdc2c8f48ffd9e34743d9b`;
+- `LICENSE` blob `63070cfb97303994fb3ae1e43338f0523815f104`;
+- history includes the earlier durable-runtime-safety-state feature family and the pinned head `774bd2a2f4035dbe48f9016a88af1cb6fb4096ae`; current history also records operational maturity/performance caveats rather than presenting the project as a finished production runtime;
+- `docs/operations/safety-checklist.md` explicitly states that the repository has no completed physical acceptance result and that software readiness is not permission to move hardware.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced `SkillCommand.command_id` / `idempotency_key` into journal reservation, replay/unknown lookup, backend execution and recovery semantics; verified the journal write precedes backend side effects.
+- **SYSTEMS / SCIENCE VALIDATOR:** separated software crash-window simulation from physical-hardware evidence and checked the repository's own acceptance caveat.
+- **ECOSYSTEM ANALYST:** compared the durable tombstone pattern with SiLA command correlation, BioModStack provider-queryable receipts, browser-print job identity and WCS task/callback patterns.
+- **COMMERCIAL ANALYST:** evaluated the primitive as a crash-safety/recovery kernel for automated labs rather than another robotics framework.
+- **RED-TEAM / VERIFIER:** challenged authoritative readback, native provider identity, hardware acceptance and whether attended recovery accidentally re-enables the old command before assigning a score.
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED IN SOURCE CORPUS**
+- `SkillCommand` carries stable `command_id`, `task_id` and `idempotency_key` plus deadline/lease, approval, robot/resource identity, world/task/aggregate revisions, fencing token and step ID. The capability schema separately marks world-mutating operations as requiring fresh post-command observation rather than treating a successful return as completion evidence.
+- `RuntimeJournal.begin()` durably reserves execution **before a backend may produce side effects**. Persistence uses a temporary file, flush + `fsync`, atomic replace and parent-directory `fsync`; if the journal write fails, regression tests prove backend execution never begins and the safety latch is raised.
+- A dedicated crash-window regression enters `backend.execute()`, records that execution was attempted, then raises a `BaseException` to simulate process loss before a terminal journal transition. Reopening the same journal and resubmitting the original command executes the fresh backend **zero times**, returns `EXECUTION_OUTCOME_UNKNOWN`, and leaves the E-stop latched.
+- A separate physical-adapter regression models `driver lost response after sending motion`. The runtime returns `EXECUTION_OUTCOME_UNKNOWN`, persists the stop, restarts, then rejects a **fresh command ID and fresh idempotency key** while the unresolved physical effect remains; the movement count stays exactly one.
+- The runtime deliberately distinguishes a known no-effect/known-failure result from ambiguity. A `TARGET_UNREACHABLE` result does not become `OUTCOME_UNKNOWN`, does not latch the same uncertainty state, and a later retry can succeed.
+- Attended recovery is local-only and auditable: the operator must be present and interactive and supply identity/reason; recovery writes an fsynced copy of the original journal before reconciling pending state. The old uncertain keys are retained as reconciled/unknown tombstones rather than deleted and made replayable.
+
+**IMPORTANT LIMITS / FALSIFIED OVERCLAIMS**
+- The recovery path does **not** authoritatively query a device or external system of record to determine whether the interrupted physical command actually happened. Operator attestation restores liveness but does not establish physical truth for the old effect.
+- No inspected durable schema binds every local command/business-effect identity to a vendor-native operation ID that can be re-queried after restart.
+- The repository's own physical safety checklist says there is **no completed physical acceptance result**. The strongest crash evidence here is unit/plugin/fake-transport style testing, not an independently reproduced hardware-in-loop process kill.
+- Current history contains explicit operational/maturity caveats, including large-ledger performance issues; source/test depth should not be silently upgraded into production field maturity.
+
+### Independent RED-TEAM / VERIFIER
+The verifier received only the frozen source/test/schema/history packet above and evaluated the effect-integrity obligations before seeing the proposed score.
+
+**Verdict: PASS_WITH_LIMITS as a durable unknown-effect tombstone / crash-barrier kernel; FAIL for full Level-3 physical exactly-once or authoritative reconciliation.**
+
+Proof obligations:
+1. **Durable command/effect identity before side effects? — PASS.** Journal reservation is persisted before backend execution; persistence failure blocks the backend.
+2. **Crash after physical execution may have begun preserves uncertainty across restart? — PASS in adversarial software tests.** The process-loss regression reopens the journal and refuses to execute the same command again.
+3. **Does unresolved physical uncertainty block even a new logical command? — PASS.** The plugin lost-response test restarts and attempts a new command/key; the movement count remains one while the E-stop/unknown state is unresolved.
+4. **Known failure versus unknown effect distinguished? — PASS.** The known `TARGET_UNREACHABLE` path remains retryable instead of being over-quarantined.
+5. **Can attended recovery erase the old uncertainty and make it replayable? — PASS_WITH_LIMITS.** Recovery preserves an audit copy and reconciled unknown tombstones; it can restore liveness, but that is not proof of the original effect's physical outcome.
+6. **Authoritative read-only device/system-of-record reconciliation of the original effect? — FAIL.** No qualifying post-restart provider/device lookup closes the tombstone to success or proven no-effect.
+7. **Durable local effect → native provider operation join? — NOT ESTABLISHED.** The command identity is strong locally, but no universal external operation ID binding was found.
+8. **Physical hardware validation? — NO.** The project's own checklist explicitly says completed physical acceptance is absent.
+
+Strongest objection: this kernel can permanently remember **“the effect may have happened; never blindly repeat it”**, but it still cannot prove what actually happened. A human reset is a liveness decision, not authoritative physical reconciliation.
+
+### Proposed score
+A) speed to first revenue: **4/5** — a crash/retry integrity audit can be delivered as a bounded integration service.  
+B) customer value / ceiling: **4/5** — avoiding duplicate robot/lab effects and unsafe recovery has direct value, though the economic ceiling needs lab-specific validation.  
+C) build/domain compression: **5/5** — durable pre-effect reservation, atomic persistence, replay/unknown classification, restart tests, safety fencing and attended-recovery audit compress difficult reliability engineering.  
+D) rarity/advantage: **4/5** — the exact tombstone behavior is uncommon, but adjacent ROSClaw patterns already show durable unknown-state gating.  
+E) evidence/completeness: **4/5** — strong source/tests/schema/history; no real hardware acceptance and no authoritative reconciliation.  
+F) rights/operability: **4/5** — MIT code and clear protocol boundaries help, but maturity/performance caveats and hardware-specific validation remain.
+**Total: 25/30 — STRONG_COMPONENT inside shadow; no central promotion is made.**
+
+### Comparator / negative evidence
+- `bitdreamit/laravel-qz-tray` exposes a unique `client_job_id` and job statuses, but its completion lifecycle is fundamentally browser/client reported around QZ printing rather than authoritative printer/spooler readback. It is therefore a false positive for provider-queryable physical completion.
+- `brettljausn-ai/openwcs` exposes persistent/idempotent device-task concepts and callback/status machinery, but this bounded pass did not establish the full crash-persistent same-identity → authoritative device-status reconciliation chain, so it remains unscored triage evidence.
+- SiLA observable-command UUID/result polling remains a valuable correlation primitive, but correlation lifetime alone is not a durable business-effect ledger across server loss.
+
+### Commercial / research implication
+The reusable component is an **Unknown-Effect Tombstone / External Effect Crash Barrier** inside the broader Autonomous-Lab External Effect Reconciliation Gateway. Persist the effect identity and request fingerprint before physical dispatch; after ambiguous execution, keep that identity permanently non-replayable; allow an attended recovery to release the global stop only without deleting the old tombstone; and, where the instrument exposes authoritative history, bind the tombstone to a BioModStack-style `stable key → native command → canonical receipt` lookup so the original effect can eventually be resolved without a second physical command.
+
+A realistic first paid wedge is a fault-injection **Physical Effect Crash/Recovery Audit** for automated labs and robotic workcells: kill the controller exactly after device write, restart it, prove that neither the old command nor a fresh surrogate command can blindly duplicate the effect, and classify which operations can be automatically reconciled versus which require human state inspection.
+
+### Search lesson outcome
+New LOCAL candidate lesson: **unresolved-effect tombstones are a first-class safety primitive**. After ambiguous dispatch, attended/manual recovery may restore system liveness without making the original idempotency/effect identity replayable. Future reviews should explicitly ask whether a reset/recovery deletes old uncertainty or preserves it as a non-replayable tombstone.
+
+One direct success only. Keep LOCAL; do not modify global `SEARCH_SKILLS.md`.
+
+### VALUE HANDOFF
+1. **Capability delta:** adds a tested caller-side crash barrier that survives process death and permanently blocks replay of an ambiguous physical effect identity, even through attended recovery.
+2. **Graph edge:** complements BioModStack's provider-queryable `key → command → receipt` side. The missing high-value edge is now the binding of this durable tombstone to authoritative provider readback.
+3. **Radar signal:** physical-effect integrity patterns are converging across lab middleware, robotics runtimes and payments: durable intent, explicit unknown state, replay blocking, then provider/system-of-record reconciliation.
+4. **Experiment impact:** the next falsifiable prototype can be very small: bind a durable tombstone to a provider-queryable scientific command key, crash after provider acceptance, restart, perform GET-only reconciliation, and assert **zero second mutation**.
+5. **Commercial impact:** supports a fixed-scope crash/recovery qualification service and a reusable gateway component with measurable duplicate-effect exposure, unresolved-effect age, recovery MTTR and reconciliation success rate.
+6. **Negative knowledge:** manual recovery is not authoritative physical truth; self-reported print/job completion and idempotent callbacks do not qualify unless the status comes from the actual external system of record and survives restart.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate/comparator inspections: 2 deep/moderate + 1 triage;
+- source/test/schema/history traversals: ~22;
+- external GitHub/web reads/searches: ~40;
+- untrusted-repository code executions: 0.
