@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -27,8 +27,24 @@
   "new_capability_ids": [],
   "strengthened_capability_ids": [],
   "experiment_ids": [],
-  "candidate_dispositions": [],
+  "candidate_dispositions": [
+    {
+      "repository": "owner/repo",
+      "revision": null,
+      "status": "watch",
+      "reason_code_standard": "needs_runtime_validation",
+      "reason_detail": "Precise evidence-backed reason for this disposition.",
+      "capability_ids": [],
+      "novelty_ordinal": null,
+      "evidence_ordinal": null,
+      "replacement_days_low": null,
+      "replacement_days_high": null,
+      "duplicate_of": null,
+      "first_seen_in_registry": null
+    }
+  ],
   "best_result": null,
   "durable_evidence_path": null,
-  "notes": null
+  "notes": null,
+  "query_family_id": "QF:replace-with-canonical-query-family-slug"
 }
