@@ -49,12 +49,16 @@ jobs:
 
       - name: Sync source-of-truth registries
         run: python tools/ti_sync.py
+      - name: Snapshot and bind strategy versions
+        run: python tools/ti_strategy_versions.py
       - name: Recompute repository registry metrics
         run: python tools/ti_registry.py
       - name: Measure revision and catalog provenance debt
         run: python tools/ti_revision_debt.py
       - name: Canonicalize query families and objectives
         run: python tools/ti_query_families.py
+      - name: Build immutable enriched run view
+        run: python tools/ti_normalize_runs.py
       - name: Derive attribution graph
         run: python tools/ti_graph.py
       - name: Measure instrumentation quality
@@ -73,8 +77,14 @@ jobs:
         run: python tools/ti_measurement_plan.py
       - name: Build matched strategy measurement campaign
         run: python tools/ti_measurement_campaign.py
+      - name: Build matched strategy execution queue
+        run: python tools/ti_measurement_queue.py
       - name: Analyze normalized search-surface yield
         run: python tools/ti_surface.py
+      - name: Audit triage false-negative holdouts
+        run: python tools/ti_triage_audit.py
+      - name: Measure search effort efficiency
+        run: python tools/ti_efficiency.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -88,9 +98,15 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add intelligence/capabilities.jsonl \
                   intelligence/search_strategies.jsonl \
+                  intelligence/strategy_versions.jsonl \
+                  intelligence/strategy_version_bindings.json \
+                  intelligence/search_runs_enriched.jsonl \
                   intelligence/query_families.jsonl \
                   intelligence/derived_edges.jsonl \
+                  intelligence/measurement_queue.jsonl \
                   intelligence/LEARNING_REPORT.md \
+                  intelligence/STRATEGY_VERSION_REPORT.md \
+                  intelligence/RUN_NORMALIZATION_REPORT.md \
                   intelligence/REGISTRY_REPORT.md \
                   intelligence/REVISION_DEBT_REPORT.md \
                   intelligence/DATA_QUALITY_REPORT.md \
@@ -101,8 +117,11 @@ jobs:
                   intelligence/ATTRIBUTION_REPORT.md \
                   intelligence/MEASUREMENT_PLAN.md \
                   intelligence/MEASUREMENT_CAMPAIGN.md \
+                  intelligence/MEASUREMENT_QUEUE.md \
                   intelligence/NEGATIVE_TRAINING_REPORT.md \
                   intelligence/SURFACE_REPORT.md \
+                  intelligence/TRIAGE_AUDIT_REPORT.md \
+                  intelligence/EFFICIENCY_REPORT.md \
                   intelligence/search_policy.json \
                   intelligence/registry_metrics.json \
                   intelligence/revision_debt_metrics.json \
@@ -112,7 +131,9 @@ jobs:
                   intelligence/measurement_plan.json \
                   intelligence/measurement_campaign.json \
                   intelligence/candidate_learning_metrics.json \
-                  intelligence/surface_metrics.json
+                  intelligence/surface_metrics.json \
+                  intelligence/triage_audit_metrics.json \
+                  intelligence/efficiency_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push
