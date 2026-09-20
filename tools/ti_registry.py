@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import json
 from collections import Counter, defaultdict
-from pathlib import Path
 import re
 from ti_common import ROOT, INTEL, parse_hunter_records, status_bucket
 
@@ -10,7 +9,7 @@ def parse_master_promotions():
     lines = text.splitlines()
     promoted = set()
     repositories = set()
-    heading = re.compile(r"^###\\s+([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)(?:\\s+—\\s+.*)?$")
+    heading = re.compile(r"^###\s+([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)(?:\s+—\s+.*)?$")
     for i, line in enumerate(lines):
         match = heading.match(line)
         if not match:
@@ -20,7 +19,7 @@ def parse_master_promotions():
         for j in range(i + 1, min(len(lines), i + 12)):
             if lines[j].startswith("### ") or lines[j].startswith("## "):
                 break
-            rm = re.search(r"^-\\s*(?:Revision|Commit):\\s*\`?([0-9a-f]{7,40})", lines[j], re.I)
+            rm = re.search(r"^-\s*(?:Revision|Commit):\s*`?([0-9a-f]{7,40})", lines[j], re.I)
             if rm:
                 revision = rm.group(1)
                 break
@@ -54,10 +53,22 @@ for r in records:
     catalog_counts[r["source_catalog"]] += 1
     state_counts[r["source_state"]] += 1
 
+master_missing_hunter = sum(1 for key in master_promotions if key not in by_key)
+for repo, revision in master_promotions:
+    key = (repo, revision)
+    if key not in by_key:
+        by_key[key] = {
+            "repository": repo,
+            "revision": revision,
+            "observations": 0,
+            "statuses": {"master"},
+            "catalogs": {"MASTER.md"},
+            "states": {"master"}
+        }
+    repo_sources[repo].add("MASTER.md")
+
 status_counts = Counter()
 for key, o in by_key.items():
-    # MASTER.md is the single authority for elite promotion. Hunter prose may
-    # describe contenders/referrals without implying actual promotion.
     if key in master_promotions:
         bucket = "master"
     else:
@@ -66,12 +77,15 @@ for key, o in by_key.items():
     o["registry_bucket"] = bucket
     status_counts[bucket] += 1
 
-top_repeat = sorted(by_key.values(), key=lambda x: (-x["observations"], x["repository"]))[:20]
-cross_catalog = sum(1 for srcs in repo_sources.values() if len(srcs) > 1)
+top_repeat = sorted(
+    [x for x in by_key.values() if x["observations"] > 0],
+    key=lambda x: (-x["observations"], x["repository"])
+)[:20]
+cross_catalog = sum(1 for srcs in repo_sources.values() if len([s for s in srcs if s != "MASTER.md"]) > 1)
 unknown_rev = sum(1 for (_, rev) in by_key if rev == "unknown")
 unique_repos = len(repo_sources)
 unique_repo_revisions = len(by_key)
-duplicates = max(0, len(records) - unique_repo_revisions)
+duplicates = max(0, len(records) - len({(r["repository"], r["revision"] or "unknown") for r in records}))
 
 metrics = {
     "observations": len(records),
@@ -85,24 +99,25 @@ metrics = {
     "source_state_counts": dict(state_counts),
     "status_counts": dict(status_counts),
     "master_promoted_repositories": len(master_repositories),
-    "master_promoted_repo_revisions": len(master_promotions)
+    "master_promoted_repo_revisions": len(master_promotions),
+    "master_promotions_without_hunter_observation": master_missing_hunter
 }
 (INTEL / "registry_metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
 
 lines = [
     "# REPOSITORY REGISTRY REPORT", "",
-    "Generated directly from the hunter Markdown corpus; no monolithic registry file is round-tripped through the GitHub connector.", "",
+    "Generated directly from the hunter Markdown corpus plus the current elite set in MASTER.md.", "",
     f"- Repository observations: **{len(records):,}**",
-    f"- Unique repositories: **{unique_repos:,}**",
+    f"- Unique repositories (including MASTER-only entries): **{unique_repos:,}**",
     f"- Unique repository/revision keys: **{unique_repo_revisions:,}**",
     f"- Observations beyond the first occurrence of a repo/revision: **{duplicates:,} ({metrics['duplicate_observation_rate']:.1%})**",
     f"- Repo/revision records with unknown revision: **{unknown_rev:,}**",
-    f"- Repositories appearing in more than one catalog/file: **{cross_catalog:,}**",
+    f"- Repositories appearing in more than one hunter catalog/file: **{cross_catalog:,}**",
     f"- Hunter Markdown files scanned: **{len(catalog_counts):,}**",
     f"- Current MASTER-promoted repositories: **{len(master_repositories):,}**",
-    f"- Current MASTER-promoted exact repo/revisions: **{len(master_promotions):,}**", "",
+    f"- Current MASTER-promoted exact repo/revisions: **{len(master_promotions):,}**",
+    f"- MASTER promotions without a matching hunter-catalog observation: **{master_missing_hunter:,}**", "",
     "## Disposition mix", "",
-    "MASTER counts below come from `MASTER.md`; all other buckets come from hunter-catalog dispositions.", "",
     "| Bucket | Repo/revision records |",
     "|---|---:|"
 ]
@@ -116,10 +131,11 @@ for o in top_repeat:
     lines.append(f"| {o['repository']} | {o['revision'] or 'unknown'} | {o['observations']} | {len(o['catalogs'])} | {', '.join(sorted(o['statuses']))} |")
 
 lines += ["", "## Interpretation", "",
+          "- MASTER.md is authoritative for elite promotion; hunter prose saying contender/referral does not equal promotion.",
           "- Repeated observations are useful only when they add new evidence, a new revision, a new capability edge or an experiment/outcome link.",
-          "- A high duplicate-observation rate is not automatically bad, but repeated deep inspections without capability/evidence delta should reduce future search priority.",
+          "- Repeated deep inspections without capability/evidence delta should reduce future search priority.",
           "- Unknown revision records should be resolved before promotion whenever the repository is load-bearing.",
-          "- This registry is recomputed from source catalogs, so it cannot silently lose older records because of connector truncation.", ""]
+          "- MASTER-only records are retained rather than silently disappearing from registry counts.", ""]
 
 (INTEL / "REGISTRY_REPORT.md").write_text("\n".join(lines), encoding="utf-8")
 print(json.dumps(metrics))
