@@ -1,8 +1,35 @@
 #!/usr/bin/env python3
 import json
 from collections import Counter, defaultdict
-from ti_common import INTEL, parse_hunter_records, status_bucket
+from pathlib import Path
+import re
+from ti_common import ROOT, INTEL, parse_hunter_records, status_bucket
 
+def parse_master_promotions():
+    text = (ROOT / "MASTER.md").read_text(encoding="utf-8")
+    lines = text.splitlines()
+    promoted = set()
+    repositories = set()
+    heading = re.compile(r"^###\\s+([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)(?:\\s+—\\s+.*)?$")
+    for i, line in enumerate(lines):
+        match = heading.match(line)
+        if not match:
+            continue
+        repo = match.group(1)
+        revision = None
+        for j in range(i + 1, min(len(lines), i + 12)):
+            if lines[j].startswith("### ") or lines[j].startswith("## "):
+                break
+            rm = re.search(r"^-\\s*(?:Revision|Commit):\\s*\`?([0-9a-f]{7,40})", lines[j], re.I)
+            if rm:
+                revision = rm.group(1)
+                break
+        repositories.add(repo)
+        if revision:
+            promoted.add((repo, revision))
+    return promoted, repositories
+
+master_promotions, master_repositories = parse_master_promotions()
 records = parse_hunter_records(include_archive=True)
 by_key = {}
 repo_sources = defaultdict(set)
@@ -28,9 +55,15 @@ for r in records:
     state_counts[r["source_state"]] += 1
 
 status_counts = Counter()
-for o in by_key.values():
-    order = ["master", "strong", "watch", "rejected", "quarantined", "unknown"]
-    bucket = next((x for x in order if x in o["statuses"]), "unknown")
+for key, o in by_key.items():
+    # MASTER.md is the single authority for elite promotion. Hunter prose may
+    # describe contenders/referrals without implying actual promotion.
+    if key in master_promotions:
+        bucket = "master"
+    else:
+        order = ["strong", "watch", "rejected", "quarantined", "unknown"]
+        bucket = next((x for x in order if x in o["statuses"]), "unknown")
+    o["registry_bucket"] = bucket
     status_counts[bucket] += 1
 
 top_repeat = sorted(by_key.values(), key=lambda x: (-x["observations"], x["repository"]))[:20]
@@ -50,7 +83,9 @@ metrics = {
     "cross_catalog_repositories": cross_catalog,
     "source_files_scanned": len(catalog_counts),
     "source_state_counts": dict(state_counts),
-    "status_counts": dict(status_counts)
+    "status_counts": dict(status_counts),
+    "master_promoted_repositories": len(master_repositories),
+    "master_promoted_repo_revisions": len(master_promotions)
 }
 (INTEL / "registry_metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
 
@@ -63,8 +98,11 @@ lines = [
     f"- Observations beyond the first occurrence of a repo/revision: **{duplicates:,} ({metrics['duplicate_observation_rate']:.1%})**",
     f"- Repo/revision records with unknown revision: **{unknown_rev:,}**",
     f"- Repositories appearing in more than one catalog/file: **{cross_catalog:,}**",
-    f"- Hunter Markdown files scanned: **{len(catalog_counts):,}**", "",
+    f"- Hunter Markdown files scanned: **{len(catalog_counts):,}**",
+    f"- Current MASTER-promoted repositories: **{len(master_repositories):,}**",
+    f"- Current MASTER-promoted exact repo/revisions: **{len(master_promotions):,}**", "",
     "## Disposition mix", "",
+    "MASTER counts below come from `MASTER.md`; all other buckets come from hunter-catalog dispositions.", "",
     "| Bucket | Repo/revision records |",
     "|---|---:|"
 ]
