@@ -154,3 +154,34 @@ The policy is advisory. A named blocker in a P0 experiment can override the gene
 Pull requests recompute and validate all intelligence products without requiring hand-maintained generated files.
 
 After a qualifying push to `main`, the workflow refreshes generated intelligence and commits it with a skip-CI marker. This prevents the dashboard drift that occurred when search runs advanced but the learning report remained stale.
+
+
+## V3 credit conservation and query-family learning
+
+V3 adds two safeguards needed for trustworthy long-run learning.
+
+### Conserved outcome credit
+An outcome may depend on several discovery runs. The system must never award the full outcome to every run.
+
+- `origin_search_ids` identifies the contributing searches.
+- `search_credit_weights` may explicitly allocate credit and must sum to 1.00.
+- If explicit weights are absent, legacy outcomes are divided equally across their origin searches.
+- Revenue, customer value, engineering compression and outcome success signals are attributed fractionally in strategy reports.
+- Weighted RUN -> OUT edges in `derived_edges.jsonl` preserve the attribution audit trail.
+
+Explicit unequal weights should be used only when evidence supports them; equal split is safer than invented precision.
+
+### Canonical query families
+Literal searches remain important for reproducibility, but one-off query strings are too fragmented for empirical learning.
+
+- `query_family_id` identifies a reusable search shape such as a capability conjunction, authority-history hunt or protocol-regression pattern.
+- `query_family` remains the human-readable description.
+- `query_family_aliases.json` can merge genuinely equivalent historical labels.
+- `query_families.jsonl` and `QUERY_FAMILY_REPORT.md` are generated from measured runs.
+
+Do not merge query families merely because they share a business domain. The family should represent substantially the same discovery mechanism.
+
+### Research efficiency
+Prospective runs may additionally record `elapsed_minutes` and `tool_calls`. These fields are optional because missing effort must not be guessed.
+
+When present, `LEARNING_REPORT.md` reports effort-adjusted inspection and retention yield. Strategy ranking does not currently punish runs merely because cost instrumentation is absent.
