@@ -49,6 +49,7 @@ Human-readable current graph connecting repository/data evidence to capabilities
 - `auths-dev/auths-proof@34fa1f33...` -> TRANSFER_ORACLE for a second valid restart pattern: durable pre-dispatch business-effect reference + deterministic idempotency + provider-readable metadata + explicit OutcomeUnknown + read-only reconciliation after restart. This challenges any architecture rule that demands knowing a provider-native operation ID before dispatch.
 - `karfalacisse900-alt/Flames-up.com@2ba5fa87...` -> STRENGTHENS provider terminality evidence with exact successful Stripe test-mode balance/payout/readback at a pinned revision but CHALLENGES full crash-safe settlement because no post-effect payout kill/restart seam was executed.
 - BlackPigIndustries/threvo-actions shadow evidence -> CHALLENGES/strengthens governed consequential-action architecture but DEPENDS_ON retained live-provider qualification; current inspected provider cases remain NOT_EXERCISED.
+- `seancrecord/scvd-general-store-repo@06baa4211849dcffaee901468e1909ecd582b790` shadow evidence -> CHALLENGES any assumption that a historical live-provider qualification automatically remains current after behavior-scope expansion. Exact qualified release provenance is not current-route eligibility unless a machine-readable behavior closure/equivalence rule still matches the deployed subject.
 - CAP-006+016+018+019 -> ENABLES OPP Money-State Integrity -> TESTED_BY EXP-010.
 
 ### Recovery Proof
@@ -61,8 +62,9 @@ Human-readable current graph connecting repository/data evidence to capabilities
 - `snapetech/DuneAwakeningSelfHost@8d3bac1df38f45fb13e2c1427216bf5dc384687b` -> STRENGTHENS CAP-010 dual-plane Postgres+RabbitMQ/Mnesia recovery.
 - `WiseOpsTeam/mneme@e595986e6efb3988e1d64ad0bba7d9761f123786` -> NEGATIVE_CONTROL / INVALIDATES process-exit-as-semantic-proof assumption.
 - nearai/pg-backup verifier mutation history -> STRENGTHENS verifier-self-test.
-- CAP-010 now requires CENSUS + SCOPE to define the expected-subject denominator before PROOF can establish coverage.
-- CAP-007+010 -> ENABLES OPP Recovery Proof -> TESTED_BY EXP-004 recovery-coverage-authority/scoped expected-subject/broken-verifier matrix.
+- `foundriesio/aktualizr-lite@1d089b006295cd924b3c87337679fef7295e4329` -> STRENGTHENS CAP-007 with independent C++ tamper/expiry/stale-authority tests; `uptane/aktualizr@e5118a74874c0561ebac57560c667c18b19d984b` -> STRENGTHENS role-separated authority plus anti-rollback/version semantics. These are cross-domain trust-model oracles, not recovery-policy correctness evidence.
+- CAP-010 now requires CENSUS + SCOPE to define the expected-subject denominator before PROOF can establish coverage; CAP-007 now requires the final proof to cite a snapshot-consistent, non-expired, non-rollback obligation/evidence authority bundle.
+- CAP-007+010 -> ENABLES OPP Recovery Proof -> TESTED_BY EXP-004 recovery-coverage-authority/scoped expected-subject/broken-verifier/proof-policy-authority matrix.
 
 ### CaptureBrief / Government acquisition
 - GSA FAR/DFARS + SAM/Data Services + USAspending + DATA Act + deviation sources -> IMPLEMENT CAP-011.
@@ -91,14 +93,17 @@ Human-readable current graph connecting repository/data evidence to capabilities
 
 ### Lab / Sequencing Operations
 - Allotropy -> IMPLEMENTS CAP-013.
+- `ethanbass/chromConverter@ddf959bb71a595357a3f4028be48afd006a78714` -> STRENGTHENS CAP-013 with registry-driven Agilent/Shimadzu/Waters/Thermo/Varian/open-format normalization, canonical source-hash/parser provenance, fixture-backed numerical/metadata comparisons and CI archaeology that exposed prior silent skips; reverse-engineered vendor formats remain non-certified until customer/vendor corpus acceptance.
 - S4 Clarity + scilifelab EPPs + samplesheet-parser + Illumina InterOp -> IMPLEMENT/STRENGTHEN CAP-017.
 - Flowcept/HELIOS -> STRENGTHEN provenance/governance.
 - `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` -> STRENGTHENS CAP-017 with same-action readback after a lost dispatch response and explicit `UNKNOWN` on unresolved result lookup, while CHALLENGING system-wide exactly-once behavior because generic workflow retry can create a fresh ActionRequest/ULID. Its current SiLA adapter adds a stronger receipt-boundary challenge: orchestration action ID and server-assigned CommandExecutionUUID are not the same identity, and the mapping is held in memory only after the SDK call returns.
 - SiLA pre-confirmation ambiguity -> CHALLENGES safe redispatch: the server may have accepted/started a non-idempotent action before the caller receives the server execution UUID. No receipt means UNKNOWN, not NOT_APPLIED.
+- `trieu04/lab-in-the-loop@80eb9524a4a36178b35810a7999cd95e8394d4fc` -> ARCHITECTURE_ORACLE / NEGATIVE_CONTROL: durable submit intent, explicit ambiguity states and reconcile-before-resubmit are implemented, but the only installed lab provider is a memory-only dry run and real mode fails closed. It therefore strengthens the control contract while invalidating any claim of completed physical Level-3 reconciliation.
+- `MolBioFreak/BioModStack@9b36a0b106cd538d772de39092c1d532ad361083` -> CONCEPTUAL_COMPLEMENT with provider-queryable stable request-key/command/receipt shape; the crash-persistent join with lab-in-the-loop remains unproven.
 - `auths-dev/auths-proof@34fa1f33...` -> COMBINES_WITH CAP-017 only as an adjacent-domain transfer oracle for stable business-effect references searchable after restart; scientific transfer requires equivalent device/server history semantics.
 - `Opentrons/opentrons@03b991fb263b97b6bb767ce311ca56e103d635e4` -> STRENGTHENS CAP-017 with external vendor `run_id` plus restart-persistent run/action/command state; CHALLENGES naive SAFE_TO_REISSUE because play/resume can begin before the run-control action row is persisted.
 - `AD-SDL/ot2_module@39ffdfdb...` + `RoryMB/simlab@5ae0641...` -> TEST-HARNESS candidates for vendor-run identity and simulated actuation; `di-omics/plr-lab-robot@0b062298...` -> NEGATIVE_CONTROL for self-validating command-mutated local state.
-- CAP-013+017 -> ENABLES OPP Installed-Base Lab Automation -> TESTED_BY EXP-007 response-loss/pre-confirmation/retry/restart acceptance case.
+- CAP-013+017 -> ENABLES OPP Installed-Base Lab Automation -> TESTED_BY EXP-007 normalization + response-loss/pre-confirmation/retry/restart/provider-binding acceptance cases.
 
 ### Industrial pre-FAT
 - Gaskony PLC emulator -> IMPLEMENTS CAP-014 controller/config binding.
