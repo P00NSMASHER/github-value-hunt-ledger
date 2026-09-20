@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+import json
+from collections import Counter
+from ti_common import INTEL, load_jsonl
+
+policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
+alloc=load_jsonl("hunt_allocations.jsonl")
+states=load_jsonl("execution_state.jsonl")
+claims=load_jsonl("execution_claim_history.jsonl")
+runs=load_jsonl("search_runs.jsonl")
+metrics=json.loads((INTEL/"execution_metrics.json").read_text(encoding="utf-8"))
+
+alloc_by_slot={x["slot_id"]:x for x in alloc}
+if len(states)!=len(alloc):
+    raise SystemExit("execution state must contain exactly one row per allocation slot")
+seen_slots=set()
+for n,s in enumerate(states,1):
+    slot=s.get("slot_id")
+    if slot in seen_slots or slot not in alloc_by_slot:
+        raise SystemExit(f"execution_state.jsonl:{n}: invalid/duplicate slot {slot}")
+    seen_slots.add(slot)
+    a=alloc_by_slot[slot]
+    if s.get("current_assignment_id")!=a.get("assignment_id"):
+        raise SystemExit(f"execution_state.jsonl:{n}: current assignment drift")
+    if s.get("current_work_item_id")!=a.get("work_item_id"):
+        raise SystemExit(f"execution_state.jsonl:{n}: work item drift")
+
+claim_by_id={}
+active_workers=Counter()
+for n,c in enumerate(claims,1):
+    cid=c.get("claim_id")
+    if not cid or cid in claim_by_id:
+        raise SystemExit(f"execution_claim_history.jsonl:{n}: missing/duplicate claim_id")
+    claim_by_id[cid]=c
+    if c.get("status") in {"CLAIMED","RUNNING"}:
+        active_workers[c.get("worker_id")]+=1
+for worker,count in active_workers.items():
+    if count>int(policy.get("max_active_claims_per_worker",1)):
+        raise SystemExit(f"worker {worker} exceeds max active claims")
+
+run_by_id={r.get("search_run_id"):r for r in runs if r.get("search_run_id")}
+for n,r in enumerate(runs,1):
+    if int(r.get("schema_version") or 0)<11:
+        continue
+    if r.get("allocation_mode") not in {"generated","manual_override"}:
+        continue
+    cid=r.get("execution_claim_id")
+    c=claim_by_id.get(cid)
+    if not c:
+        raise SystemExit(f"search_runs.jsonl:{n}: V11 run references unknown claim {cid}")
+    expected={
+      "execution_slot_id":c.get("slot_id"),
+      "execution_worker_id":c.get("worker_id"),
+      "assignment_id":c.get("assignment_id"),
+      "allocator_generation_id":c.get("allocator_generation_id"),
+      "portfolio_policy_generation_id":c.get("portfolio_policy_generation_id"),
+      "assignment_work_item_id":c.get("work_item_id"),
+      "assignment_slot_role":c.get("assignment_slot_role"),
+      "assignment_work_kind":c.get("assignment_work_kind"),
+      "assignment_source_id":c.get("assignment_source_id")
+    }
+    mismatch=[k for k,v in expected.items() if r.get(k)!=v]
+    if mismatch:
+        raise SystemExit(f"search_runs.jsonl:{n}: claim provenance mismatch: {','.join(mismatch)}")
+    try:
+        if abs(float(r.get("assignment_score"))-float(c.get("assignment_score")))>1e-9:
+            raise SystemExit(f"search_runs.jsonl:{n}: assignment_score mismatch")
+    except (TypeError,ValueError):
+        raise SystemExit(f"search_runs.jsonl:{n}: invalid assignment_score")
+
+for c in claims:
+    if c.get("status")=="COMPLETE":
+        rid=c.get("search_run_id")
+        if not rid or rid not in run_by_id:
+            raise SystemExit(f"complete claim {c.get('claim_id')} missing search run")
+        if c.get("telemetry_status")!="MATCHED":
+            raise SystemExit(f"complete claim {c.get('claim_id')} lacks matched telemetry")
+
+if metrics.get("slot_count")!=len(states):
+    raise SystemExit("execution_metrics slot_count drift")
+if metrics.get("claim_count")!=len(claims):
+    raise SystemExit("execution_metrics claim_count drift")
+status_counts=Counter(s.get("status") for s in states)
+if dict(status_counts)!=metrics.get("status_counts"):
+    raise SystemExit("execution_metrics status_counts drift")
+
+print(f"OK slots={len(states)} claims={len(claims)} active={metrics.get('active_claims')} completed={metrics.get('complete_claims')}")
