@@ -64,6 +64,20 @@ Do not start with a customer that cannot provide controlling commercial authorit
 - Larger multi-BU / enterprise target: **$150,000–$300,000+ annual base**, normally with a lower incremental-recovery percentage.
 - Price against audited spend, invoice/population complexity, source count, carrier/mode complexity and integration burden—not seats.
 
+## Commercial qualification and margin gate
+
+Use `freight/deal_economics.py` before quoting delivery scope.
+
+- The diagnostic or pilot must meet the target gross margin on its **fixed fee alone**.
+- Default internal planning target: **50% fixed-fee gross margin** until real delivery data justify changing it.
+- Do not use expected recovery, success-fee upside, or speculative customer savings to make an otherwise unprofitable engagement look viable.
+- Loaded analyst cost, other delivery costs, and analyst-hour budget must be explicit before work starts.
+- `max_analyst_hours_at_target_margin` is the delivery budget. If the expected work exceeds it, narrow scope, raise fixed fee, improve process efficiency, or HOLD the deal.
+- The $5M annual-spend / 500-invoice threshold is a prioritization signal, not an automatic rejection. A smaller buyer can proceed if readiness, complexity, strategic value and fixed-fee economics are sound.
+- One-carrier / low-complexity populations are flagged because they may offer less differentiation, but margin and proof quality remain the hard gates.
+
+Success fees remain optional upside after settlement proof; they are never part of the qualification math.
+
 ## Expansion sequence
 
 1. Paid data-readiness diagnostic.
