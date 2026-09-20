@@ -87,12 +87,12 @@ Emergence product = N × M × A × C × X. Treat it as a prioritization aid, not
 
 ### RAD-010 — Installed-base scientific operations adapters
 - Thesis: near-term lab-automation value is increasingly concentrated in preserving incumbent LIMS/instruments while adding programmable workflow state, vendor-format normalization, device control and evidence/provenance, rather than replacing the entire laboratory operating stack.
-- Signals: independent mature surfaces now span SLIMS integration, Clarity workflow automation, official Illumina run-metric parsing, cross-vendor analytical normalization, deterministic timed benches, scan/device plugin ecosystems, EPICS/Tango async control and provenance infrastructure.
+- Signals: independent mature surfaces now span SLIMS integration, Clarity workflow automation, official Illumina run-metric parsing, cross-vendor analytical normalization, deterministic timed benches, scan/device plugin ecosystems, EPICS/Tango async control and provenance infrastructure. `AD-SDL/MADSci` adds source/test evidence that lost physical-action responses can be reconciled against the same action identity and unresolved outcomes can become `UNKNOWN`; its generic retry loophole independently shows that recovery authority must span **all later retry/resume surfaces**, not just the immediate dispatch loop.
 - Score: N3 M5 A4 C5 X4 = **1200**.
 - Status: BUILD / BENCHMARK.
-- Commercial implication: service-first “automate one installed workflow/bench without replacing the system of record” may reach revenue faster and with less organizational resistance than a new lab OS.
-- Search next: stop generic laboratory frameworks unless they add a missing installed-base adapter or hard operational invariant; prioritize exact vendor/workflow handoffs, migration compatibility, failure recovery and measurable analyst/technician time or failed-run reduction.
-- Next evidence needed: a synthetic cross-system acceptance fixture first, followed by one explicitly authorized customer workflow proving deployment effort and operational value.
+- Commercial implication: service-first “automate one installed workflow/bench without replacing the system of record” may reach revenue faster and with less organizational resistance than a new lab OS; an ambiguity/retry acceptance pack can be a concrete commissioning wedge.
+- Search next: stop generic laboratory frameworks unless they add a missing installed-base adapter or hard operational invariant; prioritize exact vendor/workflow handoffs, migration compatibility, failure recovery, single-actuation authority and measurable analyst/technician time or failed-run reduction.
+- Next evidence needed: a synthetic cross-system acceptance fixture including actuated-but-response-lost -> same-ID readback -> `UNKNOWN` -> retry/restart gate, followed by one explicitly authorized customer workflow proving deployment effort and operational value.
 
 ## Radar operating rule
 A radar category should move toward BUILD only when:
