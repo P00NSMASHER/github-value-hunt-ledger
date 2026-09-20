@@ -1,0 +1,25 @@
+{
+  "engagement_id": "ENG-DEMO-001",
+  "buyer_id": "buyer-demo",
+  "business_unit": "bu-demo",
+  "population_rule": "All approved-scope invoices posted in August 2026.",
+  "source_date_start": "2026-08-01",
+  "source_date_end": "2026-08-31",
+  "carrier_scope": [
+    "carrier-a",
+    "carrier-b"
+  ],
+  "mode_scope": [
+    "parcel",
+    "LTL"
+  ],
+  "fixed_fee_usd": 20000,
+  "buyer_truth_owner_role": "Buyer truth owner",
+  "buyer_action_approver_role": "Buyer action approver",
+  "freight_engagement_owner_role": "Freight pilot lead",
+  "buyer_acknowledges_scope": true,
+  "buyer_acknowledges_blind_protocol": true,
+  "buyer_acknowledges_report_totals_separate": true,
+  "buyer_acknowledges_no_guaranteed_recovery": true,
+  "freight_acknowledges_no_external_action_without_buyer_approval": true
+}
