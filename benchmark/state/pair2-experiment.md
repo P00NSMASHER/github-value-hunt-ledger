@@ -5,7 +5,7 @@
 - 10 — COMPLETE (2026-09-20): official federal spending backend/ETL benchmark completed with fedspendingtransparency/usaspending-api at `1692d484b38c66361c54faa221548527cae29964` as the accepted strong candidate.
 - 11 — COMPLETE (2026-09-20): official DATA Act award/entity normalization benchmark completed with fedspendingtransparency/data-act-broker-backend at `76dcae4ccbf6951223608bc1d8fd0c5b03da5d68` as the accepted strong candidate.
 - 12 — COMPLETE (2026-09-20): heterogeneous restore-verification benchmark completed with RamazanKara/restore-drill at `dea374da3b340f53b798112eee82bd7ed1224572` as STRONG, with an explicit zero-check false-green caveat.
-- 13 — UNFINISHED
+- 13 — COMPLETE (2026-09-20): deterministic workforce replanning/verifier benchmark completed with joschiservice/RosterSpec at `f7e701c694bf1facdc4999e1681a3aa11493614d` as STRONG, with current weekly-property-CI and public-alpha maturity caveats.
 - 14 — UNFINISHED
 - 15 — UNFINISHED
 
@@ -23,6 +23,10 @@
 - Task 12 also exposed an important trusted-state boundary failure: configuration validation permits zero checks, while the engine initializes `allPassed := true`; therefore a successful restore can yield `ValidationPassed=true` without a semantic assertion. Strong restore coverage does not substitute for a minimum-evidence gate.
 - Machine-readable evidence can be independently inspectable without being tamper-evident. Task 12's result schema preserves provider/status/timing and per-check expected/actual/pass/error state, and incident mode can retain the restored target for external inspection, but no cryptographic binding of the report to the backup artifact/config was verified.
 - Operational-readiness evidence must include current negative signals. On 2026-09-20, the scheduled `govulncheck` workflow for the pinned Task 12 commit failed; the failure was recorded as an operational caveat rather than converted into an unverified vulnerability claim.
+- Task 13 showed that minimum-disruption replanning must be verified against the published-plan transition itself. In RosterSpec, explicit locks become CP-SAT hard assumptions; continuity is the symmetric assignment difference from the prior plan; coverage and stability are separate lexicographic phases; and proof flags are true only when the relevant phase reaches OPTIMAL. That is materially stronger evidence than a generic “pinning” or weighted-soft-disruption feature.
+- Negative scheduling tests are especially probative: Task 13 verified that an invalid locked callout becomes INFEASIBLE rather than silently unlocked, that coverage can legitimately override continuity, that explanation budget exhaustion yields `unproven` rather than causal overclaiming, and that repair verification rejects source-plan mismatches or attempts to weaken hard minimum coverage.
+- Current CI state must remain separate from source/test design. RosterSpec's exact pinned head has targeted tests and a successful deterministic-performance weekly job, but its 2026-09-14 `extended-properties` weekly job failed and its mutation job was cancelled; therefore Task 13 accepted the technical capability while explicitly withholding a production-readiness claim.
+- Mature comparator analysis prevents false novelty. Timefold already supports hard pinning and non-disruptive replanning; Task 13's differentiator is the verifier/evidence contract—published-plan hashes, optimality-gated continuity proof, counterfactual explanations, repair verification and replay—not the concept of replanning itself.
 
 ## Failed search patterns
 - Treating eCFR alone as the complete answer for acquisition automation: authoritative machine-readable regulation, but Task 09 did not verify solicitation-specific fill-in semantics there.
@@ -36,6 +40,9 @@
 - Treating “restore command exited zero” as equivalent to verified recovery. Task 12 required post-restore database/keyspace assertions with expected/actual evidence and real integration fixtures.
 - Treating report generation as proof of fail-closed semantics. Task 12 found that an empty validation-check list can still produce a passed validation state, so configuration preconditions must be traced to the trusted PASS transition.
 - Treating JSON/HTML evidence as cryptographic attestation. Task 12 verified inspectable evidence but not signatures/hashes binding each drill report to the exact backup artifact and config.
+- Treating a fresh workforce optimizer as a replanning verifier. Task 13 required a durable previous-plan artifact, hard locks, explicit change-cost semantics and tested before/after behavior; generic schedule optimizers without those invariants are weak matches.
+- Treating a weighted “avoid changes” soft score as proof of minimum disruption. Task 13's stronger evidence came from a separately optimized stability phase with an explicit optimality flag after coverage is fixed.
+- Treating committed property tests as equivalent to currently passing property CI. Task 13 found a recent exact-head weekly `pytest -m property` failure; source quality and live quality-gate status must be reported separately.
 
 ## Useful terminology / signatures
 - `xtrf="GFI"` — GSA FAR Global Fill-in marker for clause/provision input fields.
@@ -48,8 +55,11 @@
 - `c11_cross_file` — Task 11 cross-file rule requiring File C PIID or PIID/ParentAwardId combinations to exist in File D1 under the rule's stated conditions.
 - `ValidationPassed`, `CheckResult.Expected`, `CheckResult.Actual`, `CleanupSkipped`, `TargetID`, `TargetHost`, `TargetPorts` — Task 12 signatures for the restore-evidence trusted-state boundary and independently inspectable retained targets.
 - `RESTORE_DRILL_INTEGRATION=1` plus real Docker fixture generation — Task 12 signature for distinguishing operational recovery tests from mocked provider adapters.
+- `AssignmentPlan`, `AssignmentRef`, `ASSIGNMENT_LOCKED_V1`, `stability_expression`, `coverage_priority_proven`, `stability_priority_proven`, `stability_cost` — Task 13 signatures for published-plan-aware, hard-locked, lexicographic minimum-disruption replanning.
+- `build_replan_bundle_bytes` / `replay_bundle` — Task 13 signatures for replayable before/after scheduling evidence rather than a one-shot optimizer result.
 
 ## Candidate search skills
 - **Production-source triangulation for official systems**: start from a first-party publication/API surface, follow it to the source repository, inspect operational markup or transformation code, pin exact revision/history, verify internal schemas/tests, and compare adjacent first-party pipeline stages. Validated independently on Task 09 (FAR production corpus) and Task 10 (USAspending backend/ETL). This now meets the two-task evidence threshold for possible SEARCH_SKILLS.md promotion, but was not promoted during this run.
 - **Identity graph invariant triad**: for entity-resolution/award-lineage systems, require (1) authoritative source-system identifier/hierarchy ingestion, (2) deterministic compound identity/reference keys, and (3) negative tests that reject ambiguous identities or broken references. Task 11 validates this once; do not promote until it succeeds on another distinct benchmark task or Hunt 15 approves it.
 - **Restore-verification invariant quartet**: require (1) a real scratch restore, (2) post-restore semantic assertions, (3) evidence preserving expected/actual/error state, and (4) negative lifecycle/integration tests; then trace the exact PASS transition back through configuration and require a minimum-check invariant. Task 12 validates this once. Do not promote to SEARCH_SKILLS until it succeeds on another distinct benchmark task or Hunt 15 approves it.
+- **Published-plan replanning invariant quartet**: for operational scheduling repair, require (1) hard-lock failure semantics, (2) an explicit previous-plan delta objective, (3) separate coverage/stability phases with proof flags, and (4) negative repair tests or replay evidence tied to the source plan. Task 13 validates this once. Do not promote to SEARCH_SKILLS until it succeeds on another distinct benchmark task or Hunt 15 approves it.
