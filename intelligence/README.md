@@ -181,3 +181,54 @@ New runs should use `schema_version: 3` and record:
 7. durable evidence path.
 
 Do not fabricate missing history to make the dashboard look complete. Measurement debt is preferable to invented denominators.
+
+
+## V4 normalized measurement and matched strategy evaluation
+
+V4 separates four levels that were previously easy to conflate:
+
+1. **Literal query** — the exact strings used in one run.
+2. **Query family (`QF:...`)** — a reusable implementation-level hypothesis.
+3. **Search objective (`OBJ:...`)** — a broader cross-domain research question such as completeness proof, authority lineage or ambiguity reconciliation.
+4. **Strategy (`STRAT:...`)** — the search/verification procedure used to pursue that objective.
+
+This prevents one-off query wording from fragmenting the learner while preserving exact provenance.
+
+### Normalized search surfaces
+
+Exact labels such as “GitHub code/signature search” and “GitHub code search” remain stored, but `surface_aliases.json` maps them into stable `SURFACE_FAMILY:...` categories. Family-level metrics reduce wording fragmentation; exact labels remain available for diagnosis.
+
+### Candidate reason normalization
+
+New V4 candidate dispositions use:
+- `reason_code_standard` — controlled machine-learning category;
+- `reason_detail` — precise technical evidence.
+
+Reviewed `reason_aliases.json` maps older free-form reason codes into the controlled taxonomy without rewriting source history.
+
+### Matched strategy measurement
+
+Ordinary hunt telemetry is observational and confounded. V4 adds a matched benchmark layer:
+- `strategy_evaluation_sets.json` — curated strategy/task overlap;
+- `benchmark/STRATEGY_MEASUREMENT_PROTOCOL.md` — clean-condition protocol;
+- `MEASUREMENT_CAMPAIGN.md` — next recommended comparisons.
+
+Benchmark runs use `measurement_quality: "benchmark"` and record `benchmark_task_ids`, `evaluation_set_id` and `comparison_group_id`. Do not read `BENCHMARK_GOLD.md` until matched results are frozen.
+
+### Revision debt
+
+`REVISION_DEBT_REPORT.md` tracks findings whose exact inspected revision is missing plus MASTER entries lacking matching catalog evidence. Never invent a historical SHA; reinspect and create a new pinned observation when the original cannot be recovered.
+
+### V4 run contract
+
+Every new prospective hunt should use `schema_version: 4` and persist:
+- `strategy_id`
+- `query_family` and canonical `query_family_id`
+- controlled `search_objective_id`
+- literal queries and search surfaces
+- candidate/deep-inspection/retention/MASTER denominators
+- controlled candidate reason code + evidence detail
+- capability and experiment deltas
+- durable evidence location
+
+Matched benchmark runs additionally require task/set/comparison metadata.
