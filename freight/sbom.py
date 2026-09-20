@@ -108,6 +108,28 @@ def verify_sbom(sbom: dict) -> None:
     if not str(sbom.get("serialNumber", "")).startswith("urn:uuid:"):
         raise ValueError("SBOM serialNumber missing")
 
+    props = {
+        p.get("name"): p.get("value")
+        for p in sbom.get("properties", [])
+        if isinstance(p, dict)
+    }
+    recorded = props.get("freight:sbom-content-sha256")
+    if not recorded:
+        raise ValueError("SBOM content digest missing")
+    body = {
+        key: value
+        for key, value in sbom.items()
+        if key not in {"serialNumber", "properties"}
+    }
+    expected = _canonical_hash(body)
+    if recorded != expected:
+        raise ValueError("SBOM content digest mismatch")
+    expected_serial = "urn:uuid:" + str(
+        uuid.uuid5(uuid.NAMESPACE_URL, "freight-sbom:" + expected)
+    )
+    if sbom["serialNumber"] != expected_serial:
+        raise ValueError("SBOM serialNumber/content mismatch")
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
