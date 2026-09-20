@@ -118,7 +118,7 @@ registry_path = INTEL / "registry_metrics.json"
 if registry_path.exists():
     registry = json.loads(registry_path.read_text(encoding="utf-8"))
     master_text = (ROOT / "MASTER.md").read_text(encoding="utf-8")
-    master_repo_count = len(set(re.findall(r"^###\s+([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)", master_text, re.M)))
+    master_repo_count = len(set(m.group(1) for m in re.finditer(r"^###\\s+([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)(?:\\s+—\\s+.*)?$", master_text, re.M)))
     if master_repo_count and registry.get("master_promoted_repositories") != master_repo_count:
         raise SystemExit(
             f"registry_metrics.json: MASTER count drift {registry.get('master_promoted_repositories')} != {master_repo_count}"
