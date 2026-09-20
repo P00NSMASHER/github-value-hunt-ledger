@@ -3,6 +3,7 @@
 Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read this file before searching, reuse skills when appropriate, and append only methods that have produced evidence-backed value. Skills are search procedures, not conclusions; validate every candidate independently.
 
 ## Skill schema
+- STRATEGY ID: stable `STRAT:<slug>` used by `intelligence/search_runs.jsonl`
 - SKILL NAME
 - WHEN TO USE
 - PROCEDURE
@@ -277,3 +278,11 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - Benchmark Task 22: `josephazar/FreshRetailnet-50k-Analysis@7dc8815e02c74e7dd6309ec307624a190d879659`.
 - FAILURE MODES: treating held-out model metrics as realized economics; letting the chosen model score its own policy without independent outcome support; evaluating latent-demand decisions only against stockout-censored sales; assuming a nominal quantile label proves calibrated service level.
 - NEXT IMPROVEMENT: apply the method to pricing, outage-risk, warehouse optimization and other decision engines where the easiest available score is a proxy for the buyer's actual money or service outcome.
+
+
+## Empirical attribution rule
+- Every prospective use of a search skill must append a record to `intelligence/search_runs.jsonl` using that skill's stable `STRAT:...` ID.
+- Record the reusable query family separately from literal query text.
+- Record candidate count, deep-inspection count, retained count and MASTER promotions when actually observed; never backfill guessed denominators.
+- Retrospective examples remain useful qualitative evidence but do not enter yield denominators unless the original run counts are recoverable.
+- Strategy promotion/retirement is outcome-driven and sample-gated; see `intelligence/README.md` and `intelligence/LEARNING_REPORT.md`.

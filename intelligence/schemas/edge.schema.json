@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Technology Intelligence Graph Edge",
+  "type": "object",
+  "required": [
+    "edge_id",
+    "from",
+    "type",
+    "to",
+    "confidence",
+    "evidence_ref",
+    "provenance"
+  ],
+  "properties": {
+    "edge_id": {
+      "type": "string",
+      "pattern": "^EDGE:[0-9a-f]{8,}$"
+    },
+    "from": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "enum": [
+        "IMPLEMENTS",
+        "VALIDATES",
+        "CHALLENGES",
+        "DEPENDS_ON",
+        "COMBINES_WITH",
+        "ENABLES",
+        "TESTED_BY",
+        "PRODUCED",
+        "INVALIDATES",
+        "STRENGTHENS",
+        "DISCOVERED_BY",
+        "DISCOVERED_EXAMPLE",
+        "CONTRIBUTED_TO"
+      ]
+    },
+    "to": {
+      "type": "string",
+      "minLength": 1
+    },
+    "confidence": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "evidence_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provenance": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": true
+}

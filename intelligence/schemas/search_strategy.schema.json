@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Technology Intelligence Search Strategy",
+  "type": "object",
+  "required": [
+    "strategy_id",
+    "name",
+    "status",
+    "source_markdown"
+  ],
+  "properties": {
+    "strategy_id": {
+      "type": "string",
+      "pattern": "^STRAT:[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "when_to_use": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "procedure": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "why_it_worked": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "failure_modes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_improvement": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "watch",
+        "retired"
+      ]
+    },
+    "source_markdown": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

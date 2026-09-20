@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Technology Intelligence Outcome",
+  "type": "object",
+  "required": [
+    "outcome_id",
+    "date",
+    "experiment_id",
+    "result",
+    "origin_search_ids",
+    "contributing_capability_ids",
+    "evidence_location"
+  ],
+  "properties": {
+    "outcome_id": {
+      "type": "string",
+      "pattern": "^OUT:[A-Za-z0-9:_-]+$"
+    },
+    "date": {
+      "type": "string",
+      "minLength": 1
+    },
+    "experiment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "opportunity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "result": {
+      "enum": [
+        "PASSED",
+        "FAILED",
+        "PARTIAL",
+        "INVALID"
+      ]
+    },
+    "origin_search_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^RUN:[A-Za-z0-9:_-]+$"
+      }
+    },
+    "contributing_capability_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^CAP-[0-9]{3,}$"
+      }
+    },
+    "contributing_repositories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "revenue_usd": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "customer_value_usd": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "engineering_days_saved_low": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "engineering_days_saved_high": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "technical_result": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "commercial_result": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unexpected_failure_modes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "search_policy_consequence": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_location": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
