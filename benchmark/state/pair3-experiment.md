@@ -7,12 +7,15 @@
 - Task 17: Capability-conjunction search transferred successfully from airline recovery to financial reconciliation. The useful conjunction was exact Decimal money + canonical multi-source normalization + fee/refund semantics + split-group matching + idempotency/dedupe + explicit ambiguity/exception states. This surfaced and validated `Etherlabs-dev/multi-processor-reconciliation`, while generic reconciliation searches produced dashboards, assessments, and narrower explainable matchers missing part of the requested capability set.
 - Task 17: For money-bearing engines, verify the same invariant at three layers when available: algorithm-level tests, persistence/database constraints, and CI/benchmark execution. In `multi-processor-reconciliation`, Python tests cover matching semantics, PostgreSQL rejects duplicate raw events and unbalanced journals, and the exact head revision has a successful CI run that executes schema/seed, pytest, n8n import, workflow validation and a synthetic reconciliation benchmark.
 - Task 17: “Reference implementation” should not be treated as an automatic reject or as production proof. The repository explicitly disclaims verified client deployment, but source/tests/schema/CI substantiate a real engine. The correct calibration was STRONG for benchmark capability and NOT verified for enterprise scale.
+- Task 18: Temporal decision engines should be verified through transition order plus negative time/provenance invariants, not forecast accuracy. `Vzlentin/calibre` exposes one legal loop (`resolve -> settle -> predict -> reconcile -> calibrate -> order`) and tests publication-time admission, original-issuance retention for late feedback, no rewrite of issued decisions, and fail-closed settlement before inventory mutation.
+- Task 18: Exact-revision verification must precede crediting indexed repository descriptions. Search-engine/indexed documentation for `Vzlentin/calibre` still described a richer SQL/API/deployment architecture, while exact head `264b6fc...` had been replaced on 2026-09-09 with a smaller copied core whose README explicitly says the larger target architecture remains future work. This prevented a material false promotion.
 
 ## Failed search patterns
 - Generic repository-title queries such as “airline disruption optimizer/recovery” produced many aircraft-only projects, UI demos, or agent wrappers without the requested crew legality + passenger recovery + uncertainty + replay combination.
 - Research-paper repositories can look unusually deep but must be checked for the actual imported implementation. `kahyakursat1-cloud/hybrid-cpsat-qiga-airline-recovery` had strong paper/experiment claims, but inspected experiment scripts imported `src.*` modules that were absent from the repository tree, so it was not accepted as the engine result.
 - Task 17: Generic “reconciliation platform/engine” search produced many invoice dashboards, assessment projects, and accounting demos with duplicate/unmatched labels but no fee-aware + refund + split-settlement semantics backed by tests.
 - Task 17: Explainability/property-testing alone is not enough for this benchmark. `dylanpulver/recon` is technically disciplined but explicitly limits grouping to many-to-one and does not supply the full refund/fee/multi-source semantics requested.
+- Task 18: Generic “forecast-driven inventory control” searches mostly returned forecast + safety-stock simulators without publication clocks, late-observation provenance, immutable issuance semantics or settlement-state boundaries. `Surge77/stockout` is especially useful negative evidence because its current README explicitly says the earlier conformal/newsvendor inventory layer was deleted; forecasting rigor alone is not an inventory decision engine.
 
 ## Useful terminology / signatures
 - Operational replay: `NONDETERMINISM.md`, `golden replay`, `deterministic=True`, `num_search_workers=1`, fixed `random_seed`, frozen weather/input snapshots, persistence/restart equality.
@@ -20,6 +23,8 @@
 - Red-team signature: compare README phrase “hard constraint” against actual `model.add(...)` / candidate-variable construction and solution extraction.
 - Financial reconciliation conjunction: `Decimal`, `fee_aware`, `partial_refund`, `split_payment`, `ambiguous_candidates`, `ambiguous_split`, `duplicate_input`, `idempotency_key`, `CursorConflict`, `recon_exceptions`.
 - Money-engine verification signature: successful CI at exact head revision + database invariant tests + deterministic/synthetic benchmark result, not README business-outcome claims.
+- Temporal inventory conjunction: `available_at`, observation clock, `deliveries_since`, original-origin keyed score windows, `settle_periods`, complete simulation demand, `decision_bound`, `order_up_to`, no order reissue, gap/tail settlement.
+- Architecture-drift red-team signature: compare current exact-head tree/README against search-indexed feature claims and recent large replacement/rewrite commits before crediting persistence/API/deployment surfaces.
 
 ## Candidate search skills
 ### Capability-Conjunction Search + Claim Tracing — evidence 2/2; eligible for promotion
@@ -32,4 +37,10 @@ STATUS: Evidence threshold is now satisfied on two distinct benchmark tasks. Eli
 WHEN TO USE: Financial/reconciliation/billing systems where a README can easily overstate reliability.
 PROCEDURE: Verify each critical money invariant in (1) executable algorithm tests, (2) persistence/database constraints or idempotency boundaries, and (3) CI/benchmark execution at the exact revision. Treat synthetic benchmarks as capability evidence, not production-scale evidence.
 WHY IT WORKED: Task 17 separated a genuinely implemented reconciliation engine from architecture-only financial demos and prevented production-scale overclaiming.
+STATUS: Do not promote to SEARCH_SKILLS.md yet. Requires success on at least one additional distinct benchmark task or Hunt 15 approval.
+
+### Transition-Order + Temporal-Invariant Verification — evidence 1/2
+WHEN TO USE: Inventory, scheduling, planning, campaign-control or other decision systems where correctness depends on what was knowable when and on irreversible state transitions rather than on predictive accuracy alone.
+PROCEDURE: (1) Find the exact legal transition sequence. (2) Trace publication/availability clocks into admission logic. (3) Verify late feedback keeps original decision/issuance identity instead of becoming recent history. (4) Verify already-issued decisions are immutable under later actuals. (5) Verify settlement/state mutation validates the full required interval before changing state. (6) Pin exact head and compare it with indexed docs/history so removed architecture is not credited as current capability.
+WHY IT WORKED: Task 18 separated `Vzlentin/calibre` from ordinary inventory forecasting projects and, during red-team, caught that public search snippets still described a richer pre-reset SQL/API stack that the current exact revision no longer contains.
 STATUS: Do not promote to SEARCH_SKILLS.md yet. Requires success on at least one additional distinct benchmark task or Hunt 15 approval.
