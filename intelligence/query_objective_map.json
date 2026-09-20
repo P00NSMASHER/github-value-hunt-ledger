@@ -1,0 +1,13 @@
+{
+  "QF:outage-outcome-independent-falsifier-rights": "OBJ:independent-evaluation",
+  "QF:invoice-po-receipt-exact-line-identity-receipt-capacity-conservation-service-acceptance-blanket-order-semantics": "OBJ:authority-lineage",
+  "QF:sam-solicitation-history-data-services-attachment-manifest-deleted-restricted-external-link-completeness": "OBJ:completeness-proof",
+  "QF:usecpo-v2-schema-event-id-correlation-lineage": "OBJ:identity-lineage",
+  "QF:event-time-authority-external-provider-inquiry-unknown-failed-one-shot-refund-confirmed-counter-event-compensating-ledge": "OBJ:exactly-once-settlement",
+  "QF:exp-001-realized-recovery-persistence-and-concurrency-acceptance-boundary": "OBJ:exactly-once-settlement",
+  "QF:sam-attachment-deletedflag-excludedeleted-deleteall-disappearance-historical-manifest-retention": "OBJ:completeness-proof",
+  "QF:recovery-proof-completeness-expected-subject-inventory-multi-engine-semantic-restore-fail-open-validation": "OBJ:completeness-proof",
+  "QF:physical-action-response-loss-same-action-readback-unknown-retry-restart-gate": "OBJ:ambiguity-reconciliation",
+  "QF:approved-measurement-exact-work-order-contract-line-ownership-bill-period-cutoff-cumulative-authority-unbilled-claim-alt": "OBJ:authority-lineage",
+  "QF:physical-action-restart-identity-continuity-local-cancelled-unknown-retry-gate": "OBJ:ambiguity-reconciliation"
+}
