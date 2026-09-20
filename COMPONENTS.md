@@ -1,337 +1,151 @@
 # Reusable Components
 
-Cross-lane index maintained by Hunt 15 MASTER Integrator.
+Integrator-owned index of reusable infrastructure/components that materially strengthen multiple products or close a difficult integration/evidence gap. This file is intentionally compact; detailed historical entries remain in hunter catalogs and Git history.
 
-Use this file for reusable infrastructure and product building blocks: auth, multi-tenancy, RBAC, audit trails, billing, notifications, job queues, workflow engines, connectors, parsers, ETL, document generation, admin consoles, reporting, import/export, deployment tooling, SDKs, and similar components.
+For every component preserve exact revision, actual published rights/provenance, the standing repository-code permission posture, integration target, evidence limitation and next test. Third-party standards/data/vendor/customer assets remain separately governed.
 
-For each entry record:
-- Repository
-- Canonical URL
-- Exact revision / date inspected
-- Component capability
-- Evidence inspected
-- Actual published license / rights metadata
-- User-asserted separate commercial authorization posture
-- Integration targets
-- Build-time compression
-- Value score
-- Combination opportunities
-- Next action
+## Elite / cross-portfolio components — 2026-09-20
 
-## Elite reusable components — 2026-09-19
+### OmarFaig/Assay — calibrated accept/review gate
+- Revision: `821303935ef2855908a9a9bd1efd4c33f9cd39d2`.
+- Published rights: MIT; models/data/runtimes separate.
+- Capability: selective-prediction extraction with field evidence, arithmetic/alternative awareness, calibration and review routing.
+- Targets: freight, AP, ScopeSignal, CaptureBrief, subrogation and other money/evidence products.
+- Score: **29/30**.
+- Limitation: extraction confidence never establishes contractual/legal authority.
+- Next test: buyer-specific false-accept calibration at a fixed review budget.
 
-### OmarFaig/Assay — calibrated accept/review gate for extracted facts
-- Repository: https://github.com/OmarFaig/Assay
-- Exact revision: `821303935ef2855908a9a9bd1efd4c33f9cd39d2`.
-- Capability: selective-prediction document extraction with field-level constrained-decoding evidence, legal-alternative awareness, arithmetic penalties, calibration, review routing and evaluation.
-- Evidence inspected: source/evaluation architecture and calibration/review behavior as recorded in MASTER.
-- Published rights: MIT; model weights, datasets and inference runtimes remain separate.
-- Standing permission posture: repository-owned code/content commercially authorized under the user's assertion; third-party models/data remain separately governed.
-- Integration targets: Freight Recovery, ScopeSignal, CaptureBrief and other money/evidence products where an uncertain extraction must not silently become an assertion.
-- Build-time compression: supplies the difficult false-accept/calibration layer instead of another generic OCR/parser.
-- Value score: **29/30** — A5 B4 C5 D5 E5 F5.
-- Combination: source extraction -> Assay accept/review -> deterministic authority/rule engine -> proof gate.
-- Next action: maintain buyer-specific calibration at a fixed false-accept ceiling; unresolved fields remain review/$0 where money-bearing.
-
-### srthck/trustmesh — proof-obligation and next-evidence engine
-- Repository: https://github.com/srthck/trustmesh
-- Exact revision: `5a93d70b37aafecaf61a5bc0296eaf831e5504ac`.
-- Capability: deterministic authority/admissibility/independence/temporal/deadline/contradiction gates, replayable decisions and counterfactual next-best-evidence selection.
-- Evidence inspected: source/rule behavior and deterministic proof semantics recorded in MASTER.
-- Published rights: MIT; domain policy/scheme content and third-party data remain separate. User also asserted a separate commercial license for this repository.
-- Standing permission posture: repository-owned material commercially authorized; no extension to external policy/data.
-- Integration targets: Freight Recovery, claims/recovery readiness, ScopeSignal entitlement evidence, compliance/remediation evidence.
-- Build-time compression: replaces ad-hoc workflow gates with explicit proof sufficiency and evidence-acquisition semantics.
-- Value score: **29/30** — A4 B5 C5 D5 E5 F5.
-- Combination: deterministic calculation/claim -> Trustmesh proof obligations -> next-evidence queue -> reviewer/settlement outcome.
-- Next action: keep domain policy provenance separate and benchmark whether suggested next evidence actually changes blocked decisions.
+### srthck/trustmesh — proof obligations / next-best-evidence
+- Revision: `5a93d70b37aafecaf61a5bc0296eaf831e5504ac`.
+- Published rights: MIT; domain policy/content separate. User separately asserted commercial license.
+- Capability: deterministic authority/admissibility/independence/temporal/deadline/contradiction gates, replayable decisions and next-evidence selection.
+- Targets: freight, claims/subrogation, ScopeSignal, compliance, recovery proof.
+- Score: **29/30**.
+- Next test: historical blocked cases measuring whether suggested evidence actually changes decisions efficiently.
 
 ### mgilbir/formalis — structured invoice validation gateway
-- Repository: https://github.com/mgilbir/formalis
-- Exact revision: `2b3895a0c2c54e4f25ccb46e131d215ad4457eb2`.
-- Capability: multi-jurisdiction e-invoice validation across EN16931, XRechnung, Factur-X/ZUGFeRD, Peppol/PINT and national CIUS with syntax detection, neutral CII/UBL paths, authority-parity/omission tests and explicit `NotEvaluated`/fatal states.
-- Evidence inspected: format/rule coverage and fail-closed semantics recorded in MASTER.
-- Published rights: MIT for code; official schemas, Schematrons, code lists and test corpora retain separate rights/provenance.
-- Standing permission posture: repository-owned code commercially authorized; standards-derived assets remain separately governed.
-- Integration targets: AP audit/recovery, marketplace money assurance, freight structured invoices and regulated invoice gateways.
-- Build-time compression: avoids building multiple jurisdiction-specific validation stacks and preserves native structured truth before OCR.
-- Value score: **29/30** — A4 B5 C5 D5 E5 F5.
-- Combination: structured invoice -> Formalis validation -> contract/rate/entitlement engine -> settlement reconciliation.
-- Next action: pin exact rule-pack versions and provenance for each commercial jurisdiction before making compliance claims.
+- Revision: `2b3895a0c2c54e4f25ccb46e131d215ad4457eb2`.
+- Published rights: MIT code; official schemas/Schematrons/code lists/test corpora separate.
+- Capability: multi-format/multi-rule-family e-invoice validation with explicit fatal/not-evaluated semantics.
+- Targets: AP, marketplace settlement, freight structured invoices.
+- Score: **29/30**.
+- Next test: exact rule-pack provenance/parity against an independent validator on a shared corpus.
 
-### joschiservice/RosterSpec — schedule verification and minimum-disruption repair kernel
-- Repository: https://github.com/joschiservice/RosterSpec
-- Exact revision: `f7e701c694bf1facdc4999e1681a3aa11493614d`.
-- Capability: deterministic CP-SAT workforce schedule verification/explanation/repair with stable rule codes, hard locks and minimum-disruption replanning backed by goldens/oracles/load tests.
-- Evidence inspected: solver/rule/repair/test behavior recorded in MASTER.
+### joschiservice/RosterSpec — schedule verification and minimum-disruption repair
+- Revision: `f7e701c694bf1facdc4999e1681a3aa11493614d`.
 - Published rights: Apache-2.0.
-- Standing permission posture: repository-owned code commercially authorized under the user's assertion.
-- Integration targets: contact-center WFM assurance, field-service proof-to-cash capacity repair and fulfillment workforce acceptance.
-- Build-time compression: supplies difficult constraint verification and conservative repair rather than another from-scratch scheduler.
-- Value score: **29/30** — A4 B5 C5 D5 E5 F5.
-- Combination: demand/coverage evidence -> RosterSpec verify/repair -> human approval -> post-change service/QA measurement.
-- Next action: benchmark minimum-disruption repair against incumbent WFM outputs on a closed published-roster period.
+- Capability: deterministic CP-SAT verification/explanation/repair with hard locks and golden/oracle/load tests.
+- Targets: WFM, field service, labor-to-payroll, fulfillment.
+- Score: **29/30**.
+- Next test: same-period incumbent schedule vs verified/minimum-disruption repair.
+
+### cmdrvl/canon — reviewed versioned identity compiler
+- Revision: `45e9702ba7f3874c073134c1a6fb74500232b6a1`.
+- Published rights: MIT; source registries/customer identities separate.
+- Capability: candidate evidence -> review -> promoted versioned registry -> pinned deterministic runtime replay.
+- Targets: CaptureBrief, freight carrier/vendor, AP supplier and CRM/MDM identity.
+- Score: **29/30**.
+- Next test: aliases/mergers/splits/corrections with byte-stable replay for a pinned version.
+
+### ChelseaKR/constituent-reconciler — consent-aware review/writeback
+- Revision: `dbc09d25baec026027e65a0f8d21930509e2dd8e`.
+- Published rights: Apache-2.0; CRM APIs/customer identity/consent data separate.
+- Capability: multi-format intake, evidence spans, normalization/matching, human review, controlled writeback and append-only provenance.
+- Targets: Canon workflows, CRM/MDM and regulated identity correction.
+- Score: **29/30**.
+- Next test: synthetic consent conflict, ambiguous match, rollback and correction/split cases.
 
 ### open-eid/SiVa — signature/timestamp trust verifier
-- Repository: https://github.com/open-eid/SiVa
-- Exact revision: `0c9c5f2490b1a27798b47906bbaa6adb4d26daad`.
-- Capability: validation of XAdES/CAdES/PAdES/ASiC/timestamp evidence with chain trust, timestamp imprint, OCSP/CRL status and revocation freshness.
-- Evidence inspected: trust/revocation/timestamp validation semantics recorded in MASTER.
-- Published rights: EUPL v1.1; DigiDoc4J/DSS, EU trusted lists, certificates and trust-service infrastructure remain separate.
-- Standing permission posture: repository-owned code commercially authorized; external trust infrastructure/PKI material remains separately governed.
-- Integration targets: Recovery Proof, signed audit evidence, compliance evidence and recovery certificates requiring stronger historical-time/trust validation.
-- Build-time compression: materially closes the gap between parsing an RFC 3161 token and evaluating production trust/revocation validity.
-- Value score: **25/30** — A3 B4 C5 D4 E5 F4; retained because it is uniquely important to stronger evidence stacks.
-- Combination: real restore/application proof -> manifest/hash -> signature/timestamp -> SiVa trust/revocation verification -> buyer/auditor evidence package.
-- Next action: define and test a production trust policy, including certificate-chain, OCSP/CRL freshness, retention and external TSA acceptance.
+- Revision: `0c9c5f2490b1a27798b47906bbaa6adb4d26daad`.
+- Published rights: EUPL v1.1; trust lists/certificates/TSA infrastructure separate.
+- Capability: XAdES/CAdES/PAdES/ASiC/timestamp trust-chain, imprint, OCSP/CRL and revocation-freshness validation.
+- Targets: Recovery Proof, compliance and signed recovery/audit evidence.
+- Score: **25/30**, retained because it closes a unique trust gap.
+- Next test: production trust policy with chain/revocation/freshness/retention failures.
 
-### Benchling-Open-Source/allotropy — analytical-instrument normalization layer
-- Repository: https://github.com/Benchling-Open-Source/allotropy
-- Exact revision: `ecc574986b74f91eb84cd0ee14756cd8dc5e1b7e`.
-- Capability: broad vendor instrument-output parser estate normalizing chromatography/CDS, liquid-handler, plate-reader, cell-analysis, qPCR/dPCR, spectroscopy and related outputs into Allotrope Simple Model structures with dedicated readers/tests.
-- Evidence inspected: reader/parser estate and active test/maintenance footprint recorded in MASTER.
-- Published rights: MIT for code; Allotrope specifications, vendor formats/fixtures and customer data remain separately governed.
-- Standing permission posture: repository-owned code commercially authorized; specifications/vendor/customer assets remain separate.
-- Integration targets: Lab Automation v4, governed experiment campaigns, provenance and cross-instrument analytics.
-- Build-time compression: removes a large share of heterogeneous vendor export normalization work before orchestration/analysis.
-- Value score: **29/30** — A5 B5 C5 D4 E5 F5.
-- Combination: instrument export -> Allotropy normalization -> PyTestLab/Galago/PyLabRobot execution/replay -> Flowcept provenance -> HELIOS governed campaign decisions.
-- Next action: select one buyer-specific installed-base format mix and prove normalization fidelity against vendor-authorized sample exports.
-
-<!-- INTEGRATOR-R12-2026-09-19T2231-0400 -->
-### cmdrvl/canon — reviewed versioned identity compiler
-- Repository: https://github.com/cmdrvl/canon
-- Exact revision: `45e9702ba7f3874c073134c1a6fb74500232b6a1`.
-- Capability: messy identity evidence -> scored/reviewed decisions -> promoted versioned registry -> exact deterministic runtime replay. Runtime is pinned to a registry version, provider materialization/calibration is separated from registry mutation, and unresolved/refusal/partial states plus rule/confidence provenance remain explicit.
-- Evidence inspected: identity architecture/evaluation docs, registry/promotion/replay contracts, structural-linkage artifacts, benchmark/test/CI surface recorded in hunter 18.
-- Published rights: MIT for repository-owned code; provider/reference datasets and customer identities remain separately governed.
-- Standing permission posture: repository-owned code/content commercially authorized; no extension to external registries/data.
-- Integration targets: CaptureBrief entity/parent identity, freight carrier/vendor mastering, AP/vendor mastering, CRM/MDM reconciliation.
-- Build-time compression: approximately 4–8+ months of registry/versioning, review/promotion, evidence artifacts, calibration workflow and exact replay control-plane work.
-- Value score: **29/30** — A4 B5 C5 D5 E5 F5.
-- Combination: probabilistic candidate generation -> Canon review/promotion -> pinned production registry -> downstream exact identity joins.
-- Next action: synthetic vendor/company corpus through candidate generation -> review -> promotion -> replay; runtime output must change only after a new reviewed version is promoted.
-
-### ChelseaKR/constituent-reconciler — consent-aware review and audited writeback
-- Repository: https://github.com/ChelseaKR/constituent-reconciler
-- Exact revision: `dbc09d25baec026027e65a0f8d21930509e2dd8e`.
-- Capability: offline-first CSV/PDF/image/text/email intake, source-spanned extraction, deterministic normalization, probabilistic matching, human review, controlled CRM writeback and append-only provenance; policy packs can restrict cloud egress, write targets and merged consent.
-- Evidence inspected: README/tree, connectors, tests, benchmark/claims-audit/security/data-flow tooling and negative-control work recorded in hunter 18.
-- Published rights: Apache-2.0 for repository-owned code; CRM APIs, timestamp services, benchmark/source datasets and real identities remain separate.
-- Standing permission posture: repository-owned code/content commercially authorized; customer identity/consent data remains separately authorized and protected.
-- Integration targets: Canon-reviewed registry workflows, nonprofit/CRM reconciliation, regulated customer/vendor mastering and safe correction/writeback.
-- Build-time compression: roughly 3–6+ months of multi-format intake, evidence, review, target writeback, policy and audit plumbing.
-- Value score: **29/30** — A5 B4 C5 D5 E5 F5.
-- Combination: candidate engine/Canon registry -> policy-aware review -> controlled writeback -> append-only receipt -> correction/split replay.
-- Next action: benchmark consent conflict, ambiguous match, partial extraction, rollback and write-target semantics on fully synthetic multi-CRM data.
-
-### oscal-compass/compliance-to-policy-go — policy-as-code to OSCAL assessment bridge
-- Repository: https://github.com/oscal-compass/compliance-to-policy-go
-- Exact revision: `45bfc1a8947e8b56b7e11391e13f8c1f2136cfaa`.
-- Capability: maps heterogeneous policy-engine results through plugin contracts into OSCAL observations/findings while preserving resource identity, evidence, waived subjects and explicit non-pass states.
-- Evidence inspected: v2 plugin architecture and `framework/actions/report.go` Assessment Results construction recorded in hunter 14.
-- Published rights: Apache-2.0; OSCAL/NIST materials, Kyverno/OCM and proprietary policy engines/services remain separately governed.
-- Standing permission posture: repository-owned code/content commercially authorized.
-- Integration targets: Continuous Compliance Evidence Ops, Recovery Proof evidence packaging and governed remediation/re-proof.
-- Build-time compression: approximately 3–6 months of OSCAL assessment semantics, plugin contracts, control mapping and result aggregation.
-- Value score: **27/30** — A4 B4 C5 D4 E5 F5.
-- Combination: production collectors -> policy engine -> C2P OSCAL findings -> epack/OpenWright -> CAGE remediation -> fresh re-test.
-- Next action: synthetic three-control pass/fail/error/waive/missing-result fixture plus one authorized sandbox policy engine; incomplete collection may never become a pass.
-
-### duke5am/pg-restore-drill — PITR negative-control acceptance fixture
-- Repository: https://github.com/duke5am/pg-restore-drill
-- Exact revision: `e914caddd14ab1604d85ccb7919d4da071a6766c`.
-- Capability: PostgreSQL base-backup/WAL PITR drill with known pre/post-target data, exact-state checksums, measured RPO/RTO and a deliberate negative-control mode that only succeeds when the verifier detects the wrong recovery target.
-- Evidence inspected: repository tree/README, substantial restore/report scripts and negative-control/archive-gap semantics recorded in hunter 15.
-- Published rights: MIT; PostgreSQL/storage/runtime providers remain separate.
-- Standing permission posture: repository-owned code commercially authorized.
-- Integration targets: Recovery Proof test-the-test methodology; challenger to pg_hardstorage/BackupDrill rather than a parallel generic product.
-- Build-time compression: roughly 2–4 months of PITR choreography, exact-state verification and negative-control design.
-- Value score: **28/30** — A5 B4 C5 D4 E5 F5.
-- Combination: Postgres restore engine -> positive fixture + mandatory negative control -> signed proof SLA -> trust validation.
-- Next action: compare identical WAL-gap/wrong-target/checksum-corruption fixtures against the current PostgreSQL engines and retain the strongest execution path plus the negative-control methodology.
-
-<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
-## Additional reusable components — 2026-09-20
-
-### sandyliu3056/UPS-reconciliation — parcel correction/rebill specialist oracle
-- Revision: `d1e11940b262debc3c3216aba6467f39722c3000`.
+### duke5am/pg-restore-drill — recovery negative-control fixture
+- Revision: `e914caddd14ab1604d85ccb7919d4da071a6766c`.
+- Published rights: MIT; PostgreSQL/storage providers separate.
+- Capability: real PITR drill with known pre/post-target state and deliberate wrong-target/archive-gap negative controls.
+- Targets: Recovery Proof.
 - Score: **28/30**.
-- Capability: reconstructs UPS-style original/corrected billing chronology and contractual reprice logic including corrected weight/zone/returns/multipiece/LPS cases; useful for proving incremental base-charge shortages after corrections.
-- Integration: Freight Recovery v14 specialist comparator, not a second TMS/rating plane. Same-family `ups-reprice-web` is deduped as supporting evidence.
-- Rights: actual public provenance recorded in hunter 36; user's separate permission applies to repository-owned code. Carrier tariff/contracts/customer data remain separate.
-- Next action: independently author correction/rebill fixtures and compare oracle output against the main freight calculation plane.
+- Next test: common WAL-gap/wrong-target/corruption matrix across the leading PostgreSQL verifiers.
 
-### clay-good/vaulytica — construction contract/flow-down rule component
-- Revision: `ffb88ed27354f8a3b17269d327ec29bd1d1fae98`.
-- Score: **28/30**.
-- Capability: deterministic construction contract-analysis/playbook rules around prime/subcontract scope, incorporation/flow-down, payment/retainage, change orders, lien waivers, bonds, insurance/indemnity and related evidence.
-- Integration: ScopeSignal v5 authority extraction/review before commercial-state calculations.
-- Rights: MIT repository code; source legal forms/standards/current law remain independently governed and require authoritative current-source review.
-- Next action: held-out contract set with exact source spans and deliberate conflicting/absent clauses; unresolved authority stays unresolved.
-
-### abdu2030/Resolve_api — deterministic resolver challenger for identity mastering
-- Revision: `de593e6...` (full exact SHA preserved in hunter 18).
-- Score: **28/30**.
-- Capability: evidence-oriented record/identity resolution that complements Canon's reviewed/versioned registry boundary.
-- Integration: candidate generation/normalization -> Resolve/other challenger -> Canon human review/promotion -> pinned production registry.
-- Next action: synthetic vendor/customer corpus with ambiguous aliases, mergers/splits and negative matches; compare false-merge/false-split frontier.
-
-### attestwire/en16931 — independent structured-invoice rule oracle
-- Revision: `09d08...` (full exact SHA preserved in hunter 16).
+### Benchling-Open-Source/allotropy — cross-vendor analytical normalization
+- Revision: `ecc574986b74f91eb84cd0ee14756cd8dc5e1b7e`.
+- Published rights: MIT code; Allotrope specs/vendor formats/customer data separate.
+- Capability: broad analytical-instrument reader/normalization estate.
+- Targets: installed-base lab automation, governed campaigns and provenance.
 - Score: **29/30**.
-- Capability: strong independent EN16931 structured-invoice validation source/oracle.
-- Integration: use as a peer challenge to Formalis rather than replacing it; disagreements in money/compliance fields route to rule-pack/source review.
-- Rights: repository-owned material under public/standing permission; official schemas/Schematrons/code lists remain separately governed.
-- Next action: parity corpus across identical UBL/CII fixtures and exact rule-pack versions.
+- Next test: buyer-installed format mix against vendor-authorized sample exports.
 
-### adamleap02/PermitBuild — canonical permit/version/source-QA plane
+### SemaphoreSolutions/s4-clarity-lib — Clarity LIMS workflow-state adapter
+- Revision: `ad577fff3a3c4c93f4bb898940a0b45268c7dbe7`.
+- Published rights: MIT; Clarity runtime/customer records/vendor services separate.
+- Capability: high-level Python automation over Illumina BaseSpace Clarity with `StepRunner` state transitions and practical QC/pooling/placement/reagent/next-step workflow semantics.
+- Evidence: real source/examples/workflow machinery inspected; no end-to-end customer deployment outcome yet.
+- Targets: sequencing-core installed-base automation and CAP-017.
+- Integrator score: **28/30 — A5 B4 C5 D4 E5 F5**. Hunter scored 29; one point withheld for installed-base specificity/no external outcome.
+- Next test: synthetic Clarity workflow with one forced invalid transition and deterministic evidence/replay.
+
+### Illumina/interop — sequencer operational run-metric parser
+- Revision: `015a85ec100c7a770ed0e27ce7fadc6230a38208`.
+- Published rights: PolyForm Strict 1.0.0 publicly; standing separate repository-code commercial permission applies. Illumina services/assets/customer data separate.
+- Capability: official C++ plus Python/C# parsing of InterOp operational metrics across sequencer generations, including quality/error/tile/index/phasing-related run metrics.
+- Targets: sequencing operations evidence profile under CAP-017.
+- Score: **28/30**.
+- Limitation: operational run metrics are not clinical result authority and the proposed wedge does not require sequence reads/PHI.
+- Next test: lawful/public fixture linked to a synthetic Clarity run identity with missing/mismatched metric cases.
+
+### labscript-suite/labscript-suite + labscript-devices — deterministic mixed-hardware experiment control
+- Revisions: core `0ab902d0d8bc681fcd6a3a194d7b0d458c9b5338`; devices `424b9f4b0de931f48fe1b0e5760797f9e5b89ee5`.
+- Published rights: BSD-family as recorded by the hunter; device/vendor dependencies separately governed.
+- Capability: mature deterministic timing/control across heterogeneous experimental hardware with substantial device-plugin knowledge.
+- Targets: scientific bench modernization and provenance stacks.
+- Score: **28/30**.
+- Next test: one rights-clean mixed-device experiment with replay/failure provenance; do not broaden generically without a buyer-installed gap.
+
+### adamleap02/PermitBuild — permit source/version/semantic-QA plane
 - Revision: `ff795137e0c66e62a87e62956fa351926886255d`.
+- Published rights/provenance: as recorded in MASTER/hunter catalog; standing repository-code permission applies, source feeds separately governed.
+- Capability: heterogeneous municipal connectors, canonical permits, append-style versions/diffs, race handling and semantic mapping QA.
+- Targets: PermitPlate / permit-to-development intelligence.
 - Score: **29/30**.
-- Capability: Socrata/ArcGIS/CKAN/Accela-style connectors, canonical permit/property schema, idempotent upserts, immutable versions + field-level diffs and demonstrated semantic source-field QA such as fee-vs-valuation and professional-role/date mapping corrections.
-- Integration: PermitPlate source-of-event/version layer before parcel/buildability/economic enrichment.
-- Safety: reported `.playwright-signup-evidence/` browser-profile-like artifacts were not opened or used; see EXPOSURES_INDEX.
-- Next action: three-jurisdiction held-out completeness/semantic-mapping benchmark.
+- Next test: held-out multi-jurisdiction completeness/version/semantic truth set.
 
-### davidlarrimore/curatore-v2 — acquisition-forecast version/history plane
-- Exact revision: recorded in hunter 42 (`d4e42ac...`).
-- Score: **29/30**.
-- Capability: multi-source planned-buy/acquisition-forecast normalization with rich fields, SHA-256 content/history, first-seen/last-updated/field diffs and source-run success/failed/partial states.
-- Integration: CaptureBrief pre-solicitation signal; forecast must later be linked to actual SAM notice/award evidence rather than treated as procurement fact.
-- Next action: frozen forecast→SAM outcome benchmark and source coverage/failure accounting.
-
-### Gaskony-Ignition/module-plc-emulator — L5K-derived virtual PLC
-- Revision: `518f56b55566d7e20f19ce64003cdae45a08edc8`.
-- Score: **29/30**.
-- Capability: imports customer-authorized Rockwell L5K exports and creates an OPC-UA simulated controller with real tag hierarchy/types/UDT/AOI/arrays/module I/O and configurable behaviors; intended NodeIds can challenge HMI/SCADA bindings before hardware FAT.
-- Rights: Apache-2.0 repository code; Rockwell/Allen-Bradley/Studio 5000/Ignition trademarks, proprietary formats/specifications and third-party test assets remain separate.
-- Next action: synthetic L5K→OPC-UA→Ignition browse/read/write/type-drift regression.
-
-### BroadbandForum USP acceptance/model family
-- `BroadbandForum/usp-test@5d53f5280b2a90ea0040887e62828c7b7369a240` — **29/30**, standards-body TP-469-style acceptance procedures/pass metrics for message/path/access-control/MTP and stateful firmware/certificate/event behavior.
-- `BroadbandForum/usp-data-models@a6c869d4c6e80a3d940c4dc4fbeb9b5c859d233d` — **25/30**, structured model/version/object/parameter/command/event source.
-- `BroadbandForum/cwmp-xml-tools@ea856e227734001695e61135f38071afd67be90d` — **23/30**, archived migration/mapping/conversion tooling.
-- Integration: CWMP/USP model diff -> selected acceptance cases -> independent controller/agent matrix -> readiness evidence.
-- Rights: repository permission does not imply BBF certification, trademark, patent/IPR or wholesale standards redistribution rights.
-- Next action: automate 10–20 highest-value cases while keeping outputs framed as readiness unless official certification rights are verified.
-
-### thermofisherlsms/meth-modifications — official vendor method schema/version component
-- Exact revision: recorded in hunter 20 (`b30bbe1...`).
-- Score: **28/30**.
-- Capability: Thermo method XML/XSD/versioned modification surface useful for authoritative instrument-method interchange and regression.
-- Integration: Lab Automation v5 vendor-control plane beside SLIMS and normalized outputs.
-- Rights: MIT repository code; Thermo runtime/services/trademarks/vendor ecosystem remain separately governed.
-- Next action: dummy/authorized method round-trip with version mismatch and unsupported-field negative cases.
-
-<!-- INTEGRATOR-R11-LATE2-2026-09-20T0042-0400 -->
-## Late-run reusable components — financial integrity and migration
-
-### recurso-dev/recurso — immutable billing-event/ledger boundary
-- Revision: `b071318ff9b349e83daa92e6a5e0c5873664421e`.
-- Score: **29/30**.
-- Rights: Apache-2.0 repository code; tax/nexus data, payment processors and legal authority are separate.
-- Capability: subscriptions, usage/meter/tiered pricing, invoicing, credits, payments/dunning/tax plus immutable double-entry journal; inspected invariant tests cover balanced journals, tenant/project isolation, idempotent posting and duplicate prevention.
-- Integration: operational billing source under Summae's independent GL/close oracle; useful across telecom/utility/SaaS/revenue-assurance products.
-- Next action: synthetic usage→invoice→payment→journal benchmark with duplicate/missing/unbalanced failures and a provider-neutral export schema.
-
-### OPCFoundation/UA-.NETStandard — official .NET OPC UA migration/regression substrate
-- Revision: `37b552254e8da434514c87d8185c1595c03c4063`.
-- Score: **29/30**.
-- Rights: OPC Foundation MIT License 1.00 for repository code. OPC specifications, CTT/certification tooling/marks, separately licensed NodeSets/companion assets and customer code remain separate.
-- Capability: full .NET OPC UA client/server/PubSub/GDS/complex-type implementation with a 1.x→2.0 migration analyzer (26 rules/fixes) and current regression knowledge around transferred-subscription notification recovery, republish, sequence wrap and reconnect/session behavior.
-- Integration: Industrial Virtual Commissioning / Pre-FAT migration lane; falsify upgraded apps against independent S2OPC/open62541/node-opcua endpoints.
-- Next action: fixed migration corpus including subscription transfer/republish, session reactivation, secure-channel renewal, certificate/auth changes and PubSub.
-
-### malon64/floe — trusted ingress/quarantine contract engine
-- Revision: `9a0bbf1f2f4647f5b9304a2ebcff3e79182a1beb`.
-- Score: **28/30**.
-- Rights: MIT; external storage/services and customer/source data remain separate.
-- Capability: Rust/Polars multi-format trusted-layer ingestion with declarative header/schema/row/type/null/PK checks, accepted/rejected quarantine, manifests/JSON reports, PII masking and OpenLineage identities/replay.
-- Integration: place after extraction and before freight/AP/CaptureBrief/ScopeSignal money or evidence decisions so schema/key defects cannot silently enter the authoritative pipeline.
-- Next action: adversarial multi-format benchmark with broken headers/types/nulls/duplicate keys and replayed cloud identities.
-
-<!-- INTEGRATOR-R11-POSTCHECKPOINT-2026-09-20T0056-0400 -->
-## Post-checkpoint reusable components — acceptance, recovery and scheduling
-
-### WRBriska/InvoiceAudit — independent freight golden-oracle pattern
-- Revision: `bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c`.
+### oscal-compass/compliance-to-policy-go — policy result to OSCAL assessment bridge
+- Revision: `45bfc1a8947e8b56b7e11391e13f8c1f2136cfaa`.
+- Published rights: Apache-2.0; OSCAL/NIST and external policy engines separate.
+- Capability: maps heterogeneous policy-engine results into OSCAL observations/findings while preserving non-pass/waived/resource evidence semantics.
+- Targets: Continuous Compliance Evidence Ops and Recovery Proof evidence packaging.
 - Score: **27/30**.
-- Rights: no root public license was visible; under the standing user assertion, repository-owned code is treated as separately commercially authorized. External standards/customer data remain separate.
-- Capability: production freight pricing/audit plus a deliberately separate golden evaluator using hand-derived literal expected dollars and action buckets, reducing circular self-test risk.
-- Integration: blind Freight Audit Acceptance Test; report action accuracy, exact-dollar accuracy and false-recovery dollars separately.
-- Caveat / next action: do not adopt its unknown-accessorial-as-zero behavior. Convert missing contractual basis to REVIEW/$0 and independently rederive the frozen benchmark truth.
+- Next test: pass/fail/error/waive/missing-result corpus; collection failure may never become pass.
 
-### vncwr/backwyn — hosted-Postgres negative-control recovery verifier
-- Revision: `57f4b8afc3d9ce14f2a35febc802536cfa816839`.
-- Score: **27/30**.
-- Rights: MIT; PostgreSQL/Supabase/Neon/object-storage services and customer data remain separately governed.
-- Capability: least-privilege encrypted off-provider backup plus real scratch restore; test corpus rejects corruption, failing verification queries, stale proof, unverified restore and RLS partial-backup conditions.
-- Integration: Recovery Proof adversarial matrix.
-- Next action: add a wrong-but-restorable known-value/content-hash fixture; row parity/queryability alone cannot prove semantic correctness.
+## Strong challengers — test before elevating
 
-### DNYoussef/guardspine-spec — portable evidence interop/falsification contract
-- Revision: `4b21006daa82af52647c5b6e4288d995ccbaf401`.
-- Score: **24/30**.
-- Rights: Apache-2.0 repository material; external standards/integrations/customer evidence remain separate.
-- Capability: canonical JSON evidence bundle with item hashes, ordered chain/root, optional signatures, offline verification, malformed vectors and redaction/sanitization attestation.
-- Integration: portability gate after recovery/compliance evidence producers and before auditor/customer delivery.
-- Next action: differential-test one synthetic signed recovery proof against epack/OpenWright and mutate content/order/chain/root/signature/sanitization count one at a time.
+### amrit-kumar/fintechcore — payment lifecycle / ledger / reconciliation reference
+- Revision: `b27a22890e8b5173d2a97be512a198a4564ed425`.
+- Published rights: no root license found at inspected revision; standing separate repository-code permission applies.
+- Capability: initiate/authorize/capture/refund/reversal, append-only double-entry, idempotency, outbox, signed/replay-deduped webhooks and settlement/reconciliation.
+- Score: **25/30**.
+- Blocker: inspected ADR explicitly says automated unit/integration/E2E tests were deferred.
+- Next test: automated race/refund/reversal/outbox/replay/unknown-result/settlement negatives in EXP-010.
 
-### AbhishekLGowda05/SAGE — ordered-relaxation / feasible-first scheduling reference
-- Revision: `49aee96f0a15e12e7b14b1c97989600f7ab0a146`.
-- Score under standing commercial-permission posture: **28/30 — A4 B4 C5 D5 E5 F5**. Actual public metadata shows no root public license; that is provenance, not a value penalty under the user's separate-permission assertion.
-- Capability: two-phase scheduling solver with pre-solve capacity analysis, deterministic input hash, hard-core versus relaxable/soft constraint classification, ordered automatic relaxation, warm-start optimization and explicit Phase-1 fallback when optimization fails; tests cover deterministic hashing, free periods, relaxation ordering and end-to-end feasibility.
-- Integration: pair with RosterSpec's verification/minimum-disruption repair on a common workforce/field-service fixture.
-- Promotion gate: prove that the relaxation contract transfers beyond school timetabling and that every relaxed rule is minimally sufficient, human-readable and approval-ready. The committed `frontend/.env` remains uninspected and safety-indexed separately.
+### GiovanniGatti/talos — finite-horizon capacity revenue policy engine
+- Revision: `41fae94f941ea36fccddd395e86cd5662002e3cb`.
+- Published rights: MIT.
+- Capability: finite-horizon dynamic-programming/value-policy machinery with uncertainty-averaged price sensitivity and simulation/evaluation.
+- Score: **26/30**.
+- Targets: Revenue Decision Assurance.
+- Next test: reproduce simulation and compare to simple/incumbent policies on frozen inputs; repository-reported synthetic savings are not customer ROI.
 
-<!-- INTEGRATOR-R11-SAAS-REVENUE-2026-09-20T0102-0400 -->
-## SaaS revenue-integrity components — post-checkpoint
+### PyMoDAQ / ophyd-async — flexible scan and facility-control adapters
+- PyMoDAQ core revision: `d996fc9681397f20634d60f903fb70cc4c99a879`; representative Thorlabs plugin `04e95d2a7ba333a3461b4e9a48f1db8e240e937d`.
+- `bluesky/ophyd-async@b400cb1e767ce01ad1d5043f5e254ef90613370c`.
+- Published rights: MIT for PyMoDAQ surfaces recorded by the hunter; BSD-3-Clause for ophyd-async; device/EPICS/Tango/vendor dependencies separate.
+- Capability: detector/actuator scan/log UI and async EPICS CA/PVA/Tango hardware abstraction.
+- Status: strong installed-base components, not standalone MASTER leaders.
+- Next action: only deepen when a specific buyer-installed device/control gap appears.
 
-### geminimir/meterguard — Stripe usage parity / correction substrate
-- Revision: `9147d6fdf9fd8ee8761d732e956fc0a8c86989bd`.
-- Integrator score after source-level recheck: **28/30 — A5 B5 C5 D5 E3 F5**. Hunter score was 29/30; evidence/completeness is reduced one point because the strongest finalization-parity claim is documented/demoed more strongly than it is enforced by the inspected validator/tests.
-- Rights: MIT repository code. Stripe APIs/terms/trademarks and customer usage/billing data remain separately governed.
-- Capability inspected: real reconciler reads local counters and Stripe usage summaries, persists diff reports, raises `investigate`, creates pending corrections/alerts, and tracks parity metrics. ADR defines idempotent delta writes, late-event/watermark handling, rate-limit retry and a 0%-at-finalization target.
-- Important implementation caveat: current `demo/stripe-test-clocks/validate.sh` accepts either absolute zero drift **or** drift within epsilon, so it proves an open-period tolerance check rather than exact finalized-invoice parity. Reconciler correction behavior is also asymmetric: `Stripe > local` can generate suggested local adjustments while `local > Stripe` raises manual review. Both directions need an independent seeded oracle before money claims.
-- Integration: central engine in SaaS Revenue Integrity v1; upstream Mima-style contract/subscription truth, downstream invoice/journal/settlement truth.
-- Promotion gate: independent corpus must prove duplicate/late/replayed events, provider retries, both drift directions and exact final quantity+dollar parity across finalization. Keep out of MASTER until then.
-
-### Mima-N/gitlab_mrr_pipeline_dbt — CRM↔billing contract-state drift layer
-- Revision: `e43562f48a9bf70e58383f453ababd6bbe342f36`.
-- Integrator score under standing repository-code permission: **26/30 — A5 B5 C4 D3 E4 F5**. Actual public repository had no visible root license; provenance remains recorded, but public-license category is not a value penalty under the user's separate permission assertion.
-- Capability: deterministic Salesforce opportunity↔Zuora subscription reconciliation for orphaned won opportunities, start/close-date drift, MRR/term mismatches and active-billing-vs-CRM-churn states with severity/annualized impact.
-- Integration / next action: use only as the upstream cross-system truth layer; independently seed the CRM/billing mismatch matrix and keep synthetic README dollars out of commercial proof.
-
-<!-- INTEGRATOR-R11-LABOR-PAYROLL-2026-09-20T0106-0400 -->
-### WilfredTinega/Upande-TA — biometric actual-time / overtime-to-payroll bridge
-- Revision: `af15de1fb844afd81221829c3be07dba8b5d98df`.
-- Integrator score after source-level recheck: **27/30 — A5 B4 C5 D5 E3 F5**. Hunter score was 28/30; evidence/completeness is reduced because the check-in normalizer deliberately mutates direction with direct DB writes that bypass normal document validation/linked-attendance/duplicate guards, making independent provenance essential.
-- Rights: MIT repository code. ZKTeco hardware/PUSH SDK, Node-RED, ERPNext/Frappe services, customer biometric/time records and labor/payroll policy remain separately governed.
-- Capability inspected: duplicate check-in prevention on normal inserts; shift-aware/overnight grouping and heuristic direction normalization; overtime period/overlap checks; linked submitted `Additional Salary` creation and cancellation for bulk overtime.
-- Important caveat: the overtime override bypasses some native duplicate-date/overtime-type/max-hours checks for bulk-generated slips and trusts precomputed amounts. The formula/policy is not labor-law authority. Repaired check-in direction and precomputed OT amount must be independently approved/validated before payroll-dollar conclusions.
-- Integration: Labor-to-Payroll Assurance v2; RosterSpec planned state -> raw biometric facts -> labeled repair/adjudication -> OT approval -> Additional Salary/payroll -> accounting/payment proof.
-- Promotion gate: pass a synthetic adversarial clock corpus with no false compensable-hours creation and prove expected->actual->approved->paid lineage on an authorized closed period. Keep out of MASTER until then.
-
-<!-- INTEGRATOR-R11-SLA-BENCHMARK-2026-09-20T0109-0400 -->
-### tenurehq/orgforge — deterministic cross-system support/SLA corpus generator
-- Revision: `1da5e4b51e22f4a82db4b003becc9cb42cfec34b`.
-- Score: **23/30 — A3 B3 C4 D4 E4 F5**.
-- Rights: MIT repository code; named SaaS APIs/trademarks and production customer data remain separate.
-- Capability: deterministic enterprise simulation produces linked support/CRM/observability/invoice artifacts; inspected tests cover incident-to-customer linkage, SLA-breach days, exact-threshold no-credit behavior, negative invoice credits and NPS degradation.
-- Integration: synthetic oracle for support/SLA agent/release acceptance before any authorized production pilot.
-- Next action: vendor-neutral 30-case corpus with exact escalation and credit-dollar truth. Keep below MASTER because it is a test-data/evaluation component rather than a high-ACV vertical operating system.
-
-<!-- INTEGRATOR-R11-DECISION-ACTION-2026-09-20T0112-0400 -->
-### frederikgeth/PowerOptLab.jl — uncertainty-aware distribution-grid decision lab
-- Revision: `4f417d470c8bff78bd0941658f97030e5ddb7692`.
-- Score: **27/30 — A3 B5 C5 D5 E4 F5**.
-- Rights: BSD-3-Clause repository code; repo-described data CC BY 4.0; external/customer feeder data and standards remain separate.
-- Capability: four-wire distribution state/parameter estimation, candidate-model screening, scenario/fairness/security-aware dynamic import/export envelopes, multi-period OPF, DER scheduling and closed-loop convergence/stability evidence with substantial tests.
-- Integration: CIMHub model parity -> DREAMS deterministic hosting/QSTS -> PowerOptLab uncertainty/evidence challenge -> inspection/restoration action. Keep as a challenger, not an authority, until it changes a decision or reduces false confidence versus deterministic OPF on the same rights-clean feeder.
-
-### leadcatlab/MWLP-Storm-Repair — weighted-latency storm restoration kernel
-- Revision: `07adc8df235b6c95df7c8a679819a91256d40a7c`.
-- Score: **24/30 — A3 B4 C4 D4 E4 F5**.
-- Rights: MIT; operational outage/customer/road data remain separately governed.
-- Capability: multi-crew repair assignment/sequencing around minimum weighted latency, targeting customer waiting/downtime rather than raw route distance, with graph/simulation/benchmark code and tests.
-- Integration: post-failure action layer after feeder/risk evidence. Require a frozen benchmark against nearest-first and severity-first, including repair-time uncertainty, before treating the method as commercially differentiated.
+## Component promotion rule
+Promote a reusable component here when it closes a difficult cross-stack gap, has source/test evidence stronger than README claims, and changes at least one capability/opportunity/experiment. Commodity infrastructure stays lane-local.
