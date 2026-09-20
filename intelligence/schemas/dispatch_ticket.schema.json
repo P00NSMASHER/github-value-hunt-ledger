@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "V14 Dispatch Ticket",
+  "title": "V15 Dispatch Ticket",
   "type": "object",
   "required": [
     "dispatch_ticket_id",
@@ -90,6 +90,73 @@
     },
     "execution_state_at_generation": {
       "type": "string"
+    },
+    "ticket_schema_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 15
+    },
+    "dispatch_kind": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "primary",
+        "work_steal",
+        null
+      ]
+    },
+    "parent_dispatch_ticket_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "steal_rank": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "issued_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "soft_stale_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "hard_expire_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "eligible_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "issued_commit_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{40}$"
     }
   },
   "additionalProperties": true
