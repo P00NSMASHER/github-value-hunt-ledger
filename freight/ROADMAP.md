@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.4
+## Current checkpoint — v15.5 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -23,11 +23,15 @@ Internal commercialization controls now completed:
 - proof-derived buyer pilot metrics/report template;
 - fixed-fee qualification and analyst-hour budget with success-fee upside excluded;
 - Freight outcome adapter into the global search/outcome learning schema;
+- adaptive v2 domain authorization tied to `freight/GAP_REGISTER.json`, preventing generic capability-gap ranking from reopening blocked Freight search;
+- buyer-cohort commercial calibration with small-sample anti-overfit gates;
 - full synthetic diagnostic→pilot→persistent-settlement→report rehearsal;
 - rights-operability registry;
 - repository workflow hardening and pinned CI.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
+
+Commercial repricing remains locked to the existing priors until direct external evidence reaches the v15.5 calibration threshold: **5 unique buyer cohorts, 5 paid engagements, and margin evidence from 5 unique buyers**. One customer cannot unlock repricing by generating repeated engagements.
 
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
@@ -63,7 +67,7 @@ The global outcome loop now contains one Freight **PARTIAL technical-only** reco
 4. Add a buyer-facing security/data-handling one-pager derived from `RELEASE_AND_SECURITY_GATE.md`.
 5. Execute parser/input negative tests for PDF/XML/EDI/CSV.
 6. Validate tenant/business-unit isolation in whatever data service will hold pilot data.
-7. Keep an explicit list of every manual analyst touch so pilot gross margin can be measured.
+7. Record reviewer hours, invoice count, fixed fee, delivery cost and turnaround in each externally evidenced engagement outcome so buyer-level margin/effort can be calibrated.
 
 ## Next 30 days — prove willingness to pay and one real outcome
 

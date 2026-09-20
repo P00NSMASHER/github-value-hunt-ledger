@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "domains": [
+    {
+      "domain_id": "freight",
+      "experiment_id": "EXP-001",
+      "gate_type": "gap_registry_active_search",
+      "gate_path": "freight/GAP_REGISTER.json",
+      "capability_gap_map": {
+        "CAP-003": [
+          "FRT-AUTH-001",
+          "FRT-FALSIFY-001"
+        ],
+        "CAP-004": [
+          "FRT-FALSIFY-001"
+        ],
+        "CAP-005": [
+          "FRT-FALSIFY-001"
+        ]
+      },
+      "shared_capability_ids": [
+        "CAP-001",
+        "CAP-006",
+        "CAP-007",
+        "CAP-016"
+      ],
+      "reason": "Freight research is deny-by-default. Generic adaptive gap ranking must not authorize Freight discovery unless a mapped Freight gap is explicitly ACTIVE_SEARCH with search_allowed=true."
+    }
+  ]
+}

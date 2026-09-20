@@ -1,13 +1,49 @@
 #!/usr/bin/env python3
 import json, math
 from collections import defaultdict
-from ti_common import INTEL, load_jsonl
+from ti_common import INTEL, ROOT, load_jsonl
 
 runs = [r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective", "benchmark"}]
 outs = load_jsonl("outcomes.jsonl")
 strategies = load_jsonl("search_strategies.jsonl")
 caps = load_jsonl("capabilities.jsonl")
 aliases = json.loads((INTEL / "strategy_aliases.json").read_text(encoding="utf-8")) if (INTEL / "strategy_aliases.json").exists() else {}
+
+domain_policy_path = INTEL / "domain_search_policies.json"
+domain_constraints = []
+blocked_exclusive_capabilities = set()
+if domain_policy_path.exists():
+    domain_config = json.loads(domain_policy_path.read_text(encoding="utf-8"))
+    for domain in domain_config.get("domains", []):
+        if domain.get("gate_type") != "gap_registry_active_search":
+            continue
+        register_path = ROOT / domain["gate_path"]
+        register = json.loads(register_path.read_text(encoding="utf-8"))
+        active_gap_ids = sorted(
+            gap["gap_id"]
+            for gap in register.get("gaps", [])
+            if gap.get("status") == "ACTIVE_SEARCH" and gap.get("search_allowed") is True
+        )
+        active_set = set(active_gap_ids)
+        capability_gap_map = domain.get("capability_gap_map") or {}
+        authorized_capabilities = sorted(
+            cid
+            for cid, gap_ids in capability_gap_map.items()
+            if active_set.intersection(gap_ids)
+        )
+        blocked_capabilities = sorted(set(capability_gap_map) - set(authorized_capabilities))
+        blocked_exclusive_capabilities.update(blocked_capabilities)
+        domain_constraints.append({
+            "domain_id": domain["domain_id"],
+            "experiment_id": domain.get("experiment_id"),
+            "gate_path": domain["gate_path"],
+            "search_authorized": bool(active_gap_ids),
+            "active_search_gap_ids": active_gap_ids,
+            "authorized_exclusive_capability_ids": authorized_capabilities,
+            "blocked_exclusive_capability_ids": blocked_capabilities,
+            "shared_capability_ids": sorted(domain.get("shared_capability_ids") or []),
+            "reason": domain.get("reason"),
+        })
 
 by_id = {s["strategy_id"]: s for s in strategies}
 def parent(sid):
@@ -124,15 +160,21 @@ def gap(c):
         score += 1
     return score
 
-gaps = sorted([
+gap_candidates = [
     {
         "capability_id": c["capability_id"],
         "name": c["name"],
         "gap_score": gap(c),
         "missing_piece": c.get("missing_piece"),
         "run_attention": attention[c["capability_id"]]
-    } for c in caps
-], key=lambda x: (-x["gap_score"], x["capability_id"]))[:10]
+    }
+    for c in caps
+    if c["capability_id"] not in blocked_exclusive_capabilities
+]
+gaps = sorted(
+    gap_candidates,
+    key=lambda x: (-x["gap_score"], x["capability_id"])
+)[:10]
 
 policy = {
     "measured_runs": measured,
@@ -140,11 +182,13 @@ policy = {
     "exploration_budget": exploration_budget,
     "strategy_allocation": rows,
     "priority_capability_gaps": gaps,
+    "domain_constraints": domain_constraints,
     "guardrails": {
         "min_runs_for_exploitation_claim": 5,
         "min_deep_inspections_for_exploitation_claim": 20,
         "never_zero_exploration": True,
-        "recent_runs_not_treated_as_failed_outcomes": True
+        "recent_runs_not_treated_as_failed_outcomes": True,
+        "domain_authorization_precedes_generic_gap_ranking": True
     }
 }
 (INTEL / "search_policy.json").write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
@@ -170,12 +214,29 @@ lines += [
 for x in gaps:
     lines.append(f"| {x['capability_id']} — {x['name']} | {x['gap_score']} | {x['run_attention']} | {x['missing_piece'] or '—'} |")
 lines += [
+    "", "## Domain authorization constraints", "",
+    "| Domain | Experiment | Search authorized | Active search gaps | Suppressed exclusive capability gaps | Shared capability scope |",
+    "|---|---|---|---|---|---|"
+]
+for x in domain_constraints:
+    lines.append(
+        f"| {x['domain_id']} | {x.get('experiment_id') or '—'} | "
+        f"{'yes' if x['search_authorized'] else 'no'} | "
+        f"{', '.join(x['active_search_gap_ids']) or 'none'} | "
+        f"{', '.join(x['blocked_exclusive_capability_ids']) or 'none'} | "
+        f"{', '.join(x['shared_capability_ids']) or 'none'} |"
+    )
+if not domain_constraints:
+    lines.append("| — | — | — | — | — | — |")
+lines += [
     "", "## Allocation guardrails", "",
     "- Never interpret a high allocation as proof that a strategy is better; early allocation includes uncertainty-driven exploration.",
     "- Do not suppress wildcard or novelty search to zero.",
-    "- When a top experiment is blocked on one named evidence gap, that gap can override the generic allocation for a bounded run.",
+    "- Domain authorization overrides generic capability-gap ranking; a blocked domain cannot be reopened by a high adaptive gap score.",
+    "- Shared capabilities may still be searched for another active experiment, but that does not authorize their use for a blocked domain.",
+    "- When a top experiment is blocked on one named evidence gap, that gap can override the generic allocation only through its explicit domain gate.",
     "- Outcome credit is explicit and lag-aware: absence of an outcome is not a failure until an experiment actually resolves.",
     "- When sufficient evidence accumulates, realized customer and engineering outcomes should gradually outweigh retained-repository precision.", ""
 ]
 (INTEL / "SEARCH_POLICY.md").write_text("\n".join(lines), encoding="utf-8")
-print(json.dumps({"measured_runs": measured, "valid_outcomes": len(valid_out), "exploration_budget": exploration_budget}))
+print(json.dumps({"measured_runs": measured, "valid_outcomes": len(valid_out), "exploration_budget": exploration_budget, "domain_constraints": len(domain_constraints)}))

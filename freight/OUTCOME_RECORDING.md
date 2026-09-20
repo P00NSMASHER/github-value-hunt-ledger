@@ -55,3 +55,24 @@ Examples:
 - A paid diagnostic that repeatedly fails readiness for the same data reason should change qualification/data-request strategy before triggering more GitHub hunting.
 
 Commercial reality—not repository novelty—is the target signal.
+
+
+## Commercial evidence vs customer-value evidence
+
+These are separate claims.
+
+**External commercial evidence** can establish:
+- a diagnostic/pilot/annual engagement occurred;
+- fixed fee / recognized Freight revenue;
+- delivery cost;
+- reviewer hours and turnaround;
+- invoice/shipment volume;
+- diagnostic → pilot or pilot → annual conversion.
+
+It requires a unique `engagement_id` and a pseudonymous `buyer_cohort_key`.
+
+**External value evidence** is stricter. It is required before recording positive customer value or realized recovery. A paid engagement alone does not prove savings.
+
+The buyer cohort key should be stable enough to recognize repeat engagements from the same buyer without placing a buyer's legal name in the learning ledger.
+
+Commercial calibration uses only externally evidenced non-synthetic EXP-001 records and collapses repeated engagements to buyer-level medians. See `freight/COMMERCIAL_LEARNING.md`.
