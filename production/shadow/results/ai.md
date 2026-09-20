@@ -187,3 +187,51 @@ VALUE HANDOFF:
 6. NEGATIVE KNOWLEDGE: a sophisticated qualification harness is not the same thing as a qualified production adapter. Always inspect the trusted qualification index/attestation and the runtime advertisement test before crediting live-provider guarantees.
 
 EFFORT: 5 materially distinct discovery/validation modes; 2 deep inspections (`auths-dev/auths-proof`, `temporal-community/agent-memory-and-state`) plus one near-miss architecture review (`pipeshub-ai/loom`); approximately 30 external research calls; 0 reproducible repository test executions, with 1 local clone attempt blocked by sandbox DNS.
+
+## Run 5 — 2026-09-20
+
+HYPOTHESIS: A stronger long-horizon agent runtime should treat **model submission ambiguity** and **external-action ambiguity** as separate durable failure states, and where possible resolve the external-action side against authoritative provider state rather than blindly reissuing the mutation. A serious candidate should also fence ownership, detect tool/configuration drift, and have crash/recovery evidence beyond README claims.
+
+DISCOVERY METHODS: (1) direct search for ambiguous external-effect/provider-reconciliation agent runtimes; (2) code-level search around `SubmittedUnknown`, `OutcomeUnknown`, external effects, durable claims/fences, publications and replay/recovery; (3) provider-side recovery search for GitHub publication/PR reconciliation paths; (4) commit-history archaeology around external-effect invariants and ambiguous publication recovery; (5) comparator search against application-level refund/idempotency implementations. Specialist decomposition: CODE INSPECTOR traced the model-dispatch and external-effect state machines plus PR recovery; RELIABILITY/GOVERNANCE ANALYST inspected ownership, ambiguity, tool drift and live CI evidence; COMMERCIAL ANALYST mapped the semantics to coding/deployment and eventually money-mutating agents; independent RED-TEAM/VERIFIER tried to reduce the result to ordinary retry/idempotency behavior and to identify any unproven exactly-once or provider-qualification claim.
+
+BEST CANDIDATE: `orka-agents/orka`
+CANONICAL URL: https://github.com/orka-agents/orka
+EXACT REVISION: `7cffe130efa74f505d66dce561ade6c18901ba6e`
+EVIDENCE SNAPSHOT: `shadow-ai-20260920-orka-7cffe130`
+VERIFIER VERDICT: PASS_WITH_LIMITS
+PROPOSED SCORE: A3 B5 C5 D5 E5 F4 = 27/30. This is a shadow proposal only, not a MASTER promotion.
+
+CLAIM / EVIDENCE PACKET:
+- IMPLEMENTED: `api/v1alpha1/external_effect_types.go` models external effects as durable first-class state with explicit phases including `Preparing`, `Dispatching`, `Dispatched`, `Succeeded`, `Failed`, and `OutcomeUnknown`. Ambiguous remote outcomes are not silently collapsed into success or failure.
+- IMPLEMENTED + TESTED: `internal/controller/acp_external_effect.go` drives the effect state machine and turns expired/in-flight ambiguity into `OutcomeUnknown` rather than assuming no remote effect occurred. Retryable failures are distinct from ambiguous outcomes; safe retry still depends on stable operation identity plus adapter/provider idempotency semantics.
+- IMPLEMENTED: `internal/controller/harness_v1_dispatcher.go` independently models **model-call submission ambiguity** through a durable `SubmittedUnknown` state. The runtime therefore recognizes that “request may have left this process” is a reliability boundary even before a tool or external action is involved.
+- IMPLEMENTED + TESTED: `internal/controller/acp_publication_recovery.go` and `acp_publication_pr_recovery_test.go` implement a concrete provider-readback pattern for GitHub PR publication. Recovery searches provider-side state and reconciles an ambiguous publication from the observed remote object rather than blindly issuing another create. Committed tests cover existing-PR recovery and duplicate-avoidance behavior.
+- IMPLEMENTED + TESTED: `internal/controller/acp_mcp_broker_tool_drift_test.go` exercises tool/broker drift and demonstrates that changed tool/configuration assumptions can block unsafe continuation instead of inheriting stale execution assumptions. This is strong drift-fencing evidence, though it is not equivalent to a cryptographically signed source-binary qualification artifact.
+- HISTORY: commit archaeology shows the external-effect/publication area was repeatedly hardened rather than added once and forgotten. Follow-up changes tightened terminal-outcome invariants, publication outcome identity, PR reconciliation, ambiguous recovery with corrupted URLs/provider lookup failures, collision handling and scope-error preservation.
+- LIVE OPERATIONAL EVIDENCE: GitHub Actions for the pinned head included a successful `Live GitHub OIDC PR E2E` workflow on 2026-09-20. This is stronger than README-only provider claims and demonstrates a real GitHub publication path at this revision, but it is still CI evidence rather than a signed qualification corpus.
+
+CLAIMS NOT VERIFIED / LIMITS:
+- The strongest provider-backed recovery inspected here is GitHub PR publication. This run did not prove equivalent reconciliation semantics for Stripe, refunds, payouts or arbitrary third-party money APIs.
+- `OutcomeUnknown` is a correct fail-closed state, not a source of truth. If an adapter lacks provider readback/idempotency, the runtime still cannot infer whether a remote mutation committed.
+- Transport-level retry remains safe only to the extent that stable operation identity and the adapter/provider actually provide idempotent semantics. Kubernetes/CRD durability does not create remote exactly-once behavior by itself.
+- The MCP/tool drift evidence is strong operational drift protection but is not a signed semantic-closure attestation like the more ambitious Auths design.
+- I did not find a public non-empty trusted provider-attestation index in this run. The successful live GitHub E2E must not be relabeled as such an attestation.
+- The committed tests and workflow evidence were inspected, not independently rerun locally in this automation turn.
+
+INDEPENDENT RED-TEAM / VERIFIER: PASS_WITH_LIMITS. Orka survives a materially narrower but valuable thesis: it combines two explicit uncertainty boundaries—model submission and external-effect dispatch—with durable external-effect state, concrete provider-side GitHub PR reconciliation, drift-oriented tests, and recent live-provider CI evidence. The strongest objection is scope: the provider reconciliation is specialized, and the repository does not prove universal exactly-once behavior or a signed live-provider qualification system. The commodity objection is that durable workflow engines plus provider idempotency can solve large parts of this problem; Orka's differentiated value is the integrated agent-specific treatment of submission ambiguity, external-effect ambiguity and provider-aware publication recovery. Those caveats prevent an unqualified PASS but do not negate the implemented reliability pattern.
+
+COMMERCIAL WEDGE: **High-Risk Agent Action Qualification for coding/ops agents**. Start with one GitHub PR or deployment mutation: require durable action identity, explicit unknown states, ownership/fencing, tool-drift rejection and provider readback before retry/resolution. Deliver the crash/recovery evidence as the product. The same contract can later be adapted to one financial mutation, but that second step should require a provider-specific authoritative status/readback path rather than assuming the GitHub pattern transfers automatically.
+
+COMPARATOR / NEAR-MISS: `BELCORT-SDN-BHD/FIKIRTIVE@18a36c49daf431b7573d86cd310b195bcc3fa001` contains application-level refund/idempotency/manual-pending behavior, but it does not expose a comparable general runtime with first-class model/effect ambiguity, durable effect state and provider-reconciliation tests. It is useful as evidence that product teams hand-build fragments of this pattern, not as a stronger architecture candidate.
+
+VALUE HANDOFF:
+1. CAPABILITY DELTA: adds a **dual-uncertainty runtime pattern**: model submission can become `SubmittedUnknown`, external mutations can become `OutcomeUnknown`, and selected mutations can be reconciled against provider truth rather than reissued.
+2. GRAPH EDGE: strengthens the previously missing edge from “ambiguous remote action” to “authoritative readback” with a concrete GitHub publication implementation, while also adding a separate model-provider ambiguity edge absent from the earlier candidates.
+3. RADAR SIGNAL: independent agent runtimes are converging on explicit uncertainty states, effect identity, fenced ownership and provider readback. The emerging unit is not “exactly once”; it is **evidence-backed ambiguity resolution per external action family**.
+4. EXPERIMENT IMPACT: a practical first qualification experiment can use GitHub PR publication because Orka already supplies the ambiguous-publication/recovery seam and live E2E path. Acceptance should then mutate tool/configuration identity and verify that stale assumptions fail closed.
+5. COMMERCIAL IMPACT: enterprise coding/ops agents become a nearer-term buyer than money APIs for this exact implementation. A bounded PR/deployment-action qualification can demonstrate avoided duplicate mutations and faster ambiguous-outcome recovery before adapting the architecture to finance.
+6. NEGATIVE KNOWLEDGE: live CI success is not a trusted qualification artifact; provider reconciliation is action-specific; durable UNKNOWN states are only valuable when the system can later obtain authoritative evidence or deliberately require human resolution.
+
+EFFORT: 5 materially different discovery/validation modes; 2 serious implementation paths inspected (`orka-agents/orka` and the FIKIRTIVE comparator); source, tests, schema/state definitions, commit history and live CI were checked; 0 fresh local test executions. A broader public search for non-empty provider attestations produced no verified candidate and later hit transient GitHub code-search rate limits.
+
+NEXT HIGHEST-VALUE QUESTION: Can we find a public implementation with a **non-empty, independently verifiable live-provider qualification artifact** where source/configuration drift provably withdraws a production route for a money-mutating action?
