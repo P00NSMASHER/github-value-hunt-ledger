@@ -1,0 +1,20 @@
+{
+  "outcome_id": "OUT:20260920:shortid",
+  "date": "2026-09-20",
+  "experiment_id": "EXP-000",
+  "opportunity": null,
+  "result": "PARTIAL",
+  "origin_search_ids": [],
+  "contributing_capability_ids": [],
+  "contributing_repositories": [],
+  "revenue_usd": null,
+  "customer_value_usd": null,
+  "engineering_days_saved_low": null,
+  "engineering_days_saved_high": null,
+  "technical_result": null,
+  "commercial_result": null,
+  "unexpected_failure_modes": [],
+  "search_policy_consequence": null,
+  "evidence_location": "path-or-link-to-evidence",
+  "notes": null
+}
