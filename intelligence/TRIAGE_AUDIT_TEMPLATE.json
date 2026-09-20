@@ -1,0 +1,17 @@
+{
+  "audit_id": "AUDIT:<timestamp>:<short-id>",
+  "search_run_id": "RUN:<originating-run>",
+  "strategy_id": "STRAT:<strategy>",
+  "strategy_version_id": null,
+  "repository": "owner/repo",
+  "revision": null,
+  "prefilter_reason_standard": "duplicate_or_dominated",
+  "prefilter_reason_detail": "Why this candidate would normally have been excluded before deep inspection.",
+  "sampling_method": "random",
+  "sample_probability": 0.1,
+  "post_inspection_status": "rejected",
+  "false_negative_level": "none",
+  "capability_ids": [],
+  "evidence_path": "path/to/holdout-audit.md",
+  "notes": null
+}
