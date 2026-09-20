@@ -1,5 +1,17 @@
 # Production Upgrade Status — 2026-09-20
 
+## Freight product boundary
+
+The `production/` directory is the production-design work for the **GitHub research/hunter system**, not proof that Freight Recovery is already deployed as a multi-tenant enterprise runtime.
+
+Freight Recovery's current committed commercial control plane lives under `freight/`:
+- `BUSINESS_MODEL.md` — ICP, pricing and expansion sequence;
+- `PILOT_PROTOCOL.md` — buyer-owned blind pilot and settlement-readback rules;
+- `COMPONENT_RIGHTS_REGISTRY.json` — exact component/revision/rights diligence state;
+- `RELEASE_AND_SECURITY_GATE.md` — P0/P1 pilot and annual-assurance controls.
+
+Current Freight Recovery state is **commercially specified / externally blocked for proof**: EXP-001 still requires a customer-authorized frozen population and actual settlement evidence. Do not describe the research-agent control-plane architecture below as already-deployed Freight Recovery infrastructure.
+
 ## Implemented now
 - Reference architecture committed: production/ARCHITECTURE.md.
 - Typed role and authority contracts committed: production/ROLE_CONTRACTS.md.
