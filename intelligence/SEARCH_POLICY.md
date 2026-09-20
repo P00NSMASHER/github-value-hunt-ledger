@@ -11,18 +11,18 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 
 | Strategy | Allocation | Runs | Inspected | Evidence |
 |---|---:|---:|---:|---|
-| STRAT:authority-origin-invariant-set-consistency | 9.5% | 0 | 0 | insufficient |
-| STRAT:cross-source-emergence-triangulation | 9.5% | 0 | 0 | insufficient |
-| STRAT:decision-claim-runtime-side-effect-trace | 9.5% | 0 | 0 | insufficient |
-| STRAT:ingestion-invariant-triad-intersection | 9.5% | 0 | 0 | insufficient |
-| STRAT:paper-research-artifact-production-descendant | 9.5% | 0 | 0 | insufficient |
-| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 9.5% | 0 | 0 | insufficient |
-| STRAT:rule-period-authority-version-audit | 9.5% | 0 | 0 | insufficient |
-| STRAT:fail-open-boundary-archaeology | 7.2% | 1 | 4 | insufficient |
-| STRAT:capability-conjunction-search-claim-tracing | 7.0% | 2 | 6 | insufficient |
-| STRAT:evaluation-target-independence | 6.8% | 2 | 4 | insufficient |
-| STRAT:acceptance-path-transition-inspection | 6.5% | 2 | 4 | insufficient |
-| STRAT:first-party-production-source-triangulation | 6.3% | 2 | 7 | insufficient |
+| STRAT:capability-conjunction-search-claim-tracing | 16.1% | 2 | 6 | insufficient |
+| STRAT:first-party-production-source-triangulation | 15.6% | 2 | 7 | insufficient |
+| STRAT:fail-open-boundary-archaeology | 11.4% | 1 | 4 | insufficient |
+| STRAT:evaluation-target-independence | 11.2% | 2 | 4 | insufficient |
+| STRAT:acceptance-path-transition-inspection | 10.7% | 2 | 4 | insufficient |
+| STRAT:authority-origin-invariant-set-consistency | 5.0% | 0 | 0 | insufficient |
+| STRAT:cross-source-emergence-triangulation | 5.0% | 0 | 0 | insufficient |
+| STRAT:decision-claim-runtime-side-effect-trace | 5.0% | 0 | 0 | insufficient |
+| STRAT:ingestion-invariant-triad-intersection | 5.0% | 0 | 0 | insufficient |
+| STRAT:paper-research-artifact-production-descendant | 5.0% | 0 | 0 | insufficient |
+| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 5.0% | 0 | 0 | insufficient |
+| STRAT:rule-period-authority-version-audit | 5.0% | 0 | 0 | insufficient |
 
 ## Highest-information capability gaps
 

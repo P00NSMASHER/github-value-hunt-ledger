@@ -14,9 +14,8 @@
   "status_counts": {
     "unknown": 155,
     "watch": 462,
-    "strong": 432,
+    "strong": 637,
     "rejected": 390,
-    "master": 205,
     "quarantined": 36
   }
 }

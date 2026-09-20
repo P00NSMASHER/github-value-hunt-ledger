@@ -14,8 +14,8 @@ Generated directly from the hunter Markdown corpus; no monolithic registry file 
 
 | Bucket | Repo/revision records |
 |---|---:|
-| master | 205 |
-| strong | 432 |
+| master | 0 |
+| strong | 637 |
 | watch | 462 |
 | rejected | 390 |
 | quarantined | 36 |
@@ -25,7 +25,7 @@ Generated directly from the hunter Markdown corpus; no monolithic registry file 
 
 | Repository | Revision | Observations | Catalogs | Dispositions |
 |---|---|---:|---:|---|
-| GSA/open-gsa-redesign | 494b1312e9c6436474840befe6e1964da15932b3 | 7 | 2 | master, unknown |
+| GSA/open-gsa-redesign | 494b1312e9c6436474840befe6e1964da15932b3 | 7 | 2 | strong, unknown |
 | Beveren-Software-Inc/Field_Service_Management | ab6d56d1069882326475f256d09cc63236eddec1 | 3 | 3 | strong, watch |
 | ahmadpiran/restoredrill | 4afc9e8864688a6151c25e8d6cc5370332feecad | 3 | 2 | strong, watch |
 | danieltamas/fortified | c677ef30f750e1cc0b761dd9eed3bab2b40d18f4 | 3 | 3 | strong |
@@ -41,7 +41,7 @@ Generated directly from the hunter Markdown corpus; no monolithic registry file 
 | Grantg2002/Construction-Contract-Management | f9909099440b9dc7ff1b9ad6050c9a30f192a871 | 2 | 2 | rejected, unknown |
 | Hussain0327/freight-settlement-infrastructure | 37337ad219bc1e0b361f32b83d577bcb257379ca | 2 | 2 | rejected |
 | LostCat-Qian/secs4js | 41bee2cad158bd881ef12c181f85684be6dced67 | 2 | 1 | unknown |
-| MassingCloud/massing-pdf | 36794b3c54fcfd62e3a0d2d5984cfc45cac83340 | 2 | 2 | master, strong |
+| MassingCloud/massing-pdf | 36794b3c54fcfd62e3a0d2d5984cfc45cac83340 | 2 | 2 | strong |
 | MuhDur/invoicekit | 8a9e8d74e23ab97742d56d1dfabe77a9330ec61e | 2 | 2 | strong, watch |
 | ND3404/construction-change-order-rfi-analytics | 93522c5b59738d7147e7a50a8c7052b8537d210f | 2 | 2 | watch |
 | Nandanhegde1/govai-contracts | d419e9f42bf7fae6fc465800b431eceffaec6148 | 2 | 1 | strong, unknown |
