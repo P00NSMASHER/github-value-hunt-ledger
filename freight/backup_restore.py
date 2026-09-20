@@ -199,7 +199,14 @@ def run_backup_restore_drill(
         "settlement_restore_sha256":_file_hash(settlement_restore),
     }
     return BackupRestoreResult(
-        **body,
+        buyer_id=body["buyer_id"],
+        business_unit=body["business_unit"],
+        source_semantic_hash=body["source_semantic_hash"],
+        restored_semantic_hash=body["restored_semantic_hash"],
+        audit_backup_sha256=body["audit_backup_sha256"],
+        settlement_backup_sha256=body["settlement_backup_sha256"],
+        audit_restore_sha256=body["audit_restore_sha256"],
+        settlement_restore_sha256=body["settlement_restore_sha256"],
         proof_hash=canonical_hash(body),
     )
 
