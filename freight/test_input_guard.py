@@ -99,6 +99,23 @@ def test_csv_cells_per_row_limit_fails_closed():
     assert "csv_cells_per_row_limit_exceeded" in result.reasons
 
 
+def test_csv_wide_row_is_rejected_before_csv_reader(monkeypatch):
+    def parser_should_not_run(*args, **kwargs):
+        raise AssertionError("csv.reader should not receive a row beyond the preflight cell bound")
+
+    monkeypatch.setattr("freight.input_guard.csv.reader", parser_should_not_run)
+    policy = IngestPolicy(max_csv_cells_per_row=3)
+    result = inspect_input("invoice.csv", b"a,b,c,d\n", policy)
+    assert result.status is InputStatus.REJECT
+    assert "csv_cells_per_row_limit_exceeded" in result.reasons
+
+
+def test_csv_shape_preflight_respects_quoted_commas_and_newlines():
+    policy = IngestPolicy(max_csv_cells_per_row=2, max_csv_rows=1)
+    result = inspect_input("invoice.csv", b'"a,b\nc",d\n', policy)
+    assert result.status is InputStatus.ACCEPT
+
+
 def test_csv_logical_row_limit_fails_closed():
     policy = IngestPolicy(max_csv_rows=2)
     result = inspect_input("invoice.csv", b"a,b\n1,2\n3,4\n", policy)
