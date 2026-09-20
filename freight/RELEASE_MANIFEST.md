@@ -1,24 +1,24 @@
-# Freight Recovery v15.11 — Canonical Release Manifest
+# Freight Recovery v15.12 — Canonical Release Manifest
 
-Release checkpoint: **v15.11-pilot-charter-scope-freeze-2026-09-20**
+Release checkpoint: **v15.12-pilot-amendment-change-control-2026-09-20**
 
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Canonical v15.11 product merge commit: `86a58b689df2d1a4288cd165c5494d76c9b928c5`
-- Pilot Charter pull request: **#53**
-- v15.11 tested branch head: `6212b95d06847109cedebdf1611e77fbd62bef33`
-- Earlier Freight lineage retained from v15–v15.10.
-- Repository `main` may continue to advance independently as hunters/integrators commit; the merge commit above is the canonical v15.11 product checkpoint.
+- Canonical v15.12 product merge commit: `541e67eee55a897efc52cdd51b5e4699b07ad987`
+- Pilot Amendment pull request: **#57**
+- v15.12 tested branch head: `2ab2e2cd80a0657df17310aa40c3cd4b59b327c6`
+- Earlier Freight lineage retained from v15–v15.11.
+- This checkpoint is rebased conceptually onto later repository work by branching from current `main`; unrelated hunter/integrator changes are preserved.
 
 ## Verified CI checkpoints
 
-### Freight Commercial Contracts — v15.11
-- Tested branch run: `35540586715`
+### Freight Commercial Contracts — v15.12
+- PR #57 final run: `35544056352`
 - Result: **success**
 - Verified test counts:
   - hunter/model contracts: **18 passed**
-  - Freight contracts: **213 passed**
+  - Freight contracts: **222 passed**
 - Successful post-test gates included:
   - controlled-pilot rights + rights-evidence gates;
   - deployment-security evidence validation;
@@ -27,8 +27,9 @@ Release checkpoint: **v15.11-pilot-charter-scope-freeze-2026-09-20**
   - current Netlify customer-data route remains **BLOCKED**;
   - deterministic Pilot Launch Brief generation;
   - deterministic buyer-safe Pilot Activation Packet generation;
-  - deterministic **PRELAUNCH_ACCEPTED** Pilot Charter generation with `customer_data_authorized=false`;
-  - `external_action_authorized=false` preserved by the Charter;
+  - deterministic prelaunch Pilot Charter generation;
+  - accepted Pilot Amendment generation with `kickoff_suspended=true`;
+  - amendment output preserves `customer_data_authorized=false` and `external_action_authorized=false` until replacement;
   - separate-environment evidence remains **CONDITIONAL** until verified;
   - full synthetic commercial rehearsal;
   - deterministic release provenance + component inventory;
@@ -69,6 +70,8 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/pilot_activation_packet.py`
 - `freight/PILOT_CHARTER.md`
 - `freight/pilot_charter.py`
+- `freight/PILOT_AMENDMENT.md`
+- `freight/pilot_amendment.py`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
@@ -265,9 +268,45 @@ The Charter never authorizes carrier/vendor contact, disputes or money-moving ac
 
 Current Netlify route behavior is therefore fail-closed: the CI fixture produces `PRELAUNCH_ACCEPTED`, not kickoff authorization.
 
+## Pilot Amendment change control
+
+v15.12 makes an accepted Pilot Charter immutable for operating purposes.
+
+A requested change creates a separate deterministic Pilot Amendment tied to the
+base `charter_hash`. The original Charter is never edited in place.
+
+Change classes are fail-closed:
+
+- **population/date/carrier/mode change** — requires readiness revalidation,
+  launch revalidation, a new Activation Packet, fresh acknowledgments and a
+  replacement Charter;
+- **fixed-fee change inside the published price band** — requires a replacement
+  Charter and re-acknowledgment;
+- **fixed-fee change outside the published price band** — requires a new
+  commercial Activation Packet / published price band plus a replacement
+  Charter;
+- **operating-role change** — requires a replacement Charter and
+  re-acknowledgment, but does not by itself reopen readiness/launch;
+- **buyer or business-unit change** — is a new engagement, not an amendment.
+
+Amendment states:
+1. `PENDING_ACKNOWLEDGMENT`;
+2. `ACCEPTED_REPLACEMENT_REQUIRED`;
+3. `SUPERSEDED_BY_REPLACEMENT`.
+
+Once an amendment is accepted, the changed-scope kickoff is suspended until a
+replacement Charter validates the approved change. A replacement Charter may
+not silently change unapproved frozen fields.
+
+Material or out-of-band changes cannot reuse the old Activation Packet.
+
+The amendment layer never authorizes carrier/vendor contact, disputes or
+money-moving action. `external_action_authorized` remains false and separate
+buyer approval is still required.
+
 ## Commercial state
 
-Freight Recovery v15.11 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, buyer-handoff-ready through a deterministic activation packet, and protected against sales-to-delivery scope drift through a machine-checkable Pilot Charter; EXP-001 remains externally unproven**.
+Freight Recovery v15.12 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, buyer-handoff-ready through a deterministic activation packet, scope-frozen through a machine-checkable Pilot Charter, and protected against post-Charter scope drift through fail-closed Pilot Amendment control; EXP-001 remains externally unproven**.
 
 Structured external Freight evidence remains:
 - directly evidenced Freight revenue: **$0**
@@ -275,7 +314,7 @@ Structured external Freight evidence remains:
 - paid diagnostic/pilot/annual conversion: **none recorded**
 - Freight `ACTIVE_SEARCH` gaps: **0**
 
-No v15.11 internal engineering result changes those external facts.
+No v15.12 internal engineering result changes those external facts.
 
 ## Current internal proof boundary
 
