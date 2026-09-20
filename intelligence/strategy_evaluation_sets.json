@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "sets": [
+    {
+      "evaluation_set_id": "EVAL:authority-currentness",
+      "name": "Authority and currentness",
+      "task_ids": [
+        "09",
+        "10",
+        "11",
+        "49",
+        "50"
+      ],
+      "strategy_ids": [
+        "STRAT:first-party-production-source-triangulation",
+        "STRAT:rule-period-authority-version-audit",
+        "STRAT:authority-origin-invariant-set-consistency"
+      ],
+      "rationale": "Same frozen authority/currentness tasks can distinguish first-party lineage, rule-period auditing and origin-consistency methods."
+    },
+    {
+      "evaluation_set_id": "EVAL:verification-boundaries",
+      "name": "Verification and fail-open boundaries",
+      "task_ids": [
+        "12",
+        "44",
+        "45",
+        "46",
+        "47",
+        "48"
+      ],
+      "strategy_ids": [
+        "STRAT:fail-open-boundary-archaeology",
+        "STRAT:acceptance-path-transition-inspection",
+        "STRAT:evaluation-target-independence"
+      ],
+      "rationale": "Matched reject/verification tasks test whether strategies catch false-green trust transitions without simply rejecting everything."
+    },
+    {
+      "evaluation_set_id": "EVAL:operational-conjunctions",
+      "name": "Operational capability conjunctions",
+      "task_ids": [
+        "16",
+        "17",
+        "20",
+        "21",
+        "22",
+        "41",
+        "42"
+      ],
+      "strategy_ids": [
+        "STRAT:capability-conjunction-search-claim-tracing",
+        "STRAT:decision-claim-runtime-side-effect-trace",
+        "STRAT:evaluation-target-independence"
+      ],
+      "rationale": "These tasks require several implementation invariants to coexist and expose whether the claimed decision path reaches runtime truth."
+    },
+    {
+      "evaluation_set_id": "EVAL:ingestion-protocol",
+      "name": "Ingestion and protocol durability",
+      "task_ids": [
+        "37",
+        "38",
+        "39",
+        "40",
+        "41",
+        "42"
+      ],
+      "strategy_ids": [
+        "STRAT:ingestion-invariant-triad-intersection",
+        "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+        "STRAT:first-party-production-source-triangulation"
+      ],
+      "rationale": "Shared tasks compare source-history-run-truth reasoning with protocol/version defect archaeology."
+    },
+    {
+      "evaluation_set_id": "EVAL:agent-lineage-governance",
+      "name": "Agent lineage and governance",
+      "task_ids": [
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "34"
+      ],
+      "strategy_ids": [
+        "STRAT:paper-research-artifact-production-descendant",
+        "STRAT:cross-source-emergence-triangulation",
+        "STRAT:acceptance-path-transition-inspection"
+      ],
+      "rationale": "Agent tasks reveal whether lineage/emergence methods find hardened descendants and whether acceptance tracing correctly bounds autonomy claims."
+    }
+  ]
+}
