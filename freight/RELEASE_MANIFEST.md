@@ -1,185 +1,191 @@
-# Freight Recovery v15.7 — Canonical Release Manifest
+# Freight Recovery v15.8 — Canonical Release Manifest
 
-Release checkpoint: **v15.7-lifecycle-audit-sbom-attestation-2026-09-20**
+Release checkpoint: **v15.8-governance-diligence-2026-09-20**
 
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Freight v15.7 merge commit: `a6a1ad18ab95fb8706dc4297f2355f7dc8d2cdb5`
-- v15 commercialization PR: **#7**
-- v15.1 machine-gates PR: **#8**
-- v15.2 readiness/gap-control PR: **#10**
-- v15.3 proof-derived reporting PR: **#11**
-- v15.4 commercial-ops/outcome-learning PR: **#12**
-- v15.5 adaptive-authorization/commercial-learning PR: **#17**
-- v15.6 pilot-security/provenance PR: **#20**
-- v15.7 lifecycle/audit/SBOM/attestation PR: **#22**
-- Note: repository `main` continues to advance independently as hunters/integrators commit. The Freight merge commit above is the canonical v15.7 code checkpoint.
+- Canonical v15.8 governance/diligence merge commit: `361061b380d98a69b34f362d4cfd9c4f526ccba2`
+- Governance/diligence pull request: **#29**
+- Earlier Freight lineage retained from v15–v15.7.
+- Repository `main` may continue to advance independently as hunters/integrators commit; the Freight merge commit above is the canonical v15.8 control checkpoint.
 
-## Verified CI checkpoint
+## Verified CI checkpoints
 
 ### Freight Commercial Contracts
-- v15.7 PR-head run: `35525286692`
+- PR #29 final run: `35528127691`
 - Result: **success**
-- Hunter/model contracts: **success**
-- Freight commercial proof contracts: **success**
-- Controlled-pilot rights gate: **success**
-- Canonical Freight gap gate: **success**
-- Ready-pilot diagnostic fixture: **success**
-- Full synthetic commercial rehearsal: **success**
-- Deterministic release provenance generation + verification: **success**
-- Component inventory generation: **success**
-- Deterministic CycloneDX SBOM generation + verification: **success**
-- Unsigned DSSE attestation generation + verification: **success**
+- Final Freight suite included **141 tests** after the rights-evidence edge-case correction, plus:
+  - controlled-pilot rights gate;
+  - controlled-pilot rights-evidence gate;
+  - canonical Freight gap gate;
+  - Data Readiness fixture;
+  - full synthetic commercial rehearsal;
+  - deterministic release provenance generation/verification;
+  - component inventory generation;
+  - deterministic CycloneDX SBOM generation/verification;
+  - unsigned DSSE attestation generation/verification;
+  - deterministic diligence ZIP generation/verification.
 
-## New v15.7 diligence controls
+### Technology Intelligence System
+- PR #29 final run: `35528127720`
+- Result: **success**
+- Pull-request execution ran the **read-only validate job only**.
+- All registry, provenance-debt, query-family, graph, data-quality, candidate-learning, outcome-attribution, objective, report, adaptive-policy, measurement-plan/campaign, surface-yield and validation steps passed.
+- The write-capable persistence job did not run on the pull request.
 
-### CENSUS / SCOPE / PROOF data lifecycle
+## Research-model supply-chain state
 
-`freight/data_lifecycle.py` applies the reusable recovery-proof pattern:
+The Technology Intelligence workflow now:
+- pins `actions/checkout` to `11d5960a326750d5838078e36cf38b85af677262`;
+- pins `actions/setup-python` to `a26af69be951a213d495a4c3e4e4022e16d87065`;
+- grants `contents:read` to normal validation;
+- grants `contents:write` only to a separate main-only persistence job after validation;
+- uses workflow concurrency and explicit timeouts;
+- refreshes main with `git pull --ff-only` before generated-state persistence;
+- remains covered by Freight release provenance and CI regression tests.
 
-- **CENSUS** — the machine-checkable pilot data-room manifest defines the source objects under management.
-- **SCOPE** — retention days define when each source becomes due for deletion.
-- **PROOF** — only explicit external deletion confirmation can create `DELETE_CONFIRMED`.
+This reduces the chance that the research system's own supply chain or token scope silently weakens Freight's evidence model.
 
-Lifecycle states:
-- `PRESENT`
-- `DELETE_REQUESTED`
-- `DELETE_UNKNOWN`
-- `DELETE_CONFIRMED`
+## Current Freight control plane
 
-A timeout, disappearance or failed read never proves deletion. Ambiguous deletion stays `DELETE_UNKNOWN`.
+### Commercial / proof
+- `freight/BUSINESS_MODEL.md`
+- `freight/COMMERCIAL_QUALIFICATION.md`
+- `freight/COMMERCIAL_LEARNING.md`
+- `freight/DATA_READINESS_DIAGNOSTIC.md`
+- `freight/PILOT_PROTOCOL.md`
+- `freight/PILOT_DATA_ROOM.md`
+- `freight/PILOT_REPORT_TEMPLATE.md`
+- `freight/contracts.py`
+- `freight/settlement_store.py`
+- `freight/pilot_package.py`
+- `freight/pilot_reporting.py`
 
-### Source-observation receipts
+### Data / audit / recovery evidence
+- `freight/data_lifecycle.py`
+- `freight/audit_ledger.py`
+- `freight/audit_store.py`
+- `freight/backup_restore.py`
+- `freight/PERSISTENT_AUDIT_AND_BACKUP.md`
 
-Source observations distinguish:
-- `PRESENT`
-- `VERIFIED_EMPTY`
-- `UNAVAILABLE`
+### Release / diligence
+- `freight/release_provenance.py`
+- `freight/sbom.py`
+- `freight/release_attestation.py`
+- `freight/diligence_bundle.py`
+- `freight/BUYER_DILIGENCE_BUNDLE.md`
+- `freight/RELEASE_AND_SECURITY_GATE.md`
 
-`VERIFIED_EMPTY` requires completeness evidence. This prevents a failed/partial settlement, document or authority source read from becoming a false “nothing happened” conclusion.
+### Rights evidence
+- `freight/COMPONENT_RIGHTS_REGISTRY.json`
+- `freight/RIGHTS_EVIDENCE_MANIFEST.json`
+- `freight/rights_evidence.py`
+- `freight/RIGHTS_DILIGENCE.md`
 
-### Scope-bound append-only audit evidence
+### Incident response
+- `freight/incident_response.py`
+- `freight/INCIDENT_RESPONSE.md`
+- `freight/INCIDENT_TABLETOP_TEMPLATE.md`
 
-`freight/audit_ledger.py` provides:
-- buyer/business-unit scope;
-- monotonic sequence;
-- previous-record hash;
-- event hash;
-- timezone-aware event timestamp;
-- optional SHA-256 evidence reference;
-- mutation/reorder detection.
+### Research authorization / learning
+- `freight/GAP_REGISTER.json`
+- `freight/gap_registry.py`
+- `freight/outcome_adapter.py`
+- `intelligence/domain_search_policies.json`
 
-This is an **application-level tamper-evidence chain** over the supplied record set. It is not an external trusted timestamp or immutable external log-service claim.
+## Rights state
 
-### CycloneDX-shaped SBOM
+The repository now prevents separately licensed rights from being promoted to resolved hosted/SaaS/assignment/sublicensing/change-of-control claims without:
+1. a controlled diligence-room evidence reference;
+2. `ATTACHED_VERIFIED` status; and
+3. a lowercase SHA-256 for the executed evidence object.
 
-`freight/sbom.py` deterministically emits a CycloneDX 1.6-shaped document covering:
-- exact repository/revision components in `COMPONENT_RIGHTS_REGISTRY.json`;
-- direct pinned Python CI dependencies in `production/requirements-ci.txt`.
+Current evidence state:
+- **Trenova:** user-asserted separate commercial license for the pinned revision remains recorded; executed permission evidence is **NOT_ATTACHED** in this repository; hosted/SaaS/assignment/sublicensing/change-of-control remain unresolved.
+- **Opstrax:** user-asserted separate commercial permission for the pinned revision remains recorded; executed permission evidence is **NOT_ATTACHED** in this repository; hosted/SaaS/assignment/sublicensing/change-of-control remain unresolved.
+- Permissive public-license components such as MIT/Apache-2.0 do not become artificially dependent on separately asserted evidence when the public license independently supplies the relevant code-use permission.
 
-The document self-checks:
-- unique component references;
-- content digest;
-- deterministic UUID serial.
+The pilot evidence gate passes with explicit warnings for missing executed evidence; the annual-diligence gate intentionally remains blocked while required scope is unresolved.
 
-Coverage is explicitly **partial**. It does not claim every transitive runtime/OS/cloud/API/data/model/deployment dependency.
+This is an operational consistency control, not a legal opinion.
 
-### in-toto / DSSE-shaped release attestation
+## Incident-response state
 
-`freight/release_attestation.py` creates:
-- an in-toto Statement v1-shaped payload;
-- subjects for deterministic Freight control provenance and the SBOM;
-- an unsigned DSSE envelope with `signatures: []`.
+The repository now contains a fail-closed incident decision model and runbook:
+- OPEN / CONTAINED / RECOVERED / CLOSED states;
+- UNKNOWN / NO_EVIDENCE / SUSPECTED / CONFIRMED exposure states;
+- containment required before contained/recovered/closed status;
+- verified recovery required before recovered/closed status;
+- CLOSED cannot leave exposure UNKNOWN;
+- SEV1/SEV2 closure requires preserved SHA-256 evidence references;
+- any external notification requires explicit human authorization and a recorded basis;
+- incident/customer secrets and privileged forensic detail must not enter the technology-intelligence learning ledger.
 
-The repository verifier rejects non-empty/fake signatures. This deliberately prevents repository-generated evidence from masquerading as externally signed provenance.
+This is **not** proof of a deployed SOC/IR program, staffed on-call rotation, buyer-specific notification procedure or completed tabletop against the production environment.
 
-A future deployment may submit the deterministic payload to an approved external signing identity/key and preserve the signer/verifier evidence separately.
+## Commercial state
 
-### Expanded deterministic provenance
-
-`freight/release_provenance.py` now hashes the broader Freight control plane, including:
-- audit ledger;
-- commercial-learning controls;
-- scoped proof contracts;
-- data lifecycle;
-- deal economics;
-- gap authorization;
-- input guard;
-- outcome adapter;
-- pilot package/reporting;
-- readiness;
-- release attestation/gate/provenance;
-- SBOM generator;
-- settlement store;
-- synthetic rehearsal;
-- rights/gap/domain-policy files;
-- pinned CI dependencies and Freight CI workflow.
-
-## Current commercial / learning state
-
-Freight Recovery v15.7 is **commercially specified, machine-gated, internally rehearsed, scope-bound, lifecycle-aware, application-audit-chain capable, pre-parser hardened and reproducibly supply-chain documented; EXP-001 remains externally unproven**.
+Freight Recovery v15.8 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, audit/backup reference-hardened, deterministic-diligence packaged, rights-evidence gated, incident-response documented and research-CI supply-chain hardened; EXP-001 remains externally unproven**.
 
 Structured external Freight evidence remains:
 - directly evidenced Freight revenue: **$0**
 - directly evidenced Freight customer value: **$0**
 - paid diagnostic/pilot/annual conversion: **none recorded**
-- Freight ACTIVE_SEARCH gaps: **0**
+- Freight `ACTIVE_SEARCH` gaps: **0**
 
-No v15.7 internal diligence improvement changes those external facts.
+No v15.8 internal engineering result changes those external facts.
 
-## Current claim boundary
+## Current internal proof boundary
 
-The repository now demonstrates internally:
-- buyer/BU/shipment scope-bound proof;
-- sealed-incumbent blind protocol;
-- source/data-room package manifests;
-- fail-closed pre-parser input checks;
-- explicit deletion/unknown/confirmed lifecycle semantics;
-- present/verified-empty/unavailable source receipts;
-- application-level audit hash chaining;
-- deterministic control/component provenance;
-- deterministic partial CycloneDX 1.6-shaped SBOM;
-- deterministic unsigned in-toto/DSSE-shaped payload.
+The repository now demonstrates:
+- buyer/BU/shipment scoped proof objects;
+- blind population/truth/incumbent sequencing;
+- fail-closed REVIEW/$0 semantics;
+- persistent exact-cents settlement allocation and reversal handling;
+- deterministic buyer reporting;
+- fail-closed pre-parser guards;
+- source/lifecycle observation semantics;
+- application-level tamper-evident audit chains;
+- immutable-trigger SQLite reference audit persistence;
+- semantic audit+settlement backup/restore verification;
+- deterministic release provenance;
+- pinned component inventory;
+- partial CycloneDX 1.6-shaped SBOM;
+- unsigned DSSE/in-toto-shaped attestation payload;
+- deterministic zero-customer-data diligence ZIP;
+- rights-evidence promotion controls;
+- documented incident-response closure/notification rules;
+- pinned/least-privilege Technology Intelligence validation workflow.
 
-It still does **not** prove:
-- real storage-provider deletion execution;
-- externally trusted time;
-- deployed persistent audit-store access control/immutability/alerting;
-- deployed shared database/object-store/API tenant isolation;
-- production parser CPU/memory/time/network sandboxing;
-- buyer-specific encryption configuration;
-- external signing identity or valid signature;
-- complete transitive deployment SBOM;
-- backup/restore operations for the deployed service;
-- incident-response operating evidence;
-- SOC 2 / ISO 27001 or other certification.
+## Remaining external / deployment blockers
 
-## Remaining high-value blockers
-
-1. first authorized real buyer population and later settlement;
-2. executed Trenova/Opstrax hosted/SaaS/change-of-control rights where unresolved;
-3. deployment-specific customer data-service cross-tenant isolation;
-4. production parser sandbox/resource/network controls;
-5. real storage-provider deletion receipts and persistent audit-store controls;
-6. external signing/trusted timestamp and complete deployment SBOM if required;
-7. backup/restore, logging/alerting and incident-response evidence for annual assurance.
+1. first authorized real buyer population through actual later settlement;
+2. actual executed Trenova/Opstrax permission documents attached/verified in the controlled diligence room and required scope resolved;
+3. production DB/object-store/API cross-tenant authorization evidence;
+4. production parser sandbox / CPU-memory-time-network isolation evidence;
+5. deployed audit-store service authorization + external immutability/WORM/alerting if required;
+6. external signing identity/trusted timestamp and any buyer-required full transitive deployment SBOM;
+7. deployed backup scheduling/retention/geographic redundancy with measured RPO/RTO;
+8. buyer-specific security questionnaire, encryption/configuration and retention terms;
+9. deployed incident contact tree/on-call/alerting plus completed tabletop or production incident exercise evidence;
+10. any external certification/attestation a buyer requires.
 
 ## Engineering / search freeze
 
 Do not cut another Freight version for repository novelty alone.
 
-Reopen internal Freight work only for:
-- a paying-customer/EXP-001 named gap;
-- deployment/security diligence;
-- rights diligence;
-- a reproduced money-bearing disagreement;
-- a measured reviewer bottleneck whose automation preserves the false-dollar ceiling.
+Reopen Freight research or engineering only through:
+- an explicitly activated mapped Freight search gap;
+- an EXP-001/paying-customer named capability failure;
+- a security or rights diligence blocker;
+- a reproduced independent money-bearing disagreement;
+- a measured reviewer bottleneck that can be reduced without increasing false-dollar risk.
 
-The global adaptive search model cannot override the Freight domain gate.
+The global adaptive policy cannot override the Freight domain gate.
 
 ## Next canonical milestone
 
-**Externally evidenced paid diagnostic/pilot → authorized scoped data room → frozen population + sealed incumbent → buyer-owned truth → challenger-only validated finding or defensible clean result → buyer-approved action → issued credit/refund/remittance → unambiguous settlement → lifecycle/audit receipts → externally evidenced outcome → annual assurance conversion.**
+**Paid diagnostic/pilot → externally evidenced engagement outcome → frozen real population → challenger-only validated finding or defensible clean result → buyer-approved action → issued credit/refund/remittance → unambiguous realized settlement → buyer-cohort learning record → annual assurance conversion.**
 
-That external chain remains the primary path to materially increasing Freight Recovery's defensible value.
+That external chain remains more valuable than additional unsponsored Freight architecture.
