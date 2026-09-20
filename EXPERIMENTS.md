@@ -52,16 +52,17 @@ The purpose of this file is to stop the system from becoming a museum of interes
 - Decision unlocked: whether AP becomes a second direct-money wedge.
 - Next action: assemble common corpus from current structured-invoice, identity and accounting components.
 
-### EXP-003 — Commission plan-to-payout acceptance test
+### EXP-003 — Commission plan-to-settlement acceptance test
 - Opportunity: Partner / Commission Payout Assurance.
-- Capabilities: CAP-002, 006, 007, 016.
+- Capabilities: CAP-002, 006, 007, 016, 018.
 - Status: **READY**.
-- Hypothesis: frozen plan/assignment/CRM/payment truth can independently detect under/overpayment, stale-plan attribution, reversals and carry-forward errors.
-- Inputs: 40-case synthetic closed month spanning tiers, splits, plan changes, refunds, cancellations, holds, partial payouts and carry-forward.
-- Success criteria: deterministic expected payout and settlement classification across all planted cases; ambiguous credit ownership stays unresolved.
-- Failure criteria: retroactivity/refund/partial settlement semantics cannot be reproduced.
-- Decision unlocked: whether commission assurance is as commercially attractive as freight/AP.
-- Next action: normalize current commission components into one shared case schema.
+- Hypothesis: frozen plan/assignment/source-payment truth plus an explicit provider-settlement state machine can independently detect entitlement errors without creating duplicate payout risk when provider results are ambiguous.
+- Inputs: a synthetic closed month spanning tiers, splits, plan changes, writing/direct vs override compensation, staffing/compliance holds, hierarchy changes, lending sequence/slab cases, refunds/cancellations, clawbacks, minimum/carry-forward, partial payouts, definite provider refusal, timeout/unknown result, duplicate retry/callback, confirmed payout, final FX-settled amount/currency, reversal-after-payout and concurrent sweep races.
+- Procedure: freeze plan/assignment/source-credit authority -> calculate independent entitlement -> apply hold/reversal/carry-forward rules -> create one payout intent/claim -> inject provider outcome -> reconcile final settlement -> compare expected entitlement, intended payout and actual settled amount/currency as separate states.
+- Success criteria: deterministic expected payout across all supported cases; ambiguous credit ownership remains unresolved; an ambiguous provider result remains claimed/pending and is **not** automatically retried; only a definite refusal releases the claim for retry; retries/callbacks/concurrent sweeps cannot duplicate money; confirmed provider send and final settlement remain distinct; final amount/currency and reversal lineage reconcile exactly.
+- Failure criteria: retroactivity/refund/carry-forward semantics cannot be reproduced; unknown provider outcomes release the claim or trigger duplicate send; “sent” is treated as “settled”; provider status overrides entitlement authority; or settlement discrepancies are silently absorbed.
+- Decision unlocked: whether commission assurance has a sufficiently complete entitlement-to-cash proof chain to compete with freight/AP as a direct-money business.
+- Next action: normalize OpenPartner, Spree and the membership/staffing/lending/hierarchy adapters into one vendor-neutral case schema and run the full synthetic outcome matrix before seeking a customer period.
 
 ### EXP-004 — Recovery Proof adversarial matrix
 - Opportunity: Recovery Proof SLA.
