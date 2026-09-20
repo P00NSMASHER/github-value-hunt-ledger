@@ -201,7 +201,7 @@ def main()->None:
     launch_decision=json.loads(Path(args.launch_decision_json).read_text(encoding="utf-8"))
     packet=build_packet(readiness_input,launch_decision)
     if args.format=="json":
-        print(json.dumps(asdict(packet),indent=2))
+        print(json.dumps(asdict(packet),indent=2,ensure_ascii=False))
     else:
         print(render_markdown(packet))
 
