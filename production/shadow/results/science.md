@@ -523,3 +523,118 @@ New negative lesson: orchestration durability and executor recovery are frequent
 - source/test/schema/history traversals: ~22;
 - external GitHub/web reads/searches: ~30;
 - reproducible untrusted-repository code executions: 0 (source/test/history inspection only).
+
+## 2026-09-20 — Shadow Science Run 6
+
+### Hypothesis
+A cross-domain physical-AI/robotics runtime that durably records a REAL action before/through physical execution and, after process restart, seals an interrupted action as **outcome unknown** while blocking ordinary redispatch can provide the missing persistence half of the scientific physical-effect ledger. The hypothesis fails if the recovery state is session-local, if restart silently retries the physical action, or if no stable action identity survives the crash. A stronger “physical exactly-once” claim additionally requires authoritative device reconciliation of the original effect.
+
+### Discovery modes
+1. **Direct invariant search:** searched public robotics/scientific-control repositories for `outcome unknown`, `needs reconciliation`, `recovery required`, command IDs, post-restart gates and authoritative readback semantics.
+2. **Scientific/national-lab workflow comparison:** inspected Bluesky QueueServer persistence/recovery as a control showing that durable work queues and stable UIDs alone do not prove physical-effect closure.
+3. **Protocol/ecosystem adjacency:** compared SiLA/LabThings-style action APIs and cross-domain physical-AI runtimes for a durable action ledger plus ambiguous-effect state rather than another in-process action manager.
+4. **History archaeology:** traced ROSClaw's durable rosclawd control ledger back to its introduction commit and inspected the current release/CI lineage.
+
+Deep inspection was limited to `ros-claw/rosclaw` as the candidate, `bluesky/bluesky-queueserver` as the durable-orchestration comparator, and `labthings/labthings-fastapi` as an action-API comparator. No untrusted repository code was executed.
+
+### Best candidate
+**ros-claw/rosclaw — durable REAL-action uncertainty ledger/recovery gate**  
+Canonical URL: https://github.com/ros-claw/rosclaw  
+Exact revision: `027c66d907a82432be1b0ce7a0e3e8bbd33ff773`  
+Revision date: 2026-09-17  
+Release state at pinned revision: `1.3.0 Internal Alpha`  
+Public license: MIT  
+Evidence snapshot id: `shadow-science-20260920-rosclaw-027c66d`
+
+### Frozen evidence manifest
+- pinned commit `027c66d907a82432be1b0ce7a0e3e8bbd33ff773`; its signed release commit points to tree `104fc0d0f5a62776f5393c8d1fd523328a9c5928`;
+- `src/rosclaw/daemon/service.py` blob `fa4ad8e62c547c348116d5dadb4f1bd904cc682a`;
+- `src/rosclaw/daemon/ledger.py` blob `4de3f00c8de02cfe1e3a066724c6a206c2e747ea`;
+- `src/rosclaw/kernel/contracts.py` blob `de3fdae0f7637a908fbc65c1772bbc0a54477caa`;
+- `src/rosclaw/integrations/lerobot/execution/executor.py` blob `6fdb06c915e841176c87f2fab4ec1c956e00df94`;
+- `tests/daemon/test_server.py` blob `beed5468a85e72b87d748fa3a847e888153e1960`;
+- `tests/daemon/test_ledger.py` blob `a2ee135cd4c23c5f14c57d44e7472ce34b4299d7`;
+- `.github/workflows/ci.yml` blob `cea3c62933470b7cded0c590a598d803f0736531`;
+- `docs/SAFETY.md` blob `5b7ac5a8f47855859dae5e39975ae4989eea5faf`;
+- `LICENSE` blob `0ec040c949060bfcf7067eff8a6e9244e5640967`;
+- history commit `0db0d79ca08c2ff382e43e98fd1097880712c39c` — `feat(runtime): persist rosclawd control ledger`;
+- main-branch protection at inspection required broad unit/regression/integration/product/ROS deployment checks; the checked release commit itself exposed no combined-status records through the connector, so CI configuration is VERIFIED while that exact commit's green-run status remains UNKNOWN.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced `ActionEnvelope.action_id` through daemon job persistence, ledger reconstruction, restart terminalization, recovery gating, execution receipts and LeRobot command-delivery/feedback state.
+- **SYSTEMS/SCIENCE VALIDATOR:** evaluated whether the pattern transfers to autonomous scientific executors; compared against Bluesky's durable orchestration and LabThings' action API to isolate the physical-effect-specific invariant.
+- **ECOSYSTEM ANALYST:** separated generic ROS/action correlation from durable daemon-owned physical uncertainty state and inspected the fail-closed safety contract around REAL work.
+- **COMMERCIAL ANALYST:** mapped the primitive to duplicate-effect/sample-loss/recovery risk in laboratory automation rather than positioning ROSClaw itself as a lab product.
+- **RED-TEAM / VERIFIER:** independently challenged durability, automatic replay, device-native identity, authoritative readback, hardware validation and release maturity before the score was assigned.
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED**
+- `DaemonLedger` is an append-only SQLite event ledger with stable `entity_id`, a contiguous event sequence, HMAC-linked events, an independently signed head anchor, `PRAGMA synchronous=FULL`, atomic anchor writes and startup verification that fails closed on rollback, broken MAC chain or external mutation.
+- The daemon restores persisted action jobs from that ledger at construction. Startup then scans unfinished `QUEUED`/`RUNNING` jobs instead of forgetting them across process death.
+- When a persisted job was `RUNNING` and its `ExecutionMode` was `REAL`, restart does **not** replay it. Source assigns error code `DAEMON_RESTART_OUTCOME_UNKNOWN` with the explicit statement that the physical outcome is unknown, requests E-Stop, and requires operator review. `tests/daemon/test_server.py` asserts the unknown-outcome terminal state and E-Stop latch, including repeated-restart behavior.
+- Runtime status exposes `recovery.required`, `recovery.action_ids` and `recovery.real_action_ids`; the safety/architecture docs require review before new REAL work after an unclean restart. This means unresolved physical uncertainty itself survives process loss as durable daemon state.
+- The action contract is versioned around a stable `action_id`, and execution receipts separate scheduler/final state from error codes and evidence/trust state.
+- The LeRobot single-step executor sends at most one command per step, distinguishes `PROTOCOL_ACKNOWLEDGED`, `DELIVERY_INFERRED`, `REJECTED` and `UNCERTAIN`, and verifies returned position/force/current/temperature/status feedback before declaring completion. Communication loss after dispatch is therefore not collapsed into “never sent.”
+- Emergency-stop semantics likewise separate dispatch, driver acknowledgement and `physical_stop_observed`; tests include states where a stop was dispatched/acknowledged but not physically observed rather than calling it verified.
+- CI configuration runs daemon/kernel tests across Python 3.11–3.13 plus a full regression suite and black-box/product boundaries. Branch protection enumerates those checks as required on `main`.
+- Public code is MIT licensed.
+
+**CLAIMED / PARTIAL / UNKNOWN**
+- ROSClaw documentation presents the system as a broader Physical AI/robotics safety runtime. This shadow result relies only on the durable action/recovery kernel, not the broader product claims.
+- The repository contains real-system/ROS acceptance artifacts, but this run did not independently reproduce a robot-in-the-loop crash exactly in the write-before-ack window.
+- No inspected universal record durably maps every ROSClaw `action_id` to a vendor-native command/execution ID that remains queryable after both daemon and device-server restart.
+- Recovery acknowledgement is an operator/safety gate. It does **not** generically re-query the original device and prove whether the interrupted action physically occurred.
+- LeRobot feedback verification and E-Stop physical observation are strong operation-specific readback patterns, not a universal post-crash reconciliation engine for arbitrary REAL actions.
+- The pinned release is explicitly Internal Alpha; field maturity and deployment evidence are materially weaker than the source/test breadth.
+
+### Comparator / negative evidence
+- `bluesky/bluesky-queueserver@f65224d73733039a15ca17185178bfb366b68ece` has mature Redis-backed persistent queue/history state, stable item UIDs and restart recovery. It is a useful scientific-orchestration comparator, but no inspected path in this run supplied ROSClaw's specific invariant of reconstructing an interrupted physical effect as durable `OUTCOME_UNKNOWN` and blocking blind replay until review.
+- `labthings/labthings-fastapi@c33924d4d01027d2a29a020d3d7178da3c56fdff` provides a useful scientific-instrument action API/manager, but the inspected action-management pattern was process/thread oriented; no equivalent durable cross-process physical-uncertainty ledger was established here. This is negative evidence against equating an observable action API with crash-safe effect identity.
+
+### Independent RED-TEAM / VERIFIER pass
+Verifier input excluded the proposed score and used only the frozen source/test/schema/history packet above.
+
+**Verdict: PASS_WITH_LIMITS for a durable physical-uncertainty persistence kernel; FAIL for a complete physical exactly-once/reconciliation system.**
+
+Proof obligations and verdicts:
+1. **Does process restart reconstruct the same durable action/effect record? — PASS.** The ledger and action IDs survive restart and unfinished jobs are restored.
+2. **Does an ambiguous in-flight REAL action avoid automatic redispatch? — PASS.** The restart path terminalizes it as `DAEMON_RESTART_OUTCOME_UNKNOWN` instead of retrying it.
+3. **Does the system fail closed after ambiguity? — PASS.** E-Stop is requested and recovery state gates further REAL work pending review.
+4. **Is the persistent record tamper/rollback aware? — PASS_WITH_LIMITS.** HMAC chaining and a signed head anchor detect ordinary mutation/rollback, while the project's own safety documentation correctly notes that a privileged/root state owner remains outside that threat boundary.
+5. **Can the system authoritatively resolve whether the original physical command happened? — FAIL GENERICALLY.** Some executors verify feedback and E-Stop has physical observation, but the recovery path itself does not universally query a device/system-of-record for the interrupted command's final effect.
+6. **Is there a durable action→native-command join for every hardware path? — NOT ESTABLISHED.** Stable ROSClaw action identity is strong, but provider/device-specific execution identity is not proven as a generic persisted contract.
+7. **Is production maturity established? — NO.** The release is Internal Alpha and no real-hardware crash-window reproduction was run in this shadow pass.
+
+Strongest objection: the candidate solves the **“do not forget uncertainty and do not blindly retry”** problem, but not the harder **“prove what the device actually did and close the uncertainty automatically”** problem. Calling it physical exactly-once would be an overclaim.
+
+### Proposed score
+A) speed to first revenue: **4/5** — the kernel can be adapted into a focused integrity/recovery audit without replacing a lab's optimizer or LIMS.  
+B) customer value / ceiling: **5/5** — blind redispatch after uncertain physical effects can duplicate samples, moves, dispenses or robot actions and cause expensive recovery/downtime.  
+C) build/domain compression: **5/5** — durable event ledger, action identity, restart reconstruction, permits, recovery gates, receipt/evidence semantics and a large safety regression corpus compress substantial systems work.  
+D) rarity/advantage: **5/5** — preserving `OUTCOME_UNKNOWN` across process death and blocking replay is a rarer public invariant than ordinary action IDs or job queues.  
+E) evidence/completeness: **4/5** — unusually strong source/schema/tests/history/CI configuration, but no independent hardware crash-window execution and no generic authoritative reconciliation.
+F) rights/operability: **3/5** — MIT code is clear, but the project is Internal Alpha and scientific deployments would require adapter work plus separate robot/vendor/protocol diligence.  
+**Total: 26/30 — STRONG_COMPONENT inside shadow; no central promotion is made.**
+
+### Commercial / research implication
+The transferable product is a **Physical Effect Uncertainty Gateway / Autonomous-Lab Recovery Control Plane**. Persist one business-effect/action record before dispatch; if process death occurs after a command may have reached hardware, restart into `SENT_OUTCOME_UNKNOWN`, block replay/new conflicting work, then require a device-specific reconciliation adapter to query native command history, sensors or the system-of-record before transitioning to `SUCCEEDED`, `FAILED_NO_EFFECT` or `NEEDS_HUMAN_RECONCILIATION`. The immediate paid wedge is a fault-injection/recovery audit for automated labs and workcells: enumerate each physically mutating operation, crash between write and acknowledgement, and score whether identity, uncertainty, readback and retry policy remain joinable after restart.
+
+### Search lesson outcome
+LOCAL-2 receives a **third independent implementation-family success**, now from a cross-domain robotics runtime rather than another laboratory connector. This strengthens the transferable pattern while sharpening the caveat: the valuable persistence invariant is not “exactly once”; it is **durably remember that an external effect may have happened, prevent blind replay, and make reconciliation an explicit state transition**. Keep the lesson STAGED-eligible locally; do not edit global `SEARCH_SKILLS.md` from the shadow lane.
+
+New negative lesson: a durable action ledger and a fail-closed `OUTCOME_UNKNOWN` state are still only half of physical effect closure. The next discriminator is whether the same durable effect record carries a native device execution ID or enough authoritative readback coordinates to resolve the original action without reissuing it.
+
+### VALUE HANDOFF
+1. **Capability delta:** adds a concrete cross-process pattern for preserving physical-action uncertainty and preventing automatic replay after daemon death; stronger than session-local recovery flags.
+2. **Graph edge:** conceptually fills the persistence gap between BO-MCP/MADSci durable orchestration and PyLabRobot/OpenTrons executor-local recovery; authoritative device reconciliation remains the missing edge. No central graph file was edited.
+3. **Radar signal:** a third independent implementation family supports an emerging **physical-effect integrity** layer that spans robotics and scientific automation rather than belonging only to one lab framework.
+4. **Experiment impact:** the next falsifiable test can require the exact same durable business-effect ID to survive a crash after device write, then demand native readback before any retry is permitted.
+5. **Commercial impact:** strengthens the audit wedge into a concrete reliability product with measurable ambiguous-effect count, blind-replay exposure, recovery MTTR, unresolved-effect age and duplicate-physical-action KPIs.
+6. **Negative knowledge:** never equate `OUTCOME_UNKNOWN + block replay` with physical exactly-once; without authoritative device reconciliation, uncertainty is safely preserved but not resolved.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate/comparator inspections: 3;
+- source/test/schema/history traversals: ~24;
+- external GitHub reads/searches: ~35;
+- untrusted-repository code executions: 0.
