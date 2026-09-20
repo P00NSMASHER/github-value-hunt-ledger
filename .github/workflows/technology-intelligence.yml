@@ -80,6 +80,12 @@ jobs:
         run: python tools/ti_saturation.py
       - name: Validate V7 saturation neighborhoods
         run: python tools/ti_saturation_validate.py
+      - name: Build V8 repository profile registry
+        run: python tools/ti_profiles.py
+      - name: Measure V8 blind-spot exploration coverage
+        run: python tools/ti_coverage.py
+      - name: Validate V8 exploration coverage
+        run: python tools/ti_coverage_validate.py
       - name: Compile ranked next-hunt search seeds
         run: python tools/ti_seed_compiler.py
       - name: Validate V5 search seeds and seed attribution
@@ -144,6 +150,12 @@ jobs:
         run: python tools/ti_saturation.py
       - name: Validate V7 saturation neighborhoods
         run: python tools/ti_saturation_validate.py
+      - name: Build V8 repository profile registry
+        run: python tools/ti_profiles.py
+      - name: Measure V8 blind-spot exploration coverage
+        run: python tools/ti_coverage.py
+      - name: Validate V8 exploration coverage
+        run: python tools/ti_coverage_validate.py
       - name: Compile ranked next-hunt search seeds
         run: python tools/ti_seed_compiler.py
       - name: Validate V5 search seeds and seed attribution
@@ -207,7 +219,13 @@ jobs:
                   intelligence/redirect_queue.jsonl \
                   intelligence/SATURATION_REPORT.md \
                   intelligence/REDIRECT_QUEUE.md \
-                  intelligence/saturation_metrics.json
+                  intelligence/saturation_metrics.json \
+                  intelligence/repository_profiles.jsonl \
+                  intelligence/coverage_targets.jsonl \
+                  intelligence/exploration_gap_queue.jsonl \
+                  intelligence/COVERAGE_REPORT.md \
+                  intelligence/EXPLORATION_GAPS.md \
+                  intelligence/coverage_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
