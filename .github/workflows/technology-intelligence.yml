@@ -108,6 +108,10 @@ jobs:
         run: python tools/ti_allocator.py
       - name: Validate V9 unified hunt allocation
         run: python tools/ti_allocator_validate.py
+      - name: Build V11 hunt execution state
+        run: python tools/ti_execution.py
+      - name: Validate V11 hunt execution control plane
+        run: python tools/ti_execution_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -186,6 +190,10 @@ jobs:
         run: python tools/ti_allocator.py
       - name: Validate V9 unified hunt allocation
         run: python tools/ti_allocator_validate.py
+      - name: Build V11 hunt execution state
+        run: python tools/ti_execution.py
+      - name: Validate V11 hunt execution control plane
+        run: python tools/ti_execution_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -253,7 +261,12 @@ jobs:
                   intelligence/allocator_attribution_debt.jsonl \
                   intelligence/ALLOCATOR_LEARNING_REPORT.md \
                   intelligence/ALLOCATOR_WORK_KIND_REPORT.md \
-                  intelligence/allocator_learning_metrics.json
+                  intelligence/allocator_learning_metrics.json \
+                  intelligence/execution_state.jsonl \
+                  intelligence/execution_claim_history.jsonl \
+                  intelligence/EXECUTION_BOARD.md \
+                  intelligence/EXECUTION_DEBT.md \
+                  intelligence/execution_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
