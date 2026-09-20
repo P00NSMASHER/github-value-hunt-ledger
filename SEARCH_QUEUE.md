@@ -20,7 +20,7 @@ Integrator-owned search and validation direction. Updated 2026-09-20. **Experime
 
 **Do next:** clear the structured separate-environment launch gate, then obtain one explicitly authorized frozen buyer population and carry it through controlling authority -> independent expected charge -> blind incumbent comparison -> adjudication -> issued adjustment -> independently observed settlement -> unique allocation -> later reversal if any.
 
-**Engineering prerequisite:** close the known CSV pre-parser seam with explicit field/cell/row bounds, streaming parsing and typed `REJECT` for parser errors; later repeat hostile-input tests inside the real parser sandbox. This is `ACTIVE_INTERNAL`, not a search trigger.
+**Engineering checkpoint:** the known CSV pre-parser seam is now materially hardened in `freight/input_guard.py`: explicit field/row/cells-per-row/total-cell bounds, streaming logical-row inspection, non-materializing physical-line inspection and typed `csv_parse_error` rejection were added, followed by adversarial tests for each bound. Treat this as **IMPLEMENTED + TEST-CODE PRESENT**, not external validation: no exact-commit CI status was available at integration time. Next internal step is execute the hostile-input suite in the real parser sandbox/CI and preserve the evidence receipt. This is not a search trigger.
 
 **Stop:** generic freight audit/TMS/OCR/rating/EDI/reconciliation hunting. Resume external search only if the buyer population exposes one named capability/connector gap.
 
@@ -34,13 +34,17 @@ Build `ReceiptAuthorityPolicy` + CAP-019 source receipts + exact line-level quan
 **Stop:** generic OCR/RPA/three-way-match/anomaly tools until the corpus exposes a missing semantic.
 
 ## 3. Partner / Commission Payout Assurance — P0/P1 / EXP-003
-**Bottleneck:** event-time entitlement + exact provider/bank counter-event + finality.
+**Bottleneck:** independent late-return observation after a payout already reached the success state.
 
-Use EruoFood as historical-payable/UNKNOWN/re-open reference, Modern Treasury + ACHInterbank for independent bank/return mapping, and Layr-Labs as external payout/transfer counter-event comparator.
+`Practitionist/familiarise_web@020975116ef438fa6269e12abb52de6ad9299781` is now the strongest single-system reference for the middle of the chain: payment-time effective rate authority -> persisted earning/share -> one-use payout claim -> provider `COMPLETED` -> externally delivered `payout.reversed` -> exact provider-payout lookup -> compensating journal -> PAID earning reopened to READY -> future rebatch from the original stored earning rather than current policy. This materially joins the prior EruoFood historical-authority and payout-reversal patterns.
 
-**Highest-value search/test:** prove a late externally observed return/reversal maps to the exact prior payout, reopens/offsets the original obligation, and any re-payment uses the original immutable earning/rate rather than current policy.
+The remaining gap is observation redundancy/finality: Familiarise's ordinary poller covers PENDING/PROCESSING, so a permanently lost post-COMPLETED reversal webhook is not independently rediscovered. Keep Modern Treasury + ACHInterbank as bank/return mapping comparators and Layr-Labs as an external provider counter-event comparator.
 
-**Stop:** commission calculators, payout wrappers and fuzzy statement matchers.
+**Highest-value search/test:** change the rate after earning creation, complete the payout, observe a later reversal, require exact same earning to reopen, ignore duplicate reversal, and prove re-payment equals the original earning amount. Then suppress the reversal webhook entirely and require an independent provider/bank readback to discover the same late return and drive the same idempotent reopen.
+
+**Negative oracle:** any reversal path whose predicate selects only SCHEDULED/PENDING/`payout_pending` after the success path has moved the obligation to PAID/COMPLETED cannot implement revocable finality.
+
+**Stop:** commission calculators, payout wrappers and fuzzy statement matchers. Search only post-success return observation/correlation, independent finality or a concrete failed fixture.
 
 ## 4. ScopeSignal / Construction — P0/P1 / EXP-005
 **Bottleneck:** independently approved measurement -> exact commercial line -> one-time bill consumption -> independent cash.
@@ -90,15 +94,16 @@ Use `auths-dev/auths-proof@34fa1f33...` only as a transfer oracle for the altern
 Search only authoritative versioned jurisdiction/policy rules, precedence, limitations/fault effective periods and closed-claim settlement evidence. Missing/conflicting/superseded authority = REVIEW / $0. Stop generic claims AI/demand-letter tooling.
 
 ## 9. Money-State Integrity / Payments — P1 / EXP-010
-**Bottleneck:** intersection of fault-boundary proof and economic terminality in one executable path.
+**Bottleneck:** intersection of fault-boundary proof, revocable finality and economic terminality in one executable path.
 
-Keep two axes separate:
+Keep three axes separate:
 - Fault axis: response suppression -> process death/restart -> same-effect/no duplicate.
 - Economic axis: provider object -> provider final state -> provider accounting application -> payout/balance -> independent bank/processor observation.
+- Revocation axis: previously successful economic effect -> later externally observed return/reversal -> compensating entry -> original obligation reopened under original authority -> safe re-close.
 
-Interlock strongly covers crash+provider-accounting application; effect-broker covers general crash/reconciliation; Flames-up covers provider payout terminality; Paymob covers provider ambiguity/refund child evidence. None alone proves the full intersection.
+Interlock strongly covers crash+provider-accounting application; effect-broker covers general crash/reconciliation; Familiarise now covers event-time authority + post-success provider reversal + reopened original earning; Flames-up covers provider payout terminality; Paymob covers provider ambiguity/refund child evidence. None alone proves the full intersection with independent bank observation.
 
-**Do next:** one path with post-effect process death -> new-process same-effect recovery -> no duplicate -> provider terminal success -> independent processor/bank finality or later return.
+**Do next:** one path with post-effect process death -> new-process same-effect recovery -> no duplicate -> provider terminal success -> provider/accounting application -> later post-success return -> original obligation reopened without re-pricing -> independent processor/bank finality/readback. Suppress the webhook in one case to test whether long-tail independent observation can discover the counter-event.
 
 ## 10. Revenue Decision Assurance — P1/P2
 Search only held-out replay adapters, real capacity/censoring/no-show/cancellation state, incumbent decision logs and realized revenue/load outcomes. Decision score, evaluator and buyer outcome remain separate. Stop recommendation-only analytics and model-valued ROI.
