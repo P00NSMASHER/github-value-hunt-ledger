@@ -146,3 +146,9 @@ Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, basic fuzzy 
 - Use `WilfredTinega/Upande-TA@af15de1fb844afd81221829c3be07dba8b5d98df` as the current biometric installed-base adapter, but treat its direct-DB direction repair as **inference requiring review/corroboration**, not source truth. Build a synthetic adversarial corpus around duplicate/lost scans, overnight shifts, trailing IN/all-OUT, remaps and OT overlap/cancellation; measure false compensable-hour and false payroll-dollar creation.
 - Search next only for authoritative time-clock event provenance, manager exception approval/receipt, payroll-provider posted/paid evidence and current customer/labor-policy authority. Stop generic attendance/payroll CRUD and generic biometric integrations unless they add an independently verifiable device-event or settlement invariant.
 - Keep Upande at COMPONENT/combination level despite clearing 24; promote only if the repair/adjudication layer proves no false-money behavior and one authorized closed-period trace reaches paid payroll.
+
+<!-- INTEGRATOR-R11-SLA-BENCHMARK-2026-09-20T0109-0400 -->
+## Support/SLA acceptance refinement from Hunter 37
+- `tenurehq/orgforge@1da5e4b51e22f4a82db4b003becc9cb42cfec34b` is sufficient as the current synthetic support/SLA-credit oracle. Build below/at/above-threshold and multi-customer cases and compare agent/runtime output against exact expected escalation + credit dollars.
+- Stop generic FSM/helpdesk discovery. Search only for authoritative SLA/contract versioning, actual customer-impact attribution, credit issuance/settlement evidence or a runtime failure mode the current support stack cannot falsify.
+- `azaharizaman/nexus-field-service@2394bc7bcd8a42390c57732361ab4de4b9fbc713` remains rejected: advertised test breadth is a pending test plan, not passing evidence, and it adds no rare entitlement/proof/payment invariant.

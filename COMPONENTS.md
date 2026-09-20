@@ -311,3 +311,12 @@ For each entry record:
 - Important caveat: the overtime override bypasses some native duplicate-date/overtime-type/max-hours checks for bulk-generated slips and trusts precomputed amounts. The formula/policy is not labor-law authority. Repaired check-in direction and precomputed OT amount must be independently approved/validated before payroll-dollar conclusions.
 - Integration: Labor-to-Payroll Assurance v2; RosterSpec planned state -> raw biometric facts -> labeled repair/adjudication -> OT approval -> Additional Salary/payroll -> accounting/payment proof.
 - Promotion gate: pass a synthetic adversarial clock corpus with no false compensable-hours creation and prove expected->actual->approved->paid lineage on an authorized closed period. Keep out of MASTER until then.
+
+<!-- INTEGRATOR-R11-SLA-BENCHMARK-2026-09-20T0109-0400 -->
+### tenurehq/orgforge — deterministic cross-system support/SLA corpus generator
+- Revision: `1da5e4b51e22f4a82db4b003becc9cb42cfec34b`.
+- Score: **23/30 — A3 B3 C4 D4 E4 F5**.
+- Rights: MIT repository code; named SaaS APIs/trademarks and production customer data remain separate.
+- Capability: deterministic enterprise simulation produces linked support/CRM/observability/invoice artifacts; inspected tests cover incident-to-customer linkage, SLA-breach days, exact-threshold no-credit behavior, negative invoice credits and NPS degradation.
+- Integration: synthetic oracle for support/SLA agent/release acceptance before any authorized production pilot.
+- Next action: vendor-neutral 30-case corpus with exact escalation and credit-dollar truth. Keep below MASTER because it is a test-data/evaluation component rather than a high-ACV vertical operating system.
