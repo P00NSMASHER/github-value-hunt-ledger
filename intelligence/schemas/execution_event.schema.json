@@ -134,6 +134,26 @@
         "string",
         "null"
       ]
+    },
+    "routing_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ROUTING:[a-f0-9]{12}$"
+    },
+    "worker_profile_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^WORKERS:[a-f0-9]{12}$"
+    },
+    "routing_score": {
+      "type": [
+        "number",
+        "null"
+      ]
     }
   },
   "additionalProperties": true
