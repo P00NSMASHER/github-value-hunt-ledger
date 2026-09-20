@@ -233,3 +233,12 @@ The generated reports answer different questions:
 - `SEARCH_POLICY.md`: cautious next-cycle allocation balancing measured yield and exploration.
 
 The allocation policy is advisory and deliberately keeps an exploration floor so low-attention, strange and cross-domain discoveries are not optimized away.
+
+
+### V4 measurement controls
+
+The machine-learning layer now distinguishes exact queries, canonical query families, broader search objectives and search strategies. It also normalizes search-surface labels, controlled candidate disposition reasons and exact-revision debt.
+
+Matched strategy comparisons use the frozen benchmark task set and `benchmark/STRATEGY_MEASUREMENT_PROTOCOL.md`. These comparisons are deliberately separate from commercial opportunity search so strategy measurement does not distort the active product roadmap.
+
+New prospective runs should use `schema_version: 4`; see `intelligence/SEARCH_RUN_TEMPLATE.json`.
