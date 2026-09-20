@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.8 candidate
+## Current checkpoint — v15.8
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -55,6 +55,8 @@ v15.6 Freight CI run `35524672964` passed the full Freight suite, controlled-pil
 
 v15.7 Freight CI run `35525286692` passed the full Freight suite plus deterministic provenance, CycloneDX SBOM and unsigned DSSE generation/verification.
 
+v15.8 governance CI: Freight run `35528127691` and Technology Intelligence run `35528127720` both passed after rights-evidence and least-privilege workflow hardening.
+
 Technology Intelligence workflow now separates read-only validation from main-only write persistence and pins checkout/setup-python to immutable SHAs.
 
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
@@ -62,8 +64,8 @@ Technology Intelligence workflow now separates read-only validation from main-on
 ## Next 24 hours — make the asset diligence-ready
 
 ### P0
-1. **DONE:** v15 through v15.7 commercialization, proof, adaptive-authorization, commercial-learning, pilot-security, lifecycle/audit and supply-chain diligence PRs merged after CI.
-2. **DONE:** canonical Freight Recovery v15.7 release identity recorded in `freight/RELEASE_MANIFEST.md`.
+1. **DONE:** v15 through v15.8 commercialization, proof, adaptive-authorization, commercial-learning, pilot-security, lifecycle/audit, supply-chain and governance/diligence work merged after CI.
+2. **DONE:** canonical Freight Recovery v15.8 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. **DONE internally:** rights evidence manifest + fail-closed promotion validator. **OPEN externally:** attach/verify the actual executed Trenova/Opstrax permission documents and resolve hosted/SaaS/change-of-control scope.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
@@ -115,7 +117,7 @@ Subject to explicit user approval for outreach/data access:
 5. Introduce automation only where it reduces reviewer touches without increasing false-dollar risk.
 6. Build the minimum enterprise diligence package:
    - **DONE internally:** rights registry + partial SBOM + deterministic diligence ZIP;
-   - **OPEN externally:** signed provenance/trusted timestamp;
+   - **OPEN externally:** executed rights evidence, signed provenance/trusted timestamp;
    - **DONE internally:** data-retention/deletion semantics;
    - **DONE internally:** incident-response/breach-decision runbook + machine closure/notification rules; **OPEN externally:** deployed contact tree/alerting and completed tabletop or incident exercise evidence;
    - **DONE internally:** semantic reference backup/restore proof;
