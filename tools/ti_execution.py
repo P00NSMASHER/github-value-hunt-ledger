@@ -244,6 +244,17 @@ def build_execution_state(write=True, now=None):
             close_active("EXPIRED",active["_expiry_dt"])
             last_status="EXPIRED_AVAILABLE"
 
+        if active:
+            intervals.append({
+              "claim_id":active["claim_id"],
+              "worker_id":active["worker_id"],
+              "assignment_id":active["assignment_id"],
+              "slot_id":slot,
+              "start":active["_started_dt"],
+              "end":active["_expiry_dt"],
+              "provisional_live":True
+            })
+
         current_id=current.get("assignment_id")
         current_completed=current_id in completed_assignments
         current_failed=current_id in terminal_failed_assignments
