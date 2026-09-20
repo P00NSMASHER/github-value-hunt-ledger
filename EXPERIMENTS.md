@@ -13,122 +13,127 @@ Canonical stage-gate queue converting research into falsifiable technical/econom
 
 ### EXP-001 — Freight blind audit to realized settlement
 - Opportunity: Freight Recovery v15.3.
-- Capabilities: CAP-001, 003, 004, 005, 006, 007.
+- Capabilities: CAP-001, 003, 004, 005, 006, 007, 016.
 - Status: **BLOCKED_EXTERNAL**.
 - Hypothesis: on one buyer-authorized frozen population, the stack can find at least one unique incumbent-missed freight overcharge with zero unsupported dollars and carry it through actual externally observed settlement.
-- Internal technical substage: **substantially exercised, not commercial validation.** The planted 210/812/820 settlement corpus now covers exact unique auto-allocation, reviewed partial/split edges, duplicate events, orphan/excess/wrong-currency/pre-authority cases, full reversal, ambiguous partial reversal and 2,000 deterministic fuzz ledgers. Remaining internal work is persistence/concurrency/security hardening only if defects are exposed.
-- Required external inputs: fixed entity/BU/date/population; controlling contracts/rates/RateCons/addenda/tariff authority; shipment/operational evidence; sealed incumbent output; later credit/refund/remittance/bank evidence; documented customer authorization/retention/read-only boundaries.
-- Procedure: readiness gate -> freeze/hash population -> freeze independent truth -> open/hash incumbent output -> score unique findings -> buyer adjudication -> authorized dispute/action -> independently observe settlement -> one-use allocation -> recovery certificate -> later counter-event/reversal if applicable.
-- Success: unsupported asserted and realized dollars = 0; deterministic replay = 100%; every accepted finding has authority/expected/actual/evidence lineage; false-positive dollars within buyer ceiling; at least one challenger-only validated finding unless genuinely clean; `recovery proven` requires issued adjustment plus unambiguous external settlement allocation.
-- Failure: truth circularity, population drift, unsupported authority/identity/evidence, duplicate/preexisting credit, ambiguous allocation counted as realized, returned money left fee-eligible, or false-positive dollars beyond ceiling.
-- Next action: obtain one explicitly authorized closed population. Broad freight engineering/discovery remains frozen until that population exposes a named gap.
+- Internal technical substage: **substantially exercised, not commercial validation.** The planted 210/812/820 corpus covers exact unique auto-allocation, reviewed partial/split edges, duplicate/orphan/excess/wrong-currency/pre-authority cases, full reversal, ambiguous partial reversal and 2,000 deterministic fuzz ledgers. A persistent SQLite reference now adds immutable claims/events, integer-cents allocation edges, one-use event capacity, review-only persistence, append-only counter-events, SQL capacity/immutability triggers, `BEGIN IMMEDIATE` write serialization and lock retry. Hunter verification reports **21/21 persistence tests passed** plus **200 repeated two-writer/one-claim races** with exactly one realized allocation; exact-revision CI also passed.
+- External inputs: fixed entity/BU/date/population; controlling contracts/rates/RateCons/addenda/tariff authority; shipment evidence; sealed incumbent output; later credit/refund/remittance/bank evidence; customer authorization/retention/read-only boundaries.
+- Procedure: readiness gate -> freeze/hash population -> freeze independent truth -> open/hash incumbent output -> score unique findings -> buyer adjudication -> authorized dispute/action -> independently observe settlement -> one-use allocation -> recovery certificate -> later counter-event/reversal.
+- Success: unsupported asserted/realized dollars = 0; deterministic replay = 100%; every accepted finding has authority/expected/actual/evidence lineage; at least one challenger-only validated finding unless genuinely clean; `recovery proven` requires issued adjustment plus unambiguous external settlement allocation.
+- Failure: truth circularity, population drift, unsupported authority/identity/evidence, duplicate/preexisting credit, ambiguous allocation counted as realized, returned money left fee-eligible, race over-consumption, or false-positive dollars beyond buyer ceiling.
+- Next action: obtain one explicitly authorized closed buyer population. Do not resume broad freight discovery. Production DB/tenancy/security hardening is secondary unless the external connector exposes a concrete defect.
 
-### EXP-002 — AP source-authority + receipt-policy leakage audit
+### EXP-002 — AP source-authority + reversible receipt-policy audit
 - Opportunity: AP Leakage Assurance.
 - Capabilities: CAP-002, 007, 008, 016, 019.
 - Status: **READY**.
-- Hypothesis: a governed identity plane plus explicit source observation and policy-specific receipt authority can distinguish recoverable AP leakage from unresolved exceptions without false missing-receipt/PO dollars.
-- Inputs: synthetic closed month with duplicate invoices; alias/non-match/mistaken merge/split; partial receipts; mixed PO-level/direct billing; rejected quantity; service PO/SES required and legitimately not required; price/quantity/tax variance; credits; bitemporal corrections; source outage/partial load; later settlement.
-- Authority model: `ReceiptAuthorityPolicy(system, PO-line type, buyer config, supplier override, verification mode)` resolving to evidence such as `GoodsReceipt`, `ServiceEntrySheet`, explicit `DirectInvoiceAllowed`, or REVIEW. Source health is separately `PRESENT / VERIFIED_EMPTY / UNAVAILABLE`.
-- Procedure: source-observation receipt -> candidate identity -> durable POSITIVE/NEGATIVE/UNSURE judgement -> correction/split -> Canon promoted pinned registry -> policy-specific receipt authority -> PO/receipt/invoice matching -> proof gate -> outcome classification.
-- Required regression cases: PO-line billed pool consumed once across multiple partial receipts; amount+quantity residual synchronization after mixed direct/PO-level billing; rejected-quantity denominator; service-entry-sheet variants; source failure not empty-success; corrected receipt after original decision.
-- Success: all planted cases detected; unsupported recovery = 0; explicit non-match blocks later false merge; corrected identity and bitemporal state replay deterministically; unavailable source can never create missing-receipt/PO money.
-- Failure: universal `has_receipt` assumption, source outage becomes negative evidence, ERP status copied as truth, silent identity resolution, or exception dollars labeled recovered.
-- Next action: build one ERP-neutral corpus using ERPNext/Business Central/SAP-derived semantics as independent challengers, not authoritative customer truth.
+- Hypothesis: explicit source observation, reviewed identity, policy-specific receipt authority and reversible line-level authority consumption can distinguish recoverable AP leakage from unresolved exceptions without false missing-receipt/PO dollars.
+- Authority model: `ReceiptAuthorityPolicy(system, PO-line type, buyer config, supplier override, verification mode)` resolves to `GoodsReceipt`, `ServiceEntrySheet`, explicit `DirectInvoiceAllowed`, or REVIEW; source health is separately `PRESENT / VERIFIED_EMPTY / UNAVAILABLE`.
+- Evidence challengers: Business Central exact invoice↔PO-line↔receipt-line conservation; ERPNext partial-receipt semantics; `odoo/odoo@c55c82dac6283a77ee747e1e672a29e85180980f` counter-event semantics; MiniGraf bitemporal replay; Nomenklatura negative/reversible identity plus Canon pinned registry.
+- Required cases: one PO line across partial receipts; mixed direct and PO-level billing; rejected quantity; service-entry-sheet required vs legitimately not required; source outage/partial load; identity reject/merge/split correction; physical return that **does not** reopen commercial authority; refunding return that does; vendor credit note; bill cancellation; re-receipt; two same-SKU PO lines; UoM/precision adversary; later correction/settlement.
+- Conservation rule: every accepted invoice/receipt edge consumes exact amount/quantity capacity on a specific source line; every counter-event must reference the original edge, restore/reduce only the policy-authorized capacity, preserve the original event and replay deterministically. Product/SKU equality alone cannot establish line ownership.
+- Success: all planted cases detected; unsupported recovery = 0; explicit non-match blocks false merge; unavailable source cannot create missing-receipt/PO money; amount+quantity capacity is conserved through returns/credits/cancellation/re-receipt; bitemporal replay reproduces what was known then and what became valid later.
+- Failure: universal `has_receipt`, any-return-means-authority-restored, source outage becomes negative evidence, ERP header/status copied as truth, same-product auto-assignment establishes ownership, implicit float/UoM rounding creates/destroys authority, or exception dollars are labeled recovered.
+- Next action: implement the ERP-neutral reversible-authority ledger corpus. Do not search another generic three-way-match product unless this corpus exposes a concrete missing semantic.
 
 ### EXP-003 — Commission plan-to-bank acceptance test
 - Opportunity: Partner / Commission Payout Assurance.
 - Capabilities: CAP-002, 006, 007, 016, 018, 019.
 - Status: **READY**.
-- Hypothesis: frozen plan/assignment/source-payment truth plus a provider-state machine and independently observed bank/payroll state can detect entitlement and payout errors without duplicate-send or false-finality risk, while ambiguous linkage and unavailable source windows remain non-final.
-- Evidence architecture: provider payout/transfer identity remains separate from bank observation. `Modern-Treasury/modern-treasury-python@406f354a06a98060df0c9f4c242fe56cc65e1526` is a strong implementation reference for Payment Order -> ACH/reference metadata -> bank-derived Transaction/Transaction Line Item -> later Return/Reversal. `szapata85/ACHInterbank@395a359230eff35e49cc196b49995ed4c49509b9` is an adversarial correlation oracle for `Exact / Ambiguous / NotFound` behavior. Hosted treasury/bank services, account authority, feed coverage and external bank data remain separately governed.
-- Inputs: tiers/splits/overrides; plan/hierarchy changes; holds; refunds/clawbacks; carry-forward; partial payout; definite refusal; timeout/unknown; duplicate callback/retry; confirmed provider send; provider transfer ID; final FX amount/currency; forward ACH/network trace/original trace; independently sourced bank/payroll transaction; observation timestamp/coverage state; later Return/Reversal; concurrent sweep races.
-- Observation contract: every settlement lookup is classified `EXACT_UNIQUE`, `AMBIGUOUS`, `NOT_FOUND`, or `UNAVAILABLE`. `EXACT_UNIQUE` requires deterministic identity/reference/amount/currency/time compatibility against an independently observed transaction inside a verified source window. `AMBIGUOUS`, `NOT_FOUND`, stale/partial or `UNAVAILABLE` evidence cannot establish finality. A trace/reference value by itself is evidence, not a unique economic identity.
-- Procedure: freeze authority -> calculate entitlement -> apply holds/reversals -> create one payout claim -> provider result -> persist provider/reference lineage -> obtain independent bank/payroll observation receipt -> perform deterministic unique linkage -> record final amount/currency -> ingest later Return/Reversal -> one-use counter-event -> reconcile entitlement/intended/provider/bank/final outcome as separate states.
-- Required negative cases: duplicate ACH/original-trace candidates; substring-reference collision; fuzzy party/reference collision; equal totals with swapped identities; first-unmatched-row trap; unparseable amount; stale/last-seen cursor without completeness proof; provider-completed but bank transaction absent; bank-posted then later returned; duplicate semantic return in two files; ambiguous return linkage; source unavailable during the return window.
-- Success: deterministic expected payout; unknown provider result remains pending and cannot retry; definite refusal alone releases; duplicate paths cannot send twice; provider success and final settlement remain distinct; only `EXACT_UNIQUE` inside a verified observation window may establish a settlement candidate; duplicate/substring/fuzzy/amount-only matches never auto-finalize; later return/reversal exactly unwinds prior finality without deleting history.
-- Failure: provider status establishes entitlement; unknown outcome releases claim; duplicate send; trace/reference alone is treated as finality; substring/fuzzy/first-match/amount equality is called exact; last-seen cursor is treated as source completeness; ambiguous or unavailable bank observation mutates realized money; or later return leaves the prior payout economically final.
-- Next action: execute the provider-neutral synthetic matrix using the Modern Treasury bank-observation shape and ACHInterbank fail-closed linkage semantics. Resume repository search only if the corpus exposes a concrete provider/reference -> independent bank/payroll mapping or source-completeness gap.
+- Hypothesis: frozen entitlement plus provider state and independently observed bank/payroll state can detect payout errors without duplicate-send or false-finality risk, while ambiguous linkage and unavailable source windows remain non-final.
+- Evidence architecture: `Modern-Treasury/modern-treasury-python@406f354a06a98060df0c9f4c242fe56cc65e1526` provides Payment Order/reference -> bank-derived Transaction/Transaction Line Item -> later Return/Reversal shape; `szapata85/ACHInterbank@395a359230eff35e49cc196b49995ed4c49509b9` is a fail-closed Exact/Ambiguous/NotFound correlation oracle. Hosted treasury/bank services, account authority and feed coverage remain external.
+- Observation contract: every settlement lookup = `EXACT_UNIQUE / AMBIGUOUS / NOT_FOUND / UNAVAILABLE`. `EXACT_UNIQUE` requires deterministic identity/reference/amount/currency/time compatibility against an independently observed transaction inside a verified source window. Trace/reference alone is evidence, not unique economic identity.
+- Required negatives: duplicate ACH/original-trace candidates; substring/fuzzy reference collision; equal totals/swapped identities; first-unmatched-row trap; unparseable amount; stale cursor; provider-completed/bank-absent; bank-posted-then-returned; duplicate semantic return; ambiguous return; unavailable source during return window; concurrent payout sweep.
+- Success: unknown provider result stays pending and cannot retry; definite refusal alone releases; duplicate send impossible; provider success and final settlement distinct; only exact unique mapping inside verified coverage may establish settlement; later return/reversal exactly unwinds prior finality without deleting history.
+- Failure: provider status establishes entitlement/finality; trace alone is finality; substring/fuzzy/amount-only/first-match becomes exact; cursor continuity is treated as completeness; ambiguous/unavailable bank evidence mutates realized money; return leaves prior payout economically final.
+- Next action: execute the provider-neutral matrix. Resume search only if it exposes a concrete provider/reference->independent-bank/payroll or coverage gap.
 
-### EXP-004 — Recovery Proof adversarial + verifier-self-test matrix
+### EXP-004 — Recovery Proof scoped-coverage + adversarial verifier matrix
 - Opportunity: Recovery Proof SLA.
 - Capabilities: CAP-007, 010.
 - Status: **READY**.
-- Hypothesis: the verifier can prove valid recovery, reject wrong-but-restorable state, and remain non-green when either the verifier or proof-delivery path is broken.
-- Inputs: isolated PostgreSQL plus non-Postgres/object workload; wrong PITR target; missing history; corrupt object; service-up/data-wrong; stale proof; trust/revocation failure; total-host/credential-boundary case; deliberately mutated verifier/assertion helper; proof-sink outage after successful restore.
-- Procedure: restore -> independently measure content/application/relationship invariants -> RTO/RPO -> trust validation -> persist proof -> inject negatives -> mutate verifier -> rerun.
-- Success: every planted bad state fails for the intended reason; successful restore with unavailable proof sink remains overall non-green; mutated verifier cannot stay green; positives carry measured RTO/RPO and application truth.
-- Failure: any planted wrong state, broken assertion path, stale trust state or missing proof persistence yields PASS.
-- Next action: unify PostgreSQL and non-Postgres evidence schemas and execute the proof-sink + broken-verifier controls.
+- Hypothesis: a recovery proof system can restore valid state, reject wrong-but-restorable state, prove expected workload coverage and remain non-green when the verifier, proof sink, cleanup or semantic assertion path is broken.
+- Strong challengers: `kirilurbonas/FireDrill@1e532b17e49e4424f988b29dd338ae6c48dc20f3` (29/30 hunter score) for multi-engine isolated restore, semantic checks, RTO/RPO, signed DSSE evidence and expected-subject coverage gates; `snapetech/DuneAwakeningSelfHost@8d3bac1df38f45fb13e2c1427216bf5dc384687b` for PostgreSQL+RabbitMQ/Mnesia dual-plane recovery; Mukuroji for DynamoDB/S3 semantic history; existing Postgres negative controls and SiVa trust validation.
+- Inputs: isolated PostgreSQL plus non-Postgres/object/broker workload; wrong PITR target; missing history; corrupt object; service-up/data-wrong; stale proof; trust/revocation failure; total-host/credential-boundary; deliberately damaged assertion helper; proof-sink outage after restore; expected subject missing entirely; one failing sibling masked by aggregate control; semantic SQL/query that exits 0 but returns wrong value; cleanup failure.
+- Coverage contract: customer assurance must supply a versioned/fresh expected workload/subject inventory. Evidence-directory discovery alone cannot prove absence of a vanished drill. Gate per workload/subject; a control-level aggregate cannot hide a failing sibling.
+- Procedure: freeze expected inventory -> restore isolated workload -> independently measure structural/content/application/relationship/broker invariants -> RTO/RPO -> trust validation -> persist proof -> verify expected-subject coverage -> cleanup receipt -> inject negatives -> mutate verifier -> rerun.
+- Success: every planted bad state fails for the intended reason; missing expected subject is non-green; successful restore with unavailable proof sink is non-green; semantic assertion checks returned value not merely process exit; cleanup failure remains non-green; damaged verifier cannot stay green.
+- Failure: missing workload disappears from evaluation, aggregate control masks a failed workload, query rc=0 is accepted as semantic truth, wrong state or broken assertion yields PASS, or proof persistence/cleanup failure is hidden.
+- Next action: execute the scoped expected-subject matrix on PostgreSQL plus one rights-clean dual-plane workload. Keep FireDrill as a strong component/challenger until the integrated matrix runs; do not add another generic restore framework.
 
 ### EXP-005 — ScopeSignal authority-to-paid benchmark
 - Opportunity: Construction Change Leakage Recovery.
 - Capabilities: CAP-001, 006, 007.
 - Status: **READY** synthetic; **BLOCKED_EXTERNAL** for commercial proof.
 - Hypothesis: design/field changes can be traced through measurement, contract/work-order authority, notice, bill/certification, retention and independently cleared cash without inventing entitlement.
-- Inputs: synthetic project with 20–50 changes; wrong work-order ownership; over-measurement; draft/rejected/approved measurement; wrong billing period; concurrent quantity claim; superseded baseline; retention error; Payment Entry/bank-reconciliation divergence; later reversal.
-- Comparator pattern: Nirman approved-measurement-derived billing vs `mradul010/construction_management@ce345579...` server-reloaded work-order/PO quantity/rate bounds. Neither is accepted as complete truth by itself.
-- Success: all unsupported/draft/rejected/over-limit states remain nonbillable/REVIEW; authoritative line ownership and cumulative quantity hold; internal `Approved/Paid/Reconciled` never substitutes for independent cleared-cash evidence.
-- Failure: caller-entered quantity creates authority, internal accounting status is treated as bank finality, or design delta is treated as entitlement.
-- Next action: run the cross-implementation adversarial corpus; search again only if a concrete unbypassable measurement/certification or cash-finality gap remains.
+- Inputs: synthetic project with 20–50 changes; wrong work-order ownership; over-measurement; draft/rejected/approved measurement; wrong billing period; concurrent quantity claim; superseded baseline; retention error; internal payment/bank-reconciliation divergence; later reversal.
+- Comparator pattern: Nirman approved-measurement-derived billing vs `mradul010/construction_management@ce345579...` server-reloaded work-order/PO quantity/rate bounds. Neither is complete truth by itself.
+- Success: unsupported/draft/rejected/over-limit states remain nonbillable/REVIEW; authoritative ownership and cumulative quantity hold; internal `Approved/Paid/Reconciled` never substitutes for independent cleared-cash evidence.
+- Failure: caller-entered quantity creates authority, internal accounting status becomes bank finality, or design delta becomes entitlement.
+- Next action: run the cross-implementation adversarial corpus; search again only if a concrete measurement/certification or cash-finality gap remains.
 
 ### EXP-006 — CaptureBrief 10-solicitation packet/authority benchmark
 - Opportunity: CaptureBrief FAR-Deviation Readiness.
 - Capabilities: CAP-002, 007, 011, 019.
 - Status: **READY**.
-- Hypothesis: separate deterministic planes for notice/version history, attachment state, immutable artifacts, current rule/deviation authority and entity/award lineage materially improve packet completeness and analyst trust over latest-row ingestion.
-- Inputs: 10 current solicitations; official notice/action/history; attachment manifests; public attachments where access is authorized; FAR/supplement/deviation sources; entity/award IDs; source-run metadata; planted out-of-order/missing history, attachment disappearance/deletion and source-failure cases.
-- Architecture: official SAM/Data Services for notice/action lineage; public SAM attachment-manifest state as a separate plane; immutable downloaded artifact hashes; deterministic history/event hydration; explicit source degradation. `chrisfulcher/orrery@89ae2218...` is a strong implementation reference for manifest/currentness and fail-closed shape drift, not sole authority.
-- Success: exact packet completeness for the frozen rubric; correct amendment ordering; append-only/lossless manifest history or equivalent; byte/event-stable reruns; source failure cannot become no-change/no-record; correct current rule/deviation applicability; no false entity/incumbent joins.
-- Failure: bulk/version history assumed attachment-complete, disappeared/deleted attachment silently lost, undocumented manifest shape yields clean empty result, stale authority applied, or confident unresolved join.
-- Next action: freeze the 10-solicitation rubric and add historical manifest snapshots/diff rules before analyst scoring.
+- Hypothesis: separate deterministic planes for notice/action history, deletion-inclusive attachment observations, immutable artifacts, current rule/deviation authority and entity/award lineage materially improve packet completeness over latest-row ingestion.
+- Architecture: official SAM/Data Services notice/action lineage; per-action public resource-manifest observations; immutable public-artifact hashes; FAR/supplement/deviation authority; entity/award lineage. `chrisfulcher/orrery@89ae2218c031c2c46720783acfb44cea22e48636` remains a useful current-manifest reference but is revised to **26/30 component** because it does not pin `excludeDeleted=false` and does not create a complete absence/disappearance history across successful rechecks.
+- Manifest contract: where supported, request `excludeDeleted=false` explicitly; every check gets immutable observation identity carrying action/notice, exact URL/query semantics, observed time, source/HTTP state, full-body hash, parser/schema version and completeness flag; every entry is bound to that observation; newer observations never delete prior evidence; explicit tombstones and disappeared IDs are typed separately; source failure/429/5xx/shape drift cannot emit disappearance.
+- Required cases: explicit `deletedFlag=1`; resource present in action A but absent in successor action B after deletion semantics; absent after transient failure (must not create deletion/disappearance); legitimate 200/no-attachments; restricted/export-controlled resource; off-site PIEE/external dependency; same business Notice ID across multiple action UUIDs; version change forces new manifest observation.
+- Success: exact packet completeness for frozen rubric; correct amendment/action ordering; lossless append-only manifest history; byte/event-stable rerun; every relevant action has deletion-inclusive successful observation or explicit blocker; source failure cannot become no-change; rule/deviation currentness and entity joins are correct.
+- Failure: latest manifest or bulk history assumed attachment-complete; undocumented endpoint default decides tombstone visibility; disappeared/deleted attachment silently lost; source failure emits disappearance; stale authority applied; unresolved join becomes confident.
+- Next action: for the ten frozen opportunity families, query each historical action UUID with explicit deletion inclusion where supported and determine whether the union reconstructs every previously public attachment or whether independent polling snapshots are still required.
 
 ### EXP-007 — Installed-base sequencing/lab handoff acceptance
 - Opportunity: Installed-Base Lab Automation.
 - Capabilities: CAP-013, CAP-017 plus governance/provenance components.
 - Status: **READY** for rights-clean synthetic tests.
-- Hypothesis: a concrete Clarity -> sample-sheet/run identity -> InterOp -> provenance chain can improve workflow evidence without sequence-content/PHI dependence; standards facades over installed instruments are useful only when real actuation, acceptance and ownership are proven.
-- Inputs: synthetic Clarity QC/pooling/run-prep state, generated sample sheet, lawful/public InterOp fixtures, stable run identity, invalid transition, missing/mismatched identity, missing metric artifact and run-metric exception.
-- Success: deterministic workflow/run linkage, independent sample-sheet validation, rejection of mismatched identities/transitions, explicit unknowns and replayable provenance.
-- Failure: wrong run joined, missing evidence turns green, sensitive reads/PHI become required, or a standards facade is mistaken for safe control without command arbitration/HITL evidence.
-- Next action: build S4 Clarity + sample-sheet validator + InterOp synthetic handoff. LADS/CETONI remain WATCH until hardware-in-loop/regression and single-actuation authority are demonstrated.
+- Hypothesis: Clarity -> sample-sheet/run identity -> InterOp -> provenance can improve workflow evidence without sequence-content/PHI dependence; physical actuation ambiguity must remain explicit rather than being blindly retried.
+- Inputs: synthetic Clarity QC/pooling/run-prep state, generated sample sheet, lawful InterOp fixtures, stable run identity, invalid transition, missing/mismatched identity, missing metric artifact, run-metric exception and one ambiguous physical-action case.
+- Optional challenger pattern: PyLabRobot physical devices can mark post-actuation uncertainty/recovery-required in-session; MADSci persists workflow/action identity and can expose UNKNOWN after ambiguous dispatch. Do not credit restart-durable physical exactly-once without direct evidence.
+- Success: deterministic workflow/run linkage, independent sample-sheet validation, rejection of bad identities/transitions, explicit unknowns and replayable provenance; ambiguous physical action cannot be blindly redispatched.
+- Failure: wrong run joined, missing evidence turns green, PHI becomes required, standards facade is mistaken for safe control, or uncertain physical effect is retried without authoritative readback.
+- Next action: build S4 Clarity + sample-sheet validator + InterOp synthetic handoff and one ambiguity/recovery negative before broad device discovery.
 
 ### EXP-008 — Industrial virtual pre-FAT differential benchmark
 - Opportunity: Industrial Pre-FAT / Virtual Commissioning.
 - Capabilities: CAP-014.
 - Status: **READY**.
-- Hypothesis: customer/profile-derived virtual endpoints can catch binding/type/state/fault defects before hardware when independently differential-tested.
-- Inputs: synthetic L5K/PLC namespace with planted drift; frozen SECS/GEM dialogue/error profile; Dreamine.Gem and unrelated `bparzella/secsgem` implementation; duplicate-event/EC atomicity probe.
-- Success: all PLC defects detected; valid bindings preserved; every SECS/GEM disagreement classified as profile ambiguity, implementation defect or unresolved standards/vendor question; missing/error states cannot silently pass.
-- Failure: same-family self-agreement used as proof, implementation agreement labeled formal conformance, or a disagreement is hidden by generic success.
-- Next action: execute the frozen Dreamine <-> secsgem corpus before any third-engine search.
+- Hypothesis: customer/profile-derived virtual endpoints can catch binding/type/state/error/liveness defects before hardware when independently differential-tested.
+- Inputs: synthetic L5K/PLC namespace with planted drift; frozen SECS/GEM dialogue/error profile; Dreamine.Gem and unrelated `bparzella/secsgem`; exact duplicate-ECID W-bit S2F15 probe `[ECID x -> valid A, ECID x -> valid B]`.
+- Current source/test-backed prediction, **duplicate-specific runtime NOT_RUN**: Dreamine rejects duplicate ECID during decode, emits correlated S9F7, leaves EC state unchanged and the original request later expires T3 because S9F7 is not the normal S2F16 secondary; secsgem has no duplicate-ECID constraint and is source-predicted to return S2F16 EAC=0 with second-value-wins.
+- Measurement contract: record normal secondary vs F0 vs Stream-9 error, correlated System Bytes/header, requester T3/liveness outcome and post-state. Do not collapse a protocol error that leaves the original request pending into a generic `rejected` state.
+- Success: all PLC defects detected; valid bindings preserved; duplicate fixture is actually executed against both pinned packages; every SECS/GEM disagreement classified as profile ambiguity, implementation defect or unresolved standards/vendor-authority question; error and liveness states cannot silently pass.
+- Failure: same-family agreement used as proof, implementation agreement labeled formal conformance, source prediction mislabeled runtime-tested, or error reply assumed to close the original transaction without tracing transaction semantics.
+- Next action: execute this exact duplicate fixture against both pinned engines before searching a third implementation. A third engine is justified only to adjudicate an observed disagreement.
 
 ### EXP-009 — Permit intelligence multi-jurisdiction benchmark
 - Opportunity: Permit-to-Development Opportunity Intelligence / PermitPlate.
 - Capabilities: CAP-002, 012, 019.
 - Status: **READY**.
 - Hypothesis: canonical versioned permit events plus explicit source observation and parcel/economic context outperform raw lead lists on reliability/actionability.
-- Inputs: three heterogeneous jurisdictions, 30–100 held-out permit events, source-run completeness/freshness metadata.
+- Inputs: three heterogeneous jurisdictions, 30–100 held-out permit events and source-run completeness/freshness metadata.
 - Success: source completeness established; correct field semantics; stable identity/versioning; source outage never becomes verified-empty; useful buyer features carry source dates.
-- Failure: semantic mapping errors, duplicate/version confusion, empty-success, unsupported economic inference.
+- Failure: semantic mapping error, duplicate/version confusion, empty-success or unsupported economic inference.
 - Next action: freeze source-field truth for three jurisdictions.
 
 ### EXP-010 — Money-state integrity common month
 - Opportunity: Money-State Integrity / Close Assurance.
-- Capabilities: CAP-006, 016.
+- Capabilities: CAP-006, 016, 018, 019.
 - Status: **READY**.
-- Hypothesis: a generalized operational-event -> accounting -> external-settlement boundary can underpin multiple assurance verticals.
-- Inputs: synthetic month of contracts/orders/usage/invoices/credits/payments/journals with planted duplicates, reversals, outbox/webhook failures, unknown provider result, period-lock fault and later external return.
-- Success: operational/accounting planes reconcile where correct; every planted disagreement is surfaced; external contract authority and PSP/bank readback can contradict the internal system.
-- Failure: one system grades its own contract/payment state as external truth or vertical semantics become too lossy.
-- Next action: run two independent implementations against one canonical event/money-state corpus before adding another payment/billing engine.
+- Hypothesis: a generalized operational-event -> accounting -> provider -> independently observed settlement/counter-event boundary can underpin multiple assurance verticals.
+- Strong new implementation reference: `NotAbdelrahmanelsayed/paymob_integration@8999a6799c5673ad49471224ad0f8012a447495d` (**28/30**) preserves `Pending` on timeout/5xx ambiguity, recovers lost webhooks through provider inquiry, writes a durable refund-request marker before the one-shot side effect, requires a signed/independently fetched child refund delta before posting the ERP reversal, and holds inconsistent cumulative refund evidence for human review. `mymi14s/frappe_paystack@546aa26...` is a useful independent refund/reversal comparator. Bank readback remains a separate plane.
+- Inputs: synthetic month of contracts/orders/usage/invoices/credits/payments/journals with duplicate charge, lost success webhook, unknown provider result, refund request response-loss, cumulative refund resend without signed child, partial then full refund, outbox failure, period-lock fault, bank-observed payment and later external return/chargeback.
+- Success: provider timeout remains UNKNOWN/PENDING; one-shot side effect cannot be blindly retried; provider inquiry/counter-event can repair missed webhook state; only confirmed amount/currency delta can post the compensating ledger entry; operational/accounting/provider/bank states remain separately replayable; later bank return can reopen/offset canonical money state without erasing original authority.
+- Failure: outbound refund request becomes accounting truth, timeout becomes safe failure/retry, cumulative provider total creates money without a confirmed child event, one system grades its own settlement as external truth, or later return cannot invalidate prior success.
+- Next action: run Paymob/OpenPartner/Summae/bank-observation patterns against one canonical synthetic month before adding another payment core. Provider qualification harnesses count only when retained successful exact-revision provider evidence exists; `NOT_EXERCISED` remains unqualified.
 
 ### EXP-011 — Subrogation rule-and-quantum fail-closed benchmark
 - Opportunity: Insurance Subrogation Recovery Diagnostic.
 - Capabilities: CAP-001, 006, 007.
 - Status: **READY** synthetic; **BLOCKED_EXTERNAL** commercial.
 - Hypothesis: recovery opportunities can be prioritized safely only when jurisdiction/policy authority is explicit, versioned and fail-closed.
-- Inputs: synthetic paid-loss facts, comparative/contributory fault regimes, policy limits, made-whole/deductible handling, limitations periods, missing/conflicting/superseded authority and synthetic settlement outcomes.
+- Inputs: synthetic paid-loss facts, fault regimes, policy limits, made-whole/deductible handling, limitations periods, missing/conflicting/superseded authority and synthetic settlement outcomes.
 - Success: exact supported quantum; every unknown/conflicting/missing authority = REVIEW/$0; settlement remains distinct from calculated opportunity.
 - Failure: illustrative/default legal rule or model output creates hard-dollar assertion.
 - Next action: complete explicit synthetic rule-pack benchmark before any customer claim period.
@@ -136,13 +141,15 @@ Canonical stage-gate queue converting research into falsifiable technical/econom
 ### EXP-012 — Outcome-priced grid resilience calibration
 - Opportunity: Grid/Infrastructure Risk & Inspection.
 - Capabilities: CAP-015 plus optimization/routing components.
-- Status: **READY with dataset-artifact/rights constraints**.
-- Hypothesis: a resilience policy can demonstrate same-input advantage only when evaluator ancestry, construct and independence are explicit and predictions are frozen before prospective challenge.
-- Historical plane: USECPO v2 (CC BY 4.0) as event-correlated benchmark; exact v2 ZIP/guideline schema/event keys must be inspected before implementing a manifest. Use whole-event blocking and chronology preservation; record EAGLE-I ancestry.
-- Independent/challenge plane: Michigan MPSC as strong regulator evidence subject to restrictive commercial reuse terms; NYC 311 only as construct-validity negative control, not utility-outage oracle; California OES public-domain live utility-map feed for prospective post-freeze challenge, not history.
-- Success: model/policy beats simple baselines on frozen same-event outcomes without leakage; evaluator lineage/construct are explicit; proxy agreement is not called independent validation; modeled interruption dollars remain separate from observed outage outcome.
-- Failure: related EAGLE-I descendants counted as independent validators, citizen-report proxy treated as grid truth, or rights-constrained evidence embedded commercially without permission.
-- Next action: obtain/inspect the exact USECPO v2 artifact schema, then freeze splits/evaluator ancestry and run simple-vs-optimized comparisons; only search for another dataset if a genuinely independent, commercially reusable historical oracle remains necessary.
+- Status: **READY with artifact-byte gate**.
+- Hypothesis: a resilience policy can demonstrate same-input advantage only when evaluator ancestry, construct, grouping and independence are explicit and predictions are frozen before prospective challenge.
+- Historical plane: USECPO v2 is CC BY 4.0. The 2025 IEEE descriptor establishes the event-correlated logical schema and literal `event id` as the associated-event key. Whole-event blocking must use `event id`; all rows sharing an event stay in one split; chronology is preserved. `{STANDARD, LAG_8H, LAG_24H}` are evaluator variants/sensitivity analyses, **not independent evidence**. Record ancestry `EAGLE-I + DOE-417`, county-explicit vs state-generalized geography and restoration provenance/imputation.
+- Scope limits: USECPO is conditioned on major/transmission events and is not general distribution-system or asset-causal truth. Early coverage is weaker; prefer **2019–2023** for the first high-confidence historical benchmark. Missing restoration time may be imputed to event start and must never be interpreted as measured instant restoration.
+- Artifact gate still open: current v2 ZIP/guideline bytes were rate-limited during hunter inspection, so exact filenames/header casing/order, timezone, null/sentinel values, threshold defaults, any direct quality flags and whether `event id` is globally unique across years remain UNVERIFIED until the official artifact is read.
+- Independent/challenge plane: rights-permitted regulator/utility evidence plus post-freeze public-domain prospective feeds. NYC 311 is only a construct-validity negative control; related EAGLE-I descendants cannot count as independent validation.
+- Success: model/policy beats simple baselines on frozen same-event outcomes without leakage; evaluator lineage/construct and imputation flags are explicit; variants are sensitivity views only; modeled interruption dollars remain separate from observed outage outcome.
+- Failure: row-level/random split leaks one physical event across train/test, lag variants are counted as independent votes, state-generalized geography becomes county-precise truth, imputed restoration becomes observed outcome, or event correlation becomes feeder/component causality.
+- Next action: obtain the official v2 ZIP/guideline, byte-confirm headers/timezone/sentinels/thresholds and event-id namespace, then freeze event-level 2019–2023 splits and simple-vs-optimized comparisons. Search another outage dataset only if a genuinely independent rights-clear oracle remains necessary.
 
 ## Portfolio rule
 Do not start another product build because a repository is exciting. New search/build effort must close a named experiment gap, create a cheaper falsifier, or respond to a recorded outcome. When an experiment completes, mirror it in `OUTCOMES.md` and `intelligence/outcomes.jsonl` with originating search-run/capability links.
