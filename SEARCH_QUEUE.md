@@ -9,8 +9,9 @@ Integrator-owned search and validation direction. Updated 2026-09-20. The portfo
 - Never inspect, retain, test, authenticate with or use credentials/auth material, private/personal/confidential data, vulnerabilities or accidentally exposed secrets. Record sanitized metadata only.
 - No padding. A run with no new validated find is acceptable.
 - Prefer MASTER DNA: complete vertical operating systems; deterministic audit/recovery; authoritative data/evidence infrastructure; standards/protocol acceptance; difficult installed-base integration; optimization/decision engines; service-first B2B wedges with measurable outcomes.
-- Reuse benchmark-supported search skills when applicable: **first-party production-source triangulation**; **ingestion invariant-triad intersection**; **acceptance-path transition inspection**; **fail-open boundary archaeology**. Do not treat a method as proof; every candidate still needs independent verification.
+- Reuse benchmark-supported search skills when applicable: **first-party production-source triangulation**; **ingestion invariant-triad intersection**; **acceptance-path transition inspection**; **fail-open boundary archaeology**; **decision-claim -> runtime-side-effect trace**. Do not treat a method as proof; every candidate still needs independent verification.
 - For any verifier/auditor/source-health engine, explicitly hunt missing/stale/ambiguous evidence, parser/environment faults, empty-success states and selection fallbacks. PASS/VERIFIED must remain closed unless the exact required evidence survives those negative paths.
+- For any claimed decision-changing mechanism, trace **public API/dispatch -> executable body -> actual state/output/control-flow side effect -> semantic test**. Metrics, labels, enums, post-processing and no-throw tests do not establish that a policy is enforced at runtime.
 
 ## 1. Freight Recovery — P0: prove incremental settled money
 Hunt only what can change EXP-001: controlling addendum/accessorial/tariff authority, amendment/supersession/incorporation lineage, incumbent/FAP reason-code output, correction/rebill chronology and final credit/refund/812/820/remittance allocation. Prioritize archived product names, carrier/customer rate-authority classes, amendment tables, adjustment transaction types and settlement-reference schemas.
@@ -65,7 +66,7 @@ EXP-011 is the gate: unknown jurisdiction, missing rule, conflicting rule or ill
 ## 9. Money-State Integrity / Payments — P1
 Strengthen EXP-010 rather than collecting more payment cores. Differential-test operational events against independent accounting/close truth. Use `fintechcore` only as a challenger/reference until automated tests prove ledger balance, idempotency races, refunds/reversals, outbox loss, replayed webhooks, provider unknown-result and settlement consistency.
 
-Apply fail-open archaeology to provider ambiguity and settlement selection: timeout/unknown-result, missing settlement rows, partial allocations and stale provider states must not silently become paid/reconciled.
+Apply fail-open archaeology to provider ambiguity and settlement selection: timeout/unknown-result, missing settlement rows, partial allocations and stale provider states must not silently become paid/reconciled. Apply **decision-claim -> runtime-side-effect trace** to any advertised reversal, retry, settlement or approval mode so a named state or test file is not mistaken for an enforced money transition.
 
 **Search gaps:** bank/provider settlement evidence, ambiguous many-to-many allocation, dispute/chargeback lifecycle and hard failure fixtures that current leaders cannot represent.
 
@@ -73,6 +74,8 @@ Apply fail-open archaeology to provider ambiguity and settlement selection: time
 
 ## 10. Revenue Decision Assurance / Pricing-Yield — P1/P2
 Use `Talos` as the constrained-capacity booking-horizon policy challenger and existing revenue/inventory optimization leaders as comparators. Search for held-out historical replay adapters, real capacity constraints, censoring/no-show/cancellation state, incumbent decision logs and realized revenue/load outcomes—not another dynamic-pricing dashboard.
+
+Apply **decision-claim -> runtime-side-effect trace** to every claimed optimizer mode, abstention/deferral rule and information-acquisition mechanism before crediting it. Trace dispatch into a real algorithm body, then into a changed booking/protection/order/price action and a semantic test.
 
 **Validation:** reproduce the research simulation, compare against simple/current-policy baselines on the same inputs and require uncertainty calibration before any counterfactual revenue claim.
 
