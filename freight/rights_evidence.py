@@ -28,6 +28,14 @@ REGISTRY_FIELDS = {
     "change_of_control": "change_of_control_status",
 }
 UNKNOWN_REGISTRY = {"UNKNOWN", "UNKNOWN_REVIEW", None, ""}
+PERMISSIVE_PUBLIC_LICENSES = {
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "CC0-1.0",
+}
 
 
 def load_json(path: str | Path) -> dict:
@@ -95,7 +103,12 @@ def validate_rights_evidence(
     separate_permission_components = []
     for component in components:
         basis = component.get("commercial_use_basis") or ""
-        if "USER_ASSERTED" in basis or "SEPARATE_" in basis:
+        public_license = component.get("public_license") or ""
+        relies_on_separate_permission = (
+            ("USER_ASSERTED" in basis or "SEPARATE_" in basis)
+            and public_license not in PERMISSIVE_PUBLIC_LICENSES
+        )
+        if relies_on_separate_permission:
             separate_permission_components.append(component)
 
     for component in separate_permission_components:
