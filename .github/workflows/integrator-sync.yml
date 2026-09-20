@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/integrator_sync_payload.json'
+      - '.github/integrator_sync_payload.md'
 
 permissions:
   contents: write
@@ -20,33 +20,43 @@ jobs:
       - name: Preserve triggered payload and update checkout
         shell: bash
         run: |
-          cp .github/integrator_sync_payload.json /tmp/integrator_sync_payload.json
+          cp .github/integrator_sync_payload.md /tmp/integrator_sync_payload.md
           git pull --rebase origin main
       - name: Apply append and replacement payload
         shell: bash
         run: |
           python - <<'PY'
-          import json
+          import re
           from pathlib import Path
 
-          payload = json.loads(Path('/tmp/integrator_sync_payload.json').read_text())
-          marker = payload['marker']
+          text = Path('/tmp/integrator_sync_payload.md').read_text()
+          lines = text.splitlines()
+          if not lines or not lines[0].startswith('MARKER: '):
+              raise SystemExit('payload must start with MARKER: ')
+          marker = lines[0][len('MARKER: '):].strip()
+          body = '\n'.join(lines[1:])
+          pattern = re.compile(r'^=== (APPEND|REPLACE) (.+?) ===$', re.M)
+          matches = list(pattern.finditer(body))
+          if not matches:
+              raise SystemExit('payload contains no operations')
+
           changed = []
-
-          for rel, addition in payload.get('append', {}).items():
+          for i, match in enumerate(matches):
+              mode, rel = match.group(1), match.group(2)
+              start = match.end()
+              end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
+              content = body[start:end].strip()
               path = Path(rel)
-              current = path.read_text()
-              if marker in current:
-                  continue
-              path.write_text(current.rstrip() + '\n\n' + marker + '\n' + addition.strip() + '\n')
-              changed.append(rel)
-
-          for rel, replacement in payload.get('replace', {}).items():
-              path = Path(rel)
-              current = path.read_text()
-              desired = replacement.rstrip() + '\n'
+              current = path.read_text() if path.exists() else ''
+              if mode == 'APPEND':
+                  if marker in current:
+                      continue
+                  desired = current.rstrip() + '\n\n' + marker + '\n' + content + '\n'
+              else:
+                  desired = content.rstrip() + '\n'
               if current == desired:
                   continue
+              path.parent.mkdir(parents=True, exist_ok=True)
               path.write_text(desired)
               changed.append(rel)
 
