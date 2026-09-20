@@ -251,3 +251,54 @@ def status_bucket(status):
 
 def normalize_run_time(run):
     return run.get("timestamp") or run.get("date")
+
+
+def _load_json_object(name):
+    path = INTEL / name
+    if not path.exists():
+        return {}
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except Exception:
+        return {}
+
+def canonical_query_family(run):
+    """Return a stable query-family node without destroying the raw human label."""
+    explicit = run.get("query_family_id")
+    if explicit:
+        return explicit
+
+    raw = (run.get("query_family") or "unknown").strip()
+    aliases = _load_json_object("query_family_aliases.json")
+    mapped = aliases.get(raw) or aliases.get(raw.lower())
+    if mapped:
+        return mapped
+
+    family_slug = slug(raw)[:110] or "unknown"
+    return "QF:" + family_slug
+
+def outcome_search_weights(outcome):
+    """Return normalized discovery-run credit weights for one outcome.
+
+    Explicit weights are authoritative when present. Legacy outcomes receive
+    equal credit across their origin_search_ids, so no strategy can receive
+    the entire value merely because it participated in a multi-run chain.
+    """
+    origins = list(dict.fromkeys(outcome.get("origin_search_ids") or []))
+    if not origins:
+        return {}
+
+    explicit = outcome.get("search_credit_weights")
+    if isinstance(explicit, dict) and explicit:
+        values = {}
+        for rid in origins:
+            raw = explicit.get(rid, 0)
+            if isinstance(raw, (int, float)) and raw >= 0:
+                values[rid] = float(raw)
+        total = sum(values.values())
+        if total > 0:
+            return {rid: value / total for rid, value in values.items()}
+
+    equal = 1.0 / len(origins)
+    return {rid: equal for rid in origins}
