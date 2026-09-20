@@ -30,14 +30,14 @@ Each capability should record:
 - Next test: freeze a labeled domain corpus and measure auto-accept precision at a fixed false-accept ceiling.
 
 ### CAP-002 — Reviewed, versioned identity mastering
-- Ability: generate candidate matches, route ambiguity to review, promote a versioned canonical registry and replay exact production identity behavior.
+- Ability: generate candidate matches, preserve durable positive/negative/unsure judgements, route ambiguity to review, correct mistaken clusters through reversible split/remove operations, promote a versioned canonical registry and replay exact production identity behavior.
 - Maturity: VALIDATED COMPONENT.
-- Evidence basis: reviewed registry/promotion/replay contracts plus controlled writeback patterns.
-- Primary components: cmdrvl/canon; ChelseaKR/constituent-reconciler; challenger resolvers.
+- Evidence basis: reviewed registry/promotion/replay contracts, SQL-backed judgement history with explicit negative blockers and reversible clustering, plus controlled writeback patterns.
+- Primary components: `cmdrvl/canon@45e9702ba7f3874c073134c1a6fb74500232b6a1`; `opensanctions/nomenklatura@844dba09fafc8512dc3ce241f44aa5415b367029`; ChelseaKR/constituent-reconciler; challenger resolvers.
 - Reusable targets: CaptureBrief entity/parent identity, freight carrier mastering, AP/vendor mastering, CRM/MDM.
-- Limitation: source registries and customer identity data remain separately governed; false merge/split frontier still needs buyer-specific tuning.
-- Missing piece: common synthetic benchmark covering aliases, mergers, splits and corrections.
-- Next test: candidate generation -> review -> promotion -> pinned lookup -> correction/split -> exact replay.
+- Limitation: source registries/customer identities and OpenSanctions/third-party datasets remain separately governed; false merge/split frontier still needs buyer-specific tuning; Nomenklatura is not itself a promoted-version production registry and has a noncanonical-cluster edge case to characterize.
+- Missing piece: common synthetic benchmark covering aliases, explicit non-matches, mergers, mistaken merges, splits, referent additions and corrections across judgement memory plus promoted registry replay.
+- Next test: candidate generation -> explicit reject -> merge -> referent addition -> remove/explode mistaken cluster -> reviewed promotion -> pinned lookup -> exact replay; an explicit negative judgement must block an unsupported later merge.
 
 ### CAP-003 — Freight contract/rate authority reconstruction
 - Ability: reconstruct controlling freight rate authority across agreements, addenda, rate confirmations, tariffs, effective windows and supersession before calculating expected charges.
@@ -120,14 +120,14 @@ Each capability should record:
 - Next test: wrong target, missing history, corrupt checksum, service-up/data-wrong, stale proof and trust failures must all be rejected.
 
 ### CAP-011 — Government acquisition authority and lineage
-- Ability: reconstruct solicitation packet/history, machine-readable FAR authority, federal award/incumbent lineage and entity identifiers from first-party government sources.
+- Ability: reconstruct solicitation packet/history, deterministic source/amendment versions and diffs, machine-readable FAR authority, federal award/incumbent lineage and entity identifiers from first-party government sources while distinguishing source/history failure from “no change.”
 - Maturity: VALIDATED DATA/CAPABILITY.
-- Evidence basis: official GSA/SAM/USAspending/DATA Act source implementations and schemas.
-- Primary components: GSA/srt-fbo-scraper; GSA/GSA-Acquisition-FAR; fedspendingtransparency/usaspending-api; data-act-broker-backend.
+- Evidence basis: official GSA/SAM/USAspending/DATA Act source implementations and schemas, plus an independently verified procurement-history architecture showing stateful version hydration, deterministic field-level change events, idempotent reruns and explicit history/source failures.
+- Primary components: GSA/srt-fbo-scraper; GSA/GSA-Acquisition-FAR; fedspendingtransparency/usaspending-api; data-act-broker-backend; `slicedearth/contract-delta-au@630d1903507e6f5e47adaf1c690c9d6d4363af54` as a version-lineage architecture pattern only.
 - Reusable targets: CaptureBrief, GovCon readiness/decision support.
-- Limitation: agency deviations, current applicability and solicitation-specific authority still require explicit source resolution.
-- Missing piece: current live solicitation benchmark.
-- Next test: 10 live solicitations with packet completeness, rule currency, entity/award joins and manual verification.
+- Limitation: agency deviations, current applicability and solicitation-specific authority still require explicit source resolution; `contract-delta-au` implements Australian procurement semantics and does not establish U.S. SAM/FAR authority.
+- Missing piece: current live solicitation benchmark with planted amendment-order/history/source-failure cases.
+- Next test: 10 live solicitations with packet completeness, deterministic amendment/version ordering, idempotent reruns, explicit source/history failure, rule currency, entity/award joins and manual verification.
 
 ### CAP-012 — Permit event versioning and semantic source QA
 - Ability: ingest heterogeneous permit feeds into a canonical schema, keep immutable versions/field diffs and detect semantic mapping errors.
@@ -149,15 +149,15 @@ Each capability should record:
 - Missing piece: buyer-specific installed-base fidelity study.
 - Next test: authorized sample exports across one laboratory's dominant instrument mix.
 
-### CAP-014 — Virtual controller / pre-FAT acceptance
-- Ability: derive a virtual controller/tag namespace from authorized industrial configuration and test HMI/SCADA binding/type/fault behavior before hardware is available.
+### CAP-014 — Virtual industrial endpoint / pre-FAT acceptance
+- Ability: derive virtual industrial endpoints from authorized controller configuration or a frozen protocol profile and test binding/type/state/error behavior before physical hardware is available.
 - Maturity: VALIDATED COMPONENT / business benchmark pending.
-- Evidence basis: L5K-derived virtual PLC and protocol simulation.
-- Primary components: Gaskony-Ignition/module-plc-emulator plus independent protocol implementations.
-- Reusable targets: industrial pre-FAT, migration, controls integration.
-- Limitation: vendor format/specification and certification authority remain external.
-- Missing piece: end-to-end synthetic bind benchmark.
-- Next test: planted missing tag, type drift, array/UDT mismatch and fault cases.
+- Evidence basis: L5K-derived virtual PLC namespace/type behavior plus an independent stateful SECS/GEM host+equipment implementation over real HSMS/TCP with communication/control state, variables/constants, event reports, alarms, remote commands, bounded spooling and error behavior.
+- Primary components: `Gaskony-Ignition/module-plc-emulator@518f56b55566d7e20f19ce64003cdae45a08edc8`; `CodeMaru-Dreamine/Dreamine.Gem@82604d6f03c1e95e0558de5c757989b27cd4a3d6`; independent protocol clients/implementations for differential acceptance.
+- Reusable targets: industrial pre-FAT, migration, controls integration, semiconductor host/equipment integration.
+- Limitation: vendor formats/specifications, SEMI standards/current equipment profiles and formal certification/conformance authority remain external; same-family agreement is not independent proof.
+- Missing piece: end-to-end synthetic bind plus independent cross-implementation protocol-state benchmark.
+- Next test: planted missing tag/type/array/UDT faults plus a rights-clean frozen SECS/GEM dialogue/error corpus run against Dreamine.Gem and one unrelated implementation; classify every disagreement without inferring formal conformance.
 
 ### CAP-015 — Prospective, leakage-resistant prediction evidence
 - Ability: separate historical model development from immutable prospective predictions so later outcomes cannot rewrite the original call.
