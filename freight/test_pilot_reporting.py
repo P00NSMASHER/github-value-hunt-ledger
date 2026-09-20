@@ -1,5 +1,6 @@
 from freight.contracts import (
     AuthorityRef,
+    IncumbentOutput,
     PopulationRow,
     RecoveryLedger,
     SettlementEvent,
@@ -7,6 +8,7 @@ from freight.contracts import (
     freeze_truth,
     make_finding,
     open_incumbent_output,
+    seal_incumbent_submission,
     REVIEW,
     VALIDATED,
 )
@@ -18,10 +20,14 @@ from freight.pilot_reporting import (
 )
 
 
+BUYER = "buyer-1"
+BU = "bu-1"
+
+
 def setup_case():
     population = freeze_population(
-        "buyer-1",
-        "bu-1",
+        BUYER,
+        BU,
         "frozen period",
         [
             PopulationRow("inv-1","shp-1","cust","car","USD","src-1"),
@@ -29,39 +35,55 @@ def setup_case():
             PopulationRow("inv-3","shp-3","cust","car","USD","src-3"),
         ],
     )
-    authority = AuthorityRef("auth","cust","car","USD","auth-src")
+    authority = AuthorityRef("auth",BUYER,BU,"cust","car","USD","auth-src")
     findings = [
         make_finding(
-            finding_id="f-1", invoice_id="inv-1", customer_id="cust",
+            finding_id="f-1", buyer_id=BUYER, business_unit=BU,
+            invoice_id="inv-1", shipment_id="shp-1", customer_id="cust",
             carrier_id="car", currency="USD", authority_id="auth",
             expected_cents=10000, actual_cents=12500, status=VALIDATED,
         ),
         make_finding(
-            finding_id="f-2", invoice_id="inv-2", customer_id="cust",
+            finding_id="f-2", buyer_id=BUYER, business_unit=BU,
+            invoice_id="inv-2", shipment_id="shp-2", customer_id="cust",
             carrier_id="car", currency="USD", authority_id="auth",
             expected_cents=10000, actual_cents=12500, status=VALIDATED,
         ),
         make_finding(
-            finding_id="f-3", invoice_id="inv-3", customer_id="cust",
+            finding_id="f-3", buyer_id=BUYER, business_unit=BU,
+            invoice_id="inv-3", shipment_id="shp-3", customer_id="cust",
             carrier_id="car", currency="USD", authority_id=None,
             expected_cents=10000, actual_cents=15000, status=REVIEW,
         ),
     ]
     truth = freeze_truth(population, [authority], findings)
+    sealed = seal_incumbent_submission(population, "incumbent-source-hash")
     incumbent = open_incumbent_output(
         population=population,
         truth=truth,
-        incumbent_population_hash=population.manifest_hash,
+        submission=sealed,
         finding_ids=["f-2"],
     )
     ledger = RecoveryLedger(truth, incumbent)
     return truth, incumbent, ledger
 
 
+def settlement(settlement_id, finding_id, amount, source_hash):
+    return SettlementEvent(
+        buyer_id=BUYER,
+        business_unit=BU,
+        settlement_id=settlement_id,
+        finding_id=finding_id,
+        amount_cents=amount,
+        currency="USD",
+        source_hash=source_hash,
+    )
+
+
 def test_pilot_report_keeps_all_financial_totals_separate():
     truth, incumbent, ledger = setup_case()
-    ledger.apply(SettlementEvent("s-1","f-1",2000,"USD","settle-src-1"))
-    ledger.apply(SettlementEvent("s-2","f-2",2500,"USD","settle-src-2"))
+    ledger.apply(settlement("s-1","f-1",2000,"settle-src-1"))
+    ledger.apply(settlement("s-2","f-2",2500,"settle-src-2"))
 
     metrics = build_pilot_metrics(
         truth,
@@ -74,6 +96,8 @@ def test_pilot_report_keeps_all_financial_totals_separate():
         ),
     )
 
+    assert metrics.buyer_id == BUYER
+    assert metrics.business_unit == BU
     assert metrics.reviewed_discrepancy_cents == 10000
     assert metrics.validated_finding_cents == 5000
     assert metrics.challenger_only_validated_cents == 2500
@@ -85,26 +109,30 @@ def test_pilot_report_keeps_all_financial_totals_separate():
 def test_incumbent_known_finding_is_automatically_non_fee_eligible():
     truth, incumbent, ledger = setup_case()
     allocation = ledger.apply(
-        SettlementEvent("s-2","f-2",2500,"USD","settle-src-2")
+        settlement("s-2","f-2",2500,"settle-src-2")
     )
     assert allocation.allocated_cents == 2500
     assert allocation.fee_eligible_cents == 0
 
 
-def test_recovery_ledger_rejects_incumbent_from_wrong_truth_manifest():
+def test_recovery_ledger_rejects_incumbent_from_wrong_scope():
     truth, incumbent, _ = setup_case()
-    tampered = incumbent.__class__(
+    tampered = IncumbentOutput(
+        buyer_id="buyer-2",
+        business_unit=incumbent.business_unit,
         population_hash=incumbent.population_hash,
-        truth_hash="wrong",
+        truth_hash=incumbent.truth_hash,
+        submission_hash=incumbent.submission_hash,
+        source_hash=incumbent.source_hash,
         finding_ids=incumbent.finding_ids,
         output_hash=incumbent.output_hash,
     )
     try:
         RecoveryLedger(truth, tampered)
     except ValueError as exc:
-        assert "not bound to this truth" in str(exc)
+        assert "incumbent output scope mismatch" in str(exc)
     else:
-        raise AssertionError("mismatched incumbent truth should fail")
+        raise AssertionError("mismatched incumbent scope should fail")
 
 
 def test_false_positive_dollars_are_reported_not_hidden():
@@ -120,9 +148,11 @@ def test_false_positive_dollars_are_reported_not_hidden():
     assert metrics.realized_cents == 0
 
 
-def test_markdown_does_not_label_discrepancy_as_savings():
+def test_markdown_includes_scope_and_does_not_label_discrepancy_as_savings():
     truth, incumbent, ledger = setup_case()
     report = render_markdown(build_pilot_metrics(truth,incumbent,ledger))
+    assert "Buyer scope: **buyer-1**" in report
+    assert "Business unit: **bu-1**" in report
     assert "Reviewed discrepancy" in report
     assert "Uniquely attributable realized" in report
     assert "Discrepancy and validated dollars are not realized savings" in report
