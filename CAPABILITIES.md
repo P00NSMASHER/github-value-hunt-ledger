@@ -188,15 +188,15 @@ Each capability should record:
 - Missing piece: one synthetic workflow-to-run-metrics integration with a forced bad state/handoff and deterministic evidence report.
 - Next test: execute a synthetic multi-step QC/pooling/run-prep workflow, attach lawful InterOp fixtures to the same run identity, deliberately break one transition/metric expectation and require the evidence layer to distinguish workflow error, run-metric exception and unknown state.
 
-### CAP-018 — Provider-settlement ambiguity and payout-proof state machine
-- Ability: move money safely across the boundary between payout intent and provider/bank settlement by distinguishing definite refusal from ambiguous/unknown outcomes, preventing unsafe duplicate retries, preserving claim/idempotency state and reconciling the provider-confirmed settled amount/currency.
-- Maturity: VALIDATED COMPONENT / synthetic cross-provider benchmark pending.
-- Evidence basis: tested claim-before-send, ambiguous-outcome hold, definite-failure release, pending-until-confirmed state, provider payout IDs, actual settled amount/currency, reversal ordering and concurrent sweep protection.
-- Primary components: `spree/spree@2a419d42e86dea30a69a3c5b7764185cea132b3f`; `getcoherence/openpartner@eeff532ee758dc6221b4d03af852e5705a2328fb` as the broader payout/settlement control-plane complement.
-- Reusable targets: commission/affiliate payouts, marketplaces, rebates, vendor/partner disbursements and other payment workflows where timeout/unknown-result can create duplicate money movement.
-- Limitation: payment-provider and bank semantics, FX timing, account authorization and settlement-finality definitions remain provider/customer specific; no external buyer outcome has yet been recorded.
-- Missing piece: vendor-neutral outcome corpus proving refused vs unknown vs confirmed vs settled behavior under retries and concurrent sweeps.
-- Next test: synthetic matrix covering definite refusal, timeout/unknown, duplicate retry/callback, confirmed provider send, final settled amount/currency, reversal after payout and concurrent sweep; any unknown provider result must remain claimed/unresolved rather than auto-retry.
+### CAP-018 — Provider-to-bank settlement ambiguity and payout-proof state machine
+- Ability: move money safely from payout intent through provider send state into independently observed bank/payroll settlement and later counter-events, while refusing ambiguous mappings, unsafe retries and unsupported finality.
+- Maturity: VALIDATED COMPONENT / synthetic provider-to-bank benchmark pending.
+- Evidence basis: tested claim-before-send and unknown-outcome hold; definite-failure release; provider payout identity and settled amount/currency; bank-derived transaction/reference surfaces; exact-vs-ambiguous-vs-not-found return linkage; later return/reversal lineage; and concurrent/idempotent protection.
+- Primary components: `spree/spree@2a419d42e86dea30a69a3c5b7764185cea132b3f`; `getcoherence/openpartner@eeff532ee758dc6221b4d03af852e5705a2328fb`; `Modern-Treasury/modern-treasury-python@406f354a06a98060df0c9f4c242fe56cc65e1526` as the strongest current bank-derived observation bridge; `szapata85/ACHInterbank@395a359230eff35e49cc196b49995ed4c49509b9` as an Exact/Ambiguous/NotFound return-correlation oracle; `moov-io/ach` for post-success return-entry lineage.
+- Reusable targets: commission/affiliate payouts, marketplaces, rebates, vendor/partner disbursements and other payment workflows where timeout/unknown-result, weak reconciliation or later returns can create duplicate or falsely final money states.
+- Limitation: Modern Treasury's hosted API/bank connections/service data and all bank/payroll data remain external; its server-side automatic reconciliation algorithm is not public; ACH trace/reference values are not inherently unique economic identities; feed freshness/completeness is provider/bank specific; ACHInterbank is a controlled-UAT/reference architecture and its jurisdiction-specific normative materials remain separately governed. No external buyer outcome has yet been recorded.
+- Missing piece: one provider-neutral corpus proving provider-ID -> network/reference -> independently observed transaction -> later return/reversal under explicit source-health semantics, with ambiguity and missing coverage remaining non-final.
+- Next test: execute EXP-003 with duplicate trace, substring/fuzzy reference collision, equal-total swapped identities, unparseable amount, stale cursor, provider-completed/bank-absent, bank-posted-then-returned, duplicate return and unavailable-source cases. Only exact unique linkage inside a verified observation window may advance finality.
 
 ## Capability promotion rule
 Do not add a capability because a repository sounds useful. Promote only when the system can state a falsifiable ability, evidence basis, known limitation and next test.
@@ -245,3 +245,10 @@ The count of repositories is not the primary KPI. Track:
 - **CAP-014 Industrial pre-FAT:** the Dreamine↔secsgem shared tested intersection now supports a frozen 10-case differential corpus plus `EC-ATOMIC-PROBE` (valid first EC update + invalid second) predicted to expose all-or-nothing vs partial-mutation semantics. Repository collection is no longer the bottleneck; execution is.
 - **CAP-017 Sequencing operations evidence bridge:** add `scilifelab_epps` as the concrete Clarity process→flowcell/run-directory→RunParameters/RunInfo→InterOp→Clarity-writeback implementation and `samplesheet-parser` as an independent pre-run compatibility/diff gate. Missing behavioral regression/evidence packaging remains explicit.
 - **CAP-018 Provider-settlement ambiguity / payout proof:** add `moov-io/ach` post-success Return Entry/reversal lineage and statement-normalizer bank-readback input. Provider `paid` is now explicitly revocable until external network/bank evidence plus later-return window/source freshness are accounted for.
+
+<!-- INTEGRATOR-R13-2026-09-20T1207-0400 -->
+## Capability delta — 2026-09-20 12:07 ET
+- **CAP-018 external-finality gap materially narrowed:** `Modern-Treasury/modern-treasury-python@406f354a...` supplies bank-derived Transaction/Transaction-Line-Item and Return/Reversal lineage around provider/payment-order references; `szapata85/ACHInterbank@395a359...` independently supplies fail-closed `Exact / Ambiguous / NotFound` return correlation with no money-state mutation under ambiguity. The capability is now specific enough to execute rather than search broadly.
+- **CAP-019 must govern settlement absence:** stale/unavailable bank/payroll observation can never become `no transaction` or `no return`. Last-seen cursors are continuity hints, not completeness proof.
+- **Negative acceptance rule:** substring/fuzzy reference matching, equal amount, first-unmatched-row choice or a label named `EXACT_REFERENCE` cannot establish realized money. These may generate review candidates only.
+- **Portfolio effect:** no new capability ID and no MASTER promotion. The value is closing the CAP-018 architecture and converting EXP-003 from component discovery into a falsifiable provider-to-bank finality matrix.
