@@ -99,10 +99,10 @@ Each CAP records ability, maturity, evidence basis, reusable targets, limitation
 - Next test: common synthetic month spanning contract/order/receipt/invoice/credit/refund/payment/journal and later counter-event across at least two independent implementations.
 
 ### CAP-017 — Sequencing operations evidence bridge
-- Ability/maturity: **VALIDATED COMPONENT / synthetic integration pending** — connect LIMS workflow state to run identity, sample-sheet semantics, sequencer operational metrics and provenance without requiring sequence content/PHI.
-- Evidence: S4 Clarity, scilifelab EPPs, samplesheet-parser, Illumina InterOp, provenance components.
-- Emerging safety extension: PyLabRobot/MADSci independently reinforce that post-actuation uncertainty should enter recovery/UNKNOWN rather than blind redispatch, but restart-durable physical exactly-once remains unproven.
-- Next test: synthetic Clarity→run→InterOp handoff with bad transition/identity/metric plus one ambiguous physical-action recovery case.
+- Ability/maturity: **VALIDATED COMPONENT / synthetic integration pending** — connect LIMS workflow state to run identity, sample-sheet semantics, sequencer operational metrics and provenance while preserving explicit uncertainty around consequential physical actions.
+- Evidence: S4 Clarity, scilifelab EPPs, samplesheet-parser, Illumina InterOp and provenance components; `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` independently proves the narrow in-session lost-response pattern of one action identity -> same-action result readback -> `UNKNOWN` after unresolved queries -> workflow failure.
+- Critical ambiguity boundary: MADSci's generic workflow retry can reset a terminal `UNKNOWN` step and create a fresh `ActionRequest`/ULID without mandatory physical-state reconciliation. Immediate fail-closed monitoring therefore does **not** establish system-wide exactly-once actuation. Command-mutated local state is also not independent physical verification.
+- Next test: synthetic Clarity→run→InterOp handoff plus an actuated-but-response-lost fixture. PASS requires the original action/device-run identity to survive readback and restart, unresolved outcome to remain `UNKNOWN`, downstream work to stay blocked, and retry/redispatch to remain disabled until independent device/state reconciliation proves it safe.
 
 ### CAP-018 — Provider-to-bank settlement ambiguity and payout-proof state machine
 - Ability/maturity: **VALIDATED COMPONENT / provider-to-bank benchmark pending** — move payout/refund intent through provider state into independent bank/payroll observation and later counter-events without unsafe retries or false finality.
