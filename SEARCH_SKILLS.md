@@ -61,17 +61,19 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   4. Check whether the verifier/reviewer can mutate the artifact it is judging; prefer read-only or mutation-detect/restore designs.
   5. Search tests for the transition and its negative controls, not just for prompt text asking a reviewer to inspect work.
   6. Distinguish filesystem/workspace separation from hardened security isolation and policy-in-instructions from independently enforced validation.
-- WHY IT WORKED: Benchmark Experiment Tasks **30 and 31** independently benefited from this procedure. Task 30 separated a real fail-closed manager/executor/auditor completion gate from generic checkpointing. Task 31 transferred the same habit to issue-driven coding orchestration by inspecting tracker reconciliation, retry state, workspace boundaries and the validation-to-review/merge transition instead of trusting orchestration marketing.
+- WHY IT WORKED: Benchmark Experiment Tasks **30 and 31** independently validated this procedure, and Task **32** transferred the same trusted-state question from task completion into reusable-capability promotion. Task 30 separated a real fail-closed manager/executor/auditor completion gate from generic checkpointing. Task 31 traced issue orchestration through reconciliation/retry/workspace/review transitions. Task 32 showed that a verifier-gated trusted-registry insertion can be real while rollback remains a separate unproven claim.
 - EXAMPLES:
   - Benchmark Task 30: `AMAP-ML/LongHorizon-Harness@a1dd930614972b92361c1b9cd6aac441a6db5a65`
   - Benchmark Task 31: `openai/symphony@be10a1b79df723d6d7612b5651c8522704dafb2e`
+  - Benchmark Task 32: `kenhuangus/ASG-SI@c1da9a1d15883d04518f4a7213ccba612b0e6b28`
 - FAILURE MODES:
   - reviewer prompts exist but the executor can still self-certify completion;
   - validation is advisory and does not gate state transition;
   - retry/backoff state disappears on restart and is mistaken for durable recovery;
   - an "isolated workspace" is overclaimed as a security sandbox;
+  - a promotion audit/history is mistaken for an implemented rollback/version-selection path;
   - the verifier shares mutable artifacts or correlated assumptions with the executor and independence is overstated.
-- NEXT IMPROVEMENT: apply this procedure outside coding-agent systems to scientific campaign authorities, billing/audit approval flows and other human-in-the-loop state machines; measure whether it predicts false-promotion reduction across later benchmark tasks.
+- NEXT IMPROVEMENT: apply this procedure to billing/audit approval, scientific campaign authority and other human-in-the-loop state machines, and separately trace trusted-state entry versus reversal.
 
 ## First-party production-source triangulation
 - SKILL NAME: First-party production-source triangulation
@@ -96,28 +98,74 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - treating source-repository provenance as proof that every upstream fact is authoritative or complete.
 - NEXT IMPROVEMENT: apply the method to another official rule/data system with multiple first-party repositories and measure whether it improves source-currentness or pipeline-boundary accuracy versus surface-only search.
 
+## Capability-Conjunction Search + Claim Tracing
+- SKILL NAME: Capability-Conjunction Search + Claim Tracing
+- WHEN TO USE: A broad operational or financial system is defined by several rare capabilities that are unlikely to appear together in repository titles or category labels.
+- PROCEDURE:
+  1. Express the target as 3–5 rare implementation signatures drawn from different requirement families, such as solver + domain legality + deterministic replay, or exact money + refund/fee + split matching + idempotency + exception states.
+  2. Search for the signatures in code/tests rather than searching only for the product category.
+  3. Intersect candidates and deep-inspect only those where the conjunction appears in executable paths, not merely docs or disconnected modules.
+  4. Trace each integration-critical README/marketing claim into the exact solver/source/test path; downgrade claims whose capability exists only adjacent to the claimed core.
+  5. In money, safety, compliance or reproducibility domains, inspect persistence constraints and exact-revision CI/benchmark evidence in addition to algorithm code.
+  6. Preserve modularity caveats: co-located capabilities do not automatically prove they are jointly optimized or production-integrated.
+- WHY IT WORKED: Benchmark Experiment Tasks **16 and 17** independently validated the method. Task 16 found a low-attention airline recovery engine by intersecting CP-SAT, crew legality, passenger recovery, uncertainty and replay signals, then exposed that FAR117 was not a hard constraint in the main optimizer. Task 17 transferred the approach to finance, where Decimal money + fee/refund + split + dedupe/idempotency + explicit ambiguity states surfaced a tested reconciliation engine that generic platform searches missed.
+- EXAMPLES:
+  - Benchmark Task 16: `mizuharaa/olus@f1d1160de0c1cb8c2961d9a785d24b2e1ac48e68`
+  - Benchmark Task 17: `Etherlabs-dev/multi-processor-reconciliation@2f9397fbe56a76abeee42a01a37536ad1811a806`
+- FAILURE MODES:
+  - a README lists the capabilities but they are not connected in the execution path;
+  - one module audits a constraint post-solve while marketing implies the solver enforces it;
+  - synthetic benchmark coverage is mistaken for production scale;
+  - a bounded N→1 matcher is overclaimed as general N↔M reconciliation;
+  - code-level conjunctions share one weak assumption and create correlated evidence rather than independent support.
+- NEXT IMPROVEMENT: pair the conjunction search with dependency/commit archaeology so rare capability clusters can be traced to their implementation lineage and regression history before deep inspection.
+
 ## Ingestion invariant-triad intersection
 - SKILL NAME: Ingestion invariant-triad intersection
-- WHEN TO USE: Searching for a data-ingestion platform where connector breadth alone is insufficient and durable history plus source-health truth are commercially important.
+- WHEN TO USE: Searching for a data-ingestion platform where connector breadth alone is insufficient and durable history plus source-health truth are commercially important; the same logic can be generalized to other systems whose value depends on several executable correctness contracts.
 - PROCEDURE:
-  1. Define three independent axes before searching: **source topology** (multiple heterogeneous provider families), **historical durability** (first/last seen, append/version history, deterministic field diffs), and **run truth** (success/partial/failure or equivalent fail-closed source-health semantics).
-  2. Search each axis separately using concrete provider names, table/model names, diff/version fields and run-status symbols rather than product-category keywords.
-  3. Intersect candidates only after each axis has independent code evidence; a broad connector project without history, or a history store without run truth, remains a component.
-  4. Trace the actual diff/version algorithm and identity key. Do not credit fields named `history` or `changes` until the mutation/comparison path is inspected.
-  5. Red-team false-green collection paths: unexpected response shapes, zero-row success, stale cache, skipped files, identity churn and partial errors that can masquerade as “no change.”
-  6. Require domain-semantic regression evidence where money/meaningful decisions depend on mapped fields, not merely syntactic schema validation.
-- WHY IT WORKED: Benchmark Experiment Tasks **37 and 38** independently validated the method. Task 37 converged on PermitBuild by intersecting municipal connector families, immutable permit versions/diffs and fee-vs-valuation semantic QA. Task 38 transferred the same triad to government acquisition forecasts and found Curatore-v2's multi-source normalization, temporal history/diffs and explicit success/partial/failure orchestration while also surfacing an APFS false-green edge case.
+  1. Define three independent axes before searching: for ingestion, **source topology**, **historical durability**, and **run truth**. For other domains, choose three independently falsifiable implementation invariants.
+  2. Search each axis separately using concrete provider/protocol names, table/model symbols, version/diff fields, state-transition names or test signatures rather than product-category keywords.
+  3. Intersect candidates only after each axis has independent code evidence; a project with two axes remains a component even if its README sounds complete.
+  4. Trace the actual execution algorithm and identity/state boundary. Do not credit fields or status names until the mutation/comparison/transition path is inspected.
+  5. Red-team false-green paths and require at least one negative/failure assertion per load-bearing axis.
+  6. Require domain-semantic regression evidence where money, interoperability or meaningful decisions depend on mapped state rather than merely syntactic schema validity.
+- WHY IT WORKED: Benchmark Experiment Tasks **37 and 38** validated the ingestion form. Task 37 intersected municipal connector families, immutable permit versions/diffs and fee-vs-valuation semantic QA. Task 38 transferred the triad to government acquisition forecasts and surfaced multi-source normalization, temporal history/diffs and source-run success/partial/failure plus an APFS false-green edge case. Tasks **39 and 40** then generalized the method beyond ingestion: engineering-artifact import + vendor-addressing + fidelity tests isolated a stronger PLC emulator, while first-party stack + migration contract + reconnect/subscription regressions isolated the useful OPC-UA pre-FAT oracle.
 - EXAMPLES:
   - Benchmark Task 37: `adamleap02/PermitBuild@ff795137e0c66e62a87e62956fa351926886255d`
   - Benchmark Task 38: `davidlarrimore/curatore-v2@d4e42ac14450a58f84035c31db11b0399713a653`
+  - Cross-domain confirmation Task 39: `Gaskony-Ignition/module-plc-emulator@518f56b55566d7e20f19ce64003cdae45a08edc8`
+  - Cross-domain confirmation Task 40: `OPCFoundation/UA-.NETStandard@37b552254e8da434514c87d8185c1595c03c4063`
 - FAILURE MODES:
-  - counting connector count as data quality;
+  - counting connector/feature breadth as correctness;
   - mutable upserts presented as audit history;
-  - history arrays that do not expose deterministic old/new semantics;
+  - status fields/tests that never gate real execution;
   - `success` emitted on unexpected or empty source responses;
   - unstable identity keys splitting one evolving record into unrelated rows;
-  - schema tests that miss fee/value/status/date semantic swaps.
-- NEXT IMPROVEMENT: Task **39** supplied a cross-domain confirmation of the broader executable-invariant idea in virtual commissioning. Continue testing whether the same intersection strategy transfers cleanly outside ingestion before renaming or broadening this skill centrally.
+  - three axes that exist decoratively but never intersect in one functioning path.
+- NEXT IMPROVEMENT: standardize a compact “three executable invariants + one negative control each” template that hunters can apply across ingestion, protocols, optimization and audit systems without turning it into a generic checklist.
+
+## Protocol-regression archaeology for pre-FAT systems
+- SKILL NAME: Protocol-regression archaeology for pre-FAT systems
+- WHEN TO USE: Industrial/protocol software where commercial value depends on upgrade compatibility, reconnect/recovery behavior, parser fidelity or field failure modes rather than only supported feature breadth.
+- PROCEDURE:
+  1. Pin the exact implementation revision and identify the migration/compatibility contract relevant to the buyer's current and target versions.
+  2. Search release notes and commit history for concrete semantic failures, parser rewrites, withdrawn support and compatibility fixes.
+  3. Trace each important fix into a regression test or executable invariant at the pinned branch.
+  4. Search issues filed **after** the pinned revision for unresolved contradictions that current source/history alone cannot reveal.
+  5. Convert unresolved but plausible failure paths into explicit adversarial pre-FAT scenarios rather than either ignoring them or discarding the whole stack automatically.
+  6. Keep official/certification provenance separate from version-specific operational readiness.
+- WHY IT WORKED: Benchmark Experiment Tasks **39 and 40** independently supported it. Task 39 showed that a real-file L5K parser rewrite and withdrawal of unverified L5X support were stronger maturity evidence than feature breadth alone. Task 40 mined an OPC-UA reconnect/subscription defect corpus and then found a newer destructive-restart deadlock issue that materially narrowed readiness claims while increasing the stack's value as a pre-FAT oracle.
+- EXAMPLES:
+  - Benchmark Task 39: `Gaskony-Ignition/module-plc-emulator@518f56b55566d7e20f19ce64003cdae45a08edc8`
+  - Benchmark Task 40: `OPCFoundation/UA-.NETStandard@37b552254e8da434514c87d8185c1595c03c4063`
+- FAILURE MODES:
+  - commit prose is mistaken for proof without locating regression tests;
+  - an issue report is treated as reproduced fact when it is still unconfirmed;
+  - a fix belongs to another branch/version than the one being sold or tested;
+  - certification is treated as proof of every reconnect/upgrade path;
+  - unresolved issues are over-weighted into rejecting a valuable reference implementation instead of becoming test vectors.
+- NEXT IMPROVEMENT: apply this method to EDI, payment, database-driver and e-invoice protocol migrations to see whether defect archaeology predicts commercially important integration failures outside industrial automation.
 
 ## Fail-open boundary archaeology
 - SKILL NAME: Fail-open boundary archaeology
