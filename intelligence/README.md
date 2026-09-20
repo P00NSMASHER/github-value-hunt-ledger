@@ -558,3 +558,30 @@ Matched contexts are role, work kind, strategy, objective and experiment. Worker
 The system intentionally reports **no causal worker ranking**. Assignment difficulty is confounded. V13 uses matched task-context residuals as routing evidence, not as a performance-review score.
 
 Until thresholds are met, mode is `observe_only_insufficient_evidence` and every V13 routing adjustment is exactly zero.
+
+
+## V14 routing decision audit
+
+V14 preserves the alternatives that V12/V13 rejected at routing time without changing any worker assignment.
+
+For every routed worker-slot pair it independently re-solves the full matching problem with that exact pair forbidden.
+
+Generated products:
+- `routing_decision_audit.jsonl` — one decision-evidence row per chosen pair;
+- `routing_generation_audit.json` — generation-level optimum and summary metrics;
+- `ROUTING_DECISION_AUDIT.md` — human-readable criticality and local-alternative table.
+
+Each decision record preserves:
+- chosen routing score;
+- independently recomputed global optimum;
+- best feasible full matching when the chosen pair is forbidden;
+- global pair criticality = optimum score loss after forbidding that pair;
+- worker-local next-best slot and score delta;
+- slot-local next-best worker and score delta;
+- full counterfactual pair set when feasible.
+
+A zero-criticality pair can be removed without reducing the globally optimized routing score. Those pairs are useful candidates for later controlled routing exploration.
+
+A negative local delta is not an error: the globally optimal matching can choose a locally lower-scoring edge to improve the total portfolio.
+
+V14 is evidence-only. It does not reroute workers, alter claims, or make causal regret claims.
