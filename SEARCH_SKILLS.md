@@ -189,3 +189,25 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - interpreting an infrastructure fault as benign SKIP;
   - conflating cryptographic integrity with source truth or trusted-key policy.
 - NEXT IMPROVEMENT: apply the method to money-bearing audit/settlement engines and source-health collectors, then measure whether it reduces false-promotion rate on benchmark reject tasks 46–50.
+
+## Decision-claim -> runtime-side-effect trace
+- SKILL NAME: Decision-claim -> runtime-side-effect trace
+- WHEN TO USE: A repository claims a decision-changing mechanism, abstention/deferral rule, optimizer mode, fallback, information-acquisition trigger or control policy whose presence in docs, enums, metrics or test names may not mean runtime execution actually changes.
+- PROCEDURE:
+  1. Locate the public API, dispatcher or branch that selects the claimed behavior.
+  2. Follow it into the executable implementation body; treat empty, commented, placeholder or no-op bodies as unimplemented even if the surface is advertised.
+  3. Identify the concrete runtime side effect: state mutation, skipped/acquired observation, blocked action, changed control flow, altered decision output, committed schedule/order or other externally meaningful transition.
+  4. Inspect semantic tests that would fail if that side effect disappeared. Hard-coded-pass, shape-only and no-throw tests are insufficient for the decision claim.
+  5. Trace ambiguous/failure paths. Do not mistake a computed metric, log entry, visualization or post-processing label for an enforced runtime gate.
+  6. Score sibling modes independently; one real algorithm path does not validate adjacent advertised modes that terminate in stubs or weak tests.
+- WHY IT WORKED: Benchmark Experiment Tasks **25 and 26** independently validated the method. Task 25 showed that PPDM computes uncertainty and VoI signals, but the inspected runtime still emits argmax actions and logs suggested observation skips; its N/A deferral is post-processing rather than a proven execution gate. Task 26 transferred the same trace to revenue management: RMOL's Monte-Carlo chain is real, while its advertised DP service path is empty/commented and its forecasting/unconstraining tests are hard-coded passes.
+- EXAMPLES:
+  - Benchmark Task 25: `panoskom/PPDM_framework@4fbca1dfc28280d0e6428b22c796e15c4f305ccd`
+  - Benchmark Task 26: `airsim/rmol@6a51f9b90d361a115e39aa57a3329d7723af717f`
+- FAILURE MODES:
+  - treating feature labels, enums or documentation as executable behavior;
+  - treating post-processing `N/A` or warnings as operational abstention;
+  - crediting a metric/VoI/confidence calculation that never changes control flow;
+  - counting hard-coded-pass or no-throw tests as semantic validation;
+  - using one implemented mode to inflate the evidence quality of adjacent stubbed modes.
+- NEXT IMPROVEMENT: apply the trace to money settlement, compliance gates, optimizer fallback and human-approval paths, and measure whether it lowers false-promotion rates without becoming systematically over-conservative.
