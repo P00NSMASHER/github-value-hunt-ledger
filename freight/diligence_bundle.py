@@ -28,6 +28,7 @@ DOC_PATHS=(
     "freight/PILOT_LAUNCH_GATE.md",
     "freight/PILOT_LAUNCH_BRIEF.md",
     "freight/PILOT_ACTIVATION_PACKET.md",
+    "freight/PILOT_CHARTER.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json",
     "freight/PILOT_DATA_ROOM.md",

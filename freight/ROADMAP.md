@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.10
+## Current checkpoint — v15.11 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -48,7 +48,8 @@ Internal commercialization controls now completed:
 - final deployment-aware Pilot Launch Gate that prevents a READY buyer from bypassing deployment/data-handling security;
 - structured separate-environment evidence manifest/validator that removes the self-asserted manual-pilot exception;
 - deterministic Pilot Launch Brief that converts BLOCKED/CONDITIONAL gate codes into prioritized owners, evidence requests and unlock criteria without overriding the machine gate;
-- buyer-safe Pilot Activation Packet that binds readiness, published offer/price band, launch route, remediation, data-room timing, buyer/Freight responsibilities, blind-pilot stages and report semantics into one deterministic handoff without exposing internal cost/margin assumptions.
+- buyer-safe Pilot Activation Packet that binds readiness, published offer/price band, launch route, remediation, data-room timing, buyer/Freight responsibilities, blind-pilot stages and report semantics into one deterministic handoff without exposing internal cost/margin assumptions;
+- machine-checkable Pilot Charter that verifies the activation hash, freezes engagement scope/fee/roles/acknowledgments, and separates PRELAUNCH acceptance from actual KICKOFF authorization.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -75,6 +76,8 @@ Current launch classification: **Netlify deployed customer-data pilot = BLOCKED*
 Launch Brief now converts that classification into an operator-facing remediation plan; unknown future blockers fail safe into UNMAPPED_REVIEW instead of disappearing.
 
 Pilot Activation Packet now removes the remaining handoff friction by combining the selected offer, exact source requests and operating sequence into one buyer-safe artifact with an activation hash.
+
+Pilot Charter now prevents sales-to-delivery scope drift by binding that activation hash to the exact fee, population/date/carrier/mode scope and named operating roles. A blocked/conditional route can be acknowledged but cannot authorize customer-data kickoff.
 
 The separate/manual route stays **CONDITIONAL** until a VERIFIED environment manifest proves MFA, encryption, scoped access, read-only ingestion, retention/deletion, Netlify data exclusion, and any applicable tenant/parser controls with SHA-256 receipts and a <=90-day evidence-validity window.
 
