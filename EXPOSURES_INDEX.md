@@ -136,3 +136,14 @@ Never store, reproduce, test, validate, authenticate with, exploit, or monetize 
 - High-level exposure type: README contains login credential-like authentication material.
 - Apparent status: **unknown; no value retained, tested or used**.
 - Remediation note: remove public authentication material and rotate if potentially live; inspect only a sanitized later revision.
+
+### AbhishekLGowda05/SAGE-Scheduling-engine-with-Adaptive-constraint-relaxation-Grounded-Explanations
+- Repository: `AbhishekLGowda05/SAGE-Scheduling-engine-with-Adaptive-constraint-relaxation-Grounded-Explanations`.
+- Canonical URL: https://github.com/AbhishekLGowda05/SAGE-Scheduling-engine-with-Adaptive-constraint-relaxation-Grounded-Explanations
+- File/path: `frontend/.env`; contents were deliberately not opened.
+- Exact revision: `49aee96f0a15e12e7b14b1c97989600f7ab0a146`.
+- Date observed: 2026-09-20.
+- High-level exposure type: committed environment/configuration artifact potentially containing service or authentication material.
+- Apparent status: **unknown; not inspected, copied, tested or validated**.
+- Non-sensitive context: safe solver source and tests were sufficient to assess the scheduling/constraint-relaxation capability without touching the environment file.
+- Remediation note: use only sanitized configuration for any reuse/deployment review; do not inspect or rely on the committed environment artifact. No secret value is stored here.
