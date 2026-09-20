@@ -356,3 +356,46 @@ CONFIDENCE: **HIGH that the orchestration contract is reusable; HIGH that dry-ru
 - An abstract provider protocol with `find_by_idempotency_key()` is not evidence of authoritative scientific reconciliation unless the runtime actually binds a persistent external provider.
 - Durable schema + adversarial concurrency tests can still overstate operational maturity when the only implementation is an in-memory mock.
 - Inspect runtime composition/factory code early; if production modes fail closed and only dry-run is constructible, downgrade before spending time on peripheral architecture.
+
+## 2026-09-20 — Run 13 evidence-backed update
+
+### H4 — Mature research repositories can hide post-publication operational-reproducibility kernels
+STATUS: **SUPPORTED ON ONE SHADOW RUN / LOCAL ONLY.**
+
+SUPPORTING EVIDENCE:
+- `lab-emi/OpenDPD@aba888b87199d7ae7802ce931987e3aa3c951410` is an established measured-RF/DPD research project, but its September 2026 Studio/runtime hardening adds a distinct reusable reliability layer: unique run idempotency keys, append-only sequenced events, explicit terminal-state invariants, subprocess worker identity, restart interruption/orphan cleanup, explicit retry ancestry and typed run/config hashes.
+- Integration tests exercise real worker processes, same-key admission, cancellation, SIGKILL/worker death, restart recovery and late-terminal-state rejection rather than only testing UI state.
+- The measurement schema binds played-artifact and capture hashes to declared PA/capture-chain/sample-rate/drive/calibration/timestamp conditions and carries explicit attestation separating user-provided physical measurements from synthetic/mock evidence.
+- Commit history shows the operational layer was added/hardened after the core scientific project and papers were already established, which means paper/algorithm-centric discovery would underweight this reusable infrastructure.
+
+CONTRARY EVIDENCE:
+- The persistence layer is local SQLite with WAL and `synchronous=NORMAL`; it is not a distributed exactly-once system.
+- Physical measurements are operator/import attested and OpenDPD explicitly states it does not itself perform them; run provenance is not authoritative device-effect reconciliation.
+- Generic workflow/experiment platforms can substitute for much of the job supervision/tracking. The distinctive value is RF-specific integration and evidence semantics, not generic scheduling.
+- The runtime/service hardening is recent, so the long scientific history of OpenDPD should not be treated as long production history for this subsystem.
+
+NEXT TEST:
+Apply the same commit-history archaeology to a second mature scientific repository whose headline value is an algorithm or paper, and test whether recent service/runtime commits contain independently useful run-idempotency, restart-recovery or typed evidence kernels that were not obvious from the research publication.
+
+CONFIDENCE: **MEDIUM.**
+
+### New LOCAL candidate lesson — Commit-history archaeology for operational reproducibility
+WHEN TO USE: mature scientific repositories with a strong paper/algorithm identity and recent service, Studio, server, worker or deployment commits.
+
+PROCEDURE: inspect feature history around runtime/service paths; search for idempotency keys, worker identity, restart interruption, retry ancestry, immutable terminal states, event cursors, config/data hashes and measurement-evidence schemas. Then verify source, integration tests, CI and the physical/provider boundary separately from headline scientific claims.
+
+WHY IT WORKED: OpenDPD's headline value is DPD modeling, but its recent Studio/service commits surfaced a tested scientific run ledger/supervisor and RF measurement-evidence contract that generic algorithm search would likely miss.
+
+FAILURE MODES: recent service code can be commodity web/backend plumbing; local run durability does not imply external physical-effect safety; imported/manual measurements are not authoritative instrument readback; mature science does not imply mature runtime operations.
+
+NEXT IMPROVEMENT: require a second independent mature-research repository before staging this lesson.
+
+Evidence count: **1 task**. Keep LOCAL; do not modify global `SEARCH_SKILLS.md`.
+
+### H3 impact
+OpenDPD does **not** advance H3 Level 3. It is useful upstream: the run/evidence ledger can say which scientific execution and capture artifact were involved, while a separate physical-effect gateway must still answer whether an ambiguous external instrument mutation actually occurred.
+
+### Failed-search memory added
+- Do not classify scientific run-level idempotency, restart recovery or immutable statuses as physical exactly-once without provider/native-command identity and authoritative readback.
+- Manual capture provenance with explicit hashes/conditions is valuable reproducibility evidence, but it is not instrument-command truth.
+- Mature repository age/publication depth should not be used as a proxy for field maturity of a newly-added runtime subsystem.
