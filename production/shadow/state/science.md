@@ -38,25 +38,29 @@ Score a non-BO autonomous scientific workflow on the same two axes and test whet
 CONFIDENCE: **MEDIUM-HIGH**.
 
 ### H3 — Physical exactly-once requires external evidence, not only an idempotent campaign database
-STATUS: **SUPPORTED; EXECUTOR-SIDE FAIL-CLOSED PATTERN FOUND ON ONE INDEPENDENT PHYSICAL CONTROL STACK.**
+STATUS: **SUPPORTED; FAIL-CLOSED PHYSICAL-RECOVERY SIGNAL NOW FOUND IN TWO INDEPENDENT EXECUTOR FAMILIES, BUT DURABLE CROSS-PROCESS EFFECT ID REMAINS UNRESOLVED.**
 
 SUPPORTING EVIDENCE:
 - BO-MCP's database-backed idempotency can prevent duplicate logical tool mutations and duplicate linked results, but the RAISE/RoboChem execution plane is external.
 - BO-MCP source comments explicitly acknowledge reservation-timeout conditions under which a logical operation can be re-entered if protection expires.
 - An unkeyed result resend is intentionally stored again, proving that safe retry remains a caller contract rather than a universal property.
-- `AccelerationConsortium/opentrons-flex@2639016ee9f234949aaf596c2ab2b93694eb0e0b` supplies the missing executor-side evidence pattern: durable labware state is invalidated and fsynced before physical movement, only committed after verified completion, and remains invalid after cancellation, unclean restart or commit failure.
+- `AccelerationConsortium/opentrons-flex@2639016ee9f234949aaf596c2ab2b93694eb0e0b` supplies the strongest executor-side evidence pattern so far: durable labware state is invalidated and fsynced before physical movement, only committed after verified completion, and remains invalid after cancellation, unclean restart or commit failure.
 - The same connector combines software recovery gates with authoritative device readback: unknown/missing Flex Stacker sensor/platform state fails closed, and future actuation is blocked until recovery/reconciliation instead of blindly replaying an ambiguous physical action.
 - Its SiLA observable path correlates command initiation and result polling with a `CommandExecutionUUID`, demonstrating protocol-level operation identity while also showing why that UUID alone is not a durable business-effect identity across process loss.
+- `PyLabRobot/pylabrobot@697272d3591da6e5be1fcf70448479904e326904` independently implements the same **pre-actuation vs post-actuation** distinction for Agilent VSpin/Access2. A `TransitionToken` records whether hardware may have moved; post-actuation failure/cancellation sets sticky `recovery_required`, clears uncertain bucket/teachpoint knowledge, and ordinary motion is refused until recovery/readiness evidence is re-established. Dedicated tests exercise these paths.
+- `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` exposes the complementary orchestration-side primitive: persisted workflow/action identity and explicit `ActionStatus.UNKNOWN` after ambiguous dispatch/result retrieval, including logic that queries the same `action_id` when dispatch may have succeeded but its response was lost.
 
 CONTRARY EVIDENCE:
 - `opentrons-flex` does not prove universal physical exactly-once; after a crash it may intentionally know only that the physical world is uncertain and require operator/local reconciliation.
 - Its strongest durable uncertainty semantics are concentrated in labware movement, stacker recovery and controlled run mutation rather than every possible liquid/motion command.
-- Physical HITL coverage is opt-in and was not independently run in this shadow pass.
+- PyLabRobot's VSpin/Access2 recovery state and event operation IDs are session-local/in-process; a new process does not inherit the sticky recovery flag or a durable business-effect record.
+- MADSci's workcell/action identity is durable, but the inspected SiLA client tracks running observable commands in an in-memory map. `UNKNOWN` ultimately fails the workflow rather than itself proving the device effect, so a later resubmission still depends on an external system-of-record to avoid blind physical redispatch.
+- Physical/HITL behavior for the newest executor semantics was not independently reproduced in these shadow runs.
 
 NEXT TEST:
-Find a second independent scientific executor that combines a durable command/business identifier with authoritative device completion/readback and an explicit `UNKNOWN/NEEDS_RECONCILIATION` state after ambiguous dispatch; verify that retry is blocked until reconciliation.
+Find or construct a scientific execution stack that durably binds **workflow step ID → business-effect ID → native device/protocol command ID → authoritative readback/reconciliation evidence**. Crash after the device write but before acknowledgement, restart the process, and verify that the same durable effect record blocks redispatch until readback resolves the original physical outcome.
 
-CONFIDENCE: **HIGH that campaign idempotency alone is insufficient; MEDIUM-HIGH that fail-closed physical uncertainty is the reusable closure primitive.**
+CONFIDENCE: **HIGH that campaign idempotency alone is insufficient; HIGH that fail-closed post-actuation uncertainty is a reusable primitive; MEDIUM that a broadly reusable cross-process physical-effect ledger already exists publicly.**
 
 ## Validated local lessons
 
@@ -84,16 +88,17 @@ Evidence count: **3 successful independent shadow tasks**. Eligible for STAGED c
 ### LOCAL-2 — Search physical-effect closure, not just retryable orchestration
 WHEN TO USE: laboratory robots, instrument servers, plate handlers, autosamplers, synthesis platforms and any scientific workflow where retrying a side effect can physically duplicate or corrupt work.
 
-PROCEDURE: search for `valid=false` or invalidation before actuation, `clean_shutdown`, `reconcile physical`, `unknown`/`missing` device state, generation fencing, `require_home`, atomic/fsync state commits, command-execution UUIDs plus result polling, and tests that cancel/crash after physical work begins. Inspect whether future actuation is denied until authoritative readback or reconciliation restores certainty.
+PROCEDURE: search for invalidation before actuation, explicit `mark_actuated`/post-actuation markers, `recovery_required`, `clean_shutdown`, `reconcile physical`, `unknown`/`missing` device state, generation fencing, `require_home`, atomic/fsync state commits, command-execution UUIDs plus result polling, and tests that cancel/crash after physical work begins. Inspect whether future actuation is denied until authoritative readback or reconciliation restores certainty, then separately verify whether the unresolved state and command identity survive process loss.
 
 WHY IT WORKED:
 - Run 4: these invariants isolated `AccelerationConsortium/opentrons-flex`, whose durable deck ledger is deliberately invalid before movement and remains fail-closed after cancellation, unclean restart or post-move commit failure, with additional device-sensor recovery checks.
+- Run 5: `recovery_required`, `position_uncertain` and actuation-boundary terms isolated PyLabRobot's independent VSpin/Access2 semantic state machine. Source/tests distinguish pre-actuation rejection from post-actuation failure, retain recovery state in the live session, invalidate uncertain position knowledge and require fresh controller readiness before ordinary motion. The same pass exposed MADSci's complementary durable action-ID/UNKNOWN semantics and, crucially, the unsafe split between persistent orchestration and in-memory device-command tracking.
 
-FAILURE MODES: a command UUID may die with the process; locks serialize but do not prove execution outcome; simulator success does not prove physical recovery; manual reconciliation may still be required; deep guarantees may cover only selected operations.
+FAILURE MODES: a command UUID may die with the process; locks serialize but do not prove execution outcome; simulator success does not prove physical recovery; manual reconciliation may still be required; deep guarantees may cover only selected operations; an in-memory recovery flag can disappear on restart; a durable workflow ID is not sufficient if the native device command/outcome cannot be re-associated after restart.
 
-NEXT IMPROVEMENT: require a second independent executor that preserves durable command identity through process loss and exposes device-side status/readback sufficient to resolve whether a physical command executed.
+NEXT IMPROVEMENT: require a **cross-layer durable join** rather than another isolated recovery flag: workflow step ID + business-effect ID + native device command ID + authoritative device/system-of-record readback. Test the crash window after physical dispatch but before acknowledgement and prove retry remains blocked after process restart until reconciliation resolves the original effect.
 
-Evidence count: **1 successful shadow task**. Remains LOCAL.
+Evidence count: **2 successful independent executor-family shadow tasks**. Eligible for STAGED consideration inside shadow evaluation; do not promote to global `SEARCH_SKILLS.md` from this lane. The staged lesson must retain the explicit durability caveat above.
 
 ## Failed search patterns
 - Broad repository queries centered only on `autonomous experimentation`, `self-driving lab`, or `Bayesian optimization` produce many simulation-first, framework-only or README-heavy candidates. Require an operational invariant before deep inspection.
@@ -101,6 +106,7 @@ Evidence count: **1 successful shadow task**. Remains LOCAL.
 - Do not infer production robustness from a successful multi-week scientific campaign. Explicitly inspect dispatch acknowledgement, retry/restart state, duplicate suppression and intent→actual identity.
 - Do not infer physical exactly-once from a unique database row or idempotent API response. The external executor needs authoritative acknowledgement/readback or an explicit unresolved/reconciliation state.
 - Do not infer physical certainty from command IDs, locks or “success” responses alone; inspect when world state becomes non-authoritative and what evidence is required to restore it.
+- Durable orchestration state and strong executor recovery often live in different layers. Verify persistence and native command correlation at the handoff rather than scoring either layer alone: a durable workflow ID with an in-memory device-command map is unsafe after process loss, while an executor-local recovery flag without persistent effect identity loses uncertainty on restart.
 - Do not chase `.env`, credential-shaped or accidental-exposure paths in low-attention repositories. Exclude them and continue only with legitimate architecture/source evidence.
 
 ## Candidate skills
@@ -118,3 +124,4 @@ Promotion status: evidence threshold for staged consideration is met, but global
 - SHADOW-COMMERCIAL referral added for `RomeroLab/PRAXIS@2441e471...`: test whether protein-engineering labs would pay for a reliability/reproducibility retrofit that adds durable job identity, acknowledged dispatch, suggested→actual provenance and restart-safe campaign state around existing robotic workflows.
 - SHADOW-COMMERCIAL referral added for `AccelerationConsortium/bo-mcp@56d590b...`: test whether an Autonomous-Lab Experiment Integrity Gateway / Chaos Audit can command budget specifically for duplicate-run prevention, campaign reconstruction, retry/restart safety and proposed→actual divergence detection, distinct from ordinary BO or lab-automation integration.
 - SHADOW-COMMERCIAL referral added for `AccelerationConsortium/opentrons-flex@2639016...`: test whether robotized labs/CROs will pay for a Physical Lab Command Integrity / Recovery Audit that measures ambiguous-dispatch risk, duplicate physical-action exposure and recovery MTTR, distinct from ordinary instrument integration.
+- SHADOW-COMMERCIAL referral to add for `PyLabRobot/pylabrobot@697272d...` + `AD-SDL/MADSci@6b1ab6...`: test whether labs will buy a cross-layer Scientific Instrument Uncertainty Firewall / Recovery Audit focused specifically on blind redispatch risk after “physical command may have executed but acknowledgement was lost.”
