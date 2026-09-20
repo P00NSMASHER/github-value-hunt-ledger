@@ -1,9 +1,9 @@
 # GRAPH HEALTH REPORT
 
 - Curated edges: **132**
-- Derived attribution edges: **40**
+- Derived attribution edges: **47**
 - Capability nodes: **19**
-- Capabilities touched by measured search runs: **7**
+- Capabilities touched by measured search runs: **8**
 
 ## Highest-priority capability gaps
 
@@ -20,7 +20,7 @@
 | CAP-012 — Permit event versioning and semantic source QA | watch | 0 | 0 | 0 | 6 | — |
 | CAP-013 — Cross-vendor scientific data normalization | watch | 0 | 0 | 0 | 6 | — |
 | CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | watch | 0 | 0 | 0 | 6 | — |
-| CAP-017 — Sequencing operations evidence bridge | watch | 0 | 0 | 0 | 6 | — |
+| CAP-006 — Settlement-grounded recovery attribution | watch | 0 | 1 | 1 | 5 | — |
 
 ## Graph policy
 

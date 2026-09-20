@@ -2,7 +2,7 @@
 
 This is a cautious allocation recommendation, not an autonomous command. It blends empirical yield with an explicit exploration budget so unusual low-frequency discoveries are not optimized away.
 
-- Measured prospective or benchmark runs: **8**
+- Measured prospective or benchmark runs: **9**
 - Valid structured outcomes: **1**
 - Exploration budget: **50%**
 - Strategies with fewer than 5 runs or 20 deep inspections remain **insufficient evidence** even if their suggested allocation is high.
@@ -19,10 +19,10 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 | STRAT:protocol-regression-archaeology-for-pre-fat-systems | 8.6% | 0 | 0 | insufficient |
 | STRAT:rule-period-authority-version-audit | 8.6% | 0 | 0 | insufficient |
 | STRAT:search-run-v2-fields | 8.6% | 0 | 0 | insufficient |
-| STRAT:acceptance-path-transition-inspection | 6.9% | 1 | 0 | insufficient |
-| STRAT:fail-open-boundary-archaeology | 6.5% | 1 | 4 | insufficient |
-| STRAT:capability-conjunction-search-claim-tracing | 6.3% | 2 | 6 | insufficient |
-| STRAT:evaluation-target-independence | 6.1% | 2 | 4 | insufficient |
+| STRAT:fail-open-boundary-archaeology | 6.6% | 1 | 4 | insufficient |
+| STRAT:capability-conjunction-search-claim-tracing | 6.4% | 2 | 6 | insufficient |
+| STRAT:evaluation-target-independence | 6.2% | 2 | 4 | insufficient |
+| STRAT:acceptance-path-transition-inspection | 6.0% | 2 | 4 | insufficient |
 | STRAT:first-party-production-source-triangulation | 5.7% | 2 | 7 | insufficient |
 
 ## Highest-information capability gaps

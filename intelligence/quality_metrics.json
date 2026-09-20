@@ -1,7 +1,7 @@
 {
-  "search_runs": 8,
+  "search_runs": 9,
   "outcomes": 1,
-  "average_run_completeness": 0.875,
+  "average_run_completeness": 0.8888888888888888,
   "runs_below_70pct_completeness": 0,
   "issue_count": 0,
   "unregistered_strategy_runs": 0,
