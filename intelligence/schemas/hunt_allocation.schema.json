@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Unified Hunt Allocation",
+  "type": "object",
+  "required": [
+    "assignment_id",
+    "allocator_generation_id",
+    "slot_id",
+    "slot_role",
+    "work_item_id",
+    "work_kind",
+    "source_id",
+    "title",
+    "final_score",
+    "score_components",
+    "capability_ids",
+    "experiment_ids",
+    "instructions"
+  ],
+  "properties": {
+    "assignment_id": {
+      "type": "string",
+      "pattern": "^ASSIGN:[a-f0-9]{12}:slot-[0-9]{2}$"
+    },
+    "allocator_generation_id": {
+      "type": "string",
+      "pattern": "^ALLOCGEN:[a-f0-9]{12}$"
+    },
+    "slot_id": {
+      "type": "string",
+      "pattern": "^SLOT-[0-9]{2}$"
+    },
+    "slot_role": {
+      "type": "string"
+    },
+    "slot_label": {
+      "type": "string"
+    },
+    "work_item_id": {
+      "type": "string",
+      "pattern": "^WORK:[a-z0-9-]+:[a-z0-9-]+$"
+    },
+    "work_kind": {
+      "type": "string"
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "final_score": {
+      "type": "number"
+    },
+    "score_components": {
+      "type": "object"
+    },
+    "strategy_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "search_objective_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "capability_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "experiment_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "coverage_gap_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "adjacency_root": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "instructions": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true
+}
