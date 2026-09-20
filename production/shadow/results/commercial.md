@@ -569,3 +569,68 @@ This is **not a new repository**; it is a materially stronger economic-outcome s
 **REFERRALS:** No new referral. The existing provider/system-of-record readback referral already contains the unresolved settlement question; another referral would duplicate it.
 
 **NEXT TEST:** Find tier-5C-B evidence: a post-effect process death around a cash refund/payout/credit that remains economically successful, new-process recovery with no duplicate mutation, and later processor balance/payout/bank-settlement evidence that is independently grounded rather than only internally reconciled.
+
+## 2026-09-20 — Shadow run 9
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** Tier-5C-B can only be claimed when two independent axes intersect in one executable path: **effect-boundary crash safety** (post-provider-effect process death, restart, no duplicate) and **economic terminality** (later provider balance/payout/settlement evidence). A strong candidate may close the terminality half even if it fails the crash half; that gap is itself commercially useful negative knowledge.
+
+**DISCOVERY METHODS:**
+1. Direct money-domain/code search for Stripe payouts/refunds combined with `SIGKILL`, restart, idempotency, balance transactions and `payout.paid`/terminal status.
+2. Analog/gap traversal from the prior Interlock tier-5B/5C-A evidence into Connect payout and cash-settlement paths, explicitly testing whether provider-object crash safety extends to payout finality.
+3. Low-attention implementation search for payout tables, exact provider IDs, connected-account balance readback and signed payout-event handling inside obscure repositories rather than payment-framework names.
+4. Commit-history + GitHub Actions archaeology to pin the strongest **successful exact revision**, and to challenge later revisions rather than assuming HEAD improved the evidence.
+
+**BEST CANDIDATE + URL + EXACT REVISION:** `karfalacisse900-alt/Flames-up.com` — https://github.com/karfalacisse900-alt/Flames-up.com — `2ba5fa878da26f405bfae1846c8c90f1d0e69c10` (`Stabilize Stripe payout acceptance`, 2026-09-09).
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `backend-cf/scripts/stripe-sandbox-runtime.mjs` drives a real isolated Captro Worker, local Supabase Auth/Postgres and real Stripe **test-mode** APIs. It creates a paid event, creates and confirms a real PaymentIntent, waits for the signed `payment_intent.succeeded` webhook, records the creator earning, then reads the connected Stripe balance until at least $20 is instant-available.
+- It requests an actual creator payout for $20, accepts only `pending|in_transit|paid` initially, then waits until the application payout history reports that same $20 payout as `paid` and requires a processed signed `payout.paid` webhook audit record.
+- `backend-cf/scripts/verify-stripe-native.mjs` is a separate read-only acceptance verifier. It refuses live mode and production infrastructure, retrieves the real Stripe PaymentIntent, event, connected account and balance, asserts application `available`/`pending` balances equal Stripe's `/balance`, polls the exact Stripe payout until terminal and **requires `payout.status == 'paid'`**, requires `method == 'instant'`, requires the destination be an eligible debit card, then binds the same payout ID/amount/destination to `app_payout_requests`, `app_payouts`, the real Stripe `payout.paid` event, the processed webhook audit row and the application's payout history.
+- The payout schema is not an in-memory demo. `app_payout_requests` stores creator/account/external-card identity, request key, amount/fee/net/currency/status and a unique `provider_payout_id`, with `unique (creator_id, request_key)`; payout/readback rows are separated from reconciliation issues. The environment itself is explicitly pinned to one Stripe mode.
+- Static source-contract tests in `stripe_connect_marketplace.test.mjs` assert payout/connect webhook handling, real balance and payout-list endpoints, payout readiness, refund/dispute reversal paths and one immutable earning/entitlement path.
+
+**REVISION-BOUND TEST / HISTORY EVIDENCE:**
+- For exact SHA `2ba5fa878da26f405bfae1846c8c90f1d0e69c10`, GitHub Actions records `Stripe Sandbox Integration` run `34357947547` as **completed / success** on 2026-09-09. `Validate Native Payments` also completed successfully on the same SHA.
+- The commit itself changes the sandbox runtime to wait for payment-webhook audit evidence and is titled `Stabilize Stripe payout acceptance`, which is consistent with the successful protected acceptance run rather than an unrelated code snapshot.
+- History shows payout work evolved through multiple commits rather than appearing once: native Stripe/debit payout requests, payout acceptance stabilization, payout-flow fixes, reconciliation repair and later debit-token proof work.
+- A crucial contrary data point: the later `ea4b3c5eb803534fe1b57cf579dc9928404ba308` (`test: prove native debit token payout path`) had its exact `Stripe Sandbox Integration` workflow **fail** on 2026-09-12. Therefore the evidence is deliberately pinned to `2ba5...`, not silently upgraded to a newer but failing revision.
+- Repository metadata at inspection is low-attention (0 stars / 0 forks) and GitHub reports no public license metadata. Per the standing hunt rule this does not erase technical value, but public provenance must remain recorded as `no detected public license`; the user's separate authorization assumption applies only to repository-owned code.
+
+**CRITICAL FALSIFICATION / TIER RESULT:**
+- This revision strongly closes the **economic terminality / provider-finality half** of the target: real Stripe test-mode purchase → connected-account balance parity → instant payout → provider `status=paid` → real `payout.paid` event → matching application payout/ledger evidence.
+- It does **not** close tier-5C-B as currently defined because the payout mutation is not wrapped in a post-effect fault seam. The `SIGKILL` in `stripe-sandbox-runtime.mjs` appears only in final process cleanup after `main()` completes; it is not a crash injected after Stripe accepts the payout and before local completion.
+- No inspected exact-revision path proves: payout accepted → process killed before local completion → genuinely new process recovery → no duplicate payout → same payout later `paid` with balance/settlement evidence.
+- `payout.paid` in Stripe test mode is meaningful provider-grounded terminality but still not an external bank statement or live-network settlement. It must not be described as independent bank settlement.
+
+**SPECIALIST PASSES:**
+- **CODE INSPECTOR:** froze `2ba5...`; verified the sandbox runtime, read-only verifier, payout schema and source-contract tests. Conclusion: provider and application state are cross-read rather than inferred from one local table.
+- **FAILURE/RELIABILITY ANALYST:** traced every process-kill occurrence. Conclusion: the only SIGKILL in the inspected payout runtime is teardown, so no effect-boundary crash claim is allowed.
+- **ECOSYSTEM/HISTORY ANALYST:** compared exact workflow runs and payout-history commits. Conclusion: `2ba5...` has successful revision-bound Stripe sandbox evidence, while a later stricter debit-token commit has a failing sandbox workflow; exact-revision selection materially changes confidence.
+- **COMMERCIAL ANALYST:** the reusable wedge is not another payout UI; it is an evidence pack that proves provider balance, payout terminality and local ledger parity, then can be combined with a crash injector to certify the missing boundary.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The frozen evidence supports the narrow claim that exact revision `2ba5...` executed a successful real Stripe **test-mode** path from purchase and connected balance to a $20 instant payout that reached Stripe `paid`, emitted a real `payout.paid` event and reconciled to application payout/ledger state. The verifier rejects the stronger tier-5C-B claim because there is no post-effect payout crash/restart/no-duplicate proof in this path. It also rejects “bank-settled,” “live-money production proof,” and any inference that newer HEAD is stronger merely because it is newer; the later debit-token sandbox run failed.
+
+**A-F SCORE (proposed only, after verifier):** **25/30 — A4 / B5 / C4 / D4 / E5 / F3.**
+- A4: a payout-finality qualification engagement can be delivered in provider test mode without touching live customer money.
+- B5: payout duplication, stuck creator balances and false paid-state reconciliation are direct-money risks.
+- C4: compresses connected-account readiness, balance readback, instant-payout execution, signed event processing and ledger/provider acceptance checks, but lacks crash-recovery machinery.
+- D4: real payout terminality plus cross-system balance/event/ledger binding is uncommon in a 0-star repository, though not conceptually unique.
+- E5: exact successful workflow, real-provider test-mode calls, separate read-only verifier, schema/tests and contradictory later-CI evidence make the narrow claim unusually well supported.
+- F3: no detected public license, protected provider test credentials/environment are required, and cash/bank settlement plus crash-safe payout recovery remain outside scope.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: marketplace/payments engineering lead, creator-platform finance owner, Controller's systems team or payout reliability group.
+- Pain: teams can mark a withdrawal `paid` locally without proving the same provider payout, provider balance transition and signed terminal event agree; adding crashes makes this harder and can create duplicate payouts.
+- First paid wedge: **Payout Settlement Qualification Pack** for one Stripe test-mode marketplace flow. Prove purchase/earning → provider balance parity → exact payout ID → terminal `payout.paid` → matching internal payout/ledger state, and emit a revision-bound evidence report. Then, as a separate higher tier, add controlled effect-boundary crash/restart testing before claiming crash-safe payout settlement.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Run 7/8 Interlock supplies the missing fault-boundary discipline: literal post-effect SIGKILL, new-process recovery and exact provider-effect counting, plus provider-native accounting application. This run supplies a complementary terminal-payout evidence pattern: connected balance parity, instant payout, provider `paid`, signed `payout.paid`, and local ledger/API match. Together they specify a concrete composite qualification harness, but **the two halves cannot be merged into a stronger factual claim until one executable path demonstrates both**.
+
+**SEARCH EFFORT / COST PROXIES:** 4 materially different discovery modes; two new low-attention payout paths plus the prior Interlock comparator triaged; exact source/test/schema/history and Actions evidence inspected; several dozen GitHub searches/reads; 0 untrusted-repository code executions, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Refine `SK-COM-003` into a **two-axis evidence matrix** rather than a single linear ladder. Axis A is **fault-boundary proof** (`none → response suppression → process death/restart → no duplicate`). Axis B is **economic terminality** (`provider object → provider final status → provider accounting application → payout/balance/bank evidence`). A candidate strong on Axis B must not inherit Axis A, and vice versa. Exact-revision CI archaeology is now a required sub-step when provider qualification claims depend on historical workflow runs; a later commit can regress the evidence.
+
+**REFERRALS:** No new referral. The existing provider/system-of-record readback referral already captures the intersection problem; duplicating it would add noise.
+
+**NEXT TEST:** Find the **intersection in one executable path**: a cash refund or payout with post-effect process death, new-process recovery and exact no-duplicate proof, followed by the same provider effect reaching terminal success with balance/payout/bank readback. Search for repositories where `payout.paid`/refund terminality, stable idempotency and an effect-boundary kill seam appear in the same integration harness rather than in separate projects.
