@@ -1,38 +1,42 @@
-# Freight Recovery v15.8 — Canonical Release Manifest
+# Freight Recovery v15.9 — Canonical Release Manifest
 
-Release checkpoint: **v15.8-governance-diligence-2026-09-20**
+Release checkpoint: **v15.9-actionable-launch-workflow-2026-09-20**
 
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Canonical v15.8 governance/diligence merge commit: `361061b380d98a69b34f362d4cfd9c4f526ccba2`
-- Governance/diligence pull request: **#29**
-- Earlier Freight lineage retained from v15–v15.7.
-- Repository `main` may continue to advance independently as hunters/integrators commit; the Freight merge commit above is the canonical v15.8 control checkpoint.
+- Canonical v15.9 product merge commit: `4fb865afe5e581996feed8cc61b10c7a99dedc52`
+- Pilot Launch Brief pull request: **#44**
+- v15.9 PR-head tested commit: `74e33db65da82da810a8593345d05efcd7a714c8`
+- Earlier Freight lineage retained from v15–v15.8.
+- Repository `main` may continue to advance independently as hunters/integrators commit; the merge commit above is the canonical v15.9 product checkpoint.
 
 ## Verified CI checkpoints
 
-### Freight Commercial Contracts
-- PR #29 final run: `35528127691`
+### Freight Commercial Contracts — v15.9
+- PR #44 final run: `35536987620`
 - Result: **success**
-- Final Freight suite included **141 tests** after the rights-evidence edge-case correction, plus:
-  - controlled-pilot rights gate;
-  - controlled-pilot rights-evidence gate;
+- Verified test counts:
+  - hunter/model contracts: **18 passed**
+  - Freight contracts: **185 passed**
+- Successful post-test gates included:
+  - controlled-pilot rights + rights-evidence gates;
+  - deployment-security evidence validation;
   - canonical Freight gap gate;
   - Data Readiness fixture;
+  - current Netlify customer-data route remains **BLOCKED**;
+  - deterministic current-route Pilot Launch Brief generation with known blocker assertions;
+  - separate-environment evidence remains **CONDITIONAL** until verified;
   - full synthetic commercial rehearsal;
-  - deterministic release provenance generation/verification;
-  - component inventory generation;
-  - deterministic CycloneDX SBOM generation/verification;
+  - deterministic release provenance + component inventory;
+  - CycloneDX SBOM generation/verification;
   - unsigned DSSE attestation generation/verification;
-  - deterministic diligence ZIP generation/verification.
+  - deterministic zero-customer-data diligence ZIP generation/verification.
 
 ### Technology Intelligence System
-- PR #29 final run: `35528127720`
+- v15.8 governance run retained: `35528127720`
 - Result: **success**
-- Pull-request execution ran the **read-only validate job only**.
-- All registry, provenance-debt, query-family, graph, data-quality, candidate-learning, outcome-attribution, objective, report, adaptive-policy, measurement-plan/campaign, surface-yield and validation steps passed.
-- The write-capable persistence job did not run on the pull request.
+- Read-only validation / main-only persistence boundary remains in force.
 
 ## Research-model supply-chain state
 
@@ -56,6 +60,8 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/DATA_READINESS_DIAGNOSTIC.md`
 - `freight/PILOT_PROTOCOL.md`
 - `freight/PILOT_LAUNCH_GATE.md`
+- `freight/PILOT_LAUNCH_BRIEF.md`
+- `freight/launch_brief.py`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
@@ -176,9 +182,31 @@ to accept confidential customer data.
 
 The manual route no longer trusts an operator-supplied boolean. It requires a structured VERIFIED separate-environment manifest with SHA-256 evidence receipts, a configuration fingerprint, verifier role/date metadata and an unexpired <=90-day validity window. The repository currently contains only a DRAFT template, so that route remains CONDITIONAL.
 
+## Actionable launch workflow
+
+v15.9 preserves `freight/pilot_launch_gate.py` as the authorization source and adds a separate deterministic operator/buyer layer in `freight/launch_brief.py`.
+
+The Launch Brief:
+- converts BLOCKED / CONDITIONAL codes into P0/P1/P2 remediation actions;
+- assigns an explicit owner;
+- states the exact source evidence required for closure;
+- states what route/control the closure unlocks;
+- uses explicit remediation ordering so immediate access-control fixes precede deeper infrastructure work;
+- gives unknown future blocker codes an `UNMAPPED_REVIEW` action instead of silently dropping them;
+- emits a deterministic SHA-256 brief hash;
+- cannot override or mutate the launch decision.
+
+Current known Netlify-route remediation begins with:
+1. enforce Netlify team MFA;
+2. identify the actual customer data plane;
+3. prove tenant isolation if multi-tenant use is required;
+4. prove parser sandbox boundaries if parser use is required.
+
+A remediation item closes only when its underlying evidence changes and the machine launch gate is rerun.
+
 ## Commercial state
 
-Freight Recovery v15.8 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, audit/backup reference-hardened, deterministic-diligence packaged, rights-evidence gated, incident-response documented and research-CI supply-chain hardened; EXP-001 remains externally unproven**.
+Freight Recovery v15.9 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened and operator-actionable through a deterministic launch-remediation brief; EXP-001 remains externally unproven**.
 
 Structured external Freight evidence remains:
 - directly evidenced Freight revenue: **$0**
