@@ -9,7 +9,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
-import xml.etree.ElementTree as ET
+import xml.parsers.expat as expat
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -207,27 +207,42 @@ def _inspect_csv(text: str, policy: IngestPolicy, reasons: list[str]) -> None:
         reasons.append("csv_parse_error")
 
 
+class _XMLLimitExceeded(Exception):
+    pass
+
+
 def _inspect_xml(text: str, policy: IngestPolicy, reasons: list[str]) -> None:
     depth = 0
     elements = 0
+    limit_reason: str | None = None
+    parser = expat.ParserCreate()
+
+    def start_element(_name: str, attributes: dict[str, str]) -> None:
+        nonlocal depth, elements, limit_reason
+        depth += 1
+        elements += 1
+        if depth > policy.max_xml_depth:
+            limit_reason = "xml_depth_limit_exceeded"
+            raise _XMLLimitExceeded
+        if elements > policy.max_xml_elements:
+            limit_reason = "xml_element_limit_exceeded"
+            raise _XMLLimitExceeded
+        if len(attributes) > policy.max_xml_attributes_per_element:
+            limit_reason = "xml_attribute_limit_exceeded"
+            raise _XMLLimitExceeded
+
+    def end_element(_name: str) -> None:
+        nonlocal depth
+        depth -= 1
+
+    parser.StartElementHandler = start_element
+    parser.EndElementHandler = end_element
     try:
-        for event, elem in ET.iterparse(io.StringIO(text), events=("start", "end")):
-            if event == "start":
-                depth += 1
-                elements += 1
-                if depth > policy.max_xml_depth:
-                    reasons.append("xml_depth_limit_exceeded")
-                    return
-                if elements > policy.max_xml_elements:
-                    reasons.append("xml_element_limit_exceeded")
-                    return
-                if len(elem.attrib) > policy.max_xml_attributes_per_element:
-                    reasons.append("xml_attribute_limit_exceeded")
-                    return
-            else:
-                elem.clear()
-                depth -= 1
-    except ET.ParseError:
+        parser.Parse(text, True)
+    except _XMLLimitExceeded:
+        if limit_reason is not None:
+            reasons.append(limit_reason)
+    except expat.ExpatError:
         reasons.append("xml_parse_error")
 
 
