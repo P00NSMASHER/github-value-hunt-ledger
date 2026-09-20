@@ -301,3 +301,13 @@ For each entry record:
 - Integrator score under standing repository-code permission: **26/30 — A5 B5 C4 D3 E4 F5**. Actual public repository had no visible root license; provenance remains recorded, but public-license category is not a value penalty under the user's separate permission assertion.
 - Capability: deterministic Salesforce opportunity↔Zuora subscription reconciliation for orphaned won opportunities, start/close-date drift, MRR/term mismatches and active-billing-vs-CRM-churn states with severity/annualized impact.
 - Integration / next action: use only as the upstream cross-system truth layer; independently seed the CRM/billing mismatch matrix and keep synthetic README dollars out of commercial proof.
+
+<!-- INTEGRATOR-R11-LABOR-PAYROLL-2026-09-20T0106-0400 -->
+### WilfredTinega/Upande-TA — biometric actual-time / overtime-to-payroll bridge
+- Revision: `af15de1fb844afd81221829c3be07dba8b5d98df`.
+- Integrator score after source-level recheck: **27/30 — A5 B4 C5 D5 E3 F5**. Hunter score was 28/30; evidence/completeness is reduced because the check-in normalizer deliberately mutates direction with direct DB writes that bypass normal document validation/linked-attendance/duplicate guards, making independent provenance essential.
+- Rights: MIT repository code. ZKTeco hardware/PUSH SDK, Node-RED, ERPNext/Frappe services, customer biometric/time records and labor/payroll policy remain separately governed.
+- Capability inspected: duplicate check-in prevention on normal inserts; shift-aware/overnight grouping and heuristic direction normalization; overtime period/overlap checks; linked submitted `Additional Salary` creation and cancellation for bulk overtime.
+- Important caveat: the overtime override bypasses some native duplicate-date/overtime-type/max-hours checks for bulk-generated slips and trusts precomputed amounts. The formula/policy is not labor-law authority. Repaired check-in direction and precomputed OT amount must be independently approved/validated before payroll-dollar conclusions.
+- Integration: Labor-to-Payroll Assurance v2; RosterSpec planned state -> raw biometric facts -> labeled repair/adjudication -> OT approval -> Additional Salary/payroll -> accounting/payment proof.
+- Promotion gate: pass a synthetic adversarial clock corpus with no false compensable-hours creation and prove expected->actual->approved->paid lineage on an authorized closed period. Keep out of MASTER until then.

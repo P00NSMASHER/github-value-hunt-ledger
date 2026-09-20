@@ -224,3 +224,11 @@ The strongest path remains a frozen customer-authorized blind population carried
 - Buyer: IT, FinOps, procurement and controllers.
 - First paid wedge: one renewal cohort or top 20 SaaS vendors; quantify unused-seat spend, offboarded-user licenses and duplicate/unmatched payments, with human approval before any access change.
 - Revenue path: fixed audit -> recurring renewal calendar/true-up monitoring; realized savings tracked only after contract/vendor action is confirmed.
+
+<!-- INTEGRATOR-R11-LABOR-PAYROLL-2026-09-20T0106-0400 -->
+## Biometric Time-to-Payroll Acceptance Audit
+- Core: planned roster + immutable/raw biometric events + shift-aware exception/adjudication + approved overtime + payroll artifact + payment evidence.
+- Buyer: ERPNext/Frappe employers, payroll service firms and multi-site operators with ZKTeco-style clocks.
+- First paid wedge: one closed payroll period; quantify missing/duplicate punches, inferred-direction exceptions, approved-but-unpaid OT, unsupported OT and payroll-review time.
+- Revenue path: fixed diagnostic -> recurring pre-payroll exception assurance -> broader labor/payroll reconciliation.
+- Safety/integrity: biometric/person records are customer-controlled sensitive data; use only explicitly authorized customer data. Automated scan-direction repair is never sufficient evidence by itself for a wage/payment conclusion.
