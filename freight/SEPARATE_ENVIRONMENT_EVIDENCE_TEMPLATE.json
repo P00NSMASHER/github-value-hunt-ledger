@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "evidence_status": "DRAFT",
+  "environment_id": "REPLACE_WITH_UNIQUE_ENVIRONMENT_ID",
+  "environment_evidence_ref": null,
+  "provider_or_host": null,
+  "single_tenant": true,
+  "parser_runtime_used": false,
+  "controls": {
+    "mfa_enforced": {
+      "value": false,
+      "evidence_ref": null
+    },
+    "encrypted_at_rest": {
+      "value": false,
+      "evidence_ref": null
+    },
+    "encrypted_in_transit": {
+      "value": false,
+      "evidence_ref": null
+    },
+    "access_scope_defined": {
+      "value": false,
+      "evidence_ref": null
+    },
+    "read_only_ingestion": {
+      "value": false,
+      "evidence_ref": null
+    },
+    "retention_defined": {
+      "value": false,
+      "evidence_ref": null
+    },
+    "deletion_defined": {
+      "value": false,
+      "evidence_ref": null
+    },
+    "customer_data_excluded_from_current_netlify": {
+      "value": false,
+      "evidence_ref": null
+    }
+  },
+  "multi_tenant_isolation": {
+    "status": "NOT_APPLICABLE",
+    "evidence_ref": null
+  },
+  "parser_sandbox": {
+    "status": "NOT_APPLICABLE",
+    "cpu_limit_evidence_ref": null,
+    "memory_limit_evidence_ref": null,
+    "time_limit_evidence_ref": null,
+    "network_isolation_evidence_ref": null,
+    "credential_isolation_evidence_ref": null
+  },
+  "notes": "Template only. Do not put secrets or raw buyer data in this file."
+}
