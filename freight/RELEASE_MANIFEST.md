@@ -1,31 +1,33 @@
-# Freight Recovery v15.9 — Canonical Release Manifest
+# Freight Recovery v15.10 — Canonical Release Manifest
 
-Release checkpoint: **v15.9-actionable-launch-workflow-2026-09-20**
+Release checkpoint: **v15.10-buyer-activation-packet-2026-09-20**
 
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Canonical v15.9 product merge commit: `4fb865afe5e581996feed8cc61b10c7a99dedc52`
-- Pilot Launch Brief pull request: **#44**
-- v15.9 PR-head tested commit: `74e33db65da82da810a8593345d05efcd7a714c8`
-- Earlier Freight lineage retained from v15–v15.8.
-- Repository `main` may continue to advance independently as hunters/integrators commit; the merge commit above is the canonical v15.9 product checkpoint.
+- Canonical v15.10 product merge commit: `6b6d8a4403c9577abb4eca1d041f02ae210dd585`
+- Pilot Activation Packet pull request: **#48**
+- v15.10 PR-head tested commit: `7ea154d38299fcf9b3018818bbde2a2f1f6c7061`
+- Canonical checkpoint branch base: `2fe8cc6ad34cae1ece819dc324c1fd9351d3b3b3`
+- The checkpoint base includes later XML/EDI input-hardening work that landed after PR #48; checkpoint CI must therefore revalidate the combined state.
+- Earlier Freight lineage retained from v15–v15.9.
 
 ## Verified CI checkpoints
 
-### Freight Commercial Contracts — v15.9
-- PR #44 final run: `35536987620`
+### Freight Commercial Contracts — v15.10 implementation
+- PR #48 final run: `35538071323`
 - Result: **success**
 - Verified test counts:
   - hunter/model contracts: **18 passed**
-  - Freight contracts: **185 passed**
+  - Freight contracts: **205 passed**
 - Successful post-test gates included:
   - controlled-pilot rights + rights-evidence gates;
   - deployment-security evidence validation;
   - canonical Freight gap gate;
   - Data Readiness fixture;
   - current Netlify customer-data route remains **BLOCKED**;
-  - deterministic current-route Pilot Launch Brief generation with known blocker assertions;
+  - deterministic Pilot Launch Brief generation;
+  - deterministic buyer-safe Pilot Activation Packet generation with published price/source-timing assertions;
   - separate-environment evidence remains **CONDITIONAL** until verified;
   - full synthetic commercial rehearsal;
   - deterministic release provenance + component inventory;
@@ -62,6 +64,8 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/PILOT_LAUNCH_GATE.md`
 - `freight/PILOT_LAUNCH_BRIEF.md`
 - `freight/launch_brief.py`
+- `freight/PILOT_ACTIVATION_PACKET.md`
+- `freight/pilot_activation_packet.py`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
@@ -204,9 +208,39 @@ Current known Netlify-route remediation begins with:
 
 A remediation item closes only when its underlying evidence changes and the machine launch gate is rerun.
 
+## Buyer activation handoff
+
+v15.10 adds a deterministic buyer-safe `Pilot Activation Packet` above the readiness, launch-gate and launch-brief layers.
+
+The packet binds:
+- readiness status + score;
+- selected published offer and buyer-facing price band;
+- launch status/route;
+- launch warnings and prioritized remediation actions;
+- data-room requests split into **NOW / CONDITIONAL / LATER_OUTCOME**;
+- buyer responsibilities;
+- Freight Recovery responsibilities;
+- blind-pilot stages;
+- the four separate buyer-report totals;
+- commercial integrity invariants;
+- a deterministic SHA-256 activation hash.
+
+The packet rejects inconsistent readiness/launch-decision inputs and intentionally excludes internal loaded-hourly-cost, analyst-hour-budget and target-margin assumptions.
+
+For a READY buyer, the current published offer remains:
+- Blind Freight Audit Acceptance Test: **$15,000–$25,000 fixed**
+- target analysis/report turnaround: **10–15 business days after complete inputs**
+
+For a non-ready/conditional buyer, the packet routes to:
+- Data Readiness / Authority Diagnostic: **$5,000–$7,500 fixed**
+
+Settlement evidence is requested as **LATER_OUTCOME** evidence rather than being misrepresented as immediate savings proof.
+
+Editing the packet cannot authorize launch; only new underlying evidence followed by a rerun of the machine Pilot Launch Gate can do that.
+
 ## Commercial state
 
-Freight Recovery v15.9 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened and operator-actionable through a deterministic launch-remediation brief; EXP-001 remains externally unproven**.
+Freight Recovery v15.10 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, and buyer-handoff-ready through a deterministic activation packet; EXP-001 remains externally unproven**.
 
 Structured external Freight evidence remains:
 - directly evidenced Freight revenue: **$0**
@@ -214,7 +248,7 @@ Structured external Freight evidence remains:
 - paid diagnostic/pilot/annual conversion: **none recorded**
 - Freight `ACTIVE_SEARCH` gaps: **0**
 
-No v15.8 internal engineering result changes those external facts.
+No v15.10 internal engineering result changes those external facts.
 
 ## Current internal proof boundary
 
