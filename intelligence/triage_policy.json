@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "holdout_target_rate": 0.1,
+  "min_triage_rejects_for_required_holdout": 5,
+  "min_holdout_sample_count": 1,
+  "min_audited_rejects_before_prefilter_candidate": 20,
+  "max_material_false_negatives_before_prefilter_candidate": 0,
+  "hard_filter_auto_enable": false,
+  "policy_note": "Cheap prefilters may inform prioritization, but no reason code becomes an automatic hard filter from observational data alone. Sample rejected candidates and audit false negatives first."
+}
