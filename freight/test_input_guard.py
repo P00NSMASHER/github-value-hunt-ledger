@@ -31,6 +31,33 @@ def test_xml_doctype_and_entity_are_rejected():
     assert "xml_entity_rejected" in result.reasons
 
 
+def test_malformed_xml_is_typed_reject():
+    result = inspect_input("authority.xml", b"<root><child></root>")
+    assert result.status is InputStatus.REJECT
+    assert "xml_parse_error" in result.reasons
+
+
+def test_xml_depth_limit_fails_closed():
+    policy = IngestPolicy(max_xml_depth=3)
+    result = inspect_input("authority.xml", b"<a><b><c><d/></c></b></a>", policy)
+    assert result.status is InputStatus.REJECT
+    assert "xml_depth_limit_exceeded" in result.reasons
+
+
+def test_xml_element_limit_fails_closed():
+    policy = IngestPolicy(max_xml_elements=3)
+    result = inspect_input("authority.xml", b"<a><b/><c/><d/></a>", policy)
+    assert result.status is InputStatus.REJECT
+    assert "xml_element_limit_exceeded" in result.reasons
+
+
+def test_xml_attribute_limit_fails_closed():
+    policy = IngestPolicy(max_xml_attributes_per_element=2)
+    result = inspect_input("authority.xml", b'<a x="1" y="2" z="3"/>', policy)
+    assert result.status is InputStatus.REJECT
+    assert "xml_attribute_limit_exceeded" in result.reasons
+
+
 def test_csv_formula_export_is_neutralized_without_changing_plain_values():
     assert neutralize_spreadsheet_cell("=1+1") == "'=1+1"
     assert neutralize_spreadsheet_cell("  @SUM(A1:A2)") == "'  @SUM(A1:A2)"
@@ -40,6 +67,21 @@ def test_csv_formula_export_is_neutralized_without_changing_plain_values():
 
 def test_path_traversal_filename_is_rejected():
     result = inspect_input("../invoice.csv", b"a,b\n1,2\n")
+    assert result.status is InputStatus.REJECT
+    assert "unsafe_filename" in result.reasons
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        r"..\invoice.csv",
+        r"C:\temp\invoice.csv",
+        r"\\server\share\invoice.csv",
+        "invoice.csv:alternate",
+    ],
+)
+def test_windows_style_or_ads_filename_is_rejected(filename):
+    result = inspect_input(filename, b"a,b\n1,2\n")
     assert result.status is InputStatus.REJECT
     assert "unsafe_filename" in result.reasons
 
@@ -61,6 +103,13 @@ def test_edi_segment_limit_fails_closed():
     result = inspect_input("invoice.edi", b"ISA*" + b"A" * 100 + b"~", policy)
     assert result.status is InputStatus.REJECT
     assert "edi_segment_too_long" in result.reasons
+
+
+def test_many_short_edi_segments_are_accepted_under_segment_limit():
+    policy = IngestPolicy(max_edi_segment_chars=20)
+    payload = b"ISA*00~" + b"REF*A~" * 10_000
+    result = inspect_input("invoice.edi", payload, policy)
+    assert result.status is InputStatus.ACCEPT
 
 
 def test_zip_extension_is_rejected_even_without_zip_magic():
@@ -137,9 +186,12 @@ def test_csv_total_cell_limit_fails_closed():
         "max_csv_rows",
         "max_csv_cells_per_row",
         "max_csv_total_cells",
+        "max_xml_depth",
+        "max_xml_elements",
+        "max_xml_attributes_per_element",
     ],
 )
-def test_csv_policy_limits_must_be_positive(field_name):
+def test_shape_policy_limits_must_be_positive(field_name):
     kwargs = {field_name: 0}
     with pytest.raises(ValueError, match=f"{field_name} must be positive"):
         IngestPolicy(**kwargs)
