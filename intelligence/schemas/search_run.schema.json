@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v5",
+  "title": "Technology Intelligence Search Run v6",
   "type": "object",
   "required": [
     "search_run_id",
@@ -320,6 +320,45 @@
         "type": "string",
         "pattern": "^SEED:[a-z0-9:-]+$"
       }
+    },
+    "adjacency_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "generated",
+        "manual",
+        "none",
+        null
+      ]
+    },
+    "adjacency_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ADJ:[a-z0-9-]+:[a-z0-9-]+$"
+      }
+    },
+    "adjacency_types": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "organization_siblings",
+          "contributor_lineage",
+          "fork_descendants",
+          "dependency_upstream",
+          "consumer_downstream",
+          "distinctive_symbol",
+          "commit_lineage"
+        ]
+      }
+    },
+    "adjacency_root_nodes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "additionalProperties": true,
@@ -380,6 +419,26 @@
         "required": [
           "seed_mode",
           "seed_ids"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 6
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "adjacency_mode",
+          "adjacency_ids",
+          "adjacency_types",
+          "adjacency_root_nodes"
         ]
       }
     }

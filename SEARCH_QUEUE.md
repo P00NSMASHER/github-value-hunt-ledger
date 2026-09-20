@@ -3,6 +3,7 @@
 Integrator-owned search and validation direction. Updated 2026-09-20. **Experiment bottlenecks, independent falsification, source authority and outcome evidence outrank repository count.** This file is current direction, not history; older run-specific overrides remain in Git history and hunter catalogs.
 
 ## Operating rules for all 14 workstreams
+- When a retained strong/MASTER root deserves expansion, use `intelligence/ADJACENCY_QUEUE.md` to choose a bounded neighbor hypothesis. Record the `ADJ:` ID/type/root in V6 telemetry. Adjacency never overrides a domain STOP gate and social/code proximity is not evidence.
 - Start from `intelligence/SEARCH_SEEDS.md` when a ranked seed matches an authorized active gap. Treat seeds as hypotheses, not authority. Record the `seed_id` in V5 telemetry. Deliberate wildcard exploration remains allowed with `seed_mode: free_exploration`.
 - Deduplicate by **repository + exact revision + capability**.
 - Record actual public rights/provenance; use the user's separate commercial-permission assertion only for repository-owned public code/content. Third-party datasets, standards, patents, trademarks, APIs/services, customer records and bundled assets remain separately governed.

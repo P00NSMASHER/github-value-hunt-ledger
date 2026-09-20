@@ -80,6 +80,10 @@ jobs:
         run: python tools/ti_seed_compiler.py
       - name: Validate V5 search seeds and seed attribution
         run: python tools/ti_seed_validate.py
+      - name: Compile V6 adjacency expansion queue
+        run: python tools/ti_adjacency.py
+      - name: Validate V6 adjacency attribution
+        run: python tools/ti_adjacency_validate.py
       - name: Build measurement-debt plan
         run: python tools/ti_measurement_plan.py
       - name: Build matched strategy measurement campaign
@@ -136,6 +140,10 @@ jobs:
         run: python tools/ti_seed_compiler.py
       - name: Validate V5 search seeds and seed attribution
         run: python tools/ti_seed_validate.py
+      - name: Compile V6 adjacency expansion queue
+        run: python tools/ti_adjacency.py
+      - name: Validate V6 adjacency attribution
+        run: python tools/ti_adjacency_validate.py
       - name: Build measurement-debt plan
         run: python tools/ti_measurement_plan.py
       - name: Build matched strategy measurement campaign
@@ -182,7 +190,11 @@ jobs:
                   intelligence/search_seeds.jsonl \
                   intelligence/SEARCH_SEEDS.md \
                   intelligence/SEED_PERFORMANCE.md \
-                  intelligence/seed_metrics.json
+                  intelligence/seed_metrics.json \
+                  intelligence/adjacency_queue.jsonl \
+                  intelligence/ADJACENCY_QUEUE.md \
+                  intelligence/ADJACENCY_PERFORMANCE.md \
+                  intelligence/adjacency_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main

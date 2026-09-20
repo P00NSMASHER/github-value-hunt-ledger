@@ -255,3 +255,36 @@ New prospective runs should use `schema_version: 5` and record:
 - `seed_mode: free_exploration` with an empty `seed_ids` list for deliberate wildcard exploration.
 
 Seed priority is advisory. It cannot override domain-specific search gates, safety rules, source authority or experiment stop conditions. Seed performance is not used to penalize a hypothesis until it has at least 3 measured runs and 10 deep inspections.
+
+
+## V6 adjacency expansion
+
+V6 makes second-order discovery measurable. A high-value repository can now generate bounded adjacency hypotheses across:
+
+- organization siblings;
+- contributor/maintainer lineage;
+- forks and production descendants;
+- unusual upstream dependencies;
+- downstream consumers;
+- distinctive source/test symbols;
+- commit, rename and regression lineage.
+
+Generated products:
+- `adjacency_queue.jsonl` — stable `ADJ:...` hypotheses rooted in MASTER leaders and recent strong findings;
+- `ADJACENCY_QUEUE.md` — ranked human-readable expansion packets;
+- `ADJACENCY_PERFORMANCE.md` — yield by adjacency type and exact hypothesis;
+- `adjacency_metrics.json` — machine-readable summary.
+
+New prospective runs use `schema_version: 6` and record:
+- `adjacency_mode: generated` with one or more generated adjacency IDs;
+- `adjacency_mode: manual` for a bounded hunter-authored neighbor search;
+- `adjacency_mode: none` when no adjacency expansion was used;
+- standardized `adjacency_types` and `adjacency_root_nodes`.
+
+Adjacency is never evidence by itself. A neighbor is retained only when it adds a new capability, materially stronger evidence, an independent implementation, a production descendant, a useful negative control, or a new experiment edge.
+
+Minimum evidence before adjacency performance can influence priority:
+- exact adjacency hypothesis: 3 measured runs and 10 deep inspections;
+- adjacency type: 5 measured runs and 20 deep inspections.
+
+Domain STOP gates still win. Adjacency cannot be used to silently reopen broad freight or another explicitly closed search lane.
