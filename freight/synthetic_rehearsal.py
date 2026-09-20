@@ -148,7 +148,7 @@ def run_rehearsal() -> dict:
     )
 
     with tempfile.TemporaryDirectory() as td:
-        store = SettlementStore(Path(td) / "settlement.sqlite3")
+        store = SettlementStore(\n            Path(td) / "settlement.sqlite3",\n            buyer_id=BUYER,\n            business_unit=BU,\n        )
         store.create_claim(
             RecoveryClaim(
                 "f-1","inv-1","carrier",BUYER,"USD",2500,
