@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -50,5 +50,9 @@
   "search_objective_id": "OBJ:replace-with-controlled-objective",
   "benchmark_task_ids": [],
   "comparison_group_id": null,
-  "evaluation_set_id": null
+  "evaluation_set_id": null,
+  "seed_mode": "generated",
+  "seed_ids": [
+    "SEED:gap:cap-009"
+  ]
 }
