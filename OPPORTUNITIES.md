@@ -246,3 +246,33 @@ The strongest path remains a frozen customer-authorized blind population carried
 - Extend the existing grid opportunity with `PowerOptLab.jl@4f417d470c8bff78bd0941658f97030e5ddb7692` for uncertainty-aware state/model and operating-envelope analysis and `MWLP-Storm-Repair@07adc8df235b6c95df7c8a679819a91256d40a7c` for post-failure weighted-latency restoration.
 - The commercial sequence becomes model-conversion parity -> deterministic hosting/QSTS -> uncertainty/evidence challenge -> risk/inspection or storm-restoration action -> measured field/outage outcome.
 - Do not sell “better grid decisions” from method novelty alone. Require same-input baseline tests: deterministic OPF versus PowerOptLab, and nearest/severity dispatch versus MWLP, with planted model uncertainty and repair-time uncertainty.
+
+<!-- INTEGRATOR-R11-BENCHMARK-LIVE-2026-09-20 -->
+## Opportunity portfolio movement — sequencing and insurance recovery
+
+### Installed-Base Lab Automation v6 — sequencing operations evidence profile
+- Sources: `SemaphoreSolutions/s4-clarity-lib@ad577fff3a3c4c93f4bb898940a0b45268c7dbe7` + `Illumina/interop@015a85ec100c7a770ed0e27ce7fadc6230a38208` + Flowcept provenance; existing SLIMS/Allotropy/lab-control leaders remain complementary.
+- Buyer/problem: sequencing cores, genomics CROs and biotech platform labs already invested in Clarity/Illumina need reliable workflow automation and run-operational evidence without replacing their systems of record.
+- First paid wedge: automate one QC/pooling/run-prep Clarity workflow, link it to authorized non-PHI InterOp run metrics and return a deterministic evidence/replay pack.
+- Monetization: fixed workflow/integration/validation engagement -> recurring support for workflow and instrument-software changes -> broader installed-base automation.
+- Score: **28/30 — A5 B4 C5 D4 E5 F5**. The wedge is concrete and technically mature, but sales are installed-base specific and no end-to-end customer outcome is yet recorded.
+- Defensibility: accumulated vendor workflow/state semantics + official run-metric parsing + provenance, rather than another greenfield lab OS.
+- Next validation: EXP-007 synthetic Clarity -> InterOp -> provenance fixture with wrong/missing run identity, invalid workflow transition and metric exception. No sequence reads/PHI required.
+- Ranking effect: strengthens the existing lab priority but does **not** displace direct-money freight/AP/commission/recovery opportunities without external outcome evidence.
+
+### Insurance Subrogation Recovery Diagnostic — 27/30 challenger
+- Sources: `sidnov6/recoupe@60e0e02bec789ab505752dacfecdd76438aacd48` as workflow/quantum/synthetic-evaluation scaffolding + independently authoritative current jurisdiction/policy sources + proof/evidence + settlement lineage.
+- Buyer/problem: auto/property/workers-comp carriers, TPAs and subrogation vendors miss or inconsistently pursue recoverable claims because paid-loss facts, fault, policy limits, rule authority, evidence and negotiation state are fragmented.
+- First paid wedge: closed-claim diagnostic after a fail-closed synthetic benchmark; rank potentially recoverable claims and exact missing evidence/rule authority, then compare with actual historical recoveries.
+- Monetization: fixed diagnostic -> recurring prioritized recovery workflow; outcome-based economics only after realized settlement is uniquely attributable.
+- Score: **27/30 — A5 B5 C5 D4 E4 F4**.
+- Critical risk: the inspected repository's own negligence/limitations data include illustrative/pending-review values and an unsafe generic unknown-jurisdiction fallback. Those data are **not** legal authority and may never generate hard-dollar claims.
+- Next validation: EXP-011 with explicit versioned synthetic rule packs, unknown/conflicting jurisdiction negatives and $0 assertion on unresolved authority; commercial proof remains blocked until separately authoritative rules and customer-authorized closed outcomes exist.
+
+### Revenue Decision Assurance — Talos refinement, no rank jump
+- `GiovanniGatti/talos@41fae94f941ea36fccddd395e86cd5662002e3cb` adds a technically strong finite-horizon constrained-capacity policy/value engine with uncertainty-aware simulation.
+- Use it as a shadow counterfactual challenger beside the existing revenue-optimization components, not as production pricing authority. Reproduce its simulation and require same-input comparison with simple/incumbent baselines before claiming incremental revenue.
+
+### Money-State Integrity — Fintechcore refinement, evidence gate unchanged
+- `amrit-kumar/fintechcore@b27a22890e8b5173d2a97be512a198a4564ed425` adds useful payment lifecycle, idempotency, double-entry and independent reconciliation semantics to CAP-016.
+- Its own testing ADR says automated unit/integration/E2E coverage was deferred, so it remains a challenger/reference rather than a promoted operating core. EXP-010 must include automated race, reversal/refund, outbox-loss, replay and settlement negatives before this changes opportunity rank.
