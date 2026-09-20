@@ -80,5 +80,17 @@ Do not add payment/commission/FSM connectors absent a concrete buyer. Marketplac
 ### 14. Wildcard analog hunter — reproduce MASTER DNA, not keywords — P2
 Search obscure/zero-star/archived/public repositories for **complete vertical OS + deterministic money/evidence loop** analogs: healthcare revenue integrity, regulated inspection/service, specialty logistics, environmental services, utilities, laboratory operations, insurance/claims, telecom/network migration, industrial commissioning and public-data decision infrastructure. Prefer artifacts with source/tests/schemas/fixtures and a first paid diagnostic that can be run read-only. Refer cross-lane finds to the owning domain instead of starting a duplicate stack.
 
+## Coverage repair — sparse thematic catalogs
+Current catalog inventory shows five thematic files still at template-only state: `hunters/07.md` (Finance/AP audit & recovery), `hunters/08.md` (Insurance/claims/risk), `hunters/29.md` (Pricing/yield/revenue management), `hunters/30.md` (Payments/billing/subscriptions/invoicing) and `hunters/31.md` (Tax/accounting/regulatory automation). This is a **search-coverage gap, not evidence that the domains are empty**. Any active hunter whose assignment intersects these areas should write inspected strong/watch/reject results into the appropriate catalog instead of leaving findings only in adjacent lanes.
+
+Prioritized repair targets:
+- **07 Finance/AP:** deterministic duplicate-pay, vendor-allowance/rebate, contract-price, utility/telecom fee, AP recovery and credit-settlement engines with source→finding→credit/payment evidence. Avoid generic AP dashboards and invoice OCR.
+- **08 Insurance/claims:** subrogation, overpayment/recovery, reserving/coverage decision evidence, adjuster workflow and claim-proof engines using synthetic/public/authorized data only. No PHI, claimant PII or accidental private data.
+- **29 Pricing/yield:** B2B contract-price leakage, ancillary-charge/yield rules, capacity/revenue optimization and independently falsifiable price decisions. Avoid generic dynamic-pricing demos.
+- **30 Payments/billing:** read-only settlement/reconciliation, payout/reversal/reserve/refund lineage, usage-metering entitlement and billing-state invariants. Do not add another generic processor SDK.
+- **31 Tax/accounting:** versioned GST/VAT/sales-use-tax and tax-credit/reconciliation engines with explicit effective-date authority and invoice/source evidence. Reject stale rules that produce deterministic but outdated conclusions.
+
+Success condition for coverage repair is **not** candidate count. One deeply verified reject is preferable to a shallow list. Empty catalogs should remain empty only when the assigned hunter actually found nothing after a documented search, not because the domain was skipped.
+
 ## Global stop list
 Do not spend cycles on another generic CRM/ERP shell, RAG/chatbot, invoice OCR, workflow/RPA, X12 parser, fuzzy matcher, rules engine, hash ledger, backup manager, FSM CRUD, commission calculator, PDF diff, scheduler, contract-deadline extractor, protocol library, DCC writer, weather/map dashboard or generic forecasting model **unless it contains a rare domain invariant, authoritative data source, difficult integration, independently falsifiable algorithm or money/evidence workflow that materially beats an existing leader.**
