@@ -37,7 +37,10 @@
         "DISCOVERED",
         "CONTRIBUTED_TO",
         "ATTRIBUTED_TO",
-        "OBSERVED_IN"
+        "OBSERVED_IN",
+        "USED_SURFACE",
+        "MEMBER_OF",
+        "PURSUED"
       ]
     },
     "to": {
