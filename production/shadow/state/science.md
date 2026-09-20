@@ -152,3 +152,36 @@ NEXT TEST:
 Find a scientific executor whose post-restart recovery path reuses the same durable effect/command identity to query the real instrument/system-of-record and transitions `OUTCOME_UNKNOWN → SUCCEEDED/FAILED_NO_EFFECT` from authoritative readback without issuing a second physical command.
 
 CONFIDENCE: **HIGH that durable unknown-outcome gating is a reusable kernel; MEDIUM that a broadly reusable authoritative reconciliation implementation is public.**
+
+## 2026-09-20 — Run 7 evidence-backed update
+
+### H3 refinement — effect truth needs a temporal durability axis
+STATUS: **SUPPORTED; A NEW INTERMEDIATE SAFETY/TRUTH LAYER IS VERIFIED, BUT THE STRONGEST H3 RECONCILIATION TARGET REMAINS UNRESOLVED.**
+
+SUPPORTING EVIDENCE:
+- `Abenor-Labs/Open-MHS@92b04b023915ba7cdf2cac55eb58e86a3c94cc0d` independently implements a declarative hardware safety envelope with two pre-transport enforcement points. Dedicated tests assert unsafe writes produce zero transport emissions and no state change, including a deliberately naive driver behind the middleware.
+- The same write path does not equate transport success with physical truth: where feedback exists it polls the declared sensor and raises explicit desync when the command landed but the observed state did not follow.
+- The RPC/audit boundary distinguishes four materially different classes: policy refusal (`transmitted: null`), concrete transmitted values with verification status, transmitted-but-desynced state, and transport failure recorded as `transmitted: "unknown"` instead of pretending nothing happened.
+- Audit records are hash-chained, flushed/fsynced, and a fresh process resumes sequence/hash state from the prior file. This makes recorded effect truth persistent across ordinary restart.
+- The official Model Hardware Standard entered limited research preview on 2026-08-27, while `Abenor-Labs/Open-MHS` and `SCUT-ESA/open-mhs` appeared independently within days. The technical category is therefore beginning to branch before the official public specification exists.
+
+CONTRARY EVIDENCE:
+- Open-MHS writes its audit event only **after** the driver write returns or throws. A process/power failure after bytes reached the device but before the audit append can lose the fact that the effect may have happened.
+- No inspected durable business-effect/native-command identity is reserved before dispatch; the registry and last-write state are in memory, so restart does not itself block a repeated command because an earlier physical outcome is unresolved.
+- No generic post-restart resolver reuses the original native command identity to query the device/system-of-record and close ambiguity without redispatch.
+- The project explicitly states real-hardware validation is still roadmap work; serial/manipulation evidence is fake-port/loopback/simulation rather than physical metal.
+- The official MHS schema/API is not yet public, so independent “Open-MHS” projects are emergence evidence, not proof of conformance to the eventual official standard.
+
+LESSON IMPACT:
+- Refine LOCAL-2 with an **effect-integrity ladder** instead of a binary “safe/unsafe” label:
+  0. no explicit external-effect truth distinction;
+  1. runtime truth classification (`NOT_SENT / SENT_VERIFIED / SENT_DESYNC / SEND_OUTCOME_UNKNOWN`);
+  2. uncertainty/effect identity is durably persisted **before** external actuation and restart blocks blind replay;
+  3. the same durable native/effect identity supports authoritative post-crash reconciliation to `SUCCEEDED` or `FAILED_NO_EFFECT` without issuing a second physical command.
+- Run 7 verifies a strong Level-1 component. ROSClaw/Opentrons-style patterns cover much of Level 2. Level 3 remains the high-value missing kernel.
+- New LOCAL-3 candidate lesson: **inspect the effect truth table and the timing of persistence relative to actuation**. One successful task only; keep it LOCAL and do not stage/promote globally yet.
+
+NEXT TEST:
+Find a scientific executor that reaches **Level 3**: crash after device write but before acknowledgement, restart with the same durable business-effect/native-command identity, query authoritative device/system-of-record state, and resolve the original action without redispatch.
+
+CONFIDENCE: **HIGH that the ladder correctly separates auditability from crash-safe effect integrity; MEDIUM that a public Level-3 implementation exists.**
