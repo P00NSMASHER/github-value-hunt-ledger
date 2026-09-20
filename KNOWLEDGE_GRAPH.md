@@ -74,8 +74,9 @@ Human-readable current graph connecting repository/data evidence to capabilities
 - Allotropy -> IMPLEMENTS CAP-013.
 - S4 Clarity + scilifelab EPPs + samplesheet-parser + Illumina InterOp -> IMPLEMENT/STRENGTHEN CAP-017.
 - Flowcept/HELIOS -> STRENGTHEN provenance/governance.
-- PyLabRobot + MADSci shadow evidence -> CHALLENGE blind physical re-dispatch and STRENGTHEN an UNKNOWN/recovery-required actuation pattern; restart-durable exactly-once remains unproven.
-- CAP-013+017 -> ENABLES OPP Installed-Base Lab Automation -> TESTED_BY EXP-007.
+- `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` -> STRENGTHENS CAP-017 with same-action readback after a lost dispatch response and explicit `UNKNOWN` on unresolved result lookup, while CHALLENGING any system-wide exactly-once claim because generic workflow retry can create a fresh ActionRequest/ULID without mandatory physical reconciliation.
+- `AD-SDL/ot2_module@39ffdfdb...` + `RoryMB/simlab@5ae0641...` -> TEST-HARNESS candidates for vendor-run identity and simulated actuation; `di-omics/plr-lab-robot@0b062298...` -> NEGATIVE_CONTROL for self-validating command-mutated local state.
+- CAP-013+017 -> ENABLES OPP Installed-Base Lab Automation -> TESTED_BY EXP-007 actuated-but-response-lost/retry/restart acceptance case.
 
 ### Industrial pre-FAT
 - Gaskony PLC emulator -> IMPLEMENTS CAP-014 controller/config binding.
