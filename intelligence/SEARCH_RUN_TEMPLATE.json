@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -81,5 +81,9 @@
   "adjacency_types": [],
   "adjacency_root_nodes": [],
   "coverage_mode": "none",
-  "coverage_gap_ids": []
+  "coverage_gap_ids": [],
+  "allocation_mode": "generated",
+  "allocator_generation_id": "ALLOCGEN:replace12hex",
+  "assignment_id": "ASSIGN:replace12hex:slot-01",
+  "assignment_work_item_id": "WORK:seed:replace12hex"
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v8",
+  "title": "Technology Intelligence Search Run v9",
   "type": "object",
   "required": [
     "search_run_id",
@@ -510,6 +510,39 @@
         "type": "string",
         "pattern": "^COV:[a-z0-9-]+:[a-z0-9-]+$"
       }
+    },
+    "allocation_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "generated",
+        "manual_override",
+        "unallocated",
+        null
+      ]
+    },
+    "allocator_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ALLOCGEN:[a-f0-9]{12}$"
+    },
+    "assignment_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ASSIGN:[a-f0-9]{12}:slot-[0-9]{2}$"
+    },
+    "assignment_work_item_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^WORK:[a-z0-9-]+:[a-z0-9-]+$"
     }
   },
   "additionalProperties": true,
@@ -608,6 +641,26 @@
         "required": [
           "coverage_mode",
           "coverage_gap_ids"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 9
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "allocation_mode",
+          "allocator_generation_id",
+          "assignment_id",
+          "assignment_work_item_id"
         ]
       }
     }
