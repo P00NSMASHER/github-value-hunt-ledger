@@ -15,5 +15,8 @@
   "tested-progress-to-claim-bridge-but-no-independent-measurement-approval-and-alternate-line-mutation-bypasses": "authority_location_bypass",
   "approved-unbilled-selector-exists-but-current-bill-path-creates-and-later-approves-its-own-measurement-book": "authority_location_bypass",
   "caller-authored-bill-economics-free-text-measurement-reference-and-unguarded-lifecycle-transitions": "authority_location_bypass",
-  "startup-cancels-active-workflow-with-fresh-result-id-before-physical-reconciliation-then-retry-can-create-fresh-action-id": "unsafe_retry_or_idempotency"
+  "startup-cancels-active-workflow-with-fresh-result-id-before-physical-reconciliation-then-retry-can-create-fresh-action-id": "unsafe_retry_or_idempotency",
+  "workflow_unreachable": "interesting_but_not_load_bearing",
+  "lifecycle_state_machine_verified": "state_transition_verified",
+  "identity_collision": "independent_negative_control"
 }
