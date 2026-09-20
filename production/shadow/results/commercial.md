@@ -202,3 +202,76 @@ No repository code was executed.
 **REFERRALS:** No new cross-lane referral; the existing provider/system-of-record readback referral already captures the remaining gap and should not be duplicated.
 
 **NEXT TEST:** Find or falsify an external-authority bridge: a component that binds signed/order-system contract amendments and PSP/bank settlement readback into immutable evidence, so the internal closed loop cannot declare itself correct using only its own contract and payment records.
+
+## 2026-09-20 — Shadow run 4
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** The highest-value missing money-control component will make the crash window around an external money mutation explicit: persist the exact action and provider idempotency identity before the call, hold economic capacity when provider outcome is ambiguous, and resolve the ambiguity through read-only provider truth rather than silently retrying with a new action. This should outperform ordinary webhook/retry code that conflates “request failed” with “no financial effect.”
+
+**DISCOVERY METHODS:**
+1. Direct problem search for billing/payment reconciliation, refund recovery, settlement and ambiguous provider outcomes.
+2. Code/invariant search for `PaymentIntent.retrieve`, `Refund.retrieve`, deterministic idempotency, `outcome_unknown`, provider operation IDs, read-only reconciliation, durable reservations and effect/non-effect conclusions.
+3. Deliberate low-attention exact-money-mutation search around Stripe refund recovery and billing execution consoles, followed by comparison with a broader SaaS billing implementation that has provider readback but weaker money-domain lifecycle semantics.
+
+**BEST CANDIDATE + URL + EXACT REVISION:** `auths-dev/auths-proof` — https://github.com/auths-dev/auths-proof — `34fa1f33cf365fa54075a2002710aee52ab42394`.
+
+**IMPLEMENTED:**
+- The bounded Stripe refund service writes a durable decision and aggregate reservation before credential acquisition/provider entry. The reservation binds the exact action digest, policy/evidence/configuration commitments, amount/currency/account and a digest of the deterministic Stripe idempotency key.
+- Provider execution is modeled as an exact-idempotent lifecycle intent. If the Stripe gateway returns `OutcomeUnknown`, the service transitions the reservation to durable `OutcomeUnknown` instead of releasing it or assuming non-effect. Provider-response mismatch is handled the same fail-closed way.
+- Aggregate capacity accounting includes `committed + reserved + outcome_unknown`; ambiguous refunds therefore continue consuming the bounded money budget until reconciliation proves effect or non-effect. Rolling-window tests explicitly show unresolved capacity does not age out merely because time advances.
+- `reconcile_bounded_refund` accepts only an ambiguous workflow, binds the original provider-request digest into a reconciliation observation, records a read-only provider evidence source (`stripe-api-refund-list/1`), and atomically maps the outcome to committed/effect or released/non-effect in both shared lifecycle and Stripe-domain reservation state.
+- The qualification adapter exposes provider **Execute** and **Reconcile** as separate call kinds. Reconciliation reads the original idempotent refund from stored profile state; `observe_provider_truth` independently reads provider truth with a runtime-read credential rather than issuing another mutation.
+
+**TESTED / SCHEMA / HISTORY:**
+- `reservation.rs` contains direct tests that `OutcomeUnknown` capacity remains held until reconciliation; that durable state survives process restart and can then reconcile to released/non-effect; that unresolved rolling-window capacity does not age out; that concurrent last-capacity reservation succeeds only once; and that shared lifecycle + Stripe capacity reservation commit atomically.
+- The durable reservation schema explicitly distinguishes `Reserved`, `Committed`, `Released`, `OutcomeUnknown`, `ReconciledCommitted`, and `ReconciledReleased`, with canonical persisted state validation and no silent migration of obsolete prelaunch state.
+- The exact-refund specification independently states the intended ambiguous-response rule: preserve the action claim as `outcome_unknown`, reuse identical idempotency/parameters only within bounded recovery, retrieve/list-correlate the provider refund, classify created/not-created/indeterminate, and never silently create a new action or idempotency key.
+- Relevant history is staged: `1c1ab690...` (“Add Stripe-local bounded refunds”, 2026-07-29), `91b84cc5...` (“Decouple Stripe profile receipts and credentials”, 2026-07-30), and `4e44d0a0...` (“feat(stripe): adopt shared durable lifecycle”, 2026-07-31).
+- Rights are unusually clear for this class of component: the workspace declares `MIT OR Apache-2.0`, and repository release docs state both license texts are present.
+
+**CLAIMED / PLANNED / UNKNOWN:**
+- This exact repository state does **not** prove production-qualified Stripe recovery. The live-provider qualification specification explicitly says the initial Stripe refund production state is **unqualified / synthetic testkit only** and requires a protected real-provider run, crash testing on both sides of provider boundaries, replay/no-second-effect proof, response-loss/restart convergence, signed attestation and matching semantic-closure digest before a production route may be advertised.
+- The exact-refund profile is intentionally test-mode-only and explicitly does not claim that an accepted Stripe refund has settled through banking networks.
+- Current HEAD is prelaunch/pre-audit. GitHub check-runs inspected for this exact SHA show several fuzz/fuzz-implementation jobs failing on 2026-09-20, while a fuzz-plan job succeeded; therefore no blanket “green CI” claim is allowed.
+- UNKNOWN: a checked-in live Stripe qualification attestation for this exact semantic closure, independent production audit, real customer recovery/duplicate-prevention economics, and bank-settlement truth.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:a0c699be814934e676b1cbfd81b48ded0a3f25b404aaecfbca104ed361cfbdf5`, binding exact revision plus:
+- `product/integrations/auths-stripe/src/bounded_service.rs` — `94bb6dbec8c8b3f026c828fea94b74e35894cba6`
+- `product/integrations/auths-stripe/src/reservation.rs` — `ad43968ddd6caacded232e616b301b0dcfee6c39`
+- `product/integrations/auths-stripe/src/qualification.rs` — `7b3907daa590aab0576c4bb027348dcecf67f8a0`
+- `docs/specs/0010-stripe-exact-refunds.md` — `35cbe401e6322d661c97b112f91e680787c47b82`
+- `docs/specs/0044-live-provider-qualification-and-recovery-evidence.md` — `36e678bffe324de02e2fe3aef3455e3c9efd4438`
+- `Cargo.toml` — `f039a8786967a3f4e25ea5df2ee97c66fd9fea2b`
+No repository code or provider mutation was executed in this shadow run.
+
+**COMPARATORS:**
+- `sunny-aryan/billing-recovery-execution-console@b0f688eeec3ecf6f2d6d751ac25e3e2f4c811f24` is a simpler, portfolio-oriented execution console whose actual source creates Stripe **test-mode** PaymentIntents/refunds with stable idempotency keys, stores the refund ID, performs `Refund.retrieve` readback, classifies unknown lookup failures safely, and has mock reconciliation tests for provider-success/internal-failure and internal-success/provider-missing mismatches. It is easier to understand and closer to a conventional billing-ops UI, but its automated reconciliation evidence inspected here is mostly mock-shaped and it lacks Auths' explicit bounded-capacity `OutcomeUnknown` semantics.
+- `magasiev13/AOC-SMS-Admin@2b3db60eb2161f25cbb5c4d5a13930b1b2311edc` contains production-shaped billing code that performs `PaymentIntent.retrieve`, tracks settlement versions and keeps a per-message usage ledger for billing reconciliation. Its relevant tests use mocked Stripe objects, and the broader application does not expose an equally narrow crash-window/effect-state contract in the inspected packet.
+
+**RED-TEAM OBJECTION:** The candidate is easiest to overrate precisely because its recovery specification is excellent. Its own strongest launch-gate document says Stripe refund is currently **unqualified**, so the architecture cannot be cited as proof that a real-provider crash/restart path has already passed protected qualification. A simpler worker with a durable command table, one stable provider idempotency key and `Refund.retrieve`/webhook reconciliation may be sufficient for many billing teams. Current fuzz failures further reduce confidence in treating HEAD as release-clean. Evidence that would reverse this objection: a trusted qualification attestation bound to this exact semantic closure; a protected run showing a crash after provider entry then restart/read-only convergence against real Stripe test infrastructure with no duplicate refund; clean relevant CI; and, for a stronger commercial claim, independent settlement/readback beyond API-object existence.
+
+**INDEPENDENT VERIFIER VERDICT:** **PASS_WITH_LIMITS.** On the frozen evidence packet, the narrow claim passes: this exact revision implements and source-tests a durable Stripe refund lifecycle that holds money capacity when provider effect is ambiguous and can reconcile effect/non-effect without silently creating a new action or idempotency identity. The verifier rejects the stronger claim that this revision is production-qualified against Stripe: the repository's own qualification contract explicitly marks Stripe refund unqualified, and current HEAD has failing fuzz jobs. It also rejects any claim of bank settlement, recovered dollars or customer-contract authority. No sensitive-source material was used.
+
+**A-F SCORE (proposed only, after verifier):** **26/30 — A3 / B5 / C5 / D5 / E4 / F4.**
+- A3: the first sellable wedge is a controlled refund/correction execution-safety layer, but integration into an existing billing/provider stack is nontrivial.
+- B5: duplicate refunds, uncertain corrections and unsafe retries are direct-money risks with high downside and audit value.
+- C5: compresses difficult state-machine, idempotency, crash-recovery, bounded-capacity and evidence-design work.
+- D5: explicit money-capacity treatment of provider-unknown outcomes plus separate reconciliation/qualification semantics is unusually rigorous.
+- E4: source, state schema, focused tests and history are strong, but exact live-provider qualification is absent and current fuzz CI is not clean.
+- F4: MIT/Apache licensing and explicit operational gates are clear; live provider qualification/prelaunch status still blocks drop-in production use.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: billing/payments platform lead, Controller/RevOps owner of high-volume corrections/refunds, or fintech engineering team operating money-mutating workflows.
+- Pain: after a timeout or worker crash, teams often cannot distinguish “provider never received it” from “money moved but local state did not,” creating duplicate-refund risk, manual provider spelunking and weak audit evidence.
+- First paid wedge: a **Provider Outcome Guard** around one existing approved refund/correction path. Persist the exact authorized command and idempotency identity before dispatch, represent ambiguous effects explicitly, perform read-only provider reconciliation, and report unresolved/duplicate-risk cases without autonomously creating new financial actions. Start in test mode/read-only recovery; measure ambiguous-case resolution time, duplicate-effect prevention and manual investigation hours.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** This adds a missing execution-safety layer after run 1's leakage decision and run 2's accepted correction evidence, and it strengthens run 3's internal rating/receivable/reconciliation backbone. The prospective architecture becomes **external contract authority → fail-closed leakage decision → human-approved correction → durable exact money command/idempotency → provider effect or `OutcomeUnknown` → read-only provider reconciliation → receivable/ledger reconciliation**. It still does not close signed-contract ingestion or independently attested bank/processor settlement.
+
+**SEARCH EFFORT / COST PROXIES:** 3 materially different discovery modes; 3 serious candidates deep-inspected; source/tests/state schema/history inspected at exact revisions; roughly 50 external connector/tool calls including required shadow-memory reads and write-SHA refreshes; one local frozen-manifest hash; 0 untrusted-repository code executions, provider writes, contacts, spend or commitments.
+
+**LOCAL LESSON:** `SK-COM-002` transferred to a second distinct shadow run. Tracing one money-state transition all the way across **durable intent → provider entry → ambiguous outcome → read-only provider truth → terminal effect/non-effect** was higher signal than searching for “Stripe reconciliation” alone. The most important new discriminator is **qualification state**: adapter code or even a live-test design must not be silently upgraded into externally proven provider truth when the repository itself gates that route as unqualified.
+
+**REFERRALS:** No new cross-lane referral; existing provider/system-of-record readback referrals already ask the correct structural question and should not be duplicated.
+
+**NEXT TEST:** Find a candidate with **checked-in, revision-bound external outcome evidence**—for example a real-provider qualification attestation or integration artifact proving crash-after-dispatch → restart → read-only convergence with no duplicate money effect—or falsify whether public repositories expose enough lawful evidence to distinguish this from well-designed but still unqualified recovery code.
