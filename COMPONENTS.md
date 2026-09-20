@@ -320,3 +320,18 @@ For each entry record:
 - Capability: deterministic enterprise simulation produces linked support/CRM/observability/invoice artifacts; inspected tests cover incident-to-customer linkage, SLA-breach days, exact-threshold no-credit behavior, negative invoice credits and NPS degradation.
 - Integration: synthetic oracle for support/SLA agent/release acceptance before any authorized production pilot.
 - Next action: vendor-neutral 30-case corpus with exact escalation and credit-dollar truth. Keep below MASTER because it is a test-data/evaluation component rather than a high-ACV vertical operating system.
+
+<!-- INTEGRATOR-R11-DECISION-ACTION-2026-09-20T0112-0400 -->
+### frederikgeth/PowerOptLab.jl — uncertainty-aware distribution-grid decision lab
+- Revision: `4f417d470c8bff78bd0941658f97030e5ddb7692`.
+- Score: **27/30 — A3 B5 C5 D5 E4 F5**.
+- Rights: BSD-3-Clause repository code; repo-described data CC BY 4.0; external/customer feeder data and standards remain separate.
+- Capability: four-wire distribution state/parameter estimation, candidate-model screening, scenario/fairness/security-aware dynamic import/export envelopes, multi-period OPF, DER scheduling and closed-loop convergence/stability evidence with substantial tests.
+- Integration: CIMHub model parity -> DREAMS deterministic hosting/QSTS -> PowerOptLab uncertainty/evidence challenge -> inspection/restoration action. Keep as a challenger, not an authority, until it changes a decision or reduces false confidence versus deterministic OPF on the same rights-clean feeder.
+
+### leadcatlab/MWLP-Storm-Repair — weighted-latency storm restoration kernel
+- Revision: `07adc8df235b6c95df7c8a679819a91256d40a7c`.
+- Score: **24/30 — A3 B4 C4 D4 E4 F5**.
+- Rights: MIT; operational outage/customer/road data remain separately governed.
+- Capability: multi-crew repair assignment/sequencing around minimum weighted latency, targeting customer waiting/downtime rather than raw route distance, with graph/simulation/benchmark code and tests.
+- Integration: post-failure action layer after feeder/risk evidence. Require a frozen benchmark against nearest-first and severity-first, including repair-time uncertainty, before treating the method as commercially differentiated.

@@ -232,3 +232,17 @@ The strongest path remains a frozen customer-authorized blind population carried
 - First paid wedge: one closed payroll period; quantify missing/duplicate punches, inferred-direction exceptions, approved-but-unpaid OT, unsupported OT and payroll-review time.
 - Revenue path: fixed diagnostic -> recurring pre-payroll exception assurance -> broader labor/payroll reconciliation.
 - Safety/integrity: biometric/person records are customer-controlled sensitive data; use only explicitly authorized customer data. Automated scan-direction repair is never sufficient evidence by itself for a wage/payment conclusion.
+
+<!-- INTEGRATOR-R11-DECISION-ACTION-2026-09-20T0112-0400 -->
+### Airline IROPS Decision Assurance — shadow disruption economics before live control
+- Sources: `Robertn02/Airline-Revenue-Management-IROPS-Seat-Allocation-Optimizer@9a235b1ceb7a53f467c060b6a2750590b1ee0cd1` + existing airline RM/disruption components + TrustMesh.
+- Buyer/problem: airline OCC/revenue-management teams must trade reaccommodation capacity, misconnect/spill risk, loyalty and yield under disruption while retaining an auditable reason for each allocation.
+- First paid wedge: historical/shadow replay on one rights-clean or buyer-authorized disruption population, compared with FCFS/status-priority and the incumbent/manual allocation.
+- Monetization: fixed decision-assurance study -> recurring shadow monitoring/decision support; no autonomous live passenger action initially.
+- Score: **27/30 — A4 B5 C5 D4 E4 F5**. The repository is unusually complete, but current savings evidence is synthetic/repository-reported rather than independent production proof.
+- Next validation: freeze realistic disruption economics and constraints first, then compare expected and realized service/economic outcomes. Promote only if it materially beats simple baselines and survives outcome reconciliation.
+
+### Grid Model Acceptance + Hosting/Resilience Study — evidence-to-action extension
+- Extend the existing grid opportunity with `PowerOptLab.jl@4f417d470c8bff78bd0941658f97030e5ddb7692` for uncertainty-aware state/model and operating-envelope analysis and `MWLP-Storm-Repair@07adc8df235b6c95df7c8a679819a91256d40a7c` for post-failure weighted-latency restoration.
+- The commercial sequence becomes model-conversion parity -> deterministic hosting/QSTS -> uncertainty/evidence challenge -> risk/inspection or storm-restoration action -> measured field/outage outcome.
+- Do not sell “better grid decisions” from method novelty alone. Require same-input baseline tests: deterministic OPF versus PowerOptLab, and nearest/severity dispatch versus MWLP, with planted model uncertainty and repair-time uncertainty.
