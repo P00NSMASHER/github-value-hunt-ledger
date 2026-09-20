@@ -28,6 +28,7 @@ class ActivationPacket:
     launch_status:str
     launch_route:str
     remediation_actions:tuple[dict,...]
+    launch_warnings:tuple[str,...]
     buyer_data_requests:tuple[DataRequest,...]
     buyer_responsibilities:tuple[str,...]
     freight_responsibilities:tuple[str,...]
@@ -117,6 +118,10 @@ def build_packet(readiness_input:dict, launch_decision:dict)->ActivationPacket:
     readiness=assess_readiness(from_dict(readiness_input))
     offer=OFFER_CATALOG[readiness.recommended_offer]
     brief=build_brief(launch_decision)
+    if readiness.status.value!="READY" and brief.route!="DATA_READINESS_DIAGNOSTIC":
+        raise ValueError("readiness/launch decision mismatch: non-ready buyer must route to diagnostic")
+    if readiness.status.value=="READY" and brief.route=="DATA_READINESS_DIAGNOSTIC":
+        raise ValueError("readiness/launch decision mismatch: ready buyer cannot remain on diagnostic route")
     requests=list(COMMON_REQUESTS)
     if readiness.recommended_offer=="BLIND_FREIGHT_AUDIT_ACCEPTANCE_TEST":
         requests.extend(BLIND_ONLY)
@@ -132,6 +137,7 @@ def build_packet(readiness_input:dict, launch_decision:dict)->ActivationPacket:
         "launch_status":brief.status,
         "launch_route":brief.route,
         "remediation_actions":actions,
+        "launch_warnings":brief.warnings,
         "buyer_data_requests":[asdict(x) for x in requests],
         "buyer_responsibilities":BUYER_RESPONSIBILITIES,
         "freight_responsibilities":FREIGHT_RESPONSIBILITIES,
@@ -142,7 +148,7 @@ def build_packet(readiness_input:dict, launch_decision:dict)->ActivationPacket:
     return ActivationPacket(
         readiness.status.value,readiness.score,readiness.recommended_offer,
         offer["name"],offer["price_band_usd"],offer["turnaround"],
-        brief.status,brief.route,actions,requests,BUYER_RESPONSIBILITIES,
+        brief.status,brief.route,actions,brief.warnings,requests,BUYER_RESPONSIBILITIES,
         FREIGHT_RESPONSIBILITIES,PROTOCOL_STAGES,REPORT_TOTALS,
         COMMERCIAL_INVARIANTS,_hash(body)
     )
@@ -166,6 +172,8 @@ def render_markdown(packet:ActivationPacket)->str:
             lines.append(f"- **[{a['priority']}] {a['title']}** — owner: {a['owner']}")
             for e in a["evidence_required"]:
                 lines.append(f"  - Evidence: {e}")
+    lines.extend(["","## Launch warnings",""])
+    lines.extend([f"- {w}" for w in packet.launch_warnings] or ["- None."])
     lines.extend(["","## Buyer data-room requests",""])
     for req in packet.buyer_data_requests:
         source=f" (`{req.source_type}`)" if req.source_type else ""
