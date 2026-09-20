@@ -34,11 +34,15 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 ### Commission Assurance
 - getcoherence/openpartner@eeff532ee758dc6221b4d03af852e5705a2328fb -> STRENGTHENS CAP-006 and CAP-018 through event-sourced payout/settlement state.
 - spree/spree@2a419d42e86dea30a69a3c5b7764185cea132b3f -> IMPLEMENTS CAP-018 through claim-before-send, ambiguous-outcome hold and settled amount/currency proof.
+- Modern-Treasury/modern-treasury-python@406f354a06a98060df0c9f4c242fe56cc65e1526 -> STRENGTHENS CAP-018 with Payment Order/reference -> bank-derived Transaction/Transaction Line Item -> Return/Reversal lineage; hosted API/bank connections and server-side auto-reconciliation remain external.
+- szapata85/ACHInterbank@395a359230eff35e49cc196b49995ed4c49509b9 -> VALIDATES/CHALLENGES CAP-018 with fail-closed Exact/Ambiguous/NotFound return correlation; ambiguity and no-find preserve money state.
+- sebastienrousseau/bankstatementparser@b3309b78f0bd8da872a09ec2b586a694379d5d83 -> CHALLENGES CAP-018 as a negative oracle: substring/fuzzy/first-match behavior must not be accepted as exact settlement identity.
+- CAP-019 -> STRENGTHENS CAP-018 bank/payroll observation semantics by preventing stale/unavailable feeds from becoming `no transaction` or `no return`.
 - Bdkelp/getmydpc_enrollment@e753d8ebf5e087ae9a4add978d1559af86c173fb -> STRENGTHENS commission entitlement/reversal/carry-forward cases.
 - Reifye/Reifye-OS@acbb8ca46c6c6de20c0a64ac7ea0f174f308e17a -> STRENGTHENS collected-cash/hold/clawback cases.
 - D-Haku/Channel-Partner-Commission-Engine@176084bb4a5bc0a1ad17ba94a11c869dfd8a463e -> STRENGTHENS lending slab/sequence cases but DEPENDS_ON independently current statutory/tax authority.
 - mike4forge/forgelocal-commission-engine@cb4ab9bcb85a5863079d1798836727065d2d243a -> CHALLENGES/STRENGTHENS hierarchy-at-time provenance; provider settlement remains unverified.
-- CAP-002 + CAP-006 + CAP-007 + CAP-016 + CAP-018 -> ENABLES Partner / Commission Payout Assurance -> TESTED_BY EXP-003.
+- CAP-002 + CAP-006 + CAP-007 + CAP-016 + CAP-018 + CAP-019 -> ENABLES Partner / Commission Payout Assurance -> TESTED_BY EXP-003.
 
 ### Recovery Proof
 - duke5am/pg-restore-drill -> IMPLEMENTS CAP-010.
@@ -144,6 +148,14 @@ If the answer is none, the finding is not yet integrated into the value system.
 - USECPO v2 -> observed event outcomes; ICE 2.2 (external service/terms) -> economic consequence -> grid risk/inspection/restoration policy benchmark. Preserve outcome/model independence and EAGLE-I circularity caveat.
 - `AccelerationConsortium/bo-mcp@56d590b...` -> shadow evidence for stable experiment identity/idempotency/audit and proposed→actual provenance -> Installed-Base Lab / self-driving-science integrity challenger; external executor acknowledgement remains missing.
 
+<!-- INTEGRATOR-R13-2026-09-20T1207-0400 -->
+## Graph delta — 2026-09-20 12:07 ET
+- `Modern-Treasury/modern-treasury-python@406f354a...` -> STRENGTHENS **CAP-018** with bank-derived payment-reference/transaction/return lineage -> TESTED_BY **EXP-003**; opaque hosted reconciliation and bank-feed coverage prevent treating it as independent truth by itself.
+- `szapata85/ACHInterbank@395a359...` -> CHALLENGES/VALIDATES **CAP-018** unique settlement correlation through Exact/Ambiguous/NotFound state transitions -> TESTED_BY **EXP-003** duplicate-trace and return ambiguity cases.
+- `sebastienrousseau/bankstatementparser@b3309b78...` -> NEGATIVE_CONTROL for **EXP-003** substring/fuzzy/first-match settlement identity and invalid-money parsing.
+- **CAP-019** -> COMBINES_WITH **CAP-018** for bank/payroll feed coverage/freshness so unavailable observation cannot become negative evidence.
+- **CAP-018 + CAP-019** -> ENABLES the provider-to-bank finality segment of Partner / Commission Payout Assurance -> TESTED_BY **EXP-003**.
+- No OUT node is created: no customer payout population or realized economic outcome has completed validation.
 
 ## Machine graph mirror
 
