@@ -158,3 +158,15 @@ Never store, reproduce, test, validate, authenticate with, exploit, or monetize 
 - Apparent status: **unknown; tree names only were inspected, values were not opened, copied, tested or validated**.
 - Non-sensitive context: safe scraper source was sufficient to assess carrier-published detention/demurrage schedule acquisition behavior without touching either environment file.
 - Remediation note: use only sanitized configuration for any reuse; do not inspect or rely on the committed environment artifacts. No secret value is stored here.
+
+<!-- INTEGRATOR-R11-POSTCHECKPOINT-2026-09-20T0056-0400 -->
+### muhdwaseem/Logisticsrate
+- Repository: `muhdwaseem/Logisticsrate`.
+- Canonical URL: https://github.com/muhdwaseem/Logisticsrate
+- File/path: signed-agreement / tariff-seed material referenced by public commit history; exact sensitive artifact contents and contract-derived values were deliberately not opened or retained.
+- Exact revision: `6250dc36137f66d65e4d18314d36ca3b86b66913`.
+- Date observed: 2026-09-20.
+- High-level exposure type: potentially confidential third-party commercial contract/tariff material transcribed into a public repository.
+- Apparent status: **not inspected or validated** beyond non-sensitive commit/tree metadata.
+- Non-sensitive context: safe architecture evidence was insufficient to justify touching contract-derived material, and repository-code permission does not extend to third-party confidential terms.
+- Remediation note: quarantine contract-derived assets; use only a sanitized code revision with independently generated synthetic/publicly authorized tariff fixtures. No commercial rate or contract value is stored here.

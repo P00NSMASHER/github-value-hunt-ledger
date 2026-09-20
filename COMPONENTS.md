@@ -249,3 +249,37 @@ For each entry record:
 - Capability: Rust/Polars multi-format trusted-layer ingestion with declarative header/schema/row/type/null/PK checks, accepted/rejected quarantine, manifests/JSON reports, PII masking and OpenLineage identities/replay.
 - Integration: place after extraction and before freight/AP/CaptureBrief/ScopeSignal money or evidence decisions so schema/key defects cannot silently enter the authoritative pipeline.
 - Next action: adversarial multi-format benchmark with broken headers/types/nulls/duplicate keys and replayed cloud identities.
+
+<!-- INTEGRATOR-R11-POSTCHECKPOINT-2026-09-20T0056-0400 -->
+## Post-checkpoint reusable components — acceptance, recovery and scheduling
+
+### WRBriska/InvoiceAudit — independent freight golden-oracle pattern
+- Revision: `bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c`.
+- Score: **27/30**.
+- Rights: no root public license was visible; under the standing user assertion, repository-owned code is treated as separately commercially authorized. External standards/customer data remain separate.
+- Capability: production freight pricing/audit plus a deliberately separate golden evaluator using hand-derived literal expected dollars and action buckets, reducing circular self-test risk.
+- Integration: blind Freight Audit Acceptance Test; report action accuracy, exact-dollar accuracy and false-recovery dollars separately.
+- Caveat / next action: do not adopt its unknown-accessorial-as-zero behavior. Convert missing contractual basis to REVIEW/$0 and independently rederive the frozen benchmark truth.
+
+### vncwr/backwyn — hosted-Postgres negative-control recovery verifier
+- Revision: `57f4b8afc3d9ce14f2a35febc802536cfa816839`.
+- Score: **27/30**.
+- Rights: MIT; PostgreSQL/Supabase/Neon/object-storage services and customer data remain separately governed.
+- Capability: least-privilege encrypted off-provider backup plus real scratch restore; test corpus rejects corruption, failing verification queries, stale proof, unverified restore and RLS partial-backup conditions.
+- Integration: Recovery Proof adversarial matrix.
+- Next action: add a wrong-but-restorable known-value/content-hash fixture; row parity/queryability alone cannot prove semantic correctness.
+
+### DNYoussef/guardspine-spec — portable evidence interop/falsification contract
+- Revision: `4b21006daa82af52647c5b6e4288d995ccbaf401`.
+- Score: **24/30**.
+- Rights: Apache-2.0 repository material; external standards/integrations/customer evidence remain separate.
+- Capability: canonical JSON evidence bundle with item hashes, ordered chain/root, optional signatures, offline verification, malformed vectors and redaction/sanitization attestation.
+- Integration: portability gate after recovery/compliance evidence producers and before auditor/customer delivery.
+- Next action: differential-test one synthetic signed recovery proof against epack/OpenWright and mutate content/order/chain/root/signature/sanitization count one at a time.
+
+### AbhishekLGowda05/SAGE — ordered-relaxation / feasible-first scheduling reference
+- Revision: `49aee96f0a15e12e7b14b1c97989600f7ab0a146`.
+- Score under standing commercial-permission posture: **28/30 — A4 B4 C5 D5 E5 F5**. Actual public metadata shows no root public license; that is provenance, not a value penalty under the user's separate-permission assertion.
+- Capability: two-phase scheduling solver with pre-solve capacity analysis, deterministic input hash, hard-core versus relaxable/soft constraint classification, ordered automatic relaxation, warm-start optimization and explicit Phase-1 fallback when optimization fails; tests cover deterministic hashing, free periods, relaxation ordering and end-to-end feasibility.
+- Integration: pair with RosterSpec's verification/minimum-disruption repair on a common workforce/field-service fixture.
+- Promotion gate: prove that the relaxation contract transfers beyond school timetabling and that every relaxed rule is minimally sufficient, human-readable and approval-ready. The committed `frontend/.env` remains uninspected and safety-indexed separately.

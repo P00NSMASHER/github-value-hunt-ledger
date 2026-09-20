@@ -290,3 +290,13 @@ Do not add a weak repository to this file merely because it was rejected once. L
 
 ### Rejection lesson reinforced
 Clear repository use permission does not cure **stale authority, fail-open money logic, weak source coverage or misleading completeness**. Technical/commercial scoring must continue to penalize those defects independently of license category.
+
+<!-- INTEGRATOR-R11-POSTCHECKPOINT-2026-09-20T0056-0400 -->
+## Post-checkpoint safety/provenance quarantine
+
+### muhdwaseem/Logisticsrate — third-party contract-derived tariff material
+- Revision: `6250dc36137f66d65e4d18314d36ca3b86b66913`.
+- Disposition: **safety/provenance quarantine**, not a technical-license rejection.
+- Safe evidence: repository contains functioning logistics rating code, but public commit history describes a signed real freight agreement being transcribed into tariff data.
+- Boundary: the standing permission for repository-owned public code does **not** extend to a third party's confidential/commercial contract terms. The signed agreement, tariff-seed values and contract-derived commercial numbers were not opened, copied, tested or retained.
+- Revisit trigger: only a sanitized revision/fork that cleanly separates generic code from contract-derived values and uses independently generated synthetic/publicly authorized tariff fixtures.

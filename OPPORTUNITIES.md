@@ -193,3 +193,20 @@ The strongest path remains a frozen customer-authorized blind population carried
 - Revenue path: fixed diagnostic -> recurring month-end assurance -> vertical recovery/controls work on validated exceptions.
 - Why it matters: this can become the accounting truth boundary underneath AP, commission, telecom, utility and marketplace assurance instead of building a separate ledger interpretation in every vertical.
 - Promotion discipline: Recurso remains COMPONENTS; Summae is the single promoted generalized accounting leader. Tax/jurisdiction packs require independent current-authority validation.
+
+<!-- INTEGRATOR-R11-POSTCHECKPOINT-2026-09-20T0056-0400 -->
+## Post-checkpoint validation-stage opportunities
+
+### Risk-Priced Infrastructure Inspection
+- Core: stochastic inspection selection/routing -> field/UAS mission plan -> inspection evidence -> defect/work-order outcome.
+- Buyer: utility/bridge/DOT/industrial reliability owners and inspection contractors.
+- First paid wedge: shadow one asset portfolio and compare existing policy with highest-risk-first, nearest-route and stochastic policy on expected failure + deployment cost before changing operations.
+- Revenue path: fixed benchmark -> recurring inspection-priority refresh -> field mission planning/evidence service where authorized.
+- Status: promising P1, below the direct-money freight/AP/commission priorities until open-solver reproduction and field-plan repeatability prove advantage.
+
+### M365 ISO Evidence Refresh
+- Core: ComplyCore Microsoft Graph evidence collection/evaluation -> manual-control queue -> GuardSpine/epack-style portable evidence package -> existing policy/remediation/re-proof stack.
+- Buyer: Microsoft 365-heavy SMB/SaaS/professional-services firms, ISO consultants and MSPs.
+- First paid wedge: fixed-price baseline evidence/gap refresh, followed by monthly recurring evidence collection and auditor export.
+- Revenue path: setup + recurring managed evidence operations.
+- Status: fast service-first challenger; promotion depends on authorized-sandbox failure injection proving missing permissions/expired auth/empty windows/integrity breaks remain non-pass.
