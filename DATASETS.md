@@ -25,10 +25,12 @@ Integrator-owned current index of unusually valuable lawful datasets, authoritat
 - Use: evidence-grade entity/award joins.
 
 ### GSA SAM Contract Opportunities version/history planes
-- Source evidence: `GSA/open-gsa-redesign@494b1312e9c6436474840befe6e1964da15932b3` documentation and Data Services/history semantics.
+- Source evidence: `GSA/open-gsa-redesign@494b1312e9c6436474840befe6e1964da15932b3` documentation and Data Services/history semantics plus live public SAM observations.
 - Value: official public opportunity search is latest-active, not all versions. Complete packets need separate history/action and attachment planes.
-- Deletion boundary: official Opportunity Management semantics expose `excludeDeleted` and `deleteAll`; resources deleted with destructive semantics can vanish from later manifests. Latest/current manifest is therefore not historical attachment completeness.
-- Use: EXP-006. Preserve `latest_only / archive_pending / source_lag / partial / unresolved` rather than silent completeness.
+- Live fixture: Notice ID `W50S8B-26-Q-A016` showed two different Product Description objects sharing the same filename but different `resourceId`s/sizes, and one deleted resource was recoverable from historical action manifests while absent from the latest `excludeDeleted=false` manifest. Re-querying an older action later exposed later tombstone state.
+- Identity/time rule: filename is not source-object identity; action membership and observation-time source state are separate. Historical action endpoints are not immutable publication-time snapshots.
+- Deletion boundary: official Opportunity Management semantics expose `excludeDeleted` and `deleteAll`; resources deleted with destructive semantics can vanish from later manifests.
+- Use: EXP-006. Preserve action UUID + append-only observation identity + resourceId + source state + immutable artifact hash; maintain local snapshots even when historical endpoints remain queryable.
 
 ### GSA SAM Acquisition Subaward Reporting public API
 - Source: same official GSA lineage.
@@ -76,8 +78,10 @@ Integrator-owned current index of unusually valuable lawful datasets, authoritat
 - Evaluator contract: literal `event id` is the associated-event group key. Keep every row for one event in one train/tune/test partition and preserve event chronology. STANDARD/8H/24H are sensitivity variants, **not independent observations**.
 - Provenance/quality: record ancestry `EAGLE-I + DOE-417`; county-explicit vs state-generalized geography; missing DOE-417 restoration time imputed to event start; early coverage weaker, so prefer **2019–2023** for first high-confidence benchmark.
 - Critical scope limits: transmission/major-event conditioned, not general distribution-outage truth; correlation is not feeder/component causality; overlapping county physical outages may be merged; detailed restoration requires independent OMS/field truth.
-- Artifact-byte gate: hunter could not retrieve current ZIP/DOCX because official endpoints rate-limited. Exact current header casing/order, timezone, null/sentinel conventions, threshold defaults, quality flags and whether event IDs need year namespacing remain UNVERIFIED until official bytes are read.
-- Use: EXP-012 historical evaluator only after byte gate; related EAGLE-I-derived datasets do not count as independent validators.
+- New external witness: Mendeley DOI `10.17632/r4csg2h2ps.1`, version 1, exposes two byte-identical aliases of one 12,980,662-byte reproducibility package, outer SHA-256 `3496a7fe4b2fd02e7648405be83061eec614400f125b8fbeb142207e683bbc67`.
+- Witness boundary: the two aliases are one witness, not two independent sources. The outer package SHA is **not** the embedded USECPO ZIP SHA. The package reportedly contains a source/download manifest with source URL/release/size/SHA, but that exact USECPO row has not yet been extracted/verified.
+- Artifact-byte gate: obtain the Mendeley package in a binary-capable runtime, verify the outer SHA, extract only the source manifest, then independently compare the exact USECPO row against first-party OEDI bytes or a first-party digest. Until then exact current headers/timezone/nulls/thresholds/event-ID namespace and source digest remain UNKNOWN.
+- Use: EXP-012 historical evaluator only after the byte gate; related EAGLE-I-derived datasets do not count as independent validators.
 
 ### PNNL OWL-I USA v1
 - Source: Zenodo DOI `10.5281/zenodo.20433558`, 2026-08-25; EarthArXiv method preprint 2026-08-28.
