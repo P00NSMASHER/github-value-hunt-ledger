@@ -1,0 +1,40 @@
+# HUNT ALLOCATOR REPORT
+
+- Generation: **ALLOCGEN:e4c9406f29d5**
+- Candidate work items: **305**
+- Assigned slots: **14 / 14**
+
+## Portfolio mix
+
+| Work kind | Slots |
+|---|---:|
+| adjacency | 2 |
+| capability_gap | 6 |
+| coverage_gap | 2 |
+| independent_verification | 1 |
+| positive_dna_transfer | 1 |
+| strategy_measurement | 1 |
+| wildcard | 1 |
+
+## Concentration controls
+
+- Maximum assignments on one capability: **2** / allowed 2
+- Maximum assignments on one experiment: **2** / allowed 2
+- Maximum assignments using one strategy: **3** / allowed 3
+
+## Guardrails
+
+- Domain-specific STOP and authorization gates override allocator rank.
+- BLOCKED_EXTERNAL experiments are not assigned as autonomous work.
+- Coverage, adjacency or popularity never substitute for technical evidence.
+- One wildcard slot is preserved even when exploitation scores are high.
+- Do not send outreach, contact people, purchase services or take external actions without explicit authorization.
+- Never inspect or retain credentials, private data, confidential material or accidental secrets.
+
+## Interpretation
+
+- The allocator combines existing measured intelligence; it does not create new evidence.
+- READY/RUNNING experiments can outrank more repository discovery.
+- Coverage and adjacency slots preserve exploration breadth while hard concentration caps prevent swarm collapse.
+- One wildcard slot is always reserved for discoveries outside the current ontology.
+- Manual overrides should be recorded in V9 run telemetry rather than silently editing historical scores.

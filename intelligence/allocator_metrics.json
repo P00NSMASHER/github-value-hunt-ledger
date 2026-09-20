@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "allocator_generation_id": "ALLOCGEN:e4c9406f29d5",
+  "candidate_count": 305,
+  "assignment_count": 14,
+  "slot_count": 14,
+  "work_kind_counts": {
+    "capability_gap": 6,
+    "coverage_gap": 2,
+    "positive_dna_transfer": 1,
+    "adjacency": 2,
+    "strategy_measurement": 1,
+    "independent_verification": 1,
+    "wildcard": 1
+  },
+  "slot_role_counts": {
+    "experiment": 6,
+    "coverage": 3,
+    "adjacency": 2,
+    "measurement": 1,
+    "verification": 1,
+    "wildcard": 1
+  },
+  "max_capability_concentration": 2,
+  "max_experiment_concentration": 2,
+  "max_strategy_concentration": 3,
+  "constraints": {
+    "max_assignments_per_capability": 2,
+    "max_assignments_per_experiment": 2,
+    "max_assignments_per_strategy": 3,
+    "max_adjacency_assignments_per_root": 1,
+    "min_adjacency_slots": 2,
+    "min_measurement_slots": 1,
+    "min_verification_slots": 1,
+    "min_wildcard_slots": 1,
+    "min_coverage_role_slots": 3,
+    "min_coverage_gap_assignments": 2
+  }
+}
