@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Technology Intelligence Capability",
+  "type": "object",
+  "required": [
+    "capability_id",
+    "name",
+    "ability",
+    "maturity",
+    "evidence_state",
+    "confidence",
+    "source_markdown",
+    "last_updated"
+  ],
+  "properties": {
+    "capability_id": {
+      "type": "string",
+      "pattern": "^CAP-[0-9]{3,}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ability": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "maturity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_basis": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "primary_components": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reusable_targets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limitation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "missing_piece": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_falsifiable_test": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_state": {
+      "enum": [
+        "watch",
+        "source_or_test_validated",
+        "benchmarked",
+        "runtime_or_stack_proven",
+        "externally_validated"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "source_markdown": {
+      "type": "string"
+    },
+    "last_updated": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}
