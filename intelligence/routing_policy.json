@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "assignment_priority_weight": 0.12,
+  "strategy_fit_weight": 8,
+  "objective_fit_weight": 5,
+  "experiment_fit_weight": 10,
+  "capability_fit_weight": 8,
+  "domain_fit_weight": 5,
+  "role_experience_weight": 4,
+  "performance_weight": 3,
+  "unmeasured_exploration_bonus": 4,
+  "support_shrinkage_k": 3,
+  "min_runs_for_measured_label": 3,
+  "min_deep_for_measured_label": 6,
+  "exact_match_max_workers": 16,
+  "allowed_claimable_states": [
+    "AVAILABLE",
+    "EXPIRED_AVAILABLE",
+    "RETRYABLE_AVAILABLE",
+    "RELEASED_AVAILABLE"
+  ],
+  "route_statuses": [
+    "LOCKED",
+    "ROUTED",
+    "IDLE_UNASSIGNED",
+    "BUSY_UNROUTED",
+    "PAUSED"
+  ],
+  "guardrails": [
+    "Routing is positive-evidence only: missing history never creates a negative fit penalty.",
+    "An active V11 claim is locked and cannot be rerouted.",
+    "One worker receives at most one slot and one slot receives at most one worker.",
+    "Unmeasured workers receive exploration credit so routing can learn them.",
+    "Assignment priority remains part of routing; worker fit cannot turn a low-value task into a high-value task.",
+    "Routing does not override domain STOP gates, execution leases, safety rules, or explicit manual overrides.",
+    "Generated routing is observational optimization, not a causal estimate of worker quality."
+  ]
+}
