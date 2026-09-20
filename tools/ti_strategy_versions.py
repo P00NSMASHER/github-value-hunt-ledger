@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import hashlib,json
+from collections import defaultdict
 from ti_common import INTEL,load_jsonl,slug,write_jsonl
 
 strategies=load_jsonl("search_strategies.jsonl")
@@ -20,11 +21,11 @@ for s in strategies:
     if vid not in by_version:
         by_version[vid]={
           "strategy_version_id":vid,"strategy_id":s["strategy_id"],"content_sha256_12":digest,
-          "source_markdown":s.get("source_markdown","SEARCH_SKILLS.md"),
-          "snapshot":payload
+          "source_markdown":s.get("source_markdown","SEARCH_SKILLS.md"),"snapshot":payload
         }
 
 write_jsonl("strategy_versions.jsonl",sorted(by_version.values(),key=lambda x:(x["strategy_id"],x["strategy_version_id"])))
+(INTEL/"current_strategy_versions.json").write_text(json.dumps(current,indent=2,sort_keys=True)+"\n",encoding="utf-8")
 
 binding_path=INTEL/"strategy_version_bindings.json"
 bindings=json.loads(binding_path.read_text(encoding="utf-8")) if binding_path.exists() else {}
@@ -36,6 +37,13 @@ for r in runs:
         bindings[rid]={"strategy_version_id":current[sid],"binding_method":"current_at_first_v5_ingest"}
 binding_path.write_text(json.dumps(bindings,indent=2,sort_keys=True)+"\n",encoding="utf-8")
 
+perf=defaultdict(lambda:{"runs":0,"deep_inspected":0,"retained":0,"master":0})
+for r in runs:
+    vid=r.get("strategy_version_id") or (bindings.get(r["search_run_id"]) or {}).get("strategy_version_id")
+    if not vid: continue
+    p=perf[vid]; p["runs"]+=1; p["deep_inspected"]+=r.get("deep_inspected") or 0
+    p["retained"]+=r.get("retained_count") or 0; p["master"]+=r.get("master_promoted_count") or 0
+
 bound=sum(1 for r in runs if r["search_run_id"] in bindings)
 lines=[
  "# STRATEGY VERSION REPORT","",
@@ -43,13 +51,21 @@ lines=[
  f"- Canonical strategies: **{len(strategies)}**",
  f"- Strategy versions retained: **{len(by_version)}**",
  f"- Search runs with durable strategy-version bindings: **{bound}/{len(runs)}**","",
- "## Current strategy versions","",
- "| Strategy | Current version |","|---|---|"
+ "## Version evidence","",
+ "| Strategy | Version | Current? | Runs | Inspected | Retained | MASTER |",
+ "|---|---|---|---:|---:|---:|---:|"
 ]
-for sid in sorted(current): lines.append(f"| {sid} | {current[sid]} |")
+for v in sorted(by_version.values(),key=lambda x:(x["strategy_id"],x["strategy_version_id"])):
+    p=perf[v["strategy_version_id"]]
+    lines.append(
+      f"| {v['strategy_id']} | {v['strategy_version_id']} | "
+      f"{'yes' if current.get(v['strategy_id'])==v['strategy_version_id'] else 'no'} | "
+      f"{p['runs']} | {p['deep_inspected']} | {p['retained']} | {p['master']} |"
+    )
 lines += ["","## Binding policy","",
           "- Existing bindings never change when SEARCH_SKILLS.md evolves.",
-          "- A new strategy definition creates a new STRATVER ID; old versions remain in history.",
+          "- A changed strategy definition creates a new STRATVER ID; the new version begins with zero inherited evidence for exploitation/measurement sufficiency.",
+          "- Historical versions remain available for comparison and outcome attribution.",
           "- Legacy runs without an explicit version are bound once at first V5 ingest and labeled as inferred, not rewritten.",
           "- New V5-native recording should prefer an explicit/current strategy-version ID when practical.",""]
 (INTEL/"STRATEGY_VERSION_REPORT.md").write_text("\n".join(lines),encoding="utf-8")
