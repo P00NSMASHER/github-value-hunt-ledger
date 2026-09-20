@@ -9,12 +9,17 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: integrator-sync-main
+  cancel-in-progress: false
+
 jobs:
   sync:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
       - name: Preserve triggered payload and update checkout
@@ -29,11 +34,37 @@ jobs:
           import re
           from pathlib import Path
 
+          ROOT = Path.cwd().resolve()
+          ALLOWED_FILES = {
+              'MASTER.md', 'COMBINATIONS.md', 'CAPABILITIES.md', 'COMPONENTS.md',
+              'DATASETS.md', 'EXPERIMENTS.md', 'KNOWLEDGE_GRAPH.md', 'OPPORTUNITIES.md',
+              'OUTCOMES.md', 'REJECTED.md', 'SEARCH_QUEUE.md', 'SEARCH_SKILLS.md',
+              'TECHNOLOGY_RADAR.md', 'README.md',
+          }
+          ALLOWED_PREFIXES = ('hunters/', 'lanes/', 'referrals/', 'production/shadow/')
+
+          def safe_repo_path(rel: str) -> tuple[Path, str]:
+              raw = Path(rel)
+              if raw.is_absolute() or '..' in raw.parts:
+                  raise SystemExit(f'unsafe path: {rel}')
+              normalized = raw.as_posix()
+              if normalized not in ALLOWED_FILES and not any(
+                  normalized.startswith(prefix) for prefix in ALLOWED_PREFIXES
+              ):
+                  raise SystemExit(f'path not allowlisted: {rel}')
+              resolved = (ROOT / raw).resolve()
+              if resolved != ROOT and ROOT not in resolved.parents:
+                  raise SystemExit(f'path escapes repository: {rel}')
+              return resolved, normalized
+
           text = Path('/tmp/integrator_sync_payload.md').read_text()
           lines = text.splitlines()
           if not lines or not lines[0].startswith('MARKER: '):
               raise SystemExit('payload must start with MARKER: ')
           marker = lines[0][len('MARKER: '):].strip()
+          if not marker or len(marker) > 500:
+              raise SystemExit('marker must be non-empty and <= 500 characters')
+
           body = '\n'.join(lines[1:])
           pattern = re.compile(r'^=== (APPEND|REPLACE|SUBSTITUTE) (.+?) ===$', re.M)
           matches = list(pattern.finditer(body))
@@ -42,11 +73,11 @@ jobs:
 
           changed = []
           for i, match in enumerate(matches):
-              mode, rel = match.group(1), match.group(2)
+              mode, rel = match.group(1), match.group(2).strip()
+              path, normalized = safe_repo_path(rel)
               start = match.end()
               end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
               content = body[start:end].strip()
-              path = Path(rel)
               current = path.read_text() if path.exists() else ''
 
               if mode == 'APPEND':
@@ -64,7 +95,6 @@ jobs:
                   new = new.strip()
                   count = current.count(old)
                   if count == 0:
-                      # Treat an already-applied substitution as idempotent.
                       if new in current:
                           continue
                       raise SystemExit(f'SUBSTITUTE text not found in {rel}')
@@ -76,9 +106,11 @@ jobs:
                   continue
               path.parent.mkdir(parents=True, exist_ok=True)
               path.write_text(desired)
-              changed.append(rel)
+              changed.append(normalized)
 
-          Path('.integrator_sync_changed').write_text('\n'.join(changed) + ('\n' if changed else ''))
+          Path('.integrator_sync_changed').write_text(
+              '\n'.join(changed) + ('\n' if changed else '')
+          )
           PY
       - name: Commit integrator updates
         shell: bash
@@ -89,7 +121,7 @@ jobs:
           fi
           git config user.name 'github-value-hunt-integrator'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          while IFS= read -r file || [ -n "$file" ]; do git add "$file"; done < .integrator_sync_changed
+          while IFS= read -r file || [ -n "$file" ]; do git add -- "$file"; done < .integrator_sync_changed
           git commit -m 'Integrator portfolio synthesis and search direction'
           git pull --rebase origin main
           git push

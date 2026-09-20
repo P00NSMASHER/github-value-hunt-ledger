@@ -22,14 +22,19 @@ For each opportunity record:
 <!-- INTEGRATOR-R11-2026-09-19T2028-0400 -->
 ## Prioritized opportunity portfolio — 2026-09-19 20:28 ET
 
-### 1. Freight Audit Acceptance Test / Recovery Service
-- Sources: Freight Recovery v13 stack in `COMBINATIONS.md`.
-- Buyer/problem: enterprise shipper/3PL CFO, transportation/AP and freight-payment leaders need to know what incumbent audit misses and whether claimed savings became real credits/cash.
-- First paid wedge: fixed-price blind audit on a frozen customer population; optional success fee only on uniquely attributable realized recovery not already found by incumbent/automatic processes.
-- Monetization: diagnostic fee + contingency/shared savings + later monitoring.
-- Speed / ceiling / compression / rarity / evidence / rights: **5/5 / 5/5 / 5/5 / 5/5 / 4/5 / 5/5 = 29/30**. Evidence is 4 until the first authorized buyer population reaches settlement.
-- Defensibility: source authority lineage, independent rerating, blind protocol, proof obligations and settlement attribution rather than black-box anomaly scoring.
-- Next validation: one customer-authorized contract/addendum + shipment + invoice + incumbent-output + credit/refund/remittance population, with gold truth frozen before incumbent output.
+### 1. Freight Recovery v15 — Independent Freight Audit Acceptance Test / Recovery
+- Sources: Freight Recovery v15 stack in `COMBINATIONS.md`; operating model in `freight/BUSINESS_MODEL.md`.
+- Buyer/problem: enterprise/mid-market shipper or 3PL CFO/controller, transportation/AP and freight-payment leaders need to know what their current audit/payment process misses and whether claimed savings later become real credits/cash.
+- ICP screen: approximately $5M+ annual transportation spend or 500+ invoices/month; multiple carriers/accessorial exposure; incumbent audit/AP/TMS process exists; frozen contract/rate/shipment truth and later settlement evidence can be supplied.
+- Paid wedge 1: **$5k–$7.5k Data Readiness / Authority Diagnostic**.
+- Paid wedge 2: **$15k–$25k blind Freight Audit Acceptance Test** on a frozen historical population.
+- Recovery model: **15–20% only on uniquely attributable realized credit/refund/cash** after settlement proof, excluding incumbent-preidentified/automatic/preexisting/duplicate credits.
+- Recurring model after proof: initial **$60k–$150k annual base**; larger multi-BU enterprise **$150k–$300k+**, adjusted for audited spend, source count, modes/carriers and integration burden.
+- Why this sequencing wins: it coexists with an incumbent, sells a measurable financial-control test instead of a rip-and-replace platform, and turns the first customer into the evidence needed for later annual assurance.
+- Defensibility: source authority lineage + deterministic expected charge + independent falsification + blind protocol + proof obligations + later settlement attribution. The moat is **truth and realized-outcome discipline**, not number of models or hunted repos.
+- Evidence state: **29/30 opportunity, evidence still incomplete until EXP-001 reaches a real settlement**.
+- Next validation: one customer-authorized frozen contract/addendum + shipment + invoice + sealed incumbent-output + later credit/refund/remittance population, with buyer-owned truth frozen first.
+- Stop rule: do not broaden freight features/UI/integrations before this validation unless the pilot exposes the gap.
 
 ### 2. Recovery Proof SLA
 - Sources: Redrill + Probavi + pg_hardstorage + BackupDrill + SiVa + signed evidence; RestoreLab for Proxmox.

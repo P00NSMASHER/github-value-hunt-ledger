@@ -9,12 +9,17 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: catalog-append-main
+  cancel-in-progress: false
+
 jobs:
   append:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
       - name: Preserve triggered payload and update checkout
@@ -29,17 +34,53 @@ jobs:
           import json
           from pathlib import Path
 
+          ROOT = Path.cwd().resolve()
+          ALLOWED_FILES = {
+              'CAPABILITIES.md', 'COMPONENTS.md', 'DATASETS.md', 'OPPORTUNITIES.md',
+              'REJECTED.md', 'SEARCH_QUEUE.md', 'TECHNOLOGY_RADAR.md',
+          }
+          ALLOWED_PREFIXES = ('hunters/', 'lanes/', 'referrals/')
+
+          def safe_repo_path(rel: str) -> tuple[Path, str]:
+              raw = Path(rel)
+              if raw.is_absolute() or '..' in raw.parts:
+                  raise SystemExit(f'unsafe path: {rel}')
+              normalized = raw.as_posix()
+              if normalized not in ALLOWED_FILES and not any(
+                  normalized.startswith(prefix) for prefix in ALLOWED_PREFIXES
+              ):
+                  raise SystemExit(f'path not allowlisted: {rel}')
+              resolved = (ROOT / raw).resolve()
+              if resolved != ROOT and ROOT not in resolved.parents:
+                  raise SystemExit(f'path escapes repository: {rel}')
+              return resolved, normalized
+
           payload = json.loads(Path('/tmp/catalog_append_payload.json').read_text())
-          marker = payload['marker']
+          marker = payload.get('marker', '')
+          append = payload.get('append')
+          if not isinstance(marker, str) or not marker or len(marker) > 500:
+              raise SystemExit('marker must be a non-empty string <= 500 characters')
+          if not isinstance(append, dict) or not append:
+              raise SystemExit('append must be a non-empty object')
+
           changed = []
-          for rel, addition in payload['append'].items():
-              path = Path(rel)
+          for rel, addition in append.items():
+              if not isinstance(rel, str) or not isinstance(addition, str):
+                  raise SystemExit('append paths and additions must be strings')
+              path, normalized = safe_repo_path(rel)
+              if not path.exists():
+                  raise SystemExit(f'catalog target does not exist: {rel}')
               current = path.read_text()
               if marker in current:
                   continue
-              path.write_text(current.rstrip() + '\n\n' + marker + '\n' + addition.strip() + '\n')
-              changed.append(rel)
-          Path('.catalog_append_changed').write_text('\n'.join(changed) + ('\n' if changed else ''))
+              path.write_text(
+                  current.rstrip() + '\n\n' + marker + '\n' + addition.strip() + '\n'
+              )
+              changed.append(normalized)
+
+          Path('.catalog_append_changed').write_text(
+              '\n'.join(changed) + ('\n' if changed else '')
+          )
           PY
       - name: Commit catalog updates
         shell: bash
@@ -50,7 +91,7 @@ jobs:
           fi
           git config user.name 'github-value-hunt-bot'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          while IFS= read -r file || [ -n "$file" ]; do git add "$file"; done < .catalog_append_changed
+          while IFS= read -r file || [ -n "$file" ]; do git add -- "$file"; done < .catalog_append_changed
           git commit -m 'Catalog compliance and recovery proof findings'
           git pull --rebase origin main
           git push

@@ -29,17 +29,36 @@ The purpose of this file is to stop the system from becoming a museum of interes
 ## Priority queue — 2026-09-20
 
 ### EXP-001 — Freight blind audit to realized settlement
-- Opportunity: Freight Audit Acceptance Test / Recovery.
+- Opportunity: Freight Recovery v15 — Independent Freight Audit Acceptance Test / Recovery.
 - Capabilities: CAP-001, 003, 004, 005, 006, 007.
 - Status: **BLOCKED_EXTERNAL**.
-- Hypothesis: the stack can identify unique, defensible freight overcharges/incumbent misses and carry at least one through actual credit/refund/remittance without circular truth.
-- Inputs: customer-authorized frozen contracts/addenda/rate confirmations, shipment truth, invoices, incumbent output and later settlement evidence.
-- Procedure: freeze population -> freeze independent truth -> open incumbent output -> score unique findings -> dispute/review -> follow settlement.
-- Success criteria: every asserted dollar has authority + calculation + evidence lineage; false-positive dollars remain below an agreed threshold; at least one unique finding reaches realized settlement.
-- Failure criteria: material circularity, unsupported authority, unresolved settlement attribution or false positives above threshold.
-- Cost boundary: do not contact customers or spend money without explicit user approval.
-- Decision unlocked: whether freight becomes the first scaled commercial recovery business.
-- Next action: obtain one authorized closed population when the user approves outreach/data use.
+- Hypothesis: on a buyer-authorized frozen population, the stack can identify unique, defensible freight overcharges/incumbent misses with lower false-dollar risk than a black-box discrepancy process and carry at least one through actual credit/refund/remittance without circular truth.
+- Paid-entry option: a Data Readiness / Authority Diagnostic may be sold before the full experiment if it only inventories source gaps and makes no recovery claim.
+- Pilot-start gate:
+  1. buyer entity/BU and date range fixed;
+  2. exact invoice-population selection rule fixed;
+  3. contracts/rates/RateCons/addenda/tariff authority available;
+  4. shipment identity/operational evidence available for the supported claims;
+  5. incumbent output can remain sealed until buyer-owned truth is frozen;
+  6. later settlement source can be observed;
+  7. customer authorization, retention and read-only access boundaries documented.
+- Inputs: frozen invoices/EDI actuals, controlling commercial authority and versions, shipment truth, supporting POD/BOL/appointment/weight/telematics as required, sealed incumbent output and later settlement evidence.
+- Procedure: authorize scope -> readiness gate -> freeze population/hash -> freeze buyer-owned independent truth/hash -> open/hash incumbent output -> score unique findings -> buyer review -> approved dispute/action -> settlement readback -> recovery certificate.
+- Report four separate totals: reviewed discrepancy dollars; validated finding dollars; challenger-only validated dollars; uniquely attributable realized dollars.
+- Success criteria:
+  - unsupported asserted dollars = **$0**;
+  - unsupported realized dollars = **$0**;
+  - population drift after freeze = **0**;
+  - deterministic replay of all frozen scored cases = **100%**;
+  - every accepted finding has source authority + expected calculation + actual invoice + required evidence lineage;
+  - false-positive dollars remain within buyer-agreed ceiling;
+  - at least one challenger-only validated finding unless the population is genuinely clean;
+  - "recovery proven" requires at least one unique finding to reach an issued credit/refund/remittance with unambiguous allocation.
+- Failure criteria: truth contamination/circularity, wrong-population scoring, unsupported authority, silent identity resolution, self-validation, ambiguous settlement counted as realized, duplicate/preexisting credit counted as fee-eligible, or material false-positive dollars above the agreed ceiling.
+- Cost/time boundary: do not contact customers, carriers or incumbents and do not spend money without explicit user approval. Once complete inputs pass readiness, target the analysis/report portion within **10–15 business days**.
+- Evidence artifact: frozen population manifest, truth manifest, incumbent-output hash, finding ledger, review decisions, settlement source/allocation proof and recovery certificate.
+- Commercial decision unlocked: whether Freight Recovery becomes the first scaled commercial business and whether a pilot converts to annual continuous assurance.
+- Next action: obtain one authorized closed population when the user explicitly approves outreach/data use. Until then, engineering work is limited to pilot-safety/security/release gaps.
 
 ### EXP-002 — AP leakage synthetic three-way audit
 - Opportunity: AP Leakage Assurance.
