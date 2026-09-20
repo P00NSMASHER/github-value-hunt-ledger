@@ -40,28 +40,68 @@ def parse_capabilities():
     text = (ROOT / "CAPABILITIES.md").read_text(encoding="utf-8")
     matches = list(re.finditer(r"^###\s+(CAP-\d+)\s+—\s+(.+)$", text, re.M))
     out = []
+
+    def semantic_list(value):
+        if not value:
+            return []
+        parts = re.split(r";\s*|\s+\+\s+|,\s+(?=[A-Za-z0-9])", value)
+        cleaned = []
+        for part in parts:
+            part = part.strip().strip(chr(96)).strip("*").strip()
+            if part and part not in cleaned:
+                cleaned.append(part)
+        return cleaned
+
     for i, m in enumerate(matches):
         block = text[m.end(): matches[i+1].start() if i + 1 < len(matches) else len(text)]
-        maturity = _field(block, "Maturity")
+
+        compact = re.search(r"^-\s*Ability/maturity:\s*\*\*([^*]+)\*\*\s*—\s*(.*)$", block, re.I | re.M)
+        if compact:
+            maturity = compact.group(1).strip()
+            ability = compact.group(2).strip()
+            evidence = _field(block, "Evidence")
+            target_text = _field(block, "Targets") or _field(block, "Target")
+            limitation_next = _field(block, "Limitation/next test")
+            limitation = None
+            next_test = None
+            if limitation_next:
+                pieces = limitation_next.split(";", 1)
+                limitation = pieces[0].strip()
+                next_test = pieces[1].strip() if len(pieces) > 1 else limitation_next.strip()
+            components = semantic_list(evidence)
+            targets = semantic_list(target_text)
+            missing_piece = limitation
+        else:
+            maturity = _field(block, "Maturity")
+            ability = _field(block, "Ability")
+            evidence = _field(block, "Evidence basis")
+            components = _list_field(block, "Primary components")
+            targets = _list_field(block, "Reusable targets")
+            limitation = _field(block, "Limitation")
+            missing_piece = _field(block, "Missing piece")
+            next_test = _field(block, "Next test")
+
         state = "watch"
         if maturity:
-            if "PROVEN" in maturity.upper():
+            upper = maturity.upper()
+            if "PROVEN" in upper:
                 state = "runtime_or_stack_proven"
-            elif "BENCHMARK" in maturity.upper():
+            elif "BENCHMARK" in upper:
                 state = "benchmarked"
-            elif "VALIDATED" in maturity.upper():
+            elif "VALIDATED" in upper:
                 state = "source_or_test_validated"
+
         out.append({
             "capability_id": m.group(1),
             "name": m.group(2).strip(),
-            "ability": _field(block, "Ability"),
+            "ability": ability,
             "maturity": maturity,
-            "evidence_basis": _field(block, "Evidence basis"),
-            "primary_components": _list_field(block, "Primary components"),
-            "reusable_targets": _list_field(block, "Reusable targets"),
-            "limitation": _field(block, "Limitation"),
-            "missing_piece": _field(block, "Missing piece"),
-            "next_falsifiable_test": _field(block, "Next test"),
+            "evidence_basis": evidence,
+            "primary_components": components,
+            "reusable_targets": targets,
+            "limitation": limitation,
+            "missing_piece": missing_piece,
+            "next_falsifiable_test": next_test,
             "evidence_state": state,
             "confidence": "medium",
             "source_markdown": "CAPABILITIES.md",
@@ -98,7 +138,9 @@ def parse_search_skills():
         if title in skip or title == "SEARCH_SKILLS":
             continue
         block = text[m.end(): heads[i+1].start() if i + 1 < len(heads) else len(text)]
-        skill_name = _field(block, "SKILL NAME") or title
+        skill_name = _field(block, "SKILL NAME")
+        if not skill_name:
+            continue
         strategy_id = "STRAT:" + slug(skill_name)
         out.append({
             "strategy_id": strategy_id,
@@ -171,10 +213,12 @@ def status_bucket(status):
         return "quarantined"
     if "reject" in s or "deprior" in s:
         return "rejected"
-    if "master" in s or "elite" in s:
-        return "master"
     if "strong" in s:
         return "strong"
+    if "master" in s or "elite" in s:
+        if any(word in s for word in ("contender", "referral", "candidate", "watch")):
+            return "watch"
+        return "master"
     if "watch" in s:
         return "watch"
     return "unknown"
