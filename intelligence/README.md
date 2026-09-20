@@ -94,3 +94,63 @@ python tools/ti_report.py
 ```
 
 CI validates the graph and checks that the learning report is current.
+
+
+## V2 adaptive learning layer
+
+The system now distinguishes **source-of-truth records** from **generated intelligence**.
+
+Source-of-truth:
+- hunter Markdown evidence under `hunters/`;
+- `CAPABILITIES.md`;
+- `SEARCH_SKILLS.md`;
+- `intelligence/search_runs.jsonl`;
+- `intelligence/outcomes.jsonl`;
+- curated `intelligence/edges.jsonl`;
+- strategy aliases and standardized reason codes.
+
+Generated on every intelligence build:
+- `capabilities.jsonl` and `search_strategies.jsonl` synchronized from Markdown plus observed strategy variants;
+- `derived_edges.jsonl` from search-run and outcome attribution;
+- `REGISTRY_REPORT.md` and `registry_metrics.json` from the full hunter corpus;
+- `DATA_QUALITY_REPORT.md` and `quality_metrics.json`;
+- `GRAPH_HEALTH.md`;
+- `LEARNING_REPORT.md`;
+- `SEARCH_POLICY.md` and `search_policy.json`.
+
+The registry is intentionally generated from the source catalogs rather than kept as one giant checked-in JSONL. This prevents connector truncation or partial-write failures from silently deleting history.
+
+### Before deep inspection
+
+Run locally when available:
+
+```bash
+python tools/ti_lookup.py owner/repo
+```
+
+or perform the equivalent ledger lookup through GitHub. Reinspect a known repo only when there is a new revision, new capability hypothesis, unresolved evidence gap, new experiment edge, or contradictory evidence.
+
+### Search-run v2 instrumentation
+
+New prospective runs should use `schema_version: 2` and record:
+- strategy and reusable query family;
+- search surfaces plus literal queries;
+- candidate/deep-inspection/retention/promotion denominators;
+- standardized candidate dispositions and reason codes;
+- capability and experiment deltas;
+- recall-rescue usage and stop reason;
+- optional elapsed minutes and tool-call counts for future research-efficiency measurement.
+
+Missing recommended instrumentation lowers data-quality confidence but does not erase the underlying research.
+
+### Adaptive allocation
+
+`tools/ti_policy.py` uses a cautious exploration/exploitation mixture. While outcomes are sparse, the exploration budget remains high. A strategy is never declared superior from a lucky run: exploitation claims require at least 5 measured runs and 20 deep inspections.
+
+The policy is advisory. A named blocker in a P0 experiment can override the generic allocation for a bounded search.
+
+### CI behavior
+
+Pull requests recompute and validate all intelligence products without requiring hand-maintained generated files.
+
+After a qualifying push to `main`, the workflow refreshes generated intelligence and commits it with a skip-CI marker. This prevents the dashboard drift that occurred when search runs advanced but the learning report remained stale.
