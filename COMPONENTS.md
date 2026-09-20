@@ -47,6 +47,16 @@ For every component preserve exact revision, actual published rights/provenance,
 - Score: **29/30**.
 - Next test: aliases/mergers/splits/corrections with byte-stable replay for a pinned version.
 
+### opensanctions/nomenklatura — durable positive/negative identity judgement graph
+- Revision: `844dba09fafc8512dc3ce241f44aa5415b367029`.
+- Published rights: MIT for repository code; OpenSanctions/third-party datasets retain independent licenses and source-specific rights.
+- Capability: SQL-backed POSITIVE/NEGATIVE/UNSURE identity judgements, negative blockers, connected-component canonicalization, durable reviewer/timestamp history, superseded decisions and tested remove/explode operations that can dissolve or split mistaken clusters.
+- Targets: CAP-002 identity mastering for AP/vendor, CaptureBrief company/award, freight carrier and CRM/MDM workflows.
+- Integrator score: **29/30 — A4 B5 C5 D5 E5 F5**.
+- Portfolio posture: retained as a complementary component rather than a new MASTER leader because Canon already owns versioned production registry promotion/replay; Nomenklatura's distinctive value is durable negative knowledge and reversible clustering. The pair should be tested before enlarging MASTER.
+- Limitation: not itself a full promoted-version registry lifecycle; hunter inspection records a noncanonical-cluster edge case that needs characterization.
+- Next test: synthetic match -> explicit reject -> merge -> referent addition -> remove -> explode mistaken cluster -> feed final judgement graph into Canon -> verify pinned deterministic lookup/replay.
+
 ### ChelseaKR/constituent-reconciler — consent-aware review/writeback
 - Revision: `dbc09d25baec026027e65a0f8d21930509e2dd8e`.
 - Published rights: Apache-2.0; CRM APIs/customer identity/consent data separate.
@@ -113,6 +123,24 @@ For every component preserve exact revision, actual published rights/provenance,
 - Score: **29/30**.
 - Next test: held-out multi-jurisdiction completeness/version/semantic truth set.
 
+### slicedearth/contract-delta-au — deterministic procurement version-lineage pattern
+- Revision: `630d1903507e6f5e47adaf1c690c9d6d4363af54`.
+- Published rights: MIT repository code/docs; AusTender-derived source records remain CC BY 3.0 AU with their own attribution/change requirements.
+- Capability: stateful OCDS history hydration, normalized versions, deterministic field-level change events, provenance/run coverage, idempotent reruns, source-integrity validation and explicit history/source failure states.
+- Targets: CaptureBrief amendment/award version history, permit/regulatory change evidence and other public-data systems where latest-row truth is insufficient.
+- Score: **28/30**.
+- Portfolio posture: reusable architecture, not a MASTER promotion, because its verified domain is Australian procurement and U.S. SAM semantics remain unimplemented.
+- Next test: port only the provenance/event model into EXP-006 and prove amendment ordering, reruns, missing history and source failures cannot silently change a conclusion.
+
+### CodeMaru-Dreamine/Dreamine.Gem — stateful SECS/GEM pre-FAT harness
+- Revision: `82604d6f03c1e95e0558de5c757989b27cd4a3d6`.
+- Published rights: MIT repository code; SEMI standards/revisions, equipment catalogs and customer profiles are independently governed.
+- Capability: host + equipment E30/GEM behavior over real HSMS/TCP with communication/control state, variables/constants, event reports, alarms, remote commands, bounded spooling, Stream-9/error behavior and typed outcomes against an explicitly frozen derived profile.
+- Targets: CAP-014 industrial/semiconductor pre-FAT and migration acceptance.
+- Score: **27/30 — A4 B5 C5 D5 E4 F4**.
+- Limitation: not current/official SEMI conformance; external simulator/production equipment testing was explicitly not run and E37.1 conformance remains blocked by standards access.
+- Next test: run the same rights-clean frozen dialogue/error corpus against one unrelated SECS/GEM implementation/simulator and classify every disagreement; same-family Dreamine transport agreement is not independent proof.
+
 ### oscal-compass/compliance-to-policy-go — policy result to OSCAL assessment bridge
 - Revision: `45bfc1a8947e8b56b7e11391e13f8c1f2136cfaa`.
 - Published rights: Apache-2.0; OSCAL/NIST and external policy engines separate.
@@ -131,6 +159,15 @@ For every component preserve exact revision, actual published rights/provenance,
 - Next test: vendor-neutral synthetic matrix for definite refusal, timeout/unknown, duplicate retry/callback, confirmed send, final settled amount/currency, reversal and concurrent sweep.
 
 ## Strong challengers — test before elevating
+
+### ThousandBirdsInc/chidori — deterministic agent side-effect replay / strict run verification
+- Revision: `223bb8779f63822c3e63a9a4347dda7483a02158`.
+- Published rights: Apache-2.0.
+- Capability: journals mediated external effects, restores/replays without re-performing prior live effects, detects pre-frontier source/argument divergence, supports strict no-live verification, crash/pause resume and single-writer run leases on supporting backends.
+- Shadow score: **27/30 — A4 B5 C5 D5 E4 F4**, PASS_WITH_LIMITS; retained as a challenger because the production shadow itself is non-authoritative and tests were inspected rather than independently rerun.
+- Targets: verifier-gated production architecture, replayable-agent reliability retrofits and long-horizon agent incident/debug regression.
+- Limits: filesystem/S3 lease semantics are advisory; only effects mediated through the runtime boundary are replayable; custom JS runtime/migration cost and recent release/CI defects materially lower maturity confidence.
+- Next test: recorded-run no-live replay plus crash/resume, approval-fail-closed and duplicate-driver cases on the production prototype using a storage backend with strong lease semantics.
 
 ### amrit-kumar/fintechcore — payment lifecycle / ledger / reconciliation reference
 - Revision: `b27a22890e8b5173d2a97be512a198a4564ed425`.
