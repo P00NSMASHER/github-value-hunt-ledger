@@ -173,3 +173,11 @@ These sections supersede the same-named earlier versions where they conflict; ol
 - Buyer / wedge: manufacturers, distributors, ecommerce and aftermarket finance/service teams; fixed-price 50–500 claim Entitlement Leakage Audit.
 - Hard invariant: no source sale/delivery/warranty authority or ambiguous serial/quantity/credit lineage = no asserted avoidable-dollar claim.
 - Validation: 50-case blind historical/synthetic corpus covering expired windows, partial returns, multiple deliveries, prior consumed quantity, serial mismatch, duplicate RMA, warranty-policy change, manual override and refund/credit settlement.
+
+<!-- INTEGRATOR-R11-CONTACTCENTER-2026-09-19T2037-0400 -->
+### Contact Center Assurance v2 — release journey -> agent/case persistence -> QA/WFM impact
+- Add `techmatters/flex-plugins@1194b0b589e267cfc35434a2b4fce1d84ae667f3` as the Twilio Flex agent-desktop/case-lifecycle acceptance oracle beneath the existing Audrique synthetic-journey + CallQuanta/ANI QA-calibration + RosterSpec/pyworkforce WFM stack. The official `twilio-professional-services/flex-project-template@fbd559440ea6c21b72a2e3aafa8ecb3a1f760ea8` remains deployment/config scaffolding, not the assurance moat.
+- Combined capability: environment/config release -> synthetic contact/IVR journey -> agent task/contact/case create-edit-persistence regression -> post-call QA calibration -> staffing/coverage effect.
+- Buyer / wedge: Twilio Flex enterprises, BPOs, helplines and SIs; fixed-price Release Acceptance Test covering the buyer's 20–50 highest-value workflows in an authorized non-production tenant.
+- Validation: measure manual regression hours displaced, workflow coverage, failed case/contact persistence, routing/task defects, release-cycle time and escaped regression rate. Provider/customer data remain separately authorized.
+- Status: P2; strong component, but no MASTER promotion until buyer/value evidence beats the direct-money freight/commission/warranty wedges.
