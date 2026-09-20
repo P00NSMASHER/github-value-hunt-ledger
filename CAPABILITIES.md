@@ -178,6 +178,16 @@ Each capability should record:
 - Missing piece: one shared synthetic month with event-to-journal parity and deliberate faults.
 - Next test: replay identical month through operational and accounting planes and classify every disagreement.
 
+### CAP-017 — Sequencing operations evidence bridge
+- Ability: connect LIMS workflow state to sequencer operational run metrics and provenance without requiring sequence-content analysis, so labs can validate handoffs, workflow transitions and run-health evidence across an installed Clarity/Illumina estate.
+- Maturity: VALIDATED COMPONENT / synthetic integration pending.
+- Evidence basis: S4 Clarity `StepRunner` workflow-state machinery, official Illumina InterOp metric parsing across instrument generations, and existing provenance infrastructure.
+- Primary components: `SemaphoreSolutions/s4-clarity-lib@ad577fff3a3c4c93f4bb898940a0b45268c7dbe7`; `Illumina/interop@015a85ec100c7a770ed0e27ce7fadc6230a38208`; Flowcept as provenance/evidence layer.
+- Reusable targets: sequencing-core workflow automation, genomics CRO operations, installed-base lab integration and run-readiness/evidence services.
+- Limitation: Clarity/Illumina runtimes, customer instances/data and vendor services remain separately governed; current evidence verifies components, not an end-to-end customer deployment.
+- Missing piece: one synthetic workflow-to-run-metrics integration with a forced bad state/handoff and deterministic evidence report.
+- Next test: execute a synthetic multi-step QC/pooling/run-prep workflow, attach lawful InterOp fixtures to the same run identity, deliberately break one transition/metric expectation and require the evidence layer to distinguish workflow error, run-metric exception and unknown state.
+
 ## Capability promotion rule
 Do not add a capability because a repository sounds useful. Promote only when the system can state a falsifiable ability, evidence basis, known limitation and next test.
 
