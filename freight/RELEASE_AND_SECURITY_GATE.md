@@ -69,6 +69,7 @@ operability, rights-evidence consistency and the chosen data-handling path.
 ### Customer data
 - [ ] Buyer authorization is documented for the actual engagement.
 - [x] Current Netlify customer-data path is machine-classified as **BLOCKED** until deployment security evidence changes.
+- [x] Launch authorization receipt is required before pilot source ingestion and binds engagement/buyer/BU to release provenance, rights state and exact environment evidence.
 - [x] Separate controlled/manual pilot path is machine-classified as **CONDITIONAL** until a separately controlled data environment has verified evidence.
 - [x] Separate/manual pilot route cannot be self-attested: launch requires a structured VERIFIED environment manifest with evidence references for all applicable controls.
 - [ ] Netlify team MFA is enforced before confidential buyer data is accepted.
@@ -105,7 +106,7 @@ operability, rights-evidence consistency and the chosen data-handling path.
 - [x] Settlement readback has source hash + allocation lineage.
 - [x] Duplicate/preexisting/automatic credits cannot become fee-eligible.
 - [x] Recovery certificate cannot exceed validated or realized amounts and remains buyer/BU scoped.
-- [x] Final pilot-package hash binds data-room manifest, population, truth, sealed incumbent and opened incumbent output.
+- [x] Final pilot-package hash binds launch authorization, data-room manifest, population, truth, sealed incumbent and opened incumbent output.
 
 ## P1 — before annual continuous assurance
 
