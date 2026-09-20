@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.5 candidate
+## Current checkpoint — v15.5
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -31,6 +31,8 @@ Internal commercialization controls now completed:
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
+Live adaptive policy now confirms **Freight search authorized = no**, **active search gaps = none**, and Freight-exclusive **CAP-003/CAP-004/CAP-005** are suppressed from generic capability-gap priority.
+
 Commercial repricing remains locked to the existing priors until direct external evidence reaches the v15.5 calibration threshold: **5 unique buyer cohorts, 5 paid engagements, and margin evidence from 5 unique buyers**. One customer cannot unlock repricing by generating repeated engagements.
 
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
@@ -38,15 +40,9 @@ Commercial repricing remains locked to the existing priors until direct external
 ## Next 24 hours — make the asset diligence-ready
 
 ### P0
-1. **DONE:** v15 / v15.1 / v15.2 / v15.3 / v15.4 commercialization, proof and commercial-ops PRs merged after CI.
-2. **DONE:** canonical Freight Recovery v15.4 release identity recorded in `freight/RELEASE_MANIFEST.md`.
-3. Produce a release manifest with:
-   - source commit;
-   - exact component revisions;
-   - rights-registry version;
-   - test command/result;
-   - checksums;
-   - known limitations.
+1. **DONE:** v15 / v15.1 / v15.2 / v15.3 / v15.4 / v15.5 commercialization, proof, adaptive-authorization and commercial-learning PRs merged after CI.
+2. **DONE:** canonical Freight Recovery v15.5 release identity recorded in `freight/RELEASE_MANIFEST.md`.
+3. **DONE for current internal checkpoint:** v15.5 release manifest records source/CI/adaptive-policy/commercial-learning state. Production artifact checksums/SBOM/signing remain part of the annual-deployment diligence blocker.
 4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
 
