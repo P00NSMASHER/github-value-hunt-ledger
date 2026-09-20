@@ -30,12 +30,12 @@ Emergence product = N × M × A × C × X. Treat it as a prioritization aid, not
 - Search next: production systems with explicit false-accept budgets, legal alternatives and review-routing economics.
 
 ### RAD-003 — Reviewed identity compilers
-- Thesis: identity resolution is shifting from one-off fuzzy matching toward versioned registries with human promotion, correction/split semantics and exact runtime replay.
-- Signals: Canon + controlled writeback systems + privacy-preserving challengers.
+- Thesis: identity resolution is shifting from one-off fuzzy matching toward versioned registries with durable positive/negative judgements, human promotion, reversible merge/split correction and exact runtime replay.
+- Signals: Canon supplies promoted-version production registry/replay; Nomenklatura independently contributes durable POSITIVE/NEGATIVE/UNSURE reviewer judgements plus remove/explode correction of mistaken clusters; controlled writeback systems add governed source correction.
 - Score: N4 M4 A3 C5 X5 = **1200**.
 - Status: BUILD / BENCHMARK.
 - Commercial implication: potentially reusable control plane underneath procurement, AP, CRM, freight and public-data products.
-- Search next: independent implementations with promotion/version semantics, negative matches and rollback.
+- Search next: stop broad resolver hunting; benchmark Nomenklatura-style negative knowledge/reversible clustering feeding Canon-style promoted-version replay, including aliases, mergers, splits, corrections and noncanonical clusters.
 
 ### RAD-004 — Negative-control infrastructure assurance
 - Thesis: proof systems that only pass positive tests are insufficient; intentionally wrong states are becoming part of the acceptance standard.
@@ -62,20 +62,20 @@ Emergence product = N × M × A × C × X. Treat it as a prioritization aid, not
 - Search next: verticals with expensive reconciliation, authoritative rate/entitlement sources and measurable closed-loop outcomes.
 
 ### RAD-007 — Customer-configuration-derived digital twins / virtual commissioning
-- Thesis: customer-authorized controller/configuration exports can create software-only acceptance environments before physical hardware/plant access.
-- Signals: L5K-derived virtual PLC; protocol simulators and pre-FAT opportunities.
+- Thesis: customer-authorized controller/configuration or frozen protocol profiles can create software-only acceptance environments before physical hardware/plant access.
+- Signals: L5K-derived virtual PLC with namespace/type fidelity; independent SECS/GEM host+equipment state machine over HSMS/TCP with communication/control state, alarms/events/remote commands/spooling/error behavior; protocol regression/pre-FAT opportunities.
 - Score: N4 M4 A3 C5 X4 = **960**.
 - Status: BENCHMARK.
-- Commercial implication: potentially shortens commissioning and integration cycles with clear engineering ROI.
-- Search next: configuration importers that preserve types, topology, failure states and protocol behavior.
+- Commercial implication: potentially shortens commissioning and integration cycles with clear engineering ROI across controls and semiconductor equipment integration.
+- Search next: configuration/profile importers that preserve types, topology, failure states and protocol behavior; require independent endpoint comparison and do not equate implementation agreement with standards conformance.
 
 ### RAD-008 — Machine-readable regulatory/source authority
-- Thesis: official schemas, rule corpora and versioned government source pipelines enable deterministic decision support that generic web/RAG systems cannot safely provide.
-- Signals: FAR DITA, USAspending/DATA Act schemas, solicitation packet/history acquisition, structured invoice rule packs.
+- Thesis: official schemas, rule corpora and versioned public-source pipelines enable deterministic decision support that generic web/RAG systems cannot safely provide.
+- Signals: FAR DITA, USAspending/DATA Act schemas, solicitation packet/history acquisition, structured invoice rule packs, plus an independent procurement implementation showing deterministic version hydration/diffs, idempotent reruns and explicit source/history failure states.
 - Score: N3 M5 A4 C5 X4 = **1200**.
 - Status: EXPAND.
-- Commercial implication: strong moat where stale or misapplied rules create expensive decisions.
-- Search next: official machine-readable rule sources with effective-date/supersession semantics.
+- Commercial implication: strong moat where stale, superseded or misapplied rules/records create expensive decisions.
+- Search next: official machine-readable rule/source systems with effective-date/supersession semantics and deterministic history; use cross-jurisdiction implementations only as architecture patterns unless their authority applies directly.
 
 ### RAD-009 — Governed autonomous experimentation
 - Thesis: scientific automation is shifting from optimizer-only loops toward explicit permission, validation, recovery, stop and provenance policies.
