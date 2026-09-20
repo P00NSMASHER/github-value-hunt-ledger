@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Technology Intelligence Experiment Registry",
+  "type": "object",
+  "required": [
+    "experiment_id",
+    "name",
+    "priority_weight",
+    "capability_ids"
+  ],
+  "properties": {
+    "experiment_id": {
+      "type": "string",
+      "pattern": "^EXP-[0-9]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "opportunity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "priority": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "priority_weight": {
+      "type": "number",
+      "minimum": 0
+    },
+    "queue_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "capability_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^CAP-[0-9]{3,}$"
+      }
+    },
+    "hypothesis": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_action": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
