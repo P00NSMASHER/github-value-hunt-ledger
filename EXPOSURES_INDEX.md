@@ -147,3 +147,14 @@ Never store, reproduce, test, validate, authenticate with, exploit, or monetize 
 - Apparent status: **unknown; not inspected, copied, tested or validated**.
 - Non-sensitive context: safe solver source and tests were sufficient to assess the scheduling/constraint-relaxation capability without touching the environment file.
 - Remediation note: use only sanitized configuration for any reuse/deployment review; do not inspect or rely on the committed environment artifact. No secret value is stored here.
+
+### Akash-kolladikkel/Emirates-Line-Tariff-Scraper-AI
+- Repository: `Akash-kolladikkel/Emirates-Line-Tariff-Scraper-AI`.
+- Canonical URL: https://github.com/Akash-kolladikkel/Emirates-Line-Tariff-Scraper-AI
+- File/path: `Base-code/.env` and `Main-code/.env`; contents were deliberately not opened.
+- Exact revision: `5a2a48ea0f4b3d985076082ab4a43f7c9d214644`.
+- Date observed: 2026-09-20.
+- High-level exposure type: committed environment/configuration artifacts potentially containing service or authentication material.
+- Apparent status: **unknown; tree names only were inspected, values were not opened, copied, tested or validated**.
+- Non-sensitive context: safe scraper source was sufficient to assess carrier-published detention/demurrage schedule acquisition behavior without touching either environment file.
+- Remediation note: use only sanitized configuration for any reuse; do not inspect or rely on the committed environment artifacts. No secret value is stored here.
