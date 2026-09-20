@@ -27,6 +27,8 @@ def test_current_release_provenance_is_deterministic():
     assert "production/requirements-ci.txt" in a["control_file_hashes"]
     assert "freight/rights_evidence.py" in a["control_file_hashes"]
     assert "freight/incident_response.py" in a["control_file_hashes"]
+    assert "freight/deployment_security_evidence.py" in a["control_file_hashes"]
+    assert "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json" in a["control_file_hashes"]
     assert "freight/RIGHTS_EVIDENCE_MANIFEST.json" in a["control_file_hashes"]
     assert ".github/workflows/technology-intelligence.yml" in a["control_file_hashes"]
 
