@@ -143,6 +143,20 @@ Do not store credentials, tokens, private/personal data, or raw accidental secre
 - Product use: historical backtest corpus for STORCITO and infrastructure/utility wildfire-risk systems.
 - Next action: build a source-rights matrix and a 20-event benchmark with deliberate missing-layer degradation tests.
 
+### Saki et al. harmonized utility outages + NWS VTEC warnings — fresh outage/recovery outcome benchmark
+- Source: https://zenodo.org/records/22651795 ; Zenodo record v2, DOI `10.5281/zenodo.22651795`.
+- Exact version / date inspected: **v2**, published 2026-09-08; hunter inspection records a peer-reviewed *Scientific Data* Data Descriptor published 2026-09-19.
+- Dataset: 2015–2024 CONUS event archive joining utility-reported EAGLE-I outage observations with NWS VTEC watches/warnings/advisories, including event IDs, outage peaks/durations, warning types, source-availability diagnostics and sensitivity artifacts for missing data, temporal aggregation and recovery-persistence assumptions.
+- Coverage / freshness / format: national historical outage-warning/recovery evidence suitable for frozen historical replay and held-out event validation. It is observational outcome evidence, not causal proof that a warning or weather variable caused an outage.
+- Evidence inspected: Zenodo v2 inventory and DOI metadata, peer-reviewed descriptor as recorded by hunter 23, plus upstream EAGLE-I documentation describing 15-minute public-utility-map observations and known source gaps/ambiguity. External web retrieval was attempted during integration but the fresh record was not yet accessible through the available web index, so this central entry preserves the hunter's inspected evidence rather than upgrading it.
+- Rights: **unresolved for the harmonized v2 record at integration time**; the inspected Zenodo license field was not populated. Upstream EAGLE-I is separately described as CC BY 4.0 by the hunter, while NWS/Census/geometry sources retain their own terms. The standing GitHub commercial-permission assertion does not apply to this non-GitHub dataset.
+- Buyer / problem: utilities, insurers/reinsurers, infrastructure owners and resilience analytics teams need operational outage/recovery truth to falsify hazard and crew-preposition models rather than validating only against simulations.
+- Product use: historical storm/outage model calibration, frozen portfolio risk ranking, prospective forecast verification and recovery-sensitivity analysis. Do not sell raw redistribution rights until the harmonized-record terms are confirmed.
+- Build/data advantage: hunter estimate **4–8 months** of EAGLE-I/VTEC harmonization, event construction, missingness diagnostics and recovery-sensitivity work.
+- Value score: **27/30 — A4 B5 C5 D5 E5 F3**; rights clarity is the explicit gating dimension.
+- Combination: `STORCITO / WeatherNext-style risk forecast -> frozen prediction -> later harmonized outage/recovery outcome`, with physrisk/ERAD/SIRA/OpenGIRA or pyrecodes providing consequence/recovery models where inputs are lawfully sourced.
+- Next action: confirm harmonized-v2 reuse terms first; then reproduce a frozen 2019–2023 development replay and held-out 2024 benchmark with county/event calibration, lead-time lift, false-negative cost and missing-data sensitivity. Keep causal claims separate from observational association.
+
 ## Demoted / negative-control data assets
 
 ### aiparallel0/freight-audit — retain only as adversarial freight fixtures
