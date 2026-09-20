@@ -2,7 +2,7 @@
 
 This is a cautious allocation recommendation, not an autonomous command. It blends empirical yield with an explicit exploration budget so unusual low-frequency discoveries are not optimized away.
 
-- Measured prospective or benchmark runs: **11**
+- Measured prospective or benchmark runs: **12**
 - Valid structured outcomes: **1**
 - Exploration budget: **50%**
 - Multi-origin outcomes use fractional equal-touch credit rather than being counted in full for every strategy.
@@ -12,11 +12,11 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 
 | Strategy | Allocation | Runs | Inspected | Outcome eq. | Evidence |
 |---|---:|---:|---:|---:|---|
-| STRAT:acceptance-path-transition-inspection | 15.9% | 4 | 8 | 1.00 | insufficient |
-| STRAT:capability-conjunction-search-claim-tracing | 14.4% | 2 | 6 | 0.00 | insufficient |
-| STRAT:first-party-production-source-triangulation | 13.9% | 2 | 7 | 0.00 | insufficient |
-| STRAT:fail-open-boundary-archaeology | 10.4% | 1 | 4 | 0.00 | insufficient |
-| STRAT:evaluation-target-independence | 10.1% | 2 | 4 | 0.00 | insufficient |
+| STRAT:acceptance-path-transition-inspection | 18.0% | 5 | 10 | 1.00 | insufficient |
+| STRAT:capability-conjunction-search-claim-tracing | 13.6% | 2 | 6 | 0.00 | insufficient |
+| STRAT:first-party-production-source-triangulation | 13.2% | 2 | 7 | 0.00 | insufficient |
+| STRAT:fail-open-boundary-archaeology | 9.9% | 1 | 4 | 0.00 | insufficient |
+| STRAT:evaluation-target-independence | 9.6% | 2 | 4 | 0.00 | insufficient |
 | STRAT:authority-origin-invariant-set-consistency | 5.1% | 0 | 0 | 0.00 | insufficient |
 | STRAT:cross-source-emergence-triangulation | 5.1% | 0 | 0 | 0.00 | insufficient |
 | STRAT:decision-claim-runtime-side-effect-trace | 5.1% | 0 | 0 | 0.00 | insufficient |

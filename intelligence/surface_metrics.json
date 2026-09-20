@@ -29,6 +29,20 @@
       "fractional_outcome_equivalents": 0
     },
     {
+      "surface_id": "SURFACE:github-exact-head-source",
+      "labels_seen": [
+        "GitHub exact-head source"
+      ],
+      "runs": 2,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
       "surface_id": "SURFACE:exact-head-actions-license-verification",
       "labels_seen": [
         "exact-head Actions/license verification"
@@ -253,13 +267,13 @@
       "fractional_outcome_equivalents": 0
     },
     {
-      "surface_id": "SURFACE:durable-workflow-structural-analogs",
+      "surface_id": "SURFACE:madsci-ot2-wrapper-comparator",
       "labels_seen": [
-        "durable-workflow structural analogs"
+        "MADSci/OT2 wrapper comparator"
       ],
       "runs": 1,
-      "deep_inspected": 1,
-      "retained_count": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
       "master_promoted_count": 0,
       "capability_touch_runs": 1,
       "experiment_runs": 1,
@@ -267,9 +281,51 @@
       "fractional_outcome_equivalents": 0
     },
     {
-      "surface_id": "SURFACE:github-exact-head-source",
+      "surface_id": "SURFACE:official-integration-restart-tests",
       "labels_seen": [
-        "GitHub exact-head source"
+        "official integration restart tests"
+      ],
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:official-vendor-robot-server-schema-store",
+      "labels_seen": [
+        "official vendor robot-server schema/store"
+      ],
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:source-faithful-synthetic-state-model",
+      "labels_seen": [
+        "source-faithful synthetic state model"
+      ],
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:durable-workflow-structural-analogs",
+      "labels_seen": [
+        "durable-workflow structural analogs"
       ],
       "runs": 1,
       "deep_inspected": 1,

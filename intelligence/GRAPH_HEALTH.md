@@ -1,10 +1,10 @@
 # GRAPH HEALTH REPORT
 
 - Curated edges: **132**
-- Derived attribution edges: **99**
+- Derived attribution edges: **110**
 - Capability nodes: **19**
-- Query-family nodes: **11**
-- Search-surface nodes touched: **25**
+- Query-family nodes: **12**
+- Search-surface nodes touched: **29**
 - Capabilities touched by measured search runs: **10**
 
 ## Highest-priority capability gaps

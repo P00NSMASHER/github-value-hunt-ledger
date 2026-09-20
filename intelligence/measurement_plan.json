@@ -15,7 +15,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05057467403168909,
+      "policy_allocation": 0.05077479349715201,
       "sufficient_evidence": false
     },
     {
@@ -27,7 +27,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05057467403168909,
+      "policy_allocation": 0.05077479349715201,
       "sufficient_evidence": false
     },
     {
@@ -39,7 +39,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05057467403168909,
+      "policy_allocation": 0.05077479349715201,
       "sufficient_evidence": false
     },
     {
@@ -51,7 +51,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05057467403168909,
+      "policy_allocation": 0.05077479349715201,
       "sufficient_evidence": false
     },
     {
@@ -63,7 +63,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05057467403168909,
+      "policy_allocation": 0.05077479349715201,
       "sufficient_evidence": false
     },
     {
@@ -75,7 +75,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05057467403168909,
+      "policy_allocation": 0.05077479349715201,
       "sufficient_evidence": false
     },
     {
@@ -87,7 +87,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05057467403168909,
+      "policy_allocation": 0.05077479349715201,
       "sufficient_evidence": false
     },
     {
@@ -99,7 +99,7 @@
       "inspections_needed": 16,
       "measurement_debt": 1.6,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.10350768896374707,
+      "policy_allocation": 0.09932130731171682,
       "sufficient_evidence": false
     },
     {
@@ -111,7 +111,7 @@
       "inspections_needed": 16,
       "measurement_debt": 1.4,
       "instrumentation_debt": 1.0,
-      "policy_allocation": 0.10095475245374763,
+      "policy_allocation": 0.09648626371828378,
       "sufficient_evidence": false
     },
     {
@@ -123,7 +123,7 @@
       "inspections_needed": 14,
       "measurement_debt": 1.2999999999999998,
       "instrumentation_debt": 0.16666666666666666,
-      "policy_allocation": 0.14367620581270463,
+      "policy_allocation": 0.1364784982358532,
       "sufficient_evidence": false
     },
     {
@@ -135,19 +135,19 @@
       "inspections_needed": 13,
       "measurement_debt": 1.25,
       "instrumentation_debt": 1.0,
-      "policy_allocation": 0.13928654191578915,
+      "policy_allocation": 0.13236926378299615,
       "sufficient_evidence": false
     },
     {
       "strategy_id": "STRAT:acceptance-path-transition-inspection",
       "name": "Acceptance-path transition inspection",
-      "runs": 4,
-      "deep_inspected": 8,
-      "runs_needed": 1,
-      "inspections_needed": 12,
-      "measurement_debt": 0.8,
-      "instrumentation_debt": 0.08333333333333333,
-      "policy_allocation": 0.1585520926321879,
+      "runs": 5,
+      "deep_inspected": 10,
+      "runs_needed": 0,
+      "inspections_needed": 10,
+      "measurement_debt": 0.5,
+      "instrumentation_debt": 0.06666666666666667,
+      "policy_allocation": 0.179921112471086,
       "sufficient_evidence": false
     }
   ]

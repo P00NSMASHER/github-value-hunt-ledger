@@ -2,8 +2,8 @@
 
 Candidate-level dispositions are the bridge between broad discovery and cheap triage. This report measures what the system is rejecting, retaining and still failing to encode consistently.
 
-- Structured candidate dispositions: **17**
-- Candidate records using controlled reason codes: **0**
+- Structured candidate dispositions: **19**
+- Candidate records using controlled reason codes: **2**
 - Candidate records using free-form/custom reason codes: **17**
 - Unique custom reason strings: **17**
 
@@ -11,15 +11,16 @@ Candidate-level dispositions are the bridge between broad discovery and cheap tr
 
 | Status | Count |
 |---|---:|
-| strong | 6 |
-| watch | 6 |
+| strong | 7 |
+| watch | 7 |
 | rejected_or_negative | 5 |
 
 ## Controlled reasons observed
 
 | Reason | Count |
 |---|---:|
-| — | 0 |
+| state_transition_verified | 1 |
+| needs_exactly_once_reconciliation | 1 |
 
 ## Free-form reasons that should eventually map to controlled reasons
 

@@ -1,11 +1,14 @@
 {
-  "candidate_dispositions": 17,
+  "candidate_dispositions": 19,
   "status_counts": {
-    "strong": 6,
-    "watch": 6,
+    "strong": 7,
+    "watch": 7,
     "rejected_or_negative": 5
   },
-  "standard_reason_counts": {},
+  "standard_reason_counts": {
+    "state_transition_verified": 1,
+    "needs_exactly_once_reconciliation": 1
+  },
   "custom_reason_count": 17,
   "unique_custom_reasons": 17,
   "top_custom_reasons": [

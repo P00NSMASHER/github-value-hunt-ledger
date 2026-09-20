@@ -2,13 +2,14 @@
 
 Runs can use multiple surfaces, so these are **assisted surface measurements**, not isolated causal effects.
 
-- Measured surfaces: **25**
+- Measured surfaces: **29**
 - Runs missing search-surface instrumentation: **4**
 
 | Surface | Runs | Inspected | Retained | MASTER | Capability-touch runs | Experiment runs | Fractional outcome eq. |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | SURFACE:github-repository-search — GitHub repository search | 3 | 11 | 8 | 0 | 3 | 3 | 0.00 |
 | SURFACE:github-code-search — GitHub code search | 3 | 10 | 8 | 0 | 3 | 3 | 0.00 |
+| SURFACE:github-exact-head-source — GitHub exact-head source | 2 | 3 | 3 | 0 | 2 | 2 | 0.00 |
 | SURFACE:exact-head-actions-license-verification — exact-head Actions/license verification | 1 | 4 | 3 | 0 | 1 | 1 | 0.00 |
 | SURFACE:github-code-source-tests-history — GitHub code/source/tests/history | 1 | 4 | 3 | 0 | 1 | 1 | 0.00 |
 | SURFACE:private-ledger-deduplication — private ledger deduplication | 1 | 4 | 2 | 0 | 1 | 1 | 0.00 |
@@ -25,8 +26,11 @@ Runs can use multiple surfaces, so these are **assisted surface measurements**, 
 | SURFACE:official-sap-help-documentation — official SAP Help documentation | 1 | 3 | 3 | 0 | 1 | 1 | 0.00 |
 | SURFACE:organization-lineage-traversal — organization lineage traversal | 1 | 3 | 3 | 0 | 1 | 1 | 0.00 |
 | SURFACE:repository-source-tests-ci — repository source/tests/CI | 1 | 3 | 3 | 0 | 1 | 1 | 0.00 |
+| SURFACE:madsci-ot2-wrapper-comparator — MADSci/OT2 wrapper comparator | 1 | 2 | 2 | 0 | 1 | 1 | 0.00 |
+| SURFACE:official-integration-restart-tests — official integration restart tests | 1 | 2 | 2 | 0 | 1 | 1 | 0.00 |
+| SURFACE:official-vendor-robot-server-schema-store — official vendor robot-server schema/store | 1 | 2 | 2 | 0 | 1 | 1 | 0.00 |
+| SURFACE:source-faithful-synthetic-state-model — source-faithful synthetic state model | 1 | 2 | 2 | 0 | 1 | 1 | 0.00 |
 | SURFACE:durable-workflow-structural-analogs — durable-workflow structural analogs | 1 | 1 | 1 | 0 | 1 | 1 | 0.00 |
-| SURFACE:github-exact-head-source — GitHub exact-head source | 1 | 1 | 1 | 0 | 1 | 1 | 0.00 |
 | SURFACE:schema-persistence-tracing — schema/persistence tracing | 1 | 1 | 1 | 0 | 1 | 1 | 0.00 |
 | SURFACE:tests-and-commit-issue-archaeology — tests and commit/issue archaeology | 1 | 1 | 1 | 0 | 1 | 1 | 0.00 |
 | SURFACE:private-ledger-source — private ledger source | 1 | 0 | 0 | 0 | 1 | 1 | 0.33 |

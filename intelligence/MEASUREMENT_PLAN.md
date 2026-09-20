@@ -17,11 +17,11 @@ This report answers a different question from SEARCH_POLICY.md: not **where migh
 | STRAT:paper-research-artifact-production-descendant | 0 | 0 | 5 | 20 | 0% | 5.1% |
 | STRAT:protocol-regression-archaeology-for-pre-fat-systems | 0 | 0 | 5 | 20 | 0% | 5.1% |
 | STRAT:rule-period-authority-version-audit | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:fail-open-boundary-archaeology | 1 | 4 | 4 | 16 | 0% | 10.4% |
-| STRAT:evaluation-target-independence | 2 | 4 | 3 | 16 | 100% | 10.1% |
-| STRAT:capability-conjunction-search-claim-tracing | 2 | 6 | 3 | 14 | 17% | 14.4% |
-| STRAT:first-party-production-source-triangulation | 2 | 7 | 3 | 13 | 100% | 13.9% |
-| STRAT:acceptance-path-transition-inspection | 4 | 8 | 1 | 12 | 8% | 15.9% |
+| STRAT:fail-open-boundary-archaeology | 1 | 4 | 4 | 16 | 0% | 9.9% |
+| STRAT:evaluation-target-independence | 2 | 4 | 3 | 16 | 100% | 9.6% |
+| STRAT:capability-conjunction-search-claim-tracing | 2 | 6 | 3 | 14 | 17% | 13.6% |
+| STRAT:first-party-production-source-triangulation | 2 | 7 | 3 | 13 | 100% | 13.2% |
+| STRAT:acceptance-path-transition-inspection | 5 | 10 | 0 | 10 | 7% | 18.0% |
 
 ## Operating rule
 

@@ -2,8 +2,8 @@
 
 Query families are canonicalized independently from literal search strings so the system can learn reusable search patterns without collapsing distinct hypotheses too early.
 
-- Measured query families: **11**
-- One-run families: **11**
+- Measured query families: **12**
+- One-run families: **12**
 - Families with sufficient evidence (>=5 runs and >=20 deep inspections): **0**
 
 ## Family measurements
@@ -18,6 +18,7 @@ Query families are canonicalized independently from literal search strings so th
 | QF:invoice-po-receipt-exact-line-identity-receipt-capacity-conservation-service-acceptance-blanket-order-semantics — invoice-po-receipt exact-line identity + receipt-capacity conservation + service acceptance + blanket-order semantics | 1 | 3 | 3 | 0 | 0 | 1 | insufficient |
 | QF:outage-outcome-independent-falsifier-rights — outage-outcome-independent-falsifier-rights | 1 | 3 | 2 | 0 | 0 | 1 | insufficient |
 | QF:sam-solicitation-history-data-services-attachment-manifest-deleted-restricted-external-link-completeness — SAM solicitation history Data Services attachment manifest deleted restricted external-link completeness | 1 | 3 | 1 | 0 | 0 | 1 | insufficient |
+| QF:physical-action-ambiguity-external-run-identity-restart-persistent-positive-readback-negative-reissue-proof — physical-action ambiguity + external run identity + restart-persistent positive readback + negative reissue proof | 1 | 2 | 2 | 0 | 0 | 1 | insufficient |
 | QF:physical-action-restart-identity-continuity-local-cancelled-unknown-retry-gate — physical-action restart + identity continuity + local CANCELLED/UNKNOWN + retry gate | 1 | 1 | 1 | 0 | 0 | 1 | insufficient |
 | QF:usecpo-v2-schema-event-id-correlation-lineage — USECPO-v2-schema-event-id-correlation-lineage | 1 | 1 | 1 | 0 | 0 | 1 | insufficient |
 | QF:exp-001-realized-recovery-persistence-and-concurrency-acceptance-boundary — EXP-001 realized-recovery persistence and concurrency acceptance boundary | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
