@@ -4,6 +4,11 @@ from collections import Counter
 from ti_common import INTEL, load_jsonl
 
 policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
+dispatch_policy=json.loads((INTEL/"dispatch_policy.json").read_text(encoding="utf-8")) if (INTEL/"dispatch_policy.json").exists() else {}
+dispatch_history=load_jsonl("dispatch_ticket_history.jsonl") if (INTEL/"dispatch_ticket_history.jsonl").exists() else []
+dispatch_by_id={x.get("dispatch_ticket_id"):x for x in dispatch_history if x.get("dispatch_ticket_id")}
+legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
+min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
 worker_registry=json.loads((INTEL/"worker_registry.json").read_text(encoding="utf-8")) if (INTEL/"worker_registry.json").exists() else {"workers":[]}
 registered_workers={w["worker_id"] for w in worker_registry.get("workers",[])}
 alloc=load_jsonl("hunt_allocations.jsonl")
@@ -34,6 +39,30 @@ for n,c in enumerate(claims,1):
     if not cid or cid in claim_by_id:
         raise SystemExit(f"execution_claim_history.jsonl:{n}: missing/duplicate claim_id")
     claim_by_id[cid]=c
+    claim_schema=int(c.get("claim_schema_version") or 0)
+    if cid not in legacy_claim_ids:
+        if claim_schema<min_claim_schema:
+            raise SystemExit(f"execution_claim_history.jsonl:{n}: non-legacy claim below V14 schema")
+        if c.get("routing_mode")=="generated":
+            did=c.get("dispatch_ticket_id")
+            ticket=dispatch_by_id.get(did)
+            if not ticket:
+                raise SystemExit(f"execution_claim_history.jsonl:{n}: generated claim missing historical dispatch ticket")
+            exact={
+              "worker_id":c.get("worker_id"),"slot_id":c.get("slot_id"),"assignment_id":c.get("assignment_id"),
+              "allocator_generation_id":c.get("allocator_generation_id"),"portfolio_policy_generation_id":c.get("portfolio_policy_generation_id"),
+              "work_item_id":c.get("work_item_id"),"routing_generation_id":c.get("routing_generation_id"),
+              "worker_profile_generation_id":c.get("worker_profile_generation_id"),
+              "routing_learning_generation_id":c.get("routing_learning_generation_id"),
+              "dispatch_generation_id":c.get("dispatch_generation_id")
+            }
+            drift=[k for k,v in exact.items() if ticket.get(k)!=v]
+            if drift: raise SystemExit(f"execution_claim_history.jsonl:{n}: dispatch history drift {','.join(drift)}")
+        elif c.get("routing_mode")=="manual_override":
+            if not str(c.get("route_override_reason") or "").strip():
+                raise SystemExit(f"execution_claim_history.jsonl:{n}: manual override missing reason")
+        else:
+            raise SystemExit(f"execution_claim_history.jsonl:{n}: invalid V14 routing_mode")
     if registered_workers and c.get("worker_id") not in registered_workers:
         raise SystemExit(f"execution_claim_history.jsonl:{n}: unregistered worker_id {c.get('worker_id')}")
     if c.get("status") in {"CLAIMED","RUNNING"}:
@@ -74,6 +103,18 @@ for n,r in enumerate(runs,1):
                 raise SystemExit(f"search_runs.jsonl:{n}: routing_score mismatch")
         except (TypeError,ValueError):
             raise SystemExit(f"search_runs.jsonl:{n}: invalid routing_score")
+    if int(r.get("schema_version") or 0)>=14 and cid not in legacy_claim_ids:
+        if r.get("routing_mode")!=c.get("routing_mode"):
+            raise SystemExit(f"search_runs.jsonl:{n}: V14 routing_mode mismatch")
+        if c.get("routing_mode")=="generated":
+            if r.get("dispatch_ticket_id")!=c.get("dispatch_ticket_id"):
+                raise SystemExit(f"search_runs.jsonl:{n}: V14 run dispatch_ticket_id mismatch")
+            if r.get("dispatch_generation_id")!=c.get("dispatch_generation_id"):
+                raise SystemExit(f"search_runs.jsonl:{n}: V14 run dispatch_generation_id mismatch")
+            if r.get("routing_learning_generation_id")!=c.get("routing_learning_generation_id"):
+                raise SystemExit(f"search_runs.jsonl:{n}: V14 routing_learning_generation_id mismatch")
+        elif r.get("route_override_reason")!=c.get("route_override_reason"):
+            raise SystemExit(f"search_runs.jsonl:{n}: V14 override reason mismatch")
     try:
         if abs(float(r.get("assignment_score"))-float(c.get("assignment_score")))>1e-9:
             raise SystemExit(f"search_runs.jsonl:{n}: assignment_score mismatch")
