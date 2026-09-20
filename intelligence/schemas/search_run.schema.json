@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v4",
+  "title": "Technology Intelligence Search Run v5",
   "type": "object",
   "required": [
     "search_run_id",
@@ -301,6 +301,34 @@
         "null"
       ],
       "pattern": "^EVAL:[a-z0-9-]+$"
+    },
+    "strategy_version_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^STRATVER:[a-z0-9-]+:[0-9a-f]{12}$"
+    },
+    "triage_rejected_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "holdout_sample_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "tool_call_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
     }
   },
   "additionalProperties": true,
@@ -343,6 +371,26 @@
           "benchmark_task_ids",
           "comparison_group_id",
           "evaluation_set_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 5
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "queries",
+          "search_surfaces",
+          "triage_rejected_count",
+          "holdout_sample_count"
         ]
       }
     }
