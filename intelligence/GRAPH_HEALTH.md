@@ -1,7 +1,7 @@
 # GRAPH HEALTH REPORT
 
 - Curated edges: **132**
-- Derived attribution edges: **55**
+- Derived attribution edges: **59**
 - Capability nodes: **19**
 - Capabilities touched by measured search runs: **10**
 
