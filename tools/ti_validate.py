@@ -1,74 +1,96 @@
 #!/usr/bin/env python3
-import json, re, sys
-from pathlib import Path
+import json, re
+from ti_common import INTEL, load_jsonl
 
-ROOT=Path(__file__).resolve().parents[1]
-INTEL=ROOT/"intelligence"
-
-def load_jsonl(name):
-    path=INTEL/name
-    out=[]
-    if not path.exists():
-        raise SystemExit(f"missing {path}")
-    for n,line in enumerate(path.read_text(encoding="utf-8").splitlines(),1):
-        if not line.strip(): continue
-        try: obj=json.loads(line)
-        except Exception as e: raise SystemExit(f"{name}:{n}: invalid JSON: {e}")
-        out.append((n,obj))
-    return out
-
-caps=load_jsonl("capabilities.jsonl")
-strats=load_jsonl("search_strategies.jsonl")
-runs=load_jsonl("search_runs.jsonl")
-outs=load_jsonl("outcomes.jsonl")
-edges=load_jsonl("edges.jsonl")
-
-def unique(rows,key,name):
-    seen={}
-    for n,o in rows:
-        v=o.get(key)
-        if not v: raise SystemExit(f"{name}:{n}: missing {key}")
-        if v in seen: raise SystemExit(f"{name}:{n}: duplicate {key}={v} (first line {seen[v]})")
-        seen[v]=n
+def unique(rows, key, name):
+    seen = {}
+    for n, obj in enumerate(rows, 1):
+        value = obj.get(key)
+        if not value:
+            raise SystemExit(f"{name}:{n}: missing {key}")
+        if value in seen:
+            raise SystemExit(f"{name}:{n}: duplicate {key}={value}; first line {seen[value]}")
+        seen[value] = n
     return set(seen)
 
-cap_ids=unique(caps,"capability_id","capabilities.jsonl")
-strat_ids=unique(strats,"strategy_id","search_strategies.jsonl")
-run_ids=unique(runs,"search_run_id","search_runs.jsonl")
-out_ids=unique(outs,"outcome_id","outcomes.jsonl")
-edge_ids=unique(edges,"edge_id","edges.jsonl")
+caps = load_jsonl("capabilities.jsonl")
+strats = load_jsonl("search_strategies.jsonl")
+runs = load_jsonl("search_runs.jsonl")
+outs = load_jsonl("outcomes.jsonl")
+curated_edges = load_jsonl("edges.jsonl")
+derived_edges = load_jsonl("derived_edges.jsonl") if (INTEL / "derived_edges.jsonl").exists() else []
 
-for n,o in caps:
-    if not re.match(r"^CAP-\d{3,}$",o["capability_id"]): raise SystemExit(f"capabilities.jsonl:{n}: bad capability id")
-    if o.get("confidence") not in {"low","medium","high"}: raise SystemExit(f"capabilities.jsonl:{n}: bad confidence")
+cap_ids = unique(caps, "capability_id", "capabilities.jsonl")
+strat_ids = unique(strats, "strategy_id", "search_strategies.jsonl")
+run_ids = unique(runs, "search_run_id", "search_runs.jsonl")
+out_ids = unique(outs, "outcome_id", "outcomes.jsonl")
+unique(curated_edges, "edge_id", "edges.jsonl")
+unique(derived_edges, "edge_id", "derived_edges.jsonl")
 
-for n,o in runs:
-    if o.get("strategy_id") not in strat_ids: raise SystemExit(f"search_runs.jsonl:{n}: unknown strategy_id {o.get('strategy_id')}")
-    nums=[("candidate_count",o.get("candidate_count")),("deep_inspected",o.get("deep_inspected")),("retained_count",o.get("retained_count")),("master_promoted_count",o.get("master_promoted_count"))]
-    for k,v in nums:
-        if v is not None and (not isinstance(v,int) or v<0): raise SystemExit(f"search_runs.jsonl:{n}: {k} must be null or nonnegative integer")
-    c,d,r,m=o.get("candidate_count"),o.get("deep_inspected"),o.get("retained_count"),o.get("master_promoted_count")
-    if c is not None and d is not None and d>c: raise SystemExit(f"search_runs.jsonl:{n}: deep_inspected > candidate_count")
-    if d is not None and r is not None and r>d: raise SystemExit(f"search_runs.jsonl:{n}: retained_count > deep_inspected")
-    if r is not None and m is not None and m>r: raise SystemExit(f"search_runs.jsonl:{n}: master_promoted_count > retained_count")
-    for cid in o.get("new_capability_ids",[])+o.get("strengthened_capability_ids",[]):
-        if cid not in cap_ids: raise SystemExit(f"search_runs.jsonl:{n}: unknown capability {cid}")
+for n, c in enumerate(caps, 1):
+    if not re.match(r"^CAP-\d{3,}$", c["capability_id"]):
+        raise SystemExit(f"capabilities.jsonl:{n}: bad capability id")
+    if c.get("confidence") not in {"low", "medium", "high"}:
+        raise SystemExit(f"capabilities.jsonl:{n}: bad confidence")
 
-for n,o in outs:
-    for rid in o.get("origin_search_ids",[]):
-        if rid not in run_ids: raise SystemExit(f"outcomes.jsonl:{n}: unknown origin_search_id {rid}")
-    for cid in o.get("contributing_capability_ids",[]):
-        if cid not in cap_ids: raise SystemExit(f"outcomes.jsonl:{n}: unknown capability {cid}")
-    lo,hi=o.get("engineering_days_saved_low"),o.get("engineering_days_saved_high")
-    if lo is not None and hi is not None and lo>hi: raise SystemExit(f"outcomes.jsonl:{n}: engineering_days_saved_low > high")
+for n, s in enumerate(strats, 1):
+    parent = s.get("parent_strategy_id")
+    if parent and parent not in strat_ids:
+        raise SystemExit(f"search_strategies.jsonl:{n}: missing parent strategy {parent}")
 
-known_prefixes=("REPO:","SOURCE:","TARGET:","EXP-","OPP:","TECH:","DATA:")
-known_nodes=cap_ids|strat_ids|run_ids|out_ids
-for n,o in edges:
-    for side in ("from","to"):
-        v=o.get(side)
-        if not v: raise SystemExit(f"edges.jsonl:{n}: missing {side}")
-        if v.startswith(("CAP-","STRAT:","RUN:","OUT:")) and v not in known_nodes:
-            raise SystemExit(f"edges.jsonl:{n}: dangling {side} reference {v}")
+for n, r in enumerate(runs, 1):
+    sid = r.get("strategy_id")
+    if sid not in strat_ids:
+        raise SystemExit(f"search_runs.jsonl:{n}: unknown strategy_id {sid}")
+    for key in ["candidate_count", "deep_inspected", "retained_count", "master_promoted_count"]:
+        value = r.get(key)
+        if value is not None and (not isinstance(value, int) or value < 0):
+            raise SystemExit(f"search_runs.jsonl:{n}: {key} must be null or nonnegative integer")
+    c, d, k, m = r.get("candidate_count"), r.get("deep_inspected"), r.get("retained_count"), r.get("master_promoted_count")
+    if c is not None and d is not None and d > c:
+        raise SystemExit(f"search_runs.jsonl:{n}: deep_inspected > candidate_count")
+    if d is not None and k is not None and k > d:
+        raise SystemExit(f"search_runs.jsonl:{n}: retained_count > deep_inspected")
+    if k is not None and m is not None and m > k:
+        raise SystemExit(f"search_runs.jsonl:{n}: master_promoted_count > retained_count")
+    for cid in r.get("new_capability_ids", []) + r.get("strengthened_capability_ids", []):
+        if cid not in cap_ids:
+            raise SystemExit(f"search_runs.jsonl:{n}: unknown capability {cid}")
+    seen_disp = set()
+    for disp in r.get("candidate_dispositions", []) or []:
+        key = (disp.get("repository"), disp.get("revision"))
+        if key in seen_disp and key != (None, None):
+            raise SystemExit(f"search_runs.jsonl:{n}: duplicate candidate disposition {key}")
+        seen_disp.add(key)
 
-print(f"OK capabilities={len(caps)} strategies={len(strats)} runs={len(runs)} outcomes={len(outs)} edges={len(edges)}")
+for n, o in enumerate(outs, 1):
+    for rid in o.get("origin_search_ids", []):
+        if rid not in run_ids:
+            raise SystemExit(f"outcomes.jsonl:{n}: unknown origin_search_id {rid}")
+    for cid in o.get("contributing_capability_ids", []):
+        if cid not in cap_ids:
+            raise SystemExit(f"outcomes.jsonl:{n}: unknown capability {cid}")
+    low, high = o.get("engineering_days_saved_low"), o.get("engineering_days_saved_high")
+    if low is not None and high is not None and low > high:
+        raise SystemExit(f"outcomes.jsonl:{n}: engineering_days_saved_low > high")
+
+known = cap_ids | strat_ids | run_ids | out_ids
+for name, edges in [("edges.jsonl", curated_edges), ("derived_edges.jsonl", derived_edges)]:
+    for n, e in enumerate(edges, 1):
+        for side in ("from", "to"):
+            value = e.get(side)
+            if not value:
+                raise SystemExit(f"{name}:{n}: missing {side}")
+            if value.startswith(("CAP-", "STRAT:", "RUN:", "OUT:")) and value not in known:
+                raise SystemExit(f"{name}:{n}: dangling {side} reference {value}")
+
+policy_path = INTEL / "search_policy.json"
+if policy_path.exists():
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    allocations = policy.get("strategy_allocation", [])
+    if allocations:
+        total = sum(x.get("allocation", 0) for x in allocations)
+        if not 0.999 <= total <= 1.001:
+            raise SystemExit(f"search_policy.json: allocations sum to {total}, expected 1")
+
+print(f"OK capabilities={len(caps)} strategies={len(strats)} runs={len(runs)} outcomes={len(outs)} curated_edges={len(curated_edges)} derived_edges={len(derived_edges)}")
