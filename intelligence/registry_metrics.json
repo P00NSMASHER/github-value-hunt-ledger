@@ -17,5 +17,7 @@
     "strong": 637,
     "rejected": 390,
     "quarantined": 36
-  }
+  },
+  "master_promoted_repositories": 0,
+  "master_promoted_repo_revisions": 0
 }

@@ -28,16 +28,16 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 
 | Capability | Gap score | Prior run attention | Missing piece |
 |---|---:|---:|---|
-| CAP-002 — Reviewed, versioned identity mastering | 7 | 0 | datasets/customer identities separate |
 | CAP-007 — Proof obligations and next-best-evidence routing | 7 | 0 | domain policy provenance is external |
-| CAP-008 — Structured invoice compliance/validation | 7 | 0 | official rule-pack/version authority must be pinned |
 | CAP-009 — Schedule verification and conservative repair | 7 | 0 | labor/domain rules remain external |
-| CAP-012 — Permit event versioning and semantic source QA | 7 | 0 | jurisdiction completeness/semantics vary |
 | CAP-013 — Cross-vendor scientific data normalization | 7 | 0 | vendor formats/specs and buyer fixtures separately governed |
-| CAP-004 — Deterministic freight rerating and exception math | 6 | 0 | correct math cannot cure wrong authority |
-| CAP-019 — Source-authority observation receipts | 6 | 1 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
 | CAP-001 — Evidence-gated document facts | 5 | 0 | domain calibration and contractual/legal authority remain external |
-| CAP-005 — Physical-event-to-entitlement evidence | 5 | 0 | physical truth and commercial authority remain separate |
+| CAP-002 — Reviewed, versioned identity mastering | 5 | 0 | datasets/customer identities separate |
+| CAP-008 — Structured invoice compliance/validation | 5 | 0 | official rule-pack/version authority must be pinned |
+| CAP-012 — Permit event versioning and semantic source QA | 5 | 0 | jurisdiction completeness/semantics vary |
+| CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 5 | 0 | standards/certification separate |
+| CAP-003 — Freight contract/rate authority reconstruction | 4 | 0 | buyer/carrier authority is population-specific |
+| CAP-004 — Deterministic freight rerating and exception math | 4 | 0 | correct math cannot cure wrong authority |
 
 ## Allocation guardrails
 

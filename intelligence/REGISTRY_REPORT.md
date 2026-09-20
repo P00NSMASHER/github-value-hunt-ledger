@@ -9,8 +9,12 @@ Generated directly from the hunter Markdown corpus; no monolithic registry file 
 - Repo/revision records with unknown revision: **81**
 - Repositories appearing in more than one catalog/file: **64**
 - Hunter Markdown files scanned: **54**
+- Current MASTER-promoted repositories: **0**
+- Current MASTER-promoted exact repo/revisions: **0**
 
 ## Disposition mix
+
+MASTER counts below come from `MASTER.md`; all other buckets come from hunter-catalog dispositions.
 
 | Bucket | Repo/revision records |
 |---|---:|
