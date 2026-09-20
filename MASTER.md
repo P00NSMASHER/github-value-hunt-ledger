@@ -480,3 +480,71 @@ These repositories previously ranked below MASTER largely because of public-lice
 
 ## Deliberate demotions from the elite set this run
 The following remain validated and reusable in combinations/hunter catalogs but are no longer MASTER leaders because stronger or more specific assets now cover their job: `hupe1980/en16931` (retained as parser/serialization companion to FormaliS), `getomni-ai/zerox`, `microsoft/RulesEngine`, `dedupeio/dedupe`, `benseverndev-oss/goldenmatch`, `MindPetal/sam-search`, `Polycentric-Labs/evidentia`, `RamazanKara/restore-drill`, `sciencecorp/galago-tools`, `PyLabRobot/pylabrobot`, `ORNL/flowcept`, `agritheory/inventory_tools`, `gokhanozden/gabak`, `freeacs/freeacs`, and `OktopUSP/oktopus`. Demotion means **component/watch**, not rejection; their validated capabilities remain available to the active combinations.
+
+<!-- INTEGRATOR-R11-2026-09-19T2028-0400 -->
+## Integrator promotions — 2026-09-19 20:28 ET
+
+The entries below were re-scored under the standing commercial-permission posture: a public repository's missing/restrictive/copyleft public license is provenance metadata, not a value penalty for repository-owned code. Third-party standards, datasets, models, services, patents, trademarks and customer data remain separately governed.
+
+### aldemirkonuk/RestaurantAIAutomation — X12 812 realized-credit proof
+- Exact revision: `79dfea023658f014248f3c805ebe7d903c7f3974`.
+- Score: **29/30** — A5 B5 C5 D5 E5 F4. F reflects separate ASC X12/specification-content diligence, not the repository's lack of a public license.
+- Rights: no root public LICENSE identified; repository-owned code treated as commercially permitted under the user's standing assertion. Independently owned X12 specifications/code lists remain separate.
+- Concrete capability: deterministic 812 Credit/Debit Adjustment parsing with invoice-reference linkage, credit-vs-debit direction, implied-decimal N2 money, currency semantics and fail-closed warnings; tests join 810 invoice + 856 shipped quantity + 812 settlement and refuse to count debit adjustments as recovered cash.
+- Buyer/problem: shipper/3PL finance, freight-audit/payment and AP teams need proof that a finding actually became an issued credit rather than a claimed saving.
+- Monetization / first paid wedge: read-only settlement adapter in the Freight Audit Acceptance Test; charge success fees only after invoice-linked credit/payment/refund evidence reconciles.
+- Why it beats alternatives: it closes the last-mile `finding -> issued credit` semantic gap with tested direction/reference logic rather than another generic EDI parser.
+
+### acqagent FAR Overhaul family — moving deviation authority
+- Exact revisions: `acqagent/far-collector@40789a073134a484b2e4a5a2398629b067da0eea`; `acqagent/rfo-deviations@ccf31107508085cc311fb07488eb513ab97c6b7d`.
+- Score: **30/30 family** — A5 B5 C5 D5 E5 F5 under the standing repository-code permission posture; official-source/derived-index distinctions remain mandatory.
+- Rights: `far-collector` has no repository-wide public software license at the inspected revision but is covered by the user's separate permission assumption for repo-owned code. `rfo-deviations` documents U.S. Government source PDFs plus CC BY 4.0 packaging/manifest. Model dependencies and any non-government third-party material remain separate.
+- Concrete capability: official acquisition.gov FAR Overhaul guide crawl, raw PDF/HTML preservation, source hashes, agency/FAR-Part/effective-date normalization, DuckDB/incremental refresh plus a dated corpus with source-link/missing-link accounting and Part 52 indexes.
+- Buyer/problem: federal capture/proposal/compliance teams can miss agency class deviations that change the operational FAR rule surface during active solicitations.
+- Monetization / first paid wedge: fixed-price solicitation rule-currency diagnostic: solicitation agency/date/clause set -> codified FAR baseline -> potentially controlling deviation -> exact source PDF/hash/effective/supersession evidence -> reviewer verdict.
+- Why it beats alternatives: this is moving-rule evidence infrastructure, not another FAR search wrapper; it directly fills CaptureBrief's highest-value applicability gap.
+
+### open-eid/SiVa — production timestamp/signature trust validation
+- Exact revision: `0c9c5f2490b1a27798b47906bbaa6adb4d26daad`.
+- Score: **25/30** — A3 B4 C5 D4 E5 F4. Promoted as a uniquely important trust component even though revenue is indirect.
+- Rights: EUPL v1.1; repository-owned code also covered by the standing permission assertion. DigiDoc4J/DSS, EU trusted lists, certificates and trust-service infrastructure remain separately governed.
+- Concrete capability: validates XAdES/CAdES/PAdES/ASiC/timestamp evidence with chain trust, timestamp imprint, OCSP/CRL status and revocation freshness rather than merely parsing an RFC 3161 token.
+- Buyer/problem: recovery/compliance evidence products need to prove that a timestamp/signature was trusted and temporally valid, not just syntactically valid.
+- Monetization / first paid wedge: evidence-integrity add-on to a Recovery Readiness Audit.
+- Why it beats alternatives: it closes the specific PKIX/revocation/freshness gap left by generic timestamp clients and self-authored hash chains.
+
+### redrillhq/redrill — recurring Backup Proof SLA
+- Exact revision: `2016f658b366d5d5ce2e6ffab5162f7b97062597`.
+- Score: **29/30** — A5 B5 C5 D4 E5 F5.
+- Rights: AGPL-3.0 publicly; repository-owned code treated as commercially permitted under the standing user assertion. Borg/restic/PostgreSQL/container/provider rights remain separate.
+- Concrete capability: recurring L1 integrity/freshness, L2 sampled file restore and L3 isolated PostgreSQL restore + typed SQL invariants, with semantically distinct `fail`, `error` and `stale`, `max_proof_age`, history, reports and alerts.
+- Buyer/problem: SaaS/MSP/self-hosted operators often know that backup jobs ran but cannot prove when the protected dataset was last restored and shown usable.
+- Monetization / first paid wedge: managed Backup Proof SLA with setup plus recurring per-dataset/workload fee.
+- Why it beats alternatives: the valuable primitive is stale-proof semantics and recurring proof freshness, not one-off restore orchestration.
+
+### AccelerationConsortium/HELIOS — governed closed-loop campaign authority
+- Exact revision: `1e5765ec694d5ba5c26f5a8605c7e37b238a19e0`.
+- Score: **29/30** — A4 B5 C5 D5 E5 F5.
+- Rights: MIT; external scientific data/equipment APIs/services remain separately governed.
+- Concrete capability: typed decision authority above optimizers/automation backends deciding optimize/validate/recover/acquire-context/escalate/stop, with hard safety gates, deterministic decision cards, append-only trajectories, replay/offline policy evaluation and shadow/canary/promotion gates.
+- Buyer/problem: pharma/biotech/materials/self-driving-lab teams need expensive sequential experiments governed by evidence and recoverable policy rather than an optimizer that can propose invalid actions.
+- Monetization / first paid wedge: shadow one existing campaign and deliver a replayable ledger of decisions and avoided invalid actions without controlling hardware.
+- Why it beats alternatives: it is a governed campaign authority and learning/promotion control plane, not another Bayesian-optimization wrapper.
+
+### GRIDAPPSD/CIMHub — utility-model conversion acceptance oracle
+- Exact revision: `5ba4c63fa525108928942d564fddc022c3fb031f`.
+- Score: **29/30** — A4 B5 C5 D5 E5 F5.
+- Rights: Battelle permissive grant; external CIM/IEC standards, customer utility models, Blazegraph/GridLAB-D/OpenDSS and example datasets retain separate rights.
+- Concrete capability: CIM XML ingestion/model handling, measurement support, OpenDSS/GridLAB-D/CSV export and conversion validation by running incoming/converted simulations against explicit tolerances.
+- Buyer/problem: utilities, ADMS/GridAPPS-D integrators and DER/resilience consultants cannot rely on a hosting-capacity study if model translation silently changes electrical meaning.
+- Monetization / first paid wedge: customer-authorized model conversion + topology/electrical-parity acceptance report before DREAMS/DISCO/ERAD studies.
+- Why it beats alternatives: it supplies independent model-intake/round-trip proof rather than another power-flow engine.
+
+### chrisallen12789/ProofLink — hydrovac/liquid-waste proof-to-cash vertical OS
+- Exact revision: `0ca71e3cddd1d0fb6a9c65b406ef3559a759c9f0`.
+- Score: **29/30** — A5 B5 C5 D5 E4 F5. E is 4 because source depth is strong but automated-test depth has not yet been independently established.
+- Rights: no root public LICENSE found; repository-owned code treated as commercially permitted under the standing user assertion. Stripe/Supabase and other third-party services remain separately governed.
+- Concrete capability: multi-tenant CRM/jobs/scheduling/quotes/orders/invoices/payments plus a deep hydrovac/liquid-waste module covering trucks/crews, time segments, service contracts, disposal facilities, manifests, permits, qualifications, locate tickets, assets and hydrovac invoice generation. Confirmed billable uninvoiced manifests, mobilization, time, disposal, water and materials feed billing state.
+- Buyer/problem: hydrovac/excavation/liquid-waste operators can complete and document work yet miss disposal/time/material charges or carry jobs/manifests that never reach billing.
+- Monetization / first paid wedge: fixed-price 100–1,000 job-to-invoice leakage audit, followed by recurring proof-to-cash monitoring.
+- Why it beats alternatives: it is a complete vertical operating chain that directly joins compliance/disposal evidence to billable money rather than generic FSM CRUD.

@@ -105,3 +105,50 @@ Cross-repository product combinations. Keep only stacks that are materially more
 - Buyer / wedge: BPO/contact-center QA/release teams; fixed-price release acceptance or 50–200-call QA calibration benchmark.
 - Validation: score journey correctness, critical-issue recall, false escalation, AI-human score delta, reviewer minutes and staffing effect before automating decisions.
 - Status: P2 until buyer/value evidence is stronger than direct-money opportunities.
+
+<!-- INTEGRATOR-R11-2026-09-19T2028-0400 -->
+## Integrator superseding combination updates — 2026-09-19 20:28 ET
+
+These sections supersede the same-named earlier versions where they conflict; older sections remain historical context only.
+
+### Freight Recovery v13 — authority -> blind finding -> issued credit/payment proof
+- Add to v12.1: `aldemirkonuk/RestaurantAIAutomation@79dfea023658f014248f3c805ebe7d903c7f3974` as the X12 812 credit/debit settlement oracle; `api-evangelist/opereit@0b6c46a6ed871c6e45035f0e48d3832bd8e9782f` as an incumbent finding/contract-schema interoperability target; `api-evangelist/loop@6e01ab597e3ba36ed04369223fad9ef7067e881d` as a payable-review/payment outcome schema; `adonayjunior/port-billing-tariffs@feb1cd5db183fa45047660f5e2e5f4d8ba966fd4` as an independent tier/free-time terminal-charge arithmetic oracle. Live Opereit/Loop/PayCargo use remains customer-authorized and separately subject to provider terms.
+- Combined capability: source authority + shipment truth + billed invoice -> deterministic finding -> blind incumbent comparison -> dispute -> 812/820/credit/payment/refund evidence -> recovery certificate. A debit adjustment, orphan credit, mismatched currency/reference or ambiguous payment allocation contributes **$0 realized recovery**.
+- Commercial advance: the stack can now distinguish `validated finding`, `issued credit/debit document` and `cash/payment settlement` instead of collapsing them into one savings number.
+- Validation: freeze a buyer-owned population and independent truth before opening incumbent output; map the six Opereit-style finding types into the canonical reason model; require exact settlement lineage for success-fee eligibility.
+- Status: **still #1 portfolio strategy**. Remaining blocker is authorized external customer evidence, not another internal freight engine.
+
+### CaptureBrief v5 — codified FAR + moving agency deviations + lifecycle signals
+- Add: `acqagent/far-collector@40789a073134a484b2e4a5a2398629b067da0eea` + `acqagent/rfo-deviations@ccf31107508085cc311fb07488eb513ab97c6b7d` to the existing GSA FAR/solicitation/USAspending/DATA Act evidence plane. Stage `biglocalnews/sync-fed-contracts@3d6fd0ff1dc963dbc06ec7fa467504adb36cf905` as a lifecycle-event signal only.
+- Combined capability: solicitation packet/history -> entity/award lineage -> codified FAR baseline -> agency class-deviation source/effective/supersession evidence -> reviewer applicability -> bid/no-bid/compliance packet.
+- Integrity rule: the official source PDF/page/hash remains authority; derived clause/effective-date indexes are locators, not legal conclusions. A termination/cancellation modification is not automatically a recompete or contractor-distress signal.
+- Validation: 10 current solicitations with manual verification of every positive deviation hit and every material identity/award association.
+
+### Recovery Proof v7 — recurring proof SLA + application truth + externally trusted time
+- Add: `redrillhq/redrill@2016f658b366d5d5ce2e6ffab5162f7b97062597` for recurring Borg/restic/pg_dump proof freshness; `open-eid/SiVa@0c9c5f2490b1a27798b47906bbaa6adb4d26daad` for trusted-chain/OCSP/CRL/revocation-freshness validation; optional `restorelab/restorelab@923757e428b2a0fc182347c4731322dffdbf5cea` for Proxmox whole-workload BOOT/SERVICE/DATA drills.
+- Combined capability: prove backup integrity -> actually restore -> prove application/data invariants -> record RTO/proof age -> bind/sign evidence -> external timestamp -> validate chain/revocation/freshness -> mark proof current/stale/fail/error -> package for auditor/insurer.
+- New invariant: `backup succeeded`, `restore booted`, `service recovered`, `data/application invariant passed`, `proof is fresh`, and `timestamp trust is valid` are six different facts and may not be collapsed.
+- Validation: adversarial fixtures for stale proof, wrong DB, byte-valid empty backup, dead service after VM boot, bad business value, wrong timestamp imprint, untrusted root, expired/revoked signer, stale CRL/OCSP and unavailable revocation material.
+
+### Lab Data + Automation Evidence Fabric v4 — governed campaign authority
+- Add `AccelerationConsortium/HELIOS@1e5765ec694d5ba5c26f5a8605c7e37b238a19e0` above Allotropy/PyTestLab/Galago/PyLabRobot/Flowcept/Empower.
+- Combined capability: instrument/vendor data -> normalized scientific evidence -> candidate generation -> HELIOS permission/validation/recovery/stop decision -> device/workflow execution -> provenance -> replay/offline policy evaluation.
+- Validation: compare the same synthetic/right-cleared campaign under plain optimizer versus HELIOS-governed optimizer on invalid-action rate, experimental cost, recovery latency, objective regret and replay completeness. No live hardware authority until shadow evidence passes.
+
+### Grid Hosting + Resilience Engineering v2 — accepted model -> hosting -> failure -> restoration
+- Add `GRIDAPPSD/CIMHub@5ba4c63fa525108928942d564fddc022c3fb031f` as the model-conversion/acceptance layer before DREAMS; stage `pnnl/dltDFLISR@c8bf43eefc1ce208971c8889a0d6c49c5619b840` for post-fault switching/restoration and `NatLabRockies/REopt.jl@97119a8d07ef7761d39456f7e1b4d56ba7420bf4` as an optional site/microgrid economics layer.
+- Combined capability: authorized CIM/utility model -> round-trip/topology/electrical parity -> hosting/QSTS limits -> hazard/asset failure -> switching/restoration -> optional customer DER/microgrid economics.
+- Validation: 10–25 known/synthetic feeders with planted topology, impedance, DER, voltage/thermal and fault cases. Translation must pass before downstream engineering results are trusted.
+
+### Hydrovac / Waste Proof-to-Cash — new direct-money stack
+- Components: `chrisallen12789/ProofLink@0ca71e3cddd1d0fb6a9c65b406ef3559a759c9f0` + `Zenithive/midsoft@963b0fd0ccca3fd21a0ae744d734f2d8ae0da081` + roll-off billing semantics from `philipnaparan/Dumpster-Rental-Management-System@79b35c67ba5de862c0b49691de79890de4e5ecf0` + phparm/Servicialo proof/settlement patterns.
+- Combined capability: service contract/job -> time/crew/truck/asset -> disposal manifest/facility/ticket/weight -> materials/water/disposal charges -> invoice -> accounting/payment -> leakage exception.
+- Buyer / wedge: hydrovac, liquid-waste, septic, roll-off and environmental-service operators; fixed-price 100–1,000 job leakage audit.
+- Hard invariant: completed work does not become recoverable revenue unless the controlling rate/authorization and field/disposal proof support it; duplicate or ambiguous evidence routes to review.
+- Validation: planted completed-unbilled manifests, omitted disposal/time/material lines, wrong quantities/rates, double billing, returned/rented asset inconsistency and payment mismatches.
+
+### Industrial EtherCAT Pre-Commissioning Lab
+- Components: `leducp/KickCAT@43ad3e9ce390f0f6d9548118098bcaafc0d4f1f1` + `ethercrab-rs/ethercrab@ea2860c2439296780f806b0324f8f6e02439a0f6` + `OpenEtherCATsociety/SOEM@88e8ed46efba7dfa7b94d08a512db25a33e3f8d5` + SOES/device-side targets; ProtoForge can provide higher-level fault/evidence orchestration.
+- Combined capability: customer-authorized ESI/device model -> software ESC/network/topology -> independent master comparisons -> state/PDO/SDO/mailbox/DC/wire-break/recovery matrix -> hardware spot-check -> pre-commissioning evidence pack.
+- Buyer / wedge: EtherCAT OEMs, robotics/motion/machine builders and controls integrators; fixed-price regression/preflight before plant cutover or formal certification.
+- Caveat: agreement among implementations is evidence, not a substitute for controlling EtherCAT specifications/certification/vendor requirements.

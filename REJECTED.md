@@ -213,3 +213,35 @@ Cross-lane rejection/deprioritization memory. This file intentionally keeps the 
 
 ## Policy
 Do not add a weak repository to this file merely because it was rejected once. Lane-local low-value misses belong in their hunter catalog. Add here when a find is likely to be rediscovered, has a misleading surface, contains a rights/safety trap, or was formerly important enough that future hunters need to know why it is no longer preferred.
+
+<!-- INTEGRATOR-R11-2026-09-19T2028-0400 -->
+## Integrator rejection / quarantine additions — 2026-09-19 20:28 ET
+
+### notaryproject/tspclient-go as the Recovery Proof trust authority
+- Commit: `6c337f1e30f2cbdcd73d01ab54d7a49e6a34da31`.
+- Reason: real RFC 3161 client and chain verification, but inspected CMS verification explicitly does not perform revocation checking. SiVa materially surpasses it for the current PKIX/OCSP/CRL/freshness gap.
+- Revisit trigger: substantive revocation/trust-policy support or a new failure mode SiVa does not cover.
+
+### pasrom/profinet-rs as an independent PROFINET controller oracle
+- Commit: `5732f5a7f438c13efa41774921a021ea83671ee5`.
+- Reason: strong Rust implementation, but it explicitly derives wire layouts/structures/test vectors from `f0rw4rd/profinet-py`; agreement between the two is not independent conformance evidence.
+- Disposition: usable operational peer under the standing permission posture, but not counted as an independent falsifier.
+- Revisit trigger: an independently originated controller lineage or independently derived protocol vectors.
+
+### adrianstanca1/cortexx current revision
+- Commit: `87679c82a6bb5cf3619d63ee32786f8260f3ef6b`.
+- Reason: recursive tree inspection surfaced a committed environment-vault artifact. It was not opened and no values were collected or retained.
+- Disposition: safety quarantine at this revision.
+- Revisit trigger: clearly sanitized later revision and a concrete unmet construction-domain gap.
+
+### boomlocal/Dumpster-Rental-Management-System-2320 current revision
+- Commit: `ca9ec596d559c10c64fcdd3706f125f1985f9af7`.
+- Reason: current tree contains a committed environment file. It was not opened; no credential/auth material was collected.
+- Disposition: safety quarantine.
+- Revisit trigger: sanitized later revision only.
+
+### ClintonK399/Fuel-Delivery-Management-System current revision
+- Commit: `ced5ce2faecd5ceea4cc7fa94d7275b1cce35a3d`.
+- Reason: tree contains a database-configuration artifact that could contain connection/auth material; inspection stopped before opening it, and safe evidence did not establish enough domain depth to justify further risk.
+- Disposition: safety quarantine/deprioritized.
+- Revisit trigger: clearly sanitized later revision plus a specific fuel-delivery gap.
