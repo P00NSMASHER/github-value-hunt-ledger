@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.6
+## Current checkpoint — v15.7 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -32,7 +32,12 @@ Internal commercialization controls now completed:
 - machine-checkable pilot data-room/package manifests;
 - fail-closed PDF/CSV/XML/EDI/X12 pre-parser guard + spreadsheet export neutralization;
 - deterministic control-file/component provenance generator;
-- buyer-facing security/data-handling statement with explicit non-claims.
+- buyer-facing security/data-handling statement with explicit non-claims;
+- CENSUS/SCOPE/PROOF retention/deletion lifecycle with explicit `DELETE_UNKNOWN` vs `DELETE_CONFIRMED`;
+- PRESENT / VERIFIED_EMPTY / UNAVAILABLE source-observation receipts;
+- buyer/BU-scoped append-only audit hash chain;
+- deterministic CycloneDX 1.6-shaped partial SBOM;
+- deterministic unsigned in-toto/DSSE-shaped attestation payload ready for external signing.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -49,7 +54,7 @@ v15.6 Freight CI run `35524672964` passed the full Freight suite, controlled-pil
 ### P0
 1. **DONE:** v15 through v15.6 commercialization, proof, adaptive-authorization, commercial-learning and pilot-security/provenance PRs merged after CI.
 2. **DONE:** canonical Freight Recovery v15.6 release identity recorded in `freight/RELEASE_MANIFEST.md`.
-3. **DONE for deterministic internal provenance:** control-file SHA-256 and exact component inventory are generated/verified in CI. **OPEN for enterprise deployment:** signed provenance and any buyer-required full SPDX/CycloneDX SBOM.
+3. **ADVANCED:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN:** external signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
 
@@ -71,6 +76,7 @@ v15.6 Freight CI run `35524672964` passed the full Freight suite, controlled-pil
 5. **PARTIAL DONE:** fail-closed pre-parser negative tests cover PDF/XML/EDI/X12/CSV, archives, size/segment bounds and CSV formula neutralization. OS/container parser sandbox/resource limits remain deployment work.
 6. **PARTIAL DONE:** proof/source/package layers now carry buyer+BU scope with cross-scope negative tests. The actual customer data service/database/object-store still requires deployment-specific cross-tenant tests.
 7. Record reviewer hours, invoice count, fixed fee, delivery cost and turnaround in each externally evidenced engagement outcome so buyer-level margin/effort can be calibrated.
+8. **DONE internally:** data lifecycle and audit semantics distinguish delete requested/unknown/confirmed and present/verified-empty/unavailable. **OPEN externally:** real provider deletion receipts, real persistent audit store and alerting in the deployment environment.
 
 ## Next 30 days — prove willingness to pay and one real outcome
 
