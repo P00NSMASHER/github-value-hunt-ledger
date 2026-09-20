@@ -114,7 +114,11 @@ jobs:
         run: python tools/ti_execution_validate.py
       - name: Build V12 worker profiles
         run: python tools/ti_worker_profiles.py
-      - name: Build V12 worker routing plan
+      - name: Build V13 routing outcome learner
+        run: python tools/ti_routing_learning.py
+      - name: Validate V13 routing outcome learner
+        run: python tools/ti_routing_learning_validate.py
+      - name: Build V12/V13 worker routing plan
         run: python tools/ti_worker_routing.py
       - name: Validate V12 worker routing
         run: python tools/ti_worker_routing_validate.py
@@ -202,7 +206,11 @@ jobs:
         run: python tools/ti_execution_validate.py
       - name: Build V12 worker profiles
         run: python tools/ti_worker_profiles.py
-      - name: Build V12 worker routing plan
+      - name: Build V13 routing outcome learner
+        run: python tools/ti_routing_learning.py
+      - name: Validate V13 routing outcome learner
+        run: python tools/ti_routing_learning_validate.py
+      - name: Build V12/V13 worker routing plan
         run: python tools/ti_worker_routing.py
       - name: Validate V12 worker routing
         run: python tools/ti_worker_routing_validate.py
@@ -288,7 +296,13 @@ jobs:
                   intelligence/worker_routing.jsonl \
                   intelligence/worker_claim_packets.jsonl \
                   intelligence/WORKER_ROUTING.md \
-                  intelligence/routing_metrics.json
+                  intelligence/routing_metrics.json \
+                  intelligence/routing_learning_runs.jsonl \
+                  intelligence/routing_adjustments.jsonl \
+                  intelligence/routing_calibration.jsonl \
+                  intelligence/routing_learning_metrics.json \
+                  intelligence/ROUTING_LEARNING_REPORT.md \
+                  intelligence/ROUTING_CALIBRATION_REPORT.md
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
