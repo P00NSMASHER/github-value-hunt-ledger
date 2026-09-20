@@ -97,3 +97,56 @@ For each entry record:
 - Value score: **29/30** — A5 B5 C5 D4 E5 F5.
 - Combination: instrument export -> Allotropy normalization -> PyTestLab/Galago/PyLabRobot execution/replay -> Flowcept provenance -> HELIOS governed campaign decisions.
 - Next action: select one buyer-specific installed-base format mix and prove normalization fidelity against vendor-authorized sample exports.
+
+<!-- INTEGRATOR-R12-2026-09-19T2231-0400 -->
+### cmdrvl/canon — reviewed versioned identity compiler
+- Repository: https://github.com/cmdrvl/canon
+- Exact revision: `45e9702ba7f3874c073134c1a6fb74500232b6a1`.
+- Capability: messy identity evidence -> scored/reviewed decisions -> promoted versioned registry -> exact deterministic runtime replay. Runtime is pinned to a registry version, provider materialization/calibration is separated from registry mutation, and unresolved/refusal/partial states plus rule/confidence provenance remain explicit.
+- Evidence inspected: identity architecture/evaluation docs, registry/promotion/replay contracts, structural-linkage artifacts, benchmark/test/CI surface recorded in hunter 18.
+- Published rights: MIT for repository-owned code; provider/reference datasets and customer identities remain separately governed.
+- Standing permission posture: repository-owned code/content commercially authorized; no extension to external registries/data.
+- Integration targets: CaptureBrief entity/parent identity, freight carrier/vendor mastering, AP/vendor mastering, CRM/MDM reconciliation.
+- Build-time compression: approximately 4–8+ months of registry/versioning, review/promotion, evidence artifacts, calibration workflow and exact replay control-plane work.
+- Value score: **29/30** — A4 B5 C5 D5 E5 F5.
+- Combination: probabilistic candidate generation -> Canon review/promotion -> pinned production registry -> downstream exact identity joins.
+- Next action: synthetic vendor/company corpus through candidate generation -> review -> promotion -> replay; runtime output must change only after a new reviewed version is promoted.
+
+### ChelseaKR/constituent-reconciler — consent-aware review and audited writeback
+- Repository: https://github.com/ChelseaKR/constituent-reconciler
+- Exact revision: `dbc09d25baec026027e65a0f8d21930509e2dd8e`.
+- Capability: offline-first CSV/PDF/image/text/email intake, source-spanned extraction, deterministic normalization, probabilistic matching, human review, controlled CRM writeback and append-only provenance; policy packs can restrict cloud egress, write targets and merged consent.
+- Evidence inspected: README/tree, connectors, tests, benchmark/claims-audit/security/data-flow tooling and negative-control work recorded in hunter 18.
+- Published rights: Apache-2.0 for repository-owned code; CRM APIs, timestamp services, benchmark/source datasets and real identities remain separate.
+- Standing permission posture: repository-owned code/content commercially authorized; customer identity/consent data remains separately authorized and protected.
+- Integration targets: Canon-reviewed registry workflows, nonprofit/CRM reconciliation, regulated customer/vendor mastering and safe correction/writeback.
+- Build-time compression: roughly 3–6+ months of multi-format intake, evidence, review, target writeback, policy and audit plumbing.
+- Value score: **29/30** — A5 B4 C5 D5 E5 F5.
+- Combination: candidate engine/Canon registry -> policy-aware review -> controlled writeback -> append-only receipt -> correction/split replay.
+- Next action: benchmark consent conflict, ambiguous match, partial extraction, rollback and write-target semantics on fully synthetic multi-CRM data.
+
+### oscal-compass/compliance-to-policy-go — policy-as-code to OSCAL assessment bridge
+- Repository: https://github.com/oscal-compass/compliance-to-policy-go
+- Exact revision: `45bfc1a8947e8b56b7e11391e13f8c1f2136cfaa`.
+- Capability: maps heterogeneous policy-engine results through plugin contracts into OSCAL observations/findings while preserving resource identity, evidence, waived subjects and explicit non-pass states.
+- Evidence inspected: v2 plugin architecture and `framework/actions/report.go` Assessment Results construction recorded in hunter 14.
+- Published rights: Apache-2.0; OSCAL/NIST materials, Kyverno/OCM and proprietary policy engines/services remain separately governed.
+- Standing permission posture: repository-owned code/content commercially authorized.
+- Integration targets: Continuous Compliance Evidence Ops, Recovery Proof evidence packaging and governed remediation/re-proof.
+- Build-time compression: approximately 3–6 months of OSCAL assessment semantics, plugin contracts, control mapping and result aggregation.
+- Value score: **27/30** — A4 B4 C5 D4 E5 F5.
+- Combination: production collectors -> policy engine -> C2P OSCAL findings -> epack/OpenWright -> CAGE remediation -> fresh re-test.
+- Next action: synthetic three-control pass/fail/error/waive/missing-result fixture plus one authorized sandbox policy engine; incomplete collection may never become a pass.
+
+### duke5am/pg-restore-drill — PITR negative-control acceptance fixture
+- Repository: https://github.com/duke5am/pg-restore-drill
+- Exact revision: `e914caddd14ab1604d85ccb7919d4da071a6766c`.
+- Capability: PostgreSQL base-backup/WAL PITR drill with known pre/post-target data, exact-state checksums, measured RPO/RTO and a deliberate negative-control mode that only succeeds when the verifier detects the wrong recovery target.
+- Evidence inspected: repository tree/README, substantial restore/report scripts and negative-control/archive-gap semantics recorded in hunter 15.
+- Published rights: MIT; PostgreSQL/storage/runtime providers remain separate.
+- Standing permission posture: repository-owned code commercially authorized.
+- Integration targets: Recovery Proof test-the-test methodology; challenger to pg_hardstorage/BackupDrill rather than a parallel generic product.
+- Build-time compression: roughly 2–4 months of PITR choreography, exact-state verification and negative-control design.
+- Value score: **28/30** — A5 B4 C5 D4 E5 F5.
+- Combination: Postgres restore engine -> positive fixture + mandatory negative control -> signed proof SLA -> trust validation.
+- Next action: compare identical WAL-gap/wrong-target/checksum-corruption fixtures against the current PostgreSQL engines and retain the strongest execution path plus the negative-control methodology.
