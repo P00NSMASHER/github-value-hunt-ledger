@@ -56,6 +56,8 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/DATA_READINESS_DIAGNOSTIC.md`
 - `freight/PILOT_PROTOCOL.md`
 - `freight/PILOT_LAUNCH_GATE.md`
+- `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
+- `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
 - `freight/PILOT_REPORT_TEMPLATE.md`
 - `freight/contracts.py`
@@ -164,6 +166,8 @@ Current machine classification:
 
 A buyer/data readiness result of READY is therefore necessary but not sufficient
 to accept confidential customer data.
+
+The manual route no longer trusts an operator-supplied boolean. It requires a structured VERIFIED separate-environment manifest; the repository currently contains only a DRAFT template, so that route remains CONDITIONAL.
 
 ## Commercial state
 
