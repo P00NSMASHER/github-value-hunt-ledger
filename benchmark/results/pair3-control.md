@@ -20,3 +20,22 @@ SEARCH EFFORT: 8 materially distinct searches; 3 deep repository inspections plu
 FALSE-PROMOTION RISK: MEDIUM — the integrated-recovery framing and real validation make it easy to overread the project as a complete operational optimizer when several requested capabilities are simplified or absent.
 LESSON: N/A
 COMPLETED_AT: 2026-09-20T01:33:01-04:00
+
+TASK: 17
+CONDITION: CONTROL
+STARTING HYPOTHESIS: A strong match would normalize multiple payment and settlement sources into money-safe records, use deterministic exact/net/refund/split rules, explicitly quarantine ambiguity and duplicates as exceptions, and prove those edge cases with executable tests rather than only a dashboard.
+DISCOVERY METHODS: Broad multi-processor/payment-reconciliation repository search; capability-term search for fee-adjusted/refund/split/dedupe semantics; code/test-level inspection and comparison of three promising repositories.
+CANDIDATE: Etherlabs-dev/multi-processor-reconciliation
+CANONICAL URL: https://github.com/Etherlabs-dev/multi-processor-reconciliation
+EXACT REVISION: 2f9397fbe56a76abeee42a01a37536ad1811a806
+VERDICT: STRONG
+A-F SCORE: A4 B5 C5 D4 E5 F5 = 28/30
+EVIDENCE INSPECTED: Repository metadata/license and exact HEAD commit; .github/workflows/ci.yml; src/reconciliation/matching.py; src/reconciliation/models.py; src/reconciliation/benchmark.py; tests/test_matching.py; tests covering idempotency, normalization, Postgres, service/workflows; comparison against sebastienrousseau/reconcile-mcp and himanisharrma/payops-copilot plus lighter triage of VsevaTech/payment-reconciliation-helper and other searched candidates.
+CLAIMS VERIFIED: IMPLEMENTED deterministic Decimal-based reconciliation over canonical source/account records; exact-reference/exact-amount/date-window matching; fee-aware classification when gross differs but net agrees; full/partial refund and reversal matching with type isolation; bounded many-to-one split-payment matching with ambiguity quarantine; duplicate-input detection from idempotency keys; explicit discrepancy classes for ambiguous candidates/splits, currency/date/amount mismatches, unmatched refunds and missing counterparts; stable SHA-256 input fingerprint. TESTED: unit tests directly cover exact, fee-aware, full/partial refund, unique split, ambiguity, duplicates, order independence and invalid config; CI also runs pytest against a Postgres-loaded schema/seed, workflow validation, deterministic benchmark, package audit and Docker test.
+CLAIMS NOT VERIFIED: Live Stripe/PayPal/Square/ACH integrations were not executed against production data; benchmark data are synthetic; marketing claims about hours saved/error reduction were not independently validated; split matching is bounded many-to-one (max group size configurable 2–5), not unrestricted many-to-many settlement solving.
+STRONGEST OBJECTION: The core engine is unusually well aligned to the task, but the repository is still a portfolio-style implementation whose hardest remaining production risk is messy real provider/bank data and unbounded/high-volume settlement grouping rather than the matching semantics themselves.
+COMMERCIAL WEDGE: Multi-processor close/revenue-assurance service for merchants: ingest processor and bank exports, auto-clear exact/net/refund/split cases, route ambiguous/duplicate/unmatched exceptions with evidence, then sell managed daily reconciliation or recurring SaaS.
+SEARCH EFFORT: 11 materially distinct searches; 3 deep repository inspections.
+FALSE-PROMOTION RISK: LOW-MEDIUM — the code/tests verify the requested matching semantics, but synthetic data and bounded split size make it easy to overstate production readiness.
+LESSON: N/A
+COMPLETED_AT: 2026-09-20T02:03:21-04:00
