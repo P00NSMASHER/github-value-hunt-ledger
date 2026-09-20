@@ -22,7 +22,7 @@ def support_bonus(count,weight):
 
 def assignment_domains(a):
     out=["EXP:"+e for e in a.get("experiment_ids") or []]
-    if a.get("search_objective_id"): out.append("OBJ:"+a["search_objective_id"])
+    if a.get("search_objective_id"): out.append(a["search_objective_id"])
     return out
 
 def score(worker_id,a):
@@ -201,7 +201,8 @@ report=["# WORKER ROUTING PLAN","",f"Routing generation: **{routing_generation}*
 "| Worker | Profile | Route | Slot | Assignment | Score | Reason |",
 "|---|---|---|---|---|---:|---|"]
 for r in routes:
-    report.append(f"| {r['worker_id']} | {r['evidence_state']} | {r['route_status']} | {r.get('slot_id') or '—'} | {r.get('assignment_id') or '—'} | {('—' if r.get('routing_score') is None else f'{r['routing_score']:.2f}')} | {r['reason']} |")
+    score_text="—" if r.get("routing_score") is None else f"{r['routing_score']:.2f}"
+    report.append(f"| {r['worker_id']} | {r['evidence_state']} | {r['route_status']} | {r.get('slot_id') or '—'} | {r.get('assignment_id') or '—'} | {score_text} | {r['reason']} |")
 report += ["","## Routing interpretation","",
 "- Assignment priority is preserved in every worker-slot score.",
 "- Historical strategy, objective, experiment, capability, domain and completed-role experience can only add fit.",
