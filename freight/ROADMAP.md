@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.3
+## Current checkpoint — v15.4 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -21,6 +21,9 @@ Internal commercialization controls now completed:
 - settlement deduplication/validated caps;
 - automatic incumbent-known success-fee exclusion;
 - proof-derived buyer pilot metrics/report template;
+- fixed-fee qualification and analyst-hour budget with success-fee upside excluded;
+- Freight outcome adapter into the global search/outcome learning schema;
+- full synthetic diagnostic→pilot→persistent-settlement→report rehearsal;
 - rights-operability registry;
 - repository workflow hardening and pinned CI.
 
@@ -39,7 +42,7 @@ Internal commercialization controls now completed:
    - checksums;
    - known limitations.
 4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
-5. Run a dry-run pilot using synthetic/redacted inputs through the exact `freight/PILOT_PROTOCOL.md` stages.
+5. **DONE when v15.4 CI passes:** full synthetic readiness → qualification → blind proof → persistent settlement → report rehearsal runs from committed code; this is technical validation only, not external customer proof.
 
 ### Stop
 - no new generic freight repositories;
