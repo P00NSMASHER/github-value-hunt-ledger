@@ -22,7 +22,7 @@ jobs:
         run: |
           cp .github/integrator_sync_payload.md /tmp/integrator_sync_payload.md
           git pull --rebase origin main
-      - name: Apply append and replacement payload
+      - name: Apply integrator payload
         shell: bash
         run: |
           python - <<'PY'
@@ -35,7 +35,7 @@ jobs:
               raise SystemExit('payload must start with MARKER: ')
           marker = lines[0][len('MARKER: '):].strip()
           body = '\n'.join(lines[1:])
-          pattern = re.compile(r'^=== (APPEND|REPLACE) (.+?) ===$', re.M)
+          pattern = re.compile(r'^=== (APPEND|REPLACE|SUBSTITUTE) (.+?) ===$', re.M)
           matches = list(pattern.finditer(body))
           if not matches:
               raise SystemExit('payload contains no operations')
@@ -48,12 +48,30 @@ jobs:
               content = body[start:end].strip()
               path = Path(rel)
               current = path.read_text() if path.exists() else ''
+
               if mode == 'APPEND':
                   if marker in current:
                       continue
                   desired = current.rstrip() + '\n\n' + marker + '\n' + content + '\n'
-              else:
+              elif mode == 'REPLACE':
                   desired = content.rstrip() + '\n'
+              else:
+                  delimiter = '\n--- NEW ---\n'
+                  if delimiter not in content:
+                      raise SystemExit(f'SUBSTITUTE {rel} requires --- NEW --- delimiter')
+                  old, new = content.split(delimiter, 1)
+                  old = old.strip()
+                  new = new.strip()
+                  count = current.count(old)
+                  if count == 0:
+                      # Treat an already-applied substitution as idempotent.
+                      if new in current:
+                          continue
+                      raise SystemExit(f'SUBSTITUTE text not found in {rel}')
+                  if count != 1:
+                      raise SystemExit(f'SUBSTITUTE text occurs {count} times in {rel}')
+                  desired = current.replace(old, new, 1)
+
               if current == desired:
                   continue
               path.parent.mkdir(parents=True, exist_ok=True)
