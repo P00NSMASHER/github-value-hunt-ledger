@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.8 candidate
+## Current checkpoint — v15.8
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -52,13 +52,15 @@ v15.6 Freight CI run `35524672964` passed the full Freight suite, controlled-pil
 
 v15.7 Freight CI run `35525286692` passed the full Freight suite plus deterministic provenance, CycloneDX SBOM and unsigned DSSE generation/verification.
 
+v15.8 Freight CI run `35526130920` passed 129 Freight tests plus rights/gap/readiness/rehearsal, provenance, SBOM, unsigned DSSE and deterministic diligence-bundle generation/verification.
+
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
 ## Next 24 hours — make the asset diligence-ready
 
 ### P0
-1. **DONE:** v15 through v15.7 commercialization, proof, adaptive-authorization, commercial-learning, pilot-security, lifecycle/audit and supply-chain diligence PRs merged after CI.
-2. **DONE:** canonical Freight Recovery v15.7 release identity recorded in `freight/RELEASE_MANIFEST.md`.
+1. **DONE:** v15 through v15.8 commercialization, proof, adaptive-authorization, commercial-learning, pilot-security, lifecycle/audit, supply-chain diligence and operational-restore/diligence PRs merged after CI.
+2. **DONE:** canonical Freight Recovery v15.8 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
