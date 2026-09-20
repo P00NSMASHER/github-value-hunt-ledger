@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -90,5 +90,8 @@
   "assignment_slot_role": "experiment",
   "assignment_work_kind": "capability_gap",
   "assignment_source_id": "SEED:gap:cap-009",
-  "assignment_score": 0
+  "assignment_score": 0,
+  "execution_claim_id": "CLAIM:000000000000",
+  "execution_slot_id": "SLOT-01",
+  "execution_worker_id": "HUNTER-01"
 }
