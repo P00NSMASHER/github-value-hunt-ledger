@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+import json
+from collections import Counter
+from ti_common import INTEL, load_jsonl
+
+REG=json.loads((INTEL/"worker_registry.json").read_text(encoding="utf-8"))
+POL=json.loads((INTEL/"routing_policy.json").read_text(encoding="utf-8"))
+workers={w["worker_id"]:w for w in REG["workers"]}
+profiles=load_jsonl("worker_profiles.jsonl")
+routes=load_jsonl("worker_routing.jsonl")
+packets=load_jsonl("worker_claim_packets.jsonl")
+state=load_jsonl("execution_state.jsonl")
+alloc=load_jsonl("hunt_allocations.jsonl")
+runs=load_jsonl("search_runs.jsonl")
+metrics=json.loads((INTEL/"routing_metrics.json").read_text(encoding="utf-8"))
+
+if len(workers)!=14: raise SystemExit("worker registry must contain exactly 14 workers")
+if set(x["worker_id"] for x in profiles)!=set(workers): raise SystemExit("worker profile coverage drift")
+if set(x["worker_id"] for x in routes)!=set(workers): raise SystemExit("worker routing coverage drift")
+if len({x["worker_id"] for x in routes})!=len(routes): raise SystemExit("duplicate worker route")
+
+state_by_slot={x["slot_id"]:x for x in state}
+alloc_by_slot={x["slot_id"]:x for x in alloc}
+used_slots=[]
+route_by_worker={x["worker_id"]:x for x in routes}
+for r in routes:
+    if r["route_status"] in {"ROUTED","LOCKED"}:
+        if not r.get("slot_id") or r["slot_id"] not in state_by_slot: raise SystemExit(f"route {r['worker_id']} missing/unknown slot")
+        used_slots.append(r["slot_id"])
+    if r["route_status"]=="LOCKED":
+        s=state_by_slot[r["slot_id"]]
+        if s.get("worker_id")!=r["worker_id"] or s.get("status") not in {"CLAIMED","RUNNING","CLAIMED_SUPERSEDED","RUNNING_SUPERSEDED"}:
+            raise SystemExit(f"locked route does not match active V11 claim for {r['worker_id']}")
+    if r["route_status"]=="ROUTED":
+        s=state_by_slot[r["slot_id"]]
+        if s.get("status") not in set(POL.get("allowed_claimable_states") or []):
+            raise SystemExit(f"generated route targets non-claimable slot {r['slot_id']}")
+        a=alloc_by_slot[r["slot_id"]]
+        if r.get("assignment_id")!=a.get("assignment_id") or r.get("work_item_id")!=a.get("work_item_id"):
+            raise SystemExit(f"generated route assignment drift for {r['worker_id']}")
+if len(used_slots)!=len(set(used_slots)): raise SystemExit("multiple workers routed to same slot")
+
+active_workers={s.get("worker_id") for s in state if s.get("status") in {"CLAIMED","RUNNING","CLAIMED_SUPERSEDED","RUNNING_SUPERSEDED"} and s.get("worker_id")}
+for w in active_workers:
+    if route_by_worker[w]["route_status"]!="LOCKED": raise SystemExit(f"active worker {w} not locked")
+
+packet_by_worker={p["worker_id"]:p for p in packets}
+for r in routes:
+    if r["route_status"]=="ROUTED":
+        p=packet_by_worker.get(r["worker_id"])
+        if not p: raise SystemExit(f"routed worker {r['worker_id']} missing claim packet")
+        if p["slot_id"]!=r["slot_id"] or p["assignment_id"]!=r["assignment_id"]:
+            raise SystemExit(f"claim packet mismatch for {r['worker_id']}")
+    elif r["worker_id"] in packet_by_worker:
+        raise SystemExit(f"non-routed worker {r['worker_id']} has claim packet")
+
+routing_ids={r["routing_generation_id"] for r in routes}
+profile_ids={r["worker_profile_generation_id"] for r in routes}
+if len(routing_ids)!=1 or len(profile_ids)!=1: raise SystemExit("routing/profile generation drift")
+if metrics.get("routing_generation_id")!=next(iter(routing_ids)): raise SystemExit("routing metrics generation mismatch")
+
+registered=set(workers)
+for n,r in enumerate(runs,1):
+    if int(r.get("schema_version") or 0)<12: continue
+    wid=r.get("execution_worker_id")
+    if wid not in registered: raise SystemExit(f"search_runs.jsonl:{n}: unregistered execution_worker_id {wid}")
+    mode=r.get("routing_mode")
+    if mode not in {"generated","manual_override","unrouted"}: raise SystemExit(f"search_runs.jsonl:{n}: invalid routing_mode")
+    if mode=="generated":
+        required=["routing_generation_id","worker_profile_generation_id","routing_score"]
+        missing=[k for k in required if r.get(k) in {None,""}]
+        if missing: raise SystemExit(f"search_runs.jsonl:{n}: generated V12 route missing {','.join(missing)}")
+
+print(f"OK workers={len(workers)} routed={metrics.get('routed_workers')} locked={metrics.get('active_locked_workers')} edges={metrics.get('candidate_edges')}")
