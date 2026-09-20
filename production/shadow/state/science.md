@@ -38,21 +38,25 @@ Score a non-BO autonomous scientific workflow on the same two axes and test whet
 CONFIDENCE: **MEDIUM-HIGH**.
 
 ### H3 — Physical exactly-once requires external evidence, not only an idempotent campaign database
-STATUS: **NEW; SUPPORTED BY BO-MCP/PHYSICAL-PLATFORM BOUNDARY.**
+STATUS: **SUPPORTED; EXECUTOR-SIDE FAIL-CLOSED PATTERN FOUND ON ONE INDEPENDENT PHYSICAL CONTROL STACK.**
 
 SUPPORTING EVIDENCE:
 - BO-MCP's database-backed idempotency can prevent duplicate logical tool mutations and duplicate linked results, but the RAISE/RoboChem execution plane is external.
 - BO-MCP source comments explicitly acknowledge reservation-timeout conditions under which a logical operation can be re-entered if protection expires.
 - An unkeyed result resend is intentionally stored again, proving that safe retry remains a caller contract rather than a universal property.
-- The physical campaign evidence proves closed-loop use, but not that an ambiguous network timeout can be resolved by authoritative instrument readback without risking a duplicate physical run.
+- `AccelerationConsortium/opentrons-flex@2639016ee9f234949aaf596c2ab2b93694eb0e0b` supplies the missing executor-side evidence pattern: durable labware state is invalidated and fsynced before physical movement, only committed after verified completion, and remains invalid after cancellation, unclean restart or commit failure.
+- The same connector combines software recovery gates with authoritative device readback: unknown/missing Flex Stacker sensor/platform state fails closed, and future actuation is blocked until recovery/reconciliation instead of blindly replaying an ambiguous physical action.
+- Its SiLA observable path correlates command initiation and result polling with a `CommandExecutionUUID`, demonstrating protocol-level operation identity while also showing why that UUID alone is not a durable business-effect identity across process loss.
 
 CONTRARY EVIDENCE:
-- Some laboratory platforms may make commands intrinsically idempotent or expose durable operation IDs/status endpoints, which could close this gap without a separate uncertainty ledger.
+- `opentrons-flex` does not prove universal physical exactly-once; after a crash it may intentionally know only that the physical world is uncertain and require operator/local reconciliation.
+- Its strongest durable uncertainty semantics are concentrated in labware movement, stacker recovery and controlled run mutation rather than every possible liquid/motion command.
+- Physical HITL coverage is opt-in and was not independently run in this shadow pass.
 
 NEXT TEST:
-Search physical SDL interfaces specifically for deterministic command/business IDs, acknowledged dispatch, operation-status readback, completed-run registries and explicit uncertain-outcome reconciliation.
+Find a second independent scientific executor that combines a durable command/business identifier with authoritative device completion/readback and an explicit `UNKNOWN/NEEDS_RECONCILIATION` state after ambiguous dispatch; verify that retry is blocked until reconciliation.
 
-CONFIDENCE: **MEDIUM-HIGH**.
+CONFIDENCE: **HIGH that campaign idempotency alone is insufficient; MEDIUM-HIGH that fail-closed physical uncertainty is the reusable closure primitive.**
 
 ## Validated local lessons
 
@@ -77,11 +81,26 @@ NEXT IMPROVEMENT: require three-boundary scoring: **scientific closure** (real p
 
 Evidence count: **3 successful independent shadow tasks**. Eligible for STAGED consideration inside shadow evaluation; do not edit/promote to global `SEARCH_SKILLS.md` from this lane.
 
+### LOCAL-2 — Search physical-effect closure, not just retryable orchestration
+WHEN TO USE: laboratory robots, instrument servers, plate handlers, autosamplers, synthesis platforms and any scientific workflow where retrying a side effect can physically duplicate or corrupt work.
+
+PROCEDURE: search for `valid=false` or invalidation before actuation, `clean_shutdown`, `reconcile physical`, `unknown`/`missing` device state, generation fencing, `require_home`, atomic/fsync state commits, command-execution UUIDs plus result polling, and tests that cancel/crash after physical work begins. Inspect whether future actuation is denied until authoritative readback or reconciliation restores certainty.
+
+WHY IT WORKED:
+- Run 4: these invariants isolated `AccelerationConsortium/opentrons-flex`, whose durable deck ledger is deliberately invalid before movement and remains fail-closed after cancellation, unclean restart or post-move commit failure, with additional device-sensor recovery checks.
+
+FAILURE MODES: a command UUID may die with the process; locks serialize but do not prove execution outcome; simulator success does not prove physical recovery; manual reconciliation may still be required; deep guarantees may cover only selected operations.
+
+NEXT IMPROVEMENT: require a second independent executor that preserves durable command identity through process loss and exposes device-side status/readback sufficient to resolve whether a physical command executed.
+
+Evidence count: **1 successful shadow task**. Remains LOCAL.
+
 ## Failed search patterns
 - Broad repository queries centered only on `autonomous experimentation`, `self-driving lab`, or `Bayesian optimization` produce many simulation-first, framework-only or README-heavy candidates. Require an operational invariant before deep inspection.
 - Treat optimization algorithms alone as low-signal unless paired with scientific validation, experiment lifecycle state, instrument integration or durable provenance.
 - Do not infer production robustness from a successful multi-week scientific campaign. Explicitly inspect dispatch acknowledgement, retry/restart state, duplicate suppression and intent→actual identity.
 - Do not infer physical exactly-once from a unique database row or idempotent API response. The external executor needs authoritative acknowledgement/readback or an explicit unresolved/reconciliation state.
+- Do not infer physical certainty from command IDs, locks or “success” responses alone; inspect when world state becomes non-authoritative and what evidence is required to restore it.
 - Do not chase `.env`, credential-shaped or accidental-exposure paths in low-attention repositories. Exclude them and continue only with legitimate architecture/source evidence.
 
 ## Candidate skills
@@ -98,3 +117,4 @@ Promotion status: evidence threshold for staged consideration is met, but global
 - SHADOW-COMMERCIAL referral pending for `NatLabRockies/ALchemist@02c7a6e...`: determine whether a closed-loop experiment governance integration/audit has a budget owner and measurable ROI distinct from generic Bayesian-optimization consulting.
 - SHADOW-COMMERCIAL referral added for `RomeroLab/PRAXIS@2441e471...`: test whether protein-engineering labs would pay for a reliability/reproducibility retrofit that adds durable job identity, acknowledged dispatch, suggested→actual provenance and restart-safe campaign state around existing robotic workflows.
 - SHADOW-COMMERCIAL referral added for `AccelerationConsortium/bo-mcp@56d590b...`: test whether an Autonomous-Lab Experiment Integrity Gateway / Chaos Audit can command budget specifically for duplicate-run prevention, campaign reconstruction, retry/restart safety and proposed→actual divergence detection, distinct from ordinary BO or lab-automation integration.
+- SHADOW-COMMERCIAL referral added for `AccelerationConsortium/opentrons-flex@2639016...`: test whether robotized labs/CROs will pay for a Physical Lab Command Integrity / Recovery Audit that measures ambiguous-dispatch risk, duplicate physical-action exposure and recovery MTTR, distinct from ordinary instrument integration.
