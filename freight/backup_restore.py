@@ -24,12 +24,15 @@ class WorkspaceSemanticSummary:
     business_unit: str
     audit_record_count: int
     audit_chain_head: str | None
+    recovery_claim_count: int
+    review_claim_count: int
     settlement_event_count: int
     allocation_count: int
     counter_event_count: int
     reversal_edge_count: int
     realized_cents: int
     fee_eligible_cents: int
+    settlement_content_hash: str
     semantic_hash: str
 
 
@@ -77,6 +80,42 @@ def _restore_copy(source_backup: Path, destination: Path) -> None:
     _sqlite_backup(source_backup,destination)
 
 
+def _settlement_content(settlement: SettlementStore) -> tuple[int, int, str]:
+    tables=(
+        "recovery_claims",
+        "review_claims",
+        "settlement_events",
+        "allocations",
+        "counter_events",
+        "reversal_edges",
+    )
+    conn=sqlite3.connect(settlement.path)
+    conn.row_factory=sqlite3.Row
+    try:
+        payload={}
+        counts={}
+        for table in tables:
+            rows=conn.execute(
+                f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=?",
+                (settlement.buyer_id,settlement.business_unit),
+            ).fetchall()
+            normalized=[dict(row) for row in rows]
+            normalized.sort(
+                key=lambda row: json.dumps(
+                    row,sort_keys=True,separators=(",",":"),ensure_ascii=False
+                )
+            )
+            payload[table]=normalized
+            counts[table]=len(normalized)
+    finally:
+        conn.close()
+    return (
+        counts["recovery_claims"],
+        counts["review_claims"],
+        canonical_hash({"schema":1,"tables":payload}),
+    )
+
+
 def workspace_summary(
     audit: AuditStore,
     settlement: SettlementStore,
@@ -84,17 +123,23 @@ def workspace_summary(
     if (audit.buyer_id,audit.business_unit)!=(settlement.buyer_id,settlement.business_unit):
         raise ValueError("audit/settlement workspace scope mismatch")
     audit.verify()
+    recovery_claim_count,review_claim_count,settlement_content_hash=_settlement_content(
+        settlement
+    )
     body={
         "buyer_id":audit.buyer_id,
         "business_unit":audit.business_unit,
         "audit_record_count":audit.count(),
         "audit_chain_head":audit.head(),
+        "recovery_claim_count":recovery_claim_count,
+        "review_claim_count":review_claim_count,
         "settlement_event_count":settlement.count("settlement_events"),
         "allocation_count":settlement.count("allocations"),
         "counter_event_count":settlement.count("counter_events"),
         "reversal_edge_count":settlement.count("reversal_edges"),
         "realized_cents":settlement.realized_cents(),
         "fee_eligible_cents":settlement.fee_eligible_cents(),
+        "settlement_content_hash":settlement_content_hash,
     }
     return WorkspaceSemanticSummary(
         **body,
