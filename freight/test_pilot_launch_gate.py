@@ -11,12 +11,16 @@ from freight.pilot_launch_gate import (
 )
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.rights_evidence import load_json
+from freight.separate_environment_evidence import load_environment
 
 
 ROOT=Path(__file__).resolve().parents[1]
 REGISTRY=load_json(ROOT/"freight/COMPONENT_RIGHTS_REGISTRY.json")
 RIGHTS=load_json(ROOT/"freight/RIGHTS_EVIDENCE_MANIFEST.json")
 DEPLOYMENT=load_current(ROOT)
+SEPARATE_TEMPLATE=load_environment(
+    ROOT/"freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json"
+)
 
 
 def readiness(**overrides):
@@ -39,13 +43,26 @@ def readiness(**overrides):
     return assess_readiness(PilotReadinessInput(**data))
 
 
-def decide(request, *, dep=None, ready=None):
+def verified_separate_environment():
+    e=deepcopy(SEPARATE_TEMPLATE)
+    e["evidence_status"]="VERIFIED"
+    e["environment_id"]="manual-pilot-env-001"
+    e["environment_evidence_ref"]="diligence-room/manual-pilot-env-001"
+    e["provider_or_host"]="controlled-host-001"
+    for name,control in e["controls"].items():
+        control["value"]=True
+        control["evidence_ref"]="evidence/"+name
+    return e
+
+
+def decide(request, *, dep=None, ready=None, separate=None):
     return evaluate_launch(
         readiness=ready or readiness(),
         component_registry=REGISTRY,
         rights_manifest=RIGHTS,
         deployment_evidence=dep or DEPLOYMENT,
         request=request,
+        separate_environment_evidence=separate,
     )
 
 
@@ -97,24 +114,43 @@ def test_current_deployment_still_blocks_parser_use_without_sandbox_proof():
     assert "parser_sandbox_not_proven" in d.blockers
 
 
-def test_separate_environment_is_conditional_without_evidence():
+def test_separate_environment_is_conditional_without_manifest():
     d=decide(LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT))
     assert d.status is LaunchStatus.CONDITIONAL
     assert d.route is LaunchRoute.SEPARATE_ENVIRONMENT_PENDING
-    assert "separate_data_environment_controls_not_verified" in d.conditions
-    assert "separate_data_environment_evidence_ref_missing" in d.conditions
+    assert "separate_environment_evidence_manifest_missing" in d.conditions
 
 
-def test_separate_controlled_environment_can_enable_manual_pilot_when_evidenced():
+def test_draft_separate_environment_stays_conditional():
     d=decide(
-        LaunchRequest(
-            DataPath.SEPARATE_CONTROLLED_ENVIRONMENT,
-            separate_environment_controls_verified=True,
-            separate_environment_evidence_ref="diligence-room/manual-pilot-env-001",
-        )
+        LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT),
+        separate=SEPARATE_TEMPLATE,
+    )
+    assert d.status is LaunchStatus.CONDITIONAL
+    assert "separate_environment_evidence_not_verified" in d.conditions
+
+
+def test_verified_separate_environment_can_enable_manual_pilot():
+    d=decide(
+        LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT),
+        separate=verified_separate_environment(),
     )
     assert d.status is LaunchStatus.READY
     assert d.route is LaunchRoute.CONTROLLED_MANUAL_BLIND_PILOT
+
+
+def test_malformed_separate_environment_blocks_instead_of_self_asserting():
+    e=verified_separate_environment()
+    e["controls"]="not-an-object"
+    d=decide(
+        LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT),
+        separate=e,
+    )
+    assert d.status is LaunchStatus.BLOCKED
+    assert any(
+        x.startswith("separate_environment_evidence_invalid:")
+        for x in d.blockers
+    )
 
 
 def test_deployed_pilot_can_be_ready_only_after_required_controls_are_proven():

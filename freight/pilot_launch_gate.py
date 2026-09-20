@@ -16,6 +16,9 @@ from freight.deployment_security_evidence import validate_evidence
 from freight.readiness import ReadinessAssessment, ReadinessStatus, assess_readiness, from_dict
 from freight.release_gate import validate_registry
 from freight.rights_evidence import validate_rights_evidence
+from freight.separate_environment_evidence import (
+    validate_environment_evidence,
+)
 
 
 class DataPath(str, Enum):
@@ -42,8 +45,6 @@ class LaunchRequest:
     data_path: DataPath
     requires_multi_tenant_data_plane: bool = False
     requires_parser_runtime: bool = False
-    separate_environment_controls_verified: bool = False
-    separate_environment_evidence_ref: str | None = None
 
 
 @dataclass(frozen=True)
@@ -55,10 +56,6 @@ class LaunchDecision:
     warnings: tuple[str, ...]
 
 
-def _required_text(value: str | None) -> bool:
-    return isinstance(value, str) and bool(value.strip())
-
-
 def evaluate_launch(
     *,
     readiness: ReadinessAssessment,
@@ -66,6 +63,7 @@ def evaluate_launch(
     rights_manifest: dict,
     deployment_evidence: dict,
     request: LaunchRequest,
+    separate_environment_evidence: dict | None = None,
 ) -> LaunchDecision:
     blockers: list[str] = []
     conditions: list[str] = []
@@ -150,17 +148,38 @@ def evaluate_launch(
         )
 
     if request.data_path is DataPath.SEPARATE_CONTROLLED_ENVIRONMENT:
-        if not request.separate_environment_controls_verified:
-            conditions.append("separate_data_environment_controls_not_verified")
-        if not _required_text(request.separate_environment_evidence_ref):
-            conditions.append("separate_data_environment_evidence_ref_missing")
-
-        if conditions:
+        if separate_environment_evidence is None:
+            conditions.append("separate_environment_evidence_manifest_missing")
             return LaunchDecision(
                 LaunchStatus.CONDITIONAL,
                 LaunchRoute.SEPARATE_ENVIRONMENT_PENDING,
                 (),
                 tuple(conditions),
+                tuple(warnings),
+            )
+
+        environment_errors, environment_conditions = validate_environment_evidence(
+            separate_environment_evidence
+        )
+        if environment_errors:
+            blockers.extend(
+                "separate_environment_evidence_invalid:" + x
+                for x in environment_errors
+            )
+            return LaunchDecision(
+                LaunchStatus.BLOCKED,
+                LaunchRoute.SEPARATE_ENVIRONMENT_PENDING,
+                tuple(blockers),
+                tuple(environment_conditions),
+                tuple(warnings),
+            )
+
+        if environment_conditions:
+            return LaunchDecision(
+                LaunchStatus.CONDITIONAL,
+                LaunchRoute.SEPARATE_ENVIRONMENT_PENDING,
+                (),
+                tuple(environment_conditions),
                 tuple(warnings),
             )
 
@@ -189,8 +208,7 @@ def main() -> None:
     )
     parser.add_argument("--requires-multi-tenant", action="store_true")
     parser.add_argument("--requires-parser", action="store_true")
-    parser.add_argument("--separate-controls-verified", action="store_true")
-    parser.add_argument("--separate-evidence-ref")
+    parser.add_argument("--separate-evidence-json")
     parser.add_argument("--expect", choices=("BLOCKED", "CONDITIONAL", "READY"))
     args = parser.parse_args()
 
@@ -206,8 +224,12 @@ def main() -> None:
         ),
         requires_multi_tenant_data_plane=args.requires_multi_tenant,
         requires_parser_runtime=args.requires_parser,
-        separate_environment_controls_verified=args.separate_controls_verified,
-        separate_environment_evidence_ref=args.separate_evidence_ref,
+    )
+
+    separate_environment_evidence = (
+        _load(args.separate_evidence_json)
+        if args.separate_evidence_json
+        else None
     )
 
     decision = evaluate_launch(
@@ -218,6 +240,7 @@ def main() -> None:
             root / "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json"
         ),
         request=request,
+        separate_environment_evidence=separate_environment_evidence,
     )
     payload = asdict(decision)
     payload["status"] = decision.status.value

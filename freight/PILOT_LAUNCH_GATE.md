@@ -17,8 +17,6 @@ A READY Data Readiness score can never override deployment-security blockers.
 
 ## Current classification
 
-With the deployment evidence collected on 2026-09-20:
-
 ### Current Netlify deployment
 **DEPLOYED CUSTOMER-DATA PILOT: BLOCKED**
 
@@ -28,39 +26,46 @@ Reasons:
 - If multi-tenant storage/API is later used, tenant isolation is still unproven.
 - If a production parser is later used, parser sandboxing is still unproven.
 
-The current Netlify project should therefore be treated as a **protected
-demo/control shell**, not as an approved confidential-customer-data plane.
+The current Netlify project is therefore a **protected demo/control shell**, not
+an approved confidential-customer-data plane.
 
 ### Separate controlled environment
 **MANUAL/CONTROLLED PILOT: CONDITIONAL**
 
-A service-led pilot may proceed outside the current Netlify customer-data path
-only after a separate data-handling environment has:
-- its own control evidence;
-- an evidence reference in the diligence room; and
-- explicit verification that those controls are active.
+The separate route no longer accepts a caller-supplied `verified=True` flag.
 
-Until then the route remains CONDITIONAL, not READY.
+It now requires a structured environment evidence manifest governed by:
+- `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
+- `freight/separate_environment_evidence.py`
+- `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
+
+The repository currently contains only a DRAFT template, so the route remains
+CONDITIONAL.
+
+Only a VERIFIED manifest with all applicable evidence references may unlock the
+controlled manual pilot route.
 
 ## Why this improves commercialization
 
-This avoids two bad extremes:
+This avoids three bad states:
 
-- **Unsafe SaaS shortcut:** putting buyer contracts/invoices into a deployment
-  merely because the buyer itself is READY.
-- **Unnecessary sales freeze:** pretending Freight must become a full
-  multi-tenant SaaS before a supervised service pilot can ever be sold.
+- **Unsafe SaaS shortcut:** buyer READY, deployment unsafe.
+- **Unnecessary sales freeze:** waiting for a full multi-tenant SaaS before a
+  supervised service pilot can exist.
+- **Self-attested manual exception:** an operator simply marks a separate
+  environment "verified" without evidence.
 
 The intended sequence is:
 
 1. qualify the buyer;
 2. choose the actual data path;
-3. pass the launch gate for that path;
-4. only then accept confidential data.
+3. collect the environment evidence for that path;
+4. pass the launch gate;
+5. only then accept confidential data.
 
 ## Current CI expectations
 
-The repository intentionally asserts:
+Current Netlify customer-data route:
 
 ```bash
 PYTHONPATH=. python freight/pilot_launch_gate.py \
@@ -69,14 +74,15 @@ PYTHONPATH=. python freight/pilot_launch_gate.py \
   --expect BLOCKED
 ```
 
-and:
+Separate controlled environment using the current DRAFT template:
 
 ```bash
 PYTHONPATH=. python freight/pilot_launch_gate.py \
   freight/fixtures/readiness_ready.json \
   --data-path separate \
+  --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json \
   --expect CONDITIONAL
 ```
 
-Those expectations should change only when new deployment/environment evidence
-is actually collected and committed.
+Those expectations should change only when new evidence is actually collected
+and committed.
