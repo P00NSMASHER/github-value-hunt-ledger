@@ -40,6 +40,13 @@ Current deployment facts:
 
 These findings do not upgrade missing tenant/parser controls to PASS.
 
+- [x] Deployment evidence is freshness-bounded: the 2026-09-20 Netlify snapshot
+  expires after 2026-09-27 and must be recollected earlier after relevant
+  configuration changes.
+- [x] VERIFIED separate-environment evidence requires SHA-256 receipts,
+  configuration fingerprinting, verifier metadata and a validity window of no
+  more than 90 days.
+
 The **final pilot launch decision is machine-enforced** by
 `freight/pilot_launch_gate.py`, which composes buyer readiness, pilot rights
 operability, rights-evidence consistency and the chosen data-handling path.
