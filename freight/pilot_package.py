@@ -12,6 +12,10 @@ from freight.contracts import (
     TruthManifest,
     canonical_hash,
 )
+from freight.launch_authorization import (
+    LaunchAuthorizationReceipt,
+    verify_launch_authorization,
+)
 
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -44,6 +48,9 @@ class SourceEntry:
 class DataRoomManifest:
     buyer_id: str
     business_unit: str
+    engagement_id: str
+    launch_authorization_hash: str
+    launch_authorization_valid_until: str
     entries: tuple[SourceEntry, ...]
     manifest_hash: str
 
@@ -52,6 +59,9 @@ class DataRoomManifest:
 class PilotPackageManifest:
     buyer_id: str
     business_unit: str
+    engagement_id: str
+    launch_authorization_hash: str
+    launch_authorization_valid_until: str
     data_room_hash: str
     population_hash: str
     truth_hash: str
@@ -69,15 +79,45 @@ def _valid_sha256(value: str) -> bool:
     return isinstance(value, str) and bool(SHA256_RE.fullmatch(value))
 
 
+def _verify_authorization_scope(
+    authorization: LaunchAuthorizationReceipt,
+    *,
+    buyer_id: str,
+    business_unit: str,
+    as_of_date: str,
+) -> None:
+    errors = verify_launch_authorization(
+        authorization,
+        as_of_date=as_of_date,
+    )
+    if errors:
+        raise ValueError(
+            "invalid launch authorization: " + ",".join(errors)
+        )
+    if (authorization.buyer_id, authorization.business_unit) != (
+        buyer_id,
+        business_unit,
+    ):
+        raise ValueError("launch authorization scope mismatch")
+
+
 def build_data_room_manifest(
     buyer_id: str,
     business_unit: str,
     entries: Iterable[SourceEntry],
     *,
+    authorization: LaunchAuthorizationReceipt,
+    authorization_as_of_date: str,
     require_pilot_read_only: bool = True,
 ) -> DataRoomManifest:
     _required("buyer_id", buyer_id)
     _required("business_unit", business_unit)
+    _verify_authorization_scope(
+        authorization,
+        buyer_id=buyer_id,
+        business_unit=business_unit,
+        as_of_date=authorization_as_of_date,
+    )
 
     normalized = tuple(sorted(entries, key=lambda x: x.source_id))
     if not normalized:
@@ -109,14 +149,20 @@ def build_data_room_manifest(
             raise ValueError("retention_days must be a positive integer")
 
     body = {
-        "schema": 1,
+        "schema": 2,
         "buyer_id": buyer_id,
         "business_unit": business_unit,
+        "engagement_id": authorization.engagement_id,
+        "launch_authorization_hash": authorization.receipt_hash,
+        "launch_authorization_valid_until": authorization.valid_until,
         "entries": [asdict(x) for x in normalized],
     }
     return DataRoomManifest(
         buyer_id=buyer_id,
         business_unit=business_unit,
+        engagement_id=authorization.engagement_id,
+        launch_authorization_hash=authorization.receipt_hash,
+        launch_authorization_valid_until=authorization.valid_until,
         entries=normalized,
         manifest_hash=canonical_hash(body),
     )
@@ -128,7 +174,23 @@ def build_pilot_package(
     truth: TruthManifest,
     submission: SealedIncumbentSubmission,
     incumbent: IncumbentOutput,
+    *,
+    authorization: LaunchAuthorizationReceipt,
+    authorization_as_of_date: str,
 ) -> PilotPackageManifest:
+    _verify_authorization_scope(
+        authorization,
+        buyer_id=data_room.buyer_id,
+        business_unit=data_room.business_unit,
+        as_of_date=authorization_as_of_date,
+    )
+    if data_room.engagement_id != authorization.engagement_id:
+        raise ValueError("data room/launch authorization engagement mismatch")
+    if data_room.launch_authorization_hash != authorization.receipt_hash:
+        raise ValueError("data room/launch authorization hash mismatch")
+    if data_room.launch_authorization_valid_until != authorization.valid_until:
+        raise ValueError("data room/launch authorization expiry mismatch")
+
     scope = (data_room.buyer_id, data_room.business_unit)
     objects = (
         ("population", population.buyer_id, population.business_unit),
@@ -165,12 +227,17 @@ def build_pilot_package(
     required_types = {"invoice", "authority", "incumbent_output"}
     missing = sorted(required_types - source_types)
     if missing:
-        raise ValueError("pilot data room missing required source types: " + ",".join(missing))
+        raise ValueError(
+            "pilot data room missing required source types: " + ",".join(missing)
+        )
 
     body = {
-        "schema": 1,
+        "schema": 2,
         "buyer_id": data_room.buyer_id,
         "business_unit": data_room.business_unit,
+        "engagement_id": data_room.engagement_id,
+        "launch_authorization_hash": data_room.launch_authorization_hash,
+        "launch_authorization_valid_until": data_room.launch_authorization_valid_until,
         "data_room_hash": data_room.manifest_hash,
         "population_hash": population.manifest_hash,
         "truth_hash": truth.truth_hash,
@@ -180,6 +247,9 @@ def build_pilot_package(
     return PilotPackageManifest(
         buyer_id=data_room.buyer_id,
         business_unit=data_room.business_unit,
+        engagement_id=data_room.engagement_id,
+        launch_authorization_hash=data_room.launch_authorization_hash,
+        launch_authorization_valid_until=data_room.launch_authorization_valid_until,
         data_room_hash=data_room.manifest_hash,
         population_hash=population.manifest_hash,
         truth_hash=truth.truth_hash,
