@@ -4,132 +4,105 @@ Integrator-owned search and validation direction. Updated 2026-09-20. **Experime
 
 ## Operating rules for all 14 workstreams
 - Deduplicate by **repository + exact revision + capability**.
-- Repository-owned public code may use the user's standing separate-commercial-permission assumption for prioritization; record actual published rights and keep datasets, standards, patents, trademarks, APIs/services, customer records and other third-party material separately governed.
-- Verify beyond README using source, tests, schemas/migrations, fixtures, deployments/config and history. Distinguish IMPLEMENTED / TESTED / CLAIMED / EXPERIMENTAL / UNVERIFIED.
-- Never inspect, retain, reproduce, test or exploit credentials, authentication material, private/personal/confidential data, accidental secrets, leaked trade secrets, unauthorized-access material or vulnerabilities intended for unauthorized access.
-- Reuse benchmark-supported skills when applicable, but do not leak benchmark gold. Before important NO_FIND conclusions, run one recall-rescue pass using repository family/old name/author-org adjacency, oracle/test-fixture vocabulary and near-match lineage without lowering the verification bar.
-- PASS/VERIFIED must survive missing, stale, ambiguous, malformed, partial and selection-fallback states. Source exceptions may not become empty-success.
-- Any decision claim must trace **dispatch -> executable implementation -> meaningful side effect -> semantic test**.
-- Any money/trust claim must identify source authority and prevent rejected/unknown evidence from re-entering totals, billing, recovery, health or proof summaries.
+- Record actual public rights/provenance; use the user's separate commercial-permission assertion only for repository-owned public code/content. Third-party datasets, standards, patents, trademarks, APIs/services, customer records and bundled assets remain separately governed.
+- Verify beyond README using source/tests/schemas/config/history; label IMPLEMENTED / TESTED / CLAIMED / EXPERIMENTAL / UNVERIFIED.
+- Never inspect, retain, test or exploit credentials, authentication material, private/personal/confidential data, accidental secrets, unauthorized-access material or leaked trade secrets.
+- Before important NO_FIND, use one recall-rescue pass (old name/family/oracle fixture/author-org/commit lineage) without lowering the verification bar.
+- PASS/VERIFIED must survive missing, stale, ambiguous, malformed, partial, selection-fallback and source-unavailable states. Exceptions are not empty-success.
+- Trace decision claims **dispatch -> executable implementation -> meaningful side effect -> semantic test**.
+- Money/trust claims require authority origin, unique identity, governed transitions and independently observed outcome; rejected/unknown evidence never re-enters totals.
 - Effective-dated rules must pin authority, event/effective time, supersession and load-bearing thresholds/exceptions.
-- No padding. A no-new-find run is acceptable.
+- No padding. No-new-find runs are acceptable.
 
 ## 1. Freight Recovery — P0 / EXP-001
-**Current state:** internal settlement semantics are now substantially exercised. Hunter 03's planted 210/812/820 corpus passed exact/unique allocation, reviewed partial/split edges, duplicate events, full reversal, ambiguous partial reversal, wrong currency, pre-authority timing and 2,000 deterministic fuzz ledgers. This is technical evidence only; EXP-001 remains **BLOCKED_EXTERNAL**.
+**State:** internal settlement semantics and persistence are no longer the bottleneck. The 210/812/820 planted corpus passed exact/unique allocation, reviewed partial/split edges, duplicates, full reversal, ambiguous partial reversal, currency/pre-authority negatives and 2,000 fuzz ledgers. Persistent reference storage now adds integer-cents one-use allocation, immutable event/claim lineage, append-only reversal, SQL capacity guards and serialized concurrent writes; hunter verification reports 21/21 persistence tests plus 200 repeated two-writer races with exactly one realized allocation and passing CI.
 
-**Do next:**
-- freeze internal engineering except persistence/concurrency/security defects exposed by the planted corpus;
-- search only when a real authorized buyer population exposes a named missing authority, correction/rebill, source-format or settlement edge;
-- preserve the chain: controlling authority -> independently computed expected charge -> unique economic claim -> buyer adjudication -> issued adjustment -> independent settlement event -> one-use allocation edge -> later counter-event/reversal -> realized recovery.
+**Do next:** obtain one explicitly authorized frozen buyer population and carry it through controlling authority -> independent expected charge -> blind incumbent comparison -> adjudication -> issued adjustment -> independently observed settlement -> unique allocation -> later reversal if any.
 
-**Stop:** generic freight audit/reconciliation/TMS/OCR/rating/EDI discovery. A discrepancy, dispute, issued credit or provider status remains **$0 realized** until independently allocated settlement exists.
+**Search only:** if that external population exposes a named contract/amendment/source-format/correction/rebill/settlement gap. **Stop:** generic freight audit/TMS/OCR/rating/EDI/reconciliation hunting. Discrepancy, dispute, issued credit or provider status remains **$0 realized** until independent settlement allocation exists.
 
 ## 2. AP Leakage Assurance — P0 / EXP-002
-**New evidence:** ERPNext's current Purchase Receipt billing service supplies high-value regression fixtures for partial receipts, mixed PO-level/direct receipt billing and rejected quantities. Cross-ERP evidence also falsifies a universal `has_receipt` rule: receipt authority is policy- and line-type-dependent.
+**New direction:** build a reversible authority-consumption ledger, not another matcher.
 
-**Do next:** build an ERP-neutral `ReceiptAuthorityPolicy` over `{ERP/system, PO line type, buyer configuration, supplier override, verification mode}` and allow authority artifacts such as `GoodsReceipt`, `ServiceEntrySheet`, or explicit `DirectInvoiceAllowed`. Run it with CAP-019 source observation receipts (`PRESENT / VERIFIED_EMPTY / UNAVAILABLE`), Nomenklatura negative/reversible identity decisions, Canon pinned replay and bitemporal corrections.
+Use `ReceiptAuthorityPolicy(system, PO-line type, buyer config, supplier override, verification mode)` with `GoodsReceipt / ServiceEntrySheet / DirectInvoiceAllowed / REVIEW`; CAP-019 supplies `PRESENT / VERIFIED_EMPTY / UNAVAILABLE` source truth. Combine BCApps exact invoice↔PO↔receipt capacity semantics, ERPNext partial-receipt evidence, Odoo counter-events, MiniGraf bitemporal replay and Nomenklatura→Canon identity governance.
 
-Port at least these adversarial fixtures: one PO line across multiple partial receipts; residual amount+quantity after mixed direct and PO-level billing; rejected-quantity billing denominator; service-entry-sheet required vs legitimately not required; source outage/partial ingestion; corrected receipt after original decision.
+**Mandatory adversaries:** refunding vs non-refunding physical return; vendor credit; bill cancellation; re-receipt; multiple same-SKU PO lines; service/ordered-vs-received policy; UoM precision/rounding; source outage; identity reject/split/correction. Every counter-event must reference the original consumed authority edge and conserve amount+quantity. SKU equality/header state cannot establish ownership.
 
-**Stop:** matcher/OCR/RPA/anomaly hunting and any universal missing-GR conclusion. ERP status is a semantic oracle/challenger, not independent truth.
+**Stop:** generic OCR/RPA/three-way-match/anomaly discovery until this corpus exposes a concrete missing semantic.
 
 ## 3. Partner / Commission Payout Assurance — P0/P1 / EXP-003
-**New evidence:** `Modern-Treasury/modern-treasury-python@406f354a...` supplies the strongest current bank-observation bridge: Payment Order -> bank/reference metadata including ACH trace/original trace -> bank-derived Transaction/Transaction Line Item -> later Return/Reversal. `szapata85/ACHInterbank@395a359...` supplies a useful fail-closed correlation policy: exact unique return linkage may mutate state, while duplicate candidates become `Ambiguous` and zero candidates become `NotFound` with no money-state mutation. Hosted treasury/bank services and bank-feed coverage remain external; the Modern Treasury server-side auto-reconciliation algorithm is not public and a trace value alone is not proof of unique settlement identity.
+`Modern-Treasury/modern-treasury-python@406f354a...` supplies the strongest current bank-observation bridge; `szapata85/ACHInterbank@395a359...` supplies fail-closed unique/ambiguous/not-found return correlation.
 
-**Do next:** stop architecture hunting and execute the provider-neutral finality corpus. Model bank-observation outcome explicitly as `EXACT_UNIQUE / AMBIGUOUS / NOT_FOUND / UNAVAILABLE`; only `EXACT_UNIQUE` inside a verified source-observation window may become a settlement candidate, and later Return/Reversal must be able to revoke it. Plant duplicate trace, substring-reference collision, equal-total/swapped-identity, unparseable amount, stale cursor, bank-posted-then-returned and duplicate-semantic-return cases. Use CAP-019-style source-health evidence so stale/unavailable feeds cannot masquerade as `no return` or `no transaction`.
+**Do next:** execute a provider-neutral matrix where bank observation is `EXACT_UNIQUE / AMBIGUOUS / NOT_FOUND / UNAVAILABLE`. Only exact unique linkage inside a verified source window can establish a settlement candidate; later Return/Reversal revokes it. Plant duplicate trace, substring/fuzzy reference, equal-total/swapped identity, unparseable amount, stale cursor, provider-complete/bank-absent, bank-posted-then-returned and duplicate/ambiguous return cases.
 
-Provider `sent/paid/succeeded` remains distinct from bank/network finality. Unknown provider results remain claimed/pending and must not auto-release for retry. A later return/reversal invalidates prior finality without deleting history.
-
-**Search only:** a concrete provider/reference -> bank-observation mapping or completeness/freshness gap exposed by the corpus.
-
-**Stop:** commission calculators, payout wrappers, generic bank-statement parsers and reconciliation libraries. An `EXACT_REFERENCE` label, substring/fuzzy reference match, amount equality, first-match policy or last-seen cursor is not settlement proof.
+**Stop:** commission calculators, payout wrappers, generic statement parsers and reconciliation libraries. Trace/reference/amount/first-match/cursor continuity are not finality proof.
 
 ## 4. ScopeSignal / Construction Change Leakage — P0/P1 / EXP-005
-**New evidence:** `mradul010/construction_management@ce345579...` is a strong authority-to-bill component: submitted work-order/PO context is server-reloaded, measured quantity/rate is bounded against authoritative lines, Approved SC Bill gates Purchase Invoice creation, and retention/payment consistency is checked. It does **not** prove independent field-measurement approval or bank finality. ERPNext also supplies a live false-finality case where a bank transaction can be Reconciled while the Payment Entry remains uncleared.
+Run the Nirman↔`construction_management` adversarial authority corpus: wrong work-order ownership, over-measurement, draft/rejected/approved measurement, wrong period, concurrent quantity claim, retention error, internal Payment Entry/reconciliation vs independently cleared cash, later reversal.
 
-**Do next:** construct a cross-implementation corpus comparing Nirman's approved-measurement path with `construction_management` server-side contract/quantity bounds. Plant wrong work-order ownership, over-measurement, draft/rejected measurement, wrong billing period, concurrent quantity claim, retention error, payment-entry/bank-reconciliation divergence and later reversal.
-
-**Search only:** signed/approved field-measurement authority, unbypassable certification-to-bill linkage, prime/sub flow-down/amendment authority, and independent cleared-cash/reversal evidence.
-
-**Stop:** generic IPC/pay-app UI, RA-bill CRUD, quantity/takeoff/diff or internal `PAID/Reconciled` labels.
+**Search only:** signed/approved field-measurement authority, unbypassable certification-to-bill linkage, prime/sub flow-down/amendment authority and external cleared-cash/reversal evidence. **Stop:** generic pay-app/RA-bill CRUD, takeoff/diff and internal `PAID/Reconciled` labels.
 
 ## 5. Recovery Proof — P0/P1 / EXP-004
-**New evidence:** `gitdr-io/gitdr@c9d15a2...` shows that successful restoration and durable proof filing are separate assurance states; a restore may succeed while proof persistence fails, and overall assurance must remain non-green. Current recovery catalogs also reinforce verifier-self-test/mutation and wrong-state controls.
+**New evidence:** `kirilurbonas/FireDrill@1e532b17...` proves a stronger pattern: expected workload/subject inventory must be external to the evidence directory or a vanished drill can disappear from evaluation. Its multi-engine isolated restores, semantic checks, RTO/RPO, signed DSSE evidence and scoped coverage gate are strong component evidence. `snapetech/DuneAwakeningSelfHost@8d3bac1...` adds a useful PostgreSQL+RabbitMQ/Mnesia dual-plane recovery pattern. `WiseOpsTeam/mneme@e595986...` is a negative oracle because SQL process success can be mistaken for semantic assertion success.
 
-**Do next:** add `proof_sink_unavailable_after_successful_restore` to the common adversarial matrix. Run PostgreSQL plus a non-Postgres/object workload through wrong-but-restorable content, missing history, stale proof, corrupt object, service-up/data-wrong, trust/revocation failure and a deliberately damaged verifier assertion/helper.
+**Do next:** run per-workload expected-subject coverage with `expected_subject_missing_entirely`, `control_aggregate_masks_failed_workload`, wrong semantic value despite rc=0, proof-sink failure after successful restore, cleanup failure and deliberately broken verifier. Use a versioned/fresh expected inventory; unscoped evidence-directory discovery is forbidden for customer assurance.
 
-**Stop:** broad backup/restore tooling. Search only if the matrix reveals a missing negative control or workload invariant.
+**Stop:** broad backup/restore tooling. Search only if this matrix exposes a missing negative control or workload invariant.
 
 ## 6. CaptureBrief / Government acquisition intelligence — P0/P1 / EXP-006
-**New evidence:** official SAM/Data Services lineage can support notice/version history but is not attachment-complete. `chrisfulcher/orrery@89ae2218...` implements the missing public attachment-manifest/currentness plane using the SAM web-interface resource manifest, preserving access/deleted/export-controlled/file-existence metadata and failing closed on unknown manifest shape. The remaining gap is historical manifest-state completeness when attachments disappear or mutate.
+Official GSA semantics establish a deletion/history boundary: `excludeDeleted`/`deleteAll` mean a latest manifest cannot reconstruct complete attachment history. `chrisfulcher/orrery@89ae2218...` remains useful but is now a **26/30 component**, not complete history authority, because it does not pin deletion-inclusive reads and its successful recheck path does not create a lossless disappearance ledger.
 
-**Do next:** for the frozen 10-solicitation corpus, maintain separate planes:
-1. official notice/version/action history;
-2. attachment manifest state;
-3. immutable downloaded artifact hashes where public access is authorized;
-4. FAR/supplement/deviation authority;
-5. entity/award lineage.
+**Do next:** on 10 frozen solicitation families maintain separate planes for notice/action history, deletion-inclusive per-action attachment observations, immutable artifact hashes, FAR/supplement/deviation authority and entity/award lineage. Every observation must preserve action/notice identity, exact URL/query semantics, observed time, status, body hash, parser/schema version and completeness. New observations never delete old evidence; source failure cannot emit disappearance.
 
-Require append-only manifest snapshots or an equivalent deterministic history rule so disappearance/deletion cannot be mistaken for absence. Benchmark latest-row conclusions against full packet/history and source-degraded intervals.
-
-**Search only:** successor/deviation authority, historical attachment-state losslessness, source-currentness/freshness or exact packet gaps exposed by the corpus. Stop generic SAM/FAR wrappers and procurement dashboards.
+**Search only:** successor/deviation authority, historical attachment losslessness, tombstone/deleteAll semantics and concrete source-currentness gaps. **Stop:** generic SAM/FAR wrappers and procurement dashboards.
 
 ## 7. Installed-Base Lab / Sequencing Operations — P1 / EXP-007
-Sequencing remains the primary profile: Clarity workflow state -> run identity -> independently validated sample sheet -> InterOp operational metrics -> provenance/replay using synthetic/dummy or explicitly authorized non-PHI data.
+Finish the Clarity -> independent sample-sheet validation -> run identity -> Illumina InterOp -> provenance synthetic handoff. Add one ambiguous physical-action negative: post-actuation uncertainty must enter recovery/UNKNOWN and must not be blindly redispatched. PyLabRobot/MADSci are useful architectural challengers but do not yet prove restart-durable physical exactly-once behavior.
 
-New LADS and CETONI findings support the broader category of standards facades over real installed devices, but both remain WATCH because production hardening, hardware-in-loop regression and safe command ownership are not proven.
-
-**Do next:** complete the Clarity synthetic handoff. For device-standardization searches, require a named installed family plus real vendor/native actuation, behavioral/HITL regression, fault/recovery semantics and explicit arbitration/single-actuation authority. Do not count a standards facade alone as safe production control.
+For device-standardization searches, require a named installed family, real vendor/native actuation, behavioral/HITL regression, fault/recovery semantics and explicit single-actuation authority. A standards facade alone is not safe production control.
 
 ## 8. Insurance Subrogation Recovery — P1 / EXP-011
-Search only authoritative versioned jurisdiction/policy rules, policy-language precedence, limitations/fault effective periods and closed-claim settlement evidence. Unknown/missing/conflicting/superseded rule or unresolved policy wording = **REVIEW / $0 asserted recovery**.
-
-**Stop:** generic claims AI, demand-letter tools or illustrative statutes presented as current authority.
+Search only authoritative versioned jurisdiction/policy rules, policy-language precedence, limitations/fault effective periods and closed-claim settlement evidence. Unknown/missing/conflicting/superseded rule or unresolved policy wording = **REVIEW / $0 asserted recovery**. Stop generic claims AI/demand-letter tooling.
 
 ## 9. Money-State Integrity / Payments — P1 / EXP-010
-Internal contract/rating/invoice/allocation/reconciliation machinery is deep enough. Search only independent contract/amendment authority and external PSP/bank settlement/readback that can contradict the operational system, including returns/reversals/chargebacks and final amount/currency/trace.
+`NotAbdelrahmanelsayed/paymob_integration@8999a679...` is the strongest new reversal-safe provider reference: timeout/5xx remains Pending; lost webhook is recovered by provider inquiry; refund request is one-shot under ambiguity; only confirmed signed refund delta posts a compensating ERP entry; cumulative mismatches route to review. Combine with OpenPartner/Summae and independent bank observation.
 
-Run the canonical synthetic month before adding another payment core. Keep action/decision score, evaluator and buyer economic outcome separate under Evaluation-Target Independence.
+**Do next:** canonical month with duplicate charge, lost webhook, unknown result, refund-response loss, cumulative refund without child proof, partial/full refund, outbox failure, later bank return/chargeback. A later external counter-event must reopen/offset canonical state while preserving original authority.
+
+Provider qualification harnesses count only with a retained successful exact-revision provider artifact; `NOT_EXERCISED` remains unqualified. Stop generic payment cores.
 
 ## 10. Revenue Decision Assurance / Pricing-Yield — P1/P2
-Search only held-out replay adapters, real capacity/censoring/no-show/cancellation state, incumbent decision logs and realized revenue/load outcomes. Every claimed optimizer/abstention/information-acquisition mode must reach a changed operational action and semantic test.
-
-**Stop:** recommendation-only analytics and model-valued ROI without independent buyer outcomes.
+Search only held-out replay adapters, real capacity/censoring/no-show/cancellation state, incumbent decision logs and realized revenue/load outcomes. Every optimizer/abstention/information-acquisition mode must reach a changed operational action and semantic test. Stop recommendation-only analytics/model-valued ROI.
 
 ## 11. Industrial Virtual Commissioning / Protocol Acceptance — P1 / EXP-008
-Execute the frozen Dreamine.Gem <-> `bparzella/secsgem` dialogue/error differential corpus and the duplicate-EC atomicity probe before searching more SECS/GEM implementations. Classify each disagreement as profile ambiguity, implementation defect or unresolved standards/vendor-authority question.
+Execute the exact duplicate-ECID W-bit S2F15 probe against Dreamine.Gem and `bparzella/secsgem`. Current source/test-backed prediction, **not duplicate-specific runtime evidence**: Dreamine -> correlated S9F7 + unchanged EC state + eventual T3 timeout; secsgem -> S2F16 EAC=0 + last-value-wins. Record reply class, System Bytes/header, requester liveness/T3 and post-state.
 
-Search a third engine only to adjudicate a concrete disagreement. For PLC/OPC-UA, hunt only a customer-configuration/import or migration/reconnect/fault gap that changes pre-FAT acceptance. Same-family agreement is not independent proof and implementation agreement is not formal conformance.
+Search a third engine only after the exact fixture executes and an actual disagreement needs adjudication. Implementation agreement is not formal SEMI conformance.
 
 ## 12. Permit / Public-Data Intelligence — P1 / EXP-009
-Apply source topology + immutable version/diff history + explicit run truth. CAP-019 observation receipts are mandatory for absence claims. Search only jurisdiction/semantic/identity/version gaps that change a buyer decision.
-
-**Stop:** mutable upsert scrapers, connector-count projects and lead maps without completeness/freshness/run evidence.
+Use source topology + immutable version/diff history + CAP-019 observation receipts + reviewed identity. Search only jurisdiction/semantic/identity/version gaps that change a buyer decision. Stop mutable-upsert scrapers and lead maps without completeness/freshness evidence.
 
 ## 13. Grid / Infrastructure Risk & Inspection — P1/P2 / EXP-012
-**Current evidence boundary:** USECPO v2 is the rights-clear historical benchmark, but exact v2 artifact schema/event keys still require direct artifact inspection. Michigan MPSC is a strong independent historical regulator challenger but commercially rights-constrained; NYC 311 is a rights-clean construct-validity negative control, not utility outage truth; California OES is public-domain prospective outage-map evidence but has no history.
+USECPO v2 logical schema is now substantially frozen from its peer-reviewed descriptor: event-correlated files carry literal `event id`; whole-event splits must group by that key. `STANDARD / 8H / 24H` variants are sensitivity views, not independent evidence. Preserve EAGLE-I+DOE-417 ancestry, state-generalized geography and restoration imputation; use 2019–2023 first because early coverage is weaker. Do not call event correlation feeder/component causality or general distribution truth.
 
-**Do next:** use a two-plane design: (a) whole-event/chronology-preserving historical evaluation on USECPO with explicit evaluator ancestry, and (b) independent challenge using rights-permitted regulator/utility evidence plus prospective public-domain feeds after predictions are frozen. Never credit multiple EAGLE-I descendants as independent validation.
-
-**Stop:** more outage datasets/models until exact USECPO v2 schema is frozen or a genuinely independent, commercially reusable historical outage oracle is found.
+**Do next:** obtain the official v2 ZIP/guideline to byte-confirm headers, timezone, sentinels, thresholds and event-id namespace, then freeze event-level splits. **Stop:** more outage datasets/models unless a genuinely independent rights-clear historical oracle remains necessary.
 
 ## 14. Sparse-lane repair + wildcard analogs — P2
-Only pursue adjacent domains reproducing the strongest portfolio DNA: **authoritative source/version -> deterministic expected state -> observed actual state -> governed review/action -> independent realized outcome -> counter-event/reversal**.
-
-Prefer old product names, protocol/standard signatures, dependency/fork/commit archaeology, obscure internal-tool-style repositories and paper->code->production lineage over broad category keywords. After five weak measured runs from a query family, record the negative evidence and rotate strategy; do not retire strategies from anecdotes alone.
+Only pursue adjacent domains reproducing the strongest portfolio DNA: **authoritative source/version -> deterministic expected state -> observed actual state -> governed review/action -> independent realized outcome -> counter-event/reversal**. Prefer old names, protocol/standard signatures, dependency/fork/commit archaeology and obscure internal-tool-style repositories over broad categories. After five weak measured runs, record the negative evidence and rotate.
 
 ## Global stop list
-Do not spend capacity on generic OCR, CRUD, dashboards, RAG, fuzzy matching, commodity auth/RBAC, job queues, generic protocol clients, generic scheduling/routing/optimization demos, backup-status tools, generic TMS/CMMS/FSM/LIMS/AP OCR or speculative AI agents unless a candidate adds a **rare domain invariant, authoritative source, difficult installed-base integration, independently falsifiable algorithm, governed transition, or realized-money/evidence loop** that materially beats the current portfolio.
+Do not spend capacity on generic OCR, CRUD, dashboards, RAG, fuzzy matching, commodity auth/RBAC, job queues, generic protocol clients, generic scheduling/routing/optimization demos, backup-status tools, generic TMS/CMMS/FSM/LIMS/AP OCR or speculative agents unless a candidate adds a **rare domain invariant, authoritative source, difficult installed-base integration, independently falsifiable algorithm, governed transition or realized-money/evidence loop** that materially beats the current portfolio.
 
 ## Current highest-value execution order
-1. EXP-001 external authorized freight population; internal settlement corpus is no longer the bottleneck.
-2. EXP-002 AP source-health + ReceiptAuthorityPolicy + partial-receipt/identity/bitemporal corpus.
-3. EXP-006 CaptureBrief notice-history + attachment-manifest completeness on 10 solicitations.
-4. EXP-005 ScopeSignal measurement/contract authority -> bill -> independent cash/reversal corpus.
-5. EXP-004 Recovery Proof including proof-sink and broken-verifier controls.
-6. EXP-003 commission provider->bank/payroll finality and later-return matrix.
-7. EXP-008 industrial differential corpus.
-8. EXP-007 sequencing handoff.
-9. EXP-012 outage evaluator-ancestry/independence benchmark.
+1. EXP-001 external authorized freight population.
+2. EXP-002 AP source-health + reversible authority-consumption/counter-event corpus.
+3. EXP-006 CaptureBrief action-history + deletion-inclusive manifest completeness.
+4. EXP-004 Recovery Proof expected-subject coverage + broken-verifier/proof-sink matrix.
+5. EXP-005 ScopeSignal measurement/contract authority -> bill -> independent cash/reversal.
+6. EXP-003 commission provider -> bank/payroll finality and later-return matrix.
+7. EXP-010 money-state refund/unknown/counter-event month.
+8. EXP-008 industrial duplicate-S2F15 differential.
+9. EXP-007 sequencing handoff + physical ambiguity negative.
+10. EXP-012 USECPO artifact-byte gate and event-level benchmark.
 
 **Portfolio rule:** repository discovery resumes only when one of these experiments exposes a concrete missing capability, authority source, comparator or outcome edge.
