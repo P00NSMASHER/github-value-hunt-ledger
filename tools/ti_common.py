@@ -30,11 +30,37 @@ def _field(block, label):
     m = re.search(r"^-\s*" + re.escape(label) + r":\s*(.*)$", block, re.I | re.M)
     return m.group(1).strip() if m else None
 
-def _list_field(block, label):
-    value = _field(block, label)
+def _clean_md(value):
+    if value is None:
+        return None
+    return re.sub(r"\*\*([^*]+)\*\*", r"\1", value).strip()
+
+def _split_list_value(value):
     if not value:
         return []
-    return [x.strip().strip(chr(96)) for x in re.split(r";\s*|,\s*(?=[A-Za-z0-9])", value) if x.strip()]
+    return [x.strip().strip(chr(96)) for x in re.split(r";\s*|,\s*(?=[A-Za-z0-9`])", value) if x.strip()]
+
+def _list_field(block, label):
+    return _split_list_value(_field(block, label))
+
+def _split_limitation_next(value):
+    """Split the compact `Limitation/next test` convention when practical.
+
+    Capability Markdown intentionally stays human-readable. Most compact entries use
+    `<limitation>; <imperative next test>`. If the separator is not clear, retain the
+    full text as both limitation and next-test evidence rather than silently dropping it.
+    """
+    if not value:
+        return None, None
+    parts = re.split(
+        r";\s*(?=(?:run|measure|validate|execute|compare|freeze|reproduce|evaluate|obtain|benchmark|build|resolve|prove|test|apply|use|inspect|confirm|require|port|seek)\b)",
+        value,
+        maxsplit=1,
+        flags=re.I,
+    )
+    if len(parts) == 2:
+        return parts[0].strip(), parts[1].strip()
+    return value.strip(), value.strip()
 
 def parse_capabilities():
     text = (ROOT / "CAPABILITIES.md").read_text(encoding="utf-8")
@@ -42,26 +68,63 @@ def parse_capabilities():
     out = []
     for i, m in enumerate(matches):
         block = text[m.end(): matches[i+1].start() if i + 1 < len(matches) else len(text)]
-        maturity = _field(block, "Maturity")
+
+        # Support both the original explicit schema and the current compact
+        # `Ability/maturity: **STATE** — ability` format used by CAPABILITIES.md.
+        maturity = _clean_md(_field(block, "Maturity"))
+        ability = _field(block, "Ability")
+        compact = _field(block, "Ability/maturity")
+        if compact:
+            cm = re.match(r"\s*(?:\*\*)?([^*—]+?)(?:\*\*)?\s+—\s+(.+)\s*$", compact)
+            if cm:
+                if not maturity:
+                    maturity = _clean_md(cm.group(1))
+                if not ability:
+                    ability = cm.group(2).strip()
+            elif not ability:
+                ability = compact
+
+        evidence_basis = _field(block, "Evidence basis") or _field(block, "Evidence")
+        primary_components = _list_field(block, "Primary components")
+        if not primary_components and evidence_basis:
+            primary_components = _split_list_value(evidence_basis)
+
+        reusable_targets = _list_field(block, "Reusable targets")
+        if not reusable_targets:
+            reusable_targets = _list_field(block, "Targets") or _list_field(block, "Target")
+
+        limitation = _field(block, "Limitation")
+        missing_piece = _field(block, "Missing piece")
+        next_test = _field(block, "Next test")
+        compact_limit = _field(block, "Limitation/next test")
+        if compact_limit:
+            compact_limitation, compact_next = _split_limitation_next(compact_limit)
+            limitation = limitation or compact_limitation
+            next_test = next_test or compact_next
+            # In the compact schema the limitation is the named unresolved piece.
+            missing_piece = missing_piece or compact_limitation
+
         state = "watch"
         if maturity:
-            if "PROVEN" in maturity.upper():
+            upper = maturity.upper()
+            if "PROVEN" in upper:
                 state = "runtime_or_stack_proven"
-            elif "BENCHMARK" in maturity.upper():
+            elif "BENCHMARK" in upper:
                 state = "benchmarked"
-            elif "VALIDATED" in maturity.upper():
+            elif "VALIDATED" in upper:
                 state = "source_or_test_validated"
+
         out.append({
             "capability_id": m.group(1),
             "name": m.group(2).strip(),
-            "ability": _field(block, "Ability"),
+            "ability": ability,
             "maturity": maturity,
-            "evidence_basis": _field(block, "Evidence basis"),
-            "primary_components": _list_field(block, "Primary components"),
-            "reusable_targets": _list_field(block, "Reusable targets"),
-            "limitation": _field(block, "Limitation"),
-            "missing_piece": _field(block, "Missing piece"),
-            "next_falsifiable_test": _field(block, "Next test"),
+            "evidence_basis": evidence_basis,
+            "primary_components": primary_components,
+            "reusable_targets": reusable_targets,
+            "limitation": limitation,
+            "missing_piece": missing_piece,
+            "next_falsifiable_test": next_test,
             "evidence_state": state,
             "confidence": "medium",
             "source_markdown": "CAPABILITIES.md",
@@ -92,13 +155,15 @@ def parse_search_skills():
     text = (ROOT / "SEARCH_SKILLS.md").read_text(encoding="utf-8")
     heads = list(re.finditer(r"^##\s+([^\n]+)$", text, re.M))
     out = []
-    skip = {"Skill schema", "Empirical attribution rule"}
     for i, m in enumerate(heads):
         title = m.group(1).strip()
-        if title in skip or title == "SEARCH_SKILLS":
-            continue
         block = text[m.end(): heads[i+1].start() if i + 1 < len(heads) else len(text)]
-        skill_name = _field(block, "SKILL NAME") or title
+        # Only sections that explicitly declare a skill become strategy nodes.
+        # Metadata/help sections such as `Search-run v2 fields` must not consume
+        # adaptive-policy allocation as if they were discovery strategies.
+        skill_name = _field(block, "SKILL NAME")
+        if not skill_name:
+            continue
         strategy_id = "STRAT:" + slug(skill_name)
         out.append({
             "strategy_id": strategy_id,
