@@ -192,3 +192,22 @@ Dreamine.Gem (.NET) + rights-clean frozen dialogue/error profile + `bparzella/se
 - CAP-019 source observation applies to bank/payroll feeds: stale/unavailable data cannot establish `no return` or `no transaction`.
 - `sebastienrousseau/bankstatementparser@b3309b78...` is retained only as a negative fixture proving that substring/fuzzy/first-match matching must not enter realized-dollar totals.
 - Result: no new product combination. Existing Commission Payout Assurance is stronger and should now run EXP-003 before another generic reconciliation search.
+
+<!-- INTEGRATOR-R13-2026-09-20T1900-0400 -->
+## Combination delta — 2026-09-20 19:00 ET
+
+### Workforce historical-rule acceptance stack
+`official/customer-owned rule source -> versioned rule snapshot (effective-at + known/approved-at + source/version/hash + scope) -> executable outcome semantics (BLOCK|PREMIUM_PAY|REVIEW|ALLOW) -> RosterSpec hard-lock verification/repair -> receipt with schedule hash + rule bundle hash + solver/verifier revision`.
+A solver can be mathematically correct while the rule bundle is stale, semantically incomplete or non-authoritative; currentness and enforcement remain separate proof planes.
+
+### Payout finality sentinel + authority-preserving remediation
+`event-time earning authority -> local payout success -> independent terminal provider scan -> exact provider contradiction/event gap -> economic reason classification -> compensating ledger -> conditional reopen of original obligation -> independent bank/payroll observation`.
+Provider readback solves terminal-state blindness but does not decide whether money is still owed; generic “reversal” labels are not enough.
+
+### AP safe-writeback provider identity chain
+`exact reverse capacity -> durable logical effect ID -> provider-specific idempotency identity persisted before dispatch -> SDK context reconstructed with the same identity -> ambiguous result = UNKNOWN -> authoritative business-record readback -> APPLIED / proven NOT_APPLIED / UNKNOWN -> proof receipt`.
+A provider may support safe duplicate suppression while an SDK default silently generates a fresh identity after restart.
+
+### Grid evaluator semantic-proof chain
+`first-party dataset bytes/digest -> raw source provenance -> composite event identity -> unique county outage-spell fact grain -> many-to-many spell↔event bridge -> whole-event blocked split -> additive outcome once per spell -> immutable evaluator receipt`.
+Hash integrity and dedupe are both necessary but neither proves the aggregation grain is economically/scientifically correct.

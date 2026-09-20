@@ -136,3 +136,12 @@ Demote categories when adoption stalls, independent evidence fails or a simpler 
 - **RAD-001 Proof-carrying operational software:** independently strengthened by the convergence of TUF/Uptane currentness, in-toto functionary/threshold obligations, Sigstore exact-predicate verification, Ampel signer/applicability/result semantics and the current in-toto SVR result envelope. The important shift is from “signed evidence” to **admissible proof**: current, role-authorized, type-correct, threshold-complete, semantically applicable and durably packaged.
 - **RAD-004 Negative-control infrastructure assurance:** strengthened by a recurring signed-but-wrong-predicate false-green class across adjacent verification surfaces and by the synthetic 8-case proof-admission fixture. Wrong type, SKIP-as-exit-0 and threshold shortfall now join rollback/snapshot/wrong-role as permanent verifier negatives. No score change because this is stronger assurance evidence, not demonstrated adoption acceleration.
 - **Commercial implication:** a Proof Admission Gateway can become a reusable assurance layer across recovery, compliance, consequential financial actions and regulated evidence workflows, but buyer adoption/outcome evidence is still absent; do not convert technical convergence into a market-growth claim.
+
+<!-- INTEGRATOR-R13-2026-09-20T1900-0400 -->
+## Integrator radar note — 2026-09-20 19:00 ET
+No numerical emergence score changed. Four qualitative signals strengthened:
+- **Temporal authority is becoming a reusable application primitive:** effective-at and known-at rule selection belongs beside solver correctness in workforce/payroll/compliance systems.
+- **Evaluator semantics are part of proof:** artifact hashes do not prevent false scores caused by unstable identity or wrong additive grain.
+- **Financial finality is multi-observer and revocable:** local terminal state, provider object state, provider event history, bank/cash location and economic entitlement are distinct planes.
+- **Trusted transitions need typed authority receipts, not self-hashes:** runtime type validation and upstream-verdict provenance are now explicit negative controls for proof-carrying operational software.
+These are architecture/evidence signals only; no adoption or revenue acceleration is inferred.

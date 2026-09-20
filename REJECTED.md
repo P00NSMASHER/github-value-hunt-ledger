@@ -118,3 +118,14 @@ Cross-lane rejection/deprioritization memory. Keep only repeat-prone, safety/pro
 
 ## Central rejection policy
 Do not add every weak repository here. Add only repeat-prone, misleading, safety-sensitive or strategically important failure patterns. A revisit trigger must identify the evidence that would change the decision.
+
+<!-- INTEGRATOR-R13-2026-09-20T1900-0400 -->
+## Negative knowledge delta — 2026-09-20 19:00 ET
+- **Hard-coded compliance number + jurisdiction label != rule authority.** Require source/version/currentness, effective/known-at time, scope and explicit outcome semantics; warnings that still publish are not hard constraints.
+- **Bare USECPO `event_id` != global event identity.** Cross-year reuse is observed; a flat event-correlated row set is not a safe additive fact table and exact-row dedupe does not eliminate event↔spell fan-out.
+- **Reconciliation job != terminal readback.** If the query selects only pending/processing/submitted rows, the system is blind after local success. Webhook replay and direct provider object scans are separate evidence planes.
+- **Provider idempotency != durable application identity.** SDKs may auto-generate/reset request identifiers between calls; a money operation must persist its provider key before dispatch and restore it after restart. `SyncToken`/record versioning is not create-request dedupe.
+- **One-time bill selection != immutable historical evidence.** If the selected measurement can later be edited/deleted and the accepted bill silently recomputes, the original proof chain is not historical.
+- **Schema/protobuf field present != mutation semantics enforced.** Trace `allow_partial`/`required`/atomicity fields into handler use, staging/transaction behavior, rollback and post-state before crediting them.
+- **SAM resource membership != semantic filename/content identity != byte availability.** Preserve all three states separately; HTTP 400 is not proof of permanent deletion without source semantics.
+- **Python type hints/self-hash != authorization.** Unvalidated truthy strings can defeat boolean acknowledgment gates, scalar-string coercion can corrupt scope shape, and a recomputed self-hash does not prove upstream decision provenance/currentness.

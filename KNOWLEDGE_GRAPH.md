@@ -137,3 +137,14 @@ Every central promotion/demotion must answer: which CAP changes, which OPP chang
 
 ## Machine graph mirror
 `intelligence/edges.jsonl` is the canonical structured edge store. New machine edges should preserve source revision and evidence provenance; this Markdown file is the current human-readable synthesis.
+
+<!-- INTEGRATOR-R13-2026-09-20T1900-0400 -->
+## Integrator graph delta — 2026-09-20 19:00 ET
+- `PayrollEngine temporal regulation selection` -> **STRENGTHENS CAP-009** -> `source-backed effective/known-at rule bundle` -> `RosterSpec hard-lock verify/repair` -> **EXP-008 workforce-rule acceptance**.
+- `Jaskeeratr/grid-reliability-analytics@24e59a7...` -> **CHALLENGES prior bare event_id grouping assumption** -> strengthens **CAP-015** -> sharpens **EXP-012** with composite event identity + unique county-spell grain.
+- `stripe-connect-reckon@deb30aab...` -> independent terminal provider observation -> strengthens **CAP-018** -> **EXP-010** lost-post-success-webhook fixture; reason-aware historical payable reopen remains a separate edge.
+- `QuickBooks-V3-Java-SDK@c4d5df...` -> provider mutation identity exists but SDK resets it -> strengthens **CAP-016 / EXP-002** provider-adapter acceptance; durable request identity must be restored explicitly after restart.
+- `cmbautomiser@fea18e1...` -> exact evidence reference + mutable-history failure -> **NEGATIVE_CONTROL EXP-005**; one-time selection is not historical immutability.
+- `caretaker@08b309d...` + `ac-client@132c20a...` + `BroadbandForum/obuspa@59028be...` -> three-way USP Set semantic matrix -> **CAP-014 / EXP-008**; neutral runtime fixture required before conformance claims.
+- SAM first-party historical resource observation for `N6600126Q6264` -> **CAP-011** separates action membership, semantic artifact identity and byte availability; verified membership may coexist with inferred filename and unavailable bytes.
+- Freight Pilot Charter trust review -> **CHALLENGES EXP-001 launch gate** and **CAP-007 admission semantics**: strict JSON types + authority-bound launch-decision receipt are prerequisites to treating `KICKOFF_AUTHORIZED` as trusted.

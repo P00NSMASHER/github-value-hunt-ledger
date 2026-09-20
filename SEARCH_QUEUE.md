@@ -166,3 +166,14 @@ Do not spend the wildcard slot on a familiar saturated family solely because it 
 
 ## Integrator next bottleneck
 The portfolio still has **$0 directly evidenced customer value and $0 directly evidenced revenue**. The highest-value external step remains Freight EXP-001: verified separate environment + one authorized frozen buyer population + one uniquely attributable incumbent miss + actual credit/refund/remittance. Technical work elsewhere should continue only when it makes one of the active experiments cheaper, safer or more falsifiable.
+
+<!-- INTEGRATOR-R13-2026-09-20T1900-0400 -->
+## Integrator queue delta — 2026-09-20 19:00 ET
+1. **P0 Freight pilot gate + external validation:** first harden the Pilot Charter so `KICKOFF_AUTHORIZED` requires strict JSON types and a current authority-bound launch-decision receipt; then stop internal freight discovery and run one explicitly authorized frozen buyer population to actual settlement evidence.
+2. **P1 Grid EXP-012 correctness:** obtain/hash the current first-party OEDI artifact; if byte identity is established, freeze composite event identity + unique county-spell grain + event bridge before any historical scoring. Do not run the old bare-`event_id` evaluator.
+3. **P1 AP EXP-002 provider semantics:** establish authoritative QBO `requestid` retention/expiry and a conservative VendorCredit negative-readback contract; run the process-restart same-request-ID fixture. Do not hunt generic idempotency libraries.
+4. **P1 Payout EXP-010:** join terminal provider scanning to one vertical historical earning/payable by exact payout ID and classify still-owed vs clawback before reopen/re-pay. Do not count generic pending-state polling as finality assurance.
+5. **P1 ScopeSignal EXP-005:** execute immutable-evidence mutation corpus before another RA-bill search. Require accepted bill -> immutable measurement version edge and explicit correction/counter-event.
+6. **P1 CAP-009 workforce authority:** combine PayrollEngine-style effective/knowledge-time selection with RosterSpec verification/repair on a frozen historical rule bundle. Do not treat static compliance settings as authority.
+7. **P2 Protocol pre-FAT:** execute the existing USP/SECS differential fixtures with neutral measurement before discovering a fourth implementation. Caretaker is a negative-control endpoint until runtime evidence exists.
+8. **P2 CaptureBrief EXP-006:** keep `VERIFIED_ACTION_MEMBERSHIP / semantic_identity / byte_state` separate; move to the next frozen solicitation family rather than repeatedly guessing routes for the same unavailable historical object.

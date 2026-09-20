@@ -310,3 +310,11 @@ The top direct-money ranking remains Freight Recovery first, followed by AP/comm
 - **Installed-Base Lab Automation becomes more concrete:** a Clarity Sequencing Handoff Acceptance / upgrade-regression engagement can now start from a production-shaped EPP/run-metric estate plus an independent sample-sheet validator rather than inventing the handoff semantics from scratch.
 - **Grid resilience gains an outcome-priced validation path:** USECPO event outcomes plus separately governed interruption-cost economics can test avoided interruption dollars/crew-hour. Keep below top direct-money opportunities until circularity, rights and held-out reproduction are resolved.
 - No opportunity is commercially validated by this run; `OUTCOMES.md` still has no completed customer/value result that would justify a ranking change based on realized revenue.
+
+<!-- INTEGRATOR-R13-2026-09-20T1900-0400 -->
+## Portfolio movement — 2026-09-20 19:00 ET
+- **#1 Freight Recovery remains rank-1 but its launch gate is temporarily non-green.** The machine-checkable Pilot Charter has a strict-type/provenance defect at `KICKOFF_AUTHORIZED`; fix and adversarially test that boundary before customer-data kickoff. The external commercial blocker remains an authorized frozen buyer population and realized settlement evidence.
+- **Grid Resilience Calibration strengthens technically, rank unchanged.** The evaluator-grain audit materially reduces false-score risk but first-party byte identity and independent/out-of-time evaluation still gate commercialization claims.
+- **Payout Finality / Commission Assurance strengthens technically.** Terminal provider scanning makes a read-only Payout Finality Sentinel more credible, but reason-aware historical entitlement mapping and independent bank/payroll outcome are still required.
+- **Workforce Schedule Rule-Version Acceptance Test becomes a clearer bounded wedge.** Temporal rule-version selection plus deterministic repair can expose schedules that were valid under configured settings but not provably valid under the correct effective/known-at authority; jurisdictional rule substance remains external.
+- No opportunity rank is increased from repository evidence alone. No new realized customer value or revenue is recorded in this integration.
