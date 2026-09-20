@@ -44,6 +44,7 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [x] Delete attempts cannot become `DELETE_CONFIRMED` without explicit external confirmation evidence; ambiguous outcomes remain `DELETE_UNKNOWN`.
 - [x] Source observations distinguish `PRESENT`, `VERIFIED_EMPTY`, and `UNAVAILABLE`; `VERIFIED_EMPTY` requires completeness evidence.
 - [x] Buyer/BU-scoped append-only audit records are hash chained and detect mutation/reordering within the supplied record set.
+- [x] A file-backed scope-bound SQLite audit reference store persists the chain, serializes concurrent appends and blocks direct UPDATE/DELETE mutations.
 - [x] Sources explicitly marked as containing credentials/secrets are rejected from the evidence room.
 
 ### Parsing/untrusted inputs
@@ -79,17 +80,20 @@ Do not treat chat/sandbox ZIPs as the canonical release unless they are reproduc
 - [ ] externally signed release/provenance using an approved signing identity/key;
 - [x] deterministic CycloneDX-shaped SBOM for current pinned repo components + direct CI dependencies;
 - [ ] complete deployment/transitive SBOM if required by buyer diligence;
-- [ ] backup/restore drill;
-- [ ] production audit-log persistence, access control and alerting; application-level append-only hash-chain logic is implemented;
+- [x] semantic reference backup/restore drill restores scoped audit + settlement SQLite stores and re-verifies audit chain, full settlement content hash, realized cents and fee-eligible cents;
+- [ ] deployed backup scheduling/retention/geographic redundancy plus measured RPO/RTO;
+- [x] file-backed scoped reference audit persistence with immutable SQL triggers;
+- [ ] production audit-store service authorization, external immutability/WORM controls and alerting;
 - [ ] customer-specific integration secrets held outside source;
 - [ ] incident-response and breach-notification runbook;
-- [ ] completed security questionnaire / external diligence package.
+- [x] deterministic zero-customer-data technical/commercial diligence ZIP with per-entry SHA-256 and generated provenance/SBOM/unsigned attestation;
+- [ ] buyer-specific completed security questionnaire and externally supplied diligence artifacts.
 
 ## Current claim boundary
 
-The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, tamper-evident application audit records, deterministic release/component provenance, a standards-shaped CycloneDX SBOM and an unsigned in-toto/DSSE payload**.
+The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload and a deterministic zero-customer-data diligence bundle**.
 
-It does **not** prove a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, deletion was executed by a real storage provider, transport/storage encryption is configured for a specific buyer, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
+It does **not** prove a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
 
 ## Commercial launch rule
 

@@ -18,6 +18,9 @@ This document describes the current **controlled-pilot security posture** and th
 - **Data lifecycle state is fail-closed.** Pilot sources become lifecycle census entries; retention defines deletion scope; only explicit external confirmation may produce `DELETE_CONFIRMED`; unresolved delete outcomes remain `DELETE_UNKNOWN`.
 - **Source observation has three states.** `PRESENT`, `VERIFIED_EMPTY`, and `UNAVAILABLE` are distinct; `VERIFIED_EMPTY` requires completeness evidence.
 - **Application audit records are append-only/hash chained.** Buyer/BU-scoped records detect mutation/reordering inside the supplied audit set.
+- **Persistent reference audit storage is scope-bound.** File-backed SQLite serializes append transactions, re-verifies the chain before append, and blocks direct UPDATE/DELETE via triggers.
+- **Reference backup/restore is semantic.** Audit + settlement stores are backed up through SQLite, restored into fresh files, and must reproduce audit-chain head/count, scoped settlement table content hash, realized cents and fee-eligible cents.
+- **Buyer/acquirer diligence packaging is deterministic and customer-data-free.** The ZIP manifest lists every included file with SHA-256 and explicitly declares `customer_data_included=false`.
 - **Standards-shaped supply-chain artifacts are deterministic.** CI produces a CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped payload for later external signing.
 
 ## What this does NOT claim
@@ -29,6 +32,8 @@ The current repository does **not** by itself prove:
 - externally signed release provenance;
 - a complete transitive deployment SBOM (the repository now emits a deterministic partial CycloneDX 1.6-shaped SBOM);
 - independent external timestamp attestation;
+- deployed backup scheduling, geographic redundancy, measured RPO/RTO or externally supervised restore drills;
+- production audit-log service WORM/authorization/alerting controls;
 - SOC 2 / ISO 27001 / other certification.
 
 Those are deployment or external-assurance facts and must not be inferred from repository tests.
@@ -111,3 +116,26 @@ This prevents an unavailable settlement or document source from becoming a false
 `freight/release_attestation.py` creates an in-toto Statement v1-shaped payload in an **unsigned** DSSE envelope. Repository-generated signatures are intentionally forbidden so this payload cannot be mistaken for independently signed provenance.
 
 A production release may later send the deterministic payload to an approved external signing identity/key and record signer/verifier evidence separately.
+
+
+## Persistent audit and restore-proof boundary
+
+`freight/audit_store.py` persists the buyer/BU audit chain in file-backed SQLite. The repository proves transaction-serialized append, scope-bound reads, chain replay and UPDATE/DELETE immutability triggers.
+
+`freight/backup_restore.py` performs a reference restore drill across the audit and settlement databases. It uses SQLite's backup API, restores into fresh files, then verifies:
+- buyer/BU scope;
+- audit record count and chain head;
+- full scoped settlement-table content hash;
+- recovery/settlement/counter/allocation/reversal counts;
+- realized cents;
+- fee-eligible cents.
+
+A matching file checksum alone is not considered restore proof.
+
+This still does not establish a production backup schedule, offsite/geographic redundancy, RPO/RTO, encryption-at-rest configuration or an externally supervised disaster-recovery exercise.
+
+## Diligence bundle
+
+`freight/diligence_bundle.py` produces a deterministic ZIP containing only Freight commercial/security/diligence documentation plus generated provenance, component inventory, partial CycloneDX SBOM and unsigned DSSE evidence.
+
+The bundle manifest contains SHA-256 and byte size for every entry and explicitly states that no customer data is included. It is a diligence package, not a pilot evidence package and not a security certification.
