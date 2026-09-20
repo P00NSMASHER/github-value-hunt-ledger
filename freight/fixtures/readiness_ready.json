@@ -1,0 +1,15 @@
+{
+  "authorization_documented": true,
+  "read_only_access": true,
+  "population_reproducible": true,
+  "incumbent_output_sealable": true,
+  "settlement_observable": true,
+  "material_authority_reconstructable": true,
+  "customer_identity_stable": true,
+  "carrier_identity_stable": true,
+  "retention_defined": true,
+  "deletion_defined": true,
+  "invoice_source_coverage": 1,
+  "authority_source_coverage": 0.96,
+  "shipment_evidence_coverage": 0.92
+}
