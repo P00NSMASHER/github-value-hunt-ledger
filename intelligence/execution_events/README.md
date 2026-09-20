@@ -1,4 +1,4 @@
-# V14 execution events
+# V15 execution events
 
 Each slot has its own optional append-only JSONL log under this directory:
 
@@ -21,7 +21,7 @@ Do not rewrite or delete old events. Append only.
 
 ## Events
 
-- `CLAIM` — acquire the exact assignment snapshot and a lease. New claims are schema 14 and must be either dispatch-bound `generated` claims or explicit `manual_override` claims.
+- `CLAIM` — acquire the exact assignment snapshot and a lease. New lifecycle-aware claims are schema 15 and must be either dispatch-bound `generated` claims or explicit `manual_override` claims.
 - `HEARTBEAT` — extend a live lease. It cannot revive an expired lease.
 - `START` — mark active execution.
 - `COMPLETE` — close the claim and name the V11 `search_run_id` carrying telemetry.
@@ -62,3 +62,17 @@ If a worker intentionally claims a different slot, set:
 Do not fabricate a dispatch ticket for a manual override.
 
 Pre-V14 claim IDs listed in `intelligence/dispatch_policy.json` remain valid historical events.
+
+
+## V15 ticket lifecycle
+
+Primary routed tickets have a soft-stale time and a hard expiry. A generated claim is rejected before its eligibility time or after its hard expiry.
+
+Preferred helpers:
+- primary routed claim: `python tools/ti_worker_claim.py --worker HUNTER-XX`
+- standby takeover after hard expiry: `python tools/ti_worker_claim.py --worker HUNTER-XX --steal`
+- exact ticket: add `--dispatch-ticket DISPATCH:...`
+
+A hard-expired primary ticket is not reclaimed by its stale packet. V15 may instead issue bounded `dispatch_kind: "work_steal"` standby tickets to eligible idle workers. Those claims preserve `parent_dispatch_ticket_id` so the system can separate backup execution from the original primary route.
+
+Legacy V14 history remains valid; no issuance times are fabricated for old tickets.
