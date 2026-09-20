@@ -1,0 +1,17 @@
+{
+  "event_id": "EXEC:000000000000",
+  "event_type": "CLAIM",
+  "timestamp": "2026-09-20T20:00:00Z",
+  "slot_id": "SLOT-01",
+  "claim_id": "CLAIM:000000000000",
+  "worker_id": "HUNTER-01",
+  "assignment_id": "ASSIGN:000000000000:slot-01",
+  "allocator_generation_id": "ALLOCGEN:000000000000",
+  "portfolio_policy_generation_id": "PORTFOLIO:000000000000",
+  "work_item_id": "WORK:seed:000000000000",
+  "assignment_slot_role": "experiment",
+  "assignment_work_kind": "capability_gap",
+  "assignment_source_id": "SEED:gap:cap-013",
+  "assignment_score": 0,
+  "lease_minutes": 120
+}

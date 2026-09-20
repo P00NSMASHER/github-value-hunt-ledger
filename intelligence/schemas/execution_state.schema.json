@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V11 Derived Execution Slot State",
+  "type": "object",
+  "required": [
+    "slot_id",
+    "current_assignment_id",
+    "status",
+    "event_count",
+    "telemetry_status"
+  ],
+  "properties": {
+    "slot_id": {
+      "type": "string",
+      "pattern": "^SLOT-[0-9]{2}$"
+    },
+    "current_assignment_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_work_item_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_slot_role": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_work_kind": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "AVAILABLE",
+        "CLAIMED",
+        "RUNNING",
+        "CLAIMED_SUPERSEDED",
+        "RUNNING_SUPERSEDED",
+        "EXPIRED_AVAILABLE",
+        "RETRYABLE_AVAILABLE",
+        "RELEASED_AVAILABLE",
+        "COMPLETE",
+        "COMPLETE_SUPERSEDED",
+        "FAILED_TERMINAL"
+      ]
+    },
+    "claim_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "worker_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "claimed_assignment_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lease_expires_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "search_run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "telemetry_status": {
+      "enum": [
+        "NOT_APPLICABLE",
+        "PENDING",
+        "MATCHED",
+        "MISSING",
+        "MISMATCH"
+      ]
+    },
+    "event_count": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": true
+}

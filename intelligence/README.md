@@ -442,3 +442,45 @@ New prospective runs use `schema_version: 10` and additionally record:
 - `assignment_score`.
 
 The V10 learner runs before V9 allocation in CI. When evidence is insufficient, `allocator_policy_effective.json` is identical in slot composition to the human-authored baseline policy.
+
+
+## V11 hunt execution control plane
+
+V11 turns the V9/V10 plan into claimable work with explicit execution state.
+
+Source-of-truth execution events live under `intelligence/execution_events/`, one append-only JSONL log per slot. Current state is derived; old events are never rewritten.
+
+Supported transitions:
+- `CLAIM` — acquire the exact assignment snapshot and lease;
+- `HEARTBEAT` — extend a live lease;
+- `START` — mark execution active;
+- `COMPLETE` — close with a schema-v11 search run;
+- `FAIL` — close retryable or terminal;
+- `RELEASE` — voluntarily return the slot.
+
+Concurrency model:
+- slot event files are independent, reducing cross-hunter conflicts;
+- connector-based claims use GitHub blob-SHA optimistic concurrency;
+- one active claim per slot;
+- one active claim per worker by default;
+- overlapping claims for the same assignment are rejected;
+- heartbeats cannot revive expired leases.
+
+Generated products:
+- `execution_state.jsonl` — current derived state for all 14 slots;
+- `execution_claim_history.jsonl` — immutable derived claim history;
+- `EXECUTION_BOARD.md` — current human-readable execution board;
+- `EXECUTION_DEBT.md` — expiry/retry/supersession/telemetry debt;
+- `execution_metrics.json` — machine-readable execution summary.
+
+Completion is inseparable from telemetry. A COMPLETE event is invalid unless its search run is schema >=11 and exactly matches the claim's worker, slot, assignment, allocator generation, portfolio policy, work item, role, work kind, source ID and score.
+
+New allocated V11 runs additionally record:
+- `execution_claim_id`;
+- `execution_slot_id`;
+- `execution_worker_id`.
+
+Local helper:
+`python tools/ti_execution_event.py claim|heartbeat|start|complete|fail|release ...`
+
+For connector-driven claims, follow `intelligence/execution_events/README.md` and use the exact GitHub file SHA for atomic updates.
