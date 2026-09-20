@@ -100,3 +100,87 @@ Hunters write materially inspected results into the relevant files under `hunter
 - 46: Rare algorithms, benchmarks & unusual technical methods
 - 47: Wildcard cross-domain opportunity hunter
 - 48: Cross-hunt integrator
+
+
+# Knowledge-to-Value Layer
+
+The hunt is not complete when a repository is found. The system must convert research into reusable capability, a ranked commercial opportunity, a falsifiable experiment and eventually a recorded outcome.
+
+## Additional shared indexes
+- `CAPABILITIES.md` — canonical inventory of reusable abilities the system can now credibly perform.
+- `TECHNOLOGY_RADAR.md` — emerging capability categories, evidence signals and commercial implications.
+- `KNOWLEDGE_GRAPH.md` — edges linking repositories/data -> capabilities -> opportunities -> experiments -> outcomes.
+- `EXPERIMENTS.md` — prioritized falsifiable tests that convert research into technical or economic evidence.
+- `OUTCOMES.md` — completed experiment/customer/value results used to train future search priority.
+- `SEARCH_SKILLS.md` — reusable discovery methods that have produced evidence-backed value.
+
+## Closed-loop operating model
+
+RESEARCH
+-> VERIFIED FINDING
+-> CAPABILITY
+-> COMBINATION
+-> OPPORTUNITY
+-> EXPERIMENT
+-> OUTCOME
+-> SEARCH-POLICY UPDATE
+
+A new finding is more valuable when it:
+1. creates or materially strengthens a reusable capability;
+2. closes a missing edge in a high-value combination;
+3. improves a top opportunity;
+4. creates a cheaper/faster falsifiable experiment;
+5. changes an existing experiment's success criteria;
+6. explains a recorded success or failure.
+
+## Hunter value handoff
+Every hunter run should report, when applicable:
+- CAPABILITY DELTA — what can the system now do that it could not do before?
+- GRAPH EDGE — which existing capability/opportunity/experiment becomes stronger or weaker?
+- RADAR SIGNAL — what emerging category gains or loses evidence?
+- EXPERIMENT IMPACT — which current experiment should change?
+- COMMERCIAL IMPACT — does this alter buyer, wedge, economics, build compression or moat?
+- NEGATIVE KNOWLEDGE — what should not be searched/built again?
+
+Hunters keep durable evidence in their assigned catalogs. They should not race one another editing the central value files.
+
+## Integrator duties
+Hunt 15 / MASTER Integrator owns central synthesis and should update, when evidence changes:
+- `MASTER.md`
+- `DATASETS.md`
+- `COMPONENTS.md`
+- `CAPABILITIES.md`
+- `TECHNOLOGY_RADAR.md`
+- `KNOWLEDGE_GRAPH.md`
+- `COMBINATIONS.md`
+- `OPPORTUNITIES.md`
+- `EXPERIMENTS.md`
+- `OUTCOMES.md`
+- `REJECTED.md`
+- `SEARCH_QUEUE.md`
+- `SEARCH_SKILLS.md`
+
+The integrator should promote capability knowledge rather than repository count, and use recorded experiment/outcome evidence to raise or lower future search priority.
+
+## Portfolio KPIs
+Track over time:
+- validated reusable capabilities;
+- capabilities reused across two or more products;
+- experiments completed;
+- experiments surviving adversarial tests;
+- opportunities reaching authorized external validation;
+- opportunities reaching paid validation;
+- realized revenue/customer value traced to the research system;
+- build-time compression actually observed;
+- MASTER findings that materially change an experiment;
+- search skills producing successful outcomes;
+- search strategies repeatedly producing dead ends.
+
+## Stage-gate rule
+Do not launch another product simply because a new repository is exciting. First ask whether it:
+- strengthens an existing experiment;
+- creates a better experiment;
+- materially changes a capability/opportunity;
+- or invalidates an existing assumption.
+
+The desired endpoint is not a larger repository ledger. It is a self-improving private technology-intelligence and venture-discovery system.
