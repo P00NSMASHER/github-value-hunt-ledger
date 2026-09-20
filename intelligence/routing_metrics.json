@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "routing_generation_id": "ROUTING:3e5134fca2f2",
+  "worker_profile_generation_id": "WORKERS:90e860630e42",
+  "registered_workers": 14,
+  "active_locked_workers": 1,
+  "routed_workers": 13,
+  "unassigned_workers": 0,
+  "claimable_slots": 13,
+  "routed_slots": 13,
+  "candidate_edges": 169
+}

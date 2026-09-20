@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "worker_profile_generation_id": "WORKERS:90e860630e42",
+  "registered_workers": 14,
+  "measured_workers": 1,
+  "sparse_workers": 8,
+  "unmeasured_workers": 5,
+  "mapped_runs": 14,
+  "unmapped_runs": 0,
+  "active_claim_workers": 1
+}
