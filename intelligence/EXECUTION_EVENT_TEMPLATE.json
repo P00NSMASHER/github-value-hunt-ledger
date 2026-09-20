@@ -13,5 +13,14 @@
   "assignment_work_kind": "capability_gap",
   "assignment_source_id": "SEED:gap:cap-013",
   "assignment_score": 0,
-  "lease_minutes": 120
+  "lease_minutes": 120,
+  "claim_schema_version": 14,
+  "routing_mode": "generated",
+  "routing_generation_id": "ROUTING:000000000000",
+  "worker_profile_generation_id": "WORKERS:000000000000",
+  "routing_learning_generation_id": "ROUTELEARN:000000000000",
+  "routing_score": 0,
+  "dispatch_ticket_id": "DISPATCH:000000000000",
+  "dispatch_generation_id": "DISPATCHGEN:000000000000",
+  "route_override_reason": null
 }
