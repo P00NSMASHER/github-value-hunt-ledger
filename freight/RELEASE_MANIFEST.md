@@ -56,6 +56,7 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/DATA_READINESS_DIAGNOSTIC.md`
 - `freight/PILOT_PROTOCOL.md`
 - `freight/PILOT_LAUNCH_GATE.md`
+- `freight/LAUNCH_AUTHORIZATION.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
@@ -175,6 +176,27 @@ A buyer/data readiness result of READY is therefore necessary but not sufficient
 to accept confidential customer data.
 
 The manual route no longer trusts an operator-supplied boolean. It requires a structured VERIFIED separate-environment manifest with SHA-256 evidence receipts, a configuration fingerprint, verifier role/date metadata and an unexpired <=90-day validity window. The repository currently contains only a DRAFT template, so that route remains CONDITIONAL.
+
+## Launch authorization binding
+
+A READY launch decision is now converted into a deterministic receipt that binds:
+- engagement ID;
+- buyer/business unit;
+- data path + required tenant/parser semantics;
+- readiness result;
+- release provenance;
+- component-rights registry;
+- rights evidence;
+- exact deployment/separate-environment evidence;
+- authorization expiry.
+
+The data-room manifest requires the matching unexpired receipt before source
+ingestion, and the final pilot package re-verifies and carries that same receipt
+hash.
+
+**Launch authorization → data-room manifest → pilot package** is therefore one
+content-bound chain. This is application-level binding, not an external trusted
+signature/timestamp.
 
 ## Commercial state
 
