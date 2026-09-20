@@ -34,7 +34,7 @@ jobs:
       - name: Hunter/model contracts
         run: cd production && python -m pytest -q test_prototype.py
       - name: Freight commercial proof contracts
-        run: PYTHONPATH=. python -m pytest -q freight/test_contracts.py freight/test_settlement_store.py freight/test_release_gate.py freight/test_gap_registry.py freight/test_readiness.py freight/test_pilot_reporting.py freight/test_deal_economics.py freight/test_outcome_adapter.py freight/test_commercial_learning.py freight/test_input_guard.py freight/test_pilot_package.py freight/test_release_provenance.py freight/test_synthetic_rehearsal.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_contracts.py freight/test_settlement_store.py freight/test_release_gate.py freight/test_gap_registry.py freight/test_readiness.py freight/test_pilot_reporting.py freight/test_deal_economics.py freight/test_outcome_adapter.py freight/test_commercial_learning.py freight/test_input_guard.py freight/test_pilot_package.py freight/test_release_provenance.py freight/test_audit_ledger.py freight/test_data_lifecycle.py freight/test_sbom.py freight/test_release_attestation.py freight/test_synthetic_rehearsal.py
       - name: Controlled-pilot rights gate
         run: PYTHONPATH=. python freight/release_gate.py --stage pilot
       - name: Canonical freight gap register
@@ -49,3 +49,11 @@ jobs:
         run: PYTHONPATH=. python freight/release_provenance.py --verify /tmp/freight-release-provenance.json
       - name: Generate component inventory
         run: PYTHONPATH=. python freight/release_provenance.py --components > /tmp/freight-component-inventory.json
+      - name: Generate deterministic CycloneDX SBOM
+        run: PYTHONPATH=. python freight/sbom.py > /tmp/freight-cyclonedx.json
+      - name: Verify deterministic CycloneDX SBOM
+        run: PYTHONPATH=. python freight/sbom.py --verify /tmp/freight-cyclonedx.json
+      - name: Generate unsigned DSSE attestation payload
+        run: PYTHONPATH=. python freight/release_attestation.py > /tmp/freight-attestation.json
+      - name: Verify unsigned DSSE attestation payload
+        run: PYTHONPATH=. python freight/release_attestation.py --verify /tmp/freight-attestation.json
