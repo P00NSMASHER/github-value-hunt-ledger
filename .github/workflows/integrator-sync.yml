@@ -1,0 +1,67 @@
+name: Integrator sync helper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/integrator_sync_payload.json'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Preserve triggered payload and update checkout
+        shell: bash
+        run: |
+          cp .github/integrator_sync_payload.json /tmp/integrator_sync_payload.json
+          git pull --rebase origin main
+      - name: Apply append and replacement payload
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path('/tmp/integrator_sync_payload.json').read_text())
+          marker = payload['marker']
+          changed = []
+
+          for rel, addition in payload.get('append', {}).items():
+              path = Path(rel)
+              current = path.read_text()
+              if marker in current:
+                  continue
+              path.write_text(current.rstrip() + '\n\n' + marker + '\n' + addition.strip() + '\n')
+              changed.append(rel)
+
+          for rel, replacement in payload.get('replace', {}).items():
+              path = Path(rel)
+              current = path.read_text()
+              desired = replacement.rstrip() + '\n'
+              if current == desired:
+                  continue
+              path.write_text(desired)
+              changed.append(rel)
+
+          Path('.integrator_sync_changed').write_text('\n'.join(changed) + ('\n' if changed else ''))
+          PY
+      - name: Commit integrator updates
+        shell: bash
+        run: |
+          if [ ! -s .integrator_sync_changed ]; then
+            echo 'Nothing new to apply.'
+            exit 0
+          fi
+          git config user.name 'github-value-hunt-integrator'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          while IFS= read -r file || [ -n "$file" ]; do git add "$file"; done < .integrator_sync_changed
+          git commit -m 'Integrator portfolio synthesis and search direction'
+          git pull --rebase origin main
+          git push
