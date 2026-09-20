@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-20",
+  "stage_gate": "EXP-001",
+  "rule": "A freight search may run only when the named registered gap has status ACTIVE_SEARCH, search_allowed=true, and the requested trigger is allowlisted. All other gaps require customer data, diligence, or internal engineering rather than repository hunting.",
+  "gaps": [
+    {
+      "gap_id": "FRT-EXP001-001",
+      "title": "First authorized frozen buyer population through realized settlement",
+      "status": "BLOCKED_EXTERNAL",
+      "search_allowed": false,
+      "allowed_triggers": [],
+      "owner_lane": "commercial",
+      "commercial_effect": "Blocks proof of willingness to pay, incremental incumbent miss, realized recovery, and annual conversion.",
+      "evidence_to_close": [
+        "buyer authorization",
+        "frozen population manifest",
+        "buyer-owned truth freeze",
+        "sealed incumbent output",
+        "later credit/refund/remittance with unique allocation"
+      ],
+      "stop_condition": "One buyer population completes the blind protocol through settlement."
+    },
+    {
+      "gap_id": "FRT-RIGHTS-001",
+      "title": "Trenova hosted/SaaS and change-of-control scope",
+      "status": "ACTIVE_DILIGENCE",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "RIGHTS_DILIGENCE"
+      ],
+      "owner_lane": "diligence",
+      "commercial_effect": "Blocks representing the current separately licensed Trenova revision as cleared for hosted annual deployment or transferable acquisition.",
+      "evidence_to_close": [
+        "executed license/permission text confirming hosted/SaaS rights",
+        "change-of-control/assignment treatment",
+        "sublicensing/redistribution scope if needed"
+      ],
+      "stop_condition": "Rights registry is updated from actual executed permission documents."
+    },
+    {
+      "gap_id": "FRT-RIGHTS-002",
+      "title": "Opstrax hosted/SaaS and transferability scope",
+      "status": "ACTIVE_DILIGENCE",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "RIGHTS_DILIGENCE"
+      ],
+      "owner_lane": "diligence",
+      "commercial_effect": "Creates buyer/acquirer discount if the physical-evidence plane depends on a non-transferable or narrow permission.",
+      "evidence_to_close": [
+        "executed permission text",
+        "hosted-service scope",
+        "assignment/change-of-control treatment"
+      ],
+      "stop_condition": "Rights registry records documented scope rather than inference."
+    },
+    {
+      "gap_id": "FRT-SEC-001",
+      "title": "Tenant and business-unit isolation negative tests",
+      "status": "ACTIVE_INTERNAL",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "SECURITY_DILIGENCE"
+      ],
+      "owner_lane": "engineering",
+      "commercial_effect": "Blocks use of confidential multi-customer data in a shared production service.",
+      "evidence_to_close": [
+        "cross-tenant read/write negative tests",
+        "tenant/BU scope enforced at repository/service boundary",
+        "audit logs for denied cross-scope attempts"
+      ],
+      "stop_condition": "Isolation tests pass in the actual pilot data service."
+    },
+    {
+      "gap_id": "FRT-SEC-002",
+      "title": "Hostile document/parser isolation and resource limits",
+      "status": "ACTIVE_INTERNAL",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "SECURITY_DILIGENCE"
+      ],
+      "owner_lane": "engineering",
+      "commercial_effect": "Blocks safely accepting arbitrary buyer PDF/XML/EDI/CSV files at scale.",
+      "evidence_to_close": [
+        "file size/depth/time limits",
+        "XXE/network resolution disabled",
+        "CSV formula neutralization",
+        "parser sandbox or low-privilege boundary",
+        "malformed-input regression corpus"
+      ],
+      "stop_condition": "Hostile-input negative suite passes in the deployed parsing path."
+    },
+    {
+      "gap_id": "FRT-REL-001",
+      "title": "Canonical reproducible freight artifact, SBOM, and signed provenance",
+      "status": "ACTIVE_INTERNAL",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "SECURITY_DILIGENCE"
+      ],
+      "owner_lane": "release",
+      "commercial_effect": "Reduces buyer/acquirer confidence because chat/sandbox artifacts are not a reproducible product release.",
+      "evidence_to_close": [
+        "committed build recipe",
+        "SBOM",
+        "artifact checksums",
+        "source-to-artifact provenance",
+        "signed release or equivalent controlled attestation"
+      ],
+      "stop_condition": "A canonical artifact can be reproduced from a pinned source commit and verified independently."
+    },
+    {
+      "gap_id": "FRT-AUTH-001",
+      "title": "Buyer-specific external accessorial/addendum authority connector",
+      "status": "DORMANT_TRIGGERED",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "PAYING_CUSTOMER_GAP",
+        "AUTHORITY_CONNECTOR"
+      ],
+      "owner_lane": "freight",
+      "commercial_effect": "May block a specific paid pilot if its controlling addendum/tariff cannot be acquired or normalized by existing paths.",
+      "evidence_to_close": [
+        "specific buyer/carrier source format",
+        "failed existing connector trace",
+        "exact authority fields/effective/supersession requirements"
+      ],
+      "stop_condition": "Activate only after a real pilot supplies a concrete source the current stack cannot ingest."
+    },
+    {
+      "gap_id": "FRT-SETTLE-001",
+      "title": "Buyer-specific settlement/remittance readback connector",
+      "status": "DORMANT_TRIGGERED",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "PAYING_CUSTOMER_GAP",
+        "SETTLEMENT_CONNECTOR"
+      ],
+      "owner_lane": "freight",
+      "commercial_effect": "May block proof of realized recovery for a specific buyer payment/provider stack.",
+      "evidence_to_close": [
+        "specific settlement source/provider/export",
+        "failed existing allocation/readback trace",
+        "required IDs/amount/currency/reversal semantics"
+      ],
+      "stop_condition": "Activate only after a real pilot identifies an unsupported settlement source."
+    },
+    {
+      "gap_id": "FRT-FALSIFY-001",
+      "title": "Independent falsifier for a concrete production disagreement",
+      "status": "DORMANT_TRIGGERED",
+      "search_allowed": false,
+      "allowed_triggers": [
+        "INDEPENDENT_FALSIFIER"
+      ],
+      "owner_lane": "verification",
+      "commercial_effect": "Used only when existing independent comparators materially disagree on a money-bearing case.",
+      "evidence_to_close": [
+        "frozen disputed input",
+        "documented disagreement between current independent engines",
+        "specific semantic question requiring adjudication"
+      ],
+      "stop_condition": "Activate only for a reproduced disagreement; stop when one independent test resolves or bounds it."
+    }
+  ]
+}
