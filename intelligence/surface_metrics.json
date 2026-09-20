@@ -1,6 +1,21 @@
 {
   "exact_rows": [
     {
+      "id": "SURFACE:github-repository-search",
+      "runs": 4,
+      "deep_inspected": 14,
+      "retained_count": 10,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 4,
+      "experiment_runs": 4,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub repository search"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-repository-search"
+    },
+    {
       "id": "SURFACE:github-code-search",
       "runs": 4,
       "deep_inspected": 11,
@@ -14,21 +29,6 @@
         "GitHub code search"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-code-search"
-    },
-    {
-      "id": "SURFACE:github-repository-search",
-      "runs": 3,
-      "deep_inspected": 11,
-      "retained_count": 8,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 3,
-      "experiment_runs": 3,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "labels_seen": [
-        "GitHub repository search"
-      ],
-      "surface_family_id": "SURFACE_FAMILY:github-repository-search"
     },
     {
       "id": "SURFACE:github-repository-source-tests-schema-history",
@@ -226,6 +226,21 @@
       "surface_family_id": "SURFACE_FAMILY:ecosystem-adjacency"
     },
     {
+      "id": "SURFACE:exact-head-actions-status",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "exact-head Actions status"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
+    },
+    {
       "id": "SURFACE:frappe-erpnext-ecosystem-adjacency",
       "runs": 1,
       "deep_inspected": 3,
@@ -256,6 +271,21 @@
       "surface_family_id": "SURFACE_FAMILY:github-code-search"
     },
     {
+      "id": "SURFACE:github-code-source-tests-schema-history",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub code/source/tests/schema/history"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
+    },
+    {
       "id": "SURFACE:github-repository-source-tests",
       "runs": 1,
       "deep_inspected": 3,
@@ -269,6 +299,21 @@
         "GitHub repository source/tests"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
+    },
+    {
+      "id": "SURFACE:low-attention-adapter-search",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "low-attention adapter search"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:low-attention-public-works-archaeology",
@@ -329,6 +374,21 @@
         "organization lineage traversal"
       ],
       "surface_family_id": "SURFACE_FAMILY:ecosystem-adjacency"
+    },
+    {
+      "id": "SURFACE:package-publication-verification",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "package/publication verification"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:repository-source-tests-ci",
@@ -544,23 +604,44 @@
   "family_rows": [
     {
       "id": "SURFACE_FAMILY:github-source-inspection",
-      "runs": 8,
-      "deep_inspected": 21,
-      "retained_count": 18,
+      "runs": 9,
+      "deep_inspected": 24,
+      "retained_count": 20,
       "master_promoted_count": 0,
-      "capability_touch_runs": 8,
-      "experiment_runs": 8,
+      "capability_touch_runs": 9,
+      "experiment_runs": 9,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "name": "GitHub source inspection",
       "exact_surface_ids": [
         "SURFACE:exact-head-actions-license-verification",
+        "SURFACE:exact-head-actions-status",
         "SURFACE:github-exact-head-source",
         "SURFACE:github-repository-source-tests",
         "SURFACE:github-repository-source-tests-schema-history",
         "SURFACE:repository-source-tests",
         "SURFACE:repository-source-tests-ci",
         "SURFACE:schema-persistence-tracing"
+      ]
+    },
+    {
+      "id": "SURFACE_FAMILY:github-history-archaeology",
+      "runs": 6,
+      "deep_inspected": 19,
+      "retained_count": 13,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 6,
+      "experiment_runs": 6,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "name": "GitHub history archaeology",
+      "exact_surface_ids": [
+        "SURFACE:github-code-source-tests-history",
+        "SURFACE:github-code-source-tests-schema-history",
+        "SURFACE:github-issue-archaeology",
+        "SURFACE:low-attention-public-works-archaeology",
+        "SURFACE:repository-source-tests-history",
+        "SURFACE:tests-and-commit-issue-archaeology"
       ]
     },
     {
@@ -603,37 +684,37 @@
       ]
     },
     {
-      "id": "SURFACE_FAMILY:github-history-archaeology",
-      "runs": 5,
-      "deep_inspected": 16,
-      "retained_count": 11,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 5,
-      "experiment_runs": 5,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "name": "GitHub history archaeology",
-      "exact_surface_ids": [
-        "SURFACE:github-code-source-tests-history",
-        "SURFACE:github-issue-archaeology",
-        "SURFACE:low-attention-public-works-archaeology",
-        "SURFACE:repository-source-tests-history",
-        "SURFACE:tests-and-commit-issue-archaeology"
-      ]
-    },
-    {
       "id": "SURFACE_FAMILY:github-repository-search",
-      "runs": 3,
-      "deep_inspected": 11,
-      "retained_count": 8,
+      "runs": 4,
+      "deep_inspected": 14,
+      "retained_count": 10,
       "master_promoted_count": 0,
-      "capability_touch_runs": 3,
-      "experiment_runs": 3,
+      "capability_touch_runs": 4,
+      "experiment_runs": 4,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "name": "GitHub repository search",
       "exact_surface_ids": [
         "SURFACE:github-repository-search"
+      ]
+    },
+    {
+      "id": "SURFACE_FAMILY:other",
+      "runs": 3,
+      "deep_inspected": 8,
+      "retained_count": 5,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "name": "Other/uncategorized",
+      "exact_surface_ids": [
+        "SURFACE:cross-project-identity-failure-comparison",
+        "SURFACE:direct-web-github-domain-search",
+        "SURFACE:low-attention-adapter-search",
+        "SURFACE:low-attention-zero-star-implementation-audit",
+        "SURFACE:package-publication-verification"
       ]
     },
     {
@@ -652,23 +733,6 @@
         "SURFACE:official-microsoft-learn-documentation",
         "SURFACE:official-sap-help-documentation",
         "SURFACE:official-vendor-robot-server-schema-store"
-      ]
-    },
-    {
-      "id": "SURFACE_FAMILY:other",
-      "runs": 2,
-      "deep_inspected": 5,
-      "retained_count": 3,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 2,
-      "experiment_runs": 2,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "name": "Other/uncategorized",
-      "exact_surface_ids": [
-        "SURFACE:cross-project-identity-failure-comparison",
-        "SURFACE:direct-web-github-domain-search",
-        "SURFACE:low-attention-zero-star-implementation-audit"
       ]
     },
     {
@@ -709,6 +773,8 @@
   "unmapped_exact_surfaces": [
     "SURFACE:cross-project-identity-failure-comparison",
     "SURFACE:direct-web-github-domain-search",
-    "SURFACE:low-attention-zero-star-implementation-audit"
+    "SURFACE:low-attention-adapter-search",
+    "SURFACE:low-attention-zero-star-implementation-audit",
+    "SURFACE:package-publication-verification"
   ]
 }

@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "routing_generation_id": "ROUTING:1834132d84e1",
-  "worker_profile_generation_id": "WORKERS:e06f6efd8c13",
+  "routing_generation_id": "ROUTING:ff524bcab4b2",
+  "worker_profile_generation_id": "WORKERS:dde32346eaff",
   "routing_learning_generation_id": "ROUTELEARN:3427dfe228b7",
   "routing_learning_mode": "observe_only_insufficient_evidence",
   "registered_workers": 14,
-  "active_locked_workers": 2,
-  "routed_workers": 12,
+  "active_locked_workers": 0,
+  "routed_workers": 14,
   "unassigned_workers": 0,
-  "claimable_slots": 12,
-  "routed_slots": 12,
-  "candidate_edges": 144
+  "claimable_slots": 14,
+  "routed_slots": 14,
+  "candidate_edges": 196
 }

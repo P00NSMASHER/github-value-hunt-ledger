@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "dispatch_generation_id": "DISPATCHGEN:3c7a1c700fc4",
+  "current_tickets": 14,
+  "history_tickets": 14,
+  "routed_workers": 14,
+  "locked_workers": 0,
+  "unassigned_workers": 0
+}

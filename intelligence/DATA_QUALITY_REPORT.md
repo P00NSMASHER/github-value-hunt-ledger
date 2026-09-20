@@ -2,27 +2,27 @@
 
 This report measures whether the learning loop has enough structured evidence to support empirical search-policy updates.
 
-- Search runs: **15**
+- Search runs: **17**
 - Structured outcomes: **1**
-- Mean legacy/core run completeness: **89.7%**
-- Runs below 70% completeness: **1**
+- Mean legacy/core run completeness: **87.8%**
+- Runs below 70% completeness: **2**
 - Structural issues detected: **1**
 - Capabilities without an explicit next falsifiable test: **0**
-- V4 runs: **3** (core V4 instrumentation complete: **2**)
-- Runs mapped to a controlled search objective (explicit or reviewed legacy map): **14/15**
-- Candidate dispositions normalized to controlled reasons (direct or reviewed alias): **20**
+- V4 runs: **5** (core V4 instrumentation complete: **3**)
+- Runs mapped to a controlled search objective (explicit or reviewed legacy map): **16/17**
+- Candidate dispositions normalized to controlled reasons (direct or reviewed alias): **23**
 
 ## Missing recommended legacy/core fields
 
 | Field | Runs missing |
 |---|---:|
-| queries | 7 |
-| candidate_dispositions | 5 |
-| search_surfaces | 4 |
-| candidate_count | 1 |
-| deep_inspected | 1 |
-| retained_count | 1 |
-| master_promoted_count | 1 |
+| queries | 8 |
+| candidate_dispositions | 6 |
+| search_surfaces | 5 |
+| candidate_count | 2 |
+| deep_inspected | 2 |
+| retained_count | 2 |
+| master_promoted_count | 2 |
 
 ## Structural issues
 

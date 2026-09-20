@@ -3,7 +3,7 @@
 Objectives are broader than query families. They let multiple domain-specific queries teach the same reusable research question while preserving each literal query and QF identity.
 
 - Defined objectives: **12**
-- Objectives touched by measured runs: **6**
+- Objectives touched by measured runs: **7**
 - Unclassified measured runs: **1**
 
 | Objective | Runs | Inspected | Retained | MASTER | Capability-touch runs | Experiment runs | Outcome eq. |
@@ -14,6 +14,7 @@ Objectives are broader than query families. They let multiple domain-specific qu
 | OBJ:identity-lineage — Identity and correlation lineage | 2 | 5 | 3 | 0 | 2 | 2 | 0.00 |
 | OBJ:exactly-once-settlement — Exactly-once settlement | 2 | 3 | 3 | 0 | 2 | 2 | 1.00 |
 | OBJ:independent-evaluation — Independent evaluation | 1 | 3 | 2 | 0 | 1 | 1 | 0.00 |
+| OBJ:protocol-regression — Protocol regression | 1 | 3 | 2 | 0 | 1 | 1 | 0.00 |
 | OBJ:unclassified — Unclassified | 1 | 2 | 2 | 0 | 1 | 1 | 0.00 |
 
 ## Interpretation

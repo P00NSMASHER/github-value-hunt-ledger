@@ -11,7 +11,7 @@
     "unrouted": 0,
     "retrospective": 0,
     "unmatched_claim": 0,
-    "pre_v12": 15
+    "pre_v12": 17
   },
   "min_global_generated_completions": 12
 }

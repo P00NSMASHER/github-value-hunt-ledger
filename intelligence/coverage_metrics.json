@@ -1,68 +1,68 @@
 {
   "schema_version": 1,
-  "measured_runs": 14,
-  "deep_inspected_total": 36,
-  "structured_candidate_dispositions": 22,
-  "unique_structured_candidate_repositories": 20,
-  "profiled_unique_repositories": 20,
+  "measured_runs": 15,
+  "deep_inspected_total": 39,
+  "structured_candidate_dispositions": 25,
+  "unique_structured_candidate_repositories": 23,
+  "profiled_unique_repositories": 23,
   "missing_profile_repositories": [],
   "profile_coverage_rate": 1.0,
   "dimension_metrics": {
     "language_family": {
-      "profiled_repositories": 20,
-      "classified_repositories": 20,
+      "profiled_repositories": 23,
+      "classified_repositories": 23,
       "classification_rate": 1.0,
       "reliable": true
     },
     "star_band": {
-      "profiled_repositories": 20,
-      "classified_repositories": 20,
+      "profiled_repositories": 23,
+      "classified_repositories": 23,
       "classification_rate": 1.0,
       "reliable": true
     },
     "age_band": {
-      "profiled_repositories": 20,
-      "classified_repositories": 20,
+      "profiled_repositories": 23,
+      "classified_repositories": 23,
       "classification_rate": 1.0,
       "reliable": true
     },
     "lifecycle": {
-      "profiled_repositories": 20,
+      "profiled_repositories": 23,
       "classified_repositories": 0,
       "classification_rate": 0.0,
       "reliable": false
     },
     "owner_type": {
-      "profiled_repositories": 20,
-      "classified_repositories": 20,
+      "profiled_repositories": 23,
+      "classified_repositories": 23,
       "classification_rate": 1.0,
       "reliable": true
     },
     "source_type": {
-      "profiled_repositories": 20,
-      "classified_repositories": 13,
-      "classification_rate": 0.65,
+      "profiled_repositories": 23,
+      "classified_repositories": 16,
+      "classification_rate": 0.6956521739130435,
       "reliable": true
     },
     "package_ecosystem": {
-      "profiled_repositories": 20,
-      "classified_repositories": 16,
-      "classification_rate": 0.8,
+      "profiled_repositories": 23,
+      "classified_repositories": 18,
+      "classification_rate": 0.782608695652174,
       "reliable": true
     },
     "protocol_family": {
-      "profiled_repositories": 20,
-      "classified_repositories": 8,
-      "classification_rate": 0.4,
+      "profiled_repositories": 23,
+      "classified_repositories": 11,
+      "classification_rate": 0.4782608695652174,
       "reliable": false
     },
     "geography_scope": {
-      "profiled_repositories": 20,
+      "profiled_repositories": 23,
       "classified_repositories": 0,
       "classification_rate": 0.0,
       "reliable": false
     }
   },
-  "undercovered_searchable_targets": 18,
+  "undercovered_searchable_targets": 17,
   "instrumentation_debt_targets": 15
 }

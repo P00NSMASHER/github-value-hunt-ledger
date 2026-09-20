@@ -175,8 +175,8 @@
         "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
         "STRAT:first-party-production-source-triangulation"
       ],
-      "runs_needed": 5,
-      "inspections_needed": 20,
+      "runs_needed": 4,
+      "inspections_needed": 17,
       "matched_overlap": 2
     },
     {

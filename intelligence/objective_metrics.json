@@ -73,6 +73,18 @@
       "fractional_outcome_equivalents": 0
     },
     {
+      "search_objective_id": "OBJ:protocol-regression",
+      "name": "Protocol regression",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
       "search_objective_id": "OBJ:unclassified",
       "name": "Unclassified",
       "runs": 1,
