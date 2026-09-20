@@ -1,34 +1,23 @@
-MARKER: <!-- INTEGRATOR-R11-LABOR-PAYROLL-2026-09-20T0106-0400 -->
+MARKER: <!-- INTEGRATOR-R11-SLA-BENCHMARK-2026-09-20T0109-0400 -->
 
 === APPEND COMBINATIONS.md ===
-## Labor-to-Payroll Assurance v2 — roster -> physical actuals -> approved OT -> payroll -> settlement
-- Add `WilfredTinega/Upande-TA@af15de1fb844afd81221829c3be07dba8b5d98df` as a rare installed-base biometric actual-time adapter between planned schedule truth and payroll posting. Pair RosterSpec/minimum-disruption schedule truth -> customer-authorized ZKTeco/ERPNext check-in events -> Upande overtime/Additional Salary linkage -> existing payroll-reconciliation/accounting/payment evidence.
-- Buyer/problem: ERPNext/Frappe employers using biometric clocks face missed/duplicate punches, overnight-shift ambiguity, direction errors and approved-vs-paid overtime drift that can become payroll leakage or review labor.
-- First paid wedge: **Biometric Time-to-Payroll Acceptance Audit** on one closed period. Freeze device/check-in facts, shift assignment, manager-approved OT, Additional Salary/payroll output and later payment; report exceptions with source lineage rather than silently correcting payroll.
-- Critical boundary from source inspection: Upande's direction normalizer intentionally writes `log_type` directly with `frappe.db.set_value`, bypassing document validation, linked-attendance guards and duplicate checks for the flip itself. Its heuristic can turn a trailing IN into OUT or the first all-OUT scan into IN. That is useful repair logic, but **a repaired direction is inferred state, not physical ground truth**.
-- Hard invariant: automatic direction repairs must remain separately labeled `inferred/repaired`; they cannot by themselves establish compensable hours or a recoverable payroll discrepancy. Hard-dollar findings require corroborating shift/policy/approval/payroll/payment authority.
-- Validation: synthetic fixtures for duplicate punch, lost scan, overnight shift, trailing IN, all-OUT, employee/device remap, OT overlap/cancellation and a deliberately misleading scan sequence. Compare raw-only, repaired and independently adjudicated truth; measure false payroll-dollar creation as a first-class failure metric.
+## Support / SLA Acceptance refinement — synthetic customer-to-credit truth
+- Add `tenurehq/orgforge@1da5e4b51e22f4a82db4b003becc9cb42cfec34b` as a deterministic synthetic gold-truth generator beneath the existing contact-center/support assurance stack. It can link incident duration -> Zendesk/customer escalation -> Salesforce account/opportunity risk -> invoice SLA-credit line item without using real customer tickets.
+- Use it as an **acceptance corpus**, not the production source of contractual SLA authority. Seed cases immediately below, at and above thresholds, multi-customer incidents, escalation/no-escalation and exact expected credit dollars; then challenge runtime support/agent workflows against those facts.
+- Hard invariant: synthetic SLA formulas validate software behavior only. A customer credit in production requires the controlling customer agreement, actual incident/customer impact evidence and billing/credit settlement state.
+- Status: useful benchmark component below direct-money P0 lanes; do not create another generic support platform around it.
 
 === APPEND COMPONENTS.md ===
-### WilfredTinega/Upande-TA — biometric actual-time / overtime-to-payroll bridge
-- Revision: `af15de1fb844afd81221829c3be07dba8b5d98df`.
-- Integrator score after source-level recheck: **27/30 — A5 B4 C5 D5 E3 F5**. Hunter score was 28/30; evidence/completeness is reduced because the check-in normalizer deliberately mutates direction with direct DB writes that bypass normal document validation/linked-attendance/duplicate guards, making independent provenance essential.
-- Rights: MIT repository code. ZKTeco hardware/PUSH SDK, Node-RED, ERPNext/Frappe services, customer biometric/time records and labor/payroll policy remain separately governed.
-- Capability inspected: duplicate check-in prevention on normal inserts; shift-aware/overnight grouping and heuristic direction normalization; overtime period/overlap checks; linked submitted `Additional Salary` creation and cancellation for bulk overtime.
-- Important caveat: the overtime override bypasses some native duplicate-date/overtime-type/max-hours checks for bulk-generated slips and trusts precomputed amounts. The formula/policy is not labor-law authority. Repaired check-in direction and precomputed OT amount must be independently approved/validated before payroll-dollar conclusions.
-- Integration: Labor-to-Payroll Assurance v2; RosterSpec planned state -> raw biometric facts -> labeled repair/adjudication -> OT approval -> Additional Salary/payroll -> accounting/payment proof.
-- Promotion gate: pass a synthetic adversarial clock corpus with no false compensable-hours creation and prove expected->actual->approved->paid lineage on an authorized closed period. Keep out of MASTER until then.
-
-=== APPEND OPPORTUNITIES.md ===
-## Biometric Time-to-Payroll Acceptance Audit
-- Core: planned roster + immutable/raw biometric events + shift-aware exception/adjudication + approved overtime + payroll artifact + payment evidence.
-- Buyer: ERPNext/Frappe employers, payroll service firms and multi-site operators with ZKTeco-style clocks.
-- First paid wedge: one closed payroll period; quantify missing/duplicate punches, inferred-direction exceptions, approved-but-unpaid OT, unsupported OT and payroll-review time.
-- Revenue path: fixed diagnostic -> recurring pre-payroll exception assurance -> broader labor/payroll reconciliation.
-- Safety/integrity: biometric/person records are customer-controlled sensitive data; use only explicitly authorized customer data. Automated scan-direction repair is never sufficient evidence by itself for a wage/payment conclusion.
+### tenurehq/orgforge — deterministic cross-system support/SLA corpus generator
+- Revision: `1da5e4b51e22f4a82db4b003becc9cb42cfec34b`.
+- Score: **23/30 — A3 B3 C4 D4 E4 F5**.
+- Rights: MIT repository code; named SaaS APIs/trademarks and production customer data remain separate.
+- Capability: deterministic enterprise simulation produces linked support/CRM/observability/invoice artifacts; inspected tests cover incident-to-customer linkage, SLA-breach days, exact-threshold no-credit behavior, negative invoice credits and NPS degradation.
+- Integration: synthetic oracle for support/SLA agent/release acceptance before any authorized production pilot.
+- Next action: vendor-neutral 30-case corpus with exact escalation and credit-dollar truth. Keep below MASTER because it is a test-data/evaluation component rather than a high-ACV vertical operating system.
 
 === APPEND SEARCH_QUEUE.md ===
-## Labor-to-payroll refinement from Hunter 32
-- Use `WilfredTinega/Upande-TA@af15de1fb844afd81221829c3be07dba8b5d98df` as the current biometric installed-base adapter, but treat its direct-DB direction repair as **inference requiring review/corroboration**, not source truth. Build a synthetic adversarial corpus around duplicate/lost scans, overnight shifts, trailing IN/all-OUT, remaps and OT overlap/cancellation; measure false compensable-hour and false payroll-dollar creation.
-- Search next only for authoritative time-clock event provenance, manager exception approval/receipt, payroll-provider posted/paid evidence and current customer/labor-policy authority. Stop generic attendance/payroll CRUD and generic biometric integrations unless they add an independently verifiable device-event or settlement invariant.
-- Keep Upande at COMPONENT/combination level despite clearing 24; promote only if the repair/adjudication layer proves no false-money behavior and one authorized closed-period trace reaches paid payroll.
+## Support/SLA acceptance refinement from Hunter 37
+- `tenurehq/orgforge@1da5e4b51e22f4a82db4b003becc9cb42cfec34b` is sufficient as the current synthetic support/SLA-credit oracle. Build below/at/above-threshold and multi-customer cases and compare agent/runtime output against exact expected escalation + credit dollars.
+- Stop generic FSM/helpdesk discovery. Search only for authoritative SLA/contract versioning, actual customer-impact attribution, credit issuance/settlement evidence or a runtime failure mode the current support stack cannot falsify.
+- `azaharizaman/nexus-field-service@2394bc7bcd8a42390c57732361ab4de4b9fbc713` remains rejected: advertised test breadth is a pending test plan, not passing evidence, and it adds no rare entitlement/proof/payment invariant.
