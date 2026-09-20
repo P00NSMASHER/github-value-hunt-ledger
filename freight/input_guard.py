@@ -97,9 +97,7 @@ def inspect_input(
     if len(data) > policy.max_file_bytes:
         reasons.append("file_too_large")
 
-    if not reasons or all(
-        r in {"unsafe_filename", "file_too_large"} for r in reasons
-    ):
+    if not reasons:
         try:
             if ext == ".pdf":
                 if not data.startswith(b"%PDF-"):
