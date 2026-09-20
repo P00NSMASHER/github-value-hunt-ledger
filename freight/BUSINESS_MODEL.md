@@ -78,6 +78,21 @@ Use `freight/deal_economics.py` before quoting delivery scope.
 
 Success fees remain optional upside after settlement proof; they are never part of the qualification math.
 
+## Commercial learning and anti-overfit gate
+
+Use `freight/commercial_learning.py` to learn from completed paid work without letting one buyer or synthetic data rewrite the model.
+
+- The current price bands and **50% fixed-fee gross-margin target remain priors** until enough direct external evidence exists.
+- Synthetic rehearsals, pipeline estimates, proposed prices and potential savings are excluded.
+- A repricing/scope review is not unlocked until there are at least **5 unique buyer cohorts**, **5 paid engagements**, and usable fixed-fee margin evidence from **5 unique buyers**.
+- Repeated engagements from one buyer are collapsed to buyer-level medians before portfolio medians are calculated.
+- Diagnostic → pilot and pilot → annual conversion are measured by buyer cohort, not raw engagement count, and reported with Wilson 95% intervals.
+- Success-fee/recovery upside is not used to calibrate fixed-fee economics.
+- The calibrator may recommend a review; it never changes prices automatically.
+- Strong margins do not trigger automatic discounts. Preserve pricing power until broader buyer evidence supports a change.
+
+These are internal anti-overfit controls, not claimed market benchmarks.
+
 ## Expansion sequence
 
 1. Paid data-readiness diagnostic.
