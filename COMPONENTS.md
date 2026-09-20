@@ -121,6 +121,15 @@ For every component preserve exact revision, actual published rights/provenance,
 - Score: **27/30**.
 - Next test: pass/fail/error/waive/missing-result corpus; collection failure may never become pass.
 
+### spree/spree — provider-settlement ambiguity and payout-proof plane
+- Revision: `2a419d42e86dea30a69a3c5b7764185cea132b3f`.
+- Published rights: BSD-3-Clause; payment-provider APIs/accounts and customer payout data remain separately governed.
+- Capability: claim-before-send seller earnings, explicit distinction between definite provider refusal and ambiguous/unknown outcome, pending-until-confirmed settlement, persisted provider payout IDs plus actual settled amount/currency, reversal-first netting, minimum/carry-forward behavior and concurrent-sweep protection.
+- Targets: Partner / Commission Payout Assurance, marketplaces, rebates and other money-send workflows under CAP-018.
+- Integrator score: **27/30 — A4 B5 C5 D3 E5 F5**. It remains a component rather than a MASTER leader because the semantics are highly useful but not rare enough to justify expanding the elite positive-training set.
+- Limitation: provider-specific settlement timing, FX, bank confirmation and account/authorization behavior remain external; “send requested” is not “settled.”
+- Next test: vendor-neutral synthetic matrix for definite refusal, timeout/unknown, duplicate retry/callback, confirmed send, final settled amount/currency, reversal and concurrent sweep.
+
 ## Strong challengers — test before elevating
 
 ### amrit-kumar/fintechcore — payment lifecycle / ledger / reconciliation reference
