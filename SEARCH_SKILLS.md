@@ -117,4 +117,27 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - `success` emitted on unexpected or empty source responses;
   - unstable identity keys splitting one evolving record into unrelated rows;
   - schema tests that miss fee/value/status/date semantic swaps.
-- NEXT IMPROVEMENT: apply the triad to a non-government ingestion domain such as billing feeds or scientific instruments and measure whether it reduces false promotion versus broad “data platform” search.
+- NEXT IMPROVEMENT: Task **39** supplied a cross-domain confirmation of the broader executable-invariant idea in virtual commissioning. Continue testing whether the same intersection strategy transfers cleanly outside ingestion before renaming or broadening this skill centrally.
+
+## Fail-open boundary archaeology
+- SKILL NAME: Fail-open boundary archaeology
+- WHEN TO USE: A verifier, recovery drill, evidence package, compliance checker, audit engine or trust boundary claims that a state/artifact is valid, complete, current or safe.
+- PROCEDURE:
+  1. Find the exact transition or verdict that emits PASS/VERIFIED/HEALTHY/TRUSTED.
+  2. Search source, tests and commit history for the ambiguous boundary states most likely to become false green: missing evidence, stale/newer-unreadable evidence, stripped completeness material, empty results, parser faults, environment/sandbox faults, checksum/signature failures, partial restores and UNKNOWN/SKIP handling.
+  3. Require explicit negative behavior for those states. Prefer FAIL or an honest UNKNOWN/INCOMPLETE that cannot unlock the trusted transition; treat silent skip/success as a promotion blocker.
+  4. Inspect selection logic as well as validation logic: a verifier can fail open by silently choosing an older readable artifact while hiding an invalid newer one, or by accepting a subset whose completeness was never proven.
+  5. Check whether strict mode exists where optional completeness/trust material becomes mandatory, and whether malformed/tampered fixtures exercise it.
+  6. Keep integrity, completeness, freshness and external trust as separate claims; do not let one verified dimension imply the others.
+- WHY IT WORKED: Benchmark Experiment Tasks **44 and 45** independently confirmed the method. Task 44 found strong recovery-verifier evidence in explicit missing-manifest/checksum/UNKNOWN/latest-selection regressions rather than backup-success prose. Task 45 transferred the same method to portable evidence bundles: missing completeness material visibly downgraded the result instead of becoming verified, while hostile/malformed vectors exercised fail-closed behavior.
+- EXAMPLES:
+  - Benchmark Task 44: `cybertec-postgresql/pg_hardstorage@b47541b7e1cea69ce6ec63b26e154eb25fc4ca91`
+  - Benchmark Task 45: `capxholding/swarrm-verify@d3e52abfaf2b0025db87b5aa491db2001902267f`
+- FAILURE MODES:
+  - treating a documented `UNKNOWN` enum as evidence without tracing the control flow that emits it;
+  - checking only happy-path restore/signature tests;
+  - assuming a valid signed subset proves global completeness;
+  - assuming the newest selected readable artifact means no newer failed/unreadable evidence exists;
+  - interpreting an infrastructure fault as benign SKIP;
+  - conflating cryptographic integrity with source truth or trusted-key policy.
+- NEXT IMPROVEMENT: apply the method to money-bearing audit/settlement engines and source-health collectors, then measure whether it reduces false-promotion rate on benchmark reject tasks 46–50.
