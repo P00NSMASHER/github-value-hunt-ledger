@@ -5,6 +5,8 @@ from ti_common import INTEL, load_jsonl
 
 REG=json.loads((INTEL/"worker_registry.json").read_text(encoding="utf-8"))
 POL=json.loads((INTEL/"routing_policy.json").read_text(encoding="utf-8"))
+LEARN_POL=json.loads((INTEL/"routing_learning_policy.json").read_text(encoding="utf-8"))
+LEARN_MET=json.loads((INTEL/"routing_learning_metrics.json").read_text(encoding="utf-8"))
 workers={w["worker_id"]:w for w in REG["workers"]}
 profiles=load_jsonl("worker_profiles.jsonl")
 routes=load_jsonl("worker_routing.jsonl")
@@ -44,6 +46,9 @@ active_workers={s.get("worker_id") for s in state if s.get("status") in {"CLAIME
 for w in active_workers:
     if route_by_worker[w]["route_status"]!="LOCKED": raise SystemExit(f"active worker {w} not locked")
 
+learn_gen=LEARN_MET.get("routing_learning_generation_id")
+if not learn_gen: raise SystemExit("routing learning generation missing")
+
 packet_by_worker={p["worker_id"]:p for p in packets}
 for r in routes:
     if r["route_status"]=="ROUTED":
@@ -51,6 +56,8 @@ for r in routes:
         if not p: raise SystemExit(f"routed worker {r['worker_id']} missing claim packet")
         if p["slot_id"]!=r["slot_id"] or p["assignment_id"]!=r["assignment_id"]:
             raise SystemExit(f"claim packet mismatch for {r['worker_id']}")
+        if p.get("routing_learning_generation_id")!=learn_gen:
+            raise SystemExit(f"claim packet learning-generation mismatch for {r['worker_id']}")
     elif r["worker_id"] in packet_by_worker:
         raise SystemExit(f"non-routed worker {r['worker_id']} has claim packet")
 
@@ -58,6 +65,14 @@ routing_ids={r["routing_generation_id"] for r in routes}
 profile_ids={r["worker_profile_generation_id"] for r in routes}
 if len(routing_ids)!=1 or len(profile_ids)!=1: raise SystemExit("routing/profile generation drift")
 if metrics.get("routing_generation_id")!=next(iter(routing_ids)): raise SystemExit("routing metrics generation mismatch")
+if metrics.get("routing_learning_generation_id")!=learn_gen: raise SystemExit("routing metrics learning-generation mismatch")
+max_pos=float(LEARN_POL.get("max_positive_adjustment",3.0))
+max_neg=float(LEARN_POL.get("max_negative_adjustment",2.0))
+for n,r in enumerate(routes,1):
+    if r.get("routing_learning_generation_id")!=learn_gen: raise SystemExit(f"worker_routing.jsonl:{n}: learning-generation drift")
+    learned=float((r.get("score_components") or {}).get("routing_learning") or 0)
+    if learned>max_pos+1e-9 or learned<-max_neg-1e-9: raise SystemExit(f"worker_routing.jsonl:{n}: learned adjustment out of bounds")
+    if LEARN_MET.get("mode")!="adaptive" and abs(learned)>1e-9: raise SystemExit(f"worker_routing.jsonl:{n}: nonzero learned adjustment in observe-only mode")
 
 registered=set(workers)
 for n,r in enumerate(runs,1):
