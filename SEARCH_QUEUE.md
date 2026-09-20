@@ -102,3 +102,9 @@ Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, basic fuzzy 
 5. Recovery Proof positive + negative adversarial matrix.
 6. CaptureBrief DoD rule-currentness and forecast-to-actual benchmark.
 7. Lab/industrial/broadband/permit challengers only after their focused held-out tests.
+
+<!-- INTEGRATOR-R11-LATE2-2026-09-20T0042-0400 -->
+## Late-run refinements from concurrent hunter commits
+- **Finance/accounting:** do not hunt more generic ledgers. Differential-test Recurso operational-event posting against Summae close truth on the same synthetic month, then route any novel authority gaps into the sparse tax/accounting catalog. Search only for missing bank/provider settlement evidence, authoritative current policy packs or hard failure cases the pair cannot represent.
+- **Industrial migration:** `UA-.NETStandard` closes much of the generic .NET OPC UA migration-tool gap. Seek customer-like migration fixtures, independent endpoint incompatibilities, NodeSet/companion-model drift and secure session/subscription failure evidence — not another OPC UA client/server implementation.
+- **Trusted data ingress:** Floe is the current contract/quarantine reference. Search further only when a source format or replay/lineage failure materially blocks a top money/evidence stack; generic ETL/data-contract tools are deprioritized.

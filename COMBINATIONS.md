@@ -311,3 +311,16 @@ This overlay supersedes older version labels where they conflict. It intentional
 - Industrial gas: `NiketanSP/CylinderManagementSystem@78a27f75ee849e1d33fa059122e913eb7dbe814c` supplies serialized shell purchase/status/fill/distribution/invoice/outstanding-payment semantics. Pair safety/inspection and delivery/empty-return proof; first wedge is cylinder-returnables + receivables reconciliation.
 - Commercial linen: `JaroslawBolejko/HotelLinenManagerV2@381ef0a3081f7b01a695f11fdd13454b469aacd8` supplies hotel↔laundry service documents, weights/rates/tax/invoice authority. Pair deeper route/lot/custody evidence; first wedge is completed-but-uninvoiced and weight/rate discrepancy audit.
 - Keep both below MASTER until one buyer-authorized custody→invoice→payment population proves measurable dollars.
+
+<!-- INTEGRATOR-R11-LATE2-2026-09-20T0042-0400 -->
+## Late-run cross-vertical combination — Money-State Integrity v1
+- Components: operational billing/usage/invoice/payment events from `recurso-dev/recurso@b071318ff9b349e83daa92e6a5e0c5873664421e` -> independent accounting/close recomputation in `Superheld/summae@9c5292af99bab9716723b82fd221a56f91ab4581` -> structured-invoice/identity evidence where relevant -> provider/bank/payment/GL settlement evidence. AP, OpenPartner, telecom, utility and other vertical engines can feed this generic accounting boundary instead of each inventing separate ledger truth.
+- Buyer/problem: finance teams may know an operational system billed or paid something but still cannot cheaply prove the event became the correct balanced, non-duplicated journal/period-close state.
+- First paid wedge: one authorized frozen month, replay `usage/order/receipt/refund/payment -> invoice/credit -> journal -> close`, deliberately inject duplicate/missing/unbalanced/locked-period failures and compare the independent result with the customer GL/subledger.
+- Commercial shape: fixed-price Close & Ledger Integrity Diagnostic -> recurring month-end assurance -> vertical recovery work on validated exceptions.
+- Hard invariant: event presence, invoice issuance, journal posting, period close and cash settlement are distinct facts. Demo tax/nexus/rate content is never statutory authority without a current controlling source.
+
+## Late-run industrial refinement — OPC UA .NET migration acceptance
+- `OPCFoundation/UA-.NETStandard@37b552254e8da434514c87d8185c1595c03c4063` supplies an official current .NET migration analyzer plus stateful subscription-transfer/republish/reconnect regression knowledge.
+- Combine the 1.5.378→2.0 migration with independent S2OPC/open62541/node-opcua endpoints and the existing Pre-FAT evidence harness. Deliver a source migration diff plus secure-channel/session/subscription/PubSub regression report, not an OPC Foundation certification claim.
+- Promotion gate: one frozen sample app with planted API/session/subscription/certificate failures, measured manual-fix time and defects caught before rollout.

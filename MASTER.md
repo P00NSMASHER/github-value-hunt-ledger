@@ -681,7 +681,7 @@ The following entries cleared the normal 24/30 bar **and materially improve an a
 - Integrity boundary: contract entitlement, notice, waiver and payment-right conclusions remain external authoritative evidence; application state alone is not legal entitlement.
 
 ### automat-it/project-discovery-toolkit
-- Commit: `8d46d765` (exact inspected revision recorded in hunter 15; preserve the full SHA from that catalog when referenced in downstream artifacts).
+- Commit: `8d46d7651e0d948397b37ce73ea63a7898ee4935`.
 - Rights: repository public provenance recorded in hunter 15; user's standing separate commercial permission applies to repository-owned code. Database engines, storage, hosted infrastructure and customer production data remain separate.
 - Score: **29/30 — A5 B5 C5 D5 E5 F4**.
 - Capability: multi-engine full-restore verification across PostgreSQL, MySQL, SQL Server and related estates with strict source != target, measured RTO, queryability, object/row parity, engine-native integrity checks and per-table/checksum evidence. The repository explicitly does **not** prove PITR merely because a full restore succeeds.
@@ -702,3 +702,21 @@ The following entries cleared the normal 24/30 bar **and materially improve an a
 
 ### Promotion restraint this pass
 High-scoring `PermitBuild`, `curatore-v2`, `BroadbandForum/usp-test`, `module-plc-emulator`, `Attestwire/en16931`, `Resolve_api`, `ICARUS-PJM-Dataset`, `LienGuard`, `pyfao56`, STORCITO and other 27–29/30 discoveries remain in COMPONENTS/DATASETS/COMBINATIONS/OPPORTUNITIES until they prove incremental buyer value or are better classified as source/comparator infrastructure. No existing MASTER leader was demoted on the evidence reviewed in this run.
+
+<!-- INTEGRATOR-R11-LATE2-2026-09-20T0042-0400 -->
+## Late-run promotion — generalized accounting truth
+
+### Superheld/summae — deterministic accounting/close oracle
+- Commit: `9c5292af99bab9716723b82fd221a56f91ab4581`.
+- Rights: MIT for repository-owned code plus the user's standing separate commercial permission. Jurisdiction packs, statutory/tax authority and external accounting/regulatory data remain independently governed and must be current before jurisdiction-specific conclusions.
+- Score: **29/30 — A5 B5 C5 D5 E5 F4**.
+- Capability: append-only double-entry accounting engine with deterministic posting policies, invoicing/AP/AR, trial balance, balance sheet/P&L/cash flow, FX, hard period close, inventory costing, fixed assets, bank reconciliation, close checklist and versioned jurisdiction-policy packs. PHP and Node implementations target a shared language-neutral conformance suite with canonical JSON, decimal money, injected clock/IDs and journal-derived reporting.
+- Buyer/problem: controllers, finance-engineering teams, audit/recovery firms and vertical SaaS vendors need an independent way to prove operational money events reconcile into a correct GL and closed period rather than trusting stored balances or one application.
+- Monetization / first paid wedge: **Monthly Close / Ledger Integrity Diagnostic** — ingest an authorized frozen GL/subledger period, independently recompute balances and close controls, flag unexplained posting differences/period-lock/FX/inventory/asset anomalies and return a traceable exception pack.
+- Why it beats alternatives: it is a jurisdiction-neutral deterministic accounting truth layer plus cross-language conformance, reusable across AP, billing, commission, utility, telecom and other recovery products.
+- Integrity boundary: repository permission does not make a jurisdiction policy pack authoritative. Hard-dollar findings require source transaction authority and later accounting/payment disposition.
+
+### Late-run restraint
+- `recurso-dev/recurso@b071318ff9b349e83daa92e6a5e0c5873664421e` also scored **29/30** and is kept as the operational billing-event/immutable-ledger component beneath Summae rather than promoted as a second overlapping MASTER accounting leader.
+- `OPCFoundation/UA-.NETStandard@37b552254e8da434514c87d8185c1595c03c4063` scored **29/30** and is kept as the strongest current .NET OPC UA migration/conformance component pending a cross-stack buyer-facing regression.
+- `malon64/floe@9a0bbf1f2f4647f5b9304a2ebcff3e79182a1beb` scored **28/30** and remains shared trusted-ingress infrastructure rather than a standalone portfolio leader.

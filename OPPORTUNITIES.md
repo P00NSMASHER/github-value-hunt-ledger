@@ -184,3 +184,12 @@ The strongest path remains a frozen customer-authorized blind population carried
 - **Industrial Gas Returnables Proof-to-Cash:** serialized cylinder -> fill -> distribution/customer custody -> return -> invoice -> receivable/payment.
 - **Commercial Linen Custody-to-Cash:** scheduled pickup/count/weight -> processing/return -> accepted service -> rate/tax -> invoice/payment.
 - **Facilities Warranty Leakage:** work order/repair spend -> warranty/service-contract coverage -> receipt/document/claim state -> vendor/manufacturer recovery outcome. `sassanix/Warracker` is useful evidence plumbing but remains below MASTER at 23/30.
+
+<!-- INTEGRATOR-R11-LATE2-2026-09-20T0042-0400 -->
+## Late-run challenger — Money-State Integrity / Close Assurance
+- Core: Recurso operational billing-event ledger + Summae independent deterministic accounting/close oracle.
+- Buyer: controllers, subscription/usage-billing finance engineering, audit/recovery firms and vertical SaaS operators.
+- First paid wedge: one-month read-only close diagnostic; replay authorized usage/order/invoice/credit/payment/journal state and identify source-linked missing, duplicated, unbalanced or period-lock violations.
+- Revenue path: fixed diagnostic -> recurring month-end assurance -> vertical recovery/controls work on validated exceptions.
+- Why it matters: this can become the accounting truth boundary underneath AP, commission, telecom, utility and marketplace assurance instead of building a separate ledger interpretation in every vertical.
+- Promotion discipline: Recurso remains COMPONENTS; Summae is the single promoted generalized accounting leader. Tax/jurisdiction packs require independent current-authority validation.

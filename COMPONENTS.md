@@ -222,3 +222,30 @@ For each entry record:
 - Integration: Lab Automation v5 vendor-control plane beside SLIMS and normalized outputs.
 - Rights: MIT repository code; Thermo runtime/services/trademarks/vendor ecosystem remain separately governed.
 - Next action: dummy/authorized method round-trip with version mismatch and unsupported-field negative cases.
+
+<!-- INTEGRATOR-R11-LATE2-2026-09-20T0042-0400 -->
+## Late-run reusable components — financial integrity and migration
+
+### recurso-dev/recurso — immutable billing-event/ledger boundary
+- Revision: `b071318ff9b349e83daa92e6a5e0c5873664421e`.
+- Score: **29/30**.
+- Rights: Apache-2.0 repository code; tax/nexus data, payment processors and legal authority are separate.
+- Capability: subscriptions, usage/meter/tiered pricing, invoicing, credits, payments/dunning/tax plus immutable double-entry journal; inspected invariant tests cover balanced journals, tenant/project isolation, idempotent posting and duplicate prevention.
+- Integration: operational billing source under Summae's independent GL/close oracle; useful across telecom/utility/SaaS/revenue-assurance products.
+- Next action: synthetic usage→invoice→payment→journal benchmark with duplicate/missing/unbalanced failures and a provider-neutral export schema.
+
+### OPCFoundation/UA-.NETStandard — official .NET OPC UA migration/regression substrate
+- Revision: `37b552254e8da434514c87d8185c1595c03c4063`.
+- Score: **29/30**.
+- Rights: OPC Foundation MIT License 1.00 for repository code. OPC specifications, CTT/certification tooling/marks, separately licensed NodeSets/companion assets and customer code remain separate.
+- Capability: full .NET OPC UA client/server/PubSub/GDS/complex-type implementation with a 1.x→2.0 migration analyzer (26 rules/fixes) and current regression knowledge around transferred-subscription notification recovery, republish, sequence wrap and reconnect/session behavior.
+- Integration: Industrial Virtual Commissioning / Pre-FAT migration lane; falsify upgraded apps against independent S2OPC/open62541/node-opcua endpoints.
+- Next action: fixed migration corpus including subscription transfer/republish, session reactivation, secure-channel renewal, certificate/auth changes and PubSub.
+
+### malon64/floe — trusted ingress/quarantine contract engine
+- Revision: `9a0bbf1f2f4647f5b9304a2ebcff3e79182a1beb`.
+- Score: **28/30**.
+- Rights: MIT; external storage/services and customer/source data remain separate.
+- Capability: Rust/Polars multi-format trusted-layer ingestion with declarative header/schema/row/type/null/PK checks, accepted/rejected quarantine, manifests/JSON reports, PII masking and OpenLineage identities/replay.
+- Integration: place after extraction and before freight/AP/CaptureBrief/ScopeSignal money or evidence decisions so schema/key defects cannot silently enter the authoritative pipeline.
+- Next action: adversarial multi-format benchmark with broken headers/types/nulls/duplicate keys and replayed cloud identities.
