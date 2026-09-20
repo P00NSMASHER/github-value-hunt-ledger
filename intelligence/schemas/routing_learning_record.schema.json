@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V13 Routing Learning Adjustment",
+  "type": "object",
+  "required": [
+    "routing_learning_generation_id",
+    "worker_id",
+    "dimension",
+    "context_key",
+    "worker_runs",
+    "baseline_runs",
+    "baseline_distinct_workers",
+    "worker_mean_utility",
+    "baseline_mean_utility",
+    "residual",
+    "evidence_weight",
+    "adjustment",
+    "eligible_for_routing",
+    "evidence_state"
+  ],
+  "properties": {
+    "routing_learning_generation_id": {
+      "type": "string",
+      "pattern": "^ROUTELEARN:[a-f0-9]{12}$"
+    },
+    "worker_id": {
+      "type": "string",
+      "pattern": "^HUNTER-(0[1-9]|1[0-4])$"
+    },
+    "dimension": {
+      "enum": [
+        "role",
+        "work_kind",
+        "strategy",
+        "objective",
+        "experiment"
+      ]
+    },
+    "context_key": {
+      "type": "string"
+    },
+    "worker_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "worker_deep_inspected": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "worker_valid_outcome_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "baseline_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "baseline_distinct_workers": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "worker_mean_utility": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "baseline_mean_utility": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "residual": {
+      "type": "number",
+      "minimum": -1,
+      "maximum": 1
+    },
+    "evidence_weight": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "adjustment": {
+      "type": "number"
+    },
+    "eligible_for_routing": {
+      "type": "boolean"
+    },
+    "evidence_state": {
+      "enum": [
+        "INSUFFICIENT",
+        "ELIGIBLE"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
