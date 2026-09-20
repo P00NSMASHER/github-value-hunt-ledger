@@ -28,6 +28,7 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 ### AP Assurance
 - mgilbir/formalis -> IMPLEMENTS CAP-008.
 - cmdrvl/canon -> IMPLEMENTS CAP-002.
+- opensanctions/nomenklatura@844dba09fafc8512dc3ce241f44aa5415b367029 -> STRENGTHENS CAP-002 with durable POSITIVE/NEGATIVE/UNSURE judgements and reversible cluster correction; Canon remains the promoted-version production-registry/replay gate.
 - CAP-001 + CAP-002 + CAP-007 + CAP-008 + CAP-016 -> ENABLES AP Leakage Assurance -> TESTED_BY EXP-002.
 
 ### Commission Assurance
@@ -50,10 +51,13 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 - GSA/GSA-Acquisition-FAR -> IMPLEMENTS CAP-011.
 - fedspendingtransparency/usaspending-api -> IMPLEMENTS CAP-011.
 - fedspendingtransparency/data-act-broker-backend -> IMPLEMENTS CAP-011.
+- opensanctions/nomenklatura@844dba09fafc8512dc3ce241f44aa5415b367029 -> STRENGTHENS CAP-002 for durable reviewed negative identity knowledge; external source datasets remain separately governed.
+- slicedearth/contract-delta-au@630d1903507e6f5e47adaf1c690c9d6d4363af54 -> STRENGTHENS CAP-011 with deterministic procurement version-history/diff/run-failure architecture; it is an Australian-procurement implementation pattern and does NOT establish U.S. SAM semantics or authority.
 - CAP-002 + CAP-007 + CAP-011 -> ENABLES CaptureBrief FAR-Deviation Readiness -> TESTED_BY EXP-006.
 
 ### Permit Intelligence
 - adamleap02/PermitBuild -> IMPLEMENTS CAP-012.
+- slicedearth/contract-delta-au@630d1903507e6f5e47adaf1c690c9d6d4363af54 -> CHALLENGES/STRENGTHENS the general version-lineage pattern for public-data sources where latest-row truth is insufficient; permit semantics remain separately validated by PermitBuild.
 - CAP-002 + CAP-012 -> ENABLES Permit-to-Development Opportunity Intelligence -> TESTED_BY EXP-009.
 
 ### Lab Automation / Sequencing Operations
@@ -83,12 +87,17 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 
 ### Industrial Pre-FAT
 - Gaskony-Ignition/module-plc-emulator -> IMPLEMENTS CAP-014.
+- CodeMaru-Dreamine/Dreamine.Gem@82604d6f03c1e95e0558de5c757989b27cd4a3d6 -> STRENGTHENS CAP-014 with a second stateful industrial protocol family: host/equipment E30/GEM behavior over HSMS/TCP, frozen-profile state, alarms/events/remote commands/spooling/error behavior. It DEPENDS_ON separately governed SEMI standards/current equipment profiles and is not itself conformance proof.
 - CAP-014 -> ENABLES Industrial Pre-FAT / Virtual Commissioning -> TESTED_BY EXP-008.
 
 ### Prediction Credibility
 - owgreen-dev/grid-crunch -> IMPLEMENTS CAP-015.
 - savabs/queue_attrition -> STRENGTHENS CAP-015.
 - CAP-015 -> ENABLES Queue Materialization Intelligence.
+
+### Verifier-gated research production
+- ThousandBirdsInc/chidori@223bb8779f63822c3e63a9a4347dda7483a02158 -> CHALLENGES/STRENGTHENS the staged verifier-gated production architecture with mediated side-effect journaling, no-live replay, divergence detection and crash/pause resume. No reusable CAP node is promoted yet because the shadow evaluation was non-authoritative, tests were inspected rather than independently rerun and filesystem/S3 lease semantics are advisory.
+- Next evidence gate: recorded-run no-live replay plus crash/resume, approval-fail-closed and duplicate-driver cases on a storage backend with strong single-writer lease semantics.
 
 ## Graph maintenance rule
 Every MASTER promotion must answer:
