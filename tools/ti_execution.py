@@ -40,6 +40,11 @@ def read_events():
 def build_execution_state(write=True, now=None):
     now=now or datetime.now(timezone.utc)
     policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
+    dispatch_policy=json.loads((INTEL/"dispatch_policy.json").read_text(encoding="utf-8")) if (INTEL/"dispatch_policy.json").exists() else {}
+    dispatch_tickets=load_jsonl("dispatch_tickets.jsonl") if (INTEL/"dispatch_tickets.jsonl").exists() else []
+    dispatch_by_id={x.get("dispatch_ticket_id"):x for x in dispatch_tickets if x.get("dispatch_ticket_id")}
+    legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
+    min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
     allocations=load_jsonl("hunt_allocations.jsonl")
     runs=load_jsonl("search_runs.jsonl")
     run_by_id={r.get("search_run_id"):r for r in runs if r.get("search_run_id")}
@@ -150,6 +155,52 @@ def build_execution_state(write=True, now=None):
                     errors.append(f"{loc}: duplicate claim_id {cid}")
                     continue
                 claim_ids_seen.add(cid)
+                claim_schema=int(e.get("claim_schema_version") or 0)
+                is_legacy_claim=cid in legacy_claim_ids and claim_schema<min_claim_schema
+                if not is_legacy_claim:
+                    if claim_schema<min_claim_schema:
+                        errors.append(f"{loc}: new CLAIM requires claim_schema_version >= {min_claim_schema}")
+                        continue
+                    mode=e.get("routing_mode")
+                    if mode=="generated":
+                        did=e.get("dispatch_ticket_id")
+                        ticket=dispatch_by_id.get(did)
+                        if not ticket:
+                            errors.append(f"{loc}: generated CLAIM missing current dispatch ticket {did}")
+                            continue
+                        expected_ticket={
+                          "worker_id":e.get("worker_id"),
+                          "slot_id":slot,
+                          "assignment_id":e.get("assignment_id"),
+                          "allocator_generation_id":e.get("allocator_generation_id"),
+                          "portfolio_policy_generation_id":e.get("portfolio_policy_generation_id"),
+                          "work_item_id":e.get("work_item_id"),
+                          "assignment_slot_role":e.get("assignment_slot_role"),
+                          "assignment_work_kind":e.get("assignment_work_kind"),
+                          "assignment_source_id":e.get("assignment_source_id"),
+                          "routing_generation_id":e.get("routing_generation_id"),
+                          "worker_profile_generation_id":e.get("worker_profile_generation_id"),
+                          "routing_learning_generation_id":e.get("routing_learning_generation_id"),
+                          "dispatch_generation_id":e.get("dispatch_generation_id")
+                        }
+                        drift=[k for k,v in expected_ticket.items() if ticket.get(k)!=v]
+                        try:
+                            if abs(float(ticket.get("assignment_score"))-float(e.get("assignment_score")))>1e-9:
+                                drift.append("assignment_score")
+                            if abs(float(ticket.get("routing_score"))-float(e.get("routing_score")))>1e-9:
+                                drift.append("routing_score")
+                        except Exception:
+                            drift.append("score_parse")
+                        if drift:
+                            errors.append(f"{loc}: generated CLAIM dispatch binding mismatch: {','.join(sorted(set(drift)))}")
+                            continue
+                    elif mode=="manual_override":
+                        if not str(e.get("route_override_reason") or "").strip():
+                            errors.append(f"{loc}: manual_override CLAIM requires route_override_reason")
+                            continue
+                    else:
+                        errors.append(f"{loc}: CLAIM requires routing_mode generated or manual_override")
+                        continue
                 assignment_id=e["assignment_id"]
                 if assignment_id in completed_assignments:
                     errors.append(f"{loc}: assignment already completed in this slot log")
@@ -174,9 +225,15 @@ def build_execution_state(write=True, now=None):
                   "assignment_work_kind":e["assignment_work_kind"],
                   "assignment_source_id":e["assignment_source_id"],
                   "assignment_score":e["assignment_score"],
+                  "claim_schema_version":claim_schema if claim_schema else None,
+                  "routing_mode":e.get("routing_mode"),
                   "routing_generation_id":e.get("routing_generation_id"),
                   "worker_profile_generation_id":e.get("worker_profile_generation_id"),
+                  "routing_learning_generation_id":e.get("routing_learning_generation_id"),
                   "routing_score":e.get("routing_score"),
+                  "dispatch_ticket_id":e.get("dispatch_ticket_id"),
+                  "dispatch_generation_id":e.get("dispatch_generation_id"),
+                  "route_override_reason":e.get("route_override_reason"),
                   "claimed_at":fmt_ts(ts),
                   "lease_expires_at":fmt_ts(expiry),
                   "last_heartbeat_at":None,
@@ -359,6 +416,14 @@ def build_execution_state(write=True, now=None):
             if claim.get("routing_generation_id"):
                 expected["routing_generation_id"]=claim.get("routing_generation_id")
                 expected["worker_profile_generation_id"]=claim.get("worker_profile_generation_id")
+            if int(claim.get("claim_schema_version") or 0)>=14:
+                expected["routing_mode"]=claim.get("routing_mode")
+                if claim.get("routing_mode")=="generated":
+                    expected["routing_learning_generation_id"]=claim.get("routing_learning_generation_id")
+                    expected["dispatch_ticket_id"]=claim.get("dispatch_ticket_id")
+                    expected["dispatch_generation_id"]=claim.get("dispatch_generation_id")
+                elif claim.get("routing_mode")=="manual_override":
+                    expected["route_override_reason"]=claim.get("route_override_reason")
             mismatches=[f"{k}:run={run.get(k)!r}:claim={v!r}" for k,v in expected.items() if run.get(k)!=v]
             if int(run.get("schema_version") or 0)<11:
                 mismatches.append(f"schema_version={run.get('schema_version')} < 11")
