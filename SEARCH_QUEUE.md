@@ -159,3 +159,47 @@ Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, basic fuzzy 
 - **Airline IROPS:** benchmark `Robertn02/Airline-Revenue-Management-IROPS-Seat-Allocation-Optimizer@9a235b1ceb7a53f467c060b6a2750590b1ee0cd1` on a frozen rights-clean/buyer-authorized disruption corpus against FCFS, status-priority and incumbent/manual allocations. Freeze cabin/connection constraints and cost assumptions before scoring; measure realized service/economic outcome where available. Search only for hard operational/source adapters, reaccommodation settlement/service outcomes or failure modes the current engine cannot represent; stop generic airline RM/optimization demos.
 - **Inventory repair-first:** `DPFNeiland/demand-forecasting-inventory-optimization@93645b67082400591a6f99676a2f98b44c5683b2` remains watch because retrospective test-quarter demand influences ABC/low-demand policy. Do not promote reported economics until every feature/policy input is point-in-time and walk-forward results beat seasonal-naive plus the incumbent reorder policy. Stop additional generic EOQ/(s,S)/forecast prototypes.
 - `Richard-0403/CMJCC@54b5cfc04e27355d8f3b11628245cf0574fe68c9` is useful only as an evidence-bound hard-filter/soft-rank pattern for CaptureBrief/vendor qualification. Deepen it only if a procurement fixture exposes a gap not already covered by TrustMesh + Canon; do not create a separate matching-product lane.
+
+
+## Knowledge-to-Value experiment bottlenecks — 2026-09-20
+
+Search priority is now downstream of the experiment queue. Prefer findings that close a specific missing evidence/authority/implementation edge in a top experiment over another generic strong repository.
+
+### P0 — Ready experiments that can produce internal evidence now
+1. **EXP-002 AP leakage synthetic three-way audit**
+   - Seek only missing components/rules needed for invoice + PO + receipt + identity + credit/payment truth.
+   - Highest-value question: can one shared corpus cleanly separate actionable leakage from unresolved exceptions?
+
+2. **EXP-003 Commission plan-to-payout acceptance**
+   - Seek plan effective-date, split/overlay, reversal/clawback, carry-forward and settlement semantics not already represented.
+   - Highest-value question: do current components reproduce a full closed-month payout state without hidden assumptions?
+
+3. **EXP-004 Recovery Proof adversarial matrix**
+   - Seek only missing negative-control or application-invariant patterns across a second restore substrate.
+   - Highest-value question: can the verifier reject every deliberately wrong recovery for the correct reason?
+
+4. **EXP-006 CaptureBrief 10-solicitation authority benchmark**
+   - Seek only authoritative current agency deviation/supplement applicability, packet-history or identity/award evidence gaps.
+   - Highest-value question: can the stack remain current and complete on live solicitations without unsupported joins?
+
+5. **EXP-008 Industrial virtual pre-FAT**
+   - Seek customer-configuration-derived virtual-controller fidelity, type/topology/fault cases and independent protocol challenge paths.
+   - Highest-value question: which software-only defects can be caught reliably before hardware FAT?
+
+6. **EXP-009 Permit intelligence multi-jurisdiction benchmark**
+   - Seek only source-semantic/version/identity gaps across heterogeneous permit systems and high-value enrichment that can be source-backed.
+   - Highest-value question: does canonical event/version truth materially outperform raw lead rows?
+
+7. **EXP-010 Money-state integrity common month**
+   - Seek event-to-accounting truth boundaries, credit/payment allocation, period lock and reversal semantics that generalize across verticals.
+   - Highest-value question: can one close-truth component underpin AP, commissions, telecom, utility and marketplace assurance?
+
+### P1 — Externally blocked but strategically highest-value
+- **EXP-001 Freight blind audit to settlement:** no more generic freight engines unless they close a proven gap. The bottleneck is an authorized closed population and realized settlement lineage.
+- **EXP-005 ScopeSignal commercial proof:** synthetic evidence-state test first; external project proof only after that passes.
+
+### Search-policy rule
+If a candidate does not strengthen a CAP node, alter a TECH radar signal, improve an OPP, or change an EXP, record it locally but do not let it displace experiment-driven priorities.
+
+When an experiment fails, mine the failure before resuming broad search:
+FAILURE -> missing invariant -> targeted search skill -> challenger component -> rerun.
