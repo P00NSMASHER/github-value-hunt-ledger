@@ -821,7 +821,6 @@ Attention at inspection: 9 stars / 2 forks
 - `tongriyaotxt/open-mhs@61ced4d976dd192623cfc715139a061783972cae`:
   - `src/openmhs/core/device.py` — in-memory last-read/last-write state and post-return write recording;
   - `src/openmhs/cerebellum/reflex.py` blob `edf2e51ef1d31beb80b5da2f1dd69f67e46fae42`;
-  - `tests/test_cerebellum.py` blob `ca8357efe4f7db7ebefaac6969d1ae9acd2b7e3cd4e4a95` was not used as a canonical hash because the connector output is authoritative only for the exact returned blob metadata; source inspection established reflex/convergence/anomaly tests;
   - `tests/test_learning.py` blob `a06df7def27a306235aebbcf92a118ae42b804d0`;
   - `src/openmhs/cerebellum/episode.py` blob `d200ea82f5fdd0be5ca5d734d01e8eb75fd331cf`;
   - `tests/test_microduck.py` blob `adff954220161a5115107d7a92cbc27161db4739`;
@@ -961,4 +960,110 @@ This is one successful transfer task. Keep LOCAL; do not edit global `SEARCH_SKI
 - serious candidate/comparator inspections: 2 deep + 1 triage;
 - source/test/spec/history traversals: ~24;
 - external GitHub reads/searches: ~35;
+- untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 10
+
+### Hypothesis
+A scientific executor can validate the Run-9 **provider-queryable business identity** transfer if it accepts a caller-stable request/idempotency identity on a physically mutating operation and exposes a passive read-only path that resolves that same identity to the canonical native command and current receipt after an ambiguous response. The stronger Level-3 hypothesis additionally requires durable local custody of that effect identity before dispatch and survival across process/browser restart; a session-only caller record or a mocked provider lookup is not enough.
+
+### Discovery modes
+1. **Direct scientific executor search:** instrument servers, LIMS/robot job queues and BioXP/SiLA-style adapters with client-set job/reference IDs plus status/history/readback APIs.
+2. **Code/invariant search:** `Idempotency-Key`, request-by-key lookup, command receipts, `retry_forbidden`, outcome ambiguity, passive reconciliation, durable dispatch outboxes, preallocated scheduler IDs and restart-safe materialization.
+3. **Comparator search:** MADSci and current Opentrons server/client semantics to separate stable workflow IDs and server-created run IDs from provider-queryable effect identity.
+4. **Low-attention/history archaeology:** inspected a zero-star scientific platform and the commits that introduced direct-liquid recovery, canonical command lookup and duplicate-pending-submission protections.
+
+Deep inspection was limited to `MolBioFreak/BioModStack` as the candidate, with `AD-SDL/MADSci` and `Opentrons/opentrons` as comparators. No untrusted repository code was executed.
+
+### Best candidate
+**MolBioFreak/BioModStack — BioXP stable-request reconciliation + durable scientific-job outbox primitives**  
+Canonical URL: https://github.com/MolBioFreak/BioModStack  
+Exact revision: `9b36a0b106cd538d772de39092c1d532ad361083`  
+Public license: MIT  
+Repository attention at inspection: 0 stars / 0 forks  
+Evidence snapshot id: `shadow-science-20260920-biomodstack-bioxp-9b36a0b`
+
+### Frozen evidence manifest
+- `platform/api/routers/bioxp/operator_controls.py` blob `7ede9228ccae05c3972027940681677eadca8b98`;
+- `platform/api/services/bioxp/operator_models.py` blob `64991ed8e5fe382d89f2975ca39b7c54abd08dfb`;
+- `platform/frontend/src/lib/bioxpClient.ts` blob `54bd421ea116a68f47cc651c1685bb86c6569e9e`;
+- `platform/api/tests/test_bioxp_direct_liquid_idempotency.py` blob `05feb0feef3f78d8c1ef678580f3dd22d0bc1dc4`;
+- `platform/api/tests/test_bioxp_deck_queue_relay.py` blob `80ae675f2ec73614370f735fee1a8418f81efd07`;
+- `platform/api/experiment_services.py` blob `d08e408489aa09e083e3d94f0538de3820789822`;
+- `platform/api/experiment_models.py` — durable run-group/run-attempt/dispatch-outbox schemas inspected at the pinned revision;
+- `platform/api/services/global_experiments/worker.py` — durable outbox dispatch + reconciliation worker inspected at the pinned revision;
+- `platform/api/tests/test_project_manager_resource_dispatch.py` — SQLite reopen/concurrent-claim dispatch tests inspected at the pinned revision;
+- `LICENSE` blob `b28f99a6a7c79ce02901c1a9895c6b9992401adb`;
+- history commit `0e10e7b115c8a424665e297c70f658f937bd95ef` (2026-09-06), `fix(bioxp): retain and validate direct liquid recovery`;
+- later BioXP hardening includes `14008967062c948a728514cbaaba5be0a9745223` (`prevent duplicate pending submissions`) and `7eae444dbdf11f45170e5901bc04b89d10025a54` (`canonical OEM workflow jobs and controls`).
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED IN THE PUBLIC BMS BOUNDARY**
+- Normal BioXP v2 operator actions carry a caller-supplied `idempotency_key`; physical deck submissions disable automatic mutation retry and classify unresolved network/receipt outcomes as `uncertain` rather than silently resending.
+- When a deck submission is uncertain, the client polls a **GET-only** BMS route using the original key: `/operator-controls/v2/requests/{idempotency_key}`. The implementation comment explicitly says a 404 is an unsettled lookup, **not permission to replay a POST**.
+- That request lookup performs two passive reads against the robot provider: first `GET /operator/idempotency/command/{key}` to resolve the stable client key to the canonical `command_id`, then `GET /operator/v2/actions/receipts/{command_id}` to read the current authoritative receipt. It verifies the returned key/kind/command identity and fences a connection-generation change between the two reads.
+- Dedicated tests prove this exact request-by-key→current-receipt relay, reject mismatched key/command/kind, preserve the passive lookup lane while active enqueue is unavailable, and propagate a missing identity 404 without issuing a POST.
+- The direct-liquid path carries the same stable `Idempotency-Key`; a lost-response regression asserts exactly one POST and no recovery mutation. Its separate recovery route performs a bodyless GET by the original key and returns typed `unknown/pending/incomplete/resolved/conflict/unavailable` states with `retry_forbidden=True`. The test file explicitly labels this an HTTP-boundary recovery contract rather than proof of real robot-store acceptance.
+- BioXP error handling distinguishes post-dispatch uncertainty and emits `do_not_resubmit_reconcile_by_command_id` guidance when a command identity is available.
+
+**IMPORTANT LIMITS / FALSIFIED OVERCLAIMS**
+- The physical deck client's own source explicitly says its short HTTP admission custody **does not persist across reload**. The stable key is therefore not yet a crash-durable local effect reservation at this boundary.
+- The public tests validate the BMS bridge/contracts with fake/provider-bound responses; they do not prove that the underlying BioXP robot-side idempotency/receipt store survives a robot process/power restart or that a real physical command is never reissued after such a failure.
+- No inspected end-to-end test executes the decisive sequence `persist effect → physical BioXP accepts command → acknowledgement lost/process dies → restart → GET same key → resolve original command → zero second POST`.
+- The exact pinned merge commit exposed no combined-status/workflow-run evidence through the connector, so source/test presence is verified while green CI at that exact revision is UNKNOWN.
+- BioXP hardware/runtime/API rights are independent of BioModStack's MIT code; commercial deployment requires separate authorization and access to the instrument/vendor runtime.
+
+### Same-repository compression signal — the missing durable primitive already exists elsewhere
+BioModStack's global experiment subsystem separately implements the persistence half that the physical BioXP path lacks. Its schema has unique idempotent run groups, unique run-attempt scheduler IDs, a durable `ExperimentDispatchOutbox` with payload hash, status, attempts, lease token/owner/expiry, errors and acknowledgement JSON, and control-command fencing. The materializer deterministically preallocates the scheduler job ID, queries the authoritative Job by that ID before creation, rejects identity/body conflicts, reuses an already-existing matching Job after replay, and reconciles lifecycle from authoritative `job.status`. Tests include committed SQLite reopen and concurrent-claim authority. This proves a reusable crash-safe scientific-job pattern in the **same repository**, but it is not yet wired to BioXP's physical `idempotency_key` path.
+
+### Comparator evidence
+- `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` has durable workflow/action identity and action-result lookup, but its inspected SiLA observable-command map remains in-process; the durable workflow ID is not yet a cross-restart provider-native command join.
+- `Opentrons/opentrons@03b991fb263b97b6bb767ce311ca56e103d635e4` exposes server-created run IDs and run-status APIs, but this bounded pass did not establish a caller-chosen stable business/job reference on run creation that can later rediscover an ambiguously accepted run.
+
+### Independent RED-TEAM / VERIFIER
+The verifier received the frozen source/test/schema/history packet without the proposed score.
+
+**Verdict: PASS_WITH_LIMITS as a STRONG near-Level-3 scientific transfer component; FAIL for completed physical Level 3.**
+
+Proof obligations:
+1. **Caller-stable effect/request identity reaches the physical provider boundary? — PASS.** BioXP operator requests carry caller-supplied idempotency identity.
+2. **Can the same identity be resolved later through passive provider reads to the canonical command/receipt? — PASS in the public BMS contract/tests.** Key→command→receipt lookup is explicit and GET-only.
+3. **Does ambiguous response handling forbid blind automatic mutation replay? — PASS.** The deck client disables mutation retries and switches to request lookup; direct-liquid lost-response tests assert no recovery mutation.
+4. **Does the caller-side physical effect reservation survive process/browser restart? — FAIL at the inspected BioXP deck boundary.** Source explicitly says custody does not persist across reload.
+5. **Is robot-side idempotency/receipt durability across provider restart independently proven? — UNVERIFIED.** The strongest public tests stop at the BMS/provider contract boundary.
+6. **Is the exact crash-after-physical-acceptance/no-second-POST scenario tested end to end? — NO.** This remains the decisive missing proof.
+7. **Are the missing durability mechanics available as reusable code nearby? — PASS_WITH_LIMITS.** The global scientific-job outbox/materializer proves durable reservation/replay/reconciliation machinery, but integration with BioXP physical commands is not implemented in the inspected path.
+
+The verifier therefore rejects “physical exactly-once” and accepts a narrower but commercially useful conclusion: **BioModStack demonstrates the scientific provider side of the Run-9 architecture—stable externally queryable business identity plus no-blind-retry lookup—and separately contains a durable outbox pattern that could close the caller-side crash gap.**
+
+### Proposed score
+A) speed to first revenue: **4/5** — a reliability retrofit/chaos audit can be sold without replacing a laboratory platform.  
+B) customer value / ceiling: **5/5** — duplicate deck moves/dispenses/builds, orphaned robot jobs and ambiguous recovery can waste expensive samples and instrument time.  
+C) build/domain compression: **5/5** — same-repo physical request/receipt semantics plus durable scientific-job outbox/materializer substantially compress the design space for a reconciliation gateway.  
+D) rarity/advantage: **5/5** — a zero-star repository containing both halves of this integrity problem is unusually high-signal.  
+E) evidence/completeness: **3/5** — strong implementation/tests/schema/history, but no real robot-store restart proof or one-shot physical crash-window test.  
+F) rights/operability: **3/5** — MIT code is clear; proprietary BioXP hardware/runtime/API and deployment access remain independently governed.  
+**Total: 25/30 — STRONG_COMPONENT / NEAR_LEVEL3_TRANSFER inside shadow; no central promotion is made.**
+
+### Commercial / research implication
+The concrete product is an **Autonomous-Lab Physical Effect Reconciliation Retrofit**. Persist a local `EffectReservation`/outbox row before each dangerous physical POST; bind it to the exact external idempotency key and request digest; transition lost acknowledgements to `OUTCOME_UNKNOWN`; forbid a second physical submission; and after restart resolve `idempotency key → native command → canonical receipt/device truth` until the original effect becomes `SUCCEEDED`, `FAILED_NO_EFFECT`, or `NEEDS_HUMAN_RECONCILIATION`. BioModStack matters because its BioXP layer already supplies the provider-queryable key/receipt side while its experiment subsystem already supplies a reusable durable-outbox side.
+
+### Search lesson outcome
+The Run-9 LOCAL lesson **provider-queryable business identity** succeeds on a **second distinct task**: first in payments (`auths-proof`), now as a strong scientific near-match (`BioModStack`). The refined high-signal query is `Idempotency-Key` + read-only request/command lookup + explicit “404 is not permission to replay”/no-retry semantics + durable-outbox terms. Always verify whether caller custody of the key is itself crash-persistent before calling the system Level 3.
+
+Evidence count: **2 distinct tasks**. This is now STAGED-eligible inside shadow evaluation only; do not modify global `SEARCH_SKILLS.md` from this lane.
+
+### VALUE HANDOFF
+1. **Capability delta:** establishes a real scientific provider-queryable effect-identity bridge—stable client key→native command→canonical receipt—plus same-repository durable dispatch/outbox primitives.
+2. **Graph edge:** conceptually narrows the missing Level-3 edge to wiring durable local `EffectReservation` state to the already-queryable BioXP external identity; no central graph file was edited.
+3. **Radar signal:** scientific middleware is beginning to adopt the same idempotency/readback separation seen in payment APIs, suggesting cross-domain convergence on external-effect reconciliation.
+4. **Experiment impact:** the next falsifiable test is exact and small: persist a physical effect reservation, dispatch once, kill after provider acceptance/before acknowledgement, restart, GET by the same key, and prove no second POST occurs.
+5. **Commercial impact:** upgrades the generic audit concept into a concrete retrofit architecture with measurable duplicate-effect exposure, unresolved-effect age, reconciliation success rate and recovery labor.
+6. **Negative knowledge:** provider-queryable command identity without durable caller-side reservation is a near-match, not Level 3; mock/provider-contract tests are not evidence that a real robot-side receipt store survives power/process loss.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate/comparator inspections: 3;
+- source/test/schema/history traversals: ~25;
+- external GitHub reads/searches: ~40;
 - untrusted-repository code executions: 0.
