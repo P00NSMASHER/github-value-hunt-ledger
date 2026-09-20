@@ -638,3 +638,123 @@ New negative lesson: a durable action ledger and a fail-closed `OUTCOME_UNKNOWN`
 - source/test/schema/history traversals: ~24;
 - external GitHub reads/searches: ~35;
 - untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 7
+
+### Hypothesis
+The sudden emergence of agent-to-hardware standards should expose a reusable **AI hardware safety-envelope / effect-truth kernel** before the category becomes mainstream. A strong implementation should enforce declared safety limits before bytes leave the process, independently verify post-command physical state, and represent the difference between `NOT_SENT`, `SENT_AND_VERIFIED`, `SENT_BUT_DESYNCED`, and `SEND_OUTCOME_UNKNOWN`. The stronger H3 hypothesis additionally requires a durable business-effect/native-command identity that survives a crash and blocks redispatch until authoritative reconciliation; merely writing an audit line after failure is insufficient.
+
+### Discovery modes
+1. **Emerging-standard search:** followed the August 27, 2026 Model Hardware Standard research-preview announcement and searched for independent public implementations created immediately afterward.
+2. **Executable invariant search:** looked for zero-byte refusal tests, pre-transport policy gates, sensor-based verification, `transmitted: unknown`, desync errors, fsync/hash-chained audit state, and restart behavior rather than relying on “hardware safety” README language.
+3. **Protocol adjacency:** compared the new MHS-style implementations with SiLA observable-command/ErrorRecoveryService concepts, especially command-execution identity and recoverable-error handling.
+4. **Low-attention ecosystem search/history:** inspected very new/low-star projects and commit timelines to distinguish an emerging technical category from a single repository.
+
+Deep inspection was limited to `Abenor-Labs/Open-MHS`; `SCUT-ESA/open-mhs` and the SiLA/Siloxide ErrorRecoveryService surface were used as comparators/independent emergence signals. No untrusted repository code was executed.
+
+### Best candidate
+**Abenor-Labs/Open-MHS — AI-to-hardware safety envelope and effect-truth boundary**  
+Canonical URL: https://github.com/Abenor-Labs/Open-MHS  
+Exact revision: `92b04b023915ba7cdf2cac55eb58e86a3c94cc0d`  
+Public license: Apache-2.0  
+Repository attention at inspection: 3 stars / 1 fork  
+Evidence snapshot id: `shadow-science-20260920-open-mhs-92b04b0`
+
+### Frozen evidence manifest
+- `open_mhs/drivers/base.py` blob `d0462af0c9d2aee3a6ac910949cd2895507981c7`;
+- `open_mhs/server/routers/rpc.py` blob `7a2d9bdc027ce6d105865593fdd6ab7a5adc312d`;
+- `open_mhs/server/audit.py` blob `4df3d0821bb6844496ab95049f4e9d034d3123a9`;
+- `open_mhs/server/safety.py` blob `9542c062f673ddb96ad35b0875455e5191cad223`;
+- `open_mhs/server/capability_schema.json` blob `fb14e387b4aa0c56ed6f39ce2de2359cd04e00ac`;
+- `tests/test_driver_compliance.py` blob `e106d45f001cc7d3e404860e0ae878d7d128ed85`;
+- `tests/test_safety.py` blob `bec04aaeff9bb7c484c1bdb85a3381607ac6be5f`;
+- `tests/test_audit.py` blob `3f28d0f6e5e4784a97c51cf58a105aaa0e0e3650`;
+- `.github/workflows/test.yml` blob `939b8f3f0bbe80ba680ed2df7e23e594cecdd461`;
+- `README.md` blob `ed1431873ddd578f8fd4300875c22bb592f42adc`;
+- `SECURITY.md` blob `6356704094e0c4836e6c1ae11762ced6be425334`;
+- `LICENSE` blob `6f09b0f1c69f0c0c39794defc8cc11468ce0ffdb`.
+
+External emergence evidence frozen for this run:
+- official Model Hardware Standard site, https://modelhardwarestandard.com/ — limited research preview, initiated by Anthropic + HHMI Janelia, open-source release planned after preview;
+- Reuters, 2026-08-27, “Anthropic unveils new framework allowing AI agents to operate physical devices”;
+- `SCUT-ESA/open-mhs@c5b9b8a677d490777be38686b01ae6df467d3b27`, another independent public implementation created 2026-08-30/31-era and MIT licensed.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced `mhs.write` from RPC policy evaluation through driver re-check, transport write, post-command feedback verification and audit outcome classification.
+- **SYSTEMS/SCIENCE VALIDATOR:** separated simulator/fake-transport evidence from physical-hardware evidence and checked whether the repository itself admits the boundary.
+- **ECOSYSTEM ANALYST:** compared the official limited MHS preview, two independent open implementations, and SiLA recoverable-command semantics for evidence of category formation.
+- **COMMERCIAL ANALYST:** mapped the kernel to driver/workcell safety qualification rather than positioning the repository as an official MHS implementation or certification authority.
+- **RED-TEAM / VERIFIER:** independently tested the frozen packet against pre-dispatch safety, post-dispatch truth, persistence timing, crash-window identity/reconciliation and physical-validation proof obligations before any score was assigned.
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED IN SOURCE CORPUS**
+- A capability tag is validated before a driver is used; `BaseDevice.write()` refuses sensor/unknown targets, human-confirmation violations and safety-envelope violations before transport. The server performs an independent policy evaluation before calling the driver, so there are two enforcement points sharing an evaluator but not a cached verdict.
+- Rejection tests assert **zero transport transmissions and unchanged device state**, including a deliberately naive/unsafe driver behind the middleware. This is stronger evidence than an HTTP/RPC error alone.
+- Conditional safety bounds resolve against freshly read sensor state rather than the previously commanded value, so an actuator command that failed physically cannot silently relax the envelope.
+- After an accepted write, the driver polls a declared feedback sensor until the settle deadline. If the wire accepted the command but the physical/simulated state did not move, `StateDesync` carries commanded and observed values; tests assert that the transport did receive the command.
+- The RPC audit path distinguishes materially different effect states: a policy refusal records `transmitted: null`; a verified/desynced write records the transmitted value and observation; a transport-side hardware error is recorded as `transmitted: "unknown"` rather than falsely claiming that nothing happened.
+- `AuditLog` is append-only/hash-chained JSONL with flush + `fsync`; reopening a fresh writer resumes sequence/hash state from the previous file. Tests prove clean restart continuation and detect edited/deleted lines.
+- The public repository is Apache-2.0 and extremely low-attention relative to the implementation/test depth.
+
+**CLAIMED / PARTIAL / UNKNOWN**
+- The README reports 372 tests, CI on Python 3.10–3.12 across Linux/Windows, simulation benchmarks and mutation testing. The test files/CI configuration exist, but this shadow run did not independently execute the whole suite, so aggregate pass counts remain CLAIMED rather than reproduced.
+- The repository contains a serial/G-code transport, but the project's own roadmap explicitly states that real-hardware validation has **not** occurred: the serial path is tested against fake/loopback transport and all manipulation results are simulated.
+- The registry is explicitly in-memory. A restart forgets devices; persistent “stale until re-announced” registry state is roadmap work.
+- The audit chain is hash-chained but not signed; a writer with sufficient file access can rebuild it.
+- Signed capability tags, per-device credentials and broader deployment hardening are planned, not current guarantees.
+
+### Independent RED-TEAM / VERIFIER pass
+Verifier input excluded the proposed score and used only the frozen source/test/schema/history packet plus the public-standard/ecosystem evidence above.
+
+**Verdict: PASS_WITH_LIMITS for an AI-to-hardware safety-envelope / effect-truth component; FAIL for H3 physical exactly-once or crash-safe physical-effect recovery.**
+
+Proof obligations:
+1. **Are unsafe commands blocked before bytes are emitted? — PASS.** Two enforcement points exist and regression tests explicitly require zero transmissions/state change on refusal.
+2. **Does success depend on measured state rather than only transport acknowledgement? — PASS_WITH_LIMITS.** Feedback sensors are polled and desync is explicit where a tag declares feedback; actuators without feedback return `verified: false` rather than fabricated certainty.
+3. **Does the software distinguish pre-dispatch refusal from ambiguous/post-dispatch outcomes? — PASS.** The RPC path records `null`, concrete transmitted values/desync, and `"unknown"` for transport ambiguity.
+4. **Is that classification durably append-only once recorded? — PASS_WITH_LIMITS.** The audit is fsynced and restarts continue the chain, but it is not cryptographically signed/externally anchored.
+5. **Does the durable record exist before the dangerous external effect? — FAIL.** The audit line is written after `_guard_hardware(driver.write(...))` returns or throws. A process/power loss after device transmission but before the audit write can leave no durable record that the physical effect may have happened.
+6. **Is there a durable business-effect/native-command identity that survives process death and blocks redispatch? — FAIL.** No inspected command/effect ledger reserves identity before dispatch, and the in-memory registry/write history does not survive restart.
+7. **Can restart authoritatively reconcile the original device effect without resending it? — FAIL.** No generic post-crash command-history/readback resolver is implemented.
+8. **Is physical-hardware safety validated? — NO.** The repository itself states real-hardware validation is roadmap work and warns that independent hardware interlocks remain necessary.
+
+Strongest objection: this is honest and well-tested **safety middleware**, but the audit semantics occur too late to serve as the crash-safe effect ledger sought by H3. `transmitted: "unknown"` is valuable when the process survives long enough to record the exception; it does not close the write-before-audit crash window.
+
+### Proposed score
+A) speed to first revenue: **4/5** — a fixed-scope driver/workcell conformance audit can be sold before a full platform.  
+B) customer value / ceiling: **4/5** — bounding unsafe AI commands and detecting desync protects expensive lab/robot hardware, though current market budgets are still forming.  
+C) build/domain compression: **4/5** — capability schema, safety evaluator, two-layer enforcement, MCP/HTTP surfaces, audit semantics, feedback verification and adversarial tests save substantial integration work.  
+D) rarity/advantage: **5/5** — the category is weeks old, the repo has only 3 stars, and the explicit effect-truth distinctions are unusually mature for such a new public implementation.  
+E) evidence/completeness: **4/5** — strong source/tests/schema/history; no independent full-suite execution or physical-hardware validation.  
+F) rights/operability: **4/5** — Apache-2.0 and conventional Python deployment are clear, but alpha status, in-memory registry and absent physical validation constrain deployment.  
+**Total: 25/30 — STRONG_COMPONENT inside shadow; no central promotion is made.**
+
+### Commercial / research implication
+The credible first wedge is an **AI Hardware Safety Envelope / Driver Conformance Audit** for autonomous-lab vendors, robotics integrators and equipment OEMs. Translate a device manual/risk envelope into declarative capability limits; run an adversarial corpus that proves unsafe commands emit zero bytes; test clamp/confirmation/state-conditioned behavior; deliberately induce stuck-axis/desync/transport failures; and produce an effect-truth report distinguishing `NOT_SENT`, `SENT_VERIFIED`, `SENT_DESYNC`, and `SEND_OUTCOME_UNKNOWN`. Do not market this as official MHS certification while the official standard remains a limited preview.
+
+The larger product still needs the Run-6 durability kernel in front of this middleware: persist a business-effect ID **before** transmission, then let the safety envelope decide whether dispatch is permitted and use device-specific readback/reconciliation to close ambiguous outcomes after restart.
+
+### Comparator / emergence evidence
+- The official Model Hardware Standard was announced August 27, 2026 as a limited research preview for safe AI control of scientific/manufacturing hardware, with open-source publication planned later. That establishes the category but not a public official spec yet.
+- `SCUT-ESA/open-mhs@c5b9b8a...` independently appeared within days and exposes a separate MIT-licensed implementation with CI and real-instrument/VISA work in its public history. It was not deep-verified enough for a score here, but it is meaningful independent evidence that the category is already branching before the official spec is public.
+- SiLA's ErrorRecoveryService/Siloxide surface shows a mature adjacent pattern: recoverable errors are associated with command-execution UUIDs and continuation options. This is useful protocol precedent, but this run did not establish a persisted cross-restart native-command recovery engine from it.
+
+### Search lesson outcome
+A new LOCAL lesson succeeds once: **search the external-effect truth table, then inspect when each state becomes durable relative to actuation.** High-signal questions are: Can the system prove `not sent`? Can it distinguish `sent + verified` from `sent + desynced`? Can it admit `send outcome unknown`? Is that uncertainty persisted **before** or only **after** the external effect? Does restart block replay and use authoritative readback to close it? This prevents a sophisticated audit trail from being mistaken for a crash-safe physical-effect ledger.
+
+Keep this lesson LOCAL; one successful task is not enough for staged/global promotion.
+
+### VALUE HANDOFF
+1. **Capability delta:** adds a reusable pre-dispatch safety-envelope + post-dispatch truth-classification layer for AI-controlled hardware, with adversarial zero-byte refusal tests and sensor-based verification.
+2. **Graph edge:** conceptually sits between agent/campaign intent (BO-MCP/MADSci) and the durable uncertainty/reconciliation layer (ROSClaw/Opentrons/PyLabRobot patterns). It does not replace either.
+3. **Radar signal:** official MHS preview plus at least two independent public implementations within days is a strong early signal for an emerging **agent-to-hardware safety standard/middleware** category.
+4. **Experiment impact:** the next chaos prototype can combine a pre-dispatch durable effect reservation with Open-MHS-style safety checks, then kill the process after the transport write but before audit and require post-restart device reconciliation before retry.
+5. **Commercial impact:** creates a nearer-term service wedge—AI Hardware Safety Envelope / Driver Conformance Audit—while the broader exactly-once recovery control plane remains a larger product opportunity.
+6. **Negative knowledge:** a fsynced audit record written **after** hardware I/O is not a durable pre-dispatch effect ledger; `transmitted: unknown` does not survive a process crash unless uncertainty was persisted before the write.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate inspections: 1 deep + 2 comparator families;
+- source/test/schema/history traversals: ~20;
+- external GitHub/web reads/searches: ~30;
+- untrusted-repository code executions: 0.
