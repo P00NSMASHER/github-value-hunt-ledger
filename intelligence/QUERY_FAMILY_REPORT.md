@@ -2,11 +2,11 @@
 
 Query families preserve reusable search hypotheses while broader search objectives aggregate related hypotheses across domains. Retrospective runs register taxonomy/provenance but do not enter measured yield denominators.
 
-- Registered query families: **17**
-- Measured query families: **15**
+- Registered query families: **18**
+- Measured query families: **16**
 - Retrospective-only families: **2**
-- One-run measured families: **15**
-- Families mapped to a controlled search objective: **16/17**
+- One-run measured families: **16**
+- Families mapped to a controlled search objective: **17/18**
 - Objective conflicts requiring review: **0**
 - Families with sufficient evidence (>=5 runs and >=20 deep inspections): **0**
 
@@ -18,6 +18,7 @@ Query families preserve reusable search hypotheses while broader search objectiv
 | QF:recovery-coverage-identity-lifecycle-contradiction-vs-succession-vs-collision-vs-unavailable-source — recovery coverage identity lifecycle: contradiction vs succession vs collision vs unavailable source | OBJ:identity-lineage | 1 | 4 | 2 | 0 | 0 | 1 | insufficient |
 | QF:recovery-proof-completeness-expected-subject-inventory-multi-engine-semantic-restore-fail-open-validation — recovery-proof completeness + expected-subject inventory + multi-engine semantic restore + fail-open validation | OBJ:completeness-proof | 1 | 4 | 2 | 0 | 0 | 1 | insufficient |
 | QF:sam-attachment-deletedflag-excludedeleted-deleteall-disappearance-historical-manifest-retention — SAM attachment deletedFlag excludeDeleted deleteAll disappearance historical manifest retention | OBJ:completeness-proof | 1 | 4 | 2 | 0 | 0 | 1 | insufficient |
+| QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance — workforce schedule hard-lock verification + effective-dated current labor/domain rule authority + rule provenance | OBJ:current-rule-authority | 1 | 4 | 3 | 0 | 0 | 1 | insufficient |
 | QF:approved-measurement-exact-work-order-contract-line-ownership-bill-period-cutoff-cumulative-authority-unbilled-claim-alt — approved measurement + exact work-order/contract-line ownership + bill-period cutoff + cumulative authority + unbilled claim + alternate mutate endpoint | OBJ:authority-lineage | 1 | 3 | 3 | 0 | 0 | 1 | insufficient |
 | QF:cross-vendor-chromatography-raw-format-registry-canonical-metadata-provenance-open-format-export-fixture-regression — cross-vendor chromatography raw-format registry + canonical metadata provenance + open-format export + fixture regression | OBJ:protocol-regression | 1 | 3 | 2 | 0 | 0 | 1 | insufficient |
 | QF:event-time-authority-external-provider-inquiry-unknown-failed-one-shot-refund-confirmed-counter-event-compensating-ledge — event-time authority + external provider inquiry + UNKNOWN != FAILED + one-shot refund + confirmed counter-event + compensating ledger + bank realization | OBJ:exactly-once-settlement | 1 | 3 | 3 | 0 | 0 | 1 | insufficient |

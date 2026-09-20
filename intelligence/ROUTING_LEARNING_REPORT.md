@@ -1,13 +1,13 @@
 # ROUTING OUTCOME LEARNING REPORT
 
-Learning generation: **ROUTELEARN:3427dfe228b7**
+Learning generation: **ROUTELEARN:bc40639ef4db**
 Mode: **observe_only_insufficient_evidence**
 
-- Completed generated routes eligible for learning: **0**
-- Adjustment records: **0**
+- Completed generated routes eligible for learning: **1**
+- Adjustment records: **5**
 - Evidence-eligible routing adjustments: **0**
 
-Only completed MATCHED schema-v12+ generated routes train this learner. Manual overrides and retrospective repairs are excluded.
+Only completed MATCHED primary generated routes train this learner. Manual overrides, work-steal runs and retrospective repairs are excluded.
 
 ## Eligible adjustments
 

@@ -2,8 +2,8 @@
 
 Candidate dispositions are normalized into controlled reason categories while the original evidence-bearing reason text remains preserved in the source run.
 
-- Structured candidate dispositions: **25**
-- Direct controlled reasons: **8**
+- Structured candidate dispositions: **28**
+- Direct controlled reasons: **11**
 - Legacy reasons normalized through reviewed aliases: **17**
 - Unmapped custom reasons: **0**
 - Unique unmapped custom reason strings: **0**
@@ -12,19 +12,19 @@ Candidate dispositions are normalized into controlled reason categories while th
 
 | Status | Count |
 |---|---:|
-| strong | 9 |
-| watch | 9 |
-| rejected_or_negative | 6 |
+| strong | 10 |
+| watch | 10 |
+| rejected_or_negative | 7 |
 | other | 1 |
 
 ## Controlled reason distribution
 
 | Reason | Count | Alias-normalized |
 |---|---:|---:|
-| state_transition_verified | 7 | 4 |
-| interesting_but_not_load_bearing | 3 | 2 |
+| state_transition_verified | 8 | 4 |
+| interesting_but_not_load_bearing | 4 | 2 |
+| independent_negative_control | 3 | 1 |
 | authority_location_bypass | 3 | 3 |
-| independent_negative_control | 2 | 1 |
 | unsafe_retry_or_idempotency | 2 | 2 |
 | no_semantic_tests | 2 | 2 |
 | authority_lineage_verified | 1 | 1 |

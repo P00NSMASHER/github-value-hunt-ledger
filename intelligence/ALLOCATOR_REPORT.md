@@ -1,6 +1,6 @@
 # HUNT ALLOCATOR REPORT
 
-- Generation: **ALLOCGEN:51522654b284**
+- Generation: **ALLOCGEN:be768c686587**
 - Candidate work items: **305**
 - Assigned slots: **14 / 14**
 
@@ -9,9 +9,10 @@
 | Work kind | Slots |
 |---|---:|
 | adjacency | 2 |
-| capability_gap | 6 |
-| coverage_gap | 3 |
+| capability_gap | 5 |
+| coverage_gap | 2 |
 | independent_verification | 1 |
+| positive_dna_transfer | 2 |
 | strategy_measurement | 1 |
 | wildcard | 1 |
 

@@ -2,8 +2,8 @@
 
 Generated from prospective and benchmark search runs. Retrospective anecdotes are excluded from yield denominators. Multi-origin outcomes use fractional equal-touch value attribution.
 
-- Measured runs: **15**
-- Search-bearing runs: **14**
+- Measured runs: **16**
+- Search-bearing runs: **15**
 - Structured outcomes: **1**
 - Outcome-lag window: **14 days**; recent runs are not counted as outcome failures.
 
@@ -18,7 +18,7 @@ Generated from prospective and benchmark search runs. Retrospective anecdotes ar
 | STRAT:first-party-production-source-triangulation | 2 | 7 | 42.9% [15.8%, 75.0%] | 0.0% [0.0%, 35.4%] | 0.0% [0.0%, 65.8%] | 100.0% [34.2%, 100.0%] | 0 | 0.00 | $0 | insufficient |
 | STRAT:identity-lifecycle-contradiction-archaeology | 1 | 4 | 50.0% [15.0%, 85.0%] | 0.0% [0.0%, 49.0%] | 0.0% [0.0%, 79.3%] | 100.0% [20.7%, 100.0%] | 0 | 0.00 | $0 | insufficient |
 | STRAT:protocol-regression-archaeology-for-pre-fat-systems | 1 | 3 | 66.7% [20.8%, 93.9%] | 0.0% [0.0%, 56.2%] | 0.0% [0.0%, 79.3%] | 100.0% [20.7%, 100.0%] | 0 | 0.00 | $0 | insufficient |
-| STRAT:rule-period-authority-version-audit | 1 | 1 | 100.0% [20.7%, 100.0%] | 0.0% [0.0%, 79.3%] | 0.0% [0.0%, 79.3%] | 100.0% [20.7%, 100.0%] | 0 | 0.00 | $0 | insufficient |
+| STRAT:rule-period-authority-version-audit | 2 | 5 | 80.0% [37.6%, 96.4%] | 0.0% [0.0%, 43.4%] | 0.0% [0.0%, 65.8%] | 100.0% [34.2%, 100.0%] | 0 | 0.00 | $0 | insufficient |
 
 ## Query-family performance
 
@@ -39,6 +39,7 @@ Generated from prospective and benchmark search runs. Retrospective anecdotes ar
 | QF:sam-attachment-deletedflag-excludedeleted-deleteall-disappearance-historical-manifest-retention — SAM attachment deletedFlag excludeDeleted deleteAll disappearance historical manifest retention | 1 | 4 | 50.0% [15.0%, 85.0%] | 0.0% [0.0%, 49.0%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:sam-solicitation-history-data-services-attachment-manifest-deleted-restricted-external-link-completeness — SAM solicitation history Data Services attachment manifest deleted restricted external-link completeness | 1 | 3 | 33.3% [6.1%, 79.2%] | 0.0% [0.0%, 56.2%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:usecpo-v2-schema-event-id-correlation-lineage — USECPO-v2-schema-event-id-correlation-lineage | 1 | 1 | 100.0% [20.7%, 100.0%] | 0.0% [0.0%, 79.3%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
+| QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance — workforce schedule hard-lock verification + effective-dated current labor/domain rule authority + rule provenance | 1 | 4 | 75.0% [30.1%, 95.4%] | 0.0% [0.0%, 49.0%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 
 ## Policy
 

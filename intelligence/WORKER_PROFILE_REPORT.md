@@ -1,6 +1,6 @@
 # WORKER PROFILE REPORT
 
-Profile generation: **WORKERS:dde32346eaff**
+Profile generation: **WORKERS:fc22659849b1**
 
 - Registered workers: **14**
 - Measured: **1**
@@ -22,7 +22,7 @@ Profile generation: **WORKERS:dde32346eaff**
 | HUNTER-10 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 | HUNTER-11 | SPARSE | 2 | 8 | 4 | STRAT:fail-open-boundary-archaeology | EXP-004 | 0 |
 | HUNTER-12 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
-| HUNTER-13 | SPARSE | 0 | 0 | 0 | — | — | 0 |
+| HUNTER-13 | SPARSE | 1 | 4 | 3 | STRAT:rule-period-authority-version-audit | EXP-008 | 0 |
 | HUNTER-14 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 
 ## Interpretation

@@ -1,17 +1,18 @@
 {
   "schema_version": 1,
-  "routing_learning_generation_id": "ROUTELEARN:3427dfe228b7",
+  "routing_learning_generation_id": "ROUTELEARN:bc40639ef4db",
   "mode": "observe_only_insufficient_evidence",
-  "generated_completed_routes": 0,
+  "generated_completed_routes": 1,
   "eligible_adjustments": 0,
-  "adjustment_records": 0,
-  "calibration_generations": 0,
+  "adjustment_records": 5,
+  "calibration_generations": 1,
   "excluded_runs": {
     "manual_override": 0,
     "unrouted": 0,
     "retrospective": 0,
     "unmatched_claim": 0,
-    "pre_v12": 17
+    "pre_v12": 17,
+    "work_steal": 0
   },
   "min_global_generated_completions": 12
 }

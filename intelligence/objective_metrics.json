@@ -61,6 +61,18 @@
       "fractional_outcome_equivalents": 1.0
     },
     {
+      "search_objective_id": "OBJ:current-rule-authority",
+      "name": "Current rule authority",
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
       "search_objective_id": "OBJ:independent-evaluation",
       "name": "Independent evaluation",
       "runs": 1,

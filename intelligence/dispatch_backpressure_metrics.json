@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "clock_commit_sha": "ba9eb893f902e85297268e0f79d0f7369f7a16a7",
+  "clock_timestamp": "2026-09-20T23:37:02Z",
+  "primary_tickets": 14,
+  "pending_primary": 14,
+  "stale_primary": 0,
+  "expired_primary": 0,
+  "claimed_primary": 0,
+  "legacy_untimed_primary": 0,
+  "work_steal_tickets": 0,
+  "measured_worker_response_profiles": 0
+}

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "measured_runs": 15,
-  "neighborhood_count": 32,
+  "measured_runs": 16,
+  "neighborhood_count": 36,
   "status_counts": {
-    "INSUFFICIENT": 32
+    "INSUFFICIENT": 36
   },
   "sufficient_neighborhoods": 0,
   "saturated_neighborhoods": 0,

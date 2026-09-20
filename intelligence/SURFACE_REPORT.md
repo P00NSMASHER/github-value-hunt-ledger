@@ -2,7 +2,7 @@
 
 Runs can use multiple surfaces. V4 reports both exact surface labels and normalized surface families; both are assisted/multi-touch measurements, not isolated causal effects.
 
-- Exact measured surfaces: **40**
+- Exact measured surfaces: **43**
 - Normalized surface families touched: **9**
 - Runs missing search-surface instrumentation: **4**
 - Exact surfaces still uncategorized: **5**
@@ -11,13 +11,13 @@ Runs can use multiple surfaces. V4 reports both exact surface labels and normali
 
 | Surface family | Exact labels | Runs | Inspected | Retained | MASTER | Capability-touch runs | Outcome eq. |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| SURFACE_FAMILY:github-source-inspection — GitHub source inspection | 8 | 9 | 24 | 20 | 0 | 9 | 0.00 |
+| SURFACE_FAMILY:github-source-inspection — GitHub source inspection | 9 | 10 | 28 | 23 | 0 | 10 | 0.00 |
 | SURFACE_FAMILY:github-history-archaeology — GitHub history archaeology | 6 | 6 | 19 | 13 | 0 | 6 | 0.00 |
 | SURFACE_FAMILY:github-code-search — GitHub code search | 3 | 6 | 18 | 14 | 0 | 6 | 0.00 |
 | SURFACE_FAMILY:ecosystem-adjacency — Ecosystem and analogy adjacency | 8 | 6 | 14 | 13 | 0 | 6 | 0.00 |
-| SURFACE_FAMILY:github-repository-search — GitHub repository search | 1 | 4 | 14 | 10 | 0 | 4 | 0.00 |
+| SURFACE_FAMILY:github-repository-search — GitHub repository search | 1 | 5 | 18 | 13 | 0 | 5 | 0.00 |
+| SURFACE_FAMILY:first-party-docs — First-party documentation | 6 | 3 | 9 | 8 | 0 | 3 | 0.00 |
 | SURFACE_FAMILY:other — Other/uncategorized | 5 | 3 | 8 | 5 | 0 | 3 | 0.00 |
-| SURFACE_FAMILY:first-party-docs — First-party documentation | 4 | 2 | 5 | 5 | 0 | 2 | 0.00 |
 | SURFACE_FAMILY:private-ledger — Private ledger | 2 | 2 | 4 | 2 | 0 | 2 | 0.50 |
 | SURFACE_FAMILY:synthetic-local-validation — Synthetic/local validation | 3 | 2 | 2 | 2 | 0 | 2 | 0.50 |
 
@@ -25,15 +25,18 @@ Runs can use multiple surfaces. V4 reports both exact surface labels and normali
 
 | Surface | Family | Runs | Inspected | Retained | Outcome eq. |
 |---|---|---:|---:|---:|---:|
-| SURFACE:github-repository-search — GitHub repository search | SURFACE_FAMILY:github-repository-search | 4 | 14 | 10 | 0.00 |
+| SURFACE:github-repository-search — GitHub repository search | SURFACE_FAMILY:github-repository-search | 5 | 18 | 13 | 0.00 |
 | SURFACE:github-code-search — GitHub code search | SURFACE_FAMILY:github-code-search | 4 | 11 | 9 | 0.00 |
 | SURFACE:github-repository-source-tests-schema-history — GitHub repository source/tests/schema/history | SURFACE_FAMILY:github-source-inspection | 2 | 4 | 4 | 0.00 |
 | SURFACE:github-exact-head-source — GitHub exact-head source | SURFACE_FAMILY:github-source-inspection | 2 | 3 | 3 | 0.00 |
 | SURFACE:cross-project-identity-failure-comparison — cross-project identity-failure comparison | SURFACE_FAMILY:other | 1 | 4 | 2 | 0.00 |
 | SURFACE:exact-head-actions-license-verification — exact-head Actions/license verification | SURFACE_FAMILY:github-source-inspection | 1 | 4 | 3 | 0.00 |
+| SURFACE:github-code-source-tests — GitHub code/source/tests | SURFACE_FAMILY:github-source-inspection | 1 | 4 | 3 | 0.00 |
 | SURFACE:github-code-source-tests-history — GitHub code/source/tests/history | SURFACE_FAMILY:github-history-archaeology | 1 | 4 | 3 | 0.00 |
 | SURFACE:github-exact-head-code-search — GitHub exact-head code search | SURFACE_FAMILY:github-code-search | 1 | 4 | 2 | 0.00 |
 | SURFACE:github-issue-archaeology — GitHub issue archaeology | SURFACE_FAMILY:github-history-archaeology | 1 | 4 | 2 | 0.00 |
+| SURFACE:official-labor-law-sources — official labor-law sources | SURFACE_FAMILY:first-party-docs | 1 | 4 | 3 | 0.00 |
+| SURFACE:official-payroll-engine-documentation — official Payroll Engine documentation | SURFACE_FAMILY:first-party-docs | 1 | 4 | 3 | 0.00 |
 | SURFACE:private-ledger-deduplication — private ledger deduplication | SURFACE_FAMILY:private-ledger | 1 | 4 | 2 | 0.00 |
 | SURFACE:repository-source-tests — repository source/tests | SURFACE_FAMILY:github-source-inspection | 1 | 4 | 2 | 0.00 |
 | SURFACE:repository-source-tests-history — repository source/tests/history | SURFACE_FAMILY:github-history-archaeology | 1 | 4 | 2 | 0.00 |

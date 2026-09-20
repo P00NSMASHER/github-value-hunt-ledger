@@ -2,12 +2,12 @@
   "exact_rows": [
     {
       "id": "SURFACE:github-repository-search",
-      "runs": 4,
-      "deep_inspected": 14,
-      "retained_count": 10,
+      "runs": 5,
+      "deep_inspected": 18,
+      "retained_count": 13,
       "master_promoted_count": 0,
-      "capability_touch_runs": 4,
-      "experiment_runs": 4,
+      "capability_touch_runs": 5,
+      "experiment_runs": 5,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "labels_seen": [
@@ -91,6 +91,21 @@
       "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
     },
     {
+      "id": "SURFACE:github-code-source-tests",
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub code/source/tests"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
+    },
+    {
       "id": "SURFACE:github-code-source-tests-history",
       "runs": 1,
       "deep_inspected": 4,
@@ -134,6 +149,36 @@
         "GitHub issue archaeology"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
+    },
+    {
+      "id": "SURFACE:official-labor-law-sources",
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "official labor-law sources"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:official-payroll-engine-documentation",
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "official Payroll Engine documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
     },
     {
       "id": "SURFACE:private-ledger-deduplication",
@@ -604,18 +649,19 @@
   "family_rows": [
     {
       "id": "SURFACE_FAMILY:github-source-inspection",
-      "runs": 9,
-      "deep_inspected": 24,
-      "retained_count": 20,
+      "runs": 10,
+      "deep_inspected": 28,
+      "retained_count": 23,
       "master_promoted_count": 0,
-      "capability_touch_runs": 9,
-      "experiment_runs": 9,
+      "capability_touch_runs": 10,
+      "experiment_runs": 10,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "name": "GitHub source inspection",
       "exact_surface_ids": [
         "SURFACE:exact-head-actions-license-verification",
         "SURFACE:exact-head-actions-status",
+        "SURFACE:github-code-source-tests",
         "SURFACE:github-exact-head-source",
         "SURFACE:github-repository-source-tests",
         "SURFACE:github-repository-source-tests-schema-history",
@@ -685,17 +731,37 @@
     },
     {
       "id": "SURFACE_FAMILY:github-repository-search",
-      "runs": 4,
-      "deep_inspected": 14,
-      "retained_count": 10,
+      "runs": 5,
+      "deep_inspected": 18,
+      "retained_count": 13,
       "master_promoted_count": 0,
-      "capability_touch_runs": 4,
-      "experiment_runs": 4,
+      "capability_touch_runs": 5,
+      "experiment_runs": 5,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "name": "GitHub repository search",
       "exact_surface_ids": [
         "SURFACE:github-repository-search"
+      ]
+    },
+    {
+      "id": "SURFACE_FAMILY:first-party-docs",
+      "runs": 3,
+      "deep_inspected": 9,
+      "retained_count": 8,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "name": "First-party documentation",
+      "exact_surface_ids": [
+        "SURFACE:official-integration-restart-tests",
+        "SURFACE:official-labor-law-sources",
+        "SURFACE:official-microsoft-learn-documentation",
+        "SURFACE:official-payroll-engine-documentation",
+        "SURFACE:official-sap-help-documentation",
+        "SURFACE:official-vendor-robot-server-schema-store"
       ]
     },
     {
@@ -715,24 +781,6 @@
         "SURFACE:low-attention-adapter-search",
         "SURFACE:low-attention-zero-star-implementation-audit",
         "SURFACE:package-publication-verification"
-      ]
-    },
-    {
-      "id": "SURFACE_FAMILY:first-party-docs",
-      "runs": 2,
-      "deep_inspected": 5,
-      "retained_count": 5,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 2,
-      "experiment_runs": 2,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "name": "First-party documentation",
-      "exact_surface_ids": [
-        "SURFACE:official-integration-restart-tests",
-        "SURFACE:official-microsoft-learn-documentation",
-        "SURFACE:official-sap-help-documentation",
-        "SURFACE:official-vendor-robot-server-schema-store"
       ]
     },
     {
