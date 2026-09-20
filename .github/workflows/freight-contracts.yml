@@ -34,9 +34,11 @@ jobs:
       - name: Hunter/model contracts
         run: cd production && python -m pytest -q test_prototype.py
       - name: Freight commercial proof contracts
-        run: PYTHONPATH=. python -m pytest -q freight/test_contracts.py freight/test_settlement_store.py freight/test_release_gate.py freight/test_gap_registry.py freight/test_readiness.py freight/test_pilot_reporting.py freight/test_deal_economics.py freight/test_outcome_adapter.py freight/test_commercial_learning.py freight/test_input_guard.py freight/test_pilot_package.py freight/test_release_provenance.py freight/test_audit_ledger.py freight/test_data_lifecycle.py freight/test_sbom.py freight/test_release_attestation.py freight/test_audit_store.py freight/test_backup_restore.py freight/test_diligence_bundle.py freight/test_synthetic_rehearsal.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_contracts.py freight/test_settlement_store.py freight/test_release_gate.py freight/test_gap_registry.py freight/test_readiness.py freight/test_pilot_reporting.py freight/test_deal_economics.py freight/test_outcome_adapter.py freight/test_commercial_learning.py freight/test_input_guard.py freight/test_pilot_package.py freight/test_release_provenance.py freight/test_audit_ledger.py freight/test_data_lifecycle.py freight/test_sbom.py freight/test_release_attestation.py freight/test_audit_store.py freight/test_backup_restore.py freight/test_diligence_bundle.py freight/test_rights_evidence.py freight/test_incident_response.py freight/test_synthetic_rehearsal.py
       - name: Controlled-pilot rights gate
         run: PYTHONPATH=. python freight/release_gate.py --stage pilot
+      - name: Controlled-pilot rights evidence gate
+        run: PYTHONPATH=. python freight/rights_evidence.py --stage pilot
       - name: Canonical freight gap register
         run: PYTHONPATH=. python freight/gap_registry.py --list-active-search
       - name: Ready-pilot diagnostic fixture
