@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V12 Worker Profile",
+  "type": "object",
+  "required": [
+    "worker_id",
+    "status",
+    "historical_runs",
+    "deep_inspected",
+    "retained_count",
+    "measured_state",
+    "top_strategies",
+    "top_objectives",
+    "top_experiments",
+    "top_capabilities",
+    "domain_counts"
+  ],
+  "properties": {
+    "worker_id": {
+      "type": "string",
+      "pattern": "^HUNTER-(0[1-9]|1[0-4])$"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "paused"
+      ]
+    },
+    "historical_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "deep_inspected": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "retained_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "master_promoted_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "new_capability_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "measured_state": {
+      "enum": [
+        "UNMEASURED",
+        "SPARSE",
+        "MEASURED"
+      ]
+    },
+    "retained_precision": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "top_strategies": {
+      "type": "array"
+    },
+    "top_objectives": {
+      "type": "array"
+    },
+    "top_experiments": {
+      "type": "array"
+    },
+    "top_capabilities": {
+      "type": "array"
+    },
+    "domain_counts": {
+      "type": "array"
+    },
+    "active_claims": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "completed_claims": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": true
+}
