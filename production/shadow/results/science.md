@@ -195,3 +195,113 @@ New negative lesson: physical scientific success does not imply software-governa
 - serious candidate/comparator inspections: 3;
 - external GitHub/web reads: ~35;
 - untrusted-repository code executions: 0 (source/data/history inspection only).
+
+## 2026-09-20 — Shadow Science Run 3
+
+### Hypothesis
+The missing high-value quadrant in autonomous science is a **persistent experiment-intent ledger with retry-safe mutations that is actually used by physical closed-loop campaigns**. A strong candidate should preserve optimizer suggestions, actual submitted experiment conditions and provenance as distinct durable state; prevent logical duplicate mutations under retries/concurrency; and have credible physical-campaign evidence showing the same campaign state survives real operational interruption.
+
+### Discovery modes
+1. **Paper→code traversal:** followed the September 2026 *La Agente Óptima* preprint to its BO backend and released physical-campaign artifact repository.
+2. **Executable-invariant search:** searched for `suggestion_id`, result linkage, provenance snapshots, partial unique indexes, idempotency reservations, cancellation cleanup, stale-owner handling, trace/audit events and replay tests instead of optimizer names.
+3. **Physical-platform/ecosystem adjacency:** checked the RAISE physical orchestrator and RoboChem-Flex/RAISE campaign evidence to separate BO-state durability from hardware execution; low-attention MEDAL-LAB was triaged but not opened on `.env`/credential-shaped paths.
+4. **History archaeology:** inspected commits that hardened cancellation, reservation TTL/heartbeat and campaign-version integrity.
+
+Deep inspection was limited to `AccelerationConsortium/bo-mcp` as the reusable kernel, the `the-matter-lab/La-Agente-Optima-artifacts` campaign archive as corroborating evidence, and `Frank-Gu-Lab/RAISE` as a physical-execution comparator. No sensitive values were opened or retained.
+
+### Best candidate
+**AccelerationConsortium/bo-mcp**  
+Canonical URL: https://github.com/AccelerationConsortium/bo-mcp  
+Exact revision: `56d590b91ac120d0f22a3e41e770843d271808cd`  
+Revision date: 2026-09-18  
+Public license: MIT  
+Repository attention at inspection: ~2 stars / 0 forks  
+Evidence snapshot id: `shadow-science-20260920-bo-mcp-56d590b`
+
+### Frozen evidence manifest
+- `packages/bo-mcp-server/src/bo_mcp_server/idempotency.py` blob `6ae9bff5c80d8309a89aa402651308bd90f34409`;
+- `packages/bo-mcp-server/src/bo_mcp_server/storage/models.py` blob `1156604c372a934eaa2044a95b8a362f64b29fde`;
+- `packages/bo-mcp-server/src/bo_mcp_server/operations/submit_results_pipeline.py` blob `afd247eeb64f815b710e19a3e483667cb6726f81`;
+- `packages/bo-mcp-server/src/bo_mcp_server/operations/update_suggestion_status.py` blob `c029131599475898b53bdaafcaf548623526c4ed`;
+- `packages/bo-mcp-server/tests/unit/test_idempotency.py` blob `83bb85afb67c7fda3c8b2ebaad8f681e4fb9a601`;
+- `packages/bo-mcp-api/tests/test_rest_results_replicates.py` blob `bb394a40588b46e6ca4a5c10d1b9d2770937dba4`;
+- `packages/bo-mcp-server/tests/integration/test_suggestion_id_validation.py` blob `dd366fd4d2e76a1b7cbea023f2d81b52ef57baf4`;
+- `packages/bo-mcp-server/tests/unit/test_storage/test_soft_delete_and_snapshot.py` blob `449206af826b9fa3736a96624760eef57be42739`;
+- `LICENSE` blob `1a5a1523a7bbfde1270ceb97f082c00d836af06b`;
+- history commit `90186a1a9f42ba76b3ac051fc0ab9acfbda61c2f` records cancellation cleanup, bounded reservation heartbeat and campaign-version integrity work; later `07f0200ad21951af8afed49dde8ae96130a104ad` is explicitly a data-integrity hardening commit;
+- corroborating campaign archive `the-matter-lab/La-Agente-Optima-artifacts@45425bcbfc06b83330b0d4714f0dd363dbebdd73`: `showcases/README.md` blob `71562e6570fddeaaded8a040d0acb57e0c219a30`, RAISE showcase README blob `337365de4f7a86ceb62cfd535347117e7e89faaa`, RoboChem-Flex showcase README blob `a1a2893e63cef63fd5f0907a9b0ba2f0bef38f6e`;
+- physical comparator `Frank-Gu-Lab/RAISE@c3422c868ebf3fcfd8957cf560a3a6b71b023d91`, `Orchestrator.py` blob `fec8b7f0b593fc4941e8a2af602c3f12836d2d67`;
+- external research evidence: Müller et al., *La Agente Óptima: Towards Agentic Self-Driving Laboratories*, arXiv:2609.04564, submitted 2026-09-03; physical platform papers for RAISE and RoboChem-Flex are peer-reviewed 2026 publications.
+
+### Load-bearing claims
+**VERIFIED / TESTED**
+- BO-MCP persists a first-class **Suggestion** with its own parameter values and provenance, and a **Result** with independently supplied parameter values plus optional `suggestion_id`. A suggestion-linked result additionally stores a durable `suggestion_snapshot_json` containing the originating suggested parameters and provenance, so the intent context survives later deletion of the suggestion row.
+- The result pipeline explicitly states that parameter equality is **not** required when resolving a suggestion: replicate/actual measurements may use different parameter values. The actual result parameters therefore coexist with the immutable suggestion snapshot and can be compared after the fact. Snapshot persistence and survival of suggestion deletion are regression-tested.
+- A partial unique database index allows at most one active Result per non-null `suggestion_id`; phase-1 validation rejects duplicate actionable references before the DB constraint, and suggestion completion uses guarded state transitions rather than blind last-writer-wins updates.
+- State-mutating tools support a database-backed idempotency reservation protocol keyed by `(tool_name, idempotency_key)` with request hashing, reservation tokens, in-progress/conflict envelopes, stale-owner protection and same-session finalize support. Unit/integration tests cover cached replay, concurrent retries with exactly one logical side effect, payload conflicts, exception cleanup, `CancelledError`, actual task cancellation, double-cancellation cleanup and stale reservation recovery.
+- REST result tests pin the practical contract: reusing the same idempotency key replays the same result IDs and does not double-count; CSV-upload retries also replay rather than insert another measurement. The replay is explicitly surfaced as `idempotency_replay=True`.
+- Suggestion lifecycle updates use compare-and-transition semantics and write audit Event rows; trace IDs are attached at the storage layer so operation-level audit rows retain workflow correlation.
+- The released Óptima artifact repository identifies BO-MCP as the persistent campaign/observation/action-state backend for seven showcase campaigns, including two physical self-driving laboratories. The RAISE showcase preserves one artifact directory per approved increment with BO-MCP campaign exports/run logs; the RoboChem-Flex showcase reports 23 physical experiments and a campaign continuation after workstation replacement.
+- The current code is MIT licensed.
+
+**INDEPENDENTLY CORROBORATED SCIENTIFIC CLOSURE**
+- The September 2026 Óptima preprint reports evaluation on two physical platforms, including a five-day, 23-experiment flow-chemistry campaign that raised yield from roughly 30% to 59%, and a closed-loop RAISE contact-angle campaign with mid-run failure handling. This is recent preprint evidence for Óptima/BO-MCP campaign use, not peer review of BO-MCP's software invariants.
+- RAISE's separate 2026 Digital Discovery paper independently establishes a real closed-loop formulation→robotic execution→imaging→measurement→BO system; RoboChem-Flex's 2026 Nature Synthesis paper independently establishes a modular closed-loop flow-chemistry platform. These papers validate the physical platforms, not BO-MCP's exact-once guarantees.
+
+### Independent RED-TEAM / VERIFIER pass
+Verifier input excluded the proposed score and used only the frozen source/test/schema/history packet plus the public campaign/paper evidence above.
+
+**Verdict: PASS_WITH_LIMITS.**
+
+Reasons to pass:
+1. The core value is visible in source, database schema and dedicated adversarial tests rather than a README claim: durable experiment identity, suggestion/result provenance snapshots, guarded state transitions, cross-process idempotency and audit events.
+2. The candidate closes much more of the execution-governance axis than PRAXIS and has stronger durable/retry semantics than ALchemist's thread-level queue protection.
+3. Unlike a simulation-only BO service, the related released campaign artifacts and current preprint show the backend was used across two real physical SDL families and across workstation/session interruption.
+4. The public repository is low-attention relative to the depth of its reliability and campaign-state machinery.
+
+Strongest objections / limits:
+1. **No physical exactly-once guarantee.** BO-MCP can prevent duplicate database/tool mutations, but it cannot prove an external robot did not physically execute twice after an ambiguous network failure. External dispatch acknowledgement/readback remains a separate system-of-record problem.
+2. **Idempotency is opt-in.** The tests deliberately show that an unlinked resend without an idempotency key is stored again; client discipline or a mandatory gateway is still required.
+3. **Proposed→actual is reconstructable, not yet a first-class delta alert.** The result stores actual parameters and a snapshot of suggested parameters, but no inspected code automatically computes/flags their difference as ALchemist does.
+4. **Reference degradation can become free-floating data.** Invalid, missing or foreign `suggestion_id` values follow a warning-only path and may persist as unlinked results. That is useful for imports but weakens strict chain-of-custody unless a deployment hardens the policy.
+5. **Reservation timeout edge.** Source comments acknowledge that a genuinely long operation can outlive a pending reservation window and risk duplicate execution if its heartbeat/extension no longer protects the slot.
+6. **Publication maturity.** The Óptima system-level result is a September 2026 arXiv preprint; this run did not independently rerun the full test suite or reproduce a physical campaign.
+
+The verifier therefore passes BO-MCP as an unusually strong **experiment-integrity / campaign-state kernel**, while rejecting the stronger claim that it alone provides hardware-level exactly-once autonomous experimentation.
+
+### Proposed score
+A) speed to first revenue: **4/5** — a reliability/chaos audit and integration gateway can be sold before a full laboratory OS.  
+B) customer value / ceiling: **5/5** — duplicate/misattributed experiments and unreconstructable campaigns are expensive in automated R&D environments.  
+C) build/domain compression: **5/5** — persistent campaign BO, suggestion/result identity, provenance snapshots, idempotency, lifecycle, audit, API/MCP and regression corpus compress substantial engineering/domain work.  
+D) rarity/advantage: **5/5** — the combination of agent-facing BO state, data-integrity machinery and real physical-campaign evidence is unusual at this attention level.  
+E) evidence/completeness: **4/5** — excellent source/schema/tests/history plus physical artifacts, but no independent test execution and the physical exactly-once boundary remains external.  
+F) rights/operability: **5/5** — MIT code, Docker/API/MCP deployment path; third-party lab hardware/services/papers retain separate rights.  
+**Total: 28/30 — MASTER_CANDIDATE-grade technical finding inside shadow only; no central promotion is made.**
+
+### Commercial / research implication
+The most defensible wedge is an **Autonomous-Lab Experiment Integrity Gateway & Chaos Audit**, not another BO product. Put a reliability boundary between agent/optimizer and laboratory executor: require stable experiment/business IDs and idempotency keys, preserve suggestion snapshots and actual submitted conditions, surface proposed→actual divergence, chaos-test retries/cancellation/restarts, and add an external execution-ack/readback adapter so ambiguous hardware dispatches enter an explicit unresolved state instead of being blindly retried. Buyer: SDL/platform engineering lead, automated R&D group, CRO/CDMO automation team, or lab-informatics owner. Money path: fewer duplicate/wasted runs, faster recovery, defensible campaign reconstruction and lower scientist/debug labor.
+
+### Comparator / negative evidence
+- `Frank-Gu-Lab/RAISE@c3422c868ebf3fcfd8957cf560a3a6b71b023d91` is genuine physical SDL software and peer-reviewed, but the public orchestrator itself does not supply BO-MCP's database idempotency/audit layer and notes that some client/credential-dependent pieces are outside the public code path.
+- `Goldferret/MEDAL-LAB@856d20e0462e9faa3a0b3bc9855c0e2eb4b9449e` was low-attention and structurally interesting, but its public tree exposed `.env`-named paths; no such files were opened and it was not used for the result. Do not chase accidental exposure surfaces as a discovery strategy.
+- ALchemist remains stronger on explicit per-variable proposed→actual delta records; PRAXIS remains stronger as a self-contained protein physical-loop reference. BO-MCP is the strongest of the three on tested persistent mutation/retry integrity.
+
+### Search lesson outcome
+The decision→execution seam strategy succeeds a **third independent shadow run**, and the useful discriminant is now more precise: search not only for `suggested`/`actual`/`provenance`, but for **experiment identity + persistence-boundary invariants** such as `suggestion_snapshot`, partial unique `suggestion_id` indexes, `Idempotency-Key`, reservation tokens, cancellation cleanup, stale-owner fencing, audit events and physical campaign exports. This separates operational scientific infrastructure from notebooks and optimizer wrappers.
+
+New negative lesson: database exactly-once and scientific closure are still insufficient for **physical exactly-once**. Future searches should explicitly require an executor acknowledgement/readback or uncertainty/reconciliation state at the hardware/API boundary.
+
+### VALUE HANDOFF
+1. **Capability delta:** durable campaign state now includes a tested bridge from optimizer intent → actual result → preserved suggestion snapshot, plus retry-safe mutation and audit primitives.
+2. **Graph edge:** conceptually bridges the gap identified by ALchemist (governance without physical proof) and PRAXIS (physical proof without durable retry governance); no central graph file was edited.
+3. **Radar signal:** a third implementation family supports the emerging category **autonomous-science experiment integrity**, distinct from generic Bayesian optimization.
+4. **Experiment impact:** enables a concrete falsifiable chaos suite: concurrent submit, lost response/retry, task cancellation, restart, duplicate suggestion reference, altered actual parameters and external-dispatch ambiguity.
+5. **Commercial impact:** strengthens the first paid wedge from generic integration to a fixed-price Experiment Integrity / Recovery Audit with measurable duplicate-run, orphan-state, reconstruction-time and failed-retry KPIs.
+6. **Negative knowledge:** never infer hardware exactly-once from an idempotent database/API; do not treat opt-in idempotency or warning-only foreign IDs as a strict provenance guarantee.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- code/paper/history/search traversals: ~18;
+- serious candidate/evidence-family inspections: 3;
+- external GitHub/web reads: ~40;
+- untrusted-repository code executions: 0 (source/test/schema/history inspection only).
