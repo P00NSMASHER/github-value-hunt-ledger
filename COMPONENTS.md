@@ -150,3 +150,75 @@ For each entry record:
 - Value score: **28/30** — A5 B4 C5 D4 E5 F5.
 - Combination: Postgres restore engine -> positive fixture + mandatory negative control -> signed proof SLA -> trust validation.
 - Next action: compare identical WAL-gap/wrong-target/checksum-corruption fixtures against the current PostgreSQL engines and retain the strongest execution path plus the negative-control methodology.
+
+<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
+## Additional reusable components — 2026-09-20
+
+### sandyliu3056/UPS-reconciliation — parcel correction/rebill specialist oracle
+- Revision: `d1e11940b262debc3c3216aba6467f39722c3000`.
+- Score: **28/30**.
+- Capability: reconstructs UPS-style original/corrected billing chronology and contractual reprice logic including corrected weight/zone/returns/multipiece/LPS cases; useful for proving incremental base-charge shortages after corrections.
+- Integration: Freight Recovery v14 specialist comparator, not a second TMS/rating plane. Same-family `ups-reprice-web` is deduped as supporting evidence.
+- Rights: actual public provenance recorded in hunter 36; user's separate permission applies to repository-owned code. Carrier tariff/contracts/customer data remain separate.
+- Next action: independently author correction/rebill fixtures and compare oracle output against the main freight calculation plane.
+
+### clay-good/vaulytica — construction contract/flow-down rule component
+- Revision: `ffb88ed27354f8a3b17269d327ec29bd1d1fae98`.
+- Score: **28/30**.
+- Capability: deterministic construction contract-analysis/playbook rules around prime/subcontract scope, incorporation/flow-down, payment/retainage, change orders, lien waivers, bonds, insurance/indemnity and related evidence.
+- Integration: ScopeSignal v5 authority extraction/review before commercial-state calculations.
+- Rights: MIT repository code; source legal forms/standards/current law remain independently governed and require authoritative current-source review.
+- Next action: held-out contract set with exact source spans and deliberate conflicting/absent clauses; unresolved authority stays unresolved.
+
+### abdu2030/Resolve_api — deterministic resolver challenger for identity mastering
+- Revision: `de593e6...` (full exact SHA preserved in hunter 18).
+- Score: **28/30**.
+- Capability: evidence-oriented record/identity resolution that complements Canon's reviewed/versioned registry boundary.
+- Integration: candidate generation/normalization -> Resolve/other challenger -> Canon human review/promotion -> pinned production registry.
+- Next action: synthetic vendor/customer corpus with ambiguous aliases, mergers/splits and negative matches; compare false-merge/false-split frontier.
+
+### attestwire/en16931 — independent structured-invoice rule oracle
+- Revision: `09d08...` (full exact SHA preserved in hunter 16).
+- Score: **29/30**.
+- Capability: strong independent EN16931 structured-invoice validation source/oracle.
+- Integration: use as a peer challenge to Formalis rather than replacing it; disagreements in money/compliance fields route to rule-pack/source review.
+- Rights: repository-owned material under public/standing permission; official schemas/Schematrons/code lists remain separately governed.
+- Next action: parity corpus across identical UBL/CII fixtures and exact rule-pack versions.
+
+### adamleap02/PermitBuild — canonical permit/version/source-QA plane
+- Revision: `ff795137e0c66e62a87e62956fa351926886255d`.
+- Score: **29/30**.
+- Capability: Socrata/ArcGIS/CKAN/Accela-style connectors, canonical permit/property schema, idempotent upserts, immutable versions + field-level diffs and demonstrated semantic source-field QA such as fee-vs-valuation and professional-role/date mapping corrections.
+- Integration: PermitPlate source-of-event/version layer before parcel/buildability/economic enrichment.
+- Safety: reported `.playwright-signup-evidence/` browser-profile-like artifacts were not opened or used; see EXPOSURES_INDEX.
+- Next action: three-jurisdiction held-out completeness/semantic-mapping benchmark.
+
+### davidlarrimore/curatore-v2 — acquisition-forecast version/history plane
+- Exact revision: recorded in hunter 42 (`d4e42ac...`).
+- Score: **29/30**.
+- Capability: multi-source planned-buy/acquisition-forecast normalization with rich fields, SHA-256 content/history, first-seen/last-updated/field diffs and source-run success/failed/partial states.
+- Integration: CaptureBrief pre-solicitation signal; forecast must later be linked to actual SAM notice/award evidence rather than treated as procurement fact.
+- Next action: frozen forecast→SAM outcome benchmark and source coverage/failure accounting.
+
+### Gaskony-Ignition/module-plc-emulator — L5K-derived virtual PLC
+- Revision: `518f56b55566d7e20f19ce64003cdae45a08edc8`.
+- Score: **29/30**.
+- Capability: imports customer-authorized Rockwell L5K exports and creates an OPC-UA simulated controller with real tag hierarchy/types/UDT/AOI/arrays/module I/O and configurable behaviors; intended NodeIds can challenge HMI/SCADA bindings before hardware FAT.
+- Rights: Apache-2.0 repository code; Rockwell/Allen-Bradley/Studio 5000/Ignition trademarks, proprietary formats/specifications and third-party test assets remain separate.
+- Next action: synthetic L5K→OPC-UA→Ignition browse/read/write/type-drift regression.
+
+### BroadbandForum USP acceptance/model family
+- `BroadbandForum/usp-test@5d53f5280b2a90ea0040887e62828c7b7369a240` — **29/30**, standards-body TP-469-style acceptance procedures/pass metrics for message/path/access-control/MTP and stateful firmware/certificate/event behavior.
+- `BroadbandForum/usp-data-models@a6c869d4c6e80a3d940c4dc4fbeb9b5c859d233d` — **25/30**, structured model/version/object/parameter/command/event source.
+- `BroadbandForum/cwmp-xml-tools@ea856e227734001695e61135f38071afd67be90d` — **23/30**, archived migration/mapping/conversion tooling.
+- Integration: CWMP/USP model diff -> selected acceptance cases -> independent controller/agent matrix -> readiness evidence.
+- Rights: repository permission does not imply BBF certification, trademark, patent/IPR or wholesale standards redistribution rights.
+- Next action: automate 10–20 highest-value cases while keeping outputs framed as readiness unless official certification rights are verified.
+
+### thermofisherlsms/meth-modifications — official vendor method schema/version component
+- Exact revision: recorded in hunter 20 (`b30bbe1...`).
+- Score: **28/30**.
+- Capability: Thermo method XML/XSD/versioned modification surface useful for authoritative instrument-method interchange and regression.
+- Integration: Lab Automation v5 vendor-control plane beside SLIMS and normalized outputs.
+- Rights: MIT repository code; Thermo runtime/services/trademarks/vendor ecosystem remain separately governed.
+- Next action: dummy/authorized method round-trip with version mismatch and unsupported-field negative cases.

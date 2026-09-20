@@ -137,3 +137,50 @@ For each opportunity record:
 - Monetization: implementation + recurring registry compilation/review/managed hygiene.
 - Score: **28/30** — A5 B4 C5 D5 E5 F4. Crowded MDM procurement lowers ceiling/speed versus direct-dollar recovery, but the governance/replay boundary is unusually strong.
 - Next validation: synthetic multi-source corpus through candidate generation → human review → registry promotion → pinned runtime lookup → writeback → correction/split → exact replay; runtime behavior may change only on promoted versions.
+
+<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
+## Current opportunity ranking overlay — 2026-09-20
+
+### 1. Freight Audit Acceptance Test / Recovery — **29/30, unchanged #1**
+The strongest path remains a frozen customer-authorized blind population carried through controlling authority, independent expected charge, incumbent comparison, dispute and actual credit/refund/remittance. Freight v14 adds correction/rebill evidence without changing the bottleneck.
+
+### 2. AP Leakage Assurance — **29/30 challenger**
+- Sources: invoice-reconciliation-engine + structured-invoice validation + identity/proof/settlement components.
+- Buyer: controllers, AP shared services, audit/recovery firms.
+- Wedge: one closed-period read-only three-way audit with planted duplicate/partial-receipt/price/quantity/tax/no-PO/no-receipt cases first.
+- Monetization: diagnostic -> recurring assurance -> outcome-based recovery only on actually resolved credits/refunds.
+- Key risk: PO/receipt identity and contractual/tax authority must fail closed; “exception dollars” are not “recovered dollars.”
+
+### 3. Partner / Commission Payout Assurance — **29/30 challenger**
+- Sources: OpenPartner + Kleegr/OCA commission comparators + buyer plan/CRM/refund/payment evidence.
+- Wedge: blind one-month plan-to-payout reconciliation including refunds, disputes, reversals and ambiguous provider outcomes.
+- Monetization: fixed diagnostic + recurring monitoring; recovered/avoided dollars require settlement proof.
+
+### 4. Recovery Proof SLA v9 — **28–29/30 portfolio priority**
+- Wedge: 1–3 critical systems, real isolated restore, mandatory bad-target/history/checksum negative controls, app invariants, RTO/RPO and evidence trust.
+- Differentiator: prove the verifier can reject a deliberately wrong recovery, not merely produce a green report.
+
+### 5. ScopeSignal v5 / Construction Change Leakage Recovery — **28/30 challenger**
+- Wedge: one project, 20–50 changes, tracing design delta/field T&M through flow-down/notice, owner/sub commercial state, actual cost, customer approval and pay/payment/waiver evidence.
+- Differentiator: measures whether field-incurred extra work actually became approved/billable/paid value.
+
+### 6. CaptureBrief v6 — DoD rule currency + pre-solicitation evidence — **28/30**
+- Wedge: 10 live DoD/GSA solicitations with exact FAR/DFARS/supplement/deviation resolution plus packet/amendment completeness; separately backtest forecast/recompete signals against actual notices.
+- Differentiator: first-party structured regulatory source + source packet + award/identity lineage + explicit forecast-vs-actual separation.
+
+### 7. Installed-Base Lab Automation v5 — **27/30 commercial priority**
+- Wedge: automate one existing SLIMS workflow/instrument handoff using dummy or authorized records, normalized output and replayable provenance.
+- Ceiling: high-value integration/governance work; sales cycle heavier than direct-money audits.
+
+### 8. Industrial Pre-FAT / Virtual Commissioning — **27/30 challenger**
+- Wedge: customer-authorized L5K namespace to virtual OPC-UA PLC, then HMI/SCADA binding/type/fault acceptance before hardware is available.
+- Promotion gate: synthetic end-to-end bind benchmark with planted missing/type-drift/fault cases.
+
+### 9. Permit-to-Development Opportunity Intelligence — **27/30 challenger**
+- Wedge: trusted permit event/version -> parcel/hazard/economic context -> zoning/buildability/variance packet with source dates/citations.
+- Differentiator: ranks what a permit/site means economically rather than selling raw lead rows.
+
+### Emerging vertical audits — validate before promotion
+- **Industrial Gas Returnables Proof-to-Cash:** serialized cylinder -> fill -> distribution/customer custody -> return -> invoice -> receivable/payment.
+- **Commercial Linen Custody-to-Cash:** scheduled pickup/count/weight -> processing/return -> accepted service -> rate/tax -> invoice/payment.
+- **Facilities Warranty Leakage:** work order/repair spend -> warranty/service-contract coverage -> receipt/document/claim state -> vendor/manufacturer recovery outcome. `sassanix/Warracker` is useful evidence plumbing but remains below MASTER at 23/30.

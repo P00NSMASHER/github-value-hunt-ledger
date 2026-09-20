@@ -79,3 +79,60 @@ Never store, reproduce, test, validate, authenticate with, exploit, or monetize 
 - Do not test or authenticate with accidental material.
 - Do not copy a raw value into issues, commits, chat, logs, benchmarks or product artifacts.
 - When a safe sanitized revision exists, use that revision and preserve the quarantine note for the older one.
+
+<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
+## Additional redacted exposure observations — 2026-09-20
+
+### sandyliu3056/UPS-reconciliation
+- Repository: `sandyliu3056/UPS-reconciliation`.
+- Canonical URL: https://github.com/sandyliu3056/UPS-reconciliation
+- Exact revision used for safe technical evidence: `d1e11940b262debc3c3216aba6467f39722c3000`.
+- High-level exposure type: repository documentation/history indicated older public versions contained password/authentication material.
+- Apparent status: **unknown; no historical value was retrieved, copied, tested or validated**.
+- Non-sensitive context: current safe source was evaluated only for parcel correction/rebill semantics.
+- Remediation note: repository owner should ensure any historical credential is revoked/rotated; hunt should use only sanitized revisions and never reopen secret-bearing history.
+
+### BritneyMcCullough/PayrollReconciliation
+- Repository: `BritneyMcCullough/PayrollReconciliation`.
+- Exact revision: `64cd190...` (full exact SHA preserved in hunter 21).
+- High-level exposure type: tree contains payroll-like `data/uploads/` and `data/runs/` artifacts that could hold personal/private operational data.
+- Apparent status: **not inspected**; no artifact contents or personal values were opened or retained.
+- Non-sensitive context: safe source/code evidence was sufficient to assess its normalization/matching architecture.
+- Remediation note: continue code-only inspection; use synthetic fixtures for benchmarking unless customer data is explicitly authorized.
+
+### adamleap02/PermitBuild
+- Repository: `adamleap02/PermitBuild`.
+- Exact revision: `ff795137e0c66e62a87e62956fa351926886255d`.
+- High-level exposure type: repository documentation reports `backend/.playwright-signup-evidence/` may contain browser-profile/cookie/autofill/payment-adjacent state.
+- Apparent status: **not opened, copied, tested or used for authentication**.
+- Non-sensitive context: permit connector/version/semantic-QA code was assessed independently of that directory.
+- Remediation note: owner should review/remove any sensitive browser state and revoke unintended accounts; hunt must continue to avoid the directory.
+
+### kasun-m-rathnayaka/gas-distributer-backend
+- Repository: `kasun-m-rathnayaka/gas-distributer-backend`.
+- Exact revision: `f0a1f8013759f11be625f383a9449826f0751f37`.
+- File/path: committed `backend/.env.development.local`; file was not opened.
+- High-level exposure type: environment/configuration artifact potentially containing secrets/auth material.
+- Apparent status: **unknown; not tested or validated**.
+- Remediation note: quarantine this revision; revisit only a sanitized revision/fork.
+
+### dev-k99/ScrapFlow
+- Repository: `dev-k99/ScrapFlow`.
+- Exact revision: `170a655118347be55fcefd8f94f51747df8a9a35`.
+- High-level exposure type: public documentation exposed authentication material.
+- Apparent status: **unknown; no value retained, tested or used**.
+- Remediation note: revisit only sanitized later revision; rotate/remove any exposed authentication material.
+
+### openmymed/open-fleetr
+- Repository: `openmymed/open-fleetr`.
+- Exact revision: `8a4bfdd8ff644784b3706d4821ca49fb98e5c188`.
+- High-level exposure type: public SQL artifact contains credential-like authentication material and personal-data-like seed values.
+- Apparent status: **not inspected beyond safe metadata; no value/person record retained or tested**.
+- Remediation note: sanitize the dump and rotate potentially live credentials before any revisit.
+
+### anjalaeepriyadarshaniyapa/Medical-Waste-Management-System
+- Repository: `anjalaeepriyadarshaniyapa/Medical-Waste-Management-System`.
+- Exact revision: `f1ea2792db9b3a8684a68677c2f4391a6107c83b`.
+- High-level exposure type: README contains login credential-like authentication material.
+- Apparent status: **unknown; no value retained, tested or used**.
+- Remediation note: remove public authentication material and rotate if potentially live; inspect only a sanitized later revision.

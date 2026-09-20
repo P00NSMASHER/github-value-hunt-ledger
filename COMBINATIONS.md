@@ -243,3 +243,71 @@ These sections supersede earlier same-named versions where they conflict. The po
 - Buyer / first paid wedge: water cooperatives, municipal/private utilities and billing outsourcers; one-period read-only Meter-to-Cash Assurance diagnostic.
 - Integrity rule: published utility tariffs/effective dates and customer-specific billing authority remain external truth. A calculator result alone cannot prove over/under-billing.
 - Validation: synthetic meter rollover, missing/estimated reads, progressive blocks, mid-period rate changes, duplicate invoice, adjustment/reversal, partial payment and overpayment cases; then one authorized closed billing period if precision is acceptable.
+
+<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
+## Integrator overlay — 2026-09-20 current priority architecture
+
+This overlay supersedes older version labels where they conflict. It intentionally separates **source truth, deterministic decision, evidence sufficiency and realized outcome** instead of letting one implementation validate itself.
+
+### 1. Freight Recovery v14 — correction-aware authority -> blind acceptance -> realized settlement
+- Core: existing v12/v13 licensed freight operating/evidence/rerating stack + `sandyliu3056/UPS-reconciliation@d1e11940b262debc3c3216aba6467f39722c3000` as a specialist parcel correction/rebill oracle; same-family `ups-reprice-web` is deduped as supporting implementation evidence rather than a second leader.
+- New capability: preserve original charge, corrected shipment facts and rebill chronology; recompute contractual billable weight/zone/base/accessorial/fuel where authority exists; compare only source-grounded expected charges to corrected invoices; carry validated variance into blind incumbent scoring and later credit/refund/remittance attribution.
+- Negative control: `Emmanuel-tech-hub/freight-invoice-auditor@1987a776...` demonstrated the exact fail-open defect to forbid: a missing contracted accessorial rate must **not** default to $0 expected and make the billed line look recoverable. Missing/ambiguous authority = REVIEW/$0; `needs_review` rows are excluded from asserted and realized money totals.
+- Buyer / wedge: unchanged — fixed-price Freight Audit Acceptance Test on a frozen customer-authorized population; optional shared savings only on incremental cash/credits uniquely attributable and actually realized.
+- Status: **#1 commercial strategy.** The bottleneck is still a real frozen customer population with controlling contract/addenda/accessorials, shipment evidence, incumbent outputs and later settlement evidence, not another TMS/OCR/rating repository.
+
+### 2. AP Leakage Assurance v1 — PO + receipt + invoice + approval + settlement
+- Components: `kingsleyonoh/invoice-reconciliation-engine@7545330806168102cd347d64a85a44481b37a6b3` + Formalis/Attestwire structured-invoice validation where applicable + Canon/Resolve identity controls + proof/readiness and settlement evidence patterns from the recovery stacks.
+- Combined capability: buyer-authorized PO/contract price -> goods receipt/service proof -> invoice identity/line math -> duplicate/price/quantity/tax/no-receipt/no-PO exception -> human disposition -> vendor credit/refund/payment outcome.
+- First paid wedge: read-only closed-period AP Leakage Diagnostic with a planted synthetic benchmark before customer data; report exposure separately from recovered dollars.
+- Hard invariant: uncertain PO identity, receipt, commercial authority, tax rule or settlement allocation = review/unresolved, never automatic recovery.
+- Strategic position: strongest new direct-money challenger after freight because the source→variance→outcome loop is clear and buyer ROI is measurable.
+
+### 3. ScopeSignal v5 — design change -> field proof -> flow-down -> billing/payment outcome
+- Components: existing PDF/IFC/quantity/deadline/CPM stack + `mattumali579/scope-creep@1defef1bf87b2838ba0b36750e56c150841ed51c` signed/photo T&M capture + `clay-good/vaulytica@ffb88ed27354f8a3b17269d327ec29bd1d1fae98` contract/flow-down playbooks + `pedrocodesforcoffee/builder-api@3a9d2f3af61b485763a9f0cc4209ed1a8b584683` owner/sub commercial state + `SharkooMaster/Marginal@e422a07f31588e7e04a714a7b7ad2b2bcac21a11` actual-cost→scope-exception→customer-approval→billable chain + LienGuard/payment/waiver evidence where authoritative law/currentness is separately proven.
+- Combined capability: revised drawing/model -> measured quantity -> contemporaneous labor/material/equipment/photo/signature proof -> controlling contract and flow-down clause -> authoritative notice clock/receipt -> owner PCO/OCO and subcontract CCO -> actual cost -> customer approval -> invoice/pay app/retainage/waiver/payment/lien-status evidence.
+- First paid wedge: one-project Change Leakage Audit for specialty contractors/GCs, following 20–50 changes from field evidence to recognized/paid value.
+- Hard invariant: prototype notice timers are never authority; conditional waivers remain UNKNOWN without payment-clearing evidence; app state does not prove statutory entitlement.
+
+### 4. Partner / Commission Payout Assurance v2
+- Components: `getcoherence/openpartner@eeff532ee758dc6221b4d03af852e5705a2328fb` event-sourced payout/settlement control plane + existing Kleegr/OCA deterministic commission comparators + buyer-owned plan, CRM/order, refund/dispute and payroll/payment evidence.
+- Combined capability: source attribution -> versioned plan/rule -> accrual -> review/reversal -> payable -> provider transfer intent -> ambiguous-result reconciliation -> refund/dispute recovery -> actual settlement.
+- First paid wedge: one closed-month blind plan-to-payout acceptance test.
+- Hard invariant: an ambiguous external payout result is not retried blindly and is not treated as paid until independently reconciled.
+
+### 5. CaptureBrief v6 — official baseline + supplement/deviation + forecast/recompete evidence
+- Components: official GSA FAR + `GSA/GSA-Acquisition-DFARS@7e609f791af9cc6d8e7d75a7b05c83b1f62c0cb8` + GSAM/other current verified supplements + FAR Overhaul deviation collector + SAM packet/amendment acquisition + USAspending/DATA Act identity/award lineage + `davidlarrimore/curatore-v2` acquisition-forecast version history + `PHiZou/recompete-radar` explainable historical signal + `JonGerhardson/federal-agent` bulk SAM provenance.
+- Combined capability: planned-buy/forecast signal -> incumbent/award history -> actual SAM notice and complete amendment packet -> namespaced FAR/DFARS/agency-supplement clause resolution -> potentially controlling deviation/currentness -> source-backed analyst decision.
+- First paid wedge: 10-solicitation rule-currency/packet-completeness review plus a frozen forecast→actual linkage benchmark.
+- Hard invariant: forecast/recompete score is not an actual solicitation; repository commit date is not rule effective date; stale/archived supplement sources cannot drive live applicability.
+
+### 6. Recovery Proof v9 — full restore + negative control + PITR/app/trust separation
+- Components: `automat-it/project-discovery-toolkit@8d46d765...` multi-relational full restore + `duke5am/pg-restore-drill@e914caddd14ab1604d85ccb7919d4da071a6766c` mandatory wrong-target/archive-gap negative controls + Kronos/Probavi/pg_hardstorage/BackupDrill/RestoreLab where engine-specific + application/object checks + SiVa/trusted evidence.
+- Combined capability: restore to isolated target -> engine-native integrity -> object/row/checksum parity -> deliberate bad-target/bad-history/bad-checksum rejection -> separate PITR proof -> application invariants -> measured RTO/RPO -> signed/timestamped trust validation.
+- First paid wedge: Recovery Readiness Audit on 1–3 systems followed by recurring proof freshness.
+- Hard invariant: “backup succeeded,” “full restore succeeded,” “PITR succeeded,” “app works,” “RTO/RPO met” and “evidence is trustworthy” are six different claims.
+
+### 7. Lab Automation v5 — installed-base SLIMS + vendor control + normalization + provenance
+- Components: `genohm/slims-python-api@c3e3f5fb0ef0562550257aa3251caf5f5f9322b9` installed-base integration + SLimsGate callbacks/workflows + vendor-specific control/method surfaces such as VWorks and Thermo method/iAPI where buyer-authorized + Allotropy/Rainbow normalization + PyTestLab/Galago/PyLabRobot replay/control as appropriate + Flowcept/HELIOS provenance/governed campaign logic.
+- First paid wedge: automate one existing SLIMS workflow/instrument-result handoff with dummy/authorized data, replayable evidence and human approval before broader campaign control.
+- Hard invariant: normalized files, instrument command success, sample identity and scientific result validity remain separate evidence surfaces.
+
+### 8. Industrial Virtual Commissioning / Pre-FAT
+- Components: `Gaskony-Ignition/module-plc-emulator@518f56b55566d7e20f19ce64003cdae45a08edc8` plant-specific L5K→OPC-UA tag tree + ProtoForge fault/replay + PLC4X/protocol bridges + independent client/SCADA checks.
+- Wedge: customer-authorized synthetic or exported controller namespace -> emulator -> Ignition browse/read/write/binding regression -> type/tag/namespace/fault report before hardware FAT/SAT.
+- Promotion gate: reproduce one fully synthetic CompactLogix-style L5K→OPC-UA→Ignition binding corpus with expected failures. Vendor format/specification/trademark rights remain separate.
+
+### 9. Broadband USP/CWMP Migration Readiness
+- Components: `BroadbandForum/usp-test@5d53f5280b2a90ea0040887e62828c7b7369a240` TP-469 readiness corpus + `usp-data-models@a6c869d4c6e80a3d940c4dc4fbeb9b5c859d233d` structured model/version source + legacy CWMP model/tooling + existing Oktopus/Caretaker/OB-USP-Agent/independent clients.
+- Wedge: 10–20 high-value firmware/certificate/reconnect/event cases plus customer model-diff before a CPE/ISP rollout.
+- Integrity boundary: market as readiness/pre-certification unless formal BBF certification/test-suite/IPR rights are independently verified.
+
+### 10. Permit-to-Development Intelligence
+- Components: `adamleap02/PermitBuild@ff795137e0c66e62a87e62956fa351926886255d` multi-source canonical permit/version/field-QA plane + `mosswild/res_prop_mcp@ef64c7a928366a044bc51a8c528efad96916e833` parcel hazards/comps/distress/suitability + `Elliot-Sones/Hack_Canada@595508e46b3b881839a1ca9eb769712d74026573` deterministic zoning/variance/buildability/economics where jurisdictionally applicable.
+- Wedge: source-backed developer/site-screen packet answering not merely “a permit exists” but “what this project/site means economically and what evidence supports that conclusion.”
+- Promotion gate: held-out live addresses with source freshness, parcel identity, zoning-version/citation and pro-forma assumption survival through human review.
+
+### 11. Emerging returnables/custody proof-to-cash family
+- Industrial gas: `NiketanSP/CylinderManagementSystem@78a27f75ee849e1d33fa059122e913eb7dbe814c` supplies serialized shell purchase/status/fill/distribution/invoice/outstanding-payment semantics. Pair safety/inspection and delivery/empty-return proof; first wedge is cylinder-returnables + receivables reconciliation.
+- Commercial linen: `JaroslawBolejko/HotelLinenManagerV2@381ef0a3081f7b01a695f11fdd13454b469aacd8` supplies hotel↔laundry service documents, weights/rates/tax/invoice authority. Pair deeper route/lot/custody evidence; first wedge is completed-but-uninvoiced and weight/rate discrepancy audit.
+- Keep both below MASTER until one buyer-authorized custody→invoice→payment population proves measurable dollars.

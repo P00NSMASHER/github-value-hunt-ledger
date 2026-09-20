@@ -634,3 +634,71 @@ The entries below were re-scored under the standing commercial-permission postur
 - `ChelseaKR/constituent-reconciler` remains a **29/30 component/watch** rather than a second MASTER identity leader because Canon better represents the reusable reviewed-registry/replay DNA. Constituent Reconciler is indexed in `COMPONENTS.md` for consent-aware writeback.
 - `oscal-compass/compliance-to-policy-go` (**27/30**) and `duke5am/pg-restore-drill` (**28/30**) are intentionally indexed as uniquely important components rather than standalone MASTER leaders; they strengthen the compliance/recovery stacks without creating separate buyer wedges.
 - `justicebajaj161/Freight-Audit-Console` (**27/30**) remains an independent freight oracle in COMBINATIONS, not another freight MASTER leader; its revised-fuel/split-bill/residual-weight cases should be ported into the frozen benchmark.
+
+<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
+## Promotions — 2026-09-20 integrator pass
+
+The following entries cleared the normal 24/30 bar **and materially improve an active high-value stack**. Higher-scoring discoveries that are better treated as components, datasets, comparators or still-unvalidated adjacent businesses remain outside MASTER by design.
+
+### GSA/GSA-Acquisition-DFARS
+- Commit: `7e609f791af9cc6d8e7d75a7b05c83b1f62c0cb8`.
+- Rights: GitHub metadata reported no blanket root public license at inspection. The user's standing separate commercial permission applies to repository-owned public content for portfolio analysis. DFARS/regulatory source status, linked material, standards/IPR and current deviation authority remain separately governed and must be cited from the controlling source.
+- Score: **30/30 — A5 B5 C5 D5 E5 F5** under the standing separate-permission posture.
+- Capability: official Acquisition.gov/GSA machine-readable DFARS publication with clause/section DITA, paragraph hierarchy, prescription cross-references, revision markers and case-source artifacts, plus rendered publication formats.
+- Buyer/problem: DoD capture/proposal/compliance teams need exact current clause text, prescription and revision context without relying on scraped prose or stale summaries.
+- Monetization / first paid wedge: CaptureBrief DoD rule-currency diagnostic on 10 live solicitations: cited clause -> structured DFARS source -> prescription/revision -> potentially controlling class deviation -> explicit current/conflict/unresolved state.
+- Why it beats alternatives: this is first-party structured acquisition-rule evidence, not another secondary FAR search/index layer. It directly strengthens the authoritative rule chain already built around machine-readable FAR and deviation collection.
+- Integrity boundary: repository recency alone is not proof of current applicability. Solicitation date/agency, supplement namespace, deviation/supersession and authoritative source evidence must resolve before a definitive conclusion.
+
+### kingsleyonoh/invoice-reconciliation-engine
+- Commit: `7545330806168102cd347d64a85a44481b37a6b3`.
+- Rights: AGPL-3.0 public provenance; user's standing separate commercial permission applies to repository-owned code. Customer invoice/PO/receipt/approval/payment data and ERP integrations remain separately authorized.
+- Score: **29/30 — A5 B5 C5 D4 E5 F5**.
+- Capability: deterministic invoice -> PO -> goods-receipt three-way reconciliation with exact/normalized/fuzzy/fallback PO resolution, receipt verification, integer-cent discrepancy math, duplicate prevention, approvals, tenant isolation, audit logs and substantial matching/integration tests. Exception families include quantity, price, amount, overcharge, no-receipt, no-PO, duplicate and tax mismatches.
+- Buyer/problem: AP audit/recovery firms, controllers and shared-services teams lose money to duplicate invoices, unsupported receipts, price/quantity drift and weak exception controls.
+- Monetization / first paid wedge: fixed-price **AP Leakage Diagnostic** over one customer-authorized closed period, returning only source-linked evidenced exceptions and quantified exposure; recurring monitoring/recovery follows only after false-positive and outcome validation.
+- Why it beats alternatives: it supplies tested money-bearing three-way control semantics rather than OCR, anomaly scoring or generic AP workflow.
+- Integrity boundary: an exception is not a recovered dollar. Recovery requires source authority, reviewer disposition and later credit/refund/payment evidence.
+
+### getcoherence/openpartner
+- Commit: `eeff532ee758dc6221b4d03af852e5705a2328fb`.
+- Rights: MIT public provenance plus the user's standing separate commercial permission. Stripe/payment-provider services, customer attribution events and plan/source records remain independently governed.
+- Score: **29/30 — A5 B5 C5 D5 E4 F5**.
+- Capability: event-sourced partner/affiliate attribution and payout control plane with accrual/review/reversal/fraud states, payout funding, durable batch/allocation reservations, transfer intents created before provider calls, immutable idempotency, unknown-result reconciliation, refunds/disputes recovery and residual receivable handling; inspected evidence included a large automated test/race-test surface.
+- Buyer/problem: marketplaces/SaaS/channel businesses need proof that partner commissions were attributed, reversed and settled correctly, especially when payment-provider outcomes are ambiguous.
+- Monetization / first paid wedge: one closed-period **Partner Payout Acceptance Test** comparing plan + source attribution + reversals/refunds + expected payable against actual payout/settlement.
+- Why it beats alternatives: it models the dangerous settlement/idempotency/unknown-result edge, not merely a commission calculator or affiliate dashboard.
+- Integrity boundary: no blind replay after an ambiguous provider result; hard-dollar claims require later settlement evidence.
+
+### pedrocodesforcoffee/builder-api
+- Commit: `3a9d2f3af61b485763a9f0cc4209ed1a8b584683`.
+- Rights: repository-owned public code treated under the user's standing separate commercial permission; customer contracts, project records, AIA/other forms and legal authority remain separately governed.
+- Score: **29/30 — A5 B5 C5 D4 E5 F5**.
+- Capability: construction commercial-control backend that keeps owner PCO/OCO state distinct from subcontract/commitment CCO state, links cost codes/budget state, enforces approval-gated conversion and atomically carries approved commitment changes into commitment and budget committed cost.
+- Buyer/problem: GCs and specialty contractors lose margin when one change is recognized on the owner side but fails to flow down/up correctly through subcontract commitments, budget and billing state.
+- Monetization / first paid wedge: **Commercial Flow-Down Audit** on one project: trace a frozen set of changes through owner revenue, subcontract liability, budget mutation, pay-app/retainage and eventual payment evidence.
+- Why it beats alternatives: it exposes the two-sided commercial state that generic change-order CRUD often flattens, making owner-vs-sub leakage measurable.
+- Integrity boundary: contract entitlement, notice, waiver and payment-right conclusions remain external authoritative evidence; application state alone is not legal entitlement.
+
+### automat-it/project-discovery-toolkit
+- Commit: `8d46d765` (exact inspected revision recorded in hunter 15; preserve the full SHA from that catalog when referenced in downstream artifacts).
+- Rights: repository public provenance recorded in hunter 15; user's standing separate commercial permission applies to repository-owned code. Database engines, storage, hosted infrastructure and customer production data remain separate.
+- Score: **29/30 — A5 B5 C5 D5 E5 F4**.
+- Capability: multi-engine full-restore verification across PostgreSQL, MySQL, SQL Server and related estates with strict source != target, measured RTO, queryability, object/row parity, engine-native integrity checks and per-table/checksum evidence. The repository explicitly does **not** prove PITR merely because a full restore succeeds.
+- Buyer/problem: regulated SaaS/MSPs/self-hosters can show backup jobs succeeded but often cannot prove that a separate target was restored to a usable, internally consistent state.
+- Monetization / first paid wedge: fixed-price Recovery Readiness Audit on 1–3 critical systems, then recurring proof-SLA monitoring.
+- Why it beats alternatives: it exercises real restores and engine integrity instead of backup status; paired with negative controls it can test the verifier itself.
+- Integrity boundary: full-restore proof, PITR proof, application invariants, RTO/RPO and cryptographic trust remain separate claims.
+
+### genohm/slims-python-api
+- Commit: `c3e3f5fb0ef0562550257aa3251caf5f5f9322b9`.
+- Rights: Apache-2.0 public repository provenance plus the user's standing separate commercial permission. Agilent/SLIMS deployments, customer lab data, vendor services and instrument/vendor assets remain separately governed.
+- Score: **29/30 — A4 B5 C5 D5 E5 F5**.
+- Capability: production-shaped Python integration surface for Genohm/Agilent SLIMS, including entity/data access and SLimsGate workflow/callback/OAuth integration patterns that bridge an installed laboratory information estate to external automation.
+- Buyer/problem: labs with an existing SLIMS estate need automation, data exchange and governed workflow extensions without replacing the system of record.
+- Monetization / first paid wedge: automate one customer-authorized SLIMS workflow or instrument-result handoff with provenance, replay and human approval, then expand into recurring lab integration/governance.
+- Why it beats alternatives: difficult installed-base integration is a stronger commercial substrate than another standalone LIMS or generic lab framework.
+- Integrity boundary: begin with synthetic/dummy or explicitly authorized customer records; do not infer rights to vendor/customer data from repository permission.
+
+### Promotion restraint this pass
+High-scoring `PermitBuild`, `curatore-v2`, `BroadbandForum/usp-test`, `module-plc-emulator`, `Attestwire/en16931`, `Resolve_api`, `ICARUS-PJM-Dataset`, `LienGuard`, `pyfao56`, STORCITO and other 27–29/30 discoveries remain in COMPONENTS/DATASETS/COMBINATIONS/OPPORTUNITIES until they prove incremental buyer value or are better classified as source/comparator infrastructure. No existing MASTER leader was demoted on the evidence reviewed in this run.

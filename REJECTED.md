@@ -260,3 +260,33 @@ Do not add a weak repository to this file merely because it was rejected once. L
 - Reason: pulling an authoritative public diesel index is useful input plumbing, but the index value alone does not establish the customer/carrier's controlling FSC formula, base index, trigger band, rounding, publication lag or effective-date convention.
 - Disposition: source adapter only; never promote its calculated factor to contractual authority without the controlling agreement/addendum/tariff.
 - Revisit trigger: a repository binds source index + exact customer/carrier contractual formula/version/effective dates and proves that lineage with tests.
+
+<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
+## Integrator additions — 2026-09-20
+
+### Emmanuel-tech-hub/freight-invoice-auditor — production-blocked fail-open recovery logic
+- Revision: `1987a776` (full inspected SHA preserved in hunter 36).
+- Reason: missing contracted accessorial authority can resolve to `$0 expected`, making a positive billed charge appear as an overcharge; rows marked `needs_review` can still flow into totals. In a recovery product this is a false-dollar failure, not a cosmetic defect.
+- Disposition: retain only as a negative regression fixture. Do not use its output for asserted/recovered money.
+- Revisit trigger: missing/ambiguous authority routes to REVIEW/$0, review rows are excluded from money totals, and tests prove the fail-closed behavior on planted missing-rate/accessorial cases.
+
+### mccabetrow/capsight — permit/property connector surpassed on source truth
+- Revision: `1f0afdaa90e8c7e5ef0c3310fdbc8ce6a5ecdb6`.
+- Reason: inspected municipal source layer included placeholder/example dataset configuration and lacked the stronger retained controls for portal-count completeness, explicit source-health/refusal semantics and immutable permit-version history.
+- Disposition: deprioritized; PermitBuild + Urban Signal + source-health/completeness components are stronger.
+- Revisit trigger: real source coverage plus independently verified completeness, versioning/diff and `fresh/stale/not_covered/error` semantics.
+
+### GSA/GSA-Acquisition-NMCARS — currentness not established
+- Revision: `09d5b2d7040065fead99e15aacabb1d782b450d5`.
+- Reason: repository maintenance recency did not establish that sampled substantive NMCARS content was current; inspected lineage pointed to older 2022-era content.
+- Disposition: do not use for live rule applicability until independently reconciled with the current authoritative Navy/Marine Corps source.
+- Revisit trigger: newer substantive publication or authoritative cross-check proves effective/current content.
+
+### GSA/GSA-Acquisition-DAFFARS — historical/archived authority only
+- Revision: `645e3050d4e40d600bdd68a8b7fd112a6bf3171b`.
+- Reason: inspected repository is archived and directs users to a newer Department of the Air Force contracting publication location.
+- Disposition: historical provenance only; never silently use the archived snapshot as current authority.
+- Revisit trigger: none for current authority; follow the successor official source instead.
+
+### Rejection lesson reinforced
+Clear repository use permission does not cure **stale authority, fail-open money logic, weak source coverage or misleading completeness**. Technical/commercial scoring must continue to penalize those defects independently of license category.

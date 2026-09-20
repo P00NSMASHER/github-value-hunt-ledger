@@ -129,3 +129,35 @@ Do not store credentials, tokens, private/personal data, or raw accidental secre
 - Value score: **26/30** — A5 B5 C5 D5 E3 F3 at inspection because live calibration parity and upstream data-rights diligence remain unresolved.
 - Combination: grid-crunch historical scorer -> queue_attrition live snapshots/prediction ledger -> correlated expected-MW/tail-risk reporting.
 - Next action: force the live scorer to use the exact estimator/calibration contract validated out of time, freeze model/version/features and allow the append-only registry to accumulate genuinely prospective evidence before marketing calibrated live probabilities.
+
+<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
+## Additional elite data/evidence sources — 2026-09-20
+
+### HopkinsICARUS/ICARUS-PJM-Dataset — large synthetic PJM-like grid testbed
+- Repository/source: https://github.com/HopkinsICARUS/ICARUS-PJM-Dataset
+- Exact revision: `0cb6a1af86e2bdfc1d160f44b6e4a7518ca3ffe3`.
+- Category: Dataset / simulation testbed.
+- Capability: 17,467-bus synthetic PJM-like network and associated planning/resilience/queue/large-load analysis surfaces suitable for reproducible regional stress and infrastructure studies without using a customer production grid model.
+- Rights: repository software MIT and repository data CC BY 4.0 as recorded in hunter 23/related grid lane; upstream/source-derived assumptions and any external standards remain separately governed.
+- Score: **29/30** at inspection.
+- Product use: falsifiable large-load/DER/queue/resilience benchmark before customer feeder/system models; useful for testing whether algorithms preserve electrical constraints at meaningful scale.
+- Next action: define planted congestion/voltage/contingency/large-load scenarios with expected engineering outcomes; do not market the synthetic network as a utility's actual grid.
+
+### garretlking1-commits/jobwalk — synthetic construction evidence archive
+- Repository/source: exact repository/revision recorded in hunter 04 (`fdcb507...`).
+- Category: Synthetic benchmark / evidence archive.
+- Capability: rights-clean synthetic construction evidence corpus spanning project/change/payment/waiver-style records useful for testing document linking and claim-state logic without customer/private records.
+- Score: **27/30** at inspection.
+- Product use: ScopeSignal acceptance tests around evidence continuity, payment/waiver ambiguity and change-state joins.
+- Integrity rule: synthetic records are regression fixtures, not empirical construction-market evidence; conditional waiver effectiveness remains UNKNOWN without cleared payment/remittance proof.
+- Next action: add deliberately contradictory and missing-evidence cases and require fail-closed output.
+
+### xiazeyu/FireDataForge — historical wildfire event feature factory
+- Repository/source: https://github.com/xiazeyu/FireDataForge
+- Exact revision: `4328d4f6bdbec5a3ab30bf786718d759fc4fb84c`.
+- Category: Dataset pipeline / benchmark infrastructure.
+- Capability: harmonizes perimeter/fireline, VIIRS, terrain, fuels/canopy, weather, recent burn, building/land-cover, Sentinel-2 and WUI-style context onto consistent projected event grids with caching, batch work, skip/failure reasons and validation tooling.
+- Rights: MIT repository code; every underlying public/hosted source retains its own terms/provenance.
+- Score: **27/30**.
+- Product use: historical backtest corpus for STORCITO and infrastructure/utility wildfire-risk systems.
+- Next action: build a source-rights matrix and a 20-event benchmark with deliberate missing-layer degradation tests.
