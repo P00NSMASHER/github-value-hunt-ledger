@@ -232,3 +232,15 @@ Promote a reusable component here when it closes a difficult cross-stack gap, ha
 - Capability: X12 820 BPR/RMR remittance parsing, 812 credits, planted discrepancies and deterministic expected outcomes with a useful historical remittance-grain regression fossil.
 - Target: freight/AP settlement acceptance corpus, not final freight settlement authority.
 - Limitation: synthetic retail grain, float money path, ambiguous fallback and weak partial/many-to-many allocation make it unsuitable as realized-recovery truth.
+
+<!-- INTEGRATOR-R11-SHADOW-COM-2026-09-20T0914-0400 -->
+## Revenue-to-receivable internal-loop challenger
+
+### cyber-entrepreneur/wingcaster — effective-contract to reconciled-receivable backbone
+- Revision: `0d97a4ab8310d68b109e3a11ebdeda5eb3d3c829`.
+- Score: **26/30 — A3 B5 C5 D5 E5 F3**.
+- Published rights: no detected public license; standing separate repository-code permission applies only to repository-owned code/content. Customer contracts, PSP/bank data and external services remain separately governed.
+- Capability: tested internal chain from effective-dated ACTIVE customer contract/price selection → append-only rated usage → gated invoice issue/period close → idempotent payment allocation/reversal → multi-check reconciliation.
+- Evidence: source-level transition trace plus a PostgreSQL integration test that closes one billing period through FINAL, issues an invoice, records/allocates payment and requires all non-error reconciliation checks GREEN.
+- Why component rather than MASTER: the same system largely supplies/accepts the contract and payment facts that it later reconciles. External signed-amendment completeness and PSP/bank settlement readback are not independently proven, so “bank-reconciled,” “processor-settled,” “customer-contract complete” and realized-revenue claims remain unsupported.
+- Next test: replace internal authority assumptions with a frozen external contract/amendment oracle and independent PSP/bank settlement/readback corpus; require discrepancies to remain unresolved rather than self-resolve from internal records.

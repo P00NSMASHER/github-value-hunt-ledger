@@ -161,3 +161,10 @@ Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, fuzzy matchi
 ## Stop-list additions
 - Generic commission dashboards, generic IPC/pay-app UI, generic SECS/GEM libraries, generic freight reconciliation dashboards and additional outage datasets are now low-yield until the corresponding experiment fails for a concrete missing component.
 - Effective-date columns without event-time selection logic, provider webhooks without stale-operation reconciliation, and source adapters that convert exceptions into empty results are negative-control patterns, not authority components.
+
+<!-- INTEGRATOR-R11-SHADOW-COM-2026-09-20T0914-0400 -->
+## Revenue-to-receivable search stop/gap update
+- `cyber-entrepreneur/wingcaster@0d97a4ab...` closes enough of the **internal** contract→rating→invoice→allocation→reconciliation chain that additional generic billing/reconciliation-engine hunting is now low yield.
+- Hunt only the missing **external authority/readback** edge: signed/order-system amendment ingestion with supersession lineage; PSP/bank settled amount/currency/trace readback; return/reversal/chargeback after provider success; and independent fixtures that can contradict the internal system.
+- Apply `Evaluation-Target Independence` and authority-origin/invariant-set consistency: a system may not grade its own contract/payment records as sufficient proof of the buyer's real contract or settled cash.
+- Shadow skill `SK-COM-001` has transferred across three shadow runs, but it is not promoted here as a benchmark-backed shared skill; use its authority/effective-date/idempotency vocabulary only as supporting search language until governance for shadow-to-global skill promotion is explicit.

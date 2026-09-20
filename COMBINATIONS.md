@@ -134,3 +134,12 @@ Effective-dated plan/credit truth -> deterministic entitlement -> stable provide
 
 ### Industrial pre-FAT — independent SECS/GEM differential
 Dreamine.Gem (.NET) + rights-clean frozen dialogue/error profile + `bparzella/secsgem` (Python) -> exact semantic disagreement report; use `Gautam1601/secsgem-platform` only as a third-engine replay/tie-breaker. Same-family agreement is not formal SEMI conformance or certification.
+
+<!-- INTEGRATOR-R11-SHADOW-COM-2026-09-20T0914-0400 -->
+## Revenue-to-Receivable Integrity — external authority -> rating -> receivable -> independent settlement
+- Internal backbone: `cyber-entrepreneur/wingcaster@0d97a4ab...` supplies a tested effective-contract→rating→invoice→allocation→reconciliation chain.
+- Authority/correction complements: `michaelayoade/dotmac_sub@fdc85559...` contributes explicit commercial-contract version/cut-over semantics; `Etherlabs-dev/revenue_leakage_system@64c1af79...` contributes fail-closed expected-vs-actual leakage decisions; existing money-state/reconciliation components supply independent negative controls.
+- Combined capability: external signed/order-system contract amendment → immutable active contract/rate version → rated usage → issued receivable → idempotent cash/credit allocation → PSP/bank readback → later return/reversal handling → reconciliation certificate.
+- Hard invariant: an internal payment record, provider `paid` flag or all-green self-reconciliation is **not** final settlement truth. Missing external contract authority, bank/processor readback or contradictory settlement stays REVIEW/UNKNOWN and contributes $0 realized value.
+- First paid wedge: read-only Revenue-to-Receivable Trace Audit over one closed period for a usage/subscription business with negotiated pricing and nontrivial cash application.
+- Stage gate: freeze one external contract/amendment corpus plus processor/bank settlement/readback; seed wrong contract version, duplicate allocation, stale provider success, returned payment and internal-vs-external amount/currency contradictions. The stack passes only if each contradiction prevents a false green.

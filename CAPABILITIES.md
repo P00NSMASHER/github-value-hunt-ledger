@@ -218,3 +218,11 @@ The count of repositories is not the primary KPI. Track:
 - **CAP-014 industrial pre-FAT strengthened:** `bparzella/secsgem@59a5242...` provides the first mature unrelated SECS/GEM implementation family for differential testing against Dreamine.Gem; certification remains separate.
 - **CAP-018 payout money-state integrity strengthened:** `chase-sets/chase-sets@32aa260...` adds durable provider-operation/idempotency ownership, stale/lost-webhook reconciliation and post-payment receivable/clawback semantics. The remaining missing edge is actual bank/payroll settlement and return/reversal evidence after provider success.
 - **Cross-domain temporal capability added at component level:** bitemporal facts now give recovery/procurement/scope systems a reusable mechanism to distinguish transaction-time knowledge from real-world valid time without destructive correction. Keep below standalone MASTER status until a live experiment demonstrates material decision/audit value.
+
+<!-- INTEGRATOR-R11-SHADOW-COM-2026-09-20T0914-0400 -->
+## Revenue-to-receivable trace capability delta — 2026-09-20
+- `cyber-entrepreneur/wingcaster@0d97a4ab...` materially strengthens the internal transaction chain around effective-dated contract/price authority, immutable rating facts, invoice close, idempotent allocation/reversal and reconciliation.
+- Treat this as a **VALIDATED COMPONENT**, not external money truth. Its current end-to-end proof is internally coherent but partially circular because contract rows, payment records and reconciler checks live inside the same authority domain.
+- Cross-product reuse: SaaS Revenue Integrity, contract billing, commission/payout close and AP/AR trace diagnostics.
+- Missing piece: externally sourced signed/order-system contract amendments plus PSP/bank settlement and later return/reversal evidence that the system under test cannot manufacture.
+- Next falsifiable test: inject frozen external contract and settlement evidence with deliberate contradictions; the internal loop must fail closed and surface the mismatch rather than preserve an all-green result.

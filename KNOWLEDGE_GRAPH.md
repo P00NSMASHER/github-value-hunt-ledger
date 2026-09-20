@@ -121,3 +121,11 @@ If the answer is none, the finding is not yet integrated into the value system.
 - REPO `bparzella/secsgem@59a5242...` -> VALIDATES/CHALLENGES `CAP-014` through an unrelated implementation -> TESTED_BY `EXP-008` Dreamine↔secsgem differential corpus.
 - REPO `chase-sets/chase-sets@32aa260...` -> STRENGTHENS `CAP-018` provider-settlement ownership and receivable clawback -> TESTED_BY `EXP-003`; bank-finality remains a missing downstream edge.
 - DATA `PNNL OWL-I USA v1` -> ENABLES held-out high-resolution outage outcome validation; DEPENDS_ON separate rights and circularity checks because it is calibrated against EAGLE-I.
+
+<!-- INTEGRATOR-R11-SHADOW-COM-2026-09-20T0914-0400 -->
+## Revenue-to-receivable edges — 2026-09-20
+- REPO `cyber-entrepreneur/wingcaster@0d97a4ab...` -> IMPLEMENTS effective-contract selection + append-only rating + invoice-close + payment-allocation + reconciliation.
+- REPO `michaelayoade/dotmac_sub@fdc85559...` -> STRENGTHENS commercial-contract version/cut-over provenance.
+- REPO `Etherlabs-dev/revenue_leakage_system@64c1af79...` -> STRENGTHENS fail-closed expected-vs-actual leakage decision.
+- These components -> COMBINE_WITH external signed-contract/order-system authority and PSP/bank readback -> ENABLE Revenue-to-Receivable Trace Audit.
+- The composed stack -> TESTED_BY a new external-authority/readback experiment; internal all-green reconciliation alone does not PRODUCE a realized-money outcome.

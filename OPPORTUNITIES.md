@@ -286,3 +286,11 @@ The top direct-money ranking remains Freight Recovery first, followed by AP/comm
 - Buyer/problem: public-works contractors, municipal works teams, engineers/QS and GCs can over-certify, under-bill or lose recovery when accepted BOQ/estimate quantities, field measurement books and bills diverge.
 - First paid wedge: fixed-price one-project audit reconciling accepted work order/BOQ, measurement-book records and bills; flag out-of-period or out-of-scope measurements, cumulative over-measure, missing required lines, stuck workflow and authorized measured work that never reaches bill state.
 - Why challenger only: DIGIT's measurement authority is strong, but the inspected run did not prove an unbypassable approved-measurement→bill/payment gate. EXP-005 should falsify that edge before portfolio promotion.
+
+<!-- INTEGRATOR-R11-SHADOW-COM-2026-09-20T0914-0400 -->
+### Challenger — Revenue-to-Receivable Trace Audit
+- Source: `cyber-entrepreneur/wingcaster@0d97a4ab8310d68b109e3a11ebdeda5eb3d3c829` plus existing contract-version, leakage-decision and settlement-proof components.
+- Buyer/problem: controller/CFO, billing-platform owner or revenue-assurance lead at a usage/subscription business needs one defensible answer to: which contract version priced this usage, what receivable did it create, what cash/credit settled it, and do the independent systems agree?
+- First paid wedge: read-only audit of one closed period; return broken authority/transition/reconciliation invariants and unresolved gaps rather than moving money.
+- Score: **26/30 working challenger score**. High build compression and ACV ceiling, but current strongest evidence is an internally coherent loop, not independent external settlement or customer outcome.
+- Promotion gate: bind signed/order-system contract evidence and PSP/bank readback; beat a conventional billing reconciliation on externally labeled discrepancy/settlement cases without false-green self-reconciliation.
