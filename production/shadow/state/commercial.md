@@ -2,39 +2,51 @@
 
 ## Current hypotheses
 ### H-COM-001 — Authority-aware money assurance beats generic mismatch dashboards
-- STATUS: SUPPORTED BY SHADOW RUNS 1-2; not globally promoted.
-- SUPPORTING EVIDENCE: Run 1 `Etherlabs-dev/revenue_leakage_system@64c1af79ac0a22915cfb49f1a2dd6d870059b78a` independently passed the narrow technical verifier claim for effective-dated pricing authority, deterministic expected-vs-actual money math, stale/missing-source blocking, rule-versioned evidence and idempotent finding persistence. Run 2 independently found `michaelayoade/dotmac_sub@fdc85559d9677480090596f88009d2d3eed29e56`, which encodes immutable customer-specific billing-contract versions, explicit shadow-vs-authoritative cut-over semantics and idempotent reversible credit-note/ledger evidence.
-- CONTRARY EVIDENCE: run 1 remains synthetic with no realized recovery evidence; run 2's strongest contract-authority owner is explicitly still in expand-and-shadow mode and therefore is not proof of live authoritative billing. Neither run establishes end-to-end recovered cash on an independently labeled customer population.
-- NEXT TEST: locate or falsify a production-shaped cut-over/outcome path where immutable contract versions actually drive invoicing/rating and an accepted discrepancy can be traced through posted adjustment/refund/settlement to reconciled receivable state.
-- CONFIDENCE: MEDIUM-HIGH on the architecture thesis; LOW-MEDIUM on realized commercial recovery until a closed-loop population is verified.
+- STATUS: SUPPORTED BY SHADOW RUNS 1-3; not globally promoted.
+- SUPPORTING EVIDENCE: Run 1 `Etherlabs-dev/revenue_leakage_system@64c1af79ac0a22915cfb49f1a2dd6d870059b78a` independently passed the narrow technical verifier claim for effective-dated pricing authority, deterministic expected-vs-actual money math, stale/missing-source blocking, rule-versioned evidence and idempotent finding persistence. Run 2 independently found `michaelayoade/dotmac_sub@fdc85559d9677480090596f88009d2d3eed29e56`, which encodes immutable customer-specific billing-contract versions, explicit shadow-vs-authoritative cut-over semantics and idempotent reversible credit-note/ledger evidence. Run 3 found `cyber-entrepreneur/wingcaster@0d97a4ab8310d68b109e3a11ebdeda5eb3d3c829`, whose PostgreSQL integration path crosses effective-dated ACTIVE contract/price selection → append-only rating → gated invoice issue → idempotent payment allocation → all-green reconciliation.
+- CONTRARY EVIDENCE: run 1 remains synthetic with no realized recovery evidence; run 2's strongest contract-authority owner is explicitly still in expand-and-shadow mode; run 3's closed loop is internally coherent but accepts contract/payment authority inside the same system and does not independently prove signed-amendment completeness or PSP/bank settlement. No run yet establishes recovered cash on an independently labeled customer population.
+- NEXT TEST: bind external signed/order-system contract amendments and PSP/bank settlement readback into immutable evidence, then test whether the internal closed loop still passes when its own contract/payment records are not accepted as sufficient authority.
+- CONFIDENCE: HIGH on the architecture thesis; MEDIUM-LOW on realized commercial recovery until external authority/readback is verified.
 
 ### H-COM-002 — The commercially stronger stack separates contract truth, mismatch decision and money movement
-- STATUS: SUPPORTED BY SHADOW RUN 2; needs another independent outcome-oriented run.
-- SUPPORTING EVIDENCE: `dotmac_sub` separates accepted commercial commitment/version lineage from credit-note/ledger correction, while run 1's leakage engine separately computes expected-vs-actual findings. `cboxdk/laravel-billing` independently supports the correction side with effective-dated catalog pricing plus idempotent credit-note/gateway/ledger refunds.
-- CONTRARY EVIDENCE: mature billing suites may already cover enough of the stack to erase a standalone product moat; customer contract ingestion/amendment completeness remains the hardest unresolved authority problem.
-- NEXT TEST: compare a full mature billing platform's real contract-amendment and refund/settlement semantics against the proposed composed stack on one adversarial historical scenario.
-- CONFIDENCE: MEDIUM.
+- STATUS: SUPPORTED BY SHADOW RUNS 2-3; external-authority/outcome proof still missing.
+- SUPPORTING EVIDENCE: `dotmac_sub` separates accepted commercial commitment/version lineage from credit-note/ledger correction, while run 1's leakage engine separately computes expected-vs-actual findings. Run 3's Wingcaster adds an independently discovered rating→invoice→cash-allocation→reconciliation backbone. `cboxdk/laravel-billing` independently supports the correction side with effective-dated catalog pricing plus idempotent credit-note/gateway/ledger refunds.
+- CONTRARY EVIDENCE: mature billing suites may already cover enough of the stack to erase a standalone product moat; external contract ingestion/amendment completeness and processor/bank readback remain the hardest unresolved authority problems. Wingcaster's all-green reconciliation can still be circular because most facts are generated inside the same subsystem.
+- NEXT TEST: force the composed architecture to reconcile against independently sourced contract and settlement evidence rather than its own tables, and measure unresolved-authority rate rather than defaulting gaps to current truth.
+- CONFIDENCE: MEDIUM-HIGH on modular separation; MEDIUM-LOW on differentiated commercial moat until external evidence is added.
 
 ## Validated local lessons
 - **2026-09-20 / run 1:** `effective-date authority × source freshness/unknown-state × expected-vs-actual money delta × idempotent evidence` was a higher-signal search intersection than “revenue leakage” alone. It surfaced a verifier-passed 26/30 candidate and cleanly distinguished generic reconciliation from authority-aware money assurance.
 - **2026-09-20 / run 2:** The same authority-first idea transferred when extended with `supersede`, `source of truth`, `credit note`, `reversal_of_entry_id`, explicit shadow/authoritative state and idempotency. It surfaced a second verifier-passed 26/30 component and exposed an important truth boundary: a well-tested authority model can still be non-authoritative until cut-over. Treat **authority migration state** as a load-bearing money-control fact, not deployment metadata.
+- **2026-09-20 / run 3:** Requiring one integration path that crosses **authority → rating → invoice → settlement → reconciliation**, then source-verifying each transition, surfaced another verifier-passed 26/30 component hidden inside a zero-star repository with an unrelated product name. This materially reduced false positives from repos that merely contain all five nouns in separate modules. It also exposed the next truth boundary: an all-green internal reconciliation is not external settlement proof.
 - **Comparator lesson:** `dylanpulver/recon` shows that matching quality is independently valuable when it proves partition, conservation, receipts and determinism, but settlement matching alone does not establish what should have been billed. Keep **matching truth**, **contractual expected-state truth**, and **money-movement truth** as separate layers.
 - **Comparator lesson:** `cboxdk/laravel-billing` demonstrates that effective-dated catalog grandfathering plus idempotent refund/ledger tests is a strong reusable component, but catalog price history is not automatically customer-specific contract authority.
+- **Comparator lesson:** `yvgude/lean-ctx` demonstrates that content-addressed, trust-anchored settlement evidence can be excellent evidence infrastructure while deliberately not validating contracts, calculating prices, issuing invoices or mutating settlement state. Evidence eligibility and economic execution must not be conflated.
 
 ## Failed search patterns
 - Broad `revenue leakage` queries produce many portfolio dashboards, synthetic CRM/warehouse reconciliations and unsupported headline-dollar claims. Do not deep-inspect unless source authority, effective dates, fail-closed unknown states, deterministic evidence or outcome settlement is visible beyond README.
 - Generic payment/AP matching without authority or negative-control semantics is usually a component, not a complete money-assurance oracle.
 - Generic `credit note` / `refund` searches over-select systems that can reverse money but cannot prove what should have been billed. Require a structural link to contract/rating authority if using them as recovery evidence.
 - Effective-dated **catalog** pricing is not equivalent to versioned customer contract authority. Look for accepted commercial commitment, source identity/version, supersession, actor/reason and explicit cut-over semantics.
+- Settlement-evidence or reconciliation engines that do not actually mutate or observe receivable/payment state can strengthen proof but do not close the money loop. Conversely, internally generated payment facts plus all-green reconciliation still do not prove PSP/bank settlement.
 
 ## Candidate skills
 ### SK-COM-001 — Authority-freshness-money-delta intersection
-- STATE: LOCAL; 2 distinct successful shadow runs. Eligible for separate Skill Promoter review, but **not promoted or staged by this hunter**.
+- STATE: LOCAL; 3 distinct successful shadow runs. Eligible for separate Skill Promoter review, but **not promoted or staged by this hunter**.
 - INPUT: direct-money/recovery/reconciliation search lane.
 - PROCEDURE: search for the intersection of effective-dated authority/provenance, source-freshness or explicit UNKNOWN/BLOCKED states, deterministic expected-vs-actual money calculations, and idempotent/versioned evidence; extend with settlement/credit/remittance terms and explicit authority-migration state when looking for realized-outcome components. Require negative tests for stale/missing/wrong-entity inputs or over-application/replay before deep inspection.
 - OUTPUT: candidates more likely to support defensible financial findings and correction evidence rather than dashboard-only discrepancy alerts.
-- FAILURE MODES: can miss mature systems whose authority semantics are implicit in domain-specific names; may overfavor clean reference implementations without real customer outcomes; may mistake catalog versioning for negotiated contract authority; may mistake a tested shadow model for live cut-over.
-- NEXT IMPROVEMENT: add a mandatory `authority entry -> decision -> correction -> settlement/reconciliation` transition trace and test whether that produces an independently verified closed-loop recovery candidate.
+- FAILURE MODES: can miss mature systems whose authority semantics are implicit in domain-specific names; may overfavor clean reference implementations without real customer outcomes; may mistake catalog versioning for negotiated contract authority; may mistake a tested shadow model for live cut-over; may treat internally reconciled payment records as processor truth.
+- NEXT IMPROVEMENT: add external-source authority/readback terms and look for systems that reconcile against independent order/contract and PSP/bank facts.
+
+### SK-COM-002 — Closed-loop transition trace
+- STATE: LOCAL; 1 successful shadow run. Not eligible for promotion yet.
+- INPUT: a candidate claiming billing/recovery/reconciliation completeness.
+- PROCEDURE: require one executable/integration path that crosses `authority -> rating/decision -> invoice/obligation -> settlement/correction -> reconciliation`; inspect the source function at every transition and identify which boundary owns authority. Reject completeness claims when the stages exist only as disconnected modules or docs.
+- OUTPUT: a narrower set of candidates with evidence that money-state transitions actually compose.
+- FAILURE MODES: a self-contained test can still be circular; internally generated source facts may all agree while external truth is wrong; mature systems may split the chain across services/repos and therefore need cross-repository evidence rather than one test.
+- NEXT IMPROVEMENT: require at least one transition to be validated against an external authoritative source or readback fixture that the system under test cannot silently manufacture.
 
 ## Open referrals
 - COMMERCIAL -> AI: test whether replayable effect-journal infrastructure can wrap money-mutating billing correction commands without bypassing domain idempotency or causing duplicate side effects; see shared shadow referrals.
+- Existing provider/system-of-record readback referral remains the highest-value cross-lane question; do not duplicate it.
