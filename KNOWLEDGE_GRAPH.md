@@ -109,3 +109,15 @@ Every MASTER promotion must answer:
 4. Which EXP should change because of it?
 
 If the answer is none, the finding is not yet integrated into the value system.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Integration edges — 2026-09-20 08:56 ET
+- REPO `project-minigraf/minigraf@ccdc85e...` -> STRENGTHENS AP trusted-fact replay -> TESTED_BY `EXP-002` correction/partial-receipt replay.
+- REPO `mujeeb-k/AP-Three-Way-Matching-Agent@c15a4cc...` -> CHALLENGES AP source-health semantics because adapter failure can collapse into empty/missing-reference state -> TESTED_BY `EXP-002` tri-state source-authority cases.
+- REPO `lailarallc/edi-reconciliation-tool@11740303...` -> STRENGTHENS `CAP-006` settlement acceptance -> TESTED_BY `EXP-001` planted freight 210/812/820 corpus.
+- REPO `egovernments/DIGIT-Works@7c44e963...` -> STRENGTHENS `CAP-007` contract-bounded quantity proof -> TESTED_BY `EXP-005` draft/rejected/approved/over-measure-to-bill cases.
+- REPO `GSA/open-gsa-redesign@494b131...` opportunity history semantics -> STRENGTHENS `CAP-011` -> TESTED_BY `EXP-006` latest-vs-history packet completeness.
+- REPO `GSA/open-gsa-redesign@494b131...` subaward API -> STRENGTHENS CaptureBrief award/entity/team lineage; Deleted is a distinct source state, not absence.
+- REPO `bparzella/secsgem@59a5242...` -> VALIDATES/CHALLENGES `CAP-014` through an unrelated implementation -> TESTED_BY `EXP-008` Dreamine↔secsgem differential corpus.
+- REPO `chase-sets/chase-sets@32aa260...` -> STRENGTHENS `CAP-018` provider-settlement ownership and receivable clawback -> TESTED_BY `EXP-003`; bank-finality remains a missing downstream edge.
+- DATA `PNNL OWL-I USA v1` -> ENABLES held-out high-resolution outage outcome validation; DEPENDS_ON separate rights and circularity checks because it is calibrated against EAGLE-I.

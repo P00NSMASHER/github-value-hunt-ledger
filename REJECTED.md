@@ -74,3 +74,9 @@ Cross-lane rejection/deprioritization memory. Keep only repeat-prone, safety/pro
 
 ## Central rejection policy
 Do not add every weak repository here. Add a candidate only when it is likely to be rediscovered, is misleading/safety-sensitive, or records a durable failure pattern. Routine low-value misses stay lane-local. A revisit trigger must identify the evidence that would change the decision rather than merely saying “more work.”
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Integrator rejection/deprioritization delta — 2026-09-20 08:56 ET
+- **freightbill/freightbill@896857ed4bd009805012d338f637a82abc991ff9** — reject as implementation authority. Additional inspection found recovery-ledger sign/closure inconsistency, a documented shared-invoice-hint setting not enforced in the fuzzy acceptance path, greedy order-dependent many-to-many matching and identifier canonicalization that can erase economically meaningful revision suffixes without authority. Keep only as adversarial terminology/test cases. Revisit only after tested exact settlement accounting, mandatory identity guards and fail-closed global allocation.
+- **sprealm-coder/OpportunityOS@74c8020603a6828e1146675c75fcff2a27a3e9be** — keep as temporal-authority negative oracle, not a commission authority. Effective-date fields are selected/validated against current wall-clock time rather than the earning/charge event's authoritative occurrence time. Revisit only when runtime authority selection is event-time correct and regression-tested.
+- **MANO-PPL/MANO-ERP@401969aa3c60be72550585e8714a6fad16746481** — deprioritize. Retention/payment-certificate material was primarily frontend/formula/metadata rather than a tested backend money/state engine. Revisit only after substantive certificate/retention/variation backend transitions and tests appear.

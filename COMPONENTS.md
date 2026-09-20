@@ -195,3 +195,40 @@ For every component preserve exact revision, actual published rights/provenance,
 
 ## Component promotion rule
 Promote a reusable component here when it closes a difficult cross-stack gap, has source/test evidence stronger than README claims, and changes at least one capability/opportunity/experiment. Commodity infrastructure stays lane-local.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Integrator delta — temporal truth, settlement finality, quantity authority and independent protocol oracles
+
+### project-minigraf/minigraf — bitemporal fact/replay substrate
+- Revision: `ccdc85e2921f4028a9312400fe53ecdd5b2202aa`; public rights MIT OR Apache-2.0.
+- Score: **27/30**.
+- Capability: append-only assertions/retractions with transaction-time and valid-time queries, tested correction/re-assertion and restart semantics.
+- Targets: AP, CaptureBrief, ScopeSignal and recovery systems that must reproduce both “what was known then?” and “what was valid then?” after later corrections.
+- Limitation: evidence/page/document provenance must be modeled separately.
+
+### egovernments/DIGIT-Works — contract-bounded field measurement authority
+- Revision: `7c44e963c7aced16d648971ae66eb938cbe8fdc4`; MIT.
+- Score: **28/30**.
+- Capability: accepted contract/work-order → authorized estimate line → in-period physical measurement → cumulative authorized-quantity ceiling → workflow/document/audit state.
+- Targets: ScopeSignal and public-works quantity/payment assurance.
+- Limitation: the inspected run did not prove approved measurement is an unbypassable backend prerequisite for bill/payment creation.
+
+### bparzella/secsgem — independent SECS/GEM differential endpoint
+- Revision: `59a5242d8672dad73367a0acd18088adf461404f`; LGPL-2.1-or-later; SEMI standards rights remain separate.
+- Score: **27/30**.
+- Capability: independent Python SECS-I/II, HSMS and GEM host/equipment state machines with substantial timeout/state/message tests and candid compliance gaps.
+- Target: EXP-008 pre-FAT differential against Dreamine.Gem; it is an interoperability oracle, not formal SEMI certification.
+
+### chase-sets/chase-sets — payout reconciliation and post-payment receivable oracle
+- Revision: `32aa260b31c93dc02767efebb1c37877cd4a9f3b`; no public license found, standing separate repository-code permission applies.
+- Score: **27/30**.
+- Capability: durable provider-operation/idempotency records, stale payout reconciliation, unresolved nonterminal states, exactly-once reversal behavior and refund-after-payout negative-balance receivables.
+- Target: EXP-003 Commission Payout Assurance.
+- Limitation: provider `paid` is not bank-statement finality; FX and later bank-return evidence remain missing.
+
+### lailarallc/edi-reconciliation-tool — planted-fault X12 settlement acceptance harness
+- Revision: `11740303e3f5323bf5c89f35522884954e012b2d`; MIT.
+- Score: **25/30**.
+- Capability: X12 820 BPR/RMR remittance parsing, 812 credits, planted discrepancies and deterministic expected outcomes with a useful historical remittance-grain regression fossil.
+- Target: freight/AP settlement acceptance corpus, not final freight settlement authority.
+- Limitation: synthetic retail grain, float money path, ambiguous fallback and weak partial/many-to-many allocation make it unsuitable as realized-recovery truth.

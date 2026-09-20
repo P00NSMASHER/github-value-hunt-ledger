@@ -276,3 +276,13 @@ The strongest path remains a frozen customer-authorized blind population carried
 ### Money-State Integrity — Fintechcore refinement, evidence gate unchanged
 - `amrit-kumar/fintechcore@b27a22890e8b5173d2a97be512a198a4564ed425` adds useful payment lifecycle, idempotency, double-entry and independent reconciliation semantics to CAP-016.
 - Its own testing ADR says automated unit/integration/E2E coverage was deferred, so it remains a challenger/reference rather than a promoted operating core. EXP-010 must include automated race, reversal/refund, outbox-loss, replay and settlement negatives before this changes opportunity rank.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Portfolio delta — no top-rank change; one new adjacent wedge
+The top direct-money ranking remains Freight Recovery first, followed by AP/commission and the existing evidence/recovery opportunities. No repository finding in this delta is outcome evidence, so no existing opportunity is promoted as commercially validated.
+
+### Challenger — Measurement-to-Payment Leakage Assurance for public works
+- Source: `egovernments/DIGIT-Works@7c44e963c7aced16d648971ae66eb938cbe8fdc4` plus existing ScopeSignal/change-order/payment-proof components.
+- Buyer/problem: public-works contractors, municipal works teams, engineers/QS and GCs can over-certify, under-bill or lose recovery when accepted BOQ/estimate quantities, field measurement books and bills diverge.
+- First paid wedge: fixed-price one-project audit reconciling accepted work order/BOQ, measurement-book records and bills; flag out-of-period or out-of-scope measurements, cumulative over-measure, missing required lines, stuck workflow and authorized measured work that never reaches bill state.
+- Why challenger only: DIGIT's measurement authority is strong, but the inspected run did not prove an unbypassable approved-measurement→bill/payment gate. EXP-005 should falsify that edge before portfolio promotion.

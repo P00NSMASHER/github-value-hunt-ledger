@@ -208,3 +208,13 @@ The count of repositories is not the primary KPI. Track:
 - capabilities that materially reduce build time;
 - capabilities that survive independent tests;
 - capabilities that contribute to realized customer value.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Integration delta — 2026-09-20 08:56 ET
+- **CAP-006 realized-settlement proof strengthened:** `lailarallc/edi-reconciliation-tool@11740303...` contributes planted-fault 812/820/remittance-grain tests. The accepted capability remains stricter than the repository: realized recovery requires an issued adjustment plus uniquely attributable allocated credit/refund/remittance; ambiguous partial/many-to-many allocation remains REVIEW / $0 realized.
+- **AP trusted-fact replay strengthened:** `project-minigraf/minigraf@ccdc85e...` adds tested bitemporal transaction-time/valid-time replay, enabling an AP finding to be reproduced against the exact facts known when it was issued and against later corrected validity state. `mujeeb-k/AP-Three-Way-Matching-Agent@c15a4cc...` adds useful PO/GR/invoice exception semantics but its source-outage→empty/null behavior is a fail-open negative case, not authority truth.
+- **CAP-007 Scope/change evidence strengthened:** `egovernments/DIGIT-Works@7c44e963...` adds contract-bounded physical measurement: active accepted baseline, estimate-line identity, time window and cumulative quantity ceiling. Measurement validity remains distinct from entitlement, certified bill and paid outcome.
+- **CAP-011 CaptureBrief source/version truth strengthened:** official SAM documentation now proves latest opportunity search is structurally not full amendment history; complete packets require a separate version/history plane with explicit lag/access states. Subaward Published/Deleted semantics extend award/entity lineage into reported team networks.
+- **CAP-014 industrial pre-FAT strengthened:** `bparzella/secsgem@59a5242...` provides the first mature unrelated SECS/GEM implementation family for differential testing against Dreamine.Gem; certification remains separate.
+- **CAP-018 payout money-state integrity strengthened:** `chase-sets/chase-sets@32aa260...` adds durable provider-operation/idempotency ownership, stale/lost-webhook reconciliation and post-payment receivable/clawback semantics. The remaining missing edge is actual bank/payroll settlement and return/reversal evidence after provider success.
+- **Cross-domain temporal capability added at component level:** bitemporal facts now give recovery/procurement/scope systems a reusable mechanism to distinguish transaction-time knowledge from real-world valid time without destructive correction. Keep below standalone MASTER status until a live experiment demonstrates material decision/audit value.

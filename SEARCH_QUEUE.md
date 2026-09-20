@@ -145,3 +145,19 @@ After five weak runs from a query family, record the failure pattern and rotate 
 
 ## Global stop list
 Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, fuzzy matching, commodity auth/RBAC, job queues, generic protocol clients, generic scheduling/routing/optimization demos, backup-status tools, generic TMS/CMMS/FSM/LIMS/AP OCR or speculative AI agents unless a candidate adds a **rare domain invariant, authoritative source, difficult installed-base integration, independently falsifiable algorithm, governed transition, or realized-money/evidence loop** that materially beats the current portfolio.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Run 11 current override — experiment gaps now supersede broader discovery where they conflict
+1. **Freight Recovery / EXP-001:** stop generic freight discovery. Build the freight-specific planted 210/812/820 golden settlement corpus and keep pursuing one authorized frozen buyer population through actual credit/refund/remittance. Search only for controlling authority, correction/rebill chronology or ambiguity-safe settlement allocation that the existing stack lacks.
+2. **AP / EXP-002:** stop broad matcher/three-way-engine hunting. Prove `PRESENT / VERIFIED_EMPTY / UNAVAILABLE` source health, then run bitemporal partial-receipt/correction replay. A source outage must never become a money-bearing missing-GR/PO conclusion.
+3. **ScopeSignal / EXP-005:** trace `DIGIT-Works` from approved/draft/rejected/over-measured measurement states into purchase-bill generation. Search only for the missing unbypassable measurement→certification/bill/payment edge; stop generic IPC/pay-app UIs.
+4. **CaptureBrief / EXP-006:** run the 10-solicitation latest-vs-history/attachment completeness benchmark using official SAM planes. Hunt only successor/deviation/attachment-currentness gaps that fail the corpus; stop generic procurement wrappers.
+5. **Commission Payout / EXP-003:** stop commission calculators. Search bank/payroll settlement traces, ACH/return/reversal evidence, FX settled amount/currency and post-success return codes that can prove or invalidate provider `paid` finality.
+6. **Industrial pre-FAT / EXP-008:** stop generic SECS/GEM library hunting. Run the Dreamine↔bparzella differential corpus; use a third engine only to adjudicate concrete disagreements.
+7. **Grid/outage evidence:** stop broad outage-dataset hunting. First resolve OWL-I v1 dataset reuse terms, then run storm-block/time-held-out comparison against EAGLE-I/utility outcomes with cloud/missingness and circularity controls.
+8. **Decision engines:** apply `Evaluation-Target Independence` whenever ROI/profit/service value is model-derived, censored or proxy-valued. Keep action-selection score, evaluator and buyer outcome as separate variables.
+9. **Recall guard:** Task 43 is now a direct 25-vs-19 benchmark loss for Experiment. Before declaring NO_FIND, run one recall-oriented family/old-name/oracle-fixture rescue pass, then keep the verification gate strict. Better calibration must not become systematic qualified-target blindness.
+
+## Stop-list additions
+- Generic commission dashboards, generic IPC/pay-app UI, generic SECS/GEM libraries, generic freight reconciliation dashboards and additional outage datasets are now low-yield until the corresponding experiment fails for a concrete missing component.
+- Effective-date columns without event-time selection logic, provider webhooks without stale-operation reconciliation, and source adapters that convert exceptions into empty results are negative-control patterns, not authority components.

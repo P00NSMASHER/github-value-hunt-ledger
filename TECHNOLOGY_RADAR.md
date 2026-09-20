@@ -102,3 +102,9 @@ A radar category should move toward BUILD only when:
 4. a falsifiable experiment is defined.
 
 Demote categories when adoption stalls, independent evidence fails or a simpler commodity alternative wins.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Evidence delta — scores unchanged
+- **RAD-001 Proof-carrying operational software:** strengthened by MiniGraf bitemporal replay, DIGIT contract-bounded measurement and official SAM version-history semantics. The signal is broader evidence for explicit temporal/authority state, not a reason to inflate the numeric emergence score without adoption evidence.
+- **RAD-006 Authority-aware money assurance:** strengthened by independent convergence in freight settlement acceptance (`edi-reconciliation-tool`), AP source-health failure semantics, public-works quantity ceilings and `chase-sets` provider-operation/receivable handling. The recurring primitive is authority → unique claim/state → unresolved-safe transition → independently evidenced outcome.
+- **Remote-sensed outage outcomes:** OWL-I is a fresh technical signal for higher-resolution grid-service outcome evidence, but rights are unresolved and the method is EAGLE-I-calibrated; no new radar category/score is created until independent held-out use and reuse terms are established.

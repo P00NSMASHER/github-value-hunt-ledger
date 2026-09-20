@@ -167,3 +167,25 @@ Do not store credentials, tokens, private/personal data, or raw accidental secre
 - Safe residual use: selected synthetic documents/cases can be retained as **negative-control fixtures** to test whether a candidate rejects missing authority, overlapping-economic-claim duplication and pre-review value leakage. Do not inherit the repository's aggregate savings/recovery labels as gold truth.
 - Value posture: **not scored as an elite dataset/evaluation pipeline after demotion**; prior 28/30 promotion is superseded for authoritative evaluation use.
 - Next action: independently hand-author expected dollars/authority states for any retained fixture before reuse in EXP-001. Re-promote only if the repository implements explicit authority tri-state, claim-level dedupe, adjudication-to-realization states, and tests proving only confirmed/realized claims enter aggregate/billing outputs.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Integrator delta — opportunity history, subcontract lineage and high-resolution outage outcomes
+
+### GSA SAM Contract Opportunities version/history planes
+- Source/revision: `GSA/open-gsa-redesign@494b1312e9c6436474840befe6e1964da15932b3` documentation for the public Contract Opportunities API plus Data Services/history semantics; U.S. Government/CC0 repository material.
+- Value: the official public search API returns only the latest active opportunity version and explicitly points to Data Services for all versions. This is authoritative evidence that latest-search output cannot prove amendment/packet completeness.
+- Product use: CaptureBrief solicitation packet completeness, with explicit `latest_only`, `archive_pending`, `source_lag`, `partial` and `unresolved` states rather than silent completeness.
+- Score: **29/30** working source/pipeline score. Public collection spans multiple access planes/cadences; permissioned management APIs are schema evidence only, not an authorized public collection route.
+
+### GSA SAM Acquisition Subaward Reporting public API
+- Source/revision: `GSA/open-gsa-redesign@494b1312e9c6436474840befe6e1964da15932b3`; repository material U.S. Government/CC0.
+- Value: Published and Deleted subcontract reports with PIID/prime-contract/referenced-IDV filters, UEI/legal-name/parent lineage, amount/date and pagination semantics.
+- Product use: evidence-backed incumbent/team network inside CaptureBrief. Default Published status never proves absence of Deleted reports, and reporting coverage/timeliness is not universal.
+- Score: **28/30**.
+
+### PNNL OWL-I USA v1 — ~1 km historical outage/recovery observation layer
+- Source: Zenodo v1 DOI `10.5281/zenodo.20433558`, published 2026-08-25; associated EarthArXiv method preprint published 2026-08-28.
+- Coverage: nightly CONUS 2012-01-19 through 2024-12-31 at ~1 km resolution, ensemble outage fraction/uncertainty and estimated customers, derived from nighttime lights and calibrated against EAGLE-I.
+- Score: **25/30** — rare and timely outcome evidence, but rights clarity is only 2/5.
+- Rights: non-GitHub dataset; no commercial right inferred from public availability. The inspected Zenodo record did not establish a populated dataset license; source inputs also have separate terms. Do not redistribute/embed commercially until rights are confirmed.
+- Use: held-out spatial outcome validation for grid/site-risk models after circularity analysis; it is not feeder-level OMS ground truth.

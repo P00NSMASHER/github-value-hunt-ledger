@@ -116,3 +116,21 @@ A new stack enters this file only when it:
 4. has a cheap falsifiable stage gate in `EXPERIMENTS.md` or an explicitly recorded reason why it is not yet ready.
 
 Do not create parallel combinations for every repository family. Fold challengers into the strongest existing stack and let experiments decide whether they deserve elevation.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Integration delta — stronger authority and outcome edges
+
+### ScopeSignal / Measurement-to-Payment Assurance extension
+`PDF/IFC revision detection + takeoff` -> controlling contract/notice/approved change baseline -> `DIGIT-Works` accepted-contract/estimate-line/time-window/cumulative-quantity measurement -> certified bill/payment/waiver evidence. A valid field measurement is not entitlement, an approved bill or paid value by itself. EXP-005 must prove the backend boundary from measurement workflow state into authoritative billed quantity before this becomes an end-to-end money claim.
+
+### AP Leakage Assurance temporal/source-health extension
+Source-grounded invoice/PO/receipt evidence -> explicit source-health tri-state -> deterministic AP exception rules -> bitemporal fact replay (MiniGraf/Sirix family) -> reviewed identity -> adjudication -> credit/refund/settlement. A failed PO/GR adapter can never be converted into `not found`/`missing receipt` without a separate VERIFIED_EMPTY state.
+
+### CaptureBrief version-complete opportunity intelligence
+SAM latest public opportunity discovery -> Data Services/history reconstruction -> attachment/hash inventory -> FAR/DFARS/agency authority resolver -> award/PIID/IDV/entity/subaward lineage -> evidence-gated brief. Latest active notice is a discovery surface, not proof of complete solicitation history.
+
+### Commission Payout Assurance — entitlement -> provider ownership -> receivable/clawback -> bank-finality gap
+Effective-dated plan/credit truth -> deterministic entitlement -> stable provider operation/idempotency -> explicit unresolved state -> reconciliation -> provider-paid/rejected state -> refund/chargeback negative-balance receivable. `chase-sets` materially strengthens the middle and reversal edges, but provider `paid` still cannot be promoted to final settled money until bank/payroll return/reversal/trace evidence is reconciled.
+
+### Industrial pre-FAT — independent SECS/GEM differential
+Dreamine.Gem (.NET) + rights-clean frozen dialogue/error profile + `bparzella/secsgem` (Python) -> exact semantic disagreement report; use `Gautam1601/secsgem-platform` only as a third-engine replay/tie-breaker. Same-family agreement is not formal SEMI conformance or certification.

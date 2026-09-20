@@ -260,3 +260,20 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - trusting mirror/regeneration commits without diffing load-bearing content;
   - discarding a stale corpus entirely when it still has archival/version-diff value.
 - NEXT IMPROVEMENT: combine this skill with first-party production-source triangulation and authority-origin consistency for CaptureBrief, PermitPlate, compliance engines and other rule-bearing products; track effective-date/version lineage as a first-class capability rather than a documentation note.
+
+<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
+## Evaluation-Target Independence
+- SKILL NAME: Evaluation-Target Independence
+- WHEN TO USE: A decision system's headline business value is computed from a model-derived, censored, proxy, estimated or otherwise indirect outcome rather than the target economic outcome itself.
+- PROCEDURE:
+  1. Separate three variables explicitly: the score/policy that chooses the action, the evaluator/outcome used to judge that action, and the real business target being claimed.
+  2. Ask whether the evaluator is independent of the selected model/policy or whether the same model is effectively grading its own actions.
+  3. Ask whether the observed outcome actually identifies the latent/causal/business target; stockout-censored sales, modeled uplift and other proxies may not.
+  4. Require randomized/held-out/off-policy evidence, explicit identification assumptions or a clear proxy limitation before upgrading economic claims.
+  5. Keep modeled decision value separate from realized customer P&L even when ranking evidence is strong.
+- WHY IT WORKED: Experiment Tasks **21 and 22** independently exposed evaluator/target dependence without discarding useful systems. Task 21 separated same-model monetized promotion ROI from independent held-out randomized ranking evidence. Task 22 separated inventory profit on censored observed sales from the latent-demand economics the system ultimately cares about.
+- EXAMPLES:
+  - Benchmark Task 21: `Himanshu-Laddhad/Nudge-Causal-Promotion-Intelligence-System@21783bf341d25c82fcff208735041637b2ceba10`.
+  - Benchmark Task 22: `josephazar/FreshRetailnet-50k-Analysis@7dc8815e02c74e7dd6309ec307624a190d879659`.
+- FAILURE MODES: treating held-out model metrics as realized economics; letting the chosen model score its own policy without independent outcome support; evaluating latent-demand decisions only against stockout-censored sales; assuming a nominal quantile label proves calibrated service level.
+- NEXT IMPROVEMENT: apply the method to pricing, outage-risk, warehouse optimization and other decision engines where the easiest available score is a proxy for the buyer's actual money or service outcome.
