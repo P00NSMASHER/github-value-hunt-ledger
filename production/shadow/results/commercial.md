@@ -564,7 +564,7 @@ This is **not a new repository**; it is a materially stronger economic-outcome s
 
 **SEARCH EFFORT / COST PROXIES:** 3 materially different discovery modes; 3 serious candidate/comparator paths inspected; targeted source/result/test/history/license verification at exact revisions; roughly two dozen connector/search/file inspections in this run; 0 untrusted-repository code executions, provider writes, credentials, contacts, spend or commitments.
 
-**LOCAL LESSON:** Refine `SK-COM-003` with a two-part tier 5C. **Tier 5C-A = provider-accounting application:** after tier-5B crash recovery, the one external correction is later consumed by a provider-native accounting/billing event and changes the resulting obligation/receivable exactly once. **Tier 5C-B = external cash settlement:** processor balance/payout/bank evidence confirms the economic movement beyond the provider's own accounting plane. This run reaches **5C-A**, not 5C-B. The separation prevents “paid invoice after a credit” from being overclaimed as bank-settled refund money.
+**LOCAL LESSON:** Refine `SK-COM-003` with a two-part tier 5C. **Tier 5C-A = provider-accounting application:** after tier-5B recovery, the one external correction is later consumed by a provider-native accounting/billing event and changes the resulting obligation/receivable exactly once. **Tier 5C-B = external cash settlement:** processor balance/payout/bank evidence confirms the money movement beyond the provider's own accounting plane. This run reaches **5C-A**, not 5C-B. The separation prevents “paid invoice after a credit” from being overclaimed as bank-settled refund money.
 
 **REFERRALS:** No new referral. The existing provider/system-of-record readback referral already contains the unresolved settlement question; another referral would duplicate it.
 
@@ -634,3 +634,79 @@ This is **not a new repository**; it is a materially stronger economic-outcome s
 **REFERRALS:** No new referral. The existing provider/system-of-record readback referral already captures the intersection problem; duplicating it would add noise.
 
 **NEXT TEST:** Find the **intersection in one executable path**: a cash refund or payout with post-effect process death, new-process recovery and exact no-duplicate proof, followed by the same provider effect reaching terminal success with balance/payout/bank readback. Search for repositories where `payout.paid`/refund terminality, stable idempotency and an effect-boundary kill seam appear in the same integration harness rather than in separate projects.
+
+## 2026-09-20 — Shadow run 10
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** A single public payment stack may already combine application-side crash/ambiguity safety with provider-defined refund/payout terminality in one executable path. If it does not, a multi-provider refund layer that explicitly reserves refundable capacity under unknown outcomes should still expose the missing durability/provider-evidence boundary and sharpen tier-5C-B qualification.
+
+**DISCOVERY METHODS:**
+1. Direct search for Stripe/provider refunds or payouts combined with `SIGKILL`, restart, idempotency, terminal events and balance/settlement readback.
+2. Code/invariant search for atomic refund claims, explicit refund idempotency, unknown/pending status, provider fetch/reconcile and over-refund prevention.
+3. Provider-contract analog search through SDKs exposing refund/payout executed/failed and funds-received/reversal events.
+4. Adjacency comparison against the prior Temporal/Stripe Worker-kill path to separate source-implemented crash safety from checked-in economic terminality.
+
+**BEST NEW COMPONENT + URL + EXACT REVISION:** `ken-de-nigerian/payzephyr` — https://github.com/ken-de-nigerian/payzephyr — `2583da04970be2017f1806adf72ef0c8b3454989`.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `src/Refund.php` uses an atomic shared-cache `Cache::add` in-flight claim per original transaction before provider refund entry. It supports an explicit caller-supplied idempotency key rather than deriving identity only from amount, which matters because multiple legitimate partial refunds can have equal amounts.
+- The lock is deliberately held when a `RefundException` reports an ambiguous provider outcome. PayZephyr refuses provider fallback and tells the caller to reconcile first rather than risking a second refund. Definite failures release the lock; success releases it after the provider returns.
+- `Refund::fetch()` delegates to the provider's read surface. `docs/idempotency.md` separately distinguishes business reference, provider idempotency key and provider transaction/refund identity and recommends provider readback for ambiguous transmitted/no-response cases.
+- Refund accounting is conservative: pending, processing and unknown/unrecognized provider statuses count against refundable capacity until authoritative resolution, preventing a second partial refund from spending the same remaining balance merely because status normalization is incomplete.
+- The refund transaction schema preserves unique refund reference, original transaction reference, provider, status, decimal amount, currency, reason, metadata and timestamps.
+
+**TEST / SCHEMA / HISTORY / CI VERIFICATION:**
+- `tests/Unit/RefundAdversarialSafetyTest.php` exercises aggregate refund conservation across retries/concurrency/partials, counts pending/processing and unknown/unrecognized statuses against refundable balance, excludes failed refunds and protects terminal state from late webhook changes. The suite candidly includes a local-persistence-loss case showing that the DB validator alone cannot know a provider-side refund happened if the refund row was never recorded.
+- Exact HEAD GitHub Actions run `32368037426` completed successfully on 2026-08-20. The workflow runs static analysis, a PHP/Laravel Pest matrix, coverage enforcement and dependency audit; it is not a credentialed real-provider qualification run.
+- History is staged: `537462778bf7d1eafcff1c08d85fe516d0b5d359` added refunds across eight providers, logging/validation/webhook handling; `4abc20f1dd97e766ac6e69ca4e0fb3425d3197e5` then hardened payment safety so ambiguous charge/refund outcomes no longer fall through to alternate providers and concurrent refund claims remain held on ambiguity.
+- Repository metadata at inspection: public, 73 stars / 8 forks, MIT license. This is not a low-attention/zero-star find; its value is the unusually candid safety contract and tests rather than obscurity.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:ed7d37009015c0b32bdbb2aa0cc380ce146504bbbf6ff0953ddfd565352f553a`, binding exact revision to:
+- `src/Refund.php` — Git blob `2f2995ddeb622d203ad25b1014e45a1e25c8444f`
+- `docs/idempotency.md` — `7bed5947de4ef6cd4ee9a489f3c437f791364b97`
+- `tests/Unit/RefundAdversarialSafetyTest.php` — `f533147ca149244375307361ba4dac08aff00cfa`
+- `database/migrations/2024_01_02_000000_create_refund_transactions_table.php` — `f02a6fdbcea342420c2d039b6bd94f4f4846dbe6`
+- `.github/workflows/tests.yml` — `a27f05cf988719fd2297327a46511c4e0730d6f8`
+- `LICENSE` — `73374178d5521aa5d4dbc34e00b7d8e01db369d2`
+- exact-HEAD Actions run `32368037426`
+- refund-lineage commits `537462778bf7d1eafcff1c08d85fe516d0b5d359` and `4abc20f1dd97e766ac6e69ca4e0fb3425d3197e5`.
+No repository code, provider mutation, credentials, contacts, spend or commitments were executed.
+
+**CRITICAL FALSIFICATION:** This does **not** close tier-5C-B. The in-flight claim has a hard 60-second TTL. The project's own idempotency document explicitly says that if the process dies after the provider confirms but before local persistence, no local transaction trace may exist; after lock expiry, reconciliation is required. It also says PayZephyr cannot verify that a provider actually honors its idempotency contract and instructs users to consult provider docs and sandbox-test each rail. Therefore the strong claim is application-side conservation/ambiguity handling, not durable exactly-once external recovery. A transient lock must not be upgraded into a durable `OutcomeUnknown` record.
+
+**COMPARATORS / FALSIFIERS:**
+- `temporal-community/agent-memory-and-state@59fb4186bc50daefe09653a850197a985b3fa1cf` remains stronger on Axis A source design: its real Stripe test-mode demo deliberately opens the post-effect window, SIGKILLs the Worker and has replacement Worker attempt 2 reuse the same run-derived Stripe idempotency key. It still lacks an equally strong checked-in completed tier-5C-B artifact binding that recovered refund to downstream terminal settlement.
+- `TrueLayer/truelayer-php@016c885a15b581435c0390c1785beb03f6eb3010` is the opposite comparator: provider lifecycle types distinguish `refund_executed`/`refund_failed`, `payout_executed`/`payout_failed`, `payment_funds_received`, `payment_reversed` and `payment_disputed`. Its own `payment_funds_received` semantics acknowledge that received funds can still later be reversed. No inspected path couples those terminality events to a post-effect process-kill/restart experiment.
+
+**SPECIALIST PASSES:**
+- **CODE INSPECTOR:** verified refund dispatch, lock acquisition/release ordering, explicit idempotency input and provider fetch surface.
+- **TEST/SCHEMA INSPECTOR:** verified adversarial refund-conservation tests, unknown/pending capacity behavior, refund schema and exact-revision green CI.
+- **ECOSYSTEM/PROVIDER ANALYST:** compared application guarantees with provider lifecycle semantics and confirmed PayZephyr's own docs refuse to claim provider-side idempotency certainty.
+- **COMMERCIAL ANALYST:** evaluated a multi-provider ambiguity audit as the smallest paid wedge that does not require moving live money.
+- **RED-TEAM/VERIFIER:** challenged durability, provider truth and terminality independently before scoring.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The frozen packet supports the narrow claim that this exact revision implements and tests a conservative multi-provider refund-safety layer: one atomic in-flight claim, caller-controlled stable provider idempotency, no failover on ambiguous provider outcome, provider fetch/reconcile support, and refundable-capacity accounting that treats unknown/pending states as economically reserved. The verifier rejects `exactly once`, post-TTL crash recovery, verified provider idempotency, real-provider qualification, terminal refund/payout settlement and tier-5C-B. No sensitive-source material was used.
+
+**A-F SCORE (proposed only, after verifier):** **24/30 — A4 / B4 / C4 / D3 / E5 / F4.**
+- A4: a refund-safety audit/retrofit can be piloted quickly in staging or read-only review without live money mutation.
+- B4: duplicate and over-refund prevention is a direct-money control with meaningful downside avoidance.
+- C4: compresses multi-provider validation, atomic claims, ambiguity handling, status normalization and refund-capacity logic, but durable post-crash reconciliation remains missing.
+- D3: the implementation is solid but the core patterns are not uniquely rare and the repository already has visible adoption.
+- E5: source, adversarial tests, schema, candid docs, history and exact-revision green CI strongly support the narrow claim.
+- F4: MIT and public provenance are clean; provider-specific idempotency/readback contracts still require external qualification.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments-platform lead, marketplace finance engineering team, Controller systems owner or SaaS billing team operating multiple payment providers.
+- Pain: a refund timeout or process failure can leave teams unsure whether capacity is still available; naïve provider failover or a second partial refund can duplicate money while local state looks incomplete.
+- First paid wedge: **Multi-Provider Refund Ambiguity Audit**. In staging/read-only analysis, map each provider's refund idempotency/readback behavior, enforce one shared atomic claim, treat unknown statuses as consuming refundable capacity, and return a provider-by-provider matrix of safe retry, reconcile-first and unsupported cases. Measure duplicate/over-refund exposure, ambiguous-case resolution time and manual reconciliation hours; do not execute live refunds in the initial engagement.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** PayZephyr adds a pragmatic multi-provider application-side conservation layer, but it does not replace the durable recovery evidence from Auths/Interlock or the provider-terminal payout evidence from Flames-up.com. The strongest composed qualification target is **durable action identity/UNKNOWN beyond lock expiry → literal post-effect process death → provider readback/no duplicate → same action terminal provider event → balance/payout settlement evidence**. Facts from separate repositories remain separate until one executable path proves the intersection.
+
+**SEARCH EFFORT / COST PROXIES:** four materially different discovery modes; three serious candidate/comparator paths deep-inspected; source/tests/schema/history/CI/provider-semantics checked at exact revisions; no untrusted code execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Add a **durability-horizon check** to the two-axis evidence matrix. A 60-second cache lock can prevent concurrent over-refund but cannot stand in for durable ambiguity evidence after a crash. If the provider can commit while the local write is lost, the unknown state must survive independently of lock expiry until authoritative provider readback. Separately, treating unknown/unrecognized refund status as consuming refundable capacity is a valuable direct-money invariant and should be searched explicitly.
+
+**REFERRALS:** No new referral. Existing provider/system-of-record and external-outcome referrals already cover the unresolved intersection; duplicating them would add noise.
+
+**NEXT TEST:** Find one refund/payout implementation where the ambiguous action state survives beyond any transient lock TTL, a literal post-effect process death/restart occurs, authoritative provider readback proves exact no-duplicate, and the **same action identity** later reaches provider terminal success plus balance/payout/bank evidence. Prioritize ecosystems exposing explicit `refund_executed`/`payout_executed` events and pair those terms with fault-injection/process-restart search signatures.
