@@ -5,8 +5,7 @@
   "required": [
     "strategy_id",
     "name",
-    "status",
-    "source_markdown"
+    "status"
   ],
   "properties": {
     "strategy_id": {
@@ -16,6 +15,12 @@
     "name": {
       "type": "string",
       "minLength": 1
+    },
+    "parent_strategy_id": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "when_to_use": {
       "type": [
@@ -53,15 +58,27 @@
         "null"
       ]
     },
+    "observed_run_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
     "status": {
       "enum": [
         "active",
         "watch",
-        "retired"
+        "retired",
+        "observed_variant",
+        "unregistered_observed"
       ]
     },
     "source_markdown": {
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "additionalProperties": true

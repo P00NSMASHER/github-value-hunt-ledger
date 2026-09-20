@@ -1,37 +1,81 @@
-name: Technology Intelligence Graph
+name: Technology Intelligence System
 
 on:
   push:
     paths:
+      - "hunters/**"
       - "intelligence/**"
       - "tools/ti_*.py"
       - "CAPABILITIES.md"
       - "SEARCH_SKILLS.md"
+      - "SEARCH_QUEUE.md"
       - "OUTCOMES.md"
       - "KNOWLEDGE_GRAPH.md"
+      - "EXPERIMENTS.md"
+      - ".github/workflows/technology-intelligence.yml"
   pull_request:
     paths:
+      - "hunters/**"
       - "intelligence/**"
       - "tools/ti_*.py"
       - "CAPABILITIES.md"
       - "SEARCH_SKILLS.md"
+      - "SEARCH_QUEUE.md"
       - "OUTCOMES.md"
       - "KNOWLEDGE_GRAPH.md"
+      - "EXPERIMENTS.md"
+      - ".github/workflows/technology-intelligence.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate-learning-loop:
+  build-intelligence:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate graph
-        run: python tools/ti_validate.py
+
+      - name: Sync source-of-truth registries
+        run: python tools/ti_sync.py
+      - name: Recompute repository registry metrics
+        run: python tools/ti_registry.py
+      - name: Derive attribution graph
+        run: python tools/ti_graph.py
+      - name: Measure instrumentation quality
+        run: python tools/ti_quality.py
       - name: Rebuild learning report
         run: python tools/ti_report.py
-      - name: Require generated report to be current
-        run: git diff --exit-code -- intelligence/LEARNING_REPORT.md
+      - name: Recompute cautious adaptive search policy
+        run: python tools/ti_policy.py
+      - name: Validate technology-intelligence system
+        run: python tools/ti_validate.py
+      - name: Check generated text for whitespace errors
+        run: git diff --check
+
+      - name: Persist generated intelligence on main
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add intelligence/capabilities.jsonl \
+                  intelligence/search_strategies.jsonl \
+                  intelligence/derived_edges.jsonl \
+                  intelligence/LEARNING_REPORT.md \
+                  intelligence/REGISTRY_REPORT.md \
+                  intelligence/DATA_QUALITY_REPORT.md \
+                  intelligence/GRAPH_HEALTH.md \
+                  intelligence/SEARCH_POLICY.md \
+                  intelligence/search_policy.json \
+                  intelligence/registry_metrics.json \
+                  intelligence/quality_metrics.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: refresh technology intelligence [skip ci]"
+            git push
+          fi

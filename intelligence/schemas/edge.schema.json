@@ -34,7 +34,10 @@
         "STRENGTHENS",
         "DISCOVERED_BY",
         "DISCOVERED_EXAMPLE",
-        "CONTRIBUTED_TO"
+        "DISCOVERED",
+        "CONTRIBUTED_TO",
+        "ATTRIBUTED_TO",
+        "OBSERVED_IN"
       ]
     },
     "to": {
