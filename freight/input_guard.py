@@ -9,9 +9,10 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 
 class InputStatus(str, Enum):
@@ -28,6 +29,9 @@ class IngestPolicy:
     max_csv_rows: int = 250_000
     max_csv_cells_per_row: int = 2_000
     max_csv_total_cells: int = 5_000_000
+    max_xml_depth: int = 128
+    max_xml_elements: int = 250_000
+    max_xml_attributes_per_element: int = 256
     allowed_extensions: tuple[str, ...] = (".pdf", ".csv", ".xml", ".edi", ".x12")
 
     def __post_init__(self):
@@ -39,6 +43,9 @@ class IngestPolicy:
             ("max_csv_rows", self.max_csv_rows),
             ("max_csv_cells_per_row", self.max_csv_cells_per_row),
             ("max_csv_total_cells", self.max_csv_total_cells),
+            ("max_xml_depth", self.max_xml_depth),
+            ("max_xml_elements", self.max_xml_elements),
+            ("max_xml_attributes_per_element", self.max_xml_attributes_per_element),
         )
         for name, value in limits:
             if value <= 0:
@@ -66,8 +73,22 @@ def _sha256(data: bytes) -> str:
 def _safe_leaf_filename(filename: str) -> bool:
     if not filename or filename in {".", ".."}:
         return False
-    p = Path(filename)
-    return p.name == filename and not p.is_absolute() and ".." not in p.parts
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in filename):
+        return False
+    if "/" in filename or "\\" in filename or ":" in filename:
+        return False
+
+    for path_cls in (PurePosixPath, PureWindowsPath):
+        path = path_cls(filename)
+        if (
+            path.is_absolute()
+            or path.drive
+            or path.root
+            or path.name != filename
+            or ".." in path.parts
+        ):
+            return False
+    return True
 
 
 def _decode_text(data: bytes) -> str:
@@ -186,6 +207,42 @@ def _inspect_csv(text: str, policy: IngestPolicy, reasons: list[str]) -> None:
         reasons.append("csv_parse_error")
 
 
+def _inspect_xml(text: str, policy: IngestPolicy, reasons: list[str]) -> None:
+    depth = 0
+    elements = 0
+    try:
+        for event, elem in ET.iterparse(io.StringIO(text), events=("start", "end")):
+            if event == "start":
+                depth += 1
+                elements += 1
+                if depth > policy.max_xml_depth:
+                    reasons.append("xml_depth_limit_exceeded")
+                    return
+                if elements > policy.max_xml_elements:
+                    reasons.append("xml_element_limit_exceeded")
+                    return
+                if len(elem.attrib) > policy.max_xml_attributes_per_element:
+                    reasons.append("xml_attribute_limit_exceeded")
+                    return
+            else:
+                elem.clear()
+                depth -= 1
+    except ET.ParseError:
+        reasons.append("xml_parse_error")
+
+
+def _edi_segment_too_long(text: str, limit: int) -> bool:
+    segment_chars = 0
+    for ch in text:
+        if ch in {"~", "'", "\r", "\n"}:
+            segment_chars = 0
+            continue
+        segment_chars += 1
+        if segment_chars > limit:
+            return True
+    return False
+
+
 def inspect_input(
     filename: str,
     data: bytes,
@@ -230,6 +287,8 @@ def inspect_input(
                     reasons.append("nul_byte_rejected")
                 if _text_line_too_long(text, policy.max_text_line_chars):
                     reasons.append("text_line_too_long")
+                if not reasons:
+                    _inspect_xml(text, policy, reasons)
             elif ext == ".csv":
                 text = _decode_text(data)
                 if "\x00" in text:
@@ -245,13 +304,7 @@ def inspect_input(
                 stripped = text.lstrip()
                 if not (stripped.startswith("ISA") or stripped.startswith("UNB")):
                     reasons.append("edi_header_unrecognized")
-                chunks = []
-                for sep in ("~", "'"):
-                    if sep in text:
-                        chunks.extend(x for x in text.split(sep) if x)
-                if not chunks:
-                    chunks = [x for x in text.splitlines() if x]
-                if any(len(seg) > policy.max_edi_segment_chars for seg in chunks):
+                if _edi_segment_too_long(text, policy.max_edi_segment_chars):
                     reasons.append("edi_segment_too_long")
         except UnicodeDecodeError:
             reasons.append("invalid_utf8_text")
