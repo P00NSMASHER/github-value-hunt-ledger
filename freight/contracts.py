@@ -217,7 +217,18 @@ def make_finding(
         "actual_cents": actual_cents,
         "status": status,
     }
-    return Finding(**body | {"proof_hash": canonical_hash(body)})
+    return Finding(
+        finding_id=finding_id,
+        invoice_id=invoice_id,
+        customer_id=customer_id,
+        carrier_id=carrier_id,
+        currency=currency,
+        authority_id=authority_id,
+        expected_cents=expected_cents,
+        actual_cents=actual_cents,
+        status=status,
+        proof_hash=canonical_hash(body),
+    )
 
 
 def freeze_truth(
