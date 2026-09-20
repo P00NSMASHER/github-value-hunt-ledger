@@ -38,7 +38,10 @@ def _clean_md(value):
 def _split_list_value(value):
     if not value:
         return []
-    return [x.strip().strip(chr(96)) for x in re.split(r";\s*|,\s*(?=[A-Za-z0-9`])", value) if x.strip()]
+    # Human-authored compact evidence often joins components with semicolons,
+    # commas, a literal +, or the word "plus".
+    parts = re.split(r";\s*|\s+\+\s+|\s+plus\s+|,\s*(?=[A-Za-z0-9`])", value, flags=re.I)
+    return [x.strip().strip(chr(96)) for x in parts if x.strip()]
 
 def _list_field(block, label):
     return _split_list_value(_field(block, label))
