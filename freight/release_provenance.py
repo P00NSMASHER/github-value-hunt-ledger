@@ -27,6 +27,7 @@ CONTROL_PATHS = (
     "freight/gap_registry.py",
     "freight/input_guard.py",
     "freight/incident_response.py",
+    "freight/launch_authorization.py",
     "freight/outcome_adapter.py",
     "freight/pilot_package.py",
     "freight/pilot_launch_gate.py",
