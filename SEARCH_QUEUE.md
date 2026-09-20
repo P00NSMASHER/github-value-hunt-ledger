@@ -43,11 +43,13 @@ Run the Nirman↔`construction_management` adversarial authority corpus: wrong w
 **Search only:** signed/approved field-measurement authority, unbypassable certification-to-bill linkage, prime/sub flow-down/amendment authority and external cleared-cash/reversal evidence. **Stop:** generic pay-app/RA-bill CRUD, takeoff/diff and internal `PAID/Reconciled` labels.
 
 ## 5. Recovery Proof — P0/P1 / EXP-004
-**New evidence:** `kirilurbonas/FireDrill@1e532b17...` proves a stronger pattern: expected workload/subject inventory must be external to the evidence directory or a vanished drill can disappear from evaluation. Its multi-engine isolated restores, semantic checks, RTO/RPO, signed DSSE evidence and scoped coverage gate are strong component evidence. `snapetech/DuneAwakeningSelfHost@8d3bac1...` adds a useful PostgreSQL+RabbitMQ/Mnesia dual-plane recovery pattern. `WiseOpsTeam/mneme@e595986...` is a negative oracle because SQL process success can be mistaken for semantic assertion success.
+**New evidence:** `kirilurbonas/FireDrill@1e532b17...` proves that expected subject/workload inventory must be external to the evidence directory or a vanished drill can disappear from evaluation. `jorgedlcruz/open-backup-ui@d3956a4b...` independently demonstrates the missing census primitive by reconciling live infrastructure inventory against protected backup objects. `DanMrxs/danlab-vps-backup-control@6b071acd...` adds versioned inventory/manifests with explicit considered-vs-backed-up sets. `OmarRao/r3vp@404f7f7...` is a negative oracle for protected-set-derived inventory, and `NHSDigital/terraform-aws-backup@e0dbc8b...` shows scope-selector drift can corrupt compliance coverage. FireDrill's multi-engine isolated restores, semantic checks, RTO/RPO, signed DSSE evidence and scoped gates remain strong proof-plane evidence; `snapetech/DuneAwakeningSelfHost@8d3bac1...` adds PostgreSQL+RabbitMQ/Mnesia recovery and `WiseOpsTeam/mneme@e595986...` remains a process-exit-as-semantic-proof negative oracle.
 
-**Do next:** run per-workload expected-subject coverage with `expected_subject_missing_entirely`, `control_aggregate_masks_failed_workload`, wrong semantic value despite rc=0, proof-sink failure after successful restore, cleanup failure and deliberately broken verifier. Use a versioned/fresh expected inventory; unscoped evidence-directory discovery is forbidden for customer assurance.
+**Coverage authority contract:** define the denominator through three separately versioned planes: `CENSUS` = independently observed workloads with stable IDs, source revision, collected-at/freshness and tombstone/disappearance history; `SCOPE` = in/out-of-scope, criticality, RPO/RTO, owner, exclusion reason and expiry; `PROOF` = restore evidence for every resulting expected subject. The protected/evidence set may never define its own denominator, and a heartbeat is not inventory-snapshot freshness.
 
-**Stop:** broad backup/restore tooling. Search only if this matrix exposes a missing negative control or workload invariant.
+**Do next:** add `protected_set_used_as_census`, `inventory_snapshot_stale`, `subject_disappears_without_retirement_tombstone` and `scope_selector_semantics_mismatch` to the existing `expected_subject_missing_entirely`, `control_aggregate_masks_failed_workload`, wrong-semantic-value-despite-rc=0, proof-sink failure, cleanup failure and deliberately broken verifier matrix. PASS requires per-subject coverage against a frozen/fresh CENSUS+SCOPE snapshot before restore proof is considered complete.
+
+**Search only:** multi-source inventory reconciliation with stable identity, last-seen/tombstones, versioned exclusions/scope and independently verifiable snapshot provenance if this matrix exposes a missing authority component. **Stop:** broad backup/restore tooling and any design that computes coverage over only the protected/evidence set.
 
 ## 6. CaptureBrief / Government acquisition intelligence — P0/P1 / EXP-006
 Official GSA semantics establish a deletion/history boundary: `excludeDeleted`/`deleteAll` mean a latest manifest cannot reconstruct complete attachment history. `chrisfulcher/orrery@89ae2218...` remains useful but is now a **26/30 component**, not complete history authority, because it does not pin deletion-inclusive reads and its successful recheck path does not create a lossless disappearance ledger.
@@ -99,7 +101,7 @@ Do not spend capacity on generic OCR, CRUD, dashboards, RAG, fuzzy matching, com
 1. EXP-001 external authorized freight population.
 2. EXP-002 AP source-health + reversible authority-consumption/counter-event corpus.
 3. EXP-006 CaptureBrief action-history + deletion-inclusive manifest completeness.
-4. EXP-004 Recovery Proof expected-subject coverage + broken-verifier/proof-sink matrix.
+4. EXP-004 Recovery Proof CENSUS+SCOPE authority + expected-subject/broken-verifier/proof-sink matrix.
 5. EXP-005 ScopeSignal measurement/contract authority -> bill -> independent cash/reversal.
 6. EXP-003 commission provider -> bank/payroll finality and later-return matrix.
 7. EXP-010 money-state refund/unknown/counter-event month.
