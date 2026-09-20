@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v11",
+  "title": "Technology Intelligence Search Run v12",
   "type": "object",
   "required": [
     "search_run_id",
@@ -604,6 +604,38 @@
         "null"
       ],
       "pattern": "^[A-Za-z0-9_.:-]{2,64}$"
+    },
+    "routing_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "generated",
+        "manual_override",
+        "unrouted",
+        null
+      ]
+    },
+    "routing_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ROUTING:[a-f0-9]{12}$"
+    },
+    "worker_profile_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^WORKERS:[a-f0-9]{12}$"
+    },
+    "routing_score": {
+      "type": [
+        "number",
+        "null"
+      ]
     }
   },
   "additionalProperties": true,
@@ -769,6 +801,33 @@
           "execution_claim_id",
           "execution_slot_id",
           "execution_worker_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 12
+          },
+          "allocation_mode": {
+            "enum": [
+              "generated",
+              "manual_override"
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "allocation_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "routing_mode",
+          "routing_generation_id",
+          "worker_profile_generation_id",
+          "routing_score"
         ]
       }
     }
