@@ -1,6 +1,18 @@
 # Freight Recovery — Deployment Security Evidence Addendum
 
-Collected: **2026-09-20**
+Collected: **2026-09-20**  
+Valid through: **2026-09-27**
+
+## Evidence validity
+
+This snapshot is intentionally time-bounded. It must be recollected:
+- before any confidential-customer-data launch after 2026-09-27;
+- earlier if relevant deployment, access-control, team-membership, data-plane or
+  parser-runtime configuration changes.
+
+Expired evidence blocks the **current Netlify deployment route**. It does not
+block a separately controlled environment that has its own independent,
+unexpired VERIFIED evidence.
 
 ## Target deployment
 
