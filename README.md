@@ -198,3 +198,20 @@ The next-generation verifier-gated system is staged under `production/`:
 - `production/SECURITY_TEST_PLAN.md` — required fail-closed launch tests.
 
 The frozen benchmark remains unchanged and must finish before fleet-wide cutover.
+
+
+## Machine-readable technology-intelligence loop
+
+The durable Markdown research record is now paired with a structured empirical-learning layer under `intelligence/`.
+
+Every materially completed hunt cycle must:
+1. keep the detailed evidence in the appropriate `hunters/*.md` catalog;
+2. append one prospective record to `intelligence/search_runs.jsonl`;
+3. identify the stable `STRAT:...` strategy used and the reusable query family;
+4. record candidate/deep-inspection/retention/promotion denominators without inventing missing values;
+5. link any created/strengthened `CAP-###` nodes and affected `EXP-###` experiments;
+6. when an experiment or buyer validation finishes, append the result to `intelligence/outcomes.jsonl` with explicit originating search-run IDs.
+
+The machine graph uses stable node/edge IDs and is validated by `tools/ti_validate.py`. `tools/ti_report.py` computes search-strategy/query-family yield with minimum-sample safeguards and Wilson intervals. The generated report lives at `intelligence/LEARNING_REPORT.md`.
+
+**Policy:** do not reduce exploration based on anecdotal performance. Automatic expand/retire decisions require at least 5 measured runs and 20 deep inspections for the relevant strategy/query family. Realized technical/customer outcomes outrank predicted value scores.
