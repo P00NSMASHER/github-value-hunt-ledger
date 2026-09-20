@@ -1,5 +1,5 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -93,5 +93,9 @@
   "assignment_score": 0,
   "execution_claim_id": "CLAIM:000000000000",
   "execution_slot_id": "SLOT-01",
-  "execution_worker_id": "HUNTER-01"
+  "execution_worker_id": "HUNTER-01",
+  "routing_mode": "generated",
+  "routing_generation_id": "ROUTING:000000000000",
+  "worker_profile_generation_id": "WORKERS:000000000000",
+  "routing_score": 0
 }

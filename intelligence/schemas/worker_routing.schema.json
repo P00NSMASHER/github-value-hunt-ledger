@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V12 Worker Routing Decision",
+  "type": "object",
+  "required": [
+    "worker_id",
+    "route_status",
+    "routing_generation_id",
+    "worker_profile_generation_id"
+  ],
+  "properties": {
+    "worker_id": {
+      "type": "string",
+      "pattern": "^HUNTER-(0[1-9]|1[0-4])$"
+    },
+    "route_status": {
+      "enum": [
+        "LOCKED",
+        "ROUTED",
+        "IDLE_UNASSIGNED",
+        "BUSY_UNROUTED",
+        "PAUSED"
+      ]
+    },
+    "routing_generation_id": {
+      "type": "string",
+      "pattern": "^ROUTING:[a-f0-9]{12}$"
+    },
+    "worker_profile_generation_id": {
+      "type": "string",
+      "pattern": "^WORKERS:[a-f0-9]{12}$"
+    },
+    "slot_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^SLOT-[0-9]{2}$"
+    },
+    "assignment_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "work_item_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "routing_score": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "score_components": {
+      "type": "object"
+    },
+    "evidence_state": {
+      "enum": [
+        "UNMEASURED",
+        "SPARSE",
+        "MEASURED",
+        "LOCKED_ACTIVE_CLAIM"
+      ]
+    },
+    "claim_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

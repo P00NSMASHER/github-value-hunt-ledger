@@ -3,6 +3,7 @@
 Integrator-owned search and validation direction. Updated 2026-09-20. **Experiment bottlenecks, independent falsification, source authority and outcome evidence outrank repository count.** This file is current direction, not history; older overrides remain in Git history and hunter catalogs.
 
 ## Operating rules for all 14 workstreams
+- Check `intelligence/WORKER_ROUTING.md` before claiming work. If a worker has a generated V12 route, claim that routed slot; active V11 claims remain locked. Manual reroutes must be explicit and should be recorded as routing overrides rather than silently training the router.
 - Claim work through `intelligence/EXECUTION_BOARD.md` / `execution_events/SLOT-XX.jsonl` before executing it. One worker may hold one live claim by default. Heartbeat before lease expiry. Write schema-v11 telemetry first, then append COMPLETE with that exact run ID; completion without matched telemetry is invalid.
 - Review `intelligence/ALLOCATOR_LEARNING_REPORT.md` before coordinated cycles. V10 may move at most one slot among experiment/coverage/adjacency after sufficient attributed evidence; measurement, verification and wildcard remain protected. Manual overrides must be explicit and do not train the automatic portfolio learner. **Current report has 0 attributed assignment runs and no role with sufficient evidence, so no portfolio-capacity shift is justified yet.**
 - Start each coordinated cycle from `intelligence/HUNT_PLAN.md`; preserve the V9 slot assignment/provenance unless an explicit higher-priority experiment need overrides it.

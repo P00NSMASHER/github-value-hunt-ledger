@@ -112,6 +112,12 @@ jobs:
         run: python tools/ti_execution.py
       - name: Validate V11 hunt execution control plane
         run: python tools/ti_execution_validate.py
+      - name: Build V12 worker profiles
+        run: python tools/ti_worker_profiles.py
+      - name: Build V12 worker routing plan
+        run: python tools/ti_worker_routing.py
+      - name: Validate V12 worker routing
+        run: python tools/ti_worker_routing_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -194,6 +200,12 @@ jobs:
         run: python tools/ti_execution.py
       - name: Validate V11 hunt execution control plane
         run: python tools/ti_execution_validate.py
+      - name: Build V12 worker profiles
+        run: python tools/ti_worker_profiles.py
+      - name: Build V12 worker routing plan
+        run: python tools/ti_worker_routing.py
+      - name: Validate V12 worker routing
+        run: python tools/ti_worker_routing_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -266,7 +278,17 @@ jobs:
                   intelligence/execution_claim_history.jsonl \
                   intelligence/EXECUTION_BOARD.md \
                   intelligence/EXECUTION_DEBT.md \
-                  intelligence/execution_metrics.json
+                  intelligence/execution_metrics.json \
+                  intelligence/worker_profiles.jsonl \
+                  intelligence/worker_unmapped_runs.jsonl \
+                  intelligence/worker_strategy_domain_metrics.jsonl \
+                  intelligence/WORKER_PROFILE_REPORT.md \
+                  intelligence/worker_profile_metrics.json \
+                  intelligence/routing_candidates.jsonl \
+                  intelligence/worker_routing.jsonl \
+                  intelligence/worker_claim_packets.jsonl \
+                  intelligence/WORKER_ROUTING.md \
+                  intelligence/routing_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main

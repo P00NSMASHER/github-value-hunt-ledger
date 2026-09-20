@@ -484,3 +484,47 @@ Local helper:
 `python tools/ti_execution_event.py claim|heartbeat|start|complete|fail|release ...`
 
 For connector-driven claims, follow `intelligence/execution_events/README.md` and use the exact GitHub file SHA for atomic updates.
+
+
+## V12 worker routing and automatic slot selection
+
+V12 gives the execution control plane durable worker identities and a measurable worker-to-assignment routing layer.
+
+Source-of-truth:
+- `worker_registry.json` — durable `HUNTER-01`…`HUNTER-14` identities and active/paused state;
+- `worker_aliases.json` — reviewed historical label mappings;
+- `routing_policy.json` — routing weights, evidence shrinkage and guardrails.
+
+Generated products:
+- `worker_profiles.jsonl` — worker history, strategy/objective/experiment/capability/domain counts and V11 claim experience;
+- `worker_strategy_domain_metrics.jsonl` — observational worker × strategy × domain performance;
+- `WORKER_PROFILE_REPORT.md` — human-readable profile evidence;
+- `routing_candidates.jsonl` — every eligible worker↔slot edge and score decomposition;
+- `worker_routing.jsonl` — one route decision per registered worker;
+- `worker_claim_packets.jsonl` — exact assignment snapshots for routed workers;
+- `WORKER_ROUTING.md` — current routing plan;
+- `routing_metrics.json` — routing summary.
+
+Routing behavior:
+- active V11 claims are locked and cannot be rerouted;
+- idle workers and claimable slots are matched with an exact maximum-total-fit assignment rather than greedy first-pick routing;
+- assignment priority is always part of the score;
+- historical strategy, objective, experiment, capability, domain and completed-role evidence can only increase fit;
+- sparse/missing history never creates a negative penalty;
+- unmeasured workers receive a small exploration bonus so the router learns them;
+- one worker gets at most one slot and one slot gets at most one worker.
+
+Historical labels are normalized conservatively. Clear numeric identities such as `NODE 04`, `Hunt 05`, `H06`, and `hunter11` map to their corresponding durable worker. Ambiguous labels remain unmapped and are reported as profile debt.
+
+V12 run provenance adds:
+- `routing_mode`;
+- `routing_generation_id`;
+- `worker_profile_generation_id`;
+- `routing_score`.
+
+Generated V12 routing is observational optimization, not a causal ranking of worker quality.
+
+Local routed claim helper:
+`python tools/ti_worker_claim.py --worker HUNTER-05`
+
+Remote/connector claims still use V11 optimistic file-SHA concurrency. The claim packet tells the worker exactly which slot file and assignment snapshot to claim.

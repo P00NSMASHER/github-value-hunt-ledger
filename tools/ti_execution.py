@@ -174,6 +174,9 @@ def build_execution_state(write=True, now=None):
                   "assignment_work_kind":e["assignment_work_kind"],
                   "assignment_source_id":e["assignment_source_id"],
                   "assignment_score":e["assignment_score"],
+                  "routing_generation_id":e.get("routing_generation_id"),
+                  "worker_profile_generation_id":e.get("worker_profile_generation_id"),
+                  "routing_score":e.get("routing_score"),
                   "claimed_at":fmt_ts(ts),
                   "lease_expires_at":fmt_ts(expiry),
                   "last_heartbeat_at":None,
@@ -353,6 +356,9 @@ def build_execution_state(write=True, now=None):
               "assignment_work_kind":claim["assignment_work_kind"],
               "assignment_source_id":claim["assignment_source_id"]
             }
+            if claim.get("routing_generation_id"):
+                expected["routing_generation_id"]=claim.get("routing_generation_id")
+                expected["worker_profile_generation_id"]=claim.get("worker_profile_generation_id")
             mismatches=[f"{k}:run={run.get(k)!r}:claim={v!r}" for k,v in expected.items() if run.get(k)!=v]
             if int(run.get("schema_version") or 0)<11:
                 mismatches.append(f"schema_version={run.get('schema_version')} < 11")
@@ -362,6 +368,13 @@ def build_execution_state(write=True, now=None):
                 score_match=False
             if not score_match:
                 mismatches.append("assignment_score mismatch")
+            if claim.get("routing_generation_id"):
+                try:
+                    route_score_match=abs(float(run.get("routing_score"))-float(claim.get("routing_score")))<1e-9
+                except Exception:
+                    route_score_match=False
+                if not route_score_match:
+                    mismatches.append("routing_score mismatch")
             if mismatches:
                 telemetry="MISMATCH"
                 errors.append(f"COMPLETE claim {cid}: telemetry mismatch: {'; '.join(mismatches)}")

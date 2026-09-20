@@ -4,6 +4,8 @@ from collections import Counter
 from ti_common import INTEL, load_jsonl
 
 policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
+worker_registry=json.loads((INTEL/"worker_registry.json").read_text(encoding="utf-8")) if (INTEL/"worker_registry.json").exists() else {"workers":[]}
+registered_workers={w["worker_id"] for w in worker_registry.get("workers",[])}
 alloc=load_jsonl("hunt_allocations.jsonl")
 states=load_jsonl("execution_state.jsonl")
 claims=load_jsonl("execution_claim_history.jsonl")
@@ -32,6 +34,8 @@ for n,c in enumerate(claims,1):
     if not cid or cid in claim_by_id:
         raise SystemExit(f"execution_claim_history.jsonl:{n}: missing/duplicate claim_id")
     claim_by_id[cid]=c
+    if registered_workers and c.get("worker_id") not in registered_workers:
+        raise SystemExit(f"execution_claim_history.jsonl:{n}: unregistered worker_id {c.get('worker_id')}")
     if c.get("status") in {"CLAIMED","RUNNING"}:
         active_workers[c.get("worker_id")]+=1
 for worker,count in active_workers.items():
@@ -62,6 +66,14 @@ for n,r in enumerate(runs,1):
     mismatch=[k for k,v in expected.items() if r.get(k)!=v]
     if mismatch:
         raise SystemExit(f"search_runs.jsonl:{n}: claim provenance mismatch: {','.join(mismatch)}")
+    if int(r.get("schema_version") or 0)>=12 and c.get("routing_generation_id"):
+        if r.get("routing_generation_id")!=c.get("routing_generation_id") or r.get("worker_profile_generation_id")!=c.get("worker_profile_generation_id"):
+            raise SystemExit(f"search_runs.jsonl:{n}: routing provenance mismatch")
+        try:
+            if abs(float(r.get("routing_score"))-float(c.get("routing_score")))>1e-9:
+                raise SystemExit(f"search_runs.jsonl:{n}: routing_score mismatch")
+        except (TypeError,ValueError):
+            raise SystemExit(f"search_runs.jsonl:{n}: invalid routing_score")
     try:
         if abs(float(r.get("assignment_score"))-float(c.get("assignment_score")))>1e-9:
             raise SystemExit(f"search_runs.jsonl:{n}: assignment_score mismatch")

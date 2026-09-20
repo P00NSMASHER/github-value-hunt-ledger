@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "workers": [
+    {
+      "worker_id": "HUNTER-01",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-02",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-03",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-04",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-05",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-06",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-07",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-08",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-09",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-10",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-11",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-12",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-13",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    },
+    {
+      "worker_id": "HUNTER-14",
+      "status": "active",
+      "allowed_slot_roles": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard"
+      ],
+      "manual_specialties": [],
+      "notes": "Durable V12 worker identity. Historical strengths are generated from telemetry; empty history remains unmeasured."
+    }
+  ]
+}
