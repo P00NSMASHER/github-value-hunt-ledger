@@ -226,3 +226,35 @@ Evidence count: **1 task**. Keep LOCAL only.
 - Do not promote a repository because its architecture schema contains the exact ideal fields; require runtime ownership and tests for the external-effect path.
 - Same-process command dedupe/receipt lookup is not durable idempotency unless the receipt/effect identity survives restart in a real backing store and restart tests exercise it.
 - Simulation-rich local control can still be commercially useful, but it is not evidence for physical effect reconciliation; score the local-control kernel separately from physical execution integrity.
+
+## 2026-09-20 — Run 9 evidence-backed update
+
+### H3 refinement — Level 3 can use provider-queryable business identity, not only a pre-known native operation ID
+STATUS: **ADJACENT-DOMAIN TRANSFER KERNEL FOUND; SCIENTIFIC IMPLEMENTATION STILL UNVERIFIED.**
+
+SUPPORTING EVIDENCE:
+- `auths-dev/auths-proof@34fa1f33cf365fa54075a2002710aee52ab42394` implements a Stripe refund state machine with durable `Reserved`, `OutcomeUnknown`, `ReconciledCommitted` and `ReconciledReleased` states plus a crash-persistent/cross-process reservation store.
+- The reservation is created before provider mutation and carries stable workflow/action identity, exact amount/account/currency context and the digest of a deterministic provider idempotency key.
+- Source explicitly treats a still-`Reserved` record as potentially ambiguous after process failure because the crash may have occurred during provider I/O.
+- The live refund mutation sends deterministic idempotency plus stable workflow metadata. The reconcile path is read-only: it queries existing provider refunds and matches the embedded workflow reference and exact money fields instead of issuing another refund.
+- Tests separately establish restart persistence of reserved state and ambiguous-provider reconciliation while keeping the provider mutation count at exactly one. This is the first inspected public adjacent-domain implementation that substantially closes the reserve→ambiguous→restart/readback→reconcile loop.
+
+CONTRARY EVIDENCE:
+- No single inspected regression kills the process after a real/provider-accepted mutation but before the local terminal transition and then completes reconciliation after restart. The strongest crash-window conclusion is compositional across persistent-restart and ambiguous-provider tests.
+- Provider readback searches a bounded refund listing by charge and then matches metadata/amount/currency; unusual provider-cardinality or metadata-collision edge cases are not fully proven away by this run.
+- This is payments, not laboratory hardware. Scientific transfer requires a device/LIMS/robot queue that persists a stable client-supplied business/job reference and exposes authoritative read/history queries after restart.
+
+LESSON IMPACT:
+- Refine effect-integrity Level 3: a system does **not** have to know the provider-native operation ID before acknowledgement. It may instead persist a stable business-effect reference before dispatch, embed that reference into the provider-side mutation, and later rediscover the original effect from the authoritative provider system of record.
+- New LOCAL transfer lesson: search adjacent external-effect systems for **provider-queryable business identity**: durable reservation + deterministic idempotency + externally persisted workflow/reference metadata + `OutcomeUnknown` + no-blind-retry + read-only provider reconciliation.
+- One successful transfer task only. Keep LOCAL; do not edit global `SEARCH_SKILLS.md`.
+
+NEXT TEST:
+Search scientific instrument servers, LIMS, robot job queues and SiLA/vendor adapters specifically for a **client-set stable job/reference field plus read-only job/history lookup**. Then test the exact crash window: reserve effect locally, dispatch once, lose acknowledgement, restart, find the original job by the stable external reference, reconcile it, and forbid resend until that readback resolves the outcome.
+
+CONFIDENCE: **HIGH that provider-queryable business identity is a valid Level-3 architecture pattern; MEDIUM that a public scientific executor exposes the necessary provider-side metadata/history surface.**
+
+### Failed-search memory added
+- Do not overconstrain Level 3 to “native command UUID must be known before acknowledgement.” An authoritative provider can be queried later by stable business metadata embedded in the original mutation.
+- Conversely, deterministic idempotency alone is still insufficient: require durable pre-dispatch reservation, explicit ambiguous state, and authoritative read-only reconciliation of the original effect.
+- Generic durable external-action frameworks without provider-specific readback remain Level-2/reference components until a concrete system-of-record adapter proves reconciliation.
