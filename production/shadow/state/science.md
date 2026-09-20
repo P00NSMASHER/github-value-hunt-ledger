@@ -258,3 +258,34 @@ CONFIDENCE: **HIGH that provider-queryable business identity is a valid Level-3 
 - Do not overconstrain Level 3 to “native command UUID must be known before acknowledgement.” An authoritative provider can be queried later by stable business metadata embedded in the original mutation.
 - Conversely, deterministic idempotency alone is still insufficient: require durable pre-dispatch reservation, explicit ambiguous state, and authoritative read-only reconciliation of the original effect.
 - Generic durable external-action frameworks without provider-specific readback remain Level-2/reference components until a concrete system-of-record adapter proves reconciliation.
+
+## 2026-09-20 — Run 10 evidence-backed update
+
+### H3 refinement — scientific provider-queryable identity found; durability gap narrowed to one wiring boundary
+STATUS: **STRONG NEAR-LEVEL3 SCIENTIFIC MATCH; FULL PHYSICAL LEVEL3 STILL UNVERIFIED.**
+
+SUPPORTING EVIDENCE:
+- `MolBioFreak/BioModStack@9b36a0b106cd538d772de39092c1d532ad361083` accepts a caller-supplied `idempotency_key` on BioXP v2 physical operator actions and disables automatic mutation retry in the deck submission path.
+- When acknowledgement is ambiguous, the client switches to GET-only lookup by the original key. The BMS route resolves `key → robot command_id → current canonical receipt` through passive provider reads and explicitly states that a 404 is unsettled lookup, not permission to replay a POST.
+- Tests reject identity mismatches, fence connection-generation changes, preserve passive lookup while active enqueue is unavailable, and propagate missing identity without mutation. Direct-liquid lost-response tests assert one POST and no recovery mutation.
+- The same repository separately contains a durable scientific-job dispatch outbox with unique run attempts, preallocated scheduler job IDs, lease/attempt state, authoritative existing-job lookup before creation, replay identity checks, and post-reopen/concurrent-claim tests. This is the caller-side durability primitive the BioXP bridge currently lacks.
+
+CONTRARY EVIDENCE:
+- The physical deck client's own source explicitly says its admission custody does **not persist across reload**; caller-side physical effect reservation therefore fails the crash-durability obligation today.
+- Public tests stop at the BMS/provider contract boundary and do not prove the underlying BioXP robot-side idempotency/receipt store survives robot process/power loss.
+- No one-shot end-to-end regression proves `persist → physical accept → lost ACK/process death → restart → GET same key → zero second POST`.
+- BioXP hardware/runtime/API are independently governed; MIT rights to BioModStack do not extend to proprietary instrument software or hardware interfaces.
+
+LESSON IMPACT:
+- The Run-9 LOCAL lesson **provider-queryable business identity** now has **2 distinct successful tasks**: `auths-proof` in payments and BioModStack as a strong scientific near-match. It is STAGED-eligible inside shadow evaluation, but do not modify global `SEARCH_SKILLS.md` from this lane.
+- Refine the search procedure: combine `Idempotency-Key` with request/command lookup and explicit no-replay semantics, then separately inspect whether the caller's key/effect reservation is persisted before dispatch and whether provider-side identity survives restart. Provider lookup without durable caller reservation is a near-match, not Level3.
+
+NEXT TEST:
+Bind a durable scientific effect/outbox record to the BioXP `idempotency_key` path (or find an equivalent public implementation) and exercise the exact crash window: persist reservation → provider accepts physical command → acknowledgement is lost/process dies → restart → GET by the same key resolves the original command → verify **zero second physical POST**.
+
+CONFIDENCE: **HIGH that provider-queryable business identity transfers into scientific middleware; MEDIUM that the remaining durability wiring will work unchanged against real BioXP provider persistence until hardware/process-restart evidence exists.**
+
+### Failed-search memory added
+- A stable client idempotency key plus read-only command lookup is insufficient when the client forgets the key on reload/crash.
+- Mock/provider-boundary tests do not establish that the actual instrument-side receipt store is crash-persistent.
+- Look for same-repository durable outbox/materializer code before assuming the missing persistence layer must be invented from scratch.
