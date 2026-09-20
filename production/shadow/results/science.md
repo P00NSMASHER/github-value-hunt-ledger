@@ -1284,3 +1284,116 @@ Evidence count: **1 task**. Keep LOCAL; do not stage or promote to global `SEARC
 - source/test/schema/history traversals: ~18;
 - external GitHub reads/searches: ~25;
 - untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 13
+
+### Hypothesis
+A mature scientific repository can hide a newly-added **operational reproducibility kernel** that is more reusable than its headline algorithm: idempotent run admission, crash/restart recovery, retry lineage, immutable lifecycle transitions and typed measured-hardware evidence. The hypothesis fails as a strong finding if those properties are only UI bookkeeping or README claims. It does **not** satisfy physical-effect integrity Level 3 unless the runtime also preserves a provider/native-device execution identity and can authoritatively reconcile an ambiguous physical effect after restart.
+
+### Discovery modes
+1. **Direct/current scientific-runtime search:** searched mature RF/DPD research software for experiment services, worker supervision and reproducible measured-hardware workflows rather than another model architecture.
+2. **Code/schema invariant search:** followed `idempotency_key`, terminal-state transitions, worker identity, heartbeat/event cursors, `parent_run_id`, config hashes, measurement capture hashes and evidence attestations.
+3. **Commit-history archaeology:** inspected September 2026 Studio/runtime hardening commits to identify operational capabilities added after the core scientific project became established.
+4. **Paper↔code validation:** checked OpenDPDv2 / MP-DPD research evidence to confirm that the repository is grounded in measured RF hardware rather than a synthetic-only ML demo.
+
+### Best candidate
+**lab-emi/OpenDPD — crash-aware experiment runtime + typed RF measurement-evidence kernel**  
+Canonical URL: https://github.com/lab-emi/OpenDPD  
+Exact revision: `aba888b87199d7ae7802ce931987e3aa3c951410`  
+Revision date: 2026-09-18  
+Public license: Apache-2.0  
+Repository attention at inspection: 177 stars / 43 forks  
+Evidence snapshot id: `shadow-science-20260920-opendpd-runtime-aba888b`
+
+### Frozen evidence manifest
+- `opendpd/runtime/db.py` blob `d67c6e3b0a13c9a11996d1b960e732c5c6b403f8`;
+- `opendpd/runtime/supervisor.py` blob `b32410aa4c5afb62fa40b9d966147b2e6c2d074f`;
+- `tests/integration/test_runtime.py` blob `51c2f15b133e2b9ce079f7f32594b42e3b37d701`;
+- `opendpd/schemas/run.py` blob `fa1ee528e4f9757149e0fd7e80de223dd8b5e75e`;
+- `opendpd/schemas/measurement.py` blob `e313ac4ce6566efffe00a42babac07a7edaba68c`;
+- `.github/workflows/ci.yml` blob `c1b9a74dee707b5c541c1f8cd8226c5313c61eac`;
+- `pyproject.toml` blob `4a168b5457a794d96398e09d01f03a9c332d576a`;
+- `LICENSE` blob `df09eb934f8608ff252fe300ce9eacd418a03ec1`;
+- runtime history includes September 2026 service/worker hardening commits `8b3a36...`, `2dd755...` and `2ad281...`;
+- pinned release commit `aba888...` is signed/verified and visible check-runs at inspection include a successful Python 3.10 test job plus successful build/publish checks;
+- external science evidence: Wu, Li & Gao, *OpenDPDv2: A Unified Learning and Optimization Framework for Neural Network Digital Predistortion* (arXiv:2507.06849; reported accepted to IEEE GLOBECOM 2026), plus earlier MP-DPD work using measured wideband PA data.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced run admission through SQLite store, supervisor process spawning, event ingestion, cancellation, worker death, restart recovery and explicit retry lineage.
+- **SCHEMA / PROVENANCE VALIDATOR:** verified immutable terminal states, stable run/idempotency/config hashes, append-only event sequencing and typed physical-measurement evidence binding the played artifact to capture hashes and declared conditions.
+- **SCIENCE VALIDATOR:** checked that OpenDPD's scientific lineage includes measured wideband GaN PA experiments rather than only simulation.
+- **ECOSYSTEM / COMMERCIAL ANALYST:** compared the runtime to generic experiment/workflow tools and isolated the value in the RF-specific execution/evidence contract rather than generic job queuing.
+- **RED-TEAM / VERIFIER:** challenged storage durability, physical side-effect semantics, manual-attestation boundaries, generic-substitute risk and recentness of the operational layer before scoring.
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED**
+- `RunStore` is the authoritative local runtime record. Its SQLite schema makes `run_id` primary and `idempotency_key` unique, and stores append-only per-run events with a compound `(run_id, seq)` key. Explicit transactions validate lifecycle transitions and advance the run/event cursor together.
+- Run schemas encode `queued/running/succeeded/failed/cancel_requested/cancelled/interrupted`; terminal states cannot transition again. `WorkerInfo` stores PID plus creation time because PID reuse is not trusted. Retry creates a new child run through `parent_run_id` rather than rewriting the old scientific record.
+- `RunSupervisor.submit()` returns the existing run for a repeated idempotency key. Integration tests prove same-key admission returns the same run ID and a real worker process completes with strict monotonic event sequence/cursor-resume semantics.
+- Adversarial integration tests kill a worker process, test idempotent/cooperative cancellation, reject late cancelled→succeeded resurrection, and restart the service with dead-running/queued/orphan-worker records. Recovery interrupts those stale records, kills a surviving orphan worker, and leaves no running rows rather than silently pretending old work completed.
+- The measurement schema carries an explicit attestation, source run (`apply_run_id`), SHA-256 of the played artifact, capture-file hashes, PA/capture-chain/sample-rate/drive/calibration/timestamp conditions, alignment/correlation/gain diagnostics and processing version. The module explicitly states that OpenDPD itself does **not** make the measurement; user-provided evidence remains labeled as such, while mock-adapter output has a separate synthetic attestation.
+- CI configuration runs the main test corpus across Python 3.10–3.13 and contains API/build/package checks. At the pinned release, visible check-run evidence includes a successful Python 3.10 test job and successful build/publish jobs.
+- Public code is Apache-2.0.
+
+**SCIENCE VALIDATION**
+- OpenDPDv2 reports measured evaluation on a 3.5 GHz GaN Doherty PA with a 200 MHz 256-QAM OFDM test signal, including strong ACPR/EVM results and a quantized/sparse deployment result with an estimated 4.5× forward-pass energy reduction. This validates that the evidence/runtime layer sits inside a real RF research program; it does not independently validate the newer runtime's field reliability.
+
+**IMPORTANT LIMITS / FALSIFIED OVERCLAIMS**
+- The store is local SQLite with WAL and `PRAGMA synchronous=NORMAL`, not a replicated or fully synchronous transaction service. Do not overstate it as a universal durable-outbox implementation.
+- Restart safety is **run-level**, not physical-effect Level 3. In-flight/queued work becomes `interrupted`, and explicit retry creates a new child run. If an external instrument had already produced an irreversible physical effect before process loss, OpenDPD does not inspectedly preserve a native instrument operation ID or query authoritative device history to prove what happened.
+- The measurement-evidence layer is honest but largely operator/import oriented. Its own source states that OpenDPD does not perform the physical measurement; therefore capture provenance is not equivalent to instrument-command readback or exactly-once actuation.
+- Generic platforms such as MLflow/Prefect/Airflow/ClearML can cover substantial generic tracking/orchestration functionality. The differentiated value is the integrated RF run lifecycle + hashes + measured-evidence semantics, not “has a job queue.”
+- The service/runtime hardening is recent (September 2026) relative to the older DPD research core, so field maturity should not be inferred from the project's scientific history.
+- This shadow run inspected source/tests/history/CI evidence but did not independently execute the full test suite.
+
+### Independent RED-TEAM / VERIFIER
+The verifier evaluated the frozen source/test/schema/history packet without the proposed score.
+
+**Verdict: PASS_WITH_LIMITS as a reproducible scientific-runtime / measurement-provenance STRONG_COMPONENT; FAIL for H3 external-effect integrity Level 3.**
+
+Proof obligations:
+1. **Stable local run identity + idempotent admission? — PASS.** Unique idempotency keys and tests return the same run rather than duplicating admission.
+2. **Crash/restart/orphan/cancel behavior tested? — PASS.** Real subprocess, kill, restart and stale-worker cases are exercised; terminal-state resurrection is prohibited.
+3. **Typed measured-hardware provenance? — PASS_WITH_LIMITS.** Played/capture hashes and experimental conditions are first-class, but measurement truth is explicitly user-attested rather than independently device-verified.
+4. **Current CI/test support? — PASS_WITH_LIMITS.** CI configuration is broad and visible pinned-commit checks include successful tests/build/publish, but this run did not rerun the whole corpus.
+5. **Durable native instrument/provider execution identity across a crash? — FAIL.** No qualifying device-command/effect join was established.
+6. **Authoritative post-crash readback that resolves the original physical effect without a second mutation? — FAIL.** The runtime interrupts computational work; it does not inspectedly close external instrument ambiguity.
+7. **Rarity beyond generic orchestration? — MODERATE.** Generic run supervision is substitutable; RF-specific evidence lineage, retry ancestry and measured-capture contracts provide the useful domain compression.
+
+Strongest objection: if positioned as a generic experiment runner, this is commodity infrastructure. The strong finding is the integration of crash-aware scientific run lifecycle with domain-specific measured-hardware evidence and explicit epistemic labeling; it should not be marketed as physical command safety or exactly-once execution.
+
+### Proposed score
+A) speed to first revenue: **3/5** — best as a focused retrofit/audit into an existing RF R&D workflow.  
+B) customer value / ceiling: **4/5** — rerun/reconstruction costs and invalid benchmark comparisons can be material, but buyer/ROI needs validation.  
+C) build/domain compression: **4/5** — worker supervision, retry lineage, idempotency, event cursoring and RF evidence schemas save meaningful engineering/domain work.  
+D) rarity/advantage: **3/5** — mature generic alternatives exist; RF-specific evidence integration is the differentiator.  
+E) evidence/completeness: **5/5** — unusually strong source/schema/integration-test/history/CI/paper packet for the narrower claim.  
+F) rights/operability: **5/5** — Apache-2.0, packaged Python application, active current release.  
+**Total: 24/30 — STRONG_COMPONENT inside shadow; no central promotion is made.**
+
+### Commercial / research implication
+First paid wedge: **RF Experiment Reproducibility & Campaign Reliability Retrofit/Audit** for PA/DPD research teams, telecom hardware labs and measured-hardware scientific-ML groups. Add stable/idempotent run admission, retry ancestry, crash/restart qualification, capture/config hashes, experimental-condition attestations and exportable evidence packets around existing model sweeps. The money path is reduced rerun/debug/reconstruction labor and fewer irreproducible or invalid comparisons; exact ROI remains a commercial-lane question.
+
+This component belongs **upstream of** the physical-effect Level-3 gateway. It can prove which computational/scientific run and which capture/evidence artifact were involved, but a separate executor layer is still required to prove whether an ambiguous instrument mutation physically occurred.
+
+### Search lesson outcome
+New LOCAL lesson: **commit-history archaeology in mature scientific software can expose newly-added operational reproducibility kernels that algorithm/paper-centric search misses.** OpenDPD is known for DPD modeling, yet its recent Studio/service history contains reusable idempotent admission, process-recovery, retry-lineage and typed evidence machinery.
+
+Failure mode: the new operational layer may be generic backend plumbing and may stop before the physical/provider boundary. Always inspect external-effect identity/readback before upgrading a run-level recovery system into a physical-effect integrity claim.
+
+Evidence count: **1 shadow task**. Keep LOCAL; do not stage or promote to global `SEARCH_SKILLS.md`.
+
+### VALUE HANDOFF
+1. **Capability delta:** adds a reusable scientific run ledger/supervisor plus typed measured-hardware evidence, capture hashes and retry lineage.
+2. **Graph edge:** complements H3's external-effect stack upstream of the executor by improving scientific/run provenance; it does not close the provider/device effect edge.
+3. **Radar signal:** mature scientific frameworks are adding operational reliability and typed evidence layers after their headline algorithms become established, suggesting a broader research→production maturation pattern.
+4. **Experiment impact:** supplies a concrete crash/restart/idempotency/evidence test reference that can be combined with BioModStack/Tangying-style physical-effect reconciliation primitives.
+5. **Commercial impact:** exposes a nearer-term RF reproducibility/reliability retrofit with buyers distinct from autonomous-lab platform teams.
+6. **Negative knowledge:** run-level idempotency + restart recovery + manual measurement provenance is not physical effect integrity; do not equate imported capture truth with authoritative instrument readback.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate deep inspections: 1 plus prior-provider comparators;
+- source/test/schema/history traversals: ~18;
+- external GitHub/web reads/searches: ~25;
+- untrusted-repository code executions: 0.
