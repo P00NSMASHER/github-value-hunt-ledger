@@ -323,3 +323,36 @@ CONFIDENCE: **HIGH that permanent unresolved-effect tombstones are useful for cr
 - A manual/operator recovery acknowledgement is not the same as authoritative physical outcome reconciliation; treat it as a liveness decision, not proof that the original effect succeeded or failed.
 - Print/job systems with a `client_job_id` can still be false positives when “completed” is only self-reported by the browser/client after the print call rather than read from the printer/spooler system of record.
 - Industrial callback systems with idempotent task IDs remain near-matches until crash persistence and authoritative device-side status lookup are proven at the same identity boundary.
+
+## 2026-09-20 — Run 12 evidence-backed update
+
+### H3 refinement — orchestration-level Level-3 semantics now appear independently, but a real provider binding is still the decisive missing edge
+STATUS: **NO_FIND FOR COMPLETED SCIENTIFIC LEVEL 3; STRONGER EVIDENCE THAT THE CONTROL CONTRACT IS CONVERGING.**
+
+SUPPORTING EVIDENCE:
+- `trieu04/lab-in-the-loop@80eb9524a4a36178b35810a7999cd95e8394d4fc` durably prepares the execution run and submit intent before provider submission, records ambiguous outcomes, and routes active/ambiguous work through `find_by_idempotency_key()` before any possible repeat submission.
+- The durable execution schema uses a unique `submit_intent_key`, optional provider execution identity, a uniqueness constraint on adapter/provider identity, and explicit `RECONCILING`, `AMBIGUOUS` and `BLOCKED` states.
+- Concurrent reconciliation tests exercise two callers around an absent remote lookup and assert only one submit occurs. Contract tests separately enforce same-key/same-input identity and reject key reuse with conflicting input.
+- A separate durable-recovery corpus in the same repository proves that the authors use intent-before-write and authoritative rediscovery after reopen/restart for other external objects.
+
+CONTRARY EVIDENCE:
+- The only installed lab provider is `DeterministicLabExecutionAdapter`, explicitly described as a **memory-only dry run**.
+- `DisabledRealLabExecutionAdapter` explicitly states that no real laboratory implementation exists in this phase, advertises no reconciliation support and fails closed.
+- The runtime builder rejects every Phase-8 mode except `dry_run` and hard-wires the deterministic adapter, so a real/sandbox provider is intentionally unavailable rather than merely undocumented.
+- No test can therefore prove the decisive `provider accepts physical effect → ACK lost/process dies → restart → authoritative lookup → zero second mutation` sequence against a real scientific system of record.
+- GitHub repository metadata reports no public license.
+
+LESSON IMPACT:
+- New LOCAL candidate lesson: **provider-binding / dry-run collapse check**. When a repository's architecture exactly matches Level-3 semantics, inspect the concrete adapter factory, enabled runtime modes and backing store before treating `find_by_idempotency_key()` as provider evidence.
+- Run 12 is a falsification success, not a capability promotion. Architecture-complete + memory-only provider is a distinct false-positive class from planned architecture (Run 8), session-only receipts (Run 8), or durable local tombstones without readback (Run 11).
+- One task only for this lesson. Keep LOCAL; do not stage or promote globally.
+
+NEXT TEST:
+Find or build a concrete scientific adapter behind the same durable lifecycle—preferably BioModStack/BioXP or another provider with stable externally queryable command identity—then execute the exact crash window: durable pre-dispatch reservation → provider accepts once → acknowledgement lost/process death → restart → read-only lookup by the original key → reconcile the original effect → **provider mutation count remains exactly one**.
+
+CONFIDENCE: **HIGH that the orchestration contract is reusable; HIGH that dry-run-only reconciliation is insufficient; MEDIUM that a public real-provider binding already exists elsewhere.**
+
+### Failed-search memory added
+- An abstract provider protocol with `find_by_idempotency_key()` is not evidence of authoritative scientific reconciliation unless the runtime actually binds a persistent external provider.
+- Durable schema + adversarial concurrency tests can still overstate operational maturity when the only implementation is an in-memory mock.
+- Inspect runtime composition/factory code early; if production modes fail closed and only dry-run is constructible, downgrade before spending time on peripheral architecture.
