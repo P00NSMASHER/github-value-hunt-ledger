@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -46,5 +46,9 @@
   "best_result": null,
   "durable_evidence_path": null,
   "notes": null,
-  "query_family_id": "QF:replace-with-canonical-query-family-slug"
+  "query_family_id": "QF:replace-with-canonical-query-family-slug",
+  "search_objective_id": "OBJ:replace-with-controlled-objective",
+  "benchmark_task_ids": [],
+  "comparison_group_id": null,
+  "evaluation_set_id": null
 }
