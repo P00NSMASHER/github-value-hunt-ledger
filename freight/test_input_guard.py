@@ -54,7 +54,7 @@ def test_valid_x12_is_accepted():
 
 def test_edi_segment_limit_fails_closed():
     policy = IngestPolicy(max_edi_segment_chars=20)
-    result = inspect_input("invoice.edi", b"ISA*" + b"A" * 100 + b"~")
+    result = inspect_input("invoice.edi", b"ISA*" + b"A" * 100 + b"~", policy)
     assert result.status is InputStatus.REJECT
     assert "edi_segment_too_long" in result.reasons
 
