@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v6",
+  "title": "Technology Intelligence Search Run v8",
   "type": "object",
   "required": [
     "search_run_id",
@@ -244,6 +244,138 @@
               "boolean",
               "null"
             ]
+          },
+          "repository_profile": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "observed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "metadata_status": {
+                "enum": [
+                  "observed",
+                  "unavailable"
+                ]
+              },
+              "stars": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "forks_count": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "primary_language": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "archived": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "fork": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "pushed_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "owner_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "topics": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "license_spdx": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_type": {
+                "enum": [
+                  "company",
+                  "government",
+                  "university",
+                  "national_lab",
+                  "standards_body",
+                  "nonprofit",
+                  "community",
+                  "individual",
+                  "unknown"
+                ]
+              },
+              "package_ecosystems": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "protocol_families": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "geography_tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "technology_domains": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "profile_source": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": true
           }
         },
         "additionalProperties": true
@@ -359,6 +491,25 @@
       "items": {
         "type": "string"
       }
+    },
+    "coverage_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "generated",
+        "manual",
+        "none",
+        null
+      ]
+    },
+    "coverage_gap_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^COV:[a-z0-9-]+:[a-z0-9-]+$"
+      }
     }
   },
   "additionalProperties": true,
@@ -439,6 +590,24 @@
           "adjacency_ids",
           "adjacency_types",
           "adjacency_root_nodes"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 8
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "coverage_mode",
+          "coverage_gap_ids"
         ]
       }
     }
