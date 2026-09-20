@@ -32,6 +32,8 @@
     "Completion requires a matching schema-v11 search run and exact claim/assignment provenance.",
     "A non-retryable failure blocks automatic re-claim of the same assignment.",
     "A superseded in-flight claim may finish, but a new claim cannot start on that slot until it closes or expires.",
-    "No execution event authorizes outreach, purchases, credential use, private-data access, or other external actions."
-  ]
+    "No execution event authorizes outreach, purchases, credential use, private-data access, or other external actions.",
+    "New claims must satisfy V14 dispatch binding or carry an explicit manual override reason."
+  ],
+  "minimum_new_claim_schema_version": 14
 }
