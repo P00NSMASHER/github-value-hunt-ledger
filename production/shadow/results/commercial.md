@@ -964,3 +964,76 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** No new referral. Existing provider/system-of-record referrals already target the remaining settlement intersection; this run adds a local recovery-identity refinement rather than a new cross-lane question.
 
 **NEXT TEST:** Find one **cash refund or payout** where the pre-dispatch durable business/workflow identity and provider-validity horizon are both explicit, a post-effect process death is followed by genuinely new-process recovery and exact no-duplicate provider truth, and the same action then reaches terminal processor balance/payout/bank evidence.
+
+## 2026-09-20 — Shadow run 14
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** A low-attention refund implementation can close part of the replay-window gap by persisting a pre-dispatch business refund identity and distinguishing provably-not-sent from possibly-sent actions, then rediscovering provider truth by business metadata rather than relying only on provider idempotency replay. Full tier-5C-B still requires literal process death plus terminal cash evidence on that same action.
+
+**DISCOVERY METHODS:**
+1. Direct money-domain search for refund crash/restart/idempotency/provider readback and settlement evidence.
+2. Code-signature search for durable refund fences, `requested`/`dispatched` state, provider retrieval/list correlation and no-reissue invariants.
+3. Durable-execution/payment analog search across workflow, reconciliation and contract-to-cash repositories.
+4. Deliberate low-attention search emphasizing zero-star operational repositories and commit-history archaeology around refund safety fixes/reverts.
+
+**BEST NEW COMPONENT + URL + EXACT REVISION:** `SmallHeroes/Small_Heroes` — https://github.com/SmallHeroes/Small_Heroes — `ed1da86cc114a767dc1086b71a30a4ef4595c097`.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `lib/payment-refunds.ts` models a durable `RefundFence` with four states: `requested` means the provider refund was never sent; `dispatched` means it was sent/may be in flight/response may be lost; `pending` is accepted but unsettled; `confirmed` is terminal success.
+- The Prisma fence is created before provider entry, keyed by stable `refundKey`, and the `requested -> dispatched` transition is an atomic one-winner conditional update. A restarted/concurrent worker that sees `dispatched` cannot issue the physical refund again.
+- PayMe reconciliation is deliberately fail-closed: `dispatched`/`pending` always query provider truth and never reissue. A lagging `paid` read leaves the refund pending rather than treating it as permission to send again; `refunded` confirms. `requested` is the only retryable state because the call is known not to have been sent.
+- Stripe uses the stable provider idempotency key but adds an important second recovery primitive: before creating a new refund it lists refunds for the PaymentIntent and searches for an earlier recovery refund tagged with stable `orderId` plus `recovery=exception_case`. The source explicitly says Stripe idempotency records are not a permanent ledger and this lookup is meant to rediscover a prior refund after DB-write loss/provider replay-window expiry.
+- The design therefore separates **provider replay** from **provider rediscovery by durable business identity**, directly extending run 12's replay-window lesson.
+
+**TEST / SCHEMA / HISTORY VERIFICATION:**
+- `lib/__tests__/payment-refunds.spec.ts` verifies existing tagged Stripe refund reuse, one Stripe create with the stable key when no prior refund is found, PayMe fail-closed behavior without a fence, fence-before-call, one-winner dispatch, confirmation without reissue, `requested` retry only when the action was provably not sent, and no reissue from `pending`/`dispatched` even when provider reads lag at `paid`.
+- The suite also covers partial-refund safety: a pre-existing partial refund stays pending and does not blind-issue another full refund.
+- `backend/migrations/20260630_refund_attempt_fence/migration.sql` creates a durable service-only `RefundAttempt` table with unique `refundKey`, provider/provider-sale identity, status, provider action ID and timestamps; RLS is enabled.
+- History is unusually candid. Commit `4894e7529d5b015a281bc625412ee071824ec417` introduced the pre-dispatch `dispatched` marker after tests found double-refund windows. Commit `ef41204c5907ab6653ea7af23e1ae2a41eecf8cc` tried to regain liveness by reattempting supposedly definitive failures. Commit `d1ed7cd73c6a3b187e63da7e853eb6a3c52cdd8d` then reverted that behavior because the provider contract could not prove a 4xx/application rejection had no financial side effect, explicitly choosing never-double over automatic liveness.
+- Repository metadata at inspection: public, 0 stars / 0 forks, GitHub public license metadata `null`. Under the hunt's standing rule, repository-code commercial authorization is user-asserted separately; no external-service/data rights are inferred.
+
+**CLAIM STATUS / CRITICAL FALSIFICATION:**
+- **IMPLEMENTED + UNIT-TESTED:** durable pre-dispatch refund fence, explicit not-sent vs maybe-sent semantics, no-reissue invariant, provider query reconciliation, stable Stripe idempotency and metadata-based Stripe rediscovery.
+- **NOT EXTERNALLY QUALIFIED:** the inspected tests use mocked provider clients/in-memory test fences; no revision-bound real Stripe/PayMe process-kill artifact was found.
+- The repository's own decision gate says a real PayMe sandbox crash/retry proof is mandatory before flag-on, and default tests must not call providers. That self-imposed gate is evidence against overstating production qualification.
+- Safety deliberately sacrifices liveness: if a refund is marked `dispatched` but the provider call genuinely never arrived, a later `paid` read stays pending and requires operator/next-phase reconciliation rather than automatic retry.
+- Stripe rediscovery itself is not fully proven complete: the code requests `limit:100` and the inspected path has no visible pagination. Retention, pagination/scope and uniqueness of metadata lookup remain provider-contract proof obligations.
+- No literal process-kill/new-process run, terminal processor balance, payout or bank evidence is tied to this candidate. Tier-5C-B remains open.
+
+**COMPARATORS / FALSIFIERS:**
+- `Zzradar/high-concurrency-ticketing-system@bdd47edf3cbc6a2888461b6ec994b9b49178536e` is stronger on literal process failure: its integration harness uses a real Docker backend SIGKILL/exit 137, leaves a PROCESSING refund row behind, starts a fresh backend and reconciles the provider snapshot. But the provider in that proof is explicitly Fake Stripe, so it does not improve external-provider truth.
+- `contract-to-cash/core@df39318eed6063fa03b288b5864a65f21636fccf` cleanly derives durable refund idempotency slots and models compensated/burnt keys, while its adapter documentation warns that provider idempotency retention is finite. Its external-provider tests are fake/httptest shaped and it is weaker than the selected candidate on explicit post-dispatch ambiguous readback.
+- Prior `az-said/Interlock@822ec54692b30e1fdce04b55dfab62d0b56a60b2` remains stronger on actual real-Stripe tier-5B evidence; prior `temporal-community/agent-memory-and-state@59fb4186bc50daefe09653a850197a985b3fa1cf` remains stronger on durable workflow→provider-key lineage; prior `karfalacisse900-alt/Flames-up.com@2ba5...` remains stronger on the separate payout-terminality axis.
+
+**SPECIALIST PASSES:**
+- **CODE INSPECTOR:** traced fence creation, requested→dispatched ordering, provider-call boundary, Stripe rediscovery and PayMe reconciliation behavior.
+- **TEST/SCHEMA INSPECTOR:** verified unit tests, the durable `RefundAttempt` migration and single-flight uniqueness.
+- **HISTORY/ECOSYSTEM ANALYST:** inspected the FIX-5/FIX-6/revert lineage and compared replay-window handling with independent payment/recovery repositories.
+- **COMMERCIAL ANALYST:** mapped the capability to a refund-ambiguity safety audit rather than claiming a finished payment product.
+- **RED-TEAM/VERIFIER:** independently challenged real-provider qualification, process restart, lookup completeness, liveness loss, public provenance and economic terminality before scoring.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The narrow claim passes: this exact revision implements a durable refund dispatch fence that distinguishes provably-not-sent from possibly-sent actions, refuses automatic reissue once a provider mutation may have been dispatched, and adds Stripe provider-side rediscovery by stable business metadata before creating another refund. Source, focused tests, durable schema and history support that claim. The verifier rejects literal crash/restart proof, real-provider qualification, generic exactly-once semantics, lookup completeness beyond the inspected bounded list query, terminal cash settlement and tier-5C-B.
+
+**A-F SCORE (proposed only, after verifier):** **25/30 — A4 / B5 / C5 / D4 / E4 / F3.**
+- A4: a refund-safety/code-path audit or staging retrofit can be sold without moving live money.
+- B5: duplicate refunds and ambiguous provider outcomes are direct-money risks with clear finance/reliability value.
+- C5: compresses durable state-machine, pre-dispatch fencing, provider rediscovery, fail-closed reconciliation and concurrency knowledge.
+- D4: the combination of durable dispatch semantics plus explicit metadata rediscovery after the idempotency window is unusually thoughtful in a zero-star product repository, but the patterns are reproducible.
+- E4: source/tests/schema/history are strong and unusually candid; evidence is capped because provider tests are mocks and no exact-revision external run artifact was found.
+- F3: public license metadata is absent and provider contracts still require sandbox qualification; standing separate repository-code authorization does not solve external-service operability.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments/billing engineering lead, marketplace finance systems owner or Controller's platform team that issues refunds/corrections.
+- Pain: provider idempotency keys are often treated as permanent truth even though replay retention is finite; after a response/DB-write loss, a retry can become a second refund if the original effect cannot be rediscovered.
+- First paid wedge: **Refund Ambiguity Safety Audit / Exactly-Once Refund Retrofit**. Map each refund path into durable `requested/dispatched/pending/confirmed` states, persist the business refund identity before provider entry, add provider lookup by durable business reference/metadata in addition to idempotent replay, inject safe response-loss/restart cases, and deliver a matrix of safe-retry, reconcile-only and operator-required rows. Keep the first engagement test/sandbox-only.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** SmallHeroes adds an application-level durable dispatch fence plus a second provider-rediscovery mode after idempotency replay retention. Interlock supplies the strongest checked-in real Stripe SIGKILL/new-process/no-duplicate evidence; Temporal supplies durable workflow→provider-key lineage; Flames-up supplies separate provider payout terminality. Together they define a stronger qualification architecture, but these facts remain separate until one executable path proves their intersection.
+
+**SEARCH EFFORT / COST PROXIES:** Four materially different discovery modes; exactly three serious candidates/comparators deep-inspected; source/tests/schema/history/rights verified at exact revisions; no untrusted repository code execution, provider mutations, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Extend lane-local `SK-COM-003` with a **provider-rediscovery completeness check**. Distinguish **idempotent replay** from **provider lookup by durable business identity/reference**. The latter can remain useful after replay-key retention expires, but only if its retention, pagination/scope, uniqueness and completeness are verified. A bounded/incomplete “query before retry” must not be silently promoted into proof that the original effect is absent; when rediscovery is incomplete, fail closed rather than issue a second money mutation.
+
+**REFERRALS:** No new cross-lane referral. The existing provider/system-of-record referral already asks for the single-path crash-safety + external-truth + terminality intersection; this run adds a local recovery-query discriminator rather than a new lane handoff.
+
+**NEXT TEST:** Find one real cash refund or payout where provider-side rediscovery by durable business identity is proven complete across the relevant retention horizon, then inject literal post-effect process death/new-process recovery and follow that same action to terminal processor balance/payout/bank evidence.
