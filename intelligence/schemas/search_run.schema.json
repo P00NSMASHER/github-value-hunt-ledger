@@ -1,29 +1,49 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run",
+  "title": "Technology Intelligence Search Run v2",
   "type": "object",
   "required": [
     "search_run_id",
-    "timestamp",
-    "hunter_role",
     "strategy_id",
     "query_family",
     "measurement_quality",
-    "search_surfaces",
-    "queries"
+    "candidate_count",
+    "deep_inspected",
+    "retained_count",
+    "master_promoted_count"
   ],
   "properties": {
+    "schema_version": {
+      "type": "integer",
+      "minimum": 2
+    },
     "search_run_id": {
       "type": "string",
       "pattern": "^RUN:[A-Za-z0-9:_-]+$"
     },
     "timestamp": {
-      "type": "string",
-      "minLength": 1
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "date": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "hunter_role": {
-      "type": "string",
-      "minLength": 1
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hunter": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "strategy_id": {
       "type": "string",
@@ -54,14 +74,12 @@
     },
     "search_surfaces": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "string"
       }
     },
     "queries": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "string"
       }
@@ -93,6 +111,32 @@
         "null"
       ],
       "minimum": 0
+    },
+    "elapsed_minutes": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "tool_calls": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "recall_rescue_used": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "stop_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "new_capability_ids": {
       "type": "array",
@@ -133,23 +177,65 @@
             ]
           },
           "status": {
-            "enum": [
-              "master",
-              "strong",
-              "watch",
-              "rejected",
-              "quarantined"
-            ]
+            "type": "string"
           },
           "reason_code": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "capability_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "novelty_ordinal": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 5
+          },
+          "evidence_ordinal": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 5
+          },
+          "replacement_days_low": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "replacement_days_high": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
           }
         },
         "additionalProperties": true
       }
+    },
+    "best_result": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "durable_evidence_path": {
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "notes": {
       "type": [
