@@ -303,3 +303,12 @@ When a skill is used prospectively, the resulting `intelligence/search_runs.json
 Before deep-inspecting a candidate that looks familiar, use `tools/ti_lookup.py` or equivalent ledger search. Reinspection is justified by a new revision, contradictory evidence, a new capability hypothesis or a named experiment gap—not merely rediscovery.
 
 The adaptive policy may allocate more research to promising strategies, but it must preserve exploration and must not treat recent runs without outcomes as failures.
+
+
+## Query-family reuse and outcome credit
+- A search skill and a query family are different objects. The skill describes the procedure; the query family describes the recurring technical search shape used in a run.
+- Reuse an existing `query_family_id` when the same conjunction/invariant/search shape is repeated, even in a different industry.
+- Preserve literal `queries` so every run remains reproducible.
+- Do not create a new family solely because buyer/domain wording changed.
+- Outcomes linked to multiple searches must conserve total credit. Prefer equal split unless the evidence justifies explicit `search_credit_weights`.
+- Optional effort fields should be measured, never estimated after the fact.
