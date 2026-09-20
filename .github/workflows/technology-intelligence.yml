@@ -43,18 +43,31 @@ jobs:
 
       - name: Sync source-of-truth registries
         run: python tools/ti_sync.py
+
+      - name: Build canonical query-family registry
+        run: python tools/ti_queries.py
+
+      - name: Build experiment-priority registry
+        run: python tools/ti_experiments.py
+
       - name: Recompute repository registry metrics
         run: python tools/ti_registry.py
-      - name: Derive attribution graph
+
+      - name: Derive weighted attribution graph
         run: python tools/ti_graph.py
+
       - name: Measure instrumentation quality
         run: python tools/ti_quality.py
-      - name: Rebuild learning report
+
+      - name: Rebuild conserved-credit learning report
         run: python tools/ti_report.py
+
       - name: Recompute cautious adaptive search policy
         run: python tools/ti_policy.py
+
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
+
       - name: Check generated text for whitespace errors
         run: git diff --check
 
@@ -66,8 +79,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add intelligence/capabilities.jsonl \
                   intelligence/search_strategies.jsonl \
+                  intelligence/query_families.jsonl \
+                  intelligence/experiment_registry.jsonl \
                   intelligence/derived_edges.jsonl \
                   intelligence/LEARNING_REPORT.md \
+                  intelligence/QUERY_FAMILY_REPORT.md \
+                  intelligence/EXPERIMENT_PORTFOLIO.md \
                   intelligence/REGISTRY_REPORT.md \
                   intelligence/DATA_QUALITY_REPORT.md \
                   intelligence/GRAPH_HEALTH.md \
