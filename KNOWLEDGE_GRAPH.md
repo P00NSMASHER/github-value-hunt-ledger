@@ -67,8 +67,11 @@ Human-readable current graph connecting repository/data evidence to capabilities
 ### ScopeSignal / Construction
 - massing-pdf + takeoff/model/change/deadline components -> IMPLEMENT evidence/change layers.
 - DIGIT-Works -> STRENGTHENS contract-bounded quantity evidence but CHALLENGES the false claim that UI measurement awareness proves backend billing authority.
-- Nirman + `mradul010/construction_management@ce345579...` -> STRENGTHEN measurement/work-order/quantity-to-bill challengers with distinct gaps.
-- CAP-001+006+007 -> ENABLES OPP ScopeSignal -> TESTED_BY EXP-005.
+- `raahul2701/nirman@9b860bf59b4b8beca14aeafdbb7a33e2ae550a20` -> STRENGTHENS the DB-side measurement→bill authority pattern with exact-row locking, approval provenance, BOQ/project lock, quantity ceiling, BOQ-derived rate and audit lineage, while CHALLENGING any claim that row locking alone proves one-use consumption because sequential replay/direct-table bypass/contractor-period authority and migration-replay gaps remain.
+- `jbhp9fysxx-droid/construction-billing-verification-engine@3fb551a85fe6ae606b99acff0ce0abac94d4c7e6` -> COMPARATOR / NEGATIVE_CONTROL for independent BOQ/rate/arithmetic/cumulative checks; synthetic falsification shows negative and NaN quantities can pass without explicit finite/domain guards.
+- `abhirails/InfraLedgerEliteA2C` -> NEGATIVE_CONTROL for a correct service path coexisting with generic CRUD mutation bypass.
+- `mradul010/construction_management@ce345579...` -> STRENGTHENS server-reloaded work-order/PO quantity/rate bounds with separate finality gaps.
+- CAP-001+006+007+016 -> ENABLES OPP ScopeSignal -> TESTED_BY EXP-005 authority-transition replay, one-use evidence and independent-cash matrix.
 
 ### Permit Intelligence
 - PermitBuild -> IMPLEMENTS CAP-012.
