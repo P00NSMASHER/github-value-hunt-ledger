@@ -288,3 +288,38 @@ Minimum evidence before adjacency performance can influence priority:
 - adjacency type: 5 measured runs and 20 deep inspections.
 
 Domain STOP gates still win. Adjacency cannot be used to silently reopen broad freight or another explicitly closed search lane.
+
+
+## V7 search saturation and diminishing-return detection
+
+V7 measures whether a research neighborhood is still producing new technical value or is approaching diminishing returns.
+
+Neighborhoods are derived from existing telemetry rather than manually declared:
+- capability neighborhoods;
+- canonical query families;
+- search objectives;
+- adjacency types and roots;
+- generated search seeds.
+
+Generated products:
+- `research_neighborhoods.jsonl` — measured neighborhood health;
+- `SATURATION_REPORT.md` — human-readable status and evidence;
+- `redirect_queue.jsonl` / `REDIRECT_QUEUE.md` — recommended effort shifts;
+- `saturation_metrics.json` — machine-readable summary.
+
+Statuses:
+- `INSUFFICIENT` — not enough evidence to judge;
+- `PRODUCTIVE` — still producing meaningful novelty or MASTER/capability delta;
+- `BALANCED` — neither obviously productive nor exhausted;
+- `SATURATING` — diminishing returns are emerging;
+- `SATURATED` — repeated measured search is producing little novelty and enough duplicate/low-yield evidence exists.
+
+A neighborhood cannot be marked SATURATING or SATURATED until it has at least 5 measured runs and 20 deep inspections. Duplicate and first-seen signals are ignored until their own observation thresholds are met.
+
+Saturation is a soft redirect, not a ban. Seed priority adjusts conservatively:
+- PRODUCTIVE: +5;
+- BALANCED / INSUFFICIENT: 0;
+- SATURATING: -12;
+- SATURATED: -25.
+
+A concrete experiment blocker or independently justified cross-domain transfer can still override the generic redirect. Domain STOP gates remain authoritative.

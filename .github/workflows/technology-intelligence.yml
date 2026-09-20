@@ -76,6 +76,10 @@ jobs:
         run: python tools/ti_report.py
       - name: Recompute cautious adaptive search policy
         run: python tools/ti_policy.py
+      - name: Measure V7 search saturation and redirect pressure
+        run: python tools/ti_saturation.py
+      - name: Validate V7 saturation neighborhoods
+        run: python tools/ti_saturation_validate.py
       - name: Compile ranked next-hunt search seeds
         run: python tools/ti_seed_compiler.py
       - name: Validate V5 search seeds and seed attribution
@@ -136,6 +140,10 @@ jobs:
         run: python tools/ti_report.py
       - name: Recompute cautious adaptive search policy
         run: python tools/ti_policy.py
+      - name: Measure V7 search saturation and redirect pressure
+        run: python tools/ti_saturation.py
+      - name: Validate V7 saturation neighborhoods
+        run: python tools/ti_saturation_validate.py
       - name: Compile ranked next-hunt search seeds
         run: python tools/ti_seed_compiler.py
       - name: Validate V5 search seeds and seed attribution
@@ -194,7 +202,12 @@ jobs:
                   intelligence/adjacency_queue.jsonl \
                   intelligence/ADJACENCY_QUEUE.md \
                   intelligence/ADJACENCY_PERFORMANCE.md \
-                  intelligence/adjacency_metrics.json
+                  intelligence/adjacency_metrics.json \
+                  intelligence/research_neighborhoods.jsonl \
+                  intelligence/redirect_queue.jsonl \
+                  intelligence/SATURATION_REPORT.md \
+                  intelligence/REDIRECT_QUEUE.md \
+                  intelligence/saturation_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
