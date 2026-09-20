@@ -59,6 +59,23 @@ def test_customer_value_requires_direct_external_value_evidence():
         )
 
 
+def test_value_only_outcome_requires_engagement_identity_and_can_omit_revenue_evidence():
+    out = build_outcome(
+        base(
+            synthetic=False,
+            external_value_evidence=True,
+            engagement_id="recovery-1",
+            buyer_cohort_key="buyer-a",
+            customer_value_usd=2500,
+            realized_recovery_usd=2500,
+            **attribution(),
+        )
+    )
+    assert out["customer_value_usd"] == 2500
+    assert out["revenue_usd"] is None
+    assert out["freight_metrics"]["buyer_cohort_key"] == "buyer-a"
+
+
 def test_revenue_only_requires_external_commercial_not_customer_value_evidence():
     out = build_outcome(
         base(
