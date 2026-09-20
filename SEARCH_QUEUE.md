@@ -3,6 +3,7 @@
 Integrator-owned search and validation direction. Updated 2026-09-20. **Experiment bottlenecks, independent falsification, source authority and outcome evidence outrank repository count.** This file is current direction, not history; older overrides remain in Git history and hunter catalogs.
 
 ## Operating rules for all 14 workstreams
+- Check `intelligence/DISPATCH_BACKPRESSURE.md` before claiming. Primary V15 tickets soft-stale after 75 minutes and hard-expire after 150 minutes. Never claim a hard-expired primary ticket; use `WORK_STEAL_QUEUE.md` only after expiry. Work-steal runs are measured separately and do not train V13 primary-routing quality.
 - Before claiming routed work, use `intelligence/DISPATCH_BOARD.md` / `dispatch_claim_packets.jsonl`. A generated claim must carry the current `DISPATCH:` ticket exactly. Claiming a different slot is allowed only as an explicit `manual_override` with a reason, and that override must not train the generated-route learner.
 - Review `intelligence/ROUTING_LEARNING_REPORT.md` before interpreting worker specialization. V13 trains only from completed MATCHED generated routes and remains observe-only until its evidence thresholds are met; manual reroutes and retrospective repairs do not train it.
 - Check `intelligence/WORKER_ROUTING.md` before claiming work. If a worker has a generated V12 route, claim that routed slot; active V11 claims remain locked. Manual reroutes must be explicit and should be recorded as routing overrides rather than silently training the router.
