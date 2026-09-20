@@ -323,3 +323,38 @@ Saturation is a soft redirect, not a ban. Seed priority adjusts conservatively:
 - SATURATED: -25.
 
 A concrete experiment blocker or independently justified cross-domain transfer can still override the generic redirect. Domain STOP gates remain authoritative.
+
+
+## V8 blind-spot exploration coverage
+
+V8 measures where the hunt has barely explored at all, using explicit coverage quotas rather than pretending to know the true distribution of valuable technology on GitHub.
+
+Observable dimensions are derived from repository profiles:
+- primary language family;
+- star/attention band;
+- repository age;
+- archived/fork lifecycle;
+- owner account type.
+
+Reviewed/manual dimensions are supported but do not create automatic blind-spot seeds until classification coverage is high enough:
+- institution/source type (government, national lab, university, standards body, company, nonprofit, community, individual);
+- package/application ecosystem;
+- protocol family;
+- operational geography.
+
+Generated products:
+- `repository_profiles.jsonl` — merged bootstrap + V8 run profiles;
+- `coverage_targets.jsonl` — every quota target and its state;
+- `exploration_gap_queue.jsonl` — searchable undercovered targets;
+- `COVERAGE_REPORT.md` — coverage and metadata debt;
+- `EXPLORATION_GAPS.md` — ranked searchable blind spots;
+- `coverage_metrics.json` — machine-readable summary.
+
+V8 adds `coverage_gap` search seeds. They intersect a searchable blind spot (for example zero-star, archived, Rust/C++, or older repositories) with an active high-value capability gap. Coverage membership never substitutes for technical evidence.
+
+New prospective runs use `schema_version: 8` and record:
+- `coverage_mode: generated | manual | none`;
+- `coverage_gap_ids`;
+- a `repository_profile` for every structured candidate disposition. Unknown manual tags stay `unknown`/empty rather than being guessed.
+
+The default taxonomy is an exploration policy, not a claim about GitHub prevalence. It is editable as evidence accumulates.
