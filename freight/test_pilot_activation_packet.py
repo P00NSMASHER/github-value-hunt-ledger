@@ -60,3 +60,14 @@ def test_later_settlement_is_not_requested_as_immediate_recovery_proof():
     settlement=[r for r in p.buyer_data_requests if r.source_type=="settlement_observation"]
     assert len(settlement)==1
     assert settlement[0].timing=="LATER_OUTCOME"
+
+def test_mismatched_readiness_and_launch_decision_is_rejected():
+    import pytest
+    with pytest.raises(ValueError,match="readiness/launch decision mismatch"):
+        build_packet(ready_input(invoice_source_coverage=0.80),decision(status="BLOCKED",route="DEPLOYED_PILOT_BLOCKED"))
+
+
+def test_launch_warnings_are_preserved():
+    p=build_packet(ready_input(),decision(warnings=["rights_evidence_not_attached"]))
+    assert p.launch_warnings==("rights_evidence_not_attached",)
+    assert "rights_evidence_not_attached" in render_markdown(p)
