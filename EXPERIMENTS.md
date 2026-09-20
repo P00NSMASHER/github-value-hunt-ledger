@@ -96,16 +96,17 @@ The purpose of this file is to stop the system from becoming a museum of interes
 - Decision unlocked: whether CaptureBrief can sell rule-currency/readiness diagnostics now.
 - Next action: select 10 live solicitations and freeze evaluation rubric before reviewing outputs.
 
-### EXP-007 — Governed lab campaign shadow test
-- Opportunity: Installed-Base Lab Automation / Governed Campaign Shadow Audit.
-- Capabilities: CAP-013 plus governance/provenance components.
-- Status: **READY** for rights-clean synthetic campaign.
-- Hypothesis: governance/validation/recovery policies reduce invalid actions and improve replay completeness relative to optimizer-only control.
-- Inputs: closed-loop synthetic campaign with invalid-action traps and recoverable failures.
-- Success criteria: lower invalid-action rate, comparable/better objective performance, complete replay/provenance and deterministic stop/recovery behavior.
-- Failure criteria: governance adds cost without measurable safety/quality gain.
-- Decision unlocked: whether this remains radar/watch or moves toward an enterprise implementation wedge.
-- Next action: define plain-optimizer baseline and common cost metrics.
+### EXP-007 — Governed lab campaign + sequencing-operations shadow test
+- Opportunity: Installed-Base Lab Automation / Governed Campaign Shadow Audit / Sequencing Operations Evidence.
+- Capabilities: CAP-013, CAP-017 plus governance/provenance components.
+- Status: **READY** for rights-clean synthetic tests.
+- Hypothesis: governance/provenance improves replay and fail-closed behavior, and a concrete Clarity -> InterOp -> provenance profile can link workflow state to sequencer operational evidence without sequence-content analysis or PHI.
+- Inputs: (A) closed-loop synthetic campaign with invalid-action traps and recoverable failures; (B) synthetic Clarity QC/pooling/run-prep workflow, lawful/public InterOp fixtures, stable synthetic run/workflow identity and provenance store.
+- Procedure: run a plain optimizer/control baseline and governed campaign; separately execute Clarity state transitions, attach InterOp operational metrics, replay the same run, and inject invalid transition, missing/mismatched run identity, missing metric artifact and run-metric exception cases.
+- Success criteria: governed path lowers invalid actions or improves replay completeness without unacceptable objective loss; sequencing profile deterministically links workflow/run evidence, rejects mismatched identities/transitions, preserves unknown states and requires no sequence reads/PHI.
+- Failure criteria: governance adds cost without measurable safety/quality gain; sequencing evidence silently joins the wrong run, turns missing evidence into success, or requires sensitive sequence/patient data for the proposed operations wedge.
+- Decision unlocked: whether Installed-Base Lab Automation should move from generic platform integration to a concrete sequencing-core implementation service.
+- Next action: build the synthetic S4 Clarity + Illumina InterOp + provenance acceptance fixture before seeking any customer environment.
 
 ### EXP-008 — Industrial virtual pre-FAT bind benchmark
 - Opportunity: Industrial Pre-FAT / Virtual Commissioning.
@@ -138,7 +139,19 @@ The purpose of this file is to stop the system from becoming a museum of interes
 - Success criteria: operational and accounting planes reconcile on correct cases and expose every planted disagreement with source lineage.
 - Failure criteria: vertical-specific semantics make the generalized boundary too lossy.
 - Decision unlocked: whether to make this a platform component under AP, commissions, telecom, utilities and marketplaces.
-- Next action: define canonical event/money-state schema and run two independent implementations.
+- Next action: define canonical event/money-state schema and run two independent implementations, including automated idempotency/refund/reversal/outbox failure cases before relying on any untested payment core.
+
+### EXP-011 — Subrogation rule-and-quantum fail-closed benchmark
+- Opportunity: Insurance Subrogation Recovery Diagnostic.
+- Capabilities: CAP-001, CAP-006, CAP-007 plus deterministic recovery-quantum workflow under evaluation.
+- Status: **READY** for synthetic technical validation; **BLOCKED_EXTERNAL** for commercial outcome proof.
+- Hypothesis: a Recoupe-style workflow can prioritize defensible recovery opportunities only if jurisdiction/policy authority is explicit, versioned and fail-closed rather than inferred from illustrative/default rules.
+- Inputs: fully synthetic closed claims covering paid-loss composition, comparative/contributory fault regimes, policy limits, made-whole/deductible handling, limitations windows, missing/conflicting authority and settlement outcomes. Any legal/rule values in the benchmark must be deliberately authored test fixtures unless separately sourced as current authority.
+- Procedure: freeze facts -> freeze explicit synthetic rule-pack version -> calculate quantum -> proof/evidence gate -> demand/negotiation state -> synthetic settlement. Include unknown jurisdiction, missing rule, superseded rule, conflicting rule and unsupported policy-language cases.
+- Success criteria: exact deterministic quantum on supported cases; every unknown/conflicting/missing authority case remains REVIEW/$0 asserted recovery; no generic jurisdiction fallback silently creates money; settlement state remains distinct from calculated opportunity.
+- Failure criteria: an illustrative/default legal rule yields a hard-dollar recovery assertion, LLM output controls authoritative money/legal state, or calculated recovery is mislabeled as realized settlement.
+- Decision unlocked: whether the subrogation architecture merits a future customer-authorized closed-claim diagnostic after authoritative rule packs are supplied.
+- Next action: replace repository illustrative rule data with explicit synthetic benchmark rules first; only then test a separately sourced/current rule pack or buyer-authorized closed claims.
 
 ## Portfolio rule
 Do not start another product build merely because a new repository is exciting. First ask whether it changes one of these experiments, creates a better experiment, or invalidates an existing hypothesis.
