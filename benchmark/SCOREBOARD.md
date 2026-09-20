@@ -8,7 +8,7 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 ## Pair summary
 | Pair | Tasks | Control completed | Experiment completed | Matched tasks scored | Control matched mean /25 | Experiment matched mean /25 | Control false promotions | Experiment false promotions | Winner so far |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| 1 | 01-08 | 7 | 0 | 0 | — | — | 0 | 0 | — |
+| 1 | 01-08 | 8 | 0 | 0 | — | — | 0 | 0 | — |
 | 2 | 09-15 | 7 | 7 | 7 | 24.71 | 25.00 | 0 | 0 | Experiment |
 | 3 | 16-22 | 7 | 7 | 7 | 23.57 | 24.71 | 0 | 0 | Experiment |
 | 4 | 23-29 | 7 | 7 | 7 | 24.86 | 24.57 | 0 | 0 | Control |
@@ -40,6 +40,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 05 | CONTROL | 25 | 5/5/5/5/5 | `srthck/trustmesh@5a93d70b37aafecaf61a5bc0296eaf831e5504ac` | No | No | Exact target; deterministic proof obligations, blocker explanations, same-adjudicator counterfactual next-evidence ranking, negative tests and calibration caveat all correctly verified. |
 | 06 | CONTROL | 25 | 5/5/5/5/5 | `phax/phive@18c7398fff29b4c2e6b4447231728c4931eb23ee + phax/phive-rules@6e26991e780522368c6d8c7cf60f629291a2ccab` | No | No | Demonstrably strong equivalent: versioned XSD/Schematron layers, explicit INVALID vs SKIPPED/UNCLEAR semantics, fatal handling, broad EU rule packs, functional fixtures and exact-revision CI were verified; currentness/artifact-rights caveats preserved. |
 | 07 | CONTROL | 25 | 5/5/5/5/5 | `Mirdula18/CADMorph@0444d4f0b9fc72b216f146763ee00f5b822ef0a9` | No | No | Demonstrably strong construction-revision equivalent: deterministic scale/rotation/translation registration, fail-closed alignment thresholds, registered vector-entity deltas and adversarial synthetic ground truth are source/test verified; field-corpus limits are explicitly bounded. |
+| 08 | CONTROL | 25 | 5/5/5/5/5 | `finnertallon-png/contract-deadline-agent@c891f5ff391abc58b874675783a7ff2c3775c7bb` | No | No | Exact target; clause/path/page/verbatim provenance, human-gated triggers, explicit unsupported-timing refusal, idempotent calendar sync and adversarial review/calendar tests are directly verified. Legal applicability, business-day calendars, external-corpus extraction accuracy and independent test execution remain correctly bounded rather than overclaimed. |
 | 09 | CONTROL | 25 | 5/5/5/5/5 | `GSA/GSA-Acquisition-FAR@da52ccbbe114e1f031a7f4c59195c508dbfa485f` | No | No | Exact first-party target; DITA source, fill-ins and change provenance inspected. |
 | 09 | EXPERIMENT | 25 | 5/5/5/5/5 | `GSA/GSA-Acquisition-FAR@da52ccbbe114e1f031a7f4c59195c508dbfa485f` | No | No | Exact target plus source/history/publication triangulation; unsupported currentness/schema claims withheld. |
 | 10 | CONTROL | 25 | 5/5/5/5/5 | `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964` | No | No | Exact first-party backend/ETL target with loaders, models, transforms and tests. |
