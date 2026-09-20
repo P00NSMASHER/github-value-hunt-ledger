@@ -8,6 +8,8 @@ outs = load_jsonl("outcomes.jsonl")
 strategies = load_jsonl("search_strategies.jsonl")
 caps = load_jsonl("capabilities.jsonl")
 aliases = json.loads((INTEL / "strategy_aliases.json").read_text(encoding="utf-8")) if (INTEL / "strategy_aliases.json").exists() else {}
+attr = json.loads((INTEL / "attribution_metrics.json").read_text(encoding="utf-8")) if (INTEL / "attribution_metrics.json").exists() else {"by_strategy":[]}
+attr_map = {x["id"]: x for x in attr.get("by_strategy", [])}
 
 domain_policy_path = INTEL / "domain_search_policies.json"
 domain_constraints = []
@@ -27,8 +29,7 @@ if domain_policy_path.exists():
         active_set = set(active_gap_ids)
         capability_gap_map = domain.get("capability_gap_map") or {}
         authorized_capabilities = sorted(
-            cid
-            for cid, gap_ids in capability_gap_map.items()
+            cid for cid, gap_ids in capability_gap_map.items()
             if active_set.intersection(gap_ids)
         )
         blocked_capabilities = sorted(set(capability_gap_map) - set(authorized_capabilities))
@@ -74,20 +75,24 @@ for s in active:
     promoted = sum((r.get("master_promoted_count") or 0) for r in rs)
     novel_runs = sum(1 for r in rs if r.get("new_capability_ids"))
     experiment_runs = sum(1 for r in rs if r.get("experiment_ids"))
-    linked = []
+
+    unique_outcomes = {}
     for r in rs:
-        linked.extend(out_by_run.get(r["search_run_id"], []))
-    valid = [o for o in linked if o.get("result") != "INVALID"]
-    passed = sum(1 for o in valid if o.get("result") == "PASSED")
+        for o in out_by_run.get(r["search_run_id"], []):
+            unique_outcomes[o.get("outcome_id")] = o
+    valid = [o for o in unique_outcomes.values() if o.get("result") != "INVALID"]
+
     retain = beta_mean(retained, inspected) if inspected else .5
     master = beta_mean(promoted, inspected) if inspected else .5
     novel = beta_mean(novel_runs, len(rs)) if rs else .5
     experiment = beta_mean(experiment_runs, len(rs)) if rs else .5
-    outcome = beta_mean(passed, len(valid)) if valid else .5
+
+    a = attr_map.get(sid, {})
+    frac_trials = a.get("fractional_outcome_equivalents", 0)
+    frac_passed = a.get("fractional_passed_equivalents", 0)
+    outcome = beta_mean(frac_passed, frac_trials) if frac_trials else .5
     raw_exploit = .18 * retain + .24 * master + .25 * novel + .18 * experiment + .15 * outcome
 
-    # Exploitation credit grows only with actual evidence volume.
-    # Unmeasured strategies still receive exploration credit below.
     run_weight = min(1.0, len(rs) / 5.0)
     inspection_weight = min(1.0, inspected / 20.0) if inspected else 0.0
     evidence_weight = min(run_weight, inspection_weight)
@@ -99,6 +104,8 @@ for s in active:
         "name": s.get("name"),
         "runs": len(rs),
         "inspected": inspected,
+        "assisted_outcomes": len(valid),
+        "fractional_outcome_equivalents": frac_trials,
         "raw_exploit_score": raw_exploit,
         "evidence_weight": evidence_weight,
         "exploit_mass": exploit_mass,
@@ -121,14 +128,12 @@ measured_rows = [x for x in rows if x["runs"] > 0]
 
 for x in rows:
     x["exploration_component"] = x["uncertainty"] / sum_u
-
     if sum_e > 0:
         x["exploitation_component"] = x["exploit_mass"] / sum_e
     elif measured_rows:
         x["exploitation_component"] = (1 / len(measured_rows)) if x["runs"] > 0 else 0
     else:
         x["exploitation_component"] = 1 / len(rows) if rows else 0
-
     x["allocation"] = (
         exploration_budget * x["exploration_component"]
         + (1 - exploration_budget) * x["exploitation_component"]
@@ -168,18 +173,15 @@ gap_candidates = [
         "missing_piece": c.get("missing_piece"),
         "run_attention": attention[c["capability_id"]]
     }
-    for c in caps
-    if c["capability_id"] not in blocked_exclusive_capabilities
+    for c in caps if c["capability_id"] not in blocked_exclusive_capabilities
 ]
-gaps = sorted(
-    gap_candidates,
-    key=lambda x: (-x["gap_score"], x["capability_id"])
-)[:10]
+gaps = sorted(gap_candidates, key=lambda x: (-x["gap_score"], x["capability_id"]))[:10]
 
-policy = {
+policy_obj = {
     "measured_runs": measured,
     "valid_outcomes": len(valid_out),
     "exploration_budget": exploration_budget,
+    "outcome_attribution_method": "equal_touch_fractional_credit",
     "strategy_allocation": rows,
     "priority_capability_gaps": gaps,
     "domain_constraints": domain_constraints,
@@ -188,10 +190,11 @@ policy = {
         "min_deep_inspections_for_exploitation_claim": 20,
         "never_zero_exploration": True,
         "recent_runs_not_treated_as_failed_outcomes": True,
-        "domain_authorization_precedes_generic_gap_ranking": True
+        "domain_authorization_precedes_generic_gap_ranking": True,
+        "multi_origin_outcomes_not_full_credited_to_every_strategy": True
     }
 }
-(INTEL / "search_policy.json").write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
+(INTEL / "search_policy.json").write_text(json.dumps(policy_obj, indent=2) + "\n", encoding="utf-8")
 
 lines = [
     "# ADAPTIVE SEARCH POLICY", "",
@@ -199,25 +202,22 @@ lines = [
     f"- Measured prospective or benchmark runs: **{measured}**",
     f"- Valid structured outcomes: **{len(valid_out)}**",
     f"- Exploration budget: **{exploration_budget:.0%}**",
+    "- Multi-origin outcomes use fractional equal-touch credit rather than being counted in full for every strategy.",
     "- Strategies with fewer than 5 runs or 20 deep inspections remain **insufficient evidence** even if their suggested allocation is high.", "",
     "## Suggested strategy allocation", "",
-    "| Strategy | Allocation | Runs | Inspected | Evidence |",
-    "|---|---:|---:|---:|---|"
+    "| Strategy | Allocation | Runs | Inspected | Outcome eq. | Evidence |",
+    "|---|---:|---:|---:|---:|---|"
 ]
 for x in rows:
-    lines.append(f"| {x['strategy_id']} | {x['allocation']:.1%} | {x['runs']} | {x['inspected']} | {'sufficient' if x['sufficient_evidence'] else 'insufficient'} |")
-lines += [
-    "", "## Highest-information capability gaps", "",
-    "| Capability | Gap score | Prior run attention | Missing piece |",
-    "|---|---:|---:|---|"
-]
+    lines.append(f"| {x['strategy_id']} | {x['allocation']:.1%} | {x['runs']} | {x['inspected']} | {x['fractional_outcome_equivalents']:.2f} | {'sufficient' if x['sufficient_evidence'] else 'insufficient'} |")
+lines += ["", "## Highest-information capability gaps", "",
+          "| Capability | Gap score | Prior run attention | Missing piece |",
+          "|---|---:|---:|---|"]
 for x in gaps:
     lines.append(f"| {x['capability_id']} — {x['name']} | {x['gap_score']} | {x['run_attention']} | {x['missing_piece'] or '—'} |")
-lines += [
-    "", "## Domain authorization constraints", "",
-    "| Domain | Experiment | Search authorized | Active search gaps | Suppressed exclusive capability gaps | Shared capability scope |",
-    "|---|---|---|---|---|---|"
-]
+lines += ["", "## Domain authorization constraints", "",
+          "| Domain | Experiment | Search authorized | Active search gaps | Suppressed exclusive capability gaps | Shared capability scope |",
+          "|---|---|---|---|---|---|"]
 for x in domain_constraints:
     lines.append(
         f"| {x['domain_id']} | {x.get('experiment_id') or '—'} | "
@@ -228,15 +228,12 @@ for x in domain_constraints:
     )
 if not domain_constraints:
     lines.append("| — | — | — | — | — | — |")
-lines += [
-    "", "## Allocation guardrails", "",
-    "- Never interpret a high allocation as proof that a strategy is better; early allocation includes uncertainty-driven exploration.",
-    "- Do not suppress wildcard or novelty search to zero.",
-    "- Domain authorization overrides generic capability-gap ranking; a blocked domain cannot be reopened by a high adaptive gap score.",
-    "- Shared capabilities may still be searched for another active experiment, but that does not authorize their use for a blocked domain.",
-    "- When a top experiment is blocked on one named evidence gap, that gap can override the generic allocation only through its explicit domain gate.",
-    "- Outcome credit is explicit and lag-aware: absence of an outcome is not a failure until an experiment actually resolves.",
-    "- When sufficient evidence accumulates, realized customer and engineering outcomes should gradually outweigh retained-repository precision.", ""
-]
+lines += ["", "## Allocation guardrails", "",
+          "- Never interpret a high allocation as proof that a strategy is better; early allocation includes uncertainty-driven exploration.",
+          "- Do not suppress wildcard or novelty search to zero.",
+          "- Domain authorization overrides generic capability-gap ranking; a blocked domain cannot be reopened by a high adaptive gap score.",
+          "- Outcome credit is explicit and lag-aware; absence of an outcome is not a failure until an experiment actually resolves.",
+          "- SEARCH_POLICY.md answers where to allocate effort; MEASUREMENT_PLAN.md separately answers what evidence is missing before comparisons are credible.",
+          "- When sufficient evidence accumulates, realized customer and engineering outcomes should gradually outweigh retained-repository precision.", ""]
 (INTEL / "SEARCH_POLICY.md").write_text("\n".join(lines), encoding="utf-8")
 print(json.dumps({"measured_runs": measured, "valid_outcomes": len(valid_out), "exploration_budget": exploration_budget, "domain_constraints": len(domain_constraints)}))
