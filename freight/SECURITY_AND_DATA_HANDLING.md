@@ -15,6 +15,10 @@ This document describes the current **controlled-pilot security posture** and th
 - **Pre-parser input guard exists for PDF/CSV/XML/EDI/X12.** Oversized files, archives, path-traversal names, XML DTD/entity constructs, invalid text encodings, unrecognized EDI headers and overlong EDI segments are rejected before domain parsing.
 - **Spreadsheet export formula cells are neutralized.** Source evidence remains immutable; derived spreadsheet exports can neutralize formula-leading text.
 - **Release provenance is reproducible from the checkout.** Control-file hashes and the exact component-rights inventory are generated deterministically in CI.
+- **Data lifecycle state is fail-closed.** Pilot sources become lifecycle census entries; retention defines deletion scope; only explicit external confirmation may produce `DELETE_CONFIRMED`; unresolved delete outcomes remain `DELETE_UNKNOWN`.
+- **Source observation has three states.** `PRESENT`, `VERIFIED_EMPTY`, and `UNAVAILABLE` are distinct; `VERIFIED_EMPTY` requires completeness evidence.
+- **Application audit records are append-only/hash chained.** Buyer/BU-scoped records detect mutation/reordering inside the supplied audit set.
+- **Standards-shaped supply-chain artifacts are deterministic.** CI produces a CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped payload for later external signing.
 
 ## What this does NOT claim
 
@@ -22,8 +26,8 @@ The current repository does **not** by itself prove:
 - a deployed shared multi-tenant production database is isolated correctly;
 - parsers run in a hardened OS/container sandbox;
 - transport/storage encryption for a specific buyer environment;
-- signed release provenance;
-- a full SPDX or CycloneDX SBOM;
+- externally signed release provenance;
+- a complete transitive deployment SBOM (the repository now emits a deterministic partial CycloneDX 1.6-shaped SBOM);
 - independent external timestamp attestation;
 - SOC 2 / ISO 27001 / other certification.
 
@@ -79,3 +83,31 @@ This is a reproducible component/provenance inventory, **not a signed attestatio
 For an initial pilot, Freight Recovery should be represented as a **controlled, read-only, human-reviewed acceptance engagement** using scope-bound evidence and fail-closed proof rules.
 
 Do not represent it as an already-certified enterprise SaaS security platform until the deployment-specific controls above are implemented and independently evidenced.
+
+
+## Retention, deletion and source-observation semantics
+
+`freight/data_lifecycle.py` applies the research-derived **CENSUS / SCOPE / PROOF** separation:
+
+- data-room manifest = CENSUS of in-scope pilot source objects;
+- retention days / delete-after = SCOPE;
+- explicit external deletion confirmation = PROOF.
+
+A source disappearing, a delete call timing out, or a follow-up read failing does **not** prove deletion. The state remains `DELETE_UNKNOWN` until explicit confirmation evidence exists.
+
+Source observations separately record:
+- `PRESENT`;
+- `VERIFIED_EMPTY` with completeness evidence;
+- `UNAVAILABLE`.
+
+This prevents an unavailable settlement or document source from becoming a false “nothing happened” conclusion.
+
+## Audit and release evidence
+
+`freight/audit_ledger.py` provides application-level buyer/BU-scoped append-only hash-chain evidence. It detects mutation and reordering of the supplied record set but is not external trusted timestamping.
+
+`freight/sbom.py` creates a deterministic CycloneDX 1.6-shaped document covering pinned Freight repository components and direct pinned CI Python dependencies.
+
+`freight/release_attestation.py` creates an in-toto Statement v1-shaped payload in an **unsigned** DSSE envelope. Repository-generated signatures are intentionally forbidden so this payload cannot be mistaken for independently signed provenance.
+
+A production release may later send the deterministic payload to an approved external signing identity/key and record signer/verifier evidence separately.
