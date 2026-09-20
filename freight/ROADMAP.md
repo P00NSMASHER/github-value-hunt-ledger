@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.6 candidate
+## Current checkpoint — v15.6
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -40,14 +40,16 @@ Live adaptive policy now confirms **Freight search authorized = no**, **active s
 
 Commercial repricing remains locked to the existing priors until direct external evidence reaches the v15.5 calibration threshold: **5 unique buyer cohorts, 5 paid engagements, and margin evidence from 5 unique buyers**. One customer cannot unlock repricing by generating repeated engagements.
 
+v15.6 Freight CI run `35524672964` passed the full Freight suite, controlled-pilot rights gate, gap gate, readiness fixture, synthetic rehearsal, deterministic provenance verification and component-inventory generation.
+
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
 ## Next 24 hours — make the asset diligence-ready
 
 ### P0
-1. **DONE:** v15 / v15.1 / v15.2 / v15.3 / v15.4 / v15.5 commercialization, proof, adaptive-authorization and commercial-learning PRs merged after CI.
-2. **DONE:** canonical Freight Recovery v15.5 release identity recorded in `freight/RELEASE_MANIFEST.md`.
-3. **PARTIAL DONE:** deterministic control-file hashes and exact component inventory are generated/verified in CI. Signed provenance and a full buyer-required SPDX/CycloneDX SBOM remain annual-deployment diligence work.
+1. **DONE:** v15 through v15.6 commercialization, proof, adaptive-authorization, commercial-learning and pilot-security/provenance PRs merged after CI.
+2. **DONE:** canonical Freight Recovery v15.6 release identity recorded in `freight/RELEASE_MANIFEST.md`.
+3. **DONE for deterministic internal provenance:** control-file SHA-256 and exact component inventory are generated/verified in CI. **OPEN for enterprise deployment:** signed provenance and any buyer-required full SPDX/CycloneDX SBOM.
 4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
 
