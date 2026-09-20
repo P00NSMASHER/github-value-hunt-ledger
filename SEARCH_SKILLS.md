@@ -50,3 +50,25 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - benchmark claims are repository-reported only;
   - terminology changes make simple keyword counts misleading.
 - NEXT IMPROVEMENT: track independent implementation count, publication velocity, package adoption and production deployment evidence as separate emergence signals.
+
+## Acceptance-path transition inspection
+- SKILL NAME: Acceptance-path transition inspection
+- WHEN TO USE: An agent, workflow or autonomous-control repository claims independent review, verified completion, safe handoff, durable orchestration or evidence-gated promotion.
+- PROCEDURE:
+  1. Ignore reviewer/auditor prose initially and locate the exact state transition that accepts work as `complete`, `reviewable`, `merged`, `promoted` or otherwise trusted.
+  2. Trace which concrete evidence can unlock that transition and which blocking conditions keep it closed.
+  3. Inspect the failure/recovery path around the same transition: verifier timeout, worker crash, stale state, restart/resume, retry/backoff and malformed reviewer output.
+  4. Check whether the verifier/reviewer can mutate the artifact it is judging; prefer read-only or mutation-detect/restore designs.
+  5. Search tests for the transition and its negative controls, not just for prompt text asking a reviewer to inspect work.
+  6. Distinguish filesystem/workspace separation from hardened security isolation and policy-in-instructions from independently enforced validation.
+- WHY IT WORKED: Benchmark Experiment Tasks **30 and 31** independently benefited from this procedure. Task 30 separated a real fail-closed manager/executor/auditor completion gate from generic checkpointing. Task 31 transferred the same habit to issue-driven coding orchestration by inspecting tracker reconciliation, retry state, workspace boundaries and the validation-to-review/merge transition instead of trusting orchestration marketing.
+- EXAMPLES:
+  - Benchmark Task 30: `AMAP-ML/LongHorizon-Harness@a1dd930614972b92361c1b9cd6aac441a6db5a65`
+  - Benchmark Task 31: `openai/symphony@be10a1b79df723d6d7612b5651c8522704dafb2e`
+- FAILURE MODES:
+  - reviewer prompts exist but the executor can still self-certify completion;
+  - validation is advisory and does not gate state transition;
+  - retry/backoff state disappears on restart and is mistaken for durable recovery;
+  - an "isolated workspace" is overclaimed as a security sandbox;
+  - the verifier shares mutable artifacts or correlated assumptions with the executor and independence is overstated.
+- NEXT IMPROVEMENT: apply this procedure outside coding-agent systems to scientific campaign authorities, billing/audit approval flows and other human-in-the-loop state machines; measure whether it predicts false-promotion reduction across later benchmark tasks.
