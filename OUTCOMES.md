@@ -24,9 +24,9 @@ No experiment should be called commercially validated until its result is record
 - Follow-up
 
 ## Baseline — 2026-09-20
-No completed experiment outcome has yet been formally recorded in this ledger under the outcome schema above.
+The first standardized outcome is now recorded below. It is a **technical-only PARTIAL** result, not commercial validation.
 
-This does **not** mean no useful engineering work exists. It means the research system has not yet converted its accumulated technical evidence into a standardized outcome record that can train future search priority.
+The system still has **$0 directly evidenced revenue and $0 directly evidenced customer value** in the structured outcome ledger.
 
 ## Feedback rules
 1. Realized outcomes outrank README quality and repository popularity.
@@ -64,3 +64,19 @@ The structured record MUST include:
 - the search-policy consequence.
 
 This link is what allows the system to learn whether a search strategy ultimately produced useful technology rather than merely an attractive repository.
+
+
+## OUT:20260920:freight-v15-4-synthetic-rehearsal
+- Date: 2026-09-20
+- Experiment: **EXP-001 — Freight blind audit to realized settlement**
+- Opportunity: Freight Recovery
+- Result: **PARTIAL**
+- Technical result: the v15.4 synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → buyer-report rehearsal passed. The proof-derived report and persistent settlement store reconciled on realized and fee-eligible synthetic amounts.
+- Commercial result: **no external buyer validation**; no diagnostic/pilot/annual revenue and no customer recovery claimed.
+- Realized customer value: **$0 recorded**
+- Revenue: **$0 recorded**
+- Contributing capabilities: **CAP-006, CAP-016**
+- Origin search run: `RUN:20260920T155926Z:hunter03:settlement-persistence-race`
+- Search-policy consequence: keep the freight discovery freeze and **zero ACTIVE_SEARCH gaps**; prioritize an authorized customer population plus rights/security diligence instead of broader repository hunting.
+- Evidence: `freight/synthetic_rehearsal.py`; Freight Commercial Contracts CI run `35522536180`.
+- Follow-up: first external outcome must record actual paid engagement and/or buyer-controlled realized settlement evidence before any revenue/customer-value field becomes positive.
