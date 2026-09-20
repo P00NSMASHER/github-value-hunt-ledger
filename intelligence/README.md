@@ -558,3 +558,41 @@ Matched contexts are role, work kind, strategy, objective and experiment. Worker
 The system intentionally reports **no causal worker ranking**. Assignment difficulty is confounded. V13 uses matched task-context residuals as routing evidence, not as a performance-review score.
 
 Until thresholds are met, mode is `observe_only_insufficient_evidence` and every V13 routing adjustment is exactly zero.
+
+
+## V14 dispatch binding
+
+V14 closes the gap between a V12/V13 routing recommendation and a V11 execution claim.
+
+Generated products:
+- `dispatch_tickets.jsonl` — the current exact route-to-claim tickets;
+- `dispatch_ticket_history.jsonl` — append-only issued-ticket history;
+- `dispatch_claim_packets.jsonl` — claim-ready routed packets;
+- `DISPATCH_BOARD.md` — current worker -> slot -> dispatch ticket view;
+- `dispatch_metrics.json` — dispatch generation and ticket counts.
+
+A generated claim is valid only when it presents the exact current dispatch ticket and matches:
+- worker;
+- slot;
+- assignment;
+- allocator generation;
+- portfolio-policy generation;
+- work item;
+- assignment role/work kind/source;
+- assignment score;
+- routing generation;
+- worker-profile generation;
+- routing-learning generation;
+- routing score;
+- dispatch generation.
+
+Manual reroutes remain allowed, but they must use `routing_mode: manual_override` with an explicit `route_override_reason`. They are intentionally excluded from generated-route learning.
+
+Five pre-V14 claims are grandfathered by explicit claim ID. Every later claim requires `claim_schema_version >= 14`.
+
+New generated search runs use `schema_version: 14` and carry:
+- `dispatch_ticket_id`;
+- `dispatch_generation_id`;
+- `routing_learning_generation_id`.
+
+This makes route provenance durable from V12/V13 routing -> V14 dispatch -> V11 execution -> V10/V13 learning.
