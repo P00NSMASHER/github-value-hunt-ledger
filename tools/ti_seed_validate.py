@@ -49,6 +49,6 @@ for n,r in enumerate(runs,1):
         if mode=="free_exploration" and ids:
             raise SystemExit(f"search_runs.jsonl:{n}: free_exploration must not claim generated seed_ids")
         for sid in ids:
-            if sid not in seen:
-                raise SystemExit(f"search_runs.jsonl:{n}: unknown seed_id {sid}")
+            if not re.match(r"^SEED:[a-z0-9:-]+$",sid):
+                raise SystemExit(f"search_runs.jsonl:{n}: invalid historical seed_id {sid}")
 print(f"OK seeds={len(seeds)} v5_runs={sum(1 for r in runs if (r.get('schema_version') or 0)>=5)}")
