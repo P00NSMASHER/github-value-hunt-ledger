@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "search_run_id": "RUN:BENCH:<timestamp>:<strategy>:<task>",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "strategy-measurement",
@@ -28,5 +28,10 @@
   "experiment_ids": [],
   "candidate_dispositions": [],
   "durable_evidence_path": "benchmark/results/<comparison-group>-<strategy>.md",
-  "notes": "Freeze independently before reading sibling-condition results or BENCHMARK_GOLD.md."
+  "notes": "Freeze independently before reading sibling-condition results or BENCHMARK_GOLD.md.",
+  "strategy_version_id": null,
+  "triage_rejected_count": 0,
+  "holdout_sample_count": 0,
+  "elapsed_minutes": null,
+  "tool_call_count": null
 }
