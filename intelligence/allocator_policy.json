@@ -129,11 +129,12 @@
     "max_assignments_per_experiment": 2,
     "max_assignments_per_strategy": 3,
     "max_adjacency_assignments_per_root": 1,
-    "min_coverage_slots": 3,
     "min_adjacency_slots": 2,
     "min_measurement_slots": 1,
     "min_verification_slots": 1,
-    "min_wildcard_slots": 1
+    "min_wildcard_slots": 1,
+    "min_coverage_role_slots": 3,
+    "min_coverage_gap_assignments": 2
   },
   "scoring": {
     "strategy_allocation_weight": 12,
