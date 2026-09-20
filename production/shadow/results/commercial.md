@@ -710,3 +710,86 @@ No repository code, provider mutation, credentials, contacts, spend or commitmen
 **REFERRALS:** No new referral. Existing provider/system-of-record and external-outcome referrals already cover the unresolved intersection; duplicating them would add noise.
 
 **NEXT TEST:** Find one refund/payout implementation where the ambiguous action state survives beyond any transient lock TTL, a literal post-effect process death/restart occurs, authoritative provider readback proves exact no-duplicate, and the **same action identity** later reaches provider terminal success plus balance/payout/bank evidence. Prioritize ecosystems exposing explicit `refund_executed`/`payout_executed` events and pair those terms with fault-injection/process-restart search signatures.
+
+## 2026-09-20 — Shadow run 11
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** A reusable money-safety substrate can be commercially valuable even without tier-5C-B if it makes the narrow crash window between external effect and durable inverse identity explicit: persist intent before dispatch, recover only from authoritative action identity, and fail closed when a result-derived compensation descriptor never became durable. A framework that exposes this gap should outperform ordinary “WAL + retry” code that silently assumes intent logging makes external side effects recoverable.
+
+**DISCOVERY METHODS:**
+1. Direct search for Stripe refunds/payouts combined with `SIGKILL`, restart and reconciliation.
+2. Code/invariant search for WAL ordering, intent/commit records, leases, deterministic recovery tokens, result-derived compensation and provider idempotency.
+3. External issue/patch search for ambiguous Stripe refund retries and duplicate financial effects.
+4. Low-attention proof-gate comparison against provider/settlement runbooks that require reconciliation evidence but lack a post-effect crash seam.
+
+**BEST NEW COMPONENT + URL + EXACT REVISION:** `thomasjgeorge23/agent-saga` — https://github.com/thomasjgeorge23/agent-saga — `4310ff570e60c42c081ae216e87a1ccb093525d4`.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `SagaContext.execute()` appends `STEP_INTENT` before the effect and forces a WAL barrier for COMPENSABLE/IRREVERSIBLE actions.
+- On success, it derives the compensation from the actual provider result, appends `STEP_COMMITTED` with the compensation descriptor, then forces another durability barrier. The source explicitly explains why this second barrier matters for money paths.
+- On timeout/exception, the forward effect becomes `UNKNOWN` rather than being assumed absent; the UNKNOWN record is durably logged and recovery fails closed when a safe inverse cannot be derived.
+- `saga-recoveryd` uses expired leases rather than PIDs to identify abandoned work and uses deterministic recovery tokens. Recovery tests cover daemon restart, concurrent recovery actors, fail-closed irreversible work and missing compensator registration.
+- The Stripe charge connector uses a deterministic forward idempotency key; refund compensation uses stable `agent-saga-refund-{charge_id}` identity and treats provider “already refunded” responses as success.
+- If charge outcome is UNKNOWN and no returned charge ID exists, the Stripe connector explicitly refuses to invent an automatic refund and tells the operator to reconcile against the known forward idempotency key.
+
+**TEST / HISTORY / CI VERIFICATION:**
+- `tests/test_recovery.py` exercises real-process orphan detection/recovery, lease expiry, deterministic tokens, daemon-restart idempotency, one-winner recovery and escalation cases.
+- `tests/test_durable.py` exercises durable restoration around a genuinely crashed subprocess.
+- `tests/test_connectors.py` verifies Stripe idempotency, gate behavior, secret handling and UNKNOWN behavior but explicitly states **no network, no real credentials, no live database**; Stripe money evidence is therefore mock/synthetic.
+- Connector history is staged: `b17a79673d8504907d4ce2486e8ec46bf91e4e84` introduced Stripe/PostgreSQL/Salesforce reference connectors; `0d55c8a884b8c568c70bd9818e4039b6cbb521b0` fixed a pre-flight policy bypass caused by closure-hidden amounts and added regression coverage.
+- Exact revision CI is **not green**: GitHub check run `88683078599` failed at `python -m pytest -q`; benchmark/report jobs were skipped. No blanket CI-pass claim is allowed.
+- Repository metadata at inspection: public, 2 stars / 0 forks, Apache-2.0.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:b144b6d52406de1d080f8b5fb9c83b3794cd6e3e371baa310f9553d30bacb2d6`, binding exact revision to:
+- `agent_saga/context.py` — `9ddbc666fc78910aee238a641471b91e7e4af644`
+- `agent_saga/recovery.py` — `4935b30ebb1707963ac47f4512ac55e84c9a372e`
+- `agent_saga/connectors/stripe.py` — `a3d46a37c977ca7df813d5526b3be12c8415adec`
+- `tests/test_recovery.py` — `c55f309eca664e584a72359b21a1f2a5621bf1a8`
+- `tests/test_connectors.py` — `319dd7a7caec249b426fcff0dd191afd8f0be64b`
+- `tests/test_durable.py` — `67099867980ac061b56840b59fc3dc5699b24b75`
+- `LICENSE` — `d645695673349e3947e8e5ae42332d0ac3164cd7`
+- exact-revision check run `88683078599`.
+No untrusted repository code, provider mutation, credentials, contacts, spend or commitments were executed.
+
+**CRITICAL FALSIFICATION — COMPENSATION-DESCRIPTOR BIRTH GAP:**
+- This does **not** close tier-5B or tier-5C-B.
+- The framework's own ordering exposes why: a compensation descriptor is derived only after the external call returns. A SIGKILL after provider effect but before `STEP_COMMITTED` can leave durable `STEP_INTENT` but no returned provider ID/inverse descriptor. The recovery daemon then has evidence that something may have happened but no safe automatic inverse; the framework correctly escalates instead of pretending the side effect is recoverable.
+- Therefore “intent durably written before effect” is necessary but insufficient for external exactly-once recovery when inverse identity is result-derived. A stronger design must persist a pre-dispatch business/action identity that can rediscover provider truth after crash.
+- The Stripe connector is mock-tested rather than externally qualified, and the exact revision's pytest check failed.
+
+**EXTERNAL COMMERCIAL SIGNAL:** `Wei-Shaw/sub2api` issue #5187 reports a Stripe refund path without explicit idempotency where an ambiguous provider response followed by operator retry could create a second real partial refund. PR #5193 was merged the next day to add deterministic refund idempotency and tests. This corroborates the pain pattern, but remains an author-reported bug/fix rather than an independently reproduced incident. Also, amount-derived idempotency is not sufficient as a universal business action identity because two legitimate same-amount partial refunds can be distinct actions.
+
+**COMPARATOR:** `chase-sets/chase-sets@9899efdd2d0f9a2303862444fc9348234e776a39` has strong production proof discipline: provider-neutral payment/payout ports, signed/idempotent webhooks, settlement-ledger source-of-truth rules, `payout.paid`/`payout.failed`, balance/reconciliation requirements and explicit launch-evidence gates. No inspected path supplied the missing post-effect process-death/recovery proof, so it is a valuable operating-control comparator rather than a tier upgrade.
+
+**SPECIALIST PASSES:**
+- **CODE INSPECTOR:** verified intent-before-effect ordering, result-derived inverse registration and Stripe idempotency semantics.
+- **FAILURE/RELIABILITY ANALYST:** isolated the crash window between external effect and durable result-derived compensation identity.
+- **TEST/CI/HISTORY ANALYST:** verified real-process recovery tests, mock-only Stripe tests, connector lineage and exact-revision failing pytest check.
+- **COMMERCIAL ANALYST:** mapped the substrate to a sellable money-action crash-safety review rather than claiming a new payments product.
+- **RED-TEAM/VERIFIER:** challenged exactly-once, external provider truth, CI quality and automatic post-effect recovery before scoring.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The frozen evidence supports the narrow claim that this exact revision implements write-ahead intent, real-process orphan detection/recovery mechanics, deterministic recovery tokens, fail-closed ambiguous states and Stripe-specific deterministic compensation/idempotency logic. The verifier rejects real-Stripe crash recovery, provider-ground-truth no-duplicate proof, tier-5B/5C-B, exactly-once semantics and any blanket green-CI claim. In particular, a post-effect crash before result-derived compensation becomes durable is intentionally an orphan/escalation case, not a proven automatic recovery path.
+
+**A-F SCORE (proposed only, after verifier):** **24/30 — A4 / B4 / C5 / D4 / E3 / F4.**
+- A4: a crash-safety audit/retrofit can be sold quickly in staging/code review without touching live money.
+- B4: duplicate refunds/charges and unreconciled unknown outcomes are direct-money risks, with a concrete external bug/fix signal.
+- C5: compresses WAL ordering, leases, orphan recovery, deterministic recovery tokens, dynamic compensators, secret handling and preflight policy design.
+- D4: runtime-derived compensators plus an independent recovery daemon are less common than ordinary saga/retry libraries, though the broader patterns are not unique.
+- E3: source/tests/history are strong, but the real-process money path is synthetic, Stripe tests are no-network mocks and exact-revision pytest CI failed.
+- F4: Apache-2.0 and operational boundaries are clear; provider reconciliation and distributed recovery-ledger deployment remain integration obligations.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments engineering lead, Controller's systems owner, fintech reliability team or AI/support automation owner whose agents can trigger charges/refunds/credits.
+- Pain: teams can log an intended money action and still be unable to determine or reverse what happened if the process dies after provider effect but before the provider result ID/inverse is durably recorded.
+- First paid wedge: **Money-Action Crash-Safety Review**. For one existing test-mode refund/charge workflow, map each crash boundary, verify which identities are durable before dispatch, inject safe process failures, classify recoverable versus orphaned windows, and deliver an exact unsafe-window/reconciliation plan. Do not execute live money in the first engagement.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Agent-Saga contributes a reusable dynamic compensation/recovery substrate and, more importantly, makes the inverse-identity crash gap explicit. Auths remains stronger for durable `OutcomeUnknown` money-capacity reservation; Interlock remains stronger for real Stripe post-effect SIGKILL → new-process → provider-ground-truth no-duplicate evidence; Flames-up remains stronger on payout terminality. Those facts must remain separate until one executable path proves their intersection.
+
+**SEARCH EFFORT / COST PROXIES:** Four materially different discovery modes; three serious paths/comparators inspected; exact source/tests/history/CI and public rights checked; no untrusted code execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Extend `SK-COM-003` with a **compensation-descriptor birth-gap check**. For every money mutation ask: (1) what stable business/action identity is durable before dispatch; (2) whether provider effect can be rediscovered from that identity after process death; (3) whether the inverse/compensation depends on a result ID born only after the response; and (4) whether the recovery path fails closed or blindly retries when that result never became durable. “WAL before effect” without post-crash provider discoverability is not enough.
+
+**REFERRALS:** No new referral. Existing external-provider/system-of-record referrals already cover the unresolved provider-truth edge.
+
+**NEXT TEST:** Find one refund/payout path where a **pre-dispatch durable business action identity is sufficient to rediscover the exact provider effect after immediate post-effect process death**, a genuinely new process proves no duplicate mutation, and that same effect later reaches terminal payout/balance/bank evidence.
