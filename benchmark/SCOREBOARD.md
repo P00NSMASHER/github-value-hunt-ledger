@@ -9,7 +9,7 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | Pair | Tasks | Control completed | Experiment completed | Matched tasks scored | Control matched mean /25 | Experiment matched mean /25 | Control false promotions | Experiment false promotions | Winner so far |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | 1 | 01-08 | 3 | 0 | 0 | — | — | 0 | 0 | — |
-| 2 | 09-15 | 3 | 2 | 2 | 25.0 | 25.0 | 0 | 0 | Tie |
+| 2 | 09-15 | 3 | 3 | 3 | 25.0 | 25.0 | 0 | 0 | Tie |
 | 3 | 16-22 | 4 | 2 | 2 | 23.0 | 24.5 | 0 | 0 | Experiment |
 | 4 | 23-29 | 3 | 3 | 3 | 24.7 | 24.0 | 0 | 0 | Control |
 | 5 | 30-36 | 4 | 4 | 4 | 24.25 | 24.75 | 0 | 0 | Experiment |
@@ -17,16 +17,16 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | 7 | 44-50 | 4 | 2 | 2 | 24.5 | 24.5 | 0 | 0 | Tie |
 
 ## Experiment-wide matched metrics
-- Matched tasks scored: **16** — 09, 10, 16, 17, 23, 24, 25, 30, 31, 32, 33, 37, 38, 39, 44, 45.
-- Control matched mean: **24.44/25**.
-- Experiment matched mean: **24.63/25**.
-- Mean paired difference (Experiment - Control): **+0.19**.
+- Matched tasks scored: **17** — 09, 10, 11, 16, 17, 23, 24, 25, 30, 31, 32, 33, 37, 38, 39, 44, 45.
+- Control matched mean: **24.47/25**.
+- Experiment matched mean: **24.65/25**.
+- Mean paired difference (Experiment - Control): **+0.18**.
 - Median paired difference: **0.0**.
-- Pairwise task win / tie / loss for Experiment: **3 / 9 / 4**.
+- Pairwise task win / tie / loss for Experiment: **3 / 10 / 4**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
 - No-find results: **0 Control / 0 Experiment** among scored results.
 - Approximate search effort per validated STRONG result: **Control ~11 reported search/deep-inspection units; Experiment ~11–12**. Directional only because result files mix query counts, discovery modes, triage counts and deep inspections.
-- Learning slope: **still not robustly distinguishable in score, but mildly positive directionally**. Among experiment pairs with >=2 matched/completed tasks, Pair 2 is 25→25, Pair 3 is 24→25, Pair 4 is 23→25→24, Pair 5 is 25→25→24→25, Pair 6 is 25→25→25→25, and Pair 7 is 24→25. Median early-to-late within-pair change is now approximately **+0.5 points**, but ceiling effects dominate. Qualitative reusable-method transfer is stronger: 09→10, 16→17, 30→31→32, 37→38→39→40, and 44→45.
+- Learning slope: **still not robustly distinguishable in score, but mildly positive directionally**. Among experiment pairs with >=2 matched/completed tasks, Pair 2 is 25→25→25, Pair 3 is 24→25, Pair 4 is 23→25→24, Pair 5 is 25→25→24→25, Pair 6 is 25→25→25→25, and Pair 7 is 24→25. Median early-to-late within-pair change remains approximately **+0.5 points**, but ceiling effects dominate. Qualitative reusable-method transfer is stronger: 09→10→11, 16→17, 30→31→32, 37→38→39→40, and 44→45.
 
 ## Scored task details
 Scores below preserve all previously scored results and add newly completed unscored results.
@@ -41,6 +41,7 @@ Scores below preserve all previously scored results and add newly completed unsc
 | 10 | CONTROL | 25 | 5/5/5/5/5 | `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964` | No | No | Exact first-party backend/ETL target; Broker loading, normalized models, transforms and tests inspected. |
 | 10 | EXPERIMENT | 25 | 5/5/5/5/5 | `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964` | No | No | Exact target with especially strong pipeline-boundary discipline and deploy/history triangulation. |
 | 11 | CONTROL | 25 | 5/5/5/5/5 | `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964` | No | No | Demonstrably equivalent first-party identity/award-linkage target: UEI/DUNS/name fallback hierarchy, parent identities, referenced-award semantics and ambiguity-safe one-match-only linkage are source/test verified with weak-name-key limits preserved. |
+| 11 | EXPERIMENT | 25 | 5/5/5/5/5 | `fedspendingtransparency/data-act-broker-backend@76dcae4ccbf6951223608bc1d8fd0c5b03da5d68` | No | No | Exact first-party normalization target: SAM recipient/UEI and ultimate-parent schema, deterministic award/reference key semantics, cross-file validation and negative tests are source verified; upstream Broker authority is kept distinct from downstream USAspending derivation. |
 | 16 | CONTROL | 21 | 2/5/5/4/5 | `broad-well/recovair-abm@7b3379cb431591c148a26993097a08487ae6886b` | No | No | Deep partial match correctly kept WATCH because joint optimization, legality, uncertainty and explicit replay were incomplete. |
 | 16 | EXPERIMENT | 24 | 5/5/5/4/5 | `mizuharaa/olus@f1d1160de0c1cb8c2961d9a785d24b2e1ac48e68` | No | No | Exact target with solver, legality, uncertainty, simulation and replay; source tracing correctly bounded the FAR117 integration claim. |
 | 17 | CONTROL | 25 | 5/5/5/5/5 | `Etherlabs-dev/multi-processor-reconciliation@2f9397fbe56a76abeee42a01a37536ad1811a806` | No | No | Demonstrably equivalent target with exact/net/fee/refund/split/dedupe/ambiguity semantics and direct tests/CI. |
@@ -77,7 +78,7 @@ Scores below preserve all previously scored results and add newly completed unsc
 
 ## Retained-lesson / learning status
 - No benchmark lesson is promoted from a single task.
-- **Promoted to SEARCH_SKILLS:** `First-party production-source triangulation`, supported by Experiment Tasks **09 and 10**.
+- **Promoted to SEARCH_SKILLS:** `First-party production-source triangulation`, supported by Experiment Tasks **09 and 10**; Task **11** provides a third independent government-data confirmation.
 - **Promoted to SEARCH_SKILLS:** `Capability-Conjunction Search + Claim Tracing`, independently supported by Experiment Tasks **16 and 17**.
 - **Promoted to SEARCH_SKILLS:** `Acceptance-path transition inspection`, supported by Experiment Tasks **30 and 31** and reinforced on trusted-state promotion by Task **32**.
 - **Promoted to SEARCH_SKILLS:** `Ingestion invariant-triad intersection`, supported by Experiment Tasks **37 and 38**; Tasks **39 and 40** generalize the method into broader executable-invariant intersection without creating a duplicate central skill.
@@ -86,4 +87,4 @@ Scores below preserve all previously scored results and add newly completed unsc
 - Not yet separately promoted: Pair 4 state-machine + audit-log conjunction (Task 23 only); Pair 4 perturbation+hard-invariant scheduling (Task 24 only); Pair 4 decision-claim→runtime-side-effect trace (Task 25 only); Pair 5 descendant-cluster→canonical-spec pivot (Task 31 only); Pair 5 metrology traceability intersection (Task 33 only); Pair 7 contract→negative-vector→differential-implementation triangulation (Task 45 only); Pair 3 three-layer money-invariant verification (Task 17 only).
 
 ## Experiment-wide conclusion
-Too early for a winner claim. Across **16 matched tasks**, Experiment still has only a small mean advantage (**24.63 vs 24.44**), while the **median paired difference is 0** and task-level outcomes are **3 wins, 9 ties and 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is now demonstrably producing reusable methods that transfer across domains, but it continues to consume at least comparable and probably somewhat higher search effort. The current evidence does **not** justify declaring the experimental architecture the winner; continue until substantially more matched tasks are available or the full 50-task benchmark completes.
+Too early for a winner claim. Across **17 matched tasks**, Experiment still has only a small mean advantage (**24.65 vs 24.47**), while the **median paired difference is 0** and task-level outcomes are **3 wins, 10 ties and 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is demonstrably producing reusable methods that transfer across domains, but it continues to consume at least comparable and probably somewhat higher search effort. The current evidence does **not** justify declaring the experimental architecture the winner; continue until substantially more matched tasks are available or the full 50-task benchmark completes.
