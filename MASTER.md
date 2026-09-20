@@ -337,3 +337,26 @@ Broad logistics plumbing remains useful, but Trenova now owns the primary commer
 
 ## MASTER maintenance rule
 A future integrator should remove or demote an entry when later evidence falsifies a load-bearing claim, when a stronger leader subsumes its training value, or when the repository remains interesting but no longer changes a capability/opportunity/experiment. Keep negative details out of the positive set except for concise explicit-demotion notes needed to prevent accidental re-promotion.
+
+<!-- INTEGRATOR-R12-2026-09-20T0946-0400 -->
+## Promotions — 2026-09-20 09:46 ET
+
+### bsaffel/moneybin
+- Revision: `fd34d99962c833de87bdb45351f0ace142db3f63`.
+- Rights: AGPL-3.0 publicly; standing separate commercial permission applies to repository-owned code. Plaid/broker APIs, financial-account/customer data and external services remain separately governed.
+- Score: **28/30** — A4 B5 C5 D5 E5 F4.
+- Capability: durable source-observation receipts that distinguish a successful zero result from unavailable/failed source coverage. The inspected Plaid path writes a snapshot receipt for a completed zero-holdings source but deliberately writes no receipt for failed/no-window sources; replay/cursor handling is idempotent and source status is retained.
+- Buyer/problem: AP/recovery, finance ingestion and public-data products can otherwise turn connector failure or partial coverage into a false `nothing exists` conclusion and then into unsupported money/decision output.
+- Monetization / first paid wedge: Source Authority Retrofit on one high-value connector: require `PRESENT`, `VERIFIED_EMPTY` or `UNAVAILABLE` evidence per source/object/window before money-bearing rules execute.
+- Why it wins: makes **absence itself evidence-bearing**. It is stronger positive-training DNA than generic ETL health because a zero-row assertion is only trusted when a successful source observation is durably attested.
+- Strongest objection / next action: the Plaid CLI can still require consumers to inspect per-institution status for partial failure; port the receipt invariant into a synthetic ERP/AP connector and prove partial coverage cannot authorize a missing-PO/receipt conclusion.
+
+### mnmn0/mukuroji
+- Revision: `34ec66604443da9ba60e9cfbf4d2e6246445bf66`.
+- Rights: no root public LICENSE found; root package is private; standing separate commercial permission applies to repository-owned code. AWS, KMS, customer data and organization policies remain separate.
+- Score: **28/30** — A4 B5 C5 D5 E5 F4.
+- Capability: isolated non-Postgres recovery proof across DynamoDB and exact-version S3 state using a common historical point, authenticated content/metadata/descriptor aggregates, cross-domain semantic claims, RPO/RTO gates, immutable evidence publication and approval-bound cleanup.
+- Buyer/problem: AWS SaaS/MSPs can show PITR/backups exist but still cannot prove one coherent historical application state restores correctly without touching production.
+- Monetization / first paid wedge: AWS Stateful Recovery Acceptance Test on a customer's isolated DynamoDB/S3 resource set and a small frozen set of business invariants; recurring Recovery Proof SLA after the first adversarial pass.
+- Why it wins: combines exact historical source selection, wrong-content/relationship rejection, fail-closed work ceilings, immutable evidence and governed cleanup in a non-Postgres recovery architecture.
+- Strongest objection / next action: deeply application-specific and not a drop-in DR platform; run a rights-clean synthetic second-application adapter with wrong relation/content, stale restore point, object-version mutation and cleanup-receipt substitution before claiming portability.

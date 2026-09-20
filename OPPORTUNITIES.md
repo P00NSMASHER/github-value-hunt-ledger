@@ -294,3 +294,14 @@ The top direct-money ranking remains Freight Recovery first, followed by AP/comm
 - First paid wedge: read-only audit of one closed period; return broken authority/transition/reconciliation invariants and unresolved gaps rather than moving money.
 - Score: **26/30 working challenger score**. High build compression and ACV ceiling, but current strongest evidence is an internally coherent loop, not independent external settlement or customer outcome.
 - Promotion gate: bind signed/order-system contract evidence and PSP/bank readback; beat a conventional billing reconciliation on externally labeled discrepancy/settlement cases without false-green self-reconciliation.
+
+<!-- INTEGRATOR-R12-2026-09-20T0946-0400 -->
+## Portfolio movement — 2026-09-20 09:46 ET
+- **#1 Freight Recovery remains unchanged.** PayOps-style exact one-use settlement allocation materially improves defensibility but does not remove the external blocker: one customer-authorized frozen population must reach an attributable credit/refund/remittance.
+- **AP Leakage Assurance strengthens technically, rank unchanged.** CAP-019 gives the synthetic benchmark a durable distinction between legitimate absence and source failure; no new matcher should be collected until this source-authority gate is executed.
+- **Recovery Proof SLA strengthens.** Mukuroji adds a rare DynamoDB/S3 semantic recovery plane and nearai adds verifier-self-test evidence. This makes the immediate fixed-price Recovery Readiness/Stateful Recovery Acceptance service technically stronger without constituting buyer validation.
+- **Commission Payout Assurance broadens its paid wedge:** provider-paid-but-returned deposits, duplicate reissue risk and unrecovered returned payouts become explicit finance exceptions once ACH trace and independent bank evidence can be joined. Bank/network freshness/completeness remains the gating seam.
+- **CaptureBrief gains a higher-leverage pre-solicitation wedge:** forecast-change radar based on source-native DHS APFS history, followed forward into SAM/award evidence. Planning records are not commitments and linkage precision must be measured before selling predictive claims.
+- **Installed-Base Lab Automation becomes more concrete:** a Clarity Sequencing Handoff Acceptance / upgrade-regression engagement can now start from a production-shaped EPP/run-metric estate plus an independent sample-sheet validator rather than inventing the handoff semantics from scratch.
+- **Grid resilience gains an outcome-priced validation path:** USECPO event outcomes plus separately governed interruption-cost economics can test avoided interruption dollars/crew-hour. Keep below top direct-money opportunities until circularity, rights and held-out reproduction are resolved.
+- No opportunity is commercially validated by this run; `OUTCOMES.md` still has no completed customer/value result that would justify a ranking change based on realized revenue.

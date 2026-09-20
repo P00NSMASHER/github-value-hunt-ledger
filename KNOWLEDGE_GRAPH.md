@@ -129,3 +129,17 @@ If the answer is none, the finding is not yet integrated into the value system.
 - REPO `Etherlabs-dev/revenue_leakage_system@64c1af79...` -> STRENGTHENS fail-closed expected-vs-actual leakage decision.
 - These components -> COMBINE_WITH external signed-contract/order-system authority and PSP/bank readback -> ENABLE Revenue-to-Receivable Trace Audit.
 - The composed stack -> TESTED_BY a new external-authority/readback experiment; internal all-green reconciliation alone does not PRODUCE a realized-money outcome.
+
+<!-- INTEGRATOR-R12-2026-09-20T0946-0400 -->
+## Graph delta — 2026-09-20 09:46 ET
+- `bsaffel/moneybin@fd34d999...` -> **CAP-019 Source-authority observation receipts** -> strengthens **EXP-002 AP**, **EXP-006 CaptureBrief**, public-data and settlement ingestion.
+- `scolladon/dataset-loader@5039257...` -> finalize-before-watermark / partial-failure semantics -> complements CAP-019; does not independently prove durable empty.
+- `payops-labs/solana-payment-ops@7e4d9cc8...` + `Noone9029/Accounting-App@90e0eaa...` -> **CAP-006** exact auto-allocation + reviewed partial/reversal edge ledger -> **EXP-001 Freight** realized-settlement proof.
+- `mnmn0/mukuroji@34ec666...` + `nearai/pg-backup@6836158...` -> **CAP-010 Recovery Proof** non-Postgres semantic recovery + verifier-self-test -> **EXP-004**.
+- DHS APFS native history + SAM operational alerts -> **CAP-011** temporal/source-health authority -> **EXP-006 CaptureBrief**.
+- DIGIT purchase-bill path -> **negative control** for EXP-005 (UI awareness != backend authority); `senecaSparsh/nirman@0e40fba...` -> positive-but-flawed approved-measurement→RA-bill reference -> **EXP-005 ScopeSignal**.
+- `Dreamine.Gem@82604d6...` + `bparzella/secsgem@59a5242...` -> frozen semantic intersection + EC atomicity probe -> **CAP-014** -> **EXP-008** execution stage.
+- `scilifelab_epps@fbbe16f...` + `samplesheet-parser@511b484...` + Illumina InterOp -> **CAP-017** -> **EXP-007 sequencing handoff acceptance**.
+- `moov-io/ach@f36ebb7...` + independent bank statement readback -> **CAP-018** external post-success invalidation -> **EXP-003 Commission Payout**.
+- USECPO v2 -> observed event outcomes; ICE 2.2 (external service/terms) -> economic consequence -> grid risk/inspection/restoration policy benchmark. Preserve outcome/model independence and EAGLE-I circularity caveat.
+- `AccelerationConsortium/bo-mcp@56d590b...` -> shadow evidence for stable experiment identity/idempotency/audit and proposed→actual provenance -> Installed-Base Lab / self-driving-science integrity challenger; external executor acknowledgement remains missing.

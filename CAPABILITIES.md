@@ -226,3 +226,22 @@ The count of repositories is not the primary KPI. Track:
 - Cross-product reuse: SaaS Revenue Integrity, contract billing, commission/payout close and AP/AR trace diagnostics.
 - Missing piece: externally sourced signed/order-system contract amendments plus PSP/bank settlement and later return/reversal evidence that the system under test cannot manufacture.
 - Next falsifiable test: inject frozen external contract and settlement evidence with deliberate contradictions; the internal loop must fail closed and surface the mismatch rather than preserve an all-green result.
+
+<!-- INTEGRATOR-R12-2026-09-20T0946-0400 -->
+## Capability delta — 2026-09-20 09:46 ET
+
+### CAP-019 — Source-authority observation receipts
+- Ability: prove whether a queried source/object/window is `PRESENT`, `VERIFIED_EMPTY` or `UNAVAILABLE`, and advance source cursors only after durable downstream commit so absence cannot be manufactured by connector failure.
+- Maturity: **VALIDATED COMPONENT**.
+- Evidence basis: `bsaffel/moneybin@fd34d999...` tests successful zero-result snapshot receipts while failed/no-window sources receive no receipt; `scolladon/dataset-loader@5039257...` tests finalize-before-watermark, abort/no-watermark on failures and partial/all-failed exit codes.
+- Reusable targets: AP Leakage, CaptureBrief, freight/settlement imports, permit/public-data intelligence and any money-bearing source adapter.
+- Limitation: neither component alone supplies a universal whole-run completeness protocol; moneybin consumers must still fail closed on per-source partial failure and dataset-loader does not durably attest an empty read.
+- Missing piece / next test: one synthetic ERP PO/GR lifecycle with source receipts, cursor identity and bitemporal corrections; transport/auth failure must never produce `VERIFIED_EMPTY`, and cursor advancement must occur only after exact source query plus durable target state are proven.
+
+### Cross-capability upgrades
+- **CAP-006 Settlement-grounded recovery attribution:** add PayOps-style immutable claim/event identity, exact unique auto-allocation and one-use persistence; reviewed split/partial settlement becomes explicit pairwise allocation edges with residual capacity and reversible history. A deterministic subset-sum/tie-break is only a proposal, never settlement proof.
+- **CAP-010 Recovery proof:** add Mukuroji's DynamoDB/S3 historical-state/semantic verification and nearai/pg-backup's verifier-self-test requirement. The verifier itself must be mutation/fault tested; a broken assertion helper that yields green is a failed recovery-proof system.
+- **CAP-011 Government acquisition authority/lineage:** add DHS APFS source-native dated change history and SAM official operational-health intervals. Preserve source event time separately from collector observation time; a known degraded source interval taints negative/completeness conclusions.
+- **CAP-014 Industrial pre-FAT:** the Dreamine↔secsgem shared tested intersection now supports a frozen 10-case differential corpus plus `EC-ATOMIC-PROBE` (valid first EC update + invalid second) predicted to expose all-or-nothing vs partial-mutation semantics. Repository collection is no longer the bottleneck; execution is.
+- **CAP-017 Sequencing operations evidence bridge:** add `scilifelab_epps` as the concrete Clarity process→flowcell/run-directory→RunParameters/RunInfo→InterOp→Clarity-writeback implementation and `samplesheet-parser` as an independent pre-run compatibility/diff gate. Missing behavioral regression/evidence packaging remains explicit.
+- **CAP-018 Provider-settlement ambiguity / payout proof:** add `moov-io/ach` post-success Return Entry/reversal lineage and statement-normalizer bank-readback input. Provider `paid` is now explicitly revocable until external network/bank evidence plus later-return window/source freshness are accounted for.

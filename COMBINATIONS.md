@@ -143,3 +143,33 @@ Dreamine.Gem (.NET) + rights-clean frozen dialogue/error profile + `bparzella/se
 - Hard invariant: an internal payment record, provider `paid` flag or all-green self-reconciliation is **not** final settlement truth. Missing external contract authority, bank/processor readback or contradictory settlement stays REVIEW/UNKNOWN and contributes $0 realized value.
 - First paid wedge: read-only Revenue-to-Receivable Trace Audit over one closed period for a usage/subscription business with negotiated pricing and nontrivial cash application.
 - Stage gate: freeze one external contract/amendment corpus plus processor/bank settlement/readback; seed wrong contract version, duplicate allocation, stale provider success, returned payment and internal-vs-external amount/currency contradictions. The stack passes only if each contradiction prevents a false green.
+
+<!-- INTEGRATOR-R12-2026-09-20T0946-0400 -->
+## Combination delta — 2026-09-20 09:46 ET
+
+### Freight realized-recovery allocation hardening
+`controlling contract/addendum authority -> independent expected charge -> issued carrier credit/refund authority -> PayOps exact unique settlement gate -> reviewed explicit pairwise partial/split allocation edges -> reversal/counter-event -> derived realized recovery`.
+- Only active persisted allocation edges tied to an issued adjustment and independent money movement can increase realized recovery.
+- Ambiguous identity, partial/excess auto-match, alternate feasible allocations or stale caller decisions remain exception/REVIEW and **$0 realized**.
+
+### Commission / payout bank-finality chain
+`effective-at entitlement -> payout intent/idempotent provider operation -> provider settlement decomposition -> ACH forward trace -> independent bank/network observation -> later Return Entry/reversal by OriginalTrace -> final classification`.
+- Provider `paid`, ERP ledger posting and bank amount are three different evidence planes.
+- Missing/stale ACH-return or bank feeds remain UNKNOWN; no return observed is not equivalent to proven finality.
+
+### ScopeSignal measurement-to-payment authority chain
+`design/contract/notice authority -> field measurement -> APPROVED state -> correct work-order ownership + billed-period inclusion -> server-derived RA bill quantity/rate -> bill approval/AP -> independent cleared-payment evidence`.
+- DIGIT purchase-bill behavior is a negative-control architecture where measurement-aware UI does not prove backend authority.
+- Nirman is the positive-but-flawed comparator: APPROVED/unbilled MB rows derive RA-bill quantity, but work-order attribution, period gating and external cash finality remain unresolved.
+
+### Recovery Proof multi-engine adversarial stack
+`Postgres PITR/restore engine + DynamoDB/S3 exact-version isolated restore + application/business invariants + trust/evidence envelope + verifier mutation/self-test`.
+- A valid proof system must reject wrong-but-restorable content and must also fail if its own assertion/test harness is intentionally broken.
+
+### CaptureBrief pre-solicitation-to-award timeline
+`DHS APFS source-native forecast changes/cancellations -> normalized history events -> SAM opportunity/version/attachment packet + SAM health intervals -> FAR/supplement/deviation authority -> entity/award/incumbent lineage -> USAspending outcome`.
+- Collector polling remains useful but source-native history wins on event time; known platform degradation taints completeness.
+
+### Sequencing installed-base acceptance stack
+`Clarity workflow/process state -> scilifelab EPP run identity/handoff -> independent sample-sheet semantic diff/compatibility gate -> vendor-native run artifacts + Illumina InterOp metrics -> LIMS writeback -> provenance/evidence layer`.
+- Sell as an acceptance/modernization service, not as replacement LIMS or regulator/vendor certification.
