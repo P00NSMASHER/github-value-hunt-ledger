@@ -154,6 +154,13 @@ Canonical evidence:
 
 This addendum is deployment evidence, not a security certification.
 
+Deployment evidence freshness:
+- collected: **2026-09-20**
+- valid through: **2026-09-27**
+- recollect earlier after relevant access/deployment/data-plane/parser changes
+- expiry blocks the Netlify route only; it does not invalidate an independently
+  verified separate environment.
+
 ### Final pilot launch authorization
 
 `freight/pilot_launch_gate.py` now composes buyer/data readiness, pilot rights
@@ -167,7 +174,7 @@ Current machine classification:
 A buyer/data readiness result of READY is therefore necessary but not sufficient
 to accept confidential customer data.
 
-The manual route no longer trusts an operator-supplied boolean. It requires a structured VERIFIED separate-environment manifest; the repository currently contains only a DRAFT template, so that route remains CONDITIONAL.
+The manual route no longer trusts an operator-supplied boolean. It requires a structured VERIFIED separate-environment manifest with SHA-256 evidence receipts, a configuration fingerprint, verifier role/date metadata and an unexpired <=90-day validity window. The repository currently contains only a DRAFT template, so that route remains CONDITIONAL.
 
 ## Commercial state
 
