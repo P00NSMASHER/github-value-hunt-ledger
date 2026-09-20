@@ -57,7 +57,7 @@ def contexts(r):
     return out
 
 learning_runs=[]
-excluded={"manual_override":0,"unrouted":0,"retrospective":0,"unmatched_claim":0,"pre_v12":0}
+excluded={"manual_override":0,"unrouted":0,"retrospective":0,"unmatched_claim":0,"pre_v12":0,"work_steal":0}
 for r in RUNS:
     version=int(r.get("schema_version") or 0)
     if version<12:
@@ -65,6 +65,9 @@ for r in RUNS:
         continue
     if r.get("measurement_quality") not in allowed_quality:
         excluded["retrospective"]+=1
+        continue
+    if r.get("dispatch_kind")=="work_steal":
+        excluded["work_steal"]+=1
         continue
     mode=r.get("routing_mode")
     if mode not in allowed_modes:
@@ -204,7 +207,7 @@ report=["# ROUTING OUTCOME LEARNING REPORT","",f"Learning generation: **{generat
 f"- Completed generated routes eligible for learning: **{global_n}**",
 f"- Adjustment records: **{len(adjustments)}**",
 f"- Evidence-eligible routing adjustments: **{metrics['eligible_adjustments']}**","",
-"Only completed MATCHED schema-v12+ generated routes train this learner. Manual overrides and retrospective repairs are excluded.","",
+"Only completed MATCHED primary generated routes train this learner. Manual overrides, work-steal runs and retrospective repairs are excluded.","",
 "## Eligible adjustments",""]
 eligible_rows=[x for x in adjustments if x["eligible_for_routing"]]
 if eligible_rows:
