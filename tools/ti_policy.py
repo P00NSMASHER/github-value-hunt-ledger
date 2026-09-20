@@ -48,14 +48,24 @@ for s in active:
     novel = beta_mean(novel_runs, len(rs)) if rs else .5
     experiment = beta_mean(experiment_runs, len(rs)) if rs else .5
     outcome = beta_mean(passed, len(valid)) if valid else .5
-    exploit = .18 * retain + .24 * master + .25 * novel + .18 * experiment + .15 * outcome
+    raw_exploit = .18 * retain + .24 * master + .25 * novel + .18 * experiment + .15 * outcome
+
+    # Exploitation credit grows only with actual evidence volume.
+    # Unmeasured strategies still receive exploration credit below.
+    run_weight = min(1.0, len(rs) / 5.0)
+    inspection_weight = min(1.0, inspected / 20.0) if inspected else 0.0
+    evidence_weight = min(run_weight, inspection_weight)
+    exploit_mass = raw_exploit * evidence_weight
+
     uncertainty = 1 / math.sqrt(len(rs) + 1)
     rows.append({
         "strategy_id": sid,
         "name": s.get("name"),
         "runs": len(rs),
         "inspected": inspected,
-        "exploit_score": exploit,
+        "raw_exploit_score": raw_exploit,
+        "evidence_weight": evidence_weight,
+        "exploit_mass": exploit_mass,
         "uncertainty": uncertainty,
         "sufficient_evidence": len(rs) >= 5 and inspected >= 20
     })
@@ -70,11 +80,23 @@ else:
     exploration_budget = .25
 
 sum_u = sum(x["uncertainty"] for x in rows) or 1
-sum_e = sum(x["exploit_score"] for x in rows) or 1
+sum_e = sum(x["exploit_mass"] for x in rows)
+measured_rows = [x for x in rows if x["runs"] > 0]
+
 for x in rows:
     x["exploration_component"] = x["uncertainty"] / sum_u
-    x["exploitation_component"] = x["exploit_score"] / sum_e
-    x["allocation"] = exploration_budget * x["exploration_component"] + (1 - exploration_budget) * x["exploitation_component"]
+
+    if sum_e > 0:
+        x["exploitation_component"] = x["exploit_mass"] / sum_e
+    elif measured_rows:
+        x["exploitation_component"] = (1 / len(measured_rows)) if x["runs"] > 0 else 0
+    else:
+        x["exploitation_component"] = 1 / len(rows) if rows else 0
+
+    x["allocation"] = (
+        exploration_budget * x["exploration_component"]
+        + (1 - exploration_budget) * x["exploitation_component"]
+    )
 
 normalizer = sum(x["allocation"] for x in rows) or 1
 for x in rows:
