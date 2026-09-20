@@ -1177,3 +1177,110 @@ One direct success only. Keep LOCAL; do not modify global `SEARCH_SKILLS.md`.
 - source/test/schema/history traversals: ~22;
 - external GitHub/web reads/searches: ~40;
 - untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 12
+
+### Hypothesis
+A low-attention scientific orchestration runtime may already implement the missing Level-3 control lifecycle: durably reserve execution intent before dispatch, preserve ambiguous provider outcomes, reconcile by a stable idempotency/business key before any repeat submission, and fail closed when authoritative lookup is unavailable. The hypothesis fails as a completed scientific Level-3 implementation if the only concrete provider is an in-memory dry run or real execution is explicitly not installed.
+
+### Discovery modes
+1. **Direct scientific execution search:** laboratory execution adapters, provider job lookup, restart-safe experiment dispatch and reconciliation semantics.
+2. **Code/schema invariant search:** `submit_intent_key`, `find_by_idempotency_key`, `AMBIGUOUS`, `RECONCILING`, durable intent rows, provider execution IDs, unique submit keys and reconcile-before-resubmit paths.
+3. **Crash/retry test search:** concurrent ambiguous callers, process/reopen recovery, idempotent submit contracts, no-duplicate side-effect assertions and durable intent-before-write patterns.
+4. **Provider-binding/history falsification:** inspected the concrete runtime adapter factory, supported execution modes and feature history to distinguish a complete architecture from a real laboratory integration.
+
+### Result
+**NO_FIND for completed physical Level 3.** The best near-match is a strong architecture/watch component whose real laboratory provider is deliberately absent.
+
+### Best near-match
+**trieu04/lab-in-the-loop — durable execution-intent + reconcile-before-resubmit architecture**  
+Canonical URL: https://github.com/trieu04/lab-in-the-loop  
+Exact revision: `80eb9524a4a36178b35810a7999cd95e8394d4fc`  
+Public license: **none detected in GitHub repository metadata (`license: null`)**  
+Repository attention at inspection: 0 stars / 0 forks  
+Evidence snapshot id: `shadow-science-20260920-lab-in-loop-80eb952`
+
+### Frozen evidence manifest
+- `apps/lab-agent/lab_agent/execution_lifecycle.py` blob `9f76a9084eba65cf36e1f15a5a2ca6a9ffd92550`;
+- `apps/lab-agent/lab_agent/integrations/lab_execution.py` blob `001dd9e16c0db86597974d13d649a4f72083d579`;
+- `apps/lab-agent/tests/test_execution_reconciliation.py` blob `2d1469c31891c8e7e9643c95bd20247d7e83246e`;
+- `apps/lab-agent/tests/contracts/test_lab_execution_contract.py` blob `518e30410868fb2d94d85b082414ce7e4bc57baa`;
+- `apps/lab-agent/lab_agent/migrations/010_execution_analysis_knowledge.sql` blob `efb1acfd1fbf1c621a6fcb97ae755ee3ba8e2d72`;
+- `apps/lab-agent/lab_agent/runtime.py` blob `28dd38478be2fc7381be80afcc9de6e0e908aaf8`;
+- `apps/lab-agent/tests/test_durable_recovery_integration.py` blob `e52953c717b0bd37b946379db43316907d389dcb`;
+- history for `execution_lifecycle.py` includes `39603d...` and `099e21...`, showing the lifecycle was implemented/hardened in the repository's short July 2026 history.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced `run_execution()` from durable run/intent creation through submit, ambiguity, reconciliation and terminal result handling.
+- **SCHEMA / SYSTEMS VALIDATOR:** verified unique submit-intent keys, provider execution IDs and explicit `submitted/running/reconciling/ambiguous/.../blocked` durable status states.
+- **TEST VALIDATOR:** inspected concurrent reconciliation and adapter-contract tests plus a separate restart-safe durable-write corpus.
+- **ECOSYSTEM / COMMERCIAL ANALYST:** compared the lifecycle to the previously verified BioModStack key→command→receipt boundary and the Tangying unknown-effect tombstone.
+- **RED-TEAM / VERIFIER:** challenged the concrete runtime binding, real-provider availability, physical evidence, rights and one-shot crash-window proof before scoring.
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED**
+- `run_execution()` calls `prepare_execution_run()` and `prepare_intent()` before provider submission. The durable intent is keyed by `submit_intent_key`; active/submitted/executed state routes to reconciliation instead of blind replay.
+- Provider uncertainty is represented explicitly. A non-typed exception after submission marks the intent ambiguous and the run `AMBIGUOUS` instead of assuming no effect.
+- `reconcile_execution()` requires reconciliation support and performs `find_by_idempotency_key(tenant_id, submit_intent_key)` **before** any possible repeat submission. A found remote run must match tenant/canvas/run/key/input hash/mode/evidence identity before its provider ID is accepted. Lookup failure or unsupported reconciliation transitions the run to `BLOCKED`, not to another submit.
+- The migration gives execution runs a unique `submit_intent_key`, optional `provider_execution_id`, a unique adapter/provider-execution identity and durable states including `RECONCILING`, `AMBIGUOUS` and `BLOCKED`.
+- Concurrent reconciliation tests create two callers around an absent remote lookup and assert only **one** provider submit occurs; the durable run finishes succeeded and the intent is reconciled. Adapter contract tests separately prove same-key/same-input replay returns the same provider run while same-key/different-input fails.
+- The repository has a separate durable-write recovery corpus that exercises the intent-before-write pattern across reopen/restart and proves an already-landed external object is discovered/reused rather than duplicated. This supports the authors' durability discipline, though it is not the laboratory provider path itself.
+
+**DECISIVE LIMITS / FALSIFIED OVERCLAIMS**
+- The concrete `DeterministicLabExecutionAdapter` is explicitly **memory-only dry run**. Its `find_by_idempotency_key()` therefore proves the orchestration contract only against process-local mock provider state.
+- `DisabledRealLabExecutionAdapter` explicitly says **“No real laboratory implementation exists in the Phase 8 dry-run scope.”** Its reconciliation support is false and every operation fails closed.
+- The process-wide runtime builder rejects every Phase 8 mode except `dry_run` and hard-wires `DeterministicLabExecutionAdapter()`. A real or sandbox laboratory adapter is therefore not merely unverified; it is intentionally not constructible in this revision.
+- No inspected test proves `real provider accepts physical command → acknowledgement lost/process dies → restart → authoritative provider GET/find by same key → zero second physical mutation`.
+- No public license is declared in GitHub repository metadata, and there is no established physical provider/runtime deployment surface in this revision.
+
+### Independent RED-TEAM / VERIFIER
+The verifier evaluated the frozen source/test/schema/runtime packet without the proposed score.
+
+**Verdict: FAIL for completed scientific Level 3; PASS_WITH_LIMITS as a WATCH-level transfer architecture.**
+
+Proof obligations:
+1. **Durable pre-dispatch business/effect intent? — PASS at the orchestration store.** The run and submit intent are prepared before provider submission.
+2. **Explicit ambiguity plus replay block/reconciliation path? — PASS.** Ambiguity is durable and active/ambiguous runs enter `find_by_idempotency_key()` before any possible resubmit; unsupported reconciliation blocks.
+3. **Concurrent/retry duplicate suppression? — PASS in the dry-run test corpus.** Two reconciliation callers produce one submit; same-key replay returns the same provider run.
+4. **Authoritative scientific provider lookup? — FAIL.** The only installed implementation is an in-memory deterministic dry run.
+5. **Real scientific/physical execution adapter? — FAIL EXPLICITLY.** Real mode is rejected at runtime and the sentinel says implementation is not installed.
+6. **Exact crash-after-provider-acceptance/no-second-mutation test? — FAIL.** No real provider exists at this revision, so the decisive Level-3 physical boundary cannot be exercised.
+7. **Rights/operability clarity? — WEAK.** GitHub repository metadata reports no public license and production execution is intentionally disabled.
+
+Strongest objection: this repository encodes almost the ideal Level-3 **orchestration contract**, but the thing that would make it scientifically valuable—the authoritative external laboratory system of record—is a protocol interface backed only by an in-memory mock. Calling it a Level-3 scientific executor would confuse architecture quality with provider implementation.
+
+### Proposed score
+A) speed to first revenue: **3/5** — useful as a blueprint/retrofit pattern, but a real provider must be built first.  
+B) customer value / ceiling: **4/5** — the lifecycle addresses expensive duplicate/ambiguous scientific execution once connected to real automation.  
+C) build/domain compression: **5/5** — durable intent, explicit ambiguity, reconcile-before-retry, schema and adversarial tests save meaningful reliability design work.  
+D) rarity/advantage: **5/5** — unusually complete external-effect semantics for a zero-star scientific repo.  
+E) evidence/completeness: **4/5** — strong source/schema/tests/history for orchestration, but no real lab provider.  
+F) rights/operability: **1/5** — no detected public license and real/sandbox execution intentionally unavailable.  
+**Total: 22/30 — WATCH_COMPONENT / TRANSFER_ARCHITECTURE. Do not promote to STRONG.**
+
+### Commercial / research implication
+This is a high-value blueprint for the **Autonomous-Lab External Effect Reconciliation Gateway** lifecycle:
+
+`persist intent → submit once → outcome ambiguous → authoritative find-by-stable-key → reconcile or BLOCK → only resubmit after authoritative absence`
+
+The shortest path to a stronger scientific implementation is to bind this lifecycle to BioModStack's already-inspected BioXP `stable key → native command → canonical receipt` read path, while retaining a Tangying-style permanent unknown-effect tombstone after ambiguous dispatch. That combination would close substantially more of Level 3 than any of the three components alone.
+
+### Search lesson outcome
+New LOCAL lesson: **provider-binding / dry-run collapse check**. When a reconciliation architecture appears to perfectly match an external-effect invariant, immediately inspect the concrete runtime adapter factory, enabled execution modes and provider backing store. An abstract `find_by_idempotency_key()` plus durable schema/tests is not provider evidence when the only installed implementation is memory-only dry-run and real mode fails closed.
+
+Evidence count: **1 task**. Keep LOCAL; do not stage or promote to global `SEARCH_SKILLS.md`.
+
+### VALUE HANDOFF
+1. **Capability delta:** adds a clean, tested orchestration reference for durable intent → ambiguity → authoritative lookup-before-resubmit, but no new real physical capability.
+2. **Graph edge:** identifies an almost plug-shaped architecture for connecting Tangying-style durable tombstones to BioModStack-style provider-queryable receipts; the remaining edge is a concrete real adapter.
+3. **Radar signal:** scientific orchestration projects are independently converging on payment-grade reconciliation semantics even before real provider integrations are complete.
+4. **Experiment impact:** the exact next test is now implementation-shaped: wrap a real scientific provider behind `find_by_idempotency_key`, persist the key before dispatch, inject lost acknowledgement/process death, restart and assert provider mutation count stays one.
+5. **Commercial impact:** reinforces the fixed-scope crash/recovery audit and suggests a reusable adapter contract for a productized reconciliation gateway.
+6. **Negative knowledge:** architecture-complete + mock-provider is a major false-positive class; inspect runtime wiring before calling a repository externally effect-safe.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate/comparator inspections: 1 deep candidate + prior verified comparators;
+- source/test/schema/history traversals: ~18;
+- external GitHub reads/searches: ~25;
+- untrusted-repository code executions: 0.
