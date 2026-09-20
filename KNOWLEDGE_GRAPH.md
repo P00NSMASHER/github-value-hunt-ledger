@@ -31,7 +31,13 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 - CAP-001 + CAP-002 + CAP-007 + CAP-008 + CAP-016 -> ENABLES AP Leakage Assurance -> TESTED_BY EXP-002.
 
 ### Commission Assurance
-- CAP-002 + CAP-006 + CAP-007 + CAP-016 -> ENABLES Partner / Commission Payout Assurance -> TESTED_BY EXP-003.
+- getcoherence/openpartner@eeff532ee758dc6221b4d03af852e5705a2328fb -> STRENGTHENS CAP-006 and CAP-018 through event-sourced payout/settlement state.
+- spree/spree@2a419d42e86dea30a69a3c5b7764185cea132b3f -> IMPLEMENTS CAP-018 through claim-before-send, ambiguous-outcome hold and settled amount/currency proof.
+- Bdkelp/getmydpc_enrollment@e753d8ebf5e087ae9a4add978d1559af86c173fb -> STRENGTHENS commission entitlement/reversal/carry-forward cases.
+- Reifye/Reifye-OS@acbb8ca46c6c6de20c0a64ac7ea0f174f308e17a -> STRENGTHENS collected-cash/hold/clawback cases.
+- D-Haku/Channel-Partner-Commission-Engine@176084bb4a5bc0a1ad17ba94a11c869dfd8a463e -> STRENGTHENS lending slab/sequence cases but DEPENDS_ON independently current statutory/tax authority.
+- mike4forge/forgelocal-commission-engine@cb4ab9bcb85a5863079d1798836727065d2d243a -> CHALLENGES/STRENGTHENS hierarchy-at-time provenance; provider settlement remains unverified.
+- CAP-002 + CAP-006 + CAP-007 + CAP-016 + CAP-018 -> ENABLES Partner / Commission Payout Assurance -> TESTED_BY EXP-003.
 
 ### Recovery Proof
 - duke5am/pg-restore-drill -> IMPLEMENTS CAP-010.
@@ -56,6 +62,7 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 - Illumina/interop@015a85ec100c7a770ed0e27ce7fadc6230a38208 -> IMPLEMENTS CAP-017.
 - ORNL/Flowcept -> STRENGTHENS CAP-013 and CAP-017 through provenance/evidence lineage.
 - labscript-suite/labscript-suite + labscript-devices -> CHALLENGES/STRENGTHENS deterministic scientific execution under the broader lab opportunity without displacing the installed-base integration leaders.
+- NatLabRockies/ALchemist@02c7a6eaa5a8e75bb65d0292b9b8d9a5e08301cf -> CHALLENGES/STRENGTHENS experiment-governance provenance through suggested-vs-actually-executed conditions, but remains a shadow 26/30 component candidate pending an independent second implementation and physical/restart outcome evidence.
 - CAP-013 + CAP-017 -> ENABLES Installed-Base Lab Automation / Sequencing Operations Evidence / Governed Campaign Shadow Audit -> TESTED_BY EXP-007.
 
 ### Insurance Subrogation Recovery
@@ -70,6 +77,8 @@ IMPLEMENTS, VALIDATES, CHALLENGES, DEPENDS_ON, COMBINES_WITH, ENABLES, TESTED_BY
 ### Money-State / Payment Integrity
 - amrit-kumar/fintechcore@b27a22890e8b5173d2a97be512a198a4564ed425 -> CHALLENGES/STRENGTHENS CAP-016 with append-only ledger, idempotency, settlement and independent reconciliation semantics.
 - The Fintechcore test-deferred ADR -> LIMITS its maturity; it remains a reference/challenger until automated invariant/race/refund/reversal/outbox tests exist.
+- Etherlabs-dev/revenue_leakage_system@64c1af79ac0a22915cfb49f1a2dd6d870059b78a -> CHALLENGES/STRENGTHENS authority-aware expected-vs-actual billing assurance with effective-dated pricing, fail-closed source freshness and idempotent evidence, but remains shadow-only pending independent authority-ingestion and realized settlement evidence.
+- dylanpulver/recon@e6b787213bb023568c99c432ea4733e1f2456a5e -> STRENGTHENS matching truth with deterministic receipts/conservation while NOT establishing contractual expected-state truth.
 - CAP-006 + CAP-016 -> ENABLES Money-State Integrity / Close Assurance -> TESTED_BY EXP-010.
 
 ### Industrial Pre-FAT
