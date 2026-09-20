@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "V11 Hunt Execution Event",
+  "title": "V14 Hunt Execution Event",
   "type": "object",
   "required": [
     "event_id",
@@ -152,6 +152,51 @@
     "routing_score": {
       "type": [
         "number",
+        "null"
+      ]
+    },
+    "claim_schema_version": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 14
+    },
+    "routing_mode": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "generated",
+        "manual_override",
+        null
+      ]
+    },
+    "routing_learning_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ROUTELEARN:[a-f0-9]{12}$"
+    },
+    "dispatch_ticket_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "dispatch_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DISPATCHGEN:[a-f0-9]{12}$"
+    },
+    "route_override_reason": {
+      "type": [
+        "string",
         "null"
       ]
     }
