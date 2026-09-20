@@ -22,7 +22,7 @@ For each entry record:
 
 Do not store credentials, tokens, private/personal data, or raw accidental secrets.
 
-## Elite indexed sources — 2026-09-19
+## Elite indexed sources — 2026-09-20
 
 ### GSA/srt-fbo-scraper — solicitation packet/history acquisition pipeline
 - Repository / source: https://github.com/GSA/srt-fbo-scraper
@@ -84,22 +84,6 @@ Do not store credentials, tokens, private/personal data, or raw accidental secre
 - Combination: USAspending + SAM packet + FAR/deviation layer.
 - Next action: benchmark parent/PIID/referenced-IDV conflict cases and require unresolved conflicts to remain unresolved.
 
-### aiparallel0/freight-audit — synthetic freight audit challenge corpus and evaluation pipeline
-- Repository / source: https://github.com/aiparallel0/freight-audit
-- Exact revision: `e7869162cf9cb23f6d520a0cd71f87cf973d8c28`.
-- Dataset / pipeline: freight-specific rate-confirmation + invoice + POD audit harness with integer-cents money, OCR/evaluation/review tooling and synthetic challenge cases such as clean billing, duplicate fuel, unauthorized liftgate and detention evidence.
-- Coverage / format: committed synthetic/PII-free benchmark cases plus evaluation harness; external benchmark assets retain separate attribution/rights.
-- Evidence inspected: code, synthetic fixtures/challenge cases and evaluation behavior recorded in MASTER.
-- Published rights: MIT for code and committed synthetic/PII-free corpus; external benchmark assets separate.
-- Standing permission posture: repository-owned material commercially authorized; no extension to external datasets/assets.
-- Buyer / problem: freight audit systems need falsifiable gold truth separating extraction failure from rule/math failure.
-- Product use: Freight Audit Acceptance Test / blind incumbent bake-off challenge layer.
-- Build/data advantage: ready-made freight-specific negative/positive cases compress benchmark construction and reduce self-confirming tests.
-- Value score: **28/30** — A4 B4 C5 D5 E5 F5.
-- Combination: RateCon extraction + Assay acceptance + Qatoto/Kareya authority/rerating + settlement attribution.
-- Next action: extend only with independently authored customer-authorized accessorial/addendum and settlement cases; do not treat synthetic fixtures as proof of real-world recovery.
-
-<!-- INTEGRATOR-R12-2026-09-19T2231-0400 -->
 ### owgreen-dev/grid-crunch — leakage-safe interconnection-queue outcome pipeline
 - Repository / source: https://github.com/owgreen-dev/grid-crunch
 - Exact revision: `5f0c9a074d928b79caa792a84e8e92de1b2df3f2`.
@@ -130,9 +114,6 @@ Do not store credentials, tokens, private/personal data, or raw accidental secre
 - Combination: grid-crunch historical scorer -> queue_attrition live snapshots/prediction ledger -> correlated expected-MW/tail-risk reporting.
 - Next action: force the live scorer to use the exact estimator/calibration contract validated out of time, freeze model/version/features and allow the append-only registry to accumulate genuinely prospective evidence before marketing calibrated live probabilities.
 
-<!-- INTEGRATOR-R11-2026-09-20T0025-0400 -->
-## Additional elite data/evidence sources — 2026-09-20
-
 ### HopkinsICARUS/ICARUS-PJM-Dataset — large synthetic PJM-like grid testbed
 - Repository/source: https://github.com/HopkinsICARUS/ICARUS-PJM-Dataset
 - Exact revision: `0cb6a1af86e2bdfc1d160f44b6e4a7518ca3ffe3`.
@@ -161,3 +142,14 @@ Do not store credentials, tokens, private/personal data, or raw accidental secre
 - Score: **27/30**.
 - Product use: historical backtest corpus for STORCITO and infrastructure/utility wildfire-risk systems.
 - Next action: build a source-rights matrix and a 20-event benchmark with deliberate missing-layer degradation tests.
+
+## Demoted / negative-control data assets
+
+### aiparallel0/freight-audit — retain only as adversarial freight fixtures
+- Repository / source: https://github.com/aiparallel0/freight-audit
+- Exact revision: `e7869162cf9cb23f6d520a0cd71f87cf973d8c28`.
+- Published rights: MIT for code and committed synthetic/PII-free fixtures; external benchmark assets retain separate attribution/rights.
+- Revised status: **DEMOTED from elite/gold-truth use.** Later source-level adversarial inspection showed that the application's audit/value semantics are unsafe as a benchmark oracle: missing authority can become zero/default expected money, missing RateCon can still emit default-rate detention value, overlapping findings can be additively double-counted, and provisional/review-pending values can enter aggregate/usage/billing surfaces.
+- Safe residual use: selected synthetic documents/cases can be retained as **negative-control fixtures** to test whether a candidate rejects missing authority, overlapping-economic-claim duplication and pre-review value leakage. Do not inherit the repository's aggregate savings/recovery labels as gold truth.
+- Value posture: **not scored as an elite dataset/evaluation pipeline after demotion**; prior 28/30 promotion is superseded for authoritative evaluation use.
+- Next action: independently hand-author expected dollars/authority states for any retained fixture before reuse in EXP-001. Re-promote only if the repository implements explicit authority tri-state, claim-level dedupe, adjudication-to-realization states, and tests proving only confirmed/realized claims enter aggregate/billing outputs.
