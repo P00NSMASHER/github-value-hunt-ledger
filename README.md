@@ -184,3 +184,17 @@ Do not launch another product simply because a new repository is exciting. First
 - or invalidates an existing assumption.
 
 The desired endpoint is not a larger repository ledger. It is a self-improving private technology-intelligence and venture-discovery system.
+
+
+## Production architecture
+The next-generation verifier-gated system is staged under `production/`:
+- `production/ARCHITECTURE.md` — authority boundaries and state machines.
+- `production/ROLE_CONTRACTS.md` — typed hunter/verifier/red-team/integrator contracts.
+- `production/PROMPTS.md` — production role prompts.
+- `production/prototype.py` + `test_prototype.py` — deterministic promotion, evidence, skill and lease prototype.
+- `production/schema.sql` — reference authoritative-state schema.
+- `production/SHADOW_PILOT.md` — post-benchmark three-hunter shadow protocol.
+- `production/STATUS.md` — what is live versus staged.
+- `production/SECURITY_TEST_PLAN.md` — required fail-closed launch tests.
+
+The frozen benchmark remains unchanged and must finish before fleet-wide cutover.
