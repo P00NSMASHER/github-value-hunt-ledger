@@ -1,0 +1,22 @@
+{
+  "observations": 1755,
+  "unique_repositories": 1672,
+  "unique_repository_revisions": 1680,
+  "unknown_revision_records": 81,
+  "duplicate_observations": 75,
+  "duplicate_observation_rate": 0.042735042735042736,
+  "cross_catalog_repositories": 64,
+  "source_files_scanned": 54,
+  "source_state_counts": {
+    "current": 1618,
+    "archive": 137
+  },
+  "status_counts": {
+    "unknown": 155,
+    "watch": 462,
+    "strong": 432,
+    "rejected": 390,
+    "master": 205,
+    "quarantined": 36
+  }
+}

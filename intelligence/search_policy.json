@@ -1,0 +1,241 @@
+{
+  "measured_runs": 8,
+  "valid_outcomes": 1,
+  "exploration_budget": 0.5,
+  "strategy_allocation": [
+    {
+      "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
+      "name": "Authority-origin / invariant-set consistency",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:cross-source-emergence-triangulation",
+      "name": "Cross-source emergence triangulation",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
+      "name": "Decision-claim -> runtime-side-effect trace",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:ingestion-invariant-triad-intersection",
+      "name": "Ingestion invariant-triad intersection",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:paper-research-artifact-production-descendant",
+      "name": "Paper -> research artifact -> production descendant",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+      "name": "Protocol-regression archaeology for pre-FAT systems",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
+      "name": "Rule-period / authority-version audit",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:search-run-v2-fields",
+      "name": "Search-run v2 fields",
+      "runs": 0,
+      "inspected": 0,
+      "exploit_score": 0.49999999999999994,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.08971615662523587,
+      "exploitation_component": 0.08138903960933261,
+      "allocation": 0.08555259811728425
+    },
+    {
+      "strategy_id": "STRAT:acceptance-path-transition-inspection",
+      "name": "Acceptance-path transition inspection",
+      "runs": 1,
+      "inspected": 0,
+      "exploit_score": 0.4633333333333333,
+      "uncertainty": 0.7071067811865475,
+      "sufficient_evidence": false,
+      "exploration_component": 0.06343890273169868,
+      "exploitation_component": 0.07542051003798156,
+      "allocation": 0.06942970638484011
+    },
+    {
+      "strategy_id": "STRAT:fail-open-boundary-archaeology",
+      "name": "Fail-open boundary archaeology",
+      "runs": 1,
+      "inspected": 4,
+      "exploit_score": 0.4083333333333333,
+      "uncertainty": 0.7071067811865475,
+      "sufficient_evidence": false,
+      "exploration_component": 0.06343890273169868,
+      "exploitation_component": 0.06646771568095497,
+      "allocation": 0.06495330920632683
+    },
+    {
+      "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
+      "name": "Capability-Conjunction Search + Claim Tracing",
+      "runs": 2,
+      "inspected": 6,
+      "exploit_score": 0.46,
+      "uncertainty": 0.5773502691896258,
+      "sufficient_evidence": false,
+      "exploration_component": 0.051797647178238565,
+      "exploitation_component": 0.07487791644058601,
+      "allocation": 0.0633377818094123
+    },
+    {
+      "strategy_id": "STRAT:evaluation-target-independence",
+      "name": "Evaluation-Target Independence",
+      "runs": 2,
+      "inspected": 4,
+      "exploit_score": 0.4325,
+      "uncertainty": 0.5773502691896258,
+      "sufficient_evidence": false,
+      "exploration_component": 0.051797647178238565,
+      "exploitation_component": 0.07040151926207272,
+      "allocation": 0.06109958322015564
+    },
+    {
+      "strategy_id": "STRAT:first-party-production-source-triangulation",
+      "name": "First-party production-source triangulation",
+      "runs": 2,
+      "inspected": 7,
+      "exploit_score": 0.3791666666666667,
+      "uncertainty": 0.5773502691896258,
+      "sufficient_evidence": false,
+      "exploration_component": 0.051797647178238565,
+      "exploitation_component": 0.06172002170374391,
+      "allocation": 0.05675883444099124
+    }
+  ],
+  "priority_capability_gaps": [
+    {
+      "capability_id": "CAP-001",
+      "name": "Evidence-gated document facts",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-002",
+      "name": "Reviewed, versioned identity mastering",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-003",
+      "name": "Freight contract/rate authority reconstruction",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-004",
+      "name": "Deterministic freight rerating and exception math",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-005",
+      "name": "Physical-event-to-entitlement evidence",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-007",
+      "name": "Proof obligations and next-best-evidence routing",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-008",
+      "name": "Structured invoice compliance/validation",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-009",
+      "name": "Schedule verification and conservative repair",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-012",
+      "name": "Permit event versioning and semantic source QA",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    },
+    {
+      "capability_id": "CAP-013",
+      "name": "Cross-vendor scientific data normalization",
+      "gap_score": 6,
+      "missing_piece": null,
+      "run_attention": 0
+    }
+  ],
+  "guardrails": {
+    "min_runs_for_exploitation_claim": 5,
+    "min_deep_inspections_for_exploitation_claim": 20,
+    "never_zero_exploration": true,
+    "recent_runs_not_treated_as_failed_outcomes": true
+  }
+}
