@@ -1,27 +1,34 @@
 {
+  "schema_version": 2,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
-  "strategy_id": "STRAT:paper-research-artifact-production-descendant",
-  "query_family": "describe the reusable query family, not only the literal query",
+  "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
+  "query_family": "reusable family name, not only the literal query",
   "measurement_quality": "prospective",
   "lane_ids": [
     "47"
   ],
   "seed_nodes": [],
   "search_surfaces": [
-    "github_code"
+    "GitHub code search"
   ],
   "queries": [
     "literal query used"
   ],
-  "candidate_count": null,
-  "deep_inspected": null,
-  "retained_count": null,
-  "master_promoted_count": null,
+  "candidate_count": 0,
+  "deep_inspected": 0,
+  "retained_count": 0,
+  "master_promoted_count": 0,
+  "elapsed_minutes": null,
+  "tool_calls": null,
+  "recall_rescue_used": false,
+  "stop_reason": null,
   "new_capability_ids": [],
   "strengthened_capability_ids": [],
   "experiment_ids": [],
   "candidate_dispositions": [],
+  "best_result": null,
+  "durable_evidence_path": null,
   "notes": null
 }
