@@ -134,6 +134,8 @@ def build_outcome(inp: FreightOutcomeInput) -> dict:
     if has_commercial_stage:
         if not inp.external_commercial_evidence:
             raise ValueError("commercial engagement metrics require direct external commercial evidence")
+
+    if has_commercial_stage or value_claimed:
         _required_text("engagement_id", inp.engagement_id)
         _required_text("buyer_cohort_key", inp.buyer_cohort_key)
 
