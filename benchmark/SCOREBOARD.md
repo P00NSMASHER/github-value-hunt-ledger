@@ -14,7 +14,7 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | 4 | 23-29 | 4 | 4 | 4 | 24.75 | 24.25 | 0 | 0 | Control |
 | 5 | 30-36 | 4 | 4 | 4 | 24.25 | 24.75 | 0 | 0 | Experiment |
 | 6 | 37-43 | 4 | 4 | 4 | 25.0 | 25.0 | 0 | 0 | Tie |
-| 7 | 44-50 | 5 | 3 | 3 | 24.33 | 24.67 | 0 | 0 | Experiment |
+| 7 | 44-50 | 6 | 3 | 3 | 24.33 | 24.67 | 0 | 0 | Experiment |
 
 ## Experiment-wide matched metrics
 - Matched tasks scored: **20** — 09, 10, 11, 16, 17, 23, 24, 25, 26, 30, 31, 32, 33, 37, 38, 39, 40, 44, 45, 46.
@@ -25,7 +25,7 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 - Pairwise task win / tie / loss for Experiment: **4 / 12 / 4**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
 - No-find results: **0 Control / 0 Experiment** among scored results.
-- Approximate search effort per validated STRONG result: **Control ~10–11 reported search/deep-inspection units; Experiment ~11–12**. Directional only because result files mix query counts, discovery modes, triage counts and deep inspections. Task 26 again shows the Experiment arm spending more inspection effort to reach the same full task score; Task 46 shows that extra red-team effort can also improve rejection calibration.
+- Approximate search effort per validated STRONG result: **Control ~11 reported search/deep-inspection units; Experiment ~11–12**. Directional only because result files mix query counts, discovery modes, triage counts and deep inspections. Task 26 again shows the Experiment arm spending more inspection effort to reach the same full task score; Task 46 shows that extra red-team effort can also improve rejection calibration. The newly scored Task 49 adds Control effort without a validated STRONG result, nudging its directional effort estimate upward without changing matched-score comparisons.
 - Learning slope: **still not robustly distinguishable in score, but mildly positive directionally**. Among experiment pairs with >=2 matched/completed tasks, Pair 2 is 25→25→25, Pair 3 is 24→25, Pair 4 is 23→25→24→25, Pair 5 is 25→25→24→25, Pair 6 is 25→25→25→25, and Pair 7 is 24→25→25. Median early-to-late within-pair change remains approximately **+0.5 points**, but ceiling effects dominate. Qualitative reusable-method transfer is stronger: 09→10→11, 16→17, 25→26, 30→31→32, 37→38→39→40, and 44→45→46.
 
 ## Scored task details
@@ -80,6 +80,7 @@ Scores below preserve all previously scored results and add newly completed unsc
 | 46 | EXPERIMENT | 25 | 5/5/5/5/5 | `zephyrcore/BackupAttest@30ad45cf12c7b731824d6d12fb1723dc2fd11727` | No | No | Demonstrably superior equivalent negative-control result: clean/exit-0 can be unlocked by self-reported `verified=yes` and `ok` fields without reading backup bytes or restoring, drill identity is not cross-checked, and RPO counts an orphan state that chain logic rejects. Correctly calibrated REJECT with a narrow hygiene-only residual use. |
 | 47 | CONTROL | 25 | 5/5/5/5/5 | `aiparallel0/freight-audit@e7869162cf9cb23f6d520a0cd71f87cf973d8c28` | No | No | Demonstrably equivalent negative-control result: missing/unparseable contract authority collapses to zero entitlement, provisional findings feed savings/value meters, and overlapping findings double-count money; REJECT is fully justified by source/tests/CI. |
 | 48 | CONTROL | 25 | 5/5/5/5/5 | `mycomind4-arch/permitsignal@4a734615a8e388a98e085026a877b3bdfc1ac8b1` | No | No | Demonstrably equivalent negative-control result: configured landing pages cannot reach some authoritative external systems, the source model lacks completeness/freshness watermarks and PARTIAL/STALE semantics, and historical live evidence showed empty output under a fail-open workflow. Correctly rejected for production lead-intelligence use while preserving the ingest scaffold's limited value. |
+| 49 | CONTROL | 25 | 5/5/5/5/5 | `rc2consulting/rc2consulting.github.io@05c644c9fe7b27db941e26f926461a3b44768138` | No | No | Demonstrably equivalent stale-authority trap: source hard-codes 3-year receipts and 12-month employee windows, current eCFR/SBA authority requires the general 5-year/24-month rules, and the result correctly rejects current eligibility use while preserving the current-threshold-table distinction and a repairable provenance-backed calculator wedge. |
 
 ## Retained-lesson / learning status
 - No benchmark lesson is promoted from a single task.
