@@ -758,3 +758,113 @@ Keep this lesson LOCAL; one successful task is not enough for staged/global prom
 - source/test/schema/history traversals: ~20;
 - external GitHub/web reads/searches: ~30;
 - untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 8
+
+### Hypothesis
+A public scientific/physical executor now reaches **effect-integrity Level 3**: it persists a business-effect identity before dispatch, durably binds that identity to the native device/provider execution identity, survives a crash after the external write but before acknowledgement, blocks redispatch after restart, and resolves the original effect by authoritative read-only device/system-of-record evidence rather than issuing a second physical command.
+
+The hypothesis is falsified for a candidate if any of those links are merely architectural prose, process-local state, simulator-only behavior, or post-effect logging.
+
+### Discovery modes
+1. **Direct invariant search:** searched scientific-control, robotics and instrument repositories for `outcome unknown`, command receipts, command IDs, crash/restart recovery, reconciliation and authoritative readback.
+2. **Protocol/ecosystem adjacency:** followed SiLA observable-command `CommandExecutionUUID` semantics and MHS-style agent-to-hardware projects looking for persistent command-history/readback across server/process loss.
+3. **Low-attention/current implementation search:** inspected very small/new physical-AI and MHS-style repositories rather than popularity-ranked frameworks.
+4. **Architecture→source/history falsification:** when an architecture document exactly matched Level 3, checked its declared implementation status, implementation owner, tests and commit history before accepting it.
+
+Serious inspection was limited to three near-matches: `ioi-foundation/ioi`, `MacKenzieLuong/sparkle`, and `tongriyaotxt/open-mhs`.
+
+### Result
+**NO_FIND for Level 3.** The three strongest near-matches fail different proof obligations, and none is promoted to STRONG on the Level-3 claim.
+
+### Near-match 1 — IOI physical-action architecture
+Repository: `ioi-foundation/ioi`  
+Exact revision: `93f34155295b3c6122d7eb000cbe0333cc5a4f0b`  
+Public license: Apache-2.0  
+Attention at inspection: 2 stars / 0 forks
+
+**Why it looked exceptional:** the canonical physical-action architecture names exactly the desired objects: controller idempotency keys, actuator receipts, ambiguous-effect reconciliation, local runtime assurance and an execution lifecycle that reconciles mission outcomes after actuation.
+
+**Why the claim fails:** the canonical `physical-action-safety.md` explicitly labels implementation **partial admission precursor** and states that `PhysicalActionExecutionCore`, native controller mount, durable Agentgres receipt emission, cryptographic controller identity, controller-side idempotency and estate-wide coverage **remain planned**. History confirms the implemented work is admission-layer durability: commit `b2cc3025ad43cbf3653886e3ac7bfd0b4da26503` moves physical-action-intent admission into the Rust daemon, while `ceeb44235f40b98357a0fe493594a1dd5ddaa758` makes planner admissions durable and explicitly distinguishes durable admission from executing the admitted decision.
+
+**Verifier verdict: FAIL for Level 3 / PLANNED ARCHITECTURE.** This is useful prior architecture, not evidence that the external physical effect contract is operational.
+
+### Near-match 2 — Sparkle command receipts
+Repository: `MacKenzieLuong/sparkle`  
+Exact revision: `a9b4e38bfbfb0926723460c63cc4355b1bfabfc0`
+
+**Implemented/tested:** the `/direct` command path accepts a caller `commandId`; a repeated identical request returns a duplicate receipt rather than starting another navigation command, `/commands/{command_id}` exposes the receipt, and integration tests cover this behavior. The control loop also contains strong runtime safety tests for stale perception, watchdog stop, late inference discard, rotation budgets, time limits and “no motor writes after stop.”
+
+**Decisive failure:** command receipts live in the process-local `ControlLoop` receipt map. No inspected durable store or restart test preserves the command/effect identity. A process crash therefore destroys the dedupe evidence needed for Level 2/3.
+
+**Verifier verdict: FAIL for Level 3 / SAME-PROCESS IDEMPOTENCY ONLY.** Good runtime control discipline, but not crash-safe effect identity.
+
+### Near-match 3 — tongriyaotxt/Open-MHS cerebellum
+Repository: `tongriyaotxt/open-mhs`  
+Exact revision: `61ced4d976dd192623cfc715139a061783972cae`  
+Public license: MIT  
+Attention at inspection: 9 stars / 2 forks
+
+**Implemented/tested:** this independent Open-MHS implementation has a genuine local-control “cerebellum” layer: reflex checks execute before the skill action each control tick; tests show obstacle/fall reflex abort, disturbance detection and correction, force-feedback grasp, DMP demonstration fitting/generalization, autonomous habit execution with reflex priority, and Microduck deadman/speed/fall/obstacle behavior. An episode recorder writes observation/action/next-observation trajectories and camera-frame references to disk. Commit `3ea342e17ac8ffa3380f0e9d49dadfda75a9490f` introduced the cerebellum/Microduck/MuJoCo family.
+
+**Decisive failures:** `BaseDevice` last-read/last-write state is in memory and a write is recorded only after `_do_write` returns; there is no durable pre-dispatch effect/native-command ledger. The repository also explicitly calls itself early alpha, says real-hardware testing remains needed, and its scientific lab adapters (microscope, liquid handler, centrifuge, laser, spectrometer) are simulated. This is therefore a useful **local reflex/control and imitation-learning kernel**, not a Level-3 physical-effect executor.
+
+**Adjacent WATCH score:** A 3 / B 3 / C 4 / D 3 / E 4 / F 5 = **22/30 WATCH_COMPONENT** for portable local reflex/control + learning architecture; no STRONG promotion.
+
+### Frozen evidence packet
+- `ioi-foundation/ioi@93f34155295b3c6122d7eb000cbe0333cc5a4f0b`:
+  - `docs/architecture/foundations/physical-action-safety.md` — canonical implementation-status statement: partial admission precursor; controller-side idempotency/execution core/durable execution receipts remain planned;
+  - history commits `b2cc3025ad43cbf3653886e3ac7bfd0b4da26503` and `ceeb44235f40b98357a0fe493594a1dd5ddaa758` — durable physical-action admission, explicitly not equivalent to execution.
+- `MacKenzieLuong/sparkle@a9b4e38bfbfb0926723460c63cc4355b1bfabfc0`:
+  - `backend/server.py` — process-local receipt map and command duplicate logic;
+  - `backend/test_integration.py` blob `cde5ff695cd7b7f9df4586ce17d3f4a8170c9ade` — duplicate `commandId` receipt test;
+  - `backend/test_server.py` blob `956e4cbf277a3ce48c14d05000a5c0c573345a90` — deadman, stop and bounded-control regression corpus.
+- `tongriyaotxt/open-mhs@61ced4d976dd192623cfc715139a061783972cae`:
+  - `src/openmhs/core/device.py` — in-memory last-read/last-write state and post-return write recording;
+  - `src/openmhs/cerebellum/reflex.py` blob `edf2e51ef1d31beb80b5da2f1dd69f67e46fae42`;
+  - `tests/test_cerebellum.py` blob `ca8357efe4f7db7ebefaac6969d1ae9acd2b7e3cd4e4a95` was not used as a canonical hash because the connector output is authoritative only for the exact returned blob metadata; source inspection established reflex/convergence/anomaly tests;
+  - `tests/test_learning.py` blob `a06df7def27a306235aebbcf92a118ae42b804d0`;
+  - `src/openmhs/cerebellum/episode.py` blob `d200ea82f5fdd0be5ca5d734d01e8eb75fd331cf`;
+  - `tests/test_microduck.py` blob `adff954220161a5115107d7a92cbc27161db4739`;
+  - `src/openmhs/adapters/lab/__init__.py` blob `894bf6b7fef85b3ecd0a7f86c8a2b03b66685071` — lab adapters explicitly simulated;
+  - `README.md` blob `93e4e6905403dc876c4665565f0fb00851768a39` — early alpha and real-hardware-testing caveat;
+  - history commit `3ea342e17ac8ffa3380f0e9d49dadfda75a9490f` — cerebellum/Microduck/MuJoCo introduction.
+
+### Independent RED-TEAM / VERIFIER
+The verifier received the frozen evidence packet without a proposed overall score and evaluated six Level-3 proof obligations:
+
+1. **Durable business/effect identity persisted before dispatch? — FAIL across the inspected set.** IOI describes the target but marks its execution core planned; Sparkle receipts are memory-resident; Open-MHS records device write history in memory after the device method returns.
+2. **Durable mapping to native device/provider execution identity? — FAIL / NOT ESTABLISHED.** SiLA UUID-style correlation exists in the wider ecosystem, but none of these candidates proves the required durable join through restart.
+3. **Crash after external write/before ack restores the same effect record? — FAIL.** No inspected candidate supplies a tested end-to-end crash-window recovery with the same physical effect record.
+4. **Redispatch remains blocked while outcome is unresolved? — FAIL GENERICALLY.** Prior ROSClaw/Opentrons findings cover much of this Level-2 property, but none of the new candidates advances it to Level 3.
+5. **Authoritative read-only post-crash query resolves the original command without resend? — FAIL.** No qualifying implementation found.
+6. **Implementation/test/history evidence rather than docs-only claims? — PASS as a falsification discipline.** The strongest apparent hit, IOI, was correctly rejected after its own canonical implementation-status and history were inspected.
+
+**Overall verifier verdict: NO_FIND / HYPOTHESIS NOT YET SATISFIED.** Do not weaken the requirement or relabel planned architecture as an implemented kernel.
+
+### Commercial / research implication
+The gap remains commercially meaningful. A **Level-3 External Effect Qualification / Chaos Harness** can test each physical mutation for one invariant chain:
+
+`durable business-effect ID reserved pre-dispatch → native device/provider operation ID → crash after write/before ack → restart with redispatch forbidden → authoritative read-only query → SUCCEEDED or FAILED_NO_EFFECT`
+
+If the provider/device cannot supply the last query, the operation must remain `OUTCOME_UNKNOWN / NEEDS_HUMAN_RECONCILIATION` rather than be automatically retried. This can be sold as a reliability/qualification audit before attempting a universal control-plane product.
+
+### Search lesson outcome
+New LOCAL candidate lesson: **planned-vs-implemented collapse check**. When architecture/spec text perfectly matches a target invariant, immediately inspect its explicit implementation-status declaration, owning source path, executable tests, persistence timing and history. Run 8 rejected the most seductive near-match precisely because the canonical document said the hard execution pieces remain planned. One success only: keep LOCAL, do not stage or promote globally.
+
+New negative lesson: a tested command receipt/deduplication API can still be entirely process-local. Always inspect the backing store and an actual restart/crash test before calling command identity durable.
+
+### VALUE HANDOFF
+1. **Capability delta:** no new Level-3 executor found; `tongriyaotxt/open-mhs` adds a useful WATCH-level local reflex/control + DMP/imitation kernel, but does not close external-effect durability.
+2. **Graph edge:** the missing edge remains the durable join `workflow/business effect ↔ native device command ↔ authoritative post-crash readback`; IOI is architectural prior art, not implementation evidence.
+3. **Radar signal:** agent-to-hardware control continues to branch quickly, but current public projects still separate local safety/control, durable orchestration and provider/device reconciliation rather than unifying all three.
+4. **Experiment impact:** preserve the Level-3 crash test exactly; do not relax it to “has command IDs” or “has receipts.”
+5. **Commercial impact:** reinforces a qualification/audit wedge because the same failure gap recurs across unrelated stacks.
+6. **Negative knowledge:** reject planned execution cores, process-local receipt maps and simulation-only device layers as substitutes for crash-safe authoritative effect reconciliation.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate deep inspections: 3;
+- source/test/history/protocol traversals: ~22;
+- external GitHub searches/reads: ~30;
+- untrusted-repository code executions: 0.
