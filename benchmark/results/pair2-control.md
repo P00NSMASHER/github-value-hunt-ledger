@@ -20,3 +20,22 @@ SEARCH EFFORT: 8 materially distinct searches and 5 deep inspections
 FALSE-PROMOTION RISK: LOW — first-party provenance and the requested structure/change semantics were directly observed in source files and commit history; remaining risk is primarily downstream interpretation/completeness, not whether the source exists.
 LESSON: N/A
 COMPLETED_AT: 2026-09-20T01:33:21-04:00
+
+TASK: 10
+CONDITION: CONTROL
+STARTING HYPOTHESIS: The U.S. Treasury’s USAspending production backend should contain first-party DATA Act ingestion, canonical award/transaction schemas, and transformation logic that can be verified directly in code rather than inferred from the public REST API.
+DISCOVERY METHODS: Official USAspending/API web discovery; direct inspection of the fedspendingtransparency GitHub repository and exact production-branch revision; code-level inspection of Broker submission loading, normalized transaction/award schemas, Spark/Delta ETL transformations, and ETL tests.
+CANDIDATE: fedspendingtransparency/usaspending-api
+CANONICAL URL: https://github.com/fedspendingtransparency/usaspending-api
+EXACT REVISION: 1692d484b38c66361c54faa221548527cae29964
+VERDICT: STRONG
+A-F SCORE: A3 B5 C5 D5 E5 F5 = 28/30
+EVIDENCE INSPECTED: Official USAspending API site identifying Treasury’s open-source DATA Act stack; repository metadata and signed master HEAD 1692d484b38c66361c54faa221548527cae29964; usaspending_api/etl/management/commands/load_submission.py; usaspending_api/awards/models/transaction_normalized.py; usaspending_api/awards/models/award.py; usaspending_api/etl/management/commands/load_transactions_in_delta.py; usaspending_api/etl/tests/unit/test_load_transactions_in_delta.py; loading_data.md and data_reformatting.md for source/loader cross-checks.
+CLAIMS VERIFIED: The repository is the production-shaped backend used by USAspending.gov, not an API wrapper: load_submission.py connects to the Data Broker and transactionally loads certified submission File A, File B and File C data with validation and rollback behavior; the normalized transaction model defines monetary, agency, award-key, certification and action-date fields and maps them to a reporting view; the Award model explicitly constructs high-level award holders from incoming D1/D2/legacy transactions and carries PIID/FAIN/parent-award/obligation and aggregate semantics; the Spark/Delta loader implements bronze-to-silver ETL levels for award/transaction lookup, FPDS, FABS, normalized transactions and awards, including deletes, merge/upsert behavior, date parsing, string canonicalization, category derivation, earliest/latest transaction selection and monetary aggregation; a unit test exercises fail-closed behavior when required Delta tables are absent. Official USAspending documentation independently states that the U.S. Department of the Treasury builds the open-source tools and that the API serves comprehensive government spending data.
+CLAIMS NOT VERIFIED: Full end-to-end reproducibility against the live Treasury production databases; exhaustive correctness of every transformation or historical edge case; whether all production orchestration/infrastructure is contained in this single repository; live Broker credentials/data access; independent numerical reconciliation of a production snapshot.
+STRONGEST OBJECTION: This is a large evolving government production stack rather than a drop-in library. Reusing the ETL directly requires substantial Postgres/Spark/Delta/Data Broker context, and production truth still depends on upstream agency/Broker submissions and reference data.
+COMMERCIAL WEDGE: Evidence-grade federal-award intelligence infrastructure: reuse the authoritative schema and transformation semantics to normalize award histories, obligations, modifications and agency/recipient records for GovCon opportunity intelligence, spend-change monitoring, award lineage/reconciliation and provenance-backed analytics without reverse-engineering USAspending’s public endpoint behavior.
+SEARCH EFFORT: 3 materially distinct discovery methods and 6 deep inspections
+FALSE-PROMOTION RISK: LOW — first-party Treasury provenance is independently corroborated, and the requested schemas plus ETL transformations were observed directly in source and tests at a fixed commit; residual risk concerns deployment complexity and upstream data quality, not whether the backend/ETL exists.
+LESSON: N/A
+COMPLETED_AT: 2026-09-20T01:59:05-04:00
