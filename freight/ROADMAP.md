@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.5
+## Current checkpoint — v15.6 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -27,7 +27,12 @@ Internal commercialization controls now completed:
 - buyer-cohort commercial calibration with small-sample anti-overfit gates;
 - full synthetic diagnostic→pilot→persistent-settlement→report rehearsal;
 - rights-operability registry;
-- repository workflow hardening and pinned CI.
+- repository workflow hardening and pinned CI;
+- scope-bound buyer/BU/shipment proof objects and sealed incumbent-source chain;
+- machine-checkable pilot data-room/package manifests;
+- fail-closed PDF/CSV/XML/EDI/X12 pre-parser guard + spreadsheet export neutralization;
+- deterministic control-file/component provenance generator;
+- buyer-facing security/data-handling statement with explicit non-claims.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -42,7 +47,7 @@ Commercial repricing remains locked to the existing priors until direct external
 ### P0
 1. **DONE:** v15 / v15.1 / v15.2 / v15.3 / v15.4 / v15.5 commercialization, proof, adaptive-authorization and commercial-learning PRs merged after CI.
 2. **DONE:** canonical Freight Recovery v15.5 release identity recorded in `freight/RELEASE_MANIFEST.md`.
-3. **DONE for current internal checkpoint:** v15.5 release manifest records source/CI/adaptive-policy/commercial-learning state. Production artifact checksums/SBOM/signing remain part of the annual-deployment diligence blocker.
+3. **PARTIAL DONE:** deterministic control-file hashes and exact component inventory are generated/verified in CI. Signed provenance and a full buyer-required SPDX/CycloneDX SBOM remain annual-deployment diligence work.
 4. Complete the missing rights-document evidence checklist for Trenova/Opstrax and any non-permissive runtime component.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
 
@@ -59,10 +64,10 @@ Commercial repricing remains locked to the existing priors until direct external
    - validated finding;
    - challenger-only validated;
    - uniquely attributable realized.
-3. Add source manifest / truth manifest / incumbent-output manifest templates.
-4. Add a buyer-facing security/data-handling one-pager derived from `RELEASE_AND_SECURITY_GATE.md`.
-5. Execute parser/input negative tests for PDF/XML/EDI/CSV.
-6. Validate tenant/business-unit isolation in whatever data service will hold pilot data.
+3. **DONE:** machine-checkable source/data-room + population/truth + sealed/opened incumbent package chain implemented in `freight/pilot_package.py` and `PILOT_DATA_ROOM.md`.
+4. **DONE:** `freight/SECURITY_AND_DATA_HANDLING.md` separates current pilot controls from deployment/security non-claims.
+5. **PARTIAL DONE:** fail-closed pre-parser negative tests cover PDF/XML/EDI/X12/CSV, archives, size/segment bounds and CSV formula neutralization. OS/container parser sandbox/resource limits remain deployment work.
+6. **PARTIAL DONE:** proof/source/package layers now carry buyer+BU scope with cross-scope negative tests. The actual customer data service/database/object-store still requires deployment-specific cross-tenant tests.
 7. Record reviewer hours, invoice count, fixed fee, delivery cost and turnaround in each externally evidenced engagement outcome so buyer-level margin/effort can be calibrated.
 
 ## Next 30 days — prove willingness to pay and one real outcome
