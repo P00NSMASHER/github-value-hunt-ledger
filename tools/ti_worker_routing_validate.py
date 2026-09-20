@@ -46,6 +46,9 @@ active_workers={s.get("worker_id") for s in state if s.get("status") in {"CLAIME
 for w in active_workers:
     if route_by_worker[w]["route_status"]!="LOCKED": raise SystemExit(f"active worker {w} not locked")
 
+learn_gen=LEARN_MET.get("routing_learning_generation_id")
+if not learn_gen: raise SystemExit("routing learning generation missing")
+
 packet_by_worker={p["worker_id"]:p for p in packets}
 for r in routes:
     if r["route_status"]=="ROUTED":
@@ -62,8 +65,6 @@ routing_ids={r["routing_generation_id"] for r in routes}
 profile_ids={r["worker_profile_generation_id"] for r in routes}
 if len(routing_ids)!=1 or len(profile_ids)!=1: raise SystemExit("routing/profile generation drift")
 if metrics.get("routing_generation_id")!=next(iter(routing_ids)): raise SystemExit("routing metrics generation mismatch")
-learn_gen=LEARN_MET.get("routing_learning_generation_id")
-if not learn_gen: raise SystemExit("routing learning generation missing")
 if metrics.get("routing_learning_generation_id")!=learn_gen: raise SystemExit("routing metrics learning-generation mismatch")
 max_pos=float(LEARN_POL.get("max_positive_adjustment",3.0))
 max_neg=float(LEARN_POL.get("max_negative_adjustment",2.0))
