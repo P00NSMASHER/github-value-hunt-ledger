@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "aliases": {
+    "NODE 01 Vertical ERP Gold / hunters/01": "HUNTER-01",
+    "NODE 03 Freight Stack": "HUNTER-03",
+    "NODE 04 Scope Recovery / hunters/04": "HUNTER-04",
+    "Hunt 05 Gov Evidence": "HUNTER-05",
+    "NODE 06 Lab Automation / hunters/21": "HUNTER-06",
+    "Hunt 07 Geo Asset Intel": "HUNTER-07",
+    "NODE 09 Data Moats / hunters/16": "HUNTER-09",
+    "NODE 11 Compliance Proof / hunters/15": "HUNTER-11"
+  },
+  "fallback_rule": "If hunter/hunter_role contains NODE NN, Hunt NN, HNN, or hunterNN where 1<=NN<=14, canonicalize to HUNTER-NN. Otherwise leave unmapped and record routing/profile debt."
+}
