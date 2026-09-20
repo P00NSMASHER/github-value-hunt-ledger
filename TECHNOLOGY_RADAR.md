@@ -85,6 +85,15 @@ Emergence product = N × M × A × C × X. Treat it as a prioritization aid, not
 - Commercial implication: likely enterprise value in reducing invalid actions and improving auditability, but integration/sales cycles are heavy.
 - Search next: independent lab-control policies, shadow-mode results and replayable experiment governance.
 
+### RAD-010 — Installed-base scientific operations adapters
+- Thesis: near-term lab-automation value is increasingly concentrated in preserving incumbent LIMS/instruments while adding programmable workflow state, vendor-format normalization, device control and evidence/provenance, rather than replacing the entire laboratory operating stack.
+- Signals: independent mature surfaces now span SLIMS integration, Clarity workflow automation, official Illumina run-metric parsing, cross-vendor analytical normalization, deterministic timed benches, scan/device plugin ecosystems, EPICS/Tango async control and provenance infrastructure.
+- Score: N3 M5 A4 C5 X4 = **1200**.
+- Status: BUILD / BENCHMARK.
+- Commercial implication: service-first “automate one installed workflow/bench without replacing the system of record” may reach revenue faster and with less organizational resistance than a new lab OS.
+- Search next: stop generic laboratory frameworks unless they add a missing installed-base adapter or hard operational invariant; prioritize exact vendor/workflow handoffs, migration compatibility, failure recovery and measurable analyst/technician time or failed-run reduction.
+- Next evidence needed: a synthetic cross-system acceptance fixture first, followed by one explicitly authorized customer workflow proving deployment effort and operational value.
+
 ## Radar operating rule
 A radar category should move toward BUILD only when:
 1. at least two independent technical signals exist;
