@@ -1,16 +1,22 @@
 # AI / agent infrastructure shadow state
 
 ## Current hypotheses
-None yet.
+- ACTIVE — Effect-journal hypothesis: agent runtimes that force model/tool/network actions through a durable recorded host boundary and provide strict no-live replay, fail-loud divergence, crash/frontier resume, approval pauses and single-writer protection can materially improve long-horizon reliability and verification compared with checkpoint-only orchestration. Supporting evidence: `ThousandBirdsInc/chidori@223bb8779f63822c3e63a9a4347dda7483a02158` implements and tests the core replay/resume/divergence contract. Contrary evidence: generic durable workflow platforms already cover much of the surrounding problem, Chidori uses a custom JS runtime, some storage backends have advisory leases, and its latest release fixed a materially broken prior release/CI state. NEXT TEST: find an independent agent/runtime implementation with strict effect replay or audit receipts and compare side-effect identity, concurrency, source drift and recovery semantics. CONFIDENCE: MEDIUM-HIGH.
 
 ## Validated local lessons
-None yet.
+- Run 1: a durable-agent claim should be evaluated at the **side-effect boundary**, not at the presence of a checkpoint API. High-signal evidence is a journal that can prevent previously completed external effects from executing again during replay, coupled with tests that prove this behavior in a fresh runtime.
+- Run 1: replay becomes verification-grade only when it has a strict posture: source identity/fingerprints, function + argument divergence, journal completeness/consumption, no unexpected live calls, completed-state requirement and output equality. A best-effort replay/debug mode is weaker than a dedicated fail-closed verifier.
+- Run 1: crash/retry safety and multi-writer safety are separate. A runtime can replay correctly in one process while still allowing concurrent continuations to corrupt durable state. Inspect the lease/transaction semantics of each storage backend before claiming exactly-once or distributed safety.
+- Run 1: history archaeology is essential for runtime maturity. Chidori's current code contains strong regression controls, but its v3.8.1 release commit also documents an engine panic, package-version drift and previously red CI in v3.8.0. A strong architecture does not erase release-operability risk.
+- Run 1: comparator breadth and candidate depth should remain distinct. Atmosphere provides strong adjacent evidence for cross-runtime governance/capability contracts, but it was not credited with Chidori-level deterministic-replay depth without equivalent source/test inspection.
 
 ## Failed search patterns
-None yet.
+- Run 1: broad repository-name/product queries such as `durable agent runtime checkpoint replay tool approval` produced no useful repository results. Code-level signatures (`checkpoint`, `call log`, deterministic replay, host calls, approval, lease, divergence) surfaced the stronger candidates.
+- Run 1: generic `checkpoint` / `resume` is too commodity to rank reliability. Future triage should quickly discard projects that persist conversation/graph state but cannot show what prevents duplicate live effects, how divergence is detected, and how concurrent resume is serialized.
+- Run 1: an attempted local clone/test execution was blocked by the execution sandbox's outbound-DNS restriction. Until a repository is otherwise materialized locally, distinguish inspected committed tests from independently rerun tests.
 
 ## Candidate skills
-None yet.
+- EFFECT-JOURNAL RELIABILITY AUDIT — LOCAL, 1 shadow success. WHEN TO USE: agent runtimes claiming durability, resumability, deterministic execution or safe human-in-the-loop. PROCEDURE: trace every external effect to its durable identity; inspect record→fresh-process replay; force a pre-frontier source/argument change; inspect strict/no-live verification; inspect crash frontier persistence; inspect approval continuation; inspect storage-specific concurrent-writer behavior; then read release history for failures that tests later fixed. WHY IT WORKED: it separated Chidori's genuinely unusual replay verifier from ordinary checkpoint orchestration while also surfacing distributed-store and release-maturity limits. FAILURE MODES: frameworks may hide effects inside third-party runtimes; a replay can be deterministic yet still lack authoritative source identity or distributed exclusion; documentation can overstate backend guarantees. NEXT IMPROVEMENT: apply to an independent runtime and compare with workflow engines such as DBOS/Temporal/AWS durable execution to identify which semantics are truly agent-specific. Do not promote beyond lane-local state from one run.
 
 ## Open referrals
-None yet.
+- SHADOW-COMMERCIAL: determine whether a Replayable Agent Reliability Retrofit around `ThousandBirdsInc/chidori@223bb8779f63822c3e63a9a4347dda7483a02158` commands a distinct budget versus existing workflow/orchestration tooling, and identify the migration threshold that would make adoption uneconomic.
