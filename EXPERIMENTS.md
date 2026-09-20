@@ -1,216 +1,145 @@
 # EXPERIMENTS
 
-Canonical queue that converts research knowledge into falsifiable economic or technical tests.
+Canonical stage-gate queue converting research into falsifiable technical/economic evidence. Repository quality is not an outcome; commercial validation exists only when a result is recorded in `OUTCOMES.md` with direct evidence.
 
-The purpose of this file is to stop the system from becoming a museum of interesting repositories.
-
-## Experiment states
-- READY — can be run with available lawful/synthetic inputs.
-- BLOCKED_EXTERNAL — requires customer-authorized or other externally supplied data/access.
+## States
+- READY — lawful/synthetic inputs available.
+- BLOCKED_EXTERNAL — requires customer-authorized/external data or access.
 - RUNNING — execution evidence is being produced.
-- PASSED — success criteria met.
-- FAILED — success criteria not met; record why.
-- SUPERSEDED — a better experiment replaced it.
-
-## Experiment schema
-- ID / name
-- Opportunity / capabilities tested
-- Status
-- Hypothesis
-- Inputs
-- Procedure
-- Success criteria
-- Failure criteria
-- Cost/time boundary
-- Evidence artifact
-- Commercial decision unlocked
-- Next action
+- PASSED / FAILED / PARTIAL / INVALID — record under `OUTCOMES.md` when the experiment itself completes.
+- SUPERSEDED — replaced by a better test.
 
 ## Priority queue — 2026-09-20
 
 ### EXP-001 — Freight blind audit to realized settlement
-- Opportunity: Freight Recovery v15 — Independent Freight Audit Acceptance Test / Recovery.
+- Opportunity: Freight Recovery v15.3.
 - Capabilities: CAP-001, 003, 004, 005, 006, 007.
 - Status: **BLOCKED_EXTERNAL**.
-- Hypothesis: on a buyer-authorized frozen population, the stack can identify unique, defensible freight overcharges/incumbent misses with lower false-dollar risk than a black-box discrepancy process and carry at least one through actual credit/refund/remittance without circular truth.
-- Paid-entry option: a Data Readiness / Authority Diagnostic may be sold before the full experiment if it only inventories source gaps and makes no recovery claim.
-- Pilot-start gate:
-  1. buyer entity/BU and date range fixed;
-  2. exact invoice-population selection rule fixed;
-  3. contracts/rates/RateCons/addenda/tariff authority available;
-  4. shipment identity/operational evidence available for the supported claims;
-  5. incumbent output can remain sealed until buyer-owned truth is frozen;
-  6. later settlement source can be observed;
-  7. customer authorization, retention and read-only access boundaries documented.
-- Inputs: frozen invoices/EDI actuals, controlling commercial authority and versions, shipment truth, supporting POD/BOL/appointment/weight/telematics as required, sealed incumbent output and later settlement evidence.
-- Procedure: authorize scope -> readiness gate -> freeze population/hash -> freeze buyer-owned independent truth/hash -> open/hash incumbent output -> score unique findings -> buyer review -> approved dispute/action -> settlement readback -> recovery certificate.
-- Report four separate totals: reviewed discrepancy dollars; validated finding dollars; challenger-only validated dollars; uniquely attributable realized dollars.
-- Success criteria:
-  - unsupported asserted dollars = **$0**;
-  - unsupported realized dollars = **$0**;
-  - population drift after freeze = **0**;
-  - deterministic replay of all frozen scored cases = **100%**;
-  - every accepted finding has source authority + expected calculation + actual invoice + required evidence lineage;
-  - false-positive dollars remain within buyer-agreed ceiling;
-  - at least one challenger-only validated finding unless the population is genuinely clean;
-  - "recovery proven" requires at least one unique finding to reach an issued credit/refund/remittance with unambiguous allocation.
-- Failure criteria: truth contamination/circularity, wrong-population scoring, unsupported authority, silent identity resolution, self-validation, ambiguous settlement counted as realized, duplicate/preexisting credit counted as fee-eligible, or material false-positive dollars above the agreed ceiling.
-- Cost/time boundary: do not contact customers, carriers or incumbents and do not spend money without explicit user approval. Once complete inputs pass readiness, target the analysis/report portion within **10–15 business days**.
-- Evidence artifact: frozen population manifest, truth manifest, incumbent-output hash, finding ledger, review decisions, settlement source/allocation proof and recovery certificate.
-- Commercial decision unlocked: whether Freight Recovery becomes the first scaled commercial business and whether a pilot converts to annual continuous assurance.
-- Next action: obtain one authorized closed population when the user explicitly approves outreach/data use. Until then, engineering work is limited to pilot-safety/security/release gaps.
+- Hypothesis: on one buyer-authorized frozen population, the stack can find at least one unique incumbent-missed freight overcharge with zero unsupported dollars and carry it through actual externally observed settlement.
+- Internal technical substage: **substantially exercised, not commercial validation.** The planted 210/812/820 settlement corpus now covers exact unique auto-allocation, reviewed partial/split edges, duplicate events, orphan/excess/wrong-currency/pre-authority cases, full reversal, ambiguous partial reversal and 2,000 deterministic fuzz ledgers. Remaining internal work is persistence/concurrency/security hardening only if defects are exposed.
+- Required external inputs: fixed entity/BU/date/population; controlling contracts/rates/RateCons/addenda/tariff authority; shipment/operational evidence; sealed incumbent output; later credit/refund/remittance/bank evidence; documented customer authorization/retention/read-only boundaries.
+- Procedure: readiness gate -> freeze/hash population -> freeze independent truth -> open/hash incumbent output -> score unique findings -> buyer adjudication -> authorized dispute/action -> independently observe settlement -> one-use allocation -> recovery certificate -> later counter-event/reversal if applicable.
+- Success: unsupported asserted and realized dollars = 0; deterministic replay = 100%; every accepted finding has authority/expected/actual/evidence lineage; false-positive dollars within buyer ceiling; at least one challenger-only validated finding unless genuinely clean; `recovery proven` requires issued adjustment plus unambiguous external settlement allocation.
+- Failure: truth circularity, population drift, unsupported authority/identity/evidence, duplicate/preexisting credit, ambiguous allocation counted as realized, returned money left fee-eligible, or false-positive dollars beyond ceiling.
+- Next action: obtain one explicitly authorized closed population. Broad freight engineering/discovery remains frozen until that population exposes a named gap.
 
-### EXP-002 — AP leakage synthetic three-way audit
+### EXP-002 — AP source-authority + receipt-policy leakage audit
 - Opportunity: AP Leakage Assurance.
-- Capabilities: CAP-001, 002, 007, 008, 016.
+- Capabilities: CAP-002, 007, 008, 016, 019.
 - Status: **READY**.
-- Hypothesis: independent invoice/PO/receipt/identity/authority logic can separate actionable leakage from unresolved exceptions while preserving durable negative identity knowledge and reversible corrections.
-- Inputs: synthetic month with duplicates, partial receipts, price/quantity variance, tax, missing PO/receipt, credits and settlement outcomes; identity cases include alias, explicit non-match, mistaken merge, split/correction and later referent addition.
-- Procedure: run candidate identity evidence -> durable POSITIVE/NEGATIVE/UNSURE review -> correction/split where planted -> promoted pinned registry lookup -> invoice/PO/receipt matching -> authority/proof gate -> settlement classification.
-- Success criteria: 100% planted case detection with zero unsupported recovery claims; ambiguous authority routes to review/$0; explicit negative identity judgement blocks a later false merge; corrected/split identity state replays deterministically through the promoted registry.
-- Failure criteria: exception dollars are mislabeled as recoverable, identity/receipt ambiguity silently resolves, an explicit negative match is later overridden without reviewed evidence, or corrected identity state cannot replay deterministically.
-- Decision unlocked: whether AP becomes a second direct-money wedge and whether Nomenklatura-style judgement memory plus Canon-style registry promotion is worth making a shared identity control plane.
-- Next action: assemble the common corpus from structured-invoice, Nomenklatura/Canon identity and accounting components and run the identity-correction cases before adding another resolver.
+- Hypothesis: a governed identity plane plus explicit source observation and policy-specific receipt authority can distinguish recoverable AP leakage from unresolved exceptions without false missing-receipt/PO dollars.
+- Inputs: synthetic closed month with duplicate invoices; alias/non-match/mistaken merge/split; partial receipts; mixed PO-level/direct billing; rejected quantity; service PO/SES required and legitimately not required; price/quantity/tax variance; credits; bitemporal corrections; source outage/partial load; later settlement.
+- Authority model: `ReceiptAuthorityPolicy(system, PO-line type, buyer config, supplier override, verification mode)` resolving to evidence such as `GoodsReceipt`, `ServiceEntrySheet`, explicit `DirectInvoiceAllowed`, or REVIEW. Source health is separately `PRESENT / VERIFIED_EMPTY / UNAVAILABLE`.
+- Procedure: source-observation receipt -> candidate identity -> durable POSITIVE/NEGATIVE/UNSURE judgement -> correction/split -> Canon promoted pinned registry -> policy-specific receipt authority -> PO/receipt/invoice matching -> proof gate -> outcome classification.
+- Required regression cases: PO-line billed pool consumed once across multiple partial receipts; amount+quantity residual synchronization after mixed direct/PO-level billing; rejected-quantity denominator; service-entry-sheet variants; source failure not empty-success; corrected receipt after original decision.
+- Success: all planted cases detected; unsupported recovery = 0; explicit non-match blocks later false merge; corrected identity and bitemporal state replay deterministically; unavailable source can never create missing-receipt/PO money.
+- Failure: universal `has_receipt` assumption, source outage becomes negative evidence, ERP status copied as truth, silent identity resolution, or exception dollars labeled recovered.
+- Next action: build one ERP-neutral corpus using ERPNext/Business Central/SAP-derived semantics as independent challengers, not authoritative customer truth.
 
-### EXP-003 — Commission plan-to-settlement acceptance test
+### EXP-003 — Commission plan-to-bank acceptance test
 - Opportunity: Partner / Commission Payout Assurance.
 - Capabilities: CAP-002, 006, 007, 016, 018.
 - Status: **READY**.
-- Hypothesis: frozen plan/assignment/source-payment truth plus an explicit provider-settlement state machine can independently detect entitlement errors without creating duplicate payout risk when provider results are ambiguous.
-- Inputs: a synthetic closed month spanning tiers, splits, plan changes, writing/direct vs override compensation, staffing/compliance holds, hierarchy changes, lending sequence/slab cases, refunds/cancellations, clawbacks, minimum/carry-forward, partial payouts, definite provider refusal, timeout/unknown result, duplicate retry/callback, confirmed payout, final FX-settled amount/currency, reversal-after-payout and concurrent sweep races.
-- Procedure: freeze plan/assignment/source-credit authority -> calculate independent entitlement -> apply hold/reversal/carry-forward rules -> create one payout intent/claim -> inject provider outcome -> reconcile final settlement -> compare expected entitlement, intended payout and actual settled amount/currency as separate states.
-- Success criteria: deterministic expected payout across all supported cases; ambiguous credit ownership remains unresolved; an ambiguous provider result remains claimed/pending and is **not** automatically retried; only a definite refusal releases the claim for retry; retries/callbacks/concurrent sweeps cannot duplicate money; confirmed provider send and final settlement remain distinct; final amount/currency and reversal lineage reconcile exactly.
-- Failure criteria: retroactivity/refund/carry-forward semantics cannot be reproduced; unknown provider outcomes release the claim or trigger duplicate send; “sent” is treated as “settled”; provider status overrides entitlement authority; or settlement discrepancies are silently absorbed.
-- Decision unlocked: whether commission assurance has a sufficiently complete entitlement-to-cash proof chain to compete with freight/AP as a direct-money business.
-- Next action: normalize OpenPartner, Spree and the membership/staffing/lending/hierarchy adapters into one vendor-neutral case schema and run the full synthetic outcome matrix before seeking a customer period.
+- Hypothesis: frozen plan/assignment/source-payment truth plus a provider-state machine and independent bank/payroll observation can detect entitlement and payout errors without duplicate-send or false-finality risk.
+- Inputs: tiers/splits/overrides; plan/hierarchy changes; holds; refunds/clawbacks; carry-forward; partial payout; definite refusal; timeout/unknown; duplicate callback/retry; confirmed provider send; final FX amount/currency; forward ACH/network trace; later Return/Reversal; concurrent sweep races.
+- Procedure: freeze authority -> calculate entitlement -> apply holds/reversals -> create one payout claim -> provider result -> independent settlement observation -> later return/reversal -> reconcile entitlement/intended/provider/settled as separate states.
+- Success: deterministic expected payout; unknown provider result remains pending and cannot retry; definite refusal alone releases; duplicate paths cannot send twice; provider success and final settlement remain distinct; later return/reversal exactly unwinds finality.
+- Failure: provider status establishes entitlement, unknown outcome releases claim, duplicate send, or finality lacks independent observation.
+- Next action: execute provider-ID -> forward trace -> bank/payroll observation -> return/reversal matrix.
 
-### EXP-004 — Recovery Proof adversarial matrix
+### EXP-004 — Recovery Proof adversarial + verifier-self-test matrix
 - Opportunity: Recovery Proof SLA.
 - Capabilities: CAP-007, 010.
 - Status: **READY**.
-- Hypothesis: the combined verifier can prove good recovery and reliably reject deliberately wrong recovery.
-- Inputs: synthetic/isolated PostgreSQL plus one non-Postgres workload; wrong PITR target, missing history, checksum corruption, service-up/data-wrong, stale proof and trust failures.
-- Success criteria: every negative control is rejected for the correct reason; positive recovery includes measured RTO/RPO and application/data invariants.
-- Failure criteria: any planted bad state produces a pass.
-- Decision unlocked: whether to package Recovery Readiness Audit as an immediate service.
-- Next action: unify evidence schema across two restore engines and trust validation.
+- Hypothesis: the verifier can prove valid recovery, reject wrong-but-restorable state, and remain non-green when either the verifier or proof-delivery path is broken.
+- Inputs: isolated PostgreSQL plus non-Postgres/object workload; wrong PITR target; missing history; corrupt object; service-up/data-wrong; stale proof; trust/revocation failure; total-host/credential-boundary case; deliberately mutated verifier/assertion helper; proof-sink outage after successful restore.
+- Procedure: restore -> independently measure content/application/relationship invariants -> RTO/RPO -> trust validation -> persist proof -> inject negatives -> mutate verifier -> rerun.
+- Success: every planted bad state fails for the intended reason; successful restore with unavailable proof sink remains overall non-green; mutated verifier cannot stay green; positives carry measured RTO/RPO and application truth.
+- Failure: any planted wrong state, broken assertion path, stale trust state or missing proof persistence yields PASS.
+- Next action: unify PostgreSQL and non-Postgres evidence schemas and execute the proof-sink + broken-verifier controls.
 
-### EXP-005 — ScopeSignal evidence-to-paid benchmark
+### EXP-005 — ScopeSignal authority-to-paid benchmark
 - Opportunity: Construction Change Leakage Recovery.
-- Capabilities: CAP-001, 007.
-- Status: **READY** for synthetic; **BLOCKED_EXTERNAL** for commercial proof.
-- Hypothesis: design/field change evidence can be traced through contract/notice/authorization/cost/payment state without inventing entitlement.
-- Inputs: synthetic project with 20–50 changes plus deliberate missing/conflicting clauses/evidence.
-- Success criteria: correct change classification, explicit unknown states and no unsupported billable-dollar assertions.
-- Failure criteria: document delta is treated as entitlement by default.
-- Decision unlocked: whether ScopeSignal deserves a near-term commercial pilot.
-- Next action: build synthetic end-to-end change-state corpus.
+- Capabilities: CAP-001, 006, 007.
+- Status: **READY** synthetic; **BLOCKED_EXTERNAL** for commercial proof.
+- Hypothesis: design/field changes can be traced through measurement, contract/work-order authority, notice, bill/certification, retention and independently cleared cash without inventing entitlement.
+- Inputs: synthetic project with 20–50 changes; wrong work-order ownership; over-measurement; draft/rejected/approved measurement; wrong billing period; concurrent quantity claim; superseded baseline; retention error; Payment Entry/bank-reconciliation divergence; later reversal.
+- Comparator pattern: Nirman approved-measurement-derived billing vs `mradul010/construction_management@ce345579...` server-reloaded work-order/PO quantity/rate bounds. Neither is accepted as complete truth by itself.
+- Success: all unsupported/draft/rejected/over-limit states remain nonbillable/REVIEW; authoritative line ownership and cumulative quantity hold; internal `Approved/Paid/Reconciled` never substitutes for independent cleared-cash evidence.
+- Failure: caller-entered quantity creates authority, internal accounting status is treated as bank finality, or design delta is treated as entitlement.
+- Next action: run the cross-implementation adversarial corpus; search again only if a concrete unbypassable measurement/certification or cash-finality gap remains.
 
-### EXP-006 — CaptureBrief 10-solicitation authority benchmark
+### EXP-006 — CaptureBrief 10-solicitation packet/authority benchmark
 - Opportunity: CaptureBrief FAR-Deviation Readiness.
-- Capabilities: CAP-002, 007, 011.
-- Status: **READY** using current public authoritative sources.
-- Hypothesis: source packet/history + FAR/deviation + entity/award lineage materially improves analyst decision quality and rule currency when amendment/version history is deterministic and source failure cannot silently become “no change.”
-- Inputs: 10 current solicitations with authoritative source artifacts, frozen amendment/version sequence, entity/award identifiers and source-run metadata; add planted out-of-order amendment, missing-history and source-failure cases in a synthetic companion fixture.
-- Procedure: freeze every source artifact/version -> normalize deterministic history/events -> prove idempotent rerun -> resolve packet/amendment order -> apply current FAR/supplement/deviation authority -> resolve entity/award lineage -> manually verify outputs. Use the `contract-delta-au` history/event model only as an architecture pattern; do not import its Australian procurement semantics as U.S. authority.
-- Success criteria: packet completeness, exact source citations, correct amendment ordering, byte-/event-stable idempotent reruns, explicit missing-history/source-failure state, correct current rule/deviation applicability and no false incumbent/entity joins after manual verification.
-- Failure criteria: stale or misapplied authority, missing/out-of-order amendments silently accepted, source failure treated as no change/no record, nondeterministic history, or confident unresolved joins.
-- Decision unlocked: whether CaptureBrief can sell rule-currency/readiness diagnostics now and whether deterministic source-version lineage materially improves trust over latest-row ingestion.
-- Next action: select 10 live solicitations, freeze the evaluation rubric and build the small planted amendment/history-failure companion fixture before reviewing outputs.
+- Capabilities: CAP-002, 007, 011, 019.
+- Status: **READY**.
+- Hypothesis: separate deterministic planes for notice/version history, attachment state, immutable artifacts, current rule/deviation authority and entity/award lineage materially improve packet completeness and analyst trust over latest-row ingestion.
+- Inputs: 10 current solicitations; official notice/action/history; attachment manifests; public attachments where access is authorized; FAR/supplement/deviation sources; entity/award IDs; source-run metadata; planted out-of-order/missing history, attachment disappearance/deletion and source-failure cases.
+- Architecture: official SAM/Data Services for notice/action lineage; public SAM attachment-manifest state as a separate plane; immutable downloaded artifact hashes; deterministic history/event hydration; explicit source degradation. `chrisfulcher/orrery@89ae2218...` is a strong implementation reference for manifest/currentness and fail-closed shape drift, not sole authority.
+- Success: exact packet completeness for the frozen rubric; correct amendment ordering; append-only/lossless manifest history or equivalent; byte/event-stable reruns; source failure cannot become no-change/no-record; correct current rule/deviation applicability; no false entity/incumbent joins.
+- Failure: bulk/version history assumed attachment-complete, disappeared/deleted attachment silently lost, undocumented manifest shape yields clean empty result, stale authority applied, or confident unresolved join.
+- Next action: freeze the 10-solicitation rubric and add historical manifest snapshots/diff rules before analyst scoring.
 
-### EXP-007 — Governed lab campaign + sequencing-operations shadow test
-- Opportunity: Installed-Base Lab Automation / Governed Campaign Shadow Audit / Sequencing Operations Evidence.
+### EXP-007 — Installed-base sequencing/lab handoff acceptance
+- Opportunity: Installed-Base Lab Automation.
 - Capabilities: CAP-013, CAP-017 plus governance/provenance components.
 - Status: **READY** for rights-clean synthetic tests.
-- Hypothesis: governance/provenance improves replay and fail-closed behavior, and a concrete Clarity -> InterOp -> provenance profile can link workflow state to sequencer operational evidence without sequence-content analysis or PHI.
-- Inputs: (A) closed-loop synthetic campaign with invalid-action traps and recoverable failures; (B) synthetic Clarity QC/pooling/run-prep workflow, lawful/public InterOp fixtures, stable synthetic run/workflow identity and provenance store.
-- Procedure: run a plain optimizer/control baseline and governed campaign; separately execute Clarity state transitions, attach InterOp operational metrics, replay the same run, and inject invalid transition, missing/mismatched run identity, missing metric artifact and run-metric exception cases.
-- Success criteria: governed path lowers invalid actions or improves replay completeness without unacceptable objective loss; sequencing profile deterministically links workflow/run evidence, rejects mismatched identities/transitions, preserves unknown states and requires no sequence reads/PHI.
-- Failure criteria: governance adds cost without measurable safety/quality gain; sequencing evidence silently joins the wrong run, turns missing evidence into success, or requires sensitive sequence/patient data for the proposed operations wedge.
-- Decision unlocked: whether Installed-Base Lab Automation should move from generic platform integration to a concrete sequencing-core implementation service.
-- Next action: build the synthetic S4 Clarity + Illumina InterOp + provenance acceptance fixture before seeking any customer environment.
+- Hypothesis: a concrete Clarity -> sample-sheet/run identity -> InterOp -> provenance chain can improve workflow evidence without sequence-content/PHI dependence; standards facades over installed instruments are useful only when real actuation, acceptance and ownership are proven.
+- Inputs: synthetic Clarity QC/pooling/run-prep state, generated sample sheet, lawful/public InterOp fixtures, stable run identity, invalid transition, missing/mismatched identity, missing metric artifact and run-metric exception.
+- Success: deterministic workflow/run linkage, independent sample-sheet validation, rejection of mismatched identities/transitions, explicit unknowns and replayable provenance.
+- Failure: wrong run joined, missing evidence turns green, sensitive reads/PHI become required, or a standards facade is mistaken for safe control without command arbitration/HITL evidence.
+- Next action: build S4 Clarity + sample-sheet validator + InterOp synthetic handoff. LADS/CETONI remain WATCH until hardware-in-loop/regression and single-actuation authority are demonstrated.
 
-### EXP-008 — Industrial virtual pre-FAT bind + protocol-state benchmark
+### EXP-008 — Industrial virtual pre-FAT differential benchmark
 - Opportunity: Industrial Pre-FAT / Virtual Commissioning.
 - Capabilities: CAP-014.
-- Status: **READY** with rights-clean synthetic configuration/profile.
-- Hypothesis: configuration/profile-derived virtual industrial endpoints can catch binding/type/state/fault defects before hardware when validated against independent clients/implementations rather than self-agreement.
-- Inputs: (A) synthetic L5K-like export with planted missing tags, type drift, UDT/array mismatch and fault behaviors; (B) a frozen rights-clean SECS/GEM dialogue/profile containing communication/control-state transitions, variables/constants, event reports, alarms, remote commands, bounded spooling and Stream-9/error cases.
-- Procedure: instantiate the PLC/OPC profile and run independent client/binding checks; separately run the identical SECS/GEM dialogue/error corpus against Dreamine.Gem and one unrelated implementation/simulator, recording every semantic disagreement. Keep current SEMI/vendor conformance outside the claim unless separately established.
-- Success criteria: all planted PLC binding/type defects detected; valid bindings preserved; SECS/GEM state/error outcomes are reproducible and every cross-implementation disagreement is classified as profile ambiguity, implementation defect or unresolved standard/vendor-authority question.
-- Failure criteria: namespace/type/state semantics diverge enough to create false confidence; same-family agreement is used as independent proof; implementation agreement is mislabeled formal standards conformance; or missing/error states silently become success.
-- Decision unlocked: whether to package a fixed-price pre-FAT regression service spanning controller binding and stateful industrial protocol acceptance rather than a single PLC emulator demo.
-- Next action: build the small synthetic machine namespace plus frozen SECS/GEM dialogue/error corpus and identify one unrelated legal/public simulator or implementation for the differential pass.
+- Status: **READY**.
+- Hypothesis: customer/profile-derived virtual endpoints can catch binding/type/state/fault defects before hardware when independently differential-tested.
+- Inputs: synthetic L5K/PLC namespace with planted drift; frozen SECS/GEM dialogue/error profile; Dreamine.Gem and unrelated `bparzella/secsgem` implementation; duplicate-event/EC atomicity probe.
+- Success: all PLC defects detected; valid bindings preserved; every SECS/GEM disagreement classified as profile ambiguity, implementation defect or unresolved standards/vendor question; missing/error states cannot silently pass.
+- Failure: same-family self-agreement used as proof, implementation agreement labeled formal conformance, or a disagreement is hidden by generic success.
+- Next action: execute the frozen Dreamine <-> secsgem corpus before any third-engine search.
 
 ### EXP-009 — Permit intelligence multi-jurisdiction benchmark
 - Opportunity: Permit-to-Development Opportunity Intelligence / PermitPlate.
-- Capabilities: CAP-002, 012.
-- Status: **READY** using lawful public jurisdiction feeds.
-- Hypothesis: canonical versioned permit events plus parcel/economic context can outperform raw permit lead lists on reliability and actionability.
-- Inputs: three jurisdictions with different source systems and 30–100 held-out permit events.
-- Success criteria: high source completeness, correct field semantics, stable identity/versioning and useful development/opportunity features with source dates.
-- Failure criteria: semantic mapping errors, duplicate/version confusion or unsupported economic inference.
-- Decision unlocked: whether to deepen PermitPlate into a generalized permit-to-opportunity engine.
-- Next action: select three heterogeneous jurisdictions and freeze source-field truth set.
+- Capabilities: CAP-002, 012, 019.
+- Status: **READY**.
+- Hypothesis: canonical versioned permit events plus explicit source observation and parcel/economic context outperform raw lead lists on reliability/actionability.
+- Inputs: three heterogeneous jurisdictions, 30–100 held-out permit events, source-run completeness/freshness metadata.
+- Success: source completeness established; correct field semantics; stable identity/versioning; source outage never becomes verified-empty; useful buyer features carry source dates.
+- Failure: semantic mapping errors, duplicate/version confusion, empty-success, unsupported economic inference.
+- Next action: freeze source-field truth for three jurisdictions.
 
 ### EXP-010 — Money-state integrity common month
 - Opportunity: Money-State Integrity / Close Assurance.
 - Capabilities: CAP-006, 016.
 - Status: **READY**.
-- Hypothesis: one generalized event-to-accounting truth boundary can underpin multiple vertical assurance businesses.
-- Inputs: synthetic month of orders/usage/invoices/credits/payments/journals with planted missing, duplicate, unbalanced and period-lock faults.
-- Success criteria: operational and accounting planes reconcile on correct cases and expose every planted disagreement with source lineage.
-- Failure criteria: vertical-specific semantics make the generalized boundary too lossy.
-- Decision unlocked: whether to make this a platform component under AP, commissions, telecom, utilities and marketplaces.
-- Next action: define canonical event/money-state schema and run two independent implementations, including automated idempotency/refund/reversal/outbox failure cases before relying on any untested payment core.
+- Hypothesis: a generalized operational-event -> accounting -> external-settlement boundary can underpin multiple assurance verticals.
+- Inputs: synthetic month of contracts/orders/usage/invoices/credits/payments/journals with planted duplicates, reversals, outbox/webhook failures, unknown provider result, period-lock fault and later external return.
+- Success: operational/accounting planes reconcile where correct; every planted disagreement is surfaced; external contract authority and PSP/bank readback can contradict the internal system.
+- Failure: one system grades its own contract/payment state as external truth or vertical semantics become too lossy.
+- Next action: run two independent implementations against one canonical event/money-state corpus before adding another payment/billing engine.
 
 ### EXP-011 — Subrogation rule-and-quantum fail-closed benchmark
 - Opportunity: Insurance Subrogation Recovery Diagnostic.
-- Capabilities: CAP-001, CAP-006, CAP-007 plus deterministic recovery-quantum workflow under evaluation.
-- Status: **READY** for synthetic technical validation; **BLOCKED_EXTERNAL** for commercial outcome proof.
-- Hypothesis: a Recoupe-style workflow can prioritize defensible recovery opportunities only if jurisdiction/policy authority is explicit, versioned and fail-closed rather than inferred from illustrative/default rules.
-- Inputs: fully synthetic closed claims covering paid-loss composition, comparative/contributory fault regimes, policy limits, made-whole/deductible handling, limitations windows, missing/conflicting authority and settlement outcomes. Any legal/rule values in the benchmark must be deliberately authored test fixtures unless separately sourced as current authority.
-- Procedure: freeze facts -> freeze explicit synthetic rule-pack version -> calculate quantum -> proof/evidence gate -> demand/negotiation state -> synthetic settlement. Include unknown jurisdiction, missing rule, superseded rule, conflicting rule and unsupported policy-language cases.
-- Success criteria: exact deterministic quantum on supported cases; every unknown/conflicting/missing authority case remains REVIEW/$0 asserted recovery; no generic jurisdiction fallback silently creates money; settlement state remains distinct from calculated opportunity.
-- Failure criteria: an illustrative/default legal rule yields a hard-dollar recovery assertion, LLM output controls authoritative money/legal state, or calculated recovery is mislabeled as realized settlement.
-- Decision unlocked: whether the subrogation architecture merits a future customer-authorized closed-claim diagnostic after authoritative rule packs are supplied.
-- Next action: replace repository illustrative rule data with explicit synthetic benchmark rules first; only then test a separately sourced/current rule pack or buyer-authorized closed claims.
-
-## Portfolio rule
-Do not start another product build merely because a new repository is exciting. First ask whether it changes one of these experiments, creates a better experiment, or invalidates an existing hypothesis.
-
-<!-- INTEGRATOR-R11-2026-09-20T0856-0400 -->
-## Stage-gate delta — 2026-09-20 08:56 ET
-- **EXP-001 Freight Recovery:** add a rights-clean planted 210/812/820 settlement corpus inspired by `lailarallc/edi-reconciliation-tool`: multi-RMR, partial payment, duplicate invoice number, credit-after-dispute, overpayment, orphan remittance and split settlement. Only issued adjustment + uniquely allocated settlement may become realized recovery; all ambiguous cases remain $0 realized. This does not replace the BLOCKED_EXTERNAL customer-authorized frozen population.
-- **EXP-002 AP Leakage:** add explicit PO/GR source states `PRESENT`, `VERIFIED_EMPTY`, `UNAVAILABLE`; adapter failure must never masquerade as missing PO/GR. Add a bitemporal sequence PO → partial receipt → invoice → later receipt → credit/correction and prove the original decision replay remains stable while corrected valid-time state appears only where intended.
-- **EXP-003 Commission Payout:** add ambiguous-create-timeout, lost webhook/stale processing, terminal reject, duplicate retry, provider-paid/local-failed contradiction, refund after paid/zero balance, multi-payee partial refund and liability-vs-provider-balance divergence. Remaining success gate: map provider-success to actual bank/payroll settlement plus later return/reversal and amount/currency/trace lineage.
-- **EXP-005 ScopeSignal:** add accepted vs non-accepted contract, inactive/missing line item, out-of-period measurement, duplicate target, cumulative over-measure, draft/intermediate/rejected/approved measurement and separately created bill. Prove only the intended workflow state can influence authoritative billed quantity.
-- **EXP-006 CaptureBrief:** compare 10 live civilian/DoD solicitations across latest public API versus Data Services/history/version artifacts and attachment inventories. Fail closed on incomplete history, archive lag, source/access failure or missing attachment lineage. Add Published-vs-Deleted subcontract source cases.
-- **EXP-008 Industrial pre-FAT:** freeze a rights-clean intersection corpus for communication/control state, S1F13/F14, status variables, common reports/alarms/remote commands, terminal/error cases and HSMS select/reconnect/timeout behavior; run Dreamine.Gem against `bparzella/secsgem` and classify every disagreement without presuming either engine authoritative.
-
-<!-- INTEGRATOR-R11-SHADOW-COM-2026-09-20T0914-0400 -->
-## New technical stage gate — external-authority revenue-to-receivable trace
-- **Hypothesis:** Wingcaster-style internal money-state coherence remains correct when contract and settlement truth are supplied by independent frozen sources the system under test cannot manufacture.
-- **Inputs:** synthetic/authorized signed contract + amendment timeline; usage events crossing effective-date boundaries; expected invoice; processor/bank settlement/readback; returned/reversed payment; amount/currency/trace identifiers.
-- **Negative cases:** wrong ACTIVE contract despite newer signed amendment, missing amendment, stale provider success, payment recorded internally but absent externally, duplicate allocation, partial/unapplied cash, refund after paid, bank return after provider-paid, currency mismatch and reconciliation checks computed from the same bad internal fact.
-- **Success:** exact contract version and receivable lineage replay; every planted contradiction blocks GREEN/settled status; externally confirmed money alone counts as settled. Do not call this commercially validated until an authorized external population is recorded in OUTCOMES.md.
-
-<!-- INTEGRATOR-R12-2026-09-20T0946-0400 -->
-## Stage-gate delta — 2026-09-20 09:46 ET
-- **EXP-001 Freight:** add immutable issued claim + exact unique auto-allocation + explicit reviewed pairwise partial/split allocation + reversal. Plant duplicate event, alternate feasible allocation, partial, excess, wrong payee/currency/time, stale decision and reversal. Only non-reversed independently sourced allocated settlement counts as realized; external buyer population remains the blocker.
-- **EXP-002 AP:** implement CAP-019 receipts for PO/GR/invoice sources. Require one receipt per `{source, object/query-window, run}` with health, count/hash/cursor. Failed/auth/unreachable source -> `UNAVAILABLE`; completed zero -> `VERIFIED_EMPTY`; cursor advances only after durable load. Replay through the bitemporal correction and Nomenklatura→Canon identity lifecycle.
-- **EXP-003 Commission:** add provider-success followed by ACH Return Entry joined by `OriginalTrace`, duplicate reissue while return state unresolved, unmatched trace, amount/currency mismatch, missing/stale return feed and independent CAMT/MT940 readback. Finality requires traceable external observation; source-degraded remains UNKNOWN.
-- **EXP-004 Recovery Proof:** add Mukuroji-style non-Postgres cases: correct counts but wrong relationship/value, stale restore point, wrong S3 object version, metadata mismatch and substituted cleanup receipt. Add a nearai-style verifier mutation: deliberately break one assertion/helper and require CI/e2e to fail before any green recovery proof is trusted.
-- **EXP-005 ScopeSignal:** use DIGIT purchase bill as negative control and Nirman RA bill as positive-but-flawed control. Plant DRAFT/VERIFIED/REJECTED/APPROVED measurements, DRAFT vs ACTIVE work order, wrong eligible work-order ownership, before/inside/after bill period, concurrent double claim, superseded baseline and internal `PAID` without external clearing.
-- **EXP-006 CaptureBrief:** add 25 DHS APFS records with multiple source-native Change Log events and compare against polling/archive output; normalize leading `*` as change marker rather than identity. Add SAM alert-overlap cases where otherwise successful queries must be `source_degraded`, plus the existing 10-solicitation latest-vs-history/attachment benchmark.
-- **EXP-007 Sequencing:** use a synthetic/mock Clarity process + synthetic run directory and require distinct failures for no run match, ambiguous run match, missing RunParameters/RunInfo, InterOp parse/metric failure, sample-sheet collision, unknown-platform chemistry and LIMS writeback failure. Preserve each as separate evidence state.
-- **EXP-008 Industrial:** freeze and execute the existing 10-case Dreamine↔secsgem intersection plus `EC-ATOMIC-PROBE`. Do not search another generic engine until a concrete disagreement requires a third oracle.
+- Capabilities: CAP-001, 006, 007.
+- Status: **READY** synthetic; **BLOCKED_EXTERNAL** commercial.
+- Hypothesis: recovery opportunities can be prioritized safely only when jurisdiction/policy authority is explicit, versioned and fail-closed.
+- Inputs: synthetic paid-loss facts, comparative/contributory fault regimes, policy limits, made-whole/deductible handling, limitations periods, missing/conflicting/superseded authority and synthetic settlement outcomes.
+- Success: exact supported quantum; every unknown/conflicting/missing authority = REVIEW/$0; settlement remains distinct from calculated opportunity.
+- Failure: illustrative/default legal rule or model output creates hard-dollar assertion.
+- Next action: complete explicit synthetic rule-pack benchmark before any customer claim period.
 
 ### EXP-012 — Outcome-priced grid resilience calibration
-- Opportunity: Grid / Infrastructure Risk & Inspection.
-- Status: **READY** for USECPO historical benchmark; later EAGLE-I 2025 use remains rights-dependent.
-- Hypothesis: a frozen risk/inspection/restoration policy can beat highest-risk-first, nearest-route and scheduled baselines on the same event population when scored on outage outcomes and expected interruption consequence per crew-hour.
-- Inputs: USECPO v2 event-correlated outcomes; frozen model/policy inputs; separately governed interruption-cost model/service; optional 2025 holdout only after rights are established; independent regulator/live spot checks for circularity.
-- Success: materially better held-out outcome/calibration and consequence-per-crew-hour with uncertainty reported; false negatives and missing-data sensitivity explicit.
-- Failure: advantage disappears against simple baselines, depends on overlapping EAGLE-I truth, or economic score is presented as observed avoided dollars without independent outcome evidence.
-- Decision unlocked: whether grid risk/inspection intelligence deserves a buyer pilot rather than more repository/data hunting.
+- Opportunity: Grid/Infrastructure Risk & Inspection.
+- Capabilities: CAP-015 plus optimization/routing components.
+- Status: **READY with dataset-artifact/rights constraints**.
+- Hypothesis: a resilience policy can demonstrate same-input advantage only when evaluator ancestry, construct and independence are explicit and predictions are frozen before prospective challenge.
+- Historical plane: USECPO v2 (CC BY 4.0) as event-correlated benchmark; exact v2 ZIP/guideline schema/event keys must be inspected before implementing a manifest. Use whole-event blocking and chronology preservation; record EAGLE-I ancestry.
+- Independent/challenge plane: Michigan MPSC as strong regulator evidence subject to restrictive commercial reuse terms; NYC 311 only as construct-validity negative control, not utility-outage oracle; California OES public-domain live utility-map feed for prospective post-freeze challenge, not history.
+- Success: model/policy beats simple baselines on frozen same-event outcomes without leakage; evaluator lineage/construct are explicit; proxy agreement is not called independent validation; modeled interruption dollars remain separate from observed outage outcome.
+- Failure: related EAGLE-I descendants counted as independent validators, citizen-report proxy treated as grid truth, or rights-constrained evidence embedded commercially without permission.
+- Next action: obtain/inspect the exact USECPO v2 artifact schema, then freeze splits/evaluator ancestry and run simple-vs-optimized comparisons; only search for another dataset if a genuinely independent, commercially reusable historical oracle remains necessary.
+
+## Portfolio rule
+Do not start another product build because a repository is exciting. New search/build effort must close a named experiment gap, create a cheaper falsifier, or respond to a recorded outcome. When an experiment completes, mirror it in `OUTCOMES.md` and `intelligence/outcomes.jsonl` with originating search-run/capability links.
