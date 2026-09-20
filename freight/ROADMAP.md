@@ -62,11 +62,11 @@ v15.8 governance CI: Freight run `35528127691` and Technology Intelligence run `
 
 Technology Intelligence workflow now separates read-only validation from main-only write persistence and pins checkout/setup-python to immutable SHAs.
 
-Deployment evidence collected 2026-09-20: Netlify SSO-all is configured, but **Netlify team MFA is not enforced**, no Freight multi-tenant backend/data plane was discovered, and no production parser runtime was discovered. Cross-tenant isolation and parser sandboxing therefore remain **unproven**, not passed.
+Deployment evidence collected 2026-09-20: Netlify SSO-all is configured, but **Netlify team MFA is not enforced**, no Freight multi-tenant backend/data plane was discovered, and no production parser runtime was discovered. Cross-tenant isolation and parser sandboxing therefore remain **unproven**, not passed. The deployment evidence snapshot expires after **2026-09-27** and must be recollected earlier after relevant control/deployment changes.
 
 Current launch classification: **Netlify deployed customer-data pilot = BLOCKED**; **separate controlled environment = CONDITIONAL pending evidence**. The protected Netlify site is a demo/control shell until those gates change.
 
-The separate/manual route stays **CONDITIONAL** until a VERIFIED environment manifest proves MFA, encryption, scoped access, read-only ingestion, retention/deletion, Netlify data exclusion, and any applicable tenant/parser controls.
+The separate/manual route stays **CONDITIONAL** until a VERIFIED environment manifest proves MFA, encryption, scoped access, read-only ingestion, retention/deletion, Netlify data exclusion, and any applicable tenant/parser controls with SHA-256 receipts and a <=90-day evidence-validity window.
 
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
@@ -84,6 +84,7 @@ The separate/manual route stays **CONDITIONAL** until a VERIFIED environment man
 2. When a real Freight customer data plane is deployed, run two-tenant negative isolation tests and record provider/project IDs.
 3. When a production parser runtime is deployed, record/test CPU, memory, timeout, network-egress and credential-isolation controls.
 4. Capture an independent unauthenticated black-box SSO/access probe when a capable probe path is available.
+5. Recollect the Netlify deployment evidence no later than 2026-09-27, and sooner after relevant access/deployment changes.
 
 ### Stop
 - no new generic freight repositories;
