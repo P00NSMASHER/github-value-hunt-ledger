@@ -7,7 +7,7 @@ This report measures whether the learning loop has enough structured evidence to
 - Mean search-run field completeness: **88.9%**
 - Runs below 70% completeness: **0**
 - Structural issues detected: **0**
-- Capabilities without an explicit next falsifiable test: **14**
+- Capabilities without an explicit next falsifiable test: **0**
 
 ## Missing recommended fields
 
