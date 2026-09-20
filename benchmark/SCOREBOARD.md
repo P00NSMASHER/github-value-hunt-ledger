@@ -11,22 +11,22 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | 1 | 01-08 | 3 | 0 | 0 | — | — | 0 | 0 | — |
 | 2 | 09-15 | 3 | 3 | 3 | 25.0 | 25.0 | 0 | 0 | Tie |
 | 3 | 16-22 | 4 | 2 | 2 | 23.0 | 24.5 | 0 | 0 | Experiment |
-| 4 | 23-29 | 3 | 3 | 3 | 24.7 | 24.0 | 0 | 0 | Control |
+| 4 | 23-29 | 4 | 4 | 4 | 24.75 | 24.25 | 0 | 0 | Control |
 | 5 | 30-36 | 4 | 4 | 4 | 24.25 | 24.75 | 0 | 0 | Experiment |
 | 6 | 37-43 | 3 | 4 | 3 | 25.0 | 25.0 | 0 | 0 | Tie |
-| 7 | 44-50 | 4 | 2 | 2 | 24.5 | 24.5 | 0 | 0 | Tie |
+| 7 | 44-50 | 5 | 3 | 3 | 24.33 | 24.67 | 0 | 0 | Experiment |
 
 ## Experiment-wide matched metrics
-- Matched tasks scored: **17** — 09, 10, 11, 16, 17, 23, 24, 25, 30, 31, 32, 33, 37, 38, 39, 44, 45.
+- Matched tasks scored: **19** — 09, 10, 11, 16, 17, 23, 24, 25, 26, 30, 31, 32, 33, 37, 38, 39, 44, 45, 46.
 - Control matched mean: **24.47/25**.
-- Experiment matched mean: **24.65/25**.
-- Mean paired difference (Experiment - Control): **+0.18**.
+- Experiment matched mean: **24.68/25**.
+- Mean paired difference (Experiment - Control): **+0.21**.
 - Median paired difference: **0.0**.
-- Pairwise task win / tie / loss for Experiment: **3 / 10 / 4**.
+- Pairwise task win / tie / loss for Experiment: **4 / 11 / 4**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
 - No-find results: **0 Control / 0 Experiment** among scored results.
-- Approximate search effort per validated STRONG result: **Control ~11 reported search/deep-inspection units; Experiment ~11–12**. Directional only because result files mix query counts, discovery modes, triage counts and deep inspections.
-- Learning slope: **still not robustly distinguishable in score, but mildly positive directionally**. Among experiment pairs with >=2 matched/completed tasks, Pair 2 is 25→25→25, Pair 3 is 24→25, Pair 4 is 23→25→24, Pair 5 is 25→25→24→25, Pair 6 is 25→25→25→25, and Pair 7 is 24→25. Median early-to-late within-pair change remains approximately **+0.5 points**, but ceiling effects dominate. Qualitative reusable-method transfer is stronger: 09→10→11, 16→17, 30→31→32, 37→38→39→40, and 44→45.
+- Approximate search effort per validated STRONG result: **Control ~10–11 reported search/deep-inspection units; Experiment ~11–12**. Directional only because result files mix query counts, discovery modes, triage counts and deep inspections. Task 26 again shows the Experiment arm spending more inspection effort to reach the same full task score; Task 46 shows that extra red-team effort can also improve rejection calibration.
+- Learning slope: **still not robustly distinguishable in score, but mildly positive directionally**. Among experiment pairs with >=2 matched/completed tasks, Pair 2 is 25→25→25, Pair 3 is 24→25, Pair 4 is 23→25→24→25, Pair 5 is 25→25→24→25, Pair 6 is 25→25→25→25, and Pair 7 is 24→25→25. Median early-to-late within-pair change remains approximately **+0.5 points**, but ceiling effects dominate. Qualitative reusable-method transfer is stronger: 09→10→11, 16→17, 25→26, 30→31→32, 37→38→39→40, and 44→45→46.
 
 ## Scored task details
 Scores below preserve all previously scored results and add newly completed unscored results.
@@ -54,6 +54,8 @@ Scores below preserve all previously scored results and add newly completed unsc
 | 24 | EXPERIMENT | 25 | 5/5/5/5/5 | `Arpita2919/RailSync@f82d600f62fc355fd755ca3e6d457c384a300c4a` | No | No | Exact target plus explicit hard-lock-vs-warm-start falsification; resource/production limits preserved. |
 | 25 | CONTROL | 25 | 5/5/5/5/5 | `panoskom/PPDM_framework@4fbca1dfc28280d0e6428b22c796e15c4f305ccd` | No | No | Exact target; scarce slots, hold/imperfect-repair/replace actions, uncertainty/deferral and VoI surfaces were traced into source and paper evidence, while runtime-enforcement/data-artifact limitations were explicitly disclosed. |
 | 25 | EXPERIMENT | 24 | 5/5/4/5/5 | `panoskom/PPDM_framework@4fbca1dfc28280d0e6428b22c796e15c4f305ccd` | No | No | Exact target and superior runtime-side-effect tracing, but WATCH is slightly over-conservative relative to the benchmark capability: the repository does implement the requested mechanism family even though deferral/observation-skipping are weaker than the paper wording. |
+| 26 | CONTROL | 25 | 5/5/5/5/5 | `airsim/rmol@6a51f9b90d361a115e39aa57a3329d7723af717f` | No | No | Exact target; booking/availability censoring, EM unconstraining, forecasting, EMSR and Monte-Carlo protection/booking-limit control are source verified, while the nonfunctional DP path, stub tests and research-not-production posture are explicitly bounded. |
+| 26 | EXPERIMENT | 25 | 5/5/5/5/5 | `airsim/rmol@6a51f9b90d361a115e39aa57a3329d7723af717f` | No | No | Exact target with deeper dispatch-to-body tracing: the real Monte-Carlo path survives, while the advertised DP service terminates in empty/commented code and forecast/unconstraining tests are hard-coded passes. Calibration remains STRONG only for the implemented chain. |
 | 30 | CONTROL | 22 | 4/4/4/5/5 | `levi-qiao/longgraph-skill@b27376fd44f30505cbc52c2520c42e725b028ea1` | No | No | Strong conceptual match, but primarily a Markdown/file control plane rather than an executable orchestration runtime. |
 | 30 | EXPERIMENT | 25 | 5/5/5/5/5 | `AMAP-ML/LongHorizon-Harness@a1dd930614972b92361c1b9cd6aac441a6db5a65` | No | No | Exact target; fail-closed completion guards, auditor mutation handling, original-contract checks, durable resume and hardening tests verified. |
 | 31 | CONTROL | 25 | 5/5/5/5/5 | `openai/symphony@be10a1b79df723d6d7612b5651c8522704dafb2e` | No | No | Exact target; issue-state reconciliation, retry/backoff, per-issue workspaces, proof surfaces and broad tests verified with trusted-environment limits preserved. |
@@ -74,7 +76,9 @@ Scores below preserve all previously scored results and add newly completed unsc
 | 45 | CONTROL | 24 | 5/5/4/5/5 | `DNYoussef/guardspine-spec@4b21006daa82af52647c5b6e4288d995ccbaf401` + companion verifier | No | No | Exact evidence-interoperability component with strong malformed/tamper/signature checks; one calibration point withheld because trusted-key policy/external adoption remain separate. |
 | 45 | EXPERIMENT | 25 | 5/5/5/5/5 | `capxholding/swarrm-verify@d3e52abfaf2b0025db87b5aa491db2001902267f` | No | No | Demonstrably superior equivalent: normative portable contract, offline verifier, hostile/golden/fuzz vectors, explicit completeness UNKNOWN/strict mode, and a genuinely separate implementation whose differential testing caught a real spec/crypto bug. External trust/global completeness limits are sharply bounded. |
 | 46 | CONTROL | 24 | 5/5/5/4/5 | `Kjudeh/railway-postgres-backups@1949082f892f62fe47764f490683795d85a6dedd` | No | No | Demonstrably equivalent negative-control result: fail-open SQL restore behavior, zero-table default acceptance, non-blocking row-count failure and placeholder verification SQL justified REJECT despite polished claims. |
+| 46 | EXPERIMENT | 25 | 5/5/5/5/5 | `zephyrcore/BackupAttest@30ad45cf12c7b731824d6d12fb1723dc2fd11727` | No | No | Demonstrably superior equivalent negative-control result: clean/exit-0 can be unlocked by self-reported `verified=yes` and `ok` fields without reading backup bytes or restoring, drill identity is not cross-checked, and RPO counts an orphan state that chain logic rejects. Correctly calibrated REJECT with a narrow hygiene-only residual use. |
 | 47 | CONTROL | 25 | 5/5/5/5/5 | `aiparallel0/freight-audit@e7869162cf9cb23f6d520a0cd71f87cf973d8c28` | No | No | Demonstrably equivalent negative-control result: missing/unparseable contract authority collapses to zero entitlement, provisional findings feed savings/value meters, and overlapping findings double-count money; REJECT is fully justified by source/tests/CI. |
+| 48 | CONTROL | 25 | 5/5/5/5/5 | `mycomind4-arch/permitsignal@4a734615a8e388a98e085026a877b3bdfc1ac8b1` | No | No | Demonstrably equivalent negative-control result: configured landing pages cannot reach some authoritative external systems, the source model lacks completeness/freshness watermarks and PARTIAL/STALE semantics, and historical live evidence showed empty output under a fail-open workflow. Correctly rejected for production lead-intelligence use while preserving the ingest scaffold's limited value. |
 
 ## Retained-lesson / learning status
 - No benchmark lesson is promoted from a single task.
@@ -82,9 +86,10 @@ Scores below preserve all previously scored results and add newly completed unsc
 - **Promoted to SEARCH_SKILLS:** `Capability-Conjunction Search + Claim Tracing`, independently supported by Experiment Tasks **16 and 17**.
 - **Promoted to SEARCH_SKILLS:** `Acceptance-path transition inspection`, supported by Experiment Tasks **30 and 31** and reinforced on trusted-state promotion by Task **32**.
 - **Promoted to SEARCH_SKILLS:** `Ingestion invariant-triad intersection`, supported by Experiment Tasks **37 and 38**; Tasks **39 and 40** generalize the method into broader executable-invariant intersection without creating a duplicate central skill.
-- **Promoted to SEARCH_SKILLS this scoring cycle:** `Protocol-regression archaeology for pre-FAT systems`, independently supported by Experiment Tasks **39 and 40**.
-- **Promoted to SEARCH_SKILLS:** `Fail-open boundary archaeology`, independently supported by Experiment Tasks **44 and 45**.
-- Not yet separately promoted: Pair 4 state-machine + audit-log conjunction (Task 23 only); Pair 4 perturbation+hard-invariant scheduling (Task 24 only); Pair 4 decision-claim→runtime-side-effect trace (Task 25 only); Pair 5 descendant-cluster→canonical-spec pivot (Task 31 only); Pair 5 metrology traceability intersection (Task 33 only); Pair 7 contract→negative-vector→differential-implementation triangulation (Task 45 only); Pair 3 three-layer money-invariant verification (Task 17 only).
+- **Promoted to SEARCH_SKILLS:** `Protocol-regression archaeology for pre-FAT systems`, independently supported by Experiment Tasks **39 and 40**.
+- **Promoted to SEARCH_SKILLS:** `Fail-open boundary archaeology`, independently supported by Experiment Tasks **44 and 45** and now reinforced by reject-case Task **46**.
+- **Eligible and promoted this cycle:** `Decision-claim → runtime-side-effect trace`, independently supported by Experiment Tasks **25 and 26**. Both tasks showed that names, metrics, post-processing and test-file labels can overstate whether a claimed decision mechanism actually changes runtime execution.
+- Not yet separately promoted: Pair 4 state-machine + audit-log conjunction (Task 23 only); Pair 4 perturbation+hard-invariant scheduling (Task 24 only); Pair 4 censored-state→latent-state→control handoff (Task 26 only); Pair 5 descendant-cluster→canonical-spec pivot (Task 31 only); Pair 5 metrology traceability intersection (Task 33 only); Pair 7 contract→negative-vector→differential-implementation triangulation (Task 45 only); Pair 7 authority-origin/invariant-set consistency (Task 46 only); Pair 3 three-layer money-invariant verification (Task 17 only).
 
 ## Experiment-wide conclusion
-Too early for a winner claim. Across **17 matched tasks**, Experiment still has only a small mean advantage (**24.65 vs 24.47**), while the **median paired difference is 0** and task-level outcomes are **3 wins, 10 ties and 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is demonstrably producing reusable methods that transfer across domains, but it continues to consume at least comparable and probably somewhat higher search effort. The current evidence does **not** justify declaring the experimental architecture the winner; continue until substantially more matched tasks are available or the full 50-task benchmark completes.
+Too early for a winner claim. Across **19 matched tasks**, Experiment has a small mean advantage (**24.68 vs 24.47**), while the **median paired difference remains 0** and task-level outcomes are **4 wins, 11 ties and 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is demonstrably producing reusable methods that transfer across domains, including a newly validated decision-claim→runtime-side-effect trace, but it continues to consume at least comparable and probably somewhat higher search effort. The evidence still does **not** justify declaring the experimental architecture the winner; continue until substantially more matched tasks are available or the full 50-task benchmark completes.
