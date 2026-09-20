@@ -286,3 +286,20 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
 - Record candidate count, deep-inspection count, retained count and MASTER promotions when actually observed; never backfill guessed denominators.
 - Retrospective examples remain useful qualitative evidence but do not enter yield denominators unless the original run counts are recoverable.
 - Strategy promotion/retirement is outcome-driven and sample-gated; see `intelligence/README.md` and `intelligence/LEARNING_REPORT.md`.
+
+
+## Search-run v2 fields
+When a skill is used prospectively, the resulting `intelligence/search_runs.jsonl` event should capture:
+- `schema_version: 2`;
+- strategy ID and reusable query family;
+- literal search surfaces and queries;
+- candidate, deep-inspection, retention and MASTER-promotion counts;
+- candidate dispositions using standardized reason codes when practical;
+- created/strengthened capability IDs and affected experiment IDs;
+- whether a recall-rescue pass was used;
+- stop reason;
+- optional elapsed minutes and tool-call count.
+
+Before deep-inspecting a candidate that looks familiar, use `tools/ti_lookup.py` or equivalent ledger search. Reinspection is justified by a new revision, contradictory evidence, a new capability hypothesis or a named experiment gap—not merely rediscovery.
+
+The adaptive policy may allocate more research to promising strategies, but it must preserve exploration and must not treat recent runs without outcomes as failures.
