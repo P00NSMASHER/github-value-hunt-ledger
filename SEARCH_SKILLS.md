@@ -303,3 +303,17 @@ When a skill is used prospectively, the resulting `intelligence/search_runs.json
 Before deep-inspecting a candidate that looks familiar, use `tools/ti_lookup.py` or equivalent ledger search. Reinspection is justified by a new revision, contradictory evidence, a new capability hypothesis or a named experiment gap—not merely rediscovery.
 
 The adaptive policy may allocate more research to promising strategies, but it must preserve exploration and must not treat recent runs without outcomes as failures.
+
+
+## Search-run v3 measurement contract
+
+Every new prospective hunt should use `schema_version: 3`.
+
+- Keep the stable `STRAT:...` strategy ID.
+- Assign a reusable `QF:...` query-family ID for the underlying search hypothesis; literal queries remain separate evidence.
+- Record all search surfaces actually used.
+- Record candidate, deep-inspection, retained and MASTER denominators.
+- For every inspected candidate, use `reason_code_standard` from `intelligence/reason_codes.json` plus a precise `reason_detail`.
+- Record capability and experiment deltas explicitly.
+- Preserve no-find runs: they are legitimate denominator evidence when the search was genuinely executed.
+- Do not treat fractional outcome attribution as causal proof; it exists to prevent double-counting realized value across multi-origin discoveries.

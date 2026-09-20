@@ -6,7 +6,10 @@
     "strengthens_active_experiment",
     "independent_falsifier",
     "rare_data_or_protocol",
-    "large_build_compression"
+    "large_build_compression",
+    "authority_lineage_verified",
+    "state_transition_verified",
+    "independent_negative_control"
   ],
   "rejection": [
     "duplicate_or_dominated",
@@ -19,7 +22,12 @@
     "stale_authority",
     "unclear_buyer_or_wedge",
     "unsafe_or_sensitive",
-    "separately_governed_data_blocker"
+    "separately_governed_data_blocker",
+    "fail_open_boundary",
+    "authority_location_bypass",
+    "circular_evaluation",
+    "missing_completeness_proof",
+    "unsafe_retry_or_idempotency"
   ],
   "watch": [
     "needs_runtime_validation",
@@ -27,6 +35,9 @@
     "needs_current_authority",
     "needs_buyer_data",
     "rights_or_external_dependency_review",
-    "interesting_but_not_load_bearing"
+    "interesting_but_not_load_bearing",
+    "needs_exactly_once_reconciliation",
+    "needs_completeness_proof",
+    "needs_external_outcome"
   ]
 }
