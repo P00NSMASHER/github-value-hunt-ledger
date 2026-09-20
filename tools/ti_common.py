@@ -236,10 +236,12 @@ def status_bucket(status):
         return "quarantined"
     if "reject" in s or "deprior" in s:
         return "rejected"
-    if "master" in s or "elite" in s:
-        return "master"
     if "strong" in s:
         return "strong"
+    if "master" in s or "elite" in s:
+        if any(word in s for word in ("contender", "referral", "candidate", "watch")):
+            return "watch"
+        return "master"
     if "watch" in s:
         return "watch"
     return "unknown"
