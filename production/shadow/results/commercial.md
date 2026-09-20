@@ -423,3 +423,74 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** No new cross-lane referral. Existing provider/system-of-record readback referrals remain valid; this run partially answers them with a concrete Stripe test-mode pattern rather than creating a duplicate referral.
 
 **NEXT TEST:** Find or build evidence for **tier 5B**: a lawful public test/certification that kills the process immediately after a real sandbox/provider mutation, restarts against the same durable state, performs read-only provider reconciliation and proves zero duplicate money effects. Separately, test whether the same pattern exists for refunds/credits after captured money rather than only cancellation of an uncaptured PaymentIntent.
+
+## 2026-09-20 — Shadow run 7
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** A low-attention public repository exists with tier-5B evidence on captured money: a real provider/test-mode refund is accepted, the dedicated application worker is literally SIGKILLed after provider response but before local completion, a new process resumes from durable state, and provider-ground-truth readback/replay proves exactly one external refund object. Such evidence should materially exceed same-process/fresh-adapter ambiguity tests.
+
+**DISCOVERY METHODS:**
+1. Direct money-domain search for Stripe refunds, lost/unknown outcomes, process restart and idempotent reconciliation.
+2. Code-level fault-boundary search for `SIGKILL`, post-send/post-response crash seams, refund metadata lookup, stable idempotency keys and provider-ground-truth rereads.
+3. Analog/low-attention traversal through durable-workflow, fault-injection and exactly-once billing repositories, including repositories whose names do not advertise payments.
+
+**BEST CANDIDATE + URL + EXACT REVISION:** `az-said/Interlock` — https://github.com/az-said/Interlock — `822ec54692b30e1fdce04b55dfab62d0b56a60b2`.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `scenarios/stripe_dispute/worker.py` deliberately runs one refund step as its own OS process. `crash_point()` calls `os.kill(os.getpid(), signal.SIGKILL)`. In the `after` fault, `_send()` first returns from the Stripe refund request and then immediately SIGKILLs the worker, before the caller can record the result.
+- The first worker persists the decision in `STATE_DIR`; a restarted worker never asks the model again. The no-check baseline replays the same Stripe idempotency key; the careful baseline first looks up provider refunds carrying the case metadata; Interlock uses a deterministic effect key, provider lookup and durable hash-chained receipt/recovery state.
+- `experiments/scenario_stripe_dispute.py` launches the worker via a subprocess, requires the first process return code to equal `-signal.SIGKILL`, changes external Stripe state while that process is dead, then launches a genuinely new worker process and finally rereads Stripe's refund list as ground truth.
+- `scenarios/stripe_dispute/dispute.py` is test-mode-only and rejects non-test Stripe credentials through the underlying client. It creates a real $100 Stripe test PaymentIntent, issues a $20 refund with a stable idempotency key and metadata, escalates a Stripe test inquiry into a chargeback, and judges all refund objects—including failed refunds—rather than trusting local application state.
+
+**CHECKED-IN EXTERNAL EVIDENCE:**
+- `results/scenarios/stripe_dispute.json` and `.md` are revision-bound run artifacts generated 2026-09-13. They state every crash is a real SIGKILL and Stripe test mode is used; the JSON records `first_worker_exit: -9` for the tested cells.
+- In `crash_after_send_chargeback_during_outage`, all three systems converge to exactly **one** Stripe refund object after restart: no-check reports `REPLAYED_BY_STRIPE`, the hand-check baseline reports `FOUND_BY_LOOKUP`, and Interlock reports `COMMITTED_ON_QUERY`. The ground-truth reread finds no second refund object and no refund created at or after the chargeback.
+- The important economic caveat is also recorded: that refund object later reached `failed (charge_for_pending_refund_disputed)`, so no money was ultimately returned in that cell. The result therefore proves external-object exactly-once recovery across a real process death, not successful refund settlement.
+- A separate checked-in five-minute gap probe shows the opposite economic edge case: a $20 refund stayed `succeeded` and a later $100 chargeback still withdrew the full amount, leaving the merchant down $120 on a $100 payment in Stripe test mode. This is strong negative evidence that “exactly one refund object” is not sufficient to claim economic correctness.
+
+**SOURCE / TEST / HISTORY / RIGHTS VERIFICATION:**
+- Current `main` SHA independently verified as `822ec54692b30e1fdce04b55dfab62d0b56a60b2`.
+- Repository metadata at inspection: public, 1 star / 0 forks, MIT license.
+- Scenario history independently traces to commit `fe498692079dd251b88ac455e06c09dbc582f446` (2026-09-13), whose message explicitly says the suite runs live services with real SIGKILL and ground-truth readback and, importantly, says a fair handwritten check tied Interlock on outcomes while Interlock's consistent edge was tamper-evident receipts.
+- Frozen evidence manifest `sha256:f0eb1f1f3bc6386e4002207eb69f2d3f83e4442e70f9d747e31c5398e4c09527` binds the exact revision to:
+  - `results/scenarios/stripe_dispute.md` — Git blob `eb08f045feb06f0f765bcf1998227f39b9e2f4dd`
+  - `results/scenarios/stripe_dispute.json` — `855ab74c9e2d0dd57afd6a2015315600e4cb51f6`
+  - `scenarios/stripe_dispute/worker.py` — `4bd0fae8eb567bed59316cde01f0928687d56dd6`
+  - `experiments/scenario_stripe_dispute.py` — `771b4d33d6eed642a494243a5a028dd2571f6a37`
+  - `scenarios/stripe_dispute/dispute.py` — `47960cfce188a7e95ffca2bf767224d6542b4582`
+  - `LICENSE` — `f84454625104c633d7b7500f03202f6b4143f516`
+  - scenario-lineage commit `fe498692079dd251b88ac455e06c09dbc582f446`.
+- No repository code, Stripe mutation, credentials, contacts, spend or external commitments were executed in this shadow run.
+
+**COMPARATORS / FALSIFIERS:**
+- `temporal-community/agent-memory-and-state@59fb4186bc50daefe09653a850197a985b3fa1cf` is a strong source-design comparator. Its documented real Stripe test-mode demo seeds a succeeded payment, creates an idempotent refund, opens a post-effect restart window, exposes a CLI that SIGKILLs the Worker, and on replacement Worker attempt 2 reuses the same run-derived Stripe idempotency key. Its code also supports Stripe refund-list readback. I did not find an equally strong checked-in machine-readable completed tier-5B run artifact at the inspected revision, so it does not displace Interlock on evidence quality.
+- `getvelox/velox@3568ab3d540970dc0ad4f9dda3593ff924187acf` has excellent internal exactly-once billing failover tests: it SIGKILLs the billing leader at multiple commit positions, starts a successor and proves one invoice per subscription plus invariant-clean totals. Its payment provider in the failover proof is a sentinel, so it proves internal billing crash safety rather than external-provider refund ambiguity.
+- `dzaramelcone/reaper@6cb28ddb47ccd6526c4edf363ddcd3cc3d89f731` has real-process campaign machinery and explicit `STRIPE_REQUEST`/`STRIPE_RECEIVE` fault boundaries, but its documented ordinary Stripe provider tier uses Stripe's maintained mock image rather than real Stripe test-mode truth. It therefore ranks below the selected candidate on the external-outcome ladder for this hypothesis.
+
+**RED-TEAM OBJECTION:** Tier 5B is reached only for **provider-object convergence**, not settlement. The harness kills after Stripe's HTTP response has returned to the worker, not by dropping the network response before the client receives it; local state is still ambiguous because the worker dies before recording completion, but this is a narrower boundary than transport-level response loss. The checked-in run is self-authored and was not independently rerun here. Most importantly, the accepted refund later failed due the chargeback, while the gap probe shows a succeeded refund can coexist with a later full chargeback and create a $120 loss on $100 paid. It would be false to market this evidence as “prevents money loss” or “proves settled refunds.” The repository's own history also undercuts a moat claim by stating a careful handwritten baseline tied Interlock on outcomes; the differentiated value is reusable crash/evidence machinery and tamper-evident receipts, not unique refund correctness.
+
+**INDEPENDENT VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The narrow claim is supported at the frozen revision: source and checked-in results show a real Stripe test-mode refund request completing, the dedicated OS worker then terminating by SIGKILL before local completion is recorded, a new worker process resuming from persisted state, and provider-ground-truth reread/replay converging to exactly one Stripe refund object with no second external refund object. The verifier rejects stronger claims of transport-level lost-response proof, successful refund settlement, bank reconciliation, live-money production qualification, recovered dollars or independently rerun attestation. No sensitive-source material was used in the claim packet.
+
+**A-F SCORE (proposed only, after verifier):** **27/30 — A4 / B4 / C5 / D5 / E5 / F4.**
+- A4: a sandbox crash-certification engagement can be sold without touching live customer money.
+- B4: preventing duplicate refunds/charges and proving ambiguous-effect recovery has direct value, but the current artifact does not establish settled-money economics.
+- C5: compresses real process fault injection, stable provider identity, durable recovery, external truth reread and tamper-evident evidence design.
+- D5: real Stripe test-mode refund + literal SIGKILL + new-process recovery + checked-in provider-ground-truth artifact is rare, especially in a one-star repository.
+- E5: implementation, machine-readable run artifact, human-readable analysis, external provider reread and candid contradictory evidence are all present and revision-bound.
+- F4: MIT and test-mode boundaries are clear; real customer settlement/live qualification remains unproven.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: fintech/payments engineering lead, billing-platform owner, Controller's systems team or reliability group operating refunds/credits.
+- Pain: a process can die after a provider accepts a money mutation but before local state records success, creating duplicate-refund risk and expensive manual reconciliation.
+- First paid wedge: **Payment Effect Crash Certification** for one existing Stripe test-mode refund/correction path. Run controlled pre- and post-effect real SIGKILLs, restart against the same durable state, reread provider truth, prove whether exactly one external effect exists, and deliver a revision-bound evidence bundle. Keep the first engagement sandbox-only; separately score final settlement/economic outcome rather than conflating it with object-level exactly-once.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** This closes the exact tier-5B gap left by run 6. Auths remains stronger as a generic `OutcomeUnknown`/bounded-capacity state model; RAP remains stronger for multi-runtime production-edge smoke; PeanutGallery proves real-provider mutate-then-lose-response tier 5A; Interlock adds literal OS process death and new-process recovery on a captured-payment refund path with checked-in Stripe-ground-truth results. The combined architecture now has strong sandbox evidence for **durable intent → provider mutation → ambiguous local completion → process restart → provider truth → exactly-one provider object**. The next missing edge is economic settlement correctness, not another object-level idempotency proof.
+
+**SEARCH EFFORT / COST PROXIES:** 3 materially different discovery modes; 3 serious candidates/comparators deep-inspected; about 9 targeted repository/web query formulations; source, result artifact, external-provider readback code, history, rights and repository metadata verified at exact revisions; approximately 45 connector/web calls including required shadow-memory reads and write-SHA refreshes; 0 untrusted-repository code executions, provider writes, contacts, spend or commitments.
+
+**LOCAL LESSON:** `SK-COM-003` now has a third distinct shadow success but remains **LOCAL**. Tier 5B should require four facts simultaneously: **(1) a dedicated process boundary, (2) kill ordering after provider effect but before local durable completion, (3) a genuinely new process resuming from preserved state, and (4) provider-ground-truth reread with an exact effect count.** A bare `SIGKILL` test is insufficient. Add a separate axis for **economic terminality**: provider-object exactly-once, provider status finality and actual settlement/balance outcome are different claims.
+
+**REFERRALS:** No new referral. Existing provider/system-of-record readback referral is now partially answered at tier 5B object-convergence level; a new duplicate referral would add noise.
+
+**NEXT TEST:** Find a tier-5C artifact: literal post-effect process death on a **refund/credit that ultimately remains succeeded**, new-process recovery with no duplicate effect, and later processor/balance/settlement evidence showing the economic outcome—not merely the existence of one provider refund object. Prefer an independently rerunnable or independently attested artifact over another self-authored result record.
