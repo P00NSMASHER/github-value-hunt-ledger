@@ -46,10 +46,15 @@ Human-readable current graph connecting repository/data evidence to capabilities
 ### Recovery Proof
 - probavi/Kronos/Mukuroji/pg-restore-drill/SiVa -> IMPLEMENT/STRENGTHEN CAP-010.
 - `kirilurbonas/FireDrill@1e532b17e49e4424f988b29dd338ae6c48dc20f3` -> STRENGTHENS CAP-010 with multi-engine isolated restore, semantic checks, RTO/RPO, signed DSSE evidence and expected-subject coverage gate.
+- `jorgedlcruz/open-backup-ui@d3956a4b83679a567669c241fdf09c97ab07368f` -> STRENGTHENS CAP-010 CENSUS plane through independent infrastructure-inventory minus protected-object reconciliation.
+- `DanMrxs/danlab-vps-backup-control@6b071acda9912e40dab41ec98144d360a0d79567` -> STRENGTHENS CAP-010 with versioned inventory/manifests and explicit considered-vs-backed-up sets.
+- `OmarRao/r3vp@404f7f7aaed5b9fbc39506622175d87e628b3054` -> NEGATIVE_CONTROL / INVALIDATES protected-set-as-census assumption.
+- `NHSDigital/terraform-aws-backup@e0dbc8b2066834ed3383f60b4b4f603f7c757c42` -> CHALLENGES CAP-010 scope authority by showing protection-selector/compliance-scope semantic drift.
 - `snapetech/DuneAwakeningSelfHost@8d3bac1df38f45fb13e2c1427216bf5dc384687b` -> STRENGTHENS CAP-010 dual-plane Postgres+RabbitMQ/Mnesia recovery.
 - `WiseOpsTeam/mneme@e595986e6efb3988e1d64ad0bba7d9761f123786` -> NEGATIVE_CONTROL / INVALIDATES process-exit-as-semantic-proof assumption.
 - nearai/pg-backup verifier mutation history -> STRENGTHENS verifier-self-test.
-- CAP-007+010 -> ENABLES OPP Recovery Proof -> TESTED_BY EXP-004 scoped expected-subject/broken-verifier matrix.
+- CAP-010 now requires CENSUS + SCOPE to define the expected-subject denominator before PROOF can establish coverage.
+- CAP-007+010 -> ENABLES OPP Recovery Proof -> TESTED_BY EXP-004 recovery-coverage-authority/scoped expected-subject/broken-verifier matrix.
 
 ### CaptureBrief / Government acquisition
 - GSA FAR/DFARS + SAM/Data Services + USAspending + DATA Act + deviation sources -> IMPLEMENT CAP-011.
