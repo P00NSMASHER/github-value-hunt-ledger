@@ -36,13 +36,21 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 | CAP-008 — Structured invoice compliance/validation | 5 | 0 | official rule-pack/version authority must be pinned |
 | CAP-012 — Permit event versioning and semantic source QA | 5 | 0 | jurisdiction completeness/semantics vary |
 | CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 5 | 0 | standards/certification separate |
-| CAP-003 — Freight contract/rate authority reconstruction | 4 | 0 | buyer/carrier authority is population-specific |
-| CAP-004 — Deterministic freight rerating and exception math | 4 | 0 | correct math cannot cure wrong authority |
+| CAP-015 — Prospective, leakage-resistant prediction evidence | 4 | 2 | byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace still need official artifact confirmation; never call event correlation feeder/component causality or general distribution truth. |
+| CAP-019 — Source-authority observation receipts | 4 | 1 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
+
+## Domain authorization constraints
+
+| Domain | Experiment | Search authorized | Active search gaps | Suppressed exclusive capability gaps | Shared capability scope |
+|---|---|---|---|---|---|
+| freight | EXP-001 | no | none | CAP-003, CAP-004, CAP-005 | CAP-001, CAP-006, CAP-007, CAP-016 |
 
 ## Allocation guardrails
 
 - Never interpret a high allocation as proof that a strategy is better; early allocation includes uncertainty-driven exploration.
 - Do not suppress wildcard or novelty search to zero.
-- When a top experiment is blocked on one named evidence gap, that gap can override the generic allocation for a bounded run.
+- Domain authorization overrides generic capability-gap ranking; a blocked domain cannot be reopened by a high adaptive gap score.
+- Shared capabilities may still be searched for another active experiment, but that does not authorize their use for a blocked domain.
+- When a top experiment is blocked on one named evidence gap, that gap can override the generic allocation only through its explicit domain gate.
 - Outcome credit is explicit and lag-aware: absence of an outcome is not a failure until an experiment actually resolves.
 - When sufficient evidence accumulates, realized customer and engineering outcomes should gradually outweigh retained-repository precision.

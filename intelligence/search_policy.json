@@ -230,24 +230,47 @@
       "run_attention": 0
     },
     {
-      "capability_id": "CAP-003",
-      "name": "Freight contract/rate authority reconstruction",
+      "capability_id": "CAP-015",
+      "name": "Prospective, leakage-resistant prediction evidence",
       "gap_score": 4,
-      "missing_piece": "buyer/carrier authority is population-specific",
-      "run_attention": 0
+      "missing_piece": "byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace still need official artifact confirmation; never call event correlation feeder/component causality or general distribution truth.",
+      "run_attention": 2
     },
     {
-      "capability_id": "CAP-004",
-      "name": "Deterministic freight rerating and exception math",
+      "capability_id": "CAP-019",
+      "name": "Source-authority observation receipts",
       "gap_score": 4,
-      "missing_piece": "correct math cannot cure wrong authority",
-      "run_attention": 0
+      "missing_piece": "whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or \u201cno return.\u201d",
+      "run_attention": 1
+    }
+  ],
+  "domain_constraints": [
+    {
+      "domain_id": "freight",
+      "experiment_id": "EXP-001",
+      "gate_path": "freight/GAP_REGISTER.json",
+      "search_authorized": false,
+      "active_search_gap_ids": [],
+      "authorized_exclusive_capability_ids": [],
+      "blocked_exclusive_capability_ids": [
+        "CAP-003",
+        "CAP-004",
+        "CAP-005"
+      ],
+      "shared_capability_ids": [
+        "CAP-001",
+        "CAP-006",
+        "CAP-007",
+        "CAP-016"
+      ],
+      "reason": "Freight research is deny-by-default. Generic adaptive gap ranking must not authorize Freight discovery unless a mapped Freight gap is explicitly ACTIVE_SEARCH with search_allowed=true."
     }
   ],
   "guardrails": {
     "min_runs_for_exploitation_claim": 5,
     "min_deep_inspections_for_exploitation_claim": 20,
     "never_zero_exploration": true,
-    "recent_runs_not_treated_as_failed_outcomes": true
+    "recent_runs_not_treated_as_failed_outcomes": true,
+    "domain_authorization_precedes_generic_gap_ranking": true
   }
 }
