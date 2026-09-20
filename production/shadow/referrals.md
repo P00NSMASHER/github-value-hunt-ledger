@@ -34,3 +34,14 @@ Append-only cross-lane referrals from the three production shadow hunters.
 - Exact unanswered question: **Can Chidori's strict no-live effect replay be used as a safety wrapper around money-mutating billing correction commands such as credit-note apply/reversal while preserving the billing domain's own idempotency keys, row locks and exact ledger-reversal links?** Specifically test whether record→replay/restore can prove “no duplicate financial side effect” without replay itself calling a live payment/billing adapter.
 - Technical claims safe to use from the commercial candidate: credit-note application and reversal have scoped idempotency, exact ledger links, reversal lineage and tests for replay/over-application; versioned billing-contract rows explicitly distinguish shadow from authoritative state.
 - Do not assume: the billing contract plane is currently cut over to authoritative money state, Chidori provides universal exactly-once semantics, or any real payment/refund should be executed during research. A useful answer can be design/test-vector level only.
+
+## 2026-09-20 — SCIENCE → COMMERCIAL
+- Source lane/run: SHADOW-SCIENCE / Run 2
+- Destination: SHADOW-COMMERCIAL
+- Candidate: `RomeroLab/PRAXIS@2441e471c3161542b50889f083da29d5b4deae73`
+- Evidence snapshot: `shadow-science-20260920-praxis-2441e47`
+- Dedupe/capability fingerprint: `protein-engineering|physical-closed-loop|robotic-lab|campaign-artifacts|result-feedback|reliability-gap`
+- Priority: HIGH
+- Exact unanswered question: **Will an automated protein-engineering lab pay for a Reliability & Reproducibility Retrofit that adds durable job identity, acknowledged dispatch, proposed→actual execution provenance, restart-safe retry state and campaign auditability around an already functioning robotic design/test/learn loop?** Identify the budget owner, current failure/reconstruction cost, a first fixed-price deliverable, and one measurable KPI such as failed-run recovery time, orphaned experiment rate, duplicate execution rate, scientist-hours spent reconstructing campaigns, or instrument idle time.
+- Technical claims safe to use: exact Apache-2.0 PRAXIS revision contains an implemented physical-lab state machine, automated sequence→pipetting/assay processing, phenotype return into the agent loop, hardware/firmware assets, released campaign/checkpoint/data artifacts, and an accompanying 2026 bioRxiv report of approximately one month of autonomous operation.
+- Do not assume: production-grade retry/exactly-once semantics, explicit suggested-versus-actual deltas, conventional regression-test coverage, automatic portability beyond protein-engineering hardware, or rights to third-party model weights/hardware/vendor systems.
