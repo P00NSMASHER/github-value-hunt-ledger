@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "V14 Hunt Execution Event",
+  "title": "V15 Hunt Execution Event",
   "type": "object",
   "required": [
     "event_id",
@@ -199,6 +199,24 @@
         "string",
         "null"
       ]
+    },
+    "dispatch_kind": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "primary",
+        "work_steal",
+        null
+      ]
+    },
+    "parent_dispatch_ticket_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
     }
   },
   "additionalProperties": true
