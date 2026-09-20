@@ -80,3 +80,16 @@ This link is what allows the system to learn whether a search strategy ultimatel
 - Search-policy consequence: keep the freight discovery freeze and **zero ACTIVE_SEARCH gaps**; prioritize an authorized customer population plus rights/security diligence instead of broader repository hunting.
 - Evidence: `freight/synthetic_rehearsal.py`; Freight Commercial Contracts CI run `35522536180`.
 - Follow-up: first external outcome must record actual paid engagement and/or buyer-controlled realized settlement evidence before any revenue/customer-value field becomes positive.
+
+
+## Search-credit attribution
+
+An outcome can depend on more than one discovery run. To prevent double counting:
+
+- list all contributing runs in `origin_search_ids`;
+- optionally provide `search_credit_weights` mapping every origin run ID to a nonnegative weight;
+- explicit weights must sum to **1.00**;
+- if weights are omitted, the machine layer assigns equal credit across origin runs;
+- realized revenue/customer value/engineering compression remain recorded once at the outcome level, while strategy-level reports receive only their fractional attribution.
+
+Do not use unequal weights merely to make a favored search strategy look better.
