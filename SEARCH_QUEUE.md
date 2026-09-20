@@ -68,10 +68,12 @@ Use PermitBuild as the permit source/version/semantic-QA plane. On held-out acti
 
 **Stop:** generic permit maps/leads, property aggregators with placeholder datasets, or enrichment that does not materially change opportunity ranking.
 
-## 11. Grid / infrastructure risk and large-load decisions — P1
+## 11. Grid / infrastructure risk, inspection and large-load decisions — P1
 Use ICARUS-PJM as a synthetic scale testbed; preserve grid-crunch/queue_attrition historical/prospective discipline and CIMHub/DREAMS/ERAD feeder engineering. Where wildfire is buyer-relevant, test STORCITO live/current risk against FireDataForge historical event features before linking to asset failure/restoration. Require planted constraints and out-of-time outcomes.
 
-**Stop:** generic power-flow wrappers, hazard maps or queue dashboards without engineering parity/calibration/outcome evidence.
+**New inspection validation lane:** independently reproduce `JestradaG/StochasticInspectionRouting@2e7ab15b429b5138bd9ec5bb6494278c0b5da279` on a small rights-clean/open-solver fixture, then compare it against simple `highest-risk-first`, nearest-route and current-policy baselines on identical travel/deployment cost, expected failure penalty and feasibility. Only if the endogenous-risk advantage survives should it be paired with `ErToBar2/ORBIT@25903ddbdca245131ce37ca7fd057eff64faa4d7` on a synthetic/public bridge model to test mission-planning time, coverage, GNSS-degraded/under-deck handling and reflight burden. Search next for authoritative asset-criticality/failure-cost inputs, inspection-condition evidence, work-order completion/defect outcomes and route/mission acceptance—not another optimizer.
+
+**Stop:** generic power-flow wrappers, hazard maps, queue dashboards, generic inspection VRPs or drone waypoint planners without engineering parity, out-of-time calibration, operational acceptance or outcome evidence.
 
 ## 12. Identity / provenance / structured evidence — P1
 Benchmark Resolve/candidate engines -> Canon reviewed promotion -> pinned runtime -> controlled writeback on synthetic mergers/splits/aliases/negative matches. Challenge Formalis with Attestwire on identical structured-invoice fixtures and pinned rule packs. Search only provenance/lineage gaps that block a money/evidence product.
@@ -89,10 +91,11 @@ The shared system has broad coverage, but `hunters/08.md`, `hunters/29.md`, `hun
 - pricing/yield: constrained inventory/capacity/revenue optimization with counterfactual ROI, not dynamic-pricing demos;
 - payments/billing: hard reconciliation/settlement/reversal/unknown-result semantics, not payment SDK wrappers;
 - tax/accounting: current authoritative rules plus deterministic money/reconciliation outcome, not stale calculators;
+- scheduling rescue: use `AbhishekLGowda05/SAGE-Scheduling-engine-with-Adaptive-constraint-relaxation-Grounded-Explanations@49aee96f0a15e12e7b14b1c97989600f7ab0a146` as the current ordered-relaxation/fallback reference and `RosterSpec` as the verification/minimum-disruption leader. Validate both on the same synthetic workforce/field-service fixture. Every relaxation must be deterministic, minimally sufficient, human-readable and approval-ready; search only for domain-specific constraint authority, exception approval/receipt and post-change service evidence—not another generic scheduler;
 - wildcard: adjacent industries that reproduce the MASTER pattern `source authority -> deterministic expected state -> actual state -> evidence -> realized outcome`.
 
 ## Global stop list / search discipline
-Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, basic fuzzy matching, commodity auth/RBAC, basic job queues, generic protocol clients, generic optimization demos, backup-status tools, generic TMS/CMMS/FSM/LIMS/AP OCR, or speculative AI agents unless the candidate contributes a **rare domain invariant, authoritative source, difficult installed-base integration, independently falsifiable algorithm, or realized-money/evidence loop** that beats a current leader.
+Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, basic fuzzy matching, commodity auth/RBAC, basic job queues, generic protocol clients, generic optimization/scheduling/routing demos, backup-status tools, generic TMS/CMMS/FSM/LIMS/AP OCR, or speculative AI agents unless the candidate contributes a **rare domain invariant, authoritative source, difficult installed-base integration, independently falsifiable algorithm, or realized-money/evidence loop** that beats a current leader.
 
 ## Current validation order
 1. Freight blind population through actual settlement.
@@ -101,10 +104,17 @@ Do not spend hunter capacity on generic OCR, dashboards, CRUD, RAG, basic fuzzy 
 4. ScopeSignal one-change evidence-to-paid benchmark.
 5. Recovery Proof positive + negative adversarial matrix.
 6. CaptureBrief DoD rule-currentness and forecast-to-actual benchmark.
-7. Lab/industrial/broadband/permit challengers only after their focused held-out tests.
+7. Risk-priced infrastructure inspection benchmark: Jestrada open-solver reproduction vs simple baselines, then ORBIT mission test only if it wins.
+8. Lab/industrial/broadband/permit challengers only after their focused held-out tests.
 
 <!-- INTEGRATOR-R11-LATE2-2026-09-20T0042-0400 -->
 ## Late-run refinements from concurrent hunter commits
 - **Finance/accounting:** do not hunt more generic ledgers. Differential-test Recurso operational-event posting against Summae close truth on the same synthetic month, then route any novel authority gaps into the sparse tax/accounting catalog. Search only for missing bank/provider settlement evidence, authoritative current policy packs or hard failure cases the pair cannot represent.
 - **Industrial migration:** `UA-.NETStandard` closes much of the generic .NET OPC UA migration-tool gap. Seek customer-like migration fixtures, independent endpoint incompatibilities, NodeSet/companion-model drift and secure session/subscription failure evidence — not another OPC UA client/server implementation.
 - **Trusted data ingress:** Floe is the current contract/quarantine reference. Search further only when a source format or replay/lineage failure materially blocks a top money/evidence stack; generic ETL/data-contract tools are deprioritized.
+
+<!-- INTEGRATOR-R11-DECISION-ENGINE-2026-09-20T0048-0400 -->
+## Decision-engine sweep disposition
+- `JestradaG/StochasticInspectionRouting` is a high-value research component, not yet a production authority: exact source confirms real scenario decomposition/column-generation machinery, but the pinned research snapshot still contains hard-coded short stopping/debug limits and no surfaced conventional test suite. Keep it out of MASTER until the open-solver/simple-baseline benchmark is independently reproduced.
+- SAGE's published no-license state is provenance metadata under the standing separate-permission assertion, not a value penalty. Its two-phase feasibility-first solver, ordered relaxation, deterministic input hashing and Phase-1 fallback are technically strong; nevertheless, keep it at reusable-component/watch level until the relaxation contract transfers cleanly beyond school timetabling and beats/augments RosterSpec on a common fixture.
+- Pricing-promotion and ORBIT similarly re-score upward when public-license category is not treated as a commercial penalty, but neither enters MASTER yet: pricing remains a mature/crowded cluster pending second-dataset realized-profit evidence, while ORBIT needs independent repeatability/mission-outcome evidence and separately governed bridge/geospatial assets.
