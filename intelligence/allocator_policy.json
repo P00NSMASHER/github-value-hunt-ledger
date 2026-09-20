@@ -129,11 +129,11 @@
     "max_assignments_per_experiment": 2,
     "max_assignments_per_strategy": 3,
     "max_adjacency_assignments_per_root": 1,
-    "min_adjacency_slots": 2,
+    "min_adjacency_slots": 1,
     "min_measurement_slots": 1,
     "min_verification_slots": 1,
     "min_wildcard_slots": 1,
-    "min_coverage_role_slots": 3,
+    "min_coverage_role_slots": 2,
     "min_coverage_gap_assignments": 2
   },
   "scoring": {
@@ -153,6 +153,45 @@
     "Coverage, adjacency or popularity never substitute for technical evidence.",
     "One wildcard slot is preserved even when exploitation scores are high.",
     "Do not send outreach, contact people, purchase services or take external actions without explicit authorization.",
-    "Never inspect or retain credentials, private data, confidential material or accidental secrets."
-  ]
+    "Never inspect or retain credentials, private data, confidential material or accidental secrets.",
+    "Automatic portfolio adaptation may move at most one slot per generation and only after sufficient attributed-run evidence.",
+    "Manual overrides are measured separately and do not influence automatic portfolio adaptation."
+  ],
+  "adaptation": {
+    "adaptable_roles": [
+      "experiment",
+      "coverage",
+      "adjacency"
+    ],
+    "protected_roles": [
+      "measurement",
+      "verification",
+      "wildcard"
+    ],
+    "min_role_slots": {
+      "experiment": 4,
+      "coverage": 2,
+      "adjacency": 1,
+      "measurement": 1,
+      "verification": 1,
+      "wildcard": 1
+    },
+    "max_role_slots": {
+      "experiment": 8,
+      "coverage": 4,
+      "adjacency": 3,
+      "measurement": 1,
+      "verification": 1,
+      "wildcard": 1
+    },
+    "evidence_thresholds": {
+      "min_runs": 5,
+      "min_deep_inspections": 15,
+      "min_experiment_touch_runs": 3,
+      "min_valid_outcome_runs": 2
+    },
+    "min_signal_gap": 0.15,
+    "max_slot_changes_per_generation": 1,
+    "manual_overrides_influence_adaptation": false
+  }
 }
