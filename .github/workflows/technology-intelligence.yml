@@ -12,6 +12,7 @@ on:
       - "OUTCOMES.md"
       - "KNOWLEDGE_GRAPH.md"
       - "EXPERIMENTS.md"
+      - "freight/GAP_REGISTER.json"
       - ".github/workflows/technology-intelligence.yml"
   pull_request:
     paths:
@@ -24,6 +25,7 @@ on:
       - "OUTCOMES.md"
       - "KNOWLEDGE_GRAPH.md"
       - "EXPERIMENTS.md"
+      - "freight/GAP_REGISTER.json"
       - ".github/workflows/technology-intelligence.yml"
 
 permissions:
