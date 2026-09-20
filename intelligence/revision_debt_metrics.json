@@ -1,15 +1,15 @@
 {
-  "unknown_revision_observations": 86,
-  "unique_repositories_with_unknown_revision": 86,
+  "unknown_revision_observations": 87,
+  "unique_repositories_with_unknown_revision": 87,
   "status_counts": {
-    "unknown": 32,
+    "unknown": 33,
     "rejected": 18,
     "strong": 19,
     "quarantined": 3,
     "watch": 14
   },
   "source_state_counts": {
-    "current": 86
+    "current": 87
   },
   "master_catalog_gaps": [
     {
@@ -385,6 +385,14 @@
     {
       "repository": "OCA/field-service",
       "source_catalog": "hunters/37.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
+    },
+    {
+      "repository": "Practitionist/familiarise_web",
+      "source_catalog": "hunters/01-run17-2026-09-20.md",
       "source_state": "current",
       "status_bucket": "unknown",
       "status": null,

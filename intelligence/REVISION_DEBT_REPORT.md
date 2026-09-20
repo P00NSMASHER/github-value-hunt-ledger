@@ -2,15 +2,15 @@
 
 Pinned revisions are essential for reproducible technical intelligence. This report prioritizes records whose repository identity is known but whose inspected revision is not recoverable from the hunter catalog.
 
-- Unknown-revision observations: **86**
-- Unique repositories with unknown revision: **86**
+- Unknown-revision observations: **87**
+- Unique repositories with unknown revision: **87**
 - Current MASTER promotions without matching exact hunter-catalog observation: **2**
 
 ## Unknown revision mix
 
 | Bucket | Count |
 |---|---:|
-| unknown | 32 |
+| unknown | 33 |
 | strong | 19 |
 | rejected | 18 |
 | watch | 14 |
@@ -66,10 +66,10 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | LQVCohan/cohan-restaurant-app | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
 | Madhumitha-28/enterprise-contact-center-platform | hunters/37.md | current | unknown | 7 |
 | OCA/field-service | hunters/37.md | current | unknown | 7 |
+| Practitionist/familiarise_web | hunters/01-run17-2026-09-20.md | current | unknown | 7 |
 | Raunak-Sarmacharya/LocalCooksCommunity | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
 | Tests/history | hunters/04-run12-2026-09-20.md | current | unknown | 7 |
 | TheBarrelExploit/call-quality-analyzer | hunters/37.md | current | unknown | 7 |
-| Yogeshwaran-Kumar/VerticalQA | hunters/37.md | current | unknown | 7 |
 
 ## MASTER catalog provenance gaps
 
