@@ -528,3 +528,33 @@ Local routed claim helper:
 `python tools/ti_worker_claim.py --worker HUNTER-05`
 
 Remote/connector claims still use V11 optimistic file-SHA concurrency. The claim packet tells the worker exactly which slot file and assignment snapshot to claim.
+
+
+## V13 routing outcome learning
+
+V13 measures whether V12 worker-routing choices actually produce useful results and only then feeds bounded evidence back into future routing.
+
+Training eligibility is strict:
+- schema_version >= 12;
+- routing_mode = generated;
+- measurement_quality = prospective or benchmark;
+- V11 claim status COMPLETE;
+- telemetry_status MATCHED.
+
+Manual overrides, unrouted work, retrospective repairs, active claims and INVALID outcomes do not train automatic routing.
+
+Generated products:
+- `routing_learning_runs.jsonl` — one auditable realized-utility row per eligible completed generated route;
+- `routing_adjustments.jsonl` — worker × context residuals and bounded adjustments;
+- `routing_calibration.jsonl` — descriptive routing-score vs realized-utility calibration;
+- `routing_learning_metrics.json`;
+- `ROUTING_LEARNING_REPORT.md`;
+- `ROUTING_CALIBRATION_REPORT.md`.
+
+Automatic influence requires at least 12 completed generated routes globally. A worker-context additionally requires repeated worker runs, a multi-worker baseline, and either sufficient deep inspection or downstream outcome evidence.
+
+Matched contexts are role, work kind, strategy, objective and experiment. Worker residuals are shrunk toward zero and bounded to +3 / -2 routing-score points.
+
+The system intentionally reports **no causal worker ranking**. Assignment difficulty is confounded. V13 uses matched task-context residuals as routing evidence, not as a performance-review score.
+
+Until thresholds are met, mode is `observe_only_insufficient_evidence` and every V13 routing adjustment is exactly zero.
