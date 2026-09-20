@@ -1,6 +1,6 @@
 # HUNT ALLOCATOR REPORT
 
-- Generation: **ALLOCGEN:e9aefb14c424**
+- Generation: **ALLOCGEN:083df27963a9**
 - Candidate work items: **305**
 - Assigned slots: **14 / 14**
 
@@ -30,6 +30,8 @@
 - One wildcard slot is preserved even when exploitation scores are high.
 - Do not send outreach, contact people, purchase services or take external actions without explicit authorization.
 - Never inspect or retain credentials, private data, confidential material or accidental secrets.
+- Automatic portfolio adaptation may move at most one slot per generation and only after sufficient attributed-run evidence.
+- Manual overrides are measured separately and do not influence automatic portfolio adaptation.
 
 ## Interpretation
 

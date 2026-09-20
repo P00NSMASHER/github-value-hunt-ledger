@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
-  "allocator_generation_id": "ALLOCGEN:e9aefb14c424",
+  "allocator_generation_id": "ALLOCGEN:083df27963a9",
+  "portfolio_policy_generation_id": "PORTFOLIO:00ad73e21071",
   "candidate_count": 305,
   "assignment_count": 14,
   "slot_count": 14,
@@ -29,11 +30,11 @@
     "max_assignments_per_experiment": 2,
     "max_assignments_per_strategy": 3,
     "max_adjacency_assignments_per_root": 1,
-    "min_adjacency_slots": 2,
+    "min_adjacency_slots": 1,
     "min_measurement_slots": 1,
     "min_verification_slots": 1,
     "min_wildcard_slots": 1,
-    "min_coverage_role_slots": 3,
+    "min_coverage_role_slots": 2,
     "min_coverage_gap_assignments": 2
   }
 }

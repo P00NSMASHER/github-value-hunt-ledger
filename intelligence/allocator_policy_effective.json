@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "slot_count": 14,
+  "slots": [
+    {
+      "slot_id": "SLOT-01",
+      "role": "experiment",
+      "accepts": [
+        "experiment_execution",
+        "capability_gap"
+      ],
+      "label": "Experiment / blocker execution"
+    },
+    {
+      "slot_id": "SLOT-02",
+      "role": "experiment",
+      "accepts": [
+        "experiment_execution",
+        "capability_gap"
+      ],
+      "label": "Experiment / blocker execution"
+    },
+    {
+      "slot_id": "SLOT-03",
+      "role": "experiment",
+      "accepts": [
+        "experiment_execution",
+        "capability_gap"
+      ],
+      "label": "Experiment / blocker execution"
+    },
+    {
+      "slot_id": "SLOT-04",
+      "role": "experiment",
+      "accepts": [
+        "experiment_execution",
+        "capability_gap"
+      ],
+      "label": "Experiment / blocker execution"
+    },
+    {
+      "slot_id": "SLOT-05",
+      "role": "experiment",
+      "accepts": [
+        "capability_gap",
+        "positive_dna_transfer",
+        "experiment_execution"
+      ],
+      "label": "High-value capability search"
+    },
+    {
+      "slot_id": "SLOT-06",
+      "role": "experiment",
+      "accepts": [
+        "capability_gap",
+        "positive_dna_transfer",
+        "experiment_execution"
+      ],
+      "label": "High-value capability search"
+    },
+    {
+      "slot_id": "SLOT-07",
+      "role": "coverage",
+      "accepts": [
+        "coverage_gap"
+      ],
+      "label": "Blind-spot exploration"
+    },
+    {
+      "slot_id": "SLOT-08",
+      "role": "coverage",
+      "accepts": [
+        "coverage_gap"
+      ],
+      "label": "Blind-spot exploration"
+    },
+    {
+      "slot_id": "SLOT-09",
+      "role": "coverage",
+      "accepts": [
+        "coverage_gap",
+        "positive_dna_transfer"
+      ],
+      "label": "Blind-spot / transfer exploration"
+    },
+    {
+      "slot_id": "SLOT-10",
+      "role": "adjacency",
+      "accepts": [
+        "adjacency"
+      ],
+      "label": "Second-order adjacency expansion"
+    },
+    {
+      "slot_id": "SLOT-11",
+      "role": "adjacency",
+      "accepts": [
+        "adjacency"
+      ],
+      "label": "Second-order adjacency expansion"
+    },
+    {
+      "slot_id": "SLOT-12",
+      "role": "measurement",
+      "accepts": [
+        "strategy_measurement"
+      ],
+      "label": "Strategy measurement debt"
+    },
+    {
+      "slot_id": "SLOT-13",
+      "role": "verification",
+      "accepts": [
+        "independent_verification"
+      ],
+      "label": "Independent falsification / red team"
+    },
+    {
+      "slot_id": "SLOT-14",
+      "role": "wildcard",
+      "accepts": [
+        "wildcard"
+      ],
+      "label": "Unconstrained weird/rare exploration"
+    }
+  ],
+  "constraints": {
+    "max_assignments_per_capability": 2,
+    "max_assignments_per_experiment": 2,
+    "max_assignments_per_strategy": 3,
+    "max_adjacency_assignments_per_root": 1,
+    "min_adjacency_slots": 1,
+    "min_measurement_slots": 1,
+    "min_verification_slots": 1,
+    "min_wildcard_slots": 1,
+    "min_coverage_role_slots": 2,
+    "min_coverage_gap_assignments": 2
+  },
+  "scoring": {
+    "strategy_allocation_weight": 12,
+    "ready_experiment_boost": 8,
+    "running_experiment_boost": 12,
+    "p0_boost": 8,
+    "p0_p1_boost": 6,
+    "p1_boost": 4,
+    "verification_base": 88,
+    "running_experiment_base": 98,
+    "ready_experiment_base": 92
+  },
+  "guardrails": [
+    "Domain-specific STOP and authorization gates override allocator rank.",
+    "BLOCKED_EXTERNAL experiments are not assigned as autonomous work.",
+    "Coverage, adjacency or popularity never substitute for technical evidence.",
+    "One wildcard slot is preserved even when exploitation scores are high.",
+    "Do not send outreach, contact people, purchase services or take external actions without explicit authorization.",
+    "Never inspect or retain credentials, private data, confidential material or accidental secrets.",
+    "Automatic portfolio adaptation may move at most one slot per generation and only after sufficient attributed-run evidence.",
+    "Manual overrides are measured separately and do not influence automatic portfolio adaptation."
+  ],
+  "adaptation": {
+    "adaptable_roles": [
+      "experiment",
+      "coverage",
+      "adjacency"
+    ],
+    "protected_roles": [
+      "measurement",
+      "verification",
+      "wildcard"
+    ],
+    "min_role_slots": {
+      "experiment": 4,
+      "coverage": 2,
+      "adjacency": 1,
+      "measurement": 1,
+      "verification": 1,
+      "wildcard": 1
+    },
+    "max_role_slots": {
+      "experiment": 8,
+      "coverage": 4,
+      "adjacency": 3,
+      "measurement": 1,
+      "verification": 1,
+      "wildcard": 1
+    },
+    "evidence_thresholds": {
+      "min_runs": 5,
+      "min_deep_inspections": 15,
+      "min_experiment_touch_runs": 3,
+      "min_valid_outcome_runs": 2
+    },
+    "min_signal_gap": 0.15,
+    "max_slot_changes_per_generation": 1,
+    "manual_overrides_influence_adaptation": false
+  },
+  "learning": {
+    "schema_version": 1,
+    "portfolio_policy_generation_id": "PORTFOLIO:00ad73e21071",
+    "mode": "baseline_insufficient_evidence",
+    "baseline_role_counts": {
+      "experiment": 6,
+      "coverage": 3,
+      "adjacency": 2,
+      "measurement": 1,
+      "verification": 1,
+      "wildcard": 1
+    },
+    "effective_role_counts": {
+      "experiment": 6,
+      "coverage": 3,
+      "adjacency": 2,
+      "measurement": 1,
+      "verification": 1,
+      "wildcard": 1
+    },
+    "shift": null,
+    "attributed_assignment_runs": 0,
+    "attribution_debt_runs": 0,
+    "evidence_thresholds": {
+      "min_runs": 5,
+      "min_deep_inspections": 15,
+      "min_experiment_touch_runs": 3,
+      "min_valid_outcome_runs": 2
+    },
+    "min_signal_gap": 0.15,
+    "max_slot_changes_per_generation": 1,
+    "note": "Allocation signal is a scheduling heuristic, not a causal estimate of business value."
+  }
+}
