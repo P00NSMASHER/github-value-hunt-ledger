@@ -11,22 +11,22 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | 1 | 01-08 | 5 | 0 | 0 | — | — | 0 | 0 | — |
 | 2 | 09-15 | 6 | 6 | 6 | 24.67 | 25.00 | 0 | 0 | Experiment |
 | 3 | 16-22 | 7 | 5 | 5 | 23.20 | 24.60 | 0 | 0 | Experiment |
-| 4 | 23-29 | 7 | 6 | 6 | 24.83 | 24.50 | 0 | 0 | Control |
+| 4 | 23-29 | 7 | 7 | 7 | 24.86 | 24.57 | 0 | 0 | Control |
 | 5 | 30-36 | 7 | 6 | 6 | 24.50 | 24.83 | 0 | 0 | Experiment |
 | 6 | 37-43 | 5 | 6 | 5 | 25.00 | 25.00 | 0 | 0 | Tie |
 | 7 | 44-50 | 7 | 5 | 5 | 24.60 | 24.80 | 0 | 0 | Experiment |
 
 ## Experiment-wide matched metrics
-- Matched tasks scored: **33** — 09, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 44, 45, 46, 47, 48.
-- Control matched mean: **24.48/25**.
+- Matched tasks scored: **34** — 09, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 44, 45, 46, 47, 48.
+- Control matched mean: **24.50/25**.
 - Experiment matched mean: **24.79/25**.
-- Mean paired difference (Experiment - Control): **+0.30**.
+- Mean paired difference (Experiment - Control): **+0.29**.
 - Median paired difference: **0.0**.
-- Pairwise task win / tie / loss for Experiment: **7 / 22 / 4**.
+- Pairwise task win / tie / loss for Experiment: **7 / 23 / 4**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
 - No-find results: **0 Control / 0 Experiment** among scored results.
 - Approximate search effort per validated STRONG result remains **Control ~10-11 reported search/deep-inspection units; Experiment ~11-12**. This is directional because result files mix query counts, candidate triage counts, specialist passes and deep inspections.
-- Learning slope remains **mildly positive but score-ceiling limited**. Pair 2 is 25→25→25→25→25→25; Pair 3 24→25→25→25→24; Pair 4 23→25→24→25→25→25; Pair 5 25→25→24→25→25→25; Pair 6 25→25→25→25→25 with unmatched Task 42 also scoring 25; Pair 7 24→25→25→25→25. Median early-to-late within-pair change remains about **+0.5**, while most recent tasks often tie at the ceiling. Qualitative learning remains stronger than the score slope.
+- Learning slope remains **mildly positive but score-ceiling limited**. Pair 2 is 25→25→25→25→25→25; Pair 3 24→25→25→25→24; Pair 4 23→25→24→25→25→25→25; Pair 5 25→25→24→25→25→25; Pair 6 25→25→25→25→25 with unmatched Task 42 also scoring 25; Pair 7 24→25→25→25→25. Median early-to-late within-pair change remains about **+0.5**, while most recent tasks often tie at the ceiling. Qualitative learning remains stronger than the score slope.
 
 ## Scored task details
 Scores preserve prior scored results and add newly completed unscored results observed in this integration run.
@@ -75,6 +75,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 28 | CONTROL | 25 | 5/5/5/5/5 | `PrimeIntellect-ai/prime-agent@e311d6495124cf0bdc629c813fc97a39a9a3054d` | No | No | Exact target; prompt/memory/skill/subagent refinement, persistence/versioning, rollback and failure/reload tests verified. |
 | 28 | EXPERIMENT | 25 | 5/5/5/5/5 | `PrimeIntellect-ai/prime-agent@e311d6495124cf0bdc629c813fc97a39a9a3054d` | No | No | Exact target with trajectory→typed artifact→versioned persistence→later use/rollback tracing; executable-skill packaging separated. |
 | 29 | CONTROL | 25 | 5/5/5/5/5 | `ryanwi/agent-control-plane@99da3934faa2aa7be09df72134cc5e8023e8704f` | No | No | Demonstrably strong equivalent; fail-closed tool governance, durable approvals/budgets/audit/revocation/kill semantics and exact-head CI verified while host-integration/global-halt limits are preserved. |
+| 29 | EXPERIMENT | 25 | 5/5/5/5/5 | `ryanwi/agent-control-plane@99da3934faa2aa7be09df72134cc5e8023e8704f` | No | No | Same strong equivalent with execution-chokepoint/bypass archaeology; integrated tool governance and persisted stop semantics verified while host-wired model governance, budget-facade and alpha-maturity caveats are explicitly bounded. |
 | 30 | CONTROL | 22 | 4/4/4/5/5 | `levi-qiao/longgraph-skill@b27376fd44f30505cbc52c2520c42e725b028ea1` | No | No | Strong conceptual match but primarily a Markdown/file control plane rather than executable orchestration runtime. |
 | 30 | EXPERIMENT | 25 | 5/5/5/5/5 | `AMAP-ML/LongHorizon-Harness@a1dd930614972b92361c1b9cd6aac441a6db5a65` | No | No | Exact target; fail-closed completion, auditor mutation handling, contracts, durable resume and hardening tests verified. |
 | 31 | CONTROL | 25 | 5/5/5/5/5 | `openai/symphony@be10a1b79df723d6d7612b5651c8522704dafb2e` | No | No | Exact target; issue reconciliation, retry/backoff, per-issue workspaces and proof/review surfaces verified. |
@@ -122,7 +123,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 - **Promoted to SEARCH_SKILLS:** `Fail-open boundary archaeology`, supported by Experiment Tasks **44 and 45** and reinforced by Task 46.
 - **Promoted to SEARCH_SKILLS:** `Decision-claim → runtime-side-effect trace`, supported by Experiment Tasks **25 and 26**, reinforced by Tasks 27 and 28.
 - **Promoted to SEARCH_SKILLS:** `Authority-origin / invariant-set consistency`, supported independently by Experiment Tasks **46 and 47**.
-- Not yet separately promoted: Transition-Order + Temporal-Invariant Verification (Task 18 only); Governance-Loop Boundary Verification (Task 19 only); Promotion-Transaction Boundary Verification (Task 20 only); published-plan replanning invariant quartet (Task 13 only); harness-artifact closed loop (Task 28 only); provenance-adapter intersection (Task 34 only); measurement-semantics fusion intersection (Task 35 only); regulated-vendor installed-system boundary triad (Task 14 only); contract→negative-vector→differential-implementation triangulation (Task 45 only); Value-State Aggregation Audit (Task 47 only); database-boundary bypass check (Task 42 only); opaque-upstream health-contract audit (Task 48 only).
+- Not yet separately promoted: Transition-Order + Temporal-Invariant Verification (Task 18 only); Governance-Loop Boundary Verification (Task 19 only); Promotion-Transaction Boundary Verification (Task 20 only); Enforcement-Chokepoint + Persisted-Stop Verification (Task 29 only); published-plan replanning invariant quartet (Task 13 only); harness-artifact closed loop (Task 28 only); provenance-adapter intersection (Task 34 only); measurement-semantics fusion intersection (Task 35 only); regulated-vendor installed-system boundary triad (Task 14 only); contract→negative-vector→differential-implementation triangulation (Task 45 only); Value-State Aggregation Audit (Task 47 only); database-boundary bypass check (Task 42 only); opaque-upstream health-contract audit (Task 48 only).
 
 ## Experiment-wide conclusion
-Too early for a winner claim. Across **33 matched tasks**, Experiment has a small mean advantage (**24.79 vs 24.48**), but the **median paired difference is 0** and task outcomes are **7 wins, 22 ties, 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is generating transferable verification/search methods and has improved calibration on several adversarial tasks, but score separation remains modest and the experimental path still appears somewhat more expensive. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
+Too early for a winner claim. Across **34 matched tasks**, Experiment has a small mean advantage (**24.79 vs 24.50**), but the **median paired difference is 0** and task outcomes are **7 wins, 23 ties, 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is generating transferable verification/search methods and has improved calibration on several adversarial tasks, but score separation remains modest and the experimental path still appears somewhat more expensive. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
