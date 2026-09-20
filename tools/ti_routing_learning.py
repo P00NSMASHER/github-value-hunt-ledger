@@ -151,7 +151,7 @@ for (dim,key),rs in sorted(group.items()):
 def corr(pairs):
     if len(pairs)<2: return None
     xs=[float(a) for a,_ in pairs if a is not None]
-    ys=[float(b) for _,b in pairs if a is not None]
+    ys=[float(b) for a,b in pairs if a is not None]
     if len(xs)<2: return None
     mx,my=mean(xs),mean(ys)
     vx=sum((x-mx)**2 for x in xs); vy=sum((y-my)**2 for y in ys)
