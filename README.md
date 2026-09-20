@@ -233,3 +233,12 @@ The generated reports answer different questions:
 - `SEARCH_POLICY.md`: cautious next-cycle allocation balancing measured yield and exploration.
 
 The allocation policy is advisory and deliberately keeps an exploration floor so low-attention, strange and cross-domain discoveries are not optimized away.
+
+
+## Outcome credit and query-family invariants
+
+Technology-intelligence v3 conserves search attribution: one experiment/customer outcome contributes at most 1.00 total search credit across all originating runs. Use explicit `search_credit_weights` only when a defensible non-equal allocation exists; otherwise the system uses equal split.
+
+New hunts should reuse a stable `query_family_id` when they repeat the same technical discovery shape. This allows the system to learn which search families work across domains instead of treating every literal query as unrelated.
+
+Optional `elapsed_minutes` and `tool_calls` instrumentation enables research-efficiency comparisons without imputing missing effort.
