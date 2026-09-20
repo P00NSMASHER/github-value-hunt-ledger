@@ -4,7 +4,9 @@ from collections import defaultdict
 from pathlib import Path
 from ti_common import INTEL, ROOT, load_jsonl
 
-CFG=json.loads((INTEL/"allocator_policy.json").read_text(encoding="utf-8"))
+POLICY_PATH=INTEL/"allocator_policy_effective.json" if (INTEL/"allocator_policy_effective.json").exists() else INTEL/"allocator_policy.json"
+CFG=json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+PORTFOLIO_POLICY_ID=(CFG.get("learning") or {}).get("portfolio_policy_generation_id") or "PORTFOLIO:000000000000"
 POLICY=json.loads((INTEL/"search_policy.json").read_text(encoding="utf-8"))
 SEEDS=load_jsonl("search_seeds.jsonl")
 ADJ=load_jsonl("adjacency_queue.jsonl")
@@ -308,6 +310,7 @@ for slot in slots:
     a={
       "assignment_id":aid,
       "allocator_generation_id":generation_id,
+      "portfolio_policy_generation_id":PORTFOLIO_POLICY_ID,
       "slot_id":slot["slot_id"],
       "slot_role":slot["role"],
       "slot_label":slot["label"],
@@ -347,6 +350,7 @@ for a in assignments:
 metrics={
  "schema_version":1,
  "allocator_generation_id":generation_id,
+ "portfolio_policy_generation_id":PORTFOLIO_POLICY_ID,
  "candidate_count":len(candidates),
  "assignment_count":len(assignments),
  "slot_count":len(slots),
@@ -359,7 +363,7 @@ metrics={
 }
 (INTEL/"allocator_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
 
-plan=["# UNIFIED HUNT PLAN","",f"Allocator generation: **{generation_id}**","",
+plan=["# UNIFIED HUNT PLAN","",f"Allocator generation: **{generation_id}**",f"Portfolio policy: **{PORTFOLIO_POLICY_ID}**","",
       "This is the current 14-slot work plan. Scores are scheduling priorities, not claims of repository or commercial value.","",
       "| Slot | Role | Score | Work | Capability | Experiment | Source |",
       "|---|---|---:|---|---|---|---|"]

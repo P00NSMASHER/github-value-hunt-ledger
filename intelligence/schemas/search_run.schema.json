@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v9",
+  "title": "Technology Intelligence Search Run v10",
   "type": "object",
   "required": [
     "search_run_id",
@@ -543,6 +543,46 @@
         "null"
       ],
       "pattern": "^WORK:[a-z0-9-]+:[a-z0-9-]+$"
+    },
+    "portfolio_policy_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^PORTFOLIO:[a-f0-9]{12}$"
+    },
+    "assignment_slot_role": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "experiment",
+        "coverage",
+        "adjacency",
+        "measurement",
+        "verification",
+        "wildcard",
+        null
+      ]
+    },
+    "assignment_work_kind": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "assignment_source_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "assignment_score": {
+      "type": [
+        "number",
+        "null"
+      ]
     }
   },
   "additionalProperties": true,
@@ -661,6 +701,27 @@
           "allocator_generation_id",
           "assignment_id",
           "assignment_work_item_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 10
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "portfolio_policy_generation_id",
+          "assignment_slot_role",
+          "assignment_work_kind",
+          "assignment_source_id",
+          "assignment_score"
         ]
       }
     }

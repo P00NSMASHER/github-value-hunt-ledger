@@ -404,3 +404,41 @@ New prospective runs use `schema_version: 9` and record:
 - `assignment_work_item_id`.
 
 Manual overrides are allowed but must be explicit. The allocator is a scheduler, not evidence: all existing verification, rights, safety, saturation and domain-authorization gates remain in force.
+
+
+## V10 allocator learning
+
+V10 measures whether the V9 portfolio itself is allocating research capacity well.
+
+It learns from executed allocator-attributed runs, not from generated plans. An assignment receives no learning credit until a search run records the assignment provenance and any downstream outcome links back to that run.
+
+Generated products:
+- `allocator_role_metrics.jsonl` — performance by slot role;
+- `allocator_work_kind_metrics.jsonl` — diagnostic performance by work kind;
+- `allocator_attribution_debt.jsonl` — V9 runs that cannot yet be mapped cleanly to role/kind;
+- `allocator_policy_effective.json` — generated effective portfolio policy;
+- `ALLOCATOR_LEARNING_REPORT.md` — evidence and adaptation decision;
+- `ALLOCATOR_WORK_KIND_REPORT.md` — diagnostic work-kind metrics;
+- `allocator_learning_metrics.json` — machine-readable summary.
+
+Automatic adaptation is deliberately conservative:
+- only `experiment`, `coverage`, and `adjacency` slot counts can move;
+- `measurement`, `verification`, and `wildcard` remain protected;
+- a role needs at least 5 attributed generated runs plus sufficient inspection/experiment/outcome evidence;
+- the scheduling-signal gap must be at least 0.15;
+- at most one slot can move per generation;
+- hard floors remain: experiment >=4, coverage >=2, adjacency >=1;
+- hard ceilings remain: experiment <=8, coverage <=4, adjacency <=3.
+
+The allocation signal is a scheduling heuristic, not a causal estimate of commercial value. Realized outcomes remain the strongest downstream evidence.
+
+Manual overrides are recorded separately and do not influence automatic portfolio adaptation.
+
+New prospective runs use `schema_version: 10` and additionally record:
+- `portfolio_policy_generation_id`;
+- `assignment_slot_role`;
+- `assignment_work_kind`;
+- `assignment_source_id`;
+- `assignment_score`.
+
+The V10 learner runs before V9 allocation in CI. When evidence is insufficient, `allocator_policy_effective.json` is identical in slot composition to the human-authored baseline policy.

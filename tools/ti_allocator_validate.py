@@ -3,7 +3,9 @@ import json,re
 from collections import Counter
 from ti_common import INTEL, load_jsonl
 
-cfg=json.loads((INTEL/"allocator_policy.json").read_text(encoding="utf-8"))
+policy_path=INTEL/"allocator_policy_effective.json" if (INTEL/"allocator_policy_effective.json").exists() else INTEL/"allocator_policy.json"
+cfg=json.loads(policy_path.read_text(encoding="utf-8"))
+portfolio_policy_id=(cfg.get("learning") or {}).get("portfolio_policy_generation_id") or "PORTFOLIO:000000000000"
 cand=load_jsonl("hunt_candidates.jsonl")
 alloc=load_jsonl("hunt_allocations.jsonl")
 metrics=json.loads((INTEL/"allocator_metrics.json").read_text(encoding="utf-8"))
@@ -27,6 +29,7 @@ for n,a in enumerate(alloc,1):
     if sid not in slots or sid in seen_slots: raise SystemExit(f"hunt_allocations.jsonl:{n}: invalid/duplicate slot {sid}")
     seen_slots.add(sid)
     if a.get("work_item_id") not in cids: raise SystemExit(f"hunt_allocations.jsonl:{n}: unknown work item")
+    if a.get("portfolio_policy_generation_id")!=portfolio_policy_id: raise SystemExit(f"hunt_allocations.jsonl:{n}: assignment portfolio policy mismatch")
     kinds[a.get("work_kind")]+=1
     roles[a.get("slot_role")]+=1
     for cid in a.get("capability_ids") or []: caps[cid]+=1
@@ -47,6 +50,7 @@ if kinds["strategy_measurement"]<cons["min_measurement_slots"]: raise SystemExit
 if kinds["independent_verification"]<cons["min_verification_slots"]: raise SystemExit("verification reserve not met")
 if kinds["wildcard"]<cons["min_wildcard_slots"]: raise SystemExit("wildcard reserve not met")
 if metrics.get("assignment_count")!=len(alloc): raise SystemExit("allocator_metrics assignment count drift")
+if metrics.get("portfolio_policy_generation_id")!=portfolio_policy_id: raise SystemExit("allocator_metrics portfolio policy mismatch")
 
 for n,r in enumerate(runs,1):
     if (r.get("schema_version") or 0)<9: continue

@@ -100,7 +100,11 @@ jobs:
         run: python tools/ti_measurement_campaign.py
       - name: Analyze normalized search-surface yield
         run: python tools/ti_surface.py
-      - name: Build V9 unified hunt allocator
+      - name: Build V10 allocator learning policy
+        run: python tools/ti_allocator_learning.py
+      - name: Validate V10 allocator learning policy
+        run: python tools/ti_allocator_learning_validate.py
+      - name: Build V9/V10 unified hunt allocator
         run: python tools/ti_allocator.py
       - name: Validate V9 unified hunt allocation
         run: python tools/ti_allocator_validate.py
@@ -174,7 +178,11 @@ jobs:
         run: python tools/ti_measurement_campaign.py
       - name: Analyze normalized search-surface yield
         run: python tools/ti_surface.py
-      - name: Build V9 unified hunt allocator
+      - name: Build V10 allocator learning policy
+        run: python tools/ti_allocator_learning.py
+      - name: Validate V10 allocator learning policy
+        run: python tools/ti_allocator_learning_validate.py
+      - name: Build V9/V10 unified hunt allocator
         run: python tools/ti_allocator.py
       - name: Validate V9 unified hunt allocation
         run: python tools/ti_allocator_validate.py
@@ -238,7 +246,14 @@ jobs:
                   intelligence/hunt_allocations.jsonl \
                   intelligence/HUNT_PLAN.md \
                   intelligence/ALLOCATOR_REPORT.md \
-                  intelligence/allocator_metrics.json
+                  intelligence/allocator_metrics.json \
+                  intelligence/allocator_policy_effective.json \
+                  intelligence/allocator_role_metrics.jsonl \
+                  intelligence/allocator_work_kind_metrics.jsonl \
+                  intelligence/allocator_attribution_debt.jsonl \
+                  intelligence/ALLOCATOR_LEARNING_REPORT.md \
+                  intelligence/ALLOCATOR_WORK_KIND_REPORT.md \
+                  intelligence/allocator_learning_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
