@@ -1,107 +1,109 @@
-# Freight Recovery v15 — Canonical Release Manifest
+# Freight Recovery v15.3 — Canonical Release Manifest
 
-Release checkpoint: **v15-commercialization-2026-09-20**
+Release checkpoint: **v15.3-commercialization-2026-09-20**
 
 ## Source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Merged source commit: `1c55081543c332497e288a8a8129acf8c0588191`
-- Pull request: **#7 — Freight Recovery v15: commercialization model, pilot gate, rights registry, and workflow hardening**
-- PR head tested: `320efa01c2cb45ab5fe7d0d8b2403b258907d657`
-- CI run: `35517699090`
-- CI job: `test`
+- Current merged source commit: `36d0bacd29ce7e7c55d583189b9fac608e667a26`
+- v15 commercialization PR: **#7**
+- v15.1 machine-gates PR: **#8**
+- v15.2 readiness/gap-control PR: **#10**
+- v15.3 proof-derived reporting PR: **#11**
+
+## Verified CI checkpoints
+
+### Research/hunter model contracts
+- v15.2 PR-head run: `35518475666`
 - Result: **success**
+- Covers deterministic hunter/model production-contract tests including the EXP-001 freight work gate.
 
-## CI integrity at this checkpoint
+### Freight commercial contracts
+- v15.3 PR-head run: `35518677018`
+- Result: **success**
+- Covers:
+  - frozen population/truth/incumbent ordering;
+  - authority identity binding;
+  - REVIEW = $0 validated;
+  - same-dollar finding identity preservation;
+  - settlement deduplication and partial caps;
+  - recovery-certificate binding;
+  - component-rights pilot gate;
+  - canonical gap-register validity;
+  - machine-scored readiness;
+  - proof-derived pilot reporting;
+  - automatic incumbent-known exclusion from fee eligibility.
 
-Pinned GitHub Actions:
-- `actions/checkout@11d5960a326750d5838078e36cf38b85af677262`
-- `actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065`
+## Current commercial control plane
 
-Pinned test dependency file:
-- `production/requirements-ci.txt`
-
-Test command:
-```bash
-cd production && python -m pytest -q test_prototype.py
-```
-
-Important: this CI validates the committed hunter-system production contracts and the workflow hardening touched by PR #7. It is **not** evidence that a full multi-tenant Freight Recovery SaaS runtime has been deployed.
-
-## Canonical v15 commercial control files
-
-- `freight/BUSINESS_MODEL.md`
-- `freight/PILOT_PROTOCOL.md`
-- `freight/COMPONENT_RIGHTS_REGISTRY.json`
-- `freight/RELEASE_AND_SECURITY_GATE.md`
-- `freight/ROADMAP.md`
-- `COMBINATIONS.md` — Freight Recovery v15 stack
-- `EXPERIMENTS.md` — EXP-001 commercial proof gate
-- `OPPORTUNITIES.md` — paid wedge / pricing / ICP
-- `SEARCH_QUEUE.md` — freight commercialization freeze
+- `freight/BUSINESS_MODEL.md` — ICP, offer ladder, pricing, stop rules.
+- `freight/DATA_READINESS_DIAGNOSTIC.md` — $5k–$7.5k first-offer delivery specification.
+- `freight/readiness.py` — BLOCKED / CONDITIONAL / READY machine assessment.
+- `freight/PILOT_PROTOCOL.md` — buyer-owned blind protocol.
+- `freight/contracts.py` — deterministic population/truth/incumbent/settlement proof objects.
+- `freight/pilot_reporting.py` — proof-derived pilot financial and review metrics.
+- `freight/PILOT_REPORT_TEMPLATE.md` — buyer-facing result structure.
+- `freight/COMPONENT_RIGHTS_REGISTRY.json` — exact revisions / rights-operability state.
+- `freight/RELEASE_AND_SECURITY_GATE.md` — controlled-pilot vs annual-enterprise gates.
+- `freight/GAP_REGISTER.json` — canonical freight gap state.
+- `freight/gap_registry.py` — research authorization from registered gaps.
+- `freight/ROADMAP.md` — value-maximization sequence.
 
 ## Commercial state
 
-Freight Recovery v15 is **commercially specified and diligence-hardened, but EXP-001 remains BLOCKED_EXTERNAL**.
+Freight Recovery v15.3 is **commercially specified, machine-gated, and internally diligence-hardened; EXP-001 remains BLOCKED_EXTERNAL**.
 
-The product has not yet proven:
-- a paid customer blind audit;
-- a challenger-only incumbent miss on a frozen customer population;
-- a customer-approved dispute/action that reached a carrier/vendor credit/refund/remittance;
-- an unambiguous realized-recovery allocation;
-- conversion to annual continuous assurance.
+The repository currently authorizes **zero ACTIVE_SEARCH freight gaps**. This is deliberate.
 
-These remain the highest-value evidence gaps.
+Remaining high-value blockers are not generic GitHub-discovery problems:
+1. first authorized frozen buyer population through later settlement;
+2. actual executed-rights documentation for hosted/SaaS/change-of-control questions where still unknown;
+3. tenant/business-unit isolation proof in the real pilot data service;
+4. hostile-input/parser isolation in the real ingestion path;
+5. reproducible production artifact/SBOM/signed provenance for annual deployment.
 
-## Rights state
+## Money semantics now enforced
 
-The operational rights record is `freight/COMPONENT_RIGHTS_REGISTRY.json`.
+Buyer-facing reporting separates:
+1. **reviewed discrepancy dollars**;
+2. **validated finding dollars**;
+3. **challenger-only validated dollars**;
+4. **uniquely attributable realized dollars**.
 
-The registry intentionally distinguishes:
-- public repository license;
-- user-asserted separate commercial permission;
-- unknown assignment/change-of-control/sublicensing/hosted-SaaS rights;
-- separately governed third-party data, standards, vendor services, trademarks, patents and customer records.
+A separate **fee-eligible realized** field is derived for commercial billing.
 
-Do not infer transferability from commercial-use permission.
+Rules:
+- discrepancy is not savings;
+- validated is not realized;
+- realized cannot exceed validated;
+- fee-eligible cannot exceed realized;
+- fee-eligible cannot exceed challenger-only validated;
+- incumbent-known findings are automatically non-fee-eligible when the ledger is bound to the frozen incumbent output;
+- automatic/preexisting credits remain non-fee-eligible;
+- ambiguous settlement allocation remains $0 realized.
 
-## Security state
+## Current offer ladder
 
-PR #7 materially improved repository supply-chain safety by:
-- pinning external GitHub Actions to immutable full SHAs;
-- restricting catalog/integrator write helpers to allowlisted paths;
-- rejecting absolute/path-traversal destinations;
-- adding concurrency/timeouts;
-- making the production-contract test job read-only;
-- pinning Python CI dependency versions.
-
-Still required before continuous enterprise assurance:
-- isolated customer data/control plane;
-- tenant/BU negative tests;
-- parser isolation and hostile-input limits;
-- independent verifier identity;
-- immutable/versioned evidence store;
-- SBOM + signed artifact/provenance;
-- retention/deletion/export policy;
-- incident-response runbook;
-- backup/restore evidence.
-
-## Commercial model
-
-Initial offer ladder:
 1. **$5k–$7.5k** Data Readiness / Authority Diagnostic.
 2. **$15k–$25k** Blind Freight Audit Acceptance Test.
-3. **15–20%** of uniquely attributable realized credit/refund/cash only.
-4. After proof, initial **$60k–$150k annual assurance**, with larger multi-BU deployments **$150k–$300k+** depending on complexity.
+3. **15–20%** only on uniquely attributable realized credit/refund/cash.
+4. After customer proof: initial **$60k–$150k annual assurance**, larger multi-BU **$150k–$300k+** depending on scope/integrations.
 
-No fee-eligible recovery may be created from unsupported authority, incumbent-preidentified findings, automatic/preexisting credits, duplicate recovery or ambiguous settlement.
+## Engineering freeze
+
+Do **not** cut a new freight version merely because another technically interesting repository appears.
+
+Internal freight engineering reopens only when one of these occurs:
+- EXP-001 begins and exposes a concrete missing capability;
+- a paying customer exposes a required integration/authority/settlement gap;
+- a security or rights diligence blocker requires remediation;
+- an independent falsifier reproduces a money-bearing disagreement;
+- a measured reviewer bottleneck can be reduced without raising false-dollar risk.
+
+Otherwise the correct next action is commercial validation, not more freight architecture.
 
 ## Next canonical milestone
 
-The next release should be cut only after one of these materially changes:
-- EXP-001 begins on an authorized customer population;
-- a required pilot/security control is implemented;
-- a customer exposes a concrete integration/capability gap;
-- a rights/transferability status is resolved.
+**Paid blind pilot -> unique incumbent miss -> buyer-approved action -> issued credit/refund/remittance -> unambiguous settlement -> recovery certificate -> annual assurance conversion.**
 
-Broad freight feature/repository accumulation alone is not a reason to create a new major version.
+That milestone, not another internal subsystem, is the next event expected to materially increase the business's defensible value.
