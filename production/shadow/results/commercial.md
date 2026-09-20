@@ -494,3 +494,78 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** No new referral. Existing provider/system-of-record readback referral is now partially answered at tier 5B object-convergence level; a new duplicate referral would add noise.
 
 **NEXT TEST:** Find a tier-5C artifact: literal post-effect process death on a **refund/credit that ultimately remains succeeded**, new-process recovery with no duplicate effect, and later processor/balance/settlement evidence showing the economic outcome—not merely the existence of one provider refund object. Prefer an independently rerunnable or independently attested artifact over another self-authored result record.
+
+## 2026-09-20 — Shadow run 8
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** The next useful evidence tier is not another exactly-once provider object. A stronger money-control artifact will prove that, after a real post-effect process death and new-process recovery, the correction is later **consumed by the provider's own accounting/billing engine** exactly once and changes the resulting receivable. This should separate provider-object convergence from economic application, even if bank/payout settlement remains unproven.
+
+**DISCOVERY METHODS:**
+1. Direct search for real Stripe refund/credit crash-restart evidence combined with balance transactions, invoices, payouts and settlement state.
+2. Code-signature/fault-seam search for `SIGKILL`, `balance_transaction`, post-send crashes, restart workers, provider idempotency and later billing/settlement reads.
+3. Adjacency/history traversal from the prior tier-5B candidate into sibling scenarios and checked-in machine artifacts, specifically testing whether any scenario closes the provider-accounting application edge rather than merely reproducing one provider object.
+
+**BEST EVIDENCE DELTA + URL + EXACT REVISION:** `az-said/Interlock` — `billing_credit` scenario — https://github.com/az-said/Interlock — `822ec54692b30e1fdce04b55dfab62d0b56a60b2`.
+
+This is **not a new repository**; it is a materially stronger economic-outcome scenario inside the prior run's exact revision. It is recorded because the shadow protocol values falsification/capability refinement even when no new repository is promoted.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `scenarios/billing_credit/billing.py` is explicitly Stripe **test-mode only**. A support approval authorizes one $10 goodwill credit, implemented as a Stripe customer-balance adjustment (`amount=-1000`) tagged with case/effect metadata. Stripe applies customer balance to the next finalized invoice.
+- `post_credit()` performs the real provider POST and, for `crash="after_send"`, calls `SIGKILL` only **after** the Stripe response has been parsed. The local worker therefore dies after provider effect but before the caller records completion.
+- `experiments/scenario_billing_credit.py` launches the decision worker as a subprocess, requires return code `-SIGKILL`, reads Stripe observations while the worker is dead, advances the customer's Stripe test clock through a real subscription renewal, launches a genuinely new `restart` worker process, then rereads Stripe ground truth.
+- The Interlock path recovers through the durable journal and the same effect identity. The careful handwritten baseline first queries Stripe by case metadata. Both avoid a second economic credit; the no-check baseline relies on Stripe's stable idempotency key.
+- The durable state contract is split across fsynced `decision.json` / case approval state, Interlock's hash-chained `journal.jsonl`, and Stripe's own customer-balance/invoice objects. There is no separate relational schema for this scenario; the relevant state transitions are explicit in source and published JSON artifacts.
+
+**CHECKED-IN TIER-5C-A EVIDENCE:**
+- `results/scenarios/billing_credit.md` records Stripe Billing test mode with test clocks and states that **every crash is a real SIGKILL of the worker process**. In both `after_send / renewal` and `after_send / proration`, all three systems finish with exactly one $10 case credit and the invariant held.
+- The machine-readable `results/scenarios/billing_credit.json` is stronger. In the `after_send / renewal` path the first worker exits `-9`; the credit exists at crash time; after the outage/restart, Stripe ground truth contains exactly one case adjustment of `-1000` and one later `applied_to_invoice` balance transaction of `+1000`.
+- That same ground truth shows the subscription-cycle invoice is `paid`, with `total=3000`, `starting_balance=-1000`, and `amount_due=2000`. In other words, the one crash-surviving $10 correction was consumed once by Stripe Billing and reduced the paid renewal receivable by exactly $10.
+- For the Interlock cell, the recovery result is `COMMITTED_BY_RETRY` / `retry-idempotent`; Stripe returns the existing credit (`already_processed`), the published receipt verifies as valid/tamper-evident with `happened_once=true`, and the provider ground truth still contains one adjustment plus one invoice application—not two credits.
+- The `after_send / proration` row independently shows the same one-credit invariant surviving process death while the later provider-native invoice path changes; the result is not dependent on one fixed invoice shape.
+
+**TEST / HISTORY / RIGHTS VERIFICATION:**
+- `tests/test_scenario_billing_credit.py` verifies incident-scoped compensation semantics, lookup-after-send, send-once/find-on-retry behavior, stale-premise/refused-approval cases, judge invariants and offline re-verification of every published Interlock receipt against `billing_credit.json`.
+- Current `main` remains `822ec54692b30e1fdce04b55dfab62d0b56a60b2`.
+- Scenario history traces to `fe498692079dd251b88ac455e06c09dbc582f446` (2026-09-13), whose commit message explicitly says the suite uses live services with real SIGKILL and ground-truth readback, including a Billing credit across a test-clock renewal. It also candidly states the fair handwritten check ties Interlock on outcomes and the consistent edge is tamper-evident receipts.
+- MIT license verified at blob `f84454625104c633d7b7500f03202f6b4143f516`.
+- Frozen evidence manifest: `sha256:9ecd448a9045672a38c76ff0a80fc86a64b4b186d6bdc2e849771ba7496f9eac`, binding the exact revision to:
+  - `results/scenarios/billing_credit.md` — `88051af0a2326755dc273a2d2f489971f5c955ae`
+  - `results/scenarios/billing_credit.json` — `b45daad2ac699e94cd3cea73ca6608abd912e476`
+  - `scenarios/billing_credit/billing.py` — `db5fe079ce53a6e0676390ad6a75c9deeaabed08`
+  - `scenarios/billing_credit/worker.py` — `12d463bf7f5dafbdb104eda2f38f3639336fdb14`
+  - `tests/test_scenario_billing_credit.py` — `4e1572bdc9794c5b840e2ad9e2547e0859437a64`
+  - `LICENSE` — `f84454625104c633d7b7500f03202f6b4143f516`
+  - scenario-lineage commit `fe498692079dd251b88ac455e06c09dbc582f446`.
+- No repository code, Stripe mutation, credentials, contacts, spend or commitments were executed in this shadow run.
+
+**COMPARATORS / FALSIFIERS:**
+- `stripe/stripe-commercetools-checkout-app@12b31a218eb87b622ef2dbc4b6ecde92b4b78097` is an important production-lifecycle comparator. Its current source/tests explicitly distinguish a refund being created from a refund later failing on delayed rails, route `refund.updated` / `refund.failed`, and avoid double-booking successful refunds. This reinforces the economic-terminality rule: provider-object creation and final money/accounting state must be scored separately. It does not, in the inspected evidence, provide the same literal post-effect SIGKILL/new-process experiment.
+- `temporal-community/agent-memory-and-state@59fb4186bc50daefe09653a850197a985b3fa1cf` remains a strong source-design comparator: real Stripe test payment seeding, idempotent refund execution, a Worker SIGKILL command and provider refund-list readback are implemented. The inspected revision still lacks an equally strong checked-in completed machine-readable run artifact proving the full tier-5C accounting application path.
+
+**RED-TEAM OBJECTION:** This closes **provider-accounting application**, not bank settlement. A Stripe customer-balance adjustment is an internal customer credit, not a refund returned to a card/bank and not a merchant payout. The test clock accelerates time; although Stripe's own test Billing engine creates/finalizes/charges the renewal, no external acquiring/banking settlement is proven. The crash seam still occurs after Stripe's HTTP response has reached the worker rather than at transport-level response loss. The checked-in run is self-authored and was not independently rerun here. Most importantly, the repository's own history says a careful handwritten baseline tied Interlock on every money outcome; therefore Interlock's moat cannot be claimed as unique money correctness. Its differentiated value is reusable recovery/evidence machinery and verifiable receipts. The published receipts are hash-chained but unsigned, so they establish internal tamper evidence rather than independent signer identity.
+
+**INDEPENDENT VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The frozen packet supports the narrow claim that this exact revision contains checked-in Stripe test-mode evidence for: real post-effect worker SIGKILL, genuinely new-process recovery, exactly one approved customer-balance credit, and later provider-native consumption of that credit by a paid renewal invoice whose amount due is reduced by exactly $10. The verifier rejects stronger claims of card/bank refund settlement, payout reconciliation, live-money production qualification, transport-level response loss, independent attestation or recovered-dollar ROI. The verifier also rejects any claim that Interlock uniquely achieves the money outcome because the handwritten baseline ties it in the published scenario.
+
+**A-F SCORE (proposed only, after verifier):** **27/30 — A4 / B5 / C5 / D4 / E5 / F4.**
+- A4: a sandbox billing-correction crash certification can be sold without touching live customer money.
+- B5: duplicate credits and failed-to-apply corrections directly change receivables, customer balances and support/finance exposure.
+- C5: compresses process fault injection, durable effect identity, authority/premise checking, provider readback, invoice-ground-truth validation and receipt construction.
+- D4: the exact evidence bundle is rare, but the fair handwritten baseline proves the core money outcome is reproducible without the framework.
+- E5: source, tests, machine-readable external-provider artifact, provider-native invoice application, history and contradictory evidence are all revision-bound.
+- F4: MIT and test-mode boundaries are clear; live settlement and independent attestation remain outside scope.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: billing/payments engineering lead, Controller's systems team, subscription-platform owner or reliability team responsible for credits/refunds.
+- Pain: a worker can die after a customer correction is accepted but before local completion is recorded. A duplicate credit loses revenue; a missing/unapplied credit creates customer and reconciliation failures; ordinary “refund object exists” checks do not prove the correction reached the next receivable.
+- First paid wedge: **Billing Credit Crash Certification** for one Stripe test-mode correction flow. Inject pre/post-effect process deaths, restart from preserved state, prove exactly one approved correction exists, advance through the next provider-native billing event, and deliver evidence that the correction was consumed once against the resulting invoice/receivable. Keep the engagement test-mode first and explicitly separate provider-accounting application from cash/bank settlement.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Run 7 proved tier-5B provider-object convergence after literal process death. This sibling scenario advances the evidence ladder one economically meaningful step: **provider object → provider accounting application / receivable effect**. Combined with the earlier authority/leakage/correction components, the stack can now target **contract authority → discrepancy decision → approved correction → crash-safe external effect → provider-native receivable application → reconciliation evidence**. The remaining hard boundary is independently grounded **cash settlement/payout/bank truth**, not another provider-object test.
+
+**SEARCH EFFORT / COST PROXIES:** 3 materially different discovery modes; 3 serious candidate/comparator paths inspected; targeted source/result/test/history/license verification at exact revisions; roughly two dozen connector/search/file inspections in this run; 0 untrusted-repository code executions, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Refine `SK-COM-003` with a two-part tier 5C. **Tier 5C-A = provider-accounting application:** after tier-5B crash recovery, the one external correction is later consumed by a provider-native accounting/billing event and changes the resulting obligation/receivable exactly once. **Tier 5C-B = external cash settlement:** processor balance/payout/bank evidence confirms the economic movement beyond the provider's own accounting plane. This run reaches **5C-A**, not 5C-B. The separation prevents “paid invoice after a credit” from being overclaimed as bank-settled refund money.
+
+**REFERRALS:** No new referral. The existing provider/system-of-record readback referral already contains the unresolved settlement question; another referral would duplicate it.
+
+**NEXT TEST:** Find tier-5C-B evidence: a post-effect process death around a cash refund/payout/credit that remains economically successful, new-process recovery with no duplicate mutation, and later processor balance/payout/bank-settlement evidence that is independently grounded rather than only internally reconciled.
