@@ -25,6 +25,7 @@ DOC_PATHS=(
     "freight/COMMERCIAL_LEARNING.md",
     "freight/DATA_READINESS_DIAGNOSTIC.md",
     "freight/PILOT_PROTOCOL.md",
+    "freight/PILOT_LAUNCH_GATE.md",
     "freight/PILOT_DATA_ROOM.md",
     "freight/PILOT_REPORT_TEMPLATE.md",
     "freight/PILOT_AUDIT_AND_LIFECYCLE.md",
