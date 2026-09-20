@@ -236,3 +236,27 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - human-review labels exist but aggregation/billing occurs before the review transition;
   - conservative UNKNOWN states are collapsed into false negatives or asserted zeros.
 - NEXT IMPROVEMENT: combine this skill with fail-open boundary archaeology on AP, commission, freight, eligibility and recovery-proof experiments, and explicitly test whether the accepted evidence/claim set is identical at validation, aggregation and billing/reporting boundaries.
+
+## Rule-period / authority-version audit
+- SKILL NAME: Rule-period / authority-version audit
+- WHEN TO USE: A deterministic regulatory, eligibility, compliance, procurement or policy calculator/repository looks current but its categorical output depends on effective-dated rules, measurement windows, threshold types, named-program exceptions or authority text that may have drifted.
+- PROCEDURE:
+  1. Pin the exact repository revision and state the exact product/program context the code claims to decide.
+  2. Enumerate every load-bearing rule input: measurement/lookback window, threshold type, averaging basis, exception branch, effective date, section identifier, authority/contact endpoint and categorical output text.
+  3. Map each load-bearing rule to a **dated first-party authority**. Do not infer substantive currentness from repository owner, recent commits, `updated_at`, copyright year, current-looking threshold tables or a generic disclaimer.
+  4. Inspect recent diffs/commit history to distinguish substantive rule updates from regeneration, formatting, banners, metadata or mirrored publication refreshes.
+  5. Compare at least one changed load-bearing section/rule against the current authority. For calculators, construct a boundary case where the stale and current rule periods cross the same threshold and therefore flip the categorical result.
+  6. Keep general rules and named-program exceptions separate. A valid exception must not silently become the default rule for a different program/context.
+  7. If a repository is stale, preserve any legitimate archival/version-diff value while rejecting it as current decision authority until reconciled.
+- WHY IT WORKED: Benchmark Experiment Tasks **49 and 50** independently confirmed the method. Task 49 showed that a recently maintained SBA/federal-contracting calculator could carry current-looking thresholds while its executable measurement windows were stale; first-party authority plus an adversarial boundary case made the defect decision-relevant. Task 50 transferred the method to an official-looking acquisition-regulation mirror, where recent 2026 activity and fresh presentation metadata coexisted with substantively stale section structure/contact authority; direct first-party comparison correctly separated archival value from current-rule use.
+- EXAMPLES:
+  - Benchmark Task 49: `rc2consulting/rc2consulting.github.io@05c644c9fe7b27db941e26f926461a3b44768138`
+  - Benchmark Task 50: `GSA/GSA-Acquisition-NMCARS@09d5b2d7040065fead99e15aacabb1d782b450d5`
+- FAILURE MODES:
+  - treating repository recency, official organization ownership or current copyright metadata as substantive currentness;
+  - validating a current threshold table while missing a stale measurement/averaging window;
+  - accepting a disclaimer such as “verify with agency” as a substitute for current decision logic;
+  - overgeneralizing a named-program exception into the general rule;
+  - trusting mirror/regeneration commits without diffing load-bearing content;
+  - discarding a stale corpus entirely when it still has archival/version-diff value.
+- NEXT IMPROVEMENT: combine this skill with first-party production-source triangulation and authority-origin consistency for CaptureBrief, PermitPlate, compliance engines and other rule-bearing products; track effective-date/version lineage as a first-class capability rather than a documentation note.
