@@ -124,8 +124,12 @@ jobs:
         run: python tools/ti_worker_routing_validate.py
       - name: Build V14 dispatch tickets
         run: python tools/ti_dispatch.py
-      - name: Validate V14 dispatch binding
+      - name: Validate V14/V15 dispatch binding
         run: python tools/ti_dispatch_validate.py
+      - name: Build V15 dispatch backpressure
+        run: python tools/ti_dispatch_backpressure.py
+      - name: Validate V15 dispatch backpressure
+        run: python tools/ti_dispatch_backpressure_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -220,8 +224,12 @@ jobs:
         run: python tools/ti_worker_routing_validate.py
       - name: Build V14 dispatch tickets
         run: python tools/ti_dispatch.py
-      - name: Validate V14 dispatch binding
+      - name: Validate V14/V15 dispatch binding
         run: python tools/ti_dispatch_validate.py
+      - name: Build V15 dispatch backpressure
+        run: python tools/ti_dispatch_backpressure.py
+      - name: Validate V15 dispatch backpressure
+        run: python tools/ti_dispatch_backpressure_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -315,7 +323,14 @@ jobs:
                   intelligence/dispatch_ticket_history.jsonl \
                   intelligence/dispatch_claim_packets.jsonl \
                   intelligence/DISPATCH_BOARD.md \
-                  intelligence/dispatch_metrics.json
+                  intelligence/dispatch_metrics.json \
+                  intelligence/dispatch_backpressure.jsonl \
+                  intelligence/worker_dispatch_response_metrics.jsonl \
+                  intelligence/work_steal_tickets.jsonl \
+                  intelligence/work_steal_claim_packets.jsonl \
+                  intelligence/dispatch_backpressure_metrics.json \
+                  intelligence/DISPATCH_BACKPRESSURE.md \
+                  intelligence/WORK_STEAL_QUEUE.md
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
