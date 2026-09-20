@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "objectives": [
+    {
+      "search_objective_id": "OBJ:authority-lineage",
+      "name": "Authority lineage",
+      "description": "Find where controlling commercial/legal/operational authority enters the state transition and whether alternate paths bypass it."
+    },
+    {
+      "search_objective_id": "OBJ:completeness-proof",
+      "name": "Completeness proof",
+      "description": "Determine whether an evidence set can prove global/subject completeness rather than only validate present artifacts."
+    },
+    {
+      "search_objective_id": "OBJ:ambiguity-reconciliation",
+      "name": "Ambiguity reconciliation",
+      "description": "Find response-loss/restart/UNKNOWN boundaries and prove whether reissue is safe before repeating physical or financial actions."
+    },
+    {
+      "search_objective_id": "OBJ:independent-evaluation",
+      "name": "Independent evaluation",
+      "description": "Find evaluators/outcome sources independent enough to falsify the target system's own claims."
+    },
+    {
+      "search_objective_id": "OBJ:exactly-once-settlement",
+      "name": "Exactly-once settlement",
+      "description": "Trace durable monetary intent, ambiguous provider outcomes, reversals and final settlement without double application."
+    },
+    {
+      "search_objective_id": "OBJ:identity-lineage",
+      "name": "Identity and correlation lineage",
+      "description": "Establish stable event/entity identity and provenance required for joins, blocking and replay."
+    },
+    {
+      "search_objective_id": "OBJ:runtime-side-effect",
+      "name": "Runtime side-effect trace",
+      "description": "Trace a decision/claim through the exact executable path that mutates trusted state or an external system."
+    },
+    {
+      "search_objective_id": "OBJ:current-rule-authority",
+      "name": "Current rule authority",
+      "description": "Verify effective-dated rule/currentness semantics against dated first-party authority."
+    },
+    {
+      "search_objective_id": "OBJ:research-lineage",
+      "name": "Research-to-production lineage",
+      "description": "Trace a method from paper/research artifact to hardened production descendant while preserving core invariants."
+    },
+    {
+      "search_objective_id": "OBJ:emergence-triangulation",
+      "name": "Emergence triangulation",
+      "description": "Measure independent convergence of a capability across research, code, standards/packages and production systems."
+    },
+    {
+      "search_objective_id": "OBJ:ingestion-durability",
+      "name": "Ingestion durability",
+      "description": "Intersect source topology, historical durability and truthful run/source-health state."
+    },
+    {
+      "search_objective_id": "OBJ:protocol-regression",
+      "name": "Protocol regression",
+      "description": "Mine compatibility defects, migration contracts and regression evidence for protocol/integration readiness."
+    }
+  ]
+}
