@@ -8,6 +8,7 @@ strats={x["strategy_id"] for x in load_jsonl("search_strategies.jsonl")}
 obj=json.loads((INTEL/"search_objectives.json").read_text(encoding="utf-8"))
 objs={x["search_objective_id"] for x in obj.get("objectives",[])}
 runs=load_jsonl("search_runs.jsonl")
+coverage_gap_ids_active={x["coverage_gap_id"] for x in load_jsonl("exploration_gap_queue.jsonl")} if (INTEL/"exploration_gap_queue.jsonl").exists() else set()
 seen=set()
 for n,s in enumerate(seeds,1):
     sid=s.get("seed_id")
@@ -16,7 +17,7 @@ for n,s in enumerate(seeds,1):
     if sid in seen:
         raise SystemExit(f"search_seeds.jsonl:{n}: duplicate seed_id {sid}")
     seen.add(sid)
-    if s.get("seed_type") not in {"capability_gap","positive_dna_transfer","strategy_measurement"}:
+    if s.get("seed_type") not in {"capability_gap","positive_dna_transfer","strategy_measurement","coverage_gap"}:
         raise SystemExit(f"search_seeds.jsonl:{n}: invalid seed_type")
     p=s.get("priority")
     if not isinstance(p,(int,float)) or not (0<=p<=100):
@@ -30,6 +31,11 @@ for n,s in enumerate(seeds,1):
             raise SystemExit(f"search_seeds.jsonl:{n}: unknown capability {cid}")
     if not s.get("query_templates"):
         raise SystemExit(f"search_seeds.jsonl:{n}: no query templates")
+    if s.get("seed_type")=="coverage_gap":
+        gids=s.get("coverage_gap_ids") or []
+        if not gids: raise SystemExit(f"search_seeds.jsonl:{n}: coverage_gap seed missing coverage_gap_ids")
+        for gid in gids:
+            if gid not in coverage_gap_ids_active: raise SystemExit(f"search_seeds.jsonl:{n}: inactive/unknown coverage gap {gid}")
 for n,r in enumerate(runs,1):
     if (r.get("schema_version") or 0)>=5:
         mode=r.get("seed_mode")
