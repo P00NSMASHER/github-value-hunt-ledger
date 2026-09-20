@@ -52,8 +52,6 @@ def enrich(m,r,outs):
         m["valid_outcome_runs"]+=1
     if any(o.get("result")=="PASSED" for o in outs):
         m["passed_outcome_runs"]+=1
-    if r.get("allocation_mode")=="manual_override":
-        m["manual_override_runs"]+=1
     for d in r.get("candidate_dispositions") or []:
         m["candidate_dispositions"]+=1
         if d.get("duplicate_of") or d.get("reason_code_standard")=="duplicate_or_dominated":
@@ -89,6 +87,10 @@ for r in RUNS:
     outs=outcomes_by_run.get(r.get("search_run_id"),[])
     role[slot_role]["key"]=slot_role
     kind[work_kind]["key"]=work_kind
+    if r.get("allocation_mode")=="manual_override":
+        role[slot_role]["manual_override_runs"]+=1
+        kind[work_kind]["manual_override_runs"]+=1
+        continue
     enrich(role[slot_role],r,outs)
     enrich(kind[work_kind],r,outs)
 
