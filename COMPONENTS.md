@@ -283,3 +283,21 @@ For each entry record:
 - Capability: two-phase scheduling solver with pre-solve capacity analysis, deterministic input hash, hard-core versus relaxable/soft constraint classification, ordered automatic relaxation, warm-start optimization and explicit Phase-1 fallback when optimization fails; tests cover deterministic hashing, free periods, relaxation ordering and end-to-end feasibility.
 - Integration: pair with RosterSpec's verification/minimum-disruption repair on a common workforce/field-service fixture.
 - Promotion gate: prove that the relaxation contract transfers beyond school timetabling and that every relaxed rule is minimally sufficient, human-readable and approval-ready. The committed `frontend/.env` remains uninspected and safety-indexed separately.
+
+<!-- INTEGRATOR-R11-SAAS-REVENUE-2026-09-20T0102-0400 -->
+## SaaS revenue-integrity components — post-checkpoint
+
+### geminimir/meterguard — Stripe usage parity / correction substrate
+- Revision: `9147d6fdf9fd8ee8761d732e956fc0a8c86989bd`.
+- Integrator score after source-level recheck: **28/30 — A5 B5 C5 D5 E3 F5**. Hunter score was 29/30; evidence/completeness is reduced one point because the strongest finalization-parity claim is documented/demoed more strongly than it is enforced by the inspected validator/tests.
+- Rights: MIT repository code. Stripe APIs/terms/trademarks and customer usage/billing data remain separately governed.
+- Capability inspected: real reconciler reads local counters and Stripe usage summaries, persists diff reports, raises `investigate`, creates pending corrections/alerts, and tracks parity metrics. ADR defines idempotent delta writes, late-event/watermark handling, rate-limit retry and a 0%-at-finalization target.
+- Important implementation caveat: current `demo/stripe-test-clocks/validate.sh` accepts either absolute zero drift **or** drift within epsilon, so it proves an open-period tolerance check rather than exact finalized-invoice parity. Reconciler correction behavior is also asymmetric: `Stripe > local` can generate suggested local adjustments while `local > Stripe` raises manual review. Both directions need an independent seeded oracle before money claims.
+- Integration: central engine in SaaS Revenue Integrity v1; upstream Mima-style contract/subscription truth, downstream invoice/journal/settlement truth.
+- Promotion gate: independent corpus must prove duplicate/late/replayed events, provider retries, both drift directions and exact final quantity+dollar parity across finalization. Keep out of MASTER until then.
+
+### Mima-N/gitlab_mrr_pipeline_dbt — CRM↔billing contract-state drift layer
+- Revision: `e43562f48a9bf70e58383f453ababd6bbe342f36`.
+- Integrator score under standing repository-code permission: **26/30 — A5 B5 C4 D3 E4 F5**. Actual public repository had no visible root license; provenance remains recorded, but public-license category is not a value penalty under the user's separate permission assertion.
+- Capability: deterministic Salesforce opportunity↔Zuora subscription reconciliation for orphaned won opportunities, start/close-date drift, MRR/term mismatches and active-billing-vs-CRM-churn states with severity/annualized impact.
+- Integration / next action: use only as the upstream cross-system truth layer; independently seed the CRM/billing mismatch matrix and keep synthetic README dollars out of commercial proof.

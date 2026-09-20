@@ -210,3 +210,17 @@ The strongest path remains a frozen customer-authorized blind population carried
 - First paid wedge: fixed-price baseline evidence/gap refresh, followed by monthly recurring evidence collection and auditor export.
 - Revenue path: setup + recurring managed evidence operations.
 - Status: fast service-first challenger; promotion depends on authorized-sandbox failure injection proving missing permissions/expired auth/empty windows/integrity breaks remain non-pass.
+
+<!-- INTEGRATOR-R11-SAAS-REVENUE-2026-09-20T0102-0400 -->
+## SaaS Revenue Integrity Acceptance Test
+- Core: CRM/contract-state reconciliation -> entitlement/access check where applicable -> MeterGuard-style metered-usage/provider parity -> invoice -> independent ledger/settlement evidence.
+- Buyer: usage-based B2B SaaS controllers, RevOps and billing engineering.
+- First paid wedge: one-period read-only/shadow acceptance test before or across invoice close, with source-linked missing/duplicate usage, contract-state mismatch, invoice-dollar drift and remediation queue.
+- Revenue path: fixed acceptance test -> recurring pre-close monitoring -> recovery/refund-control work on validated exceptions.
+- Why it matters: it is a direct-money analog of freight audit with a much easier authorization surface, but promotion depends on exact finalization proof rather than epsilon/demo claims.
+
+## SaaS License True-Up & Renewal Savings Audit
+- Core: SaaSLens subscription/payment/user/access schema + customer-owned SSO/app-usage/HR/contract evidence.
+- Buyer: IT, FinOps, procurement and controllers.
+- First paid wedge: one renewal cohort or top 20 SaaS vendors; quantify unused-seat spend, offboarded-user licenses and duplicate/unmatched payments, with human approval before any access change.
+- Revenue path: fixed audit -> recurring renewal calendar/true-up monitoring; realized savings tracked only after contract/vendor action is confirmed.
