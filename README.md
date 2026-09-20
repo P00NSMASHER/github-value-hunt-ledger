@@ -3,42 +3,53 @@
 Private persistent memory for the GitHub Value Hunt.
 
 ## Operating model
-- Lanes 01-14 are independent discovery streams.
-- Every hunter reads its lane, MASTER.md, REJECTED.md, and COMBINATIONS.md before searching.
-- New findings must be evidence-backed and deduplicated.
-- Task 15 integrates findings across lanes and maintains MASTER.md, COMBINATIONS.md, and REJECTED.md.
-- Public repositories may be analyzed regardless of popularity or license, but reuse must respect license/copyright.
-- Do not collect, preserve, reproduce, or exploit exposed credentials, personal data, authentication material, or accidentally published confidential information. Quarantine and skip those items.
+- Fourteen active hunter workstreams search across the **47 thematic catalogs** under `hunters/`; catalog numbers are domain indexes, not necessarily one-to-one automation identities.
+- Every hunter reads the relevant thematic catalog(s), `MASTER.md`, `SEARCH_QUEUE.md`, `REJECTED.md`, and `COMBINATIONS.md` before searching.
+- Every materially inspected candidate should leave durable evidence in the appropriate hunter catalog as strong/watch/rejected so sibling work does not repeat it.
+- New findings must be evidence-backed and deduplicated by **repository + exact revision + capability**, not repository name alone.
+- Hunt 15 / MASTER Integrator owns cross-lane synthesis: `MASTER.md`, `COMBINATIONS.md`, `REJECTED.md`, `SEARCH_QUEUE.md`, `DATASETS.md`, `COMPONENTS.md`, `OPPORTUNITIES.md`, and `EXPOSURES_INDEX.md`.
+- MASTER is intentionally elite. A candidate normally needs **24+/30** on A speed to revenue, B plausible ACV/ceiling, C build/domain compression, D rarity/technical advantage, E evidence/completeness, and F rights/reuse clarity; lower scores require a uniquely important role in a stronger stack.
+- Standing user assertion dated 2026-09-19: the user states they hold separate commercial permission/license for repository-owned code/content in every PUBLIC GitHub repository discovered in this hunt. Therefore public license category is provenance metadata, not a search-value penalty. Record the actual published license exactly. Do not extend this assumption to independently owned datasets, model weights, standards/specifications, trademarks, patents, bundled assets, commercial APIs/services, or customer data.
+- Safety overrides commercial-rights assumptions. Never collect, preserve, reproduce, test, exploit or monetize exposed credentials, authentication material, private/personal data, accidentally published confidential information, leaked trade secrets, vulnerabilities or unauthorized-access material. Record only redacted non-sensitive exposure metadata when necessary.
+
+## Shared indexes
+- `MASTER.md` — elite repository/software leaders and uniquely important components.
+- `COMBINATIONS.md` — multi-repository product stacks with named buyers and falsifiable validation paths.
+- `SEARCH_QUEUE.md` — current complementary search directions, unresolved evidence gaps and stop-list guidance.
+- `REJECTED.md` — cross-lane dead ends, dominated finds, misleading surfaces and safety/rights traps likely to be rediscovered.
+- `DATASETS.md` — elite datasets, authoritative public-data pipelines, schemas and hard-to-recreate data advantages.
+- `COMPONENTS.md` — reusable infrastructure/components that compress stronger products.
+- `OPPORTUNITIES.md` — prioritized monetizable offers, services and product combinations.
+- `EXPOSURES_INDEX.md` — **redacted metadata only** for accidental sensitive-material encounters; never raw values.
 
 ## Finding schema
 Each retained finding should include:
 - Repository + canonical URL
 - Exact commit/revision inspected
 - Date discovered
-- Lane
+- Thematic catalog / lane
+- Category: Repository / Dataset / Reusable Component / Business Opportunity
 - What it contains
-- Why it matters
-- Commercial possibilities
-- Build-time savings
-- Evidence inspected
-- License / rights
-- Reuse classification
-- Scores: technical value, commercial value, rarity, completeness, build-time saved, data advantage, high-ticket potential
-- Next action
+- Why it matters / rare value
+- Buyer and painful problem
+- First paid wedge / monetization path
+- Build-time or data advantage
+- Evidence inspected beyond README where practical
+- Actual published license / rights metadata
+- Standing separate-commercial-permission posture and any separately governed third-party dependencies
+- A–F score where meaningful
+- Combination opportunities
+- Next action / validation gap
 
-## Reuse classification
-- Directly reusable
-- Reusable with license conditions
-- Inspect / learn / clean-room implementation only
-
+## Reuse / evidence posture
+- Repository-owned code/content may be treated as commercially authorized under the standing user assertion while preserving actual public license provenance.
+- Third-party standards, datasets, model weights, media/assets, trademarks, patents, APIs/services and customer data require their own authority/terms.
+- Unknown or contradictory evidence stays unknown/review. In money-bearing audit/recovery stacks, unresolved authority, entitlement, identity or outcome defaults to **$0 asserted recovery**.
+- “Rare/secret” means obscure, undernoticed, non-obvious, little-known or unusually hard-to-recreate lawful public material. It does **not** mean accidental secrets or confidential/private material.
 
 # Hunter Catalogs
 
-Each hourly hunter writes only to its own file under `hunters/` to avoid concurrent overwrite conflicts. Every meaningful repository or public technical/data artifact inspected should be recorded, including rejected/deprioritized candidates when useful, with evidence and rights status. The cross-hunt integrator maintains MASTER.md, COMBINATIONS.md, and REJECTED.md.
-
-"Rare/secret" means obscure, undernoticed, non-obvious, little-known, or unusually hard-to-recreate public material. It does **not** include credentials, personal/private data, authentication material, accidentally exposed confidential information, or leaked trade secrets.
-
-Public GitHub availability does not mean public domain. Reuse must follow the applicable license and copyright status.
+Hunters write materially inspected results into the relevant files under `hunters/` and preserve sibling content. The cross-hunt integrator performs promotion/demotion and cross-lane indexing without using MASTER as a long archive.
 
 ## Hunter index
 - 01: Abandoned SaaS & forgotten products
