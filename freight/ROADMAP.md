@@ -10,11 +10,27 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
+## Current checkpoint — v15.3
+
+Internal commercialization controls now completed:
+- paid offer/ICP/pricing defined;
+- machine-scored Data Readiness gate;
+- blind population/truth/incumbent ordering enforced;
+- canonical freight gap register with **zero ACTIVE_SEARCH gaps**;
+- hunter/integrator freight work bound to registered EXP-001 gaps;
+- settlement deduplication/validated caps;
+- automatic incumbent-known success-fee exclusion;
+- proof-derived buyer pilot metrics/report template;
+- rights-operability registry;
+- repository workflow hardening and pinned CI.
+
+**Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
+
 ## Next 24 hours — make the asset diligence-ready
 
 ### P0
-1. Merge the v15 commercialization/hardening PR after CI passes.
-2. Freeze one canonical Freight Recovery release identity from committed source.
+1. **DONE:** v15 / v15.1 / v15.2 / v15.3 commercialization and machine-gate PRs merged after CI.
+2. **DONE:** canonical Freight Recovery v15.3 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. Produce a release manifest with:
    - source commit;
    - exact component revisions;
