@@ -1,0 +1,31 @@
+{
+  "buyer_id": "buyer-synthetic",
+  "business_unit": "north-america",
+  "selection_rule": "closed paid invoices synthetic August 2026",
+  "population": [
+    {
+      "invoice_id": "INV-1001",
+      "shipment_id": "SHP-1001",
+      "customer_id": "CUST-1",
+      "carrier_id": "CAR-1",
+      "currency": "USD",
+      "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "invoice_id": "INV-1002",
+      "shipment_id": "SHP-1002",
+      "customer_id": "CUST-1",
+      "carrier_id": "CAR-1",
+      "currency": "USD",
+      "source_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "authority": {
+    "authority_id": "AUTH-DET-1",
+    "customer_id": "CUST-1",
+    "carrier_id": "CAR-1",
+    "currency": "USD",
+    "source_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "scenario": "Two separate invoices each carry the same $25 validated detention variance so the benchmark must preserve finding identity rather than collapse by reason+dollars."
+}
