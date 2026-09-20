@@ -1,5 +1,5 @@
 {
-  "schema_version": 12,
+  "schema_version": 14,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -97,5 +97,9 @@
   "routing_mode": "generated",
   "routing_generation_id": "ROUTING:000000000000",
   "worker_profile_generation_id": "WORKERS:000000000000",
-  "routing_score": 0
+  "routing_score": 0,
+  "dispatch_ticket_id": "DISPATCH:000000000000",
+  "dispatch_generation_id": "DISPATCHGEN:000000000000",
+  "routing_learning_generation_id": "ROUTELEARN:000000000000",
+  "route_override_reason": null
 }
