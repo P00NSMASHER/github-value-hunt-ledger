@@ -358,3 +358,49 @@ New prospective runs use `schema_version: 8` and record:
 - a `repository_profile` for every structured candidate disposition. Unknown manual tags stay `unknown`/empty rather than being guessed.
 
 The default taxonomy is an exploration policy, not a claim about GitHub prevalence. It is editable as evidence accumulates.
+
+
+## V9 unified hunt allocator
+
+V9 turns the separate intelligence products into one ranked 14-slot work plan.
+
+Inputs include:
+- adaptive strategy allocation;
+- READY/RUNNING experiments and their current next actions;
+- capability-gap seeds;
+- V7 saturation redirects;
+- V8 blind-spot coverage seeds;
+- V6 adjacency opportunities;
+- strategy measurement debt;
+- explicit verification and wildcard reserves.
+
+Generated products:
+- `hunt_candidates.jsonl` — all eligible work items with transparent score components;
+- `hunt_allocations.jsonl` — one assignment per configured slot;
+- `HUNT_PLAN.md` — the executable 14-slot plan;
+- `ALLOCATOR_REPORT.md` — portfolio mix and concentration controls;
+- `allocator_metrics.json` — machine-readable allocator state.
+
+Default 14-slot portfolio:
+- 6 experiment/high-value capability slots;
+- 3 blind-spot exploration slots;
+- 2 adjacency slots;
+- 1 strategy-measurement slot;
+- 1 independent falsification slot;
+- 1 protected wildcard slot.
+
+Hard concentration controls prevent more than:
+- 2 assignments on one capability;
+- 2 assignments on one experiment;
+- 3 assignments using one strategy;
+- 1 adjacency assignment from the same root repository.
+
+READY/RUNNING experiments can outrank additional repository search. BLOCKED_EXTERNAL experiments are not assigned as autonomous work.
+
+New prospective runs use `schema_version: 9` and record:
+- `allocation_mode: generated | manual_override | unallocated`;
+- `allocator_generation_id`;
+- `assignment_id`;
+- `assignment_work_item_id`.
+
+Manual overrides are allowed but must be explicit. The allocator is a scheduler, not evidence: all existing verification, rights, safety, saturation and domain-authorization gates remain in force.
