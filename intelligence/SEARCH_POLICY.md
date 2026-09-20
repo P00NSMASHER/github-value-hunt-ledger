@@ -5,24 +5,25 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 - Measured prospective or benchmark runs: **11**
 - Valid structured outcomes: **1**
 - Exploration budget: **50%**
+- Multi-origin outcomes use fractional equal-touch credit rather than being counted in full for every strategy.
 - Strategies with fewer than 5 runs or 20 deep inspections remain **insufficient evidence** even if their suggested allocation is high.
 
 ## Suggested strategy allocation
 
-| Strategy | Allocation | Runs | Inspected | Evidence |
-|---|---:|---:|---:|---|
-| STRAT:acceptance-path-transition-inspection | 15.9% | 4 | 8 | insufficient |
-| STRAT:capability-conjunction-search-claim-tracing | 14.4% | 2 | 6 | insufficient |
-| STRAT:first-party-production-source-triangulation | 13.9% | 2 | 7 | insufficient |
-| STRAT:fail-open-boundary-archaeology | 10.4% | 1 | 4 | insufficient |
-| STRAT:evaluation-target-independence | 10.1% | 2 | 4 | insufficient |
-| STRAT:authority-origin-invariant-set-consistency | 5.1% | 0 | 0 | insufficient |
-| STRAT:cross-source-emergence-triangulation | 5.1% | 0 | 0 | insufficient |
-| STRAT:decision-claim-runtime-side-effect-trace | 5.1% | 0 | 0 | insufficient |
-| STRAT:ingestion-invariant-triad-intersection | 5.1% | 0 | 0 | insufficient |
-| STRAT:paper-research-artifact-production-descendant | 5.1% | 0 | 0 | insufficient |
-| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 5.1% | 0 | 0 | insufficient |
-| STRAT:rule-period-authority-version-audit | 5.1% | 0 | 0 | insufficient |
+| Strategy | Allocation | Runs | Inspected | Outcome eq. | Evidence |
+|---|---:|---:|---:|---:|---|
+| STRAT:acceptance-path-transition-inspection | 15.9% | 4 | 8 | 1.00 | insufficient |
+| STRAT:capability-conjunction-search-claim-tracing | 14.4% | 2 | 6 | 0.00 | insufficient |
+| STRAT:first-party-production-source-triangulation | 13.9% | 2 | 7 | 0.00 | insufficient |
+| STRAT:fail-open-boundary-archaeology | 10.4% | 1 | 4 | 0.00 | insufficient |
+| STRAT:evaluation-target-independence | 10.1% | 2 | 4 | 0.00 | insufficient |
+| STRAT:authority-origin-invariant-set-consistency | 5.1% | 0 | 0 | 0.00 | insufficient |
+| STRAT:cross-source-emergence-triangulation | 5.1% | 0 | 0 | 0.00 | insufficient |
+| STRAT:decision-claim-runtime-side-effect-trace | 5.1% | 0 | 0 | 0.00 | insufficient |
+| STRAT:ingestion-invariant-triad-intersection | 5.1% | 0 | 0 | 0.00 | insufficient |
+| STRAT:paper-research-artifact-production-descendant | 5.1% | 0 | 0 | 0.00 | insufficient |
+| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 5.1% | 0 | 0 | 0.00 | insufficient |
+| STRAT:rule-period-authority-version-audit | 5.1% | 0 | 0 | 0.00 | insufficient |
 
 ## Highest-information capability gaps
 
@@ -50,7 +51,6 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 - Never interpret a high allocation as proof that a strategy is better; early allocation includes uncertainty-driven exploration.
 - Do not suppress wildcard or novelty search to zero.
 - Domain authorization overrides generic capability-gap ranking; a blocked domain cannot be reopened by a high adaptive gap score.
-- Shared capabilities may still be searched for another active experiment, but that does not authorize their use for a blocked domain.
-- When a top experiment is blocked on one named evidence gap, that gap can override the generic allocation only through its explicit domain gate.
-- Outcome credit is explicit and lag-aware: absence of an outcome is not a failure until an experiment actually resolves.
+- Outcome credit is explicit and lag-aware; absence of an outcome is not a failure until an experiment actually resolves.
+- SEARCH_POLICY.md answers where to allocate effort; MEASUREMENT_PLAN.md separately answers what evidence is missing before comparisons are credible.
 - When sufficient evidence accumulates, realized customer and engineering outcomes should gradually outweigh retained-repository precision.

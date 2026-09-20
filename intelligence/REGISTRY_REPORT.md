@@ -1,29 +1,28 @@
 # REPOSITORY REGISTRY REPORT
 
-Generated directly from the hunter Markdown corpus; no monolithic registry file is round-tripped through the GitHub connector.
+Generated directly from the hunter Markdown corpus plus the current elite set in MASTER.md.
 
 - Repository observations: **1,763**
-- Unique repositories: **1,679**
-- Unique repository/revision keys: **1,687**
+- Unique repositories (including MASTER-only entries): **1,680**
+- Unique repository/revision keys: **1,689**
 - Observations beyond the first occurrence of a repo/revision: **76 (4.3%)**
 - Repo/revision records with unknown revision: **82**
-- Repositories appearing in more than one catalog/file: **64**
+- Repositories appearing in more than one hunter catalog/file: **64**
 - Hunter Markdown files scanned: **57**
-- Current MASTER-promoted repositories: **0**
-- Current MASTER-promoted exact repo/revisions: **0**
+- Current MASTER-promoted repositories: **36**
+- Current MASTER-promoted exact repo/revisions: **36**
+- MASTER promotions without a matching hunter-catalog observation: **2**
 
 ## Disposition mix
 
-MASTER counts below come from `MASTER.md`; all other buckets come from hunter-catalog dispositions.
-
 | Bucket | Repo/revision records |
 |---|---:|
-| master | 0 |
-| strong | 642 |
-| watch | 463 |
+| master | 36 |
+| strong | 610 |
+| watch | 462 |
 | rejected | 390 |
 | quarantined | 36 |
-| unknown | 156 |
+| unknown | 155 |
 
 ## Most repeatedly observed repo/revisions
 
@@ -52,7 +51,8 @@ MASTER counts below come from `MASTER.md`; all other buckets come from hunter-ca
 
 ## Interpretation
 
+- MASTER.md is authoritative for elite promotion; hunter prose saying contender/referral does not equal promotion.
 - Repeated observations are useful only when they add new evidence, a new revision, a new capability edge or an experiment/outcome link.
-- A high duplicate-observation rate is not automatically bad, but repeated deep inspections without capability/evidence delta should reduce future search priority.
+- Repeated deep inspections without capability/evidence delta should reduce future search priority.
 - Unknown revision records should be resolved before promotion whenever the repository is load-bearing.
-- This registry is recomputed from source catalogs, so it cannot silently lose older records because of connector truncation.
+- MASTER-only records are retained rather than silently disappearing from registry counts.

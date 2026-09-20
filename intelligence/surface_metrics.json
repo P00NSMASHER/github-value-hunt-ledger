@@ -1,0 +1,354 @@
+{
+  "rows": [
+    {
+      "surface_id": "SURFACE:github-repository-search",
+      "labels_seen": [
+        "GitHub repository search"
+      ],
+      "runs": 3,
+      "deep_inspected": 11,
+      "retained_count": 8,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:github-code-search",
+      "labels_seen": [
+        "GitHub code search"
+      ],
+      "runs": 3,
+      "deep_inspected": 10,
+      "retained_count": 8,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:exact-head-actions-license-verification",
+      "labels_seen": [
+        "exact-head Actions/license verification"
+      ],
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:github-code-source-tests-history",
+      "labels_seen": [
+        "GitHub code/source/tests/history"
+      ],
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:private-ledger-deduplication",
+      "labels_seen": [
+        "private ledger deduplication"
+      ],
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:repository-source-tests-history",
+      "labels_seen": [
+        "repository source/tests/history"
+      ],
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:simulation-robotics-analogs",
+      "labels_seen": [
+        "simulation/robotics analogs"
+      ],
+      "runs": 1,
+      "deep_inspected": 4,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:current-commercial-domain-comparator",
+      "labels_seen": [
+        "current commercial domain comparator"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:current-construction-erp-graph-search",
+      "labels_seen": [
+        "current construction ERP graph search"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:frappe-erpnext-ecosystem-adjacency",
+      "labels_seen": [
+        "Frappe/ERPNext ecosystem adjacency"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:github-code-signature-search",
+      "labels_seen": [
+        "GitHub code/signature search"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:github-repository-source-tests",
+      "labels_seen": [
+        "GitHub repository source/tests"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:github-repository-source-tests-schema-history",
+      "labels_seen": [
+        "GitHub repository source/tests/schema/history"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:low-attention-public-works-archaeology",
+      "labels_seen": [
+        "low-attention public-works archaeology"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:official-microsoft-learn-documentation",
+      "labels_seen": [
+        "official Microsoft Learn documentation"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:official-sap-help-documentation",
+      "labels_seen": [
+        "official SAP Help documentation"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:organization-lineage-traversal",
+      "labels_seen": [
+        "organization lineage traversal"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:repository-source-tests-ci",
+      "labels_seen": [
+        "repository source/tests/CI"
+      ],
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:durable-workflow-structural-analogs",
+      "labels_seen": [
+        "durable-workflow structural analogs"
+      ],
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:github-exact-head-source",
+      "labels_seen": [
+        "GitHub exact-head source"
+      ],
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:schema-persistence-tracing",
+      "labels_seen": [
+        "schema/persistence tracing"
+      ],
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:tests-and-commit-issue-archaeology",
+      "labels_seen": [
+        "tests and commit/issue archaeology"
+      ],
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "surface_id": "SURFACE:private-ledger-source",
+      "labels_seen": [
+        "private ledger source"
+      ],
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.3333333333333333
+    },
+    {
+      "surface_id": "SURFACE:sqlite-concurrency-boundary",
+      "labels_seen": [
+        "SQLite concurrency boundary"
+      ],
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.3333333333333333
+    },
+    {
+      "surface_id": "SURFACE:synthetic-acceptance-corpus",
+      "labels_seen": [
+        "synthetic acceptance corpus"
+      ],
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.3333333333333333
+    }
+  ]
+}

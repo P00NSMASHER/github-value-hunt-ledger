@@ -1,0 +1,154 @@
+{
+  "thresholds": {
+    "min_runs": 5,
+    "min_deep_inspections": 20
+  },
+  "active_strategies": 12,
+  "sufficient_strategies": 0,
+  "rows": [
+    {
+      "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
+      "name": "Authority-origin / invariant-set consistency",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.05057467403168909,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:cross-source-emergence-triangulation",
+      "name": "Cross-source emergence triangulation",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.05057467403168909,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
+      "name": "Decision-claim -> runtime-side-effect trace",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.05057467403168909,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:ingestion-invariant-triad-intersection",
+      "name": "Ingestion invariant-triad intersection",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.05057467403168909,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:paper-research-artifact-production-descendant",
+      "name": "Paper -> research artifact -> production descendant",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.05057467403168909,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+      "name": "Protocol-regression archaeology for pre-FAT systems",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.05057467403168909,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
+      "name": "Rule-period / authority-version audit",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.05057467403168909,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:fail-open-boundary-archaeology",
+      "name": "Fail-open boundary archaeology",
+      "runs": 1,
+      "deep_inspected": 4,
+      "runs_needed": 4,
+      "inspections_needed": 16,
+      "measurement_debt": 1.6,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.10350768896374707,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:evaluation-target-independence",
+      "name": "Evaluation-Target Independence",
+      "runs": 2,
+      "deep_inspected": 4,
+      "runs_needed": 3,
+      "inspections_needed": 16,
+      "measurement_debt": 1.4,
+      "instrumentation_debt": 1.0,
+      "policy_allocation": 0.10095475245374763,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
+      "name": "Capability-Conjunction Search + Claim Tracing",
+      "runs": 2,
+      "deep_inspected": 6,
+      "runs_needed": 3,
+      "inspections_needed": 14,
+      "measurement_debt": 1.2999999999999998,
+      "instrumentation_debt": 0.16666666666666666,
+      "policy_allocation": 0.14367620581270463,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:first-party-production-source-triangulation",
+      "name": "First-party production-source triangulation",
+      "runs": 2,
+      "deep_inspected": 7,
+      "runs_needed": 3,
+      "inspections_needed": 13,
+      "measurement_debt": 1.25,
+      "instrumentation_debt": 1.0,
+      "policy_allocation": 0.13928654191578915,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:acceptance-path-transition-inspection",
+      "name": "Acceptance-path transition inspection",
+      "runs": 4,
+      "deep_inspected": 8,
+      "runs_needed": 1,
+      "inspections_needed": 12,
+      "measurement_debt": 0.8,
+      "instrumentation_debt": 0.08333333333333333,
+      "policy_allocation": 0.1585520926321879,
+      "sufficient_evidence": false
+    }
+  ]
+}

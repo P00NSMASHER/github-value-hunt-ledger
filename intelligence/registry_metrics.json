@@ -1,7 +1,7 @@
 {
   "observations": 1763,
-  "unique_repositories": 1679,
-  "unique_repository_revisions": 1687,
+  "unique_repositories": 1680,
+  "unique_repository_revisions": 1689,
   "unknown_revision_records": 82,
   "duplicate_observations": 76,
   "duplicate_observation_rate": 0.04310833806012479,
@@ -12,12 +12,14 @@
     "archive": 145
   },
   "status_counts": {
-    "unknown": 156,
-    "strong": 642,
-    "watch": 463,
+    "unknown": 155,
+    "strong": 610,
+    "watch": 462,
     "rejected": 390,
-    "quarantined": 36
+    "quarantined": 36,
+    "master": 36
   },
-  "master_promoted_repositories": 0,
-  "master_promoted_repo_revisions": 0
+  "master_promoted_repositories": 36,
+  "master_promoted_repo_revisions": 36,
+  "master_promotions_without_hunter_observation": 2
 }

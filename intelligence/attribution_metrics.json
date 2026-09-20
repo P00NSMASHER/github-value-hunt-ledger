@@ -1,0 +1,90 @@
+{
+  "method": "equal_touch_across_unique_origin_runs; surface credit additionally split across surfaces used by each credited run",
+  "causal_claim": false,
+  "valid_outcomes": 1,
+  "outcomes_with_attributable_origins": 1,
+  "outcomes": [
+    {
+      "outcome_id": "OUT:20260920:freight-v15-4-synthetic-rehearsal",
+      "result": "PARTIAL",
+      "origin_count": 1,
+      "credit_per_origin": 1.0,
+      "revenue_usd": null,
+      "customer_value_usd": null
+    }
+  ],
+  "by_run": [
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "RUN:20260920T155926Z:hunter03:settlement-persistence-race",
+      "assisted_outcome_count": 1
+    }
+  ],
+  "by_strategy": [
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "STRAT:acceptance-path-transition-inspection",
+      "assisted_outcome_count": 1
+    }
+  ],
+  "by_query_family": [
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "QF:exp-001-realized-recovery-persistence-and-concurrency-acceptance-boundary",
+      "assisted_outcome_count": 1
+    }
+  ],
+  "by_surface": [
+    {
+      "fractional_outcome_equivalents": 0.3333333333333333,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:private-ledger-source",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.3333333333333333,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:sqlite-concurrency-boundary",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.3333333333333333,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:synthetic-acceptance-corpus",
+      "assisted_outcome_count": 1
+    }
+  ],
+  "totals": {
+    "revenue_usd": 0,
+    "customer_value_usd": 0,
+    "engineering_days_saved_low": 0,
+    "engineering_days_saved_high": 0
+  }
+}
