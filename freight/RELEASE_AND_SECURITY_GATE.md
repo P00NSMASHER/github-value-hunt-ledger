@@ -40,6 +40,10 @@ Current deployment facts:
 
 These findings do not upgrade missing tenant/parser controls to PASS.
 
+The **final pilot launch decision is machine-enforced** by
+`freight/pilot_launch_gate.py`, which composes buyer readiness, pilot rights
+operability, rights-evidence consistency and the chosen data-handling path.
+
 ## P0 — before a paid pilot with confidential buyer data
 
 ### Repository/supply-chain
@@ -57,6 +61,8 @@ These findings do not upgrade missing tenant/parser controls to PASS.
 
 ### Customer data
 - [ ] Buyer authorization is documented for the actual engagement.
+- [x] Current Netlify customer-data path is machine-classified as **BLOCKED** until deployment security evidence changes.
+- [x] Separate controlled/manual pilot path is machine-classified as **CONDITIONAL** until a separately controlled data environment has verified evidence.
 - [ ] Netlify team MFA is enforced before confidential buyer data is accepted.
 - [x] Pilot data-room code rejects sources not marked read-only.
 - [x] Buyer/business-unit scope is carried through source manifests, findings, authority, truth, incumbent submission/output, settlement events, recovery certificates and buyer reports.

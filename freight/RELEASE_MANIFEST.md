@@ -55,6 +55,7 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/COMMERCIAL_LEARNING.md`
 - `freight/DATA_READINESS_DIAGNOSTIC.md`
 - `freight/PILOT_PROTOCOL.md`
+- `freight/PILOT_LAUNCH_GATE.md`
 - `freight/PILOT_DATA_ROOM.md`
 - `freight/PILOT_REPORT_TEMPLATE.md`
 - `freight/contracts.py`
@@ -150,6 +151,19 @@ Canonical evidence:
 - `freight/INCIDENT_TABLETOP_2026-09-20.md`
 
 This addendum is deployment evidence, not a security certification.
+
+### Final pilot launch authorization
+
+`freight/pilot_launch_gate.py` now composes buyer/data readiness, pilot rights
+operability, rights-evidence consistency and deployment-security evidence.
+
+Current machine classification:
+- current Netlify customer-data route: **BLOCKED**;
+- separate controlled/manual environment without its own verified evidence: **CONDITIONAL**;
+- current Netlify deployment: protected demo/control shell only for customer-data purposes.
+
+A buyer/data readiness result of READY is therefore necessary but not sufficient
+to accept confidential customer data.
 
 ## Commercial state
 

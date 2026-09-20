@@ -63,6 +63,7 @@ def test_bundle_contains_rights_and_incident_diligence(tmp_path):
         "freight/RIGHTS_EVIDENCE_MANIFEST.json",
         "freight/INCIDENT_RESPONSE.md",
         "freight/INCIDENT_TABLETOP_TEMPLATE.md",
+        "freight/PILOT_LAUNCH_GATE.md",
         "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.md",
         "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json",
         "freight/INCIDENT_TABLETOP_2026-09-20.md",

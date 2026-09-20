@@ -27,6 +27,11 @@ The output contains:
 
 **The score is never allowed to override a hard blocker.**
 
+**Buyer/data readiness is not deployment launch authorization.** A READY result
+only means the proposed population can support the audit method. Before any
+confidential buyer data is accepted, the actual data-handling path must also
+pass `freight/pilot_launch_gate.py`.
+
 ## Hard readiness questions
 
 The buyer must answer/prove:
@@ -108,7 +113,7 @@ For each blocking/conditional gap:
 
 - **BLOCKED** → sell/perform Data Readiness Diagnostic only; do not start blind audit.
 - **CONDITIONAL** → diagnostic + remediation/narrowing plan; blind audit starts only after gate passes.
-- **READY** → quote Blind Freight Audit Acceptance Test.
+- **READY** → the buyer may be quoted for the Blind Freight Audit Acceptance Test, but confidential-data handling does not begin until the final Pilot Launch Gate is READY for the chosen data path.
 
 ## Research routing
 
