@@ -209,7 +209,7 @@ def render_markdown(amendment:PilotAmendment)->str:
         f"**Replacement Charter:** `{amendment.replacement_charter_hash or 'pending'}`",
         f"**Amendment hash:** `{amendment.amendment_hash}`","",
         "## Revalidation","",
-        f"- Changed fields: {", ".join(amendment.changed_fields)}",
+        "- Changed fields: "+", ".join(amendment.changed_fields),
         f"- Readiness revalidation required: **{str(amendment.requires_readiness_revalidation).lower()}**",
         f"- Launch revalidation required: **{str(amendment.requires_launch_revalidation).lower()}**",
         f"- New Activation Packet required: **{str(amendment.requires_new_activation).lower()}**",
