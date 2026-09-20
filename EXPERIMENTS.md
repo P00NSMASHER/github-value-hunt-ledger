@@ -45,12 +45,13 @@ The purpose of this file is to stop the system from becoming a museum of interes
 - Opportunity: AP Leakage Assurance.
 - Capabilities: CAP-001, 002, 007, 008, 016.
 - Status: **READY**.
-- Hypothesis: independent invoice/PO/receipt/identity/authority logic can separate actionable leakage from unresolved exceptions.
-- Inputs: synthetic month with duplicates, partial receipts, price/quantity variance, tax, missing PO/receipt, credits and settlement outcomes.
-- Success criteria: 100% planted case detection with zero unsupported recovery claims; ambiguous authority routes to review/$0.
-- Failure criteria: exception dollars are mislabeled as recoverable or identity/receipt ambiguity silently resolves.
-- Decision unlocked: whether AP becomes a second direct-money wedge.
-- Next action: assemble common corpus from current structured-invoice, identity and accounting components.
+- Hypothesis: independent invoice/PO/receipt/identity/authority logic can separate actionable leakage from unresolved exceptions while preserving durable negative identity knowledge and reversible corrections.
+- Inputs: synthetic month with duplicates, partial receipts, price/quantity variance, tax, missing PO/receipt, credits and settlement outcomes; identity cases include alias, explicit non-match, mistaken merge, split/correction and later referent addition.
+- Procedure: run candidate identity evidence -> durable POSITIVE/NEGATIVE/UNSURE review -> correction/split where planted -> promoted pinned registry lookup -> invoice/PO/receipt matching -> authority/proof gate -> settlement classification.
+- Success criteria: 100% planted case detection with zero unsupported recovery claims; ambiguous authority routes to review/$0; explicit negative identity judgement blocks a later false merge; corrected/split identity state replays deterministically through the promoted registry.
+- Failure criteria: exception dollars are mislabeled as recoverable, identity/receipt ambiguity silently resolves, an explicit negative match is later overridden without reviewed evidence, or corrected identity state cannot replay deterministically.
+- Decision unlocked: whether AP becomes a second direct-money wedge and whether Nomenklatura-style judgement memory plus Canon-style registry promotion is worth making a shared identity control plane.
+- Next action: assemble the common corpus from structured-invoice, Nomenklatura/Canon identity and accounting components and run the identity-correction cases before adding another resolver.
 
 ### EXP-003 — Commission plan-to-settlement acceptance test
 - Opportunity: Partner / Commission Payout Assurance.
@@ -90,12 +91,13 @@ The purpose of this file is to stop the system from becoming a museum of interes
 - Opportunity: CaptureBrief FAR-Deviation Readiness.
 - Capabilities: CAP-002, 007, 011.
 - Status: **READY** using current public authoritative sources.
-- Hypothesis: source packet/history + FAR/deviation + entity/award lineage materially improves analyst decision quality and rule currency.
-- Inputs: 10 current solicitations with authoritative source artifacts.
-- Success criteria: packet completeness, exact source citations, correct current rule/deviation applicability and no false incumbent/entity joins after manual verification.
-- Failure criteria: stale or misapplied authority, missing amendments or confident unresolved joins.
-- Decision unlocked: whether CaptureBrief can sell rule-currency/readiness diagnostics now.
-- Next action: select 10 live solicitations and freeze evaluation rubric before reviewing outputs.
+- Hypothesis: source packet/history + FAR/deviation + entity/award lineage materially improves analyst decision quality and rule currency when amendment/version history is deterministic and source failure cannot silently become “no change.”
+- Inputs: 10 current solicitations with authoritative source artifacts, frozen amendment/version sequence, entity/award identifiers and source-run metadata; add planted out-of-order amendment, missing-history and source-failure cases in a synthetic companion fixture.
+- Procedure: freeze every source artifact/version -> normalize deterministic history/events -> prove idempotent rerun -> resolve packet/amendment order -> apply current FAR/supplement/deviation authority -> resolve entity/award lineage -> manually verify outputs. Use the `contract-delta-au` history/event model only as an architecture pattern; do not import its Australian procurement semantics as U.S. authority.
+- Success criteria: packet completeness, exact source citations, correct amendment ordering, byte-/event-stable idempotent reruns, explicit missing-history/source-failure state, correct current rule/deviation applicability and no false incumbent/entity joins after manual verification.
+- Failure criteria: stale or misapplied authority, missing/out-of-order amendments silently accepted, source failure treated as no change/no record, nondeterministic history, or confident unresolved joins.
+- Decision unlocked: whether CaptureBrief can sell rule-currency/readiness diagnostics now and whether deterministic source-version lineage materially improves trust over latest-row ingestion.
+- Next action: select 10 live solicitations, freeze the evaluation rubric and build the small planted amendment/history-failure companion fixture before reviewing outputs.
 
 ### EXP-007 — Governed lab campaign + sequencing-operations shadow test
 - Opportunity: Installed-Base Lab Automation / Governed Campaign Shadow Audit / Sequencing Operations Evidence.
@@ -109,16 +111,17 @@ The purpose of this file is to stop the system from becoming a museum of interes
 - Decision unlocked: whether Installed-Base Lab Automation should move from generic platform integration to a concrete sequencing-core implementation service.
 - Next action: build the synthetic S4 Clarity + Illumina InterOp + provenance acceptance fixture before seeking any customer environment.
 
-### EXP-008 — Industrial virtual pre-FAT bind benchmark
+### EXP-008 — Industrial virtual pre-FAT bind + protocol-state benchmark
 - Opportunity: Industrial Pre-FAT / Virtual Commissioning.
 - Capabilities: CAP-014.
-- Status: **READY** with synthetic configuration.
-- Hypothesis: a configuration-derived virtual controller can catch HMI/SCADA binding/type/fault defects before hardware.
-- Inputs: synthetic L5K-like export with planted missing tags, type drift, UDT/array mismatch and fault behaviors.
-- Success criteria: all planted defects detected; valid bindings preserved; evidence is reproducible.
-- Failure criteria: namespace/type semantics diverge enough to create false confidence.
-- Decision unlocked: whether to package a fixed-price pre-FAT regression service.
-- Next action: create a small synthetic machine namespace and acceptance checklist.
+- Status: **READY** with rights-clean synthetic configuration/profile.
+- Hypothesis: configuration/profile-derived virtual industrial endpoints can catch binding/type/state/fault defects before hardware when validated against independent clients/implementations rather than self-agreement.
+- Inputs: (A) synthetic L5K-like export with planted missing tags, type drift, UDT/array mismatch and fault behaviors; (B) a frozen rights-clean SECS/GEM dialogue/profile containing communication/control-state transitions, variables/constants, event reports, alarms, remote commands, bounded spooling and Stream-9/error cases.
+- Procedure: instantiate the PLC/OPC profile and run independent client/binding checks; separately run the identical SECS/GEM dialogue/error corpus against Dreamine.Gem and one unrelated implementation/simulator, recording every semantic disagreement. Keep current SEMI/vendor conformance outside the claim unless separately established.
+- Success criteria: all planted PLC binding/type defects detected; valid bindings preserved; SECS/GEM state/error outcomes are reproducible and every cross-implementation disagreement is classified as profile ambiguity, implementation defect or unresolved standard/vendor-authority question.
+- Failure criteria: namespace/type/state semantics diverge enough to create false confidence; same-family agreement is used as independent proof; implementation agreement is mislabeled formal standards conformance; or missing/error states silently become success.
+- Decision unlocked: whether to package a fixed-price pre-FAT regression service spanning controller binding and stateful industrial protocol acceptance rather than a single PLC emulator demo.
+- Next action: build the small synthetic machine namespace plus frozen SECS/GEM dialogue/error corpus and identify one unrelated legal/public simulator or implementation for the differential pass.
 
 ### EXP-009 — Permit intelligence multi-jurisdiction benchmark
 - Opportunity: Permit-to-Development Opportunity Intelligence / PermitPlate.
