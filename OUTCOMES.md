@@ -49,3 +49,18 @@ This does **not** mean no useful engineering work exists. It means the research 
 - Number of MASTER findings that materially affected an experiment
 - Search strategies producing successful outcomes
 - Search strategies repeatedly producing dead ends
+
+
+## Machine-readable outcome mirror
+
+Every new outcome recorded here must also be appended to `intelligence/outcomes.jsonl`.
+
+The structured record MUST include:
+- `origin_search_ids` identifying the search runs that discovered the contributing technology;
+- `contributing_capability_ids`;
+- contributing repository revisions where known;
+- directly evidenced revenue/customer value only;
+- observed engineering-time compression as a range when measurable;
+- the search-policy consequence.
+
+This link is what allows the system to learn whether a search strategy ultimately produced useful technology rather than merely an attractive repository.
