@@ -1,0 +1,7 @@
+{
+  "amendment_id": "AMD-DEMO-001",
+  "reason": "Change buyer action-approver role before kickoff.",
+  "buyer_acknowledges_change": true,
+  "freight_acknowledges_change": true,
+  "buyer_action_approver_role": "Updated buyer action approver"
+}

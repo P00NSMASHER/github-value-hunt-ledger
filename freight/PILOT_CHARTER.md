@@ -54,3 +54,17 @@ The charter receives its own deterministic SHA-256 hash after scope freeze.
 
 The charter is an operational acknowledgment record. It is not an e-signature
 platform, legal advice, or a substitute for the governing commercial agreement.
+
+## Change control after Charter freeze
+
+An accepted Charter is immutable.
+
+Any later change to scope, dates, carriers/modes, fee or named operating roles
+must go through `freight/pilot_amendment.py`.
+
+The amendment record never edits the original Charter. Material scope changes
+require fresh readiness/launch validation and a new Activation Packet before a
+replacement Charter can supersede the old scope. Role-only changes still require
+a replacement Charter and re-acknowledgment.
+
+Carrier/vendor contact and money-moving action remain separately buyer-approved.
