@@ -36,7 +36,7 @@ jobs:
       - name: Hunter/model contracts
         run: cd production && python -m pytest -q test_prototype.py
       - name: Freight commercial proof contracts
-        run: PYTHONPATH=. python -m pytest -q freight/test_contracts.py freight/test_settlement_store.py freight/test_release_gate.py freight/test_gap_registry.py freight/test_readiness.py freight/test_pilot_reporting.py freight/test_deal_economics.py freight/test_outcome_adapter.py freight/test_commercial_learning.py freight/test_input_guard.py freight/test_pilot_package.py freight/test_pilot_launch_gate.py freight/test_launch_brief.py freight/test_pilot_activation_packet.py freight/test_pilot_charter.py freight/test_separate_environment_evidence.py freight/test_release_provenance.py freight/test_audit_ledger.py freight/test_data_lifecycle.py freight/test_sbom.py freight/test_release_attestation.py freight/test_audit_store.py freight/test_backup_restore.py freight/test_diligence_bundle.py freight/test_rights_evidence.py freight/test_incident_response.py freight/test_research_ci_governance.py freight/test_deployment_security_evidence.py freight/test_synthetic_rehearsal.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_contracts.py freight/test_settlement_store.py freight/test_release_gate.py freight/test_gap_registry.py freight/test_readiness.py freight/test_pilot_reporting.py freight/test_deal_economics.py freight/test_outcome_adapter.py freight/test_commercial_learning.py freight/test_input_guard.py freight/test_pilot_package.py freight/test_pilot_launch_gate.py freight/test_launch_brief.py freight/test_pilot_activation_packet.py freight/test_pilot_charter.py freight/test_pilot_amendment.py freight/test_separate_environment_evidence.py freight/test_release_provenance.py freight/test_audit_ledger.py freight/test_data_lifecycle.py freight/test_sbom.py freight/test_release_attestation.py freight/test_audit_store.py freight/test_backup_restore.py freight/test_diligence_bundle.py freight/test_rights_evidence.py freight/test_incident_response.py freight/test_research_ci_governance.py freight/test_deployment_security_evidence.py freight/test_synthetic_rehearsal.py
       - name: Controlled-pilot rights gate
         run: PYTHONPATH=. python freight/release_gate.py --stage pilot
       - name: Controlled-pilot rights evidence gate
@@ -71,6 +71,14 @@ jobs:
           grep -q '"PRELAUNCH_ACCEPTED"' /tmp/freight-pilot-charter.json
           grep -q '"customer_data_authorized": false' /tmp/freight-pilot-charter.json
           grep -q '"external_action_authorized": false' /tmp/freight-pilot-charter.json
+      - name: Generate accepted Pilot Amendment
+        shell: bash
+        run: |
+          PYTHONPATH=. python freight/pilot_amendment.py /tmp/freight-pilot-charter.json freight/fixtures/pilot_amendment_prelaunch.json --format json > /tmp/freight-pilot-amendment.json
+          grep -q '"ACCEPTED_REPLACEMENT_REQUIRED"' /tmp/freight-pilot-amendment.json
+          grep -q '"kickoff_suspended": true' /tmp/freight-pilot-amendment.json
+          grep -q '"customer_data_authorized": false' /tmp/freight-pilot-amendment.json
+          grep -q '"external_action_authorized": false' /tmp/freight-pilot-amendment.json
       - name: Validate separate environment evidence template
         run: PYTHONPATH=. python freight/separate_environment_evidence.py freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --as-of-date 2026-09-20 --expect CONDITIONAL
       - name: Separate environment remains conditional without evidence
