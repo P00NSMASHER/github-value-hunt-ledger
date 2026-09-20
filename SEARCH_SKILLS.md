@@ -72,3 +72,26 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - an "isolated workspace" is overclaimed as a security sandbox;
   - the verifier shares mutable artifacts or correlated assumptions with the executor and independence is overstated.
 - NEXT IMPROVEMENT: apply this procedure outside coding-agent systems to scientific campaign authorities, billing/audit approval flows and other human-in-the-loop state machines; measure whether it predicts false-promotion reduction across later benchmark tasks.
+
+## First-party production-source triangulation
+- SKILL NAME: First-party production-source triangulation
+- WHEN TO USE: An official regulation, government dataset, public API or authoritative publication may have a deeper production-source repository than its public reading/API surface suggests.
+- PROCEDURE:
+  1. Start from the first-party publication, API or official service and identify the owning agency/project organization.
+  2. Follow that lineage to the source-generation/backend repository and pin an exact revision or production-deploy commit.
+  3. Inspect operational markup or transformation code in real files rather than relying on the repository name or README.
+  4. Require internal schemas/models plus tests/fixtures that exercise the claimed semantics.
+  5. Inspect commit/deploy history for currentness and do not infer deployment from generic repository activity.
+  6. Compare adjacent first-party repositories and explicitly separate pipeline stages such as source publication, submission validation, normalization and public serving.
+  7. Cross-check a separate first-party publication/rulemaking/data surface so source-repository semantics are not mistaken for sole legal/data authority.
+- WHY IT WORKED: Benchmark Experiment Tasks **09 and 10** independently validated the method. Task 09 found procurement-specific fill-ins and change markers in the GSA FAR production DITA corpus. Task 10 showed that a repository named `usaspending-api` actually owns substantial Broker ingestion, normalization, award derivation, schemas and integration tests rather than merely wrapping endpoints.
+- EXAMPLES:
+  - Benchmark Task 09: `GSA/GSA-Acquisition-FAR@da52ccbbe114e1f031a7f4c59195c508dbfa485f`
+  - Benchmark Task 10: `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964`
+- FAILURE MODES:
+  - assuming an API-named repository is only an endpoint wrapper;
+  - treating README dates as regulatory/data currentness;
+  - collapsing upstream submission/validation and downstream normalization/publication into one authority claim;
+  - relying on obsolete loader documentation instead of current source/tests/history;
+  - treating source-repository provenance as proof that every upstream fact is authoritative or complete.
+- NEXT IMPROVEMENT: apply the method to another official rule/data system with multiple first-party repositories and measure whether it improves source-currentness or pipeline-boundary accuracy versus surface-only search.
