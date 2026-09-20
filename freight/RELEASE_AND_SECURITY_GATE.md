@@ -63,6 +63,7 @@ operability, rights-evidence consistency and the chosen data-handling path.
 - [ ] Buyer authorization is documented for the actual engagement.
 - [x] Current Netlify customer-data path is machine-classified as **BLOCKED** until deployment security evidence changes.
 - [x] Separate controlled/manual pilot path is machine-classified as **CONDITIONAL** until a separately controlled data environment has verified evidence.
+- [x] Separate/manual pilot route cannot be self-attested: launch requires a structured VERIFIED environment manifest with evidence references for all applicable controls.
 - [ ] Netlify team MFA is enforced before confidential buyer data is accepted.
 - [x] Pilot data-room code rejects sources not marked read-only.
 - [x] Buyer/business-unit scope is carried through source manifests, findings, authority, truth, incumbent submission/output, settlement events, recovery certificates and buyer reports.
