@@ -34,11 +34,15 @@ Port at least these adversarial fixtures: one PO line across multiple partial re
 **Stop:** matcher/OCR/RPA/anomaly hunting and any universal missing-GR conclusion. ERP status is a semantic oracle/challenger, not independent truth.
 
 ## 3. Partner / Commission Payout Assurance — P0/P1 / EXP-003
-Search only the remaining external-finality join: `provider payout ID -> forward network/ACH trace -> independent bank/payroll observation -> later Return/Reversal`, including FX settled amount/currency and source freshness/completeness.
+**New evidence:** `Modern-Treasury/modern-treasury-python@406f354a...` supplies the strongest current bank-observation bridge: Payment Order -> bank/reference metadata including ACH trace/original trace -> bank-derived Transaction/Transaction Line Item -> later Return/Reversal. `szapata85/ACHInterbank@395a359...` supplies a useful fail-closed correlation policy: exact unique return linkage may mutate state, while duplicate candidates become `Ambiguous` and zero candidates become `NotFound` with no money-state mutation. Hosted treasury/bank services and bank-feed coverage remain external; the Modern Treasury server-side auto-reconciliation algorithm is not public and a trace value alone is not proof of unique settlement identity.
 
-Provider `sent/paid/succeeded` remains distinct from bank/network finality. Unknown provider results remain claimed/pending and must not auto-release for retry. A later return/reversal must invalidate prior finality without deleting history.
+**Do next:** stop architecture hunting and execute the provider-neutral finality corpus. Model bank-observation outcome explicitly as `EXACT_UNIQUE / AMBIGUOUS / NOT_FOUND / UNAVAILABLE`; only `EXACT_UNIQUE` inside a verified source-observation window may become a settlement candidate, and later Return/Reversal must be able to revoke it. Plant duplicate trace, substring-reference collision, equal-total/swapped-identity, unparseable amount, stale cursor, bank-posted-then-returned and duplicate-semantic-return cases. Use CAP-019-style source-health evidence so stale/unavailable feeds cannot masquerade as `no return` or `no transaction`.
 
-**Stop:** commission calculators, dashboards and payout wrappers unless they close a concrete finality/reversal gap.
+Provider `sent/paid/succeeded` remains distinct from bank/network finality. Unknown provider results remain claimed/pending and must not auto-release for retry. A later return/reversal invalidates prior finality without deleting history.
+
+**Search only:** a concrete provider/reference -> bank-observation mapping or completeness/freshness gap exposed by the corpus.
+
+**Stop:** commission calculators, payout wrappers, generic bank-statement parsers and reconciliation libraries. An `EXACT_REFERENCE` label, substring/fuzzy reference match, amount equality, first-match policy or last-seen cursor is not settlement proof.
 
 ## 4. ScopeSignal / Construction Change Leakage — P0/P1 / EXP-005
 **New evidence:** `mradul010/construction_management@ce345579...` is a strong authority-to-bill component: submitted work-order/PO context is server-reloaded, measured quantity/rate is bounded against authoritative lines, Approved SC Bill gates Purchase Invoice creation, and retention/payment consistency is checked. It does **not** prove independent field-measurement approval or bank finality. ERPNext also supplies a live false-finality case where a bank transaction can be Reconciled while the Payment Entry remains uncleared.
