@@ -569,3 +569,15 @@ The entries below were re-scored under the standing commercial-permission postur
 - Buyer/problem: RevOps/finance/payroll teams face underpayment, overpayment and disputes from stale plan versions, split attribution, reversals and payout-state drift.
 - Monetization / first paid wedge: blind Commission Payout Acceptance Test on one closed month with customer-owned CRM/plan/payment/refund/payroll truth frozen before incumbent output.
 - Why it beats alternatives: it spans entitlement through settlement and payout reconciliation rather than stopping at commission calculation.
+
+<!-- INTEGRATOR-R11-WARRANTY-2026-09-19T2034-0400 -->
+## Late-run promotion — aftermarket entitlement assurance
+
+### OCA/rma — deterministic warranty/return entitlement authority
+- Exact revision: `9416b2a5f5e1d604eff27610635eb3573227337c` on branch `18.0`.
+- Score: **28/30** — A5 B4 C5 D4 E5 F5.
+- Rights: AGPL-3.0 family; repository-owned code additionally treated as commercially permitted under the user's standing assertion. Odoo/customer data and third-party integrations remain separately governed.
+- Concrete capability: tested product-warranty and RMA entitlement path binding return eligibility to partner/product/sale state/date, completed delivery moves, operation-specific return windows and remaining returnable quantity; deterministically splits eligible returns across multiple deliveries and blocks over-return. Tests cover expired windows, exact/partial quantities, consumed entitlement, multiple deliveries and forced over-return rejection.
+- Buyer/problem: manufacturers, distributors, ecommerce and aftermarket/service finance teams lose margin to duplicate, expired, over-quantity or weakly sourced warranty/return approvals and waste analyst time reconstructing source sales/deliveries.
+- Monetization / first paid wedge: blind Warranty/RMA Entitlement Leakage Audit on customer-owned sales/delivery/serial/warranty/RMA/credit facts, measuring unsupported credits/refunds, duplicate/over-return claims, valid incorrectly rejected claims and review labor.
+- Why it beats alternatives: it supplies executable tested entitlement semantics from fulfilled sale/delivery history to remaining returnable quantity rather than generic warranty dates or RMA CRUD.

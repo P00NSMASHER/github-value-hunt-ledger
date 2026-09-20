@@ -82,3 +82,12 @@ For each opportunity record:
 
 ### Recoverability-as-Code / Recovery Proof SLA — strengthened
 - Stronghold now supplies the missing service-level policy evaluator above Redrill/Probavi/pg_hardstorage/BackupDrill/RestoreLab measured evidence, while SiVa supplies trust/revocation validation. This materially improves the existing Recovery Proof SLA opportunity without changing its first wedge: prove one to three critical services end-to-end, then sell recurring proof freshness.
+
+<!-- INTEGRATOR-R11-WARRANTY-2026-09-19T2034-0400 -->
+### Warranty/RMA Entitlement Leakage Audit
+- Sources: OCA/rma entitlement engine + buyer-owned sales/delivery/serial/warranty/RMA/credit evidence.
+- Buyer/problem: manufacturers, distributors and ecommerce/aftermarket teams can approve duplicate, expired or over-quantity returns or reject valid claims because eligibility is manually reconstructed.
+- First paid wedge: blind audit of 50–500 closed RMA/warranty claims.
+- Monetization: fixed diagnostic + shared avoided/recovered leakage where outcome evidence supports it + recurring entitlement monitoring.
+- Score: **28/30** — A5 B4 C5 D4 E5 F5.
+- Next validation: freeze source authority and expected eligibility before viewing incumbent RMA/credit decisions; quantify unsupported credits, valid rejected claims and review time.

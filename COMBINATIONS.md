@@ -165,3 +165,11 @@ These sections supersede the same-named earlier versions where they conflict; ol
 - Buyer / wedge: RevOps, finance, sales compensation and payroll; fixed-price closed-period Commission Payout Acceptance Test before any recurring monitoring.
 - Blind rule: freeze customer source facts and independent expected results before viewing incumbent payroll output. Ambiguous credit ownership, missing plan authority or unknown settlement result contributes $0 to corrected-dollar claims until resolved.
 - Validation: 40 cases spanning fixed/tiered, split/overlay, effective-plan changes, retroactivity, refund/cancel/clawback, partial receipt, hold/release, unknown provider result, partial payout and carry-forward; then one authorized closed period.
+
+<!-- INTEGRATOR-R11-WARRANTY-2026-09-19T2034-0400 -->
+### Aftermarket Entitlement Assurance — sale/delivery truth -> warranty/RMA eligibility -> credit outcome
+- Components: `OCA/rma@9416b2a5f5e1d604eff27610635eb3573227337c` for warranty/return entitlement; existing phparm/Servicialo for service-contract/proof semantics where applicable; buyer-specific ERP/ecommerce sales, delivery, lot/serial and credit/refund evidence.
+- Combined capability: freeze source sale/delivery and warranty authority -> determine applicable return window and remaining eligible quantity -> reconcile RMA approval and physical return/repair -> trace refund/credit outcome -> surface unsupported, duplicate, over-quantity or wrongly rejected claims.
+- Buyer / wedge: manufacturers, distributors, ecommerce and aftermarket finance/service teams; fixed-price 50–500 claim Entitlement Leakage Audit.
+- Hard invariant: no source sale/delivery/warranty authority or ambiguous serial/quantity/credit lineage = no asserted avoidable-dollar claim.
+- Validation: 50-case blind historical/synthetic corpus covering expired windows, partial returns, multiple deliveries, prior consumed quantity, serial mismatch, duplicate RMA, warranty-policy change, manual override and refund/credit settlement.
