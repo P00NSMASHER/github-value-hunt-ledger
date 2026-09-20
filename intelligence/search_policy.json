@@ -244,7 +244,7 @@
       "capability_id": "CAP-014",
       "name": "Virtual industrial endpoint / pre-FAT acceptance",
       "gap_score": 5,
-      "missing_piece": "standards/certification separate",
+      "missing_piece": "standards/certification remain separate. Execute the frozen fixture with a neutral raw-HSMS harness that records every correlated message, maintains its own logical T3 clock and reads post-state independently; then run Dreamine and secsgem native clients only as a second requester-compatibility matrix. Seek a third engine only to adjudicate an observed endpoint disagreement.",
       "run_attention": 0
     },
     {
@@ -258,7 +258,7 @@
       "capability_id": "CAP-015",
       "name": "Prospective, leakage-resistant prediction evidence",
       "gap_score": 4,
-      "missing_piece": "byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace still need official artifact confirmation; never call event correlation feeder/component causality or general distribution truth.",
+      "missing_piece": "the Mendeley **outer package** hash is not the embedded USECPO source hash. Extract the public package manifest, read the exact USECPO source URL/release/size/SHA row, compare it with direct first-party OEDI bytes or a first-party published digest, and keep `UNKNOWN/MISMATCH` hard-fail semantics. Byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace also remain to be confirmed from the official artifact.",
       "run_attention": 2
     },
     {

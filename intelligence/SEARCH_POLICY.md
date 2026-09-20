@@ -35,9 +35,9 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 | CAP-002 — Reviewed, versioned identity mastering | 5 | 0 | datasets/customer identities separate |
 | CAP-008 — Structured invoice compliance/validation | 5 | 0 | official rule-pack/version authority must be pinned |
 | CAP-012 — Permit event versioning and semantic source QA | 5 | 0 | jurisdiction completeness/semantics vary |
-| CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 5 | 0 | standards/certification separate |
+| CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 5 | 0 | standards/certification remain separate. Execute the frozen fixture with a neutral raw-HSMS harness that records every correlated message, maintains its own logical T3 clock and reads post-state independently; then run Dreamine and secsgem native clients only as a second requester-compatibility matrix. Seek a third engine only to adjudicate an observed endpoint disagreement. |
 | CAP-001 — Evidence-gated document facts | 4 | 1 | domain calibration and contractual/legal authority remain external |
-| CAP-015 — Prospective, leakage-resistant prediction evidence | 4 | 2 | byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace still need official artifact confirmation; never call event correlation feeder/component causality or general distribution truth. |
+| CAP-015 — Prospective, leakage-resistant prediction evidence | 4 | 2 | the Mendeley **outer package** hash is not the embedded USECPO source hash. Extract the public package manifest, read the exact USECPO source URL/release/size/SHA row, compare it with direct first-party OEDI bytes or a first-party published digest, and keep `UNKNOWN/MISMATCH` hard-fail semantics. Byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace also remain to be confirmed from the official artifact. |
 | CAP-019 — Source-authority observation receipts | 4 | 1 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
 
 ## Domain authorization constraints

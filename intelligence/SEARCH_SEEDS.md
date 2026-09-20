@@ -17,7 +17,7 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 | 91 | SEED:gap:cap-007 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-007 | CAP-007 is a current high-information gap (gap score 6, prior run attention 1). Saturation: INSUFFICIENT (+0 priority). Missing piece: domain policy provenance is external. |
 | 90 | SEED:gap:cap-009 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-009 | CAP-009 is a current high-information gap (gap score 7, prior run attention 0). Saturation: INSUFFICIENT (+0 priority). Missing piece: labor/domain rules remain external. |
 | 88 | SEED:gap:cap-002 | capability_gap | STRAT:capability-conjunction-search-claim-tracing | CAP-002 | CAP-002 is a current high-information gap (gap score 5, prior run attention 0). Saturation: INSUFFICIENT (+0 priority). Missing piece: datasets/customer identities separate. |
-| 88 | SEED:gap:cap-014 | capability_gap | STRAT:protocol-regression-archaeology-for-pre-fat-systems | CAP-014 | CAP-014 is a current high-information gap (gap score 5, prior run attention 0). Saturation: INSUFFICIENT (+0 priority). Missing piece: standards/certification separate. |
+| 88 | SEED:gap:cap-014 | capability_gap | STRAT:protocol-regression-archaeology-for-pre-fat-systems | CAP-014 | CAP-014 is a current high-information gap (gap score 5, prior run attention 0). Saturation: INSUFFICIENT (+0 priority). Missing piece: standards/certification remain separate. Execute the frozen fixture with a neutral ra |
 | 81 | SEED:gap:cap-001 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-001 | CAP-001 is a current high-information gap (gap score 4, prior run attention 1). Saturation: INSUFFICIENT (+0 priority). Missing piece: domain calibration and contractual/legal authority remain external. |
 | 80 | SEED:dna:gsa-gsa-acquisition-dfars | positive_dna_transfer | STRAT:rule-period-authority-version-audit | cross-domain | Transfer the load-bearing implementation DNA of MASTER leader GSA/GSA-Acquisition-DFARS into unrelated verticals. Why it wins: first-party structured supplement authority that directly closes a high-value CaptureBrief ga |
 | 80 | SEED:gap:cap-008 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-008 | CAP-008 is a current high-information gap (gap score 5, prior run attention 0). Saturation: INSUFFICIENT (+0 priority). Missing piece: official rule-pack/version authority must be pinned. |
@@ -27,7 +27,7 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 | 79 | SEED:dna:benchling-open-source-allotropy | positive_dna_transfer | STRAT:protocol-regression-archaeology-for-pre-fat-systems | cross-domain | Transfer the load-bearing implementation DNA of MASTER leader Benchling-Open-Source/allotropy into unrelated verticals. Why it wins: attacks a difficult installed-base data boundary rather than replacing the laboratory s |
 | 79 | SEED:dna:gridappsd-cimhub | positive_dna_transfer | STRAT:capability-conjunction-search-claim-tracing | cross-domain | Transfer the load-bearing implementation DNA of MASTER leader GRIDAPPSD/CIMHub into unrelated verticals. Why it wins: independent model-intake/round-trip proof before engineering analytics. |
 | 79 | SEED:dna:gsa-gsa-acquisition-far | positive_dna_transfer | STRAT:rule-period-authority-version-audit | cross-domain | Transfer the load-bearing implementation DNA of MASTER leader GSA/GSA-Acquisition-FAR into unrelated verticals. Why it wins: machine-readable first-party authority, not a search wrapper. |
-| 79 | SEED:gap:cap-015 | capability_gap | STRAT:capability-conjunction-search-claim-tracing | CAP-015 | CAP-015 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace still need off |
+| 79 | SEED:gap:cap-015 | capability_gap | STRAT:acceptance-path-transition-inspection | CAP-015 | CAP-015 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: the Mendeley **outer package** hash is not the embedded USECPO source hash. Extract t |
 
 ## Seed packets
 
@@ -196,12 +196,12 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 - Objective: OBJ:protocol-regression
 - Capability/experiment: CAP-014, EXP-008
 - Saturation/status: INSUFFICIENT / adjustment +0 / action MEASURE_MORE
-- Why now: CAP-014 is a current high-information gap (gap score 5, prior run attention 0). Saturation: INSUFFICIENT (+0 priority). Missing piece: standards/certification separate.
-- Required signatures: adjudicate, against, authorized, binding, bytes, certification, class
+- Why now: CAP-014 is a current high-information gap (gap score 5, prior run attention 0). Saturation: INSUFFICIENT (+0 priority). Missing piece: standards/certification remain separate. Execute the frozen fixture with a neutral raw-HSMS harness that records every correlated message, maintains its own logical T3 clock and reads post-state independently; then run Dreamine and secsgem native clients only as a second requester-compatibility matrix. Seek a third engine only to adjudicate an observed endpoint disagreement..
+- Required signatures: independent, adjudicate, certification, clients, clock, correlated, disagreement
 - Query templates:
-  - adjudicate against authorized
-  - adjudicate authorized path:tests
-  - adjudicate against audit replay
+  - independent adjudicate certification
+  - independent certification path:tests
+  - independent adjudicate audit replay
 - Search surfaces: GitHub code search, GitHub repository search, source/tests/schema/history, author/org adjacency
 - Verification gate: Retain only when at least two required signatures meet in a connected executable path and source/tests establish the claimed state transition or invariant. README-only co-location is not enough.
 - Stop conditions: Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
