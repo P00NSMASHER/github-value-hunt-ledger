@@ -47,14 +47,24 @@ jobs:
         run: python tools/ti_sync.py
       - name: Recompute repository registry metrics
         run: python tools/ti_registry.py
+      - name: Canonicalize query families
+        run: python tools/ti_query_families.py
       - name: Derive attribution graph
         run: python tools/ti_graph.py
       - name: Measure instrumentation quality
         run: python tools/ti_quality.py
+      - name: Learn from candidate dispositions
+        run: python tools/ti_candidate_learning.py
+      - name: Compute fractional outcome attribution
+        run: python tools/ti_attribution.py
       - name: Rebuild learning report
         run: python tools/ti_report.py
       - name: Recompute cautious adaptive search policy
         run: python tools/ti_policy.py
+      - name: Build measurement-debt plan
+        run: python tools/ti_measurement_plan.py
+      - name: Analyze search-surface yield
+        run: python tools/ti_surface.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -68,15 +78,25 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add intelligence/capabilities.jsonl \
                   intelligence/search_strategies.jsonl \
+                  intelligence/query_families.jsonl \
                   intelligence/derived_edges.jsonl \
                   intelligence/LEARNING_REPORT.md \
                   intelligence/REGISTRY_REPORT.md \
                   intelligence/DATA_QUALITY_REPORT.md \
                   intelligence/GRAPH_HEALTH.md \
                   intelligence/SEARCH_POLICY.md \
+                  intelligence/QUERY_FAMILY_REPORT.md \
+                  intelligence/ATTRIBUTION_REPORT.md \
+                  intelligence/MEASUREMENT_PLAN.md \
+                  intelligence/NEGATIVE_TRAINING_REPORT.md \
+                  intelligence/SURFACE_REPORT.md \
                   intelligence/search_policy.json \
                   intelligence/registry_metrics.json \
-                  intelligence/quality_metrics.json
+                  intelligence/quality_metrics.json \
+                  intelligence/attribution_metrics.json \
+                  intelligence/measurement_plan.json \
+                  intelligence/candidate_learning_metrics.json \
+                  intelligence/surface_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push
