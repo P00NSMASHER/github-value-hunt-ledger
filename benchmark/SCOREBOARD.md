@@ -8,25 +8,25 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 ## Pair summary
 | Pair | Tasks | Control completed | Experiment completed | Matched tasks scored | Control matched mean /25 | Experiment matched mean /25 | Control false promotions | Experiment false promotions | Winner so far |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| 1 | 01-08 | 5 | 0 | 0 | — | — | 0 | 0 | — |
-| 2 | 09-15 | 6 | 6 | 6 | 24.67 | 25.00 | 0 | 0 | Experiment |
+| 1 | 01-08 | 6 | 0 | 0 | — | — | 0 | 0 | — |
+| 2 | 09-15 | 7 | 7 | 7 | 24.71 | 25.00 | 0 | 0 | Experiment |
 | 3 | 16-22 | 7 | 5 | 5 | 23.20 | 24.60 | 0 | 0 | Experiment |
 | 4 | 23-29 | 7 | 7 | 7 | 24.86 | 24.57 | 0 | 0 | Control |
-| 5 | 30-36 | 7 | 6 | 6 | 24.50 | 24.83 | 0 | 0 | Experiment |
-| 6 | 37-43 | 5 | 6 | 5 | 25.00 | 25.00 | 0 | 0 | Tie |
-| 7 | 44-50 | 7 | 5 | 5 | 24.60 | 24.80 | 0 | 0 | Experiment |
+| 5 | 30-36 | 7 | 7 | 7 | 24.57 | 24.86 | 0 | 0 | Experiment |
+| 6 | 37-43 | 6 | 7 | 6 | 25.00 | 25.00 | 0 | 0 | Tie |
+| 7 | 44-50 | 7 | 7 | 7 | 24.71 | 24.86 | 0 | 0 | Experiment |
 
 ## Experiment-wide matched metrics
-- Matched tasks scored: **34** — 09, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 44, 45, 46, 47, 48.
-- Control matched mean: **24.50/25**.
-- Experiment matched mean: **24.79/25**.
-- Mean paired difference (Experiment - Control): **+0.29**.
+- Matched tasks scored: **39** — 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50.
+- Control matched mean: **24.56/25**.
+- Experiment matched mean: **24.82/25**.
+- Mean paired difference (Experiment - Control): **+0.26**.
 - Median paired difference: **0.0**.
-- Pairwise task win / tie / loss for Experiment: **7 / 23 / 4**.
+- Pairwise task win / tie / loss for Experiment: **7 / 28 / 4**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
-- No-find results: **0 Control / 0 Experiment** among scored results.
-- Approximate search effort per validated STRONG result remains **Control ~10-11 reported search/deep-inspection units; Experiment ~11-12**. This is directional because result files mix query counts, candidate triage counts, specialist passes and deep inspections.
-- Learning slope remains **mildly positive but score-ceiling limited**. Pair 2 is 25→25→25→25→25→25; Pair 3 24→25→25→25→24; Pair 4 23→25→24→25→25→25→25; Pair 5 25→25→24→25→25→25; Pair 6 25→25→25→25→25 with unmatched Task 42 also scoring 25; Pair 7 24→25→25→25→25. Median early-to-late within-pair change remains about **+0.5**, while most recent tasks often tie at the ceiling. Qualitative learning remains stronger than the score slope.
+- No-find results: **0 Control / 1 Experiment** among scored results. Experiment Task 43 is the first scored false-negative/no-find: it rigorously rejected many near-matches but missed a known benchmark-qualified component.
+- Approximate search effort per validated STRONG result remains **Control ~10-11 reported search/deep-inspection units; Experiment ~12-13**. This is directional because result files mix query counts, candidate triage counts, specialist passes and deep inspections. The Experiment estimate worsened because Task 43 spent 20+ searches / 18+ candidate inspections without a validated find.
+- Learning slope is now **mixed / score-ceiling limited rather than clearly positive**. Pair 2 is 25→25→25→25→25→25→25; Pair 3 24→25→25→25→24; Pair 4 23→25→24→25→25→25→25; Pair 5 25→25→24→25→25→25→25; Pair 6 is 25→25→25→25→25→25 followed by unmatched Task 43 at 19; Pair 7 is 24→25→25→25→25→25→25. The Task-43 miss is material contrary evidence that a strict multi-invariant/verifier architecture can become over-constrained and produce a false negative even while maintaining excellent evidence discipline.
 
 ## Scored task details
 Scores preserve prior scored results and add newly completed unscored results observed in this integration run.
@@ -38,6 +38,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 03 | CONTROL | 25 | 5/5/5/5/5 | `nace-martin/Project-RateEngine@dddd2c2df3d35e857e627e9132fe879821fdd538` | No | No | Demonstrably equivalent rerating target with effective dating, ambiguity rejection, overlap prevention and multiple charge bases. |
 | 04 | CONTROL | 25 | 5/5/5/5/5 | `Shreyas2409/freight-intake@49ee48e383aea202cc5ddf15c500a5b39092d8b7` | No | No | Superior/equivalent extraction target with page-grounded facts, deterministic money arithmetic, review gates and adversarial fixtures; production extraction accuracy bounded. |
 | 05 | CONTROL | 25 | 5/5/5/5/5 | `srthck/trustmesh@5a93d70b37aafecaf61a5bc0296eaf831e5504ac` | No | No | Exact target; deterministic proof obligations, blocker explanations, same-adjudicator counterfactual next-evidence ranking, negative tests and calibration caveat all correctly verified. |
+| 06 | CONTROL | 25 | 5/5/5/5/5 | `phax/phive@18c7398fff29b4c2e6b4447231728c4931eb23ee + phax/phive-rules@6e26991e780522368c6d8c7cf60f629291a2ccab` | No | No | Demonstrably strong equivalent: versioned XSD/Schematron layers, explicit INVALID vs SKIPPED/UNCLEAR semantics, fatal handling, broad EU rule packs, functional fixtures and exact-revision CI were verified; currentness/artifact-rights caveats preserved. |
 | 09 | CONTROL | 25 | 5/5/5/5/5 | `GSA/GSA-Acquisition-FAR@da52ccbbe114e1f031a7f4c59195c508dbfa485f` | No | No | Exact first-party target; DITA source, fill-ins and change provenance inspected. |
 | 09 | EXPERIMENT | 25 | 5/5/5/5/5 | `GSA/GSA-Acquisition-FAR@da52ccbbe114e1f031a7f4c59195c508dbfa485f` | No | No | Exact target plus source/history/publication triangulation; unsupported currentness/schema claims withheld. |
 | 10 | CONTROL | 25 | 5/5/5/5/5 | `fedspendingtransparency/usaspending-api@1692d484b38c66361c54faa221548527cae29964` | No | No | Exact first-party backend/ETL target with loaders, models, transforms and tests. |
@@ -50,6 +51,8 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 13 | EXPERIMENT | 25 | 5/5/5/5/5 | `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` | No | No | Exact target with deeper published-plan transition tracing, optimality flags and comparator/current-CI caveats. |
 | 14 | CONTROL | 25 | 5/5/5/5/5 | `novonordisk-research/OptiHPLCHandler@96399dcddc1457a5b942f61585b9e8fcf78b9a72` | No | No | Exact vendor-specific CDS integration; installed-Empower mutation/acquisition paths, original/non-overwrite semantics, tests and vendor audit boundary verified with validation/entitlement caveats. |
 | 14 | EXPERIMENT | 25 | 5/5/5/5/5 | `novonordisk-research/OptiHPLCHandler@96399dcddc1457a5b942f61585b9e8fcf78b9a72` | No | No | Same exact target with deeper API/version/commit archaeology; TLS, optional audit comments, mocked-test and system-suitability caveats correctly bounded without overrejecting the integration. |
+| 15 | CONTROL | 25 | 5/5/5/5/5 | `sandialabs/DREAMS@3eb6c6089eadf09a4bf99961faac11a76ef30ca0` | No | No | Exact target; Sandia provenance, OpenDSS QSTS execution, explicit voltage/thermal/backfeed constraints, nontrivial feeder test and publication evidence verified; numerical-golden/nonconvergence caveats preserved. |
+| 15 | EXPERIMENT | 25 | 5/5/5/5/5 | `NatLabRockies/disco@d95fa671918f3b19181d76ffff52e53569525462` | No | No | Demonstrably strong national-lab equivalent with explicit machine-readable limits, snapshot/time-series HC pipeline, integration tests, PyDSS lineage and engineering bug history; lack of dynamic numerical-golden regression correctly bounded. |
 | 16 | CONTROL | 21 | 2/5/5/4/5 | `broad-well/recovair-abm@7b3379cb431591c148a26993097a08487ae6886b` | No | No | Deep partial correctly kept WATCH; joint optimization, legality, uncertainty and replay incomplete. |
 | 16 | EXPERIMENT | 24 | 5/5/5/4/5 | `mizuharaa/olus@f1d1160de0c1cb8c2961d9a785d24b2e1ac48e68` | No | No | Exact target with solver, legality, uncertainty, simulation and replay; FAR117 integration overclaim bounded. |
 | 17 | CONTROL | 25 | 5/5/5/5/5 | `Etherlabs-dev/multi-processor-reconciliation@2f9397fbe56a76abeee42a01a37536ad1811a806` | No | No | Strong equivalent with exact/net/fee/refund/split/dedupe/ambiguity semantics and tests. |
@@ -89,6 +92,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 35 | CONTROL | 25 | 5/5/5/5/5 | `hdkim99/OperandoMerge@06d2ca8e9b0dfc2683c8ca77b19a1ab6f1623b92` | No | No | Exact target; type-aware time-fusion semantics, no extrapolation/event interpolation, row provenance and public-data validation verified. |
 | 35 | EXPERIMENT | 25 | 5/5/5/5/5 | `hdkim99/OperandoMerge@06d2ca8e9b0dfc2683c8ca77b19a1ab6f1623b92` | No | No | Exact target; measurement-semantic typing, negative interpolation/extrapolation tests and per-output raw-row provenance verified; maturity/alignment assumptions bounded. |
 | 36 | CONTROL | 25 | 5/5/5/5/5 | `thermofisherlsms/meth-modifications@b30bbe120268344c7b6f75e33944d8b30baed0ea` | No | No | Exact official vendor component; versioned method schemas plus validate/export/create/modify surfaces and first-party release-history corroboration verified, with runtime/round-trip limits preserved. |
+| 36 | EXPERIMENT | 25 | 5/5/5/5/5 | `thermofisherlsms/meth-modifications@b30bbe120268344c7b6f75e33944d8b30baed0ea` | No | No | Exact target; first-party vendor adjacency surfaced versioned schemas plus native method-transition code and schema-evolution history; missing dedicated regression suite/proprietary runtime dependencies were correctly bounded. |
 | 37 | CONTROL | 25 | 5/5/5/5/5 | `adamleap02/PermitBuild@ff795137e0c66e62a87e62956fa351926886255d` | No | No | Exact target; heterogeneous connectors, append-style versions/diffs, race tests and fee-vs-valuation QA verified. |
 | 37 | EXPERIMENT | 25 | 5/5/5/5/5 | `adamleap02/PermitBuild@ff795137e0c66e62a87e62956fa351926886255d` | No | No | Exact target plus invariant-triad search and breadth-vs-history red-team. |
 | 38 | CONTROL | 25 | 5/5/5/5/5 | `davidlarrimore/curatore-v2@d4e42ac14450a58f84035c31db11b0399713a653` | No | No | Exact target; forecast connectors, first/last seen, history/diffs and run-state semantics verified. |
@@ -99,7 +103,9 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 40 | EXPERIMENT | 25 | 5/5/5/5/5 | `OPCFoundation/UA-.NETStandard@37b552254e8da434514c87d8185c1595c03c4063` | No | No | Exact target plus defect archaeology and newer destructive-restart deadlock evidence used to narrow readiness claims. |
 | 41 | CONTROL | 25 | 5/5/5/5/5 | `geminimir/meterguard@9147d6fdf9fd8ee8761d732e956fc0a8c86989bd` | No | No | Exact target; local/provider parity, drift, corrections and stale demo/test caveats verified and bounded. |
 | 41 | EXPERIMENT | 25 | 5/5/5/5/5 | `geminimir/meterguard@9147d6fdf9fd8ee8761d732e956fc0a8c86989bd` | No | No | Exact target; symmetry/executability red-team found stale workflow, unused period semantics and legacy provider lifecycle. |
+| 42 | CONTROL | 25 | 5/5/5/5/5 | `bl4ckh4nd/billme@e4ea5720acbf378362dc307e83d3c11e3eef4cca` | No | No | Demonstrably strong equivalent: recurring billing plus immutable double-entry journal, unbalanced-post rejection, unique source identity, exact/conflicting replay tests, rollback-on-audit-failure and retry-without-duplicate-invoice behavior are source/test verified. |
 | 42 | EXPERIMENT | 25 | 5/5/5/5/5 | `cboxdk/laravel-billing@ac3305f2a857baf5208a1170387f7771dba40ca7` | No | No | Superior/equivalent billing-journal target with balanced posting, derived balances, unique-key dedupe, retries and append-only hardening; raw-SQL/portability limits bounded. |
+| 43 | EXPERIMENT | 19 | 0/5/4/5/5 | `NO_FIND` | No | Yes | Excellent oracle-provenance verification and disciplined rejection of circular/incomplete near-matches, but the run missed a known benchmark-qualified freight-audit component. Discovery receives no credit and calibration is reduced for the false negative; commercial/evidence reasoning remained strong. |
 | 44 | CONTROL | 25 | 5/5/5/5/5 | `vncwr/backwyn@57f4b8afc3d9ce14f2a35febc802536cfa816839` | No | No | Exact target; scratch restore, corruption/staleness/unverified negatives and exact-revision CI checked. |
 | 44 | EXPERIMENT | 24 | 4/5/5/5/5 | `cybertec-postgresql/pg_hardstorage@b47541b7e1cea69ce6ec63b26e154eb25fc4ca91` | No | No | Strong equivalent with scratch restore/fail-open controls; one discovery point withheld because it stops before application invariants. |
 | 45 | CONTROL | 24 | 5/5/4/5/5 | `DNYoussef/guardspine-spec@4b21006daa82af52647c5b6e4288d995ccbaf401 + companion verifier` | No | No | Exact evidence-interoperability component; malformed/tamper/signature checks strong, external trust/adoption separate. |
@@ -111,7 +117,9 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 48 | CONTROL | 25 | 5/5/5/5/5 | `mycomind4-arch/permitsignal@4a734615a8e388a98e085026a877b3bdfc1ac8b1` | No | No | Superior/equivalent negative control: unreachable authoritative systems plus missing completeness/freshness/PARTIAL semantics justify rejection for production lead intelligence. |
 | 48 | EXPERIMENT | 25 | 5/5/5/5/5 | `stojanpetkovic/sawfleet@02c1c52847e3e3f83ae7dc7dcf72ae5f6bb29fbb` | No | No | Superior/equivalent negative control: real UI over opaque source plane; health lacks freshness/completeness/degraded contracts and placeholder contact contamination is handled; correct REJECT. |
 | 49 | CONTROL | 25 | 5/5/5/5/5 | `rc2consulting/rc2consulting.github.io@05c644c9fe7b27db941e26f926461a3b44768138` | No | No | Superior/equivalent stale-authority trap: current thresholds do not rescue obsolete measurement-window logic; reject for current eligibility use. |
-| 50 | CONTROL | 25 | 5/5/5/5/5 | `GSA/GSA-Acquisition-NMCARS@09d5b2d...` | No | No | Accepted negative-control result: recent repository activity but source-level comparison showed substantive staleness; recent Git history is not current authority. |
+| 49 | EXPERIMENT | 25 | 5/5/5/5/5 | `rc2consulting/rc2consulting.github.io@05c644c9fe7b27db941e26f926461a3b44768138` | No | No | Same strong stale-rule rejection with first-party authority triangulation, exact input-period tracing, commit archaeology and a boundary case demonstrating categorical misclassification risk. |
+| 50 | CONTROL | 25 | 5/5/5/5/5 | `GSA/GSA-Acquisition-NMCARS@09d5b2d7040065fead99e15aacabb1d782b450d5` | No | No | Accepted negative-control result: recent repository activity but source-level comparison showed substantive staleness; recent Git history is not current authority. |
+| 50 | EXPERIMENT | 25 | 5/5/5/5/5 | `GSA/GSA-Acquisition-NMCARS@09d5b2d7040065fead99e15aacabb1d782b450d5` | No | No | Exact target; first-party/current-authority comparison, substantive section/contact mismatch, and metadata-only regeneration archaeology correctly support REJECT for current-rule use while preserving archival value. |
 
 ## Retained-lesson / learning status
 - No benchmark lesson is promoted from a single task.
@@ -122,8 +130,9 @@ Scores preserve prior scored results and add newly completed unscored results ob
 - **Promoted to SEARCH_SKILLS:** `Protocol-regression archaeology for pre-FAT systems`, supported by Experiment Tasks **39 and 40**.
 - **Promoted to SEARCH_SKILLS:** `Fail-open boundary archaeology`, supported by Experiment Tasks **44 and 45** and reinforced by Task 46.
 - **Promoted to SEARCH_SKILLS:** `Decision-claim → runtime-side-effect trace`, supported by Experiment Tasks **25 and 26**, reinforced by Tasks 27 and 28.
-- **Promoted to SEARCH_SKILLS:** `Authority-origin / invariant-set consistency`, supported independently by Experiment Tasks **46 and 47**.
+- **Promoted to SEARCH_SKILLS:** `Authority-origin / invariant-set consistency`, supported independently by Experiment Tasks **46 and 47** and reinforced by Tasks 48-50.
+- **Eligible for SEARCH_SKILLS promotion this run:** `Rule-period / authority-version audit`, independently supported by Experiment Tasks **49 and 50**. It must not expose any benchmark answer key; its reusable form is authority/currentness verification only.
 - Not yet separately promoted: Transition-Order + Temporal-Invariant Verification (Task 18 only); Governance-Loop Boundary Verification (Task 19 only); Promotion-Transaction Boundary Verification (Task 20 only); Enforcement-Chokepoint + Persisted-Stop Verification (Task 29 only); published-plan replanning invariant quartet (Task 13 only); harness-artifact closed loop (Task 28 only); provenance-adapter intersection (Task 34 only); measurement-semantics fusion intersection (Task 35 only); regulated-vendor installed-system boundary triad (Task 14 only); contract→negative-vector→differential-implementation triangulation (Task 45 only); Value-State Aggregation Audit (Task 47 only); database-boundary bypass check (Task 42 only); opaque-upstream health-contract audit (Task 48 only).
 
 ## Experiment-wide conclusion
-Too early for a winner claim. Across **34 matched tasks**, Experiment has a small mean advantage (**24.79 vs 24.50**), but the **median paired difference is 0** and task outcomes are **7 wins, 23 ties, 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is generating transferable verification/search methods and has improved calibration on several adversarial tasks, but score separation remains modest and the experimental path still appears somewhat more expensive. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
+Too early for a winner claim. Across **39 matched tasks**, Experiment has a small mean advantage (**24.82 vs 24.56**), but the **median paired difference is 0** and task outcomes are **7 wins, 28 ties, 4 losses** for Experiment. Neither condition has produced a scored false promotion, but Experiment now has **one scored no-find false negative (Task 43)** while Control has none. The experimental architecture continues to generate transferable verification/search methods and has improved calibration on several adversarial tasks, but score separation remains modest, the experimental path appears somewhat more expensive, and Task 43 is concrete evidence that stricter invariant/provenance gates can over-constrain discovery. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
