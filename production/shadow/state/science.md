@@ -161,7 +161,7 @@ STATUS: **SUPPORTED; A NEW INTERMEDIATE SAFETY/TRUTH LAYER IS VERIFIED, BUT THE 
 SUPPORTING EVIDENCE:
 - `Abenor-Labs/Open-MHS@92b04b023915ba7cdf2cac55eb58e86a3c94cc0d` independently implements a declarative hardware safety envelope with two pre-transport enforcement points. Dedicated tests assert unsafe writes produce zero transport emissions and no state change, including a deliberately naive driver behind the middleware.
 - The same write path does not equate transport success with physical truth: where feedback exists it polls the declared sensor and raises explicit desync when the command landed but the observed state did not follow.
-- The RPC/audit boundary distinguishes four materially different classes: policy refusal (`transmitted: null`), concrete transmitted values with verification status, transmitted-but-desynced state, and transport failure recorded as `transmitted: "unknown"` instead of pretending nothing happened.
+- The RPC/audit boundary distinguishes four materially different classes: policy refusal (`transmitted: null`), concrete transmitted values with verification status, transmitted-but-desynced state, and transport failure where whether the effect occurred is genuinely **unknown**.
 - Audit records are hash-chained, flushed/fsynced, and a fresh process resumes sequence/hash state from the prior file. This makes recorded effect truth persistent across ordinary restart.
 - The official Model Hardware Standard entered limited research preview on 2026-08-27, while `Abenor-Labs/Open-MHS` and `SCUT-ESA/open-mhs` appeared independently within days. The technical category is therefore beginning to branch before the official public specification exists.
 
@@ -185,3 +185,44 @@ NEXT TEST:
 Find a scientific executor that reaches **Level 3**: crash after device write but before acknowledgement, restart with the same durable business-effect/native-command identity, query authoritative device/system-of-record state, and resolve the original action without redispatch.
 
 CONFIDENCE: **HIGH that the ladder correctly separates auditability from crash-safe effect integrity; MEDIUM that a public Level-3 implementation exists.**
+
+## 2026-09-20 — Run 8 evidence-backed update
+
+### H3 refinement — Level 3 remains unverified after three targeted near-matches
+STATUS: **NO_FIND FOR LEVEL 3; CONFIDENCE IN THE GAP INCREASED.**
+
+SUPPORTING / NEGATIVE EVIDENCE:
+- `ioi-foundation/ioi@93f34155295b3c6122d7eb000cbe0333cc5a4f0b` is an especially instructive near-match: its canonical physical-action architecture names controller idempotency, execution receipts and ambiguous-effect reconciliation, but the same canonical file marks the implementation as only a **partial admission precursor** and says the execution core, controller-side idempotency and durable execution receipts remain planned. Commit history confirms the implemented path is durable admission, not physical execution.
+- `MacKenzieLuong/sparkle@a9b4e38bfbfb0926723460c63cc4355b1bfabfc0` tests command-ID duplicate detection and receipt lookup, but the receipt store is process-local memory. Same-process idempotency therefore must not be mistaken for restart-safe effect identity.
+- `tongriyaotxt/open-mhs@61ced4d976dd192623cfc715139a061783972cae` provides meaningful local-control evidence—tick-priority reflexes, forward-model correction, DMP learning/generalization, habit/reflex hierarchy and Microduck deadman/safety tests—but its device write history is in memory and scientific lab adapters are explicitly simulated. It is a WATCH-level control kernel, not a Level-3 physical-effect executor.
+- SiLA-style command-execution UUIDs remain useful correlation primitives, but this run found no qualifying public implementation that proves the full durable join through process loss and authoritative no-resend reconciliation.
+
+CONTRARY EVIDENCE:
+- The search did not exhaust every proprietary/vendor instrument API; a Level-3 implementation may exist in closed or domain-specific software.
+- IOI's architecture shows that the desired contract is understood and being designed, so the gap may close rapidly.
+
+NEXT TEST:
+Keep the Level-3 proof obligation unchanged and broaden to **non-scientific external-effect systems with authoritative provider status APIs**—payments, cloud provisioning, manufacturing jobs, print/CNC queues, or transactional device gateways—then transfer only implementations that prove: pre-dispatch durable effect reservation, durable provider/native operation ID, crash-after-write recovery, replay block, and read-only status reconciliation of the original action.
+
+CONFIDENCE: **HIGH that public scientific executors rarely close Level 3 end-to-end; MEDIUM-HIGH that a transferable implementation may first appear in an adjacent external-effect domain.**
+
+### LOCAL-3 refinement — effect truth table + persistence timing
+Evidence count: **2 useful tasks (Run 7 direct success; Run 8 falsification use).** Run 8 showed the method also prevents false positives: an architecture can describe perfect effect semantics while explicitly marking them planned, and a command receipt can look idempotent while living only in memory. Keep LOCAL/STAGED-ELIGIBLE only inside shadow; do not edit global `SEARCH_SKILLS.md`.
+
+### New LOCAL candidate — Planned-vs-implemented collapse check
+WHEN TO USE: architecture-heavy, standards-driven, safety-critical, autonomous-science and agent-to-hardware repositories whose documentation appears to exactly match the target capability.
+
+PROCEDURE: before scoring, locate the repository's own implementation-status declaration, owning source path, persistence boundary, executable tests and feature-introducing history. If the document says `planned`, `partial`, `precursor`, or names future execution components, downgrade those objects to design evidence unless source/tests independently prove otherwise.
+
+WHY IT WORKED: Run 8's strongest apparent Level-3 hit, IOI, was rejected by its own canonical implementation-status text and admission-history commits.
+
+FAILURE MODES: implementation-status docs may lag code, so a `planned` label should trigger source/history verification rather than automatic rejection; generated schemas alone do not prove runtime ownership.
+
+NEXT IMPROVEMENT: apply this check to one more independent architecture-heavy candidate before considering it staged.
+
+Evidence count: **1 task**. Keep LOCAL only.
+
+### Failed-search memory added
+- Do not promote a repository because its architecture schema contains the exact ideal fields; require runtime ownership and tests for the external-effect path.
+- Same-process command dedupe/receipt lookup is not durable idempotency unless the receipt/effect identity survives restart in a real backing store and restart tests exercise it.
+- Simulation-rich local control can still be commercially useful, but it is not evidence for physical effect reconciliation; score the local-control kernel separately from physical execution integrity.
