@@ -1,8 +1,8 @@
 """Final launch gate for Freight Recovery paid pilot execution.
 
-This module composes buyer/data readiness, pilot rights operability, and
-deployment-security evidence. A READY buyer does not imply the current
-deployment is safe for confidential customer data.
+Buyer/data readiness, legal operability, and environment security are separate
+claims. The chosen data path must pass its own evidence gate before
+confidential customer data is accepted.
 """
 from __future__ import annotations
 
@@ -12,13 +12,19 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from pathlib import Path
 
-from freight.deployment_security_evidence import validate_evidence
-from freight.readiness import ReadinessAssessment, ReadinessStatus, assess_readiness, from_dict
+from freight.deployment_security_evidence import (
+    evidence_conditions,
+    validate_evidence,
+)
+from freight.readiness import (
+    ReadinessAssessment,
+    ReadinessStatus,
+    assess_readiness,
+    from_dict,
+)
 from freight.release_gate import validate_registry
 from freight.rights_evidence import validate_rights_evidence
-from freight.separate_environment_evidence import (
-    validate_environment_evidence,
-)
+from freight.separate_environment_evidence import validate_environment_evidence
 
 
 class DataPath(str, Enum):
@@ -56,14 +62,23 @@ class LaunchDecision:
     warnings: tuple[str, ...]
 
 
+def _blocked_route(request: LaunchRequest) -> LaunchRoute:
+    return (
+        LaunchRoute.DEPLOYED_PILOT_BLOCKED
+        if request.data_path is DataPath.CURRENT_DEPLOYMENT
+        else LaunchRoute.SEPARATE_ENVIRONMENT_PENDING
+    )
+
+
 def evaluate_launch(
     *,
     readiness: ReadinessAssessment,
     component_registry: dict,
     rights_manifest: dict,
-    deployment_evidence: dict,
+    deployment_evidence: dict | None,
     request: LaunchRequest,
     separate_environment_evidence: dict | None = None,
+    as_of_date: str | None = None,
 ) -> LaunchDecision:
     blockers: list[str] = []
     conditions: list[str] = []
@@ -94,19 +109,39 @@ def evaluate_launch(
     warnings.extend(registry_warnings)
     warnings.extend(rights_warnings)
 
-    deployment_errors = validate_evidence(deployment_evidence)
-    blockers.extend("deployment_evidence_invalid:" + x for x in deployment_errors)
-
     if blockers:
         return LaunchDecision(
             LaunchStatus.BLOCKED,
-            LaunchRoute.DEPLOYED_PILOT_BLOCKED,
+            _blocked_route(request),
             tuple(blockers),
             tuple(conditions),
             tuple(warnings),
         )
 
     if request.data_path is DataPath.CURRENT_DEPLOYMENT:
+        if deployment_evidence is None:
+            blockers.append("deployment_evidence_missing")
+        else:
+            blockers.extend(
+                "deployment_evidence_invalid:" + x
+                for x in validate_evidence(deployment_evidence)
+            )
+            blockers.extend(
+                evidence_conditions(
+                    deployment_evidence,
+                    as_of_date=as_of_date,
+                )
+            )
+
+        if blockers:
+            return LaunchDecision(
+                LaunchStatus.BLOCKED,
+                LaunchRoute.DEPLOYED_PILOT_BLOCKED,
+                tuple(blockers),
+                tuple(conditions),
+                tuple(warnings),
+            )
+
         access = deployment_evidence.get("access_control") or {}
         inventory = deployment_evidence.get("deployment_inventory") or {}
         tenant = deployment_evidence.get("cross_tenant_isolation") or {}
@@ -159,7 +194,8 @@ def evaluate_launch(
             )
 
         environment_errors, environment_conditions = validate_environment_evidence(
-            separate_environment_evidence
+            separate_environment_evidence,
+            as_of_date=as_of_date,
         )
         if environment_errors:
             blockers.extend(
@@ -209,6 +245,7 @@ def main() -> None:
     parser.add_argument("--requires-multi-tenant", action="store_true")
     parser.add_argument("--requires-parser", action="store_true")
     parser.add_argument("--separate-evidence-json")
+    parser.add_argument("--as-of-date")
     parser.add_argument("--expect", choices=("BLOCKED", "CONDITIONAL", "READY"))
     args = parser.parse_args()
 
@@ -241,6 +278,7 @@ def main() -> None:
         ),
         request=request,
         separate_environment_evidence=separate_environment_evidence,
+        as_of_date=args.as_of_date,
     )
     payload = asdict(decision)
     payload["status"] = decision.status.value
