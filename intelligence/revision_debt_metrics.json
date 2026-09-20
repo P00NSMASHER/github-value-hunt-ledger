@@ -1,15 +1,15 @@
 {
-  "unknown_revision_observations": 85,
-  "unique_repositories_with_unknown_revision": 85,
+  "unknown_revision_observations": 86,
+  "unique_repositories_with_unknown_revision": 86,
   "status_counts": {
-    "unknown": 31,
+    "unknown": 32,
     "rejected": 18,
     "strong": 19,
     "quarantined": 3,
     "watch": 14
   },
   "source_state_counts": {
-    "current": 85
+    "current": 86
   },
   "master_catalog_gaps": [
     {
@@ -285,6 +285,14 @@
       "status_bucket": "watch",
       "status": "watch**.",
       "priority_score": 8
+    },
+    {
+      "repository": "AD-SDL/MADSci",
+      "source_catalog": "hunters/21-run19-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "unknown",
+      "status": null,
+      "priority_score": 7
     },
     {
       "repository": "ANI-IN/Call-Center-Intelligence-System",

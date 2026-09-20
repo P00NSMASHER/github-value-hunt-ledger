@@ -2,13 +2,13 @@
 
 Generated directly from the hunter Markdown corpus plus the current elite set in MASTER.md.
 
-- Repository observations: **1,772**
+- Repository observations: **1,773**
 - Unique repositories (including MASTER-only entries): **1,689**
-- Unique repository/revision keys: **1,698**
+- Unique repository/revision keys: **1,699**
 - Observations beyond the first occurrence of a repo/revision: **76 (4.3%)**
-- Repo/revision records with unknown revision: **85**
-- Repositories appearing in more than one hunter catalog/file: **64**
-- Hunter Markdown files scanned: **58**
+- Repo/revision records with unknown revision: **86**
+- Repositories appearing in more than one hunter catalog/file: **65**
+- Hunter Markdown files scanned: **59**
 - Current MASTER-promoted repositories: **36**
 - Current MASTER-promoted exact repo/revisions: **36**
 - MASTER promotions without a matching hunter-catalog observation: **2**
@@ -22,7 +22,7 @@ Generated directly from the hunter Markdown corpus plus the current elite set in
 | watch | 463 |
 | rejected | 390 |
 | quarantined | 36 |
-| unknown | 160 |
+| unknown | 161 |
 
 ## Most repeatedly observed repo/revisions
 

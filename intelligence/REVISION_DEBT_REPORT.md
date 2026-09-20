@@ -2,15 +2,15 @@
 
 Pinned revisions are essential for reproducible technical intelligence. This report prioritizes records whose repository identity is known but whose inspected revision is not recoverable from the hunter catalog.
 
-- Unknown-revision observations: **85**
-- Unique repositories with unknown revision: **85**
+- Unknown-revision observations: **86**
+- Unique repositories with unknown revision: **86**
 - Current MASTER promotions without matching exact hunter-catalog observation: **2**
 
 ## Unknown revision mix
 
 | Bucket | Count |
 |---|---:|
-| unknown | 31 |
+| unknown | 32 |
 | strong | 19 |
 | rejected | 18 |
 | watch | 14 |
@@ -53,6 +53,7 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | pasrom/profinet-rs | hunters/12.md | current | watch | 8 |
 | shensi8312/secsgem-driver | hunters/12.md | current | watch | 8 |
 | tokeyjs/TinySECSGem | hunters/12.md | current | watch | 8 |
+| AD-SDL/MADSci | hunters/21-run19-2026-09-20.md | current | unknown | 7 |
 | ANI-IN/Call-Center-Intelligence-System | hunters/37.md | current | unknown | 7 |
 | AstorisTheBrave/Rostra | hunters/37.md | current | unknown | 7 |
 | Emma-V/support-triage | hunters/37.md | current | unknown | 7 |
@@ -69,7 +70,6 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | Tests/history | hunters/04-run12-2026-09-20.md | current | unknown | 7 |
 | TheBarrelExploit/call-quality-analyzer | hunters/37.md | current | unknown | 7 |
 | Yogeshwaran-Kumar/VerticalQA | hunters/37.md | current | unknown | 7 |
-| andrewawilley/Five9-Agent-Sup-REST-API-Python-Pack | hunters/37.md | current | unknown | 7 |
 
 ## MASTER catalog provenance gaps
 
