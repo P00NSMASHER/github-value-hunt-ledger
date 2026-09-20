@@ -9,24 +9,24 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | Pair | Tasks | Control completed | Experiment completed | Matched tasks scored | Control matched mean /25 | Experiment matched mean /25 | Control false promotions | Experiment false promotions | Winner so far |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | 1 | 01-08 | 5 | 0 | 0 | — | — | 0 | 0 | — |
-| 2 | 09-15 | 5 | 5 | 5 | 24.60 | 25.00 | 0 | 0 | Experiment |
-| 3 | 16-22 | 6 | 4 | 4 | 23.75 | 24.75 | 0 | 0 | Experiment |
+| 2 | 09-15 | 6 | 6 | 6 | 24.67 | 25.00 | 0 | 0 | Experiment |
+| 3 | 16-22 | 7 | 4 | 4 | 23.75 | 24.75 | 0 | 0 | Experiment |
 | 4 | 23-29 | 6 | 6 | 6 | 24.83 | 24.50 | 0 | 0 | Control |
 | 5 | 30-36 | 6 | 6 | 6 | 24.50 | 24.83 | 0 | 0 | Experiment |
 | 6 | 37-43 | 5 | 6 | 5 | 25.00 | 25.00 | 0 | 0 | Tie |
 | 7 | 44-50 | 7 | 5 | 5 | 24.60 | 24.80 | 0 | 0 | Experiment |
 
 ## Experiment-wide matched metrics
-- Matched tasks scored: **31** — 09, 10, 11, 12, 13, 16, 17, 18, 19, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 44, 45, 46, 47, 48.
-- Control matched mean: **24.58/25**.
+- Matched tasks scored: **32** — 09, 10, 11, 12, 13, 14, 16, 17, 18, 19, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 37, 38, 39, 40, 41, 44, 45, 46, 47, 48.
+- Control matched mean: **24.59/25**.
 - Experiment matched mean: **24.81/25**.
-- Mean paired difference (Experiment - Control): **+0.23**.
+- Mean paired difference (Experiment - Control): **+0.22**.
 - Median paired difference: **0.0**.
-- Pairwise task win / tie / loss for Experiment: **6 / 21 / 4**.
+- Pairwise task win / tie / loss for Experiment: **6 / 22 / 4**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
 - No-find results: **0 Control / 0 Experiment** among scored results.
 - Approximate search effort per validated STRONG result remains **Control ~10-11 reported search/deep-inspection units; Experiment ~11-12**. This is directional because result files mix query counts, candidate triage counts, specialist passes and deep inspections.
-- Learning slope remains **mildly positive but score-ceiling limited**. Pair 2 is 25→25→25→25→25; Pair 3 24→25→25→25; Pair 4 23→25→24→25→25→25; Pair 5 25→25→24→25→25→25; Pair 6 25→25→25→25→25 with unmatched Task 42 also scoring 25; Pair 7 24→25→25→25→25. Median early-to-late within-pair change remains about **+0.5**, while most recent tasks tie at the ceiling. Qualitative learning remains stronger than the score slope.
+- Learning slope remains **mildly positive but score-ceiling limited**. Pair 2 is 25→25→25→25→25→25; Pair 3 24→25→25→25; Pair 4 23→25→24→25→25→25; Pair 5 25→25→24→25→25→25; Pair 6 25→25→25→25→25 with unmatched Task 42 also scoring 25; Pair 7 24→25→25→25→25. Median early-to-late within-pair change remains about **+0.5**, while most recent tasks tie at the ceiling. Qualitative learning remains stronger than the score slope.
 
 ## Scored task details
 Scores preserve prior scored results and add newly completed unscored results observed in this integration run.
@@ -48,6 +48,8 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 12 | EXPERIMENT | 25 | 5/5/5/5/5 | `RamazanKara/restore-drill@dea374da3b340f53b798112eee82bd7ed1224572` | No | No | Same target plus exact PASS-boundary red-team; zero-check false green and current CI/security caveats found and bounded. |
 | 13 | CONTROL | 25 | 5/5/5/5/5 | `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` | No | No | Exact target; hard locks, coverage/stability objective, replay and adverse repair tests verified. |
 | 13 | EXPERIMENT | 25 | 5/5/5/5/5 | `joschiservice/RosterSpec@f7e701c694bf1facdc4999e1681a3aa11493614d` | No | No | Exact target with deeper published-plan transition tracing, optimality flags and comparator/current-CI caveats. |
+| 14 | CONTROL | 25 | 5/5/5/5/5 | `novonordisk-research/OptiHPLCHandler@96399dcddc1457a5b942f61585b9e8fcf78b9a72` | No | No | Exact vendor-specific CDS integration; installed-Empower mutation/acquisition paths, original/non-overwrite semantics, tests and vendor audit boundary verified with validation/entitlement caveats. |
+| 14 | EXPERIMENT | 25 | 5/5/5/5/5 | `novonordisk-research/OptiHPLCHandler@96399dcddc1457a5b942f61585b9e8fcf78b9a72` | No | No | Same exact target with deeper API/version/commit archaeology; TLS, optional audit comments, mocked-test and system-suitability caveats correctly bounded without overrejecting the integration. |
 | 16 | CONTROL | 21 | 2/5/5/4/5 | `broad-well/recovair-abm@7b3379cb431591c148a26993097a08487ae6886b` | No | No | Deep partial correctly kept WATCH; joint optimization, legality, uncertainty and replay incomplete. |
 | 16 | EXPERIMENT | 24 | 5/5/5/4/5 | `mizuharaa/olus@f1d1160de0c1cb8c2961d9a785d24b2e1ac48e68` | No | No | Exact target with solver, legality, uncertainty, simulation and replay; FAR117 integration overclaim bounded. |
 | 17 | CONTROL | 25 | 5/5/5/5/5 | `Etherlabs-dev/multi-processor-reconciliation@2f9397fbe56a76abeee42a01a37536ad1811a806` | No | No | Strong equivalent with exact/net/fee/refund/split/dedupe/ambiguity semantics and tests. |
@@ -58,6 +60,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | 19 | EXPERIMENT | 25 | 5/5/5/5/5 | `KesavamurthyT/Fair-Dispatch-Transparent-Fair-Route-Allocation@90f8768abe3b49e7bd577cd666096a93ff2da3cd` | No | No | Exact target; route/fairness loop, explanations, appeals/overrides and logs real; CI/governance seams bounded. |
 | 20 | CONTROL | 21 | 2/5/5/4/5 | `sachinpatel-or/Production-Scheduling-and-Optimization-System@3b545e7ea5ca2f5efd1c5f4b283bd7b52de17bbe` | No | No | Deep partial kept WATCH; no immutable baseline, non-regression gate, safe-plan fallback or durable repair lineage. |
 | 21 | CONTROL | 24 | 5/4/5/5/5 | `Himanshu-Laddhad/Nudge-Causal-Promotion-Intelligence-System@21783bf341d25c82fcff208735041637b2ceba10` | No | No | Strong causal-promotion equivalent; one verification point withheld because outputs were model-based and not independently rerun/test-backed. |
+| 22 | CONTROL | 25 | 5/5/5/5/5 | `josephazar/FreshRetailnet-50k-Analysis@fd17142943f61452381841cbe67f67ded5fd3a52` | No | No | Demonstrably strong equivalent; censored-demand reconstruction, leakage-free calibration, validation-only policy selection, inventory economics, negative tests and proxy-economics limits all verified. |
 | 23 | CONTROL | 24 | 5/5/4/5/5 | `Dynamical-Systems-Research/dynamical-cli@b4823fb4e4babd942e3beafcad8042ea0684f1c0` | No | No | Strong campaign-governance substrate; requested action classes are semantic rather than one closed runtime state machine. |
 | 23 | EXPERIMENT | 23 | 3/5/5/5/5 | `fl-sean03/OpenSDL@43f49889c87e78cffb383f8683766453e4daaff1` | No | No | Correct WATCH; first-class acquire-context and richer campaign-level recovery/escalation transitions missing. |
 | 24 | CONTROL | 25 | 5/5/5/5/5 | `Arpita2919/RailSync@f82d600f62fc355fd755ca3e6d457c384a300c4a` | No | No | Exact target; hard locks, feasibility, adversarial lock tests and robustness/Plan-B machinery verified. |
@@ -116,7 +119,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 - **Promoted to SEARCH_SKILLS:** `Fail-open boundary archaeology`, supported by Experiment Tasks **44 and 45** and reinforced by Task 46.
 - **Promoted to SEARCH_SKILLS:** `Decision-claim → runtime-side-effect trace`, supported by Experiment Tasks **25 and 26**, reinforced by Tasks 27 and 28.
 - **Promoted to SEARCH_SKILLS:** `Authority-origin / invariant-set consistency`, supported independently by Experiment Tasks **46 and 47**.
-- Not yet separately promoted: Transition-Order + Temporal-Invariant Verification (Task 18 only); Governance-Loop Boundary Verification (Task 19 only); published-plan replanning invariant quartet (Task 13 only); harness-artifact closed loop (Task 28 only); provenance-adapter intersection (Task 34 only); measurement-semantics fusion intersection (Task 35 only); contract→negative-vector→differential-implementation triangulation (Task 45 only); Value-State Aggregation Audit (Task 47 only); database-boundary bypass check (Task 42 only); opaque-upstream health-contract audit (Task 48 only).
+- Not yet separately promoted: Transition-Order + Temporal-Invariant Verification (Task 18 only); Governance-Loop Boundary Verification (Task 19 only); published-plan replanning invariant quartet (Task 13 only); harness-artifact closed loop (Task 28 only); provenance-adapter intersection (Task 34 only); measurement-semantics fusion intersection (Task 35 only); regulated-vendor installed-system boundary triad (Task 14 only); contract→negative-vector→differential-implementation triangulation (Task 45 only); Value-State Aggregation Audit (Task 47 only); database-boundary bypass check (Task 42 only); opaque-upstream health-contract audit (Task 48 only).
 
 ## Experiment-wide conclusion
-Too early for a winner claim. Across **31 matched tasks**, Experiment has a small mean advantage (**24.81 vs 24.58**), but the **median paired difference is 0** and task outcomes are **6 wins, 21 ties, 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is generating transferable verification/search methods and has improved calibration on several adversarial tasks, but score separation remains small and the experimental path still appears somewhat more expensive. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
+Too early for a winner claim. Across **32 matched tasks**, Experiment has a small mean advantage (**24.81 vs 24.59**), but the **median paired difference is 0** and task outcomes are **6 wins, 22 ties, 4 losses** for Experiment. Neither condition has produced a scored false promotion or no-find result. The experimental architecture is generating transferable verification/search methods and has improved calibration on several adversarial tasks, but score separation remains small and the experimental path still appears somewhat more expensive. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
