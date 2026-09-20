@@ -143,3 +143,66 @@ class LeaseBook:
         del self._leases[task_id]; return True
     def recoverable(self,now:datetime|None=None)->list[str]:
         t=now or datetime.now(timezone.utc); return sorted(k for k,v in self._leases.items() if v.expires_at<=t)
+
+
+class FreightWorkDecision(str, Enum):
+    ALLOW="ALLOW"
+    DENY="DENY"
+
+@dataclass(frozen=True)
+class FreightWorkRequest:
+    stage_gate:str
+    gap_id:str|None
+    trigger:str
+    category:str
+    evidence_to_change_decision:str
+    why_existing_stack_insufficient:str
+    stop_condition:str
+    broad_search:bool=False
+
+@dataclass(frozen=True)
+class FreightWorkResult:
+    decision:FreightWorkDecision
+    reasons:tuple[str,...]=()
+
+FREIGHT_ALLOWED_TRIGGERS=frozenset({
+    "EXP001_GAP",
+    "PAYING_CUSTOMER_GAP",
+    "SECURITY_DILIGENCE",
+    "RIGHTS_DILIGENCE",
+    "INDEPENDENT_FALSIFIER",
+    "SETTLEMENT_CONNECTOR",
+    "AUTHORITY_CONNECTOR",
+})
+FREIGHT_BLOCKED_GENERIC_CATEGORIES=frozenset({
+    "GENERIC_TMS",
+    "GENERIC_OCR",
+    "GENERIC_RULES",
+    "GENERIC_RATING",
+    "GENERIC_DASHBOARD",
+    "GENERIC_ENTITY_MATCHER",
+})
+
+def evaluate_freight_work_request(req:FreightWorkRequest)->FreightWorkResult:
+    reasons=[]
+    if req.stage_gate!="EXP-001":
+        reasons.append("freight_work_must_link_to_exp001")
+    if not req.gap_id or not req.gap_id.strip():
+        reasons.append("named_gap_id_required")
+    if req.broad_search:
+        reasons.append("broad_freight_search_frozen")
+    if req.trigger not in FREIGHT_ALLOWED_TRIGGERS:
+        reasons.append("unsupported_freight_trigger")
+    if req.category in FREIGHT_BLOCKED_GENERIC_CATEGORIES:
+        reasons.append("generic_freight_subsystem_blocked")
+    for field_name in (
+        "evidence_to_change_decision",
+        "why_existing_stack_insufficient",
+        "stop_condition",
+    ):
+        value=getattr(req,field_name)
+        if not value or not value.strip():
+            reasons.append(f"{field_name}_required")
+    if reasons:
+        return FreightWorkResult(FreightWorkDecision.DENY,tuple(reasons))
+    return FreightWorkResult(FreightWorkDecision.ALLOW,())

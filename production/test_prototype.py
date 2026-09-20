@@ -50,3 +50,42 @@ def test_lease_prevents_duplicate_work_and_recovers_stale():
     assert b.claim("task","hunter-b",60,t+timedelta(seconds=10)) is None
     assert b.recoverable(t+timedelta(seconds=61))==["task"]
     c=b.claim("task","hunter-b",60,t+timedelta(seconds=61)); assert c and c.generation>a.generation
+
+
+def freight_request(**overrides):
+    base=dict(
+        stage_gate="EXP-001",
+        gap_id="FRT-AUTH-001",
+        trigger="AUTHORITY_CONNECTOR",
+        category="ACCESSORIAL_ADDENDUM_CONNECTOR",
+        evidence_to_change_decision="Customer pilot cannot reconstruct one carrier addendum.",
+        why_existing_stack_insufficient="Existing RateCon path does not contain the incorporated schedule.",
+        stop_condition="Stop after exact addendum source/version is reproducibly acquired.",
+        broad_search=False,
+    )
+    base.update(overrides)
+    return FreightWorkRequest(**base)
+
+def test_freight_specific_exp001_gap_is_allowed():
+    assert evaluate_freight_work_request(freight_request()).decision is FreightWorkDecision.ALLOW
+
+def test_freight_broad_search_is_denied():
+    result=evaluate_freight_work_request(freight_request(broad_search=True))
+    assert result.decision is FreightWorkDecision.DENY
+    assert "broad_freight_search_frozen" in result.reasons
+
+def test_freight_generic_tms_hunt_is_denied():
+    result=evaluate_freight_work_request(freight_request(category="GENERIC_TMS"))
+    assert result.decision is FreightWorkDecision.DENY
+    assert "generic_freight_subsystem_blocked" in result.reasons
+
+def test_freight_work_requires_named_gap_and_stop_condition():
+    result=evaluate_freight_work_request(freight_request(gap_id="",stop_condition=""))
+    assert result.decision is FreightWorkDecision.DENY
+    assert "named_gap_id_required" in result.reasons
+    assert "stop_condition_required" in result.reasons
+
+def test_freight_work_must_link_to_exp001():
+    result=evaluate_freight_work_request(freight_request(stage_gate="EXP-999"))
+    assert result.decision is FreightWorkDecision.DENY
+    assert "freight_work_must_link_to_exp001" in result.reasons
