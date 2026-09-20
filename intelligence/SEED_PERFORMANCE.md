@@ -5,6 +5,11 @@ Seed-level performance becomes meaningful only after hunters record V5 seed_ids.
 | Seed | Runs | Inspected | Retained | MASTER | New-cap runs | Experiment runs | Evidence |
 |---|---:|---:|---:|---:|---:|---:|---|
 | SEED:gap:cap-013 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:language-family-c-cpp:cap-009 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:language-family-dotnet:cap-013 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:language-family-rust:cap-007 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:package-ecosystem-cargo:cap-002 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:package-ecosystem-nuget:cap-008 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-007 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-009 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-002 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |

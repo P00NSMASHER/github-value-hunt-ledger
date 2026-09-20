@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
-  "seed_count": 19,
+  "seed_count": 24,
   "by_type": {
     "capability_gap": 10,
+    "coverage_gap": 5,
     "positive_dna_transfer": 6,
     "strategy_measurement": 3
   },
