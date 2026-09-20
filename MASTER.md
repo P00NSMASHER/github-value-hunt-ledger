@@ -322,7 +322,6 @@ Elite cross-lane positive training set. This file is intentionally smaller than 
 - Monetization / first paid wedge: resilience/hardening study on a synthetic or customer-authorized feeder with planted failures.
 - Why it wins: provides the hard operational middle layer from hazard to network consequence and restoration priority.
 
-
 ## License-unlocked promotions — 2026-09-19
 
 These repositories previously ranked below MASTER largely because of public-license/reuse restrictions. Under the user's standing assertion of separate commercial permission for every public repository, rights clarity is no longer treated as the limiting factor for repository-owned code. Scores below reflect technical/commercial value under that working assumption; actual public licenses remain recorded for provenance. Third-party datasets, standards content, models, trademarks, patents, APIs and external services remain separately governed.
@@ -581,3 +580,57 @@ The entries below were re-scored under the standing commercial-permission postur
 - Buyer/problem: manufacturers, distributors, ecommerce and aftermarket/service finance teams lose margin to duplicate, expired, over-quantity or weakly sourced warranty/return approvals and waste analyst time reconstructing source sales/deliveries.
 - Monetization / first paid wedge: blind Warranty/RMA Entitlement Leakage Audit on customer-owned sales/delivery/serial/warranty/RMA/credit facts, measuring unsupported credits/refunds, duplicate/over-return claims, valid incorrectly rejected claims and review labor.
 - Why it beats alternatives: it supplies executable tested entitlement semantics from fulfilled sale/delivery history to remaining returnable quantity rather than generic warranty dates or RMA CRUD.
+
+<!-- INTEGRATOR-R12-2026-09-19T2231-0400 -->
+## Integrator promotions — 2026-09-19 22:31 ET
+
+### pialmmh/billing-dotnetcore — telecom mediation/rating and revenue-assurance kernel
+- Exact revision: `ec9e0abacce7e80b3a34d2d89b929ee5db946209`.
+- Score: **29/30** — A5 B5 C5 D5 E5 F4.
+- Rights: no controlling root public `LICENSE` established at the inspected revision; repository-owned public code/content is treated as commercially authorized under the user's standing assertion. Third-party dependencies, telecom standards/data and any customer-origin corpus remain separately governed.
+- Concrete capability: production-shaped telecom CDR mediation/rating with rate-plan resolution/provenance, prefix/A-to-Z rating, charge/finalization, reseller/interconnect service families, Kafka/DLQ paths, idempotency/atomic batch semantics and extensive billed-duration, rounding, prefix, duplicate and service-family tests.
+- Buyer/problem: MVNOs, carriers, wholesale/interconnect finance, BSS vendors and revenue-assurance teams lose margin in rate-plan, duration, rounding, prefix, reseller and settlement edge cases.
+- Monetization / first paid wedge: fixed-price read-only rerating diagnostic on one closed authorized billing period, followed by recurring revenue-assurance monitoring; settlement recovery is claimed only after actual partner/payment evidence.
+- Why it wins: it is a deep deterministic money engine with accumulated telecom billing invariants, not another BSS shell or anomaly model. Pairing it with D-NBS adds bilateral reconciliation and reproducible statement evidence.
+
+### aurelianware/cloudhealthoffice — healthcare claims adjudication and payment-integrity operating plane
+- Exact revision: `85c8e18146d168ad2f4e30fbcfe6e90af0bfdb58`.
+- Score: **28/30** — A4 B5 C5 D5 E5 F4.
+- Rights: BSL-1.1 publicly at the inspected revision; repository-owned code/content treated as commercially authorized under the user's standing assertion. CMS/NCCI/code sets, payer policies, FHIR/X12 materials, customer claims and third-party services remain separately governed.
+- Concrete capability: payer-core adjudication spanning professional/institutional/dental claims, declarative plans/accumulators, fee schedules, NCCI/MUE-style edits, scrubbing, COB, provider/network state, prior authorization, FHIR R4, X12 and operator workflows, with benchmark semantics that preserve pended/unsupported states rather than forcing payment conclusions.
+- Buyer/problem: health plans, TPAs, RCM/payment-integrity vendors and provider revenue-cycle teams need independent replay of complex claims state to distinguish true financial errors from contractual adjustments, patient responsibility or correctly pended claims.
+- Monetization / first paid wedge: synthetic/redacted or customer-authorized Healthcare Revenue Integrity Diagnostic, paired with 837↔835 reconciliation and human review; no autonomous coverage/payment decisions.
+- Why it wins: unusually deep end-to-end adjudication domain compression makes a deterministic claims-replay product plausible, while its explicit unsupported/pended states fit the portfolio's fail-closed evidence standard.
+
+### ersinkoc/Kronos — heterogeneous recovery-verification engine
+- Exact revision: `541d06069459a313f91940191a2ec3812f724a71`.
+- Score: **29/30** — A4 B5 C5 D5 E5 F5.
+- Rights: Apache-2.0 for repository-owned code; database engines, containers, storage providers and customer data remain separately governed.
+- Concrete capability: backup/recovery orchestration with signed manifests and driver-based PostgreSQL, MySQL/MariaDB, MongoDB and Redis support; inspected evidence includes real MongoDB destructive-restore conformance, document count/checksum/index verification, large CI corpus and oplog/PITR-style rehearsal logic.
+- Buyer/problem: regulated SaaS/MSPs/platform teams need proof across mixed database estates, not a PostgreSQL-only green restore signal.
+- Monetization / first paid wedge: Mixed-Database Recovery Readiness Audit on 2–4 critical systems, then recurring proof-SLA monitoring layered with Redrill/Stronghold/SiVa.
+- Why it wins: materially expands Recovery Proof's real-restore surface into MongoDB/mixed-engine estates while preserving verifiable post-restore state instead of treating process exit as proof.
+
+### cmdrvl/canon — reviewed identity compiler and deterministic production registry
+- Exact revision: `45e9702ba7f3874c073134c1a6fb74500232b6a1`.
+- Score: **29/30** — A4 B5 C5 D5 E5 F5.
+- Rights: MIT for repository-owned code; external provider/reference data and customer identities remain separately governed.
+- Concrete capability: messy identity evidence → candidate/review decisions → promoted versioned registry → pinned deterministic runtime replay, with rule/confidence/unresolved provenance, provider materialization separated from runtime, and calibration/evaluation separated from registry mutation.
+- Buyer/problem: MDM/data-governance, procurement/AP, CRM and public-data products need reviewed canonical identities that remain reproducible after source systems change rather than opaque one-off fuzzy matches.
+- Monetization / first paid wedge: fixed-price multi-source vendor/customer/company canonicalization delivering a reviewed versioned registry, followed by recurring compilation/review/mapping service.
+- Why it wins: the moat is the identity **governance and replay lifecycle**, not pair scoring. It provides a clean production boundary for probabilistic discovery and is immediately useful to CaptureBrief, freight carrier mastering and AP/vendor identity.
+
+### owgreen-dev/grid-crunch — leakage-safe interconnection-queue materialization intelligence
+- Exact revision: `5f0c9a074d928b79caa792a84e8e92de1b2df3f2`.
+- Score: **29/30** — A5 B5 C5 D5 E5 F4.
+- Rights: MIT for repository software. LBNL Queued Up, EIA-860M, HIFLD, gridstatus/ISO queue feeds and other upstream datasets retain independent rights/redistribution conditions.
+- Concrete capability: reproducible competing-risks/survival analysis over public interconnection-queue history with fixed-horizon labels, strict entry-time leakage controls, out-of-cohort/within-ISO validation, calibration/lift and EIA-860M corroboration; it also preserves negative/null feature results and explicitly declines to claim post-Order-2023 validation that is not yet observable.
+- Buyer/problem: renewable/BESS developers, infrastructure investors/lenders, equipment vendors and data-center/site teams need evidence-backed completion ranking rather than queue counts or hindsight-contaminated scores.
+- Monetization / first paid wedge: fixed-price queue-portfolio underwriting/competition screen followed by recurring materialization monitoring/API.
+- Why it wins: it provides both a monetizable signal and a rare epistemic moat—leakage discipline plus documented negative results that prevent false precision and wasted feature engineering.
+
+## Deliberate portfolio tightening — 2026-09-19 22:31 ET
+- `DominicFinn/open_tms` is demoted from MASTER leader to **component/reference**. Its broad logistics plumbing remains useful as an independent comparator, but Trenova now owns the primary commercial workflow plane and Freight-Audit-Console/Kareya/Qatoto provide stronger independent audit/rating oracles. No capability is rejected; it simply no longer belongs in the elite positive set.
+- `ChelseaKR/constituent-reconciler` remains a **29/30 component/watch** rather than a second MASTER identity leader because Canon better represents the reusable reviewed-registry/replay DNA. Constituent Reconciler is indexed in `COMPONENTS.md` for consent-aware writeback.
+- `oscal-compass/compliance-to-policy-go` (**27/30**) and `duke5am/pg-restore-drill` (**28/30**) are intentionally indexed as uniquely important components rather than standalone MASTER leaders; they strengthen the compliance/recovery stacks without creating separate buyer wedges.
+- `justicebajaj161/Freight-Audit-Console` (**27/30**) remains an independent freight oracle in COMBINATIONS, not another freight MASTER leader; its revised-fuel/split-bill/residual-weight cases should be ported into the frozen benchmark.
