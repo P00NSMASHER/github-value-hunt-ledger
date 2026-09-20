@@ -1,8 +1,8 @@
 """Fail-closed pre-parser boundary for Freight Recovery buyer files.
 
 This module is deliberately conservative. It is not a sandbox and does not
-replace isolated parser execution, but it blocks obvious hostile/unsupported
-inputs before they reach document parsers or spreadsheet exports.
+replace isolated parser execution, but it blocks obvious unsupported inputs
+before they reach document parsers or spreadsheet exports.
 """
 from __future__ import annotations
 
@@ -31,16 +31,16 @@ class IngestPolicy:
     allowed_extensions: tuple[str, ...] = (".pdf", ".csv", ".xml", ".edi", ".x12")
 
     def __post_init__(self):
-        positive_limits = {
-            "max_file_bytes": self.max_file_bytes,
-            "max_text_line_chars": self.max_text_line_chars,
-            "max_edi_segment_chars": self.max_edi_segment_chars,
-            "max_csv_field_chars": self.max_csv_field_chars,
-            "max_csv_rows": self.max_csv_rows,
-            "max_csv_cells_per_row": self.max_csv_cells_per_row,
-            "max_csv_total_cells": self.max_csv_total_cells,
-        }
-        for name, value in positive_limits.items():
+        limits = (
+            ("max_file_bytes", self.max_file_bytes),
+            ("max_text_line_chars", self.max_text_line_chars),
+            ("max_edi_segment_chars", self.max_edi_segment_chars),
+            ("max_csv_field_chars", self.max_csv_field_chars),
+            ("max_csv_rows", self.max_csv_rows),
+            ("max_csv_cells_per_row", self.max_csv_cells_per_row),
+            ("max_csv_total_cells", self.max_csv_total_cells),
+        )
+        for name, value in limits:
             if value <= 0:
                 raise ValueError(f"{name} must be positive")
 
@@ -55,12 +55,7 @@ class InputInspection:
     reasons: tuple[str, ...]
 
 
-ARCHIVE_MAGIC = (
-    b"PK\x03\x04",
-    b"PK\x05\x06",
-    b"PK\x07\x08",
-    b"\x1f\x8b",
-)
+ARCHIVE_MAGIC = (b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08", b"\x1f\x8b")
 ARCHIVE_EXTENSIONS = {".zip", ".gz", ".tgz", ".tar", ".7z", ".rar"}
 
 
@@ -80,42 +75,114 @@ def _decode_text(data: bytes) -> str:
 
 
 def _text_line_too_long(text: str, limit: int) -> bool:
-    """Check physical text lines without materializing a split-lines list."""
-    for line in io.StringIO(text):
-        if len(line.rstrip("\r\n")) > limit:
-            return True
+    count = 0
+    for ch in text:
+        if ch in {"\r", "\n"}:
+            count = 0
+        else:
+            count += 1
+            if count > limit:
+                return True
     return False
 
 
-def _inspect_csv(text: str, policy: IngestPolicy, reasons: list[str]) -> None:
-    """Stream logical CSV rows and enforce explicit resource/shape bounds."""
-    row_count = 0
+def _csv_shape_preflight(text: str, policy: IngestPolicy, reasons: list[str]) -> bool:
+    rows = 0
+    cells_in_row = 1
     total_cells = 0
-    try:
-        reader = csv.reader(io.StringIO(text, newline=""))
-        for row in reader:
-            row_count += 1
-            if row_count > policy.max_csv_rows:
-                reasons.append("csv_row_limit_exceeded")
-                return
+    field_chars = 0
+    in_quotes = False
+    at_field_start = True
+    row_has_data = False
+    i = 0
 
-            row_cells = len(row)
-            if row_cells > policy.max_csv_cells_per_row:
+    while i < len(text):
+        ch = text[i]
+        if in_quotes:
+            if ch == '"':
+                if i + 1 < len(text) and text[i + 1] == '"':
+                    field_chars += 1
+                    i += 2
+                else:
+                    in_quotes = False
+                    i += 1
+            else:
+                field_chars += 1
+                i += 1
+            if field_chars > policy.max_csv_field_chars:
+                reasons.append("csv_field_too_long")
+                return False
+            row_has_data = True
+            continue
+
+        if ch == '"' and at_field_start:
+            in_quotes = True
+            at_field_start = False
+            row_has_data = True
+            i += 1
+            continue
+
+        if ch == ",":
+            cells_in_row += 1
+            if cells_in_row > policy.max_csv_cells_per_row:
                 reasons.append("csv_cells_per_row_limit_exceeded")
-                return
+                return False
+            field_chars = 0
+            at_field_start = True
+            row_has_data = True
+            i += 1
+            continue
 
-            total_cells += row_cells
+        if ch in {"\r", "\n"}:
+            if ch == "\r" and i + 1 < len(text) and text[i + 1] == "\n":
+                i += 1
+            rows += 1
+            if rows > policy.max_csv_rows:
+                reasons.append("csv_row_limit_exceeded")
+                return False
+            total_cells += cells_in_row if row_has_data else 0
             if total_cells > policy.max_csv_total_cells:
                 reasons.append("csv_total_cells_limit_exceeded")
-                return
+                return False
+            cells_in_row = 1
+            field_chars = 0
+            at_field_start = True
+            row_has_data = False
+            i += 1
+            continue
 
-            if any(len(cell) > policy.max_csv_field_chars for cell in row):
-                reasons.append("csv_field_too_long")
-                return
+        at_field_start = False
+        row_has_data = True
+        field_chars += 1
+        if field_chars > policy.max_csv_field_chars:
+            reasons.append("csv_field_too_long")
+            return False
+        i += 1
+
+    if in_quotes:
+        reasons.append("csv_parse_error")
+        return False
+
+    if row_has_data:
+        rows += 1
+        if rows > policy.max_csv_rows:
+            reasons.append("csv_row_limit_exceeded")
+            return False
+        total_cells += cells_in_row
+        if total_cells > policy.max_csv_total_cells:
+            reasons.append("csv_total_cells_limit_exceeded")
+            return False
+
+    return True
+
+
+def _inspect_csv(text: str, policy: IngestPolicy, reasons: list[str]) -> None:
+    if not _csv_shape_preflight(text, policy, reasons):
+        return
+    try:
+        for _ in csv.reader(io.StringIO(text, newline=""), strict=True):
+            pass
     except csv.Error:
-        # Python's csv parser has implementation-level limits and can reject
-        # malformed/oversized records before our per-field check runs. The
-        # boundary must still emit a typed REJECT instead of throwing.
         reasons.append("csv_parse_error")
 
 
@@ -178,8 +245,6 @@ def inspect_input(
                 stripped = text.lstrip()
                 if not (stripped.startswith("ISA") or stripped.startswith("UNB")):
                     reasons.append("edi_header_unrecognized")
-                # X12 usually uses ~, EDIFACT usually uses '. Newline-delimited
-                # files are also accepted after the header check.
                 chunks = []
                 for sep in ("~", "'"):
                     if sep in text:
@@ -214,11 +279,7 @@ def assert_accepted(
 
 
 def neutralize_spreadsheet_cell(value: object) -> object:
-    """Neutralize formula-leading text for CSV/XLSX export surfaces.
-
-    The original ingested source should remain immutable. Apply this only to
-    derived spreadsheet exports.
-    """
+    """Neutralize formula-leading text for CSV/XLSX export surfaces."""
     if not isinstance(value, str):
         return value
     stripped = value.lstrip()
