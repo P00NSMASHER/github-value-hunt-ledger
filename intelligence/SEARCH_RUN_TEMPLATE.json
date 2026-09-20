@@ -1,5 +1,5 @@
 {
-  "schema_version": 9,
+  "schema_version": 10,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -83,7 +83,12 @@
   "coverage_mode": "none",
   "coverage_gap_ids": [],
   "allocation_mode": "generated",
-  "allocator_generation_id": "ALLOCGEN:replace12hex",
-  "assignment_id": "ASSIGN:replace12hex:slot-01",
-  "assignment_work_item_id": "WORK:seed:replace12hex"
+  "allocator_generation_id": "ALLOCGEN:000000000000",
+  "assignment_id": "ASSIGN:000000000000:slot-01",
+  "assignment_work_item_id": "WORK:seed:000000000000",
+  "portfolio_policy_generation_id": "PORTFOLIO:000000000000",
+  "assignment_slot_role": "experiment",
+  "assignment_work_kind": "capability_gap",
+  "assignment_source_id": "SEED:gap:cap-009",
+  "assignment_score": 0
 }
