@@ -1,25 +1,24 @@
-# Freight Recovery v15.10 — Canonical Release Manifest
+# Freight Recovery v15.11 — Canonical Release Manifest
 
-Release checkpoint: **v15.10-buyer-activation-packet-2026-09-20**
+Release checkpoint: **v15.11-pilot-charter-scope-freeze-2026-09-20**
 
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Canonical v15.10 product merge commit: `6b6d8a4403c9577abb4eca1d041f02ae210dd585`
-- Pilot Activation Packet pull request: **#48**
-- v15.10 PR-head tested commit: `7ea154d38299fcf9b3018818bbde2a2f1f6c7061`
-- Canonical checkpoint branch base: `d57238517bfc24ae9bb6ce3bc2cfdda4264b3a02`
-- The checkpoint base includes later XML/EDI input-hardening work that landed after PR #48; checkpoint CI must therefore revalidate the combined state.
-- Earlier Freight lineage retained from v15–v15.9.
+- Canonical v15.11 product merge commit: `86a58b689df2d1a4288cd165c5494d76c9b928c5`
+- Pilot Charter pull request: **#53**
+- v15.11 tested branch head: `6212b95d06847109cedebdf1611e77fbd62bef33`
+- Earlier Freight lineage retained from v15–v15.10.
+- Repository `main` may continue to advance independently as hunters/integrators commit; the merge commit above is the canonical v15.11 product checkpoint.
 
 ## Verified CI checkpoints
 
-### Freight Commercial Contracts — v15.10 implementation
-- PR #48 final run: `35538071323`
+### Freight Commercial Contracts — v15.11
+- Tested branch run: `35540586715`
 - Result: **success**
 - Verified test counts:
   - hunter/model contracts: **18 passed**
-  - Freight contracts: **205 passed**
+  - Freight contracts: **213 passed**
 - Successful post-test gates included:
   - controlled-pilot rights + rights-evidence gates;
   - deployment-security evidence validation;
@@ -27,7 +26,9 @@ Release checkpoint: **v15.10-buyer-activation-packet-2026-09-20**
   - Data Readiness fixture;
   - current Netlify customer-data route remains **BLOCKED**;
   - deterministic Pilot Launch Brief generation;
-  - deterministic buyer-safe Pilot Activation Packet generation with published price/source-timing assertions;
+  - deterministic buyer-safe Pilot Activation Packet generation;
+  - deterministic **PRELAUNCH_ACCEPTED** Pilot Charter generation with `customer_data_authorized=false`;
+  - `external_action_authorized=false` preserved by the Charter;
   - separate-environment evidence remains **CONDITIONAL** until verified;
   - full synthetic commercial rehearsal;
   - deterministic release provenance + component inventory;
@@ -66,6 +67,8 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/launch_brief.py`
 - `freight/PILOT_ACTIVATION_PACKET.md`
 - `freight/pilot_activation_packet.py`
+- `freight/PILOT_CHARTER.md`
+- `freight/pilot_charter.py`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
@@ -238,9 +241,33 @@ Settlement evidence is requested as **LATER_OUTCOME** evidence rather than being
 
 Editing the packet cannot authorize launch; only new underlying evidence followed by a rerun of the machine Pilot Launch Gate can do that.
 
+## Pilot Charter scope freeze
+
+v15.11 adds a deterministic Pilot Charter above the buyer-safe Activation Packet.
+
+The Charter:
+- recomputes and verifies the Activation Packet SHA-256 before accepting scope;
+- binds the exact engagement ID, buyer/business unit, population rule, source-date range, carrier scope, mode scope and fixed fee;
+- requires the fixed fee to remain inside the published Activation Packet price band;
+- records buyer truth-owner, buyer action-approver and Freight engagement-owner roles;
+- requires explicit acknowledgments of scope, blind protocol, separate report totals and no guaranteed recovery;
+- keeps Freight's no-external-action-without-buyer-approval acknowledgment explicit;
+- emits its own deterministic SHA-256 charter hash.
+
+Charter states are intentionally separate:
+1. `PENDING_ACKNOWLEDGMENT` — one or more acknowledgments are missing.
+2. `PRELAUNCH_ACCEPTED` — scope is acknowledged, but the machine launch decision is still BLOCKED or CONDITIONAL.
+3. `KICKOFF_AUTHORIZED` — all acknowledgments are present **and** the Activation Packet's machine launch status is READY.
+
+Only `KICKOFF_AUTHORIZED` sets `customer_data_authorized=true`.
+
+The Charter never authorizes carrier/vendor contact, disputes or money-moving action. `external_action_authorized` remains false and the policy is `SEPARATE_BUYER_APPROVAL_REQUIRED`.
+
+Current Netlify route behavior is therefore fail-closed: the CI fixture produces `PRELAUNCH_ACCEPTED`, not kickoff authorization.
+
 ## Commercial state
 
-Freight Recovery v15.10 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, and buyer-handoff-ready through a deterministic activation packet; EXP-001 remains externally unproven**.
+Freight Recovery v15.11 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, buyer-handoff-ready through a deterministic activation packet, and protected against sales-to-delivery scope drift through a machine-checkable Pilot Charter; EXP-001 remains externally unproven**.
 
 Structured external Freight evidence remains:
 - directly evidenced Freight revenue: **$0**
@@ -248,7 +275,7 @@ Structured external Freight evidence remains:
 - paid diagnostic/pilot/annual conversion: **none recorded**
 - Freight `ACTIVE_SEARCH` gaps: **0**
 
-No v15.10 internal engineering result changes those external facts.
+No v15.11 internal engineering result changes those external facts.
 
 ## Current internal proof boundary
 
