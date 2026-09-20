@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.9
+## Current checkpoint — v15.10 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -47,7 +47,8 @@ Internal commercialization controls now completed:
 - live Netlify deployment evidence addendum for `freightleak-audit`, including SSO config, zero Forms/env-vars, provider inventory, fail-closed tenant/parser status and completed incident tabletop;
 - final deployment-aware Pilot Launch Gate that prevents a READY buyer from bypassing deployment/data-handling security;
 - structured separate-environment evidence manifest/validator that removes the self-asserted manual-pilot exception;
-- deterministic Pilot Launch Brief that converts BLOCKED/CONDITIONAL gate codes into prioritized owners, evidence requests and unlock criteria without overriding the machine gate.
+- deterministic Pilot Launch Brief that converts BLOCKED/CONDITIONAL gate codes into prioritized owners, evidence requests and unlock criteria without overriding the machine gate;
+- buyer-safe Pilot Activation Packet that binds readiness, published offer/price band, launch route, remediation, data-room timing, buyer/Freight responsibilities, blind-pilot stages and report semantics into one deterministic handoff without exposing internal cost/margin assumptions.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -70,6 +71,8 @@ Deployment evidence collected 2026-09-20: Netlify SSO-all is configured, but **N
 Current launch classification: **Netlify deployed customer-data pilot = BLOCKED**; **separate controlled environment = CONDITIONAL pending evidence**. The protected Netlify site is a demo/control shell until those gates change.
 
 Launch Brief now converts that classification into an operator-facing remediation plan; unknown future blockers fail safe into UNMAPPED_REVIEW instead of disappearing.
+
+Pilot Activation Packet now removes the remaining handoff friction by combining the selected offer, exact source requests and operating sequence into one buyer-safe artifact with an activation hash.
 
 The separate/manual route stays **CONDITIONAL** until a VERIFIED environment manifest proves MFA, encryption, scoped access, read-only ingestion, retention/deletion, Netlify data exclusion, and any applicable tenant/parser controls with SHA-256 receipts and a <=90-day evidence-validity window.
 

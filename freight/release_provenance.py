@@ -29,6 +29,7 @@ CONTROL_PATHS = (
     "freight/incident_response.py",
     "freight/launch_brief.py",
     "freight/outcome_adapter.py",
+    "freight/pilot_activation_packet.py",
     "freight/pilot_package.py",
     "freight/pilot_launch_gate.py",
     "freight/pilot_reporting.py",
