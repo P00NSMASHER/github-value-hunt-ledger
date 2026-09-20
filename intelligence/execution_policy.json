@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "default_lease_minutes": 120,
+  "heartbeat_extension_minutes": 120,
+  "max_lease_minutes": 360,
+  "max_active_claims_per_worker": 1,
+  "allow_complete_after_expiry": false,
+  "event_types": [
+    "CLAIM",
+    "HEARTBEAT",
+    "START",
+    "COMPLETE",
+    "FAIL",
+    "RELEASE"
+  ],
+  "terminal_states": [
+    "COMPLETE",
+    "FAILED_TERMINAL"
+  ],
+  "claimable_states": [
+    "AVAILABLE",
+    "EXPIRED_AVAILABLE",
+    "RETRYABLE_AVAILABLE",
+    "RELEASED_AVAILABLE"
+  ],
+  "worker_id_pattern": "^[A-Za-z0-9_.:-]{2,64}$",
+  "guardrails": [
+    "One active claim per slot.",
+    "One active claim per worker unless policy is explicitly changed.",
+    "A claim is bound to the exact assignment/work item snapshot it acquired.",
+    "Heartbeat cannot revive an already expired lease.",
+    "Completion requires a matching schema-v11 search run and exact claim/assignment provenance.",
+    "A non-retryable failure blocks automatic re-claim of the same assignment.",
+    "A superseded in-flight claim may finish, but a new claim cannot start on that slot until it closes or expires.",
+    "No execution event authorizes outreach, purchases, credential use, private-data access, or other external actions."
+  ]
+}
