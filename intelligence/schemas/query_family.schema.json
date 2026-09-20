@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Technology Intelligence Query Family",
+  "type": "object",
+  "required": [
+    "query_family_id",
+    "canonical_label",
+    "runs",
+    "deep_inspected"
+  ],
+  "properties": {
+    "query_family_id": {
+      "type": "string",
+      "pattern": "^QF:[a-z0-9-]+$"
+    },
+    "canonical_label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed_labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "strategies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^STRAT:[a-z0-9-]+$"
+      }
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^EXP-[0-9]+$"
+      }
+    },
+    "runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "candidates": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "deep_inspected": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "retained": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "master_promoted": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "new_capability_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "first_seen": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "last_seen": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
