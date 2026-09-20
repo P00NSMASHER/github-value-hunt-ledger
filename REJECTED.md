@@ -245,3 +245,18 @@ Do not add a weak repository to this file merely because it was rejected once. L
 - Reason: tree contains a database-configuration artifact that could contain connection/auth material; inspection stopped before opening it, and safe evidence did not establish enough domain depth to justify further risk.
 - Disposition: safety quarantine/deprioritized.
 - Revisit trigger: clearly sanitized later revision plus a specific fuel-delivery gap.
+
+<!-- INTEGRATOR-R12-2026-09-19T2231-0400 -->
+## Integrator deprioritization additions — 2026-09-19 22:31 ET
+
+### pypi-ahmad/OpenAI-X-RapidOCR-Agentic-Document_extraction as another portfolio OCR leader
+- Commit: `eeae35…` as cataloged by the inspecting hunter.
+- Reason: useful evidence-heavy OCR/layout extraction, but the portfolio already has Assay's calibrated accept/review semantics plus domain-specific RateCon/structured-invoice extraction. Another generic document extractor does not change a buyer, authority chain or first paid wedge.
+- Disposition: component/watch only; stop generic OCR discovery.
+- Revisit trigger: independently demonstrates materially lower false-accept at the same review rate on a money-bearing benchmark, or uniquely solves a document class the current stack cannot parse.
+
+### generic EIA diesel/index adapters as contractual fuel-surcharge authority
+- Representative repository: `naren514/Fuel-surcharge-Updater@18bad10b45b3e45a832ab549f9bf512c2e3b41fe`.
+- Reason: pulling an authoritative public diesel index is useful input plumbing, but the index value alone does not establish the customer/carrier's controlling FSC formula, base index, trigger band, rounding, publication lag or effective-date convention.
+- Disposition: source adapter only; never promote its calculated factor to contractual authority without the controlling agreement/addendum/tariff.
+- Revisit trigger: a repository binds source index + exact customer/carrier contractual formula/version/effective dates and proves that lineage with tests.
