@@ -1,0 +1,32 @@
+{
+  "promotion": [
+    "master_grade",
+    "strong_component",
+    "new_capability",
+    "strengthens_active_experiment",
+    "independent_falsifier",
+    "rare_data_or_protocol",
+    "large_build_compression"
+  ],
+  "rejection": [
+    "duplicate_or_dominated",
+    "readme_only",
+    "thin_implementation",
+    "mock_or_stub",
+    "external_wrapper_only",
+    "no_semantic_tests",
+    "no_authority_provenance",
+    "stale_authority",
+    "unclear_buyer_or_wedge",
+    "unsafe_or_sensitive",
+    "separately_governed_data_blocker"
+  ],
+  "watch": [
+    "needs_runtime_validation",
+    "needs_independent_challenger",
+    "needs_current_authority",
+    "needs_buyer_data",
+    "rights_or_external_dependency_review",
+    "interesting_but_not_load_bearing"
+  ]
+}
