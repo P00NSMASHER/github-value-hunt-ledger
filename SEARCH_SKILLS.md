@@ -200,10 +200,12 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   4. Inspect semantic tests that would fail if that side effect disappeared. Hard-coded-pass, shape-only and no-throw tests are insufficient for the decision claim.
   5. Trace ambiguous/failure paths. Do not mistake a computed metric, log entry, visualization or post-processing label for an enforced runtime gate.
   6. Score sibling modes independently; one real algorithm path does not validate adjacent advertised modes that terminate in stubs or weak tests.
-- WHY IT WORKED: Benchmark Experiment Tasks **25 and 26** independently validated the method. Task 25 showed that PPDM computes uncertainty and VoI signals, but the inspected runtime still emits argmax actions and logs suggested observation skips; its N/A deferral is post-processing rather than a proven execution gate. Task 26 transferred the same trace to revenue management: RMOL's Monte-Carlo chain is real, while its advertised DP service path is empty/commented and its forecasting/unconstraining tests are hard-coded passes.
+- WHY IT WORKED: Benchmark Experiment Tasks **25 and 26** independently validated the method. Task 25 showed that PPDM computes uncertainty and VoI signals, but the inspected runtime still emits argmax actions and logs suggested observation skips; its N/A deferral is post-processing rather than a proven execution gate. Task 26 transferred the same trace to revenue management: RMOL's Monte-Carlo chain is real, while its advertised DP service path is empty/commented and its forecasting/unconstraining tests are hard-coded passes. Tasks **27 and 28** subsequently reinforced the same causal trace in cyber-physical control and persistent-agent refinement.
 - EXAMPLES:
   - Benchmark Task 25: `panoskom/PPDM_framework@4fbca1dfc28280d0e6428b22c796e15c4f305ccd`
   - Benchmark Task 26: `airsim/rmol@6a51f9b90d361a115e39aa57a3329d7723af717f`
+  - Reinforcement Task 27: `woody-box/Dynamic-Home@250526f570fa03c09f31332085684f9b0e7dfcbb`
+  - Reinforcement Task 28: `PrimeIntellect-ai/prime-agent@e311d6495124cf0bdc629c813fc97a39a9a3054d`
 - FAILURE MODES:
   - treating feature labels, enums or documentation as executable behavior;
   - treating post-processing `N/A` or warnings as operational abstention;
@@ -211,3 +213,26 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - counting hard-coded-pass or no-throw tests as semantic validation;
   - using one implemented mode to inflate the evidence quality of adjacent stubbed modes.
 - NEXT IMPROVEMENT: apply the trace to money settlement, compliance gates, optimizer fallback and human-approval paths, and measure whether it lowers false-promotion rates without becoming systematically over-conservative.
+
+## Authority-origin / invariant-set consistency
+- SKILL NAME: Authority-origin / invariant-set consistency
+- WHEN TO USE: A verifier, audit/recovery engine, money-bearing decision system or reporting/billing workflow can emit PASS, CLEAN, SAVINGS, RECOVERY, ELIGIBLE or another asserted outcome from facts whose authority or admissibility may be ambiguous.
+- PROCEDURE:
+  1. Identify every input that can unlock the asserted state or contribute money/value to it.
+  2. For each input, record **who authored or authorizes it** and whether the system independently establishes that fact rather than trusting a caller-authored label, empty/default field or self-attestation.
+  3. Trace the admissibility set used by the core validity/authority logic.
+  4. Compare that set with the records/claims later used by derived metrics, aggregates, reports and billing. A fact rejected or unknown in one module must not silently count as proof/value in another.
+  5. Construct adversarial cases for absent-vs-empty authority, self-reported success, orphan/unlinked records, overlapping findings, BLOCK/WARN rows and pre-review state.
+  6. Require UNKNOWN/INCOMPLETE/POTENTIAL states to remain distinct from zero/false/confirmed/recovered when authority is missing or adjudication has not occurred.
+- WHY IT WORKED: Benchmark Experiment Tasks **46 and 47** independently validated the method in different domains. Task 46 found that backup metadata fields such as `verified=yes` and drill `ok` were caller-authored and could unlock a clean result without independent restore/digest evidence; it also found RPO counting an orphan state that the chain validator rejected. Task 47 transferred the same method to freight audit: missing contractual authority collapsed into empty/default assumptions, overlapping findings were summed as if economically independent, and pre-review WARN/BLOCK values flowed into savings/recovery and percentage-of-value billing.
+- EXAMPLES:
+  - Benchmark Task 46: `zephyrcore/BackupAttest@30ad45cf12c7b731824d6d12fb1723dc2fd11727`
+  - Benchmark Task 47: `aiparallel0/freight-audit@e7869162cf9cb23f6d520a0cd71f87cf973d8c28`
+- FAILURE MODES:
+  - a field is named `verified`, `approved`, `eligible` or `settled` but is merely imported rather than independently established;
+  - missing authority is coerced to zero/default and later treated as a confirmed expectation;
+  - a record excluded from validity/chain logic still enters RPO, savings, settlement or billing metrics;
+  - overlapping diagnostic findings double-count one economic delta;
+  - human-review labels exist but aggregation/billing occurs before the review transition;
+  - conservative UNKNOWN states are collapsed into false negatives or asserted zeros.
+- NEXT IMPROVEMENT: combine this skill with fail-open boundary archaeology on AP, commission, freight, eligibility and recovery-proof experiments, and explicitly test whether the accepted evidence/claim set is identical at validation, aggregation and billing/reporting boundaries.
