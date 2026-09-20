@@ -2,7 +2,7 @@
 
 This is a cautious allocation recommendation, not an autonomous command. It blends empirical yield with an explicit exploration budget so unusual low-frequency discoveries are not optimized away.
 
-- Measured prospective or benchmark runs: **9**
+- Measured prospective or benchmark runs: **10**
 - Valid structured outcomes: **1**
 - Exploration budget: **50%**
 - Strategies with fewer than 5 runs or 20 deep inspections remain **insufficient evidence** even if their suggested allocation is high.
@@ -11,11 +11,11 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 
 | Strategy | Allocation | Runs | Inspected | Evidence |
 |---|---:|---:|---:|---|
-| STRAT:capability-conjunction-search-claim-tracing | 16.1% | 2 | 6 | insufficient |
-| STRAT:first-party-production-source-triangulation | 15.6% | 2 | 7 | insufficient |
-| STRAT:fail-open-boundary-archaeology | 11.4% | 1 | 4 | insufficient |
-| STRAT:evaluation-target-independence | 11.2% | 2 | 4 | insufficient |
-| STRAT:acceptance-path-transition-inspection | 10.7% | 2 | 4 | insufficient |
+| STRAT:acceptance-path-transition-inspection | 14.9% | 3 | 7 | insufficient |
+| STRAT:capability-conjunction-search-claim-tracing | 14.7% | 2 | 6 | insufficient |
+| STRAT:first-party-production-source-triangulation | 14.3% | 2 | 7 | insufficient |
+| STRAT:fail-open-boundary-archaeology | 10.6% | 1 | 4 | insufficient |
+| STRAT:evaluation-target-independence | 10.3% | 2 | 4 | insufficient |
 | STRAT:authority-origin-invariant-set-consistency | 5.0% | 0 | 0 | insufficient |
 | STRAT:cross-source-emergence-triangulation | 5.0% | 0 | 0 | insufficient |
 | STRAT:decision-claim-runtime-side-effect-trace | 5.0% | 0 | 0 | insufficient |
@@ -28,14 +28,14 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 
 | Capability | Gap score | Prior run attention | Missing piece |
 |---|---:|---:|---|
-| CAP-007 — Proof obligations and next-best-evidence routing | 7 | 0 | domain policy provenance is external |
 | CAP-009 — Schedule verification and conservative repair | 7 | 0 | labor/domain rules remain external |
 | CAP-013 — Cross-vendor scientific data normalization | 7 | 0 | vendor formats/specs and buyer fixtures separately governed |
-| CAP-001 — Evidence-gated document facts | 5 | 0 | domain calibration and contractual/legal authority remain external |
+| CAP-007 — Proof obligations and next-best-evidence routing | 6 | 1 | domain policy provenance is external |
 | CAP-002 — Reviewed, versioned identity mastering | 5 | 0 | datasets/customer identities separate |
 | CAP-008 — Structured invoice compliance/validation | 5 | 0 | official rule-pack/version authority must be pinned |
 | CAP-012 — Permit event versioning and semantic source QA | 5 | 0 | jurisdiction completeness/semantics vary |
 | CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 5 | 0 | standards/certification separate |
+| CAP-001 — Evidence-gated document facts | 4 | 1 | domain calibration and contractual/legal authority remain external |
 | CAP-015 — Prospective, leakage-resistant prediction evidence | 4 | 2 | byte-level v2 headers/timezone/sentinels/thresholds/event-id namespace still need official artifact confirmation; never call event correlation feeder/component causality or general distribution truth. |
 | CAP-019 — Source-authority observation receipts | 4 | 1 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
 

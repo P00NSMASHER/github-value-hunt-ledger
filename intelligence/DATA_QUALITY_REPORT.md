@@ -2,9 +2,9 @@
 
 This report measures whether the learning loop has enough structured evidence to support empirical search-policy updates.
 
-- Search runs: **9**
+- Search runs: **10**
 - Structured outcomes: **1**
-- Mean search-run field completeness: **88.9%**
+- Mean search-run field completeness: **89.2%**
 - Runs below 70% completeness: **0**
 - Structural issues detected: **0**
 - Capabilities without an explicit next falsifiable test: **0**
@@ -13,7 +13,7 @@ This report measures whether the learning loop has enough structured evidence to
 
 | Field | Runs missing |
 |---|---:|
-| queries | 5 |
+| queries | 6 |
 | search_surfaces | 4 |
 | candidate_dispositions | 4 |
 
