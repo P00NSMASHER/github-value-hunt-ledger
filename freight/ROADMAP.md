@@ -46,7 +46,8 @@ Internal commercialization controls now completed:
 - Technology Intelligence validation CI pinned to immutable Actions and read-only, with write permission isolated to a main-only persistence job;
 - live Netlify deployment evidence addendum for `freightleak-audit`, including SSO config, zero Forms/env-vars, provider inventory, fail-closed tenant/parser status and completed incident tabletop;
 - final deployment-aware Pilot Launch Gate that prevents a READY buyer from bypassing deployment/data-handling security;
-- structured separate-environment evidence manifest/validator that removes the self-asserted manual-pilot exception.
+- structured separate-environment evidence manifest/validator that removes the self-asserted manual-pilot exception;
+- deterministic launch-authorization receipt binding engagement/buyer/BU to release provenance, rights state and exact environment evidence before data-room ingestion.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
