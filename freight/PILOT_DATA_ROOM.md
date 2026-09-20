@@ -2,7 +2,7 @@
 
 Updated: 2026-09-20
 
-Every controlled pilot should have one machine-checkable source manifest before truth-building begins.
+Every controlled pilot should have one machine-checkable **READY launch authorization receipt** before any source enters the data room, followed by one machine-checkable source manifest before truth-building begins.
 
 ## Required scope
 
@@ -41,18 +41,20 @@ A source does not enter the pilot evidence room when:
 - credentials/secrets are present;
 - retention is undefined/non-positive.
 
-## Blind-order chain
+## Launch + blind-order chain
 
-1. Build source/data-room manifest.
-2. Freeze population.
-3. Seal incumbent source SHA-256 against buyer/BU + population.
-4. Build/freeze buyer-owned truth.
-5. Open incumbent output from the previously sealed source.
-6. Build final pilot-package hash tying:
+1. Re-run the final Pilot Launch Gate and issue a deterministic launch authorization receipt for the exact engagement, buyer/BU, release provenance, rights state and environment evidence.
+2. Build the source/data-room manifest bound to that unexpired authorization receipt/hash.
+3. Freeze population.
+4. Seal incumbent source SHA-256 against buyer/BU + population.
+5. Build/freeze buyer-owned truth.
+6. Open incumbent output from the previously sealed source.
+7. Build final pilot-package hash tying:
    - data-room manifest;
    - population;
    - truth;
    - sealed incumbent submission;
-   - opened incumbent output.
+   - opened incumbent output;
+   - engagement ID + launch-authorization receipt hash/expiry.
 
 This chain proves deterministic content binding/order inside the application. It does **not** independently attest historical wall-clock time.
