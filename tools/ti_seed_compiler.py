@@ -9,6 +9,7 @@ STRATS = {x["strategy_id"]: x for x in load_jsonl("search_strategies.jsonl")}
 RUNS = [x for x in load_jsonl("search_runs.jsonl") if x.get("measurement_quality") in {"prospective","benchmark"}]
 OBJECTIVES_CFG = json.loads((INTEL / "search_objectives.json").read_text(encoding="utf-8"))
 OBJECTIVE_IDS = {x["search_objective_id"] for x in OBJECTIVES_CFG.get("objectives", [])}
+COVERAGE_GAPS = load_jsonl("exploration_gap_queue.jsonl") if (INTEL / "exploration_gap_queue.jsonl").exists() else []
 
 SATURATION_BY_CAP = {
     x["label"]: x for x in load_jsonl("research_neighborhoods.jsonl")
@@ -287,6 +288,52 @@ gaps=[s for s in seeds if s["seed_type"]=="capability_gap"]
 non_saturated_gaps=[s for s in gaps if s.get("saturation_status")!="SATURATED"]
 if non_saturated_gaps:
     gaps=non_saturated_gaps
+for i,cg in enumerate(COVERAGE_GAPS[:5]):
+    if not gaps:
+        break
+    g=gaps[i % len(gaps)]
+    cid=g["capability_ids"][0] if g.get("capability_ids") else None
+    if not cid:
+        continue
+    seed_id="SEED:coverage:"+slug(cg["coverage_gap_id"].replace("COV:",""))+":"+cid.lower()
+    filters=(cg.get("query_variants") or [])[:2]
+    qbase=(g.get("query_templates") or [])[:2]
+    qs=[]
+    for filt in filters:
+        for q in qbase:
+            qs.append((q+" "+filt).strip())
+    qs=list(dict.fromkeys(qs))
+    if not qs:
+        continue
+    coverage_priority=float(cg.get("priority") or 0)
+    base_priority=float(g.get("priority") or 0)
+    priority=max(1,min(92,round(.55*coverage_priority+.45*base_priority+perf_adjust(seed_id))))
+    seeds.append({
+      "seed_id":seed_id,
+      "seed_type":"coverage_gap",
+      "priority":priority,
+      "strategy_id":g["strategy_id"],
+      "search_objective_id":g["search_objective_id"],
+      "capability_ids":g.get("capability_ids") or [],
+      "experiment_ids":g.get("experiment_ids") or [],
+      "coverage_gap_ids":[cg["coverage_gap_id"]],
+      "coverage_dimension":cg.get("dimension_id"),
+      "coverage_target":cg.get("target_id"),
+      "source_nodes":[cg["coverage_gap_id"]]+(g.get("capability_ids") or []),
+      "saturation_status":g.get("saturation_status"),
+      "saturation_adjustment":g.get("saturation_adjustment",0),
+      "saturation_action":g.get("saturation_action"),
+      "why_now":f"Intersect exploration blind spot {cg['coverage_gap_id']} ({cg.get('target_label')}: {cg.get('observed_unique_repositories')}/{cg.get('target_min_repositories')}) with {cid}, an active high-value capability gap. This is coverage correction tied to a valuable technical hypothesis, not diversity for its own sake.",
+      "required_signatures":g.get("required_signatures") or [],
+      "query_templates":qs,
+      "search_surfaces":["GitHub repository search","GitHub code search"]+(g.get("search_surfaces") or []),
+      "verification_gate":g["verification_gate"]+" Coverage membership alone never raises evidence quality.",
+      "stop_conditions":(g.get("stop_conditions") or [])+["If the coverage qualifier produces only shallow variants, record the no-find and do not lower the evidence bar."],
+      "authorization_basis":"coverage_blind_spot_intersection",
+      "exclude_domains":g.get("exclude_domains") or [],
+      "performance":perf[seed_id]
+    })
+
 zero=[x for x in POLICY.get("strategy_allocation",[]) if int(x.get("runs") or 0)==0]
 for i,row in enumerate(zero[:3]):
     if not gaps:
