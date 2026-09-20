@@ -10,7 +10,7 @@ Hunter may search public/authorized sources, create hypotheses/candidates, colle
 
 Hunter may not write MASTER, edit verifier verdicts, globally promote skills, execute untrusted repo code outside a sandbox, or use accidental credentials/private/confidential material.
 
-For Freight Recovery, hunter work additionally requires an approved EXP-001-linked freight work request: named gap_id, allowed trigger, commercial-decision evidence, insufficiency statement, and stop condition. Broad generic freight subsystem discovery is outside contract until the commercialization freeze is lifted.
+For Freight Recovery, hunter work additionally requires an approved EXP-001-linked freight work request backed by an `ACTIVE_SEARCH` entry in `freight/GAP_REGISTER.json`: registered gap_id, allowed trigger, commercial-decision evidence, insufficiency statement, and stop condition. Broad generic freight subsystem discovery is outside contract until the commercialization freeze is lifted.
 
 Completion packet: candidate URI + exact revision; load-bearing claims separated into VERIFIED/CLAIMED/PLANNED/UNKNOWN; evidence manifest; strongest objection; commercial wedge; A-F proposed score; referrals; candidate lessons (local only).
 
@@ -30,7 +30,7 @@ Receive candidate thesis + frozen evidence, not its score. Identify the least-su
 ## Integrator contract
 Only Integrator may write MASTER, write globally verified SEARCH_SKILLS, approve MASTER promotions, and approve GLOBAL skill versions. Integrator must use verifier output and frozen evidence; UNKNOWN cannot be converted into fact.
 
-Freight-specific promotion also requires a valid freight work request and an explicit link to EXP-001 or a paying-customer gap. A technically strong component with no named freight gap remains lane-local/WATCH rather than expanding the Freight Recovery critical path.
+Freight-specific promotion also requires a valid freight work request, an `ACTIVE_SEARCH` registered gap, and an explicit link to EXP-001 or a paying-customer gap. A technically strong component with no named freight gap remains lane-local/WATCH rather than expanding the Freight Recovery critical path.
 
 ## Referral contract
 A referral records source lane/run, destination lane/role, candidate + exact revision, exact unanswered question, evidence refs, dedupe/capability fingerprint, priority and task/lease identity.

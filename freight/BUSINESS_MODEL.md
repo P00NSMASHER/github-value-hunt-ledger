@@ -30,6 +30,7 @@ Do not start with a customer that cannot provide controlling commercial authorit
 
 ### 1. Data Readiness / Authority Diagnostic
 - Price: **$5,000–$7,500 fixed**.
+- Machine gate: `freight/readiness.py` produces BLOCKED / CONDITIONAL / READY; a high numeric score can never override authorization, blind-order, authority, identity, retention, or settlement-observability blockers.
 - Purpose: determine whether the buyer has enough source authority, shipment evidence and settlement data for a blind acceptance test.
 - Credit: may be credited against a full pilot if started within the agreed period.
 - Deliverable: source inventory, unresolved-authority report, normalization plan and pilot-ready population definition.

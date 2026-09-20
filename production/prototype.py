@@ -165,6 +165,13 @@ class FreightWorkResult:
     decision:FreightWorkDecision
     reasons:tuple[str,...]=()
 
+@dataclass(frozen=True)
+class FreightGapAuthorization:
+    gap_id:str
+    status:str
+    search_allowed:bool
+    allowed_triggers:frozenset[str]=field(default_factory=frozenset)
+
 FREIGHT_ALLOWED_TRIGGERS=frozenset({
     "EXP001_GAP",
     "PAYING_CUSTOMER_GAP",
@@ -183,8 +190,22 @@ FREIGHT_BLOCKED_GENERIC_CATEGORIES=frozenset({
     "GENERIC_ENTITY_MATCHER",
 })
 
-def evaluate_freight_work_request(req:FreightWorkRequest)->FreightWorkResult:
+def evaluate_freight_work_request(
+    req:FreightWorkRequest,
+    gap:FreightGapAuthorization|None=None,
+)->FreightWorkResult:
     reasons=[]
+    if gap is None:
+        reasons.append("gap_id_not_registered")
+    else:
+        if req.gap_id != gap.gap_id:
+            reasons.append("gap_id_mismatch")
+        if gap.status!="ACTIVE_SEARCH":
+            reasons.append("registered_gap_not_active_search")
+        if not gap.search_allowed:
+            reasons.append("registered_gap_search_not_allowed")
+        if req.trigger not in gap.allowed_triggers:
+            reasons.append("trigger_not_allowed_for_registered_gap")
     if req.stage_gate!="EXP-001":
         reasons.append("freight_work_must_link_to_exp001")
     if not req.gap_id or not req.gap_id.strip():

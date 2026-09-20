@@ -66,26 +66,55 @@ def freight_request(**overrides):
     base.update(overrides)
     return FreightWorkRequest(**base)
 
+def active_freight_gap(**overrides):
+    base=dict(
+        gap_id="FRT-AUTH-001",
+        status="ACTIVE_SEARCH",
+        search_allowed=True,
+        allowed_triggers=frozenset({"AUTHORITY_CONNECTOR","PAYING_CUSTOMER_GAP"}),
+    )
+    base.update(overrides)
+    return FreightGapAuthorization(**base)
+
 def test_freight_specific_exp001_gap_is_allowed():
-    assert evaluate_freight_work_request(freight_request()).decision is FreightWorkDecision.ALLOW
+    assert evaluate_freight_work_request(
+        freight_request(), active_freight_gap()
+    ).decision is FreightWorkDecision.ALLOW
+
+def test_unregistered_freight_gap_is_denied():
+    result=evaluate_freight_work_request(freight_request(), None)
+    assert result.decision is FreightWorkDecision.DENY
+    assert "gap_id_not_registered" in result.reasons
+
+def test_registered_dormant_gap_is_denied():
+    result=evaluate_freight_work_request(
+        freight_request(),
+        active_freight_gap(status="DORMANT_TRIGGERED",search_allowed=False),
+    )
+    assert result.decision is FreightWorkDecision.DENY
+    assert "registered_gap_not_active_search" in result.reasons
+    assert "registered_gap_search_not_allowed" in result.reasons
 
 def test_freight_broad_search_is_denied():
-    result=evaluate_freight_work_request(freight_request(broad_search=True))
+    result=evaluate_freight_work_request(freight_request(broad_search=True),active_freight_gap())
     assert result.decision is FreightWorkDecision.DENY
     assert "broad_freight_search_frozen" in result.reasons
 
 def test_freight_generic_tms_hunt_is_denied():
-    result=evaluate_freight_work_request(freight_request(category="GENERIC_TMS"))
+    result=evaluate_freight_work_request(freight_request(category="GENERIC_TMS"),active_freight_gap())
     assert result.decision is FreightWorkDecision.DENY
     assert "generic_freight_subsystem_blocked" in result.reasons
 
 def test_freight_work_requires_named_gap_and_stop_condition():
-    result=evaluate_freight_work_request(freight_request(gap_id="",stop_condition=""))
+    result=evaluate_freight_work_request(
+        freight_request(gap_id="",stop_condition=""),
+        active_freight_gap(gap_id=""),
+    )
     assert result.decision is FreightWorkDecision.DENY
     assert "named_gap_id_required" in result.reasons
     assert "stop_condition_required" in result.reasons
 
 def test_freight_work_must_link_to_exp001():
-    result=evaluate_freight_work_request(freight_request(stage_gate="EXP-999"))
+    result=evaluate_freight_work_request(freight_request(stage_gate="EXP-999"),active_freight_gap())
     assert result.decision is FreightWorkDecision.DENY
     assert "freight_work_must_link_to_exp001" in result.reasons
