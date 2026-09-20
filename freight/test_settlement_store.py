@@ -111,7 +111,7 @@ def test_15_review_path_rejects_preissue_settlement(tmp_path):
 def test_fee_eligibility_tracks_active_edge_and_disqualification(tmp_path):
     s=S(tmp_path); s.create_claim(C()); s.ingest_event(E()); s.auto_allocate("e1",created_at="x"); assert s.fee_eligible_cents()==50000
     s.ingest_counter(R()); s.auto_apply_counter("r1",created_at="y"); assert s.fee_eligible_cents()==0
-    s2=SettlementStore(tmp_path/"d2.sqlite3"); s2.create_claim(C(disq=True)); s2.ingest_event(E()); s2.auto_allocate("e1",created_at="x"); assert s2.realized_cents()==50000 and s2.fee_eligible_cents()==0
+    s2=SettlementStore(tmp_path/"d2.sqlite3", buyer_id="TEST_BUYER", business_unit="TEST_BU"); s2.create_claim(C(disq=True)); s2.ingest_event(E()); s2.auto_allocate("e1",created_at="x"); assert s2.realized_cents()==50000 and s2.fee_eligible_cents()==0
 
 
 def test_concurrent_duplicate_ingest_and_auto_allocate_once(tmp_path):
