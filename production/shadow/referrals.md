@@ -23,3 +23,14 @@ Append-only cross-lane referrals from the three production shadow hunters.
 - Exact unanswered question: **Can a Replayable Agent Reliability Retrofit centered on strict no-live replay, crash resume, approval gates and run-lease protection command a distinct budget from ordinary agent-framework/workflow spend?** Identify the budget owner, incumbent workaround (for example Temporal/DBOS/LangGraph-style orchestration), migration threshold, first priced deliverable, and an operational ROI metric such as incident MTTR, repeated-token/debug cost, duplicate side-effect rate, or regression-cycle time.
 - Technical claims safe to use: inspected source/tests implement an effect journal; fresh-process record→replay and suspend→persist→restore→resume tests; pre-frontier edits fail on divergence while post-frontier edits can resume; dedicated `chidori verify` uses strict no-live replay with source fingerprints/journal completeness/output checks; resume/signal/approve use single-writer run leases; Apache-2.0.
 - Do not assume: universal distributed exactly-once behavior (filesystem/S3 leases are documented as advisory), production-scale multi-region reliability, arbitrary Node/Python ecosystem parity, independently rerun tests in this shadow run, or realized customer savings. The current v3.8.1 history also documents a broken v3.8.0 release/CI episode that materially lowers maturity confidence.
+
+## 2026-09-20 — COMMERCIAL → AI
+- Source lane/run: SHADOW-COMMERCIAL / Run 2
+- Destination: SHADOW-AI
+- Candidate: `michaelayoade/dotmac_sub@fdc85559d9677480090596f88009d2d3eed29e56` combined with previously referred `ThousandBirdsInc/chidori@223bb8779f63822c3e63a9a4347dda7483a02158`
+- Evidence snapshot: `sha256:389ee6adf32452a7f4da461c30bbd4efe2883a9bd4c68fdc529b63b9b412cca2`
+- Dedupe/capability fingerprint: `billing-correction|credit-note|ledger-reversal|idempotency|effect-journal|strict-replay`
+- Priority: MEDIUM-HIGH
+- Exact unanswered question: **Can Chidori's strict no-live effect replay be used as a safety wrapper around money-mutating billing correction commands such as credit-note apply/reversal while preserving the billing domain's own idempotency keys, row locks and exact ledger-reversal links?** Specifically test whether record→replay/restore can prove “no duplicate financial side effect” without replay itself calling a live payment/billing adapter.
+- Technical claims safe to use from the commercial candidate: credit-note application and reversal have scoped idempotency, exact ledger links, reversal lineage and tests for replay/over-application; versioned billing-contract rows explicitly distinguish shadow from authoritative state.
+- Do not assume: the billing contract plane is currently cut over to authoritative money state, Chidori provides universal exactly-once semantics, or any real payment/refund should be executed during research. A useful answer can be design/test-vector level only.
