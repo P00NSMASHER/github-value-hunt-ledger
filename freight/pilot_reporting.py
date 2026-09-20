@@ -26,6 +26,8 @@ class FindingReview:
 
 @dataclass(frozen=True)
 class PilotMetrics:
+    buyer_id: str
+    business_unit: str
     reviewed_discrepancy_cents: int
     validated_finding_cents: int
     challenger_only_validated_cents: int
@@ -55,6 +57,16 @@ def build_pilot_metrics(
     ledger: RecoveryLedger,
     reviews: tuple[FindingReview, ...] = (),
 ) -> PilotMetrics:
+    if (incumbent.buyer_id, incumbent.business_unit) != (
+        truth.buyer_id,
+        truth.business_unit,
+    ):
+        raise ValueError("incumbent output scope mismatch")
+    if (ledger.buyer_id, ledger.business_unit) != (
+        truth.buyer_id,
+        truth.business_unit,
+    ):
+        raise ValueError("recovery ledger scope mismatch")
     if incumbent.truth_hash != truth.truth_hash:
         raise ValueError("incumbent output truth hash mismatch")
     if incumbent.population_hash != truth.population_hash:
@@ -95,6 +107,13 @@ def build_pilot_metrics(
             unresolved_validated_cents += finding.validated_cents
 
     certs = [ledger.certificate(finding_id) for finding_id in sorted(findings)]
+    for cert in certs:
+        if (cert.buyer_id, cert.business_unit) != (
+            truth.buyer_id,
+            truth.business_unit,
+        ):
+            raise AssertionError("recovery certificate scope mismatch")
+
     realized = sum(cert.realized_cents for cert in certs)
     fee_eligible = sum(cert.fee_eligible_cents for cert in certs)
 
@@ -108,6 +127,8 @@ def build_pilot_metrics(
         )
 
     return PilotMetrics(
+        buyer_id=truth.buyer_id,
+        business_unit=truth.business_unit,
         reviewed_discrepancy_cents=reviewed_discrepancy,
         validated_finding_cents=validated_cents,
         challenger_only_validated_cents=challenger_cents,
@@ -132,6 +153,9 @@ def render_markdown(metrics: PilotMetrics) -> str:
     return "\n".join(
         [
             "# Freight Audit Acceptance Test — Pilot Metrics",
+            "",
+            "- Buyer scope: **" + metrics.buyer_id + "**",
+            "- Business unit: **" + metrics.business_unit + "**",
             "",
             "## Financial totals",
             "- Reviewed discrepancy: **" + dollars(metrics.reviewed_discrepancy_cents) + "**",
