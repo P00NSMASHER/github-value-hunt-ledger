@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-20",
+  "notice": "Operational diligence registry, not a legal opinion. Commercial-use assertions are user-provided where noted. Assignment, sublicensing, redistribution, hosted/SaaS and change-of-control rights remain UNKNOWN unless separately documented.",
+  "components": [
+    {
+      "repository": "emoss08/Trenova",
+      "revision": "95fcf816562025ad9af864ded4a5fce8a555bd65",
+      "role": "primary freight workflow/policy/rate-version/settlement plane",
+      "public_license": "FSL-1.1-ALv2",
+      "commercial_use_basis": "USER_ASSERTED_SEPARATE_COMMERCIAL_LICENSE_EXACT_REVISION",
+      "assignment_status": "UNKNOWN_REVIEW",
+      "sublicense_status": "UNKNOWN_REVIEW",
+      "hosted_saas_status": "UNKNOWN_REVIEW",
+      "change_of_control_status": "UNKNOWN_REVIEW",
+      "third_party_caveats": [
+        "vendor services",
+        "external data",
+        "trademarks",
+        "patents",
+        "bundled third-party assets"
+      ]
+    },
+    {
+      "repository": "kodekinetics79/opstrax-enterprise-build",
+      "revision": "fec2ba1432d6f8b4ba4c48be3d58e7e096819045",
+      "role": "independent physical-event/detention evidence plane",
+      "public_license": "NO_PUBLIC_LICENSE_RECORDED",
+      "commercial_use_basis": "USER_ASSERTED_SEPARATE_PERMISSION",
+      "assignment_status": "UNKNOWN_REVIEW",
+      "sublicense_status": "UNKNOWN_REVIEW",
+      "hosted_saas_status": "UNKNOWN_REVIEW",
+      "change_of_control_status": "UNKNOWN_REVIEW",
+      "third_party_caveats": [
+        "customer telematics",
+        "customer contracts"
+      ]
+    },
+    {
+      "repository": "sengtha/Kareya-Silo",
+      "revision": "a43eedea03add0728eadfc1f8ea35cc3ca6867cc",
+      "role": "independent deterministic freight rerating comparator",
+      "public_license": "Apache-2.0",
+      "commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "assignment_status": "CODE_LICENSED_BY_APACHE_2_0",
+      "third_party_caveats": [
+        "customer/carrier rate data"
+      ]
+    },
+    {
+      "repository": "vidyesh95/qatoto-backend",
+      "revision": "4f5f270f6ba5ef3ed4b230716997ccea049ce408",
+      "role": "provider-authored rate version/supersession authority",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "assignment_status": "CODE_LICENSED_BY_MIT",
+      "third_party_caveats": [
+        "provider/customer rate data"
+      ]
+    },
+    {
+      "repository": "A-Jatin/freight-ratecon-extraction",
+      "revision": "a3dbbfec7f6b042176880d06c5114f81f29e57eb",
+      "role": "evidence-gated RateCon extraction",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "assignment_status": "CODE_LICENSED_BY_MIT",
+      "third_party_caveats": [
+        "sample/bundled document provenance"
+      ]
+    },
+    {
+      "repository": "OmarFaig/Assay",
+      "revision": "821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+      "role": "selective prediction/calibration/abstention",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "assignment_status": "CODE_LICENSED_BY_MIT",
+      "third_party_caveats": [
+        "model weights",
+        "datasets",
+        "inference runtimes"
+      ]
+    },
+    {
+      "repository": "srthck/trustmesh",
+      "revision": "5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+      "role": "proof obligations and next-best-evidence",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE_AND_USER_ASSERTED_SEPARATE_COMMERCIAL_LICENSE",
+      "assignment_status": "CODE_LICENSED_BY_MIT",
+      "third_party_caveats": [
+        "domain policy/scheme content",
+        "third-party data"
+      ]
+    },
+    {
+      "repository": "mgilbir/formalis",
+      "revision": "2b3895a0c2c54e4f25ccb46e131d215ad4457eb2",
+      "role": "structured invoice validation",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "assignment_status": "CODE_LICENSED_BY_MIT",
+      "third_party_caveats": [
+        "official schemas",
+        "Schematrons",
+        "code lists",
+        "test corpora"
+      ]
+    },
+    {
+      "repository": "DominicFinn/open_tms",
+      "revision": "93d8c2b8ff78373ff69bb7ea546743e4703628b1",
+      "role": "independent architecture/comparator reference",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "assignment_status": "CODE_LICENSED_BY_MIT",
+      "runtime_status": "COMPARATOR_NOT_PRIMARY_RUNTIME"
+    },
+    {
+      "repository": "justicebajaj161/Freight-Audit-Console",
+      "revision": "c2d4c07310a77e20ee21a74fc96d49df783c2e3a",
+      "role": "independent audit falsifier",
+      "public_license": "REVIEW_LEDGER_BEFORE_RUNTIME_USE",
+      "commercial_use_basis": "BENCHMARK_OR_INDEPENDENT_FALSIFIER",
+      "runtime_status": "KEEP_INDEPENDENT"
+    },
+    {
+      "repository": "WRBriska/InvoiceAudit",
+      "revision": "bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c",
+      "role": "independent audit falsifier",
+      "public_license": "REVIEW_LEDGER_BEFORE_RUNTIME_USE",
+      "commercial_use_basis": "BENCHMARK_OR_INDEPENDENT_FALSIFIER",
+      "runtime_status": "KEEP_INDEPENDENT"
+    }
+  ]
+}
