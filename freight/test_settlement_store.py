@@ -8,7 +8,9 @@ from freight.settlement_store import (
 )
 
 
-def S(tmp_path): return SettlementStore(tmp_path / "settlement.sqlite3")
+def S(tmp_path, *, buyer_id="TEST_BUYER", business_unit="TEST_BU"):
+    return SettlementStore(tmp_path / "settlement.sqlite3", buyer_id=buyer_id, business_unit=business_unit)
+
 def C(cid="c1", ref="INV-1", amt=50000, issued="2026-09-01T10:00:00Z", currency="USD", disq=False):
     return RecoveryClaim(cid, ref, "carrier", "buyer", currency, amt, issued, f"claim-src-{cid}", disq)
 def E(eid="e1", ref="INV-1", amt=50000, booked="2026-09-02T10:00:00Z", currency="USD"):
@@ -145,7 +147,71 @@ def test_sql_triggers_block_direct_overconsume_and_mutation(tmp_path):
     s=S(tmp_path); s.create_claim(C("c1","I1")); s.create_claim(C("c2","I2")); s.ingest_event(E(ref="BATCH")); s.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=50000,created_at="x")
     conn=sqlite3.connect(s.path); conn.execute("PRAGMA foreign_keys=ON")
     with pytest.raises(sqlite3.IntegrityError,match="settlement event capacity exceeded"):
-        conn.execute("INSERT INTO allocations VALUES('bypass','c2','e1',1,'REVIEW',1,'x')")
+        conn.execute("""INSERT INTO allocations
+          (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
+          VALUES('TEST_BUYER','TEST_BU','bypass','c2','e1',1,'REVIEW',1,'x')""")
     with pytest.raises(sqlite3.IntegrityError,match="recovery claim is immutable"):
-        conn.execute("UPDATE recovery_claims SET amount_cents=1 WHERE claim_id='c1'")
+        conn.execute("UPDATE recovery_claims SET amount_cents=1 WHERE buyer_id='TEST_BUYER' AND business_unit='TEST_BU' AND claim_id='c1'")
     conn.close()
+
+
+def test_cross_tenant_same_local_ids_and_hashes_are_isolated(tmp_path):
+    path=tmp_path/"shared.sqlite3"
+    a=SettlementStore(path,buyer_id="BUYER-A",business_unit="OPS")
+    b=SettlementStore(path,buyer_id="BUYER-B",business_unit="OPS")
+    # Same local identifiers and source hashes are legal because scope is part of identity.
+    assert a.create_claim(C())
+    assert b.create_claim(C())
+    assert a.ingest_event(E())
+    assert b.ingest_event(E())
+    assert a.auto_allocate("e1",created_at="x").status==ALLOCATED
+    assert b.auto_allocate("e1",created_at="x").status==ALLOCATED
+    assert a.realized_cents()==50000 and b.realized_cents()==50000
+    assert a.count("allocations")==1 and b.count("allocations")==1
+
+
+def test_cross_tenant_event_cannot_match_other_tenant_claim(tmp_path):
+    path=tmp_path/"shared.sqlite3"
+    a=SettlementStore(path,buyer_id="BUYER-A",business_unit="OPS")
+    b=SettlementStore(path,buyer_id="BUYER-B",business_unit="OPS")
+    a.create_claim(C())
+    b.ingest_event(E())
+    d=b.auto_allocate("e1",created_at="x")
+    assert d.status==REVIEW and "count=0" in d.reason
+    assert a.realized_cents()==0 and b.realized_cents()==0
+    with pytest.raises(ValueError,match="existing claim and settlement event"):
+        b.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=50000,created_at="x")
+
+
+def test_cross_tenant_reads_are_scope_bound(tmp_path):
+    path=tmp_path/"shared.sqlite3"
+    a=SettlementStore(path,buyer_id="BUYER-A",business_unit="OPS")
+    b=SettlementStore(path,buyer_id="BUYER-B",business_unit="OPS")
+    a.create_claim(C()); a.ingest_event(E())
+    assert a.count("settlement_events")==1 and b.count("settlement_events")==0
+    with pytest.raises(ValueError,match="unknown recovery claim"):
+        b.claim_residual("c1")
+    with pytest.raises(ValueError,match="unknown settlement event"):
+        b.event_residual("e1")
+
+
+def test_direct_sql_cannot_cross_scope_allocation(tmp_path):
+    path=tmp_path/"shared.sqlite3"
+    a=SettlementStore(path,buyer_id="BUYER-A",business_unit="OPS")
+    b=SettlementStore(path,buyer_id="BUYER-B",business_unit="OPS")
+    a.create_claim(C()); b.ingest_event(E())
+    conn=sqlite3.connect(path); conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError,match="FOREIGN KEY constraint failed"):
+        conn.execute("""INSERT INTO allocations
+          (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
+          VALUES('BUYER-B','OPS','x','c1','e1',50000,'REVIEW',50000,'x')""")
+    conn.close()
+
+
+def test_legacy_unscoped_schema_fails_closed(tmp_path):
+    path=tmp_path/"legacy.sqlite3"
+    conn=sqlite3.connect(path)
+    conn.execute("CREATE TABLE recovery_claims (claim_id TEXT PRIMARY KEY)")
+    conn.commit(); conn.close()
+    with pytest.raises((RuntimeError,sqlite3.OperationalError)):
+        SettlementStore(path,buyer_id="BUYER-A",business_unit="OPS")
