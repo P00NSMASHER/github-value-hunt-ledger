@@ -100,6 +100,10 @@ jobs:
         run: python tools/ti_measurement_campaign.py
       - name: Analyze normalized search-surface yield
         run: python tools/ti_surface.py
+      - name: Build V9 unified hunt allocator
+        run: python tools/ti_allocator.py
+      - name: Validate V9 unified hunt allocation
+        run: python tools/ti_allocator_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -170,6 +174,10 @@ jobs:
         run: python tools/ti_measurement_campaign.py
       - name: Analyze normalized search-surface yield
         run: python tools/ti_surface.py
+      - name: Build V9 unified hunt allocator
+        run: python tools/ti_allocator.py
+      - name: Validate V9 unified hunt allocation
+        run: python tools/ti_allocator_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -225,7 +233,12 @@ jobs:
                   intelligence/exploration_gap_queue.jsonl \
                   intelligence/COVERAGE_REPORT.md \
                   intelligence/EXPLORATION_GAPS.md \
-                  intelligence/coverage_metrics.json
+                  intelligence/coverage_metrics.json \
+                  intelligence/hunt_candidates.jsonl \
+                  intelligence/hunt_allocations.jsonl \
+                  intelligence/HUNT_PLAN.md \
+                  intelligence/ALLOCATOR_REPORT.md \
+                  intelligence/allocator_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
