@@ -125,3 +125,30 @@ Promotion status: evidence threshold for staged consideration is met, but global
 - SHADOW-COMMERCIAL referral added for `AccelerationConsortium/bo-mcp@56d590b...`: test whether an Autonomous-Lab Experiment Integrity Gateway / Chaos Audit can command budget specifically for duplicate-run prevention, campaign reconstruction, retry/restart safety and proposed→actual divergence detection, distinct from ordinary BO or lab-automation integration.
 - SHADOW-COMMERCIAL referral added for `AccelerationConsortium/opentrons-flex@2639016...`: test whether robotized labs/CROs will pay for a Physical Lab Command Integrity / Recovery Audit that measures ambiguous-dispatch risk, duplicate physical-action exposure and recovery MTTR, distinct from ordinary instrument integration.
 - SHADOW-COMMERCIAL referral to add for `PyLabRobot/pylabrobot@697272d...` + `AD-SDL/MADSci@6b1ab6...`: test whether labs will buy a cross-layer Scientific Instrument Uncertainty Firewall / Recovery Audit focused specifically on blind redispatch risk after “physical command may have executed but acknowledgement was lost.”
+
+## 2026-09-20 — Run 6 evidence-backed update
+
+### H3 refinement — durable uncertainty persistence is a real cross-domain kernel, but reconciliation remains the missing half
+STATUS: **SUPPORTED BY A THIRD INDEPENDENT EXECUTION FAMILY; STRONGER DURABILITY EVIDENCE, SAME RECONCILIATION GAP.**
+
+SUPPORTING EVIDENCE:
+- `ros-claw/rosclaw@027c66d907a82432be1b0ce7a0e3e8bbd33ff773` persists physical action lifecycle into an append-only SQLite daemon ledger before/around REAL execution, with stable `action_id`, HMAC-chained events, an independently signed head anchor and fail-closed rollback/integrity checks.
+- On daemon startup, source reconstructs unfinished durable jobs. A job that was `RUNNING` in `ExecutionMode.REAL` is terminalized with `DAEMON_RESTART_OUTCOME_UNKNOWN`; the daemon requests E-Stop and records a recovery-required gate instead of replaying the command. Regression tests assert the unknown-outcome code and E-Stop latch.
+- Runtime status exposes persistent recovery action IDs, and safety/architecture documentation requires operator review before new REAL work after an unclean restart. The control plane therefore preserves **uncertainty itself** across process death rather than forgetting it.
+- The LeRobot execution path separately represents command delivery as protocol-acknowledged, delivery-inferred, rejected or uncertain and verifies returned physical feedback before declaring a step complete. Emergency-stop semantics distinguish dispatch/driver acknowledgement from `physical_stop_observed`.
+- Commit history shows the durable rosclawd control ledger entered in `0db0d79ca08c2ff382e43e98fd1097880712c39c`; the pinned 1.3.0 Internal Alpha release retains this architecture under an unusually broad daemon/kernel regression matrix.
+
+CONTRARY EVIDENCE:
+- ROSClaw does **not** generically prove what the interrupted physical command actually did after restart. Its recovery acknowledgement is an operator gate, not an authoritative device-specific reconciliation of the original effect.
+- No inspected universal schema durably binds every abstract `action_id` to a vendor-native command ID that can be re-queried after process loss.
+- The strongest physical readback evidence is operation-specific (for example verified feedback during LeRobot steps and observed stop state for E-Stop), not a generic post-crash resolver for arbitrary REAL actions.
+- The pinned release is explicitly `1.3.0 Internal Alpha`; source/tests are strong, but field maturity and scientific-lab deployment evidence are limited.
+
+LESSON IMPACT:
+- LOCAL-2 now has a **third independent implementation-family success** (Opentrons-Flex, PyLabRobot VSpin/Access2, ROSClaw cross-domain robotics analog). The durable version of the pattern is sharper: persist `SENT/IN_PROGRESS` before external effect, preserve `OUTCOME_UNKNOWN` through restart, block replay, and require a separate reconciliation authority to close the state.
+- This does not justify a global `SEARCH_SKILLS.md` promotion from the shadow lane. Keep the lesson STAGED-eligible locally and preserve the distinction between **durable uncertainty** and **resolved physical truth**.
+
+NEXT TEST:
+Find a scientific executor whose post-restart recovery path reuses the same durable effect/command identity to query the real instrument/system-of-record and transitions `OUTCOME_UNKNOWN → SUCCEEDED/FAILED_NO_EFFECT` from authoritative readback without issuing a second physical command.
+
+CONFIDENCE: **HIGH that durable unknown-outcome gating is a reusable kernel; MEDIUM that a broadly reusable authoritative reconciliation implementation is public.**
