@@ -215,3 +215,21 @@ Every materially completed hunt cycle must:
 The machine graph uses stable node/edge IDs and is validated by `tools/ti_validate.py`. `tools/ti_report.py` computes search-strategy/query-family yield with minimum-sample safeguards and Wilson intervals. The generated report lives at `intelligence/LEARNING_REPORT.md`.
 
 **Policy:** do not reduce exploration based on anecdotal performance. Automatic expand/retire decisions require at least 5 measured runs and 20 deep inspections for the relevant strategy/query family. Realized technical/customer outcomes outrank predicted value scores.
+
+
+## Empirical hunt instrumentation v2
+
+The hunt now has an adaptive measurement layer under `intelligence/`.
+
+Before a costly deep inspection, check prior repository evidence using `python tools/ti_lookup.py owner/repo` when a checkout is available, or inspect the corresponding hunter catalogs through GitHub.
+
+Every materially completed prospective hunt must append one `schema_version: 2` record to `intelligence/search_runs.jsonl`. Record actual denominators and do not estimate missing historical counts. Candidate dispositions should use the standardized reason taxonomy in `intelligence/reason_codes.json` where applicable.
+
+The generated reports answer different questions:
+- `REGISTRY_REPORT.md`: how much has already been hunted and where duplication is occurring;
+- `DATA_QUALITY_REPORT.md`: whether search instrumentation is trustworthy enough to learn from;
+- `GRAPH_HEALTH.md`: which capabilities are under-supported or disconnected from experiments;
+- `LEARNING_REPORT.md`: empirical strategy/query-family yield;
+- `SEARCH_POLICY.md`: cautious next-cycle allocation balancing measured yield and exploration.
+
+The allocation policy is advisory and deliberately keeps an exploration floor so low-attention, strange and cross-domain discoveries are not optimized away.
