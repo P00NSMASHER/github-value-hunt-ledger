@@ -101,3 +101,97 @@ For autonomous-science repositories, generic `Bayesian optimization` searches ov
 - deep inspections: 3 candidate/family inspections (ALchemist; AFL-agent; AFL-automation), with RAISE triage only;
 - external GitHub/web reads/searches: ~50;
 - reproducible untrusted-repository code executions: 0 (source/test inspection only).
+
+## 2026-09-20 — Shadow Science Run 2
+
+### Hypothesis
+A stronger autonomous-science maturity signal than optimizer novelty is a **closed physical design→execute→measure→learn loop with recoverable campaign artifacts**. An independent implementation should contain both an actual lab-execution state machine and released evidence from a real multi-week campaign; if found, it should independently support LOCAL-1 while also exposing where decision→execution provenance still breaks.
+
+### Discovery modes
+1. **Direct domain search:** self-driving laboratory, autonomous experiment, protein/materials robotic closed-loop systems.
+2. **Operational-seam code search:** proposal handoff, lab state, result polling, archive, retry/failure paths, sequence/result identity, save/load and campaign artifacts.
+3. **Paper→code/ecosystem traversal:** recent autonomous-lab preprints and university releases back to exact repositories; comparison against generic lab orchestration and safety frameworks.
+4. **Low-attention/current-release triage:** newly public and low-star research repositories were considered separately from established frameworks.
+
+Serious candidates/comparators were limited to `RomeroLab/PRAXIS`, `AD-SDL/MADSci`, and `MaxNaeg/safe_lab_agents`.
+
+### Best candidate
+**RomeroLab/PRAXIS**  
+Canonical URL: https://github.com/RomeroLab/PRAXIS  
+Exact revision: `2441e471c3161542b50889f083da29d5b4deae73`  
+Revision date: 2026-08-17  
+Public license: Apache-2.0  
+Evidence snapshot id: `shadow-science-20260920-praxis-2441e47`
+
+### Frozen evidence manifest
+- repository head `2441e471...`, initial public PRAXIS release;
+- `README.md`: closed-loop protein-design/lab system, bundled benchmark datasets, released analysis/campaign assets, ProteinNPT/model dependencies;
+- `environment/README.md`: physical robotic stack and five-state experiment progression;
+- `environment/lab_controller.py`: implemented lab state machine, file watchers, sequence→pipetting workflow, EvaGreen filtering, plate-reader processing, sequence tracking, SFTP result return and timestamped archival;
+- `agent/self_driving.py`: implemented model-acquisition loop, sequence dispatch to laboratory, phenotype monitoring, database update and subsequent acquisition round;
+- `agent/phenotype_monitor.py`: phenotype-result monitoring/ingestion path;
+- repository tree: hardware/auto-fridge firmware and fabrication files, assay/data-processing code, in-silico benchmark datasets/scripts, experiment database and round checkpoints through round 24;
+- external paper: Brooks, Notin & Romero, *Learning protein function through autonomous experimental interaction*, bioRxiv 2026, DOI `10.64898/2026.08.14.744985`.
+
+### Load-bearing claims
+**VERIFIED / INDEPENDENTLY CORROBORATED**
+- PRAXIS is not merely an optimizer: source contains a physical-lab controller with explicit `IDLE → SEQUENCE_RECEIVED → MONITORING_EVAGREEN → EXPERIMENTING → PROCESSING` lifecycle plus ERROR handling.
+- The environment transforms requested sequences into automated pipetting/worklist inputs, watches experimental outputs, filters failed assemblies, processes plate-reader measurements, updates sequence tracking, archives run artifacts and returns phenotype data to the compute side.
+- The agent side sends selected sequences to the lab, waits for phenotype output and feeds measured results back into the experiment database/model loop.
+- The repository includes unusually rich operational artifacts: hardware/firmware files, assay-processing code, benchmark datasets, an experiment database, paper-analysis data and many sequential round checkpoints.
+- The accompanying 2026 preprint independently describes the same closed loop and reports continuous operation for approximately one month, with multiple agents designing, physically constructing/characterizing and learning from protein variants.
+- The code license is Apache-2.0. Paper/data/model-weight rights remain separate: the bioRxiv manuscript is CC-BY-NC 4.0, and external model weights/dependencies retain their own terms.
+
+**LIMITS / FALSIFIED OVERCLAIMS**
+- No conventional automated regression-test suite was found at the pinned revision; this is empirical research software, not a heavily tested production orchestrator.
+- The lab controller uses useful local safeguards such as input-file hashing, sequence tracking and timestamped archives, but no durable transactional queue/outbox or restart-proof exactly-once experiment protocol was established.
+- The agent transfer path does not establish a strong acknowledgement contract before phenotype polling; a failed dispatch can degrade into timeout/stall behavior rather than a cleanly persisted unresolved state.
+- Unlike ALchemist, PRAXIS does **not** expose a first-class suggested-versus-actual execution record with per-variable deltas. Failed/filtered assemblies are handled operationally, but proposal→actual divergence is not preserved as an explicit governance object.
+- Reproducing the physical loop requires specific robotic/vendor hardware and external model weights; repository publication does not imply rights to those independent assets or services.
+
+### Independent RED-TEAM / VERIFIER pass
+Verifier saw the frozen claims/evidence above without the proposed score.
+
+**Verdict: PASS_WITH_LIMITS.**
+
+Reasons to pass:
+1. The model→physical-lab→measurement→model loop is visible in implementation, not only README text.
+2. Physical execution is corroborated by released campaign/checkpoint/data artifacts and a matching 2026 bioRxiv report of roughly one month of autonomous operation.
+3. Hardware, assay and data-return code materially reduce the chance that this is a simulation-only research demo.
+4. The candidate independently supports the broader search thesis that execution-boundary artifacts are more discriminative than optimizer names.
+
+Strongest objections:
+1. **Reliability gap:** absence of a proper regression suite and durable crash/restart semantics makes PRAXIS a research-grade closed loop rather than a reusable production laboratory OS.
+2. **Governance gap:** it proves real execution but does not explicitly record `suggested ≠ actual`, so it does not replace ALchemist's provenance kernel.
+3. **Hardware specificity:** value is high for protein-engineering lab architecture but portability to other scientific domains is not automatic.
+4. **Publication maturity:** the new PRAXIS result is presently a preprint; scientific claims should not be upgraded to peer-reviewed status.
+
+The verifier therefore supports STRONG_COMPONENT status specifically for **physical closed-loop research-to-code and released campaign evidence**, not for production-safe orchestration or generic optimizer superiority.
+
+### Proposed score
+A) speed to first revenue: **3/5** — likely starts as specialized integration/reproducibility work, not a plug-in SaaS.  
+B) customer value / ceiling: **5/5** — autonomous protein/biotech experimentation can compress months of scientist time and instrument idle time when it fits the lab.  
+C) build/domain compression: **5/5** — model acquisition, gene/assay workflow, hardware control, result transport, archival and campaign artifacts encode years of cross-domain work.  
+D) rarity/advantage: **5/5** — a public end-to-end physical protein-engineering closed loop with campaign artifacts is unusual.  
+E) evidence/completeness: **4/5** — source + hardware + artifacts + matching preprint are strong; automated tests/restart guarantees are weak.  
+F) rights/operability: **4/5** — Apache-2.0 code is clear, but hardware/vendor/model/data dependencies require separate diligence.  
+**Total: 26/30 — STRONG_COMPONENT, not a central promotion.**
+
+### Commercial / research implication
+The reusable product is not “sell PRAXIS.” It is a **Protein SDL Reliability & Reproducibility Retrofit**: take a lab that already has robotic protein workflows and add explicit job identity, acknowledged dispatch, suggested→actual provenance, retry/restart state and campaign auditability around the existing design/test/learn loop. PRAXIS supplies a real physical reference architecture; ALchemist supplies the missing execution-governance contract; MADSci is a stronger generic orchestration comparator; Safe Lab Agents contributes a safety/isolation pattern.
+
+### Comparator evidence
+- `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0`: broad modular autonomous-discovery infrastructure with lab/resource/workcell/data/event managers and stronger generic orchestration separation; comparator for productionizing PRAXIS-like loops.
+- `MaxNaeg/safe_lab_agents@e4a71147c219caf8867a135ab1fbd4c26e35d43b`: recent MIT framework/paper with sandboxed task compilation, controller isolation, simulated devices, validated workflows and preserved execution artifacts; stronger safety/reproducibility emphasis, weaker direct evidence of a multi-week physical campaign in this run.
+
+### Search lesson outcome
+LOCAL-1 succeeds a **second independent shadow run** in a different implementation family. Generic `self-driving lab` discovery found many framework/demo candidates, but following operational terms—lab state transitions, result return, archives, proposal dispatch, failure/retry boundaries—and then requiring physical campaign artifacts isolated PRAXIS. This makes the lesson eligible for **STAGED consideration inside the shadow program**, but no global `SEARCH_SKILLS.md` promotion is made here.
+
+New negative lesson: physical scientific success does not imply software-governance maturity. A month-long autonomous campaign can coexist with weak transactional retry semantics and no explicit suggested-vs-actual record. Future searches should score **scientific closure** and **execution-governance closure** separately.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- search/code/paper queries and traversals: ~16;
+- serious candidate/comparator inspections: 3;
+- external GitHub/web reads: ~35;
+- untrusted-repository code executions: 0 (source/data/history inspection only).
