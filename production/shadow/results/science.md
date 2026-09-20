@@ -197,7 +197,6 @@ New negative lesson: physical scientific success does not imply software-governa
 - untrusted-repository code executions: 0 (source/data/history inspection only).
 
 ## 2026-09-20 — Shadow Science Run 3
-
 ### Hypothesis
 The missing high-value quadrant in autonomous science is a **persistent experiment-intent ledger with retry-safe mutations that is actually used by physical closed-loop campaigns**. A strong candidate should preserve optimizer suggestions, actual submitted experiment conditions and provenance as distinct durable state; prevent logical duplicate mutations under retries/concurrency; and have credible physical-campaign evidence showing the same campaign state survives real operational interruption.
 
@@ -867,4 +866,99 @@ New negative lesson: a tested command receipt/deduplication API can still be ent
 - serious candidate deep inspections: 3;
 - source/test/history/protocol traversals: ~22;
 - external GitHub searches/reads: ~30;
+- untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 9
+
+### Hypothesis
+A transferable effect-integrity **Level-3 kernel** is more likely to be fully implemented in an adjacent external-effect domain with a stable provider system of record—especially payments/refunds—than in current public lab robotics. The qualifying pattern need not know the provider-native operation ID before acknowledgement if it durably reserves the business effect before dispatch, sends a stable external reference/idempotency key with the mutation, survives ambiguity/restart without blind replay, and can later resolve the original effect through an authoritative read-only provider query rather than issuing another mutation.
+
+### Discovery modes
+1. **Cross-lane referral traversal:** followed the existing AI shadow referral to `auths-dev/auths-proof` because it specifically claimed Stripe refund `OutcomeUnknown` plus provider readback.
+2. **Direct adjacent-domain search:** searched payment/refund/external-effect implementations for durable reservation, `OutcomeUnknown`, reconciliation, deterministic idempotency, provider lookup and no-resend recovery semantics.
+3. **Code-invariant search:** looked for reservation state machines, persistent backing stores, restart tests, `ReconciledCommitted/ReconciledReleased`, exact business metadata, provider idempotency headers, and read-only reconcile paths.
+4. **Comparator/history pass:** compared against `flyingrobots/echo` durable external-action settlement and `hyeonsangjeon/polaris-agent` durability/crash-test structure, then inspected auths-proof feature history to distinguish implemented machinery from roadmap prose.
+
+Deep inspection was limited to `auths-dev/auths-proof` as the candidate and `flyingrobots/echo` as the principal external-action comparator; `hyeonsangjeon/polaris-agent` was triaged but not used for the final claim.
+
+### Best candidate
+**auths-dev/auths-proof — Stripe bounded-refund reservation + ambiguous-outcome reconciliation kernel**  
+Canonical URL: https://github.com/auths-dev/auths-proof  
+Exact inspected revision: `34fa1f33cf365fa54075a2002710aee52ab42394`  
+Public package license: `MIT OR Apache-2.0`  
+Repository attention at inspection: 0 stars / 0 forks  
+Evidence snapshot id: `shadow-science-20260920-auths-refund-level3-34fa1f33`
+
+### Frozen evidence manifest
+- `product/integrations/auths-stripe/src/reservation.rs` — durable reservation state machine with `Reserved`, `Committed`, `Released`, `OutcomeUnknown`, `ReconciledCommitted`, `ReconciledReleased`; crash-persistent/cross-process store; exact reservation fields including workflow/action digests and idempotency-key digest; restart regression `persistent_state_survives_restart_and_is_canonical`;
+- `product/integrations/auths-stripe/src/bounded_service.rs` — durable reservation/execution intent before provider mutation; replay/conflict handling; provider `OutcomeUnknown` transition; reconcile entrypoint restricted to ambiguous state;
+- `demos/stripe-refund/src/stripe.rs` — one mutation path to Stripe refunds using a deterministic `Idempotency-Key`; exact Auths/workflow metadata is attached to the request; network-send ambiguity maps to `PortError::OutcomeUnknown`; reconciliation uses a read-only refund listing/query and matches stable workflow metadata plus amount/currency rather than sending a second refund;
+- `demos/stripe-refund/src/app.rs` — regression `exact_refund_executes_once_and_replay_fails_closed`; regression `ambiguous_stripe_response_holds_budget_until_reconciliation` keeps the reservation active, reconciles it to committed, and asserts the Stripe mutation-call count remains exactly one;
+- `docs/specs/0012-stripe-bounded-refunds.md` — status `Implemented`; documents the same ordered reserve→intent→provider mutation→receipt/commit flow and states that restart treats `reserved` as potentially ambiguous because process failure can occur during provider I/O;
+- history: `4e44d0a0795947fc50229b3093c6168f6628f59a` introduced the shared durable Stripe lifecycle; subsequent qualification/replay hardening commits retain the pattern through the inspected revision;
+- root workspace metadata at the inspected revision declares `MIT OR Apache-2.0` and both license texts are present.
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED IN SOURCE CORPUS**
+- Refund capacity/business intent is durably reserved before credential acquisition/provider mutation. The persistent reservation records workflow/action identity, exact amount/account/currency context, budget intents, state and a digest of the provider idempotency key.
+- The reservation API explicitly treats both `Reserved` and `OutcomeUnknown` as reconcilable because a process can die during provider I/O after the request may have reached the provider but before local state advances.
+- `PersistentRefundReservationStore` is explicitly crash-persistent and cross-process locked. A restart regression reserves state, drops/reopens the store, recovers the same `Reserved` record and transitions it through reconciliation rather than creating a new reservation.
+- The Stripe mutation carries a deterministic `Idempotency-Key` plus stable Auths/workflow metadata. A transport/send uncertainty maps to `OutcomeUnknown` instead of “no effect.”
+- The live reconcile path is **read-only**: it queries existing refunds for the original charge and matches the fixed workflow reference plus amount/currency constraints. It does not issue a second refund mutation.
+- The ambiguous-response regression keeps the budget reservation active and then reconciles to committed while asserting the Stripe mutation call count stays **one**. The exact-refund replay regression similarly asserts a second logical execution does not perform another provider mutation.
+- Source/history/specification agree on the same semantics, so this is not a documentation-only architecture target.
+
+### Comparator / negative evidence
+- `flyingrobots/echo` implements a strong generic durable external-action settlement model with explicit `OutcomeUnknown`, claim/settlement states and a rule that recovering a claimed action creates a reconciliation obligation rather than permission to repeat it. In this run, however, no provider-specific authoritative readback adapter comparable to the Stripe refund lookup was established, so Echo remains a Level-2/general-framework comparator rather than the qualifying Level-3 transfer example.
+- `hyeonsangjeon/polaris-agent` has extensive journal/recovery and crash-window test structure, but this bounded pass did not establish a provider-specific durable effect→authoritative-readback join. It was not scored.
+
+### Independent RED-TEAM / VERIFIER
+The verifier received only the frozen implementation/test/history packet above and evaluated the Level-3 proof obligations without the proposed score.
+
+**Verdict: PASS_WITH_LIMITS as a transferable Level-3-style external-effect reconciliation kernel; do not call it universal exactly-once.**
+
+Proof obligations:
+1. **Durable business/effect identity exists before provider mutation? — PASS.** Persistent reservation and exact execution intent are created before the refund call.
+2. **Stable identity reaches the provider? — PASS_WITH_LIMITS.** Deterministic provider idempotency plus stable workflow metadata are sent. The local system does not need the provider refund ID before acknowledgement because the provider can later be searched by the embedded business reference.
+3. **Ambiguous provider outcome is preserved rather than retried blindly? — PASS.** `OutcomeUnknown`/reconcilable `Reserved` states hold capacity; replay tests keep the mutation count at one.
+4. **State survives restart? — PASS.** A persistent-store restart regression proves the reservation survives process loss and remains canonically reconcilable.
+5. **Can the original external effect be resolved through authoritative read-only provider evidence without a second mutation? — PASS_WITH_LIMITS.** The live adapter performs a refund GET/list query and matches stable workflow metadata + exact money fields; the ambiguity test proves the reconcile path itself does not increment the mutation count.
+6. **Is the exact crash window “provider accepted mutation, process killed before local transition, restart, provider readback” exercised in one end-to-end failpoint test? — NO.** The repository separately tests crash-persistent reserved state and ambiguous-provider reconciliation, so the strongest crash-window conclusion is compositional rather than a single kill/restart/provider-acceptance regression.
+7. **Is reconciliation collision-proof under every provider edge case? — NOT FULLY ESTABLISHED.** The inspected lookup scans a bounded refund listing and matches workflow metadata/amount/currency; unusual provider-history/cardinality or metadata-collision cases require further testing.
+8. **Does this transfer directly to laboratory hardware? — NO.** This is an adjacent-domain reference kernel. Scientific transfer depends on instruments/LIMS/robot queues exposing a stable client-supplied job/business reference and authoritative read/history API.
+
+The verifier therefore accepts the architectural discovery but narrows the claim: **Level 3 does not require a pre-known native provider operation ID if the original mutation carries a durable externally queryable business reference and the provider itself is the authoritative system of record.**
+
+### Proposed score
+A) speed to first revenue: **4/5** — the science-facing product can begin as a fixed-scope effect-reconciliation audit/adapter rather than a replacement lab OS.  
+B) customer value / ceiling: **5/5** — duplicate physical experiments, duplicate dispenses/moves, orphaned jobs and unrecoverable ambiguous effects can be expensive in automated R&D.  
+C) build/domain compression: **5/5** — durable reservation, exact action identity, ambiguous-outcome lifecycle, idempotency, provider-readback reconciliation and adversarial tests encode a difficult reliability pattern.  
+D) rarity/advantage: **5/5** — this is the first inspected public implementation in the shadow sequence that substantially closes the full ambiguity→restart→authoritative-readback loop, albeit in payments rather than science.  
+E) evidence/completeness: **4/5** — strong implementation/tests/history/spec coherence; no single one-shot crash-after-remote-commit failpoint was independently executed here.  
+F) rights/operability: **4/5** — code is `MIT OR Apache-2.0`; provider/service semantics and any scientific-device APIs remain independently governed.  
+**Total: 27/30 — STRONG_COMPONENT / TRANSFER_KERNEL inside shadow; no central promotion is made.**
+
+### Commercial / research implication
+The science opportunity becomes more concrete: build an **Autonomous-Lab External Effect Reconciliation Gateway** modeled on the proven adjacent-domain pattern. Before dispatch, persist one experiment/business-effect reservation and request digest. Send a stable client job/reference ID and idempotency token into the device/LIMS/robot queue when supported. If acknowledgement is lost, keep the effect `OUTCOME_UNKNOWN` and prohibit a second physical command. After restart, query the instrument/LIMS/job-history read API by that same stable reference and reconcile the original effect to `SUCCEEDED`, `FAILED_NO_EFFECT`, or `NEEDS_HUMAN_RECONCILIATION`.
+
+This also changes the next science search target. Requiring every instrument to expose a client-chosen native command UUID was unnecessarily strict. The more general Level-3 requirement is **provider-queryable effect identity**: either a provider-native operation ID survives, or the original effect is tagged with a stable business reference that the authoritative system of record can query later.
+
+### Search lesson outcome
+New LOCAL candidate lesson: **search adjacent external-effect systems for provider-queryable business identity, not only native command IDs.** High-signal invariants are durable pre-dispatch reservation, deterministic idempotency, externally persisted workflow/reference metadata, `OutcomeUnknown`, no-blind-retry state, restart recovery, and a read-only provider/system-of-record query that finds the original effect.
+
+This is one successful transfer task. Keep LOCAL; do not edit global `SEARCH_SKILLS.md`.
+
+### VALUE HANDOFF
+1. **Capability delta:** substantially closes the previously missing Level-3 architecture by proving an alternate route: stable externally queryable business-effect metadata can substitute for knowing the native provider operation ID before acknowledgement.
+2. **Graph edge:** conceptually connects ROSClaw-style durable uncertainty with authoritative reconciliation. For science, the missing implementation edge is now narrower: instrument/LIMS/robot systems must expose stable client references plus read/history APIs.
+3. **Radar signal:** external-effect reliability patterns from payments are technically transferable into autonomous science; reliable agent-to-hardware systems may converge on the same reserve→dispatch→unknown→readback→reconcile lifecycle.
+4. **Experiment impact:** the next falsifiable search/prototype should select a scientific executor with client-set job metadata or external job IDs, crash after dispatch, restart, and resolve the original job through read-only device/LIMS history before permitting any resend.
+5. **Commercial impact:** strengthens the earlier audit wedge into a productizable adapter/gateway with measurable duplicate-command rate, ambiguous-effect age, reconciliation success rate, and manual-recovery hours.
+6. **Negative knowledge:** do not require a pre-known native operation UUID when the provider can authoritatively rediscover the original effect from stable embedded business metadata; conversely, metadata without durable reservation or authoritative readback is still insufficient.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate/comparator inspections: 2 deep + 1 triage;
+- source/test/spec/history traversals: ~24;
+- external GitHub reads/searches: ~35;
 - untrusted-repository code executions: 0.
