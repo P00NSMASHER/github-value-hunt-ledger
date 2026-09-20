@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json, re
-from ti_common import INTEL, load_jsonl
+from ti_common import INTEL, ROOT, load_jsonl
 
 def unique(rows, key, name):
     seen = {}
@@ -84,6 +84,57 @@ for name, edges in [("edges.jsonl", curated_edges), ("derived_edges.jsonl", deri
             if value.startswith(("CAP-", "STRAT:", "RUN:", "OUT:")) and value not in known:
                 raise SystemExit(f"{name}:{n}: dangling {side} reference {value}")
 
+domain_expectations = {}
+domain_policy_path = INTEL / "domain_search_policies.json"
+if domain_policy_path.exists():
+    domain_config = json.loads(domain_policy_path.read_text(encoding="utf-8"))
+    if domain_config.get("schema_version") != 1:
+        raise SystemExit("domain_search_policies.json: unsupported schema_version")
+    seen_domains = set()
+    for n, domain in enumerate(domain_config.get("domains", []), 1):
+        domain_id = domain.get("domain_id")
+        if not domain_id or domain_id in seen_domains:
+            raise SystemExit(f"domain_search_policies.json:{n}: missing/duplicate domain_id")
+        seen_domains.add(domain_id)
+        if domain.get("gate_type") != "gap_registry_active_search":
+            raise SystemExit(f"domain_search_policies.json:{n}: unsupported gate_type")
+        gate_path = domain.get("gate_path")
+        if not gate_path or not (ROOT / gate_path).exists():
+            raise SystemExit(f"domain_search_policies.json:{n}: missing gate_path")
+        register = json.loads((ROOT / gate_path).read_text(encoding="utf-8"))
+        gaps = {g.get("gap_id"): g for g in register.get("gaps", []) if g.get("gap_id")}
+        active_gap_ids = sorted(
+            gid for gid, gap in gaps.items()
+            if gap.get("status") == "ACTIVE_SEARCH" and gap.get("search_allowed") is True
+        )
+        active_set = set(active_gap_ids)
+        capability_gap_map = domain.get("capability_gap_map") or {}
+        if not isinstance(capability_gap_map, dict) or not capability_gap_map:
+            raise SystemExit(f"domain_search_policies.json:{n}: capability_gap_map required")
+        authorized = []
+        blocked = []
+        for cid, gap_ids in capability_gap_map.items():
+            if cid not in cap_ids:
+                raise SystemExit(f"domain_search_policies.json:{n}: unknown capability {cid}")
+            if not isinstance(gap_ids, list) or not gap_ids:
+                raise SystemExit(f"domain_search_policies.json:{n}: {cid} must map to non-empty gap list")
+            unknown_gaps = sorted(set(gap_ids) - set(gaps))
+            if unknown_gaps:
+                raise SystemExit(f"domain_search_policies.json:{n}: {cid} maps unknown gaps {unknown_gaps}")
+            if active_set.intersection(gap_ids):
+                authorized.append(cid)
+            else:
+                blocked.append(cid)
+        for cid in domain.get("shared_capability_ids") or []:
+            if cid not in cap_ids:
+                raise SystemExit(f"domain_search_policies.json:{n}: unknown shared capability {cid}")
+        domain_expectations[domain_id] = {
+            "search_authorized": bool(active_gap_ids),
+            "active_search_gap_ids": active_gap_ids,
+            "authorized_exclusive_capability_ids": sorted(authorized),
+            "blocked_exclusive_capability_ids": sorted(blocked),
+        }
+
 policy_path = INTEL / "search_policy.json"
 if policy_path.exists():
     policy = json.loads(policy_path.read_text(encoding="utf-8"))
@@ -93,4 +144,32 @@ if policy_path.exists():
         if not 0.999 <= total <= 1.001:
             raise SystemExit(f"search_policy.json: allocations sum to {total}, expected 1")
 
-print(f"OK capabilities={len(caps)} strategies={len(strats)} runs={len(runs)} outcomes={len(outs)} curated_edges={len(curated_edges)} derived_edges={len(derived_edges)}")
+    constraints = {x.get("domain_id"): x for x in policy.get("domain_constraints", [])}
+    priority_ids = {x.get("capability_id") for x in policy.get("priority_capability_gaps", [])}
+    for domain_id, expected in domain_expectations.items():
+        actual = constraints.get(domain_id)
+        if not actual:
+            raise SystemExit(f"search_policy.json: missing domain constraint {domain_id}")
+        for key in (
+            "search_authorized",
+            "active_search_gap_ids",
+            "authorized_exclusive_capability_ids",
+            "blocked_exclusive_capability_ids",
+        ):
+            actual_value = actual.get(key)
+            expected_value = expected[key]
+            if isinstance(expected_value, list):
+                actual_value = sorted(actual_value or [])
+            if actual_value != expected_value:
+                raise SystemExit(f"search_policy.json: domain {domain_id} {key} drift")
+        leaked = priority_ids.intersection(expected["blocked_exclusive_capability_ids"])
+        if leaked:
+            raise SystemExit(
+                f"search_policy.json: blocked domain capabilities leaked into priority gaps: {sorted(leaked)}"
+            )
+
+print(
+    f"OK capabilities={len(caps)} strategies={len(strats)} runs={len(runs)} "
+    f"outcomes={len(outs)} curated_edges={len(curated_edges)} "
+    f"derived_edges={len(derived_edges)} domains={len(domain_expectations)}"
+)
