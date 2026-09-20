@@ -872,3 +872,95 @@ No repository code, external mutation, credentials, contacts, spend or commitmen
 **REFERRALS:** No new referral. Existing external-provider/system-of-record referrals already target the remaining direct-money settlement intersection; this run adds a reusable rediscovery primitive rather than a new lane handoff.
 
 **NEXT TEST:** Find one **cash refund or payout** where the pre-dispatch semantic identity and its provider-validity horizon are durable, a literal post-effect process death occurs, a genuinely new process rediscoveries the exact effect with no duplicate, and that same effect later reaches terminal provider balance/payout/bank evidence.
+
+## 2026-09-20 — Shadow run 13
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** The pre-dispatch identity gap and the literal process-death gap can intersect in one real money test path even if terminal settlement still remains open: a durable workflow identity should deterministically derive the provider idempotency key before a Stripe refund, survive post-effect Worker death, and let a genuinely new Worker replay/recover the same provider effect without requiring the response-born refund ID as the recovery anchor.
+
+**DISCOVERY METHODS:**
+1. Direct code search for Stripe refunds/payouts combined with `SIGKILL`, Worker restart, idempotency and provider readback.
+2. Fault-seam/code-signature search for `effect accepted, result not reported`, stable run/workflow identity, refund-list metadata correlation, process kill and replacement-worker launch.
+3. Adjacency/history traversal from prior tier-5B/5C candidates (`az-said/Interlock`, `karfalacisse900-alt/Flames-up.com`) into durable-workflow implementations, then commit-history inspection of the strongest candidate.
+4. Broad public comparison against provider-idempotency implementations that explicitly warn against in-memory/generated retry identities after process loss.
+
+**BEST NEW COMPONENT + URL + EXACT REVISION:** `temporal-community/agent-memory-and-state` — https://github.com/temporal-community/agent-memory-and-state — `59fb4186bc50daefe09653a850197a985b3fa1cf`.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `issue_refund()` derives the Stripe idempotency key **before provider dispatch** from the durable Temporal workflow identity plus workflow-run identity: `idempotency_key_for(f"{workflow_id}:{run_id}")`. The source explicitly states that this identity remains stable across an Activity retry inside the same Workflow run while a brand-new run receives a new identity.
+- `_real_stripe_refund()` calls Stripe test mode with that exact idempotency key and also writes workflow/idempotency metadata onto the refund. Client-side network retries are disabled so Temporal owns the retry boundary.
+- After Stripe returns the refund, `issue_refund()` can open an `EFFECT_RESTART_WINDOW_SECONDS` pause that is deliberately **after the provider effect and before Activity completion**. During that interval it heartbeats `effect accepted, result not reported`; killing the Worker therefore leaves Temporal with an unresolved external-effect Activity rather than a recorded result.
+- The Workflow schedules `issue_refund` with heartbeat-based Worker-loss detection, a ten-minute schedule-to-close recovery budget and a retry policy whose next attempt reuses the same workflow/run-derived provider identity.
+- The guided stage runner launches the Worker as a dedicated Python subprocess, can hard-kill it, and later starts a fresh `python -m refund_agent.worker` process against the same Temporal state and task queue.
+- The inspection path can independently list Stripe test refunds for the seeded PaymentIntent and filter by `temporal_workflow_id`, reporting the exact external refund IDs/statuses and unique refund count rather than trusting only the local mirror.
+
+**TEST / DOCUMENTATION / HISTORY / RIGHTS VERIFICATION:**
+- `tests/test_fake_stripe.py` verifies stable workflow-scoped idempotency derivation, two calls with the same key converging to the same refund identity, and conflict rejection when the same key is reused with different economic parameters.
+- `tests/test_stage.py` verifies the real-retry CLI surface, separate subprocess lifecycle helpers, replacement-process identity for the naive side, and that the real status-read path performs Stripe `PaymentIntent.retrieve` plus `Refund.list` without creating another refund. The credentialed Stripe crash path itself is not an ordinary unit test and was not rerun here.
+- `docs/REFUND_DEMO.md` documents the real Stripe test-mode sequence: seed a succeeded PaymentIntent, wait until attempt 1 is accepted at Stripe, kill the Worker, inspect the ambiguous boundary, launch a replacement Worker, let attempt 2 reuse the same idempotency key, and inspect one unique Stripe refund. This is a manual/rehearsal contract, not a checked-in machine-readable successful provider run artifact.
+- Commit `4b632d12a6ab84f4459dd543c3ffb4bab1395cba` is a verified GitHub commit whose message explicitly includes “Run naive recovery in a replacement process,” “Add guided Stripe retry simulation,” and “Add pre-commit Stripe timeout retry demo,” showing the recovery/fault-seam behavior has independent history rather than existing only in current docs.
+- No `.github/workflows` directory exists at the inspected revision, so no green-CI claim is made.
+- Repository metadata at inspection: public, 1 star / 1 fork, MIT license.
+
+**CLAIM STATUS:**
+- **IMPLEMENTED:** pre-dispatch workflow/run-derived provider identity, real Stripe test refund path, post-effect pre-completion restart window, hard Worker kill, replacement Worker, same-identity retry, and provider-side refund listing.
+- **TESTED:** deterministic identity/deduplication and process/status-read helper semantics are unit-tested; the durable Workflow orchestration is source-verifiable.
+- **DOCUMENTED / NOT INDEPENDENTLY RERUN:** the credentialed real Stripe post-effect kill/replacement-Worker rehearsal.
+- **UNKNOWN / UNPROVEN:** processor balance transaction, payout/bank settlement, live-mode behavior, customer money economics and provider-idempotency safety beyond the provider's own retention contract.
+
+**FROZEN EVIDENCE MANIFEST:** `sha256:05a8016dc9293029e656865988a95a64edb489c688df12ba9f7b4c6bd95671f9`, binding exact revision to:
+- `src/refund_agent/activities.py` — Git blob `e5497eb7c50249d37c25d4f242ef42fba8aa0bbd`
+- `src/refund_agent/workflow.py` — `bc3ab4e1d5e8e1d3cfa828bb343f1774b1480b78`
+- `src/refund_agent/stage.py` — `886e56febda774216f9751b49dba3742d3bc8e7d`
+- `src/refund_agent/cli.py` — `730c74533a17640a88098de43607fbf0dfd8a552`
+- `docs/REFUND_DEMO.md` — `7496660d3d47260bef4dc8edeee4dec95f0f2b1c`
+- `tests/test_fake_stripe.py` — `94a73a3ae8dc0a23219cb2e6d7a41e81d1deeb69`
+- `tests/test_stage.py` — `dcadf29dc4af744e7973b29a9d5667727e47aa35`
+- `LICENSE` — `f29602815c81c78143ca09a57355c05ea2226d2c`
+- recovery-lineage commit `4b632d12a6ab84f4459dd543c3ffb4bab1395cba`.
+No repository code, Stripe mutation, credentials, contacts, spend or commitments were executed in this shadow run.
+
+**CRITICAL FALSIFICATION / TIER RESULT:**
+- This still does **not** close tier-5C-B. Search of the exact revision found no `balance_transaction` settlement path, payout readback or bank evidence tied to the recovered refund.
+- Unlike Interlock's checked-in scenario JSON, this repository does not contain a comparable machine-readable artifact proving that a credentialed real-Stripe post-effect Worker kill was actually completed at this exact revision. The strongest real-provider sequence is source + manual rehearsal documentation.
+- The recovery identity is durable because Temporal owns the Workflow/run state, but it is not separately persisted as an application database command row. Losing the Temporal execution/history would lose the identity owner that regenerates the provider key.
+- The repository does not encode the provider's idempotency-retention horizon beside the command. Therefore the safe-replay window remains an external provider contract and must not be silently treated as indefinite.
+- The configured Workflow schedule-to-close is ten minutes in this demo. That is a demonstration recovery budget, not proof of arbitrary-duration ambiguity survival.
+
+**COMPARATORS / FALSIFIERS:**
+- Prior `az-said/Interlock@822ec54692b30e1fdce04b55dfab62d0b56a60b2` remains stronger on revision-bound evidence quality: it has checked-in real-Stripe test-mode SIGKILL/new-process/result artifacts and exact provider-effect counting. This Temporal candidate's incremental value is the clean **identity lineage**: durable Workflow/run identity → provider idempotency key → same-effect retry, closing the response-born-ID gap by design.
+- Prior `winsznx/keeperhub-flightcheck@1d0142d2e401872ffe020b2a4110d85be31e0750` remains stronger on persisting canonical request bytes and an explicit provider replay-window cutoff, but its recovery invocation is same-process and the effect is zero-value testnet work. The Temporal candidate adds literal Worker-process replacement and a real Stripe refund path.
+- Prior `karfalacisse900-alt/Flames-up.com@2ba5fa878da26f405bfae1846c8c90f1d0e69c10` remains stronger on Axis-B terminality—connected balance → payout `paid` → `payout.paid` → local parity—but still has no post-effect payout crash seam.
+
+**SPECIALIST PASSES:**
+- **CODE INSPECTOR:** verified the exact identity derivation, Stripe call, post-effect restart window, retry policy and provider-list inspection path.
+- **FAILURE/RELIABILITY ANALYST:** verified dedicated Worker subprocess kill/replacement ordering and separated Temporal-owned durable execution identity from a response-born provider refund ID.
+- **TEST/HISTORY/RIGHTS ANALYST:** inspected unit tests, manual real-provider rehearsal contract, verified feature-lineage commit, 1-star/1-fork metadata and MIT license; found no exact-revision CI workflow.
+- **COMMERCIAL ANALYST:** mapped the narrow capability to a test-mode refund crash qualification service rather than claiming production settlement.
+- **RED-TEAM/VERIFIER:** received the frozen claim/evidence packet without the A-F score and challenged real-run evidence, provider-retention assumptions and economic terminality separately.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The narrow source claim passes: this exact revision implements a real Stripe test-mode refund path in which a durable pre-dispatch Workflow/run identity deterministically supplies the same provider idempotency key after a literal Worker-process loss, and the replacement Worker is designed to retry the unresolved Activity while a separate inspection path can read Stripe refund truth. The verifier rejects any claim that a credentialed run was independently reproduced here, that the repository contains a revision-bound raw successful tier-5B artifact comparable to Interlock, that the provider dedupe window is encoded/indefinite, or that the recovered refund reaches processor/bank settlement. No sensitive-source material was used.
+
+**A-F SCORE (proposed only, after verifier):** **26/30 — A4 / B5 / C5 / D4 / E4 / F4.**
+- A4: a Stripe-test refund crash/recovery qualification engagement can be delivered quickly without live money.
+- B5: duplicate refunds and unknown-effect incident handling are direct-money reliability risks.
+- C5: compresses durable orchestration, process-loss detection, stable provider identity, same-effect retry and provider-ground-truth inspection.
+- D4: the conjunction is rare in a one-star repository, though Temporal-style durable execution plus provider idempotency is a known architectural pattern.
+- E4: source/tests/history/docs are strong and internally coherent; evidence quality is capped because the real credentialed crash rehearsal is not a checked-in machine-readable completed artifact and was not rerun in this shadow pass.
+- F4: MIT, test-mode-only Stripe behavior and local Temporal deployment are clear; provider-retention and terminal-settlement obligations remain external.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments engineering lead, marketplace/billing platform owner, fintech reliability team or Controller's systems group with refund workflows.
+- Pain: a provider refund can succeed while the Worker dies before application completion is durable; teams then need an identity that survives the process, a safe retry contract, and external proof that the retry is the same business action rather than a second refund.
+- First paid wedge: **Refund Crash Recovery Drill**. In Stripe test mode, bind one refund route to a durable workflow/business identity, deterministically derive the provider idempotency key before dispatch, kill the Worker after Stripe acceptance but before local completion, start a fresh Worker, inspect Stripe directly for exactly one workflow-tagged refund, and return a revision-bound unsafe-window/retention report. Do not call the deliverable settlement certification unless processor/balance evidence is separately proven.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Run 11 exposed the compensation-descriptor birth gap; run 12 showed pre-dispatch identity can rediscover an external effect by provider replay; this run shows a **durable workflow execution identity can play that pre-dispatch anchor role across an actual Worker-process death on a real Stripe refund path**. Interlock still owns the strongest checked-in tier-5B run artifact, and Flames-up still owns the strongest independent payout-terminality half. The unified tier-5C-B intersection remains open.
+
+**SEARCH EFFORT / COST PROXIES:** Four materially different discovery modes; three serious candidate/comparator paths deep-inspected; exact source/tests/docs/history/repository rights inspected; no untrusted code execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Extend `SK-COM-003` with an **identity-lineage check**. A pre-dispatch recovery anchor need not be a separate SQL command row if a durable execution system owns a stable business/workflow identity from which the provider idempotency key is deterministically regenerated. Inspect the lineage explicitly as **durable business/workflow identity → provider idempotency identity → provider effect**. Then test two independent failure limits: whether the identity owner itself survives process loss, and whether the provider's replay/dedupe horizon is recorded and still valid. This strengthens, but does not replace, the run-12 provider-window rule.
+
+**REFERRALS:** No new referral. Existing provider/system-of-record referrals already target the remaining settlement intersection; this run adds a local recovery-identity refinement rather than a new cross-lane question.
+
+**NEXT TEST:** Find one **cash refund or payout** where the pre-dispatch durable business/workflow identity and provider-validity horizon are both explicit, a post-effect process death is followed by genuinely new-process recovery and exact no-duplicate provider truth, and the same action then reaches terminal processor balance/payout/bank evidence.
