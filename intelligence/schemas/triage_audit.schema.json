@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Technology Intelligence Triage Holdout Audit",
+  "type": "object",
+  "required": [
+    "audit_id",
+    "search_run_id",
+    "repository",
+    "prefilter_reason_standard",
+    "sampling_method",
+    "post_inspection_status",
+    "false_negative_level",
+    "evidence_path"
+  ],
+  "properties": {
+    "audit_id": {
+      "type": "string",
+      "pattern": "^AUDIT:[A-Za-z0-9:_-]+$"
+    },
+    "search_run_id": {
+      "type": "string",
+      "pattern": "^RUN:[A-Za-z0-9:_-]+$"
+    },
+    "strategy_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^STRAT:[a-z0-9-]+$"
+    },
+    "strategy_version_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^STRATVER:[a-z0-9-]+:[0-9a-f]{12}$"
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 3
+    },
+    "revision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "prefilter_reason_standard": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prefilter_reason_detail": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sampling_method": {
+      "enum": [
+        "random",
+        "stratified",
+        "novelty_holdout",
+        "manual_audit",
+        "false_negative_rescue"
+      ]
+    },
+    "sample_probability": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "post_inspection_status": {
+      "enum": [
+        "master",
+        "strong",
+        "watch",
+        "rejected",
+        "quarantined",
+        "unknown"
+      ]
+    },
+    "false_negative_level": {
+      "enum": [
+        "none",
+        "minor",
+        "material",
+        "master_grade"
+      ]
+    },
+    "capability_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^CAP-[0-9]{3,}$"
+      }
+    },
+    "evidence_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
