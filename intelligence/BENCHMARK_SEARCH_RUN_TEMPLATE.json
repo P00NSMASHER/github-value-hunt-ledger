@@ -1,0 +1,32 @@
+{
+  "schema_version": 4,
+  "search_run_id": "RUN:BENCH:<timestamp>:<strategy>:<task>",
+  "timestamp": "2026-09-20T00:00:00Z",
+  "hunter_role": "strategy-measurement",
+  "strategy_id": "STRAT:replace-with-assigned-strategy",
+  "query_family": "frozen benchmark task + strategy-specific search hypothesis",
+  "query_family_id": "QF:replace-with-canonical-query-family-slug",
+  "search_objective_id": "OBJ:replace-with-controlled-objective",
+  "measurement_quality": "benchmark",
+  "benchmark_task_ids": [
+    "00"
+  ],
+  "evaluation_set_id": "EVAL:replace-with-curated-set",
+  "comparison_group_id": "CMP:replace-with-matched-group",
+  "lane_ids": [
+    "BENCHMARK"
+  ],
+  "seed_nodes": [],
+  "search_surfaces": [],
+  "queries": [],
+  "candidate_count": 0,
+  "deep_inspected": 0,
+  "retained_count": 0,
+  "master_promoted_count": 0,
+  "new_capability_ids": [],
+  "strengthened_capability_ids": [],
+  "experiment_ids": [],
+  "candidate_dispositions": [],
+  "durable_evidence_path": "benchmark/results/<comparison-group>-<strategy>.md",
+  "notes": "Freeze independently before reading sibling-condition results or BENCHMARK_GOLD.md."
+}
