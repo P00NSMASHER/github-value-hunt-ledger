@@ -1,14 +1,14 @@
 {
-  "observations": 1778,
+  "observations": 1779,
   "unique_repositories": 1694,
   "unique_repository_revisions": 1704,
   "unknown_revision_records": 86,
-  "duplicate_observations": 76,
-  "duplicate_observation_rate": 0.04274465691788527,
+  "duplicate_observations": 77,
+  "duplicate_observation_rate": 0.04328274311410905,
   "cross_catalog_repositories": 65,
-  "source_files_scanned": 61,
+  "source_files_scanned": 62,
   "source_state_counts": {
-    "current": 1633,
+    "current": 1634,
     "archive": 145
   },
   "status_counts": {

@@ -2,13 +2,13 @@
 
 Generated directly from the hunter Markdown corpus plus the current elite set in MASTER.md.
 
-- Repository observations: **1,778**
+- Repository observations: **1,779**
 - Unique repositories (including MASTER-only entries): **1,694**
 - Unique repository/revision keys: **1,704**
-- Observations beyond the first occurrence of a repo/revision: **76 (4.3%)**
+- Observations beyond the first occurrence of a repo/revision: **77 (4.3%)**
 - Repo/revision records with unknown revision: **86**
 - Repositories appearing in more than one hunter catalog/file: **65**
-- Hunter Markdown files scanned: **61**
+- Hunter Markdown files scanned: **62**
 - Current MASTER-promoted repositories: **36**
 - Current MASTER-promoted exact repo/revisions: **36**
 - MASTER promotions without a matching hunter-catalog observation: **2**
@@ -36,6 +36,7 @@ Generated directly from the hunter Markdown corpus plus the current elite set in
 | databricks-industry-solutions/lakehouse-industry-data-models | 0157d62384960d2e0efafdaf3e7c9f9062cdcc28 | 3 | 3 | rejected, watch |
 | iacosta3994/restic-drill | 0e11db6339fc86f87239b259827f6848a69886f7 | 3 | 3 | strong, watch |
 | usdigitalresponse/entity-api | 9a868b54b2dee3c13d516600c433a673fe558b8d | 3 | 2 | rejected, unknown |
+| AD-SDL/MADSci | 6b1ab6a70ce8b15af7aa8968479c90d9138753d0 | 2 | 2 | strong, unknown |
 | BishnoiNaveen/gas-agency-management-system | c52603ff6d36972e54a8243bc5b313e24beffeb8 | 2 | 2 | quarantined, rejected |
 | CodeMaru-Dreamine/Dreamine.Gem | 82604d6f03c1e95e0558de5c757989b27cd4a3d6 | 2 | 2 | strong, unknown |
 | Construction-Progress-Coalition/cpc-changes-hub | 90193e4fdea00eea5eca03ebdbe9c18826e0c73c | 2 | 2 | rejected, watch |
@@ -47,7 +48,6 @@ Generated directly from the hunter Markdown corpus plus the current elite set in
 | LostCat-Qian/secs4js | 41bee2cad158bd881ef12c181f85684be6dced67 | 2 | 1 | unknown |
 | MassingCloud/massing-pdf | 36794b3c54fcfd62e3a0d2d5984cfc45cac83340 | 2 | 2 | strong |
 | MuhDur/invoicekit | 8a9e8d74e23ab97742d56d1dfabe77a9330ec61e | 2 | 2 | strong, watch |
-| ND3404/construction-change-order-rfi-analytics | 93522c5b59738d7147e7a50a8c7052b8537d210f | 2 | 2 | watch |
 
 ## Interpretation
 
