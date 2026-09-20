@@ -29,6 +29,7 @@ def test_current_release_provenance_is_deterministic():
     assert "freight/incident_response.py" in a["control_file_hashes"]
     assert "freight/deployment_security_evidence.py" in a["control_file_hashes"]
     assert "freight/pilot_launch_gate.py" in a["control_file_hashes"]
+    assert "freight/launch_authorization.py" in a["control_file_hashes"]
     assert "freight/separate_environment_evidence.py" in a["control_file_hashes"]
     assert "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json" in a["control_file_hashes"]
     assert "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json" in a["control_file_hashes"]
