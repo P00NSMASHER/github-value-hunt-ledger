@@ -1,1 +1,64 @@
-# Freight Recovery — Pilot Launch Brief\n\nUpdated: 2026-09-20\n\nThe machine Pilot Launch Gate answers whether a route may launch.\n\nThe Pilot Launch Brief answers the operator/buyer question:\n\n> What exactly has to happen next?\n\n## Workflow\n\n1. Run `freight/pilot_launch_gate.py` and save its JSON output.\n2. Run `freight/launch_brief.py` on that JSON.\n3. Close actions by changing the underlying evidence source.\n4. Rerun the launch gate; never close an item by editing the brief itself.\n\nExample:\n\n```bash\nPYTHONPATH=. python freight/pilot_launch_gate.py \\n  freight/fixtures/readiness_ready.json \\n  --data-path current \\n  --as-of-date 2026-09-20 > /tmp/launch-decision.json\n\nPYTHONPATH=. python freight/launch_brief.py /tmp/launch-decision.json\n```\n\nUse `--format json` for machine-readable output.\n\n## Brief contents\n\nEach blocker/condition becomes a deterministic remediation action with:\n\n- priority: P0 / P1 / P2;\n- owner;\n- category;\n- launch-gate code;\n- plain-language remediation title;\n- exact evidence required to close it;\n- what closure unlocks.\n\nUnknown future blocker codes are never dropped. They become an explicit\n`UNMAPPED_REVIEW` action until the product maps them deliberately.\n\n## Current product use\n\nFor the current Netlify route, the brief should surface items such as:\n\n- enforce Netlify team MFA;\n- identify the customer data plane;\n- if multi-tenant use is requested, prove A-vs-B isolation;\n- if parser use is requested, prove parser resource/network/credential isolation;\n- recollect deployment evidence when it expires.\n\nFor the separate/manual route, the brief requests the structured\nseparate-environment evidence manifest instead of accepting a human override.\n\n## Integrity rule\n\nThe Launch Brief cannot override the launch decision.\n\nAn item is closed only when the underlying evidence changes and the machine gate\nis rerun.
+# Freight Recovery — Pilot Launch Brief
+
+Updated: 2026-09-20
+
+The machine Pilot Launch Gate answers whether a route may launch.
+
+The Pilot Launch Brief answers the operator/buyer question:
+
+> What exactly has to happen next?
+
+## Workflow
+
+1. Run `freight/pilot_launch_gate.py` and save its JSON output.
+2. Run `freight/launch_brief.py` on that JSON.
+3. Close actions by changing the underlying evidence source.
+4. Rerun the launch gate; never close an item by editing the brief itself.
+
+Example:
+
+```bash
+PYTHONPATH=. python freight/pilot_launch_gate.py \
+  freight/fixtures/readiness_ready.json \
+  --data-path current \
+  --as-of-date 2026-09-20 > /tmp/launch-decision.json
+
+PYTHONPATH=. python freight/launch_brief.py /tmp/launch-decision.json
+```
+
+Use `--format json` for machine-readable output.
+
+## Brief contents
+
+Each blocker/condition becomes a deterministic remediation action with:
+
+- priority: P0 / P1 / P2;
+- owner;
+- category;
+- launch-gate code;
+- plain-language remediation title;
+- exact evidence required to close it;
+- what closure unlocks.
+
+Unknown future blocker codes are never dropped. They become an explicit
+`UNMAPPED_REVIEW` action until the product maps them deliberately.
+
+## Current product use
+
+For the current Netlify route, the brief should surface items such as:
+
+- enforce Netlify team MFA;
+- identify the customer data plane;
+- if multi-tenant use is requested, prove A-vs-B isolation;
+- if parser use is requested, prove parser resource/network/credential isolation;
+- recollect deployment evidence when it expires.
+
+For the separate/manual route, the brief requests the structured
+separate-environment evidence manifest instead of accepting a human override.
+
+## Integrity rule
+
+The Launch Brief cannot override the launch decision.
+
+An item is closed only when the underlying evidence changes and the machine gate
+is rerun.
