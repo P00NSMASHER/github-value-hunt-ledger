@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 8,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -40,7 +40,28 @@
       "replacement_days_low": null,
       "replacement_days_high": null,
       "duplicate_of": null,
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "observed_at": "2026-09-20",
+        "metadata_status": "observed",
+        "stars": null,
+        "forks_count": null,
+        "primary_language": null,
+        "archived": null,
+        "fork": null,
+        "created_at": null,
+        "updated_at": null,
+        "pushed_at": null,
+        "owner_type": null,
+        "topics": [],
+        "license_spdx": null,
+        "source_type": "unknown",
+        "package_ecosystems": [],
+        "protocol_families": [],
+        "geography_tags": [],
+        "technology_domains": [],
+        "profile_source": "hunter_observation"
+      }
     }
   ],
   "best_result": null,
@@ -58,5 +79,7 @@
   "adjacency_mode": "none",
   "adjacency_ids": [],
   "adjacency_types": [],
-  "adjacency_root_nodes": []
+  "adjacency_root_nodes": [],
+  "coverage_mode": "none",
+  "coverage_gap_ids": []
 }

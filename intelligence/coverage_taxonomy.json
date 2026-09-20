@@ -1,0 +1,519 @@
+{
+  "schema_version": 1,
+  "min_classification_rate": 0.6,
+  "dimensions": [
+    {
+      "dimension_id": "language_family",
+      "label": "Primary language family",
+      "classification": "derived",
+      "targets": [
+        {
+          "target_id": "python",
+          "label": "Python",
+          "target_min_repositories": 5,
+          "exploration_weight": 0.5,
+          "query_variants": [
+            "language:Python"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "js_ts",
+          "label": "JavaScript / TypeScript",
+          "target_min_repositories": 4,
+          "exploration_weight": 0.8,
+          "query_variants": [
+            "language:TypeScript",
+            "language:JavaScript"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "go",
+          "label": "Go",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [
+            "language:Go"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "jvm",
+          "label": "Java / Kotlin",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [
+            "language:Java",
+            "language:Kotlin"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "c_cpp",
+          "label": "C / C++",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.2,
+          "query_variants": [
+            "language:C",
+            "language:C++"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "dotnet",
+          "label": "C# / .NET",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [
+            "language:C#"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "rust",
+          "label": "Rust",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.2,
+          "query_variants": [
+            "language:Rust"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "domain_other",
+          "label": "Domain-specific / other",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.7,
+          "query_variants": [],
+          "searchable": false
+        }
+      ]
+    },
+    {
+      "dimension_id": "star_band",
+      "label": "Repository attention band",
+      "classification": "derived",
+      "targets": [
+        {
+          "target_id": "zero",
+          "label": "0 stars",
+          "target_min_repositories": 5,
+          "exploration_weight": 1.3,
+          "query_variants": [
+            "stars:0"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "one_nine",
+          "label": "1-9 stars",
+          "target_min_repositories": 5,
+          "exploration_weight": 1.2,
+          "query_variants": [
+            "stars:1..9"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "ten_ninetynine",
+          "label": "10-99 stars",
+          "target_min_repositories": 5,
+          "exploration_weight": 0.8,
+          "query_variants": [
+            "stars:10..99"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "hundred_999",
+          "label": "100-999 stars",
+          "target_min_repositories": 4,
+          "exploration_weight": 0.5,
+          "query_variants": [
+            "stars:100..999"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "thousand_plus",
+          "label": "1000+ stars",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.4,
+          "query_variants": [
+            "stars:>=1000"
+          ],
+          "searchable": true
+        }
+      ]
+    },
+    {
+      "dimension_id": "age_band",
+      "label": "Repository age band",
+      "classification": "derived",
+      "targets": [
+        {
+          "target_id": "under_1y",
+          "label": "Created <1 year ago",
+          "target_min_repositories": 5,
+          "exploration_weight": 0.7,
+          "query_variants": [],
+          "searchable": true
+        },
+        {
+          "target_id": "one_3y",
+          "label": "Created 1-3 years ago",
+          "target_min_repositories": 5,
+          "exploration_weight": 0.8,
+          "query_variants": [],
+          "searchable": true
+        },
+        {
+          "target_id": "three_7y",
+          "label": "Created 3-7 years ago",
+          "target_min_repositories": 5,
+          "exploration_weight": 1,
+          "query_variants": [],
+          "searchable": true
+        },
+        {
+          "target_id": "seven_plus",
+          "label": "Created 7+ years ago",
+          "target_min_repositories": 5,
+          "exploration_weight": 1.2,
+          "query_variants": [],
+          "searchable": true
+        }
+      ]
+    },
+    {
+      "dimension_id": "lifecycle",
+      "label": "Lifecycle / lineage",
+      "classification": "derived",
+      "targets": [
+        {
+          "target_id": "archived",
+          "label": "Archived repositories",
+          "target_min_repositories": 5,
+          "exploration_weight": 1.3,
+          "query_variants": [
+            "archived:true"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "fork",
+          "label": "Fork repositories",
+          "target_min_repositories": 5,
+          "exploration_weight": 1,
+          "query_variants": [
+            "fork:true"
+          ],
+          "searchable": true
+        }
+      ]
+    },
+    {
+      "dimension_id": "owner_type",
+      "label": "Owner account type",
+      "classification": "derived",
+      "targets": [
+        {
+          "target_id": "organization",
+          "label": "Organization-owned",
+          "target_min_repositories": 8,
+          "exploration_weight": 0.5,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "user",
+          "label": "User-owned",
+          "target_min_repositories": 8,
+          "exploration_weight": 0.5,
+          "query_variants": [],
+          "searchable": false
+        }
+      ]
+    },
+    {
+      "dimension_id": "source_type",
+      "label": "Source institution type",
+      "classification": "manual",
+      "targets": [
+        {
+          "target_id": "government",
+          "label": "Government",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.2,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "national_lab",
+          "label": "National laboratory",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.3,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "university",
+          "label": "University / academic lab",
+          "target_min_repositories": 4,
+          "exploration_weight": 1.1,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "standards_body",
+          "label": "Standards body / reference implementation",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.2,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "company",
+          "label": "Company / commercial organization",
+          "target_min_repositories": 5,
+          "exploration_weight": 0.6,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "nonprofit",
+          "label": "Nonprofit / foundation",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.8,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "community",
+          "label": "Open-source community",
+          "target_min_repositories": 4,
+          "exploration_weight": 0.8,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "individual",
+          "label": "Individual maintainer",
+          "target_min_repositories": 5,
+          "exploration_weight": 0.7,
+          "query_variants": [],
+          "searchable": false
+        }
+      ]
+    },
+    {
+      "dimension_id": "package_ecosystem",
+      "label": "Package / application ecosystem",
+      "classification": "manual_multi",
+      "targets": [
+        {
+          "target_id": "pypi",
+          "label": "Python / PyPI",
+          "target_min_repositories": 5,
+          "exploration_weight": 0.5,
+          "query_variants": [
+            "language:Python"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "npm",
+          "label": "Node / npm",
+          "target_min_repositories": 4,
+          "exploration_weight": 0.8,
+          "query_variants": [
+            "language:TypeScript",
+            "language:JavaScript"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "go",
+          "label": "Go modules",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [
+            "language:Go"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "maven",
+          "label": "JVM / Maven / Gradle",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [
+            "language:Java",
+            "language:Kotlin"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "cargo",
+          "label": "Rust / Cargo",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.2,
+          "query_variants": [
+            "language:Rust"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "nuget",
+          "label": ".NET / NuGet",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [
+            "language:C#"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "odoo",
+          "label": "Odoo",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.8,
+          "query_variants": [
+            "topic:odoo"
+          ],
+          "searchable": true
+        },
+        {
+          "target_id": "frappe",
+          "label": "Frappe / ERPNext",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.8,
+          "query_variants": [
+            "topic:frappe-framework",
+            "topic:erpnext"
+          ],
+          "searchable": true
+        }
+      ]
+    },
+    {
+      "dimension_id": "protocol_family",
+      "label": "Protocol / standards family",
+      "classification": "manual_multi",
+      "targets": [
+        {
+          "target_id": "industrial",
+          "label": "Industrial / OT protocols",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.2,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "scientific_instrument",
+          "label": "Scientific instrument protocols",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.2,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "payments",
+          "label": "Payments / banking protocols",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.8,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "document_standard",
+          "label": "Document / invoice standards",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "government_api",
+          "label": "Government data / acquisition APIs",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "logistics_edi",
+          "label": "Logistics EDI / transportation protocols",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.8,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "telecom",
+          "label": "Telecom / network management protocols",
+          "target_min_repositories": 3,
+          "exploration_weight": 1.1,
+          "query_variants": [],
+          "searchable": false
+        }
+      ]
+    },
+    {
+      "dimension_id": "geography_scope",
+      "label": "Operational geography",
+      "classification": "manual_multi",
+      "targets": [
+        {
+          "target_id": "us",
+          "label": "United States",
+          "target_min_repositories": 4,
+          "exploration_weight": 0.5,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "eu",
+          "label": "European Union / Europe",
+          "target_min_repositories": 4,
+          "exploration_weight": 0.8,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "india",
+          "label": "India",
+          "target_min_repositories": 3,
+          "exploration_weight": 0.8,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "latin_america",
+          "label": "Latin America",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "africa",
+          "label": "Africa",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [],
+          "searchable": false
+        },
+        {
+          "target_id": "east_asia",
+          "label": "East Asia",
+          "target_min_repositories": 3,
+          "exploration_weight": 1,
+          "query_variants": [],
+          "searchable": false
+        }
+      ]
+    }
+  ]
+}

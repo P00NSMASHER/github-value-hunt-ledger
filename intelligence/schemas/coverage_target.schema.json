@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Exploration Coverage Target",
+  "type": "object",
+  "required": [
+    "coverage_gap_id",
+    "dimension_id",
+    "target_id",
+    "state",
+    "observed_unique_repositories",
+    "target_min_repositories",
+    "gap_repositories",
+    "classification_rate",
+    "priority",
+    "searchable",
+    "query_variants"
+  ],
+  "properties": {
+    "coverage_gap_id": {
+      "type": "string",
+      "pattern": "^COV:[a-z0-9-]+:[a-z0-9-]+$"
+    },
+    "dimension_id": {
+      "type": "string"
+    },
+    "target_id": {
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "COVERED",
+        "UNDERCOVERED",
+        "INSTRUMENTATION_DEBT"
+      ]
+    },
+    "observed_unique_repositories": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "target_min_repositories": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "gap_repositories": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "classification_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "priority": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "searchable": {
+      "type": "boolean"
+    },
+    "query_variants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

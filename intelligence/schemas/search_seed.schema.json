@@ -26,7 +26,8 @@
       "enum": [
         "capability_gap",
         "positive_dna_transfer",
-        "strategy_measurement"
+        "strategy_measurement",
+        "coverage_gap"
       ]
     },
     "priority": {
@@ -108,6 +109,25 @@
     },
     "performance": {
       "type": "object"
+    },
+    "coverage_gap_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^COV:[a-z0-9-]+:[a-z0-9-]+$"
+      }
+    },
+    "coverage_dimension": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "coverage_target": {
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "additionalProperties": true
