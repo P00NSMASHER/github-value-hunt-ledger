@@ -188,6 +188,16 @@ Each capability should record:
 - Missing piece: one synthetic workflow-to-run-metrics integration with a forced bad state/handoff and deterministic evidence report.
 - Next test: execute a synthetic multi-step QC/pooling/run-prep workflow, attach lawful InterOp fixtures to the same run identity, deliberately break one transition/metric expectation and require the evidence layer to distinguish workflow error, run-metric exception and unknown state.
 
+### CAP-018 — Provider-settlement ambiguity and payout-proof state machine
+- Ability: move money safely across the boundary between payout intent and provider/bank settlement by distinguishing definite refusal from ambiguous/unknown outcomes, preventing unsafe duplicate retries, preserving claim/idempotency state and reconciling the provider-confirmed settled amount/currency.
+- Maturity: VALIDATED COMPONENT / synthetic cross-provider benchmark pending.
+- Evidence basis: tested claim-before-send, ambiguous-outcome hold, definite-failure release, pending-until-confirmed state, provider payout IDs, actual settled amount/currency, reversal ordering and concurrent sweep protection.
+- Primary components: `spree/spree@2a419d42e86dea30a69a3c5b7764185cea132b3f`; `getcoherence/openpartner@eeff532ee758dc6221b4d03af852e5705a2328fb` as the broader payout/settlement control-plane complement.
+- Reusable targets: commission/affiliate payouts, marketplaces, rebates, vendor/partner disbursements and other payment workflows where timeout/unknown-result can create duplicate money movement.
+- Limitation: payment-provider and bank semantics, FX timing, account authorization and settlement-finality definitions remain provider/customer specific; no external buyer outcome has yet been recorded.
+- Missing piece: vendor-neutral outcome corpus proving refused vs unknown vs confirmed vs settled behavior under retries and concurrent sweeps.
+- Next test: synthetic matrix covering definite refusal, timeout/unknown, duplicate retry/callback, confirmed provider send, final settled amount/currency, reversal after payout and concurrent sweep; any unknown provider result must remain claimed/unresolved rather than auto-retry.
+
 ## Capability promotion rule
 Do not add a capability because a repository sounds useful. Promote only when the system can state a falsifiable ability, evidence basis, known limitation and next test.
 
