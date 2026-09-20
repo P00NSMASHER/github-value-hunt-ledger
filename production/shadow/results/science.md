@@ -305,3 +305,107 @@ New negative lesson: database exactly-once and scientific closure are still insu
 - serious candidate/evidence-family inspections: 3;
 - external GitHub/web reads: ~40;
 - untrusted-repository code executions: 0 (source/test/schema/history inspection only).
+
+## 2026-09-20 — Shadow Science Run 4
+
+### Hypothesis
+The missing third axis after campaign-level provenance and idempotency is **external-effect closure at the physical executor**. A valuable scientific-control kernel should mark state non-authoritative before actuation, avoid declaring success until physical completion is established, and fail closed after cancellation/crash/ambiguous device state until authoritative readback or explicit reconciliation restores certainty.
+
+### Discovery modes
+1. **Direct physical-executor search:** laboratory robots, SiLA2 connectors, instrument command acknowledgement/result polling, recovery and reconciliation semantics.
+2. **Executable-invariant search:** `command_execution_uuid`, result polling, `valid=False` before actuation, `clean_shutdown`, `reconcile physical`, `unknown`/`missing` hardware state, home/recovery gates, fsync/atomic ledger commits and cancellation tests.
+3. **Protocol/ecosystem adjacency:** compared the low-attention Opentrons Flex connector against SiLA observable-command semantics and MADSci's broader workcell orchestration/error-handling model.
+4. **History archaeology:** inspected the commit that introduced durable fail-closed labware movement/recovery and the later pinned-runtime hardening at repository head.
+
+Deep inspection was limited to `AccelerationConsortium/opentrons-flex` as the candidate and `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` as the principal generic-orchestration comparator. No untrusted repository code was executed.
+
+### Best candidate
+**AccelerationConsortium/opentrons-flex**  
+Canonical URL: https://github.com/AccelerationConsortium/opentrons-flex  
+Exact revision: `2639016ee9f234949aaf596c2ab2b93694eb0e0b`  
+Revision date: 2026-07-22  
+Public license: **none detected in repository metadata/tree**  
+Repository attention at inspection: 2 stars / 1 fork  
+Evidence snapshot id: `shadow-science-20260920-opentrons-flex-2639016`
+
+### Frozen evidence manifest
+- `src/unitelabs/opentrons_flex/io/labware_state.py` blob `c064b167806158b5149683ee918c799e4c8b2ace`;
+- `src/unitelabs/opentrons_flex/io/labware_movement.py` blob `40bfcc59ea36a30ae452ab384727b85b818e49b6`;
+- `src/unitelabs/opentrons_flex/io/recovery_state.py` blob `ba1f539be02fc78aa2e2cafb5d41aa79ace9237a`;
+- `src/unitelabs/opentrons_flex/io/run_authority.py` blob `2c62a0d9ca82b274d6663c2e5554318b81f9e423`;
+- `src/unitelabs/opentrons_flex/run_mutation.py` blob `2ddd8b4851c198787f027743cbfa779302da2ba1`;
+- `tests/io/test_labware_movement.py` blob `a87bcbaf98437cd27548b241e8caf88eb4944bce`;
+- `tests/io/test_shared_recovery.py` blob `78ea6f460f3953192ff55407209e04eee6387521`;
+- `tests/integration/observable.py` blob `1b46192485a0aa352253fab283eba66aeb1c2623`;
+- `.github/workflows/test.yml` blob `92b6d756e9f0f36d7f8342699c701545da0c6a75`;
+- `README.md` blob `ff0b24982d86aa5fefbbd3f69a85cde3079135b3`;
+- `pyproject.toml` blob `7ed6f75d8c6c8ebd5a1d5708e465f60003744ce8`;
+- history commit `b2c39de3d588d7b5f9ba9a2c06f5b0a8b1eb7d94` introduced the durable location-to-labware identity ledger, fail-closed restart/cancellation recovery, raw-gripper bypass prevention and guarded real-hardware coverage;
+- head `2639016...` deliberately narrows support to the validated Python 3.10 / Opentrons 8.8.1 runtime instead of claiming an unvalidated matrix.
+
+### Load-bearing claims
+**VERIFIED / TESTED IN SOURCE CORPUS**
+- `LabwareMovementState.begin_move()` sets the durable deck model to `valid=False` and fsyncs it **before the first physical actuation**. `complete_move()` only writes the new source→destination occupancy after the movement returns and the controller re-checks operation generation and machine health.
+- The durable state file is written via temp-file + flush/fsync + atomic replace + parent-directory fsync. If the post-move durable commit itself fails, the prior in-memory occupancy remains non-authoritative and `valid=False` rather than pretending the software state matches the physical deck.
+- On startup, a previously unclean ledger is invalidated. `validate_move()` then refuses another move and explicitly requires physical-deck reconciliation/replacement of the local ledger before restart.
+- Dedicated regression tests cover: cancellation during an in-flight physical move; gripper failure; unclean restart after `begin_move`; durable state restoration after a clean completed move; and disk/replace failure during the completed-move commit. In the ambiguous cases the next actuation is blocked rather than retried as if nothing happened.
+- Cancellation/failure also raises shared recovery gates requiring full robot home and/or gripper-jaw home before further operation. A separate cross-controller test shows an emergency halt cancels active operations and gates gripper/calibration until recovery.
+- Flex Stacker recovery combines explicit software quarantine with **authoritative polled hardware state**: unknown limit-switch values, `platform_state` of `unknown`/`missing`, or inability to read a known position all fail closed and require recovery. This is materially stronger than trusting local task completion alone.
+- SiLA observable commands return a `CommandExecutionUUID`; the integration helper uses that same UUID to poll the command result and treats `Result is not ready` as non-terminal. This provides protocol-level execution identity/result readback, though it is not a durable business id across server-process loss.
+- `ProtocolRunAuthority` re-reads the embedded Protocol Engine's authoritative run owner before direct actuation and retains the gate on state-provider failure while a run was known active. Run mutation holds prevent resume/play when validation or partial-enqueue uncertainty remains.
+- CI runs unit + gRPC simulator tests and a combined HTTP robot-server + gRPC integration suite against the pinned Opentrons 8.8.1 stack. Real hardware/HITL suites are opt-in and the README explicitly refuses to call a hardware combination validated without serial/firmware evidence.
+
+### Independent RED-TEAM / VERIFIER pass
+Verifier input excluded the proposed score and used the frozen source/test/history packet plus the comparator observations above.
+
+**Verdict: PASS_WITH_LIMITS.**
+
+Reasons to pass:
+1. The candidate closes the exact boundary that BO-MCP left unresolved: it models physical movement as uncertain before actuation, only commits known deck state after verified completion, and blocks future physical effects after ambiguous termination.
+2. The strongest claims are covered by adversarial tests for cancellation, unclean restart and durable-commit failure, not only documentation.
+3. Recovery can depend on actual device/sensor readback (`unknown`/`missing` states fail closed), so the design does not assume that a local coroutine outcome is authoritative physical truth.
+4. The repository is unusually low-attention relative to its lab-safety/recovery depth.
+
+Strongest objections / limits:
+1. **Not physical exactly-once.** The design intentionally chooses safe uncertainty quarantine. After a crash it may know that the ledger is invalid without knowing whether the plate physically completed its move. Human/local reconciliation can still be required.
+2. **SiLA command UUID lifetime is not a durable business-effect identity.** The inspected helper proves command/result correlation while the server retains the command; it does not establish cross-process forever-idempotency or dedupe of a reissued physical command after server loss.
+3. **Coverage is uneven by operation.** The deepest durable known/unknown semantics are concentrated in labware movement, stacker recovery and guarded run mutation; not every motion/liquid command was proven to have the same crash-atomic contract.
+4. **Physical validation is gated, not independently reproduced here.** CI exercises real vendor simulators and HTTP+gRPC integration; HITL tests exist but were not run in this shadow pass.
+5. **Portability/maintenance risk.** The connector is deliberately pinned to Python 3.10 and Opentrons 8.8.1 and reaches vendor Protocol Engine/private surfaces. A vendor upgrade can break the control boundary.
+6. **Rights clarity is weaker than prior science finds.** GitHub reports no public license and the tree has no detected LICENSE file. Under the user's standing repository-code authorization this does not block technical evaluation, but independent Opentrons/SiLA/Unitelabs dependencies, trademarks, hardware and services retain their own terms.
+
+The verifier therefore passes this as a rare **physical-effect uncertainty/recovery kernel**, while rejecting any claim that it alone provides universal hardware exactly-once execution.
+
+### Proposed score
+A) speed to first revenue: **4/5** — a focused robot/workcell integrity audit can be sold without building a new SDL platform.  
+B) customer value / ceiling: **5/5** — duplicated/ambiguous plate movement, lost deck identity and unsafe recovery can destroy samples, halt workcells or cause hardware incidents.  
+C) build/domain compression: **5/5** — SiLA + robot-server coexistence, device locking, durable deck identity, recovery gates, module interlocks, simulator/HITL tests and mutation governance encode substantial domain work.  
+D) rarity/advantage: **5/5** — explicit pre-actuation invalidation plus post-actuation reconciliation/readback semantics are uncommon in public scientific automation code.  
+E) evidence/completeness: **4/5** — strong implementation/tests/history/CI, but no independent HITL execution in this run and semantics are not uniform across every command.  
+F) rights/operability: **4/5** — repository code is usable under the user's asserted commercial authorization, but no public license was detected and the runtime is tightly pinned to vendor software/hardware.  
+**Total: 27/30 — MASTER_CANDIDATE-grade technical component inside shadow only; no central promotion is made.**
+
+### Commercial / research implication
+Combine **BO-MCP at the campaign boundary** with this pattern at the executor boundary. BO-MCP can make optimizer/result mutations retry-safe; a physical executor should then mark its world model non-authoritative before a side effect, use device readback/recovery evidence to re-establish truth, and refuse blind replay when the final physical outcome is unknowable. The first paid wedge is a **Physical Lab Command Integrity / Recovery Audit** for robotized labs: fault-inject cancellation/restart/storage failure, identify commands that can be blindly duplicated, and retrofit explicit `KNOWN / UNKNOWN_NEEDS_RECONCILIATION / RECOVERED` state plus device-specific readback/home gates.
+
+### Comparator / negative evidence
+- `AD-SDL/MADSci@6b1ab6a70ce8b15af7aa8968479c90d9138753d0` is broader and more mature as a modular workcell/resource/node orchestration platform, with explicit connection/action/result-retrieval failure handling. In this run, however, it did not displace the candidate on the narrower invariant of **persisting uncertainty before a physical move and refusing reuse until the world is reconciled**.
+- SiLA observable-command UUID/result semantics are useful correlation primitives, but protocol correlation alone is not sufficient physical-effect closure; the important addition is device/world-state reconciliation after ambiguity.
+
+### Search lesson outcome
+A new LOCAL extension of the execution-seam skill succeeds once: **search physical-effect closure, not just orchestration retries**. High-signal terms are `valid=False`/invalid-before-actuation, `clean_shutdown`, `reconcile physical`, `unknown`/`missing` device state, generation fences, `require_home`, fsync/atomic state commits, command UUID/result polling and tests that cancel after side effects begin. Keep this LOCAL until a second independent implementation confirms it.
+
+### VALUE HANDOFF
+1. **Capability delta:** the stack can now distinguish campaign/API idempotency from physical-world certainty and has a concrete pattern for quarantine/reconciliation after ambiguous robot effects.
+2. **Graph edge:** conceptually closes the external-effect gap identified in BO-MCP Run 3 by adding executor-side known/unknown state and authoritative recovery evidence; no central graph file was edited.
+3. **Radar signal:** adds independent evidence for an emerging **scientific execution integrity** layer beneath autonomous-lab orchestration, distinct from BO, LIMS and generic workflow engines.
+4. **Experiment impact:** the next chaos suite can test crash after physical dispatch/before local commit, cancelled movement, stale/unknown sensors, storage commit failure, cross-controller emergency stop and only then authorize replay/recovery.
+5. **Commercial impact:** strengthens the experiment-integrity wedge into a two-boundary audit—campaign idempotency plus device-world reconciliation—with KPIs such as ambiguous-command rate, duplicate physical-action rate, recovery MTTR, unreconciled deck-state incidents and scientist/operator intervention time.
+6. **Negative knowledge:** command IDs, locks and simulator success are not enough; a physically mutating system needs an explicit policy for when local state becomes non-authoritative and what evidence is required to restore certainty.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate/comparator inspections: 2;
+- source/test/history/standard traversals: ~20;
+- external GitHub/web reads: ~30;
+- untrusted-repository code executions: 0.
