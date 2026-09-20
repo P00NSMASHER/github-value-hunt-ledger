@@ -4,7 +4,7 @@ V11 derives execution state from append-only per-slot events. Missing event logs
 
 | Slot | Role | Assignment | State | Worker | Claim | Telemetry |
 |---|---|---|---|---|---|---|
-| SLOT-01 | experiment | ASSIGN:eb05f1921aad:slot-01 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-01 | experiment | ASSIGN:eb05f1921aad:slot-01 | **RUNNING** | HUNTER-06 | CLAIM:062026092112 | PENDING |
 | SLOT-02 | experiment | ASSIGN:eb05f1921aad:slot-02 | **AVAILABLE** | — | — | NOT_APPLICABLE |
 | SLOT-03 | experiment | ASSIGN:eb05f1921aad:slot-03 | **AVAILABLE** | — | — | NOT_APPLICABLE |
 | SLOT-04 | experiment | ASSIGN:eb05f1921aad:slot-04 | **AVAILABLE** | — | — | NOT_APPLICABLE |
