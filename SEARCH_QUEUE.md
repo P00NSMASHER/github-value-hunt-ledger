@@ -15,6 +15,7 @@ Integrator-owned search and validation direction. Updated 2026-09-20. **Experime
 - PASS/VERIFIED must survive missing, stale, ambiguous, malformed, partial and source-unavailable states.
 - Money/trust claims require authority origin, stable identity, governed transitions and independently observed outcome. UNKNOWN/REVIEW never creates realized dollars.
 - Separate endpoint/subject behavior from the measurement harness/requester/evaluator; no candidate grades itself.
+- A retained live/provider qualification is historical provenance unless it is bound to a machine-readable behavior subject/closure that still matches the deployed subject. Covered behavior expansion must withdraw qualification; provably out-of-closure changes may retain it. Do not demand rerunning live spend after every irrelevant commit, but do not inherit proof across unbounded scope expansion.
 - Do not inspect or retain credentials, private/personal/confidential data, accidental secrets or unauthorized-access material.
 - No padding. A no-new-finding run is preferable to another dominated repository.
 
@@ -59,17 +60,21 @@ Use PMIS for agreement-BOQ/rate/cumulative/certification authority; Nirman for a
 **Stop:** generic pay-app/RA-bill CRUD, takeoff/diff and internal payment labels.
 
 ## 5. Recovery Proof — P0/P1 / EXP-004
-**Bottleneck:** independently authoritative denominator, identity-correct census and verifier self-test.
+**Bottleneck:** independently authoritative denominator, identity-correct census, versioned proof-policy authority and verifier self-test.
 
 Treat recovery coverage as four governed planes: **OBSERVATIONS -> IDENTITY AUTHORITY -> SCOPE -> PROOF**. Preserve raw cloud/control-plane, endpoint/EDR and scanner/network observations immutably; canonical workload identity is a revisable interpretation. A contradictory concurrently fresh strong identifier is a hard non-merge state, not another weighted feature. Hostname/IP/MAC evidence may propose a relationship but may not overrule conflicting cloud instance/agent/device authority.
 
 **Mandatory identity corpus before signing the expected-subject denominator:** same hostname + same public IP + different fresh cloud instance IDs => `IDENTITY_CONFLICT`; same cloud instance + rotated EDR agent => allowed relationship with rotation history; weak-only hostname/scanner evidence => `AMBIGUOUS_REVIEW`; two canonicals claiming the same hard ID => duplicate-authority conflict; source outage/partial collection => `UNOBSERVED/PARTIAL` and non-green denominator. Require durable terminal states such as `MATCHED`, `AMBIGUOUS_REVIEW`, `IDENTITY_CONFLICT`, `SOURCE_DISAGREEMENT`, and `UNOBSERVED/PARTIAL` before scope publication.
 
+Now bind the resulting proof decision to a **versioned authority envelope**. Use `foundriesio/aktualizr-lite@1d089b006295cd924b3c87337679fef7295e4329` and `uptane/aktualizr@e5118a74874c0561ebac57560c667c18b19d984b` only as cross-domain trust-model oracles: trusted root/role -> subject obligation -> evidence catalog -> coherent snapshot versions -> freshness -> highest-seen anti-rollback state. They do not supply recovery-policy substance.
+
+**Mandatory proof-authority negatives:** `tampered_policy_metadata`; `expired_policy_metadata`; `policy_version_rollback`; `snapshot_mix`; `wrong_authority_role`. A valid evidence hash under stale/mixed/wrong-role policy is non-green even when the underlying restore is technically successful.
+
 Then run missing expected subject, stale inventory, silent disappearance, scope-selector mismatch, aggregate-mask, service-up/data-wrong, rc=0/wrong-value, proof-sink failure, cleanup failure and deliberately broken verifier across PostgreSQL plus one dual-plane workload.
 
-**Search only:** exact stable-identity conflict handling, collector-run completeness/provenance, tombstones/exclusions or signed snapshot provenance if this matrix exposes a missing component. `apurvtyagi/security-asset-correlator@36aef11...` is a useful component/negative oracle because its weighted matcher can still merge contradictory hard IDs; `opsmill/infrahub-sync@76ab2b...` is useful collector provenance, not identity authority.
+**Search only:** exact stable-identity conflict handling, collector-run completeness/provenance, tombstones/exclusions or signed snapshot provenance if this matrix exposes a missing component. `apurvtyagi/security-asset-correlator@36aef11...` remains a useful component/negative oracle because its weighted matcher can still merge contradictory hard IDs; `opsmill/infrahub-sync@76ab2b...` is useful collector provenance, not identity authority.
 
-**Stop:** broad asset-inventory/CMDB/recovery-framework search. First-match, confidence-only or “highest score wins” identity logic is negative-control material, not denominator authority.
+**Stop:** broad asset-inventory/CMDB/recovery-framework or OTA/update-framework search. First-match, confidence-only, “highest score wins” identity logic and signature-only currentness claims are negative-control material, not denominator/proof authority.
 
 ## 6. CaptureBrief — P0/P1 / EXP-006
 **Bottleneck:** lossless packet/history authority, not another SAM wrapper.
@@ -81,17 +86,23 @@ Live SAM fixture `W50S8B-26-Q-A016` proved: same filename can mean different `re
 **Stop:** generic SAM/FAR dashboards. Search only successor/deviation authority or a concrete history-loss gap.
 
 ## 7. Installed-Base Lab / Sequencing — P1 / EXP-007
-**Bottleneck:** durable external execution receipt under pre-confirmation ambiguity, with client restart separated from server-lifetime restart.
+**Bottlenecks:** (1) multi-vendor data-normalization acceptance on a rights-clean corpus; (2) durable external execution receipt under pre-confirmation ambiguity with a real persistent provider, not a dry-run adapter.
 
-Current MADSci SiLA path does not make client `action_id` equal the server-assigned CommandExecutionUUID; correlation is in memory only after the SDK call returns. Current `sila2` 0.14.0 documentation exposes `ClientObservableCommandInstance(..., execution_uuid, lifetime_of_execution=...)`, so a **client-only restart** is now a concrete rebind test when the CommandExecutionUUID was durably captured and the same server execution lifetime remains authoritative. Official SiLA semantics make `ServerUUID` stable across server lifetimes while CommandExecutionUUID is lifetime-scoped; same ServerUUID after server restart therefore does not make an old command receipt valid.
+For CAP-013, use `ethanbass/chromConverter@ddf959bb71a595357a3f4028be48afd006a78714` as the strongest new normalization component. It supplies registry-driven Agilent/Shimadzu/Waters/Thermo/Varian/open-format dispatch, canonical source-hash/parser provenance, open-format writers and fixture-backed numerical/metadata comparisons. Its recent CI archaeology is valuable because prior green CI silently skipped meaningful Entab/netCDF/Shimadzu paths before the workflow was hardened. Reverse-engineered format success is still fixture-scoped, not vendor certification.
 
-**Execute seven branches:** provably not accepted => `SAFE_TO_REISSUE`; accepted/effect may have started but confirmation lost => `RECONCILIATION_REQUIRED`; confirmation received but client dies before durable receipt => `RECONCILIATION_REQUIRED`; durable receipt + positive same-operation readback => `CONFIRMED_APPLIED`; durable receipt + bounded authoritative NOT_APPLIED => `SAFE_TO_REISSUE`; client process restart with valid persisted receipt/server lifetime => reconstruct/query the same operation, no redispatch; server restart or execution-lifetime expiry => `RECONCILIATION_REQUIRED`, never infer NOT_APPLIED.
+**Normalization test:** freeze a customer-owned/rights-clean or synthetic golden corpus spanning Agilent, Shimadzu, Waters and Thermo; pin parser/runtime revision; retain raw bytes/hash; emit normalized object/open format + provenance; independently compare a stratified subset against vendor/open exports; require measurement-value and minimum metadata/provenance preservation; unsupported versions/disagreement = explicit blocker. Stop broad chromatography-converter discovery until this corpus runs.
 
-Persist at minimum `(client_intent_id, intent_hash, server_uuid, feature_fqi, command_identifier, command_execution_uuid, lifetime_of_execution, receipt_received_at, receipt_durable_at, client_runtime_version, sila_runtime_version, reconciliation_state, last_authoritative_readback_at)`. Pin the exact SiLA runtime during acceptance; do not transfer semantics from legacy `sila2` to the actively maintained UniteLabs lineage without a fresh matrix.
+For physical actions, current MADSci SiLA path does not make client `action_id` equal the server-assigned CommandExecutionUUID; correlation is in memory only after the SDK call returns. `trieu04/lab-in-the-loop@80eb9524a4a36178b35810a7999cd95e8394d4fc` proves that a strong orchestration contract can still be a false positive operationally: it durably prepares intent, models `AMBIGUOUS/RECONCILING/BLOCKED` and reconciles by idempotency key before resubmit, yet its only installed lab provider is explicitly memory-only dry run and real mode is rejected. `MolBioFreak/BioModStack@9b36a0b106cd538d772de39092c1d532ad361083` supplies a conceptual provider-queryable stable request-key/command/receipt complement, but the combined crash-persistent real-provider join is NOT proven.
+
+Current `sila2` 0.14.0 documentation exposes `ClientObservableCommandInstance(..., execution_uuid, lifetime_of_execution=...)`, so a **client-only restart** is a concrete rebind test when the CommandExecutionUUID was durably captured and the same server execution lifetime remains authoritative. Official SiLA semantics make `ServerUUID` stable across server lifetimes while CommandExecutionUUID is lifetime-scoped; same ServerUUID after server restart therefore does not make an old command receipt valid.
+
+**Execute seven branches plus provider-binding check:** provably not accepted => `SAFE_TO_REISSUE`; accepted/effect may have started but confirmation lost => `RECONCILIATION_REQUIRED`; confirmation received but client dies before durable receipt => `RECONCILIATION_REQUIRED`; durable receipt + positive same-operation readback => `CONFIRMED_APPLIED`; durable receipt + bounded authoritative NOT_APPLIED => `SAFE_TO_REISSUE`; client process restart with valid persisted receipt/server lifetime => reconstruct/query the same operation, no redispatch; server restart or execution-lifetime expiry => `RECONCILIATION_REQUIRED`; and real provider mode must actually be installed/persistent rather than memory-only dry run.
+
+Persist at minimum `(client_intent_id, intent_hash, server_uuid, feature_fqi, command_identifier, command_execution_uuid, lifetime_of_execution, receipt_received_at, receipt_durable_at, client_runtime_version, sila_runtime_version, reconciliation_state, last_authoritative_readback_at)`. Pin the exact SiLA/runtime and adapter factory during acceptance.
 
 Use `auths-dev/auths-proof@34fa1f33...` only as a transfer oracle for the alternative pattern “stable pre-dispatch business reference + provider-searchable metadata + idempotency + read-only reconciliation”; require equivalent device/server semantics before transferring it.
 
-**Stop:** broad lab-device/orchestrator discovery until the real process-kill/rebind ambiguity matrix runs. Stable endpoint/server identity is not operation identity.
+**Stop:** broad lab-device/orchestrator and chromatography-converter discovery until both bounded tests run. Stable endpoint/server identity is not operation identity; an abstract reconciliation API is not provider evidence.
 
 ## 8. Insurance Subrogation — P1 / EXP-011
 Search only authoritative versioned jurisdiction/policy rules, precedence, limitations/fault effective periods and closed-claim settlement evidence. Missing/conflicting/superseded authority = REVIEW / $0. Stop generic claims AI/demand-letter tooling.
@@ -143,10 +154,10 @@ Do not spend the wildcard slot on a familiar saturated family solely because it 
 - Generic freight systems, reconciliation engines, OCR/rating components.
 - Generic AP matchers/OCR/RPA before EXP-002.
 - Generic commission calculators/statement parsers.
-- Generic backup frameworks **and broad CMDB/asset-inventory matching** before the EXP-004 identity/coverage matrix.
+- Generic backup frameworks, broad CMDB/asset-inventory matching and additional OTA/update frameworks before the EXP-004 identity/coverage/authority matrix.
 - Generic construction pay-app CRUD before EXP-005.
 - Generic SAM/FAR wrappers before EXP-006.
-- Broad lab frameworks before EXP-007 ambiguity execution.
+- Broad lab frameworks and chromatography-converter hunting before EXP-007 bounded tests.
 - Third SECS/GEM implementation before EXP-008 execution.
 - More outage datasets before EXP-012 artifact provenance closes.
 
