@@ -95,3 +95,26 @@ Shared reusable discovery methods for the GitHub Value Hunt. Hunters should read
   - relying on obsolete loader documentation instead of current source/tests/history;
   - treating source-repository provenance as proof that every upstream fact is authoritative or complete.
 - NEXT IMPROVEMENT: apply the method to another official rule/data system with multiple first-party repositories and measure whether it improves source-currentness or pipeline-boundary accuracy versus surface-only search.
+
+## Ingestion invariant-triad intersection
+- SKILL NAME: Ingestion invariant-triad intersection
+- WHEN TO USE: Searching for a data-ingestion platform where connector breadth alone is insufficient and durable history plus source-health truth are commercially important.
+- PROCEDURE:
+  1. Define three independent axes before searching: **source topology** (multiple heterogeneous provider families), **historical durability** (first/last seen, append/version history, deterministic field diffs), and **run truth** (success/partial/failure or equivalent fail-closed source-health semantics).
+  2. Search each axis separately using concrete provider names, table/model names, diff/version fields and run-status symbols rather than product-category keywords.
+  3. Intersect candidates only after each axis has independent code evidence; a broad connector project without history, or a history store without run truth, remains a component.
+  4. Trace the actual diff/version algorithm and identity key. Do not credit fields named `history` or `changes` until the mutation/comparison path is inspected.
+  5. Red-team false-green collection paths: unexpected response shapes, zero-row success, stale cache, skipped files, identity churn and partial errors that can masquerade as “no change.”
+  6. Require domain-semantic regression evidence where money/meaningful decisions depend on mapped fields, not merely syntactic schema validation.
+- WHY IT WORKED: Benchmark Experiment Tasks **37 and 38** independently validated the method. Task 37 converged on PermitBuild by intersecting municipal connector families, immutable permit versions/diffs and fee-vs-valuation semantic QA. Task 38 transferred the same triad to government acquisition forecasts and found Curatore-v2's multi-source normalization, temporal history/diffs and explicit success/partial/failure orchestration while also surfacing an APFS false-green edge case.
+- EXAMPLES:
+  - Benchmark Task 37: `adamleap02/PermitBuild@ff795137e0c66e62a87e62956fa351926886255d`
+  - Benchmark Task 38: `davidlarrimore/curatore-v2@d4e42ac14450a58f84035c31db11b0399713a653`
+- FAILURE MODES:
+  - counting connector count as data quality;
+  - mutable upserts presented as audit history;
+  - history arrays that do not expose deterministic old/new semantics;
+  - `success` emitted on unexpected or empty source responses;
+  - unstable identity keys splitting one evolving record into unrelated rows;
+  - schema tests that miss fee/value/status/date semantic swaps.
+- NEXT IMPROVEMENT: apply the triad to a non-government ingestion domain such as billing feeds or scientific instruments and measure whether it reduces false promotion versus broad “data platform” search.
