@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Allocator Role/Work-Kind Learning Metric",
+  "type": "object",
+  "required": [
+    "key",
+    "runs",
+    "deep_inspected",
+    "retained_count",
+    "master_promoted_count",
+    "new_capability_runs",
+    "experiment_touch_runs",
+    "valid_outcome_runs",
+    "passed_outcome_runs",
+    "allocation_signal",
+    "sufficient_evidence"
+  ],
+  "properties": {
+    "key": {
+      "type": "string"
+    },
+    "runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "deep_inspected": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "retained_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "master_promoted_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "new_capability_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "experiment_touch_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "valid_outcome_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "passed_outcome_runs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "allocation_signal": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "sufficient_evidence": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": true
+}
