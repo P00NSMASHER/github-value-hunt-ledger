@@ -143,3 +143,10 @@ If the answer is none, the finding is not yet integrated into the value system.
 - `moov-io/ach@f36ebb7...` + independent bank statement readback -> **CAP-018** external post-success invalidation -> **EXP-003 Commission Payout**.
 - USECPO v2 -> observed event outcomes; ICE 2.2 (external service/terms) -> economic consequence -> grid risk/inspection/restoration policy benchmark. Preserve outcome/model independence and EAGLE-I circularity caveat.
 - `AccelerationConsortium/bo-mcp@56d590b...` -> shadow evidence for stable experiment identity/idempotency/audit and proposed→actual provenance -> Installed-Base Lab / self-driving-science integrity challenger; external executor acknowledgement remains missing.
+
+
+## Machine graph mirror
+
+`intelligence/edges.jsonl` is the canonical machine-readable edge store used for empirical learning and automated analysis. This Markdown file remains the human-readable narrative graph.
+
+New graph relationships that materially affect search attribution, capability composition, experiments or outcomes should be represented in the JSONL edge store with evidence provenance. Repository revisions should be pinned in node IDs when known.
