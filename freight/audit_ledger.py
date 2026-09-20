@@ -5,11 +5,16 @@ the supplied record set but does not provide independent external timestamping.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from enum import Enum
 from typing import Iterable
 
 from freight.contracts import canonical_hash
+
+
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 class AuditEventType(str, Enum):
@@ -43,6 +48,21 @@ def _required(name: str, value: str) -> None:
         raise ValueError(name + " is required")
 
 
+def _timestamp(value: str) -> None:
+    _required("occurred_at", value)
+    text = value.strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        raise ValueError("occurred_at must be timezone-aware")
+
+
+def _evidence_hash(value: str | None) -> None:
+    if value is not None and not SHA256_RE.fullmatch(value):
+        raise ValueError("evidence_hash must be lowercase SHA-256")
+
+
 def append_record(
     records: Iterable[AuditRecord],
     *,
@@ -56,7 +76,8 @@ def append_record(
     _required("buyer_id", buyer_id)
     _required("business_unit", business_unit)
     _required("object_id", object_id)
-    _required("occurred_at", occurred_at)
+    _timestamp(occurred_at)
+    _evidence_hash(evidence_hash)
 
     current = tuple(records)
     if current:
