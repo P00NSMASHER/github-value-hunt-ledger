@@ -43,7 +43,8 @@ Internal commercialization controls now completed:
 - deterministic zero-customer-data buyer/acquirer diligence ZIP with per-entry checksums;
 - evidence-backed rights promotion manifest/validator that prevents hosted/SaaS/assignment/change-of-control claims without verified executed-evidence metadata;
 - fail-closed incident-response runbook + closure/notification evidence model + tabletop template;
-- Technology Intelligence validation CI pinned to immutable Actions and read-only, with write permission isolated to a main-only persistence job.
+- Technology Intelligence validation CI pinned to immutable Actions and read-only, with write permission isolated to a main-only persistence job;
+- live Netlify deployment evidence addendum for `freightleak-audit`, including SSO config, zero Forms/env-vars, provider inventory, fail-closed tenant/parser status and completed incident tabletop.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -59,6 +60,8 @@ v15.8 governance CI: Freight run `35528127691` and Technology Intelligence run `
 
 Technology Intelligence workflow now separates read-only validation from main-only write persistence and pins checkout/setup-python to immutable SHAs.
 
+Deployment evidence collected 2026-09-20: Netlify SSO-all is configured, but **Netlify team MFA is not enforced**, no Freight multi-tenant backend/data plane was discovered, and no production parser runtime was discovered. Cross-tenant isolation and parser sandboxing therefore remain **unproven**, not passed.
+
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 
 ## Next 24 hours — make the asset diligence-ready
@@ -69,6 +72,12 @@ Technology Intelligence workflow now separates read-only validation from main-on
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. **DONE internally:** rights evidence manifest + fail-closed promotion validator. **OPEN externally:** attach/verify the actual executed Trenova/Opstrax permission documents and resolve hosted/SaaS/change-of-control scope.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
+
+### Deployment-security actions from live evidence
+1. Enable Netlify team MFA before confidential buyer data is accepted.
+2. When a real Freight customer data plane is deployed, run two-tenant negative isolation tests and record provider/project IDs.
+3. When a production parser runtime is deployed, record/test CPU, memory, timeout, network-egress and credential-isolation controls.
+4. Capture an independent unauthenticated black-box SSO/access probe when a capable probe path is available.
 
 ### Stop
 - no new generic freight repositories;
@@ -85,8 +94,8 @@ Technology Intelligence workflow now separates read-only validation from main-on
    - uniquely attributable realized.
 3. **DONE:** machine-checkable source/data-room + population/truth + sealed/opened incumbent package chain implemented in `freight/pilot_package.py` and `PILOT_DATA_ROOM.md`.
 4. **DONE:** `freight/SECURITY_AND_DATA_HANDLING.md` separates current pilot controls from deployment/security non-claims.
-5. **PARTIAL DONE:** fail-closed pre-parser negative tests cover PDF/XML/EDI/X12/CSV, archives, size/segment bounds and CSV formula neutralization. OS/container parser sandbox/resource limits remain deployment work.
-6. **PARTIAL DONE:** proof/source/package layers now carry buyer+BU scope with cross-scope negative tests. The actual customer data service/database/object-store still requires deployment-specific cross-tenant tests.
+5. **PARTIAL DONE:** fail-closed pre-parser negative tests cover PDF/XML/EDI/X12/CSV, archives, size/segment bounds and CSV formula neutralization. Live deployment evidence found no production Freight parser runtime, so CPU/memory/time/network/credential sandboxing remains unproven deployment work.
+6. **PARTIAL DONE:** proof/source/package layers now carry buyer+BU scope with cross-scope negative tests. Live provider inventory found no Freight multi-tenant customer data plane, so actual A-vs-B deployment isolation testing remains unproven and must occur when that data plane exists.
 7. Record reviewer hours, invoice count, fixed fee, delivery cost and turnaround in each externally evidenced engagement outcome so buyer-level margin/effort can be calibrated.
 8. **ADVANCED internally:** CENSUS/SCOPE/PROOF lifecycle, source receipts, persistent scoped audit reference storage and semantic audit+settlement restore drills are tested. **OPEN externally:** real provider deletion receipts, production audit-service authorization/WORM/alerting, deployed backup schedule/geographic redundancy and measured RPO/RTO.
 
@@ -119,7 +128,7 @@ Subject to explicit user approval for outreach/data access:
    - **DONE internally:** rights registry + partial SBOM + deterministic diligence ZIP;
    - **OPEN externally:** executed rights evidence, signed provenance/trusted timestamp;
    - **DONE internally:** data-retention/deletion semantics;
-   - **DONE internally:** incident-response/breach-decision runbook + machine closure/notification rules; **OPEN externally:** deployed contact tree/alerting and completed tabletop or incident exercise evidence;
+   - **DONE internally:** incident-response/breach-decision runbook + machine closure/notification rules + one deployment-specific Netlify tabletop; **OPEN externally:** deployed contact tree/alerting and live-environment incident exercise evidence;
    - **DONE internally:** semantic reference backup/restore proof;
    - **OPEN deployment-specific:** access-control/cross-tenant, backup scheduling/RPO/RTO and production audit-service evidence.
 7. Keep success-fee attribution subordinate to the settlement proof engine.
