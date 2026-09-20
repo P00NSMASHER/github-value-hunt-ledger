@@ -2,8 +2,8 @@
 
 Pinned revisions are essential for reproducible technical intelligence. This report prioritizes records whose repository identity is known but whose inspected revision is not recoverable from the hunter catalog.
 
-- Unknown-revision observations: **87**
-- Unique repositories with unknown revision: **87**
+- Unknown-revision observations: **88**
+- Unique repositories with unknown revision: **88**
 - Current MASTER promotions without matching exact hunter-catalog observation: **2**
 
 ## Unknown revision mix
@@ -11,7 +11,7 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | Bucket | Count |
 |---|---:|
 | unknown | 33 |
-| strong | 19 |
+| strong | 20 |
 | rejected | 18 |
 | watch | 14 |
 | quarantined | 3 |
@@ -39,6 +39,7 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | openconfig/kne | hunters/35.md | current | strong | 10 |
 | openconfig/ondatra | hunters/35.md | current | strong | 10 |
 | systerel/S2OPC | hunters/12.md | current | strong | 10 |
+| wazuh/wazuh | hunters/15-run19-2026-09-20.md | current | strong | 10 |
 | BroadbandForum/cwmp-xml-tools | hunters/35.md | current | watch | 8 |
 | CANopenNode/CANopenLinux | hunters/12.md | current | watch | 8 |
 | IoTKETI/IPE-LWM2M | hunters/35.md | current | watch | 8 |
@@ -69,7 +70,6 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | Practitionist/familiarise_web | hunters/01-run17-2026-09-20.md | current | unknown | 7 |
 | Raunak-Sarmacharya/LocalCooksCommunity | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
 | Tests/history | hunters/04-run12-2026-09-20.md | current | unknown | 7 |
-| TheBarrelExploit/call-quality-analyzer | hunters/37.md | current | unknown | 7 |
 
 ## MASTER catalog provenance gaps
 

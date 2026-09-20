@@ -1,5 +1,5 @@
 {
-  "measured_runs": 12,
+  "measured_runs": 14,
   "valid_outcomes": 1,
   "exploration_budget": 0.5,
   "outcome_attribution_method": "equal_touch_fractional_credit",
@@ -16,9 +16,9 @@
       "exploit_mass": 0.205,
       "uncertainty": 0.4082482904638631,
       "sufficient_evidence": false,
-      "exploration_component": 0.04145744528773596,
-      "exploitation_component": 0.318384779654436,
-      "allocation": 0.179921112471086
+      "exploration_component": 0.04272832168150818,
+      "exploitation_component": 0.3069819679291196,
+      "allocation": 0.1748551448053139
     },
     {
       "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
@@ -32,9 +32,9 @@
       "exploit_mass": 0.138,
       "uncertainty": 0.5773502691896258,
       "sufficient_evidence": false,
-      "exploration_component": 0.05862968138725676,
-      "exploitation_component": 0.21432731508444966,
-      "allocation": 0.1364784982358532
+      "exploration_component": 0.06042697201942924,
+      "exploitation_component": 0.2066512759717976,
+      "allocation": 0.13353912399561343
     },
     {
       "strategy_id": "STRAT:first-party-production-source-triangulation",
@@ -48,9 +48,9 @@
       "exploit_mass": 0.13270833333333334,
       "uncertainty": 0.5773502691896258,
       "sufficient_evidence": false,
-      "exploration_component": 0.05862968138725676,
-      "exploitation_component": 0.20610884617873554,
-      "allocation": 0.13236926378299615
+      "exploration_component": 0.06042697201942924,
+      "exploitation_component": 0.1987271479378549,
+      "allocation": 0.12957705997864208
     },
     {
       "strategy_id": "STRAT:fail-open-boundary-archaeology",
@@ -64,9 +64,9 @@
       "exploit_mass": 0.08166666666666667,
       "uncertainty": 0.7071067811865475,
       "sufficient_evidence": false,
-      "exploration_component": 0.07180640159036561,
-      "exploitation_component": 0.12683621303306802,
-      "allocation": 0.09932130731171682
+      "exploration_component": 0.074007624074519,
+      "exploitation_component": 0.12229362950021838,
+      "allocation": 0.09815062678736869
     },
     {
       "strategy_id": "STRAT:evaluation-target-independence",
@@ -80,9 +80,25 @@
       "exploit_mass": 0.08650000000000001,
       "uncertainty": 0.5773502691896258,
       "sufficient_evidence": false,
-      "exploration_component": 0.05862968138725676,
-      "exploitation_component": 0.13434284604931082,
-      "allocation": 0.09648626371828378
+      "exploration_component": 0.06042697201942924,
+      "exploitation_component": 0.1295314157359456,
+      "allocation": 0.09497919387768741
+    },
+    {
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
+      "name": "Rule-period / authority-version audit",
+      "runs": 1,
+      "inspected": 1,
+      "assisted_outcomes": 0,
+      "fractional_outcome_equivalents": 0,
+      "raw_exploit_score": 0.47833333333333333,
+      "evidence_weight": 0.05,
+      "exploit_mass": 0.02391666666666667,
+      "uncertainty": 0.7071067811865475,
+      "sufficient_evidence": false,
+      "exploration_component": 0.074007624074519,
+      "exploitation_component": 0.03581456292506396,
+      "allocation": 0.05491109349979148
     },
     {
       "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
@@ -96,9 +112,9 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10154958699430403,
+      "exploration_component": 0.10466258568519435,
       "exploitation_component": 0.0,
-      "allocation": 0.05077479349715201
+      "allocation": 0.052331292842597174
     },
     {
       "strategy_id": "STRAT:cross-source-emergence-triangulation",
@@ -112,9 +128,9 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10154958699430403,
+      "exploration_component": 0.10466258568519435,
       "exploitation_component": 0.0,
-      "allocation": 0.05077479349715201
+      "allocation": 0.052331292842597174
     },
     {
       "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
@@ -128,9 +144,9 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10154958699430403,
+      "exploration_component": 0.10466258568519435,
       "exploitation_component": 0.0,
-      "allocation": 0.05077479349715201
+      "allocation": 0.052331292842597174
     },
     {
       "strategy_id": "STRAT:ingestion-invariant-triad-intersection",
@@ -144,9 +160,9 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10154958699430403,
+      "exploration_component": 0.10466258568519435,
       "exploitation_component": 0.0,
-      "allocation": 0.05077479349715201
+      "allocation": 0.052331292842597174
     },
     {
       "strategy_id": "STRAT:paper-research-artifact-production-descendant",
@@ -160,9 +176,9 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10154958699430403,
+      "exploration_component": 0.10466258568519435,
       "exploitation_component": 0.0,
-      "allocation": 0.05077479349715201
+      "allocation": 0.052331292842597174
     },
     {
       "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
@@ -176,25 +192,9 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10154958699430403,
+      "exploration_component": 0.10466258568519435,
       "exploitation_component": 0.0,
-      "allocation": 0.05077479349715201
-    },
-    {
-      "strategy_id": "STRAT:rule-period-authority-version-audit",
-      "name": "Rule-period / authority-version audit",
-      "runs": 0,
-      "inspected": 0,
-      "assisted_outcomes": 0,
-      "fractional_outcome_equivalents": 0,
-      "raw_exploit_score": 0.49999999999999994,
-      "evidence_weight": 0.0,
-      "exploit_mass": 0.0,
-      "uncertainty": 1.0,
-      "sufficient_evidence": false,
-      "exploration_component": 0.10154958699430403,
-      "exploitation_component": 0.0,
-      "allocation": 0.05077479349715201
+      "allocation": 0.052331292842597174
     }
   ],
   "priority_capability_gaps": [
@@ -217,7 +217,7 @@
       "name": "Proof obligations and next-best-evidence routing",
       "gap_score": 6,
       "missing_piece": "domain policy provenance is external",
-      "run_attention": 1
+      "run_attention": 2
     },
     {
       "capability_id": "CAP-002",
@@ -252,7 +252,7 @@
       "name": "Evidence-gated document facts",
       "gap_score": 4,
       "missing_piece": "domain calibration and contractual/legal authority remain external",
-      "run_attention": 1
+      "run_attention": 2
     },
     {
       "capability_id": "CAP-015",

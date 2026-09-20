@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "portfolio_policy_generation_id": "PORTFOLIO:00ad73e21071",
+  "portfolio_policy_generation_id": "PORTFOLIO:888579311cf9",
   "mode": "baseline_insufficient_evidence",
   "baseline_role_counts": {
     "experiment": 6,
@@ -19,10 +19,10 @@
     "wildcard": 1
   },
   "shift": null,
-  "attributed_assignment_runs": 0,
+  "attributed_assignment_runs": 2,
   "attribution_debt_runs": 0,
   "roles_with_sufficient_evidence": 0,
-  "work_kinds_observed": 0,
+  "work_kinds_observed": 2,
   "evidence_thresholds": {
     "min_runs": 5,
     "min_deep_inspections": 15,

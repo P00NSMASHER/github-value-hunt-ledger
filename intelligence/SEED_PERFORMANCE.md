@@ -5,16 +5,15 @@ Seed-level performance becomes meaningful only after hunters record V5 seed_ids.
 | Seed | Runs | Inspected | Retained | MASTER | New-cap runs | Experiment runs | Evidence |
 |---|---:|---:|---:|---:|---:|---:|---|
 | SEED:gap:cap-013 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:coverage:language-family-c-cpp:cap-009 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:coverage:language-family-dotnet:cap-013 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:coverage:language-family-rust:cap-007 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:coverage:package-ecosystem-cargo:cap-002 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:coverage:package-ecosystem-nuget:cap-008 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:gap:cap-007 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:language-family-dotnet:cap-009 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:package-ecosystem-nuget:cap-013 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-009 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:gap:cap-007 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-002 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-014 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:gap:cap-001 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:language-family-c-cpp:cap-007 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:language-family-rust:cap-002 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:coverage:package-ecosystem-cargo:cap-008 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:dna:gsa-gsa-acquisition-dfars | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-008 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-012 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -23,6 +22,7 @@ Seed-level performance becomes meaningful only after hunters record V5 seed_ids.
 | SEED:dna:benchling-open-source-allotropy | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:dna:gridappsd-cimhub | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:dna:gsa-gsa-acquisition-far | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:gap:cap-001 | 1 | 1 | 1 | 0 | 0 | 1 | insufficient |
 | SEED:gap:cap-015 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-019 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:measure:authority-origin-invariant-set-consistency-cap-009 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |

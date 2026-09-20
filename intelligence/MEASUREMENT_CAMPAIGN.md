@@ -32,7 +32,7 @@ This campaign reduces strategy-measurement debt using frozen benchmark tasks. It
 | STRAT:ingestion-invariant-triad-intersection | 5 | 20 | EVAL:ingestion-protocol | 37 | CMP:ingestion-protocol:task-37 |
 | STRAT:paper-research-artifact-production-descendant | 5 | 20 | EVAL:agent-lineage-governance | 28 | CMP:agent-lineage-governance:task-28 |
 | STRAT:protocol-regression-archaeology-for-pre-fat-systems | 5 | 20 | EVAL:ingestion-protocol | 37 | CMP:ingestion-protocol:task-37 |
-| STRAT:rule-period-authority-version-audit | 5 | 20 | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
+| STRAT:rule-period-authority-version-audit | 4 | 19 | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
 
 ## Why this is stronger than ordinary telemetry
 

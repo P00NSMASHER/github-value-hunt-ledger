@@ -1,13 +1,13 @@
 {
-  "search_runs": 12,
+  "search_runs": 15,
   "outcomes": 1,
-  "average_run_completeness": 0.9102564102564102,
-  "runs_below_70pct_completeness": 0,
-  "issue_count": 0,
-  "unregistered_strategy_runs": 0,
+  "average_run_completeness": 0.8974358974358975,
+  "runs_below_70pct_completeness": 1,
+  "issue_count": 1,
+  "unregistered_strategy_runs": 1,
   "capabilities_missing_next_test": 0,
-  "v4_runs": 0,
-  "v4_core_instrumentation_complete": 0,
-  "objective_mapped_runs": 11,
-  "candidate_dispositions_with_direct_or_alias_controlled_reason": 17
+  "v4_runs": 3,
+  "v4_core_instrumentation_complete": 2,
+  "objective_mapped_runs": 14,
+  "candidate_dispositions_with_direct_or_alias_controlled_reason": 20
 }

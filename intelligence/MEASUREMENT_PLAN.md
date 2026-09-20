@@ -10,18 +10,18 @@ This report answers a different question from SEARCH_POLICY.md: not **where migh
 
 | Strategy | Runs | Inspected | More runs needed | More inspections needed | Instrumentation debt | Policy allocation |
 |---|---:|---:|---:|---:|---:|---:|
-| STRAT:authority-origin-invariant-set-consistency | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:cross-source-emergence-triangulation | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:decision-claim-runtime-side-effect-trace | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:ingestion-invariant-triad-intersection | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:paper-research-artifact-production-descendant | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:rule-period-authority-version-audit | 0 | 0 | 5 | 20 | 0% | 5.1% |
-| STRAT:fail-open-boundary-archaeology | 1 | 4 | 4 | 16 | 0% | 9.9% |
-| STRAT:evaluation-target-independence | 2 | 4 | 3 | 16 | 100% | 9.6% |
-| STRAT:capability-conjunction-search-claim-tracing | 2 | 6 | 3 | 14 | 17% | 13.6% |
-| STRAT:first-party-production-source-triangulation | 2 | 7 | 3 | 13 | 100% | 13.2% |
-| STRAT:acceptance-path-transition-inspection | 5 | 10 | 0 | 10 | 7% | 18.0% |
+| STRAT:authority-origin-invariant-set-consistency | 0 | 0 | 5 | 20 | 0% | 5.2% |
+| STRAT:cross-source-emergence-triangulation | 0 | 0 | 5 | 20 | 0% | 5.2% |
+| STRAT:decision-claim-runtime-side-effect-trace | 0 | 0 | 5 | 20 | 0% | 5.2% |
+| STRAT:ingestion-invariant-triad-intersection | 0 | 0 | 5 | 20 | 0% | 5.2% |
+| STRAT:paper-research-artifact-production-descendant | 0 | 0 | 5 | 20 | 0% | 5.2% |
+| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 0 | 0 | 5 | 20 | 0% | 5.2% |
+| STRAT:rule-period-authority-version-audit | 1 | 1 | 4 | 19 | 0% | 5.5% |
+| STRAT:fail-open-boundary-archaeology | 1 | 4 | 4 | 16 | 0% | 9.8% |
+| STRAT:evaluation-target-independence | 2 | 4 | 3 | 16 | 100% | 9.5% |
+| STRAT:capability-conjunction-search-claim-tracing | 2 | 6 | 3 | 14 | 17% | 13.4% |
+| STRAT:first-party-production-source-triangulation | 2 | 7 | 3 | 13 | 100% | 13.0% |
+| STRAT:acceptance-path-transition-inspection | 5 | 10 | 0 | 10 | 7% | 17.5% |
 
 ## Operating rule
 

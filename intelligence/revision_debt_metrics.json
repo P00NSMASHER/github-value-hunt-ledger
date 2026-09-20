@@ -1,15 +1,15 @@
 {
-  "unknown_revision_observations": 87,
-  "unique_repositories_with_unknown_revision": 87,
+  "unknown_revision_observations": 88,
+  "unique_repositories_with_unknown_revision": 88,
   "status_counts": {
     "unknown": 33,
     "rejected": 18,
-    "strong": 19,
+    "strong": 20,
     "quarantined": 3,
     "watch": 14
   },
   "source_state_counts": {
-    "current": 87
+    "current": 88
   },
   "master_catalog_gaps": [
     {
@@ -172,6 +172,14 @@
       "source_state": "current",
       "status_bucket": "strong",
       "status": "strong / Master contender**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "wazuh/wazuh",
+      "source_catalog": "hunters/15-run19-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "strong component / architecture oracle**",
       "priority_score": 10
     },
     {

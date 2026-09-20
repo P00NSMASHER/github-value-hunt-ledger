@@ -2,27 +2,31 @@
 
 This report measures whether the learning loop has enough structured evidence to support empirical search-policy updates.
 
-- Search runs: **12**
+- Search runs: **15**
 - Structured outcomes: **1**
-- Mean legacy/core run completeness: **91.0%**
-- Runs below 70% completeness: **0**
-- Structural issues detected: **0**
+- Mean legacy/core run completeness: **89.7%**
+- Runs below 70% completeness: **1**
+- Structural issues detected: **1**
 - Capabilities without an explicit next falsifiable test: **0**
-- V4 runs: **0** (core V4 instrumentation complete: **0**)
-- Runs mapped to a controlled search objective (explicit or reviewed legacy map): **11/12**
-- Candidate dispositions normalized to controlled reasons (direct or reviewed alias): **17**
+- V4 runs: **3** (core V4 instrumentation complete: **2**)
+- Runs mapped to a controlled search objective (explicit or reviewed legacy map): **14/15**
+- Candidate dispositions normalized to controlled reasons (direct or reviewed alias): **20**
 
 ## Missing recommended legacy/core fields
 
 | Field | Runs missing |
 |---|---:|
-| queries | 6 |
+| queries | 7 |
+| candidate_dispositions | 5 |
 | search_surfaces | 4 |
-| candidate_dispositions | 4 |
+| candidate_count | 1 |
+| deep_inspected | 1 |
+| retained_count | 1 |
+| master_promoted_count | 1 |
 
 ## Structural issues
 
-- None.
+- RUN:20260920T202725Z:hunter11:recovery-identity-lifecycle — **unregistered_strategy_variant**: STRAT:identity-lifecycle-contradiction-archaeology
 
 ## Learning bottlenecks
 

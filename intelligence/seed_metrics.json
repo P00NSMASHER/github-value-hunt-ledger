@@ -7,7 +7,7 @@
     "positive_dna_transfer": 6,
     "strategy_measurement": 3
   },
-  "seeds_with_measured_runs": 0,
+  "seeds_with_measured_runs": 1,
   "performance_threshold": {
     "min_runs": 3,
     "min_inspections": 10
