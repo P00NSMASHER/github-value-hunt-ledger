@@ -1,0 +1,37 @@
+name: Technology Intelligence Graph
+
+on:
+  push:
+    paths:
+      - "intelligence/**"
+      - "tools/ti_*.py"
+      - "CAPABILITIES.md"
+      - "SEARCH_SKILLS.md"
+      - "OUTCOMES.md"
+      - "KNOWLEDGE_GRAPH.md"
+  pull_request:
+    paths:
+      - "intelligence/**"
+      - "tools/ti_*.py"
+      - "CAPABILITIES.md"
+      - "SEARCH_SKILLS.md"
+      - "OUTCOMES.md"
+      - "KNOWLEDGE_GRAPH.md"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-learning-loop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate graph
+        run: python tools/ti_validate.py
+      - name: Rebuild learning report
+        run: python tools/ti_report.py
+      - name: Require generated report to be current
+        run: git diff --exit-code -- intelligence/LEARNING_REPORT.md
