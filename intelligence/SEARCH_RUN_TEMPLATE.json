@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -30,5 +30,6 @@
   "candidate_dispositions": [],
   "best_result": null,
   "durable_evidence_path": null,
-  "notes": null
+  "notes": null,
+  "query_family_id": "QF:example-family"
 }
