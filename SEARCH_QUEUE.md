@@ -3,6 +3,7 @@
 Integrator-owned search and validation direction. Updated 2026-09-20. **Experiment bottlenecks, independent falsification, source authority and outcome evidence outrank repository count.** This file is current direction, not history; older overrides remain in Git history and hunter catalogs.
 
 ## Operating rules for all 14 workstreams
+- Before claiming routed work, use `intelligence/DISPATCH_BOARD.md` / `dispatch_claim_packets.jsonl`. A generated claim must carry the current `DISPATCH:` ticket exactly. Claiming a different slot is allowed only as an explicit `manual_override` with a reason, and that override must not train the generated-route learner.
 - Review `intelligence/ROUTING_LEARNING_REPORT.md` before interpreting worker specialization. V13 trains only from completed MATCHED generated routes and remains observe-only until its evidence thresholds are met; manual reroutes and retrospective repairs do not train it.
 - Check `intelligence/WORKER_ROUTING.md` before claiming work. If a worker has a generated V12 route, claim that routed slot; active V11 claims remain locked. Manual reroutes must be explicit and should be recorded as routing overrides rather than silently training the router.
 - Claim work through `intelligence/EXECUTION_BOARD.md` / `execution_events/SLOT-XX.jsonl` before executing it. One worker may hold one live claim by default. Heartbeat before lease expiry. Write schema-v11 telemetry first, then append COMPLETE with that exact run ID; completion without matched telemetry is invalid.

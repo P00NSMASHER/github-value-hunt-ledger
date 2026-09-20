@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V14 Dispatch Ticket",
+  "type": "object",
+  "required": [
+    "dispatch_ticket_id",
+    "dispatch_generation_id",
+    "worker_id",
+    "routing_generation_id",
+    "worker_profile_generation_id",
+    "slot_id",
+    "assignment_id",
+    "allocator_generation_id",
+    "portfolio_policy_generation_id",
+    "work_item_id",
+    "assignment_slot_role",
+    "assignment_work_kind",
+    "assignment_source_id",
+    "assignment_score",
+    "routing_score",
+    "claim_file"
+  ],
+  "properties": {
+    "dispatch_ticket_id": {
+      "type": "string",
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "dispatch_generation_id": {
+      "type": "string",
+      "pattern": "^DISPATCHGEN:[a-f0-9]{12}$"
+    },
+    "worker_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{2,64}$"
+    },
+    "routing_generation_id": {
+      "type": "string",
+      "pattern": "^ROUTING:[a-f0-9]{12}$"
+    },
+    "worker_profile_generation_id": {
+      "type": "string",
+      "pattern": "^WORKERS:[a-f0-9]{12}$"
+    },
+    "routing_learning_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ROUTELEARN:[a-f0-9]{12}$"
+    },
+    "slot_id": {
+      "type": "string",
+      "pattern": "^SLOT-[0-9]{2}$"
+    },
+    "assignment_id": {
+      "type": "string"
+    },
+    "allocator_generation_id": {
+      "type": "string",
+      "pattern": "^ALLOCGEN:[a-f0-9]{12}$"
+    },
+    "portfolio_policy_generation_id": {
+      "type": "string",
+      "pattern": "^PORTFOLIO:[a-f0-9]{12}$"
+    },
+    "work_item_id": {
+      "type": "string",
+      "pattern": "^WORK:[a-z0-9-]+:[a-z0-9-]+$"
+    },
+    "assignment_slot_role": {
+      "type": "string"
+    },
+    "assignment_work_kind": {
+      "type": "string"
+    },
+    "assignment_source_id": {
+      "type": "string"
+    },
+    "assignment_score": {
+      "type": "number"
+    },
+    "routing_score": {
+      "type": "number"
+    },
+    "claim_file": {
+      "type": "string"
+    },
+    "ticket_status": {
+      "type": "string"
+    },
+    "execution_state_at_generation": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

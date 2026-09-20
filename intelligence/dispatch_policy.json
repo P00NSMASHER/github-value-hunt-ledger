@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "minimum_claim_schema_version": 14,
+  "claim_modes": [
+    "generated",
+    "manual_override"
+  ],
+  "generated_claim_requires_dispatch_ticket": true,
+  "manual_override_requires_reason": true,
+  "require_current_ticket_for_generated_claim": true,
+  "ticket_valid_execution_states": [
+    "AVAILABLE",
+    "EXPIRED_AVAILABLE",
+    "RETRYABLE_AVAILABLE",
+    "RELEASED_AVAILABLE"
+  ],
+  "history_mode": "append_only",
+  "legacy_claim_ids": [
+    "CLAIM:062026092112",
+    "CLAIM:13a920204800",
+    "CLAIM:c4a920201835",
+    "CLAIM:112026092021",
+    "CLAIM:11b920202728"
+  ],
+  "guardrails": [
+    "Generated claims must be bound to an exact current dispatch ticket.",
+    "A dispatch ticket binds worker, slot, assignment, work item, allocator generation, portfolio policy, routing generation, worker-profile generation, routing-learning generation, assignment score and routing score.",
+    "Manual reroutes remain allowed but require an explicit override reason and do not count as generated routing evidence.",
+    "Dispatch tickets never authorize outreach, purchases, private-data access or other external actions.",
+    "Pre-V14 claims are grandfathered only by explicit claim ID."
+  ]
+}

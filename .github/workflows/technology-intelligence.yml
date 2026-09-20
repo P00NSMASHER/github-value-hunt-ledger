@@ -122,6 +122,10 @@ jobs:
         run: python tools/ti_worker_routing.py
       - name: Validate V12 worker routing
         run: python tools/ti_worker_routing_validate.py
+      - name: Build V14 dispatch tickets
+        run: python tools/ti_dispatch.py
+      - name: Validate V14 dispatch binding
+        run: python tools/ti_dispatch_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -214,6 +218,10 @@ jobs:
         run: python tools/ti_worker_routing.py
       - name: Validate V12 worker routing
         run: python tools/ti_worker_routing_validate.py
+      - name: Build V14 dispatch tickets
+        run: python tools/ti_dispatch.py
+      - name: Validate V14 dispatch binding
+        run: python tools/ti_dispatch_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -302,7 +310,12 @@ jobs:
                   intelligence/routing_calibration.jsonl \
                   intelligence/routing_learning_metrics.json \
                   intelligence/ROUTING_LEARNING_REPORT.md \
-                  intelligence/ROUTING_CALIBRATION_REPORT.md
+                  intelligence/ROUTING_CALIBRATION_REPORT.md \
+                  intelligence/dispatch_tickets.jsonl \
+                  intelligence/dispatch_ticket_history.jsonl \
+                  intelligence/dispatch_claim_packets.jsonl \
+                  intelligence/DISPATCH_BOARD.md \
+                  intelligence/dispatch_metrics.json
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
