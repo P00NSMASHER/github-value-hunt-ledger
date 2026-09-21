@@ -198,6 +198,35 @@ def test_store_rejects_noncanonical_finding_order(tmp_path):
         )
 
 
+def test_store_rejects_invalid_self_hashed_intent_semantics(tmp_path):
+    s = store(tmp_path)
+    intent = make_intent()
+
+    bad_action = replace(intent, action_type="WIRE_MONEY")
+    with pytest.raises(ValueError, match="action_type"):
+        s.reserve_send_attempt(
+            bad_action,
+            attempt_id="attempt-bad-action",
+            started_at="2026-09-21T11:00:10Z",
+        )
+
+    bad_amount = replace(intent, requested_cents=2**63)
+    with pytest.raises(ValueError, match="within range"):
+        s.reserve_send_attempt(
+            bad_amount,
+            attempt_id="attempt-bad-amount",
+            started_at="2026-09-21T11:00:10Z",
+        )
+
+    bad_finding = replace(intent, finding_ids=("",))
+    with pytest.raises(ValueError, match="finding_id"):
+        s.reserve_send_attempt(
+            bad_finding,
+            attempt_id="attempt-bad-finding",
+            started_at="2026-09-21T11:00:10Z",
+        )
+
+
 def test_new_send_attempt_reserves_exclusive_slot(tmp_path):
     s = store(tmp_path)
     intent = make_intent()
