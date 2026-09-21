@@ -469,6 +469,14 @@ class SettlementStore:
                 )
             if counter["original_event_id"] != allocation["event_id"]:
                 raise ValueError("counter event does not fund allocation")
+            original_event = conn.execute(
+                "SELECT currency FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+                (*self._scope, allocation["event_id"]),
+            ).fetchone()
+            if original_event is None:
+                raise ValueError("reversal allocation references unknown settlement event")
+            if counter["currency"] != original_event["currency"]:
+                raise ValueError("counter currency mismatch with original settlement event")
             if created_at < counter["observed_at"]:
                 raise ValueError("reversal created_at cannot predate counter observation")
             if created_at < allocation["created_at"]:
@@ -531,6 +539,10 @@ class SettlementStore:
                 "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
                 (*self._scope, counter["original_event_id"]),
             ).fetchone()
+            if event is None:
+                raise ValueError("counter references unknown settlement event")
+            if counter["currency"] != event["currency"]:
+                raise ValueError("counter currency mismatch with original settlement event")
             live = conn.execute("""SELECT a.*,
               a.amount_cents-COALESCE((SELECT SUM(amount_cents) FROM reversal_edges
                  WHERE buyer_id=a.buyer_id AND business_unit=a.business_unit AND allocation_id=a.allocation_id),0) AS live_cents
