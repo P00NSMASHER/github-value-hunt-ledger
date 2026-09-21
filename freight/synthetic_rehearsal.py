@@ -10,6 +10,7 @@ import tempfile
 from dataclasses import asdict
 from pathlib import Path
 
+from freight.audit_result_bundle import build_audit_result_bundle, verify_audit_result_bundle
 from freight.audit_workflow import RuleCSVInput, render_workflow_summary, run_audit_workflow
 from freight.contracts import (
     open_incumbent_output,
@@ -179,6 +180,10 @@ def run_rehearsal() -> dict:
     )
 
     with tempfile.TemporaryDirectory() as td:
+        audit_bundle_path = Path(td) / "synthetic-audit-result.zip"
+        audit_bundle_receipt = build_audit_result_bundle(workflow, audit_bundle_path)
+        verify_audit_result_bundle(workflow, audit_bundle_path)
+
         store = SettlementStore(
             Path(td) / "settlement.sqlite3",
             buyer_id=BUYER,
@@ -259,6 +264,9 @@ def run_rehearsal() -> dict:
         "audit_workflow_state": workflow.state,
         "audit_workflow_summary": render_workflow_summary(workflow),
         "audit_run_hash": audit_run.run_hash,
+        "audit_result_bundle_sha256": audit_bundle_receipt.bundle_sha256,
+        "audit_result_bundle_manifest_sha256": audit_bundle_receipt.manifest_sha256,
+        "audit_result_bundle_entry_count": audit_bundle_receipt.entry_count,
         "population_builder_hash": population_build.builder_hash,
         "population_invoice_count": population_build.invoice_count,
         "population_charge_count": population_build.charge_count,
