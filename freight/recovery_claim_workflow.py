@@ -382,6 +382,11 @@ def _verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
         raise ValueError("recovery claim batch hash mismatch")
 
 
+def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
+    """Verify a claim batch without mutating a settlement store."""
+    _verify_recovery_claim_batch(batch)
+
+
 def persist_recovery_claim_batch(
     store: SettlementStore,
     batch: RecoveryClaimBatch,
