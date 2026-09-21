@@ -324,6 +324,8 @@ def verify_carrier_action_execution_intent_proof(
         raise ValueError("requested_cents must be a positive integer")
     if not intent.finding_ids or len(intent.finding_ids) != len(set(intent.finding_ids)):
         raise ValueError("finding_ids must be a non-empty unique tuple")
+    if intent.finding_ids != tuple(sorted(intent.finding_ids)):
+        raise ValueError("finding_ids must be in canonical sorted order")
     canonical_prepared_at, _ = _timestamp("prepared_at", intent.prepared_at)
     if canonical_prepared_at != intent.prepared_at:
         raise ValueError("prepared_at must be canonical UTC")
