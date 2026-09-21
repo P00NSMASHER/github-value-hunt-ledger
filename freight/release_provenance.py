@@ -20,6 +20,8 @@ CONTROL_PATHS = (
     "freight/audit_run_manifest.py",
     "freight/audit_workflow.py",
     "freight/carrier_action_execution.py",
+    "freight/carrier_action_execution_store.py",
+    "freight/carrier_action_execution_schema.sql",
     "freight/carrier_action_payload.py",
     "freight/carrier_action_workflow.py",
     "freight/diligence_bundle.py",
