@@ -50,6 +50,7 @@ CONTROL_PATHS = (
     "freight/review_packet.py",
     "freight/review_queue.py",
     "freight/review_routing.py",
+    "freight/reviewed_settlement_allocation.py",
     "freight/rule_csv_adapter.py",
     "freight/release_attestation.py",
     "freight/release_gate.py",
