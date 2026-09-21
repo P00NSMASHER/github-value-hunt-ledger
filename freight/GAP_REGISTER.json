@@ -70,7 +70,19 @@
         "tenant/BU scope enforced at repository/service boundary",
         "audit logs for denied cross-scope attempts"
       ],
-      "stop_condition": "Isolation tests pass in the actual pilot data service."
+      "stop_condition": "Isolation tests pass in the actual pilot data service.",
+      "internal_evidence": [
+        "freight/tenant_isolation_rehearsal.py",
+        "freight/test_tenant_isolation_rehearsal.py",
+        "freight/TENANT_ISOLATION_EVIDENCE.md"
+      ],
+      "internal_evidence_scope": "Repository/service-boundary SQLite negative isolation only; not deployed multi-tenant proof.",
+      "remaining_evidence": [
+        "Negative cross-scope attempts against the actual pilot data service",
+        "Deployed buyer/BU authorization context for those attempts",
+        "Audit/security logs showing denied cross-scope attempts"
+      ],
+      "last_internal_validation_date": "2026-09-21"
     },
     {
       "gap_id": "FRT-SEC-002",
