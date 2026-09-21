@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.14 candidate
+## Current checkpoint — v15.14
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -76,6 +76,8 @@ v15.12 Freight CI run `35544056352` passed **18 hunter/model tests + 222 Freight
 
 v15.13 Freight CI run `35549203058` passed **18 hunter/model tests + 231 Freight tests** and every post-test gate. The Engagement State Resolver blocks audit/report/settlement processing during accepted-but-unreplaced amendments, and AuditStore initialization is now concurrency-safe under the existing monotonic-chain stress test.
 
+v15.14 Freight CI run `35550422800` passed **18 hunter/model tests + 242 Freight tests** and every existing post-test gate. The External Action Authorization is ACTIVE-only, buyer-role-approved, finding/payload/recipient/dollar-bound, expiring and revocable, while money movement, settlement acceptance, general contact and automatic execution remain false.
+
 Technology Intelligence workflow now separates read-only validation from main-only write persistence and pins checkout/setup-python to immutable SHAs.
 
 Deployment evidence collected 2026-09-20: Netlify SSO-all is configured, but **Netlify team MFA is not enforced**, no Freight multi-tenant backend/data plane was discovered, and no production parser runtime was discovered. Cross-tenant isolation and parser sandboxing therefore remain **unproven**, not passed. The deployment evidence snapshot expires after **2026-09-27** and must be recollected earlier after relevant control/deployment changes.
@@ -101,8 +103,8 @@ The separate/manual route stays **CONDITIONAL** until a VERIFIED environment man
 ## Next 24 hours — make the asset diligence-ready
 
 ### P0
-1. **DONE:** v15 through v15.13 commercialization, proof, adaptive-authorization, commercial-learning, pilot-security, lifecycle/audit, governance/diligence, actionable launch-workflow, buyer-activation, scope-freeze, amendment-control and engagement-state-resolution upgrades merged after CI.
-2. **DONE:** canonical Freight Recovery v15.13 release identity recorded in `freight/RELEASE_MANIFEST.md`.
+1. **DONE:** v15 through v15.14 commercialization, proof, adaptive-authorization, commercial-learning, pilot-security, lifecycle/audit, governance/diligence, actionable launch-workflow, buyer-activation, scope-freeze, amendment-control, engagement-state resolution and revocable external-action authorization upgrades merged after CI.
+2. **DONE:** canonical Freight Recovery v15.14 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. **DONE internally:** rights evidence manifest + fail-closed promotion validator. **OPEN externally:** attach/verify the actual executed Trenova/Opstrax permission documents and resolve hosted/SaaS/change-of-control scope.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.

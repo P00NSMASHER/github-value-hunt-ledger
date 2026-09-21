@@ -1,49 +1,50 @@
-# Freight Recovery v15.13 — Canonical Release Manifest
+# Freight Recovery v15.14 — Canonical Release Manifest
 
-Release checkpoint: **v15.13-engagement-state-resolution-2026-09-21**
+Release checkpoint: **v15.14-external-action-authorization-2026-09-21**
 
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Canonical v15.13 product merge commit: `28bc3f657ffe5d48fd88a5248dfcabcbd410ddd8`
-- Engagement State Resolver pull request: **#63**
-- v15.13 tested branch head: `075786854eb1242c56a3bf5eab4f380ab0810bf4`
-- Earlier Freight lineage retained from v15–v15.12.
-- This checkpoint is based on the current post-merge `main`, preserving unrelated concurrent product/research work.
+- Canonical v15.14 product merge commit: `32fb792433052833b247653c3da50e4e5453f867`
+- External Action Authorization pull request: **#67**
+- v15.14 tested reconciled branch head: `eb0a3ae929b0878168492230751c12dcf3dc80fa`
+- Earlier Freight lineage retained from v15–v15.13.
+- This checkpoint is based on the current post-merge `main`, preserving unrelated concurrent research work.
 
 ## Verified CI checkpoints
 
-### Freight Commercial Contracts — v15.13
-- PR #63 final run: `35549203058`
+### Freight Commercial Contracts — v15.14
+- Reconciled PR #67 run: `35550422800`
 - Result: **success**
 - Verified test counts:
   - hunter/model contracts: **18 passed**
-  - Freight contracts: **231 passed**
-- Successful post-test gates included:
-  - controlled-pilot rights + rights-evidence gates;
+  - Freight contracts: **242 passed**
+- Successful post-test gates retained:
+  - rights + rights-evidence gates;
   - deployment-security evidence validation;
   - canonical Freight gap gate;
   - Data Readiness fixture;
   - current Netlify customer-data route remains **BLOCKED**;
-  - deterministic Pilot Launch Brief generation;
-  - deterministic buyer-safe Pilot Activation Packet generation;
-  - deterministic prelaunch Pilot Charter generation;
-  - accepted Pilot Amendment generation;
-  - authoritative Engagement State resolution to `SUSPENDED_PENDING_REPLACEMENT`;
-  - audit/report/settlement processing flags remain false while replacement is pending;
+  - Launch Brief, Activation Packet, Charter, Amendment and Engagement State controls;
   - separate-environment evidence remains **CONDITIONAL** until verified;
   - full synthetic commercial rehearsal;
   - deterministic release provenance + component inventory;
-  - CycloneDX SBOM generation/verification;
-  - unsigned DSSE attestation generation/verification;
-  - deterministic zero-customer-data diligence ZIP generation/verification.
+  - CycloneDX SBOM, unsigned DSSE attestation and diligence ZIP generation/verification.
 
-### Additional reliability fix
-The same PR exposed and fixed a real persistent-audit concurrency defect:
-- concurrent `AuditStore` constructors previously could race on `PRAGMA journal_mode=WAL` and raise `database is locked`;
-- initialization is now lock-aware/retried with exponential backoff;
-- append serialization/hash-chain semantics remain unchanged;
-- the existing concurrent monotonic-chain test now passes in the full suite.
+### External action authorization guarantees
+The v15.14 tests additionally prove:
+- authorization requires an `ACTIVE` engagement and the operative Charter;
+- selected findings must be positive `VALIDATED` findings with buyer review `CONFIRMED`;
+- approver role must match the Charter's buyer action approver;
+- authorization binds the exact carrier, recipient/routing SHA-256, payload SHA-256,
+  finding set/proof hashes, currency and dollar cap;
+- authorization cannot exceed the selected validated dollars;
+- validity is bounded and future/expired/revoked authorizations fail closed;
+- revocation is hash-bound and approver-role bound;
+- execution guard rejects any change in action type, target, recipient, payload,
+  finding set, currency or requested amount;
+- money movement, settlement acceptance, account changes, credential use, general
+  carrier/vendor contact and automatic execution remain explicitly false.
 
 ### Technology Intelligence System
 - v15.8 governance run retained: `35528127720`
@@ -82,6 +83,8 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/pilot_amendment.py`
 - `freight/ENGAGEMENT_STATE.md`
 - `freight/engagement_state.py`
+- `freight/EXTERNAL_ACTION_AUTHORIZATION.md`
+- `freight/external_action_authorization.py`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
@@ -353,7 +356,7 @@ authorized by the resolver.
 
 ## Commercial state
 
-Freight Recovery v15.13 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, buyer-handoff-ready through a deterministic activation packet, scope-frozen through a machine-checkable Pilot Charter, protected against post-Charter scope drift through fail-closed Pilot Amendment control, and able to derive one authoritative downstream execution state from immutable engagement history; EXP-001 remains externally unproven**.
+Freight Recovery v15.14 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, buyer-handoff-ready through a deterministic activation packet, scope-frozen through a machine-checkable Pilot Charter, protected against post-Charter scope drift, able to derive one authoritative downstream execution state, and able to represent a narrow revocable buyer-approved external action without granting automatic execution or money-movement authority; EXP-001 remains externally unproven**.
 
 Structured external Freight evidence remains:
 - directly evidenced Freight revenue: **$0**
@@ -361,7 +364,7 @@ Structured external Freight evidence remains:
 - paid diagnostic/pilot/annual conversion: **none recorded**
 - Freight `ACTIVE_SEARCH` gaps: **0**
 
-No v15.13 internal engineering result changes those external facts.
+No v15.14 internal engineering result changes those external facts.
 
 ## Current internal proof boundary
 
