@@ -1,8 +1,8 @@
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import pytest
 
-from freight.contracts import PopulationRow, freeze_population
+from freight.contracts import PopulationRow, canonical_hash, freeze_population
 from freight.finding_factory import FIXED, ChargeRule, InvoiceCharge, derive_batch
 from freight.review_packet import build_review_packet
 from freight.review_queue import build_review_queue
@@ -115,3 +115,26 @@ def test_case_hash_order_is_preserved_from_review_packet():
     )
     assert routing.buyer_review_case_hashes == expected_buyer
     assert routing.remediation_case_hashes == expected_remediation
+
+
+def test_recomputed_outer_packet_hash_cannot_hide_tampered_case_route():
+    packet = setup()
+    first = packet.cases[0]
+    tampered_case = replace(first, action_hint="ADD_APPLICABLE_RULE")
+    tampered_cases = (tampered_case,) + packet.cases[1:]
+    packet_body = {
+        "schema": 1,
+        "buyer_id": packet.buyer_id,
+        "business_unit": packet.business_unit,
+        "factory_hash": packet.factory_hash,
+        "queue_hash": packet.queue_hash,
+        "truth_hash": packet.truth_hash,
+        "cases": [asdict(case) for case in tampered_cases],
+    }
+    tampered_packet = replace(
+        packet,
+        cases=tampered_cases,
+        packet_hash=canonical_hash(packet_body),
+    )
+    with pytest.raises(ValueError, match="case hash mismatch"):
+        route_review_packet(tampered_packet)
