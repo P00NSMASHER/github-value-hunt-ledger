@@ -25,6 +25,14 @@ from freight.carrier_action_execution import (
     record_carrier_action_delivery_confirmation,
     record_carrier_action_execution,
 )
+from freight.carrier_action_execution_store import (
+    DELIVERY_RECORDED,
+    DELIVERED,
+    RECORDED,
+    RESERVED,
+    SUBMITTED,
+    CarrierActionExecutionStore,
+)
 from freight.carrier_action_payload import (
     authorize_carrier_action_payload,
     build_carrier_action_payload,
@@ -350,6 +358,37 @@ def run_rehearsal() -> dict:
         "return-1,e-1,USD,500,2026-09-22T10:00:00Z,BANK-RETURN\n"
     ).encode("utf-8")
     with tempfile.TemporaryDirectory() as td:
+        execution_store = CarrierActionExecutionStore(
+            Path(td) / "carrier-execution.sqlite3",
+            buyer_id=BUYER,
+            business_unit=BU,
+        )
+        execution_store_initial_snapshot = execution_store.snapshot_hash()
+        execution_reservation = execution_store.reserve_send_attempt(
+            execution_intent,
+            attempt_id="synthetic-send-attempt-1",
+            started_at="2026-09-21T08:00:30Z",
+        )
+        assert execution_reservation.status == RESERVED
+        execution_store_reserved_snapshot = execution_store.snapshot_hash()
+        execution_persist_status = execution_store.record_execution_receipt(
+            attempt_id="synthetic-send-attempt-1",
+            receipt=execution_receipt,
+        )
+        assert execution_persist_status == RECORDED
+        execution_submitted_state = execution_store.execution_state(
+            execution_intent.execution_key
+        )
+        assert execution_submitted_state.state == SUBMITTED
+        execution_delivery_status = execution_store.record_delivery_receipt(
+            delivery_receipt
+        )
+        assert execution_delivery_status == DELIVERY_RECORDED
+        execution_delivered_state = execution_store.execution_state(
+            execution_intent.execution_key
+        )
+        assert execution_delivered_state.state == DELIVERED
+
         audit_bundle_path = Path(td) / "synthetic-audit-result.zip"
         audit_bundle_receipt = build_audit_result_bundle(workflow, audit_bundle_path)
         verify_audit_result_bundle(workflow, audit_bundle_path)
@@ -477,6 +516,14 @@ def run_rehearsal() -> dict:
         "carrier_action_delivery_receipt_hash": delivery_receipt.delivery_receipt_hash,
         "carrier_action_async_delivery_confirmed": delivery_receipt.delivery_confirmed,
         "carrier_action_delivered_at": delivery_receipt.delivered_at,
+        "carrier_execution_store_reservation_status": execution_reservation.status,
+        "carrier_execution_store_receipt_status": execution_persist_status,
+        "carrier_execution_store_delivery_status": execution_delivery_status,
+        "carrier_execution_store_submitted_state": execution_submitted_state.state,
+        "carrier_execution_store_final_state": execution_delivered_state.state,
+        "carrier_execution_store_initial_snapshot": execution_store_initial_snapshot,
+        "carrier_execution_store_reserved_snapshot": execution_store_reserved_snapshot,
+        "carrier_execution_store_final_snapshot": execution_delivered_state.snapshot_hash,
         "recovery_claim_already_present_count": claim_persistence.already_present_count,
         "settlement_csv_adapter_hash": settlement_lifecycle.settlement_adapter_hash,
         "settlement_csv_file_sha256": settlement_lifecycle.settlement_file_sha256,
