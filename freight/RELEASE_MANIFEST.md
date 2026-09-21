@@ -1,24 +1,24 @@
-# Freight Recovery v15.12 — Canonical Release Manifest
+# Freight Recovery v15.13 — Canonical Release Manifest
 
-Release checkpoint: **v15.12-pilot-amendment-change-control-2026-09-20**
+Release checkpoint: **v15.13-engagement-state-resolution-2026-09-21**
 
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
-- Canonical v15.12 product merge commit: `541e67eee55a897efc52cdd51b5e4699b07ad987`
-- Pilot Amendment pull request: **#57**
-- v15.12 tested branch head: `2ab2e2cd80a0657df17310aa40c3cd4b59b327c6`
-- Earlier Freight lineage retained from v15–v15.11.
-- This checkpoint is rebased conceptually onto later repository work by branching from current `main`; unrelated hunter/integrator changes are preserved.
+- Canonical v15.13 product merge commit: `28bc3f657ffe5d48fd88a5248dfcabcbd410ddd8`
+- Engagement State Resolver pull request: **#63**
+- v15.13 tested branch head: `075786854eb1242c56a3bf5eab4f380ab0810bf4`
+- Earlier Freight lineage retained from v15–v15.12.
+- This checkpoint is based on the current post-merge `main`, preserving unrelated concurrent product/research work.
 
 ## Verified CI checkpoints
 
-### Freight Commercial Contracts — v15.12
-- PR #57 final run: `35544056352`
+### Freight Commercial Contracts — v15.13
+- PR #63 final run: `35549203058`
 - Result: **success**
 - Verified test counts:
   - hunter/model contracts: **18 passed**
-  - Freight contracts: **222 passed**
+  - Freight contracts: **231 passed**
 - Successful post-test gates included:
   - controlled-pilot rights + rights-evidence gates;
   - deployment-security evidence validation;
@@ -28,14 +28,22 @@ Release checkpoint: **v15.12-pilot-amendment-change-control-2026-09-20**
   - deterministic Pilot Launch Brief generation;
   - deterministic buyer-safe Pilot Activation Packet generation;
   - deterministic prelaunch Pilot Charter generation;
-  - accepted Pilot Amendment generation with `kickoff_suspended=true`;
-  - amendment output preserves `customer_data_authorized=false` and `external_action_authorized=false` until replacement;
+  - accepted Pilot Amendment generation;
+  - authoritative Engagement State resolution to `SUSPENDED_PENDING_REPLACEMENT`;
+  - audit/report/settlement processing flags remain false while replacement is pending;
   - separate-environment evidence remains **CONDITIONAL** until verified;
   - full synthetic commercial rehearsal;
   - deterministic release provenance + component inventory;
   - CycloneDX SBOM generation/verification;
   - unsigned DSSE attestation generation/verification;
   - deterministic zero-customer-data diligence ZIP generation/verification.
+
+### Additional reliability fix
+The same PR exposed and fixed a real persistent-audit concurrency defect:
+- concurrent `AuditStore` constructors previously could race on `PRAGMA journal_mode=WAL` and raise `database is locked`;
+- initialization is now lock-aware/retried with exponential backoff;
+- append serialization/hash-chain semantics remain unchanged;
+- the existing concurrent monotonic-chain test now passes in the full suite.
 
 ### Technology Intelligence System
 - v15.8 governance run retained: `35528127720`
@@ -72,6 +80,8 @@ This reduces the chance that the research system's own supply chain or token sco
 - `freight/pilot_charter.py`
 - `freight/PILOT_AMENDMENT.md`
 - `freight/pilot_amendment.py`
+- `freight/ENGAGEMENT_STATE.md`
+- `freight/engagement_state.py`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/PILOT_DATA_ROOM.md`
@@ -304,9 +314,46 @@ The amendment layer never authorizes carrier/vendor contact, disputes or
 money-moving action. `external_action_authorized` remains false and separate
 buyer approval is still required.
 
+## Engagement state resolution
+
+v15.13 adds an authoritative read-only resolver over immutable Charter/Amendment
+history.
+
+The resolver:
+- verifies every Charter and Amendment SHA-256 before use;
+- requires all replacement Charters to stay within the same engagement,
+  buyer and business unit;
+- rejects duplicate Charter/Amendment hashes;
+- rejects multiple Amendments against the same base Charter;
+- rejects dangling replacement hashes and replacement cycles;
+- resolves superseded chains deterministically to the latest verified
+  replacement Charter;
+- distinguishes pending amendment requests from accepted-but-unreplaced changes;
+- emits a deterministic resolution hash and resolution path.
+
+Execution states:
+- `PRELAUNCH`;
+- `ACTIVE`;
+- `PRELAUNCH_WITH_PENDING_AMENDMENT`;
+- `ACTIVE_WITH_PENDING_AMENDMENT`;
+- `SUSPENDED_PENDING_REPLACEMENT`.
+
+When an amendment is accepted but no validated replacement exists, the resolver
+sets:
+- `customer_data_authorized=false`;
+- `audit_processing_allowed=false`;
+- `report_generation_allowed=false`;
+- `settlement_processing_allowed=false`.
+
+Historical superseded Amendments stay visible in `resolution_path` but do not
+masquerade as currently pending/blocking amendments.
+
+External carrier/vendor action remains separately buyer-approved and is never
+authorized by the resolver.
+
 ## Commercial state
 
-Freight Recovery v15.12 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, buyer-handoff-ready through a deterministic activation packet, scope-frozen through a machine-checkable Pilot Charter, and protected against post-Charter scope drift through fail-closed Pilot Amendment control; EXP-001 remains externally unproven**.
+Freight Recovery v15.13 is **commercially specified, machine-gated, internally rehearsed, settlement-persistence hardened, deployment-aware, deterministic-diligence packaged, rights-evidence gated, incident-response documented, research-CI supply-chain hardened, operator-actionable through a deterministic launch-remediation brief, buyer-handoff-ready through a deterministic activation packet, scope-frozen through a machine-checkable Pilot Charter, protected against post-Charter scope drift through fail-closed Pilot Amendment control, and able to derive one authoritative downstream execution state from immutable engagement history; EXP-001 remains externally unproven**.
 
 Structured external Freight evidence remains:
 - directly evidenced Freight revenue: **$0**
@@ -314,7 +361,7 @@ Structured external Freight evidence remains:
 - paid diagnostic/pilot/annual conversion: **none recorded**
 - Freight `ACTIVE_SEARCH` gaps: **0**
 
-No v15.12 internal engineering result changes those external facts.
+No v15.13 internal engineering result changes those external facts.
 
 ## Current internal proof boundary
 
