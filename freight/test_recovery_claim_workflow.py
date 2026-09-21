@@ -12,8 +12,10 @@ from freight.pilot_reporting import ReviewDisposition
 from freight.recovery_claim_workflow import (
     RecoveryClaimBatchState,
     build_recovery_claim_batch,
+    persist_recovery_claim_batch,
     render_recovery_claim_batch_markdown,
 )
+from freight.settlement_store import SettlementStore
 
 
 INVOICE_HEADER = "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,charge_code,service_date,quantity_units,billed_cents\n"
@@ -185,3 +187,75 @@ def test_renderer_states_fee_and_settlement_boundaries():
     assert "Recovery Claim Batch" in text
     assert "fee-disqualified automatically" in text
     assert "does not prove settlement" in text
+
+
+def test_atomic_persistence_receipt_creates_all_then_replays_idempotently(tmp_path):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    store = SettlementStore(
+        tmp_path / "claims.sqlite3",
+        buyer_id=batch.buyer_id,
+        business_unit=batch.business_unit,
+    )
+    first = persist_recovery_claim_batch(store, batch)
+    assert first.attempted_claim_count == 2
+    assert first.created_claim_count == 2
+    assert first.already_present_count == 0
+    assert store.count("recovery_claims") == 2
+    assert len(first.receipt_hash) == 64
+
+    replay = persist_recovery_claim_batch(store, batch)
+    assert replay.attempted_claim_count == 2
+    assert replay.created_claim_count == 0
+    assert replay.already_present_count == 2
+    assert replay.claim_ids == first.claim_ids
+    assert store.count("recovery_claims") == 2
+
+
+def test_persistence_rejects_wrong_store_scope(tmp_path):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    store = SettlementStore(
+        tmp_path / "wrong.sqlite3",
+        buyer_id="other",
+        business_unit=batch.business_unit,
+    )
+    with pytest.raises(ValueError, match="scope mismatch"):
+        persist_recovery_claim_batch(store, batch)
+    assert store.count("recovery_claims") == 0
+
+
+def test_persistence_rejects_tampered_claim_before_writing(tmp_path):
+    artifacts, review, incumbent = setup()
+    batch = build_recovery_claim_batch(
+        truth=artifacts.factory.truth,
+        incumbent=incumbent,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        buyer_review=review,
+        issued_at="2026-09-21T10:00:00Z",
+    )
+    tampered_claim = replace(batch.claims[0], amount_cents=1)
+    bad = replace(batch, claims=(tampered_claim,) + batch.claims[1:])
+    store = SettlementStore(
+        tmp_path / "tampered.sqlite3",
+        buyer_id=batch.buyer_id,
+        business_unit=batch.business_unit,
+    )
+    with pytest.raises(ValueError, match="does not match persisted claim"):
+        persist_recovery_claim_batch(store, bad)
+    assert store.count("recovery_claims") == 0
