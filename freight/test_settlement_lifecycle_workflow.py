@@ -272,3 +272,41 @@ def test_scope_is_always_taken_from_bound_store(tmp_path):
     )
     assert result.buyer_id=="buyer"
     assert result.business_unit=="unit"
+
+
+def test_processed_at_cannot_predate_incoming_settlement_before_any_write(tmp_path):
+    s=store(tmp_path)
+    s.create_claim(claim("c1","INV-1",2500,"claim-1"))
+    with pytest.raises(ValueError,match="processed_at cannot predate settlement booking"):
+        process_settlement_evidence(
+            s,
+            processed_at="2026-09-21T09:59:59Z",
+            settlement_filename="settlements.csv",
+            settlement_data=settlement_bytes(
+                "e1,INV-1,carrier,customer,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+            ),
+        )
+    assert s.count("settlement_events")==0
+    assert s.count("allocations")==0
+
+
+def test_processed_at_cannot_predate_counter_before_any_package_write(tmp_path):
+    s=store(tmp_path)
+    s.create_claim(claim("c1","INV-1",2500,"claim-1"))
+    with pytest.raises(ValueError,match="processed_at cannot predate counter observation"):
+        process_settlement_evidence(
+            s,
+            processed_at="2026-09-22T09:59:59Z",
+            settlement_filename="settlements.csv",
+            settlement_data=settlement_bytes(
+                "e1,INV-1,carrier,customer,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+            ),
+            counter_filename="returns.csv",
+            counter_data=counter_bytes(
+                "r1,e1,USD,2500,2026-09-22T10:00:00Z,BANK-RETURN\n"
+            ),
+        )
+    assert s.count("settlement_events")==0
+    assert s.count("counter_events")==0
+    assert s.count("allocations")==0
+    assert s.count("reversal_edges")==0
