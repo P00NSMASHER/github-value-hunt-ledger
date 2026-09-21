@@ -46,6 +46,8 @@ class ExecutionOutcome(str, Enum):
 @dataclass(frozen=True)
 class CarrierActionExecutionIntent:
     execution_key: str
+    buyer_id: str
+    business_unit: str
     authorization_id: str
     authorization_hash: str
     proposal_hash: str
@@ -77,6 +79,8 @@ class CarrierActionExecutionEvidence:
 @dataclass(frozen=True)
 class CarrierActionExecutionReceipt:
     execution_key: str
+    buyer_id: str
+    business_unit: str
     intent_hash: str
     authorization_id: str
     authorization_hash: str
@@ -138,6 +142,10 @@ def _verify_authorization_payload_scope(
     if authorization.authorization_hash is None:
         raise ValueError("authorization hash is required")
     _sha("authorization_hash", authorization.authorization_hash)
+    if (authorization.buyer_id, authorization.business_unit) != (
+        proposal.buyer_id, proposal.business_unit,
+    ):
+        raise ValueError("authorization scope mismatch with carrier action proposal")
     if authorization.action_payload_hash != payload.payload_hash:
         raise ValueError("authorization payload hash mismatch")
     if authorization.action_type != payload.action_type:
@@ -193,6 +201,8 @@ def build_carrier_action_execution_intent(
 
     execution_key_body = {
         "schema": 1,
+        "buyer_id": authorization.buyer_id,
+        "business_unit": authorization.business_unit,
         "authorization_hash": authorization.authorization_hash,
         "proposal_hash": proposal.proposal_hash,
         "payload_hash": payload.payload_hash,
@@ -208,6 +218,8 @@ def build_carrier_action_execution_intent(
     body = {
         "schema": 1,
         "execution_key": execution_key,
+        "buyer_id": authorization.buyer_id,
+        "business_unit": authorization.business_unit,
         "authorization_id": authorization.authorization_id,
         "authorization_hash": authorization.authorization_hash,
         "proposal_hash": proposal.proposal_hash,
@@ -225,6 +237,8 @@ def build_carrier_action_execution_intent(
     }
     return CarrierActionExecutionIntent(
         execution_key=execution_key,
+        buyer_id=authorization.buyer_id,
+        business_unit=authorization.business_unit,
         authorization_id=authorization.authorization_id,
         authorization_hash=authorization.authorization_hash,
         proposal_hash=proposal.proposal_hash,
@@ -337,6 +351,8 @@ def record_carrier_action_execution(
     body = {
         "schema": 1,
         "execution_key": intent.execution_key,
+        "buyer_id": authorization.buyer_id,
+        "business_unit": authorization.business_unit,
         "intent_hash": intent.intent_hash,
         "authorization_id": authorization.authorization_id,
         "authorization_hash": authorization.authorization_hash,
@@ -361,6 +377,8 @@ def record_carrier_action_execution(
     }
     return CarrierActionExecutionReceipt(
         execution_key=intent.execution_key,
+        buyer_id=authorization.buyer_id,
+        business_unit=authorization.business_unit,
         intent_hash=intent.intent_hash,
         authorization_id=authorization.authorization_id,
         authorization_hash=authorization.authorization_hash,
@@ -400,6 +418,8 @@ def verify_carrier_action_execution_receipt(
     _sha("external_reference_hash", receipt.external_reference_hash)
     _sha("evidence_source_hash", receipt.evidence_source_hash)
     _sha("receipt_hash", receipt.receipt_hash)
+    _text("buyer_id", receipt.buyer_id)
+    _text("business_unit", receipt.business_unit)
     _text("authorization_id", receipt.authorization_id)
     _text("target_carrier_id", receipt.target_carrier_id)
     _text("target_customer_id", receipt.target_customer_id)
@@ -452,6 +472,7 @@ def render_execution_intent_markdown(intent: CarrierActionExecutionIntent) -> st
         "# Freight Recovery — Carrier Action Execution Intent",
         "",
         f"- Action: **{intent.action_type}**",
+        f"- Buyer / business unit: **{intent.buyer_id} / {intent.business_unit}**",
         f"- Carrier / customer: **{intent.target_carrier_id} / {intent.target_customer_id}**",
         f"- Amount: **{intent.currency} {intent.requested_cents / 100:,.2f}**",
         f"- Prepared at: **{intent.prepared_at}**",
@@ -476,6 +497,7 @@ def render_execution_receipt_markdown(receipt: CarrierActionExecutionReceipt) ->
         "# Freight Recovery — Carrier Action Execution Receipt",
         "",
         f"- Outcome: **{receipt.outcome}**",
+        f"- Buyer / business unit: **{receipt.buyer_id} / {receipt.business_unit}**",
         f"- Channel: **{receipt.channel}**",
         f"- Executed at: **{receipt.executed_at}**",
         f"- Action submitted: **{'yes' if receipt.action_submitted else 'no'}**",
