@@ -43,6 +43,11 @@ def build_execution_state(write=True, now=None):
     dispatch_policy=json.loads((INTEL/"dispatch_policy.json").read_text(encoding="utf-8")) if (INTEL/"dispatch_policy.json").exists() else {}
     dispatch_history=load_jsonl("dispatch_ticket_history.jsonl") if (INTEL/"dispatch_ticket_history.jsonl").exists() else []
     dispatch_by_id={x.get("dispatch_ticket_id"):x for x in dispatch_history if x.get("dispatch_ticket_id")}
+    activation_policy=json.loads((INTEL/"activation_policy.json").read_text(encoding="utf-8")) if (INTEL/"activation_policy.json").exists() else {}
+    activation_history=load_jsonl("activation_history.jsonl") if (INTEL/"activation_history.jsonl").exists() else []
+    activation_by_id={x.get("activation_id"):x for x in activation_history if x.get("activation_id")}
+    min_v16_claim_schema=int(activation_policy.get("minimum_claim_schema_version",16))
+    activation_legacy_claim_ids=set(activation_policy.get("legacy_claim_ids") or [])
     legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
     min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
     min_v15_claim_schema=int(dispatch_policy.get("minimum_v15_claim_schema_version",15))
@@ -158,7 +163,11 @@ def build_execution_state(write=True, now=None):
                 claim_ids_seen.add(cid)
                 claim_schema=int(e.get("claim_schema_version") or 0)
                 is_legacy_claim=cid in legacy_claim_ids and claim_schema<min_claim_schema
+                is_pre_v16_claim=cid in activation_legacy_claim_ids
                 if not is_legacy_claim:
+                    if activation_policy and not is_pre_v16_claim and claim_schema<min_v16_claim_schema:
+                        errors.append(f"{loc}: new CLAIM requires claim_schema_version >= {min_v16_claim_schema}")
+                        continue
                     if claim_schema<min_claim_schema:
                         errors.append(f"{loc}: new CLAIM requires claim_schema_version >= {min_claim_schema}")
                         continue
@@ -213,6 +222,29 @@ def build_execution_state(write=True, now=None):
                             if hard and ts>hard:
                                 errors.append(f"{loc}: generated CLAIM after dispatch hard expiry")
                                 continue
+                        if activation_policy and not is_pre_v16_claim and claim_schema>=min_v16_claim_schema:
+                            aid=e.get("activation_id")
+                            act=activation_by_id.get(aid)
+                            if not act:
+                                errors.append(f"{loc}: generated CLAIM missing V16 activation {aid}")
+                                continue
+                            expected_activation={
+                              "worker_id":e.get("worker_id"),
+                              "slot_id":slot,
+                              "dispatch_ticket_id":e.get("dispatch_ticket_id"),
+                              "dispatch_generation_id":e.get("dispatch_generation_id"),
+                              "presence_generation_id":e.get("presence_generation_id"),
+                              "presence_event_id":e.get("presence_event_id"),
+                              "activation_generation_id":e.get("activation_generation_id")
+                            }
+                            adrift=[k for k,v in expected_activation.items() if act.get(k)!=v]
+                            if adrift:
+                                errors.append(f"{loc}: V16 activation binding mismatch: {','.join(adrift)}")
+                                continue
+                            aexp=parse_ts(act.get("expires_at")) if act.get("expires_at") else None
+                            if aexp and ts>aexp:
+                                errors.append(f"{loc}: generated CLAIM after V16 activation expiry")
+                                continue
                     elif mode=="manual_override":
                         if not str(e.get("route_override_reason") or "").strip():
                             errors.append(f"{loc}: manual_override CLAIM requires route_override_reason")
@@ -254,6 +286,10 @@ def build_execution_state(write=True, now=None):
                   "dispatch_generation_id":e.get("dispatch_generation_id"),
                   "dispatch_kind":e.get("dispatch_kind"),
                   "parent_dispatch_ticket_id":e.get("parent_dispatch_ticket_id"),
+                  "presence_generation_id":e.get("presence_generation_id"),
+                  "presence_event_id":e.get("presence_event_id"),
+                  "activation_id":e.get("activation_id"),
+                  "activation_generation_id":e.get("activation_generation_id"),
                   "route_override_reason":e.get("route_override_reason"),
                   "claimed_at":fmt_ts(ts),
                   "lease_expires_at":fmt_ts(expiry),

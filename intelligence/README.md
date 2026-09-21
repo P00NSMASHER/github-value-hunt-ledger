@@ -628,3 +628,39 @@ Work stealing is conservative:
 Schema-v15 generated runs record `dispatch_kind: primary | work_steal`. Work-steal runs also record `dispatch_parent_ticket_id`.
 
 V13 deliberately excludes work-steal runs from primary-route specialization learning. Worker response timing is measured separately so slow/unclaimed routing can be improved without pretending the backup worker proves the original route was good or bad.
+
+
+## V16 worker presence and pull activation
+
+V16 separates **routing** from **worker availability**. A registered/routed hunter is not assumed to be awake, connected or ready to claim work.
+
+Presence is append-only under `intelligence/worker_presence_events/`:
+- `READY` — willing to accept one generated assignment;
+- `HEARTBEAT` — extend a READY lease;
+- `BUSY` — temporarily unavailable outside V11 execution;
+- `PAUSE` — explicit pause;
+- `OFFLINE` — explicit shutdown.
+
+No presence event means `UNKNOWN`, not slow or low-quality.
+
+Generated products:
+- `worker_presence_state.jsonl` / `WORKER_PRESENCE.md`;
+- `worker_presence_history.jsonl`;
+- `worker_presence_metrics.json`;
+- `activation_directives.jsonl`;
+- `activation_claim_packets.jsonl`;
+- `activation_history.jsonl`;
+- `activation_metrics.json`;
+- `ACTIVATION_BOARD.md`.
+
+Pull activation rules:
+- only `READY_FRESH` workers receive generated activation packets;
+- one worker receives at most one activation and one slot at most one activation;
+- activation expiry is the earliest of presence expiry, dispatch hard expiry and the 30-minute activation TTL;
+- activation never auto-claims work;
+- schema-v16 generated claims must match the exact activation + presence provenance;
+- manual overrides remain explicit and do not require generated activation.
+
+This prevents V15 from misclassifying an offline/unobserved worker as a slow claimant. Claim latency begins only after the worker has actually advertised fresh readiness and received a valid activation.
+
+Helper: `python tools/ti_worker_presence_event.py READY --worker HUNTER-XX`.

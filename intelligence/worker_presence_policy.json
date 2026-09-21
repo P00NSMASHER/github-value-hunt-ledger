@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "ready_ttl_minutes": 70,
+  "heartbeat_ttl_minutes": 70,
+  "max_ttl_minutes": 180,
+  "activation_ttl_minutes": 30,
+  "clock": "git_commit_time",
+  "event_types": [
+    "READY",
+    "HEARTBEAT",
+    "BUSY",
+    "PAUSE",
+    "OFFLINE"
+  ],
+  "ready_states": [
+    "READY_FRESH"
+  ],
+  "claimable_presence_states": [
+    "READY_FRESH"
+  ],
+  "guardrails": [
+    "Absence of a presence event means UNKNOWN, not slow or unhealthy.",
+    "Presence is a capacity signal, not a worker-quality score.",
+    "An active V11 execution claim overrides presence and yields ACTIVE_CLAIM.",
+    "READY and HEARTBEAT leases expire automatically; stale presence cannot authorize a generated claim.",
+    "PAUSE and OFFLINE remain explicit until a later READY event.",
+    "V16 activation never auto-claims work.",
+    "Manual claim overrides remain possible through existing execution override paths and must stay explicit."
+  ]
+}

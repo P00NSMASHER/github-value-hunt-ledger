@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V16 Derived Worker Presence State",
+  "type": "object",
+  "required": [
+    "worker_id",
+    "presence_state",
+    "event_count",
+    "presence_generation_id"
+  ],
+  "properties": {
+    "worker_id": {
+      "type": "string"
+    },
+    "presence_state": {
+      "enum": [
+        "UNKNOWN",
+        "READY_FRESH",
+        "READY_STALE",
+        "BUSY_DECLARED",
+        "PAUSED",
+        "OFFLINE",
+        "ACTIVE_CLAIM"
+      ]
+    },
+    "latest_event_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "latest_event_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "latest_event_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "presence_expires_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "active_claim_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "active_slot_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "event_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "presence_generation_id": {
+      "type": "string",
+      "pattern": "^PRESENCEGEN:[a-f0-9]{12}$"
+    }
+  },
+  "additionalProperties": true
+}
