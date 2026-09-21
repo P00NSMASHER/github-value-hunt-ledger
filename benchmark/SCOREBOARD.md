@@ -8,7 +8,7 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 ## Pair summary
 | Pair | Tasks | Control completed | Experiment completed | Matched tasks scored | Control matched mean /25 | Experiment matched mean /25 | Control false promotions | Experiment false promotions | Winner so far |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| 1 | 01-08 | 8 | 0 | 0 | — | — | 0 | 0 | — |
+| 1 | 01-08 | 8 | 1 | 1 | 25.00 | 24.00 | 0 | 0 | Control |
 | 2 | 09-15 | 7 | 7 | 7 | 24.71 | 25.00 | 0 | 0 | Experiment |
 | 3 | 16-22 | 7 | 7 | 7 | 23.57 | 24.71 | 0 | 0 | Experiment |
 | 4 | 23-29 | 7 | 7 | 7 | 24.86 | 24.57 | 0 | 0 | Control |
@@ -17,16 +17,16 @@ Scoring dimensions are each 0-5: Target Discovery (TD), Technical Verification (
 | 7 | 44-50 | 7 | 7 | 7 | 24.71 | 24.86 | 0 | 0 | Experiment |
 
 ## Experiment-wide matched metrics
-- Matched tasks scored: **42** — 09 through 50 inclusive.
-- Control matched mean: **24.57/25**.
-- Experiment matched mean: **24.69/25**.
-- Mean paired difference (Experiment - Control): **+0.12**.
+- Matched tasks scored: **43** — Task 01 plus 09 through 50 inclusive; Tasks 02-08 remain unmatched.
+- Control matched mean: **24.58/25**.
+- Experiment matched mean: **24.67/25**.
+- Mean paired difference (Experiment - Control): **+0.09**.
 - Median paired difference: **0.0**.
-- Pairwise task win / tie / loss for Experiment: **8 / 29 / 5**.
+- Pairwise task win / tie / loss for Experiment: **8 / 29 / 6**.
 - False promotions: **0 Control / 0 Experiment** among scored results.
-- No-find results: **0 Control / 1 Experiment** among scored results. Experiment Task 43 remains the scored false-negative/no-find; with Control Task 43 now complete at 25/25, that miss becomes a direct paired 25-vs-19 loss rather than an unmatched warning.
-- Approximate search effort per validated STRONG result remains **Control ~10-11 reported search/deep-inspection units; Experiment ~12-13**. This is directional because result files mix query counts, candidate triage counts, specialist passes and deep inspections. The Experiment condition still pays extra verification cost and Task 43 remains its clearest recall failure.
-- Learning slope is **mixed / score-ceiling limited with one material recall penalty**. Pair 2 is 25→25→25→25→25→25→25; Pair 3 is 24→25→25→25→24→25→25; Pair 4 is 23→25→24→25→25→25→25; Pair 5 is 25→25→24→25→25→25→25; Pair 6 is 25→25→25→25→25→25→19; Pair 7 is 24→25→25→25→25→25→25. Task 22 reinforces good evaluator/target calibration, but the newly matched Task 43 cuts the Experiment mean advantage materially. The architecture is learning useful methods, yet stricter gates can over-constrain discovery and hurt recall.
+- No-find results: **0 Control / 1 Experiment** among scored results. Experiment Task 43 remains the scored false-negative/no-find; Task 01 adds a calibration loss rather than a no-find because the exact target was discovered and deeply verified.
+- Approximate search effort per validated STRONG result remains **Control ~10-11 reported search/deep-inspection units; Experiment ~12-13**. This is directional because result files mix query counts, candidate triage counts, specialist passes and deep inspections. The Experiment condition still pays extra verification cost; Task 43 remains its clearest recall failure, while Task 01 shows a separate over-conservative calibration cost.
+- Learning slope is **mixed / score-ceiling limited with recall and calibration penalties**. Pair 1 currently begins at 24 with only one Experiment task, so no within-pair slope can yet be inferred. Pair 2 is 25→25→25→25→25→25→25; Pair 3 is 24→25→25→25→24→25→25; Pair 4 is 23→25→24→25→25→25→25; Pair 5 is 25→25→24→25→25→25→25; Pair 6 is 25→25→25→25→25→25→19; Pair 7 is 24→25→25→25→25→25→25. The architecture is learning useful methods, yet stricter gates can over-constrain discovery or calibration.
 
 ## Scored task details
 Scores preserve prior scored results and add newly completed unscored results observed in integration runs.
@@ -34,6 +34,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 | Task | Condition | Score | TD/TV/CAL/CR/ED | Candidate | False promotion | No-find | Concise justification |
 |---:|---|---:|---|---|---|---|---|
 | 01 | CONTROL | 25 | 5/5/5/5/5 | `kodekinetics79/opstrax-enterprise-build@fec2ba1432d6f8b4ba4c48be3d58e7e096819045` | No | No | Exact target; physical-event truth, fail-closed pricing, evidence freeze, approval-to-charge and failure semantics verified. |
+| 01 | EXPERIMENT | 24 | 5/5/4/5/5 | `kodekinetics79/opstrax-enterprise-build@fec2ba1432d6f8b4ba4c48be3d58e7e096819045` | No | No | Exact target found and deeply source/test/schema/history verified with independent red-team; source-level exit-bound and stale-evidence risks were valuable, but calibration was slightly over-conservative in demoting a benchmark-qualified target to WATCH without executing the planted regression cases. |
 | 02 | CONTROL | 25 | 5/5/5/5/5 | `emoss08/Trenova@3bbd4801978ec069d5a1059dfdf466764a03934f` | No | No | Exact target; dispatch/rates/detention/invoice variance/settlement transitions verified with release limits preserved. |
 | 03 | CONTROL | 25 | 5/5/5/5/5 | `nace-martin/Project-RateEngine@dddd2c2df3d35e857e627e9132fe879821fdd538` | No | No | Demonstrably equivalent rerating target with effective dating, ambiguity rejection, overlap prevention and multiple charge bases. |
 | 04 | CONTROL | 25 | 5/5/5/5/5 | `Shreyas2409/freight-intake@49ee48e383aea202cc5ddf15c500a5b39092d8b7` | No | No | Superior/equivalent extraction target with page-grounded facts, deterministic money arithmetic, review gates and adversarial fixtures; production extraction accuracy bounded. |
@@ -138,7 +139,7 @@ Scores preserve prior scored results and add newly completed unscored results ob
 - **Promoted to SEARCH_SKILLS:** `Authority-origin / invariant-set consistency`, supported independently by Experiment Tasks **46 and 47** and reinforced by Tasks 48-50.
 - **Promoted to SEARCH_SKILLS:** `Rule-period / authority-version audit`, independently supported by Experiment Tasks **49 and 50**.
 - **Promoted to SEARCH_SKILLS:** `Evaluation-Target Independence`, independently supported by Experiment Tasks **21 and 22**; both tasks showed that model-derived/proxy economics must be separated from the business target and independently supported before value claims are upgraded.
-- Not yet separately promoted: Transition-Order + Temporal-Invariant Verification (Task 18 only); Governance-Loop Boundary Verification (Task 19 only); Promotion-Transaction Boundary Verification (Task 20 only); causal baseline→treatment-effect→same-budget economics verification (Task 21 only); Enforcement-Chokepoint + Persisted-Stop Verification (Task 29 only); published-plan replanning invariant quartet (Task 13 only); harness-artifact closed loop (Task 28 only); provenance-adapter intersection (Task 34 only); measurement-semantics fusion intersection (Task 35 only); regulated-vendor installed-system boundary triad (Task 14 only); contract→negative-vector→differential-implementation triangulation (Task 45 only); Value-State Aggregation Audit (Task 47 only); database-boundary bypass check (Task 42 only); opaque-upstream health-contract audit (Task 48 only).
+- Not yet separately promoted: **Bidirectional money/evidence invariant tracing (Task 01 only)**; Transition-Order + Temporal-Invariant Verification (Task 18 only); Governance-Loop Boundary Verification (Task 19 only); Promotion-Transaction Boundary Verification (Task 20 only); causal baseline→treatment-effect→same-budget economics verification (Task 21 only); Enforcement-Chokepoint + Persisted-Stop Verification (Task 29 only); published-plan replanning invariant quartet (Task 13 only); harness-artifact closed loop (Task 28 only); provenance-adapter intersection (Task 34 only); measurement-semantics fusion intersection (Task 35 only); regulated-vendor installed-system boundary triad (Task 14 only); contract→negative-vector→differential-implementation triangulation (Task 45 only); Value-State Aggregation Audit (Task 47 only); database-boundary bypass check (Task 42 only); opaque-upstream health-contract audit (Task 48 only).
 
 ## Experiment-wide conclusion
-Too early for a winner claim. Across **42 matched tasks**, Experiment has only a small mean advantage (**24.69 vs 24.57**), while the **median paired difference is 0** and task outcomes are **8 wins, 29 ties, 5 losses** for Experiment. Neither condition has produced a scored false promotion, but Experiment has **one scored no-find false negative (Task 43)** while Control has none; Task 43 is now a direct 25-vs-19 paired loss and materially shrinks the aggregate mean edge. The experimental architecture continues to generate transferable verification/search methods, including the newly promoted Evaluation-Target Independence skill from Tasks 21 and 22, but it also appears somewhat more expensive. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
+Too early for a winner claim. Across **43 matched tasks**, Experiment has only a small mean advantage (**24.67 vs 24.58**), while the **median paired difference is 0** and task outcomes are **8 wins, 29 ties, 6 losses** for Experiment. Neither condition has produced a scored false promotion, but Experiment has **one scored no-find false negative (Task 43)** while Control has none; Task 01 adds a separate 25-vs-24 calibration loss after finding the correct target but judging it slightly too conservatively. The experimental architecture continues to generate transferable verification/search methods, but it also appears somewhat more expensive and can pay both recall and over-calibration costs. The evidence does **not** justify declaring the Experiment architecture the winner; continue until materially more matched tasks or all 50 tasks complete.
