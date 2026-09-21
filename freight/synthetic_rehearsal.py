@@ -47,14 +47,10 @@ from freight.recovery_claim_workflow import (
 )
 from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
-from freight.settlement_csv_adapter import (
-    parse_counter_event_csv,
-    parse_settlement_event_csv,
-)
+from freight.settlement_lifecycle_workflow import process_settlement_evidence
 from freight.settlement_review_workflow import (
     SettlementReviewDecisionInput,
     apply_settlement_review_decision,
-    build_settlement_review_case,
 )
 from freight.settlement_report import (
     assert_report_current,
@@ -63,7 +59,6 @@ from freight.settlement_report import (
 )
 from freight.settlement_store import (
     ALLOCATED,
-    REVIEW,
     REVERSED,
     SettlementStore,
 )
@@ -337,25 +332,10 @@ def run_rehearsal() -> dict:
         "e-1,inv-1,carrier,cust,USD,2000,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
         "e-2,inv-2,carrier,cust,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
     ).encode("utf-8")
-    settlement_batch = parse_settlement_event_csv(
-        filename="synthetic-settlements.csv",
-        data=settlement_csv,
-        buyer_id=BUYER,
-        business_unit=BU,
-    )
-    settlement_by_id = {event.event_id: event for event in settlement_batch.events}
-
     counter_csv = (
         "counter_id,original_event_id,currency,amount_cents,observed_at,source_kind\n"
         "return-1,e-1,USD,500,2026-09-22T10:00:00Z,BANK-RETURN\n"
     ).encode("utf-8")
-    counter_batch = parse_counter_event_csv(
-        filename="synthetic-returns.csv",
-        data=counter_csv,
-        buyer_id=BUYER,
-        business_unit=BU,
-    )
-
     with tempfile.TemporaryDirectory() as td:
         audit_bundle_path = Path(td) / "synthetic-audit-result.zip"
         audit_bundle_receipt = build_audit_result_bundle(workflow, audit_bundle_path)
@@ -367,14 +347,15 @@ def run_rehearsal() -> dict:
             business_unit=BU,
         )
         claim_persistence = persist_recovery_claim_batch(store, recovery_claims)
-        store.ingest_event(settlement_by_id["e-1"])
-        partial_auto = store.auto_allocate(
-            "e-1", created_at="2026-09-21T10:30:00Z"
+        settlement_lifecycle = process_settlement_evidence(
+            store,
+            processed_at="2026-09-21T10:30:00Z",
+            settlement_filename="synthetic-settlements.csv",
+            settlement_data=settlement_csv,
         )
-        assert partial_auto.status == REVIEW
-        settlement_review_case = build_settlement_review_case(
-            store, event_id="e-1"
-        )
+        assert settlement_lifecycle.state == "REVIEW_REQUIRED"
+        assert len(settlement_lifecycle.settlement_review_cases) == 1
+        settlement_review_case = settlement_lifecycle.settlement_review_cases[0]
         settlement_review_receipt = apply_settlement_review_decision(
             store,
             case=settlement_review_case,
@@ -387,17 +368,17 @@ def run_rehearsal() -> dict:
             ),
         )
         assert settlement_review_receipt.allocation_status == ALLOCATED
-        store.ingest_event(settlement_by_id["e-2"])
-        status = store.auto_allocate(
-            "e-2", created_at="2026-09-21T11:00:00Z"
-        ).status
-        assert status == ALLOCATED
+        assert settlement_lifecycle.settlement_events[1].effective_status == ALLOCATED
 
         before_return = build_persistent_pilot_report(truth, incumbent, store, bindings, reviews)
-        store.ingest_counter(counter_batch.events[0])
-        assert store.auto_apply_counter(
-            "return-1", created_at="2026-09-22T11:00:00Z",
-        ).status == REVERSED
+        counter_lifecycle = process_settlement_evidence(
+            store,
+            processed_at="2026-09-22T11:00:00Z",
+            counter_filename="synthetic-returns.csv",
+            counter_data=counter_csv,
+        )
+        assert counter_lifecycle.state == "COMPLETE"
+        assert counter_lifecycle.counter_events[0].effective_status == REVERSED
         stale_report_rejected = False
         try:
             assert_report_current(before_return, store)
@@ -481,18 +462,24 @@ def run_rehearsal() -> dict:
         "carrier_action_submitted": execution_receipt.action_submitted,
         "carrier_action_delivery_confirmed": execution_receipt.delivery_confirmed,
         "recovery_claim_already_present_count": claim_persistence.already_present_count,
-        "settlement_csv_adapter_hash": settlement_batch.adapter_hash,
-        "settlement_csv_file_sha256": settlement_batch.file_sha256,
-        "settlement_event_count": len(settlement_batch.events),
+        "settlement_csv_adapter_hash": settlement_lifecycle.settlement_adapter_hash,
+        "settlement_csv_file_sha256": settlement_lifecycle.settlement_file_sha256,
+        "settlement_event_count": len(settlement_lifecycle.settlement_events),
+        "settlement_lifecycle_state": settlement_lifecycle.state,
+        "settlement_lifecycle_state_hash": settlement_lifecycle.state_hash,
+        "settlement_lifecycle_execution_hash": settlement_lifecycle.execution_hash,
         "settlement_review_case_hash": settlement_review_case.case_hash,
         "settlement_review_candidate_count": len(settlement_review_case.candidates),
         "settlement_review_hash": settlement_review_receipt.review_hash,
         "settlement_review_receipt_hash": settlement_review_receipt.receipt_hash,
         "settlement_review_allocation_id": settlement_review_receipt.allocation_id,
         "settlement_review_allocation_status": settlement_review_receipt.allocation_status,
-        "counter_csv_adapter_hash": counter_batch.adapter_hash,
-        "counter_csv_file_sha256": counter_batch.file_sha256,
-        "counter_event_count": len(counter_batch.events),
+        "counter_csv_adapter_hash": counter_lifecycle.counter_adapter_hash,
+        "counter_csv_file_sha256": counter_lifecycle.counter_file_sha256,
+        "counter_event_count": len(counter_lifecycle.counter_events),
+        "counter_lifecycle_state": counter_lifecycle.state,
+        "counter_lifecycle_state_hash": counter_lifecycle.state_hash,
+        "counter_lifecycle_execution_hash": counter_lifecycle.execution_hash,
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
