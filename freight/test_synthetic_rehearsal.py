@@ -59,6 +59,16 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert out["carrier_action_delivery_confirmed"] is False
     assert len(out["carrier_action_delivery_receipt_hash"]) == 64
     assert out["carrier_action_async_delivery_confirmed"] is True
+    assert out["carrier_execution_store_reservation_status"] == "RESERVED"
+    assert out["carrier_execution_store_receipt_status"] == "RECORDED"
+    assert out["carrier_execution_store_delivery_status"] == "DELIVERY_RECORDED"
+    assert out["carrier_execution_store_submitted_state"] == "SUBMITTED"
+    assert out["carrier_execution_store_final_state"] == "DELIVERED"
+    assert len({
+        out["carrier_execution_store_initial_snapshot"],
+        out["carrier_execution_store_reserved_snapshot"],
+        out["carrier_execution_store_final_snapshot"],
+    }) == 3
     assert out["carrier_action_delivered_at"] == "2026-09-21T08:05:00.000000Z"
     assert len(out["settlement_csv_adapter_hash"]) == 64
     assert len(out["settlement_csv_file_sha256"]) == 64
