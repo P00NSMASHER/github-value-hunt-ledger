@@ -22,7 +22,10 @@ from freight.contracts import (
 )
 from freight.deal_economics import DealProfile, qualify_deal
 from freight.pilot_reporting import ReviewDisposition
-from freight.recovery_claim_workflow import build_recovery_claim_batch
+from freight.recovery_claim_workflow import (
+    build_recovery_claim_batch,
+    persist_recovery_claim_batch,
+)
 from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_report import (
@@ -207,8 +210,7 @@ def run_rehearsal() -> dict:
             buyer_id=BUYER,
             business_unit=BU,
         )
-        for claim in recovery_claims.claims:
-            store.create_claim(claim)
+        claim_persistence = persist_recovery_claim_batch(store, recovery_claims)
         store.ingest_event(
             SettlementEventRecord(
                 "e-1","inv-1","carrier","cust","USD",2000,
@@ -303,6 +305,9 @@ def run_rehearsal() -> dict:
         "recovery_claim_batch_hash": recovery_claims.batch_hash,
         "recovery_claim_count": recovery_claims.claim_count,
         "recovery_claim_fee_disqualified_count": recovery_claims.fee_disqualified_count,
+        "recovery_claim_persistence_receipt_hash": claim_persistence.receipt_hash,
+        "recovery_claim_persisted_count": claim_persistence.created_claim_count,
+        "recovery_claim_already_present_count": claim_persistence.already_present_count,
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
