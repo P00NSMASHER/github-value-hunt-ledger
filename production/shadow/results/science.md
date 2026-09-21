@@ -1647,3 +1647,120 @@ Evidence count: **1 shadow task**. Keep LOCAL; do not stage or promote to global
 - reproducible untrusted-repository executions: 0;
 - sensitive-source incidents: 0.
 
+## 2026-09-21 — Shadow Science Run 16
+
+### BEST NEW FIND
+**Candidate:** `google/tensorstore@ed9abe0a89ac6631272f4458a90a4f32e6a381f2` — non-distributed OCDBT atomic multi-key publication.
+
+**Classification:** **23/30 — WATCH_COMPONENT / TRANSFER_KERNEL.**
+
+**Independent verifier:** **PASS_WITH_LIMITS — WATCH, not STRONG.**
+
+**Explicit hypothesis:** TensorStore's non-distributed OCDBT transaction path may close the mixed-generation gap exposed by OpenMM and incompletely addressed by NoKV: publish immutable value/B+tree/version objects first, then expose the entire group through one conditional manifest update, with restoration pinned to that committed database generation.
+
+### Discovery modes
+1. **Direct invariant search:** searched scientific checkpoint/storage code for atomic multi-key transactions, versioned manifests, conditional publication and pinned-generation reads.
+2. **Commit-history archaeology:** traced initial OCDBT introduction, the later multi-key atomic transaction implementation and later version-pinned open support to separate mature capability from current-head build churn.
+3. **Scientific ecosystem transfer search:** inspected Orbax's real OCDBT merge/finalization path and compared the kernel with Icechunk's science-native transactional Zarr repositories.
+4. **Adversarial execution:** ran real subprocess-kill/reopen trials against the current installed TensorStore file backend at both sides of the manifest visibility boundary.
+5. **Schema/implementation collapse check:** compared the manifest-selection schema promise with the actual `CreateConfig` branch and found a safety-relevant mismatch.
+
+### Specialist passes
+- **CODE / SCHEMA / TEST INSPECTOR:** traced transaction scope, data/node flush ordering, manifest CAS, provider feature selection, version-pinned reads, source tests and exact history.
+- **SCIENCE / HISTORY / ECOSYSTEM VALIDATOR:** established Orbax adoption, scientific scope, novelty limits and the direct Icechunk comparator.
+- **INDEPENDENT RED-TEAM / VERIFIER:** received a frozen packet without the proposed score, inspected primary sources, tested deployment claims and returned PASS_WITH_LIMITS / WATCH.
+
+### Load-bearing claims
+
+**IMPLEMENTED**
+- OCDBT is a versioned key-value database. Each committed batch advances a monotonically increasing generation and timestamp.
+- In the non-distributed commit path, out-of-line values, B+tree nodes and version-tree nodes are written and their linked flush futures are forced before `TryUpdateManifest(existing_manifest, new_manifest)` runs. A failed manifest compare-and-swap reloads current state and retries.
+- Readers discover state from the manifest root. With the required provider guarantees, the manifest update is the single visibility point: pre-manifest objects are unreachable; post-manifest readers resolve one new tree.
+- `atomic_isolated` guarantees atomic writes, consistency, write isolation and durability. General read isolation is not guaranteed, so a scientific restore must pin one OCDBT generation/timestamp.
+- Atomic scope is one terminal transaction node: in practice one non-coordinator OCDBT database/manifest lineage. Separate OCDBT roots or arbitrary sidecar stores are not an atomic group.
+- Single-file manifests require atomic single-key read/modify/write. Numbered manifests require atomic create-if-absent. The file backend defaults to fsync-backed durable writes.
+- Root licensing is Apache-2.0.
+
+**TESTED IN SOURCE**
+- `OcdbtTest.TransactionalCopyRange` stages and commits multiple prefixes (`y/*` and `z/*`) in one `atomic_isolated` transaction and verifies the complete result.
+- The OCDBT driver registers the shared transactional suite with `multi_key_atomic_supported=true`, and clean-reopen tests exist after successful writes for single and numbered manifest layouts.
+- Orbax uses the kernel in a production-style checkpoint path: it copies per-process OCDBT stores into one parent under `ts.Transaction(atomic=True)`, validates the transactional view, then commits. Orbax separately adds commit-file or atomic-rename checkpoint finalization.
+- The pinned revision's visible GitHub Actions checks build wheels/packages/docs, but do not establish that the current OCDBT C++ test suite ran. A local Bazel attempt was blocked before compilation by TLS certificate failure while fetching `rules_go`; no local source-test pass is claimed.
+
+**ADVERSARIAL REPRODUCTION**
+- Eight trials initialized 24 old keys, began an atomic transaction writing 24 large new values, killed the writer immediately after a new `d/` data object appeared but before the manifest changed, reopened from a fresh process, and observed **all 24 keys old** every time.
+- Eight more trials killed the writer immediately after `manifest.ocdbt` bytes changed; fresh reopen observed **all 16 keys new** every time.
+- Across all 16 process-kill trials, no mixed old/new key set was observed.
+- This is strong reproduction evidence for the file-backed visibility boundary, but it is not upstream CI, a power-cycle test or a provider matrix.
+
+**HISTORY / NOVELTY**
+- Initial OCDBT landed on 2023-03-03 (`677476b6...`).
+- Non-distributed multi-key atomic transactions landed on 2024-05-21 (`d77c9434...`).
+- Version-pinned open landed on 2025-05-06 (`d861d14c...`).
+- The inspected 2026-09-18 head changes Bazel/CMake handling, not this kernel. This is a mature transferable component, not a new subsystem at the candidate SHA.
+
+### Decisive limits and falsifiers
+1. **Unsafe provider fallback:** the schema says database creation should error when no manifest kind safely supports concurrent writes, but `config.cc` compiles that error branch out and temporarily defaults to a single-file manifest **even if unsafe**. Provider-neutral or plug-and-play durability claims therefore fail.
+2. **One database only:** TensorStore rejects atomic transactions with multiple independent terminal nodes. Every artifact and metadata record must share one OCDBT root.
+3. **No durable transaction identity:** transaction state is staged in memory and bound transactions are not serializable. A crash cannot resume the same transaction, and acknowledgement loss after a successful manifest update has no first-class durable request/receipt mapping.
+4. **No general read snapshot:** unpinned sequential reads may straddle generations. Restore must identify and open one committed version.
+5. **No upstream kill matrix:** inspected tests do not SIGKILL at every object/manifest boundary, power-cycle a backend, or exercise manifest acceptance followed by lost acknowledgement.
+6. **No scientific semantic integration:** no inspected OpenMM, OpenDPD or atomate2 campaign stores all artifacts under one OCDBT generation and proves resumed-versus-uninterrupted equivalence.
+7. **Orphan growth:** a pre-manifest crash can leave unreachable data files. Visibility remains atomic, but cleanup, retention and storage-growth economics are separate obligations.
+8. **Coordinator exclusion:** atomic multi-key transactions are explicitly unavailable with `Context.ocdbt_coordinator`; coordinated high-contention mode and atomic campaign publication are not the same feature.
+
+### Independent RED-TEAM / VERIFIER
+
+**Verdict: PASS_WITH_LIMITS — WATCH, not STRONG.**
+
+The verifier accepted the narrow claim: one `Transaction(atomic=True)`, one non-coordinator OCDBT database, all checkpoint artifacts inside that database, a provider whose chosen manifest operation is actually safe, and generation-pinned restoration. It rejected broader claims of provider-neutral durability, resumable transactions, cross-database atomicity or a complete checkpoint protocol.
+
+Strongest falsifier: on a claimed-safe backend, force the new manifest durable while any referenced data/B+tree/version object is absent, corrupt or non-durable—or show a pinned generation containing mixed old/new artifacts.
+
+Required next proof:
+1. kill/fault-inject every indirect-object and manifest-CAS boundary, including concurrent-writer retries and acknowledgement loss;
+2. reopen from a fresh process and verify old-or-complete-new state plus reachability/hash validity of every referenced object;
+3. run the matrix against each declared backend and reject unsafe manifest/provider combinations;
+4. bind one real OpenMM or OpenDPD campaign, pin the restored generation and compare resumed scientific state with an uninterrupted run;
+5. compare the same harness with Icechunk before choosing a production substrate.
+
+### Comparator / commodity pressure
+- **Orbax** already packages OCDBT for large JAX checkpoints and adds the higher-level finalization protocol OCDBT lacks.
+- **Icechunk** is the sharper commercial comparator: an Apache-2.0 transactional Zarr storage engine with repository-wide serializable isolation, atomic never-partial commits, time travel, tags/branches and a science-native multiple-array data model.
+- Therefore the business is not “sell OCDBT as a new backend.” The defensible wedge is provider qualification, application adapters, crash evidence, observability and migration for expensive scientific campaigns.
+
+### Commercial score
+A) speed to first revenue: **3/5** — a focused audit/retrofit can sell before a platform.  
+B) customer value / ceiling: **4/5** — invalid restarts and rerun GPU/HPC hours can be expensive.  
+C) build/domain compression: **5/5** — the same-DB publication kernel removes substantial storage-engine work.  
+D) rarity/advantage: **2/5** — Orbax and Icechunk sharply reduce primitive novelty.  
+E) evidence/completeness: **4/5** — strong source/ordering/adoption plus local kill evidence, but no upstream/provider/scientific qualification.  
+F) rights/operability: **5/5** — Apache-2.0 and mature cross-platform packaging, with configuration hazards that must be fenced.  
+**Total: 23/30 — WATCH_COMPONENT / TRANSFER_KERNEL.**
+
+### Commercial / research implication
+The credible offer is a **Scientific Campaign Crash/Consistency Audit + Transactional Snapshot Retrofit** for teams with ad-hoc NFS/S3 Zarr, HDF5 or checkpoint folders. The deliverable should inventory mixed-generation windows, choose OCDBT versus Icechunk by workload, place all state and metadata inside one transactional scope, pin restoration generations, execute a kill/provider fault matrix, measure orphan/latency overhead and quantify avoided rerun GPU-hours and scientist recovery time.
+
+### Search lesson outcome
+**Closure-at-visibility verification** now has a second distinct shadow-task success:
+- Run 15 used it to falsify NoKV's high-level adapter: manifest-last visibility did not atomically prove current identity of mutable referenced shards.
+- Run 16 used it to validate TensorStore's narrower same-database kernel: immutable referenced objects are flushed before one conditional manifest-root update, while also exposing the unsafe-provider fallback.
+
+The lesson is now **LOCAL/STAGED-ELIGIBLE inside shadow evaluation**. Do not promote it to global `SEARCH_SKILLS.md` from this lane.
+
+### VALUE HANDOFF
+1. **Capability delta:** identifies a mature storage kernel that provides actual same-database group publication and version-pinned restore semantics.
+2. **Graph edge:** supplies the exact storage primitive missing from OpenMM's sequential multi-file checkpoint writes; OpenDPD can contribute run/evidence lineage.
+3. **Radar signal:** scientific state systems are converging on immutable objects plus one versioned root, but provider qualification and application finalization remain decisive.
+4. **Experiment impact:** implement the same OpenMM/OpenDPD crash harness against both OCDBT and Icechunk.
+5. **Commercial impact:** supports a fixed-scope audit/adapter retrofit, not a differentiated generic storage service.
+6. **Negative knowledge:** an atomic API name is insufficient; inspect transaction scope, reader pinning, manifest provider guarantees, configuration fallback, acknowledgement ambiguity and orphan behavior.
+
+### Cost proxies
+- materially distinct discovery modes: 5;
+- serious candidate/comparator inspections: TensorStore/OCDBT, Orbax and Icechunk;
+- specialist contexts: code/schema/test, science/history/ecosystem, independent verifier;
+- public source/test/schema/history/status reads and searches: approximately 45;
+- reproducible executions: 16 real subprocess-kill/reopen trials;
+- locally completed upstream builds/tests: 0 (dependency TLS failure before compile);
+- sensitive-source incidents: 0.
