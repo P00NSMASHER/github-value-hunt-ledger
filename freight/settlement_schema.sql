@@ -139,6 +139,27 @@ CREATE TRIGGER IF NOT EXISTS reversal_timestamp_valid BEFORE INSERT ON reversal_
   THEN RAISE(ABORT,'reversal created_at predates allocation') END;
 END;
 
+CREATE TRIGGER IF NOT EXISTS review_claim_timestamp_valid BEFORE INSERT ON review_claims BEGIN
+  SELECT CASE WHEN julianday(NEW.flagged_at) IS NULL OR substr(NEW.flagged_at,-1,1)<>'Z'
+  THEN RAISE(ABORT,'review claim flagged_at must be a valid UTC timestamp') END;
+END;
+CREATE TRIGGER IF NOT EXISTS counter_currency_match BEFORE INSERT ON counter_events BEGIN
+  SELECT CASE WHEN NEW.currency <>
+    (SELECT currency FROM settlement_events
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.original_event_id)
+  THEN RAISE(ABORT,'counter currency mismatch with original settlement event') END;
+END;
+CREATE TRIGGER IF NOT EXISTS allocation_claim_event_chronology BEFORE INSERT ON allocations BEGIN
+  SELECT CASE WHEN julianday(
+    (SELECT booked_at FROM settlement_events
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id)
+  ) < julianday(
+    (SELECT issued_at FROM recovery_claims
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND claim_id=NEW.claim_id)
+  )
+  THEN RAISE(ABORT,'settlement event predates issued claim') END;
+END;
+
 CREATE TRIGGER IF NOT EXISTS allocation_event_capacity BEFORE INSERT ON allocations BEGIN
   SELECT CASE WHEN
     (SELECT COALESCE(SUM(amount_cents),0) FROM allocations WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id)+NEW.amount_cents
