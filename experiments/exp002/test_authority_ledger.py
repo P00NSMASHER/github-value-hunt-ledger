@@ -7,6 +7,7 @@ from experiments.exp002.authority_ledger import (
     AuthorityError,
     AuthorityLedger,
     CapacityError,
+    DynamicsRecurringOutcomePolicy,
     IdentityError,
     ReceiptAuthorityPolicy,
     StaleWorkerError,
@@ -220,6 +221,101 @@ class LedgerCase(unittest.TestCase):
         self.assertEqual(self.ledger.event_count("REVERSAL_APPLIED", "sync"), 1)
         with self.assertRaises(StaleWorkerError):
             self.ledger.record_worker_result("sync", expected_version=dispatch_version)
+
+    def test_13_phase_qualified_provider_receipts(self):
+        self.receipt()
+        self.allocation()
+
+        self.ledger.reserve_effect(
+            "preapply-reject",
+            "A1",
+            "VENDOR_CREDIT",
+            10_000,
+            100_00,
+            {"credit": "all"},
+            valid_at=V1,
+            observed_at=O1,
+        )
+        self.ledger.dispatch("preapply-reject", expected_version=0)
+        self.ledger.recover_abandoned_dispatch("preapply-reject")
+        preapply = DynamicsRecurringOutcomePolicy.receipt(
+            logical_effect_id="preapply-reject",
+            provider_operation_id="message-001/execution-001",
+            message_status="PreProcessingError",
+            exact_single_effect=True,
+            operation_identity_matches=True,
+        )
+        self.assertEqual(
+            preapply.classify(expected_logical_effect_id="preapply-reject"),
+            "NOT_APPLIED",
+        )
+        self.assertEqual(
+            self.ledger.reconcile_receipt("preapply-reject", preapply, observed_at=O2),
+            "NOT_APPLIED",
+        )
+
+        replacement = self.ledger.reserve_effect(
+            "post-preapply-reject",
+            "A1",
+            "VENDOR_CREDIT",
+            10_000,
+            100_00,
+            {"credit": "replacement"},
+            valid_at=V1,
+            observed_at=O2,
+        )
+        self.ledger.dispatch("post-preapply-reject", expected_version=replacement["version"])
+        self.ledger.recover_abandoned_dispatch("post-preapply-reject")
+
+        unsafe_statuses = ["ProcessedWithErrors", "PostProcessingFailed", "Failed", "Canceled"]
+        for status in unsafe_statuses:
+            receipt = DynamicsRecurringOutcomePolicy.receipt(
+                logical_effect_id="post-preapply-reject",
+                provider_operation_id=f"message-{status}",
+                message_status=status,
+                exact_single_effect=True,
+                operation_identity_matches=True,
+            )
+            self.assertEqual(
+                receipt.classify(expected_logical_effect_id="post-preapply-reject"),
+                "UNKNOWN",
+                status,
+            )
+
+        wrong_identity = DynamicsRecurringOutcomePolicy.receipt(
+            logical_effect_id="different-effect",
+            provider_operation_id="message-002/execution-002",
+            message_status="PreProcessingError",
+            exact_single_effect=True,
+            operation_identity_matches=True,
+        )
+        batch_scope = DynamicsRecurringOutcomePolicy.receipt(
+            logical_effect_id="post-preapply-reject",
+            provider_operation_id="message-003/execution-003",
+            message_status="PreProcessingError",
+            exact_single_effect=False,
+            operation_identity_matches=True,
+        )
+        for receipt in (wrong_identity, batch_scope):
+            self.assertEqual(
+                receipt.classify(expected_logical_effect_id="post-preapply-reject"),
+                "UNKNOWN",
+            )
+
+        processed = DynamicsRecurringOutcomePolicy.receipt(
+            logical_effect_id="post-preapply-reject",
+            provider_operation_id="message-004/execution-004",
+            message_status="Processed",
+            exact_single_effect=True,
+            operation_identity_matches=True,
+            economic_fingerprint_matches=True,
+        )
+        self.assertEqual(processed.classify(expected_logical_effect_id="post-preapply-reject"), "APPLIED")
+        self.assertEqual(
+            self.ledger.reconcile_receipt("post-preapply-reject", processed, observed_at=O2),
+            "APPLIED",
+        )
+        self.assertEqual(self.ledger.event_count("REVERSAL_APPLIED", "post-preapply-reject"), 1)
 
 
 if __name__ == "__main__":
