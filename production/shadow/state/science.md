@@ -399,3 +399,38 @@ OpenDPD does **not** advance H3 Level 3. It is useful upstream: the run/evidence
 - Do not classify scientific run-level idempotency, restart recovery or immutable statuses as physical exactly-once without provider/native-command identity and authoritative readback.
 - Manual capture provenance with explicit hashes/conditions is valuable reproducibility evidence, but it is not instrument-command truth.
 - Mature repository age/publication depth should not be used as a proxy for field maturity of a newly-added runtime subsystem.
+
+## 2026-09-20 — Run 14 evidence-backed update
+
+### H4 refinement — a second mature-science reliability kernel validates history archaeology
+STATUS: **SUPPORTED ON TWO INDEPENDENT SHADOW RUNS; LOCAL/STAGED-ELIGIBLE, NOT GLOBALLY PROMOTED.**
+
+SUPPORTING EVIDENCE:
+- `openmm/openmm@5a7a268616b55d6a85e1c804f1c38681a2756cde` is a mature molecular-simulation platform whose major OpenMM 7 publication dates to 2017, yet its recent history contains a distinct 2025–2026 reliability layer: generalized safer checkpoint/state overwrite, a resumable `ReplicaExchangeReporter`, and a resumable `ExpandedEnsembleSampler`.
+- Source routes filename-based checkpoint/state replacement through a shared temporary-file/rename helper rather than blindly truncating the destination. The introducing 2025 commit explicitly broadened safer checkpoint/state writes.
+- Dedicated tests run multistate simulations, destroy the Python sampler/simulation/integrator objects, reconstruct with `resume=True`, verify restored serialized physical/algorithmic state, and continue the campaign. This is executable recovery behavior rather than documentation only.
+- History cleanly separates the operational delta from the scientific baseline: generalized safe overwrite landed in July 2025, Replica Exchange reporting/recovery in April 2026, and Expanded Ensemble in May 2026.
+- A source-faithful crash-ordering model falsified the stronger whole-campaign guarantee: after the new log row and `checkpoint_0` are advanced but before `checkpoint_1`, the durable-looking artifact set can be `log=N`, `checkpoint_0=N`, `checkpoint_1=N-1`.
+
+CONTRARY EVIDENCE:
+- Checkpoint/restart itself predates 2025 in OpenMM. The new value is operational hardening and newer multistate recovery, not a newly invented checkpoint capability.
+- Current `ReplicaExchangeReporter` writes multiple artifacts sequentially and exposes no inspected generation manifest/group commit, so per-file safer writes do not establish campaign-level atomicity.
+- The current safe-save helper performs no explicit file or parent-directory `fsync`, so atomic replace must not be described as power-loss durability.
+- The pinned `_getTempFilename()` implementation checks for an unused name but does not atomically reserve it; the 2025 introducing version used exclusive creation. Concurrent-writer safety therefore remains questionable at current head.
+- The inspected resume tests reconstruct objects but do not kill the OS process exactly between filesystem operations, and the pinned revision's Jenkins status was still pending during inspection.
+
+LESSON IMPACT:
+- H4 now has **two independent successes**: OpenDPD in measured RF and OpenMM in molecular simulation. The LOCAL lesson **commit-history archaeology for operational reproducibility** is therefore **STAGED-eligible inside shadow evaluation**.
+- Refine the procedure before wider use: first establish the repository's historical baseline so longstanding recovery is not mislabeled as new; then inspect whether new guarantees are per-file, per-process, or campaign-wide, and explicitly test group visibility/generation consistency, `fsync` ordering, concurrent writers and real process-kill boundaries.
+- Do **not** edit or promote to global `SEARCH_SKILLS.md` from this shadow lane.
+
+NEXT TEST:
+Find a mature scientific package whose recently added recovery layer goes beyond per-file safe writes and implements **generation-consistent or manifest-verified multi-artifact snapshots across an actual process crash**.
+
+CONFIDENCE: **HIGH that history archaeology is productive; MEDIUM that every hidden reliability kernel is commercially distinct; HIGH that per-file safety must not be upgraded to group durability.**
+
+### Failed-search memory added
+- `checkpoint` and `resume` are noisy terms; in ML repositories they often mean pretrained-model loading or ordinary longstanding restart behavior rather than a new scientific operations kernel.
+- `resume=True` plus successful object reconstruction does not prove process-crash consistency across multiple artifacts.
+- Per-file atomic rename/replace is not group atomicity, and rename without an explicit durability protocol is not evidence of power-loss durability.
+- Always subtract the pre-existing baseline capability before assigning novelty to a recent reliability commit.
