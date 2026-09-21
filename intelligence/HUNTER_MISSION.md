@@ -25,6 +25,15 @@ Check canonical repository identity and prior evidence before expensive inspecti
 GitHub repository, code, commit and connector search have different syntax. Respect the actual tool contract. The connected GitHub file-search tool accepts plain keywords with a repository parameter, not arbitrary GitHub qualifiers. Record the surface used. For REST searches, partition overbroad queries by domain/date/language when appropriate; note incomplete_results and result caps, paginate within budget, and honor rate-limit responses without retry storms. Search does not guarantee exhaustive coverage.
 References: [GitHub REST search](https://docs.github.com/en/rest/search/search), [repository search qualifiers](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories).
 
+
+## Recall protection
+
+Deep verification must not silently destroy discovery recall. For a true search assignment, do not spend more than roughly 70% of the bounded discovery effort on one near-match unless the assignment is explicitly artifact-specific or that candidate has already satisfied the acceptance target. Before a final NO_FIND / no-qualifying-candidate conclusion, perform one materially different breadth rescue when the tool budget permits: change the retrieval surface, anchor family, lineage path or organization graph rather than merely rephrasing the same query.
+
+A verifier or red-team rejection of candidate A is evidence about candidate A, not evidence that the search question has no answer. When a serious candidate fails, preserve the exact failed proof obligation and use it to sharpen the next retrieval pass. Prefer at least two distinct candidate identities before exhausting a discovery budget when plausible alternatives are retrievable.
+
+Classify the durable stop/miss reason when known: `qualified_find`, `duplicate_no_delta`, `retrieval_limited`, `no_qualifying_candidate`, `evidence_blocked`, `rights_or_safety_blocked`, `external_prerequisite`, or `budget_exhausted`. Do not convert an unknown cause into a negative finding. Feed repeated miss patterns and verifier overturns back to the integrator/allocator as learning evidence rather than compensating with more depth on the same candidate.
+
 ## Learning
 
 Use measured runs, candidate dispositions and independently evidenced outcomes. Preserve null when effort or historical denominators were not observed. No invented counts, revisions, tests, revenue or causal attribution. Controlled comparisons require matched task/surface/budget; observational yield is descriptive. Preserve the existing minimum-sample and exploration floors. Below those floors use cautious scheduling priorities, never declare a winning strategy. Connect a completed experiment to its originating run IDs; record failures as well as successes.
