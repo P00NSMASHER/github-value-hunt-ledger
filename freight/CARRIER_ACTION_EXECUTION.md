@@ -95,3 +95,10 @@ The delivery confirmation:
 A FAILED execution cannot receive delivery confirmation. An execution receipt that already recorded DELIVERED does not get a second delivery receipt.
 
 Delivery confirmation still does not prove settlement, credit issuance, cash receipt, recovery or realized savings.
+
+
+## Verification trust boundary
+
+Receipt hashes are deterministic integrity checks, not digital signatures. Semantic verification proves that one receipt is internally coherent: chronology, idempotency key, amount, action type, finding set, outcome flags and evidence-provenance relationships all agree with the receipt's own fields.
+
+Authenticating who produced the evidence still depends on the approved external evidence source, access controls, immutable audit storage and any deployment-level signing/attestation controls. Recomputing a hash is not treated as proof that an external event actually occurred.
