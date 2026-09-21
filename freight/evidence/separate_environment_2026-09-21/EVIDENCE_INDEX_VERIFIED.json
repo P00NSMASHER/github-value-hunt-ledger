@@ -1,0 +1,28 @@
+{
+  "artifacts": [
+    {
+      "path": "configuration_snapshot.json",
+      "sha256": "6978bcbb754681c01157ba8fdf3298e7520278f72a46e047b54e102df43cca97"
+    },
+    {
+      "path": "drive_workspace_snapshot.json",
+      "sha256": "c9c44b97be3f7a7de964e38e2e072ddcab018e21f8f57703cd6ec9c0ae303bd6"
+    },
+    {
+      "path": "mfa_evidence_2026-09-21.md",
+      "sha256": "ce10460b55fc9ff6943d4d1ab4a573f8347265fc2f594587260c6e78af85b053"
+    },
+    {
+      "path": "policy_snapshot.md",
+      "sha256": "0d234544d76c68e6d5871d9183b3ab2222a26ccfc9ffa532ff4a0f9d17a68588"
+    },
+    {
+      "path": "provider_encryption.md",
+      "sha256": "250759dbaf0e210b5383a578af35a8f8df5358b778a3aef5b451c8c174520d68"
+    }
+  ],
+  "decision": "VERIFIED",
+  "environment_id": "gdrive-single-tenant-manual-20260921",
+  "observed_at": "2026-09-21",
+  "schema_version": 2
+}
