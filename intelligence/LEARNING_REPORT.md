@@ -1,8 +1,10 @@
 # LEARNING REPORT
 
-Generated from prospective and benchmark search runs. Retrospective anecdotes are excluded from yield denominators. Multi-origin outcomes use fractional equal-touch value attribution.
+Generated from prospective and benchmark runs. Discovery denominators exclude explicit non-search or unclassified actions; historical records without an action retain their observational status. Retrospective anecdotes are excluded. Outcome attribution still includes all activity and uses fractional equal-touch credit.
 
-- Measured runs: **16**
+- Measured discovery runs: **16**
+- Other measured actions excluded from discovery denominators: **0**
+- Legacy discovery runs without action classification: **16**
 - Search-bearing runs: **15**
 - Structured outcomes: **1**
 - Outcome-lag window: **14 days**; recent runs are not counted as outcome failures.

@@ -4,7 +4,8 @@ This report answers a different question from SEARCH_POLICY.md: not **where migh
 
 - Active strategies: **12**
 - Strategies with sufficient evidence: **0**
-- Sufficiency threshold: **5 measured runs + 20 deep inspections** per strategy.
+- Sufficiency threshold: **5 measured discovery runs + 20 deep inspections** per strategy.
+- Explicit fixture, artifact-verification, waiting and unclassified actions do not satisfy discovery thresholds. Legacy records without an action remain observational evidence.
 
 ## Strategy measurement debt
 

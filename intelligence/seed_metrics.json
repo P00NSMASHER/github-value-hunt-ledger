@@ -2,11 +2,18 @@
   "schema_version": 1,
   "seed_count": 24,
   "by_type": {
-    "coverage_gap": 5,
     "capability_gap": 10,
+    "coverage_gap": 5,
     "positive_dna_transfer": 6,
     "strategy_measurement": 3
   },
+  "by_action": {
+    "execute_fixture": 6,
+    "verify_artifact": 2,
+    "search": 14,
+    "await_external": 2
+  },
+  "unmapped_master_repositories": 28,
   "seeds_with_measured_runs": 1,
   "performance_threshold": {
     "min_runs": 3,
