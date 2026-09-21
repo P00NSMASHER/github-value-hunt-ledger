@@ -1,0 +1,28 @@
+name: Golden arithmetic
+
+on:
+  push:
+    paths:
+      - 'artifacts/**'
+      - 'qa/golden_arithmetic_v0_2_0.py'
+      - 'release/**'
+  pull_request:
+    paths:
+      - 'artifacts/**'
+      - 'qa/golden_arithmetic_v0_2_0.py'
+      - 'release/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  golden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify canonical hashes and golden arithmetic
+        run: python qa/golden_arithmetic_v0_2_0.py artifacts/v0.2.0-alpha
