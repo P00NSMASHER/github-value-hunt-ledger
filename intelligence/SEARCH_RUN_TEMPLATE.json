@@ -1,5 +1,5 @@
 {
-  "schema_version": 16,
+  "schema_version": 19,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -107,5 +107,9 @@
   "presence_generation_id": "PRESENCEGEN:000000000000",
   "presence_event_id": "PRESENCE:000000000000",
   "activation_id": "ACTIVATE:000000000000",
-  "activation_generation_id": "ACTGEN:000000000000"
+  "activation_generation_id": "ACTGEN:000000000000",
+  "routing_exploration_generation_id": "ROUTEEXP:000000000000",
+  "routing_exploration_pair_id": null,
+  "baseline_slot_id": "SLOT-01",
+  "route_mode": "exploit"
 }
