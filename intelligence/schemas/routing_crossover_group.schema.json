@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V19 Crossover Group",
+  "type": "object",
+  "required": [
+    "crossover_group_id",
+    "agent_a",
+    "agent_b",
+    "baseline_task_a",
+    "baseline_task_b",
+    "cells",
+    "evidence_state",
+    "matched_analysis_generation_id"
+  ],
+  "properties": {
+    "crossover_group_id": {
+      "type": "string",
+      "pattern": "^CROSS:[a-f0-9]{12}$"
+    },
+    "agent_a": {
+      "type": "string"
+    },
+    "agent_b": {
+      "type": "string"
+    },
+    "evidence_state": {
+      "enum": [
+        "COMPLETE_CROSSOVER",
+        "INCOMPLETE_CROSSOVER"
+      ]
+    },
+    "agent_effect_a_minus_b": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "task_effect_a_minus_b": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "matched_analysis_generation_id": {
+      "type": "string",
+      "pattern": "^MATCHED:[a-f0-9]{12}$"
+    }
+  },
+  "additionalProperties": true
+}
