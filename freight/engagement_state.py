@@ -160,14 +160,22 @@ def resolve_engagement(base_charter:dict,amendments:list[dict]|tuple[dict,...]=(
         authorized=charter_authorized
         replacement_required=False
 
+    current_amendment=(
+        amendment
+        if amendment is not None
+        and amendment["base_charter_hash"]==current["charter_hash"]
+        and amendment["amendment_state"]!="SUPERSEDED_BY_REPLACEMENT"
+        else None
+    )
+
     body={
         "engagement_state":engagement_state.value,
         "engagement_id":current["engagement_id"],
         "buyer_id":current["buyer_id"],
         "business_unit":current["business_unit"],
         "operative_charter_hash":current["charter_hash"],
-        "amendment_id":amendment["amendment_id"] if amendment else None,
-        "amendment_hash":amendment["amendment_hash"] if amendment else None,
+        "amendment_id":current_amendment["amendment_id"] if current_amendment else None,
+        "amendment_hash":current_amendment["amendment_hash"] if current_amendment else None,
         "replacement_required":replacement_required,
         "customer_data_authorized":authorized,
         "audit_processing_allowed":authorized,
