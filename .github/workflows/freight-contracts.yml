@@ -1,35 +1,36 @@
 name: Freight Commercial Contracts
 
 on:
+  workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - 'freight/**'
-      - 'intelligence/capabilities.jsonl'
-      - 'intelligence/edges.jsonl'
-      - 'intelligence/outcomes.jsonl'
-      - 'intelligence/search_runs.jsonl'
-      - 'CAPABILITIES.md'
+      - '!freight/site/**'
+      - '!freight/GAP_REGISTER.json'
       - 'production/prototype.py'
       - 'production/test_prototype.py'
       - 'production/requirements-ci.txt'
       - '.github/workflows/freight-contracts.yml'
-      - '.github/workflows/technology-intelligence.yml'
   pull_request:
+    branches:
+      - main
     paths:
       - 'freight/**'
-      - 'intelligence/capabilities.jsonl'
-      - 'intelligence/edges.jsonl'
-      - 'intelligence/outcomes.jsonl'
-      - 'intelligence/search_runs.jsonl'
-      - 'CAPABILITIES.md'
+      - '!freight/site/**'
+      - '!freight/GAP_REGISTER.json'
       - 'production/prototype.py'
       - 'production/test_prototype.py'
       - 'production/requirements-ci.txt'
       - '.github/workflows/freight-contracts.yml'
-      - '.github/workflows/technology-intelligence.yml'
 
 permissions:
   contents: read
+
+concurrency:
+  group: freight-contracts-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   contracts:
