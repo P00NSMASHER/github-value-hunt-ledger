@@ -369,7 +369,7 @@ def render_workflow_summary(result: AuditWorkflowResult) -> str:
         "## Discrepancy by currency",
         *[
             "- " + item.currency
-            + " — validated discrepancy: **"
+            + " — Validated discrepancy: **"
             + item.currency + " " + format(item.validated_discrepancy_cents / 100, ",.2f")
             + "**; review discrepancy with a calculable expected amount: **"
             + item.currency + " " + format(item.review_discrepancy_cents / 100, ",.2f")
