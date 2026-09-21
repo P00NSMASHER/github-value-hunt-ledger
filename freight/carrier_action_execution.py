@@ -320,10 +320,16 @@ def verify_carrier_action_execution_intent_proof(
         "body_text",
     ):
         _text(name, getattr(intent, name))
-    if type(intent.requested_cents) is not int or intent.requested_cents <= 0:
-        raise ValueError("requested_cents must be a positive integer")
+    if type(intent.requested_cents) is not int or not (0 < intent.requested_cents <= 2**63 - 1):
+        raise ValueError("requested_cents must be positive integer cents within range")
+    try:
+        ActionType(intent.action_type)
+    except ValueError as exc:
+        raise ValueError("execution intent action_type is invalid") from exc
     if not intent.finding_ids or len(intent.finding_ids) != len(set(intent.finding_ids)):
         raise ValueError("finding_ids must be a non-empty unique tuple")
+    for finding_id in intent.finding_ids:
+        _text("finding_id", finding_id)
     if intent.finding_ids != tuple(sorted(intent.finding_ids)):
         raise ValueError("finding_ids must be in canonical sorted order")
     canonical_prepared_at, _ = _timestamp("prepared_at", intent.prepared_at)
