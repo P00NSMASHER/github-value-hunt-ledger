@@ -1,0 +1,32 @@
+{
+  "exploration_generation_id": "ROUTEEXP:a7ac85e2ebc3",
+  "seed_hash": "a7ac85e2ebc31fbe80f45331628f6165d334d200e00291110bb52291c430fb99",
+  "gate_value": 0.12400061,
+  "exploration_probability": 0.25,
+  "baseline_total_score": 229.3123,
+  "applied": true,
+  "reason": "controlled_low_regret_swap",
+  "pair_id": "EXPPAIR:f92d869414ec",
+  "workers": [
+    "HUNTER-08",
+    "HUNTER-10"
+  ],
+  "baseline_slots": [
+    "SLOT-10",
+    "SLOT-11"
+  ],
+  "exploration_slots": [
+    "SLOT-11",
+    "SLOT-10"
+  ],
+  "match_level": 3,
+  "match_basis": "role+work_kind+strategy+objective",
+  "absolute_regret": 0.0,
+  "relative_regret": 0.0,
+  "measurement_need": 6,
+  "candidate_count": 1,
+  "routing_generation_id": "ROUTING:0cf2ae1e7b4c",
+  "worker_profile_generation_id": "WORKERS:fc22659849b1",
+  "routing_learning_generation_id": "ROUTELEARN:bc40639ef4db",
+  "activation_response_learning_generation_id": "RESPLEARN:d480fa8f2992"
+}
