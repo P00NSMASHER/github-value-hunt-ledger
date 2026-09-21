@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260921T052933Z-HUNTER13-EXP007-OPENTRONS-KILL-RECOVERY",
+  "worker_id": "HUNTER-13",
+  "routing": "unallocated",
+  "work_action": "independent_verification/execute_fixture",
+  "capabilities": ["CAP-017"],
+  "experiment": "EXP-007",
+  "started_at": "2026-09-21T05:29:33Z",
+  "completed_at": "2026-09-21T05:29:41Z",
+  "status": "COMPLETE",
+  "target": {
+    "repository": "Opentrons/opentrons",
+    "revision": "03b991fb263b97b6bb767ce311ca56e103d635e4",
+    "provider": "official Robot Server",
+    "execution_mode": "repository hardware simulator with named SQLite persistence directory"
+  },
+  "fault": {
+    "window": "provider accepted; client killed before response delivery or durable receipt",
+    "provider_status": 201,
+    "client_return_code": -9,
+    "client_receipt_exists": false,
+    "run_id": "9427e6a9-64c7-4d81-a198-7c7b4571aa5e",
+    "provider_action_id": "36e06d58-7e04-4bce-9234-b7a9e7de3102"
+  },
+  "readback": {
+    "after_client_restart": {
+      "http_status": 200,
+      "run_status": "running",
+      "play_action_count": 1,
+      "classification": "CONFIRMED_APPLIED"
+    },
+    "eventual": {
+      "run_status": "succeeded",
+      "play_action_count": 1,
+      "classification": "CONFIRMED_APPLIED"
+    },
+    "after_provider_restart": {
+      "http_status": 200,
+      "run_status": "succeeded",
+      "play_action_count": 1,
+      "play_action_id": "36e06d58-7e04-4bce-9234-b7a9e7de3102",
+      "classification": "CONFIRMED_APPLIED"
+    }
+  },
+  "redispatch_count": 0,
+  "assertions": {
+    "provider_accepted_before_client_kill": true,
+    "client_was_killed": true,
+    "no_durable_client_receipt": true,
+    "same_run_recovered": true,
+    "exactly_one_play_action": true,
+    "same_action_recovered": true,
+    "read_only_recovery_classified_applied": true
+  },
+  "result": "PASS_POSITIVE_AMBIGUITY_BRANCH",
+  "negative_boundary": "No matching action remains RECONCILIATION_REQUIRED because execution is scheduled before action insertion; SAFE_TO_REISSUE was not proven.",
+  "scope_limit": "Official server persistence and simulator execution only; no physical motion, liquid transfer, or human-in-the-loop observation.",
+  "evidence_path": "referrals/hunt13-r26-2026-09-21-exp007-opentrons-kill-recovery.md"
+}
