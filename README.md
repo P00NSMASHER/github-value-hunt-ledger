@@ -4,7 +4,7 @@ Private persistent memory for the GitHub Value Hunt.
 
 ## Operating model
 - Start operational runs with [`intelligence/WORKER_RUNBOOK.md`](intelligence/WORKER_RUNBOOK.md). It points to the current assignment, claim, evidence and telemetry contracts. The [2026-09-21 strategy upgrade](intelligence/STRATEGY_UPGRADE_2026-09-21.md) explains the latest changes and their evidence limits.
-- Fourteen active hunter workstreams search across the **47 thematic catalogs** under `hunters/`; catalog numbers are domain indexes, not necessarily one-to-one automation identities.
+- Fifteen scheduled hunter roles are used: **14 research workers plus Hunt 15 / MASTER Integrator**. The 14 research workstreams search across the **47 thematic catalogs** under `hunters/`; catalog numbers are domain indexes, not necessarily one-to-one automation identities.
 - Every hunter reads the relevant thematic catalog(s), `MASTER.md`, `SEARCH_QUEUE.md`, `REJECTED.md`, and `COMBINATIONS.md` before searching.
 - Every materially inspected candidate should leave durable evidence in the appropriate hunter catalog as strong/watch/rejected so sibling work does not repeat it.
 - New findings must be evidence-backed and deduplicated by **repository + exact revision + capability**, not repository name alone.
@@ -114,6 +114,7 @@ The hunt is not complete when a repository is found. The system must convert res
 - `EXPERIMENTS.md` — prioritized falsifiable tests that convert research into technical or economic evidence.
 - `OUTCOMES.md` — completed experiment/customer/value results used to train future search priority.
 - `SEARCH_SKILLS.md` — reusable discovery methods that have produced evidence-backed value.
+- `intelligence/COORDINATION_PROTOCOL.md` + `COORDINATION_BOARD.md` — immutable cross-hunter handoffs and the integrator-owned compact view of unresolved shared learning.
 
 ## Closed-loop operating model
 
