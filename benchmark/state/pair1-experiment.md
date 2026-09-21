@@ -1,8 +1,8 @@
 # Pair 1 — EXPERIMENT persistent state
 
 ## Validated reusable lessons
-- Bidirectional money/evidence invariant tracing is now supported on tasks 01, 02 and 04: trace operational observations/terms forward into approved money, then trace corrections, partial failures and external acknowledgements backward into evidence/state. It exposed stale evidence, non-atomic payable creation and review-to-TMS bypass/replay. Preserve explicit IMPLEMENTED/TESTED/RUN/UNVERIFIED labels. Eligible for central SEARCH_SKILLS promotion; not promoted during this bounded pair-file run.
-- Nested authority/version audit is now supported on two distinct tasks (03 and 04): after verifying the outer selector/gate, follow every referenced price/evidence/unit/correction dependency through final commit. Task 03 exposed mutable matrix history, incomplete replay identity and FX relabeling; task 04 exposed ignored classifier confidence, prompt-only conflict handling, untyped corrections and replayable approval. Eligible for central promotion; not promoted in this bounded pair-file run.
+- Bidirectional money/evidence invariant tracing is now supported on tasks 01, 02, 04 and 05: trace operational observations/terms forward into approved money, then trace corrections, partial failures and external acknowledgements backward into evidence/state. It exposed stale evidence, non-atomic payable creation and review-to-TMS bypass/replay. Preserve explicit IMPLEMENTED/TESTED/RUN/UNVERIFIED labels. Eligible for central SEARCH_SKILLS promotion; not promoted during this bounded pair-file run.
+- Nested authority/version audit is now supported on three distinct tasks (03, 04 and 05): after verifying the outer selector/gate, follow every referenced price/evidence/unit/correction dependency through final commit. Task 03 exposed mutable matrix history, incomplete replay identity and FX relabeling; task 04 exposed ignored classifier confidence, prompt-only conflict handling, untyped corrections and replayable approval. Eligible for central promotion; not promoted in this bounded pair-file run.
 
 ## Failed search patterns
 - High-conjunction repository metadata searches failed on tasks 01 and 02 even when the candidate existed. Broad web/TMS searches returned either no matches or shallow CRUD/document candidates. Prefer distinctive source/schema signatures; retain metadata search as cheap negative evidence, not the primary route.
@@ -13,7 +13,7 @@
 - Document/review: gate_decision, review_reasons, field assessment, grounded evidence, arithmetic mismatch, classifier confidence, typed correction, approval idempotency, decision key, stale-processing lease.
 
 ## Candidate search skills awaiting second-task confirmation
-- None. Nested authority/version audit achieved second-task confirmation on task 04 and moved to validated lessons. Bidirectional invariant tracing remains validated. Central promotion remains pending.
+- Counterfactual next-evidence contract, evidence set {05}: for a blocked claim require the output to preserve the target evidence/obligation, state a deterministic ranking basis, predict score/status delta and pass a replay in which only that repair changes the decision. One task only; do not promote. Nested authority/version audit and bidirectional invariant tracing remain validated; central promotion remains pending.
 
 ## Task 01 checkpoint — 2026-09-21
 
@@ -72,3 +72,20 @@
 - Validated reusable procedure: nested authority/version audit, evidence set {03, 04}. Verify the outer gate, then every referenced source/unit/version and every post-review correction/commit edge. A review queue is not a safety boundary unless correction and approval preserve the original invariants.
 - No SEARCH_SKILLS.md write in this run. The lesson now meets the two-task evidence threshold and is eligible for later central promotion without another benchmark task.
 - Unresolved candidate tests: require low classifier confidence to review; detect multiple coherent money sets; parse corrected fields through the typed schema; rerun all cross-field validators; record actor/diff/source hash; enforce a unique approval decision key under concurrent POST; reclaim expired processing leases.
+
+## Task 05 checkpoint — 2026-09-21
+
+- Completed: 05. Result committed in afe9728f847096aac72fcafe6bb4f04f0b6a8c69. Next lowest unfinished assigned task: 06. Process only one task per run.
+- Candidate: MathieuDWeill/prove-it @ bef32f46bd0526d580bca42675986f468ab62d33. REJECT, 17/30; independent verifier and code/commercial passes agreed. Public source/schema/tests/history/CI inspected; 6 unit tests and 24 bundled benchmark cases passed locally.
+- Implemented capability: deterministic evidence-readiness scores and PROVABLE/PARTIAL/UNPROVABLE outcomes for existence, freshness, ownership, one-hop dependency state, caller-supplied hash equality and execution strength; required-kind/count findings and a static evidence-to-control impact lookup.
+- Required capability absent: remediation is only urgent/review plus sorted finding codes. It carries no evidence target, rank, marginal/counterfactual score, expected decision delta, minimal obligation set or acquisition value. Findings lose evidence identity before remediation.
+- Adversarial result: unrelated questions produced the same framework audit. backend=datahub searched a constant term and ignored the result before auditing local fixtures. Five separate single waste-evidence repairs changed score but not status; the engine neither ranked them nor identified a next piece.
+- Additional falsifiers: active dependency cycles and future review dates were accepted; equal arbitrary hash strings passed; confidence 3.0 yielded score 198; absent mapped items can remain named in result evidence_ids.
+- Validation boundary: exact-SHA CI passed, but tests do not cover claim routing, evidence attribution, counterfactual repair/ranking, live DataHub-derived decisions, write-back, cycles, future dates, score bounds or malformed schemas. frameworks/schema.json is minimal and the validate CLI path is a no-op.
+- Commercial boundary: useful only as an analyst-assisted pre-audit readiness prototype. Best first wedge is one control-family scan for a DataHub-using internal-audit/GRC team after live ingestion and authoritative mappings are implemented. No adoption, ROI or auditor acceptance was verified.
+- Discovery result: direct high-conjunction metadata was mostly empty; low-attention exact terminology "evidence graph engine" surfaced the zero-star candidate. Code search was partially rate-limited. Why-not provenance and compliance-graph analogs explain absence/impact but did not establish evidence-acquisition ranking.
+- Reused-lesson result: bidirectional tracing exposed the missing findings-to-evidence repair edge; nested-authority inspection exposed decorative question/backend selectors that did not govern the decision. These methods now also have task-05 evidence.
+- New one-task candidate skill: counterfactual next-evidence contract. Distinguish diagnosis from repair by requiring target evidence/obligation, deterministic ranking basis, predicted decision delta and a one-change replay. Evidence set {05}; no SEARCH_SKILLS.md write.
+- Negative knowledge: finding-code lists are not next-evidence recommendations; a router trace is not routing; DataHub screenshots/search are not proof live data drives scoring; self-authored status benchmarks can pass while the repairability requirement is completely absent.
+- Unresolved candidate test: given multiple blockers, can an engine rank exact evidence repairs by deterministic predicted decision delta and prove via one-change replay that its first recommendation flips or maximally advances the claim outcome?
+
