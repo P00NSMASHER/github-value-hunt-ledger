@@ -612,7 +612,7 @@ def record_carrier_action_delivery_confirmation(
         raise ValueError("delivery evidence source must be external and new")
 
     body = {
-        "schema": 1,
+        "schema": 2,
         "execution_key": submitted_receipt.execution_key,
         "buyer_id": submitted_receipt.buyer_id,
         "business_unit": submitted_receipt.business_unit,
@@ -735,9 +735,16 @@ def verify_carrier_action_delivery_receipt(
         raise ValueError("delivery receipt evidence source is not external and new")
     if receipt.delivery_confirmed is not True:
         raise ValueError("delivery receipt must confirm delivery")
+    if receipt.submission_evidence_source_hash in {
+        receipt.submitted_receipt_hash,
+        receipt.authorization_hash,
+        receipt.proposal_hash,
+        receipt.payload_hash,
+    }:
+        raise ValueError("submission evidence source is not external")
     fields = asdict(receipt)
     digest = fields.pop("delivery_receipt_hash")
-    body = {"schema": 1, **fields}
+    body = {"schema": 2, **fields}
     if canonical_hash(body) != digest:
         raise ValueError("delivery receipt hash mismatch")
 
