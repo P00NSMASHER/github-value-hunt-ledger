@@ -301,7 +301,7 @@ def build_settlement_review_case(
 def _canonical_decision(
     case: SettlementReviewCase,
     decision: SettlementReviewDecisionInput,
-) -> tuple[str, datetime, str, str, str]:
+) -> tuple[str, datetime, str, str, str, str]:
     if not isinstance(decision, SettlementReviewDecisionInput):
         raise ValueError("decision must be a SettlementReviewDecisionInput")
     if decision.case_hash != case.case_hash:
