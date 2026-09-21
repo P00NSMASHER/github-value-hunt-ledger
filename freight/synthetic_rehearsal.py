@@ -10,22 +10,17 @@ import tempfile
 from dataclasses import asdict
 from pathlib import Path
 
-from freight.audit_run_manifest import build_audit_run_manifest
+from freight.audit_workflow import RuleCSVInput, render_workflow_summary, run_audit_workflow
 from freight.contracts import (
     open_incumbent_output,
     seal_incumbent_submission,
 )
-from freight.finding_factory import derive_batch
-from freight.invoice_csv_adapter import parse_invoice_charge_csv
 from freight.deal_economics import DealProfile, qualify_deal
-from freight.population_builder import build_population_from_charge_batch
 from freight.pilot_reporting import (
     ReviewDisposition,
     make_finding_review,
 )
-from freight.review_packet import build_review_packet, render_review_packet_markdown
-from freight.review_queue import build_review_queue
-from freight.rule_csv_adapter import parse_charge_rule_csv
+from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_report import (
     ClaimFindingBinding,
@@ -90,63 +85,58 @@ def run_rehearsal() -> dict:
         "inv-2,shp-2,cust,carrier,USD,charge-2,ACCESSORIAL,2026-09-15,1,12500\n"
         "inv-3,shp-3,cust,carrier,USD,charge-3,MISC,2026-09-15,1,15000\n"
     ).encode("utf-8")
-    invoice_batch = parse_invoice_charge_csv(
-        filename="synthetic-freight-charges.csv",
-        data=invoice_csv,
-        buyer_id=BUYER,
-        business_unit=BU,
-    )
-    population_build = build_population_from_charge_batch(
-        invoice_batch,
-        selection_rule="three synthetic invoices",
-    )
-    population = population_build.population
-    charges = invoice_batch.charges
     verified_rules_csv = (
         "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
         "DETENTION,FIXED,2026-09-01,2026-09-30,10000,\n"
         "ACCESSORIAL,FIXED,2026-09-01,2026-09-30,10000,\n"
     ).encode("utf-8")
-    verified_rule_batch = parse_charge_rule_csv(
-        filename="rate-confirmation-rules.csv",
-        data=verified_rules_csv,
-        buyer_id=BUYER,
-        business_unit=BU,
-        customer_id="cust",
-        carrier_id="carrier",
-        currency="USD",
-        authority_document_id="rate-confirmation",
-        source_document_sha256="a" * 64,
-        verified_controlling_authority=True,
-    )
     review_rules_csv = (
         "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
         "MISC,FIXED,2026-09-01,2026-09-30,10000,\n"
     ).encode("utf-8")
-    review_rule_batch = parse_charge_rule_csv(
-        filename="candidate-addendum-rules.csv",
-        data=review_rules_csv,
+    workflow = run_audit_workflow(
+        invoice_filename="synthetic-freight-charges.csv",
+        invoice_data=invoice_csv,
         buyer_id=BUYER,
         business_unit=BU,
-        customer_id="cust",
-        carrier_id="carrier",
-        currency="USD",
-        authority_document_id="candidate-addendum",
-        source_document_sha256="b" * 64,
-        verified_controlling_authority=False,
+        selection_rule="three synthetic invoices",
+        rule_inputs=(
+            RuleCSVInput(
+                filename="rate-confirmation-rules.csv",
+                data=verified_rules_csv,
+                customer_id="cust",
+                carrier_id="carrier",
+                currency="USD",
+                authority_document_id="rate-confirmation",
+                source_document_sha256="a" * 64,
+                verified_controlling_authority=True,
+            ),
+            RuleCSVInput(
+                filename="candidate-addendum-rules.csv",
+                data=review_rules_csv,
+                customer_id="cust",
+                carrier_id="carrier",
+                currency="USD",
+                authority_document_id="candidate-addendum",
+                source_document_sha256="b" * 64,
+                verified_controlling_authority=False,
+            ),
+        ),
     )
+    if workflow.state != "REVIEW_REQUIRED" or workflow.artifacts is None:
+        raise AssertionError("synthetic audit workflow did not reach review-required state")
+
+    artifacts = workflow.artifacts
+    invoice_batch = artifacts.invoice_batch
+    population_build = artifacts.population_build
+    population = population_build.population
+    charges = invoice_batch.charges
+    verified_rule_batch, review_rule_batch = artifacts.rule_batches
     rules = verified_rule_batch.rules + review_rule_batch.rules
-    factory = derive_batch(population, charges, rules)
-    review_queue = build_review_queue(factory)
-    review_packet = build_review_packet(factory, review_queue, charges, rules)
-    audit_run = build_audit_run_manifest(
-        invoice_batch=invoice_batch,
-        population_build=population_build,
-        rule_batches=(verified_rule_batch, review_rule_batch),
-        factory=factory,
-        review_queue=review_queue,
-        review_packet=review_packet,
-    )
+    factory = artifacts.factory
+    review_queue = artifacts.review_queue
+    review_packet = artifacts.review_packet
+    audit_run = artifacts.manifest
     truth = factory.truth
     by_charge = {
         derivation.charge_id: derivation.finding
@@ -266,6 +256,8 @@ def run_rehearsal() -> dict:
         "pilot_delivery_cost_usd": deal.economics.delivery_cost_usd,
         "pilot_gross_margin": deal.economics.gross_margin,
         "population_hash": population.manifest_hash,
+        "audit_workflow_state": workflow.state,
+        "audit_workflow_summary": render_workflow_summary(workflow),
         "audit_run_hash": audit_run.run_hash,
         "population_builder_hash": population_build.builder_hash,
         "population_invoice_count": population_build.invoice_count,
