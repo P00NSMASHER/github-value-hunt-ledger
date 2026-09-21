@@ -137,6 +137,7 @@ def run_rehearsal() -> dict:
     factory = artifacts.factory
     review_queue = artifacts.review_queue
     review_packet = artifacts.review_packet
+    review_routing = artifacts.review_routing
     audit_run = artifacts.manifest
     truth = factory.truth
     by_charge = {
@@ -280,6 +281,11 @@ def run_rehearsal() -> dict:
         "finding_factory_decisions": [item.decision for item in factory.derivations],
         "review_queue_hash": review_queue.queue_hash,
         "review_packet_hash": review_packet.packet_hash,
+        "review_route": review_routing.route,
+        "review_routing_hash": review_routing.routing_hash,
+        "buyer_review_case_count": review_routing.buyer_review_case_count,
+        "evidence_remediation_case_count": review_routing.evidence_remediation_case_count,
+        "rerun_required": review_routing.rerun_required,
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
