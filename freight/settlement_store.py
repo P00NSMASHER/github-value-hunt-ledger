@@ -415,6 +415,89 @@ class SettlementStore:
             return ALLOCATED
         return self._write(op)
 
+    def review_reverse(
+        self,
+        *,
+        reversal_id: str,
+        counter_id: str,
+        allocation_id: str,
+        amount_cents: int,
+        created_at: str,
+    ) -> str:
+        reversal_id = self._text("reversal_id", reversal_id)
+        counter_id = self._text("counter_id", counter_id)
+        allocation_id = self._text("allocation_id", allocation_id)
+        amount_cents = self._positive_cents("reversal amount", amount_cents)
+        created_at = self._timestamp("created_at", created_at)
+
+        def op(conn: sqlite3.Connection) -> str:
+            old = conn.execute(
+                "SELECT * FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND reversal_id=?",
+                (*self._scope, reversal_id),
+            ).fetchone()
+            if old:
+                same = (
+                    old["counter_id"] == counter_id
+                    and old["allocation_id"] == allocation_id
+                    and int(old["amount_cents"]) == amount_cents
+                    and old["created_at"] == created_at
+                )
+                if same:
+                    return ALREADY_REVERSED
+                raise ValueError(
+                    "reversal_id replay conflicts with immutable reversal edge"
+                )
+
+            counter = conn.execute(
+                "SELECT * FROM counter_events WHERE buyer_id=? AND business_unit=? AND counter_id=?",
+                (*self._scope, counter_id),
+            ).fetchone()
+            allocation = conn.execute(
+                "SELECT * FROM allocations WHERE buyer_id=? AND business_unit=? AND allocation_id=?",
+                (*self._scope, allocation_id),
+            ).fetchone()
+            if not counter or not allocation:
+                raise ValueError(
+                    "review reversal requires existing counter and allocation"
+                )
+            if counter["original_event_id"] != allocation["event_id"]:
+                raise ValueError("counter event does not fund allocation")
+
+            allocation_reversed = int(conn.execute(
+                "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges "
+                "WHERE buyer_id=? AND business_unit=? AND allocation_id=?",
+                (*self._scope, allocation_id),
+            ).fetchone()[0])
+            live_cents = int(allocation["amount_cents"]) - allocation_reversed
+            if amount_cents > live_cents:
+                raise ValueError("allocation reversal capacity exceeded")
+
+            counter_used = int(conn.execute(
+                "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges "
+                "WHERE buyer_id=? AND business_unit=? AND counter_id=?",
+                (*self._scope, counter_id),
+            ).fetchone()[0])
+            counter_residual = int(counter["amount_cents"]) - counter_used
+            if amount_cents > counter_residual:
+                raise ValueError("counter event capacity exceeded")
+
+            conn.execute(
+                """INSERT INTO reversal_edges
+                  (buyer_id,business_unit,reversal_id,counter_id,allocation_id,amount_cents,created_at)
+                  VALUES(?,?,?,?,?,?,?)""",
+                (
+                    *self._scope,
+                    reversal_id,
+                    counter_id,
+                    allocation_id,
+                    amount_cents,
+                    created_at,
+                ),
+            )
+            return REVERSED
+
+        return self._write(op)
+
     def auto_apply_counter(self, counter_id: str, *, created_at: str) -> Decision:
         def op(conn: sqlite3.Connection) -> Decision:
             counter = conn.execute(
