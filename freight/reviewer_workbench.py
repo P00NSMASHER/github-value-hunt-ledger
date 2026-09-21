@@ -12,7 +12,7 @@ import json
 import re
 from dataclasses import asdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Iterable
 
 if TYPE_CHECKING:
     from freight.buyer_review_workflow import BuyerReviewBatch
@@ -79,6 +79,7 @@ def render_reviewer_workbench(
     return _render_payload({
         "schema_version": 1,
         "max_decisions": MAX_DECISIONS,
+        "max_decision_bytes": MAX_DECISION_BYTES,
         "buyer_id": review_packet.buyer_id,
         "business_unit": review_packet.business_unit,
         "review_packet_hash": review_packet.packet_hash,
@@ -155,6 +156,72 @@ def import_reviewer_decisions(
             case_hash=row["case_hash"], disposition=disposition,
             reviewer_minutes=row["reviewer_minutes"], reviewed_at=row["reviewed_at"],
         ))
+    return build_buyer_review_batch(
+        review_packet=review_packet, review_routing=review_routing, truth=truth,
+        reviewer_role=reviewer_role, decisions=decisions,
+    )
+
+
+def import_reviewer_decision_files(
+    *,
+    files: Iterable[bytes],
+    review_packet: ReviewPacket,
+    review_routing: ReviewRouting,
+    truth: TruthManifest,
+    reviewer_role: str,
+    previous_batch: BuyerReviewBatch | None = None,
+) -> BuyerReviewBatch:
+    """Combine split exports and optionally retain a verified prior review batch.
+
+    Every export must belong to the current audit. Conflicts never silently
+    replace a prior decision. The caller supplies the authenticated role; a
+    previous batch from another role is not relabelled. No history is persisted
+    here. Persist the returned new batch only after this entire call succeeds.
+    """
+    from freight.buyer_review_workflow import (
+        BuyerReviewDecisionInput, build_buyer_review_batch, verify_buyer_review_batch,
+    )
+    from freight.pilot_reporting import ReviewDisposition
+    from freight.reviewer_decision_package import (
+        MAX_COMBINED_DECISIONS, DraftDecision, canonical_review_time,
+        merge_decision_exports,
+    )
+
+    if not isinstance(reviewer_role, str) or not reviewer_role.strip():
+        raise ValueError("authenticated reviewer_role is required")
+    reviewer_role = reviewer_role.strip()
+    combined = merge_decision_exports(
+        files, review_packet_hash=review_packet.packet_hash,
+        review_routing_hash=review_routing.routing_hash, truth_hash=truth.truth_hash,
+    )
+    rows = {row.case_hash: row for row in combined.decisions}
+    if previous_batch is not None:
+        verify_buyer_review_batch(
+            batch=previous_batch, review_packet=review_packet,
+            review_routing=review_routing, truth=truth,
+        )
+        if previous_batch.reviewer_role != reviewer_role:
+            raise ValueError("previous batch reviewer role differs; separate reviewer handoff required")
+        for record in previous_batch.records:
+            prior = DraftDecision(
+                record.case_hash, record.disposition, record.reviewer_minutes,
+                canonical_review_time(record.reviewed_at),
+            )
+            incoming = rows.get(prior.case_hash)
+            if incoming is not None and incoming != prior:
+                raise ValueError("export conflicts with previously recorded buyer decision")
+            rows[prior.case_hash] = prior
+    if len(rows) > MAX_COMBINED_DECISIONS:
+        raise ValueError("combined decision limit exceeded including previous batch")
+    decisions = tuple(
+        BuyerReviewDecisionInput(
+            case_hash=row.case_hash, disposition=ReviewDisposition(row.disposition),
+            reviewer_minutes=row.reviewer_minutes, reviewed_at=row.reviewed_at,
+        )
+        for row in (rows[key] for key in sorted(rows))
+    )
+    # This is the existing authoritative proof-validation path, not new approval
+    # logic. It rejects unknown/remediation cases and mismatched current proofs.
     return build_buyer_review_batch(
         review_packet=review_packet, review_routing=review_routing, truth=truth,
         reviewer_role=reviewer_role, decisions=decisions,

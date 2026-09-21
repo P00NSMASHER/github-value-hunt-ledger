@@ -54,6 +54,7 @@ CONTROL_PATHS = (
     "freight/review_packet.py",
     "freight/review_queue.py",
     "freight/review_routing.py",
+    "freight/reviewer_decision_package.py",
     "freight/reviewer_workbench.py",
     "freight/reviewer_workbench.html",
     "freight/rule_csv_adapter.py",

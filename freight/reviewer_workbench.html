@@ -12,17 +12,22 @@
 @media(max-width:850px){.layout{grid-template-columns:280px minmax(0,1fr)}.money-grid{grid-template-columns:1fr}.detail-head,.detail-body{padding:18px}.money-card{padding:12px}.money-card strong{font-size:1.12rem}}
 @media(max-width:620px){header{padding:22px 16px}.shell{padding:14px}.layout{grid-template-columns:1fr}.metrics{gap:8px;margin:12px 0}.metric{padding:12px;min-width:0}.metric strong{font-size:1.55rem}.metric span{font-size:.69rem}.tag{font-size:.67rem;padding:5px 8px}#case-list{max-height:245px}.money-grid{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr}.footer{align-items:stretch;flex-direction:column}.notice{font-size:.8rem}.top{align-items:flex-start!important}}
 @media print{header{background:white;color:#152737}header p{color:#547082}.toolbar,.footer,.action-row,#decision-section,#case-list{display:none}.layout{display:block}.panel{border:0}.notice{border-color:#ccc}.tag{display:none}}
+
+.resume{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;padding:16px 20px;background:#fff;border:1px solid #d8e2e9;border-radius:14px}.resume strong{font-size:.95rem}.resume p{font-size:.82rem;color:#617888}#import-feedback{margin:0 0 14px;color:#335c49;font-size:.85rem;overflow-wrap:anywhere}.footer{align-items:flex-start}.batch-actions{display:flex;gap:8px;flex-wrap:wrap}.export-ack{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;margin:12px 0}.export-ack input{width:20px;min-height:20px;margin:3px 0 0;flex-shrink:0}.footer-main{flex:1;min-width:0}.export-controls{min-width:0;max-width:420px}#export-help{font-size:.8rem;color:#617888}.badge.archived{background:#eef0fa;color:#454d85}#feedback[data-error="true"],#import-feedback[data-error="true"]{color:#96372b}
+@media(max-width:620px){.resume{align-items:stretch;flex-direction:column;padding:14px}.batch-actions{flex-direction:column}.export-controls{max-width:none;width:100%}}
+@media print{.resume,#import-feedback{display:none}}
 </style>
 </head>
 <body>
 <header><div class="top"><span class="eyebrow">Freight Recovery / Review</span><span class="tag">Offline · Draft decisions</span></div><h1>Review the evidence.<br>Decide with confidence.</h1><p id="scope"></p></header>
 <main class="shell">
 <div class="notice"><strong>No money has been recovered by this screen.</strong> Amounts are discrepancies under supplied rules. Browser decisions are drafts until the approved backend validates them.</div>
-<div class="metrics"><div class="metric"><strong id="ready-count">0</strong><span>Ready for buyer review</span></div><div class="metric"><strong id="evidence-count">0</strong><span>Need evidence</span></div><div class="metric"><strong id="draft-count">0</strong><span>Draft decisions saved</span></div></div>
+<div class="metrics"><div class="metric"><strong id="ready-count">0</strong><span>Ready for buyer review</span></div><div class="metric"><strong id="evidence-count">0</strong><span>Need evidence</span></div><div class="metric"><strong id="draft-count">0</strong><span>Drafts in current batch</span></div></div>
+<div class="resume"><div><strong>Pick up where you left off</strong><p>Open an exported JSON draft for this exact audit. The file stays on this device; no decisions are submitted.</p></div><button type="button" id="restore">Open saved draft</button><input type="file" id="draft-file" accept=".json,application/json" hidden aria-label="Saved draft JSON file"></div><p id="import-feedback" role="status" aria-live="polite"></p>
 <div class="layout">
-<aside class="panel" aria-label="Review cases"><div class="toolbar"><label for="search">Find an invoice or charge</label><input id="search" type="search" placeholder="Invoice, shipment, charge…" autocomplete="off"><div class="filters" aria-label="Filter cases"><button type="button" data-filter="all" aria-pressed="true">All cases</button><button type="button" data-filter="ready" aria-pressed="false">Buyer review</button><button type="button" data-filter="evidence" aria-pressed="false">Needs evidence</button></div></div><div id="case-list"></div><p id="list-empty" hidden class="toolbar">No matching cases.</p></aside>
-<section class="panel" aria-label="Selected case"><div id="empty"><h2>No queued review cases</h2><p>This packet has no cases requiring review. Only the supplied charges and rules were checked; this is not a certification of complete invoice coverage.</p></div><div id="detail" hidden><div class="detail-head"><h2 id="case-title"></h2><p id="case-context"></p><span id="case-badge" class="badge"></span></div><div class="detail-body"><div class="money-grid"><div class="money-card"><span>Invoice billed</span><strong id="billed"></strong></div><div class="money-card"><span>Expected under matched rule</span><strong id="expected"></strong></div><div class="money-card"><span>Calculated discrepancy</span><strong id="variance"></strong></div></div><p class="context">Currency is preserved per case. No exchange-rate conversion or cross-currency total is applied.</p><div class="section"><h3>Rule & calculation</h3><div id="rules"></div></div><div id="remediation" class="section remediation" hidden><h3>Evidence required before a decision</h3><p id="remediation-copy"></p><p><strong>Correct the source evidence and rerun the audit.</strong> This case cannot be approved from this screen.</p></div><section id="decision-section" class="section" aria-label="Draft buyer decision" hidden><h3>Your draft decision</h3><div class="decision-grid"><div><label for="disposition">Decision</label><select id="disposition"><option value="">Choose a decision</option><option value="CONFIRMED">Confirm discrepancy</option><option value="FALSE_POSITIVE">Reject as false positive</option><option value="UNRESOLVED">Unresolved — needs investigation</option></select></div><div><label for="minutes">Review effort (minutes)</label><input id="minutes" type="number" min="0" step="1" inputmode="numeric" placeholder="Enter minutes"></div></div><div class="action-row"><button type="button" class="primary" id="save">Save draft decision</button><button type="button" id="clear">Clear draft</button></div><p id="feedback" role="status" aria-live="polite"></p></section><details class="proofs"><summary>Source & proof references</summary><dl id="proofs"></dl></details></div></div></section>
-</div><div class="footer"><div><div id="status" role="status" aria-live="polite">No draft decisions yet.</div><p>Export before closing. Drafts are kept in memory only and are not automatically saved.</p></div><button type="button" class="primary" id="export" disabled>Export draft decisions</button></div><p class="privacy">Contains customer-derived evidence. Keep this file and exports in the approved customer environment. No analytics, external assets, uploads, carrier contact, or settlement actions. An exported JSON file does not authenticate a reviewer.</p>
+<aside class="panel" aria-label="Review cases"><div class="toolbar"><label for="search">Find an invoice or charge</label><input id="search" type="search" placeholder="Invoice, shipment, charge…" autocomplete="off"><div class="filters" aria-label="Filter cases"><button type="button" data-filter="all" aria-pressed="true">All cases</button><button type="button" data-filter="ready" aria-pressed="false">Buyer review</button><button type="button" data-filter="evidence" aria-pressed="false">Needs evidence</button><button type="button" data-filter="pending" aria-pressed="false">Not drafted</button></div></div><div id="case-list"></div><p id="list-empty" hidden class="toolbar">No matching cases.</p></aside>
+<section class="panel" aria-label="Selected case"><div id="empty"><h2>No queued review cases</h2><p>This packet has no cases requiring review. Only the supplied charges and rules were checked; this is not a certification of complete invoice coverage.</p></div><div id="detail" hidden><div class="detail-head"><h2 id="case-title"></h2><p id="case-context"></p><span id="case-badge" class="badge"></span></div><div class="detail-body"><div class="money-grid"><div class="money-card"><span>Billed charge</span><strong id="billed"></strong></div><div class="money-card"><span>Expected under matched rule</span><strong id="expected"></strong></div><div class="money-card"><span>Calculated discrepancy</span><strong id="variance"></strong></div></div><p class="context">Currency is preserved per case. No exchange-rate conversion or cross-currency total is applied.</p><div class="section"><h3>Rule & calculation</h3><div id="rules"></div></div><div id="remediation" class="section remediation" hidden><h3>Evidence required before a decision</h3><p id="remediation-copy"></p><p><strong>Correct the source evidence and rerun the audit.</strong> This case cannot be approved from this screen.</p></div><section id="decision-section" class="section" aria-label="Draft buyer decision" hidden><h3>Your draft decision</h3><div class="decision-grid"><div><label for="disposition">Decision</label><select id="disposition"><option value="">Choose a decision</option><option value="CONFIRMED">Confirm discrepancy</option><option value="FALSE_POSITIVE">Reject as false positive</option><option value="UNRESOLVED">Unresolved — needs investigation</option></select></div><div><label for="minutes">Review effort (minutes)</label><input id="minutes" type="number" min="0" step="1" inputmode="numeric" placeholder="Enter minutes"></div></div><div class="action-row"><button type="button" class="primary" id="save">Save draft decision</button><button type="button" id="clear">Discard case draft</button><button type="button" id="next">Next undrafted case</button></div><p id="feedback" role="status" aria-live="polite"></p></section><details class="proofs"><summary>Source & proof references</summary><dl id="proofs"></dl></details></div></div></section>
+</div><div class="footer"><div class="footer-main"><div id="status" role="status" aria-live="polite">No draft decisions yet.</div><p>Save each case before exporting. Drafts and unsaved edits stay in memory; closing the file does not save them.</p><p id="export-help"></p></div><div class="export-controls"><div class="batch-actions"><button type="button" class="primary" id="export" disabled>Export draft decisions</button></div><div id="export-confirmation" hidden><label class="export-ack"><input type="checkbox" id="file-saved"><span>I saved and checked the exported JSON file in the approved location.</span></label><button type="button" id="next-batch" disabled>Start next batch</button></div></div></div><p class="privacy">Contains customer-derived evidence. Keep this file and exports in the approved customer environment. No analytics, external assets, uploads, carrier contact, or settlement actions. An exported JSON file does not authenticate a reviewer.</p>
 <noscript><p>JavaScript is required for the workbench. Use the accompanying reviewer packet when scripts are unavailable.</p></noscript>
 </main>
 <script type="application/json" id="audit-data">__FREIGHT_DATA__</script>
@@ -32,6 +37,14 @@
   const data = JSON.parse(document.getElementById("audit-data").textContent);
   const byId = (id) => document.getElementById(id);
   const drafts = new Map();
+  const archived = new Map();
+  const edits = new Map();
+  const caseIndex = new Map(data.cases.map(c => [c.case_hash, c]));
+  const maxBytes = data.max_decision_bytes || 1048576;
+  let batchNumber = 1;
+  let revision = 0;
+  let exportOffered = false;
+  let importing = false;
   let selected = data.cases[0] || null;
   let filter = "all";
   let unexported = false;
@@ -46,8 +59,9 @@
   function money(currency, value) {
     if (value === null) return "Not established";
     const cents = BigInt(value);
-    const whole = (cents / 100n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return currency + " " + whole + "." + (cents % 100n).toString().padStart(2, "0");
+    const absolute = cents < 0n ? -cents : cents;
+    const whole = (absolute / 100n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return currency + " " + (cents < 0n ? "-" : "") + whole + "." + (absolute % 100n).toString().padStart(2, "0");
   }
   function node(tag, value, className) {
     const el = document.createElement(tag);
@@ -55,25 +69,47 @@
     if (className) el.className = className;
     return el;
   }
+  function changed() {
+    revision += 1;
+    unexported = true;
+    exportOffered = false;
+    byId("file-saved").checked = false;
+  }
+  function feedback(id, message, error = false) {
+    text(id, message); byId(id).dataset.error = String(error);
+  }
   function progress() {
     text("draft-count", drafts.size);
-    text("status", drafts.size + " of " + data.buyer_review_case_count + " eligible cases have a draft decision.");
-    byId("export").disabled = drafts.size === 0;
+    text("status", "Batch " + batchNumber + ": " + drafts.size + " draft decisions. " + archived.size + " in earlier exported batches this session. Nothing submitted.");
+    byId("export").disabled = drafts.size === 0 || edits.size > 0 || importing;
+    byId("restore").disabled = importing;
+    byId("export-confirmation").hidden = !exportOffered;
+    byId("next-batch").disabled = !exportOffered || !byId("file-saved").checked || edits.size > 0 || importing;
+    text("export-help", edits.size ? edits.size + " case(s) have unsaved edits. Save or discard those edits before exporting or reopening a file." : "Each batch supports up to " + data.max_decisions + " decisions. Exports remain untrusted drafts for backend validation.");
+  }
+  function nextPending() {
+    const candidate = data.cases.find(c => c.buyer_review_ready && !drafts.has(c.case_hash) && !archived.has(c.case_hash));
+    if (!candidate) {feedback("feedback", "No undrafted eligible cases remain in this session. Exporting does not approve them."); return;}
+    selected = candidate; filter = "pending"; byId("search").value = "";
+    for (const b of document.querySelectorAll("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === filter));
+    renderList();
   }
   function renderList() {
     const list = byId("case-list"); list.replaceChildren();
     const query = byId("search").value.trim().toLowerCase();
     const visible = data.cases.filter(c =>
-      (filter === "all" || (filter === "ready" ? c.buyer_review_ready : !c.buyer_review_ready)) &&
+      (filter === "all" || (filter === "ready" && c.buyer_review_ready) || (filter === "evidence" && !c.buyer_review_ready) || (filter === "pending" && c.buyer_review_ready && !drafts.has(c.case_hash) && !archived.has(c.case_hash))) &&
       [c.invoice_id, c.shipment_id, c.charge_id, c.charge_code, c.carrier_id].some(v => v.toLowerCase().includes(query)));
-    if (!visible.some(c => selected && c.case_hash === selected.case_hash)) selected = visible[0] || null;
+    if (!visible.some(c => selected && selected.case_hash === c.case_hash)) selected = visible[0] || null;
     for (const c of visible) {
       const button = node("button"); button.type = "button"; button.className = "case-button";
       button.setAttribute("aria-pressed", String(Boolean(selected && selected.case_hash === c.case_hash)));
       button.append(node("strong", c.invoice_id), node("small", c.charge_code + " · " + c.shipment_id));
       button.append(node("small", money(c.currency, c.variance_cents), "amount"));
       const draft = drafts.get(c.case_hash);
-      button.append(node("span", draft ? "Draft: " + words[draft.disposition] : (c.buyer_review_ready ? "Buyer review" : "Needs evidence"), "badge" + (c.buyer_review_ready ? "" : " needs")));
+      const previous = archived.get(c.case_hash);
+      const label = edits.has(c.case_hash) ? "Unsaved edits" : draft ? "Draft: " + words[draft.disposition] : previous ? "Exported draft — not approved" : c.buyer_review_ready ? "Buyer review" : "Needs evidence";
+      button.append(node("span", label, "badge" + (previous ? " archived" : c.buyer_review_ready ? "" : " needs")));
       button.addEventListener("click", () => {selected = c; renderList();});
       list.append(button);
     }
@@ -91,7 +127,7 @@
     const c = selected;
     text("case-title", c.invoice_id + " / " + c.charge_code);
     text("case-context", "Shipment " + c.shipment_id + " · " + c.service_date + " · Carrier " + c.carrier_id);
-    text("case-badge", c.buyer_review_ready ? "Buyer review ready — not yet approved" : "Evidence remediation required");
+    text("case-badge", archived.has(c.case_hash) ? "In an exported draft batch — not approved" : c.buyer_review_ready ? "Buyer review ready — not yet approved" : "Evidence remediation required");
     byId("case-badge").className = "badge" + (c.buyer_review_ready ? "" : " needs");
     text("billed", money(c.currency, c.billed_cents)); text("expected", money(c.currency, c.expected_cents)); text("variance", money(c.currency, c.variance_cents));
     const rules = byId("rules"); rules.replaceChildren();
@@ -109,11 +145,12 @@
     if (!c.rule_evidence.length) rules.append(node("p", "No applicable rule has been established. Expected amount and discrepancy are unknown."));
     byId("remediation").hidden = c.buyer_review_ready;
     text("remediation-copy", instructions[c.action_hint] || instructions.INVESTIGATE_EVIDENCE);
-    byId("decision-section").hidden = !c.buyer_review_ready;
+    byId("decision-section").hidden = !c.buyer_review_ready || archived.has(c.case_hash);
     const draft = drafts.get(c.case_hash);
-    byId("disposition").value = draft ? draft.disposition : "";
-    byId("minutes").value = draft ? String(draft.reviewer_minutes) : "";
-    text("feedback", draft ? "Draft saved locally at " + draft.reviewed_at : "No decision is selected by default.");
+    const edit = edits.get(c.case_hash);
+    byId("disposition").value = edit ? edit.disposition : draft ? draft.disposition : "";
+    byId("minutes").value = edit ? edit.minutes : draft ? String(draft.reviewer_minutes) : "";
+    feedback("feedback", edit ? "Unsaved edits are preserved for this case. Save or discard them before exporting." : draft ? "Draft in memory at " + draft.reviewed_at : "No decision is selected by default.");
     const proofs = byId("proofs"); proofs.replaceChildren();
     const refs = [["Invoice charge source", c.charge_source_hash], ["Case proof", c.case_hash], ["Finding proof", c.finding_proof_hash || "No finding issued"], ["Review packet", data.review_packet_hash], ["Frozen truth", data.truth_hash]];
     for (const rule of c.rule_evidence) refs.push(["Authority source: " + rule.authority_document_id, rule.document_source_hash], ["Rule proof", rule.rule_hash]);
@@ -127,35 +164,175 @@
     for (const peer of document.querySelectorAll("[data-filter]")) peer.setAttribute("aria-pressed", String(peer === b));
     renderList();
   });
+  function rememberEdit() {
+    if (!selected || !selected.buyer_review_ready || archived.has(selected.case_hash)) return;
+    const value = {disposition: byId("disposition").value, minutes: byId("minutes").value};
+    const saved = drafts.get(selected.case_hash);
+    if (value.disposition === (saved ? saved.disposition : "") && value.minutes === (saved ? String(saved.reviewer_minutes) : "")) edits.delete(selected.case_hash);
+    else edits.set(selected.case_hash, value);
+    changed(); progress();
+    feedback("feedback", edits.has(selected.case_hash) ? "Unsaved edits are preserved when you change cases. Save them before exporting." : "No unsaved edits for this case.");
+  }
+  byId("disposition").addEventListener("change", rememberEdit);
+  byId("minutes").addEventListener("input", rememberEdit);
+  byId("next").addEventListener("click", nextPending);
   byId("save").addEventListener("click", () => {
-    if (!selected || !selected.buyer_review_ready) return;
+    if (!selected || !selected.buyer_review_ready || archived.has(selected.case_hash) || importing) return;
     const disposition = byId("disposition").value;
     const raw = byId("minutes").value;
     const minutes = Number(raw);
     if (!Object.prototype.hasOwnProperty.call(words, disposition) || !/^(0|[1-9][0-9]*)$/.test(raw) || !Number.isSafeInteger(minutes)) {
-      text("feedback", "Choose a decision and enter whole, non-negative review minutes."); return;
+      feedback("feedback", "Choose a decision and enter whole, non-negative review minutes.", true); return;
     }
     if (!drafts.has(selected.case_hash) && drafts.size >= data.max_decisions) {
-      text("feedback", "This export has reached the decision limit. Export this partial batch before beginning another."); return;
+      feedback("feedback", "The current batch is full. Discard this case's unsaved edits, export the batch, verify the saved file, then start the next batch.", true); return;
     }
     drafts.set(selected.case_hash, {case_hash: selected.case_hash, disposition, reviewer_minutes: minutes, reviewed_at: new Date().toISOString()});
-    unexported = true; progress(); renderList();
+    edits.delete(selected.case_hash); changed(); progress(); renderList();
   });
   byId("clear").addEventListener("click", () => {
-    if (!selected) return;
-    drafts.delete(selected.case_hash); unexported = true; progress(); renderList();
+    if (!selected || archived.has(selected.case_hash) || importing) return;
+    drafts.delete(selected.case_hash); edits.delete(selected.case_hash); changed(); progress(); renderList();
   });
   byId("export").addEventListener("click", () => {
-    if (!drafts.size) return;
+    if (!drafts.size || edits.size || importing) return;
     const envelope = {schema_version: 1, review_packet_hash: data.review_packet_hash, review_routing_hash: data.review_routing_hash, truth_hash: data.truth_hash, decisions: data.cases.filter(c => drafts.has(c.case_hash)).map(c => drafts.get(c.case_hash))};
     const blob = new Blob([JSON.stringify(envelope, null, 2) + "\n"], {type:"application/json"});
+    if (blob.size > maxBytes) {feedback("import-feedback", "This draft exceeds the backend file-size limit. Reduce the current batch before exporting.", true); return;}
     const url = URL.createObjectURL(blob);
-    const link = node("a"); link.href = url; link.download = "freight-review-decisions-" + data.review_packet_hash.slice(0, 12) + ".json";
+    const link = node("a"); link.href = url; link.download = "freight-review-decisions-" + data.review_packet_hash.slice(0, 12) + "-batch-" + batchNumber + ".json";
     document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-    unexported = false;
-    text("status", "Draft decisions exported. Backend validation is still required; no carrier action was taken.");
+    exportOffered = true; byId("file-saved").checked = false;
+    progress();
+    text("status", "Download requested. Verify the saved JSON file before closing or starting the next batch. Backend validation is still required.");
   });
-  window.addEventListener("beforeunload", event => {if (unexported) {event.preventDefault(); event.returnValue = "";}});
+  byId("file-saved").addEventListener("change", () => {
+    unexported = !byId("file-saved").checked; progress();
+  });
+  byId("next-batch").addEventListener("click", () => {
+    if (!exportOffered || !byId("file-saved").checked || edits.size || importing) return;
+    for (const [key, value] of drafts) archived.set(key, value);
+    drafts.clear(); batchNumber += 1; revision += 1; exportOffered = false; unexported = false;
+    byId("file-saved").checked = false;
+    progress(); nextPending(); renderList();
+  });
+
+  // A small strict JSON reader for this integer-only proposal schema. Unlike
+  // JSON.parse alone, it rejects duplicate properties (including escaped keys)
+  // rather than accepting a later value silently. It never evaluates code.
+  function parseDraftJSON(source) {
+    let i = 0;
+    const white = () => {while (i < source.length && /[ \t\r\n]/.test(source[i])) i += 1;};
+    function string() {
+      const start = i; i += 1;
+      while (i < source.length) {
+        const char = source[i++];
+        if (char === '"') return JSON.parse(source.slice(start, i));
+        if (char === "\\") i += 1;
+      }
+      throw new Error("Invalid JSON string.");
+    }
+    function value(depth) {
+      if (depth > 8) throw new Error("Draft JSON is too deeply nested.");
+      white(); const ch = source[i];
+      if (ch === '"') return string();
+      if (ch === "{") {
+        i += 1; const out = Object.create(null); const keys = new Set(); white();
+        if (source[i] === "}") {i += 1; return out;}
+        while (i < source.length) {
+          white(); if (source[i] !== '"') throw new Error("Invalid JSON object.");
+          const key = string(); if (keys.has(key)) throw new Error("Duplicate JSON property."); keys.add(key);
+          white(); if (source[i++] !== ":") throw new Error("Invalid JSON property.");
+          out[key] = value(depth + 1); white(); const end = source[i++];
+          if (end === "}") return out;
+          if (end !== ",") throw new Error("Invalid JSON object separator.");
+        }
+      } else if (ch === "[") {
+        i += 1; const out = []; white(); if (source[i] === "]") {i += 1; return out;}
+        while (i < source.length) {
+          out.push(value(depth + 1)); white(); const end = source[i++];
+          if (end === "]") return out;
+          if (end !== ",") throw new Error("Invalid JSON array separator.");
+        }
+      } else {
+        for (const [token, parsed] of [["true", true], ["false", false], ["null", null]]) {
+          if (source.startsWith(token, i)) {i += token.length; return parsed;}
+        }
+        const match = /^-?(0|[1-9][0-9]*)/.exec(source.slice(i));
+        if (match) {
+          i += match[0].length; const parsed = Number(match[0]);
+          if (!Number.isSafeInteger(parsed)) throw new Error("Draft numbers must be safe integers.");
+          return parsed;
+        }
+      }
+      throw new Error("Invalid draft JSON.");
+    }
+    const parsed = value(0); white(); if (i !== source.length) throw new Error("Invalid or non-integer draft JSON.");
+    return parsed;
+  }
+  function exactKeys(object, keys) {
+    return object !== null && typeof object === "object" && !Array.isArray(object) && Object.keys(object).length === keys.length && keys.every(k => Object.prototype.hasOwnProperty.call(object, k));
+  }
+  function validTimestamp(input) {
+    if (typeof input !== "string") return false;
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,6})?(Z|[+-]\d{2}:\d{2})$/.exec(input);
+    if (!m) return false;
+    const [year, month, day, hour, minute, second] = m.slice(1, 7).map(Number);
+    if (year < 1 || month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) return false;
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (day < 1 || day > days[month - 1]) return false;
+    return m[7] === "Z" || (Number(m[7].slice(1, 3)) < 24 && Number(m[7].slice(4, 6)) < 60);
+  }
+  function validateImport(envelope) {
+    if (!exactKeys(envelope, ["schema_version", "review_packet_hash", "review_routing_hash", "truth_hash", "decisions"]) || envelope.schema_version !== 1) throw new Error("Unsupported draft envelope schema.");
+    for (const key of ["review_packet_hash", "review_routing_hash", "truth_hash"]) {
+      if (typeof envelope[key] !== "string" || !/^[0-9a-f]{64}$/.test(envelope[key]) || envelope[key] !== data[key]) throw new Error("This draft belongs to a different or stale audit. Nothing was changed.");
+    }
+    if (!Array.isArray(envelope.decisions) || envelope.decisions.length > data.max_decisions) throw new Error("Draft exceeds the decision row limit.");
+    const pending = new Map();
+    for (const row of envelope.decisions) {
+      if (!exactKeys(row, ["case_hash", "disposition", "reviewer_minutes", "reviewed_at"])) throw new Error("Unexpected draft decision fields.");
+      if (typeof row.case_hash !== "string" || !/^[0-9a-f]{64}$/.test(row.case_hash)) throw new Error("Invalid draft case proof.");
+      const c = caseIndex.get(row.case_hash);
+      if (!c || !c.buyer_review_ready) throw new Error("This draft references an unknown or evidence-remediation case.");
+      if (pending.has(row.case_hash)) throw new Error("Duplicate draft decision.");
+      if (typeof row.disposition !== "string" || !Object.prototype.hasOwnProperty.call(words, row.disposition)) throw new Error("Invalid draft disposition.");
+      if (!Number.isSafeInteger(row.reviewer_minutes) || row.reviewer_minutes < 0) throw new Error("Review minutes must be non-negative safe integers.");
+      if (!validTimestamp(row.reviewed_at)) throw new Error("Draft review time must be a valid timezone-aware timestamp.");
+      const current = drafts.get(row.case_hash) || archived.get(row.case_hash);
+      if (current && ["disposition", "reviewer_minutes", "reviewed_at"].some(k => row[k] !== current[k])) throw new Error("A decision conflicts with a draft already in this session. Nothing was overwritten.");
+      pending.set(row.case_hash, row);
+    }
+    const additions = [...pending].filter(([key]) => !drafts.has(key) && !archived.has(key));
+    if (drafts.size + additions.length > data.max_decisions) throw new Error("The combined drafts exceed this batch's decision limit. Export and verify the current batch first.");
+    return additions;
+  }
+  byId("restore").addEventListener("click", () => {
+    if (edits.size) {feedback("import-feedback", "Save or discard unsaved case edits before opening a draft.", true); return;}
+    byId("draft-file").click();
+  });
+  byId("draft-file").addEventListener("change", async () => {
+    const input = byId("draft-file"); const file = input.files[0]; if (!file || importing) return;
+    const beforeRevision = revision; importing = true; progress();
+    try {
+      if (edits.size) throw new Error("Save or discard unsaved case edits first.");
+      if (!file.size || file.size > maxBytes) throw new Error("Draft file is empty or exceeds the file-size limit.");
+      const bytes = await file.arrayBuffer();
+      const raw = new TextDecoder("utf-8", {fatal: true, ignoreBOM: true}).decode(bytes);
+      const envelope = parseDraftJSON(raw);
+      if (beforeRevision !== revision || edits.size) throw new Error("Drafts changed while the file was being read. Open it again; nothing was overwritten.");
+      const additions = validateImport(envelope);
+      // All validation completes before any draft state changes.
+      for (const [key, row] of additions) drafts.set(key, row);
+      if (additions.length) {changed(); selected = caseIndex.get(additions[0][0]);}
+      feedback("import-feedback", additions.length + " draft decision(s) reopened. Existing identical drafts were left unchanged. Nothing was submitted.");
+      renderList();
+    } catch (error) {
+      feedback("import-feedback", "Draft not opened: " + (error instanceof Error ? error.message : "Invalid file.") + " Current drafts are unchanged.", true);
+    } finally {importing = false; input.value = ""; progress();}
+  });
+  window.addEventListener("beforeunload", event => {if (unexported || edits.size) {event.preventDefault(); event.returnValue = "";}});
   progress(); renderList();
 })();
 </script>

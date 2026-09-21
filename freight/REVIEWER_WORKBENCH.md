@@ -1,39 +1,112 @@
 # Offline reviewer workbench
 
-The audit-result bundle includes `reviewer-workbench.html`: a self-contained, customer-derived review screen. It is not a public website or a hosted customer-data service. Keep it in the approved processing environment and retain the original evidence separately.
+The audit-result ZIP includes `reviewer-workbench.html`, a self-contained screen
+for customer-derived evidence. It is not a public site or hosted data service.
+Keep the HTML, exported decisions, and source documents inside the approved
+customer-processing environment. No carrier or settlement action occurs here.
 
-## Reviewer flow
+## Review, pause, and continue
 
-Open the generated HTML in an approved browser. Filter or search the case list, inspect invoice billed amount, expected amount, discrepancy, effective rule and calculation, then select an explicit decision for an eligible buyer-review case. Enter whole, non-negative review minutes and save the draft. No decision is preselected. Evidence-remediation cases show the missing evidence and rerun instruction instead of decision controls.
+Search/filter the case list, inspect billed charge, expected amount, discrepancy,
+effective rule and calculation, then explicitly select a decision for an eligible
+buyer-review case. Enter whole non-negative review minutes and save the draft.
+No decision is preselected. Evidence-remediation cases show evidence/rerun
+instructions instead of approval controls.
 
-Export draft decisions before closing. Drafts exist in browser memory only: there is no automatic server save, localStorage, analytics, external resource loading or upload. An export contains at most 2,000 decision proposals and the packet/routing/truth hashes. It is not a signature, proof of reviewer identity, buyer authorization, or permission for carrier contact.
+Unfinished edits survive case navigation, search, and filter changes. Save or
+discard all unfinished edits before exporting or reopening a file. Use **Not
+drafted** and **Next undrafted case** to continue. Drafts and unfinished edits
+exist in memory only; closing this HTML does not save them automatically.
+
+Export decisions as JSON before closing. An export request is not proof that a
+file was saved. Verify the downloaded file in the approved location. To continue
+past a 2,000-decision batch, acknowledge that the export was saved and checked,
+then start another batch. Earlier exported cases are excluded from subsequent
+batches during that session and remain labelled **not approved**. Editing a
+decision invalidates the prior saved-file acknowledgement.
+
+Open a saved JSON draft to resume this exact audit. Existing identical drafts
+are retained; conflicting/stale files and remediation decisions are rejected
+before any current drafts change. Original review timestamps are retained.
+Earlier-batch tracking is in-memory and session-local, not durable backend history.
 
 ## Approved backend handoff
 
-The caller must obtain authentication, authorization and reviewer role outside the exported file, then import the proposals against the CURRENT canonical proof objects:
+Browser exports are untrusted proposals, not signatures, authenticated identity,
+authorizations, or permission to contact a carrier. The caller must authenticate
+and authorize the reviewer outside the file, supply the current canonical proof
+objects, and persist a new review batch only after the complete import succeeds.
+
+A single-file import remains available as `import_reviewer_decisions`. For split
+exports or continuation of a prior reviewed batch:
 
 ```python
-from freight.reviewer_workbench import import_reviewer_decisions
+from freight.reviewer_workbench import import_reviewer_decision_files
 
-batch = import_reviewer_decisions(
-    data=decision_json_bytes,
+batch = import_reviewer_decision_files(
+    files=exported_json_files,  # iterable of bytes
     review_packet=artifacts.review_packet,
     review_routing=artifacts.review_routing,
     truth=artifacts.factory.truth,
     reviewer_role=authenticated_reviewer_role,
+    previous_batch=previous_verified_batch,  # None for initial handoff
 )
 ```
 
-The importer delegates to the existing `build_buyer_review_batch` path. It rejects stale packet/routing/truth context, duplicate decisions, decisions for evidence-remediation cases, unknown properties, self-asserted reviewer-role fields, invalid dispositions, naive timestamps, noninteger effort, duplicate JSON properties, non-finite JSON values, oversize files and oversize decision lists. Partial review stays partial; unresolved is not confirmed. Persist the resulting review batch through the existing approved process; this adapter does not overwrite history or execute carrier actions.
+The combined importer validates every export, then calls the existing
+`build_buyer_review_batch` proof-validation path once. Partial work stays partial;
+unresolved decisions do not become confirmed. Unknown/remediation cases remain
+ineligible. This importer performs no persistence or external action.
 
-## Integrity and display
+Repeated files and identical decisions across files are idempotent. Duplicate
+rows within one file remain invalid. Different dispositions, effort, or review
+instants for the same case reject the entire handoff. Equivalent known UTC
+offsets normalize to the same instant. A supplied prior batch is re-verified
+against current proofs, all its decisions are retained, and it cannot be
+relabelled to another reviewer role. Conflicts with prior decisions require
+explicit resolution, not last-file-wins replacement.
 
-Generation validates packet/routing/truth relationships through the buyer-review workflow before rendering. Customer values are serialized as inert JSON with HTML delimiters escaped and inserted into the DOM via `textContent`, not interpreted as HTML. A content-security policy permits only the exact bundled script/style hashes and disallows network connections and form submissions.
+## Limits and validation
 
-Economic values cross into JavaScript as decimal strings and are formatted with `BigInt`, preserving exact integer-cent values. The screen does not combine currencies, label unknown expectations as zero, or present discrepancies as recovered money. Hashes detect inconsistency against trusted originals; they do not authenticate a reviewer or make an editable browser export authoritative.
+Each file permits 1 MiB and 2,000 proposals. A combined handoff permits 32 supplied
+files, 16 MiB total input, and 20,000 unique decisions including a prior batch.
+Repeated files/bytes still count toward input limits. An empty decision export
+is valid and preserves prior decisions; an absent file collection is rejected.
 
-## Verification and limitations
+The importer rejects unexpected identity/authority fields, duplicate JSON
+properties, invalid dispositions, non-integer effort, malformed timestamps,
+non-finite numbers, stale proof context, conflicting decisions, and exceeded
+limits. The combined parser also rejects unknown `-00:00` offsets and timestamps
+outside the supported UTC range. Source-file hashes identify input bytes; they
+do not authenticate their author.
 
-`freight/test_reviewer_workbench.py` runs real synthetic audit fixtures through rendering and the decision importer. The separate `Freight Reviewer Workbench` CI workflow also runs existing buyer-review and bundle regressions; the full Freight Commercial Contracts workflow remains unchanged.
+## Display and data handling
 
-Local synthetic browser QA exercised 1440, 768, 390 and 320-pixel widths, explicit decision export, evidence-only cases, empty search, clean audit, and maximum int64-cent formatting. No horizontal overflow, JavaScript exceptions or external requests were observed. Chromium ran offline with locally generated HTML loaded in memory because the tool environment blocks `file:` navigation. This does not establish Safari/iOS file-opening compatibility, authentication, hosting readiness, a production security certification or real-customer audit accuracy.
+Generation validates packet/routing/truth relationships through the existing
+buyer-review workflow. Evidence is inert escaped JSON, inserted using
+`textContent`, never interpreted as HTML. Hash-based CSP allows only the exact
+bundled script/style and blocks network connections and form submission.
+There is no analytics, browser storage, external resource loading, or upload.
+
+Decimal strings and `BigInt` preserve exact integer cents. The screen preserves
+currency per case, never adds currencies together, does not render unknown
+expectations as zero, and does not label discrepancies as realized savings.
+
+## Release verification
+
+The saved browser upgrade was re-tested locally: **27 Chromium tests passed**
+using system Chromium. The new pure Python export parser/assembly suite has
+**47 passing tests**, including a 2,001-decision package. These are scoped local
+checks, not a passing full repository gate.
+
+Nine additional real-pipeline handoff regressions are included for CI, covering
+prior-batch preservation, conflict rejection, role separation, remediation
+exclusion, replay, and 2,001 findings. The CI handoff job includes the existing
+renderer/importer, buyer-review, and audit-result bundle suites. A separate job
+runs the browser suite with pinned test tooling.
+
+The full backend/repository suite has not been demonstrated passing for this
+revision. Keep PR #107 in draft until the complete Freight Commercial Contracts
+and Freight Reviewer Workbench workflows succeed on the final head. Local tests
+use offline Chromium with HTML loaded in memory; Safari/iOS file-opening,
+production authentication/hosting, and real-customer accuracy are not verified.

@@ -1,0 +1,2 @@
+# Test-only dependency; not part of the offline HTML runtime.
+playwright==1.57.0
