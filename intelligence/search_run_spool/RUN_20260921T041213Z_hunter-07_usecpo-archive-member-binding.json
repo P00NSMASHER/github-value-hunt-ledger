@@ -132,7 +132,7 @@
   ],
   "best_result": "Retrieved the externally expected USECPO archive, verified SHA-256 44557bae…910fe7 and ZIP integrity, and proved all 51 file members match the pinned extracted tree; the 2023 member also matches two downstream copies exactly.",
   "durable_evidence_path": "referrals/hunt07-r23-2026-09-21-usecpo-archive-member-binding.md",
-  "notes": "Corrects R21's repository-wide no-extracted-tree conclusion while preserving its core archive-pointer/member distinction. Direct current first-party OEDI SHA-256 and timezone/null semantics remain unknown. Spool submission pending canonical integrator intake.",
+  "notes": "Corrects R21's repository-wide no-extracted-tree conclusion while preserving its core archive-pointer/member distinction. Direct current first-party OEDI SHA-256 and timezone/null semantics remain unknown. Spool submission pending canonical integrator intake. Manual consumer-downstream adjacency is preserved through adjacency_type/root provenance; no generated ADJ queue ID is claimed.",
   "query_family_id": "QF:usecpo-archive-to-member-cryptographic-binding",
   "search_objective_id": "OBJ:independent-evaluation",
   "benchmark_task_ids": [],
@@ -143,9 +143,7 @@
     "SEED:gap:cap-015"
   ],
   "adjacency_mode": "manual",
-  "adjacency_ids": [
-    "ADJ:consumer-downstream:usecpo"
-  ],
+  "adjacency_ids": [],
   "adjacency_types": [
     "consumer_downstream"
   ],
