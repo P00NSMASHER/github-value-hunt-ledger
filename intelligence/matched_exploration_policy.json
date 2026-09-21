@@ -17,6 +17,8 @@
     "Work-steal, manual-override, retrospective, unmatched-claim, and incomplete routes are excluded.",
     "Task difficulty and agent effect are reported separately under an additive crossover contrast.",
     "No estimate may be created from missing cells, unmatched slot identity, or inferred task identity.",
-    "Realized revenue/customer value remains separate from routing utility and is never imputed."
-  ]
+    "Realized revenue/customer value remains separate from routing utility and is never imputed.",
+    "The V19 debt queue is advisory measurement debt only and cannot authorize routing, claiming, or allocator overrides."
+  ],
+  "debt_queue_authorizes_routing": false
 }
