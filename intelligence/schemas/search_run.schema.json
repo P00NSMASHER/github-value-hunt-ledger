@@ -869,6 +869,30 @@
         },
         "additionalProperties": true
       }
+    },
+    "candidate_preflight_checks": {
+      "description": "Repository/revision/capability duplicate checks performed before expensive inspection.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "known_candidate_preflight_hits": {
+      "description": "Preflight checks that found relevant prior evidence for the candidate identity.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "duplicate_deep_inspections_avoided": {
+      "description": "Deep inspections intentionally skipped because current prior evidence made them redundant for the assignment.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
     }
   },
   "additionalProperties": true,
