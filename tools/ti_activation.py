@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+import hashlib, json, subprocess
+from datetime import datetime, timezone, timedelta
+from ti_common import INTEL, load_jsonl
+
+POL=json.loads((INTEL/"activation_policy.json").read_text(encoding="utf-8"))
+PPOL=json.loads((INTEL/"worker_presence_policy.json").read_text(encoding="utf-8"))
+PRES=load_jsonl("worker_presence_state.jsonl")
+PRIMARY=load_jsonl("dispatch_claim_packets.jsonl")
+STEALS=load_jsonl("work_steal_claim_packets.jsonl") if (INTEL/"work_steal_claim_packets.jsonl").exists() else []
+STATE=load_jsonl("execution_state.jsonl")
+HISTORY=load_jsonl("activation_history.jsonl") if (INTEL/"activation_history.jsonl").exists() else []
+
+def parse_ts(v):
+    if not v: return None
+    dt=datetime.fromisoformat(str(v).replace("Z","+00:00"))
+    return dt.astimezone(timezone.utc) if dt.tzinfo else None
+
+def fmt(dt):
+    return None if dt is None else dt.astimezone(timezone.utc).isoformat().replace("+00:00","Z")
+
+def git_clock():
+    try:
+        sha=subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip()
+        raw=subprocess.check_output(["git","show","-s","--format=%cI","HEAD"],text=True).strip()
+        return sha,parse_ts(raw)
+    except Exception:
+        return None,None
+
+def activation_id(payload):
+    raw=json.dumps(payload,sort_keys=True,separators=(",",":"))
+    return "ACTIVATE:"+hashlib.sha256(raw.encode()).hexdigest()[:12]
+
+head_sha,now=git_clock()
+pres_by_worker={x["worker_id"]:x for x in PRES}
+active_workers={
+  x.get("worker_id") for x in STATE
+  if x.get("status") in {"CLAIMED","RUNNING","CLAIMED_SUPERSEDED","RUNNING_SUPERSEDED"} and x.get("worker_id")
+}
+claimable_slots={
+  x.get("slot_id") for x in STATE
+  if x.get("status") in {"AVAILABLE","EXPIRED_AVAILABLE","RETRYABLE_AVAILABLE","RELEASED_AVAILABLE"}
+}
+
+def eligible_packet(p):
+    if p.get("slot_id") not in claimable_slots: return False
+    eligible=parse_ts(p.get("eligible_at") or p.get("issued_at"))
+    hard=parse_ts(p.get("hard_expire_at"))
+    if not now: return False
+    if eligible and now<eligible: return False
+    if hard and now>hard: return False
+    return True
+
+primary_by_worker={}
+for p in PRIMARY:
+    if eligible_packet(p):
+        primary_by_worker.setdefault(p.get("worker_id"),[]).append(p)
+steal_by_worker={}
+for p in STEALS:
+    if eligible_packet(p):
+        steal_by_worker.setdefault(p.get("worker_id"),[]).append(p)
+for d in (primary_by_worker,steal_by_worker):
+    for wid in d:
+        d[wid].sort(key=lambda x:(int(x.get("steal_rank") or 0),x.get("slot_id") or "",x.get("dispatch_ticket_id") or ""))
+
+current=[]
+status_rows=[]
+used_slots=set()
+ttl=int(POL.get("activation_ttl_minutes",30))
+ready_states=set(POL.get("eligible_presence_states") or ["READY_FRESH"])
+
+for wid in sorted(pres_by_worker):
+    ps=pres_by_worker[wid]
+    if wid in active_workers:
+        status_rows.append({"worker_id":wid,"activation_state":"ACTIVE_CLAIM","presence_state":ps.get("presence_state"),"activation_id":None,"reason":"V11 active claim is authoritative."})
+        continue
+    if ps.get("presence_state") not in ready_states:
+        status_rows.append({"worker_id":wid,"activation_state":"WAITING_PRESENCE","presence_state":ps.get("presence_state"),"activation_id":None,"reason":"Fresh READY presence is required for generated activation."})
+        continue
+    choices=[]
+    if primary_by_worker.get(wid): choices.extend(primary_by_worker[wid])
+    if steal_by_worker.get(wid): choices.extend(steal_by_worker[wid])
+    if not choices:
+        status_rows.append({"worker_id":wid,"activation_state":"NO_ELIGIBLE_DISPATCH","presence_state":ps.get("presence_state"),"activation_id":None,"reason":"Worker is ready but has no eligible primary/work-steal packet."})
+        continue
+    # Primary first; then lower steal rank and stable slot/ticket ordering.
+    choices.sort(key=lambda x:(0 if (x.get("dispatch_kind") or "primary")=="primary" else 1,int(x.get("steal_rank") or 0),x.get("slot_id") or "",x.get("dispatch_ticket_id") or ""))
+    packet=next((x for x in choices if x.get("slot_id") not in used_slots),None)
+    if not packet:
+        status_rows.append({"worker_id":wid,"activation_state":"NO_ELIGIBLE_DISPATCH","presence_state":ps.get("presence_state"),"activation_id":None,"reason":"Eligible packets were already reserved in this activation generation."})
+        continue
+    pexp=parse_ts(ps.get("presence_expires_at"))
+    dexp=parse_ts(packet.get("hard_expire_at"))
+    local_exp=None if not now else now+timedelta(minutes=ttl)
+    expires=min([x for x in [pexp,dexp,local_exp] if x is not None])
+    payload={
+      "worker_id":wid,
+      "presence_generation_id":ps["presence_generation_id"],
+      "presence_event_id":ps.get("latest_event_id"),
+      "dispatch_ticket_id":packet["dispatch_ticket_id"],
+      "dispatch_generation_id":packet["dispatch_generation_id"],
+      "slot_id":packet["slot_id"],
+      "assignment_id":packet["assignment_id"]
+    }
+    aid=activation_id(payload)
+    row={
+      **packet,
+      "activation_id":aid,
+      "presence_generation_id":ps["presence_generation_id"],
+      "presence_event_id":ps.get("latest_event_id"),
+      "presence_expires_at":ps.get("presence_expires_at"),
+      "issued_at_activation":fmt(now),
+      "expires_at":fmt(expires),
+      "activation_status":"CURRENT"
+    }
+    current.append(row)
+    used_slots.add(packet["slot_id"])
+    status_rows.append({"worker_id":wid,"activation_state":"READY_TO_CLAIM","presence_state":ps.get("presence_state"),"activation_id":aid,"slot_id":packet["slot_id"],"dispatch_ticket_id":packet["dispatch_ticket_id"],"reason":"Fresh READY presence intersects an eligible dispatch packet."})
+
+fingerprint=json.dumps({
+  "head_sha":head_sha,
+  "presence_generation":next(iter({x.get("presence_generation_id") for x in PRES}),None),
+  "rows":[(x["activation_id"],x["worker_id"],x["slot_id"],x["dispatch_ticket_id"],x["presence_event_id"],x["expires_at"]) for x in current]
+},sort_keys=True)
+gen="ACTGEN:"+hashlib.sha256(fingerprint.encode()).hexdigest()[:12]
+for x in current: x["activation_generation_id"]=gen
+for x in status_rows: x["activation_generation_id"]=gen
+
+hist={x["activation_id"]:x for x in HISTORY if x.get("activation_id")}
+for x in current:
+    if x["activation_id"] not in hist:
+        hist[x["activation_id"]]={**x,"activation_status":"ISSUED"}
+history=sorted(hist.values(),key=lambda x:x["activation_id"])
+
+claim_packets=[]
+for x in current:
+    claim_packets.append({
+      **x,
+      "claim_schema_version":int(POL.get("minimum_claim_schema_version",16))
+    })
+
+def write_jsonl(name,rows):
+    (INTEL/name).write_text("\n".join(json.dumps(x,ensure_ascii=False) for x in rows)+("\n" if rows else ""),encoding="utf-8")
+
+write_jsonl("activation_directives.jsonl",status_rows)
+write_jsonl("activation_claim_packets.jsonl",claim_packets)
+write_jsonl("activation_history.jsonl",history)
+
+metrics={
+  "schema_version":1,
+  "activation_generation_id":gen,
+  "clock_commit_sha":head_sha,
+  "clock_timestamp":fmt(now),
+  "registered_workers":len(PRES),
+  "fresh_ready_workers":sum(1 for x in PRES if x.get("presence_state")=="READY_FRESH"),
+  "current_activations":len(current),
+  "history_activations":len(history),
+  "waiting_presence":sum(1 for x in status_rows if x.get("activation_state")=="WAITING_PRESENCE"),
+  "active_claim_workers":sum(1 for x in status_rows if x.get("activation_state")=="ACTIVE_CLAIM"),
+  "ready_without_dispatch":sum(1 for x in status_rows if x.get("activation_state")=="NO_ELIGIBLE_DISPATCH")
+}
+(INTEL/"activation_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
+
+report=["# WORKER ACTIVATION BOARD","",f"Generation: **{gen}**",f"Clock: **{fmt(now)}**","",
+        "V16 activation is pull-based. Routing can exist without activation; generated claiming requires fresh READY presence.","",
+        "| Worker | Presence | Activation state | Slot | Activation |","|---|---|---|---|---|"]
+for x in status_rows:
+    report.append(f"| {x['worker_id']} | {x.get('presence_state') or '—'} | **{x['activation_state']}** | {x.get('slot_id') or '—'} | {x.get('activation_id') or '—'} |")
+report += ["",f"Current activations: **{len(current)}**. Unknown/stale/offline presence is capacity uncertainty, not negative worker evidence.",""]
+(INTEL/"ACTIVATION_BOARD.md").write_text("\n".join(report),encoding="utf-8")
+print(json.dumps(metrics))
