@@ -175,6 +175,7 @@ def _preflight(
     store: SettlementStore,
     *,
     before: dict,
+    processed_at: str,
     settlement_batch: SettlementEventCSVBatch | None,
     counter_batch: CounterEventCSVBatch | None,
 ) -> None:
@@ -195,6 +196,10 @@ def _preflight(
     incoming_events = {}
     if settlement_batch is not None:
         for event in settlement_batch.events:
+            if processed_at < event.booked_at:
+                raise ValueError(
+                    "processed_at cannot predate settlement booking: " + event.event_id
+                )
             incoming_events[event.event_id] = event
             old = existing_events.get(event.event_id)
             if old is not None:
@@ -228,6 +233,10 @@ def _preflight(
 
     if counter_batch is not None:
         for counter in counter_batch.events:
+            if processed_at < counter.observed_at:
+                raise ValueError(
+                    "processed_at cannot predate counter observation: " + counter.counter_id
+                )
             old = existing_counters.get(counter.counter_id)
             if old is not None:
                 expected = {
@@ -286,6 +295,7 @@ def process_settlement_evidence(
     _preflight(
         store,
         before=before,
+        processed_at=processed_at,
         settlement_batch=settlement_batch,
         counter_batch=counter_batch,
     )
