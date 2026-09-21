@@ -576,3 +576,60 @@ def test_review_claim_flag_timestamp_cannot_be_invalid_direct_sql(tmp_path):
           (buyer_id,business_unit,claim_id,flagged_at)
           VALUES('TEST_BUYER','TEST_BU','c1','not-a-time')""")
     conn.close()
+
+
+def test_atomic_evidence_package_rolls_back_earlier_writes_on_late_counter_failure(tmp_path):
+    s=S(tmp_path); s.create_claim(C())
+    event=E()
+    bad_counter=CounterEventRecord(
+        "bad-r","e1","EUR",10000,"2026-09-03T10:00:00Z",
+        "bad-r-source","BANK-RETURN",
+    )
+    with pytest.raises(ValueError,match="counter currency mismatch"):
+        s.process_evidence_package(
+            settlement_events=(event,),
+            counter_events=(bad_counter,),
+            created_at="2026-09-03T11:00:00Z",
+        )
+    assert s.count("settlement_events")==0
+    assert s.count("allocations")==0
+    assert s.count("counter_events")==0
+    assert s.count("reversal_edges")==0
+
+
+def test_atomic_evidence_package_returns_before_and_after_snapshots_from_same_transaction(tmp_path):
+    s=S(tmp_path); s.create_claim(C())
+    out=s.process_evidence_package(
+        settlement_events=(E(),),
+        created_at="2026-09-02T11:00:00Z",
+    )
+    assert out.store_snapshot_before["tables"]["settlement_events"]==[]
+    assert out.store_snapshot_before["tables"]["allocations"]==[]
+    assert len(out.store_snapshot_after["tables"]["settlement_events"])==1
+    assert len(out.store_snapshot_after["tables"]["allocations"])==1
+    assert out.settlement_outcomes[0].created is True
+    assert out.settlement_outcomes[0].decision.status==ALLOCATED
+
+
+def test_atomic_package_rechecks_reviewed_settlement_after_counter_restores_capacity(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C())
+    s.ingest_event(E(eid="old",ref="INV-1",amt=50000,booked="2026-09-02T10:00:00Z"))
+    assert s.auto_allocate("old",created_at="2026-09-02T11:00:00Z").status==ALLOCATED
+    new_event=E(
+        eid="new",ref="INV-1",amt=50000,
+        booked="2026-09-03T10:00:00Z",
+    )
+    counter=CounterEventRecord(
+        "restore","old","USD",50000,"2026-09-04T10:00:00Z",
+        "restore-source","BANK-RETURN",
+    )
+    out=s.process_evidence_package(
+        settlement_events=(new_event,),
+        counter_events=(counter,),
+        created_at="2026-09-04T11:00:00Z",
+    )
+    assert out.settlement_outcomes[0].decision.status==ALLOCATED
+    assert out.counter_outcomes[0].decision.status==REVERSED
+    assert s.realized_cents()==50000
+    assert s.event_residual("new")==0
