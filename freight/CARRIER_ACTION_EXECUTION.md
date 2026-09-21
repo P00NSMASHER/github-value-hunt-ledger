@@ -94,3 +94,8 @@ The delivery confirmation:
 A FAILED execution cannot receive delivery confirmation. An execution receipt that already recorded DELIVERED does not get a second delivery receipt.
 
 Delivery confirmation still does not prove settlement, credit issuance, cash receipt, recovery or realized savings.
+
+
+## Durable idempotency handoff
+
+For a real sender integration, the preferred path is to persist the execution intent in the Carrier Action Execution Store and reserve its tenant-scoped send slot **before** performing the external call. The durable ledger prevents concurrent/restarted workers from acquiring a second successful-send path for the same execution key.
