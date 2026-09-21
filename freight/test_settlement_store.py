@@ -318,3 +318,134 @@ def test_atomic_claim_batch_rejects_duplicate_claim_or_source_before_writing(tmp
     with pytest.raises(ValueError,match="duplicate source_hash"):
         s.create_claims((a,b))
     assert s.count("recovery_claims")==0
+
+
+
+def test_review_reverse_applies_selected_partial_counter_edge(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C("c1","I1",30000))
+    s.create_claim(C("c2","I2",20000))
+    s.ingest_event(E(ref="BATCH",amt=50000))
+    s.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=30000,created_at="2026-09-02T11:00:00Z")
+    s.review_allocate(allocation_id="a2",claim_id="c2",event_id="e1",amount_cents=20000,created_at="2026-09-02T11:00:00Z")
+    s.ingest_counter(R(amt=10000))
+    assert s.auto_apply_counter("r1",created_at="2026-09-03T11:00:00Z").status==REVIEW
+
+    assert s.review_reverse(
+        reversal_id="rr1",
+        counter_id="r1",
+        allocation_id="a2",
+        amount_cents=10000,
+        created_at="2026-09-03T12:00:00-04:00",
+    )==REVERSED
+    assert s.realized_cents()==40000
+    assert s.count("reversal_edges")==1
+
+
+def test_review_reverse_exact_replay_is_idempotent(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C())
+    s.ingest_event(E())
+    s.auto_allocate("e1",created_at="2026-09-02T11:00:00Z")
+    s.ingest_counter(R(amt=10000))
+    args=dict(
+        reversal_id="rr1",
+        counter_id="r1",
+        allocation_id="auto:e1:c1",
+        amount_cents=10000,
+        created_at="2026-09-03T12:00:00-04:00",
+    )
+    assert s.review_reverse(**args)==REVERSED
+    assert s.review_reverse(**args)==ALREADY_REVERSED
+    assert s.count("reversal_edges")==1
+    assert s.realized_cents()==40000
+
+
+def test_review_reverse_conflicting_replay_is_rejected(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C())
+    s.ingest_event(E())
+    s.auto_allocate("e1",created_at="2026-09-02T11:00:00Z")
+    s.ingest_counter(R(amt=10000))
+    s.review_reverse(
+        reversal_id="rr1",counter_id="r1",allocation_id="auto:e1:c1",
+        amount_cents=10000,created_at="2026-09-03T12:00:00Z",
+    )
+    with pytest.raises(ValueError,match="replay conflicts"):
+        s.review_reverse(
+            reversal_id="rr1",counter_id="r1",allocation_id="auto:e1:c1",
+            amount_cents=9999,created_at="2026-09-03T12:00:00Z",
+        )
+
+
+def test_review_reverse_rejects_wrong_event_allocation(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C("c1","I1",20000))
+    s.create_claim(C("c2","I2",20000))
+    s.ingest_event(E("e1","I1",20000))
+    s.ingest_event(E("e2","I2",20000,booked="2026-09-02T10:01:00Z"))
+    s.auto_allocate("e1",created_at="x")
+    s.auto_allocate("e2",created_at="x")
+    s.ingest_counter(R(original="e1",amt=10000))
+    with pytest.raises(ValueError,match="does not fund allocation"):
+        s.review_reverse(
+            reversal_id="rr1",counter_id="r1",allocation_id="auto:e2:c2",
+            amount_cents=10000,created_at="2026-09-03T12:00:00Z",
+        )
+
+
+def test_review_reverse_enforces_allocation_and_counter_capacity(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C())
+    s.ingest_event(E())
+    s.auto_allocate("e1",created_at="x")
+    s.ingest_counter(R(amt=15000))
+    with pytest.raises(ValueError,match="counter event capacity exceeded"):
+        s.review_reverse(
+            reversal_id="too-much-counter",counter_id="r1",allocation_id="auto:e1:c1",
+            amount_cents=15001,created_at="2026-09-03T12:00:00Z",
+        )
+    assert s.review_reverse(
+        reversal_id="rr1",counter_id="r1",allocation_id="auto:e1:c1",
+        amount_cents=10000,created_at="2026-09-03T12:00:00Z",
+    )==REVERSED
+    with pytest.raises(ValueError,match="counter event capacity exceeded"):
+        s.review_reverse(
+            reversal_id="rr2",counter_id="r1",allocation_id="auto:e1:c1",
+            amount_cents=6000,created_at="2026-09-03T12:01:00Z",
+        )
+
+    s.ingest_counter(R(rid="r2",amt=50000))
+    with pytest.raises(ValueError,match="allocation reversal capacity exceeded"):
+        s.review_reverse(
+            reversal_id="rr3",counter_id="r2",allocation_id="auto:e1:c1",
+            amount_cents=40001,created_at="2026-09-03T12:02:00Z",
+        )
+
+
+@pytest.mark.parametrize("amount", [100.5, "100", True, 0, -1, 2**63])
+def test_review_reverse_requires_exact_positive_integer_cents(tmp_path, amount):
+    s=S(tmp_path)
+    s.create_claim(C())
+    s.ingest_event(E())
+    s.auto_allocate("e1",created_at="x")
+    s.ingest_counter(R(amt=10000))
+    with pytest.raises(ValueError,match="positive integer cents"):
+        s.review_reverse(
+            reversal_id="rr1",counter_id="r1",allocation_id="auto:e1:c1",
+            amount_cents=amount,created_at="2026-09-03T12:00:00Z",
+        )
+
+
+@pytest.mark.parametrize("timestamp", ["2026-09-03T12:00:00","not-a-time",""])
+def test_review_reverse_requires_timezone_aware_timestamp(tmp_path, timestamp):
+    s=S(tmp_path)
+    s.create_claim(C())
+    s.ingest_event(E())
+    s.auto_allocate("e1",created_at="x")
+    s.ingest_counter(R(amt=10000))
+    with pytest.raises(ValueError,match="timezone-aware|required"):
+        s.review_reverse(
+            reversal_id="rr1",counter_id="r1",allocation_id="auto:e1:c1",
+            amount_cents=10000,created_at=timestamp,
+        )
