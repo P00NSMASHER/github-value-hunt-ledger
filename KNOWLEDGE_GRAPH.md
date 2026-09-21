@@ -167,3 +167,12 @@ Every central promotion/demotion must answer: which CAP changes, which OPP chang
 - Freight v15.13 Engagement State Resolver -> **STRENGTHENS EXP-001 internal authorization state** by resolving immutable Charter/Amendment chains and fail-closing accepted-but-unreplaced changes; **DEPENDS_ON external buyer population + deployment evidence + settlement** for any OUT edge.
 - `Fast-Vben scoped source-effect uniqueness + one reversal per prior effect` -> **STRENGTHENS EXP-005/CAP-016 counter-event design**; `OpenConstructionERP unscoped transaction_ref reversal lookup/idempotency` -> **NEGATIVE_CONTROL** showing prior-event ID/idempotency is unsafe when project/tenant scope is omitted.
 - No OUT edge added and no OPP rank changed: these are capability/experiment improvements only; directly evidenced revenue/customer value remain unchanged.
+
+## Integrator evidence delta — 2026-09-21
+- `RUN:20260921T030500Z:hunter13:exp007-opentfraw-thermo-falsification` -> **FALSIFIES current OpenTFRaw metadata fidelity in CAP-013/EXP-007** while **VERIFYING tested peak-array extraction**: 18,420 spectra and all 9,942,753 centroid pairs match the independent comparator, but MS level, polarity, precursor and observed-range semantics materially disagree -> **REQUIRES patched scan-event lookup + exact-fixture replay before four-vendor PASS**.
+- `RUN:20260921T031322Z:hunter08:secsgem-atomicity-correction` -> **RETRACTS predicted secsgem partial mutation in CAP-014/EXP-008**: complete-batch validation plus 7/7 local tests -> **REPLACES_WITH EC-ATOMIC-SHARED + EC-DUPLICATE-POLICY**, still dependent on neutral real-HSMS execution.
+- `RUN:20260921T025635Z:hunter-11:rqr-runtime-closure` -> **STRENGTHENS CAP-010/EXP-004** with source-closure || resolved-execution-closure qualification identity; 5/5 synthetic transfer cases pass -> **DOES_NOT_QUALIFY current FireDrill E2E**.
+- `RUN:20260921T031652Z:HUNTER-09:14e0f62a297d` -> **ADVANCES EXP-002** to synthetic PARTIAL with 12/12 cases and 60/60 stability replays -> **DEPENDS_ON real ERP/provider negative authority**.
+- `RUN:20260921T031303Z:HUNTER-03:514ce7fa5c93` -> **ADVANCES EXP-003** to synthetic PARTIAL with 24/24 baseline, 6/6 mutant kills, 200 race runs and 9/9 late-return extension -> **DEPENDS_ON independent real provider/bank observation**.
+- Exact scientific-value agreement || metadata disagreement -> **CHALLENGES single-score normalization acceptance**: measurement arrays and acquisition semantics require separate verdicts before common normalization.
+
