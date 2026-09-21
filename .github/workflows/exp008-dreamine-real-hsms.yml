@@ -49,7 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           command -v tcpdump
-          sudo tcpdump -i lo -s 0 -U -w "$GITHUB_WORKSPACE/dreamine-actual-tcp.pcap" tcp >"$RUNNER_TEMP/tcpdump.log" 2>&1 &
+          sudo tcpdump -i lo -B 8192 -s 0 -U -w "$GITHUB_WORKSPACE/dreamine-actual-tcp.pcap" tcp >"$RUNNER_TEMP/tcpdump.log" 2>&1 &
           capture_pid=$!
           cleanup() {
             sudo kill -INT "$capture_pid" 2>/dev/null || true
@@ -64,6 +64,7 @@ jobs:
             --results-directory "$GITHUB_WORKSPACE/TestResults" \
             --filter "FullyQualifiedName=Dreamine.Gem.Tests.E30RouterLoopbackTests.HostAndEquipmentExerciseLocallySupportedDialoguesAcrossActualTcp" \
             --verbosity normal
+          sleep 2
 
       - name: Hash execution artifacts
         if: always()
