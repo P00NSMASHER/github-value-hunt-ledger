@@ -1,6 +1,6 @@
 # DISPATCH BACKPRESSURE REPORT
 
-Clock: **2026-09-21T00:38:00Z**
+Clock: **2026-09-21T00:38:14Z**
 
 - Primary tickets: **14**
 - Pending: **14**
@@ -11,19 +11,19 @@ Clock: **2026-09-21T00:38:00Z**
 
 | Worker | Slot | State | Age min | Claim latency min |
 |---|---|---|---:|---:|
-| HUNTER-05 | SLOT-01 | PENDING | 61.0 | — |
-| HUNTER-06 | SLOT-02 | PENDING | 61.0 | — |
-| HUNTER-04 | SLOT-03 | PENDING | 61.0 | — |
-| HUNTER-07 | SLOT-04 | PENDING | 61.0 | — |
-| HUNTER-02 | SLOT-05 | PENDING | 61.0 | — |
-| HUNTER-13 | SLOT-06 | PENDING | 61.0 | — |
-| HUNTER-09 | SLOT-07 | PENDING | 61.0 | — |
-| HUNTER-03 | SLOT-08 | PENDING | 61.0 | — |
-| HUNTER-01 | SLOT-09 | PENDING | 61.0 | — |
-| HUNTER-08 | SLOT-10 | PENDING | 61.0 | — |
-| HUNTER-10 | SLOT-11 | PENDING | 61.0 | — |
-| HUNTER-12 | SLOT-12 | PENDING | 61.0 | — |
-| HUNTER-14 | SLOT-13 | PENDING | 61.0 | — |
-| HUNTER-11 | SLOT-14 | PENDING | 61.0 | — |
+| HUNTER-05 | SLOT-01 | PENDING | 61.2 | — |
+| HUNTER-06 | SLOT-02 | PENDING | 61.2 | — |
+| HUNTER-04 | SLOT-03 | PENDING | 61.2 | — |
+| HUNTER-07 | SLOT-04 | PENDING | 61.2 | — |
+| HUNTER-02 | SLOT-05 | PENDING | 61.2 | — |
+| HUNTER-13 | SLOT-06 | PENDING | 61.2 | — |
+| HUNTER-09 | SLOT-07 | PENDING | 61.2 | — |
+| HUNTER-03 | SLOT-08 | PENDING | 61.2 | — |
+| HUNTER-01 | SLOT-09 | PENDING | 61.2 | — |
+| HUNTER-08 | SLOT-10 | PENDING | 61.2 | — |
+| HUNTER-10 | SLOT-11 | PENDING | 61.2 | — |
+| HUNTER-12 | SLOT-12 | PENDING | 61.2 | — |
+| HUNTER-14 | SLOT-13 | PENDING | 61.2 | — |
+| HUNTER-11 | SLOT-14 | PENDING | 61.2 | — |
 
 Legacy untimed tickets are excluded from SLA judgments.
