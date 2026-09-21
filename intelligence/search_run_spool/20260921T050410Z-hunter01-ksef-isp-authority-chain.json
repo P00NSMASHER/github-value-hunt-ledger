@@ -7,12 +7,21 @@
   "hunter": "HUNTER-01",
   "strategy_id": "STRAT:rule-period-authority-version-audit",
   "query_family": "KSeF regulated vertical schema-version artifact and regulator receipt",
-  "query_family_id": "QF:ksef-regulated-vertical-schema-artifact-regulator-receipt",
+  "query_family_id": "QF:ksef-regulated-vertical-schema-version-artifact-and-regulator-receipt",
   "search_objective_id": "OBJ:current-rule-authority",
   "measurement_quality": "prospective",
   "work_action": "search",
-  "lane_ids": ["NODE-01", "CAP-008", "CAP-019"],
-  "seed_nodes": ["CAP-008", "CAP-019", "FA(3)", "UPO_KSeF"],
+  "lane_ids": [
+    "NODE-01",
+    "CAP-008",
+    "CAP-019"
+  ],
+  "seed_nodes": [
+    "CAP-008",
+    "CAP-019",
+    "FA(3)",
+    "UPO_KSeF"
+  ],
   "search_surfaces": [
     "GitHub repository and exact-revision code search",
     "GitHub REST repository/commit metadata",
@@ -36,7 +45,10 @@
   "recall_rescue_used": true,
   "stop_reason": "The bounded question was answered at the writer boundary: LMS embeds FA(3) schema identity, models regulator state and displays retained UPO evidence, but the inspected public revision contains no writer for outgoing submission/session/UPO state and no KSeF semantic tests. Additional in-repository search cannot establish an absent component.",
   "new_capability_ids": [],
-  "strengthened_capability_ids": ["CAP-008", "CAP-019"],
+  "strengthened_capability_ids": [
+    "CAP-008",
+    "CAP-019"
+  ],
   "experiment_ids": [],
   "candidate_dispositions": [
     {
@@ -45,7 +57,10 @@
       "status": "rejected",
       "reason_code": "missing_public_submission_writer_and_semantic_tests",
       "reason_code_standard": "interesting_but_not_load_bearing",
-      "capability_ids": ["CAP-008", "CAP-019"],
+      "capability_ids": [
+        "CAP-008",
+        "CAP-019"
+      ],
       "novelty_ordinal": 3,
       "evidence_ordinal": 3,
       "reason_detail": "Real ISP ERP with FA(3) namespace/form/schema identity in generated XML, outgoing KSeF session/document state, incoming form-schema/hash fields and retained UPO display. Rejected as authority-grade proof because no source path creates/updates outgoing KSeF records or saves UPO files, phpunit is disabled in CI, no KSeF semantic tests exist, and no immutable XSD/API/client manifest is stored.",
@@ -65,10 +80,22 @@
         "topics": [],
         "license_spdx": "GPL-2.0-only",
         "source_type": "individual",
-        "package_ecosystems": ["Composer"],
-        "protocol_families": ["KSeF 2.0", "FA(3)", "UPO_KSeF"],
-        "geography_tags": ["Poland"],
-        "technology_domains": ["ISP operations", "billing", "regulated e-invoicing"]
+        "package_ecosystems": [
+          "Composer"
+        ],
+        "protocol_families": [
+          "KSeF 2.0",
+          "FA(3)",
+          "UPO_KSeF"
+        ],
+        "geography_tags": [
+          "Poland"
+        ],
+        "technology_domains": [
+          "ISP operations",
+          "billing",
+          "regulated e-invoicing"
+        ]
       }
     }
   ],
