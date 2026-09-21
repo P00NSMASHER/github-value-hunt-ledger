@@ -56,10 +56,6 @@ class PublicBuildTests(unittest.TestCase):
             self.assertEqual(["keep.txt"], [file.name for file in output.iterdir()])
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class PublicOfferBoundaryTests(unittest.TestCase):
     def test_source_preview_keeps_contact_unconfigured_and_no_document_upload(self):
         page = (builder.SOURCE / "index.html").read_text()
@@ -84,3 +80,7 @@ class PublicOfferBoundaryTests(unittest.TestCase):
         self.assertEqual(page.count("<input"), 2)
         self.assertEqual(page.count("<select"), 1)
         self.assertNotIn("<textarea id="notes"", page)
+
+
+if __name__ == "__main__":
+    unittest.main()
