@@ -14,18 +14,17 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterable
 
+from freight.reviewer_decision_package import (
+    MAX_FILE_BYTES as MAX_DECISION_BYTES,
+    MAX_FILE_DECISIONS as MAX_DECISIONS,
+)
+
 if TYPE_CHECKING:
     from freight.buyer_review_workflow import BuyerReviewBatch
     from freight.contracts import TruthManifest
     from freight.review_packet import ReviewPacket
     from freight.review_routing import ReviewRouting
 
-MAX_DECISION_BYTES = 1_048_576
-MAX_DECISIONS = 2_000
-ROOT_KEYS = frozenset({
-    "schema_version", "review_packet_hash", "review_routing_hash", "truth_hash", "decisions",
-})
-DECISION_KEYS = frozenset({"case_hash", "disposition", "reviewer_minutes", "reviewed_at"})
 TEMPLATE_PATH = Path(__file__).with_suffix(".html")
 
 
@@ -91,19 +90,6 @@ def render_reviewer_workbench(
     })
 
 
-def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    out: dict[str, Any] = {}
-    for key, value in pairs:
-        if key in out:
-            raise ValueError("duplicate JSON property")
-        out[key] = value
-    return out
-
-
-def _invalid_constant(_: str) -> None:
-    raise ValueError("non-finite JSON numbers are not accepted")
-
-
 def import_reviewer_decisions(
     *,
     data: bytes,
@@ -118,47 +104,12 @@ def import_reviewer_decisions(
     nor a supplied role string authenticates a person. No carrier action occurs.
     Partial decisions remain partial. This function does not overwrite history.
     """
-    from freight.buyer_review_workflow import BuyerReviewDecisionInput, build_buyer_review_batch
-    from freight.pilot_reporting import ReviewDisposition
-
-    if not isinstance(data, bytes) or not data or len(data) > MAX_DECISION_BYTES:
-        raise ValueError("decision data must be nonempty bytes within the size limit")
-    try:
-        envelope = json.loads(data.decode("utf-8"), object_pairs_hook=_unique_object,
-                              parse_constant=_invalid_constant)
-    except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as exc:
-        raise ValueError("invalid decision JSON") from exc
-    if not isinstance(envelope, dict) or set(envelope) != ROOT_KEYS:
-        raise ValueError("decision envelope schema mismatch")
-    if type(envelope["schema_version"]) is not int or envelope["schema_version"] != 1:
-        raise ValueError("unsupported decision schema_version")
-    expected_context = {
-        "review_packet_hash": review_packet.packet_hash,
-        "review_routing_hash": review_routing.routing_hash,
-        "truth_hash": truth.truth_hash,
-    }
-    if any(envelope[key] != value for key, value in expected_context.items()):
-        raise ValueError("decision context does not match current review proofs; stale export")
-    rows = envelope["decisions"]
-    if not isinstance(rows, list) or len(rows) > MAX_DECISIONS:
-        raise ValueError("decisions must be a list within the row limit")
-    decisions = []
-    for row in rows:
-        if not isinstance(row, dict) or set(row) != DECISION_KEYS:
-            raise ValueError("decision row schema mismatch")
-        if not isinstance(row["disposition"], str):
-            raise ValueError("decision disposition must be a string")
-        try:
-            disposition = ReviewDisposition(row["disposition"])
-        except ValueError as exc:
-            raise ValueError("unsupported decision disposition") from exc
-        decisions.append(BuyerReviewDecisionInput(
-            case_hash=row["case_hash"], disposition=disposition,
-            reviewer_minutes=row["reviewer_minutes"], reviewed_at=row["reviewed_at"],
-        ))
-    return build_buyer_review_batch(
-        review_packet=review_packet, review_routing=review_routing, truth=truth,
-        reviewer_role=reviewer_role, decisions=decisions,
+    # A single export must obey the same schema, timestamp, effort and size
+    # rules as a split handoff. Keep one validator and one buyer-review path.
+    return import_reviewer_decision_files(
+        files=(data,), review_packet=review_packet,
+        review_routing=review_routing, truth=truth,
+        reviewer_role=reviewer_role,
     )
 
 
