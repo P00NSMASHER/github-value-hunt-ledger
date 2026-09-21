@@ -39,6 +39,92 @@ def canonical_hash(value: object) -> str:
 
 
 @dataclass(frozen=True)
+class ProviderOutcomeReceipt:
+    """Evidence-bound provider outcome; naked provider status strings are insufficient."""
+
+    logical_effect_id: str
+    provider_operation_id: str
+    provider: str
+    raw_status: str
+    phase: Literal["PRE_APPLY", "APPLY_OR_LATER", "POST_APPLY", "COMPLETE", "UNKNOWN"]
+    terminal: bool
+    effect_scope: Literal["EXACT_SINGLE_EFFECT", "BATCH_OR_UNKNOWN"]
+    partial_effect_possible: bool
+    operation_identity_matches: bool
+    economic_fingerprint_matches: bool = False
+
+    def classify(self, *, expected_logical_effect_id: str) -> ProbeResult:
+        exact_identity = (
+            bool(self.provider_operation_id.strip())
+            and self.operation_identity_matches
+            and self.logical_effect_id == expected_logical_effect_id
+        )
+        exact_scope = self.effect_scope == "EXACT_SINGLE_EFFECT"
+        if not exact_identity or not self.terminal or not exact_scope:
+            return "UNKNOWN"
+        if (
+            self.phase == "PRE_APPLY"
+            and self.raw_status == "PreProcessingError"
+            and not self.partial_effect_possible
+        ):
+            return "NOT_APPLIED"
+        if (
+            self.phase == "COMPLETE"
+            and self.raw_status == "Processed"
+            and not self.partial_effect_possible
+            and self.economic_fingerprint_matches
+        ):
+            return "APPLIED"
+        return "UNKNOWN"
+
+
+class DynamicsRecurringOutcomePolicy:
+    """Normalize documented Dynamics recurring-integration status semantics."""
+
+    @staticmethod
+    def receipt(
+        *,
+        logical_effect_id: str,
+        provider_operation_id: str,
+        message_status: str,
+        exact_single_effect: bool,
+        operation_identity_matches: bool,
+        economic_fingerprint_matches: bool = False,
+    ) -> ProviderOutcomeReceipt:
+        phase_by_status = {
+            "Preprocessing": "PRE_APPLY",
+            "PreProcessingError": "PRE_APPLY",
+            "Processing": "APPLY_OR_LATER",
+            "ProcessedWithErrors": "APPLY_OR_LATER",
+            "PostProcessingFailed": "POST_APPLY",
+            "Processed": "COMPLETE",
+        }
+        terminal = message_status in {
+            "PreProcessingError",
+            "ProcessedWithErrors",
+            "PostProcessingFailed",
+            "Processed",
+        }
+        partial_effect_possible = message_status in {
+            "Processing",
+            "ProcessedWithErrors",
+            "PostProcessingFailed",
+        }
+        return ProviderOutcomeReceipt(
+            logical_effect_id=logical_effect_id,
+            provider_operation_id=provider_operation_id,
+            provider="MICROSOFT_DYNAMICS_365_FO_RECURRING_INTEGRATION",
+            raw_status=message_status,
+            phase=phase_by_status.get(message_status, "UNKNOWN"),
+            terminal=terminal,
+            effect_scope="EXACT_SINGLE_EFFECT" if exact_single_effect else "BATCH_OR_UNKNOWN",
+            partial_effect_possible=partial_effect_possible,
+            operation_identity_matches=operation_identity_matches,
+            economic_fingerprint_matches=economic_fingerprint_matches,
+        )
+
+
+@dataclass(frozen=True)
 class Balance:
     authority_qty: int
     authority_amount: int
@@ -426,6 +512,19 @@ class AuthorityLedger:
         except Exception:
             self.db.execute("ROLLBACK")
             raise
+
+    def reconcile_receipt(
+        self,
+        operation_key: str,
+        receipt: ProviderOutcomeReceipt,
+        *,
+        observed_at: str,
+    ) -> str:
+        return self.reconcile(
+            operation_key,
+            receipt.classify(expected_logical_effect_id=operation_key),
+            observed_at=observed_at,
+        )
 
     def can_redispatch(self, operation_key: str, *, now: str) -> bool:
         row = self.db.execute(
