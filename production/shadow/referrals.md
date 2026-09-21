@@ -233,3 +233,15 @@ Append-only cross-lane referrals from the three production shadow hunters.
 - Technical claims safe to use: the exact Apache-2.0 revision implements manifest-last checkpoint discovery, per-shard generation/size/SHA-256 verification, deterministic operation/revision identities, and a deeper durable publication substrate with response-loss replay and path-movement rejection. Exact-SHA Python SDK and Rust CI runs passed.
 - Do not assume: atomic closure over current shard generations at manifest commit, helper-level workspace-incarnation fencing, real-provider checkpoint qualification, OpenMM/OpenDPD/atomate2 integration, cross-host fencing, metadata HA, physical power-cycle durability or STRONG scientific-product status. The independent verifier returned INCOMPLETE and the scientific candidate is 23/30 WATCH.
 
+## 2026-09-21 — AI → Commercial: attestation-to-executor binding retrofit
+
+- **Trigger:** Shadow AI Run 17 inspected `agenttrust-labs/agenttrust@21a3b111b7677d0b06ab1b063d647e4f52ea3b17`.
+- **Evidence-backed capability:** AgentTrust can atomically fail closed before a payment transfer and retains historical devnet evidence of validation-required → attested → allowed behavior.
+- **Load-bearing gap:** the payment policy consumes subject, capability label, attestor, expiry and revocation, but not the stored claim payload/URI hashes and not a runtime-derived executor identity. A valid capability credential can therefore remain admissible when the evidence payload or acting executor has changed.
+- **Currentness limit:** historical May 2026 devnet evidence is not current exact-head qualification; September 2026 scheduled devnet smoke remained red.
+- **Commercial primitive:** **Attestation-to-Executor Binding Retrofit** for an existing agent payment/action gate—derive identity from the executor/config actually acting, map it to a narrow reviewed behavior closure, bind current provider/action proof, and make the consequence gate consume that exact identity without widening to whole-release churn.
+- **Safe claim:** “We can test whether the evidence your agent presents is the evidence your payment gate actually uses.”
+- **Unsafe claims:** do not claim AgentTrust is currently live-provider qualified; do not call a capability label a reviewed source closure; do not call a subject asset a runtime measurement; do not combine AgentTrust, Signet and TEE comparators into one public end-to-end implementation.
+- **Buyer-validation question:** Will an agent-payment, x402 or automated treasury operator provide one non-production route and pay for a fixed-scope audit/retrofit that plants (a) claim-payload drift, (b) executor-binary/config drift and (c) unrelated documentation drift, requiring the first two to withdraw authority and the third to preserve it?
+- **Evidence needed before any outcome claim:** explicit buyer authorization, frozen route/population, before/after gate behavior, exact behavior/executor/provider-proof identities, independently observed zero-effect on planted denials, and an attributable commercial credit/refund/remittance or paid engagement.
+
