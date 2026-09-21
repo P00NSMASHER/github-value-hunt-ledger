@@ -65,6 +65,38 @@
       ],
       "review_date": "2026-09-21",
       "recovered_new_runs": 1
+    },
+    {
+      "search_run_id": "RUN:20260921T025635Z:hunter-11:rqr-runtime-closure",
+      "decision": "archive_incomplete_reviewed_correction_accept_final_minimal_correction",
+      "original_path": "intelligence/search_run_spool/20260921T025635Z-hunter-11-rqr-runtime-closure-reconciled.json",
+      "archive_path": "intelligence/search_run_archive/20260921T025635Z-hunter-11-rqr-runtime-closure-reconciled.json",
+      "corrected_submission_path": "intelligence/search_run_spool/20260921T025635Z-hunter-11-rqr-runtime-closure-reconciled-v2.json",
+      "archived_bytes_sha256": "1ab3710d29b4c710b6901e40d745216a5b5a2f0513984883292f1bcab9d59e7e",
+      "canonical_record_sha256": "c39e41d04318ff80ad2c731fdee2add9783aefcb33033667fb32e28c030d4c73",
+      "canonical_ledger": "intelligence/search_runs.jsonl",
+      "reason": "The first reviewed correction exposed a second independent validation error: strategy_id referenced an unregistered strategy. Based on the recorded method—testing whether a claimed source closure maps to the resolved execution closure—the final reviewed record uses the existing STRAT:decision-claim-runtime-side-effect-trace. No result, denominator, query, candidate, execution or evidence field changed.",
+      "canonical_evidence_paths": [
+        "hunters/15-run25-2026-09-21.md"
+      ],
+      "review_date": "2026-09-21",
+      "recovered_new_runs": 1
+    },
+    {
+      "search_run_id": "RUN:20260921T031322Z:hunter08:secsgem-atomicity-correction",
+      "decision": "archive_incomplete_reviewed_correction_accept_final_minimal_correction",
+      "original_path": "intelligence/search_run_spool/20260921T031322Z-hunter08-secsgem-atomicity-correction-reconciled.json",
+      "archive_path": "intelligence/search_run_archive/20260921T031322Z-hunter08-secsgem-atomicity-correction-reconciled.json",
+      "corrected_submission_path": "intelligence/search_run_spool/20260921T031322Z-hunter08-secsgem-atomicity-correction-reconciled-v2.json",
+      "archived_bytes_sha256": "97449c84c66a8328a98cc22beb5a8b36a11cf2f22caa47d5faa518db020c12be",
+      "canonical_record_sha256": "958e188fd1fdfd3807d604fbb994a937a7c82d9bdea11a2ef92e2cec9367897b",
+      "canonical_ledger": "intelligence/search_runs.jsonl",
+      "reason": "The first reviewed correction exposed a second independent validation error: both candidate dispositions lacked the V8+ repository_profile envelope. The final reviewed record marks metadata_status unavailable and explicitly refuses to infer repository metadata. No result, score, denominator, candidate identity, execution or evidence field changed.",
+      "canonical_evidence_paths": [
+        "referrals/hunt08-r24-2026-09-21-secsgem-atomicity-correction.md"
+      ],
+      "review_date": "2026-09-21",
+      "recovered_new_runs": 1
     }
   ]
 }
