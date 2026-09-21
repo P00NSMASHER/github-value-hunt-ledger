@@ -118,6 +118,8 @@ for s in active:
 measured = len(discovery_runs)
 valid_out = [o for o in outs if o.get("result") != "INVALID"]
 stop_reason_counts = defaultdict(int)
+recall_rescue_type_counts = defaultdict(int)
+recall_rescue_type_success = defaultdict(int)
 recall_rescue_observed = 0
 recall_rescue_used = 0
 for r in discovery_runs:
@@ -128,6 +130,10 @@ for r in discovery_runs:
         recall_rescue_observed += 1
         if r.get("recall_rescue_used") is True:
             recall_rescue_used += 1
+            rescue_type = r.get("recall_rescue_type") or "unspecified"
+            recall_rescue_type_counts[rescue_type] += 1
+            if r.get("recall_rescue_found_qualifying_candidate") is True:
+                recall_rescue_type_success[rescue_type] += 1
 if len(valid_out) < 3 or measured < 30:
     exploration_budget = .50
 elif len(valid_out) < 10:
@@ -201,6 +207,8 @@ policy_obj = {
     "stop_reason_counts": dict(sorted(stop_reason_counts.items())),
     "recall_rescue_observed_runs": recall_rescue_observed,
     "recall_rescue_used_runs": recall_rescue_used,
+    "recall_rescue_type_counts": dict(sorted(recall_rescue_type_counts.items())),
+    "recall_rescue_type_successes": dict(sorted(recall_rescue_type_success.items())),
     "outcome_attribution_method": "equal_touch_fractional_credit",
     "strategy_allocation": rows,
     "priority_capability_gaps": gaps,
@@ -262,9 +270,16 @@ for reason, count in sorted(stop_reason_counts.items(), key=lambda item: (-item[
     lines.append(f"| {reason} | {count} |")
 if not stop_reason_counts:
     lines.append("| — | 0 |")
+lines += ["", "### Recall rescue types", "", "| Rescue type | Uses | Qualifying finds |", "|---|---:|---:|"]
+for rescue_type, count in sorted(recall_rescue_type_counts.items(), key=lambda item: (-item[1], item[0])):
+    lines.append(f"| {rescue_type} | {count} | {recall_rescue_type_success.get(rescue_type, 0)} |")
+if not recall_rescue_type_counts:
+    lines.append("| — | 0 | 0 |")
 lines += ["", "## Recall floor", "",
           "- Do not let one attractive near-match consume the entire search budget on a true discovery task.",
           "- Before NO_FIND, use one materially different recall-rescue surface when practical.",
+          "- If domain-labelled candidates miss the defining invariant, use an invariant-first adjacent-domain rescue without relaxing the acceptance target.",
+          "- A rate-limited or failed retrieval surface is retrieval debt, not absence evidence; switch surface/anchor family when practical.",
           "- Treat verifier rejection as candidate-specific, not task-wide absence evidence.",
           "- Keep wildcard/novelty exploration alive even when a locally strong strategy emerges.",
           "- Keep coordination-derived routing observe-first until measured evidence shows it improves outcomes without worsening recall.", "",
