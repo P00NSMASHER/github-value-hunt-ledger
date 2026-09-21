@@ -1,1 +1,2 @@
 {"event_id":"PRESENCE:c1c1dd74e630","event_type":"READY","timestamp":"2026-09-21T03:08:16.689Z","worker_id":"HUNTER-06","ttl_minutes":70,"notes":"Pair 3 EXPERIMENT benchmark complete; ready for one generated EXP-007 assignment."}
+{"event_id":"PRESENCE:e638c30f65c2","event_type":"READY","timestamp":"2026-09-21T04:15:14.686Z","worker_id":"HUNTER-06","ttl_minutes":70,"notes":"Pair 3 EXPERIMENT benchmark complete; ready for current EXP-007 execution or bounded unallocated metadata-repair replay."}
