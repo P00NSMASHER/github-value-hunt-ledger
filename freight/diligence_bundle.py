@@ -49,6 +49,7 @@ DOC_PATHS=(
     "freight/PILOT_AUDIT_AND_LIFECYCLE.md",
     "freight/SECURITY_AND_DATA_HANDLING.md",
     "freight/SETTLEMENT_EVIDENCE_INGESTION.md",
+    "freight/SETTLEMENT_REVIEW_WORKFLOW.md",
     "freight/RELEASE_AND_SECURITY_GATE.md",
     "freight/RIGHTS_DILIGENCE.md",
     "freight/RIGHTS_EVIDENCE_MANIFEST.json",
