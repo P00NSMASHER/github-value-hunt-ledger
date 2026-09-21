@@ -39,6 +39,10 @@ def stable_ticket_payload(packet):
       "routing_generation_id":packet["routing_generation_id"],
       "worker_profile_generation_id":packet["worker_profile_generation_id"],
       "routing_learning_generation_id":packet.get("routing_learning_generation_id"),
+      "routing_exploration_generation_id":packet.get("routing_exploration_generation_id"),
+      "routing_exploration_pair_id":packet.get("routing_exploration_pair_id"),
+      "baseline_slot_id":packet.get("baseline_slot_id"),
+      "route_mode":packet.get("route_mode"),
       "slot_id":packet["slot_id"],
       "assignment_id":packet["assignment_id"],
       "allocator_generation_id":packet["allocator_generation_id"],
@@ -96,7 +100,7 @@ for r in ROUTES:
     t={
       **payload,
       "dispatch_ticket_id":did,
-      "ticket_schema_version":15,
+      "ticket_schema_version":19,
       "worker_id":p["worker_id"],
       "routing_generation_id":p["routing_generation_id"],
       "worker_profile_generation_id":p["worker_profile_generation_id"],
@@ -122,7 +126,7 @@ for r in ROUTES:
     tickets.append(t)
     claim_packets.append({
       **t,
-      "claim_schema_version":15,
+      "claim_schema_version":19,
       "routing_mode":"generated",
       "lease_minutes":int(EXEC_POL.get("default_lease_minutes",120))
     })
@@ -140,7 +144,8 @@ for t in tickets:
     if old:
         stable_keys=[
           "dispatch_kind","worker_id","routing_generation_id","worker_profile_generation_id",
-          "routing_learning_generation_id","slot_id","assignment_id","allocator_generation_id",
+          "routing_learning_generation_id","routing_exploration_generation_id","routing_exploration_pair_id",
+          "baseline_slot_id","route_mode","slot_id","assignment_id","allocator_generation_id",
           "portfolio_policy_generation_id","work_item_id","assignment_slot_role",
           "assignment_work_kind","assignment_source_id","assignment_score","routing_score"
         ]
