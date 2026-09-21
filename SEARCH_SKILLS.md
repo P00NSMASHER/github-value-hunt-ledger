@@ -341,3 +341,27 @@ When `measurement_quality: "benchmark"` under V4:
 - keep sibling strategy conditions independent until frozen;
 - no-find and correct-reject results are valid outcomes;
 - matched benchmark evidence improves strategy comparison but does not substitute for realized customer/engineering outcomes.
+
+## Bidirectional money/evidence invariant tracing
+- SKILL NAME: Bidirectional money/evidence invariant tracing
+- WHEN TO USE: A system claims that operational facts, pricing/authority and consequential money state remain consistent across approval, correction, retry, reconciliation or external-action boundaries.
+- PROCEDURE:
+  1. Pin the exact revision and identify the operational observations, governing terms/rates and stable business identity for one monetary effect.
+  2. Trace forward from observations and authority through calculation, review/approval, journal/payable/charge creation and any external dispatch or acknowledgment.
+  3. Trace backward from every permitted correction, repricing, cancellation, retry, partial failure and external ambiguity to the exact evidence/version that still authorizes the money state.
+  4. Inspect every multi-write boundary for shared transactionality, idempotency scope, uniqueness and durable repair. Failure-inject mentally or with tests after each write.
+  5. Distinguish recording an intended/manual external action from executing and independently confirming it.
+  6. Require the approved monetary state, retained evidence/hash and current authoritative inputs to remain mutually consistent; otherwise classify the effect as stale, stranded, duplicated or UNKNOWN rather than final.
+  7. Label each claim separately as IMPLEMENTED, TESTED, EXECUTED or UNVERIFIED.
+- WHY IT WORKED: Benchmark Experiment Tasks **01 and 02** independently validated the method. Task 01 traced geofence/appointment observations into detention billing and found frozen evidence that could become stale after repricing. Task 02 traced trucking operations through carrier invoice variance and settlement, then found a non-atomic adjustment-before-resolution boundary that can strand a payable effect after a second-write failure.
+- EXAMPLES:
+  - Benchmark Task 01: `kodekinetics79/opstrax-enterprise-build@fec2ba1432d6f8b4ba4c48be3d58e7e096819045`
+  - Benchmark Task 02: `emoss08/Trenova@0ce45c2047619689bf3f829f10c1e5e93b26e057`
+- FAILURE MODES:
+  - treating a frozen evidence hash as proof that the evidence still matches later repricing or correction;
+  - crediting a happy-path multi-write workflow without testing failure between writes;
+  - treating logged, queued or manually recorded payment/notification state as independently observed execution;
+  - tracing features only forward and missing how later corrections invalidate prior authority;
+  - inferring durable repair from idempotency or database uniqueness alone.
+- NEXT IMPROVEMENT: apply the method to one real provider-backed refund, payout or ERP writeback and require process-loss injection plus authoritative readback before extending it into a general consequential-action skill.
+
