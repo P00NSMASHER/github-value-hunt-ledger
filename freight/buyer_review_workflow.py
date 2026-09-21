@@ -294,6 +294,35 @@ def build_buyer_review_batch(
     )
 
 
+def verify_buyer_review_batch(
+    *,
+    batch: BuyerReviewBatch,
+    review_packet: ReviewPacket,
+    review_routing: ReviewRouting,
+    truth: TruthManifest,
+) -> None:
+    if not isinstance(batch, BuyerReviewBatch):
+        raise ValueError("batch must be a BuyerReviewBatch")
+    decisions = tuple(
+        BuyerReviewDecisionInput(
+            case_hash=record.case_hash,
+            disposition=ReviewDisposition(record.disposition),
+            reviewer_minutes=record.reviewer_minutes,
+            reviewed_at=record.reviewed_at,
+        )
+        for record in batch.records
+    )
+    expected = build_buyer_review_batch(
+        review_packet=review_packet,
+        review_routing=review_routing,
+        truth=truth,
+        reviewer_role=batch.reviewer_role,
+        decisions=decisions,
+    )
+    if expected != batch:
+        raise ValueError("buyer review batch does not match current review proofs")
+
+
 def render_buyer_review_markdown(batch: BuyerReviewBatch) -> str:
     lines = [
         "# Freight Recovery — Buyer Review Decisions",

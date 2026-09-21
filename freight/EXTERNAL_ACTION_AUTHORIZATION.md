@@ -86,3 +86,10 @@ Any mismatch, expiry or revocation fails closed.
 A CONFIRMED finding used for an external action must now carry a review proof bound to the exact `finding_proof_hash`, reviewer role, review timestamp and reviewer effort. The authorization stores the resulting review hashes alongside the finding proof hashes.
 
 Legacy unbound review rows can still be used for descriptive pilot reporting, but they cannot authorize a carrier-facing action. If the finding changes, the prior review no longer matches and a new review is required.
+
+
+## Customer/payee identity binding
+
+External action authorization is now bound to both the target carrier and the target customer/payee identity. Every selected finding must match the authorized carrier, customer/payee and currency.
+
+This prevents one carrier/currency authorization from being reused across different customer identities. Downstream action checks require the same customer/payee identity before an action is considered within scope.

@@ -7,6 +7,7 @@ from freight.buyer_review_workflow import (
     BuyerReviewDecisionInput,
     BuyerReviewState,
     build_buyer_review_batch,
+    verify_buyer_review_batch,
     render_buyer_review_markdown,
 )
 from freight.pilot_reporting import ReviewDisposition
@@ -234,3 +235,36 @@ def test_renderer_states_decision_and_authorization_boundaries():
     assert "CONFIRMED" in text
     assert "remediated upstream and rerun" in text
     assert "does not authorize carrier contact" in text
+
+
+def test_public_verifier_rederives_buyer_review_batch_from_packet_and_routing():
+    artifacts = workflow()
+    case_hash = artifacts.review_routing.buyer_review_case_hashes[0]
+    batch = build_buyer_review_batch(
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        truth=artifacts.factory.truth,
+        reviewer_role="Buyer Controller",
+        decisions=(
+            BuyerReviewDecisionInput(
+                case_hash=case_hash,
+                disposition=ReviewDisposition.CONFIRMED,
+                reviewer_minutes=3,
+                reviewed_at="2026-09-21T09:00:00Z",
+            ),
+        ),
+    )
+    verify_buyer_review_batch(
+        batch=batch,
+        review_packet=artifacts.review_packet,
+        review_routing=artifacts.review_routing,
+        truth=artifacts.factory.truth,
+    )
+    bad = replace(batch, batch_hash="0" * 64)
+    with pytest.raises(ValueError, match="does not match current review proofs"):
+        verify_buyer_review_batch(
+            batch=bad,
+            review_packet=artifacts.review_packet,
+            review_routing=artifacts.review_routing,
+            truth=artifacts.factory.truth,
+        )

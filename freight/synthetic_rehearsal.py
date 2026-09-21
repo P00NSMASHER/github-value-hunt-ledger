@@ -16,11 +16,20 @@ from freight.buyer_review_workflow import (
     BuyerReviewDecisionInput,
     build_buyer_review_batch,
 )
+from freight.carrier_action_workflow import (
+    CarrierActionApprovalInput,
+    authorize_carrier_action_proposal,
+    build_carrier_action_proposal_batch,
+)
 from freight.contracts import (
     open_incumbent_output,
     seal_incumbent_submission,
 )
+from freight.engagement_state import resolve_engagement
+from freight.external_action_authorization import ActionType, assert_action_allowed
 from freight.deal_economics import DealProfile, qualify_deal
+from freight.pilot_activation_packet import build_packet
+from freight.pilot_charter import build_charter, from_dict as charter_from_dict
 from freight.pilot_reporting import ReviewDisposition
 from freight.recovery_claim_workflow import (
     build_recovery_claim_batch,
@@ -49,23 +58,22 @@ BU = "bu-synthetic"
 
 
 def run_rehearsal() -> dict:
-    readiness = assess_readiness(
-        PilotReadinessInput(
-            authorization_documented=True,
-            read_only_access=True,
-            population_reproducible=True,
-            incumbent_output_sealable=True,
-            settlement_observable=True,
-            material_authority_reconstructable=True,
-            customer_identity_stable=True,
-            carrier_identity_stable=True,
-            retention_defined=True,
-            deletion_defined=True,
-            invoice_source_coverage=1.0,
-            authority_source_coverage=0.96,
-            shipment_evidence_coverage=0.92,
-        )
+    readiness_input = PilotReadinessInput(
+        authorization_documented=True,
+        read_only_access=True,
+        population_reproducible=True,
+        incumbent_output_sealable=True,
+        settlement_observable=True,
+        material_authority_reconstructable=True,
+        customer_identity_stable=True,
+        carrier_identity_stable=True,
+        retention_defined=True,
+        deletion_defined=True,
+        invoice_source_coverage=1.0,
+        authority_source_coverage=0.96,
+        shipment_evidence_coverage=0.92,
     )
+    readiness = assess_readiness(readiness_input)
 
     deal = qualify_deal(
         readiness,
@@ -83,6 +91,49 @@ def run_rehearsal() -> dict:
             target_gross_margin=0.50,
         ),
     )
+
+    activation_packet = build_packet(
+        asdict(readiness_input),
+        {
+            "status": "READY",
+            "route": "CONTROLLED_MANUAL_BLIND_PILOT",
+            "blockers": [],
+            "conditions": [],
+            "warnings": [],
+        },
+    )
+    charter_request = charter_from_dict(
+        {
+            "engagement_id": "ENG-SYNTHETIC",
+            "buyer_id": BUYER,
+            "business_unit": BU,
+            "population_rule": "three synthetic invoices",
+            "source_date_start": "2026-09-01",
+            "source_date_end": "2026-09-30",
+            "carrier_scope": ["carrier"],
+            "mode_scope": ["LTL"],
+            "fixed_fee_usd": 20000,
+            "buyer_truth_owner_role": "Truth Owner",
+            "buyer_action_approver_role": "VP Supply Chain",
+            "freight_engagement_owner_role": "Pilot Lead",
+            "buyer_acknowledges_scope": True,
+            "buyer_acknowledges_blind_protocol": True,
+            "buyer_acknowledges_report_totals_separate": True,
+            "buyer_acknowledges_no_guaranteed_recovery": True,
+            "freight_acknowledges_no_external_action_without_buyer_approval": True,
+        }
+    )
+    operative_charter = json.loads(
+        json.dumps(
+            asdict(
+                build_charter(
+                    json.loads(json.dumps(asdict(activation_packet))),
+                    charter_request,
+                )
+            )
+        )
+    )
+    engagement_resolution = resolve_engagement(operative_charter)
 
     invoice_csv = (
         "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,"
@@ -197,6 +248,45 @@ def run_rehearsal() -> dict:
         issued_at="2026-09-20T14:00:00Z",
     )
     bindings = recovery_claims.bindings
+    action_proposals = build_carrier_action_proposal_batch(
+        recovery_claims=recovery_claims
+    )
+    if action_proposals.proposal_count != 1:
+        raise AssertionError("synthetic claims should form one carrier/customer action proposal")
+    action_proposal = action_proposals.proposals[0]
+    external_authorization = authorize_carrier_action_proposal(
+        resolution=engagement_resolution,
+        operative_charter=operative_charter,
+        truth=truth,
+        review_packet=review_packet,
+        review_routing=review_routing,
+        buyer_review=buyer_review,
+        recovery_claims=recovery_claims,
+        proposal=action_proposal,
+        approval=CarrierActionApprovalInput(
+            proposal_hash=action_proposal.proposal_hash,
+            authorization_id="ACT-SYNTHETIC-1",
+            action_type=ActionType.REQUEST_CREDIT_REVIEW,
+            recipient_reference_hash="d" * 64,
+            action_payload_hash="e" * 64,
+            approver_role="VP Supply Chain",
+            issued_on="2026-09-21",
+            expires_on="2026-09-30",
+        ),
+    )
+    assert_action_allowed(
+        external_authorization,
+        as_of_date="2026-09-21",
+        action_type=ActionType.REQUEST_CREDIT_REVIEW,
+        target_carrier_id=action_proposal.target_carrier_id,
+        target_customer_id=action_proposal.target_customer_id,
+        recipient_reference_hash="d" * 64,
+        action_payload_hash="e" * 64,
+        finding_ids=action_proposal.finding_ids,
+        currency=action_proposal.currency,
+        requested_cents=action_proposal.total_claim_cents,
+    )
+
     claim_id_by_finding = {
         record.finding_id: record.claim_id
         for record in recovery_claims.records
@@ -320,6 +410,13 @@ def run_rehearsal() -> dict:
         "recovery_claim_fee_disqualified_count": recovery_claims.fee_disqualified_count,
         "recovery_claim_persistence_receipt_hash": claim_persistence.receipt_hash,
         "recovery_claim_persisted_count": claim_persistence.created_claim_count,
+        "carrier_action_proposal_batch_hash": action_proposals.batch_hash,
+        "carrier_action_proposal_count": action_proposals.proposal_count,
+        "carrier_action_proposal_hash": action_proposal.proposal_hash,
+        "carrier_action_target_customer_id": action_proposal.target_customer_id,
+        "external_action_authorization_hash": external_authorization.authorization_hash,
+        "external_action_authorized_cents": external_authorization.authorized_cents,
+        "external_action_automatic_execution_authorized": external_authorization.automatic_execution_authorized,
         "recovery_claim_already_present_count": claim_persistence.already_present_count,
         "settlement_csv_adapter_hash": settlement_batch.adapter_hash,
         "settlement_csv_file_sha256": settlement_batch.file_sha256,
