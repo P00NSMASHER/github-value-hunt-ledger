@@ -76,6 +76,13 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert len(out["counter_csv_file_sha256"]) == 64
     assert out["counter_event_count"] == 1
     assert out["counter_lifecycle_state"] == "COMPLETE"
+    assert len(out["recovery_lifecycle_manifest_hash"]) == 64
+    assert out["recovery_lifecycle_carrier_action_count"] == 1
+    assert out["recovery_lifecycle_submitted_action_count"] == 1
+    assert out["recovery_lifecycle_delivered_action_count"] == 1
+    assert out["recovery_lifecycle_pending_settlement_review_count"] == 0
+    assert out["recovery_lifecycle_audit_remediation_case_count"] == 1
+    assert out["recovery_lifecycle_transition_count"] == 3
     assert len(out["counter_lifecycle_state_hash"]) == 64
     assert len(out["counter_lifecycle_execution_hash"]) == 64
     assert "Reviewer Work Packet" in out["review_packet_markdown"]
