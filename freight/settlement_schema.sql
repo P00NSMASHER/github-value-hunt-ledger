@@ -103,15 +103,15 @@ CREATE TRIGGER IF NOT EXISTS immutable_reverse_u BEFORE UPDATE ON reversal_edges
 CREATE TRIGGER IF NOT EXISTS immutable_reverse_d BEFORE DELETE ON reversal_edges BEGIN SELECT RAISE(ABORT,'reversal edge is immutable'); END;
 
 CREATE TRIGGER IF NOT EXISTS claim_timestamp_valid BEFORE INSERT ON recovery_claims BEGIN
-  SELECT CASE WHEN julianday(NEW.issued_at) IS NULL
+  SELECT CASE WHEN julianday(NEW.issued_at) IS NULL OR substr(NEW.issued_at,-1,1)<>'Z'
   THEN RAISE(ABORT,'claim issued_at must be a valid timestamp') END;
 END;
 CREATE TRIGGER IF NOT EXISTS settlement_timestamp_valid BEFORE INSERT ON settlement_events BEGIN
-  SELECT CASE WHEN julianday(NEW.booked_at) IS NULL
+  SELECT CASE WHEN julianday(NEW.booked_at) IS NULL OR substr(NEW.booked_at,-1,1)<>'Z'
   THEN RAISE(ABORT,'settlement booked_at must be a valid timestamp') END;
 END;
 CREATE TRIGGER IF NOT EXISTS counter_timestamp_valid BEFORE INSERT ON counter_events BEGIN
-  SELECT CASE WHEN julianday(NEW.observed_at) IS NULL
+  SELECT CASE WHEN julianday(NEW.observed_at) IS NULL OR substr(NEW.observed_at,-1,1)<>'Z'
   THEN RAISE(ABORT,'counter observed_at must be a valid timestamp') END;
   SELECT CASE WHEN julianday(NEW.observed_at) <
     julianday((SELECT booked_at FROM settlement_events
@@ -119,16 +119,16 @@ CREATE TRIGGER IF NOT EXISTS counter_timestamp_valid BEFORE INSERT ON counter_ev
   THEN RAISE(ABORT,'counter event predates original settlement') END;
 END;
 CREATE TRIGGER IF NOT EXISTS allocation_timestamp_valid BEFORE INSERT ON allocations BEGIN
-  SELECT CASE WHEN julianday(NEW.created_at) IS NULL
-  THEN RAISE(ABORT,'allocation created_at must be a valid timestamp') END;
+  SELECT CASE WHEN julianday(NEW.created_at) IS NULL OR substr(NEW.created_at,-1,1)<>'Z'
+  THEN RAISE(ABORT,'allocation created_at must be a valid UTC timestamp') END;
   SELECT CASE WHEN julianday(NEW.created_at) <
     julianday((SELECT booked_at FROM settlement_events
       WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id))
   THEN RAISE(ABORT,'allocation created_at predates settlement booking') END;
 END;
 CREATE TRIGGER IF NOT EXISTS reversal_timestamp_valid BEFORE INSERT ON reversal_edges BEGIN
-  SELECT CASE WHEN julianday(NEW.created_at) IS NULL
-  THEN RAISE(ABORT,'reversal created_at must be a valid timestamp') END;
+  SELECT CASE WHEN julianday(NEW.created_at) IS NULL OR substr(NEW.created_at,-1,1)<>'Z'
+  THEN RAISE(ABORT,'reversal created_at must be a valid UTC timestamp') END;
   SELECT CASE WHEN julianday(NEW.created_at) <
     julianday((SELECT observed_at FROM counter_events
       WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND counter_id=NEW.counter_id))
