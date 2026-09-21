@@ -33,3 +33,10 @@ Both adapters:
 - emit a deterministic adapter hash.
 
 These adapters normalize evidence only. They do not decide that a settlement belongs to a claim, do not move money, and do not assert realized recovery. Settlement attribution remains governed by the persistent settlement store and reporting controls.
+
+
+## Manual allocation review
+
+If exact auto-allocation cannot identify one unique recovery claim, manual attribution must use the proof-bound Settlement Allocation Review Workflow rather than calling the settlement store's reviewed-allocation primitive directly.
+
+The review workflow binds the event, live candidate claims, reviewer identity, rationale, timestamp, and resulting allocation to deterministic proof hashes and rejects stale cases before writing.
