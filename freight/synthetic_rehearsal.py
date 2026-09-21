@@ -16,6 +16,13 @@ from freight.buyer_review_workflow import (
     BuyerReviewDecisionInput,
     build_buyer_review_batch,
 )
+from freight.carrier_action_execution import (
+    CarrierActionExecutionEvidence,
+    ExecutionChannel,
+    ExecutionOutcome,
+    build_carrier_action_execution_intent,
+    record_carrier_action_execution,
+)
 from freight.carrier_action_payload import (
     authorize_carrier_action_payload,
     build_carrier_action_payload,
@@ -295,6 +302,29 @@ def run_rehearsal() -> dict:
         currency=action_proposal.currency,
         requested_cents=action_proposal.total_claim_cents,
     )
+    execution_intent = build_carrier_action_execution_intent(
+        authorization=external_authorization,
+        proposal=action_proposal,
+        payload=action_payload,
+        recovery_claims=recovery_claims,
+        prepared_at="2026-09-21T15:00:00Z",
+    )
+    execution_receipt = record_carrier_action_execution(
+        intent=execution_intent,
+        authorization=external_authorization,
+        proposal=action_proposal,
+        payload=action_payload,
+        recovery_claims=recovery_claims,
+        evidence=CarrierActionExecutionEvidence(
+            execution_key=execution_intent.execution_key,
+            outcome=ExecutionOutcome.SUBMITTED,
+            channel=ExecutionChannel.EMAIL,
+            external_reference_hash="1" * 64,
+            evidence_source_hash="2" * 64,
+            executed_at="2026-09-21T15:01:00Z",
+            executor_role="Synthetic Freight Operator",
+        ),
+    )
 
     claim_id_by_finding = {
         record.finding_id: record.claim_id
@@ -428,6 +458,12 @@ def run_rehearsal() -> dict:
         "external_action_authorization_hash": external_authorization.authorization_hash,
         "external_action_authorized_cents": external_authorization.authorized_cents,
         "external_action_automatic_execution_authorized": external_authorization.automatic_execution_authorized,
+        "carrier_action_execution_key": execution_intent.execution_key,
+        "carrier_action_execution_intent_hash": execution_intent.intent_hash,
+        "carrier_action_execution_receipt_hash": execution_receipt.receipt_hash,
+        "carrier_action_execution_outcome": execution_receipt.outcome,
+        "carrier_action_submitted": execution_receipt.action_submitted,
+        "carrier_action_delivery_confirmed": execution_receipt.delivery_confirmed,
         "recovery_claim_already_present_count": claim_persistence.already_present_count,
         "settlement_csv_adapter_hash": settlement_batch.adapter_hash,
         "settlement_csv_file_sha256": settlement_batch.file_sha256,
