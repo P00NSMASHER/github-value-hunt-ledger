@@ -211,7 +211,9 @@ jobs:
                   intelligence/agent_crossover_metrics.jsonl \
                   intelligence/matched_exploration_metrics.json \
                   intelligence/MATCHED_EXPLORATION_REPORT.md \
-                  intelligence/MATCHED_AGENT_EFFECTS.md
+                  intelligence/MATCHED_AGENT_EFFECTS.md \
+                  intelligence/matched_exploration_debt.jsonl \
+                  intelligence/MATCHED_EXPLORATION_DEBT.md
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
