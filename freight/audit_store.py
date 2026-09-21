@@ -39,37 +39,56 @@ class AuditStore:
         if self.path == ":memory:":
             raise ValueError("file-backed SQLite is required")
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as conn:
-            conn.execute("PRAGMA journal_mode=WAL")
-            conn.executescript(
-                """
-                CREATE TABLE IF NOT EXISTS audit_events (
-                    buyer_id TEXT NOT NULL,
-                    business_unit TEXT NOT NULL,
-                    sequence INTEGER NOT NULL,
-                    event_type TEXT NOT NULL,
-                    object_id TEXT NOT NULL,
-                    occurred_at TEXT NOT NULL,
-                    evidence_hash TEXT,
-                    previous_hash TEXT,
-                    event_hash TEXT NOT NULL,
-                    PRIMARY KEY (buyer_id,business_unit,sequence),
-                    UNIQUE (buyer_id,business_unit,event_hash)
-                );
+        self._initialize()
 
-                CREATE TRIGGER IF NOT EXISTS audit_events_immutable_update
-                BEFORE UPDATE ON audit_events
-                BEGIN
-                    SELECT RAISE(ABORT,'audit event is immutable');
-                END;
+    def _initialize(self) -> None:
+        schema = """
+            CREATE TABLE IF NOT EXISTS audit_events (
+                buyer_id TEXT NOT NULL,
+                business_unit TEXT NOT NULL,
+                sequence INTEGER NOT NULL,
+                event_type TEXT NOT NULL,
+                object_id TEXT NOT NULL,
+                occurred_at TEXT NOT NULL,
+                evidence_hash TEXT,
+                previous_hash TEXT,
+                event_hash TEXT NOT NULL,
+                PRIMARY KEY (buyer_id,business_unit,sequence),
+                UNIQUE (buyer_id,business_unit,event_hash)
+            );
 
-                CREATE TRIGGER IF NOT EXISTS audit_events_immutable_delete
-                BEFORE DELETE ON audit_events
-                BEGIN
-                    SELECT RAISE(ABORT,'audit event is immutable');
-                END;
-                """
-            )
+            CREATE TRIGGER IF NOT EXISTS audit_events_immutable_update
+            BEFORE UPDATE ON audit_events
+            BEGIN
+                SELECT RAISE(ABORT,'audit event is immutable');
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS audit_events_immutable_delete
+            BEFORE DELETE ON audit_events
+            BEGIN
+                SELECT RAISE(ABORT,'audit event is immutable');
+            END;
+        """
+        delay = 0.005
+        last: Exception | None = None
+        for _ in range(8):
+            conn = self._connect()
+            try:
+                mode = str(conn.execute("PRAGMA journal_mode").fetchone()[0]).lower()
+                if mode != "wal":
+                    conn.execute("PRAGMA journal_mode=WAL")
+                conn.executescript(schema)
+                return
+            except sqlite3.OperationalError as exc:
+                last = exc
+                if "locked" not in str(exc).lower():
+                    raise
+            finally:
+                conn.close()
+            time.sleep(delay)
+            delay = min(delay * 2, 0.1)
+        assert last is not None
+        raise last
 
     @staticmethod
     def _text(name: str, value: str) -> str:
