@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "presence_generation_id": "PRESENCEGEN:ca88a2c1630d",
-  "clock_commit_sha": "303c324ee24d2a6c840934e5b2d1de899b8c6f09",
-  "clock_timestamp": "2026-09-21T06:02:26Z",
+  "presence_generation_id": "PRESENCEGEN:eb26ccb46338",
+  "clock_commit_sha": "1dbf5d807f0afbf9609ac79908709bcb1df7d893",
+  "clock_timestamp": "2026-09-21T06:07:19Z",
   "registered_workers": 14,
   "state_counts": {
     "ACTIVE_CLAIM": 1,
     "UNKNOWN": 5,
-    "READY_FRESH": 4,
-    "READY_STALE": 4
+    "READY_STALE": 4,
+    "READY_FRESH": 4
   },
   "fresh_ready_workers": 4,
   "unknown_workers": 5,
-  "presence_event_count": 17
+  "presence_event_count": 18
 }

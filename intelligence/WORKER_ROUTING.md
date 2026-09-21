@@ -1,13 +1,13 @@
 # WORKER ROUTING PLAN
 
-Routing generation: **ROUTING:61b4a77f0304**
+Routing generation: **ROUTING:50962d5cf10c**
 Worker profiles: **WORKERS:d02ecf6c7958**
 
 V12/V13 routes workers using positive historical fit, assignment priority, and evidence-gated routing outcome adjustments. Active V11 claims remain locked.
 
 Routing learning: **ROUTELEARN:bc40639ef4db** / mode **observe_only_insufficient_evidence**
-Activation-response learning: **RESPLEARN:50d9d3c1d7e7** / mode **observe_only_insufficient_evidence**
-Routing exploration: **ROUTEEXP:34845b13acbb** / applied **False**
+Activation-response learning: **RESPLEARN:8e4150423355** / mode **observe_only_insufficient_evidence**
+Routing exploration: **ROUTEEXP:1fad824f6e8f** / applied **False**
 
 | Worker | Profile | Route | Slot | Assignment | Score | Reason |
 |---|---|---|---|---|---:|---|
