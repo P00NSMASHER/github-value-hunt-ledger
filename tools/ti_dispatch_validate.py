@@ -24,6 +24,10 @@ def stable_payload(p):
       "routing_generation_id":p["routing_generation_id"],
       "worker_profile_generation_id":p["worker_profile_generation_id"],
       "routing_learning_generation_id":p.get("routing_learning_generation_id"),
+      "routing_exploration_generation_id":p.get("routing_exploration_generation_id"),
+      "routing_exploration_pair_id":p.get("routing_exploration_pair_id"),
+      "baseline_slot_id":p.get("baseline_slot_id"),
+      "route_mode":p.get("route_mode"),
       "slot_id":p["slot_id"],
       "assignment_id":p["assignment_id"],
       "allocator_generation_id":p["allocator_generation_id"],
@@ -59,12 +63,15 @@ for n,t in enumerate(TICKETS,1):
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: missing source worker claim packet")
     if did!=expected_id(p):
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: deterministic ticket ID mismatch")
-    if int(t.get("ticket_schema_version") or 0)<15 or t.get("dispatch_kind")!="primary":
-        raise SystemExit(f"dispatch_tickets.jsonl:{n}: current primary ticket must be V15")
+    if int(t.get("ticket_schema_version") or 0)<19 or t.get("dispatch_kind")!="primary":
+        raise SystemExit(f"dispatch_tickets.jsonl:{n}: current primary ticket must be V19")
     if not t.get("issued_at") or not t.get("soft_stale_at") or not t.get("hard_expire_at"):
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: V15 lifecycle timestamps missing")
     if slot!=p.get("slot_id") or t.get("assignment_id")!=p.get("assignment_id"):
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: packet binding drift")
+    for key in ["routing_exploration_generation_id","routing_exploration_pair_id","baseline_slot_id","route_mode"]:
+        if t.get(key)!=p.get(key):
+            raise SystemExit(f"dispatch_tickets.jsonl:{n}: routing exploration provenance drift {key}")
     if state.get(slot,{}).get("status") not in valid_states:
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: non-claimable execution state")
 
@@ -84,8 +91,8 @@ for t in TICKETS:
         raise SystemExit(f"claim packet ticket mismatch for {t['worker_id']}")
     if p.get("routing_mode")!="generated":
         raise SystemExit(f"claim packet routing_mode must be generated for {t['worker_id']}")
-    if int(p.get("claim_schema_version") or 0)<int(POL.get("minimum_v15_claim_schema_version",15)):
-        raise SystemExit(f"claim packet schema below V15 minimum for {t['worker_id']}")
+    if int(p.get("claim_schema_version") or 0)<int(POL.get("minimum_v19_claim_schema_version",19)):
+        raise SystemExit(f"claim packet schema below V19 minimum for {t['worker_id']}")
     if p.get("dispatch_kind")!="primary":
         raise SystemExit(f"primary claim packet dispatch_kind drift for {t['worker_id']}")
 
