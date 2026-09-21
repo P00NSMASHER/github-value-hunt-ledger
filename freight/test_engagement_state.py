@@ -70,6 +70,8 @@ def test_superseded_amendment_resolves_replacement_charter():
     assert r.engagement_state==EngagementState.ACTIVE.value
     assert r.operative_charter_hash==replacement["charter_hash"]
     assert r.customer_data_authorized is True
+    assert r.amendment_id is None
+    assert r.amendment_hash is None
 
 def test_multi_step_replacement_chain_resolves_latest_charter():
     base=charter()
