@@ -1108,3 +1108,75 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** No new cross-lane referral. Existing COMMERCIAL↔AI effect-journal/outcome-verification referrals already ask how agent actions should be bound to authoritative evidence; adding Provely as another general agent-verification referral would duplicate the capability question. Record it locally as a commercially actionable component instead.
 
 **NEXT TEST:** Find or build the **E5 verifier** that Provely's Stripe skill explicitly lacks: bind the same durable refund/payout action identity across post-effect process death/new-process recovery, provider E2/E3 terminality, and an independently grounded processor/bank/recipient outcome, then emit one signed claim whose evidence contract prevents any lower tier from being described as external settlement.
+
+## 2026-09-20 — Shadow run 16
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** Provider lookup is a safe alternative to expired idempotent replay only when the system can prove the **search itself was conclusive**: the business/action identity existed durably before dispatch, provider query scope is correct, pagination is exhausted, page structure is complete, matches are tri-state rather than boolean, and any incomplete/inconclusive read fails closed. A low-attention payment repository may implement this rigor even without real-provider crash qualification.
+
+**DISCOVERY METHODS:**
+1. Direct refund/payout search for idempotency-window expiry, response loss, provider readback and crash/recovery behavior.
+2. Code-signature search for Stripe refund-list pagination, `has_more`, `starting_after`, durable metadata identity, no-POST-after-inconclusive-read and expired-idempotency recovery.
+3. Deliberate low-attention search through ticketing/payment repositories, then source/test/schema/history verification of the strongest candidate and comparison with a synthetic crash harness and a real-provider terminal-payout path.
+
+**BEST NEW COMPONENT + URL + EXACT REVISION:** `mathd/ticketing_system` — https://github.com/mathd/ticketing_system — `d787b289330ffc8265a5a68382e7e45d510a2ecf`.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- The Stripe refund path resolves before it submits. It lists refunds scoped to the PaymentIntent with `limit=100`, advances `starting_after` cursors, and bounds traversal to 10 pages. Only a structurally complete, successfully exhausted no-match can license a new refund POST.
+- Missing/malformed `object`, `data` or `has_more`, transport/provider errors, non-progress pages, or pagination that fails to terminate within the bound become an UNKNOWN/inconclusive result and return **without issuing a refund**.
+- Matching is deliberately tri-state. A foreign/dashboard refund without the durable `compensation_key` is not adopted; a matching key plus corroborating PaymentIntent/amount/currency identifies the system's prior effect; a refund carrying the system's key but inconsistent or incomplete corroborating evidence is treated as inconclusive rather than absent.
+- A previously matching succeeded refund is adopted. A matching pending refund remains pending and carries its provider reference forward. A matching failed refund is **not automatically resubmitted**; it remains a human/reconciliation decision.
+- A new refund is stamped with the durable compensation key in metadata and uses the same deterministic provider idempotency key. Status recovery can retrieve a known `re_` provider reference; original-create replay without a provider reference reuses the original idempotency identity only inside the provider's finite replay window.
+
+**TEST / SCHEMA / HISTORY / EXTERNAL-CONTRACT VERIFICATION:**
+- `services/payments/internal/psp/stripe_test.go` asserts that a settled prior refund is adopted with one provider-list GET and **no POST**; pending and failed prior refunds also produce no blind resubmission. It separately verifies that a foreign refund does not block a legitimate own refund, a provider-list failure cannot authorize a POST, and the normal empty-list path stamps both metadata and stable idempotency.
+- Incomplete-list adversarial coverage includes `missing has_more`, `missing data`, `not a list`, and `more pages but empty`; each case asserts no refund POST. The accompanying learning note explicitly treats “decoded” and “answered conclusively” as different states.
+- `services/payments/internal/store/migrations/0002_psp_operations.sql` persists one compensation identity with deterministic provider idempotency key, status, provider reference, amount/currency and bound/completed timestamps; its primary key is designed so duplicate/concurrent compensation attempts converge on one provider operation identity.
+- ADR-032 deliberately limits its gate: local/CI Stripe tests use injected HTTP response fixtures; live `sk_test_` verification is manual/out-of-gate. The repository therefore does not pretend fixture rigor is real-provider certification.
+- History independently records commit `9b1d6a8638c00b04206f9a221b95e3db13ef73b6` (`TKT-116: refund resolution, bounded internal clients, release_pending replay (#129)`), whose rationale explicitly describes a lost refund response surviving beyond Stripe's idempotency retention and adds provider-list adoption so a second refund is not licensed merely because replay is no longer safe.
+- Current Stripe documentation independently supports the provider-contract assumptions: Stripe can prune idempotency keys after they are at least 24 hours old, after which reuse generates a new request; the refund list supports PaymentIntent filtering and cursor pagination with `starting_after`, `limit` and `has_more` semantics.
+- Repository metadata at inspection: public, 0 stars / 0 forks, Go, no detected public license metadata. The user's separate repository-code authorization remains the working code-rights assumption only; it does not extend to Stripe services/data.
+
+**CRITICAL FALSIFICATION / TIER RESULT:**
+- This **does not** close tier-5B or tier-5C-B. The refund/provider tests at this exact revision are fixture/injected-client tests by design; no revision-bound real-Stripe refund artifact or literal post-effect process-kill/new-process run was found.
+- The pagination bound is finite (10 × 100 results). Hitting that bound, malformed provider evidence, or non-progress fails closed. This is a strong safety property but not proof of infinite historical visibility or permanent provider retention.
+- A provider-list “no match” is authoritative only within the provider's actual query visibility/retention contract. The repository does not establish indefinite refund-list retention as a permanent business ledger.
+- No E5 processor/bank/recipient outcome is tied to this path. Public repository licensing is also absent.
+
+**COMPARATORS / FALSIFIERS:**
+- `Zzradar/high-concurrency-ticketing-system@bdd47edf3cbc6a2888461b6ec994b9b49178536e` has detailed Fake-Stripe response-loss, expired-idempotency and paginated refund-resolution coverage, but its provider is explicitly synthetic. It reinforces the algorithmic pattern without adding external-provider truth.
+- Current `karfalacisse900-alt/Flames-up.com@af5bdc3e06a71bb9b8fa4e491d89a0d703000027` still supplies a real Stripe test-mode terminal-payout path, but its `SIGKILL` remains teardown rather than an effect-boundary payout crash. It therefore does not close the single-path intersection either.
+- Compared with run-14 `SmallHeroes/Small_Heroes`, the selected candidate materially improves the provider-rediscovery mechanism itself: the earlier Stripe lookup was visibly bounded to `limit:100` without inspected pagination; this revision implements cursor progression, structural completeness checks, a non-progress guard, a finite safety bound and explicit UNKNOWN/no-POST semantics.
+
+**SPECIALIST PASSES:**
+- **CODE INSPECTOR:** traced resolver-before-submit, pagination/cursor progression, tri-state ownership match and stable metadata/idempotency identity.
+- **TEST/SCHEMA INSPECTOR:** verified no-POST adversarial tests plus durable compensation identity/schema.
+- **HISTORY/PROVIDER-CONTRACT ANALYST:** inspected TKT-116 lineage and cross-checked the 24-hour replay cliff and refund-list pagination against Stripe's current API documentation.
+- **COMMERCIAL ANALYST:** mapped the mechanism to a staged refund safe-retry audit/retrofit rather than a finished settlement product.
+- **RED-TEAM/VERIFIER:** independently challenged external-provider qualification, finite pagination, provider retention, public rights and cash terminality before scoring.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The narrow claim passes: exact revision `d787b...` implements and source-tests a durable refund/compensation design in which a Stripe retry must first establish conclusive provider absence through scoped cursor pagination and structural/identity evidence; any incomplete or ambiguous read fails closed and cannot authorize another refund. The verifier rejects real-Stripe qualification, literal crash/restart proof, generic exactly-once guarantees, permanent provider-search completeness, E5 settlement and any green-live-provider claim.
+
+**A-F SCORE (proposed only, after verifier):** **26/30 — A4 / B5 / C5 / D4 / E5 / F3.**
+- A4: a read-only/staging safe-retry audit can be sold without moving live money.
+- B5: duplicate refunds and false “not found” conclusions are direct-money risks.
+- C5: compresses durable compensation identity, provider replay-window reasoning, conclusive provider search, tri-state evidence handling and fail-closed tests.
+- D4: the implementation is unusually rigorous for a zero-star repository, though the underlying patterns are reproducible.
+- E5: source, focused adversarial tests, durable schema, ADR/history and independent provider-contract triangulation strongly support the narrow claim.
+- F3: no detected public license, real-provider qualification is intentionally manual/out-of-gate, and terminal settlement remains unresolved.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments/billing engineering lead, marketplace finance systems owner or Controller's platform team operating refunds/corrections.
+- Pain: once provider idempotency retention expires, “retry with the same key” may become a new financial action; a shallow or incomplete provider query can be just as dangerous if it incorrectly concludes the first refund never happened.
+- First paid wedge: **Refund Rediscovery / Safe-Retry Certification**. For one refund route, persist the business/compensation identity before provider entry, distinguish replay from provider lookup, exhaust provider pagination under that identity, fail closed on malformed/incomplete/inconclusive provider evidence, and deliver a safe-retry / reconcile-only / operator-required matrix. Keep the initial engagement sandbox/read-only.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Run 14 identified provider rediscovery after replay-key expiry but left lookup completeness visibly weak. This run supplies the missing algorithmic discipline: conclusive page structure, cursor progression, bounded non-progress handling, tri-state ownership evidence and POST-only-after-complete-no-match. Interlock still owns the strongest real-Stripe literal-SIGKILL/no-duplicate artifact; Flames-up still owns the provider-payout terminality half; Provely still owns the explicit claim/evidence-contract layer. These remain separate facts, so tier-5C-B is still open.
+
+**SEARCH EFFORT / COST PROXIES:** At least 3 materially different discovery modes; 3 serious candidates/comparators deep-inspected; source, tests, schema, history, repository metadata and current Stripe provider-contract docs checked; no untrusted repository code execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Promote only inside this lane the **authoritative-absence / rediscovery-completeness check**: provider “not found” is not evidence until the search itself is conclusive. Require a durable pre-dispatch identity, correctly scoped query, complete cursor progression, structurally complete pages, tri-state own/foreign/inconclusive matching, non-progress/bound exhaustion → UNKNOWN, and **POST only after complete no-match**. Together with run 14, this sub-lesson now has two independent repository successes and is eligible for separate Skill Promoter review, but it remains lane-local and was **not** written to `SEARCH_SKILLS.md`.
+
+**REFERRALS:** None. The existing commercial referral already asks for the same remaining single-path tier-5C-B intersection; adding another would duplicate it.
+
+**NEXT TEST:** Find one real cash refund or payout where this conclusive provider-rediscovery contract survives literal post-effect process death/new-process recovery and the **same durable action identity** then reaches independently grounded E5 processor/bank/recipient settlement evidence.
