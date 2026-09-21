@@ -47,6 +47,7 @@ def build_execution_state(write=True, now=None):
     activation_history=load_jsonl("activation_history.jsonl") if (INTEL/"activation_history.jsonl").exists() else []
     activation_by_id={x.get("activation_id"):x for x in activation_history if x.get("activation_id")}
     min_v16_claim_schema=int(activation_policy.get("minimum_claim_schema_version",16))
+    activation_legacy_claim_ids=set(activation_policy.get("legacy_claim_ids") or [])
     legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
     min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
     min_v15_claim_schema=int(dispatch_policy.get("minimum_v15_claim_schema_version",15))
@@ -162,8 +163,9 @@ def build_execution_state(write=True, now=None):
                 claim_ids_seen.add(cid)
                 claim_schema=int(e.get("claim_schema_version") or 0)
                 is_legacy_claim=cid in legacy_claim_ids and claim_schema<min_claim_schema
+                is_pre_v16_claim=cid in activation_legacy_claim_ids
                 if not is_legacy_claim:
-                    if activation_policy and claim_schema<min_v16_claim_schema:
+                    if activation_policy and not is_pre_v16_claim and claim_schema<min_v16_claim_schema:
                         errors.append(f"{loc}: new CLAIM requires claim_schema_version >= {min_v16_claim_schema}")
                         continue
                     if claim_schema<min_claim_schema:
@@ -220,7 +222,7 @@ def build_execution_state(write=True, now=None):
                             if hard and ts>hard:
                                 errors.append(f"{loc}: generated CLAIM after dispatch hard expiry")
                                 continue
-                        if activation_policy and claim_schema>=min_v16_claim_schema:
+                        if activation_policy and not is_pre_v16_claim and claim_schema>=min_v16_claim_schema:
                             aid=e.get("activation_id")
                             act=activation_by_id.get(aid)
                             if not act:
