@@ -1,0 +1,26 @@
+{
+  "schema_version": 16,
+  "search_run_id": "RUN:20260921T133200Z:HUNTER-04:ec98661714c1",
+  "timestamp": "2026-09-21T13:32:00Z",
+  "hunter_role": "HUNTER-04",
+  "strategy_id": "STRAT:rule-period-authority-version-audit",
+  "query_family": "permit-source-observation-receipt-completeness",
+  "measurement_quality": "prospective",
+  "work_action": "execute_fixture",
+  "candidate_count": 0,
+  "deep_inspected": 0,
+  "retained_count": 0,
+  "master_promoted_count": 0,
+  "strengthened_capability_ids": [
+    "CAP-012"
+  ],
+  "experiment_ids": [
+    "EXP-009"
+  ],
+  "durable_evidence_path": "referrals/hunt04-r25-2026-09-21-exp009-source-observation-receipt.md",
+  "best_result": "Seven planted receipt cases classified as expected; this refines completeness semantics but is not fresh live-source proof.",
+  "allocation_mode": "unallocated",
+  "routing_mode": "unrouted",
+  "execution_worker_id": "HUNTER-04",
+  "stop_reason_standard": "completed_nonsearch"
+}
