@@ -19,30 +19,30 @@ def parse_ts(value):
 def short_hash(text):
     return hashlib.sha256(text.encode()).hexdigest()[:12]
 
-def choose_packet(worker,steal=False,dispatch_ticket=None):
-    primary=load_jsonl("dispatch_claim_packets.jsonl")
-    steals=load_jsonl("work_steal_claim_packets.jsonl") if (INTEL/"work_steal_claim_packets.jsonl").exists() else []
-    pool=steals if steal else primary
+def choose_packet(worker,steal=False,dispatch_ticket=None,activation_id=None):
+    pool=load_jsonl("activation_claim_packets.jsonl") if (INTEL/"activation_claim_packets.jsonl").exists() else []
+    matches=[x for x in pool if x.get("worker_id")==worker]
+    if steal:
+        matches=[x for x in matches if x.get("dispatch_kind")=="work_steal"]
     if dispatch_ticket:
-        pool=primary+steals
-        matches=[x for x in pool if x.get("worker_id")==worker and x.get("dispatch_ticket_id")==dispatch_ticket]
-    else:
-        matches=[x for x in pool if x.get("worker_id")==worker]
+        matches=[x for x in matches if x.get("dispatch_ticket_id")==dispatch_ticket]
+    if activation_id:
+        matches=[x for x in matches if x.get("activation_id")==activation_id]
     if not matches:
-        kind="work-steal" if steal else "primary"
-        raise SystemExit(f"no current {kind} dispatch packet for {worker}")
-    matches.sort(key=lambda x:(int(x.get("steal_rank") or 0),x.get("slot_id") or "",x.get("dispatch_ticket_id") or ""))
+        raise SystemExit(f"no current V16 activation packet for {worker}; publish fresh READY presence first")
+    matches.sort(key=lambda x:(0 if x.get("dispatch_kind")=="primary" else 1,int(x.get("steal_rank") or 0),x.get("slot_id") or "",x.get("activation_id") or ""))
     return matches[0]
 
 def main():
-    p=argparse.ArgumentParser(description="Claim one current V15 dispatch ticket for a registered worker.")
+    p=argparse.ArgumentParser(description="Claim one current V16 activated dispatch ticket for a registered worker.")
     p.add_argument("--worker",required=True)
     p.add_argument("--lease-minutes",type=int)
     p.add_argument("--steal",action="store_true",help="claim the highest-ranked eligible standby work-steal ticket")
     p.add_argument("--dispatch-ticket",help="claim one exact current primary or work-steal ticket")
+    p.add_argument("--activation-id",help="claim one exact current V16 activation")
     args=p.parse_args()
 
-    packet=choose_packet(args.worker,args.steal,args.dispatch_ticket)
+    packet=choose_packet(args.worker,args.steal,args.dispatch_ticket,args.activation_id)
     states,_,_=build_execution_state(write=False)
     state_by_slot={x["slot_id"]:x for x in states}
     active=[
@@ -61,13 +61,16 @@ def main():
     now=now_dt()
     eligible=parse_ts(packet.get("eligible_at") or packet.get("issued_at"))
     hard=parse_ts(packet.get("hard_expire_at"))
+    activation_exp=parse_ts(packet.get("expires_at"))
     if eligible and now<eligible:
         raise SystemExit("dispatch ticket is not eligible yet")
     if hard and now>hard:
         raise SystemExit("dispatch ticket has hard-expired")
+    if activation_exp and now>activation_exp:
+        raise SystemExit("V16 activation has expired")
 
     ts=now.isoformat().replace("+00:00","Z")
-    seed=f"{ts}|{args.worker}|{packet['slot_id']}|{packet['dispatch_ticket_id']}"
+    seed=f"{ts}|{args.worker}|{packet['slot_id']}|{packet['dispatch_ticket_id']}|{packet['activation_id']}"
     claim_id="CLAIM:"+short_hash(seed)
     event={
       "event_id":"EXEC:"+short_hash("CLAIM|"+seed),
@@ -76,7 +79,7 @@ def main():
       "slot_id":packet["slot_id"],
       "claim_id":claim_id,
       "worker_id":args.worker,
-      "claim_schema_version":int(packet.get("claim_schema_version") or 15),
+      "claim_schema_version":int(packet.get("claim_schema_version") or 16),
       "assignment_id":packet["assignment_id"],
       "allocator_generation_id":packet["allocator_generation_id"],
       "portfolio_policy_generation_id":packet["portfolio_policy_generation_id"],
@@ -94,7 +97,11 @@ def main():
       "dispatch_ticket_id":packet["dispatch_ticket_id"],
       "dispatch_generation_id":packet["dispatch_generation_id"],
       "dispatch_kind":packet.get("dispatch_kind") or "primary",
-      "parent_dispatch_ticket_id":packet.get("parent_dispatch_ticket_id")
+      "parent_dispatch_ticket_id":packet.get("parent_dispatch_ticket_id"),
+      "presence_generation_id":packet.get("presence_generation_id"),
+      "presence_event_id":packet.get("presence_event_id"),
+      "activation_id":packet.get("activation_id"),
+      "activation_generation_id":packet.get("activation_generation_id")
     }
     path=INTEL/"execution_events"/f"{packet['slot_id']}.jsonl"
     with path.open("a",encoding="utf-8") as f:
