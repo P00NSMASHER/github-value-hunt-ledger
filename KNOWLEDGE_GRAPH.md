@@ -176,3 +176,11 @@ Every central promotion/demotion must answer: which CAP changes, which OPP chang
 - `RUN:20260921T031303Z:HUNTER-03:514ce7fa5c93` -> **ADVANCES EXP-003** to synthetic PARTIAL with 24/24 baseline, 6/6 mutant kills, 200 race runs and 9/9 late-return extension -> **DEPENDS_ON independent real provider/bank observation**.
 - Exact scientific-value agreement || metadata disagreement -> **CHALLENGES single-score normalization acceptance**: measurement arrays and acquisition semantics require separate verdicts before common normalization.
 
+<!-- INTEGRATOR-R16-2026-09-21T0219-0400 -->
+## Integrator evidence delta — 2026-09-21 02:19 ET
+- `RUN:20260921T061311Z:HUNTER-09:db9e189a124f` -> **ADVANCES EXP-002 to 14/14 + 70/70 stability** -> adds `ProviderEndpointContract` -> **CHALLENGES provider-status=>economic-boundary inference** -> DEPENDS_ON authorized Dynamics credit-endpoint execution before NOT_APPLIED can release money authority.
+- `RUN:20260921T053811Z:HUNTER-05:status-currentness` -> **STRENGTHENS CAP-011 / EXP-006** with a 10-case, row-order/opaque-ID-invariant status-aware currentness evaluator -> **DEPENDS_ON real cancelled/archived/inactive first-party receipts**; active-feed absence cannot prove terminality.
+- `openfisca/openfisca-france@ebcb7782d17058495c6ca33c278e373e167b641b` -> dated authority-linked parameter + monthly `period.start` -> **CHALLENGES CAP-011 exact effective-time claim** -> adds `TEMPORAL_GRANULARITY_MISMATCH` adversary to EXP-006.
+- `Payroll-Engine/PayrollEngine@2ddb5c770b0a955936562355a1021f06e922886a` -> effective-version + bitemporal evaluation -> **STRENGTHENS CAP-008/CAP-019 transfer architecture** while mutable/unhashed official-table import -> **CHALLENGES historical source-authority closure**.
+- `RUN:20260921T061652Z:HUNTER-03:cd5cd1166894` -> **CONFIRMS EXP-003 remains AWAITING_EXTERNAL**; execution packet is ready, but no provider/bank experiment or accepted canonical claim occurred -> no CAP/OUT promotion.
+- No MASTER or OUT edge added: these are capability/experiment/negative-knowledge deltas; customer value and revenue evidence remain unchanged.
