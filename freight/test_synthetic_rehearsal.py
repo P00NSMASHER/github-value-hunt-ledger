@@ -14,6 +14,9 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert "Audit run:" in out["audit_workflow_summary"]
     assert "not realized savings" in out["audit_workflow_summary"]
     assert out["audit_run_hash"]
+    assert len(out["audit_result_bundle_sha256"]) == 64
+    assert len(out["audit_result_bundle_manifest_sha256"]) == 64
+    assert out["audit_result_bundle_entry_count"] == 11
     assert out["population_builder_hash"]
     assert out["population_invoice_count"] == 3
     assert out["population_charge_count"] == 3
