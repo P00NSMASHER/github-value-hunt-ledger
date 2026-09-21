@@ -12,7 +12,7 @@ The workflow is bound to an existing buyer/business-unit `SettlementStore`.
 ## Processing order
 
 1. Parse **all supplied CSV files** before any persistent write.
-2. Preflight immutable replay conflicts, source-hash reuse, counter/original-event references, currency, and counter chronology.
+2. Preflight immutable replay conflicts, source-hash reuse, counter/original-event references, currency, event chronology, and processing-time chronology.
 3. Ingest settlement events.
 4. Run safe exact auto-allocation for each settlement event.
 5. Generate Settlement Allocation Review cases for any event that remains ambiguous.
@@ -24,7 +24,18 @@ The workflow never auto-resolves a human-review case.
 
 ## Preflight-before-write rule
 
-A malformed counter file, unknown counter reference, counter currency mismatch, or immutable replay conflict is rejected before the valid settlement file in the same package writes anything.
+A malformed counter file, unknown counter reference, counter currency mismatch, impossible evidence chronology, a processing timestamp earlier than supplied evidence, or immutable replay conflict is rejected before the valid settlement file in the same package writes anything.
+
+## Economic event-time integrity
+
+All persisted settlement timestamps are canonical UTC. Allocation edges cannot be created before their settlement event was booked. Reversal edges cannot be created before the counter/return was observed or before the allocation being reversed existed.
+
+These rules are enforced twice:
+
+- in the Python `SettlementStore` boundary, including timezone-aware parsing and UTC normalization;
+- in SQLite triggers, so direct SQL cannot bypass timestamp validity or economic chronology.
+
+Equivalent timezone-offset inputs normalize to the same UTC timestamp for replay/idempotency checks.
 
 This does not claim a global multi-row database transaction across the entire lifecycle. Each underlying store write remains independently transactional. The preflight boundary is designed to eliminate predictable package-level partial writes before processing begins.
 
