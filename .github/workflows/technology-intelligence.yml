@@ -1,7 +1,10 @@
 name: Technology Intelligence System
 
 on:
+  workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - "hunters/**"
       - "intelligence/**"
@@ -19,6 +22,8 @@ on:
       - "freight/GAP_REGISTER.json"
       - ".github/workflows/technology-intelligence.yml"
   pull_request:
+    branches:
+      - main
     paths:
       - "hunters/**"
       - "intelligence/**"
@@ -40,8 +45,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: technology-intelligence-${{ github.ref }}
-  cancel-in-progress: false
+  group: technology-intelligence-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
