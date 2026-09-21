@@ -25,6 +25,7 @@ DOC_PATHS=(
     "freight/AUDIT_WORKFLOW.md",
     "freight/BUYER_REVIEW_WORKFLOW.md",
     "freight/CARRIER_ACTION_EXECUTION.md",
+    "freight/CARRIER_ACTION_EXECUTION_STORE.md",
     "freight/CARRIER_ACTION_PAYLOAD.md",
     "freight/CARRIER_ACTION_WORKFLOW.md",
     "freight/BUSINESS_MODEL.md",
