@@ -3,6 +3,7 @@
 Integrator-owned search and validation direction. Operator references updated 2026-09-21; domain directions retain their existing evidence basis. **Experiment bottlenecks, independent falsification, source authority and outcome evidence outrank repository count.** This file is current direction, not history; older overrides remain in Git history and hunter catalogs.
 
 ## Operating rules for all 14 workstreams
+- Use `intelligence/MATCHED_EXPLORATION_DEBT.md` only as measurement debt. It identifies exact missing crossover cells but does not authorize rerouting, claiming, or overriding the allocator; any such work must still enter through the normal V9–V18 control path.
 - Review `intelligence/MATCHED_EXPLORATION_REPORT.md` before making any claim about agent specialization from V18 swaps. V19 requires all four crossover cells before computing an agent/task contrast, never imputes a missing cell, and does not feed these estimates back into routing.
 - Start with [`intelligence/WORKER_RUNBOOK.md`](intelligence/WORKER_RUNBOOK.md) for the current operator sequence. The [2026-09-21 strategy upgrade](intelligence/STRATEGY_UPGRADE_2026-09-21.md) describes the latest changes; it does not replace the frozen benchmark or domain stop conditions below.
 - Check `intelligence/ROUTING_EXPLORATION.md` before interpreting a generated route. A V18 `explore_swap` route is an intentional low-regret matched assignment used to reduce routing-selection bias; do not manually move it back to the baseline slot merely because the baseline score was slightly higher.
