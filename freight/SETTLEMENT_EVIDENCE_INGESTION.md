@@ -40,3 +40,10 @@ These adapters normalize evidence only. They do not decide that a settlement bel
 If exact auto-allocation cannot identify one unique recovery claim, manual attribution must use the proof-bound Settlement Allocation Review Workflow rather than calling the settlement store's reviewed-allocation primitive directly.
 
 The review workflow binds the event, live candidate claims, reviewer identity, rationale, timestamp, and resulting allocation to deterministic proof hashes and rejects stale cases before writing.
+
+
+## Ambiguous counter/reversal review
+
+If a return or reversal cannot be auto-applied because it is ambiguous across multiple live allocation edges, the Counter/Reversal Review Workflow must be used.
+
+The workflow snapshots current live allocation capacity, requires a reviewer decision bound to the exact case, rejects stale state before writing, and applies the reversal through the reviewed-reversal transaction primitive. Split reviewed reversals remain unsupported.
