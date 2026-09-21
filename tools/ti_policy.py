@@ -117,6 +117,17 @@ for s in active:
 
 measured = len(discovery_runs)
 valid_out = [o for o in outs if o.get("result") != "INVALID"]
+stop_reason_counts = defaultdict(int)
+recall_rescue_observed = 0
+recall_rescue_used = 0
+for r in discovery_runs:
+    reason = r.get("stop_reason_standard")
+    if reason:
+        stop_reason_counts[reason] += 1
+    if r.get("recall_rescue_used") is not None:
+        recall_rescue_observed += 1
+        if r.get("recall_rescue_used") is True:
+            recall_rescue_used += 1
 if len(valid_out) < 3 or measured < 30:
     exploration_budget = .50
 elif len(valid_out) < 10:
@@ -187,6 +198,9 @@ policy_obj = {
     "discovery_denominator_policy": "explicit_search_plus_legacy_action_absent; all_activity_outcome_credit_preserved",
     "valid_outcomes": len(valid_out),
     "exploration_budget": exploration_budget,
+    "stop_reason_counts": dict(sorted(stop_reason_counts.items())),
+    "recall_rescue_observed_runs": recall_rescue_observed,
+    "recall_rescue_used_runs": recall_rescue_used,
     "outcome_attribution_method": "equal_touch_fractional_credit",
     "strategy_allocation": rows,
     "priority_capability_gaps": gaps,
@@ -197,7 +211,9 @@ policy_obj = {
         "never_zero_exploration": True,
         "recent_runs_not_treated_as_failed_outcomes": True,
         "domain_authorization_precedes_generic_gap_ranking": True,
-        "multi_origin_outcomes_not_full_credited_to_every_strategy": True
+        "multi_origin_outcomes_not_full_credited_to_every_strategy": True,
+        "stop_reason_signals_observe_only": True,
+        "coordination_routing_observe_first": True
     }
 }
 (INTEL / "search_policy.json").write_text(json.dumps(policy_obj, indent=2) + "\n", encoding="utf-8")
@@ -236,7 +252,23 @@ for x in domain_constraints:
     )
 if not domain_constraints:
     lines.append("| — | — | — | — | — | — |")
-lines += ["", "## Allocation guardrails", "",
+lines += ["", "## Stop / recall observations — observe only", "",
+          "These signals are recorded for diagnosis and future controlled learning. They do **not** currently reward or penalize a strategy.", "",
+          f"- Discovery runs with controlled stop reasons: **{sum(stop_reason_counts.values())}**",
+          f"- Runs where recall-rescue usage was explicitly observed: **{recall_rescue_observed}**",
+          f"- Runs that used a recall rescue: **{recall_rescue_used}**", "",
+          "| Stop reason | Runs |", "|---|---:|"]
+for reason, count in sorted(stop_reason_counts.items(), key=lambda item: (-item[1], item[0])):
+    lines.append(f"| {reason} | {count} |")
+if not stop_reason_counts:
+    lines.append("| — | 0 |")
+lines += ["", "## Recall floor", "",
+          "- Do not let one attractive near-match consume the entire search budget on a true discovery task.",
+          "- Before NO_FIND, use one materially different recall-rescue surface when practical.",
+          "- Treat verifier rejection as candidate-specific, not task-wide absence evidence.",
+          "- Keep wildcard/novelty exploration alive even when a locally strong strategy emerges.",
+          "- Keep coordination-derived routing observe-first until measured evidence shows it improves outcomes without worsening recall.", "",
+          "## Allocation guardrails", "",
           "- Never interpret a high allocation as proof that a strategy is better; early allocation includes uncertainty-driven exploration.",
           "- Do not suppress wildcard or novelty search to zero.",
           "- Domain authorization overrides generic capability-gap ranking; a blocked domain cannot be reopened by a high adaptive gap score.",
