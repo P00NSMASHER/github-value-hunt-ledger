@@ -1,4 +1,4 @@
-"""Pure parser/assembly tests. Full buyer-review integration is separate."""
+"""Parser/assembly tests and real-core single/split import parity regressions."""
 import hashlib
 import json
 from dataclasses import asdict
@@ -146,3 +146,79 @@ def test_source_bytes_and_inputs_are_not_mutated_or_returned():
     assert raw == encode()
     assert result.source_file_hashes == (hashlib.sha256(raw).hexdigest(),)
     assert "reviewer_role" not in asdict(result)
+
+
+def _review_context(count=2):
+    from freight.contracts import PopulationRow, freeze_population
+    from freight.finding_factory import ChargeRule, InvoiceCharge, FIXED, derive_batch
+    from freight.review_packet import build_review_packet
+    from freight.review_queue import build_review_queue
+    from freight.review_routing import route_review_packet
+
+    population = freeze_population(
+        'synthetic', 'qa', 'synthetic import parity',
+        [PopulationRow(f'I{i}', f'S{i}', 'C', 'K', 'USD', f'source-{i}')
+         for i in range(count + 1)],
+    )
+    charges = tuple(
+        InvoiceCharge('synthetic', 'qa', f'I{i}', f'S{i}', 'C', 'K', 'USD',
+                      f'X{i}', 'DETENTION' if i < count else 'UNKNOWN',
+                      '2026-09-10', 1, 12500, f'line-{i}')
+        for i in range(count + 1)
+    )
+    rules = (ChargeRule('synthetic', 'qa', 'C', 'K', 'USD', 'synthetic-rate',
+                        'DETENTION', FIXED, '2026-09-01', None,
+                        'a' * 64, True, 10000, None),)
+    factory = derive_batch(population, charges, rules)
+    queue = build_review_queue(factory)
+    packet = build_review_packet(factory, queue, charges, rules)
+    return dict(review_packet=packet, review_routing=route_review_packet(packet),
+                truth=factory.truth)
+
+
+def _decision_export(ctx, **changes):
+    row = dict(case_hash=ctx['review_routing'].buyer_review_case_hashes[0],
+               disposition='UNRESOLVED', reviewer_minutes=3,
+               reviewed_at='2026-09-21T09:00:00-04:00')
+    row.update(changes)
+    return json.dumps(dict(
+        schema_version=1, review_packet_hash=ctx['review_packet'].packet_hash,
+        review_routing_hash=ctx['review_routing'].routing_hash,
+        truth_hash=ctx['truth'].truth_hash, decisions=[row],
+    )).encode()
+
+
+@pytest.mark.parametrize('entrypoint', ['single', 'multiple'])
+@pytest.mark.parametrize('change', [
+    {'reviewed_at': '2026-09-21T09:00:00+00:60'},
+    {'reviewed_at': '2026-09-21T09:00:00-00:00'},
+    {'reviewed_at': '2026-09-21T09:00:00.1234567Z'},
+    {'reviewer_minutes': 2**53},
+])
+def test_both_entrypoints_reject_noncanonical_export_values(entrypoint, change):
+    from freight.reviewer_workbench import (
+        import_reviewer_decisions, import_reviewer_decision_files,
+    )
+
+    ctx = _review_context()
+    raw = _decision_export(ctx, **change)
+    with pytest.raises(ValueError):
+        if entrypoint == 'single':
+            import_reviewer_decisions(data=raw, reviewer_role='Synthetic Controller', **ctx)
+        else:
+            import_reviewer_decision_files(files=(raw,), reviewer_role='Synthetic Controller', **ctx)
+
+
+def test_valid_single_and_multiple_exports_produce_identical_bound_reviews():
+    from freight.reviewer_workbench import (
+        import_reviewer_decisions, import_reviewer_decision_files,
+    )
+
+    ctx = _review_context()
+    raw = _decision_export(ctx)
+    single = import_reviewer_decisions(data=raw, reviewer_role='Synthetic Controller', **ctx)
+    multiple = import_reviewer_decision_files(files=(raw,), reviewer_role='Synthetic Controller', **ctx)
+    assert single == multiple
+    assert single.unresolved_count == 1 and single.confirmed_count == 0
+    from freight.buyer_review_workflow import verify_buyer_review_batch
+    verify_buyer_review_batch(batch=single, **ctx)
