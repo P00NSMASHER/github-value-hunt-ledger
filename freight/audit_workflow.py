@@ -8,6 +8,7 @@ It does not perform buyer review, external carrier action, or settlement.
 """
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from enum import Enum
 from typing import Iterable
@@ -50,8 +51,16 @@ class RuleCSVInput:
     carrier_id: str
     currency: str
     authority_document_id: str
-    source_document_sha256: str
+    source_document_sha256: str | None
     verified_controlling_authority: bool
+    source_document_data: bytes | None = None
+
+
+@dataclass(frozen=True)
+class CurrencyDiscrepancy:
+    currency: str
+    validated_discrepancy_cents: int
+    review_discrepancy_cents: int
 
 
 @dataclass(frozen=True)
@@ -86,8 +95,10 @@ class AuditWorkflowSummary:
     rerun_required: bool
     review_routing_hash: str
     remediation_plan_hash: str
-    validated_discrepancy_cents: int
-    review_discrepancy_cents: int
+    currency_discrepancies: tuple[CurrencyDiscrepancy, ...]
+    summary_currency: str | None
+    validated_discrepancy_cents: int | None
+    review_discrepancy_cents: int | None
     unknown_expected_count: int
 
 
@@ -99,6 +110,19 @@ class AuditWorkflowResult:
     error_message: str | None
     summary: AuditWorkflowSummary | None
     artifacts: AuditWorkflowArtifacts | None
+
+
+def _source_document_sha256(spec: RuleCSVInput) -> str:
+    if spec.source_document_data is not None:
+        if not isinstance(spec.source_document_data, (bytes, bytearray)):
+            raise ValueError("source_document_data must be bytes")
+        computed = hashlib.sha256(bytes(spec.source_document_data)).hexdigest()
+        if spec.source_document_sha256 is not None and spec.source_document_sha256 != computed:
+            raise ValueError("source_document_sha256 does not match source_document_data")
+        return computed
+    if spec.source_document_sha256 is None:
+        raise ValueError("source_document_sha256 or source_document_data is required")
+    return spec.source_document_sha256
 
 
 def _blocked(stage: AuditWorkflowStage, code: str, exc: ValueError) -> AuditWorkflowResult:
@@ -116,17 +140,39 @@ def _summary(
     *,
     state: AuditWorkflowState,
     manifest: AuditRunManifest,
+    invoice_batch: InvoiceChargeCSVBatch,
     factory: FindingFactoryBatch,
     review_routing: ReviewRouting,
     remediation_plan: RemediationPlan,
 ) -> AuditWorkflowSummary:
     validated_findings = [f for f in factory.truth.findings if f.status == VALIDATED]
     review_findings = [f for f in factory.truth.findings if f.status == REVIEW]
-    review_discrepancy = sum(
-        item.variance_cents or 0
-        for item in factory.derivations
-        if item.decision == REVIEW
+    currency_by_charge = {charge.charge_id: charge.currency for charge in invoice_batch.charges}
+    totals: dict[str, dict[str, int]] = {
+        currency: {"validated": 0, "review": 0}
+        for currency in sorted(set(currency_by_charge.values()))
+    }
+    for item in factory.derivations:
+        currency = currency_by_charge[item.charge_id]
+        if item.decision == VALIDATED:
+            totals[currency]["validated"] += item.variance_cents or 0
+        elif item.decision == REVIEW and item.expected_cents is not None:
+            totals[currency]["review"] += item.variance_cents or 0
+
+    currency_discrepancies = tuple(
+        CurrencyDiscrepancy(
+            currency=currency,
+            validated_discrepancy_cents=totals[currency]["validated"],
+            review_discrepancy_cents=totals[currency]["review"],
+        )
+        for currency in sorted(totals)
     )
+    summary_currency = (
+        currency_discrepancies[0].currency
+        if len(currency_discrepancies) == 1
+        else None
+    )
+    single = currency_discrepancies[0] if summary_currency is not None else None
     unknown_expected = sum(
         item.expected_cents is None
         for item in factory.derivations
@@ -150,8 +196,14 @@ def _summary(
         rerun_required=review_routing.rerun_required,
         review_routing_hash=review_routing.routing_hash,
         remediation_plan_hash=remediation_plan.plan_hash,
-        validated_discrepancy_cents=sum(f.validated_cents for f in validated_findings),
-        review_discrepancy_cents=review_discrepancy,
+        currency_discrepancies=currency_discrepancies,
+        summary_currency=summary_currency,
+        validated_discrepancy_cents=(
+            single.validated_discrepancy_cents if single is not None else None
+        ),
+        review_discrepancy_cents=(
+            single.review_discrepancy_cents if single is not None else None
+        ),
         unknown_expected_count=unknown_expected,
     )
 
@@ -195,7 +247,7 @@ def run_audit_workflow(
                 carrier_id=spec.carrier_id,
                 currency=spec.currency,
                 authority_document_id=spec.authority_document_id,
-                source_document_sha256=spec.source_document_sha256,
+                source_document_sha256=_source_document_sha256(spec),
                 verified_controlling_authority=spec.verified_controlling_authority,
             )
         except ValueError as exc:
@@ -277,6 +329,7 @@ def run_audit_workflow(
         summary=_summary(
             state=state,
             manifest=manifest,
+            invoice_batch=invoice_batch,
             factory=factory,
             review_routing=review_routing,
             remediation_plan=remediation_plan,
@@ -325,9 +378,18 @@ def render_workflow_summary(result: AuditWorkflowResult) -> str:
         "- Rerun required for remediation cases: **" + ("yes" if summary.rerun_required else "no") + "**",
         f"- Review routing hash: `{summary.review_routing_hash}`",
         f"- Remediation plan hash: `{summary.remediation_plan_hash}`",
-        "- Validated discrepancy: **$" + format(summary.validated_discrepancy_cents / 100, ",.2f") + "**",
-        "- Review discrepancy with a calculable expected amount: **$" + format(summary.review_discrepancy_cents / 100, ",.2f") + "**",
         f"- Review cases without an established expected amount: **{summary.unknown_expected_count}**",
+        "",
+        "## Discrepancy by currency",
+        *[
+            "- " + item.currency
+            + " — Validated discrepancy: **"
+            + item.currency + " " + format(item.validated_discrepancy_cents / 100, ",.2f")
+            + "**; review discrepancy with a calculable expected amount: **"
+            + item.currency + " " + format(item.review_discrepancy_cents / 100, ",.2f")
+            + "**"
+            for item in summary.currency_discrepancies
+        ],
         "",
         "Discrepancy amounts are not realized savings. Human review and later settlement proof remain separate.",
         "",
