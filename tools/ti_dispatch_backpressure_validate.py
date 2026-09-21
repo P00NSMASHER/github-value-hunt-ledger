@@ -81,10 +81,14 @@ packet_by_id={x.get("dispatch_ticket_id"):x for x in PACKETS}
 if set(packet_by_id)!=seen:
     raise SystemExit("work-steal claim packet coverage drift")
 for did,p in packet_by_id.items():
-    if int(p.get("claim_schema_version") or 0)<15:
-        raise SystemExit(f"work-steal packet {did} is pre-v15")
+    if int(p.get("claim_schema_version") or 0)<19:
+        raise SystemExit(f"work-steal packet {did} is pre-v19")
     if p.get("routing_mode")!="generated" or p.get("dispatch_kind")!="work_steal":
         raise SystemExit(f"work-steal packet {did} provenance drift")
+    parent=parents.get(p.get("parent_dispatch_ticket_id"))
+    for key in ["routing_exploration_generation_id","routing_exploration_pair_id","baseline_slot_id","route_mode"]:
+        if p.get(key)!=(parent or {}).get(key):
+            raise SystemExit(f"work-steal exploration provenance drift {did} {key}")
 
 if MET.get("primary_tickets")!=len(PRIMARY):
     raise SystemExit("backpressure primary count drift")
