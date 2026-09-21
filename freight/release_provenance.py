@@ -26,6 +26,7 @@ CONTROL_PATHS = (
     "freight/deployment_security_evidence.py",
     "freight/engagement_state.py",
     "freight/external_action_authorization.py",
+    "freight/finding_factory.py",
     "freight/gap_registry.py",
     "freight/input_guard.py",
     "freight/incident_response.py",
