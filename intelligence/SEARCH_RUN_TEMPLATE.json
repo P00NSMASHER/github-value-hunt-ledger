@@ -107,5 +107,7 @@
   "presence_generation_id": "PRESENCEGEN:000000000000",
   "presence_event_id": "PRESENCE:000000000000",
   "activation_id": "ACTIVATE:000000000000",
-  "activation_generation_id": "ACTGEN:000000000000"
+  "activation_generation_id": "ACTGEN:000000000000",
+  "stop_reason_standard": null,
+  "coordination_signal_ids": []
 }
