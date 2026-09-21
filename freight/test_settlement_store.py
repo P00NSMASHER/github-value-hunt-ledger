@@ -138,7 +138,7 @@ def test_19_sql_trigger_blocks_counterparty_mismatch_and_review_lock_mutation(tm
     with pytest.raises(sqlite3.IntegrityError,match="payer/payee mismatch"):
         conn.execute("""INSERT INTO allocations
           (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
-          VALUES('TEST_BUYER','TEST_BU','a1','c1','e1',50000,'REVIEW',50000,'x')""")
+          VALUES('TEST_BUYER','TEST_BU','a1','c1','e1',50000,'REVIEW',50000,'2026-09-02T11:00:00Z')""")
     conn.close()
 
     s2=SettlementStore(tmp_path/"review-lock.sqlite3", buyer_id="TEST_BUYER", business_unit="TEST_BU")
@@ -191,7 +191,7 @@ def test_sql_triggers_block_direct_overconsume_and_mutation(tmp_path):
     with pytest.raises(sqlite3.IntegrityError,match="settlement event capacity exceeded"):
         conn.execute("""INSERT INTO allocations
           (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
-          VALUES('TEST_BUYER','TEST_BU','bypass','c2','e1',1,'REVIEW',1,'x')""")
+          VALUES('TEST_BUYER','TEST_BU','bypass','c2','e1',1,'REVIEW',1,'2026-09-02T11:00:00Z')""")
     with pytest.raises(sqlite3.IntegrityError,match="recovery claim is immutable"):
         conn.execute("UPDATE recovery_claims SET amount_cents=1 WHERE buyer_id='TEST_BUYER' AND business_unit='TEST_BU' AND claim_id='c1'")
     conn.close()
@@ -246,7 +246,7 @@ def test_direct_sql_cannot_cross_scope_allocation(tmp_path):
     with pytest.raises(sqlite3.IntegrityError,match="FOREIGN KEY constraint failed"):
         conn.execute("""INSERT INTO allocations
           (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
-          VALUES('BUYER-B','OPS','x','c1','e1',50000,'REVIEW',50000,'x')""")
+          VALUES('BUYER-B','OPS','x','c1','e1',50000,'REVIEW',50000,'2026-09-02T11:00:00Z')""")
     conn.close()
 
 
