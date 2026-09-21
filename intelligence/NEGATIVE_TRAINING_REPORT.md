@@ -2,8 +2,8 @@
 
 Candidate dispositions are normalized into controlled reason categories while the original evidence-bearing reason text remains preserved in the source run.
 
-- Structured candidate dispositions: **28**
-- Direct controlled reasons: **11**
+- Structured candidate dispositions: **41**
+- Direct controlled reasons: **24**
 - Legacy reasons normalized through reviewed aliases: **17**
 - Unmapped custom reasons: **0**
 - Unique unmapped custom reason strings: **0**
@@ -12,27 +12,29 @@ Candidate dispositions are normalized into controlled reason categories while th
 
 | Status | Count |
 |---|---:|
-| strong | 10 |
+| rejected_or_negative | 13 |
+| strong | 12 |
 | watch | 10 |
-| rejected_or_negative | 7 |
-| other | 1 |
+| other | 6 |
 
 ## Controlled reason distribution
 
 | Reason | Count | Alias-normalized |
 |---|---:|---:|
-| state_transition_verified | 8 | 4 |
-| interesting_but_not_load_bearing | 4 | 2 |
-| independent_negative_control | 3 | 1 |
+| interesting_but_not_load_bearing | 9 | 2 |
+| state_transition_verified | 9 | 4 |
+| independent_negative_control | 5 | 1 |
 | authority_location_bypass | 3 | 3 |
+| strengthens_active_experiment | 3 | 0 |
 | unsafe_retry_or_idempotency | 2 | 2 |
 | no_semantic_tests | 2 | 2 |
+| needs_runtime_validation | 2 | 0 |
 | authority_lineage_verified | 1 | 1 |
 | fail_open_boundary | 1 | 1 |
 | circular_evaluation | 1 | 1 |
 | needs_exactly_once_reconciliation | 1 | 0 |
-| needs_runtime_validation | 1 | 0 |
 | duplicate_or_dominated | 1 | 0 |
+| independent_falsifier | 1 | 0 |
 
 ## Remaining unmapped legacy reasons
 

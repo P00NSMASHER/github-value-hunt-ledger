@@ -7,8 +7,8 @@
   "adjustment_records": 5,
   "calibration_generations": 1,
   "excluded_runs": {
-    "manual_override": 0,
-    "unrouted": 0,
+    "manual_override": 2,
+    "unrouted": 17,
     "retrospective": 0,
     "unmatched_claim": 0,
     "pre_v12": 17,

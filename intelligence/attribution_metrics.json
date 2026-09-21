@@ -1,11 +1,51 @@
 {
   "method": "equal_touch_across_unique_origin_runs; exact-surface and unique-surface-family credit split within each credited run",
   "causal_claim": false,
-  "valid_outcomes": 1,
-  "outcomes_with_attributable_origins": 1,
+  "valid_outcomes": 6,
+  "outcomes_with_attributable_origins": 6,
   "outcomes": [
     {
       "outcome_id": "OUT:20260920:freight-v15-4-synthetic-rehearsal",
+      "result": "PARTIAL",
+      "origin_count": 1,
+      "credit_per_origin": 1.0,
+      "revenue_usd": null,
+      "customer_value_usd": null
+    },
+    {
+      "outcome_id": "OUT:20260921:exp002-reversible-authority-reference",
+      "result": "PARTIAL",
+      "origin_count": 1,
+      "credit_per_origin": 1.0,
+      "revenue_usd": null,
+      "customer_value_usd": null
+    },
+    {
+      "outcome_id": "OUT:20260921:exp003-historical-authority-late-return",
+      "result": "PARTIAL",
+      "origin_count": 1,
+      "credit_per_origin": 1.0,
+      "revenue_usd": null,
+      "customer_value_usd": null
+    },
+    {
+      "outcome_id": "OUT:20260921:exp004-two-layer-qualification-transfer",
+      "result": "PARTIAL",
+      "origin_count": 1,
+      "credit_per_origin": 1.0,
+      "revenue_usd": null,
+      "customer_value_usd": null
+    },
+    {
+      "outcome_id": "OUT:20260921:exp007-opentfraw-thermo-disagreement",
+      "result": "PARTIAL",
+      "origin_count": 1,
+      "credit_per_origin": 1.0,
+      "revenue_usd": null,
+      "customer_value_usd": null
+    },
+    {
+      "outcome_id": "OUT:20260921:exp008-secsgem-atomicity-correction",
       "result": "PARTIAL",
       "origin_count": 1,
       "credit_per_origin": 1.0,
@@ -23,9 +63,69 @@
       "engineering_days_saved_high_credit": 0.0,
       "id": "RUN:20260920T155926Z:hunter03:settlement-persistence-race",
       "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "RUN:20260921T025635Z:hunter-11:rqr-runtime-closure",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "RUN:20260921T030500Z:hunter13:exp007-opentfraw-thermo-falsification",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "RUN:20260921T031303Z:HUNTER-03:514ce7fa5c93",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "RUN:20260921T031322Z:hunter08:secsgem-atomicity-correction",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "RUN:20260921T031652Z:HUNTER-09:14e0f62a297d",
+      "assisted_outcome_count": 1
     }
   ],
   "by_strategy": [
+    {
+      "fractional_outcome_equivalents": 3.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "STRAT:evaluation-target-independence",
+      "assisted_outcome_count": 3
+    },
     {
       "fractional_outcome_equivalents": 1.0,
       "fractional_passed_equivalents": 0.0,
@@ -34,6 +134,26 @@
       "engineering_days_saved_low_credit": 0.0,
       "engineering_days_saved_high_credit": 0.0,
       "id": "STRAT:acceptance-path-transition-inspection",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "STRAT:capability-conjunction-search-claim-tracing",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "STRAT:decision-claim-runtime-side-effect-trace",
       "assisted_outcome_count": 1
     }
   ],
@@ -47,9 +167,69 @@
       "engineering_days_saved_high_credit": 0.0,
       "id": "QF:exp-001-realized-recovery-persistence-and-concurrency-acceptance-boundary",
       "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "QF:exp002-reversible-authority-crash-matrix",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "QF:exp003-provider-bank-historical-authority-fixture",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "QF:recovery-qualification-behavior-closure-currentness",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "QF:secs-gem-equipment-constant-atomicity-runtime-falsification",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay",
+      "assisted_outcome_count": 1
     }
   ],
   "by_objective": [
+    {
+      "fractional_outcome_equivalents": 3.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "OBJ:independent-evaluation",
+      "assisted_outcome_count": 3
+    },
     {
       "fractional_outcome_equivalents": 1.0,
       "fractional_passed_equivalents": 0.0,
@@ -59,9 +239,49 @@
       "engineering_days_saved_high_credit": 0.0,
       "id": "OBJ:exactly-once-settlement",
       "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "OBJ:protocol-regression",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 1.0,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "OBJ:runtime-side-effect",
+      "assisted_outcome_count": 1
     }
   ],
   "by_surface": [
+    {
+      "fractional_outcome_equivalents": 1.5,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:local-synthetic-python-fixture",
+      "assisted_outcome_count": 2
+    },
+    {
+      "fractional_outcome_equivalents": 0.5,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:sqlite-crash-restart-harness",
+      "assisted_outcome_count": 1
+    },
     {
       "fractional_outcome_equivalents": 0.3333333333333333,
       "fractional_passed_equivalents": 0.0,
@@ -91,9 +311,179 @@
       "engineering_days_saved_high_credit": 0.0,
       "id": "SURFACE:synthetic-acceptance-corpus",
       "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.25,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:exact-revision-source-inspection",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.25,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:git-blame-history-inspection",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.25,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:local-original-package-pytest-execution",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.25,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:public-git-clone-at-pinned-revision",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:github-contents-api",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:github-exact-revision-source-and-tests",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:github-git-tree-api",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:github-pinned-release-binary",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:local-synthetic-fixture",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:local-synthetic-read-only-decoder-execution",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:massive-public-dataset-manifest-and-cc0-fixture",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:official-docker-documentation",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:official-github-documentation",
+      "assisted_outcome_count": 1
+    },
+    {
+      "fractional_outcome_equivalents": 0.2,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE:pypi-pinned-wheel",
+      "assisted_outcome_count": 1
     }
   ],
   "by_surface_family": [
+    {
+      "fractional_outcome_equivalents": 3.166666666666667,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE_FAMILY:synthetic-local-validation",
+      "assisted_outcome_count": 5
+    },
+    {
+      "fractional_outcome_equivalents": 1.1666666666666665,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE_FAMILY:other",
+      "assisted_outcome_count": 3
+    },
+    {
+      "fractional_outcome_equivalents": 0.8333333333333333,
+      "fractional_passed_equivalents": 0.0,
+      "revenue_usd_credit": 0.0,
+      "customer_value_usd_credit": 0.0,
+      "engineering_days_saved_low_credit": 0.0,
+      "engineering_days_saved_high_credit": 0.0,
+      "id": "SURFACE_FAMILY:github-history-archaeology",
+      "assisted_outcome_count": 2
+    },
     {
       "fractional_outcome_equivalents": 0.5,
       "fractional_passed_equivalents": 0.0,
@@ -105,13 +495,13 @@
       "assisted_outcome_count": 1
     },
     {
-      "fractional_outcome_equivalents": 0.5,
+      "fractional_outcome_equivalents": 0.3333333333333333,
       "fractional_passed_equivalents": 0.0,
       "revenue_usd_credit": 0.0,
       "customer_value_usd_credit": 0.0,
       "engineering_days_saved_low_credit": 0.0,
       "engineering_days_saved_high_credit": 0.0,
-      "id": "SURFACE_FAMILY:synthetic-local-validation",
+      "id": "SURFACE_FAMILY:first-party-docs",
       "assisted_outcome_count": 1
     }
   ],

@@ -1,10 +1,10 @@
 {
-  "measured_runs": 16,
-  "total_measured_activity_runs": 16,
-  "excluded_nonsearch_or_unclassified_runs": 0,
-  "legacy_unclassified_discovery_runs": 16,
+  "measured_runs": 20,
+  "total_measured_activity_runs": 35,
+  "excluded_nonsearch_or_unclassified_runs": 15,
+  "legacy_unclassified_discovery_runs": 18,
   "discovery_denominator_policy": "explicit_search_plus_legacy_action_absent; all_activity_outcome_credit_preserved",
-  "valid_outcomes": 1,
+  "valid_outcomes": 6,
   "exploration_budget": 0.5,
   "outcome_attribution_method": "equal_touch_fractional_credit",
   "strategy_allocation": [
@@ -20,25 +20,25 @@
       "exploit_mass": 0.205,
       "uncertainty": 0.4082482904638631,
       "sufficient_evidence": false,
-      "exploration_component": 0.044705915278335034,
-      "exploitation_component": 0.25065283272635175,
-      "allocation": 0.14767937400234338
+      "exploration_component": 0.04145904582509918,
+      "exploitation_component": 0.23613739950416382,
+      "allocation": 0.1387982226646315
     },
     {
       "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
       "name": "Capability-Conjunction Search + Claim Tracing",
-      "runs": 2,
-      "inspected": 6,
-      "assisted_outcomes": 0,
-      "fractional_outcome_equivalents": 0,
-      "raw_exploit_score": 0.46,
-      "evidence_weight": 0.3,
-      "exploit_mass": 0.138,
-      "uncertainty": 0.5773502691896258,
+      "runs": 3,
+      "inspected": 9,
+      "assisted_outcomes": 1,
+      "fractional_outcome_equivalents": 1.0,
+      "raw_exploit_score": 0.3443636363636363,
+      "evidence_weight": 0.45,
+      "exploit_mass": 0.15496363636363636,
+      "uncertainty": 0.5,
       "sufficient_evidence": false,
-      "exploration_component": 0.06322371170492397,
-      "exploitation_component": 0.16873215081090998,
-      "allocation": 0.11597793125791697
+      "exploration_component": 0.050776753747079094,
+      "exploitation_component": 0.17850102492008765,
+      "allocation": 0.11463888933358338
     },
     {
       "strategy_id": "STRAT:first-party-production-source-triangulation",
@@ -52,25 +52,41 @@
       "exploit_mass": 0.13270833333333334,
       "uncertainty": 0.5773502691896258,
       "sufficient_evidence": false,
-      "exploration_component": 0.06322371170492397,
-      "exploitation_component": 0.16226204720191673,
-      "allocation": 0.11274287945342035
+      "exploration_component": 0.058631944888902915,
+      "exploitation_component": 0.1528653693944638,
+      "allocation": 0.10574865714168336
     },
     {
       "strategy_id": "STRAT:rule-period-authority-version-audit",
       "name": "Rule-period / authority-version audit",
-      "runs": 2,
-      "inspected": 5,
+      "runs": 3,
+      "inspected": 6,
       "assisted_outcomes": 0,
       "fractional_outcome_equivalents": 0,
-      "raw_exploit_score": 0.43535714285714283,
-      "evidence_weight": 0.25,
-      "exploit_mass": 0.10883928571428571,
-      "uncertainty": 0.5773502691896258,
+      "raw_exploit_score": 0.3755,
+      "evidence_weight": 0.3,
+      "exploit_mass": 0.11265,
+      "uncertainty": 0.5,
       "sufficient_evidence": false,
-      "exploration_component": 0.06322371170492397,
-      "exploitation_component": 0.1330774403716998,
-      "allocation": 0.09815057603831188
+      "exploration_component": 0.050776753747079094,
+      "exploitation_component": 0.12976038075192223,
+      "allocation": 0.09026856724950066
+    },
+    {
+      "strategy_id": "STRAT:evaluation-target-independence",
+      "name": "Evaluation-Target Independence",
+      "runs": 4,
+      "inspected": 6,
+      "assisted_outcomes": 3,
+      "fractional_outcome_equivalents": 3.0,
+      "raw_exploit_score": 0.3866666666666667,
+      "evidence_weight": 0.3,
+      "exploit_mass": 0.116,
+      "uncertainty": 0.4472135954999579,
+      "sufficient_evidence": false,
+      "exploration_component": 0.0454161092220944,
+      "exploitation_component": 0.13361921142674638,
+      "allocation": 0.08951766032442039
     },
     {
       "strategy_id": "STRAT:fail-open-boundary-archaeology",
@@ -84,25 +100,9 @@
       "exploit_mass": 0.08166666666666667,
       "uncertainty": 0.7071067811865475,
       "sufficient_evidence": false,
-      "exploration_component": 0.07743291666094598,
-      "exploitation_component": 0.09985356750887182,
-      "allocation": 0.0886432420849089
-    },
-    {
-      "strategy_id": "STRAT:evaluation-target-independence",
-      "name": "Evaluation-Target Independence",
-      "runs": 2,
-      "inspected": 4,
-      "assisted_outcomes": 0,
-      "fractional_outcome_equivalents": 0,
-      "raw_exploit_score": 0.4325,
-      "evidence_weight": 0.2,
-      "exploit_mass": 0.08650000000000001,
-      "uncertainty": 0.5773502691896258,
-      "sufficient_evidence": false,
-      "exploration_component": 0.06322371170492397,
-      "exploitation_component": 0.10576326844307038,
-      "allocation": 0.08449349007399717
+      "exploration_component": 0.07180917380239812,
+      "exploitation_component": 0.09407099655043925,
+      "allocation": 0.08294008517641868
     },
     {
       "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
@@ -116,9 +116,9 @@
       "exploit_mass": 0.06515,
       "uncertainty": 0.7071067811865475,
       "sufficient_evidence": false,
-      "exploration_component": 0.07743291666094598,
-      "exploitation_component": 0.07965869293717959,
-      "allocation": 0.07854580479906279
+      "exploration_component": 0.07180917380239812,
+      "exploitation_component": 0.07504561745217694,
+      "allocation": 0.07342739562728753
     },
     {
       "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
@@ -132,9 +132,25 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10950668091601541,
+      "exploration_component": 0.10155350749415819,
       "exploitation_component": 0.0,
-      "allocation": 0.054753340458007706
+      "allocation": 0.050776753747079094
+    },
+    {
+      "strategy_id": "STRAT:bidirectional-money-evidence-invariant-tracing",
+      "name": "Bidirectional money/evidence invariant tracing",
+      "runs": 0,
+      "inspected": 0,
+      "assisted_outcomes": 0,
+      "fractional_outcome_equivalents": 0,
+      "raw_exploit_score": 0.49999999999999994,
+      "evidence_weight": 0.0,
+      "exploit_mass": 0.0,
+      "uncertainty": 1.0,
+      "sufficient_evidence": false,
+      "exploration_component": 0.10155350749415819,
+      "exploitation_component": 0.0,
+      "allocation": 0.050776753747079094
     },
     {
       "strategy_id": "STRAT:cross-source-emergence-triangulation",
@@ -148,25 +164,25 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10950668091601541,
+      "exploration_component": 0.10155350749415819,
       "exploitation_component": 0.0,
-      "allocation": 0.054753340458007706
+      "allocation": 0.050776753747079094
     },
     {
       "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
       "name": "Decision-claim -> runtime-side-effect trace",
       "runs": 0,
       "inspected": 0,
-      "assisted_outcomes": 0,
-      "fractional_outcome_equivalents": 0,
-      "raw_exploit_score": 0.49999999999999994,
+      "assisted_outcomes": 1,
+      "fractional_outcome_equivalents": 1.0,
+      "raw_exploit_score": 0.4749999999999999,
       "evidence_weight": 0.0,
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10950668091601541,
+      "exploration_component": 0.10155350749415819,
       "exploitation_component": 0.0,
-      "allocation": 0.054753340458007706
+      "allocation": 0.050776753747079094
     },
     {
       "strategy_id": "STRAT:ingestion-invariant-triad-intersection",
@@ -180,9 +196,9 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10950668091601541,
+      "exploration_component": 0.10155350749415819,
       "exploitation_component": 0.0,
-      "allocation": 0.054753340458007706
+      "allocation": 0.050776753747079094
     },
     {
       "strategy_id": "STRAT:paper-research-artifact-production-descendant",
@@ -196,40 +212,12 @@
       "exploit_mass": 0.0,
       "uncertainty": 1.0,
       "sufficient_evidence": false,
-      "exploration_component": 0.10950668091601541,
+      "exploration_component": 0.10155350749415819,
       "exploitation_component": 0.0,
-      "allocation": 0.054753340458007706
+      "allocation": 0.050776753747079094
     }
   ],
   "priority_capability_gaps": [
-    {
-      "capability_id": "CAP-002",
-      "name": "Reviewed, versioned identity mastering",
-      "gap_score": 5,
-      "missing_piece": "datasets/customer identities separate",
-      "run_attention": 0
-    },
-    {
-      "capability_id": "CAP-008",
-      "name": "Structured invoice compliance/validation",
-      "gap_score": 5,
-      "missing_piece": "official rule-pack/version authority must be pinned",
-      "run_attention": 0
-    },
-    {
-      "capability_id": "CAP-012",
-      "name": "Permit event versioning and semantic source QA",
-      "gap_score": 5,
-      "missing_piece": "jurisdiction completeness/semantics vary",
-      "run_attention": 0
-    },
-    {
-      "capability_id": "CAP-014",
-      "name": "Virtual industrial endpoint / pre-FAT acceptance",
-      "gap_score": 5,
-      "missing_piece": "standards/certification remain separate. Execute the frozen fixture with a neutral raw-HSMS harness that records every correlated message, maintains its own logical T3 clock and reads post-state independently; then run Dreamine and secsgem native clients only as a second requester-compatibility matrix. Seek a third engine only to adjudicate an observed endpoint disagreement.",
-      "run_attention": 0
-    },
     {
       "capability_id": "CAP-001",
       "name": "Evidence-gated document facts",
@@ -238,25 +226,53 @@
       "run_attention": 2
     },
     {
+      "capability_id": "CAP-002",
+      "name": "Reviewed, versioned identity mastering",
+      "gap_score": 4,
+      "missing_piece": "datasets/customer identities separate",
+      "run_attention": 1
+    },
+    {
+      "capability_id": "CAP-008",
+      "name": "Structured invoice compliance/validation",
+      "gap_score": 4,
+      "missing_piece": "official rule-pack/version authority must be pinned",
+      "run_attention": 2
+    },
+    {
+      "capability_id": "CAP-012",
+      "name": "Permit event versioning and semantic source QA",
+      "gap_score": 4,
+      "missing_piece": "jurisdiction completeness/semantics vary",
+      "run_attention": 1
+    },
+    {
+      "capability_id": "CAP-014",
+      "name": "Virtual industrial endpoint / pre-FAT acceptance",
+      "gap_score": 4,
+      "missing_piece": "secsgem's correction is source and local-test verified, not yet a real raw-HSMS/T3 capture, and Dreamine was not runtime-executed in the correcting run. Use a neutral raw-HSMS harness for EC-ATOMIC-SHARED and EC-DUPLICATE-POLICY, record every correlated message, maintain an independent logical T3 clock and independently read post-state. Seek a third engine only after an observed endpoint disagreement.",
+      "run_attention": 2
+    },
+    {
       "capability_id": "CAP-015",
       "name": "Prospective, leakage-resistant prediction and evaluator-grain evidence",
       "gap_score": 4,
       "missing_piece": "first-party OEDI ZIP digest/bytes remain unresolved in the current evidence chain. Verify the current first-party artifact against the external expected digest, byte-inspect source schema/time/null semantics, then freeze the composite-event + unique-spell evaluator manifest before running policy scores.",
-      "run_attention": 2
+      "run_attention": 3
     },
     {
       "capability_id": "CAP-019",
       "name": "Source-authority observation receipts",
       "gap_score": 4,
       "missing_piece": "whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or \u201cno return.\u201d",
-      "run_attention": 1
+      "run_attention": 8
     },
     {
       "capability_id": "CAP-016",
       "name": "Money-state integrity / deterministic close truth",
       "gap_score": 3,
       "missing_piece": null,
-      "run_attention": 5
+      "run_attention": 7
     },
     {
       "capability_id": "CAP-006",
@@ -270,7 +286,7 @@
       "name": "Proof obligations, versioned proof-policy authority and typed proof admission",
       "gap_score": 2,
       "missing_piece": null,
-      "run_attention": 2
+      "run_attention": 4
     }
   ],
   "domain_constraints": [

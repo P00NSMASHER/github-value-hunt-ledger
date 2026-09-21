@@ -1,16 +1,52 @@
 {
   "rows": [
     {
+      "search_objective_id": "OBJ:independent-evaluation",
+      "name": "Independent evaluation",
+      "runs": 10,
+      "deep_inspected": 13,
+      "retained_count": 7,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 9,
+      "experiment_runs": 9,
+      "assisted_outcome_count": 3,
+      "fractional_outcome_equivalents": 3.0
+    },
+    {
       "search_objective_id": "OBJ:completeness-proof",
       "name": "Completeness proof",
-      "runs": 3,
+      "runs": 4,
       "deep_inspected": 11,
       "retained_count": 5,
       "master_promoted_count": 0,
-      "capability_touch_runs": 3,
-      "experiment_runs": 3,
+      "capability_touch_runs": 4,
+      "experiment_runs": 4,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:current-rule-authority",
+      "name": "Current rule authority",
+      "runs": 4,
+      "deep_inspected": 6,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 4,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:runtime-side-effect",
+      "name": "Runtime side-effect trace",
+      "runs": 4,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 4,
+      "experiment_runs": 4,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 1.0
     },
     {
       "search_objective_id": "OBJ:authority-lineage",
@@ -23,6 +59,18 @@
       "experiment_runs": 3,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0
+    },
+    {
+      "search_objective_id": "OBJ:protocol-regression",
+      "name": "Protocol regression",
+      "runs": 3,
+      "deep_inspected": 6,
+      "retained_count": 5,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 1.0
     },
     {
       "search_objective_id": "OBJ:ambiguity-reconciliation",
@@ -59,42 +107,6 @@
       "experiment_runs": 2,
       "assisted_outcome_count": 1,
       "fractional_outcome_equivalents": 1.0
-    },
-    {
-      "search_objective_id": "OBJ:current-rule-authority",
-      "name": "Current rule authority",
-      "runs": 1,
-      "deep_inspected": 4,
-      "retained_count": 3,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 1,
-      "experiment_runs": 1,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0
-    },
-    {
-      "search_objective_id": "OBJ:independent-evaluation",
-      "name": "Independent evaluation",
-      "runs": 1,
-      "deep_inspected": 3,
-      "retained_count": 2,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 1,
-      "experiment_runs": 1,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0
-    },
-    {
-      "search_objective_id": "OBJ:protocol-regression",
-      "name": "Protocol regression",
-      "runs": 1,
-      "deep_inspected": 3,
-      "retained_count": 2,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 1,
-      "experiment_runs": 1,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0
     },
     {
       "search_objective_id": "OBJ:unclassified",

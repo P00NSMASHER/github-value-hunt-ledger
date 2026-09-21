@@ -2,8 +2,8 @@
   "exact_rows": [
     {
       "id": "SURFACE:github-repository-search",
-      "runs": 5,
-      "deep_inspected": 18,
+      "runs": 6,
+      "deep_inspected": 21,
       "retained_count": 13,
       "master_promoted_count": 0,
       "capability_touch_runs": 5,
@@ -29,6 +29,66 @@
         "GitHub code search"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-code-search"
+    },
+    {
+      "id": "SURFACE:local-synthetic-python-fixture",
+      "runs": 4,
+      "deep_inspected": 2,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 4,
+      "experiment_runs": 4,
+      "assisted_outcome_count": 2,
+      "fractional_outcome_equivalents": 1.5,
+      "labels_seen": [
+        "local synthetic Python fixture"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
+      "id": "SURFACE:github-contents-api",
+      "runs": 3,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "GitHub contents API"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:github-git-tree-api",
+      "runs": 3,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "GitHub Git tree API"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:local-synthetic-fixture",
+      "runs": 3,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "local synthetic fixture"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
     },
     {
       "id": "SURFACE:github-repository-source-tests-schema-history",
@@ -59,6 +119,66 @@
         "GitHub exact-head source"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
+    },
+    {
+      "id": "SURFACE:public-git-clone-at-pinned-revision",
+      "runs": 2,
+      "deep_inspected": 3,
+      "retained_count": 3,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.25,
+      "labels_seen": [
+        "public Git clone at pinned revision"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:github-exact-revision-source-and-tests",
+      "runs": 2,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "GitHub exact-revision source and tests"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:official-docker-documentation",
+      "runs": 2,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "official Docker documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:official-github-documentation",
+      "runs": 2,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "official GitHub documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
     },
     {
       "id": "SURFACE:cross-project-identity-failure-comparison",
@@ -331,6 +451,21 @@
       "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
     },
     {
+      "id": "SURFACE:github-file-search",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 0,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub file search"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:github-repository-source-tests",
       "runs": 1,
       "deep_inspected": 3,
@@ -436,6 +571,21 @@
       "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
+      "id": "SURFACE:public-web-github-discovery",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 0,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "public web/GitHub discovery"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:repository-source-tests-ci",
       "runs": 1,
       "deep_inspected": 3,
@@ -449,6 +599,111 @@
         "repository source/tests/CI"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
+    },
+    {
+      "id": "SURFACE:exact-revision-public-git-clone",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "exact-revision public Git clone"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:exact-revision-source-inspection",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.25,
+      "labels_seen": [
+        "exact-revision source inspection"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:git-blame-history-inspection",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.25,
+      "labels_seen": [
+        "git blame history inspection"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
+    },
+    {
+      "id": "SURFACE:git-lfs-object-retrieval",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Git LFS object retrieval"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:github-code-search-and-exact-revision-source-fetch",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub code search and exact-revision source fetch"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-code-search"
+    },
+    {
+      "id": "SURFACE:independent-downstream-repository-comparison",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "independent downstream repository comparison"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:local-original-package-pytest-execution",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.25,
+      "labels_seen": [
+        "local original-package pytest execution"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:madsci-ot2-wrapper-comparator",
@@ -511,6 +766,51 @@
       "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
     },
     {
+      "id": "SURFACE:stripe-first-party-payout-documentation",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Stripe first-party payout documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:whole-tree-byte-and-sha-256-comparison",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "whole-tree byte and SHA-256 comparison"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:zip-integrity-and-central-directory-inspection",
+      "runs": 1,
+      "deep_inspected": 2,
+      "retained_count": 2,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "ZIP integrity and central-directory inspection"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:call-site-mutation-graph-search",
       "runs": 1,
       "deep_inspected": 1,
@@ -556,6 +856,126 @@
       "surface_family_id": "SURFACE_FAMILY:ecosystem-adjacency"
     },
     {
+      "id": "SURFACE:exact-revision-source-schema-and-git-history-inspection",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "exact-revision source, schema and git history inspection"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
+    },
+    {
+      "id": "SURFACE:github-exact-revision-source-and-schema-inspection",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub exact-revision source and schema inspection"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:github-pinned-release-binary",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "GitHub pinned release binary"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
+    },
+    {
+      "id": "SURFACE:github-repository-and-exact-revision-code-search",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub repository and exact-revision code search"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-code-search"
+    },
+    {
+      "id": "SURFACE:github-rest-repository-commit-metadata",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub REST repository/commit metadata"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:local-patched-rebuild-and-read-only-replay",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "local patched rebuild and read-only replay"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:local-synthetic-python-and-sqlite-fixture",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "local synthetic Python and SQLite fixture"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
+      "id": "SURFACE:local-synthetic-read-only-decoder-execution",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "local synthetic/read-only decoder execution"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
       "id": "SURFACE:low-attention-zero-star-implementation-audit",
       "runs": 1,
       "deep_inspected": 1,
@@ -567,6 +987,156 @@
       "fractional_outcome_equivalents": 0,
       "labels_seen": [
         "low-attention zero-star implementation audit"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:massive-frozen-public-fixture",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "MassIVE frozen public fixture"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:massive-public-dataset-manifest-and-cc0-fixture",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "MassIVE public dataset manifest and CC0 fixture"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:microsoft-dynamics-ax-integration-exact-source-revision",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "microsoft/Dynamics-AX-Integration exact source revision"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:microsoft-learn-dynamics-365-finance-documentation",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Microsoft Learn Dynamics 365 Finance documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:polish-ministry-of-finance-ksef-official-pages",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Polish Ministry of Finance KSeF official pages"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:public-package-metadata-recall-rescue-surface",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "public package metadata recall-rescue surface"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:pypi-pinned-wheel",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.2,
+      "labels_seen": [
+        "PyPI pinned wheel"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:raw-tcp-send-boundary-frame-capture-with-independent-hsms-header-decoding",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "raw TCP send-boundary frame capture with independent HSMS header decoding"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:real-localhost-hsms-tcp-active-passive-execution",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "real localhost HSMS/TCP active-passive execution"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:s2f13-s2f14-pre-state-and-post-state-reads",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "S2F13/S2F14 pre-state and post-state reads"
       ],
       "surface_family_id": "SURFACE_FAMILY:other"
     },
@@ -601,6 +1171,261 @@
       "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
     },
     {
+      "id": "SURFACE:thermo-commoncore-backed-frozen-comparator-output",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Thermo CommonCore-backed frozen comparator output"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:ecosystem-adjacency"
+    },
+    {
+      "id": "SURFACE:upstream-original-package-pytest-regression-suite",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "upstream original-package pytest regression suite"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:zatca-official-compliance-and-enablement-toolbox-sdk-page",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "ZATCA official Compliance and Enablement Toolbox SDK page"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:zatca-official-security-features-implementation-standards-pdf",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "ZATCA official Security Features Implementation Standards PDF"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:zatca-official-xml-implementation-standard-pdf",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "ZATCA official XML Implementation Standard PDF"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:zatca-systems-developers-e-invoice-specifications",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "ZATCA Systems Developers E-Invoice specifications"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:github-exact-revision-source-schema-tests-and-history",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub exact-revision source, schema, tests and history"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
+    },
+    {
+      "id": "SURFACE:gsa-official-opportunities-api-documentation",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GSA official Opportunities API documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:live-san-antonio-ckan-resource",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "live San Antonio CKAN resource"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:live-san-francisco-socrata-api",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "live San Francisco Socrata API"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:live-tempe-arcgis-featureserver",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "live Tempe ArcGIS FeatureServer"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:local-exact-revision-pytest-and-ephemeral-sqlite-replay",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "local exact-revision pytest and ephemeral SQLite replay"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
+      "id": "SURFACE:local-python-status-currentness-acceptance-fixture",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "local Python status/currentness acceptance fixture"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:official-go-documentation",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "official Go documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:official-robot-server-read-only-api",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "official Robot Server read-only API"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Opentrons/opentrons exact-revision source and tests"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:persistent-sqlite-provider-state",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "persistent SQLite provider state"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
       "id": "SURFACE:private-ledger-source",
       "runs": 1,
       "deep_inspected": 0,
@@ -616,6 +1441,51 @@
       "surface_family_id": "SURFACE_FAMILY:private-ledger"
     },
     {
+      "id": "SURFACE:repository-hardware-simulator",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "repository hardware simulator"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:sam-gov-first-party-opportunity-pages",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "SAM.gov first-party opportunity pages"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:slsa-specification",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "SLSA specification"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:sqlite-concurrency-boundary",
       "runs": 1,
       "deep_inspected": 0,
@@ -627,6 +1497,21 @@
       "fractional_outcome_equivalents": 0.3333333333333333,
       "labels_seen": [
         "SQLite concurrency boundary"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
+      "id": "SURFACE:sqlite-crash-restart-harness",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.5,
+      "labels_seen": [
+        "SQLite crash/restart harness"
       ],
       "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
     },
@@ -647,6 +1532,87 @@
     }
   ],
   "family_rows": [
+    {
+      "id": "SURFACE_FAMILY:other",
+      "runs": 18,
+      "deep_inspected": 21,
+      "retained_count": 13,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 17,
+      "experiment_runs": 15,
+      "assisted_outcome_count": 3,
+      "fractional_outcome_equivalents": 1.1666666666666665,
+      "name": "Other/uncategorized",
+      "exact_surface_ids": [
+        "SURFACE:cross-project-identity-failure-comparison",
+        "SURFACE:direct-web-github-domain-search",
+        "SURFACE:exact-revision-public-git-clone",
+        "SURFACE:exact-revision-source-inspection",
+        "SURFACE:git-lfs-object-retrieval",
+        "SURFACE:github-contents-api",
+        "SURFACE:github-exact-revision-source-and-schema-inspection",
+        "SURFACE:github-exact-revision-source-and-tests",
+        "SURFACE:github-file-search",
+        "SURFACE:github-git-tree-api",
+        "SURFACE:github-rest-repository-commit-metadata",
+        "SURFACE:independent-downstream-repository-comparison",
+        "SURFACE:live-san-antonio-ckan-resource",
+        "SURFACE:live-san-francisco-socrata-api",
+        "SURFACE:live-tempe-arcgis-featureserver",
+        "SURFACE:local-original-package-pytest-execution",
+        "SURFACE:local-patched-rebuild-and-read-only-replay",
+        "SURFACE:local-python-status-currentness-acceptance-fixture",
+        "SURFACE:low-attention-adapter-search",
+        "SURFACE:low-attention-zero-star-implementation-audit",
+        "SURFACE:massive-frozen-public-fixture",
+        "SURFACE:massive-public-dataset-manifest-and-cc0-fixture",
+        "SURFACE:microsoft-dynamics-ax-integration-exact-source-revision",
+        "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
+        "SURFACE:package-publication-verification",
+        "SURFACE:polish-ministry-of-finance-ksef-official-pages",
+        "SURFACE:public-git-clone-at-pinned-revision",
+        "SURFACE:public-package-metadata-recall-rescue-surface",
+        "SURFACE:public-web-github-discovery",
+        "SURFACE:pypi-pinned-wheel",
+        "SURFACE:raw-tcp-send-boundary-frame-capture-with-independent-hsms-header-decoding",
+        "SURFACE:real-localhost-hsms-tcp-active-passive-execution",
+        "SURFACE:repository-hardware-simulator",
+        "SURFACE:s2f13-s2f14-pre-state-and-post-state-reads",
+        "SURFACE:sam-gov-first-party-opportunity-pages",
+        "SURFACE:slsa-specification",
+        "SURFACE:upstream-original-package-pytest-regression-suite",
+        "SURFACE:whole-tree-byte-and-sha-256-comparison",
+        "SURFACE:zatca-official-compliance-and-enablement-toolbox-sdk-page",
+        "SURFACE:zatca-official-security-features-implementation-standards-pdf",
+        "SURFACE:zatca-official-xml-implementation-standard-pdf",
+        "SURFACE:zatca-systems-developers-e-invoice-specifications",
+        "SURFACE:zip-integrity-and-central-directory-inspection"
+      ]
+    },
+    {
+      "id": "SURFACE_FAMILY:synthetic-local-validation",
+      "runs": 13,
+      "deep_inspected": 6,
+      "retained_count": 4,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 13,
+      "experiment_runs": 13,
+      "assisted_outcome_count": 5,
+      "fractional_outcome_equivalents": 3.166666666666667,
+      "name": "Synthetic/local validation",
+      "exact_surface_ids": [
+        "SURFACE:local-exact-revision-pytest-and-ephemeral-sqlite-replay",
+        "SURFACE:local-synthetic-fixture",
+        "SURFACE:local-synthetic-python-and-sqlite-fixture",
+        "SURFACE:local-synthetic-python-fixture",
+        "SURFACE:local-synthetic-read-only-decoder-execution",
+        "SURFACE:persistent-sqlite-provider-state",
+        "SURFACE:source-faithful-synthetic-state-model",
+        "SURFACE:sqlite-concurrency-boundary",
+        "SURFACE:sqlite-crash-restart-harness",
+        "SURFACE:synthetic-acceptance-corpus"
+      ]
+    },
     {
       "id": "SURFACE_FAMILY:github-source-inspection",
       "runs": 10,
@@ -672,49 +1638,82 @@
     },
     {
       "id": "SURFACE_FAMILY:github-history-archaeology",
-      "runs": 6,
-      "deep_inspected": 19,
-      "retained_count": 13,
+      "runs": 10,
+      "deep_inspected": 23,
+      "retained_count": 17,
       "master_promoted_count": 0,
-      "capability_touch_runs": 6,
-      "experiment_runs": 6,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
+      "capability_touch_runs": 10,
+      "experiment_runs": 10,
+      "assisted_outcome_count": 2,
+      "fractional_outcome_equivalents": 0.8333333333333333,
       "name": "GitHub history archaeology",
       "exact_surface_ids": [
+        "SURFACE:exact-revision-source-schema-and-git-history-inspection",
+        "SURFACE:git-blame-history-inspection",
         "SURFACE:github-code-source-tests-history",
         "SURFACE:github-code-source-tests-schema-history",
+        "SURFACE:github-exact-revision-source-schema-tests-and-history",
         "SURFACE:github-issue-archaeology",
+        "SURFACE:github-pinned-release-binary",
         "SURFACE:low-attention-public-works-archaeology",
         "SURFACE:repository-source-tests-history",
         "SURFACE:tests-and-commit-issue-archaeology"
       ]
     },
     {
+      "id": "SURFACE_FAMILY:first-party-docs",
+      "runs": 10,
+      "deep_inspected": 12,
+      "retained_count": 9,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 10,
+      "experiment_runs": 10,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.3333333333333333,
+      "name": "First-party documentation",
+      "exact_surface_ids": [
+        "SURFACE:gsa-official-opportunities-api-documentation",
+        "SURFACE:microsoft-learn-dynamics-365-finance-documentation",
+        "SURFACE:official-docker-documentation",
+        "SURFACE:official-github-documentation",
+        "SURFACE:official-go-documentation",
+        "SURFACE:official-integration-restart-tests",
+        "SURFACE:official-labor-law-sources",
+        "SURFACE:official-microsoft-learn-documentation",
+        "SURFACE:official-payroll-engine-documentation",
+        "SURFACE:official-robot-server-read-only-api",
+        "SURFACE:official-sap-help-documentation",
+        "SURFACE:official-vendor-robot-server-schema-store",
+        "SURFACE:stripe-first-party-payout-documentation"
+      ]
+    },
+    {
       "id": "SURFACE_FAMILY:github-code-search",
-      "runs": 6,
-      "deep_inspected": 18,
+      "runs": 8,
+      "deep_inspected": 21,
       "retained_count": 14,
       "master_promoted_count": 0,
-      "capability_touch_runs": 6,
-      "experiment_runs": 6,
+      "capability_touch_runs": 8,
+      "experiment_runs": 7,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "name": "GitHub code search",
       "exact_surface_ids": [
         "SURFACE:github-code-search",
+        "SURFACE:github-code-search-and-exact-revision-source-fetch",
         "SURFACE:github-code-signature-search",
-        "SURFACE:github-exact-head-code-search"
+        "SURFACE:github-exact-head-code-search",
+        "SURFACE:github-repository-and-exact-revision-code-search"
       ]
     },
     {
       "id": "SURFACE_FAMILY:ecosystem-adjacency",
-      "runs": 6,
-      "deep_inspected": 14,
-      "retained_count": 13,
+      "runs": 7,
+      "deep_inspected": 15,
+      "retained_count": 14,
       "master_promoted_count": 0,
-      "capability_touch_runs": 6,
-      "experiment_runs": 6,
+      "capability_touch_runs": 7,
+      "experiment_runs": 7,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "name": "Ecosystem and analogy adjacency",
@@ -726,13 +1725,14 @@
         "SURFACE:frappe-erpnext-ecosystem-adjacency",
         "SURFACE:madsci-ot2-wrapper-comparator",
         "SURFACE:organization-lineage-traversal",
-        "SURFACE:simulation-robotics-analogs"
+        "SURFACE:simulation-robotics-analogs",
+        "SURFACE:thermo-commoncore-backed-frozen-comparator-output"
       ]
     },
     {
       "id": "SURFACE_FAMILY:github-repository-search",
-      "runs": 5,
-      "deep_inspected": 18,
+      "runs": 6,
+      "deep_inspected": 21,
       "retained_count": 13,
       "master_promoted_count": 0,
       "capability_touch_runs": 5,
@@ -742,45 +1742,6 @@
       "name": "GitHub repository search",
       "exact_surface_ids": [
         "SURFACE:github-repository-search"
-      ]
-    },
-    {
-      "id": "SURFACE_FAMILY:first-party-docs",
-      "runs": 3,
-      "deep_inspected": 9,
-      "retained_count": 8,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 3,
-      "experiment_runs": 3,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "name": "First-party documentation",
-      "exact_surface_ids": [
-        "SURFACE:official-integration-restart-tests",
-        "SURFACE:official-labor-law-sources",
-        "SURFACE:official-microsoft-learn-documentation",
-        "SURFACE:official-payroll-engine-documentation",
-        "SURFACE:official-sap-help-documentation",
-        "SURFACE:official-vendor-robot-server-schema-store"
-      ]
-    },
-    {
-      "id": "SURFACE_FAMILY:other",
-      "runs": 3,
-      "deep_inspected": 8,
-      "retained_count": 5,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 3,
-      "experiment_runs": 3,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "name": "Other/uncategorized",
-      "exact_surface_ids": [
-        "SURFACE:cross-project-identity-failure-comparison",
-        "SURFACE:direct-web-github-domain-search",
-        "SURFACE:low-attention-adapter-search",
-        "SURFACE:low-attention-zero-star-implementation-audit",
-        "SURFACE:package-publication-verification"
       ]
     },
     {
@@ -798,31 +1759,52 @@
         "SURFACE:private-ledger-deduplication",
         "SURFACE:private-ledger-source"
       ]
-    },
-    {
-      "id": "SURFACE_FAMILY:synthetic-local-validation",
-      "runs": 2,
-      "deep_inspected": 2,
-      "retained_count": 2,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 2,
-      "experiment_runs": 2,
-      "assisted_outcome_count": 1,
-      "fractional_outcome_equivalents": 0.5,
-      "name": "Synthetic/local validation",
-      "exact_surface_ids": [
-        "SURFACE:source-faithful-synthetic-state-model",
-        "SURFACE:sqlite-concurrency-boundary",
-        "SURFACE:synthetic-acceptance-corpus"
-      ]
     }
   ],
   "missing_surface_runs": 4,
   "unmapped_exact_surfaces": [
     "SURFACE:cross-project-identity-failure-comparison",
     "SURFACE:direct-web-github-domain-search",
+    "SURFACE:exact-revision-public-git-clone",
+    "SURFACE:exact-revision-source-inspection",
+    "SURFACE:git-lfs-object-retrieval",
+    "SURFACE:github-contents-api",
+    "SURFACE:github-exact-revision-source-and-schema-inspection",
+    "SURFACE:github-exact-revision-source-and-tests",
+    "SURFACE:github-file-search",
+    "SURFACE:github-git-tree-api",
+    "SURFACE:github-rest-repository-commit-metadata",
+    "SURFACE:independent-downstream-repository-comparison",
+    "SURFACE:live-san-antonio-ckan-resource",
+    "SURFACE:live-san-francisco-socrata-api",
+    "SURFACE:live-tempe-arcgis-featureserver",
+    "SURFACE:local-original-package-pytest-execution",
+    "SURFACE:local-patched-rebuild-and-read-only-replay",
+    "SURFACE:local-python-status-currentness-acceptance-fixture",
     "SURFACE:low-attention-adapter-search",
     "SURFACE:low-attention-zero-star-implementation-audit",
-    "SURFACE:package-publication-verification"
+    "SURFACE:massive-frozen-public-fixture",
+    "SURFACE:massive-public-dataset-manifest-and-cc0-fixture",
+    "SURFACE:microsoft-dynamics-ax-integration-exact-source-revision",
+    "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
+    "SURFACE:package-publication-verification",
+    "SURFACE:polish-ministry-of-finance-ksef-official-pages",
+    "SURFACE:public-git-clone-at-pinned-revision",
+    "SURFACE:public-package-metadata-recall-rescue-surface",
+    "SURFACE:public-web-github-discovery",
+    "SURFACE:pypi-pinned-wheel",
+    "SURFACE:raw-tcp-send-boundary-frame-capture-with-independent-hsms-header-decoding",
+    "SURFACE:real-localhost-hsms-tcp-active-passive-execution",
+    "SURFACE:repository-hardware-simulator",
+    "SURFACE:s2f13-s2f14-pre-state-and-post-state-reads",
+    "SURFACE:sam-gov-first-party-opportunity-pages",
+    "SURFACE:slsa-specification",
+    "SURFACE:upstream-original-package-pytest-regression-suite",
+    "SURFACE:whole-tree-byte-and-sha-256-comparison",
+    "SURFACE:zatca-official-compliance-and-enablement-toolbox-sdk-page",
+    "SURFACE:zatca-official-security-features-implementation-standards-pdf",
+    "SURFACE:zatca-official-xml-implementation-standard-pdf",
+    "SURFACE:zatca-systems-developers-e-invoice-specifications",
+    "SURFACE:zip-integrity-and-central-directory-inspection"
   ]
 }

@@ -47,8 +47,8 @@
         "STRAT:decision-claim-runtime-side-effect-trace",
         "STRAT:evaluation-target-independence"
       ],
-      "runs_needed": 3,
-      "inspections_needed": 14,
+      "runs_needed": 2,
+      "inspections_needed": 11,
       "matched_overlap": 2
     },
     {
@@ -95,8 +95,8 @@
         "STRAT:acceptance-path-transition-inspection",
         "STRAT:evaluation-target-independence"
       ],
-      "runs_needed": 3,
-      "inspections_needed": 16,
+      "runs_needed": 1,
+      "inspections_needed": 14,
       "matched_overlap": 2
     },
     {
@@ -191,8 +191,8 @@
         "STRAT:rule-period-authority-version-audit",
         "STRAT:authority-origin-invariant-set-consistency"
       ],
-      "runs_needed": 3,
-      "inspections_needed": 15,
+      "runs_needed": 2,
+      "inspections_needed": 14,
       "matched_overlap": 2
     }
   ],

@@ -22,7 +22,7 @@
   "attributed_assignment_runs": 4,
   "attribution_debt_runs": 0,
   "roles_with_sufficient_evidence": 0,
-  "work_kinds_observed": 2,
+  "work_kinds_observed": 4,
   "evidence_thresholds": {
     "min_runs": 5,
     "min_deep_inspections": 15,

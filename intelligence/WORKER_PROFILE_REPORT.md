@@ -1,28 +1,28 @@
 # WORKER PROFILE REPORT
 
-Profile generation: **WORKERS:fc22659849b1**
+Profile generation: **WORKERS:3dd0bfdb5314**
 
 - Registered workers: **14**
-- Measured: **1**
-- Sparse: **8**
-- Unmeasured: **5**
+- Measured: **6**
+- Sparse: **4**
+- Unmeasured: **4**
 - Unmapped historical runs: **0**
 
 | Worker | State | Runs | Deep | Retained | Top strategy | Top experiment | Active claim |
 |---|---|---:|---:|---:|---|---|---:|
-| HUNTER-01 | SPARSE | 1 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-010 | 0 |
+| HUNTER-01 | MEASURED | 4 | 8 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-010 | 0 |
 | HUNTER-02 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
-| HUNTER-03 | SPARSE | 1 | 0 | 0 | STRAT:acceptance-path-transition-inspection | EXP-001 | 0 |
-| HUNTER-04 | SPARSE | 2 | 4 | 4 | STRAT:acceptance-path-transition-inspection | EXP-005 | 0 |
-| HUNTER-05 | SPARSE | 2 | 7 | 3 | STRAT:first-party-history-manifest-triangulation | EXP-006 | 0 |
+| HUNTER-03 | SPARSE | 4 | 2 | 0 | STRAT:evaluation-target-independence | EXP-003 | 0 |
+| HUNTER-04 | SPARSE | 3 | 4 | 4 | STRAT:rule-period-authority-version-audit | EXP-005 | 0 |
+| HUNTER-05 | MEASURED | 3 | 7 | 3 | STRAT:first-party-history-manifest-triangulation | EXP-006 | 0 |
 | HUNTER-06 | MEASURED | 4 | 10 | 8 | STRAT:acceptance-path-transition-inspection | EXP-007 | 0 |
-| HUNTER-07 | SPARSE | 2 | 4 | 3 | STRAT:evaluation-target-independence | EXP-012 | 0 |
-| HUNTER-08 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
-| HUNTER-09 | SPARSE | 1 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-002 | 0 |
+| HUNTER-07 | MEASURED | 3 | 6 | 5 | STRAT:evaluation-target-independence | EXP-012 | 0 |
+| HUNTER-08 | SPARSE | 2 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-008 | 0 |
+| HUNTER-09 | SPARSE | 3 | 4 | 4 | STRAT:evaluation-target-independence | EXP-002 | 0 |
 | HUNTER-10 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
-| HUNTER-11 | SPARSE | 2 | 8 | 4 | STRAT:fail-open-boundary-archaeology | EXP-004 | 0 |
+| HUNTER-11 | MEASURED | 5 | 8 | 4 | STRAT:decision-claim-runtime-side-effect-trace | EXP-004 | 0 |
 | HUNTER-12 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
-| HUNTER-13 | SPARSE | 1 | 4 | 3 | STRAT:rule-period-authority-version-audit | EXP-008 | 0 |
+| HUNTER-13 | MEASURED | 4 | 6 | 5 | STRAT:evaluation-target-independence | EXP-007 | 0 |
 | HUNTER-14 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 
 ## Interpretation
