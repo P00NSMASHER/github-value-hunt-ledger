@@ -1,0 +1,13 @@
+{
+  "access_scope": "owner-only until buyer-specific authorization",
+  "customer_data_allowed_in_netlify": false,
+  "deletion_confirmation_required": true,
+  "environment_id": "gdrive-single-tenant-manual-20260921",
+  "folder_id": "1bK4YlSLsW5Gnx7i6LGubv_tssuw--JPh",
+  "mfa_required": true,
+  "parser_runtime_used": false,
+  "provider": "Google Drive",
+  "read_only_source_ingestion": true,
+  "retention_days_default": 30,
+  "single_tenant": true
+}
