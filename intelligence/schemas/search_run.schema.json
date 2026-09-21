@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Technology Intelligence Search Run v15",
+  "title": "Technology Intelligence Search Run v16",
   "type": "object",
   "required": [
     "search_run_id",
@@ -681,6 +681,34 @@
         "null"
       ],
       "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "presence_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^PRESENCEGEN:[a-f0-9]{12}$"
+    },
+    "presence_event_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^PRESENCE:[a-f0-9]{12}$"
+    },
+    "activation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ACTIVATE:[a-f0-9]{12}$"
+    },
+    "activation_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ACTGEN:[a-f0-9]{12}$"
     }
   },
   "additionalProperties": true,
@@ -966,6 +994,30 @@
       "then": {
         "required": [
           "dispatch_parent_ticket_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "minimum": 16
+          },
+          "routing_mode": {
+            "const": "generated"
+          }
+        },
+        "required": [
+          "schema_version",
+          "routing_mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "presence_generation_id",
+          "presence_event_id",
+          "activation_id",
+          "activation_generation_id"
         ]
       }
     }
