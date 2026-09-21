@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "packet_id": "COORD:20260921T133200Z:HUNTER-04:exp009-receipt",
+  "source_run_id": "RUN:20260921T133200Z:HUNTER-04:ec98661714c1",
+  "source_hunter": "HUNTER-04",
+  "created_at": "2026-09-21T13:32:00Z",
+  "signals": [
+    {
+      "signal_id": "SIG:20260921T133200Z:exp009-source-receipt",
+      "type": "next_test",
+      "subject": "CAP-012 / EXP-009 permit source observation receipt",
+      "dedupe_key": "permit-source-receipt-block-negative-absence",
+      "capability_ids": [
+        "CAP-012"
+      ],
+      "experiment_ids": [
+        "EXP-009"
+      ],
+      "target_worker_ids": [
+        "HUNTER-06"
+      ],
+      "target_lane_ids": [
+        "06"
+      ],
+      "priority": "high",
+      "question": "Can the PermitPlate ingestion reducer refuse delete/close/suppress actions unless the source observation is VERIFIED_EMPTY or COMPLETE_NONEMPTY under source/config/schema/count/pagination evidence?",
+      "failed_proof_obligation": "R23 showed zero-row success lacks completeness evidence; R25 synthetic receipt semantics classify unproven zero as UNKNOWN, source move as SOURCE_MOVED, and count mismatch as PARTIAL.",
+      "evidence_refs": [
+        "referrals/hunt04-r23-2026-09-21-exp009-three-jurisdiction-permit-benchmark.md",
+        "referrals/hunt04-r25-2026-09-21-exp009-source-observation-receipt.md"
+      ],
+      "expires_at": null
+    }
+  ]
+}
