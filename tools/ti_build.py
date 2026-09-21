@@ -55,6 +55,7 @@ STEPS = (
     ['tools/ti_worker_presence_validate.py'],
     ['tools/ti_activation.py'],
     ['tools/ti_activation_validate.py'],
+    ['tools/ti_routing_exploration_provenance_validate.py'],
     ['tools/ti_activation_response_learning.py'],
     ['tools/ti_activation_response_validate.py'],
     ['tools/ti_validate.py'],
