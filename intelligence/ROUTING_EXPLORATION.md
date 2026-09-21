@@ -1,14 +1,14 @@
 # CONTROLLED ROUTING EXPLORATION
 
-Generation: **ROUTEEXP:d017a904db12**
-Routing generation: **ROUTING:bcf8a80e1074**
-Gate: **0.1115 / 0.2500**
+Generation: **ROUTEEXP:41e92ed0600d**
+Routing generation: **ROUTING:8f15e7a4b984**
+Gate: **0.2354 / 0.2500**
 Applied: **True**
 Reason: **controlled_low_regret_swap**
 
 V18 may alter at most one two-worker pairing per routing generation. It never changes the assignment portfolio itself.
 
-- Pair: **EXPPAIR:1b19497a41a1**
+- Pair: **EXPPAIR:f9c1bdf424f1**
 - Workers: **HUNTER-08, HUNTER-10**
 - Baseline slots: **SLOT-10, SLOT-11**
 - Exploration slots: **SLOT-11, SLOT-10**
