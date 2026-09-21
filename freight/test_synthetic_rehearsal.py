@@ -51,6 +51,12 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert len(out["external_action_authorization_hash"]) == 64
     assert out["external_action_authorized_cents"] == 5000
     assert out["external_action_automatic_execution_authorized"] is False
+    assert len(out["carrier_action_execution_key"]) == 64
+    assert len(out["carrier_action_execution_intent_hash"]) == 64
+    assert len(out["carrier_action_execution_receipt_hash"]) == 64
+    assert out["carrier_action_execution_outcome"] == "SUBMITTED"
+    assert out["carrier_action_submitted"] is True
+    assert out["carrier_action_delivery_confirmed"] is False
     assert len(out["settlement_csv_adapter_hash"]) == 64
     assert len(out["settlement_csv_file_sha256"]) == 64
     assert out["settlement_event_count"] == 2
