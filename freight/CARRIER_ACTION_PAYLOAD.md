@@ -46,3 +46,8 @@ The high-level authorization handoff:
 The recipient/routing reference remains a separate buyer-approved hash because the destination is deployment/customer specific.
 
 No network request, email, carrier portal submission, money movement, settlement acceptance, account change or automatic execution occurs here.
+
+
+## Exact amount binding
+
+Because the canonical subject/body includes the full requested amount, the high-level buyer approval may not authorize a smaller amount than the payload requests. Partial approval requires a newly scoped proposal/payload. This prevents an authorization ceiling from being lower than the amount shown in the approved carrier-facing text.
