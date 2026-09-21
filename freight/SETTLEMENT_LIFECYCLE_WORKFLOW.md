@@ -73,3 +73,19 @@ The lifecycle orchestrator:
 - does not itself convert discrepancy dollars into realized savings.
 
 Human settlement/counter decisions remain separate proof-bound workflows.
+
+
+## Package atomicity
+
+Settlement and counter evidence supplied in one lifecycle call are now persisted inside one `BEGIN IMMEDIATE` transaction. Event ingestion, safe auto-allocation, counter ingestion, safe auto-reversal, and final automatic re-evaluation either commit together or roll back together.
+
+The transaction captures both the actual pre-write and post-write store snapshots. Lifecycle provenance uses those transaction snapshots rather than an earlier advisory read.
+
+Review cases are generated only after the atomic package has reached its final state. This prevents the workflow from returning a review-case hash based on claim/allocation capacity that a later row in the same package already changed.
+
+A final automatic pass is intentional:
+
+1. counters can restore claim capacity, making a settlement that initially required review safely auto-allocatable;
+2. that newly created allocation can make a counter safely auto-reversible.
+
+After those passes, remaining review cases are derived from the transaction's final snapshot. Any later concurrent store change is still caught by the existing proof-bound review workflows when a human tries to apply the decision.
