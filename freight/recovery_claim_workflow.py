@@ -22,7 +22,7 @@ from freight.pilot_reporting import ReviewDisposition
 from freight.review_packet import ReviewPacket
 from freight.review_routing import ReviewRouting
 from freight.settlement_report import ClaimFindingBinding
-from freight.settlement_store import RecoveryClaim
+from freight.settlement_store import RecoveryClaim, SettlementStore
 
 
 class RecoveryClaimBatchState(str, Enum):
@@ -45,6 +45,18 @@ class RecoveryClaimRecord:
     incumbent_preidentified: bool
     fee_disqualified: bool
     record_hash: str
+
+
+@dataclass(frozen=True)
+class RecoveryClaimPersistenceReceipt:
+    buyer_id: str
+    business_unit: str
+    claim_batch_hash: str
+    attempted_claim_count: int
+    created_claim_count: int
+    already_present_count: int
+    claim_ids: tuple[str, ...]
+    receipt_hash: str
 
 
 @dataclass(frozen=True)
@@ -277,6 +289,133 @@ def build_recovery_claim_batch(
         claims=claims_tuple,
         bindings=bindings_tuple,
         batch_hash=canonical_hash(body),
+    )
+
+
+
+
+
+def _verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
+    if not isinstance(batch, RecoveryClaimBatch):
+        raise ValueError("batch must be a RecoveryClaimBatch")
+    if not (
+        len(batch.records) == len(batch.claims) == len(batch.bindings) == batch.claim_count
+    ):
+        raise ValueError("recovery claim batch cardinality mismatch")
+
+    for record, claim, binding in zip(
+        batch.records,
+        batch.claims,
+        batch.bindings,
+        strict=True,
+    ):
+        if (
+            record.claim_id != claim.claim_id
+            or record.claim_id != binding.claim_id
+            or record.finding_id != binding.finding_id
+            or record.finding_proof_hash != binding.finding_proof_hash
+            or record.finding_proof_hash != claim.source_hash
+        ):
+            raise ValueError("recovery claim record/claim/binding mismatch")
+        if (
+            record.reference != claim.reference
+            or record.payer_id != claim.payer_id
+            or record.payee_id != claim.payee_id
+            or record.currency != claim.currency
+            or record.amount_cents != claim.amount_cents
+            or record.issued_at != claim.issued_at
+            or record.fee_disqualified != claim.fee_disqualified
+            or record.incumbent_preidentified != claim.fee_disqualified
+        ):
+            raise ValueError("recovery claim record does not match persisted claim")
+        record_body = {
+            "schema": 1,
+            "truth_hash": batch.truth_hash,
+            "incumbent_output_hash": batch.incumbent_output_hash,
+            "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+            "claim_id": record.claim_id,
+            "finding_id": record.finding_id,
+            "finding_proof_hash": record.finding_proof_hash,
+            "review_hash": record.review_hash,
+            "reference": record.reference,
+            "payer_id": record.payer_id,
+            "payee_id": record.payee_id,
+            "currency": record.currency,
+            "amount_cents": record.amount_cents,
+            "issued_at": record.issued_at,
+            "incumbent_preidentified": record.incumbent_preidentified,
+            "fee_disqualified": record.fee_disqualified,
+        }
+        if canonical_hash(record_body) != record.record_hash:
+            raise ValueError("recovery claim record hash mismatch")
+
+    if batch.confirmed_review_count < batch.claim_count:
+        raise ValueError("claim count cannot exceed confirmed review count")
+    if batch.fee_disqualified_count != sum(
+        record.fee_disqualified for record in batch.records
+    ):
+        raise ValueError("recovery claim fee-disqualified count mismatch")
+    expected_state = (
+        RecoveryClaimBatchState.CLAIMS_READY.value
+        if batch.claims
+        else RecoveryClaimBatchState.NO_CONFIRMED_CLAIMS.value
+    )
+    if batch.state != expected_state:
+        raise ValueError("recovery claim batch state mismatch")
+
+    body = {
+        "schema": 1,
+        "buyer_id": batch.buyer_id,
+        "business_unit": batch.business_unit,
+        "truth_hash": batch.truth_hash,
+        "incumbent_output_hash": batch.incumbent_output_hash,
+        "buyer_review_batch_hash": batch.buyer_review_batch_hash,
+        "issued_at": batch.issued_at,
+        "state": batch.state,
+        "confirmed_review_count": batch.confirmed_review_count,
+        "claim_count": batch.claim_count,
+        "fee_disqualified_count": batch.fee_disqualified_count,
+        "records": [asdict(record) for record in batch.records],
+        "bindings": [asdict(binding) for binding in batch.bindings],
+    }
+    if canonical_hash(body) != batch.batch_hash:
+        raise ValueError("recovery claim batch hash mismatch")
+
+
+def persist_recovery_claim_batch(
+    store: SettlementStore,
+    batch: RecoveryClaimBatch,
+) -> RecoveryClaimPersistenceReceipt:
+    _verify_recovery_claim_batch(batch)
+    if (store.buyer_id, store.business_unit) != (
+        batch.buyer_id,
+        batch.business_unit,
+    ):
+        raise ValueError("settlement store scope mismatch with recovery claim batch")
+
+    results = store.create_claims(batch.claims)
+    created = sum(results)
+    already_present = len(results) - created
+    claim_ids = tuple(claim.claim_id for claim in batch.claims)
+    body = {
+        "schema": 1,
+        "buyer_id": batch.buyer_id,
+        "business_unit": batch.business_unit,
+        "claim_batch_hash": batch.batch_hash,
+        "attempted_claim_count": len(results),
+        "created_claim_count": created,
+        "already_present_count": already_present,
+        "claim_ids": claim_ids,
+    }
+    return RecoveryClaimPersistenceReceipt(
+        buyer_id=batch.buyer_id,
+        business_unit=batch.business_unit,
+        claim_batch_hash=batch.batch_hash,
+        attempted_claim_count=len(results),
+        created_claim_count=created,
+        already_present_count=already_present,
+        claim_ids=claim_ids,
+        receipt_hash=canonical_hash(body),
     )
 
 
