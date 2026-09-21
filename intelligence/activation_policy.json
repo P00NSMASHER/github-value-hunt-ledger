@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "minimum_claim_schema_version": 16,
+  "activation_ttl_minutes": 30,
+  "generated_claim_requires_activation": true,
+  "eligible_presence_states": [
+    "READY_FRESH"
+  ],
+  "prefer_primary_over_work_steal": true,
+  "history_mode": "append_only",
+  "legacy_claim_ids": [
+    "CLAIM:062026092112",
+    "CLAIM:13a920204800",
+    "CLAIM:c4a920201835",
+    "CLAIM:112026092021",
+    "CLAIM:11b920202728"
+  ],
+  "guardrails": [
+    "An activation is an offer to claim, never an automatic claim.",
+    "Generated activation requires fresh READY presence and a currently eligible dispatch packet.",
+    "Activation expiry is bounded by presence expiry, dispatch hard expiry, and activation TTL.",
+    "One worker receives at most one current activation.",
+    "One slot receives at most one current activation.",
+    "Manual overrides remain explicit and do not require activation.",
+    "Unknown or stale presence is not interpreted as worker failure."
+  ]
+}
