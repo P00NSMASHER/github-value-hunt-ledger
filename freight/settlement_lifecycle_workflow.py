@@ -369,7 +369,7 @@ def process_settlement_evidence(
                 "event_id": item.event_id,
                 "effective_status": item.effective_status,
                 "edge_ids": item.edge_ids,
-                "reason": item.reason,
+                "reason": item.reason if item.effective_status == REVIEW else "",
                 "review_case_hash": item.review_case_hash,
             }
             for item in settlement_results_tuple
@@ -379,7 +379,7 @@ def process_settlement_evidence(
                 "counter_id": item.counter_id,
                 "effective_status": item.effective_status,
                 "edge_ids": item.edge_ids,
-                "reason": item.reason,
+                "reason": item.reason if item.effective_status == REVIEW else "",
                 "review_case_hash": item.review_case_hash,
             }
             for item in counter_results_tuple
