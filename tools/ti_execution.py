@@ -51,6 +51,7 @@ def build_execution_state(write=True, now=None):
     legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
     min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
     min_v15_claim_schema=int(dispatch_policy.get("minimum_v15_claim_schema_version",15))
+    min_v19_claim_schema=int(dispatch_policy.get("minimum_v19_claim_schema_version",19))
     allocations=load_jsonl("hunt_allocations.jsonl")
     runs=load_jsonl("search_runs.jsonl")
     run_by_id={r.get("search_run_id"):r for r in runs if r.get("search_run_id")}
@@ -179,6 +180,9 @@ def build_execution_state(write=True, now=None):
                             errors.append(f"{loc}: generated CLAIM missing historical dispatch ticket {did}")
                             continue
                         ticket_schema=int(ticket.get("ticket_schema_version") or 0)
+                        if ticket_schema>=19 and claim_schema<min_v19_claim_schema:
+                            errors.append(f"{loc}: V19 dispatch ticket requires claim_schema_version >= {min_v19_claim_schema}")
+                            continue
                         if ticket_schema>=15 and claim_schema<min_v15_claim_schema:
                             errors.append(f"{loc}: V15 dispatch ticket requires claim_schema_version >= {min_v15_claim_schema}")
                             continue
@@ -200,6 +204,11 @@ def build_execution_state(write=True, now=None):
                         if ticket_schema>=15:
                             expected_ticket["dispatch_kind"]=e.get("dispatch_kind")
                             expected_ticket["parent_dispatch_ticket_id"]=e.get("parent_dispatch_ticket_id")
+                        if ticket_schema>=19:
+                            expected_ticket["routing_exploration_generation_id"]=e.get("routing_exploration_generation_id")
+                            expected_ticket["routing_exploration_pair_id"]=e.get("routing_exploration_pair_id")
+                            expected_ticket["baseline_slot_id"]=e.get("baseline_slot_id")
+                            expected_ticket["route_mode"]=e.get("route_mode")
                         drift=[k for k,v in expected_ticket.items() if ticket.get(k)!=v]
                         try:
                             if abs(float(ticket.get("assignment_score"))-float(e.get("assignment_score")))>1e-9:
@@ -281,6 +290,10 @@ def build_execution_state(write=True, now=None):
                   "routing_generation_id":e.get("routing_generation_id"),
                   "worker_profile_generation_id":e.get("worker_profile_generation_id"),
                   "routing_learning_generation_id":e.get("routing_learning_generation_id"),
+                  "routing_exploration_generation_id":e.get("routing_exploration_generation_id"),
+                  "routing_exploration_pair_id":e.get("routing_exploration_pair_id"),
+                  "baseline_slot_id":e.get("baseline_slot_id"),
+                  "route_mode":e.get("route_mode"),
                   "routing_score":e.get("routing_score"),
                   "dispatch_ticket_id":e.get("dispatch_ticket_id"),
                   "dispatch_generation_id":e.get("dispatch_generation_id"),
@@ -482,11 +495,18 @@ def build_execution_state(write=True, now=None):
                     if int(claim.get("claim_schema_version") or 0)>=15:
                         expected["dispatch_kind"]=claim.get("dispatch_kind")
                         expected["parent_dispatch_ticket_id"]=claim.get("parent_dispatch_ticket_id")
+                    if int(claim.get("claim_schema_version") or 0)>=19:
+                        expected["routing_exploration_generation_id"]=claim.get("routing_exploration_generation_id")
+                        expected["routing_exploration_pair_id"]=claim.get("routing_exploration_pair_id")
+                        expected["baseline_slot_id"]=claim.get("baseline_slot_id")
+                        expected["route_mode"]=claim.get("route_mode")
                 elif claim.get("routing_mode")=="manual_override":
                     expected["route_override_reason"]=claim.get("route_override_reason")
             mismatches=[f"{k}:run={run.get(k)!r}:claim={v!r}" for k,v in expected.items() if run.get(k)!=v]
             if int(run.get("schema_version") or 0)<11:
                 mismatches.append(f"schema_version={run.get('schema_version')} < 11")
+            if int(claim.get("claim_schema_version") or 0)>=19 and int(run.get("schema_version") or 0)<19:
+                mismatches.append(f"schema_version={run.get('schema_version')} < 19 for V19 claim")
             try:
                 score_match=abs(float(run.get("assignment_score"))-float(claim["assignment_score"]))<1e-9
             except Exception:
