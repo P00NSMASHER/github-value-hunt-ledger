@@ -271,9 +271,11 @@ def authorize_carrier_action_payload(
         raise ValueError("approval payload hash does not match carrier action payload")
     if (
         approval.authorized_cents is not None
-        and approval.authorized_cents > payload.requested_cents
+        and approval.authorized_cents != payload.requested_cents
     ):
-        raise ValueError("approved amount exceeds carrier action payload amount")
+        raise ValueError(
+            "approved amount must equal the canonical carrier action payload amount"
+        )
 
     return authorize_carrier_action_proposal(
         resolution=resolution,
