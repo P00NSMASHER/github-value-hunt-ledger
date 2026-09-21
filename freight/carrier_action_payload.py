@@ -10,10 +10,18 @@ from __future__ import annotations
 import unicodedata
 from dataclasses import asdict, dataclass
 
-from freight.carrier_action_workflow import CarrierActionProposal
-from freight.contracts import canonical_hash
-from freight.external_action_authorization import ActionType
+from freight.carrier_action_workflow import (
+    CarrierActionApprovalInput,
+    CarrierActionProposal,
+    authorize_carrier_action_proposal,
+)
+from freight.buyer_review_workflow import BuyerReviewBatch
+from freight.contracts import TruthManifest, canonical_hash
+from freight.engagement_state import EngagementResolution
+from freight.external_action_authorization import ActionType, ExternalActionAuthorization
 from freight.recovery_claim_workflow import RecoveryClaimBatch, verify_recovery_claim_batch
+from freight.review_packet import ReviewPacket
+from freight.review_routing import ReviewRouting
 
 
 MAX_EXTERNAL_FIELD_CHARS = 256
@@ -235,6 +243,49 @@ def verify_carrier_action_payload(
     )
     if payload != expected:
         raise ValueError("carrier action payload does not match proposal/recovery claims")
+
+
+def authorize_carrier_action_payload(
+    *,
+    resolution: EngagementResolution,
+    operative_charter: dict,
+    truth: TruthManifest,
+    review_packet: ReviewPacket,
+    review_routing: ReviewRouting,
+    buyer_review: BuyerReviewBatch,
+    recovery_claims: RecoveryClaimBatch,
+    proposal: CarrierActionProposal,
+    payload: CarrierActionPayload,
+    approval: CarrierActionApprovalInput,
+) -> ExternalActionAuthorization:
+    verify_carrier_action_payload(
+        payload,
+        proposal=proposal,
+        recovery_claims=recovery_claims,
+    )
+    if approval.proposal_hash != payload.proposal_hash:
+        raise ValueError("approval proposal hash does not match carrier action payload")
+    if approval.action_type.value != payload.action_type:
+        raise ValueError("approval action type does not match carrier action payload")
+    if approval.action_payload_hash != payload.payload_hash:
+        raise ValueError("approval payload hash does not match carrier action payload")
+    if (
+        approval.authorized_cents is not None
+        and approval.authorized_cents > payload.requested_cents
+    ):
+        raise ValueError("approved amount exceeds carrier action payload amount")
+
+    return authorize_carrier_action_proposal(
+        resolution=resolution,
+        operative_charter=operative_charter,
+        truth=truth,
+        review_packet=review_packet,
+        review_routing=review_routing,
+        buyer_review=buyer_review,
+        recovery_claims=recovery_claims,
+        proposal=proposal,
+        approval=approval,
+    )
 
 
 def render_carrier_action_payload_markdown(payload: CarrierActionPayload) -> str:
