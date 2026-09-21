@@ -45,7 +45,48 @@ class ReviewRouting:
     routing_hash: str
 
 
+def _verify_case_hash(packet: ReviewPacket, case) -> None:
+    charge = {
+        "buyer_id": packet.buyer_id,
+        "business_unit": packet.business_unit,
+        "invoice_id": case.invoice_id,
+        "shipment_id": case.shipment_id,
+        "customer_id": case.customer_id,
+        "carrier_id": case.carrier_id,
+        "currency": case.currency,
+        "charge_id": case.charge_id,
+        "charge_code": case.charge_code,
+        "service_date": case.service_date,
+        "quantity_units": case.quantity_units,
+        "billed_cents": case.billed_cents,
+        "source_hash": case.charge_source_hash,
+    }
+    body = {
+        "schema": 1,
+        "factory_hash": packet.factory_hash,
+        "queue_hash": packet.queue_hash,
+        "queue_position": case.queue_position,
+        "priority_class": case.priority_class,
+        "action_hint": case.action_hint,
+        "charge": charge,
+        "charge_hash": case.charge_hash,
+        "expected_cents": case.expected_cents,
+        "variance_cents": case.variance_cents,
+        "decision": case.decision,
+        "reason": case.reason,
+        "rule_evidence": [asdict(rule) for rule in case.rule_evidence],
+        "finding_id": case.finding_id,
+        "finding_proof_hash": case.finding_proof_hash,
+        "derivation_hash": case.derivation_hash,
+        "queue_item_hash": case.queue_item_hash,
+    }
+    if canonical_hash(body) != case.case_hash:
+        raise ValueError("review case hash mismatch: " + case.charge_id)
+
+
 def _verify_packet_hash(packet: ReviewPacket) -> None:
+    for case in packet.cases:
+        _verify_case_hash(packet, case)
     body = {
         "schema": 1,
         "buyer_id": packet.buyer_id,
