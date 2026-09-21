@@ -804,7 +804,7 @@ Exact revision: `61ced4d976dd192623cfc715139a061783972cae`
 Public license: MIT  
 Attention at inspection: 9 stars / 2 forks
 
-**Implemented/tested:** this independent Open-MHS implementation has a genuine local-control “cerebellum” layer: reflex checks execute before the skill action each control tick; tests show obstacle/fall reflex abort, disturbance detection and correction, force-feedback grasp, DMP demonstration fitting/generalization, autonomous habit execution with reflex priority, and Microduck deadman/speed/fall/obstacle behavior. An episode recorder writes observation/action/next-observation trajectories and camera-frame references to disk. Commit `3ea342e17ac8ffa3380f0e9d49dadfda75a9490f` introduced the cerebellum/Microduck/MuJoCo family.
+**Implemented/tested:** this independent Open-MHS implementation has a genuine local-control “cerebellum” layer: reflex checks execute before the skill action each control tick; tests show obstacle/fall reflex abort, disturbance detection and correction, force-feedback grasp, DMP demonstration fitting/generalization, autonomous habit execution with reflex priority, and Microduck deadman/safety tests. An episode recorder writes observation/action/next-observation trajectories and camera-frame references to disk. Commit `3ea342e17ac8ffa3380f0e9d49dadfda75a9490f` introduced the cerebellum/Microduck/MuJoCo family.
 
 **Decisive failures:** `BaseDevice` last-read/last-write state is in memory and a write is recorded only after `_do_write` returns; there is no durable pre-dispatch effect/native-command ledger. The repository also explicitly calls itself early alpha, says real-hardware testing remains needed, and its scientific lab adapters (microscope, liquid handler, centrifuge, laser, spectrometer) are simulated. This is therefore a useful **local reflex/control and imitation-learning kernel**, not a Level-3 physical-effect executor.
 
@@ -1396,4 +1396,113 @@ Evidence count: **1 shadow task**. Keep LOCAL; do not stage or promote to global
 - serious candidate deep inspections: 1 plus prior-provider comparators;
 - source/test/schema/history traversals: ~18;
 - external GitHub/web reads/searches: ~25;
+- untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 14
+
+### Hypothesis
+A second mature scientific repository whose headline scientific capability predates 2025 will contain a **recently added operational-reproducibility kernel** that is independently reusable: safer checkpoint publication, reconstructable scientific state, or restart semantics added after the core platform was already established. The hypothesis fails as a strong candidate if the new layer is merely documentation, if equivalent recovery existed unchanged for years, or if per-file safety is overstated as campaign-level crash consistency.
+
+### Discovery modes
+1. **Direct scientific reliability search:** mature molecular-simulation/HPC software with checkpoint, resume and restart behavior around expensive long-running campaigns.
+2. **Code/invariant search:** `safesave`, `resume=True`, checkpoint serializers, reconstruction tests, flush/order behavior and multi-artifact writers rather than generic “checkpoint” mentions.
+3. **Commit-history archaeology:** followed 2025–2026 OpenMM commits introducing generalized safe overwrite, `ReplicaExchangeReporter` and `ExpandedEnsembleSampler`, then subtracted the older baseline that OpenMM already supported checkpoints.
+4. **Paper→code baseline validation + falsification:** used the 2017 OpenMM 7 paper to establish that the scientific platform long predates this reliability layer, then constructed a source-faithful crash-boundary model for the current multi-file reporter ordering.
+
+Deep inspection was limited to `openmm/openmm` as the candidate, with the prior verified OpenDPD result as the H4 comparator. No untrusted repository code was executed.
+
+### Best candidate
+**openmm/openmm — recent safer checkpoint/restart hardening in a mature molecular-simulation platform**  
+Canonical URL: https://github.com/openmm/openmm  
+Exact revision: `5a7a268616b55d6a85e1c804f1c38681a2756cde`  
+Revision date: 2026-09-18  
+Public provenance: inspected Python source files carry OpenMM's permissive license grant; a single root `LICENSE` file was not established in this bounded pass.  
+Evidence snapshot id: `shadow-science-20260920-openmm-recovery-5a7a268`
+
+### Frozen evidence manifest
+- head revision `5a7a268616b55d6a85e1c804f1c38681a2756cde`;
+- `wrappers/python/openmm/app/internal/safesave.py` blob `63e4d77174b2d076ebc5ddebefe1e06ffa542a34`;
+- `wrappers/python/openmm/app/replicaexchangereporter.py` blob `2721353d2e4d5c417f87b48a617f143bfef3e8e1`;
+- `wrappers/python/tests/TestReplicaExchangeSampler.py` blob `7a497d4f631cffc7d0404e58c4e571fbf111d269`;
+- `wrappers/python/openmm/app/expandedensemblesampler.py` at the pinned revision;
+- `wrappers/python/tests/TestExpandedEnsembleSampler.py` blob `73ee69f47f4042b5ed8409c312f1b7edce03039f`;
+- introducing commit `50f9085ca0471f69a866cc1fda903b9c1bd35c3c` (2025-07-24), “Always safely save checkpoints and states when filenames are given,” merged as `546d1a4e286cd1b3769027cc673c283081981eaa`;
+- `ReplicaExchangeReporter` introduction `46376ea3e4d0ff37cdaa5e55e034dbf5c3296b81` (2026-04-17);
+- `ExpandedEnsembleSampler` introduction `ce9fcace1c7c3835ab3970781a2bceebb3e563e7` (2026-05-05);
+- current combined CI status at the pinned revision: Jenkins branch check **pending** at inspection, so green-head CI is UNKNOWN;
+- external baseline: Eastman et al., *OpenMM 7: Rapid development of high performance algorithms for molecular dynamics*, PLOS Computational Biology, published 2017-07-26;
+- current OpenMM development documentation exposes `ReplicaExchangeReporter(..., resume=True, checkpoints=True)` and describes resuming from saved checkpoint/log files.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced filename-based checkpoint/state saves through `safesave`, inspected reporter write order and resume reconstruction, and separated single-file replacement semantics from multi-file campaign semantics.
+- **SCIENCE / HISTORY VALIDATOR:** established that OpenMM's molecular-simulation platform and checkpointing long predate the 2025–2026 hardening, so novelty is assigned only to the new operational layer rather than to checkpointing itself.
+- **TEST / SCHEMA VALIDATOR:** inspected reconstruction/resume regressions for replica exchange and expanded ensemble, including state, iteration, weights, log, energy, volume and trajectory continuation.
+- **COMMERCIAL ANALYST:** evaluated value as a campaign-durability/restart audit for expensive molecular simulation rather than as another simulation engine.
+- **RED-TEAM / VERIFIER:** challenged filesystem durability, concurrent writer behavior, multi-artifact atomicity, historical novelty and current CI state before scoring.
+
+### Load-bearing claims
+**IMPLEMENTED / TESTED**
+- Filename-based `Simulation.saveCheckpoint()` and `saveState()` now route through the shared `safesave.save()` helper instead of directly overwriting the destination. The 2025 introducing commit explicitly broadened safer overwrite behavior across checkpoints/states.
+- `ReplicaExchangeReporter` can restore every per-replica serialized `State`, the latest replica→thermodynamic-state assignment and `currentIteration`, then append subsequent outputs. Its regression test runs a campaign, destroys the sampler/simulation/integrator objects, reconstructs them with `resume=True`, verifies the restored serialized states, continues the campaign and validates log/energy/volume/trajectory output.
+- `ExpandedEnsembleSampler` persists the sampler's algorithmic state together with an OpenMM `State` containing positions/velocities/parameters and supports `resume=True`. Its regression destroys and reconstructs the simulation stack, then verifies restored physical state, current step, iteration, state index and weights before continuing.
+- The history makes the operational delta temporally clear: generalized safe overwrite landed in July 2025, while the new multistate reporter/sampler recovery paths arrived in April–May 2026, years after OpenMM's established scientific platform.
+
+**INDEPENDENT FALSIFICATION / LIMITS**
+- OpenMM already had checkpoint/restart functionality years before 2025. The newly valuable delta is safer/generalized overwrite plus newer multistate recovery, not checkpointing as a novel capability.
+- `ReplicaExchangeReporter.__call__()` flushes the new log row and then updates checkpoint files one replica at a time. There is no inspected generation manifest or group commit tying the log plus every checkpoint to one atomic campaign generation.
+- A source-faithful fault model injected a crash after the log and `checkpoint_0` advanced but before `checkpoint_1`. The resulting durable-looking set was `log=1`, `checkpoint_0=gen1`, `checkpoint_1=gen0`. Per-file safe replacement therefore does **not** establish campaign-level crash consistency.
+- Current `safesave.py` writes a temporary file and then rename/replaces it, but performs no explicit file or parent-directory `fsync`; do not describe this as power-loss durability.
+- The current `_getTempFilename()` docstring says an empty file is created/reserved, but the pinned implementation only checks `os.path.exists()` and returns a name. The original 2025 introducing commit used exclusive `open(name, 'x')`; the current implementation therefore exposes a potential concurrent-writer temp-name race that the old version avoided.
+- The restart regressions destroy/reconstruct Python objects; they do not kill the OS process exactly between individual filesystem operations.
+- The pinned revision's combined Jenkins status was still pending during inspection, so source/test presence is verified while a claim that the exact head's full CI passed is withheld.
+
+### Independent RED-TEAM / VERIFIER
+The verifier received the frozen source/test/history packet and the source-faithful crash artifact without the proposed score.
+
+**Verdict: PASS_WITH_LIMITS for H4 and a WATCH-level operational-reproducibility component; do not promote to STRONG.**
+
+Proof obligations:
+1. **Is there a real post-core operational reliability delta? — PASS.** The 2025–2026 history adds generalized safer saves and reconstructable multistate resume behavior to a platform whose core scientific publication dates to 2017.
+2. **Are the new capabilities in implementation/tests rather than README prose? — PASS.** Source plus dedicated reconstruction/resume tests cover the central narrower claims.
+3. **Does single-file safe replacement imply campaign-level atomicity? — FAIL.** Reporter ordering can expose mixed generations after interruption.
+4. **Does atomic rename/replace establish power-loss durability? — FAIL.** No explicit `fsync` protocol was found in the helper.
+5. **Is concurrent temporary-name reservation robust at the pinned head? — NOT ESTABLISHED / POTENTIAL REGRESSION.** Current code checks existence without atomically reserving the name; the 2025 introducing version used exclusive creation.
+6. **Is checkpoint/restart itself a 2025–2026 novelty? — FAIL.** It predates the hardening; novelty must be subtracted to the newer safer-overwrite and multistate-resume layer.
+7. **Is current full CI green? — UNKNOWN.** The visible combined status was pending.
+
+Strongest objection: this is valuable scientific reliability hardening, but the term **safe checkpoint** can invite an overclaim. The current implementation is safer per file and strongly reconstructable at ordinary restart boundaries; it is not a transactional, generation-consistent or proven power-loss-durable campaign snapshot.
+
+### Proposed score
+A) speed to first revenue: **3/5** — best as a focused audit/retrofit for existing simulation teams.  
+B) customer value / ceiling: **3/5** — failed long-running simulations can waste meaningful GPU/HPC time, but this is a narrower budget than physical lab integrity.  
+C) build/domain compression: **4/5** — state-complete checkpoints plus multistate reconstruction/tests save meaningful scientific engineering.  
+D) rarity/advantage: **3/5** — operational hardening is useful but checkpoint/restart is established practice.  
+E) evidence/completeness: **5/5** — strong source/tests/history plus a falsifiable ordering reproduction; exact head CI remains pending.  
+F) rights/operability: **4/5** — inspected source carries permissive license text and OpenMM is mature, while this pass did not establish a single root SPDX/license file.  
+**Total: 22/30 — WATCH_COMPONENT. Do not promote to STRONG.**
+
+### Commercial / research implication
+First paid wedge: **Molecular Simulation Campaign Durability / Restart Audit** for computational-chemistry, free-energy, replica-exchange and enhanced-sampling teams. Inject failures around checkpoint boundaries, measure mixed-generation exposure, and retrofit a generation ID + per-artifact hashes + a single manifest visibility point with process-kill qualification. The money path is avoided GPU/HPC reruns, less scientist time reconstructing interrupted campaigns, and fewer invalid analyses caused by silently inconsistent restart artifacts.
+
+The strongest combination is **OpenDPD run/event/evidence lineage + OpenMM state-complete checkpoints**. OpenDPD contributes stable run identity, retry ancestry and explicit evidence semantics; OpenMM contributes reconstructable scientific state. A transactional manifest/generation layer would turn the pair into a more general scientific campaign snapshot/evidence kernel.
+
+### Search lesson outcome
+H4 receives a **second independent success**: OpenDPD exposed a recent crash-aware run/evidence layer inside a mature RF research project; OpenMM independently exposes 2025–2026 checkpoint/restart hardening inside a mature molecular-simulation platform. The LOCAL lesson **commit-history archaeology for operational reproducibility** is therefore **STAGED-eligible inside shadow evaluation**.
+
+Do not edit global `SEARCH_SKILLS.md`. Refine the lesson before any wider promotion: subtract historical baseline capability, then test whether the new reliability guarantee is per-file, per-process, or truly campaign-wide. Search terms such as `checkpoint` or `resume` alone are too noisy and can surface ordinary pretrained-model loading or longstanding recovery features.
+
+### VALUE HANDOFF
+1. **Capability delta:** adds evidence for safer per-file checkpoint publication and state-complete multistate resume; a group-atomic campaign generation remains missing.
+2. **Graph edge:** strengthens H4's research→production reliability pattern and combines naturally with OpenDPD's run/evidence lineage; it does not advance H3 physical-effect Level 3.
+3. **Radar signal:** a second mature scientific codebase independently added an operational reliability layer after its scientific core was established, supporting a broader maturation signal beyond one domain.
+4. **Experiment impact:** defines the next concrete crash test: generation-tag every campaign artifact, kill after each write boundary, and prove readers observe complete generation N or N+1 but never a mixed set.
+5. **Commercial impact:** supports a fixed-scope simulation campaign durability audit with measurable failed-restart rate, mixed-generation incidence, rerun GPU-hours and scientist recovery time.
+6. **Negative knowledge:** per-file atomic overwrite, `resume=True`, and object-reconstruction tests are each weaker than generation-consistent crash recovery; filesystem rename without explicit fsync is not power-loss durability.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate deep inspections: 1 plus the prior OpenDPD comparator;
+- source/test/history/status traversals: ~14;
+- public web/documentation queries: 2;
+- reproducible tests: 1 source-faithful crash-ordering model;
 - untrusted-repository code executions: 0.
