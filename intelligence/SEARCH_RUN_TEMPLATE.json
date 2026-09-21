@@ -1,5 +1,5 @@
 {
-  "schema_version": 15,
+  "schema_version": 16,
   "search_run_id": "RUN:20260920T000000Z:hunter-role:shortid",
   "timestamp": "2026-09-20T00:00:00Z",
   "hunter_role": "broad-discovery",
@@ -103,5 +103,9 @@
   "routing_learning_generation_id": "ROUTELEARN:000000000000",
   "route_override_reason": null,
   "dispatch_kind": "primary",
-  "dispatch_parent_ticket_id": null
+  "dispatch_parent_ticket_id": null,
+  "presence_generation_id": "PRESENCEGEN:000000000000",
+  "presence_event_id": "PRESENCE:000000000000",
+  "activation_id": "ACTIVATE:000000000000",
+  "activation_generation_id": "ACTGEN:000000000000"
 }
