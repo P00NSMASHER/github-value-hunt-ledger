@@ -67,6 +67,7 @@ CONTROL_PATHS = (
     "freight/settlement_store.py",
     "freight/settlement_report.py",
     "freight/synthetic_rehearsal.py",
+    "freight/tenant_isolation_rehearsal.py",
     "freight/COMPONENT_RIGHTS_REGISTRY.json",
     "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json",
     "freight/RIGHTS_EVIDENCE_MANIFEST.json",
