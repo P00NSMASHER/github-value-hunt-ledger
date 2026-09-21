@@ -17,6 +17,54 @@
       ],
       "review_date": "2026-09-21",
       "recovered_new_runs": 0
+    },
+    {
+      "search_run_id": "RUN:20260921T025635Z:hunter-11:rqr-runtime-closure",
+      "decision": "archive_invalid_submission_accept_minimal_reviewed_correction",
+      "original_path": "intelligence/search_run_spool/20260921T025635Z-hunter-11-rqr-runtime-closure.json",
+      "archive_path": "intelligence/search_run_archive/20260921T025635Z-hunter-11-rqr-runtime-closure.json",
+      "corrected_submission_path": "intelligence/search_run_spool/20260921T025635Z-hunter-11-rqr-runtime-closure-reconciled.json",
+      "archived_bytes_sha256": "0f82614fad01f002d3f164db7c191ad6ed29b42a3a50bd0dd0f26db80e6e4b60",
+      "canonical_record_sha256": "1ab3710d29b4c710b6901e40d745216a5b5a2f0513984883292f1bcab9d59e7e",
+      "canonical_ledger": "intelligence/search_runs.jsonl",
+      "reason": "The V16 manual/unallocated record placed CAP-010 and EXP-004 in seed_ids, whose schema requires explicit SEED provenance identifiers. No source-backed SEED identifiers were present. The reviewed correction clears seed_ids while preserving seed_nodes, capabilities, experiment, measured result, execution mode and every observed denominator unchanged.",
+      "canonical_evidence_paths": [
+        "hunters/15-run25-2026-09-21.md"
+      ],
+      "review_date": "2026-09-21",
+      "recovered_new_runs": 1
+    },
+    {
+      "search_run_id": "RUN:20260921T031322Z:hunter08:secsgem-atomicity-correction",
+      "decision": "archive_invalid_submission_accept_minimal_reviewed_correction",
+      "original_path": "intelligence/search_run_spool/20260921T031322Z-hunter08-secsgem-atomicity-correction.json",
+      "archive_path": "intelligence/search_run_archive/20260921T031322Z-hunter08-secsgem-atomicity-correction.json",
+      "corrected_submission_path": "intelligence/search_run_spool/20260921T031322Z-hunter08-secsgem-atomicity-correction-reconciled.json",
+      "archived_bytes_sha256": "68b36dde0488f685dc9c4e75c8ca58b4f82076e11ed411859a67156b7654c376",
+      "canonical_record_sha256": "97449c84c66a8328a98cc22beb5a8b36a11cf2f22caa47d5faa518db020c12be",
+      "canonical_ledger": "intelligence/search_runs.jsonl",
+      "reason": "The submitted query_family_id did not equal the deterministic slug of its own query_family. The reviewed correction changes only query_family_id to QF:secs-gem-equipment-constant-atomicity-runtime-falsification; measured findings, execution evidence, denominators and provenance are unchanged.",
+      "canonical_evidence_paths": [
+        "referrals/hunt08-r24-2026-09-21-secsgem-atomicity-correction.md"
+      ],
+      "review_date": "2026-09-21",
+      "recovered_new_runs": 1
+    },
+    {
+      "search_run_id": "RUN:20260921T030500Z:hunter13:exp007-opentfraw-thermo-falsification",
+      "decision": "archive_invalid_submission_accept_minimal_reviewed_correction",
+      "original_path": "intelligence/search_run_spool/RUN-20260921T030500Z-hunter13-exp007-opentfraw-thermo-falsification.json",
+      "archive_path": "intelligence/search_run_archive/RUN-20260921T030500Z-hunter13-exp007-opentfraw-thermo-falsification.json",
+      "corrected_submission_path": "intelligence/search_run_spool/RUN-20260921T030500Z-hunter13-exp007-opentfraw-thermo-falsification-reconciled.json",
+      "archived_bytes_sha256": "f5ba91a2a8e37bb2a10e496b3dd55ddf80304fd5304d11bf0d38d683c2f053db",
+      "canonical_record_sha256": "53521070a3f1bca7e4703aef388a4f6d6457ff4c944fed44263563a97de5c1c8",
+      "canonical_ledger": "intelligence/search_runs.jsonl",
+      "reason": "The submitted query_family_id did not equal the deterministic slug of its own query_family. The reviewed correction changes only query_family_id to QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay; measured findings, execution evidence, denominators and provenance are unchanged.",
+      "canonical_evidence_paths": [
+        "referrals/hunt13-r24-2026-09-21-exp007-opentfraw-thermo-falsification.md"
+      ],
+      "review_date": "2026-09-21",
+      "recovered_new_runs": 1
     }
   ]
 }
