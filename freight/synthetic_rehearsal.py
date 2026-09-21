@@ -22,6 +22,7 @@ from freight.contracts import (
 )
 from freight.deal_economics import DealProfile, qualify_deal
 from freight.pilot_reporting import ReviewDisposition
+from freight.recovery_claim_workflow import build_recovery_claim_batch
 from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_report import (
@@ -184,11 +185,19 @@ def run_rehearsal() -> dict:
         ),
     )
     reviews = buyer_review.finding_reviews
-    findings = {finding.finding_id: finding for finding in truth.findings}
-    bindings = tuple(
-        ClaimFindingBinding(item.finding_id, item.finding_id, item.proof_hash)
-        for item in (f1, f2)
+    recovery_claims = build_recovery_claim_batch(
+        truth=truth,
+        incumbent=incumbent,
+        review_packet=review_packet,
+        review_routing=review_routing,
+        buyer_review=buyer_review,
+        issued_at="2026-09-20T14:00:00Z",
     )
+    bindings = recovery_claims.bindings
+    claim_id_by_finding = {
+        record.finding_id: record.claim_id
+        for record in recovery_claims.records
+    }
 
     with tempfile.TemporaryDirectory() as td:
         audit_bundle_path = Path(td) / "synthetic-audit-result.zip"
@@ -200,18 +209,8 @@ def run_rehearsal() -> dict:
             buyer_id=BUYER,
             business_unit=BU,
         )
-        store.create_claim(
-            RecoveryClaim(
-                f1.finding_id,"inv-1","carrier","cust","USD",2500,
-                "2026-09-20T10:00:00Z",f1.proof_hash,False,
-            )
-        )
-        store.create_claim(
-            RecoveryClaim(
-                f2.finding_id,"inv-2","carrier","cust","USD",2500,
-                "2026-09-20T10:00:00Z",f2.proof_hash,True,
-            )
-        )
+        for claim in recovery_claims.claims:
+            store.create_claim(claim)
         store.ingest_event(
             SettlementEventRecord(
                 "e-1","inv-1","carrier","cust","USD",2000,
@@ -219,7 +218,7 @@ def run_rehearsal() -> dict:
             )
         )
         store.review_allocate(
-            allocation_id="a-1", claim_id=f1.finding_id, event_id="e-1",
+            allocation_id="a-1", claim_id=claim_id_by_finding[f1.finding_id], event_id="e-1",
             amount_cents=2000, created_at="2026-09-21T11:00:00Z",
         )
         store.ingest_event(
@@ -303,6 +302,9 @@ def run_rehearsal() -> dict:
         "buyer_review_submitted_decision_count": buyer_review.submitted_decision_count,
         "buyer_review_confirmed_count": buyer_review.confirmed_count,
         "buyer_review_pending_case_count": len(buyer_review.pending_case_hashes),
+        "recovery_claim_batch_hash": recovery_claims.batch_hash,
+        "recovery_claim_count": recovery_claims.claim_count,
+        "recovery_claim_fee_disqualified_count": recovery_claims.fee_disqualified_count,
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
