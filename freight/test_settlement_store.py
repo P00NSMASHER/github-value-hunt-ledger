@@ -13,8 +13,8 @@ def S(tmp_path, *, buyer_id="TEST_BUYER", business_unit="TEST_BU"):
 
 def C(cid="c1", ref="INV-1", amt=50000, issued="2026-09-01T10:00:00Z", currency="USD", disq=False):
     return RecoveryClaim(cid, ref, "carrier", "buyer", currency, amt, issued, f"claim-src-{cid}", disq)
-def E(eid="e1", ref="INV-1", amt=50000, booked="2026-09-02T10:00:00Z", currency="USD"):
-    return SettlementEventRecord(eid, ref, "carrier", "buyer", currency, amt, booked, f"settle-src-{eid}", "X12-820")
+def E(eid="e1", ref="INV-1", amt=50000, booked="2026-09-02T10:00:00Z", currency="USD", payer="carrier", payee="buyer"):
+    return SettlementEventRecord(eid, ref, payer, payee, currency, amt, booked, f"settle-src-{eid}", "X12-820")
 def R(rid="r1", original="e1", amt=50000, currency="USD"):
     return CounterEventRecord(rid, original, currency, amt, "2026-09-03T10:00:00Z", f"return-src-{rid}", "BANK-RETURN")
 
@@ -106,6 +106,48 @@ def test_14_wrong_currency_never_realizes(tmp_path):
 def test_15_review_path_rejects_preissue_settlement(tmp_path):
     s=S(tmp_path); s.create_claim(C(issued="2026-09-05T10:00:00Z")); s.ingest_event(E(booked="2026-09-04T10:00:00Z")); assert s.auto_allocate("e1",created_at="x").status==REVIEW
     with pytest.raises(ValueError,match="predates issued claim"): s.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=50000,created_at="y")
+
+
+def test_16_review_path_rejects_counterparty_mismatch(tmp_path):
+    s=S(tmp_path); s.create_claim(C()); s.ingest_event(E(payer="other-carrier"))
+    assert s.auto_allocate("e1",created_at="x").status==REVIEW
+    with pytest.raises(ValueError,match="payer/payee mismatch"):
+        s.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=50000,created_at="y")
+    assert s.realized_cents()==0
+
+
+def test_17_timezone_offsets_are_normalized_before_ordering(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C(issued="2026-09-01T06:00:00-04:00"))
+    s.ingest_event(E(booked="2026-09-01T09:59:59Z"))
+    assert s.auto_allocate("e1",created_at="x").status==REVIEW
+    with pytest.raises(ValueError,match="predates issued claim"):
+        s.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=50000,created_at="y")
+
+
+@pytest.mark.parametrize("bad_timestamp", ["2026-09-01T10:00:00", "not-a-time", ""])
+def test_18_settlement_timestamps_require_timezone_awareness(tmp_path, bad_timestamp):
+    s=S(tmp_path)
+    with pytest.raises(ValueError,match="timestamp|required"):
+        s.create_claim(C(issued=bad_timestamp))
+
+
+def test_19_sql_trigger_blocks_counterparty_mismatch_and_review_lock_mutation(tmp_path):
+    s=S(tmp_path); s.create_claim(C("c1","I1")); s.ingest_event(E(ref="BATCH",payer="other-carrier"))
+    conn=sqlite3.connect(s.path); conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError,match="payer/payee mismatch"):
+        conn.execute("""INSERT INTO allocations
+          (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
+          VALUES('TEST_BUYER','TEST_BU','a1','c1','e1',50000,'REVIEW',50000,'x')""")
+    conn.close()
+
+    s2=SettlementStore(tmp_path/"review-lock.sqlite3", buyer_id="TEST_BUYER", business_unit="TEST_BU")
+    s2.create_claim(C()); s2.ingest_event(E(amt=25000))
+    s2.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=25000,created_at="x")
+    conn=sqlite3.connect(s2.path)
+    with pytest.raises(sqlite3.IntegrityError,match="review claim is immutable"):
+        conn.execute("DELETE FROM review_claims WHERE buyer_id='TEST_BUYER' AND business_unit='TEST_BU' AND claim_id='c1'")
+    conn.close()
 
 
 def test_fee_eligibility_tracks_active_edge_and_disqualification(tmp_path):
