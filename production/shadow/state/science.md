@@ -434,3 +434,69 @@ CONFIDENCE: **HIGH that history archaeology is productive; MEDIUM that every hid
 - `resume=True` plus successful object reconstruction does not prove process-crash consistency across multiple artifacts.
 - Per-file atomic rename/replace is not group atomicity, and rename without an explicit durability protocol is not evidence of power-loss durability.
 - Always subtract the pre-existing baseline capability before assigning novelty to a recent reliability commit.
+
+## 2026-09-20 — Run 15 evidence-backed update
+
+### H5 — Generic durable-publication kernels can supply scientific group-snapshot integrity, but manifest visibility is weaker than atomic closure
+STATUS: **SUPPORTED AS A TRANSFER DIRECTION ON ONE SHADOW RUN; COMPLETED SCIENTIFIC COMPOSITION REMAINS UNVERIFIED.**
+
+SUPPORTING EVIDENCE:
+- NoKV-Lab/NoKV@590d3a4bdca9df604e1dfa5e881a869c8a3bfcdf implements a manifest-last checkpoint helper: shard artifacts are published first, a create-only canonical _manifest.json is the visibility point, and discovery ignores steps without that manifest.
+- Each manifest member carries exact path, generation, size and SHA-256. Load rechecks metadata and exact bytes, so mixed-generation drift is rejected loudly rather than silently accepted.
+- Deterministic operation/revision identities and the lower Rust publication substrate support exact response-loss replay, completed-operation recovery and fresh-process retry without reuploading the same publication.
+- The deeper substrate persists operation identity/digests, owner epoch/activity lease, workspace incarnation, path/revision claims, staged-object and manifest closure state and deterministic terminal results before/around provider effects.
+- Exact-revision Python SDK and Rust GitHub Actions workflows completed successfully.
+- The kernel maps directly onto Run 14's OpenMM gap: immutable per-generation artifacts plus one visibility point can prevent readers from observing a partially published checkpoint generation.
+
+CONTRARY EVIDENCE:
+- The Python checkpoint and Torch adapter tests use fake clients/stubs, and the repository explicitly marks the installed Python checkpoint path and full native real-service Gate 0 as not qualified.
+- commit_checkpoint trusts the caller-supplied shard entries and does not atomically re-read/CAS every member generation when exposing the manifest. Concurrent replacement can therefore create a visible but unloadable checkpoint. The loader catches the mismatch; atomic group closure was not established.
+- The helper does not propagate expected_workspace_incarnation_id even though the pinned SDK supports it.
+- Orphan shards, fallback from a corrupt highest manifest, cross-host fencing, metadata HA and physical power-cycle behavior remain unqualified.
+- No OpenMM, OpenDPD, atomate2, jobflow or AiiDA adapter and no resumed-versus-uninterrupted scientific equivalence test were found.
+- Orbax already supplies commit-marker/atomic-rename checkpoint visibility, and AiiDA already supplies scientific process checkpoint/provenance/restart. Broad novelty claims therefore fail.
+
+INDEPENDENT VERIFIER:
+- Verdict **INCOMPLETE** for the full scientific checkpoint hypothesis.
+- The Rust durable-publication substrate is strong, but the frozen candidate remains **23/30 WATCH_COMPONENT** as scientific campaign checkpointing.
+- A separate re-scoped verifier packet would be required before treating the lower substrate alone as STRONG_COMPONENT.
+
+NEXT TEST:
+Bind one real OpenMM or OpenDPD campaign to an installed NoKV service. Use immutable per-generation shard identities and workspace-incarnation fencing; atomically prove every manifest member at commit; kill the process before/after each shard and manifest boundary; restart through the application's native resume path; and prove readers observe complete generation N or complete N+1, publication is not duplicated after lost responses, and resumed scientific state matches an uninterrupted run.
+
+CONFIDENCE: **HIGH that the transfer direction is technically useful; HIGH that manifest-last alone is insufficient; LOW-MEDIUM that the current Python adapter is deployable for real scientific campaigns without additional work.**
+
+### New LOCAL lesson — Closure-at-visibility verification
+WHEN TO USE: checkpoint stores, model/campaign snapshots, evidence bundles, distributed rank shards, multi-file scientific state and object-store commit-marker designs.
+
+PROCEDURE:
+1. Identify the exact visibility point: manifest, commit marker, directory rename, pointer swap or catalog row.
+2. Verify whether every referenced member is immutable or whether the commit atomically re-reads/CASes its current generation, size and digest.
+3. Test a concurrent replacement immediately before the visibility point; distinguish loud load failure from actual atomic group closure.
+4. Trace deterministic replay after response loss and process restart.
+5. Verify namespace/incarnation fencing, orphan cleanup and fallback from a corrupt newest generation.
+6. Run the adapter against its real provider; do not inherit durability from a stronger lower layer through mocks.
+
+WHY IT WORKED:
+- NoKV initially appeared to close OpenMM's mixed-generation gap completely. The closure-at-visibility check separated two different guarantees: partial shards remain invisible, but a visible manifest can still reference a member generation that changed before commit.
+- The same check preserved the real value in NoKV's lower durable publication/replay layer while preventing an unsupported STRONG scientific-product claim.
+
+FAILURE MODES:
+- A manifest can be deterministic yet not prove live member identity.
+- Per-shard hashes may detect corruption only after a checkpoint has already become visible.
+- Create-only manifests do not make referenced mutable paths immutable.
+- Fake-client adapter tests can conceal provider/restart races.
+- A commit marker may be commonplace even when the lower storage/replay implementation is sophisticated.
+
+Evidence count: **1 task**. Keep LOCAL; do not stage or promote to global SEARCH_SKILLS.md.
+
+### H4 impact
+Run 15 does not add a third H4 history-archaeology success because NoKV is primarily a storage system, not a mature scientific package with a newly hidden reliability subsystem. H4 remains supported by OpenDPD and OpenMM only.
+
+### Failed-search memory added
+- Do not equate partial-upload invisibility with atomic group closure.
+- Do not inherit real-service durability from a lower Rust layer into a fake-client Python adapter without a composition test.
+- Do not call manifest/commit-marker checkpointing rare by itself; compare Orbax or equivalent checkpoint systems.
+- Do not call generic provenance/restart novel without subtracting mature workflow engines such as AiiDA.
+- When a new lower-layer fence exists, verify that the high-level adapter actually propagates it.
+
