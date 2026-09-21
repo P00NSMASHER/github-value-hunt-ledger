@@ -90,6 +90,8 @@ CREATE INDEX IF NOT EXISTS idx_alloc_event ON allocations(buyer_id,business_unit
 CREATE INDEX IF NOT EXISTS idx_reverse_alloc ON reversal_edges(buyer_id,business_unit,allocation_id);
 
 CREATE TRIGGER IF NOT EXISTS immutable_claim_u BEFORE UPDATE ON recovery_claims BEGIN SELECT RAISE(ABORT,'recovery claim is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS immutable_review_claim_u BEFORE UPDATE ON review_claims BEGIN SELECT RAISE(ABORT,'review claim is immutable'); END;
+CREATE TRIGGER IF NOT EXISTS immutable_review_claim_d BEFORE DELETE ON review_claims BEGIN SELECT RAISE(ABORT,'review claim is immutable'); END;
 CREATE TRIGGER IF NOT EXISTS immutable_claim_d BEFORE DELETE ON recovery_claims BEGIN SELECT RAISE(ABORT,'recovery claim is immutable'); END;
 CREATE TRIGGER IF NOT EXISTS immutable_event_u BEFORE UPDATE ON settlement_events BEGIN SELECT RAISE(ABORT,'settlement event is immutable'); END;
 CREATE TRIGGER IF NOT EXISTS immutable_event_d BEFORE DELETE ON settlement_events BEGIN SELECT RAISE(ABORT,'settlement event is immutable'); END;
@@ -115,6 +117,15 @@ CREATE TRIGGER IF NOT EXISTS allocation_claim_capacity BEFORE INSERT ON allocati
     + NEW.amount_cents
     > (SELECT amount_cents FROM recovery_claims WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND claim_id=NEW.claim_id)
   THEN RAISE(ABORT,'recovery claim capacity exceeded') END;
+END;
+CREATE TRIGGER IF NOT EXISTS allocation_counterparty BEFORE INSERT ON allocations BEGIN
+  SELECT CASE WHEN
+    (SELECT payer_id FROM recovery_claims WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND claim_id=NEW.claim_id)
+      <> (SELECT payer_id FROM settlement_events WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id)
+    OR
+    (SELECT payee_id FROM recovery_claims WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND claim_id=NEW.claim_id)
+      <> (SELECT payee_id FROM settlement_events WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id)
+  THEN RAISE(ABORT,'allocation payer/payee mismatch') END;
 END;
 CREATE TRIGGER IF NOT EXISTS allocation_currency BEFORE INSERT ON allocations BEGIN
   SELECT CASE WHEN
