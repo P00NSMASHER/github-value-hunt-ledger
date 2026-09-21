@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "upgrade_commit": "991f8acb0a103491d24344563a30486261e889fb",
+  "verified_on": "2026-09-21",
+  "task_updates_confirmed": 15,
+  "readback_confirmed": 15,
+  "reserve_tasks_unchanged": true,
+  "validation": {
+    "unit_tests_passed": 44,
+    "build_steps_passed": 48,
+    "whitespace_check": "passed",
+    "frozen_benchmark_prefixes_preserved": 15,
+    "shadow_overrides_preserved": 3,
+    "github_workflows": [
+      {
+        "id": 35554711822,
+        "name": "Freight Commercial Contracts",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/35554711822"
+      },
+      {
+        "id": 35554711795,
+        "name": "Technology Intelligence System",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/35554711795"
+      }
+    ]
+  },
+  "prompt_characters": {
+    "before": 244282,
+    "after": 44098,
+    "reduction_pct": 81.9
+  },
+  "tasks": [
+    {
+      "id": "6aab3db543788191983fe51d930d06be",
+      "title": "Hunt 14 MASTER Analog Miner",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:01.382222+00:00"
+    },
+    {
+      "id": "6aaa892cd4dc8191b8f9139fe435c191",
+      "title": "Hunt 12 Monetizable Kernels",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:36:56.691253+00:00"
+    },
+    {
+      "id": "6aaa82f958d88191be65ed18ee8f947a",
+      "title": "Hunt 10 Decision Engines",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:36:57.423958+00:00"
+    },
+    {
+      "id": "6aab44ee725481918ec698ace0d4ff8f",
+      "title": "Hunt 15 MASTER Integrator",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:36:58.148508+00:00"
+    },
+    {
+      "id": "6a80068860c8819194f2879c05712f34",
+      "title": "Hunt 01 Vertical ERP Gold",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:36:58.890507+00:00"
+    },
+    {
+      "id": "6aa8193145a081919eaabc6441cb88d5",
+      "title": "Hunt 02 Recovery Engines",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:36:59.993972+00:00"
+    },
+    {
+      "id": "6aa94858a3f08191bdeaae769587f49b",
+      "title": "Hunt 03 Freight Stack",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:01.220378+00:00"
+    },
+    {
+      "id": "6aa9a6fc43648191ab035bae64593452",
+      "title": "Hunt 04 Scope Recovery",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:01.963020+00:00"
+    },
+    {
+      "id": "6aa9b66fac94819181bcbd0f6bf6184e",
+      "title": "Hunt 05 Gov Evidence",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:02.767358+00:00"
+    },
+    {
+      "id": "6aa9b6f8565c81919a2f44be9a1e397b",
+      "title": "Hunt 06 Lab Automation",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:03.619644+00:00"
+    },
+    {
+      "id": "6aaa2600f2b881918262f432f19aac9f",
+      "title": "Hunt 07 Geo Asset Intel",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:04.619629+00:00"
+    },
+    {
+      "id": "6aaa2720a53c8191bf253f2ecc72c85c",
+      "title": "Hunt 08 Protocol Moats",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:05.469121+00:00"
+    },
+    {
+      "id": "6aaa7233d1208191b16dd4fb4942e7f8",
+      "title": "Hunt 09 Data Moats",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:07.370216+00:00"
+    },
+    {
+      "id": "6aaa8301976081919d81d3ab12a3961f",
+      "title": "Hunt 11 Compliance Proof",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:08.161322+00:00"
+    },
+    {
+      "id": "6aaa9b7afecc8191a0c4eab997e0507a",
+      "title": "Hunt 13 Revenue Leverage",
+      "prompt_matches": true,
+      "schedule_preserved": true,
+      "enabled_preserved": true,
+      "title_preserved": true,
+      "updated_at": "2026-09-21T02:37:09.091431+00:00"
+    }
+  ],
+  "limits": [
+    "Scheduled prompts updated; this is not proof of a completed future hunter run or improved discovery yield.",
+    "Frozen benchmark and shadow phase precedence preserved.",
+    "Staged external production runtime was not deployed."
+  ]
+}

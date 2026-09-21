@@ -29,9 +29,9 @@ No lost runs were recovered. The HUNTER-13 submission was already an exact canon
 
 ## Scheduled-worker rollout
 
-Prepared prompts preserve the frozen benchmark prefixes, original worker identities/catalog assignments and the three shadow overrides. Schedules, titles, enabled state and reserve tasks are unchanged. Stored prompt text falls from 244,282 to 44,098 characters across the 15 active tasks (81.9% shorter); common instructions are read from versioned repository files. This is not a measured token-cost or research-speed claim.
+All 15 active prompts were updated and read back successfully. They preserve the frozen benchmark prefixes, original worker identities/catalog assignments and the three shadow overrides. Schedules, titles, enabled state and reserve tasks are unchanged. Stored prompt text falls from 244,282 to 44,098 characters across the 15 active tasks (81.9% shorter); common instructions are read from versioned repository files. This is not a measured token-cost or research-speed claim.
 
-Original task configurations are preserved in `automation_backups/2026-09-21-before.json`. Desired instructions are in `automation_prompts.json`. The rollout receipt records actual update/readback status.
+Original task configurations are preserved in `automation_backups/2026-09-21-before.json`. Desired instructions are in `automation_prompts.json`. The [rollout receipt](automation_rollout_2026-09-21.json) records all 15 successful updates and readback comparisons, including unchanged schedules, enabled state, titles and reserve tasks.
 
 ## Verification
 
@@ -39,7 +39,8 @@ Original task configurations are preserved in `automation_backups/2026-09-21-bef
 - All 48 steps of `python tools/ti_build.py` passed locally, including existing graph, allocator, execution, routing, dispatch, activation and attribution checks.
 - `git diff --check` passed after regenerating reports.
 - Canonical telemetry remained at 18 records; no historical counts or outcomes were invented.
-- GitHub CI and task readback are recorded separately in the rollout receipt.
+- Both GitHub workflows passed for source commit `991f8acb0a103491d24344563a30486261e889fb`: Technology Intelligence System and Freight Commercial Contracts. The former also persisted regenerated intelligence.
+- All 15 automation prompts matched readback; frozen benchmark prefixes and three shadow overrides were preserved. See the rollout receipt.
 
 ## Evidence limits and next operational priority
 
