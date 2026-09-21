@@ -1,3 +1,5 @@
+import pytest
+
 from freight.contracts import (
     AuthorityRef,
     IncumbentOutput,
@@ -154,5 +156,85 @@ def test_markdown_includes_scope_and_does_not_label_discrepancy_as_savings():
     assert "Buyer scope: **buyer-1**" in report
     assert "Business unit: **bu-1**" in report
     assert "Reviewed discrepancy" in report
-    assert "Uniquely attributable realized" in report
+    assert "Settlement-proven realized" in report
     assert "Discrepancy and validated dollars are not realized savings" in report
+
+
+def frozen_case(*, currency="USD", expected=10000, status=VALIDATED, incumbent_ids=()):
+    population = freeze_population("buyer", "unit", "two synthetic invoices", [
+        PopulationRow(f"i{i}", f"s{i}", "customer", "carrier", currency, f"source-{i}")
+        for i in range(2)
+    ])
+    authority = AuthorityRef("authority", "buyer", "unit", "customer", "carrier", currency, "authority-source")
+    findings = [make_finding(
+        finding_id=f"f{i}", buyer_id="buyer", business_unit="unit", invoice_id=f"i{i}",
+        shipment_id=f"s{i}", customer_id="customer", carrier_id="carrier", currency=currency,
+        authority_id="authority" if status == VALIDATED else None,
+        expected_cents=expected, actual_cents=12500, status=status,
+    ) for i in range(2)]
+    truth = freeze_truth(population, [authority], findings)
+    incumbent = open_incumbent_output(
+        population=population, truth=truth,
+        submission=seal_incumbent_submission(population, "incumbent-source"), finding_ids=incumbent_ids,
+    )
+    return truth, incumbent
+
+
+def settled_ledger(truth, incumbent=None):
+    ledger = RecoveryLedger(truth, incumbent)
+    ledger.apply(SettlementEvent("buyer", "unit", "settlement", "f0", 1000, "USD", "settlement-source"))
+    return ledger
+
+
+def test_report_accepts_bound_settlement_and_preserves_financial_totals():
+    truth, incumbent = frozen_case()
+    metrics = build_pilot_metrics(truth, incumbent, settled_ledger(truth, incumbent))
+    assert metrics.validated_finding_cents == 5000
+    assert metrics.realized_cents == 1000
+    assert metrics.fee_eligible_realized_cents == 1000
+
+
+def test_same_buyer_ledger_from_other_frozen_finding_is_rejected():
+    truth, incumbent = frozen_case()
+    different_truth, _ = frozen_case(expected=9000)
+    with pytest.raises(ValueError, match="frozen finding proof"):
+        build_pilot_metrics(truth, incumbent, settled_ledger(different_truth))
+
+
+def test_incumbent_fee_attribution_is_checked_per_finding_not_aggregate():
+    truth, incumbent = frozen_case(incumbent_ids=("f0",))
+    # The other finding leaves enough aggregate challenger capacity to hide
+    # a fee assigned to the incumbent finding unless attribution is per finding.
+    with pytest.raises(ValueError, match="incumbent finding"):
+        build_pilot_metrics(truth, incumbent, settled_ledger(truth))
+
+
+def test_incumbent_bound_ledger_reports_zero_success_fee_for_its_findings():
+    truth, incumbent = frozen_case(incumbent_ids=("f0",))
+    metrics = build_pilot_metrics(truth, incumbent, settled_ledger(truth, incumbent))
+    assert metrics.realized_cents == 1000
+    assert metrics.fee_eligible_realized_cents == 0
+    report = render_markdown(metrics)
+    assert "Settlement-proven realized" in report
+    assert "Uniquely attributable realized" not in report
+
+
+def test_non_usd_amounts_cannot_be_reported_as_dollars():
+    truth, incumbent = frozen_case(currency="EUR")
+    with pytest.raises(ValueError, match="USD"):
+        build_pilot_metrics(truth, incumbent, RecoveryLedger(truth, incumbent))
+
+
+def test_review_only_false_positive_preserves_the_flagged_amount():
+    truth, incumbent = frozen_case(status=REVIEW)
+    metrics = build_pilot_metrics(truth, incumbent, RecoveryLedger(truth, incumbent), (
+        FindingReview("f0", ReviewDisposition.FALSE_POSITIVE, 3),
+    ))
+    assert metrics.validated_finding_cents == 0
+    assert metrics.false_positive_count == 1
+    assert metrics.false_positive_cents == 2500
+
+
+def test_untyped_review_disposition_cannot_be_silently_ignored():
+    with pytest.raises(ValueError, match="ReviewDisposition"):
+        FindingReview("f0", "FALSE_POSITIVE", 3)

@@ -205,6 +205,8 @@ The frozen benchmark remains unchanged and must finish before fleet-wide cutover
 
 The durable Markdown research record is now paired with a structured empirical-learning layer under `intelligence/`.
 
+For the Freight business, start with the [September 21 business audit](freight/BUSINESS_AUDIT_2026-09-21.md), [commercial playbook](freight/COMMERCIAL_PLAYBOOK.md), and [Hunter connection](freight/HUNTER_CONNECTION.md). The connection maps registry capabilities into reviewed freight applications and a change queue. The [recovered marketing source](freight/site/README.md) requires a verified business inbox and a repaired deployment before public launch; it is separate from customer-data processing.
+
 Every materially completed hunt cycle must:
 1. keep the detailed evidence in the appropriate `hunters/*.md` catalog;
 2. submit one immutable prospective record to `intelligence/search_run_spool/` for validated single-writer ingestion into `intelligence/search_runs.jsonl`;

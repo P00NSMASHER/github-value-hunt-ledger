@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "experiment_id": "EXP-001",
+  "reviewed_source_ref": "522ea934b278b85abd9a0e5a13451f8717ac858d",
+  "reviewed_at": "2026-09-21",
+  "policy": "USE means a reviewed application proposal, not installed code, deployment approval, permission to contact buyers, or proof of commercial results. New and changed evidence requires owner review.",
+  "capabilities": [
+    {
+      "capability_id": "CAP-001",
+      "disposition": "USE",
+      "priority": "P0",
+      "gap_ids": [
+        "FRT-EXP001-001",
+        "FRT-SEC-002"
+      ],
+      "freight_use": "Extract invoice and RateCon fields with source spans; send ambiguous money-bearing fields to review.",
+      "rationale": "Reduces reviewer effort while preserving evidence for every proposed finding.",
+      "acceptance_test": "Freeze a buyer-authorized sample before comparing output; report false-accept dollars and reviewer minutes per 100 invoices, with unsupported authority producing no recovery claim.",
+      "limitation": "Buyer-specific accuracy and safe deployed parsers remain unproven.",
+      "reviewed_evidence_sha256": "3161f74ada4ed6f87b4b412b1a1c3cc39af1efb1d19f532dda2b7278eebf50c4"
+    },
+    {
+      "capability_id": "CAP-002",
+      "disposition": "USE",
+      "priority": "P1",
+      "gap_ids": [
+        "FRT-EXP001-001",
+        "FRT-SEC-001"
+      ],
+      "freight_use": "Maintain reviewed carrier, invoice and shipment identity with reversible merges.",
+      "rationale": "Prevent duplicate findings and mistaken cross-buyer joins.",
+      "acceptance_test": "Pass an alias/non-match/merge/split fixture with no false cross-buyer identity join and preserved correction history.",
+      "limitation": "Identity patterns do not provide customer identities or tenant isolation by themselves.",
+      "reviewed_evidence_sha256": "0243e549b4a8895cd3f47453f13333a00048b878dafe6c60783d209bf33db2a0"
+    },
+    {
+      "capability_id": "CAP-003",
+      "disposition": "USE",
+      "priority": "P0",
+      "gap_ids": [
+        "FRT-EXP001-001",
+        "FRT-AUTH-001",
+        "FRT-RIGHTS-001"
+      ],
+      "freight_use": "Bind every rerate to the governing agreement revision, effective dates and supersession evidence.",
+      "rationale": "An arithmetically correct claim is still wrong under the wrong rate authority.",
+      "acceptance_test": "For the frozen buyer sample, reproduce controlling authority for every money-bearing finding; unresolved authority stays unresolved with zero supported recovery.",
+      "limitation": "Buyer agreement authority and separately licensed component scope require actual evidence.",
+      "reviewed_evidence_sha256": "0b9a23864e4e7771bc2d3816aea8cecae5fa2596a3181ebb243bd2816795a2ad"
+    },
+    {
+      "capability_id": "CAP-004",
+      "disposition": "USE",
+      "priority": "P0",
+      "gap_ids": [
+        "FRT-EXP001-001",
+        "FRT-FALSIFY-001"
+      ],
+      "freight_use": "Perform deterministic charge reconstruction and compare results against a sealed independent baseline.",
+      "rationale": "Creates auditable findings and tests incremental value over the incumbent.",
+      "acceptance_test": "Freeze expected answers before unsealing comparator results; reconcile each charge in currency units and route every disagreement to review.",
+      "limitation": "Benchmark success is not evidence of customer overpayment or realized recovery.",
+      "reviewed_evidence_sha256": "5bfe9969fc66c14f97d6da2c5935e9257965778a6a300bf73dfb362c5aa5ad4e"
+    },
+    {
+      "capability_id": "CAP-005",
+      "disposition": "DEFER",
+      "priority": "P2",
+      "gap_ids": [
+        "FRT-EXP001-001",
+        "FRT-RIGHTS-002"
+      ],
+      "freight_use": "Add detention/accessorial event evidence only for a buyer whose scope requires it.",
+      "rationale": "Physical events are useful only when the commercial entitlement is in scope.",
+      "acceptance_test": "Before activating this module, demonstrate one supported and one unsupported entitlement case from authorized evidence and retain unresolved entitlement at zero.",
+      "limitation": "Event timestamps alone do not establish entitlement; hosted component rights remain a separate gate.",
+      "reviewed_evidence_sha256": "8f1257dde463524f9f53adab9ccd5c9ccfd00b6f2377c382821be48bfd68d79a"
+    },
+    {
+      "capability_id": "CAP-006",
+      "disposition": "USE",
+      "priority": "P0",
+      "gap_ids": [
+        "FRT-EXP001-001",
+        "FRT-SETTLE-001"
+      ],
+      "freight_use": "Trace findings to issued credits, allocated settlement and reversals without double-counting.",
+      "rationale": "Realized recovery and fee eligibility require actual settlement truth.",
+      "acceptance_test": "Reconcile one authorized finding to independent credit/refund/remittance evidence; demonstrate unique allocation and correct later reversal treatment.",
+      "limitation": "Current recorded Freight outcome is synthetic; customer recovery remains unvalidated.",
+      "reviewed_evidence_sha256": "3d35353103386cb663fb1b05a7d2ead334b70ed598460d224d7c67fe2508d06c"
+    },
+    {
+      "capability_id": "CAP-007",
+      "disposition": "USE",
+      "priority": "P1",
+      "gap_ids": [
+        "FRT-SEC-001",
+        "FRT-SEC-002",
+        "FRT-REL-001"
+      ],
+      "freight_use": "Require explicit evidence type, applicable policy and review status before a release or monetary claim is called proven.",
+      "rationale": "Prevents stale or irrelevant evidence from satisfying a buyer diligence gate.",
+      "acceptance_test": "In ordinary release fixtures, missing, expired or wrong-scope evidence remains unresolved; a current matching evidence bundle is independently reviewed.",
+      "limitation": "Pattern reuse is not certification, signed deployment evidence or an integrated production proof.",
+      "reviewed_evidence_sha256": "21e752524f2821f02b3dd592b3e0eb697695dff6e1a746f2ae540676ab8575c4"
+    },
+    {
+      "capability_id": "CAP-008",
+      "disposition": "DEFER",
+      "priority": "P2",
+      "gap_ids": [
+        "FRT-AUTH-001",
+        "FRT-SEC-002"
+      ],
+      "freight_use": "Validate supported structured invoice formats when a paying buyer needs those formats.",
+      "rationale": "Avoids building broad e-invoice coverage before a concrete ingestion gap exists.",
+      "acceptance_test": "For the buyer-required syntax and pinned rule pack, record PASS/FAIL/NOT_EVALUATED and adjudicate validator disagreement before acceptance.",
+      "limitation": "Rule-pack authority and deployed parser limits must be established for each supported format.",
+      "reviewed_evidence_sha256": "47d89c088c62e1172df6ab52893fefce30247a08855ed0718a9d46b068989683"
+    },
+    {
+      "capability_id": "CAP-009",
+      "disposition": "DEFER",
+      "priority": "P2",
+      "gap_ids": [
+        "FRT-AUTH-001"
+      ],
+      "freight_use": "Reuse effective-date and knowledge-cutoff selection for historical rate evaluation.",
+      "rationale": "Temporal rule patterns transfer to freight without introducing an unrelated workforce scheduling product.",
+      "acceptance_test": "Historical invoice decisions remain unchanged when a later rate revision is added unless an explicit applicable retroactive correction is recorded.",
+      "limitation": "Scheduling compliance rules do not transfer into freight as contractual authority.",
+      "reviewed_evidence_sha256": "a0ccbe2ed608819cdd32bc1b2f0060ab51b4e57ced3fd3716872b6dd48807888"
+    },
+    {
+      "capability_id": "CAP-010",
+      "disposition": "USE",
+      "priority": "P1",
+      "gap_ids": [
+        "FRT-REL-001",
+        "FRT-SEC-001"
+      ],
+      "freight_use": "Verify recovery of the exact customer-data service and its audit/settlement relationships.",
+      "rationale": "A backup file does not establish recoverability of the operating business.",
+      "acceptance_test": "On the actual isolated pilot data environment, restore a synthetic scoped dataset and verify records, allocation links and declared recovery objectives with an independent reviewer.",
+      "limitation": "Local reference restore tests do not close the deployed environment gap.",
+      "reviewed_evidence_sha256": "c06546cb35b433a4ea6c4357572c402c51ee4df526454a039d46492e916d09ed"
+    },
+    {
+      "capability_id": "CAP-011",
+      "disposition": "DEFER",
+      "priority": "P3",
+      "gap_ids": [],
+      "freight_use": "Consider government freight opportunity monitoring after the initial private-buyer offer is proven.",
+      "rationale": "Potential adjacent acquisition channel; presently distracts from the first paid freight engagement.",
+      "acceptance_test": "Activate only after a chosen buyer segment and verified opportunity produce a qualified sales conversation measured separately from contract revenue.",
+      "limitation": "Public procurement data supplies signals, not permission to contact or a validated contract pipeline.",
+      "reviewed_evidence_sha256": "36203c126e2b6817f46b297b5d3842e446e71387d5ec15ab35cd094c08e0b2e8"
+    },
+    {
+      "capability_id": "CAP-012",
+      "disposition": "DEFER",
+      "priority": "P3",
+      "gap_ids": [],
+      "freight_use": "Consider permit-driven shipper expansion signals for a demonstrated target segment.",
+      "rationale": "May later improve account timing but does not establish freight spend or buying intent.",
+      "acceptance_test": "Compare a small reviewed signal cohort with the existing account-selection method using qualified-conversation rate and manual research time.",
+      "limitation": "Permit completeness and inferred shipment demand are unverified.",
+      "reviewed_evidence_sha256": "e923c729e460ce9219325efa5df19642da7c7ab7f7c63b2923630264dbf6afd5"
+    },
+    {
+      "capability_id": "CAP-013",
+      "disposition": "OUT_OF_SCOPE",
+      "priority": "P3",
+      "gap_ids": [],
+      "freight_use": "Retain scientific normalization research in Hunter; do not add instrument decoders to Freight.",
+      "rationale": "Scientific binary formats have no demonstrated role in the current freight offer.",
+      "acceptance_test": "Reconsider only if a specific paying freight workflow supplies a relevant input and a measurable gap.",
+      "limitation": "Cross-domain parser provenance can inform design; scientific product functionality is outside current scope.",
+      "reviewed_evidence_sha256": "7bd203f085ac23303070584f7e7384a8d322d28c71bfca150e164b4dd1562f34"
+    },
+    {
+      "capability_id": "CAP-014",
+      "disposition": "OUT_OF_SCOPE",
+      "priority": "P3",
+      "gap_ids": [],
+      "freight_use": "Retain industrial endpoint acceptance work outside the freight product.",
+      "rationale": "No current buyer requirement for manufacturing equipment protocol emulation.",
+      "acceptance_test": "Reconsider only on a documented buyer requirement that existing freight ingestion cannot satisfy.",
+      "limitation": "Industrial certification and equipment protocols are not freight audit evidence.",
+      "reviewed_evidence_sha256": "2dddbc07750fb393846915a72896f10e33333865c30dfc75b9607c37ac0c83ee"
+    },
+    {
+      "capability_id": "CAP-015",
+      "disposition": "DEFER",
+      "priority": "P3",
+      "gap_ids": [],
+      "freight_use": "Use prospective evaluation principles if Freight later proposes customer-risk or recovery predictions.",
+      "rationale": "Prevents hindsight leakage and unproven model scores from becoming sales promises.",
+      "acceptance_test": "Before any predictive release, freeze time-ordered holdout populations and compare against a simple baseline using the predeclared business loss metric.",
+      "limitation": "No Freight predictive advantage is currently established; underlying energy datasets are not Freight customer evidence.",
+      "reviewed_evidence_sha256": "51541bc5295f96064d1a5170902d291e449e5744a0753a0577b9a92899c5e457"
+    },
+    {
+      "capability_id": "CAP-016",
+      "disposition": "USE",
+      "priority": "P1",
+      "gap_ids": [
+        "FRT-SETTLE-001",
+        "FRT-EXP001-001"
+      ],
+      "freight_use": "Preserve explicit money states and stable action identity across invoice, credit and settlement workflows.",
+      "rationale": "Prevents uncertain downstream effects from becoming duplicate financial actions.",
+      "acceptance_test": "Using ordinary simulated provider responses, unresolved acknowledgements stay UNKNOWN and reconciliation preserves one logical effect without inferring a second payout.",
+      "limitation": "Local state is not provider or bank finality; no outbound financial connector is activated by this map.",
+      "reviewed_evidence_sha256": "f0ac236235ccda484ff93266da2e0c1cfcf142720a448d8406a3fcc116a07a05"
+    },
+    {
+      "capability_id": "CAP-017",
+      "disposition": "DEFER",
+      "priority": "P3",
+      "gap_ids": [],
+      "freight_use": "Reuse durable-intent and observation patterns only when a Freight workflow needs an external provider action.",
+      "rationale": "Useful operational pattern, but sequencing/laboratory orchestration is outside current product scope.",
+      "acceptance_test": "A reviewed synthetic workflow preserves the original intent through restart and associates later readback with that intent before external integration is proposed.",
+      "limitation": "Laboratory integration evidence does not establish Freight provider behavior.",
+      "reviewed_evidence_sha256": "9cdb65f57bb7e296fddf0bbaf50da998d8cf13c88fc8911ccfea54a98960a341"
+    },
+    {
+      "capability_id": "CAP-018",
+      "disposition": "USE",
+      "priority": "P1",
+      "gap_ids": [
+        "FRT-SETTLE-001",
+        "FRT-EXP001-001"
+      ],
+      "freight_use": "Distinguish provider completion, beneficiary receipt and later return in recovery reporting.",
+      "rationale": "Prevents premature recovery claims and contradictory payout states from being concealed.",
+      "acceptance_test": "A normal settlement-and-later-return fixture reconciles by original identity, reverses fee eligibility where appropriate, and leaves unknown bank receipt unresolved.",
+      "limitation": "Provider state does not establish beneficiary-bank finality; real-source readback remains buyer-specific.",
+      "reviewed_evidence_sha256": "83c43855e9ff2709f79b07e5592bdc4228af72cbcff7c85080c56696cdf63494"
+    },
+    {
+      "capability_id": "CAP-019",
+      "disposition": "USE",
+      "priority": "P1",
+      "gap_ids": [
+        "FRT-SETTLE-001",
+        "FRT-AUTH-001"
+      ],
+      "freight_use": "Record source observations so successful-empty, partial, failed and unavailable imports remain distinct.",
+      "rationale": "Avoids declaring no exceptions, no returns or complete data after an unsuccessful import.",
+      "acceptance_test": "For ordinary success-empty, partial and unavailable source fixtures, only complete successful observation permits an empty-result conclusion.",
+      "limitation": "Completeness is source-specific and cannot be inferred from a cursor or a successful HTTP response alone.",
+      "reviewed_evidence_sha256": "bee83f48609db316b47e7dda23d6552acbc6abd16fdeb55fa7ebbf630040afb3"
+    }
+  ],
+  "reviewed_catalog_sha256": "a675ee00e159c48c52e7490fb25c070c84cf2fa31348e6b45cba74e16b07d493"
+}

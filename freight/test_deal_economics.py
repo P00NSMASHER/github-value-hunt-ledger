@@ -1,3 +1,5 @@
+import pytest
+
 from freight.deal_economics import (
     DealProfile,
     DealRoute,
@@ -81,3 +83,45 @@ def test_success_fee_is_not_an_input_to_qualification():
     fields = DealProfile.__dataclass_fields__
     assert "success_fee" not in fields
     assert "expected_recovery" not in fields
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), True, "100"])
+@pytest.mark.parametrize("field", ["pilot_fee_usd", "pilot_analyst_hours", "loaded_hourly_cost_usd", "pilot_other_cost_usd"])
+def test_invalid_financial_values_cannot_qualify_a_deal(field, value):
+    with pytest.raises(ValueError, match=field):
+        profile(**{field: value})
+
+
+def test_display_rounding_cannot_promote_below_target_margin():
+    decision = qualify_deal(readiness(), profile(pilot_analyst_hours=80.0001))
+    assert decision.economics.gross_margin == 0.5
+    assert decision.route is DealRoute.HOLD
+    assert "fixed_fee_gross_margin_below_target" in decision.reasons
+
+
+def test_exact_margin_boundary_remains_eligible():
+    decision = qualify_deal(readiness(), profile(pilot_analyst_hours=80))
+    assert decision.route is DealRoute.BLIND_FREIGHT_AUDIT_ACCEPTANCE_TEST
+
+
+@pytest.mark.parametrize("field", ["invoices_per_month", "carrier_count"])
+def test_customer_counts_must_be_integers(field):
+    with pytest.raises(ValueError, match=field):
+        profile(**{field: 2.5})
+
+
+def test_founder_labor_cannot_be_assumed_free_for_qualification():
+    with pytest.raises(ValueError, match="including founder labor"):
+        profile(loaded_hourly_cost_usd=0)
+
+
+def test_zero_hour_offer_has_no_infinite_hour_budget():
+    decision = qualify_deal(readiness(), profile(
+        loaded_hourly_cost_usd=0, diagnostic_analyst_hours=0, pilot_analyst_hours=0,
+    ))
+    assert decision.economics.max_analyst_hours_at_target_margin is None
+
+
+def test_finite_inputs_cannot_create_infinite_derived_economics():
+    with pytest.raises(ValueError, match="derived offer economics must be finite"):
+        qualify_deal(readiness(), profile(pilot_analyst_hours=1e308, loaded_hourly_cost_usd=1e308))

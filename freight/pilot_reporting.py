@@ -20,8 +20,10 @@ class FindingReview:
     reviewer_minutes: int = 0
 
     def __post_init__(self):
-        if self.reviewer_minutes < 0:
-            raise ValueError("reviewer_minutes must be non-negative")
+        if not isinstance(self.disposition, ReviewDisposition):
+            raise ValueError("disposition must be a ReviewDisposition")
+        if type(self.reviewer_minutes) is not int or self.reviewer_minutes < 0:
+            raise ValueError("reviewer_minutes must be a non-negative integer")
 
 
 @dataclass(frozen=True)
@@ -73,6 +75,10 @@ def build_pilot_metrics(
         raise ValueError("incumbent output population hash mismatch")
 
     findings = {finding.finding_id: finding for finding in truth.findings}
+    # This report and downstream USD outcome fields have no FX conversion basis.
+    # Never add different currencies together or relabel foreign amounts as USD.
+    if any(finding.currency != "USD" for finding in findings.values()):
+        raise ValueError("USD pilot metrics require USD findings; report other currencies separately")
     incumbent_ids = set(incumbent.finding_ids)
 
     review_index: dict[str, FindingReview] = {}
@@ -101,7 +107,7 @@ def build_pilot_metrics(
         finding = findings[review.finding_id]
         if review.disposition is ReviewDisposition.FALSE_POSITIVE:
             false_positive_count += 1
-            false_positive_cents += finding.validated_cents
+            false_positive_cents += _positive_variance(finding)
         elif review.disposition is ReviewDisposition.UNRESOLVED:
             unresolved_review_count += 1
             unresolved_validated_cents += finding.validated_cents
@@ -113,6 +119,15 @@ def build_pilot_metrics(
             truth.business_unit,
         ):
             raise AssertionError("recovery certificate scope mismatch")
+        finding = findings[cert.finding_id]
+        if cert.finding_proof_hash != finding.proof_hash or cert.validated_cents != finding.validated_cents:
+            raise ValueError("recovery certificate does not match frozen finding proof")
+        if not 0 <= cert.realized_cents <= finding.validated_cents:
+            raise AssertionError("finding recovery cannot exceed its validated amount")
+        if not 0 <= cert.fee_eligible_cents <= cert.realized_cents:
+            raise AssertionError("finding fee-eligible recovery cannot exceed its realized amount")
+        if cert.finding_id in incumbent_ids and cert.fee_eligible_cents:
+            raise ValueError("incumbent finding cannot have fee-eligible recovery")
 
     realized = sum(cert.realized_cents for cert in certs)
     fee_eligible = sum(cert.fee_eligible_cents for cert in certs)
@@ -161,10 +176,10 @@ def render_markdown(metrics: PilotMetrics) -> str:
             "- Reviewed discrepancy: **" + dollars(metrics.reviewed_discrepancy_cents) + "**",
             "- Validated finding: **" + dollars(metrics.validated_finding_cents) + "**",
             "- Challenger-only validated: **" + dollars(metrics.challenger_only_validated_cents) + "**",
-            "- Uniquely attributable realized: **" + dollars(metrics.realized_cents) + "**",
+            "- Settlement-proven realized: **" + dollars(metrics.realized_cents) + "**",
             "- Fee-eligible realized: **" + dollars(metrics.fee_eligible_realized_cents) + "**",
             "",
-            "These totals are intentionally non-interchangeable. Discrepancy and validated dollars are not realized savings.",
+            "These totals are intentionally non-interchangeable. Discrepancy and validated dollars are not realized savings. Settlement-proven realized includes non-fee-eligible credits; only fee-eligible realized is eligible for a recovery fee.",
             "",
             "## Review quality",
             "- Findings: " + str(metrics.finding_count),
