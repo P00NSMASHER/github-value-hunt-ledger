@@ -16,6 +16,7 @@ from pathlib import Path
 REVISION_RE = re.compile(r"^[0-9a-f]{40}$")
 CONTROL_PATHS = (
     "freight/audit_ledger.py",
+    "freight/audit_run_manifest.py",
     "freight/diligence_bundle.py",
     "freight/backup_restore.py",
     "freight/audit_store.py",
