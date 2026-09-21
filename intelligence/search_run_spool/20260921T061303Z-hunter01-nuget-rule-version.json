@@ -56,7 +56,7 @@
       "repository": "Payroll-Engine/PayrollEngine",
       "revision": "2ddb5c770b0a955936562355a1021f06e922886a",
       "status": "watch-strong-transfer-donor",
-      "reason_code_standard": "effective-version-and-historical-evaluation-with-unbound-authority-artifact",
+      "reason_code_standard": "needs_current_authority",
       "reason_detail": "Regulation version and validFrom are first-class and boundary-tested; bitemporal evaluation is independently fixture-tested. The Skatteverket import path names an official source but preserves no required file digest/year/source receipt, resets lookup contents on annual import, and comments out expected withholding assertions.",
       "capability_ids": [
         "CAP-008",
@@ -92,13 +92,14 @@
           "regulatory-compliance"
         ],
         "profile_source": "GitHub repository metadata, exact-revision schema/examples/tests, NuGet Gallery and first-party Skatteverket publication"
-      }
+      },
+      "reason_code": "effective-version-and-historical-evaluation-with-unbound-authority-artifact"
     },
     {
       "repository": "DTS-STN/policy-dev-eng-dts-csps",
       "revision": "8996f1c1f8202a10f5849dad0c4eade3865a466e",
       "status": "rejected",
-      "reason_code_standard": "authority-linked-client-without-rule-version-or-history",
+      "reason_code_standard": "thin_implementation",
       "reason_detail": "Government prototype links the authoritative regulation and tests its C# OpenFisca client/builders, but hardcodes a single 2020-09-25 wire date and carries no rule-package version, authority digest or historical selection test.",
       "capability_ids": [
         "CAP-008"
@@ -132,13 +133,14 @@
           "labour-regulation"
         ],
         "profile_source": "GitHub repository metadata and exact-revision C# source/tests"
-      }
+      },
+      "reason_code": "authority-linked-client-without-rule-version-or-history"
     },
     {
       "repository": "microsoft/Dynamics-AX-Payroll-US",
       "revision": "7a7825d4a618147db48fa81c055033553075197d",
       "status": "rejected",
-      "reason_code_standard": "thin-proprietary-engine-wrapper-without-public-rules-or-tests",
+      "reason_code_standard": "external_wrapper_only",
       "reason_detail": "Archived adapter only pools instances from a local ste-net.dll; public source contains no rule data, effective version selection, authority provenance or tests and does not consume a NuGet rule package.",
       "capability_ids": [
         "CAP-008"
@@ -170,7 +172,8 @@
           "tax-engine-integration"
         ],
         "profile_source": "GitHub repository metadata and exact-revision C# source/project file"
-      }
+      },
+      "reason_code": "thin-proprietary-engine-wrapper-without-public-rules-or-tests"
     }
   ],
   "best_result": "Payroll Engine is a strong NuGet transfer donor: effective regulation versions, validFrom boundary tests and bitemporal historical evaluation are connected and executable. Its Swedish authority path still excludes and overwrites the annual table artifact, binds no source digest/year/receipt to the regulation version, and leaves withholding assertions as TODOs, so the full authority conjunction remains unproven.",
