@@ -35,13 +35,13 @@ Integrator-owned search and validation direction. Operator references updated 20
 **Stop:** generic freight audit/TMS/OCR/rating/EDI/reconciliation hunting. Resume external search only if the buyer population exposes one named capability/connector gap.
 
 ## 2. AP Leakage Assurance — P0 / EXP-002
-**Bottleneck:** real ERP/provider negative authority after the synthetic reversible-authority contract passed.
+**Bottleneck:** authorized endpoint-specific ERP/provider negative authority after the 14/14 synthetic contract passed.
 
-The ERP-neutral ledger now passes 12/12 cases and 60/60 across five stability replays, covering source-health states, identity blockers, exact quantity/money conservation, counter-events, atomic reverse capacity, crash-after-target-commit recovery, UNKNOWN, replay expiry, explicit negative receipts, zombie fencing and bitemporal replay.
+The ERP-neutral ledger now passes 14/14 cases and 70/70 across five stability replays. A provider phase is not portable across interfaces: `PreProcessingError` remains UNKNOWN unless an exact `ProviderEndpointContract` proves the named credit-capable interface, economic action, operation identity and pre-posting boundary. Public Dynamics documentation establishes invoice entities, separate credit-note workflows and generic recurring-integration statuses, but does not bind them into one vendor-credit posting contract.
 
-**Highest-value next action:** bind that passing reference to one real vendor-credit/reversal endpoint and require a phase-qualified `ProviderOutcomeReceipt`. Only an effect-scoped provider state proving that posting/apply never began may release capacity for a fresh mutation; generic Failed, NotFound, timeout or partial-processing states remain UNKNOWN.
+**Highest-value next action:** in an authorized Dynamics 365 Finance sandbox, identify the exact service/entity that creates and posts the vendor credit, bind its message/execution ID to the original invoice and economic fingerprint, then force response loss or pre-processing failure and prove whether target financial posting began. Keep every invoice-only, batch-scoped, partially processed or unbound status UNKNOWN.
 
-**Stop:** generic OCR/RPA/three-way-match/anomaly tools and more synthetic ledger design until the external adapter is exercised.
+**Stop:** generic OCR/RPA/three-way-match/anomaly tools, provider-wide status archaeology and more synthetic ledger design until the authorized endpoint is exercised.
 
 ## 3. Partner / Commission Payout Assurance — P0/P1 / EXP-003
 **Bottleneck:** independent real provider/bank observation after the historical-authority fixture passed.
@@ -75,13 +75,15 @@ Run the existing authority/admission, expected-subject, semantic, proof-sink, cl
 **Stop:** broad inventory/recovery/OTA/attestation search until this matrix runs.
 
 ## 6. CaptureBrief — P0/P1 / EXP-006
-**Bottleneck:** lossless packet/history authority plus independently sourced current-action authority, not another SAM wrapper.
+**Bottleneck:** first-party cross-status current/terminal receipts plus exact rule-effective granularity, not another SAM wrapper.
 
-Live fixtures prove both historical attachment loss and temporal-authority divergence. `W50S8B-26-Q-A016` shows same filename/different `resourceId` and historical resources omitted from the latest deletion-inclusive manifest. `FA524026Q0041` shows a complete bulk/mirror action set can still select the wrong current action because the bulk schema lacks an authoritative currentness primitive.
+Live fixtures prove both historical attachment loss and temporal-currentness divergence. The 10-case `CURRENT_ACTION_RECEIPT` evaluator now survives all 24 row orderings of `FA524026Q0041`, opaque-ID relabeling, stale/out-of-set/conflicting receipts and distinct active/cancelled/archived semantics. That validates evaluator logic, not issuer trust: cancelled/archived cases remain synthetic and GSA's public latest-version guarantee is active-only.
 
-**Do next:** carry three independent receipts: `HISTORY_SET_RECEIPT`, `CURRENT_ACTION_RECEIPT`, and `ACTION_ORDER_RECEIPT`. Repeat across the frozen families, especially same-day revisions. Shuffle same-day bulk rows as a negative; any current-selection result that changes under row permutation is deriving authority from non-authoritative order. Current packet completeness runs only after first-party currentness is resolved.
+OpenFisca France adds a separate rule-authority falsifier: a cited 2026-05-04 change lives in dated parameters, but monthly `period.start` evaluation uses May 1 and the committed test begins in June. Dated rules plus official links are insufficient when engine granularity cannot represent the legal effective instant.
 
-**Stop:** generic SAM/FAR dashboards. Search only successor/deviation authority or a concrete history/currentness-loss gap.
+**Do next:** retain one exact first-party fixture each for cancelled, archived and inactive status with action identity, status, observation time and payload digest; stale active-only responses, conflicting mirrors and unavailable history stay non-green. Then run May 3/May 4/June 1 rule cases against a day-capable reference and require `TEMPORAL_GRANULARITY_MISMATCH` or explicit approximation when exact application is impossible.
+
+**Stop:** generic SAM/FAR dashboards and broad rules-engine hunting. Search only a concrete missing first-party status receipt, successor/deviation authority or rule-granularity falsifier.
 
 ## 7. Installed-Base Lab / Sequencing — P1 / EXP-007
 **Bottlenecks:** (1) repair and replay the now-falsified Thermo metadata path; (2) durable physical-action receipt under pre-confirmation ambiguity.
@@ -161,3 +163,13 @@ The portfolio still has **$0 directly evidenced customer value and $0 directly e
 5. **P2 scientific campaign durability:** `openmm/openmm@5a7a268...` is a useful WATCH reference for recent safer checkpoint/restart hardening, but per-file temp+rename and object-reconstruction tests do not prove multi-artifact crash consistency. If reused as a reliability analogue, require one generation manifest/group-commit receipt and crash injection between log/checkpoint writes; do not call rename-without-fsync power-loss durable.
 6. **Benchmark update supersedes the 21:00 note:** Pair 1 Experiment Task 01 is now complete and scored **24/25** versus Control **25/25**. Overall matched tasks are **43**; Experiment mean **24.67** vs Control **24.58**, median paired difference **0**, Experiment task W/T/L **8/29/6**, false promotions **0/0**, no-finds **0/1**, and Experiment remains more search-intensive. Do not declare an Experiment win. The new Task-01 bidirectional money/evidence invariant lesson has only one-task support and is not eligible for SEARCH_SKILLS promotion yet.
 7. **Portfolio priority unchanged:** Freight EXP-001 remains the highest-value external bottleneck because the portfolio still has no directly evidenced buyer value/revenue. These technical deltas should shorten/falsify active experiments, not trigger another product launch or broad search family.
+
+<!-- INTEGRATOR-R16-2026-09-21T0219-0400 -->
+## Integrator queue delta — 2026-09-21 02:19 ET
+1. **P0 AP endpoint proof:** EXP-002 is now 14/14 with 70/70 stability replays, but the new endpoint-contract gate intentionally blocks generic Dynamics import telemetry. The only valuable next move is an authorized credit-capable endpoint execution that proves whether posting began.
+2. **P1 CaptureBrief status/granularity:** the 10-case currentness evaluator is logically sound; now collect real cancelled/archived/inactive first-party receipts and execute the May 3/4 boundary against a day-capable oracle. Do not substitute active-feed absence or month-level approximation.
+3. **P1 rule-authority receipts:** PayrollEngine's effective-version/bitemporal machinery is reusable, but mutable manual official-table import without source bytes/hash/year/map/imported-row digest is not historical authority. Seek or build the receipt, not another rules package.
+4. **External gates stay external:** EXP-003 remains awaiting an authorized provider plus independent bank/payroll observation. The provisional claim was not accepted by canonical readback and no external experiment ran; do not convert the ready packet into completion.
+5. **Benchmark status:** 47 matched tasks are scored. Control 24.62/25 vs Experiment 24.57/25; median difference 0; Experiment W/T/L 8/31/8; false promotions 0/0; no-finds 0/2. Tasks 06-08 remain unmatched. Do not claim Experiment superiority.
+6. **Portfolio priority unchanged:** Freight EXP-001 remains the highest-value external bottleneck; directly evidenced customer value and revenue remain $0.
+
