@@ -1,4 +1,4 @@
-# Hunt 07 r22 — USECPO extracted member surface / raw-grain verification
+# Hunt 07 r22 — USECPO extracted-member surface + downstream grain hazard
 
 **Date:** 2026-09-20  
 **Lane:** NODE 07 — Geo Asset Intel  
@@ -7,41 +7,55 @@
 
 ## Finding
 
-A second public repository, `Resilient-Supply-Chain/open-supply-chain-control-tower`, at pinned revision `d0691e25ee1760cc0c0b5258761c12f8add0a9cb`, contains extracted USECPO event-correlated CSV files as ordinary Git blobs. This is a different repository from the `brayo003/...` mirror audited in r21. The r21 correction therefore remains valid: that earlier pinned mirror had only an archive-level Git LFS pointer and no extracted outage tree.
+A different public repository, `Resilient-Supply-Chain/open-supply-chain-control-tower`, at pinned revision `d0691e25ee1760cc0c0b5258761c12f8add0a9cb`, contains extracted 2022/2023 USECPO event-correlated CSVs as ordinary Git blobs and actively consumes them in outage-risk / conditional-impact notebooks. This is **not** the `brayo003/...` repository audited in r21; r21 remains correct that the earlier pinned mirror had only an archive-level Git LFS pointer and no extracted outage tree.
 
-This new repository materially advances the member-level evidence gate because the actual 2023 standard event-correlated member was inspected beyond README:
+At this revision the 2023 extracted member appears in two model-data locations but both paths point to the same Git blob:
 
-- path: `outage_data/Outage_Dataset/eaglei_outages_with_events_2023.csv`
-- exact byte size: **12,452,488**
+- `Asset_Data_Team/risk_model/eaglei_outage/eaglei_outages_with_events_2023.csv`
+- `Asset_Data_Team/conditional_impact_prediction_model/raw_data/eaglei_outages_with_events_2023.csv`
+- exact size: **12,452,488 bytes**
 - Git blob SHA-1: **`35ac9310f2ee3ec0eb12cd5a786d08f8e5181a95`**
-- literal header: `fips_code,county,state_name,start_time,end_time,duration,min_customers,max_customers,mean_customers,year,outage_event,event_type,event_id,event_name`
 
-The repository also explicitly cites the PNNL/OpenEI Event-Correlated Outage Dataset in `paper.bib` with `https://data.openei.org/submissions/6458`, and notebooks load the 2022/2023 `eaglei_outages_with_events_*.csv` files for analysis. This is therefore not merely an orphaned filename found by tree search.
+The actual blob was inspected beyond README. Its literal 14-column header is:
 
-## Direct raw-row semantic test
+`event_id,state_event,Datetime Event Began,Datetime Restoration,Event Type,fips,state,county,start_time,duration,end_time,min_customers,max_customers,mean_customers`
 
-The beginning of the actual 2023 CSV contains the same Rockbridge County, Virginia outage spell repeated under the same `event_id=2023-36` with multiple event-type/event-name representations:
+Visible timestamp strings use `YYYY-MM-DD HH:MM:SS` with no explicit timezone suffix/offset. That is a representation fact only; it does **not** establish timezone semantics.
 
-- `2023-11-21 02:45:00` → `2023-11-21 03:44:59`, event type `Severe Weather, Transmission Interruption`
-- the same county/start/end/customer spell, event type `Transmission Interruption`
-- the same county/start/end/customer spell, event type `Severe Weather`
+The repository independently cites the PNNL/OpenEI Event-Correlated Outage Dataset (`https://data.openei.org/submissions/6458`) in `paper.bib`; its README labels the copied EAGLE-I/USECPO files as outage source data; and its notebooks load the 2022/2023 files directly. This is therefore an active downstream consumer, not merely an orphaned copied filename.
 
-This is direct byte-level evidence from an externally hosted extracted member that the flat `with_events` table can multiply one outage spell across event-attribution rows. It independently strengthens r19's rule that additive outage burden must be computed at unique county-spell grain `(fips,start_time,end_time)` with a separate spell↔event bridge rather than summing flat event-correlated rows.
+## Downstream grain hazard verified in code
+
+The strongest new evidence is not a new outage oracle; it is a concrete example of how a real downstream consumer can aggregate the flat event-correlated rows unsafely.
+
+`Asset_Data_Team/conditional_impact_prediction_model/data_cleaning.ipynb` performs:
+
+`impact_agg = impact_filtered.groupby(["start_date", "county"]).sum().reset_index()`
+
+and then renames `mean_customers` to `total_customers`.
+
+The README describes this target as daily affected customers derived by summing outage-row mean customer counts. The risk-model notebook separately filters California severe-weather events before constructing county/day labels.
+
+This matters because r19 already established that USECPO event-correlated rows are not a safe additive fact table: event attribution can multiply county outage spells, and exact-row deduplication alone does not solve many-to-many spell↔event fan-out. This repository therefore provides a live implementation example of the exact downstream aggregation pattern CAP-015 / EXP-012 must avoid. It should **not** be used as ground truth for outage burden without canonical spell deduplication.
 
 ## Timestamp / missingness observations
 
-Visible timestamp strings use the literal form `YYYY-MM-DD HH:MM:SS`; the inspected values contain **no explicit timezone suffix or offset**. A full-resource text search of this mirrored 2023 member found no occurrences of the common representations `NaN`, `None`, `,nan,`, `,,`, `""`, or `+00:00`.
+For the inspected mirrored 2023 blob:
+
+- timestamp representation visibly uses `YYYY-MM-DD HH:MM:SS`;
+- visible timestamps have no explicit timezone suffix/offset;
+- full-resource text searches did not find the common tokens `NaN`, `None`, `,nan,`, `,,`, `""`, or `+00:00`.
 
 These observations are deliberately narrow. They do **not** establish:
 
-- the intended first-party timezone semantics;
-- that all years/variants lack nulls;
-- that absence of an offset means UTC;
+- intended first-party timezone semantics;
+- all-year/all-variant missingness behavior;
+- that absence of an offset implies UTC;
 - that the mirrored member is byte-identical to a member of the currently served first-party OEDI ZIP.
 
 ## Provenance boundary
 
-Current first-party federal metadata still identifies PNNL's `Outage Dataset v2.zip` at `https://data.openei.org/files/6458/Outage_Dataset_R1.zip`, under CC BY 4.0. The first-party archive's SHA-256 remains unverified in this lane.
+Current first-party federal metadata identifies PNNL's `Outage Dataset v2.zip` at `https://data.openei.org/files/6458/Outage_Dataset_R1.zip`, under CC BY 4.0. The first-party archive's SHA-256 remains unverified in this lane.
 
 Previously established external expected archive identity remains:
 
@@ -49,13 +63,14 @@ Previously established external expected archive identity remains:
 - size: `31,260,449` bytes
 - external archive witness count: 2
 
-The newly inspected extracted member is **not yet cryptographically bound** to that expected archive. This run establishes a member-level external surface, not first-party authority and not archive-membership proof.
+The newly inspected 2023 Git blob is **not yet cryptographically bound** to that expected archive. This run establishes an external member surface and a downstream implementation hazard, not first-party authority and not archive-membership proof.
 
 ## Evidence labels
 
-- **VERIFIED_EXTERNAL_MEMBER:** actual 2023 member content inspected from pinned Git blob.
-- **VERIFIED:** literal 14-column header, byte size, Git blob SHA-1, and raw repeated-attribution rows.
-- **VERIFIED:** repository provenance citation points to PNNL/OpenEI submission 6458; notebooks consume 2022/2023 event CSVs.
+- **VERIFIED_EXTERNAL_MEMBER:** actual 2023 CSV content inspected from pinned Git blob.
+- **VERIFIED:** exact member paths, 12,452,488-byte size, Git blob SHA-1, and literal 14-column header.
+- **VERIFIED:** repository citation points to PNNL/OpenEI submission 6458; notebooks consume 2022/2023 event CSVs.
+- **IMPLEMENTED:** downstream notebook groups filtered flat outage rows by `(start_date, county)`, sums numeric columns, and renames summed `mean_customers` to `total_customers`.
 - **UNVERIFIED:** member SHA-256.
 - **UNVERIFIED:** member-to-expected-archive byte identity / ZIP membership.
 - **UNVERIFIED:** current first-party OEDI ZIP SHA-256.
@@ -63,21 +78,21 @@ The newly inspected extracted member is **not yet cryptographically bound** to t
 
 ## Capability delta
 
-CAP-015 should distinguish **archive receipt**, **member receipt**, **semantic grain**, and **first-party authority**. This run supplies an externally verified literal member schema plus direct raw evidence of attribution multiplicity.
+CAP-015 should distinguish **archive receipt**, **member receipt**, **semantic grain**, **downstream transform**, and **first-party authority**. This run supplies a literal externally witnessed member schema plus a concrete downstream implementation of the aggregation hazard r19 warned about.
 
 ## Graph edge
 
-`Resilient-Supply-Chain/open-supply-chain-control-tower@d0691e25...` **STRENGTHENS** the r19 grain correction and EXP-012 evaluator design, while remaining subordinate to first-party USECPO authority.
+`Resilient-Supply-Chain/open-supply-chain-control-tower@d0691e25...` **STRENGTHENS** r19's semantic-grain correction and **CHALLENGES** naive county/day aggregation for EXP-012. It remains subordinate to first-party USECPO authority.
 
 ## Radar signal
 
-Proof-carrying prospective evaluators increasingly require artifact-level and member-level receipts plus semantic-grain identity, not merely a dataset URL or enclosing archive hash.
+Proof-carrying evaluators require not only artifact/member receipts but transform receipts: a correct source can still produce a false evaluator when a downstream pipeline sums rows at the wrong grain.
 
 ## Experiment impact
 
-EXP-012 can now freeze the externally witnessed 2023 literal header and demonstrate why flat-row aggregation is invalid. It still must fail closed on first-party/archive-member identity and timezone semantics before production scoring.
+EXP-012 should preserve the literal source/member fields, derive a canonical county outage-spell fact table before additive metrics, retain a separate many-to-many spell↔event bridge, and record the transform that turns raw rows into the scored outcome. A simple county/day `.sum()` over event-correlated rows is explicitly disallowed.
 
-Recommended evaluator receipt fields:
+Recommended receipt fields:
 
 - `archive_expected_sha256`
 - `archive_first_party_sha256`
@@ -89,10 +104,12 @@ Recommended evaluator receipt fields:
 - `timestamp_representation`
 - `timezone_semantics = UNKNOWN | VERIFIED`
 - `semantic_grain = county_outage_spell`
+- `outcome_transform_id`
+- `outcome_transform_hash`
 
 ## Commercial impact
 
-This reduces the risk that a Grid Resilience Calibration / Acceptance Audit double-counts outage burden while appearing reproducible. It advances evaluator implementation without weakening the authority gate.
+This reduces the risk that a Grid Resilience Calibration / Acceptance Audit produces inflated interruption burden or trains on a distorted target while appearing reproducible. It also suggests a sellable QA wedge: **outage-evaluator lineage / grain audit** for teams consuming public reliability datasets.
 
 ## Negative knowledge
 
@@ -100,13 +117,14 @@ This reduces the risk that a Grid Resilience Calibration / Acceptance Audit doub
 2. Literal timestamps without offsets do not reveal timezone meaning.
 3. One year's lack of obvious null tokens does not establish cross-year missingness semantics.
 4. A Git blob SHA-1/size does not prove membership in an externally hash-pinned ZIP.
-5. The r21 correction remains valid for the separate `brayo003/...` repository; evidence from this new repository must not be retroactively attributed to that mirror.
+5. Correct source files do not guarantee correct outcome labels; downstream aggregation is part of evaluator provenance.
+6. The r21 correction remains valid for the separate `brayo003/...` repository; evidence from this repository must not be retroactively attributed to that mirror.
 
 ## Cross-agent referral
 
 **To:** EXP-012 / CAP-015 integrator.  
-**Question:** Can the hash-matching expected USECPO archive be retrieved and its central directory/member digests used to bind this externally inspected 2023 member to the expected archive, while keeping current first-party OEDI digest equality as a separate authority gate?
+**Question:** Can the hash-matching expected USECPO archive be retrieved and its central directory/member digests used to bind this externally inspected 2023 member to the expected archive, while the evaluator transform is rebuilt at unique-spell grain and current first-party OEDI digest equality remains a separate authority gate?
 
 ## Next action
 
-Retrieve either the current first-party OEDI archive or a byte-identical archive matching `44557bae...910fe7`; inspect the ZIP central directory; compute member SHA-256/CRC for `eaglei_outages_with_events_2023.csv`; compare it with the pinned external member; then inspect exact raw member bytes for null/timestamp representations. Do not infer timezone semantics unless authoritative documentation or first-party metadata states them.
+Retrieve either the current first-party OEDI archive or a byte-identical archive matching `44557bae...910fe7`; inspect the ZIP central directory; hash the relevant 2023 member; compare it with the pinned external member; then implement/test a unique-spell transform and quantify how much the repository's naive county/day sum differs on the same input. Do not infer timezone semantics unless authoritative documentation or first-party metadata states them.
