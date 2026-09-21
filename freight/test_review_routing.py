@@ -24,7 +24,7 @@ def setup(*, clean=False, include_unverified=True, include_missing=True):
     population = freeze_population("b", "u", "scope", rows)
     charges = [
         InvoiceCharge("b","u","i1","s1","c","k","USD","c1","A","2026-09-10",1,9000 if clean else 12000,"l1"),
-        InvoiceCharge("b","u","i2","s2","c","k","USD","c2","B","2026-09-10",1,15000,"l2"),
+        InvoiceCharge("b","u","i2","s2","c","k","USD","c2","B","2026-09-10",1,9000 if clean else 15000,"l2"),
         InvoiceCharge("b","u","i3","s3","c","k","USD","c3","C","2026-09-10",1,9000,"l3"),
     ]
     rules = [
