@@ -1,0 +1,24 @@
+{
+  "contents": [
+    {
+      "shared": false,
+      "title": "Freight Recovery Controlled Pilot Environment Policy - 2026-09-21"
+    }
+  ],
+  "customer_data_present": false,
+  "environment_id": "gdrive-single-tenant-manual-20260921",
+  "folder_id": "1bK4YlSLsW5Gnx7i6LGubv_tssuw--JPh",
+  "folder_title": "Freight Recovery - Controlled Pilot Environment - EMPTY UNTIL VERIFIED",
+  "observed_at": "2026-09-21T13:41:13Z",
+  "parser_runtime_used": false,
+  "permission_summary": [
+    {
+      "principal": "[REDACTED_OWNER]",
+      "role": "owner",
+      "type": "user"
+    }
+  ],
+  "provider": "Google Drive",
+  "shared": false,
+  "single_tenant": true
+}
