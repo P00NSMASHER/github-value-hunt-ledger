@@ -1,7 +1,7 @@
 # WORKER PRESENCE
 
-Generation: **PRESENCEGEN:7c78bc75cdb1**
-Clock: **2026-09-21T02:39:01Z**
+Generation: **PRESENCEGEN:714827ff5389**
+Clock: **2026-09-21T02:52:27Z**
 
 Presence is capacity telemetry, not a worker-quality score.
 
@@ -17,7 +17,7 @@ Presence is capacity telemetry, not a worker-quality score.
 | HUNTER-08 | **UNKNOWN** | — | — | — |
 | HUNTER-09 | **UNKNOWN** | — | — | — |
 | HUNTER-10 | **UNKNOWN** | — | — | — |
-| HUNTER-11 | **UNKNOWN** | — | — | — |
+| HUNTER-11 | **READY_FRESH** | PRESENCE:8f733d9f2bdd | 2026-09-21T04:02:26.667000Z | — |
 | HUNTER-12 | **UNKNOWN** | — | — | — |
 | HUNTER-13 | **UNKNOWN** | — | — | — |
 | HUNTER-14 | **UNKNOWN** | — | — | — |

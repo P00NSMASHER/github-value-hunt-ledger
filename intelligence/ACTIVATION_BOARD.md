@@ -1,7 +1,7 @@
 # WORKER ACTIVATION BOARD
 
-Generation: **ACTGEN:5f4444b83a65**
-Clock: **2026-09-21T02:39:01Z**
+Generation: **ACTGEN:98152e5d1b04**
+Clock: **2026-09-21T02:52:27Z**
 
 V16 activation is pull-based. Routing can exist without activation; generated claiming requires fresh READY presence.
 
@@ -17,9 +17,9 @@ V16 activation is pull-based. Routing can exist without activation; generated cl
 | HUNTER-08 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 | HUNTER-09 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 | HUNTER-10 | UNKNOWN | **WAITING_PRESENCE** | — | — |
-| HUNTER-11 | UNKNOWN | **WAITING_PRESENCE** | — | — |
+| HUNTER-11 | READY_FRESH | **READY_TO_CLAIM** | SLOT-14 | ACTIVATE:5f38766d4f18 |
 | HUNTER-12 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 | HUNTER-13 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 | HUNTER-14 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 
-Current activations: **0**. Unknown/stale/offline presence is capacity uncertainty, not negative worker evidence.
+Current activations: **1**. Unknown/stale/offline presence is capacity uncertainty, not negative worker evidence.
