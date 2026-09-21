@@ -10,6 +10,8 @@ P_MET=json.loads((INTEL/"worker_profile_metrics.json").read_text(encoding="utf-8
 LEARN_POL=json.loads((INTEL/"routing_learning_policy.json").read_text(encoding="utf-8")) if (INTEL/"routing_learning_policy.json").exists() else {}
 LEARN_MET=json.loads((INTEL/"routing_learning_metrics.json").read_text(encoding="utf-8")) if (INTEL/"routing_learning_metrics.json").exists() else {}
 ADJUSTMENTS=load_jsonl("routing_adjustments.jsonl") if (INTEL/"routing_adjustments.jsonl").exists() else []
+RESPONSE_MET=json.loads((INTEL/"activation_response_metrics.json").read_text(encoding="utf-8")) if (INTEL/"activation_response_metrics.json").exists() else {}
+RESPONSE_ADJUSTMENTS=load_jsonl("activation_response_adjustments.jsonl") if (INTEL/"activation_response_adjustments.jsonl").exists() else []
 ALLOC=load_jsonl("hunt_allocations.jsonl")
 STATE=load_jsonl("execution_state.jsonl")
 
@@ -20,6 +22,8 @@ registered={w["worker_id"] for w in workers}
 claimable=set(POL.get("allowed_claimable_states") or [])
 LEARN_GEN=LEARN_MET.get("routing_learning_generation_id") or "ROUTELEARN:000000000000"
 ADJ_INDEX={(x.get("worker_id"),x.get("dimension"),x.get("context_key")):x for x in ADJUSTMENTS if x.get("eligible_for_routing")}
+RESPONSE_GEN=RESPONSE_MET.get("response_learning_generation_id") or "RESPLEARN:000000000000"
+RESPONSE_INDEX={x.get("worker_id"):x for x in RESPONSE_ADJUSTMENTS if x.get("eligible_for_routing")}
 
 def support_bonus(count,weight):
     k=float(POL.get("support_shrinkage_k",3))
@@ -77,6 +81,7 @@ def score(worker_id,a):
     comp["exploration_bonus"]=float(POL.get("unmeasured_exploration_bonus",4))/(1+runs)
     learned,evidence_count=learned_adjustment(worker_id,a)
     comp["routing_learning"]=learned
+    comp["activation_response"]=float((RESPONSE_INDEX.get(worker_id) or {}).get("routing_response_adjustment") or 0)
     total=sum(comp.values())
     return round(total,4),{k:round(v,4) for k,v in comp.items()},evidence_count
 
@@ -113,6 +118,7 @@ for w in eligible:
           "strategy_id":a.get("strategy_id"),"search_objective_id":a.get("search_objective_id"),
           "routing_score":sc,"score_components":comp,
           "routing_learning_generation_id":LEARN_GEN,
+          "activation_response_learning_generation_id":RESPONSE_GEN,
           "routing_learning_evidence_count":learn_count,
           "worker_evidence_state":PROFILES[wid].get("measured_state")
         })
@@ -172,6 +178,7 @@ used_slots=set(pair_map.values())
 fingerprint=json.dumps({
   "profile_generation":P_MET.get("worker_profile_generation_id"),
   "routing_learning_generation":LEARN_GEN,
+  "activation_response_learning_generation":RESPONSE_GEN,
   "state":[(x.get("slot_id"),x.get("status"),x.get("worker_id"),x.get("current_assignment_id")) for x in STATE],
   "alloc":[(x["slot_id"],x["assignment_id"],x.get("final_score")) for x in ALLOC],
   "routes":sorted(pairs)
@@ -184,26 +191,26 @@ for w in workers:
     wid=w["worker_id"]
     if w.get("status","active")!="active":
         routes.append({"worker_id":wid,"route_status":"PAUSED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"slot_id":None,"assignment_id":None,"work_item_id":None,
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":None,"assignment_id":None,"work_item_id":None,
           "routing_score":None,"score_components":{},"evidence_state":PROFILES[wid].get("measured_state"),
           "claim_id":None,"reason":"Worker is paused in worker_registry.json."})
     elif wid in active_by_worker:
         s=active_by_worker[wid];a=alloc_by_slot.get(s["slot_id"]) or {}
         routes.append({"worker_id":wid,"route_status":"LOCKED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"slot_id":s["slot_id"],
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":s["slot_id"],
           "assignment_id":s.get("claimed_assignment_id") or a.get("assignment_id"),"work_item_id":a.get("work_item_id"),
           "routing_score":None,"score_components":{},"evidence_state":"LOCKED_ACTIVE_CLAIM",
           "claim_id":s.get("claim_id"),"reason":"Existing V11 active claim is authoritative and preserved."})
     elif wid in pair_map:
         slot=pair_map[wid];e=edge_map[(wid,slot)]
         routes.append({"worker_id":wid,"route_status":"ROUTED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"slot_id":slot,"assignment_id":e["assignment_id"],
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":slot,"assignment_id":e["assignment_id"],
           "work_item_id":e["work_item_id"],"routing_score":e["routing_score"],
           "score_components":e["score_components"],"routing_learning_evidence_count":e.get("routing_learning_evidence_count",0),"evidence_state":PROFILES[wid].get("measured_state"),
           "claim_id":None,"reason":"Maximum-total-fit exact assignment across currently idle registered workers and claimable slots."})
     else:
         routes.append({"worker_id":wid,"route_status":"IDLE_UNASSIGNED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"slot_id":None,"assignment_id":None,"work_item_id":None,
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":None,"assignment_id":None,"work_item_id":None,
           "routing_score":None,"score_components":{},"evidence_state":PROFILES[wid].get("measured_state"),
           "claim_id":None,"reason":"No claimable slot remained after exact matching."})
 
@@ -216,12 +223,13 @@ for r in routes:
     a=alloc_by_slot[r["slot_id"]]
     packets.append({
       "worker_id":r["worker_id"],"routing_generation_id":routing_generation,
-      "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"slot_id":r["slot_id"],
+      "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":r["slot_id"],
       "assignment_id":a["assignment_id"],"allocator_generation_id":a["allocator_generation_id"],
       "portfolio_policy_generation_id":a["portfolio_policy_generation_id"],"work_item_id":a["work_item_id"],
       "assignment_slot_role":a["slot_role"],"assignment_work_kind":a["work_kind"],
       "assignment_source_id":a["source_id"],"assignment_score":a["final_score"],
       "routing_score":r["routing_score"],"routing_learning_adjustment":(r.get("score_components") or {}).get("routing_learning",0),
+      "activation_response_adjustment":(r.get("score_components") or {}).get("activation_response",0),
       "routing_learning_evidence_count":r.get("routing_learning_evidence_count",0),"claim_file":f"intelligence/execution_events/{r['slot_id']}.jsonl"
     })
 (INTEL/"worker_claim_packets.jsonl").write_text("\n".join(json.dumps(x,ensure_ascii=False) for x in packets)+("\n" if packets else ""),encoding="utf-8")
@@ -229,6 +237,7 @@ for r in routes:
 metrics={
   "schema_version":1,"routing_generation_id":routing_generation,"worker_profile_generation_id":profile_generation,
   "routing_learning_generation_id":LEARN_GEN,"routing_learning_mode":LEARN_MET.get("mode") or "unavailable",
+  "activation_response_learning_generation_id":RESPONSE_GEN,"activation_response_learning_mode":RESPONSE_MET.get("mode") or "unavailable",
   "registered_workers":len(workers),"active_locked_workers":len(active_by_worker),
   "routed_workers":sum(1 for r in routes if r["route_status"]=="ROUTED"),
   "unassigned_workers":sum(1 for r in routes if r["route_status"]=="IDLE_UNASSIGNED"),
@@ -238,7 +247,8 @@ metrics={
 
 report=["# WORKER ROUTING PLAN","",f"Routing generation: **{routing_generation}**",f"Worker profiles: **{profile_generation}**","",
 "V12/V13 routes workers using positive historical fit, assignment priority, and evidence-gated routing outcome adjustments. Active V11 claims remain locked.","",
-f"Routing learning: **{LEARN_GEN}** / mode **{LEARN_MET.get('mode') or 'unavailable'}**","",
+f"Routing learning: **{LEARN_GEN}** / mode **{LEARN_MET.get('mode') or 'unavailable'}**",
+f"Activation-response learning: **{RESPONSE_GEN}** / mode **{RESPONSE_MET.get('mode') or 'unavailable'}**","",
 "| Worker | Profile | Route | Slot | Assignment | Score | Reason |",
 "|---|---|---|---|---|---:|---|"]
 for r in routes:
@@ -249,7 +259,8 @@ report += ["","## Routing interpretation","",
 "- Historical strategy, objective, experiment, capability, domain and completed-role experience can only add fit.",
 "- Unmeasured workers get an exploration bonus; they are not treated as low quality.",
 "- Current active claims are locked and consume worker capacity.",
-"- V13 learned adjustments are zero unless routing_learning_policy evidence thresholds are satisfied.",
+"- V13 learned task-context adjustments are zero unless routing_learning_policy evidence thresholds are satisfied.",
+"- V17 activation-response adjustment is penalty-only and stays zero until READY→activation→claim evidence thresholds are satisfied.",
 "- Routing is recomputed after execution-state, telemetry, outcomes, or routing-learning changes.",""]
 (INTEL/"WORKER_ROUTING.md").write_text("\n".join(report),encoding="utf-8")
 print(json.dumps(metrics))
