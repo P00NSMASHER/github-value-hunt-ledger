@@ -39,6 +39,30 @@ def canonical_hash(value: object) -> str:
 
 
 @dataclass(frozen=True)
+class ProviderEndpointContract:
+    """Reviewed binding from provider telemetry to one financial action boundary."""
+
+    provider: str
+    interface: str
+    economic_action: str
+    posting_boundary: str
+    credit_note_capable: bool
+    operation_identity_bound: bool
+    phase_boundary_verified: bool
+
+    def supports_financial_classification(self, *, receipt_provider: str) -> bool:
+        return (
+            self.provider == receipt_provider
+            and bool(self.interface.strip())
+            and bool(self.economic_action.strip())
+            and bool(self.posting_boundary.strip())
+            and self.credit_note_capable
+            and self.operation_identity_bound
+            and self.phase_boundary_verified
+        )
+
+
+@dataclass(frozen=True)
 class ProviderOutcomeReceipt:
     """Evidence-bound provider outcome; naked provider status strings are insufficient."""
 
@@ -52,6 +76,7 @@ class ProviderOutcomeReceipt:
     partial_effect_possible: bool
     operation_identity_matches: bool
     economic_fingerprint_matches: bool = False
+    endpoint_contract: ProviderEndpointContract | None = None
 
     def classify(self, *, expected_logical_effect_id: str) -> ProbeResult:
         exact_identity = (
@@ -60,7 +85,13 @@ class ProviderOutcomeReceipt:
             and self.logical_effect_id == expected_logical_effect_id
         )
         exact_scope = self.effect_scope == "EXACT_SINGLE_EFFECT"
-        if not exact_identity or not self.terminal or not exact_scope:
+        endpoint_bound = bool(
+            self.endpoint_contract
+            and self.endpoint_contract.supports_financial_classification(
+                receipt_provider=self.provider
+            )
+        )
+        if not exact_identity or not self.terminal or not exact_scope or not endpoint_bound:
             return "UNKNOWN"
         if (
             self.phase == "PRE_APPLY"
@@ -90,6 +121,7 @@ class DynamicsRecurringOutcomePolicy:
         exact_single_effect: bool,
         operation_identity_matches: bool,
         economic_fingerprint_matches: bool = False,
+        endpoint_contract: ProviderEndpointContract | None = None,
     ) -> ProviderOutcomeReceipt:
         phase_by_status = {
             "Preprocessing": "PRE_APPLY",
@@ -121,6 +153,7 @@ class DynamicsRecurringOutcomePolicy:
             partial_effect_possible=partial_effect_possible,
             operation_identity_matches=operation_identity_matches,
             economic_fingerprint_matches=economic_fingerprint_matches,
+            endpoint_contract=endpoint_contract,
         )
 
 
