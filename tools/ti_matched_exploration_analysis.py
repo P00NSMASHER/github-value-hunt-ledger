@@ -240,6 +240,45 @@ for aid in agents:
       "evidence_state":"SUFFICIENT_DIAGNOSTIC" if enough else "INSUFFICIENT"
     })
 
+debt_rows=[]
+for g in groups:
+    specs=[
+      ("agent_a_task_a",g["agent_a"],g["baseline_task_a"]["work_item_id"],"exploit","BASELINE_COMPARATOR"),
+      ("agent_a_task_b",g["agent_a"],g["baseline_task_b"]["work_item_id"],"explore_swap","EXPLORATION_COMPLETION"),
+      ("agent_b_task_a",g["agent_b"],g["baseline_task_a"]["work_item_id"],"explore_swap","EXPLORATION_COMPLETION"),
+      ("agent_b_task_b",g["agent_b"],g["baseline_task_b"]["work_item_id"],"exploit","BASELINE_COMPARATOR")
+    ]
+    missing=[s for s in specs if int((g["cells"].get(s[0]) or {}).get("n") or 0)<=0]
+    closure=len(missing)
+    if closure==0:
+        continue
+    tier="P0" if closure==1 else ("P1" if closure==2 else "P2")
+    observed=4-closure
+    for cell_name,agent_id,work_item_id,required_mode,evidence_kind in missing:
+        raw_debt=f"{g['crossover_group_id']}|{cell_name}|{agent_id}|{work_item_id}|{required_mode}"
+        debt_rows.append({
+          "debt_id":"CROSSDEBT:"+hashlib.sha256(raw_debt.encode()).hexdigest()[:12],
+          "crossover_group_id":g["crossover_group_id"],
+          "missing_cell":cell_name,
+          "agent_id":agent_id,
+          "work_item_id":work_item_id,
+          "required_route_mode":required_mode,
+          "required_evidence_kind":evidence_kind,
+          "priority_tier":tier,
+          "closure_distance":closure,
+          "observed_other_cells":observed,
+          "applied_pair_generations":len(g.get("pair_ids") or []),
+          "routing_authorized":False,
+          "instruction":(
+            "Observe a completed generated primary route for this exact agent/work item under a non-applied V18 generation."
+            if evidence_kind=="BASELINE_COMPARATOR"
+            else "Observe a completed generated primary route for this exact agent/work item in an applied V18 exploration generation."
+          )
+        })
+
+tier_order={"P0":0,"P1":1,"P2":2}
+debt_rows.sort(key=lambda x:(tier_order.get(x["priority_tier"],9),-x["applied_pair_generations"],x["crossover_group_id"],x["missing_cell"]))
+
 complete_groups=sum(1 for g in groups if g["evidence_state"]=="COMPLETE_CROSSOVER")
 raw=json.dumps({
   "policy":POL,
@@ -263,7 +302,9 @@ metrics={
   "global_evidence_sufficient":complete_groups>=int(POL.get("min_complete_crossover_groups_global",4)),
   "agents_with_sufficient_matched_evidence":sum(1 for x in agent_rows if x["sufficient_matched_evidence"]),
   "automatic_routing_feedback_enabled":False,
-  "routing_feedback_applied":False
+  "routing_feedback_applied":False,
+  "missing_crossover_cells":len(debt_rows),
+  "crossover_groups_with_debt":len({x["crossover_group_id"] for x in debt_rows})
 }
 
 def write_jsonl(name,rows):
@@ -272,6 +313,7 @@ def write_jsonl(name,rows):
 write_jsonl("matched_exploration_pairs.jsonl",pair_rows)
 write_jsonl("routing_crossover_groups.jsonl",groups)
 write_jsonl("agent_crossover_metrics.jsonl",agent_rows)
+write_jsonl("matched_exploration_debt.jsonl",debt_rows)
 (INTEL/"matched_exploration_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
 
 report=[
@@ -300,5 +342,23 @@ for x in agent_rows:
     effects.append(f"| {x['agent_id']} | {x['complete_crossover_groups']} | {x['distinct_task_pairs']} | {'—' if v is None else f'{v:+.3f}'} | {x['evidence_state']} | disabled |")
 effects += ["","Within a complete two-agent/two-task crossover, V19 averages the agent difference on each task. Task contrast is estimated separately. No missing cell is imputed.",""]
 (INTEL/"MATCHED_AGENT_EFFECTS.md").write_text("\n".join(effects),encoding="utf-8")
+
+debt_report=[
+ "# MATCHED EXPLORATION EVIDENCE DEBT","",
+ f"Generation: **{gen}**",
+ f"Missing crossover cells: **{len(debt_rows)}**","",
+ "This queue is measurement debt only. It does not authorize routing, claiming, or overriding the current allocator.","",
+ "| Priority | Group | Missing cell | Agent | Work item | Required mode | Pair generations |",
+ "|---|---|---|---|---|---|---:|"
+]
+for x in debt_rows:
+    debt_report.append(
+      f"| {x['priority_tier']} | {x['crossover_group_id']} | {x['missing_cell']} | {x['agent_id']} | "
+      f"{x['work_item_id']} | {x['required_route_mode']} | {x['applied_pair_generations']} |"
+    )
+if not debt_rows:
+    debt_report.append("| — | — | — | — | — | — | 0 |")
+debt_report += ["","A debt row closes only through observed generated-route evidence satisfying the exact agent × work-item × route-mode requirement. Missing cells are never imputed.",""]
+(INTEL/"MATCHED_EXPLORATION_DEBT.md").write_text("\n".join(debt_report),encoding="utf-8")
 
 print(json.dumps(metrics))
