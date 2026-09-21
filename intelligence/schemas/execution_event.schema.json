@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "V15 Hunt Execution Event",
+  "title": "V16 Hunt Execution Event",
   "type": "object",
   "required": [
     "event_id",
@@ -217,6 +217,34 @@
         "null"
       ],
       "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "presence_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^PRESENCEGEN:[a-f0-9]{12}$"
+    },
+    "presence_event_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^PRESENCE:[a-f0-9]{12}$"
+    },
+    "activation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ACTIVATE:[a-f0-9]{12}$"
+    },
+    "activation_generation_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^ACTGEN:[a-f0-9]{12}$"
     }
   },
   "additionalProperties": true
