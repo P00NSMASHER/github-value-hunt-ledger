@@ -9,8 +9,14 @@
   "query_family": "SECS/GEM S2F15 real-HSMS atomicity transport validation",
   "measurement_quality": "prospective",
   "work_action": "execute_fixture",
-  "lane_ids": ["12", "35"],
-  "seed_nodes": ["CAP-014", "EXP-008"],
+  "lane_ids": [
+    "12",
+    "35"
+  ],
+  "seed_nodes": [
+    "CAP-014",
+    "EXP-008"
+  ],
   "search_surfaces": [
     "public Git clone at pinned revision",
     "real localhost HSMS/TCP active-passive execution",
@@ -29,8 +35,12 @@
   "recall_rescue_used": false,
   "stop_reason": "The two corrected secsgem fixtures completed over real HSMS/TCP with raw correlated S2F16 frames and unchanged wire/direct post-state; Dreamine execution remains blocked by the unavailable .NET SDK.",
   "new_capability_ids": [],
-  "strengthened_capability_ids": ["CAP-014"],
-  "experiment_ids": ["EXP-008"],
+  "strengthened_capability_ids": [
+    "CAP-014"
+  ],
+  "experiment_ids": [
+    "EXP-008"
+  ],
   "candidate_dispositions": [
     {
       "repository": "bparzella/secsgem",
@@ -38,7 +48,9 @@
       "status": "retained-real-transport-validated",
       "reason_code_standard": "strengthens_active_experiment",
       "reason_detail": "Real HSMS/TCP execution returned correlated S2F16/EAC 1 for valid-plus-unknown and S2F16/EAC 3 for duplicate-plus-out-of-range, with ECID 20 unchanged at 321 by both S2F13/S2F14 and direct readback.",
-      "capability_ids": ["CAP-014"],
+      "capability_ids": [
+        "CAP-014"
+      ],
       "novelty_ordinal": 3,
       "evidence_ordinal": 5,
       "replacement_days_low": null,
@@ -50,7 +62,7 @@
   "best_result": "Closed secsgem's mock-transport gap: both corrected S2F15 cases passed over real HSMS/TCP with raw response correlation, independent logical-T3 classification, and unchanged pre/post state.",
   "durable_evidence_path": "referrals/hunt08-r25-2026-09-21-secsgem-real-hsms-atomicity.md",
   "notes": "Unallocated live-lane fixture execution after READY presence and a fresh packet check found no HUNTER-08 activation. Result is STRONG for the exact secsgem endpoint and built-in store, not a full two-engine or neutral conformance result.",
-  "query_family_id": "QF:secs-gem-equipment-constant-atomicity-runtime",
+  "query_family_id": "QF:secs-gem-s2f15-real-hsms-atomicity-transport-validation",
   "search_objective_id": "OBJ:protocol-regression",
   "benchmark_task_ids": [],
   "comparison_group_id": null,
