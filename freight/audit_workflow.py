@@ -19,6 +19,7 @@ from freight.population_builder import PopulationBuild, build_population_from_ch
 from freight.review_packet import ReviewPacket, build_review_packet
 from freight.review_queue import ReviewQueue, build_review_queue
 from freight.review_routing import ReviewRouting, route_review_packet
+from freight.remediation_plan import RemediationPlan, build_remediation_plan
 from freight.rule_csv_adapter import ChargeRuleCSVBatch, parse_charge_rule_csv
 
 
@@ -36,6 +37,7 @@ class AuditWorkflowStage(str, Enum):
     REVIEW_QUEUE = "REVIEW_QUEUE"
     REVIEW_PACKET = "REVIEW_PACKET"
     REVIEW_ROUTING = "REVIEW_ROUTING"
+    REMEDIATION_PLAN = "REMEDIATION_PLAN"
     RUN_MANIFEST = "RUN_MANIFEST"
     COMPLETE = "COMPLETE"
 
@@ -61,6 +63,7 @@ class AuditWorkflowArtifacts:
     review_queue: ReviewQueue
     review_packet: ReviewPacket
     review_routing: ReviewRouting
+    remediation_plan: RemediationPlan
     manifest: AuditRunManifest
 
 
@@ -82,6 +85,7 @@ class AuditWorkflowSummary:
     evidence_remediation_case_count: int
     rerun_required: bool
     review_routing_hash: str
+    remediation_plan_hash: str
     validated_discrepancy_cents: int
     review_discrepancy_cents: int
     unknown_expected_count: int
@@ -114,6 +118,7 @@ def _summary(
     manifest: AuditRunManifest,
     factory: FindingFactoryBatch,
     review_routing: ReviewRouting,
+    remediation_plan: RemediationPlan,
 ) -> AuditWorkflowSummary:
     validated_findings = [f for f in factory.truth.findings if f.status == VALIDATED]
     review_findings = [f for f in factory.truth.findings if f.status == REVIEW]
@@ -144,6 +149,7 @@ def _summary(
         evidence_remediation_case_count=review_routing.evidence_remediation_case_count,
         rerun_required=review_routing.rerun_required,
         review_routing_hash=review_routing.routing_hash,
+        remediation_plan_hash=remediation_plan.plan_hash,
         validated_discrepancy_cents=sum(f.validated_cents for f in validated_findings),
         review_discrepancy_cents=review_discrepancy,
         unknown_expected_count=unknown_expected,
@@ -231,6 +237,11 @@ def run_audit_workflow(
         return _blocked(AuditWorkflowStage.REVIEW_ROUTING, "REVIEW_ROUTING_FAILED", exc)
 
     try:
+        remediation_plan = build_remediation_plan(review_packet, review_routing)
+    except ValueError as exc:
+        return _blocked(AuditWorkflowStage.REMEDIATION_PLAN, "REMEDIATION_PLAN_FAILED", exc)
+
+    try:
         manifest = build_audit_run_manifest(
             invoice_batch=invoice_batch,
             population_build=population_build,
@@ -255,6 +266,7 @@ def run_audit_workflow(
         review_queue=review_queue,
         review_packet=review_packet,
         review_routing=review_routing,
+        remediation_plan=remediation_plan,
         manifest=manifest,
     )
     return AuditWorkflowResult(
@@ -267,6 +279,7 @@ def run_audit_workflow(
             manifest=manifest,
             factory=factory,
             review_routing=review_routing,
+            remediation_plan=remediation_plan,
         ),
         artifacts=artifacts,
     )
@@ -311,6 +324,7 @@ def render_workflow_summary(result: AuditWorkflowResult) -> str:
         f"- Evidence-remediation cases: **{summary.evidence_remediation_case_count}**",
         "- Rerun required for remediation cases: **" + ("yes" if summary.rerun_required else "no") + "**",
         f"- Review routing hash: `{summary.review_routing_hash}`",
+        f"- Remediation plan hash: `{summary.remediation_plan_hash}`",
         "- Validated discrepancy: **$" + format(summary.validated_discrepancy_cents / 100, ",.2f") + "**",
         "- Review discrepancy with a calculable expected amount: **$" + format(summary.review_discrepancy_cents / 100, ",.2f") + "**",
         f"- Review cases without an established expected amount: **{summary.unknown_expected_count}**",

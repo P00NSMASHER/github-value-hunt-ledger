@@ -17,6 +17,7 @@ from freight.audit_workflow import (
     render_workflow_summary,
 )
 from freight.review_packet import render_review_packet_markdown
+from freight.remediation_plan import render_remediation_plan_markdown
 
 
 FIXED_ZIP_TIME = (1980, 1, 1, 0, 0, 0)
@@ -82,6 +83,10 @@ def build_audit_result_entries(result: AuditWorkflowResult) -> dict[str, bytes]:
         ),
         "review-queue.json": _json_bytes(asdict(artifacts.review_queue)),
         "review-routing.json": _json_bytes(asdict(artifacts.review_routing)),
+        "remediation-plan.json": _json_bytes(asdict(artifacts.remediation_plan)),
+        "remediation-plan.md": render_remediation_plan_markdown(
+            artifacts.remediation_plan
+        ).encode("utf-8"),
         "review-packet.json": _json_bytes(asdict(artifacts.review_packet)),
         "review-packet.md": render_review_packet_markdown(
             artifacts.review_packet
@@ -112,6 +117,7 @@ def _bundle_manifest(result: AuditWorkflowResult, entries: dict[str, bytes]) -> 
             "Does not include raw invoice, rate, contract or settlement source files.",
             "Discrepancy amounts are not realized savings.",
             "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
+            "The remediation plan states required evidence and forbids manual promotion in place.",
             "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
             "Buyer review, external action and settlement remain separate downstream states.",
             "Bundle must remain inside an approved customer-processing environment.",

@@ -34,3 +34,8 @@ Routing verifies both:
 2. every individual review-case hash before using its action hint.
 
 The routing artifact is itself deterministically hash-bound to the exact packet and ordered case hashes. It cannot authorize carrier contact, disputes, settlement, money movement, or claim that a discrepancy is realized savings.
+
+
+## Remediation handoff
+
+Cases in the remediation bucket feed the deterministic Evidence Remediation Plan. The plan maps each exact case hash to the evidence category required and the rerun action. Routing itself never supplies or changes evidence.
