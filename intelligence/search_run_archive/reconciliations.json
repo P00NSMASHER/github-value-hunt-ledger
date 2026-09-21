@@ -97,6 +97,22 @@
       ],
       "review_date": "2026-09-21",
       "recovered_new_runs": 1
+    },
+    {
+      "search_run_id": "RUN:20260921T025635Z:hunter-11:rqr-runtime-closure",
+      "decision": "archive_second_incomplete_correction_accept_final_query_family_identity",
+      "original_path": "intelligence/search_run_spool/20260921T025635Z-hunter-11-rqr-runtime-closure-reconciled-v2.json",
+      "archive_path": "intelligence/search_run_archive/20260921T025635Z-hunter-11-rqr-runtime-closure-reconciled-v2.json",
+      "corrected_submission_path": "intelligence/search_run_spool/20260921T025635Z-hunter-11-rqr-runtime-closure-reconciled-v3.json",
+      "archived_bytes_sha256": "c39e41d04318ff80ad2c731fdee2add9783aefcb33033667fb32e28c030d4c73",
+      "canonical_record_sha256": "ff66702a88419e1d895df4e71a7e00c14939806d48eb93b2fc2ec290f713425c",
+      "canonical_ledger": "intelligence/search_runs.jsonl",
+      "reason": "The second reviewed correction exposed the remaining deterministic query-family identity mismatch. The final record changes only query_family_id to QF:recovery-qualification-behavior-closure-currentness, the slug of the submitted query_family. No observed result, denominator, query, execution or evidence field changed.",
+      "canonical_evidence_paths": [
+        "hunters/15-run25-2026-09-21.md"
+      ],
+      "review_date": "2026-09-21",
+      "recovered_new_runs": 1
     }
   ]
 }
