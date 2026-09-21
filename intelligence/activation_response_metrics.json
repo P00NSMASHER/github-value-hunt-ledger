@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "response_learning_generation_id": "RESPLEARN:4f04701f0a80",
-  "clock_commit_sha": "1dbf5d807f0afbf9609ac79908709bcb1df7d893",
-  "clock_timestamp": "2026-09-21T06:07:19Z",
+  "response_learning_generation_id": "RESPLEARN:cf5e865f756d",
+  "clock_commit_sha": "7ee82aaf34f3f3a6b8d20b378af53b969c5364b8",
+  "clock_timestamp": "2026-09-21T06:08:40Z",
   "mode": "observe_only_insufficient_evidence",
-  "activation_records": 14,
-  "global_resolved_primary_activations": 4,
+  "activation_records": 18,
+  "global_resolved_primary_activations": 5,
   "global_evidence_threshold": 20,
   "workers_with_sufficient_evidence": 0,
   "workers_with_negative_adjustment": 0

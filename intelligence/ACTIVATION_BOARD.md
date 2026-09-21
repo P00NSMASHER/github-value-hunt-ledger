@@ -1,7 +1,7 @@
 # WORKER ACTIVATION BOARD
 
-Generation: **ACTGEN:0e2ec0e99dc3**
-Clock: **2026-09-21T06:07:19Z**
+Generation: **ACTGEN:61e1ef8a27c9**
+Clock: **2026-09-21T06:08:40Z**
 
 V16 activation is pull-based. Routing can exist without activation; generated claiming requires fresh READY presence.
 
@@ -9,13 +9,13 @@ V16 activation is pull-based. Routing can exist without activation; generated cl
 |---|---|---|---|---|
 | HUNTER-01 | ACTIVE_CLAIM | **ACTIVE_CLAIM** | — | — |
 | HUNTER-02 | UNKNOWN | **WAITING_PRESENCE** | — | — |
-| HUNTER-03 | READY_STALE | **WAITING_PRESENCE** | — | — |
+| HUNTER-03 | READY_FRESH | **READY_TO_CLAIM** | SLOT-02 | ACTIVATE:97b4dd072181 |
 | HUNTER-04 | READY_STALE | **WAITING_PRESENCE** | — | — |
-| HUNTER-05 | READY_FRESH | **READY_TO_CLAIM** | SLOT-12 | ACTIVATE:c87bc9402766 |
+| HUNTER-05 | READY_FRESH | **READY_TO_CLAIM** | SLOT-12 | ACTIVATE:6d785355d60f |
 | HUNTER-06 | READY_STALE | **WAITING_PRESENCE** | — | — |
-| HUNTER-07 | READY_FRESH | **READY_TO_CLAIM** | SLOT-05 | ACTIVATE:6ddde3b4b1ac |
-| HUNTER-08 | READY_FRESH | **READY_TO_CLAIM** | SLOT-04 | ACTIVATE:75b54231344d |
-| HUNTER-09 | READY_FRESH | **READY_TO_CLAIM** | SLOT-01 | ACTIVATE:9a19e82cd71f |
+| HUNTER-07 | ACTIVE_CLAIM | **ACTIVE_CLAIM** | — | — |
+| HUNTER-08 | READY_FRESH | **READY_TO_CLAIM** | SLOT-04 | ACTIVATE:4d37b9359f97 |
+| HUNTER-09 | READY_FRESH | **READY_TO_CLAIM** | SLOT-01 | ACTIVATE:26291c541f86 |
 | HUNTER-10 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 | HUNTER-11 | READY_STALE | **WAITING_PRESENCE** | — | — |
 | HUNTER-12 | UNKNOWN | **WAITING_PRESENCE** | — | — |

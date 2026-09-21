@@ -1,6 +1,6 @@
 # WORKER PROFILE REPORT
 
-Profile generation: **WORKERS:d02ecf6c7958**
+Profile generation: **WORKERS:bb07992e7a87**
 
 - Registered workers: **14**
 - Measured: **6**
@@ -16,7 +16,7 @@ Profile generation: **WORKERS:d02ecf6c7958**
 | HUNTER-04 | SPARSE | 3 | 4 | 4 | STRAT:rule-period-authority-version-audit | EXP-005 | 0 |
 | HUNTER-05 | MEASURED | 3 | 7 | 3 | STRAT:first-party-history-manifest-triangulation | EXP-006 | 0 |
 | HUNTER-06 | MEASURED | 4 | 10 | 8 | STRAT:acceptance-path-transition-inspection | EXP-007 | 0 |
-| HUNTER-07 | MEASURED | 3 | 6 | 5 | STRAT:evaluation-target-independence | EXP-012 | 0 |
+| HUNTER-07 | MEASURED | 3 | 6 | 5 | STRAT:evaluation-target-independence | EXP-012 | 1 |
 | HUNTER-08 | SPARSE | 2 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-008 | 0 |
 | HUNTER-09 | SPARSE | 3 | 4 | 4 | STRAT:evaluation-target-independence | EXP-002 | 0 |
 | HUNTER-10 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |

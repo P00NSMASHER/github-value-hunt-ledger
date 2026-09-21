@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "clock_commit_sha": "1dbf5d807f0afbf9609ac79908709bcb1df7d893",
-  "clock_timestamp": "2026-09-21T06:07:19Z",
-  "primary_tickets": 13,
-  "pending_primary": 13,
+  "clock_commit_sha": "7ee82aaf34f3f3a6b8d20b378af53b969c5364b8",
+  "clock_timestamp": "2026-09-21T06:08:40Z",
+  "primary_tickets": 12,
+  "pending_primary": 12,
   "stale_primary": 0,
   "expired_primary": 0,
   "claimed_primary": 0,
