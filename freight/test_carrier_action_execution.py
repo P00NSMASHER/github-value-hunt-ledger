@@ -474,6 +474,40 @@ def test_rehashed_execution_receipt_requires_canonical_utc_timestamps():
         verify_carrier_action_execution_receipt(forged)
 
 
+def test_rehashed_execution_receipt_rejects_duplicate_or_unsorted_finding_sets():
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent),
+    )
+    finding_id = receipt.finding_ids[0]
+    with pytest.raises(ValueError, match="unique"):
+        verify_carrier_action_execution_receipt(
+            _rehash_execution_receipt(
+                receipt,
+                finding_ids=(finding_id, finding_id),
+            )
+        )
+    with pytest.raises(ValueError, match="sorted"):
+        verify_carrier_action_execution_receipt(
+            _rehash_execution_receipt(
+                receipt,
+                finding_ids=("z-finding", "a-finding"),
+            )
+        )
+
+
 def test_receipt_flags_are_hash_verified():
     auth, proposal, payload, claims = setup()
     intent = build_carrier_action_execution_intent(
@@ -803,6 +837,21 @@ def test_rehashed_delivery_receipt_requires_canonical_utc_timestamps():
     )
     with pytest.raises(ValueError, match="canonical UTC"):
         verify_carrier_action_delivery_receipt(forged)
+
+
+def test_rehashed_delivery_receipt_rejects_forged_submission_evidence_provenance():
+    _, _, _, _, _, submitted = submitted_context()
+    delivery = record_carrier_action_delivery_confirmation(
+        submitted_receipt=submitted,
+        evidence=delivery_evidence(submitted),
+    )
+    with pytest.raises(ValueError, match="submission evidence source is not external"):
+        verify_carrier_action_delivery_receipt(
+            _rehash_delivery_receipt(
+                delivery,
+                submission_evidence_source_hash=delivery.payload_hash,
+            )
+        )
 
 
 def test_delivery_receipt_is_self_verifying():
