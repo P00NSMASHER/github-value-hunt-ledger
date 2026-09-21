@@ -47,3 +47,8 @@ The review workflow binds the event, live candidate claims, reviewer identity, r
 If a return or reversal cannot be auto-applied because it is ambiguous across multiple live allocation edges, the Counter/Reversal Review Workflow must be used.
 
 The workflow snapshots current live allocation capacity, requires a reviewer decision bound to the exact case, rejects stale state before writing, and applies the reversal through the reviewed-reversal transaction primitive. Split reviewed reversals remain unsupported.
+
+
+## Lifecycle orchestration
+
+For operational processing, settlement and counter CSVs can be passed through the Settlement Evidence Lifecycle Workflow. It parses every supplied file before persistent writes, preflights cross-file references, runs safe automatic allocation/reversal, and returns proof-bound settlement/counter review cases for anything ambiguous.
