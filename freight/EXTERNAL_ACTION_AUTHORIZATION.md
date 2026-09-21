@@ -93,3 +93,8 @@ Legacy unbound review rows can still be used for descriptive pilot reporting, bu
 External action authorization is now bound to both the target carrier and the target customer/payee identity. Every selected finding must match the authorized carrier, customer/payee and currency.
 
 This prevents one carrier/currency authorization from being reused across different customer identities. Downstream action checks require the same customer/payee identity before an action is considered within scope.
+
+
+## Canonical action-payload binding
+
+The preferred upstream path now generates a canonical carrier-action payload from the exact recovery claims. Buyer approval binds the resulting payload hash. If the rendered subject/body, action type, invoice/reference, amount or proposal facts change, the payload hash changes and the prior approval no longer matches.

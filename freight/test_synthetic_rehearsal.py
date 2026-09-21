@@ -46,6 +46,8 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert out["carrier_action_proposal_count"] == 1
     assert len(out["carrier_action_proposal_hash"]) == 64
     assert out["carrier_action_target_customer_id"] == "cust"
+    assert len(out["carrier_action_payload_hash"]) == 64
+    assert "Freight credit review request" in out["carrier_action_payload_subject"]
     assert len(out["external_action_authorization_hash"]) == 64
     assert out["external_action_authorized_cents"] == 5000
     assert out["external_action_automatic_execution_authorized"] is False
