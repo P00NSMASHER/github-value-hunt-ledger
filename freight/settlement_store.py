@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import time
+from datetime import datetime, timezone
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, TypeVar
@@ -145,6 +146,22 @@ class SettlementStore:
         return value.strip()
 
     @staticmethod
+    def _timestamp(name: str, value: str) -> str:
+        text = SettlementStore._text(name, value)
+        normalized = text[:-1] + "+00:00" if text.endswith("Z") else text
+        try:
+            parsed = datetime.fromisoformat(normalized)
+        except ValueError as exc:
+            raise ValueError(f"{name} must be a timezone-aware ISO-8601 timestamp") from exc
+        if parsed.tzinfo is None or parsed.utcoffset() is None:
+            raise ValueError(f"{name} must be a timezone-aware ISO-8601 timestamp")
+        return (
+            parsed.astimezone(timezone.utc)
+            .isoformat(timespec="microseconds")
+            .replace("+00:00", "Z")
+        )
+
+    @staticmethod
     def _positive_cents(name: str, value: int) -> int:
         # Input adapters must perform any explicit, reviewed currency conversion.
         # Silently truncating fractional cents here changes immutable evidence.
@@ -172,7 +189,7 @@ class SettlementStore:
             payee_id=self._text("payee_id", claim.payee_id),
             currency=self._text("currency", claim.currency),
             amount_cents=self._positive_cents("claim amount", claim.amount_cents),
-            issued_at=self._text("issued_at", claim.issued_at),
+            issued_at=self._timestamp("issued_at", claim.issued_at),
             source_hash=self._text("source_hash", claim.source_hash),
             fee_disqualified=int(claim.fee_disqualified),
         )
@@ -206,7 +223,7 @@ class SettlementStore:
             payee_id=self._text("payee_id", event.payee_id),
             currency=self._text("currency", event.currency),
             amount_cents=self._positive_cents("settlement amount", event.amount_cents),
-            booked_at=self._text("booked_at", event.booked_at),
+            booked_at=self._timestamp("booked_at", event.booked_at),
             source_hash=self._text("source_hash", event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
@@ -238,7 +255,7 @@ class SettlementStore:
             original_event_id=self._text("original_event_id", event.original_event_id),
             currency=self._text("currency", event.currency),
             amount_cents=self._positive_cents("counter amount", event.amount_cents),
-            observed_at=self._text("observed_at", event.observed_at),
+            observed_at=self._timestamp("observed_at", event.observed_at),
             source_hash=self._text("source_hash", event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
@@ -361,6 +378,8 @@ class SettlementStore:
                 raise ValueError("review allocation requires existing claim and settlement event")
             if claim["currency"] != event["currency"]:
                 raise ValueError("allocation currency mismatch")
+            if (claim["payer_id"], claim["payee_id"]) != (event["payer_id"], event["payee_id"]):
+                raise ValueError("allocation payer/payee mismatch")
             if event["booked_at"] < claim["issued_at"]:
                 raise ValueError("settlement event predates issued claim")
             if amount_cents > self._claim_residual(conn, claim_id):
