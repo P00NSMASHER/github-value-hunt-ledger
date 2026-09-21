@@ -56,3 +56,18 @@ Programming exceptions outside expected validation failures are intentionally no
 Successful results contain the full in-memory audit artifacts for use inside the approved customer-processing environment plus a minimized summary containing counts, state, discrepancies, the canonical audit-run hash, review route, buyer-review-ready count, remediation count, rerun requirement, routing hash, and remediation-plan hash. Remediation cases are accompanied by proof-bound evidence requirements and explicit rerun actions.
 
 The workflow does **not** perform buyer confirmation, contact a carrier, submit a dispute, accept a settlement, or claim a discrepancy is realized savings. Those remain separately authorized downstream transitions.
+
+
+## Currency-safe discrepancy reporting
+
+Workflow summaries never add raw cents from different currencies together.
+
+For single-currency runs, the legacy scalar discrepancy fields remain populated and `summary_currency` identifies that currency. For mixed-currency runs, those scalar totals are `null` and the summary reports a deterministic `currency_discrepancies` list instead.
+
+Human-readable summaries render explicit currency-code amounts such as `USD 25.00` and `EUR 30.00`; they never relabel a mixed-currency total as dollars.
+
+## Authority-document provenance
+
+`RuleCSVInput` can carry the original authority-document bytes in `source_document_data`. The workflow computes the SHA-256 itself before rule normalization.
+
+If both `source_document_data` and `source_document_sha256` are supplied, they must match or the workflow blocks at `RULE_INGEST`. Supplying only the precomputed SHA-256 remains supported for controlled backward compatibility.
