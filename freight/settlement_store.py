@@ -177,10 +177,10 @@ class SettlementStore:
     def _scope(self) -> tuple[str, str]:
         return self.buyer_id, self.business_unit
 
-    def create_claim(self, claim: RecoveryClaim) -> bool:
+    def _claim_values(self, claim: RecoveryClaim) -> dict[str, object]:
         if type(claim.fee_disqualified) is not bool:
             raise ValueError("fee_disqualified must be a boolean")
-        v = dict(
+        return dict(
             buyer_id=self.buyer_id,
             business_unit=self.business_unit,
             claim_id=self._text("claim_id", claim.claim_id),
@@ -193,24 +193,45 @@ class SettlementStore:
             source_hash=self._text("source_hash", claim.source_hash),
             fee_disqualified=int(claim.fee_disqualified),
         )
-        def op(conn: sqlite3.Connection) -> bool:
-            old = conn.execute(
-                "SELECT * FROM recovery_claims WHERE buyer_id=? AND business_unit=? AND claim_id=?",
-                (*self._scope, v["claim_id"]),
-            ).fetchone()
-            if old:
-                if self._same(old, v):
-                    return False
-                raise ValueError("claim_id replay conflicts with immutable claim")
-            if conn.execute(
-                "SELECT 1 FROM recovery_claims WHERE buyer_id=? AND business_unit=? AND source_hash=?",
-                (*self._scope, v["source_hash"]),
-            ).fetchone():
-                raise ValueError("claim source_hash already used")
-            conn.execute("""INSERT INTO recovery_claims
-              (buyer_id,business_unit,claim_id,reference,payer_id,payee_id,currency,amount_cents,issued_at,source_hash,fee_disqualified)
-              VALUES(:buyer_id,:business_unit,:claim_id,:reference,:payer_id,:payee_id,:currency,:amount_cents,:issued_at,:source_hash,:fee_disqualified)""", v)
-            return True
+
+    def _create_claim_conn(self, conn: sqlite3.Connection, v: dict[str, object]) -> bool:
+        old = conn.execute(
+            "SELECT * FROM recovery_claims WHERE buyer_id=? AND business_unit=? AND claim_id=?",
+            (*self._scope, v["claim_id"]),
+        ).fetchone()
+        if old:
+            if self._same(old, v):
+                return False
+            raise ValueError("claim_id replay conflicts with immutable claim")
+        if conn.execute(
+            "SELECT 1 FROM recovery_claims WHERE buyer_id=? AND business_unit=? AND source_hash=?",
+            (*self._scope, v["source_hash"]),
+        ).fetchone():
+            raise ValueError("claim source_hash already used")
+        conn.execute("""INSERT INTO recovery_claims
+          (buyer_id,business_unit,claim_id,reference,payer_id,payee_id,currency,amount_cents,issued_at,source_hash,fee_disqualified)
+          VALUES(:buyer_id,:business_unit,:claim_id,:reference,:payer_id,:payee_id,:currency,:amount_cents,:issued_at,:source_hash,:fee_disqualified)""", v)
+        return True
+
+    def create_claim(self, claim: RecoveryClaim) -> bool:
+        v = self._claim_values(claim)
+        return self._write(lambda conn: self._create_claim_conn(conn, v))
+
+    def create_claims(self, claims: tuple[RecoveryClaim, ...]) -> tuple[bool, ...]:
+        normalized = tuple(claims)
+        values = tuple(self._claim_values(claim) for claim in normalized)
+        claim_ids = [str(v["claim_id"]) for v in values]
+        source_hashes = [str(v["source_hash"]) for v in values]
+        if len(claim_ids) != len(set(claim_ids)):
+            raise ValueError("duplicate claim_id in claim batch")
+        if len(source_hashes) != len(set(source_hashes)):
+            raise ValueError("duplicate source_hash in claim batch")
+        if not values:
+            return ()
+
+        def op(conn: sqlite3.Connection) -> tuple[bool, ...]:
+            return tuple(self._create_claim_conn(conn, v) for v in values)
+
         return self._write(op)
 
     def ingest_event(self, event: SettlementEventRecord) -> bool:
@@ -474,7 +495,7 @@ class SettlementStore:
         return self._read(op)
 
     def count(self, table: str) -> int:
-        allowed = {"settlement_events", "allocations", "counter_events", "reversal_edges"}
+        allowed = {"recovery_claims", "settlement_events", "allocations", "counter_events", "reversal_edges"}
         if table not in allowed:
             raise ValueError("unsupported count table")
         return self._read(lambda c: int(c.execute(

@@ -35,3 +35,18 @@ Each claim is generated with:
 - buyer review hash and incumbent attribution in the claim record proof.
 
 This artifact represents an issued recovery claim. It is not settlement proof and does not assert realized savings.
+
+
+## Atomic persistence
+
+`persist_recovery_claim_batch` re-verifies the claim batch and store scope, then writes the full claim set through one SQLite transaction.
+
+The persistence layer:
+- pre-validates every claim before opening the batch transaction;
+- rejects duplicate claim IDs or source hashes in the submitted batch;
+- commits all new claims together;
+- rolls back earlier inserts if a later claim conflicts;
+- treats an exact replay as idempotent instead of duplicating claims;
+- returns a deterministic receipt with attempted, created, and already-present counts.
+
+A persistence receipt proves that the claim batch was accepted by the reference settlement store. It still does not prove external settlement or recovery.
