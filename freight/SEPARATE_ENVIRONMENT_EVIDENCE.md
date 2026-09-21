@@ -1,6 +1,6 @@
 # Freight Recovery — Separate Controlled Environment Evidence
 
-Updated: 2026-09-20
+Updated: 2026-09-21
 
 This control supports a **service-led/manual pilot** without pretending the
 current Netlify shell is a customer-data plane.
@@ -11,6 +11,8 @@ READY from an operator checkbox or boolean.
 ## Canonical files
 
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
+- `freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json`
+- `freight/evidence/separate_environment_2026-09-21/`
 - `freight/separate_environment_evidence.py`
 - `freight/pilot_launch_gate.py`
 
@@ -57,7 +59,8 @@ Parser sandboxing must be `PROVEN` with evidence reference + SHA-256 pairs for:
 ## Status semantics
 
 ### DRAFT
-Structurally valid planning record. The launch gate remains **CONDITIONAL**.
+Structurally valid evidence record with one or more unproven controls. The launch
+gate remains **CONDITIONAL**.
 
 ### VERIFIED
 All applicable controls have evidence references + SHA-256 receipts, the
@@ -65,10 +68,29 @@ configuration snapshot is fingerprinted, verifier metadata is present, and the
 evidence is still inside its validity window. Only then may the separate/manual
 route become **READY**.
 
-## Current state
+## Current state — 2026-09-21
 
-The repository contains only the DRAFT template. Therefore the separate
-controlled environment route remains **CONDITIONAL**.
+A dedicated single-tenant Google Drive workspace now exists and was observed as
+owner-only / not shared, with no customer data present. The evidence pack records
+provider encryption, access scope, manual/no-parser operation, immutable-source
+handling, retention/deletion rules, and Netlify exclusion.
+
+A Google security alert provides evidence that a passkey was added on
+2026-09-17. That is useful authentication evidence, but it does **not** establish
+that 2-Step Verification is currently enabled/enforced for every permitted
+account sign-in path.
+
+Therefore:
+- all base controls except `mfa_enforced` are currently evidenced;
+- `mfa_enforced` remains unproven;
+- the current manifest remains `DRAFT`;
+- the route remains **CONDITIONAL**;
+- no confidential customer data may be accepted yet.
+
+The final promotion step is to obtain current account-security evidence that
+proves the required MFA posture, hash and record that evidence, set
+`mfa_enforced.value=true`, and change `evidence_status` to `VERIFIED`.
+The gate should then be re-run and must return READY before use.
 
 Do not place secrets, raw buyer contracts, invoices, credentials, or other
-confidential customer payloads in this manifest.
+confidential customer payloads in the evidence manifest or Hunter repository.
