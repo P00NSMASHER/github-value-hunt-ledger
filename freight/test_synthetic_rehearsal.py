@@ -29,6 +29,11 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert out["buyer_review_case_count"] == 2
     assert out["evidence_remediation_case_count"] == 1
     assert out["rerun_required"] is True
+    assert out["review_route"] == "MIXED_REVIEW_AND_REMEDIATION"
+    assert len(out["review_routing_hash"]) == 64
+    assert out["buyer_review_case_count"] == 2
+    assert out["evidence_remediation_case_count"] == 1
+    assert out["rerun_required"] is True
     assert "Reviewer Work Packet" in out["review_packet_markdown"]
     assert "not realized savings" in out["review_packet_markdown"]
     assert out["verified_rule_adapter_hash"]
