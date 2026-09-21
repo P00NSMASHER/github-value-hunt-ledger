@@ -1,0 +1,8 @@
+{
+  "event_id": "PRESENCE:000000000000",
+  "event_type": "READY",
+  "timestamp": "2026-09-20T20:00:00Z",
+  "worker_id": "HUNTER-01",
+  "ttl_minutes": 70,
+  "notes": null
+}
