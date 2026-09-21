@@ -165,6 +165,18 @@ def test_stale_case_is_rejected_after_claim_capacity_changes(tmp_path):
     assert s.event_residual("e1") == 2000
 
 
+
+
+
+def test_matching_reference_candidates_hide_unrelated_identity_matches(tmp_path):
+    s=store(tmp_path)
+    s.create_claim(claim(claim_id="match",reference="INV-1",amount=2500,source="a"))
+    s.create_claim(claim(claim_id="other",reference="INV-2",amount=2500,source="b"))
+    s.ingest_event(event(reference="INV-1",amount=2000))
+    case=build_settlement_review_case(s,event_id="e1")
+    assert [candidate.claim_id for candidate in case.candidates] == ["match"]
+    assert case.candidates[0].reference_match is True
+
 def test_reference_mismatch_can_be_review_candidate_for_batch_credit(tmp_path):
     s=store(tmp_path)
     s.create_claim(claim(reference="INV-1",amount=2500))
