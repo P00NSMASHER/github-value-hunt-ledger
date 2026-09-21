@@ -759,6 +759,29 @@
         "type": "string",
         "pattern": "^SIG:[A-Za-z0-9:_-]+$"
       }
+    },
+    "recall_rescue_type": {
+      "description": "Materially different retrieval move used for the final recall rescue, when any.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "surface_shift",
+        "anchor_shift",
+        "lineage_shift",
+        "organization_graph",
+        "adjacent_domain_invariant",
+        "other",
+        null
+      ]
+    },
+    "recall_rescue_found_qualifying_candidate": {
+      "description": "Whether the materially different recall rescue surfaced a candidate that satisfied the assignment acceptance target.",
+      "type": [
+        "boolean",
+        "null"
+      ]
     }
   },
   "additionalProperties": true,
