@@ -543,3 +543,36 @@ def test_sql_timestamp_guards_cover_claim_event_counter_and_reversal(tmp_path):
           (buyer_id,business_unit,reversal_id,counter_id,allocation_id,amount_cents,created_at)
           VALUES('TEST_BUYER','TEST_BU','bad-r','r1','auto:e1:c1',10000,'2026-09-03T09:59:59Z')""")
     conn.close()
+
+
+def test_sql_allocation_cannot_bind_preissue_event_to_later_claim(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C(issued="2026-09-05T10:00:00Z"))
+    s.ingest_event(E(booked="2026-09-04T10:00:00Z"))
+    conn=sqlite3.connect(s.path); conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError,match="predates issued claim"):
+        conn.execute("""INSERT INTO allocations
+          (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
+          VALUES('TEST_BUYER','TEST_BU','bad-preissue','c1','e1',50000,'REVIEW',50000,'2026-09-06T10:00:00Z')""")
+    conn.close()
+
+
+def test_sql_counter_currency_cannot_poison_later_reversal(tmp_path):
+    s=S(tmp_path); s.create_claim(C()); s.ingest_event(E())
+    assert s.auto_allocate("e1",created_at="2026-09-02T11:00:00Z").status==ALLOCATED
+    conn=sqlite3.connect(s.path); conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError,match="counter currency mismatch"):
+        conn.execute("""INSERT INTO counter_events
+          (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
+          VALUES('TEST_BUYER','TEST_BU','bad-currency','e1','EUR',10000,'2026-09-03T10:00:00Z','bad-currency-src','RETURN')""")
+    conn.close()
+
+
+def test_review_claim_flag_timestamp_cannot_be_invalid_direct_sql(tmp_path):
+    s=S(tmp_path); s.create_claim(C())
+    conn=sqlite3.connect(s.path); conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError,match="review claim flagged_at"):
+        conn.execute("""INSERT INTO review_claims
+          (buyer_id,business_unit,claim_id,flagged_at)
+          VALUES('TEST_BUYER','TEST_BU','c1','not-a-time')""")
+    conn.close()
