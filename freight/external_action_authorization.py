@@ -15,7 +15,7 @@ from enum import Enum
 
 from freight.contracts import TruthManifest, VALIDATED, canonical_hash
 from freight.engagement_state import EngagementResolution, EngagementState
-from freight.pilot_reporting import FindingReview, ReviewDisposition
+from freight.pilot_reporting import FindingReview, ReviewDisposition, verify_finding_review
 
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -50,6 +50,7 @@ class ExternalActionAuthorization:
     action_payload_hash: str
     finding_ids: tuple[str, ...]
     finding_proof_hashes: tuple[str, ...]
+    finding_review_hashes: tuple[str, ...]
     currency: str
     authorized_cents: int
     approver_role: str
@@ -169,6 +170,37 @@ def _verify_finding_proof(finding) -> None:
         raise ValueError("finding proof hash mismatch: " + finding.finding_id)
 
 
+def _verify_truth(truth: TruthManifest) -> None:
+    authority_index = {authority.authority_id: authority for authority in truth.authorities}
+    if len(authority_index) != len(truth.authorities):
+        raise ValueError("duplicate authority in truth")
+    for authority in truth.authorities:
+        if (authority.buyer_id, authority.business_unit) != (truth.buyer_id, truth.business_unit):
+            raise ValueError("authority scope mismatch in truth")
+    for finding in truth.findings:
+        _verify_finding_proof(finding)
+        if (finding.buyer_id, finding.business_unit) != (truth.buyer_id, truth.business_unit):
+            raise ValueError("finding scope mismatch in truth")
+        if finding.status == VALIDATED:
+            authority = authority_index.get(finding.authority_id or "")
+            if authority is None:
+                raise ValueError("validated finding authority missing from truth")
+            if (authority.customer_id, authority.carrier_id, authority.currency) != (
+                finding.customer_id, finding.carrier_id, finding.currency,
+            ):
+                raise ValueError("validated finding authority identity mismatch")
+    body = {
+        "schema": 3,
+        "buyer_id": truth.buyer_id,
+        "business_unit": truth.business_unit,
+        "population_hash": truth.population_hash,
+        "authorities": [asdict(authority) for authority in truth.authorities],
+        "findings": [asdict(finding) for finding in truth.findings],
+    }
+    if canonical_hash(body) != truth.truth_hash:
+        raise ValueError("truth hash mismatch")
+
+
 def issue_authorization(
     *,
     resolution: EngagementResolution,
@@ -209,6 +241,7 @@ def issue_authorization(
         resolution.business_unit,
     ):
         raise ValueError("truth scope mismatch")
+    _verify_truth(truth)
 
     if not finding_ids:
         raise ValueError("at least one finding_id is required")
@@ -224,6 +257,7 @@ def issue_authorization(
         review_index[review.finding_id] = review
 
     proof_hashes: list[str] = []
+    review_hashes: list[str] = []
     validated_total = 0
     for finding_id in normalized_ids:
         finding = finding_index.get(finding_id)
@@ -235,6 +269,9 @@ def issue_authorization(
         review = review_index.get(finding_id)
         if review is None or review.disposition is not ReviewDisposition.CONFIRMED:
             raise ValueError("authorization requires CONFIRMED buyer review: " + finding_id)
+        verify_finding_review(review, finding, require_bound=True)
+        assert review.review_hash is not None
+        review_hashes.append(review.review_hash)
         if finding.carrier_id != target_carrier_id:
             raise ValueError("finding carrier does not match target carrier")
         if finding.currency != currency:
@@ -269,6 +306,7 @@ def issue_authorization(
         "action_payload_hash": action_payload_hash,
         "finding_ids": list(normalized_ids),
         "finding_proof_hashes": proof_hashes,
+        "finding_review_hashes": review_hashes,
         "currency": currency,
         "authorized_cents": authorized_cents,
         "approver_role": approver_role,
@@ -294,6 +332,7 @@ def issue_authorization(
         action_payload_hash=action_payload_hash,
         finding_ids=normalized_ids,
         finding_proof_hashes=tuple(proof_hashes),
+        finding_review_hashes=tuple(review_hashes),
         currency=currency,
         authorized_cents=authorized_cents,
         approver_role=approver_role,
@@ -471,6 +510,7 @@ def render_markdown(auth: ExternalActionAuthorization) -> str:
             "## Exact scope",
             "",
             "- Finding IDs: " + ", ".join(auth.finding_ids),
+            "- Buyer review hashes: " + ", ".join(auth.finding_review_hashes),
             f"- Recipient/routing hash: `{auth.recipient_reference_hash}`",
             f"- Action payload hash: `{auth.action_payload_hash}`",
             "",
