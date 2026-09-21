@@ -56,7 +56,23 @@
       "replacement_days_low": null,
       "replacement_days_high": null,
       "duplicate_of": null,
-      "first_seen_in_registry": false
+      "first_seen_in_registry": false,
+      "repository_profile": {
+        "observed_at": "2026-09-21",
+        "metadata_status": "observed",
+        "primary_language": "Python",
+        "source_type": "unknown",
+        "package_ecosystems": [],
+        "protocol_families": [
+          "SECS/GEM",
+          "HSMS"
+        ],
+        "geography_tags": [],
+        "technology_domains": [
+          "industrial-automation"
+        ],
+        "profile_source": "Exact-revision source inspection and real HSMS/TCP fixture execution"
+      }
     }
   ],
   "best_result": "Closed secsgem's mock-transport gap: both corrected S2F15 cases passed over real HSMS/TCP with raw response correlation, independent logical-T3 classification, and unchanged pre/post state.",
