@@ -15,7 +15,7 @@ from freight.buyer_review_workflow import (
     BuyerReviewBatch,
     BuyerReviewDecisionInput,
     BuyerReviewState,
-    build_buyer_review_batch,
+    verify_buyer_review_batch,
 )
 from freight.contracts import IncumbentOutput, TruthManifest, VALIDATED, canonical_hash
 from freight.pilot_reporting import ReviewDisposition
@@ -113,33 +113,6 @@ def _verify_incumbent(truth: TruthManifest, incumbent: IncumbentOutput) -> None:
         raise ValueError("incumbent output references unknown finding: " + unknown[0])
 
 
-def _verify_buyer_review_batch(
-    *,
-    batch: BuyerReviewBatch,
-    review_packet: ReviewPacket,
-    review_routing: ReviewRouting,
-    truth: TruthManifest,
-) -> None:
-    decisions = tuple(
-        BuyerReviewDecisionInput(
-            case_hash=record.case_hash,
-            disposition=ReviewDisposition(record.disposition),
-            reviewer_minutes=record.reviewer_minutes,
-            reviewed_at=record.reviewed_at,
-        )
-        for record in batch.records
-    )
-    expected = build_buyer_review_batch(
-        review_packet=review_packet,
-        review_routing=review_routing,
-        truth=truth,
-        reviewer_role=batch.reviewer_role,
-        decisions=decisions,
-    )
-    if expected != batch:
-        raise ValueError("buyer review batch does not match current review proofs")
-
-
 def build_recovery_claim_batch(
     *,
     truth: TruthManifest,
@@ -149,7 +122,7 @@ def build_recovery_claim_batch(
     buyer_review: BuyerReviewBatch,
     issued_at: str,
 ) -> RecoveryClaimBatch:
-    _verify_buyer_review_batch(
+    verify_buyer_review_batch(
         batch=buyer_review,
         review_packet=review_packet,
         review_routing=review_routing,
