@@ -40,6 +40,7 @@ CONTROL_PATHS = (
     "freight/pilot_launch_gate.py",
     "freight/pilot_reporting.py",
     "freight/readiness.py",
+    "freight/review_packet.py",
     "freight/review_queue.py",
     "freight/rule_csv_adapter.py",
     "freight/release_attestation.py",

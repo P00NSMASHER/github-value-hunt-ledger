@@ -34,6 +34,7 @@ DOC_PATHS=(
     "freight/EXTERNAL_ACTION_AUTHORIZATION.md",
     "freight/FINDING_FACTORY.md",
     "freight/INGESTION_AND_REVIEW_QUEUE.md",
+    "freight/REVIEW_PACKET.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json",
     "freight/PILOT_DATA_ROOM.md",

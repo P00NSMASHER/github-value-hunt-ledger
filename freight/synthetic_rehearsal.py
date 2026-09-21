@@ -23,6 +23,7 @@ from freight.pilot_reporting import (
     ReviewDisposition,
     make_finding_review,
 )
+from freight.review_packet import build_review_packet, render_review_packet_markdown
 from freight.review_queue import build_review_queue
 from freight.rule_csv_adapter import parse_charge_rule_csv
 from freight.readiness import PilotReadinessInput, assess_readiness
@@ -142,6 +143,7 @@ def run_rehearsal() -> dict:
     rules = verified_rule_batch.rules + review_rule_batch.rules
     factory = derive_batch(population, charges, rules)
     review_queue = build_review_queue(factory)
+    review_packet = build_review_packet(factory, review_queue, charges, rules)
     truth = factory.truth
     by_charge = {
         derivation.charge_id: derivation.finding
@@ -270,6 +272,8 @@ def run_rehearsal() -> dict:
         "finding_factory_hash": factory.factory_hash,
         "finding_factory_decisions": [item.decision for item in factory.derivations],
         "review_queue_hash": review_queue.queue_hash,
+        "review_packet_hash": review_packet.packet_hash,
+        "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
                 "charge_id": item.charge_id,
