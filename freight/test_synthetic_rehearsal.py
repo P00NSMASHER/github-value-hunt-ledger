@@ -10,6 +10,12 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert out["deal_route"] == "BLIND_FREIGHT_AUDIT_ACCEPTANCE_TEST"
     assert out["pilot_gross_margin"] == 0.60
     assert out["incumbent_submission_hash"]
+    assert out["invoice_csv_adapter_hash"]
+    assert out["invoice_csv_file_sha256"]
+    assert out["review_queue_hash"]
+    assert [item["charge_id"] for item in out["review_queue"]] == ["charge-1", "charge-3"]
+    assert [item["priority_class"] for item in out["review_queue"]] == ["VALIDATED_MONEY", "REVIEW_MONEY"]
+    assert all(out["buyer_review_hashes"])
     assert out["metrics"]["reviewed_discrepancy_cents"] == 10000
     assert out["metrics"]["validated_finding_cents"] == 5000
     assert out["metrics"]["challenger_only_validated_cents"] == 2500
