@@ -37,7 +37,7 @@ Append-only shadow log. These findings are NOT authoritative MASTER promotions.
 - `src/revenue_leakage/engine.py` — `ae90eca24f1872bceb59e11562255eeca4df2e60`
 - `tests/test_rules.py` — `a0d30c91358a2e634611af0af495cbd61187a8bf`
 - `database/schema.sql` — `6e1cae258d6b6fb7e98d2e6a820d791e39898129`
-- `.github/workflows/ci.yml` — `1d833e165f186891eeaf5fecbf2056eb7be5c317`
+- `.github/workflows/ci.yml` — `1d833e165f186891eeaf5fecbf2056eb34690`
 - `results/synthetic_benchmark.json` — `3c5dabe1ddceebd634cd9949237d891dcff9baf5`
 - `README.md` — `c81c381a1155cfbc8bd4325822d8d4acca4216f7`
 - `LICENSE` — `b3d263aac194f2d123791598011223490c10cc2d` (MIT)
@@ -1037,3 +1037,74 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** No new cross-lane referral. The existing provider/system-of-record referral already asks for the single-path crash-safety + external-truth + terminality intersection; this run adds a local recovery-query discriminator rather than a new lane handoff.
 
 **NEXT TEST:** Find one real cash refund or payout where provider-side rediscovery by durable business identity is proven complete across the relevant retention horizon, then inject literal post-effect process death/new-process recovery and follow that same action to terminal processor balance/payout/bank evidence.
+
+## 2026-09-20 — Shadow run 15
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** The highest-leverage next component may be an outcome-verification layer rather than another payment state machine: if an external verifier binds each money action to an immutable/versioned completion contract, separates provider acknowledgement from actual completion, reads provider truth with independent credentials, and emits signed receipts, it can compress the evidence/qualification layer of a Payment Effect Crash Certification product even if literal process death and external bank settlement remain separate proof obligations.
+
+**DISCOVERY METHODS:**
+1. Direct money-domain repository search for Stripe refund/payout `SIGKILL`, restart, idempotency, balance transactions and terminal events.
+2. Code-signature search for `refund.paid`, `payout.paid`, lost-response/after-provider seams, provider readback and no-retry-after-ambiguous-effect patterns.
+3. External verification-infrastructure search for immutable completion contracts, read-only provider evidence, signed receipts, chaos/conformance cases and version-drift handling.
+4. Low-attention source/history archaeology on refund-retry implementations, specifically testing whether durable recovery state is born before or only after provider entry.
+
+**BEST NEW COMPONENT + CANONICAL IDENTITY:** **Provely Stripe integration / `stripe.refund.succeeded@1.0.0`** — https://provely.sh/verify/stripe — Stripe integration version `0.1.0`, provider API `2026-08-26`, signed manifest hash `0a25be438644e157`, conformance artifact digest `866e8fb637cff5a1`, last conformance run `2026-09-05T12:00:00Z`. This is a proprietary external service/integration package rather than a public source repository; no public Provely source repository was found in the GitHub search, so the exact signed package identity is used instead of inventing a Git commit revision.
+
+**IMPLEMENTED / PUBLISHED VERIFICATION CONTRACT:**
+- Provely's public protocol is `begin -> act -> action_result -> verify -> status/receipt`. `begin` returns a durable operation ID plus correlation/idempotency metadata; the agent performs the mutation; the provider acknowledgement is submitted separately; a verifier then reads evidence and issues a verdict. Public docs state that an operation outlives the agent session that opened it.
+- Completion contracts are immutable, versioned and hashable. They define the exact promise, subject identity, positive completion conditions, false-success blockers, evidence channels, timing/deadline semantics and supported provider versions. Unsupported versions return `UNVERIFIABLE` rather than inheriting semantics from a nearby version.
+- The Stripe package deliberately separates two claims. `stripe.refund.created@1.0.0` proves only that the Refund resource exists (`E2` provider readback); `stripe.refund.succeeded@1.0.0` requires the succeeded provider state plus a matching `refund.updated` provider event (`E2 + E3`). The integration explicitly says the lower completion level does not prove the higher one.
+- The verifier credential is separate from the agent's write credential and is intended to be read-only where the provider permits. This is a meaningful authority separation for money actions: the system deciding “done” does not need permission to issue another refund.
+- Receipts bind operation ID, contract ID/version/hash, integration/provider versions, evidence levels and observation digests. Public docs specify RFC-8785 canonical JSON plus Ed25519 signatures and an offline validator that checks schema, canonical hash, signature, trusted key and evidence claims. Cross-language validator fixtures are described for TypeScript, Python and Rust, including forged/tampered receipts that must be rejected.
+
+**CONFORMANCE / TEST EVIDENCE:**
+- The published Stripe manifest reports **30/32 conformance cases passed and 0 critical false VERIFIED** on 2026-09-05. The overall Stripe package is deliberately capped at **49 / Provisional** because an uncertainty remains open and two conformance cases failed; the `stripe.refund.succeeded` contract individually scores **89 / Verified** while `stripe.refund.created` remains 49 / Provisional.
+- The benchmark is directly relevant to this lane. Required chaos/false-completion rows include `timeout_after_commit` (must become VERIFIED after authoritative readback, never FAILED), `five_xx_after_execution` (must verify by readback, never blindly retry), duplicate side effect (CONTRADICTED), pre-existing matching state (must not verify), stale readback, wrong subject/amount and unsupported provider version.
+- The two failed Stripe case slots occur in precisely the danger classes this lane cares about: `error after execution` is 1/2 and `timeout after commit` is 1/2. That prevents a blanket “ambiguity solved” claim even though the succeeded contract itself is classified Verified.
+- The published false-completion benchmark uses an independent oracle with a provider simulator. It is useful qualification evidence, but it is not the same as a revision-bound real-Stripe literal-`SIGKILL` run.
+
+**EVIDENCE-TIER BOUNDARY / CRITICAL FALSIFICATION:**
+- Provely explicitly models `E0` agent assertion, `E1` action acknowledgement, `E2` provider readback, `E3` provider event, `E4` independent system, and `E5` external-world outcome such as bank/carrier/recipient acknowledgement.
+- The Stripe refund skill has **no E5 channel** and explicitly states that a bank credit/customer external outcome is **not proven**. Therefore `stripe.refund.succeeded` is strong provider-level terminality evidence, not tier-5C-B bank settlement.
+- No public evidence inspected here shows a literal OS process kill after a real Stripe refund effect followed by a new process recovering the same Provely operation. “Operation outlives the session” is useful durability semantics but cannot inherit Interlock's tier-5B process-kill proof.
+- The published conformance evidence and signed manifests are vendor-authored. They are stronger than ordinary marketing claims because they expose exact versions, hashes, cases, failed rows and signatures, but they were not independently rerun in this shadow pass.
+- The service/compiled integrations are proprietary. Provely's terms say Macleod Labs owns the service, software and compiled integrations; the published pricing FAQ says SDKs, contract format, receipt validator and generic verifier interface are always free, but “free” is not an open-source license. The terms also prohibit resale of the service without a written agreement. Do not extend the user's repository-code authorization to this independently owned service.
+
+**COMPARATORS / FALSIFIERS:**
+- `yea-80y/WoCo-Event-App@4c67646b0374ff442b6a7db2e448b728ff82ab73` is a useful low-attention source comparator (2 stars / 0 forks, MIT). Its pending-refund queue atomically persists/fsyncs exact refund parameters, lists Stripe refunds by payment intent + `metadata.sessionId` before retrying because Stripe idempotency retention is finite, and has focused disk-reload/no-second-create tests. But the durable pending row is created only inside the `createRefund` catch. A literal process death after Stripe commits but before the catch records the row can therefore leave **no durable recovery row at all**. This reinforces the pre-dispatch-identity/birth-gap rule rather than closing it. Its provider rediscovery is also bounded to `limit:100` without inspected pagination.
+- `alexlondoner/salown-docs@406e1cdb4d5cc5916561c2fd91fa94978072bfae` independently models money evidence as append-only provider-object entries plus a mutable generation-fenced refund snapshot. Its design distinguishes capture/refund balance transactions, payout membership, unknown refund fees and reversals, and explicitly treats provider status-transition tables as health checks rather than clocks. The artifact is principally a design/rollout contract and does not supply the missing literal post-effect crash + bank-settlement proof.
+- Prior `az-said/Interlock@822ec54692b30e1fdce04b55dfab62d0b56a60b2` remains stronger on actual real-Stripe tier-5B process-kill evidence; prior `karfalacisse900-alt/Flames-up.com@2ba5fa878da26f405bfae1846c8c90f1d0e69c10` remains stronger on provider-payout terminality. Provely adds the **claim/evidence-contract and signed-receipt layer**, not those missing fault/settlement facts.
+
+**SPECIALIST PASSES:**
+- **OUTCOME-CONTRACT INSPECTOR:** traced claim levels, evidence tiers, supported provider version, immutable contract semantics and the `created` versus `succeeded` boundary.
+- **CONFORMANCE / CHAOS ANALYST:** inspected the false-completion benchmark and exact Stripe 30/32 results, with special attention to post-execution error and timeout-after-commit rows.
+- **EVIDENCE / RECEIPT ANALYST:** inspected the signed receipt model, canonicalization/signature checks, evidence-level claims and session-independent operation lifecycle.
+- **COMMERCIAL / RIGHTS ANALYST:** checked current published pricing and terms, including the free developer allowance, self-run/hosted verification options, proprietary ownership and no-resale-without-agreement restriction.
+- **RED-TEAM / VERIFIER:** received the frozen claim/evidence packet without the proposed score and challenged source availability, independent reproduction, literal process-death proof, E5/bank evidence and service-rights boundaries.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The narrow claim is supported by exact, current public artifacts: Provely's Stripe integration `0.1.0` publishes immutable/versioned refund completion contracts, separates action acknowledgement from provider readback/events, emits signed evidence receipts, binds provider API version, and publishes a falsifiable conformance record with 30/32 passes and zero critical false VERIFIED. The verifier rejects stronger claims that Provely itself proves literal post-effect OS crash/new-process recovery against Stripe, that all post-commit ambiguity cases pass, that `stripe.refund.succeeded` proves bank/customer receipt, that the signed vendor artifacts were independently reproduced here, or that the proprietary implementation is reusable under the user's repository-code authorization. Tier-5C-B remains open.
+
+**A-F SCORE (proposed only, after verifier):** **26/30 — A5 / B5 / C5 / D4 / E4 / F3.**
+- A5: a verification retrofit can be piloted immediately; the Developer plan is published as free for 1,000 verified actions/month and the verifier can sit beside an existing mutation path rather than replace it.
+- B5: false completion, duplicate refund and ambiguous-money evidence are direct operational/financial risks, especially for agentic workflows.
+- C5: compresses completion-contract design, provider evidence readback, version drift, chaos conformance, signed receipts and audit surfaces that would otherwise take substantial engineering.
+- D4: the exact combination is unusual and highly aligned with this lane, but the general concepts are reproducible and the vendor already commercializes them.
+- E4: exact signed package identity, explicit conformance cases, failed rows, evidence hierarchy and receipt format are unusually transparent; score is capped because evidence is vendor-authored and no independent credentialed rerun/source audit was performed.
+- F3: hosted/self-run deployment and pricing are clear, but the implementation/compiled integrations are proprietary, there is no public source license to inherit, no default SLA, and service resale requires a written agreement.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments/billing engineering lead, AI-agent platform owner, marketplace finance systems team or Controller's automation owner.
+- Pain: existing systems often treat a provider 200/accepted response—or an agent saying “done”—as completion even when the action is still pending, later fails, duplicates, or cannot be causally tied to the intended money movement.
+- First paid wedge: **Money Outcome Verification Retrofit**. For one approved refund/correction workflow, define the exact completion promise and minimum evidence tier before execution, route the existing action through a durable operation/idempotency identity, read provider truth with separate read-only credentials, and return signed receipts that distinguish PENDING/VERIFIED/CONTRADICTED/FAILED/UNVERIFIABLE. Keep literal crash injection and E5 bank/recipient verification as separately priced higher-assurance tests. If Provely is used, have the customer contract with the service directly or obtain a written resale agreement; do not silently resell it.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Provely can supply a missing **evidence-contract / verifier / signed-receipt plane** around the stronger source/recovery assets already found. Interlock can exercise literal post-effect process death; SmallHeroes/Auths can supply durable ambiguity/fencing patterns; Flames-up can supply a provider-terminal payout pattern. Provely can encode what each component is actually allowed to claim and emit version-bound proof, but it cannot merge those separate facts into tier-5C-B. The combined product opportunity is a Payment Effect Crash Certification service whose evidence threshold is executable rather than prose-only.
+
+**SEARCH EFFORT / COST PROXIES:** Four materially different discovery modes; three serious candidate/comparator paths inspected; current provider-integration, benchmark, receipt, versioning, pricing/terms and repository-source evidence checked; no untrusted code execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Extend lane-local `SK-COM-003` with a **claim/evidence-contract check**. Before a high-risk action runs, bind the exact promise to an immutable/versioned contract that declares the minimum acceptable evidence level. A lower evidence tier must never be silently upgraded into a stronger promise: `E1` acknowledgement is not completion, `E2/E3` provider success is not `E5` external cash/recipient outcome, and unsupported provider/version semantics should become `UNVERIFIABLE` rather than guessed success. Signed receipts are valuable only when the contract hash, provider version and evidence levels are preserved together. This lesson is evidence-backed here and remains lane-local.
+
+**REFERRALS:** No new cross-lane referral. Existing COMMERCIAL↔AI effect-journal/outcome-verification referrals already ask how agent actions should be bound to authoritative evidence; adding Provely as another general agent-verification referral would duplicate the capability question. Record it locally as a commercially actionable component instead.
+
+**NEXT TEST:** Find or build the **E5 verifier** that Provely's Stripe skill explicitly lacks: bind the same durable refund/payout action identity across post-effect process death/new-process recovery, provider E2/E3 terminality, and an independently grounded processor/bank/recipient outcome, then emit one signed claim whose evidence contract prevents any lower tier from being described as external settlement.
