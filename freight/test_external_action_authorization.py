@@ -21,7 +21,7 @@ from freight.external_action_authorization import (
 )
 from freight.pilot_activation_packet import build_packet
 from freight.pilot_charter import build_charter, from_dict as charter_from_dict
-from freight.pilot_reporting import FindingReview, ReviewDisposition
+from freight.pilot_reporting import FindingReview, ReviewDisposition, make_finding_review
 
 
 def ready_input():
@@ -142,8 +142,16 @@ def proof():
     )
     truth = freeze_truth(population, (authority,), findings)
     reviews = (
-        FindingReview("F-1", ReviewDisposition.CONFIRMED, 5),
-        FindingReview("F-2", ReviewDisposition.CONFIRMED, 5),
+        make_finding_review(
+            findings[0], ReviewDisposition.CONFIRMED,
+            reviewer_role="Buyer Controller", reviewed_at="2026-09-21T09:00:00-04:00",
+            reviewer_minutes=5,
+        ),
+        make_finding_review(
+            findings[1], ReviewDisposition.CONFIRMED,
+            reviewer_role="Buyer Controller", reviewed_at="2026-09-21T09:05:00-04:00",
+            reviewer_minutes=5,
+        ),
     )
     return truth, reviews
 
@@ -177,6 +185,8 @@ def test_confirmed_validated_findings_can_be_narrowly_authorized():
     a = auth()
     assert a.authorized_cents == 3000
     assert a.finding_ids == ("F-1", "F-2")
+    assert len(a.finding_review_hashes) == 2
+    assert all(len(value) == 64 for value in a.finding_review_hashes)
     assert a.money_movement_authorized is False
     assert a.settlement_acceptance_authorized is False
     assert a.general_contact_authorized is False
@@ -217,7 +227,11 @@ def test_unconfirmed_review_cannot_be_authorized():
     c = charter()
     resolution = resolve_engagement(c)
     truth, _ = proof()
-    reviews = (FindingReview("F-1", ReviewDisposition.UNRESOLVED, 1),)
+    reviews = (make_finding_review(
+        truth.findings[0], ReviewDisposition.UNRESOLVED,
+        reviewer_role="Buyer Controller", reviewed_at="2026-09-21T09:00:00Z",
+        reviewer_minutes=1,
+    ),)
     with pytest.raises(ValueError, match="CONFIRMED"):
         issue_authorization(
             resolution=resolution,
@@ -357,3 +371,85 @@ def test_tampered_authorization_is_rejected():
     object.__setattr__(a, "authorized_cents", 999999)
     with pytest.raises(ValueError, match="authorization hash mismatch"):
         evaluate_authorization(a, as_of_date="2026-09-22")
+
+
+def test_unbound_confirmed_review_cannot_authorize_external_action():
+    c = charter()
+    resolution = resolve_engagement(c)
+    truth, _ = proof()
+    legacy_review = (FindingReview("F-1", ReviewDisposition.CONFIRMED, 1),)
+    with pytest.raises(ValueError, match="proof-bound"):
+        issue_authorization(
+            resolution=resolution,
+            operative_charter=c,
+            truth=truth,
+            reviews=legacy_review,
+            authorization_id="ACT-LEGACY",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1",),
+            currency="USD",
+            authorized_cents=1000,
+            approver_role="VP Supply Chain",
+            issued_on="2026-09-21",
+            expires_on="2026-09-22",
+        )
+
+
+def test_review_bound_to_old_finding_proof_cannot_authorize_changed_finding():
+    c = charter()
+    resolution = resolve_engagement(c)
+    truth, _ = proof()
+    old_finding = truth.findings[0]
+    stale_review = make_finding_review(
+        old_finding,
+        ReviewDisposition.CONFIRMED,
+        reviewer_role="Buyer Controller",
+        reviewed_at="2026-09-21T09:00:00Z",
+        reviewer_minutes=2,
+    )
+    changed = make_finding(
+        finding_id=old_finding.finding_id,
+        buyer_id=old_finding.buyer_id,
+        business_unit=old_finding.business_unit,
+        invoice_id=old_finding.invoice_id,
+        shipment_id=old_finding.shipment_id,
+        customer_id=old_finding.customer_id,
+        carrier_id=old_finding.carrier_id,
+        currency=old_finding.currency,
+        authority_id=old_finding.authority_id,
+        expected_cents=old_finding.expected_cents,
+        actual_cents=13000,
+        status=old_finding.status,
+    )
+    changed_truth = freeze_truth(
+        freeze_population(
+            "buyer-a", "bu-1", "August approved invoices",
+            (
+                PopulationRow("INV-1", "SHIP-1", "CUST-1", "carrier-1", "USD", "1" * 64),
+                PopulationRow("INV-2", "SHIP-2", "CUST-1", "carrier-1", "USD", "2" * 64),
+            ),
+        ),
+        truth.authorities,
+        (changed, truth.findings[1]),
+    )
+    with pytest.raises(ValueError, match="review proof hash"):
+        issue_authorization(
+            resolution=resolution,
+            operative_charter=c,
+            truth=changed_truth,
+            reviews=(stale_review,),
+            authorization_id="ACT-STALE",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1",),
+            currency="USD",
+            authorized_cents=1000,
+            approver_role="VP Supply Chain",
+            issued_on="2026-09-21",
+            expires_on="2026-09-22",
+        )

@@ -79,3 +79,10 @@ type, carrier, recipient-routing hash, payload hash, finding set, currency and
 requested amount.
 
 Any mismatch, expiry or revocation fails closed.
+
+
+## Proof-bound buyer reviews
+
+A CONFIRMED finding used for an external action must now carry a review proof bound to the exact `finding_proof_hash`, reviewer role, review timestamp and reviewer effort. The authorization stores the resulting review hashes alongside the finding proof hashes.
+
+Legacy unbound review rows can still be used for descriptive pilot reporting, but they cannot authorize a carrier-facing action. If the finding changes, the prior review no longer matches and a new review is required.

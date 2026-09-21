@@ -18,6 +18,7 @@ from freight.pilot_reporting import (
     FindingReview,
     ReviewDisposition,
     build_pilot_metrics,
+    make_finding_review,
     render_markdown,
 )
 
@@ -238,3 +239,37 @@ def test_review_only_false_positive_preserves_the_flagged_amount():
 def test_untyped_review_disposition_cannot_be_silently_ignored():
     with pytest.raises(ValueError, match="ReviewDisposition"):
         FindingReview("f0", "FALSE_POSITIVE", 3)
+
+
+def test_bound_review_rejects_stale_finding_proof_in_reporting():
+    truth, incumbent, ledger = setup_case()
+    review = make_finding_review(
+        truth.findings[0],
+        ReviewDisposition.CONFIRMED,
+        reviewer_role="Buyer Controller",
+        reviewed_at="2026-09-21T12:00:00Z",
+        reviewer_minutes=4,
+    )
+    object.__setattr__(review, "finding_proof_hash", "0" * 64)
+    with pytest.raises(ValueError, match="proof hash"):
+        build_pilot_metrics(truth, incumbent, ledger, (review,))
+
+
+def test_bound_review_normalizes_timestamp_and_has_deterministic_hash():
+    truth, _, _ = setup_case()
+    a = make_finding_review(
+        truth.findings[0],
+        ReviewDisposition.CONFIRMED,
+        reviewer_role=" Buyer Controller ",
+        reviewed_at="2026-09-21T08:00:00-04:00",
+        reviewer_minutes=4,
+    )
+    b = make_finding_review(
+        truth.findings[0],
+        ReviewDisposition.CONFIRMED,
+        reviewer_role="Buyer Controller",
+        reviewed_at="2026-09-21T12:00:00Z",
+        reviewer_minutes=4,
+    )
+    assert a.reviewed_at == "2026-09-21T12:00:00.000000Z"
+    assert a.review_hash == b.review_hash
