@@ -295,7 +295,7 @@ def build_recovery_claim_batch(
 
 
 
-def _verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
+def verify_recovery_claim_batch(batch: RecoveryClaimBatch) -> None:
     if not isinstance(batch, RecoveryClaimBatch):
         raise ValueError("batch must be a RecoveryClaimBatch")
     if not (
@@ -386,7 +386,7 @@ def persist_recovery_claim_batch(
     store: SettlementStore,
     batch: RecoveryClaimBatch,
 ) -> RecoveryClaimPersistenceReceipt:
-    _verify_recovery_claim_batch(batch)
+    verify_recovery_claim_batch(batch)
     if (store.buyer_id, store.business_unit) != (
         batch.buyer_id,
         batch.business_unit,
