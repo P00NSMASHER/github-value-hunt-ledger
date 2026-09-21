@@ -89,6 +89,7 @@ class TruthManifest:
     buyer_id: str
     business_unit: str
     population_hash: str
+    authorities: tuple[AuthorityRef, ...]
     findings: tuple[Finding, ...]
     truth_hash: str
 
@@ -308,10 +309,11 @@ def freeze_truth(
         )
         authority_index[authority.authority_id] = authority
 
+    normalized_authorities = tuple(
+        sorted(authority_index.values(), key=lambda authority: authority.authority_id)
+    )
     row_index = {row.row_key: row for row in population.rows}
     normalized = tuple(sorted(findings, key=lambda finding: finding.finding_id))
-    if not normalized:
-        raise ValueError("truth manifest must contain findings")
 
     seen_ids: set[str] = set()
     for finding in normalized:
@@ -364,16 +366,18 @@ def freeze_truth(
             )
 
     body = {
-        "schema": 2,
+        "schema": 3,
         "buyer_id": population.buyer_id,
         "business_unit": population.business_unit,
         "population_hash": population.manifest_hash,
+        "authorities": [asdict(authority) for authority in normalized_authorities],
         "findings": [asdict(finding) for finding in normalized],
     }
     return TruthManifest(
         buyer_id=population.buyer_id,
         business_unit=population.business_unit,
         population_hash=population.manifest_hash,
+        authorities=normalized_authorities,
         findings=normalized,
         truth_hash=canonical_hash(body),
     )

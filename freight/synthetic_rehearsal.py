@@ -11,15 +11,16 @@ from dataclasses import asdict
 from pathlib import Path
 
 from freight.contracts import (
-    AuthorityRef,
     PopulationRow,
-    REVIEW,
-    VALIDATED,
     freeze_population,
-    freeze_truth,
-    make_finding,
     open_incumbent_output,
     seal_incumbent_submission,
+)
+from freight.finding_factory import (
+    FIXED,
+    ChargeRule,
+    InvoiceCharge,
+    derive_batch,
 )
 from freight.deal_economics import DealProfile, qualify_deal
 from freight.pilot_reporting import (
@@ -93,49 +94,48 @@ def run_rehearsal() -> dict:
             PopulationRow("inv-3","shp-3","cust","carrier","USD","src-inv-3"),
         ),
     )
-    authority = AuthorityRef(
-        "auth-1",BUYER,BU,"cust","carrier","USD","src-auth-1"
+    charges = (
+        InvoiceCharge(BUYER,BU,"inv-1","shp-1","cust","carrier","USD",
+                      "charge-1","DETENTION","2026-09-15",1,12500,"src-line-1"),
+        InvoiceCharge(BUYER,BU,"inv-2","shp-2","cust","carrier","USD",
+                      "charge-2","ACCESSORIAL","2026-09-15",1,12500,"src-line-2"),
+        InvoiceCharge(BUYER,BU,"inv-3","shp-3","cust","carrier","USD",
+                      "charge-3","MISC","2026-09-15",1,15000,"src-line-3"),
     )
-    truth = freeze_truth(
-        population,
-        (authority,),
-        (
-            make_finding(
-                finding_id="f-1", buyer_id=BUYER, business_unit=BU,
-                invoice_id="inv-1", shipment_id="shp-1", customer_id="cust",
-                carrier_id="carrier", currency="USD", authority_id="auth-1",
-                expected_cents=10000, actual_cents=12500, status=VALIDATED,
-            ),
-            make_finding(
-                finding_id="f-2", buyer_id=BUYER, business_unit=BU,
-                invoice_id="inv-2", shipment_id="shp-2", customer_id="cust",
-                carrier_id="carrier", currency="USD", authority_id="auth-1",
-                expected_cents=10000, actual_cents=12500, status=VALIDATED,
-            ),
-            make_finding(
-                finding_id="f-3", buyer_id=BUYER, business_unit=BU,
-                invoice_id="inv-3", shipment_id="shp-3", customer_id="cust",
-                carrier_id="carrier", currency="USD", authority_id=None,
-                expected_cents=10000, actual_cents=15000, status=REVIEW,
-            ),
-        ),
+    rules = (
+        ChargeRule(BUYER,BU,"cust","carrier","USD","rate-confirmation",
+                   "DETENTION",FIXED,"2026-09-01","2026-09-30","src-auth-1",True,10000,None),
+        ChargeRule(BUYER,BU,"cust","carrier","USD","rate-confirmation",
+                   "ACCESSORIAL",FIXED,"2026-09-01","2026-09-30","src-auth-1",True,10000,None),
+        ChargeRule(BUYER,BU,"cust","carrier","USD","candidate-addendum",
+                   "MISC",FIXED,"2026-09-01","2026-09-30","src-auth-review",False,10000,None),
     )
+    factory = derive_batch(population, charges, rules)
+    truth = factory.truth
+    by_charge = {
+        derivation.charge_id: derivation.finding
+        for derivation in factory.derivations
+        if derivation.finding is not None
+    }
+    f1, f2, f3 = by_charge["charge-1"], by_charge["charge-2"], by_charge["charge-3"]
     sealed = seal_incumbent_submission(population, "synthetic-incumbent-source-hash")
     incumbent = open_incumbent_output(
         population=population,
         truth=truth,
         submission=sealed,
-        finding_ids=("f-2",),
+        finding_ids=(f2.finding_id,),
     )
 
     reviews = (
-        FindingReview("f-1",ReviewDisposition.CONFIRMED,20),
-        FindingReview("f-2",ReviewDisposition.CONFIRMED,10),
-        FindingReview("f-3",ReviewDisposition.UNRESOLVED,5),
+        FindingReview(f1.finding_id,ReviewDisposition.CONFIRMED,20),
+        FindingReview(f2.finding_id,ReviewDisposition.CONFIRMED,10),
+        FindingReview(f3.finding_id,ReviewDisposition.UNRESOLVED,5),
     )
     findings = {finding.finding_id: finding for finding in truth.findings}
-    bindings = tuple(ClaimFindingBinding(finding_id, finding_id, findings[finding_id].proof_hash)
-                     for finding_id in ("f-1", "f-2"))
+    bindings = tuple(
+        ClaimFindingBinding(item.finding_id, item.finding_id, item.proof_hash)
+        for item in (f1, f2)
+    )
 
     with tempfile.TemporaryDirectory() as td:
         store = SettlementStore(
@@ -145,14 +145,14 @@ def run_rehearsal() -> dict:
         )
         store.create_claim(
             RecoveryClaim(
-                "f-1","inv-1","carrier","cust","USD",2500,
-                "2026-09-20T10:00:00Z",findings["f-1"].proof_hash,False,
+                f1.finding_id,"inv-1","carrier","cust","USD",2500,
+                "2026-09-20T10:00:00Z",f1.proof_hash,False,
             )
         )
         store.create_claim(
             RecoveryClaim(
-                "f-2","inv-2","carrier","cust","USD",2500,
-                "2026-09-20T10:00:00Z",findings["f-2"].proof_hash,True,
+                f2.finding_id,"inv-2","carrier","cust","USD",2500,
+                "2026-09-20T10:00:00Z",f2.proof_hash,True,
             )
         )
         store.ingest_event(
@@ -162,7 +162,7 @@ def run_rehearsal() -> dict:
             )
         )
         store.review_allocate(
-            allocation_id="a-1", claim_id="f-1", event_id="e-1",
+            allocation_id="a-1", claim_id=f1.finding_id, event_id="e-1",
             amount_cents=2000, created_at="2026-09-21T11:00:00Z",
         )
         store.ingest_event(
@@ -217,6 +217,8 @@ def run_rehearsal() -> dict:
         "population_hash": population.manifest_hash,
         "incumbent_submission_hash": sealed.sealed_hash,
         "truth_hash": truth.truth_hash,
+        "finding_factory_hash": factory.factory_hash,
+        "finding_factory_decisions": [item.decision for item in factory.derivations],
         "incumbent_output_hash": incumbent.output_hash,
         "metrics": asdict(metrics),
         "persistent_store": {
