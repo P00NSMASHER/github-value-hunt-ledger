@@ -50,6 +50,18 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 |---|---|---|---|---|---|
 | freight | EXP-001 | no | none | CAP-003, CAP-004, CAP-005 | CAP-001, CAP-006, CAP-007, CAP-016 |
 
+
+## Recall floor
+
+The benchmark currently shows a precision/verification benefit in several experimental runs but no aggregate discovery advantage and two experiment-side no-find misses. Until harder held-out evidence says otherwise, preserve a within-run recall floor for live search:
+- do not let one attractive near-match consume the entire search budget;
+- before NO_FIND, use one materially different recall-rescue surface when practical;
+- treat verifier rejection as candidate-specific, not task-wide absence evidence;
+- keep novelty/wildcard exploration alive even when a high-confidence strategy has strong local results;
+- use no-find, duplicate, retrieval-limit and verifier-overturn outcomes as negative training signals for allocation.
+
+This is a guardrail, not a new benchmark treatment and not evidence that any strategy is superior.
+
 ## Allocation guardrails
 
 - Never interpret a high allocation as proof that a strategy is better; early allocation includes uncertainty-driven exploration.
