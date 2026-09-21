@@ -27,6 +27,10 @@ from freight.recovery_claim_workflow import (
     persist_recovery_claim_batch,
 )
 from freight.review_packet import render_review_packet_markdown
+from freight.reviewed_settlement_allocation import (
+    build_reviewed_settlement_allocation_decision,
+    persist_reviewed_settlement_allocation,
+)
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_csv_adapter import (
     parse_counter_event_csv,
@@ -238,9 +242,19 @@ def run_rehearsal() -> dict:
         )
         claim_persistence = persist_recovery_claim_batch(store, recovery_claims)
         store.ingest_event(settlement_by_id["e-1"])
-        store.review_allocate(
-            allocation_id="a-1", claim_id=claim_id_by_finding[f1.finding_id], event_id="e-1",
-            amount_cents=2000, created_at="2026-09-21T11:00:00Z",
+        reviewed_allocation = build_reviewed_settlement_allocation_decision(
+            store=store,
+            claim_batch=recovery_claims,
+            claim_id=claim_id_by_finding[f1.finding_id],
+            event_id="e-1",
+            amount_cents=2000,
+            reviewer_role="Settlement Analyst",
+            reviewed_at="2026-09-21T11:00:00Z",
+            reason="Partial carrier credit matched to the reviewed invoice evidence.",
+        )
+        reviewed_allocation_receipt = persist_reviewed_settlement_allocation(
+            store,
+            reviewed_allocation,
         )
         store.ingest_event(settlement_by_id["e-2"])
         status = store.auto_allocate(
@@ -327,6 +341,9 @@ def run_rehearsal() -> dict:
         "counter_csv_adapter_hash": counter_batch.adapter_hash,
         "counter_csv_file_sha256": counter_batch.file_sha256,
         "counter_event_count": len(counter_batch.events),
+        "reviewed_settlement_allocation_decision_hash": reviewed_allocation.decision_hash,
+        "reviewed_settlement_allocation_receipt_hash": reviewed_allocation_receipt.receipt_hash,
+        "reviewed_settlement_allocation_status": reviewed_allocation_receipt.status,
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
