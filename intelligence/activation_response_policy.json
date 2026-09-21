@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "global_min_resolved_primary_activations": 20,
+  "worker_min_resolved_primary_activations": 4,
+  "worker_min_claimed_primary_activations": 2,
+  "median_latency_min_claims": 2,
+  "poor_claim_rate_threshold": 0.5,
+  "slow_claim_latency_minutes": 20,
+  "max_negative_routing_adjustment": 1,
+  "positive_routing_adjustment": 0,
+  "pending_activation_counts_against_worker": false,
+  "ready_without_activation_counts_against_worker": false,
+  "work_steal_influences_primary_routing": false,
+  "completion_latency_influences_routing": false,
+  "guardrails": [
+    "Only activation-to-claim behavior may affect routing responsiveness.",
+    "READY-to-activation latency is system latency and never penalizes the worker.",
+    "UNKNOWN, stale, paused, offline, or merely unactivated presence never creates negative worker evidence.",
+    "Pending unexpired activations never count as failures.",
+    "Work-steal activations are measured separately and never train primary-routing responsiveness.",
+    "Claim-to-start and start-to-complete latency are descriptive only because task difficulty and execution complexity are confounded.",
+    "Automatic responsiveness adjustment is penalty-only, bounded, and remains zero until global and per-worker evidence thresholds are met.",
+    "This is capacity-response evidence, not a causal worker-quality ranking."
+  ]
+}
