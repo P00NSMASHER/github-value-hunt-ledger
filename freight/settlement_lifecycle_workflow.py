@@ -430,3 +430,159 @@ def process_settlement_evidence(
         state_hash=state_hash,
         execution_hash=canonical_hash(execution_body),
     )
+
+
+
+def verify_settlement_lifecycle_result(result: SettlementLifecycleResult) -> None:
+    if not isinstance(result, SettlementLifecycleResult):
+        raise ValueError("result must be a SettlementLifecycleResult")
+
+    if not isinstance(result.buyer_id, str) or not result.buyer_id.strip():
+        raise ValueError("lifecycle buyer_id is required")
+    if not isinstance(result.business_unit, str) or not result.business_unit.strip():
+        raise ValueError("lifecycle business_unit is required")
+    if _timestamp(result.processed_at) != result.processed_at:
+        raise ValueError("lifecycle processed_at is not canonical UTC")
+
+    settlement_case_index = {
+        case.case_hash: case for case in result.settlement_review_cases
+    }
+    if len(settlement_case_index) != len(result.settlement_review_cases):
+        raise ValueError("duplicate settlement review case hash")
+    counter_case_index = {
+        case.case_hash: case for case in result.counter_review_cases
+    }
+    if len(counter_case_index) != len(result.counter_review_cases):
+        raise ValueError("duplicate counter review case hash")
+
+    seen_events: set[str] = set()
+    settlement_review_hashes: list[str] = []
+    for item in result.settlement_events:
+        if item.event_id in seen_events:
+            raise ValueError("duplicate settlement lifecycle event_id")
+        seen_events.add(item.event_id)
+        if item.ingest_status not in (INGESTED, ALREADY_PRESENT):
+            raise ValueError("invalid settlement ingest status")
+        if item.effective_status not in (ALLOCATED, REVIEW):
+            raise ValueError("invalid settlement effective status")
+        if _effective_allocation(item.decision_status) != item.effective_status:
+            raise ValueError("settlement decision/effective status mismatch")
+        if item.effective_status == REVIEW:
+            if not item.review_case_hash:
+                raise ValueError("settlement REVIEW outcome is missing review case")
+            case = settlement_case_index.get(item.review_case_hash)
+            if case is None or case.event_id != item.event_id:
+                raise ValueError("settlement review case does not match event")
+            settlement_review_hashes.append(item.review_case_hash)
+        elif item.review_case_hash is not None:
+            raise ValueError("terminal settlement outcome cannot carry review case")
+
+    if tuple(settlement_review_hashes) != tuple(
+        case.case_hash for case in result.settlement_review_cases
+    ):
+        raise ValueError("settlement review case ordering/membership mismatch")
+
+    seen_counters: set[str] = set()
+    counter_review_hashes: list[str] = []
+    for item in result.counter_events:
+        if item.counter_id in seen_counters:
+            raise ValueError("duplicate settlement lifecycle counter_id")
+        seen_counters.add(item.counter_id)
+        if item.ingest_status not in (INGESTED, ALREADY_PRESENT):
+            raise ValueError("invalid counter ingest status")
+        if item.effective_status not in (REVERSED, REVIEW):
+            raise ValueError("invalid counter effective status")
+        if _effective_reversal(item.decision_status) != item.effective_status:
+            raise ValueError("counter decision/effective status mismatch")
+        if item.effective_status == REVIEW:
+            if not item.review_case_hash:
+                raise ValueError("counter REVIEW outcome is missing review case")
+            case = counter_case_index.get(item.review_case_hash)
+            if case is None or case.counter_id != item.counter_id:
+                raise ValueError("counter review case does not match counter event")
+            counter_review_hashes.append(item.review_case_hash)
+        elif item.review_case_hash is not None:
+            raise ValueError("terminal counter outcome cannot carry review case")
+
+    if tuple(counter_review_hashes) != tuple(
+        case.case_hash for case in result.counter_review_cases
+    ):
+        raise ValueError("counter review case ordering/membership mismatch")
+
+    expected_review_count = (
+        len(result.settlement_review_cases) + len(result.counter_review_cases)
+    )
+    if result.review_case_count != expected_review_count:
+        raise ValueError("settlement lifecycle review-case count mismatch")
+    expected_state = REVIEW_REQUIRED if expected_review_count else COMPLETE
+    if result.state != expected_state:
+        raise ValueError("settlement lifecycle state mismatch")
+
+    for name, value in (
+        ("store_snapshot_before_hash", result.store_snapshot_before_hash),
+        ("store_snapshot_after_hash", result.store_snapshot_after_hash),
+        ("state_hash", result.state_hash),
+        ("execution_hash", result.execution_hash),
+    ):
+        if not isinstance(value, str) or len(value) != 64:
+            raise ValueError(name + " must be SHA-256")
+
+    if (result.settlement_adapter_hash is None) != (
+        result.settlement_file_sha256 is None
+    ):
+        raise ValueError("settlement adapter/file provenance must be paired")
+    if (result.counter_adapter_hash is None) != (
+        result.counter_file_sha256 is None
+    ):
+        raise ValueError("counter adapter/file provenance must be paired")
+    if result.settlement_adapter_hash is None and result.counter_adapter_hash is None:
+        raise ValueError("lifecycle result has no input provenance")
+
+    stable_body = {
+        "schema": 1,
+        "buyer_id": result.buyer_id,
+        "business_unit": result.business_unit,
+        "settlement_adapter_hash": result.settlement_adapter_hash,
+        "counter_adapter_hash": result.counter_adapter_hash,
+        "settlement_outcomes": [
+            {
+                "event_id": item.event_id,
+                "effective_status": item.effective_status,
+                "edge_ids": item.edge_ids,
+                "reason": item.reason if item.effective_status == REVIEW else "",
+                "review_case_hash": item.review_case_hash,
+            }
+            for item in result.settlement_events
+        ],
+        "counter_outcomes": [
+            {
+                "counter_id": item.counter_id,
+                "effective_status": item.effective_status,
+                "edge_ids": item.edge_ids,
+                "reason": item.reason if item.effective_status == REVIEW else "",
+                "review_case_hash": item.review_case_hash,
+            }
+            for item in result.counter_events
+        ],
+        "settlement_review_case_hashes": [
+            item.case_hash for item in result.settlement_review_cases
+        ],
+        "counter_review_case_hashes": [
+            item.case_hash for item in result.counter_review_cases
+        ],
+        "store_snapshot_after_hash": result.store_snapshot_after_hash,
+    }
+    if canonical_hash(stable_body) != result.state_hash:
+        raise ValueError("settlement lifecycle state hash mismatch")
+
+    execution_body = {
+        "schema": 1,
+        "state_hash": result.state_hash,
+        "processed_at": result.processed_at,
+        "store_snapshot_before_hash": result.store_snapshot_before_hash,
+        "store_snapshot_after_hash": result.store_snapshot_after_hash,
+        "settlement_events": [asdict(item) for item in result.settlement_events],
+        "counter_events": [asdict(item) for item in result.counter_events],
+    }
+    if canonical_hash(execution_body) != result.execution_hash:
+        raise ValueError("settlement lifecycle execution hash mismatch")
