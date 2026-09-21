@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V16 Worker Presence Event",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "timestamp",
+    "worker_id"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "pattern": "^PRESENCE:[a-f0-9]{12}$"
+    },
+    "event_type": {
+      "enum": [
+        "READY",
+        "HEARTBEAT",
+        "BUSY",
+        "PAUSE",
+        "OFFLINE"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "worker_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{2,64}$"
+    },
+    "ttl_minutes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
