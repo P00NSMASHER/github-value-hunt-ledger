@@ -135,6 +135,7 @@ class CarrierActionDeliveryReceipt:
     delivered_at: str
     channel: str
     submission_external_reference_hash: str
+    submission_evidence_source_hash: str
     delivery_reference_hash: str
     delivery_evidence_source_hash: str
     verifier_role: str
@@ -152,6 +153,56 @@ def _text(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(name + " is required")
     return value.strip()
+
+
+def _positive_cents(name: str, value: int) -> int:
+    if type(value) is not int or not 0 < value <= 2**63 - 1:
+        raise ValueError(name + " must be positive integer cents")
+    return value
+
+
+def _finding_ids(value: tuple[str, ...]) -> tuple[str, ...]:
+    if not isinstance(value, tuple) or not value:
+        raise ValueError("finding_ids must be a non-empty tuple")
+    normalized = tuple(_text("finding_id", finding_id) for finding_id in value)
+    if normalized != tuple(sorted(normalized)):
+        raise ValueError("finding_ids must be sorted")
+    if len(normalized) != len(set(normalized)):
+        raise ValueError("finding_ids must be unique")
+    return normalized
+
+
+def _execution_key_from_fields(
+    *,
+    buyer_id: str,
+    business_unit: str,
+    authorization_hash: str,
+    proposal_hash: str,
+    payload_hash: str,
+    recipient_reference_hash: str,
+    action_type: str,
+    target_carrier_id: str,
+    target_customer_id: str,
+    currency: str,
+    finding_ids: tuple[str, ...],
+    requested_cents: int,
+) -> str:
+    body = {
+        "schema": 1,
+        "buyer_id": buyer_id,
+        "business_unit": business_unit,
+        "authorization_hash": authorization_hash,
+        "proposal_hash": proposal_hash,
+        "payload_hash": payload_hash,
+        "recipient_reference_hash": recipient_reference_hash,
+        "action_type": action_type,
+        "target_carrier_id": target_carrier_id,
+        "target_customer_id": target_customer_id,
+        "currency": currency,
+        "finding_ids": finding_ids,
+        "requested_cents": requested_cents,
+    }
+    return canonical_hash(body)
 
 
 def _timestamp(name: str, value: str) -> tuple[str, datetime]:
@@ -236,22 +287,20 @@ def build_carrier_action_execution_intent(
         revocations=revocations,
     )
 
-    execution_key_body = {
-        "schema": 1,
-        "buyer_id": authorization.buyer_id,
-        "business_unit": authorization.business_unit,
-        "authorization_hash": authorization.authorization_hash,
-        "proposal_hash": proposal.proposal_hash,
-        "payload_hash": payload.payload_hash,
-        "recipient_reference_hash": authorization.recipient_reference_hash,
-        "action_type": payload.action_type,
-        "target_carrier_id": payload.target_carrier_id,
-        "target_customer_id": payload.target_customer_id,
-        "currency": payload.currency,
-        "finding_ids": tuple(sorted(proposal.finding_ids)),
-        "requested_cents": payload.requested_cents,
-    }
-    execution_key = canonical_hash(execution_key_body)
+    execution_key = _execution_key_from_fields(
+        buyer_id=authorization.buyer_id,
+        business_unit=authorization.business_unit,
+        authorization_hash=authorization.authorization_hash,
+        proposal_hash=proposal.proposal_hash,
+        payload_hash=payload.payload_hash,
+        recipient_reference_hash=authorization.recipient_reference_hash,
+        action_type=payload.action_type,
+        target_carrier_id=payload.target_carrier_id,
+        target_customer_id=payload.target_customer_id,
+        currency=payload.currency,
+        finding_ids=tuple(sorted(proposal.finding_ids)),
+        requested_cents=payload.requested_cents,
+    )
     body = {
         "schema": 1,
         "execution_key": execution_key,
@@ -462,8 +511,40 @@ def verify_carrier_action_execution_receipt(
     _text("target_customer_id", receipt.target_customer_id)
     _text("currency", receipt.currency)
     _text("executor_role", receipt.executor_role)
-    _timestamp("prepared_at", receipt.prepared_at)
-    _timestamp("executed_at", receipt.executed_at)
+    try:
+        ActionType(receipt.action_type)
+    except ValueError as exc:
+        raise ValueError("invalid execution receipt action type") from exc
+    requested_cents = _positive_cents("requested_cents", receipt.requested_cents)
+    finding_ids = _finding_ids(receipt.finding_ids)
+    canonical_prepared_at, prepared_dt = _timestamp("prepared_at", receipt.prepared_at)
+    canonical_executed_at, executed_dt = _timestamp("executed_at", receipt.executed_at)
+    if canonical_prepared_at != receipt.prepared_at or canonical_executed_at != receipt.executed_at:
+        raise ValueError("execution receipt timestamps must be canonical UTC")
+    if executed_dt < prepared_dt:
+        raise ValueError("execution receipt predates preparation")
+    expected_execution_key = _execution_key_from_fields(
+        buyer_id=receipt.buyer_id,
+        business_unit=receipt.business_unit,
+        authorization_hash=receipt.authorization_hash,
+        proposal_hash=receipt.proposal_hash,
+        payload_hash=receipt.payload_hash,
+        recipient_reference_hash=receipt.recipient_reference_hash,
+        action_type=receipt.action_type,
+        target_carrier_id=receipt.target_carrier_id,
+        target_customer_id=receipt.target_customer_id,
+        currency=receipt.currency,
+        finding_ids=finding_ids,
+        requested_cents=requested_cents,
+    )
+    if receipt.execution_key != expected_execution_key:
+        raise ValueError("execution receipt idempotency key mismatch")
+    if receipt.evidence_source_hash in {
+        receipt.authorization_hash,
+        receipt.payload_hash,
+        receipt.proposal_hash,
+    }:
+        raise ValueError("execution receipt evidence source is not external")
     try:
         outcome = ExecutionOutcome(receipt.outcome)
     except ValueError as exc:
@@ -550,6 +631,7 @@ def record_carrier_action_delivery_confirmation(
         "delivered_at": canonical_delivered_at,
         "channel": submitted_receipt.channel,
         "submission_external_reference_hash": submitted_receipt.external_reference_hash,
+        "submission_evidence_source_hash": submitted_receipt.evidence_source_hash,
         "delivery_reference_hash": delivery_reference_hash,
         "delivery_evidence_source_hash": delivery_evidence_source_hash,
         "verifier_role": verifier_role,
@@ -574,6 +656,7 @@ def record_carrier_action_delivery_confirmation(
         delivered_at=canonical_delivered_at,
         channel=submitted_receipt.channel,
         submission_external_reference_hash=submitted_receipt.external_reference_hash,
+        submission_evidence_source_hash=submitted_receipt.evidence_source_hash,
         delivery_reference_hash=delivery_reference_hash,
         delivery_evidence_source_hash=delivery_evidence_source_hash,
         verifier_role=verifier_role,
@@ -595,6 +678,7 @@ def verify_carrier_action_delivery_receipt(
         "payload_hash",
         "recipient_reference_hash",
         "submission_external_reference_hash",
+        "submission_evidence_source_hash",
         "delivery_reference_hash",
         "delivery_evidence_source_hash",
         "delivery_receipt_hash",
@@ -603,18 +687,52 @@ def verify_carrier_action_delivery_receipt(
     for name in (
         "buyer_id",
         "business_unit",
-        "action_type",
         "target_carrier_id",
         "target_customer_id",
         "currency",
-        "channel",
         "verifier_role",
     ):
         _text(name, getattr(receipt, name))
-    _, submitted_dt = _timestamp("submitted_at", receipt.submitted_at)
-    _, delivered_dt = _timestamp("delivered_at", receipt.delivered_at)
+    try:
+        ActionType(receipt.action_type)
+    except ValueError as exc:
+        raise ValueError("invalid delivery receipt action type") from exc
+    try:
+        ExecutionChannel(receipt.channel)
+    except ValueError as exc:
+        raise ValueError("invalid delivery receipt channel") from exc
+    requested_cents = _positive_cents("requested_cents", receipt.requested_cents)
+    finding_ids = _finding_ids(receipt.finding_ids)
+    canonical_submitted_at, submitted_dt = _timestamp("submitted_at", receipt.submitted_at)
+    canonical_delivered_at, delivered_dt = _timestamp("delivered_at", receipt.delivered_at)
+    if canonical_submitted_at != receipt.submitted_at or canonical_delivered_at != receipt.delivered_at:
+        raise ValueError("delivery receipt timestamps must be canonical UTC")
     if delivered_dt < submitted_dt:
         raise ValueError("delivery receipt predates submission")
+    expected_execution_key = _execution_key_from_fields(
+        buyer_id=receipt.buyer_id,
+        business_unit=receipt.business_unit,
+        authorization_hash=receipt.authorization_hash,
+        proposal_hash=receipt.proposal_hash,
+        payload_hash=receipt.payload_hash,
+        recipient_reference_hash=receipt.recipient_reference_hash,
+        action_type=receipt.action_type,
+        target_carrier_id=receipt.target_carrier_id,
+        target_customer_id=receipt.target_customer_id,
+        currency=receipt.currency,
+        finding_ids=finding_ids,
+        requested_cents=requested_cents,
+    )
+    if receipt.execution_key != expected_execution_key:
+        raise ValueError("delivery receipt execution key mismatch")
+    if receipt.delivery_evidence_source_hash in {
+        receipt.submitted_receipt_hash,
+        receipt.authorization_hash,
+        receipt.proposal_hash,
+        receipt.payload_hash,
+        receipt.submission_evidence_source_hash,
+    }:
+        raise ValueError("delivery receipt evidence source is not external and new")
     if receipt.delivery_confirmed is not True:
         raise ValueError("delivery receipt must confirm delivery")
     fields = asdict(receipt)
