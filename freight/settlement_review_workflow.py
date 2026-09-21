@@ -243,9 +243,13 @@ def _build_case_from_snapshot(
     if exact_count == 1:
         raise ValueError("settlement event is auto-allocatable; manual review is not allowed")
 
+    reference_candidates = [
+        item for item in identity_claims if item.reference_match
+    ]
+    review_candidates = reference_candidates if reference_candidates else identity_claims
     candidates = tuple(sorted(
-        identity_claims,
-        key=lambda item: (not item.reference_match, item.claim_id),
+        review_candidates,
+        key=lambda item: item.claim_id,
     ))
     auto_reason = f"exact unique candidate count={exact_count}"
     body = {
