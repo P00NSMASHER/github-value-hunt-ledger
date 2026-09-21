@@ -152,7 +152,6 @@ Use the V9 allocator to spend the remaining slot on whichever has the highest cu
 2. external-outcome evidence for a high-ranked opportunity;
 3. measurement debt that prevents deciding whether a search strategy actually works;
 4. adjacency only where it closes a named capability seam.
-
 Do not spend the wildcard slot on a familiar saturated family solely because it is easy to search.
 
 ## Current stop list
@@ -179,3 +178,14 @@ The portfolio still has **$0 directly evidenced customer value and $0 directly e
 6. **P1 CAP-009 workforce authority:** combine PayrollEngine-style effective/knowledge-time selection with RosterSpec verification/repair on a frozen historical rule bundle. Do not treat static compliance settings as authority.
 7. **P2 Protocol pre-FAT:** execute the existing USP/SECS differential fixtures with neutral measurement before discovering a fourth implementation. Caretaker is a negative-control endpoint until runtime evidence exists.
 8. **P2 CaptureBrief EXP-006:** keep `VERIFIED_ACTION_MEMBERSHIP / semantic_identity / byte_state` separate; move to the next frozen solicitation family rather than repeatedly guessing routes for the same unavailable historical object.
+
+<!-- INTEGRATOR-R14-2026-09-20T2028-0400 -->
+## Integrator queue delta — 2026-09-20 20:28 ET
+1. **P0 Freight lifecycle gate, then external buyer:** extend the strict launch-decision receipt rule through Pilot Amendment/replacement Charter. Run truthy-`"false"`, malformed scalar scope, fabricated self-hash, arbitrary activation string and stale-evidence negatives. Material post-kickoff scope/fee/role changes must consume a fresh authority-bound Activation/launch receipt tied to the exact changed fields. Once this lifecycle gate passes, stop internal freight work and move to one authorized frozen buyer population and real settlement.
+2. **P1 Recovery EXP-004 exact-revision qualification:** before another recovery search, execute or obtain an exact-revision E2E qualification receipt. Treat `UNQUALIFIED`, `HARNESS_FAILED`, and `RECOVERY_FAILED` separately. Run `exact_revision_without_e2e_receipt`, `older_green_e2e_replayed_as_current`, `harness_setup_failed_before_subject`, and `subject_failure_after_harness_ready` alongside the existing authority/admission matrix.
+3. **P1 CaptureBrief EXP-006 current-action correctness:** use `FA524026Q0041` as the planted case where all action UUIDs are present but normalized `LATEST` is wrong. Separate history-set completeness, authoritative ordering and authoritative current action; first-party currentness wins over correlated mirror list order. Resolve current action before packet completeness.
+4. **P1 AP EXP-002 Xero finite replay:** implement a bounded replay/positive-reconciliation fixture: same key only inside authoritative replay TTL; durable business marker + exact CreditNoteID/readback after TTL; no post-TTL redispatch; zero result remains UNKNOWN. Search only for an authoritative negative-completeness contract if the fixture cannot resolve NOT_APPLIED.
+5. **P1 ScopeSignal EXP-005 counter-event provenance:** add SiteMate-style append-only negative consumption as a planted false-authority case. Require every capacity-restoring event to bind a real prior event/source and exact baseline version, be bounded and idempotent, and originate from an authoritative correction transition. Do not equate immutable history with true history.
+6. **P1 Lab EXP-007 close the Thermo row:** treat Agilent/Shimadzu/Waters as bounded exact-head automated evidence; Thermo remains OPEN because current RAW test is CI-skipped. Execute the rights-clean CC0 MassIVE Thermo file with pinned parser/runtime, source hash and independent oracle. Do not hunt another converter until this fourth row is actually executed.
+7. **P2 Money-state EXP-010 refund rediscovery:** test the SmallHeroes dispatch fence under literal process death/new process, provider lookup pagination/completeness and terminal economic readback. Distinguish provider idempotency replay from provider-side rediscovery by durable business identity.
+8. **No benchmark policy change:** Pair 1 Experiment remains empty; matched benchmark is unchanged. Do not alter SEARCH_SKILLS or claim the Experiment architecture wins until new matched evidence exists.
