@@ -386,16 +386,57 @@ def record_carrier_action_execution(
     )
 
 
+def verify_carrier_action_execution_receipt(
+    receipt: CarrierActionExecutionReceipt,
+) -> None:
+    if not isinstance(receipt, CarrierActionExecutionReceipt):
+        raise ValueError("receipt must be a CarrierActionExecutionReceipt")
+    _sha("execution_key", receipt.execution_key)
+    _sha("intent_hash", receipt.intent_hash)
+    _sha("authorization_hash", receipt.authorization_hash)
+    _sha("proposal_hash", receipt.proposal_hash)
+    _sha("payload_hash", receipt.payload_hash)
+    _sha("recipient_reference_hash", receipt.recipient_reference_hash)
+    _sha("external_reference_hash", receipt.external_reference_hash)
+    _sha("evidence_source_hash", receipt.evidence_source_hash)
+    _sha("receipt_hash", receipt.receipt_hash)
+    _text("authorization_id", receipt.authorization_id)
+    _text("target_carrier_id", receipt.target_carrier_id)
+    _text("target_customer_id", receipt.target_customer_id)
+    _text("currency", receipt.currency)
+    _text("executor_role", receipt.executor_role)
+    _timestamp("prepared_at", receipt.prepared_at)
+    _timestamp("executed_at", receipt.executed_at)
+    try:
+        outcome = ExecutionOutcome(receipt.outcome)
+    except ValueError as exc:
+        raise ValueError("invalid execution receipt outcome") from exc
+    try:
+        ExecutionChannel(receipt.channel)
+    except ValueError as exc:
+        raise ValueError("invalid execution receipt channel") from exc
+    expected_submitted = outcome in {
+        ExecutionOutcome.SUBMITTED,
+        ExecutionOutcome.DELIVERED,
+    }
+    expected_delivered = outcome is ExecutionOutcome.DELIVERED
+    if receipt.action_submitted is not expected_submitted:
+        raise ValueError("execution receipt submitted flag mismatch")
+    if receipt.delivery_confirmed is not expected_delivered:
+        raise ValueError("execution receipt delivery flag mismatch")
+    body = asdict(receipt)
+    digest = body.pop("receipt_hash")
+    if canonical_hash(body) != digest:
+        raise ValueError("execution receipt hash mismatch")
+
+
 def validate_execution_history(
     receipts: Iterable[CarrierActionExecutionReceipt],
 ) -> None:
     submitted_keys: set[str] = set()
     seen_receipts: set[str] = set()
     for receipt in receipts:
-        if not isinstance(receipt, CarrierActionExecutionReceipt):
-            raise ValueError("history must contain CarrierActionExecutionReceipt values")
-        _sha("receipt_hash", receipt.receipt_hash)
-        _sha("execution_key", receipt.execution_key)
+        verify_carrier_action_execution_receipt(receipt)
         if receipt.receipt_hash in seen_receipts:
             raise ValueError("duplicate execution receipt")
         seen_receipts.add(receipt.receipt_hash)
