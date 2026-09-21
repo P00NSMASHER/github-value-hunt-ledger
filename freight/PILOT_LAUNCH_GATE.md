@@ -1,6 +1,6 @@
 # Freight Recovery — Pilot Launch Gate
 
-Updated: 2026-09-20
+Updated: 2026-09-21
 
 This is the **final go/no-go gate** before confidential buyer data is handled for
 a paid blind Freight Audit Acceptance Test.
@@ -32,25 +32,47 @@ The current Netlify project is therefore a **protected demo/control shell**, not
 an approved confidential-customer-data plane.
 
 ### Separate controlled environment
-**MANUAL/CONTROLLED PILOT: CONDITIONAL**
+**MANUAL/CONTROLLED PILOT: CONDITIONAL — ONE BASE CONTROL REMAINS**
+
+A dedicated single-tenant Google Drive workspace was staged on 2026-09-21 and
+confirmed owner-only / not shared. It contains no customer data and is explicitly
+separate from the Netlify shell. The current evidence manifest is:
+
+- `freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json`
+- evidence root: `freight/evidence/separate_environment_2026-09-21/`
+
+The evidence pack records:
+- single-tenant workspace scope;
+- Google Drive provider encryption at rest and in transit;
+- owner-only access snapshot;
+- manual/no-parser operating route;
+- immutable-source/read-only-ingestion policy;
+- retention and deletion policy;
+- explicit exclusion of buyer data from Netlify;
+- a redacted Google security alert showing a passkey was added.
+
+The only unproven base control is **current MFA enforcement on every permitted
+sign-in path**. A passkey exists, but that alone does not prove that Google
+2-Step Verification is enabled/enforced for all account access. Therefore the
+manifest remains `DRAFT` and the route remains **CONDITIONAL**.
+
+Only current account-security evidence proving the MFA requirement may promote
+the manifest to `VERIFIED`. No confidential buyer data may enter this workspace
+before that promotion.
 
 The separate route no longer accepts a caller-supplied `verified=True` flag.
-
-It now requires a structured environment evidence manifest governed by:
+It requires a structured environment evidence manifest governed by:
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
 - `freight/separate_environment_evidence.py`
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
 
-The repository currently contains only a DRAFT template, so the route remains
-CONDITIONAL.
-
-Only a VERIFIED manifest may unlock the controlled manual pilot route. VERIFIED
-now means:
+VERIFIED means:
 - evidence references have matching lowercase SHA-256 receipts;
 - the environment has a configuration fingerprint;
 - verifier role + verification date are recorded;
 - the validity window is no more than 90 days;
-- the evidence has not expired at launch time.
+- the evidence has not expired at launch time;
+- every required base control is proven.
 
 The separate route is deliberately independent of the current Netlify snapshot:
 an expired Netlify observation blocks the Netlify route, not an independently
@@ -82,20 +104,20 @@ Current Netlify customer-data route:
 PYTHONPATH=. python freight/pilot_launch_gate.py \
   freight/fixtures/readiness_ready.json \
   --data-path current \
-  --as-of-date 2026-09-20 \
+  --as-of-date 2026-09-21 \
   --expect BLOCKED
 ```
 
-Separate controlled environment using the current DRAFT template:
+Separate controlled environment using the staged evidence manifest:
 
 ```bash
 PYTHONPATH=. python freight/pilot_launch_gate.py \
   freight/fixtures/readiness_ready.json \
   --data-path separate \
-  --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json \
-  --as-of-date 2026-09-20 \
+  --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json \
+  --as-of-date 2026-09-21 \
   --expect CONDITIONAL
 ```
 
-Those expectations should change only when new evidence is actually collected
-and committed.
+The expectation may change to READY only after current MFA enforcement evidence
+is collected, hashed, committed, and the manifest is promoted to VERIFIED.
