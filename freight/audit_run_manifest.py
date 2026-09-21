@@ -59,8 +59,6 @@ def build_audit_run_manifest(
         raise ValueError("Finding Factory truth is not bound to frozen population")
 
     batches = tuple(rule_batches)
-    if not batches:
-        raise ValueError("at least one rule batch is required")
     for batch in batches:
         if (batch.buyer_id, batch.business_unit) != scope:
             raise ValueError("rule batch scope mismatch")
