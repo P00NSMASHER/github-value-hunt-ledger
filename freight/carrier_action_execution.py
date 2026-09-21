@@ -46,6 +46,8 @@ class ExecutionOutcome(str, Enum):
 @dataclass(frozen=True)
 class CarrierActionExecutionIntent:
     execution_key: str
+    buyer_id: str
+    business_unit: str
     authorization_id: str
     authorization_hash: str
     proposal_hash: str
@@ -77,6 +79,8 @@ class CarrierActionExecutionEvidence:
 @dataclass(frozen=True)
 class CarrierActionExecutionReceipt:
     execution_key: str
+    buyer_id: str
+    business_unit: str
     intent_hash: str
     authorization_id: str
     authorization_hash: str
@@ -99,6 +103,43 @@ class CarrierActionExecutionReceipt:
     action_submitted: bool
     delivery_confirmed: bool
     receipt_hash: str
+
+
+@dataclass(frozen=True)
+class CarrierActionDeliveryEvidence:
+    execution_key: str
+    submitted_receipt_hash: str
+    delivered_at: str
+    delivery_reference_hash: str
+    evidence_source_hash: str
+    verifier_role: str
+
+
+@dataclass(frozen=True)
+class CarrierActionDeliveryReceipt:
+    execution_key: str
+    buyer_id: str
+    business_unit: str
+    submitted_receipt_hash: str
+    authorization_hash: str
+    proposal_hash: str
+    payload_hash: str
+    recipient_reference_hash: str
+    action_type: str
+    target_carrier_id: str
+    target_customer_id: str
+    currency: str
+    requested_cents: int
+    finding_ids: tuple[str, ...]
+    submitted_at: str
+    delivered_at: str
+    channel: str
+    submission_external_reference_hash: str
+    delivery_reference_hash: str
+    delivery_evidence_source_hash: str
+    verifier_role: str
+    delivery_confirmed: bool
+    delivery_receipt_hash: str
 
 
 def _sha(name: str, value: str) -> str:
@@ -138,6 +179,10 @@ def _verify_authorization_payload_scope(
     if authorization.authorization_hash is None:
         raise ValueError("authorization hash is required")
     _sha("authorization_hash", authorization.authorization_hash)
+    if (authorization.buyer_id, authorization.business_unit) != (
+        proposal.buyer_id, proposal.business_unit,
+    ):
+        raise ValueError("authorization scope mismatch with carrier action proposal")
     if authorization.action_payload_hash != payload.payload_hash:
         raise ValueError("authorization payload hash mismatch")
     if authorization.action_type != payload.action_type:
@@ -193,6 +238,8 @@ def build_carrier_action_execution_intent(
 
     execution_key_body = {
         "schema": 1,
+        "buyer_id": authorization.buyer_id,
+        "business_unit": authorization.business_unit,
         "authorization_hash": authorization.authorization_hash,
         "proposal_hash": proposal.proposal_hash,
         "payload_hash": payload.payload_hash,
@@ -208,6 +255,8 @@ def build_carrier_action_execution_intent(
     body = {
         "schema": 1,
         "execution_key": execution_key,
+        "buyer_id": authorization.buyer_id,
+        "business_unit": authorization.business_unit,
         "authorization_id": authorization.authorization_id,
         "authorization_hash": authorization.authorization_hash,
         "proposal_hash": proposal.proposal_hash,
@@ -225,6 +274,8 @@ def build_carrier_action_execution_intent(
     }
     return CarrierActionExecutionIntent(
         execution_key=execution_key,
+        buyer_id=authorization.buyer_id,
+        business_unit=authorization.business_unit,
         authorization_id=authorization.authorization_id,
         authorization_hash=authorization.authorization_hash,
         proposal_hash=proposal.proposal_hash,
@@ -337,6 +388,8 @@ def record_carrier_action_execution(
     body = {
         "schema": 1,
         "execution_key": intent.execution_key,
+        "buyer_id": authorization.buyer_id,
+        "business_unit": authorization.business_unit,
         "intent_hash": intent.intent_hash,
         "authorization_id": authorization.authorization_id,
         "authorization_hash": authorization.authorization_hash,
@@ -361,6 +414,8 @@ def record_carrier_action_execution(
     }
     return CarrierActionExecutionReceipt(
         execution_key=intent.execution_key,
+        buyer_id=authorization.buyer_id,
+        business_unit=authorization.business_unit,
         intent_hash=intent.intent_hash,
         authorization_id=authorization.authorization_id,
         authorization_hash=authorization.authorization_hash,
@@ -400,6 +455,8 @@ def verify_carrier_action_execution_receipt(
     _sha("external_reference_hash", receipt.external_reference_hash)
     _sha("evidence_source_hash", receipt.evidence_source_hash)
     _sha("receipt_hash", receipt.receipt_hash)
+    _text("buyer_id", receipt.buyer_id)
+    _text("business_unit", receipt.business_unit)
     _text("authorization_id", receipt.authorization_id)
     _text("target_carrier_id", receipt.target_carrier_id)
     _text("target_customer_id", receipt.target_customer_id)
@@ -431,6 +488,161 @@ def verify_carrier_action_execution_receipt(
         raise ValueError("execution receipt hash mismatch")
 
 
+def record_carrier_action_delivery_confirmation(
+    *,
+    submitted_receipt: CarrierActionExecutionReceipt,
+    evidence: CarrierActionDeliveryEvidence,
+) -> CarrierActionDeliveryReceipt:
+    verify_carrier_action_execution_receipt(submitted_receipt)
+    if not submitted_receipt.action_submitted:
+        raise ValueError("delivery confirmation requires a submitted execution receipt")
+    if submitted_receipt.delivery_confirmed:
+        raise ValueError("execution receipt already confirms delivery")
+    if not isinstance(evidence, CarrierActionDeliveryEvidence):
+        raise ValueError("evidence must be CarrierActionDeliveryEvidence")
+    if evidence.execution_key != submitted_receipt.execution_key:
+        raise ValueError("delivery evidence execution key mismatch")
+    if evidence.submitted_receipt_hash != submitted_receipt.receipt_hash:
+        raise ValueError("delivery evidence submitted receipt hash mismatch")
+
+    delivery_reference_hash = _sha(
+        "delivery_reference_hash", evidence.delivery_reference_hash
+    )
+    delivery_evidence_source_hash = _sha(
+        "delivery evidence_source_hash", evidence.evidence_source_hash
+    )
+    verifier_role = _text("verifier_role", evidence.verifier_role)
+    canonical_delivered_at, delivered_dt = _timestamp(
+        "delivered_at", evidence.delivered_at
+    )
+    submitted_dt = datetime.fromisoformat(
+        submitted_receipt.executed_at.replace("Z", "+00:00")
+    ).astimezone(timezone.utc)
+    if delivered_dt < submitted_dt:
+        raise ValueError("delivered_at cannot precede submitted execution time")
+
+    if delivery_evidence_source_hash in {
+        submitted_receipt.receipt_hash,
+        submitted_receipt.authorization_hash,
+        submitted_receipt.proposal_hash,
+        submitted_receipt.payload_hash,
+        submitted_receipt.evidence_source_hash,
+    }:
+        raise ValueError("delivery evidence source must be external and new")
+
+    body = {
+        "schema": 1,
+        "execution_key": submitted_receipt.execution_key,
+        "buyer_id": submitted_receipt.buyer_id,
+        "business_unit": submitted_receipt.business_unit,
+        "submitted_receipt_hash": submitted_receipt.receipt_hash,
+        "authorization_hash": submitted_receipt.authorization_hash,
+        "proposal_hash": submitted_receipt.proposal_hash,
+        "payload_hash": submitted_receipt.payload_hash,
+        "recipient_reference_hash": submitted_receipt.recipient_reference_hash,
+        "action_type": submitted_receipt.action_type,
+        "target_carrier_id": submitted_receipt.target_carrier_id,
+        "target_customer_id": submitted_receipt.target_customer_id,
+        "currency": submitted_receipt.currency,
+        "requested_cents": submitted_receipt.requested_cents,
+        "finding_ids": submitted_receipt.finding_ids,
+        "submitted_at": submitted_receipt.executed_at,
+        "delivered_at": canonical_delivered_at,
+        "channel": submitted_receipt.channel,
+        "submission_external_reference_hash": submitted_receipt.external_reference_hash,
+        "delivery_reference_hash": delivery_reference_hash,
+        "delivery_evidence_source_hash": delivery_evidence_source_hash,
+        "verifier_role": verifier_role,
+        "delivery_confirmed": True,
+    }
+    return CarrierActionDeliveryReceipt(
+        execution_key=submitted_receipt.execution_key,
+        buyer_id=submitted_receipt.buyer_id,
+        business_unit=submitted_receipt.business_unit,
+        submitted_receipt_hash=submitted_receipt.receipt_hash,
+        authorization_hash=submitted_receipt.authorization_hash,
+        proposal_hash=submitted_receipt.proposal_hash,
+        payload_hash=submitted_receipt.payload_hash,
+        recipient_reference_hash=submitted_receipt.recipient_reference_hash,
+        action_type=submitted_receipt.action_type,
+        target_carrier_id=submitted_receipt.target_carrier_id,
+        target_customer_id=submitted_receipt.target_customer_id,
+        currency=submitted_receipt.currency,
+        requested_cents=submitted_receipt.requested_cents,
+        finding_ids=submitted_receipt.finding_ids,
+        submitted_at=submitted_receipt.executed_at,
+        delivered_at=canonical_delivered_at,
+        channel=submitted_receipt.channel,
+        submission_external_reference_hash=submitted_receipt.external_reference_hash,
+        delivery_reference_hash=delivery_reference_hash,
+        delivery_evidence_source_hash=delivery_evidence_source_hash,
+        verifier_role=verifier_role,
+        delivery_confirmed=True,
+        delivery_receipt_hash=canonical_hash(body),
+    )
+
+
+def verify_carrier_action_delivery_receipt(
+    receipt: CarrierActionDeliveryReceipt,
+) -> None:
+    if not isinstance(receipt, CarrierActionDeliveryReceipt):
+        raise ValueError("receipt must be a CarrierActionDeliveryReceipt")
+    for name in (
+        "execution_key",
+        "submitted_receipt_hash",
+        "authorization_hash",
+        "proposal_hash",
+        "payload_hash",
+        "recipient_reference_hash",
+        "submission_external_reference_hash",
+        "delivery_reference_hash",
+        "delivery_evidence_source_hash",
+        "delivery_receipt_hash",
+    ):
+        _sha(name, getattr(receipt, name))
+    for name in (
+        "buyer_id",
+        "business_unit",
+        "action_type",
+        "target_carrier_id",
+        "target_customer_id",
+        "currency",
+        "channel",
+        "verifier_role",
+    ):
+        _text(name, getattr(receipt, name))
+    _, submitted_dt = _timestamp("submitted_at", receipt.submitted_at)
+    _, delivered_dt = _timestamp("delivered_at", receipt.delivered_at)
+    if delivered_dt < submitted_dt:
+        raise ValueError("delivery receipt predates submission")
+    if receipt.delivery_confirmed is not True:
+        raise ValueError("delivery receipt must confirm delivery")
+    fields = asdict(receipt)
+    digest = fields.pop("delivery_receipt_hash")
+    body = {"schema": 1, **fields}
+    if canonical_hash(body) != digest:
+        raise ValueError("delivery receipt hash mismatch")
+
+
+def validate_delivery_history(
+    receipts: Iterable[CarrierActionDeliveryReceipt],
+) -> None:
+    seen_execution_keys: set[str] = set()
+    seen_submission_receipts: set[str] = set()
+    seen_delivery_receipts: set[str] = set()
+    for receipt in receipts:
+        verify_carrier_action_delivery_receipt(receipt)
+        if receipt.delivery_receipt_hash in seen_delivery_receipts:
+            raise ValueError("duplicate delivery receipt")
+        seen_delivery_receipts.add(receipt.delivery_receipt_hash)
+        if receipt.execution_key in seen_execution_keys:
+            raise ValueError("multiple delivery confirmations share one execution key")
+        seen_execution_keys.add(receipt.execution_key)
+        if receipt.submitted_receipt_hash in seen_submission_receipts:
+            raise ValueError("multiple delivery confirmations reference one submission")
+        seen_submission_receipts.add(receipt.submitted_receipt_hash)
+
+
 def validate_execution_history(
     receipts: Iterable[CarrierActionExecutionReceipt],
 ) -> None:
@@ -452,6 +664,7 @@ def render_execution_intent_markdown(intent: CarrierActionExecutionIntent) -> st
         "# Freight Recovery — Carrier Action Execution Intent",
         "",
         f"- Action: **{intent.action_type}**",
+        f"- Buyer / business unit: **{intent.buyer_id} / {intent.business_unit}**",
         f"- Carrier / customer: **{intent.target_carrier_id} / {intent.target_customer_id}**",
         f"- Amount: **{intent.currency} {intent.requested_cents / 100:,.2f}**",
         f"- Prepared at: **{intent.prepared_at}**",
@@ -471,11 +684,33 @@ def render_execution_intent_markdown(intent: CarrierActionExecutionIntent) -> st
     ])
 
 
+def render_delivery_receipt_markdown(receipt: CarrierActionDeliveryReceipt) -> str:
+    return "\n".join([
+        "# Freight Recovery — Carrier Action Delivery Confirmation",
+        "",
+        f"- Buyer / business unit: **{receipt.buyer_id} / {receipt.business_unit}**",
+        f"- Carrier / customer: **{receipt.target_carrier_id} / {receipt.target_customer_id}**",
+        f"- Channel: **{receipt.channel}**",
+        f"- Submitted at: **{receipt.submitted_at}**",
+        f"- Delivered at: **{receipt.delivered_at}**",
+        "- Delivery confirmed: **yes**",
+        f"- Execution key: `{receipt.execution_key}`",
+        f"- Submission receipt: `{receipt.submitted_receipt_hash}`",
+        f"- Delivery reference proof: `{receipt.delivery_reference_hash}`",
+        f"- Delivery evidence proof: `{receipt.delivery_evidence_source_hash}`",
+        f"- Delivery receipt hash: `{receipt.delivery_receipt_hash}`",
+        "",
+        "Delivery confirmation does not prove settlement, credit issuance, recovery, or realized savings.",
+        "",
+    ])
+
+
 def render_execution_receipt_markdown(receipt: CarrierActionExecutionReceipt) -> str:
     return "\n".join([
         "# Freight Recovery — Carrier Action Execution Receipt",
         "",
         f"- Outcome: **{receipt.outcome}**",
+        f"- Buyer / business unit: **{receipt.buyer_id} / {receipt.business_unit}**",
         f"- Channel: **{receipt.channel}**",
         f"- Executed at: **{receipt.executed_at}**",
         f"- Action submitted: **{'yes' if receipt.action_submitted else 'no'}**",

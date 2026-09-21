@@ -17,10 +17,12 @@ from freight.buyer_review_workflow import (
     build_buyer_review_batch,
 )
 from freight.carrier_action_execution import (
+    CarrierActionDeliveryEvidence,
     CarrierActionExecutionEvidence,
     ExecutionChannel,
     ExecutionOutcome,
     build_carrier_action_execution_intent,
+    record_carrier_action_delivery_confirmation,
     record_carrier_action_execution,
 )
 from freight.carrier_action_payload import (
@@ -313,7 +315,7 @@ def run_rehearsal() -> dict:
         proposal=action_proposal,
         payload=action_payload,
         recovery_claims=recovery_claims,
-        prepared_at="2026-09-21T15:00:00Z",
+        prepared_at="2026-09-21T08:00:00Z",
     )
     execution_receipt = record_carrier_action_execution(
         intent=execution_intent,
@@ -327,8 +329,19 @@ def run_rehearsal() -> dict:
             channel=ExecutionChannel.EMAIL,
             external_reference_hash="1" * 64,
             evidence_source_hash="2" * 64,
-            executed_at="2026-09-21T15:01:00Z",
+            executed_at="2026-09-21T08:01:00Z",
             executor_role="Synthetic Freight Operator",
+        ),
+    )
+    delivery_receipt = record_carrier_action_delivery_confirmation(
+        submitted_receipt=execution_receipt,
+        evidence=CarrierActionDeliveryEvidence(
+            execution_key=execution_intent.execution_key,
+            submitted_receipt_hash=execution_receipt.receipt_hash,
+            delivered_at="2026-09-21T08:05:00Z",
+            delivery_reference_hash="3" * 64,
+            evidence_source_hash="4" * 64,
+            verifier_role="Synthetic Delivery Verifier",
         ),
     )
 
@@ -480,6 +493,9 @@ def run_rehearsal() -> dict:
         "carrier_action_execution_outcome": execution_receipt.outcome,
         "carrier_action_submitted": execution_receipt.action_submitted,
         "carrier_action_delivery_confirmed": execution_receipt.delivery_confirmed,
+        "carrier_action_delivery_receipt_hash": delivery_receipt.delivery_receipt_hash,
+        "carrier_action_async_delivery_confirmed": delivery_receipt.delivery_confirmed,
+        "carrier_action_delivered_at": delivery_receipt.delivered_at,
         "recovery_claim_already_present_count": claim_persistence.already_present_count,
         "settlement_csv_adapter_hash": settlement_batch.adapter_hash,
         "settlement_csv_file_sha256": settlement_batch.file_sha256,
