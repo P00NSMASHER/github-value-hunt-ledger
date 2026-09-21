@@ -46,6 +46,7 @@ class ExternalActionAuthorization:
     operative_charter_hash: str
     action_type: str
     target_carrier_id: str
+    target_customer_id: str
     recipient_reference_hash: str
     action_payload_hash: str
     finding_ids: tuple[str, ...]
@@ -210,6 +211,7 @@ def issue_authorization(
     authorization_id: str,
     action_type: ActionType,
     target_carrier_id: str,
+    target_customer_id: str,
     recipient_reference_hash: str,
     action_payload_hash: str,
     finding_ids: tuple[str, ...],
@@ -225,6 +227,7 @@ def issue_authorization(
 
     _required("authorization_id", authorization_id)
     _required("target_carrier_id", target_carrier_id)
+    _required("target_customer_id", target_customer_id)
     _sha("recipient_reference_hash", recipient_reference_hash)
     _sha("action_payload_hash", action_payload_hash)
     _required("currency", currency)
@@ -274,6 +277,8 @@ def issue_authorization(
         review_hashes.append(review.review_hash)
         if finding.carrier_id != target_carrier_id:
             raise ValueError("finding carrier does not match target carrier")
+        if finding.customer_id != target_customer_id:
+            raise ValueError("finding customer does not match target customer")
         if finding.currency != currency:
             raise ValueError("finding currency mismatch")
         proof_hashes.append(finding.proof_hash)
@@ -302,6 +307,7 @@ def issue_authorization(
         "operative_charter_hash": resolution.operative_charter_hash,
         "action_type": action_type.value,
         "target_carrier_id": target_carrier_id,
+        "target_customer_id": target_customer_id,
         "recipient_reference_hash": recipient_reference_hash,
         "action_payload_hash": action_payload_hash,
         "finding_ids": list(normalized_ids),
@@ -328,6 +334,7 @@ def issue_authorization(
         operative_charter_hash=resolution.operative_charter_hash,
         action_type=action_type.value,
         target_carrier_id=target_carrier_id,
+        target_customer_id=target_customer_id,
         recipient_reference_hash=recipient_reference_hash,
         action_payload_hash=action_payload_hash,
         finding_ids=normalized_ids,
@@ -465,6 +472,7 @@ def assert_action_allowed(
     as_of_date: str,
     action_type: ActionType,
     target_carrier_id: str,
+    target_customer_id: str,
     recipient_reference_hash: str,
     action_payload_hash: str,
     finding_ids: tuple[str, ...],
@@ -479,6 +487,8 @@ def assert_action_allowed(
         raise ValueError("action_type exceeds authorization")
     if target_carrier_id != auth.target_carrier_id:
         raise ValueError("target carrier exceeds authorization")
+    if target_customer_id != auth.target_customer_id:
+        raise ValueError("target customer exceeds authorization")
     if recipient_reference_hash != auth.recipient_reference_hash:
         raise ValueError("recipient/routing reference exceeds authorization")
     if action_payload_hash != auth.action_payload_hash:
@@ -502,6 +512,7 @@ def render_markdown(auth: ExternalActionAuthorization) -> str:
             f"**Engagement:** `{auth.engagement_id}`",
             f"**Action:** {auth.action_type}",
             f"**Target carrier:** `{auth.target_carrier_id}`",
+            f"**Target customer:** `{auth.target_customer_id}`",
             f"**Authorized maximum:** {auth.currency} {auth.authorized_cents / 100:,.2f}",
             f"**Issued / expires:** {auth.issued_on} / {auth.expires_on}",
             f"**Approver role:** {auth.approver_role}",
