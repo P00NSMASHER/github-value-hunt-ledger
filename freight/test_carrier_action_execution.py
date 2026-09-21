@@ -1,4 +1,4 @@
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import pytest
 
@@ -29,7 +29,7 @@ from freight.carrier_action_workflow import (
     CarrierActionApprovalInput,
     build_carrier_action_proposal_batch,
 )
-from freight.contracts import open_incumbent_output, seal_incumbent_submission
+from freight.contracts import canonical_hash, open_incumbent_output, seal_incumbent_submission
 from freight.engagement_state import resolve_engagement
 from freight.external_action_authorization import (
     ActionType,
@@ -189,6 +189,26 @@ def setup():
     return authorization, proposal, payload, recovery_claims
 
 
+def _rehash_execution_receipt(receipt, **changes):
+    candidate = replace(receipt, **changes)
+    fields = asdict(candidate)
+    fields.pop("receipt_hash")
+    return replace(
+        candidate,
+        receipt_hash=canonical_hash({"schema": 1, **fields}),
+    )
+
+
+def _rehash_delivery_receipt(receipt, **changes):
+    candidate = replace(receipt, **changes)
+    fields = asdict(candidate)
+    fields.pop("delivery_receipt_hash")
+    return replace(
+        candidate,
+        delivery_receipt_hash=canonical_hash({"schema": 1, **fields}),
+    )
+
+
 def evidence(intent, outcome=ExecutionOutcome.SUBMITTED, executed_at="2026-09-21T11:01:00Z"):
     return CarrierActionExecutionEvidence(
         execution_key=intent.execution_key,
@@ -345,6 +365,113 @@ def test_tampered_intent_is_rejected():
             payload=payload,
             recovery_claims=claims,
         )
+
+
+def test_rehashed_execution_receipt_cannot_claim_execution_before_preparation():
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent, outcome=ExecutionOutcome.SUBMITTED),
+    )
+    forged = _rehash_execution_receipt(
+        receipt,
+        prepared_at="2026-09-21T11:02:00.000000Z",
+    )
+    with pytest.raises(ValueError, match="predates preparation"):
+        verify_carrier_action_execution_receipt(forged)
+
+
+def test_rehashed_execution_receipt_cannot_change_action_or_amount_semantics():
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent),
+    )
+    with pytest.raises(ValueError, match="action type"):
+        verify_carrier_action_execution_receipt(
+            _rehash_execution_receipt(receipt, action_type="NOT-ACTION")
+        )
+    with pytest.raises(ValueError, match="positive integer cents"):
+        verify_carrier_action_execution_receipt(
+            _rehash_execution_receipt(receipt, requested_cents=0)
+        )
+
+
+def test_rehashed_execution_receipt_must_preserve_idempotency_key_and_external_evidence():
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent),
+    )
+    with pytest.raises(ValueError, match="idempotency key mismatch"):
+        verify_carrier_action_execution_receipt(
+            _rehash_execution_receipt(receipt, execution_key="9"*64)
+        )
+    with pytest.raises(ValueError, match="evidence source is not external"):
+        verify_carrier_action_execution_receipt(
+            _rehash_execution_receipt(
+                receipt,
+                evidence_source_hash=receipt.payload_hash,
+            )
+        )
+
+
+def test_rehashed_execution_receipt_requires_canonical_utc_timestamps():
+    auth, proposal, payload, claims = setup()
+    intent = build_carrier_action_execution_intent(
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        prepared_at="2026-09-21T11:00:00Z",
+    )
+    receipt = record_carrier_action_execution(
+        intent=intent,
+        authorization=auth,
+        proposal=proposal,
+        payload=payload,
+        recovery_claims=claims,
+        evidence=evidence(intent),
+    )
+    forged = _rehash_execution_receipt(
+        receipt,
+        prepared_at="2026-09-21T07:00:00-04:00",
+    )
+    with pytest.raises(ValueError, match="canonical UTC"):
+        verify_carrier_action_execution_receipt(forged)
 
 
 def test_receipt_flags_are_hash_verified():
@@ -613,6 +740,68 @@ def test_delivery_requires_new_external_evidence():
                 evidence_source_hash=submitted.evidence_source_hash,
             ),
         )
+
+
+def test_delivery_receipt_retains_submission_evidence_provenance():
+    _, _, _, _, _, submitted = submitted_context()
+    delivery = record_carrier_action_delivery_confirmation(
+        submitted_receipt=submitted,
+        evidence=delivery_evidence(submitted),
+    )
+    assert delivery.submission_evidence_source_hash == submitted.evidence_source_hash
+
+
+def test_rehashed_delivery_receipt_cannot_change_execution_semantics():
+    _, _, _, _, _, submitted = submitted_context()
+    delivery = record_carrier_action_delivery_confirmation(
+        submitted_receipt=submitted,
+        evidence=delivery_evidence(submitted),
+    )
+    with pytest.raises(ValueError, match="action type"):
+        verify_carrier_action_delivery_receipt(
+            _rehash_delivery_receipt(delivery, action_type="NOT-ACTION")
+        )
+    with pytest.raises(ValueError, match="invalid delivery receipt channel"):
+        verify_carrier_action_delivery_receipt(
+            _rehash_delivery_receipt(delivery, channel="TELEPATHY")
+        )
+    with pytest.raises(ValueError, match="positive integer cents"):
+        verify_carrier_action_delivery_receipt(
+            _rehash_delivery_receipt(delivery, requested_cents=0)
+        )
+
+
+def test_rehashed_delivery_receipt_must_preserve_execution_key_and_new_evidence():
+    _, _, _, _, _, submitted = submitted_context()
+    delivery = record_carrier_action_delivery_confirmation(
+        submitted_receipt=submitted,
+        evidence=delivery_evidence(submitted),
+    )
+    with pytest.raises(ValueError, match="execution key mismatch"):
+        verify_carrier_action_delivery_receipt(
+            _rehash_delivery_receipt(delivery, execution_key="8"*64)
+        )
+    with pytest.raises(ValueError, match="external and new"):
+        verify_carrier_action_delivery_receipt(
+            _rehash_delivery_receipt(
+                delivery,
+                delivery_evidence_source_hash=delivery.submission_evidence_source_hash,
+            )
+        )
+
+
+def test_rehashed_delivery_receipt_requires_canonical_utc_timestamps():
+    _, _, _, _, _, submitted = submitted_context()
+    delivery = record_carrier_action_delivery_confirmation(
+        submitted_receipt=submitted,
+        evidence=delivery_evidence(submitted),
+    )
+    forged = _rehash_delivery_receipt(
+        delivery,
+        delivered_at="2026-09-21T07:05:00-04:00",
+    )
+    with pytest.raises(ValueError, match="canonical UTC"):
+        verify_carrier_action_delivery_receipt(forged)
 
 
 def test_delivery_receipt_is_self_verifying():
