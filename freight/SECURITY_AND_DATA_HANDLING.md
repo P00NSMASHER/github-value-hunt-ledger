@@ -139,3 +139,12 @@ This still does not establish a production backup schedule, offsite/geographic r
 `freight/diligence_bundle.py` produces a deterministic ZIP containing only Freight commercial/security/diligence documentation plus generated provenance, component inventory, partial CycloneDX SBOM and unsigned DSSE evidence.
 
 The bundle manifest contains SHA-256 and byte size for every entry and explicitly states that no customer data is included. It is a diligence package, not a pilot evidence package and not a security certification.
+
+
+## Tenant isolation evidence boundary
+
+The reference settlement and audit stores are scoped by `buyer_id + business_unit`. A deterministic internal negative-isolation rehearsal now tests same-ID reuse across multiple buyer/BU scopes, cross-buyer and cross-BU reads, reviewed allocation attempts, composite foreign-key bypass attempts, and independent audit chains.
+
+See `freight/TENANT_ISOLATION_EVIDENCE.md`.
+
+This is **internal repository/service-boundary evidence only**. The current verified pilot environment is intentionally single-tenant; deployed multi-tenant isolation remains outside the present environment and `FRT-SEC-001` stays `ACTIVE_INTERNAL` until deployed negative attempts and denial logs are collected.
