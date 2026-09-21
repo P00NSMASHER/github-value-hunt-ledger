@@ -62,8 +62,17 @@
     },
     "work_action": {
       "description": "Actual action classification. Explicit non-search or unknown actions are excluded from discovery-yield learning; missing legacy fields retain historical observational meaning.",
-      "type": ["string", "null"],
-      "enum": ["search", "verify_artifact", "execute_fixture", "await_external", null]
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "search",
+        "verify_artifact",
+        "execute_fixture",
+        "await_external",
+        null
+      ]
     },
     "lane_ids": {
       "type": "array",
@@ -714,6 +723,34 @@
         "null"
       ],
       "pattern": "^ACTGEN:[a-f0-9]{12}$"
+    },
+    "stop_reason_standard": {
+      "description": "Controlled terminal reason for observe-first recall/coordination learning. This does not by itself prove strategy quality.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "qualified_find",
+        "duplicate_no_delta",
+        "retrieval_limited",
+        "no_qualifying_candidate",
+        "evidence_blocked",
+        "rights_or_safety_blocked",
+        "external_prerequisite",
+        "budget_exhausted",
+        "completed_nonsearch",
+        "other_or_unknown",
+        null
+      ]
+    },
+    "coordination_signal_ids": {
+      "description": "Immutable cross-hunter coordination signals emitted by this run, when any.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SIG:[A-Za-z0-9:_-]+$"
+      }
     }
   },
   "additionalProperties": true,
