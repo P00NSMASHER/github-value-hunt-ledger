@@ -384,8 +384,8 @@ def test_review_reverse_rejects_wrong_event_allocation(tmp_path):
     s.create_claim(C("c2","I2",20000))
     s.ingest_event(E("e1","I1",20000))
     s.ingest_event(E("e2","I2",20000,booked="2026-09-02T10:01:00Z"))
-    s.auto_allocate("e1",created_at="2026-10-01T10:00:00Z")
-    s.auto_allocate("e2",created_at="2026-10-01T10:00:00Z")
+    s.auto_allocate("e1",created_at="2026-09-02T11:00:00Z")
+    s.auto_allocate("e2",created_at="2026-09-02T11:00:00Z")
     s.ingest_counter(R(original="e1",amt=10000))
     with pytest.raises(ValueError,match="does not fund allocation"):
         s.review_reverse(
@@ -398,7 +398,7 @@ def test_review_reverse_enforces_allocation_and_counter_capacity(tmp_path):
     s=S(tmp_path)
     s.create_claim(C())
     s.ingest_event(E())
-    s.auto_allocate("e1",created_at="2026-10-01T10:00:00Z")
+    s.auto_allocate("e1",created_at="2026-09-02T11:00:00Z")
     s.ingest_counter(R(amt=15000))
     with pytest.raises(ValueError,match="counter event capacity exceeded"):
         s.review_reverse(
@@ -428,7 +428,7 @@ def test_review_reverse_requires_exact_positive_integer_cents(tmp_path, amount):
     s=S(tmp_path)
     s.create_claim(C())
     s.ingest_event(E())
-    s.auto_allocate("e1",created_at="2026-10-01T10:00:00Z")
+    s.auto_allocate("e1",created_at="2026-09-02T11:00:00Z")
     s.ingest_counter(R(amt=10000))
     with pytest.raises(ValueError,match="positive integer cents"):
         s.review_reverse(
@@ -442,7 +442,7 @@ def test_review_reverse_requires_timezone_aware_timestamp(tmp_path, timestamp):
     s=S(tmp_path)
     s.create_claim(C())
     s.ingest_event(E())
-    s.auto_allocate("e1",created_at="2026-10-01T10:00:00Z")
+    s.auto_allocate("e1",created_at="2026-09-02T11:00:00Z")
     s.ingest_counter(R(amt=10000))
     with pytest.raises(ValueError,match="timezone-aware|required"):
         s.review_reverse(
