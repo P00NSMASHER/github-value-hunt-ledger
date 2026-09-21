@@ -27,7 +27,7 @@ Canonical stage-gate queue converting research into falsifiable technical/econom
 ### EXP-002 — AP source-authority + reversible receipt-policy audit
 - Opportunity: AP Leakage Assurance.
 - Capabilities: CAP-002, 007, 008, 016, 019.
-- Status: **PARTIAL — synthetic reference fixture PASSED; external ERP/provider adapter pending**.
+- Status: **READY** — synthetic reference fixture PASSED; external ERP/provider adapter is the next execution.
 - Hypothesis: explicit source observation, reviewed identity, policy-specific receipt authority, reversible line-level authority consumption and crash-safe external writeback can distinguish recoverable AP leakage from unresolved exceptions without false missing-receipt/PO dollars or duplicate counter-events.
 - Executed evidence: the rights-clean ERP-neutral fixture passed all 12/12 cases and five complete stability replays (60/60). It covers `PRESENT / VERIFIED_EMPTY / UNAVAILABLE` source health, identity blockers, integer quantity/money conservation, exact counter-events, atomic reverse capacity, crash after target commit, stable payload-bound operation identity, `APPLIED / NOT_APPLIED / UNKNOWN`, replay expiry, explicit provider-negative receipts, zombie fencing and bitemporal replay.
 - Conservation rule: every accepted invoice/receipt edge consumes exact amount/quantity capacity on a specific source line; every counter-event references the original edge and one stable operation identity. UNKNOWN keeps reverse capacity reserved. Only bounded authoritative NOT_APPLIED may release capacity; APPLIED finalizes consumption; ambiguous/eventually-consistent absence remains blocked/manual-review.
@@ -39,7 +39,7 @@ Canonical stage-gate queue converting research into falsifiable technical/econom
 ### EXP-003 — Commission plan-to-bank acceptance test
 - Opportunity: Partner / Commission Payout Assurance.
 - Capabilities: CAP-002, 006, 007, 016, 018, 019.
-- Status: **PARTIAL — synthetic historical-authority/late-return fixture PASSED; external terminal observation pending**.
+- Status: **READY** — synthetic historical-authority/late-return fixture PASSED; external terminal observation is the next execution.
 - Hypothesis: frozen entitlement plus provider state and independently observed bank/payroll state can detect payout errors without duplicate-send or false-finality risk, while ambiguous linkage and unavailable source windows remain non-final.
 - Executed evidence: the baseline fixture passed 24/24 classifications, killed all six deliberately unsafe mutants, completed 200 two-writer races without double-send and handled duplicate return replay with one counter-event. A nine-case extension passed 9/9: a late return reopens the exact original earning once; historical claim and settlement remain intact; repayment uses the original 10,000-cent rate rather than a later 13,000-cent policy; duplicate/concurrent replay remains exactly once; ambiguous, not-found, partial, unavailable, wrong-payout and webhook-only evidence do not mutate money; and a clawback-not-owed branch revokes settlement without reopening the obligation.
 - Observation contract: every settlement lookup = `EXACT_UNIQUE / AMBIGUOUS / NOT_FOUND / UNAVAILABLE`. Only exact unique mapping inside verified coverage may establish settlement or a return. Provider success, bank finality and later economic classification are separate facts.
@@ -51,7 +51,7 @@ Canonical stage-gate queue converting research into falsifiable technical/econom
 ### EXP-004 — Recovery Proof scoped-coverage + two-layer qualification + typed-admission adversarial matrix
 - Opportunity: Recovery Proof SLA.
 - Capabilities: CAP-007, 010.
-- Status: **PARTIAL — qualification-transfer contract PASSED; real exact-revision recovery proof pending**.
+- Status: **READY** — qualification-transfer contract PASSED; real exact-revision recovery proof is the next execution.
 - Hypothesis: a recovery proof can become PROVEN only when coverage, semantics, authority/admission, source closure and the resolved execution environment are all current and coherent.
 - Strong challengers: `kirilurbonas/FireDrill@1e532b17e49e4424f988b29dd338ae6c48dc20f3` for isolated multi-engine restore, semantic checks and DSSE evidence; DuneAwakeningSelfHost for dual-plane recovery; Ampel/in-toto/Sigstore/TUF/Uptane for typed admission, authorized functionaries, currentness and rollback controls.
 - Executed evidence: a five-case synthetic qualification-transfer fixture passed 5/5. It correctly accepted an unchanged behavior/execution closure, preserved qualification across deliberately irrelevant source drift, and rejected behavior-source drift, unresolved mutable runtime inputs and resolved runtime mismatch. This establishes the need for two distinct identities: **source closure** and **resolved execution closure**.
@@ -87,7 +87,7 @@ Canonical stage-gate queue converting research into falsifiable technical/econom
 ### EXP-007 — Installed-base sequencing/lab handoff acceptance
 - Opportunity: Installed-Base Lab Automation.
 - Capabilities: CAP-013, CAP-017 plus governance/provenance components.
-- Status: **PARTIAL — Thermo peak extraction PASS, acquisition metadata DISAGREE; physical-action branch pending**.
+- Status: **READY** — execute the Thermo metadata repair/replay and the pending physical-action branch.
 - Hypothesis: cross-vendor analytical files can be normalized only when independently decoded measurement and acquisition semantics agree before common normalization; consequential physical actions must retain one external effect identity across ambiguity and restart.
 - Executed Thermo evidence: the CC0 MassIVE `MSV000094032/raw/Lee_CB_03.raw` fixture (89,393,247 bytes; frozen SHA-256 in the run record) was decoded by pinned OpenTFRaw 1.4.1 and ThermoRawFileParser artifacts. Both produced 18,420 spectra; all 9,942,753 centroid m/z and intensity values matched exactly; 234 empty scans agreed; RT/TIC/BPC were close.
 - Thermo falsification: OpenTFRaw disagreed on MS level for 15,838/18,420 spectra (86.0%), polarity for 15,877, precursor assignment was missing for 16,042 and extra for 76, all 1,197 shared precursor values disagreed, and observed-range CV terms were wrong for all 18,186 nonempty spectra. Source inspection strongly implicates scan-event lookup by ordinal `idx` instead of `entry.scan_event`, but the patch has not been rebuilt. The row is therefore PASS only for the tested peak arrays and **DISAGREE/FAIL for faithful acquisition metadata**.
@@ -98,7 +98,7 @@ Canonical stage-gate queue converting research into falsifiable technical/econom
 ### EXP-008 — Industrial virtual pre-FAT differential benchmark
 - Opportunity: Industrial Pre-FAT / Virtual Commissioning.
 - Capabilities: CAP-014.
-- Status: **PARTIAL — secsgem atomicity source/test claim verified; real-HSMS differential pending**.
+- Status: **READY** — secsgem atomicity source/test claim verified; real-HSMS differential is the next execution.
 - Hypothesis: customer/profile-derived virtual endpoints can catch binding/type/state/error/liveness defects before hardware when endpoint behavior is measured independently from requester-library policy.
 - Correction: the earlier predicted secsgem duplicate-ECID partial mutation is withdrawn. At `bparzella/secsgem@59a5242d8672dad73367a0acd18088adf461404f`, S2F15 validates the complete batch before applying updates. Five existing set tests plus two planted duplicate/all-or-nothing cases passed 7/7.
 - Frozen hypotheses: **EC-ATOMIC-SHARED** sends duplicate ECID with one invalid value and expects both Dreamine and secsgem to reject with no state mutation. **EC-DUPLICATE-POLICY** then compares the rejection/wire semantics—Dreamine malformed/S9 behavior versus secsgem EAC—while independently asserting unchanged state. Do not pre-label this as a state divergence.
