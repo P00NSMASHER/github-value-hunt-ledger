@@ -2,8 +2,8 @@
 
 This is a cautious allocation recommendation, not an autonomous command. It blends empirical yield with an explicit exploration budget so unusual low-frequency discoveries are not optimized away.
 
-- Measured prospective or benchmark discovery runs: **20**
-- Other measured actions excluded from discovery denominators: **15**; outcome credit remains included.
+- Measured prospective or benchmark discovery runs: **22**
+- Other measured actions excluded from discovery denominators: **17**; outcome credit remains included.
 - Historical records without work_action retain their observational status; explicit non-search or unclassified actions cannot satisfy discovery evidence gates.
 - Valid structured outcomes: **6**
 - Exploration budget: **50%**
@@ -14,19 +14,19 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 
 | Strategy | Allocation | Runs | Inspected | Outcome eq. | Evidence |
 |---|---:|---:|---:|---:|---|
-| STRAT:acceptance-path-transition-inspection | 13.9% | 5 | 10 | 1.00 | insufficient |
-| STRAT:capability-conjunction-search-claim-tracing | 11.5% | 3 | 9 | 1.00 | insufficient |
-| STRAT:first-party-production-source-triangulation | 10.6% | 2 | 7 | 0.00 | insufficient |
-| STRAT:rule-period-authority-version-audit | 9.0% | 3 | 6 | 0.00 | insufficient |
-| STRAT:evaluation-target-independence | 9.0% | 4 | 6 | 3.00 | insufficient |
-| STRAT:fail-open-boundary-archaeology | 8.3% | 1 | 4 | 0.00 | insufficient |
-| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 7.3% | 1 | 3 | 0.00 | insufficient |
-| STRAT:authority-origin-invariant-set-consistency | 5.1% | 0 | 0 | 0.00 | insufficient |
-| STRAT:bidirectional-money-evidence-invariant-tracing | 5.1% | 0 | 0 | 0.00 | insufficient |
-| STRAT:cross-source-emergence-triangulation | 5.1% | 0 | 0 | 0.00 | insufficient |
-| STRAT:decision-claim-runtime-side-effect-trace | 5.1% | 0 | 0 | 1.00 | insufficient |
-| STRAT:ingestion-invariant-triad-intersection | 5.1% | 0 | 0 | 0.00 | insufficient |
-| STRAT:paper-research-artifact-production-descendant | 5.1% | 0 | 0 | 0.00 | insufficient |
+| STRAT:acceptance-path-transition-inspection | 13.2% | 5 | 10 | 1.00 | insufficient |
+| STRAT:capability-conjunction-search-claim-tracing | 11.0% | 3 | 9 | 1.00 | insufficient |
+| STRAT:rule-period-authority-version-audit | 10.3% | 4 | 9 | 0.00 | insufficient |
+| STRAT:first-party-production-source-triangulation | 10.2% | 2 | 7 | 0.00 | insufficient |
+| STRAT:evaluation-target-independence | 8.6% | 4 | 6 | 3.00 | insufficient |
+| STRAT:fail-open-boundary-archaeology | 8.1% | 1 | 4 | 0.00 | insufficient |
+| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 7.2% | 1 | 3 | 0.00 | insufficient |
+| STRAT:bidirectional-money-evidence-invariant-tracing | 5.3% | 0 | 0 | 0.00 | insufficient |
+| STRAT:cross-source-emergence-triangulation | 5.3% | 0 | 0 | 0.00 | insufficient |
+| STRAT:decision-claim-runtime-side-effect-trace | 5.3% | 0 | 0 | 1.00 | insufficient |
+| STRAT:ingestion-invariant-triad-intersection | 5.3% | 0 | 0 | 0.00 | insufficient |
+| STRAT:paper-research-artifact-production-descendant | 5.3% | 0 | 0 | 0.00 | insufficient |
+| STRAT:authority-origin-invariant-set-consistency | 5.0% | 1 | 1 | 0.00 | insufficient |
 
 ## Highest-information capability gaps
 
@@ -34,14 +34,14 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 |---|---:|---:|---|
 | CAP-001 — Evidence-gated document facts | 4 | 2 | domain calibration and contractual/legal authority remain external |
 | CAP-002 — Reviewed, versioned identity mastering | 4 | 1 | datasets/customer identities separate |
-| CAP-008 — Structured invoice compliance/validation | 4 | 2 | official rule-pack/version authority must be pinned |
+| CAP-008 — Structured invoice compliance/validation | 4 | 3 | official rule-pack/version authority must be pinned |
 | CAP-012 — Permit event versioning and semantic source QA | 4 | 1 | jurisdiction completeness/semantics vary |
 | CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 4 | 2 | secsgem's correction is source and local-test verified, not yet a real raw-HSMS/T3 capture, and Dreamine was not runtime-executed in the correcting run. Use a neutral raw-HSMS harness for EC-ATOMIC-SHARED and EC-DUPLICATE-POLICY, record every correlated message, maintain an independent logical T3 clock and independently read post-state. Seek a third engine only after an observed endpoint disagreement. |
 | CAP-015 — Prospective, leakage-resistant prediction and evaluator-grain evidence | 4 | 3 | first-party OEDI ZIP digest/bytes remain unresolved in the current evidence chain. Verify the current first-party artifact against the external expected digest, byte-inspect source schema/time/null semantics, then freeze the composite-event + unique-spell evaluator manifest before running policy scores. |
-| CAP-019 — Source-authority observation receipts | 4 | 8 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
-| CAP-016 — Money-state integrity / deterministic close truth | 3 | 7 | — |
+| CAP-019 — Source-authority observation receipts | 4 | 10 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
+| CAP-016 — Money-state integrity / deterministic close truth | 3 | 8 | — |
 | CAP-006 — Settlement-grounded recovery attribution | 2 | 1 | realized dollars require external outcome evidence |
-| CAP-007 — Proof obligations, versioned proof-policy authority and typed proof admission | 2 | 4 | — |
+| CAP-007 — Proof obligations, versioned proof-policy authority and typed proof admission | 2 | 5 | — |
 
 ## Domain authorization constraints
 

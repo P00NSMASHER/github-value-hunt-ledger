@@ -31,8 +31,8 @@
         "STRAT:rule-period-authority-version-audit",
         "STRAT:authority-origin-invariant-set-consistency"
       ],
-      "runs_needed": 5,
-      "inspections_needed": 20,
+      "runs_needed": 4,
+      "inspections_needed": 19,
       "matched_overlap": 2
     },
     {
@@ -191,8 +191,8 @@
         "STRAT:rule-period-authority-version-audit",
         "STRAT:authority-origin-invariant-set-consistency"
       ],
-      "runs_needed": 2,
-      "inspections_needed": 14,
+      "runs_needed": 1,
+      "inspections_needed": 11,
       "matched_overlap": 2
     }
   ],

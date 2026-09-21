@@ -54,6 +54,7 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:distinctive-symbol:superheld-summae | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:distinctive-symbol:vidyesh95-qatoto-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:distinctive-symbol:ethanbass-chromconverter | 0 | 0 | 0 | 0 | 0 | insufficient |
+| ADJ:distinctive-symbol:payroll-engine-payrollengine | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:distinctive-symbol:payroll-engine-payrollengine-payroll-engine-payrollengine-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:distinctive-symbol:wazuh-wazuh | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:distinctive-symbol:open-eid-siva | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -89,6 +90,7 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:organization-siblings:vidyesh95-qatoto-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:contributor-lineage:gsa-gsa-acquisition-dfars | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:organization-siblings:ethanbass-chromconverter | 0 | 0 | 0 | 0 | 0 | insufficient |
+| ADJ:organization-siblings:payroll-engine-payrollengine | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:organization-siblings:payroll-engine-payrollengine-payroll-engine-payrollengine-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:organization-siblings:wazuh-wazuh | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:contributor-lineage:a-jatin-freight-ratecon-extraction | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -128,7 +130,6 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:contributor-lineage:vidyesh95-qatoto-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:distinctive-symbol:ad-sdl-madsci | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:distinctive-symbol:notabdelrahmanelsayed-paymob-integration | 0 | 0 | 0 | 0 | 0 | insufficient |
-| ADJ:distinctive-symbol:opentrons-opentrons | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:gsa-gsa-acquisition-dfars | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:accelerationconsortium-helios | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:benchling-open-source-allotropy | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -153,6 +154,7 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:fork-descendants:superheld-summae | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:commit-lineage:gsa-gsa-acquisition-dfars | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:contributor-lineage:ethanbass-chromconverter | 0 | 0 | 0 | 0 | 0 | insufficient |
+| ADJ:contributor-lineage:payroll-engine-payrollengine | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:contributor-lineage:payroll-engine-payrollengine-payroll-engine-payrollengine-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:contributor-lineage:wazuh-wazuh | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:alanbld-utf8proj | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -200,6 +202,7 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:commit-lineage:vidyesh95-qatoto-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:gsa-gsa-acquisition-dfars | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:ethanbass-chromconverter | 0 | 0 | 0 | 0 | 0 | insufficient |
+| ADJ:fork-descendants:payroll-engine-payrollengine | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:payroll-engine-payrollengine-payroll-engine-payrollengine-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:wazuh-wazuh | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:a-jatin-freight-ratecon-extraction | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -229,6 +232,7 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:dependency-upstream:superheld-summae | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:open-eid-siva | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:commit-lineage:ethanbass-chromconverter | 0 | 0 | 0 | 0 | 0 | insufficient |
+| ADJ:commit-lineage:payroll-engine-payrollengine | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:commit-lineage:payroll-engine-payrollengine-payroll-engine-payrollengine-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:commit-lineage:wazuh-wazuh | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:gsa-gsa-acquisition-dfars | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -243,7 +247,6 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:dependency-upstream:vidyesh95-qatoto-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:organization-siblings:ad-sdl-madsci | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:organization-siblings:notabdelrahmanelsayed-paymob-integration | 0 | 0 | 0 | 0 | 0 | insufficient |
-| ADJ:organization-siblings:opentrons-opentrons | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:commit-lineage:open-eid-siva | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:accelerationconsortium-helios | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:benchling-open-source-allotropy | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -275,25 +278,22 @@ Performance is descriptive until minimum samples are reached. A valuable root do
 | ADJ:consumer-downstream:oca-rma | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:vidyesh95-qatoto-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:ethanbass-chromconverter | 0 | 0 | 0 | 0 | 0 | insufficient |
+| ADJ:dependency-upstream:payroll-engine-payrollengine | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:payroll-engine-payrollengine-payroll-engine-payrollengine-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:wazuh-wazuh | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:open-eid-siva | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:ethanbass-chromconverter | 0 | 0 | 0 | 0 | 0 | insufficient |
+| ADJ:consumer-downstream:payroll-engine-payrollengine | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:payroll-engine-payrollengine-payroll-engine-payrollengine-backend | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:wazuh-wazuh | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:contributor-lineage:ad-sdl-madsci | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:contributor-lineage:notabdelrahmanelsayed-paymob-integration | 0 | 0 | 0 | 0 | 0 | insufficient |
-| ADJ:contributor-lineage:opentrons-opentrons | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:open-eid-siva | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:ad-sdl-madsci | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:fork-descendants:notabdelrahmanelsayed-paymob-integration | 0 | 0 | 0 | 0 | 0 | insufficient |
-| ADJ:fork-descendants:opentrons-opentrons | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:commit-lineage:ad-sdl-madsci | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:commit-lineage:notabdelrahmanelsayed-paymob-integration | 0 | 0 | 0 | 0 | 0 | insufficient |
-| ADJ:commit-lineage:opentrons-opentrons | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:ad-sdl-madsci | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:dependency-upstream:notabdelrahmanelsayed-paymob-integration | 0 | 0 | 0 | 0 | 0 | insufficient |
-| ADJ:dependency-upstream:opentrons-opentrons | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:ad-sdl-madsci | 0 | 0 | 0 | 0 | 0 | insufficient |
 | ADJ:consumer-downstream:notabdelrahmanelsayed-paymob-integration | 0 | 0 | 0 | 0 | 0 | insufficient |
-| ADJ:consumer-downstream:opentrons-opentrons | 0 | 0 | 0 | 0 | 0 | insufficient |

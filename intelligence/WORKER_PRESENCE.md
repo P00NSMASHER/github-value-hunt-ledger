@@ -1,7 +1,7 @@
 # WORKER PRESENCE
 
-Generation: **PRESENCEGEN:9eb42a69e38d**
-Clock: **2026-09-21T06:08:40Z**
+Generation: **PRESENCEGEN:adf12648cab8**
+Clock: **2026-09-21T06:21:35Z**
 
 Presence is capacity telemetry, not a worker-quality score.
 
@@ -13,9 +13,9 @@ Presence is capacity telemetry, not a worker-quality score.
 | HUNTER-04 | **READY_STALE** | PRESENCE:01a0c218e45c | 2026-09-21T05:03:26.364000Z | — |
 | HUNTER-05 | **READY_FRESH** | PRESENCE:6f5a2c91d804 | 2026-09-21T07:15:55Z | — |
 | HUNTER-06 | **READY_STALE** | PRESENCE:e638c30f65c2 | 2026-09-21T05:25:14.686000Z | — |
-| HUNTER-07 | **ACTIVE_CLAIM** | PRESENCE:c932f6b8efe0 | — | CLAIM:2be8e2d1d076 |
-| HUNTER-08 | **READY_FRESH** | PRESENCE:bd55eeaf5e0b | 2026-09-21T06:21:25.335000Z | — |
-| HUNTER-09 | **READY_FRESH** | PRESENCE:516ddff0221f | 2026-09-21T06:13:00.852000Z | — |
+| HUNTER-07 | **READY_STALE** | PRESENCE:c932f6b8efe0 | 2026-09-21T06:19:14.453000Z | — |
+| HUNTER-08 | **ACTIVE_CLAIM** | PRESENCE:bd55eeaf5e0b | — | CLAIM:22a9ad07b4a8 |
+| HUNTER-09 | **READY_STALE** | PRESENCE:516ddff0221f | 2026-09-21T06:13:00.852000Z | — |
 | HUNTER-10 | **UNKNOWN** | — | — | — |
 | HUNTER-11 | **READY_STALE** | PRESENCE:ee9949c239b2 | 2026-09-21T05:46:24.808000Z | — |
 | HUNTER-12 | **UNKNOWN** | — | — | — |

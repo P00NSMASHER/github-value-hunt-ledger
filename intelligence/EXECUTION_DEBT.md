@@ -9,4 +9,5 @@ Operational debt is distinct from research/measurement debt.
 
 ## Items requiring attention
 
-- None.
+- SLOT-04: CLAIMED_SUPERSEDED / telemetry=PENDING / assignment=ASSIGN:afebffb7a67b:slot-04
+- SLOT-07: RUNNING_SUPERSEDED / telemetry=PENDING / assignment=ASSIGN:afebffb7a67b:slot-07

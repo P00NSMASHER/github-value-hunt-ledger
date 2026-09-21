@@ -22,7 +22,7 @@ This campaign reduces strategy-measurement debt using frozen benchmark tasks. It
 | Strategy | More runs needed | More inspections needed | Evaluation set | Suggested task | Comparison group |
 |---|---:|---:|---|---|---|
 | STRAT:acceptance-path-transition-inspection | 0 | 10 | EVAL:verification-boundaries | 12 | CMP:verification-boundaries:task-12 |
-| STRAT:authority-origin-invariant-set-consistency | 5 | 20 | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
+| STRAT:authority-origin-invariant-set-consistency | 4 | 19 | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
 | STRAT:capability-conjunction-search-claim-tracing | 2 | 11 | EVAL:operational-conjunctions | 16 | CMP:operational-conjunctions:task-16 |
 | STRAT:cross-source-emergence-triangulation | 5 | 20 | EVAL:agent-lineage-governance | 28 | CMP:agent-lineage-governance:task-28 |
 | STRAT:decision-claim-runtime-side-effect-trace | 5 | 20 | EVAL:operational-conjunctions | 16 | CMP:operational-conjunctions:task-16 |
@@ -32,7 +32,7 @@ This campaign reduces strategy-measurement debt using frozen benchmark tasks. It
 | STRAT:ingestion-invariant-triad-intersection | 5 | 20 | EVAL:ingestion-protocol | 37 | CMP:ingestion-protocol:task-37 |
 | STRAT:paper-research-artifact-production-descendant | 5 | 20 | EVAL:agent-lineage-governance | 28 | CMP:agent-lineage-governance:task-28 |
 | STRAT:protocol-regression-archaeology-for-pre-fat-systems | 4 | 17 | EVAL:ingestion-protocol | 37 | CMP:ingestion-protocol:task-37 |
-| STRAT:rule-period-authority-version-audit | 2 | 14 | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
+| STRAT:rule-period-authority-version-audit | 1 | 11 | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
 
 ## Why this is stronger than ordinary telemetry
 

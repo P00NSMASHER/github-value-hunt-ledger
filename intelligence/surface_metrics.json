@@ -17,12 +17,12 @@
     },
     {
       "id": "SURFACE:github-code-search",
-      "runs": 4,
-      "deep_inspected": 11,
-      "retained_count": 9,
+      "runs": 5,
+      "deep_inspected": 12,
+      "retained_count": 10,
       "master_promoted_count": 0,
-      "capability_touch_runs": 4,
-      "experiment_runs": 4,
+      "capability_touch_runs": 5,
+      "experiment_runs": 5,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "labels_seen": [
@@ -149,6 +149,36 @@
         "GitHub exact-revision source and tests"
       ],
       "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:local-synthetic-python-and-sqlite-fixture",
+      "runs": 2,
+      "deep_inspected": 2,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "local synthetic Python and SQLite fixture"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
+      "id": "SURFACE:microsoft-learn-dynamics-365-finance-documentation",
+      "runs": 2,
+      "deep_inspected": 2,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Microsoft Learn Dynamics 365 Finance documentation"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
     },
     {
       "id": "SURFACE:official-docker-documentation",
@@ -406,6 +436,21 @@
       "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
     },
     {
+      "id": "SURFACE:exact-revision-repository-source-and-test-fixtures",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "exact-revision repository source and test fixtures"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:frappe-erpnext-ecosystem-adjacency",
       "runs": 1,
       "deep_inspected": 3,
@@ -466,6 +511,21 @@
       "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
+      "id": "SURFACE:github-repository-and-code-search",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub repository and code search"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:github-code-search"
+    },
+    {
       "id": "SURFACE:github-repository-source-tests",
       "runs": 1,
       "deep_inspected": 3,
@@ -509,6 +569,21 @@
         "low-attention public-works archaeology"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
+    },
+    {
+      "id": "SURFACE:nuget-gallery-package-metadata",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "NuGet Gallery package metadata"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:official-microsoft-learn-documentation",
@@ -599,6 +674,21 @@
         "repository source/tests/CI"
       ],
       "surface_family_id": "SURFACE_FAMILY:github-source-inspection"
+    },
+    {
+      "id": "SURFACE:skatteverket-first-party-annual-tax-table-publication",
+      "runs": 1,
+      "deep_inspected": 3,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 0,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Skatteverket first-party annual tax-table publication"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:exact-revision-public-git-clone",
@@ -871,6 +961,21 @@
       "surface_family_id": "SURFACE_FAMILY:github-history-archaeology"
     },
     {
+      "id": "SURFACE:french-service-public-first-party-authority-page",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "French Service Public first-party authority page"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:github-exact-revision-source-and-schema-inspection",
       "runs": 1,
       "deep_inspected": 1,
@@ -916,6 +1021,21 @@
       "surface_family_id": "SURFACE_FAMILY:github-code-search"
     },
     {
+      "id": "SURFACE:github-repository-commit-file-workflow-inspection",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 1,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "GitHub repository/commit/file/workflow inspection"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:github-rest-repository-commit-metadata",
       "runs": 1,
       "deep_inspected": 1,
@@ -944,21 +1064,6 @@
         "local patched rebuild and read-only replay"
       ],
       "surface_family_id": "SURFACE_FAMILY:other"
-    },
-    {
-      "id": "SURFACE:local-synthetic-python-and-sqlite-fixture",
-      "runs": 1,
-      "deep_inspected": 1,
-      "retained_count": 1,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 1,
-      "experiment_runs": 1,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "labels_seen": [
-        "local synthetic Python and SQLite fixture"
-      ],
-      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
     },
     {
       "id": "SURFACE:local-synthetic-read-only-decoder-execution",
@@ -1036,19 +1141,19 @@
       "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
-      "id": "SURFACE:microsoft-learn-dynamics-365-finance-documentation",
+      "id": "SURFACE:microsoftdocs-dynamics-365-unified-operations-public-exact-source-revision",
       "runs": 1,
       "deep_inspected": 1,
-      "retained_count": 1,
+      "retained_count": 0,
       "master_promoted_count": 0,
       "capability_touch_runs": 1,
       "experiment_runs": 1,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0,
       "labels_seen": [
-        "Microsoft Learn Dynamics 365 Finance documentation"
+        "MicrosoftDocs/dynamics-365-unified-operations-public exact source revision"
       ],
-      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:polish-ministry-of-finance-ksef-official-pages",
@@ -1257,6 +1362,36 @@
       "fractional_outcome_equivalents": 0,
       "labels_seen": [
         "ZATCA Systems Developers E-Invoice specifications"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:canonical-telemetry-readback",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 0,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "canonical telemetry readback"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:current-exp-003-assignment-and-stop-gates",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 0,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "current EXP-003 assignment and STOP gates"
       ],
       "surface_family_id": "SURFACE_FAMILY:other"
     },
@@ -1534,26 +1669,31 @@
   "family_rows": [
     {
       "id": "SURFACE_FAMILY:other",
-      "runs": 18,
-      "deep_inspected": 21,
-      "retained_count": 13,
+      "runs": 22,
+      "deep_inspected": 26,
+      "retained_count": 15,
       "master_promoted_count": 0,
-      "capability_touch_runs": 17,
-      "experiment_runs": 15,
+      "capability_touch_runs": 20,
+      "experiment_runs": 18,
       "assisted_outcome_count": 3,
       "fractional_outcome_equivalents": 1.1666666666666665,
       "name": "Other/uncategorized",
       "exact_surface_ids": [
+        "SURFACE:canonical-telemetry-readback",
         "SURFACE:cross-project-identity-failure-comparison",
+        "SURFACE:current-exp-003-assignment-and-stop-gates",
         "SURFACE:direct-web-github-domain-search",
         "SURFACE:exact-revision-public-git-clone",
+        "SURFACE:exact-revision-repository-source-and-test-fixtures",
         "SURFACE:exact-revision-source-inspection",
+        "SURFACE:french-service-public-first-party-authority-page",
         "SURFACE:git-lfs-object-retrieval",
         "SURFACE:github-contents-api",
         "SURFACE:github-exact-revision-source-and-schema-inspection",
         "SURFACE:github-exact-revision-source-and-tests",
         "SURFACE:github-file-search",
         "SURFACE:github-git-tree-api",
+        "SURFACE:github-repository-commit-file-workflow-inspection",
         "SURFACE:github-rest-repository-commit-metadata",
         "SURFACE:independent-downstream-repository-comparison",
         "SURFACE:live-san-antonio-ckan-resource",
@@ -1567,6 +1707,8 @@
         "SURFACE:massive-frozen-public-fixture",
         "SURFACE:massive-public-dataset-manifest-and-cc0-fixture",
         "SURFACE:microsoft-dynamics-ax-integration-exact-source-revision",
+        "SURFACE:microsoftdocs-dynamics-365-unified-operations-public-exact-source-revision",
+        "SURFACE:nuget-gallery-package-metadata",
         "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
         "SURFACE:package-publication-verification",
         "SURFACE:polish-ministry-of-finance-ksef-official-pages",
@@ -1579,6 +1721,7 @@
         "SURFACE:repository-hardware-simulator",
         "SURFACE:s2f13-s2f14-pre-state-and-post-state-reads",
         "SURFACE:sam-gov-first-party-opportunity-pages",
+        "SURFACE:skatteverket-first-party-annual-tax-table-publication",
         "SURFACE:slsa-specification",
         "SURFACE:upstream-original-package-pytest-regression-suite",
         "SURFACE:whole-tree-byte-and-sha-256-comparison",
@@ -1591,12 +1734,12 @@
     },
     {
       "id": "SURFACE_FAMILY:synthetic-local-validation",
-      "runs": 13,
-      "deep_inspected": 6,
+      "runs": 14,
+      "deep_inspected": 7,
       "retained_count": 4,
       "master_promoted_count": 0,
-      "capability_touch_runs": 13,
-      "experiment_runs": 13,
+      "capability_touch_runs": 14,
+      "experiment_runs": 14,
       "assisted_outcome_count": 5,
       "fractional_outcome_equivalents": 3.166666666666667,
       "name": "Synthetic/local validation",
@@ -1611,6 +1754,33 @@
         "SURFACE:sqlite-concurrency-boundary",
         "SURFACE:sqlite-crash-restart-harness",
         "SURFACE:synthetic-acceptance-corpus"
+      ]
+    },
+    {
+      "id": "SURFACE_FAMILY:first-party-docs",
+      "runs": 11,
+      "deep_inspected": 13,
+      "retained_count": 9,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 11,
+      "experiment_runs": 11,
+      "assisted_outcome_count": 1,
+      "fractional_outcome_equivalents": 0.3333333333333333,
+      "name": "First-party documentation",
+      "exact_surface_ids": [
+        "SURFACE:gsa-official-opportunities-api-documentation",
+        "SURFACE:microsoft-learn-dynamics-365-finance-documentation",
+        "SURFACE:official-docker-documentation",
+        "SURFACE:official-github-documentation",
+        "SURFACE:official-go-documentation",
+        "SURFACE:official-integration-restart-tests",
+        "SURFACE:official-labor-law-sources",
+        "SURFACE:official-microsoft-learn-documentation",
+        "SURFACE:official-payroll-engine-documentation",
+        "SURFACE:official-robot-server-read-only-api",
+        "SURFACE:official-sap-help-documentation",
+        "SURFACE:official-vendor-robot-server-schema-store",
+        "SURFACE:stripe-first-party-payout-documentation"
       ]
     },
     {
@@ -1637,6 +1807,26 @@
       ]
     },
     {
+      "id": "SURFACE_FAMILY:github-code-search",
+      "runs": 10,
+      "deep_inspected": 25,
+      "retained_count": 16,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 10,
+      "experiment_runs": 8,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "name": "GitHub code search",
+      "exact_surface_ids": [
+        "SURFACE:github-code-search",
+        "SURFACE:github-code-search-and-exact-revision-source-fetch",
+        "SURFACE:github-code-signature-search",
+        "SURFACE:github-exact-head-code-search",
+        "SURFACE:github-repository-and-code-search",
+        "SURFACE:github-repository-and-exact-revision-code-search"
+      ]
+    },
+    {
       "id": "SURFACE_FAMILY:github-history-archaeology",
       "runs": 10,
       "deep_inspected": 23,
@@ -1658,52 +1848,6 @@
         "SURFACE:low-attention-public-works-archaeology",
         "SURFACE:repository-source-tests-history",
         "SURFACE:tests-and-commit-issue-archaeology"
-      ]
-    },
-    {
-      "id": "SURFACE_FAMILY:first-party-docs",
-      "runs": 10,
-      "deep_inspected": 12,
-      "retained_count": 9,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 10,
-      "experiment_runs": 10,
-      "assisted_outcome_count": 1,
-      "fractional_outcome_equivalents": 0.3333333333333333,
-      "name": "First-party documentation",
-      "exact_surface_ids": [
-        "SURFACE:gsa-official-opportunities-api-documentation",
-        "SURFACE:microsoft-learn-dynamics-365-finance-documentation",
-        "SURFACE:official-docker-documentation",
-        "SURFACE:official-github-documentation",
-        "SURFACE:official-go-documentation",
-        "SURFACE:official-integration-restart-tests",
-        "SURFACE:official-labor-law-sources",
-        "SURFACE:official-microsoft-learn-documentation",
-        "SURFACE:official-payroll-engine-documentation",
-        "SURFACE:official-robot-server-read-only-api",
-        "SURFACE:official-sap-help-documentation",
-        "SURFACE:official-vendor-robot-server-schema-store",
-        "SURFACE:stripe-first-party-payout-documentation"
-      ]
-    },
-    {
-      "id": "SURFACE_FAMILY:github-code-search",
-      "runs": 8,
-      "deep_inspected": 21,
-      "retained_count": 14,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 8,
-      "experiment_runs": 7,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "name": "GitHub code search",
-      "exact_surface_ids": [
-        "SURFACE:github-code-search",
-        "SURFACE:github-code-search-and-exact-revision-source-fetch",
-        "SURFACE:github-code-signature-search",
-        "SURFACE:github-exact-head-code-search",
-        "SURFACE:github-repository-and-exact-revision-code-search"
       ]
     },
     {
@@ -1763,16 +1907,21 @@
   ],
   "missing_surface_runs": 4,
   "unmapped_exact_surfaces": [
+    "SURFACE:canonical-telemetry-readback",
     "SURFACE:cross-project-identity-failure-comparison",
+    "SURFACE:current-exp-003-assignment-and-stop-gates",
     "SURFACE:direct-web-github-domain-search",
     "SURFACE:exact-revision-public-git-clone",
+    "SURFACE:exact-revision-repository-source-and-test-fixtures",
     "SURFACE:exact-revision-source-inspection",
+    "SURFACE:french-service-public-first-party-authority-page",
     "SURFACE:git-lfs-object-retrieval",
     "SURFACE:github-contents-api",
     "SURFACE:github-exact-revision-source-and-schema-inspection",
     "SURFACE:github-exact-revision-source-and-tests",
     "SURFACE:github-file-search",
     "SURFACE:github-git-tree-api",
+    "SURFACE:github-repository-commit-file-workflow-inspection",
     "SURFACE:github-rest-repository-commit-metadata",
     "SURFACE:independent-downstream-repository-comparison",
     "SURFACE:live-san-antonio-ckan-resource",
@@ -1786,6 +1935,8 @@
     "SURFACE:massive-frozen-public-fixture",
     "SURFACE:massive-public-dataset-manifest-and-cc0-fixture",
     "SURFACE:microsoft-dynamics-ax-integration-exact-source-revision",
+    "SURFACE:microsoftdocs-dynamics-365-unified-operations-public-exact-source-revision",
+    "SURFACE:nuget-gallery-package-metadata",
     "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
     "SURFACE:package-publication-verification",
     "SURFACE:polish-ministry-of-finance-ksef-official-pages",
@@ -1798,6 +1949,7 @@
     "SURFACE:repository-hardware-simulator",
     "SURFACE:s2f13-s2f14-pre-state-and-post-state-reads",
     "SURFACE:sam-gov-first-party-opportunity-pages",
+    "SURFACE:skatteverket-first-party-annual-tax-table-publication",
     "SURFACE:slsa-specification",
     "SURFACE:upstream-original-package-pytest-regression-suite",
     "SURFACE:whole-tree-byte-and-sha-256-comparison",

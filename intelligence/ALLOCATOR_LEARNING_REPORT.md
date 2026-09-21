@@ -1,8 +1,8 @@
 # ALLOCATOR LEARNING REPORT
 
-- Portfolio policy: **PORTFOLIO:3f0ab6a3092f**
+- Portfolio policy: **PORTFOLIO:7d0862b1d1ea**
 - Mode: **baseline_insufficient_evidence**
-- Attributed assignment runs: **4**
+- Attributed assignment runs: **5**
 - Attribution-debt runs: **0**
 - Roles with sufficient evidence: **0**
 
@@ -13,7 +13,7 @@ V10 changes portfolio capacity only from executed assignment telemetry. Generate
 | Role | Runs | Inspected | Retained precision | New-cap run rate | MASTER/run | Experiment-touch rate | Outcome-run rate | Duplicate ratio | Signal | Evidence |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | adjacency | 0 | 0 | — | — | — | — | — | — | 0.000 | insufficient |
-| coverage | 0 | 0 | — | — | — | — | — | — | 0.000 | insufficient |
+| coverage | 1 | 3 | 33.3% | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% | 0.050 | insufficient |
 | experiment | 3 | 8 | 75.0% | 0.0% | 0.0% | 100.0% | 0.0% | 14.3% | 0.248 | insufficient |
 | measurement | 0 | 0 | — | — | — | — | — | — | 0.000 | insufficient |
 | verification | 0 | 0 | — | — | — | — | — | — | 0.000 | insufficient |

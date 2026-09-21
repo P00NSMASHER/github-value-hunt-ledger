@@ -8,9 +8,9 @@ Objectives are broader than query families. They let multiple domain-specific qu
 
 | Objective | Runs | Inspected | Retained | MASTER | Capability-touch runs | Experiment runs | Outcome eq. |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| OBJ:independent-evaluation — Independent evaluation | 10 | 13 | 7 | 0 | 9 | 9 | 3.00 |
+| OBJ:independent-evaluation — Independent evaluation | 12 | 14 | 7 | 0 | 10 | 11 | 3.00 |
+| OBJ:current-rule-authority — Current rule authority | 6 | 10 | 5 | 0 | 6 | 3 | 0.00 |
 | OBJ:completeness-proof — Completeness proof | 4 | 11 | 5 | 0 | 4 | 4 | 0.00 |
-| OBJ:current-rule-authority — Current rule authority | 4 | 6 | 3 | 0 | 4 | 2 | 0.00 |
 | OBJ:runtime-side-effect — Runtime side-effect trace | 4 | 0 | 0 | 0 | 4 | 4 | 1.00 |
 | OBJ:authority-lineage — Authority lineage | 3 | 7 | 7 | 0 | 3 | 3 | 0.00 |
 | OBJ:protocol-regression — Protocol regression | 3 | 6 | 5 | 0 | 3 | 3 | 1.00 |

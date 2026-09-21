@@ -1,14 +1,15 @@
 {
   "schema_version": 1,
-  "allocator_generation_id": "ALLOCGEN:34f76c214c64",
-  "portfolio_policy_generation_id": "PORTFOLIO:3f0ab6a3092f",
+  "allocator_generation_id": "ALLOCGEN:afebffb7a67b",
+  "portfolio_policy_generation_id": "PORTFOLIO:7d0862b1d1ea",
   "candidate_count": 324,
   "assignment_count": 14,
   "slot_count": 14,
   "work_kind_counts": {
     "experiment_execution": 5,
     "capability_gap": 1,
-    "coverage_gap": 3,
+    "coverage_gap": 2,
+    "positive_dna_transfer": 1,
     "adjacency": 2,
     "strategy_measurement": 1,
     "independent_verification": 1,
