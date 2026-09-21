@@ -7,7 +7,7 @@
   "hunter": "HUNTER-04",
   "strategy_id": "STRAT:rule-period-authority-version-audit",
   "query_family": "three-jurisdiction-permit-source-truth-and-completeness",
-  "query_family_id": "QF:permit-source-field-truth-completeness",
+  "query_family_id": "QF:three-jurisdiction-permit-source-truth-and-completeness",
   "search_objective_id": "OBJ:completeness-proof",
   "measurement_quality": "prospective",
   "work_action": "execute_fixture",
