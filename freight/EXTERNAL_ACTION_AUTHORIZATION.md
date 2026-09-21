@@ -98,3 +98,8 @@ This prevents one carrier/currency authorization from being reused across differ
 ## Canonical action-payload binding
 
 The preferred upstream path now generates a canonical carrier-action payload from the exact recovery claims. Buyer approval binds the resulting payload hash. If the rendered subject/body, action type, invoice/reference, amount or proposal facts change, the payload hash changes and the prior approval no longer matches.
+
+
+## Authorization is not execution
+
+An ACTIVE authorization only establishes the allowed scope. Carrier Action Execution Proof separately records a pre-send intent and external execution evidence. No authorization object is treated as evidence that a carrier action was submitted or delivered.
