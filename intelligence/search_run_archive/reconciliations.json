@@ -57,9 +57,9 @@
       "archive_path": "intelligence/search_run_archive/RUN-20260921T030500Z-hunter13-exp007-opentfraw-thermo-falsification.json",
       "corrected_submission_path": "intelligence/search_run_spool/RUN-20260921T030500Z-hunter13-exp007-opentfraw-thermo-falsification-reconciled.json",
       "archived_bytes_sha256": "f5ba91a2a8e37bb2a10e496b3dd55ddf80304fd5304d11bf0d38d683c2f053db",
-      "canonical_record_sha256": "53521070a3f1bca7e4703aef388a4f6d6457ff4c944fed44263563a97de5c1c8",
+      "canonical_record_sha256": "8f689d55e0ba6b8681304bed7dd6680f4529601e53396bb39d8e3a5b9e152b4c",
       "canonical_ledger": "intelligence/search_runs.jsonl",
-      "reason": "The submitted query_family_id did not equal the deterministic slug of its own query_family. The reviewed correction changes only query_family_id to QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay; measured findings, execution evidence, denominators and provenance are unchanged.",
+      "reason": "The submitted query_family_id did not equal the deterministic slug of its query_family, and the V16 execution_worker_id was null despite the source record's explicit HUNTER-13 role and HUNTER-13 run identity. The reviewed correction changes only query_family_id to QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay and execution_worker_id to HUNTER-13; measured findings, execution evidence, denominators and other provenance are unchanged.",
       "canonical_evidence_paths": [
         "referrals/hunt13-r24-2026-09-21-exp007-opentfraw-thermo-falsification.md"
       ],
