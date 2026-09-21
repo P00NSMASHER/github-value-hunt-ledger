@@ -782,6 +782,93 @@
         "boolean",
         "null"
       ]
+    },
+    "search_moves": {
+      "description": "Observed retrieval moves within a discovery run. Enables learning below whole-run/query-family granularity.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "move_type",
+          "result"
+        ],
+        "properties": {
+          "move_type": {
+            "type": "string",
+            "enum": [
+              "direct_domain_search",
+              "code_signature_search",
+              "official_source_trace",
+              "organization_graph",
+              "contributor_or_commit_lineage",
+              "paper_to_code_lineage",
+              "package_or_dependency_graph",
+              "adjacent_domain_invariant",
+              "independent_comparator",
+              "history_archaeology",
+              "other"
+            ]
+          },
+          "surface": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "query_or_action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "qualifying_hit",
+              "useful_hit",
+              "weak_hit",
+              "no_hit",
+              "retrieval_limited",
+              "blocked",
+              "unknown"
+            ]
+          },
+          "candidate_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "deep_inspected": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "retained_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "candidate_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
     }
   },
   "additionalProperties": true,
