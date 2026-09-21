@@ -16,9 +16,12 @@ from freight.buyer_review_workflow import (
     BuyerReviewDecisionInput,
     build_buyer_review_batch,
 )
+from freight.carrier_action_payload import (
+    authorize_carrier_action_payload,
+    build_carrier_action_payload,
+)
 from freight.carrier_action_workflow import (
     CarrierActionApprovalInput,
-    authorize_carrier_action_proposal,
     build_carrier_action_proposal_batch,
 )
 from freight.contracts import (
@@ -254,7 +257,12 @@ def run_rehearsal() -> dict:
     if action_proposals.proposal_count != 1:
         raise AssertionError("synthetic claims should form one carrier/customer action proposal")
     action_proposal = action_proposals.proposals[0]
-    external_authorization = authorize_carrier_action_proposal(
+    action_payload = build_carrier_action_payload(
+        proposal=action_proposal,
+        recovery_claims=recovery_claims,
+        action_type=ActionType.REQUEST_CREDIT_REVIEW,
+    )
+    external_authorization = authorize_carrier_action_payload(
         resolution=engagement_resolution,
         operative_charter=operative_charter,
         truth=truth,
@@ -263,12 +271,13 @@ def run_rehearsal() -> dict:
         buyer_review=buyer_review,
         recovery_claims=recovery_claims,
         proposal=action_proposal,
+        payload=action_payload,
         approval=CarrierActionApprovalInput(
             proposal_hash=action_proposal.proposal_hash,
             authorization_id="ACT-SYNTHETIC-1",
             action_type=ActionType.REQUEST_CREDIT_REVIEW,
             recipient_reference_hash="d" * 64,
-            action_payload_hash="e" * 64,
+            action_payload_hash=action_payload.payload_hash,
             approver_role="VP Supply Chain",
             issued_on="2026-09-21",
             expires_on="2026-09-30",
@@ -281,7 +290,7 @@ def run_rehearsal() -> dict:
         target_carrier_id=action_proposal.target_carrier_id,
         target_customer_id=action_proposal.target_customer_id,
         recipient_reference_hash="d" * 64,
-        action_payload_hash="e" * 64,
+        action_payload_hash=action_payload.payload_hash,
         finding_ids=action_proposal.finding_ids,
         currency=action_proposal.currency,
         requested_cents=action_proposal.total_claim_cents,
@@ -414,6 +423,8 @@ def run_rehearsal() -> dict:
         "carrier_action_proposal_count": action_proposals.proposal_count,
         "carrier_action_proposal_hash": action_proposal.proposal_hash,
         "carrier_action_target_customer_id": action_proposal.target_customer_id,
+        "carrier_action_payload_hash": action_payload.payload_hash,
+        "carrier_action_payload_subject": action_payload.subject,
         "external_action_authorization_hash": external_authorization.authorization_hash,
         "external_action_authorized_cents": external_authorization.authorized_cents,
         "external_action_automatic_execution_authorized": external_authorization.automatic_execution_authorized,
