@@ -7,7 +7,7 @@
   "hunter_role": "vertical-erp-gold",
   "strategy_id": "STRAT:rule-period-authority-version-audit",
   "query_family": "NuGet effective rule version plus historical evaluation plus external authority provenance",
-  "query_family_id": "QF:nuget-rule-version-authority-transfer",
+  "query_family_id": "QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
   "search_objective_id": "OBJ:current-rule-authority",
   "measurement_quality": "prospective",
   "work_action": "search",
