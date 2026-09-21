@@ -151,3 +151,32 @@ def test_changed_invoice_evidence_changes_run_hash():
         factory=changed_factory, review_queue=changed_queue, review_packet=changed_packet,
     )
     assert a.run_hash != b.run_hash
+
+
+def test_manifest_supports_explicit_no_rule_evidence_review_run():
+    invoices = parse_invoice_charge_csv(
+        filename="charges.csv",
+        data=(INVOICE_HEADER + "I1,S1,C,K,USD,X1,UNKNOWN,2026-09-10,1,500\n").encode(),
+        buyer_id="buyer",
+        business_unit="unit",
+    )
+    population = build_population_from_charge_batch(
+        invoices,
+        selection_rule="period",
+    )
+    factory = derive_batch(population.population, invoices.charges, ())
+    queue = build_review_queue(factory)
+    packet = build_review_packet(factory, queue, invoices.charges, ())
+    manifest = build_audit_run_manifest(
+        invoice_batch=invoices,
+        population_build=population,
+        rule_batches=(),
+        factory=factory,
+        review_queue=queue,
+        review_packet=packet,
+    )
+    assert manifest.rule_count == 0
+    assert manifest.rule_adapter_hashes == ()
+    assert manifest.authority_document_hashes == ()
+    assert manifest.review_case_count == 1
+    assert len(manifest.run_hash) == 64
