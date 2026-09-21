@@ -13,7 +13,7 @@ Rules:
 - buyer and business-unit scope are supplied by the authenticated caller and are not accepted from the CSV;
 - the file first passes the existing fail-closed CSV input guard;
 - the header set must be exact; extra/missing/duplicate columns are rejected;
-- quantities and money are exact unsigned integers, never floats;
+- quantities and money are exact unsigned integers after trimming surrounding export whitespace, never floats;
 - currency is normalized to an uppercase three-letter code;
 - charge code is normalized to uppercase;
 - service date must be ISO `YYYY-MM-DD`;
@@ -30,7 +30,7 @@ The queue excludes `CLEAR` derivations and orders remaining work deterministical
 2. calculable money-bearing review items;
 3. evidence/rule gaps without a supported dollar estimate.
 
-Within a class, larger supported variance is shown first. The queue does not approve findings or replace reviewer judgment. Each item and the complete queue are hash-bound to the Finding Factory output.
+Within a class, larger supported variance is shown first. The queue is built from challenger output before incumbent output is opened, so it deliberately does not suppress or deprioritize a finding merely because an incumbent may later be shown to have identified it. The queue does not approve findings or replace reviewer judgment. Each item and the complete queue are hash-bound to the Finding Factory output.
 
 ## Current boundary
 
