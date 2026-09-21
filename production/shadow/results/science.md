@@ -1764,3 +1764,160 @@ The lesson is now **LOCAL/STAGED-ELIGIBLE inside shadow evaluation**. Do not pro
 - reproducible executions: 16 real subprocess-kill/reopen trials;
 - locally completed upstream builds/tests: 0 (dependency TLS failure before compile);
 - sensitive-source incidents: 0.
+
+## 2026-09-21 — Shadow Science Run 17
+
+### BEST NEW FIND
+**Candidate:** earth-mover/icechunk@f58fd5b94176e36ff5b6170cc33b1b248f623582 — V2 repository-wide Zarr snapshot publication plus conditional-write lost-response readback.
+
+**Classification:** **21/30 — WATCH_COMPONENT / SCIENCE-NATIVE TRANSFER KERNEL.**
+
+**Independent verifier:** **PASS_WITH_LIMITS — WATCH, not STRONG.**
+
+**Explicit hypothesis:** Icechunk may close the mixed-generation scientific-checkpoint gap more naturally than raw TensorStore OCDBT by publishing a complete multi-array Zarr hierarchy through one version root, while a newer write-ID readback layer may also resolve the acknowledgement-loss gap that OCDBT left open. The hypothesis fails as a complete scientific campaign checkpoint if application identity is not durable across process death, native scientific restart state is absent, or provider/configuration requirements are not qualified.
+
+### Discovery modes
+1. **Direct invariant search:** traced multi-array Zarr transaction scope, snapshot pinning, commit ordering, root visibility and conflict handling.
+2. **Source/schema/test collapse check:** inspected the V2 session/asset-manager path, snapshot/repository schemas, storage settings, S3 and Arrow object-store implementations, concurrency tests and GC.
+3. **Commit-history archaeology:** separated the July–September 2026 lost-response subsystem from the 2024–2026 transactional baseline and from the maintenance-only candidate head.
+4. **Scientific ecosystem/comparator search:** compared Icechunk with TensorStore OCDBT, Orbax, native OpenMM checkpoints, PyTorch/OpenDPD and Earthmover's managed Arraylake.
+5. **Adversarial execution:** ran selected exact-head readback tests and a separate two-array process-kill/reopen visibility probe.
+
+### Best candidate
+**Icechunk — science-native multi-array snapshot substrate with live-client lost-acknowledgement recovery**  
+Canonical URL: https://github.com/earth-mover/icechunk  
+Exact revision: f58fd5b94176e36ff5b6170cc33b1b248f623582  
+Revision date: 2026-09-18  
+Nearest release used in the local process probe: v2.2.2, 2026-09-17  
+Public license: Apache-2.0  
+Evidence snapshot id: shadow-science-20260921-icechunk-v2-f58fd5b
+
+### Frozen evidence manifest
+- icechunk/src/session.rs blob e6f0c80dd4e445ea025bb17e9afae926a57a04a8;
+- icechunk/src/asset_manager.rs blob 45e01c9fa8a2b722741ecef8f4cb233621a383c2;
+- icechunk-storage/src/readback.rs blob f54402473f570f9dc509132a49cc6b6fda5d7207;
+- icechunk-storage/src/storage.rs blob f620639c90cd90fbf8dac184df3e442f8291bb85;
+- icechunk-s3/src/lib.rs blob 6454f4bfd6ae35d917b2618314ddc325b6cd196a;
+- icechunk-arrow-object-store/src/lib.rs blob 97fee3d3563a498db93ca60452c96bf7fb0636d9;
+- icechunk/tests/test_flaky_connections.rs blob eabe02a07623a09e24ee74757613a6951d54ed43;
+- icechunk/tests/test_storage.rs blob 1bdcc8c0829990ae2e852263649c065c007a4a92;
+- icechunk-format/flatbuffers/snapshot.fbs blob 7212765051113276ac0f9cc697cd82264bf42586;
+- icechunk-format/flatbuffers/repo.fbs blob d9d762afa18163f99f7e7caacdba1b4e0951f8e3;
+- README.md blob 953d7abdafab241c72a43bbe852578e9c54b4976;
+- LICENSE blob bf4a506ccd762423f18d7e0f25c5c8dafe2e0444;
+- lost-response introduction 55db6f5451931c52763202ca192d05258dd9248b, 2026-07-20;
+- portable metadata-key fix 07c2e55bfdd1f1bbd7b2fd25502a39ad265cfb42, 2026-09-01;
+- candidate head f58fd5b..., a Ruff/tooling maintenance commit four commits after v2.2.2;
+- local selected-test result: exact-head icechunk-storage readback unit suite, 9 passed / 0 failed;
+- local visibility probe: PyPI v2.2.2, twenty fresh-process SIGKILL/reopen trials across two arrays.
+
+### Specialist passes
+- **CODE / SCHEMA / TEST INSPECTOR:** traced chunk/manifest/snapshot/log/root ordering, V1 versus V2 identity semantics, CAS behavior, lost-response readback, concurrency and GC.
+- **SCIENCE / HISTORY / ECOSYSTEM VALIDATOR:** tested OpenMM/OpenDPD fit, adoption, benchmark evidence, product overlap and historical novelty.
+- **INDEPENDENT RED-TEAM / VERIFIER:** received a frozen packet without the proposed score, challenged durability, exactly-once, provider, comparison, application-restart and commercial claims, and returned PASS_WITH_LIMITS / WATCH.
+
+### Load-bearing claims
+
+**IMPLEMENTED**
+- One Icechunk repository can contain a Zarr hierarchy with multiple arrays and groups. A writable session gathers all changed nodes/manifests into one snapshot generation; atomic scope is the repository, not independent repositories or external sidecars.
+- Changed native chunks are written before commit. Commit writes changed manifests, builds a snapshot naming the repository hierarchy, writes the snapshot and transaction log, waits for those writes, then publishes V2 by conditionally replacing one central repo entry-point object.
+- V2 publication verifies that the branch still names the expected parent, applies the new snapshot/branch state and conditionally writes against the prior repository-object version. A stale parent becomes a conflict; a repository-object CAS race is re-read and retried.
+- A read session resolves and retains one snapshot ID. Multi-read scientific restoration can therefore remain pinned to one visible hierarchy generation.
+- Native S3 and Arrow object-store conditional writes stamp a unique icechunkwriteid metadata value. If a response is lost and retry produces a precondition conflict or multipart NoSuchUpload, the client performs HEAD/readback. Matching metadata converts the ambiguous request into success with the fresh version/ETag; mismatch remains a real conflict and inconclusive readback propagates an error.
+- Failed pre-publication work may leave unreachable chunks/manifests/snapshots/logs. Garbage collection derives reachability, age-gates deletion and removes V2 snapshot visibility before deleting dependent assets.
+- V2 snapshot IDs are random protocol identities and normally immutable, not cryptographic content hashes. V1 expiration can overwrite a snapshot object under the same ID; current/default V2 avoids that path.
+- Root licensing is Apache-2.0.
+
+**TESTED IN SOURCE**
+- Session/repository tests cover same-base stale writers, parent conflict, non-overlapping rebase, same-chunk and metadata conflict, multi-array flush, time travel and garbage collection.
+- Deterministic S3 tests seed write identity and prove a retried conditional create recovers the landed object with a fresh ETag suitable for the next conditional update.
+- Toxiproxy tests model a request body reaching the server while the acknowledgement path is cut. Repository creation succeeds for native S3 and Arrow object-store backends despite the lost conditional-PUT response; zero-byte conditional writes are also covered.
+- These end-to-end lost-response tests exercise repository creation, not an existing multi-array campaign commit followed by process death and restart.
+- Exact-head cargo test -p icechunk-storage readback --lib completed locally: 9 passed, 0 failed.
+- Parent PR 2399 exposed 51 of 52 checks passing. The visible failure was Codecov on unrelated lint edits, so no fully-green exact-head CI claim is made.
+
+**ADVERSARIAL REPRODUCTION**
+- A custom v2.2.2 probe initialized one repository containing two arrays, opened a fresh writer process, changed both arrays and slowed commit-object writes.
+- Ten trials killed the writer after a new snapshot object appeared but before the repo root changed. Fresh reopen observed both arrays entirely old in all ten trials.
+- Ten more trials killed the writer immediately after the repo root bytes changed. Fresh reopen observed both arrays entirely new in all ten trials.
+- Across twenty SIGKILL/reopen trials, no mixed two-array state appeared.
+- This validates local visibility ordering only. The LocalFileSystem backend itself warns that it is unsafe for concurrent commits, disables conditional-update/metadata behavior by default and exposes no explicit fsync/power-loss contract.
+
+**HISTORY / NOVELTY**
+- Repository first commit: 2024-07-29; functional Xarray integration: 2024-11-25; rebase/conflict support: 2024-12-20; v1.0.0: 2025-07-10; v2.0.0: 2026-04-08; v2.2.2: 2026-09-17.
+- The specific live-client lost-successful-response recovery landed on 2026-07-20; its provider-portable metadata key was fixed on 2026-09-01.
+- Candidate head f58fd5b... is a Ruff/dev-environment maintenance commit and introduces no storage or scientific-checkpoint capability. The valuable kernel predates the candidate SHA.
+- This does not add a third H4 mature-scientific-package history-archaeology success: Icechunk is itself a young storage product, not an established scientific algorithm package hiding a later operations subsystem.
+
+### Decisive limits and falsifiers
+1. **No durable application transaction identity across death:** write-ID readback solves uncertainty while the same request/retry context remains alive. No inspected persistent business/campaign transaction token maps a restarted application to the final repository CAS. Death after the CAS lands but before the caller records success can leave a valid commit plus caller uncertainty; blind retry can create another logical commit.
+2. **Provider/configuration dependence:** conditional create/update and user metadata may be disabled. The code explicitly warns that metadata-off neutralizes lost-response recovery. A target object store must preserve metadata and implement the required conditional semantics.
+3. **Local filesystem exclusion:** Icechunk explicitly says LocalFileSystem is unsafe for concurrent commits. No file/directory fsync or power-cycle durability protocol was established.
+4. **No upstream publication-boundary kill matrix:** no inspected source test SIGKILLs at every chunk, manifest, snapshot, transaction-log, backup and final-root boundary, then reopens in a fresh process.
+5. **Incomplete domain checkpoint:** no OpenMM or OpenDPD adapter exists. Icechunk can store analytical arrays and an opaque OpenMM checkpoint blob, but it does not itself capture OpenMM's hidden integrator/RNG state or guarantee cross-version/platform native restart.
+6. **No comparative win:** there is no matched Icechunk-versus-OCDBT/Orbax/native-checkpoint benchmark. OCDBT already provides same-database group publication; Orbax has broad JAX checkpoint adoption. OpenDPD is PyTorch, making Orbax an incomplete comparator for that workload.
+7. **Commercial overlap:** Earthmover already sells the obvious managed Icechunk infrastructure as Arraylake. The external wedge must add campaign-specific adapters, crash evidence and economic measurement rather than resell generic transactional array storage.
+8. **Retention/erasure boundary:** failed commits can leave unreachable assets and GC deletion errors are warned/skipped. Atomic visibility is separate from guaranteed reclamation or secure deletion.
+
+### Independent RED-TEAM / VERIFIER
+
+**Verdict: PASS_WITH_LIMITS — WATCH, not STRONG.**
+
+The verifier accepted the narrow storage claim: V2 Icechunk supplies one-repository, multi-array publication through one conditional repository-root update; snapshot-pinned readers obtain one old or new generation on a correctly configured supported backend; matching write-ID metadata can resolve a live client's landed conditional write after acknowledgement loss.
+
+The verifier rejected campaign-level exactly-once, power-loss durability, provider-neutral safety, native OpenMM support, comparative superiority, cross-repository atomicity and paid-demand claims.
+
+**Maximum justified classification:** WATCH_COMPONENT.
+
+Strongest falsifier: at the exact revision on a claimed-supported object store, make the final repository root durable while any referenced object is missing/corrupt—or kill after the final CAS loses its acknowledgement and show that restart cannot identify the landed logical campaign transaction without creating a duplicate.
+
+Required next proof:
+1. Build an exact-head OpenMM adapter that stores two analytical arrays, the native checkpoint blob and a provenance manifest inside one existing V2 repository.
+2. Persist a transaction UUID outside the writer before dispatch and include it in the snapshot properties.
+3. Against native S3 and Arrow object-store S3 through Toxiproxy, SIGKILL at every publication boundary, including after the final repository PUT lands but before acknowledgement/caller success recording.
+4. Add a competing writer during that lost-ack window; restart fresh and reconcile by UUID without blind resubmission.
+5. Repeat each boundary at least 100 times and prove all-old or all-new state, readable/hash-correct referenced objects, one logical campaign checkpoint, clean stale-writer conflict, OpenMM restart correctness, reachable-data GC safety and abandoned-object collectability.
+6. Run metadata-disabled and conditional-disabled configurations as negative controls.
+7. Execute the same scientific workload against OCDBT and native framework checkpoints, measuring p50/p95 blocked checkpoint time, restore time, object calls/bytes, retained-snapshot amplification, failure recovery and resumed-versus-uninterrupted scientific equivalence.
+
+### Commercial score
+A) speed to first revenue: **3/5** — a focused audit/adapter can sell before a platform, but no buyer or paid validation exists.  
+B) customer value / ceiling: **3/5** — invalid restarts and rerun GPU/HPC cost matter, but the wedge is narrower than a data platform.  
+C) build/domain compression: **4/5** — hierarchy transactions, pinned snapshots, conflict handling, time travel, Zarr/Xarray integration and GC remove substantial engineering.  
+D) rarity/advantage: **3/5** — scientific-array/version-control UX is differentiated; atomic root publication/checkpoint versioning are not unique.  
+E) evidence/completeness: **4/5** — strong source/tests/history and useful local kill evidence; cloud restart, existing-repo lost-ack and domain integration remain missing.  
+F) rights/operability: **4/5** — Apache-2.0 is favorable; backend/configuration constraints and absent application transaction identity reduce operability.  
+**Total: 21/30 — WATCH_COMPONENT / SCIENCE-NATIVE TRANSFER KERNEL.**
+
+### Commercial / research implication
+The credible offer is a **Scientific Campaign Crash/Consistency Audit + Native Checkpoint Adapter**, not another managed array store. For an OpenMM/OpenDPD or comparable team, the deliverable would bind native restart state, analytical arrays and provenance inside one Icechunk generation, persist a campaign transaction UUID, kill/fault-inject every publication boundary, qualify the actual object provider, compare OCDBT/native alternatives and quantify avoided rerun GPU-hours, blocked checkpoint time and scientist recovery labor.
+
+Icechunk is the strongest science-native UX candidate in Runs 15–17, but current evidence does not show it is the strongest checkpoint substrate for the target campaign or that the adapter has market pull.
+
+### Search lesson outcome
+**Closure-at-visibility verification** succeeds on a third distinct storage design:
+- NoKV: manifest visibility did not atomically close over mutable referenced shard generations.
+- OCDBT: immutable referenced objects were flushed before one conditional manifest-root update, but provider selection could fall back unsafely.
+- Icechunk V2: the whole repository hierarchy is named by one conditionally replaced repo root after snapshot assets are written.
+
+The third result adds a new required axis: **publication acknowledgement custody**. Atomic old-or-new visibility and caller certainty after lost acknowledgement are separate guarantees. Icechunk's write-ID readback materially improves live-client certainty, but without a durable application transaction UUID it does not resolve a restarted caller's logical operation.
+
+Keep this lesson LOCAL/STAGED-ELIGIBLE inside shadow evaluation; do not modify global SEARCH_SKILLS.md.
+
+### VALUE HANDOFF
+1. **Capability delta:** adds a science-native whole-hierarchy snapshot root plus matching-write readback, stronger UX and acknowledgement handling than raw generic storage primitives.
+2. **Graph edge:** Icechunk can contain OpenMM/OpenDPD native checkpoint blobs, analytical arrays and provenance under one repository generation; a durable campaign UUID/restart reconciler remains missing.
+3. **Radar signal:** scientific storage is converging on immutable assets + one version root + version control, while the next differentiator is restart-safe publication identity and evidence.
+4. **Experiment impact:** run the exact same OpenMM/OpenDPD process-kill/provider-fault matrix against Icechunk and OCDBT, including post-root lost acknowledgement.
+5. **Commercial impact:** supports an audit/adapter retrofit with measurable checkpoint/recovery economics, not an unqualified platform product.
+6. **Negative knowledge:** transactional Zarr does not automatically imply native application restart, power-loss durability, provider-neutral safety, or exactly-once logical checkpoint publication.
+
+### Cost proxies
+- materially distinct discovery modes: 5;
+- deep candidate inspections: 1, with TensorStore OCDBT, Orbax, OpenMM and native PyTorch/OpenDPD as comparators;
+- specialist contexts: code/schema/test; science/history/ecosystem; independent verifier;
+- exact-head upstream unit tests completed locally: 9;
+- reproducible subprocess-kill/reopen trials: 20;
+- public source/test/schema/history/status reads and searches: approximately 55;
+- sensitive-source incidents: 0.
+
