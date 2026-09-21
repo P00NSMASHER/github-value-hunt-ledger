@@ -11,6 +11,7 @@ The bundle contains:
 - normalized charge rows;
 - normalized rule rows;
 - review queue;
+- deterministic review routing;
 - reviewer work packet JSON + Markdown;
 - a bundle manifest with SHA-256 and byte size for every entry.
 
@@ -28,6 +29,8 @@ The normalized objects retain hashes that point back to those source files.
 ## State boundary
 
 Only successful `CLEAN` or `REVIEW_REQUIRED` workflows can produce an audit-result bundle. A `BLOCKED` workflow cannot issue one.
+
+The included `review-routing.json` states which exact review-case hashes are buyer-review-ready and which require evidence remediation. Any remediation case carries `rerun_required=true`; it is not silently promoted into the buyer-review path.
 
 The bundle stops at the pre-human-decision audit state. It does not prove:
 
