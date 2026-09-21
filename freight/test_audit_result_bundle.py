@@ -70,14 +70,6 @@ def test_review_required_result_builds_and_verifies_bundle(tmp_path):
         assert routing["rerun_required"] is False
         assert plan["items"] == []
         assert plan["rerun_required"] is False
-        assert plan["items"] == []
-        assert plan["rerun_required"] is False
-        assert "review-routing.json" in archive.namelist()
-        routing = json.loads(archive.read("review-routing.json"))
-        assert routing["route"] == "BUYER_REVIEW_READY"
-        assert routing["buyer_review_case_count"] == 1
-        assert routing["evidence_remediation_case_count"] == 0
-        assert routing["rerun_required"] is False
         assert "normalized-charges.json" in archive.namelist()
         assert "normalized-rules.json" in archive.namelist()
 
@@ -96,6 +88,8 @@ def test_clean_result_also_has_canonical_bundle(tmp_path):
         assert packet["cases"] == []
         assert routing["route"] == "NO_REVIEW"
         assert routing["rerun_required"] is False
+        assert plan["items"] == []
+        assert plan["rerun_required"] is False
 
 
 def test_bundle_bytes_are_deterministic(tmp_path):
