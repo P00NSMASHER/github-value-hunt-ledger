@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "evidence_status": "DRAFT",
+  "environment_id": "gdrive-single-tenant-manual-20260921",
+  "environment_evidence_ref": "freight/evidence/separate_environment_2026-09-21/EVIDENCE_INDEX.json",
+  "environment_evidence_sha256": "deff32f83a9db1cdb1e88ecb215b8ed6510541a722b411203b9bab84969e0b93",
+  "environment_configuration_sha256": "f4caee476aba5a098da2c53fd1f2948a6b84e0d40ae4920c760b93f27e9f1190",
+  "provider_or_host": "Google Drive",
+  "verified_by_role": "environment evidence reviewer",
+  "verified_at": "2026-09-21",
+  "valid_until": "2026-12-20",
+  "single_tenant": true,
+  "parser_runtime_used": false,
+  "controls": {
+    "mfa_enforced": {
+      "value": false,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/account_authentication_redacted.md",
+      "evidence_sha256": "e16cbecf9cf6695b5d76eae5ef4a3e060feecbe5b2e463d7b8ede8e4b6290596"
+    },
+    "encrypted_at_rest": {
+      "value": true,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/provider_encryption.md",
+      "evidence_sha256": "250759dbaf0e210b5383a578af35a8f8df5358b778a3aef5b451c8c174520d68"
+    },
+    "encrypted_in_transit": {
+      "value": true,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/provider_encryption.md",
+      "evidence_sha256": "250759dbaf0e210b5383a578af35a8f8df5358b778a3aef5b451c8c174520d68"
+    },
+    "access_scope_defined": {
+      "value": true,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/drive_workspace_snapshot.json",
+      "evidence_sha256": "22e5d6e8504520fa19a2095c48ca27b438cd7bcdcba70a24b760c5a909ead4b4"
+    },
+    "read_only_ingestion": {
+      "value": true,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/policy_snapshot.md",
+      "evidence_sha256": "9517f65effae70d662f28281ca6e49e7375cda62f44f5fc906cb645e267889ef"
+    },
+    "retention_defined": {
+      "value": true,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/policy_snapshot.md",
+      "evidence_sha256": "9517f65effae70d662f28281ca6e49e7375cda62f44f5fc906cb645e267889ef"
+    },
+    "deletion_defined": {
+      "value": true,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/policy_snapshot.md",
+      "evidence_sha256": "9517f65effae70d662f28281ca6e49e7375cda62f44f5fc906cb645e267889ef"
+    },
+    "customer_data_excluded_from_current_netlify": {
+      "value": true,
+      "evidence_ref": "freight/evidence/separate_environment_2026-09-21/policy_snapshot.md",
+      "evidence_sha256": "9517f65effae70d662f28281ca6e49e7375cda62f44f5fc906cb645e267889ef"
+    }
+  },
+  "multi_tenant_isolation": {
+    "status": "NOT_APPLICABLE",
+    "evidence_ref": null,
+    "evidence_sha256": null
+  },
+  "parser_sandbox": {
+    "status": "NOT_APPLICABLE",
+    "cpu_limit_evidence_ref": null,
+    "cpu_limit_evidence_sha256": null,
+    "memory_limit_evidence_ref": null,
+    "memory_limit_evidence_sha256": null,
+    "time_limit_evidence_ref": null,
+    "time_limit_evidence_sha256": null,
+    "network_isolation_evidence_ref": null,
+    "network_isolation_evidence_sha256": null,
+    "credential_isolation_evidence_ref": null,
+    "credential_isolation_evidence_sha256": null
+  },
+  "notes": "Staged single-tenant/manual environment. All base controls except current MFA enforcement are evidenced. No customer data may be accepted until MFA is independently proven and evidence_status is changed to VERIFIED."
+}
