@@ -560,3 +560,72 @@ The OCDBT schema states that creation should error when no manifest kind safely 
 - Versioned storage does not supply application checkpoint identity, retry lineage or acknowledgement reconciliation automatically.
 - Scientific adoption of a parent library before a subsystem existed is not evidence that the specific subsystem served those workloads.
 - When an exact-head commit is unrelated to the kernel, report the kernel's real introduction dates and do not manufacture an emerging-technology signal.
+
+## 2026-09-21 — Run 17 evidence-backed update
+
+### H5 refinement — science-native repository-root publication adds lost-ack readback, but not restart-idempotent campaign identity
+STATUS: **SUPPORTED AS A WATCH-LEVEL TRANSFER KERNEL; COMPLETE SCIENTIFIC CAMPAIGN COMPOSITION REMAINS UNVERIFIED.**
+
+SUPPORTING EVIDENCE:
+- earth-mover/icechunk@f58fd5b94176e36ff5b6170cc33b1b248f623582 publishes one V2 repository hierarchy by writing chunks/manifests, then snapshot plus transaction log, then conditionally replacing one central repo root.
+- Read sessions pin one snapshot ID; the atomic visibility scope is the entire repository, including multiple arrays/groups.
+- Native S3 and Arrow object-store conditional writes stamp icechunkwriteid. On a lost acknowledgement followed by precondition failure or multipart NoSuchUpload, HEAD readback matches that identity and can recover the fresh version/ETag as success.
+- Exact-head icechunk-storage readback tests passed locally 9/9. Upstream deterministic and Toxiproxy tests cover lost conditional responses for native S3 and object_store backends.
+- A separate v2.2.2 process-kill probe across two arrays produced ten all-old reopen results before the repository root changed and ten all-new reopen results after it changed; no mixed generation appeared.
+- Apache-2.0 and native Zarr/Xarray semantics make this a more direct scientific-array integration target than raw OCDBT.
+
+CONTRARY EVIDENCE:
+- The local filesystem backend explicitly warns that concurrent commits are unsafe and has no established fsync/power-loss contract.
+- Conditional operations and user metadata can be disabled; metadata-off explicitly removes write-ID lost-response recovery.
+- The upstream lost-response integration test covers repository creation, not an existing multi-array campaign commit followed by process death and restart.
+- The write ID is request-local storage metadata, not a durable application/campaign transaction identity. Death after the final root CAS but before caller success recording can still leave a valid commit plus a restarted caller that does not know whether its logical checkpoint landed.
+- No OpenMM/OpenDPD adapter, exact scientific restart/equivalence test or matched OCDBT/native-checkpoint benchmark exists.
+- OpenMM exact restart still requires its opaque platform/System/version-dependent native checkpoint; Icechunk can containerize that artifact but does not replace it.
+- Earthmover already sells managed Icechunk as Arraylake, so the external commercial wedge must add domain adapters, qualification and measurable recovery economics.
+- Candidate head is maintenance-only; the valuable lost-response subsystem entered in July–September 2026.
+
+INDEPENDENT VERIFIER:
+- Verdict **PASS_WITH_LIMITS — WATCH, not STRONG**.
+- Score **21/30**.
+- Safe scope: one V2 repository, supported object-store conditional semantics, metadata enabled, snapshot-pinned reads and live-client write-ID readback.
+- Forbidden scope: exactly-once logical checkpoints, power-loss durability, concurrent local filesystem writers, cross-repository atomicity, native OpenMM support or superiority over OCDBT/Orbax.
+
+NEXT TEST:
+Create one exact-head OpenMM adapter that writes two analytical arrays, the native checkpoint blob and provenance under one repository generation. Persist a transaction UUID before commit and bind it into snapshot properties. Against real S3-compatible storage through Toxiproxy, kill at every asset/root boundary including post-root lost acknowledgement, add a competing writer, restart and reconcile by UUID without blind replay. Require all-old/all-new visibility, complete object reachability, one logical checkpoint, clean conflict behavior, exact OpenMM restart, GC safety and matched OCDBT/native-checkpoint economics.
+
+CONFIDENCE: **HIGH that Icechunk V2 is a real repository-wide atomic visibility kernel on a qualified object store; HIGH that write-ID readback improves live-client ambiguity; HIGH that restarted application identity and domain restart remain unproved; MEDIUM-LOW that a standalone external adapter/audit has budget beyond Arraylake and incumbent workflow tools.**
+
+### Closure-at-visibility lesson — third distinct storage design and new acknowledgement-custody axis
+STATUS: **SUPPORTED ON THREE DISTINCT SHADOW RUNS; LOCAL/STAGED-ELIGIBLE, NOT GLOBALLY PROMOTED.**
+
+NEW EVIDENCE:
+- Run 15 showed that a manifest can make partial uploads invisible yet fail atomic closure over mutable shard generations.
+- Run 16 showed immutable OCDBT objects flushed before one root CAS, while finding unsafe provider fallback and no first-class acknowledgement reconciliation.
+- Run 17 showed Icechunk V2 repository-wide root publication plus matching-write readback for lost conditional acknowledgements.
+
+REFINED PROCEDURE:
+1. Identify the exact visibility root and transaction scope.
+2. Prove every referenced member is immutable or generation-CASed and flushed before the root update.
+3. Pin one published generation for multi-read restoration.
+4. Qualify the actual provider and every setting that controls conditional writes, metadata and durability.
+5. Distinguish three separate outcomes: atomic visibility, live-client acknowledgement recovery and restart-safe logical-operation identity.
+6. For lost acknowledgement, identify where the request/business transaction ID is durably stored and how a new process queries whether that same logical operation landed.
+7. Kill before and after the root update, reopen fresh, verify group reachability/hashes and forbid blind replay.
+8. Bind the storage generation to the application's native restart state and test scientific equivalence.
+
+Do not modify global SEARCH_SKILLS.md from this shadow lane.
+
+### New negative knowledge — storage write identity is not application effect identity
+A per-request object metadata token can prove that the currently live retry sees its own landed write. It does not automatically let a fresh process identify the logical campaign checkpoint that may have committed before death. Future storage audits must separately inspect persistent application transaction identity, snapshot metadata search/readback, duplicate logical commit behavior and competing-writer races.
+
+### H4 impact
+Run 17 does not add a third H4 mature-scientific-package history-archaeology success. Icechunk is a young storage product, and the candidate head itself is maintenance-only. H4 remains supported by OpenDPD and OpenMM.
+
+### Failed-search memory added
+- Do not equate transactional Zarr or old-or-new root visibility with exactly-once campaign checkpoint publication.
+- Do not inherit cloud conditional-write guarantees into the local filesystem backend.
+- Do not call a matching write-ID readback protocol restart-durable unless the token is durably bound to the application transaction before the mutation.
+- Do not claim Icechunk beats OCDBT/Orbax without the same application workload and adversarial matrix.
+- Do not treat a native scientific State export as equivalent to a framework's opaque exact-restart checkpoint.
+- When the inspected head is maintenance-only, date the valuable subsystem honestly and avoid manufacturing a current-head technology event.
+
