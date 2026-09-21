@@ -118,7 +118,6 @@ def _bundle_manifest(result: AuditWorkflowResult, entries: dict[str, bytes]) -> 
             "Discrepancy amounts are not realized savings.",
             "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
             "The remediation plan states required evidence and forbids manual promotion in place.",
-            "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
             "Buyer review, external action and settlement remain separate downstream states.",
             "Bundle must remain inside an approved customer-processing environment.",
         ],
