@@ -51,6 +51,12 @@ class _CertificateSnapshot:
 
 
 def _verify_frozen_proof(truth: TruthManifest, incumbent: IncumbentOutput) -> None:
+    authority_index = {authority.authority_id: authority for authority in truth.authorities}
+    if len(authority_index) != len(truth.authorities):
+        raise ValueError("duplicate frozen authority")
+    for authority in truth.authorities:
+        if (authority.buyer_id, authority.business_unit) != (truth.buyer_id, truth.business_unit):
+            raise ValueError("authority scope mismatch")
     if len({f.finding_id for f in truth.findings}) != len(truth.findings):
         raise ValueError("duplicate frozen finding")
     for finding in truth.findings:
@@ -64,8 +70,22 @@ def _verify_frozen_proof(truth: TruthManifest, incumbent: IncumbentOutput) -> No
         body.pop("proof_hash")
         if canonical_hash(body) != finding.proof_hash:
             raise ValueError("frozen finding proof hash mismatch")
-    body = {"schema": 2, **asdict(truth)}
-    body.pop("truth_hash")
+        if finding.status == VALIDATED:
+            authority = authority_index.get(finding.authority_id or "")
+            if authority is None:
+                raise ValueError("validated finding authority missing from frozen truth")
+            if (authority.customer_id, authority.carrier_id, authority.currency) != (
+                finding.customer_id, finding.carrier_id, finding.currency,
+            ):
+                raise ValueError("frozen authority identity mismatch")
+    body = {
+        "schema": 3,
+        "buyer_id": truth.buyer_id,
+        "business_unit": truth.business_unit,
+        "population_hash": truth.population_hash,
+        "authorities": [asdict(authority) for authority in truth.authorities],
+        "findings": [asdict(finding) for finding in truth.findings],
+    }
     if canonical_hash(body) != truth.truth_hash:
         raise ValueError("frozen truth hash mismatch")
     body = {"schema": 2, **asdict(incumbent)}
