@@ -51,16 +51,35 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 | freight | EXP-001 | no | none | CAP-003, CAP-004, CAP-005 | CAP-001, CAP-006, CAP-007, CAP-016 |
 
 
+## Stop / recall observations — observe only
+
+These signals are recorded for diagnosis and future controlled learning. They do **not** currently reward or penalize a strategy.
+
+- Discovery runs with controlled stop reasons: **0**
+- Runs where recall-rescue usage was explicitly observed: **10**
+- Runs that used a recall rescue: **2**
+
+| Stop reason | Runs |
+|---|---:|
+| — | 0 |
+
+### Recall rescue types
+
+| Rescue type | Uses | Qualifying finds |
+|---|---:|---:|
+| unspecified | 2 | 0 |
+
+The two historical rescue uses predate the new rescue-type/success fields. `unspecified` preserves that uncertainty rather than inventing a type or success label.
+
 ## Recall floor
 
-The benchmark currently shows a precision/verification benefit in several experimental runs but no aggregate discovery advantage and two experiment-side no-find misses. Until harder held-out evidence says otherwise, preserve a within-run recall floor for live search:
-- do not let one attractive near-match consume the entire search budget;
-- before NO_FIND, use one materially different recall-rescue surface when practical;
-- treat verifier rejection as candidate-specific, not task-wide absence evidence;
-- keep novelty/wildcard exploration alive even when a high-confidence strategy has strong local results;
-- use no-find, duplicate, retrieval-limit and verifier-overturn outcomes as negative training signals for allocation.
-
-This is a guardrail, not a new benchmark treatment and not evidence that any strategy is superior.
+- Do not let one attractive near-match consume the entire search budget on a true discovery task.
+- Before NO_FIND, use one materially different recall-rescue surface when practical.
+- If domain-labelled candidates miss the defining invariant, use an invariant-first adjacent-domain rescue without relaxing the acceptance target.
+- A rate-limited or failed retrieval surface is retrieval debt, not absence evidence; switch surface/anchor family when practical.
+- Treat verifier rejection as candidate-specific, not task-wide absence evidence.
+- Keep wildcard/novelty exploration alive even when a locally strong strategy emerges.
+- Keep coordination-derived routing observe-first until measured evidence shows it improves outcomes without worsening recall.
 
 ## Allocation guardrails
 
