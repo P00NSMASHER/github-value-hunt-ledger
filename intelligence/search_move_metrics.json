@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "discovery_runs": 22,
+  "instrumented_runs": 0,
+  "search_moves": 0,
+  "move_types_observed": 0,
+  "observe_only": true,
+  "minimum_evidence": {
+    "global_uses": 8,
+    "global_deep_inspections": 8,
+    "objective_uses": 5
+  },
+  "by_move_type": [],
+  "by_objective_and_move_type": []
+}
