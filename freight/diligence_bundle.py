@@ -24,6 +24,7 @@ DOC_PATHS=(
     "freight/AUDIT_RUN_MANIFEST.md",
     "freight/AUDIT_WORKFLOW.md",
     "freight/BUYER_REVIEW_WORKFLOW.md",
+    "freight/CARRIER_ACTION_WORKFLOW.md",
     "freight/BUSINESS_MODEL.md",
     "freight/COMMERCIAL_QUALIFICATION.md",
     "freight/COMMERCIAL_LEARNING.md",
