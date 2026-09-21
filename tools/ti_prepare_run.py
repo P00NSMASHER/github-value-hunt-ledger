@@ -38,7 +38,8 @@ CLAIM_FIELDS = {
     )},
 }
 COUNTS = ("candidate_count", "deep_inspected", "retained_count", "master_promoted_count",
-          "elapsed_minutes", "tool_calls")
+          "elapsed_minutes", "tool_calls", "candidate_preflight_checks",
+          "known_candidate_preflight_hits", "duplicate_deep_inspections_avoided")
 
 
 def read_rows(path):
