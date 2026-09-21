@@ -91,7 +91,6 @@ def test_clean_run_is_distinct_from_review_required():
     assert result.summary.evidence_remediation_case_count == 0
     assert result.summary.rerun_required is False
     assert result.artifacts.remediation_plan.items == ()
-    assert result.artifacts.remediation_plan.items == ()
     assert result.summary.validated_discrepancy_cents == 0
 
 
@@ -129,6 +128,7 @@ def test_all_validated_review_cases_route_to_buyer_review_ready():
     assert result.summary.buyer_review_case_count == 2
     assert result.summary.evidence_remediation_case_count == 0
     assert result.summary.rerun_required is False
+    assert result.artifacts.remediation_plan.items == ()
 
 
 def test_malformed_invoice_blocks_at_invoice_ingest_without_partial_artifacts():
