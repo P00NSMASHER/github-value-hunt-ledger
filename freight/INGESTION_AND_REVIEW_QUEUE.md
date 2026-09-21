@@ -22,6 +22,16 @@ Rules:
 
 This adapter does not infer columns, guess currencies, convert dollars to cents, or repair malformed exports.
 
+## Charge-rule CSV
+
+The v1 authority-rule adapter accepts only rule semantics:
+
+`charge_code, pricing_model, effective_from, effective_to, fixed_cents, unit_rate_cents`
+
+Buyer/business-unit scope, customer/carrier identity, currency, authority-document ID, original document SHA-256, and **whether the document is verified as controlling authority** all come from trusted caller context. They are deliberately not accepted from the CSV, so a spreadsheet cannot promote itself into controlling authority.
+
+The adapter supports the same `INCLUDED`, `FIXED`, and `PER_UNIT` models as the Finding Factory, validates effective dates and exact integer-cent semantics, rejects duplicate normalized rules, and binds the normalized rule batch to both the CSV file hash and original authority-document hash.
+
 ## Review queue
 
 The queue excludes `CLEAR` derivations and orders remaining work deterministically:
@@ -34,4 +44,4 @@ Within a class, larger supported variance is shown first. The queue is built fro
 
 ## Current boundary
 
-This is intentionally not a universal freight importer. CSV v1 is the first controlled adapter. Carrier-specific EDI/X12 and authority-rule adapters should be added only from a real buyer population with fixtures and exact semantics.
+This is intentionally not a universal freight importer. CSV v1 is the first controlled adapter. Carrier-specific EDI/X12 invoice adapters and richer authority models should be added only from a real buyer population with fixtures and exact semantics. The current rule adapter handles normalized deterministic rule rows; it does not extract or interpret prose contracts.

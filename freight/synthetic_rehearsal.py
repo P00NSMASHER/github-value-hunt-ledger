@@ -16,11 +16,7 @@ from freight.contracts import (
     open_incumbent_output,
     seal_incumbent_submission,
 )
-from freight.finding_factory import (
-    FIXED,
-    ChargeRule,
-    derive_batch,
-)
+from freight.finding_factory import derive_batch
 from freight.invoice_csv_adapter import parse_invoice_charge_csv
 from freight.deal_economics import DealProfile, qualify_deal
 from freight.pilot_reporting import (
@@ -28,6 +24,7 @@ from freight.pilot_reporting import (
     make_finding_review,
 )
 from freight.review_queue import build_review_queue
+from freight.rule_csv_adapter import parse_charge_rule_csv
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_report import (
     ClaimFindingBinding,
@@ -109,14 +106,40 @@ def run_rehearsal() -> dict:
         business_unit=BU,
     )
     charges = invoice_batch.charges
-    rules = (
-        ChargeRule(BUYER,BU,"cust","carrier","USD","rate-confirmation",
-                   "DETENTION",FIXED,"2026-09-01","2026-09-30","src-auth-1",True,10000,None),
-        ChargeRule(BUYER,BU,"cust","carrier","USD","rate-confirmation",
-                   "ACCESSORIAL",FIXED,"2026-09-01","2026-09-30","src-auth-1",True,10000,None),
-        ChargeRule(BUYER,BU,"cust","carrier","USD","candidate-addendum",
-                   "MISC",FIXED,"2026-09-01","2026-09-30","src-auth-review",False,10000,None),
+    verified_rules_csv = (
+        "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
+        "DETENTION,FIXED,2026-09-01,2026-09-30,10000,\n"
+        "ACCESSORIAL,FIXED,2026-09-01,2026-09-30,10000,\n"
+    ).encode("utf-8")
+    verified_rule_batch = parse_charge_rule_csv(
+        filename="rate-confirmation-rules.csv",
+        data=verified_rules_csv,
+        buyer_id=BUYER,
+        business_unit=BU,
+        customer_id="cust",
+        carrier_id="carrier",
+        currency="USD",
+        authority_document_id="rate-confirmation",
+        source_document_sha256="a" * 64,
+        verified_controlling_authority=True,
     )
+    review_rules_csv = (
+        "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
+        "MISC,FIXED,2026-09-01,2026-09-30,10000,\n"
+    ).encode("utf-8")
+    review_rule_batch = parse_charge_rule_csv(
+        filename="candidate-addendum-rules.csv",
+        data=review_rules_csv,
+        buyer_id=BUYER,
+        business_unit=BU,
+        customer_id="cust",
+        carrier_id="carrier",
+        currency="USD",
+        authority_document_id="candidate-addendum",
+        source_document_sha256="b" * 64,
+        verified_controlling_authority=False,
+    )
+    rules = verified_rule_batch.rules + review_rule_batch.rules
     factory = derive_batch(population, charges, rules)
     review_queue = build_review_queue(factory)
     truth = factory.truth
@@ -242,6 +265,8 @@ def run_rehearsal() -> dict:
         "truth_hash": truth.truth_hash,
         "invoice_csv_adapter_hash": invoice_batch.adapter_hash,
         "invoice_csv_file_sha256": invoice_batch.file_sha256,
+        "verified_rule_adapter_hash": verified_rule_batch.adapter_hash,
+        "review_rule_adapter_hash": review_rule_batch.adapter_hash,
         "finding_factory_hash": factory.factory_hash,
         "finding_factory_decisions": [item.decision for item in factory.derivations],
         "review_queue_hash": review_queue.queue_hash,
