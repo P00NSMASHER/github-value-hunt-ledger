@@ -1,0 +1,50 @@
+{
+  "product": "SheetHarbor",
+  "release": "v0.2.0-alpha",
+  "manifest_version": 1,
+  "created_date": "2026-09-20",
+  "freeze_allowed": false,
+  "artifacts": [
+    {
+      "product_id": "SH-CANDLE",
+      "file": "artifacts/v0.2.0-alpha/SheetHarbor_Candle_Economics_v0.2.0-alpha.xlsx",
+      "sha256": "b289019dbf6c129d640a7b431ab52f3431f9f6d5bf0ead387b309341005631ba"
+    },
+    {
+      "product_id": "SH-FDM",
+      "file": "artifacts/v0.2.0-alpha/SheetHarbor_FDM_3D_Printing_Economics_v0.2.0-alpha.xlsx",
+      "sha256": "94d69ceecf4f894ddacc8ae36f882dde25a918072aa7b802f2b9039a4631a94c"
+    },
+    {
+      "product_id": "SH-EMB",
+      "file": "artifacts/v0.2.0-alpha/SheetHarbor_Embroidery_Economics_v0.2.0-alpha.xlsx",
+      "sha256": "384108221ab99173f91c54d7b5cacbf1c24212b76ea07d05cd56c168fe37bc8d"
+    },
+    {
+      "product_id": "SH-SCREEN",
+      "file": "artifacts/v0.2.0-alpha/SheetHarbor_Screen_Printing_Economics_v0.2.0-alpha.xlsx",
+      "sha256": "702b5fd6fdcdc69638d570699b323c021b18d3540241d63a24a2828169241b84"
+    }
+  ],
+  "gates": {
+    "golden_arithmetic": {
+      "status": "pass",
+      "date": "2026-09-20",
+      "checks": 24,
+      "products_passed": 4,
+      "evidence_commit": "f32a4d99e8cf7c9e38c3dffb5ab17e364690ac57"
+    },
+    "google_sheets_roundtrip": {
+      "status": "pass",
+      "date": "2026-09-20",
+      "products_passed": 4,
+      "evidence_commit": "592e56e613305c6362b4e61beb055c8f2d91ec1f"
+    },
+    "microsoft_excel_roundtrip": {
+      "status": "pending",
+      "tested_version": null,
+      "tested_build": null,
+      "evidence_file": null
+    }
+  }
+}
