@@ -32,6 +32,11 @@ from freight.settlement_csv_adapter import (
     parse_counter_event_csv,
     parse_settlement_event_csv,
 )
+from freight.settlement_review_workflow import (
+    SettlementReviewDecisionInput,
+    apply_settlement_review_decision,
+    build_settlement_review_case,
+)
 from freight.settlement_report import (
     assert_report_current,
     build_persistent_pilot_report,
@@ -39,6 +44,7 @@ from freight.settlement_report import (
 )
 from freight.settlement_store import (
     ALLOCATED,
+    REVIEW,
     REVERSED,
     SettlementStore,
 )
@@ -197,11 +203,6 @@ def run_rehearsal() -> dict:
         issued_at="2026-09-20T14:00:00Z",
     )
     bindings = recovery_claims.bindings
-    claim_id_by_finding = {
-        record.finding_id: record.claim_id
-        for record in recovery_claims.records
-    }
-
     settlement_csv = (
         "event_id,reference,payer_id,payee_id,currency,amount_cents,booked_at,source_kind\n"
         "e-1,inv-1,carrier,cust,USD,2000,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
@@ -238,10 +239,25 @@ def run_rehearsal() -> dict:
         )
         claim_persistence = persist_recovery_claim_batch(store, recovery_claims)
         store.ingest_event(settlement_by_id["e-1"])
-        store.review_allocate(
-            allocation_id="a-1", claim_id=claim_id_by_finding[f1.finding_id], event_id="e-1",
-            amount_cents=2000, created_at="2026-09-21T11:00:00Z",
+        partial_auto = store.auto_allocate(
+            "e-1", created_at="2026-09-21T10:30:00Z"
         )
+        assert partial_auto.status == REVIEW
+        settlement_review_case = build_settlement_review_case(
+            store, event_id="e-1"
+        )
+        settlement_review_receipt = apply_settlement_review_decision(
+            store,
+            case=settlement_review_case,
+            decision=SettlementReviewDecisionInput(
+                case_hash=settlement_review_case.case_hash,
+                claim_id="claim:" + f1.proof_hash,
+                reviewer_role="Buyer Controller",
+                reviewed_at="2026-09-21T11:00:00Z",
+                rationale="Carrier credit memo is documented against inv-1 and partially satisfies the confirmed recovery claim.",
+            ),
+        )
+        assert settlement_review_receipt.allocation_status == ALLOCATED
         store.ingest_event(settlement_by_id["e-2"])
         status = store.auto_allocate(
             "e-2", created_at="2026-09-21T11:00:00Z"
@@ -324,6 +340,12 @@ def run_rehearsal() -> dict:
         "settlement_csv_adapter_hash": settlement_batch.adapter_hash,
         "settlement_csv_file_sha256": settlement_batch.file_sha256,
         "settlement_event_count": len(settlement_batch.events),
+        "settlement_review_case_hash": settlement_review_case.case_hash,
+        "settlement_review_candidate_count": len(settlement_review_case.candidates),
+        "settlement_review_hash": settlement_review_receipt.review_hash,
+        "settlement_review_receipt_hash": settlement_review_receipt.receipt_hash,
+        "settlement_review_allocation_id": settlement_review_receipt.allocation_id,
+        "settlement_review_allocation_status": settlement_review_receipt.allocation_status,
         "counter_csv_adapter_hash": counter_batch.adapter_hash,
         "counter_csv_file_sha256": counter_batch.file_sha256,
         "counter_event_count": len(counter_batch.events),
