@@ -7,8 +7,9 @@ minimum-sample gates and never treating a retrieval failure as evidence of absen
 """
 import json
 from collections import defaultdict
+from datetime import datetime, timezone
 
-from ti_common import INTEL, load_jsonl, is_discovery_run
+from ti_common import INTEL, load_jsonl, is_discovery_run, normalize_run_time
 
 runs = [
     r for r in load_jsonl("search_runs.jsonl")
@@ -27,6 +28,7 @@ groups = defaultdict(lambda: {
     "candidate_count": 0,
     "deep_inspected": 0,
     "retained_count": 0,
+    "observed_times": [],
 })
 objective_groups = defaultdict(lambda: defaultdict(lambda: {
     "uses": 0,
@@ -65,6 +67,12 @@ for run in runs:
             g["unknown"] += 1
         for key in ("candidate_count", "deep_inspected", "retained_count"):
             g[key] += move.get(key) or 0
+        raw_time = normalize_run_time(run)
+        if raw_time:
+            try:
+                g["observed_times"].append(datetime.fromisoformat(str(raw_time).replace("Z", "+00:00")))
+            except Exception:
+                pass
 
         og = objective_groups[objective][move_type]
         og["uses"] += 1
@@ -73,12 +81,26 @@ for run in runs:
         og["retrieval_limited"] += int(result == "retrieval_limited")
         og["retained_count"] += move.get("retained_count") or 0
 
+all_times = [
+    t for g in groups.values() for t in g["observed_times"]
+]
+reference_time = max(all_times) if all_times else None
+
 rows = []
 for move_type, g in groups.items():
     uses = g["uses"]
+    times = sorted(g.pop("observed_times"))
+    recent_30d_uses = 0
+    if reference_time:
+        recent_30d_uses = sum(
+            1 for t in times if (reference_time - t).total_seconds() <= 30 * 86400
+        )
     rows.append({
         "move_type": move_type,
         **g,
+        "first_seen": times[0].isoformat() if times else None,
+        "last_seen": times[-1].isoformat() if times else None,
+        "recent_30d_uses": recent_30d_uses,
         "qualifying_hit_rate": g["qualifying_hits"] / uses if uses else None,
         "productive_hit_rate": (g["qualifying_hits"] + g["useful_hits"]) / uses if uses else None,
         "retrieval_limit_rate": g["retrieval_limited"] / uses if uses else None,
@@ -120,6 +142,7 @@ metrics = {
         "global_uses": 8,
         "global_deep_inspections": 8,
         "objective_uses": 5,
+        "recency_window_days": 30,
     },
     "by_move_type": rows,
     "by_objective_and_move_type": objective_rows,
@@ -165,6 +188,7 @@ lines += [
     "- A productive move can still be expensive; whole-run outcome and effort telemetry remain authoritative for portfolio decisions.",
     "- Do not suppress low-frequency exploration because one move type has high early hit rate.",
     "- Search-move evidence becomes a scheduling prior only after minimum-sample gates and recall audits are satisfied.",
+    "- Learned move priors are not permanent: preserve first/last-seen metadata, prefer recent corroboration, and revalidate stale methods when ecosystems or tools change.",
     "",
 ]
 (INTEL / "SEARCH_MOVE_REPORT.md").write_text("\n".join(lines), encoding="utf-8")
