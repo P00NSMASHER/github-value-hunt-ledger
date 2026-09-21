@@ -110,5 +110,7 @@
   "activation_generation_id": "ACTGEN:000000000000",
   "stop_reason_standard": null,
   "coordination_signal_ids": [],
-  "consumed_coordination_signal_ids": []
+  "consumed_coordination_signal_ids": [],
+  "recall_rescue_type": null,
+  "recall_rescue_found_qualifying_candidate": null
 }
