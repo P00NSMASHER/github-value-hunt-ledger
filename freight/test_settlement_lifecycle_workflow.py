@@ -310,3 +310,82 @@ def test_processed_at_cannot_predate_counter_before_any_package_write(tmp_path):
     assert s.count("counter_events")==0
     assert s.count("allocations")==0
     assert s.count("reversal_edges")==0
+
+
+def test_review_case_is_built_from_final_package_state_not_mid_package_state(tmp_path):
+    s=store(tmp_path)
+    s.create_claim(claim("c1","INV-1",2500,"claim-1"))
+    result=process_settlement_evidence(
+        s,
+        processed_at="2026-09-21T11:00:00Z",
+        settlement_filename="settlements.csv",
+        settlement_data=settlement_bytes(
+            "e1,INV-1,carrier,customer,USD,2000,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+            "e2,INV-1,carrier,customer,USD,2500,2026-09-21T10:01:00Z,CREDIT-MEMO\n"
+        ),
+    )
+    assert [item.effective_status for item in result.settlement_events]==[REVIEW,ALLOCATED]
+    assert len(result.settlement_review_cases)==1
+    case=result.settlement_review_cases[0]
+    assert case.event_id=="e1"
+    assert case.candidates==()
+    assert s.claim_residual("c1")==0
+
+
+def test_same_package_counter_can_restore_capacity_and_remove_stale_settlement_review(tmp_path):
+    s=store(tmp_path)
+    s.create_claim(claim("c1","INV-1",2500,"claim-1"))
+    s.ingest_event(SettlementEventRecord(
+        "old","INV-1","carrier","customer","USD",2500,
+        "2026-09-20T11:00:00Z","old-settlement","CREDIT-MEMO",
+    ))
+    assert s.auto_allocate(
+        "old",created_at="2026-09-20T12:00:00Z"
+    ).status==ALLOCATED
+
+    result=process_settlement_evidence(
+        s,
+        processed_at="2026-09-22T11:00:00Z",
+        settlement_filename="settlements.csv",
+        settlement_data=settlement_bytes(
+            "new,INV-1,carrier,customer,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+        ),
+        counter_filename="returns.csv",
+        counter_data=counter_bytes(
+            "r-old,old,USD,2500,2026-09-22T10:00:00Z,BANK-RETURN\n"
+        ),
+    )
+    assert result.state==COMPLETE
+    assert result.settlement_events[0].effective_status==ALLOCATED
+    assert result.counter_events[0].effective_status==REVERSED
+    assert result.review_case_count==0
+    assert result.settlement_review_cases==()
+    assert s.event_residual("new")==0
+    assert s.realized_cents()==2500
+
+
+def test_mid_transaction_failure_rolls_back_entire_lifecycle_package(tmp_path,monkeypatch):
+    s=store(tmp_path)
+    s.create_claim(claim("c1","INV-1",2500,"claim-1"))
+
+    def fail_after_counter_ingest(conn,counter_id,created_at):
+        raise RuntimeError("synthetic late package failure")
+
+    monkeypatch.setattr(s,"_auto_apply_counter_conn",fail_after_counter_ingest)
+    with pytest.raises(RuntimeError,match="synthetic late package failure"):
+        process_settlement_evidence(
+            s,
+            processed_at="2026-09-22T11:00:00Z",
+            settlement_filename="settlements.csv",
+            settlement_data=settlement_bytes(
+                "e1,INV-1,carrier,customer,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+            ),
+            counter_filename="returns.csv",
+            counter_data=counter_bytes(
+                "r1,e1,USD,2500,2026-09-22T10:00:00Z,BANK-RETURN\n"
+            ),
+        )
+    assert s.count("settlement_events")==0
+    assert s.count("counter_events")==0
+    assert s.count("allocations")==0
+    assert s.count("reversal_edges")==0
