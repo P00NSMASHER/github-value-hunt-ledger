@@ -1,0 +1,221 @@
+{
+  "schema_version": 16,
+  "search_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
+  "timestamp": "2026-09-21T06:13:03Z",
+  "date": "2026-09-21",
+  "hunter": "HUNTER-01",
+  "hunter_role": "vertical-erp-gold",
+  "strategy_id": "STRAT:rule-period-authority-version-audit",
+  "query_family": "NuGet effective rule version plus historical evaluation plus external authority provenance",
+  "query_family_id": "QF:nuget-rule-version-authority-transfer",
+  "search_objective_id": "OBJ:current-rule-authority",
+  "measurement_quality": "prospective",
+  "work_action": "search",
+  "lane_ids": [
+    "NODE-01",
+    "COV:package-ecosystem:nuget"
+  ],
+  "seed_nodes": [
+    "CAP-008",
+    "CAP-019"
+  ],
+  "search_surfaces": [
+    "GitHub repository and code search",
+    "exact-revision repository source and test fixtures",
+    "NuGet Gallery package metadata",
+    "Skatteverket first-party annual tax-table publication"
+  ],
+  "queries": [
+    "\"OpenFisca\" language:C#",
+    "C# payroll HMRC tax calculator",
+    ".NET payroll tax engine",
+    "C# benefits rules engine government",
+    "C# tax calculator NuGet historical",
+    "PayrollEngine C# regulation",
+    "Payroll-Engine",
+    "PAYE C#",
+    "tax calculator C#",
+    "authority source hash tax table in Payroll-Engine/PayrollEngine"
+  ],
+  "candidate_count": 8,
+  "deep_inspected": 3,
+  "retained_count": 1,
+  "master_promoted_count": 0,
+  "elapsed_minutes": 11,
+  "tool_calls": null,
+  "recall_rescue_used": false,
+  "stop_reason": "The bounded assignment is answered: one NuGet implementation has explicit effective regulation versions and historical/bitemporal regression tests, but its real-authority tax-table path deliberately excludes and overwrites the source artifact and leaves semantic tax assertions as TODOs; two other C# candidates lack versioned historical authority entirely.",
+  "new_capability_ids": [],
+  "strengthened_capability_ids": [
+    "CAP-008",
+    "CAP-019"
+  ],
+  "experiment_ids": [],
+  "candidate_dispositions": [
+    {
+      "repository": "Payroll-Engine/PayrollEngine",
+      "revision": "2ddb5c770b0a955936562355a1021f06e922886a",
+      "status": "watch-strong-transfer-donor",
+      "reason_code_standard": "effective-version-and-historical-evaluation-with-unbound-authority-artifact",
+      "reason_detail": "Regulation version and validFrom are first-class and boundary-tested; bitemporal evaluation is independently fixture-tested. The Skatteverket import path names an official source but preserves no required file digest/year/source receipt, resets lookup contents on annual import, and comments out expected withholding assertions.",
+      "capability_ids": [
+        "CAP-008",
+        "CAP-019"
+      ],
+      "novelty_ordinal": 4,
+      "evidence_ordinal": 4,
+      "replacement_days_low": 14,
+      "replacement_days_high": 35,
+      "first_seen_in_registry": false,
+      "repository_profile": {
+        "observed_at": "2026-09-21",
+        "metadata_status": "observed",
+        "stars": 124,
+        "forks_count": 32,
+        "primary_language": "PowerShell",
+        "archived": false,
+        "fork": false,
+        "created_at": "2023-05-23T17:09:14Z",
+        "last_pushed_at": "2026-07-14T06:07:01Z",
+        "license_spdx": "MIT",
+        "source_type": "company",
+        "package_ecosystems": [
+          "NuGet"
+        ],
+        "protocol_families": [],
+        "geography_tags": [
+          "Sweden"
+        ],
+        "technology_domains": [
+          "payroll",
+          "rules-as-code",
+          "regulatory-compliance"
+        ],
+        "profile_source": "GitHub repository metadata, exact-revision schema/examples/tests, NuGet Gallery and first-party Skatteverket publication"
+      }
+    },
+    {
+      "repository": "DTS-STN/policy-dev-eng-dts-csps",
+      "revision": "8996f1c1f8202a10f5849dad0c4eade3865a466e",
+      "status": "rejected",
+      "reason_code_standard": "authority-linked-client-without-rule-version-or-history",
+      "reason_detail": "Government prototype links the authoritative regulation and tests its C# OpenFisca client/builders, but hardcodes a single 2020-09-25 wire date and carries no rule-package version, authority digest or historical selection test.",
+      "capability_ids": [
+        "CAP-008"
+      ],
+      "novelty_ordinal": 2,
+      "evidence_ordinal": 3,
+      "replacement_days_low": 2,
+      "replacement_days_high": 5,
+      "first_seen_in_registry": false,
+      "repository_profile": {
+        "observed_at": "2026-09-21",
+        "metadata_status": "observed",
+        "stars": 0,
+        "forks_count": 0,
+        "primary_language": "C#",
+        "archived": false,
+        "fork": false,
+        "created_at": "2021-03-03T19:56:28Z",
+        "last_pushed_at": "2021-07-14T19:55:23Z",
+        "license_spdx": null,
+        "source_type": "government",
+        "package_ecosystems": [],
+        "protocol_families": [
+          "OpenFisca API"
+        ],
+        "geography_tags": [
+          "Canada"
+        ],
+        "technology_domains": [
+          "rules-as-code",
+          "labour-regulation"
+        ],
+        "profile_source": "GitHub repository metadata and exact-revision C# source/tests"
+      }
+    },
+    {
+      "repository": "microsoft/Dynamics-AX-Payroll-US",
+      "revision": "7a7825d4a618147db48fa81c055033553075197d",
+      "status": "rejected",
+      "reason_code_standard": "thin-proprietary-engine-wrapper-without-public-rules-or-tests",
+      "reason_detail": "Archived adapter only pools instances from a local ste-net.dll; public source contains no rule data, effective version selection, authority provenance or tests and does not consume a NuGet rule package.",
+      "capability_ids": [
+        "CAP-008"
+      ],
+      "novelty_ordinal": 1,
+      "evidence_ordinal": 2,
+      "replacement_days_low": 1,
+      "replacement_days_high": 3,
+      "first_seen_in_registry": false,
+      "repository_profile": {
+        "observed_at": "2026-09-21",
+        "metadata_status": "observed",
+        "stars": 2,
+        "forks_count": 2,
+        "primary_language": "C#",
+        "archived": true,
+        "fork": false,
+        "created_at": "2020-08-31T20:23:59Z",
+        "last_pushed_at": "2020-12-18T17:46:04Z",
+        "license_spdx": "MIT",
+        "source_type": "company",
+        "package_ecosystems": [],
+        "protocol_families": [],
+        "geography_tags": [
+          "United States"
+        ],
+        "technology_domains": [
+          "payroll",
+          "tax-engine-integration"
+        ],
+        "profile_source": "GitHub repository metadata and exact-revision C# source/project file"
+      }
+    }
+  ],
+  "best_result": "Payroll Engine is a strong NuGet transfer donor: effective regulation versions, validFrom boundary tests and bitemporal historical evaluation are connected and executable. Its Swedish authority path still excludes and overwrites the annual table artifact, binds no source digest/year/receipt to the regulation version, and leaves withholding assertions as TODOs, so the full authority conjunction remains unproven.",
+  "durable_evidence_path": "hunters/01-run27-2026-09-21.md",
+  "notes": "Generated SLOT-07 coverage claim. No production payroll correctness, official certification, live provider execution, buyer outcome or MASTER promotion is asserted. GitHub code search rate limits affected several attempted discovery queries; only completed queries are enumerated.",
+  "benchmark_task_ids": [],
+  "comparison_group_id": null,
+  "evaluation_set_id": null,
+  "seed_mode": "generated",
+  "seed_ids": [
+    "SEED:coverage:package-ecosystem-nuget:rule-version-transfer"
+  ],
+  "adjacency_mode": "none",
+  "adjacency_ids": [],
+  "adjacency_types": [],
+  "adjacency_root_nodes": [],
+  "coverage_mode": "generated",
+  "coverage_gap_ids": [
+    "COV:package-ecosystem:nuget"
+  ],
+  "allocation_mode": "generated",
+  "allocator_generation_id": "ALLOCGEN:34f76c214c64",
+  "assignment_id": "ASSIGN:34f76c214c64:slot-07",
+  "assignment_work_item_id": "WORK:seed:0a203a0a56d1",
+  "portfolio_policy_generation_id": "PORTFOLIO:3f0ab6a3092f",
+  "assignment_slot_role": "coverage",
+  "assignment_work_kind": "coverage_gap",
+  "assignment_source_id": "SEED:coverage:package-ecosystem-nuget:rule-version-transfer",
+  "assignment_score": 88.08,
+  "execution_claim_id": "CLAIM:7cb70fe09a6d",
+  "execution_slot_id": "SLOT-07",
+  "execution_worker_id": "HUNTER-01",
+  "routing_mode": "generated",
+  "routing_generation_id": "ROUTING:2c21794e07ff",
+  "worker_profile_generation_id": "WORKERS:3dd0bfdb5314",
+  "routing_score": 17.8195,
+  "dispatch_ticket_id": "DISPATCH:1d618bf406da",
+  "dispatch_generation_id": "DISPATCHGEN:477d7c96c94e",
+  "routing_learning_generation_id": "ROUTELEARN:bc40639ef4db",
+  "route_override_reason": null,
+  "dispatch_kind": "primary",
+  "dispatch_parent_ticket_id": null,
+  "parent_dispatch_ticket_id": null,
+  "presence_generation_id": "PRESENCEGEN:46704521e8e8",
+  "presence_event_id": "PRESENCE:1819c3731d6e",
+  "activation_id": "ACTIVATE:1bfeb3bcf613",
+  "activation_generation_id": "ACTGEN:6d53c23c548e"
+}
