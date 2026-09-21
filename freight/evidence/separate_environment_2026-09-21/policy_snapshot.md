@@ -2,7 +2,7 @@
 
 Effective date: 2026-09-21
 Environment: single-tenant, manual-review Google Drive workspace
-Status: EMPTY UNTIL VERIFIED
+Status: VERIFIED FOR CONTROLLED MANUAL PILOT — EMPTY UNTIL BUYER AUTHORIZATION
 
 - One pilot at a time.
 - Owner-only until a specific buyer engagement is approved.
