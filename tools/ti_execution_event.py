@@ -26,22 +26,24 @@ def append_event(slot,event):
         f.write(json.dumps(event,ensure_ascii=False)+"\n")
     return path
 
-def select_dispatch(worker,slot,steal=False,dispatch_ticket=None):
-    primary=load_jsonl("dispatch_claim_packets.jsonl") if (INTEL/"dispatch_claim_packets.jsonl").exists() else []
-    backups=load_jsonl("work_steal_claim_packets.jsonl") if (INTEL/"work_steal_claim_packets.jsonl").exists() else []
+def select_dispatch(worker,slot,steal=False,dispatch_ticket=None,activation_id=None):
+    pool=load_jsonl("activation_claim_packets.jsonl") if (INTEL/"activation_claim_packets.jsonl").exists() else []
+    matches=[x for x in pool if x.get("worker_id")==worker and x.get("slot_id")==slot]
     if dispatch_ticket:
-        pool=primary+backups
-        matches=[x for x in pool if x.get("worker_id")==worker and x.get("slot_id")==slot and x.get("dispatch_ticket_id")==dispatch_ticket]
+        matches=[x for x in matches if x.get("dispatch_ticket_id")==dispatch_ticket]
+    elif steal:
+        matches=[x for x in matches if x.get("dispatch_kind")=="work_steal"]
     else:
-        pool=backups if steal else primary
-        matches=[x for x in pool if x.get("worker_id")==worker and x.get("slot_id")==slot]
+        matches=[x for x in matches if (x.get("dispatch_kind") or "primary")=="primary"]
+    if activation_id:
+        matches=[x for x in matches if x.get("activation_id")==activation_id]
     if not matches:
         return None
     matches.sort(key=lambda x:(int(x.get("steal_rank") or 0),x.get("dispatch_ticket_id") or ""))
     return matches[0]
 
 def main():
-    p=argparse.ArgumentParser(description="Append one local V15 execution event. Commit/push atomically after review.")
+    p=argparse.ArgumentParser(description="Append one local V19 execution event. Generated claims require a current V16 activation packet.")
     sub=p.add_subparsers(dest="cmd",required=True)
     for name in ["claim","heartbeat","start","complete","fail","release"]:
         sp=sub.add_parser(name)
@@ -52,6 +54,7 @@ def main():
             sp.add_argument("--manual-override-reason")
             sp.add_argument("--steal",action="store_true")
             sp.add_argument("--dispatch-ticket")
+            sp.add_argument("--activation-id")
         if name=="heartbeat":
             sp.add_argument("--extend-minutes",type=int)
         if name=="complete":
@@ -86,7 +89,7 @@ def main():
           "event_id":"EXEC:"+short_hash("CLAIM|"+seed),
           "event_type":"CLAIM","timestamp":ts,"slot_id":args.slot,
           "claim_id":cid,"worker_id":args.worker,
-          "claim_schema_version":int(dispatch_policy.get("minimum_v15_claim_schema_version",15)),
+          "claim_schema_version":int(dispatch_policy.get("minimum_v19_claim_schema_version",19)),
           "assignment_id":alloc["assignment_id"],
           "allocator_generation_id":alloc["allocator_generation_id"],
           "portfolio_policy_generation_id":alloc["portfolio_policy_generation_id"],
@@ -103,20 +106,27 @@ def main():
             event["dispatch_kind"]=None
             event["parent_dispatch_ticket_id"]=None
         else:
-            dispatch=select_dispatch(args.worker,args.slot,args.steal,args.dispatch_ticket)
+            dispatch=select_dispatch(args.worker,args.slot,args.steal,args.dispatch_ticket,args.activation_id)
             if not dispatch:
-                raise SystemExit("no matching current V15 dispatch packet; use --steal, --dispatch-ticket, or --manual-override-reason")
+                raise SystemExit("no matching current V19 activation packet; publish READY presence or use --manual-override-reason")
             now=now_dt()
             eligible=parse_ts(dispatch.get("eligible_at") or dispatch.get("issued_at"))
             hard=parse_ts(dispatch.get("hard_expire_at"))
+            activation_exp=parse_ts(dispatch.get("expires_at"))
             if eligible and now<eligible:
                 raise SystemExit("dispatch ticket is not eligible yet")
             if hard and now>hard:
                 raise SystemExit("dispatch ticket has hard-expired")
+            if activation_exp and now>activation_exp:
+                raise SystemExit("V16 activation has expired")
             for key in [
               "dispatch_ticket_id","dispatch_generation_id","routing_generation_id",
               "worker_profile_generation_id","routing_learning_generation_id","routing_score",
-              "dispatch_kind","parent_dispatch_ticket_id"
+              "routing_exploration_generation_id","routing_exploration_pair_id",
+              "baseline_slot_id","route_mode",
+              "dispatch_kind","parent_dispatch_ticket_id",
+              "presence_generation_id","presence_event_id",
+              "activation_id","activation_generation_id"
             ]:
                 event[key]=dispatch.get(key)
             event["routing_mode"]="generated"
