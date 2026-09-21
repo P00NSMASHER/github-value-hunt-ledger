@@ -1,0 +1,25 @@
+{
+  "artifacts": [
+    {
+      "path": "account_authentication_redacted.md",
+      "sha256": "e16cbecf9cf6695b5d76eae5ef4a3e060feecbe5b2e463d7b8ede8e4b6290596"
+    },
+    {
+      "path": "drive_workspace_snapshot.json",
+      "sha256": "22e5d6e8504520fa19a2095c48ca27b438cd7bcdcba70a24b760c5a909ead4b4"
+    },
+    {
+      "path": "policy_snapshot.md",
+      "sha256": "9517f65effae70d662f28281ca6e49e7375cda62f44f5fc906cb645e267889ef"
+    },
+    {
+      "path": "provider_encryption.md",
+      "sha256": "250759dbaf0e210b5383a578af35a8f8df5358b778a3aef5b451c8c174520d68"
+    }
+  ],
+  "decision": "CONDITIONAL",
+  "environment_id": "gdrive-single-tenant-manual-20260921",
+  "observed_at": "2026-09-21",
+  "only_unproven_base_control": "mfa_enforced",
+  "schema_version": 1
+}
