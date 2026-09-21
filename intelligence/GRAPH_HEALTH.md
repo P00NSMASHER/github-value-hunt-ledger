@@ -23,7 +23,7 @@
 | CAP-015 — Prospective, leakage-resistant prediction and evaluator-grain evidence | source_or_test_validated | 10 | 2 | 2 | 1 | 4 | first-party OEDI ZIP digest/bytes remain unresolved in the current evidence chain. Verify the current first-party artifact against the external expected digest, byte-inspect source schema/time/null semantics, then freeze the composite-event + unique-spell evaluator manifest before running policy scores. |
 | CAP-019 — Source-authority observation receipts | source_or_test_validated | 2 | 0 | 1 | 1 | 4 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
 | CAP-005 — Physical-event-to-entitlement evidence | runtime_or_stack_proven | 2 | 1 | 0 | 0 | 3 | physical truth and commercial authority remain separate |
-| CAP-016 — Money-state integrity / deterministic close truth | watch | 13 | 1 | 5 | 4 | 3 | — |
+| CAP-016 — Money-state integrity / deterministic close truth | watch | 17 | 1 | 5 | 4 | 3 | — |
 | CAP-006 — Settlement-grounded recovery attribution | runtime_or_stack_proven | 6 | 3 | 1 | 1 | 2 | realized dollars require external outcome evidence |
 
 ## Graph policy

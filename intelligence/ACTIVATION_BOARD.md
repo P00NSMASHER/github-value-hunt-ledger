@@ -1,7 +1,7 @@
 # WORKER ACTIVATION BOARD
 
-Generation: **ACTGEN:2855e98ab92c**
-Clock: **2026-09-21T00:28:06Z**
+Generation: **ACTGEN:f241a1116d06**
+Clock: **2026-09-21T00:33:12Z**
 
 V16 activation is pull-based. Routing can exist without activation; generated claiming requires fresh READY presence.
 
