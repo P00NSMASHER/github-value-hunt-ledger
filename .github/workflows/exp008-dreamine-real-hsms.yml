@@ -1,0 +1,85 @@
+name: EXP-008 Dreamine real-HSMS atomicity
+
+on:
+  push:
+    paths:
+      - ".github/workflows/exp008-dreamine-real-hsms.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dreamine-atomic-shared:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out pinned Dreamine.Gem
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: CodeMaru-Dreamine/Dreamine.Gem
+          ref: 82604d6f03c1e95e0558de5c757989b27cd4a3d6
+          fetch-depth: 1
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Pin source receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "82604d6f03c1e95e0558de5c757989b27cd4a3d6"
+          {
+            echo "repository=CodeMaru-Dreamine/Dreamine.Gem"
+            echo "revision=$(git rev-parse HEAD)"
+            echo "test=Dreamine.Gem.Tests.E30RouterLoopbackTests.HostAndEquipmentExerciseLocallySupportedDialoguesAcrossActualTcp"
+            sha256sum tests/Dreamine.Gem.Tests/E30RouterLoopbackTests.cs
+            sha256sum Protocol/E30/E30EquipmentRouter.cs
+            sha256sum Protocol/E30/E30WireCodec.cs
+            sha256sum Services/GemEquipmentConstantService.cs
+          } | tee dreamine-source-receipt.txt
+
+      - name: Restore
+        run: dotnet restore tests/Dreamine.Gem.Tests/Dreamine.Gem.Tests.csproj
+
+      - name: Capture loopback TCP and execute the exact upstream test
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v tcpdump
+          sudo tcpdump -i lo -s 0 -U -w "$GITHUB_WORKSPACE/dreamine-actual-tcp.pcap" tcp >"$RUNNER_TEMP/tcpdump.log" 2>&1 &
+          capture_pid=$!
+          cleanup() {
+            sudo kill -INT "$capture_pid" 2>/dev/null || true
+            wait "$capture_pid" 2>/dev/null || true
+            cat "$RUNNER_TEMP/tcpdump.log" || true
+          }
+          trap cleanup EXIT
+          dotnet test tests/Dreamine.Gem.Tests/Dreamine.Gem.Tests.csproj \
+            --configuration Release \
+            --no-restore \
+            --logger "trx;LogFileName=dreamine-exp008.trx" \
+            --results-directory "$GITHUB_WORKSPACE/TestResults" \
+            --filter "FullyQualifiedName=Dreamine.Gem.Tests.E30RouterLoopbackTests.HostAndEquipmentExerciseLocallySupportedDialoguesAcrossActualTcp" \
+            --verbosity normal
+
+      - name: Hash execution artifacts
+        if: always()
+        shell: bash
+        run: |
+          sha256sum dreamine-actual-tcp.pcap TestResults/dreamine-exp008.trx dreamine-source-receipt.txt | tee execution-artifact-sha256.txt
+
+      - name: Upload immutable execution evidence
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: exp008-dreamine-real-hsms-${{ github.run_id }}
+          path: |
+            dreamine-actual-tcp.pcap
+            TestResults/dreamine-exp008.trx
+            dreamine-source-receipt.txt
+            execution-artifact-sha256.txt
+          if-no-files-found: error
+          retention-days: 90
