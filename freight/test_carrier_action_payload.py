@@ -290,6 +290,39 @@ def test_approval_for_different_payload_hash_is_rejected():
         )
 
 
+def test_partial_dollar_approval_is_rejected_when_payload_requests_full_amount():
+    artifacts, review, claims, proposal = setup()
+    payload = build_carrier_action_payload(
+        proposal=proposal,
+        recovery_claims=claims,
+        action_type=ActionType.REQUEST_CREDIT_REVIEW,
+    )
+    charter = active_charter()
+    with pytest.raises(ValueError, match="must equal"):
+        authorize_carrier_action_payload(
+            resolution=resolve_engagement(charter),
+            operative_charter=charter,
+            truth=artifacts.factory.truth,
+            review_packet=artifacts.review_packet,
+            review_routing=artifacts.review_routing,
+            buyer_review=review,
+            recovery_claims=claims,
+            proposal=proposal,
+            payload=payload,
+            approval=CarrierActionApprovalInput(
+                proposal_hash=proposal.proposal_hash,
+                authorization_id="ACT-PARTIAL-BAD",
+                action_type=ActionType.REQUEST_CREDIT_REVIEW,
+                recipient_reference_hash="d"*64,
+                action_payload_hash=payload.payload_hash,
+                approver_role="VP Supply Chain",
+                issued_on="2026-09-21",
+                expires_on="2026-09-30",
+                authorized_cents=payload.requested_cents - 1,
+            ),
+        )
+
+
 def test_approval_action_type_must_match_payload():
     artifacts, review, claims, proposal = setup()
     payload = build_carrier_action_payload(
