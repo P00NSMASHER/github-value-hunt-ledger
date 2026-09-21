@@ -1399,3 +1399,85 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** None. The existing commercial referral already asks for authoritative provider/system-of-record readback on one durable action identity. This run sharpens its acceptance test without adding a duplicate handoff.
 
 **NEXT TEST:** Add a real or provider-faithful `POST accepted → response dropped → executor killed` case to one Stripe Transfer/Payout path; restart after the dedupe horizon is no longer assumed; rediscover by exhaustive pre-dispatch metadata identity; forbid a second POST until absence is conclusive; then follow the same `po_` payout through terminal provider and independent destination evidence.
+
+
+## 2026-09-21 — Shadow run 20
+
+**DATE:** 2026-09-21
+
+**HYPOTHESIS:** The current revision of the strongest terminal Stripe-Payout candidate may have added a literal post-effect payout-process death/restart seam since its previously pinned green revision. If not, its newer payout-identity migration logic might still supply a reusable direct-money cutover control.
+
+**DISCOVERY METHODS:**
+1. Exact-history comparison from the previously pinned payout revision `2ba5fa878da26f405bfae1846c8c90f1d0e69c10` to current `main`.
+2. Source/schema/test inspection of the payout harness, account-migration decision engine, retired-account lineage and guarded PostgreSQL RPC.
+3. Commit archaeology for the embedded-payout migration and its later relaxation from “never onboarded” to “no financial activity or destination.”
+4. Exact-revision GitHub Actions/check inspection to distinguish green backend tests from canceled payment-specific validation.
+5. Current Stripe-contract verification plus an independently authored three-interleaving cutover fixture.
+
+**BEST NEW COMPONENT + EXACT REVISION:** `karfalacisse900-alt/Flames-up.com@af5bdc3e06a71bb9b8fa4e491d89a0d703000027` — **Payout Identity Migration Gate**, retained as a strong component with a cross-authority race limit, not as tier-5C-B proof.
+
+**ORIGINAL HYPOTHESIS RESULT — FALSIFIED:**
+- The current real-Stripe harness still creates and observes the instant Payout before cleanup. Its only `SIGKILL` remains the final teardown fallback after the scenario has completed.
+- There is still no payout POST accepted → money executor dies before durable completion → genuinely new process recovers the same `po_` effect cutpoint.
+- Tier-5C-B therefore remains open.
+
+**IMPLEMENTED / SOURCE-VERIFIED COMPONENT:**
+- Before remapping an old Express payout identity to a new Captro-managed account, the Worker checks local purchases, destination-account references, creator earnings, payouts and payout requests.
+- It separately reads Stripe account ownership/mode/type, embedded and separately listed external accounts, connected-account balance, Payout history, incoming destination Transfers and balance-transaction history. Malformed provider lists and inconsistent empty pages fail closed.
+- The replacement account is created with an idempotent migration identity, then the full local/provider emptiness check is repeated immediately before cutover.
+- The PostgreSQL RPC locks the active account row, rechecks all local financial tables, writes immutable predecessor→replacement lineage into `app_retired_connected_accounts`, and swaps the active provider identity in one transaction.
+- Late `account.updated` events from a recorded retired provider account are not allowed to reattach it as active.
+- The later `83b1eac4ee6e0ad0108679b6390f25314c9751a5` change deliberately permits migration after partial KYC/profile entry, but continues to block an external payout destination or any local/provider financial activity.
+
+**TEST / HISTORY / CI VERIFICATION:**
+- `stripe_ledger_database.test.mjs` executes the real PostgreSQL migrations, proves unauthenticated callers cannot invoke/read the cutover state, proves service-role migration of an unused Express profile, rejects a profile with a payout card, and verifies the retired-identity lineage plus replacement state.
+- `stripe_connect_marketplace.test.mjs` structurally checks provider ownership, mode/type, external-account, balance, transfer, payout and balance-transaction gates plus the guarded RPC and retired-account behavior.
+- Current-head [Deploy Captro API run 35291672778](https://github.com/karfalacisse900-alt/Flames-up.com/actions/runs/35291672778) is green and its workflow runs TypeScript checking plus every backend `tests/*.test.mjs`. The current-head payment-specific validation run was canceled, so this is not fresh exact-head real-Stripe migration execution.
+- History is candid: [`68e4e6f`](https://github.com/karfalacisse900-alt/Flames-up.com/commit/68e4e6f6167aab140e465443b15d257c88a1391f) introduced the guarded Express→Custom cutover; [`83b1eac`](https://github.com/karfalacisse900-alt/Flames-up.com/commit/83b1eac4ee6e0ad0108679b6390f25314c9751a5) broadened eligibility only after adding the “financially untouched” distinction.
+
+**INDEPENDENT ADVERSARIAL FIXTURE:**
+- A minimal cutover model exercised three interleavings: stable provider/local emptiness migrated; a local financial row inserted before the RPC was blocked by the locked transactional recheck; and a provider-side transfer/balance effect inserted after the final provider read but before the local RPC still migrated and left value on the retired provider identity.
+- Result: **3/3 expected outcomes.** This is a contract/race model, not execution against Stripe and not a claim that an exploit occurred.
+- Stripe's current Transfer contract confirms that a Transfer credits a connected Stripe account, while its Balance contract exposes changing pending/available balances. Those facts make “provider changed after last read” a distinct authority-plane event, not something the PostgreSQL row lock can exclude: [Create a Transfer](https://docs.stripe.com/api/transfers/create), [Balance API](https://docs.stripe.com/api/balance).
+
+**LOAD-BEARING RED-TEAM LIMIT — CROSS-AUTHORITY CUTOVER RACE:**
+- The implementation explicitly performs a second provider reread immediately before the SQL transaction, which greatly narrows the window.
+- It does not establish a provider-side freeze/fence, a common monotonic snapshot token, or a post-cutover drain/observation proof. Stripe can never participate in the PostgreSQL row lock.
+- Therefore the strongest supported claim is “two-phase evidence-backed migration of an apparently untouched identity,” not “atomic money-account migration.” A provider effect concurrent with the last read/local commit is not covered by the inspected tests.
+- The risk is an inference from the source and provider contracts; no live race was induced.
+
+**SPECIALIST PASSES:**
+- **DISCOVERY ANALYST:** compared the strongest known terminal-payout repository against its pinned revision and searched the exact payout/crash seam before changing hypotheses.
+- **CODE INSPECTOR:** traced provider reads, local ledgers, replacement creation, cutover RPC and retired-event behavior.
+- **SCHEMA/TEST/HISTORY INSPECTOR:** verified the row lock, local rechecks, predecessor lineage, executable PostgreSQL tests, introducing/relaxing commits and exact-head CI boundary.
+- **PROVIDER-CONTRACT ANALYST:** separated provider-side balance/Transfer changes from local transactional authority.
+- **COMMERCIAL ANALYST:** mapped the component to financial-identity cutover assurance.
+- **RED-TEAM / VERIFIER:** attacked the interval between the last external read and the local commit, and refused to inherit the repository's separate terminal-Payout evidence as cutover atomicity.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **PASS_WITH_LIMITS.** The revision contains a substantive fail-closed pre-cutover evidence gate, durable predecessor/successor lineage and a real transactional local swap. It does not prove a provider-fenced atomic cutover, post-cutover drain, adversarial provider interleaving, payout effect-boundary crash recovery or external settlement. Evidence that would change the verdict: stop/fence all writers to the legacy provider identity; prove no in-flight provider effects; capture a provider watermark or equivalent cutover authority; race a late Transfer/balance transaction against the swap; quarantine rather than ignore late financial events on the retired identity; and require a stable-zero post-cutover observation/drain receipt.
+
+**A-F SCORE (proposed only, after verifier):** **24/30 — A4 / B5 / C5 / D4 / E4 / F2.**
+- A4: financial-identity migration qualification is a safe, sellable engagement.
+- B5: orphaning balance or payout history under a retired identity is a direct-money reconciliation failure.
+- C5: the provider/local evidence set, double read, transactional row lock and durable lineage are unusually substantive.
+- D4: the pattern is reusable, though careful bespoke cutover logic is a credible substitute.
+- E4: source, executable SQL tests, history and green exact-head backend CI support the narrow claim; no adversarial provider race or fresh exact-head Stripe migration exists.
+- F2: public inspection is possible, but no public license was detected and live use requires customer-controlled Stripe/Supabase authority.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: marketplace payments lead, finance-platform owner, Controller systems team or payments migration program lead.
+- Pain: changing seller/creator payout identities can silently strand balance, in-flight transfers, payout history or late webhooks on the predecessor account even when both the app database and provider look empty moments before cutover.
+- First paid wedge: **Money Account Cutover Certification**. Inventory every writer to the legacy identity; freeze/fence dispatch; prove complete local/provider emptiness; execute an adversarial late-effect race; atomically record predecessor→successor lineage; drain/quarantine late events; and issue a receipt distinguishing `PRECHECK_CLEAR`, `WRITERS_FENCED`, `CUTOVER_COMMITTED`, `OLD_IDENTITY_DRAINED` and `RECONCILIATION_REQUIRED`.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Runs 14/16 supplied conclusive-provider-absence discipline; this candidate applies it to financial identity replacement rather than retry authorization. Run 18 supplied settlement-chain identity; this run adds predecessor/successor identity across account generations. The new result is orthogonal to tier-5C-B and cannot repair the missing payout crash seam.
+
+**SEARCH EFFORT / COST PROXIES:** Five materially distinct discovery/verification modes; one serious candidate deep-inspected; exact source, schema, executable tests, commit history, current and introducing revisions, workflow status/logs and current provider documentation checked; one locally authored three-case interleaving fixture; no repository code execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Add a lane-local **cross-authority cutover-fence check** to `SK-COM-003`. Rechecking provider and local emptiness immediately before a local transaction narrows risk but cannot create atomicity across the provider/database boundary. Before replacing a money identity, require writer fencing or freeze authority, explicit in-flight-effect handling, durable predecessor/successor lineage and a post-cutover stable-zero/drain proof. One evidence-backed application; not eligible for central promotion.
+
+**FAILURE RULE:** “Provider empty immediately before SQL commit” is not proof that the retired provider identity remained empty through cutover when the provider cannot participate in the local lock.
+
+**REFERRALS:** None. This is lane-local financial migration logic, and the existing commercial referral already covers authoritative system-of-record readback on one durable action identity.
+
+**NEXT TEST:** Build a provider-faithful Express→Custom cutover harness with a barrier after the final provider reread. Race a Transfer/balance effect through that barrier, then require either the cutover to abort or the retired identity to remain quarantined until a post-cutover drain proves stable zero and causally assigns every late event.
+
