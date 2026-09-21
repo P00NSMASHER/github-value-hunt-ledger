@@ -47,6 +47,10 @@ from freight.recovery_claim_workflow import (
     build_recovery_claim_batch,
     persist_recovery_claim_batch,
 )
+from freight.recovery_lifecycle_manifest import (
+    CarrierActionLifecycleInput,
+    build_recovery_lifecycle_manifest,
+)
 from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_lifecycle_workflow import process_settlement_evidence
@@ -403,6 +407,34 @@ def run_rehearsal() -> dict:
 
         report = build_persistent_pilot_report(truth, incumbent, store, bindings, reviews)
         assert_report_current(report, store)
+        recovery_lifecycle_manifest = build_recovery_lifecycle_manifest(
+            audit_run=audit_run,
+            truth=truth,
+            incumbent=incumbent,
+            review_packet=review_packet,
+            review_routing=review_routing,
+            remediation_plan=remediation_plan,
+            buyer_review=buyer_review,
+            recovery_claims=recovery_claims,
+            claim_persistence=claim_persistence,
+            proposal_batch=action_proposals,
+            carrier_actions=(
+                CarrierActionLifecycleInput(
+                    proposal=action_proposal,
+                    payload=action_payload,
+                    authorization=external_authorization,
+                    intent=execution_intent,
+                    execution_receipt=execution_receipt,
+                    delivery_receipt=delivery_receipt,
+                ),
+            ),
+            settlement_transitions=(
+                settlement_lifecycle,
+                settlement_review_receipt,
+                counter_lifecycle,
+            ),
+            report=report,
+        )
         metrics = report.metrics
         store_realized = store.realized_cents()
         store_fee = store.fee_eligible_cents()
@@ -508,6 +540,13 @@ def run_rehearsal() -> dict:
         "buyer_review_hashes": [review.review_hash for review in reviews],
         "incumbent_output_hash": incumbent.output_hash,
         "metrics": asdict(metrics),
+        "recovery_lifecycle_manifest_hash": recovery_lifecycle_manifest.manifest_hash,
+        "recovery_lifecycle_carrier_action_count": recovery_lifecycle_manifest.carrier_action_count,
+        "recovery_lifecycle_submitted_action_count": recovery_lifecycle_manifest.submitted_action_count,
+        "recovery_lifecycle_delivered_action_count": recovery_lifecycle_manifest.delivered_action_count,
+        "recovery_lifecycle_pending_settlement_review_count": len(recovery_lifecycle_manifest.pending_settlement_review_case_hashes),
+        "recovery_lifecycle_audit_remediation_case_count": recovery_lifecycle_manifest.audit_remediation_case_count,
+        "recovery_lifecycle_transition_count": len(recovery_lifecycle_manifest.settlement_transitions),
         "persistent_store": {
             "realized_cents": store_realized,
             "fee_eligible_cents": store_fee,
