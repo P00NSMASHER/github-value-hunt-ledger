@@ -60,6 +60,9 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert len(out["settlement_csv_adapter_hash"]) == 64
     assert len(out["settlement_csv_file_sha256"]) == 64
     assert out["settlement_event_count"] == 2
+    assert out["settlement_lifecycle_state"] == "REVIEW_REQUIRED"
+    assert len(out["settlement_lifecycle_state_hash"]) == 64
+    assert len(out["settlement_lifecycle_execution_hash"]) == 64
     assert len(out["settlement_review_case_hash"]) == 64
     assert out["settlement_review_candidate_count"] == 1
     assert len(out["settlement_review_hash"]) == 64
@@ -69,6 +72,9 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert len(out["counter_csv_adapter_hash"]) == 64
     assert len(out["counter_csv_file_sha256"]) == 64
     assert out["counter_event_count"] == 1
+    assert out["counter_lifecycle_state"] == "COMPLETE"
+    assert len(out["counter_lifecycle_state_hash"]) == 64
+    assert len(out["counter_lifecycle_execution_hash"]) == 64
     assert "Reviewer Work Packet" in out["review_packet_markdown"]
     assert "not realized savings" in out["review_packet_markdown"]
     assert out["verified_rule_adapter_hash"]
