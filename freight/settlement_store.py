@@ -7,6 +7,7 @@ EXP-001's internal proof boundary; it is not customer outcome evidence.
 """
 from __future__ import annotations
 
+import json
 import sqlite3
 import time
 from dataclasses import dataclass
@@ -461,3 +462,40 @@ class SettlementStore:
             f"SELECT COUNT(*) FROM {table} WHERE buyer_id=? AND business_unit=?",
             self._scope,
         ).fetchone()[0]))
+
+    def report_snapshot_json(self) -> str:
+        """Read one immutable, scope-bound report snapshot without writing rows.
+
+        A single SQLite read transaction keeps claims, allocations and reversals
+        at the same database revision even when another connection writes. The
+        returned JSON is operational evidence and can contain customer data.
+        """
+        tables = (
+            ("recovery_claims", "claim_id"),
+            ("review_claims", "claim_id"),
+            ("settlement_events", "event_id"),
+            ("allocations", "allocation_id"),
+            ("counter_events", "counter_id"),
+            ("reversal_edges", "reversal_id"),
+        )
+
+        def op(conn: sqlite3.Connection) -> str:
+            conn.execute("BEGIN")
+            try:
+                rows = {
+                    table: [dict(row) for row in conn.execute(
+                        f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=? ORDER BY {key}",
+                        self._scope,
+                    )]
+                    for table, key in tables
+                }
+                return json.dumps({
+                    "schema": 1,
+                    "buyer_id": self.buyer_id,
+                    "business_unit": self.business_unit,
+                    "tables": rows,
+                }, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            finally:
+                conn.rollback()
+
+        return self._read(op)

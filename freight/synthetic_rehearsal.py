@@ -13,8 +13,6 @@ from pathlib import Path
 from freight.contracts import (
     AuthorityRef,
     PopulationRow,
-    RecoveryLedger,
-    SettlementEvent,
     REVIEW,
     VALIDATED,
     freeze_population,
@@ -27,12 +25,18 @@ from freight.deal_economics import DealProfile, qualify_deal
 from freight.pilot_reporting import (
     FindingReview,
     ReviewDisposition,
-    build_pilot_metrics,
-    render_markdown,
 )
 from freight.readiness import PilotReadinessInput, assess_readiness
+from freight.settlement_report import (
+    ClaimFindingBinding,
+    assert_report_current,
+    build_persistent_pilot_report,
+    render_persistent_markdown,
+)
 from freight.settlement_store import (
     ALLOCATED,
+    REVERSED,
+    CounterEventRecord,
     RecoveryClaim,
     SettlementEventRecord,
     SettlementStore,
@@ -124,28 +128,14 @@ def run_rehearsal() -> dict:
         finding_ids=("f-2",),
     )
 
-    ledger = RecoveryLedger(truth, incumbent)
-    ledger.apply(
-        SettlementEvent(
-            BUYER,BU,"settle-1","f-1",2000,"USD","settle-proof-1"
-        )
+    reviews = (
+        FindingReview("f-1",ReviewDisposition.CONFIRMED,20),
+        FindingReview("f-2",ReviewDisposition.CONFIRMED,10),
+        FindingReview("f-3",ReviewDisposition.UNRESOLVED,5),
     )
-    ledger.apply(
-        SettlementEvent(
-            BUYER,BU,"settle-2","f-2",2500,"USD","settle-proof-2"
-        )
-    )
-
-    metrics = build_pilot_metrics(
-        truth,
-        incumbent,
-        ledger,
-        (
-            FindingReview("f-1",ReviewDisposition.CONFIRMED,20),
-            FindingReview("f-2",ReviewDisposition.CONFIRMED,10),
-            FindingReview("f-3",ReviewDisposition.UNRESOLVED,5),
-        ),
-    )
+    findings = {finding.finding_id: finding for finding in truth.findings}
+    bindings = tuple(ClaimFindingBinding(finding_id, finding_id, findings[finding_id].proof_hash)
+                     for finding_id in ("f-1", "f-2"))
 
     with tempfile.TemporaryDirectory() as td:
         store = SettlementStore(
@@ -155,19 +145,19 @@ def run_rehearsal() -> dict:
         )
         store.create_claim(
             RecoveryClaim(
-                "f-1","inv-1","carrier",BUYER,"USD",2500,
-                "2026-09-20T10:00:00Z","claim-src-f1",False,
+                "f-1","inv-1","carrier","cust","USD",2500,
+                "2026-09-20T10:00:00Z",findings["f-1"].proof_hash,False,
             )
         )
         store.create_claim(
             RecoveryClaim(
-                "f-2","inv-2","carrier",BUYER,"USD",2500,
-                "2026-09-20T10:00:00Z","claim-src-f2",True,
+                "f-2","inv-2","carrier","cust","USD",2500,
+                "2026-09-20T10:00:00Z",findings["f-2"].proof_hash,True,
             )
         )
         store.ingest_event(
             SettlementEventRecord(
-                "e-1","inv-1","carrier",BUYER,"USD",2000,
+                "e-1","inv-1","carrier","cust","USD",2000,
                 "2026-09-21T10:00:00Z","store-settle-1","CREDIT-MEMO",
             )
         )
@@ -177,7 +167,7 @@ def run_rehearsal() -> dict:
         )
         store.ingest_event(
             SettlementEventRecord(
-                "e-2","inv-2","carrier",BUYER,"USD",2500,
+                "e-2","inv-2","carrier","cust","USD",2500,
                 "2026-09-21T10:00:00Z","store-settle-2","CREDIT-MEMO",
             )
         )
@@ -186,6 +176,26 @@ def run_rehearsal() -> dict:
         ).status
         assert status == ALLOCATED
 
+        before_return = build_persistent_pilot_report(truth, incumbent, store, bindings, reviews)
+        store.ingest_counter(CounterEventRecord(
+            "return-1", "e-1", "USD", 500, "2026-09-22T10:00:00Z",
+            "synthetic-bank-return-source", "BANK-RETURN",
+        ))
+        assert store.auto_apply_counter(
+            "return-1", created_at="2026-09-22T11:00:00Z",
+        ).status == REVERSED
+        stale_report_rejected = False
+        try:
+            assert_report_current(before_return, store)
+        except ValueError as exc:
+            if "snapshot changed" not in str(exc):
+                raise
+            stale_report_rejected = True
+        assert stale_report_rejected
+
+        report = build_persistent_pilot_report(truth, incumbent, store, bindings, reviews)
+        assert_report_current(report, store)
+        metrics = report.metrics
         store_realized = store.realized_cents()
         store_fee = store.fee_eligible_cents()
 
@@ -213,7 +223,17 @@ def run_rehearsal() -> dict:
             "realized_cents": store_realized,
             "fee_eligible_cents": store_fee,
         },
-        "report_markdown": render_markdown(metrics),
+        "persistent_reporting": {
+            "settlement_snapshot_hash": report.settlement_snapshot_hash,
+            "report_hash": report.report_hash,
+            "pre_return_snapshot_hash": before_return.settlement_snapshot_hash,
+            "pre_return_report_hash": before_return.report_hash,
+            "pre_return_realized_cents": before_return.metrics.realized_cents,
+            "pre_return_fee_eligible_cents": before_return.metrics.fee_eligible_realized_cents,
+            "return_cents": 500,
+            "stale_report_rejected": stale_report_rejected,
+        },
+        "report_markdown": render_persistent_markdown(report),
         "commercial_value_claimed": False,
     }
 
