@@ -1,0 +1,147 @@
+{
+  "schema_version": 16,
+  "search_run_id": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
+  "timestamp": "2026-09-21T06:18:00Z",
+  "date": "2026-09-21",
+  "hunter_role": "HUNTER-05",
+  "hunter": "HUNTER-05",
+  "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
+  "query_family": "authority-origin-invariant-set-consistency-rule-version-transfer",
+  "query_family_id": "QF:authority-origin-invariant-set-consistency-rule-version-transfer",
+  "search_objective_id": "OBJ:current-rule-authority",
+  "measurement_quality": "prospective",
+  "work_action": "search",
+  "lane_ids": [
+    "05"
+  ],
+  "seed_nodes": [
+    "SEED:measure:authority-origin-invariant-set-consistency-rule-version-transfer",
+    "CAP-011",
+    "openfisca/openfisca-france"
+  ],
+  "search_surfaces": [
+    "GitHub code search",
+    "GitHub repository/commit/file/workflow inspection",
+    "French Service Public first-party authority page"
+  ],
+  "queries": [
+    "OpenFisca reforms parameter",
+    "tax effective_date rule_version tests",
+    "benefits rule_version effective date source reference",
+    "crous_repas_montant",
+    "get_parameters_at_instant period.start"
+  ],
+  "candidate_count": 3,
+  "deep_inspected": 1,
+  "retained_count": 1,
+  "master_promoted_count": 0,
+  "elapsed_minutes": 24,
+  "tool_calls": 25,
+  "recall_rescue_used": false,
+  "stop_reason": "Acceptance target answered with one connected implementation path: OpenFisca France binds dated parameters, historical evaluation and official authority references in source/tests. Red-team source tracing exposed a decisive monthly-versus-May-4 effective-granularity mismatch, so broader search stopped.",
+  "new_capability_ids": [],
+  "strengthened_capability_ids": [
+    "CAP-011"
+  ],
+  "experiment_ids": [
+    "EXP-006"
+  ],
+  "candidate_dispositions": [
+    {
+      "repository": "openfisca/openfisca-france",
+      "revision": "ebcb7782d17058495c6ca33c278e373e167b641b",
+      "status": "watch",
+      "reason_code": "temporal_granularity_mismatch",
+      "reason_detail": "Version 176.1.0 provides dated historical parameters, date-keyed official references, before/after formula tests and green exact-head CI. However the MONTH variable resolves parameters at period.start, so a legal 2026-05-04 change is not represented exactly in May; the new regression begins in June.",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "novelty_ordinal": 3,
+      "evidence_ordinal": 5,
+      "replacement_days_low": 5,
+      "replacement_days_high": 15,
+      "duplicate_of": null,
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "observed_at": "2026-09-21",
+        "metadata_status": "observed",
+        "stars": 312,
+        "forks_count": 114,
+        "primary_language": "Python",
+        "archived": false,
+        "fork": false,
+        "created_at": "2013-12-29T15:15:09Z",
+        "updated_at": "2026-09-18T15:10:36Z",
+        "pushed_at": "2026-09-18T15:22:56Z",
+        "owner_type": "Organization",
+        "topics": [
+          "better-rules",
+          "france",
+          "legislation-as-code",
+          "microsimulation",
+          "rules-as-code"
+        ],
+        "license_spdx": "AGPL-3.0-only",
+        "source_type": "community",
+        "package_ecosystems": [
+          "PyPI"
+        ],
+        "protocol_families": [
+          "OpenFisca"
+        ],
+        "geography_tags": [
+          "France"
+        ],
+        "technology_domains": [
+          "rules-as-code",
+          "tax-benefit-microsimulation",
+          "government-evidence"
+        ],
+        "profile_source": "GitHub repository metadata, exact-head source, license and workflow history"
+      }
+    }
+  ],
+  "benchmark_task_ids": [],
+  "comparison_group_id": null,
+  "evaluation_set_id": null,
+  "seed_mode": "generated",
+  "seed_ids": [
+    "SEED:measure:authority-origin-invariant-set-consistency-rule-version-transfer"
+  ],
+  "adjacency_mode": "none",
+  "adjacency_ids": [],
+  "adjacency_types": [],
+  "adjacency_root_nodes": [],
+  "coverage_mode": "none",
+  "coverage_gap_ids": [],
+  "allocation_mode": "unallocated",
+  "allocator_generation_id": null,
+  "assignment_id": null,
+  "assignment_work_item_id": null,
+  "portfolio_policy_generation_id": null,
+  "assignment_slot_role": null,
+  "assignment_work_kind": null,
+  "assignment_source_id": null,
+  "assignment_score": null,
+  "execution_claim_id": null,
+  "execution_slot_id": null,
+  "execution_worker_id": "HUNTER-05",
+  "routing_mode": "unrouted",
+  "routing_generation_id": null,
+  "worker_profile_generation_id": null,
+  "routing_score": null,
+  "dispatch_ticket_id": null,
+  "dispatch_generation_id": null,
+  "routing_learning_generation_id": null,
+  "route_override_reason": "Generated activation and CLAIM were attempted, but canonical execution reduction was blocked by an unrelated pre-existing SLOT-05 active-claim conflict. No valid lease or COMPLETE is asserted.",
+  "dispatch_kind": null,
+  "dispatch_parent_ticket_id": null,
+  "parent_dispatch_ticket_id": null,
+  "presence_generation_id": null,
+  "presence_event_id": null,
+  "activation_id": null,
+  "activation_generation_id": null,
+  "best_result": "PASS_WITH_LIMITS: OpenFisca France exact head joins versioned effective-date parameters, historical before/after evaluation, official authority references and green CI, but its monthly formula resolves parameters at period.start. The May 4 statutory change is therefore not exactly representable for May and the committed regression avoids the boundary by testing June.",
+  "durable_evidence_path": "referrals/hunt05-r25-2026-09-21-openfisca-effective-granularity.md",
+  "notes": "Pair 3 CONTROL was already complete; benchmark files were not modified and BENCHMARK_GOLD.md was not read. A fresh READY event produced current generated activation ACTIVATE:6d785355d60f and CLAIM event CLAIM:4f7d29b3a1c8 was written, but the shared reducer workflow failed before canonical acceptance because intelligence/execution_events/SLOT-05.jsonl already had an active claim. This submission is therefore explicitly unallocated/unrouted. No local OpenFisca execution, MASTER promotion, government certification, buyer outcome or revenue is asserted. Exact-head repository workflows were externally observed green; the temporal boundary finding is source-derived."
+}
