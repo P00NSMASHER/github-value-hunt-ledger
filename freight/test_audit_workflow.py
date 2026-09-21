@@ -1,3 +1,5 @@
+import hashlib
+
 import pytest
 
 from freight.audit_workflow import (
@@ -19,16 +21,17 @@ INVOICE_HEADER = "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_
 RULE_HEADER = "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
 
 
-def rule_input(rows: str, *, verified=True, source="a"):
+def rule_input(rows: str, *, verified=True, source="a", currency="USD", source_data=None):
     return RuleCSVInput(
         filename="rules.csv",
         data=(RULE_HEADER + rows).encode(),
         customer_id="C",
         carrier_id="K",
-        currency="USD",
+        currency=currency,
         authority_document_id="rate",
-        source_document_sha256=source * 64,
+        source_document_sha256=(source * 64 if source is not None else None),
         verified_controlling_authority=verified,
+        source_document_data=source_data,
     )
 
 
@@ -71,8 +74,11 @@ def test_single_call_returns_review_required_with_complete_artifacts():
     assert result.artifacts.review_routing.routing_hash == result.summary.review_routing_hash
     assert result.artifacts.remediation_plan.plan_hash == result.summary.remediation_plan_hash
     assert result.artifacts.remediation_plan.remediation_case_count == 1
+    assert result.summary.summary_currency == "USD"
     assert result.summary.validated_discrepancy_cents == 2500
     assert result.summary.review_discrepancy_cents == 5000
+    assert [(item.currency, item.validated_discrepancy_cents, item.review_discrepancy_cents)
+            for item in result.summary.currency_discrepancies] == [("USD", 2500, 5000)]
     assert len(result.summary.run_hash) == 64
     assert result.summary.run_hash == result.artifacts.manifest.run_hash
 
@@ -200,3 +206,91 @@ def test_blocked_summary_states_no_manifest_was_issued():
     text = render_workflow_summary(result)
     assert "BLOCKED" in text
     assert "No audit-run manifest was issued" in text
+
+
+def test_mixed_currency_summary_never_adds_cents_across_currencies():
+    usd = rule_input(
+        "DETENTION,FIXED,2026-09-01,,10000,\n",
+        verified=True,
+        source="a",
+        currency="USD",
+    )
+    eur = RuleCSVInput(
+        filename="eur-rules.csv",
+        data=(RULE_HEADER + "MISC,FIXED,2026-09-01,,7000,\n").encode(),
+        customer_id="C",
+        carrier_id="K",
+        currency="EUR",
+        authority_document_id="eur-rate",
+        source_document_sha256="b" * 64,
+        verified_controlling_authority=True,
+    )
+    result = run_audit_workflow(
+        invoice_filename="charges.csv",
+        invoice_data=(INVOICE_HEADER
+                      + "I1,S1,C,K,USD,X1,DETENTION,2026-09-10,1,12500\n"
+                      + "I2,S2,C,K,EUR,X2,MISC,2026-09-10,1,10000\n").encode(),
+        buyer_id="buyer",
+        business_unit="unit",
+        selection_rule="mixed currencies",
+        rule_inputs=(usd, eur),
+    )
+    assert result.summary is not None
+    assert result.summary.summary_currency is None
+    assert result.summary.validated_discrepancy_cents is None
+    assert result.summary.review_discrepancy_cents is None
+    assert [
+        (item.currency, item.validated_discrepancy_cents, item.review_discrepancy_cents)
+        for item in result.summary.currency_discrepancies
+    ] == [("EUR", 3000, 0), ("USD", 2500, 0)]
+    text = render_workflow_summary(result)
+    assert "EUR 30.00" in text
+    assert "USD 25.00" in text
+    assert "$55.00" not in text
+
+
+def test_authority_document_bytes_can_supply_the_provenance_hash():
+    doc = b"exact authority document bytes"
+    spec = rule_input(
+        "DETENTION,FIXED,2026-09-01,,10000,\n",
+        source=None,
+        source_data=doc,
+    )
+    result = run(
+        "I1,S1,C,K,USD,X1,DETENTION,2026-09-10,1,12500\n",
+        rules=(spec,),
+    )
+    assert result.state == AuditWorkflowState.REVIEW_REQUIRED.value
+    assert result.artifacts is not None
+    assert result.artifacts.rule_batches[0].source_document_sha256 == hashlib.sha256(doc).hexdigest()
+
+
+def test_authority_document_hash_mismatch_blocks_rule_ingest():
+    spec = rule_input(
+        "DETENTION,FIXED,2026-09-01,,10000,\n",
+        source="a",
+        source_data=b"different actual document",
+    )
+    result = run(
+        "I1,S1,C,K,USD,X1,DETENTION,2026-09-10,1,12500\n",
+        rules=(spec,),
+    )
+    assert result.state == AuditWorkflowState.BLOCKED.value
+    assert result.stage == AuditWorkflowStage.RULE_INGEST.value
+    assert result.error_code == "RULE_INGEST_FAILED"
+    assert "does not match source_document_data" in result.error_message
+
+
+def test_authority_document_requires_hash_or_bytes():
+    spec = rule_input(
+        "DETENTION,FIXED,2026-09-01,,10000,\n",
+        source=None,
+        source_data=None,
+    )
+    result = run(
+        "I1,S1,C,K,USD,X1,DETENTION,2026-09-10,1,12500\n",
+        rules=(spec,),
+    )
+    assert result.state == AuditWorkflowState.BLOCKED.value
+    assert result.stage == AuditWorkflowStage.RULE_INGEST.value
+    assert "source_document_sha256 or source_document_data is required" in result.error_message
