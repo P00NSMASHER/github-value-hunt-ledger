@@ -10,6 +10,7 @@ LEARN_MET=json.loads((INTEL/"routing_learning_metrics.json").read_text(encoding=
 RESP_POL=json.loads((INTEL/"activation_response_policy.json").read_text(encoding="utf-8")) if (INTEL/"activation_response_policy.json").exists() else {}
 RESP_MET=json.loads((INTEL/"activation_response_metrics.json").read_text(encoding="utf-8")) if (INTEL/"activation_response_metrics.json").exists() else {}
 RESP_ADJ=load_jsonl("activation_response_adjustments.jsonl") if (INTEL/"activation_response_adjustments.jsonl").exists() else []
+EXP_MET=json.loads((INTEL/"routing_exploration_metrics.json").read_text(encoding="utf-8")) if (INTEL/"routing_exploration_metrics.json").exists() else {}
 workers={w["worker_id"]:w for w in REG["workers"]}
 profiles=load_jsonl("worker_profiles.jsonl")
 routes=load_jsonl("worker_routing.jsonl")
@@ -52,6 +53,7 @@ for w in active_workers:
 learn_gen=LEARN_MET.get("routing_learning_generation_id")
 if not learn_gen: raise SystemExit("routing learning generation missing")
 resp_gen=RESP_MET.get("response_learning_generation_id") or "RESPLEARN:000000000000"
+exp_gen=EXP_MET.get("exploration_generation_id") or "ROUTEEXP:000000000000"
 
 packet_by_worker={p["worker_id"]:p for p in packets}
 for r in routes:
@@ -64,6 +66,8 @@ for r in routes:
             raise SystemExit(f"claim packet learning-generation mismatch for {r['worker_id']}")
         if p.get("activation_response_learning_generation_id")!=resp_gen:
             raise SystemExit(f"claim packet activation-response generation mismatch for {r['worker_id']}")
+        if p.get("routing_exploration_generation_id")!=exp_gen:
+            raise SystemExit(f"claim packet routing-exploration generation mismatch for {r['worker_id']}")
     elif r["worker_id"] in packet_by_worker:
         raise SystemExit(f"non-routed worker {r['worker_id']} has claim packet")
 
@@ -73,6 +77,7 @@ if len(routing_ids)!=1 or len(profile_ids)!=1: raise SystemExit("routing/profile
 if metrics.get("routing_generation_id")!=next(iter(routing_ids)): raise SystemExit("routing metrics generation mismatch")
 if metrics.get("routing_learning_generation_id")!=learn_gen: raise SystemExit("routing metrics learning-generation mismatch")
 if metrics.get("activation_response_learning_generation_id")!=resp_gen: raise SystemExit("routing metrics activation-response generation mismatch")
+if metrics.get("routing_exploration_generation_id")!=exp_gen: raise SystemExit("routing metrics exploration-generation mismatch")
 max_pos=float(LEARN_POL.get("max_positive_adjustment",3.0))
 max_neg=float(LEARN_POL.get("max_negative_adjustment",2.0))
 max_resp_neg=float(RESP_POL.get("max_negative_routing_adjustment",1.0))
@@ -88,6 +93,12 @@ for n,r in enumerate(routes,1):
         raise SystemExit(f"worker_routing.jsonl:{n}: nonzero activation-response adjustment before V17 feedback mode")
     if r.get("activation_response_learning_generation_id")!=resp_gen:
         raise SystemExit(f"worker_routing.jsonl:{n}: activation-response generation drift")
+    if r.get("routing_exploration_generation_id")!=exp_gen:
+        raise SystemExit(f"worker_routing.jsonl:{n}: routing-exploration generation drift")
+    if r.get("route_status")=="ROUTED" and r.get("route_mode") not in {"exploit","explore_swap"}:
+        raise SystemExit(f"worker_routing.jsonl:{n}: invalid V18 route_mode")
+    if r.get("route_mode")=="exploit" and r.get("baseline_slot_id")!=r.get("slot_id"):
+        raise SystemExit(f"worker_routing.jsonl:{n}: exploit route differs from baseline slot")
 
 registered=set(workers)
 for n,r in enumerate(runs,1):
