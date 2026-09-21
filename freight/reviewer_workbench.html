@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-__SCRIPT_HASH__'; style-src 'sha256-__STYLE_HASH__'; connect-src 'none'; img-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Freight Recovery | Reviewer workbench</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#152737;background:#eef3f6;font-size:16px;line-height:1.5;color-scheme:light}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #245be1;outline-offset:3px}button,input,select{border:1px solid #c5d2dc;border-radius:10px;min-height:44px}button{padding:9px 14px;background:white;color:#173148;font-weight:650}button.primary{background:#163f60;color:white;border-color:#163f60}header{padding:26px max(22px,calc((100vw - 1320px)/2));background:#102f49;color:#fff}header .top{display:flex;align-items:center;justify-content:space-between;gap:16px}h1{font-size:clamp(1.6rem,3vw,2.25rem);line-height:1.15;letter-spacing:-.04em;margin:10px 0}h2{margin:0;font-size:1.35rem;overflow-wrap:anywhere}h3{font-size:.8rem;letter-spacing:.07em;text-transform:uppercase;color:#5a7080;margin:0 0 10px}p{margin:8px 0}.eyebrow{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;font-weight:750}.tag{font-size:.78rem;background:#254c68;border:1px solid #53738b;border-radius:30px;padding:6px 12px;white-space:nowrap}header p{color:#d8e5ee;font-size:.9rem;overflow-wrap:anywhere}.shell{max-width:1364px;margin:0 auto;padding:22px}.notice{background:#fff8e9;border:1px solid #e6ce97;border-radius:12px;padding:12px 16px;font-size:.875rem;color:#694b14}.metrics{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0}.metric{background:#fff;flex:1;min-width:140px;padding:16px 20px;border:1px solid #d8e2e9;border-radius:14px}.metric strong{display:block;font-size:1.9rem;line-height:1.2}.metric span{font-size:.8rem;color:#5a7080}.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}.panel{background:#fff;border:1px solid #d8e2e9;border-radius:16px;overflow:hidden;min-width:0}.toolbar{padding:16px;border-bottom:1px solid #e0e7ed}.toolbar label{display:block;font-size:.8rem;font-weight:650;margin-bottom:6px}input,select{width:100%;padding:10px;background:white;color:#173148}.filters{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.filters button{padding:7px 11px;font-size:.78rem;min-height:38px}.filters button[aria-pressed="true"]{background:#163f60;color:white;border-color:#163f60}#case-list{max-height:640px;overflow:auto;padding:8px}.case-button{width:100%;display:block;text-align:left;border:1px solid transparent;border-radius:10px;margin:3px 0;padding:13px;line-height:1.35;min-width:0}.case-button[aria-pressed="true"]{background:#eaf3fa;border-color:#82afce}.case-button strong{display:block;overflow-wrap:anywhere}.case-button small{display:block;color:#607788;margin-top:5px;overflow-wrap:anywhere}.case-button .amount{font-size:.98rem;font-weight:700;color:#164d70}.badge{display:inline-block;margin-top:8px;padding:3px 8px;border-radius:5px;font-size:.7rem;font-weight:750;letter-spacing:.02em;background:#e9f4f1;color:#225945}.badge.needs{background:#fff0d7;color:#7c5613}.detail-head{padding:24px;border-bottom:1px solid #e0e7ed}.detail-head p{font-size:.9rem;color:#587082;overflow-wrap:anywhere}.detail-body{padding:24px}.money-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.money-card{padding:15px;background:#f2f6f9;border:1px solid #e0e8ef;border-radius:12px;min-width:0}.money-card span{font-size:.72rem;color:#5a7080;display:block}.money-card strong{display:block;font-size:clamp(.92rem,1.5vw,1.25rem);overflow-wrap:anywhere;margin-top:5px}.money-card:last-child{background:#eaf4fa;border-color:#bddeef}.context{color:#617888;font-size:.8rem}.rule{border:1px solid #d8e2e9;border-radius:12px;padding:16px;margin-top:12px}.rule strong{overflow-wrap:anywhere}.rule p{font-size:.85rem;overflow-wrap:anywhere}.calculation{font-variant-numeric:tabular-nums;font-weight:650;color:#124b70}.section{margin-top:26px}.remediation{background:#fff8e9;border-left:4px solid #cc9136;border-radius:8px;padding:14px 18px}.remediation p{font-size:.9rem}.decision-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(110px,1fr);gap:12px}.decision-grid label{display:block;font-size:.8rem;font-weight:650;margin-bottom:5px}.action-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}#feedback{font-size:.85rem;color:#335c49;min-height:24px;overflow-wrap:anywhere}#empty{padding:36px 24px;color:#617888}.proofs{margin-top:24px;font-size:.8rem}.proofs summary{cursor:pointer;font-weight:650}.proofs dl{display:grid;gap:6px}.proofs dt{font-weight:700}.proofs dd{margin:0 0 10px;overflow-wrap:anywhere;font-family:ui-monospace,monospace;font-size:.7rem;color:#547082}.footer{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-top:18px;padding:18px;background:#fff;border:1px solid #d8e2e9;border-radius:14px}.footer p{font-size:.82rem;color:#617888}#status{font-size:.85rem;font-weight:650}.privacy{font-size:.75rem;color:#617888;margin:16px 2px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}
+@media(max-width:850px){.layout{grid-template-columns:280px minmax(0,1fr)}.money-grid{grid-template-columns:1fr}.detail-head,.detail-body{padding:18px}.money-card{padding:12px}.money-card strong{font-size:1.12rem}}
+@media(max-width:620px){header{padding:22px 16px}.shell{padding:14px}.layout{grid-template-columns:1fr}.metrics{gap:8px;margin:12px 0}.metric{padding:12px;min-width:0}.metric strong{font-size:1.55rem}.metric span{font-size:.69rem}.tag{font-size:.67rem;padding:5px 8px}#case-list{max-height:245px}.money-grid{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr}.footer{align-items:stretch;flex-direction:column}.notice{font-size:.8rem}.top{align-items:flex-start!important}}
+@media print{header{background:white;color:#152737}header p{color:#547082}.toolbar,.footer,.action-row,#decision-section,#case-list{display:none}.layout{display:block}.panel{border:0}.notice{border-color:#ccc}.tag{display:none}}
+</style>
+</head>
+<body>
+<header><div class="top"><span class="eyebrow">Freight Recovery / Review</span><span class="tag">Offline · Draft decisions</span></div><h1>Review the evidence.<br>Decide with confidence.</h1><p id="scope"></p></header>
+<main class="shell">
+<div class="notice"><strong>No money has been recovered by this screen.</strong> Amounts are discrepancies under supplied rules. Browser decisions are drafts until the approved backend validates them.</div>
+<div class="metrics"><div class="metric"><strong id="ready-count">0</strong><span>Ready for buyer review</span></div><div class="metric"><strong id="evidence-count">0</strong><span>Need evidence</span></div><div class="metric"><strong id="draft-count">0</strong><span>Draft decisions saved</span></div></div>
+<div class="layout">
+<aside class="panel" aria-label="Review cases"><div class="toolbar"><label for="search">Find an invoice or charge</label><input id="search" type="search" placeholder="Invoice, shipment, charge…" autocomplete="off"><div class="filters" aria-label="Filter cases"><button type="button" data-filter="all" aria-pressed="true">All cases</button><button type="button" data-filter="ready" aria-pressed="false">Buyer review</button><button type="button" data-filter="evidence" aria-pressed="false">Needs evidence</button></div></div><div id="case-list"></div><p id="list-empty" hidden class="toolbar">No matching cases.</p></aside>
+<section class="panel" aria-label="Selected case"><div id="empty"><h2>No queued review cases</h2><p>This packet has no cases requiring review. Only the supplied charges and rules were checked; this is not a certification of complete invoice coverage.</p></div><div id="detail" hidden><div class="detail-head"><h2 id="case-title"></h2><p id="case-context"></p><span id="case-badge" class="badge"></span></div><div class="detail-body"><div class="money-grid"><div class="money-card"><span>Invoice billed</span><strong id="billed"></strong></div><div class="money-card"><span>Expected under matched rule</span><strong id="expected"></strong></div><div class="money-card"><span>Calculated discrepancy</span><strong id="variance"></strong></div></div><p class="context">Currency is preserved per case. No exchange-rate conversion or cross-currency total is applied.</p><div class="section"><h3>Rule & calculation</h3><div id="rules"></div></div><div id="remediation" class="section remediation" hidden><h3>Evidence required before a decision</h3><p id="remediation-copy"></p><p><strong>Correct the source evidence and rerun the audit.</strong> This case cannot be approved from this screen.</p></div><section id="decision-section" class="section" aria-label="Draft buyer decision" hidden><h3>Your draft decision</h3><div class="decision-grid"><div><label for="disposition">Decision</label><select id="disposition"><option value="">Choose a decision</option><option value="CONFIRMED">Confirm discrepancy</option><option value="FALSE_POSITIVE">Reject as false positive</option><option value="UNRESOLVED">Unresolved — needs investigation</option></select></div><div><label for="minutes">Review effort (minutes)</label><input id="minutes" type="number" min="0" step="1" inputmode="numeric" placeholder="Enter minutes"></div></div><div class="action-row"><button type="button" class="primary" id="save">Save draft decision</button><button type="button" id="clear">Clear draft</button></div><p id="feedback" role="status" aria-live="polite"></p></section><details class="proofs"><summary>Source & proof references</summary><dl id="proofs"></dl></details></div></div></section>
+</div><div class="footer"><div><div id="status" role="status" aria-live="polite">No draft decisions yet.</div><p>Export before closing. Drafts are kept in memory only and are not automatically saved.</p></div><button type="button" class="primary" id="export" disabled>Export draft decisions</button></div><p class="privacy">Contains customer-derived evidence. Keep this file and exports in the approved customer environment. No analytics, external assets, uploads, carrier contact, or settlement actions. An exported JSON file does not authenticate a reviewer.</p>
+<noscript><p>JavaScript is required for the workbench. Use the accompanying reviewer packet when scripts are unavailable.</p></noscript>
+</main>
+<script type="application/json" id="audit-data">__FREIGHT_DATA__</script>
+<script id="workbench-code">
+"use strict";
+(() => {
+  const data = JSON.parse(document.getElementById("audit-data").textContent);
+  const byId = (id) => document.getElementById(id);
+  const drafts = new Map();
+  let selected = data.cases[0] || null;
+  let filter = "all";
+  let unexported = false;
+  const words = {CONFIRMED: "Confirm discrepancy", FALSE_POSITIVE: "False positive", UNRESOLVED: "Unresolved"};
+  const instructions = {
+    VERIFY_CONTROLLING_AUTHORITY: "Verify which authority controls this charge on the service date. The current calculated amount uses an unverified rule.",
+    ADD_APPLICABLE_RULE: "Supply the applicable rate or charge rule, its effective dates, and source-document reference. An expected amount has not been established.",
+    RESOLVE_RULE_AMBIGUITY: "Resolve the overlapping applicable rules and document which one controls this charge. Do not choose a rate merely because it produces a larger discrepancy.",
+    INVESTIGATE_EVIDENCE: "Investigate the invoice, shipment, and authority evidence before making a finding decision."
+  };
+  function text(id, value) { byId(id).textContent = value; }
+  function money(currency, value) {
+    if (value === null) return "Not established";
+    const cents = BigInt(value);
+    const whole = (cents / 100n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return currency + " " + whole + "." + (cents % 100n).toString().padStart(2, "0");
+  }
+  function node(tag, value, className) {
+    const el = document.createElement(tag);
+    if (value !== undefined) el.textContent = value;
+    if (className) el.className = className;
+    return el;
+  }
+  function progress() {
+    text("draft-count", drafts.size);
+    text("status", drafts.size + " of " + data.buyer_review_case_count + " eligible cases have a draft decision.");
+    byId("export").disabled = drafts.size === 0;
+  }
+  function renderList() {
+    const list = byId("case-list"); list.replaceChildren();
+    const query = byId("search").value.trim().toLowerCase();
+    const visible = data.cases.filter(c =>
+      (filter === "all" || (filter === "ready" ? c.buyer_review_ready : !c.buyer_review_ready)) &&
+      [c.invoice_id, c.shipment_id, c.charge_id, c.charge_code, c.carrier_id].some(v => v.toLowerCase().includes(query)));
+    if (!visible.some(c => selected && c.case_hash === selected.case_hash)) selected = visible[0] || null;
+    for (const c of visible) {
+      const button = node("button"); button.type = "button"; button.className = "case-button";
+      button.setAttribute("aria-pressed", String(Boolean(selected && selected.case_hash === c.case_hash)));
+      button.append(node("strong", c.invoice_id), node("small", c.charge_code + " · " + c.shipment_id));
+      button.append(node("small", money(c.currency, c.variance_cents), "amount"));
+      const draft = drafts.get(c.case_hash);
+      button.append(node("span", draft ? "Draft: " + words[draft.disposition] : (c.buyer_review_ready ? "Buyer review" : "Needs evidence"), "badge" + (c.buyer_review_ready ? "" : " needs")));
+      button.addEventListener("click", () => {selected = c; renderList();});
+      list.append(button);
+    }
+    byId("list-empty").hidden = visible.length > 0;
+    renderCase();
+  }
+  function renderCase() {
+    byId("detail").hidden = !selected;
+    byId("empty").hidden = Boolean(selected);
+    if (!selected) {
+      byId("empty").querySelector("h2").textContent = data.cases.length ? "No matching cases" : "No queued review cases";
+      byId("empty").querySelector("p").textContent = data.cases.length ? "Change the search or filter to see other cases." : "Only the supplied charges and rules were checked; this is not a certification of complete invoice coverage.";
+      return;
+    }
+    const c = selected;
+    text("case-title", c.invoice_id + " / " + c.charge_code);
+    text("case-context", "Shipment " + c.shipment_id + " · " + c.service_date + " · Carrier " + c.carrier_id);
+    text("case-badge", c.buyer_review_ready ? "Buyer review ready — not yet approved" : "Evidence remediation required");
+    byId("case-badge").className = "badge" + (c.buyer_review_ready ? "" : " needs");
+    text("billed", money(c.currency, c.billed_cents)); text("expected", money(c.currency, c.expected_cents)); text("variance", money(c.currency, c.variance_cents));
+    const rules = byId("rules"); rules.replaceChildren();
+    for (const rule of c.rule_evidence) {
+      const box = node("div", undefined, "rule");
+      box.append(node("strong", rule.authority_document_id));
+      box.append(node("p", rule.verified_controlling_authority ? "Verified controlling authority (caller-supplied determination)" : "Authority not yet verified"));
+      box.append(node("p", "Effective " + rule.effective_from + " to " + (rule.effective_to || "open-ended")));
+      let calculation = "Unsupported model — review source evidence";
+      if (rule.pricing_model === "FIXED") calculation = "Fixed charge: " + money(c.currency, rule.fixed_cents);
+      if (rule.pricing_model === "INCLUDED") calculation = "Included in the governing price: " + money(c.currency, "0");
+      if (rule.pricing_model === "PER_UNIT") calculation = c.quantity_units + " units × " + money(c.currency, rule.unit_rate_cents) + " = " + money(c.currency, (BigInt(c.quantity_units) * BigInt(rule.unit_rate_cents)).toString());
+      box.append(node("p", calculation, "calculation")); rules.append(box);
+    }
+    if (!c.rule_evidence.length) rules.append(node("p", "No applicable rule has been established. Expected amount and discrepancy are unknown."));
+    byId("remediation").hidden = c.buyer_review_ready;
+    text("remediation-copy", instructions[c.action_hint] || instructions.INVESTIGATE_EVIDENCE);
+    byId("decision-section").hidden = !c.buyer_review_ready;
+    const draft = drafts.get(c.case_hash);
+    byId("disposition").value = draft ? draft.disposition : "";
+    byId("minutes").value = draft ? String(draft.reviewer_minutes) : "";
+    text("feedback", draft ? "Draft saved locally at " + draft.reviewed_at : "No decision is selected by default.");
+    const proofs = byId("proofs"); proofs.replaceChildren();
+    const refs = [["Invoice charge source", c.charge_source_hash], ["Case proof", c.case_hash], ["Finding proof", c.finding_proof_hash || "No finding issued"], ["Review packet", data.review_packet_hash], ["Frozen truth", data.truth_hash]];
+    for (const rule of c.rule_evidence) refs.push(["Authority source: " + rule.authority_document_id, rule.document_source_hash], ["Rule proof", rule.rule_hash]);
+    for (const [label, value] of refs) proofs.append(node("dt", label), node("dd", value));
+  }
+  text("scope", "Buyer " + data.buyer_id + " · Business unit " + data.business_unit);
+  text("ready-count", data.buyer_review_case_count); text("evidence-count", data.evidence_remediation_case_count);
+  byId("search").addEventListener("input", renderList);
+  for (const b of document.querySelectorAll("[data-filter]")) b.addEventListener("click", () => {
+    filter = b.dataset.filter;
+    for (const peer of document.querySelectorAll("[data-filter]")) peer.setAttribute("aria-pressed", String(peer === b));
+    renderList();
+  });
+  byId("save").addEventListener("click", () => {
+    if (!selected || !selected.buyer_review_ready) return;
+    const disposition = byId("disposition").value;
+    const raw = byId("minutes").value;
+    const minutes = Number(raw);
+    if (!Object.prototype.hasOwnProperty.call(words, disposition) || !/^(0|[1-9][0-9]*)$/.test(raw) || !Number.isSafeInteger(minutes)) {
+      text("feedback", "Choose a decision and enter whole, non-negative review minutes."); return;
+    }
+    if (!drafts.has(selected.case_hash) && drafts.size >= data.max_decisions) {
+      text("feedback", "This export has reached the decision limit. Export this partial batch before beginning another."); return;
+    }
+    drafts.set(selected.case_hash, {case_hash: selected.case_hash, disposition, reviewer_minutes: minutes, reviewed_at: new Date().toISOString()});
+    unexported = true; progress(); renderList();
+  });
+  byId("clear").addEventListener("click", () => {
+    if (!selected) return;
+    drafts.delete(selected.case_hash); unexported = true; progress(); renderList();
+  });
+  byId("export").addEventListener("click", () => {
+    if (!drafts.size) return;
+    const envelope = {schema_version: 1, review_packet_hash: data.review_packet_hash, review_routing_hash: data.review_routing_hash, truth_hash: data.truth_hash, decisions: data.cases.filter(c => drafts.has(c.case_hash)).map(c => drafts.get(c.case_hash))};
+    const blob = new Blob([JSON.stringify(envelope, null, 2) + "\n"], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const link = node("a"); link.href = url; link.download = "freight-review-decisions-" + data.review_packet_hash.slice(0, 12) + ".json";
+    document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    unexported = false;
+    text("status", "Draft decisions exported. Backend validation is still required; no carrier action was taken.");
+  });
+  window.addEventListener("beforeunload", event => {if (unexported) {event.preventDefault(); event.returnValue = "";}});
+  progress(); renderList();
+})();
+</script>
+</body>
+</html>
