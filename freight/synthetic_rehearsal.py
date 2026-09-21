@@ -10,6 +10,7 @@ import tempfile
 from dataclasses import asdict
 from pathlib import Path
 
+from freight.audit_run_manifest import build_audit_run_manifest
 from freight.contracts import (
     open_incumbent_output,
     seal_incumbent_submission,
@@ -138,6 +139,14 @@ def run_rehearsal() -> dict:
     factory = derive_batch(population, charges, rules)
     review_queue = build_review_queue(factory)
     review_packet = build_review_packet(factory, review_queue, charges, rules)
+    audit_run = build_audit_run_manifest(
+        invoice_batch=invoice_batch,
+        population_build=population_build,
+        rule_batches=(verified_rule_batch, review_rule_batch),
+        factory=factory,
+        review_queue=review_queue,
+        review_packet=review_packet,
+    )
     truth = factory.truth
     by_charge = {
         derivation.charge_id: derivation.finding
@@ -257,6 +266,7 @@ def run_rehearsal() -> dict:
         "pilot_delivery_cost_usd": deal.economics.delivery_cost_usd,
         "pilot_gross_margin": deal.economics.gross_margin,
         "population_hash": population.manifest_hash,
+        "audit_run_hash": audit_run.run_hash,
         "population_builder_hash": population_build.builder_hash,
         "population_invoice_count": population_build.invoice_count,
         "population_charge_count": population_build.charge_count,
