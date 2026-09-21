@@ -121,7 +121,7 @@ def test_tampered_bundle_is_rejected(tmp_path):
         for name in source.namelist():
             data = source.read(name)
             if name == "summary.json":
-                data = data.replace(b"12500", b"99999")
+                data = data + b" "
             target.writestr(name, data)
 
     with pytest.raises(ValueError, match="differs|manifest"):
