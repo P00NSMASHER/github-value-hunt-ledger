@@ -86,6 +86,7 @@ class PrepareRunTests(unittest.TestCase):
         self.assertEqual(run["search_surfaces"], [])
         self.assertEqual(run["coordination_signal_ids"], [])
         self.assertEqual(run["consumed_coordination_signal_ids"], [])
+        self.assertEqual(run["search_moves"], [])
         self.assertIsNone(run["recall_rescue_type"])
         self.assertIsNone(run["recall_rescue_found_qualifying_candidate"])
         self.assertIsNone(run["stop_reason_standard"])
