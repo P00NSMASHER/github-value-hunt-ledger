@@ -33,6 +33,20 @@ A benchmark/shadow worker is BUSY in that phase, not READY for live allocation. 
 
 If runtime/connector limitations prevent fresh generated activation, the existing explicit manual_override path is available for a real currently claimable assignment, with a specific reason. It still needs a valid current lease and provenance; it is excluded from generated-route learning. If no safe claim can be persisted, do bounded unclaimed research in assigned catalogs and log unallocated telemetry. Never label it generated or complete another worker's claim. Do not churn READY events or block the whole run waiting for CI.
 
+
+### Cross-hunter handoff checkpoint
+
+Before substantial duplicate work, check the current assignment's candidate/capability fingerprint and relevant typed referrals. A live lease owned by another worker is a coordination signal: do not race it. Route an exact unanswered question or bounded referral to the owning lane when possible; otherwise choose a non-overlapping assignment or record unallocated work honestly.
+
+At the end of a materially useful run, hand off every item that can improve another worker without forcing it to reread the whole ledger:
+- a new capability delta or implementation identity;
+- a contradiction, verifier failure or reusable negative result;
+- a precise cross-lane question with exact revision/evidence refs;
+- a LOCAL search-method lesson with its scope and observed failure mode;
+- the durable stop/miss reason and the cheapest next falsifiable action.
+
+A rejected candidate is fleet memory when its failed proof obligation prevents another hunter from repeating the same dead end. A referral is not a promotion, and another hunter must still verify the evidence it relies on.
+
 ## 4. Save evidence and one immutable run
 
 Write detailed source evidence to the assigned lane catalog or a uniquely named referral. Preserve sibling content with optimistic file-SHA updates. For every materially completed live run, create exactly one new UTF-8 JSON object at intelligence/search_run_spool/<safe-unique-run-id>.json.
