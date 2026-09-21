@@ -92,7 +92,7 @@
   "best_result": "The apparent one-line event-index bug was a false diagnosis. The real defect is a missing LTQ v66 variable-size scan-event layout: primary events are 176 bytes and dependent events 232 bytes. A guarded exact-span repair eliminates all material scalar disagreements while preserving every peak value exactly.",
   "durable_evidence_path": "referrals/hunt13-r25-2026-09-21-exp007-opentfraw-ltq-repair-replay.md",
   "notes": "Unallocated bounded verification; no activation or lease was invented. No upstream write was made. Released v1.4.1 remains a negative oracle; the local patch is a repair candidate verified on one fixture.",
-  "query_family_id": "QF:thermo-raw-oracle-backed-parser-repair",
+  "query_family_id": "QF:thermo-raw-oracle-backed-parser-repair-replay",
   "search_objective_id": "OBJ:independent-evaluation",
   "benchmark_task_ids": [],
   "comparison_group_id": "CMP:EXP-007:thermo-raw-dual-decoder",
