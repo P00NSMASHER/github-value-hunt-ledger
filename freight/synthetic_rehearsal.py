@@ -138,6 +138,7 @@ def run_rehearsal() -> dict:
     review_queue = artifacts.review_queue
     review_packet = artifacts.review_packet
     review_routing = artifacts.review_routing
+    remediation_plan = artifacts.remediation_plan
     audit_run = artifacts.manifest
     truth = factory.truth
     by_charge = {
@@ -286,6 +287,8 @@ def run_rehearsal() -> dict:
         "buyer_review_case_count": review_routing.buyer_review_case_count,
         "evidence_remediation_case_count": review_routing.evidence_remediation_case_count,
         "rerun_required": review_routing.rerun_required,
+        "remediation_plan_hash": remediation_plan.plan_hash,
+        "remediation_plan_item_count": len(remediation_plan.items),
         "review_route": review_routing.route,
         "review_routing_hash": review_routing.routing_hash,
         "buyer_review_case_count": review_routing.buyer_review_case_count,
