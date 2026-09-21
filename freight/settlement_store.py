@@ -65,6 +65,28 @@ class Decision:
     reason: str = ""
 
 
+@dataclass(frozen=True)
+class AtomicSettlementOutcome:
+    event_id: str
+    created: bool
+    decision: Decision
+
+
+@dataclass(frozen=True)
+class AtomicCounterOutcome:
+    counter_id: str
+    created: bool
+    decision: Decision
+
+
+@dataclass(frozen=True)
+class AtomicEvidencePackageResult:
+    settlement_outcomes: tuple[AtomicSettlementOutcome, ...]
+    counter_outcomes: tuple[AtomicCounterOutcome, ...]
+    store_snapshot_before: dict
+    store_snapshot_after: dict
+
+
 class SettlementStore:
     """Scope-bound settlement repository.
 
@@ -234,8 +256,8 @@ class SettlementStore:
 
         return self._write(op)
 
-    def ingest_event(self, event: SettlementEventRecord) -> bool:
-        v = dict(
+    def _event_values(self, event: SettlementEventRecord) -> dict[str, object]:
+        return dict(
             buyer_id=self.buyer_id,
             business_unit=self.business_unit,
             event_id=self._text("event_id", event.event_id),
@@ -248,28 +270,36 @@ class SettlementStore:
             source_hash=self._text("source_hash", event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
-        def op(conn: sqlite3.Connection) -> bool:
-            old = conn.execute(
-                "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
-                (*self._scope, v["event_id"]),
-            ).fetchone()
-            if old:
-                if self._same(old, v):
-                    return False
-                raise ValueError("event_id replay conflicts with immutable settlement event")
-            if conn.execute(
-                "SELECT 1 FROM settlement_events WHERE buyer_id=? AND business_unit=? AND source_hash=?",
-                (*self._scope, v["source_hash"]),
-            ).fetchone():
-                raise ValueError("settlement source_hash already used")
-            conn.execute("""INSERT INTO settlement_events
-              (buyer_id,business_unit,event_id,reference,payer_id,payee_id,currency,amount_cents,booked_at,source_hash,source_kind)
-              VALUES(:buyer_id,:business_unit,:event_id,:reference,:payer_id,:payee_id,:currency,:amount_cents,:booked_at,:source_hash,:source_kind)""", v)
-            return True
-        return self._write(op)
 
-    def ingest_counter(self, event: CounterEventRecord) -> bool:
-        v = dict(
+    def _ingest_event_conn(
+        self,
+        conn: sqlite3.Connection,
+        v: dict[str, object],
+    ) -> bool:
+        old = conn.execute(
+            "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, v["event_id"]),
+        ).fetchone()
+        if old:
+            if self._same(old, v):
+                return False
+            raise ValueError("event_id replay conflicts with immutable settlement event")
+        if conn.execute(
+            "SELECT 1 FROM settlement_events WHERE buyer_id=? AND business_unit=? AND source_hash=?",
+            (*self._scope, v["source_hash"]),
+        ).fetchone():
+            raise ValueError("settlement source_hash already used")
+        conn.execute("""INSERT INTO settlement_events
+          (buyer_id,business_unit,event_id,reference,payer_id,payee_id,currency,amount_cents,booked_at,source_hash,source_kind)
+          VALUES(:buyer_id,:business_unit,:event_id,:reference,:payer_id,:payee_id,:currency,:amount_cents,:booked_at,:source_hash,:source_kind)""", v)
+        return True
+
+    def ingest_event(self, event: SettlementEventRecord) -> bool:
+        v = self._event_values(event)
+        return self._write(lambda conn: self._ingest_event_conn(conn, v))
+
+    def _counter_values(self, event: CounterEventRecord) -> dict[str, object]:
+        return dict(
             buyer_id=self.buyer_id,
             business_unit=self.business_unit,
             counter_id=self._text("counter_id", event.counter_id),
@@ -280,35 +310,43 @@ class SettlementStore:
             source_hash=self._text("source_hash", event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
-        def op(conn: sqlite3.Connection) -> bool:
-            original = conn.execute(
-                "SELECT currency,booked_at FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
-                (*self._scope, v["original_event_id"]),
-            ).fetchone()
-            if not original:
-                raise ValueError("counter references unknown settlement event")
-            if original["currency"] != v["currency"]:
-                raise ValueError("counter currency mismatch")
-            if v["observed_at"] < original["booked_at"]:
-                raise ValueError("counter event predates original settlement")
-            old = conn.execute(
-                "SELECT * FROM counter_events WHERE buyer_id=? AND business_unit=? AND counter_id=?",
-                (*self._scope, v["counter_id"]),
-            ).fetchone()
-            if old:
-                if self._same(old, v):
-                    return False
-                raise ValueError("counter_id replay conflicts with immutable counter event")
-            if conn.execute(
-                "SELECT 1 FROM counter_events WHERE buyer_id=? AND business_unit=? AND source_hash=?",
-                (*self._scope, v["source_hash"]),
-            ).fetchone():
-                raise ValueError("counter source_hash already used")
-            conn.execute("""INSERT INTO counter_events
-              (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
-              VALUES(:buyer_id,:business_unit,:counter_id,:original_event_id,:currency,:amount_cents,:observed_at,:source_hash,:source_kind)""", v)
-            return True
-        return self._write(op)
+
+    def _ingest_counter_conn(
+        self,
+        conn: sqlite3.Connection,
+        v: dict[str, object],
+    ) -> bool:
+        original = conn.execute(
+            "SELECT currency,booked_at FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, v["original_event_id"]),
+        ).fetchone()
+        if not original:
+            raise ValueError("counter references unknown settlement event")
+        if original["currency"] != v["currency"]:
+            raise ValueError("counter currency mismatch")
+        if v["observed_at"] < original["booked_at"]:
+            raise ValueError("counter event predates original settlement")
+        old = conn.execute(
+            "SELECT * FROM counter_events WHERE buyer_id=? AND business_unit=? AND counter_id=?",
+            (*self._scope, v["counter_id"]),
+        ).fetchone()
+        if old:
+            if self._same(old, v):
+                return False
+            raise ValueError("counter_id replay conflicts with immutable counter event")
+        if conn.execute(
+            "SELECT 1 FROM counter_events WHERE buyer_id=? AND business_unit=? AND source_hash=?",
+            (*self._scope, v["source_hash"]),
+        ).fetchone():
+            raise ValueError("counter source_hash already used")
+        conn.execute("""INSERT INTO counter_events
+          (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
+          VALUES(:buyer_id,:business_unit,:counter_id,:original_event_id,:currency,:amount_cents,:observed_at,:source_hash,:source_kind)""", v)
+        return True
+
+    def ingest_counter(self, event: CounterEventRecord) -> bool:
+        v = self._counter_values(event)
+        return self._write(lambda conn: self._ingest_counter_conn(conn, v))
 
     def _claim_residual(self, conn: sqlite3.Connection, claim_id: str) -> int:
         row = conn.execute("""SELECT c.amount_cents
@@ -339,44 +377,64 @@ class SettlementStore:
     def event_residual(self, event_id: str) -> int:
         return self._read(lambda c: self._event_residual(c, event_id))
 
-    def auto_allocate(self, event_id: str, *, created_at: str) -> Decision:
-        created_at = self._timestamp("created_at", created_at)
+    def _auto_allocate_conn(
+        self,
+        conn: sqlite3.Connection,
+        event_id: str,
+        created_at: str,
+    ) -> Decision:
+        event = conn.execute(
+            "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, event_id),
+        ).fetchone()
+        if not event:
+            raise ValueError("unknown settlement event")
+        if created_at < event["booked_at"]:
+            raise ValueError("allocation created_at cannot predate settlement booking")
+        old = conn.execute(
+            "SELECT allocation_id FROM allocations WHERE buyer_id=? AND business_unit=? AND event_id=? ORDER BY allocation_id",
+            (*self._scope, event_id),
+        ).fetchall()
+        if old:
+            return Decision(
+                ALREADY_ALLOCATED,
+                tuple(r[0] for r in old),
+                "event already consumed",
+            )
+        remaining = self._event_residual(conn, event_id)
+        rows = conn.execute("""SELECT c.* FROM recovery_claims c
+          LEFT JOIN review_claims r
+            ON r.buyer_id=c.buyer_id AND r.business_unit=c.business_unit AND r.claim_id=c.claim_id
+          WHERE c.buyer_id=? AND c.business_unit=?
+            AND c.reference=? AND c.payer_id=? AND c.payee_id=? AND c.currency=?
+            AND c.issued_at<=? AND r.claim_id IS NULL ORDER BY c.claim_id""",
+          (*self._scope, event["reference"], event["payer_id"], event["payee_id"], event["currency"], event["booked_at"])).fetchall()
+        candidates = [
+            row
+            for row in rows
+            if (res := self._claim_residual(conn, row["claim_id"])) > 0
+            and res == remaining
+        ]
+        if len(candidates) != 1:
+            return Decision(
+                REVIEW,
+                reason=f"exact unique candidate count={len(candidates)}",
+            )
+        claim = candidates[0]
+        edge = f"auto:{event_id}:{claim['claim_id']}"
+        fee = 0 if claim["fee_disqualified"] else remaining
+        conn.execute("""INSERT INTO allocations
+          (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
+          VALUES(?,?,?,?,?,?,?,?,?)""",
+          (*self._scope, edge, claim["claim_id"], event_id, remaining, AUTO, fee, created_at))
+        return Decision(ALLOCATED, (edge,), "exact unique external settlement")
 
-        def op(conn: sqlite3.Connection) -> Decision:
-            event = conn.execute(
-                "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
-                (*self._scope, event_id),
-            ).fetchone()
-            if not event:
-                raise ValueError("unknown settlement event")
-            if created_at < event["booked_at"]:
-                raise ValueError("allocation created_at cannot predate settlement booking")
-            old = conn.execute(
-                "SELECT allocation_id FROM allocations WHERE buyer_id=? AND business_unit=? AND event_id=? ORDER BY allocation_id",
-                (*self._scope, event_id),
-            ).fetchall()
-            if old:
-                return Decision(ALREADY_ALLOCATED, tuple(r[0] for r in old), "event already consumed")
-            remaining = self._event_residual(conn, event_id)
-            rows = conn.execute("""SELECT c.* FROM recovery_claims c
-              LEFT JOIN review_claims r
-                ON r.buyer_id=c.buyer_id AND r.business_unit=c.business_unit AND r.claim_id=c.claim_id
-              WHERE c.buyer_id=? AND c.business_unit=?
-                AND c.reference=? AND c.payer_id=? AND c.payee_id=? AND c.currency=?
-                AND c.issued_at<=? AND r.claim_id IS NULL ORDER BY c.claim_id""",
-              (*self._scope, event["reference"], event["payer_id"], event["payee_id"], event["currency"], event["booked_at"])).fetchall()
-            candidates = [r for r in rows if (res := self._claim_residual(conn, r["claim_id"])) > 0 and res == remaining]
-            if len(candidates) != 1:
-                return Decision(REVIEW, reason=f"exact unique candidate count={len(candidates)}")
-            claim = candidates[0]
-            edge = f"auto:{event_id}:{claim['claim_id']}"
-            fee = 0 if claim["fee_disqualified"] else remaining
-            conn.execute("""INSERT INTO allocations
-              (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
-              VALUES(?,?,?,?,?,?,?,?,?)""",
-              (*self._scope, edge, claim["claim_id"], event_id, remaining, AUTO, fee, created_at))
-            return Decision(ALLOCATED, (edge,), "exact unique external settlement")
-        return self._write(op)
+    def auto_allocate(self, event_id: str, *, created_at: str) -> Decision:
+        event_id = self._text("event_id", event_id)
+        created_at = self._timestamp("created_at", created_at)
+        return self._write(
+            lambda conn: self._auto_allocate_conn(conn, event_id, created_at)
+        )
 
     def review_allocate(self, *, allocation_id: str, claim_id: str, event_id: str, amount_cents: int, created_at: str) -> str:
         amount_cents = self._positive_cents("allocation amount", amount_cents)
@@ -517,58 +575,211 @@ class SettlementStore:
 
         return self._write(op)
 
-    def auto_apply_counter(self, counter_id: str, *, created_at: str) -> Decision:
-        created_at = self._timestamp("created_at", created_at)
+    def _auto_apply_counter_conn(
+        self,
+        conn: sqlite3.Connection,
+        counter_id: str,
+        created_at: str,
+    ) -> Decision:
+        counter = conn.execute(
+            "SELECT * FROM counter_events WHERE buyer_id=? AND business_unit=? AND counter_id=?",
+            (*self._scope, counter_id),
+        ).fetchone()
+        if not counter:
+            raise ValueError("unknown counter event")
+        if created_at < counter["observed_at"]:
+            raise ValueError("reversal created_at cannot predate counter observation")
+        old = conn.execute(
+            "SELECT reversal_id FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND counter_id=? ORDER BY reversal_id",
+            (*self._scope, counter_id),
+        ).fetchall()
+        if old:
+            return Decision(
+                ALREADY_REVERSED,
+                tuple(r[0] for r in old),
+                "counter already applied",
+            )
+        event = conn.execute(
+            "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            (*self._scope, counter["original_event_id"]),
+        ).fetchone()
+        if event is None:
+            raise ValueError("counter references unknown settlement event")
+        if counter["currency"] != event["currency"]:
+            raise ValueError("counter currency mismatch with original settlement event")
+        live = conn.execute("""SELECT a.*,
+          a.amount_cents-COALESCE((SELECT SUM(amount_cents) FROM reversal_edges
+             WHERE buyer_id=a.buyer_id AND business_unit=a.business_unit AND allocation_id=a.allocation_id),0) AS live_cents
+          FROM allocations a WHERE a.buyer_id=? AND a.business_unit=? AND a.event_id=? ORDER BY a.allocation_id""",
+          (*self._scope, counter["original_event_id"])).fetchall()
+        live = [r for r in live if r["live_cents"] > 0]
+        if not live:
+            return Decision(
+                REVIEW,
+                reason="original event has no live realized allocation",
+            )
+        total = sum(int(r["live_cents"]) for r in live)
+        if counter["amount_cents"] in (event["amount_cents"], total):
+            plan = [(r, int(r["live_cents"])) for r in live]
+        elif len(live) == 1 and counter["amount_cents"] <= live[0]["live_cents"]:
+            plan = [(live[0], int(counter["amount_cents"]))]
+        else:
+            return Decision(
+                REVIEW,
+                reason="partial return is ambiguous across live allocation edges",
+            )
+        if any(created_at < alloc["created_at"] for alloc, _ in plan):
+            raise ValueError("reversal created_at cannot predate allocation")
+        ids = []
+        for i, (alloc, amount) in enumerate(plan, 1):
+            edge = f"reversal:{counter_id}:{i}:{alloc['allocation_id']}"
+            conn.execute("""INSERT INTO reversal_edges
+              (buyer_id,business_unit,reversal_id,counter_id,allocation_id,amount_cents,created_at)
+              VALUES(?,?,?,?,?,?,?)""",
+              (*self._scope, edge, counter_id, alloc["allocation_id"], amount, created_at))
+            ids.append(edge)
+        return Decision(REVERSED, tuple(ids), "counter-edge applied")
 
-        def op(conn: sqlite3.Connection) -> Decision:
-            counter = conn.execute(
-                "SELECT * FROM counter_events WHERE buyer_id=? AND business_unit=? AND counter_id=?",
-                (*self._scope, counter_id),
-            ).fetchone()
-            if not counter:
-                raise ValueError("unknown counter event")
-            if created_at < counter["observed_at"]:
-                raise ValueError("reversal created_at cannot predate counter observation")
-            old = conn.execute(
-                "SELECT reversal_id FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND counter_id=? ORDER BY reversal_id",
-                (*self._scope, counter_id),
-            ).fetchall()
-            if old:
-                return Decision(ALREADY_REVERSED, tuple(r[0] for r in old), "counter already applied")
-            event = conn.execute(
-                "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
-                (*self._scope, counter["original_event_id"]),
-            ).fetchone()
-            if event is None:
-                raise ValueError("counter references unknown settlement event")
-            if counter["currency"] != event["currency"]:
-                raise ValueError("counter currency mismatch with original settlement event")
-            live = conn.execute("""SELECT a.*,
-              a.amount_cents-COALESCE((SELECT SUM(amount_cents) FROM reversal_edges
-                 WHERE buyer_id=a.buyer_id AND business_unit=a.business_unit AND allocation_id=a.allocation_id),0) AS live_cents
-              FROM allocations a WHERE a.buyer_id=? AND a.business_unit=? AND a.event_id=? ORDER BY a.allocation_id""",
-              (*self._scope, counter["original_event_id"])).fetchall()
-            live = [r for r in live if r["live_cents"] > 0]
-            if not live:
-                return Decision(REVIEW, reason="original event has no live realized allocation")
-            total = sum(int(r["live_cents"]) for r in live)
-            if counter["amount_cents"] in (event["amount_cents"], total):
-                plan = [(r, int(r["live_cents"])) for r in live]
-            elif len(live) == 1 and counter["amount_cents"] <= live[0]["live_cents"]:
-                plan = [(live[0], int(counter["amount_cents"]))]
-            else:
-                return Decision(REVIEW, reason="partial return is ambiguous across live allocation edges")
-            if any(created_at < alloc["created_at"] for alloc, _ in plan):
-                raise ValueError("reversal created_at cannot predate allocation")
-            ids = []
-            for i, (alloc, amount) in enumerate(plan, 1):
-                edge = f"reversal:{counter_id}:{i}:{alloc['allocation_id']}"
-                conn.execute("""INSERT INTO reversal_edges
-                  (buyer_id,business_unit,reversal_id,counter_id,allocation_id,amount_cents,created_at)
-                  VALUES(?,?,?,?,?,?,?)""",
-                  (*self._scope, edge, counter_id, alloc["allocation_id"], amount, created_at))
-                ids.append(edge)
-            return Decision(REVERSED, tuple(ids), "counter-edge applied")
+    def auto_apply_counter(self, counter_id: str, *, created_at: str) -> Decision:
+        counter_id = self._text("counter_id", counter_id)
+        created_at = self._timestamp("created_at", created_at)
+        return self._write(
+            lambda conn: self._auto_apply_counter_conn(conn, counter_id, created_at)
+        )
+
+    def _snapshot_dict_conn(self, conn: sqlite3.Connection) -> dict:
+        tables = (
+            ("recovery_claims", "claim_id"),
+            ("review_claims", "claim_id"),
+            ("settlement_events", "event_id"),
+            ("allocations", "allocation_id"),
+            ("counter_events", "counter_id"),
+            ("reversal_edges", "reversal_id"),
+        )
+        rows = {
+            table: [
+                dict(row)
+                for row in conn.execute(
+                    f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=? ORDER BY {key}",
+                    self._scope,
+                )
+            ]
+            for table, key in tables
+        }
+        return {
+            "schema": 1,
+            "buyer_id": self.buyer_id,
+            "business_unit": self.business_unit,
+            "tables": rows,
+        }
+
+    def process_evidence_package(
+        self,
+        *,
+        settlement_events: tuple[SettlementEventRecord, ...] = (),
+        counter_events: tuple[CounterEventRecord, ...] = (),
+        created_at: str,
+    ) -> AtomicEvidencePackageResult:
+        created_at = self._timestamp("created_at", created_at)
+        event_values = tuple(self._event_values(event) for event in settlement_events)
+        counter_values = tuple(
+            self._counter_values(counter) for counter in counter_events
+        )
+        if not event_values and not counter_values:
+            raise ValueError("at least one settlement or counter event is required")
+
+        event_ids = [str(value["event_id"]) for value in event_values]
+        event_sources = [str(value["source_hash"]) for value in event_values]
+        counter_ids = [str(value["counter_id"]) for value in counter_values]
+        counter_sources = [str(value["source_hash"]) for value in counter_values]
+        if len(event_ids) != len(set(event_ids)):
+            raise ValueError("duplicate event_id in settlement evidence package")
+        if len(event_sources) != len(set(event_sources)):
+            raise ValueError("duplicate settlement source_hash in evidence package")
+        if len(counter_ids) != len(set(counter_ids)):
+            raise ValueError("duplicate counter_id in settlement evidence package")
+        if len(counter_sources) != len(set(counter_sources)):
+            raise ValueError("duplicate counter source_hash in evidence package")
+        for value in event_values:
+            if created_at < value["booked_at"]:
+                raise ValueError(
+                    "created_at cannot predate settlement booking: "
+                    + str(value["event_id"])
+                )
+        for value in counter_values:
+            if created_at < value["observed_at"]:
+                raise ValueError(
+                    "created_at cannot predate counter observation: "
+                    + str(value["counter_id"])
+                )
+
+        def op(conn: sqlite3.Connection) -> AtomicEvidencePackageResult:
+            before = self._snapshot_dict_conn(conn)
+
+            settlements: list[AtomicSettlementOutcome] = []
+            for value in event_values:
+                event_id = str(value["event_id"])
+                created = self._ingest_event_conn(conn, value)
+                decision = self._auto_allocate_conn(conn, event_id, created_at)
+                settlements.append(
+                    AtomicSettlementOutcome(event_id, created, decision)
+                )
+
+            counters: list[AtomicCounterOutcome] = []
+            for value in counter_values:
+                counter_id = str(value["counter_id"])
+                created = self._ingest_counter_conn(conn, value)
+                decision = self._auto_apply_counter_conn(
+                    conn,
+                    counter_id,
+                    created_at,
+                )
+                counters.append(
+                    AtomicCounterOutcome(counter_id, created, decision)
+                )
+
+            # A counter can restore claim capacity after an earlier settlement
+            # was initially routed to review. Re-evaluate those cases before
+            # freezing the package state so review cases describe final state.
+            for index, outcome in enumerate(settlements):
+                if outcome.decision.status != REVIEW:
+                    continue
+                decision = self._auto_allocate_conn(
+                    conn,
+                    outcome.event_id,
+                    created_at,
+                )
+                settlements[index] = AtomicSettlementOutcome(
+                    outcome.event_id,
+                    outcome.created,
+                    decision,
+                )
+
+            # A newly allocated settlement can make an earlier counter
+            # auto-reversible. Re-evaluate reviewed counters once after the
+            # final settlement pass.
+            for index, outcome in enumerate(counters):
+                if outcome.decision.status != REVIEW:
+                    continue
+                decision = self._auto_apply_counter_conn(
+                    conn,
+                    outcome.counter_id,
+                    created_at,
+                )
+                counters[index] = AtomicCounterOutcome(
+                    outcome.counter_id,
+                    outcome.created,
+                    decision,
+                )
+
+            after = self._snapshot_dict_conn(conn)
+            return AtomicEvidencePackageResult(
+                settlement_outcomes=tuple(settlements),
+                counter_outcomes=tuple(counters),
+                store_snapshot_before=before,
+                store_snapshot_after=after,
+            )
+
         return self._write(op)
 
     def realized_cents(self, claim_id: str | None = None) -> int:
@@ -622,31 +833,17 @@ class SettlementStore:
         at the same database revision even when another connection writes. The
         returned JSON is operational evidence and can contain customer data.
         """
-        tables = (
-            ("recovery_claims", "claim_id"),
-            ("review_claims", "claim_id"),
-            ("settlement_events", "event_id"),
-            ("allocations", "allocation_id"),
-            ("counter_events", "counter_id"),
-            ("reversal_edges", "reversal_id"),
-        )
 
         def op(conn: sqlite3.Connection) -> str:
             conn.execute("BEGIN")
             try:
-                rows = {
-                    table: [dict(row) for row in conn.execute(
-                        f"SELECT * FROM {table} WHERE buyer_id=? AND business_unit=? ORDER BY {key}",
-                        self._scope,
-                    )]
-                    for table, key in tables
-                }
-                return json.dumps({
-                    "schema": 1,
-                    "buyer_id": self.buyer_id,
-                    "business_unit": self.business_unit,
-                    "tables": rows,
-                }, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+                value = self._snapshot_dict_conn(conn)
+                return json.dumps(
+                    value,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    ensure_ascii=False,
+                )
             finally:
                 conn.rollback()
 
