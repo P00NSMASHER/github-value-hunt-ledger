@@ -65,3 +65,31 @@ The live path now adds three conservative protections:
 3. an explicit cross-hunter handoff checkpoint for capability deltas, contradictions, verifier failures, negative knowledge and typed referrals.
 
 These changes do not modify benchmark tasks, gold, scoring, experiment state/results, or SEARCH_SKILLS while Pair 1 remains unfinished. They are intended to improve coordination and learning after each worker exits its frozen benchmark phase.
+
+## Immutable coordination and recall-rescue instrumentation
+
+A second follow-on patch added a race-safe cross-hunter learning channel without changing the unfinished frozen benchmark.
+
+### Coordination channel
+- `intelligence/COORDINATION_PROTOCOL.md` defines one immutable coordination packet per materially useful live run when a finding can change another worker's next action.
+- `intelligence/coordination_spool/` prevents concurrent workers from replacing one shared mutable blackboard.
+- Hunt 15 owns the compact `COORDINATION_BOARD.md` and routes durable capability deltas, negative knowledge, referrals, contradictions, local lessons and next tests into the existing authoritative ledgers.
+- Search-run telemetry now records both emitted `coordination_signal_ids` and materially `consumed_coordination_signal_ids`.
+- `tools/ti_coordination_report.py` measures transfer/consumption downstream but is **observe-first**; coordination does not yet change automatic routing.
+- Baseline at introduction: 39 measured runs, 0 historical emitted signals, 0 consumed signals. No history was retroactively relabeled.
+
+### Recall-rescue learning
+The completed benchmark exposed two different false-negative patterns: deep falsification of a polished near-match while missing another qualifying target, and overly literal domain taxonomy that rejected an adjacent-domain implementation even though it exercised the exact required invariant on domain-specific cases.
+
+The live post-benchmark path now:
+- preserves the existing recall floor;
+- treats retrieval/rate-limit failures as retrieval debt rather than absence evidence;
+- permits an **invariant-first adjacent-domain rescue** when domain-labelled candidates miss the defining mechanism;
+- keeps the original acceptance target unchanged, so adjacency cannot lower the verification bar;
+- records `recall_rescue_type` and whether the rescue surfaced a qualifying candidate;
+- records a controlled `stop_reason_standard` so no-find, duplicate, retrieval-limited, evidence-blocked, safety/rights, external-prerequisite and budget-exhausted states can be distinguished.
+
+These fields are diagnostic only. At introduction, 10 prior discovery runs had explicitly observed recall-rescue usage and 2 reported using one, but the new rescue-type/success fields did not exist historically; those two therefore remain `unspecified` and are not backfilled with invented success labels.
+
+No change here is evidence that the architecture is superior. The unfinished Pair 1 benchmark remains frozen, and automatic allocation should only use these new signals after enough prospective examples show improved useful outcomes without worsening recall.
+
