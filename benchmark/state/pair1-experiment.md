@@ -1,7 +1,8 @@
 # Pair 1 — EXPERIMENT persistent state
 
 ## Validated reusable lessons
-- Bidirectional money/evidence invariant tracing is now supported on two distinct tasks (01 and 02): trace operational observations/terms forward into approved money, then trace corrections, partial failures and external acknowledgements backward into evidence/state. This exposed stale charge evidence after repricing in task 01 and a non-atomic invoice-variance adjustment in task 02. Preserve explicit IMPLEMENTED/TESTED/RUN/UNVERIFIED labels. Eligible for central SEARCH_SKILLS promotion; not promoted during this bounded pair-file run.
+- Bidirectional money/evidence invariant tracing is now supported on tasks 01, 02 and 04: trace operational observations/terms forward into approved money, then trace corrections, partial failures and external acknowledgements backward into evidence/state. It exposed stale evidence, non-atomic payable creation and review-to-TMS bypass/replay. Preserve explicit IMPLEMENTED/TESTED/RUN/UNVERIFIED labels. Eligible for central SEARCH_SKILLS promotion; not promoted during this bounded pair-file run.
+- Nested authority/version audit is now supported on two distinct tasks (03 and 04): after verifying the outer selector/gate, follow every referenced price/evidence/unit/correction dependency through final commit. Task 03 exposed mutable matrix history, incomplete replay identity and FX relabeling; task 04 exposed ignored classifier confidence, prompt-only conflict handling, untyped corrections and replayable approval. Eligible for central promotion; not promoted in this bounded pair-file run.
 
 ## Failed search patterns
 - High-conjunction repository metadata searches failed on tasks 01 and 02 even when the candidate existed. Broad web/TMS searches returned either no matches or shallow CRUD/document candidates. Prefer distinctive source/schema signatures; retain metadata search as cheap negative evidence, not the primary route.
@@ -9,10 +10,10 @@
 ## Useful terminology / signatures
 - Physical/billing: consumed event ledger, departure_lower, appointment_clock_at, priced_pending_review, evidence_sha256, supplemental draft, stranded charges.
 - Operating/money plane: carrier cost event, assignment_version, variance_tolerance_minor, invoice match, journal_batch_id, settlement status, EDI 210, executed adjustment, system-owned detention charge.
+- Document/review: gate_decision, review_reasons, field assessment, grounded evidence, arithmetic mismatch, classifier confidence, typed correction, approval idempotency, decision key, stale-processing lease.
 
 ## Candidate search skills awaiting second-task confirmation
-- Nested price-source authority audit (evidence set {03}): after verifying effective dates on the selected rule, follow every referenced matrix, formula input, exchange rate and unit/currency label. Test whether later replacement or dependency failure preserves the exact values and units needed for historical rerating. One-task evidence only; task 03 exposed mutable matrix cells, incomplete replay hashing and fail-open FX relabeling.
-- The task-01 invariant-tracing candidate achieved second-task confirmation on task 02 and moved to validated lessons. Central promotion remains pending.
+- None. Nested authority/version audit achieved second-task confirmation on task 04 and moved to validated lessons. Bidirectional invariant tracing remains validated. Central promotion remains pending.
 
 ## Task 01 checkpoint — 2026-09-21
 
@@ -55,3 +56,19 @@
 - Candidate skill awaiting second-task confirmation: nested price-source authority audit. Verify the effective-dated outer selector, then independently version/check referenced matrices, formula variables, FX rates and output units. Evidence set {03}; do not promote yet.
 - No SEARCH_SKILLS.md write. The nested-authority lesson requires a second distinct task or Integrator approval.
 - Unresolved candidate tests: fail an EUR→USD lookup and assert no USD-labeled unconverted charge can be applied; edit lane/weight/service and assert explicit re-resolution; replace a matrix, then rerate a shipment at the prior as-of date and require the original cell/value; include SellTotal in replay identity.
+
+## Task 04 checkpoint — 2026-09-21
+
+- Completed: 04. Result committed in ad95565d69a40f208487b8535a4e67b05b448697. Next lowest unfinished assigned task: 05. Process only one task per run.
+- Candidate: Shreyas2409/freight-intake @ 49ee48e383aea202cc5ddf15c500a5b39092d8b7. WATCH, 22/30; independent verifier agreed. Public source/schema/tests/history inspected; 28 offline tests independently passed and six paid-API tests skipped.
+- Capability evidence: rate-confirmation Decimal schema; per-field value/confidence/evidence/page; exact-page substring grounding; required-field, MC/state/date/weight and line-haul+fuel+detention=total validators; explicit auto_commit/review/failed decisions; persisted review items; worker/job model; human correction and TMS boundary.
+- Adversarial run: classification confidence 0.01 still auto-committed when extracted fields passed because classifier confidence is ignored after type selection.
+- Adversarial run: a math-mismatch review accepted total_rate=NOT_A_NUMBER. Repeating the same approval returned success again and created a second TMS record. Corrections are not typed/revalidated; status is not checked/locked; no unique decision key exists.
+- Ambiguity run: page text containing two coherent conflicting rate sets auto-committed when the chosen set was grounded and internally consistent. Deterministic code does not enumerate competing money candidates; conflict refusal depends on prompt compliance.
+- Reliability gap: claimed jobs enter processing before extraction but have no lease/heartbeat/stale-processing reaper. Caught failures retry; worker death can strand state.
+- Provenance/operational boundary: one unsigned root commit, no public test CI, no LICENSE, take-home status, synthetic fixtures, no auth/tenant/CSRF/upload/parser-sandbox/retention controls. Author-reported Postgres/live-API results were not upgraded to independently verified evidence.
+- Discovery result: direct metadata was sparse; source/test conjunctions and fixture names found the exact capability. Scoped analogs had broader parsers or review infrastructure but not the same verified rate-confirmation arithmetic-to-review conjunction.
+- Prior-lesson impact: bidirectional tracing forced review→TMS inspection; task-03 nested-authority audit forced checks of classifier confidence, competing evidence, correction types and approval identity. Both produced executable falsifiers.
+- Validated reusable procedure: nested authority/version audit, evidence set {03, 04}. Verify the outer gate, then every referenced source/unit/version and every post-review correction/commit edge. A review queue is not a safety boundary unless correction and approval preserve the original invariants.
+- No SEARCH_SKILLS.md write in this run. The lesson now meets the two-task evidence threshold and is eligible for later central promotion without another benchmark task.
+- Unresolved candidate tests: require low classifier confidence to review; detect multiple coherent money sets; parse corrected fields through the typed schema; rerun all cross-field validators; record actor/diff/source hash; enforce a unique approval decision key under concurrent POST; reclaim expired processing leases.
