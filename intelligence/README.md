@@ -741,3 +741,34 @@ Every routed worker now carries:
 - `route_mode: exploit | explore_swap`.
 
 V18 is experimental-design infrastructure, not a claim that one worker is better than another. It preserves assignment priority, all V14-V17 execution controls, and the allocator's portfolio.
+
+
+## V19 matched exploration outcome analysis
+
+V19 turns V18's controlled worker swaps into auditable crossover evidence.
+
+For each applied V18 pair, it reconstructs the exact two agents, the two swapped work items, the exploration routing generation, and any completed generated primary routes. Baseline comparators come only from non-applied V18 generations with the exact same `work_item_id`.
+
+A complete crossover requires four observed cells:
+- agent A on task A;
+- agent A on task B;
+- agent B on task A;
+- agent B on task B.
+
+If any cell is missing, V19 reports the missing evidence and does not estimate an agent effect.
+
+Generated products:
+- `matched_exploration_pairs.jsonl` — one record per applied V18 pair generation;
+- `routing_crossover_groups.jsonl` — repeated generations collapsed into unique two-agent/two-task crossover groups;
+- `agent_crossover_metrics.jsonl` — diagnostic agent-level matched evidence;
+- `matched_exploration_metrics.json`;
+- `MATCHED_EXPLORATION_REPORT.md`;
+- `MATCHED_AGENT_EFFECTS.md`.
+
+For complete crossover groups, V19 reports:
+- an additive agent contrast that averages the agent difference on both tasks;
+- a separate task-difficulty contrast.
+
+V19 is intentionally diagnostic-only. No crossover estimate is routing-eligible, and no missing cell is imputed. Work-steal, manual override, retrospective and incomplete routes remain excluded.
+
+This is the first layer that can begin separating agent effect from task difficulty using deliberately varied assignment evidence rather than raw observational averages.
