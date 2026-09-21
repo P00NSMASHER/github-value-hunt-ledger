@@ -35,11 +35,11 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 |---|---:|---:|---|
 | CAP-001 — Evidence-gated document facts | 4 | 2 | domain calibration and contractual/legal authority remain external |
 | CAP-002 — Reviewed, versioned identity mastering | 4 | 1 | datasets/customer identities separate |
-| CAP-008 — Structured invoice compliance/validation | 4 | 3 | official rule-pack/version authority must be pinned |
+| CAP-008 — Structured invoice compliance/validation | 4 | 3 | pin official rule-pack/table bytes, source identity, effective interval, parser/map digest, imported-row-set digest and validator/runtime revision in one authority receipt |
 | CAP-012 — Permit event versioning and semantic source QA | 4 | 1 | jurisdiction completeness/semantics vary |
 | CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 4 | 2 | secsgem's correction is source and local-test verified, not yet a real raw-HSMS/T3 capture, and Dreamine was not runtime-executed in the correcting run. Use a neutral raw-HSMS harness for EC-ATOMIC-SHARED and EC-DUPLICATE-POLICY, record every correlated message, maintain an independent logical T3 clock and independently read post-state. Seek a third engine only after an observed endpoint disagreement. |
 | CAP-015 — Prospective, leakage-resistant prediction and evaluator-grain evidence | 4 | 3 | first-party OEDI ZIP digest/bytes remain unresolved in the current evidence chain. Verify the current first-party artifact against the external expected digest, byte-inspect source schema/time/null semantics, then freeze the composite-event + unique-spell evaluator manifest before running policy scores. |
-| CAP-019 — Source-authority observation receipts | 4 | 10 | whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or “no return.” |
+| CAP-019 — Source-authority observation receipts | 4 | 10 | whole-run completeness and negative authority remain source-specific. Execute the authorized ERP credit-endpoint test plus first-party cross-status SAM receipts and day-boundary rule fixtures; transport/auth/partial/unrepresentable states may never authorize VERIFIED_EMPTY, NOT_APPLIED or CURRENT_VERIFIED. |
 | CAP-016 — Money-state integrity / deterministic close truth | 3 | 8 | — |
 | CAP-006 — Settlement-grounded recovery attribution | 2 | 1 | realized dollars require external outcome evidence |
 | CAP-007 — Proof obligations, versioned proof-policy authority and typed proof admission | 2 | 5 | — |

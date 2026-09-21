@@ -1,6 +1,6 @@
 # UNIFIED HUNT PLAN
 
-Allocator generation: **ALLOCGEN:71337ecbacfb**
+Allocator generation: **ALLOCGEN:20e446545c5f**
 Portfolio policy: **PORTFOLIO:7d0862b1d1ea**
 
 This is the current 14-slot work plan. Scores are scheduling priorities, not claims of repository or commercial value.
@@ -25,22 +25,22 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 ## Assignment packets
 
 ### SLOT-01 — EXP-002 — AP source-authority + reversible receipt-policy audit
-- Assignment ID: ASSIGN:71337ecbacfb:slot-01
+- Assignment ID: ASSIGN:20e446545c5f:slot-01
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **99.75** — {"portfolio_priority_boost": 8, "queue_order_adjustment": -0.25, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
 - Capability/experiment: CAP-002, CAP-007, CAP-008, CAP-016, CAP-019, EXP-002
 - Why now: Experiment is READY and should be executed/falsified before searching for redundant components.
-- Execution scope: READY — synthetic reference fixture PASSED; external ERP/provider adapter is the next execution.
-- Next action: bind the passing fixture to one real ERP vendor-credit/reversal endpoint and preserve a phase-qualified provider receipt. A generic Failed/NotFound response remains UNKNOWN unless it proves the exact effect never entered posting/apply.
-- Acceptance target: all planted cases detected; unsupported recovery = 0; source outage cannot create missing-receipt/PO money; amount+quantity capacity is conserved; crash/restart cannot create a second logical counter-event; bitemporal replay reproduces known-at and valid-at truth.
-- Hypothesis: explicit source observation, reviewed identity, policy-specific receipt authority, reversible line-level authority consumption and crash-safe external writeback can distinguish recoverable AP leakage from unresolved exceptions without false missing-receipt/PO dollars or duplicate counter-events.
-- Success: all planted cases detected; unsupported recovery = 0; source outage cannot create missing-receipt/PO money; amount+quantity capacity is conserved; crash/restart cannot create a second logical counter-event; bitemporal replay reproduces known-at and valid-at truth.
-- Failure: universal `has_receipt`, any-return-means-authority-restored, unavailable source becomes negative evidence, same-product auto-assignment establishes ownership, exception/timeout becomes NOT_APPLIED, or UNKNOWN frees capacity/mints a new operation ID.
+- Execution scope: READY — synthetic reference fixture PASSED; authorized endpoint-specific ERP/provider execution is next.
+- Next action: in an authorized Dynamics 365 Finance sandbox, identify and freeze the exact vendor-credit create/post interface and original-invoice binding, force response loss or `PreProcessingError`, and prove whether financial posting began. Preserve exact operation/economic fingerprint and keep every unsupported case UNKNOWN.
+- Acceptance target: all planted cases detected; unsupported recovery = 0; source outage cannot create money; capacity is conserved; crash/restart cannot create a second logical counter-event; bitemporal replay reproduces known-at/valid-at truth; unbound generic `PreProcessingError` remains UNKNOWN.
+- Hypothesis: explicit source observation, reviewed identity, policy-specific receipt authority, reversible line-level authority consumption, crash-safe writeback and an exact endpoint-to-posting-boundary contract can distinguish recoverable AP leakage from unresolved exceptions without false missing-receipt/PO dollars or duplicate counter-events.
+- Success: all planted cases detected; unsupported recovery = 0; source outage cannot create money; capacity is conserved; crash/restart cannot create a second logical counter-event; bitemporal replay reproduces known-at/valid-at truth; unbound generic `PreProcessingError` remains UNKNOWN.
+- Failure: universal `has_receipt`, any-return-means-authority-restored, unavailable source becomes negative evidence, exception/timeout becomes NOT_APPLIED, provider-wide phase semantics are applied to an unverified economic endpoint, or UNKNOWN frees capacity/mints a new operation.
 - Stop conditions: Execute the existing alias/non-match/merge/split corpus before seeking another identity engine.; Run the existing authority/admission matrix before further restore, OTA or attestation discovery.; Pin the official rule-pack version and authority before comparing existing validators; do not replace rule authority with another repository.; Run the existing crash/replay-expiry/finality matrix. Permit adapter search only for a separately named failed NOT_APPLIED proof gap.; Run synthetic transport/auth/partial-source failure cases before source-receipt discovery.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-02 — EXP-003 — Commission plan-to-bank acceptance test
-- Assignment ID: ASSIGN:71337ecbacfb:slot-02
+- Assignment ID: ASSIGN:20e446545c5f:slot-02
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **97.50** — {"portfolio_priority_boost": 6, "queue_order_adjustment": -0.5, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -55,7 +55,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Execute the existing alias/non-match/merge/split corpus before seeking another identity engine.; Await actual authorized settlement/return evidence; repository discovery cannot establish realized recovery.; Run the existing authority/admission matrix before further restore, OTA or attestation discovery.; Run the existing crash/replay-expiry/finality matrix. Permit adapter search only for a separately named failed NOT_APPLIED proof gap.; Execute the post-success lost-webhook fixture; do not resume generic commission or payout-wrapper discovery.; Run synthetic transport/auth/partial-source failure cases before source-receipt discovery.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-03 — EXP-007 — Installed-base sequencing/lab handoff acceptance
-- Assignment ID: ASSIGN:71337ecbacfb:slot-03
+- Assignment ID: ASSIGN:20e446545c5f:slot-03
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **94.50** — {"portfolio_priority_boost": 4, "queue_order_adjustment": -1.5, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -68,7 +68,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Execute the pinned Thermo RAW row before shared normalization; no converter discovery until it runs.; Execute the existing durable-provider ambiguity matrix before broad lab-orchestrator discovery.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-04 — EXP-008 — Industrial virtual pre-FAT differential benchmark
-- Assignment ID: ASSIGN:71337ecbacfb:slot-04
+- Assignment ID: ASSIGN:20e446545c5f:slot-04
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **94.25** — {"portfolio_priority_boost": 4, "queue_order_adjustment": -1.75, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -81,7 +81,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: CAP-014 STOP: no third SECS/GEM engine until an actually executed endpoint disagreement needs adjudication. Run the neutral raw-HSMS fixture against both pinned endpoints first.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-05 — EXP-012 — Outcome-priced grid resilience calibration
-- Assignment ID: ASSIGN:71337ecbacfb:slot-05
+- Assignment ID: ASSIGN:20e446545c5f:slot-05
 - Work kind/action: **experiment_execution / verify_artifact**
 - Score: **93.25** — {"portfolio_priority_boost": 4, "queue_order_adjustment": -2.75, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -96,7 +96,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: CAP-015 STOP: obtain and verify the current first-party OEDI artifact bytes against an independently expected digest, inspect schema/time/null semantics, and freeze the event/spell manifest before policy scoring. Missing bytes or digest is blocked evidence, not authority to find more outage datasets.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-06 — SEED:gap:cap-012
-- Assignment ID: ASSIGN:71337ecbacfb:slot-06
+- Assignment ID: ASSIGN:20e446545c5f:slot-06
 - Work kind/action: **capability_gap / execute_fixture**
 - Score: **90.21** — {"base_priority": 81.0, "experiment_boost": 8, "strategy_allocation": 1.21}
 - Strategy/objective: STRAT:rule-period-authority-version-audit / OBJ:completeness-proof
@@ -108,7 +108,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Freeze three-jurisdiction source-field truth and source-outage cases before more permit repository discovery.; Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
 
 ### SLOT-07 — SEED:coverage:language-family-c-cpp:rule-version-transfer
-- Assignment ID: ASSIGN:71337ecbacfb:slot-07
+- Assignment ID: ASSIGN:20e446545c5f:slot-07
 - Work kind/action: **coverage_gap / search**
 - Score: **77.21** — {"base_priority": 76.0, "experiment_boost": 0, "strategy_allocation": 1.21}
 - Strategy/objective: STRAT:rule-period-authority-version-audit / OBJ:current-rule-authority
@@ -126,7 +126,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; If the coverage qualifier produces only shallow variants, record the no-find and do not lower the evidence bar.
 
 ### SLOT-08 — SEED:coverage:language-family-jvm:abstention-transfer
-- Assignment ID: ASSIGN:71337ecbacfb:slot-08
+- Assignment ID: ASSIGN:20e446545c5f:slot-08
 - Work kind/action: **coverage_gap / search**
 - Score: **70.29** — {"base_priority": 69.0, "experiment_boost": 0, "strategy_allocation": 1.29}
 - Strategy/objective: STRAT:capability-conjunction-search-claim-tracing / OBJ:independent-evaluation
@@ -144,7 +144,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; If the coverage qualifier produces only shallow variants, record the no-find and do not lower the evidence bar.
 
 ### SLOT-09 — SEED:dna:gsa-gsa-acquisition-dfars
-- Assignment ID: ASSIGN:71337ecbacfb:slot-09
+- Assignment ID: ASSIGN:20e446545c5f:slot-09
 - Work kind/action: **positive_dna_transfer / search**
 - Score: **73.21** — {"base_priority": 72.0, "experiment_boost": 0, "strategy_allocation": 1.21}
 - Strategy/objective: STRAT:rule-period-authority-version-audit / OBJ:current-rule-authority
@@ -161,7 +161,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.
 
 ### SLOT-10 — ADJ:distinctive-symbol:sandialabs-dreams
-- Assignment ID: ASSIGN:71337ecbacfb:slot-10
+- Assignment ID: ASSIGN:20e446545c5f:slot-10
 - Work kind/action: **adjacency / search**
 - Score: **101.29** — {"base_priority": 100.0, "strategy_allocation": 1.29}
 - Strategy/objective: STRAT:capability-conjunction-search-claim-tracing / OBJ:emergence-triangulation
@@ -180,7 +180,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Stop after three consecutive deep inspections produce only duplicates or clones with no evidence or capability delta.; Do not inspect accidental secrets or private data; quarantine metadata only.; Do not reopen a domain-specific STOP gate through adjacency.
 
 ### SLOT-11 — ADJ:distinctive-symbol:pedrocodesforcoffee-builder-api
-- Assignment ID: ASSIGN:71337ecbacfb:slot-11
+- Assignment ID: ASSIGN:20e446545c5f:slot-11
 - Work kind/action: **adjacency / search**
 - Score: **101.29** — {"base_priority": 100.0, "strategy_allocation": 1.29}
 - Strategy/objective: STRAT:capability-conjunction-search-claim-tracing / OBJ:emergence-triangulation
@@ -199,7 +199,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Stop after three consecutive deep inspections produce only duplicates or clones with no evidence or capability delta.; Do not inspect accidental secrets or private data; quarantine metadata only.; Do not reopen a domain-specific STOP gate through adjacency.
 
 ### SLOT-12 — SEED:measure:cross-source-emergence-triangulation-abstention-transfer
-- Assignment ID: ASSIGN:71337ecbacfb:slot-12
+- Assignment ID: ASSIGN:20e446545c5f:slot-12
 - Work kind/action: **strategy_measurement / search**
 - Score: **63.57** — {"base_priority": 63.0, "experiment_boost": 0, "strategy_allocation": 0.57}
 - Strategy/objective: STRAT:cross-source-emergence-triangulation / OBJ:independent-evaluation
@@ -216,7 +216,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one recall-rescue pass, then stop.
 
 ### SLOT-13 — Independent verification — EXP-007
-- Assignment ID: ASSIGN:71337ecbacfb:slot-13
+- Assignment ID: ASSIGN:20e446545c5f:slot-13
 - Work kind/action: **independent_verification / execute_fixture**
 - Score: **90.80** — {"portfolio_priority_boost": 4, "status_boost": 0, "verification_base": 88}
 - Strategy/objective: STRAT:evaluation-target-independence / OBJ:independent-evaluation
@@ -231,7 +231,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Execute the pinned Thermo RAW row before shared normalization; no converter discovery until it runs.; Execute the existing durable-provider ambiguity matrix before broad lab-orchestrator discovery.; Do not reuse the target system's own outputs as the sole oracle.; Preserve disagreements instead of forcing consensus.
 
 ### SLOT-14 — Rare / weird wildcard exploration
-- Assignment ID: ASSIGN:71337ecbacfb:slot-14
+- Assignment ID: ASSIGN:20e446545c5f:slot-14
 - Work kind/action: **wildcard / search**
 - Score: **75.00** — {"protected_exploration_budget": 75}
 - Strategy/objective: n/a / n/a

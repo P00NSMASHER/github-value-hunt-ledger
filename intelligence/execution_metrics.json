@@ -6,8 +6,7 @@
   "status_counts": {
     "RELEASED_AVAILABLE": 4,
     "AVAILABLE": 8,
-    "RUNNING": 1,
-    "RUNNING_SUPERSEDED": 1
+    "RUNNING_SUPERSEDED": 2
   },
   "active_claims": 2,
   "complete_claims": 8,

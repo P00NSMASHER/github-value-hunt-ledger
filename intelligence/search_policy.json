@@ -252,7 +252,7 @@
       "capability_id": "CAP-008",
       "name": "Structured invoice compliance/validation",
       "gap_score": 4,
-      "missing_piece": "official rule-pack/version authority must be pinned",
+      "missing_piece": "pin official rule-pack/table bytes, source identity, effective interval, parser/map digest, imported-row-set digest and validator/runtime revision in one authority receipt",
       "run_attention": 3
     },
     {
@@ -280,7 +280,7 @@
       "capability_id": "CAP-019",
       "name": "Source-authority observation receipts",
       "gap_score": 4,
-      "missing_piece": "whole-run completeness remains source-specific; a cursor is not completeness proof. Run synthetic ERP/bank source cases where transport/auth/partial failure may never authorize VERIFIED_EMPTY or \u201cno return.\u201d",
+      "missing_piece": "whole-run completeness and negative authority remain source-specific. Execute the authorized ERP credit-endpoint test plus first-party cross-status SAM receipts and day-boundary rule fixtures; transport/auth/partial/unrepresentable states may never authorize VERIFIED_EMPTY, NOT_APPLIED or CURRENT_VERIFIED.",
       "run_attention": 10
     },
     {
