@@ -31,9 +31,12 @@
     "V15 tickets validate against append-only dispatch history so completed historical claims survive later rerouting.",
     "A generated claim against a V15 ticket is rejected before eligibility or after hard expiry.",
     "Work-steal tickets require dispatch_kind=work_steal and their exact parent ticket.",
-    "V16 generated claims additionally require a fresh activation bound to worker presence."
+    "V16 generated claims additionally require a fresh activation bound to worker presence.",
+    "V19 dispatch identity includes V18 exploration generation, pair, baseline slot and route mode.",
+    "Work-steal tickets preserve the original primary route's V18 exploration identity for audit but remain ineligible for matched worker-effect analysis."
   ],
   "minimum_v15_claim_schema_version": 15,
   "generated_claim_history_source": "dispatch_ticket_history.jsonl",
-  "minimum_v16_claim_schema_version": 16
+  "minimum_v16_claim_schema_version": 16,
+  "minimum_v19_claim_schema_version": 19
 }
