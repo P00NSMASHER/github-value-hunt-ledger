@@ -50,3 +50,15 @@ action. `external_action_authorized` remains false; separate buyer approval is
 always required.
 
 Buyer/business-unit changes are not amendments. They require a new engagement.
+
+## Downstream engagement-state resolution
+
+Charters and Amendments remain immutable historical records.
+
+Downstream processing must use `freight/engagement_state.py` to determine the
+operative Charter and whether customer-data work may proceed.
+
+An accepted amendment with no replacement resolves to
+`SUSPENDED_PENDING_REPLACEMENT`, which blocks audit processing, report
+generation and settlement processing until a validated replacement Charter
+supersedes the changed scope.
