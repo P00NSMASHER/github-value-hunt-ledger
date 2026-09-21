@@ -39,6 +39,7 @@ DOC_PATHS=(
     "freight/INGESTION_AND_REVIEW_QUEUE.md",
     "freight/REVIEW_PACKET.md",
     "freight/REVIEW_ROUTING.md",
+    "freight/REMEDIATION_PLAN.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json",
     "freight/PILOT_DATA_ROOM.md",
