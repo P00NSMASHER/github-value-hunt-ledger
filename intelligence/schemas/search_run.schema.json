@@ -751,6 +751,14 @@
         "type": "string",
         "pattern": "^SIG:[A-Za-z0-9:_-]+$"
       }
+    },
+    "consumed_coordination_signal_ids": {
+      "description": "Cross-hunter coordination signals materially used to choose, narrow, falsify, or redirect this run.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SIG:[A-Za-z0-9:_-]+$"
+      }
     }
   },
   "additionalProperties": true,
