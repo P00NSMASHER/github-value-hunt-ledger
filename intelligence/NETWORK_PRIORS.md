@@ -43,6 +43,7 @@ Frequency is a preflight clue, not an automatic exclusion; false-negative rescue
 ## Search-move priors
 
 - No search-move type has sufficient prospective evidence yet. Record moves; do not guess a winner.
+- Move curriculum mode: **observe_only_insufficient_evidence**; exploration floor: **100%**. The curriculum does not activate until at least three move types satisfy evidence gates.
 
 ## Cross-hunter transfer
 
