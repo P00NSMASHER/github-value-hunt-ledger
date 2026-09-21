@@ -7,6 +7,12 @@ from freight.audit_workflow import (
     render_workflow_summary,
     run_audit_workflow,
 )
+from freight.review_routing import (
+    BUYER_REVIEW_READY,
+    EVIDENCE_REMEDIATION_REQUIRED,
+    MIXED_REVIEW_AND_REMEDIATION,
+    NO_REVIEW,
+)
 
 
 INVOICE_HEADER = "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,charge_code,service_date,quantity_units,billed_cents\n"
@@ -56,6 +62,12 @@ def test_single_call_returns_review_required_with_complete_artifacts():
     assert result.summary.validated_finding_count == 1
     assert result.summary.review_finding_count == 1
     assert result.summary.review_case_count == 2
+    assert result.summary.review_route == MIXED_REVIEW_AND_REMEDIATION
+    assert result.summary.buyer_review_case_count == 1
+    assert result.summary.evidence_remediation_case_count == 1
+    assert result.summary.rerun_required is True
+    assert len(result.summary.review_routing_hash) == 64
+    assert result.artifacts.review_routing.routing_hash == result.summary.review_routing_hash
     assert result.summary.validated_discrepancy_cents == 2500
     assert result.summary.review_discrepancy_cents == 5000
     assert len(result.summary.run_hash) == 64
@@ -71,6 +83,10 @@ def test_clean_run_is_distinct_from_review_required():
     assert result.summary is not None
     assert result.summary.clear_count == 1
     assert result.summary.review_case_count == 0
+    assert result.summary.review_route == NO_REVIEW
+    assert result.summary.buyer_review_case_count == 0
+    assert result.summary.evidence_remediation_case_count == 0
+    assert result.summary.rerun_required is False
     assert result.summary.validated_discrepancy_cents == 0
 
 
@@ -80,10 +96,32 @@ def test_no_rules_is_review_required_not_pipeline_failure():
     assert result.summary is not None
     assert result.summary.rule_count == 0
     assert result.summary.review_case_count == 1
+    assert result.summary.review_route == EVIDENCE_REMEDIATION_REQUIRED
+    assert result.summary.buyer_review_case_count == 0
+    assert result.summary.evidence_remediation_case_count == 1
+    assert result.summary.rerun_required is True
     assert result.summary.unknown_expected_count == 1
     assert result.artifacts is not None
     assert result.artifacts.manifest.rule_hashes == ()
     assert result.artifacts.manifest.rule_adapter_hashes == ()
+
+
+
+
+def test_all_validated_review_cases_route_to_buyer_review_ready():
+    result = run(
+        "I1,S1,C,K,USD,X1,DETENTION,2026-09-10,1,12500\n"
+        "I2,S2,C,K,USD,X2,MISC,2026-09-10,1,15000\n",
+        rules=(
+            rule_input("DETENTION,FIXED,2026-09-01,,10000,\n", verified=True),
+            rule_input("MISC,FIXED,2026-09-01,,10000,\n", verified=True, source="b"),
+        ),
+    )
+    assert result.state == AuditWorkflowState.REVIEW_REQUIRED.value
+    assert result.summary.review_route == BUYER_REVIEW_READY
+    assert result.summary.buyer_review_case_count == 2
+    assert result.summary.evidence_remediation_case_count == 0
+    assert result.summary.rerun_required is False
 
 
 def test_malformed_invoice_blocks_at_invoice_ingest_without_partial_artifacts():
@@ -143,6 +181,9 @@ def test_summary_renderer_separates_discrepancy_from_realized_savings():
     text = render_workflow_summary(result)
     assert "Audit run:" in text
     assert "Validated discrepancy" in text
+    assert "Review route:" in text
+    assert "Buyer-review-ready cases:" in text
+    assert "Evidence-remediation cases:" in text
     assert "not realized savings" in text
 
 

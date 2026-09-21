@@ -18,6 +18,7 @@ from freight.invoice_csv_adapter import InvoiceChargeCSVBatch, parse_invoice_cha
 from freight.population_builder import PopulationBuild, build_population_from_charge_batch
 from freight.review_packet import ReviewPacket, build_review_packet
 from freight.review_queue import ReviewQueue, build_review_queue
+from freight.review_routing import ReviewRouting, route_review_packet
 from freight.rule_csv_adapter import ChargeRuleCSVBatch, parse_charge_rule_csv
 
 
@@ -34,6 +35,7 @@ class AuditWorkflowStage(str, Enum):
     FINDING_DERIVATION = "FINDING_DERIVATION"
     REVIEW_QUEUE = "REVIEW_QUEUE"
     REVIEW_PACKET = "REVIEW_PACKET"
+    REVIEW_ROUTING = "REVIEW_ROUTING"
     RUN_MANIFEST = "RUN_MANIFEST"
     COMPLETE = "COMPLETE"
 
@@ -58,6 +60,7 @@ class AuditWorkflowArtifacts:
     factory: FindingFactoryBatch
     review_queue: ReviewQueue
     review_packet: ReviewPacket
+    review_routing: ReviewRouting
     manifest: AuditRunManifest
 
 
@@ -74,6 +77,11 @@ class AuditWorkflowSummary:
     validated_finding_count: int
     review_finding_count: int
     review_case_count: int
+    review_route: str
+    buyer_review_case_count: int
+    evidence_remediation_case_count: int
+    rerun_required: bool
+    review_routing_hash: str
     validated_discrepancy_cents: int
     review_discrepancy_cents: int
     unknown_expected_count: int
@@ -105,6 +113,7 @@ def _summary(
     state: AuditWorkflowState,
     manifest: AuditRunManifest,
     factory: FindingFactoryBatch,
+    review_routing: ReviewRouting,
 ) -> AuditWorkflowSummary:
     validated_findings = [f for f in factory.truth.findings if f.status == VALIDATED]
     review_findings = [f for f in factory.truth.findings if f.status == REVIEW]
@@ -130,6 +139,11 @@ def _summary(
         validated_finding_count=len(validated_findings),
         review_finding_count=len(review_findings),
         review_case_count=manifest.review_case_count,
+        review_route=review_routing.route,
+        buyer_review_case_count=review_routing.buyer_review_case_count,
+        evidence_remediation_case_count=review_routing.evidence_remediation_case_count,
+        rerun_required=review_routing.rerun_required,
+        review_routing_hash=review_routing.routing_hash,
         validated_discrepancy_cents=sum(f.validated_cents for f in validated_findings),
         review_discrepancy_cents=review_discrepancy,
         unknown_expected_count=unknown_expected,
@@ -212,6 +226,11 @@ def run_audit_workflow(
         return _blocked(AuditWorkflowStage.REVIEW_PACKET, "REVIEW_PACKET_FAILED", exc)
 
     try:
+        review_routing = route_review_packet(review_packet)
+    except ValueError as exc:
+        return _blocked(AuditWorkflowStage.REVIEW_ROUTING, "REVIEW_ROUTING_FAILED", exc)
+
+    try:
         manifest = build_audit_run_manifest(
             invoice_batch=invoice_batch,
             population_build=population_build,
@@ -235,6 +254,7 @@ def run_audit_workflow(
         factory=factory,
         review_queue=review_queue,
         review_packet=review_packet,
+        review_routing=review_routing,
         manifest=manifest,
     )
     return AuditWorkflowResult(
@@ -242,7 +262,12 @@ def run_audit_workflow(
         stage=AuditWorkflowStage.COMPLETE.value,
         error_code=None,
         error_message=None,
-        summary=_summary(state=state, manifest=manifest, factory=factory),
+        summary=_summary(
+            state=state,
+            manifest=manifest,
+            factory=factory,
+            review_routing=review_routing,
+        ),
         artifacts=artifacts,
     )
 
@@ -281,6 +306,11 @@ def render_workflow_summary(result: AuditWorkflowResult) -> str:
         f"- Validated findings requiring human review: **{summary.validated_finding_count}**",
         f"- Review findings: **{summary.review_finding_count}**",
         f"- Reviewer work cases: **{summary.review_case_count}**",
+        f"- Review route: **{summary.review_route}**",
+        f"- Buyer-review-ready cases: **{summary.buyer_review_case_count}**",
+        f"- Evidence-remediation cases: **{summary.evidence_remediation_case_count}**",
+        "- Rerun required for remediation cases: **" + ("yes" if summary.rerun_required else "no") + "**",
+        f"- Review routing hash: `{summary.review_routing_hash}`",
         "- Validated discrepancy: **$" + format(summary.validated_discrepancy_cents / 100, ",.2f") + "**",
         "- Review discrepancy with a calculable expected amount: **$" + format(summary.review_discrepancy_cents / 100, ",.2f") + "**",
         f"- Review cases without an established expected amount: **{summary.unknown_expected_count}**",

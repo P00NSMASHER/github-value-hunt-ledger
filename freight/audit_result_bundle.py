@@ -81,6 +81,7 @@ def build_audit_result_entries(result: AuditWorkflowResult) -> dict[str, bytes]:
             [asdict(item) for item in rules]
         ),
         "review-queue.json": _json_bytes(asdict(artifacts.review_queue)),
+        "review-routing.json": _json_bytes(asdict(artifacts.review_routing)),
         "review-packet.json": _json_bytes(asdict(artifacts.review_packet)),
         "review-packet.md": render_review_packet_markdown(
             artifacts.review_packet
@@ -110,6 +111,8 @@ def _bundle_manifest(result: AuditWorkflowResult, entries: dict[str, bytes]) -> 
             "Contains normalized/derived customer audit evidence.",
             "Does not include raw invoice, rate, contract or settlement source files.",
             "Discrepancy amounts are not realized savings.",
+            "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
+            "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
             "Buyer review, external action and settlement remain separate downstream states.",
             "Bundle must remain inside an approved customer-processing environment.",
         ],

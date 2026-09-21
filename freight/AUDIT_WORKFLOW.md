@@ -10,7 +10,8 @@ It performs, in order:
 4. deterministic Finding Factory derivation;
 5. deterministic human-review queue;
 6. deterministic reviewer work packet;
-7. canonical audit-run manifest.
+7. deterministic buyer-review vs evidence-remediation routing;
+8. canonical audit-run manifest.
 
 ## States
 
@@ -22,6 +23,17 @@ The workflow returns one of three explicit states.
 
 A missing rule set is not a pipeline error. The workflow can complete with zero rule batches and produce `REVIEW_REQUIRED` cases whose expected amount is not established. A malformed supplied rule file is different: it blocks at `RULE_INGEST`.
 
+### Review routes
+
+A successful workflow also returns a deterministic review route:
+
+- `NO_REVIEW` — no reviewer work cases;
+- `BUYER_REVIEW_READY` — every case is a validated finding ready for proof-bound buyer review;
+- `EVIDENCE_REMEDIATION_REQUIRED` — all cases need authority/rule/evidence remediation;
+- `MIXED_REVIEW_AND_REMEDIATION` — buyer-ready and remediation cases coexist.
+
+Any remediation case sets `rerun_required=true`. Remediation can alter upstream proof objects, so the affected audit must be re-derived rather than manually promoted.
+
 ## Fail-closed stages
 
 Blocked results identify the stage and a stable error code:
@@ -32,12 +44,13 @@ Blocked results identify the stage and a stable error code:
 - `FINDING_DERIVATION_FAILED`
 - `REVIEW_QUEUE_FAILED`
 - `REVIEW_PACKET_FAILED`
+- `REVIEW_ROUTING_FAILED`
 - `RUN_MANIFEST_FAILED`
 
 Programming exceptions outside expected validation failures are intentionally not converted into successful workflow results.
 
 ## Output boundary
 
-Successful results contain the full in-memory audit artifacts for use inside the approved customer-processing environment plus a minimized summary containing counts, state, discrepancies, and the canonical audit-run hash.
+Successful results contain the full in-memory audit artifacts for use inside the approved customer-processing environment plus a minimized summary containing counts, state, discrepancies, the canonical audit-run hash, review route, buyer-review-ready count, remediation count, rerun requirement, and routing hash.
 
 The workflow does **not** perform buyer confirmation, contact a carrier, submit a dispute, accept a settlement, or claim a discrepancy is realized savings. Those remain separately authorized downstream transitions.
