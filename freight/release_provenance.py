@@ -21,6 +21,7 @@ CONTROL_PATHS = (
     "freight/audit_workflow.py",
     "freight/diligence_bundle.py",
     "freight/backup_restore.py",
+    "freight/buyer_review_workflow.py",
     "freight/audit_store.py",
     "freight/commercial_learning.py",
     "freight/contracts.py",

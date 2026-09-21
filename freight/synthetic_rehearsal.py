@@ -12,15 +12,16 @@ from pathlib import Path
 
 from freight.audit_result_bundle import build_audit_result_bundle, verify_audit_result_bundle
 from freight.audit_workflow import RuleCSVInput, render_workflow_summary, run_audit_workflow
+from freight.buyer_review_workflow import (
+    BuyerReviewDecisionInput,
+    build_buyer_review_batch,
+)
 from freight.contracts import (
     open_incumbent_output,
     seal_incumbent_submission,
 )
 from freight.deal_economics import DealProfile, qualify_deal
-from freight.pilot_reporting import (
-    ReviewDisposition,
-    make_finding_review,
-)
+from freight.pilot_reporting import ReviewDisposition
 from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_report import (
@@ -157,26 +158,32 @@ def run_rehearsal() -> dict:
         finding_ids=(f2.finding_id,),
     )
 
-    reviews = (
-        make_finding_review(
-            f1, ReviewDisposition.CONFIRMED,
-            reviewer_role="Buyer Controller",
-            reviewed_at="2026-09-20T09:00:00-04:00",
-            reviewer_minutes=20,
-        ),
-        make_finding_review(
-            f2, ReviewDisposition.CONFIRMED,
-            reviewer_role="Buyer Controller",
-            reviewed_at="2026-09-20T09:10:00-04:00",
-            reviewer_minutes=10,
-        ),
-        make_finding_review(
-            f3, ReviewDisposition.UNRESOLVED,
-            reviewer_role="Buyer Controller",
-            reviewed_at="2026-09-20T09:20:00-04:00",
-            reviewer_minutes=5,
+    case_by_finding = {
+        case.finding_id: case
+        for case in review_packet.cases
+        if case.finding_id is not None
+    }
+    buyer_review = build_buyer_review_batch(
+        review_packet=review_packet,
+        review_routing=review_routing,
+        truth=truth,
+        reviewer_role="Buyer Controller",
+        decisions=(
+            BuyerReviewDecisionInput(
+                case_hash=case_by_finding[f1.finding_id].case_hash,
+                disposition=ReviewDisposition.CONFIRMED,
+                reviewer_minutes=20,
+                reviewed_at="2026-09-20T09:00:00-04:00",
+            ),
+            BuyerReviewDecisionInput(
+                case_hash=case_by_finding[f2.finding_id].case_hash,
+                disposition=ReviewDisposition.CONFIRMED,
+                reviewer_minutes=10,
+                reviewed_at="2026-09-20T09:10:00-04:00",
+            ),
         ),
     )
+    reviews = buyer_review.finding_reviews
     findings = {finding.finding_id: finding for finding in truth.findings}
     bindings = tuple(
         ClaimFindingBinding(item.finding_id, item.finding_id, item.proof_hash)
@@ -291,6 +298,11 @@ def run_rehearsal() -> dict:
         "rerun_required": review_routing.rerun_required,
         "remediation_plan_hash": remediation_plan.plan_hash,
         "remediation_plan_item_count": len(remediation_plan.items),
+        "buyer_review_state": buyer_review.state,
+        "buyer_review_batch_hash": buyer_review.batch_hash,
+        "buyer_review_submitted_decision_count": buyer_review.submitted_decision_count,
+        "buyer_review_confirmed_count": buyer_review.confirmed_count,
+        "buyer_review_pending_case_count": len(buyer_review.pending_case_hashes),
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
