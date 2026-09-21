@@ -1,0 +1,81 @@
+# Freight Recovery — External Action Authorization
+
+Updated: 2026-09-21
+
+This control converts the standing rule **"separate buyer approval required"**
+into a machine-checkable, revocable authorization for one narrowly enumerated
+carrier action.
+
+## Allowed action types
+
+- `SUBMIT_DISPUTE`
+- `REQUEST_CREDIT_REVIEW`
+- `REQUEST_DOCUMENTATION`
+- `REQUEST_STATUS`
+
+The authorization layer does not include settlement acceptance, payment
+instructions, account changes, credential use, or general carrier/vendor
+communication.
+
+## Preconditions
+
+An authorization can be issued only when:
+
+- the authoritative Engagement State Resolver is exactly `ACTIVE`;
+- the operative Charter is hash-valid and matches that resolution;
+- the buyer action-approver role matches the Charter;
+- every selected finding is positive and `VALIDATED`;
+- every selected finding has buyer review disposition `CONFIRMED`;
+- every selected finding matches the target carrier and currency;
+- the authorized dollar cap does not exceed the selected validated findings.
+
+## Exact action binding
+
+Authorization binds:
+
+- engagement-resolution hash;
+- operative-Charter hash;
+- action type;
+- target carrier;
+- hashed recipient/routing reference;
+- exact outbound payload/evidence-package hash;
+- exact finding set + finding proof hashes;
+- currency;
+- maximum authorized cents;
+- buyer approver role;
+- issue/expiry dates.
+
+Changing any of those requires a new authorization.
+
+The default internal validity ceiling is **30 days**. This is an internal
+risk-control setting, not an industry benchmark.
+
+## Explicit non-authority
+
+Every authorization records all of the following as false:
+
+- money movement;
+- settlement acceptance;
+- account changes;
+- credential use;
+- general contact authority;
+- automatic execution.
+
+Creating the authorization does **not** send anything.
+
+## Revocation
+
+Buyer approval can be revoked through a separate hash-bound revocation artifact.
+The same approver role is required.
+
+At or after the revocation date the authorization evaluates to `REVOKED` and
+the execution guard rejects the action.
+
+## Downstream execution rule
+
+Before any carrier integration or human-assisted sender executes an authorized
+action, it should call `assert_action_allowed(...)` using the exact action
+type, carrier, recipient-routing hash, payload hash, finding set, currency and
+requested amount.
+
+Any mismatch, expiry or revocation fails closed.
