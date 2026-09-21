@@ -8,7 +8,7 @@
   "strategy_id": "STRAT:first-party-history-manifest-triangulation",
   "query_family": "status-aware-representation-invariant-current-action-receipt",
   "query_family_id": "QF:status-aware-representation-invariant-current-action-receipt",
-  "search_objective_id": "OBJ:temporal-authority-proof",
+  "search_objective_id": "OBJ:current-rule-authority",
   "measurement_quality": "prospective",
   "work_action": "execute_fixture",
   "lane_ids": [
