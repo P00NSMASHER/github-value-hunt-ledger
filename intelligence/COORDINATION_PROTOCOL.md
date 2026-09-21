@@ -68,6 +68,8 @@ The source run may list emitted IDs in `coordination_signal_ids`.
 
 Before substantial duplicate work, read only board entries relevant to the current assignment/capability/experiment.
 
+When a board signal materially changes how a run is selected, narrowed, falsified or redirected, record its ID in the downstream run's `consumed_coordination_signal_ids`. Mere awareness does not count as consumption.
+
 A board item is context, not truth:
 - reverify load-bearing evidence;
 - respect current domain STOP gates and live leases;
