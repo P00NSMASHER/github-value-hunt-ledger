@@ -1,13 +1,13 @@
 # WORKER PRESENCE
 
-Generation: **PRESENCEGEN:46704521e8e8**
-Clock: **2026-09-21T05:56:28Z**
+Generation: **PRESENCEGEN:ca88a2c1630d**
+Clock: **2026-09-21T06:02:26Z**
 
 Presence is capacity telemetry, not a worker-quality score.
 
 | Worker | State | Latest event | Expires | Active claim |
 |---|---|---|---|---|
-| HUNTER-01 | **READY_FRESH** | PRESENCE:1819c3731d6e | 2026-09-21T06:08:09.249000Z | — |
+| HUNTER-01 | **ACTIVE_CLAIM** | PRESENCE:1819c3731d6e | — | CLAIM:7cb70fe09a6d |
 | HUNTER-02 | **UNKNOWN** | — | — | — |
 | HUNTER-03 | **READY_FRESH** | PRESENCE:e317e60af98b | 2026-09-21T06:05:14.936099Z | — |
 | HUNTER-04 | **READY_STALE** | PRESENCE:01a0c218e45c | 2026-09-21T05:03:26.364000Z | — |

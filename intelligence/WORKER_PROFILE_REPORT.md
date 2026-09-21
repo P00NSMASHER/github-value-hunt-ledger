@@ -1,6 +1,6 @@
 # WORKER PROFILE REPORT
 
-Profile generation: **WORKERS:3dd0bfdb5314**
+Profile generation: **WORKERS:d02ecf6c7958**
 
 - Registered workers: **14**
 - Measured: **6**
@@ -10,7 +10,7 @@ Profile generation: **WORKERS:3dd0bfdb5314**
 
 | Worker | State | Runs | Deep | Retained | Top strategy | Top experiment | Active claim |
 |---|---|---:|---:|---:|---|---|---:|
-| HUNTER-01 | MEASURED | 4 | 8 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-010 | 0 |
+| HUNTER-01 | MEASURED | 4 | 8 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-010 | 1 |
 | HUNTER-02 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 | HUNTER-03 | SPARSE | 4 | 2 | 0 | STRAT:evaluation-target-independence | EXP-003 | 0 |
 | HUNTER-04 | SPARSE | 3 | 4 | 4 | STRAT:rule-period-authority-version-audit | EXP-005 | 0 |

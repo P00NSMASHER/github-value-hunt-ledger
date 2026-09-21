@@ -1,8 +1,8 @@
 # ACTIVATION RESPONSE LEARNING
 
-Generation: **RESPLEARN:50d9d3c1d7e7**
+Generation: **RESPLEARN:8e4150423355**
 Mode: **observe_only_insufficient_evidence**
-Resolved primary activations: **1 / 20**
+Resolved primary activations: **2 / 20**
 
 V17 measures worker responsiveness only after fresh READY presence has produced a real activation.
 READY→activation is system latency. Activation→claim is the only metric allowed to affect routing.
@@ -10,7 +10,7 @@ Claim→start and start→completion are descriptive only.
 
 | Worker | Resolved | Claimed | Claim rate | Median activate→claim | Expired unclaimed | Routing adjustment | Evidence |
 |---|---:|---:|---:|---:|---:|---:|---|
-| HUNTER-01 | 0 | 0 | — | — | 0 | 0.000 | insufficient |
+| HUNTER-01 | 1 | 1 | 100.0% | — | 0 | 0.000 | insufficient |
 | HUNTER-02 | 0 | 0 | — | — | 0 | 0.000 | insufficient |
 | HUNTER-03 | 0 | 0 | — | — | 0 | 0.000 | insufficient |
 | HUNTER-04 | 0 | 0 | — | — | 0 | 0.000 | insufficient |

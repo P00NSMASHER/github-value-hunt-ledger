@@ -1,9 +1,9 @@
 # DISPATCH BACKPRESSURE REPORT
 
-Clock: **2026-09-21T05:56:28Z**
+Clock: **2026-09-21T06:02:26Z**
 
-- Primary tickets: **14**
-- Pending: **14**
+- Primary tickets: **13**
+- Pending: **13**
 - Stale: **0**
 - Expired/unclaimed: **0**
 - Claimed: **0**
@@ -17,7 +17,6 @@ Clock: **2026-09-21T05:56:28Z**
 | HUNTER-08 | SLOT-04 | PENDING | 0.0 | — |
 | HUNTER-07 | SLOT-05 | PENDING | 0.0 | — |
 | HUNTER-04 | SLOT-06 | PENDING | 0.0 | — |
-| HUNTER-01 | SLOT-07 | PENDING | 0.0 | — |
 | HUNTER-02 | SLOT-08 | PENDING | 0.0 | — |
 | HUNTER-11 | SLOT-09 | PENDING | 0.0 | — |
 | HUNTER-10 | SLOT-10 | PENDING | 0.0 | — |

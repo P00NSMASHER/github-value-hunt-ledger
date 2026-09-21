@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
-  "dispatch_generation_id": "DISPATCHGEN:477d7c96c94e",
-  "clock_commit_sha": "5093a47f51b542da8d0201e137f85b74bf748dc0",
-  "clock_timestamp": "2026-09-21T05:56:28Z",
-  "current_tickets": 14,
-  "history_tickets": 322,
-  "routed_workers": 14,
-  "locked_workers": 0,
+  "dispatch_generation_id": "DISPATCHGEN:d31764ec76e2",
+  "clock_commit_sha": "303c324ee24d2a6c840934e5b2d1de899b8c6f09",
+  "clock_timestamp": "2026-09-21T06:02:26Z",
+  "current_tickets": 13,
+  "history_tickets": 335,
+  "routed_workers": 13,
+  "locked_workers": 1,
   "unassigned_workers": 0,
   "current_work_steal_tickets": 0
 }
