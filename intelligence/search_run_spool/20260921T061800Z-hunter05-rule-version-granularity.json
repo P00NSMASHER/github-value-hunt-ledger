@@ -98,7 +98,8 @@
           "government-evidence"
         ],
         "profile_source": "GitHub repository metadata, exact-head source, license and workflow history"
-      }
+      },
+      "reason_code_standard": "needs_runtime_validation"
     }
   ],
   "benchmark_task_ids": [],
