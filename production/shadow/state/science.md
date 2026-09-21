@@ -500,3 +500,63 @@ Run 15 does not add a third H4 history-archaeology success because NoKV is prima
 - Do not call generic provenance/restart novel without subtracting mature workflow engines such as AiiDA.
 - When a new lower-layer fence exists, verify that the high-level adapter actually propagates it.
 
+## 2026-09-21 — Run 16 evidence-backed update
+
+### H5 refinement — one-database version-root publication closes group visibility, but only under a qualified provider contract
+STATUS: **SUPPORTED AS A TRANSFER KERNEL; COMPLETE SCIENTIFIC CAMPAIGN COMPOSITION REMAINS UNVERIFIED.**
+
+SUPPORTING EVIDENCE:
+- `google/tensorstore@ed9abe0a89ac6631272f4458a90a4f32e6a381f2` implements non-distributed OCDBT atomic multi-key commits using immutable value/B+tree/version-tree objects followed by one conditional manifest-root update.
+- Source forces all linked indirect writes before `TryUpdateManifest(existing,new)`; CAS conflict reloads and retries. A manifest generation therefore names one complete database tree when the underlying provider satisfies the required conditional-write and durability contract.
+- One `atomic_isolated` transaction can cover many keys/prefixes inside the same OCDBT database. Source tests exercise multi-prefix transactional copy and the driver declares multi-key atomic support.
+- OCDBT exposes monotonic generations and version-pinned read-only opens. Pinning is essential because general read isolation is not guaranteed for ordinary unpinned reads.
+- Orbax uses this exact primitive to merge per-process checkpoint stores into one parent inside `ts.Transaction(atomic=True)`, then adds its own higher-level finalization.
+- A local adversarial reproduction killed real writer processes at both sides of the visibility point. Eight pre-manifest kills reopened to all-old state; eight post-manifest kills reopened to all-new state; no mixed key set appeared.
+
+CONTRARY EVIDENCE:
+- Atomic scope is one terminal node/OCDBT database. Separate roots, sidecar files and independent stores cannot be included in the same evidenced atomic commit.
+- The coordinator path does not support atomic multi-key transactions.
+- Transaction state is memory-only and non-serializable. OCDBT supplies no durable application request ID, retry receipt, run lineage or first-class acknowledgement-loss reconciliation.
+- No inspected upstream OCDBT test kills a real process or power-cycles a backend at every object/manifest boundary, and current visible packaging workflows do not establish a current-head C++ OCDBT test pass.
+- No OpenMM/OpenDPD/atomate2 integration proves scientific resumed-versus-uninterrupted equivalence.
+- Pre-manifest failure can leave unreachable garbage objects, so retention and storage-growth qualification are required.
+- Orbax and Icechunk reduce novelty. Icechunk already provides science-native transactional Zarr repositories with serializable snapshot reads and time travel.
+
+INDEPENDENT VERIFIER:
+- Verdict **PASS_WITH_LIMITS — WATCH, not STRONG**.
+- Valid claim: one atomic transaction, one non-coordinator OCDBT database, all artifacts and metadata inside it, generation-pinned restore and an explicitly qualified provider/manifest protocol.
+- Strongest falsifier: a durable new manifest whose referenced object set is missing, corrupt, non-durable or mixed.
+
+NEXT TEST:
+Implement one OpenMM or OpenDPD adapter twice—OCDBT and Icechunk. Put every checkpoint artifact plus run metadata into one transactional scope; kill at every object/root/finalization boundary; inject concurrent commits and lost acknowledgements; reopen a pinned generation/snapshot; verify artifact hashes and resumed scientific equivalence; measure latency, orphan storage and avoided rerun cost.
+
+CONFIDENCE: **HIGH that same-database OCDBT publication is a real atomic visibility kernel on a qualified backend; HIGH that the current repository is not a complete campaign checkpoint protocol; MEDIUM that an audit/adapter retrofit can command budget beyond mature Orbax/Icechunk use cases.**
+
+### Closure-at-visibility lesson — second independent shadow-task success
+STATUS: **SUPPORTED ON TWO DISTINCT SHADOW RUNS; LOCAL/STAGED-ELIGIBLE, NOT GLOBALLY PROMOTED.**
+
+NEW EVIDENCE:
+- Run 15 applied the check to NoKV and found that a final manifest could reference mutable shards whose generations were not atomically revalidated at publication, yielding visible-but-unloadable state.
+- Run 16 applied the same check to TensorStore OCDBT and found the stronger pattern: immutable referenced objects are flushed before one conditional manifest-root change. The same inspection also found the provider-safety escape hatch below.
+
+REFINED PROCEDURE:
+1. Identify the exact visibility root.
+2. Prove every referenced member is immutable or generation-CASed at that root update.
+3. Verify write/durability ordering from member flush through root publication.
+4. Inspect transaction scope: same database, cross-database and coordinator paths may differ.
+5. Pin one committed generation for multi-read restoration.
+6. Compare schema promises with executable provider-selection/fallback code.
+7. Kill before and after the root update, reopen fresh and validate reachability plus group hashes.
+8. Measure orphan accumulation and acknowledgement-loss behavior separately from visibility atomicity.
+
+Do not modify global `SEARCH_SKILLS.md` from this shadow lane.
+
+### New negative knowledge — schema promise can be weaker than compiled fallback
+The OCDBT schema states that creation should error when no manifest kind safely supports concurrent writes. The current `CreateConfig` implementation compiles that error out and falls back to a single-file manifest “even if unsafe.” Future storage candidates must treat schema/docs, provider feature advertisement and actual fallback branches as separate evidence surfaces. A correct commit algorithm can still be deployed unsafely by configuration selection.
+
+### Failed-search memory added
+- “ACID” and `atomic=True` do not establish cross-database scope or snapshot reads.
+- A process-kill old-or-new result on one backend does not prove provider-neutral durability.
+- Versioned storage does not supply application checkpoint identity, retry lineage or acknowledgement reconciliation automatically.
+- Scientific adoption of a parent library before a subsystem existed is not evidence that the specific subsystem served those workloads.
+- When an exact-head commit is unrelated to the kernel, report the kernel's real introduction dates and do not manufacture an emerging-technology signal.
