@@ -14,10 +14,10 @@ These gaps are searchable, measurable blind spots produced by V8. Each should be
 | 53 | COV:package-ecosystem:odoo | Package / application ecosystem | Odoo | 1 / 3 | topic:odoo |
 | 33 | COV:language-family:go | Primary language family | Go | 2 / 3 | language:Go |
 | 33 | COV:package-ecosystem:go | Package / application ecosystem | Go modules | 2 / 3 | language:Go |
-| 32 | COV:age-band:one-3y | Repository age band | Created 1-3 years ago | 3 / 5 | created:2023-09-21..2025-09-20 |
+| 32 | COV:age-band:one-3y | Repository age band | Created 1-3 years ago | 3 / 5 | created:2023-09-22..2025-09-21 |
 | 27 | COV:star-band:thousand-plus | Repository attention band | 1000+ stars | 1 / 3 | stars:>=1000 |
 | 27 | COV:package-ecosystem:frappe | Package / application ecosystem | Frappe / ERPNext | 2 / 3 | topic:frappe-framework, topic:erpnext |
-| 24 | COV:age-band:seven-plus | Repository age band | Created 7+ years ago | 4 / 5 | created:<=2019-09-22 |
+| 24 | COV:age-band:seven-plus | Repository age band | Created 7+ years ago | 4 / 5 | created:<=2019-09-23 |
 | 20 | COV:language-family:js-ts | Primary language family | JavaScript / TypeScript | 3 / 4 | language:TypeScript, language:JavaScript |
 | 20 | COV:package-ecosystem:npm | Package / application ecosystem | Node / npm | 3 / 4 | language:TypeScript, language:JavaScript |
 | 16 | COV:star-band:ten-ninetynine | Repository attention band | 10-99 stars | 4 / 5 | stars:10..99 |
