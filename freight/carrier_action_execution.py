@@ -424,8 +424,9 @@ def verify_carrier_action_execution_receipt(
         raise ValueError("execution receipt submitted flag mismatch")
     if receipt.delivery_confirmed is not expected_delivered:
         raise ValueError("execution receipt delivery flag mismatch")
-    body = asdict(receipt)
-    digest = body.pop("receipt_hash")
+    fields = asdict(receipt)
+    digest = fields.pop("receipt_hash")
+    body = {"schema": 1, **fields}
     if canonical_hash(body) != digest:
         raise ValueError("execution receipt hash mismatch")
 
