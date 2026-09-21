@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "discovery_runs": 22,
+  "preflight_instrumented_runs": 0,
+  "candidate_preflight_checks": 0,
+  "known_candidate_preflight_hits": 0,
+  "duplicate_deep_inspections_avoided": 0,
+  "preflight_known_hit_rate": null,
+  "avoidance_per_known_hit": null,
+  "deep_inspected": 53,
+  "retained_count": 35,
+  "deep_inspections_per_retained": 1.5142857142857142,
+  "tool_calls_observed_runs": 4,
+  "tool_calls_observed_total": 119,
+  "elapsed_observed_runs": 8,
+  "elapsed_minutes_observed_total": 102,
+  "registry_duplicate_observation_rate": 0.044060234244283326,
+  "registry_duplicate_observations": 79,
+  "registry_unknown_revision_records": 91,
+  "observe_only": true
+}
