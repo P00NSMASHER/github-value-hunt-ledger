@@ -495,7 +495,7 @@ class SettlementStore:
         return self._read(op)
 
     def count(self, table: str) -> int:
-        allowed = {"settlement_events", "allocations", "counter_events", "reversal_edges"}
+        allowed = {"recovery_claims", "settlement_events", "allocations", "counter_events", "reversal_edges"}
         if table not in allowed:
             raise ValueError("unsupported count table")
         return self._read(lambda c: int(c.execute(
