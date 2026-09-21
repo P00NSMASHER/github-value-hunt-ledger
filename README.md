@@ -115,6 +115,9 @@ The hunt is not complete when a repository is found. The system must convert res
 - `OUTCOMES.md` — completed experiment/customer/value results used to train future search priority.
 - `SEARCH_SKILLS.md` — reusable discovery methods that have produced evidence-backed value.
 - `intelligence/COORDINATION_PROTOCOL.md` + `COORDINATION_BOARD.md` — immutable cross-hunter handoffs and the integrator-owned compact view of unresolved shared learning.
+- `intelligence/NETWORK_PRIORS.md` — compact generated memory for live hunters: current constraints, gaps, duplicate/provenance pressure, learned move priors and recall rules.
+- `intelligence/SEARCH_MOVE_REPORT.md` + `SEARCH_MOVE_POLICY.md` — observe-first learning/curriculum for individual retrieval moves rather than only whole-hunt strategies.
+- `intelligence/EFFICIENCY_REPORT.md` — duplicate-preflight savings and effort denominators, without rewarding shallow work.
 
 ## Closed-loop operating model
 
