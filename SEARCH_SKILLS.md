@@ -365,3 +365,25 @@ When `measurement_quality: "benchmark"` under V4:
   - inferring durable repair from idempotency or database uniqueness alone.
 - NEXT IMPROVEMENT: apply the method to one real provider-backed refund, payout or ERP writeback and require process-loss injection plus authoritative readback before extending it into a general consequential-action skill.
 
+## Nested authority and post-review invariant audit
+- SKILL NAME: Nested authority and post-review invariant audit
+- WHEN TO USE: An outer rule, pricing engine, extraction gate or human-review workflow appears deterministic and versioned, but the decision depends on nested matrices, formulas, exchange rates, classifications, competing values, corrections or approval writes.
+- PROCEDURE:
+  1. Pin the exact revision and identify the outer decision, its effective/as-of time, output unit/currency and replay identity.
+  2. Enumerate every nested dependency actually consumed: referenced matrices/cells, formula inputs, exchange rates, classification confidence, evidence candidates, correction schemas and approval state.
+  3. Verify each nested dependency has compatible version/effective-time semantics and is included in the trace or replay identity. An effective-dated outer rule does not preserve history if its referenced table is destructively replaced.
+  4. Trace the reverse path from correction/review into commit. Reparse corrections through typed schemas, rerun the same cross-field invariants, preserve actor/diff/source evidence and require one idempotent or transactional approval effect.
+  5. Execute adversarial cases for unavailable conversion, changed nested tables under a historical as-of date, low classification confidence, two coherent conflicting value sets, malformed corrections and repeated/concurrent approval.
+  6. Reject or downgrade any result whose outer trace is reproducible while a load-bearing nested source is mutable, unversioned, fail-open or bypassed after review.
+- WHY IT WORKED: Benchmark Experiment Tasks **03 and 04** independently validated the procedure. Task 03 found that effective-dated rate rules could still consume destructively replaced matrix cells, fail-open FX and replay identities that omitted a price input. Task 04 found that a strong pre-review extraction gate could be bypassed by ignored classifier confidence, competing grounded money sets, untyped corrections and replayable approval.
+- EXAMPLES:
+  - Benchmark Task 03: `emoss08/Trenova@e6eb6a5034ceeaca43ea5ab1882951f61853d072`.
+  - Benchmark Task 04: `Shreyas2409/freight-intake@49ee48e383aea202cc5ddf15c500a5b39092d8b7`.
+- FAILURE MODES:
+  - treating effective dating on the outer rule as proof that referenced tables/formulas are historically reproducible;
+  - treating a detailed trace as proof that units, currency or source versions were authoritative;
+  - assuming a review queue preserves pre-review invariants without typed correction and revalidation;
+  - accepting the first grounded value set without checking for another coherent contradictory set;
+  - allowing repeated approval to create multiple downstream effects.
+- NEXT IMPROVEMENT: apply the method to one ERP adjustment or regulated scientific calculation with independently versioned nested authority, then test whether selective source replacement invalidates only the affected decision receipt.
+
