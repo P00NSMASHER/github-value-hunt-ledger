@@ -58,6 +58,7 @@ CONTROL_PATHS = (
     "freight/separate_environment_evidence.py",
     "freight/sbom.py",
     "freight/settlement_csv_adapter.py",
+    "freight/settlement_review_workflow.py",
     "freight/settlement_store.py",
     "freight/settlement_report.py",
     "freight/synthetic_rehearsal.py",
