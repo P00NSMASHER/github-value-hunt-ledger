@@ -112,7 +112,6 @@ def _bundle_manifest(result: AuditWorkflowResult, entries: dict[str, bytes]) -> 
             "Does not include raw invoice, rate, contract or settlement source files.",
             "Discrepancy amounts are not realized savings.",
             "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
-            "Review routing separates buyer-ready cases from evidence remediation/rerun cases.",
             "Buyer review, external action and settlement remain separate downstream states.",
             "Bundle must remain inside an approved customer-processing environment.",
         ],
