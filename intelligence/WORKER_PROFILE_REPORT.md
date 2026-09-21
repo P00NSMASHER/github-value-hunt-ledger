@@ -17,7 +17,7 @@ Profile generation: **WORKERS:6a88fee9dd10**
 | HUNTER-05 | MEASURED | 4 | 8 | 4 | STRAT:first-party-history-manifest-triangulation | EXP-006 | 0 |
 | HUNTER-06 | MEASURED | 4 | 10 | 8 | STRAT:acceptance-path-transition-inspection | EXP-007 | 0 |
 | HUNTER-07 | MEASURED | 3 | 6 | 5 | STRAT:evaluation-target-independence | EXP-012 | 0 |
-| HUNTER-08 | SPARSE | 2 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-008 | 1 |
+| HUNTER-08 | SPARSE | 2 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-008 | 0 |
 | HUNTER-09 | SPARSE | 4 | 5 | 4 | STRAT:evaluation-target-independence | EXP-002 | 0 |
 | HUNTER-10 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 | HUNTER-11 | MEASURED | 5 | 8 | 4 | STRAT:decision-claim-runtime-side-effect-trace | EXP-004 | 0 |

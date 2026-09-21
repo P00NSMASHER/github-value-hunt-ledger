@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "activation_generation_id": "ACTGEN:e2d2dff4a1a5",
-  "clock_commit_sha": "c77e61f3c9092a61d10fad6e9af1005eb1653b63",
-  "clock_timestamp": "2026-09-21T06:21:35Z",
+  "activation_generation_id": "ACTGEN:9edc47061024",
+  "clock_commit_sha": "a2d5efdcfca35df02d22adfd8f39eb5ca5e9136b",
+  "clock_timestamp": "2026-09-21T06:23:10Z",
   "registered_workers": 14,
-  "fresh_ready_workers": 2,
-  "current_activations": 2,
-  "history_activations": 20,
+  "fresh_ready_workers": 3,
+  "current_activations": 3,
+  "history_activations": 23,
   "waiting_presence": 10,
-  "active_claim_workers": 2,
+  "active_claim_workers": 1,
   "ready_without_dispatch": 0
 }

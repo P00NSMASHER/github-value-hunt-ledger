@@ -1,7 +1,7 @@
 # WORKER ACTIVATION BOARD
 
-Generation: **ACTGEN:e2d2dff4a1a5**
-Clock: **2026-09-21T06:21:35Z**
+Generation: **ACTGEN:9edc47061024**
+Clock: **2026-09-21T06:23:10Z**
 
 V16 activation is pull-based. Routing can exist without activation; generated claiming requires fresh READY presence.
 
@@ -9,12 +9,12 @@ V16 activation is pull-based. Routing can exist without activation; generated cl
 |---|---|---|---|---|
 | HUNTER-01 | ACTIVE_CLAIM | **ACTIVE_CLAIM** | — | — |
 | HUNTER-02 | UNKNOWN | **WAITING_PRESENCE** | — | — |
-| HUNTER-03 | READY_FRESH | **READY_TO_CLAIM** | SLOT-02 | ACTIVATE:3f759dd14a94 |
+| HUNTER-03 | READY_FRESH | **READY_TO_CLAIM** | SLOT-02 | ACTIVATE:6b40405e03d4 |
 | HUNTER-04 | READY_STALE | **WAITING_PRESENCE** | — | — |
-| HUNTER-05 | READY_FRESH | **READY_TO_CLAIM** | SLOT-09 | ACTIVATE:aec000661003 |
+| HUNTER-05 | READY_FRESH | **READY_TO_CLAIM** | SLOT-09 | ACTIVATE:a7fec1c6b9e2 |
 | HUNTER-06 | READY_STALE | **WAITING_PRESENCE** | — | — |
 | HUNTER-07 | READY_STALE | **WAITING_PRESENCE** | — | — |
-| HUNTER-08 | ACTIVE_CLAIM | **ACTIVE_CLAIM** | — | — |
+| HUNTER-08 | READY_FRESH | **READY_TO_CLAIM** | SLOT-04 | ACTIVATE:23b15073651e |
 | HUNTER-09 | READY_STALE | **WAITING_PRESENCE** | — | — |
 | HUNTER-10 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 | HUNTER-11 | READY_STALE | **WAITING_PRESENCE** | — | — |
@@ -22,4 +22,4 @@ V16 activation is pull-based. Routing can exist without activation; generated cl
 | HUNTER-13 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 | HUNTER-14 | UNKNOWN | **WAITING_PRESENCE** | — | — |
 
-Current activations: **2**. Unknown/stale/offline presence is capacity uncertainty, not negative worker evidence.
+Current activations: **3**. Unknown/stale/offline presence is capacity uncertainty, not negative worker evidence.
