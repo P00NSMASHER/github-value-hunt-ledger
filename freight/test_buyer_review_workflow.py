@@ -238,7 +238,7 @@ def test_renderer_states_decision_and_authorization_boundaries():
 
 
 def test_public_verifier_rederives_buyer_review_batch_from_packet_and_routing():
-    artifacts = audit()
+    artifacts = workflow()
     case_hash = artifacts.review_routing.buyer_review_case_hashes[0]
     batch = build_buyer_review_batch(
         review_packet=artifacts.review_packet,
