@@ -53,3 +53,15 @@ This upgrade improves the current ChatGPT/GitHub operating system. It does not d
 ## Reference
 
 Search tooling instructions were checked against [GitHub REST search documentation](https://docs.github.com/en/rest/search/search) and [repository search qualifiers](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories). Connector-specific input contracts still govern connector queries.
+
+
+## Follow-on fleet coordination patch
+
+After the live automation audit found Hunt 02 paused while the other 14 hunter tasks were enabled, Hunt 02 was restored without altering its frozen benchmark prompt or schedule. The live-only shared operating documents were then tightened around the benchmark's current empirical weakness: experimental verification depth has not yet improved aggregate discovery yield, and two experiment results were no-find/recall failures.
+
+The live path now adds three conservative protections:
+1. a recall floor before NO_FIND so one polished near-match cannot consume the whole discovery budget;
+2. a durable stop/miss taxonomy so retrieval failure, duplicate/no-delta, evidence blocks and genuine no-qualifying-candidate outcomes are not conflated;
+3. an explicit cross-hunter handoff checkpoint for capability deltas, contradictions, verifier failures, negative knowledge and typed referrals.
+
+These changes do not modify benchmark tasks, gold, scoring, experiment state/results, or SEARCH_SKILLS while Pair 1 remains unfinished. They are intended to improve coordination and learning after each worker exits its frozen benchmark phase.
