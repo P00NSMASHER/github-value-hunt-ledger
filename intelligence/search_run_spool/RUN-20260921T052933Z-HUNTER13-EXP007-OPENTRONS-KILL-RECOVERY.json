@@ -1,60 +1,87 @@
 {
-  "schema_version": "1.0",
-  "run_id": "RUN-20260921T052933Z-HUNTER13-EXP007-OPENTRONS-KILL-RECOVERY",
-  "worker_id": "HUNTER-13",
-  "routing": "unallocated",
-  "work_action": "independent_verification/execute_fixture",
-  "capabilities": ["CAP-017"],
-  "experiment": "EXP-007",
-  "started_at": "2026-09-21T05:29:33Z",
-  "completed_at": "2026-09-21T05:29:41Z",
-  "status": "COMPLETE",
-  "target": {
-    "repository": "Opentrons/opentrons",
-    "revision": "03b991fb263b97b6bb767ce311ca56e103d635e4",
-    "provider": "official Robot Server",
-    "execution_mode": "repository hardware simulator with named SQLite persistence directory"
-  },
-  "fault": {
-    "window": "provider accepted; client killed before response delivery or durable receipt",
-    "provider_status": 201,
-    "client_return_code": -9,
-    "client_receipt_exists": false,
-    "run_id": "9427e6a9-64c7-4d81-a198-7c7b4571aa5e",
-    "provider_action_id": "36e06d58-7e04-4bce-9234-b7a9e7de3102"
-  },
-  "readback": {
-    "after_client_restart": {
-      "http_status": 200,
-      "run_status": "running",
-      "play_action_count": 1,
-      "classification": "CONFIRMED_APPLIED"
-    },
-    "eventual": {
-      "run_status": "succeeded",
-      "play_action_count": 1,
-      "classification": "CONFIRMED_APPLIED"
-    },
-    "after_provider_restart": {
-      "http_status": 200,
-      "run_status": "succeeded",
-      "play_action_count": 1,
-      "play_action_id": "36e06d58-7e04-4bce-9234-b7a9e7de3102",
-      "classification": "CONFIRMED_APPLIED"
-    }
-  },
-  "redispatch_count": 0,
-  "assertions": {
-    "provider_accepted_before_client_kill": true,
-    "client_was_killed": true,
-    "no_durable_client_receipt": true,
-    "same_run_recovered": true,
-    "exactly_one_play_action": true,
-    "same_action_recovered": true,
-    "read_only_recovery_classified_applied": true
-  },
-  "result": "PASS_POSITIVE_AMBIGUITY_BRANCH",
-  "negative_boundary": "No matching action remains RECONCILIATION_REQUIRED because execution is scheduled before action insertion; SAFE_TO_REISSUE was not proven.",
-  "scope_limit": "Official server persistence and simulator execution only; no physical motion, liquid transfer, or human-in-the-loop observation.",
-  "evidence_path": "referrals/hunt13-r26-2026-09-21-exp007-opentrons-kill-recovery.md"
+  "schema_version": 16,
+  "search_run_id": "RUN:20260921T052933Z:hunter13:exp007-opentrons-kill-recovery",
+  "timestamp": "2026-09-21T05:29:33Z",
+  "hunter_role": "HUNTER-13 / Revenue Leverage",
+  "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
+  "query_family": "opentrons accepted before receipt kill recovery",
+  "measurement_quality": "prospective",
+  "lane_ids": [
+    "REVENUE-LEVERAGE",
+    "LAB-AUTOMATION"
+  ],
+  "seed_nodes": [
+    "CAP-017",
+    "EXP-007"
+  ],
+  "search_surfaces": [
+    "Opentrons/opentrons exact-revision source and tests",
+    "repository hardware simulator",
+    "official Robot Server read-only API",
+    "persistent SQLite provider state"
+  ],
+  "queries": [
+    "If Robot Server accepts play but the client dies before receiving or persisting the 201 response, can a fresh process classify the original effect without redispatch?",
+    "Does the accepted play remain uniquely recoverable by the precommitted run ID after client restart?",
+    "Does the same provider action identity survive Robot Server restart over the same persistence directory?"
+  ],
+  "candidate_count": 0,
+  "deep_inspected": 0,
+  "retained_count": 0,
+  "master_promoted_count": 0,
+  "elapsed_minutes": null,
+  "tool_calls": null,
+  "recall_rescue_used": false,
+  "stop_reason": "The bounded positive ambiguity branch was executed and passed: provider acceptance survived client receipt loss and was recovered read-only with zero redispatch. The absent-action SAFE_TO_REISSUE branch and physical-effect proof remain unresolved.",
+  "new_capability_ids": [],
+  "strengthened_capability_ids": [
+    "CAP-017"
+  ],
+  "experiment_ids": [
+    "EXP-007"
+  ],
+  "candidate_dispositions": [],
+  "best_result": "Official Robot Server accepted play before the client was killed; a fresh process recovered the same run and exact action ID by read-only provider query, observed exactly one play action, and preserved the same result across provider restart with zero redispatch.",
+  "durable_evidence_path": "referrals/hunt13-r26-2026-09-21-exp007-opentrons-kill-recovery.md",
+  "notes": "Unallocated bounded execute-fixture run. Official server persistence plus repository hardware simulator only; no physical motion, liquid transfer, or human-observed device effect was proven. Discovery denominators are zero because no candidate search/disposition was performed.",
+  "query_family_id": "QF:opentrons-accepted-before-receipt-kill-recovery",
+  "search_objective_id": "OBJ:runtime-side-effect",
+  "benchmark_task_ids": [],
+  "comparison_group_id": null,
+  "evaluation_set_id": null,
+  "seed_mode": "manual_hypothesis",
+  "seed_ids": [],
+  "adjacency_mode": "none",
+  "adjacency_ids": [],
+  "adjacency_types": [],
+  "adjacency_root_nodes": [],
+  "coverage_mode": "none",
+  "coverage_gap_ids": [],
+  "allocation_mode": "unallocated",
+  "allocator_generation_id": null,
+  "assignment_id": null,
+  "assignment_work_item_id": null,
+  "portfolio_policy_generation_id": null,
+  "assignment_slot_role": null,
+  "assignment_work_kind": null,
+  "assignment_source_id": null,
+  "assignment_score": null,
+  "execution_claim_id": null,
+  "execution_slot_id": null,
+  "execution_worker_id": "HUNTER-13",
+  "routing_mode": "unrouted",
+  "routing_generation_id": null,
+  "worker_profile_generation_id": null,
+  "routing_score": null,
+  "dispatch_ticket_id": null,
+  "dispatch_generation_id": null,
+  "routing_learning_generation_id": null,
+  "route_override_reason": "No live activation or lease existed; executed one bounded EXP-007 provider-ambiguity fixture without claiming a generated slot.",
+  "dispatch_kind": null,
+  "dispatch_parent_ticket_id": null,
+  "presence_generation_id": null,
+  "presence_event_id": null,
+  "activation_id": null,
+  "activation_generation_id": null,
+  "work_action": "execute_fixture"
 }
