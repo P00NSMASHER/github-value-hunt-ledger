@@ -2,7 +2,7 @@
 
 ## Current operating entry point
 
-Use [WORKER_RUNBOOK.md](WORKER_RUNBOOK.md) and [HUNTER_MISSION.md](HUNTER_MISSION.md). The numbered V2–V18 sections below describe the evolution of the existing system; they are not competing instructions to copy old schemas. Current field contracts are in `SEARCH_RUN_TEMPLATE.json` and `schemas/search_run.schema.json`.
+Use [WORKER_RUNBOOK.md](WORKER_RUNBOOK.md) and [HUNTER_MISSION.md](HUNTER_MISSION.md). The numbered V2–V19 sections below describe the evolution of the existing system; they are not competing instructions to copy old schemas. Current field contracts are in `SEARCH_RUN_TEMPLATE.json` and `schemas/search_run.schema.json`.
 
 Workers submit one immutable JSON record under `search_run_spool/`. The single integrator/CI writer runs `python tools/ti_ingest_runs.py --write`; exact replays are idempotent and conflicting IDs fail closed. Preserve raw evidence and unknown denominators. Use `python tools/ti_prepare_run.py --help` to create a draft without fictional claim IDs or placeholder candidates, then fill in actual observations before submission.
 
@@ -741,3 +741,37 @@ Every routed worker now carries:
 - `route_mode: exploit | explore_swap`.
 
 V18 is experimental-design infrastructure, not a claim that one worker is better than another. It preserves assignment priority, all V14-V17 execution controls, and the allocator's portfolio.
+
+
+## V19 exploration provenance bridge
+
+V19 closes the provenance seam between V18 controlled-routing experiments and downstream execution/outcome telemetry.
+
+Before V19, V18 wrote `routing_exploration_generation_id`, `routing_exploration_pair_id`, `baseline_slot_id` and `route_mode` into worker routing/claim packets, but those fields were not part of the stable dispatch identity. A later completed run therefore could not be proven to belong to the exact V18 controlled swap that produced it.
+
+V19 carries that identity through:
+
+`routing -> dispatch -> activation -> claim -> schema-v19 search run`.
+
+Current primary dispatch tickets and generated claim packets use schema 19 and bind:
+- exploration generation;
+- optional `EXPPAIR:` pair ID;
+- baseline slot;
+- route mode (`exploit | explore_swap`);
+- all pre-existing allocator/routing/dispatch/activation identity.
+
+V15 work-steal tickets preserve the original primary route's exploration identity for audit, but work-steal executions are excluded from matched worker-effect analysis because the backup worker was not the worker assigned by the V18 controlled experiment.
+
+Generated V19 products:
+- `routing_exploration_provenance_metrics.json`;
+- `ROUTING_EXPLORATION_PROVENANCE.md`.
+
+A V18 pair is analysis-ready only when both members:
+- are distinct workers;
+- use generated primary dispatch;
+- complete with MATCHED telemetry;
+- carry the same `EXPPAIR:` identity through a schema-v19 run.
+
+Manual overrides, unrouted work, retrospective repairs, work-steal executions, mismatched telemetry and incomplete pairs are excluded.
+
+V19 establishes provenance and analysis eligibility only. It deliberately does **not** estimate worker causal effects; that requires completed analysis-ready pairs first.
