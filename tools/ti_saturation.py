@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import json
 from collections import defaultdict
-from ti_common import INTEL, load_jsonl, slug
+from ti_common import INTEL, load_jsonl, slug, is_discovery_run
 
-RUNS=[r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective","benchmark"}]
+RUNS=[r for r in load_jsonl("search_runs.jsonl") if is_discovery_run(r)]
 QALIASES=json.loads((INTEL/"query_family_aliases.json").read_text(encoding="utf-8")) if (INTEL/"query_family_aliases.json").exists() else {}
 POLICY=json.loads((INTEL/"search_policy.json").read_text(encoding="utf-8"))
 

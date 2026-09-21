@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import json, re
 from collections import defaultdict
-from ti_common import INTEL, ROOT, load_jsonl, write_jsonl, slug
+from ti_common import INTEL, ROOT, load_jsonl, write_jsonl, slug, is_discovery_run
 
-RUNS=[r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective","benchmark"}]
+RUNS=[r for r in load_jsonl("search_runs.jsonl") if is_discovery_run(r)]
 
 ADJ_TYPES={
  "organization_siblings":{

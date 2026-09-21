@@ -1,5 +1,17 @@
 # Technology Intelligence Data Layer
 
+## Current operating entry point
+
+Use [WORKER_RUNBOOK.md](WORKER_RUNBOOK.md) and [HUNTER_MISSION.md](HUNTER_MISSION.md). The numbered V2–V18 sections below describe the evolution of the existing system; they are not competing instructions to copy old schemas. Current field contracts are in `SEARCH_RUN_TEMPLATE.json` and `schemas/search_run.schema.json`.
+
+Workers submit one immutable JSON record under `search_run_spool/`. The single integrator/CI writer runs `python tools/ti_ingest_runs.py --write`; exact replays are idempotent and conflicting IDs fail closed. Preserve raw evidence and unknown denominators. Use `python tools/ti_prepare_run.py --help` to create a draft without fictional claim IDs or placeholder candidates, then fill in actual observations before submission.
+
+`python tools/ti_build.py` is the shared local/CI ingestion, generation and validation pipeline. It updates derived files but does not execute searches or candidate projects. Before pushing code, run `python -m unittest discover -s tests -p 'test_ti_*.py'`.
+
+Assignments now carry an explicit `work_action`: search, artifact verification, fixture execution or an external prerequisite. Reviewed domain anchors and STOP conditions live in `search_recipe_policy.json`. Read the current acceptance target and source experiment before acting; a verification bottleneck must not become an unrelated GitHub search.
+
+See [STRATEGY_UPGRADE_2026-09-21.md](STRATEGY_UPGRADE_2026-09-21.md) for the audit, changes and validation record. Frozen benchmark and shadow phase rules retain precedence.
+
 This directory is the machine-readable learning layer for the GitHub Value Hunt.
 
 The Markdown catalogs remain the human research record. These files add stable IDs, search attribution and outcome feedback so the system can measure which discovery methods actually create verified capabilities and realized value.
@@ -26,7 +38,7 @@ The Markdown catalogs remain the human research record. These files add stable I
 
 ## Search-attribution contract
 
-Every materially completed hunt cycle MUST append exactly one object to `search_runs.jsonl`.
+Every materially completed hunt cycle must submit exactly one immutable object under `search_run_spool/`. The single integrator/CI writer appends accepted new IDs to `search_runs.jsonl`.
 
 A prospective run should record:
 1. the strategy ID and query family used;

@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "description": "Reviewed action routing and anchored transfer hypotheses. Update explicitly when a named executed failure reopens discovery. Unknown capabilities fail closed to await_external; prose frequency never generates queries. CAP-014/CAP-015 search reopens only through reviewed search_gate state plus a repository-relative, SHA-256-bound executed evidence receipt identifying the named gap and next search question.",
+  "capabilities": {
+    "CAP-001": {
+      "work_action": "await_external",
+      "query_anchors": [
+        "document extraction",
+        "false-accept precision"
+      ],
+      "stop_conditions": [
+        "Wait for an authorized buyer corpus and frozen review budget; generic OCR discovery cannot provide calibration evidence."
+      ]
+    },
+    "CAP-002": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "entity resolution",
+        "negative judgement"
+      ],
+      "stop_conditions": [
+        "Execute the existing alias/non-match/merge/split corpus before seeking another identity engine."
+      ]
+    },
+    "CAP-003": {
+      "work_action": "await_external",
+      "query_anchors": [
+        "RateCon",
+        "tariff"
+      ],
+      "stop_conditions": [
+        "Freight STOP gate: no generic freight search without an explicitly authorized named gap."
+      ]
+    },
+    "CAP-004": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "freight rating",
+        "tariff"
+      ],
+      "stop_conditions": [
+        "Use the frozen blind rerating fixture; do not seek another rating engine."
+      ]
+    },
+    "CAP-005": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "detention",
+        "geofence"
+      ],
+      "stop_conditions": [
+        "Execute supported and unsupported entitlement fixtures; unresolved authority remains non-green."
+      ]
+    },
+    "CAP-006": {
+      "work_action": "await_external",
+      "query_anchors": [
+        "settlement",
+        "remittance"
+      ],
+      "stop_conditions": [
+        "Await actual authorized settlement/return evidence; repository discovery cannot establish realized recovery."
+      ]
+    },
+    "CAP-007": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "DSSE",
+        "proof policy"
+      ],
+      "stop_conditions": [
+        "Run the existing authority/admission matrix before further restore, OTA or attestation discovery."
+      ]
+    },
+    "CAP-008": {
+      "work_action": "verify_artifact",
+      "query_anchors": [
+        "UBL",
+        "CII",
+        "Schematron"
+      ],
+      "stop_conditions": [
+        "Pin the official rule-pack version and authority before comparing existing validators; do not replace rule authority with another repository."
+      ]
+    },
+    "CAP-009": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "timesheet",
+        "ValidFrom"
+      ],
+      "stop_conditions": [
+        "Run the historical-rule boundary corpus before broad scheduling discovery."
+      ]
+    },
+    "CAP-010": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "restore",
+        "RTO",
+        "RPO"
+      ],
+      "stop_conditions": [
+        "Run the scoped recovery and verifier matrix before more backup or CMDB discovery."
+      ]
+    },
+    "CAP-011": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "SAM.gov",
+        "current action"
+      ],
+      "stop_conditions": [
+        "Execute frozen history/currentness fixtures; search only if they expose a named successor/deviation authority gap."
+      ]
+    },
+    "CAP-012": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "building permit",
+        "jurisdiction"
+      ],
+      "stop_conditions": [
+        "Freeze three-jurisdiction source-field truth and source-outage cases before more permit repository discovery."
+      ]
+    },
+    "CAP-013": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "Thermo RAW",
+        "mzML"
+      ],
+      "stop_conditions": [
+        "Execute the pinned Thermo RAW row before shared normalization; no converter discovery until it runs."
+      ]
+    },
+    "CAP-014": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "HSMS",
+        "SECS/GEM",
+        "S2F15"
+      ],
+      "stop_conditions": [
+        "CAP-014 STOP: no third SECS/GEM engine until an actually executed endpoint disagreement needs adjudication. Run the neutral raw-HSMS fixture against both pinned endpoints first."
+      ],
+      "search_gate": {
+        "gate_id": "GATE:cap-014",
+        "state": "closed",
+        "closed_work_action": "execute_fixture",
+        "required_evidence_result": "observed_endpoint_disagreement",
+        "reopen_evidence": null
+      }
+    },
+    "CAP-015": {
+      "work_action": "verify_artifact",
+      "query_anchors": [
+        "OEDI",
+        "USECPO"
+      ],
+      "stop_conditions": [
+        "CAP-015 STOP: obtain and verify the current first-party OEDI artifact bytes against an independently expected digest, inspect schema/time/null semantics, and freeze the event/spell manifest before policy scoring. Missing bytes or digest is blocked evidence, not authority to find more outage datasets."
+      ],
+      "search_gate": {
+        "gate_id": "GATE:cap-015",
+        "state": "closed",
+        "closed_work_action": "verify_artifact",
+        "required_evidence_result": "artifact_verified_named_gap",
+        "reopen_evidence": null
+      }
+    },
+    "CAP-016": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "idempotency key",
+        "Xero"
+      ],
+      "stop_conditions": [
+        "Run the existing crash/replay-expiry/finality matrix. Permit adapter search only for a separately named failed NOT_APPLIED proof gap."
+      ]
+    },
+    "CAP-017": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "SiLA",
+        "Opentrons"
+      ],
+      "stop_conditions": [
+        "Execute the existing durable-provider ambiguity matrix before broad lab-orchestrator discovery."
+      ]
+    },
+    "CAP-018": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "payout.reversed",
+        "bank return"
+      ],
+      "stop_conditions": [
+        "Execute the post-success lost-webhook fixture; do not resume generic commission or payout-wrapper discovery."
+      ]
+    },
+    "CAP-019": {
+      "work_action": "execute_fixture",
+      "query_anchors": [
+        "VERIFIED_EMPTY",
+        "source receipt"
+      ],
+      "stop_conditions": [
+        "Run synthetic transport/auth/partial-source failure cases before source-receipt discovery."
+      ]
+    }
+  },
+  "transfer_recipes": [
+    {
+      "recipe_id": "rule-version-transfer",
+      "source_repositories": [
+        "GSA/GSA-Acquisition-DFARS",
+        "GSA/GSA-Acquisition-FAR"
+      ],
+      "work_action": "search",
+      "query_anchors": [
+        "OpenFisca",
+        "tax",
+        "benefits"
+      ],
+      "query_templates": [
+        "OpenFisca reforms parameter",
+        "\"tax\" \"effective_date\" path:tests",
+        "\"benefits\" \"rule_version\""
+      ],
+      "required_signatures": [
+        "effective rule version",
+        "historical evaluation",
+        "authority provenance"
+      ],
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
+      "search_objective_id": "OBJ:current-rule-authority",
+      "exclude_domains": [
+        "government procurement"
+      ],
+      "stop_conditions": [
+        "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+        "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient."
+      ]
+    },
+    {
+      "recipe_id": "abstention-transfer",
+      "source_repositories": [
+        "A-Jatin/freight-ratecon-extraction",
+        "OmarFaig/Assay"
+      ],
+      "work_action": "search",
+      "query_anchors": [
+        "mortgage",
+        "insurance"
+      ],
+      "query_templates": [
+        "\"mortgage\" \"extraction\" \"abstain\"",
+        "\"insurance\" \"source_span\" \"review\"",
+        "\"mortgage\" \"confidence\" path:tests"
+      ],
+      "required_signatures": [
+        "source span",
+        "selective prediction",
+        "review threshold"
+      ],
+      "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
+      "search_objective_id": "OBJ:independent-evaluation",
+      "exclude_domains": [
+        "freight",
+        "AP"
+      ],
+      "stop_conditions": [
+        "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+        "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient."
+      ]
+    },
+    {
+      "recipe_id": "promotion-control-transfer",
+      "source_repositories": [
+        "AccelerationConsortium/HELIOS"
+      ],
+      "work_action": "search",
+      "query_anchors": [
+        "MLflow",
+        "model registry"
+      ],
+      "query_templates": [
+        "MLflow \"alias\" \"rollback\"",
+        "\"model registry\" \"approval\"",
+        "MLflow \"champion\" path:tests"
+      ],
+      "required_signatures": [
+        "promotion authority",
+        "versioned candidate",
+        "rollback test"
+      ],
+      "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
+      "search_objective_id": "OBJ:runtime-side-effect",
+      "exclude_domains": [
+        "laboratory orchestration"
+      ],
+      "stop_conditions": [
+        "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+        "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient."
+      ]
+    },
+    {
+      "recipe_id": "format-normalization-transfer",
+      "source_repositories": [
+        "Benchling-Open-Source/allotropy",
+        "ethanbass/chromConverter"
+      ],
+      "work_action": "search",
+      "query_anchors": [
+        "DICOM",
+        "ECG"
+      ],
+      "query_templates": [
+        "DICOM \"roundtrip\"",
+        "\"ECG\" \"parser\" \"fixtures\"",
+        "DICOM \"metadata\" path:tests"
+      ],
+      "required_signatures": [
+        "raw-source identity",
+        "metadata preservation",
+        "numeric fixture"
+      ],
+      "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+      "search_objective_id": "OBJ:protocol-regression",
+      "exclude_domains": [
+        "chromatography converters",
+        "laboratory orchestration"
+      ],
+      "stop_conditions": [
+        "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+        "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient."
+      ]
+    },
+    {
+      "recipe_id": "model-roundtrip-transfer",
+      "source_repositories": [
+        "GRIDAPPSD/CIMHub"
+      ],
+      "work_action": "search",
+      "query_anchors": [
+        "IFC",
+        "CityGML",
+        "buildingSMART"
+      ],
+      "query_templates": [
+        "\"IFC\" \"roundtrip\"",
+        "CityGML \"validation\" path:tests",
+        "buildingSMART \"schema\" \"conversion\""
+      ],
+      "required_signatures": [
+        "model identity",
+        "roundtrip invariant",
+        "independent validation"
+      ],
+      "strategy_id": "STRAT:evaluation-target-independence",
+      "search_objective_id": "OBJ:independent-evaluation",
+      "exclude_domains": [
+        "grid outage datasets"
+      ],
+      "stop_conditions": [
+        "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+        "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient."
+      ]
+    },
+    {
+      "recipe_id": "physical-event-transfer",
+      "source_repositories": [
+        "kodekinetics79/opstrax-enterprise-build"
+      ],
+      "work_action": "search",
+      "query_anchors": [
+        "EVSE",
+        "OCPP",
+        "parking"
+      ],
+      "query_templates": [
+        "OCPP \"transaction\" \"meterStart\"",
+        "EVSE \"billing\" \"timestamp\"",
+        "\"parking\" \"entry\" \"tariff\" path:tests"
+      ],
+      "required_signatures": [
+        "physical event time",
+        "effective tariff",
+        "billable interval"
+      ],
+      "strategy_id": "STRAT:acceptance-path-transition-inspection",
+      "search_objective_id": "OBJ:authority-lineage",
+      "exclude_domains": [
+        "freight"
+      ],
+      "stop_conditions": [
+        "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+        "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient."
+      ]
+    }
+  ]
+}

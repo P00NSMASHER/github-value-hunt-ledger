@@ -3,6 +3,7 @@
 Private persistent memory for the GitHub Value Hunt.
 
 ## Operating model
+- Start operational runs with [`intelligence/WORKER_RUNBOOK.md`](intelligence/WORKER_RUNBOOK.md). It points to the current assignment, claim, evidence and telemetry contracts. The [2026-09-21 strategy upgrade](intelligence/STRATEGY_UPGRADE_2026-09-21.md) explains the latest changes and their evidence limits.
 - Fourteen active hunter workstreams search across the **47 thematic catalogs** under `hunters/`; catalog numbers are domain indexes, not necessarily one-to-one automation identities.
 - Every hunter reads the relevant thematic catalog(s), `MASTER.md`, `SEARCH_QUEUE.md`, `REJECTED.md`, and `COMBINATIONS.md` before searching.
 - Every materially inspected candidate should leave durable evidence in the appropriate hunter catalog as strong/watch/rejected so sibling work does not repeat it.
@@ -206,7 +207,7 @@ The durable Markdown research record is now paired with a structured empirical-l
 
 Every materially completed hunt cycle must:
 1. keep the detailed evidence in the appropriate `hunters/*.md` catalog;
-2. append one prospective record to `intelligence/search_runs.jsonl`;
+2. submit one immutable prospective record to `intelligence/search_run_spool/` for validated single-writer ingestion into `intelligence/search_runs.jsonl`;
 3. identify the stable `STRAT:...` strategy used and the reusable query family;
 4. record candidate/deep-inspection/retention/promotion denominators without inventing missing values;
 5. link any created/strengthened `CAP-###` nodes and affected `EXP-###` experiments;
@@ -217,13 +218,13 @@ The machine graph uses stable node/edge IDs and is validated by `tools/ti_valida
 **Policy:** do not reduce exploration based on anecdotal performance. Automatic expand/retire decisions require at least 5 measured runs and 20 deep inspections for the relevant strategy/query family. Realized technical/customer outcomes outrank predicted value scores.
 
 
-## Empirical hunt instrumentation v2
+## Empirical hunt instrumentation
 
 The hunt now has an adaptive measurement layer under `intelligence/`.
 
 Before a costly deep inspection, check prior repository evidence using `python tools/ti_lookup.py owner/repo` when a checkout is available, or inspect the corresponding hunter catalogs through GitHub.
 
-Every materially completed prospective hunt must append one `schema_version: 2` record to `intelligence/search_runs.jsonl`. Record actual denominators and do not estimate missing historical counts. Candidate dispositions should use the standardized reason taxonomy in `intelligence/reason_codes.json` where applicable.
+Every materially completed prospective hunt must submit one immutable record through `intelligence/search_run_spool/` for canonical ingestion using the current [`intelligence/SEARCH_RUN_TEMPLATE.json`](intelligence/SEARCH_RUN_TEMPLATE.json) and the provenance requirements in the [worker runbook](intelligence/WORKER_RUNBOOK.md). Record actual denominators and do not estimate missing historical counts. Candidate dispositions should use the standardized reason taxonomy in `intelligence/reason_codes.json` where applicable. Historical records retain their original schema version; a newer schema is not permission to fabricate missing historical fields.
 
 The generated reports answer different questions:
 - `REGISTRY_REPORT.md`: how much has already been hunted and where duplication is occurring;
@@ -235,10 +236,10 @@ The generated reports answer different questions:
 The allocation policy is advisory and deliberately keeps an exploration floor so low-attention, strange and cross-domain discoveries are not optimized away.
 
 
-### V4 measurement controls
+### Measurement controls
 
 The machine-learning layer now distinguishes exact queries, canonical query families, broader search objectives and search strategies. It also normalizes search-surface labels, controlled candidate disposition reasons and exact-revision debt.
 
 Matched strategy comparisons use the frozen benchmark task set and `benchmark/STRATEGY_MEASUREMENT_PROTOCOL.md`. These comparisons are deliberately separate from commercial opportunity search so strategy measurement does not distort the active product roadmap.
 
-New prospective runs should use `schema_version: 4`; see `intelligence/SEARCH_RUN_TEMPLATE.json`.
+The current run template is authoritative for new-record schema and fields. Current evidence counts and learning modes belong in the generated reports, not duplicated prose: see [`LEARNING_REPORT.md`](intelligence/LEARNING_REPORT.md), [`ALLOCATOR_LEARNING_REPORT.md`](intelligence/ALLOCATOR_LEARNING_REPORT.md) and [`ROUTING_LEARNING_REPORT.md`](intelligence/ROUTING_LEARNING_REPORT.md). Generated priorities are scheduling recommendations; they do not establish strategy superiority or override experiment stop conditions.

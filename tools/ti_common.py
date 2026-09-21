@@ -5,6 +5,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 INTEL = ROOT / "intelligence"
 
+def is_discovery_run(run):
+    """Exclude explicit non-search actions from discovery denominators only.
+
+    Legacy records without an action retain their observational meaning.
+    Explicit null/unknown actions are not inferred to be search. Do not apply
+    this filter to outcome attribution or portfolio execution ledgers.
+    """
+    return (run.get("measurement_quality") in {"prospective", "benchmark"}
+            and ("work_action" not in run or run["work_action"] == "search"))
+
 def slug(value):
     value = value.lower()
     value = re.sub(r"[^a-z0-9]+", "-", value)

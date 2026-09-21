@@ -2,6 +2,7 @@
 import json,re
 from collections import Counter
 from ti_common import INTEL, load_jsonl
+from ti_search_actions import action_errors
 
 policy_path=INTEL/"allocator_policy_effective.json" if (INTEL/"allocator_policy_effective.json").exists() else INTEL/"allocator_policy.json"
 cfg=json.loads(policy_path.read_text(encoding="utf-8"))
@@ -16,6 +17,18 @@ for n,c in enumerate(cand,1):
     wid=c.get("work_item_id")
     if not wid or wid in cids: raise SystemExit(f"hunt_candidates.jsonl:{n}: missing/duplicate work_item_id")
     cids.add(wid)
+    errors=action_errors(c)
+    if errors: raise SystemExit(f"hunt_candidates.jsonl:{n}: {'; '.join(errors)}")
+    if "work_action" in c and not (c.get("instructions") or {}).get("acceptance_target"):
+        raise SystemExit(f"hunt_candidates.jsonl:{n}: actionable candidate missing acceptance target")
+    if c.get("work_kind")=="independent_verification" and "work_action" in c:
+        packet=c["instructions"]
+        if packet.get("verification_mode")=="hypothesis_challenge":
+            if packet.get("queries") or packet.get("can_establish_verified") is not False:
+                raise SystemExit(f"hunt_candidates.jsonl:{n}: hypothesis challenge falsely implies independent verification")
+        elif packet.get("verification_mode")!="experiment_falsification" or not packet.get("independence_requirements") or not packet.get("next_action"):
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: verifier lacks frozen target/independence requirements")
+    if c.get("work_action")=="await_external": raise SystemExit(f"hunt_candidates.jsonl:{n}: external dependency assigned autonomously")
     if not isinstance(c.get("final_score"),(int,float)): raise SystemExit(f"hunt_candidates.jsonl:{n}: score missing")
 
 slots={x["slot_id"]:x for x in cfg.get("slots",[])}
@@ -25,6 +38,11 @@ for n,a in enumerate(alloc,1):
     aid=a.get("assignment_id")
     if not aid or aid in seen_assign: raise SystemExit(f"hunt_allocations.jsonl:{n}: missing/duplicate assignment_id")
     seen_assign.add(aid)
+    errors=action_errors(a)
+    if errors: raise SystemExit(f"hunt_allocations.jsonl:{n}: {'; '.join(errors)}")
+    candidate=next((c for c in cand if c["work_item_id"]==a.get("work_item_id")),None)
+    if candidate and (a.get("work_action")!=candidate.get("work_action") or a.get("instructions")!=candidate.get("instructions")):
+        raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
     sid=a.get("slot_id")
     if sid not in slots or sid in seen_slots: raise SystemExit(f"hunt_allocations.jsonl:{n}: invalid/duplicate slot {sid}")
     seen_slots.add(sid)

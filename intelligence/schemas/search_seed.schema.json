@@ -75,14 +75,12 @@
     },
     "query_templates": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "string"
       }
     },
     "search_surfaces": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "string"
       }
@@ -128,7 +126,50 @@
         "string",
         "null"
       ]
+    },
+    "work_action": {
+      "enum": [
+        "search",
+        "verify_artifact",
+        "execute_fixture",
+        "await_external"
+      ]
     }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "work_action"
+        ],
+        "properties": {
+          "work_action": {
+            "enum": [
+              "verify_artifact",
+              "execute_fixture",
+              "await_external"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "query_templates": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "query_templates": {
+            "minItems": 1
+          },
+          "search_surfaces": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
 }

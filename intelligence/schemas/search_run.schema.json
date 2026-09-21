@@ -60,6 +60,11 @@
         "retrospective"
       ]
     },
+    "work_action": {
+      "description": "Actual action classification. Explicit non-search or unknown actions are excluded from discovery-yield learning; missing legacy fields retain historical observational meaning.",
+      "type": ["string", "null"],
+      "enum": ["search", "verify_artifact", "execute_fixture", "await_external", null]
+    },
     "lane_ids": {
       "type": "array",
       "items": {

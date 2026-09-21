@@ -3,6 +3,8 @@ import json,re,hashlib
 from collections import defaultdict
 from pathlib import Path
 from ti_common import INTEL, ROOT, load_jsonl
+from ti_search_actions import (experiment_status, parse_capability_ids, experiment_action,
+                               capability_stops, action_errors)
 
 POLICY_PATH=INTEL/"allocator_policy_effective.json" if (INTEL/"allocator_policy_effective.json").exists() else INTEL/"allocator_policy.json"
 CFG=json.loads(POLICY_PATH.read_text(encoding="utf-8"))
@@ -37,12 +39,14 @@ def parse_experiments():
     out=[]
     for i,m in enumerate(heads):
         block=text[m.end():heads[i+1].start() if i+1<len(heads) else len(text)]
-        status=(line_field(block,"Status") or "").replace("*","").strip().upper()
-        caps=re.findall(r"CAP-\d{3,}",line_field(block,"Capabilities") or "")
+        raw_status=line_field(block,"Status") or ""
+        status=experiment_status(raw_status)
+        caps=parse_capability_ids(line_field(block,"Capabilities"))
         out.append({
           "experiment_id":m.group(1),
           "name":m.group(2).strip(),
           "status":status,
+          "execution_scope":raw_status.replace("*", "").strip(),
           "priority_label":SEARCH_PRIORITIES.get(m.group(1),""),
           "capability_ids":caps,
           "opportunity":line_field(block,"Opportunity"),
@@ -81,6 +85,11 @@ candidates=[]
 
 # Search seeds are already saturation- and coverage-aware.
 for s in SEEDS:
+    if s.get("work_action")=="await_external":
+        continue
+    errors=action_errors(s)
+    if errors:
+        raise SystemExit(f"{s['seed_id']}: {'; '.join(errors)}")
     st=s.get("seed_type")
     kind={
       "capability_gap":"capability_gap",
@@ -97,6 +106,9 @@ for s in SEEDS:
     candidates.append({
       "work_item_id":work_id("seed",s["seed_id"]),
       "work_kind":kind,
+      "work_action":s.get("work_action","search"),
+      "query_recipe_id":s.get("query_recipe_id"),
+      "query_anchors":s.get("query_anchors") or [],
       "source_id":s["seed_id"],
       "title":s["seed_id"],
       "final_score":score,
@@ -108,6 +120,11 @@ for s in SEEDS:
       "coverage_gap_ids":s.get("coverage_gap_ids") or [],
       "adjacency_root":None,
       "instructions":{
+        "work_action":s.get("work_action","search"),
+        "next_action":s.get("next_action"),
+        "acceptance_target":s.get("acceptance_target"),
+        "action_gate":s.get("action_gate"),
+        "query_anchors":s.get("query_anchors") or [],
         "why_now":s.get("why_now"),
         "queries":s.get("query_templates") or [],
         "search_surfaces":s.get("search_surfaces") or [],
@@ -125,6 +142,7 @@ for a in ADJ:
     candidates.append({
       "work_item_id":work_id("adj",a["adjacency_id"]),
       "work_kind":"adjacency",
+      "work_action":"search",
       "source_id":a["adjacency_id"],
       "title":a["adjacency_id"],
       "final_score":score,
@@ -139,6 +157,7 @@ for a in ADJ:
         "why_now":a.get("why_expand"),
         "queries":a.get("query_templates") or [],
         "search_recipe":a.get("search_recipe") or [],
+        "acceptance_target":a.get("verification_gate"),
         "verification_gate":a.get("verification_gate"),
         "stop_conditions":a.get("stop_conditions") or []
       }
@@ -154,6 +173,7 @@ for e in EXPERIMENTS:
     candidates.append({
       "work_item_id":work_id("experiment",e["experiment_id"]),
       "work_kind":"experiment_execution",
+      "work_action":experiment_action(e["capability_ids"]),
       "source_id":e["experiment_id"],
       "title":e["experiment_id"]+" — "+e["name"],
       "final_score":score,
@@ -165,12 +185,15 @@ for e in EXPERIMENTS:
       "coverage_gap_ids":[],
       "adjacency_root":None,
       "instructions":{
+        "work_action":experiment_action(e["capability_ids"]),
+        "execution_scope":e["execution_scope"],
         "why_now":"Experiment is "+e["status"]+" and should be executed/falsified before searching for redundant components.",
         "next_action":e.get("next_action"),
+        "acceptance_target":e.get("success") or e.get("next_action"),
         "hypothesis":e.get("hypothesis"),
         "success":e.get("success"),
         "failure":e.get("failure"),
-        "stop_conditions":["Do not broaden into generic discovery unless execution exposes a named technical gap."]
+        "stop_conditions":capability_stops(e["capability_ids"])+["Do not broaden into generic discovery unless execution exposes a named technical gap.", "READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external."]
       }
     })
     # Separate independent verifier candidate so red-team capacity is explicit.
@@ -178,6 +201,7 @@ for e in EXPERIMENTS:
     candidates.append({
       "work_item_id":work_id("verify",e["experiment_id"]),
       "work_kind":"independent_verification",
+      "work_action":experiment_action(e["capability_ids"]),
       "source_id":"VERIFY:"+e["experiment_id"],
       "title":"Independent verification — "+e["experiment_id"],
       "final_score":round(vbase-max(0,e["order"]-1)*0.2,2),
@@ -189,23 +213,32 @@ for e in EXPERIMENTS:
       "coverage_gap_ids":[],
       "adjacency_root":None,
       "instructions":{
+        "work_action":experiment_action(e["capability_ids"]),
+        "next_action":e.get("next_action"),
+        "acceptance_target":e.get("success") or e.get("next_action"),
+        "execution_scope":e["execution_scope"],
+        "verification_mode":"experiment_falsification",
+        "independence_requirements":["Freeze the exact claim, fixture and inspected revision before comparison.", "Use an independently sourced expected result or different implementation lineage.", "Preserve PASS/DISAGREE/UNSUPPORTED/ORACLE_UNAVAILABLE separately; repeated discovery does not establish independent VERIFIED."],
         "why_now":"Attempt to falsify the experiment using an independent oracle/fixture/implementation and negative controls.",
         "hypothesis":e.get("hypothesis"),
         "success":e.get("success"),
         "failure":e.get("failure"),
-        "stop_conditions":["Do not reuse the target system's own outputs as the sole oracle.","Preserve disagreements instead of forcing consensus."]
+        "stop_conditions":capability_stops(e["capability_ids"])+["Do not reuse the target system's own outputs as the sole oracle.","Preserve disagreements instead of forcing consensus."]
       }
     })
 
 # Fallback verifier for active search hypotheses when no live experiment is READY/RUNNING.
 if not any(c.get("work_kind")=="independent_verification" for c in candidates):
-    seed_pool=[s for s in SEEDS if s.get("seed_type") in {"capability_gap","coverage_gap","positive_dna_transfer"}]
+    seed_pool=[s for s in SEEDS if s.get("work_action", "search")=="search" and s.get("seed_type") in {"capability_gap","coverage_gap","positive_dna_transfer"}]
     seed_pool=sorted(seed_pool,key=lambda s:(-(float(s.get("priority") or 0)),s.get("seed_id") or ""))
     if seed_pool:
         s=seed_pool[0]
         candidates.append({
           "work_item_id":work_id("verify-seed",s["seed_id"]),
           "work_kind":"independent_verification",
+          "work_action":"search",
+          "query_recipe_id":None,
+          "query_anchors":[],
           "source_id":"VERIFY:"+s["seed_id"],
           "title":"Independent verification — "+s["seed_id"],
           "final_score":float(CFG["scoring"]["verification_base"]),
@@ -218,10 +251,13 @@ if not any(c.get("work_kind")=="independent_verification" for c in candidates):
           "adjacency_root":None,
           "instructions":{
             "why_now":"No READY/RUNNING experiment currently needs a dedicated verifier, so use reserved verification capacity to independently challenge the highest-ranked active search hypothesis before it becomes accepted positive training.",
-            "queries":s.get("query_templates") or [],
-            "search_surfaces":s.get("search_surfaces") or [],
-            "verification_gate":"Use an independent implementation, first-party authority, hand-authored fixture, negative control or contradictory source. Do not count the target repository's own claims as independent proof.",
-            "stop_conditions":["Do not duplicate the discovery agent's inspection path.","Preserve disagreement and uncertainty rather than forcing a PASS."]
+            "queries":[],
+            "verification_mode":"hypothesis_challenge",
+            "can_establish_verified":False,
+            "acceptance_target":"A falsifiable claim plus an independent comparator plan; no pre-discovery hypothesis is independently VERIFIED.",
+            "search_surfaces":["existing source/test evidence","independent negative controls"],
+            "verification_gate":"Pre-discovery hypothesis challenge only. Freeze a candidate claim and exact revision first; obtain an independent oracle/fixture before any VERIFIED finding. Do not repeat the discovery query and call agreement verification.",
+            "stop_conditions":(s.get("stop_conditions") or [])+["Do not duplicate the discovery agent's inspection path.","Preserve disagreement and uncertainty rather than forcing a PASS."]
           }
         })
 
@@ -229,6 +265,7 @@ if not any(c.get("work_kind")=="independent_verification" for c in candidates):
 candidates.append({
   "work_item_id":"WORK:wildcard:rare-weird",
   "work_kind":"wildcard",
+  "work_action":"search",
   "source_id":"WILDCARD:rare-weird",
   "title":"Rare / weird wildcard exploration",
   "final_score":75.0,
@@ -243,6 +280,7 @@ candidates.append({
     "why_now":"Preserve high-recall discovery for technologies the current capability graph cannot predict.",
     "queries":[],
     "search_surfaces":["zero-star and low-star repositories","archived repositories","obscure university/lab/government organizations","unusual protocol and hardware integrations"],
+    "acceptance_target":"A concrete source/test finding outside the current ontology, or an honest no-find disposition.",
     "verification_gate":"Weirdness is only a discovery prior; retain only concrete technical evidence.",
     "stop_conditions":["Do not chase credentials, private/confidential material or accidental secrets.","No padding: a no-find run is valid."]
   }
@@ -251,15 +289,20 @@ candidates.append({
 # Stable generation fingerprint.
 fingerprint=json.dumps({
  "policy":POLICY,
- "seed_ids":[(x.get("seed_id"),x.get("priority")) for x in SEEDS],
+ "seeds":SEEDS,
  "adj_ids":[(x.get("adjacency_id"),x.get("priority")) for x in ADJ],
- "experiments":[(x["experiment_id"],x["status"],x.get("priority_label")) for x in EXPERIMENTS],
+ "experiments":EXPERIMENTS,
+ "candidate_instructions":[(x["work_item_id"],x.get("work_action"),x["instructions"]) for x in candidates],
  "allocator_policy":CFG
 },sort_keys=True,default=str)
 gen_hash=hashlib.sha256(fingerprint.encode()).hexdigest()[:12]
 generation_id="ALLOCGEN:"+gen_hash
 
 # Candidate sort.
+for candidate in candidates:
+    errors=action_errors(candidate)
+    if errors:
+        raise SystemExit(f"{candidate['work_item_id']}: {'; '.join(errors)}")
 candidates.sort(key=lambda x:(-x["final_score"],x["work_item_id"]))
 
 slots=CFG["slots"]
@@ -316,6 +359,9 @@ for slot in slots:
       "slot_label":slot["label"],
       "work_item_id":c["work_item_id"],
       "work_kind":c["work_kind"],
+      "work_action":c.get("work_action","search"),
+      "query_recipe_id":c.get("query_recipe_id"),
+      "query_anchors":c.get("query_anchors") or [],
       "source_id":c["source_id"],
       "title":c["title"],
       "final_score":c["final_score"],
@@ -356,6 +402,8 @@ metrics={
  "slot_count":len(slots),
  "work_kind_counts":dict(kind_counts),
  "slot_role_counts":dict(role_counts),
+ "awaiting_external_seed_count":sum(s.get("work_action")=="await_external" for s in SEEDS),
+ "work_action_counts":{action:sum(a["work_action"]==action for a in assignments) for action in sorted({a["work_action"] for a in assignments})},
  "max_capability_concentration":max(cap_counts.values()) if cap_counts else 0,
  "max_experiment_concentration":max(exp_counts.values()) if exp_counts else 0,
  "max_strategy_concentration":max(strategy_counts.values()) if strategy_counts else 0,
@@ -374,12 +422,16 @@ for a in assignments:
     i=a["instructions"]
     plan += [f"### {a['slot_id']} — {a['title']}",
              f"- Assignment ID: {a['assignment_id']}",
-             f"- Work kind: **{a['work_kind']}**",
+             f"- Work kind/action: **{a['work_kind']} / {a['work_action']}**",
              f"- Score: **{a['final_score']:.2f}** — {json.dumps(a['score_components'],sort_keys=True)}",
              f"- Strategy/objective: {a.get('strategy_id') or 'n/a'} / {a.get('search_objective_id') or 'n/a'}",
              f"- Capability/experiment: {', '.join(a['capability_ids']+a['experiment_ids']) or 'cross-domain'}",
              f"- Why now: {i.get('why_now') or '—'}"]
+    if i.get("execution_scope"): plan.append(f"- Execution scope: {i['execution_scope']}")
     if i.get("next_action"): plan.append(f"- Next action: {i['next_action']}")
+    if i.get("acceptance_target"): plan.append(f"- Acceptance target: {i['acceptance_target']}")
+    if i.get("verification_mode"): plan.append(f"- Verification mode: {i['verification_mode']}")
+    if i.get("independence_requirements"): plan.append(f"- Independence requirements: {'; '.join(i['independence_requirements'])}")
     if i.get("hypothesis"): plan.append(f"- Hypothesis: {i['hypothesis']}")
     if i.get("queries"):
         plan.append("- Queries:")

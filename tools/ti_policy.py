@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import json, math
 from collections import defaultdict
-from ti_common import INTEL, ROOT, load_jsonl
+from ti_common import INTEL, ROOT, load_jsonl, is_discovery_run
 
 runs = [r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective", "benchmark"}]
+discovery_runs = [r for r in runs if is_discovery_run(r)]
 outs = load_jsonl("outcomes.jsonl")
 strategies = load_jsonl("search_strategies.jsonl")
 caps = load_jsonl("capabilities.jsonl")
@@ -69,7 +70,8 @@ rows = []
 active = [s for s in strategies if s.get("status") == "active"]
 for s in active:
     sid = s["strategy_id"]
-    rs = groups.get(sid, [])
+    all_activity = groups.get(sid, [])
+    rs = [r for r in all_activity if is_discovery_run(r)]
     inspected = sum((r.get("deep_inspected") or 0) for r in rs)
     retained = sum((r.get("retained_count") or 0) for r in rs)
     promoted = sum((r.get("master_promoted_count") or 0) for r in rs)
@@ -77,7 +79,7 @@ for s in active:
     experiment_runs = sum(1 for r in rs if r.get("experiment_ids"))
 
     unique_outcomes = {}
-    for r in rs:
+    for r in all_activity:
         for o in out_by_run.get(r["search_run_id"], []):
             unique_outcomes[o.get("outcome_id")] = o
     valid = [o for o in unique_outcomes.values() if o.get("result") != "INVALID"]
@@ -113,7 +115,7 @@ for s in active:
         "sufficient_evidence": len(rs) >= 5 and inspected >= 20
     })
 
-measured = len(runs)
+measured = len(discovery_runs)
 valid_out = [o for o in outs if o.get("result") != "INVALID"]
 if len(valid_out) < 3 or measured < 30:
     exploration_budget = .50
@@ -179,6 +181,10 @@ gaps = sorted(gap_candidates, key=lambda x: (-x["gap_score"], x["capability_id"]
 
 policy_obj = {
     "measured_runs": measured,
+    "total_measured_activity_runs": len(runs),
+    "excluded_nonsearch_or_unclassified_runs": len(runs) - measured,
+    "legacy_unclassified_discovery_runs": sum('work_action' not in r for r in discovery_runs),
+    "discovery_denominator_policy": "explicit_search_plus_legacy_action_absent; all_activity_outcome_credit_preserved",
     "valid_outcomes": len(valid_out),
     "exploration_budget": exploration_budget,
     "outcome_attribution_method": "equal_touch_fractional_credit",
@@ -199,7 +205,9 @@ policy_obj = {
 lines = [
     "# ADAPTIVE SEARCH POLICY", "",
     "This is a cautious allocation recommendation, not an autonomous command. It blends empirical yield with an explicit exploration budget so unusual low-frequency discoveries are not optimized away.", "",
-    f"- Measured prospective or benchmark runs: **{measured}**",
+    f"- Measured prospective or benchmark discovery runs: **{measured}**",
+    f"- Other measured actions excluded from discovery denominators: **{len(runs) - measured}**; outcome credit remains included.",
+    "- Historical records without work_action retain their observational status; explicit non-search or unclassified actions cannot satisfy discovery evidence gates.",
     f"- Valid structured outcomes: **{len(valid_out)}**",
     f"- Exploration budget: **{exploration_budget:.0%}**",
     "- Multi-origin outcomes use fractional equal-touch credit rather than being counted in full for every strategy.",

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import json
 from collections import defaultdict
-from ti_common import INTEL, load_jsonl
+from ti_common import INTEL, load_jsonl, is_discovery_run
 
-runs = [r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective", "benchmark"}]
+runs = [r for r in load_jsonl("search_runs.jsonl") if is_discovery_run(r)]
 strategies = [s for s in load_jsonl("search_strategies.jsonl") if s.get("status") == "active"]
 aliases = json.loads((INTEL / "strategy_aliases.json").read_text(encoding="utf-8")) if (INTEL / "strategy_aliases.json").exists() else {}
 policy = json.loads((INTEL / "search_policy.json").read_text(encoding="utf-8")) if (INTEL / "search_policy.json").exists() else {}
@@ -59,7 +59,8 @@ lines = [
     "This report answers a different question from SEARCH_POLICY.md: not **where might value be**, but **what evidence is still missing before the system can credibly compare search strategies**.", "",
     f"- Active strategies: **{len(rows)}**",
     f"- Strategies with sufficient evidence: **{plan['sufficient_strategies']}**",
-    "- Sufficiency threshold: **5 measured runs + 20 deep inspections** per strategy.", "",
+    "- Sufficiency threshold: **5 measured discovery runs + 20 deep inspections** per strategy.",
+    "- Explicit fixture, artifact-verification, waiting and unclassified actions do not satisfy discovery thresholds. Legacy records without an action remain observational evidence.", "",
     "## Strategy measurement debt", "",
     "| Strategy | Runs | Inspected | More runs needed | More inspections needed | Instrumentation debt | Policy allocation |",
     "|---|---:|---:|---:|---:|---:|---:|"

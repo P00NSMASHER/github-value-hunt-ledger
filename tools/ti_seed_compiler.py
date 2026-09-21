@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 import json, re
 from collections import defaultdict
-from ti_common import INTEL, ROOT, load_jsonl, write_jsonl, slug
+from ti_common import INTEL, ROOT, load_jsonl, write_jsonl, slug, is_discovery_run
+from ti_search_actions import (capability_recipe, transfer_recipe, inherited_fields,
+                               parse_capability_ids, experiment_status, action_errors)
 
 POLICY = json.loads((INTEL / "search_policy.json").read_text(encoding="utf-8"))
 CAPS = {x["capability_id"]: x for x in load_jsonl("capabilities.jsonl")}
 STRATS = {x["strategy_id"]: x for x in load_jsonl("search_strategies.jsonl")}
-RUNS = [x for x in load_jsonl("search_runs.jsonl") if x.get("measurement_quality") in {"prospective","benchmark"}]
+RUNS = [x for x in load_jsonl("search_runs.jsonl") if is_discovery_run(x)]
 OBJECTIVES_CFG = json.loads((INTEL / "search_objectives.json").read_text(encoding="utf-8"))
 OBJECTIVE_IDS = {x["search_objective_id"] for x in OBJECTIVES_CFG.get("objectives", [])}
 COVERAGE_GAPS = load_jsonl("exploration_gap_queue.jsonl") if (INTEL / "exploration_gap_queue.jsonl").exists() else []
@@ -28,25 +30,6 @@ def saturation_adjust(cid):
     }.get(status,0)
     return status, adjustment, row.get("recommended_action","MEASURE_MORE")
 
-
-HIGH_SIGNAL = [
-    "effective-dated","supersession","append-only","exactly-once","fail-closed",
-    "negative control","negative controls","reversal","idempotency","immutable",
-    "bitemporal","provenance","source span","evidence","human review","review",
-    "deterministic","replay","settlement","partial","split","ambiguity","unknown",
-    "rollback","signature","schema","calibration","conservation","one-use",
-    "counter-event","versioned","audit trail","state machine","hard lock",
-    "semantic","coverage","tombstone","retry","reconcile","source health",
-    "effective window","authority","lineage","approval","conflict","independent"
-]
-GENERIC_STOP = {
-    "the","and","for","with","from","that","this","into","without","while","before",
-    "after","under","only","where","when","which","what","their","must","remain",
-    "system","systems","current","component","components","target","targets",
-    "buyer","buyers","product","products","commercial","commercially","test","tests",
-    "source","sources","data","code","repo","repository","repositories","ability",
-    "capability","capabilities","missing","piece","next","validated","validation"
-}
 
 def line_field(block, label):
     m = re.search(r"^-\s*" + re.escape(label) + r":\s*(.*)$", block, re.I|re.M)
@@ -75,13 +58,13 @@ def parse_experiments():
     out=[]
     for i,m in enumerate(heads):
         block=text[m.end(): heads[i+1].start() if i+1<len(heads) else len(text)]
-        status=(line_field(block,"Status") or "").replace("*","").strip()
+        status=experiment_status(line_field(block,"Status"))
         cap_line=line_field(block,"Capabilities") or ""
         out.append({
             "experiment_id":m.group(1),
             "name":m.group(2).strip(),
             "status":status,
-            "capability_ids":re.findall(r"CAP-\d{3,}",cap_line),
+            "capability_ids":parse_capability_ids(cap_line),
             "next_action":line_field(block,"Next action") or ""
         })
     return out
@@ -92,23 +75,6 @@ EXP_BY_CAP=defaultdict(list)
 for e in EXPERIMENTS:
     for c in e["capability_ids"]:
         EXP_BY_CAP[c].append(e)
-
-def signatures(text, limit=7):
-    lower=(text or "").lower()
-    found=[]
-    for phrase in HIGH_SIGNAL:
-        if phrase in lower and phrase not in found:
-            found.append(phrase)
-    freq=defaultdict(int)
-    for w in re.findall(r"[a-z][a-z0-9-]{4,}",lower):
-        if w not in GENERIC_STOP and not w.startswith("cap-") and not w.startswith("exp-"):
-            freq[w]+=1
-    for w,_ in sorted(freq.items(), key=lambda kv:(-kv[1],kv[0])):
-        if w not in found:
-            found.append(w)
-        if len(found)>=limit:
-            break
-    return found[:limit]
 
 def choose_strategy(text):
     t=(text or "").lower()
@@ -150,23 +116,6 @@ def choose_objective(text):
         if oid in OBJECTIVE_IDS and any(k in t for k in keys):
             return oid
     return "OBJ:independent-evaluation" if "OBJ:independent-evaluation" in OBJECTIVE_IDS else sorted(OBJECTIVE_IDS)[0]
-
-def query_templates(sigs):
-    s=[x for x in sigs if x][:4]
-    if not s:
-        return []
-    fmt=lambda x: '"' + x + '"' if " " in x else x
-    out=[]
-    if len(s)>=3:
-        out.append(" ".join(fmt(x) for x in s[:3]))
-        out.append(" ".join(fmt(x) for x in [s[0],s[2]])+" path:tests")
-    elif len(s)==2:
-        out.append(" ".join(fmt(x) for x in s))
-        out.append(" ".join(fmt(x) for x in s)+" path:tests")
-    else:
-        out.append(fmt(s[0])+" tests schema")
-    out.append(" ".join(fmt(x) for x in s[:2])+" audit replay")
-    return list(dict.fromkeys(out))
 
 def experiment_bonus(cid):
     bonus=0
@@ -215,7 +164,8 @@ for gap in POLICY.get("priority_capability_gaps",[])[:10]:
         continue
     c=CAPS[cid]
     context=" ".join(filter(None,[c.get("ability"),c.get("missing_piece"),c.get("next_falsifiable_test")]))
-    sigs=signatures(context)
+    recipe=capability_recipe(cid)
+    sigs=recipe["required_signatures"]
     strategy=choose_strategy(context)
     objective=choose_objective(context)
     exp_bonus,exp_ids=experiment_bonus(cid)
@@ -226,6 +176,13 @@ for gap in POLICY.get("priority_capability_gaps",[])[:10]:
     seeds.append({
       "seed_id":seed_id,
       "seed_type":"capability_gap",
+      "work_action":recipe["work_action"],
+      "query_recipe_id":recipe["query_recipe_id"],
+      "query_anchors":recipe["query_anchors"],
+      "action_gate":"Reviewed capability action takes precedence over ranking or coverage.",
+      "next_action":recipe.get("next_action") or c.get("next_falsifiable_test") or c.get("missing_piece"),
+      "acceptance_target":recipe.get("acceptance_target") or c.get("next_falsifiable_test") or "A reviewed action and acceptance target are required.",
+      "blocking_reason":recipe.get("blocking_reason"),
       "priority":priority,
       "strategy_id":strategy,
       "search_objective_id":objective,
@@ -237,10 +194,10 @@ for gap in POLICY.get("priority_capability_gaps",[])[:10]:
       "saturation_action":sat_action,
       "why_now":f"{cid} is a current high-information gap (gap score {gap.get('gap_score')}, prior run attention {gap.get('run_attention')}). Saturation: {sat_status} ({sat_adjust:+d} priority). Missing piece: {c.get('missing_piece') or 'unspecified'}.",
       "required_signatures":sigs,
-      "query_templates":query_templates(sigs),
-      "search_surfaces":["GitHub code search","GitHub repository search","source/tests/schema/history","author/org adjacency"],
-      "verification_gate":"Retain only when at least two required signatures meet in a connected executable path and source/tests establish the claimed state transition or invariant. README-only co-location is not enough.",
-      "stop_conditions":["Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.","Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears."],
+      "query_templates":recipe["query_templates"],
+      "search_surfaces":["GitHub code search","GitHub repository search"] if recipe["work_action"]=="search" else [],
+      "verification_gate":("Retain only when the domain anchors meet in a connected executable path and source/tests establish the claimed invariant." if recipe["work_action"]=="search" else "Record the exact fixture/artifact subject, independent expected result, observed result and blocker. Completion of research is not completion of the acceptance test."),
+      "stop_conditions":recipe["stop_conditions"]+["Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.","Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears."],
       "authorization_basis":"adaptive_policy_capability_gap",
       "exclude_domains":[],
       "performance":perf[seed_id]
@@ -250,10 +207,11 @@ seen_sig=set()
 dna_count=0
 for m in sorted(MASTER,key=lambda x: (-(x["score"] or 0),x["repo"])):
     text=" ".join([m["capability"],m["why"]])
-    sigs=signatures(text)
-    if len(sigs)<3:
+    recipe=transfer_recipe(m["repo"])
+    if not recipe:
         continue
-    key=tuple(sorted(sigs[:4]))
+    sigs=recipe["required_signatures"]
+    key=recipe["query_recipe_id"]
     if key in seen_sig:
         continue
     seen_sig.add(key)
@@ -264,27 +222,33 @@ for m in sorted(MASTER,key=lambda x: (-(x["score"] or 0),x["repo"])):
     seeds.append({
       "seed_id":seed_id,
       "seed_type":"positive_dna_transfer",
+      "work_action":"search",
+      "query_recipe_id":recipe["query_recipe_id"],
+      "query_anchors":recipe["query_anchors"],
+      "action_gate":"Transfer only into the named target domain; source-domain STOP gates remain closed.",
+      "next_action":"Run the bounded anchored transfer queries and inspect one connected implementation path.",
+      "acceptance_target":"One independent target-domain implementation with source/test evidence for: "+", ".join(sigs),
       "priority":priority,
-      "strategy_id":choose_strategy(text),
-      "search_objective_id":choose_objective(text),
+      "strategy_id":recipe["strategy_id"],
+      "search_objective_id":recipe["search_objective_id"],
       "capability_ids":[],
       "experiment_ids":[],
       "source_nodes":["REPO:"+m["repo"]],
       "why_now":f"Transfer the load-bearing implementation DNA of MASTER leader {m['repo']} into unrelated verticals. Why it wins: {m['why']}",
       "required_signatures":sigs,
-      "query_templates":query_templates(sigs),
+      "query_templates":recipe["query_templates"],
       "search_surfaces":["GitHub code search","low-star/zero-star repository search","archived repository archaeology","author/org adjacency","dependency/consumer adjacency"],
       "verification_gate":"A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo.",
-      "stop_conditions":["Do not search the originating vertical merely because its MASTER leader scored highly.","Reject forks/clones that add no independent implementation evidence."],
+      "stop_conditions":recipe["stop_conditions"]+["Do not search the originating vertical merely because its MASTER leader scored highly.","Reject forks/clones that add no independent implementation evidence."],
       "authorization_basis":"exploration_positive_dna_transfer",
-      "exclude_domains":[origin_domain] if origin_domain else [],
+      "exclude_domains":sorted(set(recipe["exclude_domains"]+([origin_domain] if origin_domain else []))),
       "performance":perf[seed_id]
     })
     dna_count+=1
     if dna_count>=6:
         break
 
-gaps=[s for s in seeds if s["seed_type"]=="capability_gap"]
+gaps=[s for s in seeds if s["work_action"]=="search"]
 non_saturated_gaps=[s for s in gaps if s.get("saturation_status")!="SATURATED"]
 if non_saturated_gaps:
     gaps=non_saturated_gaps
@@ -292,10 +256,8 @@ for i,cg in enumerate(COVERAGE_GAPS[:5]):
     if not gaps:
         break
     g=gaps[i % len(gaps)]
-    cid=g["capability_ids"][0] if g.get("capability_ids") else None
-    if not cid:
-        continue
-    seed_id="SEED:coverage:"+slug(cg["coverage_gap_id"].replace("COV:",""))+":"+cid.lower()
+    cid=g["capability_ids"][0] if g.get("capability_ids") else g["query_recipe_id"]
+    seed_id="SEED:coverage:"+slug(cg["coverage_gap_id"].replace("COV:",""))+":"+slug(cid)
     filters=(cg.get("query_variants") or [])[:2]
     qbase=(g.get("query_templates") or [])[:2]
     qs=[]
@@ -311,6 +273,8 @@ for i,cg in enumerate(COVERAGE_GAPS[:5]):
     seeds.append({
       "seed_id":seed_id,
       "seed_type":"coverage_gap",
+      **inherited_fields(g),
+      "parent_seed_id":g["seed_id"],
       "priority":priority,
       "strategy_id":g["strategy_id"],
       "search_objective_id":g["search_objective_id"],
@@ -319,11 +283,11 @@ for i,cg in enumerate(COVERAGE_GAPS[:5]):
       "coverage_gap_ids":[cg["coverage_gap_id"]],
       "coverage_dimension":cg.get("dimension_id"),
       "coverage_target":cg.get("target_id"),
-      "source_nodes":[cg["coverage_gap_id"]]+(g.get("capability_ids") or []),
+      "source_nodes":[cg["coverage_gap_id"]]+g.get("source_nodes", []),
       "saturation_status":g.get("saturation_status"),
       "saturation_adjustment":g.get("saturation_adjustment",0),
       "saturation_action":g.get("saturation_action"),
-      "why_now":f"Intersect exploration blind spot {cg['coverage_gap_id']} ({cg.get('target_label')}: {cg.get('observed_unique_repositories')}/{cg.get('target_min_repositories')}) with {cid}, an active high-value capability gap. This is coverage correction tied to a valuable technical hypothesis, not diversity for its own sake.",
+      "why_now":f"Intersect exploration blind spot {cg['coverage_gap_id']} ({cg.get('target_label')}: {cg.get('observed_unique_repositories')}/{cg.get('target_min_repositories')}) with {cid}, an authorized anchored search hypothesis. This is coverage correction tied to a valuable technical hypothesis, not diversity for its own sake.",
       "required_signatures":g.get("required_signatures") or [],
       "query_templates":qs,
       "search_surfaces":["GitHub repository search","GitHub code search"]+(g.get("search_surfaces") or []),
@@ -339,28 +303,36 @@ for i,row in enumerate(zero[:3]):
     if not gaps:
         break
     g=gaps[i % len(gaps)]
+    target=g["capability_ids"][0] if g["capability_ids"] else g["query_recipe_id"]
     sid=row["strategy_id"]
-    seed_id="SEED:measure:"+slug(sid.replace("STRAT:",""))+"-"+g["capability_ids"][0].lower()
+    seed_id="SEED:measure:"+slug(sid.replace("STRAT:",""))+"-"+slug(target)
     priority=max(1,min(82,58+round(100*float(row.get("allocation") or 0))+perf_adjust(seed_id)))
     seeds.append({
       "seed_id":seed_id,
       "seed_type":"strategy_measurement",
+      **inherited_fields(g),
+      "parent_seed_id":g["seed_id"],
       "priority":priority,
       "strategy_id":sid,
       "search_objective_id":g["search_objective_id"],
       "capability_ids":g["capability_ids"],
       "experiment_ids":g["experiment_ids"],
-      "source_nodes":[sid]+g["capability_ids"],
-      "why_now":f"{sid} has no measured runs but receives exploration allocation. Pair it with {g['capability_ids'][0]} so the hunt searches a real gap and reduces strategy measurement debt.",
+      "source_nodes":[sid]+g.get("source_nodes",[]),
+      "why_now":f"{sid} has no measured runs but receives exploration allocation. Pair it with {target} so the hunt searches a real gap and reduces strategy measurement debt.",
       "required_signatures":g["required_signatures"],
       "query_templates":g["query_templates"],
       "search_surfaces":g["search_surfaces"],
-      "verification_gate":"Use the named strategy consistently enough to make the run comparable, while preserving the same evidence bar as ordinary discovery.",
-      "stop_conditions":["Do not turn a measurement run into an unrestricted domain sweep.","A no-find result is valid data; do one recall-rescue pass, then stop."],
+      "verification_gate":g["verification_gate"]+" Use the named strategy consistently enough to make the run comparable.",
+      "stop_conditions":g["stop_conditions"]+["Do not turn a measurement run into an unrestricted domain sweep.","A no-find result is valid data; do one recall-rescue pass, then stop."],
       "authorization_basis":"strategy_measurement_debt",
       "exclude_domains":g.get("exclude_domains",[]),
       "performance":perf[seed_id]
     })
+
+for seed in seeds:
+    errors=action_errors(seed)
+    if errors:
+        raise SystemExit(f"{seed['seed_id']}: {'; '.join(errors)}")
 
 seeds.sort(key=lambda x:(-x["priority"],x["seed_id"]))
 write_jsonl("search_seeds.jsonl",seeds)
@@ -369,16 +341,19 @@ metrics={
   "schema_version":1,
   "seed_count":len(seeds),
   "by_type":{},
+  "by_action":{},
+  "unmapped_master_repositories":sum(1 for m in MASTER if not transfer_recipe(m["repo"])),
   "seeds_with_measured_runs":sum(1 for s in seeds if s["performance"]["runs"]>0),
   "performance_threshold":{"min_runs":3,"min_inspections":10}
 }
 for s in seeds:
+    metrics["by_action"][s["work_action"]]=metrics["by_action"].get(s["work_action"],0)+1
     metrics["by_type"][s["seed_type"]]=metrics["by_type"].get(s["seed_type"],0)+1
 (INTEL/"seed_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
 
 lines=[
  "# SEARCH SEEDS","",
- "Generated search hypotheses from the current adaptive policy, capability gaps and MASTER positive-training DNA. These are ranked hypotheses, not commands.","",
+ "Generated work hypotheses from reviewed capability actions and anchored MASTER transfer recipes. Priority never turns a fixture, artifact verification or external dependency into a search.","",
  "Use a seed when it matches an authorized active gap. Record its seed_id in the V5 search-run record. Free exploration remains allowed and should use seed_mode free_exploration with an empty seed_ids list.","",
  "## Top ranked seeds","",
  "| Priority | Seed | Type | Strategy | Capability | Why now |",
@@ -392,7 +367,9 @@ lines += ["","## Seed packets",""]
 for s in seeds[:15]:
     lines += [
       f"### {s['seed_id']} — priority {s['priority']}",
-      f"- Type: {s['seed_type']}",
+      f"- Type/action: {s['seed_type']} / {s['work_action']}",
+      f"- Next action: {s.get('next_action') or '—'}",
+      f"- Query recipe: {s.get('query_recipe_id') or '—'}",
       f"- Strategy: {s['strategy_id']}",
       f"- Objective: {s['search_objective_id']}",
       f"- Capability/experiment: {', '.join(s['capability_ids']+s['experiment_ids']) or 'cross-domain exploration'}",
@@ -404,7 +381,7 @@ for s in seeds[:15]:
     for q in s["query_templates"]:
         lines.append("  - "+q)
     lines += [
-      f"- Search surfaces: {', '.join(s['search_surfaces'])}",
+      f"- Search surfaces: {', '.join(s['search_surfaces']) or 'not applicable to this action'}",
       f"- Verification gate: {s['verification_gate']}",
       f"- Stop conditions: {'; '.join(s['stop_conditions'])}",
       f"- Exclude domains: {', '.join(s['exclude_domains']) or 'none'}",

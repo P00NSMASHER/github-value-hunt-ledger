@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "canonical_json_hash_format": "UTF-8 JSON, sorted keys, ensure_ascii=false, compact comma/colon separators, no trailing newline",
+  "reconciliations": [
+    {
+      "search_run_id": "RUN:20260920T211939Z:hunter11:cpp-proof-authority",
+      "decision": "preserve_existing_canonical_archive_conflicting_submission",
+      "original_path": "intelligence/search_runs/20260920T211939Z-hunter11-cpp-proof-authority.json",
+      "archive_path": "intelligence/search_run_archive/20260920T211939Z-hunter11-cpp-proof-authority.json",
+      "archived_bytes_sha256": "201120a7ec5e71f2a6c21fa8f017f0541f360d6c7a9a30cc095c85d8e3ea5e29",
+      "canonical_record_sha256": "f5c6a4836650a58d8459315c52a1a5637a8304765cd91e9142a6029d6a86fd2c",
+      "canonical_ledger": "intelligence/search_runs.jsonl",
+      "reason": "The existing canonical V11 retrospective evidence-repair record preserves unknown counts as null and queries as empty. The legacy V12 submission conflicts with that record and has query-family/coverage metadata incompatible with current validation. Preserve the canonical reconstruction without adopting unverified prospective counts or changing any historical field.",
+      "canonical_evidence_paths": [
+        "hunters/15-run20-2026-09-20.md",
+        "referrals/hunt11-r20-2026-09-20-cap007-cpp-authority.md"
+      ],
+      "review_date": "2026-09-21",
+      "recovered_new_runs": 0
+    }
+  ]
+}

@@ -57,7 +57,9 @@ Independent verifier PASS is necessary but not sufficient.
 - MASTER always requires Integrator approval.
 
 ## Current experiment status
-The frozen A/B benchmark remains authoritative. Current checkpoint: 13 matched tasks, Control 24.31/25, Experiment 24.62/25, paired mean +0.31, median 0, wins/ties/losses 3/7/3, false promotions 0/0. Procedural learning transfer exists; architecture superiority is not established.
+The frozen A/B benchmark remains authoritative. [`benchmark/SCOREBOARD.md`](../benchmark/SCOREBOARD.md) is the source for current completion counts, matched scores, recall failures, effort limitations and the integrator's conclusion; do not maintain a second checkpoint here. Architecture superiority is not established merely by adding contracts or search skills. Benchmark workers must remain blind to gold, sibling results and scored candidate identities until their condition is frozen; the scoreboard is an operator/integrator source, not a discovery input.
+
+Operational workers use [`intelligence/WORKER_RUNBOOK.md`](../intelligence/WORKER_RUNBOOK.md) for current run and telemetry contracts. This architecture remains staged as described in [`STATUS.md`](STATUS.md); documentation and prototype tests do not establish deployed runtime enforcement. See the [2026-09-21 strategy upgrade](../intelligence/STRATEGY_UPGRADE_2026-09-21.md) for the current improvement scope.
 
 ## Production acceptance after frozen benchmark
 Before fleet cutover:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json,re
 from ti_common import INTEL, load_jsonl
+from ti_search_actions import action_errors, capability_recipe
 
 seeds=load_jsonl("search_seeds.jsonl")
 caps={x["capability_id"] for x in load_jsonl("capabilities.jsonl")}
@@ -29,8 +30,20 @@ for n,s in enumerate(seeds,1):
     for cid in s.get("capability_ids",[]):
         if cid not in caps:
             raise SystemExit(f"search_seeds.jsonl:{n}: unknown capability {cid}")
-    if not s.get("query_templates"):
+    if s.get("work_action","search")=="search" and not s.get("query_templates"):
         raise SystemExit(f"search_seeds.jsonl:{n}: no query templates")
+    errors=action_errors(s)
+    if errors: raise SystemExit(f"search_seeds.jsonl:{n}: {'; '.join(errors)}")
+    if s.get("seed_type")=="capability_gap" and "work_action" in s:
+        for cid in s.get("capability_ids") or []:
+            if s["work_action"]!=capability_recipe(cid)["work_action"]:
+                raise SystemExit(f"search_seeds.jsonl:{n}: action differs from reviewed capability recipe")
+    if s.get("seed_type") in {"coverage_gap","strategy_measurement"} and "work_action" in s:
+        parent=next((x for x in seeds if x["seed_id"]==s.get("parent_seed_id")),None)
+        if not parent or parent.get("work_action")!="search" or s["work_action"]!="search":
+            raise SystemExit(f"search_seeds.jsonl:{n}: derived discovery must inherit an authorized search parent")
+        if not set(parent.get("stop_conditions",[])).issubset(s.get("stop_conditions",[])):
+            raise SystemExit(f"search_seeds.jsonl:{n}: derived seed dropped parent STOP gates")
     if s.get("seed_type")=="coverage_gap":
         gids=s.get("coverage_gap_ids") or []
         if not gids: raise SystemExit(f"search_seeds.jsonl:{n}: coverage_gap seed missing coverage_gap_ids")

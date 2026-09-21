@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import json, re
 from collections import defaultdict
-from ti_common import ROOT, INTEL, load_jsonl
+from ti_common import ROOT, INTEL, load_jsonl, is_discovery_run
 
-runs=[r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective","benchmark"}]
+runs=[r for r in load_jsonl("search_runs.jsonl") if is_discovery_run(r)]
 strategies=[s for s in load_jsonl("search_strategies.jsonl") if s.get("status")=="active"]
 cfg=json.loads((INTEL/"strategy_evaluation_sets.json").read_text(encoding="utf-8"))
 measurement=json.loads((INTEL/"measurement_plan.json").read_text(encoding="utf-8")) if (INTEL/"measurement_plan.json").exists() else {"rows":[]}

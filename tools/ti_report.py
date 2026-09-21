@@ -2,9 +2,10 @@
 import json, math
 from collections import defaultdict
 from datetime import datetime
-from ti_common import INTEL, load_jsonl, normalize_run_time, slug
+from ti_common import INTEL, load_jsonl, normalize_run_time, slug, is_discovery_run
 
 runs = [r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective", "benchmark"}]
+discovery_runs = [r for r in runs if is_discovery_run(r)]
 outs = load_jsonl("outcomes.jsonl")
 strategies = {x["strategy_id"]: x for x in load_jsonl("search_strategies.jsonl")}
 aliases = json.loads((INTEL / "strategy_aliases.json").read_text(encoding="utf-8")) if (INTEL / "strategy_aliases.json").exists() else {}
@@ -72,6 +73,8 @@ def outcome_eligible(run):
     return bool(day and (reference_day - day).days >= OUTCOME_LAG_DAYS)
 
 def summarize(label, rs, attribution):
+    all_activity = rs
+    rs = [r for r in rs if is_discovery_run(r)]
     inspected = sum((r.get("deep_inspected") or 0) for r in rs)
     retained = sum((r.get("retained_count") or 0) for r in rs)
     promoted = sum((r.get("master_promoted_count") or 0) for r in rs)
@@ -80,7 +83,7 @@ def summarize(label, rs, attribution):
     search_bearing_runs = sum(1 for r in rs if (r.get("candidate_count") or 0) > 0 or (r.get("deep_inspected") or 0) > 0)
 
     outcome_objects = {}
-    for r in rs:
+    for r in all_activity:
         for o in out_by_run.get(r["search_run_id"], []):
             outcome_objects[o.get("outcome_id")] = o
     valid = [o for o in outcome_objects.values() if o.get("result") != "INVALID"]
@@ -121,9 +124,11 @@ query_rows.sort(key=lambda x: (-rank_score(x), x["label"]))
 
 lines = [
     "# LEARNING REPORT", "",
-    "Generated from prospective and benchmark search runs. Retrospective anecdotes are excluded from yield denominators. Multi-origin outcomes use fractional equal-touch value attribution.", "",
-    f"- Measured runs: **{len(runs)}**",
-    f"- Search-bearing runs: **{sum(1 for r in runs if (r.get('candidate_count') or 0) > 0 or (r.get('deep_inspected') or 0) > 0)}**",
+    "Generated from prospective and benchmark runs. Discovery denominators exclude explicit non-search or unclassified actions; historical records without an action retain their observational status. Retrospective anecdotes are excluded. Outcome attribution still includes all activity and uses fractional equal-touch credit.", "",
+    f"- Measured discovery runs: **{len(discovery_runs)}**",
+    f"- Other measured actions excluded from discovery denominators: **{len(runs) - len(discovery_runs)}**",
+    f"- Legacy discovery runs without action classification: **{sum('work_action' not in r for r in discovery_runs)}**",
+    f"- Search-bearing runs: **{sum(1 for r in discovery_runs if (r.get('candidate_count') or 0) > 0 or (r.get('deep_inspected') or 0) > 0)}**",
     f"- Structured outcomes: **{len(outs)}**",
     f"- Outcome-lag window: **{OUTCOME_LAG_DAYS} days**; recent runs are not counted as outcome failures.", "",
     "## Strategy performance", "",
