@@ -109,8 +109,9 @@ def run_rehearsal() -> dict:
                 carrier_id="carrier",
                 currency="USD",
                 authority_document_id="rate-confirmation",
-                source_document_sha256="a" * 64,
+                source_document_sha256=None,
                 verified_controlling_authority=True,
+                source_document_data=b"synthetic verified authority document",
             ),
             RuleCSVInput(
                 filename="candidate-addendum-rules.csv",
@@ -119,8 +120,9 @@ def run_rehearsal() -> dict:
                 carrier_id="carrier",
                 currency="USD",
                 authority_document_id="candidate-addendum",
-                source_document_sha256="b" * 64,
+                source_document_sha256=None,
                 verified_controlling_authority=False,
+                source_document_data=b"synthetic candidate authority document",
             ),
         ),
     )
@@ -289,11 +291,6 @@ def run_rehearsal() -> dict:
         "rerun_required": review_routing.rerun_required,
         "remediation_plan_hash": remediation_plan.plan_hash,
         "remediation_plan_item_count": len(remediation_plan.items),
-        "review_route": review_routing.route,
-        "review_routing_hash": review_routing.routing_hash,
-        "buyer_review_case_count": review_routing.buyer_review_case_count,
-        "evidence_remediation_case_count": review_routing.evidence_remediation_case_count,
-        "rerun_required": review_routing.rerun_required,
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
