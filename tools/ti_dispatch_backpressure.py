@@ -176,6 +176,10 @@ for bp in rows:
           "routing_generation_id":parent["routing_generation_id"],
           "worker_profile_generation_id":parent["worker_profile_generation_id"],
           "routing_learning_generation_id":parent.get("routing_learning_generation_id"),
+          "routing_exploration_generation_id":parent.get("routing_exploration_generation_id"),
+          "routing_exploration_pair_id":parent.get("routing_exploration_pair_id"),
+          "baseline_slot_id":parent.get("baseline_slot_id"),
+          "route_mode":parent.get("route_mode"),
           "slot_id":parent["slot_id"],
           "assignment_id":parent["assignment_id"],
           "allocator_generation_id":parent["allocator_generation_id"],
@@ -203,7 +207,7 @@ for bp in rows:
         t={
           **payload,
           "dispatch_ticket_id":did,
-          "ticket_schema_version":15,
+          "ticket_schema_version":19,
           "dispatch_generation_id":parent.get("dispatch_generation_id"),
           "claim_file":parent.get("claim_file"),
           "eligible_at":parent.get("hard_expire_at"),
@@ -218,7 +222,7 @@ for bp in rows:
         steal.append(t)
         claim_packets.append({
           **t,
-          "claim_schema_version":15,
+          "claim_schema_version":19,
           "routing_mode":"generated",
           "lease_minutes":int(EXEC_POL.get("default_lease_minutes",120))
         })
