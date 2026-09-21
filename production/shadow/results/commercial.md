@@ -1251,3 +1251,75 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** None. The existing commercial referral already targets the single-path crash/recovery/settlement intersection; this run sharpens its negative-control requirements without creating a new cross-lane question.
 
 **NEXT TEST:** Build or find a revision-bound refund test that kills the **refund executor** immediately after provider commit, restarts a genuinely new process after the provider replay window is no longer assumed, performs conclusive provider rediscovery from the durable pre-dispatch identity, causes no second POST and follows that same refund to independently grounded E5 outcome evidence.
+
+
+## 2026-09-21 — Shadow run 18
+
+**DATE:** 2026-09-21
+
+**HYPOTHESIS:** The missing tier-5C-B experiment may already exist in near-executable form, but its object names and proof boundary must be audited at the provider-rail level. A scenario called “payout” may actually stop at a platform-to-connected-account transfer and therefore cannot establish external settlement.
+
+**DISCOVERY METHODS:**
+1. Exact-intersection code search for `SIGKILL` plus Stripe refund/transfer/payout terminality and balance evidence.
+2. Scenario archaeology inside the strongest already-qualified crash repository: source, worker cutpoints, harness, frozen result artifact, offline tests and history.
+3. Provider-object contract verification against current Stripe Transfer, Payout, connected-account payout lifecycle and pagination documentation.
+4. Comparative source/schema inspection of the previously validated Flames-up real Stripe instant-payout path.
+
+**BEST NEW EXPERIMENT COMPONENT + EXACT REVISION:** `az-said/Interlock@822ec54692b30e1fdce04b55dfab62d0b56a60b2` — its existing `connect_payout` scenario, retained as an **INCOMPLETE experiment blueprint**, not a successful result.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- The scenario creates a $100 platform PaymentIntent, then intends to move $20 to a Custom connected account with `POST /v1/transfers`, `source_transaction=<charge>`, `transfer_group=<order>`, durable key `payout:<order>` and an Interlock effect identifier in transfer metadata.
+- The worker is a dedicated OS process. At the `after` cutpoint it calls Stripe first and then self-`SIGKILL`s before returning or recording completion; the harness then launches a genuinely new worker process.
+- Recovery can list Stripe transfers for the order/destination, adopt a matching metadata effect, re-read charge refund total and connected-account transfer capability, and produce a hash-chain receipt. The no-check and careful-handwritten arms use the same stable provider key; the latter also performs provider lookup and premise rereads.
+- The intended live matrix includes post-transfer crash/restart, pre-send crash followed by order reversal and pre-send crash followed by seller restriction. This is almost exactly the fault-boundary shape sought by prior runs.
+
+**FROZEN RESULT / TEST / HISTORY VERIFICATION:**
+- The checked-in live artifact is explicitly `status: BLOCKED`, generated 2026-09-13 22:22 UTC. Stripe rejected Express, Standard and Custom account creation because the test platform had not enabled Connect; the Accounts v2 recipient route also failed; the connected-account list was empty; `cells: []`.
+- The repository's result prose correctly says no system was compared and the live account/transfer/SIGKILL/ground-truth path did not run. It calls the offline outcomes predictions, not results.
+- Offline tests use an in-memory `FakeStripe` and replace the process-kill function with a `SimulatedCrash` exception. They validate the state-machine logic and predicted one-transfer result, but not literal OS death, real-provider behavior or connected-account settlement.
+- History independently records the scenario in commit `fe498692079d`; its message plainly says Stripe Connect was BLOCKED while seven other scenarios ran. The inspected repository is public, MIT, 1 star / 1 fork. The exact revision has no attached combined-status checks.
+
+**CRITICAL PROVIDER-RAIL FALSIFICATION:**
+- Despite the scenario name and variables, it never calls `POST /v1/payouts`. It creates and counts Stripe `Transfer` objects. Stripe's current API defines a Transfer as movement **between Stripe accounts** under Connect; the historical bank/card behavior was split into the distinct Payout object.
+- Its `paid_out()` predicate means “amount remaining in non-reversed transfers to the seller's connected Stripe account.” That is provider-accounting application / connected-balance funding, not cash arrival at a bank or debit card.
+- Stripe currently defines a Payout as movement to a connected account's external bank account or debit card. Connected-account guidance says `pending` means funds have not left Stripe, `in_transit` means submitted to the bank and `paid` means arrival at the external account; it also exposes `payout.paid` and `payout.failed`.
+- The Payout API reference adds an important caveat: `payout.paid` represents expected destination availability and a later `payout.failed` can still occur. Provider `paid` is therefore strong terminality evidence but still not automatically independent bank/recipient evidence.
+- The live design's provider rediscovery is also not yet conclusive. It requests `GET /transfers?transfer_group=...&destination=...&limit=100`, reads only `data`, and ignores `has_more` / cursor pagination. Current Stripe transfer-list documentation explicitly supports pages of at most 100 with `starting_after`. A complete no-match cannot be claimed if the response is truncated.
+
+**COMPARATOR — ACTUAL PAYOUT HOP:**
+- `karfalacisse900-alt/Flames-up.com@2ba5fa878da26f405bfae1846c8c90f1d0e69c10` supplies the missing object semantics, not crash safety. Its real Stripe test-mode flow reconciles an instant-available connected balance, creates an instant payout, waits for the application payout to become `paid`, verifies the destination debit-card last four digits, and requires a processed signed `payout.paid` webhook.
+- Its schema separately persists `provider_account_id`, external `card_` identity, request key, amount/fee/net amount, status and unique `provider_payout_id`. That is correctly modeled as a Payout hop.
+- Its `SIGKILL` occurs only during final harness teardown after the scenario has completed. It therefore contributes terminal payout evidence but no payout effect-boundary crash/restart proof.
+
+**SPECIALIST PASSES:**
+- **DISCOVERY ANALYST:** searched the exact crash + settlement intersection and selected the already-near-executable scenario instead of adding another generic framework.
+- **CODE INSPECTOR:** traced provider endpoints, process cutpoints, idempotency identity, lookup scope and ground-truth calculation.
+- **TEST/RESULT/HISTORY INSPECTOR:** verified `BLOCKED`, empty live cells, simulated offline crash and the candid introducing commit.
+- **PROVIDER-CONTRACT ANALYST:** separated Transfer from Payout and verified both list/pagination and connected-account payout lifecycle semantics.
+- **COMMERCIAL ANALYST:** converted the object mismatch into a settlement-chain qualification product rather than overstating a blocked scenario.
+- **RED-TEAM / VERIFIER:** independently attacked execution status, rail semantics, lookup completeness, late failure and external-world evidence before scoring.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **INCOMPLETE.** The exact revision contains a strong, genuinely OS-process-oriented blueprint for crash-safe Stripe Connect **transfer** recovery. It has no executed live cells, its offline crash is simulated, its transfer lookup is not demonstrably exhaustive, and it never exercises a Stripe Payout. Calling it crash-safe external seller payout or tier-5C-B settlement would be contradicted by its frozen artifact and provider object type. Evidence that would change the verdict: a Connect-enabled exact-revision run; structurally complete cursor pagination for transfer rediscovery; a separately identified Payout hop with post-effect OS death and new-process recovery; exact no-duplicate payout readback; `paid` plus absence of later failure; and independently grounded bank/card/recipient evidence if E5 is claimed.
+
+**A-F SCORE (proposed only, after verifier):** **25/30 — A4 / B5 / C5 / D4 / E3 / F4.**
+- A4: a transfer/payout qualification engagement is safe and sellable in provider test mode.
+- B5: duplicate seller transfers or payouts and falsely claimed settlement are direct-money risks.
+- C5: the blueprint combines durable identity, real process boundaries, native provider grouping, premise rereads and receipts.
+- D4: implementation is reusable, though a careful handwritten check is a credible commodity alternative.
+- E3: source/tests/history are unusually candid, but the frozen live result is BLOCKED and the settlement hop is absent.
+- F4: MIT rights are clear; operational authority still requires a customer-controlled Connect-enabled test account and external payout destination.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: marketplace payments lead, Controller/finance-systems owner or platform reliability team operating seller payouts.
+- Pain: teams often call a connected-account transfer “seller paid” even though funds have only moved between Stripe ledgers; crash safety at that hop says nothing about duplicate bank/card payouts at the next hop.
+- First paid wedge: **Settlement-Chain Qualification**. Model one business settlement intent with distinct rail-specific effects: `transfer_effect_id` for platform→connected balance and `payout_effect_id` for connected balance→external destination. Inject effect/commit crashes at each POST, recover each effect by conclusive provider lookup, prove one object per hop, bind the causal join, and report evidence separately as `CONNECTED_BALANCE_FUNDED`, `PAYOUT_PENDING`, `PAYOUT_IN_TRANSIT`, `PAYOUT_PAID_PROVIDER_ATTESTED` and `EXTERNAL_RECEIPT_VERIFIED`.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** Interlock already supplies the process-death and durable-recovery machinery; its blocked Connect scenario nearly supplies the first settlement hop. Flames-up supplies a real terminal Payout hop and production-shaped payout schema but no effect-boundary crash. Run 16 supplies conclusive-pagination discipline. The correct integration is not to pretend these are one effect: preserve one parent settlement intent with two independently crash-qualified child effects and explicit evidence at each boundary.
+
+**SEARCH EFFORT / COST PROXIES:** Four materially different discovery/verification modes; two serious candidates deep-inspected; exact source, tests, frozen result, history, schema, repository metadata, commit status and current provider documentation checked; no untrusted code execution, provider writes, credentials, account enrollment, contacts, spend or commitments.
+
+**LOCAL LESSON:** Add a lane-local **money-rail semantic identity / settlement-chain decomposition check** to `SK-COM-003`. Name the provider object and accounts on both sides of every hop. A `tr_` Transfer proves platform→connected-account movement; a `po_` Payout addresses connected-account→external-destination movement. Each hop needs its own durable idempotency/effect identity, crash cutpoint, conclusive readback and terminality evidence, joined under a parent business-settlement identity. Never let safety or terminality at one hop leak into claims about another.
+
+**REFERRALS:** None. The existing commercial referral already asks for the single-path crash/recovery/settlement intersection. This run makes the required multi-hop evidence model precise and avoids duplicating that referral.
+
+**NEXT TEST:** Run a two-hop Stripe test-mode settlement fixture in a Connect-enabled account: crash and recover the transfer executor with exhaustive transfer lookup; then crash and recover the payout executor with exhaustive payout lookup; require exactly one `tr_` and one causally linked `po_`, wait through `payout.paid` and a late-failure observation window, and attach independent external-destination evidence before claiming E5.
