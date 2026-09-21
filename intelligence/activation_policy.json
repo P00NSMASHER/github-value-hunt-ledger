@@ -13,7 +13,8 @@
     "CLAIM:13a920204800",
     "CLAIM:c4a920201835",
     "CLAIM:112026092021",
-    "CLAIM:11b920202728"
+    "CLAIM:11b920202728",
+    "CLAIM:2668c9456429"
   ],
   "guardrails": [
     "An activation is an offer to claim, never an automatic claim.",
@@ -22,6 +23,7 @@
     "One worker receives at most one current activation.",
     "One slot receives at most one current activation.",
     "Manual overrides remain explicit and do not require activation.",
-    "Unknown or stale presence is not interpreted as worker failure."
+    "Unknown or stale presence is not interpreted as worker failure.",
+    "Pre-V16 claims are grandfathered only by explicit claim ID; V14/V15 dispatch validation still applies to them."
   ]
 }
