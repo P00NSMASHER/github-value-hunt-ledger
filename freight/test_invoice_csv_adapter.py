@@ -61,7 +61,7 @@ def test_file_change_changes_row_proof_and_adapter_hash():
     assert a.adapter_hash != b.adapter_hash
 
 
-@pytest.mark.parametrize("bad", ["10.0", "1,000", "+10", "-1", " 10 "])
+@pytest.mark.parametrize("bad", ["10.0", "1,000", "+10", "-1"])
 def test_billed_cents_must_be_exact_unsigned_integer_text(bad):
     quoted = f'"{bad}"' if "," in bad else bad
     with pytest.raises(ValueError, match="billed_cents"):
@@ -130,3 +130,13 @@ def test_header_order_may_vary_but_header_set_must_be_exact():
         buyer_id="b", business_unit="u",
     )
     assert batch.charges[0].charge_id == "X"
+
+
+def test_numeric_fields_trim_surrounding_export_whitespace():
+    batch = parse_invoice_charge_csv(
+        filename="charges.csv",
+        data=csv_bytes("I,S,C,K,USD,X,FUEL,2026-09-10, 1 , 100 \n"),
+        buyer_id="b", business_unit="u",
+    )
+    assert batch.charges[0].quantity_units == 1
+    assert batch.charges[0].billed_cents == 100
