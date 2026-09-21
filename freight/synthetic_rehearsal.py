@@ -258,6 +258,8 @@ def run_rehearsal() -> dict:
         resolution=engagement_resolution,
         operative_charter=operative_charter,
         truth=truth,
+        review_packet=review_packet,
+        review_routing=review_routing,
         buyer_review=buyer_review,
         recovery_claims=recovery_claims,
         proposal=action_proposal,
