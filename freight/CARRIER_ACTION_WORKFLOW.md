@@ -53,3 +53,8 @@ It still does not authorize:
 - automatic execution.
 
 No message is sent by this workflow.
+
+
+## Canonical payload handoff
+
+After a proposal is selected, `carrier_action_payload.py` derives the exact carrier-facing subject/body and payload hash from the proposal and recovery claims. Separate buyer approval must bind that exact payload hash before the authorization wrapper accepts it. The payload remains a preview and is never sent by this workflow.
