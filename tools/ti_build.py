@@ -19,6 +19,7 @@ STEPS = (
     ['tools/ti_graph.py'],
     ['tools/ti_quality.py'],
     ['tools/ti_candidate_learning.py'],
+    ['tools/ti_coordination_report.py'],
     ['tools/ti_attribution.py'],
     ['tools/ti_objectives.py'],
     ['tools/ti_report.py'],
