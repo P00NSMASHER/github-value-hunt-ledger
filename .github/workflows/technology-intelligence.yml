@@ -205,7 +205,9 @@ jobs:
                   intelligence/routing_exploration_decision.json \
                   intelligence/routing_exploration_history.jsonl \
                   intelligence/routing_exploration_metrics.json \
-                  intelligence/ROUTING_EXPLORATION.md
+                  intelligence/ROUTING_EXPLORATION.md \
+                  intelligence/routing_exploration_provenance_metrics.json \
+                  intelligence/ROUTING_EXPLORATION_PROVENANCE.md
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
