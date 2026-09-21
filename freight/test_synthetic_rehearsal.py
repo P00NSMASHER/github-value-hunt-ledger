@@ -48,6 +48,9 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert len(out["counter_csv_adapter_hash"]) == 64
     assert len(out["counter_csv_file_sha256"]) == 64
     assert out["counter_event_count"] == 1
+    assert len(out["reviewed_settlement_allocation_decision_hash"]) == 64
+    assert len(out["reviewed_settlement_allocation_receipt_hash"]) == 64
+    assert out["reviewed_settlement_allocation_status"] == "ALLOCATED"
     assert "Reviewer Work Packet" in out["review_packet_markdown"]
     assert "not realized savings" in out["review_packet_markdown"]
     assert out["verified_rule_adapter_hash"]
