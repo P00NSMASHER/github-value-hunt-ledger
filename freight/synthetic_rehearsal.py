@@ -19,14 +19,15 @@ from freight.contracts import (
 from freight.finding_factory import (
     FIXED,
     ChargeRule,
-    InvoiceCharge,
     derive_batch,
 )
+from freight.invoice_csv_adapter import parse_invoice_charge_csv
 from freight.deal_economics import DealProfile, qualify_deal
 from freight.pilot_reporting import (
-    FindingReview,
     ReviewDisposition,
+    make_finding_review,
 )
+from freight.review_queue import build_review_queue
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_report import (
     ClaimFindingBinding,
@@ -94,14 +95,20 @@ def run_rehearsal() -> dict:
             PopulationRow("inv-3","shp-3","cust","carrier","USD","src-inv-3"),
         ),
     )
-    charges = (
-        InvoiceCharge(BUYER,BU,"inv-1","shp-1","cust","carrier","USD",
-                      "charge-1","DETENTION","2026-09-15",1,12500,"src-line-1"),
-        InvoiceCharge(BUYER,BU,"inv-2","shp-2","cust","carrier","USD",
-                      "charge-2","ACCESSORIAL","2026-09-15",1,12500,"src-line-2"),
-        InvoiceCharge(BUYER,BU,"inv-3","shp-3","cust","carrier","USD",
-                      "charge-3","MISC","2026-09-15",1,15000,"src-line-3"),
+    invoice_csv = (
+        "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,"
+        "charge_code,service_date,quantity_units,billed_cents\n"
+        "inv-1,shp-1,cust,carrier,USD,charge-1,DETENTION,2026-09-15,1,12500\n"
+        "inv-2,shp-2,cust,carrier,USD,charge-2,ACCESSORIAL,2026-09-15,1,12500\n"
+        "inv-3,shp-3,cust,carrier,USD,charge-3,MISC,2026-09-15,1,15000\n"
+    ).encode("utf-8")
+    invoice_batch = parse_invoice_charge_csv(
+        filename="synthetic-freight-charges.csv",
+        data=invoice_csv,
+        buyer_id=BUYER,
+        business_unit=BU,
     )
+    charges = invoice_batch.charges
     rules = (
         ChargeRule(BUYER,BU,"cust","carrier","USD","rate-confirmation",
                    "DETENTION",FIXED,"2026-09-01","2026-09-30","src-auth-1",True,10000,None),
@@ -111,6 +118,7 @@ def run_rehearsal() -> dict:
                    "MISC",FIXED,"2026-09-01","2026-09-30","src-auth-review",False,10000,None),
     )
     factory = derive_batch(population, charges, rules)
+    review_queue = build_review_queue(factory)
     truth = factory.truth
     by_charge = {
         derivation.charge_id: derivation.finding
@@ -127,9 +135,24 @@ def run_rehearsal() -> dict:
     )
 
     reviews = (
-        FindingReview(f1.finding_id,ReviewDisposition.CONFIRMED,20),
-        FindingReview(f2.finding_id,ReviewDisposition.CONFIRMED,10),
-        FindingReview(f3.finding_id,ReviewDisposition.UNRESOLVED,5),
+        make_finding_review(
+            f1, ReviewDisposition.CONFIRMED,
+            reviewer_role="Buyer Controller",
+            reviewed_at="2026-09-20T09:00:00-04:00",
+            reviewer_minutes=20,
+        ),
+        make_finding_review(
+            f2, ReviewDisposition.CONFIRMED,
+            reviewer_role="Buyer Controller",
+            reviewed_at="2026-09-20T09:10:00-04:00",
+            reviewer_minutes=10,
+        ),
+        make_finding_review(
+            f3, ReviewDisposition.UNRESOLVED,
+            reviewer_role="Buyer Controller",
+            reviewed_at="2026-09-20T09:20:00-04:00",
+            reviewer_minutes=5,
+        ),
     )
     findings = {finding.finding_id: finding for finding in truth.findings}
     bindings = tuple(
@@ -217,8 +240,20 @@ def run_rehearsal() -> dict:
         "population_hash": population.manifest_hash,
         "incumbent_submission_hash": sealed.sealed_hash,
         "truth_hash": truth.truth_hash,
+        "invoice_csv_adapter_hash": invoice_batch.adapter_hash,
+        "invoice_csv_file_sha256": invoice_batch.file_sha256,
         "finding_factory_hash": factory.factory_hash,
         "finding_factory_decisions": [item.decision for item in factory.derivations],
+        "review_queue_hash": review_queue.queue_hash,
+        "review_queue": [
+            {
+                "charge_id": item.charge_id,
+                "priority_class": item.priority_class,
+                "decision": item.decision,
+            }
+            for item in review_queue.items
+        ],
+        "buyer_review_hashes": [review.review_hash for review in reviews],
         "incumbent_output_hash": incumbent.output_hash,
         "metrics": asdict(metrics),
         "persistent_store": {
