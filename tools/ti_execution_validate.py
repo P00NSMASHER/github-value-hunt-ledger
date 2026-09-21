@@ -12,6 +12,7 @@ activation_policy=json.loads((INTEL/"activation_policy.json").read_text(encoding
 activation_history=load_jsonl("activation_history.jsonl") if (INTEL/"activation_history.jsonl").exists() else []
 activation_by_id={x.get("activation_id"):x for x in activation_history if x.get("activation_id")}
 min_v16_claim_schema=int(activation_policy.get("minimum_claim_schema_version",16))
+activation_legacy_claim_ids=set(activation_policy.get("legacy_claim_ids") or [])
 legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
 min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
 min_v15_claim_schema=int(dispatch_policy.get("minimum_v15_claim_schema_version",15))
@@ -53,7 +54,8 @@ for n,c in enumerate(claims,1):
     claim_by_id[cid]=c
     claim_schema=int(c.get("claim_schema_version") or 0)
     if cid not in legacy_claim_ids:
-        if activation_policy and claim_schema<min_v16_claim_schema:
+        is_pre_v16_claim=cid in activation_legacy_claim_ids
+        if activation_policy and not is_pre_v16_claim and claim_schema<min_v16_claim_schema:
             raise SystemExit(f"execution_claim_history.jsonl:{n}: non-legacy claim below V16 schema")
         if claim_schema<min_claim_schema:
             raise SystemExit(f"execution_claim_history.jsonl:{n}: non-legacy claim below V14 schema")
@@ -87,7 +89,7 @@ for n,c in enumerate(claims,1):
                     raise SystemExit(f"execution_claim_history.jsonl:{n}: claim before dispatch eligibility")
                 if claimed and hard and claimed>hard:
                     raise SystemExit(f"execution_claim_history.jsonl:{n}: claim after dispatch hard expiry")
-            if activation_policy and claim_schema>=min_v16_claim_schema:
+            if activation_policy and not is_pre_v16_claim and claim_schema>=min_v16_claim_schema:
                 aid=c.get("activation_id")
                 act=activation_by_id.get(aid)
                 if not act:
