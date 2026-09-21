@@ -1,15 +1,15 @@
 {
-  "unknown_revision_observations": 88,
-  "unique_repositories_with_unknown_revision": 88,
+  "unknown_revision_observations": 90,
+  "unique_repositories_with_unknown_revision": 90,
   "status_counts": {
     "unknown": 33,
-    "rejected": 18,
+    "watch": 15,
+    "rejected": 19,
     "strong": 20,
-    "quarantined": 3,
-    "watch": 14
+    "quarantined": 3
   },
   "source_state_counts": {
-    "current": 88
+    "current": 90
   },
   "master_catalog_gaps": [
     {
@@ -260,6 +260,14 @@
       "source_state": "current",
       "status_bucket": "watch",
       "status": "watch**.",
+      "priority_score": 8
+    },
+    {
+      "repository": "navariltd/navari_csf_ke",
+      "source_catalog": "hunters/01-run22-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "watch",
+      "status": "WATCH**",
       "priority_score": 8
     },
     {
@@ -684,6 +692,14 @@
       "source_state": "current",
       "status_bucket": "rejected",
       "status": "rejected / deprioritized**.",
+      "priority_score": 5
+    },
+    {
+      "repository": "lumyntechnologies-oss/Lumyn-Payroll",
+      "source_catalog": "hunters/01-run22-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "rejected",
+      "status": "REJECT for authority; retain as negative control**",
       "priority_score": 5
     },
     {

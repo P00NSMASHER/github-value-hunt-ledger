@@ -2,8 +2,8 @@
 
 Pinned revisions are essential for reproducible technical intelligence. This report prioritizes records whose repository identity is known but whose inspected revision is not recoverable from the hunter catalog.
 
-- Unknown-revision observations: **88**
-- Unique repositories with unknown revision: **88**
+- Unknown-revision observations: **90**
+- Unique repositories with unknown revision: **90**
 - Current MASTER promotions without matching exact hunter-catalog observation: **2**
 
 ## Unknown revision mix
@@ -12,8 +12,8 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 |---|---:|
 | unknown | 33 |
 | strong | 20 |
-| rejected | 18 |
-| watch | 14 |
+| rejected | 19 |
+| watch | 15 |
 | quarantined | 3 |
 
 ## Highest-priority records to resolve
@@ -50,6 +50,7 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | f0rw4rd/profinet-py | hunters/12.md | current | watch | 8 |
 | imdtouch/EthernetIP-Simulator | hunters/12.md | current | watch | 8 |
 | libremfg/PackML-MQTT-Simulator | hunters/12.md | current | watch | 8 |
+| navariltd/navari_csf_ke | hunters/01-run22-2026-09-20.md | current | watch | 8 |
 | optim-enterprises-bv/ac-client | hunters/35.md | current | watch | 8 |
 | pasrom/profinet-rs | hunters/12.md | current | watch | 8 |
 | shensi8312/secsgem-driver | hunters/12.md | current | watch | 8 |
@@ -69,7 +70,6 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | OCA/field-service | hunters/37.md | current | unknown | 7 |
 | Practitionist/familiarise_web | hunters/01-run17-2026-09-20.md | current | unknown | 7 |
 | Raunak-Sarmacharya/LocalCooksCommunity | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
-| Tests/history | hunters/04-run12-2026-09-20.md | current | unknown | 7 |
 
 ## MASTER catalog provenance gaps
 
