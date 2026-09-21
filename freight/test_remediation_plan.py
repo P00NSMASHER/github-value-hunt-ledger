@@ -1,5 +1,3 @@
-from dataclasses import replace
-
 import pytest
 
 from freight.audit_workflow import RuleCSVInput, run_audit_workflow
