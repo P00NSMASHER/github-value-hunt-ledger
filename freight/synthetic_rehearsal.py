@@ -26,7 +26,6 @@ from freight.recovery_claim_workflow import build_recovery_claim_batch
 from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
 from freight.settlement_report import (
-    ClaimFindingBinding,
     assert_report_current,
     build_persistent_pilot_report,
     render_persistent_markdown,
@@ -35,7 +34,6 @@ from freight.settlement_store import (
     ALLOCATED,
     REVERSED,
     CounterEventRecord,
-    RecoveryClaim,
     SettlementEventRecord,
     SettlementStore,
 )
