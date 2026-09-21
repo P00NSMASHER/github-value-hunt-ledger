@@ -29,6 +29,7 @@ DOC_PATHS=(
     "freight/BUSINESS_MODEL.md",
     "freight/COMMERCIAL_QUALIFICATION.md",
     "freight/COMMERCIAL_LEARNING.md",
+    "freight/COUNTER_REVIEW_WORKFLOW.md",
     "freight/DATA_READINESS_DIAGNOSTIC.md",
     "freight/PILOT_PROTOCOL.md",
     "freight/PILOT_LAUNCH_GATE.md",
