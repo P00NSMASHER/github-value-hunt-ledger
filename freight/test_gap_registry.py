@@ -37,3 +37,14 @@ def test_search_allowed_requires_active_search_status():
     }
     errors = validate_register(register)
     assert any("search_allowed requires ACTIVE_SEARCH" in error for error in errors)
+
+
+def test_frt_sec_001_records_internal_evidence_without_claiming_closure():
+    path = Path(__file__).with_name("GAP_REGISTER.json")
+    register = load_register(path)
+    gap = next(item for item in register["gaps"] if item["gap_id"] == "FRT-SEC-001")
+    assert gap["status"] == "ACTIVE_INTERNAL"
+    assert "freight/tenant_isolation_rehearsal.py" in gap["internal_evidence"]
+    assert "freight/TENANT_ISOLATION_EVIDENCE.md" in gap["internal_evidence"]
+    assert len(gap["remaining_evidence"]) == 3
+    assert "not deployed multi-tenant proof" in gap["internal_evidence_scope"].lower()
