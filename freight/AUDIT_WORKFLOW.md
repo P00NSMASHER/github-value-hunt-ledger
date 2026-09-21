@@ -11,7 +11,8 @@ It performs, in order:
 5. deterministic human-review queue;
 6. deterministic reviewer work packet;
 7. deterministic buyer-review vs evidence-remediation routing;
-8. canonical audit-run manifest.
+8. deterministic evidence-remediation plan;
+9. canonical audit-run manifest.
 
 ## States
 
@@ -45,12 +46,13 @@ Blocked results identify the stage and a stable error code:
 - `REVIEW_QUEUE_FAILED`
 - `REVIEW_PACKET_FAILED`
 - `REVIEW_ROUTING_FAILED`
+- `REMEDIATION_PLAN_FAILED`
 - `RUN_MANIFEST_FAILED`
 
 Programming exceptions outside expected validation failures are intentionally not converted into successful workflow results.
 
 ## Output boundary
 
-Successful results contain the full in-memory audit artifacts for use inside the approved customer-processing environment plus a minimized summary containing counts, state, discrepancies, the canonical audit-run hash, review route, buyer-review-ready count, remediation count, rerun requirement, and routing hash.
+Successful results contain the full in-memory audit artifacts for use inside the approved customer-processing environment plus a minimized summary containing counts, state, discrepancies, the canonical audit-run hash, review route, buyer-review-ready count, remediation count, rerun requirement, routing hash, and remediation-plan hash. Remediation cases are accompanied by proof-bound evidence requirements and explicit rerun actions.
 
 The workflow does **not** perform buyer confirmation, contact a carrier, submit a dispute, accept a settlement, or claim a discrepancy is realized savings. Those remain separately authorized downstream transitions.
