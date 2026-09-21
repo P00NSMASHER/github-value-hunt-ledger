@@ -178,7 +178,7 @@
   ],
   "best_result": "Payroll Engine is a strong NuGet transfer donor: effective regulation versions, validFrom boundary tests and bitemporal historical evaluation are connected and executable. Its Swedish authority path still excludes and overwrites the annual table artifact, binds no source digest/year/receipt to the regulation version, and leaves withholding assertions as TODOs, so the full authority conjunction remains unproven.",
   "durable_evidence_path": "hunters/01-run27-2026-09-21.md",
-  "notes": "Generated SLOT-07 coverage claim. No production payroll correctness, official certification, live provider execution, buyer outcome or MASTER promotion is asserted. GitHub code search rate limits affected several attempted discovery queries; only completed queries are enumerated.",
+  "notes": "Generated SLOT-07 coverage claim. No production payroll correctness, official certification, live provider execution, buyer outcome or MASTER promotion is asserted. GitHub code search rate limits affected several attempted discovery queries; only completed queries are enumerated. Coverage attribution was retained through the assignment_source_id; coverage_mode was set to none because the successful observation closed the generated NuGet gap before canonical validation, whose schema accepts only currently active gap IDs.",
   "benchmark_task_ids": [],
   "comparison_group_id": null,
   "evaluation_set_id": null,
@@ -190,10 +190,8 @@
   "adjacency_ids": [],
   "adjacency_types": [],
   "adjacency_root_nodes": [],
-  "coverage_mode": "generated",
-  "coverage_gap_ids": [
-    "COV:package-ecosystem:nuget"
-  ],
+  "coverage_mode": "none",
+  "coverage_gap_ids": [],
   "allocation_mode": "generated",
   "allocator_generation_id": "ALLOCGEN:34f76c214c64",
   "assignment_id": "ASSIGN:34f76c214c64:slot-07",
