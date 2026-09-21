@@ -1,1 +1,2 @@
 {"event_id":"PRESENCE:3afd7e2c2cfd","event_type":"READY","timestamp":"2026-09-21T04:05:43.055Z","worker_id":"HUNTER-05","ttl_minutes":70,"notes":"Pair 3 benchmark complete; available for current validated assignment."}
+{"event_id":"PRESENCE:6f5a2c91d804","event_type":"READY","timestamp":"2026-09-21T06:05:55Z","worker_id":"HUNTER-05","ttl_minutes":70,"notes":"Pair 3 benchmark complete; ready for current validated Gov Evidence assignment."}
