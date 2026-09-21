@@ -284,3 +284,37 @@ def test_input_amounts_require_exact_integer_cents(tmp_path, operation, amount):
 def test_claim_fee_disqualification_requires_a_boolean(tmp_path, flag):
     with pytest.raises(ValueError, match="fee_disqualified must be a boolean"):
         S(tmp_path).create_claim(C(disq=flag))
+
+
+def test_atomic_claim_batch_inserts_all_and_replays_idempotently(tmp_path):
+    s=S(tmp_path)
+    claims=(C("c1","I1",10000), C("c2","I2",20000))
+    assert s.create_claims(claims)==(True,True)
+    assert s.count("recovery_claims")==2
+    assert s.create_claims(claims)==(False,False)
+    assert s.count("recovery_claims")==2
+
+
+def test_atomic_claim_batch_rolls_back_earlier_insert_when_later_claim_conflicts(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C("c2","I2",9999))
+    before=s.count("recovery_claims")
+    with pytest.raises(ValueError,match="replay conflicts"):
+        s.create_claims((C("c1","I1",10000),C("c2","I2",20000)))
+    assert s.count("recovery_claims")==before
+    with pytest.raises(ValueError,match="unknown recovery claim"):
+        s.claim_residual("c1")
+
+
+def test_atomic_claim_batch_rejects_duplicate_claim_or_source_before_writing(tmp_path):
+    s=S(tmp_path)
+    with pytest.raises(ValueError,match="duplicate claim_id"):
+        s.create_claims((C("c1","I1",10000),C("c1","I2",20000)))
+    assert s.count("recovery_claims")==0
+
+    a=C("a","I1",10000)
+    b=RecoveryClaim("b","I2","carrier","buyer","USD",20000,
+                    "2026-09-01T10:00:00Z",a.source_hash,False)
+    with pytest.raises(ValueError,match="duplicate source_hash"):
+        s.create_claims((a,b))
+    assert s.count("recovery_claims")==0
