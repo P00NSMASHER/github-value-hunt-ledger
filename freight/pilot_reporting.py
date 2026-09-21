@@ -1,11 +1,13 @@
 """Pilot reporting derived from frozen Freight Recovery proof objects."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from enum import Enum
+import re
 from typing import Protocol
 
-from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, VALIDATED
+from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, VALIDATED, canonical_hash
 
 
 class RecoveryCertificateSource(Protocol):
@@ -23,17 +25,109 @@ class ReviewDisposition(str, Enum):
     UNRESOLVED = "UNRESOLVED"
 
 
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
 @dataclass(frozen=True)
 class FindingReview:
     finding_id: str
     disposition: ReviewDisposition
     reviewer_minutes: int = 0
+    finding_proof_hash: str | None = None
+    reviewer_role: str | None = None
+    reviewed_at: str | None = None
+    review_hash: str | None = field(init=False, default=None)
 
     def __post_init__(self):
         if not isinstance(self.disposition, ReviewDisposition):
             raise ValueError("disposition must be a ReviewDisposition")
         if type(self.reviewer_minutes) is not int or self.reviewer_minutes < 0:
             raise ValueError("reviewer_minutes must be a non-negative integer")
+        proof_fields = (self.finding_proof_hash, self.reviewer_role, self.reviewed_at)
+        if all(value is None for value in proof_fields):
+            return
+        if any(value is None for value in proof_fields):
+            raise ValueError("proof-bound review requires finding_proof_hash, reviewer_role and reviewed_at")
+        assert self.finding_proof_hash is not None
+        assert self.reviewer_role is not None
+        assert self.reviewed_at is not None
+        if not SHA256_RE.fullmatch(self.finding_proof_hash):
+            raise ValueError("finding_proof_hash must be lowercase SHA-256")
+        role = self.reviewer_role.strip()
+        if not role:
+            raise ValueError("reviewer_role is required")
+        timestamp = self.reviewed_at.strip()
+        normalized = timestamp[:-1] + "+00:00" if timestamp.endswith("Z") else timestamp
+        try:
+            parsed = datetime.fromisoformat(normalized)
+        except ValueError as exc:
+            raise ValueError("reviewed_at must be timezone-aware ISO-8601") from exc
+        if parsed.tzinfo is None or parsed.utcoffset() is None:
+            raise ValueError("reviewed_at must be timezone-aware ISO-8601")
+        canonical_time = (
+            parsed.astimezone(timezone.utc)
+            .isoformat(timespec="microseconds")
+            .replace("+00:00", "Z")
+        )
+        object.__setattr__(self, "reviewer_role", role)
+        object.__setattr__(self, "reviewed_at", canonical_time)
+        body = {
+            "schema": 1,
+            "finding_id": self.finding_id,
+            "finding_proof_hash": self.finding_proof_hash,
+            "disposition": self.disposition.value,
+            "reviewer_minutes": self.reviewer_minutes,
+            "reviewer_role": role,
+            "reviewed_at": canonical_time,
+        }
+        object.__setattr__(self, "review_hash", canonical_hash(body))
+
+
+def make_finding_review(
+    finding,
+    disposition: ReviewDisposition,
+    *,
+    reviewer_role: str,
+    reviewed_at: str,
+    reviewer_minutes: int = 0,
+) -> FindingReview:
+    return FindingReview(
+        finding_id=finding.finding_id,
+        disposition=disposition,
+        reviewer_minutes=reviewer_minutes,
+        finding_proof_hash=finding.proof_hash,
+        reviewer_role=reviewer_role,
+        reviewed_at=reviewed_at,
+    )
+
+
+def verify_finding_review(
+    review: FindingReview,
+    finding,
+    *,
+    require_bound: bool = False,
+) -> None:
+    if review.finding_id != finding.finding_id:
+        raise ValueError("review finding_id mismatch")
+    if review.review_hash is None:
+        if require_bound:
+            raise ValueError("proof-bound finding review is required")
+        return
+    if review.finding_proof_hash != finding.proof_hash:
+        raise ValueError("finding review proof hash does not match current finding")
+    if review.reviewer_role is None or review.reviewed_at is None:
+        raise ValueError("proof-bound finding review metadata is incomplete")
+    body = {
+        "schema": 1,
+        "finding_id": review.finding_id,
+        "finding_proof_hash": review.finding_proof_hash,
+        "disposition": review.disposition.value,
+        "reviewer_minutes": review.reviewer_minutes,
+        "reviewer_role": review.reviewer_role,
+        "reviewed_at": review.reviewed_at,
+    }
+    if canonical_hash(body) != review.review_hash:
+        raise ValueError("finding review hash mismatch")
 
 
 @dataclass(frozen=True)
@@ -97,6 +191,7 @@ def build_pilot_metrics(
             raise ValueError("review references unknown finding: " + review.finding_id)
         if review.finding_id in review_index:
             raise ValueError("duplicate review: " + review.finding_id)
+        verify_finding_review(review, findings[review.finding_id], require_bound=False)
         review_index[review.finding_id] = review
 
     reviewed_discrepancy = sum(_positive_variance(f) for f in findings.values())
