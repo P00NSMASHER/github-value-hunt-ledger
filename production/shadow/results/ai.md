@@ -790,3 +790,100 @@ SEARCH POLICY UPDATE: `EXECUTOR-IDENTITY DERIVATION AUDIT` now has a second dist
 EFFORT: 5 materially distinct discovery/validation modes; 2 deep candidates (`Dstack-TEE/private-ai-gateway`, `fantasyce/agent-runtime-proof`); current source, committed tests, provider audit schema/criteria, live-review evidence, exact current heads and history were checked; approximately 30 connector/research calls; 0 fresh provider actions and 0 locally rerun untrusted suites.
 
 NEXT HIGHEST-VALUE QUESTION: Can we find a current public **consequential-action** system that joins (1) executor identity derived from the object actually acting, (2) a narrow reviewed behavior closure with two-sided drift tests, and (3) an accepted retained provider/action proof consumed by runtime authority?
+
+## Shadow AI Run 17 — 2026-09-21
+
+### HYPOTHESIS
+
+A current public consequential-action system may already join three properties that have so far appeared separately: (1) executor identity derived from the object actually acting, (2) a narrow reviewed behavior closure with two-sided drift tests, and (3) retained provider/action proof consumed by runtime authority. Because repositories use incompatible vocabulary, the search tested attestation/admission, signed action receipts, payment policy and runtime identity as separate discovery lineages.
+
+### DISCOVERY METHODS AND SPECIALIST PASSES
+
+1. **Concept and code-signature search:** searched payment/action repositories for provider receipts, artifact/semantic digests, workload identity, attestation and policy admission terms.
+2. **Low-attention analog search:** prioritized young, zero/low-star consequential-action repositories and adjacent signing/policy systems rather than another general agent framework.
+3. **Source/test/schema/history verification:** traced the load-bearing gate, the attestation account schema, the exact fields parsed at the consequence boundary, local tests, retained devnet traces, exact-head workflow status and recent run history.
+4. **Specialist decomposition:** an admission-policy pass evaluated the on-chain decision path; an evidence-schema pass compared stored versus consumed fields; a provider-history pass separated historical live evidence from current qualification; and an independent RED-TEAM/VERIFIER challenged promotion and score calibration.
+
+Two serious candidates were deeply inspected: [AgentTrust at exact revision `21a3b111...`](https://github.com/agenttrust-labs/agenttrust/tree/21a3b111b7677d0b06ab1b063d647e4f52ea3b17) and [Signet at exact revision `67041177...`](https://github.com/Prismer-AI/signet/tree/670411774857d4bccf9a4ea4bb4de67669086d7a). A broader Lightning signer family was triaged but not promoted to deep inspection because it did not expose the retained provider/action qualification join.
+
+### BEST CANDIDATE
+
+**Name:** `agenttrust-labs/agenttrust@21a3b111b7677d0b06ab1b063d647e4f52ea3b17`  
+**Verdict:** **PASS_WITH_LIMITS as a consequence-bound attestation/payment reference; NO STRONG full-target finding**  
+**Proposed shadow score:** **24/30**
+
+AgentTrust contains a real consequence boundary. Its strict gate commits only on `Allow`; `Deny` and `RequireValidation` return errors so the composed gate + transfer + feedback transaction reverts atomically. This is materially stronger than an advisory trust score that the payment path may ignore. The relevant implementation is [`gate_payment_strict.rs`](https://github.com/agenttrust-labs/agenttrust/blob/21a3b111b7677d0b06ab1b063d647e4f52ea3b17/programs/policy-vault/src/instructions/gate_payment_strict.rs).
+
+The repository also preserves genuine devnet evidence. Its May 7, 2026 chained fixture records a `kyc.tier-1.v1` capability, a pre-attestation `RequireValidation` result, validation request/response transactions and a post-attestation `Allow` result with explorer-linked transaction identities. The retained fixture is [`devnet-chained-validation.json`](https://github.com/agenttrust-labs/agenttrust/blob/21a3b111b7677d0b06ab1b063d647e4f52ea3b17/examples/attestor-demo/devnet-chained-validation.json). The project separately documents a Pay.sh + AgentTrust atomic devnet settlement path.
+
+The decisive limit appears where the credential reaches the payment gate. The full attestation schema stores `claim_payload_hash`, `claim_uri_hash`, a reserved signature field, issue/expiry data and revocation metadata ([schema](https://github.com/agenttrust-labs/agenttrust/blob/21a3b111b7677d0b06ab1b063d647e4f52ea3b17/programs/validation-registry/src/state/validation_attestation.rs)). But PolicyVault's load-bearing byte-offset view deliberately reads only subject asset, capability hash, attestor, expiry and revoked status ([reader](https://github.com/agenttrust-labs/agenttrust/blob/21a3b111b7677d0b06ab1b063d647e4f52ea3b17/programs/policy-vault/src/ext/validation_registry.rs)). The decision function then checks only those fields ([policy](https://github.com/agenttrust-labs/agenttrust/blob/21a3b111b7677d0b06ab1b063d647e4f52ea3b17/programs/policy-vault/src/policies/require_validation.rs)).
+
+Therefore two different claim payloads—or two different executor binaries/configurations—can share the same subject/capability/attestor tuple and receive the same payment authorization. The `capability_hash` is a semantic capability identifier here, not a content-derived reviewed behavior closure. The `subject_asset` is not a runtime-derived executor measurement.
+
+Currentness also remains open. The exact-head scheduled devnet integration workflows were repeatedly red through September 17, 2026. In one current-head run, the real integration never executed because the demo dependency build failed; in another, the devnet smoke itself failed and later on-chain verification was skipped. Those failures are not proof that the on-chain gate is semantically defective, but they prevent the May devnet fixture from being presented as current exact-revision qualification. See [scheduled run 35191548396](https://github.com/agenttrust-labs/agenttrust/actions/runs/35191548396) and [daily run 35130779844](https://github.com/agenttrust-labs/agenttrust/actions/runs/35130779844).
+
+The v1 zero-filled `attestor_signature` field must also be calibrated correctly. The attestor currently authenticates by signing the Solana transaction; portable Ed25519 sysvar verification is deferred. This limits portable non-repudiation, but does not make the on-chain attestation unauthenticated ([creation path](https://github.com/agenttrust-labs/agenttrust/blob/21a3b111b7677d0b06ab1b063d647e4f52ea3b17/programs/validation-registry/src/instructions/respond_to_validation.rs)).
+
+### COMPARATOR
+
+**`Prismer-AI/signet@670411774857d4bccf9a4ea4bb4de67669086d7a`** contributes a stronger action-evidence plane. Its compound/bilateral receipts distinguish signed intent from verified outcome, bind action parameters, target, transport, policy/authz context, response and trace/parent identity, and explicitly refuse to treat a unilateral intent receipt as execution proof. Its OpenClaw integration fails closed by default and rejects `allowDegraded=true` when policy enforcement is configured.
+
+Signet does not close the full target either. No inspected path joined those receipts to identity derived from the exact executor binary/configuration actually acting, a narrow two-sided behavior closure, and retained live-provider qualification. It is complementary evidence machinery, not a substitute for executor currentness.
+
+### CLAIMS TESTED
+
+- **Consequence-bound fail-closed gate — VERIFIED.** Non-`Allow` decisions revert the composed settlement transaction.
+- **Retained historical devnet attestation lifecycle — VERIFIED.** The repository preserves source-observable transaction identities for pre-attestation denial/requirement and post-attestation allowance.
+- **Attestation includes claim hashes — VERIFIED.**
+- **Payment gate consumes claim hashes — FALSIFIED.** The parsed policy view excludes them.
+- **Capability identity is a reviewed behavior/source closure — NOT ESTABLISHED.**
+- **Subject identity is derived from the executor actually acting — FALSIFIED as a demonstrated invariant.**
+- **Historical provider evidence qualifies current exact head — FALSIFIED.** Current-head scheduled smoke remained red; the correct state is historical evidence plus current qualification failure/unknown.
+- **Signet supplies independent signed action intent/outcome evidence — VERIFIED as a component.**
+- **One current public system joins all three target properties — NOT FOUND.**
+
+### INDEPENDENT RED-TEAM / VERIFIER
+
+The independent verifier returned **PASS_WITH_LIMITS** for AgentTrust as a narrow consequential-action reference, capped the proposed score at **24/30**, and found **NO STRONG full-target candidate**. Its strongest falsification is that the consequence gate cannot distinguish different claim payloads or executor builds sharing the same subject/capability/attestor tuple. It also required the historical May trace and exact-head September workflow failures to remain separate evidence states.
+
+The verifier approved this calibrated lesson:
+
+> A persisted claim payload hash has no admission authority at the consequence boundary unless that boundary consumes it and binds it to the current executor identity.
+
+The hash may retain off-chain evidentiary value; the finding is specifically about admission authority.
+
+### COMBINATIONS DISCOVERED
+
+The strongest composite architecture is now:
+
+**runtime-derived executor/workload identity and channel binding (Run 16) → reviewed behavior closure and two-sided drift currentness → signed intent/outcome receipt (Signet) → current provider/action qualification → claim/evidence hash consumed by the atomic consequence gate (AgentTrust) → post-effect reconciliation.**
+
+The key missing join is no longer merely “has an attestation.” It is:
+
+**the exact claim admitted by the gate must be cryptographically about the exact reviewed executor currently crossing the provider/consequence boundary.**
+
+### COMMERCIAL WEDGE
+
+A concrete product primitive is an **Attestation-to-Executor Binding Retrofit** for agent payment and action gates. It would preserve an existing atomic policy gate while replacing label-only qualification with a content-derived behavior identity, runtime-derived executor identity, current provider proof and an admission check that consumes all three. The buyer-facing promise is narrower and defensible: an agent cannot spend merely because it presents a valid capability label whose underlying evidence no longer describes the code actually acting.
+
+### SEARCH POLICY UPDATE
+
+Add lane-local **ATTESTATION-PAYLOAD CONSUMPTION AUDIT** as **LOCAL / one distinct success**:
+
+1. enumerate every signed, hashed or authority-bearing field created in a credential;
+2. trace which fields are actually parsed and consumed at the consequence boundary;
+3. distinguish semantic labels from content-derived behavior identity;
+4. require a binding from admitted evidence to the current executor;
+5. separately verify current provider/action qualification at the exact behavior subject;
+6. preserve historical proof and current qualification as separate states.
+
+Do not promote globally yet. `END-TO-END CLOSURE COMPOSITION AUDIT` receives another application but remains staged-eligible locally rather than being treated as a solved global method.
+
+### EFFORT / COST PROXIES
+
+Approximately **12 search/deep-inspection units**: three discovery lineages plus low-attention analog search, three candidates triaged, two deeply inspected, eight load-bearing source/schema/test files, two current-head workflow histories and one independent verifier pass. No repository execution was claimed; this run used public source, committed fixtures and workflow history.
+
+### NEXT HIGHEST-VALUE QUESTION
+
+Can a public agent payment or consequential-action gate prove, in one current retained artifact, that the credential payload consumed at admission names a narrow reviewed behavior closure, that the runtime derives the matching identity from the executor actually acting, and that covered executor drift withdraws authority while unrelated release churn preserves it?
+
