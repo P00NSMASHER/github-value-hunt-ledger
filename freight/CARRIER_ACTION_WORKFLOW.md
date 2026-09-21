@@ -58,3 +58,8 @@ No message is sent by this workflow.
 ## Canonical payload handoff
 
 After a proposal is selected, `carrier_action_payload.py` derives the exact carrier-facing subject/body and payload hash from the proposal and recovery claims. Separate buyer approval must bind that exact payload hash before the authorization wrapper accepts it. The payload remains a preview and is never sent by this workflow.
+
+
+## Execution proof handoff
+
+After authorization, `carrier_action_execution.py` can create a pre-send intent with a stable idempotency key and later record external FAILED/SUBMITTED/DELIVERED evidence. Authorization is never treated as proof that an action was actually sent.
