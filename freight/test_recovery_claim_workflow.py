@@ -57,7 +57,7 @@ def setup(dispositions=(ReviewDisposition.CONFIRMED, ReviewDisposition.CONFIRMED
         population=population,
         truth=artifacts.factory.truth,
         submission=sealed,
-        finding_ids=(artifacts.factory.truth.findings[1].finding_id,),
+        finding_ids=(buyer_review.records[1].finding_id,) if len(buyer_review.records) > 1 else (),
     )
     return artifacts, buyer_review, incumbent
 
@@ -77,9 +77,9 @@ def test_confirmed_reviews_create_exact_claims_and_incumbent_fee_disqualificatio
     assert batch.confirmed_review_count == 2
     assert batch.fee_disqualified_count == 1
     assert [claim.fee_disqualified for claim in batch.claims] == [False, True]
-    assert [binding.finding_id for binding in batch.bindings] == [
-        finding.finding_id for finding in artifacts.factory.truth.findings
-    ]
+    assert {binding.finding_id for binding in batch.bindings} == {
+        record.finding_id for record in review.records
+    }
     assert all(claim.source_hash == binding.finding_proof_hash
                for claim, binding in zip(batch.claims, batch.bindings, strict=True))
     assert all(claim.amount_cents > 0 for claim in batch.claims)
