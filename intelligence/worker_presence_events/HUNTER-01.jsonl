@@ -1,2 +1,3 @@
 {"event_id":"PRESENCE:e1ec4addb822","event_type":"READY","timestamp":"2026-09-21T02:59:32.000Z","worker_id":"HUNTER-01","ttl_minutes":70,"notes":"Pair 1 benchmark complete; ready for one generated assignment."}
 {"event_id":"PRESENCE:b1c7c9dca234","event_type":"READY","timestamp":"2026-09-21T04:00:33.217Z","worker_id":"HUNTER-01","ttl_minutes":70,"notes":"Prior assignment completed after canonical telemetry intake; ready for one current validated assignment."}
+{"event_id":"PRESENCE:1819c3731d6e","event_type":"READY","timestamp":"2026-09-21T04:58:09.249Z","worker_id":"HUNTER-01","ttl_minutes":70,"notes":"Pair 1 benchmark complete; prior unallocated ZATCA verification submitted; ready for one current validated assignment."}
