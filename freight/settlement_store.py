@@ -340,6 +340,8 @@ class SettlementStore:
         return self._read(lambda c: self._event_residual(c, event_id))
 
     def auto_allocate(self, event_id: str, *, created_at: str) -> Decision:
+        created_at = self._timestamp("created_at", created_at)
+
         def op(conn: sqlite3.Connection) -> Decision:
             event = conn.execute(
                 "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
@@ -347,6 +349,8 @@ class SettlementStore:
             ).fetchone()
             if not event:
                 raise ValueError("unknown settlement event")
+            if created_at < event["booked_at"]:
+                raise ValueError("allocation created_at cannot predate settlement booking")
             old = conn.execute(
                 "SELECT allocation_id FROM allocations WHERE buyer_id=? AND business_unit=? AND event_id=? ORDER BY allocation_id",
                 (*self._scope, event_id),
@@ -376,6 +380,7 @@ class SettlementStore:
 
     def review_allocate(self, *, allocation_id: str, claim_id: str, event_id: str, amount_cents: int, created_at: str) -> str:
         amount_cents = self._positive_cents("allocation amount", amount_cents)
+        created_at = self._timestamp("created_at", created_at)
 
         def op(conn: sqlite3.Connection) -> str:
             old = conn.execute(
@@ -397,6 +402,8 @@ class SettlementStore:
             ).fetchone()
             if not claim or not event:
                 raise ValueError("review allocation requires existing claim and settlement event")
+            if created_at < event["booked_at"]:
+                raise ValueError("allocation created_at cannot predate settlement booking")
             if claim["currency"] != event["currency"]:
                 raise ValueError("allocation currency mismatch")
             if (claim["payer_id"], claim["payee_id"]) != (event["payer_id"], event["payee_id"]):
@@ -462,6 +469,10 @@ class SettlementStore:
                 )
             if counter["original_event_id"] != allocation["event_id"]:
                 raise ValueError("counter event does not fund allocation")
+            if created_at < counter["observed_at"]:
+                raise ValueError("reversal created_at cannot predate counter observation")
+            if created_at < allocation["created_at"]:
+                raise ValueError("reversal created_at cannot predate allocation")
 
             allocation_reversed = int(conn.execute(
                 "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges "
@@ -499,6 +510,8 @@ class SettlementStore:
         return self._write(op)
 
     def auto_apply_counter(self, counter_id: str, *, created_at: str) -> Decision:
+        created_at = self._timestamp("created_at", created_at)
+
         def op(conn: sqlite3.Connection) -> Decision:
             counter = conn.execute(
                 "SELECT * FROM counter_events WHERE buyer_id=? AND business_unit=? AND counter_id=?",
@@ -506,6 +519,8 @@ class SettlementStore:
             ).fetchone()
             if not counter:
                 raise ValueError("unknown counter event")
+            if created_at < counter["observed_at"]:
+                raise ValueError("reversal created_at cannot predate counter observation")
             old = conn.execute(
                 "SELECT reversal_id FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND counter_id=? ORDER BY reversal_id",
                 (*self._scope, counter_id),
@@ -531,6 +546,8 @@ class SettlementStore:
                 plan = [(live[0], int(counter["amount_cents"]))]
             else:
                 return Decision(REVIEW, reason="partial return is ambiguous across live allocation edges")
+            if any(created_at < alloc["created_at"] for alloc, _ in plan):
+                raise ValueError("reversal created_at cannot predate allocation")
             ids = []
             for i, (alloc, amount) in enumerate(plan, 1):
                 edge = f"reversal:{counter_id}:{i}:{alloc['allocation_id']}"
