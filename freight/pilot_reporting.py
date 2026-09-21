@@ -3,8 +3,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import Protocol
 
-from freight.contracts import IncumbentOutput, RecoveryLedger, TruthManifest, VALIDATED
+from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, VALIDATED
+
+
+class RecoveryCertificateSource(Protocol):
+    """Common read interface for in-memory and persistent proof snapshots."""
+
+    buyer_id: str
+    business_unit: str
+
+    def certificate(self, finding_id: str) -> RecoveryCertificate: ...
 
 
 class ReviewDisposition(str, Enum):
@@ -56,7 +66,7 @@ def _positive_variance(finding) -> int:
 def build_pilot_metrics(
     truth: TruthManifest,
     incumbent: IncumbentOutput,
-    ledger: RecoveryLedger,
+    ledger: RecoveryCertificateSource,
     reviews: tuple[FindingReview, ...] = (),
 ) -> PilotMetrics:
     if (incumbent.buyer_id, incumbent.business_unit) != (
