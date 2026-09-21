@@ -168,6 +168,7 @@ def auth(**overrides):
         authorization_id="ACT-001",
         action_type=ActionType.SUBMIT_DISPUTE,
         target_carrier_id="carrier-1",
+        target_customer_id="CUST-1",
         recipient_reference_hash="4" * 64,
         action_payload_hash="5" * 64,
         finding_ids=("F-1", "F-2"),
@@ -185,6 +186,7 @@ def test_confirmed_validated_findings_can_be_narrowly_authorized():
     a = auth()
     assert a.authorized_cents == 3000
     assert a.finding_ids == ("F-1", "F-2")
+    assert a.target_customer_id == "CUST-1"
     assert len(a.finding_review_hashes) == 2
     assert all(len(value) == 64 for value in a.finding_review_hashes)
     assert a.money_movement_authorized is False
@@ -252,6 +254,11 @@ def test_unconfirmed_review_cannot_be_authorized():
         )
 
 
+def test_customer_scope_cannot_be_mixed_into_external_action():
+    with pytest.raises(ValueError, match="customer"):
+        auth(target_customer_id="OTHER-CUSTOMER")
+
+
 def test_amount_cannot_exceed_selected_validated_findings():
     with pytest.raises(ValueError, match="cannot exceed"):
         auth(authorized_cents=999999)
@@ -269,6 +276,7 @@ def test_action_payload_and_recipient_are_hash_bound():
         as_of_date="2026-09-22",
         action_type=ActionType.SUBMIT_DISPUTE,
         target_carrier_id="carrier-1",
+        target_customer_id="CUST-1",
         recipient_reference_hash="4" * 64,
         action_payload_hash="5" * 64,
         finding_ids=("F-1", "F-2"),
