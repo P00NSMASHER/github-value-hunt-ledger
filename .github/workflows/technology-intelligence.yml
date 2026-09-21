@@ -138,6 +138,10 @@ jobs:
         run: python tools/ti_activation.py
       - name: Validate V16 activation broker
         run: python tools/ti_activation_validate.py
+      - name: Build V17 activation response learning
+        run: python tools/ti_activation_response_learning.py
+      - name: Validate V17 activation response learning
+        run: python tools/ti_activation_response_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -246,6 +250,10 @@ jobs:
         run: python tools/ti_activation.py
       - name: Validate V16 activation broker
         run: python tools/ti_activation_validate.py
+      - name: Build V17 activation response learning
+        run: python tools/ti_activation_response_learning.py
+      - name: Validate V17 activation response learning
+        run: python tools/ti_activation_response_validate.py
       - name: Validate technology-intelligence system
         run: python tools/ti_validate.py
       - name: Check generated text for whitespace errors
@@ -355,7 +363,12 @@ jobs:
                   intelligence/activation_claim_packets.jsonl \
                   intelligence/activation_history.jsonl \
                   intelligence/activation_metrics.json \
-                  intelligence/ACTIVATION_BOARD.md
+                  intelligence/ACTIVATION_BOARD.md \
+                  intelligence/activation_response_runs.jsonl \
+                  intelligence/worker_activation_response_metrics.jsonl \
+                  intelligence/activation_response_adjustments.jsonl \
+                  intelligence/activation_response_metrics.json \
+                  intelligence/ACTIVATION_RESPONSE_REPORT.md
           if ! git diff --cached --quiet; then
             git commit -m "chore: refresh technology intelligence [skip ci]"
             git push origin HEAD:main
