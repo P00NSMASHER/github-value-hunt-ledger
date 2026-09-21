@@ -33,7 +33,17 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('content="sales@freightfixture.com"', page)
             self.assertIn('href="mailto:sales@freightfixture.com"', page)
             self.assertNotIn("This is a source preview.", page)
-            self.assertIn("Synthetic data", page)
+            self.assertIn("Freight Recovery", page)
+            self.assertIn("Blind Freight Audit Acceptance Test", page)
+            self.assertIn("$15k–$25k", page)
+            self.assertIn("Data Readiness / Authority Diagnostic", page)
+            self.assertIn("$5k–$7.5k", page)
+            self.assertIn("Invoice disposition register", page)
+            self.assertIn("Synthetic example", page)
+            self.assertIn("Realized recovery", page)
+            self.assertIn("Nothing is submitted, uploaded, or saved by this page.", page)
+            self.assertNotIn('id="name"', page)
+            self.assertNotIn('id="notes"', page)
 
     def test_existing_files_are_preserved(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -48,3 +58,29 @@ class PublicBuildTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PublicOfferBoundaryTests(unittest.TestCase):
+    def test_source_preview_keeps_contact_unconfigured_and_no_document_upload(self):
+        page = (builder.SOURCE / "index.html").read_text()
+        self.assertEqual(page.count(builder.CONTACT_META), 1)
+        self.assertIn("Contact channel pending.", page)
+        self.assertNotIn('type="file"', page)
+        self.assertNotIn("<form", page)
+        self.assertIn("Do not send freight documents here.", page)
+
+    def test_current_offer_copy_separates_discrepancy_from_recovery(self):
+        page = (builder.SOURCE / "index.html").read_text()
+        self.assertIn("Supported discrepancy", page)
+        self.assertIn("Realized recovery", page)
+        self.assertIn("$0", page)
+        self.assertIn("not a promise of savings or recovery", page)
+        self.assertIn("No guaranteed recovery", page)
+
+    def test_inquiry_is_three_fact_fit_check(self):
+        page = (builder.SOURCE / "index.html").read_text()
+        for field in ('id="company"', 'id="email"', 'id="volume"'):
+            self.assertIn(field, page)
+        self.assertEqual(page.count("<input"), 2)
+        self.assertEqual(page.count("<select"), 1)
+        self.assertNotIn("<textarea id="notes"", page)
