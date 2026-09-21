@@ -13,8 +13,10 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert out["invoice_csv_adapter_hash"]
     assert out["invoice_csv_file_sha256"]
     assert out["review_queue_hash"]
-    assert [item["charge_id"] for item in out["review_queue"]] == ["charge-1", "charge-3"]
-    assert [item["priority_class"] for item in out["review_queue"]] == ["VALIDATED_MONEY", "REVIEW_MONEY"]
+    assert [item["charge_id"] for item in out["review_queue"]] == ["charge-1", "charge-2", "charge-3"]
+    assert [item["priority_class"] for item in out["review_queue"]] == [
+        "VALIDATED_MONEY", "VALIDATED_MONEY", "REVIEW_MONEY",
+    ]
     assert all(out["buyer_review_hashes"])
     assert out["metrics"]["reviewed_discrepancy_cents"] == 10000
     assert out["metrics"]["validated_finding_cents"] == 5000
