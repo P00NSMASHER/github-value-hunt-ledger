@@ -528,6 +528,13 @@ def test_sql_timestamp_guards_cover_claim_event_counter_and_reversal(tmp_path):
     conn.close()
 
     s.create_claim(C()); s.ingest_event(E())
+    conn=sqlite3.connect(s.path); conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError,match="counter observed_at"):
+        conn.execute("""INSERT INTO counter_events
+          (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
+          VALUES('TEST_BUYER','TEST_BU','bad-counter','e1','USD',10000,'2026-09-03 10:00:00','bad-counter-src','RETURN')""")
+    conn.close()
+
     assert s.auto_allocate("e1",created_at="2026-09-04T12:00:00Z").status==ALLOCATED
     s.ingest_counter(R(amt=10000))
     conn=sqlite3.connect(s.path); conn.execute("PRAGMA foreign_keys=ON")
