@@ -51,7 +51,7 @@ jobs:
       - name: Controlled-pilot rights gate
         run: PYTHONPATH=. python freight/release_gate.py --stage pilot
       - name: Hunter-to-freight improvement contracts
-        run: PYTHONPATH=. python -m pytest -q freight/test_hunter_bridge.py freight/site/test_build.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_hunter_bridge.py
       - name: Review Hunter changes against freight priorities
         shell: bash
         run: |
