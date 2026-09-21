@@ -887,3 +887,144 @@ Approximately **12 search/deep-inspection units**: three discovery lineages plus
 
 Can a public agent payment or consequential-action gate prove, in one current retained artifact, that the credential payload consumed at admission names a narrow reviewed behavior closure, that the runtime derives the matching identity from the executor actually acting, and that covered executor drift withdraws authority while unrelated release churn preserves it?
 
+
+
+---
+
+## SHADOW AI RUN 18 — 2026-09-21
+
+### HYPOTHESIS
+
+A useful positive analog for the post-Run-17 target will be a consequential action system where the admission gate itself reconstructs the exact action payload, consumes a credential tied to a content-derived executor/workload identity, and selectively rejects relevant identity drift without treating unrelated repository churn as behavior drift.
+
+### DISCOVERY MODES
+
+1. **Attestation-gated consequence search:** searched payment, bond, escrow and policy paths for a gate that consumes attested payload identity at the value-transfer boundary.
+2. **Content-derived runtime identity search:** traced Nitro/TEE measurements, signer registration, enclave image identity and reproducible-build closures rather than accepting a caller-supplied executor digest.
+3. **Signed-action and settlement search:** followed exact signed public values through verification, game resolution, bond accounting and vault settlement.
+4. **Source/test/schema/history archaeology:** inspected exact-head contracts, registry and verifier schemas, adversarial tests, deployment manifests, release workflows, signed prerelease evidence and the commit that introduced immutable verifier identities.
+
+### SPECIALIST PASSES
+
+- **Consequence-path specialist:** reconstructed proof submission through game resolution and ERC-20 bond settlement.
+- **Identity specialist:** traced AWS Nitro attestation, PCR approval, embedded public key registration, image-bound signer lookup and per-proof signature recovery.
+- **Closure/release specialist:** inspected the standalone measured workspace, deterministic EIF build, two-build release check, signed manifest and committed measurement registry.
+- **Currentness specialist:** separated current exact-head source and tests from historical prerelease evidence, alphanet deployment evidence and mainnet claims.
+- **Independent red-team/verifier:** challenged freshness, key continuity, source-to-measurement governance, neutral-drift proof, release currentness and production status after the positive case was frozen.
+
+### BEST CANDIDATE
+
+**Repository:** [worldcoin/world-chain](https://github.com/worldcoin/world-chain)  
+**Exact revision:** [69c7ac9683898d972882ca8959c4579616096816](https://github.com/worldcoin/world-chain/tree/69c7ac9683898d972882ca8959c4579616096816)  
+**Candidate:** World Chain MultiProofGame + Nitro attestation/proof path  
+**Proposed shadow score:** **26/30**  
+**Independent verdict:** **PASS_WITH_LIMITS**  
+**Full-target verdict:** **No STRONG full-target finding**
+
+This is the strongest public consequence-bound executor-identity analog found so far. It closes the specific Run-17 failure in which an attestation stored evidence hashes but the payment gate ignored them.
+
+The [MultiProofGame](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/pkg/contracts/src/dispute/MultiProofGame.sol) does not accept an arbitrary behavior label from a prover. For each proof lane it reconstructs the exact TransitionPublicValues from game state and selects the immutable verifier identity pinned into that game. The TEE lane passes the game-pinned Nitro image ID together with ABI-encoded transition values to the proof verifier. The validity lane likewise uses pinned aggregation and range-verification identities. The submitted credential therefore has to authenticate the exact state transition that can resolve the game.
+
+The [NitroProofVerifier](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/pkg/contracts/src/proof/NitroProofVerifier.sol) hashes those exact public values, recovers the secp256k1 signer, and requires that signer to be active for the verifier/image ID supplied by the game. The [NitroEnclaveKeyRegistry](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/pkg/contracts/src/proof/NitroEnclaveKeyRegistry.sol) only registers that signer after the [NitroAttestationVerifier](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/pkg/contracts/src/proof/NitroAttestationVerifier.sol) validates the AWS Nitro certificate chain, document freshness, approved PCR0/PCR1/PCR2 tuple and embedded public key. The registry stores the signer-to-image relationship; proof admission consumes it.
+
+This is a genuine consequence boundary. Successful proof lanes can satisfy the game threshold, resolve the disputed state transition and ultimately drive vault settlement of ERC-20 bond balances. The useful architecture is:
+
+**game-derived transition + immutable verifier/image identity → image-bound signer proof → threshold resolution → finality delay → bond settlement**
+
+### SOURCE / SCHEMA VERIFICATION
+
+**Verified in source:**
+
+- the game derives the transition payload from its own state;
+- the TEE verifier identity is an immutable game-pinned image ID;
+- the proof verifier checks a signature over the exact transition payload rather than a generic capability label;
+- the recovered signer must be registered and active for that exact image;
+- signer registration requires a fresh, cryptographically verified Nitro attestation carrying an approved PCR tuple and public key;
+- proof acceptance can affect the game result and later token settlement.
+
+The current committed [measurements.json](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/proofs/measurements.json) records the Nitro PCR0/PCR1/PCR2 values separately from SP1 verification identities. The inspected main revision was still exact head on September 21, 2026, and its commit signature is verified by GitHub.
+
+### TEST VERIFICATION
+
+The contract suite contains load-bearing negative and integration coverage rather than only a happy-path mock:
+
+- [MultiProofGame.t.sol](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/pkg/contracts/test/dispute/MultiProofGame.t.sol) verifies that proof submission passes the exact game-pinned verifier identities and public values.
+- [NitroProofVerifier.t.sol](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/pkg/contracts/test/proof/NitroProofVerifier.t.sol) rejects changed transition data, wrong rollup configuration, a different image, unknown or revoked signers and malformed values/signatures.
+- [NitroEndToEnd.t.sol](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/pkg/contracts/test/proof/NitroEndToEnd.t.sol) joins attestation-derived registration to proof verification, confirms two enclaves with one approved image can verify, confirms revocation blocks later proofs and rejects a different transition.
+- The attestation verifier has separate real AWS-signed fixture coverage; the repository explicitly states why one test cannot possess the real enclave private key and therefore does not mislabel the composed mock-key path as a complete physical-attestation exercise.
+
+The commit that introduced immutable game-pinned verifier identities, [129421b43a62a83f72fa8680087ff8f2ee6d547a](https://github.com/worldcoin/world-chain/commit/129421b43a62a83f72fa8680087ff8f2ee6d547a), has a successful Foundry CI run including contract build and tests. Exact-head Actions evidence is weaker: the latest successful push workflow inspected at head was CodeQL-oriented, so it does not independently establish that every current contract test passed at 69c7ac9. Current source and committed tests are verified; exact-head domain CI is not.
+
+### CLOSURE / RELEASE VERIFICATION
+
+The most important adjacent design is the measured-build closure.
+
+[proofs/measured/nitro-enclave/Cargo.toml](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/proofs/measured/nitro-enclave/Cargo.toml) is intentionally a standalone workspace so unrelated root-workspace dependency changes do not rotate the enclave measurement. Behavior-bearing enclave source and its local dependency lock remain inside the measured closure.
+
+[scripts/build-eif.sh](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/proofs/scripts/build-eif.sh) builds the enclave image in the pinned Nix environment and emits PCR measurements. The versioned [release-proof.yml](https://github.com/worldcoin/world-chain/blob/69c7ac9683898d972882ca8959c4579616096816/.github/workflows/release-proof.yml) builds the same commit twice, compares PCRs, root filesystem and EIF outputs, refuses publication on mismatch, produces a signed manifest and pairs the release evidence with an allowlist change.
+
+This is real separation between:
+
+- **whole-release provenance:** Git commit, container digests and signed release manifest; and
+- **consequence-bearing behavior identity:** the Nitro PCR/image identity actually consumed by the proof gate.
+
+The strongest retained public release located was [proofs/v1.0.0-rc.1](https://github.com/worldcoin/world-chain/releases/tag/proofs%2Fv1.0.0-rc.1), published August 25, 2026. It records PCRs, verification identities, container digests and a signed manifest, but it targets historical commit 387f2a49 rather than current head and is explicitly a prerelease. Current source reports a later release-candidate version. The retained release is therefore historical provenance, not exact-current qualification.
+
+### DEPLOYMENT / CURRENTNESS BOUNDARY
+
+The repository contains concrete alphanet deployment manifests for the proof system and Nitro registry, including immutable image identity, bond token, proof threshold and approved PCR data. That establishes deployment-shaped evidence, not mainnet production acceptance.
+
+The governing WIP remains **Draft**. I found no retained artifact proving that exact head 69c7ac9, its current PCR tuple and an actual AWS-attested signer produced a successfully accepted live state-transition proof that completed bond settlement on the current deployment. I therefore do not claim mainnet readiness, exact-current live qualification or customer outcome.
+
+### COMPARATOR / NEGATIVE CONTROL
+
+[prismnetwork-tech/prism@7214528c7341a6697d04134b72d675236c019798](https://github.com/prismnetwork-tech/prism/tree/7214528c7341a6697d04134b72d675236c019798) is a useful negative comparator. Its marketplace design can consume NVIDIA H100 attestation evidence in an escrow/funding trust-class decision, but its own documentation says current offers are open and that GPU evidence does not prove the guest workload or VM/VFIO chain. It illustrates the exact danger World Chain largely avoids: a consequence gate can consume a real attestation and still fail to measure the object whose behavior matters.
+
+### INDEPENDENT RED-TEAM / VERIFIER
+
+**Verdict: PASS_WITH_LIMITS, 26/30. No STRONG full-target finding.**
+
+The positive claim survives: World Chain demonstrates a real value-bearing gate that consumes an exact signed action payload and an attestation-derived workload/image identity, with substantive drift and revocation tests plus a narrow measured-build closure.
+
+The strongest objections are still load-bearing:
+
+1. **Register-once attestation is not per-action freshness.** A current proof establishes possession of a key that was once attested for the approved image. It does not replay a fresh Nitro attestation on every proof. If a key were extracted or retained outside the enclave, it could remain usable until explicit revocation. The design relies on Nitro isolation, ephemeral-key handling and governance revocation.
+2. **Measured does not automatically mean reviewed and approved correctly.** PCR verification proves a specific image. The allowlist/governance process must still correctly map that measurement to reviewed source, build policy and runtime policy.
+3. **Neutral-drift preservation is architectural, not a committed two-sided acceptance test.** The standalone workspace deliberately excludes unrelated root dependency churn, and the release workflow enforces deterministic relevant builds. I did not find a committed test that mutates an arbitrary irrelevant tracked file and proves the already-authorized route remains enabled.
+4. **Current retained qualification is missing.** The signed release is historical and prerelease; the deployment is alphanet-shaped; the governing proposal is Draft; exact-head domain CI and a retained live accepted proof/settlement were not established.
+5. **This is an adjacent rollup-proof analog, not an agent refund/payout adapter.** The architecture transfers well, but the final target still needs the same join around an agent executor and external provider action.
+
+### CLAIM STATUS
+
+**Verified:** exact payload consumption; game-derived transition; immutable image identity; attestation-derived signer registration; image-bound signer admission; revocation behavior; bond-settlement consequence path; narrow measured workspace; deterministic two-build release gate; historical signed prerelease evidence; alphanet deployment manifests.
+
+**Supported but not independently executed here:** committed adversarial tests and successful CI at the verifier-pinning contract change.
+
+**Historical only:** proofs/v1.0.0-rc.1 signed release evidence.
+
+**Not established:** exact-current live AWS-attested proof acceptance and settlement; mainnet production status; continuous/per-action attestation freshness; an externally reproduced build; a committed arbitrary-neutral-file preservation test; agent-provider qualification.
+
+### SEARCH POLICY UPDATE
+
+- **ATTESTATION-PAYLOAD CONSUMPTION AUDIT** now has a second distinct application: AgentTrust exposed a stored-but-unconsumed payload hash; World Chain supplies a positive gate that consumes the exact action payload and attestation-derived identity. Move it to **STAGED-ELIGIBLE locally**, not global promotion.
+- **MEASURED ≠ REVIEWED-SOURCE AUDIT** now has a second distinct application after Private AI Gateway. Move it to **STAGED-ELIGIBLE locally**: measurement validity, measurement-to-reviewed-source mapping, current allowlisting and live action evidence remain separate obligations.
+- **QUALIFICATION CLOSURE PRECISION AUDIT** gains another application. Preserve separate release-provenance and behavior-measurement identities.
+- Add **REGISTER-ONCE ATTESTATION CONTINUITY AUDIT** as **LOCAL / one distinct success**: determine whether each consequential action proves fresh measurement or only possession of a once-attested key; inspect key extractability assumptions, rotation, expiry, revocation latency and compromise recovery.
+
+No central or global search-policy files were modified.
+
+### CROSS-LANE REFERRAL
+
+Commercial and AI-integration work should evaluate an **Attested Consequence Gate Retrofit** patterned on this architecture:
+
+**action state reconstructed by the gate + narrow executor measurement + attested ephemeral key + signature over exact action payload + provider readback/reconciliation + selective revocation/currentness receipt**
+
+The product must add what this analog does not yet prove: exact-current live provider qualification, explicit key/attestation continuity policy and a committed neutral-drift preservation test.
+
+### EFFORT / COST PROXIES
+
+Approximately **14 search/deep-inspection units**: three discovery lineages plus one adjacent-market negative-control search; two serious candidates deeply inspected; thirteen load-bearing source, test, workflow, measurement, deployment and release artifacts; exact-head and historical CI/release checks; one independent red-team pass. No local execution or live value transfer was claimed.
+
+### NEXT HIGHEST-VALUE QUESTION
+
+Can a public agent payment or account-mutation gate combine World Chain-style exact payload consumption and narrow measured executor identity with per-action or bounded-lifetime attestation continuity, an exact-current retained live-provider proof, and committed tests showing both relevant executor drift withdrawal and irrelevant release-churn preservation?
