@@ -7,12 +7,18 @@
   "hunter": "HUNTER-05",
   "strategy_id": "STRAT:first-party-history-manifest-triangulation",
   "query_family": "status-aware-representation-invariant-current-action-receipt",
-  "query_family_id": "QF:sam-status-aware-currentness",
-  "search_objective_id": "OBJ:temporal-authority-proof",
+  "query_family_id": "QF:status-aware-representation-invariant-current-action-receipt",
+  "search_objective_id": "OBJ:current-rule-authority",
   "measurement_quality": "prospective",
   "work_action": "execute_fixture",
-  "lane_ids": ["05"],
-  "seed_nodes": ["CAP-011", "EXP-006", "FA524026Q0041"],
+  "lane_ids": [
+    "05"
+  ],
+  "seed_nodes": [
+    "CAP-011",
+    "EXP-006",
+    "FA524026Q0041"
+  ],
   "search_surfaces": [
     "GSA official Opportunities API documentation",
     "SAM.gov first-party opportunity pages",
@@ -32,8 +38,12 @@
   "recall_rescue_used": false,
   "stop_reason": "The bounded acceptance question was answered: 10/10 tests operationalized status-specific current/terminal semantics plus row-permutation and opaque-ID-renaming invariance. The remaining cancelled/archived/inactive gap requires retained first-party receipts rather than more heuristic design.",
   "new_capability_ids": [],
-  "strengthened_capability_ids": ["CAP-011"],
-  "experiment_ids": ["EXP-006"],
+  "strengthened_capability_ids": [
+    "CAP-011"
+  ],
+  "experiment_ids": [
+    "EXP-006"
+  ],
   "candidate_dispositions": [],
   "benchmark_task_ids": [],
   "seed_ids": [],
