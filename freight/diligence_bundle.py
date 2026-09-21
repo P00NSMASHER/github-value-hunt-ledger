@@ -40,6 +40,7 @@ DOC_PATHS=(
     "freight/INGESTION_AND_REVIEW_QUEUE.md",
     "freight/REVIEW_PACKET.md",
     "freight/REVIEW_ROUTING.md",
+    "freight/REVIEWED_SETTLEMENT_ALLOCATION.md",
     "freight/REMEDIATION_PLAN.md",
     "freight/RECOVERY_CLAIM_WORKFLOW.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE.md",
