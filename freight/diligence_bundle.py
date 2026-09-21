@@ -20,6 +20,7 @@ from freight.sbom import build_cyclonedx_sbom
 
 
 DOC_PATHS=(
+    "freight/AUDIT_RUN_MANIFEST.md",
     "freight/BUSINESS_MODEL.md",
     "freight/COMMERCIAL_QUALIFICATION.md",
     "freight/COMMERCIAL_LEARNING.md",
