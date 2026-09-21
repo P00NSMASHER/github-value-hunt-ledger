@@ -28,6 +28,10 @@ from freight.recovery_claim_workflow import (
 )
 from freight.review_packet import render_review_packet_markdown
 from freight.readiness import PilotReadinessInput, assess_readiness
+from freight.settlement_csv_adapter import (
+    parse_counter_event_csv,
+    parse_settlement_event_csv,
+)
 from freight.settlement_report import (
     assert_report_current,
     build_persistent_pilot_report,
@@ -36,8 +40,6 @@ from freight.settlement_report import (
 from freight.settlement_store import (
     ALLOCATED,
     REVERSED,
-    CounterEventRecord,
-    SettlementEventRecord,
     SettlementStore,
 )
 
@@ -200,6 +202,30 @@ def run_rehearsal() -> dict:
         for record in recovery_claims.records
     }
 
+    settlement_csv = (
+        "event_id,reference,payer_id,payee_id,currency,amount_cents,booked_at,source_kind\n"
+        "e-1,inv-1,carrier,cust,USD,2000,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+        "e-2,inv-2,carrier,cust,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+    ).encode("utf-8")
+    settlement_batch = parse_settlement_event_csv(
+        filename="synthetic-settlements.csv",
+        data=settlement_csv,
+        buyer_id=BUYER,
+        business_unit=BU,
+    )
+    settlement_by_id = {event.event_id: event for event in settlement_batch.events}
+
+    counter_csv = (
+        "counter_id,original_event_id,currency,amount_cents,observed_at,source_kind\n"
+        "return-1,e-1,USD,500,2026-09-22T10:00:00Z,BANK-RETURN\n"
+    ).encode("utf-8")
+    counter_batch = parse_counter_event_csv(
+        filename="synthetic-returns.csv",
+        data=counter_csv,
+        buyer_id=BUYER,
+        business_unit=BU,
+    )
+
     with tempfile.TemporaryDirectory() as td:
         audit_bundle_path = Path(td) / "synthetic-audit-result.zip"
         audit_bundle_receipt = build_audit_result_bundle(workflow, audit_bundle_path)
@@ -211,32 +237,19 @@ def run_rehearsal() -> dict:
             business_unit=BU,
         )
         claim_persistence = persist_recovery_claim_batch(store, recovery_claims)
-        store.ingest_event(
-            SettlementEventRecord(
-                "e-1","inv-1","carrier","cust","USD",2000,
-                "2026-09-21T10:00:00Z","store-settle-1","CREDIT-MEMO",
-            )
-        )
+        store.ingest_event(settlement_by_id["e-1"])
         store.review_allocate(
             allocation_id="a-1", claim_id=claim_id_by_finding[f1.finding_id], event_id="e-1",
             amount_cents=2000, created_at="2026-09-21T11:00:00Z",
         )
-        store.ingest_event(
-            SettlementEventRecord(
-                "e-2","inv-2","carrier","cust","USD",2500,
-                "2026-09-21T10:00:00Z","store-settle-2","CREDIT-MEMO",
-            )
-        )
+        store.ingest_event(settlement_by_id["e-2"])
         status = store.auto_allocate(
             "e-2", created_at="2026-09-21T11:00:00Z"
         ).status
         assert status == ALLOCATED
 
         before_return = build_persistent_pilot_report(truth, incumbent, store, bindings, reviews)
-        store.ingest_counter(CounterEventRecord(
-            "return-1", "e-1", "USD", 500, "2026-09-22T10:00:00Z",
-            "synthetic-bank-return-source", "BANK-RETURN",
-        ))
+        store.ingest_counter(counter_batch.events[0])
         assert store.auto_apply_counter(
             "return-1", created_at="2026-09-22T11:00:00Z",
         ).status == REVERSED
@@ -308,6 +321,12 @@ def run_rehearsal() -> dict:
         "recovery_claim_persistence_receipt_hash": claim_persistence.receipt_hash,
         "recovery_claim_persisted_count": claim_persistence.created_claim_count,
         "recovery_claim_already_present_count": claim_persistence.already_present_count,
+        "settlement_csv_adapter_hash": settlement_batch.adapter_hash,
+        "settlement_csv_file_sha256": settlement_batch.file_sha256,
+        "settlement_event_count": len(settlement_batch.events),
+        "counter_csv_adapter_hash": counter_batch.adapter_hash,
+        "counter_csv_file_sha256": counter_batch.file_sha256,
+        "counter_event_count": len(counter_batch.events),
         "review_packet_markdown": render_review_packet_markdown(review_packet),
         "review_queue": [
             {
