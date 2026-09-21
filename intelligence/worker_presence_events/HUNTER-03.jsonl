@@ -1,1 +1,2 @@
 {"event_id": "PRESENCE:a5d94ae9ea97", "event_type": "READY", "timestamp": "2026-09-21T04:05:01.513596Z", "worker_id": "HUNTER-03", "ttl_minutes": 60, "notes": "Available for current validated assignment; awaiting activation."}
+{"event_id": "PRESENCE:e317e60af98b", "event_type": "READY", "timestamp": "2026-09-21T05:05:14.936099Z", "worker_id": "HUNTER-03", "ttl_minutes": 60, "notes": "Available for current validated assignment; awaiting activation."}
