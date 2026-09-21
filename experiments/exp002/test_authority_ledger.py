@@ -9,6 +9,7 @@ from experiments.exp002.authority_ledger import (
     CapacityError,
     DynamicsRecurringOutcomePolicy,
     IdentityError,
+    ProviderEndpointContract,
     ReceiptAuthorityPolicy,
     StaleWorkerError,
     SyntheticTarget,
@@ -37,6 +38,18 @@ class LedgerCase(unittest.TestCase):
 
     def allocation(self, allocation="A1", line="L1", qty=10_000, amount=100_00):
         self.ledger.allocate_invoice(allocation, line, qty, amount, valid_at=V1, observed_at=O1)
+
+    @staticmethod
+    def verified_dynamics_credit_contract():
+        return ProviderEndpointContract(
+            provider="MICROSOFT_DYNAMICS_365_FO_RECURRING_INTEGRATION",
+            interface="fixture-only singleton vendor-credit import",
+            economic_action="VENDOR_CREDIT",
+            posting_boundary="before target financial posting",
+            credit_note_capable=True,
+            operation_identity_bound=True,
+            phase_boundary_verified=True,
+        )
 
     def test_01_policy_and_source_health_fail_closed(self):
         self.assertEqual(
@@ -244,6 +257,7 @@ class LedgerCase(unittest.TestCase):
             message_status="PreProcessingError",
             exact_single_effect=True,
             operation_identity_matches=True,
+            endpoint_contract=self.verified_dynamics_credit_contract(),
         )
         self.assertEqual(
             preapply.classify(expected_logical_effect_id="preapply-reject"),
@@ -275,6 +289,7 @@ class LedgerCase(unittest.TestCase):
                 message_status=status,
                 exact_single_effect=True,
                 operation_identity_matches=True,
+                endpoint_contract=self.verified_dynamics_credit_contract(),
             )
             self.assertEqual(
                 receipt.classify(expected_logical_effect_id="post-preapply-reject"),
@@ -288,6 +303,7 @@ class LedgerCase(unittest.TestCase):
             message_status="PreProcessingError",
             exact_single_effect=True,
             operation_identity_matches=True,
+            endpoint_contract=self.verified_dynamics_credit_contract(),
         )
         batch_scope = DynamicsRecurringOutcomePolicy.receipt(
             logical_effect_id="post-preapply-reject",
@@ -295,6 +311,7 @@ class LedgerCase(unittest.TestCase):
             message_status="PreProcessingError",
             exact_single_effect=False,
             operation_identity_matches=True,
+            endpoint_contract=self.verified_dynamics_credit_contract(),
         )
         for receipt in (wrong_identity, batch_scope):
             self.assertEqual(
@@ -309,6 +326,7 @@ class LedgerCase(unittest.TestCase):
             exact_single_effect=True,
             operation_identity_matches=True,
             economic_fingerprint_matches=True,
+            endpoint_contract=self.verified_dynamics_credit_contract(),
         )
         self.assertEqual(processed.classify(expected_logical_effect_id="post-preapply-reject"), "APPLIED")
         self.assertEqual(
@@ -316,6 +334,51 @@ class LedgerCase(unittest.TestCase):
             "APPLIED",
         )
         self.assertEqual(self.ledger.event_count("REVERSAL_APPLIED", "post-preapply-reject"), 1)
+
+    def test_14_generic_import_status_does_not_prove_credit_boundary(self):
+        generic_import = DynamicsRecurringOutcomePolicy.receipt(
+            logical_effect_id="credit-1",
+            provider_operation_id="message-001/execution-001",
+            message_status="PreProcessingError",
+            exact_single_effect=True,
+            operation_identity_matches=True,
+        )
+        self.assertEqual(generic_import.classify(expected_logical_effect_id="credit-1"), "UNKNOWN")
+
+        invoice_only_contract = ProviderEndpointContract(
+            provider="MICROSOFT_DYNAMICS_365_FO_RECURRING_INTEGRATION",
+            interface="VendorInvoiceHeaders/VendorInvoiceLines",
+            economic_action="PENDING_VENDOR_INVOICE_IMPORT",
+            posting_boundary="undocumented for vendor credit notes",
+            credit_note_capable=False,
+            operation_identity_bound=True,
+            phase_boundary_verified=True,
+        )
+        documented_invoice_import = DynamicsRecurringOutcomePolicy.receipt(
+            logical_effect_id="credit-1",
+            provider_operation_id="message-002/execution-002",
+            message_status="PreProcessingError",
+            exact_single_effect=True,
+            operation_identity_matches=True,
+            endpoint_contract=invoice_only_contract,
+        )
+        self.assertEqual(
+            documented_invoice_import.classify(expected_logical_effect_id="credit-1"),
+            "UNKNOWN",
+        )
+
+        exact_credit_binding = DynamicsRecurringOutcomePolicy.receipt(
+            logical_effect_id="credit-1",
+            provider_operation_id="message-003/execution-003",
+            message_status="PreProcessingError",
+            exact_single_effect=True,
+            operation_identity_matches=True,
+            endpoint_contract=self.verified_dynamics_credit_contract(),
+        )
+        self.assertEqual(
+            exact_credit_binding.classify(expected_logical_effect_id="credit-1"),
+            "NOT_APPLIED",
+        )
 
 
 if __name__ == "__main__":
