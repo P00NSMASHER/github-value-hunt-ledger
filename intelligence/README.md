@@ -763,12 +763,14 @@ Generated products:
 - `agent_crossover_metrics.jsonl` — diagnostic agent-level matched evidence;
 - `matched_exploration_metrics.json`;
 - `MATCHED_EXPLORATION_REPORT.md`;
-- `MATCHED_AGENT_EFFECTS.md`.
+- `MATCHED_AGENT_EFFECTS.md`;
+- `matched_exploration_debt.jsonl` — one exact missing agent × work-item × route-mode crossover cell;
+- `MATCHED_EXPLORATION_DEBT.md` — prioritized human-readable crossover measurement debt.
 
 For complete crossover groups, V19 reports:
 - an additive agent contrast that averages the agent difference on both tasks;
 - a separate task-difficulty contrast.
 
-V19 is intentionally diagnostic-only. No crossover estimate is routing-eligible, and no missing cell is imputed. Work-steal, manual override, retrospective and incomplete routes remain excluded.
+V19 is intentionally diagnostic-only. No crossover estimate is routing-eligible, no missing cell is imputed, and the generated debt queue is advisory measurement debt only—it cannot authorize routing or claiming. Work-steal, manual override, retrospective and incomplete routes remain excluded.
 
 This is the first layer that can begin separating agent effect from task difficulty using deliberately varied assignment evidence rather than raw observational averages.
