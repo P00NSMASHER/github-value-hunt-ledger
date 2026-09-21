@@ -70,7 +70,7 @@ Recommended receipt fields:
 - history-set digest or membership proof;
 - explicit disagreement/unknown state.
 
-## Independent red-team / verifier verdict
+## Red-team / verifier verdict
 
 **PASS_WITH_LIMITS.** The tests prove evaluator behavior for the planted corpus, including the real active counterexample. They do not prove the trustworthiness of a receipt issuer.
 
