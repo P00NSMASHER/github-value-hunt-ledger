@@ -52,6 +52,8 @@ STEPS = (
     ['tools/ti_worker_routing.py'],
     ['tools/ti_worker_routing_validate.py'],
     ['tools/ti_routing_exploration_validate.py'],
+    ['tools/ti_matched_exploration_analysis.py'],
+    ['tools/ti_matched_exploration_validate.py'],
     ['tools/ti_dispatch.py'],
     ['tools/ti_dispatch_validate.py'],
     ['tools/ti_dispatch_backpressure.py'],
