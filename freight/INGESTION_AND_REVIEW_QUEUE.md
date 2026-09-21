@@ -22,6 +22,12 @@ Rules:
 
 This adapter does not infer columns, guess currencies, convert dollars to cents, or repair malformed exports.
 
+## Population freeze
+
+The accepted invoice-charge batch is also the source of the frozen pilot population. Multiple charge rows for one invoice/shipment collapse into one population row. The builder fails closed if customer, carrier, or currency identity changes within the same invoice/shipment.
+
+Each population-row source hash binds the invoice-charge adapter hash plus every contributing charge-row source hash. The stated selection rule is included in the population manifest hash. This removes manual population-row entry while preserving the exact evidence that created the scope.
+
 ## Charge-rule CSV
 
 The v1 authority-rule adapter accepts only rule semantics:
