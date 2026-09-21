@@ -451,6 +451,61 @@ def test_execution_receipt_cannot_predate_attempt(tmp_path):
         s.record_execution_receipt(attempt_id="attempt-1", receipt=early)
 
 
+def test_direct_sql_cannot_bind_send_slot_to_wrong_attempt(tmp_path):
+    s = store(tmp_path)
+    first = make_intent(authorization_hash="a" * 64)
+    second = make_intent(authorization_hash="9" * 64)
+    assert first.execution_key != second.execution_key
+    s.reserve_send_attempt(
+        first, attempt_id="attempt-a", started_at="2026-09-21T11:00:10Z"
+    )
+    s.reserve_send_attempt(
+        second, attempt_id="attempt-b", started_at="2026-09-21T11:00:10Z"
+    )
+
+    conn = sqlite3.connect(s.path)
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("DELETE FROM carrier_execution_send_slots")
+    with pytest.raises(sqlite3.IntegrityError, match="send slot attempt mismatch"):
+        conn.execute(
+            """INSERT INTO carrier_execution_send_slots
+               (buyer_id,business_unit,execution_key,attempt_id,acquired_at)
+               VALUES(?,?,?,?,?)""",
+            (
+                "buyer","unit",second.execution_key,"attempt-a",
+                "2026-09-21T11:00:20.000000Z",
+            ),
+        )
+    conn.rollback()
+    conn.close()
+
+
+def test_direct_sql_cannot_attach_delivery_to_failed_execution(tmp_path):
+    s = store(tmp_path)
+    intent = make_intent()
+    s.reserve_send_attempt(
+        intent, attempt_id="attempt-failed", started_at="2026-09-21T11:00:10Z"
+    )
+    failed = make_receipt(intent, outcome="FAILED")
+    s.record_execution_receipt(attempt_id="attempt-failed", receipt=failed)
+
+    conn = sqlite3.connect(s.path)
+    conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError, match="delivery requires submitted"):
+        conn.execute(
+            """INSERT INTO carrier_delivery_receipts
+               (buyer_id,business_unit,delivery_receipt_hash,execution_key,
+                submitted_receipt_hash,delivered_at,delivery_json)
+               VALUES(?,?,?,?,?,?,?)""",
+            (
+                "buyer","unit","5"*64,intent.execution_key,failed.receipt_hash,
+                "2026-09-21T11:05:00.000000Z","{}",
+            ),
+        )
+    conn.rollback()
+    conn.close()
+
+
 def test_direct_sql_second_successful_submission_is_blocked(tmp_path):
     s = store(tmp_path)
     intent = make_intent()
