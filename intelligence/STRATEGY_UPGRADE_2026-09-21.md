@@ -93,3 +93,27 @@ These fields are diagnostic only. At introduction, 10 prior discovery runs had e
 
 No change here is evidence that the architecture is superior. The unfinished Pair 1 benchmark remains frozen, and automatic allocation should only use these new signals after enough prospective examples show improved useful outcomes without worsening recall.
 
+## Per-move learning, compact priors and measured efficiency
+
+A third live-path upgrade moves learning below whole-run/query-family granularity.
+
+### Why
+The current query-family report showed **39 measured families and 39 one-run measured families**. That is too fragmented for fast empirical learning: a useful code-signature search or lineage jump can work repeatedly even when the full query-family wording is unique.
+
+### Added
+- `search_moves` telemetry records materially different retrieval moves and their observed result, surface, candidate/deep/retained counts and references.
+- `tools/ti_search_move_learning.py` aggregates move-level evidence globally and by search objective with conservative minimum-sample gates.
+- Move telemetry preserves first/last-seen recency and recent-use counts so an old successful method does not become permanent dogma.
+- `tools/ti_search_move_policy.py` creates a cautious search curriculum. It remains observe-only until at least three move types satisfy evidence gates, and always preserves an exploration floor.
+- Baseline curriculum is correctly **100% exploration / inactive** because no historical runs were retroactively assigned search-move results.
+- `candidate_preflight_checks`, `known_candidate_preflight_hits` and `duplicate_deep_inspections_avoided` measure useful work the network avoids through prior memory.
+- `tools/ti_efficiency_report.py` tracks those savings alongside deep-inspection, tool-call and elapsed-time denominators without rewarding shallow work.
+- Baseline registry pressure is 1,706 unique repositories, 79 duplicate observations (4.4%) and 91 unknown-revision records. Historical duplicate avoidance was not invented.
+- `tools/ti_network_priors.py` generates `NETWORK_PRIORS.md`, a compact navigation layer so live hunters can start from current high-information constraints instead of rereading the full corpus. It is explicitly non-authoritative.
+
+### Compounding loop
+Future live hunts now produce:
+`search move -> candidate/evidence result -> run telemetry -> coordination handoff -> outcome -> move/strategy/efficiency reports -> compact network priors -> next hunt`.
+
+The new move policy is deliberately a recommendation, not an autonomous command. It should activate only after prospective evidence accumulates, and assignment-specific acceptance targets, domain gates and verifier evidence always outrank generic priors.
+
