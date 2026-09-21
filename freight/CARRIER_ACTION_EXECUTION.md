@@ -72,3 +72,25 @@ A DELIVERED receipt does not prove:
 - realized savings.
 
 Those remain downstream settlement evidence states.
+
+
+## Buyer/business-unit scope
+
+Execution intents, idempotency keys and execution receipts are explicitly bound to the buyer and business unit from the External Action Authorization / Carrier Action Proposal. The same carrier/customer/payload facts in a different buyer or business unit produce a different execution key.
+
+## Asynchronous delivery confirmation
+
+Some channels can prove submission before they can prove delivery. A SUBMITTED execution receipt can therefore receive a later, separate delivery confirmation.
+
+The delivery confirmation:
+
+- references the exact execution key and submitted execution-receipt hash;
+- must occur at or after the submission timestamp;
+- carries a delivery reference hash and new external delivery-evidence hash;
+- rejects reuse of the authorization/proposal/payload/submission evidence as delivery evidence;
+- is self-verifying and tenant scoped;
+- permits at most one delivery confirmation per execution key/submitted receipt in a validated history.
+
+A FAILED execution cannot receive delivery confirmation. An execution receipt that already recorded DELIVERED does not get a second delivery receipt.
+
+Delivery confirmation still does not prove settlement, credit issuance, cash receipt, recovery or realized savings.
