@@ -1,9 +1,11 @@
 {
   "schema_version": 1,
-  "routing_generation_id": "ROUTING:5c4022f1d84d",
+  "routing_generation_id": "ROUTING:1e64ef5f1526",
   "worker_profile_generation_id": "WORKERS:fc22659849b1",
   "routing_learning_generation_id": "ROUTELEARN:bc40639ef4db",
   "routing_learning_mode": "observe_only_insufficient_evidence",
+  "activation_response_learning_generation_id": "RESPLEARN:000000000000",
+  "activation_response_learning_mode": "unavailable",
   "registered_workers": 14,
   "active_locked_workers": 0,
   "routed_workers": 14,

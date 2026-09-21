@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "response_learning_generation_id": "RESPLEARN:efdfca633185",
+  "clock_commit_sha": "05715707ec5605ec8e0e52a36ac396d545cc67b8",
+  "clock_timestamp": "2026-09-21T00:52:28Z",
+  "mode": "observe_only_insufficient_evidence",
+  "activation_records": 0,
+  "global_resolved_primary_activations": 0,
+  "global_evidence_threshold": 20,
+  "workers_with_sufficient_evidence": 0,
+  "workers_with_negative_adjustment": 0
+}

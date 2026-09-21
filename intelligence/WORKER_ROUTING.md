@@ -1,11 +1,12 @@
 # WORKER ROUTING PLAN
 
-Routing generation: **ROUTING:5c4022f1d84d**
+Routing generation: **ROUTING:1e64ef5f1526**
 Worker profiles: **WORKERS:fc22659849b1**
 
 V12/V13 routes workers using positive historical fit, assignment priority, and evidence-gated routing outcome adjustments. Active V11 claims remain locked.
 
 Routing learning: **ROUTELEARN:bc40639ef4db** / mode **observe_only_insufficient_evidence**
+Activation-response learning: **RESPLEARN:000000000000** / mode **unavailable**
 
 | Worker | Profile | Route | Slot | Assignment | Score | Reason |
 |---|---|---|---|---|---:|---|
@@ -30,5 +31,6 @@ Routing learning: **ROUTELEARN:bc40639ef4db** / mode **observe_only_insufficient
 - Historical strategy, objective, experiment, capability, domain and completed-role experience can only add fit.
 - Unmeasured workers get an exploration bonus; they are not treated as low quality.
 - Current active claims are locked and consume worker capacity.
-- V13 learned adjustments are zero unless routing_learning_policy evidence thresholds are satisfied.
+- V13 learned task-context adjustments are zero unless routing_learning_policy evidence thresholds are satisfied.
+- V17 activation-response adjustment is penalty-only and stays zero until READY→activation→claim evidence thresholds are satisfied.
 - Routing is recomputed after execution-state, telemetry, outcomes, or routing-learning changes.
