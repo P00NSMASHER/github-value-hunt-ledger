@@ -10,7 +10,7 @@ For a retained candidate, record canonical URL, inspected revision, concrete cap
 
 Keep the existing A–F /30 rubric for comparability: speed to revenue, plausible customer value, build/domain compression, rarity, evidence, and rights/deployment clarity (0–5 each). Scores are hypotheses, not measured dollars. Exceptional 27–30 and strong 24–26 may be referred; only the integrator promotes to MASTER after evidence review. A component can matter by closing a specific stack gap. Do not launch another product because a repository is exciting.
 
-For retained evidence, hand off the affected capability/graph edge, experiment, radar signal if supported, commercial implication, negative knowledge and next action. Distinguish capability delta from another implementation of an existing capability. Record negative results and useful falsification. Forecasts, patents, stars and institutional prestige do not establish technical success or demand.
+For retained evidence, hand off the affected capability/graph edge, experiment, radar signal if supported, commercial implication, negative knowledge and next action. Distinguish capability delta from another implementation of an existing capability. Record negative results and useful falsification. When the handoff can change another worker's next action, emit a compact immutable signal under intelligence/COORDINATION_PROTOCOL.md rather than forcing sibling hunters to reread the full catalog. Forecasts, patents, stars and institutional prestige do not establish technical success or demand.
 
 ## Bounded discovery
 
@@ -36,7 +36,9 @@ Classify the durable stop/miss reason when known: `qualified_find`, `duplicate_n
 
 ## Learning
 
-Use measured runs, candidate dispositions and independently evidenced outcomes. Preserve null when effort or historical denominators were not observed. No invented counts, revisions, tests, revenue or causal attribution. Controlled comparisons require matched task/surface/budget; observational yield is descriptive. Preserve the existing minimum-sample and exploration floors. Below those floors use cautious scheduling priorities, never declare a winning strategy. Connect a completed experiment to its originating run IDs; record failures as well as successes.
+Use measured runs, candidate dispositions, coordination outcomes and independently evidenced outcomes. Preserve null when effort or historical denominators were not observed. No invented counts, revisions, tests, revenue or causal attribution. Controlled comparisons require matched task/surface/budget; observational yield is descriptive. Preserve the existing minimum-sample and exploration floors. Below those floors use cautious scheduling priorities, never declare a winning strategy. Connect a completed experiment to its originating run IDs; record failures as well as successes.
+
+Treat coordination itself as an experiment. A useful signal should eventually show evidence that it prevented duplicate deep inspection, exposed a contradiction earlier, transferred a reusable search lesson, closed an experiment gap or improved an outcome. Signal count alone is not progress, and coordination-derived routing remains observe-first until enough measured evidence exists.
 
 ## Source and action boundaries
 
