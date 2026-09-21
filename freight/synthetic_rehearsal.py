@@ -11,14 +11,13 @@ from dataclasses import asdict
 from pathlib import Path
 
 from freight.contracts import (
-    PopulationRow,
-    freeze_population,
     open_incumbent_output,
     seal_incumbent_submission,
 )
 from freight.finding_factory import derive_batch
 from freight.invoice_csv_adapter import parse_invoice_charge_csv
 from freight.deal_economics import DealProfile, qualify_deal
+from freight.population_builder import build_population_from_charge_batch
 from freight.pilot_reporting import (
     ReviewDisposition,
     make_finding_review,
@@ -83,16 +82,6 @@ def run_rehearsal() -> dict:
         ),
     )
 
-    population = freeze_population(
-        BUYER,
-        BU,
-        "three synthetic invoices",
-        (
-            PopulationRow("inv-1","shp-1","cust","carrier","USD","src-inv-1"),
-            PopulationRow("inv-2","shp-2","cust","carrier","USD","src-inv-2"),
-            PopulationRow("inv-3","shp-3","cust","carrier","USD","src-inv-3"),
-        ),
-    )
     invoice_csv = (
         "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,"
         "charge_code,service_date,quantity_units,billed_cents\n"
@@ -106,6 +95,11 @@ def run_rehearsal() -> dict:
         buyer_id=BUYER,
         business_unit=BU,
     )
+    population_build = build_population_from_charge_batch(
+        invoice_batch,
+        selection_rule="three synthetic invoices",
+    )
+    population = population_build.population
     charges = invoice_batch.charges
     verified_rules_csv = (
         "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
@@ -263,6 +257,9 @@ def run_rehearsal() -> dict:
         "pilot_delivery_cost_usd": deal.economics.delivery_cost_usd,
         "pilot_gross_margin": deal.economics.gross_margin,
         "population_hash": population.manifest_hash,
+        "population_builder_hash": population_build.builder_hash,
+        "population_invoice_count": population_build.invoice_count,
+        "population_charge_count": population_build.charge_count,
         "incumbent_submission_hash": sealed.sealed_hash,
         "truth_hash": truth.truth_hash,
         "invoice_csv_adapter_hash": invoice_batch.adapter_hash,
