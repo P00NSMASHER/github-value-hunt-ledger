@@ -137,3 +137,18 @@ This is lane-local shadow state. It is evidence-backed working memory, not autho
 
 ## Next highest-value question
 Can we find a current public **consequential-action** system that joins (1) executor identity derived from the object actually acting, (2) a narrow reviewed behavior closure with two-sided drift tests, and (3) an accepted retained provider/action proof consumed by runtime authority?
+
+## Run 17 evidence-backed state update
+- `agenttrust-labs/agenttrust@21a3b111b7677d0b06ab1b063d647e4f52ea3b17` is the first inspected low-attention reference in this sequence to combine a fail-closed atomic on-chain payment gate with retained historical devnet attestation/payment evidence. Non-`Allow` decisions revert the composed gate + transfer + feedback transaction.
+- The load-bearing limit is structural: `ValidationAttestation` stores `claim_payload_hash` and `claim_uri_hash`, but PolicyVault's parsed view and `RequireValidation::evaluate` consume only subject, capability hash, attestor, expiry and revoked state. The gate therefore cannot distinguish changed evidence payloads or executor builds that retain the same subject/capability/attestor tuple.
+- `capability_hash` is a semantic namespace identifier in this path, not a content-derived reviewed behavior closure. `subject_asset` is likewise not evidence of runtime-derived executor identity.
+- The retained May 7, 2026 devnet fixture is useful historical evidence, but exact-head scheduled devnet smoke remained red through September 17, 2026. The observed failures are harness/integration failures rather than proof of an on-chain semantic defect; they nevertheless block current exact-revision provider qualification.
+- `Prismer-AI/signet@670411774857d4bccf9a4ea4bb4de67669086d7a` supplies a complementary signed intent/outcome receipt and fail-closed policy layer, but no inspected path joins those receipts to runtime-derived executor identity, narrow two-sided behavior closure and retained live-provider qualification.
+- Independent verifier conclusion: **PASS_WITH_LIMITS**, proposed **24/30**, for AgentTrust as a consequence-bound attestation/payment reference; **NO STRONG full-target finding**.
+- Durable lesson: **a persisted claim payload hash has no admission authority at the consequence boundary unless that boundary consumes it and binds it to the current executor identity.** The hash may still have off-chain evidentiary value.
+- Search policy: add **ATTESTATION-PAYLOAD CONSUMPTION AUDIT** as **LOCAL / one distinct success**. Trace created credential fields into the actual gate, distinguish labels from behavior identity, require executor binding, and verify exact-subject provider currentness. No global promotion.
+- `END-TO-END CLOSURE COMPOSITION AUDIT` gains another application and remains staged-eligible locally. The prior `EXECUTOR-IDENTITY DERIVATION AUDIT` and `MEASURED ≠ REVIEWED-SOURCE AUDIT` statuses remain unchanged.
+
+## Next highest-value question
+Can a public agent payment or consequential-action gate prove, in one current retained artifact, that the credential payload consumed at admission names a narrow reviewed behavior closure, that the runtime derives the matching identity from the executor actually acting, and that covered executor drift withdraws authority while unrelated release churn preserves it?
+
