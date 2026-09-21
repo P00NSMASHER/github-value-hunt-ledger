@@ -32,6 +32,8 @@ Deep verification must not silently destroy discovery recall. For a true search 
 
 A verifier or red-team rejection of candidate A is evidence about candidate A, not evidence that the search question has no answer. When a serious candidate fails, preserve the exact failed proof obligation and use it to sharpen the next retrieval pass. Prefer at least two distinct candidate identities before exhausting a discovery budget when plausible alternatives are retrievable.
 
+If domain-labelled candidates repeatedly miss the defining invariant, use one **invariant-first adjacent-domain rescue** before NO_FIND when practical. Search for the load-bearing mechanism independent of product/category labels, then ask whether a broader or adjacent system actually exercises that invariant on the assignment's domain case. Eligibility is governed by the acceptance target and concrete implementation, not repository marketing taxonomy. Do not relax the invariant merely to admit an adjacent candidate. A rate-limited/failed retrieval surface is not evidence of absence; switch surface or anchor family and record `retrieval_limited` when coverage remains materially impaired.
+
 Classify the durable stop/miss reason when known: `qualified_find`, `duplicate_no_delta`, `retrieval_limited`, `no_qualifying_candidate`, `evidence_blocked`, `rights_or_safety_blocked`, `external_prerequisite`, or `budget_exhausted`. Do not convert an unknown cause into a negative finding. Feed repeated miss patterns and verifier overturns back to the integrator/allocator as learning evidence rather than compensating with more depth on the same candidate.
 
 ## Learning
