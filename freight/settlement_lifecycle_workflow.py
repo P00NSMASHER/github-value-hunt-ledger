@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from freight.contracts import canonical_hash
 from freight.counter_review_workflow import (
     CounterReviewCase,
-    build_counter_review_case,
+    _build_case_from_snapshot as _build_counter_review_case_from_snapshot,
 )
 from freight.settlement_csv_adapter import (
     CounterEventCSVBatch,
@@ -25,7 +25,7 @@ from freight.settlement_csv_adapter import (
 )
 from freight.settlement_review_workflow import (
     SettlementReviewCase,
-    build_settlement_review_case,
+    _build_case_from_snapshot as _build_settlement_review_case_from_snapshot,
 )
 from freight.settlement_store import (
     ALLOCATED,
@@ -290,69 +290,76 @@ def process_settlement_evidence(
         counter_filename=counter_filename,
         counter_data=counter_data,
     )
-    before = _snapshot(store)
-    before_hash = _snapshot_hash(before)
+    # Advisory preflight gives fast, human-readable package errors. The store
+    # repeats authoritative invariants inside one BEGIN IMMEDIATE transaction.
+    advisory_before = _snapshot(store)
     _preflight(
         store,
-        before=before,
+        before=advisory_before,
         processed_at=processed_at,
         settlement_batch=settlement_batch,
         counter_batch=counter_batch,
     )
 
+    package = store.process_evidence_package(
+        settlement_events=(
+            settlement_batch.events if settlement_batch is not None else ()
+        ),
+        counter_events=(
+            counter_batch.events if counter_batch is not None else ()
+        ),
+        created_at=processed_at,
+    )
+    before = package.store_snapshot_before
+    after = package.store_snapshot_after
+    before_hash = _snapshot_hash(before)
+    after_hash = _snapshot_hash(after)
+
     settlement_results: list[SettlementEventProcessing] = []
     settlement_cases: list[SettlementReviewCase] = []
-    if settlement_batch is not None:
-        for event in settlement_batch.events:
-            created = store.ingest_event(event)
-            decision = store.auto_allocate(
-                event.event_id,
-                created_at=processed_at,
+    for outcome in package.settlement_outcomes:
+        decision = outcome.decision
+        case_hash = None
+        if decision.status == REVIEW:
+            case = _build_settlement_review_case_from_snapshot(
+                store,
+                event_id=outcome.event_id,
+                snapshot=after,
             )
-            case_hash = None
-            if decision.status == REVIEW:
-                case = build_settlement_review_case(
-                    store,
-                    event_id=event.event_id,
-                )
-                settlement_cases.append(case)
-                case_hash = case.case_hash
-            settlement_results.append(SettlementEventProcessing(
-                event_id=event.event_id,
-                ingest_status=INGESTED if created else ALREADY_PRESENT,
-                decision_status=decision.status,
-                effective_status=_effective_allocation(decision.status),
-                edge_ids=tuple(decision.edge_ids),
-                reason=decision.reason,
-                review_case_hash=case_hash,
-            ))
+            settlement_cases.append(case)
+            case_hash = case.case_hash
+        settlement_results.append(SettlementEventProcessing(
+            event_id=outcome.event_id,
+            ingest_status=INGESTED if outcome.created else ALREADY_PRESENT,
+            decision_status=decision.status,
+            effective_status=_effective_allocation(decision.status),
+            edge_ids=tuple(decision.edge_ids),
+            reason=decision.reason,
+            review_case_hash=case_hash,
+        ))
 
     counter_results: list[CounterEventProcessing] = []
     counter_cases: list[CounterReviewCase] = []
-    if counter_batch is not None:
-        for counter in counter_batch.events:
-            created = store.ingest_counter(counter)
-            decision = store.auto_apply_counter(
-                counter.counter_id,
-                created_at=processed_at,
+    for outcome in package.counter_outcomes:
+        decision = outcome.decision
+        case_hash = None
+        if decision.status == REVIEW:
+            case = _build_counter_review_case_from_snapshot(
+                store,
+                counter_id=outcome.counter_id,
+                snapshot=after,
             )
-            case_hash = None
-            if decision.status == REVIEW:
-                case = build_counter_review_case(
-                    store,
-                    counter_id=counter.counter_id,
-                )
-                counter_cases.append(case)
-                case_hash = case.case_hash
-            counter_results.append(CounterEventProcessing(
-                counter_id=counter.counter_id,
-                ingest_status=INGESTED if created else ALREADY_PRESENT,
-                decision_status=decision.status,
-                effective_status=_effective_reversal(decision.status),
-                edge_ids=tuple(decision.edge_ids),
-                reason=decision.reason,
-                review_case_hash=case_hash,
-            ))
+            counter_cases.append(case)
+            case_hash = case.case_hash
+        counter_results.append(CounterEventProcessing(
+            counter_id=outcome.counter_id,
+            ingest_status=INGESTED if outcome.created else ALREADY_PRESENT,
+            decision_status=decision.status,
+            effective_status=_effective_reversal(decision.status),
+            edge_ids=tuple(decision.edge_ids),
+            reason=decision.reason,
+            review_case_hash=case_hash,
+        ))
 
     settlement_results_tuple = tuple(settlement_results)
     counter_results_tuple = tuple(counter_results)
@@ -360,9 +367,6 @@ def process_settlement_evidence(
     counter_cases_tuple = tuple(counter_cases)
     review_count = len(settlement_cases_tuple) + len(counter_cases_tuple)
     state = REVIEW_REQUIRED if review_count else COMPLETE
-
-    after = _snapshot(store)
-    after_hash = _snapshot_hash(after)
 
     stable_body = {
         "schema": 1,
