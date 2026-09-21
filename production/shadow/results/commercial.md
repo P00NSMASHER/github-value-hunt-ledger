@@ -1180,3 +1180,74 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** None. The existing commercial referral already asks for the same remaining single-path tier-5C-B intersection; adding another would duplicate it.
 
 **NEXT TEST:** Find one real cash refund or payout where this conclusive provider-rediscovery contract survives literal post-effect process death/new-process recovery and the **same durable action identity** then reaches independently grounded E5 processor/bank/recipient settlement evidence.
+
+
+## 2026-09-20 — Shadow run 17
+
+**DATE:** 2026-09-20
+
+**HYPOTHESIS:** An “exactly one refund after crash” test can still be a false-green if it kills the wrong process, never cuts execution after the provider effect, and gives its fake provider an infinite idempotency-memory horizon. Source/test-boundary archaeology should expose this class even when the implementation has stable keys and good local concurrency controls.
+
+**DISCOVERY METHODS:**
+1. Process-death signature search for Stripe refund paths using `SIGKILL`, `process.kill`, refund idempotency and balance-transaction evidence.
+2. Test-boundary/source inspection: identify the exact killed PID, provider-effect cutpoint, durable state transitions and whether the refund executor itself is replaced.
+3. Provider-contract verification against current Stripe idempotency and refund-list documentation.
+4. Comparator inspection against Koaryu's durable provider-operation/reconciliation model and Suprnova's payment-evidence/negative-mutation harness.
+
+**SELECTED NEGATIVE-CONTROL CANDIDATE + URL + EXACT REVISION:** `frankbria/hypnosis-studio` — https://github.com/frankbria/hypnosis-studio — `52234fbdf819e3dcc83fe5190ef29718ce7e82da`.
+
+**NARROW IMPLEMENTED CAPABILITY:**
+- The refund path uses an atomic `wx` filesystem claim, persists `pending/refunded/failed` state on the order, and submits Stripe refunds with deterministic `Idempotency-Key: refund-<sessionId>`.
+- A render-worker exit handler and a periodic stale-job sweep are deliberately raced; the local claim makes one caller win, while the stable provider key protects duplicate immediate requests in the fake provider.
+- The repository has focused tests for no-refund-on-success, refund-on-render-failure, one winner under worker/sweep concurrency, stable keys, retry after locally erased refund evidence, failed-refund retry bounds and customer-visible refund state.
+- The repository history confirms the refund feature was deliberately introduced in `19284ddecafc` (“auto-refund when a render fails after payment”) and later repaired to avoid mistaking a missing job back-pointer for proof that no payment existed.
+
+**CRITICAL FALSIFICATION / WHY THE GREEN TEST OVERSTATES THE TARGET CLAIM:**
+- The test named **“a forced mid-job crash produces exactly one refund”** kills the audio/render worker PID. The Node server that owns `refundOrder()`, provider dispatch and local completion stays alive. This is a legitimate render-failure/concurrency test, but it is not literal post-refund process death or new-process money recovery.
+- The test named **“a lost refund record cannot move the money twice”** first waits for a successful refund response, then manually rewrites the local order to `failed`. It does not terminate the refund executor after provider commit or suppress the response at the dangerous effect/commit cutpoint.
+- The fake Stripe stores every idempotency key in an in-memory `Map` without expiry. Current Stripe documentation says keys may be removed after they are at least 24 hours old and reuse after pruning generates a new request. The fixture therefore grants a stronger, effectively infinite provider guarantee than Stripe documents.
+- Production code treats the local refund claim as abandoned after five minutes, marks request/timeout failures as `failed`, deletes the claim and makes the operation retryable. It has no provider-refund rediscovery/list path. A real commit-plus-response-loss followed by retry after provider-key pruning can therefore be licensed without authoritative absence.
+- No test ties the same refund to provider terminality, `balance_transaction`, payout, bank or recipient evidence. This path establishes neither tier-5B process-restart proof nor tier-5C-B external settlement.
+
+**SOURCE / TEST / HISTORY / RIGHTS VERIFICATION:**
+- Exact-revision source and tests were inspected beyond the README. Repository metadata at inspection: public, JavaScript, 0 stars / 0 forks, no detected public license.
+- The exact commit is signed/verified in GitHub history, but its combined-status endpoint reports no attached commit statuses. No untrusted repository code was executed.
+- Stripe's current API contract independently confirms the missing horizon: idempotency results can be pruned after at least 24 hours, and a reused pruned key creates a new request. Stripe also exposes PaymentIntent-scoped, cursor-paginated refund listing, but this candidate does not use that read path.
+
+**COMPARATORS:**
+- `ronchak/Koaryu@f58886815b300631c0fc11595e1b84db8d92970a` is stronger on durable operation state and reconciliation: `provider_request_in_flight → provider_succeeded → projected → completed`, one provider-attempt accounting, immutable resource fingerprints and database concurrency/rollback recovery. Its inspected refund provider is still fake and the evidence does not add literal post-effect OS process death or E5 settlement.
+- `eas4ai/suprnova-directory-starter@5be23a2cc42fc86e66d57194955d8137fd096580` has strong provider-evidence validation and mutation-sensitive payment tests. Its visible `SIGKILL` terminates the spawned Cargo test process during harness cleanup after execution/timeout; it is not an effect-boundary refund crash and does not close the same-action intersection.
+- Neither comparator changes the verdict; they show that durable reconciliation, semantic payment evidence and literal process replacement remain separable proof obligations.
+
+**SPECIALIST PASSES:**
+- **DISCOVERY ANALYST:** searched crash/refund/provider-terminality intersections and bounded serious inspection to three candidates.
+- **CODE INSPECTOR:** traced local claim TTL, durable refund states, stable provider key, failure cleanup and absence of provider rediscovery.
+- **TEST-BOUNDARY INSPECTOR:** mapped every killed PID and distinguished render-worker failure from refund-executor process death.
+- **PROVIDER-CONTRACT ANALYST:** verified the finite Stripe replay horizon and available cursor-paginated refund read path.
+- **COMMERCIAL ANALYST:** mapped the failure to a test-certification/audit wedge rather than a production component promotion.
+- **RED-TEAM / VERIFIER:** independently challenged the exact killed process, cutpoint, provider-fixture fidelity, restart identity, terminality and rights before scoring.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **CONTRADICTED for crash-safe/exactly-once money recovery; PASS only for the narrow local worker/sweep race.** The exact revision legitimately proves that two still-live server callbacks converge on one fake-provider refund while a render worker dies. It does not prove post-effect refund-executor death, new-process recovery, finite-horizon provider safety or external settlement. The unqualified source comment that the stable Stripe key “holds even when [local layers] are lost” is too strong without a provider-retention horizon or authoritative rediscovery path.
+
+**A-F SCORE (proposed only, after verifier):** **20/30 — A3 / B5 / C4 / D3 / E4 / F1.**
+- A3: the candidate is valuable as an audit negative control, not as a drop-in crash-certified refund engine.
+- B5: duplicate or orphaned refunds after ambiguous outcomes are direct-money failures.
+- C4: local concurrency, stable identity and customer-state handling are substantive, but the load-bearing crash/replay boundary is missing.
+- D3: the local pattern is reproducible and the false-green itself is commercially useful, but not a moat.
+- E4: exact source, focused tests, history, repository metadata and provider-contract triangulation strongly support the negative verdict.
+- F1: no detected public license, no exact-commit status checks and no real-provider qualification artifact.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: payments engineering lead, marketplace finance-platform owner, QA/reliability lead or Controller systems owner.
+- Pain: teams can have green “crash-safe” refund tests whose killed process is not the money executor and whose provider fixture silently promises permanent deduplication.
+- First paid wedge: **Money-Test Boundary Audit**. For one refund/correction flow, inventory every purported crash test, identify the exact PID and provider-effect cutpoint, parameterize provider idempotency retention, inject commit-plus-response-loss and restart beyond that horizon, require authoritative provider rediscovery before any second POST, and issue a matrix of `LOCAL_RACE_ONLY / RESPONSE_LOSS_SAFE / PROCESS_RESTART_SAFE / SETTLEMENT_VERIFIED / CONTRADICTED`.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** This negative control explains why run 16's conclusive provider-rediscovery rule and the earlier replay-window-cliff rule must be tested together. Interlock remains the strongest executed literal-SIGKILL/new-process real-Stripe artifact; Koaryu supplies a richer durable operation/reconciliation model; `mathd/ticketing_system` supplies conclusive paginated absence; Flames-up supplies separate terminal-payout evidence. The selected candidate may not inherit any of those strengths.
+
+**SEARCH EFFORT / COST PROXIES:** Four materially different discovery/verification modes; three serious candidates inspected; source, tests, history, repository metadata, exact commit status and current provider documentation checked; no untrusted code execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Add a lane-local **crash-test cutpoint fidelity check** to `SK-COM-003`: name the killed process, prove it owns the money mutation, locate the cut after provider effect but before durable local completion, require a genuinely new process to recover from durable state, and make the provider fixture model the real dedupe/visibility horizon. A test that kills an adjacent worker, manually edits post-success state, or retains idempotency forever is a local concurrency test—not process-restart money proof. This lesson is evidence-backed once here and remains lane-local.
+
+**REFERRALS:** None. The existing commercial referral already targets the single-path crash/recovery/settlement intersection; this run sharpens its negative-control requirements without creating a new cross-lane question.
+
+**NEXT TEST:** Build or find a revision-bound refund test that kills the **refund executor** immediately after provider commit, restarts a genuinely new process after the provider replay window is no longer assumed, performs conclusive provider rediscovery from the durable pre-dispatch identity, causes no second POST and follows that same refund to independently grounded E5 outcome evidence.
