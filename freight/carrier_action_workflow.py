@@ -10,7 +10,7 @@ import re
 from dataclasses import asdict, dataclass
 from enum import Enum
 
-from freight.buyer_review_workflow import BuyerReviewBatch
+from freight.buyer_review_workflow import BuyerReviewBatch, verify_buyer_review_batch
 from freight.contracts import TruthManifest, canonical_hash
 from freight.engagement_state import EngagementResolution
 from freight.external_action_authorization import (
@@ -19,6 +19,8 @@ from freight.external_action_authorization import (
     issue_authorization,
 )
 from freight.pilot_reporting import ReviewDisposition
+from freight.review_packet import ReviewPacket
+from freight.review_routing import ReviewRouting
 from freight.recovery_claim_workflow import (
     RecoveryClaimBatch,
     verify_recovery_claim_batch,
@@ -235,12 +237,20 @@ def authorize_carrier_action_proposal(
     resolution: EngagementResolution,
     operative_charter: dict,
     truth: TruthManifest,
+    review_packet: ReviewPacket,
+    review_routing: ReviewRouting,
     buyer_review: BuyerReviewBatch,
     recovery_claims: RecoveryClaimBatch,
     proposal: CarrierActionProposal,
     approval: CarrierActionApprovalInput,
 ) -> ExternalActionAuthorization:
     verify_recovery_claim_batch(recovery_claims)
+    verify_buyer_review_batch(
+        batch=buyer_review,
+        review_packet=review_packet,
+        review_routing=review_routing,
+        truth=truth,
+    )
     _verify_buyer_review_link(recovery_claims, buyer_review, truth)
 
     canonical_batch = build_carrier_action_proposal_batch(recovery_claims=recovery_claims)
