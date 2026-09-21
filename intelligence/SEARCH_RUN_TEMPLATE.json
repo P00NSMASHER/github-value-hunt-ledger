@@ -113,5 +113,8 @@
   "consumed_coordination_signal_ids": [],
   "recall_rescue_type": null,
   "recall_rescue_found_qualifying_candidate": null,
-  "search_moves": []
+  "search_moves": [],
+  "candidate_preflight_checks": null,
+  "known_candidate_preflight_hits": null,
+  "duplicate_deep_inspections_avoided": null
 }
