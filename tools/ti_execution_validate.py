@@ -16,6 +16,7 @@ activation_legacy_claim_ids=set(activation_policy.get("legacy_claim_ids") or [])
 legacy_claim_ids=set(dispatch_policy.get("legacy_claim_ids") or [])
 min_claim_schema=int(dispatch_policy.get("minimum_claim_schema_version",14))
 min_v15_claim_schema=int(dispatch_policy.get("minimum_v15_claim_schema_version",15))
+min_v19_claim_schema=int(dispatch_policy.get("minimum_v19_claim_schema_version",19))
 worker_registry=json.loads((INTEL/"worker_registry.json").read_text(encoding="utf-8")) if (INTEL/"worker_registry.json").exists() else {"workers":[]}
 registered_workers={w["worker_id"] for w in worker_registry.get("workers",[])}
 def parse_ts(value):
@@ -65,6 +66,8 @@ for n,c in enumerate(claims,1):
             if not ticket:
                 raise SystemExit(f"execution_claim_history.jsonl:{n}: generated claim missing historical dispatch ticket")
             ticket_schema=int(ticket.get("ticket_schema_version") or 0)
+            if ticket_schema>=19 and claim_schema<min_v19_claim_schema:
+                raise SystemExit(f"execution_claim_history.jsonl:{n}: V19 ticket requires schema {min_v19_claim_schema}+ claim")
             if ticket_schema>=15 and claim_schema<min_v15_claim_schema:
                 raise SystemExit(f"execution_claim_history.jsonl:{n}: V15 ticket requires schema {min_v15_claim_schema}+ claim")
             exact={
@@ -78,6 +81,11 @@ for n,c in enumerate(claims,1):
             if ticket_schema>=15:
                 exact["dispatch_kind"]=c.get("dispatch_kind")
                 exact["parent_dispatch_ticket_id"]=c.get("parent_dispatch_ticket_id")
+            if ticket_schema>=19:
+                exact["routing_exploration_generation_id"]=c.get("routing_exploration_generation_id")
+                exact["routing_exploration_pair_id"]=c.get("routing_exploration_pair_id")
+                exact["baseline_slot_id"]=c.get("baseline_slot_id")
+                exact["route_mode"]=c.get("route_mode")
             drift=[k for k,v in exact.items() if ticket.get(k)!=v]
             if drift:
                 raise SystemExit(f"execution_claim_history.jsonl:{n}: dispatch history drift {','.join(drift)}")
@@ -169,6 +177,12 @@ for n,r in enumerate(runs,1):
                     for key in ["presence_generation_id","presence_event_id","activation_id","activation_generation_id"]:
                         if r.get(key)!=c.get(key):
                             raise SystemExit(f"search_runs.jsonl:{n}: V16 activation provenance mismatch {key}")
+                if int(c.get("claim_schema_version") or 0)>=19:
+                    if int(r.get("schema_version") or 0)<19:
+                        raise SystemExit(f"search_runs.jsonl:{n}: V19 claim requires schema 19+ run")
+                    for key in ["routing_exploration_generation_id","routing_exploration_pair_id","baseline_slot_id","route_mode"]:
+                        if r.get(key)!=c.get(key):
+                            raise SystemExit(f"search_runs.jsonl:{n}: V19 exploration provenance mismatch {key}")
         elif r.get("route_override_reason")!=c.get("route_override_reason"):
             raise SystemExit(f"search_runs.jsonl:{n}: V14 override reason mismatch")
     try:
