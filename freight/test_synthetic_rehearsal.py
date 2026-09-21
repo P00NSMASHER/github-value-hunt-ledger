@@ -42,6 +42,13 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert len(out["recovery_claim_persistence_receipt_hash"]) == 64
     assert out["recovery_claim_persisted_count"] == 2
     assert out["recovery_claim_already_present_count"] == 0
+    assert len(out["carrier_action_proposal_batch_hash"]) == 64
+    assert out["carrier_action_proposal_count"] == 1
+    assert len(out["carrier_action_proposal_hash"]) == 64
+    assert out["carrier_action_target_customer_id"] == "cust"
+    assert len(out["external_action_authorization_hash"]) == 64
+    assert out["external_action_authorized_cents"] == 5000
+    assert out["external_action_automatic_execution_authorized"] is False
     assert len(out["settlement_csv_adapter_hash"]) == 64
     assert len(out["settlement_csv_file_sha256"]) == 64
     assert out["settlement_event_count"] == 2
