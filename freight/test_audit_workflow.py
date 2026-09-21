@@ -67,7 +67,10 @@ def test_single_call_returns_review_required_with_complete_artifacts():
     assert result.summary.evidence_remediation_case_count == 1
     assert result.summary.rerun_required is True
     assert len(result.summary.review_routing_hash) == 64
+    assert len(result.summary.remediation_plan_hash) == 64
     assert result.artifacts.review_routing.routing_hash == result.summary.review_routing_hash
+    assert result.artifacts.remediation_plan.plan_hash == result.summary.remediation_plan_hash
+    assert result.artifacts.remediation_plan.remediation_case_count == 1
     assert result.summary.validated_discrepancy_cents == 2500
     assert result.summary.review_discrepancy_cents == 5000
     assert len(result.summary.run_hash) == 64
@@ -87,6 +90,8 @@ def test_clean_run_is_distinct_from_review_required():
     assert result.summary.buyer_review_case_count == 0
     assert result.summary.evidence_remediation_case_count == 0
     assert result.summary.rerun_required is False
+    assert result.artifacts.remediation_plan.items == ()
+    assert result.artifacts.remediation_plan.items == ()
     assert result.summary.validated_discrepancy_cents == 0
 
 
@@ -100,6 +105,8 @@ def test_no_rules_is_review_required_not_pipeline_failure():
     assert result.summary.buyer_review_case_count == 0
     assert result.summary.evidence_remediation_case_count == 1
     assert result.summary.rerun_required is True
+    assert result.artifacts.remediation_plan.remediation_case_count == 1
+    assert result.artifacts.remediation_plan.items[0].remediation_action == "ADD_RULE_AND_RERUN"
     assert result.summary.unknown_expected_count == 1
     assert result.artifacts is not None
     assert result.artifacts.manifest.rule_hashes == ()
@@ -184,6 +191,7 @@ def test_summary_renderer_separates_discrepancy_from_realized_savings():
     assert "Review route:" in text
     assert "Buyer-review-ready cases:" in text
     assert "Evidence-remediation cases:" in text
+    assert "Remediation plan hash:" in text
     assert "not realized savings" in text
 
 
