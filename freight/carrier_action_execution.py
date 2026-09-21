@@ -294,6 +294,82 @@ def build_carrier_action_execution_intent(
     )
 
 
+def verify_carrier_action_execution_intent_proof(
+    intent: CarrierActionExecutionIntent,
+) -> None:
+    if not isinstance(intent, CarrierActionExecutionIntent):
+        raise ValueError("intent must be a CarrierActionExecutionIntent")
+    for name in (
+        "execution_key",
+        "authorization_hash",
+        "proposal_hash",
+        "payload_hash",
+        "recipient_reference_hash",
+        "intent_hash",
+    ):
+        _sha(name, getattr(intent, name))
+    for name in (
+        "buyer_id",
+        "business_unit",
+        "authorization_id",
+        "action_type",
+        "target_carrier_id",
+        "target_customer_id",
+        "currency",
+        "subject",
+        "body_text",
+    ):
+        _text(name, getattr(intent, name))
+    if type(intent.requested_cents) is not int or intent.requested_cents <= 0:
+        raise ValueError("requested_cents must be a positive integer")
+    if not intent.finding_ids or len(intent.finding_ids) != len(set(intent.finding_ids)):
+        raise ValueError("finding_ids must be a non-empty unique tuple")
+    canonical_prepared_at, _ = _timestamp("prepared_at", intent.prepared_at)
+    if canonical_prepared_at != intent.prepared_at:
+        raise ValueError("prepared_at must be canonical UTC")
+
+    execution_key_body = {
+        "schema": 1,
+        "buyer_id": intent.buyer_id,
+        "business_unit": intent.business_unit,
+        "authorization_hash": intent.authorization_hash,
+        "proposal_hash": intent.proposal_hash,
+        "payload_hash": intent.payload_hash,
+        "recipient_reference_hash": intent.recipient_reference_hash,
+        "action_type": intent.action_type,
+        "target_carrier_id": intent.target_carrier_id,
+        "target_customer_id": intent.target_customer_id,
+        "currency": intent.currency,
+        "finding_ids": tuple(sorted(intent.finding_ids)),
+        "requested_cents": intent.requested_cents,
+    }
+    if canonical_hash(execution_key_body) != intent.execution_key:
+        raise ValueError("execution intent idempotency key mismatch")
+
+    body = {
+        "schema": 1,
+        "execution_key": intent.execution_key,
+        "buyer_id": intent.buyer_id,
+        "business_unit": intent.business_unit,
+        "authorization_id": intent.authorization_id,
+        "authorization_hash": intent.authorization_hash,
+        "proposal_hash": intent.proposal_hash,
+        "payload_hash": intent.payload_hash,
+        "recipient_reference_hash": intent.recipient_reference_hash,
+        "action_type": intent.action_type,
+        "target_carrier_id": intent.target_carrier_id,
+        "target_customer_id": intent.target_customer_id,
+        "currency": intent.currency,
+        "requested_cents": intent.requested_cents,
+        "finding_ids": tuple(sorted(intent.finding_ids)),
+        "prepared_at": intent.prepared_at,
+        "subject": intent.subject,
+        "body_text": intent.body_text,
+    }
+    if canonical_hash(body) != intent.intent_hash:
+        raise ValueError("execution intent hash mismatch")
+
+
 def verify_carrier_action_execution_intent(
     intent: CarrierActionExecutionIntent,
     *,
@@ -303,6 +379,7 @@ def verify_carrier_action_execution_intent(
     recovery_claims: RecoveryClaimBatch,
     revocations: tuple[AuthorizationRevocation, ...] = (),
 ) -> None:
+    verify_carrier_action_execution_intent_proof(intent)
     expected = build_carrier_action_execution_intent(
         authorization=authorization,
         proposal=proposal,
