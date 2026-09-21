@@ -27,12 +27,13 @@
     "PAUSED"
   ],
   "guardrails": [
-    "Routing is positive-evidence only: missing history never creates a negative fit penalty.",
+    "Historical task-fit routing is positive-evidence only. The only permitted negative fit is V17 evidence-gated activation-response backpressure after a worker explicitly advertised READY.",
     "An active V11 claim is locked and cannot be rerouted.",
     "One worker receives at most one slot and one slot receives at most one worker.",
     "Unmeasured workers receive exploration credit so routing can learn them.",
     "Assignment priority remains part of routing; worker fit cannot turn a low-value task into a high-value task.",
     "Routing does not override domain STOP gates, execution leases, safety rules, or explicit manual overrides.",
-    "Generated routing is observational optimization, not a causal estimate of worker quality."
+    "Generated routing is observational optimization, not a causal estimate of worker quality.",
+    "V17 activation-response feedback is penalty-only, bounded, and never inferred from UNKNOWN/OFFLINE/PAUSED presence or pending activations."
   ]
 }

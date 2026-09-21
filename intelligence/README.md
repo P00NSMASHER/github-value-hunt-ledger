@@ -664,3 +664,33 @@ Pull activation rules:
 This prevents V15 from misclassifying an offline/unobserved worker as a slow claimant. Claim latency begins only after the worker has actually advertised fresh readiness and received a valid activation.
 
 Helper: `python tools/ti_worker_presence_event.py READY --worker HUNTER-XX`.
+
+
+## V17 activation response learning
+
+V17 measures responsiveness only after V16 has established that a worker is actually present and READY.
+
+Measured stages:
+- READY presence -> activation (**system latency; descriptive only**);
+- activation -> claim (**worker responsiveness; the only stage allowed to affect routing**);
+- claim -> START (**descriptive only**);
+- START -> COMPLETE (**descriptive only; task difficulty is confounded**).
+
+Generated products:
+- `activation_response_runs.jsonl` — one lifecycle record per issued V16 activation;
+- `worker_activation_response_metrics.jsonl`;
+- `activation_response_adjustments.jsonl`;
+- `activation_response_metrics.json`;
+- `ACTIVATION_RESPONSE_REPORT.md`.
+
+Feedback is conservative:
+- only primary dispatch activations train primary routing;
+- pending/unexpired activations do not count as failures;
+- READY events that never received an activation do not count against a worker;
+- UNKNOWN/OFFLINE/PAUSED presence never creates negative evidence;
+- work-steal activations are measured separately;
+- there is no positive responsiveness bonus;
+- at least 20 resolved primary activations globally and 4 resolved / 2 claimed for a worker are required before any penalty is eligible;
+- the penalty is bounded to -1.0 routing point.
+
+V17 outputs are consumed by V12/V13 routing on the following generation, giving a deliberate one-cycle delay between observation and control.
