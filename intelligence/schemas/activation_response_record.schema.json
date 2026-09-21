@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V17 Activation Response Record",
+  "type": "object",
+  "required": [
+    "activation_id",
+    "worker_id",
+    "dispatch_ticket_id",
+    "dispatch_kind",
+    "lifecycle_state",
+    "claimed",
+    "ready_to_activation_minutes",
+    "activation_to_claim_minutes",
+    "claim_to_start_minutes",
+    "start_to_complete_minutes"
+  ],
+  "properties": {
+    "activation_id": {
+      "type": "string",
+      "pattern": "^ACTIVATE:[a-f0-9]{12}$"
+    },
+    "worker_id": {
+      "type": "string"
+    },
+    "slot_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "dispatch_ticket_id": {
+      "type": "string",
+      "pattern": "^DISPATCH:[a-f0-9]{12}$"
+    },
+    "dispatch_kind": {
+      "enum": [
+        "primary",
+        "work_steal"
+      ]
+    },
+    "presence_event_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ready_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "activated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "activation_expires_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "claim_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "claimed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "started_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "completed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lifecycle_state": {
+      "enum": [
+        "PENDING",
+        "EXPIRED_UNCLAIMED",
+        "CLAIMED",
+        "COMPLETED",
+        "CLAIM_ENDED_OTHER"
+      ]
+    },
+    "claimed": {
+      "type": "boolean"
+    },
+    "telemetry_matched": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "ready_to_activation_minutes": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "activation_to_claim_minutes": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "claim_to_start_minutes": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "start_to_complete_minutes": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "response_learning_generation_id": {
+      "type": "string",
+      "pattern": "^RESPLEARN:[a-f0-9]{12}$"
+    }
+  },
+  "additionalProperties": true
+}
