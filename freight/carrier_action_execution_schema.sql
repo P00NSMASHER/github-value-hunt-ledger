@@ -74,6 +74,16 @@ CREATE TABLE IF NOT EXISTS carrier_delivery_receipts (
     REFERENCES carrier_execution_receipts(buyer_id,business_unit,receipt_hash)
 );
 
+CREATE TRIGGER IF NOT EXISTS carrier_send_slot_attempt_match
+BEFORE INSERT ON carrier_execution_send_slots
+BEGIN
+  SELECT CASE WHEN
+    (SELECT execution_key FROM carrier_execution_attempts
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+        AND attempt_id=NEW.attempt_id) <> NEW.execution_key
+  THEN RAISE(ABORT,'send slot attempt mismatch') END;
+END;
+
 CREATE TRIGGER IF NOT EXISTS carrier_receipt_attempt_match
 BEFORE INSERT ON carrier_execution_receipts
 BEGIN
