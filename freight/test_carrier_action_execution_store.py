@@ -174,6 +174,30 @@ def test_file_backed_store_required():
         CarrierActionExecutionStore(":memory:", buyer_id="b", business_unit="u")
 
 
+def test_store_rejects_tampered_execution_intent_proof(tmp_path):
+    s = store(tmp_path)
+    intent = make_intent()
+    bad = replace(intent, intent_hash="0" * 64)
+    with pytest.raises(ValueError, match="intent hash mismatch"):
+        s.reserve_send_attempt(
+            bad,
+            attempt_id="attempt-bad",
+            started_at="2026-09-21T11:00:10Z",
+        )
+
+
+def test_store_rejects_noncanonical_finding_order(tmp_path):
+    s = store(tmp_path)
+    intent = make_intent()
+    bad = replace(intent, finding_ids=("z-finding", "a-finding"))
+    with pytest.raises(ValueError, match="canonical sorted order"):
+        s.reserve_send_attempt(
+            bad,
+            attempt_id="attempt-order",
+            started_at="2026-09-21T11:00:10Z",
+        )
+
+
 def test_new_send_attempt_reserves_exclusive_slot(tmp_path):
     s = store(tmp_path)
     intent = make_intent()
