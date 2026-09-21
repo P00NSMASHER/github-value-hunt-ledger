@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "require_primary_generated_routes": true,
+  "require_exact_work_item_match": true,
+  "baseline_comparator_source": "non_applied_v18_routing_generations",
+  "min_v18_match_level": 2,
+  "min_complete_crossover_groups_global": 4,
+  "min_complete_groups_per_agent": 2,
+  "min_distinct_task_pairs_per_agent": 2,
+  "automatic_routing_feedback_enabled": false,
+  "guardrails": [
+    "V19 is diagnostic only; it must not change agent routing.",
+    "An agent-effect estimate requires all four crossover cells: A/task1, A/task2, B/task1, B/task2.",
+    "Exploration outcomes must come from the exact V18 routing generation and agent.",
+    "Baseline comparators must be completed generated primary routes from non-applied V18 generations and must match the exact work_item_id.",
+    "Repeated routing generations for the same agent/task cell are aggregated within one crossover group and do not count as independent task pairs.",
+    "Work-steal, manual-override, retrospective, unmatched-claim, and incomplete routes are excluded.",
+    "Task difficulty and agent effect are reported separately under an additive crossover contrast.",
+    "No estimate may be created from missing cells, unmatched slot identity, or inferred task identity.",
+    "Realized revenue/customer value remains separate from routing utility and is never imputed."
+  ]
+}
