@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "activation_generation_id": "ACTGEN:59e522d38cf8",
+  "clock_commit_sha": "e28601ee1a07b0d894b8ff1d1348d56d3f8c9462",
+  "clock_timestamp": "2026-09-21T00:23:00Z",
+  "registered_workers": 14,
+  "fresh_ready_workers": 0,
+  "current_activations": 0,
+  "history_activations": 0,
+  "waiting_presence": 14,
+  "active_claim_workers": 0,
+  "ready_without_dispatch": 0
+}
