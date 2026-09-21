@@ -10,6 +10,8 @@ def test_full_synthetic_rehearsal_matches_persistent_settlement_store():
     assert out["deal_route"] == "BLIND_FREIGHT_AUDIT_ACCEPTANCE_TEST"
     assert out["pilot_gross_margin"] == 0.60
     assert out["incumbent_submission_hash"]
+    assert out["audit_workflow_status"] == "REVIEW_REQUIRED"
+    assert out["audit_workflow_result_hash"]
     assert out["audit_run_hash"]
     assert out["population_builder_hash"]
     assert out["population_invoice_count"] == 3
