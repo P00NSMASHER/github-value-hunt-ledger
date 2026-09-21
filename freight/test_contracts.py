@@ -329,3 +329,24 @@ def test_recovery_certificate_is_bound_to_scope_finding_and_settlement_proofs():
     assert cert.finding_proof_hash == truth_manifest.findings[0].proof_hash
     assert len(cert.settlement_proof_hashes) == 1
     assert cert.certificate_hash
+
+
+def test_frozen_truth_binds_authority_source_evidence():
+    pop = population()
+    one = freeze_truth(pop, [authority()], [finding()])
+    changed = freeze_truth(
+        pop,
+        [AuthorityRef("auth-1", BUYER, BU, "cust-1", "car-1", "USD", "changed-source")],
+        [finding()],
+    )
+    assert one.authorities[0].source_hash != changed.authorities[0].source_hash
+    assert one.truth_hash != changed.truth_hash
+
+
+def test_clean_truth_manifest_is_valid_and_deterministic():
+    pop = population()
+    a = freeze_truth(pop, [], [])
+    b = freeze_truth(pop, [], [])
+    assert a.findings == ()
+    assert a.authorities == ()
+    assert a.truth_hash == b.truth_hash
