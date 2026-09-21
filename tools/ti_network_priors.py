@@ -23,6 +23,7 @@ policy = read_json("search_policy.json", {})
 registry = read_json("registry_metrics.json", {})
 negative = read_json("candidate_learning_metrics.json", {})
 moves = read_json("search_move_metrics.json", {})
+move_policy = read_json("search_move_policy.json", {})
 coord = read_json("coordination_metrics.json", {})
 
 gaps = policy.get("priority_capability_gaps") or []
@@ -98,6 +99,10 @@ if sufficient:
         )
 else:
     lines.append("- No search-move type has sufficient prospective evidence yet. Record moves; do not guess a winner.")
+lines.append(
+    f"- Move curriculum mode: **{move_policy.get('mode', 'unavailable')}**; exploration floor: "
+    f"**{100*move_policy.get('exploration_floor', 1.0):.0f}%**."
+)
 
 lines += ["", "## Cross-hunter transfer", ""]
 lines.append(
