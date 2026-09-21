@@ -1,15 +1,15 @@
 {
-  "unknown_revision_observations": 90,
-  "unique_repositories_with_unknown_revision": 90,
+  "unknown_revision_observations": 91,
+  "unique_repositories_with_unknown_revision": 91,
   "status_counts": {
     "unknown": 33,
     "watch": 15,
     "rejected": 19,
-    "strong": 20,
+    "strong": 21,
     "quarantined": 3
   },
   "source_state_counts": {
-    "current": 90
+    "current": 91
   },
   "master_catalog_gaps": [
     {
@@ -44,6 +44,14 @@
       "source_state": "current",
       "status_bucket": "strong",
       "status": "strong**.",
+      "priority_score": 10
+    },
+    {
+      "repository": "CompOmics/ThermoRawFileParser",
+      "source_catalog": "hunters/21-run26-2026-09-20.md",
+      "source_state": "current",
+      "status_bucket": "strong",
+      "status": "WATCH / strong comparator; rights-gated production dependency**",
       "priority_score": 10
     },
     {

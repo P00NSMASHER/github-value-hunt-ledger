@@ -2,8 +2,8 @@
 
 Pinned revisions are essential for reproducible technical intelligence. This report prioritizes records whose repository identity is known but whose inspected revision is not recoverable from the hunter catalog.
 
-- Unknown-revision observations: **90**
-- Unique repositories with unknown revision: **90**
+- Unknown-revision observations: **91**
+- Unique repositories with unknown revision: **91**
 - Current MASTER promotions without matching exact hunter-catalog observation: **2**
 
 ## Unknown revision mix
@@ -11,7 +11,7 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | Bucket | Count |
 |---|---:|
 | unknown | 33 |
-| strong | 20 |
+| strong | 21 |
 | rejected | 19 |
 | watch | 15 |
 | quarantined | 3 |
@@ -23,6 +23,7 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | BroadbandForum/usp-data-models | hunters/35.md | current | strong | 10 |
 | BroadbandForum/usp-test | hunters/35.md | current | strong | 10 |
 | CANopenNode/CANopenNode | hunters/12.md | current | strong | 10 |
+| CompOmics/ThermoRawFileParser | hunters/21-run26-2026-09-20.md | current | strong | 10 |
 | OPCFoundation/UA-.NETStandard | hunters/12.md | current | strong | 10 |
 | OpenCommissioning/OC_TcPnScanner | hunters/12.md | current | strong | 10 |
 | OpenEtherCATsociety/SOEM | hunters/12.md | current | strong | 10 |
@@ -69,7 +70,6 @@ Pinned revisions are essential for reproducible technical intelligence. This rep
 | Madhumitha-28/enterprise-contact-center-platform | hunters/37.md | current | unknown | 7 |
 | OCA/field-service | hunters/37.md | current | unknown | 7 |
 | Practitionist/familiarise_web | hunters/01-run17-2026-09-20.md | current | unknown | 7 |
-| Raunak-Sarmacharya/LocalCooksCommunity | hunters/01-run15-2026-09-20.md | current | unknown | 7 |
 
 ## MASTER catalog provenance gaps
 

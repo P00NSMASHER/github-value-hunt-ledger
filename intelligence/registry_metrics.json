@@ -1,19 +1,19 @@
 {
-  "observations": 1792,
-  "unique_repositories": 1705,
-  "unique_repository_revisions": 1715,
-  "unknown_revision_records": 90,
+  "observations": 1793,
+  "unique_repositories": 1706,
+  "unique_repository_revisions": 1716,
+  "unknown_revision_records": 91,
   "duplicate_observations": 79,
-  "duplicate_observation_rate": 0.04408482142857143,
+  "duplicate_observation_rate": 0.044060234244283326,
   "cross_catalog_repositories": 67,
-  "source_files_scanned": 72,
+  "source_files_scanned": 73,
   "source_state_counts": {
-    "current": 1647,
+    "current": 1648,
     "archive": 145
   },
   "status_counts": {
     "unknown": 164,
-    "strong": 620,
+    "strong": 621,
     "watch": 467,
     "rejected": 392,
     "quarantined": 36,
