@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "minimum_dispatch_ticket_schema_version": 19,
+  "minimum_claim_schema_version": 19,
+  "minimum_search_run_schema_version": 19,
+  "matched_analysis": {
+    "routing_mode": "generated",
+    "dispatch_kind": "primary",
+    "route_mode": "explore_swap",
+    "claim_status": "COMPLETE",
+    "telemetry_status": "MATCHED",
+    "pair_size": 2,
+    "require_distinct_workers": true
+  },
+  "exclusions": [
+    "manual_override",
+    "unrouted",
+    "work_steal",
+    "retrospective",
+    "telemetry_mismatch",
+    "incomplete_pair"
+  ],
+  "guardrails": [
+    "V18 exploration identity must survive routing -> dispatch -> activation -> claim -> search run.",
+    "Work-steal preserves original exploration identity for audit but is excluded from matched worker-effect analysis.",
+    "Manual overrides and unrouted runs are excluded from matched exploration analysis.",
+    "A V18 pair is analysis-ready only after two distinct primary generated runs complete with matched telemetry.",
+    "V19 establishes provenance eligibility only; it does not estimate worker effects or causal outcomes."
+  ]
+}
