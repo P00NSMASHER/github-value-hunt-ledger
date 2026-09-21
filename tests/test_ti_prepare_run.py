@@ -84,6 +84,11 @@ class PrepareRunTests(unittest.TestCase):
         self.assertEqual(run["candidate_dispositions"], [])
         self.assertEqual(run["queries"], [])
         self.assertEqual(run["search_surfaces"], [])
+        self.assertEqual(run["coordination_signal_ids"], [])
+        self.assertEqual(run["consumed_coordination_signal_ids"], [])
+        self.assertIsNone(run["recall_rescue_type"])
+        self.assertIsNone(run["recall_rescue_found_qualifying_candidate"])
+        self.assertIsNone(run["stop_reason_standard"])
         self.assertEqual(run["_draft"]["status"], "incomplete")
         for key in (*COUNTS, "assignment_id", "execution_claim_id", "dispatch_ticket_id", "activation_id"):
             self.assertIsNone(run[key], key)
