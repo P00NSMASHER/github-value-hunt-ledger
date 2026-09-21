@@ -1323,3 +1323,79 @@ No repository code, Stripe mutation, credentials, contacts, spend or commitments
 **REFERRALS:** None. The existing commercial referral already asks for the single-path crash/recovery/settlement intersection. This run makes the required multi-hop evidence model precise and avoids duplicating that referral.
 
 **NEXT TEST:** Run a two-hop Stripe test-mode settlement fixture in a Connect-enabled account: crash and recover the transfer executor with exhaustive transfer lookup; then crash and recover the payout executor with exhaustive payout lookup; require exactly one `tr_` and one causally linked `po_`, wait through `payout.paid` and a late-failure observation window, and attach independent external-destination evidence before claiming E5.
+
+
+## 2026-09-21 — Shadow run 19
+
+**DATE:** 2026-09-21
+
+**HYPOTHESIS:** A mature-looking payout journal can still be unsafe in the post-effect response-loss window if its only readback key is learned from the missing response and its provider double assumes permanent idempotency. The exact source/test/history boundary should distinguish a real crash-recovery control from an attractive false proof.
+
+**DISCOVERY METHODS:**
+1. Global GitHub intersection search across Stripe payout/transfer, crash/restart, idempotency, reconciliation and process-kill terms.
+2. Low-attention repository inspection of payout source, storage seam, tests, local provider double, settlement schema and exact tree.
+3. Commit/history archaeology for the introduction and later hardening of the payout claims.
+4. Exact-revision CI/job-log inspection to separate the payout tests from unrelated current failures.
+5. Current Stripe-contract verification for idempotency retention and Transfer-versus-Payout semantics, followed by an independently written four-case adversarial state-machine fixture.
+
+**BEST NEW NEGATIVE-CONTROL CANDIDATE + EXACT REVISION:** `thewriterben/ProjectBINGO@ecf3a8a45c3d576691da7f3281505211ad78047c` — retained as a negative oracle for crash-safe payout claims, not promoted as tier-5B/5C-B evidence.
+
+**IMPLEMENTED / SOURCE-VERIFIED:**
+- `PayoutEngine` computes a deterministic key from durable economic identity, writes a `PENDING` record before provider entry, fsyncs the JSONL path, supports a transactional SQLite store and reloads records after restart.
+- `StripeConnectRail` performs a real HTTP `POST /v1/transfers` with Stripe's `Idempotency-Key`, classifies transport/429/5xx as `PENDING`, classifies other 4xx as `FAILED`, and can retrieve a known transfer by its external `tr_` reference.
+- The current source explicitly calls `retry_pending()` over **both** `PENDING` and `FAILED` records even though its own rail/history labels 4xx as terminal.
+- Provider reconciliation is meaningful after an external reference has been stored: it retrieves the transfer and compares amount, currency and destination with the signed settlement legs.
+- The repository is public, MIT, 0 stars / 0 forks at inspection.
+
+**LOAD-BEARING FALSIFICATION:**
+- The test called crash-safe never kills the money process after provider effect. The restart case persists an already-`PAID` mock result and confirms a new engine does not resend it. The Stripe test injects a 500 **before** creating a transfer, then retries.
+- The local `FakeStripe` retains every idempotency key forever. It has no expiration clock and no commit-then-drop-response mode. Stripe's current contract says keys can be removed after they are at least 24 hours old and reuse after pruning starts a new request.
+- In the dangerous case—provider created the transfer but the response was lost—the local record has no `external_ref`. The only readback method is `retrieve(external_ref)`, so reconciliation is unavailable exactly when ambiguity must be resolved. The engine blindly re-POSTs the same key and has no provider lookup by its pre-dispatch metadata identity.
+- Before the provider retention horizon, that blind replay can correctly recover the prior result. After the provider forgets the key, the same automatic retry can create a second transfer while the first still exists.
+- The rail is a Stripe **Transfer**, not a Stripe Payout. Current Stripe documentation defines Transfer as movement between Stripe accounts and Payout as movement to an external bank account or debit card. The repository's phrases “real payout rail” and “everything else is already proven” therefore overstate both the money rail and the fault boundary.
+
+**TEST / HISTORY / CI VERIFICATION:**
+- `tests/test_payout.py` verifies ordinary retry, persistence after a successfully stored `PAID`, and mock reconciliation. It does not place a process-death cut after provider effect.
+- `tests/test_payout_stripe.py` verifies a same-key replay, a pre-effect injected 500, 4xx refusal and known-reference retrieval against the local double. It does not model response loss after commit, key pruning, exhaustive metadata rediscovery or a genuine new-process provider recovery.
+- The introducing commit `3972dc75fba0840b168ed8efe59e5706211a7bec` claims that re-driving `PENDING/FAILED` means an outage “never loses or repeats a payout.” Commit `a7758ad8890999d79f1fe54a1eb23c4b36d12ea4` later calls the local double faithful and says live money requires only changing the API key/base URL.
+- The exact revision's scheduled CI on 2026-09-21 failed in an unrelated observability SQLite-concurrency test. The payout test groups themselves printed green in both CI jobs. This supports the narrow implementation claims but does not repair the missing fault case.
+
+**INDEPENDENT ADVERSARIAL FIXTURE:**
+- A minimal provider oracle preserved effects indefinitely but expired idempotency records after 24 hours, matching the relevant Stripe contract boundary.
+- Four cases produced 4/4 expected outcomes: within-window blind retry converged on one effect; post-effect response loss left `external_ref` empty; blind retry after 25 hours created a second effect; pre-dispatch-metadata rediscovery after 25 hours adopted the original effect without a second POST. A separate row confirmed that the source loop re-drives `FAILED`, contradicting its “terminal 4xx” vocabulary.
+- This fixture models the contract boundary; it is not a real Stripe execution and does not claim that Stripe itself was mutated.
+
+**SPECIALIST PASSES:**
+- **DISCOVERY ANALYST:** selected the lowest-attention serious candidate after crash/payout intersection and history searches.
+- **CODE INSPECTOR:** traced intent persistence, provider call, result persistence, restart loading, retry selection and reconciliation identity.
+- **TEST/CI INSPECTOR:** mapped each tested cutpoint and verified the current unrelated CI failure separately from green payout groups.
+- **PROVIDER-CONTRACT ANALYST:** verified finite idempotency retention and Transfer/Payout object semantics from current Stripe documentation.
+- **COMMERCIAL ANALYST:** mapped the failure to a money-recovery qualification service rather than a framework promotion.
+- **RED-TEAM / VERIFIER:** attacked the exact killed process, provider-effect ordering, response-born readback key, replay horizon, rail identity, current CI and rights.
+
+**INDEPENDENT RED-TEAM / VERIFIER VERDICT:** **CONTRADICTED for the broad crash-safe payout claim; PASS_WITH_LIMITS as a pre-dispatch intent/journal and known-reference Transfer reconciliation component.** The code has substantive safety primitives, but its evidence proves neither post-effect process death nor safe recovery after response loss beyond the provider replay horizon. The provider object is also a `tr_` Transfer, not a `po_` external payout. Evidence that would change the verdict: exact commit-then-response-loss injection; literal money-executor death; new-process recovery; a stored provider-validity horizon; exhaustive provider lookup by pre-dispatch identity before any late retry; exact-one provider truth; and a separately modeled `po_` payout plus external-destination evidence for settlement claims.
+
+**A-F SCORE (proposed only, after verifier):** **22/30 — A3 / B5 / C4 / D4 / E2 / F4.**
+- A3: useful as a qualification/audit substrate, unsafe as a drop-in crash-certified payout engine.
+- B5: a duplicate transfer after an ambiguous response is a direct-money failure.
+- C4: deterministic identity, durable intent, SQLite isolation and provider reconciliation are substantive.
+- D4: the component is understandable and reusable, while a careful handwritten implementation remains a credible alternative.
+- E2: source/history/CI are inspectable, but the load-bearing test uses a permanent-idempotency double and no effect-boundary process death.
+- F4: MIT rights are clear; live operation still requires controlled Stripe Connect authority and financial/compliance gating.
+
+**BUYER / PAIN / FIRST PAID WEDGE:**
+- Buyer: marketplace payments lead, finance-platform reliability owner, Controller systems team or payments QA lead.
+- Pain: a team can have pre-dispatch persistence, stable idempotency and green provider-double tests yet still duplicate a transfer after response loss because its reconciliation endpoint needs the provider ID that was present only in the missing response.
+- First paid wedge: **Ambiguous-Payout Recovery Audit**. Trace one payout/transfer flow from durable business identity through dispatch, provider effect, response persistence, retry clock and provider readback; execute within- and beyond-horizon ambiguity cases; require response-independent provider rediscovery before authorizing a second mutation; and label the exact rail as internal Transfer versus external Payout.
+
+**COMBINATION WITH PRIOR SHADOW RUNS:** ProjectBINGO independently joins three earlier failure rules in one mature-looking implementation: run 11's compensation/result-descriptor birth gap, run 12's provider replay-window cliff and runs 14/16's authoritative-absence requirement. It also independently confirms run 18's rail-semantic correction. Interlock remains stronger on executed real-Stripe literal SIGKILL/new-process recovery; `mathd/ticketing_system` remains stronger on conclusive provider rediscovery; Flames-up remains stronger on terminal `po_` evidence. None can be inherited by this candidate.
+
+**SEARCH EFFORT / COST PROXIES:** Five materially distinct discovery/verification modes; one serious candidate deep-inspected; approximately 50 read-only external search/retrieval actions across source, tests, schema, history, CI and current provider documentation; one locally authored four-case state-machine execution; no untrusted repository execution, provider writes, credentials, contacts, spend or commitments.
+
+**LOCAL LESSON:** Add a **response-independent reconciliation check** to lane-local `SK-COM-003`. Ask whether authoritative provider truth can be found using only identity durable before dispatch. A `retrieve(external_ref)` method is not an ambiguity resolver if `external_ref` is born in the response that may never persist. After the provider replay horizon, retry is licensed only by conclusive absence from a response-independent lookup. This is independently consistent with the run-11 descriptor-birth finding and remains lane-local pending separate Skill Promoter review.
+
+**FAILURE RULE:** Pre-dispatch intent + stable idempotency + `retrieve(provider_id)` does not prove crash-safe recovery when the provider ID is response-born, the test double retains keys forever and the recovery loop can retry after the real provider's dedupe record expires.
+
+**REFERRALS:** None. The existing commercial referral already asks for authoritative provider/system-of-record readback on one durable action identity. This run sharpens its acceptance test without adding a duplicate handoff.
+
+**NEXT TEST:** Add a real or provider-faithful `POST accepted → response dropped → executor killed` case to one Stripe Transfer/Payout path; restart after the dedupe horizon is no longer assumed; rediscover by exhaustive pre-dispatch metadata identity; forbid a second POST until absence is conclusive; then follow the same `po_` payout through terminal provider and independent destination evidence.
