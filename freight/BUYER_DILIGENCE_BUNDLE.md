@@ -9,7 +9,7 @@ technical/commercial diligence boring and reproducible.
 
 The bundle contains:
 - commercial model / qualification / learning policies;
-- data-readiness, final pilot launch gate, actionable launch-remediation brief, buyer-safe pilot activation packet, scope-freeze Pilot Charter, Pilot Amendment change-control, authoritative engagement-state resolver, separate-environment evidence template with SHA-256 evidence receipts/freshness semantics, and pilot protocols;
+- data-readiness, final pilot launch gate, actionable launch-remediation brief, buyer-safe pilot activation packet, scope-freeze Pilot Charter, Pilot Amendment change-control, authoritative engagement-state resolver, revocable external-action authorization, separate-environment evidence template with SHA-256 evidence receipts/freshness semantics, and pilot protocols;
 - pilot data-room/report/audit-lifecycle documentation;
 - security/data-handling and release/security gates;
 - rights registry + rights evidence manifest/promotion rules + release manifest;

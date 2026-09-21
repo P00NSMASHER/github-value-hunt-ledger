@@ -31,6 +31,7 @@ DOC_PATHS=(
     "freight/PILOT_CHARTER.md",
     "freight/PILOT_AMENDMENT.md",
     "freight/ENGAGEMENT_STATE.md",
+    "freight/EXTERNAL_ACTION_AUTHORIZATION.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json",
     "freight/PILOT_DATA_ROOM.md",

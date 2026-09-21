@@ -10,7 +10,7 @@ The first milestone that materially changes the business is:
 
 Everything below is prioritized by how directly it moves toward that chain.
 
-## Current checkpoint — v15.13
+## Current checkpoint — v15.14 candidate
 
 Internal commercialization controls now completed:
 - paid offer/ICP/pricing defined;
@@ -51,7 +51,8 @@ Internal commercialization controls now completed:
 - buyer-safe Pilot Activation Packet that binds readiness, published offer/price band, launch route, remediation, data-room timing, buyer/Freight responsibilities, blind-pilot stages and report semantics into one deterministic handoff without exposing internal cost/margin assumptions;
 - machine-checkable Pilot Charter that verifies the activation hash, freezes engagement scope/fee/roles/acknowledgments, and separates PRELAUNCH acceptance from actual KICKOFF authorization;
 - Pilot Amendment change-control that keeps accepted Charters immutable, classifies scope/fee/role changes, suspends changed-scope kickoff, and requires a validated replacement Charter before any amendment becomes operative;
-- authoritative Engagement State Resolver that walks immutable Charter/Amendment history and outputs the single operative Charter plus customer-data/audit/report/settlement authorization flags.
+- authoritative Engagement State Resolver that walks immutable Charter/Amendment history and outputs the single operative Charter plus customer-data/audit/report/settlement authorization flags;
+- revocable External Action Authorization that binds one buyer-approved carrier action to an ACTIVE engagement, CONFIRMED validated findings, exact carrier/recipient/payload hashes, dollar cap and expiry while explicitly excluding money movement, settlement acceptance, account changes, credential use, general contact and automatic execution.
 
 The global outcome loop now contains one Freight **PARTIAL technical-only** record with **$0 revenue and $0 customer value**. Synthetic test dollars are not treated as market evidence.
 
@@ -90,6 +91,8 @@ Pilot Charter now prevents sales-to-delivery scope drift by binding that activat
 Pilot Amendment now prevents post-Charter scope drift: material population/date/carrier/mode changes force fresh readiness/launch/activation, fee changes outside the published band force a new commercial activation, and role-only changes still require a replacement Charter and re-acknowledgment.
 
 Engagement State Resolver now prevents downstream workers from guessing which Charter is current. Accepted-but-unreplaced amendments suspend audit/report/settlement processing, while superseded chains resolve deterministically to the latest verified replacement Charter.
+
+External Action Authorization now closes the buyer-approved dispute/action boundary: only an ACTIVE engagement with CONFIRMED validated findings can receive a narrow, hash-bound, expiring and revocable carrier-action approval; creating the approval never sends the action.
 
 The separate/manual route stays **CONDITIONAL** until a VERIFIED environment manifest proves MFA, encryption, scoped access, read-only ingestion, retention/deletion, Netlify data exclusion, and any applicable tenant/parser controls with SHA-256 receipts and a <=90-day evidence-validity window.
 

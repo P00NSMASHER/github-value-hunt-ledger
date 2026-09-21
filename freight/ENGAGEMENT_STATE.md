@@ -45,3 +45,15 @@ current resolver result with their corresponding `*_allowed=true` flag.
 
 Carrier/vendor contact, disputes and money-moving action remain separately
 buyer-approved and are always `external_action_authorized=false` here.
+
+## External action authorization
+
+The Engagement State Resolver intentionally never grants carrier/vendor action
+authority. It only proves whether the engagement is operationally ACTIVE.
+
+A later buyer-approved carrier action must use
+`freight/external_action_authorization.py`, which binds the exact carrier,
+finding set, validated-dollar cap, buyer approver role, recipient-routing hash,
+payload hash, validity window and revocation state.
+
+Creating that authorization still does not send or execute anything.
