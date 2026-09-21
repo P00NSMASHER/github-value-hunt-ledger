@@ -1,0 +1,28 @@
+name: Microsoft Excel round-trip
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  excel:
+    # Requires a Windows self-hosted runner with desktop Microsoft Excel installed.
+    # Do not replace it with LibreOffice and label that Microsoft Excel compatibility.
+    runs-on: [self-hosted, windows, excel]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Microsoft Excel compatibility gate
+        shell: pwsh
+        run: >-
+          ./qa/excel_roundtrip_v0_2_0.ps1
+          -ArtifactDir ./artifacts/v0.2.0-alpha
+          -OutputDir ./qa-results/excel
+      - name: Upload compatibility evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sheetHarbor-excel-roundtrip
+          path: qa-results/excel
+          if-no-files-found: error
