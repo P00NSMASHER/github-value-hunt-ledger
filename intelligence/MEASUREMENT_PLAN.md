@@ -2,7 +2,7 @@
 
 This report answers a different question from SEARCH_POLICY.md: not **where might value be**, but **what evidence is still missing before the system can credibly compare search strategies**.
 
-- Active strategies: **13**
+- Active strategies: **14**
 - Strategies with sufficient evidence: **0**
 - Sufficiency threshold: **5 measured discovery runs + 20 deep inspections** per strategy.
 - Explicit fixture, artifact-verification, waiting and unclassified actions do not satisfy discovery thresholds. Legacy records without an action remain observational evidence.
@@ -11,19 +11,20 @@ This report answers a different question from SEARCH_POLICY.md: not **where migh
 
 | Strategy | Runs | Inspected | More runs needed | More inspections needed | Instrumentation debt | Policy allocation |
 |---|---:|---:|---:|---:|---:|---:|
-| STRAT:bidirectional-money-evidence-invariant-tracing | 0 | 0 | 5 | 20 | 0% | 5.3% |
-| STRAT:cross-source-emergence-triangulation | 0 | 0 | 5 | 20 | 0% | 5.3% |
-| STRAT:decision-claim-runtime-side-effect-trace | 0 | 0 | 5 | 20 | 0% | 5.3% |
-| STRAT:ingestion-invariant-triad-intersection | 0 | 0 | 5 | 20 | 0% | 5.3% |
-| STRAT:paper-research-artifact-production-descendant | 0 | 0 | 5 | 20 | 0% | 5.3% |
-| STRAT:authority-origin-invariant-set-consistency | 1 | 1 | 4 | 19 | 0% | 5.0% |
-| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 1 | 3 | 4 | 17 | 0% | 7.2% |
-| STRAT:fail-open-boundary-archaeology | 1 | 4 | 4 | 16 | 0% | 8.1% |
-| STRAT:first-party-production-source-triangulation | 2 | 7 | 3 | 13 | 100% | 10.2% |
-| STRAT:capability-conjunction-search-claim-tracing | 3 | 9 | 2 | 11 | 11% | 11.0% |
-| STRAT:evaluation-target-independence | 4 | 6 | 1 | 14 | 50% | 8.6% |
-| STRAT:rule-period-authority-version-audit | 4 | 9 | 1 | 11 | 0% | 10.3% |
-| STRAT:acceptance-path-transition-inspection | 5 | 10 | 0 | 10 | 7% | 13.2% |
+| STRAT:bidirectional-money-evidence-invariant-tracing | 0 | 0 | 5 | 20 | 0% | 4.8% |
+| STRAT:cross-source-emergence-triangulation | 0 | 0 | 5 | 20 | 0% | 4.8% |
+| STRAT:decision-claim-runtime-side-effect-trace | 0 | 0 | 5 | 20 | 0% | 4.8% |
+| STRAT:ingestion-invariant-triad-intersection | 0 | 0 | 5 | 20 | 0% | 4.8% |
+| STRAT:nested-authority-and-post-review-invariant-audit | 0 | 0 | 5 | 20 | 0% | 4.8% |
+| STRAT:paper-research-artifact-production-descendant | 0 | 0 | 5 | 20 | 0% | 4.8% |
+| STRAT:authority-origin-invariant-set-consistency | 1 | 1 | 4 | 19 | 0% | 4.7% |
+| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 1 | 3 | 4 | 17 | 0% | 6.9% |
+| STRAT:fail-open-boundary-archaeology | 1 | 4 | 4 | 16 | 0% | 7.8% |
+| STRAT:first-party-production-source-triangulation | 2 | 7 | 3 | 13 | 100% | 9.9% |
+| STRAT:capability-conjunction-search-claim-tracing | 3 | 9 | 2 | 11 | 11% | 10.7% |
+| STRAT:evaluation-target-independence | 4 | 6 | 1 | 14 | 50% | 8.4% |
+| STRAT:rule-period-authority-version-audit | 4 | 9 | 1 | 11 | 0% | 10.1% |
+| STRAT:acceptance-path-transition-inspection | 5 | 10 | 0 | 10 | 7% | 13.0% |
 
 ## Operating rule
 

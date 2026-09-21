@@ -1,6 +1,6 @@
 # HUNT ALLOCATOR REPORT
 
-- Generation: **ALLOCGEN:afebffb7a67b**
+- Generation: **ALLOCGEN:71337ecbacfb**
 - Candidate work items: **324**
 - Assigned slots: **14 / 14**
 

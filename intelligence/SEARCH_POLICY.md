@@ -14,19 +14,20 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 
 | Strategy | Allocation | Runs | Inspected | Outcome eq. | Evidence |
 |---|---:|---:|---:|---:|---|
-| STRAT:acceptance-path-transition-inspection | 13.2% | 5 | 10 | 1.00 | insufficient |
-| STRAT:capability-conjunction-search-claim-tracing | 11.0% | 3 | 9 | 1.00 | insufficient |
-| STRAT:rule-period-authority-version-audit | 10.3% | 4 | 9 | 0.00 | insufficient |
-| STRAT:first-party-production-source-triangulation | 10.2% | 2 | 7 | 0.00 | insufficient |
-| STRAT:evaluation-target-independence | 8.6% | 4 | 6 | 3.00 | insufficient |
-| STRAT:fail-open-boundary-archaeology | 8.1% | 1 | 4 | 0.00 | insufficient |
-| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 7.2% | 1 | 3 | 0.00 | insufficient |
-| STRAT:bidirectional-money-evidence-invariant-tracing | 5.3% | 0 | 0 | 0.00 | insufficient |
-| STRAT:cross-source-emergence-triangulation | 5.3% | 0 | 0 | 0.00 | insufficient |
-| STRAT:decision-claim-runtime-side-effect-trace | 5.3% | 0 | 0 | 1.00 | insufficient |
-| STRAT:ingestion-invariant-triad-intersection | 5.3% | 0 | 0 | 0.00 | insufficient |
-| STRAT:paper-research-artifact-production-descendant | 5.3% | 0 | 0 | 0.00 | insufficient |
-| STRAT:authority-origin-invariant-set-consistency | 5.0% | 1 | 1 | 0.00 | insufficient |
+| STRAT:acceptance-path-transition-inspection | 13.0% | 5 | 10 | 1.00 | insufficient |
+| STRAT:capability-conjunction-search-claim-tracing | 10.7% | 3 | 9 | 1.00 | insufficient |
+| STRAT:rule-period-authority-version-audit | 10.1% | 4 | 9 | 0.00 | insufficient |
+| STRAT:first-party-production-source-triangulation | 9.9% | 2 | 7 | 0.00 | insufficient |
+| STRAT:evaluation-target-independence | 8.4% | 4 | 6 | 3.00 | insufficient |
+| STRAT:fail-open-boundary-archaeology | 7.8% | 1 | 4 | 0.00 | insufficient |
+| STRAT:protocol-regression-archaeology-for-pre-fat-systems | 6.9% | 1 | 3 | 0.00 | insufficient |
+| STRAT:bidirectional-money-evidence-invariant-tracing | 4.8% | 0 | 0 | 0.00 | insufficient |
+| STRAT:cross-source-emergence-triangulation | 4.8% | 0 | 0 | 0.00 | insufficient |
+| STRAT:decision-claim-runtime-side-effect-trace | 4.8% | 0 | 0 | 1.00 | insufficient |
+| STRAT:ingestion-invariant-triad-intersection | 4.8% | 0 | 0 | 0.00 | insufficient |
+| STRAT:nested-authority-and-post-review-invariant-audit | 4.8% | 0 | 0 | 0.00 | insufficient |
+| STRAT:paper-research-artifact-production-descendant | 4.8% | 0 | 0 | 0.00 | insufficient |
+| STRAT:authority-origin-invariant-set-consistency | 4.7% | 1 | 1 | 0.00 | insufficient |
 
 ## Highest-information capability gaps
 

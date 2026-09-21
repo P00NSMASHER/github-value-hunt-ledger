@@ -3,7 +3,7 @@
     "min_runs": 5,
     "min_deep_inspections": 20
   },
-  "active_strategies": 13,
+  "active_strategies": 14,
   "sufficient_strategies": 0,
   "rows": [
     {
@@ -15,7 +15,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05262412241824695,
+      "policy_allocation": 0.04761294366591096,
       "sufficient_evidence": false
     },
     {
@@ -27,7 +27,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05262412241824695,
+      "policy_allocation": 0.04761294366591096,
       "sufficient_evidence": false
     },
     {
@@ -39,7 +39,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05262412241824695,
+      "policy_allocation": 0.04761294366591096,
       "sufficient_evidence": false
     },
     {
@@ -51,7 +51,19 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05262412241824695,
+      "policy_allocation": 0.04761294366591096,
+      "sufficient_evidence": false
+    },
+    {
+      "strategy_id": "STRAT:nested-authority-and-post-review-invariant-audit",
+      "name": "Nested authority and post-review invariant audit",
+      "runs": 0,
+      "deep_inspected": 0,
+      "runs_needed": 5,
+      "inspections_needed": 20,
+      "measurement_debt": 2.0,
+      "instrumentation_debt": 0.0,
+      "policy_allocation": 0.04761294366591096,
       "sufficient_evidence": false
     },
     {
@@ -63,7 +75,7 @@
       "inspections_needed": 20,
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05262412241824695,
+      "policy_allocation": 0.04761294366591096,
       "sufficient_evidence": false
     },
     {
@@ -75,7 +87,7 @@
       "inspections_needed": 19,
       "measurement_debt": 1.75,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.05011919082817119,
+      "policy_allocation": 0.046575752350656474,
       "sufficient_evidence": false
     },
     {
@@ -87,7 +99,7 @@
       "inspections_needed": 17,
       "measurement_debt": 1.65,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.07237366907784103,
+      "policy_allocation": 0.06883023060032631,
       "sufficient_evidence": false
     },
     {
@@ -99,7 +111,7 @@
       "inspections_needed": 16,
       "measurement_debt": 1.6,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.0812880538577209,
+      "policy_allocation": 0.07774461538020618,
       "sufficient_evidence": false
     },
     {
@@ -111,7 +123,7 @@
       "inspections_needed": 13,
       "measurement_debt": 1.25,
       "instrumentation_debt": 1.0,
-      "policy_allocation": 0.10200796881194732,
+      "policy_allocation": 0.09911476341032881,
       "sufficient_evidence": false
     },
     {
@@ -123,7 +135,7 @@
       "inspections_needed": 11,
       "measurement_debt": 0.9500000000000001,
       "instrumentation_debt": 0.1111111111111111,
-      "policy_allocation": 0.10994912365724693,
+      "policy_allocation": 0.10744353428107893,
       "sufficient_evidence": false
     },
     {
@@ -135,7 +147,7 @@
       "inspections_needed": 14,
       "measurement_debt": 0.8999999999999999,
       "instrumentation_debt": 0.5,
-      "policy_allocation": 0.0861418093417637,
+      "policy_allocation": 0.08390074207423853,
       "sufficient_evidence": false
     },
     {
@@ -147,7 +159,7 @@
       "inspections_needed": 11,
       "measurement_debt": 0.75,
       "instrumentation_debt": 0.0,
-      "policy_allocation": 0.10287314707191159,
+      "policy_allocation": 0.1006320798043864,
       "sufficient_evidence": false
     },
     {
@@ -159,7 +171,7 @@
       "inspections_needed": 10,
       "measurement_debt": 0.5,
       "instrumentation_debt": 0.06666666666666667,
-      "policy_allocation": 0.13212642526216256,
+      "policy_allocation": 0.13008062010331256,
       "sufficient_evidence": false
     }
   ]
