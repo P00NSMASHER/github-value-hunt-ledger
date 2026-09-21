@@ -205,7 +205,7 @@ def _rehash_delivery_receipt(receipt, **changes):
     fields.pop("delivery_receipt_hash")
     return replace(
         candidate,
-        delivery_receipt_hash=canonical_hash({"schema": 1, **fields}),
+        delivery_receipt_hash=canonical_hash({"schema": 2, **fields}),
     )
 
 
@@ -749,6 +749,7 @@ def test_delivery_receipt_retains_submission_evidence_provenance():
         evidence=delivery_evidence(submitted),
     )
     assert delivery.submission_evidence_source_hash == submitted.evidence_source_hash
+    verify_carrier_action_delivery_receipt(delivery)
 
 
 def test_rehashed_delivery_receipt_cannot_change_execution_semantics():
