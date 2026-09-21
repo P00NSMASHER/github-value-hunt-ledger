@@ -46,6 +46,7 @@ CONTROL_PATHS = (
     "freight/population_builder.py",
     "freight/readiness.py",
     "freight/remediation_plan.py",
+    "freight/recovery_claim_workflow.py",
     "freight/review_packet.py",
     "freight/review_queue.py",
     "freight/review_routing.py",

@@ -41,6 +41,7 @@ DOC_PATHS=(
     "freight/REVIEW_PACKET.md",
     "freight/REVIEW_ROUTING.md",
     "freight/REMEDIATION_PLAN.md",
+    "freight/RECOVERY_CLAIM_WORKFLOW.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE.md",
     "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json",
     "freight/PILOT_DATA_ROOM.md",
