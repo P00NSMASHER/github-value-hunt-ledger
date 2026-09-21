@@ -29,7 +29,7 @@ Integrator-owned search and validation direction. Updated 2026-09-20. **Experime
 
 **Do next:** clear the structured separate-environment launch gate, then obtain one explicitly authorized frozen buyer population and carry it through controlling authority -> independent expected charge -> blind incumbent comparison -> adjudication -> issued adjustment -> independently observed settlement -> unique allocation -> later reversal if any.
 
-**Engineering checkpoint:** the known CSV pre-parser seam is now materially hardened in `freight/input_guard.py`: explicit field/row/cells-per-row/total-cell bounds, streaming logical-row inspection, non-materializing physical-line inspection and typed `csv_parse_error` rejection were added, followed by adversarial tests for each bound. Treat this as **IMPLEMENTED + TEST-CODE PRESENT**, not external validation: no exact-commit CI status was available at integration time. Next internal step is execute the hostile-input suite in the real parser sandbox/CI and preserve the evidence receipt. This is not a search trigger.
+**Engineering checkpoint:** the known CSV pre-parser seam is materially hardened in `freight/input_guard.py`; v15.13 also adds a deterministic Engagement State Resolver over immutable Charter/Amendment chains. Treat these as internal technical controls, not external validation. Accepted-but-unreplaced amendments must resolve non-green (`SUSPENDED_PENDING_REPLACEMENT`); tampered/duplicate/dangling/cross-buyer/cyclic replacement state must fail closed.
 
 **Stop:** generic freight audit/TMS/OCR/rating/EDI/reconciliation hunting. Resume external search only if the buyer population exposes one named capability/connector gap.
 
@@ -45,7 +45,7 @@ Build `ReceiptAuthorityPolicy` + CAP-019 source receipts + exact line-level quan
 ## 3. Partner / Commission Payout Assurance — P0/P1 / EXP-003
 **Bottleneck:** independent late-return observation after a payout already reached the success state.
 
-`Practitionist/familiarise_web@020975116ef438fa6269e12abb52de6ad9299781` is now the strongest single-system reference for the middle of the chain: payment-time effective rate authority -> persisted earning/share -> one-use payout claim -> provider `COMPLETED` -> externally delivered `payout.reversed` -> exact provider-payout lookup -> compensating journal -> PAID earning reopened to READY -> future rebatch from the original stored earning rather than current policy. This materially joins the prior EruoFood historical-authority and payout-reversal patterns.
+`Practitionist/familiarise_web@020975116ef438fa6269e12abb52de6ad9299781` is the strongest single-system reference for the middle of the chain: payment-time effective rate authority -> persisted earning/share -> one-use payout claim -> provider `COMPLETED` -> externally delivered `payout.reversed` -> exact provider-payout lookup -> compensating journal -> PAID earning reopened to READY -> future rebatch from the original stored earning rather than current policy.
 
 The remaining gap is observation redundancy/finality: Familiarise's ordinary poller covers PENDING/PROCESSING, so a permanently lost post-COMPLETED reversal webhook is not independently rediscovered. Keep Modern Treasury + ACHInterbank as bank/return mapping comparators and Layr-Labs as an external provider counter-event comparator.
 
@@ -56,60 +56,48 @@ The remaining gap is observation redundancy/finality: Familiarise's ordinary pol
 **Stop:** commission calculators, payout wrappers and fuzzy statement matchers. Search only post-success return observation/correlation, independent finality or a concrete failed fixture.
 
 ## 4. ScopeSignal / Construction — P0/P1 / EXP-005
-**Bottleneck:** independently approved measurement -> exact commercial line -> one-time bill consumption -> independent cash.
+**Bottleneck:** independently approved measurement -> exact commercial line -> one-time bill consumption -> scoped provenance-bound counter-event -> independent cash.
 
-Use PMIS for agreement-BOQ/rate/cumulative/certification authority; Nirman for approved-measurement transition; Site-Tracker-Pro as the green-CI negative control.
+Use PMIS for agreement-BOQ/rate/cumulative/certification authority; Nirman for approved-measurement transition; Site-Tracker-Pro as the green-CI negative control. Fast-Vben is a useful positive pattern for scoped source-effect uniqueness and one reversal per prior effect; OpenConstructionERP is a negative control where `transaction_ref`/idempotency can omit project scope.
 
-**Mandatory adversaries:** sequential replay after commit; direct-table/API/RLS bypass; wrong contractor; wrong bill period; same-project/wrong-line evidence; evidence linked after approval; negative/NaN/Inf economic values; internal `PAID/Reconciled` vs independent settlement.
+**Mandatory adversaries:** sequential replay after commit; direct-table/API/RLS bypass; wrong contractor; wrong bill period; same-project/wrong-line evidence; evidence linked after approval; negative/NaN/Inf values; same human transaction reference in two projects; reversal idempotency key without project/tenant scope; duplicate source-version/effect; second reversal; wrong project/tenant; nonexistent prior event; exact prior ID without scope/FK integrity; internal `PAID/Reconciled` vs independent settlement.
 
-**Stop:** generic pay-app/RA-bill CRUD, takeoff/diff and internal payment labels.
+**Stop:** generic pay-app/RA-bill CRUD, takeoff/diff and internal payment labels until this corpus runs.
 
 ## 5. Recovery Proof — P0/P1 / EXP-004
-**Bottleneck:** independently authoritative denominator, identity-correct census, versioned proof-policy currentness, typed proof admission and verifier self-test.
+**Bottleneck:** independently authoritative denominator, identity-correct census, versioned proof-policy currentness, typed proof admission, exact-revision qualification and verifier self-test.
 
-Treat recovery coverage as four governed planes: **OBSERVATIONS -> IDENTITY AUTHORITY -> SCOPE -> PROOF**. Preserve raw cloud/control-plane, endpoint/EDR and scanner/network observations immutably; canonical workload identity is a revisable interpretation. A contradictory concurrently fresh strong identifier is a hard non-merge state, not another weighted feature. Hostname/IP/MAC evidence may propose a relationship but may not overrule conflicting cloud instance/agent/device authority.
+Treat recovery coverage as four governed planes: **OBSERVATIONS -> IDENTITY AUTHORITY -> SCOPE -> PROOF**. Preserve raw cloud/control-plane, endpoint/EDR and scanner/network observations immutably; canonical workload identity is a revisable interpretation. A contradictory concurrently fresh strong identifier is a hard non-merge state, not another weighted feature.
 
-**Mandatory identity corpus before signing the expected-subject denominator:** same hostname + same public IP + different fresh cloud instance IDs => `IDENTITY_CONFLICT`; same cloud instance + rotated EDR agent => allowed relationship with rotation history; weak-only hostname/scanner evidence => `AMBIGUOUS_REVIEW`; two canonicals claiming the same hard ID => duplicate-authority conflict; source outage/partial collection => `UNOBSERVED/PARTIAL` and non-green denominator. Require durable terminal states such as `MATCHED`, `AMBIGUOUS_REVIEW`, `IDENTITY_CONFLICT`, `SOURCE_DISAGREEMENT`, and `UNOBSERVED/PARTIAL` before scope publication.
+**Mandatory identity corpus before signing the denominator:** hard-ID conflict, agent rotation, weak-only ambiguity, duplicate hard-ID authority, source outage/partial collection. Require durable `MATCHED`, `AMBIGUOUS_REVIEW`, `IDENTITY_CONFLICT`, `SOURCE_DISAGREEMENT`, and `UNOBSERVED/PARTIAL` states.
 
-Bind the resulting proof decision to a **versioned authority envelope**. Use `foundriesio/aktualizr-lite@1d089b006295cd924b3c87337679fef7295e4329` and `uptane/aktualizr@e5118a74874c0561ebac57560c667c18b19d984b` as cross-domain currentness/rollback oracles only. Add `carabiner-dev/ampel@5cf19bc2786cbd73a8423383a966fbf842222d23` as a proof-admission accelerator for signer binding, policy expiry, explicit PASS/FAIL/SKIP and signed result output; add `in-toto/in-toto@e352b43ad7cb8915d84c36d791aa61346152a0a3` for authorized-functionary thresholds/artifact agreement. Preserve Sigstore's recurring signed-but-wrong-predicate failure class as a defensive negative oracle and require current exact predicate/type checks. None of these defines recovery-policy substance.
-
-**Mandatory proof-admission negatives:** `tampered_policy_metadata`; `expired_policy_metadata`; `policy_version_rollback`; `snapshot_mix`; `wrong_authority_role`; `wrong_predicate_type`; `threshold_shortfall`; `skip_exit_zero`. A cryptographically valid evidence object is non-green when policy is stale/mixed, the signer role is wrong, the requested evidence type is absent, threshold is incomplete or semantic result is SKIP—even if the wrapper process exits successfully.
+Bind the proof decision to the CAP-007 versioned authority envelope and require an exact-revision Recovery Qualification Receipt. Run the eight authority/admission negatives plus `exact_revision_without_e2e_receipt`, `older_green_e2e_replayed_as_current`, `harness_setup_failed_before_subject`, and `subject_failure_after_harness_ready`. `UNQUALIFIED`, `HARNESS_FAILED`, and `RECOVERY_FAILED` are distinct and all non-PROVEN.
 
 Then run missing expected subject, stale inventory, silent disappearance, scope-selector mismatch, aggregate-mask, service-up/data-wrong, rc=0/wrong-value, proof-sink failure, cleanup failure and deliberately broken verifier across PostgreSQL plus one dual-plane workload.
 
-**Do next:** wrap one actual EXP-004 restore-proof artifact in the integrated admission matrix. One fresh coherent correct bundle should become PROVEN; all eight negatives must fail for the intended reason. Durable publication should emit a current in-toto SVR v0.2-style summary carrying exact policy ResourceDescriptors/digests and point to the deeper signed proof bundle. `SVR/VSA` is a summary/index, not replacement evidence.
+**Do next:** one exact-revision-qualified artifact should become PROVEN under one fresh coherent authority bundle while every planted authority, qualification and semantic failure remains non-green for the intended reason.
 
-**Search only:** exact stable-identity conflict handling, collector-run completeness/provenance, tombstones/exclusions or a concrete proof-admission/currentness gap exposed by the matrix. Do not search another generic attestation/update framework before the integrated test.
-
-**Stop:** broad asset-inventory/CMDB/recovery-framework or OTA/update-framework search. First-match, confidence-only, “highest score wins” identity logic, signature-only currentness, process-exit-as-PASS and signed-but-wrong-type evidence are negative-control material, not denominator/proof authority.
+**Stop:** broad asset-inventory/CMDB/recovery/OTA/attestation search until this matrix runs.
 
 ## 6. CaptureBrief — P0/P1 / EXP-006
-**Bottleneck:** lossless packet/history authority, not another SAM wrapper.
+**Bottleneck:** lossless packet/history authority plus independently sourced current-action authority, not another SAM wrapper.
 
-Live SAM fixture `W50S8B-26-Q-A016` proved: same filename can mean different `resourceId`; latest deletion-inclusive manifest can omit a resource still recoverable from historical action manifests; historical action endpoints can expose later tombstone state. Therefore preserve action membership and observation-time state separately.
+Live fixtures prove both historical attachment loss and temporal-authority divergence. `W50S8B-26-Q-A016` shows same filename/different `resourceId` and historical resources omitted from the latest deletion-inclusive manifest. `FA524026Q0041` shows a complete bulk/mirror action set can still select the wrong current action because the bulk schema lacks an authoritative currentness primitive.
 
-**Do next:** repeat the historical-action-union test across the remaining nine frozen families. Record `union(all successful historical action manifests) - latest`, same-name/different-ID replacements, retroactive tombstones, restricted/offsite resources and source-failure cases. Maintain append-only local observation snapshots regardless of what old endpoints return later.
+**Do next:** carry three independent receipts: `HISTORY_SET_RECEIPT`, `CURRENT_ACTION_RECEIPT`, and `ACTION_ORDER_RECEIPT`. Repeat across the frozen families, especially same-day revisions. Shuffle same-day bulk rows as a negative; any current-selection result that changes under row permutation is deriving authority from non-authoritative order. Current packet completeness runs only after first-party currentness is resolved.
 
-**Stop:** generic SAM/FAR dashboards. Search only successor/deviation authority or a concrete history-loss gap.
+**Stop:** generic SAM/FAR dashboards. Search only successor/deviation authority or a concrete history/currentness-loss gap.
 
 ## 7. Installed-Base Lab / Sequencing — P1 / EXP-007
-**Bottlenecks:** (1) multi-vendor data-normalization acceptance on a rights-clean corpus; (2) durable external execution receipt under pre-confirmation ambiguity with a real persistent provider, not a dry-run adapter.
+**Bottlenecks:** (1) multi-vendor data-normalization acceptance on a rights-clean corpus; (2) durable external execution receipt under pre-confirmation ambiguity with a real persistent provider.
 
-For CAP-013, use `ethanbass/chromConverter@ddf959bb71a595357a3f4028be48afd006a78714` as the strongest new normalization component. It supplies registry-driven Agilent/Shimadzu/Waters/Thermo/Varian/open-format dispatch, canonical source-hash/parser provenance, open-format writers and fixture-backed numerical/metadata comparisons. Its recent CI archaeology is valuable because prior green CI silently skipped meaningful Entab/netCDF/Shimadzu paths before the workflow was hardened. Reverse-engineered format success is still fixture-scoped, not vendor certification.
+For CAP-013, retain `ethanbass/chromConverter@ddf959bb71a595357a3f4028be48afd006a78714` as the normalization component and use `Sigilweaver/OpenTFRaw@63380dff0d25898f5c6e1184087dc590b0d7b6ab` as the preferred independent Thermo RAW decoder oracle because its inspected path directly decodes RAW bytes rather than wrapping the same vendor decoder lineage. Entab is a third challenger, not the sole oracle.
 
-**Normalization test:** freeze a customer-owned/rights-clean or synthetic golden corpus spanning Agilent, Shimadzu, Waters and Thermo; pin parser/runtime revision; retain raw bytes/hash; emit normalized object/open format + provenance; independently compare a stratified subset against vendor/open exports; require measurement-value and minimum metadata/provenance preservation; unsupported versions/disagreement = explicit blocker. Stop broad chromatography-converter discovery until this corpus runs.
+**Normalization test:** execute CC0 `MSV000094032/raw/Lee_CB_03.raw` through the pinned production Thermo decoder and OpenTFRaw **before any shared normalization**. Freeze source hash and both revisions; compare predeclared scan count, RT, MS order, filter strings, centroid m/z/intensity or invariant aggregates, TIC/BPC and precursor/isolation fields where both support the semantic. Classify each field `PASS | DISAGREE | UNSUPPORTED | ORACLE_UNAVAILABLE`. XSD-valid mzML and one real-file CI fixture are structural evidence, not full scientific equivalence. Stop converter discovery until this runs.
 
-For physical actions, current MADSci SiLA path does not make client `action_id` equal the server-assigned CommandExecutionUUID; correlation is in memory only after the SDK call returns. `trieu04/lab-in-the-loop@80eb9524a4a36178b35810a7999cd95e8394d4fc` proves that a strong orchestration contract can still be a false positive operationally: it durably prepares intent, models `AMBIGUOUS/RECONCILING/BLOCKED` and reconciles by idempotency key before resubmit, yet its only installed lab provider is explicitly memory-only dry run and real mode is rejected. `MolBioFreak/BioModStack@9b36a0b106cd538d772de39092c1d532ad361083` supplies a conceptual provider-queryable stable request-key/command/receipt complement, but the combined crash-persistent real-provider join is NOT proven.
+For physical actions, MADSci/SiLA still has pre-confirmation ambiguity and Opentrons still has side-effect-before-action-persistence risk. Execute the seven-branch restart/rebind matrix with a real persistent provider; missing local action/receipt is never NOT_APPLIED.
 
-Current `sila2` 0.14.0 documentation exposes `ClientObservableCommandInstance(..., execution_uuid, lifetime_of_execution=...)`, so a **client-only restart** is a concrete rebind test when the CommandExecutionUUID was durably captured and the same server execution lifetime remains authoritative. Official SiLA semantics make `ServerUUID` stable across server lifetimes while CommandExecutionUUID is lifetime-scoped; same ServerUUID after server restart therefore does not make an old command receipt valid.
-
-**Execute seven branches plus provider-binding check:** provably not accepted => `SAFE_TO_REISSUE`; accepted/effect may have started but confirmation lost => `RECONCILIATION_REQUIRED`; confirmation received but client dies before durable receipt => `RECONCILIATION_REQUIRED`; durable receipt + positive same-operation readback => `CONFIRMED_APPLIED`; durable receipt + bounded authoritative NOT_APPLIED => `SAFE_TO_REISSUE`; client process restart with valid persisted receipt/server lifetime => reconstruct/query the same operation, no redispatch; server restart or execution-lifetime expiry => `RECONCILIATION_REQUIRED`; and real provider mode must actually be installed/persistent rather than memory-only dry run.
-
-Persist at minimum `(client_intent_id, intent_hash, server_uuid, feature_fqi, command_identifier, command_execution_uuid, lifetime_of_execution, receipt_received_at, receipt_durable_at, client_runtime_version, sila_runtime_version, reconciliation_state, last_authoritative_readback_at)`. Pin the exact SiLA/runtime and adapter factory during acceptance.
-
-Use `auths-dev/auths-proof@34fa1f33...` only as a transfer oracle for the alternative pattern “stable pre-dispatch business reference + provider-searchable metadata + idempotency + read-only reconciliation”; require equivalent device/server semantics before transferring it.
-
-**Stop:** broad lab-device/orchestrator and chromatography-converter discovery until both bounded tests run. Stable endpoint/server identity is not operation identity; an abstract reconciliation API is not provider evidence.
+**Stop:** broad lab-device/orchestrator and chromatography-converter discovery until both bounded tests run.
 
 ## 8. Insurance Subrogation — P1 / EXP-011
 Search only authoritative versioned jurisdiction/policy rules, precedence, limitations/fault effective periods and closed-claim settlement evidence. Missing/conflicting/superseded authority = REVIEW / $0. Stop generic claims AI/demand-letter tooling.
@@ -117,14 +105,9 @@ Search only authoritative versioned jurisdiction/policy rules, precedence, limit
 ## 9. Money-State Integrity / Payments — P1 / EXP-010
 **Bottleneck:** intersection of fault-boundary proof, revocable finality and economic terminality in one executable path.
 
-Keep three axes separate:
-- Fault axis: response suppression -> process death/restart -> same-effect/no duplicate.
-- Economic axis: provider object -> provider final state -> provider accounting application -> payout/balance -> independent bank/processor observation.
-- Revocation axis: previously successful economic effect -> later externally observed return/reversal -> compensating entry -> original obligation reopened under original authority -> safe re-close.
+Keep three axes separate: fault boundary; provider/accounting/bank terminality; and later revocation/counter-event. Interlock, effect-broker, Familiarise, Flames-up and Paymob each cover different parts; none proves the whole intersection with independent bank observation.
 
-Interlock strongly covers crash+provider-accounting application; effect-broker covers general crash/reconciliation; Familiarise now covers event-time authority + post-success provider reversal + reopened original earning; Flames-up covers provider payout terminality; Paymob covers provider ambiguity/refund child evidence. None alone proves the full intersection with independent bank observation.
-
-**Do next:** one path with post-effect process death -> new-process same-effect recovery -> no duplicate -> provider terminal success -> provider/accounting application -> later post-success return -> original obligation reopened without re-pricing -> independent processor/bank finality/readback. Suppress the webhook in one case to test whether long-tail independent observation can discover the counter-event.
+**Do next:** post-effect process death -> new-process same-effect recovery -> no duplicate -> provider terminal success -> provider-accounting application -> later post-success return -> original obligation reopened without re-pricing -> independent processor/bank finality/readback. Suppress the webhook in one case to test long-tail independent observation.
 
 ## 10. Revenue Decision Assurance — P1/P2
 Search only held-out replay adapters, real capacity/censoring/no-show/cancellation state, incumbent decision logs and realized revenue/load outcomes. Decision score, evaluator and buyer outcome remain separate. Stop recommendation-only analytics and model-valued ROI.
@@ -132,9 +115,9 @@ Search only held-out replay adapters, real capacity/censoring/no-show/cancellati
 ## 11. Industrial Virtual Commissioning — P1 / EXP-008
 **Bottleneck:** independent measurement of endpoint behavior.
 
-Execute duplicate-ECID S2F15 with a neutral raw-HSMS requester. Record every correlated wire message, classify EXPECTED_SECONDARY/F0/STREAM9/OTHER/none, maintain an independent logical T3 clock, and read EC post-state. Run native Dreamine and secsgem requesters separately as host-policy comparators.
+Execute duplicate-ECID S2F15 with a neutral raw-HSMS requester. Record every correlated wire message, maintain an independent logical T3 clock and read EC post-state. Run native Dreamine and secsgem requesters separately as host-policy comparators.
 
-**Stop:** third SECS/GEM engine until an actually executed endpoint disagreement needs adjudication. Same System Bytes is correlation evidence, not sufficient proof of expected transaction completion.
+**Stop:** third SECS/GEM engine until an actually executed endpoint disagreement needs adjudication.
 
 ## 12. Permit / Public-Data Intelligence — P1 / EXP-009
 Use source topology + immutable versions + CAP-019 observation receipts + reviewed identity. Freeze three-jurisdiction source-field truth. Search only source-completeness/semantic/identity/version gaps that change a buyer decision. Stop mutable-upsert lead maps.
@@ -142,52 +125,32 @@ Use source topology + immutable versions + CAP-019 observation receipts + review
 ## 13. Grid / Infrastructure — P1/P2 / EXP-012
 **Bottleneck:** evaluator-byte provenance and independence.
 
-Mendeley DOI `10.17632/r4csg2h2ps.1` supplies one exact 12,980,662-byte outer witness package under two byte-identical aliases, SHA-256 `3496a7fe4b2fd02e7648405be83061eec614400f125b8fbeb142207e683bbc67`. That hash is **not** the embedded USECPO source hash.
-
-**Do next:** in a binary-capable runtime verify the outer package, extract only the source/download manifest, read the exact USECPO URL/release/size/SHA row, and compare it with first-party OEDI bytes or a first-party digest. Keep UNKNOWN/MISMATCH hard-fail. Then freeze whole-event 2019–2023 splits.
+Mendeley DOI `10.17632/r4csg2h2ps.1` supplies one exact outer witness package but not the embedded USECPO source hash. Obtain and compare first-party OEDI bytes/digest, then freeze composite event identity, unique county-spell grain and the spell↔event bridge before scoring policy outcomes.
 
 **Stop:** more outage datasets unless a genuinely independent rights-clear oracle remains necessary.
 
 ## 14. Independent verification / adjacency / measurement debt
-Use the V9 allocator to spend the remaining slot on whichever has the highest current information value:
-1. independent falsification of one active experiment claim;
-2. external-outcome evidence for a high-ranked opportunity;
-3. measurement debt that prevents deciding whether a search strategy actually works;
-4. adjacency only where it closes a named capability seam.
-Do not spend the wildcard slot on a familiar saturated family solely because it is easy to search.
+Use the remaining slot on the highest information-value task: independent falsification, external-outcome evidence, measurement debt, or adjacency that closes a named seam. Do not spend it on a familiar saturated family because it is easy to search.
 
 ## Current stop list
 - Generic freight systems, reconciliation engines, OCR/rating components.
 - Generic AP matchers/OCR/RPA before EXP-002.
 - Generic commission calculators/statement parsers.
-- Generic backup frameworks, broad CMDB/asset-inventory matching and additional OTA/update/attestation frameworks before the EXP-004 identity/coverage/currentness/typed-admission matrix.
-- Generic construction pay-app CRUD before EXP-005.
+- Generic backup frameworks, broad CMDB matching and more OTA/attestation frameworks before EXP-004.
+- Generic construction pay-app/reversal CRUD before EXP-005 scoped counter-event corpus.
 - Generic SAM/FAR wrappers before EXP-006.
-- Broad lab frameworks and chromatography-converter hunting before EXP-007 bounded tests.
+- Broad lab frameworks and chromatography converters before EXP-007 bounded tests.
 - Third SECS/GEM implementation before EXP-008 execution.
 - More outage datasets before EXP-012 artifact provenance closes.
 
 ## Integrator next bottleneck
 The portfolio still has **$0 directly evidenced customer value and $0 directly evidenced revenue**. The highest-value external step remains Freight EXP-001: verified separate environment + one authorized frozen buyer population + one uniquely attributable incumbent miss + actual credit/refund/remittance. Technical work elsewhere should continue only when it makes one of the active experiments cheaper, safer or more falsifiable.
 
-<!-- INTEGRATOR-R13-2026-09-20T1900-0400 -->
-## Integrator queue delta — 2026-09-20 19:00 ET
-1. **P0 Freight pilot gate + external validation:** first harden the Pilot Charter so `KICKOFF_AUTHORIZED` requires strict JSON types and a current authority-bound launch-decision receipt; then stop internal freight discovery and run one explicitly authorized frozen buyer population to actual settlement evidence.
-2. **P1 Grid EXP-012 correctness:** obtain/hash the current first-party OEDI artifact; if byte identity is established, freeze composite event identity + unique county-spell grain + event bridge before any historical scoring. Do not run the old bare-`event_id` evaluator.
-3. **P1 AP EXP-002 provider semantics:** establish authoritative QBO `requestid` retention/expiry and a conservative VendorCredit negative-readback contract; run the process-restart same-request-ID fixture. Do not hunt generic idempotency libraries.
-4. **P1 Payout EXP-010:** join terminal provider scanning to one vertical historical earning/payable by exact payout ID and classify still-owed vs clawback before reopen/re-pay. Do not count generic pending-state polling as finality assurance.
-5. **P1 ScopeSignal EXP-005:** execute immutable-evidence mutation corpus before another RA-bill search. Require accepted bill -> immutable measurement version edge and explicit correction/counter-event.
-6. **P1 CAP-009 workforce authority:** combine PayrollEngine-style effective/knowledge-time selection with RosterSpec verification/repair on a frozen historical rule bundle. Do not treat static compliance settings as authority.
-7. **P2 Protocol pre-FAT:** execute the existing USP/SECS differential fixtures with neutral measurement before discovering a fourth implementation. Caretaker is a negative-control endpoint until runtime evidence exists.
-8. **P2 CaptureBrief EXP-006:** keep `VERIFIED_ACTION_MEMBERSHIP / semantic_identity / byte_state` separate; move to the next frozen solicitation family rather than repeatedly guessing routes for the same unavailable historical object.
-
-<!-- INTEGRATOR-R14-2026-09-20T2028-0400 -->
-## Integrator queue delta — 2026-09-20 20:28 ET
-1. **P0 Freight lifecycle gate, then external buyer:** extend the strict launch-decision receipt rule through Pilot Amendment/replacement Charter. Run truthy-`"false"`, malformed scalar scope, fabricated self-hash, arbitrary activation string and stale-evidence negatives. Material post-kickoff scope/fee/role changes must consume a fresh authority-bound Activation/launch receipt tied to the exact changed fields. Once this lifecycle gate passes, stop internal freight work and move to one authorized frozen buyer population and real settlement.
-2. **P1 Recovery EXP-004 exact-revision qualification:** before another recovery search, execute or obtain an exact-revision E2E qualification receipt. Treat `UNQUALIFIED`, `HARNESS_FAILED`, and `RECOVERY_FAILED` separately. Run `exact_revision_without_e2e_receipt`, `older_green_e2e_replayed_as_current`, `harness_setup_failed_before_subject`, and `subject_failure_after_harness_ready` alongside the existing authority/admission matrix.
-3. **P1 CaptureBrief EXP-006 current-action correctness:** use `FA524026Q0041` as the planted case where all action UUIDs are present but normalized `LATEST` is wrong. Separate history-set completeness, authoritative ordering and authoritative current action; first-party currentness wins over correlated mirror list order. Resolve current action before packet completeness.
-4. **P1 AP EXP-002 Xero finite replay:** implement a bounded replay/positive-reconciliation fixture: same key only inside authoritative replay TTL; durable business marker + exact CreditNoteID/readback after TTL; no post-TTL redispatch; zero result remains UNKNOWN. Search only for an authoritative negative-completeness contract if the fixture cannot resolve NOT_APPLIED.
-5. **P1 ScopeSignal EXP-005 counter-event provenance:** add SiteMate-style append-only negative consumption as a planted false-authority case. Require every capacity-restoring event to bind a real prior event/source and exact baseline version, be bounded and idempotent, and originate from an authoritative correction transition. Do not equate immutable history with true history.
-6. **P1 Lab EXP-007 close the Thermo row:** treat Agilent/Shimadzu/Waters as bounded exact-head automated evidence; Thermo remains OPEN because current RAW test is CI-skipped. Execute the rights-clean CC0 MassIVE Thermo file with pinned parser/runtime, source hash and independent oracle. Do not hunt another converter until this fourth row is actually executed.
-7. **P2 Money-state EXP-010 refund rediscovery:** test the SmallHeroes dispatch fence under literal process death/new process, provider lookup pagination/completeness and terminal economic readback. Distinguish provider idempotency replay from provider-side rediscovery by durable business identity.
-8. **No benchmark policy change:** Pair 1 Experiment remains empty; matched benchmark is unchanged. Do not alter SEARCH_SKILLS or claim the Experiment architecture wins until new matched evidence exists.
+<!-- INTEGRATOR-R15-2026-09-20T2100-0400 -->
+## Integrator queue delta — 2026-09-20 21:00 ET
+1. **P0 Freight external validation:** treat v15.13 Engagement State Resolver as internal hardening only. Verify the separate environment, freeze one authorized buyer population, and push one challenger-only finding through adjudication and actual settlement. No more generic freight hunting.
+2. **P1 CaptureBrief currentness:** use three independent receipts—history set, current action, and action ordering. Run same-day-row permutation negatives and compare against first-party latest-active/current assertions before packet completeness.
+3. **P1 Lab Thermo oracle:** run `Lee_CB_03.raw` through production Thermo decoder versus `OpenTFRaw@63380...` before normalization; keep Entab as a third challenger. Do not mistake shared decoder lineage, schema-valid mzML, or one-file CI for independent scientific equivalence.
+4. **P1 ScopeSignal scoped reversal:** execute cross-project transaction-ref/idempotency collisions, duplicate source versions, wrong-tenant reversals and FK/scope negatives. No capacity reopening unless prior-event identity, tenant/project scope, source version, uniqueness and correction authority all agree.
+5. **P1 Recovery:** execute the exact-revision qualification + authority/admission matrix rather than find another recovery or attestation framework.
+6. **No benchmark policy change:** no benchmark-path commit since the previous scored checkpoint; Pair 1 Experiment remains empty. Preserve SCOREBOARD and SEARCH_SKILLS and do not claim Experiment superiority.
