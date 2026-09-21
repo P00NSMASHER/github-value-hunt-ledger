@@ -1506,3 +1506,144 @@ Do not edit global `SEARCH_SKILLS.md`. Refine the lesson before any wider promot
 - public web/documentation queries: 2;
 - reproducible tests: 1 source-faithful crash-ordering model;
 - untrusted-repository code executions: 0.
+
+## 2026-09-20 — Shadow Science Run 15
+
+### Hypothesis
+The mixed-generation campaign-checkpoint gap exposed in OpenMM can be closed by a transferable storage kernel that publishes immutable artifact shards first, exposes a checkpoint only through one manifest visibility point, pins exact per-shard generation and digest, and makes lost-response publication replay deterministic. The hypothesis fails as a complete scientific checkpoint finding if the manifest does not establish atomic closure over the referenced shards or if the scientific adapter is only mock-qualified.
+
+### Discovery modes
+1. Direct gap search: followed Run 14's exact missing invariant—generation-consistent, manifest-verified multi-artifact publication rather than generic checkpoint/resume.
+2. Code/invariant search: traced shard publication, manifest visibility, generation/digest verification, deterministic operation identity, response-loss replay, owner/incarnation fencing and crash recovery.
+3. Commit-history archaeology: inspected the checkpoint adapter's August 2026 introduction and the September 2026 publication-incarnation fence at the pinned revision.
+4. Adjacent-system falsification: compared the thesis against Orbax commit-marker/atomic-rename checkpointing and AiiDA process checkpoint/provenance/restart semantics, then separated storage novelty from scientific integration/adoption.
+
+### Best candidate
+**NoKV-Lab/NoKV — durable publication/replay substrate with a manifest-last checkpoint adapter**  
+Canonical URL: https://github.com/NoKV-Lab/NoKV  
+Exact revision: 590d3a4bdca9df604e1dfa5e881a869c8a3bfcdf  
+Version at revision: 0.11.1  
+Public license: Apache-2.0  
+Repository attention at inspection: 492 stars / 58 forks / 8 subscribers  
+Evidence snapshot id: shadow-science-20260920-nokv-manifest-590d3a4
+
+### Frozen evidence manifest
+- crates/nokv-python/python/nokv/checkpoint.py blob e740411ebe5c982622d416b94d16e4390a8ce18b;
+- crates/nokv-python/tests/test_checkpoint.py blob 0cfcb8a8d15de12683f0a5a2990ebd488236eb61;
+- crates/nokv-python/python/nokv/torch.py blob 72d90fd23e1b5a24ce9234865020733a49ec6a2c;
+- crates/nokv-python/tests/test_torch_unit.py blob dee0400eaf0051440c7c3b54bb811d5e22adecd6;
+- crates/nokv-client/src/artifact.rs blob d8ac8f4e0a7710542810f9965dea588d26a67898;
+- crates/nokv-meta/src/workspace/publication.rs blob 932c4a0563970d5757afd5484615e1157be83e70;
+- crates/nokv-meta/src/workspace/publish_operation_records.rs blob 3d960377621eda4f07e229cb9a1fb38f5d72af85;
+- crates/nokv-meta/src/workspace/engine.rs blob 71113cb6c41f6bc3e2fc66fcfc669fd41cbc23af;
+- crates/nokv-meta/src/workspace/records.rs blob bdfebba5bd4ba05a3210550d6e8b97ca6b0ebb1c;
+- crates/nokv-meta-holt/src/options.rs blob 1650c2b572b358ecc14f60897e6b3be644db5dc3;
+- crates/nokv-meta-holt/src/tests.rs blob 370063be31b205c5109536e08f4aac0b801e81a4;
+- README.md blob 09eb98109eb9b0756470b6018536ded79c806e68;
+- LICENSE blob 261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64;
+- checkpoint-adapter introducing commit 63a9dc6257a59772e6fa531dca5767c7dfe0686d;
+- exact-SHA GitHub Actions runs 35432924187 (Python SDK) and 35432924262 (Rust), both completed successfully for head 590d3a4...;
+- primary comparator evidence: Orbax commit-success/atomic-rename checkpoint protocol and AiiDA durable process checkpoint/provenance/restart documentation at their inspected exact revisions.
+
+### Specialist passes
+- **CODE INSPECTOR:** traced checkpoint publication/load, the Torch adapter, durable publication rows, provider-write ordering, exact replay, generation/incarnation fences and crash/reopen evidence.
+- **SCIENCE / HISTORY / ECOSYSTEM VALIDATOR:** established that scientific integrations are target-only, checked adapter history and current attention, and tested novelty against Orbax and AiiDA.
+- **COMMERCIAL ANALYST:** bounded the wedge to a Campaign Snapshot Crash Audit / adapter retrofit for expensive ad-hoc multi-artifact workloads rather than a new scientific workflow platform.
+- **INDEPENDENT RED-TEAM / VERIFIER:** received the frozen packet without the proposed score and tested exact claim support, atomic closure, real-provider composition, scientific equivalence, novelty, rights and operational gaps.
+
+### Load-bearing claims
+
+**IMPLEMENTED**
+- The Python checkpoint helper publishes create-only shard artifacts first. Each shard result records its path, byte length, exact live generation and SHA-256 body digest.
+- A canonical create-only _manifest.json is published last and is the only discovery/visibility point: latest_step ignores a step whose shards exist without a manifest.
+- Manifest serialization sorts shard names, so gather order does not change manifest identity. Deterministic operation and artifact-revision identities are derived from canonical workbench/path/body-digest inputs, allowing exact response-loss replay.
+- Loading resolves the manifest, reads each referenced shard and rejects any mismatch in generation, logical size, metadata digest, byte length or recomputed SHA-256. Generation drift therefore fails loudly instead of silently assembling a mixed checkpoint.
+- The optional Torch Distributed Checkpoint adapter maps one shard per rank and publishes serialized DCP metadata last.
+- The Rust publication substrate is materially stronger than the thin Python helper: durable operation records bind identity digests, owner epoch/activity lease, workspace incarnation, target path/revision/claim, staged-object and manifest seals/cursors, cleanup state and deterministic terminal result.
+- The client persists staged-object rows before provider writes, uses generation/owner fencing and atomically installs final revision/path/index/event/result metadata after manifest closure validation. Exact completed operations can be recovered and replayed without reuploading; a replay is rejected if the live path now points to a different revision.
+- File-backed Holt configuration requires synchronous WAL acknowledgement and rejects weaker async-WAL profiles.
+- Root licensing is Apache-2.0.
+
+**TESTED**
+- Seven focused checkpoint tests cover partial-shard invisibility, distributed manifest commit, invalid shard names, deterministic replay, gather-order independence, frozen-snapshot success and loud live-generation drift.
+- Native client tests cover lost stage-response replay with one durable apply, concurrent progress reload, completed-operation recovery before abort, fresh-process exact replay without reupload and rejection when a previously published path has moved.
+- Metadata/Holt tests cover operation-identity mismatch, owner/incarnation fencing, finalization races, process exit/reopen and deterministic torn-frame behavior.
+- Exact-SHA Python SDK and Rust GitHub Actions runs completed successfully.
+
+**CLAIMED / PLANNED**
+- atomate2/jobflow is explicitly a target integration shape, not a bundled adapter, partner deployment or live-qualified HPC path.
+- OpenMM and OpenDPD combination value is architectural: no inspected adapter currently binds their scientific state/evidence to NoKV.
+- The repository does not claim full native real-service Gate 0, cross-host fencing, metadata HA or physical power-cycle qualification.
+
+**UNKNOWN / LIMITS**
+- The checkpoint and Torch tests use FakeClient/fake Torch paths. The installed Python checkpoint path has no accepted end-to-end real-service qualification.
+- commit_checkpoint validates caller-supplied manifest entries but does not atomically re-read or CAS every referenced shard generation while making the manifest visible. A concurrent shard replacement between shard publication and manifest publication can therefore create a newly visible checkpoint that immediately fails on load. Failure is loud, but group closure was not atomically established.
+- The helper does not pass expected_workspace_incarnation_id even though the underlying SDK at this revision supports that fence, and its deterministic identities omit incarnation.
+- A crash before manifest publication leaves invisible orphan shards without an adapter-level cleanup/retention policy.
+- latest_step chooses the numerically highest manifest without validating and falling back to the newest loadable checkpoint.
+- No fresh-process kill/restart test spans every Python shard/manifest boundary against a real object provider, and no scientific resumed-versus-uninterrupted equivalence test exists.
+- Torch metadata deserialization uses pickle and therefore requires trusted checkpoint metadata.
+
+### Independent RED-TEAM / VERIFIER
+
+**Verdict: INCOMPLETE for the full scientific-checkpoint hypothesis.**
+
+The verifier found strong evidence for the narrower Rust durable-publication substrate, but insufficient evidence for a qualified scientific campaign checkpoint solution.
+
+Proof obligations:
+1. **Manifest-last visibility and exact shard verification? — PASS.** The adapter hides partial steps and rejects generation/digest drift.
+2. **Durable deterministic publication replay? — PASS at the Rust substrate.** Source and tests cover lost-response replay, completed-operation recovery and no-reupload exact retry.
+3. **Atomic closure over every referenced shard at manifest commit? — FAIL / INCOMPLETE.** The helper does not re-read/CAS all shard generations at the commit point.
+4. **Workspace-incarnation fencing through the helper? — FAIL / INCOMPLETE.** The underlying capability exists but is not used by the checkpoint helper.
+5. **Real-provider Python checkpoint qualification? — FAIL / INCOMPLETE.** Current adapter evidence is fake-client/mock based.
+6. **Scientific campaign integration and equivalence? — FAIL / INCOMPLETE.** No OpenMM/OpenDPD/atomate2 end-to-end resume proof exists.
+7. **Novelty beyond commodity alternatives? — LIMITED.** Orbax already implements commit-success/atomic-rename checkpoint visibility, and AiiDA already implements scientific process checkpoint/provenance/restart. NoKV's narrower differentiator is the conjunction of exact generation/digest verification, durable publication replay, workspace history/fencing and retention-aware storage.
+8. **Rights? — PASS.** Apache-2.0 is clear; no rights block was found.
+
+Strongest objection: the visible manifest can reference a shard generation that changed immediately before manifest publication. The loader catches the mismatch, but the publication step did not prove a complete loadable group existed at the visibility instant. Combined with mock-only scientific adapter tests, this makes the full transfer claim incomplete rather than verifier-passed STRONG.
+
+Evidence that would reverse the verdict:
+- a real-provider installed-Python test at the exact revision;
+- atomic generation/incarnation fencing for every manifest member;
+- process kill/restart and lost-response tests at every shard/manifest boundary;
+- defined orphan and corrupt-highest-manifest handling;
+- one real OpenMM or atomate2/jobflow campaign whose resumed state is equivalent to an uninterrupted run;
+- cross-host fencing and metadata-recovery evidence if those conditions remain in scope.
+
+### Proposed commercial score
+A) speed to first revenue: **3/5** — a focused audit/retrofit is sellable before a platform, but the adapter requires hardening.  
+B) customer value / ceiling: **4/5** — preventing invalid restarts and rerun GPU/HPC waste can matter in expensive campaigns.  
+C) build/domain compression: **5/5** — the storage/replay substrate saves substantial reliability engineering.  
+D) rarity/advantage: **3/5** — the conjunction is useful, but manifest/commit-marker checkpointing and scientific restart are established elsewhere.  
+E) evidence/completeness: **3/5** — strong lower-layer evidence, incomplete scientific composition.  
+F) rights/operability: **5/5** — Apache-2.0 and a buildable active project, with explicit qualification boundaries.  
+**Total: 23/30 — WATCH_COMPONENT for scientific campaign checkpointing. The Rust durable-publication substrate may merit a separate STRONG_COMPONENT review, but this frozen candidate packet does not pass that narrower re-scoped verification.**
+
+### Commercial / research implication
+The near-term product is a **Campaign Snapshot Crash Audit + Adapter Retrofit** for scientific teams that still write multi-artifact state to ad-hoc NFS/S3 folders and are not already well served by Orbax or AiiDA. The deliverable would inject failures at every artifact boundary, detect mixed generations, add immutable per-generation shard paths plus one manifest visibility point, bind workspace incarnation, prove response-loss replay, and quantify avoided rerun GPU-hours and scientist recovery time.
+
+Do not sell NoKV itself as a proven scientific workflow platform. The monetizable kernel is the audit and the storage/replay design pattern; the proof gate is a real scientific adapter and crash matrix.
+
+### Search lesson outcome
+New LOCAL lesson candidate: **closure-at-visibility verification**.
+
+When a manifest or commit marker appears to make a multi-artifact checkpoint atomic, inspect whether the commit operation atomically proves the current identity/generation of every referenced member. A manifest can hide partial uploads yet still expose an unloadable group if referenced paths are mutable between shard publication and manifest commit.
+
+Evidence count: **1 shadow task**. Keep LOCAL; do not stage or promote to global SEARCH_SKILLS.md.
+
+### VALUE HANDOFF
+1. **Capability delta:** identifies a strong durable publication/replay substrate and a manifest-last checkpoint adapter, while proving the adapter does not yet establish atomic scientific group closure.
+2. **Graph edge:** supplies the likely storage component for OpenMM/OpenDPD campaign snapshots, but the adapter and crash-qualified composition remain missing.
+3. **Radar signal:** scientific-state infrastructure is borrowing database/object-store visibility semantics; the differentiation is moving from “has a manifest” to generation fencing, deterministic replay and verified closure.
+4. **Experiment impact:** the next test is exact—bind an OpenMM or OpenDPD campaign to a real NoKV service, use immutable per-generation shard identity plus workspace-incarnation fencing, kill at every boundary and prove readers see complete N or N+1 only.
+5. **Commercial impact:** supports a fixed-scope crash audit/retrofit; does not yet support a packaged scientific checkpoint product claim.
+6. **Negative knowledge:** manifest-last publication, per-shard hashes and loud load failure are weaker than atomic closure at visibility; mock adapter tests cannot inherit real-service durability from a stronger lower layer.
+
+### Cost proxies
+- materially distinct discovery modes: 4;
+- serious candidate/comparator inspections: 1 deep candidate plus Orbax and AiiDA baselines;
+- specialist contexts: code inspection, science/history/ecosystem, independent verifier;
+- public source/test/schema/history/status reads and searches: approximately 35;
+- reproducible untrusted-repository executions: 0;
+- sensitive-source incidents: 0.
+
