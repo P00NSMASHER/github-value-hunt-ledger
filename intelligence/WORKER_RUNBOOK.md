@@ -10,7 +10,7 @@ Hunts 10, 12 and 14 retain their post-benchmark shadow missions and write restri
 
 ## 2. Select one useful assignment
 
-Read intelligence/HUNTER_MISSION.md and the relevant current HUNT_PLAN packet. Preserve the original lane as a fallback specialty, not a reason to duplicate another worker. Read current capability/experiment/STOP status before execution. Generated scores are scheduling priorities.
+Read intelligence/HUNTER_MISSION.md and the relevant current HUNT_PLAN packet. Preserve the original lane as a fallback specialty, not a reason to duplicate another worker. Read current capability/experiment/STOP status before execution. Then read only the entries in intelligence/COORDINATION_BOARD.md that match the current assignment, capability, experiment or candidate fingerprint; the board is cross-hunter context, not authority. Generated scores are scheduling priorities.
 
 Use work_action and its acceptance_target:
 - search: discover a missing implementation with its domain anchors;
@@ -47,6 +47,8 @@ At the end of a materially useful run, hand off every item that can improve anot
 
 A rejected candidate is fleet memory when its failed proof obligation prevents another hunter from repeating the same dead end. A referral is not a promotion, and another hunter must still verify the evidence it relies on.
 
+When any of those handoffs would materially change another worker's next action, emit one immutable coordination packet following intelligence/COORDINATION_PROTOCOL.md. Use at most one packet per materially useful run and normally no more than five concise signals. Do not create coordination noise for routine findings that the existing catalog/search-run record already captures.
+
 ## 4. Save evidence and one immutable run
 
 Write detailed source evidence to the assigned lane catalog or a uniquely named referral. Preserve sibling content with optimistic file-SHA updates. For every materially completed live run, create exactly one new UTF-8 JSON object at intelligence/search_run_spool/<safe-unique-run-id>.json.
@@ -54,6 +56,8 @@ Write detailed source evidence to the assigned lane catalog or a uniquely named 
 Start with tools/ti_prepare_run.py for an honest draft (see --help), then use SEARCH_RUN_TEMPLATE.json plus schemas/search_run.schema.json for current field meanings; remove placeholder candidate rows and invented provenance. Record the actual work_action, measured denominators, actual queries/surfaces, dispositions, stop reason, elapsed/tool effort if observed and durable_evidence_path. Non-search fixture/artifact work is excluded from discovery-yield comparisons and remains eligible for portfolio/outcome evidence. Set fields according to what actually happened: generated claims carry exact packet provenance; manual/unallocated work uses explicit non-generated modes. Do not downgrade or inflate historical schema metadata to pass validation.
 
 Spool files are immutable submissions. The single CI/integrator writer uses tools/ti_ingest_runs.py --write to idempotently append valid new IDs to search_runs.jsonl. Exact replay adds no row. A conflicting ID or malformed new submission blocks intake; preserve both records and reconcile explicitly. Workers do not race replacing the shared canonical file.
+
+If the run produced cross-hunter learning, also create exactly one new immutable coordination packet at intelligence/coordination_spool/<safe-run-id>.json using intelligence/COORDINATION_EVENT_TEMPLATE.json and the coordination protocol. List the emitted signal IDs in the run's coordination_signal_ids when telemetry supports it. Detailed evidence stays in the durable evidence path; the coordination packet is only the compact handoff index.
 
 For claimed work, only append COMPLETE after the canonical run is present and its claim/assignment provenance validates. Pending intake is pending completion, not success. An expired claim cannot be completed retroactively; preserve the evidence and report the lifecycle issue. Use FAIL/RELEASE for genuine blocking states. Record unmeasured work without synthetic success events.
 
@@ -66,9 +70,9 @@ End with a concise change report: best evidence or useful no-find; capability/ex
 ## Integrator procedure
 
 Keep the frozen benchmark scoring duty first. Then:
-1. Review new immutable submissions/referrals and intake errors. Never turn prospective unknowns into invented denominators; preserve explicit retrospective repairs.
+1. Review new immutable search-run submissions, coordination packets/referrals and intake errors. Never turn prospective unknowns into invented denominators; preserve explicit retrospective repairs.
 2. Run intake before the existing sync/report/validation pipeline. Resolve a conflicting submission by an explicit preserved archive and evidence note, never last-write-wins.
-3. Reconcile completed experiments to outcomes with originating search IDs. Prioritize actual result/verification debt over new policy machinery.
+3. Reconcile coordination packets into intelligence/COORDINATION_BOARD.md before broad new searching: close duplicates, preserve unresolved proof obligations, and route capability deltas/negative knowledge/experiment changes to their existing authoritative ledgers. Then reconcile completed experiments to outcomes with originating search IDs. Prioritize actual result/verification debt over new policy machinery.
 4. Update central capability/experiment/MASTER/queue/skills only when evidence changed; keep promotions small and reversible. No candidate promotions based solely on scores.
 5. Check that generated plans contain concrete actions/domain anchors, current STOP gates, and useful protected exploration. A verifier without a frozen candidate is a hypothesis challenge, not post-discovery independent verification.
 6. Check readiness/claim/telemetry gaps and stale packets. Do not infer learning success from files existing.
