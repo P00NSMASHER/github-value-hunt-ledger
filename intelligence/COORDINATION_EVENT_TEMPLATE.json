@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "packet_id": "COORD:example",
+  "source_run_id": null,
+  "source_hunter": "HUNTER-00",
+  "created_at": "2026-09-21T00:00:00Z",
+  "signals": [
+    {
+      "signal_id": "SIG:example",
+      "type": "referral",
+      "subject": "owner/repo@exact-revision or CAP-000 / EXP-000",
+      "dedupe_key": "normalized-technical-question",
+      "capability_ids": [],
+      "experiment_ids": [],
+      "target_worker_ids": [],
+      "target_lane_ids": [],
+      "priority": "normal",
+      "question": "Exact unanswered question another lane can falsify.",
+      "failed_proof_obligation": null,
+      "evidence_refs": [],
+      "expires_at": null
+    }
+  ]
+}
