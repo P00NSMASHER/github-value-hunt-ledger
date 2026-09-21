@@ -106,3 +106,32 @@ def test_conversion_rates_are_buyer_cohort_based():
 def test_duplicate_engagement_id_is_rejected():
     with pytest.raises(ValueError, match="duplicate engagement_id"):
         calibrate_commercial_outcomes([O("b1", "same"), O("b2", "same")])
+
+
+@pytest.mark.parametrize("field", ["fixed_fee_usd", "delivery_cost_usd", "reviewer_hours"])
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), -1, True, "100"])
+def test_direct_jsonl_ingestion_rejects_invalid_commercial_measurements(field, value):
+    outcome = O("b1", "e1")
+    outcome["freight_metrics"][field] = value
+    with pytest.raises(ValueError, match=field):
+        calibrate_commercial_outcomes([outcome])
+
+
+def test_missing_synthetic_provenance_cannot_unlock_commercial_learning():
+    outcome = O("b1", "e1")
+    del outcome["freight_metrics"]["synthetic"]
+    assert calibrate_commercial_outcomes([outcome]).status is CalibrationStatus.NO_EXTERNAL_DATA
+
+
+def test_text_paid_flag_cannot_count_as_a_conversion():
+    outcome = O("b1", "e1")
+    outcome["freight_metrics"]["pilot_paid"] = "false"
+    with pytest.raises(ValueError, match="pilot_paid"):
+        calibrate_commercial_outcomes([outcome])
+
+
+def test_nonfinite_revenue_is_rejected_before_eligibility():
+    outcome = O("b1", "e1")
+    outcome["revenue_usd"] = float("nan")
+    with pytest.raises(ValueError, match="revenue_usd"):
+        calibrate_commercial_outcomes([outcome])

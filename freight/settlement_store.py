@@ -144,6 +144,14 @@ class SettlementStore:
         return value.strip()
 
     @staticmethod
+    def _positive_cents(name: str, value: int) -> int:
+        # Input adapters must perform any explicit, reviewed currency conversion.
+        # Silently truncating fractional cents here changes immutable evidence.
+        if type(value) is not int or not 0 < value <= 2**63 - 1:
+            raise ValueError(f"{name} must be positive integer cents within SQLite range")
+        return value
+
+    @staticmethod
     def _same(row: sqlite3.Row, values: dict[str, object]) -> bool:
         return all(row[k] == v for k, v in values.items())
 
@@ -152,6 +160,8 @@ class SettlementStore:
         return self.buyer_id, self.business_unit
 
     def create_claim(self, claim: RecoveryClaim) -> bool:
+        if type(claim.fee_disqualified) is not bool:
+            raise ValueError("fee_disqualified must be a boolean")
         v = dict(
             buyer_id=self.buyer_id,
             business_unit=self.business_unit,
@@ -160,14 +170,11 @@ class SettlementStore:
             payer_id=self._text("payer_id", claim.payer_id),
             payee_id=self._text("payee_id", claim.payee_id),
             currency=self._text("currency", claim.currency),
-            amount_cents=int(claim.amount_cents),
+            amount_cents=self._positive_cents("claim amount", claim.amount_cents),
             issued_at=self._text("issued_at", claim.issued_at),
             source_hash=self._text("source_hash", claim.source_hash),
             fee_disqualified=int(claim.fee_disqualified),
         )
-        if v["amount_cents"] <= 0:
-            raise ValueError("claim amount must be positive")
-
         def op(conn: sqlite3.Connection) -> bool:
             old = conn.execute(
                 "SELECT * FROM recovery_claims WHERE buyer_id=? AND business_unit=? AND claim_id=?",
@@ -197,14 +204,11 @@ class SettlementStore:
             payer_id=self._text("payer_id", event.payer_id),
             payee_id=self._text("payee_id", event.payee_id),
             currency=self._text("currency", event.currency),
-            amount_cents=int(event.amount_cents),
+            amount_cents=self._positive_cents("settlement amount", event.amount_cents),
             booked_at=self._text("booked_at", event.booked_at),
             source_hash=self._text("source_hash", event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
-        if v["amount_cents"] <= 0:
-            raise ValueError("settlement amount must be positive")
-
         def op(conn: sqlite3.Connection) -> bool:
             old = conn.execute(
                 "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
@@ -232,14 +236,11 @@ class SettlementStore:
             counter_id=self._text("counter_id", event.counter_id),
             original_event_id=self._text("original_event_id", event.original_event_id),
             currency=self._text("currency", event.currency),
-            amount_cents=int(event.amount_cents),
+            amount_cents=self._positive_cents("counter amount", event.amount_cents),
             observed_at=self._text("observed_at", event.observed_at),
             source_hash=self._text("source_hash", event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
-        if v["amount_cents"] <= 0:
-            raise ValueError("counter amount must be positive")
-
         def op(conn: sqlite3.Connection) -> bool:
             original = conn.execute(
                 "SELECT currency,booked_at FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
@@ -335,9 +336,7 @@ class SettlementStore:
         return self._write(op)
 
     def review_allocate(self, *, allocation_id: str, claim_id: str, event_id: str, amount_cents: int, created_at: str) -> str:
-        amount_cents = int(amount_cents)
-        if amount_cents <= 0:
-            raise ValueError("allocation amount must be positive")
+        amount_cents = self._positive_cents("allocation amount", amount_cents)
 
         def op(conn: sqlite3.Connection) -> str:
             old = conn.execute(

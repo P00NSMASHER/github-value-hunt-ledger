@@ -215,3 +215,30 @@ def test_legacy_unscoped_schema_fails_closed(tmp_path):
     conn.commit(); conn.close()
     with pytest.raises((RuntimeError,sqlite3.OperationalError)):
         SettlementStore(path,buyer_id="BUYER-A",business_unit="OPS")
+
+
+@pytest.mark.parametrize("amount", [100.9, 100.0, "100", True, False, float("nan"), float("inf"), 0, -1, 2**63])
+@pytest.mark.parametrize("operation", ["claim", "settlement", "counter", "allocation"])
+def test_input_amounts_require_exact_integer_cents(tmp_path, operation, amount):
+    s = S(tmp_path)
+    s.create_claim(C())
+    s.ingest_event(E())
+    with pytest.raises(ValueError, match="positive integer cents"):
+        if operation == "claim":
+            s.create_claim(C(cid="invalid", amt=amount))
+        elif operation == "settlement":
+            s.ingest_event(E(eid="invalid", amt=amount))
+        elif operation == "counter":
+            s.ingest_counter(R(rid="invalid", amt=amount))
+        else:
+            s.review_allocate(allocation_id="invalid", claim_id="c1", event_id="e1", amount_cents=amount, created_at="2026-09-02T11:00:00Z")
+    assert s.realized_cents() == 0
+    assert s.count("settlement_events") == 1
+    assert s.count("counter_events") == 0
+    assert s.count("allocations") == 0
+
+
+@pytest.mark.parametrize("flag", [0, 1, 0.5, "false", "true", None])
+def test_claim_fee_disqualification_requires_a_boolean(tmp_path, flag):
+    with pytest.raises(ValueError, match="fee_disqualified must be a boolean"):
+        S(tmp_path).create_claim(C(disq=flag))

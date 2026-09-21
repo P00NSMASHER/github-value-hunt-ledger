@@ -7,6 +7,7 @@ explicit external evidence and search/capability attribution.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 
 VALID_RESULTS = {"PASSED", "FAILED", "PARTIAL", "INVALID"}
@@ -50,8 +51,13 @@ class FreightOutcomeInput:
 
 
 def _nonnegative(name: str, value: float | None) -> None:
-    if value is not None and value < 0:
-        raise ValueError(name + " must be non-negative")
+    if value is not None and (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or value < 0
+    ):
+        raise ValueError(name + " must be a finite non-negative number")
 
 
 def _required_text(name: str, value: str | None) -> None:
@@ -60,6 +66,13 @@ def _required_text(name: str, value: str | None) -> None:
 
 
 def build_outcome(inp: FreightOutcomeInput) -> dict:
+    for name in ("synthetic", "external_value_evidence", "external_commercial_evidence"):
+        if type(getattr(inp, name)) is not bool:
+            raise ValueError(name + " must be a boolean")
+    for name in ("diagnostic_paid", "pilot_paid", "annual_converted"):
+        value = getattr(inp, name)
+        if value is not None and type(value) is not bool:
+            raise ValueError(name + " must be a boolean when provided")
     if not inp.outcome_id.startswith("OUT:"):
         raise ValueError("outcome_id must start with OUT:")
     if not inp.date.strip():
@@ -86,7 +99,7 @@ def build_outcome(inp: FreightOutcomeInput) -> dict:
 
     for name in ("invoices_reviewed", "shipments_reviewed"):
         value = getattr(inp, name)
-        if value is not None and (not isinstance(value, int) or value < 0):
+        if value is not None and (type(value) is not int or value < 0):
             raise ValueError(name + " must be a non-negative integer")
 
     if inp.fixed_fee_usd is not None and inp.fixed_fee_usd <= 0:

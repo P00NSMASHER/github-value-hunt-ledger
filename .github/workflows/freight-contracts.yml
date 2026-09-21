@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - 'freight/**'
+      - 'intelligence/capabilities.jsonl'
+      - 'intelligence/edges.jsonl'
+      - 'intelligence/outcomes.jsonl'
+      - 'intelligence/search_runs.jsonl'
+      - 'CAPABILITIES.md'
       - 'production/prototype.py'
       - 'production/test_prototype.py'
       - 'production/requirements-ci.txt'
@@ -12,6 +17,11 @@ on:
   pull_request:
     paths:
       - 'freight/**'
+      - 'intelligence/capabilities.jsonl'
+      - 'intelligence/edges.jsonl'
+      - 'intelligence/outcomes.jsonl'
+      - 'intelligence/search_runs.jsonl'
+      - 'CAPABILITIES.md'
       - 'production/prototype.py'
       - 'production/test_prototype.py'
       - 'production/requirements-ci.txt'
@@ -39,6 +49,13 @@ jobs:
         run: PYTHONPATH=. python -m pytest -q freight/test_contracts.py freight/test_settlement_store.py freight/test_release_gate.py freight/test_gap_registry.py freight/test_readiness.py freight/test_pilot_reporting.py freight/test_deal_economics.py freight/test_outcome_adapter.py freight/test_commercial_learning.py freight/test_input_guard.py freight/test_pilot_package.py freight/test_pilot_launch_gate.py freight/test_launch_brief.py freight/test_pilot_activation_packet.py freight/test_pilot_charter.py freight/test_pilot_amendment.py freight/test_engagement_state.py freight/test_external_action_authorization.py freight/test_separate_environment_evidence.py freight/test_release_provenance.py freight/test_audit_ledger.py freight/test_data_lifecycle.py freight/test_sbom.py freight/test_release_attestation.py freight/test_audit_store.py freight/test_backup_restore.py freight/test_diligence_bundle.py freight/test_rights_evidence.py freight/test_incident_response.py freight/test_research_ci_governance.py freight/test_deployment_security_evidence.py freight/test_synthetic_rehearsal.py
       - name: Controlled-pilot rights gate
         run: PYTHONPATH=. python freight/release_gate.py --stage pilot
+      - name: Hunter-to-freight improvement contracts
+        run: PYTHONPATH=. python -m pytest -q freight/test_hunter_bridge.py freight/site/test_build.py
+      - name: Review Hunter changes against freight priorities
+        shell: bash
+        run: |
+          PYTHONPATH=. python -m freight.hunter_bridge --source-ref "$GITHUB_SHA" --format markdown > /tmp/freight-hunter-review.md
+          cat /tmp/freight-hunter-review.md >> "$GITHUB_STEP_SUMMARY"
       - name: Controlled-pilot rights evidence gate
         run: PYTHONPATH=. python freight/rights_evidence.py --stage pilot
       - name: Validate collected deployment security evidence

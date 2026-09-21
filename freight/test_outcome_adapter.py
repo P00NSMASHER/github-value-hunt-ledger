@@ -150,3 +150,23 @@ def test_real_outcome_maps_to_global_schema_and_preserves_commercial_metrics():
     assert out["freight_metrics"]["pilot_paid"] is True
     assert out["freight_metrics"]["gross_margin"] == 0.6
     assert out["freight_metrics"]["invoices_reviewed"] == 250
+
+
+@pytest.mark.parametrize("field", ["revenue_usd", "customer_value_usd", "fixed_fee_usd", "delivery_cost_usd", "reviewer_hours"])
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), True, "100"])
+def test_nonfinite_or_nonnumeric_metrics_cannot_enter_the_learning_ledger(field, value):
+    with pytest.raises(ValueError, match=field):
+        build_outcome(base(**{field: value}))
+
+
+@pytest.mark.parametrize("field", ["synthetic", "external_commercial_evidence", "external_value_evidence", "diagnostic_paid", "pilot_paid", "annual_converted"])
+@pytest.mark.parametrize("value", ["false", "true", 0, 1])
+def test_evidence_and_paid_stage_flags_require_actual_booleans(field, value):
+    with pytest.raises(ValueError, match=field):
+        build_outcome(base(**{field: value}))
+
+
+@pytest.mark.parametrize("field", ["invoices_reviewed", "shipments_reviewed"])
+def test_boolean_is_not_an_invoice_or_shipment_count(field):
+    with pytest.raises(ValueError, match=field):
+        build_outcome(base(**{field: True}))

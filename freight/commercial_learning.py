@@ -73,12 +73,36 @@ def _eligible(outcome: dict) -> bool:
     if outcome.get("experiment_id") != "EXP-001":
         return False
     metrics = outcome.get("freight_metrics") or {}
-    if metrics.get("synthetic"):
+    if metrics.get("synthetic") is not False:
         return False
     if metrics.get("external_commercial_evidence") is not True:
         return False
-    if not metrics.get("engagement_id") or not metrics.get("buyer_cohort_key"):
+    if any(not isinstance(metrics.get(name), str) or not metrics[name].strip()
+           for name in ("engagement_id", "buyer_cohort_key")):
         return False
+    # Outcomes may be loaded directly from JSONL instead of through the adapter.
+    # Validate the commercial sample at this boundary as well.
+    for name in ("diagnostic_paid", "pilot_paid", "annual_converted"):
+        value = metrics.get(name)
+        if value is not None and type(value) is not bool:
+            raise ValueError(name + " must be a boolean when provided")
+    for name, value in (
+        ("revenue_usd", outcome.get("revenue_usd")),
+        *((name, metrics.get(name)) for name in ("fixed_fee_usd", "delivery_cost_usd", "reviewer_hours")),
+    ):
+        if value is not None and (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+            or value < 0
+        ):
+            raise ValueError(name + " must be a finite non-negative number")
+    fee = metrics.get("fixed_fee_usd")
+    if fee is not None and fee <= 0:
+        raise ValueError("fixed_fee_usd must be positive when provided")
+    invoices = metrics.get("invoices_reviewed")
+    if invoices is not None and (type(invoices) is not int or invoices < 0):
+        raise ValueError("invoices_reviewed must be a non-negative integer")
     return bool(
         metrics.get("diagnostic_paid")
         or metrics.get("pilot_paid")
@@ -94,9 +118,11 @@ def calibrate_commercial_outcomes(
     min_unique_buyers_for_review: int = 5,
     min_paid_engagements_for_review: int = 5,
 ) -> CommercialCalibration:
-    if not 0 <= target_gross_margin < 1:
+    if isinstance(target_gross_margin, bool) or not isinstance(target_gross_margin, (int, float)) or not 0 <= target_gross_margin < 1:
         raise ValueError("target_gross_margin must be in [0,1)")
-    if min_unique_buyers_for_review < 1 or min_paid_engagements_for_review < 1:
+    if any(type(value) is not int or value < 1 for value in (
+        min_unique_buyers_for_review, min_paid_engagements_for_review
+    )):
         raise ValueError("minimum sample thresholds must be positive")
 
     eligible = [o for o in outcomes if _eligible(o)]
