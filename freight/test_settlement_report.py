@@ -173,12 +173,12 @@ def test_arbitrary_claim_cannot_become_frozen_finding_proof(tmp_path, change, me
         build_persistent_pilot_report(truth, incumbent, store, (binding,))
 
 
-def test_wrong_settlement_party_cannot_be_reported_even_after_review_allocation(tmp_path):
-    truth, incumbent, store = case(tmp_path)
-    binding = add_claim(store, truth.findings[0])
-    pay(store, truth.findings[0], payer="different-carrier")
-    with pytest.raises(ValueError, match="settlement identity"):
-        build_persistent_pilot_report(truth, incumbent, store, (binding,))
+def test_wrong_settlement_party_is_rejected_before_review_allocation(tmp_path):
+    truth, _incumbent, store = case(tmp_path)
+    add_claim(store, truth.findings[0])
+    with pytest.raises(ValueError, match="payer/payee mismatch"):
+        pay(store, truth.findings[0], payer="different-carrier")
+    assert store.realized_cents() == 0
 
 
 def test_duplicate_and_missing_bindings_are_rejected(tmp_path):
