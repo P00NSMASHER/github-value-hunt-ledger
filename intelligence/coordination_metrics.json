@@ -1,0 +1,14 @@
+{
+  "measured_runs": 39,
+  "emitter_runs": 0,
+  "consumer_runs": 0,
+  "unique_signals_emitted": 0,
+  "unique_signals_consumed": 0,
+  "known_emitted_signals_consumed": 0,
+  "unresolved_consumed_signal_provenance": [],
+  "known_signal_consumption_rate": null,
+  "consumer_runs_with_retained_candidate": 0,
+  "consumer_runs_with_capability_delta": 0,
+  "consumer_runs_with_structured_outcome": 0,
+  "observe_only": true
+}
