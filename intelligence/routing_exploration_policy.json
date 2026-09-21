@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "exploration_probability": 0.25,
+  "max_swaps_per_generation": 1,
+  "eligible_slot_roles": [
+    "experiment",
+    "coverage",
+    "adjacency"
+  ],
+  "min_match_level": 2,
+  "max_absolute_regret": 1.5,
+  "max_relative_regret": 0.05,
+  "target_completed_generated_routes_per_worker": 3,
+  "selection": "deterministic_sha_gate_then_hash_order",
+  "outcome_blind": true,
+  "guardrails": [
+    "Exploration may change worker-to-slot routing only; it never changes the allocator's assignment portfolio.",
+    "At most one two-worker swap may be applied per routing generation.",
+    "Both assignments must share slot role + work kind and at least strategy or objective.",
+    "The swapped route must stay within both absolute and relative routing-score regret caps.",
+    "At least one worker in the swap must still have generated-route measurement debt.",
+    "Selection is deterministic from pre-outcome routing state; realized outcomes are never used to choose the current swap.",
+    "Verification, measurement and wildcard slots are excluded from controlled swap exploration.",
+    "Active V11 claims remain locked and are never exploration candidates.",
+    "Exploration does not relax V14-V17 dispatch, presence, activation or execution controls.",
+    "An exploratory route is experimental design evidence, not a worker-quality ranking."
+  ]
+}

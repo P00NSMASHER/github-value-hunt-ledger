@@ -34,6 +34,8 @@
     "Assignment priority remains part of routing; worker fit cannot turn a low-value task into a high-value task.",
     "Routing does not override domain STOP gates, execution leases, safety rules, or explicit manual overrides.",
     "Generated routing is observational optimization, not a causal estimate of worker quality.",
-    "V17 activation-response feedback is penalty-only, bounded, and never inferred from UNKNOWN/OFFLINE/PAUSED presence or pending activations."
+    "V17 activation-response feedback is penalty-only, bounded, and never inferred from UNKNOWN/OFFLINE/PAUSED presence or pending activations.",
+    "V18 controlled exploration may alter at most one two-worker route pair per generation and only within explicit matched-context/regret limits.",
+    "V18 exploration never changes the allocator portfolio, never touches locked claims, and is selected from pre-outcome routing state."
   ]
 }

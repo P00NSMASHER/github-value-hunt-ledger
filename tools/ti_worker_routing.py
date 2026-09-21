@@ -12,6 +12,9 @@ LEARN_MET=json.loads((INTEL/"routing_learning_metrics.json").read_text(encoding=
 ADJUSTMENTS=load_jsonl("routing_adjustments.jsonl") if (INTEL/"routing_adjustments.jsonl").exists() else []
 RESPONSE_MET=json.loads((INTEL/"activation_response_metrics.json").read_text(encoding="utf-8")) if (INTEL/"activation_response_metrics.json").exists() else {}
 RESPONSE_ADJUSTMENTS=load_jsonl("activation_response_adjustments.jsonl") if (INTEL/"activation_response_adjustments.jsonl").exists() else []
+EXP_POL=json.loads((INTEL/"routing_exploration_policy.json").read_text(encoding="utf-8")) if (INTEL/"routing_exploration_policy.json").exists() else {}
+EXP_HISTORY=load_jsonl("routing_exploration_history.jsonl") if (INTEL/"routing_exploration_history.jsonl").exists() else []
+ROUTE_RUNS=load_jsonl("routing_learning_runs.jsonl") if (INTEL/"routing_learning_runs.jsonl").exists() else []
 ALLOC=load_jsonl("hunt_allocations.jsonl")
 STATE=load_jsonl("execution_state.jsonl")
 
@@ -172,13 +175,161 @@ def exact_assign(workers,slots):
         return [(path[i],slots[i]) for i in range(len(slots))]
 
 pairs=exact_assign(worker_ids,slot_ids)
+baseline_pairs=list(pairs)
+
+def pair_score(pairs):
+    total=0.0
+    for wid,slot in pairs:
+        e=edge_map.get((wid,slot))
+        if not e:
+            return None
+        total+=float(e["routing_score"])
+    return round(total,6)
+
+def match_info(a,b):
+    if a.get("slot_role")!=b.get("slot_role") or a.get("work_kind")!=b.get("work_kind"):
+        return 0,None
+    same_strategy=bool(a.get("strategy_id")) and a.get("strategy_id")==b.get("strategy_id")
+    same_objective=bool(a.get("search_objective_id")) and a.get("search_objective_id")==b.get("search_objective_id")
+    if same_strategy and same_objective:
+        return 3,"role+work_kind+strategy+objective"
+    if same_strategy:
+        return 2,"role+work_kind+strategy"
+    if same_objective:
+        return 2,"role+work_kind+objective"
+    return 1,"role+work_kind"
+
+generated_route_counts={}
+for rr in ROUTE_RUNS:
+    wid=rr.get("worker_id")
+    if wid:
+        generated_route_counts[wid]=generated_route_counts.get(wid,0)+1
+
+def controlled_exploration_decision(baseline):
+    baseline_total=pair_score(baseline)
+    base_payload={
+      "profile_generation":P_MET.get("worker_profile_generation_id"),
+      "routing_learning_generation":LEARN_GEN,
+      "activation_response_learning_generation":RESPONSE_GEN,
+      "state":[(x.get("slot_id"),x.get("status"),x.get("worker_id"),x.get("current_assignment_id")) for x in STATE],
+      "alloc":[(x["slot_id"],x["assignment_id"],x.get("final_score")) for x in ALLOC],
+      "baseline_routes":sorted(baseline)
+    }
+    seed_raw=json.dumps(base_payload,sort_keys=True,separators=(",",":"))
+    seed_hash=hashlib.sha256(seed_raw.encode()).hexdigest()
+    exp_gen="ROUTEEXP:"+seed_hash[:12]
+    gate=int(seed_hash[12:20],16)/float(0xFFFFFFFF)
+    probability=float(EXP_POL.get("exploration_probability",0.25))
+    min_level=int(EXP_POL.get("min_match_level",2))
+    max_abs=float(EXP_POL.get("max_absolute_regret",1.5))
+    max_rel=float(EXP_POL.get("max_relative_regret",0.05))
+    target_routes=int(EXP_POL.get("target_completed_generated_routes_per_worker",3))
+    eligible_roles=set(EXP_POL.get("eligible_slot_roles") or ["experiment","coverage","adjacency"])
+    decision={
+      "exploration_generation_id":exp_gen,
+      "seed_hash":seed_hash,
+      "gate_value":round(gate,8),
+      "exploration_probability":probability,
+      "baseline_total_score":baseline_total,
+      "applied":False,
+      "reason":"gate_closed" if gate>=probability else "no_eligible_low_regret_swap",
+      "pair_id":None,
+      "workers":[],
+      "baseline_slots":[],
+      "exploration_slots":[],
+      "match_level":None,
+      "match_basis":None,
+      "absolute_regret":0.0,
+      "relative_regret":0.0,
+      "measurement_need":0,
+      "candidate_count":0
+    }
+    if not EXP_POL or not EXP_POL.get("enabled",True):
+        decision["reason"]="disabled"
+        return baseline,decision
+    if gate>=probability:
+        return baseline,decision
+    candidates=[]
+    pairs_sorted=sorted(baseline)
+    for i in range(len(pairs_sorted)):
+        w1,s1=pairs_sorted[i]; a1=alloc_by_slot[s1]
+        if a1.get("slot_role") not in eligible_roles:
+            continue
+        for j in range(i+1,len(pairs_sorted)):
+            w2,s2=pairs_sorted[j]; a2=alloc_by_slot[s2]
+            if a2.get("slot_role") not in eligible_roles:
+                continue
+            level,basis=match_info(a1,a2)
+            if level<min_level:
+                continue
+            e11=edge_map.get((w1,s1)); e22=edge_map.get((w2,s2))
+            e12=edge_map.get((w1,s2)); e21=edge_map.get((w2,s1))
+            if not all([e11,e22,e12,e21]):
+                continue
+            base=float(e11["routing_score"])+float(e22["routing_score"])
+            alt=float(e12["routing_score"])+float(e21["routing_score"])
+            regret=max(0.0,base-alt)
+            rel=regret/max(abs(base),1e-9)
+            if regret>max_abs+1e-12 or rel>max_rel+1e-12:
+                continue
+            need=max(0,target_routes-generated_route_counts.get(w1,0))+max(0,target_routes-generated_route_counts.get(w2,0))
+            if need<=0:
+                continue
+            key_raw=f"{exp_gen}|{w1}|{s1}|{w2}|{s2}"
+            key_hash=hashlib.sha256(key_raw.encode()).hexdigest()
+            candidates.append({
+              "w1":w1,"s1":s1,"w2":w2,"s2":s2,
+              "match_level":level,"match_basis":basis,
+              "base_score":round(base,6),"alt_score":round(alt,6),
+              "absolute_regret":round(regret,6),"relative_regret":round(rel,6),
+              "measurement_need":need,"selection_hash":key_hash
+            })
+    decision["candidate_count"]=len(candidates)
+    if not candidates:
+        return baseline,decision
+    max_level=max(x["match_level"] for x in candidates)
+    candidates=[x for x in candidates if x["match_level"]==max_level]
+    max_need=max(x["measurement_need"] for x in candidates)
+    candidates=[x for x in candidates if x["measurement_need"]==max_need]
+    candidates.sort(key=lambda x:(x["selection_hash"],x["w1"],x["w2"],x["s1"],x["s2"]))
+    chosen=candidates[0]
+    swapped=[]
+    for wid,slot in baseline:
+        if wid==chosen["w1"]:
+            swapped.append((wid,chosen["s2"]))
+        elif wid==chosen["w2"]:
+            swapped.append((wid,chosen["s1"]))
+        else:
+            swapped.append((wid,slot))
+    pair_id="EXPPAIR:"+hashlib.sha256(
+      f"{exp_gen}|{chosen['w1']}|{chosen['s1']}|{chosen['w2']}|{chosen['s2']}".encode()
+    ).hexdigest()[:12]
+    decision.update({
+      "applied":True,
+      "reason":"controlled_low_regret_swap",
+      "pair_id":pair_id,
+      "workers":[chosen["w1"],chosen["w2"]],
+      "baseline_slots":[chosen["s1"],chosen["s2"]],
+      "exploration_slots":[chosen["s2"],chosen["s1"]],
+      "match_level":chosen["match_level"],
+      "match_basis":chosen["match_basis"],
+      "absolute_regret":chosen["absolute_regret"],
+      "relative_regret":chosen["relative_regret"],
+      "measurement_need":chosen["measurement_need"]
+    })
+    return swapped,decision
+
+pairs,controlled_exploration_decision=controlled_exploration_decision(baseline_pairs)
 pair_map={wid:slot for wid,slot in pairs}
+baseline_pair_map={wid:slot for wid,slot in baseline_pairs}
 used_slots=set(pair_map.values())
 
 fingerprint=json.dumps({
   "profile_generation":P_MET.get("worker_profile_generation_id"),
   "routing_learning_generation":LEARN_GEN,
   "activation_response_learning_generation":RESPONSE_GEN,
+  "routing_exploration_generation":controlled_exploration_decision["exploration_generation_id"],
+  "routing_exploration_pair":controlled_exploration_decision.get("pair_id"),
   "state":[(x.get("slot_id"),x.get("status"),x.get("worker_id"),x.get("current_assignment_id")) for x in STATE],
   "alloc":[(x["slot_id"],x["assignment_id"],x.get("final_score")) for x in ALLOC],
   "routes":sorted(pairs)
@@ -191,26 +342,37 @@ for w in workers:
     wid=w["worker_id"]
     if w.get("status","active")!="active":
         routes.append({"worker_id":wid,"route_status":"PAUSED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":None,"assignment_id":None,"work_item_id":None,
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,
+          "routing_exploration_generation_id":controlled_exploration_decision["exploration_generation_id"],"routing_exploration_pair_id":None,
+          "baseline_slot_id":None,"route_mode":"paused","slot_id":None,"assignment_id":None,"work_item_id":None,
           "routing_score":None,"score_components":{},"evidence_state":PROFILES[wid].get("measured_state"),
           "claim_id":None,"reason":"Worker is paused in worker_registry.json."})
     elif wid in active_by_worker:
         s=active_by_worker[wid];a=alloc_by_slot.get(s["slot_id"]) or {}
         routes.append({"worker_id":wid,"route_status":"LOCKED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":s["slot_id"],
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,
+          "routing_exploration_generation_id":controlled_exploration_decision["exploration_generation_id"],"routing_exploration_pair_id":None,
+          "baseline_slot_id":s["slot_id"],"route_mode":"locked","slot_id":s["slot_id"],
           "assignment_id":s.get("claimed_assignment_id") or a.get("assignment_id"),"work_item_id":a.get("work_item_id"),
           "routing_score":None,"score_components":{},"evidence_state":"LOCKED_ACTIVE_CLAIM",
           "claim_id":s.get("claim_id"),"reason":"Existing V11 active claim is authoritative and preserved."})
     elif wid in pair_map:
         slot=pair_map[wid];e=edge_map[(wid,slot)]
         routes.append({"worker_id":wid,"route_status":"ROUTED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":slot,"assignment_id":e["assignment_id"],
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,
+          "routing_exploration_generation_id":controlled_exploration_decision["exploration_generation_id"],
+          "routing_exploration_pair_id":controlled_exploration_decision.get("pair_id") if wid in set(controlled_exploration_decision.get("workers") or []) else None,
+          "baseline_slot_id":baseline_pair_map.get(wid),
+          "route_mode":"explore_swap" if controlled_exploration_decision.get("applied") and wid in set(controlled_exploration_decision.get("workers") or []) else "exploit",
+          "slot_id":slot,"assignment_id":e["assignment_id"],
           "work_item_id":e["work_item_id"],"routing_score":e["routing_score"],
           "score_components":e["score_components"],"routing_learning_evidence_count":e.get("routing_learning_evidence_count",0),"evidence_state":PROFILES[wid].get("measured_state"),
           "claim_id":None,"reason":"Maximum-total-fit exact assignment across currently idle registered workers and claimable slots."})
     else:
         routes.append({"worker_id":wid,"route_status":"IDLE_UNASSIGNED","routing_generation_id":routing_generation,
-          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":None,"assignment_id":None,"work_item_id":None,
+          "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,
+          "routing_exploration_generation_id":controlled_exploration_decision["exploration_generation_id"],"routing_exploration_pair_id":None,
+          "baseline_slot_id":None,"route_mode":"unassigned","slot_id":None,"assignment_id":None,"work_item_id":None,
           "routing_score":None,"score_components":{},"evidence_state":PROFILES[wid].get("measured_state"),
           "claim_id":None,"reason":"No claimable slot remained after exact matching."})
 
@@ -223,7 +385,9 @@ for r in routes:
     a=alloc_by_slot[r["slot_id"]]
     packets.append({
       "worker_id":r["worker_id"],"routing_generation_id":routing_generation,
-      "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,"slot_id":r["slot_id"],
+      "worker_profile_generation_id":profile_generation,"routing_learning_generation_id":LEARN_GEN,"activation_response_learning_generation_id":RESPONSE_GEN,
+      "routing_exploration_generation_id":controlled_exploration_decision["exploration_generation_id"],"routing_exploration_pair_id":r.get("routing_exploration_pair_id"),
+      "baseline_slot_id":r.get("baseline_slot_id"),"route_mode":r.get("route_mode"),"slot_id":r["slot_id"],
       "assignment_id":a["assignment_id"],"allocator_generation_id":a["allocator_generation_id"],
       "portfolio_policy_generation_id":a["portfolio_policy_generation_id"],"work_item_id":a["work_item_id"],
       "assignment_slot_role":a["slot_role"],"assignment_work_kind":a["work_kind"],
@@ -238,17 +402,76 @@ metrics={
   "schema_version":1,"routing_generation_id":routing_generation,"worker_profile_generation_id":profile_generation,
   "routing_learning_generation_id":LEARN_GEN,"routing_learning_mode":LEARN_MET.get("mode") or "unavailable",
   "activation_response_learning_generation_id":RESPONSE_GEN,"activation_response_learning_mode":RESPONSE_MET.get("mode") or "unavailable",
+  "routing_exploration_generation_id":controlled_exploration_decision["exploration_generation_id"],
+  "routing_exploration_applied":bool(controlled_exploration_decision.get("applied")),
+  "routing_exploration_pair_id":controlled_exploration_decision.get("pair_id"),
+  "routing_exploration_absolute_regret":controlled_exploration_decision.get("absolute_regret",0.0),
   "registered_workers":len(workers),"active_locked_workers":len(active_by_worker),
   "routed_workers":sum(1 for r in routes if r["route_status"]=="ROUTED"),
   "unassigned_workers":sum(1 for r in routes if r["route_status"]=="IDLE_UNASSIGNED"),
   "claimable_slots":len(available_slots),"routed_slots":len(used_slots),"candidate_edges":len(edges)
 }
 (INTEL/"routing_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
+controlled_exploration_decision["routing_generation_id"]=routing_generation
+controlled_exploration_decision["worker_profile_generation_id"]=profile_generation
+controlled_exploration_decision["routing_learning_generation_id"]=LEARN_GEN
+controlled_exploration_decision["activation_response_learning_generation_id"]=RESPONSE_GEN
+(INTEL/"routing_exploration_decision.json").write_text(json.dumps(controlled_exploration_decision,indent=2)+"\n",encoding="utf-8")
+history_by_gen={x.get("exploration_generation_id"):x for x in EXP_HISTORY if x.get("exploration_generation_id")}
+old=history_by_gen.get(controlled_exploration_decision["exploration_generation_id"])
+if old:
+    immutable=["seed_hash","gate_value","exploration_probability","applied","reason","pair_id","workers","baseline_slots","exploration_slots","match_level","match_basis","absolute_regret","relative_regret","measurement_need","candidate_count"]
+    drift=[k for k in immutable if old.get(k)!=controlled_exploration_decision.get(k)]
+    if drift:
+        raise SystemExit(f"routing exploration history drift: {','.join(drift)}")
+else:
+    history_by_gen[controlled_exploration_decision["exploration_generation_id"]]=controlled_exploration_decision
+exp_history=sorted(history_by_gen.values(),key=lambda x:x["exploration_generation_id"])
+(INTEL/"routing_exploration_history.jsonl").write_text("\n".join(json.dumps(x,ensure_ascii=False) for x in exp_history)+("\n" if exp_history else ""),encoding="utf-8")
+exp_metrics={
+  "schema_version":1,
+  "exploration_generation_id":controlled_exploration_decision["exploration_generation_id"],
+  "routing_generation_id":routing_generation,
+  "applied":bool(controlled_exploration_decision.get("applied")),
+  "pair_id":controlled_exploration_decision.get("pair_id"),
+  "candidate_count":controlled_exploration_decision.get("candidate_count",0),
+  "absolute_regret":controlled_exploration_decision.get("absolute_regret",0.0),
+  "relative_regret":controlled_exploration_decision.get("relative_regret",0.0),
+  "history_generations":len(exp_history),
+  "history_applied_swaps":sum(1 for x in exp_history if x.get("applied"))
+}
+(INTEL/"routing_exploration_metrics.json").write_text(json.dumps(exp_metrics,indent=2)+"\n",encoding="utf-8")
+exp_report=[
+  "# CONTROLLED ROUTING EXPLORATION","",
+  f"Generation: **{controlled_exploration_decision['exploration_generation_id']}**",
+  f"Routing generation: **{routing_generation}**",
+  f"Gate: **{controlled_exploration_decision['gate_value']:.4f} / {controlled_exploration_decision['exploration_probability']:.4f}**",
+  f"Applied: **{controlled_exploration_decision['applied']}**",
+  f"Reason: **{controlled_exploration_decision['reason']}**","",
+  "V18 may alter at most one two-worker pairing per routing generation. It never changes the assignment portfolio itself.",""
+]
+if controlled_exploration_decision.get("applied"):
+    exp_report += [
+      f"- Pair: **{controlled_exploration_decision['pair_id']}**",
+      f"- Workers: **{', '.join(controlled_exploration_decision['workers'])}**",
+      f"- Baseline slots: **{', '.join(controlled_exploration_decision['baseline_slots'])}**",
+      f"- Exploration slots: **{', '.join(controlled_exploration_decision['exploration_slots'])}**",
+      f"- Match basis: **{controlled_exploration_decision['match_basis']}**",
+      f"- Absolute routing-score regret: **{controlled_exploration_decision['absolute_regret']:.4f}**",
+      f"- Relative regret: **{100*controlled_exploration_decision['relative_regret']:.2f}%**",
+      f"- Measurement need: **{controlled_exploration_decision['measurement_need']}**"
+    ]
+else:
+    exp_report += ["- Baseline maximum-total-fit routing is unchanged."]
+exp_report += ["",
+  "Exploration is deterministic from pre-outcome routing state and is designed to create low-regret assignment variation for later matched analysis. It is not evidence that one worker is better than another.",""]
+(INTEL/"ROUTING_EXPLORATION.md").write_text("\n".join(exp_report),encoding="utf-8")
 
 report=["# WORKER ROUTING PLAN","",f"Routing generation: **{routing_generation}**",f"Worker profiles: **{profile_generation}**","",
 "V12/V13 routes workers using positive historical fit, assignment priority, and evidence-gated routing outcome adjustments. Active V11 claims remain locked.","",
 f"Routing learning: **{LEARN_GEN}** / mode **{LEARN_MET.get('mode') or 'unavailable'}**",
-f"Activation-response learning: **{RESPONSE_GEN}** / mode **{RESPONSE_MET.get('mode') or 'unavailable'}**","",
+f"Activation-response learning: **{RESPONSE_GEN}** / mode **{RESPONSE_MET.get('mode') or 'unavailable'}**",
+f"Routing exploration: **{controlled_exploration_decision['exploration_generation_id']}** / applied **{controlled_exploration_decision['applied']}**","",
 "| Worker | Profile | Route | Slot | Assignment | Score | Reason |",
 "|---|---|---|---|---|---:|---|"]
 for r in routes:
@@ -261,6 +484,7 @@ report += ["","## Routing interpretation","",
 "- Current active claims are locked and consume worker capacity.",
 "- V13 learned task-context adjustments are zero unless routing_learning_policy evidence thresholds are satisfied.",
 "- V17 activation-response adjustment is penalty-only and stays zero until READY→activation→claim evidence thresholds are satisfied.",
+"- V18 may apply at most one deterministic low-regret matched worker swap to create controlled assignment variation.",
 "- Routing is recomputed after execution-state, telemetry, outcomes, or routing-learning changes.",""]
 (INTEL/"WORKER_ROUTING.md").write_text("\n".join(report),encoding="utf-8")
 print(json.dumps(metrics))
