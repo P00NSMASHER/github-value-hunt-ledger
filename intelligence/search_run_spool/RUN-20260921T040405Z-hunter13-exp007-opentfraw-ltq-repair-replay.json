@@ -1,0 +1,134 @@
+{
+  "schema_version": 16,
+  "search_run_id": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+  "timestamp": "2026-09-21T04:04:05Z",
+  "hunter_role": "HUNTER-13 / Revenue Leverage",
+  "strategy_id": "STRAT:evaluation-target-independence",
+  "query_family": "Thermo RAW oracle-backed parser repair replay",
+  "measurement_quality": "prospective",
+  "lane_ids": [
+    "REVENUE-LEVERAGE",
+    "LAB-AUTOMATION"
+  ],
+  "seed_nodes": [
+    "CAP-013",
+    "EXP-007"
+  ],
+  "search_surfaces": [
+    "MassIVE frozen public fixture",
+    "GitHub exact-revision source and tests",
+    "Thermo CommonCore-backed frozen comparator output",
+    "local patched rebuild and read-only replay"
+  ],
+  "queries": [
+    "Does replacing scan ordinal with entry.scan_event repair OpenTFRaw 1.4.1 metadata?",
+    "What exact v66 scan-event layout reproduces the Lee_CB_03.raw trailer span?",
+    "Does an exact-span LTQ layout repair restore semantic agreement without changing peak arrays?"
+  ],
+  "candidate_count": 1,
+  "deep_inspected": 1,
+  "retained_count": 1,
+  "master_promoted_count": 0,
+  "elapsed_minutes": 18,
+  "tool_calls": null,
+  "recall_rescue_used": false,
+  "stop_reason": "The bounded repair hypothesis was replayed against the frozen fixture. The proposed entry.scan_event change was falsified, the actual LTQ v66 variable-size layout was isolated, and a guarded local repair restored all material scan-level fields while preserving exact arrays. Broad discovery was not performed.",
+  "new_capability_ids": [],
+  "strengthened_capability_ids": [
+    "CAP-013"
+  ],
+  "experiment_ids": [
+    "EXP-007"
+  ],
+  "candidate_dispositions": [
+    {
+      "repository": "Sigilweaver/OpenTFRaw",
+      "revision": "63380dff0d25898f5c6e1184087dc590b0d7b6ab",
+      "status": "repair-verified-negative-oracle",
+      "reason_code_standard": "independent_negative_control",
+      "reason_detail": "Released v1.4.1 remains DISAGREE on the frozen LTQ fixture. A local exact-revision repair adding the byte-exact LTQ v66 primary/dependent event sizes (176/232), retaining per-scan ordinal event lookup, and emitting actual observed extrema reduced MS-level, polarity, precursor and nonempty range disagreements to zero while preserving all 9,942,753 m/z and intensity values exactly. The prior entry.scan_event cause hypothesis was independently falsified.",
+      "capability_ids": [
+        "CAP-013"
+      ],
+      "novelty_ordinal": 5,
+      "evidence_ordinal": 5,
+      "replacement_days_low": 2,
+      "replacement_days_high": 7,
+      "duplicate_of": null,
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "observed_at": "2026-09-21",
+        "metadata_status": "observed",
+        "stars": null,
+        "forks_count": null,
+        "primary_language": "Rust",
+        "archived": false,
+        "fork": false,
+        "created_at": null,
+        "updated_at": null,
+        "pushed_at": "2026-09-17T22:44:23Z",
+        "owner_type": "Organization",
+        "topics": [],
+        "license_spdx": "Apache-2.0",
+        "source_type": "company",
+        "package_ecosystems": [
+          "PyPI",
+          "Cargo"
+        ],
+        "protocol_families": [
+          "Thermo RAW",
+          "mzML 1.1"
+        ],
+        "geography_tags": [],
+        "technology_domains": [
+          "mass-spectrometry",
+          "scientific-data-normalization",
+          "instrument-data-migration"
+        ],
+        "profile_source": "Exact-revision source inspection, local rebuild, full frozen-fixture replay and independent vendor-lineage comparison"
+      }
+    }
+  ],
+  "best_result": "The apparent one-line event-index bug was a false diagnosis. The real defect is a missing LTQ v66 variable-size scan-event layout: primary events are 176 bytes and dependent events 232 bytes. A guarded exact-span repair eliminates all material scalar disagreements while preserving every peak value exactly.",
+  "durable_evidence_path": "referrals/hunt13-r25-2026-09-21-exp007-opentfraw-ltq-repair-replay.md",
+  "notes": "Unallocated bounded verification; no activation or lease was invented. No upstream write was made. Released v1.4.1 remains a negative oracle; the local patch is a repair candidate verified on one fixture.",
+  "query_family_id": "QF:thermo-raw-oracle-backed-parser-repair",
+  "search_objective_id": "OBJ:independent-evaluation",
+  "benchmark_task_ids": [],
+  "comparison_group_id": "CMP:EXP-007:thermo-raw-dual-decoder",
+  "evaluation_set_id": "EVAL:exp-007-thermo-raw-field-fidelity",
+  "seed_mode": "manual_hypothesis",
+  "seed_ids": [],
+  "adjacency_mode": "none",
+  "adjacency_ids": [],
+  "adjacency_types": [],
+  "adjacency_root_nodes": [],
+  "coverage_mode": "none",
+  "coverage_gap_ids": [],
+  "allocation_mode": "unallocated",
+  "allocator_generation_id": null,
+  "assignment_id": null,
+  "assignment_work_item_id": null,
+  "portfolio_policy_generation_id": null,
+  "assignment_slot_role": null,
+  "assignment_work_kind": null,
+  "assignment_source_id": null,
+  "assignment_score": null,
+  "execution_claim_id": null,
+  "execution_slot_id": null,
+  "execution_worker_id": null,
+  "routing_mode": "unrouted",
+  "routing_generation_id": null,
+  "worker_profile_generation_id": null,
+  "routing_score": null,
+  "dispatch_ticket_id": null,
+  "dispatch_generation_id": null,
+  "routing_learning_generation_id": null,
+  "route_override_reason": null,
+  "dispatch_kind": null,
+  "dispatch_parent_ticket_id": null,
+  "presence_generation_id": null,
+  "presence_event_id": null,
+  "activation_id": null,
+  "activation_generation_id": null
+}
