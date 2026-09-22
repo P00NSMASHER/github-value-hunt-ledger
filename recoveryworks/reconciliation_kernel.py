@@ -21,8 +21,8 @@ SOURCE_COMMIT = "e6b787213bb023568c99c432ea4733e1f2456a5e"
 SOURCE_LICENSE = "MIT"
 
 _AMOUNT_RE = re.compile(r"^[-+]?\d+(\.\d+)?$")
-_PREFIX_RE = re.compile(r"^(REF|REFERENCE|INV|INVOICE|ORDER|ORD|TXN|TRANSACTION)[\s:_-]*", re.I)
-_SEPARATORS_RE = re.compile(r"[\s:_\-./]+")
+_NOISE_PREFIXES = ("PAYMENT", "PAYOUT", "TRANSFER", "TXN", "TRX", "PMT", "REF", "TX")
+_NON_ALNUM_RE = re.compile(r"[^A-Z0-9]")
 _MAX_SAFE_INTEGER = 9_007_199_254_740_991
 
 
@@ -215,34 +215,40 @@ def _parse_iso_date(value: str) -> int:
 
 
 def normalize_reference(value: str) -> NormalizedReference:
-    raw = value.strip()
-    current = raw
+    """Mirror dylanpulver/recon reference normalization exactly."""
+    current = value
     steps: list[str] = []
+
+    trimmed = current.strip()
+    if trimmed != current:
+        steps.append("trim")
+    current = trimmed
 
     upper = current.upper()
     if upper != current:
-        current = upper
         steps.append("uppercase")
+    current = upper
 
-    stripped = _PREFIX_RE.sub("", current)
+    stripped = _NON_ALNUM_RE.sub("", current)
     if stripped != current:
-        prefix = current[: len(current) - len(stripped)].strip(" _:-")
-        current = stripped
-        steps.append(f"strip-prefix:{prefix or 'KNOWN'}")
-
-    compact = _SEPARATORS_RE.sub("", current)
-    if compact != current:
-        current = compact
         steps.append("strip-separators")
+    current = stripped
 
-    if current.isdigit():
-        no_zeros = current.lstrip("0") or "0"
-        if no_zeros != current:
-            current = no_zeros
-            steps.append("strip-leading-zeros")
+    stripped_prefix = True
+    while stripped_prefix:
+        stripped_prefix = False
+        for prefix in _NOISE_PREFIXES:
+            if current.startswith(prefix) and len(current) >= len(prefix) + 2:
+                current = current[len(prefix):]
+                steps.append(f"strip-prefix:{prefix}")
+                stripped_prefix = True
+                break
+
+    if re.fullmatch(r"0+\d+", current):
+        current = re.sub(r"^0+", "", current)
+        steps.append("strip-leading-zeros")
 
     return NormalizedReference(value=current, steps=tuple(steps))
-
 
 def _prepare_rows(
     txns: Iterable[ReconTxn],
