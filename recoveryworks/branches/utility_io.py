@@ -33,6 +33,8 @@ DEFAULT_BILL_COLUMNS = {
     "demand_kw": "Billed_Demand_kW",
     "reactive_kva": "Billed_rkVA",
     "days_used": "Days_Used",
+    "service_start": "Service_Start",
+    "service_end": "Service_End",
 }
 
 TOU_COLUMN_PREFIX = "Billed_kWh_"
@@ -146,6 +148,8 @@ def load_utility_bills_csv(
             billed_reactive_kva=_optional_value(row, columns.get("reactive_kva")),
             days_used=days_used,
             billed_kwh_by_period=billed_kwh_by_period,
+            service_start=_optional_value(row, columns.get("service_start")),
+            service_end=_optional_value(row, columns.get("service_end")),
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,
