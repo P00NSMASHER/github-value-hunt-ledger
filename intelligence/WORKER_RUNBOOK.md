@@ -49,6 +49,12 @@ A rejected candidate is fleet memory when its failed proof obligation prevents a
 
 When any of those handoffs would materially change another worker's next action, emit one immutable coordination packet following intelligence/COORDINATION_PROTOCOL.md. Use at most one packet per materially useful run and normally no more than five concise signals. Do not create coordination noise for routine findings that the existing catalog/search-run record already captures.
 
+### Learning-failure checkpoint
+
+When the **hunter system itself** fails reproducibly (search skill/query family/search move/tool/prompt/workflow/routing/memory/harness), and the defect can be tied to concrete evidence plus a regression test, submit at most one immutable packet to `intelligence/learning_failure_spool/` using `LEARNING_FAILURE_TEMPLATE.json`.
+
+Do not use this channel for an ordinary rejected repository or generic no-find. Never place sensitive/accidental/confidential payloads in it. Benchmark-contaminated observations must be marked and are blocked from learning. A queued packet is only a repair hypothesis: it cannot change a live skill until regression tests pass and the normal skill held-out/canary gates approve a new version.
+
 ## 4. Save evidence and one immutable run
 
 Write detailed source evidence to the assigned lane catalog or a uniquely named referral. Preserve sibling content with optimistic file-SHA updates. For every materially completed live run, create exactly one new UTF-8 JSON object at intelligence/search_run_spool/<safe-unique-run-id>.json.
