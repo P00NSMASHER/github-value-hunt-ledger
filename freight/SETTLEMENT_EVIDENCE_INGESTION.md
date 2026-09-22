@@ -52,3 +52,23 @@ The workflow snapshots current live allocation capacity, requires a reviewer dec
 ## Lifecycle orchestration
 
 For operational processing, settlement and counter CSVs can be passed through the Settlement Evidence Lifecycle Workflow. It parses every supplied file before persistent writes, preflights cross-file references, runs safe automatic allocation/reversal, and returns proof-bound settlement/counter review cases for anything ambiguous.
+
+
+## Returned-payment capacity
+
+A counter/return event reduces the original settlement event's allocatable capacity as soon as the return evidence is ingested. The store computes available event capacity from **net settlement funds**:
+
+`original settlement - observed returns - live allocations`
+
+where live allocations are gross allocations less applied reversals.
+
+Consequences:
+
+- a fully returned payment has zero capacity for later claim allocation, even if no allocation existed when the return arrived;
+- unused gross payment remainder cannot be allocated after that portion of the payment was returned;
+- an applied partial return can free only the amount that still exists in net settlement funds;
+- cumulative counter events cannot exceed the original settlement amount;
+- additive SQLite triggers enforce the same rules for direct SQL and for databases created under an older schema revision;
+- reopening a database fails closed if historical counter rows already exceed their original settlement event.
+
+The persistent report's unresolved-counter check remains a downstream defense. This store rule prevents the invalid recovery state from being created in the first place rather than relying on reporting to catch it later.
