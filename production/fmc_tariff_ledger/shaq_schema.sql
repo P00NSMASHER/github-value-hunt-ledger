@@ -32,7 +32,8 @@ CREATE INDEX IF NOT EXISTS idx_shaq_query_sha
 
 CREATE TABLE IF NOT EXISTS shaq_ports (
   id INTEGER PRIMARY KEY,
-  query_id INTEGER NOT NULL REFERENCES shaq_queries(id),
+  query_id INTEGER REFERENCES shaq_queries(id),
+  route_page_id INTEGER REFERENCES shaq_route_pages(id),
   raw_name TEXT NOT NULL,
   normalized_name TEXT NOT NULL,
   port_code TEXT,
@@ -41,6 +42,26 @@ CREATE TABLE IF NOT EXISTS shaq_ports (
   raw_record_json TEXT NOT NULL,
   UNIQUE(query_id, raw_name, COALESCE(port_code, ''))
 );
+
+CREATE TABLE IF NOT EXISTS shaq_route_pages (
+  id INTEGER PRIMARY KEY,
+  run_id INTEGER REFERENCES shaq_runs(id),
+  url TEXT NOT NULL,
+  fetched_at TEXT NOT NULL,
+  http_status INTEGER,
+  content_type TEXT,
+  byte_count INTEGER NOT NULL DEFAULT 0,
+  sha256 TEXT,
+  blob_relpath TEXT,
+  page_title TEXT,
+  page_heading TEXT,
+  parser_status TEXT NOT NULL,
+  lastmod TEXT,
+  UNIQUE(url, sha256)
+);
+
+CREATE INDEX IF NOT EXISTS idx_shaq_route_page_sha
+  ON shaq_route_pages(sha256);
 
 CREATE TABLE IF NOT EXISTS shaq_rates (
   id INTEGER PRIMARY KEY,
@@ -60,6 +81,8 @@ CREATE TABLE IF NOT EXISTS shaq_rates (
   valid_from TEXT,
   valid_to TEXT,
   rate_basis TEXT,
+  transit_time TEXT,
+  source_url TEXT,
   rate_kind TEXT NOT NULL DEFAULT 'UNKNOWN',
   source_label TEXT,
   source_contract_reference TEXT,
@@ -76,6 +99,20 @@ CREATE INDEX IF NOT EXISTS idx_shaq_rates_carrier
   ON shaq_rates(carrier_normalized, fmc_organization_no);
 CREATE INDEX IF NOT EXISTS idx_shaq_rates_validity
   ON shaq_rates(valid_from, valid_to);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_shaq_route_rate_dedupe
+ON shaq_rates(
+  COALESCE(route_page_id, -1),
+  COALESCE(origin_raw, ''),
+  COALESCE(destination_raw, ''),
+  COALESCE(carrier_raw, ''),
+  COALESCE(container_type, ''),
+  COALESCE(amount_value, ''),
+  COALESCE(currency, ''),
+  COALESCE(valid_from, ''),
+  COALESCE(valid_to, ''),
+  COALESCE(source_url, '')
+);
 
 CREATE TABLE IF NOT EXISTS carrier_identity_map (
   id INTEGER PRIMARY KEY,
