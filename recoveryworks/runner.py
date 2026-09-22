@@ -45,6 +45,8 @@ from .branches.contract_billing_csv import (
 )
 from .branches.lease import audit_lease_billing
 from .branches.lease_csv import load_lease_area_csv
+from .branches.procurement import audit_procurement_billing
+from .branches.procurement_csv import load_procurement_quantities_csv
 from .branches.saas import audit_saas_billing
 from .branches.saas_csv import load_billable_seat_snapshot_csv
 from .branches.telecom import audit_telecom_billing
@@ -513,6 +515,76 @@ def run_scan360_config(
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
+
+
+    for job_index, job in enumerate(
+        _jobs(config.get("procurement"), name="procurement")
+    ):
+        charges = load_invoice_charges_csv(
+            _resolve(
+                base,
+                job.get("charges_csv"),
+                name=f"procurement[{job_index}].charges_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "charge_source_verified",
+                context=f"procurement[{job_index}]",
+            ),
+        )
+        rates = load_contract_rates_csv(
+            _resolve(
+                base,
+                job.get("rates_csv"),
+                name=f"procurement[{job_index}].rates_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "rate_source_verified",
+                context=f"procurement[{job_index}]",
+            ),
+        )
+        quantities = ()
+        quantities_csv = job.get("quantities_csv")
+        if quantities_csv:
+            quantities = load_procurement_quantities_csv(
+                _resolve(
+                    base,
+                    quantities_csv,
+                    name=f"procurement[{job_index}].quantities_csv",
+                ),
+                verified=_bool_setting(
+                    job,
+                    "quantity_source_verified",
+                    context=f"procurement[{job_index}]",
+                ),
+            )
+
+        batch = audit_procurement_billing(
+            client_id=client_id,
+            charges=charges,
+            rates=rates,
+            quantities=quantities,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "procurement",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if (
+                finding.finding_id not in before_ids
+                and finding.finding_id not in added_ids
+            ):
+                added_ids.append(finding.finding_id)
 
     for job_index, job in enumerate(
         _jobs(config.get("construction"), name="construction")
