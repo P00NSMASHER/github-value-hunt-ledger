@@ -1,0 +1,227 @@
+name: CMS TiC Payer Rate Ledger
+
+on:
+  workflow_dispatch:
+    inputs:
+      shard_count:
+        description: Number of deterministic source-registry shards
+        required: true
+        default: "4"
+        type: string
+      pilot_billing_code:
+        description: Billing code for real-MRF acceptance
+        required: true
+        default: "99213"
+        type: string
+      pilot_max_gb:
+        description: Maximum compressed size for acceptance MRF
+        required: true
+        default: "0.75"
+        type: string
+      artifact_retention_days:
+        description: Catalog/normalized artifact retention
+        required: true
+        default: "90"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - production/cms_tic_ledger/RUN_NOW
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cms-tic-payer-rate-ledger
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/cms_tic_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/cms_tic_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest -v test_tic_ledger.py
+
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.make.outputs.shards }}
+      shard_count: ${{ steps.make.outputs.shard_count }}
+    steps:
+      - id: make
+        env:
+          SHARD_COUNT: ${{ inputs.shard_count || '4' }}
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          n=int(os.environ['SHARD_COUNT'])
+          if not 1 <= n <= 32:
+              raise SystemExit('shard_count must be 1..32')
+          print('shards='+json.dumps(list(range(n))))
+          print('shard_count='+str(n))
+          PY
+
+  inventory:
+    needs: [test, matrix]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        shard: ${{ fromJSON(needs.matrix.outputs.shards) }}
+    defaults:
+      run:
+        working-directory: production/cms_tic_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/cms_tic_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - name: Inventory payer source shard
+        env:
+          SHARD: ${{ matrix.shard }}
+          SHARD_COUNT: ${{ needs.matrix.outputs.shard_count }}
+        run: |
+          mkdir -p "output/shard-${SHARD}"
+          python inventory.py inventory \
+            --out "output/shard-${SHARD}" \
+            --db catalog.sqlite \
+            --shard-count "${SHARD_COUNT}" \
+            --shard-index "${SHARD}" \
+            --max-depth 2 \
+            --max-pages-per-source 125 \
+            --max-index-mb 300 \
+            --head-files-per-source 10
+          python inventory.py summary \
+            --db "output/shard-${SHARD}/catalog.sqlite" \
+            > "output/shard-${SHARD}/catalog-summary.json"
+          python -m json.tool "output/shard-${SHARD}/catalog-summary.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cms-tic-inventory-shard-${{ matrix.shard }}
+          path: production/cms_tic_ledger/output/shard-${{ matrix.shard }}/
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
+          compression-level: 6
+          if-no-files-found: error
+
+  merge:
+    needs: [matrix, inventory]
+    runs-on: ubuntu-latest
+    outputs:
+      pilot_url: ${{ steps.pilot.outputs.url }}
+      pilot_file_key: ${{ steps.pilot.outputs.file_key }}
+    defaults:
+      run:
+        working-directory: production/cms_tic_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/cms_tic_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: cms-tic-inventory-shard-*
+          path: production/cms_tic_ledger/downloaded
+      - name: Merge universe catalog
+        run: |
+          mkdir -p merged
+          python merge_catalog.py --input-root downloaded --db merged/catalog.sqlite | tee merged/merge-summary.json
+          python inventory.py summary --db merged/catalog.sqlite > merged/catalog-summary.json
+          python -m json.tool merged/catalog-summary.json
+      - id: pilot
+        name: Select bounded real MRF
+        run: |
+          python pilot_select.py --db merged/catalog.sqlite > merged/pilot.json
+          cat merged/pilot.json
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          x=json.load(open('merged/pilot.json'))
+          if x.get('status') != 'SELECTED':
+              raise SystemExit('no real in-network MRF available for pilot')
+          print('url='+x['url'])
+          print('file_key='+x['file_key'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cms-tic-universe-catalog
+          path: production/cms_tic_ledger/merged/
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
+          compression-level: 6
+          if-no-files-found: error
+
+  real_mrf_acceptance:
+    needs: merge
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/cms_tic_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/cms_tic_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: cms-tic-universe-catalog
+          path: production/cms_tic_ledger/catalog-artifact
+      - name: Ingest real payer MRF
+        env:
+          PILOT_URL: ${{ needs.merge.outputs.pilot_url }}
+          PILOT_FILE_KEY: ${{ needs.merge.outputs.pilot_file_key }}
+          BILLING_CODE: ${{ inputs.pilot_billing_code || '99213' }}
+          MAX_GB: ${{ inputs.pilot_max_gb || '0.75' }}
+        run: |
+          mkdir -p acceptance
+          cp catalog-artifact/catalog.sqlite acceptance/catalog.sqlite
+          python rate_ingest.py \
+            --catalog acceptance/catalog.sqlite \
+            --out acceptance/rate-output \
+            --file-key "${PILOT_FILE_KEY}" \
+            --billing-code "${BILLING_CODE}" \
+            --max-gb "${MAX_GB}"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifests=list(Path('acceptance/rate-output/normalized').rglob('manifest.json'))
+          if len(manifests) != 1:
+              raise SystemExit(f'expected one manifest, found {len(manifests)}')
+          m=json.loads(manifests[0].read_text())
+          if m['rate_stats']['prices_written'] < 1:
+              raise SystemExit('real MRF acceptance produced zero negotiated prices')
+          print(json.dumps({
+              'source_url':m['source_url'],
+              'source_sha256':m['source_sha256'],
+              'provider_stats':m['provider_stats'],
+              'rate_stats':m['rate_stats'],
+          },indent=2))
+          PY
+      - name: Prepare compact acceptance artifact
+        run: |
+          mkdir -p acceptance-export
+          cp acceptance/catalog.sqlite acceptance-export/catalog.sqlite
+          cp -R acceptance/rate-output/normalized acceptance-export/normalized
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cms-tic-real-mrf-acceptance
+          path: production/cms_tic_ledger/acceptance-export/
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
+          compression-level: 6
+          if-no-files-found: error
