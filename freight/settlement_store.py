@@ -127,8 +127,13 @@ class SettlementStore:
                 "SELECT name FROM sqlite_master WHERE type='trigger'"
             )
         }
-        if "allocation_event_net_capacity" not in triggers or "counter_event_capacity" not in triggers:
-            raise RuntimeError("settlement net-capacity guards are missing")
+        required = {
+            "allocation_event_counter_lock",
+            "allocation_event_net_capacity",
+            "counter_event_capacity",
+        }
+        if not required.issubset(triggers):
+            raise RuntimeError("settlement return-capacity guards are missing")
         over_returned = conn.execute("""SELECT e.event_id
           FROM settlement_events e
           JOIN counter_events c
