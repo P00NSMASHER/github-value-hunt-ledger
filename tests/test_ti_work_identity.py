@@ -1,6 +1,9 @@
+import sys
 import unittest
+from pathlib import Path
 
-from production.work_identity import (
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+from ti_work_identity import (
     semantic_revision_sha256,
     versioned_work_item_id,
 )
