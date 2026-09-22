@@ -24,6 +24,7 @@ import gzip
 import hashlib
 import json
 import os
+import re
 import sqlite3
 import tempfile
 import urllib.parse
@@ -315,6 +316,57 @@ def import_historical_sqlite(
                 inserted += 1
         h.close()
     return {"files": inserted, "snapshots": 1}
+
+
+def discover_github_master_list(
+    conn: sqlite3.Connection, root: Path, source: Source, *, timeout: int, max_bytes: int
+) -> dict[str, int]:
+    """Import a curated Markdown payer/source registry as source candidates."""
+    source_id = persist_source(conn, source)
+    raw, resp = fetch_bytes(source.source_url, timeout=timeout, max_bytes=max_bytes)
+    snap_id, digest = snapshot_bytes(
+        conn, root, source, source_id, source.source_url, raw,
+        final_url=resp.url, http_status=resp.status_code,
+        content_type=resp.headers.get("content-type"),
+        etag=resp.headers.get("etag"), last_modified=resp.headers.get("last-modified"),
+        parser_status="parsed:github_master_list",
+    )
+    text_data = raw.decode("utf-8", errors="replace")
+    candidates = direct_files = 0
+    for line in text_data.splitlines():
+        if not line.lstrip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) < 4:
+            continue
+        payer, entity_type, url_cell, notes = cells[:4]
+        if payer.lower() == "payer" or set(payer) <= {"-", ":"}:
+            continue
+        match = re.search(r"https?://[^\s)>|]+", url_cell)
+        if not match:
+            continue
+        url = canonical_url(match.group(0).rstrip(".,;"))
+        key_hash = hashlib.sha256(f"{payer}|{url}".encode()).hexdigest()[:16]
+        candidate = Source(
+            source_key=f"endurant-{key_hash}",
+            payer_name=payer,
+            adapter="master_list_candidate",
+            source_url=url,
+            historical=False,
+            notes=f"type={entity_type}; {notes}"[:2000],
+        )
+        persist_source(conn, candidate)
+        candidates += 1
+        ftype = classify_file(url)
+        if ftype in {"index", "in_network", "allowed_amounts"}:
+            insert_mrf_file(
+                conn, candidate, url, ftype,
+                snapshot_id=snap_id,
+                manifest_sha=digest,
+                parse_status="curated_master_list_direct_file",
+            )
+            direct_files += 1
+    return {"files": direct_files, "snapshots": 1, "source_candidates": candidates}
 
 
 def discover_blob_api(
@@ -688,10 +740,12 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         "index_files_parsed": 0,
         "index_files_failed": 0,
         "plans_observed": 0,
+        "source_candidates": 0,
     }
 
     adapters = {
         "github_sqlite": import_historical_sqlite,
+        "github_master_list": discover_github_master_list,
         "blob_api": discover_blob_api,
         "aetna_metadata": discover_aetna_metadata,
         "humana_api": discover_humana,
@@ -710,6 +764,7 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
             )
             stats["files_discovered"] += delta.get("files", 0)
             stats["source_snapshots"] += delta.get("snapshots", 0)
+            stats["source_candidates"] += delta.get("source_candidates", 0)
             stats["source_successes"] += 1
             conn.commit()
         except Exception as exc:
@@ -731,6 +786,21 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         for row in rows:
             source = source_map.get(row["source_key"])
             if not source:
+                db_source = conn.execute(
+                    """SELECT source_key,payer_name,adapter,source_url,historical,notes
+                       FROM sources WHERE source_key=?""",
+                    (row["source_key"],),
+                ).fetchone()
+                if db_source:
+                    source = Source(
+                        source_key=db_source["source_key"],
+                        payer_name=db_source["payer_name"],
+                        adapter=db_source["adapter"],
+                        source_url=db_source["source_url"],
+                        historical=bool(db_source["historical"]),
+                        notes=db_source["notes"],
+                    )
+            if not source:
                 continue
             source_id = persist_source(conn, source)
             try:
@@ -750,6 +820,7 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
                 stats["index_files_failed"] += 1
                 conn.commit()
 
+    stats["sources_total"] = conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0]
     stats["mrf_files_total"] = conn.execute("SELECT COUNT(*) FROM mrf_files").fetchone()[0]
     stats["mrf_files_unique_urls"] = conn.execute(
         "SELECT COUNT(DISTINCT file_url) FROM mrf_files"
