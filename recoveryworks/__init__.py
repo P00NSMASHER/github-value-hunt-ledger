@@ -1,5 +1,6 @@
 """RecoveryWorks / RecoveryOS shared recovery intelligence layer."""
 from .engine import RecoveryEngine, RecoveryObservation
+from .fees import FeeAgreement, FeeAssessment, assess_fee, calculate_fee_cents
 from .ledger import LedgerEvent, LedgerRecord, RecoveryLedger
 from .packets import RecoveryPacket, build_client_portfolio_packet, build_recovery_packet, submission_ready
 from .raw_scan import build_raw_scan, execute_raw_scan_payload, run_raw_scan_payload
@@ -19,6 +20,10 @@ __all__ = [
     "Branch",
     "CaseState",
     "EvidenceRef",
+    "FeeAgreement",
+    "FeeAssessment",
+    "assess_fee",
+    "calculate_fee_cents",
     "FindingState",
     "LedgerEvent",
     "LedgerRecord",
