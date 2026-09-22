@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:commercial-extensions-01",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "source_files": [
+    "MASTER.md",
+    "CAPABILITIES.md"
+  ],
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "Benchling-Open-Source/allotropy",
+      "revision": "ecc574986b74f91eb84cd0ee14756cd8dc5e1b7e",
+      "score": 29,
+      "domain": "scientific-data",
+      "capability_ids": [
+        "CAP-013"
+      ],
+      "wedge": "Normalize 5-10 installed instrument formats with mapping/validation evidence."
+    },
+    {
+      "repository": "AccelerationConsortium/HELIOS",
+      "revision": "1e5765ec694d5ba5c26f5a8605c7e37b238a19e0",
+      "score": 29,
+      "domain": "governed-experimentation",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-032"
+      ],
+      "wedge": "Shadow one existing campaign and produce a replayable decision/evidence ledger."
+    },
+    {
+      "repository": "GRIDAPPSD/CIMHub",
+      "revision": "5ba4c63fa525108928942d564fddc022c3fb031f",
+      "score": 29,
+      "domain": "grid-modeling",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-033"
+      ],
+      "wedge": "Model-conversion/topology/electrical-parity acceptance report."
+    },
+    {
+      "repository": "sandialabs/DREAMS",
+      "revision": "3eb6c6089eadf09a4bf99961faac11a76ef30ca0",
+      "score": 29,
+      "domain": "grid-modeling",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-034"
+      ],
+      "wedge": "Fixed-price feeder hosting-capacity diagnostic."
+    },
+    {
+      "repository": "suoten/ProtoForge",
+      "revision": "7c61b10d9ae406224c86741d9c0a450b561b40ca",
+      "score": 29,
+      "domain": "industrial",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "wedge": "Fixed-price regression pack for authorized device types."
+    },
+    {
+      "repository": "pialmmh/billing-dotnetcore",
+      "revision": "ec9e0abacce7e80b3a34d2d89b929ee5db946209",
+      "score": 29,
+      "domain": "telecom",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-035"
+      ],
+      "wedge": "Closed-period read-only Telecom Revenue Assurance rerating diagnostic."
+    },
+    {
+      "repository": "aurelianware/cloudhealthoffice",
+      "revision": "85c8e18146d168ad2f4e30fbcfe6e90af0bfdb58",
+      "score": 28,
+      "domain": "healthcare",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-036"
+      ],
+      "wedge": "Synthetic/redacted or authorized Healthcare Revenue Integrity Diagnostic with human review."
+    },
+    {
+      "repository": "owgreen-dev/grid-crunch",
+      "revision": "5f0c9a074d928b79caa792a84e8e92de1b2df3f2",
+      "score": 29,
+      "domain": "prediction-grid",
+      "capability_ids": [
+        "CAP-015"
+      ],
+      "wedge": "Fixed queue-portfolio underwriting screen followed by recurring monitoring."
+    },
+    {
+      "repository": "OCA/rma",
+      "revision": "9416b2a5f5e1d604eff27610635eb3573227337c",
+      "score": 28,
+      "domain": "warranty-rma",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-037"
+      ],
+      "wedge": "Blind Warranty/RMA Entitlement Leakage Audit on closed claims."
+    },
+    {
+      "repository": "joschiservice/RosterSpec",
+      "revision": "f7e701c694bf1facdc4999e1681a3aa11493614d",
+      "score": 29,
+      "domain": "workforce-scheduling",
+      "capability_ids": [
+        "CAP-009"
+      ],
+      "wedge": "Replay one week of callouts and compare incumbent repair to verified minimum-disruption repair."
+    },
+    {
+      "repository": "bsaffel/moneybin",
+      "revision": "fd34d99962c833de87bdb45351f0ace142db3f63",
+      "score": 28,
+      "domain": "source-authority",
+      "capability_ids": [
+        "CAP-019"
+      ],
+      "wedge": "Source Authority Retrofit on one high-value connector using PRESENT / VERIFIED_EMPTY / UNAVAILABLE receipts."
+    },
+    {
+      "repository": "mnmn0/mukuroji",
+      "revision": "34ec66604443da9ba60e9cfbf4d2e6246445bf66",
+      "score": 28,
+      "domain": "recovery-proof",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "wedge": "AWS Stateful Recovery Acceptance Test on isolated DynamoDB/S3 resource set."
+    }
+  ],
+  "proposed_capability_definitions": {
+    "CAP-032": "Governed autonomous experimentation / campaign authority with replayable decision evidence and safety-gated action selection",
+    "CAP-033": "Grid model conversion, topology preservation and electrical-parity acceptance",
+    "CAP-034": "Distribution hosting-capacity / constrained nodal analysis with reproducible evaluator evidence",
+    "CAP-035": "Telecom CDR mediation, rating authority and revenue-assurance rerating",
+    "CAP-036": "Payer-core claims adjudication and healthcare revenue-integrity evidence",
+    "CAP-037": "Warranty/RMA entitlement, consumed authority and remaining-returnable-quantity evidence"
+  },
+  "combination_stacks": [
+    {
+      "id": "STACK:GRID-DECISION-ASSURANCE",
+      "repositories": [
+        "GRIDAPPSD/CIMHub",
+        "sandialabs/DREAMS",
+        "owgreen-dev/grid-crunch"
+      ],
+      "purpose": "Model conversion/parity -> hosting-capacity physics -> prospective queue/portfolio decision evidence."
+    },
+    {
+      "id": "STACK:INDUSTRIAL-PREFAT",
+      "repositories": [
+        "suoten/ProtoForge"
+      ],
+      "purpose": "Virtual multi-protocol endpoint + fault injection + record/replay + test reports for pre-hardware acceptance."
+    },
+    {
+      "id": "STACK:REVENUE-INTEGRITY-EXPANSION",
+      "repositories": [
+        "pialmmh/billing-dotnetcore",
+        "aurelianware/cloudhealthoffice",
+        "OCA/rma",
+        "bsaffel/moneybin"
+      ],
+      "purpose": "Extend RecoveryOS control plane into telecom, healthcare and warranty while preserving source-authority observation semantics."
+    },
+    {
+      "id": "STACK:SCIENTIFIC-OPS",
+      "repositories": [
+        "Benchling-Open-Source/allotropy",
+        "AccelerationConsortium/HELIOS"
+      ],
+      "purpose": "Normalize source instrument data then run governed/replayable experimentation campaigns."
+    }
+  ],
+  "central_merge_status": "pending; additive manifest only"
+}
