@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
+from .engagement import RecoveryEngagementCharter, assert_engagement_allows_scan
 from .engine import RecoveryEngine, RecoveryObservation
 from .models import Branch, RecoveryFinding, canonical_hash
 
@@ -21,6 +22,9 @@ class SourceManifestEntry:
 class RecoveryScanManifest:
     scan_id: str
     client_id: str
+    engagement_id: str
+    engagement_charter_hash: str
+    as_of_date: str
     branches: tuple[Branch, ...]
     selection_rule: str
     sources: tuple[SourceManifestEntry, ...]
@@ -44,6 +48,8 @@ def freeze_scan(
     *,
     scan_id: str,
     client_id: str,
+    engagement: RecoveryEngagementCharter,
+    as_of_date: str,
     branches: Iterable[Branch],
     selection_rule: str,
     sources: Iterable[SourceManifestEntry],
@@ -56,6 +62,13 @@ def freeze_scan(
         raise ValueError("at least one branch is required")
 
     source_tuple = tuple(sorted(sources, key=lambda s: (s.branch.value, s.source_id)))
+    assert_engagement_allows_scan(
+        engagement,
+        client_id=client_id,
+        branches=branch_tuple,
+        source_kinds=tuple(source.kind for source in source_tuple),
+        as_of_date=as_of_date,
+    )
     seen: set[str] = set()
     for source in source_tuple:
         for name in ("source_id", "source_hash", "locator", "kind"):
@@ -70,6 +83,9 @@ def freeze_scan(
         "schema": 1,
         "scan_id": scan_id,
         "client_id": client_id,
+        "engagement_id": engagement.engagement_id,
+        "engagement_charter_hash": engagement.charter_hash,
+        "as_of_date": as_of_date,
         "branches": [branch.value for branch in branch_tuple],
         "selection_rule": selection_rule,
         "sources": [
@@ -80,6 +96,9 @@ def freeze_scan(
     return RecoveryScanManifest(
         scan_id=scan_id,
         client_id=client_id,
+        engagement_id=engagement.engagement_id,
+        engagement_charter_hash=engagement.charter_hash,
+        as_of_date=as_of_date,
         branches=branch_tuple,
         selection_rule=selection_rule,
         sources=source_tuple,
