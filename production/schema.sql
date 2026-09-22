@@ -218,3 +218,64 @@ create table if not exists intel_skill_eval_task (
   created_at timestamptz not null default now()
 );
 
+create table if not exists intel_skill_eval_result (
+  id text primary key,
+  skill_eval_id text not null,
+  skill_eval_sha256 text not null,
+  repair_candidate_id text not null,
+  candidate_record_sha256 text not null,
+  artifact_id text not null,
+  baseline_version text not null,
+  candidate_version text not null,
+  state text not null,
+  score_delta numeric not null,
+  mutate_dev_set_sha256 text not null,
+  promotion_test_set_sha256 text not null,
+  evaluation_manifest_sha256 text not null,
+  evaluation_evidence_sha256 text not null,
+  mutator_identity text not null,
+  evaluator_identity text not null,
+  evaluation_result_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists intel_skill_promotion_result (
+  id text primary key,
+  skill_promotion_id text not null,
+  skill_promotion_sha256 text not null,
+  skill_eval_result_id text not null,
+  evaluation_result_sha256 text not null,
+  artifact_id text not null,
+  candidate_version text not null,
+  state text not null,
+  distinct_success_task_ids jsonb not null default '[]',
+  heldout_tasks int not null default 0,
+  heldout_passes int not null default 0,
+  heldout_regressions int not null default 0,
+  heldout_set_sha256 text,
+  heldout_evidence_sha256 text,
+  adversarial_task_passed boolean not null default false,
+  adversarial_evidence_sha256 text,
+  adjacent_domain_task_passed boolean not null default false,
+  adjacent_domain_evidence_sha256 text,
+  curator_approved boolean not null default false,
+  curator_identity text,
+  curator_evidence_sha256 text,
+  canary_hunter_ids jsonb not null default '[]',
+  canary_regressions int not null default 0,
+  canary_evidence_sha256 text,
+  promotion_result_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists intel_global_skill_review (
+  id text primary key,
+  skill_promotion_result_id text not null,
+  promotion_result_sha256 text not null,
+  artifact_id text not null,
+  candidate_version text not null,
+  integrator_approval_required boolean not null default true,
+  automatic_global_promotion_allowed boolean not null default false,
+  global_review_sha256 text not null,
+  created_at timestamptz not null default now()
+);
