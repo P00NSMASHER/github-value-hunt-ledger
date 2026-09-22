@@ -7,6 +7,8 @@ recomputing or silently mutating historical dollars.
 from __future__ import annotations
 
 from dataclasses import asdict
+import hashlib
+import hmac
 import json
 import os
 from pathlib import Path
@@ -87,7 +89,30 @@ def _event_to_dict(event: LedgerEvent) -> dict[str, Any]:
     }
 
 
-def export_ledger(ledger: RecoveryLedger) -> dict[str, Any]:
+def _key_bytes(integrity_key: str | bytes) -> bytes:
+    if isinstance(integrity_key, bytes):
+        key = integrity_key
+    elif isinstance(integrity_key, str):
+        key = integrity_key.encode("utf-8")
+    else:
+        raise ValueError("integrity_key must be str or bytes")
+    if not key:
+        raise ValueError("integrity_key cannot be empty")
+    return key
+
+
+def _sign(export_hash: str, integrity_key: str | bytes) -> str:
+    return hmac.new(
+        _key_bytes(integrity_key),
+        export_hash.encode("ascii"),
+        hashlib.sha256,
+    ).hexdigest()
+
+
+def export_ledger(
+    ledger: RecoveryLedger,
+    integrity_key: str | bytes | None = None,
+) -> dict[str, Any]:
     core = {
         "schema": 1,
         "records": [_record_to_dict(record) for record in ledger.records()],
@@ -95,7 +120,12 @@ def export_ledger(ledger: RecoveryLedger) -> dict[str, Any]:
         "audit_head": ledger.audit_head,
         "ledger_snapshot_hash": ledger.snapshot_hash,
     }
-    return {**core, "export_hash": canonical_hash(core)}
+    export_hash = canonical_hash(core)
+    payload = {**core, "export_hash": export_hash}
+    if integrity_key is not None:
+        payload["signature_alg"] = "HMAC-SHA256"
+        payload["signature"] = _sign(export_hash, integrity_key)
+    return payload
 
 
 def _as_mapping(value: Any, name: str) -> Mapping[str, Any]:
@@ -202,10 +232,30 @@ def _load_event(value: Any) -> LedgerEvent:
     return event
 
 
-def import_ledger(payload: Any) -> RecoveryLedger:
+def import_ledger(
+    payload: Any,
+    integrity_key: str | bytes | None = None,
+    *,
+    require_signature: bool = False,
+) -> RecoveryLedger:
     root = _as_mapping(payload, "ledger snapshot")
     if root.get("schema") != 1:
         raise ValueError("unsupported ledger snapshot schema")
+
+    signature = root.get("signature")
+    signature_alg = root.get("signature_alg")
+    if integrity_key is not None:
+        if not signature:
+            raise ValueError("signed ledger required when integrity_key is supplied")
+        if signature_alg != "HMAC-SHA256":
+            raise ValueError("unsupported ledger signature algorithm")
+        expected_signature = _sign(str(root.get("export_hash", "")), integrity_key)
+        if not hmac.compare_digest(expected_signature, str(signature)):
+            raise ValueError("ledger HMAC signature mismatch")
+    elif signature is not None:
+        raise ValueError("signed ledger requires integrity_key for verification")
+    elif require_signature:
+        raise ValueError("ledger signature is required")
 
     core = {
         "schema": root["schema"],
@@ -262,11 +312,19 @@ def import_ledger(payload: Any) -> RecoveryLedger:
     return ledger
 
 
-def save_ledger(path: str | Path, ledger: RecoveryLedger) -> Path:
+def save_ledger(
+    path: str | Path,
+    ledger: RecoveryLedger,
+    integrity_key: str | bytes | None = None,
+) -> Path:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     tmp = destination.with_name(destination.name + ".tmp")
-    rendered = json.dumps(export_ledger(ledger), sort_keys=True, indent=2) + "\n"
+    rendered = json.dumps(
+        export_ledger(ledger, integrity_key=integrity_key),
+        sort_keys=True,
+        indent=2,
+    ) + "\n"
     with tmp.open("w", encoding="utf-8") as handle:
         handle.write(rendered)
         handle.flush()
@@ -279,7 +337,16 @@ def save_ledger(path: str | Path, ledger: RecoveryLedger) -> Path:
     return destination
 
 
-def load_ledger(path: str | Path) -> RecoveryLedger:
+def load_ledger(
+    path: str | Path,
+    integrity_key: str | bytes | None = None,
+    *,
+    require_signature: bool = False,
+) -> RecoveryLedger:
     source = Path(path)
     payload = json.loads(source.read_text(encoding="utf-8"))
-    return import_ledger(payload)
+    return import_ledger(
+        payload,
+        integrity_key=integrity_key,
+        require_signature=require_signature,
+    )
