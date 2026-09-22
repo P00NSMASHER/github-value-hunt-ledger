@@ -9,9 +9,9 @@ from dataclasses import asdict, dataclass
 from typing import Iterable
 
 from freight.contracts import canonical_hash
-from freight.finding_factory import FindingFactoryBatch
+from freight.finding_factory import FindingFactoryBatch, derive_batch
 from freight.invoice_csv_adapter import InvoiceChargeCSVBatch
-from freight.population_builder import PopulationBuild
+from freight.population_builder import PopulationBuild, build_population_from_charge_batch
 from freight.review_packet import ReviewPacket, build_review_packet
 from freight.review_queue import ReviewQueue, build_review_queue
 from freight.rule_csv_adapter import ChargeRuleCSVBatch
@@ -55,6 +55,14 @@ def build_audit_run_manifest(
         raise ValueError("population builder scope mismatch")
     if population_build.invoice_charge_adapter_hash != invoice_batch.adapter_hash:
         raise ValueError("population builder does not reference invoice adapter")
+    canonical_population = build_population_from_charge_batch(
+        invoice_batch,
+        selection_rule=population_build.selection_rule,
+    )
+    if population_build != canonical_population:
+        raise ValueError(
+            "population builder does not match the complete accepted invoice batch"
+        )
     if population_build.population.manifest_hash != factory.truth.population_hash:
         raise ValueError("Finding Factory truth is not bound to frozen population")
 
@@ -67,6 +75,16 @@ def build_audit_run_manifest(
     rule_hashes = tuple(sorted(rule.rule_hash for rule in rules))
     if len(rule_hashes) != len(set(rule_hashes)):
         raise ValueError("duplicate rule proof across rule batches")
+
+    canonical_factory = derive_batch(
+        population_build.population,
+        invoice_batch.charges,
+        rules,
+    )
+    if factory != canonical_factory:
+        raise ValueError(
+            "Finding Factory does not cover the complete accepted charge batch"
+        )
 
     canonical_queue = build_review_queue(factory)
     if review_queue != canonical_queue:
