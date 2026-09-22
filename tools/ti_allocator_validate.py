@@ -7,6 +7,7 @@ from ti_learning_measurement_blinding import (
     worker_assignment_blinding_errors,
 )
 from ti_search_actions import action_errors
+from ti_work_identity import versioned_work_item_id
 
 policy_path=INTEL/"allocator_policy_effective.json" if (INTEL/"allocator_policy_effective.json").exists() else INTEL/"allocator_policy.json"
 cfg=json.loads(policy_path.read_text(encoding="utf-8"))
@@ -49,10 +50,34 @@ for n,c in enumerate(cand,1):
     if c.get("work_action")=="await_external": raise SystemExit(f"hunt_candidates.jsonl:{n}: external dependency assigned autonomously")
     if c.get("work_kind") in {"experiment_execution","independent_verification"}:
         revision=c.get("work_revision_sha256")
+        payload=c.get("work_identity_payload")
         if not isinstance(revision,str) or not re.fullmatch(r"[a-f0-9]{64}",revision):
             raise SystemExit(f"hunt_candidates.jsonl:{n}: versioned work missing valid semantic revision")
-    elif c.get("work_revision_sha256") is not None:
-        raise SystemExit(f"hunt_candidates.jsonl:{n}: unversioned work unexpectedly carries semantic revision")
+        if not isinstance(payload,dict):
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: versioned work missing identity payload")
+        prefix=(
+            "experiment"
+            if c.get("work_kind")=="experiment_execution"
+            else (
+                "verify-seed"
+                if str(c.get("source_id") or "").startswith("VERIFY:SEED:")
+                else "verify"
+            )
+        )
+        expected_id,expected_revision=versioned_work_item_id(
+            prefix,
+            str(c.get("source_id") or ""),
+            payload,
+        )
+        if c.get("work_item_id")!=expected_id:
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: semantic work_item_id mismatch")
+        if revision!=expected_revision:
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: semantic work revision mismatch")
+    else:
+        if c.get("work_revision_sha256") is not None:
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: unversioned work unexpectedly carries semantic revision")
+        if c.get("work_identity_payload") is not None:
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: unversioned work unexpectedly carries identity payload")
     if c.get("work_kind")=="learning_measurement":
         blind_errors=worker_assignment_blinding_errors(c)
         if blind_errors:
@@ -78,6 +103,8 @@ for n,a in enumerate(alloc,1):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
     if candidate and a.get("work_revision_sha256")!=candidate.get("work_revision_sha256"):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate semantic revision drift")
+    if candidate and a.get("work_identity_payload")!=candidate.get("work_identity_payload"):
+        raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate semantic identity payload drift")
     sid=a.get("slot_id")
     if sid not in slots or sid in seen_slots: raise SystemExit(f"hunt_allocations.jsonl:{n}: invalid/duplicate slot {sid}")
     seen_slots.add(sid)
