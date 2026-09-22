@@ -16,6 +16,7 @@ PRES=load_jsonl("worker_presence_state.jsonl")
 DIR=load_jsonl("activation_directives.jsonl")
 PACK=load_jsonl("activation_claim_packets.jsonl")
 HIST=load_jsonl("activation_history.jsonl")
+CLAIM_HISTORY=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
 MET=json.loads((INTEL/"activation_metrics.json").read_text(encoding="utf-8"))
 
 scoreboard=(ROOT/"benchmark"/"SCOREBOARD.md").read_text(encoding="utf-8")
@@ -34,6 +35,7 @@ RUNTIME_GATE=evaluate_runtime_activation_gate(
     RUNTIME_POL,
     PREACTIVATION_READINESS,
     MEASUREMENT_PACKETS,
+    CLAIM_HISTORY,
 )
 
 pres={x["worker_id"]:x for x in PRES}
@@ -71,6 +73,8 @@ for n,x in enumerate(PACK,1):
         raise SystemExit(f"activation_claim_packets.jsonl:{n}: work kind outside runtime approval")
     if x.get("assignment_source_id") not in set(RUNTIME_GATE.get("allowed_seed_ids") or []):
         raise SystemExit(f"activation_claim_packets.jsonl:{n}: seed outside current precommitted canary")
+    if x.get("runtime_approval_id")!=RUNTIME_GATE.get("approval_id"):
+        raise SystemExit(f"activation_claim_packets.jsonl:{n}: runtime approval lineage drift")
 hist={x.get("activation_id"):x for x in HIST}
 if len(hist)!=len(HIST): raise SystemExit("activation history duplicate IDs")
 for x in PACK:
@@ -92,6 +96,21 @@ if MET.get("runtime_approval_id")!=RUNTIME_GATE.get("approval_id"):
     raise SystemExit("activation metrics runtime approval drift")
 if int(MET.get("runtime_maximum_current_activations") or 0)!=int(RUNTIME_GATE.get("maximum_current_activations") or 0):
     raise SystemExit("activation metrics runtime capacity drift")
-if (MET.get("runtime_allowed_seed_ids") or [])!=(RUNTIME_GATE.get("allowed_seed_ids") or []):
-    raise SystemExit("activation metrics runtime seed scope drift")
+for key in (
+    "maximum_total_claims",
+    "claims_consumed",
+    "remaining_claim_budget",
+    "active_claims",
+):
+    metric_key="runtime_"+key
+    if int(MET.get(metric_key) or 0)!=int(RUNTIME_GATE.get(key) or 0):
+        raise SystemExit(f"activation metrics {metric_key} drift")
+for metric_key,gate_key in (
+    ("runtime_allowed_seed_ids","allowed_seed_ids"),
+    ("runtime_approved_packet_ids","approved_packet_ids"),
+    ("runtime_approved_seed_ids","approved_seed_ids"),
+    ("runtime_claimed_seed_ids","claimed_seed_ids"),
+):
+    if (MET.get(metric_key) or [])!=(RUNTIME_GATE.get(gate_key) or []):
+        raise SystemExit(f"activation metrics {metric_key} drift")
 print(f"OK activation_generation={MET.get('activation_generation_id')} current={len(PACK)} waiting_presence={MET.get('waiting_presence')} runtime={RUNTIME_GATE.get('mode')} enabled={bool(RUNTIME_GATE.get('enabled'))}")
