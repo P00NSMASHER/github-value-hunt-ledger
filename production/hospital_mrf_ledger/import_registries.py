@@ -361,6 +361,16 @@ def summarize(conn: sqlite3.Connection) -> dict[str, Any]:
     }
 
 
+def resolve_db_path(root: Path, value: str) -> Path:
+    """Match catalog.py semantics without double-prefixing an explicit out/... path."""
+    db = Path(value)
+    if db.is_absolute():
+        return db
+    if db.parts and db.parts[0] == root.name:
+        return db
+    return root / db
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--db", required=True)
@@ -371,9 +381,7 @@ def main() -> int:
 
     root = Path(args.out)
     root.mkdir(parents=True, exist_ok=True)
-    db = Path(args.db)
-    if not db.is_absolute():
-        db = root / db
+    db = resolve_db_path(root, args.db)
     conn = catalog.init_db(db)
 
     tracker = import_tracker(conn, root, timeout=args.timeout)
