@@ -495,5 +495,186 @@ class TiCCatalogTests(unittest.TestCase):
             conn.close()
 
 
+    def test_humana_discovery_uses_bounded_datatables_pagination_and_filename_query(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            source = catalog.Source(
+                "humana-test",
+                "Humana",
+                "humana_api",
+                "https://developers.humana.com/syntheticdata/Resource/GetData",
+            )
+            payload = {
+                "aaData": [
+                    {
+                        "name": "2026-09-01_humana_index.json",
+                        "size": "1234",
+                    },
+                    [
+                        '<a href="/syntheticdata/Resource/DownloadTOCFile?fileName='
+                        '2026-09-01_humana_second_index.json">download</a>'
+                    ],
+                ],
+                "iTotalDisplayRecords": 2,
+            }
+            raw = json.dumps(payload).encode()
+
+            class FakeRequest:
+                url = (
+                    source.source_url
+                    + "?fileType=innetwork&iDisplayLength=100"
+                    + "&iDisplayStart=0&sEcho=1"
+                )
+
+            class FakeResponse:
+                url = FakeRequest.url
+                status_code = 200
+                headers = {"content-type": "application/json"}
+                content = raw
+                request = FakeRequest()
+
+                def raise_for_status(self):
+                    return None
+
+                def json(self):
+                    return payload
+
+            class FakeSession:
+                def __init__(self):
+                    self.calls = []
+
+                def get(self, url, params=None, timeout=None):
+                    self.calls.append((url, dict(params or {}), timeout))
+                    return FakeResponse()
+
+            fake = FakeSession()
+            with patch.object(catalog, "session", return_value=fake):
+                stats = catalog.discover_humana(
+                    conn, root, source, timeout=3, max_bytes=1_000_000
+                )
+
+            self.assertEqual(stats["files"], 2)
+            self.assertEqual(stats["snapshots"], 1)
+            self.assertEqual(fake.calls[0][1]["iDisplayLength"], "100")
+            self.assertEqual(fake.calls[0][1]["iDisplayStart"], "0")
+            self.assertEqual(fake.calls[0][1]["sEcho"], "1")
+            rows = conn.execute(
+                "SELECT file_url,file_type,filename FROM mrf_files ORDER BY filename"
+            ).fetchall()
+            self.assertEqual(len(rows), 2)
+            self.assertTrue(all(row[1] == "index" for row in rows))
+            self.assertTrue(all("fileName=" in row[0] for row in rows))
+            self.assertTrue(any(
+                "2026-09-01_humana_second_index.json" in row[0]
+                for row in rows
+            ))
+            conn.close()
+
+    def test_parse_index_accepts_concatenated_json_documents(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            conn.row_factory = sqlite3.Row
+            source = catalog.Source(
+                "multi-json",
+                "Network Health",
+                "monthly_toc_templates",
+                "https://payer.test/",
+            )
+            source_id = catalog.persist_source(conn, source)
+            index_url = "https://payer.test/network_index.json"
+            index_id = catalog.insert_mrf_file(
+                conn,
+                source,
+                index_url,
+                "index",
+                snapshot_id=None,
+                manifest_sha=None,
+                parse_status="monthly_template_candidate",
+            )
+            doc1 = {
+                "reporting_entity_name": "Network Health",
+                "reporting_entity_type": "health insurance issuer",
+                "last_updated_on": "2026-09-01",
+                "version": "1.0.0",
+                "reporting_structure": [{
+                    "reporting_plans": [{
+                        "plan_name": "Plan A",
+                        "plan_id_type": "hios",
+                        "plan_id": "A1",
+                        "plan_market_type": "group",
+                        "issuer_name": "Network Health",
+                    }],
+                    "in_network_files": [{
+                        "description": "rates a",
+                        "location": "https://payer.test/a_in-network-rates.json.gz",
+                    }],
+                }],
+            }
+            doc2 = {
+                "reporting_entity_name": "Network Health",
+                "reporting_entity_type": "health insurance issuer",
+                "last_updated_on": "2026-09-01",
+                "version": "1.0.0",
+                "reporting_structure": [{
+                    "reporting_plans": [{
+                        "plan_name": "Plan B",
+                        "plan_id_type": "hios",
+                        "plan_id": "B1",
+                        "plan_market_type": "group",
+                        "issuer_name": "Network Health",
+                    }],
+                    "in_network_files": [{
+                        "description": "rates b",
+                        "location": "https://payer.test/b_in-network-rates.json.gz",
+                    }],
+                }],
+            }
+            concatenated = (
+                json.dumps(doc1, separators=(",", ":"))
+                + json.dumps(doc2, separators=(",", ":"))
+            ).encode()
+
+            def fake_fetch_to_temp(url, *, timeout, max_bytes):
+                tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".json")
+                tmp.write(concatenated)
+                tmp.close()
+                return Path(tmp.name), {
+                    "final_url": url,
+                    "http_status": 200,
+                    "content_type": "application/json",
+                    "etag": '"multi"',
+                    "last_modified": None,
+                    "content_length": len(concatenated),
+                    "sha256": catalog.sha256_bytes(concatenated),
+                }
+
+            row = conn.execute(
+                "SELECT * FROM mrf_files WHERE id=?", (index_id,)
+            ).fetchone()
+            with patch.object(catalog, "fetch_to_temp", side_effect=fake_fetch_to_temp):
+                stats = catalog.parse_index_file(
+                    conn,
+                    root,
+                    source,
+                    source_id,
+                    row,
+                    timeout=3,
+                    max_index_bytes=1_000_000,
+                    snapshot_max_bytes=1_000_000,
+                )
+
+            self.assertEqual(stats["files"], 2)
+            self.assertEqual(stats["plans"], 2)
+            self.assertEqual(
+                conn.execute(
+                    "SELECT COUNT(*) FROM mrf_files WHERE file_type='in_network'"
+                ).fetchone()[0],
+                2,
+            )
+            conn.close()
+
+
 if __name__ == "__main__":
     unittest.main()
