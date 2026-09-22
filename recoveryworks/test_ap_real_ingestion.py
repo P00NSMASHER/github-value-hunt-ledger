@@ -71,41 +71,49 @@ class APRealIngestionTests(unittest.TestCase):
         self.assertEqual(finding.potential_recovery_cents, 25000)
         self.assertEqual(finding.reason, "VENDOR_STATEMENT_CREDIT")
 
-    def test_statement_credit_can_confirm_duplicate_without_obligation(self):
+    def test_statement_credit_remains_authoritative_with_suffix_alias_context(self):
         batch = audit_ap_recovery(
             client_id="client",
             payments=(payment("P-1"), payment("P-2", invoice="INV-1-DUP")),
             statements=(statement(-10000),),
         )
         self.assertEqual(len(batch.observations), 1)
+        self.assertTrue(any(
+            exc.code == "HEURISTIC_INVOICE_ALIAS" for exc in batch.exceptions
+        ))
         finding = RecoveryEngine().evaluate(batch.observations[0])
         self.assertIs(finding.state, FindingState.VALIDATED)
-        self.assertEqual(finding.reason, "VENDOR_STATEMENT_CONFIRMED_DUPLICATE_PAYMENT")
-        self.assertEqual(len(finding.evidence), 3)
+        self.assertEqual(finding.reason, "VENDOR_STATEMENT_CREDIT")
+        self.assertEqual(len(finding.evidence), 1)
+        self.assertEqual(finding.potential_recovery_cents, 10000)
 
-    def test_contradictory_positive_statement_forces_review(self):
+    def test_positive_statement_suppresses_suffix_alias_duplicate_inference(self):
         batch = audit_ap_recovery(
             client_id="client",
             payments=(payment("P-1"), payment("P-2", invoice="INV-1-DUP")),
             obligations=(obligation(),),
             statements=(statement(5000),),
         )
-        self.assertEqual(batch.exceptions[0].code, "STATEMENT_CONTRADICTS_OVERPAYMENT")
-        finding = RecoveryEngine().evaluate(batch.observations[0])
-        self.assertIs(finding.state, FindingState.REVIEW)
+        self.assertEqual(batch.observations, ())
+        codes = {exc.code for exc in batch.exceptions}
+        self.assertIn("HEURISTIC_INVOICE_ALIAS", codes)
+        self.assertIn("STATEMENT_CONTRADICTS_HEURISTIC_DUPLICATE", codes)
 
 
-    def test_mismatched_statement_credit_does_not_double_count_or_validate(self):
+    def test_statement_credit_amount_wins_over_suffix_alias_duplicate_estimate(self):
         batch = audit_ap_recovery(
             client_id="client",
             payments=(payment("P-1"), payment("P-2", invoice="INV-1-DUP")),
             statements=(statement(-5000),),
         )
         self.assertEqual(len(batch.observations), 1)
-        self.assertEqual(batch.exceptions[0].code, "STATEMENT_CREDIT_MISMATCH")
+        codes = {exc.code for exc in batch.exceptions}
+        self.assertIn("HEURISTIC_INVOICE_ALIAS", codes)
+        self.assertIn("STATEMENT_CREDIT_DIFFERS_FROM_HEURISTIC_DUPLICATE", codes)
         finding = RecoveryEngine().evaluate(batch.observations[0])
-        self.assertIs(finding.state, FindingState.REVIEW)
-        self.assertEqual(finding.potential_recovery_cents, 10000)
+        self.assertIs(finding.state, FindingState.VALIDATED)
+        self.assertEqual(finding.reason, "VENDOR_STATEMENT_CREDIT")
+        self.assertEqual(finding.potential_recovery_cents, 5000)
 
     def test_duplicate_payment_ids_are_excluded_from_recovery_math(self):
         batch = audit_ap_recovery(
