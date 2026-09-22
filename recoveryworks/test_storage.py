@@ -55,6 +55,41 @@ class LedgerStorageTests(unittest.TestCase):
         self.assertTrue(restored.verify_event_chain())
         self.assertEqual(restored.rollup(), original.rollup())
 
+    def test_signed_snapshot_requires_correct_key(self):
+        original = ledger_with_recovery()
+        payload = export_ledger(original, integrity_key="secret-key")
+        restored = import_ledger(payload, integrity_key="secret-key")
+        self.assertEqual(restored.snapshot_hash, original.snapshot_hash)
+        with self.assertRaises(ValueError):
+            import_ledger(payload)
+        with self.assertRaises(ValueError):
+            import_ledger(payload, integrity_key="wrong-key")
+
+    def test_unsigned_snapshot_can_be_forbidden(self):
+        payload = export_ledger(ledger_with_recovery())
+        with self.assertRaises(ValueError):
+            import_ledger(payload, require_signature=True)
+
+    def test_recomputed_plain_hash_cannot_bypass_hmac(self):
+        from recoveryworks.models import canonical_hash
+
+        payload = export_ledger(ledger_with_recovery(), integrity_key="secret-key")
+        tampered = copy.deepcopy(payload)
+        tampered["records"][0]["review_note"] = "tampered but internally rehashed"
+        # An attacker can recompute ordinary hashes only if every nested proof is
+        # also rebuilt. Even recomputing the outer export hash cannot reproduce
+        # the HMAC without the secret key.
+        core = {
+            "schema": tampered["schema"],
+            "records": tampered["records"],
+            "events": tampered["events"],
+            "audit_head": tampered["audit_head"],
+            "ledger_snapshot_hash": tampered["ledger_snapshot_hash"],
+        }
+        tampered["export_hash"] = canonical_hash(core)
+        with self.assertRaises(ValueError):
+            import_ledger(tampered, integrity_key="secret-key")
+
     def test_atomic_file_roundtrip(self):
         original = ledger_with_recovery()
         with tempfile.TemporaryDirectory() as tmp:
