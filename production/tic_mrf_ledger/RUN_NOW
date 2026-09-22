@@ -1,6 +1,7 @@
-run_id=tic-platforms-2026-09-22
+run_id=tic-universe-catalog-2026-09-22T14-06-ET
 parse_indexes=true
 max_indexes=60
 registry=endurant-master-list
 healthsparq=true
 object_listings=true
+phase=catalog
