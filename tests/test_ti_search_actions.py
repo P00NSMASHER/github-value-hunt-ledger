@@ -166,18 +166,52 @@ class GeneratedPacketTests(unittest.TestCase):
         original = path.read_text()
         try:
             path.write_text('# No live experiments\n')
-            result = subprocess.run([sys.executable, str(self.root / 'tools/ti_allocator.py')],
-                                    cwd=self.root, capture_output=True, text=True)
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            fallback = [c for c in self.read('hunt_candidates.jsonl') if c['work_kind'] == 'independent_verification']
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(self.root / 'tools' / 'ti_allocator.py'),
+                ],
+                cwd=self.root,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(
+                result.returncode,
+                0,
+                result.stdout + result.stderr,
+            )
+            fallback = [
+                row
+                for row in self.read('hunt_candidates.jsonl')
+                if row['work_kind'] == 'independent_verification'
+            ]
             self.assertEqual(len(fallback), 1)
             packet = fallback[0]['instructions']
             self.assertRegex(
                 fallback[0]['work_revision_sha256'],
-                r'^[a-f0-9]{64}            self.assertIs(packet['can_establish_verified'], False)
+                r'^[a-f0-9]{64}$',
+            )
+            self.assertEqual(
+                packet['verification_mode'],
+                'hypothesis_challenge',
+            )
+            self.assertIs(
+                packet['can_establish_verified'],
+                False,
+            )
             self.assertEqual(packet['queries'], [])
         finally:
             path.write_text(original)
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(self.root / 'tools' / 'ti_allocator.py'),
+                ],
+                cwd=self.root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
 
     def test_exp007_stale_assignment_is_not_reissued(self):
         exp007 = [
