@@ -2,6 +2,7 @@ from .ap import from_ap_variance
 from .base import BranchInput, RuleBackedAdapter
 from .construction import from_construction_entitlement
 from .duty import from_duty_variance
+from .freight import from_freight_derivation, from_freight_finding
 from .payer import from_payer_variance
 from .registry import BRANCHES, BranchSpec, all_specs
 from .utility import from_utility_variance
@@ -15,6 +16,8 @@ __all__ = [
     "from_ap_variance",
     "from_construction_entitlement",
     "from_duty_variance",
+    "from_freight_derivation",
+    "from_freight_finding",
     "from_payer_variance",
     "from_utility_variance",
 ]
