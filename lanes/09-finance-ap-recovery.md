@@ -567,3 +567,22 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Important risks: External service dependency and customer QuickBooks Desktop connectivity requirements; not a recovery engine by itself.
 - Connections: Natural connector for netc statement reconciliation and AP Recovery v2.
 - Opportunity score: **7.9/10** supporting infrastructure.
+
+
+### Jayesh0321/Accrual-Engine — executable rebate accrual and settlement engine
+- Repository: https://github.com/Jayesh0321/Accrual-Engine
+- Commit / revision: 2bdcef1cd05345337531b0e179ad115cef543227
+- Date discovered: 2026-09-22
+- What actually works: Zero-star FastAPI/SQLAlchemy rebate accrual prototype with structured rebate programs, explicit retroactive-vs-incremental tier modes, unit or net-revenue measurement, Decimal money, returns/credit-memo treatment, period-bound accrual recomputation from source invoice lines, immutable settled accruals, human review queue, approve/adjust/reject transitions, settlement methods, versioned contracts and post-settlement adjustment records that preserve original settlement history.
+- Evidence of implementation: `app/tier_engine.py`, `app/accrual.py`, contract/settlement routers, migrations and 67-test suite. Tests cover exact tier boundaries, retroactive jumps, marginal tier arithmetic, returns dropping below previously crossed tiers, variable pricing across lines, recomputation-without-drift, immutable settled accruals, adjustment reasons, no double approval and post-settlement corrections preserving the original settlement row.
+- Why it matters: This is the first compact executable rebate engine found that can replace a meaningful portion of the domain logic currently coming only from the `vendorrebate` playbook. It gives AP Recovery a concrete route into manufacturer/distributor/customer rebate recovery and assurance.
+- Useful capability/workflow: versioned rebate agreement -> invoice-line scope -> deterministic accrual -> review/adjustment -> credit-memo/payment settlement -> immutable correction history.
+- Likely buyer: Distributor, manufacturer, retailer, CPG finance, rebate operations, commercial finance.
+- Pain solved: Spreadsheet rebate liabilities with ambiguous tier semantics, silent contract edits and unaudited payout changes.
+- Fastest monetization path: Managed rebate-reconciliation pilot on one customer/vendor program and one quarter; compare contract terms + invoice lines + paid/credited settlement.
+- Paid-pilot concept: Freeze one rebate contract, recompute earned amount independently, compare to booked accrual and issued credit/payment, then package any under/over settlement with traceable line-level math.
+- Estimated engineering time saved: 1-3 months of tier engine, review workflow and settlement-history development.
+- License / reuse status: No public license detected; project-level user authorization says repository rights are available.
+- Important risks: Prototype lacks auth, multi-currency, ERP connector, GL posting and overlapping-program support. Settlement records prove workflow state inside the prototype, not external payment/credit realization; AP Recovery must still require external settlement evidence before counting realized money.
+- Connections: Strong execution donor for `vendorrebate/vendorrebate` domain patterns; combine with LineLedger/Accounting-App settlement evidence and AP Recovery's one-use realized-recovery ledger.
+- Opportunity score: **9.2/10**.
