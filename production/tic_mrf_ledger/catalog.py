@@ -1187,11 +1187,16 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         "html_index_links": discover_html_indexes,
     }
 
-    for source in sources:
+    for source_index, source in enumerate(sources, start=1):
         if args.live_only and source.historical:
             continue
         if args.historical_only and not source.historical:
             continue
+        print(
+            f"[source {source_index}/{len(sources)}] "
+            f"{source.source_key} adapter={source.adapter}",
+            flush=True,
+        )
         persist_source(conn, source)
         try:
             delta = adapters[source.adapter](
@@ -1202,7 +1207,19 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
             stats["source_candidates"] += delta.get("source_candidates", 0)
             stats["source_successes"] += 1
             conn.commit()
+            print(
+                f"[source ok] {source.source_key} "
+                f"files={delta.get('files', 0)} "
+                f"snapshots={delta.get('snapshots', 0)} "
+                f"candidates={delta.get('source_candidates', 0)}",
+                flush=True,
+            )
         except Exception as exc:
+            print(
+                f"[source failed] {source.source_key} "
+                f"{type(exc).__name__}: {str(exc)[:240]}",
+                flush=True,
+            )
             record_error(conn, source.source_key, source.source_url, "source_discovery", exc)
             stats["source_failures"] += 1
             conn.commit()
@@ -1225,7 +1242,12 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         if args.max_indexes:
             rows = rows[: args.max_indexes]
         source_map = {s.source_key: s for s in sources}
-        for row in rows:
+        for index_number, row in enumerate(rows, start=1):
+            print(
+                f"[index {index_number}/{len(rows)}] "
+                f"{row['source_key']} {str(row['file_url'])[:180]}",
+                flush=True,
+            )
             source = source_map.get(row["source_key"])
             if not source:
                 db_source = conn.execute(
@@ -1257,7 +1279,16 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
                 stats["source_snapshots"] += delta["snapshots"]
                 stats["index_files_parsed"] += 1
                 conn.commit()
+                print(
+                    f"[index ok] files={delta['files']} plans={delta['plans']} "
+                    f"snapshots={delta['snapshots']}",
+                    flush=True,
+                )
             except Exception as exc:
+                print(
+                    f"[index failed] {type(exc).__name__}: {str(exc)[:240]}",
+                    flush=True,
+                )
                 record_error(conn, source.source_key, row["file_url"], "index_parse", exc)
                 stats["index_files_failed"] += 1
                 conn.commit()
