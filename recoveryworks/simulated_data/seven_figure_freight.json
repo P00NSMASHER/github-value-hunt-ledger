@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "simulation_only": true,
+  "customer": {
+    "client_id": "SIMCO-INDUSTRIAL",
+    "counterparty_id": "SIM-CARRIER-A",
+    "business_unit": "Northeast Distribution"
+  },
+  "finding": {
+    "branch": "freight",
+    "reference": "SIM-MASTER-INVOICE-2026-08",
+    "currency": "USD",
+    "expected_cents": 425000000,
+    "actual_cents": 525000000,
+    "reason": "SIMULATED_CONTRACT_RATE_OVERCHARGE",
+    "confidence_basis": "synthetic executed contract + carrier portal invoice + TMS shipment population + ERP payment export"
+  },
+  "authority_source": {
+    "authority_id": "SIM-AUTH-CONTRACT-V3",
+    "authority_kind": "executed_contract",
+    "locator": "sim://authority/carrier-master-agreement-v3#section=7.4",
+    "effective_from": "2026-01-01",
+    "effective_to": null,
+    "jurisdiction": "US",
+    "acquired_at": "2026-09-22T16:00:00Z",
+    "verified_by": "sim-authority-reviewer",
+    "verification_note": "Synthetic executed amendment chain independently checked.",
+    "content": "SIMULATION ONLY. Carrier Master Agreement v3. Section 7.4 establishes the reviewed August 2026 maximum payable transportation charge for the frozen shipment population at USD 4,250,000.00."
+  },
+  "evidence_sources": [
+    {
+      "evidence_id": "SIM-EV-INVOICE",
+      "kind": "carrier_portal_invoice",
+      "locator": "sim://evidence/carrier-portal/invoice-2026-08.json",
+      "acquisition_method": "counterparty_portal_export",
+      "acquired_at": "2026-09-22T16:01:00Z",
+      "authenticated_by": "sim-evidence-reviewer-1",
+      "authentication_note": "Synthetic portal export preserved before normalization.",
+      "content": "{\"invoice_id\":\"SIM-MASTER-INVOICE-2026-08\",\"amount_usd\":5250000.00,\"carrier\":\"SIM-CARRIER-A\"}"
+    },
+    {
+      "evidence_id": "SIM-EV-TMS",
+      "kind": "tms_shipment_population",
+      "locator": "sim://evidence/tms/august-2026-population.json",
+      "acquisition_method": "client_read_only_tms_export",
+      "acquired_at": "2026-09-22T16:02:00Z",
+      "authenticated_by": "sim-evidence-reviewer-2",
+      "authentication_note": "Synthetic TMS population reconciled to invoice period.",
+      "content": "{\"period\":\"2026-08\",\"shipment_count\":1842,\"frozen_population_total_contract_usd\":4250000.00}"
+    },
+    {
+      "evidence_id": "SIM-EV-ERP",
+      "kind": "erp_payment_export",
+      "locator": "sim://evidence/erp/payment-2026-09-10.json",
+      "acquisition_method": "client_read_only_erp_export",
+      "acquired_at": "2026-09-22T16:03:00Z",
+      "authenticated_by": "sim-evidence-reviewer-3",
+      "authentication_note": "Synthetic ERP payment export independently confirms actual paid amount.",
+      "content": "{\"payment_id\":\"SIM-PAY-991\",\"invoice_id\":\"SIM-MASTER-INVOICE-2026-08\",\"paid_usd\":5250000.00,\"posted\":true}"
+    }
+  ],
+  "calculation": {
+    "calculator_id": "recoveryworks.freight.synthetic_hostile_exam",
+    "calculator_version": "1",
+    "code_commit_sha": "SIMULATED-COMMIT-SHA",
+    "created_at": "2026-09-22T16:05:00Z",
+    "trace": {
+      "contract_cap_cents": 425000000,
+      "actual_paid_cents": 525000000,
+      "variance_cents": 100000000,
+      "formula": "actual_paid_cents - contract_cap_cents"
+    }
+  },
+  "reviews": [
+    {
+      "review_id": "SIM-REVIEW-PRIMARY",
+      "reviewer_id": "sim-freight-reviewer-1",
+      "reviewer_role": "freight_reviewer",
+      "reviewed_at": "2026-09-22T16:10:00Z",
+      "note": "Synthetic primary reviewer reperformed calculation and contract binding."
+    },
+    {
+      "review_id": "SIM-REVIEW-INDEPENDENT",
+      "reviewer_id": "sim-freight-reviewer-2",
+      "reviewer_role": "independent_reviewer",
+      "reviewed_at": "2026-09-22T16:12:00Z",
+      "note": "Synthetic independent reviewer reproduced the one-million-dollar variance."
+    }
+  ],
+  "challenge": {
+    "challenge_id": "SIM-CHALLENGE-1",
+    "reviewer_id": "sim-red-team-reviewer",
+    "reviewed_at": "2026-09-22T16:14:00Z",
+    "challenge": "Search for amendments, rebills, credits, reversals, shipment exclusions, waivers, or contrary payment facts that defeat the finding.",
+    "conclusion": "Synthetic negative-evidence search found no superseding amendment, credit, rebill, reversal, excluded shipment population, or contradictory ERP payment.",
+    "contrary_evidence_manifest": "SIMULATION ONLY. Search set: amendments repository, carrier credit memos, rebills, ERP reversals, TMS excluded shipments. Result: none found."
+  },
+  "deadline": {
+    "assessment_id": "SIM-DEADLINE-1",
+    "governing_source_hash_basis": "authority",
+    "source_locator": "sim://authority/carrier-master-agreement-v3#claims-window",
+    "trigger": "receipt of disputed invoice",
+    "assessed_at": "2026-09-22T16:15:00Z",
+    "assessed_by": "sim-deadline-reviewer",
+    "deadline_at": "2026-12-31T23:59:59Z",
+    "conclusion": "Synthetic case must be externally asserted before the reviewed claims deadline."
+  },
+  "freeze": {
+    "created_at": "2026-09-22T16:20:00Z",
+    "created_by": "sim-case-freezer"
+  },
+  "client_authorization": {
+    "authorization_id": "SIM-CLIENT-AUTH-1",
+    "client_actor_id": "sim-client-cfo",
+    "approved_action_type": "carrier_overcharge_demand",
+    "authorized_at": "2026-09-22T16:25:00Z",
+    "maximum_amount_cents": 120000000,
+    "note": "SIMULATION ONLY. Client CFO authorizes pursuit of the frozen one-million-dollar finding.",
+    "expires_at": "2026-12-15T00:00:00Z"
+  },
+  "external_action": {
+    "artifact_kind": "synthetic_demand_letter",
+    "artifact_locator": "sim://outbound/demand-1.txt",
+    "action_amount_cents": 100000000,
+    "prepared_by": "sim-recovery-ops",
+    "prepared_at": "2026-09-22T16:30:00Z",
+    "artifact_template": "SIMULATION ONLY. Demand amount: $1,000,000.00\\nFrozen case bundle: {bundle_hash}\\n"
+  },
+  "seal": {
+    "seal_id": "SIM-SEAL-1",
+    "key_id": "sim-kms-key-1",
+    "sealed_at": "2026-09-22T16:35:00Z"
+  }
+}

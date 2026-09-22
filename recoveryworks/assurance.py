@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 import hashlib
+import hmac
 from typing import Any, Iterable, Mapping
 
 from .journal import finding_from_payload, finding_to_payload
@@ -38,6 +39,12 @@ def _iso(name: str, value: str) -> str:
     if parsed.tzinfo is None:
         raise ValueError(f"{name} must include timezone")
     return text
+
+
+def _dt(name: str, value: str) -> datetime:
+    """Parse an offset-aware ISO-8601 timestamp for temporal consistency checks."""
+    text = _iso(name, value)
+    return datetime.fromisoformat(text.replace("Z", "+00:00"))
 
 
 def _hash_bytes(data: bytes) -> str:
@@ -463,6 +470,49 @@ def freeze_case_proof(
     if any(item.finding_proof_hash != finding.proof_hash for item in deadline_tuple):
         raise ValueError("deadline assessment finding hash mismatch")
 
+    # Hostile-examination temporal consistency. A review cannot logically
+    # attest to evidence/calculation that did not yet exist, and a frozen case
+    # cannot predate the attestations it claims to contain.
+    freeze_time = _dt("created_at", created_at)
+    authority_time = _dt("authority.acquired_at", authority.acquired_at)
+    source_times = [
+        _dt(f"source_attestation[{item.evidence_id}].acquired_at", item.acquired_at)
+        for item in source_tuple
+    ]
+    calculation_time = _dt("calculation.created_at", calculation.created_at)
+    latest_input_time = max([authority_time, *source_times])
+    if calculation_time < latest_input_time:
+        raise ValueError(
+            "calculation cannot predate authority/source acquisition"
+        )
+
+    for item in review_tuple:
+        reviewed = _dt(f"review[{item.review_id}].reviewed_at", item.reviewed_at)
+        if reviewed < calculation_time:
+            raise ValueError("review cannot predate calculation")
+        if reviewed > freeze_time:
+            raise ValueError("review cannot postdate case freeze")
+    for item in challenge_tuple:
+        reviewed = _dt(
+            f"challenge[{item.challenge_id}].reviewed_at",
+            item.reviewed_at,
+        )
+        if reviewed < calculation_time:
+            raise ValueError("challenge review cannot predate calculation")
+        if reviewed > freeze_time:
+            raise ValueError("challenge review cannot postdate case freeze")
+    for item in deadline_tuple:
+        assessed = _dt(
+            f"deadline[{item.assessment_id}].assessed_at",
+            item.assessed_at,
+        )
+        if assessed < calculation_time:
+            raise ValueError("deadline assessment cannot predate calculation")
+        if assessed > freeze_time:
+            raise ValueError("deadline assessment cannot postdate case freeze")
+    if calculation_time > freeze_time:
+        raise ValueError("calculation cannot postdate case freeze")
+
     if finding.potential_recovery_cents >= SEVEN_FIGURE_CENTS:
         if len(approving) < 2:
             raise ValueError("seven-figure finding requires two independent approving reviewers")
@@ -473,10 +523,10 @@ def freeze_case_proof(
         if not all(item.verified_source for item in source_tuple):
             raise ValueError("seven-figure finding requires authenticated source attestations")
         challenge_reviewers = {item.reviewer_id for item in challenge_tuple}
-        if not challenge_reviewers.difference(set(reviewer_ids)):
+        if challenge_reviewers.intersection(set(reviewer_ids)):
             raise ValueError(
-                "seven-figure adversarial review requires a reviewer independent "
-                "of the approving reviewers"
+                "seven-figure adversarial reviewer must be independent "
+                "of all approving reviewers"
             )
 
     body = _case_body(
@@ -542,9 +592,11 @@ class ClientActionAuthorization:
             "client_actor_id", "approved_action_type", "note",
         ):
             _required(name, getattr(self, name))
-        _iso("authorized_at", self.authorized_at)
+        authorized = _dt("authorized_at", self.authorized_at)
         if self.expires_at is not None:
-            _iso("expires_at", self.expires_at)
+            expires = _dt("expires_at", self.expires_at)
+            if expires < authorized:
+                raise ValueError("expires_at cannot precede authorized_at")
         _nonnegative_cents("maximum_amount_cents", self.maximum_amount_cents)
 
     @property
@@ -565,8 +617,11 @@ def authorize_case_action(
 ) -> ClientActionAuthorization:
     verify_case_bundle(bundle)
     reviewer_ids = {item.reviewer_id for item in bundle.reviews}
+    reviewer_ids.update(item.reviewer_id for item in bundle.challenges)
     if client_actor_id in reviewer_ids:
         raise ValueError("client authorizer must be independent of RecoveryWorks reviewers")
+    if _dt("authorized_at", authorized_at) < _dt("bundle.created_at", bundle.created_at):
+        raise ValueError("client authorization cannot predate frozen case")
     if maximum_amount_cents < bundle.finding.potential_recovery_cents:
         raise ValueError("authorization amount is below validated recovery amount")
     return ClientActionAuthorization(
@@ -591,8 +646,14 @@ def verify_action_authorization(
         raise ValueError("authorization case bundle hash mismatch")
     if authorization.finding_proof_hash != bundle.finding.proof_hash:
         raise ValueError("authorization finding hash mismatch")
-    if authorization.client_actor_id in {item.reviewer_id for item in bundle.reviews}:
+    reviewer_ids = {item.reviewer_id for item in bundle.reviews}
+    reviewer_ids.update(item.reviewer_id for item in bundle.challenges)
+    if authorization.client_actor_id in reviewer_ids:
         raise ValueError("client authorizer must be independent of reviewers")
+    if _dt("authorization.authorized_at", authorization.authorized_at) < _dt(
+        "bundle.created_at", bundle.created_at
+    ):
+        raise ValueError("client authorization cannot predate frozen case")
     if authorization.maximum_amount_cents < bundle.finding.potential_recovery_cents:
         raise ValueError("authorization amount is below validated recovery amount")
 
@@ -653,6 +714,9 @@ def prepare_external_action(
     _required("artifact_locator", artifact_locator)
     _required("prepared_by", prepared_by)
     prepared_at = _iso("prepared_at", prepared_at)
+    prepared_time = _dt("prepared_at", prepared_at)
+    if prepared_time < _dt("authorization.authorized_at", authorization.authorized_at):
+        raise ValueError("external action cannot predate client authorization")
     _nonnegative_cents("action_amount_cents", action_amount_cents)
     if action_amount_cents > authorization.maximum_amount_cents:
         raise ValueError("action amount exceeds client authorization")
@@ -713,10 +777,193 @@ def verify_external_action(
         raise ValueError("external action finding id mismatch")
     if envelope.finding_proof_hash != bundle.finding.proof_hash:
         raise ValueError("external action finding proof mismatch")
+    if envelope.approved_action_type != authorization.approved_action_type:
+        raise ValueError("external action type differs from client authorization")
     if envelope.action_amount_cents > authorization.maximum_amount_cents:
         raise ValueError("external action exceeds authorized amount")
-    if artifact_bytes is not None and _hash_bytes(artifact_bytes) != envelope.artifact_hash:
-        raise ValueError("external action artifact hash mismatch")
+    if envelope.action_amount_cents > bundle.finding.potential_recovery_cents:
+        raise ValueError("external action exceeds validated recovery amount")
+
+    prepared = _dt("external_action.prepared_at", envelope.prepared_at)
+    authorized = _dt("authorization.authorized_at", authorization.authorized_at)
+    if prepared < authorized:
+        raise ValueError("external action predates client authorization")
+    if authorization.expires_at is not None:
+        if prepared > _dt("authorization.expires_at", authorization.expires_at):
+            raise ValueError("external action was prepared after authorization expiry")
+    for assessment in bundle.deadlines:
+        if assessment.deadline_at is None:
+            continue
+        if prepared > _dt(
+            f"deadline[{assessment.assessment_id}].deadline_at",
+            assessment.deadline_at,
+        ):
+            raise ValueError("external action is past an assessed deadline")
+
+    if artifact_bytes is not None:
+        if len(artifact_bytes) != envelope.artifact_size:
+            raise ValueError("external action artifact size mismatch")
+        if _hash_bytes(artifact_bytes) != envelope.artifact_hash:
+            raise ValueError("external action artifact hash mismatch")
+
+
+@dataclass(frozen=True)
+class ProofSeal:
+    """Detached integrity seal for a frozen high-value case.
+
+    The secret key is never stored in the seal. Production deployments should
+    perform the HMAC operation with a KMS/HSM-managed key and record key_id.
+    """
+
+    seal_id: str
+    key_id: str
+    case_bundle_hash: str
+    finding_proof_hash: str
+    journal_head_hash: str
+    sealed_at: str
+    signature_hex: str
+    authorization_hash: str | None = None
+    external_action_envelope_hash: str | None = None
+    algorithm: str = "HMAC-SHA256"
+
+    def __post_init__(self) -> None:
+        for name in (
+            "seal_id",
+            "key_id",
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "journal_head_hash",
+            "signature_hex",
+            "algorithm",
+        ):
+            _required(name, getattr(self, name))
+        _iso("sealed_at", self.sealed_at)
+        if self.algorithm != "HMAC-SHA256":
+            raise ValueError("unsupported proof seal algorithm")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "seal_id": self.seal_id,
+            "key_id": self.key_id,
+            "case_bundle_hash": self.case_bundle_hash,
+            "finding_proof_hash": self.finding_proof_hash,
+            "journal_head_hash": self.journal_head_hash,
+            "sealed_at": self.sealed_at,
+            "authorization_hash": self.authorization_hash,
+            "external_action_envelope_hash": self.external_action_envelope_hash,
+            "algorithm": self.algorithm,
+        }
+
+
+def _seal_signature(body: Mapping[str, Any], secret_key: bytes) -> str:
+    if not isinstance(secret_key, (bytes, bytearray)) or len(secret_key) < 32:
+        raise ValueError("proof seal key must contain at least 32 bytes")
+    message = canonical_hash(dict(body)).encode("ascii")
+    return hmac.new(bytes(secret_key), message, hashlib.sha256).hexdigest()
+
+
+def create_proof_seal(
+    bundle: CaseProofBundle,
+    *,
+    seal_id: str,
+    key_id: str,
+    secret_key: bytes,
+    journal_head_hash: str,
+    sealed_at: str,
+    authorization: ClientActionAuthorization | None = None,
+    external_action: ExternalActionEnvelope | None = None,
+) -> ProofSeal:
+    """Seal a frozen case plus optional authorization/action and journal head."""
+    verify_case_bundle(bundle)
+    _required("journal_head_hash", journal_head_hash)
+    seal_time = _dt("sealed_at", sealed_at)
+    if seal_time < _dt("bundle.created_at", bundle.created_at):
+        raise ValueError("proof seal cannot predate frozen case")
+
+    authorization_hash = None
+    if authorization is not None:
+        verify_action_authorization(bundle, authorization)
+        if seal_time < _dt(
+            "authorization.authorized_at", authorization.authorized_at
+        ):
+            raise ValueError("proof seal cannot predate client authorization")
+        authorization_hash = authorization.proof_hash
+
+    action_hash = None
+    if external_action is not None:
+        if authorization is None:
+            raise ValueError("external action seal requires client authorization")
+        verify_external_action(external_action, bundle, authorization)
+        if seal_time < _dt(
+            "external_action.prepared_at", external_action.prepared_at
+        ):
+            raise ValueError("proof seal cannot predate external action")
+        action_hash = external_action.envelope_hash
+
+    body = {
+        "schema": 1,
+        "seal_id": _required("seal_id", seal_id),
+        "key_id": _required("key_id", key_id),
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "journal_head_hash": journal_head_hash,
+        "sealed_at": sealed_at,
+        "authorization_hash": authorization_hash,
+        "external_action_envelope_hash": action_hash,
+        "algorithm": "HMAC-SHA256",
+    }
+    return ProofSeal(
+        seal_id=body["seal_id"],
+        key_id=body["key_id"],
+        case_bundle_hash=body["case_bundle_hash"],
+        finding_proof_hash=body["finding_proof_hash"],
+        journal_head_hash=body["journal_head_hash"],
+        sealed_at=body["sealed_at"],
+        authorization_hash=body["authorization_hash"],
+        external_action_envelope_hash=body["external_action_envelope_hash"],
+        algorithm=body["algorithm"],
+        signature_hex=_seal_signature(body, secret_key),
+    )
+
+
+def verify_proof_seal(
+    seal: ProofSeal,
+    bundle: CaseProofBundle,
+    *,
+    secret_key: bytes,
+    journal_head_hash: str,
+    authorization: ClientActionAuthorization | None = None,
+    external_action: ExternalActionEnvelope | None = None,
+) -> None:
+    """Verify the detached seal and every object it claims to bind."""
+    verify_case_bundle(bundle)
+    if seal.case_bundle_hash != bundle.bundle_hash:
+        raise ValueError("proof seal case bundle mismatch")
+    if seal.finding_proof_hash != bundle.finding.proof_hash:
+        raise ValueError("proof seal finding mismatch")
+    if seal.journal_head_hash != journal_head_hash:
+        raise ValueError("proof seal journal head mismatch")
+
+    expected_authorization_hash = None
+    if authorization is not None:
+        verify_action_authorization(bundle, authorization)
+        expected_authorization_hash = authorization.proof_hash
+    if seal.authorization_hash != expected_authorization_hash:
+        raise ValueError("proof seal authorization mismatch")
+
+    expected_action_hash = None
+    if external_action is not None:
+        if authorization is None:
+            raise ValueError("external action verification requires authorization")
+        verify_external_action(external_action, bundle, authorization)
+        expected_action_hash = external_action.envelope_hash
+    if seal.external_action_envelope_hash != expected_action_hash:
+        raise ValueError("proof seal external action mismatch")
+
+    expected = _seal_signature(seal.integrity_body(), secret_key)
+    if not hmac.compare_digest(expected, seal.signature_hex):
+        raise ValueError("proof seal signature mismatch")
 
 
 def case_bundle_to_payload(bundle: CaseProofBundle) -> dict[str, Any]:

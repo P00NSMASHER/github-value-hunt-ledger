@@ -8,15 +8,18 @@ from .assurance import (
     ClientActionAuthorization,
     DeadlineAssessment,
     ExternalActionEnvelope,
+    ProofSeal,
     ReviewAttestation,
     SEVEN_FIGURE_CENTS,
     SourceAttestation,
     authorize_case_action,
+    create_proof_seal,
     freeze_case_proof,
     prepare_external_action,
     verify_action_authorization,
     verify_case_bundle,
     verify_external_action,
+    verify_proof_seal,
 )
 from .durable_ledger import DurableRecoveryLedger
 from .engine import RecoveryEngine, RecoveryObservation
@@ -50,6 +53,7 @@ __all__ = [
     "DurableRecoveryLedger",
     "EvidenceRef",
     "ExternalActionEnvelope",
+    "ProofSeal",
     "FindingState",
     "JournalEvent",
     "LocalBundleStore",
@@ -70,6 +74,7 @@ __all__ = [
     "SourceManifestEntry",
     "StoreConflictError",
     "authorize_case_action",
+    "create_proof_seal",
     "build_scan360_report",
     "freeze_case_proof",
     "freeze_scan",
@@ -79,4 +84,5 @@ __all__ = [
     "verify_action_authorization",
     "verify_case_bundle",
     "verify_external_action",
+    "verify_proof_seal",
 ]
