@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "activation_generation_id": "ACTGEN:ca09b558d1a6",
-  "clock_commit_sha": "403c8261b681700608735bdde5b3e367d6ebbf88",
-  "clock_timestamp": "2026-09-22T17:28:50Z",
+  "activation_generation_id": "ACTGEN:a9e7ac0cfd30",
+  "clock_commit_sha": "6931a294e9a0d201dd7d32425abb0252ac22fce4",
+  "clock_timestamp": "2026-09-22T17:31:40Z",
   "registered_workers": 14,
   "fresh_ready_workers": 0,
   "current_activations": 0,
@@ -16,5 +16,12 @@
   "runtime_gate_errors": [],
   "runtime_approval_id": null,
   "runtime_maximum_current_activations": 0,
-  "runtime_allowed_seed_ids": []
+  "runtime_maximum_total_claims": 0,
+  "runtime_claims_consumed": 0,
+  "runtime_remaining_claim_budget": 0,
+  "runtime_active_claims": 0,
+  "runtime_allowed_seed_ids": [],
+  "runtime_approved_packet_ids": [],
+  "runtime_approved_seed_ids": [],
+  "runtime_claimed_seed_ids": []
 }
