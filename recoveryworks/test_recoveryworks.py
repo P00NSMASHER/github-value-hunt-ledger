@@ -83,6 +83,23 @@ class RecoveryWorksTests(unittest.TestCase):
         ))
         self.assertIsNone(finding)
 
+    def test_invalid_observation_cannot_hide_behind_zero_variance(self):
+        engine = RecoveryEngine()
+        with self.assertRaisesRegex(ValueError, "expected_cents"):
+            engine.evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="bad", currency="USD", expected_cents=-1,
+                actual_cents=-1, rule=rule(), evidence=(evidence(),),
+                reason="BAD", confidence_basis="bad input",
+            ))
+        with self.assertRaisesRegex(ValueError, "evidence"):
+            engine.evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="bad2", currency="USD", expected_cents=100,
+                actual_cents=100, rule=rule(), evidence=(),
+                reason="BAD", confidence_basis="missing proof",
+            ))
+
     def test_ledger_requires_review_and_authorization_before_claim(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
             branch=Branch.DUTY, client_id="c", counterparty_id="customs",
