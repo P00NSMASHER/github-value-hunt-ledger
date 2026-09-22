@@ -7,6 +7,8 @@ from typing import Any, Mapping, Sequence
 
 RECEIPT_SCHEMA_VERSION = 1
 PARTITION_METHOD = "hmac-sha256-v1"
+PRECOMMIT_METHOD = "precommit-train-only-v1"
+KEY_COMMITMENT_METHOD = "sha256-secret-commitment-v1"
 DEFAULT_CONFIRM_MODULUS = 5
 DEFAULT_CONFIRM_BUCKET = 0
 
@@ -55,11 +57,121 @@ def assign_partition(
     return partition, digest.hex()
 
 
+def key_commitment_sha256(secret: str) -> str:
+    if not secret:
+        raise ValueError("blind partition secret is required")
+    return hashlib.sha256(
+        ("hunter-split-key-v1\0" + secret).encode("utf-8")
+    ).hexdigest()
+
+
+def _ledger_prefix_sha256(
+    search_runs: Sequence[Mapping[str, Any]],
+    count: int,
+) -> str:
+    if count < 0 or count > len(search_runs):
+        raise ValueError("invalid activation run count")
+    rows = [
+        {
+            "search_run_id": str(run.get("search_run_id") or ""),
+            "execution_claim_id": str(run.get("execution_claim_id") or ""),
+        }
+        for run in search_runs[:count]
+    ]
+    payload = json.dumps(
+        rows,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def build_key_commitment(
+    search_runs: Sequence[Mapping[str, Any]],
+    existing: Mapping[str, Any] | None,
+    *,
+    secret: str | None,
+) -> tuple[dict[str, Any] | None, list[str]]:
+    errors: list[str] = []
+    if existing:
+        commitment = dict(existing)
+        if commitment.get("schema_version") != 1:
+            errors.append("key_commitment_schema_mismatch")
+        if commitment.get("commitment_method") != KEY_COMMITMENT_METHOD:
+            errors.append("key_commitment_method_mismatch")
+        count = commitment.get("activation_run_count")
+        if not isinstance(count, int) or not 0 <= count <= len(search_runs):
+            errors.append("key_commitment_invalid_run_count")
+        else:
+            expected_prefix = _ledger_prefix_sha256(search_runs, count)
+            if commitment.get("activation_prefix_sha256") != expected_prefix:
+                errors.append("key_commitment_ledger_prefix_mismatch")
+        key_hash = str(commitment.get("key_commitment_sha256") or "")
+        if (
+            len(key_hash) != 64
+            or any(ch not in "0123456789abcdef" for ch in key_hash.lower())
+        ):
+            errors.append("key_commitment_invalid_sha256")
+        elif secret and key_hash != key_commitment_sha256(secret):
+            errors.append("configured_split_key_does_not_match_commitment")
+        return commitment, sorted(set(errors))
+
+    if not secret:
+        return None, []
+    count = len(search_runs)
+    return {
+        "schema_version": 1,
+        "commitment_method": KEY_COMMITMENT_METHOD,
+        "key_commitment_sha256": key_commitment_sha256(secret),
+        "activation_run_count": count,
+        "activation_prefix_sha256": _ledger_prefix_sha256(
+            search_runs,
+            count,
+        ),
+        "rule": (
+            "canonical runs before activation_run_count are permanently "
+            "precommit train-only; only later appended trusted generated "
+            "runs may receive HMAC train/confirm partitions"
+        ),
+    }, []
+
+
+def _precommit_receipt(
+    run: Mapping[str, Any],
+    *,
+    activation_prefix_sha256: str,
+) -> dict[str, Any]:
+    claim_id = str(run.get("execution_claim_id") or "")
+    run_id = str(run.get("search_run_id") or "")
+    commitment = hashlib.sha256(
+        (
+            "precommit-train-only-v1\0"
+            + activation_prefix_sha256
+            + "\0"
+            + claim_id
+            + "\0"
+            + run_id
+        ).encode("utf-8")
+    ).hexdigest()
+    return {
+        "schema_version": RECEIPT_SCHEMA_VERSION,
+        "execution_claim_id": claim_id,
+        "search_run_id": run_id,
+        "partition": "train",
+        "partition_method": PRECOMMIT_METHOD,
+        "confirm_modulus": None,
+        "confirm_bucket": None,
+        "commitment_sha256": commitment,
+    }
+
+
 def build_partition_receipts(
     search_runs: Sequence[Mapping[str, Any]],
     existing_receipts: Sequence[Mapping[str, Any]],
     *,
     secret: str | None,
+    key_commitment: Mapping[str, Any] | None = None,
     confirm_modulus: int = DEFAULT_CONFIRM_MODULUS,
     confirm_bucket: int = DEFAULT_CONFIRM_BUCKET,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -81,7 +193,18 @@ def build_partition_receipts(
             continue
         receipts[claim_id] = dict(row)
 
-    for run in search_runs:
+    activation_count = (
+        key_commitment.get("activation_run_count")
+        if key_commitment
+        else None
+    )
+    activation_prefix = (
+        str(key_commitment.get("activation_prefix_sha256") or "")
+        if key_commitment
+        else ""
+    )
+
+    for index, run in enumerate(search_runs):
         claim_id = trusted_claim_id(run)
         if not claim_id or claim_id in receipts:
             continue
@@ -91,6 +214,26 @@ def build_partition_receipts(
                 {
                     "reason": "trusted_run_missing_run_id",
                     "execution_claim_id": claim_id,
+                }
+            )
+            continue
+
+        if (
+            isinstance(activation_count, int)
+            and index < activation_count
+        ):
+            receipts[claim_id] = _precommit_receipt(
+                run,
+                activation_prefix_sha256=activation_prefix,
+            )
+            continue
+
+        if key_commitment is None:
+            issues.append(
+                {
+                    "reason": "split_key_commitment_unavailable",
+                    "execution_claim_id": claim_id,
+                    "search_run_id": run_id,
                 }
             )
             continue
