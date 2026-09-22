@@ -82,6 +82,8 @@ STEPS = (
     ['tools/ti_activation_validate.py'],
     ['tools/ti_activation_response_learning.py'],
     ['tools/ti_activation_response_validate.py'],
+    ['tools/ti_restart_readiness.py'],
+    ['tools/ti_restart_readiness_validate.py'],
     ['tools/ti_validate.py'],
 )
 
