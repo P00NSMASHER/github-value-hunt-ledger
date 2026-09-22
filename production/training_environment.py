@@ -91,6 +91,15 @@ def _run_time(run: Mapping[str, Any]) -> str:
     return str(run.get("timestamp") or run.get("date") or "")
 
 
+def _outcome_time(outcome: Mapping[str, Any]) -> str:
+    return str(
+        outcome.get("timestamp")
+        or outcome.get("observed_at")
+        or outcome.get("date")
+        or ""
+    )
+
+
 def _date_key(value: str | None) -> str:
     if not value:
         return ""
@@ -104,12 +113,35 @@ def _date_key(value: str | None) -> str:
     return parsed.astimezone(timezone.utc).isoformat()
 
 
-def _not_after(run: Mapping[str, Any], outcome: Mapping[str, Any]) -> bool:
-    run_time = _date_key(_run_time(run))
-    out_time = _date_key(str(outcome.get("date") or ""))
+def _not_after(
+    run: Mapping[str, Any],
+    outcome: Mapping[str, Any],
+    *,
+    direct_origin: bool = False,
+) -> bool:
+    """Prevent future information from crediting an earlier training episode.
+
+    Direct origins are explicit provenance and may share a date with a
+    date-only outcome. Indirect support requires strict temporal precedence
+    when the outcome has only day precision, because same-day ordering is
+    otherwise unknowable.
+    """
+    run_raw = _run_time(run)
+    outcome_raw = _outcome_time(outcome)
+    if not run_raw or not outcome_raw:
+        return direct_origin
+
+    run_time = _date_key(run_raw)
+    out_time = _date_key(outcome_raw)
     if not run_time or not out_time:
-        return True
-    return run_time[:10] <= out_time[:10]
+        return direct_origin
+
+    outcome_has_clock = "T" in outcome_raw
+    if outcome_has_clock:
+        return run_time <= out_time
+    if direct_origin:
+        return run_time[:10] <= out_time[:10]
+    return run_time[:10] < out_time[:10]
 
 
 def partition_for_id(
@@ -464,6 +496,25 @@ def build_outcome_credit(
             outcome_split = next(iter(anchor_splits))
             credit_anchor_kind = "excluded_direct_origin_hash"
 
+        invalid_direct_ids = [
+            rid
+            for rid in direct_ids
+            if not _not_after(
+                runs_by_id[rid],
+                outcome,
+                direct_origin=True,
+            )
+        ]
+        if invalid_direct_ids:
+            excluded.append(
+                {
+                    "outcome_id": outcome_id,
+                    "reason": "direct_origin_after_outcome",
+                    "origin_run_ids": sorted(invalid_direct_ids),
+                }
+            )
+            continue
+
         allowed_splits = {outcome_split}
         candidates: list[dict[str, Any]] = []
         direct_set = {
@@ -475,7 +526,12 @@ def build_outcome_credit(
         for rid, run in runs_by_id.items():
             if splits[rid] not in allowed_splits:
                 continue
-            if not _not_after(run, outcome):
+            is_direct = rid in direct_set
+            if not _not_after(
+                run,
+                outcome,
+                direct_origin=is_direct,
+            ):
                 continue
             evidence = _path_evidence(
                 run,
