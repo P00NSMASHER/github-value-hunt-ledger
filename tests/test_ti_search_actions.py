@@ -379,6 +379,37 @@ if __name__ == '__main__':
                 text=True,
             )
 
+    def test_semantic_identity_payload_tamper_fails_validation(self):
+        candidate_path = self.root / "intelligence" / "hunt_candidates.jsonl"
+        original = candidate_path.read_text()
+        try:
+            rows = self.read("hunt_candidates.jsonl")
+            target = next(
+                row
+                for row in rows
+                if row.get("work_kind") in {
+                    "experiment_execution",
+                    "independent_verification",
+                }
+            )
+            target["work_identity_payload"]["next_action"] = "tampered action"
+            candidate_path.write_text(
+                "\n".join(json.dumps(row) for row in rows) + "\n"
+            )
+            result = subprocess.run(
+                [sys.executable, str(self.root / "tools" / "ti_allocator_validate.py")],
+                cwd=self.root,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(
+                "semantic work",
+                result.stdout + result.stderr,
+            )
+        finally:
+            candidate_path.write_text(original)
+
     def test_verification_uses_a_frozen_experiment_target(self):
         for c in self.candidates:
             if c['work_kind'] == 'independent_verification':
