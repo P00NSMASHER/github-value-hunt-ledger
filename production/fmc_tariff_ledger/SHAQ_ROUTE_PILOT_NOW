@@ -1,0 +1,4 @@
+pilot_id=shaq-route-pages-2026-09-22
+max_pages=40
+workers=2
+min_host_interval=0.50
