@@ -10,6 +10,7 @@ import re
 from dataclasses import asdict, dataclass
 from enum import Enum
 
+from freight.money import format_cents, format_dollars
 from freight.buyer_review_workflow import BuyerReviewBatch, verify_buyer_review_batch
 from freight.contracts import TruthManifest, canonical_hash
 from freight.engagement_state import EngagementResolution
@@ -298,7 +299,7 @@ def render_carrier_action_proposals_markdown(batch: CarrierActionProposalBatch) 
         f"- State: **{batch.state}**",
         f"- Claims: **{batch.claim_count}**",
         f"- Proposals: **{batch.proposal_count}**",
-        "- Total claim amount: **$" + format(batch.total_claim_cents / 100, ",.2f") + "**",
+        "- Total claim amount: **" + format_dollars(batch.total_claim_cents) + "**",
         f"- Proposal batch hash: `{batch.batch_hash}`",
         "",
         "Proposals are grouped by carrier, customer/payee and currency.",
