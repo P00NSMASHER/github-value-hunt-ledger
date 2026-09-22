@@ -18,6 +18,7 @@ PRES=load_jsonl("worker_presence_state.jsonl")
 PRIMARY=load_jsonl("dispatch_claim_packets.jsonl")
 STEALS=load_jsonl("work_steal_claim_packets.jsonl") if (INTEL/"work_steal_claim_packets.jsonl").exists() else []
 STATE=load_jsonl("execution_state.jsonl")
+CLAIM_HISTORY=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
 HISTORY=load_jsonl("activation_history.jsonl") if (INTEL/"activation_history.jsonl").exists() else []
 
 scoreboard=(ROOT/"benchmark"/"SCOREBOARD.md").read_text(encoding="utf-8")
@@ -36,6 +37,7 @@ RUNTIME_GATE=evaluate_runtime_activation_gate(
     RUNTIME_POL,
     PREACTIVATION_READINESS,
     MEASUREMENT_PACKETS,
+    CLAIM_HISTORY,
 )
 
 def parse_ts(v):
@@ -155,7 +157,8 @@ for wid in sorted(pres_by_worker):
       "dispatch_ticket_id":packet["dispatch_ticket_id"],
       "dispatch_generation_id":packet["dispatch_generation_id"],
       "slot_id":packet["slot_id"],
-      "assignment_id":packet["assignment_id"]
+      "assignment_id":packet["assignment_id"],
+      "runtime_approval_id":RUNTIME_GATE.get("approval_id")
     }
     aid=activation_id(payload)
     row={
@@ -166,7 +169,8 @@ for wid in sorted(pres_by_worker):
       "presence_expires_at":ps.get("presence_expires_at"),
       "issued_at_activation":fmt(now),
       "expires_at":fmt(expires),
-      "activation_status":"CURRENT"
+      "activation_status":"CURRENT",
+      "runtime_approval_id":RUNTIME_GATE.get("approval_id")
     }
     current.append(row)
     used_slots.add(packet["slot_id"])
@@ -219,7 +223,14 @@ metrics={
   "runtime_gate_errors":RUNTIME_GATE.get("errors") or [],
   "runtime_approval_id":RUNTIME_GATE.get("approval_id"),
   "runtime_maximum_current_activations":int(RUNTIME_GATE.get("maximum_current_activations") or 0),
-  "runtime_allowed_seed_ids":RUNTIME_GATE.get("allowed_seed_ids") or []
+  "runtime_maximum_total_claims":int(RUNTIME_GATE.get("maximum_total_claims") or 0),
+  "runtime_claims_consumed":int(RUNTIME_GATE.get("claims_consumed") or 0),
+  "runtime_remaining_claim_budget":int(RUNTIME_GATE.get("remaining_claim_budget") or 0),
+  "runtime_active_claims":int(RUNTIME_GATE.get("active_claims") or 0),
+  "runtime_allowed_seed_ids":RUNTIME_GATE.get("allowed_seed_ids") or [],
+  "runtime_approved_packet_ids":RUNTIME_GATE.get("approved_packet_ids") or [],
+  "runtime_approved_seed_ids":RUNTIME_GATE.get("approved_seed_ids") or [],
+  "runtime_claimed_seed_ids":RUNTIME_GATE.get("claimed_seed_ids") or []
 }
 (INTEL/"activation_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
 
