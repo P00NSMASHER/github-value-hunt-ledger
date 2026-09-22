@@ -893,6 +893,20 @@
         "null"
       ],
       "minimum": 0
+    },
+    "learning_measurement_packet_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^LMP:[a-f0-9]{16}$"
+    },
+    "learning_measurement_packet_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
     }
   },
   "additionalProperties": true,
@@ -1203,6 +1217,34 @@
           "activation_id",
           "activation_generation_id"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "assignment_work_kind": {
+            "const": "learning_measurement"
+          }
+        },
+        "required": [
+          "assignment_work_kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "learning_measurement_packet_id",
+          "learning_measurement_packet_sha256"
+        ],
+        "properties": {
+          "learning_measurement_packet_id": {
+            "type": "string",
+            "pattern": "^LMP:[a-f0-9]{16}$"
+          },
+          "learning_measurement_packet_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
       }
     }
   ]
