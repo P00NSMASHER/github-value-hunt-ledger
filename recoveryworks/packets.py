@@ -26,6 +26,7 @@ class RecoveryPacket:
     claim_evidence: Mapping[str, Any] | None
     recovery_evidence: Mapping[str, Any] | None
     settlement_total_cents: int | None
+    fee_assessment: Mapping[str, Any] | None
     recovered_cents: int
     fee_cents: int
     packet_hash: str
@@ -41,6 +42,25 @@ def _evidence_body(ref) -> dict[str, Any] | None:
         "kind": ref.kind,
         "verified": ref.verified,
         "proof_hash": ref.proof_hash,
+    }
+
+
+def _fee_assessment_body(record: LedgerRecord) -> dict[str, Any] | None:
+    assessment = record.fee_assessment
+    if assessment is None:
+        return None
+    agreement = assessment.agreement
+    return {
+        "agreement_id": agreement.agreement_id,
+        "agreement_proof_hash": agreement.proof_hash,
+        "fee_assessment_proof_hash": assessment.proof_hash,
+        "fee_bps": agreement.fee_bps,
+        "rounding": agreement.rounding,
+        "currency": agreement.currency,
+        "source_hash": agreement.source_hash,
+        "locator": agreement.locator,
+        "recovered_cents": assessment.recovered_cents,
+        "fee_cents": assessment.fee_cents,
     }
 
 
@@ -90,6 +110,7 @@ def _packet_body(record: LedgerRecord) -> dict[str, Any]:
         "claim_evidence": _evidence_body(record.claim_evidence),
         "recovery_evidence": _evidence_body(record.recovery_evidence),
         "settlement_total_cents": record.settlement_total_cents,
+        "fee_assessment": _fee_assessment_body(record),
         "recovered_cents": record.recovered_cents,
         "fee_cents": record.fee_cents,
     }
@@ -115,6 +136,7 @@ def build_recovery_packet(record: LedgerRecord) -> RecoveryPacket:
         claim_evidence=body["claim_evidence"],
         recovery_evidence=body["recovery_evidence"],
         settlement_total_cents=body["settlement_total_cents"],
+        fee_assessment=body["fee_assessment"],
         recovered_cents=body["recovered_cents"],
         fee_cents=body["fee_cents"],
         packet_hash=packet_hash,
