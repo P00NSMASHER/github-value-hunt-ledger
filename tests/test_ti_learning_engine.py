@@ -107,6 +107,68 @@ class ValueMemoryTests(unittest.TestCase):
         observation = observed_search_reward(run)
         self.assertLess(observation.reward, 0)
 
+    def test_objective_conditioned_memory_separates_opposite_strategy_value(self):
+        episodes = [
+            {
+                "run_id": "RUN:obj-a",
+                "split": "train",
+                "state": {
+                    "search_objective_id": "OBJ:authority-lineage",
+                },
+                "action": {
+                    "strategy_id": "STRAT:shared",
+                    "query_family_id": "QF:shared",
+                    "search_move_ids": ["symbol-search"],
+                },
+                "reward": {
+                    "training_reward": 0.8,
+                    "reward_stage": "technical_proxy",
+                    "downstream": {"outcome_ids": []},
+                },
+                "provenance": {
+                    "timestamp": "2026-09-20T00:00:00Z",
+                },
+            },
+            {
+                "run_id": "RUN:obj-b",
+                "split": "train",
+                "state": {
+                    "search_objective_id": "OBJ:wildcard-discovery",
+                },
+                "action": {
+                    "strategy_id": "STRAT:shared",
+                    "query_family_id": "QF:shared",
+                    "search_move_ids": ["symbol-search"],
+                },
+                "reward": {
+                    "training_reward": -0.8,
+                    "reward_stage": "technical_proxy",
+                    "downstream": {"outcome_ids": []},
+                },
+                "provenance": {
+                    "timestamp": "2026-09-21T00:00:00Z",
+                },
+            },
+        ]
+        memory, observations = learn_training_episode_memory(
+            episodes,
+            config=ValueConfig(alpha=1.0, epsilon=0.0),
+        )
+        authority_key = contextual_memory_key(
+            "STRAT:shared",
+            "OBJ:authority-lineage",
+        )
+        wildcard_key = contextual_memory_key(
+            "STRAT:shared",
+            "OBJ:wildcard-discovery",
+        )
+        self.assertEqual(memory.get(authority_key).q_value, 0.8)
+        self.assertEqual(memory.get(wildcard_key).q_value, -0.8)
+        self.assertEqual(memory.get(authority_key).visits, 1)
+        self.assertEqual(memory.get(wildcard_key).visits, 1)
+        self.assertIn(authority_key, observations[0]["updated_memory_keys"])
+        self.assertIn(wildcard_key, observations[1]["updated_memory_keys"])
+
     def test_learning_updates_strategy_and_query_family(self):
         runs = [
             {
