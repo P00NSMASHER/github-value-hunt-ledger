@@ -209,6 +209,19 @@ def resolve_contract_rate(
             "contract_candidates": [_serialize_rate(row) for row in rows],
             "benchmark_context": {},
         }
+
+    rate_bases = {
+        " ".join(str(row["rate_basis"] or "").lower().split())
+        for row in rows
+    }
+    if len(rate_bases) > 1:
+        return {
+            "status": "AMBIGUOUS_CONTRACT_RATE_BASIS",
+            "distinct_rate_bases": sorted(rate_bases),
+            "contract_candidates": [_serialize_rate(row) for row in rows],
+            "benchmark_context": {},
+        }
+
     if len(values) > 1:
         return {
             "status": "AMBIGUOUS_CONTRACT_RATE",
