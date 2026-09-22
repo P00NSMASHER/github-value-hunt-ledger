@@ -673,6 +673,11 @@ class SevenFigureReadinessPackage:
     build_attestation_hash: str
     public_record_hash: str
     journal_head_hash: str
+    hostile_packet: HostileExaminationPacket
+    artifact_replay: CaseArtifactReplayReceipt
+    calculation_replay: CalculationReplayReceipt
+    proof_seal: ProofSeal
+    hostile_packet_verification: HostilePacketVerificationEvidence
     external_signature: ExternalSignatureEvidence
     external_timestamp: ExternalTimestampEvidence
     object_lock_receipts: tuple[ObjectLockVerificationReceipt, ...]
@@ -712,6 +717,13 @@ class SevenFigureReadinessPackage:
             "build_attestation_hash": self.build_attestation_hash,
             "public_record_hash": self.public_record_hash,
             "journal_head_hash": self.journal_head_hash,
+            "hostile_packet": asdict(self.hostile_packet),
+            "artifact_replay": asdict(self.artifact_replay),
+            "calculation_replay": asdict(self.calculation_replay),
+            "proof_seal": asdict(self.proof_seal),
+            "hostile_packet_verification": asdict(
+                self.hostile_packet_verification
+            ),
             "external_signature": asdict(self.external_signature),
             "external_timestamp": asdict(self.external_timestamp),
             "object_lock_receipts": [
@@ -742,6 +754,11 @@ def build_seven_figure_readiness(
     external_timestamp: ExternalTimestampEvidence,
     object_lock_receipts: Iterable[ObjectLockVerificationReceipt],
     *,
+    hostile_packet: HostileExaminationPacket,
+    artifact_replay: CaseArtifactReplayReceipt,
+    calculation_replay: CalculationReplayReceipt,
+    proof_seal: ProofSeal,
+    hostile_packet_verification: HostilePacketVerificationEvidence,
     journal_head_hash: str,
     evaluated_at: str,
     evaluated_by: str,
@@ -750,6 +767,35 @@ def build_seven_figure_readiness(
     verify_case_bundle(bundle)
     if bundle.finding.potential_recovery_cents < SEVEN_FIGURE_CENTS:
         raise ValueError("seven-figure readiness gate only applies to seven-figure findings")
+
+    if hostile_packet_hash(packet) != hostile_packet_hash(hostile_packet):
+        raise ValueError("hostile packet argument mismatch")
+    verify_case_artifact_replay(artifact_replay, bundle)
+    verify_calculation_replay(calculation_replay, bundle, artifact_replay)
+    if hostile_packet.artifact_replay_receipt_hash != artifact_replay.receipt_hash:
+        raise ValueError("hostile packet artifact replay receipt mismatch")
+    if (
+        hostile_packet.calculation_replay_receipt_hash
+        != calculation_replay.receipt_hash
+    ):
+        raise ValueError("hostile packet calculation replay receipt mismatch")
+    if hostile_packet.proof_seal_id != proof_seal.seal_id:
+        raise ValueError("hostile packet proof seal id mismatch")
+    if hostile_packet.proof_seal_signature_hex != proof_seal.signature_hex:
+        raise ValueError("hostile packet proof seal signature mismatch")
+    if hostile_packet.journal_head_hash != journal_head_hash:
+        raise ValueError("hostile packet journal head mismatch")
+    if proof_seal.case_bundle_hash != bundle.bundle_hash:
+        raise ValueError("proof seal case bundle mismatch")
+    if proof_seal.finding_proof_hash != bundle.finding.proof_hash:
+        raise ValueError("proof seal finding proof mismatch")
+    if proof_seal.journal_head_hash != journal_head_hash:
+        raise ValueError("proof seal journal head mismatch")
+    verify_hostile_packet_provider_evidence(
+        hostile_packet_verification,
+        hostile_packet,
+        proof_seal,
+    )
 
     verify_source_retention(retention, bundle, require_immutable=True)
     verify_case_completeness(completeness, bundle)
@@ -790,6 +836,17 @@ def build_seven_figure_readiness(
     evaluated_at = _iso("evaluated_at", evaluated_at)
     evaluated_by = _required("evaluated_by", evaluated_by)
     latest_component = max(
+        _dt(
+            "hostile_packet_verification.verified_at",
+            hostile_packet_verification.verified_at,
+        ),
+        _dt("artifact_replay.replayed_at", artifact_replay.replayed_at),
+        _dt(
+            "calculation_replay.reproduced_at",
+            calculation_replay.reproduced_at,
+        ),
+        _dt("proof_seal.sealed_at", proof_seal.sealed_at),
+        _dt("hostile_packet.assembled_at", hostile_packet.assembled_at),
         _dt("signature.verified_at", external_signature.verified_at),
         _dt("timestamp.verified_at", external_timestamp.verified_at),
         *(
@@ -812,6 +869,11 @@ def build_seven_figure_readiness(
         "build_attestation_hash": build.attestation_hash,
         "public_record_hash": public_record.record_hash,
         "journal_head_hash": _required("journal_head_hash", journal_head_hash),
+        "hostile_packet": asdict(hostile_packet),
+        "artifact_replay": asdict(artifact_replay),
+        "calculation_replay": asdict(calculation_replay),
+        "proof_seal": asdict(proof_seal),
+        "hostile_packet_verification": asdict(hostile_packet_verification),
         "external_signature": asdict(external_signature),
         "external_timestamp": asdict(external_timestamp),
         "object_lock_receipts": [asdict(item) for item in receipt_tuple],
@@ -829,6 +891,11 @@ def build_seven_figure_readiness(
         build_attestation_hash=build.attestation_hash,
         public_record_hash=public_record.record_hash,
         journal_head_hash=journal_head_hash,
+        hostile_packet=hostile_packet,
+        artifact_replay=artifact_replay,
+        calculation_replay=calculation_replay,
+        proof_seal=proof_seal,
+        hostile_packet_verification=hostile_packet_verification,
         external_signature=external_signature,
         external_timestamp=external_timestamp,
         object_lock_receipts=receipt_tuple,
