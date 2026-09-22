@@ -370,6 +370,7 @@ def compile_state(
         "search_runs": search_runs,
         "outcomes": outcomes,
         "failures": [raw for raw, _assessment in failure_rows],
+        "split_receipts": dict(sorted((split_receipts or {}).items())),
     }
     source_snapshot_sha256 = hashlib.sha256(
         json.dumps(
