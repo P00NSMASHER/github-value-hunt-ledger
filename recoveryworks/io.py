@@ -71,7 +71,8 @@ def observation_from_payload(value: Any) -> RecoveryObservation:
     )
 
 
-def run_scan_payload(payload: Any) -> dict[str, Any]:
+def execute_scan_payload(payload: Any) -> tuple[dict[str, Any], RecoveryLedger]:
+    """Run a frozen scan and return both the report and its durable ledger object."""
     root = _mapping(payload, "payload")
     if root.get("schema") != 1:
         raise ValueError("unsupported payload schema")
@@ -125,13 +126,20 @@ def run_scan_payload(payload: Any) -> dict[str, Any]:
         "submission_ready": submission_ready(packet),
     } for packet in case_packets]
 
-    return {
+    result = {
         "schema": 1,
         "scan_id": manifest.scan_id,
         "client_id": manifest.client_id,
         "manifest_hash": manifest.manifest_hash,
         "batch_hash": batch.batch_hash,
         "ledger_snapshot_hash": ledger.snapshot_hash,
+        "audit_head": ledger.audit_head,
         "portfolio": portfolio,
         "findings": findings,
     }
+    return result, ledger
+
+
+def run_scan_payload(payload: Any) -> dict[str, Any]:
+    result, _ = execute_scan_payload(payload)
+    return result
