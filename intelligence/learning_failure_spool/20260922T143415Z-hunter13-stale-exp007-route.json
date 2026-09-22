@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "failure_id": "FAIL:20260922T143415Z:HUNTER-13:stale-exp007-route",
+  "run_id": "RUN:20260922T143415Z:hunter13:exp007-stale-assignment-preflight",
+  "hunter_id": "HUNTER-13",
+  "target_type": "workflow",
+  "target_id": "EXP-007 central-state-to-allocation reconciliation",
+  "failure_class": "false_positive",
+  "observation": "Allocator generated an EXP-007 verification assignment whose stated next actions are already contradicted/completed by canonical search_runs.jsonl evidence.",
+  "reproduction_steps": [
+    "Confirm the three prior HUNTER-13 EXP-007 run IDs are present in intelligence/search_runs.jsonl.",
+    "Read current EXPERIMENTS.md / SEARCH_QUEUE.md / HUNT_PLAN.md and observe that they still request the falsified entry.scan_event repair and already-executed Opentrons kill/restart work."
+  ],
+  "evidence_refs": [
+    "referrals/hunt13-r28-2026-09-22-exp007-stale-assignment-preflight.md"
+  ],
+  "proposed_regression_test": "Generation must reject or supersede an assignment when canonical prior runs already satisfy or falsify its exact next-action fingerprint; EXP-007 should not reissue entry.scan_event repair after the LTQ-v66 repair run is canonical.",
+  "sensitive_material_involved": false,
+  "benchmark_contaminated": false,
+  "status": "SUBMITTED",
+  "notes": "Coordination defect caused duplicate-work risk."
+}
