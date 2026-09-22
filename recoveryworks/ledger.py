@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any, Mapping
 
-from .models import CaseState, FindingState, RecoveryFinding, canonical_hash
+from .models import CaseState, EvidenceRef, FindingState, RecoveryFinding, canonical_hash
 from .policies import assert_claim_authorizable
 
 
@@ -17,9 +17,34 @@ class LedgerRecord:
     reviewer_id: str | None = None
     review_note: str | None = None
     authorization_id: str | None = None
+    claim_evidence: EvidenceRef | None = None
+    recovery_evidence: EvidenceRef | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
     updated_at: str | None = None
+
+    def __post_init__(self) -> None:
+        if type(self.reviewer_approved) is not bool:
+            raise ValueError("reviewer_approved must be boolean")
+        if type(self.recovered_cents) is not int or self.recovered_cents < 0:
+            raise ValueError("recovered_cents must be non-negative integer cents")
+        if type(self.fee_cents) is not int or not 0 <= self.fee_cents <= self.recovered_cents:
+            raise ValueError("fee_cents must be between zero and recovered_cents")
+
+        controlled = {CaseState.AUTHORIZED, CaseState.CLAIMED, CaseState.RECOVERED}
+        if self.case_state in controlled:
+            if not self.reviewer_approved or not self.authorization_id:
+                raise ValueError("authorized/claimed/recovered records require review and authorization")
+        if self.case_state in {CaseState.CLAIMED, CaseState.RECOVERED}:
+            if self.claim_evidence is None or not self.claim_evidence.verified:
+                raise ValueError("claimed/recovered records require verified claim evidence")
+        if self.case_state is CaseState.RECOVERED:
+            if self.recovered_cents <= 0:
+                raise ValueError("recovered records require positive recovered cents")
+            if self.recovery_evidence is None or not self.recovery_evidence.verified:
+                raise ValueError("recovered records require verified recovery evidence")
+        elif self.recovered_cents or self.fee_cents or self.recovery_evidence is not None:
+            raise ValueError("recovery amounts/evidence require RECOVERED state")
 
     @property
     def record_hash(self) -> str:
@@ -170,21 +195,63 @@ class RecoveryLedger:
         )
         return updated
 
-    def mark_claimed(self, finding_id: str) -> LedgerRecord:
+    def mark_claimed(self, finding_id: str, claim_evidence: EvidenceRef) -> LedgerRecord:
+        if not isinstance(claim_evidence, EvidenceRef) or not claim_evidence.verified:
+            raise ValueError("claim action requires verified submission evidence")
         record = self.get(finding_id)
+        if record.case_state is CaseState.CLAIMED:
+            if (
+                record.claim_evidence is not None
+                and record.claim_evidence.proof_hash == claim_evidence.proof_hash
+            ):
+                return record
+            raise ValueError("case is already claimed with different evidence")
         if record.case_state is not CaseState.AUTHORIZED or not record.authorization_id:
             raise ValueError("claim action requires explicit authorization")
-        updated = replace(record, case_state=CaseState.CLAIMED, updated_at=self._now())
+        updated = replace(
+            record,
+            case_state=CaseState.CLAIMED,
+            claim_evidence=claim_evidence,
+            updated_at=self._now(),
+        )
         self._records[finding_id] = updated
-        self._append_event(record=updated, action="CLAIMED", prior_state=record.case_state)
+        self._append_event(
+            record=updated,
+            action="CLAIMED",
+            prior_state=record.case_state,
+            metadata={
+                "evidence_id": claim_evidence.evidence_id,
+                "evidence_proof_hash": claim_evidence.proof_hash,
+                "source_hash": claim_evidence.source_hash,
+                "locator": claim_evidence.locator,
+            },
+        )
         return updated
 
-    def mark_recovered(self, finding_id: str, recovered_cents: int, fee_cents: int = 0) -> LedgerRecord:
+    def mark_recovered(
+        self,
+        finding_id: str,
+        recovered_cents: int,
+        fee_cents: int = 0,
+        *,
+        recovery_evidence: EvidenceRef,
+    ) -> LedgerRecord:
+        if not isinstance(recovery_evidence, EvidenceRef) or not recovery_evidence.verified:
+            raise ValueError("recovery requires verified settlement/payment evidence")
         record = self.get(finding_id)
+        if record.case_state is CaseState.RECOVERED:
+            if (
+                record.recovered_cents == recovered_cents
+                and record.fee_cents == fee_cents
+                and record.recovery_evidence is not None
+                and record.recovery_evidence.proof_hash == recovery_evidence.proof_hash
+            ):
+                return record
+            raise ValueError("case is already recovered with different outcome evidence")
         if record.case_state is not CaseState.CLAIMED:
             raise ValueError("only CLAIMED cases may be marked recovered")
-        if type(recovered_cents) is not int or recovered_cents < 0:
-            raise ValueError("recovered_cents must be non-negative integer cents")
+        if type(recovered_cents) is not int or recovered_cents <= 0:
+            raise ValueError("recovered_cents must be positive integer cents")
         if type(fee_cents) is not int or fee_cents < 0 or fee_cents > recovered_cents:
             raise ValueError("fee_cents must be between zero and recovered_cents")
         if recovered_cents > record.finding.potential_recovery_cents:
@@ -192,6 +259,7 @@ class RecoveryLedger:
         updated = replace(
             record,
             case_state=CaseState.RECOVERED,
+            recovery_evidence=recovery_evidence,
             recovered_cents=recovered_cents,
             fee_cents=fee_cents,
             updated_at=self._now(),
@@ -201,7 +269,14 @@ class RecoveryLedger:
             record=updated,
             action="RECOVERED",
             prior_state=record.case_state,
-            metadata={"recovered_cents": recovered_cents, "fee_cents": fee_cents},
+            metadata={
+                "recovered_cents": recovered_cents,
+                "fee_cents": fee_cents,
+                "evidence_id": recovery_evidence.evidence_id,
+                "evidence_proof_hash": recovery_evidence.proof_hash,
+                "source_hash": recovery_evidence.source_hash,
+                "locator": recovery_evidence.locator,
+            },
         )
         return updated
 
