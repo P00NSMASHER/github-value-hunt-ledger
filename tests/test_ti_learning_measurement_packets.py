@@ -50,6 +50,12 @@ def seed(
         "seed_id": seed_id,
         "seed_type": seed_type,
         "work_action": "search",
+        "measurement_contract_version": "phase_blind_v1",
+        "query_recipe_id": "test-transfer",
+        "query_anchors": ["alpha", "beta"],
+        "next_action": "Run the bounded test transfer.",
+        "action_gate": "Use only the named target-domain transfer.",
+        "required_signatures": ["effective rule version", "authority provenance"],
         "strategy_id": strategy_id,
         "search_objective_id": "OBJ:test",
         "capability_ids": [],
@@ -147,6 +153,21 @@ class LearningMeasurementPacketTests(unittest.TestCase):
         )
         self.assertTrue(
             packet["partition_unknown_until_ingestion"]
+        )
+        frozen = packet["seed"]
+        self.assertEqual(
+            frozen["measurement_contract_version"],
+            "phase_blind_v1",
+        )
+        self.assertEqual(frozen["query_recipe_id"], "test-transfer")
+        self.assertEqual(frozen["query_anchors"], ["alpha", "beta"])
+        self.assertEqual(
+            frozen["next_action"],
+            "Run the bounded test transfer.",
+        )
+        self.assertEqual(
+            frozen["required_signatures"],
+            ["effective rule version", "authority provenance"],
         )
         self.assertEqual(
             validate_measurement_packets(bundle),
