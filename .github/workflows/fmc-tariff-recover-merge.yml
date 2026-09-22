@@ -18,7 +18,7 @@ on:
       retention_days:
         description: Retention for recovered metadata artifacts
         required: true
-        default: "7"
+        default: "90"
         type: string
       copy_raw_evidence:
         description: Duplicate raw shard artifacts into the recovery run
