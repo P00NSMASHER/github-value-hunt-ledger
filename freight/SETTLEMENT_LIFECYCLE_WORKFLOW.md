@@ -15,10 +15,10 @@ The workflow is bound to an existing buyer/business-unit `SettlementStore`.
 2. Preflight immutable replay conflicts, source-hash reuse, counter/original-event references, currency, event chronology, and processing-time chronology.
 3. Ingest settlement events.
 4. Run safe exact auto-allocation for each settlement event.
-5. Generate Settlement Allocation Review cases for any event that remains ambiguous.
-6. Ingest counter-events.
-7. Run safe auto-reversal for each counter-event.
-8. Generate Counter/Reversal Review cases for any ambiguous return.
+5. Ingest counter-events.
+6. Run safe auto-reversal for each counter-event.
+7. Re-evaluate only the safe automatic cases whose capacity changed inside the package.
+8. Generate Settlement Allocation Review and Counter/Reversal Review cases from the final transaction snapshot.
 
 The workflow never auto-resolves a human-review case.
 
@@ -37,7 +37,7 @@ These rules are enforced twice:
 
 Equivalent timezone-offset inputs normalize to the same UTC timestamp for replay/idempotency checks.
 
-This does not claim a global multi-row database transaction across the entire lifecycle. Each underlying store write remains independently transactional. The preflight boundary is designed to eliminate predictable package-level partial writes before processing begins.
+Package persistence is additionally protected by the atomic transaction described below. Advisory preflight remains useful for clear early errors, while the transaction is the authoritative all-or-nothing write boundary.
 
 ## Review state
 
@@ -87,5 +87,7 @@ A final automatic pass is intentional:
 
 1. counters can restore claim capacity, making a settlement that initially required review safely auto-allocatable;
 2. that newly created allocation can make a counter safely auto-reversible.
+
+A counter never restores capacity to the settlement event it returns. Returned funds are removed from that event's allocatable capacity immediately; reversals restore claim capacity while preserving the event's reduced net-funds ceiling.
 
 After those passes, remaining review cases are derived from the transaction's final snapshot. Any later concurrent store change is still caught by the existing proof-bound review workflows when a human tries to apply the decision.
