@@ -767,6 +767,42 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         "SELECT COUNT(*) FROM mrf_files WHERE parse_status LIKE 'unresolved%'"
     ).fetchone()[0]
     stats["errors"] = conn.execute("SELECT COUNT(*) FROM ingestion_errors").fetchone()[0]
+    stats["known_content_bytes"] = conn.execute(
+        "SELECT COALESCE(SUM(content_length),0) FROM mrf_files WHERE content_length IS NOT NULL"
+    ).fetchone()[0]
+    stats["file_types"] = [
+        {"file_type": row[0], "rows": row[1], "unique_urls": row[2]}
+        for row in conn.execute(
+            """SELECT file_type,COUNT(*),COUNT(DISTINCT file_url)
+               FROM mrf_files GROUP BY file_type ORDER BY COUNT(*) DESC"""
+        )
+    ]
+    stats["by_payer"] = [
+        {"payer_name": row[0], "rows": row[1], "unique_urls": row[2],
+         "known_content_bytes": row[3]}
+        for row in conn.execute(
+            """SELECT payer_name,COUNT(*),COUNT(DISTINCT file_url),
+                      COALESCE(SUM(content_length),0)
+               FROM mrf_files GROUP BY payer_name ORDER BY COUNT(*) DESC"""
+        )
+    ]
+    stats["by_source"] = [
+        {"source_key": row[0], "payer_name": row[1], "rows": row[2],
+         "unique_urls": row[3], "historical": bool(row[4])}
+        for row in conn.execute(
+            """SELECT source_key,payer_name,COUNT(*),COUNT(DISTINCT file_url),MAX(historical)
+               FROM mrf_files
+               GROUP BY source_key,payer_name ORDER BY COUNT(*) DESC"""
+        )
+    ]
+    stats["error_types"] = [
+        {"stage": row[0], "error_type": row[1], "count": row[2]}
+        for row in conn.execute(
+            """SELECT stage,error_type,COUNT(*)
+               FROM ingestion_errors GROUP BY stage,error_type
+               ORDER BY COUNT(*) DESC"""
+        )
+    ]
     stats["finished_at"] = utcnow()
 
     conn.execute(
