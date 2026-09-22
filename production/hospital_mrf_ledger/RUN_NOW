@@ -1,4 +1,4 @@
-run_id=hospital-mrf-seed-2026-09-22
+run_id=hospital-mrf-national-registry-2026-09-22
 fetch_mrfs=true
-max_mrfs=6
+max_mrfs=2
 max_mrf_bytes=250000000

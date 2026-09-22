@@ -93,6 +93,12 @@ jobs:
             $FETCH \
             --max-mrfs "$MAX_MRFS" \
             --max-mrf-bytes "$MAX_BYTES"
+          python import_registries.py \
+            --db output/hospital_mrf.sqlite \
+            --out output \
+            --report output/registry_import.json \
+            > /dev/null
+          python -m json.tool output/registry_import.json > /dev/null
           python quality.py --db output/hospital_mrf.sqlite --json > output/quality.json
           python -m json.tool output/quality.json
           python - <<'PY'
@@ -108,6 +114,16 @@ jobs:
               "mrf_snapshots": con.execute("SELECT COUNT(*) FROM mrf_snapshots").fetchone()[0],
               "hospital_identities": con.execute("SELECT COUNT(*) FROM hospital_identities").fetchone()[0],
               "errors": con.execute("SELECT COUNT(*) FROM ingestion_errors").fetchone()[0],
+              "registry_sources": con.execute("SELECT COUNT(*) FROM registry_sources").fetchone()[0],
+              "national_hospitals": con.execute("SELECT COUNT(*) FROM national_hospital_registry").fetchone()[0],
+              "national_unique_mrf_urls": con.execute(
+                  "SELECT COUNT(DISTINCT mrf_url) FROM national_hospital_registry WHERE mrf_url IS NOT NULL AND mrf_url<>''"
+              ).fetchone()[0],
+              "historical_registry_rows": con.execute("SELECT COUNT(*) FROM historical_hospital_mrf_registry").fetchone()[0],
+              "historical_unique_mrf_urls": con.execute(
+                  "SELECT COUNT(DISTINCT machine_readable_url) FROM historical_hospital_mrf_registry WHERE machine_readable_url IS NOT NULL AND machine_readable_url<>''"
+              ).fetchone()[0],
+              "combined_discovery_rows": con.execute("SELECT COUNT(*) FROM hospital_discovery_evidence").fetchone()[0],
               "errors_by_stage": [
                   dict(row) for row in con.execute(
                       "SELECT stage, error_type, COUNT(*) count FROM ingestion_errors GROUP BY stage,error_type ORDER BY count DESC"
