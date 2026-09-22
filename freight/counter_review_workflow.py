@@ -16,6 +16,7 @@ import json
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 
+from freight.money import format_cents
 from freight.contracts import canonical_hash
 from freight.settlement_store import (
     ALREADY_REVERSED,
@@ -453,7 +454,7 @@ def render_counter_review_markdown(
         "",
         f"- Counter event: **{case.counter_id}**",
         f"- Original settlement event: **{case.original_event_id}**",
-        f"- Remaining return amount: **{case.currency} {case.counter_residual_cents / 100:,.2f}**",
+        f"- Remaining return amount: **{format_cents(case.currency, case.counter_residual_cents)}**",
         f"- Auto-reversal result: **{case.auto_review_reason}**",
         f"- Live allocation edges: **{case.live_allocation_count}**",
         f"- Review case hash: `{case.case_hash}`",
@@ -465,7 +466,7 @@ def render_counter_review_markdown(
     else:
         for candidate in case.candidates:
             lines.extend([
-                f"- **{candidate.allocation_id}** — live {case.currency} {candidate.live_cents / 100:,.2f}",
+                f"- **{candidate.allocation_id}** — live {format_cents(case.currency, candidate.live_cents)}",
                 f"  - Claim: {candidate.claim_id}",
                 f"  - Claim reference: {candidate.claim_reference}",
                 f"  - Allocation mode: {candidate.mode}",
@@ -482,7 +483,7 @@ def render_counter_review_markdown(
         lines.extend([
             "## Applied review",
             f"- Allocation: **{receipt.allocation_id}**",
-            f"- Reversed amount: **{case.currency} {receipt.amount_cents / 100:,.2f}**",
+            f"- Reversed amount: **{format_cents(case.currency, receipt.amount_cents)}**",
             f"- Reviewer role: **{receipt.reviewer_role}**",
             f"- Reviewed at: **{receipt.reviewed_at}**",
             f"- Rationale: {receipt.rationale}",
