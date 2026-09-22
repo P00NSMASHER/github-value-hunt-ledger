@@ -66,6 +66,11 @@ POLICIES: dict[Branch, BranchPolicy] = {
         "lease_recovery_reviewer",
         professional_review_note="Lease interpretation and CAM/operating-expense entitlement require qualified human review.",
     ),
+    Branch.PROCUREMENT: BranchPolicy(
+        Branch.PROCUREMENT,
+        RecoveryMode.OVERPAYMENT,
+        "procurement_contract_reviewer",
+    ),
 }
 
 
