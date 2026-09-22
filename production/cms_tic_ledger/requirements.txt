@@ -1,0 +1,5 @@
+requests>=2.32,<3
+beautifulsoup4>=4.12,<5
+ijson>=3.3,<4
+pyarrow>=17,<23
+duckdb>=1.1,<2
