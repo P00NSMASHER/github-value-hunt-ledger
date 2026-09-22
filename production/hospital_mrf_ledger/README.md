@@ -28,6 +28,23 @@ Input is a reviewed seed list of hospital/homepage or MRF-host domains. The craw
 
 A missing or inaccessible TXT file is coverage debt, not evidence that the hospital has no MRF.
 
+## National discovery registries
+
+The live crawler is supplemented by two pinned GitHub registries, kept as separate
+evidence classes rather than silently promoted to first-party observations:
+
+- **2026 current tracker** — `anthonyisnotadev/cms-hpt-tracker` pinned at
+  `27c08db25896d765845f9ff6827da7f96ee66b04`. The importer uses the public
+  compliance CSV plus CMS-roster-derived identity fields. It deliberately discards
+  phone values and does not import pointer contact names/emails.
+- **2022 historical registry** — `TPAFS/transparency-data` pinned at
+  `8baae985b3d08380305c93091ad815e4cf57b83f`. Its hospital MRF URL catalog is
+  preserved as historical discovery evidence with its original status/date fields.
+
+Direct `cms-hpt.txt` snapshots remain the strongest discovery evidence in this
+subsystem. Registry claims are useful for national coverage, gap-filling and
+historical comparison, but do not overwrite a contradictory direct observation.
+
 ## Evidence layers
 
 1. CMS schema authority receipt: exact CMS repo revision/path/blob SHA.
