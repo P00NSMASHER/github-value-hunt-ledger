@@ -155,3 +155,94 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 3/10
   - High-ticket potential: 8.5/10
 - Next action: Reimplement only the valuable detector concepts against an independently authored schema and synthetic holdout corpus, then compare incremental dollars-at-risk found over invoice-lens/dedupe baselines; do not copy the unlicensed code and do not market the repository's synthetic precision/recall or price-ranking figures as real-world accuracy.
+
+
+### Noone9029/Accounting-App — realized-recovery settlement and supplier-credit state machine
+- Repository: https://github.com/Noone9029/Accounting-App
+- Commit / revision: 90e0eaa4896a55c1c8cda1c4101f4ab1323a4a61
+- Date discovered: 2026-09-22
+- What actually works: Zero-star TypeScript/NestJS/Prisma accounting SaaS with a substantive AP exception and settlement layer, not merely invoice CRUD. Inspected code/tests implement purchase-order/bill/receipt matching, over-billed and pending-receipt exception states, tenant-scoped review records with no-posting side effects, purchase debit notes with immutable application/reversal rows and unapplied balances, supplier payments with unapplied credit, later application and reversal, supplier refunds sourced from either unapplied supplier payments or purchase debit notes, idempotent void/reversal behavior, supplier ledgers/statements, accounting journals, fiscal-period guards and extensive local/deployed proof artifacts.
+- Evidence of implementation: `apps/api/src/purchase-matching/purchase-matching.service.ts` and its ~22KB spec; `purchase-debit-notes/*` service and ~30KB rules spec; `supplier-payments/*` service and ~48KB rules spec; `supplier-refunds/*` service and ~14KB rules spec; README accounting rules; DEV-08 evidence showing actual local mutation/reversal sequences. Tests explicitly cover over-billing, review lifecycle, cross-tenant blocking, unapplied-credit exhaustion, repeated reversal blocking, posted-refund void blockers, refund void restoration, and repeated/idempotent actions.
+- Why it matters: Most recovery tools stop at “we found $X.” This supplies the missing realized-recovery state model: identified exception -> supplier credit/debit note -> application to open bill OR cash refund -> reversible/idempotent accounting evidence. That distinction is commercially important because contingency fees should be based on realized cash/credit, not merely estimated leakage.
+- Useful capability/workflow: `RecoveryCase -> CreditEntitlement -> SupplierCreditSource -> Allocation/Refund -> RealizedRecovery -> Reversal` can be clean-roomed or adapted into an AP Recovery ledger. The existing purchase-matching review object is also a strong template for human-only recovery adjudication.
+- Likely buyer: Controller, AP director, shared-services lead, procurement finance, recovery-audit firm.
+- Pain solved: Unapplied supplier credits, overpayments, debit balances and audit findings often remain “identified” without a reliable trail proving whether they were actually applied, refunded, reversed or double-counted.
+- Fastest monetization path: Managed AP-recovery engagement where imported findings are tracked through verified supplier credit/refund realization; charge contingency fee only on realized recoveries.
+- Paid-pilot concept: 90-day supplier-credit recovery pilot on AP history + current open credits. Deliver a case ledger with source finding, supplier evidence, outstanding credit, application/refund proof and recovered amount.
+- Estimated engineering time saved: 2-4 months for settlement/accounting state-machine design, idempotency/reversal logic and test cases.
+- License / reuse status: No public repository license detected at inspected revision; project-level user authorization says rights are available. Keep provenance explicit.
+- Important risks: Built as a broad accounting product rather than a recovery product; some proof is local/beta rather than production/customer-data evidence; recovery ingestion and supplier-contact workflows still need purpose-built controls.
+- Connections: Combine with `invoice-lens` for discovery, `erpocr_integration` for supplier statements, and ERP-native extracts for a complete detect -> prove -> realize loop.
+- Opportunity score: **9.6/10**.
+
+### wphamman/erpocr_integration — ERPNext supplier-statement reconciliation intake
+- Repository: https://github.com/wphamman/erpocr_integration
+- Commit / revision: a9c82c0ff02f580ff60ebf012797686ba91e977e
+- Date discovered: 2026-09-22
+- What actually works: Active two-star ERPNext/Frappe application that classifies uploaded PDFs, extracts supplier statements, matches supplier identities, reconciles statement transaction references to submitted Purchase Invoices, carries a 365-day brought-forward candidate window, prefers in-period candidates deterministically, amount-checks references, performs reverse checks for ERP invoices missing from statements, re-reconciles on new PI submission and exposes accountant review status.
+- Evidence of implementation: `erpocr_integration/tasks/reconcile.py`, `statement_api.py`, OCR Statement doctypes, `test_reconcile.py`, `test_statement_api.py`, and OCR Statement guide. Tests explicitly cover recycled invoice references, recurring same-ref/same-amount invoices, consumed-candidate re-reference, mixed date types, period-bounded reverse checks and enqueue-failure isolation.
+- Why it matters: Supplier statements are one of the best recovery evidence sources because they reveal open credits, unapplied balances, vendor-side invoices and timing differences that the buyer's AP ledger alone cannot show.
+- Useful capability/workflow: PDF supplier statement -> supplier entity match -> statement lines -> AP ledger cross-check -> missing/mismatched/not-on-statement review population.
+- Likely buyer: ERPNext users, AP teams, outsourced bookkeeping/shared services.
+- Pain solved: Manual supplier-statement reconciliation and hidden discrepancies across supplier vs buyer ledgers.
+- Fastest monetization path: Statement-reconciliation diagnostic layered onto AP Recovery; customer uploads statements plus ERP export.
+- Paid-pilot concept: Reconcile the top 25 suppliers' latest statements and produce a recovery queue for credits/mismatches/missing records.
+- Estimated engineering time saved: 4-8 weeks for ERPNext statement ingestion, reconciliation edge cases and review workflow.
+- License / reuse status: GPL-3.0.
+- Important risks: Current credit-only statement lines are treated generically as payments; supplier credit memos/refunds need a richer classifier before money can be called recoverable. Gemini/Drive dependencies may need replacement for a local-first deployment.
+- Connections: Feed discrepancies into the Accounting-App realized-recovery state machine; use Invoice Lens or a deterministic AP matcher to prove underlying invoice/PO/receipt cause.
+- Opportunity score: **8.8/10**.
+
+### ai-frankie/ap-close-engine — independent AP re-performance and control falsifier
+- Repository: https://github.com/ai-frankie/ap-close-engine
+- Commit / revision: db38c8476ccd21155a5dc161c5f36b9747e88e64
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Python AP close/control engine with PO-receipt-invoice matching, duplicate-payment detection, AP subledger-to-GL reconciliation, GRNI completeness, negative balance checks, vendor-statement reconciliation and an independent reviewer that recomputes truth from raw data and compares a prepared close workbook against it.
+- Evidence of implementation: `ap_match.py`, `ap_duplicates.py`, `ap_vendor_recon.py`, `ap_review.py`, `ap_controls.py`, `CONTROLS.md`, and 35 tests in `test_ap.py`. Tests pin planted duplicate recovery, price variance, GRNI, GL tie failures, manual/top-side AP-control JEs and reviewer detection of double-count/omission errors.
+- Why it matters: This is a compact independent falsifier. A recovery claim should survive a separately implemented re-performance path before entering a contingency-fee recovery queue.
+- Useful capability/workflow: raw AP/PO/receipt/payment/GL -> recomputed truth -> compare against prepared findings -> PASS/FAIL with diagnosis.
+- Likely buyer: Controllers, audit/recovery firms, finance transformation teams.
+- Pain solved: Self-confirming audit logic and spreadsheet-preparer errors.
+- Fastest monetization path: Use as an independent validation pass in paid AP diagnostics, not as the primary product.
+- Paid-pilot concept: Run the client's prepared AP recovery workbook through an independent recomputation and produce a falsification report before supplier contact.
+- Estimated engineering time saved: 2-4 weeks for an independent control/re-performance harness.
+- License / reuse status: No public license detected at inspected revision; project-level user authorization says rights are available. Core data is synthetic.
+- Important risks: Single-line PO/full-receipt assumptions, floats rather than Decimal, fixed schemas, synthetic validation only.
+- Connections: Pair with Invoice Lens as primary engine and require disagreement to route to human review rather than majority vote.
+- Opportunity score: **8.4/10**.
+
+### vendorrebate/vendorrebate — rebate/deduction recovery domain logic
+- Repository: https://github.com/vendorrebate/vendorrebate
+- Commit / revision: f37427a762555f4538aa4ffd21e7afaadc6e81e9
+- Date discovered: 2026-09-22
+- What it contains: Zero-star code-first practitioner reference covering versioned rebate agreements, EDI 810/852/844 ingestion, Decimal-exact accruals, deterministic eligibility/claim rules, duplicate deduction detection, short-pay recovery, dispute-window aging, immutable recovery packets, idempotent recovery queues and financial-close posting patterns. It is a reference/playbook rather than a finished application.
+- Evidence of implementation: Long-form guides include concrete runnable Python/Pydantic/Decimal patterns and validation checks for schema-version hashing and replay, EDI 844 claims, duplicate detection, claim confidence, payment-to-accrual reconciliation and unauthorized-deduction recovery. Inspected `versioning-rebate-agreement-schemas` and `routing-unauthorized-deductions-for-recovery` in depth.
+- Why it matters: Opens an adjacent high-value recovery vertical: vendor rebates/trade promotions/unauthorized deductions, where negotiated terms and payout tiers are often poorly reconciled and disputed.
+- Useful capability/workflow: versioned agreement -> earned accrual -> incoming deduction/claim -> authorization check -> evidence packet -> dispute-window priority -> idempotent recovery queue -> realized settlement.
+- Likely buyer: Retailers, distributors, CPG manufacturers, trade-promotion finance teams.
+- Pain solved: Missed rebates, duplicate/invalid deductions, short-pay leakage and unreconciled trade accruals.
+- Fastest monetization path: Managed rebate/deduction reconciliation pilot using ERP/POS/EDI exports before building a full SaaS.
+- Paid-pilot concept: One vendor/program/quarter; recompute earned rebate and deductions to the cent, flag unsupported deductions, and package recovery evidence.
+- Estimated engineering time saved: 4-8 weeks of domain modeling and failure-mode discovery; less direct code savings because this is not a complete app.
+- License / reuse status: No public license detected at inspected revision; project-level user authorization says rights are available. Treat it primarily as domain-logic/reference unless provenance requires otherwise.
+- Important risks: No integrated application/test suite; accounting treatment and contract interpretation remain buyer-specific and require human review.
+- Connections: Strong extension of AP Recovery beyond duplicates into rebates, allowances and retailer/vendor deductions.
+- Opportunity score: **8.9/10**.
+
+### Enginatics/Oracle-EBS-SQL — Oracle EBS recovery extraction map
+- Repository: https://github.com/Enginatics/Oracle-EBS-SQL
+- Commit / revision: 6c0f3b1a70e1b6ff747e497176e7be9256e6e7ee
+- Date discovered: 2026-09-22
+- What actually works: Large current Oracle EBS SQL/report library with ready AP queries for negative supplier balances, supplier statements, invoice audit listings, PO/intercompany/SLA detail, matched/modified receipts, payment registers, open balances and trial balance. The negative-supplier query uses Oracle's SLA/open-balance machinery and filters supplier liability totals below zero; the supplier-statement query joins invoices, payments, discounts, GL periods, supplier sites and liability accounts with running/opening balances.
+- Evidence of implementation: Inspected actual `AP Negative Supplier Balance.sql`, its technical description, and `AP Supplier Statement.sql`; repository contains the other named AP reports as executable SQL assets.
+- Why it matters: The fastest path into large Oracle EBS buyers is often not building an API connector first—it is giving their finance/DBA team a precise read-only extract specification using native EBS tables/packages. Negative supplier balances are directly tied to overpayment/credit-refund opportunities.
+- Useful capability/data/workflow: Oracle EBS read-only extraction of supplier debit balances, transaction/payment statements, receipt modifications and audit populations.
+- Likely buyer: Mid-market/enterprise Oracle EBS controller, AP shared services, internal audit, recovery-audit firms.
+- Pain solved: Months of reverse-engineering EBS data relationships before an AP recovery pilot can even begin.
+- Fastest monetization path: Oracle-EBS-specific recovery diagnostic: customer DBA runs vetted read-only SQL, exports CSV, AP Recovery analyzes and tracks cases outside the ERP.
+- Paid-pilot concept: Extract all negative supplier balances plus underlying statement/payment detail for one legal entity and validate the top recovery cases.
+- Estimated engineering time saved: 1-3 months of Oracle EBS report/query mapping for an enterprise pilot.
+- License / reuse status: No repository license detected; source headers assert Enginatics copyright. Under project-level user authorization, use is assumed available; otherwise the schema/table/query relationships remain valuable for independently authored extraction.
+- Important risks: Oracle EBS version/configuration differences; standard packages must be current; some reports depend on Blitz substitution variables/packages.
+- Connections: Best enterprise ingestion route discovered so far for the AP Recovery stack; downstream logic remains Invoice Lens + independent reviewer + realized-recovery ledger.
+- Opportunity score: **9.2/10**.
