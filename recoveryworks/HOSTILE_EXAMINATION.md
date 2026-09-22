@@ -405,3 +405,74 @@ RFC3161/TSA, and object-storage APIs and setting `provider_verified=true` only
 after provider verification succeeds. RecoveryOS records and cross-binds those
 verification receipts; it does not fabricate provider verification or implement
 home-grown public-key cryptography.
+
+
+## Dossier-bound client consent and provider-verified build
+
+The final seven-figure authorization gate adds two controls above the readiness
+dossier.
+
+### Provider-verified build receipt
+
+A BuildProvenanceAttestation is an internal immutable statement of the build
+identity. Before authorization, RecoveryOS now also requires an independent
+BuildProviderVerificationReceipt created from a CI/provider verification result.
+
+The receipt must match the exact:
+
+- build-attestation hash;
+- workflow run ID;
+- code commit;
+- source-tree hash;
+- build-artifact hash; and
+- passing-test state.
+
+provider_verified=true must only be set after a successful provider/API check.
+A forged internal build attestation cannot satisfy the final gate without the
+matching provider receipt.
+
+### Client consent to the exact final dossier
+
+The original ClientActionAuthorization binds the case/finding and action limits.
+For a seven-figure case, that is no longer sufficient by itself.
+
+RecoveryOS now computes a deterministic consent payload containing:
+
+- authorization ID/hash;
+- case-bundle hash;
+- finding proof;
+- readiness-package hash;
+- final dossier hash;
+- client actor;
+- approved action type;
+- maximum authorized amount;
+- consent timestamp; and
+- client note.
+
+The client consent must occur after the final dossier is assembled and must be
+covered by provider-verified asymmetric signature evidence. The signature is
+verified against the exact deterministic consent-payload hash.
+
+### Final authorization seal
+
+A SevenFigureAuthorizationSeal binds:
+
+- the final dossier and readiness package;
+- the current pre-authorization durable-journal head;
+- the provider-verified build receipt;
+- the dossier-specific client consent/signature; and
+- the original client authorization proof.
+
+Seven-figure authorization is refused without this seal. A subsequent ledger
+event that changes the journal head invalidates an unconsumed seal and requires
+re-evaluation.
+
+The durable authorization journal stores the seal and replays it during ledger
+restoration. A seven-figure CLAIMED case must retain:
+
+- readiness_hash;
+- readiness_dossier_hash; and
+- authorization_seal_hash.
+
+This ensures the exact evidence set reviewed by the customer and the exact
+provider-verified build are permanently bound to the authorization lifecycle.
