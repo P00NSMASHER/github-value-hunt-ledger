@@ -16,6 +16,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 
 from freight.contracts import canonical_hash
+from freight.money import format_cents
 from freight.settlement_store import (
     ALREADY_ALLOCATED,
     ALLOCATED,
@@ -452,7 +453,7 @@ def render_settlement_review_markdown(
         "",
         f"- Event: **{case.event_id}**",
         f"- Reference: **{case.event_reference}**",
-        f"- Remaining settlement amount: **{case.currency} {case.event_residual_cents / 100:,.2f}**",
+        f"- Remaining settlement amount: **{format_cents(case.currency, case.event_residual_cents)}**",
         f"- Auto-allocation result: **{case.auto_review_reason}**",
         f"- Review case hash: `{case.case_hash}`",
         "",
@@ -463,7 +464,7 @@ def render_settlement_review_markdown(
     else:
         for candidate in case.candidates:
             lines.extend([
-                f"- **{candidate.claim_id}** — residual {candidate.currency} {candidate.residual_cents / 100:,.2f}",
+                f"- **{candidate.claim_id}** — residual {format_cents(candidate.currency, candidate.residual_cents)}",
                 f"  - Reference: {candidate.reference}",
                 f"  - Reference matches event: {'yes' if candidate.reference_match else 'no'}",
                 f"  - Previously review-locked: {'yes' if candidate.review_locked else 'no'}",
@@ -480,7 +481,7 @@ def render_settlement_review_markdown(
         lines.extend([
             "## Applied review",
             f"- Claim: **{receipt.claim_id}**",
-            f"- Amount: **{case.currency} {receipt.amount_cents / 100:,.2f}**",
+            f"- Amount: **{format_cents(case.currency, receipt.amount_cents)}**",
             f"- Reviewer role: **{receipt.reviewer_role}**",
             f"- Reviewed at: **{receipt.reviewed_at}**",
             f"- Rationale: {receipt.rationale}",
