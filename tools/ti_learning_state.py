@@ -243,7 +243,37 @@ def compile_state(
             row["train_evidence_ready"]
             and row["confirm_evidence_ready"]
         )
+        if row["eligible_for_policy_consideration"]:
+            row["generalization_status"] = "confirmed"
+        elif (
+            row["train_evidence_ready"]
+            and row["confirm_support"]["measured_runs"] >= 2
+            and row["confirm_support"]["mean_reward"] < 0.0
+        ):
+            row["generalization_status"] = "overfit_signal"
+        elif row["train_evidence_ready"]:
+            row["generalization_status"] = "awaiting_confirm"
+        else:
+            row["generalization_status"] = "gathering_evidence"
         records.append(row)
+
+    learning_alerts = [
+        {
+            "type": "overfit_signal",
+            "memory_key": row["key"],
+            "train_mean_reward": row["support"]["mean_reward"],
+            "confirm_mean_reward": row["confirm_support"]["mean_reward"],
+            "confirm_runs": row["confirm_support"]["measured_runs"],
+            "confirm_deep_inspections": row["confirm_support"]["deep_inspections"],
+            "recommended_action": (
+                "Keep suppressed from live priors; inspect failure shapes "
+                "and submit a reproducible learning-failure packet if a "
+                "regression test can be defined."
+            ),
+        }
+        for row in records
+        if row["generalization_status"] == "overfit_signal"
+    ]
 
     failure_rows = load_failure_events(failure_dir)
     failures = [assessment for _raw, assessment in failure_rows]
@@ -295,6 +325,7 @@ def compile_state(
             "records": records,
         },
         "reward_observations": observations,
+        "learning_alerts": learning_alerts,
         "training_environment": {
             "source_snapshot_sha256": (
                 training_environment["source_snapshot_sha256"]
