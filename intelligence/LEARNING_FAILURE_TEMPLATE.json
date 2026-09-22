@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "failure_id": "FAIL:20260921T000000Z:HUNTER-01:shortid",
+  "run_id": "RUN:replace-with-origin-run-id",
+  "hunter_id": "HUNTER-01",
+  "target_type": "search_skill",
+  "target_id": "SKILL:replace-with-target",
+  "failure_class": "false_positive",
+  "observation": "Evidence-backed description of what failed in the hunter system.",
+  "reproduction_steps": [
+    "Repeatable step 1",
+    "Repeatable step 2"
+  ],
+  "evidence_refs": [
+    "path-or-frozen-evidence-reference"
+  ],
+  "proposed_regression_test": "A concrete test that fails before the repair and passes after it.",
+  "sensitive_material_involved": false,
+  "benchmark_contaminated": false,
+  "status": "SUBMITTED",
+  "notes": null
+}
