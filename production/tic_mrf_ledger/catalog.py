@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import html
 import hashlib
 import json
 import os
@@ -718,54 +719,177 @@ def discover_aetna_metadata(
     return {"files": inserted, "snapshots": 1}
 
 
+
+def _humana_payload_rows(payload: dict[str, Any]) -> list[Any]:
+    for key in ("aaData", "data", "rows"):
+        rows = payload.get(key)
+        if isinstance(rows, list):
+            return rows
+    return []
+
+
+def _humana_total_records(payload: dict[str, Any]) -> int | None:
+    for key in (
+        "iTotalDisplayRecords",
+        "iTotalRecords",
+        "recordsFiltered",
+        "recordsTotal",
+    ):
+        value = payload.get(key)
+        try:
+            return int(value) if value is not None else None
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def _humana_row_text(row: Any) -> str:
+    if isinstance(row, dict):
+        return " ".join(str(value or "") for value in row.values())
+    if isinstance(row, (list, tuple)):
+        return " ".join(str(value or "") for value in row)
+    return str(row or "")
+
+
+def _humana_file_name(row: Any) -> str | None:
+    text = html.unescape(_humana_row_text(row))
+
+    if isinstance(row, dict):
+        for key in (
+            "fileName", "filename", "file_name", "name",
+            "downloadFileName", "download_file_name",
+        ):
+            value = row.get(key)
+            if value:
+                candidate = str(value).strip()
+                if candidate:
+                    return candidate
+
+    for url in re.findall(r"https?://[^\s\"'<>]+", text, flags=re.I):
+        parsed = urllib.parse.urlsplit(url)
+        query = urllib.parse.parse_qs(parsed.query)
+        for key in ("fileName", "filename"):
+            values = query.get(key)
+            if values:
+                candidate = urllib.parse.unquote(str(values[0])).strip()
+                if candidate:
+                    return candidate
+        name = urllib.parse.unquote(Path(parsed.path).name).strip()
+        if name:
+            return name
+
+    match = re.search(
+        r"""(?P<name>[A-Za-z0-9._~%+ -]+(?:\.json(?:\.gz)?|\.zip|\.7z|\.csv(?:\.gz)?))""",
+        text,
+        flags=re.I,
+    )
+    return match.group("name").strip() if match else None
+
+
 def discover_humana(
     conn: sqlite3.Connection, root: Path, source: Source, *, timeout: int, max_bytes: int
 ) -> dict[str, int]:
+    """Discover Humana public TiC table-of-contents files.
+
+    Humana's public DataTables-style endpoint is paginated. Large page sizes can
+    return a non-JSON response, so use the same bounded public request shape as
+    the live service: 100 rows, iDisplayStart/iDisplayLength, and sEcho.
+    """
     source_id = persist_source(conn, source)
     s = session()
-    start = 0
+    page_size = 100
+    max_pages = 25
     inserted = snapshots = 0
-    while True:
+    seen_urls: set[str] = set()
+
+    for page in range(max_pages):
+        start = page * page_size
         params = {
             "fileType": "innetwork",
-            "iDisplayLength": "2000",
+            "iDisplayLength": str(page_size),
             "iDisplayStart": str(start),
+            "sEcho": str(page + 1),
         }
         resp = s.get(source.source_url, params=params, timeout=timeout)
         resp.raise_for_status()
         raw = resp.content
+        if len(raw) > max_bytes:
+            raise ValueError(f"Humana page exceeds max_bytes={max_bytes}")
+
         snap_id, digest = snapshot_bytes(
             conn, root, source, source_id, str(resp.request.url), raw,
             final_url=resp.url, http_status=resp.status_code,
             content_type=resp.headers.get("content-type"),
-            etag=resp.headers.get("etag"), last_modified=resp.headers.get("last-modified"),
+            etag=resp.headers.get("etag"),
+            last_modified=resp.headers.get("last-modified"),
             parser_status="parsed:humana_page",
         )
         snapshots += 1
-        data = resp.json()
-        rows = data.get("aaData", [])
+
+        try:
+            data = resp.json()
+        except Exception as exc:
+            preview = raw[:500].decode("utf-8", errors="replace")
+            raise ValueError(
+                f"Humana file-list response was not JSON; "
+                f"status={resp.status_code}; preview={preview!r}"
+            ) from exc
+        if not isinstance(data, dict):
+            raise ValueError("Humana file-list response must be a JSON object")
+
+        rows = _humana_payload_rows(data)
         if not rows:
             break
+
         for item in rows:
-            if not isinstance(item, dict) or not item.get("name"):
+            name = _humana_file_name(item)
+            if not name:
                 continue
-            name = str(item["name"])
             url = (
-                "https://developers.humana.com/syntheticdata/Resource/DownloadTOCFile?"
-                "fileType=innetwork&" + name
+                "https://developers.humana.com"
+                "/syntheticdata/Resource/DownloadTOCFile?"
+                + urllib.parse.urlencode({"fileName": name})
             )
-            size = item.get("size")
+            url = canonical_url(url)
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+
+            # DownloadTOCFile is a table-of-contents endpoint. Retain filename
+            # classification when explicit but fail toward INDEX rather than
+            # mislabeling it as a rate body.
+            ftype = classify_file(url, name)
+            if ftype == "unknown":
+                ftype = "index"
+
+            size = None
+            if isinstance(item, dict):
+                raw_size = (
+                    item.get("size")
+                    or item.get("contentLength")
+                    or item.get("content_length")
+                )
+                try:
+                    size = int(raw_size) if raw_size not in (None, "") else None
+                except (TypeError, ValueError):
+                    size = None
+
             insert_mrf_file(
-                conn, source, url, "in_network", snapshot_id=snap_id,
+                conn, source, url, ftype,
+                snapshot_id=snap_id,
                 manifest_sha=digest,
-                content_length=int(size) if str(size).isdigit() else None,
+                content_length=size,
                 filename=name,
+                parse_status="humana_file_list",
             )
             inserted += 1
-        start += len(rows)
-        total = data.get("iTotalRecords")
-        if total is not None and start >= int(total):
+
+        total = _humana_total_records(data)
+        if total is not None and start + len(rows) >= total:
             break
+        if len(rows) < page_size:
+            break
+
     return {"files": inserted, "snapshots": snapshots}
 
 
@@ -973,7 +1097,7 @@ def read_index_header(path: Path, url: str) -> dict[str, str]:
     }
     result: dict[str, str] = {}
     with open_json_stream(path, url) as fh:
-        for prefix, event, value in ijson.parse(fh):
+        for prefix, event, value in ijson.parse(fh, multiple_values=True):
             if prefix == "reporting_structure" and event == "start_array":
                 break
             if prefix in wanted and event in {"string", "number"}:
@@ -1105,7 +1229,7 @@ def parse_index_file(
 
         file_count = plan_count = 0
         with open_json_stream(path, url) as fh:
-            for rs in ijson.items(fh, "reporting_structure.item"):
+            for rs in ijson.items(fh, "reporting_structure.item", multiple_values=True):
                 if not isinstance(rs, dict):
                     continue
                 plans = rs.get("reporting_plans") or []
