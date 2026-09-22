@@ -479,6 +479,23 @@ def open_json_stream(path: Path, url: str):
     return path.open("rb")
 
 
+def read_index_header(path: Path, url: str) -> dict[str, str]:
+    wanted = {
+        "reporting_entity_name",
+        "reporting_entity_type",
+        "version",
+        "last_updated_on",
+    }
+    result: dict[str, str] = {}
+    with open_json_stream(path, url) as fh:
+        for prefix, event, value in ijson.parse(fh):
+            if prefix == "reporting_structure" and event == "start_array":
+                break
+            if prefix in wanted and event in {"string", "number"}:
+                result[prefix] = str(value)
+    return result
+
+
 def fetch_to_temp(
     url: str,
     *,
@@ -586,6 +603,21 @@ def parse_index_file(
             assert row
             snap_id, digest = int(row[0]), meta["sha256"]
 
+        header = read_index_header(path, url)
+        conn.execute(
+            """UPDATE mrf_files
+               SET reporting_entity_name=?, reporting_entity_type=?,
+                   schema_version=?, last_updated_on=?
+               WHERE id=?""",
+            (
+                header.get("reporting_entity_name"),
+                header.get("reporting_entity_type"),
+                header.get("version"),
+                header.get("last_updated_on"),
+                index_row["id"],
+            ),
+        )
+
         file_count = plan_count = 0
         with open_json_stream(path, url) as fh:
             for rs in ijson.items(fh, "reporting_structure.item"):
@@ -610,6 +642,10 @@ def parse_index_file(
                             snapshot_id=snap_id, manifest_sha=digest,
                             filename=f.get("description"),
                             parse_status="discovered_from_index",
+                            reporting_entity_name=header.get("reporting_entity_name"),
+                            reporting_entity_type=header.get("reporting_entity_type"),
+                            schema_version=header.get("version"),
+                            last_updated_on=header.get("last_updated_on"),
                         )
                         for pid in plan_ids:
                             conn.execute(
