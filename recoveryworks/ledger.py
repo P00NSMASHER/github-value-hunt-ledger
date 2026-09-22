@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any, Mapping
 
+from .fees import FeeAssessment
 from .models import CaseState, EvidenceRef, FindingState, RecoveryFinding, canonical_hash
 from .policies import assert_claim_authorizable
 
@@ -22,6 +23,7 @@ class LedgerRecord:
     settlement_total_cents: int | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
+    fee_assessment: FeeAssessment | None = None
     updated_at: str | None = None
 
     def __post_init__(self) -> None:
@@ -31,6 +33,25 @@ class LedgerRecord:
             raise ValueError("recovered_cents must be non-negative integer cents")
         if type(self.fee_cents) is not int or not 0 <= self.fee_cents <= self.recovered_cents:
             raise ValueError("fee_cents must be between zero and recovered_cents")
+        if self.fee_cents > 0:
+            assessment = self.fee_assessment
+            if assessment is None:
+                raise ValueError("positive recovery fee requires a verified fee assessment")
+            if assessment.recovered_cents != self.recovered_cents:
+                raise ValueError("fee assessment recovered amount does not match record")
+            if assessment.fee_cents != self.fee_cents:
+                raise ValueError("fee assessment amount does not match record")
+            agreement = assessment.agreement
+            if not agreement.verified:
+                raise ValueError("fee assessment agreement must be verified")
+            if agreement.client_id != self.finding.client_id:
+                raise ValueError("fee agreement client does not match record")
+            if self.finding.branch not in agreement.branches:
+                raise ValueError("fee agreement branch does not match record")
+            if agreement.currency is not None and agreement.currency != self.finding.currency:
+                raise ValueError("fee agreement currency does not match record")
+        elif self.fee_assessment is not None and self.fee_assessment.fee_cents != 0:
+            raise ValueError("nonzero fee assessment cannot be attached to zero fee")
 
         controlled = {CaseState.AUTHORIZED, CaseState.CLAIMED, CaseState.RECOVERED}
         if self.case_state in controlled:
@@ -250,6 +271,7 @@ class RecoveryLedger:
         *,
         recovery_evidence: EvidenceRef,
         settlement_total_cents: int | None = None,
+        fee_assessment: FeeAssessment | None = None,
     ) -> LedgerRecord:
         if not isinstance(recovery_evidence, EvidenceRef) or not recovery_evidence.verified:
             raise ValueError("recovery requires verified settlement/payment evidence")
@@ -265,6 +287,14 @@ class RecoveryLedger:
                 record.recovered_cents == recovered_cents
                 and record.fee_cents == fee_cents
                 and record.settlement_total_cents == settlement_total
+                and (
+                    (record.fee_assessment is None and fee_assessment is None)
+                    or (
+                        record.fee_assessment is not None
+                        and fee_assessment is not None
+                        and record.fee_assessment.proof_hash == fee_assessment.proof_hash
+                    )
+                )
                 and record.recovery_evidence is not None
                 and record.recovery_evidence.proof_hash == recovery_evidence.proof_hash
             ):
@@ -278,6 +308,24 @@ class RecoveryLedger:
             raise ValueError("fee_cents must be between zero and recovered_cents")
         if recovered_cents > record.finding.potential_recovery_cents:
             raise ValueError("recovered amount cannot exceed validated potential recovery")
+        if fee_cents > 0:
+            if fee_assessment is None:
+                raise ValueError("positive recovery fee requires fee_assessment")
+            if fee_assessment.recovered_cents != recovered_cents:
+                raise ValueError("fee assessment recovered amount mismatch")
+            if fee_assessment.fee_cents != fee_cents:
+                raise ValueError("fee_cents does not match deterministic fee assessment")
+            agreement = fee_assessment.agreement
+            if not agreement.verified:
+                raise ValueError("fee agreement must be verified")
+            if agreement.client_id != record.finding.client_id:
+                raise ValueError("fee agreement client mismatch")
+            if record.finding.branch not in agreement.branches:
+                raise ValueError("fee agreement branch mismatch")
+            if agreement.currency is not None and agreement.currency != record.finding.currency:
+                raise ValueError("fee agreement currency mismatch")
+        elif fee_assessment is not None and fee_assessment.fee_cents != 0:
+            raise ValueError("nonzero fee assessment cannot be used with zero fee")
 
         allocated_so_far = 0
         for other in self._records.values():
@@ -306,6 +354,7 @@ class RecoveryLedger:
             settlement_total_cents=settlement_total,
             recovered_cents=recovered_cents,
             fee_cents=fee_cents,
+            fee_assessment=fee_assessment,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
@@ -316,6 +365,13 @@ class RecoveryLedger:
             metadata={
                 "recovered_cents": recovered_cents,
                 "fee_cents": fee_cents,
+                "fee_assessment_hash": (
+                    fee_assessment.proof_hash if fee_assessment is not None else None
+                ),
+                "fee_agreement_id": (
+                    fee_assessment.agreement.agreement_id
+                    if fee_assessment is not None else None
+                ),
                 "settlement_total_cents": settlement_total,
                 "evidence_id": recovery_evidence.evidence_id,
                 "evidence_proof_hash": recovery_evidence.proof_hash,
