@@ -2,7 +2,7 @@
 
 ## RecoveryOS shared layers
 
-1. **Ingestion** — branch-specific adapters normalize source data while original source hashes remain addressable.
+1. **Ingestion** — branch-specific adapters normalize source data while original source hashes remain addressable. Adapters that can observe source completeness should emit coverage receipts distinguishing `PRESENT`, `VERIFIED_EMPTY`, `PARTIAL`, and `UNAVAILABLE`; once supplied, partial/unavailable coverage cannot validate money-bearing findings.
 2. **Authority** — effective-dated governing rules carry source hashes and explicit verification status.
 3. **Calculation** — deterministic expected-vs-actual arithmetic; LLM output is never accepted as money math.
 4. **Evidence** — every load-bearing source has a locator, content hash, type, and verification state.
