@@ -1338,6 +1338,176 @@ def verify_proof_seal(
         raise ValueError("proof seal signature mismatch")
 
 
+@dataclass(frozen=True)
+class HostileExaminationPacket:
+    """Cryptographically bound verification packet for a high-value case."""
+
+    case_bundle_hash: str
+    finding_proof_hash: str
+    artifact_replay_receipt_hash: str
+    calculation_replay_receipt_hash: str
+    proof_seal_id: str
+    proof_seal_signature_hex: str
+    journal_head_hash: str
+    assembled_at: str
+    assembled_by: str
+    key_id: str
+    algorithm: str
+    packet_signature_hex: str
+
+    def __post_init__(self) -> None:
+        for name in (
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "artifact_replay_receipt_hash",
+            "calculation_replay_receipt_hash",
+            "proof_seal_id",
+            "proof_seal_signature_hex",
+            "journal_head_hash",
+            "assembled_by",
+            "key_id",
+            "algorithm",
+            "packet_signature_hex",
+        ):
+            _required(name, getattr(self, name))
+        _iso("assembled_at", self.assembled_at)
+        if self.algorithm != "HMAC-SHA256":
+            raise ValueError("unsupported hostile examination packet algorithm")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "case_bundle_hash": self.case_bundle_hash,
+            "finding_proof_hash": self.finding_proof_hash,
+            "artifact_replay_receipt_hash": self.artifact_replay_receipt_hash,
+            "calculation_replay_receipt_hash": self.calculation_replay_receipt_hash,
+            "proof_seal_id": self.proof_seal_id,
+            "proof_seal_signature_hex": self.proof_seal_signature_hex,
+            "journal_head_hash": self.journal_head_hash,
+            "assembled_at": self.assembled_at,
+            "assembled_by": self.assembled_by,
+            "key_id": self.key_id,
+            "algorithm": self.algorithm,
+        }
+
+
+def build_hostile_examination_packet(
+    bundle: CaseProofBundle,
+    artifact_receipt: CaseArtifactReplayReceipt,
+    calculation_receipt: CalculationReplayReceipt,
+    proof_seal: ProofSeal,
+    *,
+    journal_head_hash: str,
+    secret_key: bytes,
+    key_id: str,
+    assembled_at: str,
+    assembled_by: str,
+) -> HostileExaminationPacket:
+    """Assemble and sign the independent examination record.
+
+    This binds the frozen case, exact source replay, independent recalculation,
+    lifecycle journal head, and detached case proof seal into one signed packet.
+    """
+    verify_case_bundle(bundle)
+    verify_case_artifact_replay(artifact_receipt, bundle)
+    verify_calculation_replay(
+        calculation_receipt,
+        bundle,
+        artifact_receipt,
+    )
+    verify_proof_seal(
+        proof_seal,
+        bundle,
+        secret_key=secret_key,
+        journal_head_hash=journal_head_hash,
+    )
+    _required("journal_head_hash", journal_head_hash)
+    key_id = _required("key_id", key_id)
+    assembled_at = _iso("assembled_at", assembled_at)
+    assembled_by = _required("assembled_by", assembled_by)
+
+    assembled_time = _dt("assembled_at", assembled_at)
+    latest_component = max(
+        _dt("artifact_replay.replayed_at", artifact_receipt.replayed_at),
+        _dt("calculation_replay.reproduced_at", calculation_receipt.reproduced_at),
+        _dt("proof_seal.sealed_at", proof_seal.sealed_at),
+    )
+    if assembled_time < latest_component:
+        raise ValueError("hostile examination packet predates a bound component")
+
+    body = {
+        "schema": 1,
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "artifact_replay_receipt_hash": artifact_receipt.receipt_hash,
+        "calculation_replay_receipt_hash": calculation_receipt.receipt_hash,
+        "proof_seal_id": proof_seal.seal_id,
+        "proof_seal_signature_hex": proof_seal.signature_hex,
+        "journal_head_hash": journal_head_hash,
+        "assembled_at": assembled_at,
+        "assembled_by": assembled_by,
+        "key_id": key_id,
+        "algorithm": "HMAC-SHA256",
+    }
+    return HostileExaminationPacket(
+        case_bundle_hash=body["case_bundle_hash"],
+        finding_proof_hash=body["finding_proof_hash"],
+        artifact_replay_receipt_hash=body["artifact_replay_receipt_hash"],
+        calculation_replay_receipt_hash=body["calculation_replay_receipt_hash"],
+        proof_seal_id=body["proof_seal_id"],
+        proof_seal_signature_hex=body["proof_seal_signature_hex"],
+        journal_head_hash=body["journal_head_hash"],
+        assembled_at=body["assembled_at"],
+        assembled_by=body["assembled_by"],
+        key_id=body["key_id"],
+        algorithm=body["algorithm"],
+        packet_signature_hex=_seal_signature(body, secret_key),
+    )
+
+
+def verify_hostile_examination_packet(
+    packet: HostileExaminationPacket,
+    bundle: CaseProofBundle,
+    artifact_receipt: CaseArtifactReplayReceipt,
+    calculation_receipt: CalculationReplayReceipt,
+    proof_seal: ProofSeal,
+    *,
+    journal_head_hash: str,
+    secret_key: bytes,
+) -> None:
+    """Verify all hostile-examination components and their signed binding."""
+    verify_case_bundle(bundle)
+    verify_case_artifact_replay(artifact_receipt, bundle)
+    verify_calculation_replay(
+        calculation_receipt,
+        bundle,
+        artifact_receipt,
+    )
+    verify_proof_seal(
+        proof_seal,
+        bundle,
+        secret_key=secret_key,
+        journal_head_hash=journal_head_hash,
+    )
+
+    expected_fields = {
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "artifact_replay_receipt_hash": artifact_receipt.receipt_hash,
+        "calculation_replay_receipt_hash": calculation_receipt.receipt_hash,
+        "proof_seal_id": proof_seal.seal_id,
+        "proof_seal_signature_hex": proof_seal.signature_hex,
+        "journal_head_hash": journal_head_hash,
+    }
+    for field_name, expected_value in expected_fields.items():
+        if getattr(packet, field_name) != expected_value:
+            raise ValueError(f"hostile examination packet {field_name} mismatch")
+
+    expected_signature = _seal_signature(packet.integrity_body(), secret_key)
+    if not hmac.compare_digest(expected_signature, packet.packet_signature_hex):
+        raise ValueError("hostile examination packet signature mismatch")
+
+
 def case_bundle_to_payload(bundle: CaseProofBundle) -> dict[str, Any]:
     verify_case_bundle(bundle)
     return {
