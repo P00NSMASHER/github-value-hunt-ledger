@@ -89,6 +89,7 @@ class ShipmentAuthorityTests(unittest.TestCase):
         container="40HQ",
         source_label="AUTHORIZED_CONTRACT_CORPUS",
         rate_basis="per container",
+        source_url="authorized://contract-corpus",
     ):
         self.rates.execute(
             """INSERT INTO shaq_rates(
@@ -101,7 +102,7 @@ class ShipmentAuthorityTests(unittest.TestCase):
             (
                 origin, destination, "COSCO", "COSCO", org, identity, container,
                 amount, "USD", valid_from, valid_to, rate_basis,
-                "authorized://contract-corpus", kind, source_label, "C-001",
+                source_url, kind, source_label, "C-001",
                 "contract row", 1.0, "test",
             ),
         )
@@ -149,6 +150,7 @@ class ShipmentAuthorityTests(unittest.TestCase):
             amount="5000",
             rate_basis="per shipment",
             source_label="SECOND_AUTHORIZED_SOURCE",
+            source_url="authorized://contract-corpus-2",
         )
         self.add_fmc_rule()
         result = self.envelope()
