@@ -137,6 +137,10 @@ class RetryTransientTests(unittest.TestCase):
                 )
 
             self.assertEqual(result["retry_status"], "RECOVERED")
+            self.assertEqual(
+                result["parser_version"],
+                retry_transient.PARSER_VERSION,
+            )
             self.assertEqual(len(result["snapshots"]), 1)
             self.assertEqual(
                 result["snapshots"][0]["sha256"],
