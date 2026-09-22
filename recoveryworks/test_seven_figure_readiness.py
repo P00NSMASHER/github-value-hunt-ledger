@@ -14,10 +14,11 @@ from recoveryworks import (
     readiness_to_payload,
     record_external_signature_verification,
     record_external_timestamp_verification,
+    record_hostile_packet_provider_verification,
     record_object_lock_verification,
     verify_seven_figure_readiness,
 )
-from recoveryworks.test_custody_provenance import build_custody_chain
+from recoveryworks.test_custody_provenance import build_custody_chain_full
 
 
 def sha(data: bytes) -> str:
@@ -83,8 +84,31 @@ def timestamp_for(signature, *, provider_verified=True, subject_hash=None):
 
 
 def build_readiness_chain():
-    bundle, ledger, packet, retention, completeness, build, public = (
-        build_custody_chain()
+    (
+        bundle,
+        artifact_replay,
+        calculation_replay,
+        ledger,
+        proof_seal,
+        packet,
+        retention,
+        completeness,
+        build,
+        public,
+    ) = build_custody_chain_full()
+    hostile_verification = record_hostile_packet_provider_verification(
+        packet,
+        proof_seal,
+        verification_id="SIM-HOSTILE-PACKET-KMS-VERIFY-1",
+        provider="SIM-KMS",
+        key_id=packet.key_id,
+        provider_request_id="SIM-KMS-HMAC-VERIFY-1",
+        verification_receipt_hash=sha(
+            b"SIMULATED KMS HMAC VERIFY RESPONSE FOR PACKET AND PROOF SEAL"
+        ),
+        verified_at="2026-09-22T16:48:30Z",
+        verified_by_adapter="sim-kms-hmac-verify-adapter",
+        provider_verified=True,
     )
     signature = signature_for(public)
     timestamp = timestamp_for(signature)
@@ -99,6 +123,10 @@ def build_readiness_chain():
         signature,
         timestamp,
         receipts,
+        artifact_replay=artifact_replay,
+        calculation_replay=calculation_replay,
+        proof_seal=proof_seal,
+        hostile_packet_verification=hostile_verification,
         journal_head_hash=ledger.journal.head_hash,
         evaluated_at="2026-09-22T16:49:00Z",
         evaluated_by="sim-seven-figure-readiness-controller",
@@ -184,10 +212,87 @@ class SevenFigureReadinessTests(unittest.TestCase):
                 signature,
                 timestamp,
                 receipts,
+                artifact_replay=_readiness.artifact_replay,
+                calculation_replay=_readiness.calculation_replay,
+                proof_seal=_readiness.proof_seal,
+                hostile_packet_verification=_readiness.hostile_packet_verification,
                 journal_head_hash=ledger.journal.head_hash,
                 evaluated_at="2026-09-22T16:49:00Z",
                 evaluated_by="controller",
             )
+
+    def test_unverified_hostile_packet_provider_receipt_blocks_readiness(self):
+        (
+            bundle,
+            ledger,
+            packet,
+            retention,
+            completeness,
+            build,
+            public,
+            signature,
+            timestamp,
+            receipts,
+            readiness,
+        ) = build_readiness_chain()
+        bad_provider = record_hostile_packet_provider_verification(
+            packet,
+            readiness.proof_seal,
+            verification_id="SIM-HOSTILE-PACKET-KMS-VERIFY-BAD",
+            provider="SIM-KMS",
+            key_id=packet.key_id,
+            provider_request_id="SIM-KMS-HMAC-VERIFY-BAD",
+            verification_receipt_hash=sha(b"SIMULATED FAILED KMS VERIFY RESPONSE"),
+            verified_at="2026-09-22T16:48:30Z",
+            verified_by_adapter="sim-kms-hmac-verify-adapter",
+            provider_verified=False,
+        )
+        with self.assertRaises(ValueError):
+            build_seven_figure_readiness(
+                bundle,
+                packet,
+                retention,
+                completeness,
+                build,
+                public,
+                signature,
+                timestamp,
+                receipts,
+                artifact_replay=readiness.artifact_replay,
+                calculation_replay=readiness.calculation_replay,
+                proof_seal=readiness.proof_seal,
+                hostile_packet_verification=bad_provider,
+                journal_head_hash=ledger.journal.head_hash,
+                evaluated_at="2026-09-22T16:49:00Z",
+                evaluated_by="controller",
+            )
+
+    def test_readiness_payload_contains_replayable_hostile_exam_chain(self):
+        bundle, ledger, *rest = build_readiness_chain()
+        readiness = rest[-1]
+        payload = readiness_to_payload(readiness)
+        restored = readiness_from_payload(payload)
+        verify_seven_figure_readiness(
+            restored,
+            bundle,
+            expected_journal_head_hash=ledger.journal.head_hash,
+        )
+        self.assertEqual(
+            restored.artifact_replay.receipt_hash,
+            readiness.artifact_replay.receipt_hash,
+        )
+        self.assertEqual(
+            restored.calculation_replay.receipt_hash,
+            readiness.calculation_replay.receipt_hash,
+        )
+        self.assertEqual(
+            restored.proof_seal.signature_hex,
+            readiness.proof_seal.signature_hex,
+        )
+        self.assertEqual(
+            restored.hostile_packet_verification.evidence_hash,
+            readiness.hostile_packet_verification.evidence_hash,
+        )
 
     def test_timestamp_must_bind_external_signature(self):
         (
@@ -215,6 +320,10 @@ class SevenFigureReadinessTests(unittest.TestCase):
                 signature,
                 timestamp,
                 receipts,
+                artifact_replay=_readiness.artifact_replay,
+                calculation_replay=_readiness.calculation_replay,
+                proof_seal=_readiness.proof_seal,
+                hostile_packet_verification=_readiness.hostile_packet_verification,
                 journal_head_hash=ledger.journal.head_hash,
                 evaluated_at="2026-09-22T16:49:00Z",
                 evaluated_by="controller",
@@ -250,6 +359,10 @@ class SevenFigureReadinessTests(unittest.TestCase):
                 signature,
                 timestamp,
                 bad,
+                artifact_replay=_readiness.artifact_replay,
+                calculation_replay=_readiness.calculation_replay,
+                proof_seal=_readiness.proof_seal,
+                hostile_packet_verification=_readiness.hostile_packet_verification,
                 journal_head_hash=ledger.journal.head_hash,
                 evaluated_at="2026-09-22T16:49:00Z",
                 evaluated_by="controller",
