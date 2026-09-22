@@ -1,0 +1,10 @@
+{
+  "cms_reference": {
+    "repository": "CMSgov/hospital-price-transparency",
+    "revision": "5333564a710f80d7740180b9ffab8dbdcba9b502",
+    "schema_version": "3.0",
+    "json_schema_path": "documentation/JSON/schemas/V3.0.0_Hospital_price_transparency_schema.json",
+    "json_schema_blob_sha": "11043f073ab24e638c91bde1b8bcf73e4733b296"
+  },
+  "seed_hospitals": []
+}
