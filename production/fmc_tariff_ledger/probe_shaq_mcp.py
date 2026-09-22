@@ -26,6 +26,13 @@ def dump_model(value):
     return value
 
 
+def attr_any(obj, *names, default=None):
+    for name in names:
+        if hasattr(obj, name):
+            return getattr(obj, name)
+    return default
+
+
 async def probe(url: str) -> dict:
     result = {
         "endpoint": url,
@@ -44,9 +51,15 @@ async def probe(url: str) -> dict:
                 {
                     "name": tool.name,
                     "description": tool.description,
-                    "inputSchema": dump_model(tool.inputSchema),
-                    "outputSchema": dump_model(getattr(tool, "outputSchema", None)),
-                    "annotations": dump_model(getattr(tool, "annotations", None)),
+                    "inputSchema": dump_model(
+                        attr_any(tool, "input_schema", "inputSchema")
+                    ),
+                    "outputSchema": dump_model(
+                        attr_any(tool, "output_schema", "outputSchema")
+                    ),
+                    "annotations": dump_model(
+                        attr_any(tool, "annotations")
+                    ),
                 }
                 for tool in tools.tools
             ]
@@ -57,7 +70,9 @@ async def probe(url: str) -> dict:
                     {
                         "name": p.name,
                         "description": p.description,
-                        "arguments": dump_model(p.arguments),
+                        "arguments": dump_model(
+                            attr_any(p, "arguments", default=[])
+                        ),
                     }
                     for p in prompts.prompts
                 ]
@@ -71,7 +86,7 @@ async def probe(url: str) -> dict:
                         "uri": str(r.uri),
                         "name": r.name,
                         "description": r.description,
-                        "mimeType": r.mimeType,
+                        "mimeType": attr_any(r, "mime_type", "mimeType"),
                     }
                     for r in resources.resources
                 ]
