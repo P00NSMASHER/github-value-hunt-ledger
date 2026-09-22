@@ -25,10 +25,16 @@ negative = read_json("candidate_learning_metrics.json", {})
 moves = read_json("search_move_metrics.json", {})
 move_policy = read_json("search_move_policy.json", {})
 coord = read_json("coordination_metrics.json", {})
+learning = read_json("LEARNING_STATE.json", {})
 
 gaps = policy.get("priority_capability_gaps") or []
 constraints = policy.get("domain_constraints") or []
 move_rows = moves.get("by_move_type") or []
+learning_rows = ((learning.get("memory") or {}).get("records") or [])
+value_priors = sorted(
+    (row for row in learning_rows if row.get("eligible_for_policy_consideration")),
+    key=lambda row: (-(row.get("q_value") or 0), row.get("key") or ""),
+)
 reason_rows = sorted(
     (negative.get("controlled_reason_counts") or {}).items(),
     key=lambda kv: (-kv[1], kv[0])
@@ -111,6 +117,27 @@ lines.append(
     f"consumer runs: **{coord.get('consumer_runs', 0)}**."
 )
 lines.append("- Coordination-derived routing remains observe-first until downstream benefit is measured without worsening recall.")
+
+lines += ["", "## Outcome-weighted experience priors", ""]
+if value_priors:
+    for row in value_priors[:6]:
+        support = row.get("support") or {}
+        lines.append(
+            f"- **{row.get('key')}**: Q={row.get('q_value', 0):+.3f}; "
+            f"{support.get('measured_runs', 0)} measured runs / "
+            f"{support.get('deep_inspections', 0)} deep inspections. "
+            "Use as a retrieval prior only; assignment/STOP/verifier rules still outrank it."
+        )
+else:
+    lines.append(
+        "- No strategy/query-family value prior has cleared the 5-run / 20-deep-inspection gate yet. "
+        "The learning engine is recording outcomes but must not steer search from insufficient evidence."
+    )
+failure_queue = learning.get("failure_queue") or {}
+lines.append(
+    f"- Reproducible hunter-system failure queue: **{failure_queue.get('queued', 0)} queued**, "
+    f"**{failure_queue.get('blocked', 0)} blocked**. Queued failures still require regression-tested repair and skill promotion."
+)
 
 lines += [
     "",
