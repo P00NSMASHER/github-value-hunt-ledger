@@ -185,6 +185,22 @@ class GeneratedPacketTests(unittest.TestCase):
             packet['seed']['seed_id']: packet
             for packet in packet_bundle['packets']
         }
+        curriculum = json.loads(
+            (
+                self.root
+                / 'intelligence'
+                / 'learning_curriculum.json'
+            ).read_text()
+        )
+        rec_by_strategy = {
+            row['strategy_id']: row
+            for row in curriculum['recommended_measurements']
+        }
+        seed_by_id = {
+            row['seed_id']: row
+            for row in self.seeds
+            if row['seed_type'] == 'learning_measurement'
+        }
         candidates = [
             row
             for row in self.candidates
@@ -192,6 +208,24 @@ class GeneratedPacketTests(unittest.TestCase):
         ]
         self.assertGreaterEqual(len(candidates), 1)
         for candidate in candidates:
+            rec = rec_by_strategy[candidate['strategy_id']]
+            seed = seed_by_id[candidate['source_id']]
+            self.assertEqual(
+                seed['priority'],
+                rec['measurement_priority'],
+            )
+            self.assertEqual(
+                candidate['final_score'],
+                rec['measurement_priority'],
+            )
+            self.assertEqual(
+                candidate['score_components']['strategy_allocation'],
+                0.0,
+            )
+            self.assertEqual(
+                candidate['score_components']['experiment_boost'],
+                0.0,
+            )
             packet = packets_by_seed[candidate['source_id']]
             self.assertEqual(
                 candidate['learning_measurement_packet_id'],
