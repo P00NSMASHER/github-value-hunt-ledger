@@ -70,3 +70,7 @@ documented in `recoveryworks/INGESTION_LEASE.md`.
 
 Operational-vs-foundation status for all RecoveryWorks divisions is tracked in
 `recoveryworks/PORTFOLIO.md`.
+
+ConstructionRecovery entitlement, schedule-version, CPM, event-mapping,
+qualified-causation, and settlement schemas are documented in
+`recoveryworks/INGESTION_CONSTRUCTION.md`.
