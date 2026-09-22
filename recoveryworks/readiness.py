@@ -14,9 +14,15 @@ from datetime import datetime
 from typing import Any, Iterable, Mapping
 
 from .assurance import (
+    ArtifactReplayEntry,
+    CalculationReplayReceipt,
+    CaseArtifactReplayReceipt,
     CaseProofBundle,
     HostileExaminationPacket,
+    ProofSeal,
     SEVEN_FIGURE_CENTS,
+    verify_calculation_replay,
+    verify_case_artifact_replay,
     verify_case_bundle,
 )
 from .custody import (
@@ -60,6 +66,8 @@ REQUIRED_READINESS_CHECKS = (
     "EXTERNAL_ASYMMETRIC_SIGNATURE_VERIFIED",
     "EXTERNAL_TIMESTAMP_VERIFIED",
     "HOSTILE_EXAM_PACKET_BOUND",
+    "HOSTILE_EXAM_PACKET_PROVIDER_VERIFIED",
+    "HOSTILE_EXAM_REPLAY_RECEIPTS_VERIFIED",
     "IMMUTABLE_SOURCE_RETENTION_VERIFIED",
     "OBJECT_LOCK_PROVIDER_RECEIPTS_VERIFIED",
     "PUBLIC_TRANSPARENCY_RECORD_VERIFIED",
@@ -497,6 +505,159 @@ def verify_object_lock_receipts(
         ):
             raise ValueError("object-lock provider receipt predates retention manifest")
     return receipt_tuple
+
+
+@dataclass(frozen=True)
+class HostilePacketVerificationEvidence:
+    """Provider/KMS verification receipt for the hostile packet and proof seal.
+
+    RecoveryOS does not possess the production HMAC key. A provider-specific
+    adapter must verify both HMAC signatures with the managed key, then record
+    the provider receipt here. This receipt is itself content-addressed.
+    """
+
+    verification_id: str
+    hostile_packet_hash: str
+    hostile_packet_signature_hash: str
+    proof_seal_id: str
+    proof_seal_signature_hash: str
+    provider: str
+    key_id: str
+    algorithm: str
+    provider_request_id: str
+    verification_receipt_hash: str
+    verified_at: str
+    verified_by_adapter: str
+    provider_verified: bool
+    evidence_hash: str
+    metadata: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        for name in (
+            "verification_id",
+            "hostile_packet_hash",
+            "hostile_packet_signature_hash",
+            "proof_seal_id",
+            "proof_seal_signature_hash",
+            "provider",
+            "key_id",
+            "algorithm",
+            "provider_request_id",
+            "verification_receipt_hash",
+            "verified_by_adapter",
+            "evidence_hash",
+        ):
+            _required(name, getattr(self, name))
+        _iso("verified_at", self.verified_at)
+        if self.algorithm != "HMAC-SHA256":
+            raise ValueError("hostile packet provider verification must use HMAC-SHA256")
+        if type(self.provider_verified) is not bool:
+            raise ValueError("provider_verified must be boolean")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            **{
+                key: value
+                for key, value in asdict(self).items()
+                if key != "evidence_hash"
+            },
+        }
+
+    def verify_integrity(self) -> None:
+        if canonical_hash(self.integrity_body()) != self.evidence_hash:
+            raise ValueError("hostile packet provider evidence hash mismatch")
+
+
+def _signature_hex_hash(value: str) -> str:
+    return canonical_hash({
+        "schema": 1,
+        "signature_hex": _required("signature_hex", value),
+    })
+
+
+def record_hostile_packet_provider_verification(
+    packet: HostileExaminationPacket,
+    proof_seal: ProofSeal,
+    *,
+    verification_id: str,
+    provider: str,
+    key_id: str,
+    provider_request_id: str,
+    verification_receipt_hash: str,
+    verified_at: str,
+    verified_by_adapter: str,
+    provider_verified: bool,
+    metadata: Mapping[str, Any] | None = None,
+) -> HostilePacketVerificationEvidence:
+    """Record a managed-key verification of packet + proof-seal HMAC signatures."""
+    if packet.proof_seal_id != proof_seal.seal_id:
+        raise ValueError("hostile packet proof seal id mismatch")
+    if packet.proof_seal_signature_hex != proof_seal.signature_hex:
+        raise ValueError("hostile packet proof seal signature mismatch")
+    if packet.key_id != proof_seal.key_id:
+        raise ValueError("hostile packet/proof seal key mismatch")
+    if packet.algorithm != "HMAC-SHA256" or proof_seal.algorithm != "HMAC-SHA256":
+        raise ValueError("hostile packet/proof seal algorithm mismatch")
+    if key_id != packet.key_id:
+        raise ValueError("provider verification key_id does not match packet key")
+    if provider_verified:
+        _required("provider_request_id", provider_request_id)
+        _required("verification_receipt_hash", verification_receipt_hash)
+
+    body = {
+        "schema": 1,
+        "verification_id": _required("verification_id", verification_id),
+        "hostile_packet_hash": hostile_packet_hash(packet),
+        "hostile_packet_signature_hash": _signature_hex_hash(
+            packet.packet_signature_hex
+        ),
+        "proof_seal_id": proof_seal.seal_id,
+        "proof_seal_signature_hash": _signature_hex_hash(proof_seal.signature_hex),
+        "provider": _required("provider", provider),
+        "key_id": _required("key_id", key_id),
+        "algorithm": "HMAC-SHA256",
+        "provider_request_id": _required("provider_request_id", provider_request_id),
+        "verification_receipt_hash": _required(
+            "verification_receipt_hash", verification_receipt_hash
+        ),
+        "verified_at": _iso("verified_at", verified_at),
+        "verified_by_adapter": _required(
+            "verified_by_adapter", verified_by_adapter
+        ),
+        "provider_verified": provider_verified,
+        "metadata": dict(metadata or {}),
+    }
+    return HostilePacketVerificationEvidence(
+        **{key: value for key, value in body.items() if key != "schema"},
+        evidence_hash=canonical_hash(body),
+    )
+
+
+def verify_hostile_packet_provider_evidence(
+    evidence: HostilePacketVerificationEvidence,
+    packet: HostileExaminationPacket,
+    proof_seal: ProofSeal,
+) -> None:
+    evidence.verify_integrity()
+    if not evidence.provider_verified:
+        raise ValueError("hostile packet/proof seal were not provider-verified")
+    if evidence.hostile_packet_hash != hostile_packet_hash(packet):
+        raise ValueError("hostile packet provider receipt packet hash mismatch")
+    if evidence.hostile_packet_signature_hash != _signature_hex_hash(
+        packet.packet_signature_hex
+    ):
+        raise ValueError("hostile packet provider receipt signature mismatch")
+    if evidence.proof_seal_id != proof_seal.seal_id:
+        raise ValueError("hostile packet provider receipt proof seal id mismatch")
+    if evidence.proof_seal_signature_hash != _signature_hex_hash(
+        proof_seal.signature_hex
+    ):
+        raise ValueError("hostile packet provider receipt proof seal signature mismatch")
+    if evidence.key_id != packet.key_id or evidence.key_id != proof_seal.key_id:
+        raise ValueError("hostile packet provider receipt key mismatch")
+    if evidence.algorithm != packet.algorithm or evidence.algorithm != proof_seal.algorithm:
+        raise ValueError("hostile packet provider receipt algorithm mismatch")
 
 
 @dataclass(frozen=True)
