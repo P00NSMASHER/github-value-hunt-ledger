@@ -49,6 +49,12 @@ class RecoveryEngine:
             value = getattr(observation, name)
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"{name} is required")
+        if (
+            len(observation.currency) != 3
+            or not observation.currency.isalpha()
+            or observation.currency != observation.currency.upper()
+        ):
+            raise ValueError("currency must be a canonical 3-letter uppercase code")
         for name in ("expected_cents", "actual_cents"):
             value = getattr(observation, name)
             if type(value) is not int or not 0 <= value <= MAX_CENTS:
