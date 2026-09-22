@@ -24,9 +24,10 @@ if str(REPO_ROOT) not in sys.path:
 from production.learning_engine import (
     FailureEvent,
     assess_failure_for_repair,
-    learn_value_memory,
+    learn_training_episode_memory,
     observed_search_reward,
 )
+from production.training_environment import build_training_environment
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -152,11 +153,23 @@ def compile_state(
     outcomes: list[dict[str, Any]],
     failure_dir: Path,
 ) -> dict[str, Any]:
-    memory, observations = learn_value_memory(
+    training_environment = build_training_environment(
         search_runs,
         outcomes,
     )
-    support = support_index(search_runs)
+    memory, observations = learn_training_episode_memory(
+        training_environment["episodes"],
+    )
+    train_run_ids = {
+        episode["run_id"]
+        for episode in training_environment["episodes"]
+        if episode.get("split") == "train"
+    }
+    support = support_index(
+        run
+        for run in search_runs
+        if run.get("search_run_id") in train_run_ids
+    )
 
     records: list[dict[str, Any]] = []
     for record in memory.records():
@@ -219,6 +232,31 @@ def compile_state(
             "records": records,
         },
         "reward_observations": observations,
+        "training_environment": {
+            "source_snapshot_sha256": (
+                training_environment["source_snapshot_sha256"]
+            ),
+            "split_counts": (
+                training_environment["summary"]["split_counts"]
+            ),
+            "reward_stage_counts": (
+                training_environment["summary"][
+                    "reward_stage_counts"
+                ]
+            ),
+            "credit_edges": (
+                training_environment["summary"]["credit_edges"]
+            ),
+            "excluded_outcomes": (
+                training_environment["summary"][
+                    "excluded_outcomes"
+                ]
+            ),
+            "note": (
+                "Only train episodes update memory. Confirm and "
+                "evaluation-only episodes are held out."
+            ),
+        },
         "failure_queue": {
             "count": len(failures),
             "queued": sum(
