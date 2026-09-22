@@ -1,6 +1,6 @@
 import unittest
 
-from production.learning_measurement_blinding import (
+from tools.ti_learning_measurement_blinding import (
     PHASE_BLIND_CONTRACT_VERSION,
     REQUIRED_BLINDING_STOP,
     worker_assignment_blinding_errors,
