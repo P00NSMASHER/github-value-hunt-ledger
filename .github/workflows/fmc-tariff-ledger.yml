@@ -136,7 +136,7 @@ jobs:
           name: fmc-shard-${{ matrix.shard }}
           path: production/fmc_tariff_ledger/output/shard-${{ matrix.shard }}/
           retention-days: ${{ inputs.artifact_retention_days || 90 }}
-          compression-level: 6
+          compression-level: 0
           if-no-files-found: error
       - name: Upload compact shard metadata
         uses: actions/upload-artifact@v4
@@ -185,5 +185,5 @@ jobs:
           name: fmc-tariff-rule-ledger-merged
           path: production/fmc_tariff_ledger/merged/
           retention-days: ${{ inputs.artifact_retention_days || 90 }}
-          compression-level: 0
+          compression-level: 6
           if-no-files-found: error
