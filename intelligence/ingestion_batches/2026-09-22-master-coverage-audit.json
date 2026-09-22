@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "audit_id": "INGEST-COVERAGE:2026-09-22:master",
+  "created_at": "2026-09-22",
+  "source": "MASTER.md",
+  "master_scored_leader_count": 37,
+  "covered_scored_leader_count": 37,
+  "coverage_fraction": 1,
+  "batches": [
+    "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json",
+    "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json",
+    "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+  ],
+  "note": "Coverage is repository/revision inventory coverage of all MASTER entries carrying an A-F score. It is not evidence that every central CAP/OPP/KG Markdown projection has been reconciled; replacement-style central-index edits remain pending."
+}
