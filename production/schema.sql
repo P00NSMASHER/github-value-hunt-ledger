@@ -297,3 +297,17 @@ create table if not exists intel_training_split_receipt (
   commitment_sha256 text not null,
   created_at timestamptz not null default now()
 );
+
+-- Frozen adaptive-learning measurement provenance. A learning_measurement run
+-- must remain bound to the exact precommit packet and packet-derived work item
+-- from planning through canonical telemetry.
+create table if not exists intel_learning_measurement_run_binding (
+  run_id text primary key references intel_run(id),
+  learning_measurement_packet_id text not null,
+  learning_measurement_packet_sha256 text not null,
+  assignment_id text not null,
+  work_item_id text not null,
+  execution_claim_id text not null,
+  dispatch_ticket_id text not null,
+  created_at timestamptz not null default now()
+);
