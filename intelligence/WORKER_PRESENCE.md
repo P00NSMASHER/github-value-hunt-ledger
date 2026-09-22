@@ -1,7 +1,7 @@
 # WORKER PRESENCE
 
-Generation: **PRESENCEGEN:0a0feb0c2b52**
-Clock: **2026-09-22T14:17:02Z**
+Generation: **PRESENCEGEN:3a8927cad232**
+Clock: **2026-09-22T14:30:26Z**
 
 Presence is capacity telemetry, not a worker-quality score.
 
@@ -19,7 +19,7 @@ Presence is capacity telemetry, not a worker-quality score.
 | HUNTER-10 | **UNKNOWN** | — | — | — |
 | HUNTER-11 | **READY_STALE** | PRESENCE:ee9949c239b2 | 2026-09-21T05:46:24.808000Z | — |
 | HUNTER-12 | **UNKNOWN** | — | — | — |
-| HUNTER-13 | **UNKNOWN** | — | — | — |
+| HUNTER-13 | **READY_FRESH** | PRESENCE:7b7e34118d87 | 2026-09-22T15:39:33.040137Z | — |
 | HUNTER-14 | **UNKNOWN** | — | — | — |
 
 Workers with UNKNOWN/STALE/OFFLINE/PAUSED presence do not receive V16 generated activation packets.
