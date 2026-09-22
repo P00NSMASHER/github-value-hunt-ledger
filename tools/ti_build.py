@@ -36,6 +36,8 @@ STEPS = (
     ['tools/ti_repair_candidate_intake_validate.py'],
     ['tools/ti_skill_eval_result_intake.py'],
     ['tools/ti_skill_eval_result_intake_validate.py'],
+    ['tools/ti_skill_promotion_result_intake.py'],
+    ['tools/ti_skill_promotion_result_intake_validate.py'],
     ['tools/ti_policy.py'],
     ['tools/ti_network_priors.py'],
     ['tools/ti_saturation.py'],
