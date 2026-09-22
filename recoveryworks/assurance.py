@@ -877,11 +877,17 @@ def create_proof_seal(
     """Seal a frozen case plus optional authorization/action and journal head."""
     verify_case_bundle(bundle)
     _required("journal_head_hash", journal_head_hash)
-    _iso("sealed_at", sealed_at)
+    seal_time = _dt("sealed_at", sealed_at)
+    if seal_time < _dt("bundle.created_at", bundle.created_at):
+        raise ValueError("proof seal cannot predate frozen case")
 
     authorization_hash = None
     if authorization is not None:
         verify_action_authorization(bundle, authorization)
+        if seal_time < _dt(
+            "authorization.authorized_at", authorization.authorized_at
+        ):
+            raise ValueError("proof seal cannot predate client authorization")
         authorization_hash = authorization.proof_hash
 
     action_hash = None
@@ -889,6 +895,10 @@ def create_proof_seal(
         if authorization is None:
             raise ValueError("external action seal requires client authorization")
         verify_external_action(external_action, bundle, authorization)
+        if seal_time < _dt(
+            "external_action.prepared_at", external_action.prepared_at
+        ):
+            raise ValueError("proof seal cannot predate external action")
         action_hash = external_action.envelope_hash
 
     body = {
