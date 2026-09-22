@@ -67,6 +67,10 @@ If the run produced cross-hunter learning, also create exactly one new immutable
 
 For claimed work, only append COMPLETE after the canonical run is present and its claim/assignment provenance validates. Pending intake is pending completion, not success. An expired claim cannot be completed retroactively; preserve the evidence and report the lifecycle issue. Use FAIL/RELEASE for genuine blocking states. Record unmeasured work without synthetic success events.
 
+### Blind learning partition rule
+
+Do not compute, request, infer, or condition behavior on whether a generated claim will become train or confirm evidence. A valid generated claim intentionally does **not** reveal its learning partition. After the completed run reaches canonical intake, GitHub Actions assigns train/confirm with a secret-keyed HMAC receipt. A generated run with no receipt remains pending and cannot influence learned priors. The split secret must never be placed in prompts, run telemetry, repository files, logs, or worker-visible configuration.
+
 ## 5. Close the loop
 
 A discovery is not a completed experiment. Submit experiment result evidence and true origin_search_ids for integrator review into outcomes.jsonl/OUTCOMES.md. No predicted revenue enters realized-value fields. Generated reports rebuild from canonical events.
