@@ -11,7 +11,7 @@ A repair candidate is not a live edit. It is a bounded proposed variant that mus
 3. The task must currently be `READY_FOR_REPAIR`; `NEEDS_REPRODUCTION` cannot accept a candidate fix.
 4. `target_type`, `target_id`, and `changed_logical_targets` must match the repair task exactly.
 5. Freeze baseline and candidate artifact references plus the complete diff SHA-256.
-6. Every stated regression test must pass and have durable evidence.
+6. Copy the repair task's exact regression-test requirement into the candidate packet; every stated test must pass and have durable evidence.
 7. Do not include sensitive/confidential payloads or benchmark-contaminated evidence.
 8. Spool files are immutable. Correct a bad packet with a new candidate ID rather than rewriting history.
 
