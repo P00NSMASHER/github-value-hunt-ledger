@@ -105,6 +105,7 @@ jobs:
           git add intelligence/search_runs.jsonl \
                   intelligence/training_split_receipts.jsonl \
                   intelligence/TRAINING_SPLIT_STATUS.json \
+                  intelligence/TRAINING_SPLIT_KEY_COMMITMENT.json \
                   intelligence/capabilities.jsonl \
                   intelligence/search_strategies.jsonl \
                   intelligence/query_families.jsonl \
