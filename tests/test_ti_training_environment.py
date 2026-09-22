@@ -222,6 +222,48 @@ class TrainingEnvironmentTests(unittest.TestCase):
             )
         )
 
+    def test_shared_experiment_alone_does_not_receive_support_credit(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=1,
+        )
+        ids = []
+        for index in range(100):
+            run_id = f"RUN:experiment-only:{index}"
+            candidate = search_run(run_id)
+            if split_for_run(candidate, config=config) == "train":
+                ids.append(run_id)
+            if len(ids) == 2:
+                break
+
+        direct_id, support_id = ids
+        direct = search_run(
+            direct_id,
+            capability_ids=("CAP-001",),
+            repository="org/direct",
+        )
+        support = search_run(
+            support_id,
+            capability_ids=("CAP-999",),
+            repository="org/unrelated",
+        )
+        out = outcome(
+            [direct_id],
+            capability_ids=("CAP-001",),
+            repository="org/direct@abc",
+        )
+        edges, excluded = build_outcome_credit(
+            [direct, support],
+            [out],
+            config=config,
+        )
+        self.assertFalse(excluded)
+        self.assertEqual(
+            {edge["run_id"] for edge in edges},
+            {direct_id},
+        )
+        self.assertAlmostEqual(edges[0]["credit"], 1.0)
+
     def test_credit_does_not_cross_train_confirm_split(self):
         config = TrainingEnvironmentConfig(
             confirm_modulus=2,
