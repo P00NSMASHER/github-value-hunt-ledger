@@ -39,7 +39,7 @@ Unknown denominators remain unknown. Non-search fixture/artifact work is exclude
 
 The generated `intelligence/LEARNING_STATE.json` is advisory. It does **not** automatically expand/retire strategies or override assignment/STOP/verification rules.
 
-Existing policy evidence gates remain unchanged: at least **5 measured runs and 20 deep inspections** before a strategy/query family even becomes eligible for policy consideration.
+Existing policy evidence gates remain unchanged: at least **5 train runs and 20 train deep inspections**, followed by **2 independent confirm runs and 6 confirm deep inspections with non-negative mean confirm reward**, before a strategy/query family becomes eligible for policy consideration.
 
 ### 2. Failure capture → regression repair — queue implemented
 
