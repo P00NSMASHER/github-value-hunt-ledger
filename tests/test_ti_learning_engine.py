@@ -148,6 +148,14 @@ class FailureLearningTests(unittest.TestCase):
         self.assertEqual(assessment.decision, FailureDecision.BLOCKED)
         self.assertIn("sensitive_material_blocked", assessment.reasons)
 
+    def test_malformed_failure_target_is_blocked(self):
+        assessment = assess_failure_for_repair(
+            self.good_failure(target_type="", target_id="")
+        )
+        self.assertEqual(assessment.decision, FailureDecision.BLOCKED)
+        self.assertIn("invalid_target_type", assessment.reasons)
+        self.assertIn("target_id_required", assessment.reasons)
+
     def test_repair_requires_regression_pass_and_history(self):
         candidate = RepairCandidate(
             failure_id="FAIL:1",
