@@ -47,6 +47,12 @@ for n,c in enumerate(cand,1):
         elif packet.get("verification_mode")!="experiment_falsification" or not packet.get("independence_requirements") or not packet.get("next_action"):
             raise SystemExit(f"hunt_candidates.jsonl:{n}: verifier lacks frozen target/independence requirements")
     if c.get("work_action")=="await_external": raise SystemExit(f"hunt_candidates.jsonl:{n}: external dependency assigned autonomously")
+    if c.get("work_kind") in {"experiment_execution","independent_verification"}:
+        revision=c.get("work_revision_sha256")
+        if not isinstance(revision,str) or not re.fullmatch(r"[a-f0-9]{64}",revision):
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: versioned work missing valid semantic revision")
+    elif c.get("work_revision_sha256") is not None:
+        raise SystemExit(f"hunt_candidates.jsonl:{n}: unversioned work unexpectedly carries semantic revision")
     if c.get("work_kind")=="learning_measurement":
         blind_errors=worker_assignment_blinding_errors(c)
         if blind_errors:
@@ -70,6 +76,8 @@ for n,a in enumerate(alloc,1):
     candidate=next((c for c in cand if c["work_item_id"]==a.get("work_item_id")),None)
     if candidate and (a.get("work_action")!=candidate.get("work_action") or a.get("instructions")!=candidate.get("instructions")):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
+    if candidate and a.get("work_revision_sha256")!=candidate.get("work_revision_sha256"):
+        raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate semantic revision drift")
     sid=a.get("slot_id")
     if sid not in slots or sid in seen_slots: raise SystemExit(f"hunt_allocations.jsonl:{n}: invalid/duplicate slot {sid}")
     seen_slots.add(sid)
