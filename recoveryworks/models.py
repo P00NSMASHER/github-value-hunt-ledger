@@ -27,6 +27,7 @@ class Branch(str, Enum):
     REBATE = "rebate"
     LEASE = "lease"
     TAX = "tax"
+    INSURANCE = "insurance"
 
 
 class RecoveryMode(str, Enum):
