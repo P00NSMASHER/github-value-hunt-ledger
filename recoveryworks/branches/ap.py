@@ -316,8 +316,9 @@ def _dedupe_payment_ids(
     """Deduplicate repeated export lines without rejecting split-settlement payments.
 
     One ACH/check can legitimately repeat the same payment_id across several
-    invoices. The collision boundary is therefore vendor + normalized invoice +
-    payment_id. Repeated identical lines collapse to one; conflicting lines are
+    invoices. The collision boundary is therefore vendor + exact canonical
+    invoice + payment_id. Heuristic suffix folding is never used to deduplicate
+    source rows. Repeated identical lines collapse to one; conflicting lines are
     excluded and surfaced for review.
     """
     grouped: dict[tuple[str, str, str], list[APPayment]] = defaultdict(list)
@@ -412,6 +413,17 @@ def audit_ap_recovery(
     statement_by_key, statement_exceptions = _latest_statement_index(statements)
     exceptions = list(payment_exceptions) + list(statement_exceptions)
 
+    statement_family_groups: dict[tuple[str, str], list[APVendorStatementLine]] = defaultdict(list)
+    for statement_item in statement_by_key.values():
+        statement_family_groups[
+            (statement_item.vendor_id, statement_item.normalized_invoice)
+        ].append(statement_item)
+    statement_by_family = {
+        family: items[0]
+        for family, items in statement_family_groups.items()
+        if len(items) == 1
+    }
+
     payment_groups: dict[tuple[str, str], list[APPayment]] = defaultdict(list)
     for payment in accepted_payments:
         payment_groups[payment.key].append(payment)
@@ -438,8 +450,57 @@ def audit_ap_recovery(
             exceptions.append(APRecoveryException(
                 f"{vendor_id}/{normalized_invoice}",
                 "HEURISTIC_INVOICE_ALIAS",
-                "multiple exact invoice IDs collapse to one duplicate-discovery family; authority matching is disabled",
+                "multiple exact invoice IDs collapse to one duplicate-discovery family; obligation authority matching is disabled",
             ))
+            family_statements = statement_family_groups.get(key, [])
+            if len(family_statements) > 1:
+                exceptions.append(APRecoveryException(
+                    f"{vendor_id}/{normalized_invoice}",
+                    "AMBIGUOUS_STATEMENT_ALIAS_FAMILY",
+                    "multiple exact vendor-statement invoice IDs share the same heuristic family; duplicate inference is suppressed",
+                ))
+                # Exact statement credits, if any, are emitted separately below.
+                continue
+
+            family_statement = statement_by_family.get(key)
+            if family_statement is not None:
+                if family_statement.balance_cents < 0:
+                    credit_cents = abs(family_statement.balance_cents)
+                    represented_statement_keys.add(family_statement.key)
+                    observations.append(RecoveryObservation(
+                        branch=Branch.AP,
+                        client_id=client_id,
+                        counterparty_id=vendor_id,
+                        reference=f"{family_statement.canonical_invoice}:statement-credit",
+                        currency=currency,
+                        expected_cents=0,
+                        actual_cents=credit_cents,
+                        rule=family_statement.credit_rule_ref(),
+                        evidence=(family_statement.evidence(),),
+                        reason="VENDOR_STATEMENT_CREDIT",
+                        confidence_basis=(
+                            "vendor statement credit is authoritative; suffix-normalized payment cluster is context only"
+                            if family_statement.verified
+                            else "vendor statement requires verification; suffix-normalized payment cluster is context only"
+                        ),
+                        metadata={
+                            "normalized_invoice": normalized_invoice,
+                            "canonical_invoice_number": family_statement.canonical_invoice,
+                            "statement_date": family_statement.statement_date,
+                            "statement_credit_cents": credit_cents,
+                            "context_payment_ids": [p.payment_id for p in items],
+                            "context_invoice_numbers": canonical_invoices,
+                            "detection_basis": "vendor_statement_credit_with_heuristic_duplicate_context",
+                        },
+                    ))
+                    continue
+
+                exceptions.append(APRecoveryException(
+                    f"{vendor_id}/{normalized_invoice}",
+                    "STATEMENT_CONTRADICTS_HEURISTIC_DUPLICATE",
+                    "vendor statement shows no credit for a suffix-normalized duplicate family; duplicate inference is suppressed",
+                ))
+                continue
 
         if obligation is not None:
             actual_cents = sum(p.amount_cents for p in items)
