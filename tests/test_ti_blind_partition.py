@@ -2,7 +2,9 @@ import unittest
 
 from production.blind_partition import (
     PARTITION_METHOD,
+    PRECOMMIT_METHOD,
     assign_partition,
+    build_key_commitment,
     build_partition_receipts,
     receipt_partition_map,
     trusted_claim_id,
@@ -56,48 +58,92 @@ class BlindPartitionTests(unittest.TestCase):
         )
         self.assertNotEqual(one[1], two[1])
 
-    def test_missing_secret_leaves_trusted_run_pending(self):
+    def test_missing_secret_and_commitment_leave_trusted_run_pending(self):
         receipts, issues = build_partition_receipts(
             [generated_run()],
             [],
             secret=None,
+            key_commitment=None,
         )
         self.assertEqual(receipts, [])
         self.assertEqual(
             issues[0]["reason"],
-            "blind_partition_secret_unavailable",
+            "split_key_commitment_unavailable",
         )
 
-    def test_receipt_is_created_only_after_run_exists(self):
+    def test_first_secret_activation_precommits_existing_runs_train_only(self):
+        runs = [generated_run()]
+        commitment, errors = build_key_commitment(
+            runs,
+            None,
+            secret="test-secret",
+        )
+        self.assertFalse(errors)
+        self.assertEqual(commitment["activation_run_count"], 1)
+
         receipts, issues = build_partition_receipts(
-            [generated_run()],
+            runs,
             [],
             secret="test-secret",
+            key_commitment=commitment,
         )
         self.assertFalse(issues)
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual(
             receipt["partition_method"],
-            PARTITION_METHOD,
+            PRECOMMIT_METHOD,
         )
-        self.assertEqual(
-            receipt["execution_claim_id"],
-            "CLAIM:blind:1",
-        )
-        self.assertEqual(
-            receipt["search_run_id"],
-            "RUN:blind:1",
-        )
-        self.assertIn(receipt["partition"], {"train", "confirm"})
-        self.assertEqual(len(receipt["commitment_sha256"]), 64)
+        self.assertEqual(receipt["partition"], "train")
 
-    def test_receipts_validate_with_secret(self):
-        runs = [generated_run(1), generated_run(2)]
+    def test_post_commit_run_receives_hmac_partition(self):
+        baseline = generated_run(1)
+        commitment, errors = build_key_commitment(
+            [baseline],
+            None,
+            secret="test-secret",
+        )
+        self.assertFalse(errors)
+        future = generated_run(2)
+        runs = [baseline, future]
         receipts, issues = build_partition_receipts(
             runs,
             [],
             secret="test-secret",
+            key_commitment=commitment,
+        )
+        self.assertFalse(issues)
+        by_claim = {
+            row["execution_claim_id"]: row
+            for row in receipts
+        }
+        self.assertEqual(
+            by_claim["CLAIM:blind:1"]["partition_method"],
+            PRECOMMIT_METHOD,
+        )
+        self.assertEqual(
+            by_claim["CLAIM:blind:2"]["partition_method"],
+            PARTITION_METHOD,
+        )
+        self.assertIn(
+            by_claim["CLAIM:blind:2"]["partition"],
+            {"train", "confirm"},
+        )
+
+    def test_receipts_validate_with_secret_and_commitment(self):
+        baseline = generated_run(1)
+        commitment, errors = build_key_commitment(
+            [baseline],
+            None,
+            secret="test-secret",
+        )
+        self.assertFalse(errors)
+        runs = [baseline, generated_run(2)]
+        receipts, issues = build_partition_receipts(
+            runs,
+            [],
+            secret="test-secret",
+            key_commitment=commitment,
         )
         self.assertFalse(issues)
         self.assertEqual(
@@ -105,25 +151,33 @@ class BlindPartitionTests(unittest.TestCase):
                 receipts,
                 runs,
                 secret="test-secret",
+                key_commitment=commitment,
             ),
             [],
         )
 
-    def test_wrong_secret_detects_tampering_or_mismatch(self):
+    def test_wrong_secret_detects_key_commitment_mismatch(self):
         runs = [generated_run()]
+        commitment, _errors = build_key_commitment(
+            runs,
+            None,
+            secret="test-secret",
+        )
         receipts, _issues = build_partition_receipts(
             runs,
             [],
             secret="test-secret",
+            key_commitment=commitment,
         )
         errors = validate_partition_receipts(
             receipts,
             runs,
             secret="wrong-secret",
+            key_commitment=commitment,
         )
         self.assertTrue(
             any(
-                error.startswith("receipt_commitment_mismatch:")
+                error == "configured_split_key_does_not_match_commitment"
                 for error in errors
             )
         )
