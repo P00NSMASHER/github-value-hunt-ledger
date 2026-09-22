@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:lane-local-elite-02",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "selection_rule": "Remaining exact-revision primary-catalog findings scoring >=29/30 and absent from prior ingestion registry after Tier-A/Tier-B direct-dollar tranche.",
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "Karl-Dai/IEC60870-5-104-Simulator",
+      "revision": "04c8ee363b95ef0af75eab44efff507fdb026053",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/12.md",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "role": "IEC 60870-5-104 Master/Slave simulator with TLS, SBO, GI/counter interrogation, replay and negative confirmations."
+    },
+    {
+      "repository": "leducp/KickCAT",
+      "revision": "43ad3e9ce390f0f6d9548118098bcaafc0d4f1f1",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/12.md",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "role": "EtherCAT master+slave stack with software network/ESC emulation, redundancy, SDO/PDO and diagnostics."
+    },
+    {
+      "repository": "NLR-Distribution-Suite/erad",
+      "revision": "735f7a6baa9fe24878a986a3425bf6d55ad556c3",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/11.md",
+      "proposed_capability_ids": [
+        "CAP-055"
+      ],
+      "role": "Distribution-grid resilience engine with hazard/fragility/failure/restoration workflows across flood, wind, wildfire and earthquake."
+    },
+    {
+      "repository": "OPCFoundation/UA-.NETStandard",
+      "revision": "37b552254e8da434514c87d8185c1595c03c4063",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/12.md",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "role": "Official OPC UA .NET reference implementation and migration analyzer with subscription-transfer/republish recovery tests."
+    },
+    {
+      "repository": "tgerke/lims-core",
+      "revision": "8e7b793572ea519136ffd9b7799d56487e6f2153",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/10.md",
+      "capability_ids": [
+        "CAP-007",
+        "CAP-017"
+      ],
+      "role": "Database-enforced LIMS chain-of-custody, append-only audit/compliance, role separation and idempotent synchronization."
+    },
+    {
+      "repository": "vd1371/GIAMS",
+      "revision": "0e2e3dc59928a1570395f3626266059be7444b5b",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/11.md",
+      "proposed_capability_ids": [
+        "CAP-056"
+      ],
+      "role": "Infrastructure asset-management deterioration, life-cycle cost, hazard, resilience and maintenance-priority optimization."
+    },
+    {
+      "repository": "AccelerationConsortium/ac-organic-lab",
+      "revision": "dccbc468b630f97c2219764c71e8a18096019a1e",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/20.md",
+      "capability_ids": [
+        "CAP-017",
+        "CAP-032"
+      ],
+      "role": "Self-driving-lab workcell with normalized equipment state, allowed-actions, claims and live pre-actuation interlocks."
+    },
+    {
+      "repository": "funcpp/sqllineage",
+      "revision": "12b566e4940b29eeb005a817040837247f030408",
+      "score": 29,
+      "priority": "C",
+      "source_catalog": "hunters/16.md",
+      "proposed_capability_ids": [
+        "CAP-057"
+      ],
+      "role": "Rust/Python table/column lineage engine with CTE/MERGE/UPDATE/window/multi-statement coverage; independent oracle."
+    },
+    {
+      "repository": "genohm/slims-python-api",
+      "revision": "c3e3f5fb0ef0562550257aa3251caf5f5f9322b9",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/21.md",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Agilent/Genohm SLIMS REST client plus Python-defined SLimsGate workflow callbacks and order/report flows."
+    },
+    {
+      "repository": "gnutvz/prismdoc",
+      "revision": "f2d1f0cfd1c98aa43706ac9918a3cc77ec0997b1",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/17.md",
+      "capability_ids": [
+        "CAP-001"
+      ],
+      "role": "Cost-aware document extraction orchestration with schema extraction, field confidence, evidence provenance, validation and cost ledgers."
+    },
+    {
+      "repository": "KenLP/autoaudit-bim",
+      "revision": "46ee940e0bd0d21824def5e38a44e3c94464922c",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/19.md",
+      "capability_ids": [
+        "CAP-028"
+      ],
+      "role": "Audit-grade BIM/Revit/ACC QA with deterministic findings, proposed-fix approval and run/report evidence."
+    },
+    {
+      "repository": "kton-protocol/kton",
+      "revision": "864385f185c370ddd17c3b72783410638e7b6ae2",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/16.md",
+      "capability_ids": [
+        "CAP-007",
+        "CAP-022"
+      ],
+      "role": "Content-addressed computation lineage plus signed claims/sign-offs, federated by hash without a central server."
+    },
+    {
+      "repository": "labiium/pytestlab",
+      "revision": "8b7f873e29457f05dee7af0de698e27985c98a33",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/21.md",
+      "capability_ids": [
+        "CAP-014",
+        "CAP-017"
+      ],
+      "role": "Instrument test-and-measurement automation with simulation, recording/replay, session evidence and compliance/verification."
+    },
+    {
+      "repository": "NiclasOlofsson/sqllens",
+      "revision": "ae24f646c0abf2b8ff1bcfac92432bd761c5afc0",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/16.md",
+      "proposed_capability_ids": [
+        "CAP-057"
+      ],
+      "role": "Multi-dialect SQL parser/semantic analyzer/column-lineage engine with source spans and dbt/minijinja awareness."
+    },
+    {
+      "repository": "novonordisk-research/MomentumPyClient",
+      "revision": "e304e930bd5f7c4a73933266f3d0eb0debd3468c",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/21.md",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Thermo Momentum Scheduler client for inventory, process, experiment, queue and worklist orchestration."
+    },
+    {
+      "repository": "novonordisk-research/OptiHPLCHandler",
+      "revision": "96399dcddc1457a5b942f61585b9e8fcf78b9a72",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/21.md",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Waters Empower Web API SDK for instrument methods, sample sets, audit-trail messages and automated assay workflows."
+    },
+    {
+      "repository": "PrimeIntellect-ai/prime-agent",
+      "revision": "e311d6495124cf0bdc629c813fc97a39a9a3054d",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/19.md",
+      "capability_ids": [
+        "CAP-020",
+        "CAP-021",
+        "CAP-024",
+        "CAP-026"
+      ],
+      "role": "Persistent coding/research agent with Python REPL, subagents, goals, schedules, executable skills and continual harness refinement."
+    },
+    {
+      "repository": "preloop/preloop",
+      "revision": "8bb692918a2b59cddcd92083bca5ce56229e8c6b",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/19.md",
+      "proposed_capability_ids": [
+        "CAP-058"
+      ],
+      "role": "Self-hostable agent control plane with MCP firewall, policy-as-code, approvals, budgets, timelines and kill-switch semantics."
+    },
+    {
+      "repository": "Sigilweaver/OpenMassSpec",
+      "revision": "0793a6c4715a806ca3ab3d4bba9ae19ec423f819",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/21.md",
+      "capability_ids": [
+        "CAP-013"
+      ],
+      "role": "Vendor-independent mass-spec raw-file stack across Thermo/Bruker/Waters/Agilent/SCIEX/Shimadzu with mzML/Arrow output."
+    },
+    {
+      "repository": "tobilg/polyglot",
+      "revision": "8b728c154648fd3e92d328183df1e5ac5008746f",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/16.md",
+      "proposed_capability_ids": [
+        "CAP-057"
+      ],
+      "role": "Rust/WASM SQL parser/transpiler/validator/semantic analyzer over 30+ dialects with lineage and OpenLineage payloads."
+    },
+    {
+      "repository": "waldowda/spec-echem",
+      "revision": "fed19e4b9da6b8d7185c9e32918e8d5956a1e957",
+      "score": 29,
+      "priority": "C",
+      "source_catalog": "hunters/20.md",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Spectroelectrochemistry orchestration coupling potentiostat workflows with Avantes spectroscopy and vendor integrations."
+    },
+    {
+      "repository": "bjb2/mmo-ah-service",
+      "revision": "a9e6f64929a2a314838940154caa8396e07e3ba8",
+      "score": 29,
+      "priority": "C",
+      "source_catalog": "hunters/26.md",
+      "proposed_capability_ids": [
+        "CAP-059"
+      ],
+      "role": "Server-authoritative virtual economy/marketplace with double-entry currency, custody, idempotency and settlement semantics."
+    },
+    {
+      "repository": "BroadbandForum/usp-test",
+      "revision": "5d53f5280b2a90ea0040887e62828c7b7369a240",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/35.md",
+      "proposed_capability_ids": [
+        "CAP-060"
+      ],
+      "role": "TP-469 USP protocol behavior corpus for firmware, certificates, scheduling, notifications and reconnect readiness."
+    },
+    {
+      "repository": "Hongchen030/mstATA",
+      "revision": "4c6ec22caba582b3f3b6d82559a7fd52b4f6a3cf",
+      "score": 29,
+      "priority": "C",
+      "source_catalog": "hunters/25.md",
+      "proposed_capability_ids": [
+        "CAP-061"
+      ],
+      "role": "Mixed-integer automated-test assembly for constrained assessment forms and multistage panels."
+    },
+    {
+      "repository": "mkmbhs/ledger",
+      "revision": "b9309ce2afe3b9a7d263b35c65afe242bd84fa9b",
+      "score": 29,
+      "priority": "C",
+      "source_catalog": "hunters/26.md",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-059"
+      ],
+      "role": "Go/Postgres double-entry wallet/payments kernel with holds, idempotency, row locking and conformance suite."
+    },
+    {
+      "repository": "RainbowCloudLabs/omcipcap",
+      "revision": "80b403cc9fd25bb8161d56b078bff8e08b853d37",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/35.md",
+      "proposed_capability_ids": [
+        "CAP-060"
+      ],
+      "role": "Vendor-neutral OMCI PCAP semantic analysis, MIB snapshots/diffs, topology reconstruction and vendor ME schemas."
+    },
+    {
+      "repository": "VortexDevX/gate-economy",
+      "revision": "474c6bab51a43eb6d18487a4d6a6e2fffc152525",
+      "score": 29,
+      "priority": "C",
+      "source_catalog": "hunters/26.md",
+      "proposed_capability_ids": [
+        "CAP-059"
+      ],
+      "role": "Deterministic player-economy OS with order book, escrow, reproducible state hashes and conservation auditing."
+    },
+    {
+      "repository": "ibuilder/SheetForge",
+      "revision": "36e28cebe970bd6671f098226ae45f3026517678",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/43.md",
+      "capability_ids": [
+        "CAP-028",
+        "CAP-030"
+      ],
+      "role": "Desktop construction drawing review with calibrated takeoff, revision alignment, slip-sheet markup migration and hash-chained audit history."
+    },
+    {
+      "repository": "mingulov/pdf-rfc3161",
+      "revision": "4d543775e66b840ff644a90ccc1a008ae831e18f",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/43.md",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "RFC 3161 PDF timestamping with strict token validation, LTV material, trust-store validation and OCSP/CRL support."
+    }
+  ],
+  "proposed_capability_definitions": {
+    "CAP-055": "Infrastructure resilience hazard/fragility/failure/restoration analysis",
+    "CAP-056": "Infrastructure asset-management deterioration, life-cycle cost and maintenance-priority optimization",
+    "CAP-057": "Static SQL semantic/column lineage and transformation-impact evidence",
+    "CAP-058": "Agent runtime governance/control plane with tool firewall, policy-as-code, approvals, budgets and kill switch",
+    "CAP-059": "Server-authoritative virtual-economy integrity, custody and currency-conservation assurance",
+    "CAP-060": "Broadband USP/OMCI protocol readiness, capture analysis and regression evidence",
+    "CAP-061": "Constraint-based assessment/test-form assembly and feasibility evidence"
+  },
+  "note": "These are secondary/adjacent strong assets. Priority B/C is relative to the Hunter portfolio, not a downgrade of repository implementation quality."
+}
