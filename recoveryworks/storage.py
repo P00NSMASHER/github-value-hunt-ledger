@@ -66,6 +66,14 @@ def _record_to_dict(record: LedgerRecord) -> dict[str, Any]:
         "reviewer_id": record.reviewer_id,
         "review_note": record.review_note,
         "authorization_id": record.authorization_id,
+        "claim_evidence": (
+            _evidence_to_dict(record.claim_evidence)
+            if record.claim_evidence is not None else None
+        ),
+        "recovery_evidence": (
+            _evidence_to_dict(record.recovery_evidence)
+            if record.recovery_evidence is not None else None
+        ),
         "recovered_cents": record.recovered_cents,
         "fee_cents": record.fee_cents,
         "updated_at": record.updated_at,
@@ -204,6 +212,14 @@ def _load_record(value: Any) -> LedgerRecord:
         reviewer_id=item.get("reviewer_id"),
         review_note=item.get("review_note"),
         authorization_id=item.get("authorization_id"),
+        claim_evidence=(
+            _load_evidence(item["claim_evidence"])
+            if item.get("claim_evidence") is not None else None
+        ),
+        recovery_evidence=(
+            _load_evidence(item["recovery_evidence"])
+            if item.get("recovery_evidence") is not None else None
+        ),
         recovered_cents=item.get("recovered_cents", 0),
         fee_cents=item.get("fee_cents", 0),
         updated_at=item.get("updated_at"),
