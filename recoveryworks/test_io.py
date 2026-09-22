@@ -158,10 +158,18 @@ class RecoveryIOTests(unittest.TestCase):
                     .build_recovery_packet(load_ledger(ledger_path).get(finding_id))
                 )
             )
-            self.assertEqual(main(["mark-claimed", str(ledger_path), finding_id]), 0)
+            self.assertEqual(main([
+                "mark-claimed", str(ledger_path), finding_id,
+                "--evidence-id", "claim-receipt-1",
+                "--source-hash", "claim-receipt-hash",
+                "--locator", "source://claim/receipt-1",
+            ]), 0)
             self.assertEqual(main([
                 "recover", str(ledger_path), finding_id,
                 "--recovered-cents", "1000", "--fee-cents", "200",
+                "--evidence-id", "settlement-receipt-1",
+                "--source-hash", "settlement-receipt-hash",
+                "--locator", "source://settlement/receipt-1",
             ]), 0)
 
             ledger = load_ledger(ledger_path)
@@ -169,6 +177,8 @@ class RecoveryIOTests(unittest.TestCase):
             self.assertIs(record.case_state, CaseState.RECOVERED)
             self.assertEqual(record.recovered_cents, 1000)
             self.assertEqual(record.fee_cents, 200)
+            self.assertIsNotNone(record.claim_evidence)
+            self.assertIsNotNone(record.recovery_evidence)
             self.assertTrue(ledger.verify_event_chain())
 
 
