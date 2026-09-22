@@ -24,6 +24,8 @@ COMMON_CORP = {
     "inc", "incorporated", "llc", "ltd", "limited", "corp", "corporation",
     "co", "company", "the", "and", "of", "usa", "us", "international",
     "logistics", "shipping", "freight", "services", "service", "global",
+    "ocean", "transport", "transportation", "marine", "line", "lines",
+    "cargo", "forwarding", "forwarder", "nvocc", "carrier", "carriers",
 }
 
 FAMILY_HOSTS = {
