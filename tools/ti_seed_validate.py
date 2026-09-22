@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
-import json,re
-from ti_common import INTEL, load_jsonl
+import json,re,sys
+from ti_common import INTEL, ROOT, load_jsonl
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from production.learning_measurement_blinding import (
+    worker_measurement_blinding_errors,
+)
 from ti_search_actions import action_errors, capability_recipe
 
 seeds=load_jsonl("search_seeds.jsonl")
@@ -55,12 +62,12 @@ for n,s in enumerate(seeds,1):
         rec=learning_recommendations.get(s.get("strategy_id"))
         if not rec:
             raise SystemExit(f"search_seeds.jsonl:{n}: learning measurement is not a current curriculum recommendation")
-        if s.get("learning_phase")!=rec.get("phase"):
-            raise SystemExit(f"search_seeds.jsonl:{n}: learning phase drifted from curriculum")
-        if s.get("authorization_basis")!="adaptive_learning_curriculum":
-            raise SystemExit(f"search_seeds.jsonl:{n}: learning measurement authorization basis drifted")
-        if s.get("learning_curriculum_rank")!=rec.get("rank"):
-            raise SystemExit(f"search_seeds.jsonl:{n}: learning curriculum rank drifted")
+        blind_errors=worker_measurement_blinding_errors(s)
+        if blind_errors:
+            raise SystemExit(
+                f"search_seeds.jsonl:{n}: worker measurement blinding failed: "
+                + "; ".join(blind_errors)
+            )
     if s.get("seed_type")=="coverage_gap":
         gids=s.get("coverage_gap_ids") or []
         if not gids: raise SystemExit(f"search_seeds.jsonl:{n}: coverage_gap seed missing coverage_gap_ids")
