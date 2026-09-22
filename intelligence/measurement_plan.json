@@ -250,8 +250,8 @@
       "sufficient_evidence": false,
       "count_semantics": "observational_discovery",
       "learning_phase": "train_measurement",
-      "learning_train_runs": 2,
-      "learning_train_deep_inspections": 2,
+      "learning_train_runs": 4,
+      "learning_train_deep_inspections": 9,
       "learning_confirm_runs": 0,
       "learning_confirm_deep_inspections": 0,
       "learning_policy_eligible": false

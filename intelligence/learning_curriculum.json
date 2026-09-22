@@ -1,11 +1,11 @@
 {
   "blind_confirmation": {
-    "activation_run_count": null,
-    "blocker": "split_key_commitment_inactive",
-    "key_commitment_active": false,
-    "operational": false,
-    "pending_claim_count": 2,
-    "secret_available": false
+    "activation_run_count": 43,
+    "blocker": null,
+    "key_commitment_active": true,
+    "operational": true,
+    "pending_claim_count": 0,
+    "secret_available": true
   },
   "manual_work_can_satisfy_confirm": false,
   "mode": "measurement_only",
@@ -57,16 +57,16 @@
         "runs": 0,
         "runs_needed": 2
       },
-      "measurement_priority": 76.5,
+      "measurement_priority": 78.75,
       "phase": "train_measurement",
       "rank": 2,
       "requires_generated_claim": true,
       "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
       "selection_reason": "reduce_train_evidence_deficit",
-      "strategy_id": "STRAT:evaluation-target-independence",
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
       "train": {
-        "deep_inspections": 6,
-        "deep_inspections_needed": 14,
+        "deep_inspections": 9,
+        "deep_inspections_needed": 11,
         "ready": false,
         "runs": 4,
         "runs_needed": 1
@@ -525,7 +525,7 @@
       "zero_train_runs": false
     },
     {
-      "audit_only_q_value": 0.0735,
+      "audit_only_q_value": 0.13958109375,
       "confirm": {
         "deep_inspections": 0,
         "deep_inspections_needed": 6,
@@ -541,18 +541,18 @@
       },
       "eligible_for_policy_consideration": false,
       "generalization_status": "gathering_evidence",
-      "measurement_priority": 67.5,
+      "measurement_priority": 78.75,
       "phase": "train_measurement",
       "policy_allocation_audit_only": 0.1006320798043864,
       "selection_reason": "reduce_train_evidence_deficit",
       "strategy_id": "STRAT:rule-period-authority-version-audit",
       "strategy_name": "Rule-period / authority-version audit",
       "train": {
-        "deep_inspections": 2,
-        "deep_inspections_needed": 18,
+        "deep_inspections": 9,
+        "deep_inspections_needed": 11,
         "ready": false,
-        "runs": 2,
-        "runs_needed": 3
+        "runs": 4,
+        "runs_needed": 1
       },
       "zero_train_runs": false
     }

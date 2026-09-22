@@ -34,7 +34,7 @@ This campaign reduces **matched benchmark comparison debt** using frozen benchma
 | STRAT:ingestion-invariant-triad-intersection | 5 | 20 | 0/0 | 0/0 | train_measurement | EVAL:ingestion-protocol | 37 | CMP:ingestion-protocol:task-37 |
 | STRAT:paper-research-artifact-production-descendant | 5 | 20 | 0/0 | 0/0 | train_measurement | EVAL:agent-lineage-governance | 28 | CMP:agent-lineage-governance:task-28 |
 | STRAT:protocol-regression-archaeology-for-pre-fat-systems | 4 | 17 | 1/3 | 0/0 | train_measurement | EVAL:ingestion-protocol | 37 | CMP:ingestion-protocol:task-37 |
-| STRAT:rule-period-authority-version-audit | 1 | 11 | 2/2 | 0/0 | train_measurement | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
+| STRAT:rule-period-authority-version-audit | 1 | 11 | 4/9 | 0/0 | train_measurement | EVAL:authority-currentness | 09 | CMP:authority-currentness:task-09 |
 
 ## Why this is stronger than ordinary telemetry
 

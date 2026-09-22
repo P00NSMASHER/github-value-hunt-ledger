@@ -53,16 +53,11 @@ Generated compact memory for live hunters. This is a **navigation aid, not autho
 
 - No strategy/query-family value prior has cleared both the 5-run / 20-deep train gate and the independent 2-run / 6-deep confirm gate yet. The learning engine is recording outcomes but must not steer search from insufficient or unconfirmed evidence.
 
-### Blind confirmation readiness
-
-- **Confirmation learning is currently blocked**: split_key_commitment_inactive. Train evidence can continue through normal generated claims, but no strategy may be treated as independently confirmed until the blind partition commitment/secret path is operational.
-- Pending trusted generated claims awaiting partition resolution: **2**.
-
 ### Learning measurement debt
 
 - These are **measurement-only** recommendations. They do not change allocator weights or authorize work by themselves; use the normal generated assignment/claim path and never select/retry based on train/confirm partition.
 - **STRAT:acceptance-path-transition-inspection** — train_measurement; train 4/10 (need 1 runs / 10 deep); confirm 0/0 (need 2 runs / 6 deep).
-- **STRAT:evaluation-target-independence** — train_measurement; train 4/6 (need 1 runs / 14 deep); confirm 0/0 (need 2 runs / 6 deep).
+- **STRAT:rule-period-authority-version-audit** — train_measurement; train 4/9 (need 1 runs / 11 deep); confirm 0/0 (need 2 runs / 6 deep).
 - **STRAT:bidirectional-money-evidence-invariant-tracing** — train_measurement; train 0/0 (need 5 runs / 20 deep); confirm 0/0 (need 2 runs / 6 deep).
 - Reproducible hunter-system failure queue: **0 queued**, **0 blocked**. Queued failures still require regression-tested repair and skill promotion.
 - Repair workbench: **0 bounded repair-ready**, **0 reproduction-first**. These are advisory repair/falsification tasks, not automatic worker routes or live skill edits.

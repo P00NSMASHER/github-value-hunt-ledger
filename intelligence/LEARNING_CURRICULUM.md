@@ -4,11 +4,11 @@ Evidence-collection plan for the adaptive hunter layer. This is **measurement-on
 
 ## Blind confirmation readiness
 
-- Operational: **no**
-- Key commitment active: **false**
-- Split secret available to CI: **false**
-- Pending trusted generated claims: **2**
-- Confirmation blocker: **split_key_commitment_inactive**
+- Operational: **yes**
+- Key commitment active: **true**
+- Split secret available to CI: **true**
+- Pending trusted generated claims: **0**
+- Confirmation blocker: **none**
 
 ## Guardrails
 
@@ -23,7 +23,7 @@ Evidence-collection plan for the adaptive hunter layer. This is **measurement-on
 | Rank | Strategy | Phase | Train evidence | Confirm evidence | Reason |
 |---:|---|---|---|---|---|
 | 1 | STRAT:acceptance-path-transition-inspection | train_measurement | 4 runs / 10 deep (need 1 / 10) | 0 runs / 0 deep (need 2 / 6) | reduce_train_evidence_deficit |
-| 2 | STRAT:evaluation-target-independence | train_measurement | 4 runs / 6 deep (need 1 / 14) | 0 runs / 0 deep (need 2 / 6) | reduce_train_evidence_deficit |
+| 2 | STRAT:rule-period-authority-version-audit | train_measurement | 4 runs / 9 deep (need 1 / 11) | 0 runs / 0 deep (need 2 / 6) | reduce_train_evidence_deficit |
 | 3 | STRAT:bidirectional-money-evidence-invariant-tracing | train_measurement | 0 runs / 0 deep (need 5 / 20) | 0 runs / 0 deep (need 2 / 6) | reduce_train_evidence_deficit |
 
 ## All active strategies
@@ -31,9 +31,9 @@ Evidence-collection plan for the adaptive hunter layer. This is **measurement-on
 | Strategy | Phase | Train runs/deep | Confirm runs/deep | Priority |
 |---|---|---:|---:|---:|
 | STRAT:acceptance-path-transition-inspection | train_measurement | 4/10 | 0/0 | 79.5 |
+| STRAT:rule-period-authority-version-audit | train_measurement | 4/9 | 0/0 | 78.8 |
 | STRAT:evaluation-target-independence | train_measurement | 4/6 | 0/0 | 76.5 |
 | STRAT:capability-conjunction-search-claim-tracing | train_measurement | 3/9 | 0/0 | 75.8 |
-| STRAT:rule-period-authority-version-audit | train_measurement | 2/2 | 0/0 | 67.5 |
 | STRAT:fail-open-boundary-archaeology | train_measurement | 1/4 | 0/0 | 66.0 |
 | STRAT:protocol-regression-archaeology-for-pre-fat-systems | train_measurement | 1/3 | 0/0 | 65.2 |
 | STRAT:authority-origin-invariant-set-consistency | train_measurement | 1/1 | 0/0 | 63.8 |

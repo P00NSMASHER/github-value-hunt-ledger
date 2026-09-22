@@ -1,0 +1,8 @@
+{
+  "activation_prefix_sha256": "e457881829169bb179d46a14992be8e4070a5080d8db0227bf1d6463c7061c57",
+  "activation_run_count": 43,
+  "commitment_method": "sha256-secret-commitment-v1",
+  "key_commitment_sha256": "1420a9d6b51ba9842fd467eb3831c9d2f9d289c0a14477d1485b22a92b899a1e",
+  "rule": "canonical runs before activation_run_count are permanently precommit train-only; only later appended trusted generated runs may receive HMAC train/confirm partitions",
+  "schema_version": 1
+}

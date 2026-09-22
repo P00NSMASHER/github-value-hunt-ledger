@@ -1105,6 +1105,89 @@
     {
       "action": {
         "queries": [
+          "schedule minimum rest hard constraint labor law effective date version",
+          "workforce compliance 32 consecutive hours rest source tests",
+          "PayrollEngine regulation validFrom evaluationDate work time validation",
+          "medical rota legal hours rest rule checker"
+        ],
+        "query_family": "workforce schedule hard-lock verification + effective-dated current labor/domain rule authority + rule provenance",
+        "query_family_id": "QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
+        "recall_rescue_used": false,
+        "search_move_ids": [],
+        "search_moves": [],
+        "search_surfaces": [
+          "GitHub repository search",
+          "GitHub code/source/tests",
+          "official labor-law sources",
+          "official Payroll Engine documentation"
+        ],
+        "stop_reason_standard": null,
+        "strategy_id": "STRAT:rule-period-authority-version-audit"
+      },
+      "episode_sha256": "1e1a61cd9b8787a3268aba15f66dabbf172e7f1dedb3210c54aec20b45c18852",
+      "observation": {
+        "candidate_count": null,
+        "deep_inspected": 4,
+        "elapsed_minutes": null,
+        "experiment_ids": [
+          "EXP-008"
+        ],
+        "master_promoted_count": 0,
+        "new_capability_ids": [],
+        "retained_count": 3,
+        "strengthened_capability_ids": [
+          "CAP-009"
+        ],
+        "tool_calls": null
+      },
+      "provenance": {
+        "durable_evidence_path": "hunters/32-run11-2026-09-20.md",
+        "measurement_quality": "prospective",
+        "partition_basis": {
+          "identifier": "CLAIM:2668c9456429",
+          "partition": "train",
+          "provenance_contract": "validated_v14_generated_claim",
+          "source": "blind_partition_receipt",
+          "trusted": true
+        },
+        "timestamp": "2026-09-20T22:58:00Z"
+      },
+      "reward": {
+        "discovery": 0.35625,
+        "downstream": {
+          "commercial_credit": 0.0,
+          "commercial_observed": false,
+          "credit_edges": 0,
+          "downstream_reward": 0.0,
+          "engineering_credit": 0.0,
+          "engineering_observed": false,
+          "outcome_ids": [],
+          "technical_credit": 0.0
+        },
+        "reward_stage": "discovery_only",
+        "training_reward": 0.35625
+      },
+      "run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
+      "schema_version": 1,
+      "split": "train",
+      "state": {
+        "assignment_slot_role": "experiment",
+        "assignment_work_kind": "capability_gap",
+        "hunter": "HUNTER-13 / Revenue Leverage",
+        "lane_ids": [
+          "REVENUE-LEVERAGE",
+          "WORKFORCE-SCHEDULING"
+        ],
+        "search_objective_id": "OBJ:current-rule-authority",
+        "seed_ids": [
+          "SEED:gap:cap-009"
+        ],
+        "seed_mode": "generated"
+      }
+    },
+    {
+      "action": {
+        "queries": [
           "mortgage extraction abstain",
           "insurance source_span review",
           "mortgage confidence review threshold",
@@ -1437,6 +1520,94 @@
     {
       "action": {
         "queries": [
+          "\"OpenFisca\" language:C#",
+          "C# payroll HMRC tax calculator",
+          ".NET payroll tax engine",
+          "C# benefits rules engine government",
+          "C# tax calculator NuGet historical",
+          "PayrollEngine C# regulation",
+          "Payroll-Engine",
+          "PAYE C#",
+          "tax calculator C#",
+          "authority source hash tax table in Payroll-Engine/PayrollEngine"
+        ],
+        "query_family": "NuGet effective rule version plus historical evaluation plus external authority provenance",
+        "query_family_id": "QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
+        "recall_rescue_used": false,
+        "search_move_ids": [],
+        "search_moves": [],
+        "search_surfaces": [
+          "GitHub repository and code search",
+          "exact-revision repository source and test fixtures",
+          "NuGet Gallery package metadata",
+          "Skatteverket first-party annual tax-table publication"
+        ],
+        "stop_reason_standard": null,
+        "strategy_id": "STRAT:rule-period-authority-version-audit"
+      },
+      "episode_sha256": "96220274bd9359431f90e4cb9af7b4ee3acd6ba47458428493304c1eaf21476f",
+      "observation": {
+        "candidate_count": 8,
+        "deep_inspected": 3,
+        "elapsed_minutes": 11,
+        "experiment_ids": [],
+        "master_promoted_count": 0,
+        "new_capability_ids": [],
+        "retained_count": 1,
+        "strengthened_capability_ids": [
+          "CAP-008",
+          "CAP-019"
+        ],
+        "tool_calls": null
+      },
+      "provenance": {
+        "durable_evidence_path": "hunters/01-run27-2026-09-21.md",
+        "measurement_quality": "prospective",
+        "partition_basis": {
+          "identifier": "CLAIM:7cb70fe09a6d",
+          "partition": "train",
+          "provenance_contract": "validated_v14_generated_claim",
+          "source": "blind_partition_receipt",
+          "trusted": true
+        },
+        "timestamp": "2026-09-21T06:13:03Z"
+      },
+      "reward": {
+        "discovery": 0.3,
+        "downstream": {
+          "commercial_credit": 0.0,
+          "commercial_observed": false,
+          "credit_edges": 0,
+          "downstream_reward": 0.0,
+          "engineering_credit": 0.0,
+          "engineering_observed": false,
+          "outcome_ids": [],
+          "technical_credit": 0.0
+        },
+        "reward_stage": "discovery_only",
+        "training_reward": 0.3
+      },
+      "run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
+      "schema_version": 1,
+      "split": "train",
+      "state": {
+        "assignment_slot_role": "coverage",
+        "assignment_work_kind": "coverage_gap",
+        "hunter": "HUNTER-01",
+        "lane_ids": [
+          "NODE-01",
+          "COV:package-ecosystem:nuget"
+        ],
+        "search_objective_id": "OBJ:current-rule-authority",
+        "seed_ids": [
+          "SEED:coverage:package-ecosystem-nuget:rule-version-transfer"
+        ],
+        "seed_mode": "generated"
+      }
+    },
+    {
+      "action": {
+        "queries": [
           "OpenFisca reforms parameter",
           "tax effective_date rule_version tests",
           "benefits rule_version effective date source reference",
@@ -1568,10 +1739,6 @@
       "run_id": "RUN:20260920T213600Z:hunter13:late-payout-return-readback"
     },
     {
-      "reason": "pending_blind_partition",
-      "run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority"
-    },
-    {
       "reason": "not_eligible_search_training_record",
       "run_id": "RUN:20260921T025635Z:hunter-11:rqr-runtime-closure"
     },
@@ -1634,10 +1801,6 @@
     {
       "reason": "not_eligible_search_training_record",
       "run_id": "RUN:20260921T060826Z:HUNTER-13:opentrons-absent-action-race"
-    },
-    {
-      "reason": "pending_blind_partition",
-      "run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version"
     },
     {
       "reason": "not_eligible_search_training_record",
@@ -1865,7 +2028,7 @@
     "support_origin_budget": 0.4
   },
   "schema_version": 1,
-  "source_snapshot_sha256": "70a6bdacb3fcd101ed323467fd87de30ac4aeba8a7cc5fe61bda519bd0a65b0a",
+  "source_snapshot_sha256": "1121de331062157149dadcfdf0255ffc58772f5ac168e0df1f7cb03541607a51",
   "source_through": "2026-09-21T13:32:00Z",
   "split_policy": {
     "benchmark": "evaluation_only",
@@ -1877,15 +2040,15 @@
   "summary": {
     "commercially_grounded_episodes": 0,
     "credit_edges": 5,
-    "episodes": 19,
+    "episodes": 21,
     "excluded_outcomes": 5,
-    "excluded_runs": 24,
+    "excluded_runs": 22,
     "reward_stage_counts": {
-      "discovery_only": 14,
+      "discovery_only": 16,
       "technical_proxy": 5
     },
     "split_counts": {
-      "train": 19
+      "train": 21
     }
   }
 }
