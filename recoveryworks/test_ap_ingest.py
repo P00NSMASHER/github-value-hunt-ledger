@@ -3,8 +3,8 @@ import tempfile
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
+from recoveryworks.branches import ingest_ap_exports
 from recoveryworks.branches.ap import APObligation, APPayment, build_ap_observations
-from recoveryworks.branches.ap_ingest import ingest_ap_exports
 
 
 def p(payment_id, amount, *, invoice="INV-1", locator="row"):
