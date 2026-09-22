@@ -134,8 +134,18 @@ class LedgerAuditChainTests(unittest.TestCase):
             ledger.approve(finding.finding_id, "reviewer-2", "late second approval")
         with self.assertRaises(ValueError):
             ledger.authorize(finding.finding_id, "customer-auth-2")
-        ledger.mark_claimed(finding.finding_id)
-        ledger.mark_recovered(finding.finding_id, 4000, 800)
+        claim_receipt = evidence("claim-submission")
+        recovery_receipt = evidence("settlement")
+        ledger.mark_claimed(finding.finding_id, claim_receipt)
+        ledger.mark_claimed(finding.finding_id, claim_receipt)
+        ledger.mark_recovered(
+            finding.finding_id, 4000, 800,
+            recovery_evidence=recovery_receipt,
+        )
+        ledger.mark_recovered(
+            finding.finding_id, 4000, 800,
+            recovery_evidence=recovery_receipt,
+        )
 
         self.assertEqual(
             [event.action for event in ledger.events()],
