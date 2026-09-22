@@ -1461,8 +1461,7 @@ def validate_training_environment(
             episode.get("reward") or {}
         ).get("training_reward")
         if (
-            not isinstance(reward, (int, float))
-            or not math.isfinite(reward)
+            not _finite_number(reward)
             or not -1.0 <= reward <= 1.0
         ):
             errors.append(f"invalid_reward:{rid}")
@@ -1509,7 +1508,7 @@ def validate_training_environment(
                 if (
                     value is not None
                     and (
-                        not isinstance(value, int)
+                        type(value) is not int
                         or value < 0
                     )
                 ):
