@@ -1,0 +1,116 @@
+name: Public Repo Hunter Scouts
+
+on:
+  workflow_dispatch:
+    inputs:
+      worker:
+        description: Worker to run
+        required: true
+        default: ALL
+        type: choice
+        options:
+          - ALL
+          - HUNTER-01
+          - HUNTER-02
+          - HUNTER-03
+          - HUNTER-04
+          - HUNTER-05
+          - HUNTER-06
+          - HUNTER-07
+          - HUNTER-08
+          - HUNTER-09
+          - HUNTER-10
+          - HUNTER-11
+          - HUNTER-12
+          - HUNTER-13
+          - HUNTER-14
+          - INTEGRATOR
+  schedule:
+    - cron: "7 2,14 * * *"
+    - cron: "15 2,14 * * *"
+    - cron: "23 2,14 * * *"
+    - cron: "31 2,14 * * *"
+    - cron: "39 2,14 * * *"
+    - cron: "47 2,14 * * *"
+    - cron: "55 2,14 * * *"
+    - cron: "3 3,15 * * *"
+    - cron: "11 3,15 * * *"
+    - cron: "19 3,15 * * *"
+    - cron: "27 3,15 * * *"
+    - cron: "35 3,15 * * *"
+    - cron: "43 3,15 * * *"
+    - cron: "51 3,15 * * *"
+    - cron: "7 4,16 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: public-repo-hunter-${{ github.event.schedule || inputs.worker || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Resolve role
+        id: route
+        shell: bash
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          MANUAL: ${{ inputs.worker }}
+        run: |
+          worker="$MANUAL"
+          case "$SCHEDULE" in
+            "7 2,14 * * *") worker="HUNTER-01";;
+            "15 2,14 * * *") worker="HUNTER-02";;
+            "23 2,14 * * *") worker="HUNTER-03";;
+            "31 2,14 * * *") worker="HUNTER-04";;
+            "39 2,14 * * *") worker="HUNTER-05";;
+            "47 2,14 * * *") worker="HUNTER-06";;
+            "55 2,14 * * *") worker="HUNTER-07";;
+            "3 3,15 * * *") worker="HUNTER-08";;
+            "11 3,15 * * *") worker="HUNTER-09";;
+            "19 3,15 * * *") worker="HUNTER-10";;
+            "27 3,15 * * *") worker="HUNTER-11";;
+            "35 3,15 * * *") worker="HUNTER-12";;
+            "43 3,15 * * *") worker="HUNTER-13";;
+            "51 3,15 * * *") worker="HUNTER-14";;
+            "7 4,16 * * *") worker="INTEGRATOR";;
+          esac
+          [ -n "$worker" ] || worker="ALL"
+          echo "worker=$worker" >> "$GITHUB_OUTPUT"
+      - name: Tests
+        run: python -m unittest tests.test_public_repo_scout -v
+      - name: Scout
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          WORKER: ${{ steps.route.outputs.worker }}
+        shell: bash
+        run: |
+          if [ "$WORKER" = "INTEGRATOR" ]; then
+            python tools/public_repo_scout.py --integrate
+          elif [ "$WORKER" = "ALL" ]; then
+            python tools/public_repo_scout.py --worker ALL
+            python tools/public_repo_scout.py --integrate
+          else
+            python tools/public_repo_scout.py --worker "$WORKER"
+          fi
+      - name: Commit queue refresh
+        env:
+          WORKER: ${{ steps.route.outputs.worker }}
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add intelligence/scout_queue automation/SCOUT_DIGEST.md 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "automation: refresh ${WORKER} scout state"
+          git pull --rebase origin main
+          git push origin HEAD:main
