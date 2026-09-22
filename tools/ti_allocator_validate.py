@@ -15,12 +15,26 @@ cand=load_jsonl("hunt_candidates.jsonl")
 alloc=load_jsonl("hunt_allocations.jsonl")
 metrics=json.loads((INTEL/"allocator_metrics.json").read_text(encoding="utf-8"))
 runs=load_jsonl("search_runs.jsonl")
+execution_history=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
+terminal_stale_work_items={
+    row.get("work_item_id")
+    for row in execution_history
+    if (
+        row.get("status")=="FAILED_TERMINAL"
+        and row.get("retryable") is False
+        and row.get("failure_code")=="STALE_ASSIGNMENT"
+        and isinstance(row.get("work_item_id"),str)
+        and row.get("work_item_id")
+    )
+}
 
 cids=set()
 for n,c in enumerate(cand,1):
     wid=c.get("work_item_id")
     if not wid or wid in cids: raise SystemExit(f"hunt_candidates.jsonl:{n}: missing/duplicate work_item_id")
     cids.add(wid)
+    if wid in terminal_stale_work_items:
+        raise SystemExit(f"hunt_candidates.jsonl:{n}: terminal stale work item reissued {wid}")
     errors=action_errors(c)
     if errors: raise SystemExit(f"hunt_candidates.jsonl:{n}: {'; '.join(errors)}")
     if "work_action" in c and not (c.get("instructions") or {}).get("acceptance_target"):
@@ -33,6 +47,12 @@ for n,c in enumerate(cand,1):
         elif packet.get("verification_mode")!="experiment_falsification" or not packet.get("independence_requirements") or not packet.get("next_action"):
             raise SystemExit(f"hunt_candidates.jsonl:{n}: verifier lacks frozen target/independence requirements")
     if c.get("work_action")=="await_external": raise SystemExit(f"hunt_candidates.jsonl:{n}: external dependency assigned autonomously")
+    if c.get("work_kind") in {"experiment_execution","independent_verification"}:
+        revision=c.get("work_revision_sha256")
+        if not isinstance(revision,str) or not re.fullmatch(r"[a-f0-9]{64}",revision):
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: versioned work missing valid semantic revision")
+    elif c.get("work_revision_sha256") is not None:
+        raise SystemExit(f"hunt_candidates.jsonl:{n}: unversioned work unexpectedly carries semantic revision")
     if c.get("work_kind")=="learning_measurement":
         blind_errors=worker_assignment_blinding_errors(c)
         if blind_errors:
@@ -49,11 +69,15 @@ for n,a in enumerate(alloc,1):
     aid=a.get("assignment_id")
     if not aid or aid in seen_assign: raise SystemExit(f"hunt_allocations.jsonl:{n}: missing/duplicate assignment_id")
     seen_assign.add(aid)
+    if a.get("work_item_id") in terminal_stale_work_items:
+        raise SystemExit(f"hunt_allocations.jsonl:{n}: terminal stale work item assigned {a.get('work_item_id')}")
     errors=action_errors(a)
     if errors: raise SystemExit(f"hunt_allocations.jsonl:{n}: {'; '.join(errors)}")
     candidate=next((c for c in cand if c["work_item_id"]==a.get("work_item_id")),None)
     if candidate and (a.get("work_action")!=candidate.get("work_action") or a.get("instructions")!=candidate.get("instructions")):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
+    if candidate and a.get("work_revision_sha256")!=candidate.get("work_revision_sha256"):
+        raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate semantic revision drift")
     sid=a.get("slot_id")
     if sid not in slots or sid in seen_slots: raise SystemExit(f"hunt_allocations.jsonl:{n}: invalid/duplicate slot {sid}")
     seen_slots.add(sid)
@@ -87,6 +111,14 @@ if kinds["independent_verification"]<cons["min_verification_slots"]: raise Syste
 if kinds["wildcard"]<cons["min_wildcard_slots"]: raise SystemExit("wildcard reserve not met")
 if metrics.get("assignment_count")!=len(alloc): raise SystemExit("allocator_metrics assignment count drift")
 if metrics.get("portfolio_policy_generation_id")!=portfolio_policy_id: raise SystemExit("allocator_metrics portfolio policy mismatch")
+reported_suppressed=metrics.get("suppressed_stale_work_items") or []
+if not isinstance(reported_suppressed,list) or len(reported_suppressed)!=len(set(reported_suppressed)):
+    raise SystemExit("allocator_metrics suppressed stale work list invalid")
+if metrics.get("suppressed_stale_work_item_count")!=len(reported_suppressed):
+    raise SystemExit("allocator_metrics suppressed stale work count drift")
+unknown_suppressed=set(reported_suppressed)-terminal_stale_work_items
+if unknown_suppressed:
+    raise SystemExit(f"allocator_metrics suppresses work without terminal stale evidence: {sorted(unknown_suppressed)}")
 
 for n,r in enumerate(runs,1):
     if (r.get("schema_version") or 0)<9: continue
