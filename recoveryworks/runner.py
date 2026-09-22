@@ -11,6 +11,10 @@ from .report import RecoveryScan360Report, build_scan360_report
 from .store import LocalBundleStore
 from .branches.ap import build_ap_observations
 from .branches.ap_csv import load_obligations_csv, load_payments_csv
+from .branches.freight_io import (
+    load_freight_audit_result_bundle,
+    load_freight_truth_manifest,
+)
 from .branches.payer import audit_payer_lines
 from .branches.payer_csv import load_payer_lines_csv, load_payer_rates_csv
 from .branches.utility import audit_utility_bills
@@ -72,7 +76,7 @@ def run_scan360_config(
     state_path: str | Path,
     base_dir: str | Path = ".",
 ) -> Scan360RunResult:
-    """Run configured AP/payer/utility scans into one durable client ledger.
+    """Run configured freight/AP/payer/utility scans into one durable client ledger.
 
     This function performs detection only. It never approves, authorizes, claims,
     contacts counterparties, or marks money recovered.
@@ -93,6 +97,46 @@ def run_scan360_config(
     added_ids: list[str] = []
     exceptions: list[dict[str, Any]] = []
     engine = RecoveryEngine()
+
+    for job_index, job in enumerate(_jobs(config.get("freight"), name="freight")):
+        truth_path = job.get("truth_manifest_json")
+        bundle_path = job.get("audit_bundle_zip")
+        if bool(truth_path) == bool(bundle_path):
+            raise ValueError(
+                f"freight[{job_index}] requires exactly one of "
+                "truth_manifest_json or audit_bundle_zip"
+            )
+        if truth_path:
+            batch = load_freight_truth_manifest(
+                _resolve(
+                    base,
+                    truth_path,
+                    name=f"freight[{job_index}].truth_manifest_json",
+                )
+            )
+        else:
+            batch = load_freight_audit_result_bundle(
+                _resolve(
+                    base,
+                    bundle_path,
+                    name=f"freight[{job_index}].audit_bundle_zip",
+                )
+            )
+        if batch.buyer_id != client_id:
+            raise ValueError(
+                f"freight[{job_index}] buyer_id does not match Scan 360 client_id"
+            )
+        for observation in batch.observations:
+            if observation.currency.upper() != currency:
+                raise ValueError(
+                    f"freight[{job_index}] currency does not match Scan 360 currency"
+                )
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
 
     for job_index, job in enumerate(_jobs(config.get("ap"), name="ap")):
         payments_path = _resolve(
