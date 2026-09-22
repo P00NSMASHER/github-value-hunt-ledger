@@ -1,0 +1,607 @@
+{
+  "schema_version": 1,
+  "generated_from": [
+    "MASTER.md",
+    "COMPONENTS.md",
+    "CAPABILITIES.md"
+  ],
+  "reviewed_at": "2026-09-22",
+  "base_ref": "f0cd414ac8f4266606cf6adcb5d4d71cbbb2aba8",
+  "policy": [
+    "Exact revisions only; no floating default-branch ingestion.",
+    "Registry admission is not runtime integration or proof of correctness.",
+    "Repository-owned code/content follows the standing user permission posture; third-party datasets, standards, APIs, model weights, assets and customer data remain separately governed.",
+    "Sensitive or accidentally exposed material is never an ingestion source.",
+    "Independent comparators/falsifiers must remain independent when combining them would destroy test value."
+  ],
+  "states": [
+    "QUEUED",
+    "STARTED",
+    "MAPPED",
+    "INTEGRATED",
+    "DEFERRED",
+    "BLOCKED"
+  ],
+  "sources": [
+    {
+      "source_id": "ELITE-001",
+      "repository": "kodekinetics79/opstrax-enterprise-build",
+      "revision": "fec2ba1432d6f8b4ba4c48be3d58e7e096819045",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "freight",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-002",
+      "repository": "emoss08/Trenova",
+      "revision": "95fcf816562025ad9af864ded4a5fce8a555bd65",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "freight",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-003",
+      "repository": "sengtha/Kareya-Silo",
+      "revision": "a43eedea03add0728eadfc1f8ea35cc3ca6867cc",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "freight",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-004",
+      "repository": "vidyesh95/qatoto-backend",
+      "revision": "4f5f270f6ba5ef3ed4b230716997ccea049ce408",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "freight",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-005",
+      "repository": "A-Jatin/freight-ratecon-extraction",
+      "revision": "a3dbbfec7f6b042176880d06c5114f81f29e57eb",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "freight",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-006",
+      "repository": "OmarFaig/Assay",
+      "revision": "821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "shared_evidence",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-007",
+      "repository": "srthck/trustmesh",
+      "revision": "5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "shared_evidence",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-008",
+      "repository": "mgilbir/formalis",
+      "revision": "2b3895a0c2c54e4f25ccb46e131d215ad4457eb2",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "ap_recovery",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-009",
+      "repository": "kingsleyonoh/invoice-reconciliation-engine",
+      "revision": "7545330806168102cd347d64a85a44481b37a6b3",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "ap_recovery",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-010",
+      "repository": "getcoherence/openpartner",
+      "revision": "eeff532ee758dc6221b4d03af852e5705a2328fb",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "settlement_recovery",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-011",
+      "repository": "Superheld/summae",
+      "revision": "9c5292af99bab9716723b82fd221a56f91ab4581",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "shared_ledger",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-012",
+      "repository": "cmdrvl/canon",
+      "revision": "45e9702ba7f3874c073134c1a6fb74500232b6a1",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "shared_identity",
+      "priority": "P0",
+      "status": "MAPPED"
+    },
+    {
+      "source_id": "ELITE-013",
+      "repository": "MassingCloud/massing-pdf",
+      "revision": "36794b3c54fcfd62e3a0d2d5984cfc45cac83340",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "construction",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-014",
+      "repository": "finnertallon-png/contract-deadline-agent",
+      "revision": "c891f5ff391abc58b874675783a7ff2c3775c7bb",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "construction",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-015",
+      "repository": "pedrocodesforcoffee/builder-api",
+      "revision": "3a9d2f3af61b485763a9f0cc4209ed1a8b584683",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "construction",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-016",
+      "repository": "alanbld/utf8proj",
+      "revision": "92d96268159035cc2b53a34467dab6c64d1f0a98",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "construction",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-017",
+      "repository": "GSA/GSA-Acquisition-FAR",
+      "revision": "da52ccbbe114e1f031a7f4c59195c508dbfa485f",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "capturebrief",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-018",
+      "repository": "GSA/GSA-Acquisition-DFARS",
+      "revision": "7e609f791af9cc6d8e7d75a7b05c83b1f62c0cb8",
+      "score": 30,
+      "source_tier": "MASTER",
+      "integration_target": "capturebrief",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-019",
+      "repository": "acqagent/far-collector",
+      "revision": "40789a073134a484b2e4a5a2398629b067da0eea",
+      "score": 30,
+      "source_tier": "MASTER",
+      "integration_target": "capturebrief",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-020",
+      "repository": "acqagent/rfo-deviations",
+      "revision": "ccf31107508085cc311fb07488eb513ab97c6b7d",
+      "score": 30,
+      "source_tier": "MASTER",
+      "integration_target": "capturebrief",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-021",
+      "repository": "fedspendingtransparency/usaspending-api",
+      "revision": "1692d484b38c66361c54faa221548527cae29964",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "capturebrief",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-022",
+      "repository": "fedspendingtransparency/data-act-broker-backend",
+      "revision": "76dcae4ccbf6951223608bc1d8fd0c5b03da5d68",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "capturebrief",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-023",
+      "repository": "probavi/probavi",
+      "revision": "3f0dd3bd94259f91eb0a54ce6b5425afb70ad216",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "recovery_readiness",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-024",
+      "repository": "ersinkoc/Kronos",
+      "revision": "541d06069459a313f91940191a2ec3812f724a71",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "recovery_readiness",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-025",
+      "repository": "mehdi-arfaoui/Stronghold",
+      "revision": "776fe21f159bcab9e4333c716c8ac11cd6329a91",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "recovery_readiness",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-026",
+      "repository": "open-eid/SiVa",
+      "revision": "0c9c5f2490b1a27798b47906bbaa6adb4d26daad",
+      "score": 25,
+      "source_tier": "MASTER_UNIQUE",
+      "integration_target": "recovery_readiness",
+      "priority": "P2",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-027",
+      "repository": "Benchling-Open-Source/allotropy",
+      "revision": "ecc574986b74f91eb84cd0ee14756cd8dc5e1b7e",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "lab_automation",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-028",
+      "repository": "AccelerationConsortium/HELIOS",
+      "revision": "1e5765ec694d5ba5c26f5a8605c7e37b238a19e0",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "lab_automation",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-029",
+      "repository": "GRIDAPPSD/CIMHub",
+      "revision": "5ba4c63fa525108928942d564fddc022c3fb031f",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "grid_intelligence",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-030",
+      "repository": "sandialabs/DREAMS",
+      "revision": "3eb6c6089eadf09a4bf99961faac11a76ef30ca0",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "grid_intelligence",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-031",
+      "repository": "suoten/ProtoForge",
+      "revision": "7c61b10d9ae406224c86741d9c0a450b561b40ca",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "industrial_validation",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-032",
+      "repository": "pialmmh/billing-dotnetcore",
+      "revision": "ec9e0abacce7e80b3a34d2d89b929ee5db946209",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "telecom",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-033",
+      "repository": "owgreen-dev/grid-crunch",
+      "revision": "5f0c9a074d928b79caa792a84e8e92de1b2df3f2",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "grid_intelligence",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-034",
+      "repository": "joschiservice/RosterSpec",
+      "revision": "f7e701c694bf1facdc4999e1681a3aa11493614d",
+      "score": 29,
+      "source_tier": "MASTER",
+      "integration_target": "workforce",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-035",
+      "repository": "aurelianware/cloudhealthoffice",
+      "revision": "85c8e18146d168ad2f4e30fbcfe6e90af0bfdb58",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "payer_recovery",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-036",
+      "repository": "OCA/rma",
+      "revision": "9416b2a5f5e1d604eff27610635eb3573227337c",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "warranty_recovery",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-037",
+      "repository": "bsaffel/moneybin",
+      "revision": "fd34d99962c833de87bdb45351f0ace142db3f63",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "shared_evidence",
+      "priority": "P0",
+      "status": "STARTED"
+    },
+    {
+      "source_id": "ELITE-038",
+      "repository": "mnmn0/mukuroji",
+      "revision": "34ec66604443da9ba60e9cfbf4d2e6246445bf66",
+      "score": 28,
+      "source_tier": "MASTER",
+      "integration_target": "recovery_readiness",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-039",
+      "repository": "opensanctions/nomenklatura",
+      "revision": "844dba09fafc8512dc3ce241f44aa5415b367029",
+      "score": 29,
+      "source_tier": "COMPONENT",
+      "integration_target": "shared_identity",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-040",
+      "repository": "ChelseaKR/constituent-reconciler",
+      "revision": "dbc09d25baec026027e65a0f8d21930509e2dd8e",
+      "score": 29,
+      "source_tier": "COMPONENT",
+      "integration_target": "shared_identity",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-041",
+      "repository": "kirilurbonas/FireDrill",
+      "revision": "1e532b17e49e4424f988b29dd338ae6c48dc20f3",
+      "score": 29,
+      "source_tier": "COMPONENT",
+      "integration_target": "recovery_readiness",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-042",
+      "repository": "adamleap02/PermitBuild",
+      "revision": "ff795137e0c66e62a87e62956fa351926886255d",
+      "score": 29,
+      "source_tier": "COMPONENT",
+      "integration_target": "permitplate",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-043",
+      "repository": "odoo/odoo",
+      "revision": "c55c82dac6283a77ee747e1e672a29e85180980f",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "ap_recovery",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-044",
+      "repository": "duke5am/pg-restore-drill",
+      "revision": "e914caddd14ab1604d85ccb7919d4da071a6766c",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "recovery_readiness",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-045",
+      "repository": "carabiner-dev/ampel",
+      "revision": "5cf19bc2786cbd73a8423383a966fbf842222d23",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "shared_evidence",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-046",
+      "repository": "nearai/pg-backup",
+      "revision": "6836158bdfd38937a55fd21d72e221192d2a9b59",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "recovery_readiness",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-047",
+      "repository": "snapetech/DuneAwakeningSelfHost",
+      "revision": "8d3bac1df38f45fb13e2c1427216bf5dc384687b",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "recovery_readiness",
+      "priority": "P2",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-048",
+      "repository": "slicedearth/contract-delta-au",
+      "revision": "630d1903507e6f5e47adaf1c690c9d6d4363af54",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "capturebrief",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-049",
+      "repository": "SemaphoreSolutions/s4-clarity-lib",
+      "revision": "ad577fff3a3c4c93f4bb898940a0b45268c7dbe7",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "lab_automation",
+      "priority": "P2",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-050",
+      "repository": "Illumina/interop",
+      "revision": "015a85ec100c7a770ed0e27ce7fadc6230a38208",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "lab_automation",
+      "priority": "P2",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-051",
+      "repository": "NationalGenomicsInfrastructure/scilifelab_epps",
+      "revision": "fbbe16f9a5ee50d4df610b20908cef501da32bbe",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "lab_automation",
+      "priority": "P2",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-052",
+      "repository": "labscript-suite/labscript-suite",
+      "revision": "0ab902d0d8bc681fcd6a3a194d7b0d458c9b5338",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "lab_automation",
+      "priority": "P2",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-053",
+      "repository": "labscript-suite/labscript-devices",
+      "revision": "424b9f4b0de931f48fe1b0e5760797f9e5b89ee5",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "lab_automation",
+      "priority": "P2",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-054",
+      "repository": "prathamesh-git9/effect-broker",
+      "revision": "eb273640a3a8a2d65fc15169ed1f6d335608b23e",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "shared_settlement",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-055",
+      "repository": "nzebrian/eruofood-ai",
+      "revision": "9c191ece9b27ad6efd7675dd7bf7013e5e1bdf1c",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "settlement_recovery",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-056",
+      "repository": "payops-labs/solana-payment-ops",
+      "revision": "7e4d9cc8d137e4d32cdb4b23aa5c0965f3379e94",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "shared_settlement",
+      "priority": "P0",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-057",
+      "repository": "NotAbdelrahmanelsayed/paymob_integration",
+      "revision": "8999a6799c5673ad49471224ad0f8012a447495d",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "shared_settlement",
+      "priority": "P1",
+      "status": "QUEUED"
+    },
+    {
+      "source_id": "ELITE-058",
+      "repository": "Jaskeeratr/grid-reliability-analytics",
+      "revision": "24e59a7318db3560b6547ff9b79416119abf6ecb",
+      "score": 28,
+      "source_tier": "COMPONENT",
+      "integration_target": "grid_intelligence",
+      "priority": "P2",
+      "status": "QUEUED"
+    }
+  ]
+}
