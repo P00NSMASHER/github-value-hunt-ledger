@@ -633,6 +633,7 @@ def build_outcome_credit(
     outcomes: Sequence[Mapping[str, Any]],
     *,
     config: TrainingEnvironmentConfig | None = None,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
@@ -642,7 +643,11 @@ def build_outcome_credit(
         if run.get("search_run_id")
     }
     splits = {
-        rid: split_for_run(run, config=cfg)
+        rid: split_for_run(
+            run,
+            config=cfg,
+            split_receipts=split_receipts,
+        )
         for rid, run in runs_by_id.items()
     }
     edges: list[dict[str, Any]] = []
@@ -1012,6 +1017,7 @@ def build_training_environment(
     outcomes: Sequence[Mapping[str, Any]],
     *,
     config: TrainingEnvironmentConfig | None = None,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
@@ -1019,6 +1025,7 @@ def build_training_environment(
         search_runs,
         outcomes,
         config=cfg,
+        split_receipts=split_receipts,
     )
     credit_by_run = _aggregate_credit_by_run(
         credit_edges
@@ -1038,9 +1045,13 @@ def build_training_environment(
         split = split_for_run(
             run,
             config=cfg,
+            split_receipts=split_receipts,
         )
-        discovery = discovery_signal(run)
-        if split == "excluded" or discovery is None:
+        discovery = discovery_signal(
+            run,
+            split_receipts=split_receipts,
+        )
+        if split in {"excluded", "pending_partition"} or discovery is None:
             excluded_runs.append(
                 {
                     "run_id": rid,
@@ -1048,7 +1059,11 @@ def build_training_environment(
                         "inconsistent_search_telemetry:"
                         + ",".join(consistency_errors)
                         if consistency_errors
-                        else "not_eligible_search_training_record"
+                        else (
+                            "pending_blind_partition"
+                            if split == "pending_partition"
+                            else "not_eligible_search_training_record"
+                        )
                     ),
                 }
             )
@@ -1245,6 +1260,7 @@ def build_training_environment(
                 "never crosses train/confirm/evaluation "
                 "split; mixed-origin outcomes excluded"
             ),
+            "blind_partition_receipts_required": True,
         },
         "reward_policy": {
             **asdict(cfg),
