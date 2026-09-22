@@ -86,9 +86,81 @@ class TariffLedgerTests(unittest.TestCase):
                 ).fetchall()
             }
             self.assertTrue(
-                {"entities", "tariff_locations", "snapshots", "terms", "crawl_errors"}
+                {"entities", "tariff_locations", "snapshots", "snapshot_observations", "terms", "crawl_errors"}
                 <= tables
             )
+            conn.close()
+
+    def test_snapshot_identity_is_separate_from_observation_history(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = crawler.init_db(root / "ledger.sqlite")
+            src = crawler.EntitySource(
+                entity_class="vocc",
+                organization_no="123456",
+                legal_name="ACME OCEAN LLC",
+                trade_name="",
+                active=True,
+                tariff_url="https://carrier.example/tariff",
+                directory_url="https://fmc.example/report",
+                directory_sha256="d" * 64,
+            )
+
+            def persist(digest: str, observed_at: str):
+                crawler.persist_crawl_result(
+                    conn,
+                    {
+                        "source": src,
+                        "snapshots": [{
+                            "requested_url": "https://carrier.example/tariff.pdf",
+                            "final_url": "https://carrier.example/tariff.pdf",
+                            "fetched_at": observed_at,
+                            "http_status": 200,
+                            "content_type": "application/pdf",
+                            "byte_count": 10,
+                            "sha256": digest,
+                            "blob_relpath": f"blobs/sha256/{digest[:2]}/{digest}",
+                            "parser_status": "parsed:pdf",
+                            "title": "Tariff",
+                            "source_version": None,
+                            "effective_from": None,
+                            "effective_to": None,
+                        }],
+                        "terms": [],
+                        "errors": [],
+                    },
+                    root,
+                )
+
+            persist("a" * 64, "2026-01-01T00:00:00+00:00")
+            persist("a" * 64, "2026-01-02T00:00:00+00:00")
+            persist("b" * 64, "2026-02-01T00:00:00+00:00")
+
+            self.assertEqual(
+                conn.execute("SELECT COUNT(*) FROM snapshots").fetchone()[0],
+                2,
+            )
+            self.assertEqual(
+                conn.execute("SELECT COUNT(*) FROM snapshot_observations").fetchone()[0],
+                3,
+            )
+            rows = conn.execute(
+                """SELECT sha256, first_observed_at, last_observed_at,
+                          next_version_first_observed_at
+                   FROM snapshot_observation_windows
+                   ORDER BY first_observed_at"""
+            ).fetchall()
+            self.assertEqual(
+                rows[0],
+                (
+                    "a" * 64,
+                    "2026-01-01T00:00:00+00:00",
+                    "2026-01-02T00:00:00+00:00",
+                    "2026-02-01T00:00:00+00:00",
+                ),
+            )
+            self.assertEqual(rows[1][0], "b" * 64)
+            self.assertIsNone(rows[1][3])
             conn.close()
 
     def test_shard_assignment_is_complete_and_disjoint(self):
