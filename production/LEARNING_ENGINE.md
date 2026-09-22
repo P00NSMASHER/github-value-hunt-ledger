@@ -21,6 +21,8 @@ No third-party runtime is required for the first layer. The production engine is
 
 ### 1. Value-scored memory — active, observe-first
 
+Value is learned at both global and search-objective scope. Objective-conditioned priors prevent success in one problem class from being blindly generalized to unrelated lanes. Search moves are credited from their own observed hit/yield telemetry rather than inheriting the whole hunt's reward, and repeated uses of the same move type within one hunt collapse to one averaged update.
+
 `production/learning_engine.py::ValueMemory` maintains a bounded Q-value per strategy, query family, search move, salvaged trajectory, or local skill.
 
 `tools/ti_learning_state.py` rebuilds those values from canonical `search_runs.jsonl` plus linked `outcomes.jsonl`.
