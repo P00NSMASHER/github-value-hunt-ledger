@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-import json, re, sys
+import json, re
 from collections import defaultdict
 from ti_common import INTEL, ROOT, load_jsonl, write_jsonl, slug, is_discovery_run
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from production.learning_measurement_blinding import (
+from ti_learning_measurement_blinding import (
     PHASE_BLIND_CONTRACT_VERSION,
     REQUIRED_BLINDING_STOP,
 )
