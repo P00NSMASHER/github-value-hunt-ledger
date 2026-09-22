@@ -14,6 +14,8 @@ class LearningStateIntegrationTests(unittest.TestCase):
             "timestamp": f"2026-09-{10 + index:02d}T00:00:00Z",
             "work_action": "search",
             "measurement_quality": "prospective",
+            "allocation_mode": "generated",
+            "execution_claim_id": f"CLAIM:test:{index}",
             "strategy_id": "STRAT:integration-test",
             "query_family_id": "QF:integration-test",
             "candidate_count": max(1, deep),
