@@ -79,7 +79,7 @@ A candidate is rejected for:
 - no dev improvement;
 - insufficient held-out delta against the current champion.
 
-A passing candidate reaches only `STAGED_MUTATION`. The pre-existing production rule still controls GLOBAL promotion:
+A passing candidate reaches only `STAGED_MUTATION`. Separately, any strategy/query-family that is train-ready but becomes negative on sufficient confirm evidence is labeled `overfit_signal`, suppressed from live priors, and surfaced for falsification/repair. The pre-existing production rule still controls GLOBAL promotion:
 
 2 distinct successes → STAGED → >=5 held-out tasks at 100% with zero regressions + adversarial + adjacent-domain transfer + curator approval → CANARY → >=3 hunters with zero regressions → GLOBAL.
 
