@@ -90,13 +90,30 @@ class RecoveryWorksTests(unittest.TestCase):
         ledger = RecoveryLedger()
         rec = ledger.add(finding)
         self.assertIs(rec.case_state, CaseState.VALIDATED)
+        claim_receipt = EvidenceRef(
+            evidence_id="claim-receipt",
+            source_hash="claimhash",
+            locator="source://claim/receipt",
+            kind="claim_submission_receipt",
+            verified=True,
+        )
+        recovery_receipt = EvidenceRef(
+            evidence_id="settlement-receipt",
+            source_hash="settlementhash",
+            locator="source://settlement/receipt",
+            kind="recovery_settlement",
+            verified=True,
+        )
         with self.assertRaises(ValueError):
-            ledger.mark_claimed(finding.finding_id)
+            ledger.mark_claimed(finding.finding_id, claim_receipt)
         ledger.approve(finding.finding_id, "reviewer-1", "Checked source and calculation")
         ledger.authorize(finding.finding_id, "customer-auth-1")
-        claimed = ledger.mark_claimed(finding.finding_id)
+        claimed = ledger.mark_claimed(finding.finding_id, claim_receipt)
         self.assertIs(claimed.case_state, CaseState.CLAIMED)
-        recovered = ledger.mark_recovered(finding.finding_id, 3000, 600)
+        recovered = ledger.mark_recovered(
+            finding.finding_id, 3000, 600,
+            recovery_evidence=recovery_receipt,
+        )
         self.assertIs(recovered.case_state, CaseState.RECOVERED)
         self.assertEqual(ledger.rollup()["totals"]["fee_cents"], 600)
 
