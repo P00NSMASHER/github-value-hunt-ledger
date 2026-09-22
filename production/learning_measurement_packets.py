@@ -107,6 +107,19 @@ def build_measurement_packets(
             "seed": {
                 "seed_id": seed.get("seed_id"),
                 "seed_type": seed.get("seed_type"),
+                "work_action": seed.get("work_action"),
+                "measurement_contract_version": seed.get(
+                    "measurement_contract_version"
+                ),
+                "query_recipe_id": seed.get("query_recipe_id"),
+                "query_anchors": list(
+                    seed.get("query_anchors") or []
+                ),
+                "next_action": seed.get("next_action"),
+                "action_gate": seed.get("action_gate"),
+                "required_signatures": list(
+                    seed.get("required_signatures") or []
+                ),
                 "search_objective_id": seed.get(
                     "search_objective_id"
                 ),
@@ -217,6 +230,20 @@ def validate_measurement_packets(
             errors.append(f"seed_required:{pid}")
         if seed.get("seed_type") != "learning_measurement":
             errors.append(f"learning_measurement_seed_required:{pid}")
+        if seed.get("work_action") != "search":
+            errors.append(f"learning_measurement_search_required:{pid}")
+        if seed.get("measurement_contract_version") != "phase_blind_v1":
+            errors.append(f"phase_blind_contract_required:{pid}")
+        if not seed.get("query_recipe_id"):
+            errors.append(f"query_recipe_required:{pid}")
+        if not seed.get("query_anchors"):
+            errors.append(f"query_anchors_required:{pid}")
+        if not seed.get("next_action"):
+            errors.append(f"next_action_required:{pid}")
+        if not seed.get("action_gate"):
+            errors.append(f"action_gate_required:{pid}")
+        if not seed.get("required_signatures"):
+            errors.append(f"required_signatures_required:{pid}")
         if seed.get("authorization_basis") != "adaptive_learning_curriculum":
             errors.append(f"learning_curriculum_authorization_required:{pid}")
         if not str(seed.get("seed_id") or "").startswith("SEED:learn:"):
