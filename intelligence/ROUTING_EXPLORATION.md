@@ -1,13 +1,20 @@
 # CONTROLLED ROUTING EXPLORATION
 
-Generation: **ROUTEEXP:af551f9d2287**
-Routing generation: **ROUTING:987dd177e849**
-Gate: **0.4217 / 0.2500**
-Applied: **False**
-Reason: **gate_closed**
+Generation: **ROUTEEXP:f3616a8626ea**
+Routing generation: **ROUTING:04b913ba562f**
+Gate: **0.0745 / 0.2500**
+Applied: **True**
+Reason: **controlled_low_regret_swap**
 
 V18 may alter at most one two-worker pairing per routing generation. It never changes the assignment portfolio itself.
 
-- Baseline maximum-total-fit routing is unchanged.
+- Pair: **EXPPAIR:186b69288aa0**
+- Workers: **HUNTER-10, HUNTER-12**
+- Baseline slots: **SLOT-10, SLOT-11**
+- Exploration slots: **SLOT-11, SLOT-10**
+- Match basis: **role+work_kind+strategy+objective**
+- Absolute routing-score regret: **0.0000**
+- Relative regret: **0.00%**
+- Measurement need: **6**
 
 Exploration is deterministic from pre-outcome routing state and is designed to create low-regret assignment variation for later matched analysis. It is not evidence that one worker is better than another.
