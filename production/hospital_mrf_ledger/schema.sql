@@ -180,3 +180,135 @@ SELECT
 FROM charge_rows cr
 JOIN mrf_snapshots ms ON ms.id = cr.mrf_snapshot_id
 LEFT JOIN hospital_identities hi ON hi.mrf_snapshot_id = ms.id;
+
+
+CREATE TABLE IF NOT EXISTS registry_sources (
+  id INTEGER PRIMARY KEY,
+  source_key TEXT NOT NULL,
+  repository TEXT NOT NULL,
+  revision TEXT NOT NULL,
+  source_path TEXT NOT NULL,
+  observed_at TEXT NOT NULL,
+  sha256 TEXT NOT NULL,
+  byte_count INTEGER NOT NULL,
+  blob_relpath TEXT NOT NULL,
+  upstream_license TEXT,
+  evidence_class TEXT NOT NULL,
+  UNIQUE(repository, revision, source_path, sha256)
+);
+
+CREATE TABLE IF NOT EXISTS national_hospital_registry (
+  id INTEGER PRIMARY KEY,
+  registry_source_id INTEGER NOT NULL REFERENCES registry_sources(id),
+  ccn TEXT NOT NULL,
+  hospital_name TEXT NOT NULL,
+  address TEXT,
+  city TEXT,
+  state TEXT,
+  zip TEXT,
+  hospital_type TEXT,
+  domain TEXT,
+  pointer_url TEXT,
+  mrf_url TEXT,
+  mrf_last_updated TEXT,
+  cms_template_version TEXT,
+  finding TEXT,
+  assessable INTEGER,
+  checked_at TEXT,
+  evidence TEXT,
+  UNIQUE(registry_source_id, ccn)
+);
+
+CREATE INDEX IF NOT EXISTS idx_national_hospital_registry_ccn
+  ON national_hospital_registry(ccn);
+CREATE INDEX IF NOT EXISTS idx_national_hospital_registry_mrf
+  ON national_hospital_registry(mrf_url);
+CREATE INDEX IF NOT EXISTS idx_national_hospital_registry_domain
+  ON national_hospital_registry(domain);
+
+CREATE TABLE IF NOT EXISTS historical_hospital_mrf_registry (
+  id INTEGER PRIMARY KEY,
+  registry_source_id INTEGER NOT NULL REFERENCES registry_sources(id),
+  ccn TEXT,
+  reporting_entity_name_legal TEXT,
+  reporting_entity_name_common TEXT,
+  reporting_entity_type TEXT,
+  machine_readable_url TEXT,
+  machine_readable_url_status TEXT,
+  machine_readable_page TEXT,
+  supplemental_url TEXT,
+  file_name TEXT,
+  file_format TEXT,
+  file_size TEXT,
+  meets_standard TEXT,
+  standard_issue TEXT,
+  state_or_region TEXT,
+  last_updated_date TEXT,
+  entry_date TEXT,
+  notes TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_historical_hospital_mrf_ccn
+  ON historical_hospital_mrf_registry(ccn);
+CREATE INDEX IF NOT EXISTS idx_historical_hospital_mrf_url
+  ON historical_hospital_mrf_registry(machine_readable_url);
+
+CREATE VIEW IF NOT EXISTS hospital_discovery_evidence AS
+SELECT
+  'direct_cms_hpt' AS evidence_class,
+  NULL AS ccn,
+  he.location_name AS hospital_name,
+  NULL AS address,
+  NULL AS city,
+  NULL AS state,
+  sd.root_url AS domain_or_root,
+  ts.requested_url AS pointer_url,
+  he.mrf_url AS mrf_url,
+  NULL AS mrf_last_updated,
+  NULL AS cms_template_version,
+  'DIRECT_POINTER_OBSERVED' AS finding,
+  he.discovered_at AS observed_or_checked_at,
+  ts.sha256 AS source_sha256
+FROM hpt_entries he
+JOIN source_domains sd ON sd.id=he.source_id
+LEFT JOIN txt_snapshots ts ON ts.id=he.txt_snapshot_id
+
+UNION ALL
+
+SELECT
+  'national_2026_tracker',
+  n.ccn,
+  n.hospital_name,
+  n.address,
+  n.city,
+  n.state,
+  n.domain,
+  n.pointer_url,
+  n.mrf_url,
+  n.mrf_last_updated,
+  n.cms_template_version,
+  n.finding,
+  n.checked_at,
+  rs.sha256
+FROM national_hospital_registry n
+JOIN registry_sources rs ON rs.id=n.registry_source_id
+
+UNION ALL
+
+SELECT
+  'historical_2022_registry',
+  h.ccn,
+  COALESCE(NULLIF(h.reporting_entity_name_common,''), h.reporting_entity_name_legal),
+  NULL,
+  NULL,
+  h.state_or_region,
+  NULL,
+  h.machine_readable_page,
+  h.machine_readable_url,
+  h.last_updated_date,
+  NULL,
+  h.machine_readable_url_status,
+  h.entry_date,
+  rs.sha256
+FROM historical_hospital_mrf_registry h
+JOIN registry_sources rs ON rs.id=h.registry_source_id;
