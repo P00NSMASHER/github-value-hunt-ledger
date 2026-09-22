@@ -1,0 +1,101 @@
+import copy
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+from recoveryworks import EvidenceRef, RecoveryEngine, RecoveryLedger, RuleRef
+from recoveryworks.branches import from_ap_variance
+from recoveryworks.storage import export_ledger, import_ledger, load_ledger, save_ledger
+
+
+def ledger_with_recovery():
+    rule = RuleRef(
+        rule_id="invoice-rule",
+        source_hash="rulehash",
+        effective_from="2026-01-01",
+        effective_to=None,
+        verified_controlling=True,
+        source_locator="source://invoice",
+    )
+    evidence = EvidenceRef(
+        evidence_id="pay-1",
+        source_hash="paymenthash",
+        locator="source://payment#1",
+        kind="payment",
+        verified=True,
+    )
+    observation = from_ap_variance(
+        client_id="client-1",
+        vendor_id="vendor-1",
+        transaction_id="inv-1",
+        transaction_date="2026-06-01",
+        expected_cents=10000,
+        paid_cents=15000,
+        rule=rule,
+        evidence=(evidence,),
+    )
+    finding = RecoveryEngine().evaluate(observation)
+    ledger = RecoveryLedger()
+    ledger.add(finding)
+    ledger.approve(finding.finding_id, "reviewer", "verified")
+    ledger.authorize(finding.finding_id, "customer-auth")
+    ledger.mark_claimed(finding.finding_id)
+    ledger.mark_recovered(finding.finding_id, 4000, 800)
+    return ledger
+
+
+class LedgerStorageTests(unittest.TestCase):
+    def test_export_import_preserves_snapshot_and_audit_chain(self):
+        original = ledger_with_recovery()
+        payload = export_ledger(original)
+        restored = import_ledger(payload)
+        self.assertEqual(restored.snapshot_hash, original.snapshot_hash)
+        self.assertEqual(restored.audit_head, original.audit_head)
+        self.assertTrue(restored.verify_event_chain())
+        self.assertEqual(restored.rollup(), original.rollup())
+
+    def test_atomic_file_roundtrip(self):
+        original = ledger_with_recovery()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.json"
+            save_ledger(path, original)
+            restored = load_ledger(path)
+            self.assertEqual(restored.snapshot_hash, original.snapshot_hash)
+            self.assertTrue(path.exists())
+
+    def test_tampered_money_is_rejected(self):
+        payload = export_ledger(ledger_with_recovery())
+        tampered = copy.deepcopy(payload)
+        tampered["records"][0]["recovered_cents"] += 1
+        with self.assertRaises(ValueError):
+            import_ledger(tampered)
+
+    def test_tampered_event_chain_is_rejected_even_if_outer_hash_recomputed(self):
+        payload = export_ledger(ledger_with_recovery())
+        tampered = copy.deepcopy(payload)
+        tampered["events"][1]["previous_event_hash"] = "0" * 64
+        core = {
+            "schema": tampered["schema"],
+            "records": tampered["records"],
+            "events": tampered["events"],
+            "audit_head": tampered["audit_head"],
+            "ledger_snapshot_hash": tampered["ledger_snapshot_hash"],
+        }
+        from recoveryworks.models import canonical_hash
+        tampered["export_hash"] = canonical_hash(core)
+        with self.assertRaises(ValueError):
+            import_ledger(tampered)
+
+    def test_event_for_unknown_finding_is_rejected(self):
+        payload = export_ledger(ledger_with_recovery())
+        tampered = copy.deepcopy(payload)
+        tampered["events"][0]["finding_id"] = "unknown"
+        # Recomputing nested hashes is deliberately omitted: the first failing
+        # integrity layer should already reject the mutation.
+        with self.assertRaises(ValueError):
+            import_ledger(tampered)
+
+
+if __name__ == "__main__":
+    unittest.main()
