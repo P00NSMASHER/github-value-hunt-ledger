@@ -54,6 +54,55 @@ CREATE TABLE IF NOT EXISTS snapshots (
 CREATE INDEX IF NOT EXISTS idx_snapshots_sha ON snapshots(sha256);
 CREATE INDEX IF NOT EXISTS idx_snapshots_effective ON snapshots(effective_from, effective_to);
 
+-- Snapshot identity is content-addressed, while observations record every time that
+-- exact version was seen. This preserves temporal evidence across unchanged re-runs
+-- without duplicating raw bytes or conflating observation time with business effectivity.
+CREATE TABLE IF NOT EXISTS snapshot_observations (
+  id INTEGER PRIMARY KEY,
+  snapshot_id INTEGER NOT NULL REFERENCES snapshots(id),
+  observed_at TEXT NOT NULL,
+  http_status INTEGER,
+  final_url TEXT,
+  content_type TEXT,
+  UNIQUE(snapshot_id, observed_at)
+);
+
+CREATE INDEX IF NOT EXISTS idx_snapshot_observations_snapshot
+  ON snapshot_observations(snapshot_id, observed_at);
+
+CREATE VIEW IF NOT EXISTS snapshot_observation_windows AS
+WITH obs AS (
+  SELECT
+    snapshot_id,
+    MIN(observed_at) AS first_observed_at,
+    MAX(observed_at) AS last_observed_at
+  FROM snapshot_observations
+  GROUP BY snapshot_id
+),
+versions AS (
+  SELECT
+    s.id AS snapshot_id,
+    s.tariff_location_id,
+    s.requested_url,
+    s.sha256,
+    COALESCE(obs.first_observed_at, s.fetched_at) AS first_observed_at,
+    COALESCE(obs.last_observed_at, s.fetched_at) AS last_observed_at
+  FROM snapshots s
+  LEFT JOIN obs ON obs.snapshot_id = s.id
+)
+SELECT
+  snapshot_id,
+  tariff_location_id,
+  requested_url,
+  sha256,
+  first_observed_at,
+  last_observed_at,
+  LEAD(first_observed_at) OVER (
+    PARTITION BY tariff_location_id, requested_url
+    ORDER BY first_observed_at, snapshot_id
+  ) AS next_version_first_observed_at
+FROM versions;
+
 CREATE TABLE IF NOT EXISTS terms (
   id INTEGER PRIMARY KEY,
   snapshot_id INTEGER NOT NULL REFERENCES snapshots(id),
@@ -142,8 +191,16 @@ SELECT
   s.final_url,
   s.sha256 AS source_sha256,
   s.fetched_at,
+  ow.first_observed_at,
+  ow.last_observed_at,
+  ow.next_version_first_observed_at,
   COALESCE(t.effective_from, s.effective_from) AS effective_from,
   COALESCE(t.effective_to, s.effective_to) AS effective_to,
+  CASE
+    WHEN COALESCE(t.effective_from, s.effective_from) IS NOT NULL
+      THEN 'explicit_effective'
+    ELSE 'observed_only'
+  END AS date_basis,
   COALESCE(t.source_version, s.source_version) AS source_version,
   t.rule_type,
   t.term_kind,
@@ -158,4 +215,5 @@ SELECT
 FROM terms t
 JOIN snapshots s ON s.id = t.snapshot_id
 JOIN tariff_locations tl ON tl.id = s.tariff_location_id
-JOIN entities e ON e.id = tl.entity_id;
+JOIN entities e ON e.id = tl.entity_id
+LEFT JOIN snapshot_observation_windows ow ON ow.snapshot_id = s.id;
