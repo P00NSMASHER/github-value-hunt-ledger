@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
-import json, re
+import json, re, sys
 from collections import defaultdict
 from ti_common import INTEL, ROOT, load_jsonl, write_jsonl, slug, is_discovery_run
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from production.learning_measurement_blinding import (
+    PHASE_BLIND_CONTRACT_VERSION,
+    REQUIRED_BLINDING_STOP,
+)
 from ti_search_actions import (capability_recipe, transfer_recipe, inherited_fields,
                                parse_capability_ids, experiment_status, action_errors)
 
@@ -313,12 +321,11 @@ for i,row in enumerate(learning_recs[:3]):
     g=gaps[i % len(gaps)]
     target=g["capability_ids"][0] if g.get("capability_ids") else g["query_recipe_id"]
     sid=row["strategy_id"]
-    phase=row.get("phase")
     seed_id="SEED:learn:"+slug(sid.replace("STRAT:",""))+"-"+slug(target)
-    base_priority=float(row.get("measurement_priority") or 0)
+    # Worker-visible measurement priority must not encode curriculum phase or
+    # train/confirm debt. Seed-history adjustment is phase-independent.
+    base_priority=75.0
     priority=max(1,min(100,round(base_priority+perf_adjust(seed_id),2)))
-    train=row.get("train") or {}
-    confirm=row.get("confirm") or {}
     seeds.append({
       "seed_id":seed_id,
       "seed_type":"learning_measurement",
@@ -330,16 +337,13 @@ for i,row in enumerate(learning_recs[:3]):
       "capability_ids":g.get("capability_ids") or [],
       "experiment_ids":g.get("experiment_ids") or [],
       "source_nodes":[sid,"LEARNING_CURRICULUM"]+g.get("source_nodes",[]),
-      "learning_phase":phase,
-      "learning_curriculum_rank":row.get("rank"),
-      "learning_selection_reason":row.get("selection_reason"),
+      "measurement_contract_version":PHASE_BLIND_CONTRACT_VERSION,
       "why_now":(
-          f"{sid} is a curriculum-ranked adaptive-learning measurement target "
-          f"({phase}). Train evidence: {train.get('runs',0)} runs / "
-          f"{train.get('deep_inspections',0)} deep; confirm evidence: "
-          f"{confirm.get('runs',0)} runs / {confirm.get('deep_inspections',0)} deep. "
-          f"Pair it with {target} so the run measures a real bounded search task. "
-          "The worker must not know or infer whether this run will later be train or confirm."
+          f"{sid} is a scheduler-selected adaptive-learning measurement target. "
+          f"Pair it with {target} for one bounded comparable search. "
+          "Scheduler-only learning state is intentionally withheld from the worker; "
+          "apply the named strategy exactly as specified and freeze the observed result "
+          "before any learning-state reconciliation."
       ),
       "required_signatures":g.get("required_signatures") or [],
       "query_templates":g.get("query_templates") or [],
@@ -348,7 +352,8 @@ for i,row in enumerate(learning_recs[:3]):
       "stop_conditions":g["stop_conditions"]+[
           "Do not turn a learning-measurement run into an unrestricted domain sweep.",
           "A no-find result is valid data; do one materially different recall-rescue pass, then stop.",
-          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership."
+          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.",
+          REQUIRED_BLINDING_STOP
       ],
       "authorization_basis":"adaptive_learning_curriculum",
       "exclude_domains":g.get("exclude_domains",[]),
