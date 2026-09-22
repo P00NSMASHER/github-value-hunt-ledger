@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import json
 from typing import Any, Mapping, Sequence
 
 
@@ -286,16 +287,35 @@ def validate_partition_receipts(
     search_runs: Sequence[Mapping[str, Any]],
     *,
     secret: str | None = None,
+    key_commitment: Mapping[str, Any] | None = None,
 ) -> list[str]:
     errors: list[str] = []
-    runs_by_claim: dict[str, Mapping[str, Any]] = {}
-    for run in search_runs:
+    commitment, commitment_errors = build_key_commitment(
+        search_runs,
+        key_commitment,
+        secret=secret,
+    )
+    errors.extend(commitment_errors)
+
+    runs_by_claim: dict[str, tuple[int, Mapping[str, Any]]] = {}
+    for index, run in enumerate(search_runs):
         claim_id = trusted_claim_id(run)
         if claim_id:
             if claim_id in runs_by_claim:
                 errors.append(f"duplicate_trusted_claim_run:{claim_id}")
             else:
-                runs_by_claim[claim_id] = run
+                runs_by_claim[claim_id] = (index, run)
+
+    activation_count = (
+        commitment.get("activation_run_count")
+        if commitment
+        else None
+    )
+    activation_prefix = (
+        str(commitment.get("activation_prefix_sha256") or "")
+        if commitment
+        else ""
+    )
 
     seen: set[str] = set()
     for row in receipts:
@@ -309,18 +329,55 @@ def validate_partition_receipts(
             continue
         seen.add(claim_id)
 
-        run = runs_by_claim.get(claim_id)
-        if run is None:
+        indexed = runs_by_claim.get(claim_id)
+        if indexed is None:
             errors.append(f"receipt_unknown_trusted_claim:{claim_id}")
             continue
+        run_index, run = indexed
         if run_id != str(run.get("search_run_id") or ""):
             errors.append(f"receipt_run_id_mismatch:{claim_id}")
 
         if row.get("schema_version") != RECEIPT_SCHEMA_VERSION:
             errors.append(f"receipt_schema_mismatch:{claim_id}")
-        if row.get("partition_method") != PARTITION_METHOD:
-            errors.append(f"receipt_method_mismatch:{claim_id}")
+
+        method = row.get("partition_method")
         partition = row.get("partition")
+        commitment_sha = str(row.get("commitment_sha256") or "").lower()
+        if (
+            len(commitment_sha) != 64
+            or any(ch not in "0123456789abcdef" for ch in commitment_sha)
+        ):
+            errors.append(f"receipt_invalid_commitment:{claim_id}")
+            continue
+
+        if method == PRECOMMIT_METHOD:
+            if commitment is None or not isinstance(activation_count, int):
+                errors.append(f"precommit_receipt_without_key_commitment:{claim_id}")
+                continue
+            if run_index >= activation_count:
+                errors.append(f"precommit_receipt_after_activation:{claim_id}")
+            if partition != "train":
+                errors.append(f"precommit_receipt_not_train:{claim_id}")
+            if row.get("confirm_modulus") is not None:
+                errors.append(f"precommit_receipt_has_modulus:{claim_id}")
+            if row.get("confirm_bucket") is not None:
+                errors.append(f"precommit_receipt_has_bucket:{claim_id}")
+            expected = _precommit_receipt(
+                run,
+                activation_prefix_sha256=activation_prefix,
+            )["commitment_sha256"]
+            if commitment_sha != expected:
+                errors.append(f"precommit_receipt_commitment_mismatch:{claim_id}")
+            continue
+
+        if method != PARTITION_METHOD:
+            errors.append(f"receipt_method_mismatch:{claim_id}")
+            continue
+        if commitment is None or not isinstance(activation_count, int):
+            errors.append(f"hmac_receipt_without_key_commitment:{claim_id}")
+        elif run_index < activation_count:
+            errors.append(f"hmac_receipt_before_activation:{claim_id}")
+
         if partition not in {"train", "confirm"}:
             errors.append(f"receipt_invalid_partition:{claim_id}")
         modulus = row.get("confirm_modulus")
@@ -333,13 +390,6 @@ def validate_partition_receipts(
             or not 0 <= bucket < modulus
         ):
             errors.append(f"receipt_invalid_bucket:{claim_id}")
-        commitment = str(row.get("commitment_sha256") or "").lower()
-        if (
-            len(commitment) != 64
-            or any(ch not in "0123456789abcdef" for ch in commitment)
-        ):
-            errors.append(f"receipt_invalid_commitment:{claim_id}")
-            continue
 
         if secret and isinstance(modulus, int) and isinstance(bucket, int):
             expected_partition, expected_commitment = assign_partition(
@@ -350,7 +400,7 @@ def validate_partition_receipts(
             )
             if partition != expected_partition:
                 errors.append(f"receipt_partition_mismatch:{claim_id}")
-            if commitment != expected_commitment:
+            if commitment_sha != expected_commitment:
                 errors.append(f"receipt_commitment_mismatch:{claim_id}")
 
     return sorted(set(errors))
