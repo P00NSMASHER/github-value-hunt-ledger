@@ -95,3 +95,7 @@ documented in `recoveryworks/INGESTION_CLOUD_MERCHANT.md`.
 ParcelRecovery, ProcurementRecovery, Warranty/CreditRecovery, and
 Payroll/BenefitBillingRecovery schemas and scope boundaries are documented in
 `recoveryworks/INGESTION_PARCEL_PROCUREMENT_CREDIT_PAYROLL.md`.
+
+## Seven-figure assurance
+
+The mandatory proof, dual-control, source-authentication, deadline, and outbound-artifact controls for seven-figure findings are documented in `recoveryworks/HOSTILE_EXAMINATION_STANDARD.md`.
