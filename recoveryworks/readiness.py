@@ -1447,7 +1447,17 @@ def build_seven_figure_authorization_seal(
         "sealed_by": sealed_by,
     }
     return SevenFigureAuthorizationSeal(
-        **{key: value for key, value in body.items() if key != "schema"},
+        seal_version=body["seal_version"],
+        case_bundle_hash=body["case_bundle_hash"],
+        finding_proof_hash=body["finding_proof_hash"],
+        authorization_hash=body["authorization_hash"],
+        readiness_package_hash=body["readiness_package_hash"],
+        readiness_dossier_hash=body["readiness_dossier_hash"],
+        journal_head_hash=body["journal_head_hash"],
+        build_provider_receipt=build_provider_receipt,
+        client_consent=client_consent,
+        sealed_at=body["sealed_at"],
+        sealed_by=body["sealed_by"],
         seal_hash=canonical_hash(body),
     )
 
