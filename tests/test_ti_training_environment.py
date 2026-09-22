@@ -6,7 +6,6 @@ from production.training_environment import (
     build_outcome_credit,
     build_training_environment,
     outcome_signal,
-    partition_for_id,
     split_for_run,
     telemetry_consistency_errors,
     validate_training_environment,
@@ -388,10 +387,10 @@ class TrainingEnvironmentTests(unittest.TestCase):
             execution_origin,
         )
         execution["work_action"] = "execute_fixture"
-        anchor_split = partition_for_id(
-            execution["execution_claim_id"],
-            config=config,
-        )
+        anchor_split = _receipt_map(
+            [execution],
+            config,
+        )[execution["execution_claim_id"]]
         support_id = None
         opposite_id = None
         for index in range(100):
@@ -427,7 +426,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         )
         self.assertEqual(
             edges[0]["credit_anchor"]["kind"],
-            "excluded_direct_origin_precommit",
+            "excluded_direct_origin_blind_receipt",
         )
         self.assertEqual(
             edges[0]["credit_anchor"]["split"],
@@ -441,19 +440,14 @@ class TrainingEnvironmentTests(unittest.TestCase):
             anchor_split,
         )
 
-    def test_manual_run_is_train_only_even_if_run_id_hashes_to_confirm(self):
+    def test_manual_run_is_train_only_and_never_confirm(self):
         config = TrainingEnvironmentConfig(
             confirm_modulus=2,
             confirm_bucket=0,
         )
-        chosen = None
-        for index in range(100):
-            run_id = f"RUN:manual:{index}"
-            if partition_for_id(run_id, config=config) == "confirm":
-                chosen = search_run(run_id)
-                break
-        self.assertIsNotNone(chosen)
+        chosen = search_run("RUN:manual")
         chosen["allocation_mode"] = "manual_override"
+        chosen["routing_mode"] = "manual_override"
         chosen["execution_claim_id"] = None
         self.assertEqual(
             test_split_for_run(chosen, config=config),
@@ -797,33 +791,27 @@ class TrainingEnvironmentTests(unittest.TestCase):
             errors,
         )
 
-    def test_validator_rejects_partition_hash_tamper(self):
+    def test_validator_rejects_partition_receipt_tamper(self):
         config = TrainingEnvironmentConfig(
             confirm_modulus=2,
             confirm_bucket=0,
         )
-        chosen = None
-        opposite_identifier = None
-        for index in range(100):
-            candidate = search_run(f"RUN:partition:{index}")
-            split = test_split_for_run(candidate, config=config)
-            if chosen is None:
-                chosen = candidate
-                expected = split
-            fake = f"CLAIM:fake:{index}"
-            if partition_for_id(fake, config=config) != expected:
-                opposite_identifier = fake
-                break
+        chosen = search_run("RUN:partition")
         environment = test_build_training_environment(
             [chosen],
             [],
             config=config,
         )
         episode = environment["episodes"][0]
-        episode["provenance"]["partition_basis"]["identifier"] = (
-            opposite_identifier
+        original = episode["provenance"]["partition_basis"]["partition"]
+        episode["provenance"]["partition_basis"]["partition"] = (
+            "confirm" if original == "train" else "train"
         )
         errors = validate_training_environment(environment)
+        self.assertIn(
+            f"partition_receipt_mismatch:{episode['run_id']}",
+            errors,
+        )
         self.assertIn(
             f"episode_hash_mismatch:{episode['run_id']}",
             errors,
