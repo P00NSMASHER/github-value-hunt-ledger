@@ -659,6 +659,10 @@ def replay_case_source_artifacts(
     verify_case_bundle(bundle)
     replayed_at = _iso("replayed_at", replayed_at)
     replayed_by = _required("replayed_by", replayed_by)
+    if _dt("replayed_at", replayed_at) < _dt(
+        "bundle.created_at", bundle.created_at
+    ):
+        raise ValueError("source artifact replay cannot predate frozen case")
 
     authority_hash = _hash_bytes(authority_bytes)
     if authority_hash != bundle.authority.source_hash:
@@ -944,6 +948,10 @@ def verify_calculation_replay(
         raise ValueError("calculation replay recovery amount mismatch")
     if receipt.trace_hash != manifest.trace_hash:
         raise ValueError("calculation replay trace mismatch")
+    if _dt("calculation_replay.reproduced_at", receipt.reproduced_at) < _dt(
+        "artifact_replay.replayed_at", artifact_receipt.replayed_at
+    ):
+        raise ValueError("calculation replay predates source artifact replay")
 
 
 @dataclass(frozen=True)
@@ -1502,6 +1510,14 @@ def verify_hostile_examination_packet(
     for field_name, expected_value in expected_fields.items():
         if getattr(packet, field_name) != expected_value:
             raise ValueError(f"hostile examination packet {field_name} mismatch")
+
+    latest_component = max(
+        _dt("artifact_replay.replayed_at", artifact_receipt.replayed_at),
+        _dt("calculation_replay.reproduced_at", calculation_receipt.reproduced_at),
+        _dt("proof_seal.sealed_at", proof_seal.sealed_at),
+    )
+    if _dt("packet.assembled_at", packet.assembled_at) < latest_component:
+        raise ValueError("hostile examination packet predates a bound component")
 
     expected_signature = _seal_signature(packet.integrity_body(), secret_key)
     if not hmac.compare_digest(expected_signature, packet.packet_signature_hex):
