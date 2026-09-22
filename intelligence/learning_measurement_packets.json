@@ -32,7 +32,7 @@
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 79.5,
       "packet_id": "LMP:22b9ba3ee5dc0dc8",
-      "packet_sha256": "0d105ace9a523ba09680d0c16310901b2191a3ba916be42d420e2ffcf89cdd3e",
+      "packet_sha256": "8a8a5aaeb474c8f941ebd9b558f8b62481e9e5a24d6ea8084eb0eea30da40d64",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
@@ -45,16 +45,30 @@
       "schema_version": 1,
       "seed": {
         "acceptance_target": "One independent target-domain implementation with source/test evidence for: effective rule version, historical evaluation, authority provenance",
+        "action_gate": "Transfer only into the named target domain; source-domain STOP gates remain closed.",
         "authorization_basis": "adaptive_learning_curriculum",
         "capability_ids": [],
         "exclude_domains": [
           "government procurement"
         ],
         "experiment_ids": [],
+        "measurement_contract_version": "phase_blind_v1",
+        "next_action": "Run the bounded anchored transfer queries and inspect one connected implementation path.",
+        "query_anchors": [
+          "OpenFisca",
+          "tax",
+          "benefits"
+        ],
+        "query_recipe_id": "rule-version-transfer",
         "query_templates": [
           "OpenFisca reforms parameter",
           "\"tax\" \"effective_date\" path:tests",
           "\"benefits\" \"rule_version\""
+        ],
+        "required_signatures": [
+          "effective rule version",
+          "historical evaluation",
+          "authority provenance"
         ],
         "search_objective_id": "OBJ:current-rule-authority",
         "search_surfaces": [
@@ -77,7 +91,8 @@
           "Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result."
         ],
         "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.",
-        "why_now": "STRAT:acceptance-path-transition-inspection is a scheduler-selected adaptive-learning measurement target. Pair it with rule-version-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation."
+        "why_now": "STRAT:acceptance-path-transition-inspection is a scheduler-selected adaptive-learning measurement target. Pair it with rule-version-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation.",
+        "work_action": "search"
       },
       "selection_reason": "reduce_train_evidence_deficit",
       "status": "PRECOMMITTED_ADVISORY",
@@ -113,7 +128,7 @@
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 78.75,
       "packet_id": "LMP:78280f5bc099ca0e",
-      "packet_sha256": "0e21412f83e54aeec0212d01fcbe69b2e10fd91848ac3432f97e5f7987f76c4b",
+      "packet_sha256": "c555898332f54f9c76d18f076021c3f169fc857482263210f857e56a142655ff",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
@@ -126,6 +141,7 @@
       "schema_version": 1,
       "seed": {
         "acceptance_target": "One independent target-domain implementation with source/test evidence for: source span, selective prediction, review threshold",
+        "action_gate": "Transfer only into the named target domain; source-domain STOP gates remain closed.",
         "authorization_basis": "adaptive_learning_curriculum",
         "capability_ids": [],
         "exclude_domains": [
@@ -133,10 +149,22 @@
           "freight"
         ],
         "experiment_ids": [],
+        "measurement_contract_version": "phase_blind_v1",
+        "next_action": "Run the bounded anchored transfer queries and inspect one connected implementation path.",
+        "query_anchors": [
+          "mortgage",
+          "insurance"
+        ],
+        "query_recipe_id": "abstention-transfer",
         "query_templates": [
           "\"mortgage\" \"extraction\" \"abstain\"",
           "\"insurance\" \"source_span\" \"review\"",
           "\"mortgage\" \"confidence\" path:tests"
+        ],
+        "required_signatures": [
+          "source span",
+          "selective prediction",
+          "review threshold"
         ],
         "search_objective_id": "OBJ:independent-evaluation",
         "search_surfaces": [
@@ -159,7 +187,8 @@
           "Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result."
         ],
         "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.",
-        "why_now": "STRAT:rule-period-authority-version-audit is a scheduler-selected adaptive-learning measurement target. Pair it with abstention-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation."
+        "why_now": "STRAT:rule-period-authority-version-audit is a scheduler-selected adaptive-learning measurement target. Pair it with abstention-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation.",
+        "work_action": "search"
       },
       "selection_reason": "reduce_train_evidence_deficit",
       "status": "PRECOMMITTED_ADVISORY",
@@ -195,7 +224,7 @@
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 60.0,
       "packet_id": "LMP:1dafa60a98e37eb8",
-      "packet_sha256": "7ae8724469df9e63065ad94a6f61d3b5f13e60630eaf42d05f83263a30149080",
+      "packet_sha256": "b8c76cef8157e722ca559e5e7f77a92182859ebb807e87293a9ba3cb30bd3b11",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
@@ -208,16 +237,29 @@
       "schema_version": 1,
       "seed": {
         "acceptance_target": "One independent target-domain implementation with source/test evidence for: promotion authority, versioned candidate, rollback test",
+        "action_gate": "Transfer only into the named target domain; source-domain STOP gates remain closed.",
         "authorization_basis": "adaptive_learning_curriculum",
         "capability_ids": [],
         "exclude_domains": [
           "laboratory orchestration"
         ],
         "experiment_ids": [],
+        "measurement_contract_version": "phase_blind_v1",
+        "next_action": "Run the bounded anchored transfer queries and inspect one connected implementation path.",
+        "query_anchors": [
+          "MLflow",
+          "model registry"
+        ],
+        "query_recipe_id": "promotion-control-transfer",
         "query_templates": [
           "MLflow \"alias\" \"rollback\"",
           "\"model registry\" \"approval\"",
           "MLflow \"champion\" path:tests"
+        ],
+        "required_signatures": [
+          "promotion authority",
+          "versioned candidate",
+          "rollback test"
         ],
         "search_objective_id": "OBJ:runtime-side-effect",
         "search_surfaces": [
@@ -240,7 +282,8 @@
           "Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result."
         ],
         "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.",
-        "why_now": "STRAT:bidirectional-money-evidence-invariant-tracing is a scheduler-selected adaptive-learning measurement target. Pair it with promotion-control-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation."
+        "why_now": "STRAT:bidirectional-money-evidence-invariant-tracing is a scheduler-selected adaptive-learning measurement target. Pair it with promotion-control-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation.",
+        "work_action": "search"
       },
       "selection_reason": "reduce_train_evidence_deficit",
       "status": "PRECOMMITTED_ADVISORY",
