@@ -39,7 +39,14 @@ class RecoveryCaseTests(unittest.TestCase):
         dd_line = next(
             row for row in result["lines"] if row["invoice_line_id"] == "DD-1"
         )
-        self.assertEqual(dd_line["candidate_upper_bound_no_double_count"], "1500.00")
+        self.assertEqual(dd_line["candidate_upper_bound_no_double_count"], "125.00")
+        dd_scope = next(
+            row for row in result["invoice_scopes"] if row["invoice_id"] == "INV-DD"
+        )
+        self.assertEqual(
+            dd_scope["candidate_upper_bound_no_double_count"],
+            "1500.00",
+        )
         self.assertEqual(result["asserted_recovery_total"], "0.00")
 
     def test_unresolved_base_authority_produces_no_candidate_amount(self):
