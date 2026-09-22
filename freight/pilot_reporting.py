@@ -7,6 +7,7 @@ from enum import Enum
 import re
 from typing import Protocol
 
+from freight.money import format_dollars
 from freight.contracts import IncumbentOutput, RecoveryCertificate, TruthManifest, VALIDATED, canonical_hash
 
 
@@ -266,9 +267,7 @@ def build_pilot_metrics(
 
 
 def dollars(cents: int) -> str:
-    sign = "-" if cents < 0 else ""
-    whole, fraction = divmod(abs(cents), 100)
-    return "$" + sign + f"{whole:,}.{fraction:02d}"
+    return format_dollars(cents)
 
 
 def render_markdown(metrics: PilotMetrics) -> str:
