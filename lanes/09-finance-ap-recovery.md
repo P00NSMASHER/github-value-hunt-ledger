@@ -478,3 +478,22 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Important dependencies/risks: Current test corpus is sale-side; do not claim vendor rebate entitlement from it. Odoo floats are used in parts of rebate math; a recovery product should use explicit decimal/minor-unit money semantics and literal-golden tests.
 - Connections: Pairs well with M3H5/vendorrebate for agreement/claim truth and LedgerByte for one-use realized recovery allocation.
 - Opportunity score: **8.9/10**.
+
+
+### wusheyi/SAP-S-4HANA-3-Way-Match — tested S/4 AP matching, duplicate and human-post gate
+- Repository: https://github.com/wusheyi/SAP-S-4HANA-3-Way-Match
+- Commit / revision: 62109e80ea864c473b3dc76f666994070cfe2719
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Python SAP S/4HANA AP workbench with real OData transport, PO/GR/supplier-invoice matching, persistent SQLite workflow/audit state, invoice-review/reversal state, duplicate detection, document-recognition intake and an explicit human posting gate. The implementation reads `API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrderItem`, `API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentItem` and `API_SUPPLIERINVOICE_PROCESS_SRV/A_SupplierInvoice`; posting/cancellation paths use CSRF-protected SAP OData and are disabled unless explicitly configured.
+- Evidence of implementation: `back/ap_matching.py` (~32 KB), `sap_client.py`, `ap_runtime.py`, `automation_service.py`, `back/tests/test_ap_matching.py`, `test_concurrency.py`, `test_sap_client.py`, and committed demo/test fixtures. Tests cover multi-line matching, 101 minus 102 receipt quantity, tax payload modes, SAP invoice-reference length normalization, SAP reversal detection, content-based duplicate blocking even when the external invoice reference changes, persistent workflow/review state, idempotent terminal review resolution and SAP OData error handling.
+- Rare / undernoticed value: Concurrency tests prove two simultaneous attempts to post the same ready invoice result in exactly one SAP FI post and one blocked caller. Agent approval never posts by itself: even with posting enabled the run stops at `ready_to_post` until an accounting user explicitly confirms. SAP mode without credentials fails rather than silently falling back to demo data.
+- Useful capability/workflow: S/4 invoice/PO/GR read adapter + deterministic 3-way-match candidate + duplicate-content guard + human approval + optional reversal evidence.
+- Likely buyer: SAP S/4HANA AP shared services, controller/internal audit, finance transformation and recovery-audit teams.
+- Pain solved: S/4-specific data retrieval/matching and safe transition from reviewed invoice evidence to SAP state without building the entire OData/CSRF/reversal/concurrency layer from scratch.
+- Fastest monetization path: Reuse only the read-side and audit-state concepts for an S/4 AP Recovery Diagnostic. Keep SAP writes disabled for initial pilots; buyer exports/tenant APIs remain read-only until a separately approved action is required.
+- Paid-pilot concept: one company code / one quarter; read PO, receipts and supplier invoices, run duplicate/quantity/price/payment-term checks, then route only human-confirmed recovery cases into the AP Recovery realization ledger.
+- Estimated engineering time saved: 1-2 months of S/4 OData, workflow persistence, duplicate/concurrency and reversal integration work.
+- License / reuse status: No public LICENSE detected at the inspected revision; project-level user authorization asserts reuse rights. SAP APIs/product semantics remain separately governed by the customer's SAP environment and current SAP documentation.
+- Important dependencies/risks: Matching helper currently uses Python `float` for money, so production money math should be wrapped/replaced with exact Decimal/integer-minor-unit logic. Repository evidence is demo/test oriented rather than a customer production proof. PO/GR correctness does not establish contract entitlement or realized recovery.
+- Connections: S/4 counterpart to SAP ECC `Accountw-debug/mdq`; pair its read adapter/workflow with Invoice Lens/ReconForge exact-money rules and the Accounting-App-style realized-credit/refund state machine.
+- Opportunity score: **9.1/10**.
