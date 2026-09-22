@@ -541,6 +541,48 @@ class TrainingEnvironmentTests(unittest.TestCase):
             1000.0,
         )
 
+    def test_training_episode_preserves_schema_native_move_telemetry(self):
+        run = search_run("RUN:moves")
+        run["search_moves"] = [
+            {
+                "move_type": "code_signature_search",
+                "surface": "GitHub code search",
+                "query_or_action": "distinctive symbol",
+                "result": "qualifying_hit",
+                "candidate_count": 2,
+                "deep_inspected": 1,
+                "retained_count": 1,
+            },
+            {
+                "move_type": "direct_domain_search",
+                "surface": "GitHub repository search",
+                "query_or_action": "broad phrase",
+                "result": "no_hit",
+                "candidate_count": 0,
+                "deep_inspected": 0,
+                "retained_count": 0,
+            },
+        ]
+        environment = build_training_environment(
+            [run],
+            [],
+        )
+        episode = environment["episodes"][0]
+        self.assertEqual(
+            episode["action"]["search_move_ids"],
+            [
+                "MOVE:code_signature_search",
+                "MOVE:direct_domain_search",
+            ],
+        )
+        self.assertEqual(
+            [
+                move["result"]
+                for move in episode["action"]["search_moves"]
+            ],
+            ["qualifying_hit", "no_hit"],
+        )
+
     def test_environment_is_hash_stable_and_valid(self):
         runs = [
             search_run("RUN:1"),
