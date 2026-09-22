@@ -14,6 +14,7 @@ from .assurance import (
 )
 from .models import CaseState, FindingState, RecoveryFinding, canonical_hash
 from .policies import assert_claim_authorizable
+from .readiness import SevenFigureReadinessPackage, verify_seven_figure_readiness
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,7 @@ class LedgerRecord:
     customer_actor_id: str | None = None
     case_bundle_hash: str | None = None
     authorization_hash: str | None = None
+    readiness_hash: str | None = None
     external_action_envelope_hash: str | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
@@ -136,6 +138,7 @@ class RecoveryLedger:
         finding_id: str,
         bundle: CaseProofBundle,
         authorization: ClientActionAuthorization,
+        readiness: SevenFigureReadinessPackage | None = None,
     ) -> LedgerRecord:
         record = self.get(finding_id)
         assert_claim_authorizable(record.finding, record.reviewer_approved)
@@ -157,6 +160,15 @@ class RecoveryLedger:
                 raise ValueError("seven-figure finding requires independent ledger approval")
             if record.independent_reviewer_id not in approving_reviewers:
                 raise ValueError("independent ledger reviewer is not in frozen case proof")
+            if readiness is None:
+                raise ValueError(
+                    "seven-figure finding requires completed readiness package"
+                )
+            verify_seven_figure_readiness(readiness, bundle)
+        elif readiness is not None:
+            raise ValueError(
+                "seven-figure readiness package cannot authorize a sub-seven-figure case"
+            )
         if authorization.client_actor_id in {
             record.reviewer_id,
             record.independent_reviewer_id,
@@ -170,6 +182,7 @@ class RecoveryLedger:
             customer_actor_id=authorization.client_actor_id,
             case_bundle_hash=bundle.bundle_hash,
             authorization_hash=authorization.proof_hash,
+            readiness_hash=readiness.package_hash if readiness is not None else None,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
@@ -184,10 +197,15 @@ class RecoveryLedger:
         if record.case_state is not CaseState.AUTHORIZED or not record.authorization_id:
             raise ValueError("claim action requires explicit authorization")
 
-        if self._high_value(record) and action_envelope is None:
-            raise ValueError(
-                "seven-figure claim requires a hashed external-action envelope"
-            )
+        if self._high_value(record):
+            if not record.readiness_hash:
+                raise ValueError(
+                    "seven-figure claim requires completed readiness gate"
+                )
+            if action_envelope is None:
+                raise ValueError(
+                    "seven-figure claim requires a hashed external-action envelope"
+                )
 
         envelope_hash = record.external_action_envelope_hash
         if action_envelope is not None:

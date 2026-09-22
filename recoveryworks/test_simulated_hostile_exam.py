@@ -11,6 +11,9 @@ from recoveryworks import (
     AuthorityRegistry,
     AuthoritySnapshot,
     CalculationManifest,
+    NegativeEvidenceSearch,
+    PopulationSegment,
+    RetainedSourceObject,
     ChallengeReview,
     ClientActionAuthorization,
     DeadlineAssessment,
@@ -23,9 +26,20 @@ from recoveryworks import (
     RuleRef,
     SourceAttestation,
     authorize_case_action,
+    build_hostile_examination_packet,
+    build_seven_figure_readiness,
+    create_build_provenance_attestation,
     create_proof_seal,
+    create_public_verification_record,
+    freeze_case_completeness,
     freeze_case_proof,
+    freeze_source_retention,
     prepare_external_action,
+    record_external_signature_verification,
+    record_external_timestamp_verification,
+    record_object_lock_verification,
+    replay_case_calculation,
+    replay_case_source_artifacts,
     verify_external_action,
     verify_proof_seal,
 )
@@ -45,6 +59,244 @@ def _sha(text: str) -> str:
 
 def _load() -> dict:
     return json.loads(FIXTURE.read_text(encoding="utf-8"))
+
+
+def _trace_bytes(trace: dict) -> bytes:
+    return json.dumps(
+        trace,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode("utf-8")
+
+
+def _build_readiness(
+    payload: dict,
+    bundle,
+    calculation,
+    ledger,
+    challenge_manifest_hash: str,
+):
+    authority_bytes = payload["authority_source"]["content"].encode("utf-8")
+    evidence_bytes = {
+        src["evidence_id"]: src["content"].encode("utf-8")
+        for src in payload["evidence_sources"]
+    }
+    artifact_receipt = replay_case_source_artifacts(
+        bundle,
+        authority_bytes=authority_bytes,
+        evidence_bytes=evidence_bytes,
+        replayed_at="2026-09-22T16:21:00Z",
+        replayed_by="sim-independent-examiner",
+    )
+    calculation_receipt = replay_case_calculation(
+        bundle,
+        artifact_receipt,
+        calculator_id=calculation.calculator_id,
+        calculator_version=calculation.calculator_version,
+        code_commit_sha=calculation.code_commit_sha,
+        input_manifest_hash=calculation.input_manifest_hash,
+        expected_cents=bundle.finding.expected_cents,
+        actual_cents=bundle.finding.actual_cents,
+        trace_bytes=_trace_bytes(payload["calculation"]["trace"]),
+        reproduced_at="2026-09-22T16:22:00Z",
+        reproduced_by="sim-independent-calculation-examiner",
+    )
+    preauth_seal = create_proof_seal(
+        bundle,
+        seal_id="SIM-PREAUTH-SEAL-1",
+        key_id=payload["seal"]["key_id"],
+        secret_key=SIM_SEAL_KEY,
+        journal_head_hash=ledger.journal.head_hash,
+        sealed_at="2026-09-22T16:23:00Z",
+    )
+    packet = build_hostile_examination_packet(
+        bundle,
+        artifact_receipt,
+        calculation_receipt,
+        preauth_seal,
+        journal_head_hash=ledger.journal.head_hash,
+        secret_key=SIM_SEAL_KEY,
+        key_id=payload["seal"]["key_id"],
+        assembled_at="2026-09-22T16:23:30Z",
+        assembled_by="sim-hostile-exam-assembler",
+    )
+
+    retention_entries = []
+    authority = payload["authority_source"]
+    retention_entries.append(RetainedSourceObject(
+        source_id=authority["authority_id"],
+        role="authority",
+        source_hash=hashlib.sha256(authority_bytes).hexdigest(),
+        size_bytes=len(authority_bytes),
+        storage_uri="sim-private://object-lock/authority",
+        retained_at=authority["acquired_at"],
+        retention_mode="OBJECT_LOCK_COMPLIANCE",
+        retention_control_id="SIM-LOCK-AUTH",
+        provider_attestation_hash=_sha("SIM PROVIDER AUTHORITY RECEIPT"),
+        immutable_storage_verified=True,
+        retain_until="2033-09-22T00:00:00Z",
+        metadata={"simulation_only": True},
+    ))
+    for index, src in enumerate(payload["evidence_sources"], start=1):
+        raw = evidence_bytes[src["evidence_id"]]
+        retention_entries.append(RetainedSourceObject(
+            source_id=src["evidence_id"],
+            role="evidence",
+            source_hash=hashlib.sha256(raw).hexdigest(),
+            size_bytes=len(raw),
+            storage_uri=f"sim-private://object-lock/evidence-{index}",
+            retained_at=src["acquired_at"],
+            retention_mode="OBJECT_LOCK_COMPLIANCE",
+            retention_control_id=f"SIM-LOCK-EVIDENCE-{index}",
+            provider_attestation_hash=_sha(
+                f"SIM PROVIDER EVIDENCE RECEIPT {index}"
+            ),
+            immutable_storage_verified=True,
+            retain_until="2033-09-22T00:00:00Z",
+            metadata={"simulation_only": True},
+        ))
+    retention = freeze_source_retention(
+        bundle,
+        entries=retention_entries,
+        created_at="2026-09-22T16:24:00Z",
+        created_by="sim-custody-controller",
+    )
+
+    tms_source = next(
+        src for src in payload["evidence_sources"]
+        if src["kind"] == "tms_shipment_population"
+    )
+    tms = json.loads(tms_source["content"])
+    population = PopulationSegment(
+        segment_id="SIM-AUG-2026-SHIPMENTS",
+        source_export_hash=_sha(tms_source["content"]),
+        selection_rule="All invoiced August 2026 shipments for SIM-CARRIER-A",
+        record_count=tms["shipment_count"],
+        included_record_count=tms["shipment_count"],
+        excluded_record_count=0,
+        control_total_hash=canonical_hash({
+            "shipment_count": tms["shipment_count"],
+            "contract_total": tms["frozen_population_total_contract_usd"],
+        }),
+        included_ids_hash=_sha("SIMULATED SORTED SHIPMENT IDS"),
+        excluded_ids_hash=_sha("EMPTY"),
+        metadata={"simulation_only": True},
+    )
+    negative_search = NegativeEvidenceSearch(
+        search_id="SIM-NEGATIVE-SEARCH-READINESS",
+        scope=payload["challenge"]["challenge"],
+        method="Synthetic full-population search for contrary commercial evidence",
+        searched_source_hashes=tuple(
+            [bundle.authority.source_hash]
+            + [item.source_hash for item in bundle.source_attestations]
+            + [challenge_manifest_hash]
+        ),
+        contrary_evidence_hashes=(),
+        searched_at=payload["challenge"]["reviewed_at"],
+        searched_by=payload["challenge"]["reviewer_id"],
+        conclusion=payload["challenge"]["conclusion"],
+        resolved=True,
+        metadata={"simulation_only": True},
+    )
+    completeness = freeze_case_completeness(
+        bundle,
+        populations=(population,),
+        negative_searches=(negative_search,),
+        created_at="2026-09-22T16:24:10Z",
+        created_by="sim-completeness-reviewer",
+    )
+    build = create_build_provenance_attestation(
+        bundle,
+        repository="P00NSMASHER/github-value-hunt-ledger",
+        build_system="github-actions",
+        workflow_identity="RecoveryWorks/recoveryworks",
+        workflow_run_id="SIM-READINESS-BUILD-1",
+        dependency_lock_hash=_sha("SIMULATED STDLIB DEPENDENCIES"),
+        source_tree_hash=_sha("SIMULATED SOURCE TREE"),
+        build_artifact_hash=_sha("SIMULATED BUILD ARTIFACT"),
+        tests_passed=True,
+        built_at=payload["calculation"]["created_at"],
+        attested_at="2026-09-22T16:24:15Z",
+        attested_by="sim-ci-attestor",
+    )
+    public_record = create_public_verification_record(
+        bundle,
+        packet,
+        retention,
+        completeness,
+        build,
+        journal_head_hash=ledger.journal.head_hash,
+        record_id="SIM-PUBLIC-READINESS-1",
+        published_at="2026-09-22T16:24:20Z",
+        publisher_id="sim-recoveryworks-transparency-log",
+    )
+    signature = record_external_signature_verification(
+        signature_id="SIM-KMS-SIGNATURE-1",
+        payload_kind="recoveryworks_public_verification_record_v1",
+        payload_hash=public_record.record_hash,
+        provider="SIM-KMS",
+        key_id="sim-kms-asymmetric-key-1",
+        algorithm="RSA_PSS_SHA256",
+        public_key_fingerprint=_sha("SIMULATED PUBLIC KEY"),
+        signature_hash=_sha("SIMULATED RSA PSS SIGNATURE"),
+        provider_request_id="SIM-KMS-VERIFY-1",
+        verification_receipt_hash=_sha("SIMULATED KMS VERIFY RESPONSE"),
+        signed_at="2026-09-22T16:24:25Z",
+        verified_at="2026-09-22T16:24:30Z",
+        verified_by_adapter="sim-kms-adapter",
+        provider_verified=True,
+        metadata={"simulation_only": True},
+    )
+    timestamp = record_external_timestamp_verification(
+        timestamp_id="SIM-RFC3161-READINESS-1",
+        subject_hash=signature.signature_hash,
+        authority="SIM-TSA",
+        standard="RFC3161",
+        token_hash=_sha("SIMULATED RFC3161 TOKEN"),
+        serial_number="SIM-TSA-SERIAL-READINESS-1",
+        provider_request_id="SIM-TSA-VERIFY-1",
+        verification_receipt_hash=_sha("SIMULATED TSA VERIFY RESPONSE"),
+        timestamped_at="2026-09-22T16:24:35Z",
+        verified_at="2026-09-22T16:24:40Z",
+        verified_by_adapter="sim-tsa-adapter",
+        provider_verified=True,
+        metadata={"simulation_only": True},
+    )
+    lock_receipts = tuple(
+        record_object_lock_verification(
+            source_id=item.source_id,
+            role=item.role,
+            source_hash=item.source_hash,
+            provider="SIM-OBJECT-STORE",
+            object_version_id=f"SIM-VERSION-{index}",
+            retention_control_id=item.retention_control_id,
+            retention_mode=item.retention_mode,
+            retain_until=item.retain_until,
+            legal_hold_status="OFF",
+            checked_at="2026-09-22T16:24:30Z",
+            provider_request_id=f"SIM-LOCK-VERIFY-{index}",
+            provider_response_hash=item.provider_attestation_hash,
+            verified_by_adapter="sim-object-lock-adapter",
+            provider_verified=True,
+            metadata={"simulation_only": True},
+        )
+        for index, item in enumerate(retention.entries, start=1)
+    )
+    return build_seven_figure_readiness(
+        bundle,
+        packet,
+        retention,
+        completeness,
+        build,
+        public_record,
+        signature,
+        timestamp,
+        lock_receipts,
+        journal_head_hash=ledger.journal.head_hash,
+        evaluated_at="2026-09-22T16:24:50Z",
+        evaluated_by="sim-readiness-controller",
+    )
 
 
 def _build(payload: dict):
@@ -144,7 +396,7 @@ def _build(payload: dict):
         expected_cents=finding.expected_cents,
         actual_cents=finding.actual_cents,
         potential_recovery_cents=finding.potential_recovery_cents,
-        trace_hash=canonical_hash(calc_cfg["trace"]),
+        trace_hash=hashlib.sha256(_trace_bytes(calc_cfg["trace"])).hexdigest(),
         created_at=calc_cfg["created_at"],
         metadata={"simulation_only": True, "trace": calc_cfg["trace"]},
     )
@@ -244,7 +496,19 @@ def _build(payload: dict):
         reviews[1].reviewer_id,
         reviews[1].note,
     )
-    ledger.authorize_with_case(finding.finding_id, bundle, authorization)
+    readiness = _build_readiness(
+        payload,
+        bundle,
+        calculation,
+        ledger,
+        challenge_manifest_hash,
+    )
+    ledger.authorize_with_case(
+        finding.finding_id,
+        bundle,
+        authorization,
+        readiness,
+    )
     ledger.mark_claimed(finding.finding_id, envelope)
 
     seal_cfg = payload["seal"]
@@ -282,6 +546,7 @@ def _build(payload: dict):
         "envelope": envelope,
         "ledger": ledger,
         "seal": seal,
+        "readiness": readiness,
     }
 
 

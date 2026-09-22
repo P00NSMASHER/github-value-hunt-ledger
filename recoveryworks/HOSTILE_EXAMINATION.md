@@ -281,3 +281,83 @@ change-detection. It does **not** by itself authenticate RecoveryWorks as the
 publisher. Production should publish/sign the record through an external
 asymmetric-signature or transparency/timestamp service. RecoveryOS deliberately
 does not implement home-grown public-key cryptography in this reference layer.
+
+
+## Final authorization readiness gate
+
+For seven-figure findings, the assurance controls above are now authorization
+preconditions rather than optional review artifacts.
+
+A `SevenFigureReadinessPackage` is required before the ledger can transition
+the case to `AUTHORIZED`. The package must bind:
+
+- the frozen case bundle and finding proof;
+- the hostile-examination packet;
+- immutable/private source-retention manifest;
+- provider-verified object-lock/WORM receipts for every retained authority and
+  load-bearing evidence object;
+- source-population completeness and resolved negative-evidence searches;
+- passing build/code provenance;
+- the public hash-only transparency record;
+- an externally verified asymmetric signature over that public record;
+- a trusted timestamp over the external signature; and
+- the exact current durable-journal head immediately before authorization.
+
+### External/KMS-backed signature evidence
+
+The reference layer does not implement custom RSA/ECDSA/Ed25519 cryptography.
+
+A provider-specific adapter must first call the configured KMS/PKI verification
+service. RecoveryOS then records and binds the provider result:
+
+- provider and key identifier;
+- approved asymmetric algorithm;
+- public-key fingerprint;
+- signature hash;
+- provider request ID;
+- verification-receipt hash;
+- signing/verification timestamps; and
+- verification adapter identity.
+
+Approved external algorithms are asymmetric only. HMAC is explicitly rejected
+for this external-signature control.
+
+For production, `provider_verified=true` must only be set after a successful
+KMS/PKI verify operation.
+
+### Trusted timestamp evidence
+
+The timestamp evidence must bind the exact external-signature hash. A provider
+verification receipt is required, together with the timestamp authority,
+standard (for example RFC 3161), token hash, serial/request identifier, and
+verified timestamp.
+
+A timestamp over any different subject is rejected.
+
+### Provider-verifiable object lock
+
+Every retained source object must have a provider verification receipt matching
+the frozen source hash, retention-control ID, retention mode, and provider
+attestation hash. The provider-confirmed retention horizon may not be shorter
+than the frozen retention requirement.
+
+RecoveryOS never treats a storage URI, bucket name, or configured policy as
+proof of immutable retention by itself.
+
+### Stale readiness protection
+
+The durable ledger compares the readiness package's journal head against its
+live pre-authorization journal head.
+
+Any review/approval event written after the readiness package was evaluated
+invalidates the package for authorization. The case must be re-evaluated and a
+new readiness package produced.
+
+### Claim-time enforcement
+
+A seven-figure case cannot be marked `CLAIMED` unless its ledger record
+contains the readiness-package hash and the existing external-action envelope
+requirements are also satisfied.
+
+The readiness package itself is journaled and replayed with the authorization
+event, so durable-ledger restoration must reproduce the same readiness hash.
