@@ -40,3 +40,23 @@ The universal client-facing output is the Recovery Ledger:
 - fee eligibility and realized fee
 
 This supports one-time historical audits and continuous monitoring without changing the evidence model.
+
+## Fulfillment boundary
+
+Recovery packets are derived from immutable findings plus the current ledger
+record. They do not create authority. They expose the rule/version and evidence
+required to support a human-controlled recovery action.
+
+The action gate is:
+
+VALIDATED finding -> reviewer approval -> customer authorization -> AUTHORIZED
+
+Only AUTHORIZED packets are submission-ready. Once a case moves to CLAIMED, the
+packet records that state and is no longer represented as awaiting submission.
+
+## Audit-chain boundary
+
+Every ledger mutation appends a hash-linked event. The event includes the case,
+transition, actor when applicable, timestamp, prior event hash, and transition
+metadata. This provides tamper-evident lifecycle evidence without making the
+event log itself permission to contact a counterparty.
