@@ -22,6 +22,7 @@ from .engine import RecoveryEngine, RecoveryObservation
 from .ledger import RecoveryLedger
 from .sqlite_ledger import SQLiteRecoveryLedger
 from .scan import RecoveryScanBatch, RecoveryScanManifest, SourceManifestEntry, freeze_scan, run_scan
+from .tenant import ClientRecoveryLedger
 from .models import (
     Branch,
     CaseState,
@@ -39,6 +40,7 @@ __all__ = [
     "EngagementState",
     "Branch",
     "CaseState",
+    "ClientRecoveryLedger",
     "EvidenceRef",
     "FindingState",
     "RecoveryActionAuthorization",
