@@ -10,7 +10,12 @@ from dataclasses import asdict, dataclass
 from typing import Iterable
 
 from freight.contracts import REVIEW, VALIDATED, canonical_hash
-from freight.finding_factory import ChargeRule, FindingFactoryBatch, InvoiceCharge
+from freight.finding_factory import (
+    ChargeRule,
+    FindingFactoryBatch,
+    InvoiceCharge,
+    derive_charge,
+)
 from freight.review_queue import ReviewQueue, build_review_queue
 
 
@@ -102,8 +107,9 @@ def build_review_packet(
             raise ValueError("duplicate charge_id in review evidence")
         charge_index[charge.charge_id] = charge
 
+    normalized_rules = tuple(rules)
     rule_index: dict[str, ChargeRule] = {}
-    for rule in rules:
+    for rule in normalized_rules:
         digest = rule.rule_hash
         if digest in rule_index:
             raise ValueError("duplicate rule proof in review evidence")
@@ -122,6 +128,13 @@ def build_review_packet(
         charge_hash = canonical_hash({"schema": 1, **asdict(charge)})
         if charge_hash != derivation.charge_hash:
             raise ValueError("review charge proof does not match derivation: " + item.charge_id)
+
+        canonical_derivation = derive_charge(charge, normalized_rules)
+        if canonical_derivation != derivation:
+            raise ValueError(
+                "review derivation does not match current charge/rule evidence: "
+                + item.charge_id
+            )
 
         matched_rules: list[RuleEvidence] = []
         for digest in derivation.matched_rule_hashes:
