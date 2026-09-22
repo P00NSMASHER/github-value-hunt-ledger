@@ -601,9 +601,13 @@ def discover_github_master_list(
         match = re.search(r"https?://[^\s)>|]+", url_cell)
         if not match:
             continue
-        url = canonical_url(match.group(0).rstrip(".,;"))
+        raw_url = match.group(0).rstrip(".,;")
+        raw_host = (urllib.parse.urlsplit(raw_url).hostname or "").lower()
+        # HealthSparq uses the URL fragment as application routing state; its
+        # insurerCode/brandCode live there and must survive source discovery.
+        is_healthsparq = "healthsparq.com" in raw_host
+        url = raw_url if is_healthsparq else canonical_url(raw_url)
         key_hash = hashlib.sha256(f"{payer}|{url}".encode()).hexdigest()[:16]
-        is_healthsparq = "healthsparq.com" in (urllib.parse.urlsplit(url).hostname or "").lower()
         candidate = Source(
             source_key=f"endurant-{key_hash}",
             payer_name=payer,
