@@ -229,6 +229,8 @@ jobs:
                   intelligence/activation_response_adjustments.jsonl \
                   intelligence/activation_response_metrics.json \
                   intelligence/ACTIVATION_RESPONSE_REPORT.md \
+                  intelligence/HUNTER_RESTART_READINESS.json \
+                  intelligence/HUNTER_RESTART_READINESS.md \
                   intelligence/routing_exploration_decision.json \
                   intelligence/routing_exploration_history.jsonl \
                   intelligence/routing_exploration_metrics.json \
