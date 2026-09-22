@@ -33,6 +33,20 @@ line is counted and a `DUPLICATE_PAYMENT_ID` exception records the export issue.
 If those repeated lines conflict on amount/date/source attributes, none of the
 conflicting lines enter recovery math and `CONFLICTING_PAYMENT_ID` is emitted.
 
+Invoice identity has two levels:
+
+- **canonical invoice ID** — case/spacing normalization only; this is the only
+  invoice identity allowed to match a verified obligation or vendor-statement
+  line for validation;
+- **heuristic invoice family** — suffixes such as `-R`, `-DUP`, `-COPY`,
+  `-REV`, and `-REVERSAL` may be folded only to discover suspicious clusters.
+
+If multiple exact invoice IDs collapse into one heuristic family,
+`HEURISTIC_INVOICE_ALIAS` is emitted and obligation authority is disabled for
+that cluster. The heuristic may produce a REVIEW candidate, but cannot by itself
+create VALIDATED recovery. A verified vendor-statement credit can still validate
+its own exact credit amount independently.
+
 ### Obligations / invoice CSV
 
 Default columns:
