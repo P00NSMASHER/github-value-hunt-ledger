@@ -1,8 +1,9 @@
 """Recovery Ledger: auditable lifecycle for every potential recovered dollar."""
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
+from typing import Any, Mapping
 
 from .models import CaseState, FindingState, RecoveryFinding, canonical_hash
 from .policies import assert_claim_authorizable
@@ -30,14 +31,71 @@ class LedgerRecord:
         return canonical_hash(payload)
 
 
+@dataclass(frozen=True)
+class LedgerEvent:
+    sequence: int
+    finding_id: str
+    action: str
+    prior_state: str | None
+    new_state: str
+    actor_id: str | None
+    note: str | None
+    at: str
+    previous_event_hash: str | None
+    metadata: Mapping[str, Any] = field(default_factory=dict)
+
+    @property
+    def event_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "sequence": self.sequence,
+            "finding_id": self.finding_id,
+            "action": self.action,
+            "prior_state": self.prior_state,
+            "new_state": self.new_state,
+            "actor_id": self.actor_id,
+            "note": self.note,
+            "at": self.at,
+            "previous_event_hash": self.previous_event_hash,
+            "metadata": dict(self.metadata),
+        })
+
+
 class RecoveryLedger:
     def __init__(self) -> None:
         self._records: dict[str, LedgerRecord] = {}
         self._proof_index: dict[str, str] = {}
+        self._events: list[LedgerEvent] = []
 
     @staticmethod
     def _now() -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+    def _append_event(
+        self,
+        *,
+        record: LedgerRecord,
+        action: str,
+        prior_state: CaseState | None,
+        actor_id: str | None = None,
+        note: str | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> LedgerEvent:
+        previous = self._events[-1].event_hash if self._events else None
+        event = LedgerEvent(
+            sequence=len(self._events) + 1,
+            finding_id=record.finding.finding_id,
+            action=action,
+            prior_state=prior_state.value if prior_state else None,
+            new_state=record.case_state.value,
+            actor_id=actor_id,
+            note=note,
+            at=record.updated_at or self._now(),
+            previous_event_hash=previous,
+            metadata=dict(metadata or {}),
+        )
+        self._events.append(event)
+        return event
 
     def add(self, finding: RecoveryFinding) -> LedgerRecord:
         existing_id = self._proof_index.get(finding.proof_hash)
@@ -49,6 +107,7 @@ class RecoveryLedger:
         record = LedgerRecord(finding=finding, case_state=state, updated_at=self._now())
         self._records[finding.finding_id] = record
         self._proof_index[finding.proof_hash] = finding.finding_id
+        self._append_event(record=record, action="ADDED", prior_state=None, actor_id="system")
         return record
 
     def get(self, finding_id: str) -> LedgerRecord:
@@ -70,6 +129,13 @@ class RecoveryLedger:
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
+        self._append_event(
+            record=updated,
+            action="APPROVED",
+            prior_state=record.case_state,
+            actor_id=reviewer_id.strip(),
+            note=note.strip(),
+        )
         return updated
 
     def authorize(self, finding_id: str, authorization_id: str) -> LedgerRecord:
@@ -84,6 +150,12 @@ class RecoveryLedger:
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
+        self._append_event(
+            record=updated,
+            action="AUTHORIZED",
+            prior_state=record.case_state,
+            metadata={"authorization_id": authorization_id.strip()},
+        )
         return updated
 
     def mark_claimed(self, finding_id: str) -> LedgerRecord:
@@ -92,6 +164,7 @@ class RecoveryLedger:
             raise ValueError("claim action requires explicit authorization")
         updated = replace(record, case_state=CaseState.CLAIMED, updated_at=self._now())
         self._records[finding_id] = updated
+        self._append_event(record=updated, action="CLAIMED", prior_state=record.case_state)
         return updated
 
     def mark_recovered(self, finding_id: str, recovered_cents: int, fee_cents: int = 0) -> LedgerRecord:
@@ -112,6 +185,12 @@ class RecoveryLedger:
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
+        self._append_event(
+            record=updated,
+            action="RECOVERED",
+            prior_state=record.case_state,
+            metadata={"recovered_cents": recovered_cents, "fee_cents": fee_cents},
+        )
         return updated
 
     def reject(self, finding_id: str, reviewer_id: str, note: str) -> LedgerRecord:
@@ -128,10 +207,45 @@ class RecoveryLedger:
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
+        self._append_event(
+            record=updated,
+            action="REJECTED",
+            prior_state=record.case_state,
+            actor_id=reviewer_id.strip(),
+            note=note.strip(),
+        )
         return updated
 
     def records(self) -> tuple[LedgerRecord, ...]:
         return tuple(sorted(self._records.values(), key=lambda r: r.finding.finding_id))
+
+    def events(self, finding_id: str | None = None) -> tuple[LedgerEvent, ...]:
+        events = self._events
+        if finding_id is not None:
+            events = [event for event in events if event.finding_id == finding_id]
+        return tuple(events)
+
+    @property
+    def audit_head(self) -> str | None:
+        return self._events[-1].event_hash if self._events else None
+
+    def verify_event_chain(self) -> bool:
+        previous: str | None = None
+        for expected_sequence, event in enumerate(self._events, start=1):
+            if event.sequence != expected_sequence:
+                return False
+            if event.previous_event_hash != previous:
+                return False
+            previous = event.event_hash
+        return True
+
+    @property
+    def snapshot_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "record_hashes": sorted(record.record_hash for record in self.records()),
+            "audit_head": self.audit_head,
+        })
 
     def rollup(self) -> dict:
         branches: dict[str, dict[str, int]] = {}
