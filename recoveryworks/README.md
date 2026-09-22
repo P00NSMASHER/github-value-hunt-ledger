@@ -15,6 +15,7 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **TelecomRecovery** — recurring service and CDR/usage billing leakage.
 - **RebateRecovery** — earned supplier/volume rebates not fully settled.
 - **LeaseRecovery** — rent, CAM, operating-expense, and area-based lease billing leakage.
+- **ProcurementRecovery** — negotiated supplier unit-price and contract-rate leakage.
 
 ## Non-negotiable invariant
 
@@ -74,3 +75,6 @@ Operational-vs-foundation status for all RecoveryWorks divisions is tracked in
 ConstructionRecovery entitlement, schedule-version, CPM, event-mapping,
 qualified-causation, and settlement schemas are documented in
 `recoveryworks/INGESTION_CONSTRUCTION.md`.
+
+ProcurementRecovery supplier-charge, contract/PO rate, and independent quantity schemas are documented in
+`recoveryworks/INGESTION_PROCUREMENT.md`.
