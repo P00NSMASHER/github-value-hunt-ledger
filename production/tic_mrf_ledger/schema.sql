@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS plans (
   id INTEGER PRIMARY KEY,
   mrf_file_id INTEGER NOT NULL REFERENCES mrf_files(id),
   plan_name TEXT,
+  issuer_name TEXT,
+  plan_sponsor_name TEXT,
   plan_id_type TEXT,
   plan_id TEXT,
   plan_market_type TEXT
@@ -85,6 +87,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_tic_plans_stable
 ON plans(
   mrf_file_id,
   COALESCE(plan_name,''),
+  COALESCE(issuer_name,''),
+  COALESCE(plan_sponsor_name,''),
   COALESCE(plan_id_type,''),
   COALESCE(plan_id,''),
   COALESCE(plan_market_type,'')
