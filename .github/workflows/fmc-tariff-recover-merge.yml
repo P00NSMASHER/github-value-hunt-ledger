@@ -65,11 +65,13 @@ jobs:
               # artifacts will fail explicitly in rehydrate instead.
               run_id = os.environ.get('WORKFLOW_RUN_ID', '').strip()
               shard_count = 12
-              retention = 90
+              retention = 7
+              copy_raw = False
           elif event == 'workflow_dispatch':
               run_id = os.environ.get('INPUT_RUN_ID', '').strip()
               shard_count = int(os.environ.get('INPUT_SHARDS') or '12')
-              retention = int(os.environ.get('INPUT_RETENTION') or '90')
+              retention = int(os.environ.get('INPUT_RETENTION') or '7')
+              copy_raw = (os.environ.get('INPUT_COPY_RAW') or 'false').lower() == 'true'
           else:
               cfg = {}
               for line in Path('production/fmc_tariff_ledger/MERGE_NOW').read_text().splitlines():
