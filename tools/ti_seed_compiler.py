@@ -384,11 +384,20 @@ for seed in seeds:
 seeds.sort(key=lambda x:(-x["priority"],x["seed_id"]))
 write_jsonl("search_seeds.jsonl",seeds)
 
+measurement_seeds=[
+  s for s in seeds
+  if s.get("seed_type")=="strategy_measurement"
+]
 metrics={
   "schema_version":1,
   "seed_count":len(seeds),
   "by_type":{},
   "by_action":{},
+  "measurement_strategy_ids":[s["strategy_id"] for s in measurement_seeds],
+  "measurement_evidence_phases":{
+    s["strategy_id"]:s.get("learning_evidence_phase")
+    for s in measurement_seeds
+  },
   "unmapped_master_repositories":sum(1 for m in MASTER if not transfer_recipe(m["repo"])),
   "seeds_with_measured_runs":sum(1 for s in seeds if s["performance"]["runs"]>0),
   "performance_threshold":{"min_runs":3,"min_inspections":10}
@@ -448,4 +457,10 @@ for s in seeds:
     perf_lines.append(f"| {s['seed_id']} | {p['runs']} | {p['inspected']} | {p['retained']} | {p['promoted']} | {p['new_cap_runs']} | {p['experiment_runs']} | {evidence} |")
 (INTEL/"SEED_PERFORMANCE.md").write_text("\n".join(perf_lines)+"\n",encoding="utf-8")
 
-print(json.dumps({"seed_count":len(seeds),"types":metrics["by_type"],"measured_seeds":metrics["seeds_with_measured_runs"]}))
+print(json.dumps({
+  "seed_count":len(seeds),
+  "types":metrics["by_type"],
+  "measured_seeds":metrics["seeds_with_measured_runs"],
+  "measurement_strategy_ids":metrics["measurement_strategy_ids"],
+  "measurement_evidence_phases":metrics["measurement_evidence_phases"]
+}))
