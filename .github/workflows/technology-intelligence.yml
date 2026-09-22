@@ -114,6 +114,8 @@ jobs:
                   intelligence/derived_edges.jsonl \
                   intelligence/LEARNING_REPORT.md \
                   intelligence/LEARNING_STATE.json \
+                  intelligence/learning_curriculum.json \
+                  intelligence/LEARNING_CURRICULUM.md \
                   intelligence/NETWORK_PRIORS.md \
                   intelligence/TRAINING_ENVIRONMENT.json \
                   intelligence/training_episodes.jsonl \
