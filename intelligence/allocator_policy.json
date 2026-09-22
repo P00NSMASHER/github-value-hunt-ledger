@@ -103,9 +103,9 @@
       "slot_id": "SLOT-12",
       "role": "measurement",
       "accepts": [
-        "strategy_measurement"
+        "learning_measurement"
       ],
-      "label": "Strategy measurement debt"
+      "label": "Adaptive learning measurement"
     },
     {
       "slot_id": "SLOT-13",
@@ -155,7 +155,9 @@
     "Do not send outreach, contact people, purchase services or take external actions without explicit authorization.",
     "Never inspect or retain credentials, private data, confidential material or accidental secrets.",
     "Automatic portfolio adaptation may move at most one slot per generation and only after sufficient attributed-run evidence.",
-    "Manual overrides are measured separately and do not influence automatic portfolio adaptation."
+    "Manual overrides are measured separately and do not influence automatic portfolio adaptation.",
+    "Frozen benchmark strategy_measurement and adaptive learning_measurement are distinct work kinds; normal prospective runs may use only learning_measurement.",
+    "Frozen benchmark strategy_measurement is not a live allocator work kind; adaptive prospective measurement uses learning_measurement only."
   ],
   "adaptation": {
     "adaptable_roles": [

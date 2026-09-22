@@ -5,13 +5,6 @@ import json
 from typing import Any, Mapping, Sequence
 
 
-_SEED_TYPE_ORDER = {
-    "strategy_measurement": 0,
-    "capability_gap": 1,
-    "positive_dna_transfer": 2,
-    "coverage_gap": 3,
-}
-
 
 def _stable_hash(value: Any) -> str:
     return hashlib.sha256(
@@ -28,29 +21,28 @@ def choose_seed_for_measurement(
     strategy_id: str,
     seeds: Sequence[Mapping[str, Any]],
 ) -> Mapping[str, Any] | None:
-    """Choose one already-authorized search seed without using learned value.
+    """Choose the curriculum-backed adaptive measurement seed.
 
-    Selection deliberately ignores seed priority, Q-values, rewards and policy
-    allocation. A dedicated strategy-measurement seed wins when one exists;
-    otherwise use a stable seed-type/seed-id ordering.
+    Adaptive learning packets must never fall back to ordinary discovery or
+    frozen benchmark measurement seeds. The seed compiler creates at most one
+    current `learning_measurement` seed per recommended strategy; packet
+    generation binds to that exact semantic work kind.
     """
     candidates = [
         seed
         for seed in seeds
         if seed.get("strategy_id") == strategy_id
         and seed.get("work_action") == "search"
+        and seed.get("seed_type") == "learning_measurement"
+        and seed.get("authorization_basis")
+        == "adaptive_learning_curriculum"
         and isinstance(seed.get("seed_id"), str)
+        and str(seed.get("seed_id")).startswith("SEED:learn:")
     ]
     if not candidates:
         return None
     candidates.sort(
-        key=lambda seed: (
-            _SEED_TYPE_ORDER.get(
-                str(seed.get("seed_type") or ""),
-                99,
-            ),
-            str(seed.get("seed_id") or ""),
-        )
+        key=lambda seed: str(seed.get("seed_id") or "")
     )
     return candidates[0]
 
@@ -223,6 +215,12 @@ def validate_measurement_packets(
         seed = packet.get("seed") or {}
         if not seed.get("seed_id"):
             errors.append(f"seed_required:{pid}")
+        if seed.get("seed_type") != "learning_measurement":
+            errors.append(f"learning_measurement_seed_required:{pid}")
+        if seed.get("authorization_basis") != "adaptive_learning_curriculum":
+            errors.append(f"learning_curriculum_authorization_required:{pid}")
+        if not str(seed.get("seed_id") or "").startswith("SEED:learn:"):
+            errors.append(f"learning_seed_id_required:{pid}")
         if not seed.get("acceptance_target"):
             errors.append(f"acceptance_target_required:{pid}")
         if not seed.get("query_templates"):

@@ -114,10 +114,11 @@ def assignment_for_claim(intel, claim):
                            ("source_id", "assignment_source_id"), ("final_score", "assignment_score")):
         if assignment.get(source) != claim.get(target):
             raise ValueError(f"assignment disagrees with stored claim: {source}")
-    # Measurement assignments require separate frozen benchmark metadata.  This
-    # helper deliberately cannot relabel them as ordinary prospective discovery.
+    # Frozen benchmark strategy_measurement assignments require separate
+    # benchmark metadata and can never be relabeled as ordinary prospective
+    # discovery. Adaptive learning_measurement is a distinct live work kind.
     if assignment.get("work_kind") == "strategy_measurement":
-        raise ValueError("measurement assignment requires the separate benchmark workflow")
+        raise ValueError("frozen strategy measurement requires the separate benchmark workflow")
     return assignment
 
 
@@ -154,7 +155,7 @@ def prepare_run(*, worker=None, claim_id=None, strategy=None, query_family=None,
     claim = real_claim(intel, claim_id, worker) if claim_id else None
     assignment = assignment_for_claim(intel, claim) if claim else {}
     if claim and claim.get("assignment_work_kind") == "strategy_measurement":
-        raise ValueError("measurement claim requires the separate benchmark workflow")
+        raise ValueError("frozen strategy measurement requires the separate benchmark workflow")
     actions = {"search", "verify_artifact", "execute_fixture", "await_external"}
     if work_action is not None and work_action not in actions:
         raise ValueError("unsupported work_action")

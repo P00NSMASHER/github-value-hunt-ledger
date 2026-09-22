@@ -173,6 +173,53 @@ class PrepareRunTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.bound()
 
+    def test_adaptive_learning_measurement_is_prospective_but_frozen_measurement_stays_blocked(self):
+        self.claim["assignment_slot_role"] = "measurement"
+        self.claim["assignment_work_kind"] = "learning_measurement"
+        self.claim["assignment_source_id"] = "SEED:learn:fixture-inspection"
+        self.claim["work_item_id"] = "WORK:seed:learnfixture"
+        self.save_claim()
+        self.assignment(
+            slot_role="measurement",
+            work_kind="learning_measurement",
+            source_id=self.claim["assignment_source_id"],
+            work_item_id=self.claim["work_item_id"],
+            work_action="search",
+        )
+        run = self.bound(strategy=None, objective=None)
+        self.assertEqual(run["work_action"], "search")
+        self.assertEqual(
+            run["assignment_work_kind"],
+            "learning_measurement",
+        )
+        self.assertEqual(
+            run["allocation_mode"],
+            "generated",
+        )
+        self.assertEqual(
+            run["measurement_quality"],
+            "prospective",
+        )
+        self.assertEqual(
+            run["execution_claim_id"],
+            self.claim["claim_id"],
+        )
+
+        self.claim["assignment_work_kind"] = "strategy_measurement"
+        self.save_claim()
+        self.assignment(
+            slot_role="measurement",
+            work_kind="strategy_measurement",
+            source_id=self.claim["assignment_source_id"],
+            work_item_id=self.claim["work_item_id"],
+            work_action="search",
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "separate benchmark workflow",
+        ):
+            self.bound()
+
     def test_schema_routing_enum_is_enforced(self):
         self.claim["routing_mode"] = "none"
         self.save_claim()

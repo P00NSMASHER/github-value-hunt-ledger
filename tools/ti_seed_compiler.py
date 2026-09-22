@@ -12,6 +12,7 @@ RUNS = [x for x in load_jsonl("search_runs.jsonl") if is_discovery_run(x)]
 OBJECTIVES_CFG = json.loads((INTEL / "search_objectives.json").read_text(encoding="utf-8"))
 OBJECTIVE_IDS = {x["search_objective_id"] for x in OBJECTIVES_CFG.get("objectives", [])}
 COVERAGE_GAPS = load_jsonl("exploration_gap_queue.jsonl") if (INTEL / "exploration_gap_queue.jsonl").exists() else []
+LEARNING_CURRICULUM = json.loads((INTEL / "learning_curriculum.json").read_text(encoding="utf-8")) if (INTEL / "learning_curriculum.json").exists() else {}
 
 SATURATION_BY_CAP = {
     x["label"]: x for x in load_jsonl("research_neighborhoods.jsonl")
@@ -298,33 +299,58 @@ for i,cg in enumerate(COVERAGE_GAPS[:5]):
       "performance":perf[seed_id]
     })
 
-zero=[x for x in POLICY.get("strategy_allocation",[]) if int(x.get("runs") or 0)==0]
-for i,row in enumerate(zero[:3]):
+learning_recs=[
+    row for row in LEARNING_CURRICULUM.get("recommended_measurements",[])
+    if isinstance(row,dict)
+    and row.get("phase") in {"train_measurement","confirm_measurement"}
+    and isinstance(row.get("strategy_id"),str)
+    and row.get("strategy_id") in STRATS
+    and STRATS[row.get("strategy_id")].get("status")=="active"
+]
+for i,row in enumerate(learning_recs[:3]):
     if not gaps:
         break
     g=gaps[i % len(gaps)]
-    target=g["capability_ids"][0] if g["capability_ids"] else g["query_recipe_id"]
+    target=g["capability_ids"][0] if g.get("capability_ids") else g["query_recipe_id"]
     sid=row["strategy_id"]
-    seed_id="SEED:measure:"+slug(sid.replace("STRAT:",""))+"-"+slug(target)
-    priority=max(1,min(82,58+round(100*float(row.get("allocation") or 0))+perf_adjust(seed_id)))
+    phase=row.get("phase")
+    seed_id="SEED:learn:"+slug(sid.replace("STRAT:",""))+"-"+slug(target)
+    base_priority=float(row.get("measurement_priority") or 0)
+    priority=max(1,min(100,round(base_priority+perf_adjust(seed_id),2)))
+    train=row.get("train") or {}
+    confirm=row.get("confirm") or {}
     seeds.append({
       "seed_id":seed_id,
-      "seed_type":"strategy_measurement",
+      "seed_type":"learning_measurement",
       **inherited_fields(g),
       "parent_seed_id":g["seed_id"],
       "priority":priority,
       "strategy_id":sid,
       "search_objective_id":g["search_objective_id"],
-      "capability_ids":g["capability_ids"],
-      "experiment_ids":g["experiment_ids"],
-      "source_nodes":[sid]+g.get("source_nodes",[]),
-      "why_now":f"{sid} has no measured runs but receives exploration allocation. Pair it with {target} so the hunt searches a real gap and reduces strategy measurement debt.",
-      "required_signatures":g["required_signatures"],
-      "query_templates":g["query_templates"],
-      "search_surfaces":g["search_surfaces"],
-      "verification_gate":g["verification_gate"]+" Use the named strategy consistently enough to make the run comparable.",
-      "stop_conditions":g["stop_conditions"]+["Do not turn a measurement run into an unrestricted domain sweep.","A no-find result is valid data; do one recall-rescue pass, then stop."],
-      "authorization_basis":"strategy_measurement_debt",
+      "capability_ids":g.get("capability_ids") or [],
+      "experiment_ids":g.get("experiment_ids") or [],
+      "source_nodes":[sid,"LEARNING_CURRICULUM"]+g.get("source_nodes",[]),
+      "learning_phase":phase,
+      "learning_curriculum_rank":row.get("rank"),
+      "learning_selection_reason":row.get("selection_reason"),
+      "why_now":(
+          f"{sid} is a curriculum-ranked adaptive-learning measurement target "
+          f"({phase}). Train evidence: {train.get('runs',0)} runs / "
+          f"{train.get('deep_inspections',0)} deep; confirm evidence: "
+          f"{confirm.get('runs',0)} runs / {confirm.get('deep_inspections',0)} deep. "
+          f"Pair it with {target} so the run measures a real bounded search task. "
+          "The worker must not know or infer whether this run will later be train or confirm."
+      ),
+      "required_signatures":g.get("required_signatures") or [],
+      "query_templates":g.get("query_templates") or [],
+      "search_surfaces":g.get("search_surfaces") or [],
+      "verification_gate":g["verification_gate"]+" Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.",
+      "stop_conditions":g["stop_conditions"]+[
+          "Do not turn a learning-measurement run into an unrestricted domain sweep.",
+          "A no-find result is valid data; do one materially different recall-rescue pass, then stop.",
+          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership."
+      ],
+      "authorization_basis":"adaptive_learning_curriculum",
       "exclude_domains":g.get("exclude_domains",[]),
       "performance":perf[seed_id]
     })

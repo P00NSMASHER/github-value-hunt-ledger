@@ -12,9 +12,9 @@ The curriculum is **measurement-only**.
 
 It does not:
 
-- change allocator weights;
+- change learned allocator weights;
 - reactivate paused hunters;
-- authorize an assignment;
+- itself authorize execution or create a worker claim;
 - select a strategy because its Q-value or reward is high;
 - use current policy allocation as a selection signal;
 - inspect or choose train/confirm membership;
