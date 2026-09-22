@@ -459,6 +459,7 @@ class CausationReview:
     source_locator: str
     verified: bool
     qualified_reviewer_id: str | None = None
+    qualification_basis: str | None = None
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -473,13 +474,21 @@ class CausationReview:
         _days("accepted_delay_days", self.accepted_delay_days)
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
-        if self.verified and not (
-            isinstance(self.qualified_reviewer_id, str)
-            and self.qualified_reviewer_id.strip()
-        ):
-            raise ValueError(
-                "verified causation review requires qualified_reviewer_id"
-            )
+        if self.verified:
+            if not (
+                isinstance(self.qualified_reviewer_id, str)
+                and self.qualified_reviewer_id.strip()
+            ):
+                raise ValueError(
+                    "verified causation review requires qualified_reviewer_id"
+                )
+            if not (
+                isinstance(self.qualification_basis, str)
+                and self.qualification_basis.strip()
+            ):
+                raise ValueError(
+                    "verified causation review requires qualification_basis"
+                )
         if self.baseline_version_id == self.update_version_id:
             raise ValueError("baseline and update schedule versions must differ")
         if self.accepted_causation and self.accepted_delay_days <= 0:
@@ -502,6 +511,7 @@ class CausationReview:
                 "accepted_causation": self.accepted_causation,
                 "accepted_delay_days": self.accepted_delay_days,
                 "qualified_reviewer_id": self.qualified_reviewer_id,
+                "qualification_basis": self.qualification_basis,
                 **dict(self.metadata),
             },
         )
