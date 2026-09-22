@@ -35,7 +35,9 @@ Before external action, RecoveryOS requires all of the following:
     reviewers;
 11. an exact outbound artifact hash and immutable locator;
 12. a content-addressed ExternalActionEnvelope binding the artifact to the
-    frozen case and client authorization.
+    frozen case and client authorization;
+13. a detached proof seal binding the frozen case, authorization, external
+    action, and durable-journal head to a KMS/HSM-managed key.
 
 The ledger rejects a seven-figure case that attempts to bypass these controls.
 
@@ -154,6 +156,25 @@ than represented by missing data.
 
 The external-action gate rejects an action prepared after an assessed deadline.
 
+## 5A. Temporal consistency
+
+For a hostile-examination case, chronology is part of the proof.
+
+RecoveryOS rejects a case when:
+
+- calculation time predates acquisition of the authority or any load-bearing
+  source;
+- a reviewer, challenge reviewer, or deadline assessor claims to have reviewed
+  a calculation before that calculation existed;
+- a review/assessment postdates the frozen case it is supposedly inside;
+- client authorization predates the frozen case;
+- an outbound action predates client authorization;
+- an authorization expiry predates the authorization itself; or
+- a final proof seal predates the case/action it claims to bind.
+
+This prevents a technically hash-consistent packet from containing impossible
+or backfilled chronology.
+
 ## 6. Frozen CaseProofBundle
 
 `freeze_case_proof(...)` creates the content-addressed proof packet.
@@ -193,7 +214,8 @@ It records:
 - note;
 - optional expiry.
 
-The client actor may not be one of the RecoveryWorks reviewers.
+The client actor may not be one of the approving or adversarial RecoveryWorks
+reviewers.
 
 A seven-figure ledger record cannot use the legacy
 `ledger.authorize(finding_id, authorization_id)` route. It must use
@@ -242,6 +264,30 @@ This allows an examiner to distinguish:
 The existing journal hash chain therefore covers the seven-figure proof packet
 and action gate. A durable bundle can be replayed into the same logical state,
 and tampered journal payloads fail verification.
+
+## 9A. Detached proof seal
+
+A final seven-figure packet may be sealed with `ProofSeal`.
+
+The seal binds:
+
+- frozen case bundle hash;
+- finding proof hash;
+- client authorization hash when present;
+- external-action envelope hash when present;
+- durable journal head hash;
+- seal time;
+- key identifier.
+
+The current code uses HMAC-SHA256 so it has no additional runtime dependency.
+The secret is never stored in the proof packet. A production deployment should
+perform the HMAC with a KMS/HSM-managed key and retain the provider audit trail
+for the key operation. The in-repo simulator uses an explicitly synthetic key
+only for regression testing.
+
+The proof seal is intentionally detached: the case remains independently
+content-addressed, while the seal demonstrates that a trusted key-holder
+attested to the exact frozen state.
 
 ## 10. Separation of duties
 
@@ -299,4 +345,12 @@ Step 1 is complete when CI proves:
 - A one-byte artifact change fails verification.
 - Durable journal export/replay preserves the frozen case hash, authorization
   hash, and outbound-action envelope hash.
+- Impossible chronology (review before calculation, authorization before
+  freeze, action before authorization) is rejected.
+- Rehashed action envelopes cannot change the authorized action type or exceed
+  the validated recovery amount.
+- A detached proof seal fails under the wrong key or journal head and cannot
+  predate the action it binds.
+- The synthetic seven-figure fixture completes the full proof lifecycle and is
+  explicitly labeled simulation-only.
 - Existing lower-value RecoveryWorks lifecycles remain backward compatible.
