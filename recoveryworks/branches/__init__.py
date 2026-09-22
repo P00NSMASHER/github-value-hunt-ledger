@@ -56,6 +56,23 @@ from .payer import (
     audit_payer_lines,
 )
 from .payer_csv import load_payer_lines_csv, load_payer_rates_csv
+from .lease import audit_lease_billing
+from .lease_csv import load_lease_area_csv
+from .rebate import (
+    RebateActivity,
+    RebateAgreement,
+    RebateAuditBatch,
+    RebateAuditException,
+    RebateBasis,
+    RebateCredit,
+    audit_rebates,
+    expected_rebate_cents,
+)
+from .rebate_csv import (
+    load_rebate_activity_csv,
+    load_rebate_agreements_csv,
+    load_rebate_credits_csv,
+)
 from .registry import BRANCHES, BranchSpec, all_specs
 from .utility import (
     UtilityAuditBatch,
@@ -102,6 +119,12 @@ __all__ = [
     "PayerAuditException",
     "PayerRate",
     "PayerServiceLine",
+    "RebateActivity",
+    "RebateAgreement",
+    "RebateAuditBatch",
+    "RebateAuditException",
+    "RebateBasis",
+    "RebateCredit",
     "RuleBackedAdapter",
     "UtilityAuditBatch",
     "UtilityIngestionResult",
@@ -133,14 +156,19 @@ __all__ = [
     "load_duty_entries_csv",
     "load_freight_audit_result_bundle",
     "load_freight_truth_manifest",
+    "load_lease_area_csv",
     "load_obligations_csv",
     "load_payer_lines_csv",
     "load_payer_rates_csv",
     "load_payments_csv",
+    "load_rebate_activity_csv",
+    "load_rebate_agreements_csv",
+    "load_rebate_credits_csv",
     "load_simple_tariff_definitions_json",
     "load_utility_bills_csv",
     "load_usage_csv",
     "load_vendor_statements_csv",
+    "expected_rebate_cents",
     "money_to_cents",
     "normalize_hts",
     "normalize_invoice_number",
