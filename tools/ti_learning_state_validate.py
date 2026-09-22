@@ -28,12 +28,16 @@ def main() -> int:
     min_confirm_runs = gate.get("minimum_confirm_runs")
     min_confirm_deep = gate.get("minimum_confirm_deep_inspections")
     min_confirm_mean = gate.get("minimum_confirm_mean_reward")
+    min_confirm_floor = gate.get("minimum_confirm_min_reward")
+    min_confirm_positive = gate.get("minimum_confirm_positive_runs")
     if min_runs != 5 or min_deep != 20:
         raise SystemExit("learning policy gates drifted from repository policy")
     if (
         min_confirm_runs != 2
         or min_confirm_deep != 6
         or min_confirm_mean != 0.0
+        or min_confirm_floor != 0.0
+        or min_confirm_positive != 1
     ):
         raise SystemExit("confirm evidence gates drifted")
 
@@ -52,6 +56,8 @@ def main() -> int:
         confirm_runs = confirm.get("measured_runs", 0)
         confirm_deep = confirm.get("deep_inspections", 0)
         confirm_mean = confirm.get("mean_reward", 0.0)
+        confirm_min = confirm.get("min_reward")
+        confirm_positive = confirm.get("positive_runs", 0)
         if (
             not isinstance(measured_runs, int)
             or measured_runs < 0
@@ -62,6 +68,12 @@ def main() -> int:
             or not isinstance(confirm_deep, int)
             or confirm_deep < 0
             or not isinstance(confirm_mean, (int, float))
+            or (
+                confirm_min is not None
+                and not isinstance(confirm_min, (int, float))
+            )
+            or not isinstance(confirm_positive, int)
+            or confirm_positive < 0
         ):
             raise SystemExit(f"invalid support counts for {row.get('key')}")
         expected_train = measured_runs >= min_runs and deep_inspections >= min_deep
@@ -69,6 +81,9 @@ def main() -> int:
             confirm_runs >= min_confirm_runs
             and confirm_deep >= min_confirm_deep
             and confirm_mean >= min_confirm_mean
+            and confirm_min is not None
+            and confirm_min >= min_confirm_floor
+            and confirm_positive >= min_confirm_positive
         )
         if row.get("train_evidence_ready") is not expected_train:
             raise SystemExit(f"train evidence mismatch for {row.get('key')}")
@@ -89,6 +104,13 @@ def main() -> int:
             and confirm_mean < min_confirm_mean
         ):
             expected_status = "overfit_signal"
+        elif (
+            expected_train
+            and confirm_runs >= min_confirm_runs
+            and confirm_min is not None
+            and confirm_min < min_confirm_floor
+        ):
+            expected_status = "confirm_regression_signal"
         elif expected_train:
             expected_status = "awaiting_confirm"
         else:
@@ -99,18 +121,24 @@ def main() -> int:
             )
 
     alerts = data.get("learning_alerts") or []
-    overfit_keys = {
-        row.get("key")
+    expected_alerts = {
+        (row.get("generalization_status"), row.get("key"))
         for row in records
-        if row.get("generalization_status") == "overfit_signal"
+        if row.get("generalization_status") in {
+            "overfit_signal",
+            "confirm_regression_signal",
+        }
     }
-    alert_keys = {
-        alert.get("memory_key")
+    actual_alerts = {
+        (alert.get("type"), alert.get("memory_key"))
         for alert in alerts
-        if alert.get("type") == "overfit_signal"
+        if alert.get("type") in {
+            "overfit_signal",
+            "confirm_regression_signal",
+        }
     }
-    if alert_keys != overfit_keys:
-        raise SystemExit("learning alerts do not match overfit signals")
+    if actual_alerts != expected_alerts:
+        raise SystemExit("learning alerts do not match suppression signals")
 
     failure_queue = data.get("failure_queue") or {}
     items = failure_queue.get("items") or []
