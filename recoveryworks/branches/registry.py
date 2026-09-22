@@ -102,6 +102,14 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "lease-backed billing variance",
         ("contract billing engine", "lease abstracts", "CAM reconciliation"),
     ),
+    Branch.TAX: BranchSpec(
+        Branch.TAX,
+        "TaxRecovery",
+        "sales/use-tax and transaction-tax overpayments",
+        ("invoice tax lines", "reviewed expected tax assessments", "rule snapshots"),
+        "professionally reviewed tax overpayment finding",
+        ("tax engine output", "taxability review", "invoice reconciliation"),
+    ),
 }
 
 

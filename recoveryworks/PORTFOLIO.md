@@ -30,6 +30,7 @@ traction.
 | RebateRecovery | underpayment | Operational ingestion | rebate program + purchase population + settlement evidence |
 | LeaseRecovery | overpayment | Operational ingestion | landlord charge + effective lease rate + independent area/allocation evidence |
 | ConstructionRecovery | underpayment | Operational ingestion | reviewed entitlement + event mapping + versioned CPM schedules + qualified causation review + settlement evidence |
+| TaxRecovery | overpayment | Operational ingestion | invoice tax line + professionally reviewed expected assessment + rule snapshot |
 
 ## Shared commercial motion
 
@@ -60,13 +61,14 @@ A manufacturer/distributor can plausibly supply inputs for:
 - RebateRecovery
 - LeaseRecovery
 - ConstructionRecovery when project records exist
+- TaxRecovery when transaction-tax exports and reviewed assessments exist
 
 A healthcare provider can plausibly add PayerRecovery to the same shared
 portfolio.
 
 ## Portfolio state
 
-All 10 registered RecoveryWorks divisions now have operational Scan 360
+All 11 registered RecoveryWorks divisions now have operational Scan 360
 ingestion paths with the same durable evidence/lifecycle model.
 
 ConstructionRecovery completes the previously missing lane with:

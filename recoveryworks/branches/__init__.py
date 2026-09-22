@@ -1,3 +1,13 @@
+from .tax import (
+    TaxAssessment,
+    TaxAuditBatch,
+    TaxAuditException,
+    TaxTransactionLine,
+    audit_tax_lines,
+    normalize_jurisdiction,
+    normalize_tax_category,
+)
+from .tax_csv import load_tax_assessments_csv, load_tax_lines_csv
 from .construction import (
     CPMActivityResult,
     CPMResult,
@@ -124,6 +134,10 @@ from .utility_io import (
 )
 
 __all__ = [
+    "TaxAssessment",
+    "TaxAuditBatch",
+    "TaxAuditException",
+    "TaxTransactionLine",
     "load_schedule_versions_json",
     "load_event_activity_mappings_csv",
     "load_construction_settlements_csv",
@@ -187,6 +201,7 @@ __all__ = [
     "UtilityTariff",
     "UtilityTier",
     "all_specs",
+    "audit_tax_lines",
     "audit_rebates",
     "calculate_rebate",
     "audit_contract_billing",
@@ -204,6 +219,8 @@ __all__ = [
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
+    "load_tax_assessments_csv",
+    "load_tax_lines_csv",
     "load_rebate_programs_json",
     "load_rebate_purchases_csv",
     "load_rebate_settlements_csv",
@@ -225,6 +242,8 @@ __all__ = [
     "load_usage_csv",
     "load_vendor_statements_csv",
     "money_to_cents",
+    "normalize_jurisdiction",
+    "normalize_tax_category",
     "normalize_hts",
     "normalize_invoice_number",
     "normalize_period",
