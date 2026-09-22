@@ -260,18 +260,24 @@ def audit_contract_billing(
     usage_by_charge, usage_exceptions = _usage_index(usage)
     observations: list[RecoveryObservation] = []
     exceptions = list(usage_exceptions)
-    seen_charge_ids: set[str] = set()
 
-    for charge in sorted(charges, key=lambda item: item.charge_id):
-        if charge.charge_id in seen_charge_ids:
+    charge_groups: dict[str, list[InvoiceCharge]] = {}
+    for charge in charges:
+        charge_groups.setdefault(charge.charge_id, []).append(charge)
+
+    accepted_charges: list[InvoiceCharge] = []
+    for charge_id in sorted(charge_groups):
+        group = charge_groups[charge_id]
+        if len(group) != 1:
             exceptions.append(ContractBillingException(
-                charge.charge_id,
+                charge_id,
                 "DUPLICATE_CHARGE_ID",
-                "duplicate charge_id excluded from recovery math",
+                f"charge_id appears {len(group)} times; all copies excluded from recovery math",
             ))
             continue
-        seen_charge_ids.add(charge.charge_id)
+        accepted_charges.append(group[0])
 
+    for charge in sorted(accepted_charges, key=lambda item: item.charge_id):
         candidates = [
             rate
             for rate in rate_index.get((charge.counterparty_id, charge.service_id), [])
