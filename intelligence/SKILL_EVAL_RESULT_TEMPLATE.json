@@ -23,6 +23,7 @@
   "evaluation_evidence_refs": [
     "path-or-frozen-evaluation-evidence"
   ],
+  "evaluation_evidence_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
   "source_failure_ids": [],
   "mutator_saw_promotion_test": false,
   "evaluator_modified": false,
