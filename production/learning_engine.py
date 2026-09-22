@@ -14,8 +14,25 @@ class ExperienceKind(str, Enum):
     STRATEGY = "STRATEGY"
     QUERY_FAMILY = "QUERY_FAMILY"
     SEARCH_MOVE = "SEARCH_MOVE"
+    CONTEXTUAL_STRATEGY = "CONTEXTUAL_STRATEGY"
+    CONTEXTUAL_QUERY_FAMILY = "CONTEXTUAL_QUERY_FAMILY"
+    CONTEXTUAL_SEARCH_MOVE = "CONTEXTUAL_SEARCH_MOVE"
     SALVAGED_TRAJECTORY = "SALVAGED_TRAJECTORY"
     LOCAL_SKILL = "LOCAL_SKILL"
+
+
+def contextual_memory_key(
+    base_key: str,
+    search_objective_id: str | None,
+) -> str | None:
+    if (
+        not isinstance(base_key, str)
+        or not base_key
+        or not isinstance(search_objective_id, str)
+        or not search_objective_id.startswith("OBJ:")
+    ):
+        return None
+    return f"CTX:{search_objective_id}::{base_key}"
 
 
 class FailureDecision(str, Enum):
@@ -462,8 +479,10 @@ def learn_training_episode_memory(
             continue
 
         run_id = str(episode.get("run_id") or "")
+        state = episode.get("state") or {}
         action = episode.get("action") or {}
         provenance = episode.get("provenance") or {}
+        objective_id = state.get("search_objective_id")
         updated_at = str(provenance.get("timestamp") or "") or None
         updated: list[str] = []
 
@@ -477,6 +496,19 @@ def learn_training_episode_memory(
                 updated_at=updated_at,
             )
             updated.append(strategy_id)
+            contextual_strategy = contextual_memory_key(
+                strategy_id,
+                objective_id,
+            )
+            if contextual_strategy:
+                memory.update(
+                    contextual_strategy,
+                    ExperienceKind.CONTEXTUAL_STRATEGY,
+                    float(reward),
+                    run_id=run_id or None,
+                    updated_at=updated_at,
+                )
+                updated.append(contextual_strategy)
 
         query_family_id = action.get("query_family_id")
         if (
@@ -491,6 +523,19 @@ def learn_training_episode_memory(
                 updated_at=updated_at,
             )
             updated.append(query_family_id)
+            contextual_query_family = contextual_memory_key(
+                query_family_id,
+                objective_id,
+            )
+            if contextual_query_family:
+                memory.update(
+                    contextual_query_family,
+                    ExperienceKind.CONTEXTUAL_QUERY_FAMILY,
+                    float(reward),
+                    run_id=run_id or None,
+                    updated_at=updated_at,
+                )
+                updated.append(contextual_query_family)
 
         for move_id in action.get("search_move_ids") or []:
             if not isinstance(move_id, str) or not move_id:
@@ -504,6 +549,19 @@ def learn_training_episode_memory(
                 updated_at=updated_at,
             )
             updated.append(key)
+            contextual_move = contextual_memory_key(
+                key,
+                objective_id,
+            )
+            if contextual_move:
+                memory.update(
+                    contextual_move,
+                    ExperienceKind.CONTEXTUAL_SEARCH_MOVE,
+                    float(reward),
+                    run_id=run_id or None,
+                    updated_at=updated_at,
+                )
+                updated.append(contextual_move)
 
         observations.append(
             {
