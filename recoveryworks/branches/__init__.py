@@ -1,3 +1,21 @@
+from .rebate import (
+    RebateAuditBatch,
+    RebateAuditException,
+    RebateCalculation,
+    RebateMeasurementBasis,
+    RebateProgram,
+    RebatePurchaseLine,
+    RebateSettlement,
+    RebateTier,
+    RebateTierMode,
+    audit_rebates,
+    calculate_rebate,
+)
+from .rebate_io import (
+    load_rebate_programs_json,
+    load_rebate_purchases_csv,
+    load_rebate_settlements_csv,
+)
 from .contract_billing import (
     ContractBillingBatch,
     ContractBillingException,
@@ -80,6 +98,15 @@ from .utility_io import (
 
 __all__ = [
     "APIngestionResult",
+    "RebateAuditBatch",
+    "RebateAuditException",
+    "RebateCalculation",
+    "RebateMeasurementBasis",
+    "RebateProgram",
+    "RebatePurchaseLine",
+    "RebateSettlement",
+    "RebateTier",
+    "RebateTierMode",
     "ContractBillingBatch",
     "ContractBillingException",
     "ContractRate",
@@ -112,6 +139,8 @@ __all__ = [
     "UtilityTariff",
     "UtilityTier",
     "all_specs",
+    "audit_rebates",
+    "calculate_rebate",
     "audit_contract_billing",
     "audit_saas_billing",
     "audit_telecom_billing",
@@ -125,6 +154,9 @@ __all__ = [
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
+    "load_rebate_programs_json",
+    "load_rebate_purchases_csv",
+    "load_rebate_settlements_csv",
     "load_billable_seat_snapshot_csv",
     "load_cdr_usage_csv",
     "load_contract_rates_csv",
