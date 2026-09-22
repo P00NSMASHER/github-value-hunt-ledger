@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 from typing import Any, Sequence
 
+from .ap_csv import execute_ap_csv_scan
 from .fees import FeeAgreement, assess_fee
 from .io import execute_scan_payload
 from .models import Branch, EvidenceRef
@@ -68,6 +69,35 @@ def build_parser() -> argparse.ArgumentParser:
     raw_scan.add_argument("input", type=Path)
     _add_output(raw_scan)
     raw_scan.add_argument("--ledger-output", type=Path, help="persist the resulting proof/audit ledger locally")
+
+    ap_csv = sub.add_parser(
+        "ap-scan-csv",
+        help="scan ordinary AP invoice/payment CSV exports",
+    )
+    ap_csv.add_argument("--scan-id", required=True)
+    ap_csv.add_argument("--client-id", required=True)
+    ap_csv.add_argument("--invoices", type=Path, required=True)
+    ap_csv.add_argument("--payments", type=Path, required=True)
+    ap_csv.add_argument(
+        "--verify-invoices",
+        action="store_true",
+        help="operator attests invoice export source is verified",
+    )
+    ap_csv.add_argument(
+        "--verify-payments",
+        action="store_true",
+        help="operator attests payment export source is verified",
+    )
+    ap_csv.add_argument(
+        "--selection-rule",
+        default="all rows in supplied AP invoice and payment exports",
+    )
+    _add_output(ap_csv)
+    ap_csv.add_argument(
+        "--ledger-output",
+        type=Path,
+        help="persist the resulting proof/audit ledger locally",
+    )
 
     review = sub.add_parser("review-queue", help="render deterministic operator queues")
     review.add_argument("ledger", type=Path)
@@ -174,6 +204,32 @@ def main(argv: Sequence[str] | None = None) -> int:
             result, ledger = execute_raw_scan_payload(payload)
         else:
             result, ledger = execute_scan_payload(payload)
+        if args.ledger_output:
+            key = _ledger_key()
+            if _require_signed_ledger() and key is None:
+                raise ValueError(
+                    "RECOVERYWORKS_REQUIRE_SIGNED_LEDGER is enabled but "
+                    "RECOVERYWORKS_LEDGER_HMAC_KEY is missing"
+                )
+            save_ledger(args.ledger_output, ledger, integrity_key=key)
+            result = {
+                **result,
+                "ledger_path": str(args.ledger_output),
+                "ledger_signed": key is not None,
+            }
+        _emit(result, args.output)
+        return 0
+
+    if args.command == "ap-scan-csv":
+        result, ledger = execute_ap_csv_scan(
+            scan_id=args.scan_id,
+            client_id=args.client_id,
+            invoices_path=args.invoices,
+            payments_path=args.payments,
+            invoices_verified=args.verify_invoices,
+            payments_verified=args.verify_payments,
+            selection_rule=args.selection_rule,
+        )
         if args.ledger_output:
             key = _ledger_key()
             if _require_signed_ledger() and key is None:
