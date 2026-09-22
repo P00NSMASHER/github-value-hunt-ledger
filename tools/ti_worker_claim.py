@@ -19,6 +19,17 @@ def parse_ts(value):
 def short_hash(text):
     return hashlib.sha256(text.encode()).hexdigest()[:12]
 
+def runtime_approval_errors(packet, runtime_policy):
+    errors=[]
+    if runtime_policy.get("mode")!="measurement_canary":
+        errors.append("runtime_policy_not_measurement_canary")
+    if packet.get("runtime_approval_id")!=runtime_policy.get("approval_id"):
+        errors.append("runtime_approval_id_stale")
+    if packet.get("runtime_approval_record_sha256")!=runtime_policy.get("approval_record_sha256"):
+        errors.append("runtime_approval_record_hash_stale")
+    return errors
+
+
 def choose_packet(worker,steal=False,dispatch_ticket=None,activation_id=None):
     pool=load_jsonl("activation_claim_packets.jsonl") if (INTEL/"activation_claim_packets.jsonl").exists() else []
     matches=[x for x in pool if x.get("worker_id")==worker]
@@ -56,12 +67,12 @@ def main():
         raise SystemExit(f"unknown slot {packet['slot_id']}")
     policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
     runtime_policy=json.loads((INTEL/"hunter_runtime_policy.json").read_text(encoding="utf-8"))
-    if runtime_policy.get("mode")!="measurement_canary":
-        raise SystemExit("current hunter runtime policy is not an approved measurement canary")
-    if packet.get("runtime_approval_id")!=runtime_policy.get("approval_id"):
-        raise SystemExit("activation packet approval ID is stale relative to current runtime policy")
-    if packet.get("runtime_approval_record_sha256")!=runtime_policy.get("approval_record_sha256"):
-        raise SystemExit("activation packet approval record hash is stale relative to current runtime policy")
+    runtime_errors=runtime_approval_errors(packet,runtime_policy)
+    if runtime_errors:
+        raise SystemExit(
+            "activation packet is not authorized by current runtime policy: "
+            + "; ".join(runtime_errors)
+        )
     if state["status"] not in set(policy.get("claimable_states") or []):
         raise SystemExit(f"dispatch slot is no longer claimable: {state['status']}")
 
