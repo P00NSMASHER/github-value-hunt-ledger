@@ -271,3 +271,32 @@ Generated artifacts:
 
 The top measurement debts are also exposed in \`NETWORK_PRIORS.md\`. The curriculum remains \`policy_effect=none\` and does not alter allocator weights or activate work by itself.
 
+### 14. Blind learning measurement precommit packets — implemented
+
+\`production/learning_measurement_packets.py\` freezes the current curriculum recommendation to one already-authorized search seed **before execution** without creating an assignment or activating a worker.
+
+Packet selection is deliberately independent of learned value:
+
+- Q-values are not used;
+- reward means are not used;
+- seed priority is not used;
+- policy allocation is not used.
+
+A dedicated \`strategy_measurement\` seed is preferred when one already exists; otherwise a deterministic seed-type + seed-id rule selects an existing bounded search hypothesis for the same strategy.
+
+Every packet is content-addressed and binds:
+
+- strategy and measurement phase;
+- exact current learning curriculum bytes;
+- exact current search-seed bytes;
+- selected seed, objective, queries, surfaces and acceptance target;
+- current train/confirm evidence deficit;
+- the blind partition and no-split-shopping retry rules.
+
+The generated artifacts are:
+
+- \`intelligence/learning_measurement_packets.json\`;
+- \`intelligence/LEARNING_MEASUREMENT_PACKETS.md\`.
+
+These packets are \`PRECOMMITTED_ADVISORY\`, \`policy_effect=none\`, and \`activates_work=false\`. Manual work cannot complete them. They become executable only after the user explicitly resumes hunters and the normal generated assignment/claim path selects the bounded work. Train/confirm assignment remains unknown to the worker and is determined only after canonical ingestion through the secret-keyed split receipt mechanism.
+

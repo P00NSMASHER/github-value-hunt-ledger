@@ -116,6 +116,8 @@ jobs:
                   intelligence/LEARNING_STATE.json \
                   intelligence/learning_curriculum.json \
                   intelligence/LEARNING_CURRICULUM.md \
+                  intelligence/learning_measurement_packets.json \
+                  intelligence/LEARNING_MEASUREMENT_PACKETS.md \
                   intelligence/NETWORK_PRIORS.md \
                   intelligence/TRAINING_ENVIRONMENT.json \
                   intelligence/training_episodes.jsonl \

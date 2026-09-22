@@ -21,6 +21,7 @@ Current Freight Recovery state is **commercially specified / externally blocked 
 - Local execution result before commit: **11/11 tests passed**.
 - Reference PostgreSQL schema committed: production/schema.sql.
 - Outcome-weighted hunter learning engine committed: `production/learning_engine.py`.
+- Blind measurement curriculum and content-addressed advisory precommit packets are staged; they do not activate work or alter allocator policy.
 - Build-generated advisory value memory committed through `tools/ti_learning_state.py` + fail-closed validator; it cannot alter policy before the existing 5-run/20-deep-inspection evidence gate.
 - Immutable reproducible hunter-system failure spool/schema committed under `intelligence/learning_failure_spool/`.
 - Skill repair, failed-trajectory salvage, staged skill evolution, personalized peer transfer, performance×novelty fleet selection, canary-only harness mutation and clean future-training export gates are encoded and covered by CI-discovered unit tests.
