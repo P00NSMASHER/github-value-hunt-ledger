@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:agent-learning-01",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "exact_revision_required": true,
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "DataArcTech/Bayesian-Agent",
+      "revision": "4b69b4ed02d166c8d1673ea67e2ac836ac377896",
+      "capability_ids": [
+        "CAP-020"
+      ]
+    },
+    {
+      "repository": "mao-code/MANTA",
+      "revision": "6f4411c54b4a2cc2169b0fbd99f34934c85816c0",
+      "capability_ids": [
+        "CAP-021"
+      ]
+    },
+    {
+      "repository": "BrunoBanana/memory-as-history",
+      "revision": "84f519e920b706849cc0ccf184c377c2dc6d0c1f",
+      "capability_ids": [
+        "CAP-022"
+      ]
+    },
+    {
+      "repository": "ruc-datalab/EvoOntology",
+      "revision": "6201f3d49d508874755bccfa5664363c943d9d88",
+      "capability_ids": [
+        "CAP-025"
+      ]
+    },
+    {
+      "repository": "Gen-Verse/ScienceInfra",
+      "revision": "49bd221bb18077a349e7f860569c3c5f5a4de64f",
+      "capability_ids": [
+        "CAP-023"
+      ]
+    },
+    {
+      "repository": "aitofound/ScienceIDE",
+      "revision": "65fb87f9e4cc59859f9aca4616798c78477f57bc",
+      "capability_ids": [
+        "CAP-023"
+      ]
+    },
+    {
+      "repository": "DeepExperience/Harness-R1",
+      "revision": "94f2e087f573e1b82fc9568bb634d4ae9a887e28",
+      "capability_ids": [
+        "CAP-024"
+      ]
+    },
+    {
+      "repository": "rmax-ai/skill-lifecycle-lab",
+      "revision": "4c0b3a53e7c835013f8524e579f356926b2ab0ab",
+      "capability_ids": [
+        "CAP-020",
+        "CAP-024"
+      ]
+    },
+    {
+      "repository": "alibaba/skill-up",
+      "revision": "889cfa6d4990d198db18049e147995f9eae31658",
+      "capability_ids": [
+        "CAP-020"
+      ]
+    },
+    {
+      "repository": "AetherLabsAI/RSIAgent",
+      "revision": "a9e56263f6deaa493496ad6b155fe24bf131bc12",
+      "capability_ids": [
+        "CAP-026"
+      ]
+    },
+    {
+      "repository": "agentsynth/agentsynth",
+      "revision": "d2564dfb25ed7ba32e367d28117e6afd1ee6c485",
+      "capability_ids": [
+        "CAP-023"
+      ]
+    },
+    {
+      "repository": "Jerry-LuP/COBRA-Skills",
+      "revision": "44b00ef55a06a637e9bad06999b618ca2eb37288",
+      "capability_ids": [
+        "CAP-020"
+      ]
+    },
+    {
+      "repository": "jhxu5214/HarnessLens",
+      "revision": "369a5c8c7856902bed25024c293db61779b2c9f0",
+      "capability_ids": [
+        "CAP-020",
+        "CAP-024"
+      ]
+    }
+  ],
+  "watch": [
+    {
+      "repository": "exoharness/exo",
+      "revision": "7678236329554bea728cff55e9182d9ff786f931"
+    },
+    {
+      "repository": "oldbulb/samsara",
+      "revision": "8af12afcea34c527b91e8023dd8999f64d49360d"
+    },
+    {
+      "repository": "WeAgentAI/LLM-Wiki",
+      "revision": "79a5a2d5fb9e07c7e5d21fe704b4eca0c27452ef"
+    }
+  ],
+  "capability_definitions": {
+    "CAP-020": "Evidence-weighted target-specific skill governance and lifecycle",
+    "CAP-021": "Self-evolving hunter organization/topology with protected verdict authority",
+    "CAP-022": "Provenance-aware historical memory and revisable claims",
+    "CAP-023": "Repository-derived verifiable training worlds",
+    "CAP-024": "Failure-trajectory-to-executable-harness repair with paired rerun",
+    "CAP-025": "Self-evolving ontology / semantic control plane",
+    "CAP-026": "Broad-to-deep autonomous environment learning with verifier isolation"
+  }
+}
