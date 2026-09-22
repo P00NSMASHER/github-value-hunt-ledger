@@ -1,6 +1,6 @@
 # ACTIVATION RESPONSE LEARNING
 
-Generation: **RESPLEARN:e5551432c25d**
+Generation: **RESPLEARN:d913f8b8cbe6**
 Mode: **measured_feedback**
 Resolved primary activations: **37 / 20**
 
