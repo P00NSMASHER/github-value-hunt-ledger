@@ -193,3 +193,21 @@ def test_multiple_fixed_fee_lines_fail_closed_when_pricing_scope_is_not_explicit
         "FIXED_SCOPE_AMBIGUOUS_MULTI_LINE"
     }
     assert all(item.expected_cents is None for item in out.derivations)
+
+
+def test_semantic_duplicate_with_different_evidence_hashes_is_quarantined_not_double_validated():
+    pop = population()
+    out = derive_batch(
+        pop,
+        [
+            charge(charge_id="charge-a", source_hash="source-a"),
+            charge(charge_id="charge-b", source_hash="source-b"),
+        ],
+        [rule()],
+    )
+    assert out.validated_count == 0
+    assert out.review_count == 2
+    assert out.truth.findings == ()
+    assert {item.reason for item in out.derivations} == {
+        "POSSIBLE_DUPLICATE_CHARGE_EVIDENCE"
+    }
