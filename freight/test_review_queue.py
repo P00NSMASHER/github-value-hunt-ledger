@@ -1,3 +1,7 @@
+from dataclasses import replace
+
+import pytest
+
 from freight.contracts import PopulationRow, freeze_population
 from freight.finding_factory import FIXED, ChargeRule, InvoiceCharge, derive_batch
 from freight.review_queue import (
@@ -84,3 +88,19 @@ def test_same_priority_orders_larger_variance_first():
     )
     q = build_review_queue(b)
     assert [item.charge_id for item in q.items] == ["ch-2", "ch-1"]
+
+
+def test_queue_rejects_stale_tampered_derivation_before_prioritizing_it():
+    original = batch()
+    first = original.derivations[0]
+    tampered = replace(
+        first,
+        expected_cents=0,
+        variance_cents=first.billed_cents,
+    )
+    forged = replace(
+        original,
+        derivations=(tampered, *original.derivations[1:]),
+    )
+    with pytest.raises(ValueError, match="expected amount does not match finding|derivation hash mismatch"):
+        build_review_queue(forged)
