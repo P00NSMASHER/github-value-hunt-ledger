@@ -687,7 +687,11 @@ def prepare_external_action(
         "prepared_by": prepared_by,
         "prepared_at": prepared_at,
     }
-    return ExternalActionEnvelope(**body, envelope_hash=canonical_hash(body))
+    envelope_fields = {key: value for key, value in body.items() if key != "schema"}
+    return ExternalActionEnvelope(
+        **envelope_fields,
+        envelope_hash=canonical_hash(body),
+    )
 
 
 def verify_external_action(
