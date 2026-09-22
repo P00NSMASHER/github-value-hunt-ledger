@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-import json,re,sys
+import json,re
 from collections import Counter
 from ti_common import INTEL, ROOT, load_jsonl
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from production.learning_measurement_blinding import (
+from ti_learning_measurement_blinding import (
     worker_assignment_blinding_errors,
 )
 from ti_search_actions import action_errors
