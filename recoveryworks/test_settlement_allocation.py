@@ -55,14 +55,12 @@ class SettlementAllocationTests(unittest.TestCase):
         ledger.mark_recovered(
             first.finding_id,
             4000,
-            800,
             recovery_evidence=settlement,
             settlement_total_cents=6000,
         )
         ledger.mark_recovered(
             second.finding_id,
             2000,
-            400,
             recovery_evidence=settlement,
             settlement_total_cents=6000,
         )
