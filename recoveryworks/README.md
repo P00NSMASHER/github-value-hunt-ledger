@@ -14,6 +14,7 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **SaaSRecovery** — subscription, seat, and contracted-rate billing leakage.
 - **TelecomRecovery** — recurring service and CDR/usage billing leakage.
 - **RebateRecovery** — earned supplier/volume rebates not fully settled.
+- **LeaseRecovery** — rent, CAM, operating-expense, and area-based lease billing leakage.
 
 ## Non-negotiable invariant
 
@@ -61,6 +62,9 @@ are documented in `recoveryworks/INGESTION_SAAS_TELECOM.md`.
 
 RebateRecovery tier modes, purchase/settlement schemas, and calculation controls
 are documented in `recoveryworks/INGESTION_REBATE.md`.
+
+LeaseRecovery landlord-charge, lease-rate, and area/allocation schemas are
+documented in `recoveryworks/INGESTION_LEASE.md`.
 
 ## Portfolio readiness
 

@@ -29,6 +29,9 @@ from .contract_billing_csv import (
     load_invoice_charges_csv,
     load_usage_csv,
 )
+from .lease import audit_lease_billing
+from .lease_csv import load_lease_area_csv
+from .lease_ingest import LeaseIngestionResult, ingest_lease_exports
 from .saas import audit_saas_billing
 from .saas_csv import load_billable_seat_snapshot_csv
 from .telecom import audit_telecom_billing
@@ -111,6 +114,7 @@ __all__ = [
     "ContractBillingException",
     "ContractRate",
     "InvoiceCharge",
+    "LeaseIngestionResult",
     "UsageRecord",
     "APObligation",
     "APPayment",
@@ -142,6 +146,7 @@ __all__ = [
     "audit_rebates",
     "calculate_rebate",
     "audit_contract_billing",
+    "audit_lease_billing",
     "audit_saas_billing",
     "audit_telecom_billing",
     "audit_ap_recovery",
@@ -150,6 +155,7 @@ __all__ = [
     "audit_utility_bills",
     "build_ap_observations",
     "ingest_ap_exports",
+    "ingest_lease_exports",
     "ingest_utility_exports",
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
@@ -162,6 +168,7 @@ __all__ = [
     "load_contract_rates_csv",
     "load_duty_assessments_csv",
     "load_invoice_charges_csv",
+    "load_lease_area_csv",
     "load_duty_entries_csv",
     "load_freight_audit_result_bundle",
     "load_freight_truth_manifest",

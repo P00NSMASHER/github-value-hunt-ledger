@@ -34,6 +34,8 @@ from .branches.contract_billing_csv import (
     load_invoice_charges_csv,
     load_usage_csv,
 )
+from .branches.lease import audit_lease_billing
+from .branches.lease_csv import load_lease_area_csv
 from .branches.saas import audit_saas_billing
 from .branches.saas_csv import load_billable_seat_snapshot_csv
 from .branches.telecom import audit_telecom_billing
@@ -442,6 +444,65 @@ def run_scan360_config(
                 added_ids.append(finding.finding_id)
 
 
+
+
+    for job_index, job in enumerate(_jobs(config.get("lease"), name="lease")):
+        charges = load_invoice_charges_csv(
+            _resolve(base, job.get("charges_csv"), name=f"lease[{job_index}].charges_csv"),
+            verified=_bool_setting(
+                job, "charge_source_verified", context=f"lease[{job_index}]"
+            ),
+        )
+        rates = load_contract_rates_csv(
+            _resolve(base, job.get("rates_csv"), name=f"lease[{job_index}].rates_csv"),
+            verified=_bool_setting(
+                job, "rate_source_verified", context=f"lease[{job_index}]"
+            ),
+        )
+        usage_csv = job.get("usage_csv")
+        area_csv = job.get("area_csv")
+        if usage_csv and area_csv:
+            raise ValueError(
+                f"lease[{job_index}] accepts only one of usage_csv or area_csv"
+            )
+        quantity = ()
+        if usage_csv:
+            quantity = load_usage_csv(
+                _resolve(base, usage_csv, name=f"lease[{job_index}].usage_csv"),
+                verified=_bool_setting(
+                    job, "usage_source_verified", context=f"lease[{job_index}]"
+                ),
+            )
+        elif area_csv:
+            quantity = load_lease_area_csv(
+                _resolve(base, area_csv, name=f"lease[{job_index}].area_csv"),
+                verified=_bool_setting(
+                    job, "area_source_verified", context=f"lease[{job_index}]"
+                ),
+            )
+
+        batch = audit_lease_billing(
+            client_id=client_id,
+            charges=charges,
+            rates=rates,
+            area=quantity,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "lease",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
 
     for job_index, job in enumerate(_jobs(config.get("duty"), name="duty")):
         entries = load_duty_entries_csv(

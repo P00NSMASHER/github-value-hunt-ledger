@@ -28,6 +28,7 @@ traction.
 | SaaSRecovery | overpayment | Operational ingestion | invoice + subscription contract + independent seat/usage quantity |
 | TelecomRecovery | overpayment | Operational ingestion | invoice + service contract + independent CDR/usage quantity |
 | RebateRecovery | underpayment | Operational ingestion | rebate program + purchase population + settlement evidence |
+| LeaseRecovery | overpayment | Operational ingestion | landlord charge + effective lease rate + independent area/allocation evidence |
 | ConstructionRecovery | underpayment | Foundation | contract/change evidence + schedule causation still to be integrated |
 
 ## Shared commercial motion
@@ -57,6 +58,7 @@ A manufacturer/distributor can plausibly supply inputs for:
 - SaaSRecovery
 - TelecomRecovery
 - RebateRecovery
+- LeaseRecovery
 - ConstructionRecovery when project records exist
 
 A healthcare provider can plausibly add PayerRecovery to the same shared
