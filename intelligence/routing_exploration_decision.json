@@ -1,11 +1,11 @@
 {
-  "exploration_generation_id": "ROUTEEXP:7b2dbd54ea13",
-  "seed_hash": "7b2dbd54ea1318c901d35333f0ca0197934d60c80a3737cec189a61d88d3e103",
-  "gate_value": 0.09681713,
+  "exploration_generation_id": "ROUTEEXP:7691b75bbd20",
+  "seed_hash": "7691b75bbd20ae7802f73c49fa9e89056808d9b3f6a608b0dcc4d34c17d5df57",
+  "gate_value": 0.68151873,
   "exploration_probability": 0.25,
   "baseline_total_score": 288.9096,
   "applied": false,
-  "reason": "no_eligible_low_regret_swap",
+  "reason": "gate_closed",
   "pair_id": null,
   "workers": [],
   "baseline_slots": [],
@@ -16,8 +16,8 @@
   "relative_regret": 0.0,
   "measurement_need": 0,
   "candidate_count": 0,
-  "routing_generation_id": "ROUTING:0c6b00d35fad",
+  "routing_generation_id": "ROUTING:bffe486041bd",
   "worker_profile_generation_id": "WORKERS:45cdbf855c3e",
   "routing_learning_generation_id": "ROUTELEARN:bc40639ef4db",
-  "activation_response_learning_generation_id": "RESPLEARN:42ca3bc88d80"
+  "activation_response_learning_generation_id": "RESPLEARN:82ca7bc068df"
 }
