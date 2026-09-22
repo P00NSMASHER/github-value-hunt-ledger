@@ -26,6 +26,7 @@ from production.learning_engine import (
     assess_failure_for_repair,
     contextual_memory_key,
     learn_training_episode_memory,
+    search_move_training_reward,
 )
 from production.training_environment import build_training_environment
 
@@ -130,41 +131,81 @@ def episode_support_index(
         deep = observation.get("deep_inspected")
         deep_value = deep if isinstance(deep, int) and deep >= 0 else 0
         action = episode.get("action") or {}
-        keys: list[str] = []
+        state = episode.get("state") or {}
+        objective_id = state.get("search_objective_id")
+        key_rewards: list[tuple[str, float, int]] = []
 
         strategy = action.get("strategy_id")
         if isinstance(strategy, str) and strategy.startswith("STRAT:"):
-            keys.append(strategy)
+            key_rewards.append((strategy, float(reward), deep_value))
 
         query_family = action.get("query_family_id")
         if (
             isinstance(query_family, str)
             and query_family.startswith("QF:")
         ):
-            keys.append(query_family)
+            key_rewards.append((query_family, float(reward), deep_value))
 
-        for move_id in action.get("search_move_ids") or []:
-            if isinstance(move_id, str) and move_id:
-                keys.append(
-                    move_id
-                    if move_id.startswith("MOVE:")
-                    else f"MOVE:{move_id}"
-                )
-
-        objective_id = (
-            episode.get("state") or {}
-        ).get("search_objective_id")
-        contextual_keys = [
-            contextual_memory_key(key, objective_id)
-            for key in keys
+        structured_moves = [
+            move
+            for move in action.get("search_moves") or []
+            if isinstance(move, dict)
         ]
-        keys.extend(
-            key
-            for key in contextual_keys
-            if key
-        )
+        if structured_moves:
+            for move in structured_moves:
+                key = str(
+                    move.get("key")
+                    or (
+                        f"MOVE:{move.get('move_type')}"
+                        if move.get("move_type")
+                        else ""
+                    )
+                )
+                if not key:
+                    continue
+                move_deep = move.get("deep_inspected")
+                move_deep_value = (
+                    move_deep
+                    if isinstance(move_deep, int) and move_deep >= 0
+                    else 0
+                )
+                key_rewards.append(
+                    (
+                        key,
+                        search_move_training_reward(
+                            move,
+                            float(reward),
+                        ),
+                        move_deep_value,
+                    )
+                )
+        else:
+            for move_id in action.get("search_move_ids") or []:
+                if isinstance(move_id, str) and move_id:
+                    key = (
+                        move_id
+                        if move_id.startswith("MOVE:")
+                        else f"MOVE:{move_id}"
+                    )
+                    key_rewards.append((key, float(reward), deep_value))
 
-        for key in dict.fromkeys(keys):
+        contextual_rows = []
+        for key, key_reward, key_deep in key_rewards:
+            contextual = contextual_memory_key(
+                key,
+                objective_id,
+            )
+            if contextual:
+                contextual_rows.append(
+                    (contextual, key_reward, key_deep)
+                )
+        key_rewards.extend(contextual_rows)
+
+        seen_keys: set[str] = set()
+        for key, key_reward, key_deep in key_rewards:
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
             bucket = out.setdefault(
                 key,
                 {
@@ -176,17 +217,17 @@ def episode_support_index(
                 },
             )
             bucket["measured_runs"] += 1
-            bucket["deep_inspections"] += deep_value
-            bucket["reward_sum"] += float(reward)
+            bucket["deep_inspections"] += key_deep
+            bucket["reward_sum"] += float(key_reward)
             bucket["min_reward"] = (
-                float(reward)
+                float(key_reward)
                 if bucket["min_reward"] is None
                 else min(
                     float(bucket["min_reward"]),
-                    float(reward),
+                    float(key_reward),
                 )
             )
-            if float(reward) > 0:
+            if float(key_reward) > 0:
                 bucket["positive_runs"] += 1
 
     for bucket in out.values():
