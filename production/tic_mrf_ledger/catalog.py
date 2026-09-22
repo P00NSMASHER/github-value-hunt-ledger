@@ -330,9 +330,16 @@ def extract_file_locations(structure: dict[str, Any]) -> list[tuple[str, str]]:
     return result
 
 
-def normalize_plan(plan: dict[str, Any]) -> tuple[str | None, str | None, str | None, str | None]:
+def normalize_plan(
+    plan: dict[str, Any],
+) -> tuple[
+    str | None, str | None, str | None,
+    str | None, str | None, str | None,
+]:
     return (
         str(plan.get("plan_name")) if plan.get("plan_name") is not None else None,
+        str(plan.get("issuer_name")) if plan.get("issuer_name") is not None else None,
+        str(plan.get("plan_sponsor_name")) if plan.get("plan_sponsor_name") is not None else None,
         str(plan.get("plan_id_type")) if plan.get("plan_id_type") is not None else None,
         str(plan.get("plan_id")) if plan.get("plan_id") is not None else None,
         str(plan.get("plan_market_type")) if plan.get("plan_market_type") is not None else None,
@@ -380,12 +387,16 @@ def upsert_mrf_file(
 
 
 def persist_plan(conn: sqlite3.Connection, mrf_file_id: int, plan: dict[str, Any]) -> None:
-    name, id_type, plan_id, market = normalize_plan(plan)
+    name, issuer_name, sponsor_name, id_type, plan_id, market = normalize_plan(plan)
     conn.execute(
         """INSERT OR IGNORE INTO plans(
-             mrf_file_id, plan_name, plan_id_type, plan_id, plan_market_type
-           ) VALUES (?, ?, ?, ?, ?)""",
-        (mrf_file_id, name, id_type, plan_id, market),
+             mrf_file_id, plan_name, issuer_name, plan_sponsor_name,
+             plan_id_type, plan_id, plan_market_type
+           ) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (
+            mrf_file_id, name, issuer_name, sponsor_name,
+            id_type, plan_id, market,
+        ),
     )
 
 
