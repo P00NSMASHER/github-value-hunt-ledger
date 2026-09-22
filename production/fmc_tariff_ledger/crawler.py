@@ -528,14 +528,31 @@ def extract_terms(text: str, url: str) -> list[ExtractedTerm]:
     return terms
 
 
+def apply_schema(conn: sqlite3.Connection, *, seed_observations: bool = True) -> None:
+    """Apply additive schema changes and refresh derived views safely."""
+    conn.execute("PRAGMA foreign_keys=ON")
+    # Views can evolve while CREATE VIEW IF NOT EXISTS cannot replace an older definition.
+    conn.execute("DROP VIEW IF EXISTS carrier_rule_effective_ledger")
+    conn.execute("DROP VIEW IF EXISTS snapshot_observation_windows")
+    schema = Path(__file__).with_name("schema.sql").read_text(encoding="utf-8")
+    conn.executescript(schema)
+    if seed_observations:
+        conn.execute(
+            """INSERT OR IGNORE INTO snapshot_observations(
+                 snapshot_id, observed_at, http_status, final_url, content_type
+               )
+               SELECT id, fetched_at, http_status, final_url, content_type
+               FROM snapshots
+               WHERE fetched_at IS NOT NULL"""
+        )
+    conn.commit()
+
+
 def init_db(db_path: Path) -> sqlite3.Connection:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    schema = Path(__file__).with_name("schema.sql").read_text(encoding="utf-8")
-    conn.executescript(schema)
-    conn.commit()
+    apply_schema(conn)
     return conn
 
 
@@ -811,7 +828,20 @@ def persist_crawl_result(conn: sqlite3.Connection, result: dict, out_dir: Path) 
             (loc_id, snap["requested_url"], snap["sha256"]),
         ).fetchone()
         assert row
-        snap_ids.append(int(row[0]))
+        snap_id = int(row[0])
+        snap_ids.append(snap_id)
+        conn.execute(
+            """INSERT OR IGNORE INTO snapshot_observations(
+                 snapshot_id, observed_at, http_status, final_url, content_type
+               ) VALUES (?, ?, ?, ?, ?)""",
+            (
+                snap_id,
+                snap["fetched_at"],
+                snap["http_status"],
+                snap["final_url"],
+                snap["content_type"],
+            ),
+        )
 
     for snap_idx, term in result["terms"]:
         if snap_idx >= len(snap_ids):
@@ -1058,7 +1088,35 @@ def copy_rows(dst: sqlite3.Connection, src: sqlite3.Connection) -> None:
             (new_loc, requested, digest),
         ).fetchone()
         assert new
-        snap_map[int(old_id)] = int(new[0])
+        new_snap_id = int(new[0])
+        snap_map[int(old_id)] = new_snap_id
+        # Old shard DBs predate snapshot_observations; seed the original fetch
+        # as their first observation during merge.
+        dst.execute(
+            """INSERT OR IGNORE INTO snapshot_observations(
+                 snapshot_id, observed_at, http_status, final_url, content_type
+               ) VALUES (?, ?, ?, ?, ?)""",
+            (new_snap_id, fetched, status, final, ctype),
+        )
+
+    has_observations = src.execute(
+        """SELECT 1 FROM sqlite_master
+           WHERE type='table' AND name='snapshot_observations'"""
+    ).fetchone()
+    if has_observations:
+        for old_snap, observed_at, obs_status, obs_final, obs_ctype in src.execute(
+            """SELECT snapshot_id, observed_at, http_status, final_url, content_type
+               FROM snapshot_observations"""
+        ):
+            mapped = snap_map.get(int(old_snap))
+            if mapped is None:
+                continue
+            dst.execute(
+                """INSERT OR IGNORE INTO snapshot_observations(
+                     snapshot_id, observed_at, http_status, final_url, content_type
+                   ) VALUES (?, ?, ?, ?, ?)""",
+                (mapped, observed_at, obs_status, obs_final, obs_ctype),
+            )
 
     for row in src.execute(
         """SELECT snapshot_id, entity_class, organization_no, legal_name, rule_type,
@@ -1112,7 +1170,13 @@ def command_merge(args: argparse.Namespace) -> int:
 
 def command_summary(args: argparse.Namespace) -> int:
     conn = sqlite3.connect(args.db)
+    apply_schema(conn)
     queries = {
+        "observations": "SELECT COUNT(*) FROM snapshot_observations",
+        "snapshots_with_repeat_observations": """SELECT COUNT(*) FROM (
+            SELECT snapshot_id FROM snapshot_observations
+            GROUP BY snapshot_id HAVING COUNT(*) > 1
+        )""",
         "entities": "SELECT COUNT(*) FROM entities",
         "tariff_locations": "SELECT COUNT(*) FROM tariff_locations",
         "snapshots": "SELECT COUNT(*) FROM snapshots",
@@ -1194,6 +1258,17 @@ def command_summary(args: argparse.Namespace) -> int:
              AND instr(url, '//') > 0
            GROUP BY host ORDER BY c DESC LIMIT 50"""
     ).fetchall()
+    stats["date_basis"] = conn.execute(
+        """SELECT date_basis, COUNT(*) c
+           FROM carrier_rule_effective_ledger
+           GROUP BY date_basis ORDER BY c DESC"""
+    ).fetchall()
+    stats["observation_windows"] = conn.execute(
+        """SELECT
+             COUNT(*) AS versions,
+             SUM(CASE WHEN next_version_first_observed_at IS NOT NULL THEN 1 ELSE 0 END)
+           FROM snapshot_observation_windows"""
+    ).fetchone()
     print(json.dumps(stats, indent=2))
     return 0
 
