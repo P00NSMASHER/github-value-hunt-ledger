@@ -272,6 +272,23 @@ def build_repair_queue(
             training_environment,
             memory_key,
         )
+        if not confirm_refs:
+            blocked.append(
+                {
+                    "source_kind": "learning_alert",
+                    "source_id": f"{alert_type}:{memory_key}",
+                    "signature": _stable_hash(
+                        {
+                            "alert_type": alert_type,
+                            "memory_key": memory_key,
+                        }
+                    ),
+                    "reasons": [
+                        "no_matching_negative_confirm_episode",
+                    ],
+                }
+            )
+            continue
         priority = (
             85
             if alert_type == "confirm_regression_signal"
