@@ -170,7 +170,9 @@ def build_remediation_plan(
 def _money(cents: int | None) -> str:
     if cents is None:
         return "Not established"
-    return "$" + format(cents / 100, ",.2f")
+    sign = "-" if cents < 0 else ""
+    whole, fraction = divmod(abs(cents), 100)
+    return sign + "$" + f"{whole:,}.{fraction:02d}"
 
 
 def render_remediation_plan_markdown(plan: RemediationPlan) -> str:
