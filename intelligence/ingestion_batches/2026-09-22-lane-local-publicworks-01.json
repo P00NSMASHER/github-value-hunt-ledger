@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:lane-local-publicworks-01",
+  "created_at": "2026-09-22",
+  "source_hunter_file": "hunters/04-run22-2026-09-20.md",
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "coolabhi991/ap-os",
+      "revision": "b68e9686e008fffa6dafdcabc9196b08cfcb32f3",
+      "status": "dual_use_donor_negative_oracle",
+      "capability_ids": [
+        "CAP-042"
+      ],
+      "role": "Government-contractor/public-works ERP exposing both a strong historical Measurement Book->RA Bill identity pattern and concrete authority-bypass/atomicity failures.",
+      "positive_evidence": [
+        "Legacy MB billing requires APPROVED Measurement Book selection and unlinked MB state.",
+        "RunningBill.measurementBookId is unique on the legacy path, enforcing at most one Running Bill per MB.",
+        "Server-side MB/Running Bill item math recomputes quantity/rate/amount rather than trusting client totals.",
+        "Running Bill payment status is derived from received-vs-payable state rather than directly set by clients."
+      ],
+      "negative_evidence": [
+        "MB approval is committed inside prisma.$transaction, then createRunningBillFromApprovedMB is called afterward; bill creation failure can leave APPROVED MB without the expected bill.",
+        "20260726090000_form58_redesign makes RunningBill.measurementBookId nullable.",
+        "Current primary createRunningBillFromForm58 path explicitly states Measurement Book is no longer involved and bills directly from SiteBillItem master state.",
+        "Form 58 path therefore weakens any claim that measured/certified field evidence is an unbypassable authority prerequisite for billing."
+      ],
+      "integration_rule": "Use legacy MB identity/immutability mechanics as a positive donor, and current Form58/non-atomic approval behavior as adversarial fixtures. Do not treat the repository as production authority for approved-measurement->bill/payment proof.",
+      "next_test": "Construct a synthetic accepted-BOQ -> MB approval -> bill creation corpus with forced post-approval bill-create failure and a Form58 direct-billing bypass. CAP-042 should fail closed unless the exact authoritative measurement/approval edge is proven for the billed quantity."
+    }
+  ],
+  "proposed_graph_edges": [
+    "coolabhi991/ap-os@b68e9686e008fffa6dafdcabc9196b08cfcb32f3 -> CAP-042 [positive_donor: legacy MB identity]",
+    "coolabhi991/ap-os@b68e9686e008fffa6dafdcabc9196b08cfcb32f3 -> CAP-042 [negative_oracle: non-atomic approval->bill]",
+    "coolabhi991/ap-os@b68e9686e008fffa6dafdcabc9196b08cfcb32f3 -> CAP-042 [negative_oracle: Form58 bypasses MB authority]"
+  ]
+}
