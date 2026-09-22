@@ -94,7 +94,7 @@ jobs:
             --max-mrfs "$MAX_MRFS" \
             --max-mrf-bytes "$MAX_BYTES"
           python import_registries.py \
-            --db output/hospital_mrf.sqlite \
+            --db hospital_mrf.sqlite \
             --out output \
             --report output/registry_import.json \
             > /dev/null
