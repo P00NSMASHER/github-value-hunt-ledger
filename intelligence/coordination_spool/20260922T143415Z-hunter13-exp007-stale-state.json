@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "packet_id": "COORD:20260922T143415Z:HUNTER-13:exp007-stale-state",
+  "source_run_id": "RUN:20260922T143415Z:hunter13:exp007-stale-assignment-preflight",
+  "source_hunter": "HUNTER-13",
+  "created_at": "2026-09-22T14:34:15.614996Z",
+  "signals": [
+    {
+      "signal_id": "SIG:exp007-stale-central-state",
+      "type": "contradiction",
+      "subject": "EXP-007 central next-action state",
+      "dedupe_key": "exp007-central-state-lags-canonical-runs",
+      "capability_ids": [
+        "CAP-013",
+        "CAP-017"
+      ],
+      "experiment_ids": [
+        "EXP-007"
+      ],
+      "target_worker_ids": [],
+      "target_lane_ids": [
+        "INTEGRATOR"
+      ],
+      "priority": "blocking",
+      "question": null,
+      "failed_proof_obligation": "Current HUNT_PLAN/EXPERIMENTS/SEARCH_QUEUE still instruct entry.scan_event repair and unexecuted Opentrons kill/restart despite canonical prior runs falsifying/completing those steps.",
+      "evidence_refs": [
+        "referrals/hunt13-r28-2026-09-22-exp007-stale-assignment-preflight.md",
+        "intelligence/search_run_spool/RUN-20260921T040405Z-hunter13-exp007-opentfraw-ltq-repair-replay.json",
+        "intelligence/search_run_spool/RUN-20260921T052933Z-HUNTER13-EXP007-OPENTRONS-KILL-RECOVERY.json",
+        "intelligence/search_run_spool/RUN-20260921T060826Z-HUNTER13-EXP007-OPENTRONS-ABSENT-ACTION-RACE.json"
+      ],
+      "expires_at": null
+    }
+  ]
+}
