@@ -221,6 +221,48 @@ class RecoveryWorksTests(unittest.TestCase):
             self.assertEqual(restored.record_hash, final_hash)
             reopened.verify_event_chains()
 
+    def test_sqlite_ledger_rejects_stale_writer_and_reloads_authoritative_state(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.FREIGHT, client_id="c", counterparty_id="carrier",
+                reference="invoice-concurrent", currency="USD", expected_cents=10000,
+                actual_cents=13000, rule=rule(), evidence=(evidence(),),
+                reason="OVERCHARGE", confidence_basis="verified contract",
+            ))
+            writer_a = SQLiteRecoveryLedger(path)
+            writer_a.add(finding)
+            writer_b = SQLiteRecoveryLedger(path)
+
+            writer_a.approve(finding.finding_id, "reviewer-a", "Verified by A")
+            with self.assertRaisesRegex(ValueError, "stale recovery ledger state"):
+                writer_b.approve(finding.finding_id, "reviewer-b", "Conflicting stale review")
+
+            reloaded = writer_b.get(finding.finding_id)
+            self.assertTrue(reloaded.reviewer_approved)
+            self.assertEqual(reloaded.reviewer_id, "reviewer-a")
+            self.assertEqual(reloaded.review_note, "Verified by A")
+            writer_b.verify_event_chains()
+
+    def test_sqlite_add_on_stale_process_rehydrates_existing_lifecycle(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="payment-stale", currency="USD", expected_cents=0,
+                actual_cents=10000, rule=rule(), evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+            ))
+            stale = SQLiteRecoveryLedger(path)
+            authoritative = SQLiteRecoveryLedger(path)
+            authoritative.add(finding)
+            authoritative.approve(finding.finding_id, "reviewer-a", "Verified duplicate")
+
+            restored = stale.add(finding)
+            self.assertTrue(restored.reviewer_approved)
+            self.assertEqual(restored.reviewer_id, "reviewer-a")
+            stale.verify_event_chains()
+
     def test_sqlite_ledger_detects_event_tampering(self):
         with tempfile.TemporaryDirectory() as td:
             path = f"{td}/recovery.db"
