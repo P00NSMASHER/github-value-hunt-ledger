@@ -30,6 +30,8 @@ Generated finding IDs are content-addressed from the normalized charge evidence,
 
 This means changing the invoice-line source hash, rule parameters, effective dates, verification state or authority document source hash changes downstream proof hashes.
 
+Invoice/shipment membership is matched as a structured two-field identity, not by concatenating the two values with a delimiter. The legacy `invoice|shipment` string remains display-only. This prevents distinct identifier pairs containing `|` from colliding and attaching a charge or finding to the wrong frozen population row.
+
 The frozen truth schema also permits **zero findings**, so a clean audit can be represented honestly instead of forcing a discrepancy object.
 
 ## What it does not do
