@@ -108,13 +108,13 @@ def negative_search(bundle, *, resolved=True):
     )
 
 
-def build_custody_chain():
+def build_custody_chain_full():
     (
         bundle,
-        _artifact_receipt,
-        _calculation_receipt,
+        artifact_receipt,
+        calculation_receipt,
         ledger,
-        _proof_seal,
+        proof_seal,
         packet,
     ) = build_exam()
 
@@ -156,6 +156,33 @@ def build_custody_chain():
         published_at="2026-09-22T16:45:00Z",
         publisher_id="sim-recoveryworks-transparency-log",
     )
+    return (
+        bundle,
+        artifact_receipt,
+        calculation_receipt,
+        ledger,
+        proof_seal,
+        packet,
+        retention,
+        completeness,
+        build,
+        public,
+    )
+
+
+def build_custody_chain():
+    (
+        bundle,
+        _artifact_receipt,
+        _calculation_receipt,
+        ledger,
+        _proof_seal,
+        packet,
+        retention,
+        completeness,
+        build,
+        public,
+    ) = build_custody_chain_full()
     return bundle, ledger, packet, retention, completeness, build, public
 
 
