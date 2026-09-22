@@ -1,5 +1,6 @@
-run_id=tic-healthsparq-platform-2026-09-22
+run_id=tic-platforms-2026-09-22
 parse_indexes=true
-max_indexes=40
+max_indexes=60
 registry=endurant-master-list
 healthsparq=true
+object_listings=true
