@@ -95,10 +95,27 @@ def _packet_errors(packet: Mapping[str, Any]) -> list[str]:
         errors.append("baseline_artifact_ref_required")
     if not packet.get("candidate_artifact_ref"):
         errors.append("candidate_artifact_ref_required")
+    if (
+        packet.get("baseline_artifact_ref")
+        and packet.get("candidate_artifact_ref")
+        and packet.get("baseline_artifact_ref")
+        == packet.get("candidate_artifact_ref")
+    ):
+        errors.append("candidate_artifact_must_differ_from_baseline")
 
     diff_hash = str(packet.get("diff_hash") or "")
     if len(diff_hash) != 64 or any(ch not in "0123456789abcdef" for ch in diff_hash.lower()):
         errors.append("diff_hash_must_be_sha256")
+    elif diff_hash.lower() == hashlib.sha256(b"").hexdigest():
+        errors.append("empty_diff_not_allowed")
+
+    for field_name in (
+        "unrelated_files_changed",
+        "sensitive_material_involved",
+        "benchmark_contaminated",
+    ):
+        if not isinstance(packet.get(field_name), bool):
+            errors.append(f"{field_name}_boolean_required")
 
     total = packet.get("regression_tests_total")
     passed = packet.get("regression_tests_passed")
