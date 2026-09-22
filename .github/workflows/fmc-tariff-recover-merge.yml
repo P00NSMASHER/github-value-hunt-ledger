@@ -208,6 +208,10 @@ jobs:
           python run.py merge \
             --input-root metadata \
             --db merged/fmc_tariff_ledger.sqlite
+          python quality_rollup.py \
+            --input-root metadata \
+            --output merged/quality_rollup.json \
+            > /dev/null
           python run.py summary \
             --db merged/fmc_tariff_ledger.sqlite \
             > merged/summary.json
@@ -220,6 +224,7 @@ jobs:
             --output merged/retry_plan.json \
             > /dev/null
           python -m json.tool merged/summary.json
+          python -m json.tool merged/quality_rollup.json > /dev/null
           python -m json.tool merged/publisher_gap_report.json > /dev/null
           python -m json.tool merged/retry_plan.json > /dev/null
           FIRST_MANIFEST=$(find metadata -name fmc_directory_manifest.json -print -quit || true)
