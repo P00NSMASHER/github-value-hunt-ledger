@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json,re
+from datetime import datetime
 from ti_common import INTEL,ROOT,load_jsonl,slug
 
 def unique(rows,key,name):
@@ -115,6 +116,10 @@ for n,r in enumerate(runs,1):
         if not gid.startswith("CMP:"): raise SystemExit(f"search_runs.jsonl:{n}: comparison_group_id must start CMP:")
 
 for n,o in enumerate(outs,1):
+    timestamp=o.get("timestamp")
+    if timestamp:
+        try: datetime.fromisoformat(str(timestamp).replace("Z","+00:00"))
+        except ValueError: raise SystemExit(f"outcomes.jsonl:{n}: invalid timestamp {timestamp}")
     if len(o.get("origin_search_ids",[]))!=len(set(o.get("origin_search_ids",[]))): raise SystemExit(f"outcomes.jsonl:{n}: duplicate origin_search_ids")
     for rid in o.get("origin_search_ids",[]):
         if rid not in run_ids: raise SystemExit(f"outcomes.jsonl:{n}: unknown origin_search_id {rid}")
