@@ -316,7 +316,9 @@ for i,row in enumerate(learning_recs[:3]):
     phase=row.get("phase")
     seed_id="SEED:learn:"+slug(sid.replace("STRAT:",""))+"-"+slug(target)
     base_priority=float(row.get("measurement_priority") or 0)
-    priority=max(1,min(100,round(base_priority+perf_adjust(seed_id),2)))
+    # Adaptive measurement priority is curriculum evidence debt only.
+    # Do not re-rank it with prior seed yield, policy allocation or reward.
+    priority=max(1,min(100,round(base_priority,2)))
     train=row.get("train") or {}
     confirm=row.get("confirm") or {}
     seeds.append({
