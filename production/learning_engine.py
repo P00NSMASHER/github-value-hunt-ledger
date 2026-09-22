@@ -588,34 +588,47 @@ def learn_training_episode_memory(
             if isinstance(move, Mapping)
         ]
         if structured_moves:
-            move_rows = [
-                (
-                    str(
-                        move.get("key")
-                        or (
-                            f"MOVE:{move.get('move_type')}"
-                            if move.get("move_type")
-                            else ""
-                        )
-                    ),
+            move_reward_lists: dict[str, list[float]] = {}
+            for move in structured_moves:
+                key = str(
+                    move.get("key")
+                    or (
+                        f"MOVE:{move.get('move_type')}"
+                        if move.get("move_type")
+                        else ""
+                    )
+                )
+                if not key:
+                    continue
+                move_reward_lists.setdefault(key, []).append(
                     search_move_training_reward(
                         move,
                         float(reward),
-                    ),
+                    )
                 )
-                for move in structured_moves
+            move_rows = [
+                (
+                    key,
+                    sum(values) / len(values),
+                )
+                for key, values in move_reward_lists.items()
             ]
         else:
             # Backward compatibility for already-generated episode artifacts.
             move_rows = [
                 (
-                    move_id
-                    if move_id.startswith("MOVE:")
-                    else f"MOVE:{move_id}",
+                    key,
                     float(reward),
                 )
-                for move_id in action.get("search_move_ids") or []
-                if isinstance(move_id, str) and move_id
+                for key in dict.fromkeys(
+                    (
+                        move_id
+                        if move_id.startswith("MOVE:")
+                        else f"MOVE:{move_id}"
+                    )
+                    for move_id in action.get("search_move_ids") or []
+                    if isinstance(move_id, str) and move_id
+                )
             ]
 
         for key, move_reward in move_rows:
