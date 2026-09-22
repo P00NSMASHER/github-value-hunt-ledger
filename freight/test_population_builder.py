@@ -27,7 +27,7 @@ def test_multiple_charge_lines_collapse_to_one_population_row():
     out = build_population_from_charge_batch(b, selection_rule="all September rows")
     assert out.charge_count == 3
     assert out.invoice_count == 2
-    assert [row.row_key for row in out.population.rows] == ["I1|S1", "I2|S2"]
+    assert [row.row_key for row in out.population.rows] == [("I1", "S1"), ("I2", "S2")]
     assert all(len(row.source_hash) == 64 for row in out.population.rows)
     assert len(out.builder_hash) == 64
 
@@ -49,7 +49,7 @@ def test_builder_is_deterministic_for_same_accepted_batch():
     a = build_population_from_charge_batch(b, selection_rule="period")
     c = build_population_from_charge_batch(b, selection_rule="period")
     assert a == c
-    assert [row.row_key for row in a.population.rows] == ["I1|S1", "I2|S2"]
+    assert [row.row_key for row in a.population.rows] == [("I1", "S1"), ("I2", "S2")]
 
 
 def test_source_change_changes_population_and_builder_proof():
@@ -79,3 +79,16 @@ def test_tampered_charge_scope_cannot_enter_population():
     tampered = replace(b, charges=(bad_charge,))
     with pytest.raises(ValueError, match="scope"):
         build_population_from_charge_batch(tampered, selection_rule="period")
+
+
+def test_delimiter_like_ids_remain_distinct_structured_population_keys():
+    b = batch(
+        "INV|PART,SHIP,C,K,USD,X1,FUEL,2026-09-01,1,100\n"
+        "INV,PART|SHIP,C,K,USD,X2,FUEL,2026-09-01,1,100\n"
+    )
+    out = build_population_from_charge_batch(b, selection_rule="period")
+    assert out.invoice_count == 2
+    assert {row.row_key for row in out.population.rows} == {
+        ("INV|PART", "SHIP"),
+        ("INV", "PART|SHIP"),
+    }
