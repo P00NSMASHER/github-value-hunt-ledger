@@ -132,12 +132,25 @@ CREATE TABLE IF NOT EXISTS carrier_identity_map (
 
 CREATE TABLE IF NOT EXISTS shaq_source_classification (
   id INTEGER PRIMARY KEY,
-  source_pattern TEXT NOT NULL UNIQUE,
+  dataset_key TEXT,
+  match_field TEXT NOT NULL DEFAULT 'source_label',
+  source_pattern TEXT NOT NULL,
   rate_kind TEXT NOT NULL,
   classification_method TEXT NOT NULL,
   reviewed INTEGER NOT NULL DEFAULT 0,
   evidence TEXT NOT NULL,
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  UNIQUE(match_field, source_pattern)
+);
+
+CREATE TABLE IF NOT EXISTS shaq_classification_applications (
+  id INTEGER PRIMARY KEY,
+  classification_id INTEGER NOT NULL REFERENCES shaq_source_classification(id),
+  applied_at TEXT NOT NULL,
+  matching_rate_rows INTEGER NOT NULL,
+  updated_rate_rows INTEGER NOT NULL,
+  prior_kinds_json TEXT NOT NULL,
+  evidence TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dataset_authorizations (
