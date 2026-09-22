@@ -270,6 +270,50 @@ class RepairCandidateIntakeTests(unittest.TestCase):
             state["blocked_submissions"][0]["reasons"],
         )
 
+    def test_empty_diff_is_blocked(self):
+        queue = ready_queue()
+        empty_sha = (
+            "e3b0c44298fc1c149afbf4c8996fb924"
+            "27ae41e4649b934ca495991b7852b855"
+        )
+        state = build_repair_candidate_intake(
+            queue,
+            [candidate_packet(queue, diff_hash=empty_sha)],
+        )
+        self.assertIn(
+            "empty_diff_not_allowed",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_candidate_artifact_must_differ_from_baseline(self):
+        queue = ready_queue()
+        state = build_repair_candidate_intake(
+            queue,
+            [
+                candidate_packet(
+                    queue,
+                    candidate_artifact_ref="sha256:baseline",
+                )
+            ],
+        )
+        self.assertIn(
+            "candidate_artifact_must_differ_from_baseline",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_required_safety_booleans_must_be_explicit(self):
+        queue = ready_queue()
+        packet = candidate_packet(queue)
+        packet.pop("benchmark_contaminated")
+        state = build_repair_candidate_intake(
+            queue,
+            [packet],
+        )
+        self.assertIn(
+            "benchmark_contaminated_boolean_required",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
     def test_candidate_record_tamper_fails_validation(self):
         queue = ready_queue()
         state = build_repair_candidate_intake(
