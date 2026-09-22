@@ -25,6 +25,7 @@ class RecoveryPacket:
     gates: Mapping[str, bool]
     claim_evidence: Mapping[str, Any] | None
     recovery_evidence: Mapping[str, Any] | None
+    settlement_total_cents: int | None
     recovered_cents: int
     fee_cents: int
     packet_hash: str
@@ -88,6 +89,7 @@ def _packet_body(record: LedgerRecord) -> dict[str, Any]:
         "gates": gates,
         "claim_evidence": _evidence_body(record.claim_evidence),
         "recovery_evidence": _evidence_body(record.recovery_evidence),
+        "settlement_total_cents": record.settlement_total_cents,
         "recovered_cents": record.recovered_cents,
         "fee_cents": record.fee_cents,
     }
@@ -112,6 +114,7 @@ def build_recovery_packet(record: LedgerRecord) -> RecoveryPacket:
         gates=body["gates"],
         claim_evidence=body["claim_evidence"],
         recovery_evidence=body["recovery_evidence"],
+        settlement_total_cents=body["settlement_total_cents"],
         recovered_cents=body["recovered_cents"],
         fee_cents=body["fee_cents"],
         packet_hash=packet_hash,
