@@ -18,7 +18,7 @@ on:
       retention_days:
         description: Retention for recovered evidence artifacts
         required: true
-        default: "90"
+        default: "7"
         type: string
   push:
     branches: [main]
@@ -71,7 +71,7 @@ jobs:
                       cfg[k.strip()] = v.strip()
               run_id = cfg['source_run_id']
               shard_count = int(cfg.get('shard_count', '12'))
-              retention = int(cfg.get('retention_days', '90'))
+              retention = int(cfg.get('retention_days', '7'))
 
           if not run_id.isdigit():
               raise SystemExit('source_run_id must be numeric')
