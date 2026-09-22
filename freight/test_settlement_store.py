@@ -82,6 +82,109 @@ def test_10_duplicate_return_is_idempotent(tmp_path):
     assert s.count("reversal_edges")==1 and s.realized_cents()==0
 
 
+def test_returned_event_cannot_fund_late_historical_claim(tmp_path):
+    s=S(tmp_path)
+    s.ingest_event(E(amt=10000))
+    s.ingest_counter(R(amt=10000))
+    assert s.auto_apply_counter(
+        "r1",created_at="2026-09-03T11:00:00Z"
+    ).status==REVIEW
+    assert s.event_residual("e1")==0
+
+    # The claim arrives later in the store but is historically eligible.
+    s.create_claim(C(amt=8000,issued="2026-09-01T09:00:00Z"))
+    assert s.auto_allocate(
+        "e1",created_at="2026-09-04T11:00:00Z"
+    ).status==REVIEW
+    with pytest.raises(ValueError,match="settlement event capacity exceeded"):
+        s.review_allocate(
+            allocation_id="late",
+            claim_id="c1",
+            event_id="e1",
+            amount_cents=8000,
+            created_at="2026-09-04T11:01:00Z",
+        )
+    assert s.realized_cents()==0
+    assert s.fee_eligible_cents()==0
+
+
+def test_full_return_blocks_unused_remainder_from_new_allocation(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C("c1","INV-1",7000))
+    s.create_claim(C("c2","INV-1",5000))
+    s.ingest_event(E(amt=7500))
+    s.review_allocate(
+        allocation_id="a1",claim_id="c1",event_id="e1",
+        amount_cents=7000,created_at="2026-09-02T11:00:00Z",
+    )
+    assert s.event_residual("e1")==500
+    s.ingest_counter(R(amt=7500))
+    assert s.auto_apply_counter(
+        "r1",created_at="2026-09-03T11:00:00Z"
+    ).status==REVERSED
+    assert s.event_residual("e1")==0
+    with pytest.raises(ValueError,match="settlement event capacity exceeded"):
+        s.review_allocate(
+            allocation_id="a2",claim_id="c2",event_id="e1",
+            amount_cents=500,created_at="2026-09-03T11:01:00Z",
+        )
+    assert s.realized_cents()==0
+    assert s.fee_eligible_cents()==0
+
+
+def test_applied_partial_return_preserves_only_true_net_event_capacity(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C("c1","INV-1",8000))
+    s.create_claim(C("c2","INV-1",2000))
+    s.ingest_event(E(amt=10000))
+    s.review_allocate(
+        allocation_id="a1",claim_id="c1",event_id="e1",
+        amount_cents=8000,created_at="2026-09-02T11:00:00Z",
+    )
+    s.ingest_counter(R(amt=2000))
+    assert s.auto_apply_counter(
+        "r1",created_at="2026-09-03T11:00:00Z"
+    ).status==REVERSED
+
+    # Net event funds are 8000 and the first allocation is now live for 6000,
+    # leaving exactly 2000 available—not the pre-return 2000 plus returned cash.
+    assert s.event_residual("e1")==2000
+    assert s.review_allocate(
+        allocation_id="a2",claim_id="c2",event_id="e1",
+        amount_cents=2000,created_at="2026-09-03T11:01:00Z",
+    )==ALLOCATED
+    assert s.event_residual("e1")==0
+    assert s.realized_cents()==8000
+
+
+def test_counter_events_cannot_exceed_original_settlement_amount(tmp_path):
+    s=S(tmp_path)
+    s.ingest_event(E(amt=10000))
+    assert s.ingest_counter(R("r1",amt=6000))
+    with pytest.raises(ValueError,match="exceed original settlement"):
+        s.ingest_counter(R("r2",amt=4001))
+    assert s.count("counter_events")==1
+    assert s.event_residual("e1")==4000
+
+
+def test_direct_sql_cannot_allocate_returned_funds_or_overreturn_event(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C(amt=10000))
+    s.ingest_event(E(amt=10000))
+    s.ingest_counter(R(amt=10000))
+    conn=sqlite3.connect(s.path)
+    conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError,match="settlement event capacity exceeded"):
+        conn.execute("""INSERT INTO allocations
+          (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
+          VALUES('TEST_BUYER','TEST_BU','bypass','c1','e1',1,'REVIEW',1,'2026-09-03T11:00:00Z')""")
+    with pytest.raises(sqlite3.IntegrityError,match="exceed original settlement"):
+        conn.execute("""INSERT INTO counter_events
+          (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
+          VALUES('TEST_BUYER','TEST_BU','r2','e1','USD',1,'2026-09-03T11:00:00Z','return-src-r2','BANK-RETURN')""")
+    conn.close()
+
+
 def test_11_partial_return_across_two_edges_is_review(tmp_path):
     s=S(tmp_path); s.create_claim(C("c1","I1",30000)); s.create_claim(C("c2","I2",20000)); s.ingest_event(E(ref="BATCH",amt=50000))
     s.review_allocate(allocation_id="a1",claim_id="c1",event_id="e1",amount_cents=30000,created_at="2026-10-01T10:00:00Z"); s.review_allocate(allocation_id="a2",claim_id="c2",event_id="e1",amount_cents=20000,created_at="2026-10-01T10:00:00Z")
