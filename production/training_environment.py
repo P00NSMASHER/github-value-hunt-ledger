@@ -164,6 +164,77 @@ def partition_for_id(
     return "confirm" if bucket == cfg.confirm_bucket else "train"
 
 
+def telemetry_consistency_errors(
+    run: Mapping[str, Any],
+) -> tuple[str, ...]:
+    """Return cross-field telemetry contradictions that make learning unsafe.
+
+    Schema-valid nonnegative counters can still be mutually impossible. Those
+    records remain durable evidence, but they must not train value estimates,
+    receive indirect outcome credit, or satisfy policy evidence thresholds.
+    """
+    errors: list[str] = []
+
+    candidate_count = run.get("candidate_count")
+    deep = run.get("deep_inspected")
+    retained = run.get("retained_count")
+    promoted = run.get("master_promoted_count")
+
+    if (
+        isinstance(candidate_count, int)
+        and candidate_count >= 0
+        and isinstance(deep, int)
+        and deep >= 0
+        and deep > candidate_count
+    ):
+        errors.append("deep_inspected_exceeds_candidates")
+    if (
+        isinstance(deep, int)
+        and deep >= 0
+        and isinstance(retained, int)
+        and retained >= 0
+        and retained > deep
+    ):
+        errors.append("retained_exceeds_deep_inspected")
+    if (
+        isinstance(retained, int)
+        and retained >= 0
+        and isinstance(promoted, int)
+        and promoted >= 0
+        and promoted > retained
+    ):
+        errors.append("promotions_exceed_retained")
+
+    checks = run.get("candidate_preflight_checks")
+    hits = run.get("known_candidate_preflight_hits")
+    avoided = run.get("duplicate_deep_inspections_avoided")
+    if (
+        isinstance(checks, int)
+        and checks >= 0
+        and isinstance(hits, int)
+        and hits >= 0
+        and hits > checks
+    ):
+        errors.append("preflight_hits_exceed_checks")
+    if (
+        isinstance(checks, int)
+        and checks >= 0
+        and isinstance(avoided, int)
+        and avoided >= 0
+        and avoided > checks
+    ):
+        errors.append("duplicate_avoidance_exceeds_checks")
+
+    elapsed = run.get("elapsed_minutes")
+    if isinstance(elapsed, (int, float)) and elapsed < 0:
+        errors.append("negative_elapsed_minutes")
+    tool_calls = run.get("tool_calls")
+    if isinstance(tool_calls, int) and tool_calls < 0:
+        errors.append("negative_tool_calls")
+
+    return tuple(errors)
+
+
 def split_for_run(
     run: Mapping[str, Any],
     *,
@@ -178,6 +249,8 @@ def split_for_run(
         return "excluded"
     work_action = run.get("work_action")
     if work_action not in (None, "search"):
+        return "excluded"
+    if telemetry_consistency_errors(run):
         return "excluded"
     if work_action is None:
         candidate_count = run.get("candidate_count")
@@ -811,6 +884,7 @@ def build_training_environment(
         ),
     ):
         rid = str(run.get("search_run_id") or "")
+        consistency_errors = telemetry_consistency_errors(run)
         split = split_for_run(
             run,
             config=cfg,
@@ -821,7 +895,10 @@ def build_training_environment(
                 {
                     "run_id": rid,
                     "reason": (
-                        "not_eligible_search_training_record"
+                        "inconsistent_search_telemetry:"
+                        + ",".join(consistency_errors)
+                        if consistency_errors
+                        else "not_eligible_search_training_record"
                     ),
                 }
             )
@@ -1091,6 +1168,16 @@ def validate_training_environment(
             "evaluation_only",
         }:
             errors.append(f"invalid_split:{rid}")
+
+        observation = episode.get("observation") or {}
+        episode_consistency = telemetry_consistency_errors(observation)
+        if episode_consistency:
+            errors.append(
+                "episode_inconsistent_telemetry:"
+                + str(rid)
+                + ":"
+                + ",".join(episode_consistency)
+            )
 
         reward = (
             episode.get("reward") or {}
