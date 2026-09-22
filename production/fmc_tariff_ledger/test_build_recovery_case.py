@@ -11,12 +11,14 @@ import shaq_route_crawl
 class RecoveryCaseTests(unittest.TestCase):
     def test_candidate_consolidation_uses_max_per_line_not_sum(self):
         base = {
+            "invoice_id": "INV-BASE",
             "invoice_line_id": "BASE",
             "status": "POTENTIAL_BASE_RATE_VARIANCE_REVIEW",
             "potential_review_amount": "200.00",
         }
         pass_rows = [
             {
+                "invoice_id": "INV-DD",
                 "invoice_line_id": "DD-1",
                 "status": "POTENTIAL_PASS_THROUGH_MARKUP_REVIEW",
                 "potential_markup_delta": "125.00",
@@ -24,7 +26,7 @@ class RecoveryCaseTests(unittest.TestCase):
         ]
         dd_rows = [
             {
-                "invoice_id": "DD-1",
+                "invoice_id": "INV-DD",
                 "status": "POTENTIAL_NO_PAYMENT_OBLIGATION_REVIEW",
                 "potential_charge_relief_amount": "1500.00",
             }
@@ -81,6 +83,79 @@ class RecoveryCaseTests(unittest.TestCase):
         self.assertEqual(result["status"], "POTENTIAL_BASE_RATE_VARIANCE_REVIEW")
         self.assertEqual(result["potential_review_amount"], "600.00")
         self.assertEqual(result["asserted_recovery"], "0.00")
+
+    def test_whole_invoice_candidate_and_distinct_lines_use_max_not_sum(self):
+        base = {
+            "invoice_id": "INV-1",
+            "invoice_line_id": "BASE",
+            "status": "POTENTIAL_BASE_RATE_VARIANCE_REVIEW",
+            "potential_review_amount": "100.00",
+        }
+        pass_rows = [
+            {
+                "invoice_id": "INV-1",
+                "invoice_line_id": "THC",
+                "status": "POTENTIAL_PASS_THROUGH_MARKUP_REVIEW",
+                "potential_markup_delta": "200.00",
+            }
+        ]
+        dd_rows = [
+            {
+                "invoice_id": "INV-1",
+                "status": "POTENTIAL_NO_PAYMENT_OBLIGATION_REVIEW",
+                "potential_charge_relief_amount": "250.00",
+            }
+        ]
+        result = cases.consolidate_candidates(base, pass_rows, dd_rows)
+        self.assertEqual(result["status"], "CONSOLIDATED")
+        self.assertEqual(
+            result["potential_review_upper_bound_no_double_count"],
+            "300.00",
+        )
+        self.assertEqual(result["invoice_scopes"][0]["line_level_candidate_sum"], "300.00")
+        self.assertEqual(result["invoice_scopes"][0]["whole_invoice_candidate_max"], "250.00")
+
+    def test_missing_invoice_scope_with_whole_invoice_candidate_abstains(self):
+        base = {
+            "invoice_line_id": "BASE",
+            "status": "POTENTIAL_BASE_RATE_VARIANCE_REVIEW",
+            "potential_review_amount": "200.00",
+        }
+        result = cases.consolidate_candidates(
+            base,
+            [],
+            [{
+                "invoice_id": "INV-1",
+                "status": "POTENTIAL_NO_PAYMENT_OBLIGATION_REVIEW",
+                "potential_charge_relief_amount": "1500.00",
+            }],
+        )
+        self.assertEqual(result["status"], "OVERLAP_SCOPE_INCOMPLETE")
+        self.assertIsNone(result["potential_review_upper_bound_no_double_count"])
+        self.assertEqual(result["asserted_recovery_total"], "0.00")
+
+    def test_multi_unit_base_rate_requires_explicit_per_container_basis(self):
+        envelope = {
+            "status": "AUTHORITY_ENVELOPE_READY",
+            "base_rate_authority": {
+                "status": "RESOLVED",
+                "amount_value": "5000",
+                "rate_basis": None,
+                "contract_candidates": [{"source": "contract"}],
+                "benchmark_context": {},
+            },
+        }
+        result = cases.base_rate_review(
+            envelope,
+            {
+                "invoice_id": "INV-1",
+                "invoice_line_id": "BASE",
+                "billed_amount": "11000",
+                "quantity": "2",
+            },
+        )
+        self.assertEqual(result["status"], "BASE_RATE_BASIS_REVIEW_REQUIRED")
+        self.assertEqual(result["potential_review_amount"], "0.00")
 
     def test_case_without_contract_authority_keeps_asserted_total_zero(self):
         with tempfile.TemporaryDirectory() as td:
