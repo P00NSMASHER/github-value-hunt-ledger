@@ -29,6 +29,7 @@ def build_learning_curriculum(
     strategies: Sequence[Mapping[str, Any]],
     policy: Mapping[str, Any],
     *,
+    split_status: Mapping[str, Any] | None = None,
     gate_closing_slots: int = 2,
     zero_run_exploration_slots: int = 1,
 ) -> dict[str, Any]:
@@ -63,6 +64,23 @@ def build_learning_curriculum(
     min_confirm_positive = int(
         gate.get("minimum_confirm_positive_runs") or 1
     )
+
+    split_status = split_status or {}
+    key_commitment_active = (
+        split_status.get("key_commitment_active") is True
+    )
+    split_secret_available = (
+        split_status.get("secret_available") is True
+    )
+    blind_confirmation_operational = (
+        key_commitment_active
+        and split_secret_available
+    )
+    pending_claim_ids = [
+        str(value)
+        for value in split_status.get("pending_claim_ids") or []
+        if value
+    ]
 
     active = {
         row["strategy_id"]: row
@@ -133,6 +151,12 @@ def build_learning_curriculum(
             phase = "repair_or_falsify"
             measurement_priority = 0.0
             selection_reason = generalization
+        elif train_ready and not blind_confirmation_operational:
+            phase = "confirm_blocked"
+            measurement_priority = 0.0
+            selection_reason = (
+                "blind_confirmation_not_operational"
+            )
         elif train_ready:
             phase = "confirm_measurement"
             confirm_progress = (
@@ -300,8 +324,26 @@ def build_learning_curriculum(
         )
 
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "mode": "measurement_only",
+        "blind_confirmation": {
+            "operational": blind_confirmation_operational,
+            "key_commitment_active": key_commitment_active,
+            "secret_available": split_secret_available,
+            "activation_run_count": split_status.get(
+                "activation_run_count"
+            ),
+            "pending_claim_count": len(pending_claim_ids),
+            "blocker": (
+                None
+                if blind_confirmation_operational
+                else (
+                    "split_key_commitment_inactive"
+                    if not key_commitment_active
+                    else "split_secret_unavailable"
+                )
+            ),
+        },
         "policy_effect": "none",
         "uses_q_value_for_selection": False,
         "uses_reward_for_selection": False,
@@ -340,7 +382,7 @@ def validate_learning_curriculum(
     curriculum: Mapping[str, Any],
 ) -> list[str]:
     errors: list[str] = []
-    if curriculum.get("schema_version") != 2:
+    if curriculum.get("schema_version") != 3:
         errors.append("unexpected_schema_version")
     if curriculum.get("mode") != "measurement_only":
         errors.append("mode_must_be_measurement_only")
@@ -380,6 +422,23 @@ def validate_learning_curriculum(
             "manual_confirm_must_be_false"
         )
 
+    blind = curriculum.get("blind_confirmation") or {}
+    operational = blind.get("operational")
+    commitment_active = blind.get("key_commitment_active")
+    secret_available = blind.get("secret_available")
+    if not isinstance(operational, bool):
+        errors.append("blind_confirmation_operational_boolean_required")
+    if not isinstance(commitment_active, bool):
+        errors.append("key_commitment_active_boolean_required")
+    if not isinstance(secret_available, bool):
+        errors.append("split_secret_available_boolean_required")
+    expected_operational = (
+        commitment_active is True
+        and secret_available is True
+    )
+    if operational is not expected_operational:
+        errors.append("blind_confirmation_operational_mismatch")
+
     rows = curriculum.get("rows") or []
     by_id: dict[str, Mapping[str, Any]] = {}
     for row in rows:
@@ -396,6 +455,7 @@ def validate_learning_curriculum(
         if row.get("phase") not in {
             "train_measurement",
             "confirm_measurement",
+            "confirm_blocked",
             "repair_or_falsify",
             "ready",
         }:
@@ -443,6 +503,23 @@ def validate_learning_curriculum(
             errors.append(
                 f"missing_retry_rule:{sid}"
             )
+
+    if operational is False:
+        for row in rows:
+            if (
+                row.get("train", {}).get("ready") is True
+                and row.get("eligible_for_policy_consideration") is not True
+                and row.get("generalization_status") not in _SUPPRESSED
+                and row.get("phase") == "confirm_measurement"
+            ):
+                errors.append(
+                    f"confirm_measurement_without_blind_partition:{row.get('strategy_id')}"
+                )
+        for rec in curriculum.get("recommended_measurements") or []:
+            if rec.get("phase") == "confirm_measurement":
+                errors.append(
+                    f"confirm_recommendation_without_blind_partition:{rec.get('strategy_id')}"
+                )
 
     reservation = curriculum.get("reservation") or {}
     expected_capacity = int(

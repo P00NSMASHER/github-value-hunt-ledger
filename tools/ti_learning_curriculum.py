@@ -54,11 +54,15 @@ def main() -> int:
     policy = load_json(
         INTEL / "search_policy.json", {}
     )
+    split_status = load_json(
+        INTEL / "TRAINING_SPLIT_STATUS.json", {}
+    )
 
     curriculum = build_learning_curriculum(
         learning,
         strategies,
         policy,
+        split_status=split_status,
     )
     errors = validate_learning_curriculum(
         curriculum
@@ -93,6 +97,53 @@ def main() -> int:
             "This is **measurement-only**: learned Q-values, reward "
             "means and current policy allocations do not select "
             "strategies, and this file does not change live policy."
+        ),
+        "",
+        "## Blind confirmation readiness",
+        "",
+        (
+            "- Operational: **"
+            + (
+                "yes"
+                if curriculum["blind_confirmation"]["operational"]
+                else "no"
+            )
+            + "**"
+        ),
+        (
+            "- Key commitment active: **"
+            + str(
+                curriculum["blind_confirmation"][
+                    "key_commitment_active"
+                ]
+            ).lower()
+            + "**"
+        ),
+        (
+            "- Split secret available to CI: **"
+            + str(
+                curriculum["blind_confirmation"][
+                    "secret_available"
+                ]
+            ).lower()
+            + "**"
+        ),
+        (
+            "- Pending trusted generated claims: **"
+            + str(
+                curriculum["blind_confirmation"][
+                    "pending_claim_count"
+                ]
+            )
+            + "**"
+        ),
+        (
+            "- Confirmation blocker: **"
+            + str(
+                curriculum["blind_confirmation"]["blocker"]
+                or "none"
+            )
+            + "**"
         ),
         "",
         "## Guardrails",
@@ -196,6 +247,11 @@ def main() -> int:
                 "policy_effect": curriculum[
                     "policy_effect"
                 ],
+                "blind_confirmation_operational": (
+                    curriculum["blind_confirmation"][
+                        "operational"
+                    ]
+                ),
             },
             sort_keys=True,
         )
