@@ -1,0 +1,32 @@
+name: SHAQ Public Sitemap Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - production/fmc_tariff_ledger/SHAQ_SITEMAP_NOW
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: production/fmc_tariff_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Discover public route indexes
+        run: python probe_shaq_sitemap.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shaq-public-sitemap-probe
+          path: production/fmc_tariff_ledger/shaq_sitemap_probe.json
+          retention-days: 30
+          if-no-files-found: error
