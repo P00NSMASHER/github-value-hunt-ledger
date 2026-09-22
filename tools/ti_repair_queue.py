@@ -162,7 +162,7 @@ def main() -> int:
     )
     md_path = Path(args.markdown_output)
     md_path.write_text(
-        render_markdown(queue) + "\n",
+        render_markdown(queue).rstrip() + "\n",
         encoding="utf-8",
     )
     print(json_path)
