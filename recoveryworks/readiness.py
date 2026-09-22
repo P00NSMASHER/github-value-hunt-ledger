@@ -15,8 +15,10 @@ from typing import Any, Iterable, Mapping
 
 from .assurance import (
     CaseProofBundle,
+    ClientActionAuthorization,
     HostileExaminationPacket,
     SEVEN_FIGURE_CENTS,
+    verify_action_authorization,
     verify_case_bundle,
 )
 from .custody import (
@@ -1012,3 +1014,518 @@ def authorization_dossier_from_payload(
     )
     dossier.verify_integrity()
     return dossier
+
+
+
+@dataclass(frozen=True)
+class BuildProviderVerificationReceipt:
+    """Provider-verified CI/build receipt for the frozen calculator artifact."""
+
+    build_attestation_hash: str
+    provider: str
+    workflow_run_id: str
+    code_commit_sha: str
+    source_tree_hash: str
+    build_artifact_hash: str
+    tests_passed: bool
+    checked_at: str
+    provider_request_id: str
+    provider_response_hash: str
+    verified_by_adapter: str
+    provider_verified: bool
+    receipt_hash: str
+    metadata: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        for name in (
+            "build_attestation_hash",
+            "provider",
+            "workflow_run_id",
+            "code_commit_sha",
+            "source_tree_hash",
+            "build_artifact_hash",
+            "provider_request_id",
+            "provider_response_hash",
+            "verified_by_adapter",
+            "receipt_hash",
+        ):
+            _required(name, getattr(self, name))
+        _iso("checked_at", self.checked_at)
+        if type(self.tests_passed) is not bool:
+            raise ValueError("tests_passed must be boolean")
+        if type(self.provider_verified) is not bool:
+            raise ValueError("provider_verified must be boolean")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            **{
+                key: value
+                for key, value in asdict(self).items()
+                if key != "receipt_hash"
+            },
+        }
+
+    def verify_integrity(self) -> None:
+        if canonical_hash(self.integrity_body()) != self.receipt_hash:
+            raise ValueError("build provider verification receipt hash mismatch")
+
+
+def record_build_provider_verification(
+    build: BuildProvenanceAttestation,
+    *,
+    provider: str,
+    workflow_run_id: str,
+    code_commit_sha: str,
+    source_tree_hash: str,
+    build_artifact_hash: str,
+    tests_passed: bool,
+    checked_at: str,
+    provider_request_id: str,
+    provider_response_hash: str,
+    verified_by_adapter: str,
+    provider_verified: bool,
+    metadata: Mapping[str, Any] | None = None,
+) -> BuildProviderVerificationReceipt:
+    """Record a CI/provider verification result for an existing build attestation."""
+    build.verify_integrity()
+    body = {
+        "schema": 1,
+        "build_attestation_hash": build.attestation_hash,
+        "provider": _required("provider", provider),
+        "workflow_run_id": _required("workflow_run_id", workflow_run_id),
+        "code_commit_sha": _required("code_commit_sha", code_commit_sha),
+        "source_tree_hash": _required("source_tree_hash", source_tree_hash),
+        "build_artifact_hash": _required("build_artifact_hash", build_artifact_hash),
+        "tests_passed": tests_passed,
+        "checked_at": _iso("checked_at", checked_at),
+        "provider_request_id": _required("provider_request_id", provider_request_id),
+        "provider_response_hash": _required(
+            "provider_response_hash", provider_response_hash
+        ),
+        "verified_by_adapter": _required("verified_by_adapter", verified_by_adapter),
+        "provider_verified": provider_verified,
+        "metadata": dict(metadata or {}),
+    }
+    return BuildProviderVerificationReceipt(
+        **{key: value for key, value in body.items() if key != "schema"},
+        receipt_hash=canonical_hash(body),
+    )
+
+
+def verify_build_provider_verification(
+    receipt: BuildProviderVerificationReceipt,
+    build: BuildProvenanceAttestation,
+) -> None:
+    build.verify_integrity()
+    receipt.verify_integrity()
+    if not receipt.provider_verified:
+        raise ValueError("build provenance was not provider-verified")
+    if not receipt.tests_passed:
+        raise ValueError("provider build verification reports failed tests")
+    fields = {
+        "build_attestation_hash": build.attestation_hash,
+        "workflow_run_id": build.workflow_run_id,
+        "code_commit_sha": build.code_commit_sha,
+        "source_tree_hash": build.source_tree_hash,
+        "build_artifact_hash": build.build_artifact_hash,
+        "tests_passed": build.tests_passed,
+    }
+    for name, expected in fields.items():
+        if getattr(receipt, name) != expected:
+            raise ValueError(f"build provider verification {name} mismatch")
+    if _dt("build_provider.checked_at", receipt.checked_at) < _dt(
+        "build.attested_at", build.attested_at
+    ):
+        raise ValueError("build provider verification predates build attestation")
+
+
+def seven_figure_consent_payload_hash(
+    authorization: ClientActionAuthorization,
+    bundle: CaseProofBundle,
+    dossier: SevenFigureAuthorizationDossier,
+    *,
+    consented_at: str,
+    note: str,
+) -> str:
+    verify_action_authorization(bundle, authorization)
+    verify_seven_figure_authorization_dossier(
+        dossier,
+        bundle,
+        expected_journal_head_hash=dossier.readiness.journal_head_hash,
+    )
+    consented_at = _iso("consented_at", consented_at)
+    note = _required("note", note)
+    if _dt("consented_at", consented_at) < _dt(
+        "dossier.assembled_at", dossier.assembled_at
+    ):
+        raise ValueError("client dossier consent cannot predate final dossier")
+    body = {
+        "schema": 1,
+        "consent_version": "seven-figure-consent-v1",
+        "authorization_id": authorization.authorization_id,
+        "authorization_hash": authorization.proof_hash,
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "readiness_package_hash": dossier.readiness.package_hash,
+        "readiness_dossier_hash": dossier.dossier_hash,
+        "client_actor_id": authorization.client_actor_id,
+        "approved_action_type": authorization.approved_action_type,
+        "maximum_amount_cents": authorization.maximum_amount_cents,
+        "consented_at": consented_at,
+        "note": note,
+    }
+    return canonical_hash(body)
+
+
+@dataclass(frozen=True)
+class SevenFigureDossierConsent:
+    """Client consent explicitly bound to the final seven-figure dossier."""
+
+    consent_version: str
+    authorization_id: str
+    authorization_hash: str
+    case_bundle_hash: str
+    finding_proof_hash: str
+    readiness_package_hash: str
+    readiness_dossier_hash: str
+    client_actor_id: str
+    approved_action_type: str
+    maximum_amount_cents: int
+    consented_at: str
+    note: str
+    client_signature: ExternalSignatureEvidence
+    consent_payload_hash: str
+    consent_hash: str
+
+    def __post_init__(self) -> None:
+        for name in (
+            "consent_version",
+            "authorization_id",
+            "authorization_hash",
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "readiness_package_hash",
+            "readiness_dossier_hash",
+            "client_actor_id",
+            "approved_action_type",
+            "note",
+            "consent_payload_hash",
+            "consent_hash",
+        ):
+            _required(name, getattr(self, name))
+        _iso("consented_at", self.consented_at)
+        if self.consent_version != "seven-figure-consent-v1":
+            raise ValueError("unsupported seven-figure client consent version")
+        if type(self.maximum_amount_cents) is not int or self.maximum_amount_cents < 0:
+            raise ValueError("maximum_amount_cents must be non-negative integer")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "consent_version": self.consent_version,
+            "authorization_id": self.authorization_id,
+            "authorization_hash": self.authorization_hash,
+            "case_bundle_hash": self.case_bundle_hash,
+            "finding_proof_hash": self.finding_proof_hash,
+            "readiness_package_hash": self.readiness_package_hash,
+            "readiness_dossier_hash": self.readiness_dossier_hash,
+            "client_actor_id": self.client_actor_id,
+            "approved_action_type": self.approved_action_type,
+            "maximum_amount_cents": self.maximum_amount_cents,
+            "consented_at": self.consented_at,
+            "note": self.note,
+            "client_signature": asdict(self.client_signature),
+            "consent_payload_hash": self.consent_payload_hash,
+        }
+
+    def verify_integrity(self) -> None:
+        if canonical_hash(self.integrity_body()) != self.consent_hash:
+            raise ValueError("seven-figure dossier consent hash mismatch")
+
+
+def bind_seven_figure_dossier_consent(
+    authorization: ClientActionAuthorization,
+    bundle: CaseProofBundle,
+    dossier: SevenFigureAuthorizationDossier,
+    client_signature: ExternalSignatureEvidence,
+    *,
+    consented_at: str,
+    note: str,
+) -> SevenFigureDossierConsent:
+    """Bind explicit client consent and external signature to the exact final dossier."""
+    payload_hash = seven_figure_consent_payload_hash(
+        authorization,
+        bundle,
+        dossier,
+        consented_at=consented_at,
+        note=note,
+    )
+    verify_external_signature_evidence(
+        client_signature,
+        expected_payload_hash=payload_hash,
+    )
+    if _dt("client_signature.signed_at", client_signature.signed_at) < _dt(
+        "dossier.assembled_at", dossier.assembled_at
+    ):
+        raise ValueError("client signature predates final dossier")
+    body = {
+        "schema": 1,
+        "consent_version": "seven-figure-consent-v1",
+        "authorization_id": authorization.authorization_id,
+        "authorization_hash": authorization.proof_hash,
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "readiness_package_hash": dossier.readiness.package_hash,
+        "readiness_dossier_hash": dossier.dossier_hash,
+        "client_actor_id": authorization.client_actor_id,
+        "approved_action_type": authorization.approved_action_type,
+        "maximum_amount_cents": authorization.maximum_amount_cents,
+        "consented_at": _iso("consented_at", consented_at),
+        "note": _required("note", note),
+        "client_signature": asdict(client_signature),
+        "consent_payload_hash": payload_hash,
+    }
+    return SevenFigureDossierConsent(
+        **{key: value for key, value in body.items() if key != "schema"},
+        consent_hash=canonical_hash(body),
+    )
+
+
+def verify_seven_figure_dossier_consent(
+    consent: SevenFigureDossierConsent,
+    authorization: ClientActionAuthorization,
+    bundle: CaseProofBundle,
+    dossier: SevenFigureAuthorizationDossier,
+) -> None:
+    consent.verify_integrity()
+    expected_payload_hash = seven_figure_consent_payload_hash(
+        authorization,
+        bundle,
+        dossier,
+        consented_at=consent.consented_at,
+        note=consent.note,
+    )
+    fields = {
+        "authorization_id": authorization.authorization_id,
+        "authorization_hash": authorization.proof_hash,
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "readiness_package_hash": dossier.readiness.package_hash,
+        "readiness_dossier_hash": dossier.dossier_hash,
+        "client_actor_id": authorization.client_actor_id,
+        "approved_action_type": authorization.approved_action_type,
+        "maximum_amount_cents": authorization.maximum_amount_cents,
+        "consent_payload_hash": expected_payload_hash,
+    }
+    for name, expected in fields.items():
+        if getattr(consent, name) != expected:
+            raise ValueError(f"seven-figure dossier consent {name} mismatch")
+    verify_external_signature_evidence(
+        consent.client_signature,
+        expected_payload_hash=expected_payload_hash,
+    )
+    if _dt("consent.client_signature.signed_at", consent.client_signature.signed_at) < _dt(
+        "dossier.assembled_at", dossier.assembled_at
+    ):
+        raise ValueError("client signature predates final dossier")
+
+
+@dataclass(frozen=True)
+class SevenFigureAuthorizationSeal:
+    """Final authorization gate binding provider build proof and client dossier consent."""
+
+    seal_version: str
+    case_bundle_hash: str
+    finding_proof_hash: str
+    authorization_hash: str
+    readiness_package_hash: str
+    readiness_dossier_hash: str
+    journal_head_hash: str
+    build_provider_receipt: BuildProviderVerificationReceipt
+    client_consent: SevenFigureDossierConsent
+    sealed_at: str
+    sealed_by: str
+    seal_hash: str
+
+    def __post_init__(self) -> None:
+        for name in (
+            "seal_version",
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "authorization_hash",
+            "readiness_package_hash",
+            "readiness_dossier_hash",
+            "journal_head_hash",
+            "sealed_by",
+            "seal_hash",
+        ):
+            _required(name, getattr(self, name))
+        _iso("sealed_at", self.sealed_at)
+        if self.seal_version != "seven-figure-authorization-seal-v1":
+            raise ValueError("unsupported seven-figure authorization seal version")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "seal_version": self.seal_version,
+            "case_bundle_hash": self.case_bundle_hash,
+            "finding_proof_hash": self.finding_proof_hash,
+            "authorization_hash": self.authorization_hash,
+            "readiness_package_hash": self.readiness_package_hash,
+            "readiness_dossier_hash": self.readiness_dossier_hash,
+            "journal_head_hash": self.journal_head_hash,
+            "build_provider_receipt": asdict(self.build_provider_receipt),
+            "client_consent": asdict(self.client_consent),
+            "sealed_at": self.sealed_at,
+            "sealed_by": self.sealed_by,
+        }
+
+    def verify_integrity(self) -> None:
+        if canonical_hash(self.integrity_body()) != self.seal_hash:
+            raise ValueError("seven-figure authorization seal hash mismatch")
+
+
+def build_seven_figure_authorization_seal(
+    authorization: ClientActionAuthorization,
+    bundle: CaseProofBundle,
+    dossier: SevenFigureAuthorizationDossier,
+    build_provider_receipt: BuildProviderVerificationReceipt,
+    client_consent: SevenFigureDossierConsent,
+    *,
+    journal_head_hash: str,
+    sealed_at: str,
+    sealed_by: str,
+) -> SevenFigureAuthorizationSeal:
+    verify_seven_figure_authorization_dossier(
+        dossier,
+        bundle,
+        expected_journal_head_hash=journal_head_hash,
+    )
+    verify_action_authorization(bundle, authorization)
+    verify_build_provider_verification(build_provider_receipt, dossier.build)
+    verify_seven_figure_dossier_consent(
+        client_consent,
+        authorization,
+        bundle,
+        dossier,
+    )
+    sealed_at = _iso("sealed_at", sealed_at)
+    sealed_by = _required("sealed_by", sealed_by)
+    latest = max(
+        _dt("dossier.assembled_at", dossier.assembled_at),
+        _dt("build_provider.checked_at", build_provider_receipt.checked_at),
+        _dt("client_signature.verified_at", client_consent.client_signature.verified_at),
+    )
+    if _dt("sealed_at", sealed_at) < latest:
+        raise ValueError("seven-figure authorization seal predates a bound verification")
+    body = {
+        "schema": 1,
+        "seal_version": "seven-figure-authorization-seal-v1",
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "authorization_hash": authorization.proof_hash,
+        "readiness_package_hash": dossier.readiness.package_hash,
+        "readiness_dossier_hash": dossier.dossier_hash,
+        "journal_head_hash": _required("journal_head_hash", journal_head_hash),
+        "build_provider_receipt": asdict(build_provider_receipt),
+        "client_consent": asdict(client_consent),
+        "sealed_at": sealed_at,
+        "sealed_by": sealed_by,
+    }
+    return SevenFigureAuthorizationSeal(
+        **{key: value for key, value in body.items() if key != "schema"},
+        seal_hash=canonical_hash(body),
+    )
+
+
+def verify_seven_figure_authorization_seal(
+    seal: SevenFigureAuthorizationSeal,
+    authorization: ClientActionAuthorization,
+    bundle: CaseProofBundle,
+    dossier: SevenFigureAuthorizationDossier,
+    *,
+    expected_journal_head_hash: str,
+) -> None:
+    seal.verify_integrity()
+    verify_seven_figure_authorization_dossier(
+        dossier,
+        bundle,
+        expected_journal_head_hash=expected_journal_head_hash,
+    )
+    verify_action_authorization(bundle, authorization)
+    verify_build_provider_verification(seal.build_provider_receipt, dossier.build)
+    verify_seven_figure_dossier_consent(
+        seal.client_consent,
+        authorization,
+        bundle,
+        dossier,
+    )
+    fields = {
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "authorization_hash": authorization.proof_hash,
+        "readiness_package_hash": dossier.readiness.package_hash,
+        "readiness_dossier_hash": dossier.dossier_hash,
+        "journal_head_hash": expected_journal_head_hash,
+    }
+    for name, expected in fields.items():
+        if getattr(seal, name) != expected:
+            raise ValueError(f"seven-figure authorization seal {name} mismatch")
+    latest = max(
+        _dt("dossier.assembled_at", dossier.assembled_at),
+        _dt("build_provider.checked_at", seal.build_provider_receipt.checked_at),
+        _dt("client_signature.verified_at", seal.client_consent.client_signature.verified_at),
+    )
+    if _dt("seal.sealed_at", seal.sealed_at) < latest:
+        raise ValueError("seven-figure authorization seal predates bound verification")
+
+
+def authorization_seal_to_payload(
+    seal: SevenFigureAuthorizationSeal,
+) -> dict[str, Any]:
+    seal.verify_integrity()
+    return {**seal.integrity_body(), "seal_hash": seal.seal_hash}
+
+
+def authorization_seal_from_payload(
+    payload: Mapping[str, Any],
+) -> SevenFigureAuthorizationSeal:
+    build_receipt = BuildProviderVerificationReceipt(
+        **dict(payload["build_provider_receipt"])
+    )
+    consent_raw = dict(payload["client_consent"])
+    client_signature = ExternalSignatureEvidence(**dict(consent_raw["client_signature"]))
+    client_consent = SevenFigureDossierConsent(
+        consent_version=consent_raw["consent_version"],
+        authorization_id=consent_raw["authorization_id"],
+        authorization_hash=consent_raw["authorization_hash"],
+        case_bundle_hash=consent_raw["case_bundle_hash"],
+        finding_proof_hash=consent_raw["finding_proof_hash"],
+        readiness_package_hash=consent_raw["readiness_package_hash"],
+        readiness_dossier_hash=consent_raw["readiness_dossier_hash"],
+        client_actor_id=consent_raw["client_actor_id"],
+        approved_action_type=consent_raw["approved_action_type"],
+        maximum_amount_cents=consent_raw["maximum_amount_cents"],
+        consented_at=consent_raw["consented_at"],
+        note=consent_raw["note"],
+        client_signature=client_signature,
+        consent_payload_hash=consent_raw["consent_payload_hash"],
+        consent_hash=consent_raw["consent_hash"],
+    )
+    seal = SevenFigureAuthorizationSeal(
+        seal_version=payload["seal_version"],
+        case_bundle_hash=payload["case_bundle_hash"],
+        finding_proof_hash=payload["finding_proof_hash"],
+        authorization_hash=payload["authorization_hash"],
+        readiness_package_hash=payload["readiness_package_hash"],
+        readiness_dossier_hash=payload["readiness_dossier_hash"],
+        journal_head_hash=payload["journal_head_hash"],
+        build_provider_receipt=build_receipt,
+        client_consent=client_consent,
+        sealed_at=payload["sealed_at"],
+        sealed_by=payload["sealed_by"],
+        seal_hash=payload["seal_hash"],
+    )
+    seal.verify_integrity()
+    return seal
