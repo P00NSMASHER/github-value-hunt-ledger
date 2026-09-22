@@ -448,6 +448,33 @@ class FailureEvent:
         ).hexdigest()
 
 
+_ALLOWED_FAILURE_TARGET_TYPES = {
+    "search_skill",
+    "query_family",
+    "search_move",
+    "tool",
+    "prompt",
+    "workflow",
+    "routing",
+    "memory",
+    "harness",
+}
+_ALLOWED_FAILURE_CLASSES = {
+    "false_positive",
+    "false_negative",
+    "duplicate_work",
+    "retrieval_failure",
+    "evidence_failure",
+    "tool_failure",
+    "prompt_failure",
+    "workflow_failure",
+    "regression",
+    "overfit",
+    "transfer_failure",
+    "other",
+}
+
+
 @dataclass(frozen=True)
 class FailureAssessment:
     decision: FailureDecision
@@ -461,6 +488,16 @@ def assess_failure_for_repair(event: FailureEvent) -> FailureAssessment:
         reasons.append("failure_id_required")
     if not event.run_id:
         reasons.append("origin_run_required")
+    if not event.hunter_id:
+        reasons.append("hunter_id_required")
+    if event.target_type not in _ALLOWED_FAILURE_TARGET_TYPES:
+        reasons.append("invalid_target_type")
+    if not event.target_id:
+        reasons.append("target_id_required")
+    if event.failure_class not in _ALLOWED_FAILURE_CLASSES:
+        reasons.append("invalid_failure_class")
+    if not event.observation.strip():
+        reasons.append("observation_required")
     if not event.reproduction_steps:
         reasons.append("reproduction_required")
     if not event.evidence_refs:
