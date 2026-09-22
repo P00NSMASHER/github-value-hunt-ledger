@@ -694,7 +694,8 @@ def build_outcome_credit(
                 continue
             anchor_bases = {
                 rid: partition_basis_for_run(
-                    runs_by_id[rid]
+                    runs_by_id[rid],
+                    split_receipts=split_receipts,
                 )
                 for rid in direct_ids
             }
@@ -1184,7 +1185,10 @@ def build_training_environment(
                     or run.get("date")
                 ),
                 "partition_basis": (
-                    partition_basis_for_run(run)
+                    partition_basis_for_run(
+                        run,
+                        split_receipts=split_receipts,
+                    )
                 ),
             },
         }
@@ -1369,15 +1373,19 @@ def validate_training_environment(
                     errors.append(
                         f"missing_partition_identifier:{rid}"
                     )
-                else:
-                    expected_split = partition_for_id(
-                        identifier,
-                        config=split_validation_config,
+                receipt_partition = basis.get("partition")
+                if receipt_partition not in {"train", "confirm"}:
+                    errors.append(
+                        f"missing_blind_partition_receipt:{rid}"
                     )
-                    if split != expected_split:
-                        errors.append(
-                            f"partition_hash_mismatch:{rid}"
-                        )
+                elif split != receipt_partition:
+                    errors.append(
+                        f"partition_receipt_mismatch:{rid}"
+                    )
+                if basis.get("source") != "blind_partition_receipt":
+                    errors.append(
+                        f"invalid_partition_source:{rid}"
+                    )
             elif split != "train":
                 errors.append(
                     f"untrusted_partition_not_train:{rid}"
