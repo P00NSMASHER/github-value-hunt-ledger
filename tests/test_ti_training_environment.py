@@ -293,6 +293,100 @@ class TrainingEnvironmentTests(unittest.TestCase):
             anchor_split,
         )
 
+    def test_date_only_outcome_does_not_credit_same_day_indirect_support(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=0,
+        )
+        direct_id = None
+        support_id = None
+        for index in range(100):
+            run_id = f"RUN:temporal:{index}"
+            if (
+                split_for_run(
+                    search_run(run_id),
+                    config=config,
+                )
+                == "train"
+            ):
+                if direct_id is None:
+                    direct_id = run_id
+                elif support_id is None:
+                    support_id = run_id
+                    break
+
+        direct = search_run(direct_id)
+        support = search_run(support_id)
+        direct["timestamp"] = "2026-09-21T08:00:00Z"
+        support["timestamp"] = "2026-09-21T07:00:00Z"
+        out = outcome([direct_id])
+        out["date"] = "2026-09-21"
+
+        edges, excluded = build_outcome_credit(
+            [direct, support],
+            [out],
+            config=config,
+        )
+        self.assertFalse(excluded)
+        self.assertEqual(
+            {edge["run_id"] for edge in edges},
+            {direct_id},
+        )
+
+    def test_timestamped_outcome_can_credit_earlier_same_day_support(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=0,
+        )
+        ids = []
+        for index in range(100):
+            run_id = f"RUN:clock:{index}"
+            if (
+                split_for_run(
+                    search_run(run_id),
+                    config=config,
+                )
+                == "train"
+            ):
+                ids.append(run_id)
+            if len(ids) == 2:
+                break
+
+        direct_id, support_id = ids
+        direct = search_run(direct_id)
+        support = search_run(support_id)
+        direct["timestamp"] = "2026-09-21T08:00:00Z"
+        support["timestamp"] = "2026-09-21T07:00:00Z"
+        out = outcome([direct_id])
+        out["timestamp"] = "2026-09-21T09:00:00Z"
+
+        edges, excluded = build_outcome_credit(
+            [direct, support],
+            [out],
+            config=config,
+        )
+        self.assertFalse(excluded)
+        self.assertEqual(
+            {edge["run_id"] for edge in edges},
+            {direct_id, support_id},
+        )
+
+    def test_direct_origin_after_outcome_is_excluded(self):
+        run = search_run("RUN:future-origin")
+        run["timestamp"] = "2026-09-22T12:00:00Z"
+        out = outcome(["RUN:future-origin"])
+        out["timestamp"] = "2026-09-21T12:00:00Z"
+
+        edges, excluded = build_outcome_credit(
+            [run],
+            [out],
+        )
+        self.assertEqual(edges, [])
+        self.assertEqual(
+            excluded[0]["reason"],
+            "direct_origin_after_outcome",
+        )
+
     def test_mixed_direct_origin_splits_are_excluded(self):
         config = TrainingEnvironmentConfig(
             confirm_modulus=2,
