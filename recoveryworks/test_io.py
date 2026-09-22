@@ -39,6 +39,20 @@ def payload():
                 "locator": "file://utility.csv",
                 "kind": "bill_export",
             },
+            {
+                "source_id": "ap-rule",
+                "branch": "ap",
+                "source_hash": "rulehash",
+                "locator": "source://rule#1",
+                "kind": "controlling_rule",
+            },
+            {
+                "source_id": "utility-rule",
+                "branch": "utility",
+                "source_hash": "rulehash",
+                "locator": "source://rule#1",
+                "kind": "controlling_rule",
+            },
         ],
         "observations": [
             {
