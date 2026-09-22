@@ -151,13 +151,24 @@ def freeze_source_retention(
         },
     }
     observed: dict[tuple[str, str], str] = {}
+    acquired_times = {
+        ("authority", bundle.authority.authority_id): bundle.authority.acquired_at,
+        **{
+            ("evidence", item.evidence_id): item.acquired_at
+            for item in bundle.source_attestations
+        },
+    }
     for item in entry_tuple:
         key = (item.role, item.source_id)
         if key in observed:
             raise ValueError(f"duplicate retained source entry: {key!r}")
         observed[key] = item.source_hash
-        if _dt("entry.retained_at", item.retained_at) > _dt("manifest.created_at", created_at):
+        retained_at = _dt("entry.retained_at", item.retained_at)
+        if retained_at > _dt("manifest.created_at", created_at):
             raise ValueError("retained source cannot postdate retention manifest")
+        acquired_at = acquired_times.get(key)
+        if acquired_at is not None and retained_at < _dt("source.acquired_at", acquired_at):
+            raise ValueError("retained source cannot predate source acquisition")
         if require_immutable and not item.immutable_storage_verified:
             raise ValueError("high-value retention manifest requires verified immutable storage")
     if observed != expected:
@@ -295,6 +306,17 @@ class CaseCompletenessManifest:
     created_at: str
     created_by: str
     manifest_hash: str
+
+    def __post_init__(self) -> None:
+        for name in (
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "input_manifest_hash",
+            "created_by",
+            "manifest_hash",
+        ):
+            _required(name, getattr(self, name))
+        _iso("created_at", self.created_at)
 
     def integrity_body(self) -> dict[str, Any]:
         return {
