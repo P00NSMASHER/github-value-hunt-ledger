@@ -13,8 +13,8 @@
 ## Branch boundary
 
 A branch owns domain-specific parsing and expected-amount logic. RecoveryOS owns
-the invariants after normalization. This prevents six products from drifting into
-six incompatible concepts of evidence, money, approval, and recovery status.
+the invariants after normalization. This prevents a growing portfolio of recovery products from drifting into
+incompatible concepts of evidence, money, approval, and recovery status.
 
 ## Security boundary
 

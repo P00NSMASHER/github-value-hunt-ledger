@@ -45,6 +45,16 @@ POLICIES: dict[Branch, BranchPolicy] = {
         "customs_reviewer",
         professional_review_note="Customs classification/refund action requires appropriate broker/counsel review.",
     ),
+    Branch.SAAS: BranchPolicy(
+        Branch.SAAS,
+        RecoveryMode.OVERPAYMENT,
+        "saas_contract_reviewer",
+    ),
+    Branch.TELECOM: BranchPolicy(
+        Branch.TELECOM,
+        RecoveryMode.OVERPAYMENT,
+        "telecom_billing_reviewer",
+    ),
 }
 
 

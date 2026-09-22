@@ -21,6 +21,15 @@ from .branches.freight_io import (
 )
 from .branches.payer import audit_payer_lines
 from .branches.payer_csv import load_payer_lines_csv, load_payer_rates_csv
+from .branches.contract_billing_csv import (
+    load_contract_rates_csv,
+    load_invoice_charges_csv,
+    load_usage_csv,
+)
+from .branches.saas import audit_saas_billing
+from .branches.saas_csv import load_billable_seat_snapshot_csv
+from .branches.telecom import audit_telecom_billing
+from .branches.telecom_csv import load_cdr_usage_csv
 from .branches.utility import audit_utility_bills
 from .branches.utility_io import (
     load_simple_tariff_definitions_json,
@@ -80,7 +89,7 @@ def run_scan360_config(
     state_path: str | Path,
     base_dir: str | Path = ".",
 ) -> Scan360RunResult:
-    """Run configured freight/AP/payer/utility scans into one durable client ledger.
+    """Run configured recovery branch scans into one durable client ledger.
 
     This function performs detection only. It never approves, authorizes, claims,
     contacts counterparties, or marks money recovered.
@@ -292,6 +301,127 @@ def run_scan360_config(
                 "branch": "utility",
                 "job_index": job_index,
                 "bill_id": issue.bill_id,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+
+    for job_index, job in enumerate(_jobs(config.get("saas"), name="saas")):
+        charges = load_invoice_charges_csv(
+            _resolve(base, job.get("charges_csv"), name=f"saas[{job_index}].charges_csv"),
+            verified=_bool_setting(job, "charge_source_verified", context=f"saas[{job_index}]"),
+        )
+        rates = load_contract_rates_csv(
+            _resolve(base, job.get("rates_csv"), name=f"saas[{job_index}].rates_csv"),
+            verified=_bool_setting(job, "rate_source_verified", context=f"saas[{job_index}]"),
+        )
+        usage_csv = job.get("usage_csv")
+        seat_snapshot_csv = job.get("seat_snapshot_csv")
+        if usage_csv and seat_snapshot_csv:
+            raise ValueError(
+                f"saas[{job_index}] accepts only one of usage_csv or seat_snapshot_csv"
+            )
+        usage = ()
+        if usage_csv:
+            usage = load_usage_csv(
+                _resolve(base, usage_csv, name=f"saas[{job_index}].usage_csv"),
+                verified=_bool_setting(
+                    job, "usage_source_verified", context=f"saas[{job_index}]"
+                ),
+            )
+        elif seat_snapshot_csv:
+            usage = load_billable_seat_snapshot_csv(
+                _resolve(
+                    base,
+                    seat_snapshot_csv,
+                    name=f"saas[{job_index}].seat_snapshot_csv",
+                ),
+                verified=_bool_setting(
+                    job, "seat_source_verified", context=f"saas[{job_index}]"
+                ),
+            )
+
+        batch = audit_saas_billing(
+            client_id=client_id,
+            charges=charges,
+            rates=rates,
+            usage=usage,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "saas",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(_jobs(config.get("telecom"), name="telecom")):
+        charges = load_invoice_charges_csv(
+            _resolve(
+                base,
+                job.get("charges_csv"),
+                name=f"telecom[{job_index}].charges_csv",
+            ),
+            verified=_bool_setting(
+                job, "charge_source_verified", context=f"telecom[{job_index}]"
+            ),
+        )
+        rates = load_contract_rates_csv(
+            _resolve(base, job.get("rates_csv"), name=f"telecom[{job_index}].rates_csv"),
+            verified=_bool_setting(
+                job, "rate_source_verified", context=f"telecom[{job_index}]"
+            ),
+        )
+        usage_csv = job.get("usage_csv")
+        cdr_csv = job.get("cdr_csv")
+        if usage_csv and cdr_csv:
+            raise ValueError(
+                f"telecom[{job_index}] accepts only one of usage_csv or cdr_csv"
+            )
+        usage = ()
+        if usage_csv:
+            usage = load_usage_csv(
+                _resolve(base, usage_csv, name=f"telecom[{job_index}].usage_csv"),
+                verified=_bool_setting(
+                    job, "usage_source_verified", context=f"telecom[{job_index}]"
+                ),
+            )
+        elif cdr_csv:
+            usage = load_cdr_usage_csv(
+                _resolve(base, cdr_csv, name=f"telecom[{job_index}].cdr_csv"),
+                verified=_bool_setting(
+                    job, "cdr_source_verified", context=f"telecom[{job_index}]"
+                ),
+            )
+
+        batch = audit_telecom_billing(
+            client_id=client_id,
+            charges=charges,
+            rates=rates,
+            usage=usage,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "telecom",
+                "job_index": job_index,
+                "reference": issue.reference,
                 "code": issue.code,
                 "detail": issue.detail,
             })
