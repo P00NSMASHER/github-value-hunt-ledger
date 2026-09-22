@@ -13,7 +13,8 @@ from typing import Any, Sequence
 
 from .fees import FeeAgreement, assess_fee
 from .io import execute_scan_payload
-from .models import EvidenceRef
+from .models import Branch, EvidenceRef
+from .review import build_review_queue, review_queue_summary
 from .raw_scan import execute_raw_scan_payload
 from .packets import build_client_portfolio_packet, build_recovery_packet, submission_ready
 from .storage import load_ledger, save_ledger
@@ -67,6 +68,13 @@ def build_parser() -> argparse.ArgumentParser:
     raw_scan.add_argument("input", type=Path)
     _add_output(raw_scan)
     raw_scan.add_argument("--ledger-output", type=Path, help="persist the resulting proof/audit ledger locally")
+
+    review = sub.add_parser("review-queue", help="render deterministic operator queues")
+    review.add_argument("ledger", type=Path)
+    review.add_argument("--client-id")
+    review.add_argument("--branch", choices=tuple(branch.value for branch in Branch))
+    review.add_argument("--currency")
+    _add_output(review)
 
     summary = sub.add_parser("summary", help="read a persisted ledger without mutating it")
     summary.add_argument("ledger", type=Path)
@@ -188,6 +196,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         integrity_key=key,
         require_signature=_require_signed_ledger(),
     )
+
+    if args.command == "review-queue":
+        branch_filter = Branch(args.branch) if args.branch else None
+        items = build_review_queue(
+            ledger,
+            client_id=args.client_id,
+            branch=branch_filter,
+            currency=args.currency,
+        )
+        _emit({
+            "summary": review_queue_summary(items),
+            "items": [
+                {
+                    **item.__dict__,
+                    "blockers": list(item.blockers),
+                }
+                for item in items
+            ],
+            "ledger_snapshot_hash": ledger.snapshot_hash,
+            "audit_head": ledger.audit_head,
+        }, args.output)
+        return 0
 
     if args.command == "summary":
         _emit({
