@@ -180,3 +180,53 @@ def test_manifest_allows_zero_rule_batches_for_reviewable_missing_rule_run():
     assert manifest.rule_adapter_hashes == ()
     assert manifest.authority_document_hashes == ()
     assert manifest.review_case_count == 1
+
+
+def test_manifest_rejects_valid_factory_that_processed_only_subset_of_accepted_charges():
+    invoices, population, batches, _factory, _queue, _packet = setup()
+    rules = tuple(rule for batch in batches for rule in batch.rules)
+
+    partial_factory = derive_batch(
+        population.population,
+        invoices.charges[:1],
+        rules,
+    )
+    partial_queue = build_review_queue(partial_factory)
+    partial_packet = build_review_packet(
+        partial_factory,
+        partial_queue,
+        invoices.charges[:1],
+        rules,
+    )
+
+    with pytest.raises(ValueError, match="complete accepted charge batch"):
+        build_audit_run_manifest(
+            invoice_batch=invoices,
+            population_build=population,
+            rule_batches=batches,
+            factory=partial_factory,
+            review_queue=partial_queue,
+            review_packet=partial_packet,
+        )
+
+
+def test_manifest_rejects_population_build_forged_from_only_subset_of_charge_batch():
+    invoices, population, batches, factory, queue, packet = setup()
+    subset_batch = replace(invoices, charges=invoices.charges[:1])
+    subset_population = build_population_from_charge_batch(
+        subset_batch,
+        selection_rule=population.selection_rule,
+    )
+    forged_population = replace(
+        subset_population,
+        invoice_charge_adapter_hash=invoices.adapter_hash,
+    )
+    with pytest.raises(ValueError, match="complete accepted invoice batch"):
+        build_audit_run_manifest(
+            invoice_batch=invoices,
+            population_build=forged_population,
+            rule_batches=batches,
+            factory=factory,
+            review_queue=queue,
+            review_packet=packet,
+        )
