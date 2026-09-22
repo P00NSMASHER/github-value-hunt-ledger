@@ -134,11 +134,18 @@ jobs:
             --db source/ledger.sqlite \
             --artifact-root source \
             --report source/reparse.json
+          python production/fmc_tariff_ledger/retry_transient.py \
+            --db source/ledger.sqlite \
+            --artifact-root source \
+            --timeout 20 \
+            --limit 100 \
+            --report source/retry_transient.json
           python production/fmc_tariff_ledger/run.py summary \
             --db source/ledger.sqlite \
             > source/summary.json
           python -m json.tool source/revalidation.json
           python -m json.tool source/reparse.json
+          python -m json.tool source/retry_transient.json
           python -m json.tool source/summary.json
           mkdir -p metadata/shard-${SHARD}
           cp source/ledger.sqlite metadata/shard-${SHARD}/ledger.sqlite
@@ -146,6 +153,7 @@ jobs:
           cp source/summary_prevalidation.json metadata/shard-${SHARD}/summary_prevalidation.json
           cp source/revalidation.json metadata/shard-${SHARD}/revalidation.json
           cp source/reparse.json metadata/shard-${SHARD}/reparse.json
+          cp source/retry_transient.json metadata/shard-${SHARD}/retry_transient.json
           if test -f source/stats.json; then
             cp source/stats.json metadata/shard-${SHARD}/stats.json
           fi
