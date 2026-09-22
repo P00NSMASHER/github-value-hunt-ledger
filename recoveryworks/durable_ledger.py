@@ -17,6 +17,12 @@ from .assurance import (
 from .journal import RecoveryJournal, finding_from_payload, finding_to_payload
 from .ledger import RecoveryLedger
 from .models import RecoveryFinding
+from .readiness import (
+    SevenFigureReadinessPackage,
+    readiness_from_payload,
+    readiness_to_payload,
+    verify_seven_figure_readiness,
+)
 
 
 class DurableRecoveryLedger(RecoveryLedger):
@@ -63,12 +69,32 @@ class DurableRecoveryLedger(RecoveryLedger):
         finding_id: str,
         bundle: CaseProofBundle,
         authorization: ClientActionAuthorization,
+        readiness: SevenFigureReadinessPackage | None = None,
     ):
-        record = super().authorize_with_case(finding_id, bundle, authorization)
-        self.journal.append("AUTHORIZE_CASE", finding_id, {
+        record_before = self.get(finding_id)
+        if self._high_value(record_before):
+            if readiness is None:
+                raise ValueError(
+                    "seven-figure finding requires completed readiness package"
+                )
+            verify_seven_figure_readiness(
+                readiness,
+                bundle,
+                expected_journal_head_hash=self.journal.head_hash,
+            )
+        record = super().authorize_with_case(
+            finding_id,
+            bundle,
+            authorization,
+            readiness,
+        )
+        payload = {
             "case_bundle": case_bundle_to_payload(bundle),
             "authorization": authorization_to_payload(authorization),
-        })
+        }
+        if readiness is not None:
+            payload["readiness"] = readiness_to_payload(readiness)
+        self.journal.append("AUTHORIZE_CASE", finding_id, payload)
         return record
 
     def mark_claimed(
@@ -132,7 +158,18 @@ class DurableRecoveryLedger(RecoveryLedger):
             elif action == "AUTHORIZE_CASE":
                 bundle = case_bundle_from_payload(data["case_bundle"])
                 authorization = authorization_from_payload(data["authorization"])
-                ledger.authorize_with_case(event.finding_id, bundle, authorization)
+                readiness_raw = data.get("readiness")
+                readiness = (
+                    readiness_from_payload(readiness_raw)
+                    if readiness_raw is not None
+                    else None
+                )
+                ledger.authorize_with_case(
+                    event.finding_id,
+                    bundle,
+                    authorization,
+                    readiness,
+                )
             elif action == "CLAIM":
                 envelope_raw = data.get("external_action")
                 envelope = (
