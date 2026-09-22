@@ -110,6 +110,14 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "professionally reviewed tax overpayment finding",
         ("tax engine output", "taxability review", "invoice reconciliation"),
     ),
+    Branch.INSURANCE: BranchSpec(
+        Branch.INSURANCE,
+        "InsuranceRecovery",
+        "commercial/property insurance claim underpayments",
+        ("claim lines", "reviewed policy/coverage assessments", "insurer settlements"),
+        "professionally reviewed insurance underpayment finding",
+        ("coverage review", "claim valuation", "settlement reconciliation"),
+    ),
 }
 
 

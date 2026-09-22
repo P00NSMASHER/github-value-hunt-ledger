@@ -1,3 +1,17 @@
+from .insurance import (
+    InsuranceAuditBatch,
+    InsuranceAuditException,
+    InsuranceClaimLine,
+    InsuranceCoverageAssessment,
+    InsuranceSettlement,
+    audit_insurance_claims,
+    normalize_coverage_category,
+)
+from .insurance_csv import (
+    load_insurance_assessments_csv,
+    load_insurance_claim_lines_csv,
+    load_insurance_settlements_csv,
+)
 from .tax import (
     TaxAssessment,
     TaxAuditBatch,
@@ -134,6 +148,11 @@ from .utility_io import (
 )
 
 __all__ = [
+    "InsuranceAuditBatch",
+    "InsuranceAuditException",
+    "InsuranceClaimLine",
+    "InsuranceCoverageAssessment",
+    "InsuranceSettlement",
     "TaxAssessment",
     "TaxAuditBatch",
     "TaxAuditException",
@@ -201,6 +220,7 @@ __all__ = [
     "UtilityTariff",
     "UtilityTier",
     "all_specs",
+    "audit_insurance_claims",
     "audit_tax_lines",
     "audit_rebates",
     "calculate_rebate",
@@ -219,6 +239,9 @@ __all__ = [
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
+    "load_insurance_assessments_csv",
+    "load_insurance_claim_lines_csv",
+    "load_insurance_settlements_csv",
     "load_tax_assessments_csv",
     "load_tax_lines_csv",
     "load_rebate_programs_json",
@@ -242,6 +265,7 @@ __all__ = [
     "load_usage_csv",
     "load_vendor_statements_csv",
     "money_to_cents",
+    "normalize_coverage_category",
     "normalize_jurisdiction",
     "normalize_tax_category",
     "normalize_hts",
