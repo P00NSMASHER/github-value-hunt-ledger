@@ -19,6 +19,10 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **InsuranceRecovery** — professionally reviewed commercial/property claim underpayments.
 - **CloudRecovery** — contracted cloud/hosting rate and metered-usage billing leakage.
 - **MerchantFeeRecovery** — processor-controlled markup, per-transaction, and fixed-fee leakage.
+- **ParcelRecovery** — parcel carrier rate/zone/weight billing leakage.
+- **ProcurementRecovery** — PO/contract price and approved-quantity invoice leakage.
+- **Warranty/CreditRecovery** — approved supplier/warranty credits not fully received.
+- **Payroll/BenefitBillingRecovery** — employer-side payroll-service and benefit-carrier billing leakage.
 
 ## Non-negotiable invariant
 
@@ -87,3 +91,7 @@ are documented in `recoveryworks/INGESTION_INSURANCE.md`.
 
 CloudRecovery metering and MerchantFeeRecovery processor-fee scope schemas are
 documented in `recoveryworks/INGESTION_CLOUD_MERCHANT.md`.
+
+ParcelRecovery, ProcurementRecovery, Warranty/CreditRecovery, and
+Payroll/BenefitBillingRecovery schemas and scope boundaries are documented in
+`recoveryworks/INGESTION_PARCEL_PROCUREMENT_CREDIT_PAYROLL.md`.
