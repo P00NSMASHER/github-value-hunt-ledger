@@ -27,6 +27,7 @@ Current Freight Recovery state is **commercially specified / externally blocked 
 - The hunter ledger now compiles into a deterministic offline training environment with state/action/observation/reward episodes, isolated train/confirm/evaluation splits, provenance-backed long-horizon credit, and a separate commercial-value reward channel.
 - A deterministic repair workbench now converts confirm-suppressed learning alerts into reproduction-only tasks and evidence-backed learning-failure packets into bounded repair-ready tasks; automatic mutation/routing/promotion remains disabled.
 - Repair-candidate intake now binds proposed fixes to the exact repair-task hash, baseline/candidate artifacts, diff hash and regression evidence; the only positive transition is READY_FOR_SKILL_EVAL, with live/global promotion still prohibited.
+- Skill-evaluation result intake now binds independent evaluator evidence to the exact candidate/task hashes, enforces mutate-dev vs promotion-test isolation, and emits only STAGED_MUTATION plus a gated promotion-evidence queue; automatic live/global use remains disabled.
 - Three shadow state/result ledgers initialized under production/shadow/.
 - Shadow protocol committed: production/SHADOW_PILOT.md.
 - Three existing benchmark experiment automations have a post-benchmark shadow override:
