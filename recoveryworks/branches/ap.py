@@ -258,6 +258,18 @@ class APRecoveryBatch:
     exceptions: tuple[APRecoveryException, ...]
 
 
+def _same_obligation(a: APObligation, b: APObligation) -> bool:
+    """Treat repeated rows from the same source export as one obligation."""
+    return (
+        a.key == b.key
+        and a.expected_cents == b.expected_cents
+        and a.source_hash == b.source_hash
+        and a.effective_from == b.effective_from
+        and a.effective_to == b.effective_to
+        and a.verified == b.verified
+    )
+
+
 def _obligation_index(obligations: Iterable[APObligation]) -> dict[tuple[str, str], APObligation]:
     result: dict[tuple[str, str], APObligation] = {}
     for obligation in obligations:
@@ -265,13 +277,46 @@ def _obligation_index(obligations: Iterable[APObligation]) -> dict[tuple[str, st
         if existing is None:
             result[obligation.key] = obligation
             continue
-        if existing == obligation:
+        if _same_obligation(existing, obligation):
             continue
         raise ValueError(
             "conflicting AP obligations for "
             f"{obligation.vendor_id}/{obligation.normalized_invoice}"
         )
     return result
+
+
+def _unique_payment_lines(payments: Iterable[APPayment]) -> tuple[APPayment, ...]:
+    """Deduplicate repeated export rows without collapsing legitimate split payments.
+
+    AP systems commonly repeat the same payment number across different invoices
+    when one check/ACH settles several invoices. Therefore the dedupe identity is
+    vendor + normalized invoice + payment_id, not payment_id globally.
+    """
+    seen: dict[tuple[str, str, str], APPayment] = {}
+    for payment in payments:
+        key = (payment.vendor_id, payment.normalized_invoice, payment.payment_id)
+        existing = seen.get(key)
+        if existing is None:
+            seen[key] = payment
+            continue
+        same_material_line = (
+            existing.amount_cents == payment.amount_cents
+            and existing.payment_date == payment.payment_date
+            and existing.source_hash == payment.source_hash
+            and existing.verified == payment.verified
+        )
+        if not same_material_line:
+            raise ValueError(
+                "conflicting AP payment rows for "
+                f"{payment.vendor_id}/{payment.normalized_invoice}/{payment.payment_id}"
+            )
+        # Same material payment line repeated in one export: keep the first
+        # locator so a duplicated CSV row cannot manufacture recoverable dollars.
+    return tuple(sorted(
+        seen.values(),
+        key=lambda p: (p.vendor_id, p.normalized_invoice, p.payment_id),
+    ))
 
 
 def _dedupe_payment_ids(
