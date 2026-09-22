@@ -364,6 +364,100 @@ class TiCCatalogTests(unittest.TestCase):
             self.assertEqual(tuple(plan), ("Arizona Gold", "AZ123", "hios", "BCBS Arizona"))
             conn.close()
 
+    def test_azure_object_listing_catalogs_index_and_rate_files(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            source = catalog.Source(
+                "azure-test",
+                "Azure Payer",
+                "xml_object_listing",
+                "https://blob.test/container?restype=container&comp=list",
+                notes=json.dumps({"kind": "azure", "max_targets": 10}),
+            )
+            raw = b"""<?xml version="1.0"?>
+            <EnumerationResults ContainerName="https://blob.test/container">
+              <Blobs>
+                <Blob>
+                  <Name>2026-09-01_payer_index.json</Name>
+                  <Url>https://blob.test/container/2026-09-01_payer_index.json</Url>
+                  <Properties>
+                    <Content-Length>123</Content-Length>
+                    <Content-Type>application/json</Content-Type>
+                    <Etag>etag-1</Etag>
+                    <Last-Modified>Tue, 01 Sep 2026 00:00:00 GMT</Last-Modified>
+                  </Properties>
+                </Blob>
+                <Blob>
+                  <Name>2026-09-01_payer_in-network-rates.json.gz</Name>
+                  <Url>https://blob.test/container/2026-09-01_payer_in-network-rates.json.gz</Url>
+                  <Properties><Content-Length>456</Content-Length></Properties>
+                </Blob>
+              </Blobs>
+            </EnumerationResults>"""
+            with patch.object(catalog, "fetch_bytes", return_value=(
+                raw, fake_response(source.source_url, "application/xml")
+            )):
+                stats = catalog.discover_xml_object_listing(
+                    conn, root, source, timeout=1, max_bytes=1_000_000
+                )
+            self.assertEqual(stats["files"], 2)
+            rows = conn.execute(
+                "SELECT file_type,content_length,parse_status FROM mrf_files ORDER BY file_type"
+            ).fetchall()
+            self.assertEqual({r[0] for r in rows}, {"index", "in_network"})
+            self.assertTrue(any(r[2] == "object_listing_index" for r in rows))
+            self.assertTrue(any(r[1] == 456 for r in rows))
+            conn.close()
+
+    def test_s3_object_listing_respects_prefix_and_public_base_url(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            source = catalog.Source(
+                "s3-test",
+                "S3 Payer",
+                "xml_object_listing",
+                "https://bucket.s3.amazonaws.com",
+                notes=json.dumps({
+                    "kind": "s3",
+                    "public_base_url": "https://public.test",
+                    "include_prefixes": ["index/", "download/"],
+                }),
+            )
+            raw = b"""<?xml version="1.0"?>
+            <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+              <Contents>
+                <Key>index/2026-09-01_payer_index.json</Key>
+                <LastModified>2026-09-01T00:00:00Z</LastModified>
+                <ETag>&quot;abc&quot;</ETag>
+                <Size>789</Size>
+              </Contents>
+              <Contents>
+                <Key>ignore/readme.txt</Key><Size>12</Size>
+              </Contents>
+            </ListBucketResult>"""
+            with patch.object(catalog, "fetch_bytes", return_value=(
+                raw, fake_response(source.source_url, "application/xml")
+            )):
+                stats = catalog.discover_xml_object_listing(
+                    conn, root, source, timeout=1, max_bytes=1_000_000
+                )
+            self.assertEqual(stats["files"], 1)
+            row = conn.execute(
+                "SELECT file_url,file_type,content_length,etag FROM mrf_files"
+            ).fetchone()
+            self.assertEqual(
+                tuple(row),
+                (
+                    "https://public.test/index/2026-09-01_payer_index.json",
+                    "index",
+                    789,
+                    "abc",
+                ),
+            )
+            conn.close()
+
 
 if __name__ == "__main__":
     unittest.main()
