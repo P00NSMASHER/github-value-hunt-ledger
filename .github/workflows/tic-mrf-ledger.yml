@@ -70,7 +70,13 @@ jobs:
           if [ "$EVENT_NAME" = "push" ] || [ "$INPUT_PARSE_INDEXES" = "true" ]; then
             PARSE="--parse-indexes"
           fi
-          MAX_INDEXES="${INPUT_MAX_INDEXES:-25}"
+          if [ "$EVENT_NAME" = "push" ]; then
+            MAX_INDEXES="$(awk -F= '$1=="max_indexes"{print $2}' RUN_NOW | tail -1)"
+            MAX_INDEXES="${MAX_INDEXES:-25}"
+          else
+            MAX_INDEXES="${INPUT_MAX_INDEXES:-25}"
+          fi
+          echo "TiC catalog max_indexes=$MAX_INDEXES"
           python catalog.py \
             --out output \
             --db tic_mrf.sqlite \
@@ -81,7 +87,20 @@ jobs:
             --snapshot-max-bytes 100000000
           python -m json.tool output/catalog_summary.json
           python coverage_debt.py --db output/tic_mrf.sqlite --output output/coverage_debt.json > /dev/null
-          python -m json.tool output/coverage_debt.json > /dev/null
+          echo "=== TiC coverage debt ==="
+          python -m json.tool output/coverage_debt.json
+          echo "=== TiC ingestion errors ==="
+          python - <<'PY'
+          import json, sqlite3
+          db = sqlite3.connect("output/tic_mrf.sqlite")
+          db.row_factory = sqlite3.Row
+          rows = db.execute(
+              """SELECT source_key,url,stage,error_type,detail
+                 FROM ingestion_errors ORDER BY id"""
+          ).fetchall()
+          print(json.dumps([dict(row) for row in rows], indent=2))
+          db.close()
+          PY
       - name: Upload TiC universe ledger
         uses: actions/upload-artifact@v4
         with:
