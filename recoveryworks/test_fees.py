@@ -1,6 +1,6 @@
 import unittest
 
-from recoveryworks import Branch, EvidenceRef, RecoveryEngine, RuleRef
+from recoveryworks import Branch, EvidenceRef, RecoveryEngine, RecoveryLedger, RuleRef
 from recoveryworks.branches import from_ap_variance
 from recoveryworks.fees import (
     FLOOR,
@@ -64,6 +64,37 @@ class FeeAgreementTests(unittest.TestCase):
             assess_fee(f, 1000, agreement(branches=(Branch.UTILITY,)))
         with self.assertRaises(ValueError):
             assess_fee(f, 1000, agreement(currency="EUR"))
+
+    def test_ledger_rejects_arbitrary_positive_fee_without_assessment(self):
+        f = finding()
+        ledger = RecoveryLedger()
+        ledger.add(f)
+        ledger.approve(f.finding_id, "reviewer", "verified")
+        ledger.authorize(f.finding_id, "auth-1")
+        ledger.mark_claimed(
+            f.finding_id,
+            EvidenceRef(
+                evidence_id="claim", source_hash="ch", locator="source://claim",
+                kind="claim_submission_receipt", verified=True,
+            ),
+        )
+        settlement = EvidenceRef(
+            evidence_id="settlement", source_hash="sh", locator="source://settlement",
+            kind="recovery_settlement", verified=True,
+        )
+        with self.assertRaises(ValueError):
+            ledger.mark_recovered(
+                f.finding_id, 4000, 800,
+                recovery_evidence=settlement,
+            )
+
+        assessment = assess_fee(f, 4000, agreement())
+        recovered = ledger.mark_recovered(
+            f.finding_id, 4000, 800,
+            recovery_evidence=settlement,
+            fee_assessment=assessment,
+        )
+        self.assertEqual(recovered.fee_assessment.proof_hash, assessment.proof_hash)
 
     def test_unverified_agreement_fails_closed(self):
         with self.assertRaises(ValueError):
