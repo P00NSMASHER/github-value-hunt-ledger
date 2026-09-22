@@ -35,15 +35,20 @@ class LearningStateIntegrationTests(unittest.TestCase):
         return rows
 
     def confirm_run(self):
+        return self.confirm_runs(1)[0]
+
+    def confirm_runs(self, count):
+        rows = []
         index = 1
-        while True:
+        while len(rows) < count:
             row = self.search_run(index)
             if split_for_run(row) == "confirm":
-                return row
+                rows.append(row)
             index += 1
+        return rows
 
     def test_policy_support_requires_same_runs_that_can_train_reward(self):
-        runs = self.train_runs(5)
+        runs = self.train_runs(5) + self.confirm_runs(2)
         runs.append(
             {
                 "schema_version": 10,
@@ -71,10 +76,20 @@ class LearningStateIntegrationTests(unittest.TestCase):
         self.assertEqual(strategy["visits"], 5)
         self.assertEqual(strategy["support"]["measured_runs"], 5)
         self.assertEqual(strategy["support"]["deep_inspections"], 20)
+        self.assertEqual(
+            strategy["confirm_support"]["measured_runs"],
+            2,
+        )
+        self.assertGreaterEqual(
+            strategy["confirm_support"]["deep_inspections"],
+            6,
+        )
+        self.assertTrue(strategy["train_evidence_ready"])
+        self.assertTrue(strategy["confirm_evidence_ready"])
         self.assertTrue(strategy["eligible_for_policy_consideration"])
 
     def test_four_valid_runs_do_not_unlock_policy_prior(self):
-        runs = self.train_runs(4)
+        runs = self.train_runs(4) + self.confirm_runs(2)
         with tempfile.TemporaryDirectory() as tmp:
             state = compile_state(runs, [], Path(tmp))
 
@@ -108,10 +123,31 @@ class LearningStateIntegrationTests(unittest.TestCase):
             1,
         )
         self.assertEqual(
+            strategy["confirm_support"]["measured_runs"],
+            1,
+        )
+        self.assertFalse(strategy["confirm_evidence_ready"])
+        self.assertEqual(
             state["training_environment"][
                 "split_counts"
             ].get("confirm"),
             1,
+        )
+
+    def test_train_ready_prior_stays_locked_without_confirm_evidence(self):
+        runs = self.train_runs(5)
+        with tempfile.TemporaryDirectory() as tmp:
+            state = compile_state(runs, [], Path(tmp))
+
+        strategy = next(
+            row
+            for row in state["memory"]["records"]
+            if row["key"] == "STRAT:integration-test"
+        )
+        self.assertTrue(strategy["train_evidence_ready"])
+        self.assertFalse(strategy["confirm_evidence_ready"])
+        self.assertFalse(
+            strategy["eligible_for_policy_consideration"]
         )
 
     def test_generated_state_is_deterministic_for_identical_sources(self):
