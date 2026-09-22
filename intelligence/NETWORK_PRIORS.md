@@ -53,6 +53,7 @@ Generated compact memory for live hunters. This is a **navigation aid, not autho
 
 - No strategy/query-family value prior has cleared both the 5-run / 20-deep train gate and the independent 2-run / 6-deep confirm gate yet. The learning engine is recording outcomes but must not steer search from insufficient or unconfirmed evidence.
 - Reproducible hunter-system failure queue: **0 queued**, **0 blocked**. Queued failures still require regression-tested repair and skill promotion.
+- Repair workbench: **0 bounded repair-ready**, **0 reproduction-first**. These are advisory repair/falsification tasks, not automatic worker routes or live skill edits.
 
 ## Recall / efficiency rules
 

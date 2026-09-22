@@ -1,0 +1,16 @@
+{
+  "automatic_mutation_enabled": false,
+  "automatic_promotion_enabled": false,
+  "blocked_sources": [],
+  "mode": "advisory_repair_workbench",
+  "policy_effect": "none",
+  "schema_version": 1,
+  "source_snapshot_sha256": "c2ee54fe320c43dbdadb77d089d5db59dc3d56cba81b423aa66cbbd6e8ebf6b9",
+  "summary": {
+    "blocked_sources": 0,
+    "needs_reproduction": 0,
+    "ready_for_repair": 0,
+    "tasks": 0
+  },
+  "tasks": []
+}
