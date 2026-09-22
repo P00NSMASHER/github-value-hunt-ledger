@@ -276,7 +276,7 @@ class RecoveryWorksTests(unittest.TestCase):
             authorization_id="customer-auth-1",
             authorized_cents=3000,
         )
-        with self.assertRaisesRegex(ValueError, "AUTHORIZED"):
+        with self.assertRaisesRegex(ValueError, "authorization"):
             claim_case(
                 ledger, finding, auth, action, recipient_hash, payload_hash,
                 requested_cents=3000,
