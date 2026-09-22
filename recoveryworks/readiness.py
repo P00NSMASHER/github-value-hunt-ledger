@@ -22,7 +22,10 @@ from .assurance import (
 from .custody import (
     BuildProvenanceAttestation,
     CaseCompletenessManifest,
+    NegativeEvidenceSearch,
+    PopulationSegment,
     PublicVerificationRecord,
+    RetainedSourceObject,
     SourceRetentionManifest,
     hostile_packet_hash,
     verify_build_provenance,
@@ -771,3 +774,241 @@ def readiness_from_payload(payload: Mapping[str, Any]) -> SevenFigureReadinessPa
     )
     package.verify_integrity()
     return package
+
+
+@dataclass(frozen=True)
+class SevenFigureAuthorizationDossier:
+    """Full replayable evidence set required to authorize a seven-figure case."""
+
+    dossier_version: str
+    readiness: SevenFigureReadinessPackage
+    hostile_packet: HostileExaminationPacket
+    retention: SourceRetentionManifest
+    completeness: CaseCompletenessManifest
+    build: BuildProvenanceAttestation
+    public_record: PublicVerificationRecord
+    assembled_at: str
+    assembled_by: str
+    dossier_hash: str
+
+    def __post_init__(self) -> None:
+        for name in ("dossier_version", "assembled_by", "dossier_hash"):
+            _required(name, getattr(self, name))
+        _iso("assembled_at", self.assembled_at)
+        if self.dossier_version != "seven-figure-dossier-v1":
+            raise ValueError("unsupported seven-figure authorization dossier version")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "dossier_version": self.dossier_version,
+            "readiness": asdict(self.readiness),
+            "hostile_packet": asdict(self.hostile_packet),
+            "retention": asdict(self.retention),
+            "completeness": asdict(self.completeness),
+            "build": asdict(self.build),
+            "public_record": asdict(self.public_record),
+            "assembled_at": self.assembled_at,
+            "assembled_by": self.assembled_by,
+        }
+
+    def verify_integrity(self) -> None:
+        if canonical_hash(self.integrity_body()) != self.dossier_hash:
+            raise ValueError("seven-figure authorization dossier hash mismatch")
+
+
+def _verify_dossier_components(
+    *,
+    readiness: SevenFigureReadinessPackage,
+    hostile_packet: HostileExaminationPacket,
+    retention: SourceRetentionManifest,
+    completeness: CaseCompletenessManifest,
+    build: BuildProvenanceAttestation,
+    public_record: PublicVerificationRecord,
+    bundle: CaseProofBundle,
+    journal_head_hash: str,
+) -> None:
+    verify_seven_figure_readiness(
+        readiness,
+        bundle,
+        expected_journal_head_hash=journal_head_hash,
+    )
+    verify_source_retention(retention, bundle, require_immutable=True)
+    verify_case_completeness(completeness, bundle)
+    verify_build_provenance(build, bundle)
+    verify_object_lock_receipts(readiness.object_lock_receipts, retention)
+    verify_public_verification_record(
+        public_record,
+        bundle,
+        hostile_packet,
+        retention,
+        completeness,
+        build,
+        journal_head_hash=journal_head_hash,
+    )
+
+    expected_packet_hash = hostile_packet_hash(hostile_packet)
+    component_hashes = {
+        "hostile_packet_hash": expected_packet_hash,
+        "retention_manifest_hash": retention.manifest_hash,
+        "completeness_manifest_hash": completeness.manifest_hash,
+        "build_attestation_hash": build.attestation_hash,
+        "public_record_hash": public_record.record_hash,
+        "journal_head_hash": journal_head_hash,
+    }
+    for field_name, expected in component_hashes.items():
+        if getattr(readiness, field_name) != expected:
+            raise ValueError(f"readiness {field_name} does not match dossier component")
+
+
+def build_seven_figure_authorization_dossier(
+    readiness: SevenFigureReadinessPackage,
+    hostile_packet: HostileExaminationPacket,
+    retention: SourceRetentionManifest,
+    completeness: CaseCompletenessManifest,
+    build: BuildProvenanceAttestation,
+    public_record: PublicVerificationRecord,
+    bundle: CaseProofBundle,
+    *,
+    journal_head_hash: str,
+    assembled_at: str,
+    assembled_by: str,
+) -> SevenFigureAuthorizationDossier:
+    """Freeze the full evidence set that must be replayed at authorization time."""
+    _verify_dossier_components(
+        readiness=readiness,
+        hostile_packet=hostile_packet,
+        retention=retention,
+        completeness=completeness,
+        build=build,
+        public_record=public_record,
+        bundle=bundle,
+        journal_head_hash=journal_head_hash,
+    )
+    assembled_at = _iso("assembled_at", assembled_at)
+    assembled_by = _required("assembled_by", assembled_by)
+    if _dt("assembled_at", assembled_at) < _dt(
+        "readiness.evaluated_at", readiness.evaluated_at
+    ):
+        raise ValueError("authorization dossier cannot predate readiness evaluation")
+
+    body = {
+        "schema": 1,
+        "dossier_version": "seven-figure-dossier-v1",
+        "readiness": asdict(readiness),
+        "hostile_packet": asdict(hostile_packet),
+        "retention": asdict(retention),
+        "completeness": asdict(completeness),
+        "build": asdict(build),
+        "public_record": asdict(public_record),
+        "assembled_at": assembled_at,
+        "assembled_by": assembled_by,
+    }
+    return SevenFigureAuthorizationDossier(
+        dossier_version="seven-figure-dossier-v1",
+        readiness=readiness,
+        hostile_packet=hostile_packet,
+        retention=retention,
+        completeness=completeness,
+        build=build,
+        public_record=public_record,
+        assembled_at=assembled_at,
+        assembled_by=assembled_by,
+        dossier_hash=canonical_hash(body),
+    )
+
+
+def verify_seven_figure_authorization_dossier(
+    dossier: SevenFigureAuthorizationDossier,
+    bundle: CaseProofBundle,
+    *,
+    expected_journal_head_hash: str,
+) -> None:
+    """Re-run all underlying assurance verifiers before authorization/replay."""
+    dossier.verify_integrity()
+    _verify_dossier_components(
+        readiness=dossier.readiness,
+        hostile_packet=dossier.hostile_packet,
+        retention=dossier.retention,
+        completeness=dossier.completeness,
+        build=dossier.build,
+        public_record=dossier.public_record,
+        bundle=bundle,
+        journal_head_hash=expected_journal_head_hash,
+    )
+    if _dt("dossier.assembled_at", dossier.assembled_at) < _dt(
+        "readiness.evaluated_at", dossier.readiness.evaluated_at
+    ):
+        raise ValueError("authorization dossier predates readiness evaluation")
+
+
+def authorization_dossier_to_payload(
+    dossier: SevenFigureAuthorizationDossier,
+) -> dict[str, Any]:
+    dossier.verify_integrity()
+    return {
+        **dossier.integrity_body(),
+        "dossier_hash": dossier.dossier_hash,
+    }
+
+
+def authorization_dossier_from_payload(
+    payload: Mapping[str, Any],
+) -> SevenFigureAuthorizationDossier:
+    readiness = readiness_from_payload(payload["readiness"])
+    hostile_packet = HostileExaminationPacket(**dict(payload["hostile_packet"]))
+
+    retention_raw = dict(payload["retention"])
+    retention = SourceRetentionManifest(
+        case_bundle_hash=retention_raw["case_bundle_hash"],
+        finding_proof_hash=retention_raw["finding_proof_hash"],
+        entries=tuple(
+            RetainedSourceObject(**dict(item))
+            for item in retention_raw.get("entries", [])
+        ),
+        created_at=retention_raw["created_at"],
+        created_by=retention_raw["created_by"],
+        manifest_hash=retention_raw["manifest_hash"],
+    )
+
+    completeness_raw = dict(payload["completeness"])
+    completeness = CaseCompletenessManifest(
+        case_bundle_hash=completeness_raw["case_bundle_hash"],
+        finding_proof_hash=completeness_raw["finding_proof_hash"],
+        input_manifest_hash=completeness_raw["input_manifest_hash"],
+        populations=tuple(
+            PopulationSegment(**dict(item))
+            for item in completeness_raw.get("populations", [])
+        ),
+        negative_searches=tuple(
+            NegativeEvidenceSearch(
+                **{
+                    **dict(item),
+                    "searched_source_hashes": tuple(item.get("searched_source_hashes", ())),
+                    "contrary_evidence_hashes": tuple(item.get("contrary_evidence_hashes", ())),
+                }
+            )
+            for item in completeness_raw.get("negative_searches", [])
+        ),
+        created_at=completeness_raw["created_at"],
+        created_by=completeness_raw["created_by"],
+        manifest_hash=completeness_raw["manifest_hash"],
+    )
+
+    build = BuildProvenanceAttestation(**dict(payload["build"]))
+    public_record = PublicVerificationRecord(**dict(payload["public_record"]))
+
+    dossier = SevenFigureAuthorizationDossier(
+        dossier_version=payload["dossier_version"],
+        readiness=readiness,
+        hostile_packet=hostile_packet,
+        retention=retention,
+        completeness=completeness,
+        build=build,
+        public_record=public_record,
+        assembled_at=payload["assembled_at"],
+        assembled_by=payload["assembled_by"],
+        dossier_hash=payload["dossier_hash"],
+    )
+    dossier.verify_integrity()
+    return dossier
