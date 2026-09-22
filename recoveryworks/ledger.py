@@ -259,10 +259,13 @@ class RecoveryLedger:
         self._records[finding_id] = updated
         return updated
 
-    def records(self) -> tuple[LedgerRecord, ...]:
-        return tuple(sorted(self._records.values(), key=lambda r: r.finding.finding_id))
+    def records(self, client_id: str | None = None) -> tuple[LedgerRecord, ...]:
+        records = self._records.values()
+        if client_id is not None:
+            records = (record for record in records if record.finding.client_id == client_id)
+        return tuple(sorted(records, key=lambda r: r.finding.finding_id))
 
-    def rollup(self) -> dict:
+    def rollup(self, client_id: str | None = None) -> dict:
         """Return lifecycle counts plus money partitioned by currency.
 
         Monetary amounts from different currencies are never summed together.
@@ -303,7 +306,8 @@ class RecoveryLedger:
             bucket["recovered_cents"] += record.recovered_cents
             bucket["fee_cents"] += record.fee_cents
 
-        for record in self.records():
+        selected_records = self.records(client_id=client_id)
+        for record in selected_records:
             branch = record.finding.branch.value
             currency = record.finding.currency
             rejected = record.case_state is CaseState.REJECTED
@@ -323,7 +327,7 @@ class RecoveryLedger:
         return {
             "branches": branches,
             "totals": {
-                "cases": len(self._records),
+                "cases": len(selected_records),
                 "rejected_cases": total_rejected,
             },
             "currencies": currencies,
