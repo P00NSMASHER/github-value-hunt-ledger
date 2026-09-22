@@ -22,7 +22,10 @@ class LedgerRecord:
 
     @property
     def record_hash(self) -> str:
+        # State identity must survive deterministic event replay. updated_at is
+        # operational metadata, not economic/lifecycle state, so it is excluded.
         payload = asdict(self)
+        payload.pop("updated_at", None)
         payload["finding"]["branch"] = self.finding.branch.value
         payload["finding"]["mode"] = self.finding.mode.value
         payload["finding"]["state"] = self.finding.state.value
