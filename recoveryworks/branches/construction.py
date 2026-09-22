@@ -617,12 +617,32 @@ def audit_construction_recovery(
         duplicate_code="DUPLICATE_EVENT_ID",
     )
     exceptions.extend(more)
-    mapping_by_event, more = _unique_index(
+    mapping_by_id, more = _unique_index(
         mappings,
-        key_attr="event_id",
-        duplicate_code="AMBIGUOUS_EVENT_ACTIVITY_MAPPING",
+        key_attr="mapping_id",
+        duplicate_code="DUPLICATE_MAPPING_ID",
     )
     exceptions.extend(more)
+    mappings_by_event: dict[str, list[EventActivityMapping]] = defaultdict(list)
+    seen_mapping_pairs: set[tuple[str, str, str]] = set()
+    duplicate_mapping_events: set[str] = set()
+    for mapping in mapping_by_id.values():
+        pair = (
+            mapping.event_id,
+            mapping.baseline_activity_id,
+            mapping.update_activity_id,
+        )
+        if pair in seen_mapping_pairs:
+            duplicate_mapping_events.add(mapping.event_id)
+            continue
+        seen_mapping_pairs.add(pair)
+        mappings_by_event[mapping.event_id].append(mapping)
+    for event_id in sorted(duplicate_mapping_events):
+        exceptions.append(ConstructionAuditException(
+            event_id,
+            "DUPLICATE_EVENT_ACTIVITY_MAPPING",
+            "duplicate event/activity mapping pair was excluded",
+        ))
     schedule_by_id, more = _unique_index(
         schedules,
         key_attr="version_id",
@@ -680,12 +700,15 @@ def audit_construction_recovery(
             ))
             continue
 
-        mapping = mapping_by_event.get(entitlement.event_id)
-        if mapping is None:
+        event_mappings = tuple(sorted(
+            mappings_by_event.get(entitlement.event_id, ()),
+            key=lambda item: item.mapping_id,
+        ))
+        if not event_mappings:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
                 "NO_EVENT_ACTIVITY_MAPPING",
-                "no unique event-to-activity mapping exists",
+                "no event-to-activity mapping exists",
             ))
             continue
 
@@ -780,29 +803,51 @@ def audit_construction_recovery(
         baseline_cpm = cpm_cache[baseline.version_id]
         update_cpm = cpm_cache[update.version_id]
 
-        baseline_activity = baseline_cpm.activities.get(mapping.baseline_activity_id)
-        update_activity = update_cpm.activities.get(mapping.update_activity_id)
-        if baseline_activity is None or update_activity is None:
-            missing = []
-            if baseline_activity is None:
-                missing.append(f"baseline:{mapping.baseline_activity_id}")
-            if update_activity is None:
-                missing.append(f"update:{mapping.update_activity_id}")
-            exceptions.append(ConstructionAuditException(
-                entitlement_id,
-                "MAPPED_ACTIVITY_MISSING",
-                "mapped activity missing from schedule: " + ", ".join(missing),
-            ))
+        mapping_impacts: list[dict[str, Any]] = []
+        mapping_error = False
+        for mapping in event_mappings:
+            baseline_activity = baseline_cpm.activities.get(mapping.baseline_activity_id)
+            update_activity = update_cpm.activities.get(mapping.update_activity_id)
+            if baseline_activity is None or update_activity is None:
+                missing = []
+                if baseline_activity is None:
+                    missing.append(f"baseline:{mapping.baseline_activity_id}")
+                if update_activity is None:
+                    missing.append(f"update:{mapping.update_activity_id}")
+                exceptions.append(ConstructionAuditException(
+                    entitlement_id,
+                    "MAPPED_ACTIVITY_MISSING",
+                    (
+                        f"mapping {mapping.mapping_id} references missing activity: "
+                        + ", ".join(missing)
+                    ),
+                ))
+                mapping_error = True
+                break
+            finish_delay_days = max(
+                update_activity.earliest_finish - baseline_activity.earliest_finish,
+                0,
+            )
+            mapping_impacts.append({
+                "mapping_id": mapping.mapping_id,
+                "baseline_activity_id": mapping.baseline_activity_id,
+                "update_activity_id": mapping.update_activity_id,
+                "baseline_earliest_finish": baseline_activity.earliest_finish,
+                "update_earliest_finish": update_activity.earliest_finish,
+                "finish_delay_days": finish_delay_days,
+                "baseline_critical": baseline_activity.critical,
+                "update_critical": update_activity.critical,
+            })
+        if mapping_error:
             continue
 
         project_delay_days = max(
             update_cpm.project_duration_days - baseline_cpm.project_duration_days,
             0,
         )
-        mapped_finish_delay_days = max(
-            update_activity.earliest_finish - baseline_activity.earliest_finish,
-            0,
-        )
+        positive_mapping_impacts = [
+            impact for impact in mapping_impacts if impact["finish_delay_days"] > 0
+        ]
         if project_delay_days <= 0:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
@@ -810,13 +855,21 @@ def audit_construction_recovery(
                 "update schedule does not extend deterministic CPM project duration",
             ))
             continue
-        if mapped_finish_delay_days <= 0:
+        if not positive_mapping_impacts:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
                 "MAPPED_ACTIVITY_NO_DELAY",
-                "mapped activity does not show positive earliest-finish delay",
+                "no mapped activity shows positive earliest-finish delay",
             ))
             continue
+        primary_mapping_impact = max(
+            positive_mapping_impacts,
+            key=lambda impact: (
+                impact["finish_delay_days"],
+                impact["mapping_id"],
+            ),
+        )
+        mapped_finish_delay_days = primary_mapping_impact["finish_delay_days"]
         if review.accepted_delay_days > project_delay_days:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
@@ -850,7 +903,7 @@ def audit_construction_recovery(
 
         evidence = (
             event.evidence(),
-            mapping.evidence(),
+            *tuple(mapping.evidence() for mapping in event_mappings),
             baseline.evidence(),
             update.evidence(),
             review.evidence(),
@@ -893,13 +946,20 @@ def audit_construction_recovery(
                 "baseline_project_duration_days": baseline_cpm.project_duration_days,
                 "update_project_duration_days": update_cpm.project_duration_days,
                 "cpm_project_delay_days": project_delay_days,
-                "mapped_baseline_activity_id": mapping.baseline_activity_id,
-                "mapped_update_activity_id": mapping.update_activity_id,
+                "baseline_topology_hash": baseline.topology_hash,
+                "update_topology_hash": update.topology_hash,
+                "baseline_cpm_manifest": dict(baseline_cpm.manifest),
+                "update_cpm_manifest": dict(update_cpm.manifest),
+                "mapping_ids": [mapping.mapping_id for mapping in event_mappings],
+                "mapped_activity_impacts": mapping_impacts,
+                "mapped_baseline_activity_id": primary_mapping_impact["baseline_activity_id"],
+                "mapped_update_activity_id": primary_mapping_impact["update_activity_id"],
                 "mapped_activity_finish_delay_days": mapped_finish_delay_days,
-                "baseline_activity_critical": baseline_activity.critical,
-                "update_activity_critical": update_activity.critical,
+                "baseline_activity_critical": primary_mapping_impact["baseline_critical"],
+                "update_activity_critical": primary_mapping_impact["update_critical"],
                 "accepted_delay_days": review.accepted_delay_days,
                 "qualified_reviewer_id": review.qualified_reviewer_id,
+                "qualification_basis": review.qualification_basis,
                 "entitlement_reviewer_id": entitlement.entitlement_reviewer_id,
                 "settlement_ids": [
                     settlement.settlement_id for settlement in group_settlements
