@@ -130,8 +130,9 @@ if value_priors:
         )
 else:
     lines.append(
-        "- No strategy/query-family value prior has cleared the 5-run / 20-deep-inspection gate yet. "
-        "The learning engine is recording outcomes but must not steer search from insufficient evidence."
+        "- No strategy/query-family value prior has cleared both the 5-run / 20-deep train gate "
+        "and the independent 2-run / 6-deep confirm gate yet. The learning engine is recording "
+        "outcomes but must not steer search from insufficient or unconfirmed evidence."
     )
 failure_queue = learning.get("failure_queue") or {}
 lines.append(
