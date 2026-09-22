@@ -24,6 +24,7 @@ if str(REPO_ROOT) not in sys.path:
 from production.learning_engine import (
     FailureEvent,
     assess_failure_for_repair,
+    contextual_memory_key,
     learn_training_episode_memory,
 )
 from production.training_environment import build_training_environment
@@ -149,6 +150,19 @@ def episode_support_index(
                     if move_id.startswith("MOVE:")
                     else f"MOVE:{move_id}"
                 )
+
+        objective_id = (
+            episode.get("state") or {}
+        ).get("search_objective_id")
+        contextual_keys = [
+            contextual_memory_key(key, objective_id)
+            for key in keys
+        ]
+        keys.extend(
+            key
+            for key in contextual_keys
+            if key
+        )
 
         for key in dict.fromkeys(keys):
             bucket = out.setdefault(
