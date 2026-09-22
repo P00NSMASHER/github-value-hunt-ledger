@@ -13,6 +13,10 @@ from enum import Enum
 import re
 from typing import TYPE_CHECKING
 
+from .engagement import (
+    RecoveryEngagementCharter,
+    assert_engagement_allows_action_approval,
+)
 from .models import Branch, CaseState, FindingState, RecoveryFinding, canonical_hash
 
 if TYPE_CHECKING:
@@ -88,6 +92,8 @@ class AuthorizationState(str, Enum):
 class RecoveryActionAuthorization:
     authorization_id: str
     client_id: str
+    engagement_id: str
+    engagement_charter_hash: str
     branch: str
     finding_id: str
     finding_proof_hash: str
@@ -171,6 +177,7 @@ def _verify_authorization_hash(auth: RecoveryActionAuthorization) -> None:
 
 def issue_authorization(
     record: "LedgerRecord",
+    engagement: RecoveryEngagementCharter,
     *,
     authorization_id: str,
     action_type: RecoveryActionType,
@@ -191,6 +198,13 @@ def issue_authorization(
     if not record.reviewer_approved or not record.reviewer_id:
         raise ValueError("authorization issuance requires human reviewer approval")
     _required("authorization_id", authorization_id)
+    assert_engagement_allows_action_approval(
+        engagement,
+        client_id=finding.client_id,
+        branch=finding.branch,
+        approver_role=approver_role,
+        as_of_date=issued_on,
+    )
     _required("target_counterparty_id", target_counterparty_id)
     _sha("recipient_reference_hash", recipient_reference_hash)
     _sha("action_payload_hash", action_payload_hash)
@@ -212,10 +226,14 @@ def issue_authorization(
         raise ValueError("max_validity_days must be positive")
     if (expires - issued).days > max_validity_days:
         raise ValueError("authorization validity exceeds internal maximum")
+    if expires > _parse_date("engagement expires_on", engagement.expires_on):
+        raise ValueError("authorization cannot outlive engagement charter")
 
     body = {
         "authorization_id": authorization_id,
         "client_id": finding.client_id,
+        "engagement_id": engagement.engagement_id,
+        "engagement_charter_hash": engagement.charter_hash,
         "branch": finding.branch.value,
         "finding_id": finding.finding_id,
         "finding_proof_hash": finding.proof_hash,
