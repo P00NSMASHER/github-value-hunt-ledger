@@ -8,6 +8,7 @@ from freight.review_packet import (
     ADD_APPLICABLE_RULE,
     REVIEW_VALIDATED_FINDING,
     VERIFY_CONTROLLING_AUTHORITY,
+    _money,
     build_review_packet,
     render_review_packet_markdown,
 )
@@ -94,3 +95,7 @@ def test_markdown_is_human_readable_and_does_not_call_variance_savings():
     assert "verified controlling" in text
     assert "No applicable rule proof was established" in text
     assert "realized savings:**" not in text
+
+
+def test_money_renderer_preserves_full_integer_cent_precision():
+    assert _money("USD", 2**63 - 1) == "USD 92,233,720,368,547,758.07"
