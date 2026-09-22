@@ -1,8 +1,10 @@
 """RecoveryWorks / RecoveryOS shared recovery intelligence layer."""
 from .assurance import (
+    ArtifactReplayEntry,
     AuthorityRegistry,
     AuthoritySnapshot,
     CalculationManifest,
+    CaseArtifactReplayReceipt,
     CaseProofBundle,
     ChallengeReview,
     ClientActionAuthorization,
@@ -16,7 +18,9 @@ from .assurance import (
     create_proof_seal,
     freeze_case_proof,
     prepare_external_action,
+    replay_case_source_artifacts,
     verify_action_authorization,
+    verify_case_artifact_replay,
     verify_case_bundle,
     verify_external_action,
     verify_proof_seal,
@@ -40,10 +44,12 @@ from .models import (
 )
 
 __all__ = [
+    "ArtifactReplayEntry",
     "AuthorityRegistry",
     "AuthoritySnapshot",
     "Branch",
     "CalculationManifest",
+    "CaseArtifactReplayReceipt",
     "CaseProofBundle",
     "ChallengeReview",
     "ClientActionAuthorization",
@@ -80,8 +86,10 @@ __all__ = [
     "freeze_scan",
     "run_scan",
     "prepare_external_action",
+    "replay_case_source_artifacts",
     "run_scan360_config",
     "verify_action_authorization",
+    "verify_case_artifact_replay",
     "verify_case_bundle",
     "verify_external_action",
     "verify_proof_seal",
