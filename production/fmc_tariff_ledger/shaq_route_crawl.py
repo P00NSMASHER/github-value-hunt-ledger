@@ -183,7 +183,7 @@ def parse_money(value: str) -> tuple[str | None, str | None]:
     match = re.search(
         r"(?:(?P<currency>USD|EUR|GBP|CAD|AUD|CNY|RMB)\s*)?"
         r"(?P<symbol>[$€£])?\s*"
-        r"(?P<amount>\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)",
+        r"(?P<amount>\d+(?:,\d{3})*(?:\.\d+)?)",
         value,
         re.I,
     )
