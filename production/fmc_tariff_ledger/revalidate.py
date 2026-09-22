@@ -19,7 +19,7 @@ import crawler
 import publisher_adapters as publishers
 
 
-BOGUS_RULE_IDS = {"rule:no", "rule:number", "rule:nos"}
+BOGUS_RULE_IDS = {"rule:no", "rule:number", "rule:nos", "rule:page", "rule:pages"}
 
 
 def revalidate(db_path: Path, artifact_root: Path, dry_run: bool = False) -> dict:
@@ -37,7 +37,7 @@ def revalidate(db_path: Path, artifact_root: Path, dry_run: bool = False) -> dic
     }
 
     bogus_count = conn.execute(
-        "SELECT COUNT(*) FROM terms WHERE lower(rule_type) IN ('rule:no','rule:number','rule:nos')"
+        "SELECT COUNT(*) FROM terms WHERE lower(rule_type) IN ('rule:no','rule:number','rule:nos','rule:page','rule:pages')"
     ).fetchone()[0]
     stats["bogus_rule_terms_removed"] = bogus_count
     if not dry_run:
