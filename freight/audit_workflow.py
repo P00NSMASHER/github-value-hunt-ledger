@@ -15,6 +15,7 @@ from typing import Iterable
 
 from freight.audit_run_manifest import AuditRunManifest, build_audit_run_manifest
 from freight.finding_factory import FindingFactoryBatch, REVIEW, VALIDATED, derive_batch
+from freight.money import format_cents
 from freight.invoice_csv_adapter import InvoiceChargeCSVBatch, parse_invoice_charge_csv
 from freight.population_builder import PopulationBuild, build_population_from_charge_batch
 from freight.review_packet import ReviewPacket, build_review_packet
@@ -339,9 +340,7 @@ def run_audit_workflow(
 
 
 def _currency_amount(currency: str, cents: int) -> str:
-    sign = "-" if cents < 0 else ""
-    whole, fraction = divmod(abs(cents), 100)
-    return currency + " " + sign + f"{whole:,}.{fraction:02d}"
+    return format_cents(currency, cents)
 
 
 def render_workflow_summary(result: AuditWorkflowResult) -> str:
