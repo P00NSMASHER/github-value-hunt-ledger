@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "skill_promotion_result_id": "SPROMORES:20260922T000000Z:shortid",
+  "skill_promotion_id": "SKILLPROMO:replace-with-task-id",
+  "skill_promotion_sha256": "replace-with-current-promotion-task-sha256",
+  "skill_eval_result_id": "SEVALRES:replace-with-eval-result-id",
+  "evaluation_result_sha256": "replace-with-current-evaluation-result-sha256",
+  "artifact_id": "SKILL:replace-with-artifact",
+  "candidate_version": "v2",
+  "distinct_success_task_ids": [
+    "TASK:success-1",
+    "TASK:success-2"
+  ],
+  "heldout_tasks": 5,
+  "heldout_passes": 5,
+  "heldout_regressions": 0,
+  "heldout_set_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "heldout_evidence_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "adversarial_task_passed": true,
+  "adversarial_evidence_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "adjacent_domain_task_passed": true,
+  "adjacent_domain_evidence_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+  "curator_approved": true,
+  "curator_identity": "INTEGRATOR:curator-01",
+  "curator_evidence_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+  "canary_hunter_ids": [
+    "HUNTER-01",
+    "HUNTER-02",
+    "HUNTER-03"
+  ],
+  "canary_regressions": 0,
+  "canary_evidence_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+  "sensitive_material_involved": false,
+  "benchmark_contaminated": false,
+  "notes": null
+}
