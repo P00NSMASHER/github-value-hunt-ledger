@@ -88,6 +88,6 @@ A final automatic pass is intentional:
 1. counters can restore claim capacity, making a settlement that initially required review safely auto-allocatable;
 2. that newly created allocation can make a counter safely auto-reversible.
 
-A counter never restores capacity to the settlement event it returns. Returned funds are removed from that event's allocatable capacity immediately; reversals restore claim capacity while preserving the event's reduced net-funds ceiling.
+A counter never restores capacity to the settlement event it returns. Once counter/return evidence exists, that original event is closed to new allocation. Reversals may restore claim capacity, but any later replacement/net remittance must be represented as a new settlement event. This avoids applying the same return once through net-capacity arithmetic and again through a later reversal.
 
 After those passes, remaining review cases are derived from the transaction's final snapshot. Any later concurrent store change is still caught by the existing proof-bound review workflows when a human tries to apply the decision.
