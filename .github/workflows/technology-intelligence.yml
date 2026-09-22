@@ -105,6 +105,8 @@ jobs:
                   intelligence/derived_edges.jsonl \
                   intelligence/LEARNING_REPORT.md \
                   intelligence/LEARNING_STATE.json \
+                  intelligence/TRAINING_ENVIRONMENT.json \
+                  intelligence/training_episodes.jsonl \
                   intelligence/REGISTRY_REPORT.md \
                   intelligence/REVISION_DEBT_REPORT.md \
                   intelligence/DATA_QUALITY_REPORT.md \
