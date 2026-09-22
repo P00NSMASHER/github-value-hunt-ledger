@@ -7,7 +7,7 @@ import hashlib
 from pathlib import Path
 from typing import Mapping
 
-from .ap import APObligation, APPayment
+from .ap import APObligation, APPayment, APVendorStatementLine
 
 
 DEFAULT_PAYMENT_COLUMNS = {
@@ -25,24 +25,45 @@ DEFAULT_OBLIGATION_COLUMNS = {
     "effective_from": "Invoice_Date",
 }
 
+DEFAULT_VENDOR_STATEMENT_COLUMNS = {
+    "vendor_id": "Vendor",
+    "invoice_number": "Invoice_Number",
+    "balance": "Balance",
+    "statement_date": "Statement_Date",
+}
 
-def money_to_cents(value: str) -> int:
+
+def _parse_money(value: str, *, allow_zero: bool, allow_negative: bool) -> int:
     text = (value or "").strip().replace("$", "").replace(",", "")
     if not text:
         raise ValueError("money value is required")
-    negative = text.startswith("(") and text.endswith(")")
-    if negative:
+    parenthetical = text.startswith("(") and text.endswith(")")
+    if parenthetical:
         text = text[1:-1].strip()
     try:
         amount = Decimal(text)
     except InvalidOperation as exc:
         raise ValueError(f"invalid money value: {value!r}") from exc
-    if negative:
+    if parenthetical:
         amount = -amount
     cents = int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    if not allow_negative and cents < 0:
+        raise ValueError("negative money value is not allowed")
+    if not allow_zero and cents == 0:
+        raise ValueError("zero money value is not allowed")
+    return cents
+
+
+def money_to_cents(value: str) -> int:
+    cents = _parse_money(value, allow_zero=False, allow_negative=False)
     if cents <= 0:
         raise ValueError("AP payment/obligation amount must be positive")
     return cents
+
+
+def signed_money_to_cents(value: str) -> int:
+    """Parse statement balances, including credits such as -100 or (100)."""
+    return _parse_money(value, allow_zero=True, allow_negative=True)
 
 
 def _read_rows(path: str | Path) -> tuple[Path, str, list[dict[str, str]]]:
@@ -115,6 +136,46 @@ def load_obligations_csv(
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
             effective_from=effective,
+            verified=verified,
+            metadata={"source_file": source.name, "row_number": row_number},
+        ))
+    return tuple(result)
+
+
+def load_vendor_statements_csv(
+    path: str | Path,
+    *,
+    verified: bool = False,
+    default_statement_date: str | None = None,
+    columns: Mapping[str, str] = DEFAULT_VENDOR_STATEMENT_COLUMNS,
+) -> tuple[APVendorStatementLine, ...]:
+    """Load invoice-level vendor statement balances.
+
+    Negative balances or parenthetical amounts represent credits owed to the
+    client. If the export omits a statement-date column, default_statement_date
+    must be supplied explicitly.
+    """
+    source, digest, rows = _read_rows(path)
+    date_column = columns.get("statement_date")
+    result: list[APVendorStatementLine] = []
+    for row_number, row in enumerate(rows, start=2):
+        statement_date = (
+            (row.get(date_column) or "").strip() if date_column else ""
+        ) or (default_statement_date or "").strip()
+        if not statement_date:
+            raise ValueError(
+                f"row {row_number}: statement date is required "
+                "(column or default_statement_date)"
+            )
+        result.append(APVendorStatementLine(
+            vendor_id=_value(row, columns["vendor_id"], row_number=row_number),
+            invoice_number=_value(row, columns["invoice_number"], row_number=row_number),
+            balance_cents=signed_money_to_cents(
+                _value(row, columns["balance"], row_number=row_number)
+            ),
+            statement_date=statement_date,
+            source_hash=digest,
+            source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,
             metadata={"source_file": source.name, "row_number": row_number},
         ))
