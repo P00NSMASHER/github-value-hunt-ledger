@@ -335,35 +335,77 @@ class RecoveryLedger:
         })
 
     def rollup(self) -> dict:
-        branches: dict[str, dict[str, int]] = {}
-        total_potential = total_validated = total_recovered = total_fees = 0
-        for record in self.records():
-            key = record.finding.branch.value
-            bucket = branches.setdefault(key, {
+        def new_bucket() -> dict[str, int]:
+            return {
                 "cases": 0,
                 "potential_cents": 0,
                 "validated_cents": 0,
                 "recovered_cents": 0,
                 "fee_cents": 0,
-            })
-            potential = record.finding.potential_recovery_cents
-            validated = potential if record.finding.state is FindingState.VALIDATED else 0
+            }
+
+        def add(bucket: dict[str, int], potential: int, validated: int, recovered: int, fees: int) -> None:
             bucket["cases"] += 1
             bucket["potential_cents"] += potential
             bucket["validated_cents"] += validated
-            bucket["recovered_cents"] += record.recovered_cents
-            bucket["fee_cents"] += record.fee_cents
-            total_potential += potential
-            total_validated += validated
-            total_recovered += record.recovered_cents
-            total_fees += record.fee_cents
+            bucket["recovered_cents"] += recovered
+            bucket["fee_cents"] += fees
+
+        branches: dict[str, dict[str, Any]] = {}
+        currencies: dict[str, dict[str, int]] = {}
+
+        for record in self.records():
+            branch_key = record.finding.branch.value
+            currency = record.finding.currency
+            branch = branches.setdefault(branch_key, {
+                "cases": 0,
+                "currencies": {},
+            })
+            currency_bucket = currencies.setdefault(currency, new_bucket())
+            branch_currency = branch["currencies"].setdefault(currency, new_bucket())
+
+            potential = record.finding.potential_recovery_cents
+            validated = potential if record.finding.state is FindingState.VALIDATED else 0
+            recovered = record.recovered_cents
+            fees = record.fee_cents
+
+            add(currency_bucket, potential, validated, recovered, fees)
+            add(branch_currency, potential, validated, recovered, fees)
+            branch["cases"] += 1
+
+        for branch in branches.values():
+            branch_currencies = branch["currencies"]
+            branch["currency_count"] = len(branch_currencies)
+            if len(branch_currencies) == 1:
+                only = next(iter(branch_currencies.values()))
+                for key in (
+                    "potential_cents", "validated_cents", "recovered_cents", "fee_cents",
+                ):
+                    branch[key] = only[key]
+            else:
+                for key in (
+                    "potential_cents", "validated_cents", "recovered_cents", "fee_cents",
+                ):
+                    branch[key] = None
+
+        totals: dict[str, Any] = {
+            "cases": len(self._records),
+            "currency_count": len(currencies),
+        }
+        if len(currencies) == 1:
+            only = next(iter(currencies.values()))
+            for key in (
+                "potential_cents", "validated_cents", "recovered_cents", "fee_cents",
+            ):
+                totals[key] = only[key]
+        else:
+            for key in (
+                "potential_cents", "validated_cents", "recovered_cents", "fee_cents",
+            ):
+                totals[key] = None
+
         return {
             "branches": branches,
-            "totals": {
-                "cases": len(self._records),
-                "potential_cents": total_potential,
-                "validated_cents": total_validated,
-                "recovered_cents": total_recovered,
-                "fee_cents": total_fees,
-            },
+            "currencies": currencies,
+            "totals": totals,
         }
