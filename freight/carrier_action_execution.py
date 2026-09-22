@@ -18,6 +18,7 @@ from freight.carrier_action_payload import (
 )
 from freight.carrier_action_workflow import CarrierActionProposal
 from freight.contracts import canonical_hash
+from freight.money import format_cents
 from freight.external_action_authorization import (
     ActionType,
     AuthorizationRevocation,
@@ -791,7 +792,7 @@ def render_execution_intent_markdown(intent: CarrierActionExecutionIntent) -> st
         f"- Action: **{intent.action_type}**",
         f"- Buyer / business unit: **{intent.buyer_id} / {intent.business_unit}**",
         f"- Carrier / customer: **{intent.target_carrier_id} / {intent.target_customer_id}**",
-        f"- Amount: **{intent.currency} {intent.requested_cents / 100:,.2f}**",
+        f"- Amount: **{format_cents(intent.currency, intent.requested_cents)}**",
         f"- Prepared at: **{intent.prepared_at}**",
         f"- Idempotency key: `{intent.execution_key}`",
         f"- Intent hash: `{intent.intent_hash}`",
