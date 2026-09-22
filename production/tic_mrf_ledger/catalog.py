@@ -708,6 +708,97 @@ def command_summary(args: argparse.Namespace) -> int:
     return 0
 
 
+
+def command_probe(args: argparse.Namespace) -> int:
+    conn = sqlite3.connect(args.db)
+    conn.row_factory = sqlite3.Row
+    params: list[Any] = []
+    where = ["1=1"]
+    if args.file_type:
+        where.append("f.file_type=?")
+        params.append(args.file_type.upper())
+    if args.payer_key:
+        where.append("s.payer_key=?")
+        params.append(args.payer_key)
+
+    sql = f"""SELECT f.id, f.url, f.source_id, f.file_type, s.payer_key
+              FROM mrf_files f
+              JOIN sources s ON s.id=f.source_id
+              WHERE {' AND '.join(where)}
+              ORDER BY f.id"""
+    if args.limit:
+        sql += " LIMIT ?"
+        params.append(args.limit)
+    rows = conn.execute(sql, params).fetchall()
+
+    session = requests.Session()
+    session.headers.update({"User-Agent": USER_AGENT, "Accept": "*/*"})
+    stats = {"targets": len(rows), "head_ok": 0, "head_failed": 0}
+
+    for row in rows:
+        try:
+            resp = session.head(
+                row["url"],
+                timeout=args.timeout,
+                allow_redirects=True,
+            )
+            status = resp.status_code
+            if 200 <= status < 400:
+                length = resp.headers.get("content-length")
+                conn.execute(
+                    """UPDATE mrf_files
+                       SET etag=COALESCE(?, etag),
+                           last_modified=COALESCE(?, last_modified),
+                           content_length=COALESCE(?, content_length),
+                           access_status='HEAD_OK',
+                           last_seen_at=?
+                       WHERE id=?""",
+                    (
+                        resp.headers.get("etag"),
+                        resp.headers.get("last-modified"),
+                        int(length) if length and length.isdigit() else None,
+                        utcnow(),
+                        row["id"],
+                    ),
+                )
+                stats["head_ok"] += 1
+            else:
+                conn.execute(
+                    """UPDATE mrf_files SET access_status=? WHERE id=?""",
+                    (f"HEAD_HTTP_{status}", row["id"]),
+                )
+                record_error(
+                    conn,
+                    int(row["source_id"]),
+                    row["url"],
+                    "head_probe",
+                    f"HEAD returned HTTP {status}",
+                    "HTTPStatus",
+                )
+                stats["head_failed"] += 1
+        except Exception as exc:
+            record_error(
+                conn,
+                int(row["source_id"]),
+                row["url"],
+                "head_probe",
+                exc,
+            )
+            stats["head_failed"] += 1
+        conn.commit()
+
+    totals = conn.execute(
+        """SELECT COUNT(*), COALESCE(SUM(content_length), 0)
+           FROM mrf_files WHERE content_length IS NOT NULL"""
+    ).fetchone()
+    stats["files_with_content_length"] = int(totals[0])
+    stats["known_content_bytes"] = int(totals[1])
+    print(json.dumps(stats, indent=2))
+    conn.close()
+    return 0
+
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="CMS TiC public MRF catalog")
     sub = p.add_subparsers(dest="command", required=True)
@@ -722,6 +813,18 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--max-indexes-per-source", type=int, default=25)
     c.add_argument("--max-depth", type=int, default=2)
     c.set_defaults(func=command_crawl)
+
+    probe = sub.add_parser("probe")
+    probe.add_argument("--db", required=True)
+    probe.add_argument("--payer-key")
+    probe.add_argument(
+        "--file-type",
+        choices=["INDEX", "IN_NETWORK", "ALLOWED_AMOUNTS", "UNKNOWN"],
+        default="IN_NETWORK",
+    )
+    probe.add_argument("--limit", type=int, default=0)
+    probe.add_argument("--timeout", type=int, default=20)
+    probe.set_defaults(func=command_probe)
 
     s = sub.add_parser("summary")
     s.add_argument("--db", required=True)
