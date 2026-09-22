@@ -172,10 +172,42 @@ class RepairQueueTests(unittest.TestCase):
             [],
             env,
         )
+        self.assertEqual(queue["tasks"], [])
         self.assertEqual(
-            queue["tasks"][0]["confirm_failure_refs"],
-            [],
+            queue["summary"]["blocked_sources"],
+            1,
         )
+        self.assertIn(
+            "no_matching_negative_confirm_episode",
+            queue["blocked_sources"][0]["reasons"],
+        )
+
+    def test_alert_without_negative_confirm_episode_is_blocked(self):
+        env = training_environment()
+        env["episodes"][0]["reward"]["training_reward"] = 0.2
+        queue = build_repair_queue(
+            alert_state(),
+            [],
+            env,
+        )
+        self.assertEqual(queue["tasks"], [])
+        self.assertEqual(
+            queue["summary"]["needs_reproduction"],
+            0,
+        )
+        self.assertEqual(
+            queue["summary"]["blocked_sources"],
+            1,
+        )
+        self.assertEqual(
+            queue["blocked_sources"][0]["source_kind"],
+            "learning_alert",
+        )
+        self.assertIn(
+            "no_matching_negative_confirm_episode",
+            queue["blocked_sources"][0]["reasons"],
+        )
+        self.assertEqual(validate_repair_queue(queue), [])
 
     def test_explicit_failure_outranks_matching_statistical_alert(self):
         queue = build_repair_queue(
