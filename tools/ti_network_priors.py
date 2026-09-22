@@ -28,6 +28,7 @@ coord = read_json("coordination_metrics.json", {})
 learning = read_json("LEARNING_STATE.json", {})
 repair = read_json("REPAIR_QUEUE.json", {})
 repair_intake = read_json("REPAIR_CANDIDATE_INTAKE.json", {})
+curriculum = read_json("learning_curriculum.json", {})
 
 gaps = policy.get("priority_capability_gaps") or []
 constraints = policy.get("domain_constraints") or []
@@ -195,6 +196,28 @@ if suppression_alerts:
         "are blocked from live priors. Treat these as repair/falsification targets, "
         "not as candidates for more allocation."
     )
+measurement_recs = curriculum.get("recommended_measurements") or []
+if measurement_recs:
+    lines += ["", "### Learning measurement debt", ""]
+    lines.append(
+        "- These are **measurement-only** recommendations. They do not change "
+        "allocator weights or authorize work by themselves; use the normal "
+        "generated assignment/claim path and never select/retry based on "
+        "train/confirm partition."
+    )
+    for rec in measurement_recs[:3]:
+        train = rec.get("train") or {}
+        confirm = rec.get("confirm") or {}
+        lines.append(
+            f"- **{rec.get('strategy_id')}** — {rec.get('phase')}; "
+            f"train {train.get('runs', 0)}/{train.get('deep_inspections', 0)} "
+            f"(need {train.get('runs_needed', 0)} runs / "
+            f"{train.get('deep_inspections_needed', 0)} deep); "
+            f"confirm {confirm.get('runs', 0)}/{confirm.get('deep_inspections', 0)} "
+            f"(need {confirm.get('runs_needed', 0)} runs / "
+            f"{confirm.get('deep_inspections_needed', 0)} deep)."
+        )
+
 failure_queue = learning.get("failure_queue") or {}
 lines.append(
     f"- Reproducible hunter-system failure queue: **{failure_queue.get('queued', 0)} queued**, "
