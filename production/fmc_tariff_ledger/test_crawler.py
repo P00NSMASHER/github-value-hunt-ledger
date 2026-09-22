@@ -16,7 +16,36 @@ class TariffLedgerTests(unittest.TestCase):
     def test_effective_date_and_version(self):
         text = "Tariff No. FMC-7 Revision 4. Effective April 1, 2026."
         self.assertEqual(crawler.detect_effective_dates(text)[0], "2026-04-01")
-        self.assertEqual(crawler.detect_source_version(text, "https://x.test/tariff"), "FMC-7")
+        self.assertEqual(crawler.detect_source_version(text, "https://x.test/tariff"), "FMC-7|REV:4")
+
+    def test_compact_maritime_effective_and_expiration_dates(self):
+        text = """
+        Tariff No. 019075-002 Amendment No. 7
+        Effective Date: 5MAY2022
+        Expire Date: 11-AUG-2023
+        """
+        self.assertEqual(
+            crawler.detect_effective_dates(text),
+            ("2022-05-05", "2023-08-11"),
+        )
+        self.assertEqual(
+            crawler.detect_source_version(text, "https://x.test/title"),
+            "019075-002|AMD:7",
+        )
+
+    def test_numeric_compact_effective_date(self):
+        text = "Tariff No. 12 Effective Date: 20260401"
+        self.assertEqual(crawler.detect_effective_dates(text)[0], "2026-04-01")
+
+    def test_applicability_and_pass_through_rule_families(self):
+        text = """
+        Rates, charges, and rules applicable are those in effect on the date
+        cargo is received by the carrier. The listed ocean carrier surcharge
+        is passed through at cost without markup.
+        """
+        rules = set(crawler.classify_rules(text))
+        self.assertIn("applicability_date", rules)
+        self.assertIn("pass_through", rules)
 
     def test_extract_money_and_free_time(self):
         text = """
