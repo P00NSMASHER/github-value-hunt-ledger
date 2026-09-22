@@ -341,21 +341,61 @@ def derive_batch(
     normalized_charges = tuple(sorted(charges, key=lambda charge: charge.charge_id))
     if len({charge.charge_id for charge in normalized_charges}) != len(normalized_charges):
         raise ValueError("duplicate charge_id")
+    if len({charge.source_hash for charge in normalized_charges}) != len(normalized_charges):
+        raise ValueError("duplicate charge source evidence")
     normalized_rules = tuple(rules)
     row_index = {row.row_key: row for row in population.rows}
+    covered_rows = {(charge.invoice_id, charge.shipment_id) for charge in normalized_charges}
+    missing_rows = set(row_index) - covered_rows
+    if missing_rows:
+        raise ValueError(
+            "audit charge set does not cover every frozen population row: "
+            + ",".join(repr(key) for key in sorted(missing_rows))
+        )
+
+    fixed_scope_groups: dict[tuple[str, str, str], list[InvoiceCharge]] = {}
+    for charge in normalized_charges:
+        fixed_scope_groups.setdefault(
+            (charge.invoice_id, charge.shipment_id, charge.charge_code), []
+        ).append(charge)
 
     derivations = []
     for charge in normalized_charges:
         _validate_charge(charge)
         if (charge.buyer_id, charge.business_unit) != (population.buyer_id, population.business_unit):
             raise ValueError("charge scope mismatch")
-        row = row_index.get(f"{charge.invoice_id}|{charge.shipment_id}")
+        row = row_index.get((charge.invoice_id, charge.shipment_id))
         if row is None:
             raise ValueError("charge outside frozen population")
         if (charge.customer_id, charge.carrier_id, charge.currency) != (
             row.customer_id, row.carrier_id, row.currency,
         ):
             raise ValueError("charge identity mismatch with frozen population")
+        multi_line = fixed_scope_groups[
+            (charge.invoice_id, charge.shipment_id, charge.charge_code)
+        ]
+        if len(multi_line) > 1:
+            service_day = _validate_charge(charge)
+            candidates = tuple(
+                sorted(
+                    (
+                        rule for rule in normalized_rules
+                        if _matches(charge, service_day, rule)
+                    ),
+                    key=lambda rule: rule.rule_hash,
+                )
+            )
+            if len(candidates) == 1 and candidates[0].pricing_model == FIXED:
+                derivations.append(_finish(
+                    charge=charge,
+                    decision=REVIEW,
+                    reason="FIXED_SCOPE_AMBIGUOUS_MULTI_LINE",
+                    expected_cents=None,
+                    matched_rules=candidates,
+                    finding=None,
+                    authority_ref=None,
+                ))
+                continue
         derivations.append(derive_charge(charge, normalized_rules))
 
     derivations = tuple(derivations)
