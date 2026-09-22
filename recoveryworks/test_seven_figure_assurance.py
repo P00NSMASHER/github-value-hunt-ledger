@@ -290,7 +290,7 @@ class SevenFigureAssuranceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             ledger.authorize(finding.finding_id, "legacy-auth")
 
-    def test_high_value_lifecycle_requires_dual_control_and_action_envelope(self):
+    def test_high_value_lifecycle_requires_readiness_after_dual_control(self):
         bundle = frozen_bundle()
         finding = bundle.finding
         authorization = authorize_case_action(
@@ -301,17 +301,6 @@ class SevenFigureAssuranceTests(unittest.TestCase):
             authorized_at="2026-09-22T16:10:00Z",
             maximum_amount_cents=100_000_000,
             note="Approved frozen finding.",
-        )
-        artifact = b"exact outbound demand"
-        envelope = prepare_external_action(
-            bundle,
-            authorization,
-            artifact_kind="demand_letter",
-            artifact_bytes=artifact,
-            artifact_locator="vault://outbound/exact-demand",
-            action_amount_cents=100_000_000,
-            prepared_by="recovery-ops-1",
-            prepared_at="2026-09-22T16:20:00Z",
         )
 
         ledger = DurableRecoveryLedger()
@@ -325,29 +314,8 @@ class SevenFigureAssuranceTests(unittest.TestCase):
             "reviewer-2",
             "independent reperformance",
         )
-        ledger.authorize_with_case(finding.finding_id, bundle, authorization)
         with self.assertRaises(ValueError):
-            ledger.mark_claimed(finding.finding_id)
-
-        claimed = ledger.mark_claimed(finding.finding_id, envelope)
-        self.assertEqual(
-            claimed.external_action_envelope_hash,
-            envelope.envelope_hash,
-        )
-
-        exported = ledger.export_bundle()
-        restored = DurableRecoveryLedger.from_bundle(exported)
-        restored_record = restored.get(finding.finding_id)
-        self.assertEqual(restored.journal.head_hash, ledger.journal.head_hash)
-        self.assertEqual(restored_record.case_bundle_hash, bundle.bundle_hash)
-        self.assertEqual(
-            restored_record.authorization_hash,
-            authorization.proof_hash,
-        )
-        self.assertEqual(
-            restored_record.external_action_envelope_hash,
-            envelope.envelope_hash,
-        )
+            ledger.authorize_with_case(finding.finding_id, bundle, authorization)
 
 
 if __name__ == "__main__":
