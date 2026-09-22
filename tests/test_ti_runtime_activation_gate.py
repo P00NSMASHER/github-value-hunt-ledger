@@ -12,19 +12,16 @@ def packets():
     return {
         "packets": [
             {
-                "seed": {
-                    "seed_id": "SEED:learn:a",
-                }
+                "packet_id": "LMP:a",
+                "seed": {"seed_id": "SEED:learn:a"},
             },
             {
-                "seed": {
-                    "seed_id": "SEED:learn:b",
-                }
+                "packet_id": "LMP:b",
+                "seed": {"seed_id": "SEED:learn:b"},
             },
             {
-                "seed": {
-                    "seed_id": "SEED:learn:c",
-                }
+                "packet_id": "LMP:c",
+                "seed": {"seed_id": "SEED:learn:c"},
             },
         ]
     }
@@ -63,22 +60,47 @@ def paused_policy():
         "approval_scope": None,
         "approval_id": None,
         "approved_at": None,
+        "approved_packet_ids": [],
+        "approved_seed_ids": [],
         "maximum_current_activations": 0,
+        "maximum_total_claims": 0,
         "allowed_work_kinds": ["learning_measurement"],
         "explicit_user_approval_required": True,
     }
 
 
-def approved_policy(*, maximum=2):
+def approved_policy(*, current=2, total=2):
     return {
         "schema_version": 1,
         "mode": MEASUREMENT_CANARY,
         "approval_scope": CANARY_SCOPE,
         "approval_id": "APPROVAL:test-canary",
         "approved_at": "2026-09-22T17:00:00Z",
-        "maximum_current_activations": maximum,
+        "approved_packet_ids": ["LMP:a", "LMP:b"][:total],
+        "approved_seed_ids": [
+            "SEED:learn:a",
+            "SEED:learn:b",
+        ][:total],
+        "maximum_current_activations": current,
+        "maximum_total_claims": total,
         "allowed_work_kinds": ["learning_measurement"],
         "explicit_user_approval_required": True,
+    }
+
+
+def claim(
+    seed_id,
+    *,
+    status="COMPLETE",
+    approval_id="APPROVAL:test-canary",
+):
+    return {
+        "claim_id": "CLAIM:" + seed_id[-1] * 12,
+        "runtime_approval_id": approval_id,
+        "routing_mode": "generated",
+        "assignment_work_kind": "learning_measurement",
+        "assignment_source_id": seed_id,
+        "status": status,
     }
 
 
@@ -92,6 +114,7 @@ class RuntimeActivationGateTests(unittest.TestCase):
         self.assertFalse(gate["enabled"])
         self.assertEqual(gate["reason"], "runtime_policy_paused")
         self.assertEqual(gate["maximum_current_activations"], 0)
+        self.assertEqual(gate["maximum_total_claims"], 0)
         self.assertEqual(gate["allowed_seed_ids"], [])
 
     def test_approval_cannot_bypass_blocked_machine_readiness(self):
@@ -106,30 +129,109 @@ class RuntimeActivationGateTests(unittest.TestCase):
             gate["errors"],
         )
 
-    def test_valid_canary_is_bounded_to_current_packet_seeds(self):
+    def test_valid_canary_is_snapshot_bound(self):
         gate = evaluate_runtime_activation_gate(
-            approved_policy(maximum=2),
+            approved_policy(),
             readiness(ready=True),
             packets(),
         )
         self.assertTrue(gate["enabled"])
         self.assertEqual(
-            gate["allowed_work_kinds"],
-            ["learning_measurement"],
+            gate["allowed_seed_ids"],
+            ["SEED:learn:a", "SEED:learn:b"],
         )
         self.assertEqual(
-            gate["allowed_seed_ids"],
+            gate["approved_packet_ids"],
+            ["LMP:a", "LMP:b"],
+        )
+        self.assertEqual(gate["remaining_claim_budget"], 2)
+
+    def test_packet_snapshot_change_requires_new_approval(self):
+        changed = packets()
+        changed["packets"][0]["packet_id"] = "LMP:new-a"
+        gate = evaluate_runtime_activation_gate(
+            approved_policy(),
+            readiness(ready=True),
+            changed,
+        )
+        self.assertFalse(gate["enabled"])
+        self.assertTrue(
+            any(
+                error.startswith("approved_packet_not_current:")
+                for error in gate["errors"]
+            )
+        )
+
+    def test_completed_or_released_claim_consumes_budget(self):
+        for status in ("COMPLETE", "RELEASED", "FAILED_RETRYABLE"):
+            with self.subTest(status=status):
+                gate = evaluate_runtime_activation_gate(
+                    approved_policy(),
+                    readiness(ready=True),
+                    packets(),
+                    [claim("SEED:learn:a", status=status)],
+                )
+                self.assertTrue(gate["enabled"])
+                self.assertEqual(gate["claims_consumed"], 1)
+                self.assertEqual(gate["remaining_claim_budget"], 1)
+                self.assertEqual(
+                    gate["allowed_seed_ids"],
+                    ["SEED:learn:b"],
+                )
+
+    def test_active_claim_consumes_concurrent_capacity(self):
+        gate = evaluate_runtime_activation_gate(
+            approved_policy(current=2, total=2),
+            readiness(ready=True),
+            packets(),
+            [claim("SEED:learn:a", status="RUNNING")],
+        )
+        self.assertTrue(gate["enabled"])
+        self.assertEqual(gate["active_claims"], 1)
+        self.assertEqual(gate["maximum_current_activations"], 1)
+
+    def test_budget_exhaustion_disables_canary(self):
+        gate = evaluate_runtime_activation_gate(
+            approved_policy(),
+            readiness(ready=True),
+            packets(),
             [
-                "SEED:learn:a",
-                "SEED:learn:b",
-                "SEED:learn:c",
+                claim("SEED:learn:a"),
+                claim("SEED:learn:b"),
             ],
         )
-        self.assertEqual(gate["maximum_current_activations"], 2)
+        self.assertFalse(gate["enabled"])
+        self.assertEqual(
+            gate["reason"],
+            "canary_claim_budget_exhausted",
+        )
+        self.assertEqual(gate["claims_consumed"], 2)
+        self.assertEqual(gate["remaining_claim_budget"], 0)
+
+    def test_same_seed_cannot_be_claimed_twice_under_approval(self):
+        gate = evaluate_runtime_activation_gate(
+            approved_policy(),
+            readiness(ready=True),
+            packets(),
+            [
+                claim("SEED:learn:a"),
+                {
+                    **claim("SEED:learn:a"),
+                    "claim_id": "CLAIM:duplicate001",
+                },
+            ],
+        )
+        self.assertFalse(gate["enabled"])
+        self.assertIn(
+            "approved_seed_claimed_more_than_once",
+            gate["errors"],
+        )
 
     def test_capacity_above_three_fails_closed(self):
+        policy = approved_policy()
+        policy["maximum_current_activations"] = 4
         gate = evaluate_runtime_activation_gate(
-            approved_policy(maximum=4),
+            policy,
             readiness(ready=True),
             packets(),
         )
@@ -161,10 +263,13 @@ class RuntimeActivationGateTests(unittest.TestCase):
             gate["errors"],
         )
 
-    def test_paused_policy_cannot_smuggle_approval_or_capacity(self):
+    def test_paused_policy_cannot_smuggle_approval_or_budget(self):
         policy = paused_policy()
         policy["approval_id"] = "APPROVAL:bad"
         policy["maximum_current_activations"] = 1
+        policy["maximum_total_claims"] = 1
+        policy["approved_packet_ids"] = ["LMP:a"]
+        policy["approved_seed_ids"] = ["SEED:learn:a"]
         gate = evaluate_runtime_activation_gate(
             policy,
             readiness(ready=True),
@@ -173,11 +278,19 @@ class RuntimeActivationGateTests(unittest.TestCase):
         self.assertFalse(gate["enabled"])
         self.assertEqual(gate["reason"], "invalid_runtime_policy")
         self.assertIn(
-            "paused_mode_requires_zero_capacity",
+            "paused_mode_requires_zero_current_capacity",
+            gate["errors"],
+        )
+        self.assertIn(
+            "paused_mode_requires_zero_total_claim_budget",
             gate["errors"],
         )
         self.assertIn(
             "paused_mode_forbids_approval_id",
+            gate["errors"],
+        )
+        self.assertIn(
+            "paused_mode_forbids_approved_packet_ids",
             gate["errors"],
         )
 
