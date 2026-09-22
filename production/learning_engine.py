@@ -267,6 +267,19 @@ def observed_search_reward(
         return None
 
     deep = run.get("deep_inspected")
+    if work_action is None:
+        candidate_count = run.get("candidate_count")
+        legacy_search_evidence = (
+            isinstance(candidate_count, int)
+            and candidate_count > 0
+        ) or (
+            isinstance(deep, int)
+            and deep > 0
+        )
+        if not legacy_search_evidence:
+            return None
+
+    deep = run.get("deep_inspected")
     retained = run.get("retained_count")
     promoted = run.get("master_promoted_count")
     if not isinstance(deep, int) or not isinstance(retained, int) or not isinstance(promoted, int):
