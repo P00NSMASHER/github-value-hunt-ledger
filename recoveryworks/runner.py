@@ -24,6 +24,13 @@ def _required_text(name: str, value: Any) -> str:
     return value.strip()
 
 
+def _bool_setting(job: Mapping[str, Any], key: str, *, context: str) -> bool:
+    value = job.get(key, False)
+    if type(value) is not bool:
+        raise ValueError(f"{context}.{key} must be boolean")
+    return value
+
+
 def _jobs(section: Any, *, name: str) -> tuple[Mapping[str, Any], ...]:
     if section is None:
         return ()
@@ -91,7 +98,7 @@ def run_scan360_config(
         )
         payments = load_payments_csv(
             payments_path,
-            verified=bool(job.get("payment_source_verified", False)),
+            verified=_bool_setting(job, "payment_source_verified", context=f"ap[{job_index}]"),
         )
 
         obligations = ()
@@ -102,7 +109,7 @@ def run_scan360_config(
             )
             obligations = load_obligations_csv(
                 obligations_path,
-                verified=bool(job.get("obligation_source_verified", False)),
+                verified=_bool_setting(job, "obligation_source_verified", context=f"ap[{job_index}]"),
                 default_effective_from=_required_text(
                     f"ap[{job_index}].default_effective_from",
                     job.get("default_effective_from"),
@@ -140,12 +147,12 @@ def run_scan360_config(
 
         bills = load_utility_bills_csv(
             bills_path,
-            verified=bool(job.get("bill_source_verified", False)),
+            verified=_bool_setting(job, "bill_source_verified", context=f"utility[{job_index}]"),
         )
         tariffs = load_simple_tariff_definitions_json(
             tariffs_path,
             utility_id=utility_id,
-            verified=bool(job.get("tariff_source_verified", False)),
+            verified=_bool_setting(job, "tariff_source_verified", context=f"utility[{job_index}]"),
             default_effective_from=default_effective_from,
             jurisdiction=job.get("jurisdiction"),
         )
