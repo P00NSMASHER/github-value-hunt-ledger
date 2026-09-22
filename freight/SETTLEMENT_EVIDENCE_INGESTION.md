@@ -56,19 +56,18 @@ For operational processing, settlement and counter CSVs can be passed through th
 
 ## Returned-payment capacity
 
-A counter/return event reduces the original settlement event's allocatable capacity as soon as the return evidence is ingested. The store computes available event capacity from **net settlement funds**:
+A settlement event becomes closed to **new** allocation as soon as any counter/return evidence exists for that event.
 
-`original settlement - observed returns - live allocations`
+Existing allocations may still be reduced through proof-bound reversal edges. New recovery attribution must use new replacement/net remittance evidence rather than reuse the returned event.
 
-where live allocations are gross allocations less applied reversals.
+This conservative rule prevents the same return from being represented twice—for example, first by reducing a payment's apparent net capacity and later by reversing a newly created allocation.
 
-Consequences:
+Additional controls:
 
-- a fully returned payment has zero capacity for later claim allocation, even if no allocation existed when the return arrived;
-- unused gross payment remainder cannot be allocated after that portion of the payment was returned;
-- an applied partial return can free only the amount that still exists in net settlement funds;
 - cumulative counter events cannot exceed the original settlement amount;
-- additive SQLite triggers enforce the same rules for direct SQL and for databases created under an older schema revision;
-- reopening a database fails closed if historical counter rows already exceed their original settlement event.
+- direct SQL allocations are blocked after counter evidence exists;
+- additive SQLite triggers install the returned-event lock on databases created under an older schema revision;
+- reopening verifies all return-capacity guards exist;
+- reopening fails closed if historical counter rows already exceed their original settlement event.
 
-The persistent report's unresolved-counter check remains a downstream defense. This store rule prevents the invalid recovery state from being created in the first place rather than relying on reporting to catch it later.
+The persistent report's unresolved-counter check remains a downstream defense. The store now prevents new attribution from returned events before reporting is reached.
