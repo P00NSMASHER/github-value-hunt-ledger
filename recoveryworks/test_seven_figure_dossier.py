@@ -9,7 +9,10 @@ from recoveryworks import (
     build_seven_figure_authorization_dossier,
     verify_seven_figure_authorization_dossier,
 )
-from recoveryworks.test_seven_figure_readiness import build_readiness_chain
+from recoveryworks.test_seven_figure_readiness import (
+    build_final_authorization_chain,
+    build_readiness_chain,
+)
 
 
 def build_dossier_chain():
@@ -99,35 +102,29 @@ class SevenFigureAuthorizationDossierTests(unittest.TestCase):
         (
             bundle,
             ledger,
+            authorization,
             _packet,
             _retention,
             _completeness,
             _build,
             _public,
-            _signature,
-            _timestamp,
-            _receipts,
             readiness,
             dossier,
-        ) = build_dossier_chain()
-        authorization = authorize_case_action(
-            bundle,
-            authorization_id="SIM-CLIENT-AUTH-DOSSIER-2",
-            client_actor_id="sim-client-cfo",
-            approved_action_type="carrier_overcharge_demand",
-            authorized_at="2026-09-22T16:50:00Z",
-            maximum_amount_cents=100_000_000,
-            note="SIMULATION ONLY. Full dossier verified.",
-        )
+            _build_receipt,
+            _consent,
+            seal,
+        ) = build_final_authorization_chain()
         record = ledger.authorize_with_case(
             bundle.finding.finding_id,
             bundle,
             authorization,
             readiness,
             dossier,
+            seal,
         )
         self.assertEqual(record.readiness_hash, readiness.package_hash)
         self.assertEqual(record.readiness_dossier_hash, dossier.dossier_hash)
+        self.assertEqual(record.authorization_seal_hash, seal.seal_hash)
 
         restored = DurableRecoveryLedger.from_bundle(ledger.export_bundle())
         restored_record = restored.get(bundle.finding.finding_id)
@@ -135,6 +132,7 @@ class SevenFigureAuthorizationDossierTests(unittest.TestCase):
             restored_record.readiness_dossier_hash,
             dossier.dossier_hash,
         )
+        self.assertEqual(restored_record.authorization_seal_hash, seal.seal_hash)
 
     def test_tampered_underlying_retention_fails_even_with_valid_readiness(self):
         (
