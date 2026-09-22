@@ -25,8 +25,17 @@ def main() -> int:
     gate = data.get("policy_gate") or {}
     min_runs = gate.get("minimum_measured_runs")
     min_deep = gate.get("minimum_deep_inspections")
+    min_confirm_runs = gate.get("minimum_confirm_runs")
+    min_confirm_deep = gate.get("minimum_confirm_deep_inspections")
+    min_confirm_mean = gate.get("minimum_confirm_mean_reward")
     if min_runs != 5 or min_deep != 20:
         raise SystemExit("learning policy gates drifted from repository policy")
+    if (
+        min_confirm_runs != 2
+        or min_confirm_deep != 6
+        or min_confirm_mean != 0.0
+    ):
+        raise SystemExit("confirm evidence gates drifted")
 
     records = ((data.get("memory") or {}).get("records") or [])
     for row in records:
@@ -39,15 +48,36 @@ def main() -> int:
             raise SystemExit(f"invalid visits for {row.get('key')}")
         measured_runs = support.get("measured_runs", 0)
         deep_inspections = support.get("deep_inspections", 0)
+        confirm = row.get("confirm_support") or {}
+        confirm_runs = confirm.get("measured_runs", 0)
+        confirm_deep = confirm.get("deep_inspections", 0)
+        confirm_mean = confirm.get("mean_reward", 0.0)
         if (
             not isinstance(measured_runs, int)
             or measured_runs < 0
             or not isinstance(deep_inspections, int)
             or deep_inspections < 0
+            or not isinstance(confirm_runs, int)
+            or confirm_runs < 0
+            or not isinstance(confirm_deep, int)
+            or confirm_deep < 0
+            or not isinstance(confirm_mean, (int, float))
         ):
             raise SystemExit(f"invalid support counts for {row.get('key')}")
-        expected = measured_runs >= min_runs and deep_inspections >= min_deep
-        if row.get("eligible_for_policy_consideration") is not expected:
+        expected_train = measured_runs >= min_runs and deep_inspections >= min_deep
+        expected_confirm = (
+            confirm_runs >= min_confirm_runs
+            and confirm_deep >= min_confirm_deep
+            and confirm_mean >= min_confirm_mean
+        )
+        if row.get("train_evidence_ready") is not expected_train:
+            raise SystemExit(f"train evidence mismatch for {row.get('key')}")
+        if row.get("confirm_evidence_ready") is not expected_confirm:
+            raise SystemExit(f"confirm evidence mismatch for {row.get('key')}")
+        if (
+            row.get("eligible_for_policy_consideration")
+            is not (expected_train and expected_confirm)
+        ):
             raise SystemExit(f"policy eligibility mismatch for {row.get('key')}")
 
     failure_queue = data.get("failure_queue") or {}
