@@ -49,6 +49,14 @@ from .branches.contract_billing_csv import (
     load_invoice_charges_csv,
     load_usage_csv,
 )
+from .branches.cloud import audit_cloud_billing
+from .branches.cloud_csv import load_cloud_meter_csv
+from .branches.merchant_fee import audit_merchant_fees
+from .branches.merchant_fee_csv import (
+    load_merchant_fee_agreements_csv,
+    load_merchant_fee_statements_csv,
+    load_merchant_transaction_summaries_csv,
+)
 from .branches.lease import audit_lease_billing
 from .branches.lease_csv import load_lease_area_csv
 from .branches.saas import audit_saas_billing
@@ -462,6 +470,130 @@ def run_scan360_config(
 
 
 
+
+
+    for job_index, job in enumerate(_jobs(config.get("cloud"), name="cloud")):
+        charges = load_invoice_charges_csv(
+            _resolve(base, job.get("charges_csv"), name=f"cloud[{job_index}].charges_csv"),
+            verified=_bool_setting(
+                job, "charge_source_verified", context=f"cloud[{job_index}]"
+            ),
+        )
+        rates = load_contract_rates_csv(
+            _resolve(base, job.get("rates_csv"), name=f"cloud[{job_index}].rates_csv"),
+            verified=_bool_setting(
+                job, "rate_source_verified", context=f"cloud[{job_index}]"
+            ),
+        )
+        usage_csv = job.get("usage_csv")
+        meter_csv = job.get("meter_csv")
+        if usage_csv and meter_csv:
+            raise ValueError(
+                f"cloud[{job_index}] accepts only one of usage_csv or meter_csv"
+            )
+        usage = ()
+        if usage_csv:
+            usage = load_usage_csv(
+                _resolve(base, usage_csv, name=f"cloud[{job_index}].usage_csv"),
+                verified=_bool_setting(
+                    job, "usage_source_verified", context=f"cloud[{job_index}]"
+                ),
+            )
+        elif meter_csv:
+            usage = load_cloud_meter_csv(
+                _resolve(base, meter_csv, name=f"cloud[{job_index}].meter_csv"),
+                verified=_bool_setting(
+                    job, "meter_source_verified", context=f"cloud[{job_index}]"
+                ),
+            )
+
+        batch = audit_cloud_billing(
+            client_id=client_id,
+            charges=charges,
+            rates=rates,
+            usage=usage,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "cloud",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(
+        _jobs(config.get("merchant_fee"), name="merchant_fee")
+    ):
+        statements = load_merchant_fee_statements_csv(
+            _resolve(
+                base,
+                job.get("statements_csv"),
+                name=f"merchant_fee[{job_index}].statements_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "statement_source_verified",
+                context=f"merchant_fee[{job_index}]",
+            ),
+        )
+        agreements = load_merchant_fee_agreements_csv(
+            _resolve(
+                base,
+                job.get("agreements_csv"),
+                name=f"merchant_fee[{job_index}].agreements_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "agreement_source_verified",
+                context=f"merchant_fee[{job_index}]",
+            ),
+        )
+        transaction_summaries = ()
+        transaction_csv = job.get("transactions_csv")
+        if transaction_csv:
+            transaction_summaries = load_merchant_transaction_summaries_csv(
+                _resolve(
+                    base,
+                    transaction_csv,
+                    name=f"merchant_fee[{job_index}].transactions_csv",
+                ),
+                verified=_bool_setting(
+                    job,
+                    "transaction_source_verified",
+                    context=f"merchant_fee[{job_index}]",
+                ),
+            )
+        batch = audit_merchant_fees(
+            client_id=client_id,
+            statements=statements,
+            agreements=agreements,
+            transaction_summaries=transaction_summaries,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "merchant_fee",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
 
     for job_index, job in enumerate(_jobs(config.get("lease"), name="lease")):
         charges = load_invoice_charges_csv(
