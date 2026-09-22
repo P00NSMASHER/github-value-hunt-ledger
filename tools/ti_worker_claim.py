@@ -101,7 +101,8 @@ def main():
       "presence_generation_id":packet.get("presence_generation_id"),
       "presence_event_id":packet.get("presence_event_id"),
       "activation_id":packet.get("activation_id"),
-      "activation_generation_id":packet.get("activation_generation_id")
+      "activation_generation_id":packet.get("activation_generation_id"),
+      "runtime_approval_id":packet.get("runtime_approval_id")
     }
     path=INTEL/"execution_events"/f"{packet['slot_id']}.jsonl"
     with path.open("a",encoding="utf-8") as f:
