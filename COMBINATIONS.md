@@ -214,6 +214,14 @@ Hash integrity and dedupe are both necessary but neither proves the aggregation 
 
 
 ## AP Recovery v2 — Supplier Credit Recovery -> realized cash/credit -> rebate/deduction assurance
+
+- Newly strengthened realization/intake layer (2026-09-22):
+  - `lineledger/lineledger@40607d92c7e7a418178ce27d3e679538110100f2`: GL-grounded vendor-credit posting and bill reconciliation that closes only ledger-supported balances and reopens them when the supporting credit is voided; strong no-double-count recovery-accounting donor.
+  - `netc-fleet-services/statement-reconciliation@d06d500b0cc010350ace2293f3b4f28dd6f68ddb`: 23 vendor-specific PDF parsers + QuickBooks loader + parser control-total verification + exact/fuzzy reconciliation; use for statement normalization, not source-document redistribution.
+  - `rehman671/vendor-reconciliation-engine@1ae859c938533f4f3e79fd8eef5d6e2ed45fd625`: fail-closed reconciliation-to-settlement gate; unresolved exception, low-confidence match or control-total mismatch => no settlement artifact.
+  - `conductor-is/quickbooks-desktop-node@a8024fd028ca1103c190684868456efc8d842940` / Python sibling: optional QuickBooks Desktop read connector after paid recurring need; hosted-service terms remain separate.
+- Stronger canonical flow: supplier statement/raw ERP evidence -> parser control-total verification -> exact/normalized reconciliation -> explicit exceptions -> independent AP re-performance -> human-confirmed entitlement -> GL/vendor-credit or refund evidence -> document-level allocation/reconciliation -> fail-closed realized-recovery gate -> reversible recovery certificate.
+- Added invariant: **GL credit is necessary but not sufficient for a document-level realized claim; document allocation/reconciliation must be bounded by the independently observed GL/vendor balance, and void/reversal must unwind realized recovery.**
 - Product position: **independent supplier-credit recovery and realization control**, not generic OCR, not a replacement ERP, and not a claim that every exception is owed money.
 - Components:
   - Discovery/control engine: `leagames0221-sys/invoice-lens@4a9ce4123f8eba3308c2d414f449be68b7fbc05e` for deterministic duplicates, three-way mismatch, approval/fraud signals and append-only evidence.
