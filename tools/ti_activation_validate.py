@@ -28,6 +28,10 @@ for n,x in enumerate(PACK,1):
         raise SystemExit(f"activation_claim_packets.jsonl:{n}: presence binding drift")
     if int(x.get("claim_schema_version") or 0)<int(POL.get("minimum_claim_schema_version",16)):
         raise SystemExit(f"activation_claim_packets.jsonl:{n}: claim schema below V16 minimum")
+    if x.get("assignment_work_kind")=="learning_measurement":
+        for key in ("learning_measurement_packet_id","learning_measurement_packet_sha256"):
+            if not x.get(key):
+                raise SystemExit(f"activation_claim_packets.jsonl:{n}: learning measurement missing {key}")
 hist={x.get("activation_id"):x for x in HIST}
 if len(hist)!=len(HIST): raise SystemExit("activation history duplicate IDs")
 for x in PACK:
