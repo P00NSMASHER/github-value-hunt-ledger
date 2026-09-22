@@ -12,14 +12,17 @@
   "guardrails": [
     "Paused mode must produce zero generated activation claim packets.",
     "Measurement-canary mode requires all current machine restart gates to pass.",
+    "Measurement-canary approval must match one hashed approval-history record exactly.",
     "Measurement-canary approval is bound to exact current packet IDs and seed IDs; later packet changes require new approval.",
     "Each generated claim permanently consumes one unit of the approval's total claim budget, even if later released or failed.",
     "One approved seed may be claimed at most once per approval ID.",
+    "Issued activation packets are bound to approval ID and approval-record hash; worker claim rechecks current policy before use.",
     "Approval never selects, predicts, retries, releases, or substitutes work based on train/confirm partition membership.",
     "At most three total claims and three concurrent activation offers may be authorized.",
     "Changing this policy requires a separate explicit user instruction; generated reports cannot self-authorize activation."
   ],
   "approved_packet_ids": [],
   "approved_seed_ids": [],
-  "maximum_total_claims": 0
+  "maximum_total_claims": 0,
+  "approval_record_sha256": null
 }

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from collections import Counter
+import hashlib
+import json
 from typing import Any, Mapping, Sequence
 
 
@@ -9,6 +11,64 @@ MEASUREMENT_CANARY = "measurement_canary"
 CANARY_SCOPE = "learning_measurement_canary"
 ALLOWED_WORK_KIND = "learning_measurement"
 ACTIVE_CLAIM_STATES = {"CLAIMED", "RUNNING"}
+APPROVAL_RECORD_FIELDS = (
+    "schema_version",
+    "approval_id",
+    "approval_scope",
+    "approved_at",
+    "approved_packet_ids",
+    "approved_seed_ids",
+    "maximum_current_activations",
+    "maximum_total_claims",
+    "allowed_work_kinds",
+)
+
+
+def approval_record_sha256(record: Mapping[str, Any]) -> str:
+    body = {
+        field: record.get(field)
+        for field in APPROVAL_RECORD_FIELDS
+    }
+    raw = json.dumps(
+        body,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
+def _approval_history_index(
+    rows: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, Mapping[str, Any]], list[str]]:
+    by_id: dict[str, Mapping[str, Any]] = {}
+    errors: list[str] = []
+    for index, row in enumerate(rows, 1):
+        if row.get("schema_version") != 1:
+            errors.append(
+                f"approval_history_schema_invalid:{index}"
+            )
+        approval_id = row.get("approval_id")
+        if not isinstance(approval_id, str) or not approval_id.startswith(
+            "APPROVAL:"
+        ):
+            errors.append(
+                f"approval_history_id_invalid:{index}"
+            )
+            continue
+        if approval_id in by_id:
+            errors.append(
+                f"approval_history_duplicate_id:{approval_id}"
+            )
+            continue
+        supplied = row.get("approval_sha256")
+        expected = approval_record_sha256(row)
+        if supplied != expected:
+            errors.append(
+                f"approval_history_hash_mismatch:{approval_id}"
+            )
+        by_id[approval_id] = row
+    return by_id, errors
 
 
 def _blocked(
@@ -17,6 +77,7 @@ def _blocked(
     reason: str,
     errors: Sequence[str],
     approval_id: Any = None,
+    approval_record_sha256_value: Any = None,
 ) -> dict[str, Any]:
     return {
         "enabled": False,
@@ -24,6 +85,7 @@ def _blocked(
         "reason": reason,
         "errors": list(errors),
         "approval_id": approval_id,
+        "approval_record_sha256": approval_record_sha256_value,
         "maximum_current_activations": 0,
         "maximum_total_claims": 0,
         "claims_consumed": 0,
@@ -42,6 +104,7 @@ def evaluate_runtime_activation_gate(
     readiness: Mapping[str, Any],
     packets: Mapping[str, Any],
     claims: Sequence[Mapping[str, Any]] = (),
+    approval_history: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     errors: list[str] = []
     if policy.get("schema_version") != 1:
@@ -52,6 +115,11 @@ def evaluate_runtime_activation_gate(
     mode = policy.get("mode")
     if mode not in {PAUSED, MEASUREMENT_CANARY}:
         errors.append("invalid_runtime_mode")
+
+    approval_by_id, approval_history_errors = (
+        _approval_history_index(approval_history)
+    )
+    errors.extend(approval_history_errors)
 
     packet_rows = [
         row
@@ -84,7 +152,12 @@ def evaluate_runtime_activation_gate(
         if policy.get("approved_seed_ids") is not None:
             if list(policy.get("approved_seed_ids") or []):
                 errors.append("paused_mode_forbids_approved_seed_ids")
-        for field in ("approval_scope", "approval_id", "approved_at"):
+        for field in (
+            "approval_scope",
+            "approval_id",
+            "approved_at",
+            "approval_record_sha256",
+        ):
             if policy.get(field) not in {None, ""}:
                 errors.append(f"paused_mode_forbids_{field}")
         return _blocked(
@@ -107,6 +180,40 @@ def evaluate_runtime_activation_gate(
     approved_at = policy.get("approved_at")
     if not isinstance(approved_at, str) or not approved_at:
         errors.append("measurement_canary_approved_at_required")
+
+    policy_record_sha = policy.get("approval_record_sha256")
+    if (
+        not isinstance(policy_record_sha, str)
+        or len(policy_record_sha) != 64
+        or any(ch not in "0123456789abcdef" for ch in policy_record_sha)
+    ):
+        errors.append("approval_record_sha256_required")
+        policy_record_sha = None
+
+    approval_record = (
+        approval_by_id.get(approval_id)
+        if isinstance(approval_id, str)
+        else None
+    )
+    if approval_record is None:
+        errors.append("approval_history_record_required")
+    else:
+        record_sha = approval_record.get("approval_sha256")
+        if policy_record_sha != record_sha:
+            errors.append("approval_policy_record_hash_mismatch")
+        for field in (
+            "approval_scope",
+            "approved_at",
+            "approved_packet_ids",
+            "approved_seed_ids",
+            "maximum_current_activations",
+            "maximum_total_claims",
+            "allowed_work_kinds",
+        ):
+            if policy.get(field) != approval_record.get(field):
+                errors.append(
+                    f"approval_policy_record_mismatch:{field}"
+                )
 
     allowed_kinds = policy.get("allowed_work_kinds")
     if allowed_kinds != [ALLOWED_WORK_KIND]:
@@ -192,6 +299,7 @@ def evaluate_runtime_activation_gate(
             reason="runtime_gate_blocked",
             errors=sorted(set(errors)),
             approval_id=approval_id,
+            approval_record_sha256_value=policy_record_sha,
         )
 
     consumed = len(approval_claims)
@@ -214,6 +322,7 @@ def evaluate_runtime_activation_gate(
                 reason="canary_claim_budget_exhausted",
                 errors=[],
                 approval_id=approval_id,
+                approval_record_sha256_value=policy_record_sha,
             ),
             "maximum_total_claims": maximum_total,
             "claims_consumed": consumed,
@@ -241,6 +350,7 @@ def evaluate_runtime_activation_gate(
         ),
         "errors": [],
         "approval_id": approval_id,
+        "approval_record_sha256": policy_record_sha,
         "maximum_current_activations": current_capacity,
         "maximum_total_claims": maximum_total,
         "claims_consumed": consumed,

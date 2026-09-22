@@ -19,6 +19,17 @@ def parse_ts(value):
 def short_hash(text):
     return hashlib.sha256(text.encode()).hexdigest()[:12]
 
+def runtime_approval_errors(packet, runtime_policy):
+    errors=[]
+    if runtime_policy.get("mode")!="measurement_canary":
+        errors.append("runtime_policy_not_measurement_canary")
+    if packet.get("runtime_approval_id")!=runtime_policy.get("approval_id"):
+        errors.append("runtime_approval_id_stale")
+    if packet.get("runtime_approval_record_sha256")!=runtime_policy.get("approval_record_sha256"):
+        errors.append("runtime_approval_record_hash_stale")
+    return errors
+
+
 def choose_packet(worker,steal=False,dispatch_ticket=None,activation_id=None):
     pool=load_jsonl("activation_claim_packets.jsonl") if (INTEL/"activation_claim_packets.jsonl").exists() else []
     matches=[x for x in pool if x.get("worker_id")==worker]
@@ -55,6 +66,13 @@ def main():
     if not state:
         raise SystemExit(f"unknown slot {packet['slot_id']}")
     policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
+    runtime_policy=json.loads((INTEL/"hunter_runtime_policy.json").read_text(encoding="utf-8"))
+    runtime_errors=runtime_approval_errors(packet,runtime_policy)
+    if runtime_errors:
+        raise SystemExit(
+            "activation packet is not authorized by current runtime policy: "
+            + "; ".join(runtime_errors)
+        )
     if state["status"] not in set(policy.get("claimable_states") or []):
         raise SystemExit(f"dispatch slot is no longer claimable: {state['status']}")
 
@@ -102,7 +120,8 @@ def main():
       "presence_event_id":packet.get("presence_event_id"),
       "activation_id":packet.get("activation_id"),
       "activation_generation_id":packet.get("activation_generation_id"),
-      "runtime_approval_id":packet.get("runtime_approval_id")
+      "runtime_approval_id":packet.get("runtime_approval_id"),
+      "runtime_approval_record_sha256":packet.get("runtime_approval_record_sha256")
     }
     path=INTEL/"execution_events"/f"{packet['slot_id']}.jsonl"
     with path.open("a",encoding="utf-8") as f:
