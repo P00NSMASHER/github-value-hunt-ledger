@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "exploration_generation_id": "ROUTEEXP:482ab856806d",
-  "routing_generation_id": "ROUTING:b29ec4c0993b",
+  "exploration_generation_id": "ROUTEEXP:20c3ce3c1af1",
+  "routing_generation_id": "ROUTING:072fe37e1d61",
   "applied": true,
-  "pair_id": "EXPPAIR:7ea88e65db5c",
+  "pair_id": "EXPPAIR:4807c9e5fcea",
   "candidate_count": 1,
   "absolute_regret": 0.0,
   "relative_regret": 0.0,
-  "history_generations": 37,
-  "history_applied_swaps": 13
+  "history_generations": 38,
+  "history_applied_swaps": 14
 }
