@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from recoveryworks.models import Branch, RecoveryMode
 from recoveryworks.policies import policy_for
+from recoveryworks.branches.standard import ADAPTERS, adapter_for
 
 
 @dataclass(frozen=True)
@@ -75,3 +76,8 @@ BRANCHES: dict[Branch, BranchSpec] = {
 
 def all_specs() -> tuple[BranchSpec, ...]:
     return tuple(BRANCHES[key] for key in Branch)
+
+
+def normalize(branch: Branch, item):
+    """Normalize one branch-engine output into the common RecoveryObservation."""
+    return adapter_for(branch).normalize(item)
