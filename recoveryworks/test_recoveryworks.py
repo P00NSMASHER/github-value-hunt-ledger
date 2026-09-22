@@ -10,6 +10,9 @@ from recoveryworks import (
     RecoveryLedger,
     RecoveryObservation,
     RuleRef,
+    SourceManifestEntry,
+    freeze_scan,
+    run_scan,
 )
 from recoveryworks.branches.freight import from_freight_finding
 from recoveryworks.branches.registry import BRANCHES
@@ -123,6 +126,34 @@ class RecoveryWorksTests(unittest.TestCase):
         self.assertIs(finding.state, FindingState.VALIDATED)
         downgraded = RecoveryEngine().evaluate(from_freight_finding(f, None))
         self.assertIs(downgraded.state, FindingState.REVIEW)
+
+    def test_recovery_scan_360_freezes_scope_and_batch(self):
+        manifest = freeze_scan(
+            scan_id="scan-1",
+            client_id="c",
+            branches=(Branch.FREIGHT, Branch.AP),
+            selection_rule="all records in supplied historical period",
+            sources=(
+                SourceManifestEntry("s1", Branch.FREIGHT, "h1", "file://freight.csv", "invoice_export"),
+                SourceManifestEntry("s2", Branch.AP, "h2", "file://payments.csv", "payment_export"),
+            ),
+        )
+        observation = RecoveryObservation(
+            branch=Branch.AP, client_id="c", counterparty_id="vendor",
+            reference="inv-1", currency="USD", expected_cents=10000,
+            actual_cents=12000, rule=rule(), evidence=(evidence(),),
+            reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+        )
+        first = run_scan(manifest, (observation,))
+        second = run_scan(manifest, (observation,))
+        self.assertEqual(first.batch_hash, second.batch_hash)
+        self.assertEqual(len(first.findings), 1)
+        with self.assertRaises(ValueError):
+            run_scan(manifest, (RecoveryObservation(
+                branch=Branch.UTILITY, client_id="c", counterparty_id="u",
+                reference="b", currency="USD", expected_cents=1, actual_cents=2,
+                rule=rule(), evidence=(evidence(),), reason="x", confidence_basis="x",
+            ),))
 
 
 if __name__ == "__main__":
