@@ -89,6 +89,7 @@ def _packet_errors(packet: Mapping[str, Any]) -> list[str]:
     for name in (
         "mutator_saw_promotion_test",
         "evaluator_modified",
+        "controller_modified",
         "sealed_holdout_opened_by_mutator",
         "provenance_complete",
         "sensitive_material_involved",
@@ -101,6 +102,8 @@ def _packet_errors(packet: Mapping[str, Any]) -> list[str]:
         errors.append("promotion_test_leakage_to_mutator")
     if packet.get("evaluator_modified") is True:
         errors.append("evaluator_mutation_blocked")
+    if packet.get("controller_modified") is True:
+        errors.append("controller_mutation_blocked")
     if packet.get("sealed_holdout_opened_by_mutator") is True:
         errors.append("sealed_holdout_contamination")
     if packet.get("sensitive_material_involved") is True:
@@ -126,8 +129,26 @@ def _packet_errors(packet: Mapping[str, Any]) -> list[str]:
         if not _finite_score(packet.get(name)):
             errors.append(f"{name}_normalized_score_required")
 
+    if not packet.get("mutator_identity"):
+        errors.append("mutator_identity_required")
     if not packet.get("evaluator_identity"):
         errors.append("evaluator_identity_required")
+    if (
+        packet.get("mutator_identity")
+        and packet.get("evaluator_identity")
+        and packet.get("mutator_identity") == packet.get("evaluator_identity")
+    ):
+        errors.append("evaluator_must_be_independent_of_mutator")
+
+    empty_sha = hashlib.sha256(b"").hexdigest()
+    for name in (
+        "mutate_dev_set_sha256",
+        "promotion_test_set_sha256",
+        "evaluation_manifest_sha256",
+    ):
+        if packet.get(name) == empty_sha:
+            errors.append(f"{name}_cannot_be_empty_hash")
+
     if not packet.get("evaluation_evidence_refs"):
         errors.append("evaluation_evidence_required")
     return errors
@@ -292,6 +313,7 @@ def build_skill_eval_result_intake(
             "evaluation_manifest_sha256": packet.get(
                 "evaluation_manifest_sha256"
             ),
+            "mutator_identity": packet.get("mutator_identity"),
             "evaluator_identity": packet.get("evaluator_identity"),
             "evaluation_evidence_refs": list(
                 packet.get("evaluation_evidence_refs") or []
