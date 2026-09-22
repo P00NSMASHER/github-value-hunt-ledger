@@ -223,6 +223,63 @@ class TrainingEnvironmentTests(unittest.TestCase):
             "excluded",
         )
 
+    def test_boolean_and_nonfinite_run_telemetry_is_excluded(self):
+        boolean_count = search_run("RUN:boolean-count")
+        boolean_count["deep_inspected"] = True
+        self.assertIn(
+            "invalid_deep_inspected",
+            telemetry_consistency_errors(boolean_count),
+        )
+        self.assertEqual(
+            test_split_for_run(boolean_count),
+            "excluded",
+        )
+
+        nonfinite_elapsed = search_run("RUN:infinite-elapsed")
+        nonfinite_elapsed["elapsed_minutes"] = float("inf")
+        self.assertIn(
+            "invalid_elapsed_minutes",
+            telemetry_consistency_errors(nonfinite_elapsed),
+        )
+        self.assertEqual(
+            test_split_for_run(nonfinite_elapsed),
+            "excluded",
+        )
+
+    def test_boolean_and_nonfinite_economic_values_are_not_outcomes(self):
+        boolean_value = outcome(["RUN:1"], revenue=True)
+        self.assertIsNone(outcome_signal(boolean_value))
+
+        infinite_value = outcome(["RUN:1"], revenue=float("inf"))
+        self.assertIsNone(outcome_signal(infinite_value))
+
+        invalid_engineering = outcome(["RUN:1"])
+        invalid_engineering["engineering_days_saved_low"] = True
+        invalid_engineering["engineering_days_saved_high"] = 2
+        self.assertIsNone(outcome_signal(invalid_engineering))
+
+    def test_duplicate_learning_identities_fail_closed(self):
+        duplicate_run = search_run("RUN:duplicate")
+        with self.assertRaisesRegex(
+            ValueError,
+            "duplicate search run",
+        ):
+            test_build_outcome_credit(
+                [duplicate_run, dict(duplicate_run)],
+                [],
+            )
+
+        first = outcome(["RUN:duplicate"])
+        second = dict(first)
+        with self.assertRaisesRegex(
+            ValueError,
+            "duplicate outcome",
+        ):
+            test_build_outcome_credit(
+                [duplicate_run],
+                [first, second],
+            )
+
     def test_pending_partition_blocks_direct_outcome_credit(self):
         run = search_run("RUN:pending-credit")
         edges, excluded = build_outcome_credit(
