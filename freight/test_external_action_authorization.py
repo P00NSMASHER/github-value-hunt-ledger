@@ -1,10 +1,11 @@
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 import pytest
 
 from freight.contracts import (
     AuthorityRef,
+    canonical_hash,
     PopulationRow,
     freeze_population,
     freeze_truth,
@@ -182,6 +183,20 @@ def auth(**overrides):
     return issue_authorization(**kwargs)
 
 
+def rehash_authorization(value, **changes):
+    candidate = replace(value, **changes)
+    body = asdict(candidate)
+    body.pop("authorization_hash")
+    return replace(candidate, authorization_hash=canonical_hash(body))
+
+
+def rehash_revocation(value, **changes):
+    candidate = replace(value, **changes)
+    body = asdict(candidate)
+    body.pop("revocation_hash")
+    return replace(candidate, revocation_hash=canonical_hash(body))
+
+
 def test_confirmed_validated_findings_can_be_narrowly_authorized():
     a = auth()
     assert a.authorized_cents == 3000
@@ -200,8 +215,6 @@ def test_prelaunch_engagement_cannot_issue_external_action():
     c["charter_state"] = "PRELAUNCH_ACCEPTED"
     c["customer_data_authorized"] = False
     body = {k: v for k, v in c.items() if k != "charter_hash"}
-    from freight.contracts import canonical_hash
-
     c["charter_hash"] = canonical_hash(body)
     resolution = resolve_engagement(c)
     truth, reviews = proof()
@@ -386,6 +399,128 @@ def test_tampered_authorization_is_rejected():
     object.__setattr__(a, "authorized_cents", 999999)
     with pytest.raises(ValueError, match="authorization hash mismatch"):
         evaluate_authorization(a, as_of_date="2026-09-22")
+
+
+def test_rehashed_authorization_cannot_extend_validity_window():
+    a = auth()
+    forged = rehash_authorization(a, expires_on="2027-09-30")
+    with pytest.raises(ValueError, match="validity exceeds"):
+        evaluate_authorization(forged, as_of_date="2026-09-22")
+
+
+def test_rehashed_authorization_rejects_invalid_action_and_nonpositive_amount():
+    a = auth()
+    with pytest.raises(ValueError, match="invalid authorization action_type"):
+        evaluate_authorization(
+            rehash_authorization(a, action_type="NOT-ACTION"),
+            as_of_date="2026-09-22",
+        )
+    with pytest.raises(ValueError, match="authorized_cents"):
+        evaluate_authorization(
+            rehash_authorization(a, authorized_cents=0),
+            as_of_date="2026-09-22",
+        )
+    with pytest.raises(ValueError, match="authorized_cents"):
+        evaluate_authorization(
+            rehash_authorization(a, authorized_cents=True),
+            as_of_date="2026-09-22",
+        )
+
+
+def test_rehashed_authorization_rejects_malformed_or_misaligned_proof_sets():
+    a = auth()
+    with pytest.raises(ValueError, match="recipient_reference_hash"):
+        evaluate_authorization(
+            rehash_authorization(a, recipient_reference_hash="not-a-hash"),
+            as_of_date="2026-09-22",
+        )
+    with pytest.raises(ValueError, match="cardinality"):
+        evaluate_authorization(
+            rehash_authorization(
+                a,
+                finding_proof_hashes=a.finding_proof_hashes[:1],
+            ),
+            as_of_date="2026-09-22",
+        )
+    with pytest.raises(ValueError, match="sorted"):
+        evaluate_authorization(
+            rehash_authorization(
+                a,
+                finding_ids=("F-2", "F-1"),
+            ),
+            as_of_date="2026-09-22",
+        )
+    with pytest.raises(ValueError, match="duplicate finding_id"):
+        evaluate_authorization(
+            rehash_authorization(
+                a,
+                finding_ids=("F-1", "F-1"),
+                finding_proof_hashes=(
+                    a.finding_proof_hashes[0],
+                    a.finding_proof_hashes[0],
+                ),
+                finding_review_hashes=(
+                    a.finding_review_hashes[0],
+                    a.finding_review_hashes[0],
+                ),
+            ),
+            as_of_date="2026-09-22",
+        )
+
+
+def test_rehashed_authorization_cannot_reverse_issue_expiry_chronology():
+    a = auth()
+    forged = rehash_authorization(
+        a,
+        issued_on="2026-09-30",
+        expires_on="2026-09-21",
+    )
+    with pytest.raises(ValueError, match="cannot precede"):
+        evaluate_authorization(forged, as_of_date="2026-09-22")
+
+
+def test_rehashed_revocation_cannot_predate_authorization_or_blank_reason():
+    a = auth()
+    valid = revoke_authorization(
+        a,
+        revocation_id="REV-SEMANTIC",
+        revoked_on="2026-09-23",
+        approver_role=a.approver_role,
+        reason="Buyer withdrew approval",
+    )
+    with pytest.raises(ValueError, match="cannot precede issued_on"):
+        evaluate_authorization(
+            a,
+            as_of_date="2026-09-22",
+            revocations=(
+                rehash_revocation(valid, revoked_on="2026-09-20"),
+            ),
+        )
+    with pytest.raises(ValueError, match="reason is required"):
+        evaluate_authorization(
+            a,
+            as_of_date="2026-09-23",
+            revocations=(
+                rehash_revocation(valid, reason=""),
+            ),
+        )
+
+
+def test_requested_cents_rejects_boolean_even_though_bool_is_int_subclass():
+    a = auth()
+    with pytest.raises(ValueError, match="positive integer cents"):
+        assert_action_allowed(
+            a,
+            as_of_date="2026-09-22",
+            action_type=ActionType.SUBMIT_DISPUTE,
+            target_carrier_id="carrier-1",
+            target_customer_id="CUST-1",
+            recipient_reference_hash="4" * 64,
+            action_payload_hash="5" * 64,
+            finding_ids=("F-1", "F-2"),
+            currency="USD",
+            requested_cents=True,
+        )
 
 
 def test_unbound_confirmed_review_cannot_authorize_external_action():

@@ -103,3 +103,25 @@ The preferred upstream path now generates a canonical carrier-action payload fro
 ## Authorization is not execution
 
 An ACTIVE authorization only establishes the allowed scope. Carrier Action Execution Proof separately records a pre-send intent and external execution evidence. No authorization object is treated as evidence that a carrier action was submitted or delivered.
+
+
+## Persisted/imported authorization verification
+
+Authorization and revocation hashes are integrity checks, not a substitute for re-validating the authorization semantics.
+
+Before an authorization is evaluated or used downstream, verification independently rechecks:
+
+- allowed `ActionType`;
+- non-empty buyer/engagement/target/currency/approver fields;
+- SHA-256 shape for resolution, Charter, recipient, payload, finding-proof and buyer-review proofs;
+- a non-empty, sorted, unique finding set;
+- one finding proof and one buyer-review proof for every finding ID;
+- exact positive integer cents (booleans are not accepted as integers);
+- issue/expiry chronology;
+- the same 30-day internal validity ceiling used at issuance;
+- every explicitly forbidden capability remains exactly `false`;
+- the complete authorization hash after those semantic checks.
+
+Revocation verification likewise rechecks required fields, authorization/revocation proof hashes, approver binding, and that a revocation cannot predate the authorization's issue date.
+
+This prevents a self-consistent object from becoming acceptable merely because someone recomputed its hash after changing a business-critical field. These deterministic hashes still do not function as digital signatures; source authenticity remains a deployment/access-control concern.

@@ -284,7 +284,7 @@ def issue_authorization(
         proof_hashes.append(finding.proof_hash)
         validated_total += finding.validated_cents
 
-    if not isinstance(authorized_cents, int) or authorized_cents <= 0:
+    if type(authorized_cents) is not int or authorized_cents <= 0:
         raise ValueError("authorized_cents must be a positive integer")
     if authorized_cents > validated_total:
         raise ValueError("authorized_cents cannot exceed selected validated findings")
@@ -356,11 +356,76 @@ def issue_authorization(
 
 
 def _verify_authorization(auth: ExternalActionAuthorization) -> None:
-    body = asdict(auth)
-    digest = body.pop("authorization_hash")
-    _sha("authorization_hash", digest)
-    if canonical_hash(body) != digest:
-        raise ValueError("authorization hash mismatch")
+    if not isinstance(auth, ExternalActionAuthorization):
+        raise ValueError("authorization must be ExternalActionAuthorization")
+
+    for name in (
+        "authorization_id",
+        "engagement_id",
+        "buyer_id",
+        "business_unit",
+        "target_carrier_id",
+        "target_customer_id",
+        "currency",
+        "approver_role",
+    ):
+        _required(name, getattr(auth, name))
+
+    for name in (
+        "engagement_resolution_hash",
+        "operative_charter_hash",
+        "recipient_reference_hash",
+        "action_payload_hash",
+        "authorization_hash",
+    ):
+        _sha(name, getattr(auth, name))
+
+    try:
+        ActionType(auth.action_type)
+    except ValueError as exc:
+        raise ValueError("invalid authorization action_type") from exc
+
+    if not isinstance(auth.finding_ids, tuple) or not auth.finding_ids:
+        raise ValueError("authorization requires a non-empty finding_ids tuple")
+    finding_ids = tuple(_required("finding_id", value) for value in auth.finding_ids)
+    if finding_ids != tuple(sorted(finding_ids)):
+        raise ValueError("authorization finding_ids must be sorted")
+    if len(finding_ids) != len(set(finding_ids)):
+        raise ValueError("duplicate finding_id in authorization")
+
+    if not isinstance(auth.finding_proof_hashes, tuple):
+        raise ValueError("finding_proof_hashes must be a tuple")
+    if not isinstance(auth.finding_review_hashes, tuple):
+        raise ValueError("finding_review_hashes must be a tuple")
+    if not (
+        len(auth.finding_ids)
+        == len(auth.finding_proof_hashes)
+        == len(auth.finding_review_hashes)
+    ):
+        raise ValueError("authorization finding proof cardinality mismatch")
+    proof_hashes = tuple(
+        _sha("finding_proof_hash", value)
+        for value in auth.finding_proof_hashes
+    )
+    review_hashes = tuple(
+        _sha("finding_review_hash", value)
+        for value in auth.finding_review_hashes
+    )
+    if len(proof_hashes) != len(set(proof_hashes)):
+        raise ValueError("duplicate finding proof hash in authorization")
+    if len(review_hashes) != len(set(review_hashes)):
+        raise ValueError("duplicate finding review hash in authorization")
+
+    if type(auth.authorized_cents) is not int or auth.authorized_cents <= 0:
+        raise ValueError("authorized_cents must be a positive integer")
+
+    issued = _parse_date("issued_on", auth.issued_on)
+    expires = _parse_date("expires_on", auth.expires_on)
+    if expires < issued:
+        raise ValueError("expires_on cannot precede issued_on")
+    if (expires - issued).days > MAX_VALIDITY_DAYS:
+        raise ValueError("authorization validity exceeds internal maximum")
+
     for field in (
         "money_movement_authorized",
         "settlement_acceptance_authorized",
@@ -371,6 +436,11 @@ def _verify_authorization(auth: ExternalActionAuthorization) -> None:
     ):
         if getattr(auth, field) is not False:
             raise ValueError(field + " must remain false")
+
+    body = asdict(auth)
+    digest = body.pop("authorization_hash")
+    if canonical_hash(body) != digest:
+        raise ValueError("authorization hash mismatch")
 
 
 def revoke_authorization(
@@ -410,10 +480,26 @@ def revoke_authorization(
     )
 
 
-def _verify_revocation(auth: ExternalActionAuthorization, revocation: AuthorizationRevocation) -> None:
+def _verify_revocation(
+    auth: ExternalActionAuthorization,
+    revocation: AuthorizationRevocation,
+) -> None:
+    if not isinstance(revocation, AuthorizationRevocation):
+        raise ValueError("revocation must be AuthorizationRevocation")
+    _required("revocation_id", revocation.revocation_id)
+    _required("authorization_id", revocation.authorization_id)
+    _required("approver_role", revocation.approver_role)
+    _required("reason", revocation.reason)
+    _sha("authorization_hash", revocation.authorization_hash)
+    _sha("revocation_hash", revocation.revocation_hash)
+
+    revoked = _parse_date("revoked_on", revocation.revoked_on)
+    issued = _parse_date("issued_on", auth.issued_on)
+    if revoked < issued:
+        raise ValueError("revoked_on cannot precede issued_on")
+
     body = asdict(revocation)
     digest = body.pop("revocation_hash")
-    _sha("revocation_hash", digest)
     if canonical_hash(body) != digest:
         raise ValueError("revocation hash mismatch")
     if revocation.authorization_id != auth.authorization_id:
@@ -497,8 +583,8 @@ def assert_action_allowed(
         raise ValueError("finding set exceeds authorization")
     if currency != auth.currency:
         raise ValueError("currency exceeds authorization")
-    if not isinstance(requested_cents, int) or requested_cents <= 0:
-        raise ValueError("requested_cents must be positive")
+    if type(requested_cents) is not int or requested_cents <= 0:
+        raise ValueError("requested_cents must be positive integer cents")
     if requested_cents > auth.authorized_cents:
         raise ValueError("requested amount exceeds authorization")
 

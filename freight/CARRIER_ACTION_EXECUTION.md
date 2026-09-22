@@ -55,7 +55,7 @@ Before recording a receipt, the product:
 6. validates the external evidence hashes;
 7. derives submitted/delivered booleans from the outcome rather than trusting caller booleans.
 
-Receipts are self-verifying. Execution history rejects multiple successful submitted/delivered receipts sharing one idempotency key.
+Receipts are semantically self-verifying, not merely hash-checked. Verification independently rechecks canonical UTC chronology, action/channel enums, exact positive cents, sorted unique finding IDs, external-evidence provenance, and recomputes the stable execution/idempotency key from the receipt's own buyer/business-unit/action/target/finding/amount fields. Execution history rejects multiple successful submitted/delivered receipts sharing one idempotency key.
 
 Multiple FAILED attempt receipts may exist for the same idempotency key because no action was submitted.
 
@@ -85,12 +85,20 @@ Some channels can prove submission before they can prove delivery. A SUBMITTED e
 The delivery confirmation:
 
 - references the exact execution key and submitted execution-receipt hash;
+- preserves the submission evidence-source hash so standalone verification can prove delivery evidence is new rather than reused submission evidence;
 - must occur at or after the submission timestamp;
 - carries a delivery reference hash and new external delivery-evidence hash;
 - rejects reuse of the authorization/proposal/payload/submission evidence as delivery evidence;
-- is self-verifying and tenant scoped;
+- uses the version-2 delivery-receipt proof body and is semantically self-verifying and tenant scoped;
 - permits at most one delivery confirmation per execution key/submitted receipt in a validated history.
 
 A FAILED execution cannot receive delivery confirmation. An execution receipt that already recorded DELIVERED does not get a second delivery receipt.
 
 Delivery confirmation still does not prove settlement, credit issuance, cash receipt, recovery or realized savings.
+
+
+## Verification trust boundary
+
+Receipt hashes are deterministic integrity checks, not digital signatures. Semantic verification proves that one receipt is internally coherent: chronology, idempotency key, amount, action type, finding set, outcome flags and evidence-provenance relationships all agree with the receipt's own fields.
+
+Authenticating who produced the evidence still depends on the approved external evidence source, access controls, immutable audit storage and any deployment-level signing/attestation controls. Recomputing a hash is not treated as proof that an external event actually occurred.
