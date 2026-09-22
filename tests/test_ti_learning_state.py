@@ -2,8 +2,26 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from production.blind_partition import assign_partition
 from production.training_environment import split_for_run
 from tools.ti_learning_state import compile_state
+
+
+TEST_SPLIT_SECRET = "unit-test-blind-partition-key"
+
+
+def receipt_map_for(runs):
+    out = {}
+    for run in runs:
+        claim_id = run.get("execution_claim_id")
+        if not isinstance(claim_id, str) or not claim_id.startswith("CLAIM:"):
+            continue
+        partition, _commitment = assign_partition(
+            claim_id,
+            TEST_SPLIT_SECRET,
+        )
+        out[claim_id] = partition
+    return out
 
 
 class LearningStateIntegrationTests(unittest.TestCase):
@@ -32,7 +50,10 @@ class LearningStateIntegrationTests(unittest.TestCase):
         index = 1
         while len(rows) < count:
             row = self.search_run(index)
-            if split_for_run(row) == "train":
+            if split_for_run(
+                row,
+                split_receipts=receipt_map_for([row]),
+            ) == "train":
                 rows.append(row)
             index += 1
         return rows
@@ -45,7 +66,10 @@ class LearningStateIntegrationTests(unittest.TestCase):
         index = 1
         while len(rows) < count:
             row = self.search_run(index)
-            if split_for_run(row) == "confirm":
+            if split_for_run(
+                row,
+                split_receipts=receipt_map_for([row]),
+            ) == "confirm":
                 rows.append(row)
             index += 1
         return rows
@@ -69,7 +93,12 @@ class LearningStateIntegrationTests(unittest.TestCase):
         )
 
         with tempfile.TemporaryDirectory() as tmp:
-            state = compile_state(runs, [], Path(tmp))
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         records = {
             row["key"]: row
@@ -91,10 +120,30 @@ class LearningStateIntegrationTests(unittest.TestCase):
         self.assertTrue(strategy["confirm_evidence_ready"])
         self.assertTrue(strategy["eligible_for_policy_consideration"])
 
+    def test_generated_runs_without_receipts_do_not_enter_memory(self):
+        runs = self.train_runs(1)
+        with tempfile.TemporaryDirectory() as tmp:
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts={},
+            )
+        self.assertEqual(state["memory"]["records"], [])
+        self.assertEqual(
+            state["training_environment"]["split_counts"],
+            {},
+        )
+
     def test_four_valid_runs_do_not_unlock_policy_prior(self):
         runs = self.train_runs(4) + self.confirm_runs(2)
         with tempfile.TemporaryDirectory() as tmp:
-            state = compile_state(runs, [], Path(tmp))
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         strategy = next(
             row
@@ -113,6 +162,7 @@ class LearningStateIntegrationTests(unittest.TestCase):
                 [train, confirm],
                 [],
                 Path(tmp),
+                split_receipts=receipt_map_for([train, confirm]),
             )
 
         strategy = next(
@@ -140,7 +190,12 @@ class LearningStateIntegrationTests(unittest.TestCase):
     def test_train_ready_prior_stays_locked_without_confirm_evidence(self):
         runs = self.train_runs(5)
         with tempfile.TemporaryDirectory() as tmp:
-            state = compile_state(runs, [], Path(tmp))
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         strategy = next(
             row
@@ -159,7 +214,12 @@ class LearningStateIntegrationTests(unittest.TestCase):
         confirm[1]["retained_count"] = 4
         runs = self.train_runs(5) + confirm
         with tempfile.TemporaryDirectory() as tmp:
-            state = compile_state(runs, [], Path(tmp))
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         strategy = next(
             row
@@ -206,6 +266,7 @@ class LearningStateIntegrationTests(unittest.TestCase):
                 train + confirm,
                 [],
                 Path(tmp),
+                split_receipts=receipt_map_for(train + confirm),
             )
 
         strategy = next(
@@ -233,8 +294,18 @@ class LearningStateIntegrationTests(unittest.TestCase):
     def test_generated_state_is_deterministic_for_identical_sources(self):
         runs = [self.search_run(1)]
         with tempfile.TemporaryDirectory() as tmp:
-            first = compile_state(runs, [], Path(tmp))
-            second = compile_state(runs, [], Path(tmp))
+            first = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
+            second = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         self.assertEqual(
             first["source_snapshot_sha256"],

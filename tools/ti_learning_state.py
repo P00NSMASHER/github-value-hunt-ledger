@@ -21,6 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from production.blind_partition import receipt_partition_map
 from production.learning_engine import (
     FailureEvent,
     assess_failure_for_repair,
@@ -260,10 +261,13 @@ def compile_state(
     search_runs: list[dict[str, Any]],
     outcomes: list[dict[str, Any]],
     failure_dir: Path,
+    *,
+    split_receipts: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     training_environment = build_training_environment(
         search_runs,
         outcomes,
+        split_receipts=split_receipts,
     )
     memory, observations = learn_training_episode_memory(
         training_environment["episodes"],
@@ -366,6 +370,7 @@ def compile_state(
         "search_runs": search_runs,
         "outcomes": outcomes,
         "failures": [raw for raw, _assessment in failure_rows],
+        "split_receipts": dict(sorted((split_receipts or {}).items())),
     }
     source_snapshot_sha256 = hashlib.sha256(
         json.dumps(
@@ -470,6 +475,10 @@ def main() -> int:
         default="intelligence/learning_failure_spool",
     )
     parser.add_argument(
+        "--split-receipts",
+        default="intelligence/training_split_receipts.jsonl",
+    )
+    parser.add_argument(
         "--write",
         help="Write JSON to this path instead of stdout",
     )
@@ -479,6 +488,9 @@ def main() -> int:
         load_jsonl(Path(args.search_runs)),
         load_jsonl(Path(args.outcomes)),
         Path(args.failure_dir),
+        split_receipts=receipt_partition_map(
+            load_jsonl(Path(args.split_receipts))
+        ),
     )
     rendered = json.dumps(
         state,

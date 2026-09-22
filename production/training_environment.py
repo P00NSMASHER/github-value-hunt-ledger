@@ -7,6 +7,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
+from production.blind_partition import trusted_claim_id
+
 
 _VALID_RESULTS = {"PASSED", "FAILED", "PARTIAL"}
 _VALID_MOVE_TYPES = {
@@ -211,33 +213,40 @@ def partition_for_id(
 
 def partition_basis_for_run(
     run: Mapping[str, Any],
+    *,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
-    """Choose a pre-hunt split token backed by canonical provenance checks.
+    """Resolve a post-run blind partition without exposing it pre-hunt.
 
-    Search-run IDs are agent-authored and therefore cannot be validation keys.
-    A confirm-eligible basis requires the same V14+ generated claim chain that
-    ti_execution_validate.py binds to assignment, routing and dispatch history.
-    Manual overrides, legacy records and incomplete provenance are train-only.
+    A V14+ generated claim is eligible for independent confirmation only after
+    canonical intake has a persisted blind-partition receipt. The worker sees
+    the claim ID before searching but not the HMAC key used by CI, so it cannot
+    derive train/confirm in advance. Missing receipts remain pending and do not
+    train or confirm. Manual/legacy records remain train-only.
     """
-    version = int(run.get("schema_version") or 0)
-    claim_id = run.get("execution_claim_id")
-    if (
-        version >= 14
-        and run.get("allocation_mode") == "generated"
-        and run.get("routing_mode") == "generated"
-        and isinstance(claim_id, str)
-        and claim_id.startswith("CLAIM:")
-    ):
+    claim_id = trusted_claim_id(run)
+    if claim_id:
+        partition = (
+            (split_receipts or {}).get(claim_id)
+            if split_receipts is not None
+            else None
+        )
         return {
             "trusted": True,
-            "source": "execution_claim_id",
+            "source": (
+                "blind_partition_receipt"
+                if partition in {"train", "confirm"}
+                else "pending_blind_partition"
+            ),
             "identifier": claim_id,
+            "partition": partition,
             "provenance_contract": "validated_v14_generated_claim",
         }
     return {
         "trusted": False,
         "source": "run_id_fallback_train_only",
         "identifier": str(run.get("search_run_id") or ""),
+        "partition": "train",
         "provenance_contract": "untrusted_or_legacy",
     }
 
@@ -317,6 +326,7 @@ def split_for_run(
     run: Mapping[str, Any],
     *,
     config: TrainingEnvironmentConfig | None = None,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> str:
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
@@ -345,19 +355,29 @@ def split_for_run(
     run_id = str(run.get("search_run_id") or "")
     if not run_id:
         return "excluded"
-    basis = partition_basis_for_run(run)
+    basis = partition_basis_for_run(
+        run,
+        split_receipts=split_receipts,
+    )
     if not basis["trusted"]:
         # Manual/unallocated IDs are controllable by the worker. They remain
         # useful train evidence but can never manufacture confirm evidence.
         return "train"
-    return partition_for_id(
-        str(basis["identifier"]),
-        config=cfg,
-    )
+    partition = basis.get("partition")
+    if partition not in {"train", "confirm"}:
+        return "pending_partition"
+    return str(partition)
 
 
-def discovery_signal(run: Mapping[str, Any]) -> float | None:
-    if split_for_run(run) == "excluded":
+def discovery_signal(
+    run: Mapping[str, Any],
+    *,
+    split_receipts: Mapping[str, str] | None = None,
+) -> float | None:
+    if split_for_run(
+        run,
+        split_receipts=split_receipts,
+    ) in {"excluded", "pending_partition"}:
         return None
     deep = run.get("deep_inspected")
     retained = run.get("retained_count")
@@ -613,6 +633,7 @@ def build_outcome_credit(
     outcomes: Sequence[Mapping[str, Any]],
     *,
     config: TrainingEnvironmentConfig | None = None,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
@@ -622,7 +643,11 @@ def build_outcome_credit(
         if run.get("search_run_id")
     }
     splits = {
-        rid: split_for_run(run, config=cfg)
+        rid: split_for_run(
+            run,
+            config=cfg,
+            split_receipts=split_receipts,
+        )
         for rid, run in runs_by_id.items()
     }
     edges: list[dict[str, Any]] = []
@@ -640,10 +665,25 @@ def build_outcome_credit(
             )
             if rid in runs_by_id
         ]
+        pending_direct_ids = sorted(
+            rid
+            for rid in direct_ids
+            if splits[rid] == "pending_partition"
+        )
+        if pending_direct_ids:
+            excluded.append(
+                {
+                    "outcome_id": outcome_id,
+                    "reason": "pending_direct_origin_partition",
+                    "origin_run_ids": pending_direct_ids,
+                }
+            )
+            continue
+
         direct_splits = {
             splits[rid]
             for rid in direct_ids
-            if splits[rid] != "excluded"
+            if splits[rid] in {"train", "confirm", "evaluation_only"}
         }
         if len(direct_splits) > 1:
             excluded.append(
@@ -669,7 +709,8 @@ def build_outcome_credit(
                 continue
             anchor_bases = {
                 rid: partition_basis_for_run(
-                    runs_by_id[rid]
+                    runs_by_id[rid],
+                    split_receipts=split_receipts,
                 )
                 for rid in direct_ids
             }
@@ -689,11 +730,22 @@ def build_outcome_credit(
                     }
                 )
                 continue
-            anchor_splits = {
-                partition_for_id(
-                    str(basis["identifier"]),
-                    config=cfg,
+            pending_anchor_ids = sorted(
+                rid
+                for rid, basis in anchor_bases.items()
+                if basis.get("partition") not in {"train", "confirm"}
+            )
+            if pending_anchor_ids:
+                excluded.append(
+                    {
+                        "outcome_id": outcome_id,
+                        "reason": "pending_excluded_direct_origin_partition",
+                        "origin_run_ids": pending_anchor_ids,
+                    }
                 )
+                continue
+            anchor_splits = {
+                str(basis["partition"])
                 for basis in anchor_bases.values()
             }
             if len(anchor_splits) != 1:
@@ -708,7 +760,7 @@ def build_outcome_credit(
                 )
                 continue
             outcome_split = next(iter(anchor_splits))
-            credit_anchor_kind = "excluded_direct_origin_precommit"
+            credit_anchor_kind = "excluded_direct_origin_blind_receipt"
 
         invalid_direct_ids = [
             rid
@@ -734,7 +786,7 @@ def build_outcome_credit(
         direct_set = {
             rid
             for rid in direct_ids
-            if splits[rid] != "excluded"
+            if splits[rid] in {"train", "confirm", "evaluation_only"}
         }
 
         for rid, run in runs_by_id.items():
@@ -784,7 +836,7 @@ def build_outcome_credit(
                     "reason": (
                         "no_support_path_in_anchor_split"
                         if credit_anchor_kind
-                        == "excluded_direct_origin_hash"
+                        == "excluded_direct_origin_blind_receipt"
                         else "no_provenance_path"
                     ),
                     "anchor_split": outcome_split,
@@ -992,6 +1044,7 @@ def build_training_environment(
     outcomes: Sequence[Mapping[str, Any]],
     *,
     config: TrainingEnvironmentConfig | None = None,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
@@ -999,6 +1052,7 @@ def build_training_environment(
         search_runs,
         outcomes,
         config=cfg,
+        split_receipts=split_receipts,
     )
     credit_by_run = _aggregate_credit_by_run(
         credit_edges
@@ -1018,9 +1072,13 @@ def build_training_environment(
         split = split_for_run(
             run,
             config=cfg,
+            split_receipts=split_receipts,
         )
-        discovery = discovery_signal(run)
-        if split == "excluded" or discovery is None:
+        discovery = discovery_signal(
+            run,
+            split_receipts=split_receipts,
+        )
+        if split in {"excluded", "pending_partition"} or discovery is None:
             excluded_runs.append(
                 {
                     "run_id": rid,
@@ -1028,7 +1086,11 @@ def build_training_environment(
                         "inconsistent_search_telemetry:"
                         + ",".join(consistency_errors)
                         if consistency_errors
-                        else "not_eligible_search_training_record"
+                        else (
+                            "pending_blind_partition"
+                            if split == "pending_partition"
+                            else "not_eligible_search_training_record"
+                        )
                     ),
                 }
             )
@@ -1149,7 +1211,10 @@ def build_training_environment(
                     or run.get("date")
                 ),
                 "partition_basis": (
-                    partition_basis_for_run(run)
+                    partition_basis_for_run(
+                        run,
+                        split_receipts=split_receipts,
+                    )
                 ),
             },
         }
@@ -1161,6 +1226,7 @@ def build_training_environment(
     source_payload = {
         "search_runs": list(search_runs),
         "outcomes": list(outcomes),
+        "split_receipts": dict(sorted((split_receipts or {}).items())),
     }
     source_times = [
         _run_time(run)
@@ -1225,6 +1291,7 @@ def build_training_environment(
                 "never crosses train/confirm/evaluation "
                 "split; mixed-origin outcomes excluded"
             ),
+            "blind_partition_receipts_required": True,
         },
         "reward_policy": {
             **asdict(cfg),
@@ -1333,15 +1400,19 @@ def validate_training_environment(
                     errors.append(
                         f"missing_partition_identifier:{rid}"
                     )
-                else:
-                    expected_split = partition_for_id(
-                        identifier,
-                        config=split_validation_config,
+                receipt_partition = basis.get("partition")
+                if receipt_partition not in {"train", "confirm"}:
+                    errors.append(
+                        f"missing_blind_partition_receipt:{rid}"
                     )
-                    if split != expected_split:
-                        errors.append(
-                            f"partition_hash_mismatch:{rid}"
-                        )
+                elif split != receipt_partition:
+                    errors.append(
+                        f"partition_receipt_mismatch:{rid}"
+                    )
+                if basis.get("source") != "blind_partition_receipt":
+                    errors.append(
+                        f"invalid_partition_source:{rid}"
+                    )
             elif split != "train":
                 errors.append(
                     f"untrusted_partition_not_train:{rid}"
