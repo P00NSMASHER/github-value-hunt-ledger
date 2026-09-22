@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-import json,re,hashlib
+import json,re,hashlib,sys
 from collections import defaultdict
 from pathlib import Path
 from ti_common import INTEL, ROOT, load_jsonl
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from production.work_identity import versioned_work_item_id
 from ti_search_actions import (experiment_status, parse_capability_ids, experiment_action,
                                capability_stops, action_errors)
 
@@ -80,6 +83,18 @@ def experiment_status_boost(exp_ids):
 
 def work_id(prefix,value):
     return "WORK:"+prefix+":"+hashlib.sha256(value.encode()).hexdigest()[:12]
+
+def experiment_plan_payload(e):
+    return {
+      "status":e.get("status"),
+      "execution_scope":e.get("execution_scope"),
+      "work_action":experiment_action(e.get("capability_ids") or []),
+      "capability_ids":e.get("capability_ids") or [],
+      "hypothesis":e.get("hypothesis"),
+      "next_action":e.get("next_action"),
+      "success":e.get("success"),
+      "failure":e.get("failure")
+    }
 
 candidates=[]
 
@@ -181,10 +196,21 @@ for e in EXPERIMENTS:
     base=CFG["scoring"]["running_experiment_base"] if e["status"]=="RUNNING" else CFG["scoring"]["ready_experiment_base"]
     pb=priority_boost(e.get("priority_label"))
     score=round(base+pb-max(0,e["order"]-1)*0.25,2)
+    plan_payload=experiment_plan_payload(e)
+    experiment_work_item_id,_=versioned_work_item_id(
+      "experiment",e["experiment_id"],plan_payload
+    )
+    verification_payload={
+      **plan_payload,
+      "verification_mode":"experiment_falsification"
+    }
+    verification_work_item_id,_=versioned_work_item_id(
+      "verify","VERIFY:"+e["experiment_id"],verification_payload
+    )
     candidates.append({
-      "work_item_id":work_id("experiment",e["experiment_id"]),
+      "work_item_id":experiment_work_item_id,
       "work_kind":"experiment_execution",
-      "work_action":experiment_action(e["capability_ids"]),
+      "work_action":plan_payload["work_action"],
       "source_id":e["experiment_id"],
       "title":e["experiment_id"]+" — "+e["name"],
       "final_score":score,
@@ -196,7 +222,7 @@ for e in EXPERIMENTS:
       "coverage_gap_ids":[],
       "adjacency_root":None,
       "instructions":{
-        "work_action":experiment_action(e["capability_ids"]),
+        "work_action":plan_payload["work_action"],
         "execution_scope":e["execution_scope"],
         "why_now":"Experiment is "+e["status"]+" and should be executed/falsified before searching for redundant components.",
         "next_action":e.get("next_action"),
@@ -210,9 +236,9 @@ for e in EXPERIMENTS:
     # Separate independent verifier candidate so red-team capacity is explicit.
     vbase=CFG["scoring"]["verification_base"]+(4 if e["status"]=="RUNNING" else 0)+pb
     candidates.append({
-      "work_item_id":work_id("verify",e["experiment_id"]),
+      "work_item_id":verification_work_item_id,
       "work_kind":"independent_verification",
-      "work_action":experiment_action(e["capability_ids"]),
+      "work_action":plan_payload["work_action"],
       "source_id":"VERIFY:"+e["experiment_id"],
       "title":"Independent verification — "+e["experiment_id"],
       "final_score":round(vbase-max(0,e["order"]-1)*0.2,2),
@@ -224,7 +250,7 @@ for e in EXPERIMENTS:
       "coverage_gap_ids":[],
       "adjacency_root":None,
       "instructions":{
-        "work_action":experiment_action(e["capability_ids"]),
+        "work_action":plan_payload["work_action"],
         "next_action":e.get("next_action"),
         "acceptance_target":e.get("success") or e.get("next_action"),
         "execution_scope":e["execution_scope"],
