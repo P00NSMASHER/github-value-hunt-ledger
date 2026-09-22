@@ -135,6 +135,8 @@ for s in SEEDS:
       "work_action":s.get("work_action","search"),
       "query_recipe_id":s.get("query_recipe_id"),
       "query_anchors":s.get("query_anchors") or [],
+      "required_signatures":s.get("required_signatures") or [],
+      "exclude_domains":s.get("exclude_domains") or [],
       "source_id":s["seed_id"],
       "title":s["seed_id"],
       "measurement_contract_version":(
@@ -442,6 +444,8 @@ for slot in slots:
       "work_action":c.get("work_action","search"),
       "query_recipe_id":c.get("query_recipe_id"),
       "query_anchors":c.get("query_anchors") or [],
+      "required_signatures":c.get("required_signatures") or [],
+      "exclude_domains":c.get("exclude_domains") or [],
       "source_id":c["source_id"],
       "title":c["title"],
       "measurement_contract_version":c.get("measurement_contract_version"),
