@@ -53,8 +53,9 @@ jobs:
 
           event = os.environ.get('EVENT_NAME')
           if event == 'workflow_run':
-              if os.environ.get('WORKFLOW_RUN_CONCLUSION') != 'success':
-                  raise SystemExit('source FMC workflow did not complete successfully')
+              # Recover even when the legacy source run is marked failed solely
+              # because its oversized final merge failed. Missing/failed shard
+              # artifacts will fail explicitly in rehydrate instead.
               run_id = os.environ.get('WORKFLOW_RUN_ID', '').strip()
               shard_count = 12
               retention = 90
@@ -118,16 +119,22 @@ jobs:
             --db source/ledger.sqlite \
             --artifact-root source \
             --report source/revalidation.json
+          python production/fmc_tariff_ledger/reparse.py \
+            --db source/ledger.sqlite \
+            --artifact-root source \
+            --report source/reparse.json
           python production/fmc_tariff_ledger/run.py summary \
             --db source/ledger.sqlite \
             > source/summary.json
           python -m json.tool source/revalidation.json
+          python -m json.tool source/reparse.json
           python -m json.tool source/summary.json
           mkdir -p metadata/shard-${SHARD}
           cp source/ledger.sqlite metadata/shard-${SHARD}/ledger.sqlite
           cp source/summary.json metadata/shard-${SHARD}/summary.json
           cp source/summary_prevalidation.json metadata/shard-${SHARD}/summary_prevalidation.json
           cp source/revalidation.json metadata/shard-${SHARD}/revalidation.json
+          cp source/reparse.json metadata/shard-${SHARD}/reparse.json
           if test -f source/stats.json; then
             cp source/stats.json metadata/shard-${SHARD}/stats.json
           fi
