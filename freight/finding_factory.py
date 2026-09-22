@@ -342,14 +342,14 @@ def derive_batch(
     if len({charge.charge_id for charge in normalized_charges}) != len(normalized_charges):
         raise ValueError("duplicate charge_id")
     normalized_rules = tuple(rules)
-    row_index = {row.row_key: row for row in population.rows}
+    row_index = {row.identity_key: row for row in population.rows}
 
     derivations = []
     for charge in normalized_charges:
         _validate_charge(charge)
         if (charge.buyer_id, charge.business_unit) != (population.buyer_id, population.business_unit):
             raise ValueError("charge scope mismatch")
-        row = row_index.get(f"{charge.invoice_id}|{charge.shipment_id}")
+        row = row_index.get((charge.invoice_id, charge.shipment_id))
         if row is None:
             raise ValueError("charge outside frozen population")
         if (charge.customer_id, charge.carrier_id, charge.currency) != (
