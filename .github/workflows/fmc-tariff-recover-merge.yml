@@ -40,6 +40,7 @@ jobs:
     outputs:
       source_run_id: ${{ steps.cfg.outputs.source_run_id }}
       shards: ${{ steps.cfg.outputs.shards }}
+      shard_count: ${{ steps.cfg.outputs.shard_count }}
       retention_days: ${{ steps.cfg.outputs.retention_days }}
       copy_raw_evidence: ${{ steps.cfg.outputs.copy_raw_evidence }}
     steps:
@@ -92,6 +93,7 @@ jobs:
 
           print(f'source_run_id={run_id}')
           print('shards=' + json.dumps(list(range(shard_count))))
+          print(f'shard_count={shard_count}')
           print(f'retention_days={retention}')
           print('copy_raw_evidence=' + ('true' if copy_raw else 'false'))
           PY
@@ -201,7 +203,7 @@ jobs:
       - name: Merge rule ledgers
         env:
           SOURCE_RUN_ID: ${{ needs.prepare.outputs.source_run_id }}
-          SHARD_COUNT: ${{ inputs.shard_count || '12' }}
+          SHARD_COUNT: ${{ needs.prepare.outputs.shard_count }}
           COPY_RAW: ${{ needs.prepare.outputs.copy_raw_evidence }}
         run: |
           mkdir -p merged
