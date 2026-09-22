@@ -37,13 +37,17 @@ def revalidate(db_path: Path, artifact_root: Path, dry_run: bool = False) -> dic
         "parse_failures": 0,
     }
 
+    bogus_ids = sorted(BOGUS_RULE_IDS)
+    placeholders = ",".join("?" for _ in bogus_ids)
     bogus_count = conn.execute(
-        "SELECT COUNT(*) FROM terms WHERE lower(rule_type) IN ('rule:no','rule:number','rule:nos','rule:page','rule:pages')"
+        f"SELECT COUNT(*) FROM terms WHERE lower(rule_type) IN ({placeholders})",
+        bogus_ids,
     ).fetchone()[0]
     stats["bogus_rule_terms_removed"] = bogus_count
-    if not dry_run:
+    if not dry_run and bogus_ids:
         conn.execute(
-            "DELETE FROM terms WHERE lower(rule_type) IN ('rule:no','rule:number','rule:nos')"
+            f"DELETE FROM terms WHERE lower(rule_type) IN ({placeholders})",
+            bogus_ids,
         )
 
     rows = conn.execute(
