@@ -19,7 +19,7 @@ Reward is multi-stage:
 - **discovery** — measured retained yield, promotion, capability contribution, duplicate avoidance and efficiency;
 - **technical** — downstream experiment results;
 - **engineering** — observed implementation time saved when actually recorded;
-- **commercial** — realized revenue/customer value when actually recorded.
+- **commercial** — realized revenue/customer value when actually recorded, using a bounded log-scale magnitude signal so $1K, $100K and $1M are not treated as equivalent while extreme outliers cannot dominate training.
 
 Technical-only evidence is deliberately capped below commercially grounded evidence. A synthetic or partial technical result can teach the system which searches are promising, but it cannot masquerade as customer value.
 
