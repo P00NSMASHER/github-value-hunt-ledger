@@ -31,7 +31,7 @@ FAMILY_HOSTS = {
     "ratewave": {"ratewave.com", "www.ratewave.com", "ratewave5.com", "www.ratewave5.com"},
     "dpi": {"dpiusa.com", "www.dpiusa.com", "members.dpiusa.com"},
     "boterates": {"boterates.com", "www.boterates.com"},
-    "descartes": {"rates.descartes.com"},
+    "descartes": {"rates.descartes.com", "myrates.descartes.com"},
     "dms": {"dmstradeservices.com", "www.dmstradeservices.com"},
     "paramount": {"paramounttariff.com", "www.paramounttariff.com", "search.paramounttariff.com"},
     "tds": {"tariffdatasystems.com", "www.tariffdatasystems.com"},
@@ -41,7 +41,19 @@ FAMILY_HOSTS = {
     "ace": {"acetariff.com", "www.acetariff.com", "data.acetariff.com"},
     "cargosphere": {"cargosphere.net", "www.cargosphere.net"},
     "blue": {"blue-usa.com", "www.blue-usa.com"},
-    "etariff": {"etariff.com", "login.etariff.com", "login2.etariff.com"},
+    "etariff": {"etariff.com", "login.etariff.com", "login2.etariff.com", "e-tariff.com", "www.e-tariff.com"},
+    "shared": {
+        "pctb.com", "www.pctb.com",
+        "oceantariff.com", "www.oceantariff.com",
+        "sumnertariff.com", "www.sumnertariff.com",
+        "ustraf.com", "www.ustraf.com",
+        "infoxrates.com", "www.infoxrates.com",
+        "rates.etransport.com", "etransport.com", "www.etransport.com",
+        "new.fmccompliances.com", "fmccompliances.com", "www.fmccompliances.com",
+        "tariff.gocatapult.com", "gocatapult.com", "www.gocatapult.com",
+        "plustariff.com", "www.plustariff.com",
+        "nvots.com", "www.nvots.com",
+    },
 }
 
 AUTH_MARKERS = (
