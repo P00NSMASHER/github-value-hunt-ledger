@@ -61,7 +61,7 @@
       "source_key": "humana-live",
       "payer_name": "Humana",
       "adapter": "humana_api",
-      "source_url": "https://developers.humana.com/Resource/GetData"
+      "source_url": "https://developers.humana.com/syntheticdata/Resource/GetData"
     },
     {
       "source_key": "aetna-ash-live",
@@ -109,6 +109,55 @@
       "payer_name": "Elevance/Anthem",
       "adapter": "html_index_links",
       "source_url": "https://www.anthem.com/machine-readable-file/search/"
+    },
+    {
+      "source_key": "bcbswy-monthly",
+      "payer_name": "Blue Cross Blue Shield of Wyoming",
+      "adapter": "monthly_toc_templates",
+      "source_url": "https://mrfdata.hmhs.com/files/460/wy/inbound/local/",
+      "notes": "{\"base_url\":\"https://mrfdata.hmhs.com/files/460/wy/inbound/local/\",\"file_templates\":[\"{month_start}_Blue_Cross_Blue_Shield_of_Wyoming_index.json\"],\"month_offsets\":[0,-1]}"
+    },
+    {
+      "source_key": "hmsa-monthly",
+      "payer_name": "HMSA",
+      "adapter": "monthly_toc_templates",
+      "source_url": "https://hmsa-cost-transparency-west2.s3.us-west-2.amazonaws.com/",
+      "notes": "{\"base_url\":\"https://hmsa-cost-transparency-west2.s3.us-west-2.amazonaws.com/\",\"file_templates\":[\"{month_start}_hmsa_index.json\"],\"month_offsets\":[0,-1]}"
+    },
+    {
+      "source_key": "sutter-monthly",
+      "payer_name": "Sutter Health Plus",
+      "adapter": "monthly_toc_templates",
+      "source_url": "https://xmc-sutterhealt962c-sutterhealt8fce-production57cc.sitecorecloud.io/-/media/Project/SutterHealth/SutterHealthPlan/PDF/",
+      "notes": "{\"base_url\":\"https://xmc-sutterhealt962c-sutterhealt8fce-production57cc.sitecorecloud.io/-/media/Project/SutterHealth/SutterHealthPlan/PDF/\",\"file_templates\":[\"{month_start}_sutter-health-plus_index\"],\"month_offsets\":[0,-1]}"
+    },
+    {
+      "source_key": "uha-monthly",
+      "payer_name": "University Health Alliance",
+      "adapter": "monthly_toc_templates",
+      "source_url": "https://app.uhahealth.com/mrf/",
+      "notes": "{\"base_url\":\"https://app.uhahealth.com/mrf/\",\"file_templates\":[\"{month_start}_uha_index.json\"],\"month_offsets\":[0,-1]}"
+    },
+    {
+      "source_key": "bcbsmn-monthly",
+      "payer_name": "Blue Cross Blue Shield of Minnesota",
+      "adapter": "monthly_toc_templates",
+      "source_url": "https://mktg.bluecrossmn.com/mrf/",
+      "notes": "{\"base_url\":\"https://mktg.bluecrossmn.com/mrf/\",\"file_templates\":[\"{year}/{month_start}_Blue_Cross_and_Blue_Shield_of_Minnesota_index.json\"],\"month_offsets\":[0,-1]}"
+    },
+    {
+      "source_key": "oscar-monthly",
+      "payer_name": "Oscar Health",
+      "adapter": "monthly_toc_templates",
+      "source_url": "https://hioscar-cms-tic-us-east-1.s3.amazonaws.com/oscar/",
+      "notes": "{\"base_url\":\"https://hioscar-cms-tic-us-east-1.s3.amazonaws.com/oscar/\",\"file_templates\":[\"{month_start_compact}_oscar_index.json\"],\"month_offsets\":[0,-1]}"
+    },
+    {
+      "source_key": "upmc-monthly",
+      "payer_name": "UPMC Health Plan",
+      "adapter": "monthly_toc_templates",
+      "source_url": "https://content.upmchp.com/publicweb/table-of-contents/",
+      "notes": "{\"base_url\":\"https://content.upmchp.com/publicweb/table-of-contents/\",\"file_templates\":[\"{month_start}_UPMC-Health-Plan_index.json\"],\"month_offsets\":[0,-1]}"
     }
   ]
 }
