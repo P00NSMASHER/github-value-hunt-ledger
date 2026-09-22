@@ -26,12 +26,14 @@ moves = read_json("search_move_metrics.json", {})
 move_policy = read_json("search_move_policy.json", {})
 coord = read_json("coordination_metrics.json", {})
 learning = read_json("LEARNING_STATE.json", {})
+curriculum = read_json("learning_curriculum.json", {})
 
 gaps = policy.get("priority_capability_gaps") or []
 constraints = policy.get("domain_constraints") or []
 move_rows = moves.get("by_move_type") or []
 learning_rows = ((learning.get("memory") or {}).get("records") or [])
 learning_alerts = learning.get("learning_alerts") or []
+curriculum_recommendations = curriculum.get("recommended_measurements") or []
 eligible_value_rows = [
     row
     for row in learning_rows
@@ -193,6 +195,17 @@ if suppression_alerts:
         "are blocked from live priors. Treat these as repair/falsification targets, "
         "not as candidates for more allocation."
     )
+if curriculum_recommendations:
+    lines.append("- Next blind evidence targets:")
+    for rec in curriculum_recommendations[:3]:
+        train = rec.get("train") or {}
+        confirm = rec.get("confirm") or {}
+        lines.append(
+            f"  - **{rec.get('strategy_id')}** — {rec.get('phase')}: "
+            f"train {train.get('runs', 0)}/{train.get('deep_inspections', 0)}, "
+            f"confirm {confirm.get('runs', 0)}/{confirm.get('deep_inspections', 0)}. "
+            "Partition membership must not be calculated or targeted."
+        )
 failure_queue = learning.get("failure_queue") or {}
 lines.append(
     f"- Reproducible hunter-system failure queue: **{failure_queue.get('queued', 0)} queued**, "
