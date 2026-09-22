@@ -20,6 +20,10 @@ Current Freight Recovery state is **commercially specified / externally blocked 
 - Prototype tests committed: production/test_prototype.py.
 - Local execution result before commit: **11/11 tests passed**.
 - Reference PostgreSQL schema committed: production/schema.sql.
+- Outcome-weighted hunter learning engine committed: `production/learning_engine.py`.
+- Build-generated advisory value memory committed through `tools/ti_learning_state.py` + fail-closed validator; it cannot alter policy before the existing 5-run/20-deep-inspection evidence gate.
+- Immutable reproducible hunter-system failure spool/schema committed under `intelligence/learning_failure_spool/`.
+- Skill repair, failed-trajectory salvage, staged skill evolution, personalized peer transfer, performance×novelty fleet selection, canary-only harness mutation and clean future-training export gates are encoded and covered by CI-discovered unit tests.
 - Three shadow state/result ledgers initialized under production/shadow/.
 - Shadow protocol committed: production/SHADOW_PILOT.md.
 - Three existing benchmark experiment automations have a post-benchmark shadow override:
