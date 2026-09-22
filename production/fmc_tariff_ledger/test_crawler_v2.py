@@ -116,6 +116,25 @@ class PublisherAdapterTests(unittest.TestCase):
         ):
             self.assertNotEqual(publishers.family_for(url), "direct")
 
+    def test_generic_maritime_words_do_not_establish_entity_scope(self):
+        text = "Ocean shipping transport carrier tariff publishing services."
+        self.assertFalse(
+            publishers.entity_scoped_text(
+                text,
+                "999999",
+                "OCEAN TRANSPORT LINES LLC",
+                "",
+            )
+        )
+        self.assertTrue(
+            publishers.entity_scoped_text(
+                "FMC Organization 999999 Ocean transport tariff.",
+                "999999",
+                "OCEAN TRANSPORT LINES LLC",
+                "",
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
