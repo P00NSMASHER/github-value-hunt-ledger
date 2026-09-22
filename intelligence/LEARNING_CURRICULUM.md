@@ -2,6 +2,14 @@
 
 Evidence-collection plan for the adaptive hunter layer. This is **measurement-only**: learned Q-values, reward means and current policy allocations do not select strategies, and this file does not change live policy.
 
+## Blind confirmation readiness
+
+- Operational: **no**
+- Key commitment active: **false**
+- Split secret available to CI: **false**
+- Pending trusted generated claims: **2**
+- Confirmation blocker: **split_key_commitment_inactive**
+
 ## Guardrails
 
 - Measurement work must use the normal generated assignment/claim path.

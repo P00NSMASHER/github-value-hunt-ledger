@@ -1,4 +1,12 @@
 {
+  "blind_confirmation": {
+    "activation_run_count": null,
+    "blocker": "split_key_commitment_inactive",
+    "key_commitment_active": false,
+    "operational": false,
+    "pending_claim_count": 2,
+    "secret_available": false
+  },
   "manual_work_can_satisfy_confirm": false,
   "mode": "measurement_only",
   "partition_selection_allowed": false,
@@ -549,7 +557,7 @@
       "zero_train_runs": false
     }
   ],
-  "schema_version": 2,
+  "schema_version": 3,
   "thresholds": {
     "minimum_confirm_deep_inspections": 6,
     "minimum_confirm_mean_reward": 0.0,
