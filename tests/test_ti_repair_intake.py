@@ -67,8 +67,10 @@ def candidate_packet(queue=None, **overrides):
         "artifact_id": "SKILL:test",
         "baseline_version": "v1",
         "candidate_version": "v2",
-        "baseline_artifact_ref": "sha256:baseline",
-        "candidate_artifact_ref": "sha256:candidate",
+        "baseline_artifact_ref": "artifacts/baseline.json",
+        "baseline_artifact_sha256": "1" * 64,
+        "candidate_artifact_ref": "artifacts/candidate.json",
+        "candidate_artifact_sha256": "2" * 64,
         "diff_hash": "a" * 64,
         "changed_logical_targets": [task["target"]["id"]],
         "regression_test_requirement": task["regression_test_requirement"],
@@ -77,7 +79,9 @@ def candidate_packet(queue=None, **overrides):
         "regression_test_evidence_refs": [
             "tests/test_skill.py::test_readme_only",
         ],
+        "regression_test_evidence_sha256": "3" * 64,
         "decision_history_ref": "production/history/RCAND-test-1.json",
+        "decision_history_sha256": "4" * 64,
         "unrelated_files_changed": False,
         "sensitive_material_involved": False,
         "benchmark_contaminated": False,
@@ -285,6 +289,60 @@ class RepairCandidateIntakeTests(unittest.TestCase):
             state["blocked_submissions"][0]["reasons"],
         )
 
+    def test_artifact_content_hashes_are_required(self):
+        queue = ready_queue()
+        state = build_repair_candidate_intake(
+            queue,
+            [
+                candidate_packet(
+                    queue,
+                    baseline_artifact_sha256="not-a-sha",
+                )
+            ],
+        )
+        self.assertIn(
+            "baseline_artifact_sha256_required",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_candidate_artifact_hash_must_differ_from_baseline(self):
+        queue = ready_queue()
+        state = build_repair_candidate_intake(
+            queue,
+            [
+                candidate_packet(
+                    queue,
+                    candidate_artifact_sha256="1" * 64,
+                )
+            ],
+        )
+        self.assertIn(
+            "candidate_artifact_hash_must_differ_from_baseline",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_regression_and_decision_history_evidence_must_be_content_addressed(self):
+        queue = ready_queue()
+        state = build_repair_candidate_intake(
+            queue,
+            [
+                candidate_packet(
+                    queue,
+                    regression_test_evidence_sha256="",
+                    decision_history_sha256="bad",
+                )
+            ],
+        )
+        reasons = state["blocked_submissions"][0]["reasons"]
+        self.assertIn(
+            "regression_test_evidence_sha256_required",
+            reasons,
+        )
+        self.assertIn(
+            "decision_history_sha256_required",
+            reasons,
+        )
+
     def test_candidate_artifact_must_differ_from_baseline(self):
         queue = ready_queue()
         state = build_repair_candidate_intake(
@@ -292,7 +350,7 @@ class RepairCandidateIntakeTests(unittest.TestCase):
             [
                 candidate_packet(
                     queue,
-                    candidate_artifact_ref="sha256:baseline",
+                    candidate_artifact_ref="artifacts/baseline.json",
                 )
             ],
         )
