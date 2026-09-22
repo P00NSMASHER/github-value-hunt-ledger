@@ -70,8 +70,8 @@ def write_sources(root: Path, *, claimant="client-1", accepted_days=3):
     )
     (root / "causation.csv").write_text(
         "Review_ID,Entitlement_ID,Event_ID,Baseline_Version_ID,Update_Version_ID,"
-        "Accepted_Causation,Accepted_Delay_Days,Review_Date,Qualified_Reviewer_ID\n"
-        f"REV-1,ENT-1,EV-1,BASE,UPD,true,{accepted_days},2026-09-15,scheduler-1\n",
+        "Accepted_Causation,Accepted_Delay_Days,Review_Date,Qualified_Reviewer_ID,Qualification_Basis\n"
+        f"REV-1,ENT-1,EV-1,BASE,UPD,true,{accepted_days},2026-09-15,scheduler-1,Forensic scheduler and P6 delay analyst\n",
         encoding="utf-8",
     )
     (root / "settlements.csv").write_text(
@@ -111,8 +111,12 @@ class ConstructionIoTests(unittest.TestCase):
                 schedules[1].source_locator,
             )
             self.assertIn("#versions[0]", schedules[0].source_locator)
-            self.assertEqual(calculate_cpm(schedules[0]).project_duration_days, 10)
-            self.assertEqual(calculate_cpm(schedules[1]).project_duration_days, 13)
+            base_cpm = calculate_cpm(schedules[0])
+            update_cpm = calculate_cpm(schedules[1])
+            self.assertEqual(base_cpm.project_duration_days, 10)
+            self.assertEqual(update_cpm.project_duration_days, 13)
+            self.assertEqual(base_cpm.manifest["topology_hash"], schedules[0].topology_hash)
+            self.assertNotEqual(schedules[0].topology_hash, schedules[1].topology_hash)
 
             batch = audit_construction_recovery(
                 client_id="client-1",
@@ -154,7 +158,26 @@ class ConstructionIoTests(unittest.TestCase):
             root = Path(d)
             write_sources(root)
             text = (root / "causation.csv").read_text()
-            text = text.replace(",scheduler-1\n", ",\n")
+            text = text.replace(
+                ",scheduler-1,Forensic scheduler and P6 delay analyst\n",
+                ",,Forensic scheduler and P6 delay analyst\n",
+            )
+            (root / "causation.csv").write_text(text, encoding="utf-8")
+            with self.assertRaises(ValueError):
+                load_causation_reviews_csv(
+                    root / "causation.csv", verified=True
+                )
+
+
+    def test_verified_causation_file_requires_qualification_basis(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            write_sources(root)
+            text = (root / "causation.csv").read_text()
+            text = text.replace(
+                ",scheduler-1,Forensic scheduler and P6 delay analyst\n",
+                ",scheduler-1,\n",
+            )
             (root / "causation.csv").write_text(text, encoding="utf-8")
             with self.assertRaises(ValueError):
                 load_causation_reviews_csv(
@@ -179,8 +202,8 @@ class ConstructionIoTests(unittest.TestCase):
             root = Path(d)
             write_sources(root)
             text = (root / "causation.csv").read_text().replace(
-                "2026-09-15,scheduler-1",
-                "2026-08-15,scheduler-1",
+                "2026-09-15,scheduler-1,Forensic scheduler and P6 delay analyst",
+                "2026-08-15,scheduler-1,Forensic scheduler and P6 delay analyst",
             )
             (root / "causation.csv").write_text(text, encoding="utf-8")
             batch = audit_construction_recovery(
