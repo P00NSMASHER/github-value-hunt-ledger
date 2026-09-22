@@ -292,6 +292,15 @@ def telemetry_consistency_errors(
     retained = run.get("retained_count")
     promoted = run.get("master_promoted_count")
 
+    for field_name, value in (
+        ("candidate_count", candidate_count),
+        ("deep_inspected", deep),
+        ("retained_count", retained),
+        ("master_promoted_count", promoted),
+    ):
+        if value is not None and not _nonnegative_int(value):
+            errors.append(f"invalid_{field_name}")
+
     if (
         _nonnegative_int(candidate_count)
         and candidate_count >= 0
@@ -343,7 +352,9 @@ def telemetry_consistency_errors(
     elif _finite_number(elapsed) and elapsed < 0:
         errors.append("negative_elapsed_minutes")
     tool_calls = run.get("tool_calls")
-    if type(tool_calls) is int and tool_calls < 0:
+    if tool_calls is not None and type(tool_calls) is not int:
+        errors.append("invalid_tool_calls")
+    elif type(tool_calls) is int and tool_calls < 0:
         errors.append("negative_tool_calls")
 
     return tuple(errors)
@@ -409,7 +420,7 @@ def discovery_signal(
     deep = run.get("deep_inspected")
     retained = run.get("retained_count")
     promoted = run.get("master_promoted_count")
-    if not all(isinstance(v, int) and v >= 0 for v in (deep, retained, promoted)):
+    if not all(_nonnegative_int(v) for v in (deep, retained, promoted)):
         return None
 
     score = 0.0
@@ -456,6 +467,21 @@ def outcome_signal(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
 
     revenue = outcome.get("revenue_usd")
     customer_value = outcome.get("customer_value_usd")
+    low = outcome.get("engineering_days_saved_low")
+    high = outcome.get("engineering_days_saved_high")
+    for value in (revenue, customer_value, low, high):
+        if value is not None and (
+            not _finite_number(value)
+            or value < 0
+        ):
+            return None
+    if (
+        low is not None
+        and high is not None
+        and low > high
+    ):
+        return None
+
     observed_values = [
         float(value)
         for value in (revenue, customer_value)
@@ -474,8 +500,6 @@ def outcome_signal(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         else 0.0
     )
 
-    low = outcome.get("engineering_days_saved_low")
-    high = outcome.get("engineering_days_saved_high")
     engineering_observed = (
         _finite_number(low)
         and _finite_number(high)
