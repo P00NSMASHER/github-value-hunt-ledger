@@ -21,6 +21,12 @@ from .branches.freight_io import (
 )
 from .branches.payer import audit_payer_lines
 from .branches.payer_csv import load_payer_lines_csv, load_payer_rates_csv
+from .branches.rebate import audit_rebates
+from .branches.rebate_io import (
+    load_rebate_programs_json,
+    load_rebate_purchases_csv,
+    load_rebate_settlements_csv,
+)
 from .branches.contract_billing_csv import (
     load_contract_rates_csv,
     load_invoice_charges_csv,
@@ -420,6 +426,61 @@ def run_scan360_config(
         for issue in batch.exceptions:
             exceptions.append({
                 "branch": "telecom",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+
+    for job_index, job in enumerate(_jobs(config.get("rebate"), name="rebate")):
+        programs = load_rebate_programs_json(
+            _resolve(
+                base,
+                job.get("programs_json"),
+                name=f"rebate[{job_index}].programs_json",
+            ),
+            verified=_bool_setting(
+                job, "program_source_verified", context=f"rebate[{job_index}]"
+            ),
+        )
+        purchases = load_rebate_purchases_csv(
+            _resolve(
+                base,
+                job.get("purchases_csv"),
+                name=f"rebate[{job_index}].purchases_csv",
+            ),
+            verified=_bool_setting(
+                job, "purchase_source_verified", context=f"rebate[{job_index}]"
+            ),
+        )
+        settlements = load_rebate_settlements_csv(
+            _resolve(
+                base,
+                job.get("settlements_csv"),
+                name=f"rebate[{job_index}].settlements_csv",
+            ),
+            verified=_bool_setting(
+                job, "settlement_source_verified", context=f"rebate[{job_index}]"
+            ),
+        )
+        batch = audit_rebates(
+            client_id=client_id,
+            programs=programs,
+            purchases=purchases,
+            settlements=settlements,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "rebate",
                 "job_index": job_index,
                 "reference": issue.reference,
                 "code": issue.code,
