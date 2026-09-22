@@ -40,8 +40,25 @@ def ledger_with_recovery():
     ledger.add(finding)
     ledger.approve(finding.finding_id, "reviewer", "verified")
     ledger.authorize(finding.finding_id, "customer-auth")
-    ledger.mark_claimed(finding.finding_id)
-    ledger.mark_recovered(finding.finding_id, 4000, 800)
+    claim_receipt = EvidenceRef(
+        evidence_id="claim-receipt",
+        source_hash="claimhash",
+        locator="source://claim/receipt",
+        kind="claim_submission_receipt",
+        verified=True,
+    )
+    recovery_receipt = EvidenceRef(
+        evidence_id="settlement-receipt",
+        source_hash="settlementhash",
+        locator="source://settlement/receipt",
+        kind="recovery_settlement",
+        verified=True,
+    )
+    ledger.mark_claimed(finding.finding_id, claim_receipt)
+    ledger.mark_recovered(
+        finding.finding_id, 4000, 800,
+        recovery_evidence=recovery_receipt,
+    )
     return ledger
 
 
