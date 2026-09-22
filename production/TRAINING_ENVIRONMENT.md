@@ -28,9 +28,9 @@ Technical-only evidence is deliberately capped below commercially grounded evide
 A downstream outcome may credit more than its immediate origin search, but only through explicit ledger links:
 
 - direct `origin_search_ids`;
-- shared `experiment_id`;
 - contributed capability IDs;
-- retained repositories that the outcome explicitly names.
+- retained repositories that the outcome explicitly names;
+- shared `experiment_id` only as contextual corroboration, never as sufficient indirect-credit evidence by itself.
 
 Direct origin runs receive a reserved credit budget. Supporting runs share the remaining budget according to their explicit provenance paths. Per-outcome credit is normalized to exactly 1.0. Indirect support must also precede the outcome in time; when an outcome has only day-level precision, same-day indirect support is excluded rather than guessing event order.
 
@@ -38,14 +38,15 @@ This is **training/accounting attribution, not a causal claim**.
 
 ## Leakage boundary
 
-Prospective searches are deterministically split by the hash of `search_run_id` into train and confirm partitions.
+Prospective searches use a precommitted split that the hunter cannot choose after seeing results. Current schema-v14+ generated runs hash their validated `execution_claim_id`; legacy/manual/unallocated runs are train-only and can never manufacture confirm evidence.
 
 - train outcomes can credit train runs only;
 - confirm outcomes can credit confirm runs only;
 - live value priors train only on the train partition and must separately pass a confirm-support gate before they can steer hunters;
 - benchmark runs are `evaluation_only`;
 - retrospective and non-search records are excluded;
-- an outcome whose direct origins span train and confirm is excluded from learning.
+- an outcome whose direct origins span train and confirm is excluded from learning;
+- an excluded non-search origin may anchor downstream support credit only when it carries the same validated generated-claim provenance; untrusted/manual origins cannot create a confirm anchor.
 
 This prevents the learning loop from improving itself using the evidence later used to judge that improvement.
 
