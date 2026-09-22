@@ -134,6 +134,38 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "processor-controlled fee overpayment finding",
         ("fee agreement engine", "transaction reconciliation", "processor statements"),
     ),
+    Branch.PARCEL: BranchSpec(
+        Branch.PARCEL,
+        "ParcelRecovery",
+        "parcel carrier rate, zone, weight, and surcharge billing leakage",
+        ("parcel invoice lines", "reviewed expected-rate assessments", "rate snapshots"),
+        "rate-assessment-backed parcel overpayment finding",
+        ("parcel rating engines", "shipment reconciliation", "carrier invoice exports"),
+    ),
+    Branch.PROCUREMENT: BranchSpec(
+        Branch.PROCUREMENT,
+        "ProcurementRecovery",
+        "PO/contract price and approved-quantity invoice leakage",
+        ("supplier invoice lines", "effective PO/contract lines", "approved billable quantities"),
+        "PO-backed procurement overpayment finding",
+        ("PO matching", "receipt/quantity approval", "invoice reconciliation"),
+    ),
+    Branch.WARRANTY_CREDIT: BranchSpec(
+        Branch.WARRANTY_CREDIT,
+        "Warranty/CreditRecovery",
+        "approved warranty, return, allowance, and supplier credits not fully received",
+        ("reviewed credit entitlements", "credit memos/refunds/remittances"),
+        "entitlement-backed supplier credit underpayment finding",
+        ("warranty approvals", "return credits", "credit settlement reconciliation"),
+    ),
+    Branch.PAYROLL_BENEFIT: BranchSpec(
+        Branch.PAYROLL_BENEFIT,
+        "Payroll/BenefitBillingRecovery",
+        "employer payroll-service and benefit-carrier billing leakage",
+        ("vendor/carrier invoices", "service/rate agreements", "deidentified enrollment or processing counts"),
+        "contract-backed employer billing overpayment finding",
+        ("contract billing engine", "deidentified enrollment aggregation", "invoice exports"),
+    ),
 }
 
 
