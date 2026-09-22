@@ -181,3 +181,39 @@ create table if not exists intel_repair_task (
   created_at timestamptz not null default now()
 );
 
+-- Candidate fixes bound to a specific repair-task hash. These rows may become
+-- READY_FOR_SKILL_EVAL only; they do not authorize deployment or global use.
+create table if not exists intel_repair_candidate (
+  id text primary key,
+  repair_task_id text not null,
+  repair_task_sha256 text not null,
+  state text not null,
+  target_type text not null,
+  target_id text not null,
+  artifact_id text not null,
+  baseline_version text not null,
+  candidate_version text not null,
+  baseline_artifact_ref text not null,
+  candidate_artifact_ref text not null,
+  diff_hash text not null,
+  regression_tests_total int not null,
+  regression_tests_passed int not null,
+  regression_test_evidence_refs jsonb not null default '[]',
+  decision_history_ref text not null,
+  candidate_record_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists intel_skill_eval_task (
+  id text primary key,
+  repair_candidate_id text not null,
+  candidate_record_sha256 text not null,
+  artifact_id text not null,
+  baseline_version text not null,
+  candidate_version text not null,
+  required_evaluation jsonb not null,
+  automatic_global_promotion_allowed boolean not null default false,
+  skill_eval_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
