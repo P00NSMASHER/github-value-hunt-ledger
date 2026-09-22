@@ -27,6 +27,9 @@ import retry_plan
 import run as production
 
 
+PARSER_VERSION = "fmc-ledger-v3-retry"
+
+
 def collect_targets(
     conn: sqlite3.Connection,
     *,
@@ -144,6 +147,7 @@ def retry_one(
                 ),
             }],
             "retry_status": "FAILED",
+            "parser_version": PARSER_VERSION,
         }
 
     final_url = base.canonicalize_url(resp.url) or resp.url
@@ -227,6 +231,7 @@ def retry_one(
         "terms": terms,
         "errors": errors,
         "retry_status": "RECOVERED",
+        "parser_version": PARSER_VERSION,
     }
 
 
