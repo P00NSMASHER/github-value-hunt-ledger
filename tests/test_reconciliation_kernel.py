@@ -42,6 +42,7 @@ class ReconciliationKernelTests(unittest.TestCase):
         )
         self.assertEqual(fuzzy.matches[0].receipt.rule, "reference-fuzzy")
         self.assertEqual(fuzzy.matches[0].receipt.normalization["normalized"], "42")
+        self.assertIn("strip-prefix:REF", fuzzy.matches[0].receipt.normalization["steps"])
 
     def test_amount_date_and_tolerance(self):
         window = reconcile(
@@ -104,6 +105,7 @@ class ReconciliationKernelTests(unittest.TestCase):
         self.assertEqual(residual.category, "amount-mismatch")
         self.assertEqual(residual.candidate.id, "b1")
         self.assertEqual(residual.candidate.amount_delta_minor, 600)
+        self.assertEqual(residual.candidate.shared_reference, "ORD18")
 
     def test_strict_money_and_date_fail_closed(self):
         with self.assertRaisesRegex(ValueError, "unparseable amount"):
