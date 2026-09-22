@@ -120,16 +120,42 @@ def consolidate_candidates(
     pass_through: list[dict[str, Any]],
     dd_reviews: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    by_line: dict[str, dict[str, Any]] = {}
+    """Consolidate review candidates without counting overlapping theories twice.
 
-    def add(line_id: str | None, finding_type: str, amount: Any, status: str) -> None:
+    Line-level theories are first collapsed to the maximum candidate amount per
+    invoice line. Those distinct line maxima are summed within a known invoice.
+    A whole-invoice D&D candidate can overlap every line in that invoice, so the
+    invoice upper bound is max(sum(line candidates), whole-invoice candidate).
+
+    If a positive whole-invoice candidate exists while positive line candidates
+    lack invoice scope, overlap cannot be proven or excluded. In that case the
+    engine abstains from emitting a combined numeric no-double-count total.
+    """
+
+    line_entries: dict[tuple[str | None, str], dict[str, Any]] = {}
+    invoice_candidates: dict[str, dict[str, Any]] = {}
+
+    def clean_invoice_id(value: Any) -> str | None:
+        text_value = str(value or "").strip()
+        return text_value or None
+
+    def add_line(
+        invoice_id: str | None,
+        line_id: str | None,
+        finding_type: str,
+        amount: Any,
+        status: str,
+    ) -> None:
         if not line_id:
             return
+        invoice_id = clean_invoice_id(invoice_id)
         value = dec(amount)
-        entry = by_line.setdefault(
-            line_id,
+        key = (invoice_id, str(line_id))
+        entry = line_entries.setdefault(
+            key,
             {
-                "invoice_line_id": line_id,
+                "invoice_id": invoice_id,
+                "invoice_line_id": str(line_id),
                 "candidate_amounts": [],
                 "finding_types": [],
                 "statuses": [],
@@ -139,45 +165,138 @@ def consolidate_candidates(
         entry["finding_types"].append(finding_type)
         entry["statuses"].append(status)
 
-    add(
+    def add_invoice(
+        invoice_id: str | None,
+        finding_type: str,
+        amount: Any,
+        status: str,
+    ) -> None:
+        invoice_id = clean_invoice_id(invoice_id)
+        if not invoice_id:
+            return
+        value = dec(amount)
+        entry = invoice_candidates.setdefault(
+            invoice_id,
+            {
+                "invoice_id": invoice_id,
+                "candidate_amounts": [],
+                "finding_types": [],
+                "statuses": [],
+            },
+        )
+        entry["candidate_amounts"].append(str(value))
+        entry["finding_types"].append(finding_type)
+        entry["statuses"].append(status)
+
+    add_line(
+        base_review.get("invoice_id"),
         base_review.get("invoice_line_id"),
         "BASE_RATE",
         base_review.get("potential_review_amount", "0"),
         base_review.get("status", "UNKNOWN"),
     )
     for row in pass_through:
-        add(
+        add_line(
+            row.get("invoice_id"),
             row.get("invoice_line_id"),
             "PASS_THROUGH",
             row.get("potential_markup_delta", "0"),
             row.get("status", "UNKNOWN"),
         )
     for row in dd_reviews:
-        add(
+        add_invoice(
             row.get("invoice_id"),
             "DEMURRAGE_DETENTION_INVOICE",
             row.get("potential_charge_relief_amount", "0"),
             row.get("status", "UNKNOWN"),
         )
 
-    total = Decimal("0.00")
-    rows = []
-    for line_id, entry in sorted(by_line.items()):
+    line_rows: list[dict[str, Any]] = []
+    line_sums_by_invoice: dict[str, Decimal] = {}
+    unscoped_line_total = Decimal("0.00")
+    positive_unscoped_lines = False
+
+    for (invoice_id, line_id), entry in sorted(
+        line_entries.items(),
+        key=lambda item: ((item[0][0] or ""), item[0][1]),
+    ):
         values = [dec(value) for value in entry["candidate_amounts"]]
         upper = max(values) if values else Decimal("0.00")
-        total += upper
-        rows.append(
+        if invoice_id is None:
+            unscoped_line_total += upper
+            positive_unscoped_lines = positive_unscoped_lines or upper > 0
+        else:
+            line_sums_by_invoice[invoice_id] = (
+                line_sums_by_invoice.get(invoice_id, Decimal("0.00")) + upper
+            )
+        line_rows.append(
             {
                 **entry,
                 "candidate_upper_bound_no_double_count": str(upper),
             }
         )
+
+    invoice_rows: list[dict[str, Any]] = []
+    scoped_total = Decimal("0.00")
+    positive_whole_invoice_candidate = False
+    invoice_ids = sorted(set(line_sums_by_invoice) | set(invoice_candidates))
+    for invoice_id in invoice_ids:
+        line_total = line_sums_by_invoice.get(invoice_id, Decimal("0.00"))
+        invoice_entry = invoice_candidates.get(invoice_id)
+        invoice_values = (
+            [dec(value) for value in invoice_entry["candidate_amounts"]]
+            if invoice_entry
+            else []
+        )
+        whole_invoice_upper = (
+            max(invoice_values) if invoice_values else Decimal("0.00")
+        )
+        positive_whole_invoice_candidate = (
+            positive_whole_invoice_candidate or whole_invoice_upper > 0
+        )
+        upper = max(line_total, whole_invoice_upper)
+        scoped_total += upper
+        invoice_rows.append(
+            {
+                "invoice_id": invoice_id,
+                "line_level_candidate_sum": str(line_total),
+                "whole_invoice_candidate_max": str(whole_invoice_upper),
+                "candidate_upper_bound_no_double_count": str(upper),
+                "whole_invoice_finding_types": (
+                    invoice_entry["finding_types"] if invoice_entry else []
+                ),
+                "whole_invoice_statuses": (
+                    invoice_entry["statuses"] if invoice_entry else []
+                ),
+            }
+        )
+
+    scope_incomplete = positive_whole_invoice_candidate and positive_unscoped_lines
+    combined = None
+    if not scope_incomplete:
+        combined = str(
+            (scoped_total + unscoped_line_total).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+        )
+
     return {
-        "lines": rows,
-        "potential_review_upper_bound_no_double_count": str(
-            total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        "status": (
+            "OVERLAP_SCOPE_INCOMPLETE"
+            if scope_incomplete
+            else "CONSOLIDATED"
         ),
+        "lines": line_rows,
+        "invoice_scopes": invoice_rows,
+        "unscoped_line_candidate_total": str(unscoped_line_total),
+        "potential_review_upper_bound_no_double_count": combined,
         "asserted_recovery_total": "0.00",
+        "overlap_policy": {
+            "line_theories_use_max_per_line": True,
+            "distinct_lines_sum_within_known_invoice": True,
+            "whole_invoice_vs_line_sum_uses_max": True,
+            "missing_invoice_scope_with_whole_invoice_candidate_abstains": True,
+        },
     }
 
 
