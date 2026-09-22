@@ -40,6 +40,7 @@ CONTROL_PATHS = (
     "freight/invoice_csv_adapter.py",
     "freight/incident_response.py",
     "freight/launch_brief.py",
+    "freight/money.py",
     "freight/outcome_adapter.py",
     "freight/pilot_activation_packet.py",
     "freight/pilot_amendment.py",
