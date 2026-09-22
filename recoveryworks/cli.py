@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from .io import execute_scan_payload
+from .raw_scan import execute_raw_scan_payload
 from .packets import build_client_portfolio_packet, build_recovery_packet, submission_ready
 from .storage import load_ledger, save_ledger
 
@@ -35,10 +36,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="recoveryworks")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    scan = sub.add_parser("scan", help="run a frozen Recovery Scan 360 payload")
+    scan = sub.add_parser("scan", help="run a normalized frozen Recovery Scan 360 payload")
     scan.add_argument("input", type=Path)
     _add_output(scan)
     scan.add_argument("--ledger-output", type=Path, help="persist the resulting proof/audit ledger locally")
+
+    raw_scan = sub.add_parser(
+        "raw-scan",
+        help="run raw structured records through all applicable deterministic recovery engines",
+    )
+    raw_scan.add_argument("input", type=Path)
+    _add_output(raw_scan)
+    raw_scan.add_argument("--ledger-output", type=Path, help="persist the resulting proof/audit ledger locally")
 
     summary = sub.add_parser("summary", help="read a persisted ledger without mutating it")
     summary.add_argument("ledger", type=Path)
@@ -116,9 +125,12 @@ def _record_result(ledger, finding_id: str) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
-    if args.command == "scan":
+    if args.command in {"scan", "raw-scan"}:
         payload = json.loads(args.input.read_text(encoding="utf-8"))
-        result, ledger = execute_scan_payload(payload)
+        if args.command == "raw-scan":
+            result, ledger = execute_raw_scan_payload(payload)
+        else:
+            result, ledger = execute_scan_payload(payload)
         if args.ledger_output:
             key = _ledger_key()
             if _require_signed_ledger() and key is None:
