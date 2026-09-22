@@ -250,13 +250,23 @@ def outcome_signal(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
 
     revenue = outcome.get("revenue_usd")
     customer_value = outcome.get("customer_value_usd")
-    commercial_observed = (
-        isinstance(revenue, (int, float)) and revenue > 0
-    ) or (
-        isinstance(customer_value, (int, float))
-        and customer_value > 0
+    observed_values = [
+        float(value)
+        for value in (revenue, customer_value)
+        if isinstance(value, (int, float)) and value > 0
+    ]
+    economic_value_usd = max(observed_values) if observed_values else 0.0
+    commercial_observed = economic_value_usd > 0
+    # Bounded log scale: $1M reaches the ceiling, while small realized
+    # amounts still count without being treated as equivalent to $1M.
+    commercial = (
+        min(
+            1.0,
+            math.log10(1.0 + economic_value_usd) / 6.0,
+        )
+        if commercial_observed
+        else 0.0
     )
-    commercial = 1.0 if commercial_observed else 0.0
 
     low = outcome.get("engineering_days_saved_low")
     high = outcome.get("engineering_days_saved_high")
@@ -291,6 +301,7 @@ def outcome_signal(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
     return {
         "technical": technical,
         "commercial": commercial,
+        "economic_value_usd": economic_value_usd,
         "engineering": engineering,
         "commercial_observed": commercial_observed,
         "engineering_observed": engineering_observed,
