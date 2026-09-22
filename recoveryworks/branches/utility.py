@@ -179,6 +179,20 @@ class UtilityTariff:
         end = _iso_date("effective_to", self.effective_to) if self.effective_to else None
         return when >= start and (end is None or when <= end)
 
+    def covers_period(self, service_start: str, service_end: str) -> bool:
+        start = _iso_date("service_start", service_start)
+        end = _iso_date("service_end", service_end)
+        tariff_start = _iso_date("effective_from", self.effective_from)
+        tariff_end = _iso_date("effective_to", self.effective_to) if self.effective_to else None
+        return start >= tariff_start and (tariff_end is None or end <= tariff_end)
+
+    def overlaps_period(self, service_start: str, service_end: str) -> bool:
+        start = _iso_date("service_start", service_start)
+        end = _iso_date("service_end", service_end)
+        tariff_start = _iso_date("effective_from", self.effective_from)
+        tariff_end = _iso_date("effective_to", self.effective_to) if self.effective_to else None
+        return tariff_start <= end and (tariff_end is None or tariff_end >= start)
+
     def rule_ref(self) -> RuleRef:
         identity = {
             "schema": 2,
@@ -439,20 +453,50 @@ def audit_utility_bills(
     exceptions: list[UtilityAuditException] = []
 
     for bill in sorted(bills, key=lambda b: b.bill_id):
-        candidates = [
-            tariff
-            for tariff in tariff_index.get(
-                (bill.utility_id, bill.normalized_service_class), []
-            )
-            if tariff.covers(bill.bill_date)
-        ]
-        if not candidates:
-            exceptions.append(UtilityAuditException(
-                bill.bill_id,
-                "NO_TARIFF_VERSION",
-                "no tariff version covers the bill date/service class",
-            ))
-            continue
+        versions = tariff_index.get(
+            (bill.utility_id, bill.normalized_service_class), []
+        )
+        if bill.has_service_period:
+            candidates = [
+                tariff
+                for tariff in versions
+                if tariff.covers_period(bill.service_start or "", bill.service_end or "")
+            ]
+            if not candidates:
+                overlaps = [
+                    tariff
+                    for tariff in versions
+                    if tariff.overlaps_period(bill.service_start or "", bill.service_end or "")
+                ]
+                if len(overlaps) > 1:
+                    exceptions.append(UtilityAuditException(
+                        bill.bill_id,
+                        "SERVICE_PERIOD_SPANS_TARIFF_CHANGE",
+                        "service period overlaps multiple tariff versions; interval usage is required",
+                    ))
+                elif len(overlaps) == 1:
+                    exceptions.append(UtilityAuditException(
+                        bill.bill_id,
+                        "PARTIAL_TARIFF_COVERAGE",
+                        "no single tariff version covers the full service period",
+                    ))
+                else:
+                    exceptions.append(UtilityAuditException(
+                        bill.bill_id,
+                        "NO_TARIFF_VERSION",
+                        "no tariff version covers the service period/service class",
+                    ))
+                continue
+        else:
+            candidates = [tariff for tariff in versions if tariff.covers(bill.bill_date)]
+            if not candidates:
+                exceptions.append(UtilityAuditException(
+                    bill.bill_id,
+                    "NO_TARIFF_VERSION",
+                    "no tariff version covers the bill date/service class",
+                ))
+                continue
+
         if len(candidates) > 1:
             exceptions.append(UtilityAuditException(
                 bill.bill_id,
@@ -495,6 +539,9 @@ def audit_utility_bills(
                 "account_id": bill.account_id,
                 "service_class": bill.normalized_service_class,
                 "bill_date": bill.bill_date,
+                "service_start": bill.service_start,
+                "service_end": bill.service_end,
+                "rate_selection_basis": "service_period" if bill.has_service_period else "bill_date",
                 "calculation_trace": list(trace),
                 "tariff_source_hash": tariff.source_hash,
             },
