@@ -124,8 +124,15 @@ CREATE TABLE IF NOT EXISTS provider_entities (
   tin_type TEXT,
   tin_value TEXT,
   business_name TEXT,
-  npi TEXT,
-  UNIQUE(provider_group_row_id, COALESCE(tin_type,''), COALESCE(tin_value,''), COALESCE(npi,''))
+  npi TEXT
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_provider_entity_unique
+ON provider_entities(
+  provider_group_row_id,
+  COALESCE(tin_type,''),
+  COALESCE(tin_value,''),
+  COALESCE(npi,'')
 );
 
 CREATE INDEX IF NOT EXISTS idx_provider_npi ON provider_entities(npi);
