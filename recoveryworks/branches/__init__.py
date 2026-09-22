@@ -1,3 +1,38 @@
+from .parcel import (
+    ParcelAuditBatch,
+    ParcelAuditException,
+    ParcelCharge,
+    ParcelExpectedAssessment,
+    audit_parcel_charges,
+)
+from .parcel_csv import load_parcel_assessments_csv, load_parcel_charges_csv
+from .procurement import (
+    ProcurementAuditBatch,
+    ProcurementAuditException,
+    ProcurementAuthority,
+    ProcurementInvoiceLine,
+    ProcurementQuantityApproval,
+    audit_procurement_lines,
+)
+from .procurement_csv import (
+    load_procurement_authorities_csv,
+    load_procurement_invoice_lines_csv,
+    load_procurement_quantities_csv,
+)
+from .warranty_credit import (
+    WarrantyCreditAuditBatch,
+    WarrantyCreditAuditException,
+    WarrantyCreditEntitlement,
+    WarrantyCreditSettlement,
+    audit_warranty_credits,
+    normalize_credit_category,
+)
+from .warranty_credit_csv import (
+    load_warranty_credit_entitlements_csv,
+    load_warranty_credit_settlements_csv,
+)
+from .payroll_benefit import audit_payroll_benefit_billing
+from .payroll_benefit_csv import load_payroll_benefit_units_csv
 from .cloud import audit_cloud_billing
 from .cloud_csv import load_cloud_meter_csv
 from .merchant_fee import (
@@ -163,6 +198,19 @@ from .utility_io import (
 )
 
 __all__ = [
+    "ParcelAuditBatch",
+    "ParcelAuditException",
+    "ParcelCharge",
+    "ParcelExpectedAssessment",
+    "ProcurementAuditBatch",
+    "ProcurementAuditException",
+    "ProcurementAuthority",
+    "ProcurementInvoiceLine",
+    "ProcurementQuantityApproval",
+    "WarrantyCreditAuditBatch",
+    "WarrantyCreditAuditException",
+    "WarrantyCreditEntitlement",
+    "WarrantyCreditSettlement",
     "MerchantFeeAgreement",
     "MerchantFeeAuditBatch",
     "MerchantFeeAuditException",
@@ -240,6 +288,10 @@ __all__ = [
     "UtilityTariff",
     "UtilityTier",
     "all_specs",
+    "audit_parcel_charges",
+    "audit_procurement_lines",
+    "audit_warranty_credits",
+    "audit_payroll_benefit_billing",
     "audit_cloud_billing",
     "audit_merchant_fees",
     "audit_insurance_claims",
@@ -261,6 +313,14 @@ __all__ = [
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
+    "load_parcel_assessments_csv",
+    "load_parcel_charges_csv",
+    "load_procurement_authorities_csv",
+    "load_procurement_invoice_lines_csv",
+    "load_procurement_quantities_csv",
+    "load_warranty_credit_entitlements_csv",
+    "load_warranty_credit_settlements_csv",
+    "load_payroll_benefit_units_csv",
     "load_cloud_meter_csv",
     "load_merchant_fee_agreements_csv",
     "load_merchant_fee_statements_csv",
@@ -291,6 +351,7 @@ __all__ = [
     "load_usage_csv",
     "load_vendor_statements_csv",
     "money_to_cents",
+    "normalize_credit_category",
     "normalize_coverage_category",
     "normalize_jurisdiction",
     "normalize_tax_category",
