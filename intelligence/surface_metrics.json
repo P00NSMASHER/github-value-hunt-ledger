@@ -211,6 +211,21 @@
       "surface_family_id": "SURFACE_FAMILY:first-party-docs"
     },
     {
+      "id": "SURFACE:repository-hardware-simulator",
+      "runs": 2,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 2,
+      "experiment_runs": 2,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "repository hardware simulator"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:cross-project-identity-failure-comparison",
       "runs": 1,
       "deep_inspected": 4,
@@ -1501,6 +1516,21 @@
       "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
+      "id": "SURFACE:local-synthetic-source-observation-receipt-acceptance-matrix",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "local synthetic source-observation receipt acceptance matrix"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
       "id": "SURFACE:official-go-documentation",
       "runs": 1,
       "deep_inspected": 0,
@@ -1529,6 +1559,36 @@
         "official Robot Server read-only API"
       ],
       "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:official-robot-server-runtime",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "official Robot Server runtime"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:first-party-docs"
+    },
+    {
+      "id": "SURFACE:opentrons-exact-revision-source",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "Opentrons exact-revision source"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
@@ -1561,6 +1621,21 @@
       "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
     },
     {
+      "id": "SURFACE:prior-frozen-exp-009-evidence",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "prior frozen EXP-009 evidence"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:private-ledger-source",
       "runs": 1,
       "deep_inspected": 0,
@@ -1574,21 +1649,6 @@
         "private ledger source"
       ],
       "surface_family_id": "SURFACE_FAMILY:private-ledger"
-    },
-    {
-      "id": "SURFACE:repository-hardware-simulator",
-      "runs": 1,
-      "deep_inspected": 0,
-      "retained_count": 0,
-      "master_promoted_count": 0,
-      "capability_touch_runs": 1,
-      "experiment_runs": 1,
-      "assisted_outcome_count": 0,
-      "fractional_outcome_equivalents": 0,
-      "labels_seen": [
-        "repository hardware simulator"
-      ],
-      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:sam-gov-first-party-opportunity-pages",
@@ -1651,6 +1711,21 @@
       "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
     },
     {
+      "id": "SURFACE:sqlite-persistence",
+      "runs": 1,
+      "deep_inspected": 0,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "SQLite persistence"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:synthetic-local-validation"
+    },
+    {
       "id": "SURFACE:synthetic-acceptance-corpus",
       "runs": 1,
       "deep_inspected": 0,
@@ -1669,12 +1744,12 @@
   "family_rows": [
     {
       "id": "SURFACE_FAMILY:other",
-      "runs": 22,
+      "runs": 24,
       "deep_inspected": 26,
       "retained_count": 15,
       "master_promoted_count": 0,
-      "capability_touch_runs": 20,
-      "experiment_runs": 18,
+      "capability_touch_runs": 22,
+      "experiment_runs": 20,
       "assisted_outcome_count": 3,
       "fractional_outcome_equivalents": 1.1666666666666665,
       "name": "Other/uncategorized",
@@ -1709,9 +1784,11 @@
         "SURFACE:microsoft-dynamics-ax-integration-exact-source-revision",
         "SURFACE:microsoftdocs-dynamics-365-unified-operations-public-exact-source-revision",
         "SURFACE:nuget-gallery-package-metadata",
+        "SURFACE:opentrons-exact-revision-source",
         "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
         "SURFACE:package-publication-verification",
         "SURFACE:polish-ministry-of-finance-ksef-official-pages",
+        "SURFACE:prior-frozen-exp-009-evidence",
         "SURFACE:public-git-clone-at-pinned-revision",
         "SURFACE:public-package-metadata-recall-rescue-surface",
         "SURFACE:public-web-github-discovery",
@@ -1734,12 +1811,12 @@
     },
     {
       "id": "SURFACE_FAMILY:synthetic-local-validation",
-      "runs": 14,
+      "runs": 16,
       "deep_inspected": 7,
       "retained_count": 4,
       "master_promoted_count": 0,
-      "capability_touch_runs": 14,
-      "experiment_runs": 14,
+      "capability_touch_runs": 16,
+      "experiment_runs": 16,
       "assisted_outcome_count": 5,
       "fractional_outcome_equivalents": 3.166666666666667,
       "name": "Synthetic/local validation",
@@ -1749,21 +1826,23 @@
         "SURFACE:local-synthetic-python-and-sqlite-fixture",
         "SURFACE:local-synthetic-python-fixture",
         "SURFACE:local-synthetic-read-only-decoder-execution",
+        "SURFACE:local-synthetic-source-observation-receipt-acceptance-matrix",
         "SURFACE:persistent-sqlite-provider-state",
         "SURFACE:source-faithful-synthetic-state-model",
         "SURFACE:sqlite-concurrency-boundary",
         "SURFACE:sqlite-crash-restart-harness",
+        "SURFACE:sqlite-persistence",
         "SURFACE:synthetic-acceptance-corpus"
       ]
     },
     {
       "id": "SURFACE_FAMILY:first-party-docs",
-      "runs": 11,
+      "runs": 12,
       "deep_inspected": 13,
       "retained_count": 9,
       "master_promoted_count": 0,
-      "capability_touch_runs": 11,
-      "experiment_runs": 11,
+      "capability_touch_runs": 12,
+      "experiment_runs": 12,
       "assisted_outcome_count": 1,
       "fractional_outcome_equivalents": 0.3333333333333333,
       "name": "First-party documentation",
@@ -1778,6 +1857,7 @@
         "SURFACE:official-microsoft-learn-documentation",
         "SURFACE:official-payroll-engine-documentation",
         "SURFACE:official-robot-server-read-only-api",
+        "SURFACE:official-robot-server-runtime",
         "SURFACE:official-sap-help-documentation",
         "SURFACE:official-vendor-robot-server-schema-store",
         "SURFACE:stripe-first-party-payout-documentation"
@@ -1937,9 +2017,11 @@
     "SURFACE:microsoft-dynamics-ax-integration-exact-source-revision",
     "SURFACE:microsoftdocs-dynamics-365-unified-operations-public-exact-source-revision",
     "SURFACE:nuget-gallery-package-metadata",
+    "SURFACE:opentrons-exact-revision-source",
     "SURFACE:opentrons-opentrons-exact-revision-source-and-tests",
     "SURFACE:package-publication-verification",
     "SURFACE:polish-ministry-of-finance-ksef-official-pages",
+    "SURFACE:prior-frozen-exp-009-evidence",
     "SURFACE:public-git-clone-at-pinned-revision",
     "SURFACE:public-package-metadata-recall-rescue-surface",
     "SURFACE:public-web-github-discovery",

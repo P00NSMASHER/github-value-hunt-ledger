@@ -1,11 +1,18 @@
 {
   "measured_runs": 22,
-  "total_measured_activity_runs": 39,
-  "excluded_nonsearch_or_unclassified_runs": 17,
+  "total_measured_activity_runs": 41,
+  "excluded_nonsearch_or_unclassified_runs": 19,
   "legacy_unclassified_discovery_runs": 18,
   "discovery_denominator_policy": "explicit_search_plus_legacy_action_absent; all_activity_outcome_credit_preserved",
   "valid_outcomes": 6,
   "exploration_budget": 0.5,
+  "stop_reason_counts": {},
+  "recall_rescue_observed_runs": 10,
+  "recall_rescue_used_runs": 2,
+  "recall_rescue_type_counts": {
+    "unspecified": 2
+  },
+  "recall_rescue_type_successes": {},
   "outcome_attribution_method": "equal_touch_fractional_credit",
   "strategy_allocation": [
     {
@@ -260,7 +267,7 @@
       "name": "Permit event versioning and semantic source QA",
       "gap_score": 4,
       "missing_piece": "jurisdiction completeness/semantics vary",
-      "run_attention": 1
+      "run_attention": 2
     },
     {
       "capability_id": "CAP-014",
@@ -333,6 +340,8 @@
     "never_zero_exploration": true,
     "recent_runs_not_treated_as_failed_outcomes": true,
     "domain_authorization_precedes_generic_gap_ranking": true,
-    "multi_origin_outcomes_not_full_credited_to_every_strategy": true
+    "multi_origin_outcomes_not_full_credited_to_every_strategy": true,
+    "stop_reason_signals_observe_only": true,
+    "coordination_routing_observe_first": true
   }
 }

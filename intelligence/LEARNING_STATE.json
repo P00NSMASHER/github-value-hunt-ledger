@@ -1,0 +1,1311 @@
+{
+  "automatic_expand_retire_enabled": false,
+  "failure_queue": {
+    "blocked": 0,
+    "count": 0,
+    "items": [],
+    "queued": 0
+  },
+  "learning_alerts": [],
+  "memory": {
+    "config": {
+      "alpha": 0.15,
+      "epsilon": 0.1,
+      "gamma": 0.0,
+      "q_ceiling": 1.0,
+      "q_floor": -1.0,
+      "similarity_weight": 0.45,
+      "value_weight": 0.55
+    },
+    "records": [
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:authority-lineage::QF:reachable-trusted-measurement-state-exact-work-order-line-bill-period-authority-one-use-claim-closed-mutation-surface",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260920T202500Z:hunter04:reachable-authority",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T20:25:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:current-rule-authority::QF:authority-origin-invariant-set-consistency-rule-version-transfer",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:18:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:current-rule-authority::QF:ksef-regulated-vertical-schema-version-artifact-and-regulator-receipt",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.15,
+        "last_run_id": "RUN:20260921T050410Z:HUNTER-01:9378fda616cc",
+        "q_value": 0.0225,
+        "reward_ma": 0.15,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.15,
+          "measured_runs": 1,
+          "min_reward": 0.15,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T05:04:10.093166Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:current-rule-authority::QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.3,
+        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
+        "q_value": 0.045,
+        "reward_ma": 0.3,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": 0.3,
+          "measured_runs": 1,
+          "min_reward": 0.3,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:13:03Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:current-rule-authority::QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.35625,
+        "last_run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
+        "q_value": 0.0534375,
+        "reward_ma": 0.35625,
+        "support": {
+          "deep_inspections": 4,
+          "mean_reward": 0.35625,
+          "measured_runs": 1,
+          "min_reward": 0.35625,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T22:58:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:identity-lineage::QF:recovery-coverage-identity-lifecycle-contradiction-vs-succession-vs-collision-vs-unavailable-source",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.24375,
+        "last_run_id": "RUN:20260920T202725Z:hunter11:recovery-identity-lifecycle",
+        "q_value": 0.0365625,
+        "reward_ma": 0.24375,
+        "support": {
+          "deep_inspections": 4,
+          "mean_reward": 0.24375,
+          "measured_runs": 1,
+          "min_reward": 0.24375,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T20:27:25Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:independent-evaluation::QF:c-c-mortgage-insurance-source-span-selective-prediction-review-threshold-transfer",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": -0.35,
+        "last_run_id": "RUN:20260921T030456Z:hunter01:cpp-abstention-transfer",
+        "q_value": -0.0525,
+        "reward_ma": -0.35,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": -0.35,
+          "measured_runs": 1,
+          "min_reward": -0.35,
+          "positive_runs": 0
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T03:04:56Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:independent-evaluation::QF:thermo-raw-oracle-backed-parser-repair-replay",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T04:04:05Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:independent-evaluation::QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.47975,
+        "last_run_id": "RUN:20260921T030500Z:hunter13:exp007-opentfraw-thermo-falsification",
+        "q_value": 0.0719625,
+        "reward_ma": 0.47975,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.47975,
+          "measured_runs": 1,
+          "min_reward": 0.47975,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T03:05:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:protocol-regression::QF:cross-vendor-chromatography-raw-format-registry-canonical-metadata-provenance-open-format-export-fixture-regression",
+        "kind": "CONTEXTUAL_QUERY_FAMILY",
+        "last_reward": 0.28850000000000003,
+        "last_run_id": "RUN:20260920T212700Z:hunter06:chromconverter-normalization",
+        "q_value": 0.043275,
+        "reward_ma": 0.28850000000000003,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": 0.28850000000000003,
+          "measured_runs": 1,
+          "min_reward": 0.28850000000000003,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T21:27:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:authority-lineage::STRAT:rule-period-authority-version-audit",
+        "kind": "CONTEXTUAL_STRATEGY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260920T202500Z:hunter04:reachable-authority",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T20:25:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:current-rule-authority::STRAT:authority-origin-invariant-set-consistency",
+        "kind": "CONTEXTUAL_STRATEGY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:18:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:current-rule-authority::STRAT:rule-period-authority-version-audit",
+        "kind": "CONTEXTUAL_STRATEGY",
+        "last_reward": 0.3,
+        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
+        "q_value": 0.10273359374999999,
+        "reward_ma": 0.32151562499999997,
+        "support": {
+          "deep_inspections": 8,
+          "mean_reward": 0.26875,
+          "measured_runs": 3,
+          "min_reward": 0.15,
+          "positive_runs": 3
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:13:03Z",
+        "visits": 3
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:identity-lineage::STRAT:identity-lifecycle-contradiction-archaeology",
+        "kind": "CONTEXTUAL_STRATEGY",
+        "last_reward": 0.24375,
+        "last_run_id": "RUN:20260920T202725Z:hunter11:recovery-identity-lifecycle",
+        "q_value": 0.0365625,
+        "reward_ma": 0.24375,
+        "support": {
+          "deep_inspections": 4,
+          "mean_reward": 0.24375,
+          "measured_runs": 1,
+          "min_reward": 0.24375,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T20:27:25Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:independent-evaluation::STRAT:capability-conjunction-search-claim-tracing",
+        "kind": "CONTEXTUAL_STRATEGY",
+        "last_reward": -0.35,
+        "last_run_id": "RUN:20260921T030456Z:hunter01:cpp-abstention-transfer",
+        "q_value": -0.0525,
+        "reward_ma": -0.35,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": -0.35,
+          "measured_runs": 1,
+          "min_reward": -0.35,
+          "positive_runs": 0
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T03:04:56Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:independent-evaluation::STRAT:evaluation-target-independence",
+        "kind": "CONTEXTUAL_STRATEGY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+        "q_value": 0.12116812499999999,
+        "reward_ma": 0.4677875,
+        "support": {
+          "deep_inspections": 2,
+          "mean_reward": 0.439875,
+          "measured_runs": 2,
+          "min_reward": 0.4,
+          "positive_runs": 2
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T04:04:05Z",
+        "visits": 2
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "CTX:OBJ:protocol-regression::STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+        "kind": "CONTEXTUAL_STRATEGY",
+        "last_reward": 0.28850000000000003,
+        "last_run_id": "RUN:20260920T212700Z:hunter06:chromconverter-normalization",
+        "q_value": 0.043275,
+        "reward_ma": 0.28850000000000003,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": 0.28850000000000003,
+          "measured_runs": 1,
+          "min_reward": 0.28850000000000003,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T21:27:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:authority-origin-invariant-set-consistency-rule-version-transfer",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:18:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:c-c-mortgage-insurance-source-span-selective-prediction-review-threshold-transfer",
+        "kind": "QUERY_FAMILY",
+        "last_reward": -0.35,
+        "last_run_id": "RUN:20260921T030456Z:hunter01:cpp-abstention-transfer",
+        "q_value": -0.0525,
+        "reward_ma": -0.35,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": -0.35,
+          "measured_runs": 1,
+          "min_reward": -0.35,
+          "positive_runs": 0
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T03:04:56Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:cross-vendor-chromatography-raw-format-registry-canonical-metadata-provenance-open-format-export-fixture-regression",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.28850000000000003,
+        "last_run_id": "RUN:20260920T212700Z:hunter06:chromconverter-normalization",
+        "q_value": 0.043275,
+        "reward_ma": 0.28850000000000003,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": 0.28850000000000003,
+          "measured_runs": 1,
+          "min_reward": 0.28850000000000003,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T21:27:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:ksef-regulated-vertical-schema-version-artifact-and-regulator-receipt",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.15,
+        "last_run_id": "RUN:20260921T050410Z:HUNTER-01:9378fda616cc",
+        "q_value": 0.0225,
+        "reward_ma": 0.15,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.15,
+          "measured_runs": 1,
+          "min_reward": 0.15,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T05:04:10.093166Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.3,
+        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
+        "q_value": 0.045,
+        "reward_ma": 0.3,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": 0.3,
+          "measured_runs": 1,
+          "min_reward": 0.3,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:13:03Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:reachable-trusted-measurement-state-exact-work-order-line-bill-period-authority-one-use-claim-closed-mutation-surface",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260920T202500Z:hunter04:reachable-authority",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T20:25:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:recovery-coverage-identity-lifecycle-contradiction-vs-succession-vs-collision-vs-unavailable-source",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.24375,
+        "last_run_id": "RUN:20260920T202725Z:hunter11:recovery-identity-lifecycle",
+        "q_value": 0.0365625,
+        "reward_ma": 0.24375,
+        "support": {
+          "deep_inspections": 4,
+          "mean_reward": 0.24375,
+          "measured_runs": 1,
+          "min_reward": 0.24375,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T20:27:25Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:thermo-raw-oracle-backed-parser-repair-replay",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T04:04:05Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.47975,
+        "last_run_id": "RUN:20260921T030500Z:hunter13:exp007-opentfraw-thermo-falsification",
+        "q_value": 0.0719625,
+        "reward_ma": 0.47975,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.47975,
+          "measured_runs": 1,
+          "min_reward": 0.47975,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T03:05:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
+        "kind": "QUERY_FAMILY",
+        "last_reward": 0.35625,
+        "last_run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
+        "q_value": 0.0534375,
+        "reward_ma": 0.35625,
+        "support": {
+          "deep_inspections": 4,
+          "mean_reward": 0.35625,
+          "measured_runs": 1,
+          "min_reward": 0.35625,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T22:58:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:acceptance-path-transition-inspection",
+        "kind": "STRATEGY",
+        "last_reward": 0.329125,
+        "last_run_id": "RUN:H06-20260920T1343-OPENTRONS-RECONCILIATION",
+        "q_value": 0.160249702734375,
+        "reward_ma": 0.28752135156249997,
+        "support": {
+          "deep_inspections": 10,
+          "mean_reward": 0.331609375,
+          "measured_runs": 4,
+          "min_reward": 0.24381250000000002,
+          "positive_runs": 4
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T17:43:41Z",
+        "visits": 4
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:authority-origin-invariant-set-consistency",
+        "kind": "STRATEGY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
+        "q_value": 0.06,
+        "reward_ma": 0.4,
+        "support": {
+          "deep_inspections": 1,
+          "mean_reward": 0.4,
+          "measured_runs": 1,
+          "min_reward": 0.4,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:18:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:capability-conjunction-search-claim-tracing",
+        "kind": "STRATEGY",
+        "last_reward": -0.35,
+        "last_run_id": "RUN:20260921T030456Z:hunter01:cpp-abstention-transfer",
+        "q_value": 0.04184999999999999,
+        "reward_ma": 0.28750000000000003,
+        "support": {
+          "deep_inspections": 9,
+          "mean_reward": 0.15000000000000002,
+          "measured_runs": 3,
+          "min_reward": -0.35,
+          "positive_runs": 2
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T03:04:56Z",
+        "visits": 3
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:evaluation-target-independence",
+        "kind": "STRATEGY",
+        "last_reward": 0.4,
+        "last_run_id": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+        "q_value": 0.19445671874999998,
+        "reward_ma": 0.3641087499999999,
+        "support": {
+          "deep_inspections": 6,
+          "mean_reward": 0.40118750000000003,
+          "measured_runs": 4,
+          "min_reward": 0.325,
+          "positive_runs": 4
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T04:04:05Z",
+        "visits": 4
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:fail-open-boundary-archaeology",
+        "kind": "STRATEGY",
+        "last_reward": 0.24375,
+        "last_run_id": "RUN:20260920T160413Z:hunter15:recovery-coverage-gate",
+        "q_value": 0.0365625,
+        "reward_ma": 0.24375,
+        "support": {
+          "deep_inspections": 4,
+          "mean_reward": 0.24375,
+          "measured_runs": 1,
+          "min_reward": 0.24375,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T16:04:13Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:first-party-history-manifest-triangulation",
+        "kind": "STRATEGY",
+        "last_reward": 0.24375,
+        "last_run_id": "RUN:H05-20260920T1203-SAM-DELETION-RETENTION",
+        "q_value": 0.058875,
+        "reward_ma": 0.1853125,
+        "support": {
+          "deep_inspections": 7,
+          "mean_reward": 0.20937499999999998,
+          "measured_runs": 2,
+          "min_reward": 0.175,
+          "positive_runs": 2
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20",
+        "visits": 2
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:identity-lifecycle-contradiction-archaeology",
+        "kind": "STRATEGY",
+        "last_reward": 0.24375,
+        "last_run_id": "RUN:20260920T202725Z:hunter11:recovery-identity-lifecycle",
+        "q_value": 0.0365625,
+        "reward_ma": 0.24375,
+        "support": {
+          "deep_inspections": 4,
+          "mean_reward": 0.24375,
+          "measured_runs": 1,
+          "min_reward": 0.24375,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T20:27:25Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+        "kind": "STRATEGY",
+        "last_reward": 0.28850000000000003,
+        "last_run_id": "RUN:20260920T212700Z:hunter06:chromconverter-normalization",
+        "q_value": 0.043275,
+        "reward_ma": 0.28850000000000003,
+        "support": {
+          "deep_inspections": 3,
+          "mean_reward": 0.28850000000000003,
+          "measured_runs": 1,
+          "min_reward": 0.28850000000000003,
+          "positive_runs": 1
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-20T21:27:00Z",
+        "visits": 1
+      },
+      {
+        "confirm_evidence_ready": false,
+        "confirm_support": {
+          "deep_inspections": 0,
+          "mean_reward": 0.0,
+          "measured_runs": 0,
+          "min_reward": null,
+          "positive_runs": 0
+        },
+        "eligible_for_policy_consideration": false,
+        "generalization_status": "gathering_evidence",
+        "key": "STRAT:rule-period-authority-version-audit",
+        "kind": "STRATEGY",
+        "last_reward": 0.3,
+        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
+        "q_value": 0.13958109375,
+        "reward_ma": 0.34838359375,
+        "support": {
+          "deep_inspections": 9,
+          "mean_reward": 0.3015625,
+          "measured_runs": 4,
+          "min_reward": 0.15,
+          "positive_runs": 4
+        },
+        "train_evidence_ready": false,
+        "updated_at": "2026-09-21T06:13:03Z",
+        "visits": 4
+      }
+    ]
+  },
+  "mode": "observe_first_advisory",
+  "policy_effect": "none",
+  "policy_gate": {
+    "minimum_confirm_deep_inspections": 6,
+    "minimum_confirm_mean_reward": 0.0,
+    "minimum_confirm_min_reward": 0.0,
+    "minimum_confirm_positive_runs": 1,
+    "minimum_confirm_runs": 2,
+    "minimum_deep_inspections": 20,
+    "minimum_measured_runs": 5,
+    "note": "The existing 5-run/20-deep gate must be met on train episodes, then independently confirmed before a value prior may steer live search. Learning values never override stage/STOP/verification gates."
+  },
+  "reward_observations": [
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.175,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:H05-20260920T1103-SAM-MANIFEST-COMPLETENESS",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:first-party-history-manifest-triangulation"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.24375,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:H05-20260920T1203-SAM-DELETION-RETENTION",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:first-party-history-manifest-triangulation"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.325,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:H07-20260920T1106-OUTAGE-INDEPENDENCE",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:evaluation-target-independence"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.4,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:H07-20260920T1203-USECPO-SCHEMA",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:evaluation-target-independence"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.4,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260920T150647Z:hunter16:po-authority-graph",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:capability-conjunction-search-claim-tracing"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.4,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:H01-20260920T1201-REVERSAL-SAFE-PAYMENT",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:capability-conjunction-search-claim-tracing"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.24375,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260920T160413Z:hunter15:recovery-coverage-gate",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:fail-open-boundary-archaeology"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [
+        "OUT:20260921:exp007-opentfraw-thermo-disagreement"
+      ],
+      "reward": 0.24381250000000002,
+      "reward_stage": "technical_proxy",
+      "search_run_id": "RUN:H06-20260920T1226-PHYSICAL-AMBIGUITY",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:acceptance-path-transition-inspection"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.4,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260920T164727Z:hunter04:authority-path-bypass",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:acceptance-path-transition-inspection"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [
+        "OUT:20260921:exp007-opentfraw-thermo-disagreement"
+      ],
+      "reward": 0.35350000000000004,
+      "reward_stage": "technical_proxy",
+      "search_run_id": "RUN:H06-20260920T1258-RESTART-AMBIGUITY",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:acceptance-path-transition-inspection"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [
+        "OUT:20260921:exp007-opentfraw-thermo-disagreement"
+      ],
+      "reward": 0.329125,
+      "reward_stage": "technical_proxy",
+      "search_run_id": "RUN:H06-20260920T1343-OPENTRONS-RECONCILIATION",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:acceptance-path-transition-inspection"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.4,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260920T202500Z:hunter04:reachable-authority",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:rule-period-authority-version-audit",
+        "CTX:OBJ:authority-lineage::STRAT:rule-period-authority-version-audit",
+        "QF:reachable-trusted-measurement-state-exact-work-order-line-bill-period-authority-one-use-claim-closed-mutation-surface",
+        "CTX:OBJ:authority-lineage::QF:reachable-trusted-measurement-state-exact-work-order-line-bill-period-authority-one-use-claim-closed-mutation-surface"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.24375,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260920T202725Z:hunter11:recovery-identity-lifecycle",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:identity-lifecycle-contradiction-archaeology",
+        "CTX:OBJ:identity-lineage::STRAT:identity-lifecycle-contradiction-archaeology",
+        "QF:recovery-coverage-identity-lifecycle-contradiction-vs-succession-vs-collision-vs-unavailable-source",
+        "CTX:OBJ:identity-lineage::QF:recovery-coverage-identity-lifecycle-contradiction-vs-succession-vs-collision-vs-unavailable-source"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [
+        "OUT:20260921:exp007-opentfraw-thermo-disagreement"
+      ],
+      "reward": 0.28850000000000003,
+      "reward_stage": "technical_proxy",
+      "search_run_id": "RUN:20260920T212700Z:hunter06:chromconverter-normalization",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+        "CTX:OBJ:protocol-regression::STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+        "QF:cross-vendor-chromatography-raw-format-registry-canonical-metadata-provenance-open-format-export-fixture-regression",
+        "CTX:OBJ:protocol-regression::QF:cross-vendor-chromatography-raw-format-registry-canonical-metadata-provenance-open-format-export-fixture-regression"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.35625,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:rule-period-authority-version-audit",
+        "CTX:OBJ:current-rule-authority::STRAT:rule-period-authority-version-audit",
+        "QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
+        "CTX:OBJ:current-rule-authority::QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": -0.35,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260921T030456Z:hunter01:cpp-abstention-transfer",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:capability-conjunction-search-claim-tracing",
+        "CTX:OBJ:independent-evaluation::STRAT:capability-conjunction-search-claim-tracing",
+        "QF:c-c-mortgage-insurance-source-span-selective-prediction-review-threshold-transfer",
+        "CTX:OBJ:independent-evaluation::QF:c-c-mortgage-insurance-source-span-selective-prediction-review-threshold-transfer"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [
+        "OUT:20260921:exp007-opentfraw-thermo-disagreement"
+      ],
+      "reward": 0.47975,
+      "reward_stage": "technical_proxy",
+      "search_run_id": "RUN:20260921T030500Z:hunter13:exp007-opentfraw-thermo-falsification",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:evaluation-target-independence",
+        "CTX:OBJ:independent-evaluation::STRAT:evaluation-target-independence",
+        "QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay",
+        "CTX:OBJ:independent-evaluation::QF:thermo-raw-vendor-native-versus-clean-room-decoder-field-fidelity-replay"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.4,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:evaluation-target-independence",
+        "CTX:OBJ:independent-evaluation::STRAT:evaluation-target-independence",
+        "QF:thermo-raw-oracle-backed-parser-repair-replay",
+        "CTX:OBJ:independent-evaluation::QF:thermo-raw-oracle-backed-parser-repair-replay"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.15,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260921T050410Z:HUNTER-01:9378fda616cc",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:rule-period-authority-version-audit",
+        "CTX:OBJ:current-rule-authority::STRAT:rule-period-authority-version-audit",
+        "QF:ksef-regulated-vertical-schema-version-artifact-and-regulator-receipt",
+        "CTX:OBJ:current-rule-authority::QF:ksef-regulated-vertical-schema-version-artifact-and-regulator-receipt"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.3,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:rule-period-authority-version-audit",
+        "CTX:OBJ:current-rule-authority::STRAT:rule-period-authority-version-audit",
+        "QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
+        "CTX:OBJ:current-rule-authority::QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance"
+      ]
+    },
+    {
+      "downstream_outcome_ids": [],
+      "reward": 0.4,
+      "reward_stage": "discovery_only",
+      "search_run_id": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
+      "split": "train",
+      "updated_memory_keys": [
+        "STRAT:authority-origin-invariant-set-consistency",
+        "CTX:OBJ:current-rule-authority::STRAT:authority-origin-invariant-set-consistency",
+        "QF:authority-origin-invariant-set-consistency-rule-version-transfer",
+        "CTX:OBJ:current-rule-authority::QF:authority-origin-invariant-set-consistency-rule-version-transfer"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "source_snapshot_sha256": "3b54dba4b4d8597bd6b4af71953f0ae4985e2152189d8ed68d5ca11d5d2cc07c",
+  "source_through": "2026-09-21T13:32:00Z",
+  "training_environment": {
+    "credit_edges": 5,
+    "excluded_outcomes": 5,
+    "note": "Only train episodes update memory. Confirm and evaluation-only episodes are held out.",
+    "reward_stage_counts": {
+      "discovery_only": 16,
+      "technical_proxy": 5
+    },
+    "source_snapshot_sha256": "b0230d2ba002a81cf6e9c800b422784ee788c58708c2ef7df05eec9d0ca13f54",
+    "split_counts": {
+      "train": 21
+    }
+  }
+}

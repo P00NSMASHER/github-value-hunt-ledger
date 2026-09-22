@@ -1,6 +1,6 @@
 # WORKER PROFILE REPORT
 
-Profile generation: **WORKERS:d1242505c989**
+Profile generation: **WORKERS:70e9f3831b9f**
 
 - Registered workers: **14**
 - Measured: **6**
@@ -10,19 +10,19 @@ Profile generation: **WORKERS:d1242505c989**
 
 | Worker | State | Runs | Deep | Retained | Top strategy | Top experiment | Active claim |
 |---|---|---:|---:|---:|---|---|---:|
-| HUNTER-01 | MEASURED | 5 | 11 | 4 | STRAT:rule-period-authority-version-audit | EXP-010 | 1 |
+| HUNTER-01 | MEASURED | 5 | 11 | 4 | STRAT:rule-period-authority-version-audit | EXP-010 | 0 |
 | HUNTER-02 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 | HUNTER-03 | SPARSE | 5 | 2 | 0 | STRAT:evaluation-target-independence | EXP-003 | 0 |
-| HUNTER-04 | SPARSE | 3 | 4 | 4 | STRAT:rule-period-authority-version-audit | EXP-005 | 0 |
+| HUNTER-04 | SPARSE | 4 | 4 | 4 | STRAT:rule-period-authority-version-audit | EXP-005 | 0 |
 | HUNTER-05 | MEASURED | 4 | 8 | 4 | STRAT:first-party-history-manifest-triangulation | EXP-006 | 0 |
 | HUNTER-06 | MEASURED | 4 | 10 | 8 | STRAT:acceptance-path-transition-inspection | EXP-007 | 0 |
 | HUNTER-07 | MEASURED | 3 | 6 | 5 | STRAT:evaluation-target-independence | EXP-012 | 0 |
-| HUNTER-08 | SPARSE | 2 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-008 | 1 |
+| HUNTER-08 | SPARSE | 2 | 3 | 3 | STRAT:capability-conjunction-search-claim-tracing | EXP-008 | 0 |
 | HUNTER-09 | SPARSE | 4 | 5 | 4 | STRAT:evaluation-target-independence | EXP-002 | 0 |
 | HUNTER-10 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 | HUNTER-11 | MEASURED | 5 | 8 | 4 | STRAT:decision-claim-runtime-side-effect-trace | EXP-004 | 0 |
 | HUNTER-12 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
-| HUNTER-13 | MEASURED | 4 | 6 | 5 | STRAT:evaluation-target-independence | EXP-007 | 0 |
+| HUNTER-13 | MEASURED | 5 | 6 | 5 | STRAT:decision-claim-runtime-side-effect-trace | EXP-007 | 0 |
 | HUNTER-14 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 
 ## Interpretation

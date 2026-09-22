@@ -3,7 +3,7 @@
 Generated from prospective and benchmark runs. Discovery denominators exclude explicit non-search or unclassified actions; historical records without an action retain their observational status. Retrospective anecdotes are excluded. Outcome attribution still includes all activity and uses fractional equal-touch credit.
 
 - Measured discovery runs: **22**
-- Other measured actions excluded from discovery denominators: **17**
+- Other measured actions excluded from discovery denominators: **19**
 - Legacy discovery runs without action classification: **18**
 - Search-bearing runs: **21**
 - Structured outcomes: **6**
@@ -41,11 +41,13 @@ Generated from prospective and benchmark runs. Discovery denominators exclude ex
 | QF:exp003-provider-bank-historical-authority-fixture — exp003-provider-bank-historical-authority-fixture | 0 | 0 | — | — | — | 1 | 1.00 | insufficient |
 | QF:exp003-source-authority-cursor-fixture — exp003-source-authority-cursor-fixture | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
 | QF:exp003-stripe-camt-reference-adapter — exp003-stripe-camt-reference-adapter | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
+| QF:exp007-opentrons-absent-action-race — exp007-opentrons-absent-action-race | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
 | QF:invoice-po-receipt-exact-line-identity-receipt-capacity-conservation-service-acceptance-blanket-order-semantics — invoice-po-receipt exact-line identity + receipt-capacity conservation + service acceptance + blanket-order semantics | 1 | 3 | 100.0% [43.8%, 100.0%] | 0.0% [0.0%, 56.2%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:ksef-regulated-vertical-schema-version-artifact-and-regulator-receipt — KSeF regulated vertical schema-version artifact and regulator receipt | 1 | 1 | 0.0% [0.0%, 79.3%] | 0.0% [0.0%, 79.3%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance — NuGet effective rule version plus historical evaluation plus external authority provenance | 1 | 3 | 33.3% [6.1%, 79.2%] | 0.0% [0.0%, 56.2%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:opentrons-accepted-before-receipt-kill-recovery — opentrons accepted before receipt kill recovery | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
 | QF:outage-outcome-independent-falsifier-rights — outage-outcome-independent-falsifier-rights | 1 | 3 | 66.7% [20.8%, 93.9%] | 0.0% [0.0%, 56.2%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
+| QF:permit-source-observation-receipt-completeness — permit-source-observation-receipt-completeness | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
 | QF:physical-action-ambiguity-external-run-identity-restart-persistent-positive-readback-negative-reissue-proof — physical-action ambiguity + external run identity + restart-persistent positive readback + negative reissue proof | 1 | 2 | 100.0% [34.2%, 100.0%] | 0.0% [0.0%, 65.8%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:physical-action-response-loss-same-action-readback-unknown-retry-restart-gate — physical-action response-loss + same-action readback + UNKNOWN + retry/restart gate | 1 | 4 | 75.0% [30.1%, 95.4%] | 0.0% [0.0%, 49.0%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:physical-action-restart-identity-continuity-local-cancelled-unknown-retry-gate — physical-action restart + identity continuity + local CANCELLED/UNKNOWN + retry gate | 1 | 1 | 100.0% [20.7%, 100.0%] | 0.0% [0.0%, 79.3%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |

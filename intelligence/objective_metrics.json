@@ -27,12 +27,12 @@
     {
       "search_objective_id": "OBJ:completeness-proof",
       "name": "Completeness proof",
-      "runs": 4,
+      "runs": 5,
       "deep_inspected": 11,
       "retained_count": 5,
       "master_promoted_count": 0,
-      "capability_touch_runs": 4,
-      "experiment_runs": 4,
+      "capability_touch_runs": 5,
+      "experiment_runs": 5,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0
     },
@@ -75,12 +75,12 @@
     {
       "search_objective_id": "OBJ:ambiguity-reconciliation",
       "name": "Ambiguity reconciliation",
-      "runs": 2,
+      "runs": 3,
       "deep_inspected": 5,
       "retained_count": 4,
       "master_promoted_count": 0,
-      "capability_touch_runs": 2,
-      "experiment_runs": 2,
+      "capability_touch_runs": 3,
+      "experiment_runs": 3,
       "assisted_outcome_count": 0,
       "fractional_outcome_equivalents": 0
     },

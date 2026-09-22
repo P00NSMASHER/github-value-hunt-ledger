@@ -6,9 +6,9 @@
   "status_counts": {
     "RELEASED_AVAILABLE": 4,
     "AVAILABLE": 8,
-    "RUNNING_SUPERSEDED": 2
+    "EXPIRED_AVAILABLE": 2
   },
-  "active_claims": 2,
+  "active_claims": 0,
   "complete_claims": 8,
   "telemetry_matched_completions": 8,
   "telemetry_debt_completions": 0

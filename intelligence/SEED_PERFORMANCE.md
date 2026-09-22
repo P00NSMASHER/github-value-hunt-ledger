@@ -5,8 +5,8 @@ Seed-level performance becomes meaningful only after hunters record V5 seed_ids.
 | Seed | Runs | Inspected | Retained | MASTER | New-cap runs | Experiment runs | Evidence |
 |---|---:|---:|---:|---:|---:|---:|---|
 | SEED:gap:cap-002 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:gap:cap-012 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-001 | 1 | 1 | 1 | 0 | 0 | 1 | insufficient |
+| SEED:gap:cap-012 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-014 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-008 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-015 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |

@@ -2,11 +2,11 @@
 
 Query families preserve reusable search hypotheses while broader search objectives aggregate related hypotheses across domains. Retrospective runs register taxonomy/provenance but do not enter measured yield denominators.
 
-- Registered query families: **41**
-- Measured query families: **39**
+- Registered query families: **43**
+- Measured query families: **41**
 - Retrospective-only families: **2**
-- One-run measured families: **39**
-- Families mapped to a controlled search objective: **40/41**
+- One-run measured families: **41**
+- Families mapped to a controlled search objective: **42/43**
 - Objective conflicts requiring review: **0**
 - Families with sufficient evidence (>=5 runs and >=20 deep inspections): **0**
 
@@ -47,7 +47,9 @@ Query families preserve reusable search hypotheses while broader search objectiv
 | QF:exp003-external-terminal-observation — exp003-external-terminal-observation | OBJ:independent-evaluation | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
 | QF:exp003-provider-bank-historical-authority-fixture — exp003-provider-bank-historical-authority-fixture | OBJ:independent-evaluation | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
 | QF:exp003-source-authority-cursor-fixture — exp003-source-authority-cursor-fixture | OBJ:independent-evaluation | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
+| QF:exp007-opentrons-absent-action-race — exp007-opentrons-absent-action-race | OBJ:ambiguity-reconciliation | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
 | QF:opentrons-accepted-before-receipt-kill-recovery — opentrons accepted before receipt kill recovery | OBJ:runtime-side-effect | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
+| QF:permit-source-observation-receipt-completeness — permit-source-observation-receipt-completeness | OBJ:completeness-proof | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
 | QF:recovery-qualification-behavior-closure-currentness — recovery qualification behavior-closure currentness | OBJ:runtime-side-effect | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
 | QF:recovery-qualification-closure-completeness-authority — recovery qualification closure completeness authority | OBJ:runtime-side-effect | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |
 | QF:recovery-qualification-skip-aware-test-inventory — recovery qualification skip aware test inventory | OBJ:runtime-side-effect | 1 | 0 | 0 | 0 | 0 | 1 | insufficient |

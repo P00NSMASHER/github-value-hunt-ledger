@@ -2,18 +2,18 @@
 
 Runs can use multiple surfaces. V4 reports both exact surface labels and normalized surface families; both are assisted/multi-touch measurements, not isolated causal effects.
 
-- Exact measured surfaces: **111**
+- Exact measured surfaces: **116**
 - Normalized surface families touched: **9**
 - Runs missing search-surface instrumentation: **4**
-- Exact surfaces still uncategorized: **51**
+- Exact surfaces still uncategorized: **53**
 
 ## Normalized surface families
 
 | Surface family | Exact labels | Runs | Inspected | Retained | MASTER | Capability-touch runs | Outcome eq. |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| SURFACE_FAMILY:other — Other/uncategorized | 51 | 22 | 26 | 15 | 0 | 20 | 1.17 |
-| SURFACE_FAMILY:synthetic-local-validation — Synthetic/local validation | 10 | 14 | 7 | 4 | 0 | 14 | 3.17 |
-| SURFACE_FAMILY:first-party-docs — First-party documentation | 13 | 11 | 13 | 9 | 0 | 11 | 0.33 |
+| SURFACE_FAMILY:other — Other/uncategorized | 53 | 24 | 26 | 15 | 0 | 22 | 1.17 |
+| SURFACE_FAMILY:synthetic-local-validation — Synthetic/local validation | 12 | 16 | 7 | 4 | 0 | 16 | 3.17 |
+| SURFACE_FAMILY:first-party-docs — First-party documentation | 14 | 12 | 13 | 9 | 0 | 12 | 0.33 |
 | SURFACE_FAMILY:github-source-inspection — GitHub source inspection | 9 | 10 | 28 | 23 | 0 | 10 | 0.00 |
 | SURFACE_FAMILY:github-code-search — GitHub code search | 6 | 10 | 25 | 16 | 0 | 10 | 0.00 |
 | SURFACE_FAMILY:github-history-archaeology — GitHub history archaeology | 10 | 10 | 23 | 17 | 0 | 10 | 0.83 |
@@ -39,6 +39,7 @@ Runs can use multiple surfaces. V4 reports both exact surface labels and normali
 | SURFACE:microsoft-learn-dynamics-365-finance-documentation — Microsoft Learn Dynamics 365 Finance documentation | SURFACE_FAMILY:first-party-docs | 2 | 2 | 1 | 0.00 |
 | SURFACE:official-docker-documentation — official Docker documentation | SURFACE_FAMILY:first-party-docs | 2 | 0 | 0 | 0.20 |
 | SURFACE:official-github-documentation — official GitHub documentation | SURFACE_FAMILY:first-party-docs | 2 | 0 | 0 | 0.20 |
+| SURFACE:repository-hardware-simulator — repository hardware simulator | SURFACE_FAMILY:other | 2 | 0 | 0 | 0.00 |
 | SURFACE:cross-project-identity-failure-comparison — cross-project identity-failure comparison | SURFACE_FAMILY:other | 1 | 4 | 2 | 0.00 |
 | SURFACE:exact-head-actions-license-verification — exact-head Actions/license verification | SURFACE_FAMILY:github-source-inspection | 1 | 4 | 3 | 0.00 |
 | SURFACE:github-code-source-tests — GitHub code/source/tests | SURFACE_FAMILY:github-source-inspection | 1 | 4 | 3 | 0.00 |
@@ -125,16 +126,20 @@ Runs can use multiple surfaces. V4 reports both exact surface labels and normali
 | SURFACE:live-tempe-arcgis-featureserver — live Tempe ArcGIS FeatureServer | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
 | SURFACE:local-exact-revision-pytest-and-ephemeral-sqlite-replay — local exact-revision pytest and ephemeral SQLite replay | SURFACE_FAMILY:synthetic-local-validation | 1 | 0 | 0 | 0.00 |
 | SURFACE:local-python-status-currentness-acceptance-fixture — local Python status/currentness acceptance fixture | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
+| SURFACE:local-synthetic-source-observation-receipt-acceptance-matrix — local synthetic source-observation receipt acceptance matrix | SURFACE_FAMILY:synthetic-local-validation | 1 | 0 | 0 | 0.00 |
 | SURFACE:official-go-documentation — official Go documentation | SURFACE_FAMILY:first-party-docs | 1 | 0 | 0 | 0.00 |
 | SURFACE:official-robot-server-read-only-api — official Robot Server read-only API | SURFACE_FAMILY:first-party-docs | 1 | 0 | 0 | 0.00 |
+| SURFACE:official-robot-server-runtime — official Robot Server runtime | SURFACE_FAMILY:first-party-docs | 1 | 0 | 0 | 0.00 |
+| SURFACE:opentrons-exact-revision-source — Opentrons exact-revision source | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
 | SURFACE:opentrons-opentrons-exact-revision-source-and-tests — Opentrons/opentrons exact-revision source and tests | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
 | SURFACE:persistent-sqlite-provider-state — persistent SQLite provider state | SURFACE_FAMILY:synthetic-local-validation | 1 | 0 | 0 | 0.00 |
+| SURFACE:prior-frozen-exp-009-evidence — prior frozen EXP-009 evidence | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
 | SURFACE:private-ledger-source — private ledger source | SURFACE_FAMILY:private-ledger | 1 | 0 | 0 | 0.33 |
-| SURFACE:repository-hardware-simulator — repository hardware simulator | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
 | SURFACE:sam-gov-first-party-opportunity-pages — SAM.gov first-party opportunity pages | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
 | SURFACE:slsa-specification — SLSA specification | SURFACE_FAMILY:other | 1 | 0 | 0 | 0.00 |
 | SURFACE:sqlite-concurrency-boundary — SQLite concurrency boundary | SURFACE_FAMILY:synthetic-local-validation | 1 | 0 | 0 | 0.33 |
 | SURFACE:sqlite-crash-restart-harness — SQLite crash/restart harness | SURFACE_FAMILY:synthetic-local-validation | 1 | 0 | 0 | 0.50 |
+| SURFACE:sqlite-persistence — SQLite persistence | SURFACE_FAMILY:synthetic-local-validation | 1 | 0 | 0 | 0.00 |
 | SURFACE:synthetic-acceptance-corpus — synthetic acceptance corpus | SURFACE_FAMILY:synthetic-local-validation | 1 | 0 | 0 | 0.33 |
 
 ## Interpretation

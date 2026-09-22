@@ -3,7 +3,7 @@
 This is a cautious allocation recommendation, not an autonomous command. It blends empirical yield with an explicit exploration budget so unusual low-frequency discoveries are not optimized away.
 
 - Measured prospective or benchmark discovery runs: **22**
-- Other measured actions excluded from discovery denominators: **17**; outcome credit remains included.
+- Other measured actions excluded from discovery denominators: **19**; outcome credit remains included.
 - Historical records without work_action retain their observational status; explicit non-search or unclassified actions cannot satisfy discovery evidence gates.
 - Valid structured outcomes: **6**
 - Exploration budget: **50%**
@@ -36,7 +36,7 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 | CAP-001 — Evidence-gated document facts | 4 | 2 | domain calibration and contractual/legal authority remain external |
 | CAP-002 — Reviewed, versioned identity mastering | 4 | 1 | datasets/customer identities separate |
 | CAP-008 — Structured invoice compliance/validation | 4 | 3 | pin official rule-pack/table bytes, source identity, effective interval, parser/map digest, imported-row-set digest and validator/runtime revision in one authority receipt |
-| CAP-012 — Permit event versioning and semantic source QA | 4 | 1 | jurisdiction completeness/semantics vary |
+| CAP-012 — Permit event versioning and semantic source QA | 4 | 2 | jurisdiction completeness/semantics vary |
 | CAP-014 — Virtual industrial endpoint / pre-FAT acceptance | 4 | 2 | secsgem's correction is source and local-test verified, not yet a real raw-HSMS/T3 capture, and Dreamine was not runtime-executed in the correcting run. Use a neutral raw-HSMS harness for EC-ATOMIC-SHARED and EC-DUPLICATE-POLICY, record every correlated message, maintain an independent logical T3 clock and independently read post-state. Seek a third engine only after an observed endpoint disagreement. |
 | CAP-015 — Prospective, leakage-resistant prediction and evaluator-grain evidence | 4 | 3 | first-party OEDI ZIP digest/bytes remain unresolved in the current evidence chain. Verify the current first-party artifact against the external expected digest, byte-inspect source schema/time/null semantics, then freeze the composite-event + unique-spell evaluator manifest before running policy scores. |
 | CAP-019 — Source-authority observation receipts | 4 | 10 | whole-run completeness and negative authority remain source-specific. Execute the authorized ERP credit-endpoint test plus first-party cross-status SAM receipts and day-boundary rule fixtures; transport/auth/partial/unrepresentable states may never authorize VERIFIED_EMPTY, NOT_APPLIED or CURRENT_VERIFIED. |
@@ -49,7 +49,6 @@ This is a cautious allocation recommendation, not an autonomous command. It blen
 | Domain | Experiment | Search authorized | Active search gaps | Suppressed exclusive capability gaps | Shared capability scope |
 |---|---|---|---|---|---|
 | freight | EXP-001 | no | none | CAP-003, CAP-004, CAP-005 | CAP-001, CAP-006, CAP-007, CAP-016 |
-
 
 ## Stop / recall observations — observe only
 
@@ -68,8 +67,6 @@ These signals are recorded for diagnosis and future controlled learning. They do
 | Rescue type | Uses | Qualifying finds |
 |---|---:|---:|
 | unspecified | 2 | 0 |
-
-The two historical rescue uses predate the new rescue-type/success fields. `unspecified` preserves that uncertainty rather than inventing a type or success label.
 
 ## Recall floor
 

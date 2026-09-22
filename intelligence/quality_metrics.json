@@ -1,13 +1,13 @@
 {
-  "search_runs": 41,
+  "search_runs": 43,
   "outcomes": 6,
-  "average_run_completeness": 0.9305816135084428,
+  "average_run_completeness": 0.9302325581395349,
   "runs_below_70pct_completeness": 2,
   "issue_count": 1,
   "unregistered_strategy_runs": 1,
   "capabilities_missing_next_test": 0,
-  "v4_runs": 29,
+  "v4_runs": 31,
   "v4_core_instrumentation_complete": 19,
-  "objective_mapped_runs": 40,
+  "objective_mapped_runs": 42,
   "candidate_dispositions_with_direct_or_alias_controlled_reason": 44
 }

@@ -9,8 +9,8 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 | Priority | Seed | Type | Strategy | Capability | Why now |
 |---:|---|---|---|---|---|
 | 81 | SEED:gap:cap-002 | capability_gap | STRAT:capability-conjunction-search-claim-tracing | CAP-002 | CAP-002 is a current high-information gap (gap score 4, prior run attention 1). Saturation: INSUFFICIENT (+0 priority). Missing piece: datasets/customer identities separate. |
-| 81 | SEED:gap:cap-012 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-012 | CAP-012 is a current high-information gap (gap score 4, prior run attention 1). Saturation: INSUFFICIENT (+0 priority). Missing piece: jurisdiction completeness/semantics vary. |
 | 79 | SEED:gap:cap-001 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-001 | CAP-001 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: domain calibration and contractual/legal authority remain external. |
+| 79 | SEED:gap:cap-012 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-012 | CAP-012 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: jurisdiction completeness/semantics vary. |
 | 79 | SEED:gap:cap-014 | capability_gap | STRAT:protocol-regression-archaeology-for-pre-fat-systems | CAP-014 | CAP-014 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: secsgem's correction is source and local-test verified, not yet a real raw-HSMS/T3 ca |
 | 77 | SEED:gap:cap-008 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-008 | CAP-008 is a current high-information gap (gap score 4, prior run attention 3). Saturation: INSUFFICIENT (+0 priority). Missing piece: pin official rule-pack/table bytes, source identity, effective interval, parser/map d |
 | 77 | SEED:gap:cap-015 | capability_gap | STRAT:fail-open-boundary-archaeology | CAP-015 | CAP-015 is a current high-information gap (gap score 4, prior run attention 3). Saturation: INSUFFICIENT (+0 priority). Missing piece: first-party OEDI ZIP digest/bytes remain unresolved in the current evidence chain. Ve |
@@ -48,23 +48,6 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 - Exclude domains: none
 - Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
 
-### SEED:gap:cap-012 — priority 81
-- Type/action: capability_gap / execute_fixture
-- Next action: run three-jurisdiction source-field truth and source-outage benchmark.
-- Query recipe: capability:cap-012
-- Strategy: STRAT:rule-period-authority-version-audit
-- Objective: OBJ:completeness-proof
-- Capability/experiment: CAP-012, EXP-009
-- Saturation/status: INSUFFICIENT / adjustment +0 / action MEASURE_MORE
-- Why now: CAP-012 is a current high-information gap (gap score 4, prior run attention 1). Saturation: INSUFFICIENT (+0 priority). Missing piece: jurisdiction completeness/semantics vary.
-- Required signatures: building permit, jurisdiction
-- Query templates:
-- Search surfaces: not applicable to this action
-- Verification gate: Record the exact fixture/artifact subject, independent expected result, observed result and blocker. Completion of research is not completion of the acceptance test.
-- Stop conditions: Freeze three-jurisdiction source-field truth and source-outage cases before more permit repository discovery.; Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
-- Exclude domains: none
-- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
-
 ### SEED:gap:cap-001 — priority 79
 - Type/action: capability_gap / await_external
 - Next action: measure buyer-specific false-accept precision at a frozen review budget.
@@ -81,6 +64,23 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 - Stop conditions: Wait for an authorized buyer corpus and frozen review budget; generic OCR discovery cannot provide calibration evidence.; Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
 - Exclude domains: none
 - Measured seed history: 1 runs / 1 inspections / 1 retained / 0 MASTER promotions.
+
+### SEED:gap:cap-012 — priority 79
+- Type/action: capability_gap / execute_fixture
+- Next action: run three-jurisdiction source-field truth and source-outage benchmark.
+- Query recipe: capability:cap-012
+- Strategy: STRAT:rule-period-authority-version-audit
+- Objective: OBJ:completeness-proof
+- Capability/experiment: CAP-012, EXP-009
+- Saturation/status: INSUFFICIENT / adjustment +0 / action MEASURE_MORE
+- Why now: CAP-012 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: jurisdiction completeness/semantics vary.
+- Required signatures: building permit, jurisdiction
+- Query templates:
+- Search surfaces: not applicable to this action
+- Verification gate: Record the exact fixture/artifact subject, independent expected result, observed result and blocker. Completion of research is not completion of the acceptance test.
+- Stop conditions: Freeze three-jurisdiction source-field truth and source-outage cases before more permit repository discovery.; Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
+- Exclude domains: none
+- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
 
 ### SEED:gap:cap-014 — priority 79
 - Type/action: capability_gap / execute_fixture
