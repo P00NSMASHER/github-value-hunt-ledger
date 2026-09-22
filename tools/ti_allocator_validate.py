@@ -16,6 +16,13 @@ cand=load_jsonl("hunt_candidates.jsonl")
 alloc=load_jsonl("hunt_allocations.jsonl")
 metrics=json.loads((INTEL/"allocator_metrics.json").read_text(encoding="utf-8"))
 runs=load_jsonl("search_runs.jsonl")
+seeds=load_jsonl("search_seeds.jsonl")
+seed_by_id={
+    row.get("seed_id"): row
+    for row in seeds
+    if isinstance(row.get("seed_id"),str)
+    and row.get("seed_id")
+}
 execution_history=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
 terminal_stale_work_items={
     row.get("work_item_id")
@@ -85,6 +92,46 @@ for n,c in enumerate(cand,1):
                 f"hunt_candidates.jsonl:{n}: worker measurement blinding failed: "
                 + "; ".join(blind_errors)
             )
+        seed=seed_by_id.get(c.get("source_id"))
+        if not seed or seed.get("seed_type")!="learning_measurement":
+            raise SystemExit(
+                f"hunt_candidates.jsonl:{n}: learning measurement missing exact authorized seed"
+            )
+        expected_top={
+            "work_action":seed.get("work_action"),
+            "measurement_contract_version":seed.get("measurement_contract_version"),
+            "query_recipe_id":seed.get("query_recipe_id"),
+            "query_anchors":seed.get("query_anchors") or [],
+            "required_signatures":seed.get("required_signatures") or [],
+            "exclude_domains":seed.get("exclude_domains") or [],
+            "strategy_id":seed.get("strategy_id"),
+            "search_objective_id":seed.get("search_objective_id"),
+            "capability_ids":seed.get("capability_ids") or [],
+            "experiment_ids":seed.get("experiment_ids") or [],
+            "authorization_basis":seed.get("authorization_basis"),
+        }
+        for key,expected in expected_top.items():
+            if c.get(key)!=expected:
+                raise SystemExit(
+                    f"hunt_candidates.jsonl:{n}: learning measurement contract mismatch: {key}"
+                )
+        instructions=c.get("instructions") or {}
+        expected_instructions={
+            "next_action":seed.get("next_action"),
+            "acceptance_target":seed.get("acceptance_target"),
+            "action_gate":seed.get("action_gate"),
+            "query_anchors":seed.get("query_anchors") or [],
+            "why_now":seed.get("why_now"),
+            "queries":seed.get("query_templates") or [],
+            "search_surfaces":seed.get("search_surfaces") or [],
+            "verification_gate":seed.get("verification_gate"),
+            "stop_conditions":seed.get("stop_conditions") or [],
+        }
+        for key,expected in expected_instructions.items():
+            if instructions.get(key)!=expected:
+                raise SystemExit(
+                    f"hunt_candidates.jsonl:{n}: learning measurement instruction mismatch: {key}"
+                )
     if not isinstance(c.get("final_score"),(int,float)): raise SystemExit(f"hunt_candidates.jsonl:{n}: score missing")
 
 slots={x["slot_id"]:x for x in cfg.get("slots",[])}
@@ -101,6 +148,25 @@ for n,a in enumerate(alloc,1):
     candidate=next((c for c in cand if c["work_item_id"]==a.get("work_item_id")),None)
     if candidate and (a.get("work_action")!=candidate.get("work_action") or a.get("instructions")!=candidate.get("instructions")):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
+    if candidate:
+        for key in (
+            "source_id",
+            "work_kind",
+            "query_recipe_id",
+            "query_anchors",
+            "required_signatures",
+            "exclude_domains",
+            "measurement_contract_version",
+            "authorization_basis",
+            "strategy_id",
+            "search_objective_id",
+            "capability_ids",
+            "experiment_ids",
+        ):
+            if a.get(key)!=candidate.get(key):
+                raise SystemExit(
+                    f"hunt_allocations.jsonl:{n}: candidate contract drift: {key}"
+                )
     if candidate and a.get("work_revision_sha256")!=candidate.get("work_revision_sha256"):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate semantic revision drift")
     if candidate and a.get("work_identity_payload")!=candidate.get("work_identity_payload"):
