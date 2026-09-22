@@ -178,6 +178,30 @@ class GeneratedPacketTests(unittest.TestCase):
         finally:
             path.write_text(original)
 
+    def test_exp007_stale_assignment_is_not_reissued(self):
+        exp007 = [
+            candidate
+            for candidate in self.candidates
+            if "EXP-007" in candidate.get("experiment_ids", [])
+        ]
+        self.assertTrue(exp007)
+        stale_work_id = "WORK:verify:aec101b06ab5"
+        self.assertFalse(
+            any(
+                candidate.get("work_item_id") == stale_work_id
+                for candidate in exp007
+            )
+        )
+        for candidate in exp007:
+            next_action = (
+                candidate.get("instructions") or {}
+            ).get("next_action") or ""
+            self.assertIn("176/232-byte", next_action)
+            self.assertNotIn(
+                "patch/rebuild OpenTFRaw event lookup",
+                next_action,
+            )
+
     def test_verification_uses_a_frozen_experiment_target(self):
         for c in self.candidates:
             if c['work_kind'] == 'independent_verification':
