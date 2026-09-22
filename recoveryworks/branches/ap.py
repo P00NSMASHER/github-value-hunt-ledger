@@ -466,6 +466,23 @@ def audit_ap_recovery(
             if family_statement is not None:
                 if family_statement.balance_cents < 0:
                     credit_cents = abs(family_statement.balance_cents)
+                    heuristic_duplicate_cents = sum(
+                        amount * (len(group) - 1)
+                        for amount, group in (
+                            (amount, [p for p in items if p.amount_cents == amount])
+                            for amount in sorted({p.amount_cents for p in items})
+                        )
+                        if len(group) > 1
+                    )
+                    if (
+                        heuristic_duplicate_cents > 0
+                        and heuristic_duplicate_cents != credit_cents
+                    ):
+                        exceptions.append(APRecoveryException(
+                            f"{vendor_id}/{normalized_invoice}",
+                            "STATEMENT_CREDIT_DIFFERS_FROM_HEURISTIC_DUPLICATE",
+                            "authoritative vendor-statement credit differs from the suffix-normalized duplicate hypothesis; statement amount is retained",
+                        ))
                     represented_statement_keys.add(family_statement.key)
                     observations.append(RecoveryObservation(
                         branch=Branch.AP,
@@ -488,6 +505,7 @@ def audit_ap_recovery(
                             "canonical_invoice_number": family_statement.canonical_invoice,
                             "statement_date": family_statement.statement_date,
                             "statement_credit_cents": credit_cents,
+                            "heuristic_duplicate_cents": heuristic_duplicate_cents,
                             "context_payment_ids": [p.payment_id for p in items],
                             "context_invoice_numbers": canonical_invoices,
                             "detection_basis": "vendor_statement_credit_with_heuristic_duplicate_context",
