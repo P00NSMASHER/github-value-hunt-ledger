@@ -24,6 +24,7 @@ from production.learning_engine import (
     assess_skill_variant,
     assess_training_export,
     build_training_manifest,
+    contextual_memory_key,
     learn_training_episode_memory,
     learn_value_memory,
     observed_search_reward,
