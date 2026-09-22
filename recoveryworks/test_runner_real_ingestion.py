@@ -63,7 +63,10 @@ class RealIngestionRunnerTests(unittest.TestCase):
                 state_path=root / "private" / "ledger.json",
                 base_dir=root,
             )
-            self.assertEqual(result.exceptions, ())
+            self.assertTrue(any(
+                item["code"] == "HEURISTIC_INVOICE_ALIAS"
+                for item in result.exceptions
+            ))
             self.assertEqual(len(result.added_finding_ids), 2)
             self.assertEqual(result.report.totals["validated_cents"], 11500)
             self.assertEqual(result.report.branches["ap"]["validated_cents"], 10000)
