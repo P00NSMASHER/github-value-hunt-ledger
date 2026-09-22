@@ -665,10 +665,25 @@ def build_outcome_credit(
             )
             if rid in runs_by_id
         ]
+        pending_direct_ids = sorted(
+            rid
+            for rid in direct_ids
+            if splits[rid] == "pending_partition"
+        )
+        if pending_direct_ids:
+            excluded.append(
+                {
+                    "outcome_id": outcome_id,
+                    "reason": "pending_direct_origin_partition",
+                    "origin_run_ids": pending_direct_ids,
+                }
+            )
+            continue
+
         direct_splits = {
             splits[rid]
             for rid in direct_ids
-            if splits[rid] != "excluded"
+            if splits[rid] in {"train", "confirm", "evaluation_only"}
         }
         if len(direct_splits) > 1:
             excluded.append(
@@ -715,11 +730,22 @@ def build_outcome_credit(
                     }
                 )
                 continue
-            anchor_splits = {
-                partition_for_id(
-                    str(basis["identifier"]),
-                    config=cfg,
+            pending_anchor_ids = sorted(
+                rid
+                for rid, basis in anchor_bases.items()
+                if basis.get("partition") not in {"train", "confirm"}
+            )
+            if pending_anchor_ids:
+                excluded.append(
+                    {
+                        "outcome_id": outcome_id,
+                        "reason": "pending_excluded_direct_origin_partition",
+                        "origin_run_ids": pending_anchor_ids,
+                    }
                 )
+                continue
+            anchor_splits = {
+                str(basis["partition"])
                 for basis in anchor_bases.values()
             }
             if len(anchor_splits) != 1:
@@ -734,7 +760,7 @@ def build_outcome_credit(
                 )
                 continue
             outcome_split = next(iter(anchor_splits))
-            credit_anchor_kind = "excluded_direct_origin_precommit"
+            credit_anchor_kind = "excluded_direct_origin_blind_receipt"
 
         invalid_direct_ids = [
             rid
@@ -760,7 +786,7 @@ def build_outcome_credit(
         direct_set = {
             rid
             for rid in direct_ids
-            if splits[rid] != "excluded"
+            if splits[rid] in {"train", "confirm", "evaluation_only"}
         }
 
         for rid, run in runs_by_id.items():
@@ -810,7 +836,7 @@ def build_outcome_credit(
                     "reason": (
                         "no_support_path_in_anchor_split"
                         if credit_anchor_kind
-                        == "excluded_direct_origin_hash"
+                        == "excluded_direct_origin_blind_receipt"
                         else "no_provenance_path"
                     ),
                     "anchor_split": outcome_split,
