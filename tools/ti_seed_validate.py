@@ -18,7 +18,7 @@ for n,s in enumerate(seeds,1):
     if sid in seen:
         raise SystemExit(f"search_seeds.jsonl:{n}: duplicate seed_id {sid}")
     seen.add(sid)
-    if s.get("seed_type") not in {"capability_gap","positive_dna_transfer","strategy_measurement","coverage_gap"}:
+    if s.get("seed_type") not in {"capability_gap","positive_dna_transfer","strategy_measurement","learning_measurement","coverage_gap"}:
         raise SystemExit(f"search_seeds.jsonl:{n}: invalid seed_type")
     p=s.get("priority")
     if not isinstance(p,(int,float)) or not (0<=p<=100):
@@ -38,7 +38,7 @@ for n,s in enumerate(seeds,1):
         for cid in s.get("capability_ids") or []:
             if s["work_action"]!=capability_recipe(cid)["work_action"]:
                 raise SystemExit(f"search_seeds.jsonl:{n}: action differs from reviewed capability recipe")
-    if s.get("seed_type") in {"coverage_gap","strategy_measurement"} and "work_action" in s:
+    if s.get("seed_type") in {"coverage_gap","strategy_measurement","learning_measurement"} and "work_action" in s:
         parent=next((x for x in seeds if x["seed_id"]==s.get("parent_seed_id")),None)
         if not parent or parent.get("work_action")!="search" or s["work_action"]!="search":
             raise SystemExit(f"search_seeds.jsonl:{n}: derived discovery must inherit an authorized search parent")
