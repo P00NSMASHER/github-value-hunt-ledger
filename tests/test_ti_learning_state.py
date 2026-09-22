@@ -150,6 +150,42 @@ class LearningStateIntegrationTests(unittest.TestCase):
             strategy["eligible_for_policy_consideration"]
         )
 
+    def test_negative_confirm_reward_flags_overfit_and_suppresses_prior(self):
+        train = self.train_runs(5)
+        confirm = self.confirm_runs(2)
+        for row in confirm:
+            row["retained_count"] = 0
+            row["new_capability_ids"] = []
+            row["strengthened_capability_ids"] = []
+        with tempfile.TemporaryDirectory() as tmp:
+            state = compile_state(
+                train + confirm,
+                [],
+                Path(tmp),
+            )
+
+        strategy = next(
+            row
+            for row in state["memory"]["records"]
+            if row["key"] == "STRAT:integration-test"
+        )
+        self.assertTrue(strategy["train_evidence_ready"])
+        self.assertFalse(strategy["confirm_evidence_ready"])
+        self.assertEqual(
+            strategy["generalization_status"],
+            "overfit_signal",
+        )
+        self.assertFalse(
+            strategy["eligible_for_policy_consideration"]
+        )
+        self.assertEqual(
+            {
+                alert["memory_key"]
+                for alert in state["learning_alerts"]
+            },
+            {"STRAT:integration-test", "QF:integration-test"},
+        )
+
     def test_generated_state_is_deterministic_for_identical_sources(self):
         runs = [self.search_run(1)]
         with tempfile.TemporaryDirectory() as tmp:
