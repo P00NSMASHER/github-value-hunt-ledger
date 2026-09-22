@@ -9,5 +9,5 @@ Operational debt is distinct from research/measurement debt.
 
 ## Items requiring attention
 
-- SLOT-04: EXPIRED_AVAILABLE / telemetry=NOT_APPLICABLE / assignment=ASSIGN:51e2788d0136:slot-04
-- SLOT-07: EXPIRED_AVAILABLE / telemetry=NOT_APPLICABLE / assignment=ASSIGN:51e2788d0136:slot-07
+- SLOT-04: EXPIRED_AVAILABLE / telemetry=NOT_APPLICABLE / assignment=ASSIGN:da63048c7581:slot-04
+- SLOT-07: EXPIRED_AVAILABLE / telemetry=NOT_APPLICABLE / assignment=ASSIGN:da63048c7581:slot-07

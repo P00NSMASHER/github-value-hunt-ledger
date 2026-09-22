@@ -53,12 +53,12 @@ Generated compact memory for live hunters. This is a **navigation aid, not autho
 
 - No strategy/query-family value prior has cleared both the 5-run / 20-deep train gate and the independent 2-run / 6-deep confirm gate yet. The learning engine is recording outcomes but must not steer search from insufficient or unconfirmed evidence.
 
-### Learning measurement debt
+### Adaptive learning measurement targets
 
-- These are **measurement-only** recommendations. They do not change allocator weights or authorize work by themselves; use the normal generated assignment/claim path and never select/retry based on train/confirm partition.
-- **STRAT:acceptance-path-transition-inspection** — train_measurement; train 4/10 (need 1 runs / 10 deep); confirm 0/0 (need 2 runs / 6 deep).
-- **STRAT:rule-period-authority-version-audit** — train_measurement; train 4/9 (need 1 runs / 11 deep); confirm 0/0 (need 2 runs / 6 deep).
-- **STRAT:bidirectional-money-evidence-invariant-tracing** — train_measurement; train 0/0 (need 5 runs / 20 deep); confirm 0/0 (need 2 runs / 6 deep).
+- These are **worker-safe bounded measurement targets only**. Exact learning phase, curriculum rank, and train/confirm evidence debt are planner-only until the assigned run's evidence and result are frozen. Do not open detailed curriculum/learning-state artifacts to change effort, retry behavior, or stopping decisions.
+- **STRAT:acceptance-path-transition-inspection** — follow only the current bounded HUNT_PLAN assignment and its acceptance/STOP gates; treat a no-find as valid evidence and do not infer learning state from priority.
+- **STRAT:rule-period-authority-version-audit** — follow only the current bounded HUNT_PLAN assignment and its acceptance/STOP gates; treat a no-find as valid evidence and do not infer learning state from priority.
+- **STRAT:bidirectional-money-evidence-invariant-tracing** — follow only the current bounded HUNT_PLAN assignment and its acceptance/STOP gates; treat a no-find as valid evidence and do not infer learning state from priority.
 - Reproducible hunter-system failure queue: **0 queued**, **0 blocked**. Queued failures still require regression-tested repair and skill promotion.
 - Repair workbench: **0 bounded repair-ready**, **0 reproduction-first**. These are advisory repair/falsification tasks, not automatic worker routes or live skill edits.
 - Repair-candidate intake: **0 ready for independent skill evaluation**, **0 blocked**. READY_FOR_SKILL_EVAL is not a live/global promotion.
