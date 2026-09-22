@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -40,8 +41,12 @@ def main() -> int:
     bundle = build_measurement_packets(
         curriculum,
         seeds,
-        curriculum_sha=curriculum_path.read_bytes().hex()[:64],
-        seeds_sha=seeds_path.read_bytes().hex()[:64],
+        curriculum_sha=hashlib.sha256(
+            curriculum_path.read_bytes()
+        ).hexdigest(),
+        seeds_sha=hashlib.sha256(
+            seeds_path.read_bytes()
+        ).hexdigest(),
     )
     errors = validate_measurement_packets(bundle)
     if errors:
