@@ -78,14 +78,16 @@ CREATE TABLE IF NOT EXISTS plans (
   plan_name TEXT,
   plan_id_type TEXT,
   plan_id TEXT,
-  plan_market_type TEXT,
-  UNIQUE(
-    mrf_file_id,
-    COALESCE(plan_name,''),
-    COALESCE(plan_id_type,''),
-    COALESCE(plan_id,''),
-    COALESCE(plan_market_type,'')
-  )
+  plan_market_type TEXT
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tic_plans_stable
+ON plans(
+  mrf_file_id,
+  COALESCE(plan_name,''),
+  COALESCE(plan_id_type,''),
+  COALESCE(plan_id,''),
+  COALESCE(plan_market_type,'')
 );
 
 CREATE TABLE IF NOT EXISTS rate_extract_runs (
@@ -108,8 +110,15 @@ CREATE TABLE IF NOT EXISTS provider_groups (
   rate_extract_run_id INTEGER NOT NULL REFERENCES rate_extract_runs(id),
   provider_group_id TEXT NOT NULL,
   tin_type TEXT,
-  tin_value TEXT,
-  UNIQUE(rate_extract_run_id, provider_group_id, COALESCE(tin_type,''), COALESCE(tin_value,''))
+  tin_value TEXT
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tic_provider_groups_stable
+ON provider_groups(
+  rate_extract_run_id,
+  provider_group_id,
+  COALESCE(tin_type,''),
+  COALESCE(tin_value,'')
 );
 
 CREATE TABLE IF NOT EXISTS provider_group_npis (
