@@ -39,7 +39,8 @@ class LocalBundleStore:
 
     The file is written with mode 0600, fsynced, and atomically replaced.
     expected_head_hash provides compare-and-swap semantics so two workers cannot
-    silently overwrite each other's accepted lifecycle events.
+    silently overwrite each other's accepted lifecycle events. Set
+    enforce_expected=True to also assert that an empty store remains empty.
     """
 
     def __init__(self, path: str | os.PathLike[str]) -> None:
@@ -80,9 +81,10 @@ class LocalBundleStore:
         ledger: DurableRecoveryLedger,
         *,
         expected_head_hash: str | None = None,
+        enforce_expected: bool = False,
     ) -> str | None:
         existing_head = self.current_head_hash()
-        if expected_head_hash is not None and existing_head != expected_head_hash:
+        if (enforce_expected or expected_head_hash is not None) and existing_head != expected_head_hash:
             raise StoreConflictError(
                 f"stale ledger writer: expected {expected_head_hash!r}, "
                 f"found {existing_head!r}"

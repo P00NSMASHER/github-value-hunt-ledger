@@ -79,6 +79,19 @@ class StoreTests(unittest.TestCase):
             with self.assertRaises(StoreConflictError):
                 store.save(stale, expected_head_hash=head1)
 
+    def test_compare_and_swap_can_require_store_to_remain_empty(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "recoveryworks.json"
+            store = LocalBundleStore(path)
+            first = DurableRecoveryLedger()
+            first.add(finding())
+            store.save(first)
+
+            second = DurableRecoveryLedger()
+            second.add(finding())
+            with self.assertRaises(StoreConflictError):
+                store.save(second, expected_head_hash=None, enforce_expected=True)
+
     def test_bundle_hash_tampering_is_rejected_before_replay(self):
         with tempfile.TemporaryDirectory() as d:
             path = Path(d) / "recoveryworks.json"

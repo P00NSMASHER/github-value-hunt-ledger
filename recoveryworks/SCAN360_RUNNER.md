@@ -1,0 +1,116 @@
+# Recovery Scan 360 runner
+
+The runner is the first operational surface for the RecoveryWorks umbrella. It
+combines supported branch adapters into one proof-bound, durable client ledger.
+
+Current executable branches:
+
+- APRecovery
+- UtilityRecovery
+
+FreightRecovery already has a bridge into RecoveryOS but is not yet wired into
+this file-based runner.
+
+## Run
+
+```bash
+python -m recoveryworks.cli \
+  --config /private/client-scan.json \
+  --state /private/recoveryworks-state.json \
+  --report /private/recoveryworks-report.json
+```
+
+The state and report files are atomically written with mode `0600`. Operational
+state must live on private storage, not in the public repository.
+
+## Example config
+
+```json
+{
+  "client_id": "client-001",
+  "currency": "USD",
+  "ap": {
+    "payments_csv": "Payments.csv",
+    "obligations_csv": "AP_Invoices.csv",
+    "default_effective_from": "2026-01-01",
+    "payment_source_verified": false,
+    "obligation_source_verified": false
+  },
+  "utility": [
+    {
+      "bills_csv": "Bills.csv",
+      "tariffs_json": "utility-a-tariffs.json",
+      "utility_id": "Utility A",
+      "default_effective_from": "2026-01-01",
+      "bill_source_verified": false,
+      "tariff_source_verified": false,
+      "jurisdiction": "NY"
+    }
+  ]
+}
+```
+
+Paths are resolved relative to the config file.
+
+Verification booleans default to false and must be JSON booleans. Marking a
+source verified means the operating workflow has independently established that
+the file/source is the relevant, authentic source. Merely receiving or hashing a
+file does not make its contents verified.
+
+## AP input
+
+Default payment headers:
+
+- `Payment_Number`
+- `Vendor`
+- `Invoice_Number`
+- `Amount`
+- `Payment_Date`
+
+Default obligation headers:
+
+- `Vendor`
+- `Invoice_Number`
+- `Amount`
+- `Invoice_Date`
+
+Duplicate-looking payments without a verified obligation remain REVIEW.
+
+## Utility input
+
+Default bill headers:
+
+- `Bill_ID`
+- `Utility`
+- `Account_ID`
+- `Service_Class`
+- `Bill_Date`
+- `Bill_Amount`
+- `Billed_kWh`
+- `Billed_Demand_kW`
+- `Billed_rkVA`
+
+The current tariff importer accepts scalar `logic_steps` with these charge
+types:
+
+- `fixed_fee`
+- `per_kwh` / `energy_charge`
+- `per_kw` / `demand_charge`
+- `per_rkva` / `reactive_demand_fee`
+- `minimum_charge` / `minimum_bill`
+
+It deliberately rejects conditional expressions, free-form formulas, voltage or
+tier dictionaries, and unknown charge types. Those constructs must be
+implemented explicitly before they can affect expected dollars.
+
+## Lifecycle boundary
+
+A Scan 360 run may discover and validate findings. It does not:
+
+- approve findings;
+- authorize recovery activity;
+- contact a counterparty;
+- submit a claim, appeal, dispute, or demand;
+- mark a case recovered.
+
+Those remain separate human-controlled RecoveryLedger transitions.
