@@ -203,7 +203,12 @@ jobs:
           python run.py summary \
             --db merged/fmc_tariff_ledger.sqlite \
             > merged/summary.json
+          python gap_report.py \
+            --db merged/fmc_tariff_ledger.sqlite \
+            --output merged/publisher_gap_report.json \
+            > /dev/null
           python -m json.tool merged/summary.json
+          python -m json.tool merged/publisher_gap_report.json > /dev/null
           FIRST_MANIFEST=$(find metadata -name fmc_directory_manifest.json -print -quit || true)
           if test -n "$FIRST_MANIFEST"; then
             cp "$FIRST_MANIFEST" merged/fmc_directory_manifest.json
