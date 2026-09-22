@@ -1287,7 +1287,20 @@ def bind_seven_figure_dossier_consent(
         "consent_payload_hash": payload_hash,
     }
     return SevenFigureDossierConsent(
-        **{key: value for key, value in body.items() if key != "schema"},
+        consent_version=body["consent_version"],
+        authorization_id=body["authorization_id"],
+        authorization_hash=body["authorization_hash"],
+        case_bundle_hash=body["case_bundle_hash"],
+        finding_proof_hash=body["finding_proof_hash"],
+        readiness_package_hash=body["readiness_package_hash"],
+        readiness_dossier_hash=body["readiness_dossier_hash"],
+        client_actor_id=body["client_actor_id"],
+        approved_action_type=body["approved_action_type"],
+        maximum_amount_cents=body["maximum_amount_cents"],
+        consented_at=body["consented_at"],
+        note=body["note"],
+        client_signature=client_signature,
+        consent_payload_hash=body["consent_payload_hash"],
         consent_hash=canonical_hash(body),
     )
 
