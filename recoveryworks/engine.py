@@ -1,10 +1,12 @@
 """Deterministic expected-vs-actual recovery engine shared by every branch."""
 from __future__ import annotations
 
+from collections.abc import Mapping as MappingABC
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Mapping
 
 from .models import (
+    MAX_CENTS,
     Branch,
     EvidenceRef,
     FindingState,
@@ -31,6 +33,29 @@ class RecoveryObservation:
     confidence_basis: str
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.branch, Branch):
+            raise ValueError("branch must be a RecoveryWorks Branch")
+        for name in (
+            "client_id", "counterparty_id", "reference", "currency",
+            "reason", "confidence_basis",
+        ):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} is required")
+        for name in ("expected_cents", "actual_cents"):
+            value = getattr(self, name)
+            if type(value) is not int or not 0 <= value <= MAX_CENTS:
+                raise ValueError(f"{name} must be non-negative integer cents")
+        if self.rule is not None and not isinstance(self.rule, RuleRef):
+            raise ValueError("rule must be RuleRef or None")
+        if not isinstance(self.evidence, tuple) or not self.evidence:
+            raise ValueError("at least one evidence reference is required")
+        if not all(isinstance(ref, EvidenceRef) for ref in self.evidence):
+            raise ValueError("evidence entries must be EvidenceRef objects")
+        if not isinstance(self.metadata, MappingABC):
+            raise ValueError("metadata must be a mapping")
+
 
 class RecoveryEngine:
     """Convert normalized branch observations into proof-bound findings.
@@ -53,7 +78,6 @@ class RecoveryEngine:
         verified = (
             observation.rule is not None
             and observation.rule.verified_controlling
-            and bool(observation.evidence)
             and all(ref.verified for ref in observation.evidence)
         )
         state = FindingState.VALIDATED if verified else FindingState.REVIEW
