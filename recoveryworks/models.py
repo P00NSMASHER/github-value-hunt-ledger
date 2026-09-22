@@ -28,6 +28,8 @@ class Branch(str, Enum):
     LEASE = "lease"
     TAX = "tax"
     INSURANCE = "insurance"
+    CLOUD = "cloud"
+    MERCHANT_FEE = "merchant_fee"
 
 
 class RecoveryMode(str, Enum):
