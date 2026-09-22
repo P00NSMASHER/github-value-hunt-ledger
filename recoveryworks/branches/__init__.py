@@ -1,6 +1,15 @@
 from .ap import APObligation, APPayment, build_ap_observations, normalize_invoice_number
 from .ap_csv import load_obligations_csv, load_payments_csv, money_to_cents
 from .base import BranchInput, RuleBackedAdapter
+from .duty import (
+    DutyAssessment,
+    DutyAuditBatch,
+    DutyAuditException,
+    DutyEntryLine,
+    audit_duty_entries,
+    normalize_hts,
+)
+from .duty_csv import load_duty_assessments_csv, load_duty_entries_csv
 from .freight_io import (
     FreightImportBatch,
     load_freight_audit_result_bundle,
@@ -39,6 +48,10 @@ __all__ = [
     "BRANCHES",
     "BranchInput",
     "BranchSpec",
+    "DutyAssessment",
+    "DutyAuditBatch",
+    "DutyAuditException",
+    "DutyEntryLine",
     "FreightImportBatch",
     "PayerAuditBatch",
     "PayerAuditException",
@@ -52,6 +65,7 @@ __all__ = [
     "UtilityChargeKind",
     "UtilityTariff",
     "all_specs",
+    "audit_duty_entries",
     "audit_payer_lines",
     "audit_utility_bills",
     "build_ap_observations",
@@ -60,6 +74,8 @@ __all__ = [
     "dollars_to_cents",
     "load_freight_audit_result_bundle",
     "load_freight_truth_manifest",
+    "load_duty_assessments_csv",
+    "load_duty_entries_csv",
     "load_obligations_csv",
     "load_payer_lines_csv",
     "load_payer_rates_csv",
@@ -67,6 +83,7 @@ __all__ = [
     "load_simple_tariff_definitions_json",
     "load_utility_bills_csv",
     "money_to_cents",
+    "normalize_hts",
     "normalize_invoice_number",
     "normalize_service_class",
 ]
