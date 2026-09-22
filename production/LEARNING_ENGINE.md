@@ -173,3 +173,23 @@ The first useful live effect is deliberately small:
 5. once enough failure/holdout evidence exists, an external optimizer can generate skill variants for the existing staged-mutation gate.
 
 Fleet evolution, harness evolution, and model training remain shadow/canary operations until the current benchmark and production launch gates permit them.
+
+### 9. Hunter database training environment — implemented
+
+`production/training_environment.py` converts canonical measured search telemetry into deterministic offline episodes:
+
+`state -> action -> observation -> reward`
+
+Prospective runs are deterministically split into train and confirm partitions by `sha256(search_run_id)`. Benchmark records are evaluation-only. Outcome credit never crosses a split, and mixed-origin outcomes spanning train and confirm are excluded.
+
+Downstream reward is intentionally multi-stage. Discovery yield and technical validation can teach search behavior now, but technical-only evidence is capped below commercially grounded evidence. Realized revenue/customer value, when actually observed, receives the strongest reward weight.
+
+Long-horizon credit can flow backward only through explicit ledger provenance: direct origin search IDs, shared experiment IDs, contributed capability IDs and explicitly retained repositories. Each credited outcome conserves total credit at exactly 1.0. This is training/accounting attribution, not a causal claim.
+
+Generated artifacts:
+
+- `intelligence/TRAINING_ENVIRONMENT.json`;
+- `intelligence/training_episodes.jsonl`.
+
+The training environment remains `policy_effect=none`. Optimizers may use the train partition to propose variants, but only confirm/evaluation evidence plus the existing held-out/canary/global promotion gates may authorize later policy changes.
+
