@@ -41,3 +41,10 @@ The frozen truth schema also permits **zero findings**, so a clean audit can be 
 This is not OCR, contract interpretation, a tariff parser, carrier dispute automation or a universal rating engine. Upstream extraction and authority selection still require controlled evidence and review. The factory only turns already-normalized, explicitly scoped evidence into deterministic calculations.
 
 Additional pricing models should be added only when a real buyer population demonstrates the need and the calculation can be specified with exact, testable semantics.
+
+
+## Persisted factory verification
+
+Before review work is queued, the factory batch is re-verified as a proof graph rather than trusted because its outer hash exists. Verification checks exact-cent arithmetic, derivation decision/finding semantics, finding proof hashes, truth contents and truth hash, and the factory hash itself.
+
+This catches stale or mixed artifacts before they can influence reviewer priority or displayed discrepancy amounts.
