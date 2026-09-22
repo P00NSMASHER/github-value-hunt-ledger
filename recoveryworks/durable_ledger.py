@@ -3,18 +3,24 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
+from .assurance import (
+    CaseProofBundle,
+    ClientActionAuthorization,
+    ExternalActionEnvelope,
+    authorization_from_payload,
+    authorization_to_payload,
+    case_bundle_from_payload,
+    case_bundle_to_payload,
+    external_action_from_payload,
+    external_action_to_payload,
+)
 from .journal import RecoveryJournal, finding_from_payload, finding_to_payload
 from .ledger import RecoveryLedger
 from .models import RecoveryFinding
 
 
 class DurableRecoveryLedger(RecoveryLedger):
-    """RecoveryLedger plus an append-only tamper-evident lifecycle journal.
-
-    The public lifecycle API stays compatible with RecoveryLedger. Persistence
-    can store export_bundle() in any private durable backend and reconstruct the
-    exact logical state with from_bundle().
-    """
+    """RecoveryLedger plus an append-only tamper-evident lifecycle journal."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -37,6 +43,14 @@ class DurableRecoveryLedger(RecoveryLedger):
         })
         return record
 
+    def independent_approve(self, finding_id: str, reviewer_id: str, note: str):
+        record = super().independent_approve(finding_id, reviewer_id, note)
+        self.journal.append("INDEPENDENT_APPROVE", finding_id, {
+            "reviewer_id": record.independent_reviewer_id,
+            "review_note": record.independent_review_note,
+        })
+        return record
+
     def authorize(self, finding_id: str, authorization_id: str):
         record = super().authorize(finding_id, authorization_id)
         self.journal.append("AUTHORIZE", finding_id, {
@@ -44,9 +58,29 @@ class DurableRecoveryLedger(RecoveryLedger):
         })
         return record
 
-    def mark_claimed(self, finding_id: str):
-        record = super().mark_claimed(finding_id)
-        self.journal.append("CLAIM", finding_id, {})
+    def authorize_with_case(
+        self,
+        finding_id: str,
+        bundle: CaseProofBundle,
+        authorization: ClientActionAuthorization,
+    ):
+        record = super().authorize_with_case(finding_id, bundle, authorization)
+        self.journal.append("AUTHORIZE_CASE", finding_id, {
+            "case_bundle": case_bundle_to_payload(bundle),
+            "authorization": authorization_to_payload(authorization),
+        })
+        return record
+
+    def mark_claimed(
+        self,
+        finding_id: str,
+        action_envelope: ExternalActionEnvelope | None = None,
+    ):
+        record = super().mark_claimed(finding_id, action_envelope)
+        payload: dict[str, Any] = {}
+        if action_envelope is not None:
+            payload["external_action"] = external_action_to_payload(action_envelope)
+        self.journal.append("CLAIM", finding_id, payload)
         return record
 
     def mark_recovered(self, finding_id: str, recovered_cents: int, fee_cents: int = 0):
@@ -87,10 +121,26 @@ class DurableRecoveryLedger(RecoveryLedger):
                 ledger.add(finding_from_payload(data["finding"]))
             elif action == "APPROVE":
                 ledger.approve(event.finding_id, data["reviewer_id"], data["review_note"])
+            elif action == "INDEPENDENT_APPROVE":
+                ledger.independent_approve(
+                    event.finding_id,
+                    data["reviewer_id"],
+                    data["review_note"],
+                )
             elif action == "AUTHORIZE":
                 ledger.authorize(event.finding_id, data["authorization_id"])
+            elif action == "AUTHORIZE_CASE":
+                bundle = case_bundle_from_payload(data["case_bundle"])
+                authorization = authorization_from_payload(data["authorization"])
+                ledger.authorize_with_case(event.finding_id, bundle, authorization)
             elif action == "CLAIM":
-                ledger.mark_claimed(event.finding_id)
+                envelope_raw = data.get("external_action")
+                envelope = (
+                    external_action_from_payload(envelope_raw)
+                    if envelope_raw is not None
+                    else None
+                )
+                ledger.mark_claimed(event.finding_id, envelope)
             elif action == "RECOVER":
                 ledger.mark_recovered(
                     event.finding_id,
