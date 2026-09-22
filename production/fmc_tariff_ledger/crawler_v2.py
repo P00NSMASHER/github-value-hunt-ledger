@@ -23,7 +23,7 @@ _CORE_FETCH_BYTES = base.fetch_bytes
 
 RULE_SECTION_RE = re.compile(
     r"(?im)^\s*(?:RULE|ITEM)\s+"
-    r"(?P<number>[A-Z0-9]+(?:\.[A-Z0-9]+)*)"
+    r"(?P<number>(?!(?:NO|NUMBER|NOS)\\b)[A-Z0-9]+(?:\\.[A-Z0-9]+)*)"
     r"\s*[.\-:]?\s*(?P<title>[^\n]{0,180})$"
 )
 
