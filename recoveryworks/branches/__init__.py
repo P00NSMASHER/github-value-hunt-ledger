@@ -56,6 +56,9 @@ from .contract_billing_csv import (
 from .lease import audit_lease_billing
 from .lease_csv import load_lease_area_csv
 from .lease_ingest import LeaseIngestionResult, ingest_lease_exports
+from .procurement import audit_procurement_billing
+from .procurement_csv import load_procurement_quantities_csv
+from .procurement_ingest import ProcurementIngestionResult, ingest_procurement_exports
 from .saas import audit_saas_billing
 from .saas_csv import load_billable_seat_snapshot_csv
 from .telecom import audit_telecom_billing
@@ -124,6 +127,10 @@ from .utility_io import (
 )
 
 __all__ = [
+    "load_procurement_quantities_csv",
+    "ingest_procurement_exports",
+    "audit_procurement_billing",
+    "ProcurementIngestionResult",
     "load_schedule_versions_json",
     "load_event_activity_mappings_csv",
     "load_construction_settlements_csv",
