@@ -819,6 +819,7 @@ def persist_crawl_result(conn: sqlite3.Connection, result: dict, out_dir: Path) 
     loc_id = persist_source(conn, src)
     snap_ids: list[int] = []
     now = utcnow()
+    parser_version = str(result.get("parser_version") or "fmc-ledger-v2")
 
     for snap in result["snapshots"]:
         conn.execute(
@@ -864,14 +865,14 @@ def persist_crawl_result(conn: sqlite3.Connection, result: dict, out_dir: Path) 
                (snapshot_id, entity_class, organization_no, legal_name, rule_type,
                 term_kind, amount_value, currency, unit, quantity_value,
                 effective_from, effective_to, source_version, evidence_locator,
-                evidence_excerpt, confidence, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                evidence_excerpt, confidence, parser_version, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 snap_ids[snap_idx], src.entity_class, src.organization_no,
                 src.legal_name, term.rule_type, term.term_kind, term.amount_value,
                 term.currency, term.unit, term.quantity_value, term.effective_from,
                 term.effective_to, term.source_version, term.evidence_locator,
-                term.evidence_excerpt, term.confidence, now,
+                term.evidence_excerpt, term.confidence, parser_version, now,
             ),
         )
 
