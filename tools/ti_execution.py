@@ -149,6 +149,11 @@ def build_execution_state(write=True, now=None):
                 required=["claim_id","worker_id","assignment_id","allocator_generation_id",
                           "portfolio_policy_generation_id","work_item_id","assignment_slot_role",
                           "assignment_work_kind","assignment_source_id","assignment_score"]
+                if e.get("assignment_work_kind")=="learning_measurement":
+                    required += [
+                        "learning_measurement_packet_id",
+                        "learning_measurement_packet_sha256",
+                    ]
                 missing=[k for k in required if e.get(k) in {None,""}]
                 if missing:
                     errors.append(f"{loc}: CLAIM missing {','.join(missing)}")
@@ -197,6 +202,9 @@ def build_execution_state(write=True, now=None):
                           "routing_learning_generation_id":e.get("routing_learning_generation_id"),
                           "dispatch_generation_id":e.get("dispatch_generation_id")
                         }
+                        if e.get("assignment_work_kind")=="learning_measurement":
+                            expected_ticket["learning_measurement_packet_id"]=e.get("learning_measurement_packet_id")
+                            expected_ticket["learning_measurement_packet_sha256"]=e.get("learning_measurement_packet_sha256")
                         if ticket_schema>=15:
                             expected_ticket["dispatch_kind"]=e.get("dispatch_kind")
                             expected_ticket["parent_dispatch_ticket_id"]=e.get("parent_dispatch_ticket_id")
@@ -276,6 +284,8 @@ def build_execution_state(write=True, now=None):
                   "assignment_work_kind":e["assignment_work_kind"],
                   "assignment_source_id":e["assignment_source_id"],
                   "assignment_score":e["assignment_score"],
+                  "learning_measurement_packet_id":e.get("learning_measurement_packet_id"),
+                  "learning_measurement_packet_sha256":e.get("learning_measurement_packet_sha256"),
                   "claim_schema_version":claim_schema if claim_schema else None,
                   "routing_mode":e.get("routing_mode"),
                   "routing_generation_id":e.get("routing_generation_id"),
@@ -470,6 +480,9 @@ def build_execution_state(write=True, now=None):
               "assignment_work_kind":claim["assignment_work_kind"],
               "assignment_source_id":claim["assignment_source_id"]
             }
+            if claim.get("assignment_work_kind")=="learning_measurement":
+                expected["learning_measurement_packet_id"]=claim.get("learning_measurement_packet_id")
+                expected["learning_measurement_packet_sha256"]=claim.get("learning_measurement_packet_sha256")
             if claim.get("routing_generation_id"):
                 expected["routing_generation_id"]=claim.get("routing_generation_id")
                 expected["worker_profile_generation_id"]=claim.get("worker_profile_generation_id")
