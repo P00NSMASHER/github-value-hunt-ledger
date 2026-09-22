@@ -123,7 +123,11 @@ class RecoveryWorksTests(unittest.TestCase):
         authority = SimpleNamespace(authority_id="a1", source_hash="authorityhash")
         obs = from_freight_finding(f, authority)
         finding = RecoveryEngine().evaluate(obs)
-        self.assertIs(finding.state, FindingState.VALIDATED)
+        self.assertIs(finding.state, FindingState.REVIEW)
+        dated = RecoveryEngine().evaluate(from_freight_finding(
+            f, authority, effective_from="2026-01-01", occurred_on="2026-06-01"
+        ))
+        self.assertIs(dated.state, FindingState.VALIDATED)
         downgraded = RecoveryEngine().evaluate(from_freight_finding(f, None))
         self.assertIs(downgraded.state, FindingState.REVIEW)
 
