@@ -443,3 +443,38 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Important dependencies/risks: Coupa's `paid/payment-date` is useful corroboration but is not by itself proof that a specific credit note was economically applied; downstream ERP/remittance evidence remains required. API schemas/profile provenance should be checked against the customer's live Coupa version.
 - Connections: Completes another major procurement front-end feeding the Supplier Credit Recovery case ledger.
 - Opportunity score: **8.7/10**.
+
+
+### GaryWayneSmith/M3H5 — Infor M3 supplier-rebate agreement, claim and paid-amount adapter
+- Repository: https://github.com/GaryWayneSmith/M3H5
+- Commit / revision: 62f027a9ceaa027138bb193aaffb1745c3f5c6fd
+- Date discovered: 2026-09-22
+- What actually works: One-star Apache-2.0 C#/.NET Standard wrapper around Infor/Lawson/M3/Movex MI APIs with hundreds of generated executable resource classes. The rebate path is unusually valuable: `OIS860MI` exposes supplier rebate agreements including supplier, agreement reference, calculation method and rebate percentage; `APS450MI` exposes supplier invoice-batch/claim detail including supplier rebate reference number and **paid rebate amount**. The same library carries supplier invoices, payment proposals, payee totals, purchase agreements and claim APIs, giving enough surrounding context to map a rebate from commercial term to claim/payment state.
+- Evidence of implementation: `M3H5Lib.Api/OIS860MIResource.cs` implements MI calls such as `AddHead` (“Add supplier rebate agreement”), list-by-supplier/facility/status/reference operations and real request execution through `{BasePath}/{ProgramName}/...`; response models expose `SRCA` (“Supplier rebate calculation method”) and `SREP` (“Rebate percentage”). `M3H5Lib.Api/APS450MI/LstClaimDetailsResponse.cs` exposes `CLAR` (“Supplier rebate reference number”) and `PARA` (“Paid rebate amount”), plus invoice/order/delivery/supplier fields. `APS450MIResource.cs` implements the corresponding claim-detail call. README includes working resource-call examples using the shared API client.
+- License / reuse status: Apache-2.0. Infor M3 customer API permissions, vendor product terms and customer data rights remain separate.
+- Useful capability/data/workflow: `SupplierRebateAgreement -> qualifying transaction/claim -> supplier rebate reference -> paid rebate amount` with ERP-native identifiers.
+- Likely buyer: Infor M3 users in distribution, food/beverage, manufacturing, wholesale and other rebate-heavy procurement environments.
+- Painful problem solved: Earned supplier rebates can be lost because agreements, invoice claims and paid amounts live in different M3 programs/transactions and are difficult to reconcile independently.
+- Fastest monetization path: Infor M3 Supplier Rebate Recovery diagnostic: pull agreements, supplier invoices/claims and paid rebate detail read-only, independently recompute expected earned rebate from buyer-authorized purchase/invoice data, then identify earned-but-unpaid or underpaid cases.
+- Realistic paid pilot: One business unit, top 10-25 suppliers, last 4-8 rebate periods. Deliver agreement version, qualifying spend, expected rebate, claim reference, paid amount, difference and settlement evidence.
+- Estimated engineering time saved: 2-4 months of Infor M3 MI discovery, endpoint modeling and rebate/payment field mapping.
+- Important dependencies/risks: Auto-generated response types may occasionally misinfer M3 numeric types; validate fields against the customer's M3 metadata/version. The ERP's stored paid rebate amount proves recorded M3 state, not by itself that the agreement interpretation or qualifying-spend population is correct.
+- Connections: Strongest supplier-rebate-specific ERP connector found so far. Combine with AP Recovery v2's evidence/settlement ledger and vendorrebate agreement-version patterns.
+- Opportunity score: **9.7/10**.
+
+### OCA/agreement — tested rebate settlement and accounting-document engine
+- Repository: https://github.com/OCA/agreement
+- Commit / revision: d337a0b90288eb9b19fae3ae5d791ca6845c11a3
+- Date discovered: 2026-09-22
+- What actually works: Mature Odoo Community Association repository; the AGPL-3.0 `agreement_rebate` module implements rebate agreements, product/category/domain filters, stepped rebate sections, settlement generation from posted account-move lines, settlement status, and creation of accounting documents from calculated rebate settlements. Negative settlement amounts reverse the invoice/refund move type rather than silently flipping signs. The module maintains links from settlement lines to the source invoice lines and generated accounting move.
+- Evidence of implementation: `agreement_rebate/models/agreement_rebate_settlement.py` stores amount invoiced/rebate, source invoice-line links, settlement invoice status and generated `account.move`; `wizards/settlement_create.py` builds settlements for date windows and can discard already-settled agreements; `wizards/invoice_create.py` creates settlement invoices/refunds. `tests/test_agreement_rebate.py` creates posted invoices and rebate agreements, verifies global/line/section calculations (e.g. 3,800 invoiced -> 380 rebate), creates settlements and then creates actual accounting invoices from them.
+- License / reuse status: AGPL-3.0. Current tested examples are **sales/customer rebate** flows, not a validated supplier-purchase rebate implementation. Treat direct hosted-code reuse according to AGPL obligations; the settlement design itself is highly reusable under the user's rights assumption.
+- Useful capability/workflow: posted transaction lines -> rebate eligibility/tiering -> immutable settlement lines -> invoice/refund document -> invoiced/reversed status.
+- Likely buyer: Odoo customers or as an architectural donor for rebate recovery systems.
+- Painful problem solved: Calculated rebates often stay in spreadsheets and lose their source-transaction lineage when finance posts a settlement.
+- Fastest monetization path: Use the tested settlement design behind Supplier Rebate Recovery after replacing the sale-side authority/input layer with supplier agreement + posted purchase invoice/receipt evidence.
+- Realistic paid pilot: Odoo customer with supplier rebate programs; independently reconstruct qualifying AP purchase lines, calculate rebate, and produce buyer-reviewed settlement evidence while using Odoo's accounting document lifecycle as the final realization source.
+- Estimated engineering time saved: 4-8 weeks for settlement, source-line linkage, invoice/refund generation and reversal-state design.
+- Important dependencies/risks: Current test corpus is sale-side; do not claim vendor rebate entitlement from it. Odoo floats are used in parts of rebate math; a recovery product should use explicit decimal/minor-unit money semantics and literal-golden tests.
+- Connections: Pairs well with M3H5/vendorrebate for agreement/claim truth and LedgerByte for one-use realized recovery allocation.
+- Opportunity score: **8.9/10**.
