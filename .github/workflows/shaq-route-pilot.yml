@@ -1,0 +1,71 @@
+name: SHAQ Public Route Crawl Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_pages:
+        description: Sitemap route pages to crawl
+        required: true
+        default: "40"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - production/fmc_tariff_ledger/SHAQ_ROUTE_PILOT_NOW
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: production/fmc_tariff_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/fmc_tariff_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - name: Crawl bounded public-route pilot
+        env:
+          MAX_PAGES: ${{ inputs.max_pages || '40' }}
+        run: |
+          python shaq_route_crawl.py             --out shaq-route-pilot             --db shaq_routes.sqlite             --workers 2             --min-host-interval 0.50             --max-pages "${MAX_PAGES}"
+      - name: Inspect pilot database
+        run: |
+          python - <<'PY'
+          import json, sqlite3
+          from pathlib import Path
+
+          db = sqlite3.connect("shaq-route-pilot/shaq_routes.sqlite")
+          checks = {
+              "route_pages": db.execute("select count(*) from shaq_route_pages").fetchone()[0],
+              "rates": db.execute("select count(*) from shaq_rates").fetchone()[0],
+              "carriers": db.execute("select count(distinct carrier_raw) from shaq_rates").fetchone()[0],
+              "lanes": db.execute("select count(distinct origin_raw || '->' || destination_raw) from shaq_rates").fetchone()[0],
+              "containers": db.execute("select count(distinct container_type) from shaq_rates").fetchone()[0],
+              "with_valid_to": db.execute("select count(*) from shaq_rates where valid_to is not null").fetchone()[0],
+              "authority_ready": db.execute("select count(*) from shaq_rate_authority_view where authority_readiness='AUTHORITY_READY'").fetchone()[0],
+              "benchmark_only": db.execute("select count(*) from shaq_rate_authority_view where authority_readiness='BENCHMARK_ONLY'").fetchone()[0],
+          }
+          Path("shaq-route-pilot/qa.json").write_text(json.dumps(checks, indent=2) + "\n")
+          print(json.dumps(checks, indent=2))
+          if checks["route_pages"] == 0:
+              raise SystemExit("pilot captured no route pages")
+          if checks["rates"] == 0:
+              raise SystemExit("pilot parser extracted no rates")
+          if checks["authority_ready"] != 0:
+              raise SystemExit("publisher route pages must not become contract authority")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shaq-route-pilot
+          path: production/fmc_tariff_ledger/shaq-route-pilot/
+          retention-days: 30
+          compression-level: 3
+          if-no-files-found: error
