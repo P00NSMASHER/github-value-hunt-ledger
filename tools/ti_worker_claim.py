@@ -103,6 +103,13 @@ def main():
       "activation_id":packet.get("activation_id"),
       "activation_generation_id":packet.get("activation_generation_id")
     }
+    if event["assignment_work_kind"]=="learning_measurement":
+        packet_id=packet.get("learning_measurement_packet_id")
+        packet_sha=packet.get("learning_measurement_packet_sha256")
+        if not packet_id or not packet_sha:
+            raise SystemExit("learning_measurement claim requires frozen packet id+sha256")
+        event["learning_measurement_packet_id"]=packet_id
+        event["learning_measurement_packet_sha256"]=packet_sha
     path=INTEL/"execution_events"/f"{packet['slot_id']}.jsonl"
     with path.open("a",encoding="utf-8") as f:
         f.write(json.dumps(event,ensure_ascii=False)+"\n")
