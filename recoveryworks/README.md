@@ -16,6 +16,7 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **RebateRecovery** — earned supplier/volume rebates not fully settled.
 - **LeaseRecovery** — rent, CAM, operating-expense, and area-based lease billing leakage.
 - **TaxRecovery** — professionally reviewed sales/use-tax and transaction-tax overpayments.
+- **InsuranceRecovery** — professionally reviewed commercial/property claim underpayments.
 
 ## Non-negotiable invariant
 
@@ -78,3 +79,6 @@ qualified-causation, and settlement schemas are documented in
 
 TaxRecovery invoice-tax, reviewed-assessment, rule-snapshot, and professional-review
 schemas are documented in `recoveryworks/INGESTION_TAX.md`.
+
+InsuranceRecovery claim, policy-assessment, settlement, and qualified-review schemas
+are documented in `recoveryworks/INGESTION_INSURANCE.md`.
