@@ -1,15 +1,42 @@
 #!/usr/bin/env python3
-import hashlib, json, subprocess
+import hashlib, json, subprocess, sys
 from datetime import datetime, timezone, timedelta
-from ti_common import INTEL, load_jsonl
+from ti_common import INTEL, ROOT, load_jsonl
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from production.restart_readiness import build_restart_readiness
+from production.runtime_activation_gate import evaluate_runtime_activation_gate
 
 POL=json.loads((INTEL/"activation_policy.json").read_text(encoding="utf-8"))
+RUNTIME_POL=json.loads((INTEL/"hunter_runtime_policy.json").read_text(encoding="utf-8"))
 PPOL=json.loads((INTEL/"worker_presence_policy.json").read_text(encoding="utf-8"))
+SPLIT_STATUS=json.loads((INTEL/"TRAINING_SPLIT_STATUS.json").read_text(encoding="utf-8"))
+MEASUREMENT_PACKETS=json.loads((INTEL/"learning_measurement_packets.json").read_text(encoding="utf-8"))
 PRES=load_jsonl("worker_presence_state.jsonl")
 PRIMARY=load_jsonl("dispatch_claim_packets.jsonl")
 STEALS=load_jsonl("work_steal_claim_packets.jsonl") if (INTEL/"work_steal_claim_packets.jsonl").exists() else []
 STATE=load_jsonl("execution_state.jsonl")
 HISTORY=load_jsonl("activation_history.jsonl") if (INTEL/"activation_history.jsonl").exists() else []
+
+scoreboard=(ROOT/"benchmark"/"SCOREBOARD.md").read_text(encoding="utf-8")
+shadow_results={}
+for lane in ("ai","science","commercial"):
+    path=ROOT/"production"/"shadow"/"results"/f"{lane}.md"
+    shadow_results[lane]=path.read_text(encoding="utf-8") if path.exists() else ""
+PREACTIVATION_READINESS=build_restart_readiness(
+    split_status=SPLIT_STATUS,
+    activation_metrics={"current_activations":0},
+    packets=MEASUREMENT_PACKETS,
+    scoreboard_text=scoreboard,
+    shadow_results=shadow_results,
+)
+RUNTIME_GATE=evaluate_runtime_activation_gate(
+    RUNTIME_POL,
+    PREACTIVATION_READINESS,
+    MEASUREMENT_PACKETS,
+)
 
 def parse_ts(v):
     if not v: return None
@@ -43,6 +70,13 @@ claimable_slots={
 }
 
 def eligible_packet(p):
+    if not RUNTIME_GATE.get("enabled"): return False
+    if p.get("assignment_work_kind") not in set(
+        RUNTIME_GATE.get("allowed_work_kinds") or []
+    ): return False
+    if p.get("assignment_source_id") not in set(
+        RUNTIME_GATE.get("allowed_seed_ids") or []
+    ): return False
     if p.get("slot_id") not in claimable_slots: return False
     eligible=parse_ts(p.get("eligible_at") or p.get("issued_at"))
     hard=parse_ts(p.get("hard_expire_at"))
@@ -73,6 +107,27 @@ for wid in sorted(pres_by_worker):
     ps=pres_by_worker[wid]
     if wid in active_workers:
         status_rows.append({"worker_id":wid,"activation_state":"ACTIVE_CLAIM","presence_state":ps.get("presence_state"),"activation_id":None,"reason":"V11 active claim is authoritative."})
+        continue
+    if not RUNTIME_GATE.get("enabled"):
+        status_rows.append({
+          "worker_id":wid,
+          "activation_state":"PAUSED_BY_RUNTIME_POLICY",
+          "presence_state":ps.get("presence_state"),
+          "activation_id":None,
+          "reason":(
+            "Generated activation disabled: "
+            + str(RUNTIME_GATE.get("reason") or "runtime_gate_blocked")
+          )
+        })
+        continue
+    if len(current)>=int(RUNTIME_GATE.get("maximum_current_activations") or 0):
+        status_rows.append({
+          "worker_id":wid,
+          "activation_state":"CANARY_CAPACITY_HELD",
+          "presence_state":ps.get("presence_state"),
+          "activation_id":None,
+          "reason":"Approved measurement-canary activation capacity is already reserved."
+        })
         continue
     if ps.get("presence_state") not in ready_states:
         status_rows.append({"worker_id":wid,"activation_state":"WAITING_PRESENCE","presence_state":ps.get("presence_state"),"activation_id":None,"reason":"Fresh READY presence is required for generated activation."})
@@ -157,12 +212,21 @@ metrics={
   "history_activations":len(history),
   "waiting_presence":sum(1 for x in status_rows if x.get("activation_state")=="WAITING_PRESENCE"),
   "active_claim_workers":sum(1 for x in status_rows if x.get("activation_state")=="ACTIVE_CLAIM"),
-  "ready_without_dispatch":sum(1 for x in status_rows if x.get("activation_state")=="NO_ELIGIBLE_DISPATCH")
+  "ready_without_dispatch":sum(1 for x in status_rows if x.get("activation_state")=="NO_ELIGIBLE_DISPATCH"),
+  "runtime_mode":RUNTIME_GATE.get("mode"),
+  "runtime_activation_enabled":bool(RUNTIME_GATE.get("enabled")),
+  "runtime_gate_reason":RUNTIME_GATE.get("reason"),
+  "runtime_gate_errors":RUNTIME_GATE.get("errors") or [],
+  "runtime_approval_id":RUNTIME_GATE.get("approval_id"),
+  "runtime_maximum_current_activations":int(RUNTIME_GATE.get("maximum_current_activations") or 0),
+  "runtime_allowed_seed_ids":RUNTIME_GATE.get("allowed_seed_ids") or []
 }
 (INTEL/"activation_metrics.json").write_text(json.dumps(metrics,indent=2)+"\n",encoding="utf-8")
 
 report=["# WORKER ACTIVATION BOARD","",f"Generation: **{gen}**",f"Clock: **{fmt(now)}**","",
-        "V16 activation is pull-based. Routing can exist without activation; generated claiming requires fresh READY presence.","",
+        f"Runtime mode: **{RUNTIME_GATE.get('mode')}**. Generated activation enabled: **{str(bool(RUNTIME_GATE.get('enabled'))).lower()}**.",
+        f"Runtime gate reason: **{RUNTIME_GATE.get('reason')}**.",
+        "V16 activation is pull-based. Routing can exist without activation; generated claiming additionally requires explicit runtime authorization and fresh READY presence.","",
         "| Worker | Presence | Activation state | Slot | Activation |","|---|---|---|---|---|"]
 for x in status_rows:
     report.append(f"| {x['worker_id']} | {x.get('presence_state') or '—'} | **{x['activation_state']}** | {x.get('slot_id') or '—'} | {x.get('activation_id') or '—'} |")
