@@ -71,6 +71,7 @@ def candidate_packet(queue=None, **overrides):
         "candidate_artifact_ref": "sha256:candidate",
         "diff_hash": "a" * 64,
         "changed_logical_targets": [task["target"]["id"]],
+        "regression_test_requirement": task["regression_test_requirement"],
         "regression_tests_total": 2,
         "regression_tests_passed": 2,
         "regression_test_evidence_refs": [
@@ -196,6 +197,25 @@ class RepairCandidateIntakeTests(unittest.TestCase):
         self.assertEqual(state["candidates"], [])
         self.assertIn(
             "mutation_scope_not_exactly_one_authorized_target",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_wrong_regression_requirement_is_blocked(self):
+        queue = ready_queue()
+        state = build_repair_candidate_intake(
+            queue,
+            [
+                candidate_packet(
+                    queue,
+                    regression_test_requirement=(
+                        "Run an unrelated passing test instead."
+                    ),
+                )
+            ],
+        )
+        self.assertEqual(state["candidates"], [])
+        self.assertIn(
+            "regression_test_requirement_mismatch",
             state["blocked_submissions"][0]["reasons"],
         )
 
