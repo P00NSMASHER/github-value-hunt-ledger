@@ -21,6 +21,14 @@ create table if not exists intel_experience_value (
   reward_ma numeric not null default 0,
   last_reward numeric,
   last_run_id text references intel_run(id),
+  train_measured_runs int not null default 0,
+  train_deep_inspections int not null default 0,
+  train_mean_reward numeric,
+  confirm_measured_runs int not null default 0,
+  confirm_deep_inspections int not null default 0,
+  confirm_mean_reward numeric,
+  generalization_status text not null default 'gathering_evidence',
+  eligible_for_policy_consideration boolean not null default false,
   updated_at timestamptz not null default now()
 );
 
