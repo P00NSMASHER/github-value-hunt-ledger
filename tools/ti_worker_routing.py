@@ -392,6 +392,8 @@ for r in routes:
       "portfolio_policy_generation_id":a["portfolio_policy_generation_id"],"work_item_id":a["work_item_id"],
       "assignment_slot_role":a["slot_role"],"assignment_work_kind":a["work_kind"],
       "assignment_source_id":a["source_id"],"assignment_score":a["final_score"],
+      "learning_measurement_packet_id":a.get("learning_measurement_packet_id"),
+      "learning_measurement_packet_sha256":a.get("learning_measurement_packet_sha256"),
       "routing_score":r["routing_score"],"routing_learning_adjustment":(r.get("score_components") or {}).get("routing_learning",0),
       "activation_response_adjustment":(r.get("score_components") or {}).get("activation_response",0),
       "routing_learning_evidence_count":r.get("routing_learning_evidence_count",0),"claim_file":f"intelligence/execution_events/{r['slot_id']}.jsonl"
