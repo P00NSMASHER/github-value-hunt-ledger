@@ -5,6 +5,7 @@ from recoveryworks.branches.ap import (
     APObligation,
     APPayment,
     build_ap_observations,
+    canonical_invoice_number,
     normalize_invoice_number,
 )
 
@@ -35,6 +36,13 @@ def obligation(vendor, invoice, cents, *, verified=True):
 
 
 class APBranchTests(unittest.TestCase):
+    def test_canonical_invoice_number_never_strips_semantic_suffix(self):
+        self.assertEqual(canonical_invoice_number(" inv-2001-R "), "INV-2001-R")
+        self.assertNotEqual(
+            canonical_invoice_number("INV-2001"),
+            canonical_invoice_number("INV-2001-R"),
+        )
+
     def test_invoice_normalization_only_strips_known_suffix(self):
         self.assertEqual(normalize_invoice_number("inv-2001-R"), "INV-2001")
         self.assertEqual(normalize_invoice_number("inv-2001-DUP"), "INV-2001")
