@@ -211,3 +211,38 @@ A provider may support safe duplicate suppression while an SDK default silently 
 ### Grid evaluator semantic-proof chain
 `first-party dataset bytes/digest -> raw source provenance -> composite event identity -> unique county outage-spell fact grain -> many-to-many spell↔event bridge -> whole-event blocked split -> additive outcome once per spell -> immutable evaluator receipt`.
 Hash integrity and dedupe are both necessary but neither proves the aggregation grain is economically/scientifically correct.
+
+
+## AP Recovery v2 — Supplier Credit Recovery -> realized cash/credit -> rebate/deduction assurance
+- Product position: **independent supplier-credit recovery and realization control**, not generic OCR, not a replacement ERP, and not a claim that every exception is owed money.
+- Components:
+  - Discovery/control engine: `leagames0221-sys/invoice-lens@4a9ce4123f8eba3308c2d414f449be68b7fbc05e` for deterministic duplicates, three-way mismatch, approval/fraud signals and append-only evidence.
+  - Durable AP/PO/receipt substrate: `stateset/stateset-icommerce@0ae4cf3c531f35d28a55f0211fc64413114d4bd1`.
+  - Control/evidence plane: `amrzainmubarak/reconforge-erp@b61ea56bb9c135fda12546e173795af3c243e4fb` for exact-money, SoD, exception routing, atomic audit/outbox and tenant boundaries.
+  - Realized-recovery state model: `Noone9029/Accounting-App@90e0eaa4896a55c1c8cda1c4101f4ab1323a4a61` patterns for debit notes, unapplied supplier payments/credits, allocations, supplier refunds, reversals and idempotency.
+  - Supplier-side evidence intake: `wphamman/erpocr_integration@a9c82c0ff02f580ff60ebf012797686ba91e977e` statement extraction/reconciliation; replace/extend generic credit-line classification before monetary decisions.
+  - Independent falsifier: `ai-frankie/ap-close-engine@db38c8476ccd21155a5dc161c5f36b9747e88e64` re-performance + vendor statement + GL/GRNI/duplicate controls.
+  - Enterprise Oracle EBS wedge: `Enginatics/Oracle-EBS-SQL@6c0f3b1a70e1b6ff747e497176e7be9256e6e7ee` negative supplier balance / supplier statement / invoice-payment / receipt query maps.
+  - Adjacent rebate/deduction domain: `vendorrebate/vendorrebate@f37427a762555f4538aa4ffd21e7afaadc6e81e9` versioned agreement, EDI claim, accrual, dispute-window and recovery-packet patterns.
+- Combined capability: AP/PO/receipt/payment/GL + supplier statement -> deterministic exception -> independent re-performance -> human-confirmed entitlement -> supplier credit/debit note/refund case -> one-use allocation to invoice or cash refund -> **realized recovery certificate**. For rebates/deductions, add versioned agreement/accrual authority before any money assertion.
+- Hard invariant: an exception is not a recovery. Unsupported entitlement, ambiguous supplier identity, missing source document, unverified credit, unallocated credit, disputed settlement, or reversal = **$0 realized recovery** until buyer-verifiable settlement evidence exists.
+- Fastest first paid wedge: top-25-supplier **Credit Balance & Statement Recovery Diagnostic** using read-only ERP/AP exports plus supplier statements. Target old debit balances, duplicate/overpayments, unapplied credits, debit notes and statement-vs-ledger differences.
+- Pilot deliverable: case ledger with source record, evidence, gross candidate, independent validation result, supplier-side credit/refund evidence, allocation/refund status, reversals and realized amount. Do not contact suppliers without explicit buyer action/authorization.
+- Commercial ladder (test, not forecast):
+  - Data/ERP extraction diagnostic: **$5k-$10k fixed**.
+  - 60-90 day recovery pilot: **$10k-$25k fixed** or a modest setup fee plus **15-25% of uniquely attributable realized recovery**.
+  - Continuous supplier-credit assurance after proof: **$30k-$120k+ annual** depending on vendor count, spend, ERP complexity and evidence burden.
+  - Rebate/deduction assurance add-on for retail/CPG: separate fixed diagnostic + percentage only on verified realized recoveries.
+- Fastest path to first payment: sell read-only historical diagnostic that needs CSV/Excel/statement exports and no ERP writeback; Oracle EBS buyers can use a vetted extract specification rather than waiting for an API integration.
+- Plausible path to $100K: 5-10 paid diagnostics/pilots at $10k-$20k, or fewer if realized-recovery contingency fees are material.
+- Plausible path to $1M: e.g. 20-30 recurring customers averaging ~$35k-$50k annual value, or a smaller enterprise portfolio plus realized-recovery fees. This is a scenario, not a revenue prediction.
+- What remains to build:
+  1. canonical recovery-case + entitlement + settlement/allocation schema;
+  2. supplier-statement credit/debit/refund classifier richer than “credit = payment”;
+  3. ERP import adapters starting CSV + Oracle EBS read-only extract contract;
+  4. duplicate/overpayment/negative-balance/rebate rule packs with source/effective-date authority;
+  5. independent-falsification boundary and literal goldens;
+  6. settlement evidence upload/verification and one-use realized-recovery allocation;
+  7. buyer review UI and exportable evidence packet.
+- Assumptions: buyer can supply AP/PO/receipt/payment/GL exports and supplier statements; candidate populations contain some recoverable debit balances/credits; buyer has contractual/legal basis to seek refund/credit; realized recovery is measured from buyer-verifiable accounting/settlement records.
+- Confidence: **high** in engineering feasibility and paid-diagnostic plausibility; **unproven** on customer acquisition, actual recovery yield and $1M timing until real pilots run.
