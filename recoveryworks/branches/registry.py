@@ -86,6 +86,14 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "contract-backed telecom billing variance",
         ("contract billing engine", "CDR usage", "invoice exports"),
     ),
+    Branch.REBATE: BranchSpec(
+        Branch.REBATE,
+        "RebateRecovery",
+        "earned supplier and volume rebates not fully received",
+        ("rebate programs", "purchase lines", "settlement/remittance records"),
+        "tier-backed rebate underpayment finding",
+        ("tier engine", "purchase reconciliation", "settlement evidence"),
+    ),
 }
 
 
