@@ -134,7 +134,7 @@ class FailureLearningTests(unittest.TestCase):
             failure_id="FAIL:1",
             run_id="RUN:1",
             hunter_id="HUNTER-01",
-            target_type="skill",
+            target_type="search_skill",
             target_id="search-inspector",
             failure_class="false_positive",
             observation="README looked complete but implementation was absent",
