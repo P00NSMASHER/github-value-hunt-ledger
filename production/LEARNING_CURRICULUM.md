@@ -102,4 +102,15 @@ The shared intelligence build produces:
 
 The top recommendations also appear in \`NETWORK_PRIORS.md\` as measurement debt.
 
-These artifacts remain advisory. The allocator and live policy are unchanged.
+The shared build then compiles each recommended strategy into:
+
+1. one curriculum-bound \`learning_measurement\` seed (\`SEED:learn:*\`);
+2. one immutable advisory precommit packet with \`packet_id\` + \`packet_sha256\`;
+3. a packet-derived \`WORK:learn:*\` work-item identity;
+4. at most one protected live allocator assignment in the measurement slot.
+
+The measurement score remains **curriculum-only**: prior seed yield, Q-value, policy allocation and experiment boosts are not allowed to re-rank adaptive measurement work.
+
+For \`learning_measurement\`, the exact packet ID and SHA are copied through allocation, routing, dispatch, activation, CLAIM and canonical run telemetry. They are part of dispatch/work identity. Any mismatch or omission fails closed. A changed packet therefore becomes new work; a stale claim cannot silently measure a revised hypothesis.
+
+These generated artifacts still do **not** activate paused hunters. A precommit packet has no execution authority. Actual work requires explicit future hunter resumption plus the normal generated READY → activation → CLAIM path. Frozen benchmark \`strategy_measurement\` remains a separate benchmark-only work kind and cannot enter ordinary prospective telemetry.
