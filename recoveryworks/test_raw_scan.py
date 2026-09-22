@@ -1,6 +1,11 @@
+import json
+from pathlib import Path
+import tempfile
 import unittest
 
+from recoveryworks.cli import main
 from recoveryworks.raw_scan import run_raw_scan_payload
+from recoveryworks.storage import load_ledger
 
 
 def all_six_payload():
@@ -150,6 +155,23 @@ class RawRecoveryScanTests(unittest.TestCase):
         self.assertEqual(len(result["manifest_hash"]), 64)
         self.assertEqual(len(result["batch_hash"]), 64)
         self.assertGreaterEqual(result["source_count"], 13)
+
+    def test_raw_scan_cli_persists_all_six_branch_ledger(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "raw.json"
+            out = Path(tmp) / "result.json"
+            ledger_path = Path(tmp) / "ledger.json"
+            src.write_text(json.dumps(all_six_payload()), encoding="utf-8")
+            self.assertEqual(main([
+                "raw-scan", str(src),
+                "--output", str(out),
+                "--ledger-output", str(ledger_path),
+            ]), 0)
+            result = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(result["portfolio"]["totals"]["cases"], 6)
+            ledger = load_ledger(ledger_path)
+            self.assertEqual(ledger.rollup()["totals"]["cases"], 6)
+            self.assertTrue(ledger.verify_event_chain())
 
     def test_missing_required_construction_schedule_impact_stays_review(self):
         payload = all_six_payload()
