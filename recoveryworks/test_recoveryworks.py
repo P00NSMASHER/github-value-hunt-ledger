@@ -113,6 +113,48 @@ class RecoveryWorksTests(unittest.TestCase):
         self.assertEqual(a.finding.finding_id, b.finding.finding_id)
         self.assertEqual(ledger.rollup()["totals"]["cases"], 1)
 
+    def test_rejected_validated_case_is_removed_from_live_rollups(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.FREIGHT, client_id="c", counterparty_id="carrier",
+            reference="bad-1", currency="USD", expected_cents=10000,
+            actual_cents=13000, rule=rule(), evidence=(evidence(),),
+            reason="OVERCHARGE", confidence_basis="verified inputs",
+        ))
+        ledger = RecoveryLedger()
+        ledger.add(finding)
+        before = ledger.rollup()["totals"]
+        self.assertEqual(before["validated_cents"], 3000)
+        ledger.reject(finding.finding_id, "reviewer-1", "Source was superseded")
+        after = ledger.rollup()["totals"]
+        self.assertEqual(after["discovered_cents"], 3000)
+        self.assertEqual(after["potential_cents"], 0)
+        self.assertEqual(after["validated_cents"], 0)
+        self.assertEqual(after["rejected_cases"], 1)
+
+    def test_rejected_or_recovered_case_cannot_reenter_authorization(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.DUTY, client_id="c", counterparty_id="customs",
+            reference="entry-2", currency="USD", expected_cents=10000,
+            actual_cents=15000, rule=rule(), evidence=(evidence(),),
+            reason="DUTY_VARIANCE", confidence_basis="verified tariff",
+        ))
+        rejected = RecoveryLedger()
+        rejected.add(finding)
+        rejected.reject(finding.finding_id, "reviewer-1", "False positive")
+        with self.assertRaises(ValueError):
+            rejected.approve(finding.finding_id, "reviewer-2", "Try to reopen")
+        with self.assertRaises(ValueError):
+            rejected.authorize(finding.finding_id, "auth-should-fail")
+
+        recovered = RecoveryLedger()
+        recovered.add(finding)
+        recovered.approve(finding.finding_id, "reviewer-1", "Verified")
+        recovered.authorize(finding.finding_id, "auth-1")
+        recovered.mark_claimed(finding.finding_id)
+        recovered.mark_recovered(finding.finding_id, 5000, 1000)
+        with self.assertRaises(ValueError):
+            recovered.authorize(finding.finding_id, "auth-2")
+
     def test_freight_bridge_preserves_authority_gate(self):
         f = SimpleNamespace(
             finding_id="f1", proof_hash="proof", buyer_id="buyer",
@@ -136,6 +178,8 @@ class RecoveryWorksTests(unittest.TestCase):
             sources=(
                 SourceManifestEntry("s1", Branch.FREIGHT, "h1", "file://freight.csv", "invoice_export"),
                 SourceManifestEntry("s2", Branch.AP, "h2", "file://payments.csv", "payment_export"),
+                SourceManifestEntry("s3", Branch.AP, "rulehash", "source://contract#7.4", "governing_rule"),
+                SourceManifestEntry("s4", Branch.AP, "abc123", "source://doc#p1", "evidence"),
             ),
         )
         observation = RecoveryObservation(
@@ -153,6 +197,47 @@ class RecoveryWorksTests(unittest.TestCase):
                 branch=Branch.UTILITY, client_id="c", counterparty_id="u",
                 reference="b", currency="USD", expected_cents=1, actual_cents=2,
                 rule=rule(), evidence=(evidence(),), reason="x", confidence_basis="x",
+            ),))
+
+    def test_recovery_scan_rejects_out_of_manifest_rule_or_evidence(self):
+        manifest = freeze_scan(
+            scan_id="scan-proof",
+            client_id="c",
+            branches=(Branch.AP,),
+            selection_rule="supplied AP period",
+            sources=(
+                SourceManifestEntry("s1", Branch.AP, "rulehash", "source://contract#7.4", "governing_rule"),
+                SourceManifestEntry("s2", Branch.AP, "abc123", "source://doc#p1", "evidence"),
+            ),
+        )
+        bad_evidence = EvidenceRef(
+            evidence_id="ev:outside",
+            source_hash="outside",
+            locator="source://outside",
+            kind="invoice",
+            verified=True,
+        )
+        with self.assertRaisesRegex(ValueError, "evidence source"):
+            run_scan(manifest, (RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="inv-outside", currency="USD", expected_cents=10000,
+                actual_cents=12000, rule=rule(), evidence=(bad_evidence,),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+            ),))
+        outside_rule = RuleRef(
+            rule_id="rule:outside",
+            source_hash="outside-rule",
+            effective_from="2026-01-01",
+            effective_to=None,
+            verified_controlling=True,
+            source_locator="source://outside-rule",
+        )
+        with self.assertRaisesRegex(ValueError, "rule source"):
+            run_scan(manifest, (RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="inv-rule", currency="USD", expected_cents=10000,
+                actual_cents=12000, rule=outside_rule, evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
             ),))
 
 
