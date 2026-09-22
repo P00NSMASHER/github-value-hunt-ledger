@@ -68,7 +68,12 @@ def memory_row(
 
 
 class LearningCurriculumTests(unittest.TestCase):
-    def build(self, rows, allocations=None):
+    def build(
+        self,
+        rows,
+        allocations=None,
+        split_status=None,
+    ):
         strategies = [
             strategy("STRAT:near-a"),
             strategy("STRAT:near-b"),
@@ -114,10 +119,18 @@ class LearningCurriculumTests(unittest.TestCase):
                 for sid, allocation in allocations.items()
             ]
         }
+        if split_status is None:
+            split_status = {
+                "key_commitment_active": True,
+                "secret_available": True,
+                "activation_run_count": 10,
+                "pending_claim_ids": [],
+            }
         return build_learning_curriculum(
             state,
             strategies,
             policy,
+            split_status=split_status,
         )
 
     def test_two_gate_closing_plus_one_zero_run_are_reserved(self):
@@ -232,6 +245,95 @@ class LearningCurriculumTests(unittest.TestCase):
         )
         self.assertTrue(
             first["requires_generated_claim"]
+        )
+
+    def test_train_ready_strategy_is_blocked_when_blind_confirm_inactive(self):
+        curriculum = self.build(
+            [
+                memory_row(
+                    "STRAT:near-a",
+                    runs=5,
+                    deep=20,
+                    train_ready=True,
+                ),
+                memory_row(
+                    "STRAT:near-b",
+                    runs=4,
+                    deep=19,
+                ),
+            ],
+            split_status={
+                "key_commitment_active": False,
+                "secret_available": False,
+                "activation_run_count": None,
+                "pending_claim_ids": ["CLAIM:pending"],
+            },
+        )
+        row = next(
+            item
+            for item in curriculum["rows"]
+            if item["strategy_id"] == "STRAT:near-a"
+        )
+        self.assertEqual(row["phase"], "confirm_blocked")
+        self.assertEqual(row["measurement_priority"], 0.0)
+        self.assertEqual(
+            row["selection_reason"],
+            "blind_confirmation_not_operational",
+        )
+        selected = {
+            item["strategy_id"]
+            for item in curriculum["recommended_measurements"]
+        }
+        self.assertNotIn("STRAT:near-a", selected)
+        self.assertFalse(
+            curriculum["blind_confirmation"]["operational"]
+        )
+        self.assertEqual(
+            curriculum["blind_confirmation"]["blocker"],
+            "split_key_commitment_inactive",
+        )
+        self.assertEqual(
+            curriculum["blind_confirmation"][
+                "pending_claim_count"
+            ],
+            1,
+        )
+        self.assertEqual(
+            validate_learning_curriculum(curriculum),
+            [],
+        )
+
+    def test_active_commitment_without_secret_still_blocks_confirm(self):
+        curriculum = self.build(
+            [
+                memory_row(
+                    "STRAT:near-a",
+                    runs=5,
+                    deep=20,
+                    train_ready=True,
+                )
+            ],
+            split_status={
+                "key_commitment_active": True,
+                "secret_available": False,
+                "activation_run_count": 10,
+                "pending_claim_ids": [],
+            },
+        )
+        self.assertFalse(
+            curriculum["blind_confirmation"]["operational"]
+        )
+        self.assertEqual(
+            curriculum["blind_confirmation"]["blocker"],
+            "split_secret_unavailable",
+        )
+        self.assertEqual(
+            next(
+                row
+                for row in curriculum["rows"]
+                if row["strategy_id"] == "STRAT:near-a"
+            )["phase"],
+            "confirm_blocked",
         )
 
     def test_value_reward_and_policy_allocation_do_not_change_selection(self):
