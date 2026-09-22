@@ -353,6 +353,47 @@ def test_direct_sql_cannot_cross_scope_allocation(tmp_path):
     conn.close()
 
 
+def test_existing_database_gets_additive_net_capacity_guards_on_reopen(tmp_path):
+    path=tmp_path/"migrate.sqlite3"
+    s=SettlementStore(path,buyer_id="TEST_BUYER",business_unit="TEST_BU")
+    conn=sqlite3.connect(path)
+    conn.execute("DROP TRIGGER allocation_event_net_capacity")
+    conn.execute("DROP TRIGGER counter_event_capacity")
+    conn.commit()
+    conn.close()
+
+    # Reopening executes the additive schema migration without replacing the
+    # legacy gross-capacity trigger.
+    SettlementStore(path,buyer_id="TEST_BUYER",business_unit="TEST_BU")
+    conn=sqlite3.connect(path)
+    names={row[0] for row in conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='trigger'"
+    )}
+    conn.close()
+    assert "allocation_event_capacity" in names
+    assert "allocation_event_net_capacity" in names
+    assert "counter_event_capacity" in names
+
+
+def test_reopen_fails_closed_if_legacy_database_already_overreturned_event(tmp_path):
+    path=tmp_path/"overreturned.sqlite3"
+    s=SettlementStore(path,buyer_id="TEST_BUYER",business_unit="TEST_BU")
+    s.ingest_event(E(amt=10000))
+
+    conn=sqlite3.connect(path)
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("DROP TRIGGER counter_event_capacity")
+    conn.execute("""INSERT INTO counter_events
+      (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
+      VALUES('TEST_BUYER','TEST_BU','legacy-overreturn','e1','USD',10001,
+             '2026-09-03T10:00:00Z','legacy-overreturn-src','BANK-RETURN')""")
+    conn.commit()
+    conn.close()
+
+    with pytest.raises(RuntimeError,match="counter capacity invariant violated"):
+        SettlementStore(path,buyer_id="TEST_BUYER",business_unit="TEST_BU")
+
+
 def test_legacy_unscoped_schema_fails_closed(tmp_path):
     path=tmp_path/"legacy.sqlite3"
     conn=sqlite3.connect(path)
