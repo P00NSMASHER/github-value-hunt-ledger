@@ -458,6 +458,42 @@ class TiCCatalogTests(unittest.TestCase):
             )
             conn.close()
 
+    def test_master_list_preserves_healthsparq_fragment_route(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            source = catalog.Source(
+                "master-hs", "Registry", "github_master_list",
+                "https://github.test/master.md"
+            )
+            hs_url = (
+                "https://bcbsaz.healthsparq.com/app/public/"
+                "#/one/insurerCode=BCBSAZ_I&brandCode=BCBSAZ/"
+                "machine-readable-transparency-in-coverage"
+            )
+            raw = (
+                "| Payer | Type | Public MRF TOC / landing URL | Notes |\n"
+                "|---|---|---|---|\n"
+                f"| BCBS Arizona | commercial | {hs_url} | HealthSparq |\n"
+            ).encode()
+            with patch.object(catalog, "fetch_bytes", return_value=(
+                raw, fake_response(source.source_url, "text/markdown")
+            )), patch.object(
+                catalog, "ingest_healthsparq_public",
+                return_value={"files": 0, "plans": 0, "snapshots": 0},
+            ) as ingest:
+                catalog.discover_github_master_list(
+                    conn, root, source, timeout=1, max_bytes=1_000_000
+                )
+            dynamic = conn.execute(
+                "SELECT source_url,adapter FROM sources WHERE source_key LIKE 'endurant-%'"
+            ).fetchone()
+            self.assertEqual(dynamic[0], hs_url)
+            self.assertEqual(dynamic[1], "healthsparq_public")
+            passed_source = ingest.call_args.args[2]
+            self.assertIn("#/one/insurerCode=BCBSAZ_I&brandCode=BCBSAZ/", passed_source.source_url)
+            conn.close()
+
 
 if __name__ == "__main__":
     unittest.main()
