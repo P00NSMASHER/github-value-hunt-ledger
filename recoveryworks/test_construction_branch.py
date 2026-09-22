@@ -97,6 +97,7 @@ def review(*, verified=True, accepted=True, days=3):
         source_locator="file://causation.csv#row=2",
         verified=verified,
         qualified_reviewer_id="scheduler-1" if verified else None,
+        qualification_basis="Forensic scheduler / P6 delay analyst" if verified else None,
     )
 
 
@@ -269,7 +270,94 @@ class ConstructionBranchTests(unittest.TestCase):
                 source_locator="file://r",
                 verified=True,
                 qualified_reviewer_id=None,
+                qualification_basis="Forensic scheduler",
             )
+
+    def test_verified_causation_requires_qualification_basis(self):
+        with self.assertRaises(ValueError):
+            CausationReview(
+                review_id="R",
+                entitlement_id="E",
+                event_id="EV",
+                baseline_version_id="B",
+                update_version_id="U",
+                accepted_causation=True,
+                accepted_delay_days=1,
+                review_date="2026-09-01",
+                source_hash="h",
+                source_locator="file://r",
+                verified=True,
+                qualified_reviewer_id="scheduler-1",
+                qualification_basis=None,
+            )
+
+    def test_schedule_topology_hash_and_cpm_manifest_are_reproducible(self):
+        version = schedule("BASE", "2026-08-01", b_duration=5)
+        same = schedule("BASE-COPY", "2026-08-01", b_duration=5)
+        self.assertEqual(version.topology_hash, same.topology_hash)
+        result = calculate_cpm(version)
+        self.assertEqual(result.manifest["topology_hash"], version.topology_hash)
+        self.assertEqual(result.manifest["engine_id"], "recoveryworks.fs_cpm")
+        self.assertEqual(result.manifest["method"], "finish_to_start_integer_day_cpm")
+
+    def test_multiple_event_activity_mappings_are_supported(self):
+        baseline = ScheduleVersion(
+            version_id="BASE",
+            project_id="PRJ-1",
+            data_date="2026-08-01",
+            activities=(
+                ScheduleActivity("A", "A", 2),
+                ScheduleActivity("B", "B", 3),
+                ScheduleActivity("C", "C", 1),
+            ),
+            relationships=(
+                ScheduleRelationship("A", "B"),
+                ScheduleRelationship("B", "C"),
+            ),
+            source_hash="base",
+            source_locator="file://base",
+            verified=True,
+        )
+        update = ScheduleVersion(
+            version_id="UPD",
+            project_id="PRJ-1",
+            data_date="2026-09-01",
+            activities=(
+                ScheduleActivity("A", "A", 2),
+                ScheduleActivity("B", "B", 5),
+                ScheduleActivity("C", "C", 2),
+            ),
+            relationships=(
+                ScheduleRelationship("A", "B"),
+                ScheduleRelationship("B", "C"),
+            ),
+            source_hash="upd",
+            source_locator="file://upd",
+            verified=True,
+        )
+        mappings = (
+            mapping(),
+            EventActivityMapping(
+                mapping_id="MAP-2",
+                event_id="EV-1",
+                baseline_activity_id="C",
+                update_activity_id="C",
+                mapping_basis="daily report and schedule narrative",
+                source_hash="mapping-hash-2",
+                source_locator="file://mappings.csv#row=3",
+                verified=True,
+            ),
+        )
+        result = batch(
+            schedules=(baseline, update),
+            mappings=mappings,
+            causation_reviews=(review(days=3),),
+        )
+        self.assertEqual(result.exceptions, ())
+        finding = RecoveryEngine().evaluate(result.observations[0])
+        self.assertEqual(finding.metadata["mapping_ids"], ["MAP-1", "MAP-2"])
+        self.assertEqual(len(finding.metadata["mapped_activity_impacts"]), 2)
+        self.assertEqual(len(finding.evidence), 7)
 
 
 if __name__ == "__main__":
