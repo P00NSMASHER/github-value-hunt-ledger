@@ -54,6 +54,98 @@ class ValueMemoryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             ValueMemory(ValueConfig(alpha=2.0))
 
+    def test_value_memory_rejects_boolean_reward(self):
+        memory = ValueMemory()
+        with self.assertRaisesRegex(
+            ValueError,
+            "finite non-boolean",
+        ):
+            memory.update(
+                "STRAT:boolean",
+                ExperienceKind.STRATEGY,
+                True,
+            )
+
+    def test_search_reward_rejects_boolean_counts(self):
+        run = {
+            "work_action": "search",
+            "measurement_quality": "prospective",
+            "deep_inspected": True,
+            "retained_count": 1,
+            "master_promoted_count": 0,
+        }
+        self.assertIsNone(observed_search_reward(run))
+
+    def test_invalid_economic_numbers_do_not_create_commercial_credit(self):
+        run = {
+            "work_action": "search",
+            "measurement_quality": "prospective",
+            "deep_inspected": 2,
+            "retained_count": 1,
+            "master_promoted_count": 0,
+            "new_capability_ids": [],
+        }
+        for value in (True, float("inf")):
+            with self.subTest(value=value):
+                observation = observed_search_reward(
+                    run,
+                    [{
+                        "result": "SUCCESS",
+                        "revenue_usd": value,
+                    }],
+                )
+                self.assertNotIn(
+                    "realized_revenue",
+                    observation.reasons,
+                )
+
+    def test_duplicate_value_learning_identities_fail_closed(self):
+        run = {
+            "search_run_id": "RUN:duplicate",
+            "work_action": "search",
+            "measurement_quality": "prospective",
+            "deep_inspected": 2,
+            "retained_count": 1,
+            "master_promoted_count": 0,
+            "new_capability_ids": [],
+        }
+        with self.assertRaisesRegex(
+            ValueError,
+            "duplicate search run",
+        ):
+            learn_value_memory([run, dict(run)])
+
+        outcome_row = {
+            "outcome_id": "OUT:duplicate",
+            "origin_search_ids": ["RUN:duplicate"],
+            "result": "SUCCESS",
+        }
+        with self.assertRaisesRegex(
+            ValueError,
+            "duplicate outcome",
+        ):
+            learn_value_memory(
+                [run],
+                [outcome_row, dict(outcome_row)],
+            )
+
+    def test_duplicate_training_episode_ids_fail_closed(self):
+        episode = {
+            "run_id": "RUN:episode-duplicate",
+            "split": "train",
+            "state": {},
+            "action": {},
+            "reward": {"training_reward": 0.1},
+            "provenance": {},
+        }
+        with self.assertRaisesRegex(
+            ValueError,
+            "duplicate training episode",
+        ):
+            learn_training_episode_memory(
+                [episode, dict(episode)]
+            )
+
     def test_search_reward_refuses_non_search_work(self):
         run = {
             "work_action": "execute_fixture",
