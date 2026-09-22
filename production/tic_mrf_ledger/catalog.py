@@ -51,14 +51,24 @@ def sha256_bytes(raw: bytes) -> str:
 
 def classify_file(url: str, hint: str | None = None) -> str:
     probe = f"{url} {hint or ''}".lower()
+    path = urllib.parse.urlsplit(url).path.lower()
     if "allowed-amount" in probe or "allowed_amount" in probe:
         return "allowed_amounts"
     if "in-network" in probe or "innetwork" in probe or "in_network" in probe:
         return "in_network"
-    if "index" in probe or "table-of-contents" in probe or "table_of_contents" in probe:
-        return "index"
     if "provider-reference" in probe or "provider_reference" in probe:
         return "provider_reference"
+    # "index.html" and routes like /File/Visit/Index are landing pages, not
+    # CMS table-of-contents JSON. Only classify index-shaped data files here.
+    data_suffix = (
+        path.endswith(".json") or path.endswith(".json.gz")
+        or path.endswith(".json.zip") or path.endswith(".json.7z")
+    )
+    if data_suffix and (
+        "index" in path or "table-of-contents" in path or "table_of_contents" in path
+        or "toc" in path
+    ):
+        return "index"
     return "unknown"
 
 
@@ -478,7 +488,7 @@ def discover_humana(
                 continue
             name = str(item["name"])
             url = (
-                "https://developers.humana.com/Resource/DownloadPCTFile?"
+                "https://developers.humana.com/syntheticdata/Resource/DownloadTOCFile?"
                 "fileType=innetwork&" + name
             )
             size = item.get("size")
@@ -494,6 +504,56 @@ def discover_humana(
         if total is not None and start >= int(total):
             break
     return {"files": inserted, "snapshots": snapshots}
+
+
+def month_start(offset: int = 0) -> tuple[int, int, str, str]:
+    now = datetime.now(timezone.utc)
+    y, m = now.year, now.month + offset
+    while m < 1:
+        y -= 1
+        m += 12
+    while m > 12:
+        y += 1
+        m -= 12
+    iso = f"{y:04d}-{m:02d}-01"
+    compact = f"{y:04d}{m:02d}01"
+    return y, m, iso, compact
+
+
+def discover_monthly_toc_templates(
+    conn: sqlite3.Connection, root: Path, source: Source, *, timeout: int, max_bytes: int
+) -> dict[str, int]:
+    """Generate stable current/previous-month public TOC candidates.
+
+    Config is stored in source.notes JSON so the generic Source schema stays
+    backward compatible with prior catalog artifacts.
+    """
+    persist_source(conn, source)
+    try:
+        cfg = json.loads(source.notes or "{}")
+    except json.JSONDecodeError:
+        cfg = {}
+    base = cfg.get("base_url") or source.source_url
+    templates = cfg.get("file_templates") or []
+    offsets = cfg.get("month_offsets") or [0, -1]
+    inserted = 0
+    for offset in offsets:
+        year, month, month_iso, compact = month_start(int(offset))
+        for template in templates:
+            rel = str(template).format(
+                year=year,
+                month=f"{month:02d}",
+                month_start=month_iso,
+                month_start_compact=compact,
+            )
+            url = canonical_url(urllib.parse.urljoin(base, rel))
+            insert_mrf_file(
+                conn, source, url, "index",
+                snapshot_id=None, manifest_sha=None,
+                parse_status="monthly_template_candidate",
+            )
+            inserted += 1
+    return {"files": inserted, "snapshots": 0}
 
 
 def discover_html_indexes(
@@ -749,6 +809,7 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         "blob_api": discover_blob_api,
         "aetna_metadata": discover_aetna_metadata,
         "humana_api": discover_humana,
+        "monthly_toc_templates": discover_monthly_toc_templates,
         "html_index_links": discover_html_indexes,
     }
 
