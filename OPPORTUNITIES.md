@@ -333,3 +333,17 @@ The top direct-money ranking remains Freight Recovery first, followed by AP/comm
 - Key risk: recovery yield and customer willingness to share supplier statements are unknown; never market candidate dollars as guaranteed recoveries.
 - Value score: **9.5/10 opportunity**, external market proof pending.
 - Next validation action: run one frozen synthetic/authorized holdout corpus through the entire detect -> falsify -> case -> credit/refund -> allocation/reversal chain, then seek one buyer-authorized read-only pilot.
+
+
+### ERP-Native Supplier Credit Sweep — multi-ERP enterprise wedge
+- Opportunity: package AP Recovery v2 as a **read-only supplier-credit/debit-balance sweep** with ERP-specific extraction kits rather than requiring a universal integration.
+- Supported discovery paths now evidenced in the Hunter portfolio: Oracle EBS, SAP ECC/S4, Dynamics 365 Finance, JD Edwards EnterpriseOne, ERPNext and NetSuite.
+- Buyer: CFO/controller/AP shared-services leader at multi-entity or acquisitive companies where multiple ERPs make conventional AP analytics expensive.
+- Pain: credits, overpayments and debit balances remain stranded because each ERP exposes them differently; cross-entity finance teams often lack one evidence model for realized recovery.
+- Paid wedge: one ERP + one legal entity + 12-24 months history; read-only export package + top supplier credit/overpayment cases + realized-recovery ledger.
+- Expansion motion: after one entity proves value, add other legal entities/ERPs using the same canonical recovery schema; then recurring quarterly/continuous assurance.
+- Why this may monetize faster than generic AP SaaS: it does not require rip-and-replace, writeback or long IT deployment. The customer's DBA/AP analyst can produce a bounded export, letting delivery start as a managed service.
+- Commercial scenario, not forecast: 10 enterprise diagnostics at $15k = $150k; 15 retained multi-entity accounts averaging $70k annual service/software value = $1.05M. Actual willingness to pay and recovery yield remain unproven until pilots.
+- Main risks: ERP export permissions, supplier-statement availability, entity resolution across acquired companies, old/closed-period data, and entitlement disputes. None of these can be converted into assumed recoveries.
+- Value score: **9.7/10 strategic wedge**; external market proof pending.
+- Next validation: build one canonical synthetic cross-ERP corpus expressing the same underlying economic events in Oracle/SAP/D365/JDE/NetSuite-shaped extracts and prove identical recovery decisions and realized-settlement math across adapters.
