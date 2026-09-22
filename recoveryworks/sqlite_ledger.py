@@ -11,6 +11,15 @@ from pathlib import Path
 import sqlite3
 from typing import Any, Callable
 
+from .authorization import (
+    AuthorizationRevocation,
+    RecoveryActionAuthorization,
+    RecoveryActionType,
+    authorization_from_dict,
+    authorization_to_dict,
+    revocation_from_dict,
+    revocation_to_dict,
+)
 from .ledger import LedgerRecord, RecoveryLedger
 from .models import RecoveryFinding, canonical_hash
 from .serde import finding_from_dict, finding_to_dict, record_to_dict
@@ -227,20 +236,72 @@ class SQLiteRecoveryLedger:
             lambda: self._ledger.approve(finding_id, reviewer_id, note),
         )
 
-    def authorize(self, finding_id: str, authorization_id: str) -> LedgerRecord:
+    def authorize(
+        self,
+        finding_id: str,
+        authorization: RecoveryActionAuthorization,
+        *,
+        as_of_date: str,
+        revocations: tuple[AuthorizationRevocation, ...] = (),
+    ) -> LedgerRecord:
+        payload = {
+            "authorization": authorization_to_dict(authorization),
+            "as_of_date": as_of_date,
+            "revocations": [revocation_to_dict(r) for r in revocations],
+        }
         return self._apply_and_persist(
             finding_id,
             "AUTHORIZE",
-            {"authorization_id": authorization_id},
-            lambda: self._ledger.authorize(finding_id, authorization_id),
+            payload,
+            lambda: self._ledger.authorize(
+                finding_id,
+                authorization,
+                as_of_date=as_of_date,
+                revocations=revocations,
+            ),
         )
 
-    def mark_claimed(self, finding_id: str) -> LedgerRecord:
+    def mark_claimed(
+        self,
+        finding_id: str,
+        authorization: RecoveryActionAuthorization,
+        *,
+        as_of_date: str,
+        action_type: RecoveryActionType,
+        target_counterparty_id: str,
+        recipient_reference_hash: str,
+        action_payload_hash: str,
+        currency: str,
+        requested_cents: int,
+        revocations: tuple[AuthorizationRevocation, ...] = (),
+    ) -> LedgerRecord:
+        payload = {
+            "authorization": authorization_to_dict(authorization),
+            "as_of_date": as_of_date,
+            "action_type": action_type.value,
+            "target_counterparty_id": target_counterparty_id,
+            "recipient_reference_hash": recipient_reference_hash,
+            "action_payload_hash": action_payload_hash,
+            "currency": currency,
+            "requested_cents": requested_cents,
+            "revocations": [revocation_to_dict(r) for r in revocations],
+        }
         return self._apply_and_persist(
             finding_id,
             "CLAIM",
-            {},
-            lambda: self._ledger.mark_claimed(finding_id),
+            payload,
+            lambda: self._ledger.mark_claimed(
+                finding_id,
+                authorization,
+                as_of_date=as_of_date,
+                action_type=action_type,
+                target_counterparty_id=target_counterparty_id,
+                recipient_reference_hash=recipient_reference_hash,
+                action_payload_hash=action_payload_hash,
+                currency=currency,
+                requested_cents=requested_cents,
+                revocations=revocations,
+            ),
         )
 
     def mark_recovered(self, finding_id: str, recovered_cents: int, fee_cents: int = 0) -> LedgerRecord:
@@ -287,9 +348,35 @@ class SQLiteRecoveryLedger:
             elif event_type == "APPROVE":
                 self._ledger.approve(finding_id, payload["reviewer_id"], payload["note"])
             elif event_type == "AUTHORIZE":
-                self._ledger.authorize(finding_id, payload["authorization_id"])
+                authorization = authorization_from_dict(payload["authorization"])
+                revocations = tuple(
+                    revocation_from_dict(item)
+                    for item in payload.get("revocations", [])
+                )
+                self._ledger.authorize(
+                    finding_id,
+                    authorization,
+                    as_of_date=payload["as_of_date"],
+                    revocations=revocations,
+                )
             elif event_type == "CLAIM":
-                self._ledger.mark_claimed(finding_id)
+                authorization = authorization_from_dict(payload["authorization"])
+                revocations = tuple(
+                    revocation_from_dict(item)
+                    for item in payload.get("revocations", [])
+                )
+                self._ledger.mark_claimed(
+                    finding_id,
+                    authorization,
+                    as_of_date=payload["as_of_date"],
+                    action_type=RecoveryActionType(payload["action_type"]),
+                    target_counterparty_id=payload["target_counterparty_id"],
+                    recipient_reference_hash=payload["recipient_reference_hash"],
+                    action_payload_hash=payload["action_payload_hash"],
+                    currency=payload["currency"],
+                    requested_cents=payload["requested_cents"],
+                    revocations=revocations,
+                )
             elif event_type == "RECOVER":
                 self._ledger.mark_recovered(
                     finding_id,
