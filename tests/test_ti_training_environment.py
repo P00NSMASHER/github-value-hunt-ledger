@@ -105,6 +105,18 @@ class TrainingEnvironmentTests(unittest.TestCase):
             "evaluation_only",
         )
 
+    def test_legacy_zero_candidate_record_is_excluded(self):
+        legacy = search_run("RUN:legacy")
+        legacy["work_action"] = None
+        legacy["candidate_count"] = 0
+        legacy["deep_inspected"] = 0
+        legacy["retained_count"] = 0
+        legacy["master_promoted_count"] = 0
+        self.assertEqual(
+            split_for_run(legacy),
+            "excluded",
+        )
+
     def test_credit_conserves_and_reserves_direct_origin_budget(self):
         config = TrainingEnvironmentConfig(
             confirm_modulus=2,
