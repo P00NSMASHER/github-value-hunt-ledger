@@ -450,6 +450,51 @@ def learn_value_memory(
     return memory, observations
 
 
+_MOVE_RESULT_SIGNAL = {
+    "qualifying_hit": 1.0,
+    "useful_hit": 0.55,
+    "weak_hit": 0.10,
+    "no_hit": -0.55,
+    "retrieval_limited": -0.20,
+    "blocked": -0.40,
+    "unknown": 0.0,
+}
+
+
+def search_move_training_reward(
+    move: Mapping[str, Any],
+    run_reward: float,
+) -> float:
+    """Attribute reward to one retrieval move instead of the whole hunt."""
+    result_signal = _MOVE_RESULT_SIGNAL.get(
+        str(move.get("result") or "unknown"),
+        0.0,
+    )
+    productivity = 0.0
+    deep = move.get("deep_inspected")
+    retained = move.get("retained_count")
+    if (
+        isinstance(deep, int)
+        and isinstance(retained, int)
+        and deep > 0
+        and retained >= 0
+    ):
+        retention = max(
+            0.0,
+            min(1.0, retained / deep),
+        )
+        productivity = max(
+            -0.5,
+            min(1.0, 2.0 * retention - 0.5),
+        )
+    value = (
+        0.65 * result_signal
+        + 0.25 * productivity
+        + 0.10 * float(run_reward)
+    )
+    return max(-1.0, min(1.0, value))
+
+
 def learn_training_episode_memory(
     episodes: Iterable[Mapping[str, Any]],
     *,
@@ -537,14 +582,49 @@ def learn_training_episode_memory(
                 )
                 updated.append(contextual_query_family)
 
-        for move_id in action.get("search_move_ids") or []:
-            if not isinstance(move_id, str) or not move_id:
+        structured_moves = [
+            move
+            for move in action.get("search_moves") or []
+            if isinstance(move, Mapping)
+        ]
+        if structured_moves:
+            move_rows = [
+                (
+                    str(
+                        move.get("key")
+                        or (
+                            f"MOVE:{move.get('move_type')}"
+                            if move.get("move_type")
+                            else ""
+                        )
+                    ),
+                    search_move_training_reward(
+                        move,
+                        float(reward),
+                    ),
+                )
+                for move in structured_moves
+            ]
+        else:
+            # Backward compatibility for already-generated episode artifacts.
+            move_rows = [
+                (
+                    move_id
+                    if move_id.startswith("MOVE:")
+                    else f"MOVE:{move_id}",
+                    float(reward),
+                )
+                for move_id in action.get("search_move_ids") or []
+                if isinstance(move_id, str) and move_id
+            ]
+
+        for key, move_reward in move_rows:
+            if not key:
                 continue
-            key = move_id if move_id.startswith("MOVE:") else f"MOVE:{move_id}"
             memory.update(
                 key,
                 ExperienceKind.SEARCH_MOVE,
-                float(reward),
+                move_reward,
                 run_id=run_id or None,
                 updated_at=updated_at,
             )
@@ -557,7 +637,7 @@ def learn_training_episode_memory(
                 memory.update(
                     contextual_move,
                     ExperienceKind.CONTEXTUAL_SEARCH_MOVE,
-                    float(reward),
+                    move_reward,
                     run_id=run_id or None,
                     updated_at=updated_at,
                 )
