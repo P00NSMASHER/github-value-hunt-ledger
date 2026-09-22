@@ -132,7 +132,7 @@ def test_full_return_blocks_unused_remainder_from_new_allocation(tmp_path):
     assert s.fee_eligible_cents()==0
 
 
-def test_applied_partial_return_preserves_only_true_net_event_capacity(tmp_path):
+def test_partial_return_closes_original_event_to_future_allocation(tmp_path):
     s=S(tmp_path)
     s.create_claim(C("c1","INV-1",8000))
     s.create_claim(C("c2","INV-1",2000))
@@ -146,15 +146,16 @@ def test_applied_partial_return_preserves_only_true_net_event_capacity(tmp_path)
         "r1",created_at="2026-09-03T11:00:00Z"
     ).status==REVERSED
 
-    # Net event funds are 8000 and the first allocation is now live for 6000,
-    # leaving exactly 2000 available—not the pre-return 2000 plus returned cash.
-    assert s.event_residual("e1")==2000
-    assert s.review_allocate(
-        allocation_id="a2",claim_id="c2",event_id="e1",
-        amount_cents=2000,created_at="2026-09-03T11:01:00Z",
-    )==ALLOCATED
+    # The return is already represented by the counter/reversal. Reusing the
+    # same event for a later allocation could apply that return twice, so the
+    # original payment event is closed and replacement remittance must be new.
     assert s.event_residual("e1")==0
-    assert s.realized_cents()==8000
+    with pytest.raises(ValueError,match="settlement event capacity exceeded"):
+        s.review_allocate(
+            allocation_id="a2",claim_id="c2",event_id="e1",
+            amount_cents=1,created_at="2026-09-03T11:01:00Z",
+        )
+    assert s.realized_cents()==6000
 
 
 def test_counter_events_cannot_exceed_original_settlement_amount(tmp_path):
@@ -164,7 +165,7 @@ def test_counter_events_cannot_exceed_original_settlement_amount(tmp_path):
     with pytest.raises(ValueError,match="exceed original settlement"):
         s.ingest_counter(R("r2",amt=4001))
     assert s.count("counter_events")==1
-    assert s.event_residual("e1")==4000
+    assert s.event_residual("e1")==0
 
 
 def test_direct_sql_cannot_allocate_returned_funds_or_overreturn_event(tmp_path):
@@ -174,7 +175,7 @@ def test_direct_sql_cannot_allocate_returned_funds_or_overreturn_event(tmp_path)
     s.ingest_counter(R(amt=10000))
     conn=sqlite3.connect(s.path)
     conn.execute("PRAGMA foreign_keys=ON")
-    with pytest.raises(sqlite3.IntegrityError,match="settlement event capacity exceeded"):
+    with pytest.raises(sqlite3.IntegrityError,match="return evidence|settlement event capacity exceeded"):
         conn.execute("""INSERT INTO allocations
           (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
           VALUES('TEST_BUYER','TEST_BU','bypass','c1','e1',1,'REVIEW',1,'2026-09-03T11:00:00Z')""")
@@ -357,6 +358,7 @@ def test_existing_database_gets_additive_net_capacity_guards_on_reopen(tmp_path)
     path=tmp_path/"migrate.sqlite3"
     s=SettlementStore(path,buyer_id="TEST_BUYER",business_unit="TEST_BU")
     conn=sqlite3.connect(path)
+    conn.execute("DROP TRIGGER allocation_event_counter_lock")
     conn.execute("DROP TRIGGER allocation_event_net_capacity")
     conn.execute("DROP TRIGGER counter_event_capacity")
     conn.commit()
@@ -371,6 +373,7 @@ def test_existing_database_gets_additive_net_capacity_guards_on_reopen(tmp_path)
     )}
     conn.close()
     assert "allocation_event_capacity" in names
+    assert "allocation_event_counter_lock" in names
     assert "allocation_event_net_capacity" in names
     assert "counter_event_capacity" in names
 
