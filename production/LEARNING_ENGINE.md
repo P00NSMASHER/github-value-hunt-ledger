@@ -195,3 +195,33 @@ Generated artifacts:
 
 The training environment remains `policy_effect=none`. Optimizers may use the train partition to propose variants, but only confirm/evaluation evidence plus the existing held-out/canary/global promotion gates may authorize later policy changes.
 
+## Evidence curriculum and blind confirmation
+
+The learning loop now treats **evidence collection** separately from learned
+performance. `production/learning_curriculum.py` and
+`tools/ti_learning_curriculum.py` rank strategy-measurement debt without
+using Q-values in the selection formula.
+
+The measurement reservation is deliberately small and diverse:
+
+1. two recommendations target strategies closest to clearing the learning
+   evidence gates;
+2. one recommendation remains reserved for a zero-train-run strategy so
+   exploration does not collapse around familiar methods.
+
+A strategy that has cleared the train gate but lacks confirm evidence receives
+a `confirm_measurement` recommendation, but the system never preselects a
+confirm run. Train/confirm membership is derived from the centrally generated
+assignment identity. The validated claim proves execution; release/reclaim can
+change the claim ID but cannot change the assignment partition.
+
+Workers and routing logic must not calculate, expose, select, release, retry,
+or reroute work based on partition membership. Manual, unallocated, legacy, or
+incomplete-provenance runs remain train-only. Overfit and hidden confirm
+regressions are suppressed and routed toward repair/falsification rather than
+additional allocation.
+
+This curriculum changes **measurement priority only**. It does not activate a
+learned search policy, weaken STOP gates, restart scheduled hunters, or bypass
+the existing train/confirm/verification thresholds.
+
