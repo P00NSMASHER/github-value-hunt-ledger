@@ -1,7 +1,7 @@
 # WORKER PRESENCE
 
-Generation: **PRESENCEGEN:264e42258c10**
-Clock: **2026-09-22T12:44:18Z**
+Generation: **PRESENCEGEN:388da2e8c0ec**
+Clock: **2026-09-22T12:44:44Z**
 
 Presence is capacity telemetry, not a worker-quality score.
 
