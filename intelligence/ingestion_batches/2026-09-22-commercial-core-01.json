@@ -1,0 +1,352 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:commercial-core-01",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "source_files": [
+    "MASTER.md",
+    "CAPABILITIES.md"
+  ],
+  "canonical_history_overwritten": false,
+  "selection_rule": "MASTER elite assets directly powering Freight/AP/CaptureBrief/Construction/Recovery; exact revision preserved; semantic CAP edges resolved from capability definitions rather than name-only dedupe.",
+  "retained": [
+    {
+      "repository": "kodekinetics79/opstrax-enterprise-build",
+      "revision": "fec2ba1432d6f8b4ba4c48be3d58e7e096819045",
+      "score": 29,
+      "domain": "freight",
+      "capability_ids": [
+        "CAP-005"
+      ],
+      "wedge": "Physical-evidence plane inside a blind Freight Audit Acceptance Test."
+    },
+    {
+      "repository": "emoss08/Trenova",
+      "revision": "95fcf816562025ad9af864ded4a5fce8a555bd65",
+      "score": 29,
+      "domain": "freight",
+      "capability_ids": [
+        "CAP-003",
+        "CAP-006"
+      ],
+      "wedge": "Operating substrate for blind freight audit and managed recovery."
+    },
+    {
+      "repository": "sengtha/Kareya-Silo",
+      "revision": "a43eedea03add0728eadfc1f8ea35cc3ca6867cc",
+      "score": 28,
+      "domain": "freight",
+      "capability_ids": [
+        "CAP-004"
+      ],
+      "wedge": "Rerate a frozen authorized invoice population."
+    },
+    {
+      "repository": "vidyesh95/qatoto-backend",
+      "revision": "4f5f270f6ba5ef3ed4b230716997ccea049ce408",
+      "score": 28,
+      "domain": "freight",
+      "capability_ids": [
+        "CAP-003"
+      ],
+      "wedge": "Authority/version plane ahead of independent rerating."
+    },
+    {
+      "repository": "A-Jatin/freight-ratecon-extraction",
+      "revision": "a3dbbfec7f6b042176880d06c5114f81f29e57eb",
+      "score": 29,
+      "domain": "freight",
+      "capability_ids": [
+        "CAP-001",
+        "CAP-003"
+      ],
+      "wedge": "Source-grounded reviewed RateCon batch before rerating."
+    },
+    {
+      "repository": "OmarFaig/Assay",
+      "revision": "821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+      "score": 29,
+      "domain": "cross-vertical-document",
+      "capability_ids": [
+        "CAP-001"
+      ],
+      "wedge": "Calibrate auto-accept versus review at a fixed false-accept ceiling."
+    },
+    {
+      "repository": "srthck/trustmesh",
+      "revision": "5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+      "score": 29,
+      "domain": "cross-vertical-proof",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "wedge": "Historical recovery-readiness/evidence-gap diagnostic."
+    },
+    {
+      "repository": "mgilbir/formalis",
+      "revision": "2b3895a0c2c54e4f25ccb46e131d215ad4457eb2",
+      "score": 29,
+      "domain": "ap",
+      "capability_ids": [
+        "CAP-008"
+      ],
+      "wedge": "Invoice validation gateway ahead of AP assurance."
+    },
+    {
+      "repository": "kingsleyonoh/invoice-reconciliation-engine",
+      "revision": "7545330806168102cd347d64a85a44481b37a6b3",
+      "score": 29,
+      "domain": "ap",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "wedge": "Closed-period read-only AP Leakage Diagnostic."
+    },
+    {
+      "repository": "getcoherence/openpartner",
+      "revision": "eeff532ee758dc6221b4d03af852e5705a2328fb",
+      "score": 29,
+      "domain": "payouts",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "wedge": "Closed-period Partner Payout Acceptance Test."
+    },
+    {
+      "repository": "Superheld/summae",
+      "revision": "9c5292af99bab9716723b82fd221a56f91ab4581",
+      "score": 29,
+      "domain": "accounting",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "wedge": "Monthly Close / Ledger Integrity Diagnostic."
+    },
+    {
+      "repository": "cmdrvl/canon",
+      "revision": "45e9702ba7f3874c073134c1a6fb74500232b6a1",
+      "score": 29,
+      "domain": "identity",
+      "capability_ids": [
+        "CAP-002"
+      ],
+      "wedge": "Reviewed multi-source identity registry implementation."
+    },
+    {
+      "repository": "MassingCloud/massing-pdf",
+      "revision": "36794b3c54fcfd62e3a0d2d5984cfc45cac83340",
+      "score": 29,
+      "domain": "construction",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-028"
+      ],
+      "wedge": "Issued drawing revision pair -> aligned change-evidence review."
+    },
+    {
+      "repository": "finnertallon-png/contract-deadline-agent",
+      "revision": "c891f5ff391abc58b874675783a7ff2c3775c7bb",
+      "score": 28,
+      "domain": "construction",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-029"
+      ],
+      "wedge": "Notice-preservation audit plus recurring deadline monitoring."
+    },
+    {
+      "repository": "pedrocodesforcoffee/builder-api",
+      "revision": "3a9d2f3af61b485763a9f0cc4209ed1a8b584683",
+      "score": 29,
+      "domain": "construction",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-030"
+      ],
+      "wedge": "Commercial Flow-Down Audit on one project."
+    },
+    {
+      "repository": "alanbld/utf8proj",
+      "revision": "92d96268159035cc2b53a34467dab6c64d1f0a98",
+      "score": 28,
+      "domain": "construction",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-031"
+      ],
+      "wedge": "Normalize one baseline/update schedule and produce reviewer-approved deterministic schedule evidence."
+    },
+    {
+      "repository": "GSA/GSA-Acquisition-FAR",
+      "revision": "da52ccbbe114e1f031a7f4c59195c508dbfa485f",
+      "score": 29,
+      "domain": "govcon",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "wedge": "Authoritative clause reconstruction inside a solicitation rule-currency diagnostic."
+    },
+    {
+      "repository": "GSA/GSA-Acquisition-DFARS",
+      "revision": "7e609f791af9cc6d8e7d75a7b05c83b1f62c0cb8",
+      "score": 30,
+      "domain": "govcon",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "wedge": "Ten-live-solicitation DoD rule-currency diagnostic."
+    },
+    {
+      "repository": "fedspendingtransparency/usaspending-api",
+      "revision": "1692d484b38c66361c54faa221548527cae29964",
+      "score": 28,
+      "domain": "govcon",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "wedge": "Authoritative award/incumbent lineage beneath CaptureBrief."
+    },
+    {
+      "repository": "fedspendingtransparency/data-act-broker-backend",
+      "revision": "76dcae4ccbf6951223608bc1d8fd0c5b03da5d68",
+      "score": 29,
+      "domain": "govcon",
+      "capability_ids": [
+        "CAP-011",
+        "CAP-002"
+      ],
+      "wedge": "Evidence-grade entity/award lineage for active solicitations."
+    },
+    {
+      "repository": "acqagent/far-collector",
+      "revision": "40789a073134a484b2e4a5a2398629b067da0eea",
+      "score": 30,
+      "domain": "govcon",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "wedge": "Solicitation rule-currency diagnostic with exact source/effective/supersession evidence."
+    },
+    {
+      "repository": "acqagent/rfo-deviations",
+      "revision": "ccf31107508085cc311fb07488eb513ab97c6b7d",
+      "score": 30,
+      "domain": "govcon",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "wedge": "Dated agency-deviation corpus for operative FAR reconstruction."
+    },
+    {
+      "repository": "probavi/probavi",
+      "revision": "3f0dd3bd94259f91eb0a54ce6b5425afb70ad216",
+      "score": 29,
+      "domain": "recovery-proof",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "wedge": "Fixed-price Recovery Readiness Audit on 1-3 critical systems."
+    },
+    {
+      "repository": "ersinkoc/Kronos",
+      "revision": "541d06069459a313f91940191a2ec3812f724a71",
+      "score": 29,
+      "domain": "recovery-proof",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "wedge": "Mixed-engine Recovery Readiness Audit."
+    },
+    {
+      "repository": "mehdi-arfaoui/Stronghold",
+      "revision": "776fe21f159bcab9e4333c716c8ac11cd6329a91",
+      "score": 29,
+      "domain": "recovery-proof",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "wedge": "Recoverability-as-code diagnostic layered above restore engines."
+    },
+    {
+      "repository": "open-eid/SiVa",
+      "revision": "0c9c5f2490b1a27798b47906bbaa6adb4d26daad",
+      "score": 25,
+      "domain": "recovery-proof",
+      "capability_ids": [
+        "CAP-007",
+        "CAP-010"
+      ],
+      "wedge": "Evidence-trust add-on to Recovery Readiness Audit."
+    }
+  ],
+  "proposed_capability_definitions": {
+    "CAP-027": "Deterministic AP invoice-to-PO-to-receipt three-way matching and leakage exception evidence",
+    "CAP-028": "Construction drawing revision registration, change-region and quantity evidence",
+    "CAP-029": "Construction contractual notice/deadline provenance and fail-closed time arithmetic",
+    "CAP-030": "Two-sided construction change-order commercial state and flow-down authority",
+    "CAP-031": "Deterministic CPM schedule-impact evidence and diagnostics"
+  },
+  "combination_stacks": [
+    {
+      "id": "STACK:FREIGHT-RECOVERY-CORE",
+      "repositories": [
+        "emoss08/Trenova",
+        "vidyesh95/qatoto-backend",
+        "A-Jatin/freight-ratecon-extraction",
+        "sengtha/Kareya-Silo",
+        "kodekinetics79/opstrax-enterprise-build",
+        "OmarFaig/Assay",
+        "srthck/trustmesh"
+      ],
+      "purpose": "Authority -> source facts -> rerating -> physical evidence -> proof sufficiency -> workflow/settlement."
+    },
+    {
+      "id": "STACK:AP-LEAKAGE-ASSURANCE",
+      "repositories": [
+        "mgilbir/formalis",
+        "kingsleyonoh/invoice-reconciliation-engine",
+        "cmdrvl/canon",
+        "Superheld/summae",
+        "OmarFaig/Assay"
+      ],
+      "purpose": "Invoice validity -> canonical identity -> PO/receipt match -> independent close truth -> reviewed evidence."
+    },
+    {
+      "id": "STACK:CAPTUREBRIEF-AUTHORITY",
+      "repositories": [
+        "GSA/GSA-Acquisition-FAR",
+        "GSA/GSA-Acquisition-DFARS",
+        "acqagent/far-collector",
+        "acqagent/rfo-deviations",
+        "fedspendingtransparency/usaspending-api",
+        "fedspendingtransparency/data-act-broker-backend",
+        "cmdrvl/canon"
+      ],
+      "purpose": "First-party rule/deviation authority + award/entity lineage + reviewed identity."
+    },
+    {
+      "id": "STACK:CONSTRUCTION-CLAIM-EVIDENCE",
+      "repositories": [
+        "MassingCloud/massing-pdf",
+        "finnertallon-png/contract-deadline-agent",
+        "pedrocodesforcoffee/builder-api",
+        "alanbld/utf8proj",
+        "srthck/trustmesh"
+      ],
+      "purpose": "Drawing change -> notice clocks -> commercial flow-down -> schedule impact -> proof sufficiency."
+    },
+    {
+      "id": "STACK:RECOVERY-PROOF",
+      "repositories": [
+        "probavi/probavi",
+        "ersinkoc/Kronos",
+        "mehdi-arfaoui/Stronghold",
+        "open-eid/SiVa",
+        "srthck/trustmesh"
+      ],
+      "purpose": "Restore execution -> cross-engine orchestration -> recoverability contract -> trust/timestamp validation -> proof admission."
+    }
+  ],
+  "central_merge_status": "pending; additive manifest committed without replacing canonical Markdown indexes"
+}
