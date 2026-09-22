@@ -167,6 +167,10 @@ class RecoveryIOTests(unittest.TestCase):
             self.assertEqual(main([
                 "recover", str(ledger_path), finding_id,
                 "--recovered-cents", "1000", "--fee-cents", "200",
+                "--fee-agreement-id", "fee-1",
+                "--fee-bps", "2000",
+                "--fee-source-hash", "fee-agreement-hash",
+                "--fee-locator", "source://fee-agreement/1",
                 "--evidence-id", "settlement-receipt-1",
                 "--source-hash", "settlement-receipt-hash",
                 "--locator", "source://settlement/receipt-1",
@@ -177,6 +181,8 @@ class RecoveryIOTests(unittest.TestCase):
             self.assertIs(record.case_state, CaseState.RECOVERED)
             self.assertEqual(record.recovered_cents, 1000)
             self.assertEqual(record.fee_cents, 200)
+            self.assertIsNotNone(record.fee_assessment)
+            self.assertEqual(record.fee_assessment.agreement.agreement_id, "fee-1")
             self.assertIsNotNone(record.claim_evidence)
             self.assertIsNotNone(record.recovery_evidence)
             self.assertTrue(ledger.verify_event_chain())
