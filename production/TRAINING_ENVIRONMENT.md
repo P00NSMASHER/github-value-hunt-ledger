@@ -40,6 +40,8 @@ This is **training/accounting attribution, not a causal claim**.
 
 Prospective generated searches use a **post-run blind partition receipt**. The worker receives a validated schema-v14+ `execution_claim_id` before the hunt, but the train/confirm label is assigned only after canonical run intake by HMAC-SHA256 using the repository Actions secret `TI_TRAINING_SPLIT_KEY`. The key is never committed or exposed to workers. Legacy/manual/unallocated runs are train-only and can never manufacture confirm evidence.
 
+The first build after the secret is configured creates `TRAINING_SPLIT_KEY_COMMITMENT.json`, containing only a one-way key commitment plus the exact canonical ledger prefix present at activation. Trusted generated runs already inside that prefix are permanently marked `precommit-train-only`; they can never be retroactively selected into confirm. Only later append-only canonical runs are eligible for HMAC train/confirm assignment. Changing the secret after activation fails validation unless it matches the committed key hash.
+
 - a generated run without a persisted blind receipt is `pending_partition` and contributes to neither train nor confirm learning;
 - train outcomes can credit train runs only;
 - confirm outcomes can credit confirm runs only;
