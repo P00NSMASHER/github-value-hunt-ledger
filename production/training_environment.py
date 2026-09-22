@@ -7,6 +7,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
+from production.blind_partition import trusted_claim_id
+
 
 _VALID_RESULTS = {"PASSED", "FAILED", "PARTIAL"}
 _VALID_MOVE_TYPES = {
@@ -211,33 +213,40 @@ def partition_for_id(
 
 def partition_basis_for_run(
     run: Mapping[str, Any],
+    *,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
-    """Choose a pre-hunt split token backed by canonical provenance checks.
+    """Resolve a post-run blind partition without exposing it pre-hunt.
 
-    Search-run IDs are agent-authored and therefore cannot be validation keys.
-    A confirm-eligible basis requires the same V14+ generated claim chain that
-    ti_execution_validate.py binds to assignment, routing and dispatch history.
-    Manual overrides, legacy records and incomplete provenance are train-only.
+    A V14+ generated claim is eligible for independent confirmation only after
+    canonical intake has a persisted blind-partition receipt. The worker sees
+    the claim ID before searching but not the HMAC key used by CI, so it cannot
+    derive train/confirm in advance. Missing receipts remain pending and do not
+    train or confirm. Manual/legacy records remain train-only.
     """
-    version = int(run.get("schema_version") or 0)
-    claim_id = run.get("execution_claim_id")
-    if (
-        version >= 14
-        and run.get("allocation_mode") == "generated"
-        and run.get("routing_mode") == "generated"
-        and isinstance(claim_id, str)
-        and claim_id.startswith("CLAIM:")
-    ):
+    claim_id = trusted_claim_id(run)
+    if claim_id:
+        partition = (
+            (split_receipts or {}).get(claim_id)
+            if split_receipts is not None
+            else None
+        )
         return {
             "trusted": True,
-            "source": "execution_claim_id",
+            "source": (
+                "blind_partition_receipt"
+                if partition in {"train", "confirm"}
+                else "pending_blind_partition"
+            ),
             "identifier": claim_id,
+            "partition": partition,
             "provenance_contract": "validated_v14_generated_claim",
         }
     return {
         "trusted": False,
         "source": "run_id_fallback_train_only",
         "identifier": str(run.get("search_run_id") or ""),
+        "partition": "train",
         "provenance_contract": "untrusted_or_legacy",
     }
 
@@ -317,6 +326,7 @@ def split_for_run(
     run: Mapping[str, Any],
     *,
     config: TrainingEnvironmentConfig | None = None,
+    split_receipts: Mapping[str, str] | None = None,
 ) -> str:
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
@@ -345,19 +355,29 @@ def split_for_run(
     run_id = str(run.get("search_run_id") or "")
     if not run_id:
         return "excluded"
-    basis = partition_basis_for_run(run)
+    basis = partition_basis_for_run(
+        run,
+        split_receipts=split_receipts,
+    )
     if not basis["trusted"]:
         # Manual/unallocated IDs are controllable by the worker. They remain
         # useful train evidence but can never manufacture confirm evidence.
         return "train"
-    return partition_for_id(
-        str(basis["identifier"]),
-        config=cfg,
-    )
+    partition = basis.get("partition")
+    if partition not in {"train", "confirm"}:
+        return "pending_partition"
+    return str(partition)
 
 
-def discovery_signal(run: Mapping[str, Any]) -> float | None:
-    if split_for_run(run) == "excluded":
+def discovery_signal(
+    run: Mapping[str, Any],
+    *,
+    split_receipts: Mapping[str, str] | None = None,
+) -> float | None:
+    if split_for_run(
+        run,
+        split_receipts=split_receipts,
+    ) in {"excluded", "pending_partition"}:
         return None
     deep = run.get("deep_inspected")
     retained = run.get("retained_count")
