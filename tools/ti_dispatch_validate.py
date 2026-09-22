@@ -18,7 +18,7 @@ state={x["slot_id"]:x for x in STATE}
 valid_states=set(POL.get("ticket_valid_execution_states") or [])
 
 def stable_payload(p):
-    return {
+    payload = {
       "dispatch_kind":"primary",
       "worker_id":p["worker_id"],
       "routing_generation_id":p["routing_generation_id"],
@@ -35,6 +35,14 @@ def stable_payload(p):
       "assignment_score":p["assignment_score"],
       "routing_score":p["routing_score"]
     }
+    if p.get("assignment_work_kind")=="learning_measurement":
+        packet_id=p.get("learning_measurement_packet_id")
+        packet_sha=p.get("learning_measurement_packet_sha256")
+        if not packet_id or not packet_sha:
+            raise SystemExit("learning_measurement worker packet missing frozen packet binding")
+        payload["learning_measurement_packet_id"]=packet_id
+        payload["learning_measurement_packet_sha256"]=packet_sha
+    return payload
 
 def expected_id(p):
     raw=json.dumps(stable_payload(p),sort_keys=True,separators=(",",":"))
@@ -65,6 +73,10 @@ for n,t in enumerate(TICKETS,1):
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: V15 lifecycle timestamps missing")
     if slot!=p.get("slot_id") or t.get("assignment_id")!=p.get("assignment_id"):
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: packet binding drift")
+    if t.get("assignment_work_kind")=="learning_measurement":
+        for key in ("learning_measurement_packet_id","learning_measurement_packet_sha256"):
+            if not t.get(key) or t.get(key)!=p.get(key):
+                raise SystemExit(f"dispatch_tickets.jsonl:{n}: learning packet binding drift: {key}")
     if state.get(slot,{}).get("status") not in valid_states:
         raise SystemExit(f"dispatch_tickets.jsonl:{n}: non-claimable execution state")
 
@@ -82,6 +94,10 @@ for t in TICKETS:
         raise SystemExit(f"missing dispatch claim packet for {t['worker_id']}")
     if p.get("dispatch_ticket_id")!=t.get("dispatch_ticket_id"):
         raise SystemExit(f"claim packet ticket mismatch for {t['worker_id']}")
+    if t.get("assignment_work_kind")=="learning_measurement":
+        for key in ("learning_measurement_packet_id","learning_measurement_packet_sha256"):
+            if p.get(key)!=t.get(key):
+                raise SystemExit(f"dispatch claim packet learning binding drift for {t['worker_id']}: {key}")
     if p.get("routing_mode")!="generated":
         raise SystemExit(f"claim packet routing_mode must be generated for {t['worker_id']}")
     if int(p.get("claim_schema_version") or 0)<int(POL.get("minimum_v15_claim_schema_version",15)):
