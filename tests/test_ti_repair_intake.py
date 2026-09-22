@@ -50,7 +50,33 @@ def reproduction_queue():
             ]
         },
         [],
-        {},
+        {
+            "episodes": [
+                {
+                    "run_id": "RUN:confirm:repair-intake",
+                    "split": "confirm",
+                    "state": {
+                        "search_objective_id": None,
+                    },
+                    "action": {
+                        "strategy_id": "STRAT:test",
+                        "query_family_id": None,
+                        "search_move_ids": [],
+                        "search_moves": [],
+                    },
+                    "reward": {
+                        "training_reward": -0.3,
+                        "reward_stage": "technical_proxy",
+                    },
+                    "provenance": {
+                        "durable_evidence_path": (
+                            "hunters/19-confirm-repair-intake.md"
+                        ),
+                    },
+                    "episode_sha256": "f" * 64,
+                }
+            ]
+        },
     )
 
 
