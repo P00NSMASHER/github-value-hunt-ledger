@@ -78,10 +78,10 @@ def evaluate_runtime_activation_gate(
             errors.append("paused_mode_requires_zero_current_capacity")
         if int(policy.get("maximum_total_claims") or 0) != 0:
             errors.append("paused_mode_requires_zero_total_claim_budget")
-        if policy.get("approved_packet_ids") not in {None}:
+        if policy.get("approved_packet_ids") is not None:
             if list(policy.get("approved_packet_ids") or []):
                 errors.append("paused_mode_forbids_approved_packet_ids")
-        if policy.get("approved_seed_ids") not in {None}:
+        if policy.get("approved_seed_ids") is not None:
             if list(policy.get("approved_seed_ids") or []):
                 errors.append("paused_mode_forbids_approved_seed_ids")
         for field in ("approval_scope", "approval_id", "approved_at"):
