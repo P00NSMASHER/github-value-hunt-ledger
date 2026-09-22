@@ -57,6 +57,7 @@ create table if not exists intel_skill_repair (
   skill_id text not null,
   candidate_version text not null,
   diff_hash text not null,
+  regression_test_requirement text not null,
   regression_tests_total int not null,
   regression_tests_passed int not null,
   decision_history_ref text not null,
