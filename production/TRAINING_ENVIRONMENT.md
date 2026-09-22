@@ -32,7 +32,7 @@ A downstream outcome may credit more than its immediate origin search, but only 
 - contributed capability IDs;
 - retained repositories that the outcome explicitly names.
 
-Direct origin runs receive a reserved credit budget. Supporting runs share the remaining budget according to their explicit provenance paths. Per-outcome credit is normalized to exactly 1.0.
+Direct origin runs receive a reserved credit budget. Supporting runs share the remaining budget according to their explicit provenance paths. Per-outcome credit is normalized to exactly 1.0. Indirect support must also precede the outcome in time; when an outcome has only day-level precision, same-day indirect support is excluded rather than guessing event order.
 
 This is **training/accounting attribution, not a causal claim**.
 
@@ -42,6 +42,7 @@ Prospective searches are deterministically split by the hash of `search_run_id` 
 
 - train outcomes can credit train runs only;
 - confirm outcomes can credit confirm runs only;
+- live value priors train only on the train partition and must separately pass a confirm-support gate before they can steer hunters;
 - benchmark runs are `evaluation_only`;
 - retrospective and non-search records are excluded;
 - an outcome whose direct origins span train and confirm is excluded from learning.
