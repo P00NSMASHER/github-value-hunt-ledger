@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 from typing import Any, Sequence
 
+from .fees import FeeAgreement, assess_fee
 from .io import execute_scan_payload
 from .models import EvidenceRef
 from .raw_scan import execute_raw_scan_payload
@@ -105,6 +106,15 @@ def build_parser() -> argparse.ArgumentParser:
     recovered.add_argument("finding_id")
     recovered.add_argument("--recovered-cents", type=int, required=True)
     recovered.add_argument("--fee-cents", type=int, default=0)
+    recovered.add_argument("--fee-agreement-id")
+    recovered.add_argument("--fee-bps", type=int)
+    recovered.add_argument("--fee-source-hash")
+    recovered.add_argument("--fee-locator")
+    recovered.add_argument(
+        "--fee-rounding",
+        choices=("HALF_UP", "FLOOR"),
+        default="HALF_UP",
+    )
     recovered.add_argument(
         "--settlement-total-cents",
         type=int,
@@ -210,12 +220,47 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "mark-claimed":
         ledger.mark_claimed(args.finding_id, _receipt(args))
     elif args.command == "recover":
+        fee_assessment = None
+        if args.fee_cents > 0:
+            required = {
+                "--fee-agreement-id": args.fee_agreement_id,
+                "--fee-bps": args.fee_bps,
+                "--fee-source-hash": args.fee_source_hash,
+                "--fee-locator": args.fee_locator,
+            }
+            missing = [name for name, value in required.items() if value is None]
+            if missing:
+                raise ValueError(
+                    "positive --fee-cents requires " + ", ".join(missing)
+                )
+            finding = ledger.get(args.finding_id).finding
+            agreement = FeeAgreement(
+                agreement_id=args.fee_agreement_id,
+                client_id=finding.client_id,
+                fee_bps=args.fee_bps,
+                branches=(finding.branch,),
+                source_hash=args.fee_source_hash,
+                locator=args.fee_locator,
+                verified=True,
+                currency=finding.currency,
+                rounding=args.fee_rounding,
+            )
+            fee_assessment = assess_fee(
+                finding,
+                args.recovered_cents,
+                agreement,
+            )
+            if fee_assessment.fee_cents != args.fee_cents:
+                raise ValueError(
+                    "--fee-cents does not match the verified fee agreement calculation"
+                )
         ledger.mark_recovered(
             args.finding_id,
             args.recovered_cents,
             args.fee_cents,
             recovery_evidence=_receipt(args),
             settlement_total_cents=args.settlement_total_cents,
+            fee_assessment=fee_assessment,
         )
     elif args.command == "reject":
         ledger.reject(args.finding_id, args.reviewer, args.note)
