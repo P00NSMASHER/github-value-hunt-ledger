@@ -24,6 +24,7 @@ Current Freight Recovery state is **commercially specified / externally blocked 
 - Build-generated advisory value memory committed through `tools/ti_learning_state.py` + fail-closed validator; it cannot alter policy before the existing 5-run/20-deep-inspection evidence gate.
 - Immutable reproducible hunter-system failure spool/schema committed under `intelligence/learning_failure_spool/`.
 - Skill repair, failed-trajectory salvage, staged skill evolution, personalized peer transfer, performance×novelty fleet selection, canary-only harness mutation and clean future-training export gates are encoded and covered by CI-discovered unit tests.
+- The hunter ledger now compiles into a deterministic offline training environment with state/action/observation/reward episodes, isolated train/confirm/evaluation splits, provenance-backed long-horizon credit, and a separate commercial-value reward channel.
 - Three shadow state/result ledgers initialized under production/shadow/.
 - Shadow protocol committed: production/SHADOW_PILOT.md.
 - Three existing benchmark experiment automations have a post-benchmark shadow override:
