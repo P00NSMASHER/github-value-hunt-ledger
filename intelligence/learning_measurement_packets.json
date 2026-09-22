@@ -1,0 +1,243 @@
+{
+  "activates_work": false,
+  "mode": "precommit_only",
+  "packets": [
+    {
+      "blind_partition_rule": "Do not calculate, expose, select, release, retry, or otherwise alter work based on train/confirm membership. Use the normal generated assignment/claim identity once; partition membership may be evaluated only after canonical ingestion.",
+      "evidence_deficit": {
+        "confirm": {
+          "deep_inspections": 0,
+          "deep_inspections_needed": 6,
+          "mean_reward": 0.0,
+          "min_reward": null,
+          "minimum_mean_reward": 0.0,
+          "minimum_reward_floor": 0.0,
+          "positive_runs": 0,
+          "positive_runs_needed": 1,
+          "ready": false,
+          "runs": 0,
+          "runs_needed": 2
+        },
+        "train": {
+          "deep_inspections": 10,
+          "deep_inspections_needed": 10,
+          "ready": false,
+          "runs": 4,
+          "runs_needed": 1
+        }
+      },
+      "execution_authority": false,
+      "execution_contract": "When hunters are explicitly resumed, use the normal generated assignment/claim path exactly once. Execute the frozen strategy against the frozen seed hypothesis. Do not inspect, predict, choose, release, or retry based on train/confirm membership. Canonical ingestion decides partition and learning credit after execution.",
+      "manual_work_can_complete_packet": false,
+      "measurement_phase": "train_measurement",
+      "measurement_priority_audit_only": 79.5,
+      "packet_id": "LMP:45a15ced2e8038af",
+      "packet_sha256": "aa8ce410e67e051ccc491f499daddbb6c8046a04242d2894e3af3c8555279b76",
+      "partition_selection_allowed": false,
+      "partition_unknown_until_ingestion": true,
+      "policy_effect": "none",
+      "provenance": {
+        "learning_curriculum_sha": "ae5e33b33d994b188119170380ee40c3567a79e01f3e2553507b7a3b31e0f56a",
+        "search_seeds_sha": "ea20de13d465a5a7715e5be904be2971cc2bfe110b2fa782ec34f5a0fefb286d"
+      },
+      "requires_generated_claim": true,
+      "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
+      "schema_version": 1,
+      "seed": {
+        "acceptance_target": "One independent target-domain implementation with source/test evidence for: physical event time, effective tariff, billable interval",
+        "authorization_basis": "exploration_positive_dna_transfer",
+        "capability_ids": [],
+        "exclude_domains": [
+          "freight"
+        ],
+        "experiment_ids": [],
+        "query_templates": [
+          "OCPP \"transaction\" \"meterStart\"",
+          "EVSE \"billing\" \"timestamp\"",
+          "\"parking\" \"entry\" \"tariff\" path:tests"
+        ],
+        "search_objective_id": "OBJ:authority-lineage",
+        "search_surfaces": [
+          "GitHub code search",
+          "low-star/zero-star repository search",
+          "archived repository archaeology",
+          "author/org adjacency",
+          "dependency/consumer adjacency"
+        ],
+        "seed_id": "SEED:dna:kodekinetics79-opstrax-enterprise-build",
+        "seed_type": "positive_dna_transfer",
+        "stop_conditions": [
+          "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+          "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.",
+          "Do not search the originating vertical merely because its MASTER leader scored highly.",
+          "Reject forks/clones that add no independent implementation evidence."
+        ],
+        "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo.",
+        "why_now": "Transfer the load-bearing implementation DNA of MASTER leader kodekinetics79/opstrax-enterprise-build into unrelated verticals. Why it wins: cleanly separates physical truth from commercial entitlement and billing."
+      },
+      "selection_reason": "reduce_train_evidence_deficit",
+      "status": "PRECOMMITTED_ADVISORY",
+      "strategy_id": "STRAT:acceptance-path-transition-inspection"
+    },
+    {
+      "blind_partition_rule": "Do not calculate, expose, select, release, retry, or otherwise alter work based on train/confirm membership. Use the normal generated assignment/claim identity once; partition membership may be evaluated only after canonical ingestion.",
+      "evidence_deficit": {
+        "confirm": {
+          "deep_inspections": 0,
+          "deep_inspections_needed": 6,
+          "mean_reward": 0.0,
+          "min_reward": null,
+          "minimum_mean_reward": 0.0,
+          "minimum_reward_floor": 0.0,
+          "positive_runs": 0,
+          "positive_runs_needed": 1,
+          "ready": false,
+          "runs": 0,
+          "runs_needed": 2
+        },
+        "train": {
+          "deep_inspections": 6,
+          "deep_inspections_needed": 14,
+          "ready": false,
+          "runs": 4,
+          "runs_needed": 1
+        }
+      },
+      "execution_authority": false,
+      "execution_contract": "When hunters are explicitly resumed, use the normal generated assignment/claim path exactly once. Execute the frozen strategy against the frozen seed hypothesis. Do not inspect, predict, choose, release, or retry based on train/confirm membership. Canonical ingestion decides partition and learning credit after execution.",
+      "manual_work_can_complete_packet": false,
+      "measurement_phase": "train_measurement",
+      "measurement_priority_audit_only": 76.5,
+      "packet_id": "LMP:3617f43da0c305da",
+      "packet_sha256": "6bb04be8475c00ba5ec4ab75a9369d579d37052fe896553c5d82558622c1b2e6",
+      "partition_selection_allowed": false,
+      "partition_unknown_until_ingestion": true,
+      "policy_effect": "none",
+      "provenance": {
+        "learning_curriculum_sha": "ae5e33b33d994b188119170380ee40c3567a79e01f3e2553507b7a3b31e0f56a",
+        "search_seeds_sha": "ea20de13d465a5a7715e5be904be2971cc2bfe110b2fa782ec34f5a0fefb286d"
+      },
+      "requires_generated_claim": true,
+      "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
+      "schema_version": 1,
+      "seed": {
+        "acceptance_target": "One independent target-domain implementation with source/test evidence for: model identity, roundtrip invariant, independent validation",
+        "authorization_basis": "exploration_positive_dna_transfer",
+        "capability_ids": [],
+        "exclude_domains": [
+          "grid outage datasets"
+        ],
+        "experiment_ids": [],
+        "query_templates": [
+          "\"IFC\" \"roundtrip\"",
+          "CityGML \"validation\" path:tests",
+          "buildingSMART \"schema\" \"conversion\""
+        ],
+        "search_objective_id": "OBJ:independent-evaluation",
+        "search_surfaces": [
+          "GitHub code search",
+          "low-star/zero-star repository search",
+          "archived repository archaeology",
+          "author/org adjacency",
+          "dependency/consumer adjacency"
+        ],
+        "seed_id": "SEED:dna:gridappsd-cimhub",
+        "seed_type": "positive_dna_transfer",
+        "stop_conditions": [
+          "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+          "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.",
+          "Do not search the originating vertical merely because its MASTER leader scored highly.",
+          "Reject forks/clones that add no independent implementation evidence."
+        ],
+        "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo.",
+        "why_now": "Transfer the load-bearing implementation DNA of MASTER leader GRIDAPPSD/CIMHub into unrelated verticals. Why it wins: independent model-intake/round-trip proof before engineering analytics."
+      },
+      "selection_reason": "reduce_train_evidence_deficit",
+      "status": "PRECOMMITTED_ADVISORY",
+      "strategy_id": "STRAT:evaluation-target-independence"
+    },
+    {
+      "blind_partition_rule": "Do not calculate, expose, select, release, retry, or otherwise alter work based on train/confirm membership. Use the normal generated assignment/claim identity once; partition membership may be evaluated only after canonical ingestion.",
+      "evidence_deficit": {
+        "confirm": {
+          "deep_inspections": 0,
+          "deep_inspections_needed": 6,
+          "mean_reward": 0.0,
+          "min_reward": null,
+          "minimum_mean_reward": 0.0,
+          "minimum_reward_floor": 0.0,
+          "positive_runs": 0,
+          "positive_runs_needed": 1,
+          "ready": false,
+          "runs": 0,
+          "runs_needed": 2
+        },
+        "train": {
+          "deep_inspections": 0,
+          "deep_inspections_needed": 20,
+          "ready": false,
+          "runs": 0,
+          "runs_needed": 5
+        }
+      },
+      "execution_authority": false,
+      "execution_contract": "When hunters are explicitly resumed, use the normal generated assignment/claim path exactly once. Execute the frozen strategy against the frozen seed hypothesis. Do not inspect, predict, choose, release, or retry based on train/confirm membership. Canonical ingestion decides partition and learning credit after execution.",
+      "manual_work_can_complete_packet": false,
+      "measurement_phase": "train_measurement",
+      "measurement_priority_audit_only": 60.0,
+      "packet_id": "LMP:9b7920594a0a6c49",
+      "packet_sha256": "7681c80836f962a077216d92e80a649bf0695f01a8330e17fd0ec6a506dc437f",
+      "partition_selection_allowed": false,
+      "partition_unknown_until_ingestion": true,
+      "policy_effect": "none",
+      "provenance": {
+        "learning_curriculum_sha": "ae5e33b33d994b188119170380ee40c3567a79e01f3e2553507b7a3b31e0f56a",
+        "search_seeds_sha": "ea20de13d465a5a7715e5be904be2971cc2bfe110b2fa782ec34f5a0fefb286d"
+      },
+      "requires_generated_claim": true,
+      "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
+      "schema_version": 1,
+      "seed": {
+        "acceptance_target": "One independent target-domain implementation with source/test evidence for: effective rule version, historical evaluation, authority provenance",
+        "authorization_basis": "strategy_measurement_debt",
+        "capability_ids": [],
+        "exclude_domains": [
+          "government procurement"
+        ],
+        "experiment_ids": [],
+        "query_templates": [
+          "OpenFisca reforms parameter",
+          "\"tax\" \"effective_date\" path:tests",
+          "\"benefits\" \"rule_version\""
+        ],
+        "search_objective_id": "OBJ:current-rule-authority",
+        "search_surfaces": [
+          "GitHub code search",
+          "low-star/zero-star repository search",
+          "archived repository archaeology",
+          "author/org adjacency",
+          "dependency/consumer adjacency"
+        ],
+        "seed_id": "SEED:measure:bidirectional-money-evidence-invariant-tracing-rule-version-transfer",
+        "seed_type": "strategy_measurement",
+        "stop_conditions": [
+          "Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.",
+          "Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.",
+          "Do not search the originating vertical merely because its MASTER leader scored highly.",
+          "Reject forks/clones that add no independent implementation evidence.",
+          "Do not turn a measurement run into an unrestricted domain sweep.",
+          "A no-find result is valid data; do one recall-rescue pass, then stop."
+        ],
+        "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable.",
+        "why_now": "STRAT:bidirectional-money-evidence-invariant-tracing has no measured runs but receives exploration allocation. Pair it with rule-version-transfer so the hunt searches a real gap and reduces strategy measurement debt."
+      },
+      "selection_reason": "reduce_train_evidence_deficit",
+      "status": "PRECOMMITTED_ADVISORY",
+      "strategy_id": "STRAT:bidirectional-money-evidence-invariant-tracing"
+    }
+  ],
+  "partition_selection_allowed": false,
+  "policy_effect": "none",
+  "schema_version": 1,
+  "unpaired_recommendations": []
+}
