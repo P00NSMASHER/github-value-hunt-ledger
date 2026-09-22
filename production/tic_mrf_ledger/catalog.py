@@ -1296,6 +1296,7 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         "source_snapshots": 0,
         "index_files_parsed": 0,
         "index_files_failed": 0,
+        "index_candidates_missing": 0,
         "plans_observed": 0,
         "source_candidates": 0,
     }
@@ -1408,6 +1409,30 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
                     f"snapshots={delta['snapshots']}",
                     flush=True,
                 )
+            except requests.HTTPError as exc:
+                status = getattr(getattr(exc, "response", None), "status_code", None)
+                if (
+                    row["parse_status"] == "monthly_template_candidate"
+                    and status in {404, 410}
+                ):
+                    conn.execute(
+                        "UPDATE mrf_files SET parse_status='monthly_candidate_missing' WHERE id=?",
+                        (row["id"],),
+                    )
+                    stats["index_candidates_missing"] += 1
+                    conn.commit()
+                    print(
+                        f"[index missing] expected monthly candidate status={status}",
+                        flush=True,
+                    )
+                    continue
+                print(
+                    f"[index failed] {type(exc).__name__}: {str(exc)[:240]}",
+                    flush=True,
+                )
+                record_error(conn, source.source_key, row["file_url"], "index_parse", exc)
+                stats["index_files_failed"] += 1
+                conn.commit()
             except Exception as exc:
                 print(
                     f"[index failed] {type(exc).__name__}: {str(exc)[:240]}",
