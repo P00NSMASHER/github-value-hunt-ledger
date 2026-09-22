@@ -17,8 +17,9 @@ from recoveryworks import (
     freeze_scan,
     run_scan,
 )
+from recoveryworks.branches.base import BranchInput
 from recoveryworks.branches.freight import from_freight_finding
-from recoveryworks.branches.registry import BRANCHES
+from recoveryworks.branches.registry import ADAPTERS, BRANCHES, normalize
 
 
 def evidence(verified=True):
@@ -45,6 +46,26 @@ def rule(verified=True):
 class RecoveryWorksTests(unittest.TestCase):
     def test_all_six_branches_registered(self):
         self.assertEqual(set(BRANCHES), set(Branch))
+        self.assertEqual(set(ADAPTERS), set(Branch))
+
+    def test_branch_registry_normalizes_without_bypassing_common_engine(self):
+        item = BranchInput(
+            client_id="c",
+            counterparty_id="payer",
+            reference="claim-1",
+            currency="USD",
+            expected_cents=20000,
+            actual_cents=15000,
+            rule=rule(),
+            evidence=(evidence(),),
+            reason="PAYER_UNDERPAYMENT",
+            confidence_basis="verified payer schedule",
+        )
+        observation = normalize(Branch.PAYER, item)
+        self.assertIs(observation.branch, Branch.PAYER)
+        finding = RecoveryEngine().evaluate(observation)
+        self.assertEqual(finding.potential_recovery_cents, 5000)
+        self.assertIs(finding.state, FindingState.VALIDATED)
 
     def test_overpayment_and_underpayment_modes(self):
         engine = RecoveryEngine()
