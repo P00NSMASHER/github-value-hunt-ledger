@@ -22,6 +22,9 @@ from typing import Iterable
 
 REPO_RE = re.compile(r"(?P<repo>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)")
 URL_RE = re.compile(r"https://github\.com/(?P<repo>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)")
+REPO_REV_RE = re.compile(
+    r"`?(?P<repo>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)@(?P<rev>[0-9a-fA-F]{7,40})`?"
+)
 REVISION_PATTERNS = (
     re.compile(r"^- Exact commit / revision:\s*`?(?P<v>[^`\n]+)`?\s*$", re.M),
     re.compile(r"^- Exact revision:\s*`?(?P<v>[^`\n]+)`?\s*$", re.M),
@@ -34,6 +37,10 @@ SCORE_PATTERNS = (
 STATUS_RE = re.compile(r"^- Status:\s*(?P<v>.+)$", re.M)
 TOTAL_SCORE_RE = re.compile(r"(?P<n>\d{2})/30")
 HEADING_RE = re.compile(r"^###\s+(?P<title>.+)$", re.M)
+MASTER_DEMOTION_MARKERS = (
+    "removed from master",
+    "not master leader",
+)
 
 
 @dataclass(frozen=True)
@@ -86,6 +93,30 @@ def _revision(section: str) -> str | None:
     return None
 
 
+def _repo_revision_pairs(title: str, section: str) -> list[tuple[str, str | None]]:
+    """Extract one or more repositories from a ledger section.
+
+    Normal sections usually have one repository in the heading/URL plus a
+    Revision field. Family entries can contain multiple explicit owner/repo@sha
+    members; those are emitted independently so ingestion never collapses a
+    multi-repository authority stack into one pseudo-repository.
+    """
+    explicit = []
+    seen: set[tuple[str, str | None]] = set()
+    for match in REPO_REV_RE.finditer(section):
+        pair = (match.group("repo"), match.group("rev").lower())
+        if pair not in seen:
+            explicit.append(pair)
+            seen.add(pair)
+
+    primary = _repo_from_section(title, section)
+    if primary:
+        pair = (primary, _revision(section))
+        if pair not in seen:
+            explicit.insert(0, pair)
+    return explicit
+
+
 def _score(title: str, section: str) -> int | None:
     for pattern in SCORE_PATTERNS:
         match = pattern.search(section)
@@ -102,9 +133,14 @@ def _status(section: str) -> str:
     return match.group("v").strip() if match else ""
 
 
+def _is_master_demotion(title: str, section: str) -> bool:
+    marker = f"{title}\n{section}".lower()
+    return any(value in marker for value in MASTER_DEMOTION_MARKERS)
+
+
 def _elite(title: str, section: str, score: int | None, *, master: bool) -> bool:
     if master:
-        return True
+        return not _is_master_demotion(title, section)
     if score is not None and score >= 25:
         return True
     marker = f"{title} {_status(section)}"
@@ -142,44 +178,46 @@ def build_repository_intake(root: Path) -> list[RepositoryIntake]:
     merged: dict[tuple[str, str | None], dict] = {}
 
     sources: list[tuple[Path, bool]] = [(root / "MASTER.md", True)]
-    sources.extend((path, False) for path in sorted((root / "hunters").glob("[0-9][0-9].md")))
+    sources.extend(
+        (path, False)
+        for path in sorted((root / "hunters").glob("[0-9][0-9].md"))
+    )
 
     for path, master in sources:
         if not path.exists():
             continue
         text = path.read_text(encoding="utf-8")
         for title, section in _sections(text):
-            repo = _repo_from_section(title, section)
-            if not repo:
-                continue
             score = _score(title, section)
             if not _elite(title, section, score, master=master):
                 continue
-            rev = _revision(section)
-            key = (repo, rev)
-            row = merged.setdefault(
-                key,
-                {
-                    "repository": repo,
-                    "revision": rev,
-                    "ledger_score": score,
-                    "source_files": set(),
-                    "source_sections": set(),
-                    "master_present": False,
-                },
-            )
-            if score is not None:
-                row["ledger_score"] = max(score, row["ledger_score"] or score)
-            row["source_files"].add(str(path.relative_to(root)))
-            row["source_sections"].add(title)
-            row["master_present"] = row["master_present"] or master
+            for repo, rev in _repo_revision_pairs(title, section):
+                key = (repo, rev)
+                row = merged.setdefault(
+                    key,
+                    {
+                        "repository": repo,
+                        "revision": rev,
+                        "ledger_score": score,
+                        "source_files": set(),
+                        "source_sections": set(),
+                        "master_present": False,
+                    },
+                )
+                if score is not None:
+                    row["ledger_score"] = max(score, row["ledger_score"] or score)
+                row["source_files"].add(str(path.relative_to(root)))
+                row["source_sections"].add(title)
+                row["master_present"] = row["master_present"] or master
 
     records: list[RepositoryIntake] = []
     for row in merged.values():
         caps = tuple(sorted(capability_links.get(row["repository"], set())))
         master = bool(row["master_present"])
-        structural_state = "CAPABILITY_LINKED" if caps else (
-            "MASTER_UNMAPPED" if master else "ELITE_CATALOG_UNMAPPED"
+        structural_state = (
+            "CAPABILITY_LINKED"
+            if caps
+            else ("MASTER_UNMAPPED" if master else "ELITE_CATALOG_UNMAPPED")
         )
         next_stage = (
             "FREEZE_SOURCE_INGESTION_PACKET"
@@ -231,8 +269,12 @@ def render_json(records: list[RepositoryIntake], root: Path) -> dict:
             "p0": sum(r.ingestion_priority == "P0" for r in records),
             "p1": sum(r.ingestion_priority == "P1" for r in records),
             "p2": sum(r.ingestion_priority == "P2" for r in records),
-            "capability_linked": sum(r.structural_state == "CAPABILITY_LINKED" for r in records),
-            "unmapped": sum(r.structural_state != "CAPABILITY_LINKED" for r in records),
+            "capability_linked": sum(
+                r.structural_state == "CAPABILITY_LINKED" for r in records
+            ),
+            "unmapped": sum(
+                r.structural_state != "CAPABILITY_LINKED" for r in records
+            ),
         },
         "records": [asdict(r) for r in records],
     }
