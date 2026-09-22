@@ -1,0 +1,5 @@
+source_run_id=35716840663
+shard_count=6
+retention_days=7
+copy_raw_evidence=false
+mode=rehydrate-revalidate-reparse-merge
