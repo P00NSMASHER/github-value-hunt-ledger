@@ -116,5 +116,7 @@
   "search_moves": [],
   "candidate_preflight_checks": null,
   "known_candidate_preflight_hits": null,
-  "duplicate_deep_inspections_avoided": null
+  "duplicate_deep_inspections_avoided": null,
+  "learning_measurement_packet_id": null,
+  "learning_measurement_packet_sha256": null
 }
