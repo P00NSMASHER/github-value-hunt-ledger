@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "mode": "paused",
+  "approval_scope": null,
+  "approval_id": null,
+  "approved_at": null,
+  "maximum_current_activations": 0,
+  "allowed_work_kinds": [
+    "learning_measurement"
+  ],
+  "explicit_user_approval_required": true,
+  "guardrails": [
+    "Paused mode must produce zero generated activation claim packets.",
+    "Measurement-canary mode requires all current machine restart gates to pass.",
+    "Measurement-canary mode is limited to current precommitted learning-measurement seeds.",
+    "Approval never selects, predicts, retries, releases, or substitutes work based on train/confirm partition membership.",
+    "At most three current canary activations may exist.",
+    "Changing this policy requires a separate explicit user instruction; generated reports cannot self-authorize activation."
+  ]
+}
