@@ -32,7 +32,7 @@ The reward is deliberately grounded in measured evidence only:
 - new capability creation;
 - measured duplicate-inspection avoidance;
 - linked downstream experiment outcomes;
-- realized revenue/customer value when those fields are actually observed;
+- realized revenue/customer value when those fields are actually observed, with bounded log-scale magnitude weighting;
 - a penalty for repeated deep inspection producing no retained candidate.
 
 Unknown denominators remain unknown. Non-search fixture/artifact work is excluded. Retrospective records do not train this layer.
