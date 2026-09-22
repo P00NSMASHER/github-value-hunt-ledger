@@ -25,7 +25,6 @@ from production.learning_engine import (
     FailureEvent,
     assess_failure_for_repair,
     learn_training_episode_memory,
-    observed_search_reward,
 )
 from production.training_environment import build_training_environment
 
@@ -111,40 +110,79 @@ def load_failure_events(
     return out
 
 
-def support_index(
-    search_runs: Iterable[dict[str, Any]],
-) -> dict[str, dict[str, int]]:
-    out: dict[str, dict[str, int]] = {}
-    for run in search_runs:
-        if observed_search_reward(run) is None:
+def episode_support_index(
+    episodes: Iterable[dict[str, Any]],
+    *,
+    split: str,
+) -> dict[str, dict[str, Any]]:
+    """Measure independent support for a learned memory key."""
+    out: dict[str, dict[str, Any]] = {}
+    for episode in episodes:
+        if episode.get("split") != split:
             continue
-
-        deep = run.get("deep_inspected")
+        reward = (
+            episode.get("reward") or {}
+        ).get("training_reward")
+        if not isinstance(reward, (int, float)):
+            continue
+        observation = episode.get("observation") or {}
+        deep = observation.get("deep_inspected")
         deep_value = deep if isinstance(deep, int) and deep >= 0 else 0
+        action = episode.get("action") or {}
         keys: list[str] = []
 
-        strategy = run.get("strategy_id")
+        strategy = action.get("strategy_id")
         if isinstance(strategy, str) and strategy.startswith("STRAT:"):
             keys.append(strategy)
 
-        query_family = run.get("query_family_id")
+        query_family = action.get("query_family_id")
         if (
             isinstance(query_family, str)
             and query_family.startswith("QF:")
         ):
             keys.append(query_family)
 
-        for key in keys:
+        for move_id in action.get("search_move_ids") or []:
+            if isinstance(move_id, str) and move_id:
+                keys.append(
+                    move_id
+                    if move_id.startswith("MOVE:")
+                    else f"MOVE:{move_id}"
+                )
+
+        for key in dict.fromkeys(keys):
             bucket = out.setdefault(
                 key,
                 {
                     "measured_runs": 0,
                     "deep_inspections": 0,
+                    "reward_sum": 0.0,
+                    "min_reward": None,
+                    "positive_runs": 0,
                 },
             )
             bucket["measured_runs"] += 1
             bucket["deep_inspections"] += deep_value
+            bucket["reward_sum"] += float(reward)
+            bucket["min_reward"] = (
+                float(reward)
+                if bucket["min_reward"] is None
+                else min(
+                    float(bucket["min_reward"]),
+                    float(reward),
+                )
+            )
+            if float(reward) > 0:
+                bucket["positive_runs"] += 1
 
+    for bucket in out.values():
+        runs = bucket["measured_runs"]
+        bucket["mean_reward"] = (
+            bucket["reward_sum"] / runs
+            if runs
+            else 0.0
+        )
+        del bucket["reward_sum"]
     return out
 
 
@@ -160,30 +198,50 @@ def compile_state(
     memory, observations = learn_training_episode_memory(
         training_environment["episodes"],
     )
-    train_run_ids = {
-        episode["run_id"]
-        for episode in training_environment["episodes"]
-        if episode.get("split") == "train"
-    }
-    support = support_index(
-        run
-        for run in search_runs
-        if run.get("search_run_id") in train_run_ids
+    train_support = episode_support_index(
+        training_environment["episodes"],
+        split="train",
+    )
+    confirm_support = episode_support_index(
+        training_environment["episodes"],
+        split="confirm",
     )
 
     records: list[dict[str, Any]] = []
     for record in memory.records():
         row = record.to_dict()
-        row["support"] = support.get(
+        row["support"] = train_support.get(
             record.key,
             {
                 "measured_runs": 0,
                 "deep_inspections": 0,
+                "min_reward": None,
+                "positive_runs": 0,
+                "mean_reward": 0.0,
             },
         )
-        row["eligible_for_policy_consideration"] = (
+        row["confirm_support"] = confirm_support.get(
+            record.key,
+            {
+                "measured_runs": 0,
+                "deep_inspections": 0,
+                "min_reward": None,
+                "positive_runs": 0,
+                "mean_reward": 0.0,
+            },
+        )
+        row["train_evidence_ready"] = (
             row["support"]["measured_runs"] >= 5
             and row["support"]["deep_inspections"] >= 20
+        )
+        row["confirm_evidence_ready"] = (
+            row["confirm_support"]["measured_runs"] >= 2
+            and row["confirm_support"]["deep_inspections"] >= 6
+            and row["confirm_support"]["mean_reward"] >= 0.0
+        )
+        row["eligible_for_policy_consideration"] = (
+            row["train_evidence_ready"]
+            and row["confirm_evidence_ready"]
         )
         records.append(row)
 
@@ -222,9 +280,14 @@ def compile_state(
         "policy_gate": {
             "minimum_measured_runs": 5,
             "minimum_deep_inspections": 20,
+            "minimum_confirm_runs": 2,
+            "minimum_confirm_deep_inspections": 6,
+            "minimum_confirm_mean_reward": 0.0,
             "note": (
-                "Matches existing repository policy; learning values "
-                "never override stage/STOP/verification gates."
+                "The existing 5-run/20-deep gate must be met on train "
+                "episodes, then independently confirmed before a value "
+                "prior may steer live search. Learning values never "
+                "override stage/STOP/verification gates."
             ),
         },
         "memory": {
