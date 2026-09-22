@@ -1,0 +1,62 @@
+{
+  "activates_work": false,
+  "activation_contract": "This artifact never activates a hunter. If all machine gates become true, remain AWAITING_EXPLICIT_USER_APPROVAL. Only a separate explicit user instruction may change scheduled-task state or begin the canary.",
+  "blockers": [
+    {
+      "action": "Configure the GitHub Actions repository secret TI_TRAINING_SPLIT_KEY, then rerun Technology Intelligence so the public commitment is generated.",
+      "code": "split_key_commitment_inactive"
+    },
+    {
+      "action": "Make TI_TRAINING_SPLIT_KEY available to the Technology Intelligence workflow; never put its value in repository files, prompts, logs, or worker-visible state.",
+      "code": "split_secret_unavailable"
+    },
+    {
+      "action": "After the split key is configured, regenerate receipts and require the split-status validator to clear all pending generated claims before canary activation.",
+      "code": "split_receipt_debt",
+      "issue_count": 2,
+      "pending_claim_count": 2
+    },
+    {
+      "action": "Finish the remaining frozen benchmark experiment conditions in clean contexts before using adaptive measurement packets.",
+      "code": "frozen_benchmark_incomplete",
+      "matched_tasks": 47,
+      "required_matched_tasks": 50
+    }
+  ],
+  "canary": {
+    "manual_completion_forbidden": true,
+    "maximum_initial_packet_runs": 3,
+    "one_generated_claim_per_packet": true,
+    "packet_count": 3,
+    "post_ingestion_split_receipt_required": true,
+    "retry_for_partition_forbidden": true
+  },
+  "changes_automation_state": false,
+  "evidence": {
+    "current_activations": 0,
+    "matched_benchmark_tasks": 47,
+    "pending_split_claims": 2,
+    "required_matched_benchmark_tasks": 50,
+    "required_shadow_runs": 15,
+    "shadow_runs_by_lane": {
+      "ai": 18,
+      "commercial": 20,
+      "science": 17
+    },
+    "shadow_runs_total": 55,
+    "split_key_commitment_active": false,
+    "split_receipts": 0,
+    "split_secret_available": false
+  },
+  "explicit_user_approval_required": true,
+  "gates": {
+    "benchmark_complete": false,
+    "measurement_packets_ready": true,
+    "no_current_activations": true,
+    "shadow_run_gate_complete": true,
+    "split_receipt_system_ready": false
+  },
+  "mode": "restart_readiness_only",
+  "schema_version": 1,
+  "state": "BLOCKED"
+}
