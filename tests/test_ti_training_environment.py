@@ -1,5 +1,6 @@
 import unittest
 
+from production.blind_partition import assign_partition
 from production.training_environment import (
     TrainingEnvironmentConfig,
     build_outcome_credit,
@@ -10,6 +11,52 @@ from production.training_environment import (
     telemetry_consistency_errors,
     validate_training_environment,
 )
+
+
+TEST_SPLIT_SECRET = "unit-test-blind-partition-key"
+
+
+def _receipt_map(runs, config=None):
+    cfg = config or TrainingEnvironmentConfig()
+    out = {}
+    for run in runs:
+        claim_id = run.get("execution_claim_id")
+        if not isinstance(claim_id, str) or not claim_id.startswith("CLAIM:"):
+            continue
+        partition, _commitment = assign_partition(
+            claim_id,
+            TEST_SPLIT_SECRET,
+            confirm_modulus=cfg.confirm_modulus,
+            confirm_bucket=cfg.confirm_bucket,
+        )
+        out[claim_id] = partition
+    return out
+
+
+def test_split_for_run(run, *, config=None):
+    return split_for_run(
+        run,
+        config=config,
+        split_receipts=_receipt_map([run], config),
+    )
+
+
+def test_build_training_environment(runs, outcomes, *, config=None):
+    return build_training_environment(
+        runs,
+        outcomes,
+        config=config,
+        split_receipts=_receipt_map(runs, config),
+    )
+
+
+def test_build_outcome_credit(runs, outcomes, *, config=None):
+    return build_outcome_credit(
+        runs,
+        outcomes,
+        config=config,
+        split_receipts=_receipt_map(runs, config),
+    )
 
 
 def search_run(
@@ -97,17 +144,34 @@ class TrainingEnvironmentTests(unittest.TestCase):
     def test_split_is_deterministic_and_benchmark_eval_only(self):
         run = search_run("RUN:det")
         self.assertEqual(
-            split_for_run(run),
-            split_for_run(run),
+            test_split_for_run(run),
+            test_split_for_run(run),
         )
         self.assertEqual(
-            split_for_run(
+            test_split_for_run(
                 search_run(
                     "RUN:b",
                     quality="benchmark",
                 )
             ),
             "evaluation_only",
+        )
+
+    def test_generated_run_without_blind_receipt_is_pending(self):
+        run = search_run("RUN:pending")
+        self.assertEqual(
+            split_for_run(run, split_receipts={}),
+            "pending_partition",
+        )
+        environment = build_training_environment(
+            [run],
+            [],
+            split_receipts={},
+        )
+        self.assertEqual(environment["episodes"], [])
+        self.assertIn(
+            "pending_blind_partition",
+            environment["excluded_runs"][0]["reason"],
         )
 
     def test_legacy_zero_candidate_record_is_excluded(self):
@@ -118,7 +182,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         legacy["retained_count"] = 0
         legacy["master_promoted_count"] = 0
         self.assertEqual(
-            split_for_run(legacy),
+            test_split_for_run(legacy),
             "excluded",
         )
 
@@ -133,10 +197,10 @@ class TrainingEnvironmentTests(unittest.TestCase):
             telemetry_consistency_errors(bad),
         )
         self.assertEqual(
-            split_for_run(bad),
+            test_split_for_run(bad),
             "excluded",
         )
-        environment = build_training_environment(
+        environment = test_build_training_environment(
             [bad],
             [],
         )
@@ -156,7 +220,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             telemetry_consistency_errors(bad),
         )
         self.assertEqual(
-            split_for_run(bad),
+            test_split_for_run(bad),
             "excluded",
         )
 
@@ -169,7 +233,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         for index in range(100):
             run_id = f"RUN:{index}"
             if (
-                split_for_run(
+                test_split_for_run(
                     search_run(run_id),
                     config=config,
                 )
@@ -180,7 +244,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 break
 
         direct, support = ids
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [
                 search_run(direct),
                 search_run(support),
@@ -231,7 +295,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         for index in range(100):
             run_id = f"RUN:experiment-only:{index}"
             candidate = search_run(run_id)
-            if split_for_run(candidate, config=config) == "train":
+            if test_split_for_run(candidate, config=config) == "train":
                 ids.append(run_id)
             if len(ids) == 2:
                 break
@@ -252,7 +316,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             capability_ids=("CAP-001",),
             repository="org/direct@abc",
         )
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [direct, support],
             [out],
             config=config,
@@ -273,7 +337,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         confirm_id = None
         for index in range(100):
             run_id = f"RUN:{index}"
-            split = split_for_run(
+            split = test_split_for_run(
                 search_run(run_id),
                 config=config,
             )
@@ -290,7 +354,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             if train_id and confirm_id:
                 break
 
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [
                 search_run(train_id),
                 search_run(confirm_id),
@@ -332,7 +396,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         opposite_id = None
         for index in range(100):
             run_id = f"RUN:support:{index}"
-            split = split_for_run(
+            split = test_split_for_run(
                 search_run(run_id),
                 config=config,
             )
@@ -343,7 +407,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             if support_id and opposite_id:
                 break
 
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [
                 execution,
                 search_run(support_id),
@@ -370,7 +434,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             anchor_split,
         )
         self.assertNotEqual(
-            split_for_run(
+            test_split_for_run(
                 execution,
                 config=config,
             ),
@@ -392,7 +456,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         chosen["allocation_mode"] = "manual_override"
         chosen["execution_claim_id"] = None
         self.assertEqual(
-            split_for_run(chosen, config=config),
+            test_split_for_run(chosen, config=config),
             "train",
         )
 
@@ -404,7 +468,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         support = search_run("RUN:generated-support")
         out = outcome(["RUN:manual-execution"])
 
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [execution, support],
             [out],
         )
@@ -424,7 +488,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         for index in range(100):
             run_id = f"RUN:temporal:{index}"
             if (
-                split_for_run(
+                test_split_for_run(
                     search_run(run_id),
                     config=config,
                 )
@@ -443,7 +507,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         out = outcome([direct_id])
         out["date"] = "2026-09-21"
 
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [direct, support],
             [out],
             config=config,
@@ -463,7 +527,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         for index in range(100):
             run_id = f"RUN:clock:{index}"
             if (
-                split_for_run(
+                test_split_for_run(
                     search_run(run_id),
                     config=config,
                 )
@@ -481,7 +545,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         out = outcome([direct_id])
         out["timestamp"] = "2026-09-21T09:00:00Z"
 
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [direct, support],
             [out],
             config=config,
@@ -498,7 +562,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         out = outcome(["RUN:future-origin"])
         out["timestamp"] = "2026-09-21T12:00:00Z"
 
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [run],
             [out],
         )
@@ -517,7 +581,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         confirm_id = None
         for index in range(100):
             run_id = f"RUN:{index}"
-            split = split_for_run(
+            split = test_split_for_run(
                 search_run(run_id),
                 config=config,
             )
@@ -534,7 +598,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             if train_id and confirm_id:
                 break
 
-        edges, excluded = build_outcome_credit(
+        edges, excluded = test_build_outcome_credit(
             [
                 search_run(train_id),
                 search_run(confirm_id),
@@ -645,7 +709,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 "retained_count": 0,
             },
         ]
-        environment = build_training_environment(
+        environment = test_build_training_environment(
             [run],
             [],
         )
@@ -675,11 +739,11 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 repository="org/other",
             ),
         ]
-        first = build_training_environment(
+        first = test_build_training_environment(
             runs,
             [outcome(["RUN:1"])],
         )
-        second = build_training_environment(
+        second = test_build_training_environment(
             runs,
             [outcome(["RUN:1"])],
         )
@@ -712,11 +776,11 @@ class TrainingEnvironmentTests(unittest.TestCase):
         confirm_run = None
         for index in range(100):
             candidate = search_run(f"RUN:confirm-tamper:{index}")
-            if split_for_run(candidate, config=config) == "confirm":
+            if test_split_for_run(candidate, config=config) == "confirm":
                 confirm_run = candidate
                 break
         self.assertIsNotNone(confirm_run)
-        environment = build_training_environment(
+        environment = test_build_training_environment(
             [confirm_run],
             [],
             config=config,
@@ -742,7 +806,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         opposite_identifier = None
         for index in range(100):
             candidate = search_run(f"RUN:partition:{index}")
-            split = split_for_run(candidate, config=config)
+            split = test_split_for_run(candidate, config=config)
             if chosen is None:
                 chosen = candidate
                 expected = split
@@ -750,7 +814,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             if partition_for_id(fake, config=config) != expected:
                 opposite_identifier = fake
                 break
-        environment = build_training_environment(
+        environment = test_build_training_environment(
             [chosen],
             [],
             config=config,
@@ -761,7 +825,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         )
         errors = validate_training_environment(environment)
         self.assertIn(
-            f"partition_hash_mismatch:{episode['run_id']}",
+            f"episode_hash_mismatch:{episode['run_id']}",
             errors,
         )
 
@@ -776,7 +840,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 "retained_count": 1,
             }
         ]
-        environment = build_training_environment(
+        environment = test_build_training_environment(
             [run],
             [],
         )
@@ -792,7 +856,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         )
 
     def test_immediate_only_episode_is_capped(self):
-        environment = build_training_environment(
+        environment = test_build_training_environment(
             [
                 search_run(
                     "RUN:solo",
