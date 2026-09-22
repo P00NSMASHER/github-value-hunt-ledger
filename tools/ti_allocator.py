@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-import json,re,hashlib,sys
+import json,re,hashlib
 from collections import defaultdict
 from pathlib import Path
 from ti_common import INTEL, ROOT, load_jsonl
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-from production.work_identity import versioned_work_item_id
+from ti_work_identity import versioned_work_item_id
 from ti_search_actions import (experiment_status, parse_capability_ids, experiment_action,
                                capability_stops, action_errors)
 
