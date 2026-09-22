@@ -26,7 +26,7 @@ on:
       artifact_retention_days:
         description: Raw snapshot artifact retention
         required: true
-        default: "7"
+        default: "90"
         type: string
   push:
     branches: [main]
@@ -117,13 +117,34 @@ jobs:
             --db "output/shard-${SHARD}/ledger.sqlite" \
             > "output/shard-${SHARD}/summary.json"
           python -m json.tool "output/shard-${SHARD}/summary.json"
+      - name: Prepare compact shard metadata
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          mkdir -p "metadata/shard-${SHARD}"
+          cp "output/shard-${SHARD}/ledger.sqlite" "metadata/shard-${SHARD}/ledger.sqlite"
+          cp "output/shard-${SHARD}/summary.json" "metadata/shard-${SHARD}/summary.json"
+          if test -f "output/shard-${SHARD}/stats.json"; then
+            cp "output/shard-${SHARD}/stats.json" "metadata/shard-${SHARD}/stats.json"
+          fi
+          if test -f "output/shard-${SHARD}/fmc_directory_manifest.json"; then
+            cp "output/shard-${SHARD}/fmc_directory_manifest.json" "metadata/shard-${SHARD}/fmc_directory_manifest.json"
+          fi
       - name: Upload immutable shard snapshots
         uses: actions/upload-artifact@v4
         with:
           name: fmc-shard-${{ matrix.shard }}
           path: production/fmc_tariff_ledger/output/shard-${{ matrix.shard }}/
-          retention-days: ${{ inputs.artifact_retention_days || 7 }}
-          compression-level: 0
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
+          compression-level: 6
+          if-no-files-found: error
+      - name: Upload compact shard metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: fmc-metadata-shard-${{ matrix.shard }}
+          path: production/fmc_tariff_ledger/metadata/shard-${{ matrix.shard }}/
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
+          compression-level: 6
           if-no-files-found: error
 
   merge:
@@ -139,51 +160,30 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt
-      - name: Download every shard
+      - name: Download compact shard metadata
         uses: actions/download-artifact@v4
         with:
-          pattern: fmc-shard-*
-          path: production/fmc_tariff_ledger/downloaded
-      - name: Merge metadata ledgers and content-addressed evidence
+          pattern: fmc-metadata-shard-*
+          path: production/fmc_tariff_ledger/metadata
+      - name: Merge metadata ledgers
         run: |
           mkdir -p merged
           python run.py merge \
-            --input-root downloaded \
+            --input-root metadata \
             --db merged/fmc_tariff_ledger.sqlite
-          python - <<'PY'
-          from pathlib import Path
-          import shutil
-
-          root = Path("downloaded")
-          dest = Path("merged")
-          copied = 0
-          deduped = 0
-          for src in root.rglob("blobs/sha256/*/*"):
-              if not src.is_file():
-                  continue
-              parts = src.parts
-              try:
-                  idx = parts.index("blobs")
-              except ValueError:
-                  continue
-              target = dest.joinpath(*parts[idx:])
-              target.parent.mkdir(parents=True, exist_ok=True)
-              if target.exists():
-                  deduped += 1
-                  continue
-              shutil.copy2(src, target)
-              copied += 1
-          print(f"raw evidence copied={copied} deduped={deduped}")
-          PY
           python run.py summary \
             --db merged/fmc_tariff_ledger.sqlite \
             > merged/summary.json
           python -m json.tool merged/summary.json
+          FIRST_MANIFEST=$(find metadata -name fmc_directory_manifest.json -print -quit || true)
+          if test -n "$FIRST_MANIFEST"; then
+            cp "$FIRST_MANIFEST" merged/fmc_directory_manifest.json
+          fi
       - name: Upload merged carrier-rule ledger
         uses: actions/upload-artifact@v4
         with:
           name: fmc-tariff-rule-ledger-merged
           path: production/fmc_tariff_ledger/merged/
-          retention-days: ${{ inputs.artifact_retention_days || 7 }}
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
           compression-level: 0
           if-no-files-found: error
