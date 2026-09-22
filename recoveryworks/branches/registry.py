@@ -118,6 +118,22 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "professionally reviewed insurance underpayment finding",
         ("coverage review", "claim valuation", "settlement reconciliation"),
     ),
+    Branch.CLOUD: BranchSpec(
+        Branch.CLOUD,
+        "CloudRecovery",
+        "cloud/hosting committed-rate and metered-usage billing leakage",
+        ("provider invoice charges", "effective contract rates", "independent meter/usage exports"),
+        "contract-backed cloud billing variance",
+        ("contract billing engine", "meter aggregation", "invoice exports"),
+    ),
+    Branch.MERCHANT_FEE: BranchSpec(
+        Branch.MERCHANT_FEE,
+        "MerchantFeeRecovery",
+        "payment-processor markup, per-transaction, and fixed-fee leakage",
+        ("processor fee statements", "merchant agreements", "independent transaction summaries"),
+        "processor-controlled fee overpayment finding",
+        ("fee agreement engine", "transaction reconciliation", "processor statements"),
+    ),
 }
 
 
