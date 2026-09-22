@@ -201,11 +201,26 @@ def episode_support_index(
                 )
         key_rewards.extend(contextual_rows)
 
-        seen_keys: set[str] = set()
+        aggregated: dict[str, dict[str, Any]] = {}
         for key, key_reward, key_deep in key_rewards:
-            if key in seen_keys:
-                continue
-            seen_keys.add(key)
+            bucket = aggregated.setdefault(
+                key,
+                {
+                    "reward_sum": 0.0,
+                    "observations": 0,
+                    "deep_inspections": 0,
+                },
+            )
+            bucket["reward_sum"] += float(key_reward)
+            bucket["observations"] += 1
+            bucket["deep_inspections"] += key_deep
+
+        for key, aggregate in aggregated.items():
+            key_reward = (
+                aggregate["reward_sum"]
+                / aggregate["observations"]
+            )
+            key_deep = aggregate["deep_inspections"]
             bucket = out.setdefault(
                 key,
                 {
