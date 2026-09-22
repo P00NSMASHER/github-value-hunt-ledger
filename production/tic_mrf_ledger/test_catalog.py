@@ -222,6 +222,55 @@ class TiCCatalogTests(unittest.TestCase):
             self.assertIn("example_index.json", row[1])
             conn.close()
 
+    def test_html_index_landing_is_not_misclassified_as_toc(self):
+        self.assertEqual(
+            catalog.classify_file("https://payer.test/index.html"),
+            "unknown",
+        )
+        self.assertEqual(
+            catalog.classify_file("https://payer.test/File/Visit/Index"),
+            "unknown",
+        )
+        self.assertEqual(
+            catalog.classify_file("https://payer.test/2026-09-01_payer_index.json"),
+            "index",
+        )
+
+    def test_monthly_template_generates_current_and_previous_tocs(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            source = catalog.Source(
+                "monthly",
+                "Regional Payer",
+                "monthly_toc_templates",
+                "https://payer.test/mrf/",
+                notes=json.dumps({
+                    "base_url": "https://payer.test/mrf/",
+                    "file_templates": ["{year}/{month_start}_payer_index.json"],
+                    "month_offsets": [0, -1],
+                }),
+            )
+            with patch.object(catalog, "month_start") as ms:
+                ms.side_effect = [
+                    (2026, 9, "2026-09-01", "20260901"),
+                    (2026, 8, "2026-08-01", "20260801"),
+                ]
+                stats = catalog.discover_monthly_toc_templates(
+                    conn, root, source, timeout=1, max_bytes=1000
+                )
+            self.assertEqual(stats["files"], 2)
+            rows = [
+                r[0] for r in conn.execute(
+                    "SELECT file_url FROM mrf_files ORDER BY file_url"
+                ).fetchall()
+            ]
+            self.assertEqual(rows, [
+                "https://payer.test/mrf/2026/2026-08-01_payer_index.json",
+                "https://payer.test/mrf/2026/2026-09-01_payer_index.json",
+            ])
+            conn.close()
+
 
 if __name__ == "__main__":
     unittest.main()
