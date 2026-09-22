@@ -576,16 +576,35 @@ def _path_evidence(
 def _combine_support_strength(
     evidence: Sequence[Mapping[str, Any]],
 ) -> float:
-    support = [
-        float(item["strength"])
+    """Score indirect provenance without rewarding experiment membership alone."""
+    support_items = [
+        item
         for item in evidence
         if item.get("kind") != "direct_origin"
     ]
-    if not support:
+    if not support_items:
         return 0.0
+
+    concrete_kinds = {
+        "new_capability",
+        "strengthened_capability",
+        "retained_repository",
+    }
+    if not any(
+        item.get("kind") in concrete_kinds
+        for item in support_items
+    ):
+        # Sharing an experiment only establishes context, not contribution.
+        return 0.0
+
     complement = 1.0
-    for strength in support:
-        complement *= 1.0 - _clip(strength, 0.0, 1.0)
+    for item in support_items:
+        strength = float(item["strength"])
+        complement *= 1.0 - _clip(
+            strength,
+            0.0,
+            1.0,
+        )
     return 1.0 - complement
 
 
