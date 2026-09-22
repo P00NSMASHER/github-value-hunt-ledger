@@ -1,0 +1,6 @@
+archive_id=shaq-public-routes-2026-09-22
+shards=8
+max_parallel=2
+workers_per_shard=1
+min_host_interval=0.75
+expected_sitemap_routes=2421
