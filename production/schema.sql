@@ -194,13 +194,17 @@ create table if not exists intel_repair_candidate (
   baseline_version text not null,
   candidate_version text not null,
   baseline_artifact_ref text not null,
+  baseline_artifact_sha256 text not null,
   candidate_artifact_ref text not null,
+  candidate_artifact_sha256 text not null,
   diff_hash text not null,
   regression_test_requirement text not null,
   regression_tests_total int not null,
   regression_tests_passed int not null,
   regression_test_evidence_refs jsonb not null default '[]',
+  regression_test_evidence_sha256 text not null,
   decision_history_ref text not null,
+  decision_history_sha256 text not null,
   candidate_record_sha256 text not null,
   created_at timestamptz not null default now()
 );
