@@ -135,3 +135,29 @@ def test_review_packet_renders_large_integer_cents_exactly():
     packet = build_review_packet(batch, build_review_queue(batch), charges, rules)
     text = render_review_packet_markdown(packet)
     assert "USD 92,233,720,368,547,758.07" in text
+
+
+def test_packet_accepts_canonical_duplicate_evidence_quarantine_as_remediation():
+    pop = freeze_population(
+        "buyer", "unit", "dupe",
+        [PopulationRow("i1", "s1", "customer", "carrier", "USD", "p1")],
+    )
+    charges = (
+        InvoiceCharge("buyer","unit","i1","s1","customer","carrier","USD",
+                      "a","DETENTION","2026-09-10",1,12500,"source-a"),
+        InvoiceCharge("buyer","unit","i1","s1","customer","carrier","USD",
+                      "b","DETENTION","2026-09-10",1,12500,"source-b"),
+    )
+    rules = (
+        ChargeRule("buyer","unit","customer","carrier","USD","rate",
+                   "DETENTION",FIXED,"2026-09-01","2026-09-30",
+                   "r"*64,True,10000,None),
+    )
+    batch = derive_batch(pop, charges, rules)
+    queue = build_review_queue(batch)
+    packet = build_review_packet(batch, queue, charges, rules)
+    assert len(packet.cases) == 2
+    assert {case.reason for case in packet.cases} == {
+        "POSSIBLE_DUPLICATE_CHARGE_EVIDENCE"
+    }
+    assert all(case.expected_cents is None for case in packet.cases)
