@@ -1,8 +1,8 @@
 """UtilityRecovery deterministic tariff audit adapter.
 
-The first production slice intentionally supports only explicit, deterministic
-charge primitives. Unsupported or overlapping tariff logic is surfaced for
-review rather than evaluated dynamically.
+The production adapter supports explicit effective-dated charge primitives only.
+No Python eval or free-form formula execution is permitted. Missing quantities,
+overlapping tariff versions, and unsupported tariff logic fail closed.
 """
 from __future__ import annotations
 
@@ -18,7 +18,10 @@ from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
 
 class UtilityChargeKind(str, Enum):
     FIXED = "fixed"
+    DAILY_FIXED = "daily_fixed"
     ENERGY = "energy"
+    TIERED_ENERGY = "tiered_energy"
+    TOU_ENERGY = "tou_energy"
     DEMAND = "demand"
     REACTIVE = "reactive"
 
@@ -45,6 +48,10 @@ def normalize_service_class(value: str) -> str:
     return _required("service_class", value).upper().replace(" ", "").replace("-", "")
 
 
+def normalize_period(value: str) -> str:
+    return _required("period", value).upper().replace(" ", "_").replace("-", "_")
+
+
 def _iso_date(name: str, value: str) -> date:
     text = _required(name, value)
     try:
@@ -53,7 +60,9 @@ def _iso_date(name: str, value: str) -> date:
         raise ValueError(f"{name} must be YYYY-MM-DD") from exc
 
 
-def _quantity(name: str, value: str | int | float | Decimal) -> Decimal:
+def _quantity(name: str, value: str | int | float | Decimal | None) -> Decimal:
+    if value is None or str(value).strip() == "":
+        raise ValueError(f"{name} is required by the selected tariff")
     try:
         result = Decimal(str(value))
     except (InvalidOperation, ValueError) as exc:
@@ -64,26 +73,73 @@ def _quantity(name: str, value: str | int | float | Decimal) -> Decimal:
 
 
 @dataclass(frozen=True)
+class UtilityTier:
+    rate_micros_per_unit: int
+    up_to_kwh: str | None = None
+
+    def __post_init__(self) -> None:
+        _positive_int("rate_micros_per_unit", self.rate_micros_per_unit)
+        if self.up_to_kwh is not None:
+            threshold = _quantity("up_to_kwh", self.up_to_kwh)
+            if threshold <= 0:
+                raise ValueError("up_to_kwh must be positive")
+
+
+@dataclass(frozen=True)
 class UtilityCharge:
     name: str
     kind: UtilityChargeKind
     amount_cents: int | None = None
     rate_micros_per_unit: int | None = None
+    tiers: tuple[UtilityTier, ...] = ()
+    period: str | None = None
 
     def __post_init__(self) -> None:
         _required("name", self.name)
+
         if self.kind is UtilityChargeKind.FIXED:
             if self.amount_cents is None:
                 raise ValueError("fixed charge requires amount_cents")
             _nonnegative_cents("amount_cents", self.amount_cents)
-            if self.rate_micros_per_unit is not None:
-                raise ValueError("fixed charge cannot define rate_micros_per_unit")
-        else:
-            if self.rate_micros_per_unit is None:
-                raise ValueError(f"{self.kind.value} charge requires rate_micros_per_unit")
-            _positive_int("rate_micros_per_unit", self.rate_micros_per_unit)
-            if self.amount_cents is not None:
-                raise ValueError("rate charge cannot define amount_cents")
+            if self.rate_micros_per_unit is not None or self.tiers or self.period is not None:
+                raise ValueError("fixed charge cannot define rate, tiers, or period")
+            return
+
+        if self.kind is UtilityChargeKind.TIERED_ENERGY:
+            if self.amount_cents is not None or self.rate_micros_per_unit is not None:
+                raise ValueError("tiered energy uses tiers, not scalar amount/rate")
+            if not self.tiers:
+                raise ValueError("tiered energy requires tiers")
+            if self.period is not None:
+                raise ValueError("tiered energy cannot define a TOU period")
+            previous = Decimal("0")
+            open_ended_seen = False
+            for index, tier in enumerate(self.tiers):
+                if open_ended_seen:
+                    raise ValueError("open-ended tier must be final")
+                if tier.up_to_kwh is None:
+                    open_ended_seen = True
+                    if index != len(self.tiers) - 1:
+                        raise ValueError("open-ended tier must be final")
+                    continue
+                threshold = _quantity("up_to_kwh", tier.up_to_kwh)
+                if threshold <= previous:
+                    raise ValueError("tier thresholds must be strictly increasing")
+                previous = threshold
+            if not open_ended_seen:
+                raise ValueError("tiered energy requires a final open-ended tier")
+            return
+
+        if self.rate_micros_per_unit is None:
+            raise ValueError(f"{self.kind.value} charge requires rate_micros_per_unit")
+        _positive_int("rate_micros_per_unit", self.rate_micros_per_unit)
+        if self.amount_cents is not None or self.tiers:
+            raise ValueError("rate charge cannot define amount_cents or tiers")
+
+        if self.kind is UtilityChargeKind.TOU_ENERGY:
+            normalize_period(self.period or "")
+        elif self.period is not None:
+            raise ValueError("period is only valid for tou_energy charges")
 
 
 @dataclass(frozen=True)
@@ -103,11 +159,9 @@ class UtilityTariff:
     def __post_init__(self) -> None:
         for name in ("utility_id", "service_class", "effective_from", "source_hash", "source_locator"):
             _required(name, getattr(self, name))
-        _iso_date("effective_from", self.effective_from)
+        start = _iso_date("effective_from", self.effective_from)
         if self.effective_to is not None:
-            if _iso_date("effective_to", self.effective_to) < _iso_date(
-                "effective_from", self.effective_from
-            ):
+            if _iso_date("effective_to", self.effective_to) < start:
                 raise ValueError("effective_to cannot precede effective_from")
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
@@ -127,7 +181,7 @@ class UtilityTariff:
 
     def rule_ref(self) -> RuleRef:
         identity = {
-            "schema": 1,
+            "schema": 2,
             "utility_id": self.utility_id,
             "service_class": self.normalized_service_class,
             "effective_from": self.effective_from,
@@ -139,6 +193,14 @@ class UtilityTariff:
                     "kind": c.kind.value,
                     "amount_cents": c.amount_cents,
                     "rate_micros_per_unit": c.rate_micros_per_unit,
+                    "period": c.period,
+                    "tiers": [
+                        {
+                            "up_to_kwh": tier.up_to_kwh,
+                            "rate_micros_per_unit": tier.rate_micros_per_unit,
+                        }
+                        for tier in c.tiers
+                    ],
                 }
                 for c in self.charges
             ],
@@ -169,9 +231,11 @@ class UtilityBill:
     service_class: str
     bill_date: str
     actual_cents: int
-    billed_kwh: str = "0"
-    billed_demand_kw: str = "0"
-    billed_reactive_kva: str = "0"
+    billed_kwh: str | None = None
+    billed_demand_kw: str | None = None
+    billed_reactive_kva: str | None = None
+    days_used: int | None = None
+    billed_kwh_by_period: Mapping[str, str] = field(default_factory=dict)
     source_hash: str = ""
     source_locator: str = ""
     verified: bool = False
@@ -185,15 +249,28 @@ class UtilityBill:
             _required(name, getattr(self, name))
         _iso_date("bill_date", self.bill_date)
         _nonnegative_cents("actual_cents", self.actual_cents)
-        _quantity("billed_kwh", self.billed_kwh)
-        _quantity("billed_demand_kw", self.billed_demand_kw)
-        _quantity("billed_reactive_kva", self.billed_reactive_kva)
+        for name, value in (
+            ("billed_kwh", self.billed_kwh),
+            ("billed_demand_kw", self.billed_demand_kw),
+            ("billed_reactive_kva", self.billed_reactive_kva),
+        ):
+            if value not in (None, ""):
+                _quantity(name, value)
+        if self.days_used is not None:
+            _positive_int("days_used", self.days_used)
+        for period, value in self.billed_kwh_by_period.items():
+            normalize_period(period)
+            _quantity(f"billed_kwh_by_period[{period}]", value)
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
 
     @property
     def normalized_service_class(self) -> str:
         return normalize_service_class(self.service_class)
+
+    @property
+    def normalized_period_quantities(self) -> dict[str, str]:
+        return {normalize_period(k): v for k, v in self.billed_kwh_by_period.items()}
 
     def evidence(self) -> EvidenceRef:
         return EvidenceRef(
@@ -207,6 +284,8 @@ class UtilityBill:
                 "account_id": self.account_id,
                 "service_class": self.normalized_service_class,
                 "bill_date": self.bill_date,
+                "days_used": self.days_used,
+                "tou_periods": sorted(self.normalized_period_quantities),
                 **dict(self.metadata),
             },
         )
@@ -226,9 +305,45 @@ class UtilityAuditBatch:
 
 
 def _rate_charge_cents(rate_micros_per_unit: int, quantity: Decimal) -> int:
-    # 1 currency unit = 1,000,000 micros = 100 cents, so micros / 10,000 = cents.
     raw_cents = Decimal(rate_micros_per_unit) * quantity / Decimal(10000)
     return int(raw_cents.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
+def _tiered_charge_cents(
+    quantity: Decimal,
+    tiers: tuple[UtilityTier, ...],
+) -> tuple[int, list[dict[str, Any]]]:
+    remaining = quantity
+    lower = Decimal("0")
+    total = 0
+    details: list[dict[str, Any]] = []
+
+    for index, tier in enumerate(tiers):
+        if remaining <= 0:
+            break
+        if tier.up_to_kwh is None:
+            units = remaining
+        else:
+            upper = _quantity("up_to_kwh", tier.up_to_kwh)
+            capacity = max(upper - lower, Decimal("0"))
+            units = min(remaining, capacity)
+        cents = _rate_charge_cents(tier.rate_micros_per_unit, units)
+        total += cents
+        details.append({
+            "tier": index + 1,
+            "from_kwh": str(lower),
+            "to_kwh": tier.up_to_kwh,
+            "quantity": str(units),
+            "rate_micros_per_unit": tier.rate_micros_per_unit,
+            "amount_cents": cents,
+        })
+        remaining -= units
+        if tier.up_to_kwh is not None:
+            lower = _quantity("up_to_kwh", tier.up_to_kwh)
+
+    if remaining > 0:
+        raise ValueError("tier schedule does not cover billed_kwh")
+    return total, details
 
 
 def calculate_expected_bill(
@@ -242,29 +357,54 @@ def calculate_expected_bill(
     if not tariff.covers(bill.bill_date):
         raise ValueError("tariff does not cover bill date")
 
-    quantities = {
-        UtilityChargeKind.ENERGY: _quantity("billed_kwh", bill.billed_kwh),
-        UtilityChargeKind.DEMAND: _quantity("billed_demand_kw", bill.billed_demand_kw),
-        UtilityChargeKind.REACTIVE: _quantity(
-            "billed_reactive_kva", bill.billed_reactive_kva
-        ),
-    }
+    period_quantities = bill.normalized_period_quantities
     total = 0
     trace: list[dict[str, Any]] = []
+
     for charge in tariff.charges:
+        quantity: Decimal | None = None
+        tier_details: list[dict[str, Any]] | None = None
+
         if charge.kind is UtilityChargeKind.FIXED:
             cents = charge.amount_cents or 0
-            quantity = None
-        else:
-            quantity = quantities[charge.kind]
+        elif charge.kind is UtilityChargeKind.DAILY_FIXED:
+            if bill.days_used is None:
+                raise ValueError("days_used is required by daily_fixed tariff charge")
+            quantity = Decimal(bill.days_used)
             cents = _rate_charge_cents(charge.rate_micros_per_unit or 0, quantity)
+        elif charge.kind is UtilityChargeKind.ENERGY:
+            quantity = _quantity("billed_kwh", bill.billed_kwh)
+            cents = _rate_charge_cents(charge.rate_micros_per_unit or 0, quantity)
+        elif charge.kind is UtilityChargeKind.TIERED_ENERGY:
+            quantity = _quantity("billed_kwh", bill.billed_kwh)
+            cents, tier_details = _tiered_charge_cents(quantity, charge.tiers)
+        elif charge.kind is UtilityChargeKind.TOU_ENERGY:
+            period = normalize_period(charge.period or "")
+            if period not in period_quantities:
+                raise ValueError(f"TOU quantity for period {period} is required")
+            quantity = _quantity(
+                f"billed_kwh_by_period[{period}]",
+                period_quantities[period],
+            )
+            cents = _rate_charge_cents(charge.rate_micros_per_unit or 0, quantity)
+        elif charge.kind is UtilityChargeKind.DEMAND:
+            quantity = _quantity("billed_demand_kw", bill.billed_demand_kw)
+            cents = _rate_charge_cents(charge.rate_micros_per_unit or 0, quantity)
+        elif charge.kind is UtilityChargeKind.REACTIVE:
+            quantity = _quantity("billed_reactive_kva", bill.billed_reactive_kva)
+            cents = _rate_charge_cents(charge.rate_micros_per_unit or 0, quantity)
+        else:
+            raise ValueError(f"unsupported charge kind: {charge.kind}")
+
         total += cents
         trace.append({
             "name": charge.name,
             "kind": charge.kind.value,
+            "period": charge.period,
             "quantity": None if quantity is None else str(quantity),
             "amount_cents": cents,
             "rate_micros_per_unit": charge.rate_micros_per_unit,
+            "tiers": tier_details,
         })
 
     if total < tariff.minimum_bill_cents:
@@ -322,7 +462,16 @@ def audit_utility_bills(
             continue
 
         tariff = candidates[0]
-        expected_cents, trace = calculate_expected_bill(bill, tariff)
+        try:
+            expected_cents, trace = calculate_expected_bill(bill, tariff)
+        except ValueError as exc:
+            exceptions.append(UtilityAuditException(
+                bill.bill_id,
+                "MISSING_OR_INVALID_BILL_QUANTITY",
+                str(exc),
+            ))
+            continue
+
         if bill.actual_cents <= expected_cents:
             continue
 
