@@ -42,7 +42,7 @@ class ActionUnitTests(unittest.TestCase):
     def test_hard_gates_apply_to_every_seed_kind(self):
         for cid in ('CAP-014', 'CAP-015'):
             recipe = capability_recipe(cid)
-            for kind in ('capability_gap', 'coverage_gap', 'strategy_measurement'):
+            for kind in ('capability_gap', 'coverage_gap', 'learning_measurement'):
                 bad = {'seed_type': kind, 'capability_ids': [cid], 'work_action': 'search',
                        'query_templates': ['HSMS engine'], 'stop_conditions': recipe['stop_conditions']}
                 self.assertTrue(action_errors(bad))
@@ -97,7 +97,7 @@ class GeneratedPacketTests(unittest.TestCase):
         inputs = ('search_policy.json', 'capabilities.jsonl', 'search_strategies.jsonl', 'search_runs.jsonl',
                   'search_objectives.json', 'exploration_gap_queue.jsonl', 'research_neighborhoods.jsonl',
                   'search_recipe_policy.json', 'allocator_policy.json', 'allocator_policy_effective.json',
-                  'adjacency_queue.jsonl', 'measurement_plan.json')
+                  'adjacency_queue.jsonl', 'measurement_plan.json', 'learning_curriculum.json')
         for name in inputs:
             if (ROOT / 'intelligence' / name).exists():
                 shutil.copy(ROOT / 'intelligence' / name, cls.root / 'intelligence' / name)
@@ -132,7 +132,7 @@ class GeneratedPacketTests(unittest.TestCase):
         for s in self.seeds:
             if s['work_action'] != 'search':
                 self.assertEqual(s['query_templates'], [])
-            if s['seed_type'] in {'coverage_gap', 'strategy_measurement'}:
+            if s['seed_type'] in {'coverage_gap', 'learning_measurement'}:
                 parent = by_id[s['parent_seed_id']]
                 self.assertEqual(parent['work_action'], 'search')
                 self.assertTrue(set(parent['stop_conditions']).issubset(s['stop_conditions']))
@@ -149,8 +149,15 @@ class GeneratedPacketTests(unittest.TestCase):
     def test_protected_exploration_and_external_dependencies(self):
         kinds = [a['work_kind'] for a in self.allocations]
         self.assertGreaterEqual(kinds.count('coverage_gap'), 2)
-        for kind in ('strategy_measurement', 'wildcard', 'independent_verification'):
+        for kind in ('learning_measurement', 'wildcard', 'independent_verification'):
             self.assertIn(kind, kinds)
+        self.assertNotIn('strategy_measurement', kinds)
+        self.assertFalse(
+            any(
+                s['seed_type'] == 'strategy_measurement'
+                for s in self.seeds
+            )
+        )
         self.assertFalse(any(a['work_action'] == 'await_external' for a in self.allocations))
         self.assertTrue(all(a['instructions'].get('acceptance_target') for a in self.allocations))
 
