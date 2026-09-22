@@ -4,7 +4,9 @@ import tempfile
 import unittest
 
 from recoveryworks.cli import main
+from recoveryworks import CaseState
 from recoveryworks.io import run_scan_payload
+from recoveryworks.storage import load_ledger
 
 
 def payload():
@@ -103,10 +105,57 @@ class RecoveryIOTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             src = Path(tmp) / "scan.json"
             dst = Path(tmp) / "result.json"
+            ledger_path = Path(tmp) / "ledger.json"
             src.write_text(json.dumps(payload()), encoding="utf-8")
-            self.assertEqual(main(["scan", str(src), "--output", str(dst)]), 0)
+            self.assertEqual(main([
+                "scan", str(src), "--output", str(dst),
+                "--ledger-output", str(ledger_path),
+            ]), 0)
             result = json.loads(dst.read_text(encoding="utf-8"))
             self.assertEqual(result["portfolio"]["totals"]["potential_cents"], 8000)
+            ledger = load_ledger(ledger_path)
+            self.assertEqual(ledger.rollup()["totals"]["cases"], 2)
+            self.assertTrue(ledger.verify_event_chain())
+
+    def test_cli_persists_review_authorization_and_recovery_lifecycle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            src = Path(tmp) / "scan.json"
+            ledger_path = Path(tmp) / "ledger.json"
+            result_path = Path(tmp) / "result.json"
+            src.write_text(json.dumps(payload()), encoding="utf-8")
+            main([
+                "scan", str(src), "--output", str(result_path),
+                "--ledger-output", str(ledger_path),
+            ])
+            finding_id = load_ledger(ledger_path).records()[0].finding.finding_id
+
+            self.assertEqual(main([
+                "approve", str(ledger_path), finding_id,
+                "--reviewer", "reviewer-1", "--note", "verified source and arithmetic",
+            ]), 0)
+            self.assertEqual(main([
+                "authorize", str(ledger_path), finding_id,
+                "--authorization-id", "customer-auth-1",
+            ]), 0)
+            self.assertTrue(
+                __import__("recoveryworks.packets", fromlist=["submission_ready"])
+                .submission_ready(
+                    __import__("recoveryworks.packets", fromlist=["build_recovery_packet"])
+                    .build_recovery_packet(load_ledger(ledger_path).get(finding_id))
+                )
+            )
+            self.assertEqual(main(["mark-claimed", str(ledger_path), finding_id]), 0)
+            self.assertEqual(main([
+                "recover", str(ledger_path), finding_id,
+                "--recovered-cents", "1000", "--fee-cents", "200",
+            ]), 0)
+
+            ledger = load_ledger(ledger_path)
+            record = ledger.get(finding_id)
+            self.assertIs(record.case_state, CaseState.RECOVERED)
+            self.assertEqual(record.recovered_cents, 1000)
+            self.assertEqual(record.fee_cents, 200)
+            self.assertTrue(ledger.verify_event_chain())
 
 
 if __name__ == "__main__":
