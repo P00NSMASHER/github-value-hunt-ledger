@@ -150,6 +150,47 @@ class LearningStateIntegrationTests(unittest.TestCase):
             strategy["eligible_for_policy_consideration"]
         )
 
+    def test_positive_confirm_average_cannot_hide_negative_episode(self):
+        confirm = self.confirm_runs(2)
+        confirm[0]["retained_count"] = 0
+        confirm[1]["retained_count"] = 4
+        runs = self.train_runs(5) + confirm
+        with tempfile.TemporaryDirectory() as tmp:
+            state = compile_state(runs, [], Path(tmp))
+
+        strategy = next(
+            row
+            for row in state["memory"]["records"]
+            if row["key"] == "STRAT:integration-test"
+        )
+        self.assertGreaterEqual(
+            strategy["confirm_support"]["mean_reward"],
+            0.0,
+        )
+        self.assertLess(
+            strategy["confirm_support"]["min_reward"],
+            0.0,
+        )
+        self.assertFalse(strategy["confirm_evidence_ready"])
+        self.assertFalse(
+            strategy["eligible_for_policy_consideration"]
+        )
+        self.assertEqual(
+            strategy["generalization_status"],
+            "confirm_regression_signal",
+        )
+        alerts = {
+            (row["type"], row["memory_key"])
+            for row in state["learning_alerts"]
+        }
+        self.assertIn(
+            (
+                "confirm_regression_signal",
+                "STRAT:integration-test",
+            ),
+            alerts,
+        )
+
     def test_negative_confirm_reward_flags_overfit_and_suppresses_prior(self):
         train = self.train_runs(5)
         confirm = self.confirm_runs(2)
