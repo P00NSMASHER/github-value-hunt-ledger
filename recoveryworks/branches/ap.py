@@ -258,6 +258,18 @@ class APRecoveryBatch:
     exceptions: tuple[APRecoveryException, ...]
 
 
+def _same_obligation(a: APObligation, b: APObligation) -> bool:
+    """Treat repeated rows from the same source export as one obligation."""
+    return (
+        a.key == b.key
+        and a.expected_cents == b.expected_cents
+        and a.source_hash == b.source_hash
+        and a.effective_from == b.effective_from
+        and a.effective_to == b.effective_to
+        and a.verified == b.verified
+    )
+
+
 def _obligation_index(obligations: Iterable[APObligation]) -> dict[tuple[str, str], APObligation]:
     result: dict[tuple[str, str], APObligation] = {}
     for obligation in obligations:
@@ -265,7 +277,7 @@ def _obligation_index(obligations: Iterable[APObligation]) -> dict[tuple[str, st
         if existing is None:
             result[obligation.key] = obligation
             continue
-        if existing == obligation:
+        if _same_obligation(existing, obligation):
             continue
         raise ValueError(
             "conflicting AP obligations for "
@@ -277,24 +289,46 @@ def _obligation_index(obligations: Iterable[APObligation]) -> dict[tuple[str, st
 def _dedupe_payment_ids(
     payments: Iterable[APPayment],
 ) -> tuple[tuple[APPayment, ...], tuple[APRecoveryException, ...]]:
-    by_id: dict[str, list[APPayment]] = defaultdict(list)
+    """Deduplicate repeated export lines without rejecting split-settlement payments.
+
+    One ACH/check can legitimately repeat the same payment_id across several
+    invoices. The collision boundary is therefore vendor + normalized invoice +
+    payment_id. Repeated identical lines collapse to one; conflicting lines are
+    excluded and surfaced for review.
+    """
+    grouped: dict[tuple[str, str, str], list[APPayment]] = defaultdict(list)
     for payment in payments:
-        by_id[payment.payment_id].append(payment)
+        grouped[(payment.vendor_id, payment.normalized_invoice, payment.payment_id)].append(payment)
 
     accepted: list[APPayment] = []
     exceptions: list[APRecoveryException] = []
-    for payment_id in sorted(by_id):
-        items = by_id[payment_id]
+    for key in sorted(grouped):
+        items = grouped[key]
         if len(items) == 1:
             accepted.append(items[0])
             continue
-        exceptions.append(APRecoveryException(
-            payment_id,
-            "DUPLICATE_PAYMENT_ID",
-            f"payment_id appears {len(items)} times; excluded from recovery math",
-        ))
-    return tuple(accepted), tuple(exceptions)
 
+        signatures = {
+            (item.amount_cents, item.payment_date, item.source_hash, item.verified)
+            for item in items
+        }
+        reference = f"{key[0]}/{key[1]}/{key[2]}"
+        if len(signatures) == 1:
+            accepted.append(sorted(items, key=lambda item: item.source_locator)[0])
+            exceptions.append(APRecoveryException(
+                reference,
+                "DUPLICATE_PAYMENT_ID",
+                f"payment line appears {len(items)} times in the source export; counted once",
+            ))
+            continue
+
+        exceptions.append(APRecoveryException(
+            reference,
+            "CONFLICTING_PAYMENT_ID",
+            "same vendor/invoice/payment_id has conflicting amount/date/source attributes; excluded from recovery math",
+        ))
+
+    return tuple(accepted), tuple(exceptions)
 
 def _latest_statement_index(
     statements: Iterable[APVendorStatementLine],

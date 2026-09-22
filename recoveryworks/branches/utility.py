@@ -179,6 +179,20 @@ class UtilityTariff:
         end = _iso_date("effective_to", self.effective_to) if self.effective_to else None
         return when >= start and (end is None or when <= end)
 
+    def covers_period(self, service_start: str, service_end: str) -> bool:
+        start = _iso_date("service_start", service_start)
+        end = _iso_date("service_end", service_end)
+        tariff_start = _iso_date("effective_from", self.effective_from)
+        tariff_end = _iso_date("effective_to", self.effective_to) if self.effective_to else None
+        return start >= tariff_start and (tariff_end is None or end <= tariff_end)
+
+    def overlaps_period(self, service_start: str, service_end: str) -> bool:
+        start = _iso_date("service_start", service_start)
+        end = _iso_date("service_end", service_end)
+        tariff_start = _iso_date("effective_from", self.effective_from)
+        tariff_end = _iso_date("effective_to", self.effective_to) if self.effective_to else None
+        return tariff_start <= end and (tariff_end is None or tariff_end >= start)
+
     def rule_ref(self) -> RuleRef:
         identity = {
             "schema": 2,
@@ -236,6 +250,8 @@ class UtilityBill:
     billed_reactive_kva: str | None = None
     days_used: int | None = None
     billed_kwh_by_period: Mapping[str, str] = field(default_factory=dict)
+    service_start: str | None = None
+    service_end: str | None = None
     source_hash: str = ""
     source_locator: str = ""
     verified: bool = False
@@ -261,6 +277,13 @@ class UtilityBill:
         for period, value in self.billed_kwh_by_period.items():
             normalize_period(period)
             _quantity(f"billed_kwh_by_period[{period}]", value)
+        if (self.service_start is None) != (self.service_end is None):
+            raise ValueError("service_start and service_end must be supplied together")
+        if self.service_start is not None and self.service_end is not None:
+            start = _iso_date("service_start", self.service_start)
+            end = _iso_date("service_end", self.service_end)
+            if end < start:
+                raise ValueError("service_end cannot precede service_start")
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
 
@@ -271,6 +294,10 @@ class UtilityBill:
     @property
     def normalized_period_quantities(self) -> dict[str, str]:
         return {normalize_period(k): v for k, v in self.billed_kwh_by_period.items()}
+
+    @property
+    def has_service_period(self) -> bool:
+        return self.service_start is not None and self.service_end is not None
 
     def evidence(self) -> EvidenceRef:
         return EvidenceRef(
@@ -284,6 +311,8 @@ class UtilityBill:
                 "account_id": self.account_id,
                 "service_class": self.normalized_service_class,
                 "bill_date": self.bill_date,
+                "service_start": self.service_start,
+                "service_end": self.service_end,
                 "days_used": self.days_used,
                 "tou_periods": sorted(self.normalized_period_quantities),
                 **dict(self.metadata),
@@ -354,7 +383,10 @@ def calculate_expected_bill(
         raise ValueError("bill utility does not match tariff utility")
     if bill.normalized_service_class != tariff.normalized_service_class:
         raise ValueError("bill service class does not match tariff service class")
-    if not tariff.covers(bill.bill_date):
+    if bill.has_service_period:
+        if not tariff.covers_period(bill.service_start or "", bill.service_end or ""):
+            raise ValueError("tariff does not cover full service period")
+    elif not tariff.covers(bill.bill_date):
         raise ValueError("tariff does not cover bill date")
 
     period_quantities = bill.normalized_period_quantities
@@ -439,20 +471,50 @@ def audit_utility_bills(
     exceptions: list[UtilityAuditException] = []
 
     for bill in sorted(bills, key=lambda b: b.bill_id):
-        candidates = [
-            tariff
-            for tariff in tariff_index.get(
-                (bill.utility_id, bill.normalized_service_class), []
-            )
-            if tariff.covers(bill.bill_date)
-        ]
-        if not candidates:
-            exceptions.append(UtilityAuditException(
-                bill.bill_id,
-                "NO_TARIFF_VERSION",
-                "no tariff version covers the bill date/service class",
-            ))
-            continue
+        versions = tariff_index.get(
+            (bill.utility_id, bill.normalized_service_class), []
+        )
+        if bill.has_service_period:
+            candidates = [
+                tariff
+                for tariff in versions
+                if tariff.covers_period(bill.service_start or "", bill.service_end or "")
+            ]
+            if not candidates:
+                overlaps = [
+                    tariff
+                    for tariff in versions
+                    if tariff.overlaps_period(bill.service_start or "", bill.service_end or "")
+                ]
+                if len(overlaps) > 1:
+                    exceptions.append(UtilityAuditException(
+                        bill.bill_id,
+                        "SERVICE_PERIOD_SPANS_TARIFF_CHANGE",
+                        "service period overlaps multiple tariff versions; interval usage is required",
+                    ))
+                elif len(overlaps) == 1:
+                    exceptions.append(UtilityAuditException(
+                        bill.bill_id,
+                        "PARTIAL_TARIFF_COVERAGE",
+                        "no single tariff version covers the full service period",
+                    ))
+                else:
+                    exceptions.append(UtilityAuditException(
+                        bill.bill_id,
+                        "NO_TARIFF_VERSION",
+                        "no tariff version covers the service period/service class",
+                    ))
+                continue
+        else:
+            candidates = [tariff for tariff in versions if tariff.covers(bill.bill_date)]
+            if not candidates:
+                exceptions.append(UtilityAuditException(
+                    bill.bill_id,
+                    "NO_TARIFF_VERSION",
+                    "no tariff version covers the bill date/service class",
+                ))
+                continue
+
         if len(candidates) > 1:
             exceptions.append(UtilityAuditException(
                 bill.bill_id,
@@ -495,6 +557,9 @@ def audit_utility_bills(
                 "account_id": bill.account_id,
                 "service_class": bill.normalized_service_class,
                 "bill_date": bill.bill_date,
+                "service_start": bill.service_start,
+                "service_end": bill.service_end,
+                "rate_selection_basis": "service_period" if bill.has_service_period else "bill_date",
                 "calculation_trace": list(trace),
                 "tariff_source_hash": tariff.source_hash,
             },

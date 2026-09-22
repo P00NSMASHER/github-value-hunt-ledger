@@ -15,6 +15,7 @@ from .ap_csv import (
     money_to_cents,
     signed_money_to_cents,
 )
+from .ap_ingest import APIngestionResult, ingest_ap_exports
 from .base import BranchInput, RuleBackedAdapter
 from .duty import (
     DutyAssessment,
@@ -52,6 +53,7 @@ from .utility import (
     normalize_period,
     normalize_service_class,
 )
+from .utility_ingest import UtilityIngestionResult, ingest_utility_exports
 from .utility_io import (
     dollars_per_unit_to_micros,
     dollars_to_cents,
@@ -60,6 +62,7 @@ from .utility_io import (
 )
 
 __all__ = [
+    "APIngestionResult",
     "APObligation",
     "APPayment",
     "APRecoveryBatch",
@@ -79,6 +82,7 @@ __all__ = [
     "PayerServiceLine",
     "RuleBackedAdapter",
     "UtilityAuditBatch",
+    "UtilityIngestionResult",
     "UtilityAuditException",
     "UtilityBill",
     "UtilityCharge",
@@ -91,6 +95,8 @@ __all__ = [
     "audit_payer_lines",
     "audit_utility_bills",
     "build_ap_observations",
+    "ingest_ap_exports",
+    "ingest_utility_exports",
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
