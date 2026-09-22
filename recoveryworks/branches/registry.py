@@ -70,6 +70,22 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "broker/counsel-review recovery candidate",
         ("HTS resolver", "historical tariff versions", "fee calculator"),
     ),
+    Branch.SAAS: BranchSpec(
+        Branch.SAAS,
+        "SaaSRecovery",
+        "software subscription, seat, and contracted-rate leakage",
+        ("vendor invoices", "subscription contracts", "seat/license snapshots"),
+        "contract-backed SaaS billing variance",
+        ("contract billing engine", "license inventory", "invoice exports"),
+    ),
+    Branch.TELECOM: BranchSpec(
+        Branch.TELECOM,
+        "TelecomRecovery",
+        "recurring telecom service and usage billing leakage",
+        ("carrier invoices", "service contracts", "CDR/usage aggregates"),
+        "contract-backed telecom billing variance",
+        ("contract billing engine", "CDR usage", "invoice exports"),
+    ),
 }
 
 
