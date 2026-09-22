@@ -302,7 +302,30 @@ class RecoveryWorksTests(unittest.TestCase):
             self.assertEqual(restored.reviewer_id, "reviewer-a")
             stale.verify_event_chains()
 
-    def test_sqlite_ledger_detects_event_tampering(self):
+    def test_sqlite_ledger_blocks_direct_event_update_and_delete(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="payment-immutable", currency="USD", expected_cents=0,
+                actual_cents=10000, rule=rule(), evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+            ))
+            ledger = SQLiteRecoveryLedger(path)
+            ledger.add(finding)
+            with sqlite3.connect(path) as con:
+                with self.assertRaisesRegex(sqlite3.IntegrityError, "append-only"):
+                    con.execute(
+                        "UPDATE recovery_events SET event_type = 'FORGED' WHERE finding_id = ?",
+                        (finding.finding_id,),
+                    )
+                with self.assertRaisesRegex(sqlite3.IntegrityError, "append-only"):
+                    con.execute(
+                        "DELETE FROM recovery_events WHERE finding_id = ?",
+                        (finding.finding_id,),
+                    )
+
+    def test_sqlite_ledger_detects_event_tampering_even_if_guard_was_removed(self):
         with tempfile.TemporaryDirectory() as td:
             path = f"{td}/recovery.db"
             finding = RecoveryEngine().evaluate(RecoveryObservation(
@@ -315,11 +338,32 @@ class RecoveryWorksTests(unittest.TestCase):
             ledger.add(finding)
             ledger.approve(finding.finding_id, "reviewer-1", "Verified duplicate")
             with sqlite3.connect(path) as con:
+                con.execute("DROP TRIGGER recovery_events_no_update")
                 con.execute(
                     "UPDATE recovery_events SET payload_json = ? WHERE event_type = 'APPROVE'",
                     ('{"reviewer_id":"attacker","note":"forged"}',),
                 )
             with self.assertRaisesRegex(ValueError, "event hash mismatch"):
+                SQLiteRecoveryLedger(path)
+
+    def test_sqlite_ledger_detects_orphan_snapshot_if_event_chain_was_removed(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.UTILITY, client_id="c", counterparty_id="utility",
+                reference="bill-orphan", currency="USD", expected_cents=10000,
+                actual_cents=14000, rule=rule(), evidence=(evidence(),),
+                reason="TARIFF_VARIANCE", confidence_basis="verified tariff",
+            ))
+            ledger = SQLiteRecoveryLedger(path)
+            ledger.add(finding)
+            with sqlite3.connect(path) as con:
+                con.execute("DROP TRIGGER recovery_events_no_delete")
+                con.execute(
+                    "DELETE FROM recovery_events WHERE finding_id = ?",
+                    (finding.finding_id,),
+                )
+            with self.assertRaisesRegex(ValueError, "snapshot/event population mismatch"):
                 SQLiteRecoveryLedger(path)
 
     def test_freight_bridge_preserves_authority_gate(self):
