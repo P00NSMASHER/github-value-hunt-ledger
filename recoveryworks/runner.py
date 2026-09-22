@@ -9,8 +9,12 @@ from .durable_ledger import DurableRecoveryLedger
 from .engine import RecoveryEngine
 from .report import RecoveryScan360Report, build_scan360_report
 from .store import LocalBundleStore
-from .branches.ap import build_ap_observations
-from .branches.ap_csv import load_obligations_csv, load_payments_csv
+from .branches.ap import audit_ap_recovery
+from .branches.ap_csv import (
+    load_obligations_csv,
+    load_payments_csv,
+    load_vendor_statements_csv,
+)
 from .branches.freight_io import (
     load_freight_audit_result_bundle,
     load_freight_truth_manifest,
@@ -162,13 +166,40 @@ def run_scan360_config(
                 ),
             )
 
-        observations = build_ap_observations(
+        statements = ()
+        statements_csv = job.get("vendor_statements_csv")
+        if statements_csv:
+            statement_path = _resolve(
+                base,
+                statements_csv,
+                name=f"ap[{job_index}].vendor_statements_csv",
+            )
+            statements = load_vendor_statements_csv(
+                statement_path,
+                verified=_bool_setting(
+                    job,
+                    "vendor_statement_source_verified",
+                    context=f"ap[{job_index}]",
+                ),
+                default_statement_date=job.get("default_statement_date"),
+            )
+
+        batch = audit_ap_recovery(
             client_id=client_id,
             payments=payments,
             obligations=obligations,
+            statements=statements,
             currency=currency,
         )
-        for observation in observations:
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "ap",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
             finding = engine.evaluate(observation)
             if finding is None:
                 continue

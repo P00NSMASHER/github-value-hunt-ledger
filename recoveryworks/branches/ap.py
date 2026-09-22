@@ -1,14 +1,17 @@
-"""APRecovery ingestion and deterministic overpayment detection.
+"""APRecovery ingestion and deterministic recovery detection.
 
-This adapter is deliberately conservative:
-- verified obligation + verified payment evidence can produce VALIDATED dollars;
-- duplicate-looking payments without a verified obligation stay REVIEW;
-- grouping is exact on vendor + normalized invoice identity, never fuzzy vendor matching.
+The adapter consumes concrete payment, obligation, and vendor-statement records.
+It is intentionally conservative:
+- verified obligation + verified payments can produce VALIDATED overpayments;
+- a verified negative vendor-statement balance can produce a validated credit;
+- duplicate-looking payments without verified authority stay REVIEW;
+- duplicate payment IDs and contradictory statement evidence fail closed.
 """
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from datetime import date
 import re
 from typing import Any, Iterable, Mapping
 
@@ -29,6 +32,21 @@ def _positive_cents(name: str, value: int) -> int:
     if type(value) is not int or value <= 0:
         raise ValueError(f"{name} must be positive integer cents")
     return value
+
+
+def _signed_cents(name: str, value: int) -> int:
+    if type(value) is not int:
+        raise ValueError(f"{name} must be integer cents")
+    return value
+
+
+def _iso_date(name: str, value: str) -> str:
+    text = _required(name, value)
+    try:
+        date.fromisoformat(text)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be YYYY-MM-DD") from exc
+    return text
 
 
 def normalize_invoice_number(value: str) -> str:
@@ -53,12 +71,18 @@ class APPayment:
         for name in ("payment_id", "vendor_id", "invoice_number", "source_hash", "source_locator"):
             _required(name, getattr(self, name))
         _positive_cents("amount_cents", self.amount_cents)
+        if self.payment_date is not None:
+            _iso_date("payment_date", self.payment_date)
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
 
     @property
     def normalized_invoice(self) -> str:
         return normalize_invoice_number(self.invoice_number)
+
+    @property
+    def key(self) -> tuple[str, str]:
+        return (self.vendor_id, self.normalized_invoice)
 
     def evidence(self) -> EvidenceRef:
         return EvidenceRef(
@@ -95,6 +119,11 @@ class APObligation:
         ):
             _required(name, getattr(self, name))
         _positive_cents("expected_cents", self.expected_cents)
+        start = date.fromisoformat(_iso_date("effective_from", self.effective_from))
+        if self.effective_to is not None:
+            end = date.fromisoformat(_iso_date("effective_to", self.effective_to))
+            if end < start:
+                raise ValueError("effective_to cannot precede effective_from")
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
 
@@ -133,6 +162,102 @@ class APObligation:
         )
 
 
+@dataclass(frozen=True)
+class APVendorStatementLine:
+    """One invoice-level vendor statement balance.
+
+    Negative balance means the vendor reports a credit owed to the client.
+    Positive balance means the vendor reports an amount still due.
+    """
+
+    vendor_id: str
+    invoice_number: str
+    balance_cents: int
+    statement_date: str
+    source_hash: str
+    source_locator: str
+    verified: bool
+    metadata: Mapping[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        for name in ("vendor_id", "invoice_number", "source_hash", "source_locator"):
+            _required(name, getattr(self, name))
+        _signed_cents("balance_cents", self.balance_cents)
+        _iso_date("statement_date", self.statement_date)
+        if type(self.verified) is not bool:
+            raise ValueError("verified must be boolean")
+
+    @property
+    def normalized_invoice(self) -> str:
+        return normalize_invoice_number(self.invoice_number)
+
+    @property
+    def key(self) -> tuple[str, str]:
+        return (self.vendor_id, self.normalized_invoice)
+
+    def evidence(self) -> EvidenceRef:
+        return EvidenceRef(
+            evidence_id="ap-statement:" + canonical_hash({
+                "vendor_id": self.vendor_id,
+                "invoice_number": self.normalized_invoice,
+                "statement_date": self.statement_date,
+                "source_hash": self.source_hash,
+                "locator": self.source_locator,
+            }),
+            source_hash=self.source_hash,
+            locator=self.source_locator,
+            kind="vendor_statement",
+            verified=self.verified,
+            metadata={
+                "vendor_id": self.vendor_id,
+                "invoice_number": self.invoice_number,
+                "statement_date": self.statement_date,
+                "balance_cents": self.balance_cents,
+                **dict(self.metadata),
+            },
+        )
+
+    def credit_rule_ref(self) -> RuleRef:
+        if self.balance_cents >= 0:
+            raise ValueError("vendor statement line is not a credit")
+        identity = {
+            "schema": 1,
+            "vendor_id": self.vendor_id,
+            "invoice_number": self.normalized_invoice,
+            "statement_date": self.statement_date,
+            "credit_cents": abs(self.balance_cents),
+            "source_hash": self.source_hash,
+        }
+        return RuleRef(
+            rule_id="ap-statement-credit:" + canonical_hash(identity),
+            source_hash=self.source_hash,
+            effective_from=self.statement_date,
+            effective_to=None,
+            verified_controlling=self.verified,
+            source_locator=self.source_locator,
+            metadata={
+                "kind": "vendor_statement_credit",
+                "vendor_id": self.vendor_id,
+                "invoice_number": self.invoice_number,
+                "credit_cents": abs(self.balance_cents),
+                **dict(self.metadata),
+            },
+        )
+
+
+@dataclass(frozen=True)
+class APRecoveryException:
+    reference: str
+    code: str
+    detail: str
+
+
+@dataclass(frozen=True)
+class APRecoveryBatch:
+    observations: tuple[RecoveryObservation, ...]
+    exceptions: tuple[APRecoveryException, ...]
+
+
 def _obligation_index(obligations: Iterable[APObligation]) -> dict[tuple[str, str], APObligation]:
     result: dict[tuple[str, str], APObligation] = {}
     for obligation in obligations:
@@ -149,39 +274,146 @@ def _obligation_index(obligations: Iterable[APObligation]) -> dict[tuple[str, st
     return result
 
 
-def build_ap_observations(
+def _dedupe_payment_ids(
+    payments: Iterable[APPayment],
+) -> tuple[tuple[APPayment, ...], tuple[APRecoveryException, ...]]:
+    by_id: dict[str, list[APPayment]] = defaultdict(list)
+    for payment in payments:
+        by_id[payment.payment_id].append(payment)
+
+    accepted: list[APPayment] = []
+    exceptions: list[APRecoveryException] = []
+    for payment_id in sorted(by_id):
+        items = by_id[payment_id]
+        if len(items) == 1:
+            accepted.append(items[0])
+            continue
+        exceptions.append(APRecoveryException(
+            payment_id,
+            "DUPLICATE_PAYMENT_ID",
+            f"payment_id appears {len(items)} times; excluded from recovery math",
+        ))
+    return tuple(accepted), tuple(exceptions)
+
+
+def _latest_statement_index(
+    statements: Iterable[APVendorStatementLine],
+) -> tuple[dict[tuple[str, str], APVendorStatementLine], tuple[APRecoveryException, ...]]:
+    grouped: dict[tuple[str, str], list[APVendorStatementLine]] = defaultdict(list)
+    for item in statements:
+        grouped[item.key].append(item)
+
+    result: dict[tuple[str, str], APVendorStatementLine] = {}
+    exceptions: list[APRecoveryException] = []
+    for key in sorted(grouped):
+        items = sorted(grouped[key], key=lambda x: (x.statement_date, x.source_locator))
+        latest_date = items[-1].statement_date
+        latest = [item for item in items if item.statement_date == latest_date]
+        balances = {item.balance_cents for item in latest}
+        if len(balances) > 1:
+            reference = f"{key[0]}/{key[1]}"
+            exceptions.append(APRecoveryException(
+                reference,
+                "CONFLICTING_VENDOR_STATEMENT_LINES",
+                f"multiple balances exist for latest statement date {latest_date}",
+            ))
+            continue
+        result[key] = latest[-1]
+    return result, tuple(exceptions)
+
+
+def _unverified_rule(rule: RuleRef) -> RuleRef:
+    return replace(
+        rule,
+        verified_controlling=False,
+        metadata={**dict(rule.metadata), "verification_downgrade": "contradictory_statement"},
+    )
+
+
+def audit_ap_recovery(
     *,
     client_id: str,
     payments: Iterable[APPayment],
     obligations: Iterable[APObligation] = (),
+    statements: Iterable[APVendorStatementLine] = (),
     currency: str = "USD",
-) -> tuple[RecoveryObservation, ...]:
-    """Build AP overpayment observations from payment and obligation exports.
+) -> APRecoveryBatch:
+    """Audit AP records into proof-bound RecoveryObservations.
 
-    For invoice keys with an obligation, all payments are summed and compared to
-    the verified expected liability. For keys without an obligation, only exact
-    same-amount duplicate clusters are emitted, and they intentionally carry no
-    RuleRef so RecoveryEngine keeps them in REVIEW.
+    Vendor statements are used in two ways:
+    1. a matching negative credit can corroborate an obligation/payment overpay;
+    2. a statement-only negative credit is itself a recovery candidate.
+
+    A positive statement balance that contradicts a calculated overpayment does
+    not erase the candidate, but it forces the candidate back to REVIEW.
     """
     client_id = _required("client_id", client_id)
     currency = _required("currency", currency).upper()
 
+    accepted_payments, payment_exceptions = _dedupe_payment_ids(payments)
+    statement_by_key, statement_exceptions = _latest_statement_index(statements)
+    exceptions = list(payment_exceptions) + list(statement_exceptions)
+
     payment_groups: dict[tuple[str, str], list[APPayment]] = defaultdict(list)
-    for payment in payments:
-        payment_groups[(payment.vendor_id, payment.normalized_invoice)].append(payment)
+    for payment in accepted_payments:
+        payment_groups[payment.key].append(payment)
 
     obligation_by_key = _obligation_index(obligations)
     observations: list[RecoveryObservation] = []
+    represented_statement_keys: set[tuple[str, str]] = set()
 
     for key in sorted(payment_groups):
         vendor_id, normalized_invoice = key
         items = sorted(payment_groups[key], key=lambda p: p.payment_id)
         obligation = obligation_by_key.get(key)
+        statement = statement_by_key.get(key)
 
         if obligation is not None:
             actual_cents = sum(p.amount_cents for p in items)
             if actual_cents <= obligation.expected_cents:
                 continue
+            recovery_cents = actual_cents - obligation.expected_cents
+            evidence = [p.evidence() for p in items]
+            rule = obligation.rule_ref()
+            confidence = (
+                "verified obligation and payment evidence"
+                if obligation.verified and all(p.verified for p in items)
+                else "obligation/payment evidence requires verification"
+            )
+            metadata: dict[str, Any] = {
+                "normalized_invoice": normalized_invoice,
+                "payment_ids": [p.payment_id for p in items],
+                "payment_count": len(items),
+                "detection_basis": "obligation_vs_total_payments",
+            }
+
+            if statement is not None:
+                represented_statement_keys.add(key)
+                evidence.append(statement.evidence())
+                metadata["vendor_statement_balance_cents"] = statement.balance_cents
+                metadata["vendor_statement_date"] = statement.statement_date
+                if statement.balance_cents > 0:
+                    exceptions.append(APRecoveryException(
+                        f"{vendor_id}/{normalized_invoice}",
+                        "STATEMENT_CONTRADICTS_OVERPAYMENT",
+                        "vendor statement shows amount due while ledger math shows overpayment",
+                    ))
+                    rule = _unverified_rule(rule)
+                    confidence = "contradictory vendor statement requires human reconciliation"
+                elif statement.balance_cents < 0:
+                    statement_credit = abs(statement.balance_cents)
+                    matches = statement_credit == recovery_cents
+                    metadata["statement_credit_cents"] = statement_credit
+                    metadata["statement_credit_matches_recovery"] = matches
+                    if not matches:
+                        exceptions.append(APRecoveryException(
+                            f"{vendor_id}/{normalized_invoice}",
+                            "STATEMENT_CREDIT_MISMATCH",
+                            "vendor statement credit does not equal calculated overpayment",
+                        ))
+                        rule = _unverified_rule(rule)
+                        confidence = "vendor statement credit amount conflicts with ledger recovery math"
+
             observations.append(RecoveryObservation(
                 branch=Branch.AP,
                 client_id=client_id,
@@ -190,20 +422,11 @@ def build_ap_observations(
                 currency=currency,
                 expected_cents=obligation.expected_cents,
                 actual_cents=actual_cents,
-                rule=obligation.rule_ref(),
-                evidence=tuple(p.evidence() for p in items),
+                rule=rule,
+                evidence=tuple(evidence),
                 reason="AP_OBLIGATION_OVERPAYMENT",
-                confidence_basis=(
-                    "verified obligation and payment evidence"
-                    if obligation.verified and all(p.verified for p in items)
-                    else "obligation/payment evidence requires verification"
-                ),
-                metadata={
-                    "normalized_invoice": normalized_invoice,
-                    "payment_ids": [p.payment_id for p in items],
-                    "payment_count": len(items),
-                    "detection_basis": "obligation_vs_total_payments",
-                },
+                confidence_basis=confidence,
+                metadata=metadata,
             ))
             continue
 
@@ -215,6 +438,44 @@ def build_ap_observations(
             duplicates = sorted(by_amount[amount_cents], key=lambda p: p.payment_id)
             if len(duplicates) < 2:
                 continue
+            recovery_cents = amount_cents * (len(duplicates) - 1)
+            evidence = [p.evidence() for p in duplicates]
+            rule = None
+            confidence = (
+                "same vendor + normalized invoice + exact payment amount; "
+                "verified obligation still required"
+            )
+            reason = "SUSPECTED_DUPLICATE_PAYMENT"
+            metadata: dict[str, Any] = {
+                "normalized_invoice": normalized_invoice,
+                "payment_ids": [p.payment_id for p in duplicates],
+                "payment_count": len(duplicates),
+                "duplicate_amount_cents": amount_cents,
+                "detection_basis": "exact_invoice_amount_duplicate",
+            }
+            if statement is not None and statement.balance_cents < 0:
+                represented_statement_keys.add(key)
+                evidence.append(statement.evidence())
+                statement_credit = abs(statement.balance_cents)
+                metadata["vendor_statement_date"] = statement.statement_date
+                metadata["statement_credit_cents"] = statement_credit
+                metadata["statement_credit_matches_recovery"] = (
+                    statement_credit == recovery_cents
+                )
+                if statement_credit == recovery_cents:
+                    rule = statement.credit_rule_ref()
+                    reason = "VENDOR_STATEMENT_CONFIRMED_DUPLICATE_PAYMENT"
+                    confidence = (
+                        "exact duplicate payment cluster corroborated by vendor statement credit"
+                    )
+                else:
+                    exceptions.append(APRecoveryException(
+                        f"{vendor_id}/{normalized_invoice}",
+                        "STATEMENT_CREDIT_MISMATCH",
+                        "vendor statement credit does not equal suspected duplicate recovery",
+                    ))
+                    confidence = "duplicate cluster conflicts with vendor statement credit amount"
+
             observations.append(RecoveryObservation(
                 branch=Branch.AP,
                 client_id=client_id,
@@ -223,20 +484,61 @@ def build_ap_observations(
                 currency=currency,
                 expected_cents=amount_cents,
                 actual_cents=amount_cents * len(duplicates),
-                rule=None,
-                evidence=tuple(p.evidence() for p in duplicates),
-                reason="SUSPECTED_DUPLICATE_PAYMENT",
-                confidence_basis=(
-                    "same vendor + normalized invoice + exact payment amount; "
-                    "verified obligation still required"
-                ),
-                metadata={
-                    "normalized_invoice": normalized_invoice,
-                    "payment_ids": [p.payment_id for p in duplicates],
-                    "payment_count": len(duplicates),
-                    "duplicate_amount_cents": amount_cents,
-                    "detection_basis": "exact_invoice_amount_duplicate",
-                },
+                rule=rule,
+                evidence=tuple(evidence),
+                reason=reason,
+                confidence_basis=confidence,
+                metadata=metadata,
             ))
 
-    return tuple(observations)
+    for key in sorted(statement_by_key):
+        if key in represented_statement_keys:
+            continue
+        statement = statement_by_key[key]
+        if statement.balance_cents >= 0:
+            continue
+        credit_cents = abs(statement.balance_cents)
+        observations.append(RecoveryObservation(
+            branch=Branch.AP,
+            client_id=client_id,
+            counterparty_id=statement.vendor_id,
+            reference=f"{statement.normalized_invoice}:statement-credit",
+            currency=currency,
+            expected_cents=0,
+            actual_cents=credit_cents,
+            rule=statement.credit_rule_ref(),
+            evidence=(statement.evidence(),),
+            reason="VENDOR_STATEMENT_CREDIT",
+            confidence_basis=(
+                "verified vendor statement credit"
+                if statement.verified else "vendor statement requires verification"
+            ),
+            metadata={
+                "normalized_invoice": statement.normalized_invoice,
+                "statement_date": statement.statement_date,
+                "statement_credit_cents": credit_cents,
+                "detection_basis": "vendor_statement_negative_balance",
+            },
+        ))
+
+    observations.sort(key=lambda item: (item.counterparty_id, item.reference))
+    exceptions.sort(key=lambda item: (item.code, item.reference, item.detail))
+    return APRecoveryBatch(tuple(observations), tuple(exceptions))
+
+
+def build_ap_observations(
+    *,
+    client_id: str,
+    payments: Iterable[APPayment],
+    obligations: Iterable[APObligation] = (),
+    statements: Iterable[APVendorStatementLine] = (),
+    currency: str = "USD",
+) -> tuple[RecoveryObservation, ...]:
+    """Backward-compatible observation-only wrapper."""
+    return audit_ap_recovery(
+        client_id=client_id,
+        payments=payments,
+        obligations=obligations,
+        statements=statements,
+        currency=currency,
+    ).observations
