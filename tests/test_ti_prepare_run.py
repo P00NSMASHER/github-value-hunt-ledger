@@ -207,6 +207,13 @@ class PrepareRunTests(unittest.TestCase):
 
         self.claim["assignment_work_kind"] = "strategy_measurement"
         self.save_claim()
+        self.assignment(
+            slot_role="measurement",
+            work_kind="strategy_measurement",
+            source_id=self.claim["assignment_source_id"],
+            work_item_id=self.claim["work_item_id"],
+            work_action="search",
+        )
         with self.assertRaisesRegex(
             ValueError,
             "separate benchmark workflow",
