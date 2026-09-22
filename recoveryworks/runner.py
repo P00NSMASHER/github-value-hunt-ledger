@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
 from .durable_ledger import DurableRecoveryLedger
 from .engine import RecoveryEngine
@@ -11,6 +11,8 @@ from .report import RecoveryScan360Report, build_scan360_report
 from .store import LocalBundleStore
 from .branches.ap import build_ap_observations
 from .branches.ap_csv import load_obligations_csv, load_payments_csv
+from .branches.payer import audit_payer_lines
+from .branches.payer_csv import load_payer_lines_csv, load_payer_rates_csv
 from .branches.utility import audit_utility_bills
 from .branches.utility_io import (
     load_simple_tariff_definitions_json,
@@ -70,7 +72,7 @@ def run_scan360_config(
     state_path: str | Path,
     base_dir: str | Path = ".",
 ) -> Scan360RunResult:
-    """Run configured AP/utility recovery scans into one durable client ledger.
+    """Run configured AP/payer/utility scans into one durable client ledger.
 
     This function performs detection only. It never approves, authorizes, claims,
     contacts counterparties, or marks money recovered.
@@ -123,6 +125,54 @@ def run_scan360_config(
             currency=currency,
         )
         for observation in observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(_jobs(config.get("payer"), name="payer")):
+        lines_path = _resolve(
+            base, job.get("lines_csv"), name=f"payer[{job_index}].lines_csv"
+        )
+        rates_path = _resolve(
+            base, job.get("rates_csv"), name=f"payer[{job_index}].rates_csv"
+        )
+        default_effective_from = _required_text(
+            f"payer[{job_index}].default_effective_from",
+            job.get("default_effective_from"),
+        )
+        lines = load_payer_lines_csv(
+            lines_path,
+            verified=_bool_setting(
+                job, "line_source_verified", context=f"payer[{job_index}]"
+            ),
+        )
+        rates = load_payer_rates_csv(
+            rates_path,
+            verified=_bool_setting(
+                job, "rate_source_verified", context=f"payer[{job_index}]"
+            ),
+            default_effective_from=default_effective_from,
+            jurisdiction=job.get("jurisdiction"),
+        )
+        batch = audit_payer_lines(
+            client_id=client_id,
+            lines=lines,
+            rates=rates,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "payer",
+                "job_index": job_index,
+                "claim_surrogate_id": issue.claim_surrogate_id,
+                "line_id": issue.line_id,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
