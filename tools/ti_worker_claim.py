@@ -55,6 +55,13 @@ def main():
     if not state:
         raise SystemExit(f"unknown slot {packet['slot_id']}")
     policy=json.loads((INTEL/"execution_policy.json").read_text(encoding="utf-8"))
+    runtime_policy=json.loads((INTEL/"hunter_runtime_policy.json").read_text(encoding="utf-8"))
+    if runtime_policy.get("mode")!="measurement_canary":
+        raise SystemExit("current hunter runtime policy is not an approved measurement canary")
+    if packet.get("runtime_approval_id")!=runtime_policy.get("approval_id"):
+        raise SystemExit("activation packet approval ID is stale relative to current runtime policy")
+    if packet.get("runtime_approval_record_sha256")!=runtime_policy.get("approval_record_sha256"):
+        raise SystemExit("activation packet approval record hash is stale relative to current runtime policy")
     if state["status"] not in set(policy.get("claimable_states") or []):
         raise SystemExit(f"dispatch slot is no longer claimable: {state['status']}")
 
@@ -102,7 +109,8 @@ def main():
       "presence_event_id":packet.get("presence_event_id"),
       "activation_id":packet.get("activation_id"),
       "activation_generation_id":packet.get("activation_generation_id"),
-      "runtime_approval_id":packet.get("runtime_approval_id")
+      "runtime_approval_id":packet.get("runtime_approval_id"),
+      "runtime_approval_record_sha256":packet.get("runtime_approval_record_sha256")
     }
     path=INTEL/"execution_events"/f"{packet['slot_id']}.jsonl"
     with path.open("a",encoding="utf-8") as f:
