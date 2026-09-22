@@ -6,6 +6,7 @@ Repository-side readiness for a future adaptive-learning hunter canary. **This r
 - Explicit user approval required: **yes**
 - Precommitted measurement packets: **3**
 - Frozen benchmark matched: **47/50**
+- Unmatched benchmark tasks: **06, 07, 08**
 - Shadow runs: **55** (required 15)
 - Split key commitment active: **true**
 - Split secret available to workflow: **true**
