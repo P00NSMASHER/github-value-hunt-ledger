@@ -28,6 +28,7 @@ coord = read_json("coordination_metrics.json", {})
 learning = read_json("LEARNING_STATE.json", {})
 repair = read_json("REPAIR_QUEUE.json", {})
 repair_intake = read_json("REPAIR_CANDIDATE_INTAKE.json", {})
+skill_eval_results = read_json("SKILL_EVAL_RESULT_INTAKE.json", {})
 
 gaps = policy.get("priority_capability_gaps") or []
 constraints = policy.get("domain_constraints") or []
@@ -211,6 +212,12 @@ lines.append(
     f"- Repair-candidate intake: **{repair_intake_summary.get('ready_for_skill_eval', 0)} ready for independent skill evaluation**, "
     f"**{repair_intake_summary.get('blocked', 0)} blocked**. "
     "READY_FOR_SKILL_EVAL is not a live/global promotion."
+)
+skill_eval_summary = skill_eval_results.get("summary") or {}
+lines.append(
+    f"- Skill-evaluation intake: **{skill_eval_summary.get('staged_mutations', 0)} staged mutation(s)**, "
+    f"**{skill_eval_summary.get('blocked', 0)} blocked**. "
+    "STAGED_MUTATION is still not deployed/canary/global."
 )
 
 lines += [
