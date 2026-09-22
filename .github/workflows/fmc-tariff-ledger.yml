@@ -26,7 +26,7 @@ on:
       artifact_retention_days:
         description: Raw snapshot artifact retention
         required: true
-        default: "7"
+        default: "90"
         type: string
   push:
     branches: [main]
@@ -135,7 +135,7 @@ jobs:
         with:
           name: fmc-shard-${{ matrix.shard }}
           path: production/fmc_tariff_ledger/output/shard-${{ matrix.shard }}/
-          retention-days: ${{ inputs.artifact_retention_days || 7 }}
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
           compression-level: 0
           if-no-files-found: error
       - name: Upload compact shard metadata
@@ -143,7 +143,7 @@ jobs:
         with:
           name: fmc-metadata-shard-${{ matrix.shard }}
           path: production/fmc_tariff_ledger/metadata/shard-${{ matrix.shard }}/
-          retention-days: ${{ inputs.artifact_retention_days || 7 }}
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
           compression-level: 6
           if-no-files-found: error
 
@@ -194,6 +194,6 @@ jobs:
         with:
           name: fmc-tariff-rule-ledger-merged
           path: production/fmc_tariff_ledger/merged/
-          retention-days: ${{ inputs.artifact_retention_days || 7 }}
+          retention-days: ${{ inputs.artifact_retention_days || 90 }}
           compression-level: 6
           if-no-files-found: error
