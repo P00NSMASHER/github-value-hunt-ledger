@@ -679,10 +679,23 @@ def write_blob(blob_root: Path, digest: str, raw: bytes) -> str:
     rel = Path("blobs") / "sha256" / digest[:2] / digest
     path = blob_root.parent / rel
     path.parent.mkdir(parents=True, exist_ok=True)
-    if not path.exists():
-        tmp = path.with_suffix(".tmp")
+    if path.exists():
+        return str(rel)
+
+    # Multiple crawl workers frequently encounter the same shared-publisher
+    # bytes. Use a per-process/per-thread temp name so concurrent identical
+    # content can safely race to the same content-addressed final path.
+    tmp = path.with_name(
+        f"{path.name}.{os.getpid()}.{threading.get_ident()}.tmp"
+    )
+    try:
         tmp.write_bytes(raw)
         os.replace(tmp, path)
+    finally:
+        try:
+            tmp.unlink()
+        except FileNotFoundError:
+            pass
     return str(rel)
 
 
