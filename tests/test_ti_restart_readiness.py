@@ -244,6 +244,74 @@ class RestartReadinessTests(unittest.TestCase):
             },
         )
 
+    def test_active_generated_claim_blocks_canary(self):
+        report = build_restart_readiness(
+            split_status=split_status(ready=True),
+            activation_metrics={
+                "current_activations": 0
+            },
+            packets=packets(),
+            scoreboard_text=scoreboard(50),
+            shadow_results=shadows(5),
+            execution_claim_history=[
+                {
+                    "claim_id": "CLAIM:aaaaaaaaaaaa",
+                    "routing_mode": "generated",
+                    "status": "RUNNING",
+                }
+            ],
+        )
+        self.assertEqual(report["state"], "BLOCKED")
+        self.assertFalse(
+            report["gates"]["no_active_generated_claims"]
+        )
+        self.assertEqual(
+            report["evidence"]["active_generated_claim_ids"],
+            ["CLAIM:aaaaaaaaaaaa"],
+        )
+        blocker = next(
+            row
+            for row in report["blockers"]
+            if row["code"] == "active_generated_claims_present"
+        )
+        self.assertEqual(
+            blocker["active_generated_claim_count"],
+            1,
+        )
+        self.assertEqual(
+            validate_restart_readiness(report),
+            [],
+        )
+
+    def test_manual_override_claim_does_not_count_as_generated_debt(self):
+        report = build_restart_readiness(
+            split_status=split_status(ready=True),
+            activation_metrics={
+                "current_activations": 0
+            },
+            packets=packets(),
+            scoreboard_text=scoreboard(50),
+            shadow_results=shadows(5),
+            execution_claim_history=[
+                {
+                    "claim_id": "CLAIM:bbbbbbbbbbbb",
+                    "routing_mode": "manual_override",
+                    "status": "RUNNING",
+                }
+            ],
+        )
+        self.assertEqual(
+            report["state"],
+            "AWAITING_EXPLICIT_USER_APPROVAL",
+        )
+        self.assertTrue(
+            report["gates"]["no_active_generated_claims"]
+        )
+        self.assertEqual(
+            report["evidence"]["active_generated_claim_ids"],
+            [],
+        )
+
     def test_missing_or_unpaired_packets_block_canary(self):
         bad = packets()
         bad["packets"] = []
