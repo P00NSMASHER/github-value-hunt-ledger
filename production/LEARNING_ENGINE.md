@@ -254,3 +254,20 @@ The shared build now executes, validates and persists all three post-failure sta
 
 `repair candidate -> skill evaluation -> skill promotion evidence -> global review`
 
+### 13. Blind measurement curriculum — implemented
+
+\`production/learning_curriculum.py\` converts the live train/confirm evidence deficit into a bounded measurement plan without using learned value to select what gets measured.
+
+The curriculum reserves two gate-closing measurement slots plus one zero-run exploration slot. Selection uses evidence quantity only; Q-values, reward means, realized commercial value and current policy allocation are audit fields and cannot influence measurement priority.
+
+Every recommended measurement requires the normal generated assignment/claim path. Train/confirm membership must remain blind until canonical ingestion, and retries may never be used to seek a different partition.
+
+Suppressed \`overfit_signal\` and \`confirm_regression_signal\` strategies are routed conceptually to repair/falsification rather than more measurement. Confirmed strategies receive no measurement quota.
+
+Generated artifacts:
+
+- \`intelligence/learning_curriculum.json\`;
+- \`intelligence/LEARNING_CURRICULUM.md\`.
+
+The top measurement debts are also exposed in \`NETWORK_PRIORS.md\`. The curriculum remains \`policy_effect=none\` and does not alter allocator weights or activate work by itself.
+
