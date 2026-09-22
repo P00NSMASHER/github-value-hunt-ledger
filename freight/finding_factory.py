@@ -252,6 +252,140 @@ def _finish(
     )
 
 
+def verify_finding_factory_batch(batch: FindingFactoryBatch) -> None:
+    """Re-verify persisted/imported Finding Factory proof semantics.
+
+    This is intentionally independent of the review queue. It proves that the
+    derivation fields, referenced findings, frozen truth, and factory hash agree
+    with one another. Review-packet construction separately re-derives each
+    charge from the supplied charge/rule evidence.
+    """
+    if not isinstance(batch, FindingFactoryBatch):
+        raise ValueError("batch must be FindingFactoryBatch")
+
+    seen_charge_ids: set[str] = set()
+    expected_findings: list[Finding] = []
+    expected_authorities: dict[str, AuthorityRef] = {}
+
+    for item in batch.derivations:
+        if item.charge_id in seen_charge_ids:
+            raise ValueError("duplicate derivation charge_id")
+        seen_charge_ids.add(item.charge_id)
+
+        _text("charge_id", item.charge_id)
+        _cents("billed_cents", item.billed_cents)
+        if item.expected_cents is None:
+            if item.variance_cents is not None:
+                raise ValueError("derivation variance requires an expected amount")
+        else:
+            _cents("expected_cents", item.expected_cents)
+            expected_variance = max(item.billed_cents - item.expected_cents, 0)
+            if item.variance_cents != expected_variance:
+                raise ValueError("derivation variance does not match billed/expected amounts")
+
+        if item.variance_cents is not None:
+            _cents("variance_cents", item.variance_cents)
+
+        if not isinstance(item.matched_rule_hashes, tuple):
+            raise ValueError("matched_rule_hashes must be a tuple")
+        if item.matched_rule_hashes != tuple(sorted(item.matched_rule_hashes)):
+            raise ValueError("matched_rule_hashes must be sorted")
+        if len(item.matched_rule_hashes) != len(set(item.matched_rule_hashes)):
+            raise ValueError("duplicate matched rule hash")
+
+        finding = item.finding
+        authority = item.authority_ref
+        if item.decision == VALIDATED:
+            if finding is None or finding.status != VALIDATED:
+                raise ValueError("validated derivation requires a validated finding")
+            if authority is None:
+                raise ValueError("validated derivation requires controlling authority")
+            if finding.authority_id != authority.authority_id:
+                raise ValueError("derivation authority does not match finding")
+            if item.expected_cents is None or item.variance_cents is None:
+                raise ValueError("validated derivation requires calculable amounts")
+        elif item.decision == CLEAR:
+            if finding is not None:
+                raise ValueError("clear derivation cannot carry a finding")
+            if item.expected_cents is None or item.variance_cents != 0:
+                raise ValueError("clear derivation requires a zero calculable variance")
+        elif item.decision == REVIEW:
+            if finding is not None and finding.status != REVIEW:
+                raise ValueError("review derivation can only carry a review finding")
+            if finding is not None and authority is not None:
+                raise ValueError("review finding cannot assert controlling authority")
+        else:
+            raise ValueError("unsupported derivation decision")
+
+        if finding is not None:
+            if finding.actual_cents != item.billed_cents:
+                raise ValueError("derivation billed amount does not match finding")
+            if item.expected_cents is None or finding.expected_cents != item.expected_cents:
+                raise ValueError("derivation expected amount does not match finding")
+            finding_fields = asdict(finding)
+            finding_digest = finding_fields.pop("proof_hash")
+            if canonical_hash({"schema": 2, **finding_fields}) != finding_digest:
+                raise ValueError("finding proof hash mismatch")
+            expected_findings.append(finding)
+
+        if (
+            finding is not None
+            and finding.status == VALIDATED
+            and authority is not None
+        ):
+            old = expected_authorities.get(authority.authority_id)
+            if old is not None and old != authority:
+                raise ValueError("conflicting derivation authority")
+            expected_authorities[authority.authority_id] = authority
+
+        body = {
+            "schema": 1,
+            "charge_id": item.charge_id,
+            "decision": item.decision,
+            "reason": item.reason,
+            "billed_cents": item.billed_cents,
+            "expected_cents": item.expected_cents,
+            "variance_cents": item.variance_cents,
+            "charge_hash": item.charge_hash,
+            "matched_rule_hashes": item.matched_rule_hashes,
+            "authority_id": authority.authority_id if authority else None,
+            "finding_proof_hash": finding.proof_hash if finding else None,
+        }
+        if canonical_hash(body) != item.derivation_hash:
+            raise ValueError("derivation hash mismatch: " + item.charge_id)
+
+    findings = tuple(sorted(expected_findings, key=lambda finding: finding.finding_id))
+    if len({finding.finding_id for finding in findings}) != len(findings):
+        raise ValueError("duplicate finding_id across derivations")
+    authorities = tuple(
+        sorted(expected_authorities.values(), key=lambda authority: authority.authority_id)
+    )
+    if batch.truth.findings != findings:
+        raise ValueError("frozen truth findings do not match derivations")
+    if batch.truth.authorities != authorities:
+        raise ValueError("frozen truth authorities do not match derivations")
+
+    truth_body = {
+        "schema": 3,
+        "buyer_id": batch.truth.buyer_id,
+        "business_unit": batch.truth.business_unit,
+        "population_hash": batch.truth.population_hash,
+        "authorities": [asdict(authority) for authority in batch.truth.authorities],
+        "findings": [asdict(finding) for finding in batch.truth.findings],
+    }
+    if canonical_hash(truth_body) != batch.truth.truth_hash:
+        raise ValueError("frozen truth hash mismatch")
+
+    factory_body = {
+        "schema": 1,
+        "population_hash": batch.truth.population_hash,
+        "derivation_hashes": [item.derivation_hash for item in batch.derivations],
+        "truth_hash": batch.truth.truth_hash,
+    }
+    if canonical_hash(factory_body) != batch.factory_hash:
+        raise ValueError("Finding Factory batch hash mismatch")
+
+
 def derive_charge(charge: InvoiceCharge, rules: Iterable[ChargeRule]) -> ChargeDerivation:
     service_day = _validate_charge(charge)
     candidates = tuple(
