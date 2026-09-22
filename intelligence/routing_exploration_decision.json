@@ -1,23 +1,32 @@
 {
-  "exploration_generation_id": "ROUTEEXP:be694c6e7656",
-  "seed_hash": "be694c6e7656812464dc29728c2044a35ef6b1ab81d3ff80fc36e34082a6a670",
-  "gate_value": 0.50446158,
+  "exploration_generation_id": "ROUTEEXP:f4243defd8e0",
+  "seed_hash": "f4243defd8e020a3cc7f748dcc796a888544609aa2da957b3b6d49ce7e88bce3",
+  "gate_value": 0.12749937,
   "exploration_probability": 0.25,
   "baseline_total_score": 284.1736,
-  "applied": false,
-  "reason": "gate_closed",
-  "pair_id": null,
-  "workers": [],
-  "baseline_slots": [],
-  "exploration_slots": [],
-  "match_level": null,
-  "match_basis": null,
+  "applied": true,
+  "reason": "controlled_low_regret_swap",
+  "pair_id": "EXPPAIR:4d45105dccaf",
+  "workers": [
+    "HUNTER-10",
+    "HUNTER-12"
+  ],
+  "baseline_slots": [
+    "SLOT-10",
+    "SLOT-11"
+  ],
+  "exploration_slots": [
+    "SLOT-11",
+    "SLOT-10"
+  ],
+  "match_level": 3,
+  "match_basis": "role+work_kind+strategy+objective",
   "absolute_regret": 0.0,
   "relative_regret": 0.0,
-  "measurement_need": 0,
-  "candidate_count": 0,
-  "routing_generation_id": "ROUTING:c27be08cb344",
+  "measurement_need": 6,
+  "candidate_count": 1,
+  "routing_generation_id": "ROUTING:fca4c1677a32",
   "worker_profile_generation_id": "WORKERS:70e9f3831b9f",
   "routing_learning_generation_id": "ROUTELEARN:bc40639ef4db",
-  "activation_response_learning_generation_id": "RESPLEARN:7fe1295d336a"
+  "activation_response_learning_generation_id": "RESPLEARN:ecc3e3bdc5f0"
 }
