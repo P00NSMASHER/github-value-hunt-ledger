@@ -46,3 +46,45 @@ From repository root:
     python -m unittest recoveryworks.test_recoveryworks
 
 The foundation intentionally uses only Python's standard library.
+
+## Multibranch adapter status
+
+RecoveryOS now has concrete normalization adapters for all six initial branches:
+
+- FreightRecovery bridges existing proof-bound freight findings.
+- PayerRecovery accepts deterministic expected reimbursement vs paid amounts.
+- UtilityRecovery accepts effective-dated tariff recalculation results.
+- APRecovery accepts deterministic payment/reconciliation variances.
+- ConstructionRecovery accepts reviewed entitlement amounts and paid amounts.
+- DutyRecovery accepts deterministic tariff/fee expected-vs-paid results.
+
+Every non-freight adapter is date-scoped. If the proposed controlling rule is
+outside its effective window for the transaction/event date, the rule remains
+visible for review but its controlling flag is revoked and the finding cannot
+become VALIDATED.
+
+## Fulfillment packets
+
+`build_recovery_packet()` converts a ledger record into a deterministic,
+hash-addressed fulfillment packet containing the money calculation, rule
+provenance, evidence locators, case state, and readiness gates.
+
+`submission_ready(packet)` is true only when all of the following are true:
+
+- the finding is VALIDATED;
+- the controlling rule is verified;
+- every load-bearing evidence item is verified;
+- a human reviewer approved the case;
+- explicit customer authorization exists; and
+- the case is currently in AUTHORIZED state.
+
+`build_client_portfolio_packet()` produces a client-isolated, hash-addressed
+rollup across branches without leaking records belonging to another client.
+
+## Audit trail
+
+RecoveryLedger now emits an append-only SHA-256 event chain for add, approval,
+authorization, claim, rejection, and recovery transitions. Duplicate ingestion,
+identical repeated approval, and identical repeated authorization are idempotent.
+The ledger exposes an audit head and snapshot hash so a delivered portfolio can
+be tied back to the exact case state used to produce it.
