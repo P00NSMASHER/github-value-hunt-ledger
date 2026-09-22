@@ -158,6 +158,41 @@
       "adapter": "monthly_toc_templates",
       "source_url": "https://content.upmchp.com/publicweb/table-of-contents/",
       "notes": "{\"base_url\":\"https://content.upmchp.com/publicweb/table-of-contents/\",\"file_templates\":[\"{month_start}_UPMC-Health-Plan_index.json\"],\"month_offsets\":[0,-1]}"
+    },
+    {
+      "source_key": "bcbsri-azure-listing",
+      "payer_name": "Blue Cross Blue Shield of Rhode Island",
+      "adapter": "xml_object_listing",
+      "source_url": "https://api.bcbsri.com/public/price-transparency?restype=container&comp=list&prefix=/index/",
+      "notes": "{\"kind\":\"azure\",\"listing_urls\":[\"https://api.bcbsri.com/public/price-transparency?restype=container&comp=list&prefix=/index/\"],\"max_targets\":1000}"
+    },
+    {
+      "source_key": "hostedjson-azure-listing",
+      "payer_name": "HostedJSON multi-payer TiC",
+      "adapter": "xml_object_listing",
+      "source_url": "https://hostedjson.blob.core.windows.net/transparencyfiles?restype=container&comp=list",
+      "notes": "{\"kind\":\"azure\",\"listing_urls\":[\"https://hostedjson.blob.core.windows.net/transparencyfiles?restype=container&comp=list\"],\"skip_toc_targets\":true,\"max_targets\":1000}"
+    },
+    {
+      "source_key": "ghcscw-azure-listing",
+      "payer_name": "Group Health Cooperative of South Central Wisconsin",
+      "adapter": "xml_object_listing",
+      "source_url": "https://transparencyincoverage.blob.core.windows.net/public?restype=container&comp=list&prefix=2026",
+      "notes": "{\"kind\":\"azure\",\"listing_urls\":[\"https://transparencyincoverage.blob.core.windows.net/public?restype=container&comp=list&prefix=2026\"],\"max_targets\":1000}"
+    },
+    {
+      "source_key": "pacificsource-azure-listing",
+      "payer_name": "PacificSource",
+      "adapter": "xml_object_listing",
+      "source_url": "https://w2bipdmrfsa.blob.core.windows.net/$web?restype=container&comp=list&prefix=202",
+      "notes": "{\"kind\":\"azure\",\"listing_urls\":[\"https://w2bipdmrfsa.blob.core.windows.net/$web?restype=container&comp=list&prefix=202\"],\"max_targets\":24}"
+    },
+    {
+      "source_key": "lacare-s3-listing",
+      "payer_name": "L.A. Care Health Plan",
+      "adapter": "xml_object_listing",
+      "source_url": "https://lac-transparency-prod.s3.amazonaws.com",
+      "notes": "{\"kind\":\"s3\",\"listing_urls\":[\"https://lac-transparency-prod.s3.amazonaws.com\"],\"public_base_url\":\"https://transparency.lacare.org\",\"include_prefixes\":[\"index/\",\"download/\"],\"max_targets\":5000}"
     }
   ]
 }
