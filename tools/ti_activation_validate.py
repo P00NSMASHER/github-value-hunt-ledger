@@ -30,6 +30,7 @@ PREACTIVATION_READINESS=build_restart_readiness(
     packets=MEASUREMENT_PACKETS,
     scoreboard_text=scoreboard,
     shadow_results=shadow_results,
+    execution_claim_history=CLAIM_HISTORY,
 )
 RUNTIME_GATE=evaluate_runtime_activation_gate(
     RUNTIME_POL,
