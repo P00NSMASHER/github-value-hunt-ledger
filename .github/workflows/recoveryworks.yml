@@ -25,4 +25,4 @@ jobs:
       - name: Compile
         run: python -m compileall -q recoveryworks
       - name: Test RecoveryWorks
-        run: python -m unittest recoveryworks.test_recoveryworks -v
+        run: python -m unittest discover -s recoveryworks -p "test_*.py" -v
