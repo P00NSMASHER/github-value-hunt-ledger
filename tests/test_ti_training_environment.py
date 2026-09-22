@@ -622,6 +622,32 @@ class TrainingEnvironmentTests(unittest.TestCase):
             [],
         )
 
+    def test_validator_rejects_malformed_move_telemetry(self):
+        run = search_run("RUN:bad-move")
+        run["search_moves"] = [
+            {
+                "move_type": "code_signature_search",
+                "result": "qualifying_hit",
+                "candidate_count": 1,
+                "deep_inspected": 1,
+                "retained_count": 1,
+            }
+        ]
+        environment = build_training_environment(
+            [run],
+            [],
+        )
+        environment["episodes"][0]["action"]["search_moves"][0][
+            "result"
+        ] = "invented_result"
+        errors = validate_training_environment(environment)
+        self.assertTrue(
+            any(
+                error.startswith("invalid_move_result:")
+                for error in errors
+            )
+        )
+
     def test_immediate_only_episode_is_capped(self):
         environment = build_training_environment(
             [
