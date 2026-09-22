@@ -75,6 +75,23 @@ from .readiness import (
 )
 from .durable_ledger import DurableRecoveryLedger
 from .engine import RecoveryEngine, RecoveryObservation
+from .reconciliation_kernel import (
+    ManyToOneConfig,
+    MatchGroup,
+    MatchReceipt,
+    ReconConfig,
+    ReconResult,
+    ReconSummary,
+    ReconTxn,
+    Residual,
+    ResidualCandidate,
+    SOURCE_COMMIT as RECON_SOURCE_COMMIT,
+    SOURCE_LICENSE as RECON_SOURCE_LICENSE,
+    SOURCE_REPOSITORY as RECON_SOURCE_REPOSITORY,
+    normalize_reference as normalize_reconciliation_reference,
+    parse_amount_to_minor,
+    reconcile,
+)
 from .journal import JournalEvent, RecoveryJournal
 from .ledger import RecoveryLedger
 from .report import RecoveryScan360Report, build_scan360_report
@@ -128,6 +145,18 @@ __all__ = [
     "PopulationSegment",
     "PublicVerificationRecord",
     "RecoveryObservation",
+    "ManyToOneConfig",
+    "MatchGroup",
+    "MatchReceipt",
+    "ReconConfig",
+    "ReconResult",
+    "ReconSummary",
+    "ReconTxn",
+    "Residual",
+    "ResidualCandidate",
+    "RECON_SOURCE_COMMIT",
+    "RECON_SOURCE_LICENSE",
+    "RECON_SOURCE_REPOSITORY",
     "RecoveryScan360Report",
     "RecoveryScanBatch",
     "RecoveryScanManifest",
@@ -160,6 +189,9 @@ __all__ = [
     "run_scan",
     "hostile_packet_hash",
     "merkle_root",
+    "normalize_reconciliation_reference",
+    "parse_amount_to_minor",
+    "reconcile",
     "prepare_external_action",
     "readiness_from_payload",
     "readiness_to_payload",
