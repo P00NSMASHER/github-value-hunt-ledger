@@ -1,4 +1,6 @@
 from types import SimpleNamespace
+import sqlite3
+import tempfile
 import unittest
 
 from recoveryworks import (
@@ -8,14 +10,16 @@ from recoveryworks import (
     FindingState,
     RecoveryEngine,
     RecoveryLedger,
+    SQLiteRecoveryLedger,
     RecoveryObservation,
     RuleRef,
     SourceManifestEntry,
     freeze_scan,
     run_scan,
 )
+from recoveryworks.branches.base import BranchInput
 from recoveryworks.branches.freight import from_freight_finding
-from recoveryworks.branches.registry import BRANCHES
+from recoveryworks.branches.registry import ADAPTERS, BRANCHES, normalize
 
 
 def evidence(verified=True):
@@ -42,6 +46,26 @@ def rule(verified=True):
 class RecoveryWorksTests(unittest.TestCase):
     def test_all_six_branches_registered(self):
         self.assertEqual(set(BRANCHES), set(Branch))
+        self.assertEqual(set(ADAPTERS), set(Branch))
+
+    def test_branch_registry_normalizes_without_bypassing_common_engine(self):
+        item = BranchInput(
+            client_id="c",
+            counterparty_id="payer",
+            reference="claim-1",
+            currency="USD",
+            expected_cents=20000,
+            actual_cents=15000,
+            rule=rule(),
+            evidence=(evidence(),),
+            reason="PAYER_UNDERPAYMENT",
+            confidence_basis="verified payer schedule",
+        )
+        observation = normalize(Branch.PAYER, item)
+        self.assertIs(observation.branch, Branch.PAYER)
+        finding = RecoveryEngine().evaluate(observation)
+        self.assertEqual(finding.potential_recovery_cents, 5000)
+        self.assertIs(finding.state, FindingState.VALIDATED)
 
     def test_overpayment_and_underpayment_modes(self):
         engine = RecoveryEngine()
@@ -80,6 +104,23 @@ class RecoveryWorksTests(unittest.TestCase):
         ))
         self.assertIsNone(finding)
 
+    def test_invalid_observation_cannot_hide_behind_zero_variance(self):
+        engine = RecoveryEngine()
+        with self.assertRaisesRegex(ValueError, "expected_cents"):
+            engine.evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="bad", currency="USD", expected_cents=-1,
+                actual_cents=-1, rule=rule(), evidence=(evidence(),),
+                reason="BAD", confidence_basis="bad input",
+            ))
+        with self.assertRaisesRegex(ValueError, "evidence"):
+            engine.evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="bad2", currency="USD", expected_cents=100,
+                actual_cents=100, rule=rule(), evidence=(),
+                reason="BAD", confidence_basis="missing proof",
+            ))
+
     def test_ledger_requires_review_and_authorization_before_claim(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
             branch=Branch.DUTY, client_id="c", counterparty_id="customs",
@@ -113,6 +154,135 @@ class RecoveryWorksTests(unittest.TestCase):
         self.assertEqual(a.finding.finding_id, b.finding.finding_id)
         self.assertEqual(ledger.rollup()["totals"]["cases"], 1)
 
+    def test_rejected_validated_case_is_removed_from_live_rollups(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.FREIGHT, client_id="c", counterparty_id="carrier",
+            reference="bad-1", currency="USD", expected_cents=10000,
+            actual_cents=13000, rule=rule(), evidence=(evidence(),),
+            reason="OVERCHARGE", confidence_basis="verified inputs",
+        ))
+        ledger = RecoveryLedger()
+        ledger.add(finding)
+        before = ledger.rollup()["totals"]
+        self.assertEqual(before["validated_cents"], 3000)
+        ledger.reject(finding.finding_id, "reviewer-1", "Source was superseded")
+        after = ledger.rollup()["totals"]
+        self.assertEqual(after["discovered_cents"], 3000)
+        self.assertEqual(after["potential_cents"], 0)
+        self.assertEqual(after["validated_cents"], 0)
+        self.assertEqual(after["rejected_cases"], 1)
+
+    def test_rejected_or_recovered_case_cannot_reenter_authorization(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.DUTY, client_id="c", counterparty_id="customs",
+            reference="entry-2", currency="USD", expected_cents=10000,
+            actual_cents=15000, rule=rule(), evidence=(evidence(),),
+            reason="DUTY_VARIANCE", confidence_basis="verified tariff",
+        ))
+        rejected = RecoveryLedger()
+        rejected.add(finding)
+        rejected.reject(finding.finding_id, "reviewer-1", "False positive")
+        with self.assertRaises(ValueError):
+            rejected.approve(finding.finding_id, "reviewer-2", "Try to reopen")
+        with self.assertRaises(ValueError):
+            rejected.authorize(finding.finding_id, "auth-should-fail")
+
+        recovered = RecoveryLedger()
+        recovered.add(finding)
+        recovered.approve(finding.finding_id, "reviewer-1", "Verified")
+        recovered.authorize(finding.finding_id, "auth-1")
+        recovered.mark_claimed(finding.finding_id)
+        recovered.mark_recovered(finding.finding_id, 5000, 1000)
+        with self.assertRaises(ValueError):
+            recovered.authorize(finding.finding_id, "auth-2")
+
+    def test_sqlite_ledger_survives_restart_with_same_state(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.UTILITY, client_id="c", counterparty_id="utility",
+                reference="bill-77", currency="USD", expected_cents=10000,
+                actual_cents=14000, rule=rule(), evidence=(evidence(),),
+                reason="TARIFF_VARIANCE", confidence_basis="verified tariff",
+            ))
+            ledger = SQLiteRecoveryLedger(path)
+            ledger.add(finding)
+            ledger.approve(finding.finding_id, "reviewer-1", "Verified tariff and bill")
+            ledger.authorize(finding.finding_id, "customer-auth-77")
+            ledger.mark_claimed(finding.finding_id)
+            final = ledger.mark_recovered(finding.finding_id, 3500, 700)
+            final_hash = final.record_hash
+
+            reopened = SQLiteRecoveryLedger(path)
+            restored = reopened.get(finding.finding_id)
+            self.assertIs(restored.case_state, CaseState.RECOVERED)
+            self.assertEqual(restored.recovered_cents, 3500)
+            self.assertEqual(restored.fee_cents, 700)
+            self.assertEqual(restored.record_hash, final_hash)
+            reopened.verify_event_chains()
+
+    def test_sqlite_ledger_rejects_stale_writer_and_reloads_authoritative_state(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.FREIGHT, client_id="c", counterparty_id="carrier",
+                reference="invoice-concurrent", currency="USD", expected_cents=10000,
+                actual_cents=13000, rule=rule(), evidence=(evidence(),),
+                reason="OVERCHARGE", confidence_basis="verified contract",
+            ))
+            writer_a = SQLiteRecoveryLedger(path)
+            writer_a.add(finding)
+            writer_b = SQLiteRecoveryLedger(path)
+
+            writer_a.approve(finding.finding_id, "reviewer-a", "Verified by A")
+            with self.assertRaisesRegex(ValueError, "stale recovery ledger state"):
+                writer_b.approve(finding.finding_id, "reviewer-b", "Conflicting stale review")
+
+            reloaded = writer_b.get(finding.finding_id)
+            self.assertTrue(reloaded.reviewer_approved)
+            self.assertEqual(reloaded.reviewer_id, "reviewer-a")
+            self.assertEqual(reloaded.review_note, "Verified by A")
+            writer_b.verify_event_chains()
+
+    def test_sqlite_add_on_stale_process_rehydrates_existing_lifecycle(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="payment-stale", currency="USD", expected_cents=0,
+                actual_cents=10000, rule=rule(), evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+            ))
+            stale = SQLiteRecoveryLedger(path)
+            authoritative = SQLiteRecoveryLedger(path)
+            authoritative.add(finding)
+            authoritative.approve(finding.finding_id, "reviewer-a", "Verified duplicate")
+
+            restored = stale.add(finding)
+            self.assertTrue(restored.reviewer_approved)
+            self.assertEqual(restored.reviewer_id, "reviewer-a")
+            stale.verify_event_chains()
+
+    def test_sqlite_ledger_detects_event_tampering(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="payment-9", currency="USD", expected_cents=0,
+                actual_cents=10000, rule=rule(), evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+            ))
+            ledger = SQLiteRecoveryLedger(path)
+            ledger.add(finding)
+            ledger.approve(finding.finding_id, "reviewer-1", "Verified duplicate")
+            with sqlite3.connect(path) as con:
+                con.execute(
+                    "UPDATE recovery_events SET payload_json = ? WHERE event_type = 'APPROVE'",
+                    ('{"reviewer_id":"attacker","note":"forged"}',),
+                )
+            with self.assertRaisesRegex(ValueError, "event hash mismatch"):
+                SQLiteRecoveryLedger(path)
+
     def test_freight_bridge_preserves_authority_gate(self):
         f = SimpleNamespace(
             finding_id="f1", proof_hash="proof", buyer_id="buyer",
@@ -136,6 +306,8 @@ class RecoveryWorksTests(unittest.TestCase):
             sources=(
                 SourceManifestEntry("s1", Branch.FREIGHT, "h1", "file://freight.csv", "invoice_export"),
                 SourceManifestEntry("s2", Branch.AP, "h2", "file://payments.csv", "payment_export"),
+                SourceManifestEntry("s3", Branch.AP, "rulehash", "source://contract#7.4", "governing_rule"),
+                SourceManifestEntry("s4", Branch.AP, "abc123", "source://doc#p1", "evidence"),
             ),
         )
         observation = RecoveryObservation(
@@ -153,6 +325,47 @@ class RecoveryWorksTests(unittest.TestCase):
                 branch=Branch.UTILITY, client_id="c", counterparty_id="u",
                 reference="b", currency="USD", expected_cents=1, actual_cents=2,
                 rule=rule(), evidence=(evidence(),), reason="x", confidence_basis="x",
+            ),))
+
+    def test_recovery_scan_rejects_out_of_manifest_rule_or_evidence(self):
+        manifest = freeze_scan(
+            scan_id="scan-proof",
+            client_id="c",
+            branches=(Branch.AP,),
+            selection_rule="supplied AP period",
+            sources=(
+                SourceManifestEntry("s1", Branch.AP, "rulehash", "source://contract#7.4", "governing_rule"),
+                SourceManifestEntry("s2", Branch.AP, "abc123", "source://doc#p1", "evidence"),
+            ),
+        )
+        bad_evidence = EvidenceRef(
+            evidence_id="ev:outside",
+            source_hash="outside",
+            locator="source://outside",
+            kind="invoice",
+            verified=True,
+        )
+        with self.assertRaisesRegex(ValueError, "evidence source"):
+            run_scan(manifest, (RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="inv-outside", currency="USD", expected_cents=10000,
+                actual_cents=12000, rule=rule(), evidence=(bad_evidence,),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+            ),))
+        outside_rule = RuleRef(
+            rule_id="rule:outside",
+            source_hash="outside-rule",
+            effective_from="2026-01-01",
+            effective_to=None,
+            verified_controlling=True,
+            source_locator="source://outside-rule",
+        )
+        with self.assertRaisesRegex(ValueError, "rule source"):
+            run_scan(manifest, (RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="inv-rule", currency="USD", expected_cents=10000,
+                actual_cents=12000, rule=outside_rule, evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
             ),))
 
 

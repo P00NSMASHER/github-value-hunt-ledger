@@ -22,7 +22,10 @@ class LedgerRecord:
 
     @property
     def record_hash(self) -> str:
+        # State identity must survive deterministic event replay. updated_at is
+        # operational metadata, not economic/lifecycle state, so it is excluded.
         payload = asdict(self)
+        payload.pop("updated_at", None)
         payload["finding"]["branch"] = self.finding.branch.value
         payload["finding"]["mode"] = self.finding.mode.value
         payload["finding"]["state"] = self.finding.state.value
@@ -58,29 +61,44 @@ class RecoveryLedger:
             raise KeyError(f"unknown finding_id: {finding_id}") from exc
 
     def approve(self, finding_id: str, reviewer_id: str, note: str) -> LedgerRecord:
-        if not reviewer_id.strip() or not note.strip():
+        reviewer_id = reviewer_id.strip()
+        note = note.strip()
+        if not reviewer_id or not note:
             raise ValueError("reviewer_id and review note are required")
         record = self.get(finding_id)
+        if record.case_state is not CaseState.VALIDATED:
+            raise ValueError("review approval requires a VALIDATED case")
         assert_claim_authorizable(record.finding, True)
+        if record.reviewer_approved:
+            if record.reviewer_id == reviewer_id and record.review_note == note:
+                return record
+            raise ValueError("case already has reviewer approval; conflicting replay rejected")
         updated = replace(
             record,
             reviewer_approved=True,
-            reviewer_id=reviewer_id.strip(),
-            review_note=note.strip(),
+            reviewer_id=reviewer_id,
+            review_note=note,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
         return updated
 
     def authorize(self, finding_id: str, authorization_id: str) -> LedgerRecord:
-        if not authorization_id.strip():
+        authorization_id = authorization_id.strip()
+        if not authorization_id:
             raise ValueError("authorization_id is required")
         record = self.get(finding_id)
+        if record.case_state is CaseState.AUTHORIZED:
+            if record.authorization_id == authorization_id:
+                return record
+            raise ValueError("case already authorized under a different authorization")
+        if record.case_state is not CaseState.VALIDATED:
+            raise ValueError("authorization requires a VALIDATED case")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
         updated = replace(
             record,
             case_state=CaseState.AUTHORIZED,
-            authorization_id=authorization_id.strip(),
+            authorization_id=authorization_id,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
@@ -88,6 +106,8 @@ class RecoveryLedger:
 
     def mark_claimed(self, finding_id: str) -> LedgerRecord:
         record = self.get(finding_id)
+        if record.case_state is CaseState.CLAIMED:
+            return record
         if record.case_state is not CaseState.AUTHORIZED or not record.authorization_id:
             raise ValueError("claim action requires explicit authorization")
         updated = replace(record, case_state=CaseState.CLAIMED, updated_at=self._now())
@@ -96,6 +116,10 @@ class RecoveryLedger:
 
     def mark_recovered(self, finding_id: str, recovered_cents: int, fee_cents: int = 0) -> LedgerRecord:
         record = self.get(finding_id)
+        if record.case_state is CaseState.RECOVERED:
+            if record.recovered_cents == recovered_cents and record.fee_cents == fee_cents:
+                return record
+            raise ValueError("recovered case cannot be rewritten with different money")
         if record.case_state is not CaseState.CLAIMED:
             raise ValueError("only CLAIMED cases may be marked recovered")
         if type(recovered_cents) is not int or recovered_cents < 0:
@@ -115,16 +139,24 @@ class RecoveryLedger:
         return updated
 
     def reject(self, finding_id: str, reviewer_id: str, note: str) -> LedgerRecord:
-        if not reviewer_id.strip() or not note.strip():
+        reviewer_id = reviewer_id.strip()
+        note = note.strip()
+        if not reviewer_id or not note:
             raise ValueError("reviewer_id and rejection note are required")
         record = self.get(finding_id)
-        if record.case_state in {CaseState.CLAIMED, CaseState.RECOVERED}:
-            raise ValueError("claimed/recovered cases cannot be rejected")
+        if record.case_state is CaseState.REJECTED:
+            if record.reviewer_id == reviewer_id and record.review_note == note:
+                return record
+            raise ValueError("case already rejected; conflicting replay rejected")
+        if record.case_state not in {CaseState.REVIEW, CaseState.VALIDATED}:
+            raise ValueError("authorized/claimed/recovered cases cannot be rejected")
         updated = replace(
             record,
             case_state=CaseState.REJECTED,
-            reviewer_id=reviewer_id.strip(),
-            review_note=note.strip(),
+            reviewer_approved=False,
+            reviewer_id=reviewer_id,
+            review_note=note,
+            authorization_id=None,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
@@ -135,33 +167,66 @@ class RecoveryLedger:
 
     def rollup(self) -> dict:
         branches: dict[str, dict[str, int]] = {}
-        total_potential = total_validated = total_recovered = total_fees = 0
+        total_discovered = total_potential = total_validated = 0
+        total_authorized = total_claimed = total_recovered = total_fees = total_rejected = 0
+        validated_states = {
+            CaseState.VALIDATED,
+            CaseState.AUTHORIZED,
+            CaseState.CLAIMED,
+            CaseState.RECOVERED,
+        }
+        authorized_states = {CaseState.AUTHORIZED, CaseState.CLAIMED, CaseState.RECOVERED}
+        claimed_states = {CaseState.CLAIMED, CaseState.RECOVERED}
+
         for record in self.records():
             key = record.finding.branch.value
             bucket = branches.setdefault(key, {
                 "cases": 0,
+                "rejected_cases": 0,
+                "discovered_cents": 0,
                 "potential_cents": 0,
                 "validated_cents": 0,
+                "authorized_cents": 0,
+                "claimed_cents": 0,
                 "recovered_cents": 0,
                 "fee_cents": 0,
             })
-            potential = record.finding.potential_recovery_cents
-            validated = potential if record.finding.state is FindingState.VALIDATED else 0
+            amount = record.finding.potential_recovery_cents
+            rejected = record.case_state is CaseState.REJECTED
+            live_potential = 0 if rejected else amount
+            validated = amount if record.case_state in validated_states else 0
+            authorized = amount if record.case_state in authorized_states else 0
+            claimed = amount if record.case_state in claimed_states else 0
+
             bucket["cases"] += 1
-            bucket["potential_cents"] += potential
+            bucket["rejected_cases"] += int(rejected)
+            bucket["discovered_cents"] += amount
+            bucket["potential_cents"] += live_potential
             bucket["validated_cents"] += validated
+            bucket["authorized_cents"] += authorized
+            bucket["claimed_cents"] += claimed
             bucket["recovered_cents"] += record.recovered_cents
             bucket["fee_cents"] += record.fee_cents
-            total_potential += potential
+
+            total_discovered += amount
+            total_potential += live_potential
             total_validated += validated
+            total_authorized += authorized
+            total_claimed += claimed
             total_recovered += record.recovered_cents
             total_fees += record.fee_cents
+            total_rejected += int(rejected)
+
         return {
             "branches": branches,
             "totals": {
                 "cases": len(self._records),
+                "rejected_cases": total_rejected,
+                "discovered_cents": total_discovered,
                 "potential_cents": total_potential,
                 "validated_cents": total_validated,
+                "authorized_cents": total_authorized,
+                "claimed_cents": total_claimed,
                 "recovered_cents": total_recovered,
                 "fee_cents": total_fees,
             },
