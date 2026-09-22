@@ -55,6 +55,11 @@ POLICIES: dict[Branch, BranchPolicy] = {
         RecoveryMode.OVERPAYMENT,
         "telecom_billing_reviewer",
     ),
+    Branch.REBATE: BranchPolicy(
+        Branch.REBATE,
+        RecoveryMode.UNDERPAYMENT,
+        "rebate_recovery_reviewer",
+    ),
 }
 
 
