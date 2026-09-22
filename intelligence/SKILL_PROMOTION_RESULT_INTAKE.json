@@ -1,0 +1,21 @@
+{
+  "automatic_global_promotion_enabled": false,
+  "automatic_live_write_enabled": false,
+  "blocked_submissions": [],
+  "global_review_queue": [],
+  "mode": "skill_promotion_result_intake",
+  "policy_effect": "none",
+  "results": [],
+  "schema_version": 1,
+  "source_snapshot_sha256": "11dd0cae06d2f12be522b9b24f12e2c7026e4e8c2d96a4591a13ba616c95a955",
+  "summary": {
+    "accepted_records": 0,
+    "blocked": 0,
+    "canary": 0,
+    "global_eligible": 0,
+    "quarantined": 0,
+    "staged": 0,
+    "submitted": 0,
+    "verified": 0
+  }
+}
