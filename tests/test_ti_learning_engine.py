@@ -158,6 +158,51 @@ class ValueMemoryTests(unittest.TestCase):
         self.assertNotEqual(good.q_value, 0.8)
         self.assertNotEqual(weak.q_value, 0.8)
 
+    def test_repeated_move_type_counts_once_per_hunt(self):
+        episode = {
+            "run_id": "RUN:repeat-move",
+            "split": "train",
+            "state": {
+                "search_objective_id": "OBJ:test",
+            },
+            "action": {
+                "strategy_id": "STRAT:test",
+                "query_family_id": "QF:test",
+                "search_moves": [
+                    {
+                        "key": "MOVE:code_signature_search",
+                        "move_type": "code_signature_search",
+                        "result": "qualifying_hit",
+                        "deep_inspected": 1,
+                        "retained_count": 1,
+                    },
+                    {
+                        "key": "MOVE:code_signature_search",
+                        "move_type": "code_signature_search",
+                        "result": "no_hit",
+                        "deep_inspected": 0,
+                        "retained_count": 0,
+                    },
+                ],
+            },
+            "reward": {
+                "training_reward": 0.8,
+                "reward_stage": "technical_proxy",
+                "downstream": {"outcome_ids": []},
+            },
+            "provenance": {
+                "timestamp": "2026-09-20T00:00:00Z",
+            },
+        }
+        memory, _ = learn_training_episode_memory(
+            [episode],
+            config=ValueConfig(alpha=1.0, epsilon=0.0),
+        )
+        record = memory.get("MOVE:code_signature_search")
+        self.assertEqual(record.visits, 1)
+        self.assertGreater(record.q_value, 0.0)
+        self.assertLess(record.q_value, 0.8)
+
     def test_objective_conditioned_memory_separates_opposite_strategy_value(self):
         episodes = [
             {
