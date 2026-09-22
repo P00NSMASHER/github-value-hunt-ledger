@@ -81,7 +81,7 @@ class APIngestTests(unittest.TestCase):
         )
         self.assertEqual(observations, ())
 
-    def test_file_to_frozen_scan_is_deterministic_and_validated_when_verified(self):
+    def test_file_to_frozen_scan_is_deterministic_and_suffix_alias_stays_review(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             payments = root / "Payments.csv"
@@ -121,8 +121,12 @@ class APIngestTests(unittest.TestCase):
             self.assertEqual(first.payment_count, 2)
             self.assertEqual(first.obligation_count, 1)
             self.assertEqual(len(first.scan.findings), 1)
-            self.assertIs(first.scan.findings[0].state, FindingState.VALIDATED)
+            self.assertIs(first.scan.findings[0].state, FindingState.REVIEW)
             self.assertEqual(first.scan.findings[0].potential_recovery_cents, 10000)
+            self.assertTrue(any(
+                exc.code == "HEURISTIC_INVOICE_ALIAS"
+                for exc in first.audit.exceptions
+            ))
 
     def test_direct_ingest_can_validate_statement_only_credit(self):
         with tempfile.TemporaryDirectory() as d:
