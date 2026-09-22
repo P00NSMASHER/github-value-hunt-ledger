@@ -164,7 +164,16 @@ class RecoveryLedger:
                 raise ValueError(
                     "seven-figure finding requires completed readiness package"
                 )
-            verify_seven_figure_readiness(readiness, bundle)
+            journal = getattr(self, "journal", None)
+            if journal is None:
+                raise ValueError(
+                    "seven-figure authorization requires DurableRecoveryLedger"
+                )
+            verify_seven_figure_readiness(
+                readiness,
+                bundle,
+                expected_journal_head_hash=journal.head_hash,
+            )
         elif readiness is not None:
             raise ValueError(
                 "seven-figure readiness package cannot authorize a sub-seven-figure case"

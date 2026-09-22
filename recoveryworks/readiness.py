@@ -40,6 +40,17 @@ ASYMMETRIC_SIGNATURE_ALGORITHMS = frozenset({
     "ED25519",
 })
 
+TRUSTED_TIMESTAMP_STANDARDS = frozenset({"RFC3161"})
+
+APPROVED_IMMUTABLE_RETENTION_MODES = frozenset({
+    "OBJECT_LOCK_COMPLIANCE",
+    "WORM_COMPLIANCE",
+    "AZURE_IMMUTABLE_LOCKED",
+    "GCS_BUCKET_LOCK",
+})
+
+LEGAL_HOLD_STATUSES = frozenset({"ON", "OFF"})
+
 REQUIRED_READINESS_CHECKS = (
     "BUILD_PROVENANCE_VERIFIED",
     "CASE_COMPLETENESS_VERIFIED",
@@ -235,6 +246,8 @@ class ExternalTimestampEvidence:
             "evidence_hash",
         ):
             _required(name, getattr(self, name))
+        if self.standard not in TRUSTED_TIMESTAMP_STANDARDS:
+            raise ValueError("external timestamp standard is not approved")
         timestamped = _dt("timestamped_at", self.timestamped_at)
         verified = _dt("verified_at", self.verified_at)
         if verified < timestamped:
@@ -355,8 +368,14 @@ class ObjectLockVerificationReceipt:
             _required(name, getattr(self, name))
         if self.role not in {"authority", "evidence"}:
             raise ValueError("object-lock receipt role must be authority or evidence")
-        _iso("retain_until", self.retain_until)
-        _iso("checked_at", self.checked_at)
+        if self.retention_mode not in APPROVED_IMMUTABLE_RETENTION_MODES:
+            raise ValueError("object-lock receipt retention mode is not approved")
+        if self.legal_hold_status not in LEGAL_HOLD_STATUSES:
+            raise ValueError("object-lock receipt legal hold status is invalid")
+        retain_until = _dt("retain_until", self.retain_until)
+        checked_at = _dt("checked_at", self.checked_at)
+        if retain_until <= checked_at:
+            raise ValueError("object-lock retention must extend beyond verification time")
         if type(self.provider_verified) is not bool:
             raise ValueError("provider_verified must be boolean")
 
@@ -393,6 +412,12 @@ def record_object_lock_verification(
     provider_verified: bool,
     metadata: Mapping[str, Any] | None = None,
 ) -> ObjectLockVerificationReceipt:
+    if retention_mode not in APPROVED_IMMUTABLE_RETENTION_MODES:
+        raise ValueError("object-lock receipt retention mode is not approved")
+    if legal_hold_status not in LEGAL_HOLD_STATUSES:
+        raise ValueError("object-lock receipt legal hold status is invalid")
+    if _dt("retain_until", retain_until) <= _dt("checked_at", checked_at):
+        raise ValueError("object-lock retention must extend beyond verification time")
     body = {
         "schema": 1,
         "source_id": _required("source_id", source_id),
