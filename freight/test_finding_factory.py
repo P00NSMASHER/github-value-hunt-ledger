@@ -142,3 +142,28 @@ def test_money_and_units_require_exact_integer_semantics(bad):
     else:
         with pytest.raises(ValueError):
             derive_charge(charge(billed_cents=bad), [rule()])
+
+
+def test_delimiter_collision_cannot_make_different_charge_look_in_population():
+    pop = freeze_population(
+        "buyer",
+        "unit",
+        "synthetic",
+        [
+            PopulationRow(
+                "INV|PART",
+                "SHIP",
+                "customer",
+                "carrier",
+                "USD",
+                "frozen-source",
+            )
+        ],
+    )
+    impostor = charge(
+        invoice_id="INV",
+        shipment_id="PART|SHIP",
+        charge_id="collision",
+    )
+    with pytest.raises(ValueError, match="outside frozen population"):
+        derive_batch(pop, [impostor], [rule()])
