@@ -1,0 +1,38 @@
+name: SHAQ MCP Read-Only Sample Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - production/fmc_tariff_ledger/SHAQ_SAMPLE_NOW
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: production/fmc_tariff_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/fmc_tariff_ledger/requirements-shaq.txt
+      - run: python -m pip install -r requirements-shaq.txt
+      - name: Probe read-only response shapes
+        env:
+          SHAQ_MCP_URL: https://search.shaq-logistics.com/sse
+          SHAQ_SAMPLE_OUTPUT: shaq_sample_probe.json
+        run: python probe_shaq_samples.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shaq-mcp-readonly-samples
+          path: production/fmc_tariff_ledger/shaq_sample_probe.json
+          retention-days: 30
+          if-no-files-found: error
