@@ -1200,6 +1200,7 @@ def build_training_environment(
     source_payload = {
         "search_runs": list(search_runs),
         "outcomes": list(outcomes),
+        "split_receipts": dict(sorted((split_receipts or {}).items())),
     }
     source_times = [
         _run_time(run)
