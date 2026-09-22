@@ -16,10 +16,15 @@ on:
         default: "12"
         type: string
       retention_days:
-        description: Retention for recovered evidence artifacts
+        description: Retention for recovered metadata artifacts
         required: true
         default: "7"
         type: string
+      copy_raw_evidence:
+        description: Duplicate raw shard artifacts into the recovery run
+        required: true
+        default: false
+        type: boolean
   push:
     branches: [main]
     paths:
@@ -36,6 +41,7 @@ jobs:
       source_run_id: ${{ steps.cfg.outputs.source_run_id }}
       shards: ${{ steps.cfg.outputs.shards }}
       retention_days: ${{ steps.cfg.outputs.retention_days }}
+      copy_raw_evidence: ${{ steps.cfg.outputs.copy_raw_evidence }}
     steps:
       - uses: actions/checkout@v4
       - id: cfg
@@ -44,6 +50,7 @@ jobs:
           INPUT_RUN_ID: ${{ inputs.source_run_id }}
           INPUT_SHARDS: ${{ inputs.shard_count }}
           INPUT_RETENTION: ${{ inputs.retention_days }}
+          INPUT_COPY_RAW: ${{ inputs.copy_raw_evidence }}
           WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
           WORKFLOW_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
         run: |
@@ -72,6 +79,7 @@ jobs:
               run_id = cfg['source_run_id']
               shard_count = int(cfg.get('shard_count', '12'))
               retention = int(cfg.get('retention_days', '7'))
+              copy_raw = cfg.get('copy_raw_evidence', 'false').lower() == 'true'
 
           if not run_id.isdigit():
               raise SystemExit('source_run_id must be numeric')
@@ -83,6 +91,7 @@ jobs:
           print(f'source_run_id={run_id}')
           print('shards=' + json.dumps(list(range(shard_count))))
           print(f'retention_days={retention}')
+          print('copy_raw_evidence=' + ('true' if copy_raw else 'false'))
           PY
 
   rehydrate:
@@ -143,6 +152,7 @@ jobs:
           fi
           du -sh source metadata/shard-${SHARD}
       - name: Re-upload durable raw evidence shard
+        if: needs.prepare.outputs.copy_raw_evidence == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: fmc-evidence-shard-${{ matrix.shard }}
@@ -182,6 +192,7 @@ jobs:
         env:
           SOURCE_RUN_ID: ${{ needs.prepare.outputs.source_run_id }}
           SHARD_COUNT: ${{ inputs.shard_count || '12' }}
+          COPY_RAW: ${{ needs.prepare.outputs.copy_raw_evidence }}
         run: |
           mkdir -p merged
           python run.py merge \
@@ -202,7 +213,7 @@ jobs:
               'source_workflow_run_id': os.environ['SOURCE_RUN_ID'],
               'recovery_workflow_run_id': os.environ.get('GITHUB_RUN_ID'),
               'source_shard_count': int(os.environ.get('SHARD_COUNT', '12')),
-              'raw_evidence_artifact_pattern': 'fmc-evidence-shard-*',
+              'raw_evidence_artifact_pattern': 'fmc-evidence-shard-*' if os.environ.get('COPY_RAW') == 'true' else None,
               'metadata_artifact_pattern': 'fmc-metadata-shard-*',
               'raw_evidence_embedded_in_merged_artifact': False,
           }
