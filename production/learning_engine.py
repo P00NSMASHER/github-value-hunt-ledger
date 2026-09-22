@@ -10,6 +10,14 @@ from enum import Enum
 from typing import Any, Iterable, Mapping, Sequence
 
 
+def _finite_number(value: Any) -> bool:
+    return type(value) in {int, float} and math.isfinite(float(value))
+
+
+def _nonnegative_int(value: Any) -> bool:
+    return type(value) is int and value >= 0
+
+
 class ExperienceKind(str, Enum):
     STRATEGY = "STRATEGY"
     QUERY_FAMILY = "QUERY_FAMILY"
@@ -147,8 +155,8 @@ class ValueMemory:
         run_id: str | None = None,
         updated_at: str | None = None,
     ) -> MemoryRecord:
-        if not math.isfinite(reward):
-            raise ValueError("reward must be finite")
+        if not _finite_number(reward):
+            raise ValueError("reward must be a finite non-boolean number")
         rec = self.observe(key, kind)
         target = float(reward) + self.config.gamma * float(next_max_q)
         new_q = (1.0 - self.config.alpha) * rec.q_value + self.config.alpha * target
@@ -226,7 +234,7 @@ _FAILURE_RESULTS = {"FAIL", "FAILED", "REJECTED", "INVALIDATED", "NO_FIND", "BLO
 
 
 def _safe_ratio(num: Any, den: Any) -> float | None:
-    if not isinstance(num, (int, float)) or not isinstance(den, (int, float)):
+    if not _finite_number(num) or not _finite_number(den):
         return None
     if den <= 0:
         return None
@@ -249,18 +257,18 @@ def _outcome_component(outcome: Mapping[str, Any]) -> tuple[float, list[str]]:
 
     revenue = outcome.get("revenue_usd")
     customer_value = outcome.get("customer_value_usd")
-    if isinstance(revenue, (int, float)) and revenue > 0:
+    if _finite_number(revenue) and revenue > 0:
         score += 0.35
         reasons.append("realized_revenue")
-    if isinstance(customer_value, (int, float)) and customer_value > 0:
+    if _finite_number(customer_value) and customer_value > 0:
         score += 0.20
         reasons.append("realized_customer_value")
 
     saved_low = outcome.get("engineering_days_saved_low")
     saved_high = outcome.get("engineering_days_saved_high")
     if (
-        isinstance(saved_low, (int, float))
-        and isinstance(saved_high, (int, float))
+        _finite_number(saved_low)
+        and _finite_number(saved_high)
         and saved_high >= saved_low > 0
     ):
         score += min(0.20, 0.02 * float(saved_low))
@@ -287,10 +295,10 @@ def observed_search_reward(
     if work_action is None:
         candidate_count = run.get("candidate_count")
         legacy_search_evidence = (
-            isinstance(candidate_count, int)
+            _nonnegative_int(candidate_count)
             and candidate_count > 0
         ) or (
-            isinstance(deep, int)
+            _nonnegative_int(deep)
             and deep > 0
         )
         if not legacy_search_evidence:
@@ -299,9 +307,10 @@ def observed_search_reward(
     deep = run.get("deep_inspected")
     retained = run.get("retained_count")
     promoted = run.get("master_promoted_count")
-    if not isinstance(deep, int) or not isinstance(retained, int) or not isinstance(promoted, int):
-        return None
-    if min(deep, retained, promoted) < 0:
+    if not all(
+        _nonnegative_int(value)
+        for value in (deep, retained, promoted)
+    ):
         return None
 
     components: dict[str, float] = {}
@@ -416,8 +425,8 @@ def learn_value_memory(
                 retained_count = move.get("retained_count")
                 deep_count = move.get("deep_inspected")
                 if (
-                    isinstance(deep_count, int)
-                    and isinstance(retained_count, int)
+                    _nonnegative_int(deep_count)
+                    and _nonnegative_int(retained_count)
                     and deep_count > 0
                 ):
                     move_reward = max(
@@ -520,7 +529,7 @@ def learn_training_episode_memory(
             continue
         reward_body = episode.get("reward") or {}
         reward = reward_body.get("training_reward")
-        if not isinstance(reward, (int, float)) or not math.isfinite(reward):
+        if not _finite_number(reward):
             continue
 
         run_id = str(episode.get("run_id") or "")
