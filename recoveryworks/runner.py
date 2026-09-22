@@ -57,6 +57,21 @@ from .branches.merchant_fee_csv import (
     load_merchant_fee_statements_csv,
     load_merchant_transaction_summaries_csv,
 )
+from .branches.parcel import audit_parcel_charges
+from .branches.parcel_csv import load_parcel_assessments_csv, load_parcel_charges_csv
+from .branches.procurement import audit_procurement_lines
+from .branches.procurement_csv import (
+    load_procurement_authorities_csv,
+    load_procurement_invoice_lines_csv,
+    load_procurement_quantities_csv,
+)
+from .branches.warranty_credit import audit_warranty_credits
+from .branches.warranty_credit_csv import (
+    load_warranty_credit_entitlements_csv,
+    load_warranty_credit_settlements_csv,
+)
+from .branches.payroll_benefit import audit_payroll_benefit_billing
+from .branches.payroll_benefit_csv import load_payroll_benefit_units_csv
 from .branches.lease import audit_lease_billing
 from .branches.lease_csv import load_lease_area_csv
 from .branches.saas import audit_saas_billing
@@ -582,6 +597,220 @@ def run_scan360_config(
         for issue in batch.exceptions:
             exceptions.append({
                 "branch": "merchant_fee",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+
+    for job_index, job in enumerate(_jobs(config.get("parcel"), name="parcel")):
+        charges = load_parcel_charges_csv(
+            _resolve(
+                base,
+                job.get("charges_csv"),
+                name=f"parcel[{job_index}].charges_csv",
+            ),
+            verified=_bool_setting(
+                job, "charge_source_verified", context=f"parcel[{job_index}]"
+            ),
+        )
+        assessments = load_parcel_assessments_csv(
+            _resolve(
+                base,
+                job.get("assessments_csv"),
+                name=f"parcel[{job_index}].assessments_csv",
+            ),
+            verified=_bool_setting(
+                job, "assessment_source_verified", context=f"parcel[{job_index}]"
+            ),
+        )
+        batch = audit_parcel_charges(
+            client_id=client_id,
+            charges=charges,
+            assessments=assessments,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "parcel",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(
+        _jobs(config.get("procurement"), name="procurement")
+    ):
+        invoice_lines = load_procurement_invoice_lines_csv(
+            _resolve(
+                base,
+                job.get("invoice_lines_csv"),
+                name=f"procurement[{job_index}].invoice_lines_csv",
+            ),
+            verified=_bool_setting(
+                job, "invoice_source_verified", context=f"procurement[{job_index}]"
+            ),
+        )
+        authorities = load_procurement_authorities_csv(
+            _resolve(
+                base,
+                job.get("authorities_csv"),
+                name=f"procurement[{job_index}].authorities_csv",
+            ),
+            verified=_bool_setting(
+                job, "authority_source_verified", context=f"procurement[{job_index}]"
+            ),
+        )
+        quantities = load_procurement_quantities_csv(
+            _resolve(
+                base,
+                job.get("quantities_csv"),
+                name=f"procurement[{job_index}].quantities_csv",
+            ),
+            verified=_bool_setting(
+                job, "quantity_source_verified", context=f"procurement[{job_index}]"
+            ),
+        )
+        batch = audit_procurement_lines(
+            client_id=client_id,
+            invoice_lines=invoice_lines,
+            authorities=authorities,
+            quantity_approvals=quantities,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "procurement",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(
+        _jobs(config.get("warranty_credit"), name="warranty_credit")
+    ):
+        entitlements = load_warranty_credit_entitlements_csv(
+            _resolve(
+                base,
+                job.get("entitlements_csv"),
+                name=f"warranty_credit[{job_index}].entitlements_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "entitlement_source_verified",
+                context=f"warranty_credit[{job_index}]",
+            ),
+        )
+        settlements = load_warranty_credit_settlements_csv(
+            _resolve(
+                base,
+                job.get("settlements_csv"),
+                name=f"warranty_credit[{job_index}].settlements_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "settlement_source_verified",
+                context=f"warranty_credit[{job_index}]",
+            ),
+        )
+        batch = audit_warranty_credits(
+            client_id=client_id,
+            entitlements=entitlements,
+            settlements=settlements,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "warranty_credit",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(
+        _jobs(config.get("payroll_benefit"), name="payroll_benefit")
+    ):
+        charges = load_invoice_charges_csv(
+            _resolve(
+                base,
+                job.get("charges_csv"),
+                name=f"payroll_benefit[{job_index}].charges_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "charge_source_verified",
+                context=f"payroll_benefit[{job_index}]",
+            ),
+        )
+        rates = load_contract_rates_csv(
+            _resolve(
+                base,
+                job.get("rates_csv"),
+                name=f"payroll_benefit[{job_index}].rates_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "rate_source_verified",
+                context=f"payroll_benefit[{job_index}]",
+            ),
+        )
+        units = ()
+        units_csv = job.get("units_csv")
+        if units_csv:
+            units = load_payroll_benefit_units_csv(
+                _resolve(
+                    base,
+                    units_csv,
+                    name=f"payroll_benefit[{job_index}].units_csv",
+                ),
+                verified=_bool_setting(
+                    job,
+                    "unit_source_verified",
+                    context=f"payroll_benefit[{job_index}]",
+                ),
+            )
+        batch = audit_payroll_benefit_billing(
+            client_id=client_id,
+            charges=charges,
+            rates=rates,
+            units=units,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "payroll_benefit",
                 "job_index": job_index,
                 "reference": issue.reference,
                 "code": issue.code,
