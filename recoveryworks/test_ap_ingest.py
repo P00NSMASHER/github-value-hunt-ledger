@@ -45,15 +45,19 @@ class APIngestTests(unittest.TestCase):
         self.assertEqual(observations, ())
 
     def test_conflicting_repeated_payment_line_fails_closed(self):
-        with self.assertRaises(ValueError):
-            build_ap_observations(
-                client_id="client",
-                payments=(
-                    p("PAY-1", 10000, locator="row=2"),
-                    p("PAY-1", 12000, locator="row=3"),
-                ),
-                obligations=(o(),),
-            )
+        from recoveryworks.branches.ap import audit_ap_recovery
+
+        batch = audit_ap_recovery(
+            client_id="client",
+            payments=(
+                p("PAY-1", 10000, locator="row=2"),
+                p("PAY-1", 12000, locator="row=3"),
+            ),
+            obligations=(o(),),
+        )
+        self.assertEqual(batch.observations, ())
+        self.assertEqual(len(batch.exceptions), 1)
+        self.assertEqual(batch.exceptions[0].code, "CONFLICTING_PAYMENT_ID")
 
     def test_same_payment_number_across_different_invoices_is_not_globally_deduped(self):
         observations = build_ap_observations(
