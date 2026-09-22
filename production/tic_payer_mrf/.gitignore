@@ -1,0 +1,7 @@
+output/
+.tic_payer_mrf/
+__pycache__/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.partial
