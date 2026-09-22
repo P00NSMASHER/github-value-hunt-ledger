@@ -75,6 +75,38 @@ class RevalidateTests(unittest.TestCase):
             self.assertEqual(stats["terms_quarantined_shared_generic"], 0)
             self.assertEqual(stats["remaining_terms"], 1)
 
+    def test_rule_page_pseudo_identifier_is_removed(self):
+        self._seed(
+            org="333333",
+            legal="DIRECT CARRIER",
+            tariff_url="https://direct.example/tariff",
+            snapshot_url="https://direct.example/rules",
+            text="RULE PAGE 4",
+            parser_status="parsed:html:entity_scoped",
+        )
+        snap = self.conn.execute(
+            "SELECT id FROM snapshots ORDER BY id DESC LIMIT 1"
+        ).fetchone()[0]
+        self.conn.execute(
+            """INSERT INTO terms(
+                 snapshot_id, entity_class, organization_no, legal_name,
+                 rule_type, term_kind, evidence_excerpt, confidence,
+                 parser_version, created_at
+               ) VALUES (?, 'vocc', '333333', 'DIRECT CARRIER',
+                         'rule:PAGE', 'rule_text', 'RULE PAGE 4',
+                         0.9, 'legacy', 'now')""",
+            (snap,),
+        )
+        self.conn.commit()
+        report = revalidate.revalidate(self.db, self.root)
+        self.assertGreaterEqual(report["bogus_rule_terms_removed"], 1)
+        self.assertEqual(
+            self.conn.execute(
+                "SELECT COUNT(*) FROM terms WHERE lower(rule_type)='rule:page'"
+            ).fetchone()[0],
+            0,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
