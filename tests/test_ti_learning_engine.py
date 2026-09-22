@@ -62,6 +62,17 @@ class ValueMemoryTests(unittest.TestCase):
         }
         self.assertIsNone(observed_search_reward(run))
 
+    def test_legacy_zero_candidate_execution_is_not_treated_as_search(self):
+        run = {
+            "work_action": None,
+            "measurement_quality": "prospective",
+            "candidate_count": 0,
+            "deep_inspected": 0,
+            "retained_count": 0,
+            "master_promoted_count": 0,
+        }
+        self.assertIsNone(observed_search_reward(run))
+
     def test_search_reward_uses_measured_outcome(self):
         run = {
             "work_action": "search",
