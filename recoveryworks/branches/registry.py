@@ -94,6 +94,14 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "tier-backed rebate underpayment finding",
         ("tier engine", "purchase reconciliation", "settlement evidence"),
     ),
+    Branch.LEASE: BranchSpec(
+        Branch.LEASE,
+        "LeaseRecovery",
+        "rent, CAM, operating-expense, and area-based lease billing leakage",
+        ("landlord charges", "lease rate schedules", "area/allocation snapshots"),
+        "lease-backed billing variance",
+        ("contract billing engine", "lease abstracts", "CAM reconciliation"),
+    ),
 }
 
 
