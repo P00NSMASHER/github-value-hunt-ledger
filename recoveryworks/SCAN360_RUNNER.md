@@ -6,6 +6,7 @@ combines supported branch adapters into one proof-bound, durable client ledger.
 Current executable branches:
 
 - APRecovery
+- PayerRecovery
 - UtilityRecovery
 
 FreightRecovery already has a bridge into RecoveryOS but is not yet wired into
@@ -35,6 +36,14 @@ state must live on private storage, not in the public repository.
     "default_effective_from": "2026-01-01",
     "payment_source_verified": false,
     "obligation_source_verified": false
+  },
+  "payer": {
+    "lines_csv": "payer_lines.csv",
+    "rates_csv": "payer_rates.csv",
+    "default_effective_from": "2026-01-01",
+    "line_source_verified": false,
+    "rate_source_verified": false,
+    "jurisdiction": "US"
   },
   "utility": [
     {
@@ -75,6 +84,38 @@ Default obligation headers:
 - `Invoice_Date`
 
 Duplicate-looking payments without a verified obligation remain REVIEW.
+
+## Payer input
+
+Payer inputs must already be de-identified and use a claim surrogate ID. The
+common-ledger CSV loader rejects direct identifier headers such as patient name,
+member ID, patient ID, DOB/date of birth, SSN, and subscriber ID.
+
+Default remittance-line headers:
+
+- `Line_ID`
+- `Claim_Surrogate_ID`
+- `Payer`
+- `Service_Date`
+- `Billed_Procedure`
+- `Paid_Procedure`
+- `Units`
+- `Paid_Amount`
+- `Modifier`
+- `Place_Of_Service`
+
+Default rate headers:
+
+- `Payer`
+- `Procedure_Code`
+- `Allowed_Amount_Per_Unit`
+- `Effective_From`
+- `Effective_To`
+- `Modifier`
+- `Place_Of_Service`
+
+Missing or ambiguous effective rates are reported as exceptions and do not
+produce recoverable dollars.
 
 ## Utility input
 
