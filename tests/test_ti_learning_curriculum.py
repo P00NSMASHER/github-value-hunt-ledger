@@ -74,10 +74,21 @@ class LearningCurriculumTests(unittest.TestCase):
             strategy("STRAT:near-b"),
             strategy("STRAT:zero-a"),
             strategy("STRAT:zero-b"),
-            strategy("STRAT:suppressed"),
-            strategy("STRAT:ready"),
             strategy("STRAT:inactive", status="retired"),
         ]
+        existing = {
+            row["strategy_id"]
+            for row in strategies
+        }
+        for row in rows:
+            sid = row.get("key")
+            if (
+                isinstance(sid, str)
+                and sid.startswith("STRAT:")
+                and sid not in existing
+            ):
+                strategies.append(strategy(sid))
+                existing.add(sid)
         state = {
             "policy_gate": {
                 "minimum_measured_runs": 5,
@@ -154,6 +165,42 @@ class LearningCurriculumTests(unittest.TestCase):
                 curriculum
             ),
             [],
+        )
+
+    def test_active_strategy_without_memory_is_valid_zero_run_exploration(self):
+        curriculum = self.build(
+            [
+                memory_row(
+                    "STRAT:near-a",
+                    runs=4,
+                    deep=12,
+                ),
+                memory_row(
+                    "STRAT:near-b",
+                    runs=3,
+                    deep=15,
+                ),
+            ]
+        )
+        selected = [
+            row["strategy_id"]
+            for row in curriculum[
+                "recommended_measurements"
+            ]
+        ]
+        self.assertIn(
+            "STRAT:zero-a",
+            selected,
+        )
+        zero_row = next(
+            row
+            for row in curriculum["rows"]
+            if row["strategy_id"] == "STRAT:zero-a"
+        )
+        self.assertTrue(zero_row["zero_train_runs"])
+        self.assertEqual(
+            zero_row["phase"],
+            "train_measurement",
         )
 
     def test_confirm_measurement_outranks_train_measurement(self):
