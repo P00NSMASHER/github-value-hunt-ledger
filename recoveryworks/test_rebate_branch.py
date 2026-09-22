@@ -74,11 +74,24 @@ class RebateBranchTests(unittest.TestCase):
         self.assertEqual(incremental.expected_cents, 10000)
 
     def test_incremental_spend_basis(self):
-        result = calculate_rebate(
-            program(
-                mode=RebateTierMode.INCREMENTAL,
-                basis=RebateMeasurementBasis.SPEND,
+        spend_program = RebateProgram(
+            supplier_id="Supplier A",
+            program_id="2026-Q3",
+            period_start="2026-07-01",
+            period_end="2026-09-30",
+            tier_mode=RebateTierMode.INCREMENTAL,
+            measurement_basis=RebateMeasurementBasis.SPEND,
+            tiers=(
+                RebateTier("0", "1000", 0),
+                RebateTier("1000", "2000", 500),
+                RebateTier("2000", None, 1000),
             ),
+            source_hash="program-spend-hash",
+            source_locator="file://program-spend.json#0",
+            verified=True,
+        )
+        result = calculate_rebate(
+            spend_program,
             (purchase(qty="25", spend=250000),),
         )
         self.assertEqual(result.expected_cents, 10000)
