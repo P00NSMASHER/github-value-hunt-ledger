@@ -88,6 +88,7 @@ class ShipmentAuthorityTests(unittest.TestCase):
         destination="Chancay",
         container="40HQ",
         source_label="AUTHORIZED_CONTRACT_CORPUS",
+        rate_basis="per container",
     ):
         self.rates.execute(
             """INSERT INTO shaq_rates(
@@ -99,7 +100,7 @@ class ShipmentAuthorityTests(unittest.TestCase):
                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'now')""",
             (
                 origin, destination, "COSCO", "COSCO", org, identity, container,
-                amount, "USD", valid_from, valid_to, "per container",
+                amount, "USD", valid_from, valid_to, rate_basis,
                 "authorized://contract-corpus", kind, source_label, "C-001",
                 "contract row", 1.0, "test",
             ),
@@ -140,6 +141,25 @@ class ShipmentAuthorityTests(unittest.TestCase):
         self.assertEqual(
             result["base_rate_authority"]["status"],
             "NO_AUTHORITY_READY_CONTRACT_RATE",
+        )
+
+    def test_same_amount_with_conflicting_contract_basis_abstains(self):
+        self.add_rate(amount="5000", rate_basis="per container")
+        self.add_rate(
+            amount="5000",
+            rate_basis="per shipment",
+            source_label="SECOND_AUTHORIZED_SOURCE",
+        )
+        self.add_fmc_rule()
+        result = self.envelope()
+        self.assertEqual(
+            result["base_rate_authority"]["status"],
+            "AMBIGUOUS_CONTRACT_RATE_BASIS",
+        )
+        self.assertEqual(result["status"], "NOT_READY_FOR_MONEY_ASSERTION")
+        self.assertIn(
+            "AMBIGUOUS_CONTRACT_RATE_BASIS",
+            result["blockers"],
         )
 
     def test_two_contract_amounts_on_same_latest_period_abstain(self):
