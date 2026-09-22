@@ -1,13 +1,13 @@
 # WORKER ROUTING PLAN
 
-Routing generation: **ROUTING:24a9da1f5089**
+Routing generation: **ROUTING:39959b6c2426**
 Worker profiles: **WORKERS:70e9f3831b9f**
 
 V12/V13 routes workers using positive historical fit, assignment priority, and evidence-gated routing outcome adjustments. Active V11 claims remain locked.
 
 Routing learning: **ROUTELEARN:bc40639ef4db** / mode **observe_only_insufficient_evidence**
-Activation-response learning: **RESPLEARN:3007c7b1f39d** / mode **measured_feedback**
-Routing exploration: **ROUTEEXP:d88e8d4918e6** / applied **False**
+Activation-response learning: **RESPLEARN:0f85b8d8e2ff** / mode **measured_feedback**
+Routing exploration: **ROUTEEXP:471ba5ad296c** / applied **True**
 
 | Worker | Profile | Route | Slot | Assignment | Score | Reason |
 |---|---|---|---|---|---:|---|
@@ -20,9 +20,9 @@ Routing exploration: **ROUTEEXP:d88e8d4918e6** / applied **False**
 | HUNTER-07 | MEASURED | ROUTED | SLOT-05 | ASSIGN:f371a412de11:slot-05 | 25.16 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 | HUNTER-08 | SPARSE | ROUTED | SLOT-04 | ASSIGN:f371a412de11:slot-04 | 23.51 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 | HUNTER-09 | SPARSE | ROUTED | SLOT-01 | ASSIGN:f371a412de11:slot-01 | 28.10 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
-| HUNTER-10 | UNMEASURED | ROUTED | SLOT-10 | ASSIGN:f371a412de11:slot-10 | 16.15 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
+| HUNTER-10 | UNMEASURED | ROUTED | SLOT-11 | ASSIGN:f371a412de11:slot-11 | 16.15 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 | HUNTER-11 | MEASURED | ROUTED | SLOT-14 | ASSIGN:f371a412de11:slot-14 | 11.09 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
-| HUNTER-12 | UNMEASURED | ROUTED | SLOT-11 | ASSIGN:f371a412de11:slot-11 | 16.15 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
+| HUNTER-12 | UNMEASURED | ROUTED | SLOT-10 | ASSIGN:f371a412de11:slot-10 | 16.15 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 | HUNTER-13 | MEASURED | ROUTED | SLOT-13 | ASSIGN:f371a412de11:slot-13 | 29.20 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 | HUNTER-14 | UNMEASURED | ROUTED | SLOT-12 | ASSIGN:f371a412de11:slot-12 | 11.63 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 
