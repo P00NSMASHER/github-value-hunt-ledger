@@ -758,6 +758,38 @@ class TrainingEnvironmentTests(unittest.TestCase):
             errors,
         )
 
+    def test_validator_rejects_trusted_partition_source_tamper(self):
+        run = search_run("RUN:trusted-source-tamper")
+        environment = build_training_environment(
+            [run],
+            [],
+        )
+        episode = environment["episodes"][0]
+        episode["provenance"]["partition_basis"]["source"] = (
+            "execution_claim_id"
+        )
+        errors = validate_training_environment(environment)
+        self.assertIn(
+            f"invalid_trusted_partition_source:{episode['run_id']}",
+            errors,
+        )
+
+    def test_validator_rejects_partition_provenance_contract_tamper(self):
+        run = search_run("RUN:trusted-contract-tamper")
+        environment = build_training_environment(
+            [run],
+            [],
+        )
+        episode = environment["episodes"][0]
+        episode["provenance"]["partition_basis"][
+            "provenance_contract"
+        ] = "invented_contract"
+        errors = validate_training_environment(environment)
+        self.assertIn(
+            f"invalid_partition_provenance_contract:{episode['run_id']}",
+            errors,
+        )
+
     def test_validator_rejects_partition_hash_tamper(self):
         config = TrainingEnvironmentConfig(
             confirm_modulus=2,
