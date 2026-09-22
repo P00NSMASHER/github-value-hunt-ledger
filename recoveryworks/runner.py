@@ -464,6 +464,14 @@ def run_scan360_config(
                 job, "assessment_source_verified", context=f"duty[{job_index}]"
             ),
         )
+        mismatched_importers = sorted({
+            entry.importer_id for entry in entries if entry.importer_id != client_id
+        })
+        if mismatched_importers:
+            raise ValueError(
+                f"duty[{job_index}] Importer_ID does not match Scan 360 client_id: "
+                + ", ".join(mismatched_importers)
+            )
         batch = audit_duty_entries(
             client_id=client_id,
             entries=entries,
