@@ -328,6 +328,243 @@ def import_historical_sqlite(
     return {"files": inserted, "snapshots": 1}
 
 
+
+HEALTHSPARQ_ALLOWED_SUFFIXES = (
+    "healthsparq.com",
+    "kyruushsq.com",
+)
+
+def healthsparq_params(public_url: str) -> dict[str, str]:
+    parsed = urllib.parse.urlsplit(public_url)
+    fragment = parsed.fragment or ""
+    query_text = ""
+    if "?" in fragment:
+        fragment, query_text = fragment.split("?", 1)
+    params = dict(urllib.parse.parse_qsl(fragment.split("/", 2)[-1], keep_blank_values=False))
+    params.update(dict(urllib.parse.parse_qsl(query_text, keep_blank_values=False)))
+    if not params:
+        params = dict(urllib.parse.parse_qsl(parsed.query, keep_blank_values=False))
+    insurer = str(params.get("insurerCode") or "").strip()
+    brand = str(params.get("brandCode") or "").strip()
+    if not insurer or not brand:
+        raise ValueError("HealthSparq URL missing insurerCode/brandCode")
+    return {k: str(v) for k, v in params.items() if str(v).strip()}
+
+
+def healthsparq_tenant(params: dict[str, str]) -> str:
+    overrides = {
+        "MERITAIN_I": "aetnacvs",
+        "LIFEWISE_I": "premera",
+    }
+    insurer = params["insurerCode"]
+    if insurer.upper() in overrides:
+        return overrides[insurer.upper()]
+    tenant = re.sub(r"_i$", "", insurer, flags=re.I).lower()
+    return re.sub(r"[^a-z0-9]+", "-", tenant).strip("-")
+
+
+def healthsparq_direct_metadata_url(public_url: str) -> str:
+    params = healthsparq_params(public_url)
+    tenant = healthsparq_tenant(params)
+    return (
+        "https://mrf.healthsparq.com/"
+        f"{tenant}-egress.nophi.kyruushsq.com/prd/mrf/"
+        f"{urllib.parse.quote(params['insurerCode'], safe='')}/"
+        f"{urllib.parse.quote(params['brandCode'], safe='')}/latest_metadata.json"
+    )
+
+
+def allowed_healthsparq_url(url: str) -> bool:
+    try:
+        p = urllib.parse.urlsplit(url)
+    except ValueError:
+        return False
+    host = (p.hostname or "").lower()
+    return (
+        p.scheme == "https"
+        and any(host == suffix or host.endswith("." + suffix)
+                for suffix in HEALTHSPARQ_ALLOWED_SUFFIXES)
+    )
+
+
+def healthsparq_metadata_files(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    containers: list[dict[str, Any]] = [payload]
+    data = payload.get("data")
+    if isinstance(data, dict):
+        containers.append(data)
+    elif isinstance(data, list):
+        containers.append({"items": data})
+    for container in containers:
+        for key in ("files", "items", "results"):
+            rows = container.get(key)
+            if isinstance(rows, list):
+                return [row for row in rows if isinstance(row, dict)]
+    return []
+
+
+def healthsparq_value(row: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        value = row.get(key)
+        if value not in (None, ""):
+            return value
+    return None
+
+
+def healthsparq_file_type(row: dict[str, Any], url: str) -> str:
+    schema = str(healthsparq_value(
+        row, "fileSchema", "file_schema", "schema", "fileType", "file_type"
+    ) or "").lower().replace("_", "-")
+    if "allowed" in schema:
+        return "allowed_amounts"
+    if "in-network" in schema or "in network" in schema or "innetwork" in schema:
+        return "in_network"
+    if "toc" in schema or "table" in schema:
+        return "index"
+    return classify_file(url, schema)
+
+
+def healthsparq_reporting_plans(row: dict[str, Any]) -> list[dict[str, Any]]:
+    plans = healthsparq_value(
+        row, "reportingPlans", "reporting_plans", "plans", "planInfo", "plan_info"
+    )
+    return [p for p in (plans or []) if isinstance(p, dict)]
+
+
+def resolve_healthsparq_metadata_url(
+    public_url: str,
+    *,
+    timeout: int,
+    max_bytes: int,
+) -> tuple[str, requests.Session]:
+    params = healthsparq_params(public_url)
+    direct = healthsparq_direct_metadata_url(public_url)
+    s = session()
+    try:
+        resp = s.get(direct, timeout=timeout, allow_redirects=True)
+        resp.raise_for_status()
+        if allowed_healthsparq_url(resp.url):
+            payload = resp.json()
+            if healthsparq_metadata_files(payload):
+                return resp.url, s
+    except Exception:
+        pass
+
+    parsed = urllib.parse.urlsplit(public_url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    login_url = origin + "/healthsparq/public/service/login"
+    login_params = {"_": str(int(datetime.now(timezone.utc).timestamp() * 1000)), **params}
+    login = s.get(login_url, params=login_params, timeout=timeout, allow_redirects=True)
+    login.raise_for_status()
+    # The login endpoint is public and establishes the session cookie used by v2/mrf/all.
+    try:
+        login.json()
+    except Exception:
+        pass
+    mrf_all = origin + "/healthsparq/public/service/v2/mrf/all"
+    body = {
+        k: v for k, v in params.items()
+        if k in {"brandCode", "insurerCode", "reportingEntityType", "searchTerm", "productCode"}
+        and v
+    }
+    resolved = s.post(mrf_all, json=body, timeout=timeout, allow_redirects=True)
+    resolved.raise_for_status()
+    payload = resolved.json()
+    metadata_url = str(payload.get("url") or "").strip()
+    if not metadata_url or not allowed_healthsparq_url(metadata_url):
+        raise ValueError("HealthSparq public service returned unsupported metadata URL")
+    return metadata_url, s
+
+
+def ingest_healthsparq_public(
+    conn: sqlite3.Connection,
+    root: Path,
+    source: Source,
+    *,
+    timeout: int,
+    max_bytes: int,
+) -> dict[str, int]:
+    source_id = persist_source(conn, source)
+    metadata_url, s = resolve_healthsparq_metadata_url(
+        source.source_url, timeout=timeout, max_bytes=max_bytes
+    )
+    resp = s.get(metadata_url, timeout=timeout, allow_redirects=True)
+    resp.raise_for_status()
+    if not allowed_healthsparq_url(resp.url):
+        raise ValueError("HealthSparq metadata redirected outside allowed public hosts")
+    raw = resp.content
+    if len(raw) > max_bytes:
+        raise ValueError(f"HealthSparq metadata exceeds max_bytes={max_bytes}")
+    payload = resp.json()
+    snap_id, digest = snapshot_bytes(
+        conn, root, source, source_id, metadata_url, raw,
+        final_url=resp.url, http_status=resp.status_code,
+        content_type=resp.headers.get("content-type"),
+        etag=resp.headers.get("etag"), last_modified=resp.headers.get("last-modified"),
+        parser_status="parsed:healthsparq_metadata",
+    )
+    files = healthsparq_metadata_files(payload)
+    file_count = plan_count = 0
+    for item in files:
+        file_path = healthsparq_value(
+            item, "filePath", "file_path", "path", "location", "url",
+            "downloadUrl", "download_url", "href"
+        )
+        if not file_path:
+            continue
+        file_url = str(file_path).strip()
+        if not file_url.startswith(("http://", "https://")):
+            file_url = urllib.parse.urljoin(resp.url.rsplit("/", 1)[0] + "/", file_url)
+        if not file_url.startswith(("http://", "https://")):
+            continue
+        ftype = healthsparq_file_type(item, file_url)
+        if ftype == "unknown":
+            continue
+        reporting_entity_name = healthsparq_value(
+            item, "reportingEntityName", "reporting_entity_name", "reportingEntity"
+        )
+        reporting_entity_type = healthsparq_value(
+            item, "reportingEntityType", "reporting_entity_type"
+        )
+        last_updated = healthsparq_value(
+            item, "lastUpdatedOn", "last_updated_on", "updatedAt", "updated_at"
+        )
+        size = healthsparq_value(item, "size", "contentLength", "content_length")
+        mrf_id = insert_mrf_file(
+            conn, source, file_url, ftype,
+            snapshot_id=snap_id, manifest_sha=digest,
+            content_length=int(size) if str(size).isdigit() else None,
+            filename=str(healthsparq_value(
+                item, "fileName", "file_name", "filename", "name"
+            ) or "") or None,
+            reporting_entity_name=str(reporting_entity_name) if reporting_entity_name else None,
+            reporting_entity_type=str(reporting_entity_type) if reporting_entity_type else None,
+            last_updated_on=str(last_updated) if last_updated else None,
+            parse_status="healthsparq_metadata",
+        )
+        file_count += 1
+        for plan in healthsparq_reporting_plans(item):
+            normalized = {
+                "plan_name": healthsparq_value(plan, "planName", "plan_name", "name"),
+                "plan_id_type": healthsparq_value(plan, "planIdType", "plan_id_type"),
+                "plan_id": healthsparq_value(plan, "planId", "plan_id"),
+                "plan_market_type": healthsparq_value(
+                    plan, "planMarketType", "plan_market_type", "marketType"
+                ),
+                "issuer_name": healthsparq_value(plan, "issuerName", "issuer_name"),
+                "plan_sponsor_name": healthsparq_value(
+                    plan, "planSponsorName", "plan_sponsor_name", "sponsorName"
+                ),
+            }
+            pid = persist_plan(conn, source, normalized)
+            conn.execute(
+                """INSERT OR IGNORE INTO file_plan_links(mrf_file_id,plan_id,index_snapshot_id)
+                   VALUES(?,?,?)""",
+                (mrf_id, pid, snap_id),
+            )
+            plan_count += 1
+    return {"files": file_count, "plans": plan_count, "snapshots": 1}
+
+
 def discover_github_master_list(
     conn: sqlite3.Connection, root: Path, source: Source, *, timeout: int, max_bytes: int
 ) -> dict[str, int]:
@@ -357,16 +594,29 @@ def discover_github_master_list(
             continue
         url = canonical_url(match.group(0).rstrip(".,;"))
         key_hash = hashlib.sha256(f"{payer}|{url}".encode()).hexdigest()[:16]
+        is_healthsparq = "healthsparq.com" in (urllib.parse.urlsplit(url).hostname or "").lower()
         candidate = Source(
             source_key=f"endurant-{key_hash}",
             payer_name=payer,
-            adapter="master_list_candidate",
+            adapter="healthsparq_public" if is_healthsparq else "master_list_candidate",
             source_url=url,
             historical=False,
             notes=f"type={entity_type}; {notes}"[:2000],
         )
         persist_source(conn, candidate)
         candidates += 1
+        if is_healthsparq:
+            try:
+                hs = ingest_healthsparq_public(
+                    conn, root, candidate, timeout=timeout, max_bytes=max_bytes
+                )
+                direct_files += hs.get("files", 0)
+            except Exception as exc:
+                record_error(
+                    conn, candidate.source_key, url,
+                    "healthsparq_discovery", exc
+                )
+            continue
         ftype = classify_file(url)
         if ftype in {"index", "in_network", "allowed_amounts"}:
             insert_mrf_file(
