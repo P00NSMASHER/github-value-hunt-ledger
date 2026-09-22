@@ -95,6 +95,23 @@ class MultiBranchAdapterTests(unittest.TestCase):
                 rule=rule(), evidence=(evidence("entry"),),
             )
 
+    def test_invalid_money_fails_before_variance_math(self):
+        with self.assertRaises(ValueError):
+            from_ap_variance(
+                client_id="c", vendor_id="v", transaction_id="x",
+                transaction_date="2026-06-01", expected_cents=-1, paid_cents=200,
+                rule=rule(), evidence=(evidence("payment"),),
+            )
+
+    def test_invalid_rule_window_fails_closed(self):
+        with self.assertRaises(ValueError):
+            from_utility_variance(
+                client_id="c", utility_id="u", bill_id="b",
+                bill_date="2026-06-01", expected_cents=100, billed_cents=200,
+                rule=rule(start="2026-12-31", end="2026-01-01"),
+                evidence=(evidence("bill"),),
+            )
+
 
 class LedgerAuditChainTests(unittest.TestCase):
     def test_lifecycle_is_hash_chained_and_idempotent(self):
@@ -110,7 +127,13 @@ class LedgerAuditChainTests(unittest.TestCase):
         self.assertEqual([event.action for event in ledger.events()], ["ADDED"])
 
         ledger.approve(finding.finding_id, "reviewer-1", "verified source and arithmetic")
+        ledger.approve(finding.finding_id, "reviewer-1", "verified source and arithmetic")
         ledger.authorize(finding.finding_id, "customer-auth-1")
+        ledger.authorize(finding.finding_id, "customer-auth-1")
+        with self.assertRaises(ValueError):
+            ledger.approve(finding.finding_id, "reviewer-2", "late second approval")
+        with self.assertRaises(ValueError):
+            ledger.authorize(finding.finding_id, "customer-auth-2")
         ledger.mark_claimed(finding.finding_id)
         ledger.mark_recovered(finding.finding_id, 4000, 800)
 
