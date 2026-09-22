@@ -230,6 +230,57 @@ class TariffLedgerTests(unittest.TestCase):
             src.close()
             dst.close()
 
+    def test_apply_schema_migrates_legacy_snapshot_observation(self):
+        with tempfile.TemporaryDirectory() as td:
+            db = Path(td) / "legacy.sqlite"
+            conn = sqlite3.connect(db)
+            conn.executescript(
+                """
+                CREATE TABLE snapshots (
+                  id INTEGER PRIMARY KEY,
+                  tariff_location_id INTEGER NOT NULL,
+                  requested_url TEXT NOT NULL,
+                  final_url TEXT,
+                  fetched_at TEXT NOT NULL,
+                  http_status INTEGER,
+                  content_type TEXT,
+                  byte_count INTEGER NOT NULL DEFAULT 0,
+                  sha256 TEXT,
+                  blob_relpath TEXT,
+                  parser_status TEXT NOT NULL,
+                  title TEXT,
+                  source_version TEXT,
+                  effective_from TEXT,
+                  effective_to TEXT,
+                  UNIQUE(tariff_location_id, requested_url, sha256)
+                );
+                CREATE VIEW carrier_rule_effective_ledger AS SELECT 1 AS legacy;
+                INSERT INTO snapshots(
+                  tariff_location_id, requested_url, final_url, fetched_at,
+                  http_status, content_type, byte_count, sha256, blob_relpath,
+                  parser_status
+                ) VALUES (
+                  1, 'https://carrier.example/tariff.pdf',
+                  'https://carrier.example/tariff.pdf',
+                  '2026-01-01T00:00:00+00:00',
+                  200, 'application/pdf', 10, 'abc', 'blobs/abc', 'parsed:pdf'
+                );
+                """
+            )
+            crawler.apply_schema(conn)
+            self.assertEqual(
+                conn.execute("SELECT COUNT(*) FROM snapshot_observations").fetchone()[0],
+                1,
+            )
+            columns = {
+                row[1]
+                for row in conn.execute(
+                    "PRAGMA table_info(carrier_rule_effective_ledger)"
+                ).fetchall()
+            }
+            self.assertIn("date_basis", columns)
+            conn.close()
+
     def test_shard_assignment_is_complete_and_disjoint(self):
         rows = [
             crawler.EntitySource(
