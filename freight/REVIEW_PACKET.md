@@ -19,3 +19,17 @@ Action hints are descriptive workflow directions such as reviewing a validated f
 The packet deliberately calls money a **variance**, not a saving. Realized savings/recovery remain downstream settlement concepts.
 
 The packet contains customer-derived audit evidence and belongs only in the approved customer-processing environment. It must not be copied into Hunter or a public website.
+
+
+## Canonical calculation check
+
+Review-packet construction does not trust a persisted derivation merely because its hashes are internally consistent.
+
+For every queued case, the packet builder independently runs the Finding Factory calculation again from the exact normalized charge and complete supplied rule set. The fresh derivation must equal the derivation bound into the factory batch.
+
+This creates two separate checks:
+
+1. factory verification rejects stale or internally inconsistent derivation/finding/truth objects;
+2. packet construction rejects a self-consistent re-hashed derivation whose calculation disagrees with the actual charge and rule evidence.
+
+The reviewer therefore sees amounts that are tied to the same deterministic calculation that can be reproduced from the packet inputs.
