@@ -14,6 +14,7 @@
   "changed_logical_targets": [
     "STRAT:replace-with-authorized-target"
   ],
+  "regression_test_requirement": "Copy the exact requirement from the authorized repair task.",
   "regression_tests_total": 1,
   "regression_tests_passed": 1,
   "regression_test_evidence_refs": [
