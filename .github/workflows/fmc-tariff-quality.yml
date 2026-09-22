@@ -35,4 +35,4 @@ jobs:
       - run: python -m unittest discover -v -p 'test_*.py'
       - name: Compile production modules
         run: |
-          python -m py_compile             crawler.py crawler_v2.py currency_terms.py             publisher_adapters.py revalidate.py run.py
+          python -m py_compile             crawler.py crawler_v2.py currency_terms.py             publisher_adapters.py revalidate.py resolve.py run.py
