@@ -1,8 +1,9 @@
 """Shared deterministic contract-billing engine for recurring-service recovery.
 
-Used by SaaSRecovery and TelecomRecovery. It compares an invoice charge to the
-expected amount derived from an effective-dated contract plus independently
-supplied usage/seat quantities when the contract is usage based.
+Used by recurring-service branches including SaaS, Telecom, Lease, Cloud, and
+Payroll/Benefit billing recovery. It compares an invoice charge to the expected
+amount derived from an effective-dated contract plus independently supplied
+billable quantities when the contract is usage based.
 """
 from __future__ import annotations
 
@@ -248,8 +249,8 @@ def audit_contract_billing(
     usage: Iterable[UsageRecord] = (),
     currency: str = "USD",
 ) -> ContractBillingBatch:
-    if branch not in {Branch.SAAS, Branch.TELECOM, Branch.LEASE, Branch.CLOUD}:
-        raise ValueError("contract billing engine only supports SaaS/telecom/lease/cloud branches")
+    if branch not in {Branch.SAAS, Branch.TELECOM, Branch.LEASE, Branch.CLOUD, Branch.PAYROLL_BENEFIT}:
+        raise ValueError("contract billing engine only supports SaaS/telecom/lease/cloud/payroll-benefit branches")
     client_id = _required("client_id", client_id)
     currency = _required("currency", currency).upper()
 

@@ -89,6 +89,28 @@ POLICIES: dict[Branch, BranchPolicy] = {
         "merchant_fee_reviewer",
         professional_review_note="Only reviewed processor-controlled fees are in scope; interchange/network/pass-through charges require separate review.",
     ),
+    Branch.PARCEL: BranchPolicy(
+        Branch.PARCEL,
+        RecoveryMode.OVERPAYMENT,
+        "parcel_recovery_reviewer",
+    ),
+    Branch.PROCUREMENT: BranchPolicy(
+        Branch.PROCUREMENT,
+        RecoveryMode.OVERPAYMENT,
+        "procurement_recovery_reviewer",
+    ),
+    Branch.WARRANTY_CREDIT: BranchPolicy(
+        Branch.WARRANTY_CREDIT,
+        RecoveryMode.UNDERPAYMENT,
+        "warranty_credit_reviewer",
+    ),
+    Branch.PAYROLL_BENEFIT: BranchPolicy(
+        Branch.PAYROLL_BENEFIT,
+        RecoveryMode.OVERPAYMENT,
+        "payroll_benefit_reviewer",
+        sensitive_data=True,
+        professional_review_note="Employer-side vendor/benefit billing only; employee wages, payroll taxes, and employee deductions are outside this branch.",
+    ),
 }
 
 
