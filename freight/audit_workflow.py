@@ -338,6 +338,12 @@ def run_audit_workflow(
     )
 
 
+def _currency_amount(currency: str, cents: int) -> str:
+    sign = "-" if cents < 0 else ""
+    whole, fraction = divmod(abs(cents), 100)
+    return currency + " " + sign + f"{whole:,}.{fraction:02d}"
+
+
 def render_workflow_summary(result: AuditWorkflowResult) -> str:
     if result.state == AuditWorkflowState.BLOCKED.value:
         return "\n".join([
@@ -384,9 +390,9 @@ def render_workflow_summary(result: AuditWorkflowResult) -> str:
         *[
             "- " + item.currency
             + " — Validated discrepancy: **"
-            + item.currency + " " + format(item.validated_discrepancy_cents / 100, ",.2f")
+            + _currency_amount(item.currency, item.validated_discrepancy_cents)
             + "**; review discrepancy with a calculable expected amount: **"
-            + item.currency + " " + format(item.review_discrepancy_cents / 100, ",.2f")
+            + _currency_amount(item.currency, item.review_discrepancy_cents)
             + "**"
             for item in summary.currency_discrepancies
         ],
