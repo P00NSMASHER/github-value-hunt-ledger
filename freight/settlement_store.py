@@ -317,7 +317,7 @@ class SettlementStore:
         v: dict[str, object],
     ) -> bool:
         original = conn.execute(
-            "SELECT currency,booked_at FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
+            "SELECT currency,booked_at,amount_cents FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
             (*self._scope, v["original_event_id"]),
         ).fetchone()
         if not original:
@@ -339,6 +339,13 @@ class SettlementStore:
             (*self._scope, v["source_hash"]),
         ).fetchone():
             raise ValueError("counter source_hash already used")
+        countered_cents = int(conn.execute(
+            "SELECT COALESCE(SUM(amount_cents),0) FROM counter_events "
+            "WHERE buyer_id=? AND business_unit=? AND original_event_id=?",
+            (*self._scope, v["original_event_id"]),
+        ).fetchone()[0])
+        if countered_cents + int(v["amount_cents"]) > int(original["amount_cents"]):
+            raise ValueError("counter events exceed original settlement amount")
         conn.execute("""INSERT INTO counter_events
           (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
           VALUES(:buyer_id,:business_unit,:counter_id,:original_event_id,:currency,:amount_cents,:observed_at,:source_hash,:source_kind)""", v)
@@ -363,13 +370,27 @@ class SettlementStore:
 
     def _event_residual(self, conn: sqlite3.Connection, event_id: str) -> int:
         row = conn.execute("""SELECT e.amount_cents
+          - COALESCE((SELECT SUM(amount_cents) FROM counter_events
+              WHERE buyer_id=e.buyer_id AND business_unit=e.business_unit
+                AND original_event_id=e.event_id),0)
           - COALESCE((SELECT SUM(amount_cents) FROM allocations
-              WHERE buyer_id=e.buyer_id AND business_unit=e.business_unit AND event_id=e.event_id),0) AS residual
+              WHERE buyer_id=e.buyer_id AND business_unit=e.business_unit
+                AND event_id=e.event_id),0)
+          + COALESCE((SELECT SUM(r.amount_cents) FROM reversal_edges r
+              JOIN allocations a
+                ON a.buyer_id=r.buyer_id
+               AND a.business_unit=r.business_unit
+               AND a.allocation_id=r.allocation_id
+              WHERE a.buyer_id=e.buyer_id AND a.business_unit=e.business_unit
+                AND a.event_id=e.event_id),0) AS residual
           FROM settlement_events e WHERE e.buyer_id=? AND e.business_unit=? AND e.event_id=?""",
           (*self._scope, event_id)).fetchone()
         if not row:
             raise ValueError("unknown settlement event")
-        return int(row["residual"])
+        # An unresolved return can temporarily make live allocations exceed
+        # net settlement funds. That is an over-attributed state requiring
+        # reversal/review, never additional allocatable capacity.
+        return max(int(row["residual"]), 0)
 
     def claim_residual(self, claim_id: str) -> int:
         return self._read(lambda c: self._claim_residual(c, claim_id))
