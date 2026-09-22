@@ -152,6 +152,12 @@ from .ap_csv import (
     signed_money_to_cents,
 )
 from .ap_ingest import APIngestionResult, ingest_ap_exports
+from .ap_shadow import (
+    APReconciliationShadowReport,
+    APShadowDiagnostic,
+    APShadowLegacyCandidate,
+    shadow_ap_reconciliation,
+)
 from .base import BranchInput, RuleBackedAdapter
 from .duty import (
     DutyAssessment,
@@ -246,6 +252,9 @@ __all__ = [
     "CPMResult",
     "CPMActivityResult",
     "APIngestionResult",
+    "APReconciliationShadowReport",
+    "APShadowDiagnostic",
+    "APShadowLegacyCandidate",
     "RebateAuditBatch",
     "RebateAuditException",
     "RebateCalculation",
@@ -308,6 +317,7 @@ __all__ = [
     "audit_utility_bills",
     "build_ap_observations",
     "ingest_ap_exports",
+    "shadow_ap_reconciliation",
     "ingest_lease_exports",
     "ingest_utility_exports",
     "calculate_expected_bill",
