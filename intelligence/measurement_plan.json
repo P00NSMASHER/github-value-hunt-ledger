@@ -3,6 +3,9 @@
     "min_runs": 5,
     "min_deep_inspections": 20
   },
+  "count_semantics": "observational_discovery",
+  "learning_authority": "intelligence/learning_curriculum.json",
+  "learning_note": "Observational discovery counts are broader than adaptive-learning train/confirm counts. Use learning_* fields and LEARNING_CURRICULUM for policy-learning evidence.",
   "active_strategies": 14,
   "sufficient_strategies": 0,
   "rows": [
@@ -16,7 +19,14 @@
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.04761294366591096,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 0,
+      "learning_train_deep_inspections": 0,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:cross-source-emergence-triangulation",
@@ -28,7 +38,14 @@
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.04761294366591096,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 0,
+      "learning_train_deep_inspections": 0,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
@@ -40,7 +57,14 @@
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.04761294366591096,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 0,
+      "learning_train_deep_inspections": 0,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:ingestion-invariant-triad-intersection",
@@ -52,7 +76,14 @@
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.04761294366591096,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 0,
+      "learning_train_deep_inspections": 0,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:nested-authority-and-post-review-invariant-audit",
@@ -64,7 +95,14 @@
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.04761294366591096,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 0,
+      "learning_train_deep_inspections": 0,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:paper-research-artifact-production-descendant",
@@ -76,7 +114,14 @@
       "measurement_debt": 2.0,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.04761294366591096,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 0,
+      "learning_train_deep_inspections": 0,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
@@ -88,7 +133,14 @@
       "measurement_debt": 1.75,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.046575752350656474,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 1,
+      "learning_train_deep_inspections": 1,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
@@ -100,7 +152,14 @@
       "measurement_debt": 1.65,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.06883023060032631,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 1,
+      "learning_train_deep_inspections": 3,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:fail-open-boundary-archaeology",
@@ -112,7 +171,14 @@
       "measurement_debt": 1.6,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.07774461538020618,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 1,
+      "learning_train_deep_inspections": 4,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:first-party-production-source-triangulation",
@@ -124,7 +190,14 @@
       "measurement_debt": 1.25,
       "instrumentation_debt": 1.0,
       "policy_allocation": 0.09911476341032881,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 0,
+      "learning_train_deep_inspections": 0,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
@@ -136,7 +209,14 @@
       "measurement_debt": 0.9500000000000001,
       "instrumentation_debt": 0.1111111111111111,
       "policy_allocation": 0.10744353428107893,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 3,
+      "learning_train_deep_inspections": 9,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:evaluation-target-independence",
@@ -148,7 +228,14 @@
       "measurement_debt": 0.8999999999999999,
       "instrumentation_debt": 0.5,
       "policy_allocation": 0.08390074207423853,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 4,
+      "learning_train_deep_inspections": 6,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:rule-period-authority-version-audit",
@@ -160,7 +247,14 @@
       "measurement_debt": 0.75,
       "instrumentation_debt": 0.0,
       "policy_allocation": 0.1006320798043864,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 4,
+      "learning_train_deep_inspections": 9,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     },
     {
       "strategy_id": "STRAT:acceptance-path-transition-inspection",
@@ -172,7 +266,14 @@
       "measurement_debt": 0.5,
       "instrumentation_debt": 0.06666666666666667,
       "policy_allocation": 0.13008062010331256,
-      "sufficient_evidence": false
+      "sufficient_evidence": false,
+      "count_semantics": "observational_discovery",
+      "learning_phase": "train_measurement",
+      "learning_train_runs": 4,
+      "learning_train_deep_inspections": 10,
+      "learning_confirm_runs": 0,
+      "learning_confirm_deep_inspections": 0,
+      "learning_policy_eligible": false
     }
   ]
 }
