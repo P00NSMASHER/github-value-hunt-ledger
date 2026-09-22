@@ -236,7 +236,7 @@ Automatic writes and automatic global promotion remain disabled.
 
 `production/skill_eval_intake.py` and `tools/ti_skill_eval_result_intake.py` consume immutable evaluator results only for candidates already present in `SKILL_EVAL_QUEUE.md`.
 
-Every result must bind to the exact current skill-evaluation task hash and candidate-record hash. Mutate-dev and promotion-test sets must have distinct frozen fingerprints; the mutator must attest that it never saw promotion-test data; evaluator mutation and sealed-holdout access by the mutator are blocked.
+Every result must bind to the exact current skill-evaluation task hash and candidate-record hash. Mutate-dev and promotion-test sets must have distinct non-empty frozen fingerprints; the mutator and evaluator identities must be distinct; the mutator must attest that it never saw promotion-test data; evaluator/controller mutation and sealed-holdout access by the mutator are blocked.
 
 The positive transition remains narrow:
 
