@@ -1,0 +1,131 @@
+name: TiC Targeted Rate Extract
+
+on:
+  workflow_dispatch:
+    inputs:
+      rate_file_urls:
+        description: "One or more public TiC in-network MRF URLs, newline/comma separated"
+        required: true
+        type: string
+      npis:
+        description: "One or more 10-digit provider NPIs, newline/comma separated"
+        required: true
+        type: string
+      billing_codes:
+        description: "CPT/HCPCS/revenue codes, newline/comma separated"
+        required: true
+        type: string
+      max_bytes:
+        description: "Per-file download safety ceiling in bytes"
+        required: true
+        default: "20000000000"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/tic_mrf_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/tic_mrf_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - name: Stream targeted payer rates
+        env:
+          RATE_FILE_URLS: ${{ inputs.rate_file_urls }}
+          NPIS: ${{ inputs.npis }}
+          BILLING_CODES: ${{ inputs.billing_codes }}
+          MAX_BYTES: ${{ inputs.max_bytes }}
+        run: |
+          mkdir -p output
+          python - <<'PY'
+          import os, re, subprocess
+
+          def values(name):
+              return [
+                  part.strip()
+                  for part in re.split(r"[\n,;]+", os.environ.get(name, ""))
+                  if part.strip()
+              ]
+
+          urls = values("RATE_FILE_URLS")
+          npis = values("NPIS")
+          codes = values("BILLING_CODES")
+          if not urls or not npis or not codes:
+              raise SystemExit("URLs, NPIs, and billing codes are all required")
+          if not all(url.startswith(("https://", "http://")) for url in urls):
+              raise SystemExit("every rate file must be an http(s) URL")
+          if not all(re.fullmatch(r"\d{10}", npi) for npi in npis):
+              raise SystemExit("every NPI must contain exactly 10 digits")
+          max_bytes = int(os.environ["MAX_BYTES"])
+          if max_bytes <= 0 or max_bytes > 100_000_000_000:
+              raise SystemExit("max_bytes must be between 1 and 100GB")
+
+          cmd = [
+              "python", "extract_targeted.py",
+              "--db", "output/tic_targeted.sqlite",
+              "--output", "output/extraction.json",
+              "--max-bytes", str(max_bytes),
+          ]
+          for url in urls:
+              cmd.extend(["--url", url])
+          for npi in npis:
+              cmd.extend(["--npi", npi])
+          for code in codes:
+              cmd.extend(["--billing-code", code])
+          subprocess.run(cmd, check=True)
+
+          export_cmd = [
+              "python", "export_benchmarks.py",
+              "--db", "output/tic_targeted.sqlite",
+              "--output", "output/benchmark_rates.csv",
+          ]
+          for npi in npis:
+              export_cmd.extend(["--npi", npi])
+          for code in codes:
+              export_cmd.extend(["--billing-code", code])
+          subprocess.run(export_cmd, check=True)
+          PY
+      - name: Validate fail-closed benchmark boundary
+        run: |
+          python - <<'PY'
+          import csv, json, pathlib, sqlite3
+
+          root = pathlib.Path("output")
+          payload = json.loads((root / "extraction.json").read_text())
+          con = sqlite3.connect(root / "tic_targeted.sqlite")
+          rates = con.execute("SELECT COUNT(*) FROM rate_rows").fetchone()[0]
+          providers = con.execute("SELECT COUNT(*) FROM provider_groups").fetchone()[0]
+          errors = con.execute("SELECT COUNT(*) FROM ingestion_errors").fetchone()[0]
+          con.close()
+          with (root / "benchmark_rates.csv").open(newline="") as fh:
+              rows = list(csv.DictReader(fh))
+          if any(row["Verified_Controlling_Rate"].lower() != "false" for row in rows):
+              raise SystemExit("TiC benchmark was incorrectly promoted to controlling rate")
+          summary = {
+              "rate_rows": rates,
+              "provider_groups": providers,
+              "errors": errors,
+              "benchmark_rows": len(rows),
+              "files": payload.get("files", []),
+              "authority_boundary": "benchmark_only_not_controlling_contract_rate",
+          }
+          (root / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+          print(json.dumps(summary, indent=2))
+          PY
+      - name: Upload targeted TiC evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tic-targeted-rate-evidence
+          path: production/tic_mrf_ledger/output/
+          retention-days: 90
+          compression-level: 6
+          if-no-files-found: error
