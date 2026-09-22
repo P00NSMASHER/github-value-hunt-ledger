@@ -102,10 +102,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f intelligence/TRAINING_SPLIT_KEY_COMMITMENT.json ]; then
+            git add intelligence/TRAINING_SPLIT_KEY_COMMITMENT.json
+          fi
           git add intelligence/search_runs.jsonl \
                   intelligence/training_split_receipts.jsonl \
                   intelligence/TRAINING_SPLIT_STATUS.json \
-                  intelligence/TRAINING_SPLIT_KEY_COMMITMENT.json \
                   intelligence/capabilities.jsonl \
                   intelligence/search_strategies.jsonl \
                   intelligence/query_families.jsonl \
