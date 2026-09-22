@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import hashlib
 import sqlite3
 import tempfile
 import unittest
@@ -8,6 +9,7 @@ from recoveryworks import (
     CaseState,
     EvidenceRef,
     FindingState,
+    RecoveryActionType,
     RecoveryEngine,
     RecoveryLedger,
     SQLiteRecoveryLedger,
@@ -15,6 +17,8 @@ from recoveryworks import (
     RuleRef,
     SourceManifestEntry,
     freeze_scan,
+    issue_authorization,
+    revoke_authorization,
     run_scan,
 )
 from recoveryworks.branches.base import BranchInput
@@ -40,6 +44,98 @@ def rule(verified=True):
         effective_to=None,
         verified_controlling=verified,
         source_locator="source://contract#7.4",
+    )
+
+
+def sha(text):
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+DEFAULT_ACTION = {
+    Branch.FREIGHT: RecoveryActionType.SUBMIT_DISPUTE,
+    Branch.PAYER: RecoveryActionType.SUBMIT_APPEAL,
+    Branch.UTILITY: RecoveryActionType.SUBMIT_DISPUTE,
+    Branch.AP: RecoveryActionType.REQUEST_VENDOR_REFUND,
+    Branch.CONSTRUCTION: RecoveryActionType.SUBMIT_CHANGE_CLAIM,
+    Branch.DUTY: RecoveryActionType.REQUEST_CUSTOMS_REVIEW,
+}
+
+
+def scoped_authorization(
+    ledger,
+    finding,
+    *,
+    authorization_id="auth-1",
+    authorized_cents=None,
+    issued_on="2026-09-22",
+    expires_on="2026-10-01",
+    action_type=None,
+):
+    action_type = action_type or DEFAULT_ACTION[finding.branch]
+    recipient_hash = sha(finding.finding_id + ":recipient")
+    payload_hash = sha(finding.finding_id + ":payload:" + action_type.value)
+    auth = issue_authorization(
+        ledger.get(finding.finding_id),
+        authorization_id=authorization_id,
+        action_type=action_type,
+        target_counterparty_id=finding.counterparty_id,
+        recipient_reference_hash=recipient_hash,
+        action_payload_hash=payload_hash,
+        authorized_cents=authorized_cents or finding.potential_recovery_cents,
+        approver_role="customer_recovery_approver",
+        issued_on=issued_on,
+        expires_on=expires_on,
+    )
+    return auth, action_type, recipient_hash, payload_hash
+
+
+def authorize_case(
+    ledger,
+    finding,
+    *,
+    authorization_id="auth-1",
+    authorized_cents=None,
+    issued_on="2026-09-22",
+    expires_on="2026-10-01",
+    action_type=None,
+):
+    auth, action, recipient_hash, payload_hash = scoped_authorization(
+        ledger,
+        finding,
+        authorization_id=authorization_id,
+        authorized_cents=authorized_cents,
+        issued_on=issued_on,
+        expires_on=expires_on,
+        action_type=action_type,
+    )
+    ledger.authorize(finding.finding_id, auth, as_of_date=issued_on)
+    return auth, action, recipient_hash, payload_hash
+
+
+def claim_case(
+    ledger,
+    finding,
+    auth,
+    action,
+    recipient_hash,
+    payload_hash,
+    *,
+    requested_cents=None,
+    as_of_date="2026-09-22",
+    revocations=(),
+):
+    requested_cents = requested_cents or auth.authorized_cents
+    return ledger.mark_claimed(
+        finding.finding_id,
+        auth,
+        as_of_date=as_of_date,
+        action_type=action,
+        target_counterparty_id=finding.counterparty_id,
+        recipient_reference_hash=recipient_hash,
+        action_payload_hash=payload_hash,
+        currency=finding.currency,
+        requested_cents=requested_cents,
+        revocations=revocations,
     )
 
 
@@ -160,7 +256,7 @@ class RecoveryWorksTests(unittest.TestCase):
             5000,
         )
 
-    def test_ledger_requires_review_and_authorization_before_claim(self):
+    def test_ledger_requires_scoped_authorization_before_claim(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
             branch=Branch.DUTY, client_id="c", counterparty_id="customs",
             reference="entry1", currency="USD", expected_cents=10000,
@@ -170,15 +266,41 @@ class RecoveryWorksTests(unittest.TestCase):
         ledger = RecoveryLedger()
         rec = ledger.add(finding)
         self.assertIs(rec.case_state, CaseState.VALIDATED)
-        with self.assertRaises(ValueError):
-            ledger.mark_claimed(finding.finding_id)
+        with self.assertRaisesRegex(ValueError, "scope-bound"):
+            ledger.authorize(finding.finding_id, "customer-auth-1", as_of_date="2026-09-22")
+
         ledger.approve(finding.finding_id, "reviewer-1", "Checked source and calculation")
-        ledger.authorize(finding.finding_id, "customer-auth-1")
-        claimed = ledger.mark_claimed(finding.finding_id)
+        auth, action, recipient_hash, payload_hash = scoped_authorization(
+            ledger,
+            finding,
+            authorization_id="customer-auth-1",
+            authorized_cents=3000,
+        )
+        with self.assertRaisesRegex(ValueError, "AUTHORIZED"):
+            claim_case(
+                ledger, finding, auth, action, recipient_hash, payload_hash,
+                requested_cents=3000,
+            )
+
+        authorized = ledger.authorize(
+            finding.finding_id,
+            auth,
+            as_of_date="2026-09-22",
+        )
+        self.assertEqual(authorized.authorization_hash, auth.authorization_hash)
+        self.assertEqual(authorized.authorized_cents, 3000)
+
+        claimed = claim_case(
+            ledger, finding, auth, action, recipient_hash, payload_hash,
+            requested_cents=3000,
+        )
         self.assertIs(claimed.case_state, CaseState.CLAIMED)
+        self.assertEqual(claimed.claimed_cents, 3000)
         recovered = ledger.mark_recovered(finding.finding_id, 3000, 600)
         self.assertIs(recovered.case_state, CaseState.RECOVERED)
         self.assertEqual(ledger.rollup()["currencies"]["USD"]["fee_cents"], 600)
+        self.assertEqual(ledger.rollup()["currencies"]["USD"]["authorized_cents"], 3000)
+        self.assertEqual(ledger.rollup()["currencies"]["USD"]["claimed_cents"], 3000)
 
     def test_ledger_dedupes_identical_proof(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
@@ -223,17 +345,106 @@ class RecoveryWorksTests(unittest.TestCase):
         rejected.reject(finding.finding_id, "reviewer-1", "False positive")
         with self.assertRaises(ValueError):
             rejected.approve(finding.finding_id, "reviewer-2", "Try to reopen")
-        with self.assertRaises(ValueError):
-            rejected.authorize(finding.finding_id, "auth-should-fail")
+        with self.assertRaisesRegex(ValueError, "VALIDATED ledger state"):
+            scoped_authorization(rejected, finding, authorization_id="auth-should-fail")
 
         recovered = RecoveryLedger()
         recovered.add(finding)
         recovered.approve(finding.finding_id, "reviewer-1", "Verified")
-        recovered.authorize(finding.finding_id, "auth-1")
-        recovered.mark_claimed(finding.finding_id)
+        auth, action, recipient_hash, payload_hash = authorize_case(
+            recovered, finding, authorization_id="auth-1",
+        )
+        claim_case(recovered, finding, auth, action, recipient_hash, payload_hash)
         recovered.mark_recovered(finding.finding_id, 5000, 1000)
         with self.assertRaises(ValueError):
-            recovered.authorize(finding.finding_id, "auth-2")
+            recovered.authorize(finding.finding_id, auth, as_of_date="2026-09-22")
+
+    def test_authorization_rejects_wrong_branch_action_and_excess_amount(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.AP, client_id="c", counterparty_id="vendor",
+            reference="pay-auth", currency="USD", expected_cents=0,
+            actual_cents=10000, rule=rule(), evidence=(evidence(),),
+            reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+        ))
+        ledger = RecoveryLedger()
+        ledger.add(finding)
+        ledger.approve(finding.finding_id, "reviewer-1", "Verified")
+        with self.assertRaisesRegex(ValueError, "not allowed"):
+            scoped_authorization(
+                ledger,
+                finding,
+                action_type=RecoveryActionType.SUBMIT_APPEAL,
+            )
+        with self.assertRaisesRegex(ValueError, "exceeds"):
+            scoped_authorization(
+                ledger,
+                finding,
+                authorized_cents=10001,
+            )
+
+    def test_revoked_authorization_cannot_authorize_or_claim(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.FREIGHT, client_id="c", counterparty_id="carrier",
+            reference="inv-revoke", currency="USD", expected_cents=10000,
+            actual_cents=14000, rule=rule(), evidence=(evidence(),),
+            reason="OVERCHARGE", confidence_basis="verified contract",
+        ))
+        ledger = RecoveryLedger()
+        ledger.add(finding)
+        ledger.approve(finding.finding_id, "reviewer-1", "Verified")
+        auth, action, recipient_hash, payload_hash = scoped_authorization(
+            ledger,
+            finding,
+            authorization_id="auth-revoked",
+        )
+        revocation = revoke_authorization(
+            auth,
+            revocation_id="rev-1",
+            revoked_on="2026-09-22",
+            approver_role="customer_recovery_approver",
+            reason="Customer withdrew permission",
+        )
+        with self.assertRaisesRegex(ValueError, "REVOKED"):
+            ledger.authorize(
+                finding.finding_id,
+                auth,
+                as_of_date="2026-09-22",
+                revocations=(revocation,),
+            )
+
+    def test_claim_scope_and_recovery_ceiling_are_enforced(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.UTILITY, client_id="c", counterparty_id="utility",
+            reference="bill-scope", currency="USD", expected_cents=10000,
+            actual_cents=15000, rule=rule(), evidence=(evidence(),),
+            reason="TARIFF_VARIANCE", confidence_basis="verified tariff",
+        ))
+        ledger = RecoveryLedger()
+        ledger.add(finding)
+        ledger.approve(finding.finding_id, "reviewer-1", "Verified")
+        auth, action, recipient_hash, payload_hash = authorize_case(
+            ledger,
+            finding,
+            authorized_cents=3000,
+        )
+        with self.assertRaisesRegex(ValueError, "payload"):
+            ledger.mark_claimed(
+                finding.finding_id,
+                auth,
+                as_of_date="2026-09-22",
+                action_type=action,
+                target_counterparty_id=finding.counterparty_id,
+                recipient_reference_hash=recipient_hash,
+                action_payload_hash=sha("different-payload"),
+                currency=finding.currency,
+                requested_cents=3000,
+            )
+        claim_case(
+            ledger, finding, auth, action, recipient_hash, payload_hash,
+            requested_cents=2500,
+        )
+        with self.assertRaisesRegex(ValueError, "claimed amount"):
+            ledger.mark_recovered(finding.finding_id, 2501)
 
     def test_sqlite_ledger_survives_restart_with_same_state(self):
         with tempfile.TemporaryDirectory() as td:
@@ -247,8 +458,16 @@ class RecoveryWorksTests(unittest.TestCase):
             ledger = SQLiteRecoveryLedger(path)
             ledger.add(finding)
             ledger.approve(finding.finding_id, "reviewer-1", "Verified tariff and bill")
-            ledger.authorize(finding.finding_id, "customer-auth-77")
-            ledger.mark_claimed(finding.finding_id)
+            auth, action, recipient_hash, payload_hash = authorize_case(
+                ledger,
+                finding,
+                authorization_id="customer-auth-77",
+                authorized_cents=3500,
+            )
+            claim_case(
+                ledger, finding, auth, action, recipient_hash, payload_hash,
+                requested_cents=3500,
+            )
             final = ledger.mark_recovered(finding.finding_id, 3500, 700)
             final_hash = final.record_hash
 
