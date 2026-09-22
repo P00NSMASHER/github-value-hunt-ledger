@@ -190,6 +190,38 @@ class TiCCatalogTests(unittest.TestCase):
             self.assertEqual(row[1], "unresolved_path_from_metadata")
             conn.close()
 
+    def test_github_master_list_adds_source_candidates_and_direct_indexes(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            source = catalog.Source(
+                "master", "Registry", "github_master_list",
+                "https://github.test/master.md"
+            )
+            raw = (
+                "| Payer | Type | Public MRF TOC / landing URL | Notes |\n"
+                "|---|---|---|---|\n"
+                "| Example Health | commercial | https://payer.test/2026-09-01_example_index.json | current |\n"
+                "| Landing Only | tpa | https://payer.test/transparency | landing |\n"
+            ).encode()
+            with patch.object(catalog, "fetch_bytes", return_value=(
+                raw, fake_response(source.source_url, "text/markdown")
+            )):
+                stats = catalog.discover_github_master_list(
+                    conn, root, source, timeout=1, max_bytes=1_000_000
+                )
+            self.assertEqual(stats["source_candidates"], 2)
+            self.assertEqual(stats["files"], 1)
+            self.assertEqual(
+                conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0], 3
+            )
+            row = conn.execute(
+                "SELECT file_type,file_url FROM mrf_files"
+            ).fetchone()
+            self.assertEqual(row[0], "index")
+            self.assertIn("example_index.json", row[1])
+            conn.close()
+
 
 if __name__ == "__main__":
     unittest.main()
