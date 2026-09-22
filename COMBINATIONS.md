@@ -260,3 +260,39 @@ Hash integrity and dedupe are both necessary but neither proves the aggregation 
 - Commercial advantage: sell **the same recovery method across multiple ERPs**, changing only the read-only source adapter. This avoids building six separate businesses and turns ERP knowledge into an onboarding moat.
 - First-payment strategy: sell a fixed diagnostic using file exports/DBA queries first; only build credentialed continuous connectors after a paying buyer proves recurring value.
 - Security invariant: default read-only. ERP writes, payment actions, credit applications, supplier communication and journal posting are outside the first product and require separate explicit buyer authorization.
+
+
+## Utility Bill Recovery — official tariff authority -> exact rerating -> utility credit/refund
+- Product position: **independent commercial/industrial utility-bill recovery and tariff assurance**, not generic energy analytics and not autonomous tariff interpretation.
+- Core calculation substrate: `aws-samples/sample-energy-utility-rate-engine@e2f987be3863b0a5026940b7217cbc4ddffe6129` for RDL -> typed AST -> generated Rust calculators, scenario/version management and batch rerating.
+- Tariff discovery/index plane: `we3lab/industrial-electricity-tariffs@ffab0314814d4796c6655c91f53f90b525acdf94` monthly industrial/commercial tariff corpus with normalized structures, utility metadata and original source URLs. Its continuity validator is known-defective and therefore cannot certify completeness.
+- Independent comparator: `LBNL-ETA/elecprice@a6947c3b65fdedec7da5bbeb52b85e8fdeffd1f4` for supported commercial TOU/fixed/energy/demand cases, plus literal hand-derived goldens.
+- Document/intake donor only: PDF/tariff-version/orchestration concepts from `harshalsp0011/utility-billing-ai@c66e124f1991366f6c38c3535780905545edffb0`, after replacing its fail-open money semantics. Do not inherit LLM-extracted tariff logic as authority.
+- Combined capability: utility bill + interval/meter demand data + account/service-class identity -> candidate tariff discovery -> reviewed first-party controlling tariff/rider/tax authority with exact effective dates -> deterministic exact-money expected bill -> independent comparison -> evidence-ranked discrepancy -> buyer-approved utility dispute -> issued bill credit/refund/check -> unique settlement allocation -> realized-recovery certificate.
+- Hard invariants:
+  - OpenEI/WE3 normalized data is discovery/reference evidence, **not controlling entitlement**.
+  - No applicable tariff/factor/rider, ambiguous account class, incomplete interval data, future-version fallback, missing demand determinant or unsupported tax logic = **REVIEW / $0 asserted recovery**.
+  - A rate engine may not turn a missing factor into zero. Replace AWS sample `GET_FACTOR -> 0.0` semantics with typed missing-authority failure.
+  - Money-bearing arithmetic uses Decimal/integer minor units and explicit tariff-defined rounding scope/method; `f64` output is challenge/benchmark evidence only.
+  - Candidate overcharge is not recovery; only buyer-verifiable credit/refund/offset, uniquely allocated and net of reversal, is realized.
+- Initial ICP: multi-site commercial/industrial electricity users with material demand/rider exposure and accessible bills/meter data: REIT/property management, retail/franchise chains, cold storage, manufacturers, universities/hospitals, large municipal/wastewater portfolios and energy-service firms.
+- Fastest first paid wedge: 5-25 meters, 12-24 months history, read-only **Utility Tariff & Billing Recovery Diagnostic**. Start with bill PDFs/CSV plus 15/30-minute interval or billed-demand records; no utility-account mutation required.
+- Pilot deliverable: per-bill source/authority version, expected component breakdown, disputed component, supporting tariff page/rider/effective-date evidence, independent rerate result, disposition, utility response, issued credit/refund and realized amount.
+- Commercial ladder (hypotheses, not forecasts):
+  - Data/tariff readiness scan: **$7.5k-$15k fixed**.
+  - Historical rerating/recovery pilot: **$15k-$40k fixed** or setup plus **15-25% of uniquely attributable realized utility credits/refunds**.
+  - Ongoing tariff/bill assurance after proof: **$40k-$150k+ annual** for multi-site portfolios, scaled by meter count, tariff complexity and data/integration burden.
+- Fastest path to first payment: managed-service diagnostic using historical bills/interval exports; tariff research is accelerated by the monthly national corpus and does not require utility API integration.
+- Plausible path to $100K: 3-6 multi-site pilots at roughly $20k-$35k, or fewer plus realized-recovery fees.
+- Plausible path to $1M: scenario of 15-25 retained multi-site customers averaging roughly $40k-$75k annual value plus outcome fees. Recovery yield, sales cycle and willingness to pay remain unproven.
+- Estimated engineering compression: **6-12 months** when combining rate-language/compiler/batch work, tariff discovery/normalization and independent commercial-rate calculation rather than greenfield.
+- What remains to build:
+  1. exact-money/fail-closed fork or adapter around the primary rate engine;
+  2. immutable tariff/rider/source version registry with page/section evidence;
+  3. utility bill + interval-meter canonical model and parser;
+  4. tariff/account-class applicability review gate;
+  5. taxes, riders, ratchets, coincident/daily/reactive-demand extensions driven only by proven customer tariffs;
+  6. independent rerating/golden corpus;
+  7. dispute/recovery workflow and CAP-006-style settlement allocation;
+  8. coverage tests proving every billed component is either independently recomputed or explicitly UNKNOWN.
+- Confidence: **high technical feasibility / high commercial plausibility**, but no buyer-authorized recovery outcome yet.
