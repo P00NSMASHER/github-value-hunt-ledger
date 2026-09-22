@@ -25,6 +25,7 @@ from production.learning_engine import (
     FailureEvent,
     assess_failure_for_repair,
     learn_value_memory,
+    observed_search_reward,
 )
 
 
@@ -114,12 +115,7 @@ def support_index(
 ) -> dict[str, dict[str, int]]:
     out: dict[str, dict[str, int]] = {}
     for run in search_runs:
-        if run.get("work_action") not in (None, "search"):
-            continue
-        if run.get("measurement_quality") not in {
-            "prospective",
-            "benchmark",
-        }:
+        if observed_search_reward(run) is None:
             continue
 
         deep = run.get("deep_inspected")
