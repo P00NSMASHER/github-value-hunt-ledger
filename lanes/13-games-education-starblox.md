@@ -177,3 +177,125 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 3.5/10
   - High-ticket potential: 9.8/10
 - Next action: Stand up a local synthetic LTI 1.3 launch test with AGS grade passback, then connect it conceptually to the qti3 question layer and OneRoster classroom model before any real-school integration work.
+
+
+## Art Production Accelerators
+
+StarBlox integration target: `P00NSMASHER/StarBlox@screenshot-match-preproduction`, with the active implementation contract under `docs/preproduction/art-factory/`. Model/checkpoint rights for the StarBlox project are user-attested as fully cleared; this does **not** change repository code licenses, dataset/reference-asset terms, external API/service terms, or custom-node licenses.
+
+### Hugging Face Diffusers
+- Repository: https://github.com/huggingface/diffusers
+- Commit / revision: `7263f3317f6b392d62f41e9d75ed9d7e21fc5a5c`
+- Capability: Production Python diffusion runtime exposing FLUX/SDXL pipelines, ControlNet surfaces, IP-Adapter loading, schedulers, seedable generation, and reusable pipeline components.
+- Why it fits StarBlox: Provides the provider-neutral generation layer behind the existing exact-metadata `artPromptOptimizer` without forcing prompt logic into a hosted vendor.
+- Estimated build-time saved: ~6–12+ engineering weeks versus building/maintaining modern diffusion pipeline, scheduler, conditioning and batching infrastructure from scratch.
+- Integration surface: `artPromptOptimizer` -> deterministic generation attempt -> versioned exact-byte source -> optional derivative stage -> staged-art render -> independent exact-hash review -> Workstream 08 canonical integration.
+- License / weight / data terms: Repository code Apache-2.0. StarBlox model/checkpoint rights are user-attested as cleared, but exact model ID/revision must still be recorded; reference/dataset/API terms remain separate.
+- Reuse classification: **DIRECT CODE REUSE / PREFERRED GENERATION FOUNDATION**.
+- Concrete pilot: Generate 2–4 variants for one currently assigned REWORK item using exact Store metadata, a deterministic seed per attempt and full provenance; do not scale until independent review.
+
+### Tencent AI Lab IP-Adapter
+- Repository: https://github.com/tencent-ailab/IP-Adapter
+- Commit / revision: `62e4af9d0c1ac7d5f8dd386a0ccf2211346af1a2`
+- Capability: Image-prompt/reference conditioning for identity/style/appearance consistency across diffusion generations.
+- Why it fits StarBlox: High leverage for keeping a character, item family, material language or approved visual reference consistent while still allowing distinct poses/forms.
+- Estimated build-time saved: ~3–6 weeks for reference-conditioning plumbing and experiments.
+- Integration surface: Reference asset SHA + adapter scale become explicit conditioning provenance fields on each factory attempt; outputs remain versioned candidates subject to real StarBlox render/review.
+- License / weight / data terms: Repository code Apache-2.0. Model/checkpoint rights are user-attested cleared for StarBlox; reference-image rights remain independent.
+- Reuse classification: **DIRECT CODE REUSE / REFERENCE-CONSISTENCY LAYER**.
+- Concrete pilot: Pair one accepted family reference with a single REWORK item, vary adapter scale across 2–4 deterministic attempts, and compare actual card/detail identity/readability.
+
+### JohannesBuchner ImageHash
+- Repository: https://github.com/JohannesBuchner/imagehash
+- Commit / revision: `7a405c9a27571ee8c998b661ce751639c34b7355`
+- Capability: pHash, dHash, color hash and related perceptual fingerprints for image similarity/deduplication.
+- Why it fits StarBlox: Cheaply flags recolor clones, repeated silhouettes and suspiciously similar catalog variants before reviewer time is spent.
+- Estimated build-time saved: ~1–2 weeks for robust perceptual-hash implementations, normalization and comparison logic.
+- Integration surface: Existing `pilot_art_accelerators.py` normalizes Store canvases, records hashes and emits nearest neighbors after exact byte checks.
+- License / weight / data terms: Permissive BSD-style repository license; no model weights required.
+- Reuse classification: **DIRECT CODE REUSE / REPORT-ONLY QA**.
+- Concrete pilot: Continue collecting pHash/dHash/color-hash distances against independently labeled ACCEPT/REWORK history; do not auto-reject or auto-approve from thresholds yet.
+
+### PyMatting
+- Repository: https://github.com/pymatting/pymatting
+- Commit / revision: `6d5c4a6bed0e5672abac0bad078e594423ffe4fd`
+- Capability: Classical alpha matting/refinement from trimaps without requiring a learned segmentation checkpoint.
+- Why it fits StarBlox: Improves halo/fringe quality for catalog items, characters and accessories while retaining deterministic source-to-derivative lineage.
+- Estimated build-time saved: ~2–4 weeks for reliable matting solvers and edge-quality experimentation.
+- Integration surface: Source candidate -> mask/trimap -> versioned alpha-refined derivative -> checkerboard and actual Store render -> independent review. Never overwrite source bytes.
+- License / weight / data terms: MIT code; no learned model weights required for the selected classical path.
+- Reuse classification: **DIRECT CODE REUSE / ALPHA-EDGE REFINEMENT**.
+- Concrete pilot: Run on transparent non-canonical candidates with partial-alpha boundaries; compare source vs derivative at card/detail size and preserve both hashes.
+
+### scikit-image SSIM
+- Repository: https://github.com/scikit-image/scikit-image
+- Commit / revision: `2dff163516e1a7c528b48d5eda8cf40788f0ade3`
+- Capability: Tested structural-similarity metrics and image-processing primitives.
+- Why it fits StarBlox: Provides an independent second similarity signal alongside perceptual hashes for duplicate/fidelity diagnostics.
+- Estimated build-time saved: ~1–2 weeks versus implementing and validating SSIM correctly.
+- Integration surface: Optional offline/report-only sidecar after normalized render capture; never a promotion gate.
+- License / weight / data terms: BSD-family code; no model weights.
+- Reuse classification: **OPTIONAL DIRECT REUSE / REPORT-ONLY QA**.
+- Concrete pilot: Correlate SSIM and perceptual-hash distances with existing independent originality decisions before any threshold is considered.
+
+### rembg
+- Repository: https://github.com/danielgatis/rembg
+- Commit / revision: `202e42649a8492a7c49f808de36608a7d1cbbfe3`
+- Capability: Local CLI/API/batch background removal, alpha matting and foreground decontamination.
+- Why it fits StarBlox: Fast path for converting generated item/character sources into transparent catalog-ready derivatives.
+- Estimated build-time saved: ~2–4 weeks for background-removal service/CLI integration and batch plumbing.
+- Integration surface: Optional source-preserving derivative stage before PyMatting/render QA.
+- License / weight / data terms: MIT code. Segmentation-model files are a separate rights domain; StarBlox model/checkpoint rights are user-attested cleared, but exact model revision still belongs in provenance.
+- Reuse classification: **OPTIONAL DIRECT CODE REUSE / BACKGROUND REMOVAL**.
+- Concrete pilot: Compare rembg+PyMatting against source/native alpha on the same four bounded candidates and keep only derivatives that improve actual card/detail edges.
+
+### LayerDiffuse Diffusers CLI
+- Repository: https://github.com/lllyasviel/LayerDiffuse_DiffusersCLI
+- Commit / revision: `3061d9aed52a6c52a13fcf2b196c0fef4d727824`
+- Capability: SDXL-oriented native transparent/latent-layer generation path with deterministic examples.
+- Why it fits StarBlox: Can reduce the need for post-hoc cutout when accessories/items genuinely benefit from native alpha.
+- Estimated build-time saved: ~2–5 weeks of native-alpha experimentation/integration.
+- Integration surface: Alternate generator mode producing a versioned source with alpha; compare against segmentation+PyMatting under the same prompt/seed metadata.
+- License / weight / data terms: Apache-2.0 code. Associated model/safetensor/base-model rights remain separate but are user-attested cleared for StarBlox; exact revisions still required.
+- Reuse classification: **OPTIONAL DIRECT CODE REUSE / NATIVE-ALPHA EXPERIMENT**.
+- Concrete pilot: Same four prompts/seeds through native-alpha and normal-generation+matting paths; decide from real Store renders, not isolated transparency previews.
+
+### Real-ESRGAN
+- Repository: https://github.com/xinntao/Real-ESRGAN
+- Commit / revision: `a4abfb2979a7bbff3f69f58f58ae324608821e27`
+- Capability: Tiled super-resolution/restoration with alpha-aware image handling.
+- Why it fits StarBlox: Can rescue otherwise good source art with insufficient detail/payload scale without regenerating the concept.
+- Estimated build-time saved: ~2–4 weeks for robust tiling, alpha-aware upscale and restoration plumbing.
+- Integration surface: Optional derivative only after a source is preserved; derivative gets its own hash/render/review.
+- License / weight / data terms: BSD-3-Clause code. Pretrained weights remain a separate rights item; StarBlox rights are user-attested cleared but exact revision must be logged.
+- Reuse classification: **OPTIONAL DIRECT CODE REUSE / DERIVATIVE RESTORATION**.
+- Concrete pilot: Apply only to one or two candidates whose independent review identifies resolution/edge detail as the actual defect; reject the step if it invents texture or harms small-card readability.
+
+### InvokeAI
+- Repository: https://github.com/invoke-ai/InvokeAI
+- Commit / revision: `9e1540962bcca7f8fa668d7d8e02cf79d75fda3b`
+- Capability: Tested batch queue, API and graph/workflow orchestration around diffusion generation.
+- Why it fits StarBlox: Useful only after the bounded factory proves enough throughput to justify a persistent queue; avoids inventing another orchestration service.
+- Estimated build-time saved: ~4–8+ weeks if/when multi-worker batch generation becomes a real bottleneck.
+- Integration surface: Queue/orchestration layer around the same provider-neutral attempt/provenance contract; never replaces StarBlox review or canonical integration.
+- License / weight / data terms: Apache-2.0 code; model and external-service terms separate.
+- Reuse classification: **OPTIONAL SCALE-UP INFRASTRUCTURE**.
+- Concrete pilot: Defer until repeated 2–4 item pilots show generation throughput, not review quality, is the limiting factor.
+
+### ComfyUI
+- Repository: https://github.com/Comfy-Org/ComfyUI
+- Commit / revision: `e638023d54497dbe0579565e5de4bb7076899592`
+- Capability: Mature node-graph workflow authoring/execution with prompt queue/websocket interfaces and a large ecosystem.
+- Why it fits StarBlox: Strong for visual workflow experimentation and reproducible node graphs, but less clean as the default foundation because core code is GPL-3.0 and custom-node/model licenses vary.
+- Estimated build-time saved: ~3–8 weeks for visual workflow authoring and queue plumbing if a node-graph path is specifically needed.
+- Integration surface: Isolated authoring/worker option that must emit the same StarBlox attempt/provenance record and exact-byte candidates.
+- License / weight / data terms: GPL-3.0 core code; every custom node/model/data dependency must be reviewed independently.
+- Reuse classification: **ISOLATED OPTION / NOT DEFAULT FOUNDATION**.
+- Concrete pilot: Use only if a workflow requires graph authoring that Diffusers/InvokeAI cannot provide cleanly; keep it outside StarBlox runtime and compare throughput/maintenance cost before adoption.
+
+### Current StarBlox factory referral
+- Branch handoff: `P00NSMASHER/StarBlox@screenshot-match-preproduction/docs/preproduction/art-factory/README.md`
+- Machine-readable contract: `docs/preproduction/art-factory/ART_FACTORY_V2.json`
+- Direct pilot: `docs/preproduction/art-factory/pilot_art_accelerators.py`
+- Deterministic preflight: `.github/workflows/art-factory-preflight.yml`
+- Promotion rule: bounded generation -> exact-byte staging/readback -> real card/detail or target-surface render -> independent exact-hash review -> Workstream 08 canonical integration.
