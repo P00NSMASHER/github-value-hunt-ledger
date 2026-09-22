@@ -217,7 +217,7 @@ The workbench is advisory. It is not a worker router and does not itself modify 
 
 `production/repair_intake.py` and `tools/ti_repair_candidate_intake.py` turn a bounded repair task into a content-addressed candidate-review flow.
 
-A candidate packet must bind to the exact current `repair_task_sha256`, target type/id, baseline version, candidate version, baseline/candidate artifact refs and full diff SHA-256. Its declared logical mutation target must be exactly the one authorized by the repair task. Sensitive or benchmark-contaminated candidates fail closed.
+A candidate packet must bind to the exact current `repair_task_sha256`, target type/id, exact repair-task regression-test requirement, baseline version, candidate version, distinct baseline/candidate artifact refs and a non-empty full diff SHA-256. Its declared logical mutation target must be exactly the one authorized by the repair task. Sensitive or benchmark-contaminated candidates fail closed.
 
 The positive transition is intentionally narrow:
 
