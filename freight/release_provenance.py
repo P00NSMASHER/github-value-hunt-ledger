@@ -54,6 +54,9 @@ CONTROL_PATHS = (
     "freight/review_packet.py",
     "freight/review_queue.py",
     "freight/review_routing.py",
+    "freight/reviewer_decision_package.py",
+    "freight/reviewer_workbench.py",
+    "freight/reviewer_workbench.html",
     "freight/rule_csv_adapter.py",
     "freight/release_attestation.py",
     "freight/release_gate.py",
@@ -75,6 +78,7 @@ CONTROL_PATHS = (
     "intelligence/domain_search_policies.json",
     "production/requirements-ci.txt",
     ".github/workflows/freight-contracts.yml",
+    ".github/workflows/freight-reviewer-workbench.yml",
     ".github/workflows/technology-intelligence.yml",
 )
 

@@ -18,6 +18,7 @@ from freight.audit_workflow import (
 )
 from freight.review_packet import render_review_packet_markdown
 from freight.remediation_plan import render_remediation_plan_markdown
+from freight.reviewer_workbench import render_reviewer_workbench
 
 
 FIXED_ZIP_TIME = (1980, 1, 1, 0, 0, 0)
@@ -90,6 +91,11 @@ def build_audit_result_entries(result: AuditWorkflowResult) -> dict[str, bytes]:
         "review-packet.json": _json_bytes(asdict(artifacts.review_packet)),
         "review-packet.md": render_review_packet_markdown(
             artifacts.review_packet
+        ).encode("utf-8"),
+        "reviewer-workbench.html": render_reviewer_workbench(
+            review_packet=artifacts.review_packet,
+            review_routing=artifacts.review_routing,
+            truth=artifacts.factory.truth,
         ).encode("utf-8"),
     }
 
