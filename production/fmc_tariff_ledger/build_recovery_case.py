@@ -47,11 +47,13 @@ def base_rate_review(
         }
 
     line_id = str(base_charge.get("invoice_line_id") or "BASE")
+    invoice_id = str(base_charge.get("invoice_id") or "").strip() or None
     billed = dec(base_charge["billed_amount"])
     quantity = dec(base_charge.get("quantity") or "1")
     rate = envelope["base_rate_authority"]
 
     result = {
+        "invoice_id": invoice_id,
         "invoice_line_id": line_id,
         "billed_amount": str(billed),
         "quantity": str(quantity),
@@ -68,7 +70,7 @@ def base_rate_review(
         }
 
     basis = (rate.get("rate_basis") or "").lower()
-    if basis and "container" not in basis and quantity != Decimal("1.00"):
+    if quantity != Decimal("1.00") and "container" not in basis:
         return {
             **result,
             "status": "BASE_RATE_BASIS_REVIEW_REQUIRED",
