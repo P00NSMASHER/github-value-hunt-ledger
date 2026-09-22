@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from production.blind_partition import (
+    build_key_commitment,
     build_partition_receipts,
     trusted_claim_id,
 )
@@ -44,17 +45,43 @@ def main() -> int:
         "--status",
         default="intelligence/TRAINING_SPLIT_STATUS.json",
     )
+    p.add_argument(
+        "--key-commitment",
+        default="intelligence/TRAINING_SPLIT_KEY_COMMITMENT.json",
+    )
     args = p.parse_args()
 
     runs = load_jsonl(Path(args.search_runs))
     receipts_path = Path(args.receipts)
     existing = load_jsonl(receipts_path)
     secret = os.environ.get("TI_TRAINING_SPLIT_KEY")
+    commitment_path = Path(args.key_commitment)
+    existing_commitment = (
+        json.loads(commitment_path.read_text(encoding="utf-8"))
+        if commitment_path.exists()
+        else None
+    )
+    commitment, commitment_errors = build_key_commitment(
+        runs,
+        existing_commitment,
+        secret=secret,
+    )
+    if commitment_errors:
+        raise ValueError(
+            "invalid split-key commitment: "
+            + ", ".join(commitment_errors)
+        )
+    if commitment is not None:
+        commitment_path.write_text(
+            json.dumps(commitment, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
 
     receipts, issues = build_partition_receipts(
         runs,
         existing,
         secret=secret,
+        key_commitment=commitment,
     )
 
     receipts_path.parent.mkdir(parents=True, exist_ok=True)
@@ -81,6 +108,17 @@ def main() -> int:
         "schema_version": 1,
         "partition_method": "hmac-sha256-v1",
         "secret_available": bool(secret),
+        "key_commitment_active": commitment is not None,
+        "activation_run_count": (
+            commitment.get("activation_run_count")
+            if commitment
+            else None
+        ),
+        "key_commitment_sha256": (
+            commitment.get("key_commitment_sha256")
+            if commitment
+            else None
+        ),
         "trusted_generated_runs": len(trusted_claims),
         "receipts": len(receipts),
         "train_receipts": sum(
