@@ -323,11 +323,11 @@ class SQLiteRecoveryLedger:
     def get(self, finding_id: str) -> LedgerRecord:
         return self._ledger.get(finding_id)
 
-    def records(self) -> tuple[LedgerRecord, ...]:
-        return self._ledger.records()
+    def records(self, client_id: str | None = None) -> tuple[LedgerRecord, ...]:
+        return self._ledger.records(client_id=client_id)
 
-    def rollup(self) -> dict:
-        return self._ledger.rollup()
+    def rollup(self, client_id: str | None = None) -> dict:
+        return self._ledger.rollup(client_id=client_id)
 
     def _rehydrate(self) -> None:
         self.verify_event_chains()
