@@ -168,15 +168,30 @@ if contextual_value_priors:
             "Prefer this scoped prior over the global prior only when the live assignment matches the same objective."
         )
 
-overfit_alerts = [
+suppression_alerts = [
     alert
     for alert in learning_alerts
-    if alert.get("type") == "overfit_signal"
+    if alert.get("type") in {
+        "overfit_signal",
+        "confirm_regression_signal",
+    }
 ]
-if overfit_alerts:
+if suppression_alerts:
+    overfit_count = sum(
+        1
+        for alert in suppression_alerts
+        if alert.get("type") == "overfit_signal"
+    )
+    regression_count = sum(
+        1
+        for alert in suppression_alerts
+        if alert.get("type") == "confirm_regression_signal"
+    )
     lines.append(
-        f"- **{len(overfit_alerts)} train→confirm overfit signal(s)** are suppressed from live priors. "
-        "Treat these as repair/falsification targets, not as candidates for more allocation."
+        f"- **{len(suppression_alerts)} confirm-suppressed learning signal(s)** "
+        f"({overfit_count} mean-negative overfit; {regression_count} hidden-regression) "
+        "are blocked from live priors. Treat these as repair/falsification targets, "
+        "not as candidates for more allocation."
     )
 failure_queue = learning.get("failure_queue") or {}
 lines.append(
