@@ -6,6 +6,7 @@ from .ap import (
     APVendorStatementLine,
     audit_ap_recovery,
     build_ap_observations,
+    canonical_invoice_number,
     normalize_invoice_number,
 )
 from .ap_csv import (
@@ -95,6 +96,7 @@ __all__ = [
     "audit_payer_lines",
     "audit_utility_bills",
     "build_ap_observations",
+    "canonical_invoice_number",
     "ingest_ap_exports",
     "ingest_utility_exports",
     "calculate_expected_bill",
