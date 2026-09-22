@@ -1,6 +1,9 @@
 import sqlite3
+import threading
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
+from unittest import mock
 from pathlib import Path
 
 import crawler
@@ -280,6 +283,39 @@ class TariffLedgerTests(unittest.TestCase):
             }
             self.assertIn("date_basis", columns)
             conn.close()
+
+    def test_blob_write_is_safe_for_identical_concurrent_content(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            raw = b"same evidence bytes"
+            digest = crawler.sha256_bytes(raw)
+            barrier = threading.Barrier(2)
+            original_replace = crawler.os.replace
+
+            def synchronized_replace(src, dst):
+                barrier.wait(timeout=5)
+                return original_replace(src, dst)
+
+            with mock.patch.object(
+                crawler.os,
+                "replace",
+                side_effect=synchronized_replace,
+            ):
+                with ThreadPoolExecutor(max_workers=2) as pool:
+                    futures = [
+                        pool.submit(
+                            crawler.write_blob,
+                            root / "blobs",
+                            digest,
+                            raw,
+                        )
+                        for _ in range(2)
+                    ]
+                    relpaths = [future.result(timeout=10) for future in futures]
+
+            self.assertEqual(relpaths[0], relpaths[1])
+            self.assertEqual((root / relpaths[0]).read_bytes(), raw)
+            self.assertEqual(list(root.rglob("*.tmp")), [])
 
     def test_shard_assignment_is_complete_and_disjoint(self):
         rows = [
