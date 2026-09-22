@@ -212,29 +212,33 @@ def partition_for_id(
 def partition_basis_for_run(
     run: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Choose a split token that existed before the hunt whenever possible.
+    """Choose a pre-hunt split token backed by canonical provenance checks.
 
-    Search-run IDs are agent-authored after routing and therefore cannot be a
-    trusted validation split key. Generated allocation/claim identifiers are
-    emitted before execution and are suitable precommit anchors.
+    Search-run IDs are agent-authored and therefore cannot be validation keys.
+    A confirm-eligible basis requires the same V14+ generated claim chain that
+    ti_execution_validate.py binds to assignment, routing and dispatch history.
+    Manual overrides, legacy records and incomplete provenance are train-only.
     """
-    if run.get("allocation_mode") == "generated":
-        for field_name in (
-            "execution_claim_id",
-            "assignment_id",
-            "dispatch_ticket_id",
-        ):
-            value = run.get(field_name)
-            if isinstance(value, str) and value:
-                return {
-                    "trusted": True,
-                    "source": field_name,
-                    "identifier": value,
-                }
+    version = int(run.get("schema_version") or 0)
+    claim_id = run.get("execution_claim_id")
+    if (
+        version >= 14
+        and run.get("allocation_mode") == "generated"
+        and run.get("routing_mode") == "generated"
+        and isinstance(claim_id, str)
+        and claim_id.startswith("CLAIM:")
+    ):
+        return {
+            "trusted": True,
+            "source": "execution_claim_id",
+            "identifier": claim_id,
+            "provenance_contract": "validated_v14_generated_claim",
+        }
     return {
         "trusted": False,
         "source": "run_id_fallback_train_only",
         "identifier": str(run.get("search_run_id") or ""),
+        "provenance_contract": "untrusted_or_legacy",
     }
 
 
