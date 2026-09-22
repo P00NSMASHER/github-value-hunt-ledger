@@ -22,6 +22,10 @@ from typing import Any, Iterable, Mapping
 from recoveryworks.engine import RecoveryObservation
 from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
 
+CPM_ENGINE_ID = "recoveryworks.fs_cpm"
+CPM_ENGINE_VERSION = "1"
+CPM_METHOD = "finish_to_start_integer_day_cpm"
+
 
 def _required(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
@@ -113,6 +117,37 @@ class ScheduleVersion:
                     f"relationship successor {rel.successor_id!r} is missing"
                 )
 
+    @property
+    def topology_hash(self) -> str:
+        """Canonical network fingerprint for this normalized schedule version."""
+        return canonical_hash({
+            "schema": 1,
+            "activities": [
+                {
+                    "activity_id": activity.activity_id,
+                    "duration_days": activity.duration_days,
+                }
+                for activity in sorted(self.activities, key=lambda item: item.activity_id)
+            ],
+            "relationships": [
+                {
+                    "predecessor_id": rel.predecessor_id,
+                    "successor_id": rel.successor_id,
+                    "relationship_type": rel.relationship_type,
+                    "lag_days": rel.lag_days,
+                }
+                for rel in sorted(
+                    self.relationships,
+                    key=lambda item: (
+                        item.predecessor_id,
+                        item.successor_id,
+                        item.relationship_type,
+                        item.lag_days,
+                    ),
+                )
+            ],
+        })
+
     def evidence(self) -> EvidenceRef:
         return EvidenceRef(
             evidence_id=f"construction-schedule:{self.version_id}",
@@ -127,6 +162,7 @@ class ScheduleVersion:
                 "label": self.label,
                 "activity_count": len(self.activities),
                 "relationship_count": len(self.relationships),
+                "topology_hash": self.topology_hash,
                 **dict(self.metadata),
             },
         )
@@ -149,6 +185,7 @@ class CPMResult:
     project_duration_days: int
     activities: Mapping[str, CPMActivityResult]
     critical_activity_ids: tuple[str, ...]
+    manifest: Mapping[str, Any]
 
 
 def calculate_cpm(version: ScheduleVersion) -> CPMResult:
@@ -245,6 +282,17 @@ def calculate_cpm(version: ScheduleVersion) -> CPMResult:
         project_duration_days=project_duration,
         activities=results,
         critical_activity_ids=tuple(sorted(critical)),
+        manifest={
+            "engine_id": CPM_ENGINE_ID,
+            "engine_version": CPM_ENGINE_VERSION,
+            "method": CPM_METHOD,
+            "schedule_version_id": version.version_id,
+            "schedule_source_hash": version.source_hash,
+            "topology_hash": version.topology_hash,
+            "data_date": version.data_date,
+            "activity_count": len(version.activities),
+            "relationship_count": len(version.relationships),
+        },
     )
 
 
@@ -411,6 +459,7 @@ class CausationReview:
     source_locator: str
     verified: bool
     qualified_reviewer_id: str | None = None
+    qualification_basis: str | None = None
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -425,13 +474,21 @@ class CausationReview:
         _days("accepted_delay_days", self.accepted_delay_days)
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
-        if self.verified and not (
-            isinstance(self.qualified_reviewer_id, str)
-            and self.qualified_reviewer_id.strip()
-        ):
-            raise ValueError(
-                "verified causation review requires qualified_reviewer_id"
-            )
+        if self.verified:
+            if not (
+                isinstance(self.qualified_reviewer_id, str)
+                and self.qualified_reviewer_id.strip()
+            ):
+                raise ValueError(
+                    "verified causation review requires qualified_reviewer_id"
+                )
+            if not (
+                isinstance(self.qualification_basis, str)
+                and self.qualification_basis.strip()
+            ):
+                raise ValueError(
+                    "verified causation review requires qualification_basis"
+                )
         if self.baseline_version_id == self.update_version_id:
             raise ValueError("baseline and update schedule versions must differ")
         if self.accepted_causation and self.accepted_delay_days <= 0:
@@ -454,6 +511,7 @@ class CausationReview:
                 "accepted_causation": self.accepted_causation,
                 "accepted_delay_days": self.accepted_delay_days,
                 "qualified_reviewer_id": self.qualified_reviewer_id,
+                "qualification_basis": self.qualification_basis,
                 **dict(self.metadata),
             },
         )
@@ -559,12 +617,32 @@ def audit_construction_recovery(
         duplicate_code="DUPLICATE_EVENT_ID",
     )
     exceptions.extend(more)
-    mapping_by_event, more = _unique_index(
+    mapping_by_id, more = _unique_index(
         mappings,
-        key_attr="event_id",
-        duplicate_code="AMBIGUOUS_EVENT_ACTIVITY_MAPPING",
+        key_attr="mapping_id",
+        duplicate_code="DUPLICATE_MAPPING_ID",
     )
     exceptions.extend(more)
+    mappings_by_event: dict[str, list[EventActivityMapping]] = defaultdict(list)
+    seen_mapping_pairs: set[tuple[str, str, str]] = set()
+    duplicate_mapping_events: set[str] = set()
+    for mapping in mapping_by_id.values():
+        pair = (
+            mapping.event_id,
+            mapping.baseline_activity_id,
+            mapping.update_activity_id,
+        )
+        if pair in seen_mapping_pairs:
+            duplicate_mapping_events.add(mapping.event_id)
+            continue
+        seen_mapping_pairs.add(pair)
+        mappings_by_event[mapping.event_id].append(mapping)
+    for event_id in sorted(duplicate_mapping_events):
+        exceptions.append(ConstructionAuditException(
+            event_id,
+            "DUPLICATE_EVENT_ACTIVITY_MAPPING",
+            "duplicate event/activity mapping pair was excluded",
+        ))
     schedule_by_id, more = _unique_index(
         schedules,
         key_attr="version_id",
@@ -622,12 +700,15 @@ def audit_construction_recovery(
             ))
             continue
 
-        mapping = mapping_by_event.get(entitlement.event_id)
-        if mapping is None:
+        event_mappings = tuple(sorted(
+            mappings_by_event.get(entitlement.event_id, ()),
+            key=lambda item: item.mapping_id,
+        ))
+        if not event_mappings:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
                 "NO_EVENT_ACTIVITY_MAPPING",
-                "no unique event-to-activity mapping exists",
+                "no event-to-activity mapping exists",
             ))
             continue
 
@@ -722,29 +803,51 @@ def audit_construction_recovery(
         baseline_cpm = cpm_cache[baseline.version_id]
         update_cpm = cpm_cache[update.version_id]
 
-        baseline_activity = baseline_cpm.activities.get(mapping.baseline_activity_id)
-        update_activity = update_cpm.activities.get(mapping.update_activity_id)
-        if baseline_activity is None or update_activity is None:
-            missing = []
-            if baseline_activity is None:
-                missing.append(f"baseline:{mapping.baseline_activity_id}")
-            if update_activity is None:
-                missing.append(f"update:{mapping.update_activity_id}")
-            exceptions.append(ConstructionAuditException(
-                entitlement_id,
-                "MAPPED_ACTIVITY_MISSING",
-                "mapped activity missing from schedule: " + ", ".join(missing),
-            ))
+        mapping_impacts: list[dict[str, Any]] = []
+        mapping_error = False
+        for mapping in event_mappings:
+            baseline_activity = baseline_cpm.activities.get(mapping.baseline_activity_id)
+            update_activity = update_cpm.activities.get(mapping.update_activity_id)
+            if baseline_activity is None or update_activity is None:
+                missing = []
+                if baseline_activity is None:
+                    missing.append(f"baseline:{mapping.baseline_activity_id}")
+                if update_activity is None:
+                    missing.append(f"update:{mapping.update_activity_id}")
+                exceptions.append(ConstructionAuditException(
+                    entitlement_id,
+                    "MAPPED_ACTIVITY_MISSING",
+                    (
+                        f"mapping {mapping.mapping_id} references missing activity: "
+                        + ", ".join(missing)
+                    ),
+                ))
+                mapping_error = True
+                break
+            finish_delay_days = max(
+                update_activity.earliest_finish - baseline_activity.earliest_finish,
+                0,
+            )
+            mapping_impacts.append({
+                "mapping_id": mapping.mapping_id,
+                "baseline_activity_id": mapping.baseline_activity_id,
+                "update_activity_id": mapping.update_activity_id,
+                "baseline_earliest_finish": baseline_activity.earliest_finish,
+                "update_earliest_finish": update_activity.earliest_finish,
+                "finish_delay_days": finish_delay_days,
+                "baseline_critical": baseline_activity.critical,
+                "update_critical": update_activity.critical,
+            })
+        if mapping_error:
             continue
 
         project_delay_days = max(
             update_cpm.project_duration_days - baseline_cpm.project_duration_days,
             0,
         )
-        mapped_finish_delay_days = max(
-            update_activity.earliest_finish - baseline_activity.earliest_finish,
-            0,
-        )
+        positive_mapping_impacts = [
+            impact for impact in mapping_impacts if impact["finish_delay_days"] > 0
+        ]
         if project_delay_days <= 0:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
@@ -752,13 +855,21 @@ def audit_construction_recovery(
                 "update schedule does not extend deterministic CPM project duration",
             ))
             continue
-        if mapped_finish_delay_days <= 0:
+        if not positive_mapping_impacts:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
                 "MAPPED_ACTIVITY_NO_DELAY",
-                "mapped activity does not show positive earliest-finish delay",
+                "no mapped activity shows positive earliest-finish delay",
             ))
             continue
+        primary_mapping_impact = max(
+            positive_mapping_impacts,
+            key=lambda impact: (
+                impact["finish_delay_days"],
+                impact["mapping_id"],
+            ),
+        )
+        mapped_finish_delay_days = primary_mapping_impact["finish_delay_days"]
         if review.accepted_delay_days > project_delay_days:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
@@ -792,7 +903,7 @@ def audit_construction_recovery(
 
         evidence = (
             event.evidence(),
-            mapping.evidence(),
+            *tuple(mapping.evidence() for mapping in event_mappings),
             baseline.evidence(),
             update.evidence(),
             review.evidence(),
@@ -835,13 +946,20 @@ def audit_construction_recovery(
                 "baseline_project_duration_days": baseline_cpm.project_duration_days,
                 "update_project_duration_days": update_cpm.project_duration_days,
                 "cpm_project_delay_days": project_delay_days,
-                "mapped_baseline_activity_id": mapping.baseline_activity_id,
-                "mapped_update_activity_id": mapping.update_activity_id,
+                "baseline_topology_hash": baseline.topology_hash,
+                "update_topology_hash": update.topology_hash,
+                "baseline_cpm_manifest": dict(baseline_cpm.manifest),
+                "update_cpm_manifest": dict(update_cpm.manifest),
+                "mapping_ids": [mapping.mapping_id for mapping in event_mappings],
+                "mapped_activity_impacts": mapping_impacts,
+                "mapped_baseline_activity_id": primary_mapping_impact["baseline_activity_id"],
+                "mapped_update_activity_id": primary_mapping_impact["update_activity_id"],
                 "mapped_activity_finish_delay_days": mapped_finish_delay_days,
-                "baseline_activity_critical": baseline_activity.critical,
-                "update_activity_critical": update_activity.critical,
+                "baseline_activity_critical": primary_mapping_impact["baseline_critical"],
+                "update_activity_critical": primary_mapping_impact["update_critical"],
                 "accepted_delay_days": review.accepted_delay_days,
                 "qualified_reviewer_id": review.qualified_reviewer_id,
+                "qualification_basis": review.qualification_basis,
                 "entitlement_reviewer_id": entitlement.entitlement_reviewer_id,
                 "settlement_ids": [
                     settlement.settlement_id for settlement in group_settlements
