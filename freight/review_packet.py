@@ -96,8 +96,9 @@ def build_review_packet(
     if queue != canonical_queue:
         raise ValueError("review queue does not match Finding Factory output")
 
+    normalized_charges = tuple(charges)
     charge_index: dict[str, InvoiceCharge] = {}
-    for charge in charges:
+    for charge in normalized_charges:
         if charge.charge_id in charge_index:
             raise ValueError("duplicate charge_id in review evidence")
         charge_index[charge.charge_id] = charge
@@ -124,7 +125,41 @@ def build_review_packet(
         if charge_hash != derivation.charge_hash:
             raise ValueError("review charge proof does not match derivation: " + item.charge_id)
         canonical_derivation = derive_charge(charge, normalized_rules)
-        if derivation != canonical_derivation:
+        if derivation.reason == "FIXED_SCOPE_AMBIGUOUS_MULTI_LINE":
+            same_group = [
+                candidate for candidate in normalized_charges
+                if (
+                    candidate.invoice_id,
+                    candidate.shipment_id,
+                    candidate.charge_code,
+                ) == (
+                    charge.invoice_id,
+                    charge.shipment_id,
+                    charge.charge_code,
+                )
+            ]
+            matched = [
+                rule_index[digest]
+                for digest in derivation.matched_rule_hashes
+                if digest in rule_index
+            ]
+            if not (
+                len(same_group) > 1
+                and len(matched) == 1
+                and matched[0].pricing_model == "FIXED"
+                and derivation.decision == REVIEW
+                and derivation.expected_cents is None
+                and derivation.variance_cents is None
+                and derivation.finding is None
+                and derivation.authority_ref is None
+                and canonical_derivation.matched_rule_hashes
+                    == derivation.matched_rule_hashes
+            ):
+                raise ValueError(
+                    "review derivation does not match fixed-scope ambiguity: "
+                    + item.charge_id
+                )
+        elif derivation != canonical_derivation:
             raise ValueError(
                 "review derivation does not match canonical charge/rule calculation: "
                 + item.charge_id
