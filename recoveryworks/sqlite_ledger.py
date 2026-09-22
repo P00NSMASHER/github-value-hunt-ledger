@@ -54,6 +54,18 @@ class SQLiteRecoveryLedger:
 
                 CREATE INDEX IF NOT EXISTS ix_recovery_events_finding
                     ON recovery_events(finding_id, seq);
+
+                CREATE TRIGGER IF NOT EXISTS recovery_events_no_update
+                BEFORE UPDATE ON recovery_events
+                BEGIN
+                    SELECT RAISE(ABORT, 'recovery_events are append-only');
+                END;
+
+                CREATE TRIGGER IF NOT EXISTS recovery_events_no_delete
+                BEFORE DELETE ON recovery_events
+                BEGIN
+                    SELECT RAISE(ABORT, 'recovery_events are append-only');
+                END;
                 """
             )
 
@@ -297,6 +309,10 @@ class SQLiteRecoveryLedger:
                     "SELECT finding_id, proof_hash, record_hash FROM recovery_snapshots"
                 ).fetchall()
             }
+        replayed_ids = {record.finding.finding_id for record in self._ledger.records()}
+        if set(snapshots) != replayed_ids:
+            raise ValueError("recovery snapshot/event population mismatch")
+
         for record in self._ledger.records():
             snapshot = snapshots.get(record.finding.finding_id)
             if snapshot is None:
