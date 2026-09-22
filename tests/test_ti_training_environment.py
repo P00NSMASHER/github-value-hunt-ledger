@@ -5,6 +5,7 @@ from production.training_environment import (
     build_outcome_credit,
     build_training_environment,
     outcome_signal,
+    partition_for_id,
     split_for_run,
     validate_training_environment,
 )
@@ -214,6 +215,70 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 for edge in edges
             },
             {"confirm"},
+        )
+
+    def test_excluded_execution_origin_can_anchor_support_credit(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=0,
+        )
+        execution_origin = "RUN:execution-origin"
+        anchor_split = partition_for_id(
+            execution_origin,
+            config=config,
+        )
+        support_id = None
+        opposite_id = None
+        for index in range(100):
+            run_id = f"RUN:support:{index}"
+            split = split_for_run(
+                search_run(run_id),
+                config=config,
+            )
+            if split == anchor_split and support_id is None:
+                support_id = run_id
+            if split != anchor_split and opposite_id is None:
+                opposite_id = run_id
+            if support_id and opposite_id:
+                break
+
+        execution = search_run(
+            execution_origin,
+        )
+        execution["work_action"] = "execute_fixture"
+
+        edges, excluded = build_outcome_credit(
+            [
+                execution,
+                search_run(support_id),
+                search_run(opposite_id),
+            ],
+            [outcome([execution_origin])],
+            config=config,
+        )
+        self.assertFalse(excluded)
+        self.assertEqual(
+            {edge["run_id"] for edge in edges},
+            {support_id},
+        )
+        self.assertAlmostEqual(
+            edges[0]["credit"],
+            1.0,
+        )
+        self.assertEqual(
+            edges[0]["credit_anchor"]["kind"],
+            "excluded_direct_origin_hash",
+        )
+        self.assertEqual(
+            edges[0]["credit_anchor"]["split"],
+            anchor_split,
+        )
+        self.assertNotEqual(
+            split_for_run(
+                execution,
+                config=config,
+            ),
+            anchor_split,
         )
 
     def test_mixed_direct_origin_splits_are_excluded(self):
