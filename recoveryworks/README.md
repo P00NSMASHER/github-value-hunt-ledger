@@ -13,6 +13,7 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **DutyRecovery** — customs-duty and tariff inconsistencies for professional review.
 - **SaaSRecovery** — subscription, seat, and contracted-rate billing leakage.
 - **TelecomRecovery** — recurring service and CDR/usage billing leakage.
+- **RebateRecovery** — earned supplier/volume rebates not fully settled.
 
 ## Non-negotiable invariant
 
@@ -57,3 +58,6 @@ verification flags, and failure modes are documented in
 
 SaaSRecovery and TelecomRecovery contract, invoice, seat, usage, and CDR schemas
 are documented in `recoveryworks/INGESTION_SAAS_TELECOM.md`.
+
+RebateRecovery tier modes, purchase/settlement schemas, and calculation controls
+are documented in `recoveryworks/INGESTION_REBATE.md`.
