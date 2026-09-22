@@ -15,6 +15,7 @@ from freight.contracts import (
     VALIDATED,
 )
 from freight.pilot_reporting import (
+    dollars,
     FindingReview,
     ReviewDisposition,
     build_pilot_metrics,
@@ -273,3 +274,7 @@ def test_bound_review_normalizes_timestamp_and_has_deterministic_hash():
     )
     assert a.reviewed_at == "2026-09-21T12:00:00.000000Z"
     assert a.review_hash == b.review_hash
+
+
+def test_pilot_dollar_renderer_preserves_full_integer_cent_precision():
+    assert dollars(2**63 - 1) == "$92,233,720,368,547,758.07"
