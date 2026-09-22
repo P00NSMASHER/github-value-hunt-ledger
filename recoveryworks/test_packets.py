@@ -30,16 +30,17 @@ def rule():
     )
 
 
-def finding(client_id="client-a", reference="pay-1"):
+def finding(client_id="client-a", reference="pay-1", currency="USD", paid_cents=15000):
     observation = from_ap_variance(
         client_id=client_id,
         vendor_id="vendor",
         transaction_id=reference,
         transaction_date="2026-06-01",
         expected_cents=10000,
-        paid_cents=15000,
+        paid_cents=paid_cents,
         rule=rule(),
         evidence=(ev(),),
+        currency=currency,
     )
     return RecoveryEngine().evaluate(observation)
 
@@ -79,6 +80,25 @@ class PacketTests(unittest.TestCase):
             claimed_packet.claim_evidence["proof_hash"],
             claim_receipt.proof_hash,
         )
+
+    def test_multi_currency_portfolio_never_adds_incompatible_cents(self):
+        ledger = RecoveryLedger()
+        usd = finding("client-a", "usd", currency="USD", paid_cents=15000)
+        eur = finding("client-a", "eur", currency="EUR", paid_cents=17000)
+        ledger.add(usd)
+        ledger.add(eur)
+
+        report = build_client_portfolio_packet(ledger, "client-a")
+        self.assertEqual(report["totals"]["currency_count"], 2)
+        self.assertIsNone(report["totals"]["potential_cents"])
+        self.assertEqual(report["currencies"]["USD"]["potential_cents"], 5000)
+        self.assertEqual(report["currencies"]["EUR"]["potential_cents"], 7000)
+
+        rollup = ledger.rollup()
+        self.assertEqual(rollup["totals"]["currency_count"], 2)
+        self.assertIsNone(rollup["totals"]["validated_cents"])
+        self.assertEqual(rollup["currencies"]["USD"]["validated_cents"], 5000)
+        self.assertEqual(rollup["currencies"]["EUR"]["validated_cents"], 7000)
 
     def test_client_portfolio_packet_never_rolls_up_other_clients(self):
         ledger = RecoveryLedger()
