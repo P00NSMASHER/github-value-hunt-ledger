@@ -74,9 +74,35 @@ class SQLiteRecoveryLedger:
             "prev_event_hash": prev_event_hash,
         })
 
-    def _persist(self, event_type: str, record: LedgerRecord, payload: dict[str, Any]) -> None:
+    def _persist(
+        self,
+        event_type: str,
+        record: LedgerRecord,
+        payload: dict[str, Any],
+        *,
+        expected_record_hash: str | None,
+    ) -> bool:
         finding_id = record.finding.finding_id
         with self._connect() as con:
+            # Serialize writers before reading the last event/snapshot. This
+            # prevents two processes from both deriving the same next sequence.
+            con.execute("BEGIN IMMEDIATE")
+            snapshot = con.execute(
+                "SELECT proof_hash, record_hash FROM recovery_snapshots WHERE finding_id = ?",
+                (finding_id,),
+            ).fetchone()
+
+            if event_type == "ADD":
+                if snapshot is not None:
+                    if snapshot["proof_hash"] == record.finding.proof_hash:
+                        return False
+                    raise ValueError("finding_id already exists with different persisted proof")
+            else:
+                if snapshot is None:
+                    raise ValueError("recovery transition requires persisted ADD event")
+                if expected_record_hash is None or snapshot["record_hash"] != expected_record_hash:
+                    raise ValueError("stale recovery ledger state; reload before transition")
+
             last = con.execute(
                 """
                 SELECT seq, event_hash
@@ -90,6 +116,11 @@ class SQLiteRecoveryLedger:
             seq = 1 if last is None else int(last["seq"]) + 1
             prev_hash = None if last is None else last["event_hash"]
             event_hash = self._event_hash(finding_id, seq, event_type, payload, prev_hash)
+            if event_type == "ADD" and last is not None:
+                raise ValueError("ADD event cannot follow an existing event chain")
+            if event_type != "ADD" and last is None:
+                raise ValueError("recovery transition has no prior event")
+
             con.execute(
                 """
                 INSERT INTO recovery_events(
@@ -124,6 +155,7 @@ class SQLiteRecoveryLedger:
                     record_json,
                 ),
             )
+        return True
 
     def _reload_after_failure(self) -> None:
         self._ledger = RecoveryLedger()
@@ -141,7 +173,12 @@ class SQLiteRecoveryLedger:
         if after.record_hash == before.record_hash:
             return after
         try:
-            self._persist(event_type, after, payload)
+            self._persist(
+                event_type,
+                after,
+                payload,
+                expected_record_hash=before.record_hash,
+            )
         except Exception:
             self._reload_after_failure()
             raise
@@ -153,18 +190,21 @@ class SQLiteRecoveryLedger:
         except Exception:
             raise
         # Exact proof replay is idempotent and must not create a second ADD event.
-        with self._connect() as con:
-            exists = con.execute(
-                "SELECT 1 FROM recovery_snapshots WHERE finding_id = ?",
-                (existing.finding.finding_id,),
-            ).fetchone()
-        if exists:
-            return existing
         try:
-            self._persist("ADD", existing, {"finding": finding_to_dict(finding)})
+            inserted = self._persist(
+                "ADD",
+                existing,
+                {"finding": finding_to_dict(finding)},
+                expected_record_hash=None,
+            )
         except Exception:
             self._reload_after_failure()
             raise
+        if not inserted:
+            # This process may have been stale while another process advanced
+            # the case beyond ADD. Reload the authoritative lifecycle state.
+            self._reload_after_failure()
+            return self._ledger.get(finding.finding_id)
         return existing
 
     def approve(self, finding_id: str, reviewer_id: str, note: str) -> LedgerRecord:
