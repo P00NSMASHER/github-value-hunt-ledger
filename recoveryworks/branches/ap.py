@@ -401,10 +401,18 @@ def audit_ap_recovery(
                     rule = _unverified_rule(rule)
                     confidence = "contradictory vendor statement requires human reconciliation"
                 elif statement.balance_cents < 0:
-                    metadata["statement_credit_cents"] = abs(statement.balance_cents)
-                    metadata["statement_credit_matches_recovery"] = (
-                        abs(statement.balance_cents) == recovery_cents
-                    )
+                    statement_credit = abs(statement.balance_cents)
+                    matches = statement_credit == recovery_cents
+                    metadata["statement_credit_cents"] = statement_credit
+                    metadata["statement_credit_matches_recovery"] = matches
+                    if not matches:
+                        exceptions.append(APRecoveryException(
+                            f"{vendor_id}/{normalized_invoice}",
+                            "STATEMENT_CREDIT_MISMATCH",
+                            "vendor statement credit does not equal calculated overpayment",
+                        ))
+                        rule = _unverified_rule(rule)
+                        confidence = "vendor statement credit amount conflicts with ledger recovery math"
 
             observations.append(RecoveryObservation(
                 branch=Branch.AP,
@@ -445,20 +453,28 @@ def audit_ap_recovery(
                 "duplicate_amount_cents": amount_cents,
                 "detection_basis": "exact_invoice_amount_duplicate",
             }
-            if (
-                statement is not None
-                and statement.balance_cents < 0
-                and abs(statement.balance_cents) == recovery_cents
-            ):
+            if statement is not None and statement.balance_cents < 0:
                 represented_statement_keys.add(key)
                 evidence.append(statement.evidence())
-                rule = statement.credit_rule_ref()
-                reason = "VENDOR_STATEMENT_CONFIRMED_DUPLICATE_PAYMENT"
-                confidence = (
-                    "exact duplicate payment cluster corroborated by vendor statement credit"
-                )
+                statement_credit = abs(statement.balance_cents)
                 metadata["vendor_statement_date"] = statement.statement_date
-                metadata["statement_credit_cents"] = abs(statement.balance_cents)
+                metadata["statement_credit_cents"] = statement_credit
+                metadata["statement_credit_matches_recovery"] = (
+                    statement_credit == recovery_cents
+                )
+                if statement_credit == recovery_cents:
+                    rule = statement.credit_rule_ref()
+                    reason = "VENDOR_STATEMENT_CONFIRMED_DUPLICATE_PAYMENT"
+                    confidence = (
+                        "exact duplicate payment cluster corroborated by vendor statement credit"
+                    )
+                else:
+                    exceptions.append(APRecoveryException(
+                        f"{vendor_id}/{normalized_invoice}",
+                        "STATEMENT_CREDIT_MISMATCH",
+                        "vendor statement credit does not equal suspected duplicate recovery",
+                    ))
+                    confidence = "duplicate cluster conflicts with vendor statement credit amount"
 
             observations.append(RecoveryObservation(
                 branch=Branch.AP,
