@@ -4,6 +4,7 @@ from .engine import RecoveryEngine, RecoveryObservation
 from .journal import JournalEvent, RecoveryJournal
 from .ledger import RecoveryLedger
 from .report import RecoveryScan360Report, build_scan360_report
+from .runner import Scan360RunResult, run_scan360_config
 from .scan import RecoveryScanBatch, RecoveryScanManifest, SourceManifestEntry, freeze_scan, run_scan
 from .store import BundleIntegrityError, LocalBundleStore, StoreConflictError
 from .models import (
@@ -35,9 +36,11 @@ __all__ = [
     "RecoveryScanBatch",
     "RecoveryScanManifest",
     "RuleRef",
+    "Scan360RunResult",
     "SourceManifestEntry",
     "StoreConflictError",
     "build_scan360_report",
     "freeze_scan",
     "run_scan",
+    "run_scan360_config",
 ]
