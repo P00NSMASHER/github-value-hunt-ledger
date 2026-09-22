@@ -16,8 +16,10 @@ from .models import CaseState, FindingState, RecoveryFinding, canonical_hash
 from .policies import assert_claim_authorizable
 from .readiness import (
     SevenFigureAuthorizationDossier,
+    SevenFigureAuthorizationSeal,
     SevenFigureReadinessPackage,
     verify_seven_figure_authorization_dossier,
+    verify_seven_figure_authorization_seal,
 )
 
 
@@ -36,6 +38,7 @@ class LedgerRecord:
     authorization_hash: str | None = None
     readiness_hash: str | None = None
     readiness_dossier_hash: str | None = None
+    authorization_seal_hash: str | None = None
     external_action_envelope_hash: str | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
@@ -145,6 +148,7 @@ class RecoveryLedger:
         authorization: ClientActionAuthorization,
         readiness: SevenFigureReadinessPackage | None = None,
         dossier: SevenFigureAuthorizationDossier | None = None,
+        authorization_seal: SevenFigureAuthorizationSeal | None = None,
     ) -> LedgerRecord:
         record = self.get(finding_id)
         assert_claim_authorizable(record.finding, record.reviewer_approved)
@@ -183,7 +187,18 @@ class RecoveryLedger:
                 bundle,
                 expected_journal_head_hash=journal.head_hash,
             )
-        elif readiness is not None or dossier is not None:
+            if authorization_seal is None:
+                raise ValueError(
+                    "seven-figure finding requires final authorization seal"
+                )
+            verify_seven_figure_authorization_seal(
+                authorization_seal,
+                authorization,
+                bundle,
+                dossier,
+                expected_journal_head_hash=journal.head_hash,
+            )
+        elif readiness is not None or dossier is not None or authorization_seal is not None:
             raise ValueError(
                 "seven-figure assurance artifacts cannot authorize a sub-seven-figure case"
             )
@@ -202,6 +217,9 @@ class RecoveryLedger:
             authorization_hash=authorization.proof_hash,
             readiness_hash=readiness.package_hash if readiness is not None else None,
             readiness_dossier_hash=dossier.dossier_hash if dossier is not None else None,
+            authorization_seal_hash=(
+                authorization_seal.seal_hash if authorization_seal is not None else None
+            ),
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
@@ -217,9 +235,13 @@ class RecoveryLedger:
             raise ValueError("claim action requires explicit authorization")
 
         if self._high_value(record):
-            if not record.readiness_hash or not record.readiness_dossier_hash:
+            if (
+                not record.readiness_hash
+                or not record.readiness_dossier_hash
+                or not record.authorization_seal_hash
+            ):
                 raise ValueError(
-                    "seven-figure claim requires completed readiness dossier"
+                    "seven-figure claim requires completed readiness dossier and authorization seal"
                 )
             if action_envelope is None:
                 raise ValueError(
