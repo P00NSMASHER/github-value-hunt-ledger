@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass
 from typing import Iterable
 
 from freight.contracts import canonical_hash
-from freight.finding_factory import FindingFactoryBatch
+from freight.finding_factory import FindingFactoryBatch, derive_batch
 from freight.invoice_csv_adapter import InvoiceChargeCSVBatch
 from freight.population_builder import PopulationBuild
 from freight.review_packet import ReviewPacket, build_review_packet
@@ -64,6 +64,15 @@ def build_audit_run_manifest(
             raise ValueError("rule batch scope mismatch")
 
     rules = tuple(rule for batch in batches for rule in batch.rules)
+    canonical_factory = derive_batch(
+        population_build.population,
+        invoice_batch.charges,
+        rules,
+    )
+    if factory != canonical_factory:
+        raise ValueError(
+            "Finding Factory output does not match complete accepted charge/rule set"
+        )
     rule_hashes = tuple(sorted(rule.rule_hash for rule in rules))
     if len(rule_hashes) != len(set(rule_hashes)):
         raise ValueError("duplicate rule proof across rule batches")
