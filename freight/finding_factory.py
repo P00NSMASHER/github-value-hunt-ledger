@@ -341,6 +341,11 @@ def derive_batch(
     normalized_charges = tuple(sorted(charges, key=lambda charge: charge.charge_id))
     if len({charge.charge_id for charge in normalized_charges}) != len(normalized_charges):
         raise ValueError("duplicate charge_id")
+    source_hashes = [charge.source_hash for charge in normalized_charges]
+    if len(source_hashes) != len(set(source_hashes)):
+        raise ValueError(
+            "duplicate charge source_hash: one source record cannot be counted under multiple charge IDs"
+        )
     normalized_rules = tuple(rules)
     row_index = {row.identity_key: row for row in population.rows}
 
