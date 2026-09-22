@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:lane-local-proof-hardening-01",
+  "created_at": "2026-09-22",
+  "source_hunter_files": [
+    "hunters/15-run18-2026-09-20.md",
+    "hunters/15-run19-2026-09-20.md",
+    "hunters/15-run20-2026-09-20.md",
+    "hunters/15-run21-2026-09-20.md"
+  ],
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "apurvtyagi/security-asset-correlator",
+      "revision": "36aef11ec62b2f13ea7ab508ec8154bac455535a",
+      "score": 25,
+      "status": "dual_use_identity_component_negative_oracle",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "role": "Cross-source cloud/EDR/scanner correlation and conflict audit, plus an adversarial example showing contradictory hard IDs can still be false-merged by weaker hostname/IP evidence.",
+      "positive_evidence": [
+        "Layered exact cloud instance ID / EDR agent ID / MAC / hostname / freshness-aware IP matching.",
+        "Ambiguous middle-confidence candidates can be separated for human review.",
+        "Field-level disagreements retain both values, sources, authority ranks, chosen resolution and timestamps.",
+        "Coverage gaps such as no_edr/no_scanner/shadow_it are explicit."
+      ],
+      "negative_evidence": [
+        "Different fresh instance IDs are not a hard veto; hostname+IP evidence can exceed the merge threshold and collapse distinct workloads.",
+        "No signed/versioned census snapshot, source-run completeness proof or cryptographic observation history was verified."
+      ],
+      "integration_rule": "Use normalization/conflict/audit plumbing, but require Recovery Census identity to hard-fail on concurrently authoritative stable-ID contradiction."
+    },
+    {
+      "repository": "opsmill/infrahub-sync",
+      "revision": "76ab2b436a6f6b735aee4ef9363bb38f00f6c738",
+      "score": 25,
+      "status": "retained_provenance_completeness_component",
+      "capability_ids": [
+        "CAP-010",
+        "CAP-019"
+      ],
+      "role": "Collector-run provenance and completeness substrate for Recovery Census observations.",
+      "evidence": [
+        "Persists source snapshot, destination snapshot, deterministic plan, errors, cursors, schema hash and run status.",
+        "Row-count guardrail compares current resource counts with the last successful baseline and fails large unexplained drops unless explicitly overridden.",
+        "Cached apply refuses schema drift and missing peer identifiers become structured errors."
+      ],
+      "limitation": "It is not itself a cross-source canonical identity authority; feed observations/completeness evidence into a separate identity adjudicator."
+    },
+    {
+      "repository": "wazuh/wazuh",
+      "revision": "6513e55177cf46779bbc1bc61dbfe7d5d3eeca58",
+      "score": 27,
+      "status": "retained_identity_lifecycle_oracle",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "role": "Concrete lifecycle semantics for identity succession versus identity conflict after endpoint re-enrollment.",
+      "evidence": [
+        "syscollector identity tests distinguish missing marker adoption, unchanged ID no-op, unknown ID no-op, failed marker read, and changed-ID resend.",
+        "Changed synchronized agent ID causes inventory republish on the correct protocol lane; the marker advances only after successful recovery.",
+        "The design demonstrates that same-workload/new-agent-generation can be legitimate succession rather than duplicate workload identity."
+      ],
+      "limitation": "Agent ID alone cannot authorize same-business-workload continuity; a stronger continuity witness such as cloud/VM identity or approved replacement lineage is still required.",
+      "integration_rule": "Represent IDENTITY_SUCCESSION(old,new) as a generation edge that invalidates prior proof until the new generation is re-observed/re-proven."
+    },
+    {
+      "repository": "foundriesio/aktualizr-lite",
+      "revision": "1d089b006295cd924b3c87337679fef7295e4329",
+      "score": 25,
+      "status": "retained_proof_currentness_component",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "C++ TUF/Uptane-style metadata currentness/freshness/rollback transfer donor.",
+      "evidence": [
+        "Tests mutate signed bundle metadata without resigning and require invalid-metadata failure.",
+        "Tests construct expired metadata and require explicit expiration failure.",
+        "Separate stale/security fixtures distinguish rollback/currentness from syntactic validity."
+      ],
+      "limitation": "OTA/update verification is an architectural donor, not domain-policy correctness."
+    },
+    {
+      "repository": "uptane/aktualizr",
+      "revision": "e5118a74874c0561ebac57560c667c18b19d984b",
+      "score": 24,
+      "status": "retained_authority_separation_reference",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "Separate subject-specific Director authority from artifact/Image authority, with expiry and rollback rejection.",
+      "limitation": "Standards/policy semantics remain separately governed and the repository does not alone provide the full Recovery Proof contract."
+    },
+    {
+      "repository": "rauc/rauc",
+      "revision": "1a412fe80badb9cf91f5374ea2ef791de4db55a9",
+      "score": 22,
+      "status": "watch_trust_chain_component",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "C implementation reference for X.509 trust-chain/keyring/CRL verification.",
+      "limitation": "Weaker than TUF/Uptane for explicit multi-role version/freshness/rollback lineage."
+    },
+    {
+      "repository": "sigstore/cosign",
+      "revision": "0c66ecdff337f647bbcb0259efe61a81e33a76e8",
+      "status": "current_patch_negative_oracle",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "Permanent wrong-attestation-type false-green regression oracle.",
+      "evidence": [
+        "Current inspected code performs an explicit post-verification predicate-type check and hard-fails on expected/observed type mismatch.",
+        "The Hunter run records the recurring historical class where valid signatures could still accompany semantically wrong evidence."
+      ],
+      "safety_note": "Only the defensive invariant and current patched behavior are retained; no exploit workflow or vulnerable-target instructions."
+    },
+    {
+      "repository": "sigstore/policy-controller",
+      "revision": "e0d5d701087c020419738d69e2d2eac2ca715c4b",
+      "status": "current_patch_negative_oracle",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "Independent recurrence of wrong-predicate false-positive class; current code requires matching requested attestation predicate types.",
+      "safety_note": "Defensive regression pattern only."
+    },
+    {
+      "repository": "in-toto/attestation",
+      "revision": "fd2609c16bcb0ac53443e2b4612977f997e8f9a5",
+      "status": "retained_standard_result_reference",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "Simple Verification Result v0.2 result-envelope reference: subject, verifier identity, policy resources, verification time and checked properties.",
+      "limitation": "SVR is a concise result/index, not a substitute for the complete signed Recovery Proof evidence bundle."
+    }
+  ],
+  "permanent_negative_controls": [
+    "concurrent authoritative stable-ID contradiction must never be outweighed by hostname/IP similarity",
+    "missing/failed identity marker read remains UNKNOWN rather than 'never recorded'",
+    "valid signature does not imply correct predicate/evidence type",
+    "valid old metadata does not imply current authority",
+    "policy/evidence role, freshness, applicability and threshold are separate acceptance dimensions"
+  ],
+  "graph_edges": [
+    "apurvtyagi/security-asset-correlator@36aef11ec62b2f13ea7ab508ec8154bac455535a -> CAP-010 [identity_correlation_donor+false_merge_negative]",
+    "opsmill/infrahub-sync@76ab2b436a6f6b735aee4ef9363bb38f00f6c738 -> CAP-010 [collector_completeness]",
+    "opsmill/infrahub-sync@76ab2b436a6f6b735aee4ef9363bb38f00f6c738 -> CAP-019 [observation_provenance]",
+    "wazuh/wazuh@6513e55177cf46779bbc1bc61dbfe7d5d3eeca58 -> CAP-010 [identity_succession]",
+    "foundriesio/aktualizr-lite@1d089b006295cd924b3c87337679fef7295e4329 -> CAP-007 [currentness_rollback]",
+    "uptane/aktualizr@e5118a74874c0561ebac57560c667c18b19d984b -> CAP-007 [authority_role_separation]",
+    "sigstore/cosign@0c66ecdff337f647bbcb0259efe61a81e33a76e8 -> CAP-007 [wrong_predicate_negative]",
+    "sigstore/policy-controller@e0d5d701087c020419738d69e2d2eac2ca715c4b -> CAP-007 [wrong_predicate_negative]"
+  ]
+}
