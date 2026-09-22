@@ -405,3 +405,62 @@ RFC3161/TSA, and object-storage APIs and setting `provider_verified=true` only
 after provider verification succeeds. RecoveryOS records and cross-binds those
 verification receipts; it does not fabricate provider verification or implement
 home-grown public-key cryptography.
+
+
+## Final seven-figure authorization gate
+
+A seven-figure case is not authorization-ready merely because the underlying
+assurance artifacts exist somewhere in storage.
+
+The authorization gate requires a self-contained SevenFigureReadinessPackage
+and SevenFigureAuthorizationDossier that survive deterministic serialization
+and durable-ledger replay.
+
+The readiness package now carries and re-verifies:
+
+- the exact HostileExaminationPacket;
+- the CaseArtifactReplayReceipt proving the original authority/evidence bytes;
+- the CalculationReplayReceipt proving independent reperformance;
+- the ProofSeal bound to the frozen case and journal head;
+- a provider/KMS/HSM verification receipt attesting that both hostile-packet
+  and proof-seal HMAC signatures were verified with the managed key;
+- provider-verified object-lock receipts;
+- case-completeness and negative-evidence controls;
+- build provenance;
+- the public transparency record;
+- external asymmetric signature verification; and
+- trusted timestamp verification.
+
+### Managed-key verification boundary
+
+RecoveryOS still does not expose or store the production HMAC secret.
+
+A provider-specific adapter must ask the KMS/HSM to verify:
+
+1. the detached ProofSeal signature; and
+2. the HostileExaminationPacket signature.
+
+The adapter then records a HostilePacketVerificationEvidence receipt containing
+the key ID, provider request ID, provider verification receipt hash, packet hash,
+packet-signature hash, proof-seal ID/signature hash, verification time, and
+adapter identity.
+
+A boolean alone is not sufficient: the receipt is content-addressed and must
+bind the exact packet, proof seal, managed key, and provider response.
+
+### Authorization behavior
+
+For findings at or above SEVEN_FIGURE_CENTS:
+
+- legacy authorization remains blocked;
+- a non-durable RecoveryLedger remains blocked;
+- dual ledger approval remains mandatory;
+- the readiness package journal head must equal the live durable journal head;
+- the full authorization dossier must be present;
+- every underlying readiness/dossier verifier runs again immediately before
+  authorization; and
+- durable journal replay reconstructs the same readiness and dossier hashes.
+
+If any replay receipt, proof seal, provider verification receipt, object-lock
+receipt, public record, build attestation, or journal head is stale or altered,
+authorization fails closed.
