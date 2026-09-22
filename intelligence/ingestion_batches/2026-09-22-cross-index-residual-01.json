@@ -1,0 +1,452 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:cross-index-residual-01",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "source_files": [
+    "MASTER.md",
+    "COMBINATIONS.md",
+    "OPPORTUNITIES.md"
+  ],
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "aiparallel0/freight-audit",
+      "revision": "e7869162cf9cb23f6d520a0cd71f87cf973d8c28",
+      "status": "negative_oracle",
+      "capability_ids": [
+        "CAP-003",
+        "CAP-004"
+      ],
+      "role": "Removed from MASTER as money/value oracle; retain only selected synthetic documents/cases with independently authored expected authority/dollars."
+    },
+    {
+      "repository": "DominicFinn/open_tms",
+      "revision": "93d8c2b8ff78373ff69bb7ea546743e4703628b1",
+      "status": "dominated_reference",
+      "capability_ids": [
+        "CAP-003"
+      ],
+      "role": "Broad logistics plumbing reference; Trenova and stronger independent rating/evidence components dominate production value."
+    },
+    {
+      "repository": "justicebajaj161/Freight-Audit-Console",
+      "revision": "c2d4c07310a77e20ee21a74fc96d49df783c2e3a",
+      "status": "independent_falsifier",
+      "capability_ids": [
+        "CAP-003",
+        "CAP-004"
+      ],
+      "role": "Independent freight audit comparator; keep outside production path."
+    },
+    {
+      "repository": "WRBriska/InvoiceAudit",
+      "revision": "bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c",
+      "status": "independent_falsifier",
+      "capability_ids": [
+        "CAP-003",
+        "CAP-004"
+      ],
+      "role": "Independent invoice/freight audit comparator; keep outside production path."
+    },
+    {
+      "repository": "Bdkelp/getmydpc_enrollment",
+      "revision": "e753d8ebf5e087ae9a4add978d1559af86c173fb",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "proposed_capability_ids": [
+        "CAP-039"
+      ],
+      "role": "Recurring writing/override commissions and carry-forward entitlement adapter."
+    },
+    {
+      "repository": "Reifye/Reifye-OS",
+      "revision": "acbb8ca46c6c6de20c0a64ac7ea0f174f308e17a",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "proposed_capability_ids": [
+        "CAP-039"
+      ],
+      "role": "Collected-cash eligibility, compliance/admin holds and refund-window clawbacks."
+    },
+    {
+      "repository": "D-Haku/Channel-Partner-Commission-Engine",
+      "revision": "176084bb4a5bc0a1ad17ba94a11c869dfd8a463e",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "proposed_capability_ids": [
+        "CAP-039"
+      ],
+      "role": "Lending DSA commission slab/sequence entitlement logic."
+    },
+    {
+      "repository": "mike4forge/forgelocal-commission-engine",
+      "revision": "cb4ab9bcb85a5863079d1798836727065d2d243a",
+      "status": "watch",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "proposed_capability_ids": [
+        "CAP-039"
+      ],
+      "role": "Point-in-time hierarchy/genealogy provenance adapter."
+    },
+    {
+      "repository": "joedanields/CaD-Track",
+      "revision": "5ae85e868e12f1814381174a3afdfff6e5edf629",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-028"
+      ],
+      "role": "Field/contemporaneous change-evidence contributor inside ScopeSignal."
+    },
+    {
+      "repository": "Kentucky-ai/opentakeoff",
+      "revision": "6ff9cc355e60d6312c0c82e2ddac56cb212cc394",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-028"
+      ],
+      "role": "Construction quantity/takeoff contributor for design-delta evidence."
+    },
+    {
+      "repository": "delongwangshu49-hub/bimchange-agent",
+      "revision": "cd7fd6e6522e060b7847f0daaed00979097da7dd",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-028"
+      ],
+      "role": "BIM/model change evidence contributor."
+    },
+    {
+      "repository": "sidnov6/recoupe",
+      "revision": "60e0e02bec789ab505752dacfecdd76438aacd48",
+      "status": "workflow_challenger",
+      "capability_ids": [
+        "CAP-001",
+        "CAP-007"
+      ],
+      "proposed_capability_ids": [
+        "CAP-030"
+      ],
+      "role": "Extraction/liability/quantum/workflow challenger; illustrative negligence/limitations data are not legal authority."
+    },
+    {
+      "repository": "Gaskony-Ignition/module-plc-emulator",
+      "revision": "518f56b55566d7e20f19ce64003cdae45a08edc8",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "role": "PLC emulator core for buyer-specific virtual pre-FAT / protocol acceptance."
+    },
+    {
+      "repository": "lineledger/lineledger",
+      "revision": "40607d92c7e7a418178ce27d3e679538110100f2",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "GL-grounded vendor-credit posting and bill reconciliation with reopen-on-void; no-double-count recovery-accounting donor."
+    },
+    {
+      "repository": "netc-fleet-services/statement-reconciliation",
+      "revision": "d06d500b0cc010350ace2293f3b4f28dd6f68ddb",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "23 vendor-specific PDF parsers + QuickBooks loader + control-total verification + exact/fuzzy reconciliation."
+    },
+    {
+      "repository": "rehman671/vendor-reconciliation-engine",
+      "revision": "1ae859c938533f4f3e79fd8eef5d6e2ed45fd625",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-006"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Fail-closed reconciliation-to-settlement gate; unresolved/low-confidence/control-total mismatch blocks settlement artifact."
+    },
+    {
+      "repository": "conductor-is/quickbooks-desktop-node",
+      "revision": "a8024fd028ca1103c190684868456efc8d842940",
+      "status": "optional_connector",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "QuickBooks Desktop read connector for recurring automation after export-based pilot proves value."
+    },
+    {
+      "repository": "leagames0221-sys/invoice-lens",
+      "revision": "4a9ce4123f8eba3308c2d414f449be68b7fbc05e",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Deterministic duplicate/three-way mismatch/approval/fraud signals with append-only evidence."
+    },
+    {
+      "repository": "stateset/stateset-icommerce",
+      "revision": "0ae4cf3c531f35d28a55f0211fc64413114d4bd1",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Durable AP/PO/receipt substrate."
+    },
+    {
+      "repository": "amrzainmubarak/reconforge-erp",
+      "revision": "b61ea56bb9c135fda12546e173795af3c243e4fb",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Exact-money, segregation-of-duties, exception routing, atomic audit/outbox and tenant-boundary control plane."
+    },
+    {
+      "repository": "wphamman/erpocr_integration",
+      "revision": "a9c82c0ff02f580ff60ebf012797686ba91e977e",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-001"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Supplier-side statement extraction/reconciliation intake donor."
+    },
+    {
+      "repository": "ai-frankie/ap-close-engine",
+      "revision": "db38c8476ccd21155a5dc161c5f36b9747e88e64",
+      "status": "independent_falsifier",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Independent AP re-performance + vendor statement + GL/GRNI/duplicate control challenger."
+    },
+    {
+      "repository": "Enginatics/Oracle-EBS-SQL",
+      "revision": "6c0f3b1a70e1b6ff747e497176e7be9256e6e7ee",
+      "status": "enterprise_query_map",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Oracle EBS supplier balance/statement/invoice-payment/receipt query maps."
+    },
+    {
+      "repository": "vendorrebate/vendorrebate",
+      "revision": "f37427a762555f4538aa4ffd21e7afaadc6e81e9",
+      "status": "retained_adjacent_domain",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Versioned rebate agreement, EDI claim, accrual, dispute-window and recovery-packet patterns."
+    },
+    {
+      "repository": "Accountw-debug/mdq",
+      "revision": "8853e2c54fdc293903e994e40c629808008d782e",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "SAP ECC/S4 recovery/control rules and gold corpus."
+    },
+    {
+      "repository": "ib823/sapconnect",
+      "revision": "5851e9fdeaba462c3137686f4ced0aae1ba4b0f7",
+      "status": "optional_connector",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Optional live SAP RFC/OData extraction after export-based pilot proves recurring need."
+    },
+    {
+      "repository": "ballerina-platform/module-ballerinax-microsoft.dynamics365.finance",
+      "revision": "fb15cb2f34749e8a031344943c107e115b93d7c4",
+      "status": "optional_connector",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Typed Dynamics 365 Finance OData packages; connector output is not financial authority."
+    },
+    {
+      "repository": "hidayattaufiqur/fno-navigator",
+      "revision": "0fd0998094abb3d9c3a8a30ca21ea9d21b7d69af",
+      "status": "process_map",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Tested Dynamics 365 Finance table/process maps."
+    },
+    {
+      "repository": "oracle-quickstart/oci-jde-monitoring",
+      "revision": "77c6aac079183e5076ff098ad00e463be16aa634",
+      "status": "enterprise_query_map",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Oracle-published JDE F0411/F0414/F0911 integrity relationships and monitoring rules."
+    },
+    {
+      "repository": "hotgluexyz/tap-netsuite-rest",
+      "revision": "aeed1c57c266f265a95a30aca041ae8b4e84ed9d",
+      "status": "optional_connector",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Read-only NetSuite vendor bill/credit/payment extraction."
+    },
+    {
+      "repository": "kimtabilon/ebp_netsuite",
+      "revision": "0f80fc77279b6806985a1868b12d37455bfae930",
+      "status": "future_write_donor",
+      "proposed_capability_ids": [
+        "CAP-027"
+      ],
+      "role": "Optional future NetSuite vendor-credit application donor; not required for first pilot."
+    },
+    {
+      "repository": "aws-samples/sample-energy-utility-rate-engine",
+      "revision": "e2f987be3863b0a5026940b7217cbc4ddffe6129",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-038"
+      ],
+      "role": "RDL -> typed AST -> generated Rust calculators with scenario/version management and batch rerating."
+    },
+    {
+      "repository": "we3lab/industrial-electricity-tariffs",
+      "revision": "ffab0314814d4796c6655c91f53f90b525acdf94",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-038"
+      ],
+      "role": "Monthly commercial/industrial tariff discovery/index corpus; continuity validator cannot certify completeness."
+    },
+    {
+      "repository": "LBNL-ETA/elecprice",
+      "revision": "a6947c3b65fdedec7da5bbeb52b85e8fdeffd1f4",
+      "status": "independent_comparator",
+      "proposed_capability_ids": [
+        "CAP-038"
+      ],
+      "role": "Independent supported commercial TOU/fixed/energy/demand calculator."
+    },
+    {
+      "repository": "harshalsp0011/utility-billing-ai",
+      "revision": "c66e124f1991366f6c38c3535780905545edffb0",
+      "status": "document_intake_donor",
+      "proposed_capability_ids": [
+        "CAP-038"
+      ],
+      "role": "PDF/tariff-version/orchestration concepts only; fail-open money semantics must not be inherited."
+    },
+    {
+      "repository": "surendersara1/D-NBS_PySpark",
+      "revision": "dfa941279d318bd698e2e5c756be81331a854eb3",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-035"
+      ],
+      "role": "Telecom bilateral/interconnect matching and settlement-side complement to billing-dotnetcore."
+    },
+    {
+      "repository": "vitthalhumbe/ciphercrew-claimcraft",
+      "revision": "8b61f1b7e6cc8e86ff56011267e0da8e263401f3",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-036"
+      ],
+      "role": "837/835 healthcare claim/payment reconciliation complement to payer adjudication replay."
+    },
+    {
+      "repository": "nyimbi/AppGen-X",
+      "revision": "d3cf2829702ee414e0d7b64b03fa300ae5173abb",
+      "status": "control_surface_reference",
+      "proposed_capability_ids": [
+        "CAP-036"
+      ],
+      "role": "Healthcare revenue-integrity control-surface reference."
+    },
+    {
+      "repository": "adipras/tirta-saas-backend",
+      "revision": "79053de1629098969abe8254defececc9a114acb",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-040"
+      ],
+      "role": "Utility meter/rate/invoice/payment substrate for meter-to-cash assurance."
+    },
+    {
+      "repository": "navariltd/utility-billing",
+      "revision": "380f6305350e4f7d90e745d48e2360170001a4db",
+      "status": "retained_component",
+      "proposed_capability_ids": [
+        "CAP-040"
+      ],
+      "role": "Complementary utility billing/meter-to-cash implementation."
+    },
+    {
+      "repository": "datasciencecampus/pprl_toolkit",
+      "revision": "b278afdcf37d557a06d058e5d164d6e4d373a87a",
+      "status": "optional_privacy_component",
+      "capability_ids": [
+        "CAP-002"
+      ],
+      "role": "Privacy-preserving record linkage option where plaintext pooling is unacceptable."
+    },
+    {
+      "repository": "Robertn02/Airline-Revenue-Management-IROPS-Seat-Allocation-Optimizer",
+      "revision": "9a235b1ceb7a53f467c060b6a2750590b1ee0cd1",
+      "status": "retained_challenger",
+      "proposed_capability_ids": [
+        "CAP-041"
+      ],
+      "role": "Auditable disruption/seat-allocation economics for shadow airline IROPS decision assurance."
+    },
+    {
+      "repository": "egovernments/DIGIT-Works",
+      "revision": "7c44e963c7aced16d648971ae66eb938cbe8fdc4",
+      "status": "retained_challenger",
+      "proposed_capability_ids": [
+        "CAP-042"
+      ],
+      "role": "Public-works work-order/BOQ/measurement-book/billing authority challenger; approved-measurement-to-payment gate still unproven."
+    }
+  ],
+  "proposed_capability_definitions": {
+    "CAP-038": "Utility tariff authority, exact commercial/industrial rerating and bill-recovery evidence",
+    "CAP-039": "Commission/partner entitlement authority across effective plans, hierarchies, holds, carry-forward and clawbacks",
+    "CAP-040": "Utility meter-to-cash revenue assurance across readings, tariffs, invoices, adjustments and payments",
+    "CAP-041": "Auditable airline IROPS allocation / disruption decision assurance",
+    "CAP-042": "Public-works measurement-to-payment leakage evidence from accepted BOQ/work order through measured and billed state"
+  },
+  "note": "This batch closes the exact-revision repository gap across central commercial indexes. Status encodes the role the repository is allowed to play; falsifiers/watch/donors/connectors are not production authority."
+}
