@@ -28,9 +28,17 @@ on:
         required: true
         default: "7"
         type: string
+  push:
+    branches: [main]
+    paths:
+      - production/fmc_tariff_ledger/RUN_NOW
 
 permissions:
   contents: read
+
+concurrency:
+  group: fmc-tariff-rule-ledger
+  cancel-in-progress: false
 
 jobs:
   test:
@@ -46,7 +54,7 @@ jobs:
           cache: pip
           cache-dependency-path: production/fmc_tariff_ledger/requirements.txt
       - run: python -m pip install -r requirements.txt
-      - run: python -m unittest -v test_crawler.py test_run.py
+      - run: python -m unittest discover -v -p 'test_*.py'
 
   matrix:
     runs-on: ubuntu-latest
@@ -55,7 +63,7 @@ jobs:
     steps:
       - id: make
         env:
-          SHARD_COUNT: ${{ inputs.shard_count }}
+          SHARD_COUNT: ${{ inputs.shard_count || '12' }}
         run: |
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json, os
@@ -86,26 +94,35 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - name: Crawl deterministic FMC shard
         env:
-          SHARD_COUNT: ${{ inputs.shard_count }}
-          WORKERS: ${{ inputs.workers_per_shard }}
-          MAX_DEPTH: ${{ inputs.max_depth }}
-          MAX_PAGES: ${{ inputs.max_pages_per_location }}
+          SHARD_COUNT: ${{ inputs.shard_count || '12' }}
+          WORKERS: ${{ inputs.workers_per_shard || '4' }}
+          MAX_DEPTH: ${{ inputs.max_depth || '3' }}
+          MAX_PAGES: ${{ inputs.max_pages_per_location || '100' }}
           SHARD: ${{ matrix.shard }}
         run: |
           mkdir -p "output/shard-${SHARD}"
-          python run.py crawl             --out "output/shard-${SHARD}"             --db ledger.sqlite             --workers "${WORKERS}"             --max-depth "${MAX_DEPTH}"             --max-pages-per-location "${MAX_PAGES}"             --shard-count "${SHARD_COUNT}"             --shard-index "${SHARD}"
+          python run.py crawl \
+            --out "output/shard-${SHARD}" \
+            --db ledger.sqlite \
+            --workers "${WORKERS}" \
+            --max-depth "${MAX_DEPTH}" \
+            --max-pages-per-location "${MAX_PAGES}" \
+            --shard-count "${SHARD_COUNT}" \
+            --shard-index "${SHARD}"
       - name: Validate shard database
         env:
           SHARD: ${{ matrix.shard }}
         run: |
-          python run.py summary             --db "output/shard-${SHARD}/ledger.sqlite"             > "output/shard-${SHARD}/summary.json"
+          python run.py summary \
+            --db "output/shard-${SHARD}/ledger.sqlite" \
+            > "output/shard-${SHARD}/summary.json"
           python -m json.tool "output/shard-${SHARD}/summary.json"
       - name: Upload immutable shard snapshots
         uses: actions/upload-artifact@v4
         with:
           name: fmc-shard-${{ matrix.shard }}
           path: production/fmc_tariff_ledger/output/shard-${{ matrix.shard }}/
-          retention-days: ${{ inputs.artifact_retention_days }}
+          retention-days: ${{ inputs.artifact_retention_days || 7 }}
           compression-level: 0
           if-no-files-found: error
 
@@ -130,7 +147,9 @@ jobs:
       - name: Merge metadata ledgers and content-addressed evidence
         run: |
           mkdir -p merged
-          python run.py merge             --input-root downloaded             --db merged/fmc_tariff_ledger.sqlite
+          python run.py merge \
+            --input-root downloaded \
+            --db merged/fmc_tariff_ledger.sqlite
           python - <<'PY'
           from pathlib import Path
           import shutil
@@ -156,13 +175,15 @@ jobs:
               copied += 1
           print(f"raw evidence copied={copied} deduped={deduped}")
           PY
-          python run.py summary             --db merged/fmc_tariff_ledger.sqlite             > merged/summary.json
+          python run.py summary \
+            --db merged/fmc_tariff_ledger.sqlite \
+            > merged/summary.json
           python -m json.tool merged/summary.json
       - name: Upload merged carrier-rule ledger
         uses: actions/upload-artifact@v4
         with:
           name: fmc-tariff-rule-ledger-merged
           path: production/fmc_tariff_ledger/merged/
-          retention-days: ${{ inputs.artifact_retention_days }}
+          retention-days: ${{ inputs.artifact_retention_days || 7 }}
           compression-level: 0
           if-no-files-found: error
