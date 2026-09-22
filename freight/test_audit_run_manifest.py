@@ -180,3 +180,17 @@ def test_manifest_allows_zero_rule_batches_for_reviewable_missing_rule_run():
     assert manifest.rule_adapter_hashes == ()
     assert manifest.authority_document_hashes == ()
     assert manifest.review_case_count == 1
+
+
+def test_manifest_recomputes_factory_from_complete_accepted_charge_set():
+    invoices, population, batches, factory, queue, packet = setup()
+    incomplete = replace(factory, derivations=factory.derivations[:1])
+    with pytest.raises(ValueError, match="complete accepted charge/rule set"):
+        build_audit_run_manifest(
+            invoice_batch=invoices,
+            population_build=population,
+            rule_batches=batches,
+            factory=incomplete,
+            review_queue=queue,
+            review_packet=packet,
+        )
