@@ -1,4 +1,23 @@
 """RecoveryWorks / RecoveryOS shared recovery intelligence layer."""
+from .assurance import (
+    AuthorityRegistry,
+    AuthoritySnapshot,
+    CalculationManifest,
+    CaseProofBundle,
+    ChallengeReview,
+    ClientActionAuthorization,
+    DeadlineAssessment,
+    ExternalActionEnvelope,
+    ReviewAttestation,
+    SEVEN_FIGURE_CENTS,
+    SourceAttestation,
+    authorize_case_action,
+    freeze_case_proof,
+    prepare_external_action,
+    verify_action_authorization,
+    verify_case_bundle,
+    verify_external_action,
+)
 from .durable_ledger import DurableRecoveryLedger
 from .engine import RecoveryEngine, RecoveryObservation
 from .journal import JournalEvent, RecoveryJournal
@@ -18,11 +37,19 @@ from .models import (
 )
 
 __all__ = [
+    "AuthorityRegistry",
+    "AuthoritySnapshot",
     "Branch",
+    "CalculationManifest",
+    "CaseProofBundle",
+    "ChallengeReview",
+    "ClientActionAuthorization",
+    "DeadlineAssessment",
     "BundleIntegrityError",
     "CaseState",
     "DurableRecoveryLedger",
     "EvidenceRef",
+    "ExternalActionEnvelope",
     "FindingState",
     "JournalEvent",
     "LocalBundleStore",
@@ -35,12 +62,21 @@ __all__ = [
     "RecoveryScan360Report",
     "RecoveryScanBatch",
     "RecoveryScanManifest",
+    "ReviewAttestation",
+    "SEVEN_FIGURE_CENTS",
+    "SourceAttestation",
     "RuleRef",
     "Scan360RunResult",
     "SourceManifestEntry",
     "StoreConflictError",
+    "authorize_case_action",
     "build_scan360_report",
+    "freeze_case_proof",
     "freeze_scan",
     "run_scan",
+    "prepare_external_action",
     "run_scan360_config",
+    "verify_action_authorization",
+    "verify_case_bundle",
+    "verify_external_action",
 ]
