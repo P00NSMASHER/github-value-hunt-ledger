@@ -6,5 +6,114 @@
     "json_schema_path": "documentation/JSON/schemas/V3.0.0_Hospital_price_transparency_schema.json",
     "json_schema_blob_sha": "11043f073ab24e638c91bde1b8bcf73e4733b296"
   },
-  "seed_hospitals": []
+  "seed_hospitals": [
+    {
+      "hospital_name": "Coffeyville Regional Medical Center",
+      "homepage_url": "https://www.crmcinc.org/",
+      "root_url": "https://www.crmcinc.org/",
+      "notes": "Current price-transparency page exposes cms-hpt.txt."
+    },
+    {
+      "hospital_name": "Memorial Medical Center Las Cruces",
+      "homepage_url": "https://www.mmclc.org/",
+      "root_url": "https://www.mmclc.org/",
+      "notes": "Reviewed 2026 cms-hpt discovery root."
+    },
+    {
+      "hospital_name": "Lovelace Health System",
+      "homepage_url": "https://lovelace.com/",
+      "root_url": "https://lovelace.com/",
+      "notes": "Reviewed 2026 cms-hpt discovery root."
+    },
+    {
+      "hospital_name": "Artesia General Hospital",
+      "homepage_url": "https://artesiageneral.com/",
+      "root_url": "https://artesiageneral.com/",
+      "notes": "Reviewed 2026 cms-hpt discovery root."
+    },
+    {
+      "hospital_name": "San Juan Regional Medical Center",
+      "homepage_url": "https://www.sanjuanregional.com/",
+      "root_url": "https://www.sanjuanregional.com/",
+      "notes": "Reviewed 2026 cms-hpt discovery root."
+    },
+    {
+      "hospital_name": "Eastern New Mexico Medical Center",
+      "homepage_url": "https://www.enmmc.com/",
+      "root_url": "https://www.enmmc.com/",
+      "notes": "www host explicitly required by reviewed 2026 discovery evidence."
+    },
+    {
+      "hospital_name": "Providence",
+      "homepage_url": "https://www.providence.org/",
+      "root_url": "https://www.providence.org/",
+      "notes": "Parent-system locator can enumerate many hospital locations."
+    },
+    {
+      "hospital_name": "Los Angeles County Department of Health Services",
+      "homepage_url": "https://dhs.lacounty.gov/",
+      "root_url": "https://dhs.lacounty.gov/",
+      "notes": "Multi-hospital public system."
+    },
+    {
+      "hospital_name": "Froedtert Holy Family Memorial",
+      "homepage_url": "https://www.hfmhealth.org/",
+      "root_url": "https://www.hfmhealth.org/",
+      "notes": "Current price-transparency page exposes cms-hpt.txt."
+    },
+    {
+      "hospital_name": "MLK Community Hospital",
+      "homepage_url": "https://www.mlkch.org/",
+      "root_url": "https://www.mlkch.org/",
+      "notes": "Current price-transparency page exposes cms-hpt.txt."
+    },
+    {
+      "hospital_name": "SSM Health",
+      "homepage_url": "https://www.ssmhealth.com/",
+      "root_url": "https://www.ssmhealth.com/",
+      "notes": "Multi-state multi-hospital system locator."
+    },
+    {
+      "hospital_name": "Logan Health",
+      "homepage_url": "https://www.logan.org/",
+      "root_url": "https://www.logan.org/",
+      "notes": "System locator covers multiple facilities."
+    },
+    {
+      "hospital_name": "Sharp HealthCare",
+      "homepage_url": "https://www.sharp.com/",
+      "root_url": "https://www.sharp.com/",
+      "notes": "Multi-hospital system locator."
+    },
+    {
+      "hospital_name": "Northern Light Health",
+      "homepage_url": "https://northernlighthealth.org/",
+      "root_url": "https://northernlighthealth.org/",
+      "notes": "Multi-hospital Maine system."
+    },
+    {
+      "hospital_name": "Marion Health",
+      "homepage_url": "https://www.marionhealth.com/",
+      "root_url": "https://www.marionhealth.com/",
+      "notes": "Current price-transparency page exposes cms-hpt.txt."
+    },
+    {
+      "hospital_name": "Parrish Medical Center",
+      "homepage_url": "https://www.parrishhealthcare.com/",
+      "root_url": "https://www.parrishhealthcare.com/",
+      "notes": "Current price-transparency page exposes cms-hpt.txt."
+    },
+    {
+      "hospital_name": "Bear Lake Memorial Healthcare",
+      "homepage_url": "https://blmh.health/",
+      "root_url": "https://blmh.health/",
+      "notes": "Current site links cms-hpt.txt."
+    },
+    {
+      "hospital_name": "San Gorgonio Memorial Hospital",
+      "homepage_url": "https://www.sgmh.org/",
+      "root_url": "https://www.sgmh.org/",
+      "notes": "Current site links cms-hpt.txt."
+    }
+  ]
 }
