@@ -116,6 +116,50 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(result["selected_effective_from"], "2026-04-01")
         self.assertEqual({c["amount_value"] for c in result["candidates"]}, {"175"})
 
+    def test_same_version_mirror_hashes_with_same_semantics_resolve(self):
+        self.add_term(
+            effective_from="2026-04-01",
+            source_version="REV-A",
+            amount="125",
+            sha="a" * 64,
+        )
+        self.add_term(
+            effective_from="2026-04-01",
+            source_version="REV-A",
+            amount="125",
+            sha="b" * 64,
+        )
+        result = resolve.resolve_rule(
+            self.conn, "999999", "2026-06-01", "demurrage"
+        )
+        self.assertEqual(result["status"], "RESOLVED")
+        self.assertTrue(result["mirror_hashes_semantically_identical"])
+        self.assertIsNone(result["authority_conflict_reason"])
+        self.assertEqual(len(result["source_hashes"]), 2)
+
+    def test_same_version_divergent_hash_content_abstains(self):
+        self.add_term(
+            effective_from="2026-04-01",
+            source_version="REV-A",
+            amount="100",
+            sha="a" * 64,
+        )
+        self.add_term(
+            effective_from="2026-04-01",
+            source_version="REV-A",
+            amount="175",
+            sha="b" * 64,
+        )
+        result = resolve.resolve_rule(
+            self.conn, "999999", "2026-06-01", "demurrage"
+        )
+        self.assertEqual(result["status"], "AMBIGUOUS_AUTHORITY")
+        self.assertFalse(result["mirror_hashes_semantically_identical"])
+        self.assertEqual(
+            result["authority_conflict_reason"],
+            "SAME_VERSION_DIVERGENT_CONTENT",
+        )
+
     def test_competing_same_date_versions_abstain(self):
         self.add_term(
             effective_from="2026-04-01",
