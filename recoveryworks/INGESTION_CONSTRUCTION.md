@@ -72,13 +72,18 @@ Default columns:
 - `Update_Activity_ID`
 - `Mapping_Basis`
 
-A construction event must have one unambiguous mapping for the candidate.
-Multiple mappings for the same event fail closed as
-`AMBIGUOUS_EVENT_ACTIVITY_MAPPING`.
+A construction event may map to **multiple** baseline/update activity pairs.
+This is required for real delay events that affect more than one activity or
+workstream.
 
-The mapped activity must exist in both referenced schedule versions and must
-show positive earliest-finish delay before RecoveryOS will produce a recovery
-candidate.
+Every Mapping_ID must be unique. Duplicate event/activity pairs are rejected as
+`DUPLICATE_EVENT_ACTIVITY_MAPPING` rather than counted twice.
+
+Every mapped activity must exist in its referenced schedule version. At least
+one mapped activity must show positive earliest-finish delay before RecoveryOS
+will produce a recovery candidate. The finding preserves the complete reviewed
+mapping set and each mapped activity's calculated finish-delay/criticality
+result.
 
 ## 4. Versioned schedule JSON
 
@@ -139,10 +144,16 @@ Every schedule input file is SHA-256 hashed. Each version carries:
 - source-file hash
 - object locator such as `#versions[0]`
 - activity and relationship counts
+- canonical topology hash over normalized activity durations and FS relationships
 - verification state
 
-The resulting RecoveryFinding also records baseline/update source hashes and
-data dates.
+Each CPM calculation also emits a deterministic manifest containing the
+RecoveryWorks CPM engine ID/version, method ID, schedule source hash, topology
+hash, data date, and activity/relationship counts.
+
+The resulting RecoveryFinding records both baseline/update source hashes and
+topology hashes, the full CPM manifests, and data dates. This distinguishes
+"same file bytes" provenance from "same normalized network topology" provenance.
 
 ### Current CPM support
 
@@ -183,8 +194,12 @@ Default columns:
 - `Accepted_Delay_Days`
 - `Review_Date`
 - `Qualified_Reviewer_ID`
+- `Qualification_Basis`
 
-When `causation_source_verified=true`, `Qualified_Reviewer_ID` is mandatory.
+When `causation_source_verified=true`, both fields are mandatory.
+`Qualification_Basis` is an explicit human-supplied statement of why the
+reviewer is qualified for schedule/delay causation review; RecoveryOS does not
+infer credentials from a name or ID.
 
 The review must:
 
@@ -222,22 +237,28 @@ For the schedule versions selected by the causation review:
 
 `CPM project delay = max(update project duration - baseline project duration, 0)`
 
-The mapped activity also must show:
+For each reviewed event/activity mapping RecoveryOS computes:
 
 `mapped finish delay = max(update mapped activity EF - baseline mapped activity EF, 0)`
 
-Recovery is not generated when either value is zero.
+Recovery is not generated unless project delay is positive and at least one
+reviewed mapped activity has positive finish delay. Additional reviewed mappings
+may be retained even when their individual finish delay is zero, because a
+single construction event can affect multiple activities differently.
 
 The finding metadata records:
 
 - baseline/update version IDs, hashes, and data dates
 - baseline/update project durations
 - CPM project-delay days
-- mapped activity IDs
-- mapped earliest-finish delay
-- baseline/update critical status
+- complete mapping IDs and per-mapping impact records
+- primary/highest mapped earliest-finish delay
+- baseline/update critical status for each mapped pair
+- baseline/update topology hashes
+- baseline/update CPM provenance manifests
 - reviewer-accepted delay days
 - qualified causation reviewer ID
+- reviewer qualification basis
 - entitlement reviewer ID
 
 ## Scan 360 configuration
@@ -273,7 +294,8 @@ ConstructionRecovery surfaces exceptions instead of guessing, including:
 - `NO_EVENT_EVIDENCE`
 - `EVENT_PROJECT_MISMATCH`
 - `NO_EVENT_ACTIVITY_MAPPING`
-- `AMBIGUOUS_EVENT_ACTIVITY_MAPPING`
+- `DUPLICATE_MAPPING_ID`
+- `DUPLICATE_EVENT_ACTIVITY_MAPPING`
 - `NO_CAUSATION_REVIEW`
 - `CAUSATION_NOT_ACCEPTED`
 - `MISSING_SCHEDULE_VERSION`
