@@ -60,6 +60,12 @@ POLICIES: dict[Branch, BranchPolicy] = {
         RecoveryMode.UNDERPAYMENT,
         "rebate_recovery_reviewer",
     ),
+    Branch.LEASE: BranchPolicy(
+        Branch.LEASE,
+        RecoveryMode.OVERPAYMENT,
+        "lease_recovery_reviewer",
+        professional_review_note="Lease interpretation and CAM/operating-expense entitlement require qualified human review.",
+    ),
 }
 
 
