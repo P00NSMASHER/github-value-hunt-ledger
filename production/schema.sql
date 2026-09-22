@@ -121,3 +121,36 @@ create table if not exists intel_training_export (
   rejected_run_ids jsonb not null default '[]',
   created_at timestamptz not null default now()
 );
+
+-- Deterministic offline replay episodes compiled from measured hunter telemetry.
+-- Split isolation is enforced before any optimizer consumes these rows.
+create table if not exists intel_training_episode (
+  run_id text primary key,
+  split text not null,
+  episode_sha256 text not null unique,
+  reward_stage text not null,
+  training_reward numeric not null,
+  state jsonb not null,
+  action jsonb not null,
+  observation jsonb not null,
+  reward jsonb not null,
+  provenance jsonb not null,
+  source_snapshot_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
+-- Long-horizon outcome credit follows only explicit ledger provenance.
+-- Credit is accounting/training attribution, not a causal claim.
+create table if not exists intel_outcome_credit_edge (
+  outcome_id text not null,
+  run_id text not null,
+  split text not null,
+  credit numeric not null check (credit > 0 and credit <= 1),
+  direct_origin boolean not null default false,
+  path_evidence jsonb not null default '[]',
+  credited_scalar_reward numeric not null,
+  source_snapshot_sha256 text not null,
+  created_at timestamptz not null default now(),
+  primary key (outcome_id, run_id)
+);
+
