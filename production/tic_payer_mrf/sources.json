@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "source_id": "uhc-public-mrf",
+      "payer_family": "UnitedHealthcare",
+      "resolver": "azure_blob_container",
+      "url": "https://mrfstorageprod.blob.core.windows.net/public-mrf",
+      "monthly_prefix": "{YYYY-MM}-01/",
+      "notes": "Public UHC/Optum MRF blob container. Resolver lists public blobs when container listing is enabled."
+    },
+    {
+      "source_id": "aetna-cvs-metadata",
+      "payer_family": "Aetna CVS Health",
+      "resolver": "metadata_json",
+      "url": "https://mrf.healthsparq.com/aetnacvs-egress.nophi.kyruushsq.com/prd/mrf/AETNACVS_I/ALICSI/latest_metadata.json",
+      "base_url": "https://mrf.healthsparq.com/aetnacvs-egress.nophi.kyruushsq.com/prd/mrf/AETNACVS_I/ALICSI/",
+      "notes": "Public Aetna metadata endpoint listing current MRF file paths."
+    },
+    {
+      "source_id": "cigna-tic",
+      "payer_family": "Cigna",
+      "resolver": "html_links",
+      "url": "https://www.cigna.com/legal/compliance/machine-readable-files",
+      "notes": "Public TiC landing page; dynamic link failures remain explicit unresolved records."
+    },
+    {
+      "source_id": "anthem-tic",
+      "payer_family": "Elevance / Anthem",
+      "resolver": "html_links",
+      "url": "https://www.anthem.com/machine-readable-file",
+      "notes": "Public TiC landing page covering commercial machine-readable files."
+    },
+    {
+      "source_id": "aetna-tic-landing",
+      "payer_family": "Aetna CVS Health",
+      "resolver": "html_links",
+      "url": "https://www.aetna.com/health-care-professionals/transparency-in-coverage.html",
+      "notes": "Public TiC landing page retained independently from metadata endpoint."
+    },
+    {
+      "source_id": "humana-tic-landing",
+      "payer_family": "Humana",
+      "resolver": "html_links",
+      "url": "https://www.humana.com",
+      "link_filter": "machine-readable|transparency",
+      "notes": "Discovery seed; unresolved until a current public MRF endpoint is found."
+    }
+  ]
+}
