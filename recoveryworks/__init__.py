@@ -1,6 +1,7 @@
 """RecoveryWorks / RecoveryOS shared recovery intelligence layer."""
 from .engine import RecoveryEngine, RecoveryObservation
 from .ledger import LedgerEvent, LedgerRecord, RecoveryLedger
+from .packets import RecoveryPacket, build_client_portfolio_packet, build_recovery_packet, submission_ready
 from .scan import RecoveryScanBatch, RecoveryScanManifest, SourceManifestEntry, freeze_scan, run_scan
 from .models import (
     Branch,
@@ -24,10 +25,14 @@ __all__ = [
     "RecoveryLedger",
     "RecoveryMode",
     "RecoveryObservation",
+    "RecoveryPacket",
     "RecoveryScanBatch",
     "RecoveryScanManifest",
     "RuleRef",
     "SourceManifestEntry",
+    "build_client_portfolio_packet",
+    "build_recovery_packet",
     "freeze_scan",
     "run_scan",
+    "submission_ready",
 ]
