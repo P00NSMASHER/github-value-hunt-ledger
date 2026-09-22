@@ -235,7 +235,8 @@ def build_execution_state(write=True, now=None):
                               "dispatch_generation_id":e.get("dispatch_generation_id"),
                               "presence_generation_id":e.get("presence_generation_id"),
                               "presence_event_id":e.get("presence_event_id"),
-                              "activation_generation_id":e.get("activation_generation_id")
+                              "activation_generation_id":e.get("activation_generation_id"),
+                              "runtime_approval_id":e.get("runtime_approval_id")
                             }
                             adrift=[k for k,v in expected_activation.items() if act.get(k)!=v]
                             if adrift:
@@ -290,6 +291,7 @@ def build_execution_state(write=True, now=None):
                   "presence_event_id":e.get("presence_event_id"),
                   "activation_id":e.get("activation_id"),
                   "activation_generation_id":e.get("activation_generation_id"),
+                  "runtime_approval_id":e.get("runtime_approval_id"),
                   "route_override_reason":e.get("route_override_reason"),
                   "claimed_at":fmt_ts(ts),
                   "lease_expires_at":fmt_ts(expiry),
