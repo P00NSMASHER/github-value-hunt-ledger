@@ -444,9 +444,14 @@ def _parse_freight(builder: RawScanBuilder, value: Any) -> None:
             "freight_invoice_charge",
         )
         derivation = derive_charge(charge, rules)
-        if derivation.finding is None or len(derivation.matched_rules) != 1:
+        matched_rules = [
+            candidate
+            for candidate in rules
+            if candidate.rule_hash in derivation.matched_rule_hashes
+        ]
+        if derivation.finding is None or len(matched_rules) != 1:
             continue
-        matched_rule = derivation.matched_rules[0]
+        matched_rule = matched_rules[0]
         builder.add_source(
             Branch.FREIGHT,
             derivation.derivation_hash,
