@@ -7,12 +7,24 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any, Sequence
 
 from .io import execute_scan_payload
 from .packets import build_client_portfolio_packet, build_recovery_packet, submission_ready
 from .storage import load_ledger, save_ledger
+
+
+def _ledger_key() -> str | None:
+    value = os.environ.get("RECOVERYWORKS_LEDGER_HMAC_KEY")
+    return value if value else None
+
+
+def _require_signed_ledger() -> bool:
+    return os.environ.get("RECOVERYWORKS_REQUIRE_SIGNED_LEDGER", "").strip().lower() in {
+        "1", "true", "yes", "on",
+    }
 
 
 def _add_output(parser: argparse.ArgumentParser) -> None:
@@ -108,12 +120,27 @@ def main(argv: Sequence[str] | None = None) -> int:
         payload = json.loads(args.input.read_text(encoding="utf-8"))
         result, ledger = execute_scan_payload(payload)
         if args.ledger_output:
-            save_ledger(args.ledger_output, ledger)
-            result = {**result, "ledger_path": str(args.ledger_output)}
+            key = _ledger_key()
+            if _require_signed_ledger() and key is None:
+                raise ValueError(
+                    "RECOVERYWORKS_REQUIRE_SIGNED_LEDGER is enabled but "
+                    "RECOVERYWORKS_LEDGER_HMAC_KEY is missing"
+                )
+            save_ledger(args.ledger_output, ledger, integrity_key=key)
+            result = {
+                **result,
+                "ledger_path": str(args.ledger_output),
+                "ledger_signed": key is not None,
+            }
         _emit(result, args.output)
         return 0
 
-    ledger = load_ledger(args.ledger)
+    key = _ledger_key()
+    ledger = load_ledger(
+        args.ledger,
+        integrity_key=key,
+        require_signature=_require_signed_ledger(),
+    )
 
     if args.command == "summary":
         _emit({
@@ -152,7 +179,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     else:
         raise ValueError("unsupported command")
 
-    save_ledger(args.ledger, ledger)
+    save_ledger(args.ledger, ledger, integrity_key=key)
     _emit(_record_result(ledger, args.finding_id))
     return 0
 
