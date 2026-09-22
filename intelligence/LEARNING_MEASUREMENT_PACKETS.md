@@ -13,9 +13,9 @@ Advisory packets that freeze **what** to measure before execution. They do not a
 
 | Packet | Strategy | Phase | Seed | Objective |
 |---|---|---|---|---|
-| LMP:45a15ced2e8038af | STRAT:acceptance-path-transition-inspection | train_measurement | SEED:dna:kodekinetics79-opstrax-enterprise-build | OBJ:authority-lineage |
-| LMP:3617f43da0c305da | STRAT:evaluation-target-independence | train_measurement | SEED:dna:gridappsd-cimhub | OBJ:independent-evaluation |
-| LMP:9b7920594a0a6c49 | STRAT:bidirectional-money-evidence-invariant-tracing | train_measurement | SEED:measure:bidirectional-money-evidence-invariant-tracing-rule-version-transfer | OBJ:current-rule-authority |
+| LMP:18849ec8a55d3f0e | STRAT:acceptance-path-transition-inspection | train_measurement | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | OBJ:current-rule-authority |
+| LMP:cdd37b84a92a1635 | STRAT:rule-period-authority-version-audit | train_measurement | SEED:learn:rule-period-authority-version-audit-abstention-transfer | OBJ:independent-evaluation |
+| LMP:785a181aa1ce2da1 | STRAT:bidirectional-money-evidence-invariant-tracing | train_measurement | SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer | OBJ:runtime-side-effect |
 
 ## Execution boundary
 

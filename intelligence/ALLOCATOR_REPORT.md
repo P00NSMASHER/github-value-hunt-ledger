@@ -1,6 +1,6 @@
 # HUNT ALLOCATOR REPORT
 
-- Generation: **ALLOCGEN:f371a412de11**
+- Generation: **ALLOCGEN:55e8d55d0f69**
 - Candidate work items: **324**
 - Assigned slots: **14 / 14**
 
@@ -13,8 +13,8 @@
 | coverage_gap | 2 |
 | experiment_execution | 5 |
 | independent_verification | 1 |
+| learning_measurement | 1 |
 | positive_dna_transfer | 1 |
-| strategy_measurement | 1 |
 | wildcard | 1 |
 
 ## Concentration controls
@@ -33,6 +33,8 @@
 - Never inspect or retain credentials, private data, confidential material or accidental secrets.
 - Automatic portfolio adaptation may move at most one slot per generation and only after sufficient attributed-run evidence.
 - Manual overrides are measured separately and do not influence automatic portfolio adaptation.
+- Frozen benchmark strategy_measurement and adaptive learning_measurement are distinct work kinds; normal prospective runs may use only learning_measurement.
+- Frozen benchmark strategy_measurement is not a live allocator work kind; adaptive prospective measurement uses learning_measurement only.
 
 ## Interpretation
 

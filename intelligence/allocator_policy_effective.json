@@ -156,6 +156,7 @@
     "Never inspect or retain credentials, private data, confidential material or accidental secrets.",
     "Automatic portfolio adaptation may move at most one slot per generation and only after sufficient attributed-run evidence.",
     "Manual overrides are measured separately and do not influence automatic portfolio adaptation.",
+    "Frozen benchmark strategy_measurement and adaptive learning_measurement are distinct work kinds; normal prospective runs may use only learning_measurement.",
     "Frozen benchmark strategy_measurement is not a live allocator work kind; adaptive prospective measurement uses learning_measurement only."
   ],
   "adaptation": {

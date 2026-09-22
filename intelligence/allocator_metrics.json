@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "allocator_generation_id": "ALLOCGEN:f371a412de11",
+  "allocator_generation_id": "ALLOCGEN:55e8d55d0f69",
   "portfolio_policy_generation_id": "PORTFOLIO:7d0862b1d1ea",
   "candidate_count": 324,
   "assignment_count": 14,
@@ -11,7 +11,7 @@
     "coverage_gap": 2,
     "positive_dna_transfer": 1,
     "adjacency": 2,
-    "strategy_measurement": 1,
+    "learning_measurement": 1,
     "independent_verification": 1,
     "wildcard": 1
   },
