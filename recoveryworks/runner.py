@@ -19,6 +19,8 @@ from .branches.freight_io import (
     load_freight_audit_result_bundle,
     load_freight_truth_manifest,
 )
+from .branches.duty import audit_duty_entries
+from .branches.duty_csv import load_duty_assessments_csv, load_duty_entries_csv
 from .branches.payer import audit_payer_lines
 from .branches.payer_csv import load_payer_lines_csv, load_payer_rates_csv
 from .branches.rebate import audit_rebates
@@ -439,6 +441,50 @@ def run_scan360_config(
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
+
+
+    for job_index, job in enumerate(_jobs(config.get("duty"), name="duty")):
+        entries = load_duty_entries_csv(
+            _resolve(
+                base,
+                job.get("entries_csv"),
+                name=f"duty[{job_index}].entries_csv",
+            ),
+            verified=_bool_setting(
+                job, "entry_source_verified", context=f"duty[{job_index}]"
+            ),
+        )
+        assessments = load_duty_assessments_csv(
+            _resolve(
+                base,
+                job.get("assessments_csv"),
+                name=f"duty[{job_index}].assessments_csv",
+            ),
+            verified=_bool_setting(
+                job, "assessment_source_verified", context=f"duty[{job_index}]"
+            ),
+        )
+        batch = audit_duty_entries(
+            client_id=client_id,
+            entries=entries,
+            assessments=assessments,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "duty",
+                "job_index": job_index,
+                "entry_line_id": issue.entry_line_id,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
 
     for job_index, job in enumerate(_jobs(config.get("rebate"), name="rebate")):
         programs = load_rebate_programs_json(
