@@ -114,6 +114,8 @@ jobs:
                   intelligence/SKILL_EVAL_QUEUE.md \
                   intelligence/SKILL_EVAL_RESULT_INTAKE.json \
                   intelligence/SKILL_PROMOTION_QUEUE.md \
+                  intelligence/SKILL_PROMOTION_RESULT_INTAKE.json \
+                  intelligence/GLOBAL_SKILL_REVIEW_QUEUE.md \
                   intelligence/REGISTRY_REPORT.md \
                   intelligence/REVISION_DEBT_REPORT.md \
                   intelligence/DATA_QUALITY_REPORT.md \
