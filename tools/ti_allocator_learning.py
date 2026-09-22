@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
-import copy, hashlib, json
+import copy, hashlib, json, sys
 from collections import defaultdict
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from production.allocator_learning_bootstrap import (
+    BOOTSTRAP_MODE,
+    apply_learning_bootstrap,
+)
 from ti_common import INTEL, load_jsonl
 
 BASE=json.loads((INTEL/"allocator_policy.json").read_text(encoding="utf-8"))
@@ -9,6 +19,9 @@ OUTCOMES=load_jsonl("outcomes.jsonl")
 CURRENT_ALLOC=load_jsonl("hunt_allocations.jsonl") if (INTEL/"hunt_allocations.jsonl").exists() else []
 ALLOC_INDEX={a.get("assignment_id"):a for a in CURRENT_ALLOC if a.get("assignment_id")}
 ADAPT=BASE.get("adaptation") or {}
+LEARNING_STATE=json.loads((INTEL/"LEARNING_STATE.json").read_text(encoding="utf-8")) if (INTEL/"LEARNING_STATE.json").exists() else {}
+LEARNING_CURRICULUM=json.loads((INTEL/"learning_curriculum.json").read_text(encoding="utf-8")) if (INTEL/"learning_curriculum.json").exists() else {}
+SPLIT_STATUS=json.loads((INTEL/"TRAINING_SPLIT_STATUS.json").read_text(encoding="utf-8")) if (INTEL/"TRAINING_SPLIT_STATUS.json").exists() else {}
 
 outcomes_by_run=defaultdict(list)
 for o in OUTCOMES:
@@ -152,8 +165,16 @@ baseline_counts=defaultdict(int)
 for s in BASE.get("slots",[]):
     baseline_counts[s["role"]]+=1
 
-effective=copy.deepcopy(BASE)
-effective_counts=dict(baseline_counts)
+effective,bootstrap_shift=apply_learning_bootstrap(
+    BASE,
+    LEARNING_STATE,
+    LEARNING_CURRICULUM,
+    SPLIT_STATUS,
+)
+effective_counts=defaultdict(int)
+for s in effective.get("slots",[]):
+    effective_counts[s["role"]]+=1
+effective_counts=dict(effective_counts)
 adaptable=ADAPT.get("adaptable_roles") or ["experiment","coverage","adjacency"]
 protected=ADAPT.get("protected_roles") or ["measurement","verification","wildcard"]
 min_slots=ADAPT.get("min_role_slots") or {"experiment":4,"coverage":2,"adjacency":1,"measurement":1,"verification":1,"wildcard":1}
@@ -163,10 +184,10 @@ max_changes=int(ADAPT.get("max_slot_changes_per_generation",1))
 
 role_index={x["key"]:x for x in role_rows}
 sufficient=[r for r in adaptable if role_index.get(r,{}).get("sufficient_evidence")]
-shift=None
-mode="baseline_insufficient_evidence"
+shift=bootstrap_shift
+mode=BOOTSTRAP_MODE if bootstrap_shift else "baseline_insufficient_evidence"
 
-if len(sufficient)>=2 and max_changes>0:
+if not bootstrap_shift and len(sufficient)>=2 and max_changes>0:
     receiver=max(sufficient,key=lambda r:(role_index[r]["allocation_signal"],r))
     donor=min(sufficient,key=lambda r:(role_index[r]["allocation_signal"],r))
     gap=role_index[receiver]["allocation_signal"]-role_index[donor]["allocation_signal"]
@@ -209,6 +230,7 @@ effective["learning"]={
   "baseline_role_counts":dict(baseline_counts),
   "effective_role_counts":effective_counts,
   "shift":shift,
+  "learning_bootstrap_active": bool(bootstrap_shift),
   "attributed_assignment_runs":sum(x["runs"] for x in role_rows),
   "attribution_debt_runs":len(attribution_debt),
   "evidence_thresholds":thresholds,
@@ -225,6 +247,7 @@ metrics={
   "baseline_role_counts":dict(baseline_counts),
   "effective_role_counts":effective_counts,
   "shift":shift,
+  "learning_bootstrap_active": bool(bootstrap_shift),
   "attributed_assignment_runs":sum(x["runs"] for x in role_rows),
   "attribution_debt_runs":len(attribution_debt),
   "roles_with_sufficient_evidence":len([x for x in role_rows if x["sufficient_evidence"]]),
@@ -240,7 +263,8 @@ report=[
  f"- Mode: **{mode}**",
  f"- Attributed assignment runs: **{metrics['attributed_assignment_runs']}**",
  f"- Attribution-debt runs: **{metrics['attribution_debt_runs']}**",
- f"- Roles with sufficient evidence: **{metrics['roles_with_sufficient_evidence']}**","",
+ f"- Roles with sufficient evidence: **{metrics['roles_with_sufficient_evidence']}**",
+ f"- Learning bootstrap active: **{str(bool(bootstrap_shift)).lower()}**","",
  "V10 changes portfolio capacity only from executed assignment telemetry. Generated plans that were never run receive no learning credit.",
  "",
  "## Slot-role evidence","",
@@ -261,8 +285,9 @@ report += ["",
  "## Adaptation decision","",
  f"- Shift: **{json.dumps(shift,sort_keys=True) if shift else 'none'}**",
  "- At most one slot can move per generation.",
- "- Measurement, verification and wildcard remain protected roles.",
- "- Experiment, coverage and adjacency cannot move outside configured minimum/maximum slot bounds.",
+ "- Measurement, verification and wildcard remain protected roles during ordinary performance adaptation.",
+ "- During blind-learning bootstrap only, one adjacency/coverage/experiment slot above its configured minimum may temporarily become a second measurement slot; this reverts after the first confirmed strategy prior.",
+ "- Experiment, coverage and adjacency cannot move outside configured minimum slot bounds.",
  "- Manual overrides are measured separately and never silently treated as generated allocator success.",
  "- Allocation signal is a scheduling heuristic; realized outcomes remain the strongest downstream evidence.",
  ""]
