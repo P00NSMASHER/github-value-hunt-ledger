@@ -24,6 +24,7 @@ from production.learning_engine import (
     assess_skill_variant,
     assess_training_export,
     build_training_manifest,
+    learn_training_episode_memory,
     learn_value_memory,
     observed_search_reward,
     salvage_trajectory,
@@ -126,6 +127,60 @@ class ValueMemoryTests(unittest.TestCase):
         self.assertEqual(len(observations), 1)
         self.assertEqual(memory.get("STRAT:test").visits, 1)
         self.assertEqual(memory.get("QF:test").visits, 1)
+
+
+class EpisodeMemoryTests(unittest.TestCase):
+    def episode(self, run_id, split, reward):
+        return {
+            "run_id": run_id,
+            "split": split,
+            "action": {
+                "strategy_id": "STRAT:episode",
+                "query_family_id": "QF:episode",
+                "search_move_ids": ["pivot"],
+            },
+            "reward": {
+                "training_reward": reward,
+                "reward_stage": "technical_proxy",
+                "downstream": {
+                    "outcome_ids": ["OUT:1"],
+                },
+            },
+            "provenance": {
+                "timestamp": "2026-09-20T00:00:00Z",
+            },
+        }
+
+    def test_only_train_episode_updates_memory(self):
+        memory, observations = learn_training_episode_memory(
+            [
+                self.episode("RUN:train", "train", 0.6),
+                self.episode("RUN:confirm", "confirm", 1.0),
+                self.episode(
+                    "RUN:evaluation",
+                    "evaluation_only",
+                    1.0,
+                ),
+            ],
+            config=ValueConfig(alpha=1.0),
+        )
+        self.assertEqual(
+            memory.get("STRAT:episode").visits,
+            1,
+        )
+        self.assertEqual(
+            memory.get("QF:episode").visits,
+            1,
+        )
+        self.assertEqual(
+            memory.get("MOVE:pivot").visits,
+            1,
+        )
+        self.assertEqual(len(observations), 1)
+        self.assertEqual(
+            observations[0]["search_run_id"],
+            "RUN:train",
+        )
 
 
 class FailureLearningTests(unittest.TestCase):
