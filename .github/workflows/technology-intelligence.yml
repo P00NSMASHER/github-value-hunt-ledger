@@ -100,4 +100,7 @@ jobs:
       - name: Persist generated intelligence on main
         env:
           TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}
-        run: python tools/ti_persist_generated.py --max-attempts 5
+        run: >-
+          python tools/ti_persist_generated.py
+          --max-attempts 5
+          --clean-untracked-on-rebuild
