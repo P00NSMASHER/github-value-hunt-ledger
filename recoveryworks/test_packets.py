@@ -64,10 +64,21 @@ class PacketTests(unittest.TestCase):
         self.assertTrue(submission_ready(packet))
         self.assertEqual(len(packet.packet_hash), 64)
 
-        ledger.mark_claimed(f.finding_id)
+        claim_receipt = EvidenceRef(
+            evidence_id="claim-receipt",
+            source_hash="claimhash",
+            locator="source://claim/receipt",
+            kind="claim_submission_receipt",
+            verified=True,
+        )
+        ledger.mark_claimed(f.finding_id, claim_receipt)
         claimed_packet = build_recovery_packet(ledger.get(f.finding_id))
         self.assertFalse(submission_ready(claimed_packet))
         self.assertEqual(claimed_packet.case_state, "CLAIMED")
+        self.assertEqual(
+            claimed_packet.claim_evidence["proof_hash"],
+            claim_receipt.proof_hash,
+        )
 
     def test_client_portfolio_packet_never_rolls_up_other_clients(self):
         ledger = RecoveryLedger()
