@@ -21,6 +21,15 @@ from .branches.freight_io import (
 )
 from .branches.duty import audit_duty_entries
 from .branches.duty_csv import load_duty_assessments_csv, load_duty_entries_csv
+from .branches.construction import audit_construction_recovery
+from .branches.construction_io import (
+    load_causation_reviews_csv,
+    load_construction_entitlements_csv,
+    load_construction_events_csv,
+    load_construction_settlements_csv,
+    load_event_activity_mappings_csv,
+    load_schedule_versions_json,
+)
 from .branches.payer import audit_payer_lines
 from .branches.payer_csv import load_payer_lines_csv, load_payer_rates_csv
 from .branches.rebate import audit_rebates
@@ -442,6 +451,123 @@ def run_scan360_config(
                 added_ids.append(finding.finding_id)
 
 
+
+
+    for job_index, job in enumerate(
+        _jobs(config.get("construction"), name="construction")
+    ):
+        entitlements = load_construction_entitlements_csv(
+            _resolve(
+                base,
+                job.get("entitlements_csv"),
+                name=f"construction[{job_index}].entitlements_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "entitlement_source_verified",
+                context=f"construction[{job_index}]",
+            ),
+        )
+        mismatched_claimants = sorted({
+            entitlement.claimant_id
+            for entitlement in entitlements
+            if entitlement.claimant_id != client_id
+        })
+        if mismatched_claimants:
+            raise ValueError(
+                f"construction[{job_index}] Claimant_ID does not match "
+                "Scan 360 client_id: " + ", ".join(mismatched_claimants)
+            )
+
+        events = load_construction_events_csv(
+            _resolve(
+                base,
+                job.get("events_csv"),
+                name=f"construction[{job_index}].events_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "event_source_verified",
+                context=f"construction[{job_index}]",
+            ),
+        )
+        mappings = load_event_activity_mappings_csv(
+            _resolve(
+                base,
+                job.get("mappings_csv"),
+                name=f"construction[{job_index}].mappings_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "mapping_source_verified",
+                context=f"construction[{job_index}]",
+            ),
+        )
+        schedules = load_schedule_versions_json(
+            _resolve(
+                base,
+                job.get("schedules_json"),
+                name=f"construction[{job_index}].schedules_json",
+            ),
+            verified=_bool_setting(
+                job,
+                "schedule_source_verified",
+                context=f"construction[{job_index}]",
+            ),
+        )
+        causation_reviews = load_causation_reviews_csv(
+            _resolve(
+                base,
+                job.get("causation_reviews_csv"),
+                name=f"construction[{job_index}].causation_reviews_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "causation_source_verified",
+                context=f"construction[{job_index}]",
+            ),
+        )
+        settlements = load_construction_settlements_csv(
+            _resolve(
+                base,
+                job.get("settlements_csv"),
+                name=f"construction[{job_index}].settlements_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "settlement_source_verified",
+                context=f"construction[{job_index}]",
+            ),
+        )
+
+        batch = audit_construction_recovery(
+            client_id=client_id,
+            entitlements=entitlements,
+            events=events,
+            mappings=mappings,
+            schedules=schedules,
+            causation_reviews=causation_reviews,
+            settlements=settlements,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "construction",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if (
+                finding.finding_id not in before_ids
+                and finding.finding_id not in added_ids
+            ):
+                added_ids.append(finding.finding_id)
 
     for job_index, job in enumerate(_jobs(config.get("duty"), name="duty")):
         entries = load_duty_entries_csv(
