@@ -1094,21 +1094,68 @@ def command_summary(args: argparse.Namespace) -> int:
         "effective_dated_terms": "SELECT COUNT(*) FROM terms WHERE effective_from IS NOT NULL",
     }
     stats = {name: conn.execute(sql).fetchone()[0] for name, sql in queries.items()}
+    stats["entity_classes"] = conn.execute(
+        """SELECT entity_class, COUNT(*) c FROM entities
+           GROUP BY entity_class ORDER BY c DESC"""
+    ).fetchall()
     stats["top_rule_types"] = conn.execute(
         """SELECT rule_type, COUNT(*) c FROM terms
-           GROUP BY rule_type ORDER BY c DESC LIMIT 20"""
+           GROUP BY rule_type ORDER BY c DESC LIMIT 30"""
+    ).fetchall()
+    stats["currencies"] = conn.execute(
+        """SELECT COALESCE(currency, '(none)') currency, COUNT(*) c FROM terms
+           GROUP BY 1 ORDER BY c DESC LIMIT 30"""
+    ).fetchall()
+    stats["parser_statuses"] = conn.execute(
+        """SELECT parser_status, COUNT(*) c FROM snapshots
+           GROUP BY parser_status ORDER BY c DESC LIMIT 40"""
     ).fetchall()
     stats["top_publishers"] = conn.execute(
-        """SELECT lower(replace(replace(substr(canonical_url, instr(canonical_url, '//')+2),
-                   'www.', ''), '/', '')) host, COUNT(*) c
-           FROM tariff_locations GROUP BY host ORDER BY c DESC LIMIT 25"""
+        """SELECT lower(
+                 replace(
+                   replace(substr(canonical_url, instr(canonical_url, '//')+2), 'www.', ''),
+                   '/', ''
+                 )
+               ) host,
+               COUNT(*) c
+           FROM tariff_locations
+           GROUP BY host ORDER BY c DESC LIMIT 40"""
     ).fetchall()
     stats["error_types"] = conn.execute(
         """SELECT stage || ':' || error_type, COUNT(*) c FROM crawl_errors
-           GROUP BY 1 ORDER BY c DESC LIMIT 25"""
+           GROUP BY 1 ORDER BY c DESC LIMIT 40"""
+    ).fetchall()
+    stats["error_domains"] = conn.execute(
+        """SELECT lower(
+                 replace(
+                   replace(substr(url, instr(url, '//')+2), 'www.', ''),
+                   '/', ''
+                 )
+               ) host,
+               stage || ':' || error_type reason,
+               COUNT(*) c
+           FROM crawl_errors
+           WHERE instr(url, '//') > 0
+           GROUP BY host, reason
+           ORDER BY c DESC LIMIT 80"""
+    ).fetchall()
+    stats["unresolved_publishers"] = conn.execute(
+        """SELECT lower(
+                 replace(
+                   replace(substr(url, instr(url, '//')+2), 'www.', ''),
+                   '/', ''
+                 )
+               ) host,
+               COUNT(*) c
+           FROM crawl_errors
+           WHERE stage='publisher_adapter'
+             AND error_type='EntityTariffNotResolved'
+             AND instr(url, '//') > 0
+           GROUP BY host ORDER BY c DESC LIMIT 50"""
     ).fetchall()
     print(json.dumps(stats, indent=2))
     return 0
+
 
 
 def build_parser() -> argparse.ArgumentParser:
