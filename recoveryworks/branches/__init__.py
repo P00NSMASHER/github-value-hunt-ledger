@@ -1,6 +1,14 @@
 from .ap import APObligation, APPayment, build_ap_observations, normalize_invoice_number
 from .ap_csv import load_obligations_csv, load_payments_csv, money_to_cents
 from .base import BranchInput, RuleBackedAdapter
+from .payer import (
+    PayerAuditBatch,
+    PayerAuditException,
+    PayerRate,
+    PayerServiceLine,
+    audit_payer_lines,
+)
+from .payer_csv import load_payer_lines_csv, load_payer_rates_csv
 from .registry import BRANCHES, BranchSpec, all_specs
 from .utility import (
     UtilityAuditBatch,
@@ -26,6 +34,10 @@ __all__ = [
     "BRANCHES",
     "BranchInput",
     "BranchSpec",
+    "PayerAuditBatch",
+    "PayerAuditException",
+    "PayerRate",
+    "PayerServiceLine",
     "RuleBackedAdapter",
     "UtilityAuditBatch",
     "UtilityAuditException",
@@ -34,12 +46,15 @@ __all__ = [
     "UtilityChargeKind",
     "UtilityTariff",
     "all_specs",
+    "audit_payer_lines",
     "audit_utility_bills",
     "build_ap_observations",
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
     "load_obligations_csv",
+    "load_payer_lines_csv",
+    "load_payer_rates_csv",
     "load_payments_csv",
     "load_simple_tariff_definitions_json",
     "load_utility_bills_csv",
