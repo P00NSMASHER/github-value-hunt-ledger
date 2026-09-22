@@ -270,3 +270,9 @@ Candidate fixes are submitted through `intelligence/repair_candidate_spool/` usi
 
 Passing intake produces only `READY_FOR_SKILL_EVAL` in `REPAIR_CANDIDATE_INTAKE.json` / `SKILL_EVAL_QUEUE.md`. It cannot write the live skill or bypass the independent evaluation/canary/global gates.
 
+### Skill evaluation result intake
+
+Independent evaluator results are submitted through `intelligence/skill_eval_result_spool/`. They must bind to the exact current skill-evaluation task and candidate hashes, use distinct frozen mutate-dev/promotion-test set fingerprints, preserve evaluator/holdout isolation, and provide durable evidence.
+
+Passing evaluation produces only `STAGED_MUTATION` in `SKILL_EVAL_RESULT_INTAKE.json` and an entry in `SKILL_PROMOTION_QUEUE.md`. It cannot deploy or globally promote the candidate.
+
