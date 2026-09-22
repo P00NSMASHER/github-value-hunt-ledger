@@ -72,6 +72,12 @@ POLICIES: dict[Branch, BranchPolicy] = {
         "tax_recovery_reviewer",
         professional_review_note="Taxability, refund eligibility, and filing action require qualified tax review.",
     ),
+    Branch.INSURANCE: BranchPolicy(
+        Branch.INSURANCE,
+        RecoveryMode.UNDERPAYMENT,
+        "insurance_claims_reviewer",
+        professional_review_note="Coverage, valuation, causation, and recovery action require qualified insurance/claims review.",
+    ),
 }
 
 
