@@ -299,6 +299,34 @@ def persist_observation(
             meta.get("version"),
         ),
     )
+    conn.execute(
+        """UPDATE source_observations SET
+             final_url=?,fetched_at=?,http_status=?,content_type=?,byte_count=?,
+             blob_relpath=?,etag=?,last_modified=?,parser_status=?,
+             reporting_entity_name=COALESCE(?,reporting_entity_name),
+             reporting_entity_type=COALESCE(?,reporting_entity_type),
+             last_updated_on=COALESCE(?,last_updated_on),
+             schema_version=COALESCE(?,schema_version)
+           WHERE source_id=? AND requested_url=? AND sha256=?""",
+        (
+            result.final_url,
+            result.fetched_at,
+            result.status,
+            result.content_type,
+            result.byte_count,
+            result.blob_relpath,
+            result.etag,
+            result.last_modified,
+            parser_status,
+            meta.get("reporting_entity_name"),
+            meta.get("reporting_entity_type"),
+            meta.get("last_updated_on"),
+            meta.get("version"),
+            source_db_id,
+            result.requested_url,
+            result.sha256,
+        ),
+    )
     row = conn.execute(
         """SELECT id FROM source_observations
            WHERE source_id=? AND requested_url=? AND sha256=?""",
@@ -702,6 +730,95 @@ def catalog_source(
     raise ValueError(f"unsupported resolver: {resolver}")
 
 
+def expand_catalog_indexes(
+    conn: sqlite3.Connection,
+    root: Path,
+    *,
+    timeout: int,
+    limit: int,
+    max_bytes: int,
+) -> dict[str, int]:
+    """Fetch and parse cataloged CMS TOC/index files into plans + MRF URLs."""
+    rows = conn.execute(
+        """SELECT cf.id,cf.file_url,cf.payer_family,cf.source_observation_id,
+                  so.source_id
+           FROM catalog_files cf
+           LEFT JOIN source_observations so ON so.id=cf.source_observation_id
+           WHERE cf.file_kind='index'
+           ORDER BY cf.id"""
+    ).fetchall()
+    if limit:
+        rows = rows[:limit]
+    stats = {"targets": len(rows), "expanded": 0, "errors": 0, "files": 0, "plans": 0}
+    for _, url, payer_family, parent_obs_id, source_db_id in rows:
+        if source_db_id is None:
+            stats["errors"] += 1
+            record_error(
+                conn,
+                stage="expand_index",
+                url=url,
+                error_type="MissingSourceLineage",
+                detail="Cataloged index has no source observation/source row.",
+            )
+            continue
+        try:
+            result = fetch_to_blob(url, root, timeout=timeout, max_bytes=max_bytes)
+            obs_id = persist_observation(
+                conn,
+                int(source_db_id),
+                result,
+                parser_status="fetched:catalog_index",
+            )
+            meta = parse_toc_catalog(
+                conn,
+                root=root,
+                observation_id=obs_id,
+                result=result,
+                payer_family=payer_family or "(unknown)",
+            )
+            persist_observation(
+                conn,
+                int(source_db_id),
+                result,
+                parser_status="parsed:cms_toc",
+                meta=meta,
+            )
+            conn.execute(
+                """UPDATE catalog_files SET
+                     reporting_entity_name=COALESCE(?,reporting_entity_name),
+                     metadata_status='index_expanded',
+                     content_length=COALESCE(content_length,?),
+                     content_type=COALESCE(content_type,?),
+                     etag=COALESCE(etag,?),
+                     last_modified=COALESCE(last_modified,?),
+                     http_status=?
+                   WHERE file_url=?""",
+                (
+                    meta.get("reporting_entity_name"),
+                    result.byte_count,
+                    result.content_type,
+                    result.etag,
+                    result.last_modified,
+                    result.status,
+                    url,
+                ),
+            )
+            conn.commit()
+            stats["expanded"] += 1
+            stats["files"] += int(meta.get("files") or 0)
+            stats["plans"] += int(meta.get("plans") or 0)
+        except Exception as exc:
+            stats["errors"] += 1
+            record_error(
+                conn,
+                stage="expand_index",
+                url=url,
+                error_type=type(exc).__name__,
+                detail=str(exc),
+            )
+    return stats
+
+
 def probe_one(url: str, timeout: int) -> dict[str, Any]:
     try:
         resp = session().head(url, allow_redirects=True, timeout=timeout)
@@ -715,9 +832,16 @@ def probe_one(url: str, timeout: int) -> dict[str, Any]:
                 stream=True,
             )
         length = resp.headers.get("content-length")
+        content_range = resp.headers.get("content-range") or ""
+        total_match = re.search(r"/(\d+)$", content_range)
+        full_length = (
+            int(total_match.group(1))
+            if total_match
+            else (int(length) if length and length.isdigit() else None)
+        )
         result = {
             "http_status": resp.status_code,
-            "content_length": int(length) if length and length.isdigit() else None,
+            "content_length": full_length,
             "content_type": (resp.headers.get("content-type") or "").split(";")[0],
             "etag": resp.headers.get("etag"),
             "last_modified": resp.headers.get("last-modified"),
@@ -970,7 +1094,7 @@ def normalize_in_network(
     source_url: str,
     code_filter: set[str] | None,
 ) -> dict[str, int]:
-    stats = {"billing_items": 0, "rate_rows": 0}
+    stats = {"billing_items": 0, "rate_rows": 0, "rate_provider_links": 0}
     with open_blob(root, relpath, source_url) as fh:
         for idx, item in enumerate(ijson.items(fh, "in_network.item")):
             code = str(item.get("billing_code") or "")
@@ -978,46 +1102,55 @@ def normalize_in_network(
                 continue
             stats["billing_items"] += 1
             for nr_idx, nr in enumerate(item.get("negotiated_rates") or []):
-                refs = nr.get("provider_references") or [None]
-                prices = nr.get("negotiated_prices") or []
-                for pr_idx, price in enumerate(prices):
+                refs = [
+                    int(ref)
+                    for ref in (nr.get("provider_references") or [])
+                    if ref is not None
+                ]
+                for pr_idx, price in enumerate(nr.get("negotiated_prices") or []):
                     rate = price.get("negotiated_rate")
                     if rate is None:
                         continue
+                    cur = conn.execute(
+                        """INSERT INTO negotiated_rates(
+                             snapshot_id,billing_code_type,billing_code_type_version,
+                             billing_code,description,negotiation_arrangement,
+                             negotiated_type,negotiated_rate,expiration_date,billing_class,
+                             setting,service_codes_json,modifiers_json,
+                             additional_information,evidence_locator
+                           ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                        (
+                            snapshot_id,
+                            item.get("billing_code_type"),
+                            item.get("billing_code_type_version"),
+                            code,
+                            item.get("description"),
+                            item.get("negotiation_arrangement"),
+                            price.get("negotiated_type"),
+                            str(rate),
+                            price.get("expiration_date"),
+                            price.get("billing_class"),
+                            price.get("setting"),
+                            json.dumps(price.get("service_code") or [], separators=(",", ":")),
+                            json.dumps(price.get("billing_code_modifier") or [], separators=(",", ":")),
+                            price.get("additional_information"),
+                            f"in_network[{idx}].negotiated_rates[{nr_idx}].negotiated_prices[{pr_idx}]",
+                        ),
+                    )
+                    rate_id = int(cur.lastrowid)
+                    stats["rate_rows"] += 1
                     for ref in refs:
                         conn.execute(
-                            """INSERT INTO negotiated_rates(
-                                 snapshot_id,billing_code_type,billing_code_type_version,
-                                 billing_code,description,negotiation_arrangement,
-                                 provider_group_id,negotiated_type,negotiated_rate,
-                                 expiration_date,billing_class,setting,service_codes_json,
-                                 modifiers_json,additional_information,evidence_locator
-                               ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                            (
-                                snapshot_id,
-                                item.get("billing_code_type"),
-                                item.get("billing_code_type_version"),
-                                code,
-                                item.get("description"),
-                                item.get("negotiation_arrangement"),
-                                int(ref) if ref is not None else None,
-                                price.get("negotiated_type"),
-                                str(rate),
-                                price.get("expiration_date"),
-                                price.get("billing_class"),
-                                price.get("setting"),
-                                json.dumps(price.get("service_code") or [], separators=(",", ":")),
-                                json.dumps(price.get("billing_code_modifier") or [], separators=(",", ":")),
-                                price.get("additional_information"),
-                                f"in_network[{idx}].negotiated_rates[{nr_idx}].negotiated_prices[{pr_idx}]",
-                            ),
+                            """INSERT OR IGNORE INTO rate_provider_groups(
+                                 rate_id,provider_group_id
+                               ) VALUES (?,?)""",
+                            (rate_id, ref),
                         )
-                        stats["rate_rows"] += 1
+                        stats["rate_provider_links"] += 1
             if idx and idx % 1000 == 0:
                 conn.commit()
     conn.commit()
     return stats
-
 
 def normalize_allowed(
     conn: sqlite3.Connection,
@@ -1125,6 +1258,15 @@ def command_catalog(args: argparse.Namespace) -> int:
                 flush=True,
             )
 
+    if args.expand_indexes:
+        stats["index_expansion"] = expand_catalog_indexes(
+            conn,
+            out,
+            timeout=args.timeout,
+            limit=args.index_limit,
+            max_bytes=args.max_index_bytes,
+        )
+
     if args.probe:
         stats["probe"] = probe_catalog(
             conn, workers=args.workers, timeout=args.timeout, limit=args.probe_limit
@@ -1171,6 +1313,34 @@ def command_normalize(args: argparse.Namespace) -> int:
         kind=kind,
         meta=meta,
     )
+    # Normalization is idempotent for a given immutable snapshot/parser.
+    rate_ids = [
+        row[0]
+        for row in conn.execute(
+            "SELECT id FROM negotiated_rates WHERE snapshot_id=?", (snapshot_id,)
+        ).fetchall()
+    ]
+    if rate_ids:
+        conn.executemany(
+            "DELETE FROM rate_provider_groups WHERE rate_id=?",
+            [(rid,) for rid in rate_ids],
+        )
+    conn.execute("DELETE FROM negotiated_rates WHERE snapshot_id=?", (snapshot_id,))
+    conn.execute("DELETE FROM allowed_amounts WHERE snapshot_id=?", (snapshot_id,))
+    pg_rows = [
+        row[0]
+        for row in conn.execute(
+            "SELECT id FROM provider_groups WHERE snapshot_id=?", (snapshot_id,)
+        ).fetchall()
+    ]
+    if pg_rows:
+        conn.executemany(
+            "DELETE FROM provider_entities WHERE provider_group_row_id=?",
+            [(pgid,) for pgid in pg_rows],
+        )
+    conn.execute("DELETE FROM provider_groups WHERE snapshot_id=?", (snapshot_id,))
+    conn.commit()
+
     code_filter = (
         {x.strip().upper() for x in args.codes.split(",") if x.strip()}
         if args.codes
@@ -1243,6 +1413,7 @@ def command_summary(args: argparse.Namespace) -> int:
         "provider_groups": conn.execute("SELECT COUNT(*) FROM provider_groups").fetchone()[0],
         "provider_entities": conn.execute("SELECT COUNT(*) FROM provider_entities").fetchone()[0],
         "negotiated_rates": conn.execute("SELECT COUNT(*) FROM negotiated_rates").fetchone()[0],
+        "rate_provider_links": conn.execute("SELECT COUNT(*) FROM rate_provider_groups").fetchone()[0],
         "allowed_amount_rows": conn.execute("SELECT COUNT(*) FROM allowed_amounts").fetchone()[0],
         "errors": conn.execute("SELECT COUNT(*) FROM errors").fetchone()[0],
         "files_by_payer": conn.execute(
@@ -1271,6 +1442,9 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--db", default="ledger.sqlite")
     c.add_argument("--timeout", type=int, default=45)
     c.add_argument("--max-list-pages", type=int, default=50)
+    c.add_argument("--expand-indexes", action="store_true")
+    c.add_argument("--index-limit", type=int, default=0)
+    c.add_argument("--max-index-bytes", type=int, default=2_000_000_000)
     c.add_argument("--probe", action="store_true")
     c.add_argument("--probe-limit", type=int, default=0)
     c.add_argument("--workers", type=int, default=8)
