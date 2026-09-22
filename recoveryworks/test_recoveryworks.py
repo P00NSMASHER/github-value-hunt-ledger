@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 import unittest
 
+from recoveryworks.fees import FeeAgreement, assess_fee
 from recoveryworks import (
     Branch,
     CaseState,
@@ -110,9 +111,24 @@ class RecoveryWorksTests(unittest.TestCase):
         ledger.authorize(finding.finding_id, "customer-auth-1")
         claimed = ledger.mark_claimed(finding.finding_id, claim_receipt)
         self.assertIs(claimed.case_state, CaseState.CLAIMED)
+        fee_assessment = assess_fee(
+            finding,
+            3000,
+            FeeAgreement(
+                agreement_id="fee-1",
+                client_id=finding.client_id,
+                fee_bps=2000,
+                branches=(finding.branch,),
+                source_hash="fee-hash",
+                locator="source://fee-agreement",
+                verified=True,
+                currency=finding.currency,
+            ),
+        )
         recovered = ledger.mark_recovered(
             finding.finding_id, 3000, 600,
             recovery_evidence=recovery_receipt,
+            fee_assessment=fee_assessment,
         )
         self.assertIs(recovered.case_state, CaseState.RECOVERED)
         self.assertEqual(ledger.rollup()["totals"]["fee_cents"], 600)
