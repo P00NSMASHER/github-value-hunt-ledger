@@ -10,10 +10,10 @@ any later policy change.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from dataclasses import asdict
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -178,16 +178,35 @@ def compile_state(
         )
         records.append(row)
 
-    failures = [
-        assessment
-        for _raw, assessment in load_failure_events(failure_dir)
+    failure_rows = load_failure_events(failure_dir)
+    failures = [assessment for _raw, assessment in failure_rows]
+    source_payload = {
+        "search_runs": search_runs,
+        "outcomes": outcomes,
+        "failures": [raw for raw, _assessment in failure_rows],
+    }
+    source_snapshot_sha256 = hashlib.sha256(
+        json.dumps(
+            source_payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        ).encode("utf-8")
+    ).hexdigest()
+    source_times = [
+        str(run.get("timestamp") or run.get("date"))
+        for run in search_runs
+        if run.get("timestamp") or run.get("date")
+    ] + [
+        str(outcome.get("date"))
+        for outcome in outcomes
+        if outcome.get("date")
     ]
 
     return {
         "schema_version": 1,
-        "generated_at": datetime.now(
-            timezone.utc
-        ).isoformat(),
+        "source_through": max(source_times) if source_times else None,
+        "source_snapshot_sha256": source_snapshot_sha256,
         "mode": "observe_first_advisory",
         "policy_effect": "none",
         "automatic_expand_retire_enabled": False,
