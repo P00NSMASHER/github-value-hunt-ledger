@@ -49,6 +49,8 @@ from .branches.saas import audit_saas_billing
 from .branches.saas_csv import load_billable_seat_snapshot_csv
 from .branches.telecom import audit_telecom_billing
 from .branches.telecom_csv import load_cdr_usage_csv
+from .branches.tax import audit_tax_lines
+from .branches.tax_csv import load_tax_assessments_csv, load_tax_lines_csv
 from .branches.utility import audit_utility_bills
 from .branches.utility_io import (
     load_simple_tariff_definitions_json,
@@ -724,6 +726,60 @@ def run_scan360_config(
                 "branch": "rebate",
                 "job_index": job_index,
                 "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+
+    for job_index, job in enumerate(_jobs(config.get("tax"), name="tax")):
+        lines = load_tax_lines_csv(
+            _resolve(
+                base,
+                job.get("lines_csv"),
+                name=f"tax[{job_index}].lines_csv",
+            ),
+            verified=_bool_setting(
+                job, "line_source_verified", context=f"tax[{job_index}]"
+            ),
+        )
+        assessments = load_tax_assessments_csv(
+            _resolve(
+                base,
+                job.get("assessments_csv"),
+                name=f"tax[{job_index}].assessments_csv",
+            ),
+            verified=_bool_setting(
+                job, "assessment_source_verified", context=f"tax[{job_index}]"
+            ),
+        )
+
+        mismatched_purchasers = sorted({
+            line.purchaser_id for line in lines if line.purchaser_id != client_id
+        })
+        if mismatched_purchasers:
+            raise ValueError(
+                f"tax[{job_index}] Purchaser_ID does not match Scan 360 client_id: "
+                + ", ".join(mismatched_purchasers)
+            )
+
+        batch = audit_tax_lines(
+            client_id=client_id,
+            lines=lines,
+            assessments=assessments,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "tax",
+                "job_index": job_index,
+                "tax_line_id": issue.tax_line_id,
                 "code": issue.code,
                 "detail": issue.detail,
             })
