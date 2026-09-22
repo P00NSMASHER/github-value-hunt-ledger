@@ -94,6 +94,19 @@ class APRealIngestionTests(unittest.TestCase):
         finding = RecoveryEngine().evaluate(batch.observations[0])
         self.assertIs(finding.state, FindingState.REVIEW)
 
+
+    def test_mismatched_statement_credit_does_not_double_count_or_validate(self):
+        batch = audit_ap_recovery(
+            client_id="client",
+            payments=(payment("P-1"), payment("P-2", invoice="INV-1-DUP")),
+            statements=(statement(-5000),),
+        )
+        self.assertEqual(len(batch.observations), 1)
+        self.assertEqual(batch.exceptions[0].code, "STATEMENT_CREDIT_MISMATCH")
+        finding = RecoveryEngine().evaluate(batch.observations[0])
+        self.assertIs(finding.state, FindingState.REVIEW)
+        self.assertEqual(finding.potential_recovery_cents, 10000)
+
     def test_duplicate_payment_ids_are_excluded_from_recovery_math(self):
         batch = audit_ap_recovery(
             client_id="client",
