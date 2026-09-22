@@ -1091,9 +1091,21 @@ def command_summary(args: argparse.Namespace) -> int:
         "terms": "SELECT COUNT(*) FROM terms",
         "errors": "SELECT COUNT(*) FROM crawl_errors",
         "rules": "SELECT COUNT(DISTINCT rule_type) FROM terms",
-        "effective_dated_terms": "SELECT COUNT(*) FROM terms WHERE effective_from IS NOT NULL",
+        "term_effective_dated_terms": "SELECT COUNT(*) FROM terms WHERE effective_from IS NOT NULL",
+        "effective_dated_terms": """SELECT COUNT(*) FROM terms t JOIN snapshots s ON s.id=t.snapshot_id
+                                      WHERE COALESCE(t.effective_from, s.effective_from) IS NOT NULL""",
+        "source_versioned_terms": """SELECT COUNT(*) FROM terms t JOIN snapshots s ON s.id=t.snapshot_id
+                                      WHERE COALESCE(t.source_version, s.source_version) IS NOT NULL""",
     }
     stats = {name: conn.execute(sql).fetchone()[0] for name, sql in queries.items()}
+    stats["effective_date_coverage_pct"] = round(
+        (100.0 * stats["effective_dated_terms"] / stats["terms"]) if stats["terms"] else 0.0,
+        2,
+    )
+    stats["source_version_coverage_pct"] = round(
+        (100.0 * stats["source_versioned_terms"] / stats["terms"]) if stats["terms"] else 0.0,
+        2,
+    )
     stats["entity_classes"] = conn.execute(
         """SELECT entity_class, COUNT(*) c FROM entities
            GROUP BY entity_class ORDER BY c DESC"""
