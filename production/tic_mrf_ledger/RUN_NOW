@@ -1,5 +1,5 @@
-run_id=tic-payer-mrf-regional-2026-09-22
+run_id=tic-healthsparq-platform-2026-09-22
 parse_indexes=true
 max_indexes=40
 registry=endurant-master-list
-priority=monthly-curated
+healthsparq=true
