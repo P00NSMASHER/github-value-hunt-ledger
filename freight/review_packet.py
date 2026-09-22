@@ -125,7 +125,46 @@ def build_review_packet(
         if charge_hash != derivation.charge_hash:
             raise ValueError("review charge proof does not match derivation: " + item.charge_id)
         canonical_derivation = derive_charge(charge, normalized_rules)
-        if derivation.reason == "FIXED_SCOPE_AMBIGUOUS_MULTI_LINE":
+        if derivation.reason == "POSSIBLE_DUPLICATE_CHARGE_EVIDENCE":
+            same_group = [
+                candidate for candidate in normalized_charges
+                if (
+                    candidate.invoice_id,
+                    candidate.shipment_id,
+                    candidate.customer_id,
+                    candidate.carrier_id,
+                    candidate.currency,
+                    candidate.charge_code,
+                    candidate.service_date,
+                    candidate.quantity_units,
+                    candidate.billed_cents,
+                ) == (
+                    charge.invoice_id,
+                    charge.shipment_id,
+                    charge.customer_id,
+                    charge.carrier_id,
+                    charge.currency,
+                    charge.charge_code,
+                    charge.service_date,
+                    charge.quantity_units,
+                    charge.billed_cents,
+                )
+            ]
+            if not (
+                len(same_group) > 1
+                and derivation.decision == REVIEW
+                and derivation.expected_cents is None
+                and derivation.variance_cents is None
+                and derivation.finding is None
+                and derivation.authority_ref is None
+                and canonical_derivation.matched_rule_hashes
+                    == derivation.matched_rule_hashes
+            ):
+                raise ValueError(
+                    "review derivation does not match duplicate-evidence quarantine: "
+                    + item.charge_id
+                )
+        elif derivation.reason == "FIXED_SCOPE_AMBIGUOUS_MULTI_LINE":
             same_group = [
                 candidate for candidate in normalized_charges
                 if (
