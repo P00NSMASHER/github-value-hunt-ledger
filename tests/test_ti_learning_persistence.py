@@ -38,7 +38,12 @@ class LearningPersistenceTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertIn(path, manifest)
         self.assertIn(
-            "python tools/ti_persist_generated.py --max-attempts 5",
+            "python tools/ti_persist_generated.py",
+            workflow,
+        )
+        self.assertIn("--max-attempts 5", workflow)
+        self.assertIn(
+            "--clean-untracked-on-rebuild",
             workflow,
         )
 

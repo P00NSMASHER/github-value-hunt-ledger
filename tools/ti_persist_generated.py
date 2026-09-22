@@ -119,6 +119,7 @@ def persist_generated(
     max_attempts: int = 5,
     rebuild_fn: Callable[[Path], None] = default_rebuild,
     before_push: Callable[[int], None] | None = None,
+    clean_untracked_on_rebuild: bool = False,
 ) -> dict[str, object]:
     if max_attempts < 1:
         raise ValueError("max_attempts must be >= 1")
@@ -139,6 +140,8 @@ def persist_generated(
 
         if local_head != remote_head:
             git(repo, "reset", "--hard", "origin/main")
+            if clean_untracked_on_rebuild:
+                git(repo, "clean", "-fd")
             rebuild_fn(repo)
             rebuilt_attempts += 1
 
@@ -206,6 +209,15 @@ def main() -> int:
         type=int,
         default=5,
     )
+    parser.add_argument(
+        "--clean-untracked-on-rebuild",
+        action="store_true",
+        help=(
+            "After a lost push race, remove untracked files/directories "
+            "before rebuilding from fresh origin/main. Intended for "
+            "ephemeral CI workspaces."
+        ),
+    )
     args = parser.parse_args()
 
     paths = read_manifest(args.manifest)
@@ -213,6 +225,7 @@ def main() -> int:
         ROOT,
         paths,
         max_attempts=args.max_attempts,
+        clean_untracked_on_rebuild=args.clean_untracked_on_rebuild,
     )
     print(json.dumps(result, sort_keys=True))
     return 0
