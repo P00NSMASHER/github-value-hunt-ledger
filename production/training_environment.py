@@ -112,6 +112,26 @@ def _not_after(run: Mapping[str, Any], outcome: Mapping[str, Any]) -> bool:
     return run_time[:10] <= out_time[:10]
 
 
+def partition_for_id(
+    run_id: str,
+    *,
+    config: TrainingEnvironmentConfig | None = None,
+) -> str:
+    """Assign an identifier to a deterministic train/confirm partition.
+
+    This helper is intentionally independent of run eligibility. It lets a
+    non-search execution/verification origin anchor its downstream outcome to
+    one partition without ever becoming a search-training episode itself.
+    """
+    cfg = config or TrainingEnvironmentConfig()
+    cfg.validate()
+    if not run_id:
+        return "excluded"
+    digest = hashlib.sha256(run_id.encode("utf-8")).digest()
+    bucket = int.from_bytes(digest[:8], "big") % cfg.confirm_modulus
+    return "confirm" if bucket == cfg.confirm_bucket else "train"
+
+
 def split_for_run(
     run: Mapping[str, Any],
     *,
@@ -129,9 +149,7 @@ def split_for_run(
     run_id = str(run.get("search_run_id") or "")
     if not run_id:
         return "excluded"
-    digest = hashlib.sha256(run_id.encode("utf-8")).digest()
-    bucket = int.from_bytes(digest[:8], "big") % cfg.confirm_modulus
-    return "confirm" if bucket == cfg.confirm_bucket else "train"
+    return partition_for_id(run_id, config=cfg)
 
 
 def discovery_signal(run: Mapping[str, Any]) -> float | None:
@@ -402,19 +420,44 @@ def build_outcome_credit(
                 }
             )
             continue
-        if not direct_splits:
-            excluded.append(
-                {
-                    "outcome_id": outcome_id,
-                    "reason": "no_eligible_direct_origin",
-                }
-            )
-            continue
 
-        outcome_split = next(iter(direct_splits))
+        if direct_splits:
+            outcome_split = next(iter(direct_splits))
+            credit_anchor_kind = "eligible_direct_origin"
+        else:
+            if not direct_ids:
+                excluded.append(
+                    {
+                        "outcome_id": outcome_id,
+                        "reason": "no_known_direct_origin",
+                    }
+                )
+                continue
+            anchor_splits = {
+                partition_for_id(rid, config=cfg)
+                for rid in direct_ids
+            }
+            if len(anchor_splits) != 1:
+                excluded.append(
+                    {
+                        "outcome_id": outcome_id,
+                        "reason": (
+                            "mixed_excluded_direct_origin_partitions"
+                        ),
+                        "splits": sorted(anchor_splits),
+                    }
+                )
+                continue
+            outcome_split = next(iter(anchor_splits))
+            credit_anchor_kind = "excluded_direct_origin_hash"
+
         allowed_splits = {outcome_split}
         candidates: list[dict[str, Any]] = []
-        direct_set = set(direct_ids)
+        direct_set = {
+            rid
+            for rid in direct_ids
+            if splits[rid] != "excluded"
+        }
 
         for rid, run in runs_by_id.items():
             if splits[rid] not in allowed_splits:
@@ -455,7 +498,14 @@ def build_outcome_credit(
             excluded.append(
                 {
                     "outcome_id": outcome_id,
-                    "reason": "no_provenance_path",
+                    "reason": (
+                        "no_support_path_in_anchor_split"
+                        if credit_anchor_kind
+                        == "excluded_direct_origin_hash"
+                        else "no_provenance_path"
+                    ),
+                    "anchor_split": outcome_split,
+                    "origin_run_ids": direct_ids,
                 }
             )
             continue
@@ -501,6 +551,11 @@ def build_outcome_credit(
                     "credit": credit,
                     "direct_origin": row["direct"],
                     "path_evidence": row["path_evidence"],
+                    "credit_anchor": {
+                        "kind": credit_anchor_kind,
+                        "split": outcome_split,
+                        "origin_run_ids": direct_ids,
+                    },
                     "outcome_signal": signal,
                     "credited_scalar_reward": (
                         credit * float(signal["scalar"])
