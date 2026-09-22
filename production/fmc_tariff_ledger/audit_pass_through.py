@@ -82,6 +82,7 @@ class AuditInput:
     rule_type: str
     billed_amount: str
     currency: str
+    invoice_id: str = ""
     quantity: str = "1"
     unit: str | None = None
     separately_disclosed_service_fee: str = "0"
@@ -181,6 +182,7 @@ def audit_one(conn: sqlite3.Connection, item: AuditInput) -> dict[str, Any]:
     )
 
     base = {
+        "invoice_id": item.invoice_id or None,
         "invoice_line_id": item.invoice_line_id,
         "nvocc_organization_no": item.nvocc_organization_no,
         "upstream_vocc_organization_no": item.upstream_vocc_organization_no,
@@ -296,6 +298,7 @@ def load_csv(path: Path) -> list[AuditInput]:
                     rule_type=row["rule_type"],
                     billed_amount=row["billed_amount"],
                     currency=row["currency"],
+                    invoice_id=row.get("invoice_id") or "",
                     quantity=row.get("quantity") or "1",
                     unit=row.get("unit") or None,
                     separately_disclosed_service_fee=(
