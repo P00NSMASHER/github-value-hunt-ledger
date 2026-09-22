@@ -318,3 +318,18 @@ The top direct-money ranking remains Freight Recovery first, followed by AP/comm
 - **Payout Finality / Commission Assurance strengthens technically.** Terminal provider scanning makes a read-only Payout Finality Sentinel more credible, but reason-aware historical entitlement mapping and independent bank/payroll outcome are still required.
 - **Workforce Schedule Rule-Version Acceptance Test becomes a clearer bounded wedge.** Temporal rule-version selection plus deterministic repair can expose schedules that were valid under configured settings but not provably valid under the correct effective/known-at authority; jurisdictional rule substance remains external.
 - No opportunity rank is increased from repository evidence alone. No new realized customer value or revenue is recorded in this integration.
+
+
+<!-- INTEGRATOR-AP-2026-09-22 -->
+## New validated opportunity — Supplier Credit Recovery / AP Realization Control
+- Sources: AP Recovery v2 combination in `COMBINATIONS.md`; validated lane findings in `lanes/09-finance-ap-recovery.md`.
+- Buyer/problem: CFO/controller/AP shared-services teams have duplicate/overpayment/credit/debit-note and supplier-statement discrepancies, but often lack a defensible chain from “candidate” to **actually applied credit or returned cash**.
+- First paid wedge: top-25-supplier Credit Balance & Statement Recovery Diagnostic on read-only exports/statements.
+- Monetization: $5k-$10k extraction/readiness diagnostic; $10k-$25k pilot or setup + 15-25% of uniquely attributable realized recovery; recurring assurance only after evidence from pilots.
+- Speed to first revenue: potentially faster than a full SaaS because CSV/Excel/statement ingestion is enough for the first engagement and no ERP writeback is required.
+- Build-time advantage: existing findings collectively eliminate roughly **6-12 months** of AP workflow/control/settlement/domain design if reused selectively rather than rebuilt greenfield.
+- Defensibility: source evidence + independent re-performance + exact-money case state + supplier-side statement evidence + one-use settlement allocation + reversible realized-recovery certificate.
+- Expansion: Oracle EBS-specific diagnostic, then vendor rebate/trade-promotion and unauthorized-deduction recovery for retail/CPG.
+- Key risk: recovery yield and customer willingness to share supplier statements are unknown; never market candidate dollars as guaranteed recoveries.
+- Value score: **9.5/10 opportunity**, external market proof pending.
+- Next validation action: run one frozen synthetic/authorized holdout corpus through the entire detect -> falsify -> case -> credit/refund -> allocation/reversal chain, then seek one buyer-authorized read-only pilot.
