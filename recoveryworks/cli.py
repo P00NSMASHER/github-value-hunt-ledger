@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from .io import execute_scan_payload
+from .models import EvidenceRef
 from .raw_scan import execute_raw_scan_payload
 from .packets import build_client_portfolio_packet, build_recovery_packet, submission_ready
 from .storage import load_ledger, save_ledger
@@ -30,6 +31,23 @@ def _require_signed_ledger() -> bool:
 
 def _add_output(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--output", "-o", type=Path)
+
+
+def _add_receipt_args(parser: argparse.ArgumentParser, default_kind: str) -> None:
+    parser.add_argument("--evidence-id", required=True)
+    parser.add_argument("--source-hash", required=True)
+    parser.add_argument("--locator", required=True)
+    parser.add_argument("--kind", dest="receipt_kind", default=default_kind)
+
+
+def _receipt(args) -> EvidenceRef:
+    return EvidenceRef(
+        evidence_id=args.evidence_id,
+        source_hash=args.source_hash,
+        locator=args.locator,
+        kind=args.receipt_kind,
+        verified=True,
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -80,12 +98,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     claimed.add_argument("ledger", type=Path)
     claimed.add_argument("finding_id")
+    _add_receipt_args(claimed, "claim_submission_receipt")
 
     recovered = sub.add_parser("recover", help="record externally verified recovered cash")
     recovered.add_argument("ledger", type=Path)
     recovered.add_argument("finding_id")
     recovered.add_argument("--recovered-cents", type=int, required=True)
     recovered.add_argument("--fee-cents", type=int, default=0)
+    _add_receipt_args(recovered, "recovery_settlement")
 
     reject = sub.add_parser("reject", help="record reviewer rejection locally")
     reject.add_argument("ledger", type=Path)
@@ -183,9 +203,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "authorize":
         ledger.authorize(args.finding_id, args.authorization_id)
     elif args.command == "mark-claimed":
-        ledger.mark_claimed(args.finding_id)
+        ledger.mark_claimed(args.finding_id, _receipt(args))
     elif args.command == "recover":
-        ledger.mark_recovered(args.finding_id, args.recovered_cents, args.fee_cents)
+        ledger.mark_recovered(
+            args.finding_id,
+            args.recovered_cents,
+            args.fee_cents,
+            recovery_evidence=_receipt(args),
+        )
     elif args.command == "reject":
         ledger.reject(args.finding_id, args.reviewer, args.note)
     else:
