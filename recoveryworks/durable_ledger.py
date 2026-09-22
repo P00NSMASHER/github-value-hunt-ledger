@@ -18,10 +18,13 @@ from .journal import RecoveryJournal, finding_from_payload, finding_to_payload
 from .ledger import RecoveryLedger
 from .models import RecoveryFinding
 from .readiness import (
+    SevenFigureAuthorizationDossier,
     SevenFigureReadinessPackage,
+    authorization_dossier_from_payload,
+    authorization_dossier_to_payload,
     readiness_from_payload,
     readiness_to_payload,
-    verify_seven_figure_readiness,
+    verify_seven_figure_authorization_dossier,
 )
 
 
@@ -70,23 +73,28 @@ class DurableRecoveryLedger(RecoveryLedger):
         bundle: CaseProofBundle,
         authorization: ClientActionAuthorization,
         readiness: SevenFigureReadinessPackage | None = None,
+        dossier: SevenFigureAuthorizationDossier | None = None,
     ):
         record_before = self.get(finding_id)
         if self._high_value(record_before):
-            if readiness is None:
+            if dossier is None:
                 raise ValueError(
-                    "seven-figure finding requires completed readiness package"
+                    "seven-figure finding requires full authorization dossier"
                 )
-            verify_seven_figure_readiness(
-                readiness,
+            verify_seven_figure_authorization_dossier(
+                dossier,
                 bundle,
                 expected_journal_head_hash=self.journal.head_hash,
             )
+            if readiness is not None and readiness.package_hash != dossier.readiness.package_hash:
+                raise ValueError("readiness package does not match authorization dossier")
+            readiness = dossier.readiness
         record = super().authorize_with_case(
             finding_id,
             bundle,
             authorization,
             readiness,
+            dossier,
         )
         payload = {
             "case_bundle": case_bundle_to_payload(bundle),
@@ -94,6 +102,8 @@ class DurableRecoveryLedger(RecoveryLedger):
         }
         if readiness is not None:
             payload["readiness"] = readiness_to_payload(readiness)
+        if dossier is not None:
+            payload["dossier"] = authorization_dossier_to_payload(dossier)
         self.journal.append("AUTHORIZE_CASE", finding_id, payload)
         return record
 
@@ -164,11 +174,18 @@ class DurableRecoveryLedger(RecoveryLedger):
                     if readiness_raw is not None
                     else None
                 )
+                dossier_raw = data.get("dossier")
+                dossier = (
+                    authorization_dossier_from_payload(dossier_raw)
+                    if dossier_raw is not None
+                    else None
+                )
                 ledger.authorize_with_case(
                     event.finding_id,
                     bundle,
                     authorization,
                     readiness,
+                    dossier,
                 )
             elif action == "CLAIM":
                 envelope_raw = data.get("external_action")

@@ -14,7 +14,11 @@ from .assurance import (
 )
 from .models import CaseState, FindingState, RecoveryFinding, canonical_hash
 from .policies import assert_claim_authorizable
-from .readiness import SevenFigureReadinessPackage, verify_seven_figure_readiness
+from .readiness import (
+    SevenFigureAuthorizationDossier,
+    SevenFigureReadinessPackage,
+    verify_seven_figure_authorization_dossier,
+)
 
 
 @dataclass(frozen=True)
@@ -31,6 +35,7 @@ class LedgerRecord:
     case_bundle_hash: str | None = None
     authorization_hash: str | None = None
     readiness_hash: str | None = None
+    readiness_dossier_hash: str | None = None
     external_action_envelope_hash: str | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
@@ -139,6 +144,7 @@ class RecoveryLedger:
         bundle: CaseProofBundle,
         authorization: ClientActionAuthorization,
         readiness: SevenFigureReadinessPackage | None = None,
+        dossier: SevenFigureAuthorizationDossier | None = None,
     ) -> LedgerRecord:
         record = self.get(finding_id)
         assert_claim_authorizable(record.finding, record.reviewer_approved)
@@ -160,23 +166,26 @@ class RecoveryLedger:
                 raise ValueError("seven-figure finding requires independent ledger approval")
             if record.independent_reviewer_id not in approving_reviewers:
                 raise ValueError("independent ledger reviewer is not in frozen case proof")
-            if readiness is None:
+            if dossier is None:
                 raise ValueError(
-                    "seven-figure finding requires completed readiness package"
+                    "seven-figure finding requires full authorization dossier"
                 )
+            if readiness is not None and readiness.package_hash != dossier.readiness.package_hash:
+                raise ValueError("readiness package does not match authorization dossier")
+            readiness = dossier.readiness
             journal = getattr(self, "journal", None)
             if journal is None:
                 raise ValueError(
                     "seven-figure authorization requires DurableRecoveryLedger"
                 )
-            verify_seven_figure_readiness(
-                readiness,
+            verify_seven_figure_authorization_dossier(
+                dossier,
                 bundle,
                 expected_journal_head_hash=journal.head_hash,
             )
-        elif readiness is not None:
+        elif readiness is not None or dossier is not None:
             raise ValueError(
-                "seven-figure readiness package cannot authorize a sub-seven-figure case"
+                "seven-figure assurance artifacts cannot authorize a sub-seven-figure case"
             )
         if authorization.client_actor_id in {
             record.reviewer_id,
@@ -192,6 +201,7 @@ class RecoveryLedger:
             case_bundle_hash=bundle.bundle_hash,
             authorization_hash=authorization.proof_hash,
             readiness_hash=readiness.package_hash if readiness is not None else None,
+            readiness_dossier_hash=dossier.dossier_hash if dossier is not None else None,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
@@ -207,9 +217,9 @@ class RecoveryLedger:
             raise ValueError("claim action requires explicit authorization")
 
         if self._high_value(record):
-            if not record.readiness_hash:
+            if not record.readiness_hash or not record.readiness_dossier_hash:
                 raise ValueError(
-                    "seven-figure claim requires completed readiness gate"
+                    "seven-figure claim requires completed readiness dossier"
                 )
             if action_envelope is None:
                 raise ValueError(

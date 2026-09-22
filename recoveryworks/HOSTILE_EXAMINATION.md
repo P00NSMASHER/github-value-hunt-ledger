@@ -361,3 +361,47 @@ requirements are also satisfied.
 
 The readiness package itself is journaled and replayed with the authorization
 event, so durable-ledger restoration must reproduce the same readiness hash.
+
+
+## Final seven-figure authorization gate
+
+The compact `SevenFigureReadinessPackage` is a signed/hash-bound summary of the
+mandatory checks, but it is no longer sufficient by itself to authorize a
+seven-figure case.
+
+Before `DurableRecoveryLedger.authorize_with_case(...)` may move a finding to
+AUTHORIZED, RecoveryOS now requires a `SevenFigureAuthorizationDossier` that
+contains the actual underlying:
+
+- hostile-examination packet;
+- immutable source-retention manifest;
+- population-completeness / negative-evidence manifest;
+- build-provenance attestation;
+- public verification record; and
+- compact readiness package, including the external signature, RFC3161
+  timestamp evidence, and provider object-lock receipts.
+
+At authorization time RecoveryOS re-runs the underlying retention,
+completeness, build, object-lock, public-record, and readiness verifiers and
+requires every component hash to match the compact package. The dossier must
+also bind the exact durable-ledger journal head immediately before
+authorization.
+
+The authorization journal event stores the full dossier payload. Durable replay
+deserializes it and re-runs the same verifiers before reconstructing the
+AUTHORIZED state. A seven-figure CLAIMED state therefore requires both:
+
+- `readiness_hash`; and
+- `readiness_dossier_hash`.
+
+This closes the gap where a compact readiness package could remain internally
+valid while its underlying assurance artifacts were unavailable, mismatched, or
+silently replaced.
+
+### Production boundary
+
+Provider-specific adapters remain responsible for actually calling KMS/PKI,
+RFC3161/TSA, and object-storage APIs and setting `provider_verified=true` only
+after provider verification succeeds. RecoveryOS records and cross-binds those
+verification receipts; it does not fabricate provider verification or implement
+home-grown public-key cryptography.
