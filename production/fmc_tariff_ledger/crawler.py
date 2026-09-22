@@ -97,6 +97,8 @@ RULE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("late_fee", re.compile(r"late fee|late charge", re.I)),
     ("general_rate", re.compile(r"ocean freight|base rate|freight rate|rate per", re.I)),
     ("effective_rule", re.compile(r"effective date|effective from|revised|revision|supplement", re.I)),
+    ("applicability_date", re.compile(r"(?:rates?|charges?|rules?).{0,120}(?:in effect|effective).{0,120}(?:cargo|shipment).{0,80}received|date.{0,80}(?:cargo|shipment).{0,80}received", re.I)),
+    ("pass_through", re.compile(r"pass(?:ed)?[ -]?through|pass-through|cross-reference|without markup|not be marked up|no markup|at cost", re.I)),
 ]
 
 MONEY_RE = re.compile(
@@ -119,19 +121,25 @@ FREE_DAYS_RE = re.compile(
 )
 DATE_PATTERNS = [
     re.compile(
-        r"(?:effective(?:\s+date)?|effective\s+from|effective\s+as\s+of|"
+        r"(?:effective(?:\s+dates?)?|effective\s+from|effective\s+as\s+of|"
         r"revised|revision\s+date|valid\s+from|commencing)\s*[:\-]?\s*"
-        r"(?P<date>\d{4}-\d{1,2}-\d{1,2}|\d{1,2}/\d{1,2}/\d{2,4}|"
-        r"[A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})",
+        r"(?P<date>\d{4}-\d{1,2}-\d{1,2}|\d{8}|"
+        r"\d{1,2}/\d{1,2}/\d{2,4}|\d{1,2}-[A-Za-z]{3}-\d{4}|"
+        r"\d{1,2}[A-Za-z]{3}\d{4}|"
+        r"[A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4}|"
+        r"\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4})",
         re.I,
     ),
 ]
 END_DATE_PATTERNS = [
     re.compile(
-        r"(?:expires?|expiration(?:\s+date)?|valid\s+(?:through|until)|"
-        r"effective\s+through)\s*[:\-]?\s*"
-        r"(?P<date>\d{4}-\d{1,2}-\d{1,2}|\d{1,2}/\d{1,2}/\d{2,4}|"
-        r"[A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})",
+        r"(?:expires?|expire\s+date|expiration(?:\s+date)?|"
+        r"valid\s+(?:through|until)|effective\s+through)\s*[:\-]?\s*"
+        r"(?P<date>\d{4}-\d{1,2}-\d{1,2}|\d{8}|"
+        r"\d{1,2}/\d{1,2}/\d{2,4}|\d{1,2}-[A-Za-z]{3}-\d{4}|"
+        r"\d{1,2}[A-Za-z]{3}\d{4}|"
+        r"[A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4}|"
+        r"\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4})",
         re.I,
     ),
 ]
@@ -253,8 +261,9 @@ def likely_tariff_link(url: str, anchor_text: str = "", depth: int = 0) -> bool:
 def parse_date(value: str) -> str | None:
     value = re.sub(r"\s+", " ", value.strip()).replace(",", "")
     for fmt in (
-        "%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y",
-        "%B %d %Y", "%b %d %Y",
+        "%Y-%m-%d", "%Y%m%d", "%m/%d/%Y", "%m/%d/%y",
+        "%B %d %Y", "%b %d %Y", "%d %B %Y", "%d %b %Y",
+        "%d%b%Y", "%d-%b-%Y",
     ):
         try:
             return datetime.strptime(value, fmt).date().isoformat()
@@ -283,10 +292,28 @@ def detect_effective_dates(text: str) -> tuple[str | None, str | None]:
 
 def detect_source_version(text: str, url: str) -> str | None:
     probe = (url + "\n" + text[:10000])
-    for pat in VERSION_PATTERNS:
-        m = pat.search(probe)
-        if m:
-            return m.group(1)[:120]
+
+    tariff = re.search(
+        r"tariff\s+(?:no\.?|number)\s*[:#]?\s*([A-Za-z0-9.\-_]+)",
+        probe,
+        re.I,
+    )
+    qualifiers = []
+    for label, pattern in (
+        ("AMD", r"amendment\s+(?:no\.?|number)?\s*[:#]?\s*([A-Za-z0-9.\-_]+)"),
+        ("REV", r"(?:revision|rev\.)\s*[:#]?\s*([A-Za-z0-9.\-_]+)"),
+        ("SUP", r"supplement\s+(?:no\.?|number)?\s*[:#]?\s*([A-Za-z0-9.\-_]+)"),
+    ):
+        match = re.search(pattern, probe, re.I)
+        if match:
+            qualifiers.append(f"{label}:{match.group(1)}")
+
+    if tariff:
+        parts = [tariff.group(1), *qualifiers]
+        return "|".join(parts)[:120]
+    if qualifiers:
+        return "|".join(qualifiers)[:120]
+
     # Useful fallback for filenames such as Tariff_Rev-6_effective-04_01_2022.pdf.
     name = Path(urllib.parse.urlsplit(url).path).name
     if name and any(token in name.lower() for token in ("tariff", "rate", "schedule")):
