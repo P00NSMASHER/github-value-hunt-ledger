@@ -12,6 +12,7 @@ Repository-side readiness for a future adaptive-learning hunter canary. **This r
 - Split secret available to workflow: **true**
 - Pending split claims: **0**
 - Current generated activations: **0**
+- Active generated claims: **0**
 
 ## Machine gates
 
@@ -22,6 +23,7 @@ Repository-side readiness for a future adaptive-learning hunter canary. **This r
 | benchmark_complete | BLOCKED |
 | shadow_run_gate_complete | PASS |
 | no_current_activations | PASS |
+| no_active_generated_claims | PASS |
 
 ## Blockers
 

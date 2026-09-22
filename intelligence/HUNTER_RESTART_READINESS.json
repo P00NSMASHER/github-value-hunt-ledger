@@ -53,6 +53,8 @@
   },
   "changes_automation_state": false,
   "evidence": {
+    "active_generated_claim_count": 0,
+    "active_generated_claim_ids": [],
     "current_activations": 0,
     "matched_benchmark_tasks": 47,
     "pending_split_claims": 0,
@@ -106,6 +108,7 @@
   "gates": {
     "benchmark_complete": false,
     "measurement_packets_ready": true,
+    "no_active_generated_claims": true,
     "no_current_activations": true,
     "shadow_run_gate_complete": true,
     "split_receipt_system_ready": true
