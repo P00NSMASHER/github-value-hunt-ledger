@@ -221,18 +221,26 @@ def partition_basis_for_run(
     """
     version = int(run.get("schema_version") or 0)
     claim_id = run.get("execution_claim_id")
+    assignment_id = run.get("assignment_id")
     if (
         version >= 14
         and run.get("allocation_mode") == "generated"
         and run.get("routing_mode") == "generated"
         and isinstance(claim_id, str)
         and claim_id.startswith("CLAIM:")
+        and isinstance(assignment_id, str)
+        and assignment_id.startswith("ASSIGN:")
     ):
+        # The validated claim proves that this centrally generated assignment
+        # actually executed. Partition on the assignment, not the claim:
+        # claim IDs include a wall-clock timestamp and can change on retry,
+        # while the assignment identity is fixed before execution and survives
+        # release/reclaim cycles. This makes holdout membership retry-stable.
         return {
             "trusted": True,
-            "source": "execution_claim_id",
-            "identifier": claim_id,
-            "provenance_contract": "validated_v14_generated_claim",
+            "source": "assignment_id",
+            "identifier": assignment_id,
+            "provenance_contract": "validated_v14_generated_assignment_claim",
         }
     return {
         "trusted": False,
@@ -1213,8 +1221,7 @@ def build_training_environment(
         ),
         "split_policy": {
             "prospective": (
-                "generated runs hash a precommitted execution claim, "
-                "assignment or dispatch id mod "
+                "generated runs hash the centrally generated assignment id mod "
                 f"{cfg.confirm_modulus}; bucket "
                 f"{cfg.confirm_bucket}=confirm; others=train. "
                 "Manual/untrusted run IDs are train-only."
