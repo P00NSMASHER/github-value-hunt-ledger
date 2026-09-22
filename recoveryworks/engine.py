@@ -14,6 +14,7 @@ from .models import (
     canonical_hash,
 )
 from .policies import policy_for
+from .source_coverage import SourceCoverageReceipt, coverage_blockers, coverage_is_conclusive
 
 
 @dataclass(frozen=True)
@@ -30,6 +31,7 @@ class RecoveryObservation:
     reason: str
     confidence_basis: str
     metadata: Mapping[str, Any] = field(default_factory=dict)
+    source_coverage: tuple[SourceCoverageReceipt, ...] = ()
 
 
 class RecoveryEngine:
@@ -37,7 +39,8 @@ class RecoveryEngine:
 
     This class never interprets natural-language source documents and never uses
     an LLM for arithmetic. Upstream branch adapters may extract candidate rules,
-    but only a verified controlling rule can produce VALIDATED dollars.
+    but only a verified controlling rule, verified evidence, and any explicitly
+    supplied conclusive source-coverage receipts can produce VALIDATED dollars.
     """
 
     def evaluate(self, observation: RecoveryObservation) -> RecoveryFinding | None:
@@ -50,15 +53,18 @@ class RecoveryEngine:
         if recovery <= 0:
             return None
 
+        coverage_ok = coverage_is_conclusive(observation.source_coverage)
         verified = (
             observation.rule is not None
             and observation.rule.verified_controlling
             and bool(observation.evidence)
             and all(ref.verified for ref in observation.evidence)
+            and coverage_ok
         )
         state = FindingState.VALIDATED if verified else FindingState.REVIEW
+        coverage_hashes = sorted(receipt.proof_hash for receipt in observation.source_coverage)
         identity = {
-            "schema": 1,
+            "schema": 2 if observation.source_coverage else 1,
             "branch": observation.branch.value,
             "client_id": observation.client_id,
             "counterparty_id": observation.counterparty_id,
@@ -70,7 +76,17 @@ class RecoveryEngine:
             "rule_hash": observation.rule.proof_hash if observation.rule else None,
             "evidence_hashes": sorted(ref.proof_hash for ref in observation.evidence),
         }
+        if observation.source_coverage:
+            identity["source_coverage_hashes"] = coverage_hashes
         finding_id = f"rw:{observation.branch.value}:" + canonical_hash(identity)
+
+        metadata = dict(observation.metadata)
+        if observation.source_coverage:
+            metadata["source_coverage_hashes"] = coverage_hashes
+            blockers = coverage_blockers(observation.source_coverage)
+            if blockers:
+                metadata["source_coverage_blockers"] = list(blockers)
+
         return RecoveryFinding(
             finding_id=finding_id,
             branch=observation.branch,
@@ -86,7 +102,7 @@ class RecoveryEngine:
             state=state,
             reason=observation.reason,
             confidence_basis=observation.confidence_basis,
-            metadata=observation.metadata,
+            metadata=metadata,
         )
 
     def scan(self, observations: Iterable[RecoveryObservation]) -> tuple[RecoveryFinding, ...]:
