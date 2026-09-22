@@ -102,6 +102,14 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "lease-backed billing variance",
         ("contract billing engine", "lease abstracts", "CAM reconciliation"),
     ),
+    Branch.PROCUREMENT: BranchSpec(
+        Branch.PROCUREMENT,
+        "ProcurementRecovery",
+        "supplier invoice unit-price and contracted-rate leakage",
+        ("supplier invoice charges", "contract/PO rate schedules", "received quantities"),
+        "contract-backed procurement price variance",
+        ("contract billing engine", "PO/receipt quantities", "invoice exports"),
+    ),
 }
 
 
