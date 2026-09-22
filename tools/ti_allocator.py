@@ -13,6 +13,15 @@ POLICY=json.loads((INTEL/"search_policy.json").read_text(encoding="utf-8"))
 SEEDS=load_jsonl("search_seeds.jsonl")
 ADJ=load_jsonl("adjacency_queue.jsonl")
 MEASURE=json.loads((INTEL/"measurement_plan.json").read_text(encoding="utf-8")) if (INTEL/"measurement_plan.json").exists() else {}
+LEARNING_PACKETS=json.loads((INTEL/"learning_measurement_packets.json").read_text(encoding="utf-8")) if (INTEL/"learning_measurement_packets.json").exists() else {"packets":[]}
+learning_packet_by_seed={}
+for packet in LEARNING_PACKETS.get("packets") or []:
+    seed_id=((packet.get("seed") or {}).get("seed_id"))
+    if not isinstance(seed_id,str) or not seed_id:
+        continue
+    if seed_id in learning_packet_by_seed:
+        raise SystemExit(f"duplicate learning measurement packet for {seed_id}")
+    learning_packet_by_seed[seed_id]=packet
 RUNS=[r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective","benchmark"}]
 
 strategy_alloc={x["strategy_id"]:float(x.get("allocation") or 0) for x in POLICY.get("strategy_allocation",[])}
@@ -104,8 +113,29 @@ for s in SEEDS:
     strat=CFG["scoring"]["strategy_allocation_weight"]*strategy_alloc.get(sid,0)
     expb=experiment_status_boost(s.get("experiment_ids") or [])
     score=round(min(120,base+strat+expb),2)
-    candidates.append({
-      "work_item_id":work_id("seed",s["seed_id"]),
+    packet=None
+    if kind=="learning_measurement":
+        packet=learning_packet_by_seed.get(s["seed_id"])
+        if not packet:
+            raise SystemExit(f"{s['seed_id']}: missing frozen learning measurement packet")
+        if packet.get("strategy_id")!=sid:
+            raise SystemExit(f"{s['seed_id']}: learning packet strategy mismatch")
+        packet_seed=packet.get("seed") or {}
+        if packet_seed.get("seed_id")!=s["seed_id"] or packet_seed.get("seed_type")!="learning_measurement":
+            raise SystemExit(f"{s['seed_id']}: learning packet seed binding mismatch")
+        packet_id=packet.get("packet_id")
+        packet_sha=packet.get("packet_sha256")
+        if not isinstance(packet_id,str) or not packet_id.startswith("LMP:"):
+            raise SystemExit(f"{s['seed_id']}: invalid learning packet id")
+        if not isinstance(packet_sha,str) or len(packet_sha)!=64:
+            raise SystemExit(f"{s['seed_id']}: invalid learning packet sha256")
+        item_id=work_id("learn",packet_id+"|"+packet_sha)
+    else:
+        packet_id=None
+        packet_sha=None
+        item_id=work_id("seed",s["seed_id"])
+    candidate={
+      "work_item_id":item_id,
       "work_kind":kind,
       "work_action":s.get("work_action","search"),
       "query_recipe_id":s.get("query_recipe_id"),
@@ -132,7 +162,11 @@ for s in SEEDS:
         "verification_gate":s.get("verification_gate"),
         "stop_conditions":s.get("stop_conditions") or []
       }
-    })
+    }
+    if packet_id:
+        candidate["learning_measurement_packet_id"]=packet_id
+        candidate["learning_measurement_packet_sha256"]=packet_sha
+    candidates.append(candidate)
 
 # Adjacency candidates.
 for a in ADJ:
@@ -373,6 +407,8 @@ for slot in slots:
       "experiment_ids":c.get("experiment_ids") or [],
       "coverage_gap_ids":c.get("coverage_gap_ids") or [],
       "adjacency_root":c.get("adjacency_root"),
+      "learning_measurement_packet_id":c.get("learning_measurement_packet_id"),
+      "learning_measurement_packet_sha256":c.get("learning_measurement_packet_sha256"),
       "instructions":c["instructions"]
     }
     assignments.append(a)
