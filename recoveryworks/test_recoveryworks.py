@@ -7,6 +7,7 @@ import unittest
 from recoveryworks import (
     Branch,
     CaseState,
+    ClientRecoveryLedger,
     EvidenceRef,
     FindingState,
     RecoveryActionType,
@@ -337,6 +338,39 @@ class RecoveryWorksTests(unittest.TestCase):
             rollup["branches"]["utility"]["currencies"]["EUR"]["potential_cents"],
             5000,
         )
+
+    def test_client_ledger_hides_and_blocks_other_tenant_cases(self):
+        base = RecoveryLedger()
+        finding_a = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.AP, client_id="client-a", counterparty_id="vendor-a",
+            reference="a-1", currency="USD", expected_cents=0,
+            actual_cents=10000, rule=rule(), evidence=(evidence(),),
+            reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+        ))
+        finding_b = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.AP, client_id="client-b", counterparty_id="vendor-b",
+            reference="b-1", currency="USD", expected_cents=0,
+            actual_cents=20000, rule=rule(), evidence=(evidence(),),
+            reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+        ))
+        client_a = ClientRecoveryLedger(base, "client-a")
+        client_b = ClientRecoveryLedger(base, "client-b")
+        client_a.add(finding_a)
+        client_b.add(finding_b)
+
+        self.assertEqual(len(client_a.records()), 1)
+        self.assertEqual(client_a.records()[0].finding.client_id, "client-a")
+        self.assertEqual(client_a.rollup()["totals"]["cases"], 1)
+        self.assertEqual(
+            client_a.rollup()["currencies"]["USD"]["potential_cents"],
+            10000,
+        )
+        with self.assertRaisesRegex(KeyError, "unknown recovery case"):
+            client_a.get(finding_b.finding_id)
+        with self.assertRaisesRegex(KeyError, "unknown recovery case"):
+            client_a.approve(finding_b.finding_id, "reviewer-a", "Should not see it")
+        with self.assertRaisesRegex(ValueError, "outside client ledger scope"):
+            client_a.add(finding_b)
 
     def test_ledger_requires_scoped_authorization_before_claim(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
