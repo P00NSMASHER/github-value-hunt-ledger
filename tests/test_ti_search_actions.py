@@ -91,6 +91,11 @@ class GeneratedPacketTests(unittest.TestCase):
         cls.tmp = tempfile.TemporaryDirectory(prefix='hunter-action-test-')
         cls.root = Path(cls.tmp.name)
         shutil.copytree(ROOT / 'tools', cls.root / 'tools', ignore=shutil.ignore_patterns('__pycache__'))
+        (cls.root / 'production').mkdir()
+        shutil.copy(
+            ROOT / 'production' / 'learning_measurement_packets.py',
+            cls.root / 'production' / 'learning_measurement_packets.py',
+        )
         (cls.root / 'intelligence').mkdir()
         for name in ('MASTER.md', 'EXPERIMENTS.md', 'SEARCH_QUEUE.md'):
             shutil.copy(ROOT / name, cls.root / name)
@@ -101,7 +106,14 @@ class GeneratedPacketTests(unittest.TestCase):
         for name in inputs:
             if (ROOT / 'intelligence' / name).exists():
                 shutil.copy(ROOT / 'intelligence' / name, cls.root / 'intelligence' / name)
-        for script in ('ti_seed_compiler.py', 'ti_seed_validate.py', 'ti_allocator.py', 'ti_allocator_validate.py'):
+        for script in (
+            'ti_seed_compiler.py',
+            'ti_seed_validate.py',
+            'ti_learning_measurement_packets.py',
+            'ti_learning_measurement_packets_validate.py',
+            'ti_allocator.py',
+            'ti_allocator_validate.py',
+        ):
             result = subprocess.run([sys.executable, str(cls.root / 'tools' / script)], cwd=cls.root,
                                     capture_output=True, text=True)
             if result.returncode:
@@ -160,6 +172,101 @@ class GeneratedPacketTests(unittest.TestCase):
         )
         self.assertFalse(any(a['work_action'] == 'await_external' for a in self.allocations))
         self.assertTrue(all(a['instructions'].get('acceptance_target') for a in self.allocations))
+
+    def test_learning_measurement_assignment_is_packet_bound(self):
+        packet_bundle = json.loads(
+            (
+                self.root
+                / 'intelligence'
+                / 'learning_measurement_packets.json'
+            ).read_text()
+        )
+        packets_by_seed = {
+            packet['seed']['seed_id']: packet
+            for packet in packet_bundle['packets']
+        }
+        candidates = [
+            row
+            for row in self.candidates
+            if row['work_kind'] == 'learning_measurement'
+        ]
+        self.assertGreaterEqual(len(candidates), 1)
+        for candidate in candidates:
+            packet = packets_by_seed[candidate['source_id']]
+            self.assertEqual(
+                candidate['learning_measurement_packet_id'],
+                packet['packet_id'],
+            )
+            self.assertEqual(
+                candidate['learning_measurement_packet_sha256'],
+                packet['packet_sha256'],
+            )
+            expected = (
+                'WORK:learn:'
+                + hashlib.sha256(
+                    (
+                        packet['packet_id']
+                        + '|'
+                        + packet['packet_sha256']
+                    ).encode()
+                ).hexdigest()[:12]
+            )
+            self.assertEqual(candidate['work_item_id'], expected)
+
+        assignments = [
+            row
+            for row in self.allocations
+            if row['work_kind'] == 'learning_measurement'
+        ]
+        self.assertEqual(len(assignments), 1)
+        assignment = assignments[0]
+        candidate = next(
+            row
+            for row in candidates
+            if row['work_item_id'] == assignment['work_item_id']
+        )
+        for key in (
+            'learning_measurement_packet_id',
+            'learning_measurement_packet_sha256',
+        ):
+            self.assertEqual(assignment[key], candidate[key])
+
+    def test_learning_measurement_packet_tamper_breaks_allocator_validation(self):
+        allocation_path = (
+            self.root / 'intelligence' / 'hunt_allocations.jsonl'
+        )
+        original = allocation_path.read_text()
+        try:
+            rows = self.read('hunt_allocations.jsonl')
+            target = next(
+                row
+                for row in rows
+                if row['work_kind'] == 'learning_measurement'
+            )
+            target['learning_measurement_packet_sha256'] = '0' * 64
+            allocation_path.write_text(
+                ''.join(json.dumps(row) + '\n' for row in rows)
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        self.root
+                        / 'tools'
+                        / 'ti_allocator_validate.py'
+                    ),
+                ],
+                cwd=self.root,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(
+                'learning packet assignment drift',
+                result.stdout + result.stderr,
+            )
+        finally:
+            allocation_path.write_text(original)
 
     def test_fallback_is_hypothesis_challenge_not_independent_verified(self):
         path = self.root / 'EXPERIMENTS.md'
