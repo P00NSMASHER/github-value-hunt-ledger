@@ -69,9 +69,7 @@
   "comparison_group_id": null,
   "evaluation_set_id": null,
   "seed_mode": "generated",
-  "seed_ids": [
-    "VERIFY:EXP-007"
-  ],
+  "seed_ids": [],
   "adjacency_mode": "none",
   "adjacency_ids": [],
   "adjacency_types": [],
