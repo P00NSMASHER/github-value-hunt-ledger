@@ -1122,7 +1122,7 @@ def copy_rows(dst: sqlite3.Connection, src: sqlite3.Connection) -> None:
         """SELECT snapshot_id, entity_class, organization_no, legal_name, rule_type,
                   term_kind, amount_value, currency, unit, quantity_value,
                   effective_from, effective_to, source_version, evidence_locator,
-                  evidence_excerpt, confidence, created_at
+                  evidence_excerpt, confidence, parser_version, created_at
            FROM terms"""
     ):
         old_snap = int(row[0])
@@ -1133,8 +1133,8 @@ def copy_rows(dst: sqlite3.Connection, src: sqlite3.Connection) -> None:
                (snapshot_id, entity_class, organization_no, legal_name, rule_type,
                 term_kind, amount_value, currency, unit, quantity_value,
                 effective_from, effective_to, source_version, evidence_locator,
-                evidence_excerpt, confidence, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                evidence_excerpt, confidence, parser_version, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (snap_map[old_snap], *row[1:]),
         )
 
