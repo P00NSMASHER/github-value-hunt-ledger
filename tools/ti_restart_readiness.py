@@ -23,6 +23,16 @@ def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_jsonl(path: Path):
+    if not path.exists():
+        return []
+    return [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
 def main() -> int:
     split_status = load_json(
         INTEL / "TRAINING_SPLIT_STATUS.json"
@@ -32,6 +42,9 @@ def main() -> int:
     )
     packets = load_json(
         INTEL / "learning_measurement_packets.json"
+    )
+    execution_claim_history = load_jsonl(
+        INTEL / "execution_claim_history.jsonl"
     )
     scoreboard = (
         ROOT / "benchmark" / "SCOREBOARD.md"
@@ -58,6 +71,7 @@ def main() -> int:
         packets=packets,
         scoreboard_text=scoreboard,
         shadow_results=shadow_results,
+        execution_claim_history=execution_claim_history,
     )
     errors = validate_restart_readiness(report)
     if errors:
@@ -124,6 +138,10 @@ def main() -> int:
         (
             f"- Current generated activations: "
             f"**{report['evidence']['current_activations']}**"
+        ),
+        (
+            f"- Active generated claims: "
+            f"**{report['evidence']['active_generated_claim_count']}**"
         ),
         "",
         "## Machine gates",
