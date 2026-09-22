@@ -19,7 +19,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:first-party-history-manifest-triangulation"
       },
-      "episode_sha256": "e96eae4a948bcce155b08073a45ef4ee102553677ad9996617d14a824a9085f9",
+      "episode_sha256": "84be8ae81d2212f1131a16925420e074e186859b6eaec65f3c54a1d66e5e383e",
       "observation": {
         "candidate_count": 3,
         "deep_inspected": 3,
@@ -40,6 +40,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H05-20260920T1103-SAM-MANIFEST-COMPLETENESS",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -86,7 +87,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:first-party-history-manifest-triangulation"
       },
-      "episode_sha256": "3de9f881bf3a591a36071e52d649ed5af980e00adbd0ecdf8448d95cdcca6371",
+      "episode_sha256": "52bc0180a7995403c4e21374c5770cf67013ab3ef1e852765f8f900942e0d987",
       "observation": {
         "candidate_count": 5,
         "deep_inspected": 4,
@@ -107,6 +108,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H05-20260920T1203-SAM-DELETION-RETENTION",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -153,7 +155,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:evaluation-target-independence"
       },
-      "episode_sha256": "f6f019e618becbcdcc43b0bc95b3fb1103ad7f71c1369d205d88e4c30d92fbfa",
+      "episode_sha256": "9396d45fbf488b03ed634b9721e4520c642e844a57264be27ddf4e47d5c65a86",
       "observation": {
         "candidate_count": 3,
         "deep_inspected": 3,
@@ -174,6 +176,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H07-20260920T1106-OUTAGE-INDEPENDENCE",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -220,7 +223,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:evaluation-target-independence"
       },
-      "episode_sha256": "e8d1142a48134c89c33f7b67ad95e372e130b1ac9dd85960512d4865e129ac00",
+      "episode_sha256": "c72cdf513cc50c088936dcc4a298e868cd7efd4a1e5ce19ad3d0f7cf57312238",
       "observation": {
         "candidate_count": 1,
         "deep_inspected": 1,
@@ -241,6 +244,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H07-20260920T1203-USECPO-SCHEMA",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -298,7 +302,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:capability-conjunction-search-claim-tracing"
       },
-      "episode_sha256": "c15649ad0f9b17188c5c0202eb6f16c91470a67b36de33773ee77e83ae54e435",
+      "episode_sha256": "47d99636b9236acc8dd1bf9d7a1310e1462576100b0c983bd92397e2fa2be659",
       "observation": {
         "candidate_count": 3,
         "deep_inspected": 3,
@@ -320,6 +324,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260920T150647Z:hunter16:po-authority-graph",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -374,7 +379,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:capability-conjunction-search-claim-tracing"
       },
-      "episode_sha256": "cb8ac8a564ca7677578f16dc312975e2172f63e817b11560e1783dc827388357",
+      "episode_sha256": "f1ed7f1f39f4640bea741b16deac3f2001cbe7ed4593369f57a0010b1bf7b44b",
       "observation": {
         "candidate_count": 5,
         "deep_inspected": 3,
@@ -396,6 +401,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H01-20260920T1201-REVERSAL-SAFE-PAYMENT",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -454,7 +460,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:fail-open-boundary-archaeology"
       },
-      "episode_sha256": "3898c3ef2725e341e1ecd75d81193bfb7efbb63488ac825a292305059309cb2c",
+      "episode_sha256": "4f8061b2171aa4724320898a7e863087c565d934f87faca1e48e632c72558a71",
       "observation": {
         "candidate_count": 10,
         "deep_inspected": 4,
@@ -475,6 +481,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260920T160413Z:hunter15:recovery-coverage-gate",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -533,7 +540,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:acceptance-path-transition-inspection"
       },
-      "episode_sha256": "de007526af1ff0e6ffdd39db2d2509cccc183f6fc621edc1a88095c3643ad037",
+      "episode_sha256": "c236086173245b6e2547d48b16a32b3165888a5a92deb1f1cd44f434f1358e38",
       "observation": {
         "candidate_count": 4,
         "deep_inspected": 4,
@@ -554,6 +561,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H06-20260920T1226-PHYSICAL-AMBIGUITY",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -612,7 +620,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:acceptance-path-transition-inspection"
       },
-      "episode_sha256": "65a711d650e92f0ce17ab64a4751385d4dd43ef5ba42c9c87840517ecd80345a",
+      "episode_sha256": "c9cc590c8bac3ef85f2934e91ae5b70e8f9acdc0005a5e39959b720a336ca3e6",
       "observation": {
         "candidate_count": 9,
         "deep_inspected": 3,
@@ -635,6 +643,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260920T164727Z:hunter04:authority-path-bypass",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -693,7 +702,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:acceptance-path-transition-inspection"
       },
-      "episode_sha256": "574cd032f95343cce83268e452a28eeef89b61b8a6a9099b449ce43ba4ad9de2",
+      "episode_sha256": "9ae51ae51cd33401057262cfe11ca19f4d76e4f11a730126ed8dadb462c24d23",
       "observation": {
         "candidate_count": 1,
         "deep_inspected": 1,
@@ -714,6 +723,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H06-20260920T1258-RESTART-AMBIGUITY",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -775,7 +785,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:acceptance-path-transition-inspection"
       },
-      "episode_sha256": "a20b5227dd91a97f0bb7f037c56375a50590c89005e8904923efc17ff760b173",
+      "episode_sha256": "8d101101fd13f7e1a11b682906640de717c443b3c8e5b91dbd3b2cc3524a1633",
       "observation": {
         "candidate_count": 2,
         "deep_inspected": 2,
@@ -796,6 +806,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:H06-20260920T1343-OPENTRONS-RECONCILIATION",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -858,7 +869,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:rule-period-authority-version-audit"
       },
-      "episode_sha256": "a883a239b004973ddd3cc0469f120e8bc98777170ab2e6a694c4f90c68c44258",
+      "episode_sha256": "0453f7286fe105110ead4edd6b4324b73a993cb1dc22ec31806df171bec625e8",
       "observation": {
         "candidate_count": 5,
         "deep_inspected": 1,
@@ -881,6 +892,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260920T202500Z:hunter04:reachable-authority",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -942,7 +954,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:identity-lifecycle-contradiction-archaeology"
       },
-      "episode_sha256": "c583970872ddccae5b9749e74b1d33343cb5f9618d70a75fa007bbd16fe27688",
+      "episode_sha256": "2eca20e5599ea1c681902cf77941566dd781f6722d1adffa524c855afa6ff0fc",
       "observation": {
         "candidate_count": 6,
         "deep_inspected": 4,
@@ -963,6 +975,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260920T202725Z:hunter11:recovery-identity-lifecycle",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -1026,7 +1039,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems"
       },
-      "episode_sha256": "39f95e1c880365a1a4dea12116acd3342e3f07fd7df94ececee8f31d17cdf7e1",
+      "episode_sha256": "46a3496ba749b7ac572301c4e8ce05b059020f2594a1b42d41e2427b42e9427e",
       "observation": {
         "candidate_count": 10,
         "deep_inspected": 3,
@@ -1047,6 +1060,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260920T212700Z:hunter06:chromconverter-normalization",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -1091,88 +1105,6 @@
     {
       "action": {
         "queries": [
-          "schedule minimum rest hard constraint labor law effective date version",
-          "workforce compliance 32 consecutive hours rest source tests",
-          "PayrollEngine regulation validFrom evaluationDate work time validation",
-          "medical rota legal hours rest rule checker"
-        ],
-        "query_family": "workforce schedule hard-lock verification + effective-dated current labor/domain rule authority + rule provenance",
-        "query_family_id": "QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
-        "recall_rescue_used": false,
-        "search_move_ids": [],
-        "search_moves": [],
-        "search_surfaces": [
-          "GitHub repository search",
-          "GitHub code/source/tests",
-          "official labor-law sources",
-          "official Payroll Engine documentation"
-        ],
-        "stop_reason_standard": null,
-        "strategy_id": "STRAT:rule-period-authority-version-audit"
-      },
-      "episode_sha256": "7276400a415cf0aac32c1df32bf61823fe7f7c5e3c5f5186e1d93ec4d4983efc",
-      "observation": {
-        "candidate_count": null,
-        "deep_inspected": 4,
-        "elapsed_minutes": null,
-        "experiment_ids": [
-          "EXP-008"
-        ],
-        "master_promoted_count": 0,
-        "new_capability_ids": [],
-        "retained_count": 3,
-        "strengthened_capability_ids": [
-          "CAP-009"
-        ],
-        "tool_calls": null
-      },
-      "provenance": {
-        "durable_evidence_path": "hunters/32-run11-2026-09-20.md",
-        "measurement_quality": "prospective",
-        "partition_basis": {
-          "identifier": "CLAIM:2668c9456429",
-          "provenance_contract": "validated_v14_generated_claim",
-          "source": "execution_claim_id",
-          "trusted": true
-        },
-        "timestamp": "2026-09-20T22:58:00Z"
-      },
-      "reward": {
-        "discovery": 0.35625,
-        "downstream": {
-          "commercial_credit": 0.0,
-          "commercial_observed": false,
-          "credit_edges": 0,
-          "downstream_reward": 0.0,
-          "engineering_credit": 0.0,
-          "engineering_observed": false,
-          "outcome_ids": [],
-          "technical_credit": 0.0
-        },
-        "reward_stage": "discovery_only",
-        "training_reward": 0.35625
-      },
-      "run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
-      "schema_version": 1,
-      "split": "train",
-      "state": {
-        "assignment_slot_role": "experiment",
-        "assignment_work_kind": "capability_gap",
-        "hunter": "HUNTER-13 / Revenue Leverage",
-        "lane_ids": [
-          "REVENUE-LEVERAGE",
-          "WORKFORCE-SCHEDULING"
-        ],
-        "search_objective_id": "OBJ:current-rule-authority",
-        "seed_ids": [
-          "SEED:gap:cap-009"
-        ],
-        "seed_mode": "generated"
-      }
-    },
-    {
-      "action": {
-        "queries": [
           "mortgage extraction abstain",
           "insurance source_span review",
           "mortgage confidence review threshold",
@@ -1200,7 +1132,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:capability-conjunction-search-claim-tracing"
       },
-      "episode_sha256": "52a79346925e0b6ef1992ee4a8039ffbf408c3bd7734110e4ea0f11a495c4e7e",
+      "episode_sha256": "47098c3feb8fba40ec6a8151267795fb0b877be513d27cccdf14d6cf318c8f77",
       "observation": {
         "candidate_count": 3,
         "deep_inspected": 3,
@@ -1217,6 +1149,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260921T030456Z:hunter01:cpp-abstention-transfer",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -1277,7 +1210,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:evaluation-target-independence"
       },
-      "episode_sha256": "7e49d32a26ba30bea30462566df627fe2c043daa170c2e0ef3ad598495ebf3dc",
+      "episode_sha256": "9ee55c777d04dd20060c9999382327494f0786346091cd96c15a6632dbe98527",
       "observation": {
         "candidate_count": 1,
         "deep_inspected": 1,
@@ -1298,6 +1231,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260921T030500Z:hunter13:exp007-opentfraw-thermo-falsification",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -1358,7 +1292,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:evaluation-target-independence"
       },
-      "episode_sha256": "7575931528e4149ef935d909d908fcc7896999b4139e1fbd50b1343010b7e665",
+      "episode_sha256": "d95d6d8d336d977109d0088b96ddab50ba370f1aa61a1cb1e1087106712cac4b",
       "observation": {
         "candidate_count": 1,
         "deep_inspected": 1,
@@ -1379,6 +1313,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -1440,7 +1375,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:rule-period-authority-version-audit"
       },
-      "episode_sha256": "7e82ff1cca2c4d867b74a3e3f1aa369fdf3b70971cf465a6057cf542d23bd324",
+      "episode_sha256": "d1d32da95101cb80272c9bc6501d5fd86942326239ad65410a125e5840c5160f",
       "observation": {
         "candidate_count": 1,
         "deep_inspected": 1,
@@ -1460,6 +1395,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260921T050410Z:HUNTER-01:9378fda616cc",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -1501,93 +1437,6 @@
     {
       "action": {
         "queries": [
-          "\"OpenFisca\" language:C#",
-          "C# payroll HMRC tax calculator",
-          ".NET payroll tax engine",
-          "C# benefits rules engine government",
-          "C# tax calculator NuGet historical",
-          "PayrollEngine C# regulation",
-          "Payroll-Engine",
-          "PAYE C#",
-          "tax calculator C#",
-          "authority source hash tax table in Payroll-Engine/PayrollEngine"
-        ],
-        "query_family": "NuGet effective rule version plus historical evaluation plus external authority provenance",
-        "query_family_id": "QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
-        "recall_rescue_used": false,
-        "search_move_ids": [],
-        "search_moves": [],
-        "search_surfaces": [
-          "GitHub repository and code search",
-          "exact-revision repository source and test fixtures",
-          "NuGet Gallery package metadata",
-          "Skatteverket first-party annual tax-table publication"
-        ],
-        "stop_reason_standard": null,
-        "strategy_id": "STRAT:rule-period-authority-version-audit"
-      },
-      "episode_sha256": "1064506dfc39872716f4066797594ccc611e969fd755a31d244b376c36ab40db",
-      "observation": {
-        "candidate_count": 8,
-        "deep_inspected": 3,
-        "elapsed_minutes": 11,
-        "experiment_ids": [],
-        "master_promoted_count": 0,
-        "new_capability_ids": [],
-        "retained_count": 1,
-        "strengthened_capability_ids": [
-          "CAP-008",
-          "CAP-019"
-        ],
-        "tool_calls": null
-      },
-      "provenance": {
-        "durable_evidence_path": "hunters/01-run27-2026-09-21.md",
-        "measurement_quality": "prospective",
-        "partition_basis": {
-          "identifier": "CLAIM:7cb70fe09a6d",
-          "provenance_contract": "validated_v14_generated_claim",
-          "source": "execution_claim_id",
-          "trusted": true
-        },
-        "timestamp": "2026-09-21T06:13:03Z"
-      },
-      "reward": {
-        "discovery": 0.3,
-        "downstream": {
-          "commercial_credit": 0.0,
-          "commercial_observed": false,
-          "credit_edges": 0,
-          "downstream_reward": 0.0,
-          "engineering_credit": 0.0,
-          "engineering_observed": false,
-          "outcome_ids": [],
-          "technical_credit": 0.0
-        },
-        "reward_stage": "discovery_only",
-        "training_reward": 0.3
-      },
-      "run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
-      "schema_version": 1,
-      "split": "train",
-      "state": {
-        "assignment_slot_role": "coverage",
-        "assignment_work_kind": "coverage_gap",
-        "hunter": "HUNTER-01",
-        "lane_ids": [
-          "NODE-01",
-          "COV:package-ecosystem:nuget"
-        ],
-        "search_objective_id": "OBJ:current-rule-authority",
-        "seed_ids": [
-          "SEED:coverage:package-ecosystem-nuget:rule-version-transfer"
-        ],
-        "seed_mode": "generated"
-      }
-    },
-    {
-      "action": {
-        "queries": [
           "OpenFisca reforms parameter",
           "tax effective_date rule_version tests",
           "benefits rule_version effective date source reference",
@@ -1607,7 +1456,7 @@
         "stop_reason_standard": null,
         "strategy_id": "STRAT:authority-origin-invariant-set-consistency"
       },
-      "episode_sha256": "6d82fe1bc6c4055729569c40fb1978b8349305c361e0678ef00a95291fca7bdc",
+      "episode_sha256": "beaa6c97a3ca55fc24f1029643218feafb2597dd447488959213175a80d811dc",
       "observation": {
         "candidate_count": 3,
         "deep_inspected": 1,
@@ -1628,6 +1477,7 @@
         "measurement_quality": "prospective",
         "partition_basis": {
           "identifier": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
+          "partition": "train",
           "provenance_contract": "untrusted_or_legacy",
           "source": "run_id_fallback_train_only",
           "trusted": false
@@ -1718,6 +1568,10 @@
       "run_id": "RUN:20260920T213600Z:hunter13:late-payout-return-readback"
     },
     {
+      "reason": "pending_blind_partition",
+      "run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority"
+    },
+    {
       "reason": "not_eligible_search_training_record",
       "run_id": "RUN:20260921T025635Z:hunter-11:rqr-runtime-closure"
     },
@@ -1780,6 +1634,10 @@
     {
       "reason": "not_eligible_search_training_record",
       "run_id": "RUN:20260921T060826Z:HUNTER-13:opentrons-absent-action-race"
+    },
+    {
+      "reason": "pending_blind_partition",
+      "run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version"
     },
     {
       "reason": "not_eligible_search_training_record",
@@ -2007,10 +1865,11 @@
     "support_origin_budget": 0.4
   },
   "schema_version": 1,
-  "source_snapshot_sha256": "b0230d2ba002a81cf6e9c800b422784ee788c58708c2ef7df05eec9d0ca13f54",
+  "source_snapshot_sha256": "70a6bdacb3fcd101ed323467fd87de30ac4aeba8a7cc5fe61bda519bd0a65b0a",
   "source_through": "2026-09-21T13:32:00Z",
   "split_policy": {
     "benchmark": "evaluation_only",
+    "blind_partition_receipts_required": true,
     "outcome_credit": "never crosses train/confirm/evaluation split; mixed-origin outcomes excluded",
     "prospective": "generated runs hash a precommitted execution claim, assignment or dispatch id mod 5; bucket 0=confirm; others=train. Manual/untrusted run IDs are train-only.",
     "retrospective_or_non_search": "excluded"
@@ -2018,15 +1877,15 @@
   "summary": {
     "commercially_grounded_episodes": 0,
     "credit_edges": 5,
-    "episodes": 21,
+    "episodes": 19,
     "excluded_outcomes": 5,
-    "excluded_runs": 22,
+    "excluded_runs": 24,
     "reward_stage_counts": {
-      "discovery_only": 16,
+      "discovery_only": 14,
       "technical_proxy": 5
     },
     "split_counts": {
-      "train": 21
+      "train": 19
     }
   }
 }

@@ -7,7 +7,7 @@
   "policy_effect": "none",
   "results": [],
   "schema_version": 1,
-  "source_snapshot_sha256": "11dd0cae06d2f12be522b9b24f12e2c7026e4e8c2d96a4591a13ba616c95a955",
+  "source_snapshot_sha256": "efd86d23e94cfd57cb69e90660ee77829b9caf6b408a9ee77c712e587cab3d52",
   "summary": {
     "accepted_records": 0,
     "blocked": 0,

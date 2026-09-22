@@ -7,7 +7,7 @@
   "policy_effect": "none",
   "schema_version": 1,
   "skill_eval_queue": [],
-  "source_snapshot_sha256": "ea2f07ecb4aecd13a194dfd595001f97d10087e5994f7af47a29c2dd31d62e4b",
+  "source_snapshot_sha256": "8ea31011cdf8f544f2650edc9f096d8515c51d966ab1cf90fe9f102a934094d2",
   "summary": {
     "accepted_records": 0,
     "blocked": 0,

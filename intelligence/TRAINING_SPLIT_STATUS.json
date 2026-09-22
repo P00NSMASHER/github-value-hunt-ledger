@@ -1,0 +1,29 @@
+{
+  "activation_run_count": null,
+  "confirm_receipts": 0,
+  "issues": [
+    {
+      "execution_claim_id": "CLAIM:2668c9456429",
+      "reason": "split_key_commitment_unavailable",
+      "search_run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority"
+    },
+    {
+      "execution_claim_id": "CLAIM:7cb70fe09a6d",
+      "reason": "split_key_commitment_unavailable",
+      "search_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version"
+    }
+  ],
+  "key_commitment_active": false,
+  "key_commitment_sha256": null,
+  "partition_method": "hmac-sha256-v1",
+  "pending_claim_ids": [
+    "CLAIM:2668c9456429",
+    "CLAIM:7cb70fe09a6d"
+  ],
+  "receipts": 0,
+  "schema_version": 1,
+  "secret_available": false,
+  "train_receipts": 0,
+  "trusted_generated_runs": 2,
+  "worker_visibility_rule": "partition is assigned only after canonical run intake; workers must not receive the HMAC key"
+}

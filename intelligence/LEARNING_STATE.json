@@ -113,62 +113,6 @@
         },
         "eligible_for_policy_consideration": false,
         "generalization_status": "gathering_evidence",
-        "key": "CTX:OBJ:current-rule-authority::QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
-        "kind": "CONTEXTUAL_QUERY_FAMILY",
-        "last_reward": 0.3,
-        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
-        "q_value": 0.045,
-        "reward_ma": 0.3,
-        "support": {
-          "deep_inspections": 3,
-          "mean_reward": 0.3,
-          "measured_runs": 1,
-          "min_reward": 0.3,
-          "positive_runs": 1
-        },
-        "train_evidence_ready": false,
-        "updated_at": "2026-09-21T06:13:03Z",
-        "visits": 1
-      },
-      {
-        "confirm_evidence_ready": false,
-        "confirm_support": {
-          "deep_inspections": 0,
-          "mean_reward": 0.0,
-          "measured_runs": 0,
-          "min_reward": null,
-          "positive_runs": 0
-        },
-        "eligible_for_policy_consideration": false,
-        "generalization_status": "gathering_evidence",
-        "key": "CTX:OBJ:current-rule-authority::QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
-        "kind": "CONTEXTUAL_QUERY_FAMILY",
-        "last_reward": 0.35625,
-        "last_run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
-        "q_value": 0.0534375,
-        "reward_ma": 0.35625,
-        "support": {
-          "deep_inspections": 4,
-          "mean_reward": 0.35625,
-          "measured_runs": 1,
-          "min_reward": 0.35625,
-          "positive_runs": 1
-        },
-        "train_evidence_ready": false,
-        "updated_at": "2026-09-20T22:58:00Z",
-        "visits": 1
-      },
-      {
-        "confirm_evidence_ready": false,
-        "confirm_support": {
-          "deep_inspections": 0,
-          "mean_reward": 0.0,
-          "measured_runs": 0,
-          "min_reward": null,
-          "positive_runs": 0
-        },
-        "eligible_for_policy_consideration": false,
-        "generalization_status": "gathering_evidence",
         "key": "CTX:OBJ:identity-lineage::QF:recovery-coverage-identity-lifecycle-contradiction-vs-succession-vs-collision-vs-unavailable-source",
         "kind": "CONTEXTUAL_QUERY_FAMILY",
         "last_reward": 0.24375,
@@ -367,20 +311,20 @@
         "generalization_status": "gathering_evidence",
         "key": "CTX:OBJ:current-rule-authority::STRAT:rule-period-authority-version-audit",
         "kind": "CONTEXTUAL_STRATEGY",
-        "last_reward": 0.3,
-        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
-        "q_value": 0.10273359374999999,
-        "reward_ma": 0.32151562499999997,
+        "last_reward": 0.15,
+        "last_run_id": "RUN:20260921T050410Z:HUNTER-01:9378fda616cc",
+        "q_value": 0.0225,
+        "reward_ma": 0.15,
         "support": {
-          "deep_inspections": 8,
-          "mean_reward": 0.26875,
-          "measured_runs": 3,
+          "deep_inspections": 1,
+          "mean_reward": 0.15,
+          "measured_runs": 1,
           "min_reward": 0.15,
-          "positive_runs": 3
+          "positive_runs": 1
         },
         "train_evidence_ready": false,
-        "updated_at": "2026-09-21T06:13:03Z",
-        "visits": 3
+        "updated_at": "2026-09-21T05:04:10.093166Z",
+        "visits": 1
       },
       {
         "confirm_evidence_ready": false,
@@ -617,34 +561,6 @@
         },
         "eligible_for_policy_consideration": false,
         "generalization_status": "gathering_evidence",
-        "key": "QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
-        "kind": "QUERY_FAMILY",
-        "last_reward": 0.3,
-        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
-        "q_value": 0.045,
-        "reward_ma": 0.3,
-        "support": {
-          "deep_inspections": 3,
-          "mean_reward": 0.3,
-          "measured_runs": 1,
-          "min_reward": 0.3,
-          "positive_runs": 1
-        },
-        "train_evidence_ready": false,
-        "updated_at": "2026-09-21T06:13:03Z",
-        "visits": 1
-      },
-      {
-        "confirm_evidence_ready": false,
-        "confirm_support": {
-          "deep_inspections": 0,
-          "mean_reward": 0.0,
-          "measured_runs": 0,
-          "min_reward": null,
-          "positive_runs": 0
-        },
-        "eligible_for_policy_consideration": false,
-        "generalization_status": "gathering_evidence",
         "key": "QF:reachable-trusted-measurement-state-exact-work-order-line-bill-period-authority-one-use-claim-closed-mutation-surface",
         "kind": "QUERY_FAMILY",
         "last_reward": 0.4,
@@ -744,34 +660,6 @@
         },
         "train_evidence_ready": false,
         "updated_at": "2026-09-21T03:05:00Z",
-        "visits": 1
-      },
-      {
-        "confirm_evidence_ready": false,
-        "confirm_support": {
-          "deep_inspections": 0,
-          "mean_reward": 0.0,
-          "measured_runs": 0,
-          "min_reward": null,
-          "positive_runs": 0
-        },
-        "eligible_for_policy_consideration": false,
-        "generalization_status": "gathering_evidence",
-        "key": "QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
-        "kind": "QUERY_FAMILY",
-        "last_reward": 0.35625,
-        "last_run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
-        "q_value": 0.0534375,
-        "reward_ma": 0.35625,
-        "support": {
-          "deep_inspections": 4,
-          "mean_reward": 0.35625,
-          "measured_runs": 1,
-          "min_reward": 0.35625,
-          "positive_runs": 1
-        },
-        "train_evidence_ready": false,
-        "updated_at": "2026-09-20T22:58:00Z",
         "visits": 1
       },
       {
@@ -1011,20 +899,20 @@
         "generalization_status": "gathering_evidence",
         "key": "STRAT:rule-period-authority-version-audit",
         "kind": "STRATEGY",
-        "last_reward": 0.3,
-        "last_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
-        "q_value": 0.13958109375,
-        "reward_ma": 0.34838359375,
+        "last_reward": 0.15,
+        "last_run_id": "RUN:20260921T050410Z:HUNTER-01:9378fda616cc",
+        "q_value": 0.0735,
+        "reward_ma": 0.36250000000000004,
         "support": {
-          "deep_inspections": 9,
-          "mean_reward": 0.3015625,
-          "measured_runs": 4,
+          "deep_inspections": 2,
+          "mean_reward": 0.275,
+          "measured_runs": 2,
           "min_reward": 0.15,
-          "positive_runs": 4
+          "positive_runs": 2
         },
         "train_evidence_ready": false,
-        "updated_at": "2026-09-21T06:13:03Z",
-        "visits": 4
+        "updated_at": "2026-09-21T05:04:10.093166Z",
+        "visits": 2
       }
     ]
   },
@@ -1200,19 +1088,6 @@
     },
     {
       "downstream_outcome_ids": [],
-      "reward": 0.35625,
-      "reward_stage": "discovery_only",
-      "search_run_id": "RUN:20260920T225800Z:hunter13:cap009-rule-authority",
-      "split": "train",
-      "updated_memory_keys": [
-        "STRAT:rule-period-authority-version-audit",
-        "CTX:OBJ:current-rule-authority::STRAT:rule-period-authority-version-audit",
-        "QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance",
-        "CTX:OBJ:current-rule-authority::QF:workforce-schedule-hard-lock-verification-effective-dated-current-labor-domain-rule-authority-rule-provenance"
-      ]
-    },
-    {
-      "downstream_outcome_ids": [],
       "reward": -0.35,
       "reward_stage": "discovery_only",
       "search_run_id": "RUN:20260921T030456Z:hunter01:cpp-abstention-transfer",
@@ -1267,19 +1142,6 @@
     },
     {
       "downstream_outcome_ids": [],
-      "reward": 0.3,
-      "reward_stage": "discovery_only",
-      "search_run_id": "RUN:20260921T061303Z:HUNTER-01:nuget-rule-version",
-      "split": "train",
-      "updated_memory_keys": [
-        "STRAT:rule-period-authority-version-audit",
-        "CTX:OBJ:current-rule-authority::STRAT:rule-period-authority-version-audit",
-        "QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance",
-        "CTX:OBJ:current-rule-authority::QF:nuget-effective-rule-version-plus-historical-evaluation-plus-external-authority-provenance"
-      ]
-    },
-    {
-      "downstream_outcome_ids": [],
       "reward": 0.4,
       "reward_stage": "discovery_only",
       "search_run_id": "RUN:20260921T061800Z:HUNTER-05:rule-version-granularity",
@@ -1293,19 +1155,19 @@
     }
   ],
   "schema_version": 1,
-  "source_snapshot_sha256": "3b54dba4b4d8597bd6b4af71953f0ae4985e2152189d8ed68d5ca11d5d2cc07c",
+  "source_snapshot_sha256": "dbe6f06355355cb8678cd696621c19d4a74ef7f2e714dc1f4853b4aa2195dd68",
   "source_through": "2026-09-21T13:32:00Z",
   "training_environment": {
     "credit_edges": 5,
     "excluded_outcomes": 5,
     "note": "Only train episodes update memory. Confirm and evaluation-only episodes are held out.",
     "reward_stage_counts": {
-      "discovery_only": 16,
+      "discovery_only": 14,
       "technical_proxy": 5
     },
-    "source_snapshot_sha256": "b0230d2ba002a81cf6e9c800b422784ee788c58708c2ef7df05eec9d0ca13f54",
+    "source_snapshot_sha256": "70a6bdacb3fcd101ed323467fd87de30ac4aeba8a7cc5fe61bda519bd0a65b0a",
     "split_counts": {
-      "train": 21
+      "train": 19
     }
   }
 }

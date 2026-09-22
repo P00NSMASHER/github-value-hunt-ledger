@@ -24,7 +24,7 @@ This report answers a different question from SEARCH_POLICY.md: not **where migh
 | STRAT:first-party-production-source-triangulation | 2 | 7 | 0/0 | 0/0 | train_measurement | 3 | 13 | 100% | 9.9% |
 | STRAT:capability-conjunction-search-claim-tracing | 3 | 9 | 3/9 | 0/0 | train_measurement | 2 | 11 | 11% | 10.7% |
 | STRAT:evaluation-target-independence | 4 | 6 | 4/6 | 0/0 | train_measurement | 1 | 14 | 50% | 8.4% |
-| STRAT:rule-period-authority-version-audit | 4 | 9 | 4/9 | 0/0 | train_measurement | 1 | 11 | 0% | 10.1% |
+| STRAT:rule-period-authority-version-audit | 4 | 9 | 2/2 | 0/0 | train_measurement | 1 | 11 | 0% | 10.1% |
 | STRAT:acceptance-path-transition-inspection | 5 | 10 | 4/10 | 0/0 | train_measurement | 0 | 10 | 7% | 13.0% |
 
 ## Operating rule

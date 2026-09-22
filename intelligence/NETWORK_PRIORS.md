@@ -57,7 +57,7 @@ Generated compact memory for live hunters. This is a **navigation aid, not autho
 
 - These are **measurement-only** recommendations. They do not change allocator weights or authorize work by themselves; use the normal generated assignment/claim path and never select/retry based on train/confirm partition.
 - **STRAT:acceptance-path-transition-inspection** — train_measurement; train 4/10 (need 1 runs / 10 deep); confirm 0/0 (need 2 runs / 6 deep).
-- **STRAT:rule-period-authority-version-audit** — train_measurement; train 4/9 (need 1 runs / 11 deep); confirm 0/0 (need 2 runs / 6 deep).
+- **STRAT:evaluation-target-independence** — train_measurement; train 4/6 (need 1 runs / 14 deep); confirm 0/0 (need 2 runs / 6 deep).
 - **STRAT:bidirectional-money-evidence-invariant-tracing** — train_measurement; train 0/0 (need 5 runs / 20 deep); confirm 0/0 (need 2 runs / 6 deep).
 - Reproducible hunter-system failure queue: **0 queued**, **0 blocked**. Queued failures still require regression-tested repair and skill promotion.
 - Repair workbench: **0 bounded repair-ready**, **0 reproduction-first**. These are advisory repair/falsification tasks, not automatic worker routes or live skill edits.
