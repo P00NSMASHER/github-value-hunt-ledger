@@ -31,6 +31,7 @@ gaps = policy.get("priority_capability_gaps") or []
 constraints = policy.get("domain_constraints") or []
 move_rows = moves.get("by_move_type") or []
 learning_rows = ((learning.get("memory") or {}).get("records") or [])
+learning_alerts = learning.get("learning_alerts") or []
 value_priors = sorted(
     (row for row in learning_rows if row.get("eligible_for_policy_consideration")),
     key=lambda row: (-(row.get("q_value") or 0), row.get("key") or ""),
@@ -133,6 +134,16 @@ else:
         "- No strategy/query-family value prior has cleared both the 5-run / 20-deep train gate "
         "and the independent 2-run / 6-deep confirm gate yet. The learning engine is recording "
         "outcomes but must not steer search from insufficient or unconfirmed evidence."
+    )
+overfit_alerts = [
+    alert
+    for alert in learning_alerts
+    if alert.get("type") == "overfit_signal"
+]
+if overfit_alerts:
+    lines.append(
+        f"- **{len(overfit_alerts)} train→confirm overfit signal(s)** are suppressed from live priors. "
+        "Treat these as repair/falsification targets, not as candidates for more allocation."
     )
 failure_queue = learning.get("failure_queue") or {}
 lines.append(
