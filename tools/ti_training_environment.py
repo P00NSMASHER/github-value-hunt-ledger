@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from production.blind_partition import receipt_partition_map
 from production.training_environment import build_training_environment
 
 
@@ -51,6 +52,10 @@ def main() -> int:
         default="intelligence/outcomes.jsonl",
     )
     parser.add_argument(
+        "--split-receipts",
+        default="intelligence/training_split_receipts.jsonl",
+    )
+    parser.add_argument(
         "--write",
         default="intelligence/TRAINING_ENVIRONMENT.json",
     )
@@ -63,6 +68,9 @@ def main() -> int:
     environment = build_training_environment(
         load_jsonl(Path(args.search_runs)),
         load_jsonl(Path(args.outcomes)),
+        split_receipts=receipt_partition_map(
+            load_jsonl(Path(args.split_receipts))
+        ),
     )
 
     output_path = Path(args.write)
