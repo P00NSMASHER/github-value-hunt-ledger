@@ -7,6 +7,7 @@ from production.training_environment import (
     outcome_signal,
     partition_for_id,
     split_for_run,
+    telemetry_consistency_errors,
     validate_training_environment,
 )
 
@@ -114,6 +115,44 @@ class TrainingEnvironmentTests(unittest.TestCase):
         legacy["master_promoted_count"] = 0
         self.assertEqual(
             split_for_run(legacy),
+            "excluded",
+        )
+
+    def test_impossible_denominators_are_excluded_from_training(self):
+        bad = search_run(
+            "RUN:bad-denominators",
+            deep=1,
+            retained=2,
+        )
+        self.assertIn(
+            "retained_exceeds_deep_inspected",
+            telemetry_consistency_errors(bad),
+        )
+        self.assertEqual(
+            split_for_run(bad),
+            "excluded",
+        )
+        environment = build_training_environment(
+            [bad],
+            [],
+        )
+        self.assertEqual(environment["episodes"], [])
+        self.assertIn(
+            "retained_exceeds_deep_inspected",
+            environment["excluded_runs"][0]["reason"],
+        )
+
+    def test_duplicate_avoidance_cannot_exceed_preflight_checks(self):
+        bad = search_run("RUN:bad-preflight")
+        bad["candidate_preflight_checks"] = 2
+        bad["known_candidate_preflight_hits"] = 1
+        bad["duplicate_deep_inspections_avoided"] = 3
+        self.assertIn(
+            "duplicate_avoidance_exceeds_checks",
+            telemetry_consistency_errors(bad),
+        )
+        self.assertEqual(
+            split_for_run(bad),
             "excluded",
         )
 
