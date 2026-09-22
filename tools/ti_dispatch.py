@@ -33,7 +33,7 @@ def git_clock():
         return None,None
 
 def stable_ticket_payload(packet):
-    return {
+    payload = {
       "dispatch_kind":"primary",
       "worker_id":packet["worker_id"],
       "routing_generation_id":packet["routing_generation_id"],
@@ -50,6 +50,14 @@ def stable_ticket_payload(packet):
       "assignment_score":packet["assignment_score"],
       "routing_score":packet["routing_score"]
     }
+    if packet.get("assignment_work_kind")=="learning_measurement":
+        packet_id=packet.get("learning_measurement_packet_id")
+        packet_sha=packet.get("learning_measurement_packet_sha256")
+        if not packet_id or not packet_sha:
+            raise SystemExit("learning_measurement dispatch requires frozen packet id+sha256")
+        payload["learning_measurement_packet_id"]=packet_id
+        payload["learning_measurement_packet_sha256"]=packet_sha
+    return payload
 
 def ticket_id(payload):
     raw=json.dumps(payload,sort_keys=True,separators=(",",":"))
@@ -142,7 +150,8 @@ for t in tickets:
           "dispatch_kind","worker_id","routing_generation_id","worker_profile_generation_id",
           "routing_learning_generation_id","slot_id","assignment_id","allocator_generation_id",
           "portfolio_policy_generation_id","work_item_id","assignment_slot_role",
-          "assignment_work_kind","assignment_source_id","assignment_score","routing_score"
+          "assignment_work_kind","assignment_source_id","assignment_score","routing_score",
+          "learning_measurement_packet_id","learning_measurement_packet_sha256"
         ]
         drift=[k for k in stable_keys if old.get(k)!=t.get(k)]
         if drift:
