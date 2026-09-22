@@ -3,6 +3,7 @@ import json,re
 from collections import Counter
 from ti_common import INTEL, ROOT, load_jsonl
 
+from ti_assignment_projection import validate_ti_assignment_projection
 from ti_learning_measurement_blinding import (
     worker_assignment_blinding_errors,
 )
@@ -146,43 +147,13 @@ for n,a in enumerate(alloc,1):
     errors=action_errors(a)
     if errors: raise SystemExit(f"hunt_allocations.jsonl:{n}: {'; '.join(errors)}")
     candidate=next((c for c in cand if c["work_item_id"]==a.get("work_item_id")),None)
-    if candidate and (a.get("work_action")!=candidate.get("work_action") or a.get("instructions")!=candidate.get("instructions")):
-        raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
     if candidate:
-        list_contract_fields={
-            "query_anchors",
-            "required_signatures",
-            "exclude_domains",
-            "capability_ids",
-            "experiment_ids",
-        }
-        for key in (
-            "source_id",
-            "work_kind",
-            "query_recipe_id",
-            "query_anchors",
-            "required_signatures",
-            "exclude_domains",
-            "measurement_contract_version",
-            "authorization_basis",
-            "strategy_id",
-            "search_objective_id",
-            "capability_ids",
-            "experiment_ids",
-        ):
-            actual=a.get(key)
-            expected=candidate.get(key)
-            if key in list_contract_fields:
-                actual=actual or []
-                expected=expected or []
-            if actual!=expected:
-                raise SystemExit(
-                    f"hunt_allocations.jsonl:{n}: candidate contract drift: {key}"
-                )
-    if candidate and a.get("work_revision_sha256")!=candidate.get("work_revision_sha256"):
-        raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate semantic revision drift")
-    if candidate and a.get("work_identity_payload")!=candidate.get("work_identity_payload"):
-        raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate semantic identity payload drift")
+        try:
+            validate_ti_assignment_projection(candidate,a)
+        except ValueError as exc:
+            raise SystemExit(
+                f"hunt_allocations.jsonl:{n}: {exc}"
+            ) from exc
     sid=a.get("slot_id")
     if sid not in slots or sid in seen_slots: raise SystemExit(f"hunt_allocations.jsonl:{n}: invalid/duplicate slot {sid}")
     seen_slots.add(sid)
