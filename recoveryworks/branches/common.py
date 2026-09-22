@@ -30,6 +30,9 @@ def effective_rule(rule: RuleRef | None, occurred_on: str) -> RuleRef | None:
 
     start = _date(rule.effective_from, "rule.effective_from")
     end = _date(rule.effective_to, "rule.effective_to") if rule.effective_to else None
+    if end is not None and end < start:
+        raise ValueError("rule effective_to cannot precede effective_from")
+
     applies = occurred >= start and (end is None or occurred <= end)
     if applies or not rule.verified_controlling:
         return rule
