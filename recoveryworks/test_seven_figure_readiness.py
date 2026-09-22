@@ -1,0 +1,369 @@
+from dataclasses import replace
+import hashlib
+import unittest
+
+from recoveryworks import (
+    DurableRecoveryLedger,
+    REQUIRED_READINESS_CHECKS,
+    authorize_case_action,
+    build_seven_figure_readiness,
+    prepare_external_action,
+    readiness_from_payload,
+    readiness_to_payload,
+    record_external_signature_verification,
+    record_external_timestamp_verification,
+    record_object_lock_verification,
+    verify_seven_figure_readiness,
+)
+from recoveryworks.test_custody_provenance import build_custody_chain
+
+
+def sha(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def object_lock_receipts(retention):
+    result = []
+    for index, item in enumerate(retention.entries, start=1):
+        result.append(record_object_lock_verification(
+            source_id=item.source_id,
+            role=item.role,
+            source_hash=item.source_hash,
+            provider="SIM-OBJECT-STORE",
+            object_version_id=f"SIM-VERSION-{index}",
+            retention_control_id=item.retention_control_id,
+            retention_mode=item.retention_mode,
+            retain_until=item.retain_until,
+            legal_hold_status="OFF",
+            checked_at="2026-09-22T16:46:00Z",
+            provider_request_id=f"SIM-LOCK-VERIFY-{index}",
+            provider_response_hash=item.provider_attestation_hash,
+            verified_by_adapter="sim-object-lock-adapter",
+            provider_verified=True,
+        ))
+    return tuple(result)
+
+
+def signature_for(public_record, *, provider_verified=True, algorithm="RSA_PSS_SHA256"):
+    return record_external_signature_verification(
+        signature_id="SIM-EXT-SIGNATURE-1",
+        payload_kind="recoveryworks_public_verification_record_v1",
+        payload_hash=public_record.record_hash,
+        provider="SIM-KMS",
+        key_id="sim-kms-asymmetric-key-1",
+        algorithm=algorithm,
+        public_key_fingerprint=sha(b"SIMULATED PUBLIC KEY"),
+        signature_hash=sha(b"SIMULATED RSA-PSS SIGNATURE BYTES"),
+        provider_request_id="SIM-KMS-VERIFY-REQUEST-1",
+        verification_receipt_hash=sha(b"SIMULATED KMS VERIFY RESPONSE"),
+        signed_at="2026-09-22T16:46:00Z",
+        verified_at="2026-09-22T16:47:00Z",
+        verified_by_adapter="sim-kms-verify-adapter",
+        provider_verified=provider_verified,
+    )
+
+
+def timestamp_for(signature, *, provider_verified=True, subject_hash=None):
+    return record_external_timestamp_verification(
+        timestamp_id="SIM-RFC3161-1",
+        subject_hash=subject_hash or signature.signature_hash,
+        authority="SIM-TRUSTED-TIMESTAMP-AUTHORITY",
+        standard="RFC3161",
+        token_hash=sha(b"SIMULATED RFC3161 TOKEN"),
+        serial_number="SIM-TSA-SERIAL-1",
+        provider_request_id="SIM-TSA-VERIFY-REQUEST-1",
+        verification_receipt_hash=sha(b"SIMULATED TSA VERIFY RESPONSE"),
+        timestamped_at="2026-09-22T16:47:30Z",
+        verified_at="2026-09-22T16:48:00Z",
+        verified_by_adapter="sim-rfc3161-verify-adapter",
+        provider_verified=provider_verified,
+    )
+
+
+def build_readiness_chain():
+    bundle, ledger, packet, retention, completeness, build, public = (
+        build_custody_chain()
+    )
+    signature = signature_for(public)
+    timestamp = timestamp_for(signature)
+    receipts = object_lock_receipts(retention)
+    readiness = build_seven_figure_readiness(
+        bundle,
+        packet,
+        retention,
+        completeness,
+        build,
+        public,
+        signature,
+        timestamp,
+        receipts,
+        journal_head_hash=ledger.journal.head_hash,
+        evaluated_at="2026-09-22T16:49:00Z",
+        evaluated_by="sim-seven-figure-readiness-controller",
+    )
+    return (
+        bundle,
+        ledger,
+        packet,
+        retention,
+        completeness,
+        build,
+        public,
+        signature,
+        timestamp,
+        receipts,
+        readiness,
+    )
+
+
+class SevenFigureReadinessTests(unittest.TestCase):
+    def test_full_readiness_package_verifies(self):
+        (
+            bundle,
+            ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            _signature,
+            _timestamp,
+            _receipts,
+            readiness,
+        ) = build_readiness_chain()
+        verify_seven_figure_readiness(
+            readiness,
+            bundle,
+            expected_journal_head_hash=ledger.journal.head_hash,
+        )
+        self.assertEqual(
+            tuple(sorted(readiness.checks)),
+            tuple(sorted(REQUIRED_READINESS_CHECKS)),
+        )
+
+    def test_hmac_is_rejected_as_external_signature(self):
+        (
+            _bundle,
+            _ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            public,
+            *_rest,
+        ) = build_readiness_chain()
+        with self.assertRaises(ValueError):
+            signature_for(public, algorithm="HMAC-SHA256")
+
+    def test_unverified_external_signature_blocks_readiness(self):
+        (
+            bundle,
+            ledger,
+            packet,
+            retention,
+            completeness,
+            build,
+            public,
+            _signature,
+            _timestamp,
+            receipts,
+            _readiness,
+        ) = build_readiness_chain()
+        signature = signature_for(public, provider_verified=False)
+        timestamp = timestamp_for(signature)
+        with self.assertRaises(ValueError):
+            build_seven_figure_readiness(
+                bundle,
+                packet,
+                retention,
+                completeness,
+                build,
+                public,
+                signature,
+                timestamp,
+                receipts,
+                journal_head_hash=ledger.journal.head_hash,
+                evaluated_at="2026-09-22T16:49:00Z",
+                evaluated_by="controller",
+            )
+
+    def test_timestamp_must_bind_external_signature(self):
+        (
+            bundle,
+            ledger,
+            packet,
+            retention,
+            completeness,
+            build,
+            public,
+            signature,
+            _timestamp,
+            receipts,
+            _readiness,
+        ) = build_readiness_chain()
+        timestamp = timestamp_for(signature, subject_hash="wrong-signature-hash")
+        with self.assertRaises(ValueError):
+            build_seven_figure_readiness(
+                bundle,
+                packet,
+                retention,
+                completeness,
+                build,
+                public,
+                signature,
+                timestamp,
+                receipts,
+                journal_head_hash=ledger.journal.head_hash,
+                evaluated_at="2026-09-22T16:49:00Z",
+                evaluated_by="controller",
+            )
+
+    def test_object_lock_provider_response_must_match_retention_attestation(self):
+        (
+            bundle,
+            ledger,
+            packet,
+            retention,
+            completeness,
+            build,
+            public,
+            signature,
+            timestamp,
+            receipts,
+            _readiness,
+        ) = build_readiness_chain()
+        bad = list(receipts)
+        bad[0] = replace(
+            bad[0],
+            provider_response_hash="wrong-provider-response-hash",
+        )
+        with self.assertRaises(ValueError):
+            build_seven_figure_readiness(
+                bundle,
+                packet,
+                retention,
+                completeness,
+                build,
+                public,
+                signature,
+                timestamp,
+                bad,
+                journal_head_hash=ledger.journal.head_hash,
+                evaluated_at="2026-09-22T16:49:00Z",
+                evaluated_by="controller",
+            )
+
+    def test_high_value_authorization_refuses_missing_readiness(self):
+        bundle, ledger, *_rest = build_readiness_chain()
+        authorization = authorize_case_action(
+            bundle,
+            authorization_id="SIM-CLIENT-AUTH-READINESS-1",
+            client_actor_id="sim-client-cfo",
+            approved_action_type="carrier_overcharge_demand",
+            authorized_at="2026-09-22T16:50:00Z",
+            maximum_amount_cents=100_000_000,
+            note="SIMULATION ONLY. Approve frozen seven-figure claim.",
+        )
+        with self.assertRaises(ValueError):
+            ledger.authorize_with_case(
+                bundle.finding.finding_id,
+                bundle,
+                authorization,
+            )
+
+    def test_stale_readiness_journal_head_blocks_authorization(self):
+        bundle, ledger, *rest = build_readiness_chain()
+        readiness = rest[-1]
+        authorization = authorize_case_action(
+            bundle,
+            authorization_id="SIM-CLIENT-AUTH-READINESS-2",
+            client_actor_id="sim-client-cfo",
+            approved_action_type="carrier_overcharge_demand",
+            authorized_at="2026-09-22T16:50:00Z",
+            maximum_amount_cents=100_000_000,
+            note="SIMULATION ONLY. Approve frozen seven-figure claim.",
+        )
+        ledger.approve(
+            bundle.finding.finding_id,
+            "sim-reviewer-1",
+            "Synthetic approval note changed after readiness evaluation.",
+        )
+        with self.assertRaises(ValueError):
+            ledger.authorize_with_case(
+                bundle.finding.finding_id,
+                bundle,
+                authorization,
+                readiness,
+            )
+
+    def test_authorized_claim_persists_readiness_through_durable_replay(self):
+        (
+            bundle,
+            ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            _signature,
+            _timestamp,
+            _receipts,
+            readiness,
+        ) = build_readiness_chain()
+        authorization = authorize_case_action(
+            bundle,
+            authorization_id="SIM-CLIENT-AUTH-READINESS-3",
+            client_actor_id="sim-client-cfo",
+            approved_action_type="carrier_overcharge_demand",
+            authorized_at="2026-09-22T16:50:00Z",
+            maximum_amount_cents=100_000_000,
+            note="SIMULATION ONLY. Approve readiness-gated claim.",
+        )
+        authorized = ledger.authorize_with_case(
+            bundle.finding.finding_id,
+            bundle,
+            authorization,
+            readiness,
+        )
+        self.assertEqual(authorized.readiness_hash, readiness.package_hash)
+
+        artifact = b"SIMULATION ONLY. Readiness-gated external demand."
+        envelope = prepare_external_action(
+            bundle,
+            authorization,
+            artifact_kind="synthetic_demand",
+            artifact_bytes=artifact,
+            artifact_locator="sim://outbound/readiness-demand",
+            action_amount_cents=100_000_000,
+            prepared_by="sim-recovery-ops",
+            prepared_at="2026-09-22T16:51:00Z",
+        )
+        ledger.mark_claimed(bundle.finding.finding_id, envelope)
+
+        exported = ledger.export_bundle()
+        restored = DurableRecoveryLedger.from_bundle(exported)
+        restored_record = restored.get(bundle.finding.finding_id)
+        self.assertEqual(restored.journal.head_hash, ledger.journal.head_hash)
+        self.assertEqual(restored_record.readiness_hash, readiness.package_hash)
+
+    def test_readiness_payload_round_trip_is_tamper_evident(self):
+        bundle, ledger, *rest = build_readiness_chain()
+        readiness = rest[-1]
+        payload = readiness_to_payload(readiness)
+        restored = readiness_from_payload(payload)
+        verify_seven_figure_readiness(
+            restored,
+            bundle,
+            expected_journal_head_hash=ledger.journal.head_hash,
+        )
+        tampered = replace(restored, evaluated_by="different-controller")
+        with self.assertRaises(ValueError):
+            verify_seven_figure_readiness(
+                tampered,
+                bundle,
+                expected_journal_head_hash=ledger.journal.head_hash,
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()
