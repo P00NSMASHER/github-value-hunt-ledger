@@ -336,14 +336,22 @@ HEALTHSPARQ_ALLOWED_SUFFIXES = (
 
 def healthsparq_params(public_url: str) -> dict[str, str]:
     parsed = urllib.parse.urlsplit(public_url)
-    fragment = parsed.fragment or ""
-    query_text = ""
-    if "?" in fragment:
-        fragment, query_text = fragment.split("?", 1)
-    params = dict(urllib.parse.parse_qsl(fragment.split("/", 2)[-1], keep_blank_values=False))
-    params.update(dict(urllib.parse.parse_qsl(query_text, keep_blank_values=False)))
+    raw = urllib.parse.unquote(parsed.fragment or "")
+    params: dict[str, str] = {}
+    match = re.search(r"^/?(?:one|public)/(?P<params>[^/?#]+)(?P<tail>.*)$", raw)
+    if match:
+        params.update(dict(
+            urllib.parse.parse_qsl(match.group("params"), keep_blank_values=False)
+        ))
+        tail = match.group("tail") or ""
+        if "?" in tail:
+            params.update(dict(
+                urllib.parse.parse_qsl(tail.split("?", 1)[1], keep_blank_values=False)
+            ))
     if not params:
-        params = dict(urllib.parse.parse_qsl(parsed.query, keep_blank_values=False))
+        params.update(dict(
+            urllib.parse.parse_qsl(parsed.query, keep_blank_values=False)
+        ))
     insurer = str(params.get("insurerCode") or "").strip()
     brand = str(params.get("brandCode") or "").strip()
     if not insurer or not brand:
