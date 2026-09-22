@@ -3,6 +3,7 @@ import hashlib
 import pytest
 
 from freight.audit_workflow import (
+    _currency_money,
     AuditWorkflowStage,
     AuditWorkflowState,
     RuleCSVInput,
@@ -294,3 +295,7 @@ def test_authority_document_requires_hash_or_bytes():
     assert result.state == AuditWorkflowState.BLOCKED.value
     assert result.stage == AuditWorkflowStage.RULE_INGEST.value
     assert "source_document_sha256 or source_document_data is required" in result.error_message
+
+
+def test_workflow_money_renderer_preserves_full_integer_cent_precision():
+    assert _currency_money("USD", 2**63 - 1) == "USD 92,233,720,368,547,758.07"
