@@ -132,39 +132,66 @@ def build_client_portfolio_packet(ledger: RecoveryLedger, client_id: str) -> dic
         if record.finding.client_id == client_id
     )
 
-    branches: dict[str, dict[str, int]] = {}
-    total_potential = total_validated = total_recovered = total_fees = 0
-    for packet in packets:
-        bucket = branches.setdefault(packet.branch, {
+    def new_bucket() -> dict[str, int]:
+        return {
             "cases": 0,
             "potential_cents": 0,
             "validated_cents": 0,
             "recovered_cents": 0,
             "fee_cents": 0,
-        })
+        }
+
+    def add(bucket: dict[str, int], packet: RecoveryPacket) -> None:
         validated = packet.potential_recovery_cents if packet.gates["finding_validated"] else 0
         bucket["cases"] += 1
         bucket["potential_cents"] += packet.potential_recovery_cents
         bucket["validated_cents"] += validated
         bucket["recovered_cents"] += packet.recovered_cents
         bucket["fee_cents"] += packet.fee_cents
-        total_potential += packet.potential_recovery_cents
-        total_validated += validated
-        total_recovered += packet.recovered_cents
-        total_fees += packet.fee_cents
+
+    branches: dict[str, dict[str, Any]] = {}
+    currencies: dict[str, dict[str, int]] = {}
+    for packet in packets:
+        currency_bucket = currencies.setdefault(packet.currency, new_bucket())
+        add(currency_bucket, packet)
+
+        branch = branches.setdefault(packet.branch, {
+            "cases": 0,
+            "currencies": {},
+        })
+        branch_currency = branch["currencies"].setdefault(packet.currency, new_bucket())
+        add(branch_currency, packet)
+        branch["cases"] += 1
+
+    for branch in branches.values():
+        branch["currency_count"] = len(branch["currencies"])
+        if len(branch["currencies"]) == 1:
+            only = next(iter(branch["currencies"].values()))
+            for key in ("potential_cents", "validated_cents", "recovered_cents", "fee_cents"):
+                branch[key] = only[key]
+        else:
+            for key in ("potential_cents", "validated_cents", "recovered_cents", "fee_cents"):
+                branch[key] = None
+
+    totals: dict[str, Any] = {
+        "cases": len(packets),
+        "currency_count": len(currencies),
+    }
+    if len(currencies) == 1:
+        only = next(iter(currencies.values()))
+        for key in ("potential_cents", "validated_cents", "recovered_cents", "fee_cents"):
+            totals[key] = only[key]
+    else:
+        for key in ("potential_cents", "validated_cents", "recovered_cents", "fee_cents"):
+            totals[key] = None
 
     body = {
-        "schema": 1,
+        "schema": 2,
         "client_id": client_id,
         "ledger_snapshot_hash": ledger.snapshot_hash,
         "branches": branches,
-        "totals": {
-            "cases": len(packets),
-            "potential_cents": total_potential,
-            "validated_cents": total_validated,
-            "recovered_cents": total_recovered,
-            "fee_cents": total_fees,
-        },
+        "currencies": currencies,
+        "totals": totals,
         "case_packet_hashes": sorted(packet.packet_hash for packet in packets),
     }
     return {**body, "portfolio_hash": canonical_hash(body)}
