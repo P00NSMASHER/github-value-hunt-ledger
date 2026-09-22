@@ -23,9 +23,24 @@ class RecoveryPacket:
     rule: Mapping[str, Any] | None
     evidence: tuple[Mapping[str, Any], ...]
     gates: Mapping[str, bool]
+    claim_evidence: Mapping[str, Any] | None
+    recovery_evidence: Mapping[str, Any] | None
     recovered_cents: int
     fee_cents: int
     packet_hash: str
+
+
+def _evidence_body(ref) -> dict[str, Any] | None:
+    if ref is None:
+        return None
+    return {
+        "evidence_id": ref.evidence_id,
+        "source_hash": ref.source_hash,
+        "locator": ref.locator,
+        "kind": ref.kind,
+        "verified": ref.verified,
+        "proof_hash": ref.proof_hash,
+    }
 
 
 def _packet_body(record: LedgerRecord) -> dict[str, Any]:
@@ -43,14 +58,10 @@ def _packet_body(record: LedgerRecord) -> dict[str, Any]:
             "proof_hash": finding.rule.proof_hash,
         }
 
-    evidence = tuple({
-        "evidence_id": ref.evidence_id,
-        "source_hash": ref.source_hash,
-        "locator": ref.locator,
-        "kind": ref.kind,
-        "verified": ref.verified,
-        "proof_hash": ref.proof_hash,
-    } for ref in sorted(finding.evidence, key=lambda item: item.evidence_id))
+    evidence = tuple(
+        _evidence_body(ref)
+        for ref in sorted(finding.evidence, key=lambda item: item.evidence_id)
+    )
 
     gates = {
         "finding_validated": finding.state is FindingState.VALIDATED,
@@ -75,6 +86,8 @@ def _packet_body(record: LedgerRecord) -> dict[str, Any]:
         "rule": rule,
         "evidence": evidence,
         "gates": gates,
+        "claim_evidence": _evidence_body(record.claim_evidence),
+        "recovery_evidence": _evidence_body(record.recovery_evidence),
         "recovered_cents": record.recovered_cents,
         "fee_cents": record.fee_cents,
     }
@@ -97,6 +110,8 @@ def build_recovery_packet(record: LedgerRecord) -> RecoveryPacket:
         rule=body["rule"],
         evidence=body["evidence"],
         gates=body["gates"],
+        claim_evidence=body["claim_evidence"],
+        recovery_evidence=body["recovery_evidence"],
         recovered_cents=body["recovered_cents"],
         fee_cents=body["fee_cents"],
         packet_hash=packet_hash,
