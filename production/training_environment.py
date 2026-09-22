@@ -195,23 +195,47 @@ def _not_after(
 
 
 def partition_for_id(
-    run_id: str,
+    identifier: str,
     *,
     config: TrainingEnvironmentConfig | None = None,
 ) -> str:
-    """Assign an identifier to a deterministic train/confirm partition.
-
-    This helper is intentionally independent of run eligibility. It lets a
-    non-search execution/verification origin anchor its downstream outcome to
-    one partition without ever becoming a search-training episode itself.
-    """
+    """Hash a precommitted identifier into train or confirm."""
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
-    if not run_id:
+    if not identifier:
         return "excluded"
-    digest = hashlib.sha256(run_id.encode("utf-8")).digest()
+    digest = hashlib.sha256(identifier.encode("utf-8")).digest()
     bucket = int.from_bytes(digest[:8], "big") % cfg.confirm_modulus
     return "confirm" if bucket == cfg.confirm_bucket else "train"
+
+
+def partition_basis_for_run(
+    run: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Choose a split token that existed before the hunt whenever possible.
+
+    Search-run IDs are agent-authored after routing and therefore cannot be a
+    trusted validation split key. Generated allocation/claim identifiers are
+    emitted before execution and are suitable precommit anchors.
+    """
+    if run.get("allocation_mode") == "generated":
+        for field_name in (
+            "execution_claim_id",
+            "assignment_id",
+            "dispatch_ticket_id",
+        ):
+            value = run.get(field_name)
+            if isinstance(value, str) and value:
+                return {
+                    "trusted": True,
+                    "source": field_name,
+                    "identifier": value,
+                }
+    return {
+        "trusted": False,
+        "source": "run_id_fallback_train_only",
+        "identifier": str(run.get("search_run_id") or ""),
+    }
 
 
 def telemetry_consistency_errors(
@@ -317,7 +341,15 @@ def split_for_run(
     run_id = str(run.get("search_run_id") or "")
     if not run_id:
         return "excluded"
-    return partition_for_id(run_id, config=cfg)
+    basis = partition_basis_for_run(run)
+    if not basis["trusted"]:
+        # Manual/unallocated IDs are controllable by the worker. They remain
+        # useful train evidence but can never manufacture confirm evidence.
+        return "train"
+    return partition_for_id(
+        str(basis["identifier"]),
+        config=cfg,
+    )
 
 
 def discovery_signal(run: Mapping[str, Any]) -> float | None:
@@ -612,9 +644,34 @@ def build_outcome_credit(
                     }
                 )
                 continue
-            anchor_splits = {
-                partition_for_id(rid, config=cfg)
+            anchor_bases = {
+                rid: partition_basis_for_run(
+                    runs_by_id[rid]
+                )
                 for rid in direct_ids
+            }
+            untrusted_anchor_ids = sorted(
+                rid
+                for rid, basis in anchor_bases.items()
+                if not basis["trusted"]
+            )
+            if untrusted_anchor_ids:
+                excluded.append(
+                    {
+                        "outcome_id": outcome_id,
+                        "reason": (
+                            "untrusted_excluded_direct_origin_partition"
+                        ),
+                        "origin_run_ids": untrusted_anchor_ids,
+                    }
+                )
+                continue
+            anchor_splits = {
+                partition_for_id(
+                    str(basis["identifier"]),
+                    config=cfg,
+                )
+                for basis in anchor_bases.values()
             }
             if len(anchor_splits) != 1:
                 excluded.append(
@@ -628,7 +685,7 @@ def build_outcome_credit(
                 )
                 continue
             outcome_split = next(iter(anchor_splits))
-            credit_anchor_kind = "excluded_direct_origin_hash"
+            credit_anchor_kind = "excluded_direct_origin_precommit"
 
         invalid_direct_ids = [
             rid
@@ -1068,6 +1125,9 @@ def build_training_environment(
                     run.get("timestamp")
                     or run.get("date")
                 ),
+                "partition_basis": (
+                    partition_basis_for_run(run)
+                ),
             },
         }
         episode_payload["episode_sha256"] = (
@@ -1130,10 +1190,11 @@ def build_training_environment(
         ),
         "split_policy": {
             "prospective": (
-                "sha256(run_id) mod "
+                "generated runs hash a precommitted execution claim, "
+                "assignment or dispatch id mod "
                 f"{cfg.confirm_modulus}; bucket "
-                f"{cfg.confirm_bucket}=confirm; "
-                "others=train"
+                f"{cfg.confirm_bucket}=confirm; others=train. "
+                "Manual/untrusted run IDs are train-only."
             ),
             "benchmark": "evaluation_only",
             "retrospective_or_non_search": "excluded",
