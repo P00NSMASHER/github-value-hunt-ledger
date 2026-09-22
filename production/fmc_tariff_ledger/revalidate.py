@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import sqlite3
+import urllib.parse
 from pathlib import Path
 
 import crawler
@@ -49,6 +50,7 @@ def revalidate(db_path: Path, artifact_root: Path, dry_run: bool = False) -> dic
         """
         SELECT DISTINCT
           s.id snapshot_id,
+          s.sha256,
           s.blob_relpath,
           s.content_type,
           COALESCE(s.final_url, s.requested_url) source_url,
@@ -63,6 +65,13 @@ def revalidate(db_path: Path, artifact_root: Path, dry_run: bool = False) -> dic
         WHERE EXISTS (SELECT 1 FROM terms t WHERE t.snapshot_id = s.id)
         """
     ).fetchall()
+
+    # Shared publisher landing pages are repeated across many FMC entities. Raw
+    # bytes are already content-addressed, so parse identical evidence once and
+    # run only the entity-specific attribution test per row.
+    text_cache: dict[tuple[str, str, str], str | None] = {}
+    stats["unique_blob_text_parses"] = 0
+    stats["text_cache_hits"] = 0
 
     for row in rows:
         family = publishers.family_for(row["tariff_location"])
@@ -79,16 +88,34 @@ def revalidate(db_path: Path, artifact_root: Path, dry_run: bool = False) -> dic
             stats["missing_blobs"] += 1
             continue
 
-        try:
-            raw = blob.read_bytes()
-            text, _, _, _ = crawler.extract_text_and_links(
-                raw,
-                row["content_type"] or "",
-                row["source_url"],
-            )
-        except Exception:
-            stats["parse_failures"] += 1
-            continue
+        suffix = Path(
+            urllib.parse.urlsplit(row["source_url"] or "").path
+        ).suffix.lower()
+        cache_key = (
+            row["sha256"] or row["blob_relpath"] or "",
+            row["content_type"] or "",
+            suffix,
+        )
+        if cache_key in text_cache:
+            stats["text_cache_hits"] += 1
+            text = text_cache[cache_key]
+            if text is None:
+                stats["parse_failures"] += 1
+                continue
+        else:
+            stats["unique_blob_text_parses"] += 1
+            try:
+                raw = blob.read_bytes()
+                text, _, _, _ = crawler.extract_text_and_links(
+                    raw,
+                    row["content_type"] or "",
+                    row["source_url"],
+                )
+                text_cache[cache_key] = text
+            except Exception:
+                text_cache[cache_key] = None
+                stats["parse_failures"] += 1
+                continue
 
         entity_scoped = (
             not publishers.auth_or_login_page(text, row["source_url"])
