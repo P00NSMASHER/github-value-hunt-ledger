@@ -71,7 +71,7 @@ For claimed work, only append COMPLETE after the canonical run is present and it
 
 `intelligence/LEARNING_MEASUREMENT_PACKETS.md` may freeze a useful strategy + authorized seed pairing before execution. These packets are advisory only: they do not activate work, assign a worker, replace HUNT_PLAN, or authorize a manual run. A packet becomes executable only after the user explicitly resumes hunters and the normal generated assignment/claim path selects that exact bounded work.
 
-Never choose, release, substitute, or retry a packet to influence its learning partition. Packet execution must use the normal generated claim once; only post-ingestion secret-keyed split receipts may determine whether the resulting canonical run becomes train or confirm evidence.
+Never choose, release, substitute, or retry a packet to influence its learning partition. For `learning_measurement`, the generated assignment and CLAIM carry the exact `learning_measurement_packet_id` and `learning_measurement_packet_sha256`. Copy those fields unchanged into the run via `ti_prepare_run.py`; never repair, retype, or substitute them manually. If assignment, dispatch, CLAIM, or packet hash disagree, stop and obtain a fresh generated claim rather than changing telemetry. Packet execution must use the normal generated claim once; only post-ingestion secret-keyed split receipts may determine whether the resulting canonical run becomes train or confirm evidence.
 
 ### Blind learning partition rule
 
