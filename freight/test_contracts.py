@@ -1,3 +1,5 @@
+import pytest
+
 from freight.contracts import (
     AuthorityRef,
     PopulationRow,
