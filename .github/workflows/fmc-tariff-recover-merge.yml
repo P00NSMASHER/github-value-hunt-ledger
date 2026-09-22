@@ -214,6 +214,11 @@ jobs:
             --input-root metadata \
             --output merged/quality_rollup.json \
             > /dev/null
+          python evidence_inventory.py \
+            --input-root metadata \
+            --source-run-id "$SOURCE_RUN_ID" \
+            --output merged/evidence_inventory.json \
+            > /dev/null
           python run.py summary \
             --db merged/fmc_tariff_ledger.sqlite \
             > merged/summary.json
@@ -227,6 +232,7 @@ jobs:
             > /dev/null
           python -m json.tool merged/summary.json
           python -m json.tool merged/quality_rollup.json > /dev/null
+          python -m json.tool merged/evidence_inventory.json > /dev/null
           python -m json.tool merged/publisher_gap_report.json > /dev/null
           python -m json.tool merged/retry_plan.json > /dev/null
           FIRST_MANIFEST=$(find metadata -name fmc_directory_manifest.json -print -quit || true)
