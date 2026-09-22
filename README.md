@@ -254,7 +254,7 @@ The current run template is authoritative for new-record schema and fields. Curr
 
 The staged production layer now includes `production/LEARNING_ENGINE.md` and `production/learning_engine.py`.
 
-Every build can derive `intelligence/LEARNING_STATE.json` from canonical search runs and linked outcomes. It maintains outcome-weighted utility for strategies/query families/search moves while preserving the existing exploration and evidence thresholds. Only priors that clear the current 5 measured runs / 20 deep inspections gate are exposed to hunters through `NETWORK_PRIORS.md`; the learning state never overrides assignment, STOP, verifier, benchmark, safety or promotion rules.
+Every build can derive `intelligence/LEARNING_STATE.json` from canonical search runs and linked outcomes. It maintains outcome-weighted utility for strategies/query families/search moves while preserving the existing exploration and evidence thresholds. Only priors that clear the 5-run / 20-deep train gate and an independent confirm gate are exposed to hunters through `NETWORK_PRIORS.md`; the learning state never overrides assignment, STOP, verifier, benchmark, safety or promotion rules.
 
 Reproducible defects in hunter skills/tools/prompts/workflows can be submitted as immutable packets under `intelligence/learning_failure_spool/`. They must include evidence, reproduction steps and a proposed regression test. Queueing a defect does not authorize an automatic repair or global skill change.
 
