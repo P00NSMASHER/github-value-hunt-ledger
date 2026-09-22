@@ -142,3 +142,54 @@ def test_money_and_units_require_exact_integer_semantics(bad):
     else:
         with pytest.raises(ValueError):
             derive_charge(charge(billed_cents=bad), [rule()])
+
+
+def test_batch_rejects_duplicate_source_evidence_under_different_charge_ids():
+    pop = population()
+    with pytest.raises(ValueError, match="duplicate charge source evidence"):
+        derive_batch(
+            pop,
+            [
+                charge(charge_id="charge-a", source_hash="same-source"),
+                charge(charge_id="charge-b", source_hash="same-source"),
+            ],
+            [rule()],
+        )
+
+
+def test_batch_requires_coverage_for_every_frozen_population_row():
+    pop = freeze_population(
+        "buyer", "unit", "two rows",
+        [
+            PopulationRow("inv-1", "shp-1", "customer", "carrier", "USD", "p1"),
+            PopulationRow("inv-2", "shp-2", "customer", "carrier", "USD", "p2"),
+        ],
+    )
+    with pytest.raises(ValueError, match="does not cover every frozen population row"):
+        derive_batch(pop, [charge()], [rule()])
+
+
+def test_collision_like_invoice_shipment_pair_cannot_match_wrong_population_row():
+    pop = freeze_population(
+        "buyer", "unit", "one row",
+        [PopulationRow("INV|PART", "SHIP", "customer", "carrier", "USD", "p")],
+    )
+    wrong = charge(invoice_id="INV", shipment_id="PART|SHIP")
+    with pytest.raises(ValueError, match="outside frozen population"):
+        derive_batch(pop, [wrong], [rule()])
+
+
+def test_multiple_fixed_fee_lines_fail_closed_when_pricing_scope_is_not_explicit():
+    pop = population()
+    charges = [
+        charge(charge_id="a", billed_cents=8000, source_hash="source-a"),
+        charge(charge_id="b", billed_cents=8000, source_hash="source-b"),
+    ]
+    out = derive_batch(pop, charges, [rule(fixed_cents=10000)])
+    assert out.validated_count == 0
+    assert out.clear_count == 0
+    assert out.review_count == 2
+    assert {item.reason for item in out.derivations} == {
+        "FIXED_SCOPE_AMBIGUOUS_MULTI_LINE"
+    }
+    assert all(item.expected_cents is None for item in out.derivations)
