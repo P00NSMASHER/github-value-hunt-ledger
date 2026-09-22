@@ -124,6 +124,38 @@ class APIngestTests(unittest.TestCase):
             self.assertIs(first.scan.findings[0].state, FindingState.VALIDATED)
             self.assertEqual(first.scan.findings[0].potential_recovery_cents, 10000)
 
+    def test_direct_ingest_can_validate_statement_only_credit(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            payments = root / "Payments.csv"
+            statements = root / "Vendor_Statement.csv"
+            payments.write_text(
+                "Payment_Number,Vendor,Invoice_Number,Amount,Payment_Date\n",
+                encoding="utf-8",
+            )
+            statements.write_text(
+                "Vendor,Invoice_Number,Balance,Statement_Date\n"
+                "Vendor A,INV-9,(250.00),2026-08-31\n",
+                encoding="utf-8",
+            )
+
+            result = ingest_ap_exports(
+                client_id="client-1",
+                payments_path=payments,
+                statements_path=statements,
+                verified_statements=True,
+            )
+
+            self.assertEqual(result.payment_count, 0)
+            self.assertEqual(result.statement_count, 1)
+            self.assertEqual(result.audit.exceptions, ())
+            self.assertEqual(len(result.scan.manifest.sources), 2)
+            self.assertEqual(len(result.scan.findings), 1)
+            finding = result.scan.findings[0]
+            self.assertIs(finding.state, FindingState.VALIDATED)
+            self.assertEqual(finding.reason, "VENDOR_STATEMENT_CREDIT")
+            self.assertEqual(finding.potential_recovery_cents, 25000)
+
 
 if __name__ == "__main__":
     unittest.main()
