@@ -140,6 +140,8 @@ class RecoveryWorksTests(unittest.TestCase):
             sources=(
                 SourceManifestEntry("s1", Branch.FREIGHT, "h1", "file://freight.csv", "invoice_export"),
                 SourceManifestEntry("s2", Branch.AP, "h2", "file://payments.csv", "payment_export"),
+                SourceManifestEntry("s3", Branch.AP, "rulehash", "source://contract#7.4", "controlling_rule"),
+                SourceManifestEntry("s4", Branch.AP, "abc123", "source://doc#p1", "evidence"),
             ),
         )
         observation = RecoveryObservation(
