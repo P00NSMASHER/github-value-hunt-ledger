@@ -177,7 +177,9 @@ class PrepareRunTests(unittest.TestCase):
         self.claim["assignment_slot_role"] = "measurement"
         self.claim["assignment_work_kind"] = "learning_measurement"
         self.claim["assignment_source_id"] = "SEED:learn:fixture-inspection"
-        self.claim["work_item_id"] = "WORK:seed:learnfixture"
+        self.claim["work_item_id"] = "WORK:learn:abc123def456"
+        self.claim["learning_measurement_packet_id"] = "LMP:0123456789abcdef"
+        self.claim["learning_measurement_packet_sha256"] = "a" * 64
         self.save_claim()
         self.assignment(
             slot_role="measurement",
@@ -185,6 +187,8 @@ class PrepareRunTests(unittest.TestCase):
             source_id=self.claim["assignment_source_id"],
             work_item_id=self.claim["work_item_id"],
             work_action="search",
+            learning_measurement_packet_id=self.claim["learning_measurement_packet_id"],
+            learning_measurement_packet_sha256=self.claim["learning_measurement_packet_sha256"],
         )
         run = self.bound(strategy=None, objective=None)
         self.assertEqual(run["work_action"], "search")
@@ -204,6 +208,29 @@ class PrepareRunTests(unittest.TestCase):
             run["execution_claim_id"],
             self.claim["claim_id"],
         )
+        self.assertEqual(
+            run["learning_measurement_packet_id"],
+            self.claim["learning_measurement_packet_id"],
+        )
+        self.assertEqual(
+            run["learning_measurement_packet_sha256"],
+            self.claim["learning_measurement_packet_sha256"],
+        )
+
+        self.assignment(
+            slot_role="measurement",
+            work_kind="learning_measurement",
+            source_id=self.claim["assignment_source_id"],
+            work_item_id=self.claim["work_item_id"],
+            work_action="search",
+            learning_measurement_packet_id=self.claim["learning_measurement_packet_id"],
+            learning_measurement_packet_sha256="b" * 64,
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "learning_measurement_packet_sha256",
+        ):
+            self.bound(strategy=None, objective=None)
 
         self.claim["assignment_work_kind"] = "strategy_measurement"
         self.save_claim()
