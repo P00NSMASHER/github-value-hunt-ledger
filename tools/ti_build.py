@@ -51,6 +51,8 @@ STEPS = (
     ['tools/ti_coverage_validate.py'],
     ['tools/ti_seed_compiler.py'],
     ['tools/ti_seed_validate.py'],
+    ['tools/ti_learning_measurement_packets.py'],
+    ['tools/ti_learning_measurement_packets_validate.py'],
     ['tools/ti_adjacency.py'],
     ['tools/ti_adjacency_validate.py'],
     ['tools/ti_measurement_plan.py'],
