@@ -90,6 +90,26 @@ CREATE TABLE IF NOT EXISTS carrier_identity_map (
   UNIQUE(carrier_raw_pattern, carrier_normalized)
 );
 
+
+CREATE TABLE IF NOT EXISTS shaq_source_classification (
+  id INTEGER PRIMARY KEY,
+  source_pattern TEXT NOT NULL UNIQUE,
+  rate_kind TEXT NOT NULL,
+  classification_method TEXT NOT NULL,
+  reviewed INTEGER NOT NULL DEFAULT 0,
+  evidence TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS dataset_authorizations (
+  id INTEGER PRIMARY KEY,
+  dataset_key TEXT NOT NULL UNIQUE,
+  authorization_scope TEXT NOT NULL,
+  asserted_by TEXT NOT NULL,
+  asserted_at TEXT NOT NULL,
+  evidence_note TEXT NOT NULL
+);
+
 CREATE VIEW IF NOT EXISTS shaq_rate_authority_view AS
 SELECT
   r.*,
