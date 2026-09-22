@@ -28,6 +28,7 @@ import re
 import sqlite3
 import tempfile
 import urllib.parse
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -778,6 +779,116 @@ def month_start(offset: int = 0) -> tuple[int, int, str, str]:
     return y, m, iso, compact
 
 
+
+def xml_local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def xml_child_text(element: ET.Element, name: str) -> str:
+    for child in list(element):
+        if xml_local_name(child.tag) == name:
+            return str(child.text or "").strip()
+    return ""
+
+
+def discover_xml_object_listing(
+    conn: sqlite3.Connection, root: Path, source: Source, *, timeout: int, max_bytes: int
+) -> dict[str, int]:
+    """Catalog public Azure Blob or S3 XML listings."""
+    source_id = persist_source(conn, source)
+    try:
+        cfg = json.loads(source.notes or "{}")
+    except json.JSONDecodeError:
+        cfg = {}
+    kind = str(cfg.get("kind") or "azure").lower()
+    listing_urls = cfg.get("listing_urls") or [source.source_url]
+    public_base_url = str(cfg.get("public_base_url") or "").rstrip("/")
+    include_prefixes = tuple(str(x) for x in (cfg.get("include_prefixes") or []) if str(x))
+    exclude_prefixes = tuple(str(x) for x in (cfg.get("exclude_prefixes") or []) if str(x))
+    skip_toc = bool(cfg.get("skip_toc_targets"))
+    max_targets = int(cfg.get("max_targets") or 5000)
+    inserted = snapshots = 0
+
+    for listing_url in listing_urls:
+        raw, resp = fetch_bytes(str(listing_url), timeout=timeout, max_bytes=max_bytes)
+        snap_id, digest = snapshot_bytes(
+            conn, root, source, source_id, str(listing_url), raw,
+            final_url=resp.url, http_status=resp.status_code,
+            content_type=resp.headers.get("content-type"),
+            etag=resp.headers.get("etag"), last_modified=resp.headers.get("last-modified"),
+            parser_status=f"parsed:{kind}_xml_listing",
+        )
+        snapshots += 1
+        xml_root = ET.fromstring(raw.decode("utf-8", errors="replace").lstrip("\ufeff"))
+        container_url = str(xml_root.attrib.get("ContainerName") or "").strip()
+        targets: list[tuple[str,str,int|None,str|None,str|None,str|None]] = []
+
+        if kind == "azure":
+            for element in xml_root.iter():
+                if xml_local_name(element.tag) != "Blob":
+                    continue
+                name = xml_child_text(element, "Name")
+                url = xml_child_text(element, "Url")
+                if not url and container_url and name:
+                    url = urllib.parse.urljoin(container_url.rstrip("/") + "/", name.lstrip("/"))
+                if not url or not name:
+                    continue
+                size_text = ""
+                etag = last_modified = content_type = None
+                for child in list(element):
+                    if xml_local_name(child.tag) == "Properties":
+                        size_text = xml_child_text(child, "Content-Length")
+                        etag = xml_child_text(child, "Etag") or None
+                        last_modified = xml_child_text(child, "Last-Modified") or None
+                        content_type = xml_child_text(child, "Content-Type") or None
+                size = int(size_text) if size_text.isdigit() else None
+                targets.append((name, url, size, etag, last_modified, content_type))
+        else:
+            for element in xml_root.iter():
+                if xml_local_name(element.tag) != "Contents":
+                    continue
+                key = xml_child_text(element, "Key")
+                if (
+                    not key or key.endswith("/")
+                    or (include_prefixes and not key.startswith(include_prefixes))
+                    or (exclude_prefixes and key.startswith(exclude_prefixes))
+                ):
+                    continue
+                base = public_base_url or str(listing_url).split("?", 1)[0].rstrip("/")
+                url = f"{base}/{urllib.parse.quote(key, safe='/')}"
+                size_text = xml_child_text(element, "Size")
+                size = int(size_text) if size_text.isdigit() else None
+                etag = (xml_child_text(element, "ETag") or "").strip('"') or None
+                last_modified = xml_child_text(element, "LastModified") or None
+                targets.append((key, url, size, etag, last_modified, None))
+
+        seen: set[str] = set()
+        for name, url, size, etag, last_modified, _content_type in targets:
+            url = canonical_url(url)
+            if url in seen:
+                continue
+            seen.add(url)
+            ftype = classify_file(url, name)
+            if ftype == "unknown" or (skip_toc and ftype == "index"):
+                continue
+            insert_mrf_file(
+                conn, source, url, ftype,
+                snapshot_id=snap_id, manifest_sha=digest,
+                content_length=size, etag=etag, last_modified=last_modified,
+                filename=Path(urllib.parse.urlsplit(url).path).name or name,
+                parse_status=(
+                    "object_listing_index" if ftype == "index"
+                    else "object_listing_file"
+                ),
+            )
+            inserted += 1
+            if inserted >= max_targets:
+                break
+        if inserted >= max_targets:
+            break
+    return {"files": inserted, "snapshots": snapshots}
+
+
 def discover_monthly_toc_templates(
     conn: sqlite3.Connection, root: Path, source: Source, *, timeout: int, max_bytes: int
 ) -> dict[str, int]:
@@ -1068,6 +1179,7 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
         "aetna_metadata": discover_aetna_metadata,
         "humana_api": discover_humana,
         "monthly_toc_templates": discover_monthly_toc_templates,
+        "xml_object_listing": discover_xml_object_listing,
         "html_index_links": discover_html_indexes,
     }
 
@@ -1101,7 +1213,8 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
                  CASE
                    WHEN parse_status='monthly_template_candidate' THEN 0
                    WHEN parse_status='curated_master_list_direct_file' THEN 1
-                   ELSE 2
+                   WHEN parse_status='object_listing_index' THEN 2
+                   ELSE 3
                  END,
                  id"""
         ).fetchall()
