@@ -26,8 +26,10 @@ from recoveryworks import (
     RuleRef,
     SourceAttestation,
     authorize_case_action,
+    bind_seven_figure_dossier_consent,
     build_hostile_examination_packet,
     build_seven_figure_authorization_dossier,
+    build_seven_figure_authorization_seal,
     build_seven_figure_readiness,
     create_build_provenance_attestation,
     create_proof_seal,
@@ -36,11 +38,13 @@ from recoveryworks import (
     freeze_case_proof,
     freeze_source_retention,
     prepare_external_action,
+    record_build_provider_verification,
     record_external_signature_verification,
     record_external_timestamp_verification,
     record_object_lock_verification,
     replay_case_calculation,
     replay_case_source_artifacts,
+    seven_figure_consent_payload_hash,
     verify_external_action,
     verify_proof_seal,
 )
@@ -77,6 +81,7 @@ def _build_readiness(
     calculation,
     ledger,
     challenge_manifest_hash: str,
+    authorization,
 ):
     authority_bytes = payload["authority_source"]["content"].encode("utf-8")
     evidence_bytes = {
@@ -310,7 +315,66 @@ def _build_readiness(
         assembled_at="2026-09-22T16:24:55Z",
         assembled_by="sim-readiness-dossier-controller",
     )
-    return readiness, dossier
+    build_provider_receipt = record_build_provider_verification(
+        build,
+        provider="SIM-GITHUB-ACTIONS",
+        workflow_run_id=build.workflow_run_id,
+        code_commit_sha=build.code_commit_sha,
+        source_tree_hash=build.source_tree_hash,
+        build_artifact_hash=build.build_artifact_hash,
+        tests_passed=True,
+        checked_at="2026-09-22T16:25:02Z",
+        provider_request_id="SIM-CI-PROVIDER-VERIFY-1",
+        provider_response_hash=_sha("SIMULATED CI PROVIDER VERIFY RESPONSE"),
+        verified_by_adapter="sim-ci-provider-adapter",
+        provider_verified=True,
+        metadata={"simulation_only": True},
+    )
+    consented_at = "2026-09-22T16:25:05Z"
+    consent_note = "SIMULATION ONLY. Client approves this exact final dossier."
+    consent_payload_hash = seven_figure_consent_payload_hash(
+        authorization,
+        bundle,
+        dossier,
+        consented_at=consented_at,
+        note=consent_note,
+    )
+    client_signature = record_external_signature_verification(
+        signature_id="SIM-CLIENT-DOSSIER-SIGNATURE",
+        payload_kind="recoveryworks_seven_figure_dossier_consent_v1",
+        payload_hash=consent_payload_hash,
+        provider="SIM-CLIENT-ESIGN",
+        key_id="sim-client-cfo-key",
+        algorithm="ECDSA_SHA256",
+        public_key_fingerprint=_sha("SIMULATED CLIENT PUBLIC KEY"),
+        signature_hash=_sha("SIMULATED CLIENT DOSSIER SIGNATURE"),
+        provider_request_id="SIM-CLIENT-SIGN-VERIFY-1",
+        verification_receipt_hash=_sha("SIMULATED CLIENT SIGNATURE VERIFY RESPONSE"),
+        signed_at="2026-09-22T16:25:10Z",
+        verified_at="2026-09-22T16:25:15Z",
+        verified_by_adapter="sim-client-esign-adapter",
+        provider_verified=True,
+        metadata={"simulation_only": True},
+    )
+    client_consent = bind_seven_figure_dossier_consent(
+        authorization,
+        bundle,
+        dossier,
+        client_signature,
+        consented_at=consented_at,
+        note=consent_note,
+    )
+    authorization_seal = build_seven_figure_authorization_seal(
+        authorization,
+        bundle,
+        dossier,
+        build_provider_receipt,
+        client_consent,
+        journal_head_hash=ledger.journal.head_hash,
+        sealed_at="2026-09-22T16:25:20Z",
+        sealed_by="sim-final-authorization-controller",
+    )
+    return readiness, dossier, authorization_seal
 
 
 def _build(payload: dict):
@@ -510,12 +574,13 @@ def _build(payload: dict):
         reviews[1].reviewer_id,
         reviews[1].note,
     )
-    readiness, dossier = _build_readiness(
+    readiness, dossier, authorization_seal = _build_readiness(
         payload,
         bundle,
         calculation,
         ledger,
         challenge_manifest_hash,
+        authorization,
     )
     ledger.authorize_with_case(
         finding.finding_id,
@@ -523,6 +588,7 @@ def _build(payload: dict):
         authorization,
         readiness,
         dossier,
+        authorization_seal,
     )
     ledger.mark_claimed(finding.finding_id, envelope)
 
@@ -563,6 +629,7 @@ def _build(payload: dict):
         "seal": seal,
         "readiness": readiness,
         "dossier": dossier,
+        "authorization_seal": authorization_seal,
     }
 
 
