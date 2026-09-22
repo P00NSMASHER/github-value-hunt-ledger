@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS reversal_edges (
 CREATE INDEX IF NOT EXISTS idx_claim_match ON recovery_claims(buyer_id,business_unit,reference,payer_id,payee_id,currency,issued_at);
 CREATE INDEX IF NOT EXISTS idx_alloc_claim ON allocations(buyer_id,business_unit,claim_id);
 CREATE INDEX IF NOT EXISTS idx_alloc_event ON allocations(buyer_id,business_unit,event_id);
+CREATE INDEX IF NOT EXISTS idx_counter_event ON counter_events(buyer_id,business_unit,original_event_id);
 CREATE INDEX IF NOT EXISTS idx_reverse_alloc ON reversal_edges(buyer_id,business_unit,allocation_id);
 
 CREATE TRIGGER IF NOT EXISTS immutable_claim_u BEFORE UPDATE ON recovery_claims BEGIN SELECT RAISE(ABORT,'recovery claim is immutable'); END;
@@ -149,6 +150,17 @@ CREATE TRIGGER IF NOT EXISTS counter_currency_match BEFORE INSERT ON counter_eve
       WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.original_event_id)
   THEN RAISE(ABORT,'counter currency mismatch with original settlement event') END;
 END;
+CREATE TRIGGER IF NOT EXISTS counter_event_capacity BEFORE INSERT ON counter_events BEGIN
+  SELECT CASE WHEN
+    (SELECT COALESCE(SUM(amount_cents),0) FROM counter_events
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+        AND original_event_id=NEW.original_event_id)
+    + NEW.amount_cents
+    > (SELECT amount_cents FROM settlement_events
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+        AND event_id=NEW.original_event_id)
+  THEN RAISE(ABORT,'counter events exceed original settlement amount') END;
+END;
 CREATE TRIGGER IF NOT EXISTS allocation_claim_event_chronology BEFORE INSERT ON allocations BEGIN
   SELECT CASE WHEN julianday(
     (SELECT booked_at FROM settlement_events
@@ -162,8 +174,28 @@ END;
 
 CREATE TRIGGER IF NOT EXISTS allocation_event_capacity BEFORE INSERT ON allocations BEGIN
   SELECT CASE WHEN
-    (SELECT COALESCE(SUM(amount_cents),0) FROM allocations WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id)+NEW.amount_cents
-    > (SELECT amount_cents FROM settlement_events WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id)
+    (
+      (SELECT COALESCE(SUM(amount_cents),0) FROM allocations
+        WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+          AND event_id=NEW.event_id)
+      - (SELECT COALESCE(SUM(r.amount_cents),0) FROM reversal_edges r
+          JOIN allocations a
+            ON a.buyer_id=r.buyer_id
+           AND a.business_unit=r.business_unit
+           AND a.allocation_id=r.allocation_id
+          WHERE a.buyer_id=NEW.buyer_id AND a.business_unit=NEW.business_unit
+            AND a.event_id=NEW.event_id)
+      + NEW.amount_cents
+    )
+    >
+    (
+      (SELECT amount_cents FROM settlement_events
+        WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+          AND event_id=NEW.event_id)
+      - (SELECT COALESCE(SUM(amount_cents),0) FROM counter_events
+          WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+            AND original_event_id=NEW.event_id)
+    )
   THEN RAISE(ABORT,'settlement event capacity exceeded') END;
 END;
 CREATE TRIGGER IF NOT EXISTS allocation_claim_capacity BEFORE INSERT ON allocations BEGIN
