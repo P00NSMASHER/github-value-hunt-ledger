@@ -56,6 +56,7 @@ STEPS = (
     ['tools/ti_measurement_plan.py'],
     ['tools/ti_measurement_plan_validate.py'],
     ['tools/ti_measurement_campaign.py'],
+    ['tools/ti_measurement_campaign_validate.py'],
     ['tools/ti_surface.py'],
     ['tools/ti_allocator_learning.py'],
     ['tools/ti_allocator_learning_validate.py'],
