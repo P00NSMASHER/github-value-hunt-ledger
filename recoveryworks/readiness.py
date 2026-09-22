@@ -166,8 +166,6 @@ def record_external_signature_verification(
     """Record the result of a provider-specific asymmetric signature verification."""
     if algorithm not in ASYMMETRIC_SIGNATURE_ALGORITHMS:
         raise ValueError("external signature must use an approved asymmetric algorithm")
-    if standard not in TRUSTED_TIMESTAMP_STANDARDS:
-        raise ValueError("external timestamp standard is not approved")
     if provider_verified:
         _required("verification_receipt_hash", verification_receipt_hash)
         _required("provider_request_id", provider_request_id)
