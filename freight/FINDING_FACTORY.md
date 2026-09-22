@@ -32,6 +32,8 @@ This means changing the invoice-line source hash, rule parameters, effective dat
 
 Invoice/shipment membership is matched as a structured two-field identity, not by concatenating the two values with a delimiter. The legacy `invoice|shipment` string remains display-only. This prevents distinct identifier pairs containing `|` from colliding and attaching a charge or finding to the wrong frozen population row.
 
+Within one derivation batch, a normalized charge source hash is one-use evidence. Reusing the exact same source proof under a second internal `charge_id` fails closed instead of increasing discrepancy dollars. Different source hashes remain distinct charge lines; the engine does not merge merely similar charges.
+
 The frozen truth schema also permits **zero findings**, so a clean audit can be represented honestly instead of forcing a discrepancy object.
 
 ## What it does not do
