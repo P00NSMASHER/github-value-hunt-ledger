@@ -11,6 +11,12 @@ cand=load_jsonl("hunt_candidates.jsonl")
 alloc=load_jsonl("hunt_allocations.jsonl")
 metrics=json.loads((INTEL/"allocator_metrics.json").read_text(encoding="utf-8"))
 runs=load_jsonl("search_runs.jsonl")
+measurement_bundle=json.loads((INTEL/"learning_measurement_packets.json").read_text(encoding="utf-8")) if (INTEL/"learning_measurement_packets.json").exists() else {"packets":[]}
+measurement_by_seed={
+    (row.get("seed") or {}).get("seed_id"): row
+    for row in measurement_bundle.get("packets") or []
+    if (row.get("seed") or {}).get("seed_id")
+}
 
 cids=set()
 for n,c in enumerate(cand,1):
@@ -29,6 +35,19 @@ for n,c in enumerate(cand,1):
         elif packet.get("verification_mode")!="experiment_falsification" or not packet.get("independence_requirements") or not packet.get("next_action"):
             raise SystemExit(f"hunt_candidates.jsonl:{n}: verifier lacks frozen target/independence requirements")
     if c.get("work_action")=="await_external": raise SystemExit(f"hunt_candidates.jsonl:{n}: external dependency assigned autonomously")
+    if c.get("work_kind")=="learning_measurement":
+        packet=measurement_by_seed.get(c.get("source_id"))
+        if not packet:
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: learning measurement missing current precommit packet")
+        if c.get("learning_measurement_packet_id")!=packet.get("packet_id"):
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: learning packet id drift")
+        if c.get("learning_measurement_packet_sha256")!=packet.get("packet_sha256"):
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: learning packet sha drift")
+        expected_work="WORK:learn:"+__import__("hashlib").sha256(
+            (packet["packet_id"]+"|"+packet["packet_sha256"]).encode()
+        ).hexdigest()[:12]
+        if c.get("work_item_id")!=expected_work:
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: learning work identity is not packet-bound")
     if not isinstance(c.get("final_score"),(int,float)): raise SystemExit(f"hunt_candidates.jsonl:{n}: score missing")
 
 slots={x["slot_id"]:x for x in cfg.get("slots",[])}
@@ -43,6 +62,12 @@ for n,a in enumerate(alloc,1):
     candidate=next((c for c in cand if c["work_item_id"]==a.get("work_item_id")),None)
     if candidate and (a.get("work_action")!=candidate.get("work_action") or a.get("instructions")!=candidate.get("instructions")):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
+    if a.get("work_kind")=="learning_measurement":
+        if not candidate:
+            raise SystemExit(f"hunt_allocations.jsonl:{n}: learning assignment missing candidate")
+        for key in ("learning_measurement_packet_id","learning_measurement_packet_sha256"):
+            if not a.get(key) or a.get(key)!=candidate.get(key):
+                raise SystemExit(f"hunt_allocations.jsonl:{n}: learning packet assignment drift: {key}")
     sid=a.get("slot_id")
     if sid not in slots or sid in seen_slots: raise SystemExit(f"hunt_allocations.jsonl:{n}: invalid/duplicate slot {sid}")
     seen_slots.add(sid)
