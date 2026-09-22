@@ -34,6 +34,10 @@ traction.
 | InsuranceRecovery | underpayment | Operational ingestion | claim line + reviewed policy/coverage assessment + insurer settlement evidence |
 | CloudRecovery | overpayment | Operational ingestion | provider invoice + effective contract rate + independent metering evidence |
 | MerchantFeeRecovery | overpayment | Operational ingestion | reviewed processor-controlled fee statement + merchant agreement + independent transaction summary |
+| ParcelRecovery | overpayment | Operational ingestion | parcel invoice line + reviewed expected-rate assessment + rate snapshot |
+| ProcurementRecovery | overpayment | Operational ingestion | supplier invoice + PO/contract unit price + independent approved billable quantity |
+| Warranty/CreditRecovery | underpayment | Operational ingestion | reviewed supplier/warranty credit entitlement + credit memo/refund settlement evidence |
+| Payroll/BenefitBillingRecovery | overpayment | Operational ingestion | employer vendor/carrier invoice + effective contract rate + deidentified billable-unit evidence |
 
 ## Shared commercial motion
 
@@ -68,13 +72,17 @@ A manufacturer/distributor can plausibly supply inputs for:
 - InsuranceRecovery when commercial/property claim and settlement records exist
 - CloudRecovery when provider invoice/rate/meter exports exist
 - MerchantFeeRecovery when reviewed processor-fee scope and transaction summaries exist
+- ParcelRecovery when parcel invoice and reviewed expected-rate records exist
+- ProcurementRecovery when PO/contract and approved-quantity records exist
+- Warranty/CreditRecovery when approved supplier credit and settlement records exist
+- Payroll/BenefitBillingRecovery when employer-side rates and deidentified billing units exist
 
 A healthcare provider can plausibly add PayerRecovery to the same shared
 portfolio.
 
 ## Portfolio state
 
-All 14 registered RecoveryWorks divisions now have operational Scan 360
+All 18 registered RecoveryWorks divisions now have operational Scan 360
 ingestion paths with the same durable evidence/lifecycle model.
 
 ConstructionRecovery completes the previously missing lane with:
