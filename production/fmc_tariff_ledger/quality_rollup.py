@@ -16,11 +16,29 @@ def load_json(path: Path) -> dict[str, Any] | None:
         return None
 
 
+SUMMARY_ADD_KEYS = {
+    "snapshots",
+    "observations",
+    "terms",
+    "errors",
+    "term_effective_dated_terms",
+    "effective_dated_terms",
+    "source_versioned_terms",
+}
+
+
 def add_numeric(dst: dict[str, float], src: dict[str, Any]) -> None:
     for key, value in src.items():
-        if isinstance(value, bool):
+        if isinstance(value, bool) or key.endswith("_pct"):
             continue
         if isinstance(value, (int, float)):
+            dst[key] = dst.get(key, 0) + value
+
+
+def add_summary_numeric(dst: dict[str, float], src: dict[str, Any]) -> None:
+    for key in SUMMARY_ADD_KEYS:
+        value = src.get(key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
             dst[key] = dst.get(key, 0) + value
 
 
@@ -49,8 +67,8 @@ def build_rollup(root: Path) -> dict[str, Any]:
         reparsed = load_json(shard_dir / "reparse.json") or {}
         retried = load_json(shard_dir / "retry_transient.json") or {}
 
-        add_numeric(pre_summary, before)
-        add_numeric(post_summary, after)
+        add_summary_numeric(pre_summary, before)
+        add_summary_numeric(post_summary, after)
         add_numeric(revalidation, validation)
         add_numeric(reparse, reparsed)
         add_numeric(retry, retried)
@@ -85,10 +103,18 @@ def build_rollup(root: Path) -> dict[str, Any]:
         "before": {
             **pre_summary,
             "effective_date_coverage_pct": pct(before_dated, before_terms),
+            "source_version_coverage_pct": pct(
+                pre_summary.get("source_versioned_terms", 0),
+                before_terms,
+            ),
         },
         "after": {
             **post_summary,
             "effective_date_coverage_pct": pct(after_dated, after_terms),
+            "source_version_coverage_pct": pct(
+                post_summary.get("source_versioned_terms", 0),
+                after_terms,
+            ),
         },
         "delta": {
             "terms": after_terms - before_terms,
@@ -121,6 +147,7 @@ def build_rollup(root: Path) -> dict[str, Any]:
             "effective_dates_are_source_extracted_not_observation_inferred": True,
             "observation_time_is_tracked_separately": True,
             "retry_is_bounded_to_transient_failure_classes": True,
+            "entity_location_and_distinct_rule_counts_use_final_merged_summary": True,
         },
     }
 
