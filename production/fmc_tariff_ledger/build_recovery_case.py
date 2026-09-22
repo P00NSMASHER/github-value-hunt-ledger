@@ -336,6 +336,8 @@ def assemble_case(
 
     consolidated = consolidate_candidates(base, pass_results, dd_results)
     blockers = list(envelope.get("blockers", []))
+    if consolidated.get("status") == "OVERLAP_SCOPE_INCOMPLETE":
+        blockers.append("CANDIDATE_OVERLAP_SCOPE_INCOMPLETE")
     if any(
         result["status"].startswith(("AMBIGUOUS_", "UNDATED_", "NO_EFFECTIVE_"))
         for result in pass_results
