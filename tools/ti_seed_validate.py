@@ -10,6 +10,13 @@ obj=json.loads((INTEL/"search_objectives.json").read_text(encoding="utf-8"))
 objs={x["search_objective_id"] for x in obj.get("objectives",[])}
 runs=load_jsonl("search_runs.jsonl")
 coverage_gap_ids_active={x["coverage_gap_id"] for x in load_jsonl("exploration_gap_queue.jsonl")} if (INTEL/"exploration_gap_queue.jsonl").exists() else set()
+learning_curriculum=json.loads((INTEL/"learning_curriculum.json").read_text(encoding="utf-8")) if (INTEL/"learning_curriculum.json").exists() else {}
+learning_recommendations={
+    row.get("strategy_id"): row
+    for row in learning_curriculum.get("recommended_measurements") or []
+    if isinstance(row,dict)
+    and isinstance(row.get("strategy_id"),str)
+}
 seen=set()
 for n,s in enumerate(seeds,1):
     sid=s.get("seed_id")
@@ -18,7 +25,7 @@ for n,s in enumerate(seeds,1):
     if sid in seen:
         raise SystemExit(f"search_seeds.jsonl:{n}: duplicate seed_id {sid}")
     seen.add(sid)
-    if s.get("seed_type") not in {"capability_gap","positive_dna_transfer","strategy_measurement","learning_measurement","coverage_gap"}:
+    if s.get("seed_type") not in {"capability_gap","positive_dna_transfer","learning_measurement","coverage_gap"}:
         raise SystemExit(f"search_seeds.jsonl:{n}: invalid seed_type")
     p=s.get("priority")
     if not isinstance(p,(int,float)) or not (0<=p<=100):
@@ -38,12 +45,22 @@ for n,s in enumerate(seeds,1):
         for cid in s.get("capability_ids") or []:
             if s["work_action"]!=capability_recipe(cid)["work_action"]:
                 raise SystemExit(f"search_seeds.jsonl:{n}: action differs from reviewed capability recipe")
-    if s.get("seed_type") in {"coverage_gap","strategy_measurement","learning_measurement"} and "work_action" in s:
+    if s.get("seed_type") in {"coverage_gap","learning_measurement"} and "work_action" in s:
         parent=next((x for x in seeds if x["seed_id"]==s.get("parent_seed_id")),None)
         if not parent or parent.get("work_action")!="search" or s["work_action"]!="search":
             raise SystemExit(f"search_seeds.jsonl:{n}: derived discovery must inherit an authorized search parent")
         if not set(parent.get("stop_conditions",[])).issubset(s.get("stop_conditions",[])):
             raise SystemExit(f"search_seeds.jsonl:{n}: derived seed dropped parent STOP gates")
+    if s.get("seed_type")=="learning_measurement":
+        rec=learning_recommendations.get(s.get("strategy_id"))
+        if not rec:
+            raise SystemExit(f"search_seeds.jsonl:{n}: learning measurement is not a current curriculum recommendation")
+        if s.get("learning_phase")!=rec.get("phase"):
+            raise SystemExit(f"search_seeds.jsonl:{n}: learning phase drifted from curriculum")
+        if s.get("authorization_basis")!="adaptive_learning_curriculum":
+            raise SystemExit(f"search_seeds.jsonl:{n}: learning measurement authorization basis drifted")
+        if s.get("learning_curriculum_rank")!=rec.get("rank"):
+            raise SystemExit(f"search_seeds.jsonl:{n}: learning curriculum rank drifted")
     if s.get("seed_type")=="coverage_gap":
         gids=s.get("coverage_gap_ids") or []
         if not gids: raise SystemExit(f"search_seeds.jsonl:{n}: coverage_gap seed missing coverage_gap_ids")
