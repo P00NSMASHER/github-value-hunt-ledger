@@ -32,8 +32,25 @@ constraints = policy.get("domain_constraints") or []
 move_rows = moves.get("by_move_type") or []
 learning_rows = ((learning.get("memory") or {}).get("records") or [])
 learning_alerts = learning.get("learning_alerts") or []
-value_priors = sorted(
-    (row for row in learning_rows if row.get("eligible_for_policy_consideration")),
+eligible_value_rows = [
+    row
+    for row in learning_rows
+    if row.get("eligible_for_policy_consideration")
+]
+global_value_priors = sorted(
+    (
+        row
+        for row in eligible_value_rows
+        if not str(row.get("key") or "").startswith("CTX:")
+    ),
+    key=lambda row: (-(row.get("q_value") or 0), row.get("key") or ""),
+)
+contextual_value_priors = sorted(
+    (
+        row
+        for row in eligible_value_rows
+        if str(row.get("key") or "").startswith("CTX:")
+    ),
     key=lambda row: (-(row.get("q_value") or 0), row.get("key") or ""),
 )
 reason_rows = sorted(
@@ -120,13 +137,15 @@ lines.append(
 lines.append("- Coordination-derived routing remains observe-first until downstream benefit is measured without worsening recall.")
 
 lines += ["", "## Outcome-weighted experience priors", ""]
-if value_priors:
-    for row in value_priors[:6]:
+if global_value_priors:
+    for row in global_value_priors[:6]:
         support = row.get("support") or {}
+        confirm = row.get("confirm_support") or {}
         lines.append(
-            f"- **{row.get('key')}**: Q={row.get('q_value', 0):+.3f}; "
-            f"{support.get('measured_runs', 0)} measured runs / "
-            f"{support.get('deep_inspections', 0)} deep inspections. "
+            f"- **{row.get('key')}**: train Q={row.get('q_value', 0):+.3f}; "
+            f"confirm mean={confirm.get('mean_reward', 0):+.3f}; "
+            f"{support.get('measured_runs', 0)} train runs / "
+            f"{support.get('deep_inspections', 0)} train inspections. "
             "Use as a retrieval prior only; assignment/STOP/verifier rules still outrank it."
         )
 else:
@@ -135,6 +154,20 @@ else:
         "and the independent 2-run / 6-deep confirm gate yet. The learning engine is recording "
         "outcomes but must not steer search from insufficient or unconfirmed evidence."
     )
+if contextual_value_priors:
+    lines += ["", "### Objective-conditioned priors", ""]
+    for row in contextual_value_priors[:8]:
+        key = str(row.get("key") or "")
+        scoped = key[4:].split("::", 1)
+        scope = scoped[0] if len(scoped) == 2 else "unknown"
+        base = scoped[1] if len(scoped) == 2 else key
+        confirm = row.get("confirm_support") or {}
+        lines.append(
+            f"- **{scope} → {base}**: train Q={row.get('q_value', 0):+.3f}; "
+            f"confirm mean={confirm.get('mean_reward', 0):+.3f}. "
+            "Prefer this scoped prior over the global prior only when the live assignment matches the same objective."
+        )
+
 overfit_alerts = [
     alert
     for alert in learning_alerts
