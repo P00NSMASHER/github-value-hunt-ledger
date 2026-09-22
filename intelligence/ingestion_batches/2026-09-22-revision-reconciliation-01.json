@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:revision-reconciliation-01",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "resolved_revision_debt": [
+    {
+      "repository": "OCA/bank-statement-import",
+      "prior_prefix": "01be32ea",
+      "resolved_revision": "01be32ea73e485e9b2495ea80fcce934badedeea",
+      "status": "watch",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "CAMT/Ponto identity/cursor input; cursor continuity is not source completeness."
+    },
+    {
+      "repository": "sebastienrousseau/bankstatementparser",
+      "prior_prefix": "b3309b78",
+      "resolved_revision": "b3309b78f0bd8da872a09ec2b586a694379d5d83",
+      "status": "negative_oracle",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Unsafe substring/fuzzy/first-match settlement semantics."
+    },
+    {
+      "repository": "garretlking1-commits/jobwalk",
+      "prior_prefix": "fdcb507",
+      "resolved_revision": "fdcb507d196eef5d1d2bb8f7db9a18cd30c4f2fe",
+      "status": "retained_dataset_fixture",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-028",
+        "CAP-029",
+        "CAP-030",
+        "CAP-031"
+      ],
+      "role": "Rights-clean synthetic construction evidence archive for change/payment/waiver regression."
+    }
+  ],
+  "newly_ingested_capturebrief_sources": [
+    {
+      "repository": "GSA/srt-fbo-scraper",
+      "revision": "fbdfa86a2bce4323a5afacda04f083698cab02e1",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "role": "First-party opportunity paging, attachment acquisition, malformed-link handling, text extraction and solicitation/history state."
+    },
+    {
+      "repository": "GSA/open-gsa-redesign",
+      "revision": "494b1312e9c6436474840befe6e1964da15932b3",
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-011",
+        "CAP-019"
+      ],
+      "role": "Official SAM contract-opportunity version/history semantics; filename != resource identity; preserve action UUID + resourceId + observation state + immutable artifact hash."
+    }
+  ],
+  "note": "This batch resolves abbreviated commit prefixes before ingestion and adds two first-party CaptureBrief source/history adapters. No canonical raw history was overwritten."
+}
