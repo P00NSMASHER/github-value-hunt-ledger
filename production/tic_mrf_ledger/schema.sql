@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS provider_groups (
   provider_group_id INTEGER NOT NULL,
   tin_type TEXT,
   tin_value TEXT,
+  business_name TEXT,
   npi TEXT,
   source_locator TEXT NOT NULL,
   UNIQUE(rate_file_url, provider_group_id, tin_type, tin_value, npi)
@@ -112,6 +113,7 @@ CREATE TABLE IF NOT EXISTS rate_rows (
   provider_group_id INTEGER,
   negotiated_rate TEXT NOT NULL,
   negotiated_type TEXT,
+  setting TEXT,
   expiration_date TEXT,
   billing_class TEXT,
   service_code_json TEXT,
@@ -148,6 +150,7 @@ SELECT
   rr.provider_group_id,
   rr.negotiated_rate,
   rr.negotiated_type,
+  rr.setting,
   rr.expiration_date,
   rr.billing_class,
   rr.service_code_json,
@@ -160,6 +163,7 @@ SELECT
   rr.extraction_run_id,
   pg.tin_type,
   pg.tin_value,
+  pg.business_name,
   pg.npi
 FROM rate_rows rr
 LEFT JOIN provider_groups pg
