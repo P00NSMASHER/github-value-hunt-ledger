@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:lane-local-govcon-01",
+  "created_at": "2026-09-22",
+  "source_hunter_file": "hunters/05-run11-2026-09-20.md",
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "GSA/GSA-Acquisition-GSAM",
+      "revision": "f15565ea94c231f416865b8bf73d3d420d41eae6",
+      "score": 29,
+      "status": "retained_official_authority_component",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "role": "Official structured GSAM/GSAR agency-supplement source for deterministic FAR -> agency supplement resolution.",
+      "implementation_evidence": [
+        "Exact DITA source dita/552.204-9.dita encodes GSAR clause identifier/title, prescribing section 504.1303, revision text (Apr 2023), structured paragraphs and subcontract flowdown.",
+        "Repository is an official GSA Acquisition.gov publication surface with DITA plus rendered publication artifacts."
+      ],
+      "limitations": [
+        "Repository currentness still must be tied to the controlling solicitation/effective source and deviations.",
+        "Similarly numbered clauses across FAR/DFARS/agency supplements require namespace-aware resolution."
+      ],
+      "first_paid_wedge": "Agency-specific rule/readiness section inside CaptureBrief for GSA opportunities with exact source/prescription lineage."
+    },
+    {
+      "repository": "JonGerhardson/federal-agent",
+      "revision": "5674ce02df97f9f7fef88e5dc33c08ea82cefb22",
+      "score": 28,
+      "status": "retained_evidence_acquisition_component",
+      "capability_ids": [
+        "CAP-011",
+        "CAP-019"
+      ],
+      "role": "Corpus-scale SAM entity/exclusion acquisition with cache-first enrichment, artifact hashing, source manifests and explicit source-coverage limits.",
+      "implementation_evidence": [
+        "sam_extract.py implements asynchronous SAM Entity Extract submit/download, gzip/zip/plain sniffing, 1,000,000-record cap handling, state partition fallback, cache-first UEI enrichment and quota-aware two-step download.",
+        "provenance.py persists request/source metadata, fetch time, record count and SHA-256; API keys are redacted before persistence.",
+        "The code explicitly documents public-key coverage gaps such as absent FOUO parent/POC fields rather than interpreting absence as negative evidence."
+      ],
+      "limitations": [
+        "SAM/API service behavior and source terms remain external authority.",
+        "Public-key source omissions cannot support negative conclusions about restricted fields or parent hierarchy."
+      ],
+      "first_paid_wedge": "Evidence-grade vendor/entity snapshot layer for CaptureBrief or vendor due diligence, with reproducible bulk-source manifests."
+    },
+    {
+      "repository": "PHiZou/recompete-radar",
+      "revision": "99baa87ae0ad8ed1d041c919d4c56c05645c917c",
+      "score": 28,
+      "status": "retained_decision_signal_component",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "role": "Explainable federal recompete/incumbent signal layer over normalized award history; useful for pre-solicitation prioritization but not source authority.",
+      "implementation_evidence": [
+        "mart_recompete_candidates.sql computes named SQL components for recompete and incumbent scores, exposing the component breakdown rather than a black-box model.",
+        "sql/analysis.sql includes explicit artifact traps, placebo-control backtests, repeated scope-expansion checks and documented look-ahead bias.",
+        "The 2026-09-14 Treasury expansion commit reports near-window incumbent retention ~30.5% versus placebo ~11.4% after scope expansion.",
+        "A separate commit measured and deliberately excluded GSA because its source shape would swamp the radar, rather than forcing a larger but misleading corpus."
+      ],
+      "limitations": [
+        "No explicit predecessor->successor award link exists; follow-on matching is inferred and noisy.",
+        "Current lifetime_obligated creates look-ahead bias in historical retention analysis.",
+        "Award summaries do not provide modification history, and the score itself has known saturation limits.",
+        "Use as prioritization evidence only; never as proof that a solicitation will occur."
+      ],
+      "first_paid_wedge": "Agency/NAICS-specific recompete watchlist with incumbent lineage, explicit score components and scope caveats."
+    }
+  ],
+  "graph_edges": [
+    "GSA/GSA-Acquisition-GSAM@f15565ea94c231f416865b8bf73d3d420d41eae6 -> CAP-011 [agency_supplement_authority]",
+    "JonGerhardson/federal-agent@5674ce02df97f9f7fef88e5dc33c08ea82cefb22 -> CAP-011 [bulk_entity_evidence]",
+    "JonGerhardson/federal-agent@5674ce02df97f9f7fef88e5dc33c08ea82cefb22 -> CAP-019 [source_observation_manifest]",
+    "PHiZou/recompete-radar@99baa87ae0ad8ed1d041c919d4c56c05645c917c -> CAP-011 [pre_solicitation_decision_signal]"
+  ],
+  "integration_rule": "Keep authority/evidence infrastructure separate from predictive decision signals. Recompete-radar may prioritize review but cannot establish current solicitation or regulatory authority."
+}
