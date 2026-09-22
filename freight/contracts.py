@@ -185,7 +185,7 @@ def freeze_population(
     if not normalized:
         raise ValueError("population must contain at least one row")
 
-    seen: set[str] = set()
+    seen: set[tuple[str, str]] = set()
     for row in normalized:
         for name in (
             "invoice_id",
@@ -330,10 +330,11 @@ def freeze_truth(
             "finding",
         )
 
-        row = row_index.get(f"{finding.invoice_id}|{finding.shipment_id}")
+        row_key = (finding.invoice_id, finding.shipment_id)
+        row = row_index.get(row_key)
         if row is None:
             raise ValueError(
-                f"finding outside frozen population: {finding.invoice_id}|{finding.shipment_id}"
+                "finding outside frozen population: " + repr(row_key)
             )
 
         row_identity = (row.customer_id, row.carrier_id, row.currency)
