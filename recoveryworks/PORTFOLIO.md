@@ -29,6 +29,7 @@ traction.
 | TelecomRecovery | overpayment | Operational ingestion | invoice + service contract + independent CDR/usage quantity |
 | RebateRecovery | underpayment | Operational ingestion | rebate program + purchase population + settlement evidence |
 | LeaseRecovery | overpayment | Operational ingestion | landlord charge + effective lease rate + independent area/allocation evidence |
+| ProcurementRecovery | overpayment | Operational ingestion | supplier charge + effective contract/PO price + independent received quantity |
 | ConstructionRecovery | underpayment | Operational ingestion | reviewed entitlement + event mapping + versioned CPM schedules + qualified causation review + settlement evidence |
 
 ## Shared commercial motion
@@ -59,6 +60,7 @@ A manufacturer/distributor can plausibly supply inputs for:
 - TelecomRecovery
 - RebateRecovery
 - LeaseRecovery
+- ProcurementRecovery
 - ConstructionRecovery when project records exist
 
 A healthcare provider can plausibly add PayerRecovery to the same shared
@@ -66,7 +68,7 @@ portfolio.
 
 ## Portfolio state
 
-All 10 registered RecoveryWorks divisions now have operational Scan 360
+All 11 registered RecoveryWorks divisions now have operational Scan 360
 ingestion paths with the same durable evidence/lifecycle model.
 
 ConstructionRecovery completes the previously missing lane with:
@@ -78,6 +80,8 @@ ConstructionRecovery completes the previously missing lane with:
 - explicit event-to-activity mapping;
 - qualified causation review bounded by reproducible CPM impact; and
 - settlement evidence establishing the actual amount received.
+
+ProcurementRecovery adds negotiated-price leakage without duplicating AP payment recovery.
 
 The next leverage layer is deeper source automation: direct P6/XER normalization,
 drawing/model revision deltas, quantity takeoff changes, and field-evidence links.
