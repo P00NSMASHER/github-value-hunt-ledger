@@ -51,8 +51,10 @@ def candidate_intake():
         "artifact_id": "SKILL:test",
         "baseline_version": "v1",
         "candidate_version": "v2",
-        "baseline_artifact_ref": "sha256:baseline",
-        "candidate_artifact_ref": "sha256:candidate",
+        "baseline_artifact_ref": "artifacts/baseline.json",
+        "baseline_artifact_sha256": "1" * 64,
+        "candidate_artifact_ref": "artifacts/candidate.json",
+        "candidate_artifact_sha256": "2" * 64,
         "diff_hash": "a" * 64,
         "changed_logical_targets": [task["target"]["id"]],
         "regression_test_requirement": task[
@@ -63,9 +65,11 @@ def candidate_intake():
         "regression_test_evidence_refs": [
             "tests/test_skill.py::test_readme_only",
         ],
+        "regression_test_evidence_sha256": "3" * 64,
         "decision_history_ref": (
             "production/history/RCAND-skill-eval-1.json"
         ),
+        "decision_history_sha256": "4" * 64,
         "unrelated_files_changed": False,
         "sensitive_material_involved": False,
         "benchmark_contaminated": False,
@@ -106,6 +110,7 @@ def eval_packet(intake=None, **overrides):
         "evaluation_evidence_refs": [
             "production/evals/SEVALRES-test-1.json",
         ],
+        "evaluation_evidence_sha256": "5" * 64,
         "source_failure_ids": ["FAIL:skill-eval:1"],
         "mutator_saw_promotion_test": False,
         "evaluator_modified": False,
@@ -304,6 +309,22 @@ class SkillEvalResultIntakeTests(unittest.TestCase):
         }
         self.assertIn("sensitive_material_blocked", reasons)
         self.assertIn("benchmark_contamination_blocked", reasons)
+
+    def test_evaluation_evidence_must_be_content_addressed(self):
+        intake = candidate_intake()
+        state = build_skill_eval_result_intake(
+            intake,
+            [
+                eval_packet(
+                    intake,
+                    evaluation_evidence_sha256="not-a-sha",
+                )
+            ],
+        )
+        self.assertIn(
+            "evaluation_evidence_sha256_must_be_sha256",
+            state["blocked_submissions"][0]["reasons"],
+        )
 
     def test_hard_regression_rejects_candidate(self):
         intake = candidate_intake()
