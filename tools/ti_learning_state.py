@@ -252,6 +252,9 @@ def compile_state(
             row["confirm_support"]["measured_runs"] >= 2
             and row["confirm_support"]["deep_inspections"] >= 6
             and row["confirm_support"]["mean_reward"] >= 0.0
+            and row["confirm_support"]["min_reward"] is not None
+            and row["confirm_support"]["min_reward"] >= 0.0
+            and row["confirm_support"]["positive_runs"] >= 1
         )
         row["eligible_for_policy_consideration"] = (
             row["train_evidence_ready"]
@@ -265,6 +268,13 @@ def compile_state(
             and row["confirm_support"]["mean_reward"] < 0.0
         ):
             row["generalization_status"] = "overfit_signal"
+        elif (
+            row["train_evidence_ready"]
+            and row["confirm_support"]["measured_runs"] >= 2
+            and row["confirm_support"]["min_reward"] is not None
+            and row["confirm_support"]["min_reward"] < 0.0
+        ):
+            row["generalization_status"] = "confirm_regression_signal"
         elif row["train_evidence_ready"]:
             row["generalization_status"] = "awaiting_confirm"
         else:
@@ -273,10 +283,12 @@ def compile_state(
 
     learning_alerts = [
         {
-            "type": "overfit_signal",
+            "type": row["generalization_status"],
             "memory_key": row["key"],
             "train_mean_reward": row["support"]["mean_reward"],
             "confirm_mean_reward": row["confirm_support"]["mean_reward"],
+            "confirm_min_reward": row["confirm_support"]["min_reward"],
+            "confirm_positive_runs": row["confirm_support"]["positive_runs"],
             "confirm_runs": row["confirm_support"]["measured_runs"],
             "confirm_deep_inspections": row["confirm_support"]["deep_inspections"],
             "recommended_action": (
@@ -286,7 +298,10 @@ def compile_state(
             ),
         }
         for row in records
-        if row["generalization_status"] == "overfit_signal"
+        if row["generalization_status"] in {
+            "overfit_signal",
+            "confirm_regression_signal",
+        }
     ]
 
     failure_rows = load_failure_events(failure_dir)
@@ -327,6 +342,8 @@ def compile_state(
             "minimum_confirm_runs": 2,
             "minimum_confirm_deep_inspections": 6,
             "minimum_confirm_mean_reward": 0.0,
+            "minimum_confirm_min_reward": 0.0,
+            "minimum_confirm_positive_runs": 1,
             "note": (
                 "The existing 5-run/20-deep gate must be met on train "
                 "episodes, then independently confirmed before a value "
