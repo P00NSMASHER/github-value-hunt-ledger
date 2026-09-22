@@ -252,18 +252,34 @@ class GeneratedPacketTests(unittest.TestCase):
             for row in self.allocations
             if row['work_kind'] == 'learning_measurement'
         ]
-        self.assertEqual(len(assignments), 1)
-        assignment = assignments[0]
-        candidate = next(
-            row
-            for row in candidates
-            if row['work_item_id'] == assignment['work_item_id']
+        effective_policy = json.loads(
+            (
+                self.root
+                / 'intelligence'
+                / 'allocator_policy_effective.json'
+            ).read_text()
         )
-        for key in (
-            'learning_measurement_packet_id',
-            'learning_measurement_packet_sha256',
-        ):
-            self.assertEqual(assignment[key], candidate[key])
+        minimum = int(
+            effective_policy['constraints'][
+                'min_measurement_slots'
+            ]
+        )
+        self.assertGreaterEqual(len(assignments), minimum)
+        for assignment in assignments:
+            candidate = next(
+                row
+                for row in candidates
+                if row['work_item_id']
+                == assignment['work_item_id']
+            )
+            for key in (
+                'learning_measurement_packet_id',
+                'learning_measurement_packet_sha256',
+            ):
+                self.assertEqual(
+                    assignment[key],
+                    candidate[key],
+                )
 
     def test_learning_measurement_packet_tamper_breaks_allocator_validation(self):
         allocation_path = (
