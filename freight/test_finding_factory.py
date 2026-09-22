@@ -167,3 +167,27 @@ def test_delimiter_collision_cannot_make_different_charge_look_in_population():
     )
     with pytest.raises(ValueError, match="outside frozen population"):
         derive_batch(pop, [impostor], [rule()])
+
+
+def test_same_source_evidence_cannot_be_counted_under_two_charge_ids():
+    first = charge(charge_id="charge-1", source_hash="same-source")
+    replay = charge(charge_id="charge-2", source_hash="same-source")
+    with pytest.raises(ValueError, match="duplicate charge source_hash"):
+        derive_batch(population(), [first, replay], [rule()])
+
+
+def test_distinct_source_evidence_remains_separate_even_on_same_shipment():
+    first = charge(
+        charge_id="charge-1",
+        source_hash="source-line-1",
+        billed_cents=12500,
+    )
+    second = charge(
+        charge_id="charge-2",
+        source_hash="source-line-2",
+        billed_cents=13000,
+    )
+    out = derive_batch(population(), [first, second], [rule()])
+    assert len(out.derivations) == 2
+    assert len(out.truth.findings) == 2
+    assert sum(item.validated_cents for item in out.truth.findings) == 5500
