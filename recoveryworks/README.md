@@ -46,3 +46,9 @@ From repository root:
     python -m unittest recoveryworks.test_recoveryworks
 
 The foundation intentionally uses only Python's standard library.
+
+## Operational ingestion
+
+APRecovery and UtilityRecovery file schemas, deterministic tariff primitives,
+verification flags, and failure modes are documented in
+`recoveryworks/INGESTION_AP_UTILITY.md`.
