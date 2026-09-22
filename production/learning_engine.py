@@ -18,6 +18,23 @@ def _nonnegative_int(value: Any) -> bool:
     return type(value) is int and value >= 0
 
 
+def _require_unique_ids(
+    rows: Sequence[Mapping[str, Any]],
+    field: str,
+    label: str,
+) -> None:
+    seen: set[str] = set()
+    for index, row in enumerate(rows, 1):
+        value = row.get(field)
+        if not isinstance(value, str) or not value:
+            continue
+        if value in seen:
+            raise ValueError(
+                f"duplicate {label} {field}={value} at input row {index}"
+            )
+        seen.add(value)
+
+
 class ExperienceKind(str, Enum):
     STRATEGY = "STRATEGY"
     QUERY_FAMILY = "QUERY_FAMILY"
@@ -378,7 +395,11 @@ def learn_value_memory(
     config: ValueConfig | None = None,
 ) -> tuple[ValueMemory, list[dict[str, Any]]]:
     memory = ValueMemory(config)
-    outcome_index = build_outcome_index(outcomes)
+    run_rows = list(search_runs)
+    outcome_rows = list(outcomes)
+    _require_unique_ids(run_rows, "search_run_id", "search run")
+    _require_unique_ids(outcome_rows, "outcome_id", "outcome")
+    outcome_index = build_outcome_index(outcome_rows)
     observations: list[dict[str, Any]] = []
 
     def sort_key(run: Mapping[str, Any]) -> tuple[str, str]:
@@ -387,7 +408,7 @@ def learn_value_memory(
             str(run.get("search_run_id") or ""),
         )
 
-    for run in sorted(search_runs, key=sort_key):
+    for run in sorted(run_rows, key=sort_key):
         run_id = str(run.get("search_run_id") or "")
         observation = observed_search_reward(run, outcome_index.get(run_id, []))
         if observation is None:
@@ -515,6 +536,8 @@ def learn_training_episode_memory(
     exist to judge candidate policy/skill changes, not to train the live prior.
     """
     memory = ValueMemory(config)
+    episode_rows = list(episodes)
+    _require_unique_ids(episode_rows, "run_id", "training episode")
     observations: list[dict[str, Any]] = []
 
     def sort_key(episode: Mapping[str, Any]) -> tuple[str, str]:
@@ -524,7 +547,7 @@ def learn_training_episode_memory(
             str(episode.get("run_id") or ""),
         )
 
-    for episode in sorted(episodes, key=sort_key):
+    for episode in sorted(episode_rows, key=sort_key):
         if episode.get("split") != "train":
             continue
         reward_body = episode.get("reward") or {}
