@@ -5,7 +5,7 @@
   "hunter_role": "HUNTER-13",
   "strategy_id": "STRAT:evaluation-target-independence",
   "query_family": "EXP-007 duplicate-preflight against canonical prior verification",
-  "query_family_id": "QF:exp007-canonical-duplicate-preflight",
+  "query_family_id": "QF:exp-007-duplicate-preflight-against-canonical-prior-verification",
   "search_objective_id": "OBJ:independent-evaluation",
   "measurement_quality": "prospective",
   "work_action": "execute_fixture",
