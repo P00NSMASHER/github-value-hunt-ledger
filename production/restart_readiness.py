@@ -107,7 +107,10 @@ def build_restart_readiness(
         and not (split_status.get("issues") or [])
         and not (split_status.get("pending_claim_ids") or [])
     )
-    benchmark_ready = matched >= required_matched_tasks
+    benchmark_ready = (
+        matched >= required_matched_tasks
+        and not unmatched_tasks
+    )
     shadow_ready = shadow_total >= required_shadow_runs
     no_current_activations = (
         int(activation_metrics.get("current_activations") or 0) == 0
@@ -295,6 +298,11 @@ def validate_restart_readiness(
         if machine_ready
         else "BLOCKED"
     )
+    unmatched = (
+        report.get("evidence") or {}
+    ).get("unmatched_benchmark_task_ids") or []
+    if gates.get("benchmark_complete") is True and unmatched:
+        errors.append("benchmark_complete_with_unmatched_tasks")
     if report.get("state") != expected_state:
         errors.append("restart_state_mismatch")
     if machine_ready and blockers:
