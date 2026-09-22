@@ -1,6 +1,9 @@
 import sqlite3
+import threading
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
+from unittest import mock
 from pathlib import Path
 
 import shaq_route_crawl as crawl
@@ -68,6 +71,34 @@ class ShaqRouteCrawlTests(unittest.TestCase):
             ("https://shaq-log.com/q/a", "2026-08-08"),
             ("https://shaq-log.com/q/b", None),
         ])
+
+    def test_blob_write_is_safe_for_identical_concurrent_content(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            raw = b"same SHAQ evidence bytes"
+            digest = crawl.hashlib.sha256(raw).hexdigest()
+            barrier = threading.Barrier(2)
+            original_replace = crawl.os.replace
+
+            def synchronized_replace(src, dst):
+                barrier.wait(timeout=5)
+                return original_replace(src, dst)
+
+            with mock.patch.object(
+                crawl.os,
+                "replace",
+                side_effect=synchronized_replace,
+            ):
+                with ThreadPoolExecutor(max_workers=2) as pool:
+                    futures = [
+                        pool.submit(crawl.write_blob, root, digest, raw)
+                        for _ in range(2)
+                    ]
+                    relpaths = [future.result(timeout=10) for future in futures]
+
+            self.assertEqual(relpaths[0], relpaths[1])
+            self.assertEqual((root / relpaths[0]).read_bytes(), raw)
+            self.assertEqual(list(root.rglob("*.tmp")), [])
 
     def test_schema_marks_route_rates_benchmark_only(self):
         with tempfile.TemporaryDirectory() as td:
