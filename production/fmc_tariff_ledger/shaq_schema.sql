@@ -32,16 +32,17 @@ CREATE INDEX IF NOT EXISTS idx_shaq_query_sha
 
 CREATE TABLE IF NOT EXISTS shaq_ports (
   id INTEGER PRIMARY KEY,
-  query_id INTEGER REFERENCES shaq_queries(id),
-  route_page_id INTEGER REFERENCES shaq_route_pages(id),
+  query_id INTEGER NOT NULL REFERENCES shaq_queries(id),
   raw_name TEXT NOT NULL,
   normalized_name TEXT NOT NULL,
   port_code TEXT,
   country TEXT,
   aliases_json TEXT,
-  raw_record_json TEXT NOT NULL,
-  UNIQUE(query_id, raw_name, COALESCE(port_code, ''))
+  raw_record_json TEXT NOT NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_shaq_ports_dedupe
+ON shaq_ports(query_id, raw_name, COALESCE(port_code, ''));
 
 CREATE TABLE IF NOT EXISTS shaq_route_pages (
   id INTEGER PRIMARY KEY,
@@ -65,7 +66,8 @@ CREATE INDEX IF NOT EXISTS idx_shaq_route_page_sha
 
 CREATE TABLE IF NOT EXISTS shaq_rates (
   id INTEGER PRIMARY KEY,
-  query_id INTEGER NOT NULL REFERENCES shaq_queries(id),
+  query_id INTEGER REFERENCES shaq_queries(id),
+  route_page_id INTEGER REFERENCES shaq_route_pages(id),
   origin_query TEXT,
   destination_query TEXT,
   origin_raw TEXT,
