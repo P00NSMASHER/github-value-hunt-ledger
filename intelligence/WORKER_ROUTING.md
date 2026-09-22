@@ -1,13 +1,13 @@
 # WORKER ROUTING PLAN
 
-Routing generation: **ROUTING:a0a57856d600**
-Worker profiles: **WORKERS:70e9f3831b9f**
+Routing generation: **ROUTING:d6574aa7e720**
+Worker profiles: **WORKERS:39f2b09f8dfa**
 
 V12/V13 routes workers using positive historical fit, assignment priority, and evidence-gated routing outcome adjustments. Active V11 claims remain locked.
 
 Routing learning: **ROUTELEARN:bc40639ef4db** / mode **observe_only_insufficient_evidence**
-Activation-response learning: **RESPLEARN:66cd587fa07c** / mode **measured_feedback**
-Routing exploration: **ROUTEEXP:bce0acad9c4e** / applied **False**
+Activation-response learning: **RESPLEARN:54cf79c1d4a7** / mode **measured_feedback**
+Routing exploration: **ROUTEEXP:d419d375ff1d** / applied **False**
 
 | Worker | Profile | Route | Slot | Assignment | Score | Reason |
 |---|---|---|---|---|---:|---|
@@ -23,7 +23,7 @@ Routing exploration: **ROUTEEXP:bce0acad9c4e** / applied **False**
 | HUNTER-10 | UNMEASURED | ROUTED | SLOT-09 | ASSIGN:da63048c7581:slot-09 | 12.79 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 | HUNTER-11 | MEASURED | ROUTED | SLOT-12 | ASSIGN:da63048c7581:slot-12 | 12.66 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 | HUNTER-12 | UNMEASURED | ROUTED | SLOT-10 | ASSIGN:da63048c7581:slot-10 | 16.15 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
-| HUNTER-13 | MEASURED | ROUTED | SLOT-13 | ASSIGN:da63048c7581:slot-13 | 29.20 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
+| HUNTER-13 | LOCKED_ACTIVE_CLAIM | LOCKED | SLOT-13 | ASSIGN:da63048c7581:slot-13 | — | Existing V11 active claim is authoritative and preserved. |
 | HUNTER-14 | UNMEASURED | ROUTED | SLOT-14 | ASSIGN:da63048c7581:slot-14 | 13.00 | Maximum-total-fit exact assignment across currently idle registered workers and claimable slots. |
 
 ## Routing interpretation

@@ -11,7 +11,7 @@ Repository-side readiness for a future adaptive-learning hunter canary. **This r
 - Split key commitment active: **true**
 - Split secret available to workflow: **true**
 - Pending split claims: **0**
-- Current generated activations: **1**
+- Current generated activations: **0**
 
 ## Machine gates
 
@@ -21,12 +21,11 @@ Repository-side readiness for a future adaptive-learning hunter canary. **This r
 | split_receipt_system_ready | PASS |
 | benchmark_complete | BLOCKED |
 | shadow_run_gate_complete | PASS |
-| no_current_activations | BLOCKED |
+| no_current_activations | PASS |
 
 ## Blockers
 
 - **frozen_benchmark_incomplete** — Finish the remaining frozen benchmark experiment conditions in clean contexts before using adaptive measurement packets.
-- **existing_generated_activations_present** — Resolve or release existing generated activations before starting a measurement canary.
 
 ## Canary contract after explicit approval
 

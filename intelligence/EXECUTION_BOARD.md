@@ -16,7 +16,7 @@ V11 derives execution state from append-only per-slot events. Missing event logs
 | SLOT-10 | adjacency | ASSIGN:da63048c7581:slot-10 | **AVAILABLE** | — | — | NOT_APPLICABLE |
 | SLOT-11 | measurement | ASSIGN:da63048c7581:slot-11 | **AVAILABLE** | — | — | NOT_APPLICABLE |
 | SLOT-12 | measurement | ASSIGN:da63048c7581:slot-12 | **RELEASED_AVAILABLE** | — | — | NOT_APPLICABLE |
-| SLOT-13 | verification | ASSIGN:da63048c7581:slot-13 | **AVAILABLE** | — | — | NOT_APPLICABLE |
+| SLOT-13 | verification | ASSIGN:da63048c7581:slot-13 | **RUNNING** | HUNTER-13 | CLAIM:be6863fbb5e1 | PENDING |
 | SLOT-14 | wildcard | ASSIGN:da63048c7581:slot-14 | **AVAILABLE** | — | — | NOT_APPLICABLE |
 
 ## Claim protocol

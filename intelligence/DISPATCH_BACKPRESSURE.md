@@ -1,9 +1,9 @@
 # DISPATCH BACKPRESSURE REPORT
 
-Clock: **2026-09-22T14:30:26Z**
+Clock: **2026-09-22T14:31:54Z**
 
-- Primary tickets: **14**
-- Pending: **14**
+- Primary tickets: **13**
+- Pending: **13**
 - Stale: **0**
 - Expired/unclaimed: **0**
 - Claimed: **0**
@@ -23,7 +23,6 @@ Clock: **2026-09-22T14:30:26Z**
 | HUNTER-12 | SLOT-10 | PENDING | 0.0 | — |
 | HUNTER-05 | SLOT-11 | PENDING | 0.0 | — |
 | HUNTER-11 | SLOT-12 | PENDING | 0.0 | — |
-| HUNTER-13 | SLOT-13 | PENDING | 0.0 | — |
 | HUNTER-14 | SLOT-14 | PENDING | 0.0 | — |
 
 Legacy untimed tickets are excluded from SLA judgments.

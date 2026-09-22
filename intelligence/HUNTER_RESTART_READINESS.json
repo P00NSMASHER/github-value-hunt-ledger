@@ -41,11 +41,6 @@
           "task_id": "08"
         }
       ]
-    },
-    {
-      "action": "Resolve or release existing generated activations before starting a measurement canary.",
-      "code": "existing_generated_activations_present",
-      "current_activations": 1
     }
   ],
   "canary": {
@@ -58,7 +53,7 @@
   },
   "changes_automation_state": false,
   "evidence": {
-    "current_activations": 1,
+    "current_activations": 0,
     "matched_benchmark_tasks": 47,
     "pending_split_claims": 0,
     "required_matched_benchmark_tasks": 50,
@@ -111,7 +106,7 @@
   "gates": {
     "benchmark_complete": false,
     "measurement_packets_ready": true,
-    "no_current_activations": false,
+    "no_current_activations": true,
     "shadow_run_gate_complete": true,
     "split_receipt_system_ready": true
   },
