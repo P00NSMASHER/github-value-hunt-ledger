@@ -1,7 +1,7 @@
 # UNIFIED HUNT PLAN
 
-Allocator generation: **ALLOCGEN:55e8d55d0f69**
-Portfolio policy: **PORTFOLIO:7d0862b1d1ea**
+Allocator generation: **ALLOCGEN:51e2788d0136**
+Portfolio policy: **PORTFOLIO:6c1a3e6e5624**
 
 This is the current 14-slot work plan. Scores are scheduling priorities, not claims of repository or commercial value.
 
@@ -17,15 +17,15 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 | SLOT-08 | coverage | 70.3 | SEED:coverage:language-family-jvm:abstention-transfer | — | — | SEED:coverage:language-family-jvm:abstention-transfer |
 | SLOT-09 | coverage | 73.2 | SEED:dna:gsa-gsa-acquisition-dfars | — | — | SEED:dna:gsa-gsa-acquisition-dfars |
 | SLOT-10 | adjacency | 101.3 | ADJ:distinctive-symbol:sandialabs-dreams | — | — | ADJ:distinctive-symbol:sandialabs-dreams |
-| SLOT-11 | adjacency | 101.3 | ADJ:distinctive-symbol:pedrocodesforcoffee-builder-api | — | — | ADJ:distinctive-symbol:pedrocodesforcoffee-builder-api |
-| SLOT-12 | measurement | 81.1 | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | — | — | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer |
+| SLOT-11 | measurement | 81.1 | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | — | — | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer |
+| SLOT-12 | measurement | 60.6 | SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer | — | — | SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer |
 | SLOT-13 | verification | 90.8 | Independent verification — EXP-007 | CAP-013, CAP-017 | EXP-007 | VERIFY:EXP-007 |
 | SLOT-14 | wildcard | 75.0 | Rare / weird wildcard exploration | — | — | WILDCARD:rare-weird |
 
 ## Assignment packets
 
 ### SLOT-01 — EXP-002 — AP source-authority + reversible receipt-policy audit
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-01
+- Assignment ID: ASSIGN:51e2788d0136:slot-01
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **99.75** — {"portfolio_priority_boost": 8, "queue_order_adjustment": -0.25, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -40,7 +40,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Execute the existing alias/non-match/merge/split corpus before seeking another identity engine.; Run the existing authority/admission matrix before further restore, OTA or attestation discovery.; Pin the official rule-pack version and authority before comparing existing validators; do not replace rule authority with another repository.; Run the existing crash/replay-expiry/finality matrix. Permit adapter search only for a separately named failed NOT_APPLIED proof gap.; Run synthetic transport/auth/partial-source failure cases before source-receipt discovery.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-02 — EXP-003 — Commission plan-to-bank acceptance test
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-02
+- Assignment ID: ASSIGN:51e2788d0136:slot-02
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **97.50** — {"portfolio_priority_boost": 6, "queue_order_adjustment": -0.5, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -55,7 +55,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Execute the existing alias/non-match/merge/split corpus before seeking another identity engine.; Await actual authorized settlement/return evidence; repository discovery cannot establish realized recovery.; Run the existing authority/admission matrix before further restore, OTA or attestation discovery.; Run the existing crash/replay-expiry/finality matrix. Permit adapter search only for a separately named failed NOT_APPLIED proof gap.; Execute the post-success lost-webhook fixture; do not resume generic commission or payout-wrapper discovery.; Run synthetic transport/auth/partial-source failure cases before source-receipt discovery.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-03 — EXP-007 — Installed-base sequencing/lab handoff acceptance
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-03
+- Assignment ID: ASSIGN:51e2788d0136:slot-03
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **94.50** — {"portfolio_priority_boost": 4, "queue_order_adjustment": -1.5, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -68,7 +68,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Execute the pinned Thermo RAW row before shared normalization; no converter discovery until it runs.; Execute the existing durable-provider ambiguity matrix before broad lab-orchestrator discovery.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-04 — EXP-008 — Industrial virtual pre-FAT differential benchmark
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-04
+- Assignment ID: ASSIGN:51e2788d0136:slot-04
 - Work kind/action: **experiment_execution / execute_fixture**
 - Score: **94.25** — {"portfolio_priority_boost": 4, "queue_order_adjustment": -1.75, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -81,7 +81,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: CAP-014 STOP: no third SECS/GEM engine until an actually executed endpoint disagreement needs adjudication. Run the neutral raw-HSMS fixture against both pinned endpoints first.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-05 — EXP-012 — Outcome-priced grid resilience calibration
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-05
+- Assignment ID: ASSIGN:51e2788d0136:slot-05
 - Work kind/action: **experiment_execution / verify_artifact**
 - Score: **93.25** — {"portfolio_priority_boost": 4, "queue_order_adjustment": -2.75, "readiness_base": 92}
 - Strategy/objective: n/a / n/a
@@ -96,7 +96,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: CAP-015 STOP: obtain and verify the current first-party OEDI artifact bytes against an independently expected digest, inspect schema/time/null semantics, and freeze the event/spell manifest before policy scoring. Missing bytes or digest is blocked evidence, not authority to find more outage datasets.; Do not broaden into generic discovery unless execution exposes a named technical gap.; READY scope authorizes the stated fixture/verification only; separately blocked commercial or customer proof remains external.
 
 ### SLOT-06 — SEED:gap:cap-012
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-06
+- Assignment ID: ASSIGN:51e2788d0136:slot-06
 - Work kind/action: **capability_gap / execute_fixture**
 - Score: **88.21** — {"base_priority": 79.0, "experiment_boost": 8, "strategy_allocation": 1.21}
 - Strategy/objective: STRAT:rule-period-authority-version-audit / OBJ:completeness-proof
@@ -108,7 +108,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Freeze three-jurisdiction source-field truth and source-outage cases before more permit repository discovery.; Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
 
 ### SLOT-07 — SEED:coverage:language-family-c-cpp:rule-version-transfer
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-07
+- Assignment ID: ASSIGN:51e2788d0136:slot-07
 - Work kind/action: **coverage_gap / search**
 - Score: **77.21** — {"base_priority": 76.0, "experiment_boost": 0, "strategy_allocation": 1.21}
 - Strategy/objective: STRAT:rule-period-authority-version-audit / OBJ:current-rule-authority
@@ -126,7 +126,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; If the coverage qualifier produces only shallow variants, record the no-find and do not lower the evidence bar.
 
 ### SLOT-08 — SEED:coverage:language-family-jvm:abstention-transfer
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-08
+- Assignment ID: ASSIGN:51e2788d0136:slot-08
 - Work kind/action: **coverage_gap / search**
 - Score: **70.29** — {"base_priority": 69.0, "experiment_boost": 0, "strategy_allocation": 1.29}
 - Strategy/objective: STRAT:capability-conjunction-search-claim-tracing / OBJ:independent-evaluation
@@ -144,7 +144,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; If the coverage qualifier produces only shallow variants, record the no-find and do not lower the evidence bar.
 
 ### SLOT-09 — SEED:dna:gsa-gsa-acquisition-dfars
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-09
+- Assignment ID: ASSIGN:51e2788d0136:slot-09
 - Work kind/action: **positive_dna_transfer / search**
 - Score: **73.21** — {"base_priority": 72.0, "experiment_boost": 0, "strategy_allocation": 1.21}
 - Strategy/objective: STRAT:rule-period-authority-version-audit / OBJ:current-rule-authority
@@ -161,7 +161,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.
 
 ### SLOT-10 — ADJ:distinctive-symbol:sandialabs-dreams
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-10
+- Assignment ID: ASSIGN:51e2788d0136:slot-10
 - Work kind/action: **adjacency / search**
 - Score: **101.29** — {"base_priority": 100.0, "strategy_allocation": 1.29}
 - Strategy/objective: STRAT:capability-conjunction-search-claim-tracing / OBJ:emergence-triangulation
@@ -179,27 +179,8 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Verification gate: Retain a neighbor only if it adds a new capability, stronger evidence, an independent implementation, a production descendant, a useful negative control, or a new experiment edge. Mere proximity is not value.
 - Stop conditions: Stop after three consecutive deep inspections produce only duplicates or clones with no evidence or capability delta.; Do not inspect accidental secrets or private data; quarantine metadata only.; Do not reopen a domain-specific STOP gate through adjacency.
 
-### SLOT-11 — ADJ:distinctive-symbol:pedrocodesforcoffee-builder-api
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-11
-- Work kind/action: **adjacency / search**
-- Score: **101.29** — {"base_priority": 100.0, "strategy_allocation": 1.29}
-- Strategy/objective: STRAT:capability-conjunction-search-claim-tracing / OBJ:emergence-triangulation
-- Capability/experiment: cross-domain
-- Why now: pedrocodesforcoffee/builder-api is a high-value root. Expand nearby while preserving the load-bearing invariant rather than cloning the product category.
-- Acceptance target: Retain a neighbor only if it adds a new capability, stronger evidence, an independent implementation, a production descendant, a useful negative control, or a new experiment edge. Mere proximity is not value.
-- Queries:
-  - <distinctive_symbol>
-  - <symbol_a> <symbol_b>
-  - <schema_key> path:tests
-- Search recipe:
-  - Extract two to four distinctive class, function, config or schema symbols from load-bearing source and tests.
-  - Search those symbols globally, including zero-star and archived repositories.
-  - Separate exact copies from independent implementations; independent reimplementation is higher-value evidence.
-- Verification gate: Retain a neighbor only if it adds a new capability, stronger evidence, an independent implementation, a production descendant, a useful negative control, or a new experiment edge. Mere proximity is not value.
-- Stop conditions: Stop after three consecutive deep inspections produce only duplicates or clones with no evidence or capability delta.; Do not inspect accidental secrets or private data; quarantine metadata only.; Do not reopen a domain-specific STOP gate through adjacency.
-
-### SLOT-12 — SEED:learn:acceptance-path-transition-inspection-rule-version-transfer
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-12
+### SLOT-11 — SEED:learn:acceptance-path-transition-inspection-rule-version-transfer
+- Assignment ID: ASSIGN:51e2788d0136:slot-11
 - Work kind/action: **learning_measurement / search**
 - Score: **81.06** — {"base_priority": 79.5, "experiment_boost": 0, "strategy_allocation": 1.56}
 - Strategy/objective: STRAT:acceptance-path-transition-inspection / OBJ:current-rule-authority
@@ -215,8 +196,25 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a learning-measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one materially different recall-rescue pass, then stop.; Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.
 
+### SLOT-12 — SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer
+- Assignment ID: ASSIGN:51e2788d0136:slot-12
+- Work kind/action: **learning_measurement / search**
+- Score: **60.57** — {"base_priority": 60.0, "experiment_boost": 0, "strategy_allocation": 0.57}
+- Strategy/objective: STRAT:bidirectional-money-evidence-invariant-tracing / OBJ:runtime-side-effect
+- Capability/experiment: cross-domain
+- Why now: STRAT:bidirectional-money-evidence-invariant-tracing is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 0 runs / 0 deep; confirm evidence: 0 runs / 0 deep. Pair it with promotion-control-transfer so the run measures a real bounded search task. The worker must not know or infer whether this run will later be train or confirm.
+- Next action: Run the bounded anchored transfer queries and inspect one connected implementation path.
+- Acceptance target: One independent target-domain implementation with source/test evidence for: promotion authority, versioned candidate, rollback test
+- Queries:
+  - MLflow "alias" "rollback"
+  - "model registry" "approval"
+  - MLflow "champion" path:tests
+- Search surfaces: GitHub code search, low-star/zero-star repository search, archived repository archaeology, author/org adjacency, dependency/consumer adjacency
+- Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.
+- Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a learning-measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one materially different recall-rescue pass, then stop.; Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.
+
 ### SLOT-13 — Independent verification — EXP-007
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-13
+- Assignment ID: ASSIGN:51e2788d0136:slot-13
 - Work kind/action: **independent_verification / execute_fixture**
 - Score: **90.80** — {"portfolio_priority_boost": 4, "status_boost": 0, "verification_base": 88}
 - Strategy/objective: STRAT:evaluation-target-independence / OBJ:independent-evaluation
@@ -231,7 +229,7 @@ This is the current 14-slot work plan. Scores are scheduling priorities, not cla
 - Stop conditions: Execute the pinned Thermo RAW row before shared normalization; no converter discovery until it runs.; Execute the existing durable-provider ambiguity matrix before broad lab-orchestrator discovery.; Do not reuse the target system's own outputs as the sole oracle.; Preserve disagreements instead of forcing consensus.
 
 ### SLOT-14 — Rare / weird wildcard exploration
-- Assignment ID: ASSIGN:55e8d55d0f69:slot-14
+- Assignment ID: ASSIGN:51e2788d0136:slot-14
 - Work kind/action: **wildcard / search**
 - Score: **75.00** — {"protected_exploration_budget": 75}
 - Strategy/objective: n/a / n/a

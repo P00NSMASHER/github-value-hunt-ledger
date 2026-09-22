@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "allocator_generation_id": "ALLOCGEN:55e8d55d0f69",
-  "portfolio_policy_generation_id": "PORTFOLIO:7d0862b1d1ea",
+  "allocator_generation_id": "ALLOCGEN:51e2788d0136",
+  "portfolio_policy_generation_id": "PORTFOLIO:6c1a3e6e5624",
   "candidate_count": 324,
   "assignment_count": 14,
   "slot_count": 14,
@@ -10,16 +10,16 @@
     "capability_gap": 1,
     "coverage_gap": 2,
     "positive_dna_transfer": 1,
-    "adjacency": 2,
-    "learning_measurement": 1,
+    "adjacency": 1,
+    "learning_measurement": 2,
     "independent_verification": 1,
     "wildcard": 1
   },
   "slot_role_counts": {
     "experiment": 6,
     "coverage": 3,
-    "adjacency": 2,
-    "measurement": 1,
+    "adjacency": 1,
+    "measurement": 2,
     "verification": 1,
     "wildcard": 1
   },

@@ -93,11 +93,11 @@
     },
     {
       "slot_id": "SLOT-11",
-      "role": "adjacency",
+      "role": "measurement",
       "accepts": [
-        "adjacency"
+        "learning_measurement"
       ],
-      "label": "Second-order adjacency expansion"
+      "label": "Adaptive learning measurement"
     },
     {
       "slot_id": "SLOT-12",
@@ -198,8 +198,8 @@
   },
   "learning": {
     "schema_version": 1,
-    "portfolio_policy_generation_id": "PORTFOLIO:7d0862b1d1ea",
-    "mode": "baseline_insufficient_evidence",
+    "portfolio_policy_generation_id": "PORTFOLIO:6c1a3e6e5624",
+    "mode": "learning_bootstrap_second_measurement_slot",
     "baseline_role_counts": {
       "experiment": 6,
       "coverage": 3,
@@ -211,12 +211,22 @@
     "effective_role_counts": {
       "experiment": 6,
       "coverage": 3,
-      "adjacency": 2,
-      "measurement": 1,
+      "adjacency": 1,
+      "measurement": 2,
       "verification": 1,
       "wildcard": 1
     },
-    "shift": null,
+    "shift": {
+      "reason": "blind_learning_bootstrap_no_confirmed_strategy_priors",
+      "from_role": "adjacency",
+      "to_role": "measurement",
+      "slot_id": "SLOT-11",
+      "measurement_recommendations": 3,
+      "confirmed_strategy_priors": 0,
+      "blind_confirmation_operational": true,
+      "automatic_revert_condition": "first strategy-level prior becomes eligible_for_policy_consideration"
+    },
+    "learning_bootstrap_active": true,
     "attributed_assignment_runs": 5,
     "attribution_debt_runs": 0,
     "evidence_thresholds": {
