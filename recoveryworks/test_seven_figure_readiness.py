@@ -4,6 +4,7 @@ import unittest
 
 from recoveryworks import (
     DurableRecoveryLedger,
+    RecoveryLedger,
     REQUIRED_READINESS_CHECKS,
     authorize_case_action,
     build_seven_figure_readiness,
@@ -345,6 +346,116 @@ class SevenFigureReadinessTests(unittest.TestCase):
         restored_record = restored.get(bundle.finding.finding_id)
         self.assertEqual(restored.journal.head_hash, ledger.journal.head_hash)
         self.assertEqual(restored_record.readiness_hash, readiness.package_hash)
+
+
+    def test_high_value_authorization_requires_durable_ledger_even_with_readiness(self):
+        (
+            bundle,
+            _durable_ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            _signature,
+            _timestamp,
+            _receipts,
+            readiness,
+        ) = build_readiness_chain()
+        ledger = RecoveryLedger()
+        ledger.add(bundle.finding)
+        ledger.approve(
+            bundle.finding.finding_id,
+            "sim-reviewer-1",
+            "Synthetic primary review.",
+        )
+        ledger.independent_approve(
+            bundle.finding.finding_id,
+            "sim-reviewer-2",
+            "Synthetic independent review.",
+        )
+        authorization = authorize_case_action(
+            bundle,
+            authorization_id="SIM-CLIENT-AUTH-NONDURABLE",
+            client_actor_id="sim-client-cfo",
+            approved_action_type="carrier_overcharge_demand",
+            authorized_at="2026-09-22T16:50:00Z",
+            maximum_amount_cents=100_000_000,
+            note="SIMULATION ONLY. Must still require durable journal.",
+        )
+        with self.assertRaises(ValueError):
+            ledger.authorize_with_case(
+                bundle.finding.finding_id,
+                bundle,
+                authorization,
+                readiness,
+            )
+
+    def test_unapproved_timestamp_standard_is_rejected(self):
+        (
+            _bundle,
+            _ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            signature,
+            *_rest,
+        ) = build_readiness_chain()
+        with self.assertRaises(ValueError):
+            record_external_timestamp_verification(
+                timestamp_id="SIM-BAD-TIMESTAMP",
+                subject_hash=signature.signature_hash,
+                authority="SIM-TSA",
+                standard="UNVERIFIED-CLOCK",
+                token_hash=sha(b"bad token"),
+                serial_number="BAD-1",
+                provider_request_id="BAD-REQ",
+                verification_receipt_hash=sha(b"bad receipt"),
+                timestamped_at="2026-09-22T16:47:30Z",
+                verified_at="2026-09-22T16:48:00Z",
+                verified_by_adapter="sim-adapter",
+                provider_verified=True,
+            )
+
+    def test_unapproved_object_lock_mode_is_rejected(self):
+        with self.assertRaises(ValueError):
+            record_object_lock_verification(
+                source_id="SIM-EV",
+                role="evidence",
+                source_hash="hash",
+                provider="SIM-STORE",
+                object_version_id="v1",
+                retention_control_id="control",
+                retention_mode="CONFIGURED_BUT_MUTABLE",
+                retain_until="2033-09-22T00:00:00Z",
+                legal_hold_status="OFF",
+                checked_at="2026-09-22T16:46:00Z",
+                provider_request_id="req",
+                provider_response_hash="response",
+                verified_by_adapter="adapter",
+                provider_verified=True,
+            )
+
+    def test_expired_object_lock_horizon_is_rejected(self):
+        with self.assertRaises(ValueError):
+            record_object_lock_verification(
+                source_id="SIM-EV",
+                role="evidence",
+                source_hash="hash",
+                provider="SIM-STORE",
+                object_version_id="v1",
+                retention_control_id="control",
+                retention_mode="OBJECT_LOCK_COMPLIANCE",
+                retain_until="2026-09-22T16:45:00Z",
+                legal_hold_status="OFF",
+                checked_at="2026-09-22T16:46:00Z",
+                provider_request_id="req",
+                provider_response_hash="response",
+                verified_by_adapter="adapter",
+                provider_verified=True,
+            )
 
     def test_readiness_payload_round_trip_is_tamper_evident(self):
         bundle, ledger, *rest = build_readiness_chain()
