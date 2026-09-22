@@ -22,6 +22,10 @@ from typing import Any, Iterable, Mapping
 from recoveryworks.engine import RecoveryObservation
 from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
 
+CPM_ENGINE_ID = "recoveryworks.fs_cpm"
+CPM_ENGINE_VERSION = "1"
+CPM_METHOD = "finish_to_start_integer_day_cpm"
+
 
 def _required(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
@@ -113,6 +117,37 @@ class ScheduleVersion:
                     f"relationship successor {rel.successor_id!r} is missing"
                 )
 
+    @property
+    def topology_hash(self) -> str:
+        """Canonical network fingerprint for this normalized schedule version."""
+        return canonical_hash({
+            "schema": 1,
+            "activities": [
+                {
+                    "activity_id": activity.activity_id,
+                    "duration_days": activity.duration_days,
+                }
+                for activity in sorted(self.activities, key=lambda item: item.activity_id)
+            ],
+            "relationships": [
+                {
+                    "predecessor_id": rel.predecessor_id,
+                    "successor_id": rel.successor_id,
+                    "relationship_type": rel.relationship_type,
+                    "lag_days": rel.lag_days,
+                }
+                for rel in sorted(
+                    self.relationships,
+                    key=lambda item: (
+                        item.predecessor_id,
+                        item.successor_id,
+                        item.relationship_type,
+                        item.lag_days,
+                    ),
+                )
+            ],
+        })
+
     def evidence(self) -> EvidenceRef:
         return EvidenceRef(
             evidence_id=f"construction-schedule:{self.version_id}",
@@ -127,6 +162,7 @@ class ScheduleVersion:
                 "label": self.label,
                 "activity_count": len(self.activities),
                 "relationship_count": len(self.relationships),
+                "topology_hash": self.topology_hash,
                 **dict(self.metadata),
             },
         )
@@ -149,6 +185,7 @@ class CPMResult:
     project_duration_days: int
     activities: Mapping[str, CPMActivityResult]
     critical_activity_ids: tuple[str, ...]
+    manifest: Mapping[str, Any]
 
 
 def calculate_cpm(version: ScheduleVersion) -> CPMResult:
@@ -245,6 +282,17 @@ def calculate_cpm(version: ScheduleVersion) -> CPMResult:
         project_duration_days=project_duration,
         activities=results,
         critical_activity_ids=tuple(sorted(critical)),
+        manifest={
+            "engine_id": CPM_ENGINE_ID,
+            "engine_version": CPM_ENGINE_VERSION,
+            "method": CPM_METHOD,
+            "schedule_version_id": version.version_id,
+            "schedule_source_hash": version.source_hash,
+            "topology_hash": version.topology_hash,
+            "data_date": version.data_date,
+            "activity_count": len(version.activities),
+            "relationship_count": len(version.relationships),
+        },
     )
 
 
