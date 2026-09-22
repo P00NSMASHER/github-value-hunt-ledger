@@ -9,7 +9,11 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from freight.contracts import REVIEW, VALIDATED, canonical_hash
-from freight.finding_factory import CLEAR, FindingFactoryBatch
+from freight.finding_factory import (
+    CLEAR,
+    FindingFactoryBatch,
+    verify_finding_factory_batch,
+)
 
 
 VALIDATED_MONEY = "VALIDATED_MONEY"
@@ -52,6 +56,7 @@ def _priority(item) -> tuple[int, int, str]:
 
 
 def build_review_queue(batch: FindingFactoryBatch) -> ReviewQueue:
+    verify_finding_factory_batch(batch)
     candidates = [item for item in batch.derivations if item.decision != CLEAR]
     candidates.sort(key=_priority)
 
