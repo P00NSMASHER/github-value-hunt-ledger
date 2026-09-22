@@ -283,3 +283,17 @@ create table if not exists intel_global_skill_review (
   global_review_sha256 text not null,
   created_at timestamptz not null default now()
 );
+
+-- Post-run blind partition receipts. The HMAC key never enters this table.
+-- Receipts are created only after canonical search-run intake so a worker
+-- cannot know train versus confirm while executing the claimed hunt.
+create table if not exists intel_training_split_receipt (
+  execution_claim_id text primary key,
+  search_run_id text not null unique,
+  partition text not null check (partition in ('train','confirm')),
+  partition_method text not null,
+  confirm_modulus int not null,
+  confirm_bucket int not null,
+  commitment_sha256 text not null,
+  created_at timestamptz not null default now()
+);
