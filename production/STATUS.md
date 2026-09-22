@@ -66,6 +66,19 @@ The current scheduled system still executes through ChatGPT automations and GitH
 
 These are deployment tasks, not research-design gaps. They should not be represented as already live.
 
+## Adaptive-learning restart readiness
+
+The repository now generates `intelligence/HUNTER_RESTART_READINESS.json` and `.md` as a non-activating gate. Machine readiness cannot enable a worker or change scheduled tasks: even after all gates pass, state stops at `AWAITING_EXPLICIT_USER_APPROVAL`.
+
+The readiness gate requires:
+- valid precommitted adaptive-learning measurement packets;
+- active secret-keyed train/confirm commitment and no pending split-receipt debt;
+- completion of the frozen matched benchmark;
+- the existing combined shadow-run minimum;
+- zero current generated activations before the canary starts.
+
+The initial canary is capped at three packet runs, one generated claim per packet, with no partition probing or partition-seeking retry.
+
 ## Next launch gate
 Finish the frozen 50-task A/B benchmark. Do not promote the new architecture fleet-wide before:
 1. benchmark completes;
