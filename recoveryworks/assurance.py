@@ -88,6 +88,96 @@ class AuthoritySnapshot:
             raise ValueError("authority jurisdiction does not match controlling rule")
 
 
+class AuthorityRegistry:
+    """Content-addressed registry of reviewed point-in-time authorities."""
+
+    def __init__(self) -> None:
+        self._by_id: dict[str, AuthoritySnapshot] = {}
+
+    def register(self, snapshot: AuthoritySnapshot) -> AuthoritySnapshot:
+        existing = self._by_id.get(snapshot.authority_id)
+        if existing is not None:
+            if existing.proof_hash != snapshot.proof_hash:
+                raise ValueError(
+                    "authority_id already exists with different immutable proof"
+                )
+            return existing
+        if (
+            snapshot.supersedes_authority_id is not None
+            and snapshot.supersedes_authority_id not in self._by_id
+        ):
+            raise ValueError("superseded authority must be registered first")
+        self._by_id[snapshot.authority_id] = snapshot
+        return snapshot
+
+    def get(self, authority_id: str) -> AuthoritySnapshot:
+        try:
+            return self._by_id[authority_id]
+        except KeyError as exc:
+            raise KeyError(f"unknown authority_id: {authority_id}") from exc
+
+    def resolve_rule(self, rule: RuleRef) -> AuthoritySnapshot:
+        matches: list[AuthoritySnapshot] = []
+        for snapshot in self._by_id.values():
+            try:
+                snapshot.assert_binds(rule)
+            except ValueError:
+                continue
+            matches.append(snapshot)
+        if len(matches) != 1:
+            raise ValueError(
+                f"controlling rule must resolve to exactly one authority snapshot; "
+                f"found {len(matches)}"
+            )
+        return matches[0]
+
+    @property
+    def registry_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "authorities": [
+                {
+                    "authority_id": item.authority_id,
+                    "proof_hash": item.proof_hash,
+                }
+                for item in sorted(
+                    self._by_id.values(),
+                    key=lambda value: value.authority_id,
+                )
+            ],
+        })
+
+    def export(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "registry_hash": self.registry_hash,
+            "authorities": [
+                {**asdict(item), "proof_hash": item.proof_hash}
+                for item in sorted(
+                    self._by_id.values(),
+                    key=lambda value: value.authority_id,
+                )
+            ],
+        }
+
+    @classmethod
+    def from_export(cls, payload: Mapping[str, Any]) -> "AuthorityRegistry":
+        if payload.get("schema") != 1:
+            raise ValueError("unsupported authority registry schema")
+        registry = cls()
+        for raw in payload.get("authorities", []):
+            proof_hash = raw.get("proof_hash")
+            snapshot = AuthoritySnapshot(**{
+                key: value for key, value in raw.items() if key != "proof_hash"
+            })
+            if proof_hash != snapshot.proof_hash:
+                raise ValueError("authority snapshot proof hash mismatch")
+            registry.register(snapshot)
+        if payload.get("registry_hash") != registry.registry_hash:
+            raise ValueError("authority registry hash mismatch")
+        return registry
+
+
 @dataclass(frozen=True)
 class SourceAttestation:
     evidence_id: str
