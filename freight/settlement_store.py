@@ -339,6 +339,18 @@ class SettlementStore:
             (*self._scope, v["source_hash"]),
         ).fetchone():
             raise ValueError("counter source_hash already used")
+        counter_total = int(conn.execute(
+            """SELECT COALESCE(SUM(amount_cents),0) FROM counter_events
+               WHERE buyer_id=? AND business_unit=? AND original_event_id=?""",
+            (*self._scope, v["original_event_id"]),
+        ).fetchone()[0])
+        event_amount = int(conn.execute(
+            """SELECT amount_cents FROM settlement_events
+               WHERE buyer_id=? AND business_unit=? AND event_id=?""",
+            (*self._scope, v["original_event_id"]),
+        ).fetchone()[0])
+        if counter_total + int(v["amount_cents"]) > event_amount:
+            raise ValueError("counter events exceed original settlement capacity")
         conn.execute("""INSERT INTO counter_events
           (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
           VALUES(:buyer_id,:business_unit,:counter_id,:original_event_id,:currency,:amount_cents,:observed_at,:source_hash,:source_kind)""", v)
@@ -364,12 +376,29 @@ class SettlementStore:
     def _event_residual(self, conn: sqlite3.Connection, event_id: str) -> int:
         row = conn.execute("""SELECT e.amount_cents
           - COALESCE((SELECT SUM(amount_cents) FROM allocations
-              WHERE buyer_id=e.buyer_id AND business_unit=e.business_unit AND event_id=e.event_id),0) AS residual
+              WHERE buyer_id=e.buyer_id AND business_unit=e.business_unit AND event_id=e.event_id),0)
+          - (
+              COALESCE((SELECT SUM(amount_cents) FROM counter_events
+                WHERE buyer_id=e.buyer_id AND business_unit=e.business_unit
+                  AND original_event_id=e.event_id),0)
+              - COALESCE((SELECT SUM(r.amount_cents)
+                FROM reversal_edges r
+                JOIN counter_events c
+                  ON c.buyer_id=r.buyer_id
+                 AND c.business_unit=r.business_unit
+                 AND c.counter_id=r.counter_id
+                WHERE c.buyer_id=e.buyer_id
+                  AND c.business_unit=e.business_unit
+                  AND c.original_event_id=e.event_id),0)
+            ) AS residual
           FROM settlement_events e WHERE e.buyer_id=? AND e.business_unit=? AND e.event_id=?""",
           (*self._scope, event_id)).fetchone()
         if not row:
             raise ValueError("unknown settlement event")
-        return int(row["residual"])
+        residual = int(row["residual"])
+        if residual < 0:
+            raise RuntimeError("settlement event residual is negative; evidence capacity is inconsistent")
+        return residual
 
     def claim_residual(self, claim_id: str) -> int:
         return self._read(lambda c: self._claim_residual(c, claim_id))
@@ -539,6 +568,10 @@ class SettlementStore:
                 raise ValueError("reversal created_at cannot predate counter observation")
             if created_at < allocation["created_at"]:
                 raise ValueError("reversal created_at cannot predate allocation")
+            if allocation["created_at"] > counter["observed_at"]:
+                raise ValueError(
+                    "counter predates allocation; returned funds already reduce event capacity"
+                )
 
             allocation_reversed = int(conn.execute(
                 "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges "
@@ -610,8 +643,11 @@ class SettlementStore:
         live = conn.execute("""SELECT a.*,
           a.amount_cents-COALESCE((SELECT SUM(amount_cents) FROM reversal_edges
              WHERE buyer_id=a.buyer_id AND business_unit=a.business_unit AND allocation_id=a.allocation_id),0) AS live_cents
-          FROM allocations a WHERE a.buyer_id=? AND a.business_unit=? AND a.event_id=? ORDER BY a.allocation_id""",
-          (*self._scope, counter["original_event_id"])).fetchall()
+          FROM allocations a
+          WHERE a.buyer_id=? AND a.business_unit=? AND a.event_id=?
+            AND a.created_at<=?
+          ORDER BY a.allocation_id""",
+          (*self._scope, counter["original_event_id"], counter["observed_at"])).fetchall()
         live = [r for r in live if r["live_cents"] > 0]
         if not live:
             return Decision(
