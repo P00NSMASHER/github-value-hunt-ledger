@@ -86,6 +86,7 @@ def load_construction_entitlements_csv(
     for row_number, row in enumerate(rows, start=2):
         result.append(ConstructionEntitlement(
             entitlement_id=_required(row, "Entitlement_ID", row_number),
+            claimant_id=_required(row, "Claimant_ID", row_number),
             project_id=_required(row, "Project_ID", row_number),
             counterparty_id=_required(row, "Counterparty_ID", row_number),
             change_id=_required(row, "Change_ID", row_number),
