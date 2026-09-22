@@ -207,18 +207,19 @@ for e in EXPERIMENTS:
     pb=priority_boost(e.get("priority_label"))
     score=round(base+pb-max(0,e["order"]-1)*0.25,2)
     plan_payload=experiment_plan_payload(e)
-    experiment_work_item_id,_=versioned_work_item_id(
+    experiment_work_item_id,experiment_work_revision=versioned_work_item_id(
       "experiment",e["experiment_id"],plan_payload
     )
     verification_payload={
       **plan_payload,
       "verification_mode":"experiment_falsification"
     }
-    verification_work_item_id,_=versioned_work_item_id(
+    verification_work_item_id,verification_work_revision=versioned_work_item_id(
       "verify","VERIFY:"+e["experiment_id"],verification_payload
     )
     candidates.append({
       "work_item_id":experiment_work_item_id,
+      "work_revision_sha256":experiment_work_revision,
       "work_kind":"experiment_execution",
       "work_action":plan_payload["work_action"],
       "source_id":e["experiment_id"],
@@ -247,6 +248,7 @@ for e in EXPERIMENTS:
     vbase=CFG["scoring"]["verification_base"]+(4 if e["status"]=="RUNNING" else 0)+pb
     candidates.append({
       "work_item_id":verification_work_item_id,
+      "work_revision_sha256":verification_work_revision,
       "work_kind":"independent_verification",
       "work_action":plan_payload["work_action"],
       "source_id":"VERIFY:"+e["experiment_id"],
@@ -418,6 +420,7 @@ for slot in slots:
       "slot_role":slot["role"],
       "slot_label":slot["label"],
       "work_item_id":c["work_item_id"],
+      "work_revision_sha256":c.get("work_revision_sha256"),
       "work_kind":c["work_kind"],
       "work_action":c.get("work_action","search"),
       "query_recipe_id":c.get("query_recipe_id"),
