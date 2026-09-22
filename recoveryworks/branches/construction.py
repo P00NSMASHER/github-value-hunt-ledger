@@ -251,6 +251,7 @@ def calculate_cpm(version: ScheduleVersion) -> CPMResult:
 @dataclass(frozen=True)
 class ConstructionEntitlement:
     entitlement_id: str
+    claimant_id: str
     project_id: str
     counterparty_id: str
     change_id: str
@@ -266,7 +267,7 @@ class ConstructionEntitlement:
 
     def __post_init__(self) -> None:
         for name in (
-            "entitlement_id", "project_id", "counterparty_id", "change_id",
+            "entitlement_id", "claimant_id", "project_id", "counterparty_id", "change_id",
             "event_id", "effective_date", "entitlement_basis",
             "source_hash", "source_locator",
         ):
@@ -289,6 +290,7 @@ class ConstructionEntitlement:
         identity = {
             "schema": 1,
             "entitlement_id": self.entitlement_id,
+            "claimant_id": self.claimant_id,
             "project_id": self.project_id,
             "counterparty_id": self.counterparty_id,
             "change_id": self.change_id,
@@ -308,6 +310,7 @@ class ConstructionEntitlement:
             source_locator=self.source_locator,
             metadata={
                 "kind": "reviewed_construction_entitlement",
+                "claimant_id": self.claimant_id,
                 "project_id": self.project_id,
                 "change_id": self.change_id,
                 "event_id": self.event_id,
@@ -429,6 +432,8 @@ class CausationReview:
             raise ValueError(
                 "verified causation review requires qualified_reviewer_id"
             )
+        if self.baseline_version_id == self.update_version_id:
+            raise ValueError("baseline and update schedule versions must differ")
         if self.accepted_causation and self.accepted_delay_days <= 0:
             raise ValueError(
                 "accepted causation requires positive accepted_delay_days"
@@ -593,6 +598,13 @@ def audit_construction_recovery(
 
     for entitlement_id in sorted(entitlement_by_id):
         entitlement = entitlement_by_id[entitlement_id]
+        if entitlement.claimant_id != client_id:
+            exceptions.append(ConstructionAuditException(
+                entitlement_id,
+                "CLAIMANT_SCOPE_MISMATCH",
+                "entitlement claimant_id does not match Scan 360 client_id",
+            ))
+            continue
 
         event = event_by_id.get(entitlement.event_id)
         if event is None:
@@ -673,6 +685,24 @@ def audit_construction_recovery(
                 entitlement_id,
                 "SCHEDULE_VERSION_ORDER_INVALID",
                 "update data_date precedes baseline data_date",
+            ))
+            continue
+        if _iso_date("review_date", review.review_date) < _iso_date(
+            "update data_date", update.data_date
+        ):
+            exceptions.append(ConstructionAuditException(
+                entitlement_id,
+                "CAUSATION_REVIEW_PRECEDES_UPDATE",
+                "qualified causation review predates the update schedule data_date",
+            ))
+            continue
+        if _iso_date("review_date", review.review_date) < _iso_date(
+            "event_date", event.event_date
+        ):
+            exceptions.append(ConstructionAuditException(
+                entitlement_id,
+                "CAUSATION_REVIEW_PRECEDES_EVENT",
+                "qualified causation review predates the delay event",
             ))
             continue
 
