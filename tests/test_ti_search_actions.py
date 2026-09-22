@@ -204,30 +204,49 @@ class GeneratedPacketTests(unittest.TestCase):
             )
 
     def test_terminal_stale_semantic_work_is_suppressed(self):
-        history_path = self.root / "intelligence" / "execution_claim_history.jsonl"
+        history_path = (
+            self.root
+            / "intelligence"
+            / "execution_claim_history.jsonl"
+        )
         verifier = next(
             candidate
             for candidate in self.candidates
             if (
-                candidate.get("work_kind") == "independent_verification"
-                and "EXP-007" in candidate.get("experiment_ids", [])
+                candidate.get("work_kind")
+                == "independent_verification"
+                and "EXP-007"
+                in candidate.get("experiment_ids", [])
             )
         )
         stale_id = verifier["work_item_id"]
-        original = history_path.read_text() if history_path.exists() else None
+        original = (
+            history_path.read_text()
+            if history_path.exists()
+            else None
+        )
         try:
             history_path.write_text(
-                json.dumps({
-                    "claim_id": "CLAIM:teststale001",
-                    "work_item_id": stale_id,
-                    "status": "FAILED_TERMINAL",
-                    "failure_code": "STALE_ASSIGNMENT",
-                    "retryable": False,
-                }) + "\n"
+                json.dumps(
+                    {
+                        "claim_id": "CLAIM:teststale001",
+                        "work_item_id": stale_id,
+                        "status": "FAILED_TERMINAL",
+                        "failure_code": "STALE_ASSIGNMENT",
+                        "retryable": False,
+                    }
+                )
+                + "\n"
             )
-            for script in ("ti_allocator.py", "ti_allocator_validate.py"):
+            for script in (
+                "ti_allocator.py",
+                "ti_allocator_validate.py",
+            ):
                 result = subprocess.run(
-                    [sys.executable, str(self.root / "tools" / script)],
+                    [
+                        sys.executable,
+                        str(self.root / "tools" / script),
+                    ],
                     cwd=self.root,
                     capture_output=True,
                     text=True,
@@ -240,13 +259,23 @@ class GeneratedPacketTests(unittest.TestCase):
             candidates = self.read("hunt_candidates.jsonl")
             allocations = self.read("hunt_allocations.jsonl")
             metrics = json.loads(
-                (self.root / "intelligence" / "allocator_metrics.json").read_text()
+                (
+                    self.root
+                    / "intelligence"
+                    / "allocator_metrics.json"
+                ).read_text()
             )
             self.assertFalse(
-                any(row.get("work_item_id") == stale_id for row in candidates)
+                any(
+                    row.get("work_item_id") == stale_id
+                    for row in candidates
+                )
             )
             self.assertFalse(
-                any(row.get("work_item_id") == stale_id for row in allocations)
+                any(
+                    row.get("work_item_id") == stale_id
+                    for row in allocations
+                )
             )
             self.assertIn(
                 stale_id,
@@ -258,7 +287,14 @@ class GeneratedPacketTests(unittest.TestCase):
             else:
                 history_path.write_text(original)
             subprocess.run(
-                [sys.executable, str(self.root / "tools" / "ti_allocator.py")],
+                [
+                    sys.executable,
+                    str(
+                        self.root
+                        / "tools"
+                        / "ti_allocator.py"
+                    ),
+                ],
                 cwd=self.root,
                 check=True,
                 capture_output=True,
@@ -267,137 +303,66 @@ class GeneratedPacketTests(unittest.TestCase):
 
     def test_versioned_work_revision_is_preserved_into_assignments(self):
         candidates = {
-            row['work_item_id']: row
+            row["work_item_id"]: row
             for row in self.candidates
         }
         for candidate in self.candidates:
-            if candidate['work_kind'] in {
-                'experiment_execution',
-                'independent_verification',
+            if candidate["work_kind"] in {
+                "experiment_execution",
+                "independent_verification",
             }:
                 self.assertRegex(
-                    candidate['work_revision_sha256'],
-                    r'^[a-f0-9]{64}                self.assertEqual(packet['verification_mode'], 'experiment_falsification')
-                self.assertTrue(packet['next_action'])
-                self.assertTrue(packet['independence_requirements'])
-                self.assertFalse(packet.get('queries'))
-
-
-if __name__ == '__main__':
-    unittest.main()
-,
-            )
-            self.assertEqual(packet['verification_mode'], 'hypothesis_challenge')
-            self.assertIs(packet['can_establish_verified'], False)
-            self.assertEqual(packet['queries'], [])
-        finally:
-            path.write_text(original)
-
-    def test_exp007_stale_assignment_is_not_reissued(self):
-        exp007 = [
-            candidate
-            for candidate in self.candidates
-            if "EXP-007" in candidate.get("experiment_ids", [])
-        ]
-        self.assertTrue(exp007)
-        stale_work_id = "WORK:verify:aec101b06ab5"
-        self.assertFalse(
-            any(
-                candidate.get("work_item_id") == stale_work_id
-                for candidate in exp007
-            )
-        )
-        for candidate in exp007:
-            next_action = (
-                candidate.get("instructions") or {}
-            ).get("next_action") or ""
-            self.assertIn("176/232-byte", next_action)
-            self.assertNotIn(
-                "patch/rebuild OpenTFRaw event lookup",
-                next_action,
-            )
-
-    def test_terminal_stale_semantic_work_is_suppressed(self):
-        history_path = self.root / "intelligence" / "execution_claim_history.jsonl"
-        verifier = next(
-            candidate
-            for candidate in self.candidates
-            if (
-                candidate.get("work_kind") == "independent_verification"
-                and "EXP-007" in candidate.get("experiment_ids", [])
-            )
-        )
-        stale_id = verifier["work_item_id"]
-        original = history_path.read_text() if history_path.exists() else None
-        try:
-            history_path.write_text(
-                json.dumps({
-                    "claim_id": "CLAIM:teststale001",
-                    "work_item_id": stale_id,
-                    "status": "FAILED_TERMINAL",
-                    "failure_code": "STALE_ASSIGNMENT",
-                    "retryable": False,
-                }) + "\n"
-            )
-            for script in ("ti_allocator.py", "ti_allocator_validate.py"):
-                result = subprocess.run(
-                    [sys.executable, str(self.root / "tools" / script)],
-                    cwd=self.root,
-                    capture_output=True,
-                    text=True,
+                    candidate["work_revision_sha256"],
+                    r"^[a-f0-9]{64}$",
                 )
-                self.assertEqual(
-                    result.returncode,
-                    0,
-                    result.stdout + result.stderr,
-                )
-            candidates = self.read("hunt_candidates.jsonl")
-            allocations = self.read("hunt_allocations.jsonl")
-            metrics = json.loads(
-                (self.root / "intelligence" / "allocator_metrics.json").read_text()
+        for assignment in self.allocations:
+            candidate = candidates[assignment["work_item_id"]]
+            self.assertEqual(
+                assignment.get("work_revision_sha256"),
+                candidate.get("work_revision_sha256"),
             )
-            self.assertFalse(
-                any(row.get("work_item_id") == stale_id for row in candidates)
-            )
-            self.assertFalse(
-                any(row.get("work_item_id") == stale_id for row in allocations)
-            )
-            self.assertIn(
-                stale_id,
-                metrics["suppressed_stale_work_items"],
-            )
-        finally:
-            if original is None:
-                history_path.unlink(missing_ok=True)
-            else:
-                history_path.write_text(original)
-            subprocess.run(
-                [sys.executable, str(self.root / "tools" / "ti_allocator.py")],
-                cwd=self.root,
-                check=True,
-                capture_output=True,
-                text=True,
+            self.assertEqual(
+                assignment.get("work_identity_payload"),
+                candidate.get("work_identity_payload"),
             )
 
     def test_semantic_identity_payload_tamper_fails_validation(self):
-        candidate_path = self.root / "intelligence" / "hunt_candidates.jsonl"
+        candidate_path = (
+            self.root
+            / "intelligence"
+            / "hunt_candidates.jsonl"
+        )
         original = candidate_path.read_text()
         try:
             rows = self.read("hunt_candidates.jsonl")
             target = next(
                 row
                 for row in rows
-                if row.get("work_kind") in {
+                if row.get("work_kind")
+                in {
                     "experiment_execution",
                     "independent_verification",
                 }
             )
-            target["work_identity_payload"]["next_action"] = "tampered action"
+            target["work_identity_payload"][
+                "next_action"
+            ] = "tampered action"
             candidate_path.write_text(
-                "\n".join(json.dumps(row) for row in rows) + "\n"
+                "\n".join(
+                    json.dumps(row)
+                    for row in rows
+                )
+                + "\n"
             )
             result = subprocess.run(
-                [sys.executable, str(self.root / "tools" / "ti_allocator_validate.py")],
+                [
+                    sys.executable,
+                    str(
+                        self.root
+                        / "tools"
+                        / "ti_allocator_validate.py"
+                    ),
+                ],
                 cwd=self.root,
                 capture_output=True,
                 text=True,
@@ -423,119 +388,12 @@ if __name__ == '__main__':
 if __name__ == '__main__':
     unittest.main()
 ,
-                )
-        for assignment in self.allocations:
-            candidate = candidates[assignment['work_item_id']]
-            self.assertEqual(
-                assignment.get('work_revision_sha256'),
-                candidate.get('work_revision_sha256'),
-            )
-
-    def test_verification_uses_a_frozen_experiment_target(self):
-        for c in self.candidates:
-            if c['work_kind'] == 'independent_verification':
-                packet = c['instructions']
-                self.assertEqual(packet['verification_mode'], 'experiment_falsification')
-                self.assertTrue(packet['next_action'])
-                self.assertTrue(packet['independence_requirements'])
-                self.assertFalse(packet.get('queries'))
-
-
-if __name__ == '__main__':
-    unittest.main()
-,
             )
             self.assertEqual(packet['verification_mode'], 'hypothesis_challenge')
             self.assertIs(packet['can_establish_verified'], False)
             self.assertEqual(packet['queries'], [])
         finally:
             path.write_text(original)
-
-    def test_exp007_stale_assignment_is_not_reissued(self):
-        exp007 = [
-            candidate
-            for candidate in self.candidates
-            if "EXP-007" in candidate.get("experiment_ids", [])
-        ]
-        self.assertTrue(exp007)
-        stale_work_id = "WORK:verify:aec101b06ab5"
-        self.assertFalse(
-            any(
-                candidate.get("work_item_id") == stale_work_id
-                for candidate in exp007
-            )
-        )
-        for candidate in exp007:
-            next_action = (
-                candidate.get("instructions") or {}
-            ).get("next_action") or ""
-            self.assertIn("176/232-byte", next_action)
-            self.assertNotIn(
-                "patch/rebuild OpenTFRaw event lookup",
-                next_action,
-            )
-
-    def test_terminal_stale_semantic_work_is_suppressed(self):
-        history_path = self.root / "intelligence" / "execution_claim_history.jsonl"
-        verifier = next(
-            candidate
-            for candidate in self.candidates
-            if (
-                candidate.get("work_kind") == "independent_verification"
-                and "EXP-007" in candidate.get("experiment_ids", [])
-            )
-        )
-        stale_id = verifier["work_item_id"]
-        original = history_path.read_text() if history_path.exists() else None
-        try:
-            history_path.write_text(
-                json.dumps({
-                    "claim_id": "CLAIM:teststale001",
-                    "work_item_id": stale_id,
-                    "status": "FAILED_TERMINAL",
-                    "failure_code": "STALE_ASSIGNMENT",
-                    "retryable": False,
-                }) + "\n"
-            )
-            for script in ("ti_allocator.py", "ti_allocator_validate.py"):
-                result = subprocess.run(
-                    [sys.executable, str(self.root / "tools" / script)],
-                    cwd=self.root,
-                    capture_output=True,
-                    text=True,
-                )
-                self.assertEqual(
-                    result.returncode,
-                    0,
-                    result.stdout + result.stderr,
-                )
-            candidates = self.read("hunt_candidates.jsonl")
-            allocations = self.read("hunt_allocations.jsonl")
-            metrics = json.loads(
-                (self.root / "intelligence" / "allocator_metrics.json").read_text()
-            )
-            self.assertFalse(
-                any(row.get("work_item_id") == stale_id for row in candidates)
-            )
-            self.assertFalse(
-                any(row.get("work_item_id") == stale_id for row in allocations)
-            )
-            self.assertIn(
-                stale_id,
-                metrics["suppressed_stale_work_items"],
-            )
-        finally:
-            if original is None:
-                history_path.unlink(missing_ok=True)
-            else:
-                history_path.write_text(original)
-            subprocess.run(
-                [sys.executable, str(self.root / "tools" / "ti_allocator.py")],
-                cwd=self.root,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
 
     def test_verification_uses_a_frozen_experiment_target(self):
         for c in self.candidates:
