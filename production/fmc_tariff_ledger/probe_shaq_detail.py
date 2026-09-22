@@ -40,8 +40,17 @@ def fetch_openapi() -> dict:
         OPENAPI_URL,
         headers={"User-Agent": "GitHub-Research-SHAQ-ReadOnly-Probe/1.0"},
     )
-    with urllib.request.urlopen(req, timeout=60) as response:
-        raw = response.read(10_000_000)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as response:
+            raw = response.read(10_000_000)
+    except Exception as exc:
+        return {
+            "url": OPENAPI_URL,
+            "status": "unavailable",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+        }
+
     digest = hashlib.sha256(raw).hexdigest()
     parsed = json.loads(raw)
     paths = {}
@@ -59,6 +68,7 @@ def fetch_openapi() -> dict:
         }
     return {
         "url": OPENAPI_URL,
+        "status": "available",
         "sha256": digest,
         "title": (parsed.get("info") or {}).get("title"),
         "version": (parsed.get("info") or {}).get("version"),
