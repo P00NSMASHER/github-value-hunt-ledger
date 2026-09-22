@@ -13,6 +13,8 @@ import currency_terms
 
 _CORE_TERMS = v2.extract_terms_v2
 _CORE_COMMAND_CRAWL = base.command_crawl
+_CORE_CRAWL_ONE = v2.crawl_one_location_v2
+PRODUCTION_PARSER_VERSION = "fmc-ledger-v3-crawl"
 
 
 def extract_terms_production(text: str, url: str):
@@ -84,6 +86,12 @@ def snapshot_fmc_directories(out_dir: Path, timeout: int, max_bytes: int) -> lis
     return manifest
 
 
+def crawl_one_location_production(*args, **kwargs):
+    result = _CORE_CRAWL_ONE(*args, **kwargs)
+    result["parser_version"] = PRODUCTION_PARSER_VERSION
+    return result
+
+
 def command_crawl_production(args):
     out_dir = Path(args.out).resolve()
     manifest = snapshot_fmc_directories(out_dir, args.timeout, args.max_bytes)
@@ -96,7 +104,7 @@ def command_crawl_production(args):
 # Install final production semantics on top of the reviewed v2 discovery/storage layer.
 v2.extract_terms_v2 = extract_terms_production
 base.extract_terms = extract_terms_production
-base.crawl_one_location = v2.crawl_one_location_v2
+base.crawl_one_location = crawl_one_location_production
 base.command_crawl = command_crawl_production
 
 
