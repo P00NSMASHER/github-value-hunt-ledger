@@ -196,6 +196,24 @@ if suppression_alerts:
         "are blocked from live priors. Treat these as repair/falsification targets, "
         "not as candidates for more allocation."
     )
+blind_confirmation = curriculum.get("blind_confirmation") or {}
+if blind_confirmation.get("operational") is not True:
+    lines += ["", "### Blind confirmation readiness", ""]
+    lines.append(
+        "- **Confirmation learning is currently blocked**: "
+        + str(
+            blind_confirmation.get("blocker")
+            or "blind_partition_not_operational"
+        )
+        + ". Train evidence can continue through normal generated claims, "
+        "but no strategy may be treated as independently confirmed until "
+        "the blind partition commitment/secret path is operational."
+    )
+    lines.append(
+        f"- Pending trusted generated claims awaiting partition resolution: "
+        f"**{blind_confirmation.get('pending_claim_count', 0)}**."
+    )
+
 measurement_recs = curriculum.get("recommended_measurements") or []
 if measurement_recs:
     lines += ["", "### Learning measurement debt", ""]
