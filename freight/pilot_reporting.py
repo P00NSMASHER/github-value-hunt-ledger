@@ -266,7 +266,9 @@ def build_pilot_metrics(
 
 
 def dollars(cents: int) -> str:
-    return "$" + format(cents / 100, ",.2f")
+    sign = "-" if cents < 0 else ""
+    whole, fraction = divmod(abs(cents), 100)
+    return sign + "$" + f"{whole:,}.{fraction:02d}"
 
 
 def render_markdown(metrics: PilotMetrics) -> str:
