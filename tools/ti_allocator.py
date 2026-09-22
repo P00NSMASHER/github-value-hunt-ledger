@@ -95,6 +95,7 @@ for s in SEEDS:
       "capability_gap":"capability_gap",
       "positive_dna_transfer":"positive_dna_transfer",
       "strategy_measurement":"strategy_measurement",
+      "learning_measurement":"learning_measurement",
       "coverage_gap":"coverage_gap"
     }.get(st)
     if not kind: continue
