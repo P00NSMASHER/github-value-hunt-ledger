@@ -39,6 +39,13 @@
   ],
   "live_sources": [
     {
+      "source_key": "endurant-master-list-live",
+      "payer_name": "Multi-payer TiC source registry",
+      "adapter": "github_master_list",
+      "source_url": "https://raw.githubusercontent.com/EndurantDevs/healthcare-mrf-api/main/specs/mrf_payer_master_list.md",
+      "notes": "Curated public payer/TiC entrypoint registry; imported as source candidates."
+    },
+    {
       "source_key": "uhc-live",
       "payer_name": "UnitedHealthcare",
       "adapter": "blob_api",
