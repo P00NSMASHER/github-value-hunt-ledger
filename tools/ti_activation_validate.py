@@ -6,6 +6,7 @@ POL=json.loads((INTEL/"activation_policy.json").read_text(encoding="utf-8"))
 PRES=load_jsonl("worker_presence_state.jsonl")
 DIR=load_jsonl("activation_directives.jsonl")
 PACK=load_jsonl("activation_claim_packets.jsonl")
+DISPATCH={x.get("dispatch_ticket_id"):x for x in load_jsonl("dispatch_claim_packets.jsonl") if x.get("dispatch_ticket_id")}
 HIST=load_jsonl("activation_history.jsonl")
 MET=json.loads((INTEL/"activation_metrics.json").read_text(encoding="utf-8"))
 
@@ -29,9 +30,14 @@ for n,x in enumerate(PACK,1):
     if int(x.get("claim_schema_version") or 0)<int(POL.get("minimum_claim_schema_version",16)):
         raise SystemExit(f"activation_claim_packets.jsonl:{n}: claim schema below V16 minimum")
     if x.get("assignment_work_kind")=="learning_measurement":
+        dispatch=DISPATCH.get(x.get("dispatch_ticket_id"))
+        if not dispatch:
+            raise SystemExit(f"activation_claim_packets.jsonl:{n}: learning measurement missing source dispatch packet")
         for key in ("learning_measurement_packet_id","learning_measurement_packet_sha256"):
             if not x.get(key):
                 raise SystemExit(f"activation_claim_packets.jsonl:{n}: learning measurement missing {key}")
+            if x.get(key)!=dispatch.get(key):
+                raise SystemExit(f"activation_claim_packets.jsonl:{n}: learning measurement dispatch binding drift: {key}")
 hist={x.get("activation_id"):x for x in HIST}
 if len(hist)!=len(HIST): raise SystemExit("activation history duplicate IDs")
 for x in PACK:
