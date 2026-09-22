@@ -347,3 +347,23 @@ The top direct-money ranking remains Freight Recovery first, followed by AP/comm
 - Main risks: ERP export permissions, supplier-statement availability, entity resolution across acquired companies, old/closed-period data, and entitlement disputes. None of these can be converted into assumed recoveries.
 - Value score: **9.7/10 strategic wedge**; external market proof pending.
 - Next validation: build one canonical synthetic cross-ERP corpus expressing the same underlying economic events in Oracle/SAP/D365/JDE/NetSuite-shaped extracts and prove identical recovery decisions and realized-settlement math across adapters.
+
+
+<!-- INTEGRATOR-UTILITY-2026-09-22 -->
+## New challenger — Utility Tariff & Billing Recovery
+- Sources: Utility Bill Recovery combination in `COMBINATIONS.md`; AWS rate compiler, WE3 monthly industrial/commercial tariff corpus, LBNL independent calculator and existing proof/settlement capabilities.
+- Buyer/problem: multi-site commercial/industrial energy users can be billed under wrong/obsolete rate classes, incorrect demand determinants/ratchets, rider/factor mistakes, duplicated periods or incorrect tariff versions, yet historical manual rerating is expensive.
+- First paid wedge: 5-25 meters x 12-24 months, read-only bill/interval-data rerating with frozen official tariff authority and a human-reviewed discrepancy/evidence packet.
+- Monetization hypothesis: $7.5k-$15k readiness scan; $15k-$40k historical pilot or setup plus 15-25% of uniquely attributable **realized** credits/refunds; recurring assurance only after pilot evidence.
+- Why now: the discovered components materially compress the hard technical work—complex tariff language, batch rating, national rate discovery and independent comparison—while the product can initially operate as a managed service without utility write access.
+- Defensibility: official tariff/rider version lineage + exact deterministic bill reconstruction + independent falsification + component coverage accounting + later utility credit/refund allocation. The moat is evidence and versioned rerating, not an LLM explanation.
+- Critical falsifiers before selling hard-dollar claims:
+  1. missing factor/tariff must stay UNKNOWN rather than zero;
+  2. no future tariff version may be applied to an older bill;
+  3. every billed component must map to authority or be explicitly unresolved;
+  4. exact cents and rounding scope must survive hand-derived goldens;
+  5. tariff-discovery corpus rows must be independently revalidated because its continuity check is currently defective;
+  6. a candidate discrepancy must remain distinct from issued and realized utility credit/refund.
+- Build-time advantage: estimated 6-12 months vs greenfield.
+- Value score: **9.6/10 challenger opportunity**, external buyer/outcome proof pending.
+- Next validation: create a rights-clean synthetic commercial meter corpus with effective-dated tariff revisions, TOU energy, tiered demand, ratchet, minimum bill, riders, taxes, one missing factor, one wrong rate class and one later credit; require two independent engines to agree on supported cases and force unsupported cases to REVIEW/$0.
