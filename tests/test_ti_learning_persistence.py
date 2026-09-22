@@ -20,6 +20,8 @@ class LearningPersistenceTests(unittest.TestCase):
         text = WORKFLOW.read_text(encoding="utf-8")
         required = [
             "intelligence/LEARNING_STATE.json",
+            "intelligence/learning_curriculum.json",
+            "intelligence/LEARNING_CURRICULUM.md",
             "intelligence/TRAINING_ENVIRONMENT.json",
             "intelligence/training_episodes.jsonl",
             "intelligence/NETWORK_PRIORS.md",
