@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 
 def parse_matched_benchmark_tasks(scoreboard: str) -> int:
@@ -67,6 +67,7 @@ def build_restart_readiness(
     packets: Mapping[str, Any],
     scoreboard_text: str,
     shadow_results: Mapping[str, str],
+    execution_claim_history: Sequence[Mapping[str, Any]] = (),
     required_matched_tasks: int = 50,
     required_shadow_runs: int = 15,
 ) -> dict[str, Any]:
@@ -115,6 +116,15 @@ def build_restart_readiness(
     no_current_activations = (
         int(activation_metrics.get("current_activations") or 0) == 0
     )
+    active_generated_claim_ids = sorted(
+        str(row.get("claim_id"))
+        for row in execution_claim_history
+        if row.get("routing_mode") == "generated"
+        and row.get("status") in {"CLAIMED", "RUNNING"}
+        and isinstance(row.get("claim_id"), str)
+        and row.get("claim_id")
+    )
+    no_active_generated_claims = not active_generated_claim_ids
 
     blockers: list[dict[str, Any]] = []
     if not packets_ready:
@@ -205,6 +215,20 @@ def build_restart_readiness(
                 ),
             }
         )
+    if not no_active_generated_claims:
+        blockers.append(
+            {
+                "code": "active_generated_claims_present",
+                "active_generated_claim_count": len(
+                    active_generated_claim_ids
+                ),
+                "active_generated_claim_ids": active_generated_claim_ids,
+                "action": (
+                    "Complete, fail, expire, or release active generated "
+                    "claims before starting a measurement canary."
+                ),
+            }
+        )
 
     if blockers:
         state = "BLOCKED"
@@ -232,6 +256,7 @@ def build_restart_readiness(
             "benchmark_complete": benchmark_ready,
             "shadow_run_gate_complete": shadow_ready,
             "no_current_activations": no_current_activations,
+            "no_active_generated_claims": no_active_generated_claims,
         },
         "evidence": {
             "matched_benchmark_tasks": matched,
@@ -255,6 +280,10 @@ def build_restart_readiness(
             "current_activations": int(
                 activation_metrics.get("current_activations") or 0
             ),
+            "active_generated_claim_count": len(
+                active_generated_claim_ids
+            ),
+            "active_generated_claim_ids": active_generated_claim_ids,
         },
         "blockers": blockers,
         "activation_contract": (
@@ -291,6 +320,7 @@ def validate_restart_readiness(
             "benchmark_complete",
             "shadow_run_gate_complete",
             "no_current_activations",
+            "no_active_generated_claims",
         )
     )
     expected_state = (
