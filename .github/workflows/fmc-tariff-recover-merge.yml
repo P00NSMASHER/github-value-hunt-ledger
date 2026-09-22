@@ -66,12 +66,12 @@ jobs:
               # artifacts will fail explicitly in rehydrate instead.
               run_id = os.environ.get('WORKFLOW_RUN_ID', '').strip()
               shard_count = 12
-              retention = 7
+              retention = 90
               copy_raw = False
           elif event == 'workflow_dispatch':
               run_id = os.environ.get('INPUT_RUN_ID', '').strip()
               shard_count = int(os.environ.get('INPUT_SHARDS') or '12')
-              retention = int(os.environ.get('INPUT_RETENTION') or '7')
+              retention = int(os.environ.get('INPUT_RETENTION') or '90')
               copy_raw = (os.environ.get('INPUT_COPY_RAW') or 'false').lower() == 'true'
           else:
               cfg = {}
@@ -81,7 +81,7 @@ jobs:
                       cfg[k.strip()] = v.strip()
               run_id = cfg['source_run_id']
               shard_count = int(cfg.get('shard_count', '12'))
-              retention = int(cfg.get('retention_days', '7'))
+              retention = int(cfg.get('retention_days', '90'))
               copy_raw = cfg.get('copy_raw_evidence', 'false').lower() == 'true'
 
           if not run_id.isdigit():
