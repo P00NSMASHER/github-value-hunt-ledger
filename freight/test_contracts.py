@@ -127,6 +127,33 @@ def test_duplicate_population_row_is_rejected():
         raise AssertionError("duplicate row should fail")
 
 
+def test_delimiter_colliding_population_pairs_remain_distinct_identities():
+    first = row("INV|PART", "SHIP", customer="cust-a")
+    second = row("INV", "PART|SHIP", customer="cust-b")
+    pop = population([first, second])
+    assert len(pop.rows) == 2
+    assert {item.identity_key for item in pop.rows} == {
+        ("INV|PART", "SHIP"),
+        ("INV", "PART|SHIP"),
+    }
+
+
+def test_delimiter_collision_cannot_attach_finding_to_wrong_population_row():
+    pop = population([
+        row("INV|PART", "SHIP", customer="cust-a"),
+    ])
+    with pytest.raises(ValueError, match="outside frozen population"):
+        freeze_truth(
+            pop,
+            [authority(customer="cust-a")],
+            [finding(
+                invoice_id="INV",
+                shipment_id="PART|SHIP",
+                customer="cust-a",
+            )],
+        )
+
+
 def test_wrong_customer_or_carrier_authority_cannot_validate_money():
     pop = population()
     bad = authority(customer="different-customer")
