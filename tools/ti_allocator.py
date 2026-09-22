@@ -103,7 +103,6 @@ for s in SEEDS:
     kind={
       "capability_gap":"capability_gap",
       "positive_dna_transfer":"positive_dna_transfer",
-      "strategy_measurement":"strategy_measurement",
       "learning_measurement":"learning_measurement",
       "coverage_gap":"coverage_gap"
     }.get(st)
@@ -376,7 +375,7 @@ for slot in slots:
           "experiment":["capability_gap","positive_dna_transfer"],
           "coverage":["positive_dna_transfer","capability_gap"],
           "adjacency":["positive_dna_transfer"],
-          "measurement":["strategy_measurement","capability_gap"],
+          "measurement":["learning_measurement"],
           "verification":["independent_verification"],
           "wildcard":["wildcard"]
         }.get(slot["role"],[])
