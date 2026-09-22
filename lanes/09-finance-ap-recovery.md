@@ -497,3 +497,73 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Important dependencies/risks: Matching helper currently uses Python `float` for money, so production money math should be wrapped/replaced with exact Decimal/integer-minor-unit logic. Repository evidence is demo/test oriented rather than a customer production proof. PO/GR correctness does not establish contract entitlement or realized recovery.
 - Connections: S/4 counterpart to SAP ECC `Accountw-debug/mdq`; pair its read adapter/workflow with Invoice Lens/ReconForge exact-money rules and the Accounting-App-style realized-credit/refund state machine.
 - Opportunity score: **9.1/10**.
+
+
+### lineledger/lineledger — GL-grounded vendor-credit settlement and reversal donor
+- Repository: https://github.com/lineledger/lineledger
+- Commit / revision: 40607d92c7e7a418178ce27d3e679538110100f2
+- Date discovered: 2026-09-22
+- What actually works: Active five-star Laravel accounting system with cents-based vendor credits, bills, bill payments, bank reconciliation, contact statements and GL posting. A posted vendor credit debits AP and credits expense/tax, reducing the vendor's AP balance. The `BillReconciler` then closes only the portion of bill-document balance that the GL proves is already settled; it posts no new journal for that reconciliation. If a vendor credit is voided, the reconciler releases unsupported prior reconciliation and reopens the bill. Bill payment posting uses row locks to avoid concurrent lost updates and recomputes bill state from live applications.
+- Evidence of implementation: `SaveVendorCredit.php`, `VendorCreditPoster.php`, `BillPaymentPoster.php`, `BillReconciler.php`, `ContactStatementBuilder.php`; feature tests `VendorCreditPostingTest.php`, `BillReconcilerTest.php`, `BillPaymentCreditSummaryTest.php`. Tests explicitly prove AP reduction, vendor-credit netting, no double-count, no GL mutation during document reconciliation, refusal to close still-owed balances, and re-opening after credit void.
+- Why it matters: This is one of the strongest accounting implementations found for the exact distinction AP Recovery needs between a credit existing in the GL and a bill actually being economically settled. It provides a clean template for preventing double-counted realized recovery.
+- Useful capability/workflow: vendor credit -> GL AP reduction -> ledger-supported bill reconciliation -> reversible settlement state -> vendor statement/report.
+- Likely buyer: SMB/mid-market controller/AP team; internal AP Recovery settlement ledger.
+- Pain solved: Credits can exist on a vendor account while invoice-level documents remain open, causing double-counting or false “realized recovery” claims.
+- Fastest monetization path: Use these semantics inside the AP Recovery case ledger so a recovery is realized only when GL/vendor balance and document allocation agree.
+- Paid-pilot concept: Supplier-credit audit that distinguishes credit created, credit economically available, credit applied to bill, cash refunded and later reversed.
+- Estimated engineering time saved: 1-3 months of accounting settlement/reversal and regression-test design.
+- License / reuse status: AGPL-3.0 upstream; project-level user authorization says repository rights are available.
+- Important risks: LineLedger itself is a full accounting app, so selective semantic reuse is preferable to wholesale adoption; its vendor-credit application is GL-netted rather than a separate explicit allocation record, so AP Recovery should preserve its own recovery-case allocation edges.
+- Connections: Complements Accounting-App's explicit supplier refund/debit-note state machine and ReconForge's exact-money/audit controls.
+- Opportunity score: **9.4/10**.
+
+### netc-fleet-services/statement-reconciliation — multi-vendor real-format statement parser library
+- Repository: https://github.com/netc-fleet-services/statement-reconciliation
+- Commit / revision: d06d500b0cc010350ace2293f3b4f28dd6f68ddb
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Python statement-reconciliation project with 23 vendor-specific PDF parsers covering 27 statement layouts, a QuickBooks Desktop XLSX loader, a common `StatementRecord` model where charges are positive and credits/payments negative, parser verification against statement control totals, exact invoice-number reconciliation, penny/date tolerances, edit-distance-one fuzzy matching gated for human review, and Excel discrepancy export. It also contains a small Supabase/Next.js job surface.
+- Evidence of implementation: `reconciler/parsers/*`, `qb_loader.py`, `verify.py`, `reconcile.py`, `scripts/run_reconciliation.py`; README states 26/27 parser samples verify against printed totals, with the remaining parser explicitly marked no-stated-total rather than falsely passing.
+- Why it matters: The hard practical problem in supplier-statement recovery is not generic OCR; it is normalization across dozens of idiosyncratic vendor layouts. This repository contains unusually concentrated real-format parser logic.
+- Useful capability/workflow: vendor PDF -> typed charge/credit/payment records -> parser control-total verification -> QB normalized records -> exact/fuzzy comparison -> discrepancy workbook.
+- Likely buyer: AP shared services, vehicle/fleet operators, SMBs on QuickBooks Desktop, recovery-audit firms.
+- Pain solved: Manual vendor-statement parsing/reconciliation and missed credits/mismatches.
+- Fastest monetization path: Top-vendor statement reconciliation service; start with PDF + QuickBooks export and add parser families as paying customers require them.
+- Paid-pilot concept: Reconcile 20-30 high-spend suppliers for one month/quarter, return statement-only, QB-only, amount/date mismatch and likely-typo populations for review.
+- Estimated engineering time saved: 2-4 months of vendor-layout parsing and verification work.
+- License / reuse status: No public license detected; project-level user authorization says rights are available.
+- Important dependencies/risks: Repository provenance for sample statements is not sufficiently explicit to treat source PDFs as reusable benchmark data; retain code/parser knowledge and do not ingest or redistribute source documents without clear customer/public authorization. Money uses float in the comparator and should be converted to Decimal/integer cents.
+- Connections: Strong front-end intake for AP Recovery v2; downstream cases should be re-rated/re-performed independently before recovery.
+- Opportunity score: **9.1/10**.
+
+### rehman671/vendor-reconciliation-engine — fail-closed reconciliation-to-settlement gate
+- Repository: https://github.com/rehman671/vendor-reconciliation-engine
+- Commit / revision: 1ae859c938533f4f3e79fd8eef5d6e2ed45fd625
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Django reference implementation for vendor statement ingestion, reference normalization, exact/normalized/amount-date matching, Decimal money, exception persistence, validation gates and settlement-file emission. Raw vendor references are preserved while normalized references are stored separately. One statement line cannot settle two internal transactions. Every vendor line must become either a match or an explicit exception. Low-confidence amount/date matches block settlement. A control-total disagreement blocks settlement. A blocked run cannot emit a settlement file even when the emitter is called directly.
+- Evidence of implementation: `models.py`, `ingest.py`, `matching.py`, `validation.py`, `settlement.py`, 41-test suite; `test_pipeline.py` explicitly proves blocked runs produce no settlement file, forced emitter calls are rejected, low-confidence matches block settlement, and all gates report together.
+- Why it matters: This is a compact, reusable control pattern for AP Recovery's core safety invariant: **reconciliation is not settlement; settlement is earned only when all validation gates pass**.
+- Useful capability/workflow: raw statement batch -> normalized but immutable evidence -> match/exception ledger -> full validation report -> settlement artifact only on PASS.
+- Likely buyer: AP/payment operations, marketplaces, vendor-pay teams, internal Recovery engine.
+- Pain solved: Reconciliation systems that “mostly match” and still release money or count recoveries despite unresolved breaks.
+- Fastest monetization path: Use as the settlement-gate architecture beneath supplier-credit recovery and acceptance testing.
+- Paid-pilot concept: Independent settlement-readiness report for a buyer's recovery workbook or supplier-credit population.
+- Estimated engineering time saved: 3-6 weeks of fail-closed reconciliation/settlement state design plus test cases.
+- License / reuse status: No public license detected; project-level user authorization says rights are available.
+- Important risks: It is a reference engine, not ERP-specific; settlement-file semantics need adaptation from payment release to recovery realization.
+- Connections: Pair with netc statement normalization + LineLedger/Accounting-App settlement semantics + ReconForge evidence/audit plane.
+- Opportunity score: **9.3/10**.
+
+### conductor-is/quickbooks-desktop — production-grade QuickBooks Desktop connector option
+- Repositories: https://github.com/conductor-is/quickbooks-desktop-node and https://github.com/conductor-is/quickbooks-desktop-python
+- Revisions: node a8024fd028ca1103c190684868456efc8d842940; python ffb1c0de120500e24c331cb89c1a77a8a02b7437
+- Date discovered: 2026-09-22
+- What actually works: Actively maintained Apache-2.0 generated SDKs exposing QuickBooks Desktop bills, bills-to-pay, bill-check/credit-card payments, vendor credits, purchase orders, vendors, reports, deleted transactions and related APIs, with extensive endpoint tests.
+- Why it matters: Gives AP Recovery a plausible direct QuickBooks Desktop integration path for SMB/mid-market customers instead of requiring only file exports.
+- Useful capability/workflow: read vendor/bill/vendor-credit/payment/PO/report state; optional write paths exist but AP Recovery should stay read-only during initial audits.
+- Likely buyer: QuickBooks Desktop-heavy SMB/mid-market AP departments and accounting firms.
+- Fastest monetization path: Keep CSV/XLSX as default; offer connector onboarding only after a customer pays for recurring assurance.
+- Estimated engineering time saved: 3-6 weeks of SDK/endpoint plumbing.
+- License / reuse status: Apache-2.0 client SDK code; Conductor's hosted/backend service and access terms are separate from SDK licensing.
+- Important risks: External service dependency and customer QuickBooks Desktop connectivity requirements; not a recovery engine by itself.
+- Connections: Natural connector for netc statement reconciliation and AP Recovery v2.
+- Opportunity score: **7.9/10** supporting infrastructure.
