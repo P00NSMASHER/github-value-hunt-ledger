@@ -27,6 +27,7 @@ from recoveryworks import (
     SourceAttestation,
     authorize_case_action,
     build_hostile_examination_packet,
+    build_seven_figure_authorization_dossier,
     build_seven_figure_readiness,
     create_build_provenance_attestation,
     create_proof_seal,
@@ -283,7 +284,7 @@ def _build_readiness(
         )
         for index, item in enumerate(retention.entries, start=1)
     )
-    return build_seven_figure_readiness(
+    readiness = build_seven_figure_readiness(
         bundle,
         packet,
         retention,
@@ -297,6 +298,19 @@ def _build_readiness(
         evaluated_at="2026-09-22T16:24:50Z",
         evaluated_by="sim-readiness-controller",
     )
+    dossier = build_seven_figure_authorization_dossier(
+        readiness,
+        packet,
+        retention,
+        completeness,
+        build,
+        public_record,
+        bundle,
+        journal_head_hash=ledger.journal.head_hash,
+        assembled_at="2026-09-22T16:24:55Z",
+        assembled_by="sim-readiness-dossier-controller",
+    )
+    return readiness, dossier
 
 
 def _build(payload: dict):
@@ -496,7 +510,7 @@ def _build(payload: dict):
         reviews[1].reviewer_id,
         reviews[1].note,
     )
-    readiness = _build_readiness(
+    readiness, dossier = _build_readiness(
         payload,
         bundle,
         calculation,
@@ -508,6 +522,7 @@ def _build(payload: dict):
         bundle,
         authorization,
         readiness,
+        dossier,
     )
     ledger.mark_claimed(finding.finding_id, envelope)
 
@@ -547,6 +562,7 @@ def _build(payload: dict):
         "ledger": ledger,
         "seal": seal,
         "readiness": readiness,
+        "dossier": dossier,
     }
 
 
