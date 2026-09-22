@@ -2,6 +2,7 @@
 from .engine import RecoveryEngine, RecoveryObservation
 from .ledger import LedgerEvent, LedgerRecord, RecoveryLedger
 from .packets import RecoveryPacket, build_client_portfolio_packet, build_recovery_packet, submission_ready
+from .raw_scan import build_raw_scan, execute_raw_scan_payload, run_raw_scan_payload
 from .scan import RecoveryScanBatch, RecoveryScanManifest, SourceManifestEntry, freeze_scan, run_scan
 from .storage import export_ledger, import_ledger, load_ledger, save_ledger
 from .models import (
@@ -32,6 +33,9 @@ __all__ = [
     "RuleRef",
     "SourceManifestEntry",
     "build_client_portfolio_packet",
+    "build_raw_scan",
+    "execute_raw_scan_payload",
+    "run_raw_scan_payload",
     "build_recovery_packet",
     "export_ledger",
     "import_ledger",
