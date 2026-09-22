@@ -345,13 +345,7 @@ def derive_batch(
         raise ValueError("duplicate charge source evidence")
     normalized_rules = tuple(rules)
     row_index = {row.row_key: row for row in population.rows}
-    covered_rows = {(charge.invoice_id, charge.shipment_id) for charge in normalized_charges}
-    missing_rows = set(row_index) - covered_rows
-    if missing_rows:
-        raise ValueError(
-            "audit charge set does not cover every frozen population row: "
-            + ",".join(repr(key) for key in sorted(missing_rows))
-        )
+    covered_rows: set[tuple[str, str]] = set()
 
     fixed_scope_groups: dict[tuple[str, str, str], list[InvoiceCharge]] = {}
     for charge in normalized_charges:
@@ -371,6 +365,7 @@ def derive_batch(
             row.customer_id, row.carrier_id, row.currency,
         ):
             raise ValueError("charge identity mismatch with frozen population")
+        covered_rows.add((charge.invoice_id, charge.shipment_id))
         multi_line = fixed_scope_groups[
             (charge.invoice_id, charge.shipment_id, charge.charge_code)
         ]
@@ -397,6 +392,13 @@ def derive_batch(
                 ))
                 continue
         derivations.append(derive_charge(charge, normalized_rules))
+
+    missing_rows = set(row_index) - covered_rows
+    if missing_rows:
+        raise ValueError(
+            "audit charge set does not cover every frozen population row: "
+            + ",".join(repr(key) for key in sorted(missing_rows))
+        )
 
     derivations = tuple(derivations)
     findings = tuple(item.finding for item in derivations if item.finding is not None)
