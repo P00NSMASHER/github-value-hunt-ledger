@@ -5,6 +5,7 @@ on:
     paths:
       - "hunters/**"
       - "intelligence/**"
+      - "production/**"
       - "tools/ti_*.py"
       - "tests/test_ti_*.py"
       - "CAPABILITIES.md"
@@ -22,6 +23,7 @@ on:
     paths:
       - "hunters/**"
       - "intelligence/**"
+      - "production/**"
       - "tools/ti_*.py"
       - "tests/test_ti_*.py"
       - "CAPABILITIES.md"
@@ -102,6 +104,9 @@ jobs:
                   intelligence/query_families.jsonl \
                   intelligence/derived_edges.jsonl \
                   intelligence/LEARNING_REPORT.md \
+                  intelligence/LEARNING_STATE.json \
+                  intelligence/TRAINING_ENVIRONMENT.json \
+                  intelligence/training_episodes.jsonl \
                   intelligence/REGISTRY_REPORT.md \
                   intelligence/REVISION_DEBT_REPORT.md \
                   intelligence/DATA_QUALITY_REPORT.md \

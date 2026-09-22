@@ -1,57 +1,143 @@
 {
-  "schema_version": "1.0",
-  "run_id": "RUN-20260921T060826Z-HUNTER13-EXP007-OPENTRONS-ABSENT-ACTION-RACE",
-  "worker_id": "HUNTER-13",
-  "routing": "unallocated",
-  "work_action": "independent_verification/execute_fixture",
-  "capabilities": ["CAP-017"],
-  "experiment": "EXP-007",
-  "started_at": "2026-09-21T06:08:26Z",
-  "completed_at": "2026-09-21T06:08:30Z",
-  "status": "COMPLETE",
-  "target": {
-    "repository": "Opentrons/opentrons",
-    "revision": "03b991fb263b97b6bb767ce311ca56e103d635e4",
-    "provider": "official Robot Server",
-    "execution_mode": "repository hardware simulator with named SQLite persistence directory"
-  },
-  "frozen_claim": "No provider action record after an ambiguous failure means execution never began and the action is safe to reissue.",
-  "instrumentation": {
-    "description": "30-second await inserted immediately before the existing action-store insert",
-    "controller_sha256": "660ddf14481b77c3aaa28b167be18e919975263416398b04a445569949ad0c97",
-    "semantic_change": "Widened the existing execution-before-insert interval without reordering it",
-    "removed_after_run": true
-  },
-  "fault": {
-    "type": "SIGKILL provider while run and command were running but action count was zero",
-    "run_id": "9669a79b-9f84-4d2d-87ea-dd686a238a1d",
-    "command_id": "63f9fa44-3b25-4b44-9f0a-0c8fe637b689",
-    "client_result": "RemoteDisconnected"
-  },
-  "before_crash": {
-    "run_status": "running",
-    "command_states": ["running"],
-    "action_count": 0
-  },
-  "after_provider_restart": {
-    "same_run_read_status": 200,
-    "run_status": "stopped",
-    "command_states": [],
-    "action_count": 0
-  },
-  "redispatch_count": 0,
-  "classification": "RECONCILIATION_REQUIRED",
-  "assertions": {
-    "execution_running_before_action_insert": true,
-    "command_running_before_action_insert": true,
-    "no_action_before_crash": true,
-    "no_action_after_restart": true,
-    "same_run_readable_after_restart": true,
-    "no_redispatch": true,
-    "absence_cannot_prove_no_effect": true
-  },
-  "result": "FALSIFIED_SAFE_TO_REISSUE_FROM_ABSENT_ACTION",
-  "result_artifact_sha256": "faf378912249221a24bcab15cb9cf7d24afc7943f222d79bceac2e2ec4587be2",
-  "scope_limit": "Race-amplified official server path with simulator execution; no physical robot motion, liquid transfer or human observation was claimed.",
-  "evidence_path": "referrals/hunt13-r27-2026-09-21-exp007-opentrons-absent-action-race.md"
+  "schema_version": 16,
+  "search_run_id": "RUN:20260921T060826Z:HUNTER-13:opentrons-absent-action-race",
+  "timestamp": "2026-09-21T06:08:26Z",
+  "date": "2026-09-21",
+  "hunter_role": "HUNTER-13",
+  "hunter": "HUNTER-13",
+  "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
+  "query_family": "exp007-opentrons-absent-action-race",
+  "query_family_id": "QF:exp007-opentrons-absent-action-race",
+  "search_objective_id": "OBJ:ambiguity-reconciliation",
+  "measurement_quality": "prospective",
+  "work_action": "execute_fixture",
+  "lane_ids": [],
+  "seed_nodes": [
+    "CAP-017",
+    "EXP-007"
+  ],
+  "search_surfaces": [
+    "Opentrons exact-revision source",
+    "official Robot Server runtime",
+    "SQLite persistence",
+    "repository hardware simulator"
+  ],
+  "queries": [],
+  "candidate_count": 0,
+  "deep_inspected": 0,
+  "retained_count": 0,
+  "master_promoted_count": 0,
+  "elapsed_minutes": null,
+  "tool_calls": null,
+  "recall_rescue_used": false,
+  "stop_reason": "The frozen SAFE_TO_REISSUE-from-absent-action claim was falsified in the official simulator; absent provider action remains RECONCILIATION_REQUIRED and device-in-the-loop evidence is the next external falsifier.",
+  "new_capability_ids": [],
+  "strengthened_capability_ids": [
+    "CAP-017"
+  ],
+  "experiment_ids": [
+    "EXP-007"
+  ],
+  "candidate_dispositions": [],
+  "best_result": "Official Robot Server showed a running command before action persistence; SIGKILL in that interval left the restarted run readable with zero actions, falsifying the claim that an absent action record proves no execution began.",
+  "durable_evidence_path": "referrals/hunt13-r27-2026-09-21-exp007-opentrons-absent-action-race.md",
+  "notes": "Bounded unallocated verification using repository hardware simulator and real SQLite persistence. No physical robot, liquid transfer, human observation, activation, lease or redispatch is claimed.",
+  "benchmark_task_ids": [],
+  "comparison_group_id": null,
+  "evaluation_set_id": null,
+  "seed_mode": "manual_hypothesis",
+  "seed_ids": [],
+  "adjacency_mode": "none",
+  "adjacency_ids": [],
+  "adjacency_types": [],
+  "adjacency_root_nodes": [],
+  "coverage_mode": "none",
+  "coverage_gap_ids": [],
+  "allocation_mode": "unallocated",
+  "allocator_generation_id": null,
+  "assignment_id": null,
+  "assignment_work_item_id": null,
+  "portfolio_policy_generation_id": null,
+  "assignment_slot_role": null,
+  "assignment_work_kind": null,
+  "assignment_source_id": null,
+  "assignment_score": null,
+  "execution_claim_id": null,
+  "execution_slot_id": null,
+  "execution_worker_id": "HUNTER-13",
+  "routing_mode": "unrouted",
+  "routing_generation_id": null,
+  "worker_profile_generation_id": null,
+  "routing_score": null,
+  "dispatch_ticket_id": null,
+  "dispatch_generation_id": null,
+  "routing_learning_generation_id": null,
+  "route_override_reason": "No HUNTER-13 activation or lease was claimed; bounded unallocated verification followed the experiment scope.",
+  "dispatch_kind": null,
+  "dispatch_parent_ticket_id": null,
+  "parent_dispatch_ticket_id": null,
+  "presence_generation_id": null,
+  "presence_event_id": null,
+  "activation_id": null,
+  "activation_generation_id": null,
+  "stop_reason_standard": "completed_nonsearch",
+  "coordination_signal_ids": [],
+  "consumed_coordination_signal_ids": [],
+  "recall_rescue_type": null,
+  "recall_rescue_found_qualifying_candidate": null,
+  "search_moves": [],
+  "candidate_preflight_checks": null,
+  "known_candidate_preflight_hits": null,
+  "duplicate_deep_inspections_avoided": null,
+  "execution_evidence": {
+    "started_at": "2026-09-21T06:08:26Z",
+    "completed_at": "2026-09-21T06:08:30Z",
+    "status": "COMPLETE",
+    "target": {
+      "repository": "Opentrons/opentrons",
+      "revision": "03b991fb263b97b6bb767ce311ca56e103d635e4",
+      "provider": "official Robot Server",
+      "execution_mode": "repository hardware simulator with named SQLite persistence directory"
+    },
+    "frozen_claim": "No provider action record after an ambiguous failure means execution never began and the action is safe to reissue.",
+    "instrumentation": {
+      "description": "30-second await inserted immediately before the existing action-store insert",
+      "controller_sha256": "660ddf14481b77c3aaa28b167be18e919975263416398b04a445569949ad0c97",
+      "semantic_change": "Widened the existing execution-before-insert interval without reordering it",
+      "removed_after_run": true
+    },
+    "fault": {
+      "type": "SIGKILL provider while run and command were running but action count was zero",
+      "run_id": "9669a79b-9f84-4d2d-87ea-dd686a238a1d",
+      "command_id": "63f9fa44-3b25-4b44-9f0a-0c8fe637b689",
+      "client_result": "RemoteDisconnected"
+    },
+    "before_crash": {
+      "run_status": "running",
+      "command_states": [
+        "running"
+      ],
+      "action_count": 0
+    },
+    "after_provider_restart": {
+      "same_run_read_status": 200,
+      "run_status": "stopped",
+      "command_states": [],
+      "action_count": 0
+    },
+    "redispatch_count": 0,
+    "classification": "RECONCILIATION_REQUIRED",
+    "assertions": {
+      "execution_running_before_action_insert": true,
+      "command_running_before_action_insert": true,
+      "no_action_before_crash": true,
+      "no_action_after_restart": true,
+      "same_run_readable_after_restart": true,
+      "no_redispatch": true,
+      "absence_cannot_prove_no_effect": true
+    },
+    "result": "FALSIFIED_SAFE_TO_REISSUE_FROM_ABSENT_ACTION",
+    "result_artifact_sha256": "faf378912249221a24bcab15cb9cf7d24afc7943f222d79bceac2e2ec4587be2",
+    "scope_limit": "Race-amplified official server path with simulator execution; no physical robot motion, liquid transfer or human observation was claimed."
+  }
 }

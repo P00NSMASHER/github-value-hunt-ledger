@@ -20,6 +20,13 @@
       "type": "string",
       "minLength": 1
     },
+    "timestamp": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
     "experiment_id": {
       "type": "string",
       "minLength": 1
