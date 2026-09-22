@@ -1333,6 +1333,17 @@ def validate_training_environment(
                     f"untrusted_confirm_partition:{rid}"
                 )
             if trusted:
+                if basis.get("source") != "assignment_id":
+                    errors.append(
+                        f"invalid_trusted_partition_source:{rid}"
+                    )
+                if (
+                    basis.get("provenance_contract")
+                    != "validated_v14_generated_assignment_claim"
+                ):
+                    errors.append(
+                        f"invalid_partition_provenance_contract:{rid}"
+                    )
                 if (
                     not isinstance(identifier, str)
                     or not identifier
