@@ -3,6 +3,7 @@ import json,re,hashlib
 from collections import defaultdict
 from pathlib import Path
 from ti_common import INTEL, ROOT, load_jsonl
+from ti_assignment_projection import project_ti_assignment
 from ti_work_identity import versioned_work_item_id
 from ti_search_actions import (experiment_status, parse_capability_ids, experiment_action,
                                capability_stops, action_errors)
@@ -430,36 +431,17 @@ for slot in slots:
         raise SystemExit(f"No candidate available for {slot['slot_id']} ({slot['role']})")
     c=pool[0]
     aid=f"ASSIGN:{gen_hash}:{slot['slot_id'].lower()}"
-    a={
-      "assignment_id":aid,
-      "allocator_generation_id":generation_id,
-      "portfolio_policy_generation_id":PORTFOLIO_POLICY_ID,
-      "slot_id":slot["slot_id"],
-      "slot_role":slot["role"],
-      "slot_label":slot["label"],
-      "work_item_id":c["work_item_id"],
-      "work_revision_sha256":c.get("work_revision_sha256"),
-      "work_identity_payload":c.get("work_identity_payload"),
-      "work_kind":c["work_kind"],
-      "work_action":c.get("work_action","search"),
-      "query_recipe_id":c.get("query_recipe_id"),
-      "query_anchors":c.get("query_anchors") or [],
-      "required_signatures":c.get("required_signatures") or [],
-      "exclude_domains":c.get("exclude_domains") or [],
-      "source_id":c["source_id"],
-      "title":c["title"],
-      "measurement_contract_version":c.get("measurement_contract_version"),
-      "authorization_basis":c.get("authorization_basis"),
-      "final_score":c["final_score"],
-      "score_components":c["score_components"],
-      "strategy_id":c.get("strategy_id"),
-      "search_objective_id":c.get("search_objective_id"),
-      "capability_ids":c.get("capability_ids") or [],
-      "experiment_ids":c.get("experiment_ids") or [],
-      "coverage_gap_ids":c.get("coverage_gap_ids") or [],
-      "adjacency_root":c.get("adjacency_root"),
-      "instructions":c["instructions"]
-    }
+    a=project_ti_assignment(
+      c,
+      {
+        "assignment_id":aid,
+        "allocator_generation_id":generation_id,
+        "portfolio_policy_generation_id":PORTFOLIO_POLICY_ID,
+        "slot_id":slot["slot_id"],
+        "slot_role":slot["role"],
+        "slot_label":slot["label"],
+      },
+    )
     assignments.append(a)
     used_work.add(c["work_item_id"])
     for cid in a["capability_ids"]: cap_counts[cid]+=1
