@@ -26,6 +26,8 @@ STEPS = (
     ['tools/ti_attribution.py'],
     ['tools/ti_objectives.py'],
     ['tools/ti_report.py'],
+    ['tools/ti_learning_state.py', '--write', 'intelligence/LEARNING_STATE.json'],
+    ['tools/ti_learning_state_validate.py'],
     ['tools/ti_policy.py'],
     ['tools/ti_network_priors.py'],
     ['tools/ti_saturation.py'],
