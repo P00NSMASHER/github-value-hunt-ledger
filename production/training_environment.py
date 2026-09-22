@@ -789,6 +789,14 @@ def build_training_environment(
                 "search_surfaces": list(
                     run.get("search_surfaces") or []
                 ),
+                "search_move_ids": [
+                    str(move.get("move_id"))
+                    for move in run.get("search_moves") or []
+                    if (
+                        isinstance(move, Mapping)
+                        and move.get("move_id")
+                    )
+                ],
                 "queries": list(
                     run.get("queries") or []
                 ),
