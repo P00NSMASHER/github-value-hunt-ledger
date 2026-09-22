@@ -149,6 +149,13 @@ for n,a in enumerate(alloc,1):
     if candidate and (a.get("work_action")!=candidate.get("work_action") or a.get("instructions")!=candidate.get("instructions")):
         raise SystemExit(f"hunt_allocations.jsonl:{n}: candidate action/instructions drift")
     if candidate:
+        list_contract_fields={
+            "query_anchors",
+            "required_signatures",
+            "exclude_domains",
+            "capability_ids",
+            "experiment_ids",
+        }
         for key in (
             "source_id",
             "work_kind",
@@ -163,7 +170,12 @@ for n,a in enumerate(alloc,1):
             "capability_ids",
             "experiment_ids",
         ):
-            if a.get(key)!=candidate.get(key):
+            actual=a.get(key)
+            expected=candidate.get(key)
+            if key in list_contract_fields:
+                actual=actual or []
+                expected=expected or []
+            if actual!=expected:
                 raise SystemExit(
                     f"hunt_allocations.jsonl:{n}: candidate contract drift: {key}"
                 )
