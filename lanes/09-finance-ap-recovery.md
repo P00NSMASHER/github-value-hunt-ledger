@@ -357,3 +357,89 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Important risks: application-specific assumptions/custom fields, extensive emergency logging, write/delete helpers and synchronization state require substantial hardening before production; not an independent recovery authority.
 - Connections: Hotglue read layer -> recovery validation -> human approval -> optional future NetSuite credit application.
 - Opportunity score: **8.4/10** as a settlement implementation donor.
+
+
+### microsoft/BCApps — first-party Business Central vendor-credit/application connector
+- Repository: https://github.com/microsoft/BCApps
+- Commit / revision: 8b8571bf54443e2d385b6cab37845f19b1380898
+- Date discovered: 2026-09-22
+- What actually works: Microsoft's current MIT Business Central application repository exposes the exact vendor-settlement primitives AP Recovery needs. API v2 page `applyVendorEntries` returns open Vendor Ledger Entries including vendor, document number, Applies-to ID and Remaining Amount, and PATCHing the API invokes the standard `Gen. Jnl.-Apply` vendor application path. Purchase credit memos are exposed through API v2 as a full lifecycle entity. The underlying payables code preserves Vendor Ledger Entry and Detailed Vendor Ledger Entry application history and supports explicit unapply/cancellation semantics for posted purchase credit memos.
+- Evidence of implementation: `APIV2ApplyVendorEntries.Page.al`; `APIV2PurchaseCreditMemos.Page.al`; `VendorLedgerEntry.Table.al`; `DetailedVendorLedgEntry.Table.al`; `VendEntryApplyPostedEntries.Codeunit.al`; `CancelPostedPurchCrMemo.Codeunit.al`. Crucially, `APIV2ApplyVendorEntE2E.Codeunit.al` is a real API E2E test that creates a vendor and posted purchase invoice, creates a vendor payment through API v2, GETs the open ledger entry, PATCHes `{"applied":true}`, and asserts the payment now has an Applies-to ID. The broader test tree includes invoice-to-credit-memo apply/unapply coverage.
+- License / reuse status: MIT. Business Central service/API access and customer tenant permissions remain separate from repository licensing.
+- Useful capability: first-party proof of `VendorCredit/Payment -> VendorLedgerEntry -> application -> remaining amount -> unapplication/reversal`.
+- Likely buyer: Business Central / Dynamics SMB-midmarket controller, AP manager, outsourced accounting firm.
+- Painful problem solved: Recovery audits often find supplier credits but cannot prove whether a credit is still open, was actually applied, or was later unapplied/reversed.
+- Fastest monetization path: Business Central Supplier Credit Recovery diagnostic using read-only vendor ledger + purchase credit memo extraction; only buyer-approved workflows would perform any writeback.
+- Realistic paid pilot: Pull the top suppliers' open ledger/credit-memo population, reconcile candidate credits to originating invoices, then re-read the ledger after buyer-side application/refund to certify realized recovery.
+- Estimated engineering time saved: 1-3 months of Business Central vendor-ledger/application domain discovery and connector validation.
+- Important dependencies/risks: Tenant/API permissions; localization/version differences; an application event proves ERP state but not independently that the underlying recovery entitlement was correct.
+- Connections: Directly strengthens AP Recovery v2's realized-settlement plane and is structurally analogous to LedgerByte's debit-note/refund state machine.
+- Opportunity score: **9.6/10**.
+
+### Acumatica/AcumaticaRESTAPIClientForCSharp — official Acumatica AP recovery extraction/application model
+- Repository: https://github.com/Acumatica/AcumaticaRESTAPIClientForCSharp
+- Commit / revision: 91b52dcda9fd7f2ead3c85fee5651a86222568c3
+- Date discovered: 2026-09-22
+- What actually works: Official MIT C# client and generated Contract-Based REST endpoint models for multiple Acumatica releases. The AP `Bill` entity maps screen AP301000 and exposes amount, balance, vendor reference, status, approval-for-payment and `Applications`. `BillApplicationDetail` maps APAdjust and exposes applied amount, balance, adjusted document type/reference and status. The AP `Check` entity maps AP302000 / `PX.Objects.AP.APPayment`, exposing payment amount, application date, vendor, status, details/history and, critically, `UnappliedBalance`; `CheckDetail` maps APAdjust with exact amount-paid and adjusted-document reference. The repository also includes actions for AP bill creation/release/reversal and payment release/void plus generated endpoint versions across releases.
+- Evidence of implementation: `Endpoints/Acumatica.Default_25.200.001/Model/Bill.cs`, `BillApplicationDetail.cs`, `Check.cs`, `CheckDetail.cs`; REST client/core libraries; endpoint generator; example applications; repository tests and published NuGet packages. The generated comments bind fields to Acumatica DAC names such as `APInvoice.CuryDocBal`, `APPayment.CuryUnappliedBal` and `APAdjust.CuryAdjgAmt`.
+- License / reuse status: MIT. Actual customer Acumatica API access and commercial tenant terms remain separate.
+- Useful capability: read-only reconstruction of `AP Bill -> AP payment/debit adjustment -> APAdjust application -> unapplied balance`, with versioned endpoint models.
+- Likely buyer: Acumatica customers in distribution, construction, manufacturing, services and midmarket finance.
+- Painful problem solved: Hidden unapplied vendor balances and ambiguous payment/credit application state otherwise require bespoke Acumatica schema/API work.
+- Fastest monetization path: Acumatica-specific credit/overpayment diagnostic using the Contract-Based API with no ERP mutation in the initial pilot.
+- Realistic paid pilot: Export bills, AP checks/debit adjustments, application lines and vendors for a historical window; validate negative/unapplied supplier positions and certify later application/refund from re-read state.
+- Estimated engineering time saved: 1-2 months for Acumatica API/entity mapping; more across multi-version support.
+- Important dependencies/risks: Endpoint customization varies by customer; `Check` includes several AP document types and needs explicit semantic mapping; ERP application state is outcome evidence, not entitlement evidence.
+- Connections: Adds a clean Acumatica adapter to the same realized-recovery schema used for Business Central, Oracle EBS, SAP and D365.
+- Opportunity score: **9.3/10**.
+
+### ciphersbak/psftpp — deep PeopleSoft AP/P2P extraction and exception map
+- Repository: https://github.com/ciphersbak/psftpp
+- Commit / revision: 86c2aa6706d0a6fcd08965905f70123a8d5240b2
+- Date discovered: 2026-09-22
+- What actually works: Low-attention PeopleSoft practitioner repository containing substantial production-oriented SQL across Payables and procure-to-pay. `Check_Payables.sql` maps vouchers awaiting match/approval, supplier liability exposure, prepayments, detailed AP match exceptions, match-rule overrides, voucher/payment accounting distribution anomalies, postability/close state, pending payments and pay-cycle state. Other SQL files connect PO, receipt, voucher and payment data; `VendorMaster.sql` resolves effective-dated vendor location/payment/bank configuration.
+- Evidence of implementation: direct PeopleSoft tables and views including `PS_VOUCHER`, `PS_VOUCHER_LINE`, `PS_PYMNT_VCHR_XREF`, `PS_VCHR_PPAY_XREF`, `PS_AP_MTCH_EXCPTN`, `PS_AP_MTCH_RULES`, `PS_MTCH_RULE_OVRD`, `PS_VCHR_ACCTG_LINE`, `PS_VENDOR`, PO/receipt tables and payment tables. Oracle's separate UPL-licensed `oracle-quickstart/oci-peoplesoft-monitoring@72cd95ab...` independently confirms a read-only PeopleSoft sensor architecture and grants its monitoring user SELECT access to core tables including `PS_VOUCHER`, `PS_VCHR_ACCTG_LINE`, `PS_PYMNT_VCHR_XREF` and `PS_PO_HDR`.
+- License / reuse status: No public license detected for psftpp; under project authorization it remains usable. Oracle's corroborating monitoring stack is UPL-1.0. Customer PeopleSoft database rights/permissions remain separate.
+- Useful capability: PeopleSoft-native extraction contract for voucher/payment/prepayment/match-exception/override/accounting state.
+- Likely buyer: Enterprise/public-sector/university PeopleSoft Financials AP/shared-services teams.
+- Painful problem solved: PeopleSoft recovery pilots otherwise require expensive discovery of dozens of effective-dated and status-heavy AP tables before any useful analysis can begin.
+- Fastest monetization path: Customer DBA executes generalized, read-only extracts; AP Recovery operates on CSVs outside PeopleSoft.
+- Realistic paid pilot: Freeze one legal entity/business unit's vouchers, payment cross-references, prepayments and match exceptions, then identify open credits/overpayments and independently validate the top cases.
+- Estimated engineering time saved: 1-3 months of PeopleSoft table/status discovery.
+- Important dependencies/risks: Several scripts contain organization-specific filters such as `BUSINESS_UNIT LIKE '6%'` and `SETID='UNUNI'`; these must be parameterized and independently reconciled to the customer's version/config. Repository is older, so use current customer metadata and Oracle references before treating every field/status as authoritative.
+- Connections: Adds an enterprise PeopleSoft wedge parallel to Oracle EBS extraction; Oracle's official monitoring stack demonstrates a safe read-only deployment pattern.
+- Opportunity score: **9.1/10**.
+
+### pgahq/finance-agent — tested Workday Supplier Invoice SOAP integration substrate
+- Repository: https://github.com/pgahq/finance-agent
+- Commit / revision: bcacb4851c43b779edbb2c9554044dd20eddf52e
+- Date discovered: 2026-09-22
+- What actually works: One-star, actively maintained TypeScript/AWS application with a very large Workday SOAP integration layer and extensive tests. It performs OAuth-authenticated `Get_Supplier_Invoices` by Workday WID, can fetch supplier invoices with attachments, resolves suppliers/companies/POs/worktags, reads Workday custom reports, and implements Supplier Invoice submit/update workflows with detailed validation-repair logic. `src/__tests__/workday.test.ts` is over 200KB and exercises the Workday wrapper heavily.
+- Evidence of implementation: `src/lib/workday.ts`, `get-supplier-invoice.ts`, `TEST-SOAP-API.md`, supplier/PO caches and large Workday tests. The tests assert the exact `Get_Supplier_Invoices_Request -> Supplier_Invoice_Reference -> WID` structure and parsed invoice numbers. IBM's Apache-2.0 Maximo-Workday connector repository independently documents a production integration pattern where final approved/paid Workday supplier invoices are fetched with `Get_Supplier_Invoices`; because Workday does not expose date-based delta extraction for that call, IBM uses a sliding 90-day paging/dedupe window.
+- License / reuse status: AGPL-3.0-or-later. IBM corroborating integration documentation/mappings are Apache-2.0. Workday API/customer tenancy terms remain separate.
+- Useful capability: robust Workday invoice/document ingestion plus a known incremental-extraction workaround.
+- Likely buyer: Workday Financial Management AP teams.
+- Painful problem solved: Workday invoice ingestion and attachment handling are difficult enough that the ERP connector can dominate pilot engineering time.
+- Fastest monetization path: Read-only Workday invoice/PO/document adapter feeding AP Recovery; avoid write operations for the initial offer.
+- Realistic paid pilot: Pull a bounded historical Supplier Invoice population plus supporting documents, reconcile to supplier statements/POs, and use buyer-provided settlement data to prove any recovery.
+- Estimated engineering time saved: 1-3 months of Workday SOAP/auth/request/response and attachment integration work.
+- Important dependencies/risks: This codebase is designed for invoice creation/enrichment, not recovery settlement; Workday payment/credit allocation proof needs a separate current readback source. AGPL obligations matter if directly incorporated into a hosted proprietary product.
+- Connections: Strong ingestion component behind Invoice Lens/ReconForge; IBM's sliding-window pattern supplies the missing incremental-read strategy.
+- Opportunity score: **8.9/10**.
+
+### troystaylor/SharingIsCaring — functioning Coupa invoice connector with credit-note-ready API surface
+- Repository: https://github.com/troystaylor/SharingIsCaring
+- Commit / revision: 836ba71d13bec220acac4c945f68300bf5f161c3
+- Date discovered: 2026-09-22
+- What actually works: Active enterprise connector collection containing a Coupa Power Platform custom connector/MCP implementation. `Coupa/script.csx` implements runtime `list_invoices` and `get_invoice` tools against `/api/invoices` with status, invoice-number and supplier filters, alongside purchase-order/supplier operations. The Swagger and OAuth properties define Coupa invoice read/write scopes.
+- Evidence of implementation: `Coupa/script.csx`, `Coupa/apiDefinition.swagger.json`, `Coupa/apiProperties.json`, `Coupa/readme.md`. The separate zero-star `api-evangelist/coupa@ddd4c1d...` current API profile provides a useful normalized schema/reference: invoice `document-type` includes Invoice/Credit Note; credit notes carry `is-credit-note`, `original-invoice-number`, `original-invoice-date`, `credit-reason` and credit variance, while invoice records expose `paid`, `payment-date`, supplier, status and line items.
+- License / reuse status: No public license detected for SharingIsCaring or the API-Evangelist profile; project authorization applies to repository content. Coupa's actual API/service is proprietary and separately governed by customer access/terms.
+- Useful capability: Coupa invoice/credit-note extraction and original-invoice linkage without inventing the resource model.
+- Likely buyer: Coupa BSM enterprise AP/procurement teams.
+- Painful problem solved: Linking supplier credit notes back to original invoices and knowing whether associated invoices are paid/disputed/exported is a prerequisite to recovery but is easy to lose across ERP/procurement boundaries.
+- Fastest monetization path: Coupa read-only credit-note diagnostic using customer-authorized API credentials; export canonical invoice/credit relationships into AP Recovery.
+- Realistic paid pilot: Extract supplier invoice and credit-note population for the top vendors, link credits to originals, reconcile against downstream ERP/payment evidence, and flag credits with no proven realization.
+- Estimated engineering time saved: 3-6 weeks of Coupa connector/schema discovery.
+- Important dependencies/risks: Coupa's `paid/payment-date` is useful corroboration but is not by itself proof that a specific credit note was economically applied; downstream ERP/remittance evidence remains required. API schemas/profile provenance should be checked against the customer's live Coupa version.
+- Connections: Completes another major procurement front-end feeding the Supplier Credit Recovery case ledger.
+- Opportunity score: **8.7/10**.
