@@ -348,9 +348,24 @@ def derive_batch(
     covered_rows: set[tuple[str, str]] = set()
 
     fixed_scope_groups: dict[tuple[str, str, str], list[InvoiceCharge]] = {}
+    semantic_groups: dict[tuple[object, ...], list[InvoiceCharge]] = {}
     for charge in normalized_charges:
         fixed_scope_groups.setdefault(
             (charge.invoice_id, charge.shipment_id, charge.charge_code), []
+        ).append(charge)
+        semantic_groups.setdefault(
+            (
+                charge.invoice_id,
+                charge.shipment_id,
+                charge.customer_id,
+                charge.carrier_id,
+                charge.currency,
+                charge.charge_code,
+                charge.service_date,
+                charge.quantity_units,
+                charge.billed_cents,
+            ),
+            [],
         ).append(charge)
 
     derivations = []
@@ -366,6 +381,40 @@ def derive_batch(
         ):
             raise ValueError("charge identity mismatch with frozen population")
         covered_rows.add((charge.invoice_id, charge.shipment_id))
+        semantic_group = semantic_groups[
+            (
+                charge.invoice_id,
+                charge.shipment_id,
+                charge.customer_id,
+                charge.carrier_id,
+                charge.currency,
+                charge.charge_code,
+                charge.service_date,
+                charge.quantity_units,
+                charge.billed_cents,
+            )
+        ]
+        if len(semantic_group) > 1:
+            service_day = _validate_charge(charge)
+            candidates = tuple(
+                sorted(
+                    (
+                        rule for rule in normalized_rules
+                        if _matches(charge, service_day, rule)
+                    ),
+                    key=lambda rule: rule.rule_hash,
+                )
+            )
+            derivations.append(_finish(
+                charge=charge,
+                decision=REVIEW,
+                reason="POSSIBLE_DUPLICATE_CHARGE_EVIDENCE",
+                expected_cents=None,
+                matched_rules=candidates,
+                finding=None,
+                authority_ref=None,
+            ))
+            continue
         multi_line = fixed_scope_groups[
             (charge.invoice_id, charge.shipment_id, charge.charge_code)
         ]
