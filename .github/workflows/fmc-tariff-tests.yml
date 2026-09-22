@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: fmc-tariff-tests-${{ github.ref }}
-  cancel-in-progress: true
+  group: fmc-tariff-tests-${{ github.sha }}
+  cancel-in-progress: false
 
 jobs:
   unit:
