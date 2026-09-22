@@ -40,6 +40,7 @@ This is **training/accounting attribution, not a causal claim**.
 
 Prospective searches use a precommitted split that the hunter cannot choose after seeing results. Current schema-v14+ generated runs hash their validated `execution_claim_id`; legacy/manual/unallocated runs are train-only and can never manufacture confirm evidence.
 
+- a release/reclaim retry stays in the same partition because the assignment identity is stable;
 - train outcomes can credit train runs only;
 - confirm outcomes can credit confirm runs only;
 - live value priors train only on the train partition and must separately pass a confirm-support gate before they can steer hunters;
