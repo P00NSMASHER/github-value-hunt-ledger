@@ -1,6 +1,11 @@
 from .ap import APObligation, APPayment, build_ap_observations, normalize_invoice_number
 from .ap_csv import load_obligations_csv, load_payments_csv, money_to_cents
 from .base import BranchInput, RuleBackedAdapter
+from .freight_io import (
+    FreightImportBatch,
+    load_freight_audit_result_bundle,
+    load_freight_truth_manifest,
+)
 from .payer import (
     PayerAuditBatch,
     PayerAuditException,
@@ -34,6 +39,7 @@ __all__ = [
     "BRANCHES",
     "BranchInput",
     "BranchSpec",
+    "FreightImportBatch",
     "PayerAuditBatch",
     "PayerAuditException",
     "PayerRate",
@@ -52,6 +58,8 @@ __all__ = [
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
+    "load_freight_audit_result_bundle",
+    "load_freight_truth_manifest",
     "load_obligations_csv",
     "load_payer_lines_csv",
     "load_payer_rates_csv",

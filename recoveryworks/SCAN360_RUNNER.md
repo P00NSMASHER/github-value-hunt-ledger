@@ -5,12 +5,10 @@ combines supported branch adapters into one proof-bound, durable client ledger.
 
 Current executable branches:
 
+- FreightRecovery
 - APRecovery
 - PayerRecovery
 - UtilityRecovery
-
-FreightRecovery already has a bridge into RecoveryOS but is not yet wired into
-this file-based runner.
 
 ## Run
 
@@ -30,6 +28,9 @@ state must live on private storage, not in the public repository.
 {
   "client_id": "client-001",
   "currency": "USD",
+  "freight": {
+    "truth_manifest_json": "truth-manifest.json"
+  },
   "ap": {
     "payments_csv": "Payments.csv",
     "obligations_csv": "AP_Invoices.csv",
@@ -65,6 +66,19 @@ Verification booleans default to false and must be JSON booleans. Marking a
 source verified means the operating workflow has independently established that
 the file/source is the relevant, authentic source. Merely receiving or hashing a
 file does not make its contents verified.
+
+## Freight input
+
+FreightRecovery is imported from its existing proof artifacts; Scan 360 does not
+recompute freight pricing. Each freight job must provide exactly one of:
+
+- `truth_manifest_json` — an existing FreightRecovery `truth-manifest.json`; or
+- `audit_bundle_zip` — a FreightRecovery `AUDIT_RESULT` bundle.
+
+The importer verifies individual finding proof hashes and the truth-manifest hash.
+For audit bundles it also verifies the bundle manifest hash and size for
+`truth-manifest.json`. The freight buyer ID and currency must match the Scan 360
+client scope.
 
 ## AP input
 
