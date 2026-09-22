@@ -37,8 +37,9 @@ class PopulationRow:
     source_hash: str
 
     @property
-    def row_key(self) -> str:
-        return f"{self.invoice_id}|{self.shipment_id}"
+    def row_key(self) -> tuple[str, str]:
+        """Collision-free structured identity for one invoice/shipment pair."""
+        return (self.invoice_id, self.shipment_id)
 
 
 @dataclass(frozen=True)
