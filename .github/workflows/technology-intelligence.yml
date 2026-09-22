@@ -63,6 +63,8 @@ jobs:
       - name: Test action routing, telemetry intake and run preparation
         run: python -m unittest discover -s tests -p 'test_ti_*.py'
       - name: Ingest, rebuild and validate technology intelligence
+        env:
+          TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}
         run: python tools/ti_build.py
       - name: Check generated text for whitespace errors
         run: git diff --check
@@ -89,6 +91,8 @@ jobs:
       - name: Test action routing, telemetry intake and run preparation
         run: python -m unittest discover -s tests -p 'test_ti_*.py'
       - name: Ingest, rebuild and validate technology intelligence
+        env:
+          TI_TRAINING_SPLIT_KEY: ${{ secrets.TI_TRAINING_SPLIT_KEY }}
         run: python tools/ti_build.py
       - name: Check generated text for whitespace errors
         run: git diff --check
@@ -99,6 +103,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add intelligence/search_runs.jsonl \
+                  intelligence/training_split_receipts.jsonl \
+                  intelligence/TRAINING_SPLIT_STATUS.json \
                   intelligence/capabilities.jsonl \
                   intelligence/search_strategies.jsonl \
                   intelligence/query_families.jsonl \
