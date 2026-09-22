@@ -575,6 +575,186 @@ def verify_case_bundle(bundle: CaseProofBundle) -> None:
 
 
 @dataclass(frozen=True)
+class ArtifactReplayEntry:
+    """One exact source artifact independently replayed against a frozen case."""
+
+    role: str
+    source_id: str
+    source_hash: str
+    locator: str
+    size_bytes: int
+
+    def __post_init__(self) -> None:
+        for name in ("role", "source_id", "source_hash", "locator"):
+            _required(name, getattr(self, name))
+        if self.role not in {"authority", "evidence"}:
+            raise ValueError("artifact replay role must be authority or evidence")
+        if type(self.size_bytes) is not int or self.size_bytes < 0:
+            raise ValueError("artifact replay size_bytes must be non-negative integer")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({"schema": 1, **asdict(self)})
+
+
+@dataclass(frozen=True)
+class CaseArtifactReplayReceipt:
+    """Deterministic receipt proving raw source bytes match a frozen case bundle."""
+
+    case_bundle_hash: str
+    finding_proof_hash: str
+    replayed_at: str
+    replayed_by: str
+    entries: tuple[ArtifactReplayEntry, ...]
+    receipt_hash: str
+
+    def __post_init__(self) -> None:
+        for name in (
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "replayed_by",
+            "receipt_hash",
+        ):
+            _required(name, getattr(self, name))
+        _iso("replayed_at", self.replayed_at)
+        if not self.entries:
+            raise ValueError("artifact replay receipt requires at least one entry")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "case_bundle_hash": self.case_bundle_hash,
+            "finding_proof_hash": self.finding_proof_hash,
+            "replayed_at": self.replayed_at,
+            "replayed_by": self.replayed_by,
+            "entries": [
+                {**asdict(entry), "proof_hash": entry.proof_hash}
+                for entry in sorted(
+                    self.entries,
+                    key=lambda item: (item.role, item.source_id),
+                )
+            ],
+        }
+
+    def verify_integrity(self) -> None:
+        if canonical_hash(self.integrity_body()) != self.receipt_hash:
+            raise ValueError("artifact replay receipt hash mismatch")
+
+
+def replay_case_source_artifacts(
+    bundle: CaseProofBundle,
+    *,
+    authority_bytes: bytes,
+    evidence_bytes: Mapping[str, bytes],
+    replayed_at: str,
+    replayed_by: str,
+) -> CaseArtifactReplayReceipt:
+    """Re-hash original source bytes and prove they match the frozen case.
+
+    The caller supplies the exact authority artifact bytes plus one byte payload
+    per load-bearing evidence_id. Missing, extra, or altered artifacts fail
+    closed. The returned receipt is deterministic and tied to the frozen case
+    bundle hash; it is suitable for an independent examiner's replay record.
+    """
+    verify_case_bundle(bundle)
+    replayed_at = _iso("replayed_at", replayed_at)
+    replayed_by = _required("replayed_by", replayed_by)
+
+    authority_hash = _hash_bytes(authority_bytes)
+    if authority_hash != bundle.authority.source_hash:
+        raise ValueError("authority artifact bytes do not match frozen source_hash")
+
+    attestations = {
+        item.evidence_id: item for item in bundle.source_attestations
+    }
+    expected_ids = set(attestations)
+    supplied_ids = set(evidence_bytes)
+    if supplied_ids != expected_ids:
+        missing = sorted(expected_ids - supplied_ids)
+        extra = sorted(supplied_ids - expected_ids)
+        raise ValueError(
+            "evidence artifact set mismatch: "
+            f"missing={missing!r}, extra={extra!r}"
+        )
+
+    entries: list[ArtifactReplayEntry] = [
+        ArtifactReplayEntry(
+            role="authority",
+            source_id=bundle.authority.authority_id,
+            source_hash=authority_hash,
+            locator=bundle.authority.source_locator,
+            size_bytes=len(authority_bytes),
+        )
+    ]
+
+    for evidence_id in sorted(expected_ids):
+        raw = evidence_bytes[evidence_id]
+        observed_hash = _hash_bytes(raw)
+        attestation = attestations[evidence_id]
+        if observed_hash != attestation.source_hash:
+            raise ValueError(
+                f"evidence artifact {evidence_id!r} does not match frozen source_hash"
+            )
+        entries.append(ArtifactReplayEntry(
+            role="evidence",
+            source_id=evidence_id,
+            source_hash=observed_hash,
+            locator=attestation.locator,
+            size_bytes=len(raw),
+        ))
+
+    body = {
+        "schema": 1,
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "replayed_at": replayed_at,
+        "replayed_by": replayed_by,
+        "entries": [
+            {**asdict(entry), "proof_hash": entry.proof_hash}
+            for entry in sorted(entries, key=lambda item: (item.role, item.source_id))
+        ],
+    }
+    return CaseArtifactReplayReceipt(
+        case_bundle_hash=bundle.bundle_hash,
+        finding_proof_hash=bundle.finding.proof_hash,
+        replayed_at=replayed_at,
+        replayed_by=replayed_by,
+        entries=tuple(entries),
+        receipt_hash=canonical_hash(body),
+    )
+
+
+def verify_case_artifact_replay(
+    receipt: CaseArtifactReplayReceipt,
+    bundle: CaseProofBundle,
+) -> None:
+    """Verify a replay receipt is intact and references exactly this frozen case."""
+    verify_case_bundle(bundle)
+    receipt.verify_integrity()
+    if receipt.case_bundle_hash != bundle.bundle_hash:
+        raise ValueError("artifact replay receipt case bundle mismatch")
+    if receipt.finding_proof_hash != bundle.finding.proof_hash:
+        raise ValueError("artifact replay receipt finding proof mismatch")
+
+    expected: dict[tuple[str, str], tuple[str, str]] = {
+        ("authority", bundle.authority.authority_id): (
+            bundle.authority.source_hash,
+            bundle.authority.source_locator,
+        ),
+        **{
+            ("evidence", item.evidence_id): (item.source_hash, item.locator)
+            for item in bundle.source_attestations
+        },
+    }
+    observed = {
+        (entry.role, entry.source_id): (entry.source_hash, entry.locator)
+        for entry in receipt.entries
+    }
+    if observed != expected:
+        raise ValueError("artifact replay receipt source set mismatch")
+
+
+@dataclass(frozen=True)
 class ClientActionAuthorization:
     authorization_id: str
     case_bundle_hash: str
