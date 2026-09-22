@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from typing import Any, Mapping
 
+from .fees import FeeAgreement, FeeAssessment
 from .ledger import LedgerEvent, LedgerRecord, RecoveryLedger
 from .models import (
     Branch,
@@ -58,6 +59,33 @@ def _finding_to_dict(finding: RecoveryFinding) -> dict[str, Any]:
     }
 
 
+def _fee_agreement_to_dict(agreement: FeeAgreement) -> dict[str, Any]:
+    return {
+        "agreement_id": agreement.agreement_id,
+        "client_id": agreement.client_id,
+        "fee_bps": agreement.fee_bps,
+        "branches": [branch.value for branch in agreement.branches],
+        "source_hash": agreement.source_hash,
+        "locator": agreement.locator,
+        "verified": agreement.verified,
+        "currency": agreement.currency,
+        "rounding": agreement.rounding,
+        "metadata": dict(agreement.metadata),
+        "proof_hash": agreement.proof_hash,
+    }
+
+
+def _fee_assessment_to_dict(assessment: FeeAssessment | None) -> dict[str, Any] | None:
+    if assessment is None:
+        return None
+    return {
+        "agreement": _fee_agreement_to_dict(assessment.agreement),
+        "recovered_cents": assessment.recovered_cents,
+        "fee_cents": assessment.fee_cents,
+        "proof_hash": assessment.proof_hash,
+    }
+
+
 def _record_to_dict(record: LedgerRecord) -> dict[str, Any]:
     return {
         "finding": _finding_to_dict(record.finding),
@@ -77,6 +105,7 @@ def _record_to_dict(record: LedgerRecord) -> dict[str, Any]:
         "settlement_total_cents": record.settlement_total_cents,
         "recovered_cents": record.recovered_cents,
         "fee_cents": record.fee_cents,
+        "fee_assessment": _fee_assessment_to_dict(record.fee_assessment),
         "updated_at": record.updated_at,
         "record_hash": record.record_hash,
     }
@@ -204,6 +233,39 @@ def _load_finding(value: Any) -> RecoveryFinding:
     return finding
 
 
+def _load_fee_agreement(value: Any) -> FeeAgreement:
+    item = _as_mapping(value, "fee agreement")
+    agreement = FeeAgreement(
+        agreement_id=item["agreement_id"],
+        client_id=item["client_id"],
+        fee_bps=item["fee_bps"],
+        branches=tuple(Branch(value) for value in item["branches"]),
+        source_hash=item["source_hash"],
+        locator=item["locator"],
+        verified=item["verified"],
+        currency=item.get("currency"),
+        rounding=item.get("rounding", "HALF_UP"),
+        metadata=item.get("metadata", {}),
+    )
+    if agreement.proof_hash != item.get("proof_hash"):
+        raise ValueError("fee agreement proof hash mismatch")
+    return agreement
+
+
+def _load_fee_assessment(value: Any) -> FeeAssessment | None:
+    if value is None:
+        return None
+    item = _as_mapping(value, "fee assessment")
+    assessment = FeeAssessment(
+        agreement=_load_fee_agreement(item["agreement"]),
+        recovered_cents=item["recovered_cents"],
+        fee_cents=item["fee_cents"],
+    )
+    if assessment.proof_hash != item.get("proof_hash"):
+        raise ValueError("fee assessment proof hash mismatch")
+    return assessment
+
+
 def _load_record(value: Any) -> LedgerRecord:
     item = _as_mapping(value, "record")
     record = LedgerRecord(
@@ -224,6 +286,7 @@ def _load_record(value: Any) -> LedgerRecord:
         settlement_total_cents=item.get("settlement_total_cents"),
         recovered_cents=item.get("recovered_cents", 0),
         fee_cents=item.get("fee_cents", 0),
+        fee_assessment=_load_fee_assessment(item.get("fee_assessment")),
         updated_at=item.get("updated_at"),
     )
     if record.record_hash != item.get("record_hash"):
