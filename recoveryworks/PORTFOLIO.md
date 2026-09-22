@@ -32,6 +32,8 @@ traction.
 | ConstructionRecovery | underpayment | Operational ingestion | reviewed entitlement + event mapping + versioned CPM schedules + qualified causation review + settlement evidence |
 | TaxRecovery | overpayment | Operational ingestion | invoice tax line + professionally reviewed expected assessment + rule snapshot |
 | InsuranceRecovery | underpayment | Operational ingestion | claim line + reviewed policy/coverage assessment + insurer settlement evidence |
+| CloudRecovery | overpayment | Operational ingestion | provider invoice + effective contract rate + independent metering evidence |
+| MerchantFeeRecovery | overpayment | Operational ingestion | reviewed processor-controlled fee statement + merchant agreement + independent transaction summary |
 
 ## Shared commercial motion
 
@@ -64,13 +66,15 @@ A manufacturer/distributor can plausibly supply inputs for:
 - ConstructionRecovery when project records exist
 - TaxRecovery when transaction-tax exports and reviewed assessments exist
 - InsuranceRecovery when commercial/property claim and settlement records exist
+- CloudRecovery when provider invoice/rate/meter exports exist
+- MerchantFeeRecovery when reviewed processor-fee scope and transaction summaries exist
 
 A healthcare provider can plausibly add PayerRecovery to the same shared
 portfolio.
 
 ## Portfolio state
 
-All 12 registered RecoveryWorks divisions now have operational Scan 360
+All 14 registered RecoveryWorks divisions now have operational Scan 360
 ingestion paths with the same durable evidence/lifecycle model.
 
 ConstructionRecovery completes the previously missing lane with:

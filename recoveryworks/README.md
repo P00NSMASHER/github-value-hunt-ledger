@@ -17,6 +17,8 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **LeaseRecovery** — rent, CAM, operating-expense, and area-based lease billing leakage.
 - **TaxRecovery** — professionally reviewed sales/use-tax and transaction-tax overpayments.
 - **InsuranceRecovery** — professionally reviewed commercial/property claim underpayments.
+- **CloudRecovery** — contracted cloud/hosting rate and metered-usage billing leakage.
+- **MerchantFeeRecovery** — processor-controlled markup, per-transaction, and fixed-fee leakage.
 
 ## Non-negotiable invariant
 
@@ -82,3 +84,6 @@ schemas are documented in `recoveryworks/INGESTION_TAX.md`.
 
 InsuranceRecovery claim, policy-assessment, settlement, and qualified-review schemas
 are documented in `recoveryworks/INGESTION_INSURANCE.md`.
+
+CloudRecovery metering and MerchantFeeRecovery processor-fee scope schemas are
+documented in `recoveryworks/INGESTION_CLOUD_MERCHANT.md`.

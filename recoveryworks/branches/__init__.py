@@ -1,3 +1,18 @@
+from .cloud import audit_cloud_billing
+from .cloud_csv import load_cloud_meter_csv
+from .merchant_fee import (
+    MerchantFeeAgreement,
+    MerchantFeeAuditBatch,
+    MerchantFeeAuditException,
+    MerchantFeeStatement,
+    MerchantTransactionSummary,
+    audit_merchant_fees,
+)
+from .merchant_fee_csv import (
+    load_merchant_fee_agreements_csv,
+    load_merchant_fee_statements_csv,
+    load_merchant_transaction_summaries_csv,
+)
 from .insurance import (
     InsuranceAuditBatch,
     InsuranceAuditException,
@@ -148,6 +163,11 @@ from .utility_io import (
 )
 
 __all__ = [
+    "MerchantFeeAgreement",
+    "MerchantFeeAuditBatch",
+    "MerchantFeeAuditException",
+    "MerchantFeeStatement",
+    "MerchantTransactionSummary",
     "InsuranceAuditBatch",
     "InsuranceAuditException",
     "InsuranceClaimLine",
@@ -220,6 +240,8 @@ __all__ = [
     "UtilityTariff",
     "UtilityTier",
     "all_specs",
+    "audit_cloud_billing",
+    "audit_merchant_fees",
     "audit_insurance_claims",
     "audit_tax_lines",
     "audit_rebates",
@@ -239,6 +261,10 @@ __all__ = [
     "calculate_expected_bill",
     "dollars_per_unit_to_micros",
     "dollars_to_cents",
+    "load_cloud_meter_csv",
+    "load_merchant_fee_agreements_csv",
+    "load_merchant_fee_statements_csv",
+    "load_merchant_transaction_summaries_csv",
     "load_insurance_assessments_csv",
     "load_insurance_claim_lines_csv",
     "load_insurance_settlements_csv",
