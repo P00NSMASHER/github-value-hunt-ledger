@@ -97,7 +97,7 @@ RULE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("late_fee", re.compile(r"late fee|late charge", re.I)),
     ("general_rate", re.compile(r"ocean freight|base rate|freight rate|rate per", re.I)),
     ("effective_rule", re.compile(r"effective date|effective from|revised|revision|supplement", re.I)),
-    ("applicability_date", re.compile(r"(?:rates?|charges?|rules?).{0,120}(?:in effect|effective).{0,120}(?:cargo|shipment).{0,80}received|date.{0,80}(?:cargo|shipment).{0,80}received", re.I)),
+    ("applicability_date", re.compile(r"(?:rates?|charges?|rules?)[\\s\\S]{0,160}(?:in effect|effective)[\\s\\S]{0,160}(?:cargo|shipment)[\\s\\S]{0,100}received|date[\\s\\S]{0,100}(?:cargo|shipment)[\\s\\S]{0,100}received", re.I)),
     ("pass_through", re.compile(r"pass(?:ed)?[ -]?through|pass-through|cross-reference|without markup|not be marked up|no markup|at cost", re.I)),
 ]
 
@@ -306,10 +306,12 @@ def detect_source_version(text: str, url: str) -> str | None:
     ):
         match = re.search(pattern, probe, re.I)
         if match:
-            qualifiers.append(f"{label}:{match.group(1)}")
+            qualifier = match.group(1).strip().rstrip(".,;:")
+            qualifiers.append(f"{label}:{qualifier}")
 
     if tariff:
-        parts = [tariff.group(1), *qualifiers]
+        tariff_id = tariff.group(1).strip().rstrip(".,;:")
+        parts = [tariff_id, *qualifiers]
         return "|".join(parts)[:120]
     if qualifiers:
         return "|".join(qualifiers)[:120]
