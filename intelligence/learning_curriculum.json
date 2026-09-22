@@ -1,0 +1,565 @@
+{
+  "manual_work_can_satisfy_confirm": false,
+  "mode": "measurement_only",
+  "partition_selection_allowed": false,
+  "policy_effect": "none",
+  "recommended_measurements": [
+    {
+      "blind_partition_rule": "Do not calculate, expose, select, release, retry, or otherwise alter work based on train/confirm membership. Use the normal generated assignment/claim identity once; partition membership may be evaluated only after canonical ingestion.",
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "measurement_priority": 79.5,
+      "phase": "train_measurement",
+      "rank": 1,
+      "requires_generated_claim": true,
+      "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:acceptance-path-transition-inspection",
+      "train": {
+        "deep_inspections": 10,
+        "deep_inspections_needed": 10,
+        "ready": false,
+        "runs": 4,
+        "runs_needed": 1
+      }
+    },
+    {
+      "blind_partition_rule": "Do not calculate, expose, select, release, retry, or otherwise alter work based on train/confirm membership. Use the normal generated assignment/claim identity once; partition membership may be evaluated only after canonical ingestion.",
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "measurement_priority": 78.75,
+      "phase": "train_measurement",
+      "rank": 2,
+      "requires_generated_claim": true,
+      "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
+      "train": {
+        "deep_inspections": 9,
+        "deep_inspections_needed": 11,
+        "ready": false,
+        "runs": 4,
+        "runs_needed": 1
+      }
+    },
+    {
+      "blind_partition_rule": "Do not calculate, expose, select, release, retry, or otherwise alter work based on train/confirm membership. Use the normal generated assignment/claim identity once; partition membership may be evaluated only after canonical ingestion.",
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "rank": 3,
+      "requires_generated_claim": true,
+      "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:bidirectional-money-evidence-invariant-tracing",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      }
+    }
+  ],
+  "reservation": {
+    "gate_closing_slots": 2,
+    "zero_run_exploration_slots": 1
+  },
+  "rows": [
+    {
+      "audit_only_q_value": 0.160249702734375,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 79.5,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.13008062010331256,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:acceptance-path-transition-inspection",
+      "strategy_name": "Acceptance-path transition inspection",
+      "train": {
+        "deep_inspections": 10,
+        "deep_inspections_needed": 10,
+        "ready": false,
+        "runs": 4,
+        "runs_needed": 1
+      },
+      "zero_train_runs": false
+    },
+    {
+      "audit_only_q_value": 0.06,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 63.75,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.046575752350656474,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:authority-origin-invariant-set-consistency",
+      "strategy_name": "Authority-origin / invariant-set consistency",
+      "train": {
+        "deep_inspections": 1,
+        "deep_inspections_needed": 19,
+        "ready": false,
+        "runs": 1,
+        "runs_needed": 4
+      },
+      "zero_train_runs": false
+    },
+    {
+      "audit_only_q_value": null,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.04761294366591096,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:bidirectional-money-evidence-invariant-tracing",
+      "strategy_name": "Bidirectional money/evidence invariant tracing",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      },
+      "zero_train_runs": true
+    },
+    {
+      "audit_only_q_value": 0.04184999999999999,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 75.75,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.10744353428107893,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:capability-conjunction-search-claim-tracing",
+      "strategy_name": "Capability-Conjunction Search + Claim Tracing",
+      "train": {
+        "deep_inspections": 9,
+        "deep_inspections_needed": 11,
+        "ready": false,
+        "runs": 3,
+        "runs_needed": 2
+      },
+      "zero_train_runs": false
+    },
+    {
+      "audit_only_q_value": null,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.04761294366591096,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:cross-source-emergence-triangulation",
+      "strategy_name": "Cross-source emergence triangulation",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      },
+      "zero_train_runs": true
+    },
+    {
+      "audit_only_q_value": null,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.04761294366591096,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:decision-claim-runtime-side-effect-trace",
+      "strategy_name": "Decision-claim -> runtime-side-effect trace",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      },
+      "zero_train_runs": true
+    },
+    {
+      "audit_only_q_value": 0.19445671874999998,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 76.5,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.08390074207423853,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:evaluation-target-independence",
+      "strategy_name": "Evaluation-Target Independence",
+      "train": {
+        "deep_inspections": 6,
+        "deep_inspections_needed": 14,
+        "ready": false,
+        "runs": 4,
+        "runs_needed": 1
+      },
+      "zero_train_runs": false
+    },
+    {
+      "audit_only_q_value": 0.0365625,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 66.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.07774461538020618,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:fail-open-boundary-archaeology",
+      "strategy_name": "Fail-open boundary archaeology",
+      "train": {
+        "deep_inspections": 4,
+        "deep_inspections_needed": 16,
+        "ready": false,
+        "runs": 1,
+        "runs_needed": 4
+      },
+      "zero_train_runs": false
+    },
+    {
+      "audit_only_q_value": null,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.09911476341032881,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:first-party-production-source-triangulation",
+      "strategy_name": "First-party production-source triangulation",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      },
+      "zero_train_runs": true
+    },
+    {
+      "audit_only_q_value": null,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.04761294366591096,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:ingestion-invariant-triad-intersection",
+      "strategy_name": "Ingestion invariant-triad intersection",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      },
+      "zero_train_runs": true
+    },
+    {
+      "audit_only_q_value": null,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.04761294366591096,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:nested-authority-and-post-review-invariant-audit",
+      "strategy_name": "Nested authority and post-review invariant audit",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      },
+      "zero_train_runs": true
+    },
+    {
+      "audit_only_q_value": null,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 60.0,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.04761294366591096,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:paper-research-artifact-production-descendant",
+      "strategy_name": "Paper -> research artifact -> production descendant",
+      "train": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 20,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 5
+      },
+      "zero_train_runs": true
+    },
+    {
+      "audit_only_q_value": 0.043275,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 65.25,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.06883023060032631,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:protocol-regression-archaeology-for-pre-fat-systems",
+      "strategy_name": "Protocol-regression archaeology for pre-FAT systems",
+      "train": {
+        "deep_inspections": 3,
+        "deep_inspections_needed": 17,
+        "ready": false,
+        "runs": 1,
+        "runs_needed": 4
+      },
+      "zero_train_runs": false
+    },
+    {
+      "audit_only_q_value": 0.13958109375,
+      "confirm": {
+        "deep_inspections": 0,
+        "deep_inspections_needed": 6,
+        "mean_reward": 0.0,
+        "min_reward": null,
+        "minimum_mean_reward": 0.0,
+        "minimum_reward_floor": 0.0,
+        "positive_runs": 0,
+        "positive_runs_needed": 1,
+        "ready": false,
+        "runs": 0,
+        "runs_needed": 2
+      },
+      "eligible_for_policy_consideration": false,
+      "generalization_status": "gathering_evidence",
+      "measurement_priority": 78.75,
+      "phase": "train_measurement",
+      "policy_allocation_audit_only": 0.1006320798043864,
+      "selection_reason": "reduce_train_evidence_deficit",
+      "strategy_id": "STRAT:rule-period-authority-version-audit",
+      "strategy_name": "Rule-period / authority-version audit",
+      "train": {
+        "deep_inspections": 9,
+        "deep_inspections_needed": 11,
+        "ready": false,
+        "runs": 4,
+        "runs_needed": 1
+      },
+      "zero_train_runs": false
+    }
+  ],
+  "schema_version": 2,
+  "thresholds": {
+    "minimum_confirm_deep_inspections": 6,
+    "minimum_confirm_mean_reward": 0.0,
+    "minimum_confirm_positive_runs": 1,
+    "minimum_confirm_reward_floor": 0.0,
+    "minimum_confirm_runs": 2,
+    "minimum_train_deep_inspections": 20,
+    "minimum_train_runs": 5
+  },
+  "uses_policy_allocation_for_selection": false,
+  "uses_q_value_for_selection": false,
+  "uses_reward_for_selection": false
+}
