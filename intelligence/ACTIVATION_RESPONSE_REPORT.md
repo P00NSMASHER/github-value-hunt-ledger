@@ -1,8 +1,8 @@
 # ACTIVATION RESPONSE LEARNING
 
-Generation: **RESPLEARN:9e4f3e2500dc**
+Generation: **RESPLEARN:30b2b3a575cc**
 Mode: **measured_feedback**
-Resolved primary activations: **36 / 20**
+Resolved primary activations: **37 / 20**
 
 V17 measures worker responsiveness only after fresh READY presence has produced a real activation.
 READY→activation is system latency. Activation→claim is the only metric allowed to affect routing.
@@ -22,7 +22,7 @@ Claim→start and start→completion are descriptive only.
 | HUNTER-10 | 0 | 0 | — | — | 0 | 0.000 | insufficient |
 | HUNTER-11 | 1 | 0 | 0.0% | — | 1 | 0.000 | insufficient |
 | HUNTER-12 | 0 | 0 | — | — | 0 | 0.000 | insufficient |
-| HUNTER-13 | 1 | 1 | 100.0% | — | 0 | 0.000 | insufficient |
+| HUNTER-13 | 2 | 1 | 50.0% | — | 1 | 0.000 | insufficient |
 | HUNTER-14 | 0 | 0 | — | — | 0 | 0.000 | insufficient |
 
 No adjustment is created from UNKNOWN/OFFLINE/PAUSED presence, unactivated READY events, pending activations, work-steal activations, or completion duration.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "allocator_generation_id": "ALLOCGEN:f21d37288c5d",
+  "allocator_generation_id": "ALLOCGEN:b88db354751e",
   "portfolio_policy_generation_id": "PORTFOLIO:92c1307240fd",
   "candidate_count": 324,
   "assignment_count": 14,
@@ -24,6 +24,8 @@
     "wildcard": 1
   },
   "awaiting_external_seed_count": 2,
+  "suppressed_stale_work_item_count": 0,
+  "suppressed_stale_work_items": [],
   "work_action_counts": {
     "execute_fixture": 6,
     "search": 7,

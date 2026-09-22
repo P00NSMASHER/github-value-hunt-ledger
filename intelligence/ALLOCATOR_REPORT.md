@@ -1,6 +1,6 @@
 # HUNT ALLOCATOR REPORT
 
-- Generation: **ALLOCGEN:f21d37288c5d**
+- Generation: **ALLOCGEN:b88db354751e**
 - Candidate work items: **324**
 - Assigned slots: **14 / 14**
 
@@ -16,6 +16,11 @@
 | learning_measurement | 2 |
 | positive_dna_transfer | 1 |
 | wildcard | 1 |
+
+## Stale-work suppression
+
+- Terminal stale semantic work versions suppressed: **0**
+- Suppressed work IDs: none
 
 ## Concentration controls
 
