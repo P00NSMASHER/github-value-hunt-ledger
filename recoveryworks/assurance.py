@@ -40,6 +40,12 @@ def _iso(name: str, value: str) -> str:
     return text
 
 
+def _dt(name: str, value: str) -> datetime:
+    """Parse an offset-aware ISO-8601 timestamp for temporal consistency checks."""
+    text = _iso(name, value)
+    return datetime.fromisoformat(text.replace("Z", "+00:00"))
+
+
 def _hash_bytes(data: bytes) -> str:
     if not isinstance(data, (bytes, bytearray)):
         raise ValueError("artifact bytes are required")
@@ -463,6 +469,49 @@ def freeze_case_proof(
     if any(item.finding_proof_hash != finding.proof_hash for item in deadline_tuple):
         raise ValueError("deadline assessment finding hash mismatch")
 
+    # Hostile-examination temporal consistency. A review cannot logically
+    # attest to evidence/calculation that did not yet exist, and a frozen case
+    # cannot predate the attestations it claims to contain.
+    freeze_time = _dt("created_at", created_at)
+    authority_time = _dt("authority.acquired_at", authority.acquired_at)
+    source_times = [
+        _dt(f"source_attestation[{item.evidence_id}].acquired_at", item.acquired_at)
+        for item in source_tuple
+    ]
+    calculation_time = _dt("calculation.created_at", calculation.created_at)
+    latest_input_time = max([authority_time, *source_times])
+    if calculation_time < latest_input_time:
+        raise ValueError(
+            "calculation cannot predate authority/source acquisition"
+        )
+
+    for item in review_tuple:
+        reviewed = _dt(f"review[{item.review_id}].reviewed_at", item.reviewed_at)
+        if reviewed < calculation_time:
+            raise ValueError("review cannot predate calculation")
+        if reviewed > freeze_time:
+            raise ValueError("review cannot postdate case freeze")
+    for item in challenge_tuple:
+        reviewed = _dt(
+            f"challenge[{item.challenge_id}].reviewed_at",
+            item.reviewed_at,
+        )
+        if reviewed < calculation_time:
+            raise ValueError("challenge review cannot predate calculation")
+        if reviewed > freeze_time:
+            raise ValueError("challenge review cannot postdate case freeze")
+    for item in deadline_tuple:
+        assessed = _dt(
+            f"deadline[{item.assessment_id}].assessed_at",
+            item.assessed_at,
+        )
+        if assessed < calculation_time:
+            raise ValueError("deadline assessment cannot predate calculation")
+        if assessed > freeze_time:
+            raise ValueError("deadline assessment cannot postdate case freeze")
+    if calculation_time > freeze_time:
+        raise ValueError("calculation cannot postdate case freeze")
+
     if finding.potential_recovery_cents >= SEVEN_FIGURE_CENTS:
         if len(approving) < 2:
             raise ValueError("seven-figure finding requires two independent approving reviewers")
@@ -473,10 +522,10 @@ def freeze_case_proof(
         if not all(item.verified_source for item in source_tuple):
             raise ValueError("seven-figure finding requires authenticated source attestations")
         challenge_reviewers = {item.reviewer_id for item in challenge_tuple}
-        if not challenge_reviewers.difference(set(reviewer_ids)):
+        if challenge_reviewers.intersection(set(reviewer_ids)):
             raise ValueError(
-                "seven-figure adversarial review requires a reviewer independent "
-                "of the approving reviewers"
+                "seven-figure adversarial reviewer must be independent "
+                "of all approving reviewers"
             )
 
     body = _case_body(
@@ -542,9 +591,11 @@ class ClientActionAuthorization:
             "client_actor_id", "approved_action_type", "note",
         ):
             _required(name, getattr(self, name))
-        _iso("authorized_at", self.authorized_at)
+        authorized = _dt("authorized_at", self.authorized_at)
         if self.expires_at is not None:
-            _iso("expires_at", self.expires_at)
+            expires = _dt("expires_at", self.expires_at)
+            if expires < authorized:
+                raise ValueError("expires_at cannot precede authorized_at")
         _nonnegative_cents("maximum_amount_cents", self.maximum_amount_cents)
 
     @property
@@ -565,8 +616,11 @@ def authorize_case_action(
 ) -> ClientActionAuthorization:
     verify_case_bundle(bundle)
     reviewer_ids = {item.reviewer_id for item in bundle.reviews}
+    reviewer_ids.update(item.reviewer_id for item in bundle.challenges)
     if client_actor_id in reviewer_ids:
         raise ValueError("client authorizer must be independent of RecoveryWorks reviewers")
+    if _dt("authorized_at", authorized_at) < _dt("bundle.created_at", bundle.created_at):
+        raise ValueError("client authorization cannot predate frozen case")
     if maximum_amount_cents < bundle.finding.potential_recovery_cents:
         raise ValueError("authorization amount is below validated recovery amount")
     return ClientActionAuthorization(
@@ -591,8 +645,14 @@ def verify_action_authorization(
         raise ValueError("authorization case bundle hash mismatch")
     if authorization.finding_proof_hash != bundle.finding.proof_hash:
         raise ValueError("authorization finding hash mismatch")
-    if authorization.client_actor_id in {item.reviewer_id for item in bundle.reviews}:
+    reviewer_ids = {item.reviewer_id for item in bundle.reviews}
+    reviewer_ids.update(item.reviewer_id for item in bundle.challenges)
+    if authorization.client_actor_id in reviewer_ids:
         raise ValueError("client authorizer must be independent of reviewers")
+    if _dt("authorization.authorized_at", authorization.authorized_at) < _dt(
+        "bundle.created_at", bundle.created_at
+    ):
+        raise ValueError("client authorization cannot predate frozen case")
     if authorization.maximum_amount_cents < bundle.finding.potential_recovery_cents:
         raise ValueError("authorization amount is below validated recovery amount")
 
@@ -653,6 +713,9 @@ def prepare_external_action(
     _required("artifact_locator", artifact_locator)
     _required("prepared_by", prepared_by)
     prepared_at = _iso("prepared_at", prepared_at)
+    prepared_time = _dt("prepared_at", prepared_at)
+    if prepared_time < _dt("authorization.authorized_at", authorization.authorized_at):
+        raise ValueError("external action cannot predate client authorization")
     _nonnegative_cents("action_amount_cents", action_amount_cents)
     if action_amount_cents > authorization.maximum_amount_cents:
         raise ValueError("action amount exceeds client authorization")
@@ -713,10 +776,34 @@ def verify_external_action(
         raise ValueError("external action finding id mismatch")
     if envelope.finding_proof_hash != bundle.finding.proof_hash:
         raise ValueError("external action finding proof mismatch")
+    if envelope.approved_action_type != authorization.approved_action_type:
+        raise ValueError("external action type differs from client authorization")
     if envelope.action_amount_cents > authorization.maximum_amount_cents:
         raise ValueError("external action exceeds authorized amount")
-    if artifact_bytes is not None and _hash_bytes(artifact_bytes) != envelope.artifact_hash:
-        raise ValueError("external action artifact hash mismatch")
+    if envelope.action_amount_cents > bundle.finding.potential_recovery_cents:
+        raise ValueError("external action exceeds validated recovery amount")
+
+    prepared = _dt("external_action.prepared_at", envelope.prepared_at)
+    authorized = _dt("authorization.authorized_at", authorization.authorized_at)
+    if prepared < authorized:
+        raise ValueError("external action predates client authorization")
+    if authorization.expires_at is not None:
+        if prepared > _dt("authorization.expires_at", authorization.expires_at):
+            raise ValueError("external action was prepared after authorization expiry")
+    for assessment in bundle.deadlines:
+        if assessment.deadline_at is None:
+            continue
+        if prepared > _dt(
+            f"deadline[{assessment.assessment_id}].deadline_at",
+            assessment.deadline_at,
+        ):
+            raise ValueError("external action is past an assessed deadline")
+
+    if artifact_bytes is not None:
+        if len(artifact_bytes) != envelope.artifact_size:
+            raise ValueError("external action artifact size mismatch")
+        if _hash_bytes(artifact_bytes) != envelope.artifact_hash:
+            raise ValueError("external action artifact hash mismatch")
 
 
 def case_bundle_to_payload(bundle: CaseProofBundle) -> dict[str, Any]:
