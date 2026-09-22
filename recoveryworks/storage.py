@@ -74,6 +74,7 @@ def _record_to_dict(record: LedgerRecord) -> dict[str, Any]:
             _evidence_to_dict(record.recovery_evidence)
             if record.recovery_evidence is not None else None
         ),
+        "settlement_total_cents": record.settlement_total_cents,
         "recovered_cents": record.recovered_cents,
         "fee_cents": record.fee_cents,
         "updated_at": record.updated_at,
@@ -220,6 +221,7 @@ def _load_record(value: Any) -> LedgerRecord:
             _load_evidence(item["recovery_evidence"])
             if item.get("recovery_evidence") is not None else None
         ),
+        settlement_total_cents=item.get("settlement_total_cents"),
         recovered_cents=item.get("recovered_cents", 0),
         fee_cents=item.get("fee_cents", 0),
         updated_at=item.get("updated_at"),
