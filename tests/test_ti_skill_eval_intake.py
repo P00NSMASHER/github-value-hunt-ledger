@@ -101,6 +101,7 @@ def eval_packet(intake=None, **overrides):
         "mutate_dev_set_sha256": "1" * 64,
         "promotion_test_set_sha256": "2" * 64,
         "evaluation_manifest_sha256": "3" * 64,
+        "mutator_identity": "MUTATOR:repair-01",
         "evaluator_identity": "VERIFIER:independent-01",
         "evaluation_evidence_refs": [
             "production/evals/SEVALRES-test-1.json",
@@ -108,6 +109,7 @@ def eval_packet(intake=None, **overrides):
         "source_failure_ids": ["FAIL:skill-eval:1"],
         "mutator_saw_promotion_test": False,
         "evaluator_modified": False,
+        "controller_modified": False,
         "sealed_holdout_opened_by_mutator": False,
         "provenance_complete": True,
         "sensitive_material_involved": False,
@@ -212,6 +214,54 @@ class SkillEvalResultIntakeTests(unittest.TestCase):
         )
         self.assertIn(
             "evaluator_mutation_blocked",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_controller_mutation_is_blocked(self):
+        intake = candidate_intake()
+        state = build_skill_eval_result_intake(
+            intake,
+            [eval_packet(intake, controller_modified=True)],
+        )
+        self.assertIn(
+            "controller_mutation_blocked",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_evaluator_must_be_independent_of_mutator(self):
+        intake = candidate_intake()
+        state = build_skill_eval_result_intake(
+            intake,
+            [
+                eval_packet(
+                    intake,
+                    mutator_identity="SAME:agent",
+                    evaluator_identity="SAME:agent",
+                )
+            ],
+        )
+        self.assertIn(
+            "evaluator_must_be_independent_of_mutator",
+            state["blocked_submissions"][0]["reasons"],
+        )
+
+    def test_empty_set_or_manifest_hash_is_blocked(self):
+        intake = candidate_intake()
+        empty_sha = (
+            "e3b0c44298fc1c149afbf4c8996fb924"
+            "27ae41e4649b934ca495991b7852b855"
+        )
+        state = build_skill_eval_result_intake(
+            intake,
+            [
+                eval_packet(
+                    intake,
+                    promotion_test_set_sha256=empty_sha,
+                )
+            ],
+        )
+        self.assertIn(
+            "promotion_test_set_sha256_cannot_be_empty_hash",
             state["blocked_submissions"][0]["reasons"],
         )
 
