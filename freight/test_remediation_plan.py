@@ -2,6 +2,7 @@ import pytest
 
 from freight.audit_workflow import RuleCSVInput, run_audit_workflow
 from freight.remediation_plan import (
+    _money,
     ADD_RULE_AND_RERUN,
     VERIFY_AUTHORITY_AND_RERUN,
     build_remediation_plan,
@@ -143,3 +144,7 @@ def test_remediation_item_is_bound_to_original_case_hash():
     )
     routed_hashes = set(result.artifacts.review_routing.remediation_case_hashes)
     assert {item.case_hash for item in plan.items} == routed_hashes
+
+
+def test_remediation_money_renderer_preserves_full_integer_cent_precision():
+    assert _money(2**63 - 1) == "$92,233,720,368,547,758.07"
