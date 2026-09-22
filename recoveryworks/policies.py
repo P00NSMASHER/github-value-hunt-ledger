@@ -78,6 +78,17 @@ POLICIES: dict[Branch, BranchPolicy] = {
         "insurance_claims_reviewer",
         professional_review_note="Coverage, valuation, causation, and recovery action require qualified insurance/claims review.",
     ),
+    Branch.CLOUD: BranchPolicy(
+        Branch.CLOUD,
+        RecoveryMode.OVERPAYMENT,
+        "cloud_billing_reviewer",
+    ),
+    Branch.MERCHANT_FEE: BranchPolicy(
+        Branch.MERCHANT_FEE,
+        RecoveryMode.OVERPAYMENT,
+        "merchant_fee_reviewer",
+        professional_review_note="Only reviewed processor-controlled fees are in scope; interchange/network/pass-through charges require separate review.",
+    ),
 }
 
 
