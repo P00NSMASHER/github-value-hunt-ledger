@@ -15,6 +15,18 @@ SEEDS=load_jsonl("search_seeds.jsonl")
 ADJ=load_jsonl("adjacency_queue.jsonl")
 MEASURE=json.loads((INTEL/"measurement_plan.json").read_text(encoding="utf-8")) if (INTEL/"measurement_plan.json").exists() else {}
 RUNS=[r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective","benchmark"}]
+EXECUTION_HISTORY=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
+STALE_TERMINAL_WORK_ITEMS={
+    row.get("work_item_id")
+    for row in EXECUTION_HISTORY
+    if (
+        row.get("status")=="FAILED_TERMINAL"
+        and row.get("retryable") is False
+        and row.get("failure_code")=="STALE_ASSIGNMENT"
+        and isinstance(row.get("work_item_id"),str)
+        and row.get("work_item_id")
+    )
+}
 
 strategy_alloc={x["strategy_id"]:float(x.get("allocation") or 0) for x in POLICY.get("strategy_allocation",[])}
 
@@ -321,6 +333,18 @@ candidates.append({
   }
 })
 
+# Exact semantic versions that already terminally failed as stale are not
+# eligible again. Revised plans receive different versioned work_item_ids.
+suppressed_stale_work_items=sorted(
+  c["work_item_id"]
+  for c in candidates
+  if c.get("work_item_id") in STALE_TERMINAL_WORK_ITEMS
+)
+candidates=[
+  c for c in candidates
+  if c.get("work_item_id") not in STALE_TERMINAL_WORK_ITEMS
+]
+
 # Stable generation fingerprint.
 fingerprint=json.dumps({
  "policy":POLICY,
@@ -328,6 +352,7 @@ fingerprint=json.dumps({
  "adj_ids":[(x.get("adjacency_id"),x.get("priority")) for x in ADJ],
  "experiments":EXPERIMENTS,
  "candidate_instructions":[(x["work_item_id"],x.get("work_action"),x["instructions"]) for x in candidates],
+ "suppressed_stale_work_items":suppressed_stale_work_items,
  "allocator_policy":CFG
 },sort_keys=True,default=str)
 gen_hash=hashlib.sha256(fingerprint.encode()).hexdigest()[:12]
@@ -440,6 +465,8 @@ metrics={
  "work_kind_counts":dict(kind_counts),
  "slot_role_counts":dict(role_counts),
  "awaiting_external_seed_count":sum(s.get("work_action")=="await_external" for s in SEEDS),
+ "suppressed_stale_work_item_count":len(suppressed_stale_work_items),
+ "suppressed_stale_work_items":suppressed_stale_work_items,
  "work_action_counts":{action:sum(a["work_action"]==action for a in assignments) for action in sorted({a["work_action"] for a in assignments})},
  "max_capability_concentration":max(cap_counts.values()) if cap_counts else 0,
  "max_experiment_concentration":max(exp_counts.values()) if exp_counts else 0,
@@ -489,7 +516,10 @@ rep=["# HUNT ALLOCATOR REPORT","",f"- Generation: **{generation_id}**",
      "## Portfolio mix","",
      "| Work kind | Slots |","|---|---:|"]
 for k,v in sorted(kind_counts.items()): rep.append(f"| {k} | {v} |")
-rep += ["","## Concentration controls","",
+rep += ["","## Stale-work suppression","",
+        f"- Terminal stale semantic work versions suppressed: **{len(suppressed_stale_work_items)}**",
+        f"- Suppressed work IDs: {', '.join(suppressed_stale_work_items) or 'none'}",
+        "","## Concentration controls","",
         f"- Maximum assignments on one capability: **{metrics['max_capability_concentration']}** / allowed {cons['max_assignments_per_capability']}",
         f"- Maximum assignments on one experiment: **{metrics['max_experiment_concentration']}** / allowed {cons['max_assignments_per_experiment']}",
         f"- Maximum assignments using one strategy: **{metrics['max_strategy_concentration']}** / allowed {cons['max_assignments_per_strategy']}",
