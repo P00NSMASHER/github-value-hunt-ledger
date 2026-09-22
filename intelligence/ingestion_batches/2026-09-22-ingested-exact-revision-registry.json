@@ -1,0 +1,1137 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-22",
+  "exact_revision_count": 160,
+  "source_batches": [
+    "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json",
+    "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json",
+    "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json",
+    "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json",
+    "intelligence/ingestion_batches/2026-09-22-authoritative-data-01.json",
+    "intelligence/ingestion_batches/2026-09-22-revision-reconciliation-01.json",
+    "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+  ],
+  "refs": [
+    {
+      "repository": "A-Jatin/freight-ratecon-extraction",
+      "revision": "a3dbbfec7f6b042176880d06c5114f81f29e57eb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "AccelerationConsortium/HELIOS",
+      "revision": "1e5765ec694d5ba5c26f5a8605c7e37b238a19e0",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "Accountw-debug/mdq",
+      "revision": "8853e2c54fdc293903e994e40c629808008d782e",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "acqagent/far-collector",
+      "revision": "40789a073134a484b2e4a5a2398629b067da0eea",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "acqagent/rfo-deviations",
+      "revision": "ccf31107508085cc311fb07488eb513ab97c6b7d",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "AD-SDL/MADSci",
+      "revision": "6b1ab6a70ce8b15af7aa8968479c90d9138753d0",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "adamleap02/PermitBuild",
+      "revision": "ff795137e0c66e62a87e62956fa351926886255d",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "adipras/tirta-saas-backend",
+      "revision": "79053de1629098969abe8254defececc9a114acb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "AetherLabsAI/RSIAgent",
+      "revision": "a9e56263f6deaa493496ad6b155fe24bf131bc12",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "agentsynth/agentsynth",
+      "revision": "d2564dfb25ed7ba32e367d28117e6afd1ee6c485",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "ai-frankie/ap-close-engine",
+      "revision": "db38c8476ccd21155a5dc161c5f36b9747e88e64",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "aiparallel0/freight-audit",
+      "revision": "e7869162cf9cb23f6d520a0cd71f87cf973d8c28",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "aitofound/ScienceIDE",
+      "revision": "65fb87f9e4cc59859f9aca4616798c78477f57bc",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "alanbld/utf8proj",
+      "revision": "92d96268159035cc2b53a34467dab6c64d1f0a98",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "alibaba/skill-up",
+      "revision": "889cfa6d4990d198db18049e147995f9eae31658",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "amrit-kumar/fintechcore",
+      "revision": "b27a22890e8b5173d2a97be512a198a4564ed425",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "amrzainmubarak/reconforge-erp",
+      "revision": "b61ea56bb9c135fda12546e173795af3c243e4fb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "aurelianware/cloudhealthoffice",
+      "revision": "85c8e18146d168ad2f4e30fbcfe6e90af0bfdb58",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "awksedgreep/caretaker",
+      "revision": "08b309dd927f7f2c26d4aa42fec4533dceeb7cf1",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "aws-samples/sample-energy-utility-rate-engine",
+      "revision": "e2f987be3863b0a5026940b7217cbc4ddffe6129",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "az-said/Interlock",
+      "revision": "822ec54692b30e1fdce04b55dfab62d0b56a60b2",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "ballerina-platform/module-ballerinax-microsoft.dynamics365.finance",
+      "revision": "fb15cb2f34749e8a031344943c107e115b93d7c4",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "Bdkelp/getmydpc_enrollment",
+      "revision": "e753d8ebf5e087ae9a4add978d1559af86c173fb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "Benchling-Open-Source/allotropy",
+      "revision": "ecc574986b74f91eb84cd0ee14756cd8dc5e1b7e",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "BlackPigIndustries/threvo-actions",
+      "revision": "f50d568e8d67d1806a122b3151048f038832dcf9",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "bparzella/secsgem",
+      "revision": "59a5242d8672dad73367a0acd18088adf461404f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "BrunoBanana/memory-as-history",
+      "revision": "84f519e920b706849cc0ccf184c377c2dc6d0c1f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "bsaffel/moneybin",
+      "revision": "fd34d99962c833de87bdb45351f0ace142db3f63",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "carabiner-dev/ampel",
+      "revision": "5cf19bc2786cbd73a8423383a966fbf842222d23",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "chaitanyakasaraneni/samplesheet-parser",
+      "revision": "511b484f59de18ed3f444f064d46e9c930dba630",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "chase-sets/chase-sets",
+      "revision": "32aa260b31c93dc02767efebb1c37877cd4a9f3b",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "ChelseaKR/constituent-reconciler",
+      "revision": "dbc09d25baec026027e65a0f8d21930509e2dd8e",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "chrisfulcher/orrery",
+      "revision": "89ae2218c031c2c46720783acfb44cea22e48636",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "cmdrvl/canon",
+      "revision": "45e9702ba7f3874c073134c1a6fb74500232b6a1",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "CodeMaru-Dreamine/Dreamine.Gem",
+      "revision": "82604d6f03c1e95e0558de5c757989b27cd4a3d6",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "conductor-is/quickbooks-desktop-node",
+      "revision": "a8024fd028ca1103c190684868456efc8d842940",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "cyber-entrepreneur/wingcaster",
+      "revision": "0d97a4ab8310d68b109e3a11ebdeda5eb3d3c829",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "D-Haku/Channel-Partner-Commission-Engine",
+      "revision": "176084bb4a5bc0a1ad17ba94a11c869dfd8a463e",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "DataArcTech/Bayesian-Agent",
+      "revision": "4b69b4ed02d166c8d1673ea67e2ac836ac377896",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "datasciencecampus/pprl_toolkit",
+      "revision": "b278afdcf37d557a06d058e5d164d6e4d373a87a",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "DeepExperience/Harness-R1",
+      "revision": "94f2e087f573e1b82fc9568bb634d4ae9a887e28",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "delongwangshu49-hub/bimchange-agent",
+      "revision": "cd7fd6e6522e060b7847f0daaed00979097da7dd",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "DominicFinn/open_tms",
+      "revision": "93d8c2b8ff78373ff69bb7ea546743e4703628b1",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "duke5am/pg-restore-drill",
+      "revision": "e914caddd14ab1604d85ccb7919d4da071a6766c",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "egovernments/DIGIT-Works",
+      "revision": "7c44e963c7aced16d648971ae66eb938cbe8fdc4",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "emoss08/Trenova",
+      "revision": "95fcf816562025ad9af864ded4a5fce8a555bd65",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "Enginatics/Oracle-EBS-SQL",
+      "revision": "6c0f3b1a70e1b6ff747e497176e7be9256e6e7ee",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "ersinkoc/Kronos",
+      "revision": "541d06069459a313f91940191a2ec3812f724a71",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "exoharness/exo",
+      "revision": "7678236329554bea728cff55e9182d9ff786f931",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "fedspendingtransparency/data-act-broker-backend",
+      "revision": "76dcae4ccbf6951223608bc1d8fd0c5b03da5d68",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "fedspendingtransparency/usaspending-api",
+      "revision": "1692d484b38c66361c54faa221548527cae29964",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "finnertallon-png/contract-deadline-agent",
+      "revision": "c891f5ff391abc58b874675783a7ff2c3775c7bb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "garretlking1-commits/jobwalk",
+      "revision": "fdcb507d196eef5d1d2bb8f7db9a18cd30c4f2fe",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-revision-reconciliation-01.json"
+      ]
+    },
+    {
+      "repository": "Gaskony-Ignition/module-plc-emulator",
+      "revision": "518f56b55566d7e20f19ce64003cdae45a08edc8",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "Gen-Verse/ScienceInfra",
+      "revision": "49bd221bb18077a349e7f860569c3c5f5a4de64f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "getcoherence/openpartner",
+      "revision": "eeff532ee758dc6221b4d03af852e5705a2328fb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "GiovanniGatti/talos",
+      "revision": "41fae94f941ea36fccddd395e86cd5662002e3cb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "GRIDAPPSD/CIMHub",
+      "revision": "5ba4c63fa525108928942d564fddc022c3fb031f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "GSA/GSA-Acquisition-DFARS",
+      "revision": "7e609f791af9cc6d8e7d75a7b05c83b1f62c0cb8",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "GSA/GSA-Acquisition-FAR",
+      "revision": "da52ccbbe114e1f031a7f4c59195c508dbfa485f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "GSA/open-gsa-redesign",
+      "revision": "494b1312e9c6436474840befe6e1964da15932b3",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-revision-reconciliation-01.json"
+      ]
+    },
+    {
+      "repository": "GSA/srt-fbo-scraper",
+      "revision": "fbdfa86a2bce4323a5afacda04f083698cab02e1",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-revision-reconciliation-01.json"
+      ]
+    },
+    {
+      "repository": "harshalsp0011/utility-billing-ai",
+      "revision": "c66e124f1991366f6c38c3535780905545edffb0",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "hidayattaufiqur/fno-navigator",
+      "revision": "0fd0998094abb3d9c3a8a30ca21ea9d21b7d69af",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "HopkinsICARUS/ICARUS-PJM-Dataset",
+      "revision": "0cb6a1af86e2bdfc1d160f44b6e4a7518ca3ffe3",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-authoritative-data-01.json"
+      ]
+    },
+    {
+      "repository": "hotgluexyz/tap-netsuite-rest",
+      "revision": "aeed1c57c266f265a95a30aca041ae8b4e84ed9d",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "ib823/sapconnect",
+      "revision": "5851e9fdeaba462c3137686f4ced0aae1ba4b0f7",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "Illumina/interop",
+      "revision": "015a85ec100c7a770ed0e27ce7fadc6230a38208",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "in-toto/in-toto",
+      "revision": "e352b43ad7cb8915d84c36d791aa61346152a0a3",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "intuit/QuickBooks-V3-Java-SDK",
+      "revision": "c4d5dfad23ffebf0302356876d0dc389708513a9",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "Jaskeeratr/grid-reliability-analytics",
+      "revision": "24e59a7318db3560b6547ff9b79416119abf6ecb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "Jerry-LuP/COBRA-Skills",
+      "revision": "44b00ef55a06a637e9bad06999b618ca2eb37288",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "jhxu5214/HarnessLens",
+      "revision": "369a5c8c7856902bed25024c293db61779b2c9f0",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "joedanields/CaD-Track",
+      "revision": "5ae85e868e12f1814381174a3afdfff6e5edf629",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "joschiservice/RosterSpec",
+      "revision": "f7e701c694bf1facdc4999e1681a3aa11493614d",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "justicebajaj161/Freight-Audit-Console",
+      "revision": "c2d4c07310a77e20ee21a74fc96d49df783c2e3a",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "karfalacisse900-alt/Flames-up.com",
+      "revision": "2ba5fa878da26f405bfae1846c8c90f1d0e69c10",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "Kentucky-ai/opentakeoff",
+      "revision": "6ff9cc355e60d6312c0c82e2ddac56cb212cc394",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "kimtabilon/ebp_netsuite",
+      "revision": "0f80fc77279b6806985a1868b12d37455bfae930",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "kingsleyonoh/invoice-reconciliation-engine",
+      "revision": "7545330806168102cd347d64a85a44481b37a6b3",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "kirilurbonas/FireDrill",
+      "revision": "1e532b17e49e4424f988b29dd338ae6c48dc20f3",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "kodekinetics79/opstrax-enterprise-build",
+      "revision": "fec2ba1432d6f8b4ba4c48be3d58e7e096819045",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "labscript-suite/labscript-devices",
+      "revision": "424b9f4b0de931f48fe1b0e5760797f9e5b89ee5",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "labscript-suite/labscript-suite",
+      "revision": "0ab902d0d8bc681fcd6a3a194d7b0d458c9b5338",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "LBNL-ETA/elecprice",
+      "revision": "a6947c3b65fdedec7da5bbeb52b85e8fdeffd1f4",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "leagames0221-sys/invoice-lens",
+      "revision": "4a9ce4123f8eba3308c2d414f449be68b7fbc05e",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "lineledger/lineledger",
+      "revision": "40607d92c7e7a418178ce27d3e679538110100f2",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "manuvarkey/cmbautomiser",
+      "revision": "fea18e164c63dad4526ac59d7a51cfec7cafb860",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "mao-code/MANTA",
+      "revision": "6f4411c54b4a2cc2169b0fbd99f34934c85816c0",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "MassingCloud/massing-pdf",
+      "revision": "36794b3c54fcfd62e3a0d2d5984cfc45cac83340",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "Maxed-OSS/statement-normalizer",
+      "revision": "0963c962a5ab618761ab57b604bad10578d39a0f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "mehdi-arfaoui/Stronghold",
+      "revision": "776fe21f159bcab9e4333c716c8ac11cd6329a91",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "mgilbir/formalis",
+      "revision": "2b3895a0c2c54e4f25ccb46e131d215ad4457eb2",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "mike4forge/forgelocal-commission-engine",
+      "revision": "cb4ab9bcb85a5863079d1798836727065d2d243a",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "mnmn0/mukuroji",
+      "revision": "34ec66604443da9ba60e9cfbf4d2e6246445bf66",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "Modern-Treasury/modern-treasury-python",
+      "revision": "406f354a06a98060df0c9f4c242fe56cc65e1526",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "moov-io/ach",
+      "revision": "f36ebb7ef2e6d678ef95ca6278d2b1f2deae4299",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "NationalGenomicsInfrastructure/scilifelab_epps",
+      "revision": "fbbe16f9a5ee50d4df610b20908cef501da32bbe",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "navariltd/utility-billing",
+      "revision": "380f6305350e4f7d90e745d48e2360170001a4db",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "nearai/pg-backup",
+      "revision": "6836158bdfd38937a55fd21d72e221192d2a9b59",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "netc-fleet-services/statement-reconciliation",
+      "revision": "d06d500b0cc010350ace2293f3b4f28dd6f68ddb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "Noone9029/Accounting-App",
+      "revision": "90e0eaa4896a55c1c8cda1c4101f4ab1323a4a61",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "NotAbdelrahmanelsayed/paymob_integration",
+      "revision": "8999a6799c5673ad49471224ad0f8012a447495d",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "nyimbi/AppGen-X",
+      "revision": "d3cf2829702ee414e0d7b64b03fa300ae5173abb",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "nzebrian/eruofood-ai",
+      "revision": "9c191ece9b27ad6efd7675dd7bf7013e5e1bdf1c",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "OCA/bank-statement-import",
+      "revision": "01be32ea73e485e9b2495ea80fcce934badedeea",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-revision-reconciliation-01.json"
+      ]
+    },
+    {
+      "repository": "OCA/rma",
+      "revision": "9416b2a5f5e1d604eff27610635eb3573227337c",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "odoo/odoo",
+      "revision": "c55c82dac6283a77ee747e1e672a29e85180980f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "oldbulb/samsara",
+      "revision": "8af12afcea34c527b91e8023dd8999f64d49360d",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "OmarFaig/Assay",
+      "revision": "821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "open-eid/SiVa",
+      "revision": "0c9c5f2490b1a27798b47906bbaa6adb4d26daad",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "openfisca/openfisca-france",
+      "revision": "ebcb7782d17058495c6ca33c278e373e167b641b",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "opensanctions/nomenklatura",
+      "revision": "844dba09fafc8512dc3ce241f44aa5415b367029",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "Opentrons/opentrons",
+      "revision": "03b991fb263b97b6bb767ce311ca56e103d635e4",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "oracle-quickstart/oci-jde-monitoring",
+      "revision": "77c6aac079183e5076ff098ad00e463be16aa634",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "oscal-compass/compliance-to-policy-go",
+      "revision": "45bfc1a8947e8b56b7e11391e13f8c1f2136cfaa",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "owgreen-dev/grid-crunch",
+      "revision": "5f0c9a074d928b79caa792a84e8e92de1b2df3f2",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json",
+        "intelligence/ingestion_batches/2026-09-22-authoritative-data-01.json"
+      ]
+    },
+    {
+      "repository": "payops-labs/solana-payment-ops",
+      "revision": "7e4d9cc8d137e4d32cdb4b23aa5c0965f3379e94",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "Payroll-Engine/PayrollEngine",
+      "revision": "2ddb5c770b0a955936562355a1021f06e922886a",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "PayrollEngine.Backend",
+      "revision": "ecd049ee43a64c130981301192a0f8ab36eed1ed",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "pedrocodesforcoffee/builder-api",
+      "revision": "3a9d2f3af61b485763a9f0cc4209ed1a8b584683",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "pialmmh/billing-dotnetcore",
+      "revision": "ec9e0abacce7e80b3a34d2d89b929ee5db946209",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "prathamesh-git9/effect-broker",
+      "revision": "eb273640a3a8a2d65fc15169ed1f6d335608b23e",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "probavi/probavi",
+      "revision": "3f0dd3bd94259f91eb0a54ce6b5425afb70ad216",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "project-minigraf/minigraf",
+      "revision": "ccdc85e2921f4028a9312400fe53ecdd5b2202aa",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "Rakesh-7989/Site-Tracker-Pro",
+      "revision": "4cbb87434b7909b39b11d764e29da97174579994",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "rehman671/vendor-reconciliation-engine",
+      "revision": "1ae859c938533f4f3e79fd8eef5d6e2ed45fd625",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "Reifye/Reifye-OS",
+      "revision": "acbb8ca46c6c6de20c0a64ac7ea0f174f308e17a",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "rmax-ai/skill-lifecycle-lab",
+      "revision": "4c0b3a53e7c835013f8524e579f356926b2ab0ab",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "Robertn02/Airline-Revenue-Management-IROPS-Seat-Allocation-Optimizer",
+      "revision": "9a235b1ceb7a53f467c060b6a2750590b1ee0cd1",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "ruc-datalab/EvoOntology",
+      "revision": "6201f3d49d508874755bccfa5664363c943d9d88",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "sandialabs/DREAMS",
+      "revision": "3eb6c6089eadf09a4bf99961faac11a76ef30ca0",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "savabs/queue_attrition",
+      "revision": "daf180778383b8675e252346e771a4e754f0558d",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-authoritative-data-01.json"
+      ]
+    },
+    {
+      "repository": "sebastienrousseau/bankstatementparser",
+      "revision": "b3309b78f0bd8da872a09ec2b586a694379d5d83",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-revision-reconciliation-01.json"
+      ]
+    },
+    {
+      "repository": "SemaphoreSolutions/s4-clarity-lib",
+      "revision": "ad577fff3a3c4c93f4bb898940a0b45268c7dbe7",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "sengtha/Kareya-Silo",
+      "revision": "a43eedea03add0728eadfc1f8ea35cc3ca6867cc",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "sidnov6/recoupe",
+      "revision": "60e0e02bec789ab505752dacfecdd76438aacd48",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "Sigilweaver/OpenTFRaw",
+      "revision": "63380dff0d25898f5c6e1184087dc590b0d7b6ab",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "simstudioai/sim",
+      "revision": "a2c9756113a13debfa1c6b5b1503700fae9007d9",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "slicedearth/contract-delta-au",
+      "revision": "630d1903507e6f5e47adaf1c690c9d6d4363af54",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "snapetech/DuneAwakeningSelfHost",
+      "revision": "8d3bac1df38f45fb13e2c1427216bf5dc384687b",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "spree/spree",
+      "revision": "2a419d42e86dea30a69a3c5b7764185cea132b3f",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "srthck/trustmesh",
+      "revision": "5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "stateset/stateset-icommerce",
+      "revision": "0ae4cf3c531f35d28a55f0211fc64413114d4bd1",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "sudosahil/pmis",
+      "revision": "03d5c47c2a235e12f3c53ed518201476f566fc72",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "suoten/ProtoForge",
+      "revision": "7c61b10d9ae406224c86741d9c0a450b561b40ca",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-extensions-01.json"
+      ]
+    },
+    {
+      "repository": "Superheld/summae",
+      "revision": "9c5292af99bab9716723b82fd221a56f91ab4581",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "surendersara1/D-NBS_PySpark",
+      "revision": "dfa941279d318bd698e2e5c756be81331a854eb3",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "szapata85/ACHInterbank",
+      "revision": "395a359230eff35e49cc196b49995ed4c49509b9",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "ThousandBirdsInc/chidori",
+      "revision": "223bb8779f63822c3e63a9a4347dda7483a02158",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "tonytonycoder11/stripe-connect-reckon",
+      "revision": "deb30aabfed84c7b0b2e5ae28c92cc9f85f79193",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "vendorrebate/vendorrebate",
+      "revision": "f37427a762555f4538aa4ffd21e7afaadc6e81e9",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "vidyesh95/qatoto-backend",
+      "revision": "4f5f270f6ba5ef3ed4b230716997ccea049ce408",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-commercial-core-01.json"
+      ]
+    },
+    {
+      "repository": "vitthalhumbe/ciphercrew-claimcraft",
+      "revision": "8b61f1b7e6cc8e86ff56011267e0da8e263401f3",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "we3lab/industrial-electricity-tariffs",
+      "revision": "ffab0314814d4796c6655c91f53f90b525acdf94",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "WeAgentAI/LLM-Wiki",
+      "revision": "79a5a2d5fb9e07c7e5d21fe704b4eca0c27452ef",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-agent-learning-01.json"
+      ]
+    },
+    {
+      "repository": "WiseOpsTeam/mneme",
+      "revision": "e595986e6efb3988e1d64ad0bba7d9761f123786",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-supporting-components-01.json"
+      ]
+    },
+    {
+      "repository": "wphamman/erpocr_integration",
+      "revision": "a9c82c0ff02f580ff60ebf012797686ba91e977e",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "WRBriska/InvoiceAudit",
+      "revision": "bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-cross-index-residual-01.json"
+      ]
+    },
+    {
+      "repository": "xiazeyu/FireDataForge",
+      "revision": "4328d4f6bdbec5a3ab30bf786718d759fc4fb84c",
+      "source_batches": [
+        "intelligence/ingestion_batches/2026-09-22-authoritative-data-01.json"
+      ]
+    }
+  ]
+}
