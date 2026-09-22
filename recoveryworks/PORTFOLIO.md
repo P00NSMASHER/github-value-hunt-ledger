@@ -29,7 +29,7 @@ traction.
 | TelecomRecovery | overpayment | Operational ingestion | invoice + service contract + independent CDR/usage quantity |
 | RebateRecovery | underpayment | Operational ingestion | rebate program + purchase population + settlement evidence |
 | LeaseRecovery | overpayment | Operational ingestion | landlord charge + effective lease rate + independent area/allocation evidence |
-| ConstructionRecovery | underpayment | Foundation | contract/change evidence + schedule causation still to be integrated |
+| ConstructionRecovery | underpayment | Operational ingestion | reviewed entitlement + event mapping + versioned CPM schedules + qualified causation review + settlement evidence |
 
 ## Shared commercial motion
 
@@ -64,16 +64,21 @@ A manufacturer/distributor can plausibly supply inputs for:
 A healthcare provider can plausibly add PayerRecovery to the same shared
 portfolio.
 
-## Remaining highest-leverage build gap
+## Portfolio state
 
-ConstructionRecovery is the only registered branch without a complete Scan 360
-ingestion path. Its safe production path requires explicit integration of:
+All ten registered RecoveryWorks divisions now have operational Scan 360
+ingestion paths with the same durable evidence/lifecycle model.
 
-- contract/change-order entitlement evidence
-- baseline and update schedule identity/versioning
-- event-to-activity mapping
-- CPM/delay-impact output
-- qualified reviewer sign-off on entitlement and causation
+ConstructionRecovery completes the previously missing construction lane with:
 
-The common RecoveryOS lifecycle should remain unchanged when that adapter is
-added.
+- reviewed contract/change-order entitlement evidence;
+- claimant/project scope enforcement;
+- source-hashed baseline and update schedule versions;
+- deterministic finish-to-start CPM calculation and project-duration comparison;
+- explicit event-to-activity mapping;
+- qualified causation review bounded by reproducible CPM impact; and
+- settlement evidence establishing actual compensation received.
+
+Direct XER/P6 normalization, richer relationship types, and jurisdiction-specific
+claim packaging can be added upstream or as specialist adapters without changing
+or weakening the common RecoveryOS authorization gates.
