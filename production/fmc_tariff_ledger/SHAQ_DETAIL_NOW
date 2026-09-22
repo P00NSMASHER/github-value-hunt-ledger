@@ -1,4 +1,5 @@
-probe_id=shaq-detail-2026-09-22
+probe_id=shaq-detail-2026-09-22-v2
 read_only=true
 rate_calls=2
 write_calls=0
+openapi_best_effort=true
