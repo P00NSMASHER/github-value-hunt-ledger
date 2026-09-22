@@ -433,6 +433,97 @@ def learn_value_memory(
     return memory, observations
 
 
+def learn_training_episode_memory(
+    episodes: Iterable[Mapping[str, Any]],
+    *,
+    config: ValueConfig | None = None,
+) -> tuple[ValueMemory, list[dict[str, Any]]]:
+    """Learn value priors from the train partition only.
+
+    Confirm and evaluation-only episodes are deliberately ignored here. They
+    exist to judge candidate policy/skill changes, not to train the live prior.
+    """
+    memory = ValueMemory(config)
+    observations: list[dict[str, Any]] = []
+
+    def sort_key(episode: Mapping[str, Any]) -> tuple[str, str]:
+        provenance = episode.get("provenance") or {}
+        return (
+            str(provenance.get("timestamp") or ""),
+            str(episode.get("run_id") or ""),
+        )
+
+    for episode in sorted(episodes, key=sort_key):
+        if episode.get("split") != "train":
+            continue
+        reward_body = episode.get("reward") or {}
+        reward = reward_body.get("training_reward")
+        if not isinstance(reward, (int, float)) or not math.isfinite(reward):
+            continue
+
+        run_id = str(episode.get("run_id") or "")
+        action = episode.get("action") or {}
+        provenance = episode.get("provenance") or {}
+        updated_at = str(provenance.get("timestamp") or "") or None
+        updated: list[str] = []
+
+        strategy_id = action.get("strategy_id")
+        if isinstance(strategy_id, str) and strategy_id.startswith("STRAT:"):
+            memory.update(
+                strategy_id,
+                ExperienceKind.STRATEGY,
+                float(reward),
+                run_id=run_id or None,
+                updated_at=updated_at,
+            )
+            updated.append(strategy_id)
+
+        query_family_id = action.get("query_family_id")
+        if (
+            isinstance(query_family_id, str)
+            and query_family_id.startswith("QF:")
+        ):
+            memory.update(
+                query_family_id,
+                ExperienceKind.QUERY_FAMILY,
+                float(reward),
+                run_id=run_id or None,
+                updated_at=updated_at,
+            )
+            updated.append(query_family_id)
+
+        for move_id in action.get("search_move_ids") or []:
+            if not isinstance(move_id, str) or not move_id:
+                continue
+            key = move_id if move_id.startswith("MOVE:") else f"MOVE:{move_id}"
+            memory.update(
+                key,
+                ExperienceKind.SEARCH_MOVE,
+                float(reward),
+                run_id=run_id or None,
+                updated_at=updated_at,
+            )
+            updated.append(key)
+
+        observations.append(
+            {
+                "search_run_id": run_id,
+                "split": "train",
+                "reward": float(reward),
+                "reward_stage": reward_body.get("reward_stage"),
+                "downstream_outcome_ids": list(
+                    (reward_body.get("downstream") or {}).get(
+                        "outcome_ids",
+                        [],
+                    )
+                ),
+                "updated_memory_keys": updated,
+            }
+        )
+
+    return memory, observations
+
+
 @dataclass(frozen=True)
 class FailureEvent:
     failure_id: str
