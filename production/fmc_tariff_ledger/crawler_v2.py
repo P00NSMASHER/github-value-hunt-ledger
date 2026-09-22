@@ -23,9 +23,10 @@ _CORE_FETCH_BYTES = base.fetch_bytes
 
 RULE_SECTION_RE = re.compile(
     r"(?im)^\s*(?:RULE|ITEM)\s+"
-    r"(?P<number>(?!(?:NO|NUMBER|NOS)\b)[A-Z0-9]+(?:\.[A-Z0-9]+)*)"
+    r"(?P<number>[A-Z0-9]+(?:\.[A-Z0-9]+)*)"
     r"\s*[.\-:]?\s*(?P<title>[^\n]{0,180})$"
 )
+BOGUS_RULE_TOKENS = {"NO", "NUMBER", "NOS", "PAGE", "PAGES"}
 
 
 @dataclass
@@ -87,7 +88,11 @@ def likely_tariff_link_v2(url: str, anchor_text: str = "", depth: int = 0) -> bo
 
 def _generic_rule_terms(text: str, url: str) -> list[base.ExtractedTerm]:
     """Preserve every RULE/ITEM section, not only preselected commercial keywords."""
-    matches = list(RULE_SECTION_RE.finditer(text))
+    matches = [
+        match
+        for match in RULE_SECTION_RE.finditer(text)
+        if match.group("number").upper() not in BOGUS_RULE_TOKENS
+    ]
     if not matches:
         return []
 
