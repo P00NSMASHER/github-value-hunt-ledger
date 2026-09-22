@@ -15,6 +15,7 @@ class LearningStateIntegrationTests(unittest.TestCase):
             "work_action": "search",
             "measurement_quality": "prospective",
             "allocation_mode": "generated",
+            "routing_mode": "generated",
             "execution_claim_id": f"CLAIM:test:{index}",
             "strategy_id": "STRAT:integration-test",
             "query_family_id": "QF:integration-test",
