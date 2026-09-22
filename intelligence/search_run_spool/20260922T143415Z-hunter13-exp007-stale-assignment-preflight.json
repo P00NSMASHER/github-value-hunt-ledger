@@ -99,7 +99,7 @@
   "benchmark_task_ids": [],
   "comparison_group_id": null,
   "evaluation_set_id": null,
-  "seed_mode": "generated",
+  "seed_mode": "free_exploration",
   "seed_ids": [],
   "adjacency_mode": "none",
   "adjacency_ids": [],
