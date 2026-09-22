@@ -1,8 +1,7 @@
-"""File ingestion for UtilityRecovery bills and simple tariff definitions.
+"""File ingestion for UtilityRecovery bills and deterministic tariff definitions.
 
-The tariff loader accepts the simple logic-step shape used by the discovered
-utility-billing prototype, but rejects formulas, conditions, tier dictionaries,
-and unknown charge types. Those need an explicit future DSL implementation.
+The loader accepts explicit scalar, tiered, TOU, daily, and minimum charge
+primitives. Free-form formulas and executable conditions are rejected.
 """
 from __future__ import annotations
 
@@ -13,7 +12,14 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-from .utility import UtilityBill, UtilityCharge, UtilityChargeKind, UtilityTariff
+from .utility import (
+    UtilityBill,
+    UtilityCharge,
+    UtilityChargeKind,
+    UtilityTariff,
+    UtilityTier,
+    normalize_period,
+)
 
 
 DEFAULT_BILL_COLUMNS = {
@@ -26,7 +32,10 @@ DEFAULT_BILL_COLUMNS = {
     "kwh": "Billed_kWh",
     "demand_kw": "Billed_Demand_kW",
     "reactive_kva": "Billed_rkVA",
+    "days_used": "Days_Used",
 }
+
+TOU_COLUMN_PREFIX = "Billed_kWh_"
 
 
 def _decimal(value: Any, *, name: str) -> Decimal:
@@ -65,6 +74,15 @@ def _read_text(path: str | Path) -> tuple[Path, bytes, str]:
     return source, raw, text
 
 
+def _optional_value(row: Mapping[str, str], column: str | None) -> str | None:
+    if not column:
+        return None
+    value = row.get(column)
+    if value is None or not str(value).strip():
+        return None
+    return str(value).strip()
+
+
 def load_utility_bills_csv(
     path: str | Path,
     *,
@@ -77,6 +95,18 @@ def load_utility_bills_csv(
     if not reader.fieldnames:
         raise ValueError(f"{source} has no CSV header")
 
+    period_columns: dict[str, str] = {}
+    reserved_columns = {value for value in columns.values() if value}
+    for field in reader.fieldnames:
+        if (
+            field
+            and field.startswith(TOU_COLUMN_PREFIX)
+            and field not in reserved_columns
+        ):
+            raw_period = field[len(TOU_COLUMN_PREFIX):]
+            if raw_period:
+                period_columns[normalize_period(raw_period)] = field
+
     result: list[UtilityBill] = []
     for row_number, row in enumerate(reader, start=2):
         def req(key: str) -> str:
@@ -86,12 +116,23 @@ def load_utility_bills_csv(
                 raise ValueError(f"row {row_number}: {column} is required")
             return str(value).strip()
 
-        def optional(key: str, default: str = "0") -> str:
-            column = columns.get(key)
-            if not column:
-                return default
-            value = row.get(column)
-            return str(value).strip() if value is not None and str(value).strip() else default
+        days_raw = _optional_value(row, columns.get("days_used"))
+        days_used = None
+        if days_raw is not None:
+            try:
+                days_used = int(days_raw)
+            except ValueError as exc:
+                raise ValueError(
+                    f"row {row_number}: {columns.get('days_used')} must be integer"
+                ) from exc
+            if days_used <= 0:
+                raise ValueError(f"row {row_number}: Days_Used must be positive")
+
+        billed_kwh_by_period = {
+            period: str(row[column]).strip()
+            for period, column in period_columns.items()
+            if row.get(column) is not None and str(row[column]).strip()
+        }
 
         result.append(UtilityBill(
             bill_id=req("bill_id"),
@@ -100,13 +141,49 @@ def load_utility_bills_csv(
             service_class=req("service_class"),
             bill_date=req("bill_date"),
             actual_cents=dollars_to_cents(req("actual")),
-            billed_kwh=optional("kwh"),
-            billed_demand_kw=optional("demand_kw"),
-            billed_reactive_kva=optional("reactive_kva"),
+            billed_kwh=_optional_value(row, columns.get("kwh")),
+            billed_demand_kw=_optional_value(row, columns.get("demand_kw")),
+            billed_reactive_kva=_optional_value(row, columns.get("reactive_kva")),
+            days_used=days_used,
+            billed_kwh_by_period=billed_kwh_by_period,
             source_hash=digest,
             source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,
-            metadata={"source_file": source.name, "row_number": row_number},
+            metadata={
+                "source_file": source.name,
+                "row_number": row_number,
+                "tou_columns": dict(period_columns),
+            },
+        ))
+    return tuple(result)
+
+
+def _load_tiers(
+    *,
+    tiers: Any,
+    tariff_index: int,
+    step_name: str,
+) -> tuple[UtilityTier, ...]:
+    if not isinstance(tiers, list) or not tiers:
+        raise ValueError(
+            f"tariffs[{tariff_index}] step {step_name!r} requires non-empty tiers list"
+        )
+    result: list[UtilityTier] = []
+    for tier_index, tier in enumerate(tiers):
+        if not isinstance(tier, dict):
+            raise ValueError(
+                f"tariffs[{tariff_index}] step {step_name!r} tiers[{tier_index}] "
+                "must be an object"
+            )
+        if "rate" not in tier:
+            raise ValueError(
+                f"tariffs[{tariff_index}] step {step_name!r} tiers[{tier_index}] "
+                "missing rate"
+            )
+        upper = tier.get("up_to_kwh")
+        result.append(UtilityTier(
+            rate_micros_per_unit=dollars_per_unit_to_micros(tier["rate"]),
+            up_to_kwh=None if upper in (None, "", "null") else str(upper),
         ))
     return tuple(result)
 
@@ -119,14 +196,29 @@ def load_simple_tariff_definitions_json(
     default_effective_from: str,
     jurisdiction: str | None = None,
 ) -> tuple[UtilityTariff, ...]:
-    """Load deterministic scalar tariff steps from a JSON extraction output.
+    """Load explicit deterministic tariff steps from JSON extraction output.
 
     Supported charge_type values:
-    fixed_fee, per_kwh/energy_charge, per_kw/demand_charge,
-    per_rkva/reactive_demand_fee, minimum_charge/minimum_bill.
+    - fixed_fee
+    - daily_fixed_fee
+    - per_kwh / energy_charge
+    - tiered_kwh
+    - tou_kwh
+    - per_kw / demand_charge
+    - per_rkva / reactive_demand_fee
+    - minimum_charge / minimum_bill
 
-    Any condition other than "Always", formula, dict-valued tier, or unknown
-    charge type fails closed.
+    Tiered example:
+      {"charge_type":"tiered_kwh","tiers":[
+        {"up_to_kwh":1000,"rate":0.10},
+        {"up_to_kwh":null,"rate":0.15}
+      ]}
+
+    TOU example:
+      {"charge_type":"tou_kwh","period":"on_peak","value":0.20}
+
+    Any executable condition, free-form formula, or unknown charge type fails
+    closed rather than silently approximating the bill.
     """
     if not isinstance(utility_id, str) or not utility_id.strip():
         raise ValueError("utility_id is required")
@@ -168,7 +260,9 @@ def load_simple_tariff_definitions_json(
         minimum_bill_cents = 0
         for step_index, step in enumerate(steps):
             if not isinstance(step, dict):
-                raise ValueError(f"tariffs[{index}].logic_steps[{step_index}] must be an object")
+                raise ValueError(
+                    f"tariffs[{index}].logic_steps[{step_index}] must be an object"
+                )
             name = str(step.get("step_name") or f"step-{step_index}")
             condition = step.get("condition", "Always")
             if condition != "Always":
@@ -180,10 +274,6 @@ def load_simple_tariff_definitions_json(
                     f"tariffs[{index}] step {name!r} uses unsupported free-form formula"
                 )
             value = step.get("value")
-            if isinstance(value, dict):
-                raise ValueError(
-                    f"tariffs[{index}] step {name!r} uses unsupported tier/voltage dictionary"
-                )
             kind = str(step.get("charge_type") or "").strip().lower()
 
             if kind == "fixed_fee":
@@ -192,11 +282,43 @@ def load_simple_tariff_definitions_json(
                     kind=UtilityChargeKind.FIXED,
                     amount_cents=dollars_to_cents(value or 0),
                 ))
+            elif kind == "daily_fixed_fee":
+                charges.append(UtilityCharge(
+                    name=name,
+                    kind=UtilityChargeKind.DAILY_FIXED,
+                    rate_micros_per_unit=dollars_per_unit_to_micros(value),
+                ))
             elif kind in {"per_kwh", "energy_charge"}:
+                if isinstance(value, (dict, list)):
+                    raise ValueError(
+                        f"tariffs[{index}] step {name!r} scalar energy value must be numeric"
+                    )
                 charges.append(UtilityCharge(
                     name=name,
                     kind=UtilityChargeKind.ENERGY,
                     rate_micros_per_unit=dollars_per_unit_to_micros(value),
+                ))
+            elif kind == "tiered_kwh":
+                charges.append(UtilityCharge(
+                    name=name,
+                    kind=UtilityChargeKind.TIERED_ENERGY,
+                    tiers=_load_tiers(
+                        tiers=step.get("tiers"),
+                        tariff_index=index,
+                        step_name=name,
+                    ),
+                ))
+            elif kind == "tou_kwh":
+                period = step.get("period")
+                if not isinstance(period, str) or not period.strip():
+                    raise ValueError(
+                        f"tariffs[{index}] step {name!r} tou_kwh requires period"
+                    )
+                charges.append(UtilityCharge(
+                    name=name,
+                    kind=UtilityChargeKind.TOU_ENERGY,
+                    rate_micros_per_unit=dollars_per_unit_to_micros(value),
+                    period=normalize_period(period),
                 ))
             elif kind in {"per_kw", "demand_charge"}:
                 charges.append(UtilityCharge(
@@ -211,14 +333,17 @@ def load_simple_tariff_definitions_json(
                     rate_micros_per_unit=dollars_per_unit_to_micros(value),
                 ))
             elif kind in {"minimum_charge", "minimum_bill"}:
-                minimum_bill_cents = max(minimum_bill_cents, dollars_to_cents(value or 0))
+                minimum_bill_cents = max(
+                    minimum_bill_cents,
+                    dollars_to_cents(value or 0),
+                )
             else:
                 raise ValueError(
                     f"tariffs[{index}] step {name!r} has unsupported charge_type {kind!r}"
                 )
 
         tariffs.append(UtilityTariff(
-            utility_id=utility_id.strip(),
+            utility_id=str(entry.get("utility_id") or utility_id).strip(),
             service_class=str(service_class),
             effective_from=str(effective_from),
             effective_to=None if effective_to in (None, "") else str(effective_to),
