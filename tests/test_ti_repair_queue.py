@@ -186,6 +186,18 @@ class RepairQueueTests(unittest.TestCase):
         states = [task["state"] for task in queue["tasks"]]
         self.assertEqual(states, ["READY_FOR_REPAIR"])
 
+    def test_duplicate_failure_packets_collapse_by_signature(self):
+        duplicate = good_failure(
+            failure_id="FAIL:test:2",
+        )
+        queue = build_repair_queue(
+            {"learning_alerts": []},
+            [good_failure(), duplicate],
+            {},
+        )
+        self.assertEqual(queue["summary"]["tasks"], 1)
+        self.assertEqual(queue["summary"]["ready_for_repair"], 1)
+
     def test_tampered_hash_fails_validation(self):
         queue = build_repair_queue(
             {"learning_alerts": []},
