@@ -49,7 +49,7 @@ def test_review_required_result_builds_and_verifies_bundle(tmp_path):
 
     assert receipt.state == "REVIEW_REQUIRED"
     assert receipt.run_hash == result.summary.run_hash
-    assert receipt.entry_count == 14
+    assert receipt.entry_count == 15
     assert len(receipt.bundle_sha256) == 64
     assert len(receipt.manifest_sha256) == 64
 
@@ -59,6 +59,10 @@ def test_review_required_result_builds_and_verifies_bundle(tmp_path):
         assert manifest["raw_source_files_included"] is False
         assert manifest["run_hash"] == result.summary.run_hash
         assert "review-packet.md" in archive.namelist()
+        html = archive.read("reviewer-workbench.html").decode("utf-8")
+        assert result.artifacts.review_packet.packet_hash in html
+        assert "__FREIGHT_DATA__" not in html
+        assert "Draft decisions" in html
         assert "review-routing.json" in archive.namelist()
         assert "remediation-plan.json" in archive.namelist()
         assert "remediation-plan.md" in archive.namelist()
