@@ -220,6 +220,7 @@ for e in EXPERIMENTS:
     candidates.append({
       "work_item_id":experiment_work_item_id,
       "work_revision_sha256":experiment_work_revision,
+      "work_identity_payload":plan_payload,
       "work_kind":"experiment_execution",
       "work_action":plan_payload["work_action"],
       "source_id":e["experiment_id"],
@@ -249,6 +250,7 @@ for e in EXPERIMENTS:
     candidates.append({
       "work_item_id":verification_work_item_id,
       "work_revision_sha256":verification_work_revision,
+      "work_identity_payload":verification_payload,
       "work_kind":"independent_verification",
       "work_action":plan_payload["work_action"],
       "source_id":"VERIFY:"+e["experiment_id"],
@@ -297,6 +299,7 @@ if not any(c.get("work_kind")=="independent_verification" for c in candidates):
         candidates.append({
           "work_item_id":fallback_work_item_id,
           "work_revision_sha256":fallback_work_revision,
+          "work_identity_payload":fallback_verification_payload,
           "work_kind":"independent_verification",
           "work_action":"search",
           "query_recipe_id":None,
@@ -434,6 +437,7 @@ for slot in slots:
       "slot_label":slot["label"],
       "work_item_id":c["work_item_id"],
       "work_revision_sha256":c.get("work_revision_sha256"),
+      "work_identity_payload":c.get("work_identity_payload"),
       "work_kind":c["work_kind"],
       "work_action":c.get("work_action","search"),
       "query_recipe_id":c.get("query_recipe_id"),
