@@ -57,7 +57,7 @@ class APBranchTests(unittest.TestCase):
         self.assertEqual(finding.potential_recovery_cents, 432100)
         self.assertEqual(finding.reason, "SUSPECTED_DUPLICATE_PAYMENT")
 
-    def test_verified_obligation_promotes_supported_duplicate_to_validated(self):
+    def test_suffix_alias_cannot_borrow_verified_obligation_authority(self):
         observations = build_ap_observations(
             client_id="client",
             payments=(
@@ -67,10 +67,22 @@ class APBranchTests(unittest.TestCase):
             obligations=(obligation("vendor", "INV-2001", 432100),),
         )
         finding = RecoveryEngine().evaluate(observations[0])
+        self.assertIs(finding.state, FindingState.REVIEW)
+        self.assertEqual(finding.potential_recovery_cents, 432100)
+        self.assertIsNone(finding.rule)
+
+    def test_exact_invoice_duplicate_can_use_verified_obligation(self):
+        observations = build_ap_observations(
+            client_id="client",
+            payments=(
+                payment("p1", "vendor", "INV-2001", 432100),
+                payment("p2", "vendor", "INV-2001", 432100),
+            ),
+            obligations=(obligation("vendor", "INV-2001", 432100),),
+        )
+        finding = RecoveryEngine().evaluate(observations[0])
         self.assertIs(finding.state, FindingState.VALIDATED)
         self.assertEqual(finding.potential_recovery_cents, 432100)
-        self.assertEqual(finding.actual_cents, 864200)
-        self.assertEqual(finding.expected_cents, 432100)
 
     def test_three_payments_recover_two_extras(self):
         observations = build_ap_observations(
