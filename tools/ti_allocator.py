@@ -109,9 +109,16 @@ for s in SEEDS:
     if not kind: continue
     sid=s.get("strategy_id")
     base=float(s.get("priority") or 0)
-    strat=CFG["scoring"]["strategy_allocation_weight"]*strategy_alloc.get(sid,0)
-    expb=experiment_status_boost(s.get("experiment_ids") or [])
-    score=round(min(120,base+strat+expb),2)
+    if kind=="learning_measurement":
+        # Measurement-only work must remain independent of learned/policy
+        # exploitation signals. The curriculum priority is authoritative.
+        strat=0.0
+        expb=0.0
+        score=round(base,2)
+    else:
+        strat=CFG["scoring"]["strategy_allocation_weight"]*strategy_alloc.get(sid,0)
+        expb=experiment_status_boost(s.get("experiment_ids") or [])
+        score=round(min(120,base+strat+expb),2)
     packet=None
     if kind=="learning_measurement":
         packet=learning_packet_by_seed.get(s["seed_id"])
@@ -463,6 +470,11 @@ for a in assignments:
              f"- Strategy/objective: {a.get('strategy_id') or 'n/a'} / {a.get('search_objective_id') or 'n/a'}",
              f"- Capability/experiment: {', '.join(a['capability_ids']+a['experiment_ids']) or 'cross-domain'}",
              f"- Why now: {i.get('why_now') or '—'}"]
+    if a.get("learning_measurement_packet_id"):
+        plan.append(
+            f"- Frozen learning measurement packet: {a['learning_measurement_packet_id']} "
+            f"@ {a['learning_measurement_packet_sha256']}"
+        )
     if i.get("execution_scope"): plan.append(f"- Execution scope: {i['execution_scope']}")
     if i.get("next_action"): plan.append(f"- Next action: {i['next_action']}")
     if i.get("acceptance_target"): plan.append(f"- Acceptance target: {i['acceptance_target']}")
