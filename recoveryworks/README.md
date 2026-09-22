@@ -33,6 +33,25 @@ The two common financial modes are:
 - OVERPAYMENT: recoverable = max(actual - expected, 0)
 - UNDERPAYMENT: recoverable = max(expected - actual, 0)
 
+## Durable Recovery Ledger
+
+SQLiteRecoveryLedger persists the same guarded lifecycle as RecoveryLedger and
+adds an append-only per-case event chain. Every event is chained to the previous
+event hash; startup replays the chain and verifies the persisted snapshot against
+the replayed economic/lifecycle state. A modified event payload, sequence gap,
+previous-hash mismatch, proof mismatch, or snapshot mismatch fails closed.
+
+Operational timestamps are deliberately excluded from record_hash so deterministic
+replay across process restarts preserves the same state identity.
+
+## Branch adapter registry
+
+Every branch has a stable RuleBackedAdapter entry point. Vertical engines own
+domain parsing and deterministic expected-amount logic; the registry only
+normalizes those proof-bound results into RecoveryObservation. This prevents a
+new vertical from bypassing the shared evidence, arithmetic, review, and
+authorization controls.
+
 ## Existing FreightRecovery integration
 
 recoveryworks.branches.freight.from_freight_finding() bridges the existing
