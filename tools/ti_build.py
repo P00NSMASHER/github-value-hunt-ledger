@@ -31,6 +31,7 @@ STEPS = (
     ['tools/ti_training_environment.py'],
     ['tools/ti_training_environment_validate.py'],
     ['tools/ti_policy.py'],
+    ['tools/ti_learning_curriculum.py'],
     ['tools/ti_network_priors.py'],
     ['tools/ti_saturation.py'],
     ['tools/ti_saturation_validate.py'],
