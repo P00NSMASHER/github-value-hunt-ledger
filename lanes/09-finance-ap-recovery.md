@@ -246,3 +246,114 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Important risks: Oracle EBS version/configuration differences; standard packages must be current; some reports depend on Blitz substitution variables/packages.
 - Connections: Best enterprise ingestion route discovered so far for the AP Recovery stack; downstream logic remains Invoice Lens + independent reviewer + realized-recovery ledger.
 - Opportunity score: **9.2/10**.
+
+
+### Accountw-debug/mdq — SAP AP leakage rules + synthetic gold corpus
+- Repository: https://github.com/Accountw-debug/mdq
+- Commit / revision: 8853e2c54fdc293903e994e40c629808008d782e
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Python/DuckDB finance-quality and leakage engine with SAP ECC read-only extraction instructions, canonical schemas, deterministic AP leakage/control rules, explicit confidence tiers, SAP remediation fields, a fully synthetic SAP-style source corpus, planted defects, expected findings and a very large pytest regression suite. Latest commit reports 1,083 passing tests and specifically tightens data-as-of window semantics and AP-LEA-002.
+- Evidence of implementation: `docs/extraction/SAP-ECC-EXTRACTION.md`; `logic/rules/AP-LEA-001.rule.sql` duplicate-payment logic; `AP-LEA-002.rule.sql` cash-discount leakage; `AP-COM-003.rule.sql` SAP duplicate-invoice-check control; `AP-CON-001.rule.sql` vendor IBAN clusters with legitimate-relationship exclusions; AP VAT/IBAN validation rules; `engine/tests/test_rules_ap.py`; `testdata/README.md`.
+- Rare / undernoticed value: AP-LEA-001 does not merely flag same vendor/amount/reference pairs; it suppresses pairs when an equal-value AP credit memo later nets the duplicate, avoiding a common false “recoverable duplicate” claim. AP-LEA-002 separates realized cash-discount loss, expired-unpaid loss and still-avoidable value, using run data-as-of semantics rather than current wall-clock time. The rules preserve UNKNOWN rather than inventing a correction.
+- Test corpus: deterministic synthetic SAP ECC-style dataset (~2,000 customers, 1,500 vendors, ~40k AR + ~20k AP items, ~77k rows) with planted defects and independent expected-results generation. The base tenant is designed to trigger zero rules before defects are layered.
+- Useful capability/workflow: SAP ECC exports (LFA1/LFB1/LFBK/BSIK/BSAK/T052/TIBAN/T001 etc.) -> canonical AP ledger -> leakage/control rules -> evidence-bearing findings -> human review.
+- Likely buyer: SAP ECC/S/4 controller, AP shared services, internal audit, treasury/procurement finance, recovery-audit firms.
+- Pain solved: duplicate vendor payments, missed cash discounts, weak duplicate-invoice controls, risky shared bank accounts, invalid vendor banking/tax master data and false-positive-heavy AP recovery.
+- Fastest monetization path: read-only SAP AP Recovery Diagnostic. Customer runs supplied SE16N/FBL1N exports; no SAP writeback required.
+- Paid-pilot concept: one company code / 12 months AP history; quantify independently validated duplicate-payment and discount leakage plus control gaps, then track only confirmed supplier credits/refunds as realized recovery.
+- Estimated engineering time saved: 2-4 months across SAP field mapping, AP domain edge cases, regression corpus, fail-closed rule semantics and QA.
+- License / reuse status: no public repository license detected at inspected revision; project-level user authorization asserts reuse rights. Keep provenance and external SAP product/field documentation rights separate.
+- Important dependencies/risks: extraction is file-based rather than a live SAP connector; S/4HANA source mappings need ACDOCA/CDS adaptation; synthetic benchmarks are not evidence of customer recovery yield.
+- Connections: Pair directly with `ib823/sapconnect` for live RFC/OData extraction and with the AP Recovery realized-settlement ledger for credit/refund attribution.
+- Opportunity score: **9.8/10**.
+
+### ib823/sapconnect — Apache SAP ECC/S4 extraction substrate
+- Repository: https://github.com/ib823/sapconnect
+- Commit / revision: 5851e9fdeaba462c3137686f4ced0aae1ba4b0f7
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Node.js SAP connectivity/extraction platform with OData and RFC support, pooled RFC connections, a universal `RFC_READ_TABLE` reader with fallback function modules, field selection, WHERE splitting, streaming/chunking, DD03L metadata reads, and concrete FI extractors for BKPF/BSEG/BSID/BSAD/BSIK/BSAK/BSIS/BSAS/ACDOCA. It also contains ECC/S4 process-mining table maps and vendor-open-item migration mappings.
+- Evidence of implementation: `lib/rfc/table-reader.js`; `extraction/extractors/fi-transactions.js`; `extraction/process-mining/sap-table-config.js`; test tree for RFC/table reader, OData, extraction and integration. P2P mapping correlates purchasing documents, receipts, invoice verification, FI accounting docs and vendor open/cleared items.
+- Useful capability/workflow: live SAP -> streamed finance/AP tables -> recovery canonical model. This can remove the manual SE16N export step when a buyer authorizes API/RFC access.
+- Likely buyer: SAP ECC/S4 enterprise AP/finance teams and implementation partners.
+- Pain solved: customer-specific extraction plumbing that otherwise delays every SAP recovery pilot.
+- Fastest monetization path: keep CSV/SE16N as the default first-pilot path; offer this connector only when a buyer wants recurring continuous assurance.
+- Estimated engineering time saved: 1-2 months of SAP RFC/OData connectivity and extraction plumbing.
+- License / reuse status: repository contains Apache-2.0 LICENSE despite GitHub metadata showing NOASSERTION.
+- Important dependencies/risks: some inspected FI field lists contain suspicious/generated field names and must be validated against the exact customer SAP release before use; RFC_READ_TABLE has platform/width/performance/security limitations; no connector output is authority by itself.
+- Connections: `mdq` supplies better recovery semantics and gold tests; sapconnect supplies the transport/extraction plane.
+- Opportunity score: **9.0/10** as enabling infrastructure.
+
+### ballerina-platform/module-ballerinax-microsoft.dynamics365.finance — D365 Finance AP OData connector family
+- Repository: https://github.com/ballerina-platform/module-ballerinax-microsoft.dynamics365.finance
+- Commit / revision: fb15cb2f34749e8a031344943c107e115b93d7c4
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Apache-2.0 connector family for Dynamics 365 Finance & Operations OData REST API (documented against v10.0.47), split into 30 packages with OAuth2, generated typed clients, tests and CI. AP-relevant packages include `vendor`, `vendorextended`, `vendorpayment`, `procurement`, plus ledger/payment/tax packages. The vendor-payment client includes typed list/read/create/update/delete operations for vendor payment journal headers/lines and other payment entities.
+- Evidence of implementation: root README; `ballerina/vendorpayment/client.bal`, `types.bal`, package tests/mocks; corresponding vendor/procurement/payment packages and OpenAPI specs.
+- Current authority connection: Microsoft Learn currently documents that the Vendor Payment Proposal “Check vendor balance” option should prevent payment when a vendor has a debit balance caused by unsettled credit memos/payments, and that approved vendor rebate claims generate vendor credit memos which enter normal AP settlement.
+- Useful capability/workflow: D365 vendor/invoice/payment/procurement OData reads -> identify debit-balance/open-credit situations -> reconstruct settlement evidence -> realized supplier-credit recovery.
+- Likely buyer: Dynamics 365 Finance AP/shared-services teams.
+- Pain solved: building and maintaining a D365 API layer before recovery logic can even run.
+- Fastest monetization path: start read-only using vendor/open-transaction/payment exports or OData; package current Microsoft settlement semantics into a D365-specific supplier-credit diagnostic.
+- Estimated engineering time saved: 4-8 weeks of OData auth/client/entity scaffolding.
+- License / reuse status: Apache-2.0.
+- Important risks: generated connectors expose many write methods—first-pilot integration should be read-only; entity availability/security varies by D365 environment/version; connector types do not themselves determine recovery entitlement.
+- Connections: Pair with `hidayattaufiqur/fno-navigator` table/process maps and AP Recovery v2 settlement evidence.
+- Opportunity score: **9.1/10**.
+
+### hidayattaufiqur/fno-navigator — tested D365 table/process relationship map
+- Repository: https://github.com/hidayattaufiqur/fno-navigator
+- Commit / revision: 0fd0998094abb3d9c3a8a30ca21ea9d21b7d69af
+- Date discovered: 2026-09-22
+- What actually works: Zero-star MIT Svelte/TypeScript Dynamics F&O navigation/data-model tool with rich process stages, table relationships, documentation links and a graph/pathfinder whose JS output is locked to committed golden results (and designed for parity with a Python implementation). AP flow maps vendor invoice through `VendInvoiceJour`/`VendInvoiceTrans`/`VendTrans`, and payment through `VendTrans`/`VendSettlement`/ledger journal/bank tables; cash-discount relationships are also mapped.
+- Why it matters: It is a compact, tested semantic map for turning D365 OData entities/tables into recovery evidence chains rather than treating isolated API rows as sufficient proof.
+- Commercial possibilities: use as implementation/reference infrastructure for a D365-specific read-only AP recovery adapter and analyst trace UI.
+- Estimated engineering time saved: 2-4 weeks of D365 relationship discovery and documentation.
+- License / reuse status: MIT.
+- Important risks: primarily a navigation/reference graph, not a recovery engine; mappings need verification against customer configuration and official current Microsoft docs.
+- Connections: Ballerina provides access; Microsoft docs provide controlling current product behavior; AP Recovery provides money-state semantics.
+- Opportunity score: **8.6/10**.
+
+### oracle-quickstart/oci-jde-monitoring — Oracle-published JDE AP integrity rule map
+- Repository: https://github.com/oracle-quickstart/oci-jde-monitoring
+- Commit / revision: 77c6aac079183e5076ff098ad00e463be16aa634
+- Date discovered: 2026-09-22
+- What actually works: Oracle quickstart/Logging Analytics package for JD Edwards EnterpriseOne containing deployable monitoring configuration plus a large JDE sensor knowledge base and scheduled database checks. AP sensor inventory covers F0411/F0413/F0414/F0911 and standard integrity reports such as R047001A, R04701, R04702A, R04711, R04712 and R04713.
+- Evidence of domain logic: Oracle lookup content states, among other checks, that R04702A compares payment amount in F0414 to F0911 GL amount by batch; R04711 compares F0411 AP ledger gross/distribution values to F0911; R04712 checks F0414 payments against F0911; R04713 compares F0411 voucher gross/open amounts against F0414 paid amounts. The schedule also includes paid items with non-null open amount, unpaid items with null open amount, voucher/post-code mismatches, duplicate/mismatched payment IDs and stuck voucher batches.
+- Why it matters: This gives an unusually authoritative map of JDE AP integrity relationships and failure modes, shortening the path to an EnterpriseOne-specific recovery/readiness diagnostic.
+- Useful capability/workflow: read-only JDE F0411/F0413/F0414/F0911 extracts -> integrity/control checks -> candidate payment/voucher exceptions -> independent recovery review.
+- Likely buyer: JDE EnterpriseOne controllers/AP shared services/internal audit.
+- Fastest monetization path: customer DBA runs read-only extract/control queries; AP Recovery ingests the output and layers duplicate/credit/settlement logic.
+- Estimated engineering time saved: 1-2 months of JDE AP table/control discovery.
+- License / reuse status: UPL-1.0, Oracle copyright.
+- Important risks: monitoring sensors prove integrity relationships, not entitlement/recovery; some referenced Oracle support-note details live outside GitHub; JDE customer versions/customizations require validation.
+- Connections: analogous to the Enginatics Oracle EBS wedge; combine with AP Recovery’s independent validation and settlement attribution.
+- Opportunity score: **9.0/10**.
+
+### hotgluexyz/tap-netsuite-rest — NetSuite AP/credit/payment extraction connector
+- Repository: https://github.com/hotgluexyz/tap-netsuite-rest
+- Commit / revision: aeed1c57c266f265a95a30aca041ae8b4e84ed9d
+- Date discovered: 2026-09-22
+- What actually works: Zero-star Python Singer/Meltano NetSuite connector with a large SuiteQL/REST/SOAP client and stream catalog. Inspected streams explicitly extract vendor credits and their item/expense/tax lines, vendor bill transactions including foreign paid/unpaid totals, and bill-to-vendor-payment relationships through `NextTransactionLineLink`. The current repository also contains rate-limit/backoff work and smoke CI.
+- Evidence of implementation: `tap_netsuite_rest/streams.py` (~127KB), `client.py` (~65KB), bill-attachment SuiteScript, tap config/tests. `BillPaymentsStream` joins `NextTransactionLineLink` to vendor payments and filters by the parent bill; `VendorCreditStream`/child streams expose credit details.
+- Why it matters: This is enough read-only transaction structure for a first NetSuite supplier-credit recovery adapter without writing SuiteScript mutations.
+- Useful capability/workflow: NetSuite SuiteQL/REST -> bills + unpaid amounts + vendor credits + payments + bill/payment links -> recovery canonical ledger.
+- Likely buyer: NetSuite mid-market AP/controller teams.
+- Fastest monetization path: a NetSuite Credit & Overpayment Diagnostic using a scoped read-only integration or exported SuiteQL result.
+- Estimated engineering time saved: 1-2 months for extraction/catalog/pagination/rate-limit plumbing.
+- License / reuse status: pyproject declares Apache 2.0; repository metadata exposes no recognized license, so preserve the pyproject provenance and confirm distribution notices before packaging.
+- Important risks: README remains template-like/TODO-heavy; test suite is thin relative to implementation size; schema behavior varies by NetSuite role/account/features.
+- Connections: combine with deterministic AP rules and Accounting-App-style realized credit/refund states.
+- Opportunity score: **9.0/10**.
+
+### kimtabilon/ebp_netsuite — NetSuite vendor-credit application reference
+- Repository: https://github.com/kimtabilon/ebp_netsuite
+- Commit / revision: 0f80fc77279b6806985a1868b12d37455bfae930
+- Date discovered: 2026-09-22
+- What actually works: Zero-star TypeScript/SuiteScript integration with large REST client, vendor bill synchronization and a ~48KB vendor-credit RESTlet. The credit path finds the PO/vendor bill, transforms a vendor bill into `VENDOR_CREDIT`, maps item/expense detail, locates the source bill in the credit's `apply` sublist, applies a specified amount, saves the credit, and persists the NetSuite vendor-credit ID/result back to its integration store.
+- Why it matters: This is useful implementation evidence for how a recovered vendor credit can become applied settlement in NetSuite, which complements the read-only Hotglue extraction layer.
+- Reuse classification: reference/optional writeback component only; first recovery product must remain read-only unless a customer explicitly authorizes ERP mutation.
+- Estimated engineering time saved: 2-4 weeks of NetSuite vendor-credit application behavior discovery.
+- License / reuse status: no public license detected; project-level user authorization asserts reuse rights.
+- Important risks: application-specific assumptions/custom fields, extensive emergency logging, write/delete helpers and synchronization state require substantial hardening before production; not an independent recovery authority.
+- Connections: Hotglue read layer -> recovery validation -> human approval -> optional future NetSuite credit application.
+- Opportunity score: **8.4/10** as a settlement implementation donor.
