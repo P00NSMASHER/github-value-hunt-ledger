@@ -463,6 +463,45 @@ class TrainingEnvironmentTests(unittest.TestCase):
             technical["scalar"],
         )
 
+    def test_realized_commercial_reward_is_magnitude_aware_and_bounded(self):
+        small = outcome_signal(
+            outcome(
+                ["RUN:1"],
+                result="PARTIAL",
+                revenue=1000,
+            )
+        )
+        large = outcome_signal(
+            outcome(
+                ["RUN:1"],
+                result="PARTIAL",
+                revenue=1_000_000,
+            )
+        )
+        huge = outcome_signal(
+            outcome(
+                ["RUN:1"],
+                result="PARTIAL",
+                revenue=1_000_000_000,
+            )
+        )
+        self.assertLess(
+            small["commercial"],
+            large["commercial"],
+        )
+        self.assertEqual(
+            large["commercial"],
+            1.0,
+        )
+        self.assertEqual(
+            huge["commercial"],
+            1.0,
+        )
+        self.assertEqual(
+            small["economic_value_usd"],
+            1000.0,
+        )
+
     def test_environment_is_hash_stable_and_valid(self):
         runs = [
             search_run("RUN:1"),
