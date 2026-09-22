@@ -421,23 +421,3 @@ class GeneratedPacketTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-,
-            )
-            self.assertEqual(packet['verification_mode'], 'hypothesis_challenge')
-            self.assertIs(packet['can_establish_verified'], False)
-            self.assertEqual(packet['queries'], [])
-        finally:
-            path.write_text(original)
-
-    def test_verification_uses_a_frozen_experiment_target(self):
-        for c in self.candidates:
-            if c['work_kind'] == 'independent_verification':
-                packet = c['instructions']
-                self.assertEqual(packet['verification_mode'], 'experiment_falsification')
-                self.assertTrue(packet['next_action'])
-                self.assertTrue(packet['independence_requirements'])
-                self.assertFalse(packet.get('queries'))
-
-
-if __name__ == '__main__':
-    unittest.main()
