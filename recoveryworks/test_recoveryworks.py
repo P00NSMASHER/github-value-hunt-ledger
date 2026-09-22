@@ -1,4 +1,6 @@
 from types import SimpleNamespace
+import sqlite3
+import tempfile
 import unittest
 
 from recoveryworks import (
@@ -8,6 +10,7 @@ from recoveryworks import (
     FindingState,
     RecoveryEngine,
     RecoveryLedger,
+    SQLiteRecoveryLedger,
     RecoveryObservation,
     RuleRef,
     SourceManifestEntry,
@@ -154,6 +157,51 @@ class RecoveryWorksTests(unittest.TestCase):
         recovered.mark_recovered(finding.finding_id, 5000, 1000)
         with self.assertRaises(ValueError):
             recovered.authorize(finding.finding_id, "auth-2")
+
+    def test_sqlite_ledger_survives_restart_with_same_state(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.UTILITY, client_id="c", counterparty_id="utility",
+                reference="bill-77", currency="USD", expected_cents=10000,
+                actual_cents=14000, rule=rule(), evidence=(evidence(),),
+                reason="TARIFF_VARIANCE", confidence_basis="verified tariff",
+            ))
+            ledger = SQLiteRecoveryLedger(path)
+            ledger.add(finding)
+            ledger.approve(finding.finding_id, "reviewer-1", "Verified tariff and bill")
+            ledger.authorize(finding.finding_id, "customer-auth-77")
+            ledger.mark_claimed(finding.finding_id)
+            final = ledger.mark_recovered(finding.finding_id, 3500, 700)
+            final_hash = final.record_hash
+
+            reopened = SQLiteRecoveryLedger(path)
+            restored = reopened.get(finding.finding_id)
+            self.assertIs(restored.case_state, CaseState.RECOVERED)
+            self.assertEqual(restored.recovered_cents, 3500)
+            self.assertEqual(restored.fee_cents, 700)
+            self.assertEqual(restored.record_hash, final_hash)
+            reopened.verify_event_chains()
+
+    def test_sqlite_ledger_detects_event_tampering(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = f"{td}/recovery.db"
+            finding = RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="payment-9", currency="USD", expected_cents=0,
+                actual_cents=10000, rule=rule(), evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="verified ledger",
+            ))
+            ledger = SQLiteRecoveryLedger(path)
+            ledger.add(finding)
+            ledger.approve(finding.finding_id, "reviewer-1", "Verified duplicate")
+            with sqlite3.connect(path) as con:
+                con.execute(
+                    "UPDATE recovery_events SET payload_json = ? WHERE event_type = 'APPROVE'",
+                    ('{"reviewer_id":"attacker","note":"forged"}',),
+                )
+            with self.assertRaisesRegex(ValueError, "event hash mismatch"):
+                SQLiteRecoveryLedger(path)
 
     def test_freight_bridge_preserves_authority_gate(self):
         f = SimpleNamespace(
