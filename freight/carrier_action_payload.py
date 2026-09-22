@@ -16,6 +16,7 @@ from freight.carrier_action_workflow import (
     authorize_carrier_action_proposal,
 )
 from freight.buyer_review_workflow import BuyerReviewBatch
+from freight.money import format_cents
 from freight.contracts import TruthManifest, canonical_hash
 from freight.engagement_state import EngagementResolution
 from freight.external_action_authorization import ActionType, ExternalActionAuthorization
@@ -189,11 +190,11 @@ def build_carrier_action_payload(
     ]
     for line in lines:
         body_lines.append(
-            f"- Reference {line.reference}: {currency} {line.amount_cents / 100:,.2f}"
+            f"- Reference {line.reference}: {format_cents(currency, line.amount_cents)}"
         )
     body_lines.extend([
         "",
-        f"Total amount in this request: {currency} {total / 100:,.2f}",
+        f"Total amount in this request: {format_cents(currency, total)}",
         "",
         "This request does not accept settlement terms, authorize payment, or authorize account changes.",
     ])
@@ -297,7 +298,7 @@ def render_carrier_action_payload_markdown(payload: CarrierActionPayload) -> str
         f"- Action: **{payload.action_type}**",
         f"- Carrier: **{payload.target_carrier_id}**",
         f"- Customer/payee: **{payload.target_customer_id}**",
-        f"- Amount: **{payload.currency} {payload.requested_cents / 100:,.2f}**",
+        f"- Amount: **{format_cents(payload.currency, payload.requested_cents)}**",
         f"- Payload hash: `{payload.payload_hash}`",
         "",
         "## Subject",
