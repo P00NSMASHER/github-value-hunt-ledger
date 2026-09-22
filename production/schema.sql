@@ -218,3 +218,45 @@ create table if not exists intel_skill_eval_task (
   created_at timestamptz not null default now()
 );
 
+-- Independent evaluation results for repair candidates. A successful result
+-- can become STAGED_MUTATION only; it does not authorize live/global use.
+create table if not exists intel_skill_eval_result (
+  id text primary key,
+  skill_eval_id text not null,
+  skill_eval_sha256 text not null,
+  repair_candidate_id text not null,
+  candidate_record_sha256 text not null,
+  state text not null,
+  artifact_id text not null,
+  baseline_version text not null,
+  candidate_version text not null,
+  mutate_dev_examples int not null,
+  promotion_test_examples int not null,
+  baseline_dev_score numeric not null,
+  candidate_dev_score numeric not null,
+  champion_test_score numeric not null,
+  candidate_test_score numeric not null,
+  hard_regressions int not null default 0,
+  mutate_dev_set_sha256 text not null,
+  promotion_test_set_sha256 text not null,
+  evaluation_manifest_sha256 text not null,
+  mutator_identity text not null,
+  evaluator_identity text not null,
+  evaluation_evidence_refs jsonb not null default '[]',
+  provenance_complete boolean not null default false,
+  evaluation_result_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists intel_skill_promotion_task (
+  id text primary key,
+  skill_eval_result_id text not null,
+  evaluation_result_sha256 text not null,
+  artifact_id text not null,
+  candidate_version text not null,
+  required_promotion_evidence jsonb not null,
+  automatic_global_promotion_allowed boolean not null default false,
+  skill_promotion_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
