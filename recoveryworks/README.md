@@ -11,6 +11,8 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **APRecovery** — duplicate payments, unapplied credits, and vendor-statement leakage.
 - **ConstructionRecovery** — change-order and delay entitlement preflight.
 - **DutyRecovery** — customs-duty and tariff inconsistencies for professional review.
+- **SaaSRecovery** — subscription, seat, and contracted-rate billing leakage.
+- **TelecomRecovery** — recurring service and CDR/usage billing leakage.
 
 ## Non-negotiable invariant
 
@@ -52,3 +54,6 @@ The foundation intentionally uses only Python's standard library.
 APRecovery and UtilityRecovery file schemas, deterministic tariff primitives,
 verification flags, and failure modes are documented in
 `recoveryworks/INGESTION_AP_UTILITY.md`.
+
+SaaSRecovery and TelecomRecovery contract, invoice, seat, usage, and CDR schemas
+are documented in `recoveryworks/INGESTION_SAAS_TELECOM.md`.
