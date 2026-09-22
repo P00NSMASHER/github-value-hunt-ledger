@@ -18,7 +18,7 @@ class APCsvTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             money_to_cents("0")
 
-    def test_common_exports_flow_into_validated_duplicate_finding(self):
+    def test_suffix_normalized_exports_stay_review_without_exact_authority(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             payments_path = root / "Payments.csv"
@@ -48,7 +48,7 @@ class APCsvTests(unittest.TestCase):
             )
             self.assertEqual(len(observations), 1)
             finding = RecoveryEngine().evaluate(observations[0])
-            self.assertIs(finding.state, FindingState.VALIDATED)
+            self.assertIs(finding.state, FindingState.REVIEW)
             self.assertEqual(finding.potential_recovery_cents, 432100)
             self.assertEqual(len(finding.evidence), 2)
             self.assertTrue(all(ref.source_hash for ref in finding.evidence))
