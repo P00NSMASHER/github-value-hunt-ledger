@@ -93,3 +93,76 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
   - Data advantage: 3/10
   - High-ticket potential: 9/10
 - Next action: Replace the demo PNG-only intake with a synthetic ERA/835 fixture and an independently verified payer/rule table, then benchmark routing precision, evidence completeness, deadline correctness, and recovered-dollar prioritization against labeled historical denial cases. Treat the current hard-coded 5-day receipt presumption + 120-day deadline and model-generated recovery probabilities as uncalibrated until validated for the specific payer/workflow.
+
+
+### aws-samples/sample-energy-utility-rate-engine — utility tariff compiler / batch rerating substrate
+- Repository: https://github.com/aws-samples/sample-energy-utility-rate-engine
+- Commit / revision: e2f987be3863b0a5026940b7217cbc4ddffe6129
+- Date discovered: 2026-09-22
+- What actually works: Four-star MIT-0 full-stack utility rate engine. Business-readable Rate Definition Language (RDL) is parsed with Lark into a typed AST, transpiled into Rust, compiled to ARM64 Lambda, and used from both real-time and high-volume batch paths. Rate logic is separated from date-effective factor values. The shipped rule/function surface covers customer charges, tiered/N-tier energy, demand caps and ratchets, power-factor adjustments, critical-peak days, TOU periods including overnight windows, seasons, riders, net-metering credits, taxes/fees, minimum bills and multiple rounding modes.
+- Evidence of implementation: `cdk/lambda/dsl-generator/*`; generated Rust template; frontend scenario/calculation editors; Step Functions batch path; `tests/test_dsl_generator.py`; `tests/rust_function_tests.rs`; and `tests/test_calculation_e2e.py`. The E2E test generates the actual Rust from shipped RDL/custom-function data, compiles it with Cargo, injects a controlled factor table, and checks line-item and total bills across residential/commercial tiers, tax exemption, NEM, demand caps, minimum bills, ratchets, power factor, critical peak and riders.
+- Rare / undernoticed value: This is much closer to a utility billing compiler than a tariff calculator. The same versioned business rules can be applied to one disputed bill or a multi-year, multi-site population, which maps unusually well to retrospective recovery auditing.
+- Useful capability/workflow: reviewed tariff logic + effective-dated factors -> compiled deterministic calculator -> itemized expected bill -> large-scale historical rerating.
+- Likely buyer: commercial/industrial multi-site energy users, REIT/property managers, retail/franchise chains, manufacturers, cold storage, universities/hospitals, wastewater/municipal energy users, energy consultants.
+- Pain solved: Recalculating complex historical utility bills across changing tariffs, demand rules and riders is expensive and often spreadsheet/vendor dependent.
+- Fastest monetization path: Use the engine behind a managed Utility Bill Recovery diagnostic, not as a standalone rate-engine sale.
+- Paid-pilot concept: freeze official tariff/rider versions for 5-25 meters and rerate 12-24 months of interval/bill data; human-review discrepancies; pursue only customer-authorized utility credits/refunds.
+- Estimated engineering time saved: roughly 4-8 months across rate-language/parser/compiler, scenario management, batch rerating, calculation UI and regression tests.
+- License / reuse status: MIT-0 for repository code. Utility tariff documents/data and customer meter/bill data remain separately governed.
+- Important dependencies/risks: **Do not use the shipped calculator unchanged for money authority.** Its numeric model is `f64`, and the seeded `GET_FACTOR` returns `0.0` when no applicable factor is found. For recovery this must become a typed UNKNOWN/REVIEW state, never a zero-valued factor. Replace/guard monetary arithmetic with exact decimal/integer-minor-unit semantics and bind every deployed scenario to immutable reviewed authority/source hashes.
+- Connections: Pair with WE3 tariff discovery/source metadata, LBNL Elecprice as an independent comparator, existing CAP-006 settlement attribution and proof-obligation controls.
+- Opportunity score: **9.6/10**.
+
+### we3lab/industrial-electricity-tariffs — monthly US industrial/commercial tariff discovery corpus
+- Repository: https://github.com/we3lab/industrial-electricity-tariffs
+- Commit / revision: ffab0314814d4796c6655c91f53f90b525acdf94
+- Current release inspected: 2026.09.01, GitHub release asset `industrial-electricity-tariffs.zip`, published digest `sha256:71ae5b5666099b13f53e08ded151744095d8f5fc5798c1597ed102ebca64fa7b`.
+- Date discovered: 2026-09-22
+- What it contains: Two-star MIT research/data pipeline that publishes a monthly normalized dataset of U.S. industrial/commercial electricity tariffs derived from USURDB plus manually collected research tariffs. The format represents customer, energy and demand charges; monthly/daily demand assessment; multiple concurrent demand periods; tiers; month/hour/weekday applicability; units; service type; ZIP/geography; and source links. Each release also includes metadata and an explicit reject list with reject reasons. DOI/Zenodo provenance is provided.
+- Evidence of implementation: GitHub Actions monthly pipeline; `scripts/download.py`, `filter.py`, `convert.py`, `merge.py`, `validate.py`; large conversion test suite (~100 KB) plus validation/filter/merge/download tests; current release asset.
+- Rare / undernoticed value: This is a ready-made national **tariff discovery/index layer** for the buyer segment Utility Recovery would target. The source URL attached to each tariff is especially valuable because it can drive acquisition of controlling first-party documents rather than treating the normalized dataset as entitlement.
+- Useful capability/data/workflow: utility/rate candidate search -> normalized complex tariff structure -> original source link -> customer/official document authority review.
+- Likely buyer: same Utility Recovery ICP; internal tariff research/QA.
+- Pain solved: discovering and normalizing thousands of complex commercial/industrial tariff schedules before a historical rerating exercise.
+- Fastest monetization path: use internally to accelerate meter/rate onboarding and identify source documents; do not resell its normalized row as controlling authority.
+- Paid-pilot concept: map each pilot meter to candidate tariff/source, freeze the actual controlling utility document/account class, then rerate in the independent engine.
+- Estimated engineering time saved: 2-4 months of tariff discovery/normalization and data-maintenance work, plus an ongoing monthly refresh pipeline.
+- License / reuse status: MIT repository; dataset has academic citation/provenance. Preserve source/citation metadata and verify source-specific terms where relevant.
+- Important dependencies/risks: **The current validator has a material bug:** `if charge_type == "customer" or "demand": return True` is always truthy in Python, so its advertised continuity check does not actually prove full time coverage. Re-run independent continuity/completeness tests before any tariff is admitted to money-bearing calculations. Normalized/OpenEI data is reference evidence, not controlling tariff authority.
+- Connections: Data moat/discovery plane for the AWS engine; original source URL should enter the authority/provenance graph.
+- Opportunity score: **9.2/10**.
+
+### LBNL-ETA/elecprice — independent commercial TOU/demand bill-calculation comparator
+- Repository: https://github.com/LBNL-ETA/elecprice
+- Commit / revision: a6947c3b65fdedec7da5bbeb52b85e8fdeffd1f4
+- Date discovered: 2026-09-22
+- What actually works: Lawrence Berkeley National Laboratory Python library for manipulating U.S. commercial electricity tariffs and computing bills from time-series meter data. It models fixed, energy and demand components, commercial time-of-use schedules, monthly detail and Peak Day Pricing events/credits; it can ingest OpenEI-format tariff data or a local revised tariff JSON.
+- Evidence of implementation: `electricity_rate_manager/rate_manager.py`, rate/tariff structure modules, OpenEI analyzer and example workflows inspected. The project explicitly documents its supported/unsupported cases rather than claiming universal tariff coverage.
+- Rare / undernoticed value: An implementation from a materially independent code lineage is useful as a **falsifier** for straightforward commercial tariff cases. Production recovery math should not be validated solely by the same engine that generated the candidate discrepancy.
+- Useful capability/workflow: meter interval series + independent tariff representation -> fixed/energy/demand bill breakdown for comparison against the primary engine.
+- Likely buyer/user: internal Utility Recovery QA and commercial-building energy analysis.
+- Pain solved: independent re-performance of tariff math and demand-charge interpretation.
+- Fastest monetization path: internal acceptance/comparator layer in Utility Recovery; not a standalone wedge.
+- Estimated engineering time saved: 2-4 weeks of independent comparator and commercial TOU/demand fixtures.
+- License / reuse status: LBNL BSD-style permissive license with attribution/nonendorsement conditions.
+- Important dependencies/risks: Project is older; README says it is tested mainly for commercial buildings, does not support residential tiers or reactive-power cost, and has PDP-credit limitations. Keep its supported domain narrow and route disagreement to review.
+- Connections: independent comparator to AWS RDL/Rust calculation; combine with literal hand-derived goldens and later utility credit/refund evidence.
+- Opportunity score: **8.5/10**.
+
+### Wondermove-Inc/saaslens — self-hosted SaaS spend / seat-waste assurance substrate
+- Repository: https://github.com/Wondermove-Inc/saaslens
+- Commit / revision inspected: 10a93ea490d1d7d98df041b368d04d292096c7f5
+- Date discovered: 2026-09-22
+- What actually works: MIT Next.js/Postgres multi-tenant SaaS-spend platform with payment/card import and merchant-to-app matching, subscription inventory, SSO/browser-extension usage evidence, seat assignment/utilization, terminated-user access scanning, renewal alerts, cost analytics, unused-app analysis, billing-model/seat-price inference and broad tests.
+- Evidence of implementation: `seat-waste-analysis.ts` and tests explicitly refuse to classify missing/null telemetry as inactive; only observed stale use is counted inactive, while unassigned paid seats are separately counted. `unused-apps.ts` combines UserAppAccess and browser-extension evidence. `seat-optimization.ts` simulates seat reductions and adds a 15% active-user buffer. Payment matching, cost analytics, renewal alerts, terminated-user scanning and seat-price heuristics have dedicated tests.
+- Rare / undernoticed value: Supplies most of the data plane for an evidence-backed **SaaS Spend Assurance** service without requiring expensive commercial SaaS-management tooling.
+- Useful capability/workflow: payment/card feed + SaaS identity + assigned seats + observed use/offboarding + renewal date -> evidence-ranked waste/renewal review -> human-approved seat/license changes -> later invoice confirmation.
+- Likely buyer: 50-1000 employee tech/professional-services firms, PE portfolio ops, IT/finance/procurement.
+- Pain solved: orphaned seats, former-employee access, shadow subscriptions, unmatched card spend and renewals happening without usage evidence.
+- Fastest monetization path: read-only 30-day SaaS spend/seat audit followed by recurring renewal calendar and optimization review.
+- Paid-pilot concept: reconcile 6-12 months of card/AP payments to SaaS inventory, import Workspace/SSO or usage evidence, and produce a pre-renewal cancellation/downsize queue.
+- Estimated engineering time saved: 3-6 months of multi-tenant SaaS inventory, payment matching, telemetry, seat analytics, renewals and dashboard work.
+- License / reuse status: MIT.
+- Important dependencies/risks: This is primarily **future spend avoidance**, not recovery. Estimated annual/monthly “savings” are not realized until a vendor contract/seat count changes and later invoices actually decrease. The optimization path may treat missing usage as zero active for recommendation math more aggressively than the waste-analysis path, so human review/telemetry-sufficiency gates are required. Never charge a recovery fee on forecast savings.
+- Connections: reuse the portfolio's settlement/outcome discipline to track `candidate waste -> approved change -> vendor confirmation -> subsequent lower invoice -> realized avoided spend`.
+- Opportunity score: **8.8/10**.
