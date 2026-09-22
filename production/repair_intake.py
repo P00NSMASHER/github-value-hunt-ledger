@@ -53,6 +53,11 @@ def _binding_errors(
         errors.append("target_type_mismatch")
     if packet.get("target_id") != target.get("id"):
         errors.append("target_id_mismatch")
+    if (
+        packet.get("regression_test_requirement")
+        != task.get("regression_test_requirement")
+    ):
+        errors.append("regression_test_requirement_mismatch")
 
     scope = task.get("mutation_scope") or {}
     if scope.get("automatic_write_allowed") is not False:
@@ -190,6 +195,9 @@ def build_repair_candidate_intake(
             "diff_hash": packet.get("diff_hash"),
             "changed_logical_targets": list(
                 packet.get("changed_logical_targets") or []
+            ),
+            "regression_test_requirement": packet.get(
+                "regression_test_requirement"
             ),
             "regression_tests_total": packet.get("regression_tests_total"),
             "regression_tests_passed": packet.get("regression_tests_passed"),
