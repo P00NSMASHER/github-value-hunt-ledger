@@ -61,6 +61,13 @@ def _cents(name: str, value: int) -> int:
     return value
 
 
+def _currency(value: str) -> str:
+    value = _required_text("currency", value)
+    if len(value) != 3 or not value.isalpha() or value != value.upper():
+        raise ValueError("currency must be a canonical 3-letter uppercase code")
+    return value
+
+
 @dataclass(frozen=True)
 class EvidenceRef:
     evidence_id: str
@@ -127,6 +134,7 @@ class RecoveryFinding:
             "currency", "reason", "confidence_basis",
         ):
             _required_text(name, getattr(self, name))
+        _currency(self.currency)
         _cents("expected_cents", self.expected_cents)
         _cents("actual_cents", self.actual_cents)
         if not self.evidence:
