@@ -37,6 +37,17 @@ class LearningPersistenceTests(unittest.TestCase):
             text,
         )
 
+    def test_pr_validation_cancels_only_superseded_pr_runs(self):
+        text = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn(
+            "cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
+            text,
+        )
+        self.assertIn(
+            "github.event_name == 'push' && github.ref == 'refs/heads/main'",
+            text,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
