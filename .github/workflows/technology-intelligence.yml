@@ -110,6 +110,8 @@ jobs:
                   intelligence/training_episodes.jsonl \
                   intelligence/REPAIR_QUEUE.json \
                   intelligence/REPAIR_QUEUE.md \
+                  intelligence/REPAIR_CANDIDATE_INTAKE.json \
+                  intelligence/SKILL_EVAL_QUEUE.md \
                   intelligence/REGISTRY_REPORT.md \
                   intelligence/REVISION_DEBT_REPORT.md \
                   intelligence/DATA_QUALITY_REPORT.md \
