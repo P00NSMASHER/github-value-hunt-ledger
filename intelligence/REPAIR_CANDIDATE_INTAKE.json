@@ -1,0 +1,18 @@
+{
+  "automatic_global_promotion_enabled": false,
+  "automatic_write_enabled": false,
+  "blocked_submissions": [],
+  "candidates": [],
+  "mode": "repair_candidate_intake",
+  "policy_effect": "none",
+  "schema_version": 1,
+  "skill_eval_queue": [],
+  "source_snapshot_sha256": "ea2f07ecb4aecd13a194dfd595001f97d10087e5994f7af47a29c2dd31d62e4b",
+  "summary": {
+    "accepted_records": 0,
+    "blocked": 0,
+    "ready_for_skill_eval": 0,
+    "rejected": 0,
+    "submitted": 0
+  }
+}

@@ -1,0 +1,7 @@
+.fmc_tariff_ledger/
+output/
+merged/
+__pycache__/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

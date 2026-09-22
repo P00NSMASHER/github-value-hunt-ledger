@@ -27,6 +27,8 @@ move_policy = read_json("search_move_policy.json", {})
 coord = read_json("coordination_metrics.json", {})
 learning = read_json("LEARNING_STATE.json", {})
 curriculum = read_json("learning_curriculum.json", {})
+repair = read_json("REPAIR_QUEUE.json", {})
+repair_intake = read_json("REPAIR_CANDIDATE_INTAKE.json", {})
 
 gaps = policy.get("priority_capability_gaps") or []
 constraints = policy.get("domain_constraints") or []
@@ -210,6 +212,18 @@ failure_queue = learning.get("failure_queue") or {}
 lines.append(
     f"- Reproducible hunter-system failure queue: **{failure_queue.get('queued', 0)} queued**, "
     f"**{failure_queue.get('blocked', 0)} blocked**. Queued failures still require regression-tested repair and skill promotion."
+)
+repair_summary = repair.get("summary") or {}
+lines.append(
+    f"- Repair workbench: **{repair_summary.get('ready_for_repair', 0)} bounded repair-ready**, "
+    f"**{repair_summary.get('needs_reproduction', 0)} reproduction-first**. "
+    "These are advisory repair/falsification tasks, not automatic worker routes or live skill edits."
+)
+repair_intake_summary = repair_intake.get("summary") or {}
+lines.append(
+    f"- Repair-candidate intake: **{repair_intake_summary.get('ready_for_skill_eval', 0)} ready for independent skill evaluation**, "
+    f"**{repair_intake_summary.get('blocked', 0)} blocked**. "
+    "READY_FOR_SKILL_EVAL is not a live/global promotion."
 )
 
 lines += [

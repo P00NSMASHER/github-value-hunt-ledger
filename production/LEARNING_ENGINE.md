@@ -225,3 +225,40 @@ This curriculum changes **measurement priority only**. It does not activate a
 learned search policy, weaken STOP gates, restart scheduled hunters, or bypass
 the existing train/confirm/verification thresholds.
 
+### 10. Deterministic repair workbench — implemented
+
+`production/repair_queue.py` and `tools/ti_repair_queue.py` compile the learning layer into an auditable repair queue.
+
+There are only two active states:
+
+- `NEEDS_REPRODUCTION` — produced from train→confirm overfit or hidden-regression signals. This is a falsification task only. It cannot authorize a mutation because a statistical alert is not yet a reproducible defect.
+- `READY_FOR_REPAIR` — produced only from an immutable, non-sensitive, non-benchmark-contaminated learning-failure packet that already contains reproduction steps, evidence refs and a concrete regression-test requirement.
+
+Every repair task is content-hashed and carries an explicit logical mutation scope. Automatic writes, global promotion, verifier/evaluator/controller changes, benchmark/holdout changes, credential access, safety-policy edits and promotion-history mutation are forbidden.
+
+The generated artifacts are:
+
+- `intelligence/REPAIR_QUEUE.json`;
+- `intelligence/REPAIR_QUEUE.md`.
+
+The workbench is advisory. It is not a worker router and does not itself modify a live prompt, skill or harness. A completed candidate repair still must pass `assess_repair_candidate`, then the existing held-out/adversarial/adjacent-domain/canary promotion gates.
+
+### 11. Repair-candidate intake → skill evaluation — implemented
+
+`production/repair_intake.py` and `tools/ti_repair_candidate_intake.py` turn a bounded repair task into a content-addressed candidate-review flow.
+
+A candidate packet must bind to the exact current `repair_task_sha256`, target type/id, exact repair-task regression-test requirement, baseline version, candidate version, distinct baseline/candidate artifact refs and a non-empty full diff SHA-256. Its declared logical mutation target must be exactly the one authorized by the repair task. Sensitive or benchmark-contaminated candidates fail closed.
+
+The positive transition is intentionally narrow:
+
+`READY_FOR_REPAIR -> candidate regression evidence -> READY_FOR_SKILL_EVAL`
+
+`READY_FOR_SKILL_EVAL` does **not** mean accepted, deployed, canaried or global. The generated skill-evaluation packet still requires separate mutate-dev and promotion-test evidence, disjoint split fingerprints, complete provenance, zero hard regressions and the existing adversarial/adjacent-domain/curator/canary gates.
+
+Generated artifacts:
+
+- `intelligence/REPAIR_CANDIDATE_INTAKE.json`;
+- `intelligence/SKILL_EVAL_QUEUE.md`.
+
+Automatic writes and automatic global promotion remain disabled.
+

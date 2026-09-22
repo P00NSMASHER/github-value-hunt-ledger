@@ -258,3 +258,15 @@ Every build can derive `intelligence/LEARNING_STATE.json` from canonical search 
 
 Reproducible defects in hunter skills/tools/prompts/workflows can be submitted as immutable packets under `intelligence/learning_failure_spool/`. They must include evidence, reproduction steps and a proposed regression test. Queueing a defect does not authorize an automatic repair or global skill change.
 
+### Repair workbench
+
+The adaptive learning layer now generates `intelligence/REPAIR_QUEUE.json` and `intelligence/REPAIR_QUEUE.md`.
+
+Confirm overfit/regression signals enter as `NEEDS_REPRODUCTION` and cannot authorize mutation. Only a non-sensitive, non-benchmark-contaminated immutable learning-failure packet with reproduction steps, evidence and a concrete regression test can become `READY_FOR_REPAIR`. Even then, the workbench permits only one bounded candidate repair; it cannot edit a live/global skill, route itself to a worker, change verifier/evaluator/controller logic, or bypass held-out/canary promotion gates.
+
+### Repair candidate intake
+
+Candidate fixes are submitted through `intelligence/repair_candidate_spool/` using `REPAIR_CANDIDATE_TEMPLATE.json`. A candidate must match the exact current repair task and SHA-256, declare exactly one authorized logical target, freeze baseline/candidate artifact refs and the full diff hash, and supply the exact required regression test plus evidence.
+
+Passing intake produces only `READY_FOR_SKILL_EVAL` in `REPAIR_CANDIDATE_INTAKE.json` / `SKILL_EVAL_QUEUE.md`. It cannot write the live skill or bypass the independent evaluation/canary/global gates.
+

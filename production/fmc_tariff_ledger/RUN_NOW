@@ -1,0 +1,6 @@
+run_id=fmc-full-crawl-2026-09-22T10:33Z
+mode=full
+shards=12
+workers_per_shard=4
+max_depth=3
+max_pages_per_location=100
