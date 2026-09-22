@@ -755,6 +755,198 @@ def verify_case_artifact_replay(
 
 
 @dataclass(frozen=True)
+class CalculationReplayReceipt:
+    """Independent reperformance of the frozen money calculation and trace."""
+
+    case_bundle_hash: str
+    finding_proof_hash: str
+    artifact_replay_receipt_hash: str
+    calculator_id: str
+    calculator_version: str
+    code_commit_sha: str
+    input_manifest_hash: str
+    expected_cents: int
+    actual_cents: int
+    potential_recovery_cents: int
+    trace_hash: str
+    reproduced_at: str
+    reproduced_by: str
+    receipt_hash: str
+
+    def __post_init__(self) -> None:
+        for name in (
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "artifact_replay_receipt_hash",
+            "calculator_id",
+            "calculator_version",
+            "code_commit_sha",
+            "input_manifest_hash",
+            "trace_hash",
+            "reproduced_by",
+            "receipt_hash",
+        ):
+            _required(name, getattr(self, name))
+        _iso("reproduced_at", self.reproduced_at)
+        _nonnegative_cents("expected_cents", self.expected_cents)
+        _nonnegative_cents("actual_cents", self.actual_cents)
+        _nonnegative_cents("potential_recovery_cents", self.potential_recovery_cents)
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "case_bundle_hash": self.case_bundle_hash,
+            "finding_proof_hash": self.finding_proof_hash,
+            "artifact_replay_receipt_hash": self.artifact_replay_receipt_hash,
+            "calculator_id": self.calculator_id,
+            "calculator_version": self.calculator_version,
+            "code_commit_sha": self.code_commit_sha,
+            "input_manifest_hash": self.input_manifest_hash,
+            "expected_cents": self.expected_cents,
+            "actual_cents": self.actual_cents,
+            "potential_recovery_cents": self.potential_recovery_cents,
+            "trace_hash": self.trace_hash,
+            "reproduced_at": self.reproduced_at,
+            "reproduced_by": self.reproduced_by,
+        }
+
+    def verify_integrity(self) -> None:
+        if canonical_hash(self.integrity_body()) != self.receipt_hash:
+            raise ValueError("calculation replay receipt hash mismatch")
+
+
+def replay_case_calculation(
+    bundle: CaseProofBundle,
+    artifact_receipt: CaseArtifactReplayReceipt,
+    *,
+    calculator_id: str,
+    calculator_version: str,
+    code_commit_sha: str,
+    input_manifest_hash: str,
+    expected_cents: int,
+    actual_cents: int,
+    trace_bytes: bytes,
+    reproduced_at: str,
+    reproduced_by: str,
+) -> CalculationReplayReceipt:
+    """Independently reperform the frozen calculation and bind the result.
+
+    The examiner supplies independently reproduced expected/actual amounts and
+    the exact deterministic trace bytes. Every calculator identity/version,
+    input manifest, amount, and trace hash must match the frozen calculation
+    manifest exactly.
+    """
+    verify_case_bundle(bundle)
+    verify_case_artifact_replay(artifact_receipt, bundle)
+    reproduced_at = _iso("reproduced_at", reproduced_at)
+    reproduced_by = _required("reproduced_by", reproduced_by)
+
+    manifest = bundle.calculation
+    supplied_identity = {
+        "calculator_id": _required("calculator_id", calculator_id),
+        "calculator_version": _required("calculator_version", calculator_version),
+        "code_commit_sha": _required("code_commit_sha", code_commit_sha),
+        "input_manifest_hash": _required("input_manifest_hash", input_manifest_hash),
+    }
+    frozen_identity = {
+        "calculator_id": manifest.calculator_id,
+        "calculator_version": manifest.calculator_version,
+        "code_commit_sha": manifest.code_commit_sha,
+        "input_manifest_hash": manifest.input_manifest_hash,
+    }
+    if supplied_identity != frozen_identity:
+        raise ValueError("calculation replay calculator/input identity mismatch")
+
+    _nonnegative_cents("expected_cents", expected_cents)
+    _nonnegative_cents("actual_cents", actual_cents)
+    if expected_cents != manifest.expected_cents:
+        raise ValueError("calculation replay expected amount mismatch")
+    if actual_cents != manifest.actual_cents:
+        raise ValueError("calculation replay actual amount mismatch")
+
+    if bundle.finding.mode.value == "OVERPAYMENT":
+        reproduced_potential = max(actual_cents - expected_cents, 0)
+    else:
+        reproduced_potential = max(expected_cents - actual_cents, 0)
+    if reproduced_potential != manifest.potential_recovery_cents:
+        raise ValueError("calculation replay recovery amount mismatch")
+
+    trace_hash = _hash_bytes(trace_bytes)
+    if trace_hash != manifest.trace_hash:
+        raise ValueError("calculation replay trace hash mismatch")
+
+    if _dt("reproduced_at", reproduced_at) < _dt(
+        "artifact_replay.replayed_at", artifact_receipt.replayed_at
+    ):
+        raise ValueError("calculation replay cannot predate source artifact replay")
+
+    body = {
+        "schema": 1,
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "artifact_replay_receipt_hash": artifact_receipt.receipt_hash,
+        **supplied_identity,
+        "expected_cents": expected_cents,
+        "actual_cents": actual_cents,
+        "potential_recovery_cents": reproduced_potential,
+        "trace_hash": trace_hash,
+        "reproduced_at": reproduced_at,
+        "reproduced_by": reproduced_by,
+    }
+    return CalculationReplayReceipt(
+        case_bundle_hash=bundle.bundle_hash,
+        finding_proof_hash=bundle.finding.proof_hash,
+        artifact_replay_receipt_hash=artifact_receipt.receipt_hash,
+        calculator_id=calculator_id,
+        calculator_version=calculator_version,
+        code_commit_sha=code_commit_sha,
+        input_manifest_hash=input_manifest_hash,
+        expected_cents=expected_cents,
+        actual_cents=actual_cents,
+        potential_recovery_cents=reproduced_potential,
+        trace_hash=trace_hash,
+        reproduced_at=reproduced_at,
+        reproduced_by=reproduced_by,
+        receipt_hash=canonical_hash(body),
+    )
+
+
+def verify_calculation_replay(
+    receipt: CalculationReplayReceipt,
+    bundle: CaseProofBundle,
+    artifact_receipt: CaseArtifactReplayReceipt,
+) -> None:
+    """Verify the independent calculation receipt against the frozen case."""
+    verify_case_bundle(bundle)
+    verify_case_artifact_replay(artifact_receipt, bundle)
+    receipt.verify_integrity()
+    manifest = bundle.calculation
+
+    if receipt.case_bundle_hash != bundle.bundle_hash:
+        raise ValueError("calculation replay case bundle mismatch")
+    if receipt.finding_proof_hash != bundle.finding.proof_hash:
+        raise ValueError("calculation replay finding proof mismatch")
+    if receipt.artifact_replay_receipt_hash != artifact_receipt.receipt_hash:
+        raise ValueError("calculation replay artifact receipt mismatch")
+    if receipt.calculator_id != manifest.calculator_id:
+        raise ValueError("calculation replay calculator mismatch")
+    if receipt.calculator_version != manifest.calculator_version:
+        raise ValueError("calculation replay calculator version mismatch")
+    if receipt.code_commit_sha != manifest.code_commit_sha:
+        raise ValueError("calculation replay code commit mismatch")
+    if receipt.input_manifest_hash != manifest.input_manifest_hash:
+        raise ValueError("calculation replay input manifest mismatch")
+    if receipt.expected_cents != manifest.expected_cents:
+        raise ValueError("calculation replay expected amount mismatch")
+    if receipt.actual_cents != manifest.actual_cents:
+        raise ValueError("calculation replay actual amount mismatch")
+    if receipt.potential_recovery_cents != manifest.potential_recovery_cents:
+        raise ValueError("calculation replay recovery amount mismatch")
+    if receipt.trace_hash != manifest.trace_hash:
+        raise ValueError("calculation replay trace mismatch")
+
+
+@dataclass(frozen=True)
 class ClientActionAuthorization:
     authorization_id: str
     case_bundle_hash: str
