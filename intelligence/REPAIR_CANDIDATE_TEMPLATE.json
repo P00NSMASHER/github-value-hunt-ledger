@@ -9,7 +9,9 @@
   "baseline_version": "v1",
   "candidate_version": "v2",
   "baseline_artifact_ref": "path-or-content-addressed-baseline-ref",
+  "baseline_artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
   "candidate_artifact_ref": "path-or-content-addressed-candidate-ref",
+  "candidate_artifact_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
   "diff_hash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
   "changed_logical_targets": [
     "STRAT:replace-with-authorized-target"
@@ -20,7 +22,9 @@
   "regression_test_evidence_refs": [
     "path-or-frozen-test-evidence"
   ],
+  "regression_test_evidence_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
   "decision_history_ref": "path-or-content-addressed-decision-history",
+  "decision_history_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
   "unrelated_files_changed": false,
   "sensitive_material_involved": false,
   "benchmark_contaminated": false,

@@ -151,6 +151,13 @@ def _packet_errors(packet: Mapping[str, Any]) -> list[str]:
 
     if not packet.get("evaluation_evidence_refs"):
         errors.append("evaluation_evidence_required")
+    if not _sha256_string(packet.get("evaluation_evidence_sha256")):
+        errors.append("evaluation_evidence_sha256_must_be_sha256")
+    elif (
+        packet.get("evaluation_evidence_sha256")
+        == hashlib.sha256(b"").hexdigest()
+    ):
+        errors.append("evaluation_evidence_sha256_cannot_be_empty_hash")
     return errors
 
 
@@ -317,6 +324,9 @@ def build_skill_eval_result_intake(
             "evaluator_identity": packet.get("evaluator_identity"),
             "evaluation_evidence_refs": list(
                 packet.get("evaluation_evidence_refs") or []
+            ),
+            "evaluation_evidence_sha256": packet.get(
+                "evaluation_evidence_sha256"
             ),
             "provenance_complete": packet.get(
                 "provenance_complete"

@@ -22,6 +22,14 @@ def _stable_hash(value: Any) -> str:
     ).hexdigest()
 
 
+def _is_sha256(value: Any) -> bool:
+    raw = str(value or "").lower()
+    return (
+        len(raw) == 64
+        and all(ch in "0123456789abcdef" for ch in raw)
+    )
+
+
 def _finalize(row: dict[str, Any], field: str) -> dict[str, Any]:
     out = dict(row)
     out[field] = _stable_hash(out)
@@ -103,6 +111,19 @@ def _packet_errors(packet: Mapping[str, Any]) -> list[str]:
     ):
         errors.append("candidate_artifact_must_differ_from_baseline")
 
+    baseline_hash = packet.get("baseline_artifact_sha256")
+    candidate_hash = packet.get("candidate_artifact_sha256")
+    if not _is_sha256(baseline_hash):
+        errors.append("baseline_artifact_sha256_required")
+    if not _is_sha256(candidate_hash):
+        errors.append("candidate_artifact_sha256_required")
+    if (
+        _is_sha256(baseline_hash)
+        and _is_sha256(candidate_hash)
+        and str(baseline_hash).lower() == str(candidate_hash).lower()
+    ):
+        errors.append("candidate_artifact_hash_must_differ_from_baseline")
+
     diff_hash = str(packet.get("diff_hash") or "")
     if len(diff_hash) != 64 or any(ch not in "0123456789abcdef" for ch in diff_hash.lower()):
         errors.append("diff_hash_must_be_sha256")
@@ -131,8 +152,12 @@ def _packet_errors(packet: Mapping[str, Any]) -> list[str]:
         errors.append("regression_passes_exceed_total")
     if not packet.get("regression_test_evidence_refs"):
         errors.append("regression_test_evidence_required")
+    if not _is_sha256(packet.get("regression_test_evidence_sha256")):
+        errors.append("regression_test_evidence_sha256_required")
     if not packet.get("decision_history_ref"):
         errors.append("decision_history_ref_required")
+    if not _is_sha256(packet.get("decision_history_sha256")):
+        errors.append("decision_history_sha256_required")
     return errors
 
 
@@ -208,7 +233,9 @@ def build_repair_candidate_intake(
             "baseline_version": packet.get("baseline_version"),
             "candidate_version": packet.get("candidate_version"),
             "baseline_artifact_ref": packet.get("baseline_artifact_ref"),
+            "baseline_artifact_sha256": packet.get("baseline_artifact_sha256"),
             "candidate_artifact_ref": packet.get("candidate_artifact_ref"),
+            "candidate_artifact_sha256": packet.get("candidate_artifact_sha256"),
             "diff_hash": packet.get("diff_hash"),
             "changed_logical_targets": list(
                 packet.get("changed_logical_targets") or []
@@ -221,7 +248,11 @@ def build_repair_candidate_intake(
             "regression_test_evidence_refs": list(
                 packet.get("regression_test_evidence_refs") or []
             ),
+            "regression_test_evidence_sha256": packet.get(
+                "regression_test_evidence_sha256"
+            ),
             "decision_history_ref": packet.get("decision_history_ref"),
+            "decision_history_sha256": packet.get("decision_history_sha256"),
             "automatic_write_allowed": False,
             "global_promotion_allowed": False,
         }

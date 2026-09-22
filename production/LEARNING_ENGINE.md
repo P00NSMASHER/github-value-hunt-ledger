@@ -232,3 +232,25 @@ Generated artifacts:
 
 Automatic writes and automatic global promotion remain disabled.
 
+### 12. Machine-enforced skill promotion evidence → global review — implemented
+
+`production/skill_promotion_intake.py` closes the gap after a mutation reaches `STAGED_MUTATION`.
+
+Promotion evidence is submitted through `intelligence/skill_promotion_result_spool/` and is bound to the exact current promotion-task hash plus the exact skill-evaluation result hash.
+
+The state machine is deliberately non-automatic:
+
+- `STAGED` — success/held-out/adversarial/adjacent-domain evidence remains incomplete;
+- `VERIFIED` — held-out + adversarial + adjacent-domain evidence passes, but curator approval is absent;
+- `CANARY` — curator approval exists, but fewer than three canary hunters have completed;
+- `QUARANTINED` — any held-out or canary regression;
+- `GLOBAL_ELIGIBLE` — all evidence gates pass.
+
+Evidence that claims a pass must be content-addressed. Held-out, adversarial, adjacent-domain, curator and canary evidence use SHA-256 bindings. Sensitive or benchmark-contaminated promotion evidence fails closed.
+
+`GLOBAL_ELIGIBLE` never means `GLOBAL`. The generated `GLOBAL_SKILL_REVIEW_QUEUE.md` requires a separate Integrator approval, and automatic global promotion remains disabled.
+
+The shared build now executes, validates and persists all three post-failure stages:
+
+`repair candidate -> skill evaluation -> skill promotion evidence -> global review`
+
