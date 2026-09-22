@@ -38,8 +38,9 @@ This is **training/accounting attribution, not a causal claim**.
 
 ## Leakage boundary
 
-Prospective searches use a precommitted split that the hunter cannot choose after seeing results. Current schema-v14+ generated runs hash their validated `execution_claim_id`; legacy/manual/unallocated runs are train-only and can never manufacture confirm evidence.
+Prospective generated searches use a **post-run blind partition receipt**. The worker receives a validated schema-v14+ `execution_claim_id` before the hunt, but the train/confirm label is assigned only after canonical run intake by HMAC-SHA256 using the repository Actions secret `TI_TRAINING_SPLIT_KEY`. The key is never committed or exposed to workers. Legacy/manual/unallocated runs are train-only and can never manufacture confirm evidence.
 
+- a generated run without a persisted blind receipt is `pending_partition` and contributes to neither train nor confirm learning;
 - train outcomes can credit train runs only;
 - confirm outcomes can credit confirm runs only;
 - live value priors train only on the train partition and must separately pass a confirm-support gate before they can steer hunters;
@@ -48,7 +49,7 @@ Prospective searches use a precommitted split that the hunter cannot choose afte
 - an outcome whose direct origins span train and confirm is excluded from learning;
 - an excluded non-search origin may anchor downstream support credit only when it carries the same validated generated-claim provenance; untrusted/manual origins cannot create a confirm anchor.
 
-This prevents the learning loop from improving itself using the evidence later used to judge that improvement.
+This prevents the learning loop from improving itself using the evidence later used to judge that improvement, and prevents a worker from changing behavior because it knows it is in the held-out confirmation arm.
 
 ## Generated artifacts
 
