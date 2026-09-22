@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
@@ -157,9 +158,9 @@ def protected_snapshot(
         )
         for field in contract.protected_fields
     }
-    # Force strict JSON validation now rather than later during persistence.
-    canonical_json_text(snapshot)
-    return snapshot
+    # Canonical round-trip both validates JSON and deep-copies nested values,
+    # so assignment mutations can never mutate the source candidate by alias.
+    return json.loads(canonical_json_text(snapshot))
 
 
 def projection_sha256(
