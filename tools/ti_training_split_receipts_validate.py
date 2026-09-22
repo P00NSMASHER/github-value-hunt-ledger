@@ -34,10 +34,19 @@ def main() -> int:
     receipts = load_jsonl(
         ROOT / "intelligence" / "training_split_receipts.jsonl"
     )
+    commitment_path = (
+        ROOT / "intelligence" / "TRAINING_SPLIT_KEY_COMMITMENT.json"
+    )
+    commitment = (
+        json.loads(commitment_path.read_text(encoding="utf-8"))
+        if commitment_path.exists()
+        else None
+    )
     errors = validate_partition_receipts(
         receipts,
         runs,
         secret=os.environ.get("TI_TRAINING_SPLIT_KEY"),
+        key_commitment=commitment,
     )
     if errors:
         for error in errors:
