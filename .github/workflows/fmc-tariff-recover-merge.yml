@@ -53,8 +53,9 @@ jobs:
 
           event = os.environ.get('EVENT_NAME')
           if event == 'workflow_run':
-              if os.environ.get('WORKFLOW_RUN_CONCLUSION') != 'success':
-                  raise SystemExit('source FMC workflow did not complete successfully')
+              # Recover even when the legacy source run is marked failed solely
+              # because its oversized final merge failed. Missing/failed shard
+              # artifacts will fail explicitly in rehydrate instead.
               run_id = os.environ.get('WORKFLOW_RUN_ID', '').strip()
               shard_count = 12
               retention = 90
