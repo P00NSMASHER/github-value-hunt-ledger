@@ -121,6 +121,28 @@ class SettlementStore:
         cols = {row[1] for row in conn.execute("PRAGMA table_info(recovery_claims)")}
         if not {"buyer_id", "business_unit"}.issubset(cols):
             raise RuntimeError("legacy unscoped settlement schema detected; migrate or rebuild before use")
+        triggers = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='trigger'"
+            )
+        }
+        if "allocation_event_net_capacity" not in triggers or "counter_event_capacity" not in triggers:
+            raise RuntimeError("settlement net-capacity guards are missing")
+        over_returned = conn.execute("""SELECT e.event_id
+          FROM settlement_events e
+          JOIN counter_events c
+            ON c.buyer_id=e.buyer_id
+           AND c.business_unit=e.business_unit
+           AND c.original_event_id=e.event_id
+          GROUP BY e.buyer_id,e.business_unit,e.event_id,e.amount_cents
+          HAVING SUM(c.amount_cents)>e.amount_cents
+          LIMIT 1""").fetchone()
+        if over_returned is not None:
+            raise RuntimeError(
+                "settlement database counter capacity invariant violated: "
+                + str(over_returned[0])
+            )
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.path, timeout=self.busy_timeout_ms / 1000, isolation_level=None)
