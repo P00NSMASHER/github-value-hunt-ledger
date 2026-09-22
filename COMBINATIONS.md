@@ -246,3 +246,17 @@ Hash integrity and dedupe are both necessary but neither proves the aggregation 
   7. buyer review UI and exportable evidence packet.
 - Assumptions: buyer can supply AP/PO/receipt/payment/GL exports and supplier statements; candidate populations contain some recoverable debit balances/credits; buyer has contractual/legal basis to seek refund/credit; realized recovery is measured from buyer-verifiable accounting/settlement records.
 - Confidence: **high** in engineering feasibility and paid-diagnostic plausibility; **unproven** on customer acquisition, actual recovery yield and $1M timing until real pilots run.
+
+
+### ERP-native adapter matrix for AP Recovery v2
+- Objective: remove “we need to build an integration first” as the blocker to a paid supplier-credit recovery diagnostic.
+- Oracle EBS: `Enginatics/Oracle-EBS-SQL@6c0f3b1a70e1b6ff747e497176e7be9256e6e7ee` — negative supplier balance, supplier statement, invoice/payment/receipt/SLA query maps. First pilot can be DBA-run read-only SQL/CSV.
+- SAP ECC/S4: `Accountw-debug/mdq@8853e2c54fdc293903e994e40c629808008d782e` supplies recovery/control rules + gold corpus; `ib823/sapconnect@5851e9fdeaba462c3137686f4ced0aae1ba4b0f7` supplies optional live RFC/OData extraction. First pilot remains SE16N/FBL1N exports unless recurring automation is justified.
+- Dynamics 365 Finance: `ballerina-platform/module-ballerinax-microsoft.dynamics365.finance@fb15cb2f34749e8a031344943c107e115b93d7c4` supplies typed OData packages; `hidayattaufiqur/fno-navigator@0fd0998094abb3d9c3a8a30ca21ea9d21b7d69af` supplies tested table/process maps. Current Microsoft product guidance provides the live debit-balance/credit-memo/settlement semantics; connector output alone is not authority.
+- JD Edwards EnterpriseOne: `oracle-quickstart/oci-jde-monitoring@77c6aac079183e5076ff098ad00e463be16aa634` supplies Oracle-published F0411/F0414/F0911 integrity relationships and monitoring rules. Start with DBA-run extracts/queries.
+- ERPNext: `wphamman/erpocr_integration@a9c82c0ff02f580ff60ebf012797686ba91e977e` supplies supplier-statement ingestion/reconciliation.
+- NetSuite: `hotgluexyz/tap-netsuite-rest@aeed1c57c266f265a95a30aca041ae8b4e84ed9d` supplies read-only vendor bill/credit/payment extraction; `kimtabilon/ebp_netsuite@0f80fc77279b6806985a1868b12d37455bfae930` is an optional future vendor-credit application donor, never required for the first pilot.
+- Canonical adapter contract: every ERP-specific extractor maps into immutable `supplier`, `invoice/bill`, `payment`, `credit/debit-note`, `receipt/PO`, `open-balance`, `settlement-link`, `currency`, `posting/effective-date`, and `source-provenance` records. Unknown/unavailable fields remain UNKNOWN, never zero/default.
+- Commercial advantage: sell **the same recovery method across multiple ERPs**, changing only the read-only source adapter. This avoids building six separate businesses and turns ERP knowledge into an onboarding moat.
+- First-payment strategy: sell a fixed diagnostic using file exports/DBA queries first; only build credentialed continuous connectors after a paying buyer proves recurring value.
+- Security invariant: default read-only. ERP writes, payment actions, credit applications, supplier communication and journal posting are outside the first product and require separate explicit buyer authorization.
