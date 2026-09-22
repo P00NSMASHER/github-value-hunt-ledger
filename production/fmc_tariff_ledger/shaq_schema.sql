@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS shaq_rates (
   valid_from TEXT,
   valid_to TEXT,
   rate_basis TEXT,
+  rate_kind TEXT NOT NULL DEFAULT 'UNKNOWN',
   source_label TEXT,
   source_contract_reference TEXT,
   evidence_excerpt TEXT NOT NULL,
@@ -93,8 +94,9 @@ CREATE VIEW IF NOT EXISTS shaq_rate_authority_view AS
 SELECT
   r.*,
   CASE
+    WHEN r.rate_kind <> 'CARRIER_CONTRACT' THEN 'BENCHMARK_ONLY'
     WHEN r.fmc_organization_no IS NULL THEN 'UNRESOLVED'
-    WHEN r.fmc_identity_status <> 'REVIEWED_EXACT' THEN 'IDENTITY_REVIEW_REQUIRED'
+    WHEN r.fmc_identity_status NOT IN ('REVIEWED_EXACT','REVIEWED_NORMALIZED_ALIAS') THEN 'IDENTITY_REVIEW_REQUIRED'
     WHEN r.valid_from IS NULL AND r.valid_to IS NULL THEN 'VALIDITY_REVIEW_REQUIRED'
     ELSE 'AUTHORITY_READY'
   END AS authority_readiness
