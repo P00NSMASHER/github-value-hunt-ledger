@@ -15,12 +15,26 @@ cand=load_jsonl("hunt_candidates.jsonl")
 alloc=load_jsonl("hunt_allocations.jsonl")
 metrics=json.loads((INTEL/"allocator_metrics.json").read_text(encoding="utf-8"))
 runs=load_jsonl("search_runs.jsonl")
+execution_history=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
+terminal_stale_work_items={
+    row.get("work_item_id")
+    for row in execution_history
+    if (
+        row.get("status")=="FAILED_TERMINAL"
+        and row.get("retryable") is False
+        and row.get("failure_code")=="STALE_ASSIGNMENT"
+        and isinstance(row.get("work_item_id"),str)
+        and row.get("work_item_id")
+    )
+}
 
 cids=set()
 for n,c in enumerate(cand,1):
     wid=c.get("work_item_id")
     if not wid or wid in cids: raise SystemExit(f"hunt_candidates.jsonl:{n}: missing/duplicate work_item_id")
     cids.add(wid)
+    if wid in terminal_stale_work_items:
+        raise SystemExit(f"hunt_candidates.jsonl:{n}: terminal stale work item reissued {wid}")
     errors=action_errors(c)
     if errors: raise SystemExit(f"hunt_candidates.jsonl:{n}: {'; '.join(errors)}")
     if "work_action" in c and not (c.get("instructions") or {}).get("acceptance_target"):
@@ -49,6 +63,8 @@ for n,a in enumerate(alloc,1):
     aid=a.get("assignment_id")
     if not aid or aid in seen_assign: raise SystemExit(f"hunt_allocations.jsonl:{n}: missing/duplicate assignment_id")
     seen_assign.add(aid)
+    if a.get("work_item_id") in terminal_stale_work_items:
+        raise SystemExit(f"hunt_allocations.jsonl:{n}: terminal stale work item assigned {a.get('work_item_id')}")
     errors=action_errors(a)
     if errors: raise SystemExit(f"hunt_allocations.jsonl:{n}: {'; '.join(errors)}")
     candidate=next((c for c in cand if c["work_item_id"]==a.get("work_item_id")),None)
@@ -87,6 +103,14 @@ if kinds["independent_verification"]<cons["min_verification_slots"]: raise Syste
 if kinds["wildcard"]<cons["min_wildcard_slots"]: raise SystemExit("wildcard reserve not met")
 if metrics.get("assignment_count")!=len(alloc): raise SystemExit("allocator_metrics assignment count drift")
 if metrics.get("portfolio_policy_generation_id")!=portfolio_policy_id: raise SystemExit("allocator_metrics portfolio policy mismatch")
+reported_suppressed=metrics.get("suppressed_stale_work_items") or []
+if not isinstance(reported_suppressed,list) or len(reported_suppressed)!=len(set(reported_suppressed)):
+    raise SystemExit("allocator_metrics suppressed stale work list invalid")
+if metrics.get("suppressed_stale_work_item_count")!=len(reported_suppressed):
+    raise SystemExit("allocator_metrics suppressed stale work count drift")
+unknown_suppressed=set(reported_suppressed)-terminal_stale_work_items
+if unknown_suppressed:
+    raise SystemExit(f"allocator_metrics suppresses work without terminal stale evidence: {sorted(unknown_suppressed)}")
 
 for n,r in enumerate(runs,1):
     if (r.get("schema_version") or 0)<9: continue
