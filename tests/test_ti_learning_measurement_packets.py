@@ -43,7 +43,7 @@ def seed(
     seed_id,
     strategy_id,
     *,
-    seed_type="positive_dna_transfer",
+    seed_type="learning_measurement",
     priority=50,
 ):
     return {
@@ -54,7 +54,11 @@ def seed(
         "search_objective_id": "OBJ:test",
         "capability_ids": [],
         "experiment_ids": [],
-        "authorization_basis": "test_authorized",
+        "authorization_basis": (
+            "adaptive_learning_curriculum"
+            if seed_type == "learning_measurement"
+            else "test_authorized"
+        ),
         "acceptance_target": "Find one executable implementation.",
         "why_now": "Bounded useful hypothesis.",
         "query_templates": ["alpha beta", "gamma delta"],
@@ -67,7 +71,7 @@ def seed(
 
 
 class LearningMeasurementPacketTests(unittest.TestCase):
-    def test_strategy_measurement_seed_is_preferred(self):
+    def test_only_adaptive_learning_seed_is_eligible(self):
         seeds = [
             seed(
                 "SEED:z",
@@ -75,9 +79,14 @@ class LearningMeasurementPacketTests(unittest.TestCase):
                 seed_type="positive_dna_transfer",
             ),
             seed(
-                "SEED:m",
+                "SEED:measure:legacy",
                 "STRAT:x",
                 seed_type="strategy_measurement",
+            ),
+            seed(
+                "SEED:learn:x-target",
+                "STRAT:x",
+                seed_type="learning_measurement",
             ),
         ]
         chosen = choose_seed_for_measurement(
@@ -85,13 +94,13 @@ class LearningMeasurementPacketTests(unittest.TestCase):
         )
         self.assertEqual(
             chosen["seed_id"],
-            "SEED:m",
+            "SEED:learn:x-target",
         )
 
     def test_seed_priority_does_not_change_precommit_choice(self):
         first = [
-            seed("SEED:a", "STRAT:x", priority=1),
-            seed("SEED:b", "STRAT:x", priority=999),
+            seed("SEED:learn:a", "STRAT:x", priority=1),
+            seed("SEED:learn:b", "STRAT:x", priority=999),
         ]
         second = copy.deepcopy(first)
         second[0]["priority"] = 999
@@ -101,13 +110,13 @@ class LearningMeasurementPacketTests(unittest.TestCase):
             choose_seed_for_measurement(
                 "STRAT:x", first
             )["seed_id"],
-            "SEED:a",
+            "SEED:learn:a",
         )
         self.assertEqual(
             choose_seed_for_measurement(
                 "STRAT:x", second
             )["seed_id"],
-            "SEED:a",
+            "SEED:learn:a",
         )
 
     def test_bundle_is_advisory_and_partition_blind(self):
@@ -120,7 +129,7 @@ class LearningMeasurementPacketTests(unittest.TestCase):
         }
         bundle = build_measurement_packets(
             curriculum,
-            [seed("SEED:a", "STRAT:x")],
+            [seed("SEED:learn:a", "STRAT:x")],
             curriculum_sha="a" * 64,
             seeds_sha="b" * 64,
         )
@@ -153,7 +162,7 @@ class LearningMeasurementPacketTests(unittest.TestCase):
                     rec("STRAT:x")
                 ],
             },
-            [seed("SEED:a", "STRAT:x")],
+            [seed("SEED:learn:a", "STRAT:x")],
             curriculum_sha="a" * 64,
             seeds_sha="b" * 64,
         )
@@ -194,8 +203,25 @@ class LearningMeasurementPacketTests(unittest.TestCase):
             ],
         )
 
+    def test_non_learning_seed_cannot_be_precommitted(self):
+        legacy = seed(
+            "SEED:measure:legacy",
+            "STRAT:x",
+            seed_type="strategy_measurement",
+        )
+        ordinary = seed(
+            "SEED:dna:ordinary",
+            "STRAT:x",
+            seed_type="positive_dna_transfer",
+        )
+        self.assertIsNone(
+            choose_seed_for_measurement(
+                "STRAT:x", [legacy, ordinary]
+            )
+        )
+
     def test_non_search_seed_cannot_be_precommitted(self):
-        bad = seed("SEED:a", "STRAT:x")
+        bad = seed("SEED:learn:a", "STRAT:x")
         bad["work_action"] = "execute_fixture"
         self.assertIsNone(
             choose_seed_for_measurement(
@@ -211,7 +237,7 @@ class LearningMeasurementPacketTests(unittest.TestCase):
                 rec("STRAT:x")
             ],
         }
-        seeds = [seed("SEED:a", "STRAT:x")]
+        seeds = [seed("SEED:learn:a", "STRAT:x")]
         first = build_measurement_packets(
             curriculum,
             seeds,
