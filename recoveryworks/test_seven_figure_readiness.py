@@ -7,6 +7,7 @@ from recoveryworks import (
     RecoveryLedger,
     REQUIRED_READINESS_CHECKS,
     authorize_case_action,
+    build_seven_figure_authorization_dossier,
     build_seven_figure_readiness,
     prepare_external_action,
     readiness_from_payload,
@@ -320,13 +321,27 @@ class SevenFigureReadinessTests(unittest.TestCase):
             maximum_amount_cents=100_000_000,
             note="SIMULATION ONLY. Approve readiness-gated claim.",
         )
+        dossier = build_seven_figure_authorization_dossier(
+            readiness,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            bundle,
+            journal_head_hash=ledger.journal.head_hash,
+            assembled_at="2026-09-22T16:49:30Z",
+            assembled_by="sim-seven-figure-dossier-controller",
+        )
         authorized = ledger.authorize_with_case(
             bundle.finding.finding_id,
             bundle,
             authorization,
             readiness,
+            dossier,
         )
         self.assertEqual(authorized.readiness_hash, readiness.package_hash)
+        self.assertEqual(authorized.readiness_dossier_hash, dossier.dossier_hash)
 
         artifact = b"SIMULATION ONLY. Readiness-gated external demand."
         envelope = prepare_external_action(
@@ -346,6 +361,7 @@ class SevenFigureReadinessTests(unittest.TestCase):
         restored_record = restored.get(bundle.finding.finding_id)
         self.assertEqual(restored.journal.head_hash, ledger.journal.head_hash)
         self.assertEqual(restored_record.readiness_hash, readiness.package_hash)
+        self.assertEqual(restored_record.readiness_dossier_hash, dossier.dossier_hash)
 
 
     def test_high_value_authorization_requires_durable_ledger_even_with_readiness(self):
