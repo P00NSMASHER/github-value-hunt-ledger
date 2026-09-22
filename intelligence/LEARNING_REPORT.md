@@ -3,7 +3,7 @@
 Generated from prospective and benchmark runs. Discovery denominators exclude explicit non-search or unclassified actions; historical records without an action retain their observational status. Retrospective anecdotes are excluded. Outcome attribution still includes all activity and uses fractional equal-touch credit.
 
 - Measured discovery runs: **22**
-- Other measured actions excluded from discovery denominators: **19**
+- Other measured actions excluded from discovery denominators: **20**
 - Legacy discovery runs without action classification: **18**
 - Search-bearing runs: **21**
 - Structured outcomes: **6**
@@ -34,6 +34,7 @@ Generated from prospective and benchmark runs. Discovery denominators exclude ex
 | QF:cross-vendor-chromatography-raw-format-registry-canonical-metadata-provenance-open-format-export-fixture-regression — cross-vendor chromatography raw-format registry + canonical metadata provenance + open-format export + fixture regression | 1 | 3 | 66.7% [20.8%, 93.9%] | 0.0% [0.0%, 56.2%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:event-time-authority-external-provider-inquiry-unknown-failed-one-shot-refund-confirmed-counter-event-compensating-ledge — event-time authority + external provider inquiry + UNKNOWN != FAILED + one-shot refund + confirmed counter-event + compensating ledger + bank realization | 1 | 3 | 100.0% [43.8%, 100.0%] | 0.0% [0.0%, 56.2%] | 0.0% [0.0%, 79.3%] | 0 | 0.00 | insufficient |
 | QF:exp-001-realized-recovery-persistence-and-concurrency-acceptance-boundary — EXP-001 realized-recovery persistence and concurrency acceptance boundary | 1 | 0 | — | — | 0.0% [0.0%, 79.3%] | 1 | 1.00 | insufficient |
+| QF:exp-007-duplicate-preflight-against-canonical-prior-verification — EXP-007 duplicate-preflight against canonical prior verification | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
 | QF:exp002-phase-qualified-provider-receipts — exp002-phase-qualified-provider-receipts | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
 | QF:exp002-provider-endpoint-boundary — exp002-provider-endpoint-boundary | 0 | 0 | — | — | — | 0 | 0.00 | insufficient |
 | QF:exp002-reversible-authority-crash-matrix — exp002-reversible-authority-crash-matrix | 0 | 0 | — | — | — | 1 | 1.00 | insufficient |

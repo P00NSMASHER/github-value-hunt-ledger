@@ -931,6 +931,36 @@
       "surface_family_id": "SURFACE_FAMILY:ecosystem-adjacency"
     },
     {
+      "id": "SURFACE:canonical-search-runs-jsonl",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "canonical search_runs.jsonl"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:current-hunt-plan",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "current HUNT_PLAN"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
       "id": "SURFACE:direct-web-github-domain-search",
       "runs": 1,
       "deep_inspected": 1,
@@ -959,6 +989,21 @@
         "durable-workflow structural analogs"
       ],
       "surface_family_id": "SURFACE_FAMILY:ecosystem-adjacency"
+    },
+    {
+      "id": "SURFACE:exact-revision-opentfraw-source",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "exact-revision OpenTFRaw source"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
     },
     {
       "id": "SURFACE:exact-revision-source-schema-and-git-history-inspection",
@@ -1182,6 +1227,21 @@
       "fractional_outcome_equivalents": 0,
       "labels_seen": [
         "Polish Ministry of Finance KSeF official pages"
+      ],
+      "surface_family_id": "SURFACE_FAMILY:other"
+    },
+    {
+      "id": "SURFACE:prior-immutable-search-run-submissions",
+      "runs": 1,
+      "deep_inspected": 1,
+      "retained_count": 0,
+      "master_promoted_count": 0,
+      "capability_touch_runs": 1,
+      "experiment_runs": 1,
+      "assisted_outcome_count": 0,
+      "fractional_outcome_equivalents": 0,
+      "labels_seen": [
+        "prior immutable search-run submissions"
       ],
       "surface_family_id": "SURFACE_FAMILY:other"
     },
@@ -1744,20 +1804,23 @@
   "family_rows": [
     {
       "id": "SURFACE_FAMILY:other",
-      "runs": 24,
-      "deep_inspected": 26,
+      "runs": 25,
+      "deep_inspected": 27,
       "retained_count": 15,
       "master_promoted_count": 0,
-      "capability_touch_runs": 22,
-      "experiment_runs": 20,
+      "capability_touch_runs": 23,
+      "experiment_runs": 21,
       "assisted_outcome_count": 3,
       "fractional_outcome_equivalents": 1.1666666666666665,
       "name": "Other/uncategorized",
       "exact_surface_ids": [
+        "SURFACE:canonical-search-runs-jsonl",
         "SURFACE:canonical-telemetry-readback",
         "SURFACE:cross-project-identity-failure-comparison",
         "SURFACE:current-exp-003-assignment-and-stop-gates",
+        "SURFACE:current-hunt-plan",
         "SURFACE:direct-web-github-domain-search",
+        "SURFACE:exact-revision-opentfraw-source",
         "SURFACE:exact-revision-public-git-clone",
         "SURFACE:exact-revision-repository-source-and-test-fixtures",
         "SURFACE:exact-revision-source-inspection",
@@ -1789,6 +1852,7 @@
         "SURFACE:package-publication-verification",
         "SURFACE:polish-ministry-of-finance-ksef-official-pages",
         "SURFACE:prior-frozen-exp-009-evidence",
+        "SURFACE:prior-immutable-search-run-submissions",
         "SURFACE:public-git-clone-at-pinned-revision",
         "SURFACE:public-package-metadata-recall-rescue-surface",
         "SURFACE:public-web-github-discovery",
@@ -1987,10 +2051,13 @@
   ],
   "missing_surface_runs": 4,
   "unmapped_exact_surfaces": [
+    "SURFACE:canonical-search-runs-jsonl",
     "SURFACE:canonical-telemetry-readback",
     "SURFACE:cross-project-identity-failure-comparison",
     "SURFACE:current-exp-003-assignment-and-stop-gates",
+    "SURFACE:current-hunt-plan",
     "SURFACE:direct-web-github-domain-search",
+    "SURFACE:exact-revision-opentfraw-source",
     "SURFACE:exact-revision-public-git-clone",
     "SURFACE:exact-revision-repository-source-and-test-fixtures",
     "SURFACE:exact-revision-source-inspection",
@@ -2022,6 +2089,7 @@
     "SURFACE:package-publication-verification",
     "SURFACE:polish-ministry-of-finance-ksef-official-pages",
     "SURFACE:prior-frozen-exp-009-evidence",
+    "SURFACE:prior-immutable-search-run-submissions",
     "SURFACE:public-git-clone-at-pinned-revision",
     "SURFACE:public-package-metadata-recall-rescue-surface",
     "SURFACE:public-web-github-discovery",

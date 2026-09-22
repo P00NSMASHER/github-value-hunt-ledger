@@ -7,4 +7,5 @@ Work-kind metrics are diagnostic only in V10. They do not directly move portfoli
 | capability_gap | 3 | 8 | 75.0% | 0.0% | 0.0% | 100.0% | 0.0% | 0.248 | insufficient |
 | coverage_gap | 1 | 3 | 33.3% | 0.0% | 0.0% | 0.0% | 0.0% | 0.050 | insufficient |
 | experiment_execution | 0 | 0 | — | — | — | — | — | 0.000 | insufficient |
+| independent_verification | 1 | 1 | 0.0% | 0.0% | 0.0% | 100.0% | 0.0% | 0.150 | insufficient |
 | wildcard | 1 | 4 | 50.0% | 0.0% | 0.0% | 100.0% | 0.0% | 0.225 | insufficient |

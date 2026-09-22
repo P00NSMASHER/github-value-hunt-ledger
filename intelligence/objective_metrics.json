@@ -3,12 +3,12 @@
     {
       "search_objective_id": "OBJ:independent-evaluation",
       "name": "Independent evaluation",
-      "runs": 12,
-      "deep_inspected": 14,
+      "runs": 13,
+      "deep_inspected": 15,
       "retained_count": 7,
       "master_promoted_count": 0,
-      "capability_touch_runs": 10,
-      "experiment_runs": 11,
+      "capability_touch_runs": 11,
+      "experiment_runs": 12,
       "assisted_outcome_count": 3,
       "fractional_outcome_equivalents": 3.0
     },

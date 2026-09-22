@@ -2,11 +2,11 @@
 
 Query families preserve reusable search hypotheses while broader search objectives aggregate related hypotheses across domains. Retrospective runs register taxonomy/provenance but do not enter measured yield denominators.
 
-- Registered query families: **43**
-- Measured query families: **41**
+- Registered query families: **44**
+- Measured query families: **42**
 - Retrospective-only families: **2**
-- One-run measured families: **41**
-- Families mapped to a controlled search objective: **42/43**
+- One-run measured families: **42**
+- Families mapped to a controlled search objective: **43/44**
 - Objective conflicts requiring review: **0**
 - Families with sufficient evidence (>=5 runs and >=20 deep inspections): **0**
 
@@ -32,6 +32,7 @@ Query families preserve reusable search hypotheses while broader search objectiv
 | QF:secs-gem-equipment-constant-atomicity-runtime-falsification — SECS/GEM equipment-constant atomicity runtime falsification | OBJ:protocol-regression | 1 | 2 | 2 | 0 | 0 | 1 | insufficient |
 | QF:usecpo-archive-to-member-cryptographic-binding — USECPO archive-to-member cryptographic binding | OBJ:independent-evaluation | 1 | 2 | 2 | 0 | 0 | 1 | insufficient |
 | QF:authority-origin-invariant-set-consistency-rule-version-transfer — authority-origin-invariant-set-consistency-rule-version-transfer | OBJ:current-rule-authority | 1 | 1 | 1 | 0 | 0 | 1 | insufficient |
+| QF:exp-007-duplicate-preflight-against-canonical-prior-verification — EXP-007 duplicate-preflight against canonical prior verification | OBJ:independent-evaluation | 1 | 1 | 0 | 0 | 0 | 1 | insufficient |
 | QF:exp002-phase-qualified-provider-receipts — exp002-phase-qualified-provider-receipts | OBJ:independent-evaluation | 1 | 1 | 1 | 0 | 0 | 1 | insufficient |
 | QF:exp002-provider-endpoint-boundary — exp002-provider-endpoint-boundary | OBJ:independent-evaluation | 1 | 1 | 0 | 0 | 0 | 1 | insufficient |
 | QF:ksef-regulated-vertical-schema-version-artifact-and-regulator-receipt — KSeF regulated vertical schema-version artifact and regulator receipt | OBJ:current-rule-authority | 1 | 1 | 0 | 0 | 0 | 0 | insufficient |

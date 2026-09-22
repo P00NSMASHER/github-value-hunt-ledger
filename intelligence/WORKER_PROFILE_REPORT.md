@@ -1,6 +1,6 @@
 # WORKER PROFILE REPORT
 
-Profile generation: **WORKERS:39f2b09f8dfa**
+Profile generation: **WORKERS:45cdbf855c3e**
 
 - Registered workers: **14**
 - Measured: **6**
@@ -22,7 +22,7 @@ Profile generation: **WORKERS:39f2b09f8dfa**
 | HUNTER-10 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 | HUNTER-11 | MEASURED | 5 | 8 | 4 | STRAT:decision-claim-runtime-side-effect-trace | EXP-004 | 0 |
 | HUNTER-12 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
-| HUNTER-13 | MEASURED | 5 | 6 | 5 | STRAT:decision-claim-runtime-side-effect-trace | EXP-007 | 1 |
+| HUNTER-13 | MEASURED | 6 | 7 | 5 | STRAT:evaluation-target-independence | EXP-007 | 0 |
 | HUNTER-14 | UNMEASURED | 0 | 0 | 0 | — | — | 0 |
 
 ## Interpretation

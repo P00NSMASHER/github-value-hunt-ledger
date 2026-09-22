@@ -1,9 +1,9 @@
 {
-  "candidate_dispositions": 46,
+  "candidate_dispositions": 47,
   "status_counts": {
     "strong": 13,
     "watch": 11,
-    "rejected_or_negative": 15,
+    "rejected_or_negative": 16,
     "other": 7
   },
   "controlled_reason_counts": {
@@ -18,14 +18,14 @@
     "authority_location_bypass": 3,
     "needs_exactly_once_reconciliation": 1,
     "needs_runtime_validation": 3,
-    "duplicate_or_dominated": 1,
+    "duplicate_or_dominated": 2,
     "strengthens_active_experiment": 3,
     "independent_falsifier": 1,
     "needs_current_authority": 1,
     "thin_implementation": 1,
     "external_wrapper_only": 1
   },
-  "direct_standard_count": 29,
+  "direct_standard_count": 30,
   "alias_normalized_count": 17,
   "unmapped_custom_reason_count": 0,
   "unique_unmapped_custom_reasons": 0,

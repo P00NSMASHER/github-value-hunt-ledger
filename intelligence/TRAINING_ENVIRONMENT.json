@@ -1813,6 +1813,10 @@
     {
       "reason": "not_eligible_search_training_record",
       "run_id": "RUN:20260921T133200Z:HUNTER-04:ec98661714c1"
+    },
+    {
+      "reason": "not_eligible_search_training_record",
+      "run_id": "RUN:20260922T143415Z:hunter13:exp007-stale-assignment-preflight"
     }
   ],
   "mode": "offline_replay_training_environment",
@@ -2028,8 +2032,8 @@
     "support_origin_budget": 0.4
   },
   "schema_version": 1,
-  "source_snapshot_sha256": "1121de331062157149dadcfdf0255ffc58772f5ac168e0df1f7cb03541607a51",
-  "source_through": "2026-09-21T13:32:00Z",
+  "source_snapshot_sha256": "b36677da268b7cfda88e7fb37488202f873e9404b7420d5452df8d655651f3f9",
+  "source_through": "2026-09-22T14:34:15.614996Z",
   "split_policy": {
     "benchmark": "evaluation_only",
     "blind_partition_receipts_required": true,
@@ -2042,7 +2046,7 @@
     "credit_edges": 5,
     "episodes": 21,
     "excluded_outcomes": 5,
-    "excluded_runs": 22,
+    "excluded_runs": 23,
     "reward_stage_counts": {
       "discovery_only": 16,
       "technical_proxy": 5

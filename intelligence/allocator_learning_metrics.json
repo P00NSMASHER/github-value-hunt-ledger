@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "portfolio_policy_generation_id": "PORTFOLIO:6c1a3e6e5624",
+  "portfolio_policy_generation_id": "PORTFOLIO:92c1307240fd",
   "mode": "learning_bootstrap_second_measurement_slot",
   "baseline_role_counts": {
     "experiment": 6,
@@ -29,10 +29,10 @@
     "automatic_revert_condition": "first strategy-level prior becomes eligible_for_policy_consideration"
   },
   "learning_bootstrap_active": true,
-  "attributed_assignment_runs": 5,
+  "attributed_assignment_runs": 6,
   "attribution_debt_runs": 0,
   "roles_with_sufficient_evidence": 0,
-  "work_kinds_observed": 4,
+  "work_kinds_observed": 5,
   "evidence_thresholds": {
     "min_runs": 5,
     "min_deep_inspections": 15,

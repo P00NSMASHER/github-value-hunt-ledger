@@ -2,9 +2,9 @@
 
 Coverage is measured against explicit exploration quotas, not an assumed distribution of valuable GitHub technology.
 
-- Measured runs: **41**
-- Deep inspections reported: **63**
-- Structured candidate dispositions: **46**
+- Measured runs: **42**
+- Deep inspections reported: **64**
+- Structured candidate dispositions: **47**
 - Unique structured candidate repositories: **42**
 - Profiled unique repositories: **42 (100%)**
 - Searchable undercovered targets: **8**

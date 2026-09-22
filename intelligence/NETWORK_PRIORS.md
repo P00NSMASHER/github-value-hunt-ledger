@@ -36,7 +36,7 @@ Generated compact memory for live hunters. This is a **navigation aid, not autho
 - `authority_location_bypass`: 3 structured observations.
 - `needs_runtime_validation`: 3 structured observations.
 - `strengthens_active_experiment`: 3 structured observations.
-- `no_semantic_tests`: 2 structured observations.
+- `duplicate_or_dominated`: 2 structured observations.
 - Frequency is a preflight clue, not an automatic exclusion; false-negative rescues must be audited.
 
 ## Search-move priors
@@ -46,7 +46,7 @@ Generated compact memory for live hunters. This is a **navigation aid, not autho
 
 ## Cross-hunter transfer
 
-- Emitted signals: **0**; consumed signals: **0**; consumer runs: **0**.
+- Emitted signals: **1**; consumed signals: **0**; consumer runs: **0**.
 - Coordination-derived routing remains observe-first until downstream benefit is measured without worsening recall.
 
 ## Outcome-weighted experience priors
@@ -59,8 +59,8 @@ Generated compact memory for live hunters. This is a **navigation aid, not autho
 - **STRAT:acceptance-path-transition-inspection** — follow only the current bounded HUNT_PLAN assignment and its acceptance/STOP gates; treat a no-find as valid evidence and do not infer learning state from priority.
 - **STRAT:rule-period-authority-version-audit** — follow only the current bounded HUNT_PLAN assignment and its acceptance/STOP gates; treat a no-find as valid evidence and do not infer learning state from priority.
 - **STRAT:bidirectional-money-evidence-invariant-tracing** — follow only the current bounded HUNT_PLAN assignment and its acceptance/STOP gates; treat a no-find as valid evidence and do not infer learning state from priority.
-- Reproducible hunter-system failure queue: **0 queued**, **0 blocked**. Queued failures still require regression-tested repair and skill promotion.
-- Repair workbench: **0 bounded repair-ready**, **0 reproduction-first**. These are advisory repair/falsification tasks, not automatic worker routes or live skill edits.
+- Reproducible hunter-system failure queue: **1 queued**, **0 blocked**. Queued failures still require regression-tested repair and skill promotion.
+- Repair workbench: **1 bounded repair-ready**, **0 reproduction-first**. These are advisory repair/falsification tasks, not automatic worker routes or live skill edits.
 - Repair-candidate intake: **0 ready for independent skill evaluation**, **0 blocked**. READY_FOR_SKILL_EVAL is not a live/global promotion.
 
 ## Recall / efficiency rules

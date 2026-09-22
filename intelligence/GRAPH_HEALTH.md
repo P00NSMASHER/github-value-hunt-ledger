@@ -1,11 +1,11 @@
 # GRAPH HEALTH REPORT
 
 - Curated edges: **132**
-- Derived attribution edges: **638**
+- Derived attribution edges: **654**
 - Capability nodes: **19**
-- Query-family nodes: **43**
+- Query-family nodes: **44**
 - Search-objective nodes touched: **10**
-- Exact search-surface nodes touched: **117**
+- Exact search-surface nodes touched: **121**
 - Normalized surface-family nodes touched: **9**
 - Capabilities touched by measured search runs: **16**
 

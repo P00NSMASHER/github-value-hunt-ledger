@@ -1,7 +1,7 @@
 {
   "measured_runs": 22,
-  "total_measured_activity_runs": 41,
-  "excluded_nonsearch_or_unclassified_runs": 19,
+  "total_measured_activity_runs": 42,
+  "excluded_nonsearch_or_unclassified_runs": 20,
   "legacy_unclassified_discovery_runs": 18,
   "discovery_denominator_policy": "explicit_search_plus_legacy_action_absent; all_activity_outcome_credit_preserved",
   "valid_outcomes": 6,

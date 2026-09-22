@@ -1,8 +1,8 @@
 # ALLOCATOR LEARNING REPORT
 
-- Portfolio policy: **PORTFOLIO:6c1a3e6e5624**
+- Portfolio policy: **PORTFOLIO:92c1307240fd**
 - Mode: **learning_bootstrap_second_measurement_slot**
-- Attributed assignment runs: **5**
+- Attributed assignment runs: **6**
 - Attribution-debt runs: **0**
 - Roles with sufficient evidence: **0**
 - Learning bootstrap active: **true**
@@ -17,7 +17,7 @@ V10 changes portfolio capacity only from executed assignment telemetry. Generate
 | coverage | 1 | 3 | 33.3% | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% | 0.050 | insufficient |
 | experiment | 3 | 8 | 75.0% | 0.0% | 0.0% | 100.0% | 0.0% | 14.3% | 0.248 | insufficient |
 | measurement | 0 | 0 | — | — | — | — | — | — | 0.000 | insufficient |
-| verification | 0 | 0 | — | — | — | — | — | — | 0.000 | insufficient |
+| verification | 1 | 1 | 0.0% | 0.0% | 0.0% | 100.0% | 0.0% | 100.0% | 0.150 | insufficient |
 | wildcard | 1 | 4 | 50.0% | 0.0% | 0.0% | 100.0% | 0.0% | 0.0% | 0.225 | insufficient |
 
 ## Effective portfolio

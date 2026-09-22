@@ -2,9 +2,17 @@
   "automatic_expand_retire_enabled": false,
   "failure_queue": {
     "blocked": 0,
-    "count": 0,
-    "items": [],
-    "queued": 0
+    "count": 1,
+    "items": [
+      {
+        "decision": "QUEUED",
+        "failure_id": "FAIL:20260922T143415Z:HUNTER-13:stale-exp007-route",
+        "file": "intelligence/learning_failure_spool/20260922T143415Z-hunter13-stale-exp007-route.json",
+        "reasons": [],
+        "signature": "ada8016cf3b210ca6e429c534e3d68a3a32828e82314e8e19cdaba2d6a69f159"
+      }
+    ],
+    "queued": 1
   },
   "learning_alerts": [],
   "memory": {
@@ -1293,8 +1301,8 @@
     }
   ],
   "schema_version": 1,
-  "source_snapshot_sha256": "f19a3c03d595fb96c2a06ef0fdcc6008f98fbb0f1e57a27d6a3cd9f70720aad0",
-  "source_through": "2026-09-21T13:32:00Z",
+  "source_snapshot_sha256": "6c92eed613db19126517f340ce4d95b09b91d7d12c8e1ab3999a1256a07093df",
+  "source_through": "2026-09-22T14:34:15.614996Z",
   "training_environment": {
     "credit_edges": 5,
     "excluded_outcomes": 5,
@@ -1303,7 +1311,7 @@
       "discovery_only": 16,
       "technical_proxy": 5
     },
-    "source_snapshot_sha256": "1121de331062157149dadcfdf0255ffc58772f5ac168e0df1f7cb03541607a51",
+    "source_snapshot_sha256": "b36677da268b7cfda88e7fb37488202f873e9404b7420d5452df8d655651f3f9",
     "split_counts": {
       "train": 21
     }

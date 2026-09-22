@@ -6,10 +6,10 @@
   "key_commitment_sha256": "1420a9d6b51ba9842fd467eb3831c9d2f9d289c0a14477d1485b22a92b899a1e",
   "partition_method": "hmac-sha256-v1",
   "pending_claim_ids": [],
-  "receipts": 2,
+  "receipts": 3,
   "schema_version": 1,
   "secret_available": true,
-  "train_receipts": 2,
-  "trusted_generated_runs": 2,
+  "train_receipts": 3,
+  "trusted_generated_runs": 3,
   "worker_visibility_rule": "partition is assigned only after canonical run intake; workers must not receive the HMAC key"
 }

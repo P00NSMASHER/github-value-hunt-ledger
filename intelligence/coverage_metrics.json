@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "measured_runs": 41,
-  "deep_inspected_total": 63,
-  "structured_candidate_dispositions": 46,
+  "measured_runs": 42,
+  "deep_inspected_total": 64,
+  "structured_candidate_dispositions": 47,
   "unique_structured_candidate_repositories": 42,
   "profiled_unique_repositories": 42,
   "missing_profile_repositories": [],

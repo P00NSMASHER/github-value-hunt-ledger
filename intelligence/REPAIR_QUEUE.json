@@ -5,12 +5,61 @@
   "mode": "advisory_repair_workbench",
   "policy_effect": "none",
   "schema_version": 1,
-  "source_snapshot_sha256": "223245a3b81ecac4849f46b1a6914f77c2df8e0264753aa9b2000428cf130868",
+  "source_snapshot_sha256": "55d9da37ff1371e2cdcdd4da5745d4f59e0b8dbdd66fd7e3acab91c728c05fcc",
   "summary": {
     "blocked_sources": 0,
     "needs_reproduction": 0,
-    "ready_for_repair": 0,
-    "tasks": 0
+    "ready_for_repair": 1,
+    "tasks": 1
   },
-  "tasks": []
+  "tasks": [
+    {
+      "confirm_failure_refs": [],
+      "evidence_refs": [
+        "referrals/hunt13-r28-2026-09-22-exp007-stale-assignment-preflight.md"
+      ],
+      "failure_class": "false_positive",
+      "failure_observation": "Allocator generated an EXP-007 verification assignment whose stated next actions are already contradicted/completed by canonical search_runs.jsonl evidence.",
+      "mutation_scope": {
+        "automatic_write_allowed": false,
+        "global_promotion_allowed": false,
+        "mode": "logical_target_only",
+        "prohibited_areas": [
+          "benchmark_gold",
+          "benchmark_scoring",
+          "sealed_holdout",
+          "verifier",
+          "evaluator",
+          "controller",
+          "credentials",
+          "safety_policy",
+          "promotion_history"
+        ],
+        "target_id": "EXP-007 central-state-to-allocation reconciliation",
+        "target_type": "workflow"
+      },
+      "next_action": "Create one bounded candidate repair inside the logical target, add/run the stated regression test, freeze the diff hash and decision history, then submit to assess_repair_candidate. Do not change the live/global skill.",
+      "priority_score": 100,
+      "regression_test_requirement": "Generation must reject or supersede an assignment when canonical prior runs already satisfy or falsify its exact next-action fingerprint; EXP-007 should not reissue entry.scan_event repair after the LTQ-v66 repair run is canonical.",
+      "repair_task_id": "REPAIR:416a843ab95507c6",
+      "reproduction_steps": [
+        "Confirm the three prior HUNTER-13 EXP-007 run IDs are present in intelligence/search_runs.jsonl.",
+        "Read current EXPERIMENTS.md / SEARCH_QUEUE.md / HUNT_PLAN.md and observe that they still request the falsified entry.scan_event repair and already-executed Opentrons kill/restart work."
+      ],
+      "schema_version": 1,
+      "source": {
+        "id": "FAIL:20260922T143415Z:HUNTER-13:stale-exp007-route",
+        "kind": "failure_packet",
+        "reported_failure_id": "FAIL:20260922T143415Z:HUNTER-13:stale-exp007-route",
+        "run_id": "RUN:20260922T143415Z:hunter13:exp007-stale-assignment-preflight",
+        "signature": "ada8016cf3b210ca6e429c534e3d68a3a32828e82314e8e19cdaba2d6a69f159"
+      },
+      "state": "READY_FOR_REPAIR",
+      "target": {
+        "id": "EXP-007 central-state-to-allocation reconciliation",
+        "type": "workflow"
+      },
+      "task_sha256": "7ce534afd0441da1a23115125ee21994e4c5155b394c8a0a19f3886d205b3be4"
+    }
+  ]
 }

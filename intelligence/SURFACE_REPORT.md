@@ -2,16 +2,16 @@
 
 Runs can use multiple surfaces. V4 reports both exact surface labels and normalized surface families; both are assisted/multi-touch measurements, not isolated causal effects.
 
-- Exact measured surfaces: **116**
+- Exact measured surfaces: **120**
 - Normalized surface families touched: **9**
 - Runs missing search-surface instrumentation: **4**
-- Exact surfaces still uncategorized: **53**
+- Exact surfaces still uncategorized: **57**
 
 ## Normalized surface families
 
 | Surface family | Exact labels | Runs | Inspected | Retained | MASTER | Capability-touch runs | Outcome eq. |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| SURFACE_FAMILY:other — Other/uncategorized | 53 | 24 | 26 | 15 | 0 | 22 | 1.17 |
+| SURFACE_FAMILY:other — Other/uncategorized | 57 | 25 | 27 | 15 | 0 | 23 | 1.17 |
 | SURFACE_FAMILY:synthetic-local-validation — Synthetic/local validation | 12 | 16 | 7 | 4 | 0 | 16 | 3.17 |
 | SURFACE_FAMILY:first-party-docs — First-party documentation | 14 | 12 | 13 | 9 | 0 | 12 | 0.33 |
 | SURFACE_FAMILY:github-source-inspection — GitHub source inspection | 9 | 10 | 28 | 23 | 0 | 10 | 0.00 |
@@ -87,8 +87,11 @@ Runs can use multiple surfaces. V4 reports both exact surface labels and normali
 | SURFACE:whole-tree-byte-and-sha-256-comparison — whole-tree byte and SHA-256 comparison | SURFACE_FAMILY:other | 1 | 2 | 2 | 0.00 |
 | SURFACE:zip-integrity-and-central-directory-inspection — ZIP integrity and central-directory inspection | SURFACE_FAMILY:other | 1 | 2 | 2 | 0.00 |
 | SURFACE:call-site-mutation-graph-search — call-site/mutation graph search | SURFACE_FAMILY:ecosystem-adjacency | 1 | 1 | 1 | 0.00 |
+| SURFACE:canonical-search-runs-jsonl — canonical search_runs.jsonl | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
+| SURFACE:current-hunt-plan — current HUNT_PLAN | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
 | SURFACE:direct-web-github-domain-search — direct web/GitHub domain search | SURFACE_FAMILY:other | 1 | 1 | 1 | 0.00 |
 | SURFACE:durable-workflow-structural-analogs — durable-workflow structural analogs | SURFACE_FAMILY:ecosystem-adjacency | 1 | 1 | 1 | 0.00 |
+| SURFACE:exact-revision-opentfraw-source — exact-revision OpenTFRaw source | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
 | SURFACE:exact-revision-source-schema-and-git-history-inspection — exact-revision source, schema and git history inspection | SURFACE_FAMILY:github-history-archaeology | 1 | 1 | 1 | 0.00 |
 | SURFACE:french-service-public-first-party-authority-page — French Service Public first-party authority page | SURFACE_FAMILY:other | 1 | 1 | 1 | 0.00 |
 | SURFACE:github-exact-revision-source-and-schema-inspection — GitHub exact-revision source and schema inspection | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
@@ -104,6 +107,7 @@ Runs can use multiple surfaces. V4 reports both exact surface labels and normali
 | SURFACE:microsoft-dynamics-ax-integration-exact-source-revision — microsoft/Dynamics-AX-Integration exact source revision | SURFACE_FAMILY:other | 1 | 1 | 1 | 0.00 |
 | SURFACE:microsoftdocs-dynamics-365-unified-operations-public-exact-source-revision — MicrosoftDocs/dynamics-365-unified-operations-public exact source revision | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
 | SURFACE:polish-ministry-of-finance-ksef-official-pages — Polish Ministry of Finance KSeF official pages | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
+| SURFACE:prior-immutable-search-run-submissions — prior immutable search-run submissions | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
 | SURFACE:public-package-metadata-recall-rescue-surface — public package metadata recall-rescue surface | SURFACE_FAMILY:other | 1 | 1 | 0 | 0.00 |
 | SURFACE:pypi-pinned-wheel — PyPI pinned wheel | SURFACE_FAMILY:other | 1 | 1 | 1 | 0.20 |
 | SURFACE:raw-tcp-send-boundary-frame-capture-with-independent-hsms-header-decoding — raw TCP send-boundary frame capture with independent HSMS header decoding | SURFACE_FAMILY:other | 1 | 1 | 1 | 0.00 |

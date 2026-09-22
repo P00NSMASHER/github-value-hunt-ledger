@@ -3,7 +3,7 @@
 This is a cautious allocation recommendation, not an autonomous command. It blends empirical yield with an explicit exploration budget so unusual low-frequency discoveries are not optimized away.
 
 - Measured prospective or benchmark discovery runs: **22**
-- Other measured actions excluded from discovery denominators: **19**; outcome credit remains included.
+- Other measured actions excluded from discovery denominators: **20**; outcome credit remains included.
 - Historical records without work_action retain their observational status; explicit non-search or unclassified actions cannot satisfy discovery evidence gates.
 - Valid structured outcomes: **6**
 - Exploration budget: **50%**
