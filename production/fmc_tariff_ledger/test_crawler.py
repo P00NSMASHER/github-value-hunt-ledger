@@ -163,6 +163,73 @@ class TariffLedgerTests(unittest.TestCase):
             self.assertIsNone(rows[1][3])
             conn.close()
 
+    def test_merge_preserves_parser_version_and_observations(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            src = crawler.init_db(root / "src.sqlite")
+            dst = crawler.init_db(root / "dst.sqlite")
+
+            src.execute(
+                """INSERT INTO entities(
+                     entity_class, organization_no, legal_name, trade_name, active
+                   ) VALUES ('vocc','777777','MERGE OCEAN LLC','',1)"""
+            )
+            entity_id = src.execute("SELECT last_insert_rowid()").fetchone()[0]
+            src.execute(
+                """INSERT INTO tariff_locations(
+                     entity_id, canonical_url, directory_url,
+                     directory_snapshot_sha256, first_seen_at, last_seen_at
+                   ) VALUES (?, 'https://carrier.example/tariff',
+                             'https://fmc.example/report', 'x', '2026-01-01', '2026-01-02')""",
+                (entity_id,),
+            )
+            loc_id = src.execute("SELECT last_insert_rowid()").fetchone()[0]
+            src.execute(
+                """INSERT INTO snapshots(
+                     tariff_location_id, requested_url, final_url, fetched_at,
+                     http_status, content_type, byte_count, sha256, blob_relpath,
+                     parser_status
+                   ) VALUES (?, 'https://carrier.example/tariff.pdf',
+                             'https://carrier.example/tariff.pdf',
+                             '2026-01-01T00:00:00+00:00', 200, 'application/pdf',
+                             10, ?, 'blobs/x', 'parsed:pdf')""",
+                (loc_id, "c" * 64),
+            )
+            snap_id = src.execute("SELECT last_insert_rowid()").fetchone()[0]
+            src.execute(
+                """INSERT INTO snapshot_observations(
+                     snapshot_id, observed_at, http_status, final_url, content_type
+                   ) VALUES (?, '2026-01-02T00:00:00+00:00', 200,
+                             'https://carrier.example/tariff.pdf', 'application/pdf')""",
+                (snap_id,),
+            )
+            src.execute(
+                """INSERT INTO terms(
+                     snapshot_id, entity_class, organization_no, legal_name,
+                     rule_type, term_kind, amount_value, currency, unit,
+                     evidence_excerpt, confidence, parser_version, created_at
+                   ) VALUES (?, 'vocc', '777777', 'MERGE OCEAN LLC',
+                             'demurrage', 'money', '125', 'USD', 'per day',
+                             'Demurrage USD 125 per day', 0.95,
+                             'fmc-ledger-v3-reparse', '2026-01-02')""",
+                (snap_id,),
+            )
+            src.commit()
+
+            crawler.copy_rows(dst, src)
+
+            parser_version = dst.execute(
+                "SELECT parser_version FROM terms"
+            ).fetchone()[0]
+            self.assertEqual(parser_version, "fmc-ledger-v3-reparse")
+            observations = dst.execute(
+                "SELECT COUNT(*) FROM snapshot_observations"
+            ).fetchone()[0]
+            self.assertEqual(observations, 2)
+
+            src.close()
+            dst.close()
+
     def test_shard_assignment_is_complete_and_disjoint(self):
         rows = [
             crawler.EntitySource(
