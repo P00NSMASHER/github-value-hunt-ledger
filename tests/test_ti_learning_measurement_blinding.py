@@ -3,6 +3,7 @@ import unittest
 from production.learning_measurement_blinding import (
     PHASE_BLIND_CONTRACT_VERSION,
     REQUIRED_BLINDING_STOP,
+    worker_assignment_blinding_errors,
     worker_measurement_blinding_errors,
 )
 
@@ -99,6 +100,72 @@ class LearningMeasurementBlindingTests(unittest.TestCase):
         self.assertIn(
             "phase_blind_measurement_reason_not_neutral",
             errors,
+        )
+
+    def test_phase_blind_assignment_is_valid(self):
+        assignment = {
+            "work_kind": "learning_measurement",
+            "measurement_contract_version": PHASE_BLIND_CONTRACT_VERSION,
+            "authorization_basis": "adaptive_learning_curriculum",
+            "strategy_id": "STRAT:test",
+            "final_score": 75.0,
+            "instructions": {
+                "why_now": (
+                    "STRAT:test is a scheduler-selected adaptive-learning "
+                    "measurement target. Execute one bounded comparable search."
+                ),
+                "stop_conditions": [
+                    REQUIRED_BLINDING_STOP,
+                    "A no-find result is valid evidence.",
+                ],
+            },
+        }
+        self.assertEqual(
+            worker_assignment_blinding_errors(assignment),
+            [],
+        )
+
+    def test_nested_assignment_phase_leak_is_rejected(self):
+        assignment = {
+            "work_kind": "learning_measurement",
+            "measurement_contract_version": PHASE_BLIND_CONTRACT_VERSION,
+            "authorization_basis": "adaptive_learning_curriculum",
+            "instructions": {
+                "why_now": (
+                    "This is a scheduler-selected adaptive-learning "
+                    "measurement target."
+                ),
+                "learning_phase": "confirm_measurement",
+                "stop_conditions": [REQUIRED_BLINDING_STOP],
+            },
+        }
+        errors = worker_assignment_blinding_errors(assignment)
+        self.assertIn(
+            "planner_only_field_exposed:learning_phase",
+            errors,
+        )
+        self.assertTrue(
+            any(
+                error.startswith("planner_only_text_exposed:")
+                for error in errors
+            )
+        )
+
+    def test_assignment_contract_marker_is_required(self):
+        assignment = {
+            "work_kind": "learning_measurement",
+            "authorization_basis": "adaptive_learning_curriculum",
+            "instructions": {
+                "why_now": (
+                    "This is a scheduler-selected adaptive-learning "
+                    "measurement target."
+                ),
+                "stop_conditions": [REQUIRED_BLINDING_STOP],
+            },
+        }
+        self.assertIn(
+            "phase_blind_contract_required",
+            worker_assignment_blinding_errors(assignment),
         )
 
     def test_non_learning_seed_is_ignored(self):
