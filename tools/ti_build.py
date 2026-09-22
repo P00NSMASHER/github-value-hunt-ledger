@@ -13,6 +13,8 @@ STEPS = (
     ['tools/ti_sync.py'],  # Materialize same-commit taxonomy changes before intake.
     ['tools/ti_ingest_runs.py', '--write'],
     ['tools/ti_sync.py'],
+    ['tools/ti_training_split_receipts.py'],
+    ['tools/ti_training_split_receipts_validate.py'],
     ['tools/ti_registry.py'],
     ['tools/ti_revision_debt.py'],
     ['tools/ti_query_families.py'],
