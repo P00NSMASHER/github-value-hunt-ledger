@@ -138,7 +138,12 @@ class LearningStateIntegrationTests(unittest.TestCase):
     def test_four_valid_runs_do_not_unlock_policy_prior(self):
         runs = self.train_runs(4) + self.confirm_runs(2)
         with tempfile.TemporaryDirectory() as tmp:
-            state = compile_state(runs, [], Path(tmp))
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         strategy = next(
             row
@@ -185,7 +190,12 @@ class LearningStateIntegrationTests(unittest.TestCase):
     def test_train_ready_prior_stays_locked_without_confirm_evidence(self):
         runs = self.train_runs(5)
         with tempfile.TemporaryDirectory() as tmp:
-            state = compile_state(runs, [], Path(tmp))
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         strategy = next(
             row
@@ -204,7 +214,12 @@ class LearningStateIntegrationTests(unittest.TestCase):
         confirm[1]["retained_count"] = 4
         runs = self.train_runs(5) + confirm
         with tempfile.TemporaryDirectory() as tmp:
-            state = compile_state(runs, [], Path(tmp))
+            state = compile_state(
+                runs,
+                [],
+                Path(tmp),
+                split_receipts=receipt_map_for(runs),
+            )
 
         strategy = next(
             row
