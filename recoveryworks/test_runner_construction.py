@@ -56,8 +56,8 @@ def write_sources(root: Path, *, claimant="client-1", accepted_days=3):
     )
     (root / "causation.csv").write_text(
         "Review_ID,Entitlement_ID,Event_ID,Baseline_Version_ID,Update_Version_ID,"
-        "Accepted_Causation,Accepted_Delay_Days,Review_Date,Qualified_Reviewer_ID\n"
-        f"REV-1,ENT-1,EV-1,BASE,UPD,true,{accepted_days},2026-09-15,scheduler-1\n",
+        "Accepted_Causation,Accepted_Delay_Days,Review_Date,Qualified_Reviewer_ID,Qualification_Basis\n"
+        f"REV-1,ENT-1,EV-1,BASE,UPD,true,{accepted_days},2026-09-15,scheduler-1,Forensic scheduler and P6 delay analyst\n",
         encoding="utf-8",
     )
     (root / "settlements.csv").write_text(
