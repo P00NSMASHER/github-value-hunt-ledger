@@ -64,7 +64,7 @@ class RecoveryEngine:
         state = FindingState.VALIDATED if verified else FindingState.REVIEW
         coverage_hashes = sorted(receipt.proof_hash for receipt in observation.source_coverage)
         identity = {
-            "schema": 2,
+            "schema": 2 if observation.source_coverage else 1,
             "branch": observation.branch.value,
             "client_id": observation.client_id,
             "counterparty_id": observation.counterparty_id,
@@ -75,8 +75,9 @@ class RecoveryEngine:
             "actual_cents": observation.actual_cents,
             "rule_hash": observation.rule.proof_hash if observation.rule else None,
             "evidence_hashes": sorted(ref.proof_hash for ref in observation.evidence),
-            "source_coverage_hashes": coverage_hashes,
         }
+        if observation.source_coverage:
+            identity["source_coverage_hashes"] = coverage_hashes
         finding_id = f"rw:{observation.branch.value}:" + canonical_hash(identity)
         metadata = dict(observation.metadata)
         if observation.source_coverage:
