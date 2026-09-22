@@ -86,6 +86,22 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "contract-backed telecom billing variance",
         ("contract billing engine", "CDR usage", "invoice exports"),
     ),
+    Branch.LEASE: BranchSpec(
+        Branch.LEASE,
+        "LeaseRecovery",
+        "rent, CAM, operating-expense, and area-based lease billing leakage",
+        ("landlord charges", "lease rate schedules", "area/allocation snapshots"),
+        "lease-backed billing variance",
+        ("contract billing engine", "lease abstracts", "CAM reconciliation"),
+    ),
+    Branch.REBATE: BranchSpec(
+        Branch.REBATE,
+        "RebateRecovery",
+        "earned but unpaid supplier rebates and volume incentives",
+        ("rebate agreements", "eligible spend/units", "rebate credit ledger"),
+        "agreement-backed rebate underpayment",
+        ("rebate calculator", "purchase aggregates", "credit reconciliation"),
+    ),
 }
 
 
