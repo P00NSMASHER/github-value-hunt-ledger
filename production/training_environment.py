@@ -103,8 +103,33 @@ def _clip(value: float, low: float = -1.0, high: float = 1.0) -> float:
     return max(low, min(high, float(value)))
 
 
+def _finite_number(value: Any) -> bool:
+    return type(value) in {int, float} and math.isfinite(float(value))
+
+
+def _nonnegative_int(value: Any) -> bool:
+    return type(value) is int and value >= 0
+
+
+def _require_unique_ids(
+    rows: Sequence[Mapping[str, Any]],
+    field: str,
+    label: str,
+) -> None:
+    seen: set[str] = set()
+    for index, row in enumerate(rows, 1):
+        value = row.get(field)
+        if not isinstance(value, str) or not value:
+            continue
+        if value in seen:
+            raise ValueError(
+                f"duplicate {label} {field}={value} at input row {index}"
+            )
+        seen.add(value)
+
+
 def _safe_ratio(num: Any, den: Any) -> float | None:
-    if not isinstance(num, (int, float)) or not isinstance(den, (int, float)):
+    if not _finite_number(num) or not _finite_number(den):
         return None
     if den <= 0:
         return None
@@ -268,25 +293,25 @@ def telemetry_consistency_errors(
     promoted = run.get("master_promoted_count")
 
     if (
-        isinstance(candidate_count, int)
+        _nonnegative_int(candidate_count)
         and candidate_count >= 0
-        and isinstance(deep, int)
+        and _nonnegative_int(deep)
         and deep >= 0
         and deep > candidate_count
     ):
         errors.append("deep_inspected_exceeds_candidates")
     if (
-        isinstance(deep, int)
+        _nonnegative_int(deep)
         and deep >= 0
-        and isinstance(retained, int)
+        and _nonnegative_int(retained)
         and retained >= 0
         and retained > deep
     ):
         errors.append("retained_exceeds_deep_inspected")
     if (
-        isinstance(retained, int)
+        _nonnegative_int(retained)
         and retained >= 0
-        and isinstance(promoted, int)
+        and _nonnegative_int(promoted)
         and promoted >= 0
         and promoted > retained
     ):
@@ -296,27 +321,29 @@ def telemetry_consistency_errors(
     hits = run.get("known_candidate_preflight_hits")
     avoided = run.get("duplicate_deep_inspections_avoided")
     if (
-        isinstance(checks, int)
+        _nonnegative_int(checks)
         and checks >= 0
-        and isinstance(hits, int)
+        and _nonnegative_int(hits)
         and hits >= 0
         and hits > checks
     ):
         errors.append("preflight_hits_exceed_checks")
     if (
-        isinstance(checks, int)
+        _nonnegative_int(checks)
         and checks >= 0
-        and isinstance(avoided, int)
+        and _nonnegative_int(avoided)
         and avoided >= 0
         and avoided > checks
     ):
         errors.append("duplicate_avoidance_exceeds_checks")
 
     elapsed = run.get("elapsed_minutes")
-    if isinstance(elapsed, (int, float)) and elapsed < 0:
+    if elapsed is not None and not _finite_number(elapsed):
+        errors.append("invalid_elapsed_minutes")
+    elif _finite_number(elapsed) and elapsed < 0:
         errors.append("negative_elapsed_minutes")
     tool_calls = run.get("tool_calls")
-    if isinstance(tool_calls, int) and tool_calls < 0:
+    if type(tool_calls) is int and tool_calls < 0:
         errors.append("negative_tool_calls")
 
     return tuple(errors)
@@ -344,10 +371,10 @@ def split_for_run(
         candidate_count = run.get("candidate_count")
         deep_inspected = run.get("deep_inspected")
         legacy_search_evidence = (
-            isinstance(candidate_count, int)
+            _nonnegative_int(candidate_count)
             and candidate_count > 0
         ) or (
-            isinstance(deep_inspected, int)
+            _nonnegative_int(deep_inspected)
             and deep_inspected > 0
         )
         if not legacy_search_evidence:
@@ -410,7 +437,7 @@ def discovery_signal(
         score -= 0.35
 
     elapsed = run.get("elapsed_minutes")
-    if isinstance(elapsed, (int, float)) and elapsed > 0 and retained > 0:
+    if _finite_number(elapsed) and elapsed > 0 and retained > 0:
         retained_per_hour = retained * 60.0 / float(elapsed)
         score += 0.10 * min(1.0, retained_per_hour)
 
@@ -432,7 +459,7 @@ def outcome_signal(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
     observed_values = [
         float(value)
         for value in (revenue, customer_value)
-        if isinstance(value, (int, float)) and value > 0
+        if _finite_number(value) and value > 0
     ]
     economic_value_usd = max(observed_values) if observed_values else 0.0
     commercial_observed = economic_value_usd > 0
@@ -450,8 +477,8 @@ def outcome_signal(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
     low = outcome.get("engineering_days_saved_low")
     high = outcome.get("engineering_days_saved_high")
     engineering_observed = (
-        isinstance(low, (int, float))
-        and isinstance(high, (int, float))
+        _finite_number(low)
+        and _finite_number(high)
         and high >= low > 0
     )
     engineering = (
@@ -637,6 +664,8 @@ def build_outcome_credit(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     cfg = config or TrainingEnvironmentConfig()
     cfg.validate()
+    _require_unique_ids(search_runs, "search_run_id", "search run")
+    _require_unique_ids(outcomes, "outcome_id", "outcome")
     runs_by_id = {
         str(run.get("search_run_id")): run
         for run in search_runs
@@ -1488,16 +1517,16 @@ def validate_training_environment(
                         f"invalid_move_{field_name}:{rid}:{move_index}"
                     )
             if (
-                isinstance(candidate_count, int)
-                and isinstance(deep_count, int)
+                _nonnegative_int(candidate_count)
+                and _nonnegative_int(deep_count)
                 and deep_count > candidate_count
             ):
                 errors.append(
                     f"move_deep_exceeds_candidates:{rid}:{move_index}"
                 )
             if (
-                isinstance(deep_count, int)
-                and isinstance(retained_count, int)
+                _nonnegative_int(deep_count)
+                and _nonnegative_int(retained_count)
                 and retained_count > deep_count
             ):
                 errors.append(
