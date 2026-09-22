@@ -4,6 +4,13 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 
+from .authorization import (
+    AuthorizationRevocation,
+    RecoveryActionAuthorization,
+    RecoveryActionType,
+    assert_action_allowed,
+    assert_authorization_matches_reviewed_record,
+)
 from .models import CaseState, FindingState, RecoveryFinding, canonical_hash
 from .policies import assert_claim_authorizable
 
@@ -16,6 +23,10 @@ class LedgerRecord:
     reviewer_id: str | None = None
     review_note: str | None = None
     authorization_id: str | None = None
+    authorization_hash: str | None = None
+    authorized_cents: int = 0
+    claim_action_hash: str | None = None
+    claimed_cents: int = 0
     recovered_cents: int = 0
     fee_cents: int = 0
     updated_at: str | None = None
@@ -37,6 +48,8 @@ class RecoveryLedger:
     def __init__(self) -> None:
         self._records: dict[str, LedgerRecord] = {}
         self._proof_index: dict[str, str] = {}
+        self._authorization_index: dict[str, str] = {}
+        self._authorization_hash_index: dict[str, str] = {}
 
     @staticmethod
     def _now() -> str:
@@ -83,34 +96,114 @@ class RecoveryLedger:
         self._records[finding_id] = updated
         return updated
 
-    def authorize(self, finding_id: str, authorization_id: str) -> LedgerRecord:
-        authorization_id = authorization_id.strip()
-        if not authorization_id:
-            raise ValueError("authorization_id is required")
+    def authorize(
+        self,
+        finding_id: str,
+        authorization: RecoveryActionAuthorization,
+        *,
+        as_of_date: str,
+        revocations: tuple[AuthorizationRevocation, ...] = (),
+    ) -> LedgerRecord:
+        if not isinstance(authorization, RecoveryActionAuthorization):
+            raise ValueError("scope-bound RecoveryActionAuthorization is required")
         record = self.get(finding_id)
         if record.case_state is CaseState.AUTHORIZED:
-            if record.authorization_id == authorization_id:
+            if (
+                record.authorization_id == authorization.authorization_id
+                and record.authorization_hash == authorization.authorization_hash
+            ):
                 return record
             raise ValueError("case already authorized under a different authorization")
         if record.case_state is not CaseState.VALIDATED:
             raise ValueError("authorization requires a VALIDATED case")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
+        assert_authorization_matches_reviewed_record(
+            authorization,
+            record,
+            as_of_date=as_of_date,
+            revocations=revocations,
+        )
+
+        existing_id = self._authorization_index.get(authorization.authorization_id)
+        if existing_id is not None and existing_id != finding_id:
+            raise ValueError("authorization_id is already bound to another finding")
+        existing_hash = self._authorization_hash_index.get(authorization.authorization_hash)
+        if existing_hash is not None and existing_hash != finding_id:
+            raise ValueError("authorization_hash is already bound to another finding")
+
         updated = replace(
             record,
             case_state=CaseState.AUTHORIZED,
-            authorization_id=authorization_id,
+            authorization_id=authorization.authorization_id,
+            authorization_hash=authorization.authorization_hash,
+            authorized_cents=authorization.authorized_cents,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
+        self._authorization_index[authorization.authorization_id] = finding_id
+        self._authorization_hash_index[authorization.authorization_hash] = finding_id
         return updated
 
-    def mark_claimed(self, finding_id: str) -> LedgerRecord:
+    def mark_claimed(
+        self,
+        finding_id: str,
+        authorization: RecoveryActionAuthorization,
+        *,
+        as_of_date: str,
+        action_type: RecoveryActionType,
+        target_counterparty_id: str,
+        recipient_reference_hash: str,
+        action_payload_hash: str,
+        currency: str,
+        requested_cents: int,
+        revocations: tuple[AuthorizationRevocation, ...] = (),
+    ) -> LedgerRecord:
         record = self.get(finding_id)
+        if (
+            record.authorization_id != authorization.authorization_id
+            or record.authorization_hash != authorization.authorization_hash
+        ):
+            raise ValueError("claim authorization does not match ledger authorization")
+
+        assert_action_allowed(
+            authorization,
+            record.finding,
+            as_of_date=as_of_date,
+            action_type=action_type,
+            target_counterparty_id=target_counterparty_id,
+            recipient_reference_hash=recipient_reference_hash,
+            action_payload_hash=action_payload_hash,
+            currency=currency,
+            requested_cents=requested_cents,
+            revocations=revocations,
+        )
+        action_hash = canonical_hash({
+            "schema": 1,
+            "authorization_hash": authorization.authorization_hash,
+            "as_of_date": as_of_date,
+            "action_type": action_type.value,
+            "target_counterparty_id": target_counterparty_id,
+            "recipient_reference_hash": recipient_reference_hash,
+            "action_payload_hash": action_payload_hash,
+            "currency": currency,
+            "requested_cents": requested_cents,
+            "revocation_hashes": sorted(r.revocation_hash for r in revocations),
+        })
+
         if record.case_state is CaseState.CLAIMED:
-            return record
-        if record.case_state is not CaseState.AUTHORIZED or not record.authorization_id:
-            raise ValueError("claim action requires explicit authorization")
-        updated = replace(record, case_state=CaseState.CLAIMED, updated_at=self._now())
+            if record.claim_action_hash == action_hash and record.claimed_cents == requested_cents:
+                return record
+            raise ValueError("case already claimed under a different action")
+        if record.case_state is not CaseState.AUTHORIZED:
+            raise ValueError("claim action requires AUTHORIZED case state")
+
+        updated = replace(
+            record,
+            case_state=CaseState.CLAIMED,
+            claim_action_hash=action_hash,
+            claimed_cents=requested_cents,
+            updated_at=self._now(),
+        )
         self._records[finding_id] = updated
         return updated
 
@@ -126,8 +219,8 @@ class RecoveryLedger:
             raise ValueError("recovered_cents must be non-negative integer cents")
         if type(fee_cents) is not int or fee_cents < 0 or fee_cents > recovered_cents:
             raise ValueError("fee_cents must be between zero and recovered_cents")
-        if recovered_cents > record.finding.potential_recovery_cents:
-            raise ValueError("recovered amount cannot exceed validated potential recovery")
+        if recovered_cents > record.claimed_cents:
+            raise ValueError("recovered amount cannot exceed claimed amount")
         updated = replace(
             record,
             case_state=CaseState.RECOVERED,
@@ -157,6 +250,10 @@ class RecoveryLedger:
             reviewer_id=reviewer_id,
             review_note=note,
             authorization_id=None,
+            authorization_hash=None,
+            authorized_cents=0,
+            claim_action_hash=None,
+            claimed_cents=0,
             updated_at=self._now(),
         )
         self._records[finding_id] = updated
@@ -201,8 +298,8 @@ class RecoveryLedger:
             bucket["discovered_cents"] += amount
             bucket["potential_cents"] += 0 if rejected else amount
             bucket["validated_cents"] += amount if record.case_state in validated_states else 0
-            bucket["authorized_cents"] += amount if record.case_state in authorized_states else 0
-            bucket["claimed_cents"] += amount if record.case_state in claimed_states else 0
+            bucket["authorized_cents"] += record.authorized_cents if record.case_state in authorized_states else 0
+            bucket["claimed_cents"] += record.claimed_cents if record.case_state in claimed_states else 0
             bucket["recovered_cents"] += record.recovered_cents
             bucket["fee_cents"] += record.fee_cents
 
