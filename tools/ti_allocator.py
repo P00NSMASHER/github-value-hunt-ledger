@@ -112,6 +112,16 @@ for s in SEEDS:
       "query_anchors":s.get("query_anchors") or [],
       "source_id":s["seed_id"],
       "title":s["seed_id"],
+      "measurement_contract_version":(
+          s.get("measurement_contract_version")
+          if kind=="learning_measurement"
+          else None
+      ),
+      "authorization_basis":(
+          s.get("authorization_basis")
+          if kind=="learning_measurement"
+          else None
+      ),
       "final_score":score,
       "score_components":{"base_priority":base,"strategy_allocation":round(strat,2),"experiment_boost":expb},
       "strategy_id":sid,
@@ -365,6 +375,8 @@ for slot in slots:
       "query_anchors":c.get("query_anchors") or [],
       "source_id":c["source_id"],
       "title":c["title"],
+      "measurement_contract_version":c.get("measurement_contract_version"),
+      "authorization_basis":c.get("authorization_basis"),
       "final_score":c["final_score"],
       "score_components":c["score_components"],
       "strategy_id":c.get("strategy_id"),

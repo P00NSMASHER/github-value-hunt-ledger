@@ -21,6 +21,12 @@ Use work_action and its acceptance_target:
 
 For unknown/stale task contracts, derive a narrow question from current source evidence and document a manual plan. Do not infer buyer authorization, certification or external access from a rank.
 
+### Phase-blind adaptive measurement rule
+
+For a `learning_measurement` assignment, the current HUNT_PLAN packet is the complete worker-facing measurement contract. Execute it as an ordinary bounded search with the stated strategy, acceptance target, recall-rescue rule and STOP gates.
+
+Before the run's durable evidence and result are frozen, do **not** inspect or use `LEARNING_CURRICULUM.md`, `learning_curriculum.json`, `LEARNING_STATE.json`, `TRAINING_SPLIT_STATUS.json`, `training_split_receipts.jsonl`, or other planner artifacts that reveal learning phase/debt. Do not infer phase from assignment score, repository history, or prior runs. After the run is frozen, the Integrator may reconcile it against planner state. This rule prevents measurement effort or stopping behavior from changing because the worker knows why the strategy was selected.
+
 ## 3. Coordinate work honestly
 
 For a generated route:

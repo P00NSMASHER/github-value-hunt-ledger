@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 import json,re
 from collections import Counter
-from ti_common import INTEL, load_jsonl
+from ti_common import INTEL, ROOT, load_jsonl
+
+from ti_learning_measurement_blinding import (
+    worker_assignment_blinding_errors,
+)
 from ti_search_actions import action_errors
 
 policy_path=INTEL/"allocator_policy_effective.json" if (INTEL/"allocator_policy_effective.json").exists() else INTEL/"allocator_policy.json"
@@ -29,6 +33,13 @@ for n,c in enumerate(cand,1):
         elif packet.get("verification_mode")!="experiment_falsification" or not packet.get("independence_requirements") or not packet.get("next_action"):
             raise SystemExit(f"hunt_candidates.jsonl:{n}: verifier lacks frozen target/independence requirements")
     if c.get("work_action")=="await_external": raise SystemExit(f"hunt_candidates.jsonl:{n}: external dependency assigned autonomously")
+    if c.get("work_kind")=="learning_measurement":
+        blind_errors=worker_assignment_blinding_errors(c)
+        if blind_errors:
+            raise SystemExit(
+                f"hunt_candidates.jsonl:{n}: worker measurement blinding failed: "
+                + "; ".join(blind_errors)
+            )
     if not isinstance(c.get("final_score"),(int,float)): raise SystemExit(f"hunt_candidates.jsonl:{n}: score missing")
 
 slots={x["slot_id"]:x for x in cfg.get("slots",[])}
@@ -48,6 +59,13 @@ for n,a in enumerate(alloc,1):
     seen_slots.add(sid)
     if a.get("work_item_id") not in cids: raise SystemExit(f"hunt_allocations.jsonl:{n}: unknown work item")
     if a.get("portfolio_policy_generation_id")!=portfolio_policy_id: raise SystemExit(f"hunt_allocations.jsonl:{n}: assignment portfolio policy mismatch")
+    if a.get("work_kind")=="learning_measurement":
+        blind_errors=worker_assignment_blinding_errors(a)
+        if blind_errors:
+            raise SystemExit(
+                f"hunt_allocations.jsonl:{n}: worker measurement blinding failed: "
+                + "; ".join(blind_errors)
+            )
     kinds[a.get("work_kind")]+=1
     roles[a.get("slot_role")]+=1
     for cid in a.get("capability_ids") or []: caps[cid]+=1

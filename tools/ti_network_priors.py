@@ -216,24 +216,19 @@ if blind_confirmation.get("operational") is not True:
 
 measurement_recs = curriculum.get("recommended_measurements") or []
 if measurement_recs:
-    lines += ["", "### Learning measurement debt", ""]
+    lines += ["", "### Adaptive learning measurement targets", ""]
     lines.append(
-        "- These are **measurement-only** recommendations. They do not change "
-        "allocator weights or authorize work by themselves; use the normal "
-        "generated assignment/claim path and never select/retry based on "
-        "train/confirm partition."
+        "- These are **worker-safe bounded measurement targets only**. Exact "
+        "learning phase, curriculum rank, and train/confirm evidence debt are "
+        "planner-only until the assigned run's evidence and result are frozen. "
+        "Do not open detailed curriculum/learning-state artifacts to change "
+        "effort, retry behavior, or stopping decisions."
     )
     for rec in measurement_recs[:3]:
-        train = rec.get("train") or {}
-        confirm = rec.get("confirm") or {}
         lines.append(
-            f"- **{rec.get('strategy_id')}** — {rec.get('phase')}; "
-            f"train {train.get('runs', 0)}/{train.get('deep_inspections', 0)} "
-            f"(need {train.get('runs_needed', 0)} runs / "
-            f"{train.get('deep_inspections_needed', 0)} deep); "
-            f"confirm {confirm.get('runs', 0)}/{confirm.get('deep_inspections', 0)} "
-            f"(need {confirm.get('runs_needed', 0)} runs / "
-            f"{confirm.get('deep_inspections_needed', 0)} deep)."
+            f"- **{rec.get('strategy_id')}** — follow only the current bounded "
+            "HUNT_PLAN assignment and its acceptance/STOP gates; treat a no-find "
+            "as valid evidence and do not infer learning state from priority."
         )
 
 failure_queue = learning.get("failure_queue") or {}
