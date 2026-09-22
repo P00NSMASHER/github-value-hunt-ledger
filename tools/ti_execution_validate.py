@@ -75,6 +75,11 @@ for n,c in enumerate(claims,1):
               "routing_learning_generation_id":c.get("routing_learning_generation_id"),
               "dispatch_generation_id":c.get("dispatch_generation_id")
             }
+            if c.get("assignment_work_kind")=="learning_measurement":
+                for key in ("learning_measurement_packet_id","learning_measurement_packet_sha256"):
+                    if not c.get(key):
+                        raise SystemExit(f"execution_claim_history.jsonl:{n}: learning measurement missing {key}")
+                    exact[key]=c.get(key)
             if ticket_schema>=15:
                 exact["dispatch_kind"]=c.get("dispatch_kind")
                 exact["parent_dispatch_ticket_id"]=c.get("parent_dispatch_ticket_id")
@@ -139,6 +144,9 @@ for n,r in enumerate(runs,1):
       "assignment_work_kind":c.get("assignment_work_kind"),
       "assignment_source_id":c.get("assignment_source_id")
     }
+    if c.get("assignment_work_kind")=="learning_measurement":
+        expected["learning_measurement_packet_id"]=c.get("learning_measurement_packet_id")
+        expected["learning_measurement_packet_sha256"]=c.get("learning_measurement_packet_sha256")
     mismatch=[k for k,v in expected.items() if r.get(k)!=v]
     if mismatch:
         raise SystemExit(f"search_runs.jsonl:{n}: claim provenance mismatch: {','.join(mismatch)}")
