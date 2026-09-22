@@ -146,7 +146,6 @@ CREATE TABLE IF NOT EXISTS negotiated_rates (
   billing_code TEXT NOT NULL,
   description TEXT,
   negotiation_arrangement TEXT,
-  provider_group_id INTEGER,
   negotiated_type TEXT,
   negotiated_rate TEXT NOT NULL,
   expiration_date TEXT,
@@ -159,8 +158,16 @@ CREATE TABLE IF NOT EXISTS negotiated_rates (
 );
 
 CREATE INDEX IF NOT EXISTS idx_rates_code ON negotiated_rates(billing_code_type, billing_code);
-CREATE INDEX IF NOT EXISTS idx_rates_group ON negotiated_rates(snapshot_id, provider_group_id);
 CREATE INDEX IF NOT EXISTS idx_rates_expiration ON negotiated_rates(expiration_date);
+
+CREATE TABLE IF NOT EXISTS rate_provider_groups (
+  rate_id INTEGER NOT NULL REFERENCES negotiated_rates(id) ON DELETE CASCADE,
+  provider_group_id INTEGER NOT NULL,
+  PRIMARY KEY(rate_id, provider_group_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_provider_group
+  ON rate_provider_groups(provider_group_id, rate_id);
 
 CREATE TABLE IF NOT EXISTS allowed_amounts (
   id INTEGER PRIMARY KEY,
@@ -210,7 +217,6 @@ SELECT
   r.billing_code_type_version,
   r.billing_code,
   r.negotiation_arrangement,
-  r.provider_group_id,
   r.negotiated_type,
   r.negotiated_rate,
   r.expiration_date,
