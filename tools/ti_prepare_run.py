@@ -30,7 +30,8 @@ CLAIM_FIELDS = {
     **{key: key for key in (
         "assignment_id", "allocator_generation_id", "portfolio_policy_generation_id",
         "assignment_slot_role", "assignment_work_kind", "assignment_source_id",
-        "assignment_score", "routing_generation_id", "worker_profile_generation_id",
+        "assignment_score", "learning_measurement_packet_id",
+        "learning_measurement_packet_sha256", "routing_generation_id", "worker_profile_generation_id",
         "routing_score", "dispatch_ticket_id", "dispatch_generation_id",
         "routing_learning_generation_id", "route_override_reason", "dispatch_kind",
         "presence_generation_id", "presence_event_id", "activation_id",
@@ -119,6 +120,15 @@ def assignment_for_claim(intel, claim):
     # discovery. Adaptive learning_measurement is a distinct live work kind.
     if assignment.get("work_kind") == "strategy_measurement":
         raise ValueError("frozen strategy measurement requires the separate benchmark workflow")
+    if assignment.get("work_kind") == "learning_measurement":
+        for key in (
+            "learning_measurement_packet_id",
+            "learning_measurement_packet_sha256",
+        ):
+            if not claim.get(key):
+                raise ValueError(f"learning measurement claim missing {key}")
+            if assignment.get(key) != claim.get(key):
+                raise ValueError(f"assignment disagrees with stored claim: {key}")
     return assignment
 
 
