@@ -214,7 +214,7 @@ def build_repair_queue(
             "schema_version": 1,
             "repair_task_id": _task_id(
                 "failure_packet",
-                source_id,
+                assessment.signature,
                 event.target_id,
             ),
             "state": "READY_FOR_REPAIR",
@@ -224,6 +224,7 @@ def build_repair_queue(
                 "id": source_id,
                 "run_id": event.run_id,
                 "signature": assessment.signature,
+                "reported_failure_id": source_id,
             },
             "target": {
                 "type": event.target_type,
