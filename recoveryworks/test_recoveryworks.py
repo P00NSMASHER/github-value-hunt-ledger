@@ -18,6 +18,7 @@ from recoveryworks import (
     SourceManifestEntry,
     freeze_scan,
     issue_authorization,
+    issue_engagement_charter,
     revoke_authorization,
     run_scan,
 )
@@ -51,6 +52,42 @@ def sha(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+AUTHORIZED_SOURCE_KINDS = (
+    "classification_basis",
+    "contract_clause",
+    "evidence",
+    "entry_summary",
+    "fee_schedule_or_contract",
+    "governing_rule",
+    "invoice_export",
+    "payment_export",
+    "policy",
+    "remittance_835",
+    "tariff_version",
+    "usage_record",
+)
+
+
+def engagement(
+    *,
+    client_id="c",
+    branches=tuple(Branch),
+    source_kinds=AUTHORIZED_SOURCE_KINDS,
+    roles=("customer_recovery_approver",),
+    effective_from="2026-01-01",
+    expires_on="2026-12-31",
+):
+    return issue_engagement_charter(
+        engagement_id=f"eng:{client_id}",
+        client_id=client_id,
+        authorized_branches=branches,
+        authorized_source_kinds=source_kinds,
+        action_approver_roles=roles,
+        effective_from=effective_from,
+        expires_on=expires_on,
+    )
+
+
 DEFAULT_ACTION = {
     Branch.FREIGHT: RecoveryActionType.SUBMIT_DISPUTE,
     Branch.PAYER: RecoveryActionType.SUBMIT_APPEAL,
@@ -76,6 +113,7 @@ def scoped_authorization(
     payload_hash = sha(finding.finding_id + ":payload:" + action_type.value)
     auth = issue_authorization(
         ledger.get(finding.finding_id),
+        engagement(client_id=finding.client_id),
         authorization_id=authorization_id,
         action_type=action_type,
         target_counterparty_id=finding.counterparty_id,
@@ -143,6 +181,50 @@ class RecoveryWorksTests(unittest.TestCase):
     def test_all_six_branches_registered(self):
         self.assertEqual(set(BRANCHES), set(Branch))
         self.assertEqual(set(ADAPTERS), set(Branch))
+
+    def test_engagement_charter_never_pre_authorizes_external_action(self):
+        charter = engagement()
+        self.assertTrue(charter.customer_data_authorized)
+        self.assertTrue(charter.report_generation_allowed)
+        self.assertFalse(charter.external_action_authorized)
+        self.assertEqual(
+            charter.external_action_policy,
+            "SEPARATE_CUSTOMER_APPROVAL_REQUIRED",
+        )
+
+    def test_scan_rejects_branch_or_source_kind_outside_engagement(self):
+        narrow = engagement(
+            branches=(Branch.AP,),
+            source_kinds=("payment_export",),
+        )
+        with self.assertRaisesRegex(ValueError, "branch"):
+            freeze_scan(
+                scan_id="scan-bad-branch",
+                client_id="c",
+                engagement=narrow,
+                as_of_date="2026-09-22",
+                branches=(Branch.FREIGHT,),
+                selection_rule="supplied period",
+                sources=(
+                    SourceManifestEntry(
+                        "s1", Branch.FREIGHT, "h1", "file://freight.csv", "payment_export"
+                    ),
+                ),
+            )
+        with self.assertRaisesRegex(ValueError, "source kind"):
+            freeze_scan(
+                scan_id="scan-bad-kind",
+                client_id="c",
+                engagement=narrow,
+                as_of_date="2026-09-22",
+                branches=(Branch.AP,),
+                selection_rule="supplied period",
+                sources=(
+                    SourceManifestEntry(
+                        "s1", Branch.AP, "h1", "file://ap.csv", "invoice_export"
+                    ),
+                ),
+            )
 
     def test_branch_registry_normalizes_without_bypassing_common_engine(self):
         item = BranchInput(
@@ -603,6 +685,8 @@ class RecoveryWorksTests(unittest.TestCase):
         manifest = freeze_scan(
             scan_id="scan-1",
             client_id="c",
+            engagement=engagement(),
+            as_of_date="2026-09-22",
             branches=(Branch.FREIGHT, Branch.AP),
             selection_rule="all records in supplied historical period",
             sources=(
@@ -633,6 +717,8 @@ class RecoveryWorksTests(unittest.TestCase):
         manifest = freeze_scan(
             scan_id="scan-cross-branch",
             client_id="c",
+            engagement=engagement(),
+            as_of_date="2026-09-22",
             branches=(Branch.AP, Branch.FREIGHT),
             selection_rule="two-branch supplied period",
             sources=(
@@ -653,6 +739,8 @@ class RecoveryWorksTests(unittest.TestCase):
         manifest = freeze_scan(
             scan_id="scan-proof",
             client_id="c",
+            engagement=engagement(),
+            as_of_date="2026-09-22",
             branches=(Branch.AP,),
             selection_rule="supplied AP period",
             sources=(
