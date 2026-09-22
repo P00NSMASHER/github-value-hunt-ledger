@@ -43,6 +43,10 @@ python -m recoveryworks.cli mark-claimed /tmp/recoveryworks-ledger.json FINDING_
 # Record externally verified recovered cash.
 python -m recoveryworks.cli recover /tmp/recoveryworks-ledger.json FINDING_ID \
   --recovered-cents 1000 --fee-cents 200 \
+  --fee-agreement-id fee-agreement-1 \
+  --fee-bps 2000 \
+  --fee-source-hash SHA256_OF_FEE_AGREEMENT \
+  --fee-locator file://path/to/fee-agreement \
   --evidence-id settlement-receipt-1 \
   --source-hash SHA256_OF_SETTLEMENT_PROOF \
   --locator file://path/to/settlement-proof
