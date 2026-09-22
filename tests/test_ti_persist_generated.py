@@ -142,6 +142,86 @@ class PersistGeneratedTests(unittest.TestCase):
             "generated:new-main\n",
         )
 
+    def test_race_retry_can_clean_untracked_build_contamination(self):
+        contaminant = self.worker / "contaminant.txt"
+        contaminant.write_text(
+            "stale-from-lost-attempt\n",
+            encoding="utf-8",
+        )
+
+        def contaminated_rebuild(repo: Path) -> None:
+            source = (repo / "source.txt").read_text(
+                encoding="utf-8"
+            ).strip()
+            stale = (
+                (repo / "contaminant.txt").read_text(
+                    encoding="utf-8"
+                ).strip()
+                if (repo / "contaminant.txt").exists()
+                else ""
+            )
+            (repo / "generated.txt").write_text(
+                f"generated:{source}:{stale}\n",
+                encoding="utf-8",
+            )
+
+        contaminated_rebuild(self.worker)
+
+        def race(attempt: int) -> None:
+            if attempt != 1:
+                return
+            (self.racer / "source.txt").write_text(
+                "new-main\n",
+                encoding="utf-8",
+            )
+            git(self.racer, "add", "source.txt")
+            git(self.racer, "commit", "-m", "concurrent main")
+            git(self.racer, "push", "origin", "main")
+
+        result = persist_generated(
+            self.worker,
+            ["generated.txt"],
+            max_attempts=3,
+            rebuild_fn=contaminated_rebuild,
+            before_push=race,
+            clean_untracked_on_rebuild=True,
+        )
+
+        self.assertEqual(result["status"], "pushed")
+        self.assertFalse(contaminant.exists())
+
+        verify = self.root / "verify-clean-race"
+        run(
+            self.root,
+            "git",
+            "clone",
+            "--branch",
+            "main",
+            str(self.remote),
+            str(verify),
+        )
+        self.assertEqual(
+            (verify / "generated.txt").read_text(
+                encoding="utf-8"
+            ),
+            "generated:new-main:\n",
+        )
+
+    def test_local_default_does_not_clean_untracked_files(self):
+        local_only = self.worker / "local-only.txt"
+        local_only.write_text("keep-me\n", encoding="utf-8")
+        self.rebuild(self.worker)
+
+        result = persist_generated(
+            self.worker,
+            ["generated.txt"],
+            max_attempts=2,
+            rebuild_fn=self.rebuild,
+        )
+
+        self.assertEqual(result["status"], "pushed")
+        self.assertTrue(local_only.exists())
+
     def test_only_whitelisted_generated_paths_are_committed(self):
         self.rebuild(self.worker)
         (self.worker / "unrelated.txt").write_text(
