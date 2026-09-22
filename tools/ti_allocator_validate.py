@@ -64,7 +64,7 @@ if roots and max(roots.values())>cons["max_adjacency_assignments_per_root"]: rai
 if roles["coverage"]<cons["min_coverage_role_slots"]: raise SystemExit("coverage role reserve not met")
 if kinds["coverage_gap"]<cons["min_coverage_gap_assignments"]: raise SystemExit("coverage-gap assignment reserve not met")
 if kinds["adjacency"]<cons["min_adjacency_slots"]: raise SystemExit("adjacency reserve not met")
-if kinds["strategy_measurement"]<cons["min_measurement_slots"]: raise SystemExit("measurement reserve not met")
+if kinds["learning_measurement"]<cons["min_measurement_slots"]: raise SystemExit("adaptive learning measurement reserve not met")
 if kinds["independent_verification"]<cons["min_verification_slots"]: raise SystemExit("verification reserve not met")
 if kinds["wildcard"]<cons["min_wildcard_slots"]: raise SystemExit("wildcard reserve not met")
 if metrics.get("assignment_count")!=len(alloc): raise SystemExit("allocator_metrics assignment count drift")
