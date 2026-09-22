@@ -337,6 +337,7 @@ def crawl_one_location_v2(
                         follow = likely_tariff_link_v2(href, anchor, depth)
                         if family != "direct" and _entity_specific_same_site_link(src, anchor, href):
                             child_parse = True
+                            follow = True
                     else:
                         follow, cross_parse = publishers.allow_cross_publisher_link(
                             family,
