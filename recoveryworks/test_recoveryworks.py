@@ -121,6 +121,45 @@ class RecoveryWorksTests(unittest.TestCase):
                 reason="BAD", confidence_basis="missing proof",
             ))
 
+    def test_invalid_currency_cannot_hide_behind_zero_variance(self):
+        with self.assertRaisesRegex(ValueError, "currency"):
+            RecoveryEngine().evaluate(RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="bad-currency", currency="usd", expected_cents=100,
+                actual_cents=100, rule=rule(), evidence=(evidence(),),
+                reason="BAD", confidence_basis="bad currency",
+            ))
+
+    def test_rollup_never_sums_different_currencies(self):
+        ledger = RecoveryLedger()
+        usd = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.FREIGHT, client_id="c", counterparty_id="carrier",
+            reference="usd-1", currency="USD", expected_cents=10000,
+            actual_cents=13000, rule=rule(), evidence=(evidence(),),
+            reason="OVERCHARGE", confidence_basis="verified contract",
+        ))
+        eur = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.UTILITY, client_id="c", counterparty_id="utility",
+            reference="eur-1", currency="EUR", expected_cents=20000,
+            actual_cents=25000, rule=rule(), evidence=(evidence(),),
+            reason="TARIFF_VARIANCE", confidence_basis="verified tariff",
+        ))
+        ledger.add(usd)
+        ledger.add(eur)
+        rollup = ledger.rollup()
+        self.assertEqual(rollup["totals"], {"cases": 2, "rejected_cases": 0})
+        self.assertEqual(rollup["currencies"]["USD"]["potential_cents"], 3000)
+        self.assertEqual(rollup["currencies"]["EUR"]["potential_cents"], 5000)
+        self.assertNotIn("potential_cents", rollup["totals"])
+        self.assertEqual(
+            rollup["branches"]["freight"]["currencies"]["USD"]["potential_cents"],
+            3000,
+        )
+        self.assertEqual(
+            rollup["branches"]["utility"]["currencies"]["EUR"]["potential_cents"],
+            5000,
+        )
+
     def test_ledger_requires_review_and_authorization_before_claim(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
             branch=Branch.DUTY, client_id="c", counterparty_id="customs",
@@ -139,7 +178,7 @@ class RecoveryWorksTests(unittest.TestCase):
         self.assertIs(claimed.case_state, CaseState.CLAIMED)
         recovered = ledger.mark_recovered(finding.finding_id, 3000, 600)
         self.assertIs(recovered.case_state, CaseState.RECOVERED)
-        self.assertEqual(ledger.rollup()["totals"]["fee_cents"], 600)
+        self.assertEqual(ledger.rollup()["currencies"]["USD"]["fee_cents"], 600)
 
     def test_ledger_dedupes_identical_proof(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
@@ -163,14 +202,14 @@ class RecoveryWorksTests(unittest.TestCase):
         ))
         ledger = RecoveryLedger()
         ledger.add(finding)
-        before = ledger.rollup()["totals"]
-        self.assertEqual(before["validated_cents"], 3000)
+        before = ledger.rollup()
+        self.assertEqual(before["currencies"]["USD"]["validated_cents"], 3000)
         ledger.reject(finding.finding_id, "reviewer-1", "Source was superseded")
-        after = ledger.rollup()["totals"]
-        self.assertEqual(after["discovered_cents"], 3000)
-        self.assertEqual(after["potential_cents"], 0)
-        self.assertEqual(after["validated_cents"], 0)
-        self.assertEqual(after["rejected_cases"], 1)
+        after = ledger.rollup()
+        self.assertEqual(after["currencies"]["USD"]["discovered_cents"], 3000)
+        self.assertEqual(after["currencies"]["USD"]["potential_cents"], 0)
+        self.assertEqual(after["currencies"]["USD"]["validated_cents"], 0)
+        self.assertEqual(after["totals"]["rejected_cases"], 1)
 
     def test_rejected_or_recovered_case_cannot_reenter_authorization(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
@@ -325,6 +364,26 @@ class RecoveryWorksTests(unittest.TestCase):
                 branch=Branch.UTILITY, client_id="c", counterparty_id="u",
                 reference="b", currency="USD", expected_cents=1, actual_cents=2,
                 rule=rule(), evidence=(evidence(),), reason="x", confidence_basis="x",
+            ),))
+
+    def test_recovery_scan_rejects_source_hash_registered_only_to_other_branch(self):
+        manifest = freeze_scan(
+            scan_id="scan-cross-branch",
+            client_id="c",
+            branches=(Branch.AP, Branch.FREIGHT),
+            selection_rule="two-branch supplied period",
+            sources=(
+                SourceManifestEntry("f-rule", Branch.FREIGHT, "rulehash", "freight://rule", "governing_rule"),
+                SourceManifestEntry("f-ev", Branch.FREIGHT, "abc123", "freight://invoice", "evidence"),
+                SourceManifestEntry("a-input", Branch.AP, "ap-only", "ap://payments", "payment_export"),
+            ),
+        )
+        with self.assertRaisesRegex(ValueError, "frozen branch manifest"):
+            run_scan(manifest, (RecoveryObservation(
+                branch=Branch.AP, client_id="c", counterparty_id="vendor",
+                reference="ap-cross-branch", currency="USD", expected_cents=10000,
+                actual_cents=12000, rule=rule(), evidence=(evidence(),),
+                reason="DUPLICATE_PAYMENT", confidence_basis="cross-branch proof attempt",
             ),))
 
     def test_recovery_scan_rejects_out_of_manifest_rule_or_evidence(self):
