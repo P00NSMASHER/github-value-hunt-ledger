@@ -248,8 +248,8 @@ def audit_contract_billing(
     usage: Iterable[UsageRecord] = (),
     currency: str = "USD",
 ) -> ContractBillingBatch:
-    if branch not in {Branch.SAAS, Branch.TELECOM, Branch.LEASE}:
-        raise ValueError("contract billing engine only supports SaaS/telecom/lease branches")
+    if branch not in {Branch.SAAS, Branch.TELECOM, Branch.LEASE, Branch.PROCUREMENT}:
+        raise ValueError("contract billing engine only supports SaaS/telecom/lease/procurement branches")
     client_id = _required("client_id", client_id)
     currency = _required("currency", currency).upper()
 
