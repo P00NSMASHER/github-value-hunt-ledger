@@ -3,6 +3,7 @@ import json,re,hashlib
 from collections import defaultdict
 from pathlib import Path
 from ti_common import INTEL, ROOT, load_jsonl
+from ti_work_identity import versioned_work_item_id
 from ti_search_actions import (experiment_status, parse_capability_ids, experiment_action,
                                capability_stops, action_errors)
 
@@ -14,6 +15,18 @@ SEEDS=load_jsonl("search_seeds.jsonl")
 ADJ=load_jsonl("adjacency_queue.jsonl")
 MEASURE=json.loads((INTEL/"measurement_plan.json").read_text(encoding="utf-8")) if (INTEL/"measurement_plan.json").exists() else {}
 RUNS=[r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective","benchmark"}]
+EXECUTION_HISTORY=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
+STALE_TERMINAL_WORK_ITEMS={
+    row.get("work_item_id")
+    for row in EXECUTION_HISTORY
+    if (
+        row.get("status")=="FAILED_TERMINAL"
+        and row.get("retryable") is False
+        and row.get("failure_code")=="STALE_ASSIGNMENT"
+        and isinstance(row.get("work_item_id"),str)
+        and row.get("work_item_id")
+    )
+}
 
 strategy_alloc={x["strategy_id"]:float(x.get("allocation") or 0) for x in POLICY.get("strategy_allocation",[])}
 
@@ -80,6 +93,18 @@ def experiment_status_boost(exp_ids):
 
 def work_id(prefix,value):
     return "WORK:"+prefix+":"+hashlib.sha256(value.encode()).hexdigest()[:12]
+
+def experiment_plan_payload(e):
+    return {
+      "status":e.get("status"),
+      "execution_scope":e.get("execution_scope"),
+      "work_action":experiment_action(e.get("capability_ids") or []),
+      "capability_ids":e.get("capability_ids") or [],
+      "hypothesis":e.get("hypothesis"),
+      "next_action":e.get("next_action"),
+      "success":e.get("success"),
+      "failure":e.get("failure")
+    }
 
 candidates=[]
 
@@ -181,10 +206,23 @@ for e in EXPERIMENTS:
     base=CFG["scoring"]["running_experiment_base"] if e["status"]=="RUNNING" else CFG["scoring"]["ready_experiment_base"]
     pb=priority_boost(e.get("priority_label"))
     score=round(base+pb-max(0,e["order"]-1)*0.25,2)
+    plan_payload=experiment_plan_payload(e)
+    experiment_work_item_id,experiment_work_revision=versioned_work_item_id(
+      "experiment",e["experiment_id"],plan_payload
+    )
+    verification_payload={
+      **plan_payload,
+      "verification_mode":"experiment_falsification"
+    }
+    verification_work_item_id,verification_work_revision=versioned_work_item_id(
+      "verify","VERIFY:"+e["experiment_id"],verification_payload
+    )
     candidates.append({
-      "work_item_id":work_id("experiment",e["experiment_id"]),
+      "work_item_id":experiment_work_item_id,
+      "work_revision_sha256":experiment_work_revision,
+      "work_identity_payload":plan_payload,
       "work_kind":"experiment_execution",
-      "work_action":experiment_action(e["capability_ids"]),
+      "work_action":plan_payload["work_action"],
       "source_id":e["experiment_id"],
       "title":e["experiment_id"]+" — "+e["name"],
       "final_score":score,
@@ -196,7 +234,7 @@ for e in EXPERIMENTS:
       "coverage_gap_ids":[],
       "adjacency_root":None,
       "instructions":{
-        "work_action":experiment_action(e["capability_ids"]),
+        "work_action":plan_payload["work_action"],
         "execution_scope":e["execution_scope"],
         "why_now":"Experiment is "+e["status"]+" and should be executed/falsified before searching for redundant components.",
         "next_action":e.get("next_action"),
@@ -210,9 +248,11 @@ for e in EXPERIMENTS:
     # Separate independent verifier candidate so red-team capacity is explicit.
     vbase=CFG["scoring"]["verification_base"]+(4 if e["status"]=="RUNNING" else 0)+pb
     candidates.append({
-      "work_item_id":work_id("verify",e["experiment_id"]),
+      "work_item_id":verification_work_item_id,
+      "work_revision_sha256":verification_work_revision,
+      "work_identity_payload":verification_payload,
       "work_kind":"independent_verification",
-      "work_action":experiment_action(e["capability_ids"]),
+      "work_action":plan_payload["work_action"],
       "source_id":"VERIFY:"+e["experiment_id"],
       "title":"Independent verification — "+e["experiment_id"],
       "final_score":round(vbase-max(0,e["order"]-1)*0.2,2),
@@ -224,7 +264,7 @@ for e in EXPERIMENTS:
       "coverage_gap_ids":[],
       "adjacency_root":None,
       "instructions":{
-        "work_action":experiment_action(e["capability_ids"]),
+        "work_action":plan_payload["work_action"],
         "next_action":e.get("next_action"),
         "acceptance_target":e.get("success") or e.get("next_action"),
         "execution_scope":e["execution_scope"],
@@ -244,8 +284,22 @@ if not any(c.get("work_kind")=="independent_verification" for c in candidates):
     seed_pool=sorted(seed_pool,key=lambda s:(-(float(s.get("priority") or 0)),s.get("seed_id") or ""))
     if seed_pool:
         s=seed_pool[0]
+        fallback_verification_payload={
+          "work_action":"search",
+          "strategy_id":s.get("strategy_id"),
+          "search_objective_id":s.get("search_objective_id"),
+          "query_recipe_id":s.get("query_recipe_id"),
+          "query_anchors":s.get("query_anchors") or [],
+          "acceptance_target":"A falsifiable claim plus an independent comparator plan; no pre-discovery hypothesis is independently VERIFIED.",
+          "stop_conditions":(s.get("stop_conditions") or [])+["Do not duplicate the discovery agent's inspection path.","Preserve disagreement and uncertainty rather than forcing a PASS."]
+        }
+        fallback_work_item_id,fallback_work_revision=versioned_work_item_id(
+          "verify-seed","VERIFY:"+s["seed_id"],fallback_verification_payload
+        )
         candidates.append({
-          "work_item_id":work_id("verify-seed",s["seed_id"]),
+          "work_item_id":fallback_work_item_id,
+          "work_revision_sha256":fallback_work_revision,
+          "work_identity_payload":fallback_verification_payload,
           "work_kind":"independent_verification",
           "work_action":"search",
           "query_recipe_id":None,
@@ -297,6 +351,18 @@ candidates.append({
   }
 })
 
+# Exact semantic versions that already terminally failed as stale are not
+# eligible again. Revised plans receive different versioned work_item_ids.
+suppressed_stale_work_items=sorted(
+  c["work_item_id"]
+  for c in candidates
+  if c.get("work_item_id") in STALE_TERMINAL_WORK_ITEMS
+)
+candidates=[
+  c for c in candidates
+  if c.get("work_item_id") not in STALE_TERMINAL_WORK_ITEMS
+]
+
 # Stable generation fingerprint.
 fingerprint=json.dumps({
  "policy":POLICY,
@@ -304,6 +370,7 @@ fingerprint=json.dumps({
  "adj_ids":[(x.get("adjacency_id"),x.get("priority")) for x in ADJ],
  "experiments":EXPERIMENTS,
  "candidate_instructions":[(x["work_item_id"],x.get("work_action"),x["instructions"]) for x in candidates],
+ "suppressed_stale_work_items":suppressed_stale_work_items,
  "allocator_policy":CFG
 },sort_keys=True,default=str)
 gen_hash=hashlib.sha256(fingerprint.encode()).hexdigest()[:12]
@@ -369,6 +436,8 @@ for slot in slots:
       "slot_role":slot["role"],
       "slot_label":slot["label"],
       "work_item_id":c["work_item_id"],
+      "work_revision_sha256":c.get("work_revision_sha256"),
+      "work_identity_payload":c.get("work_identity_payload"),
       "work_kind":c["work_kind"],
       "work_action":c.get("work_action","search"),
       "query_recipe_id":c.get("query_recipe_id"),
@@ -416,6 +485,8 @@ metrics={
  "work_kind_counts":dict(kind_counts),
  "slot_role_counts":dict(role_counts),
  "awaiting_external_seed_count":sum(s.get("work_action")=="await_external" for s in SEEDS),
+ "suppressed_stale_work_item_count":len(suppressed_stale_work_items),
+ "suppressed_stale_work_items":suppressed_stale_work_items,
  "work_action_counts":{action:sum(a["work_action"]==action for a in assignments) for action in sorted({a["work_action"] for a in assignments})},
  "max_capability_concentration":max(cap_counts.values()) if cap_counts else 0,
  "max_experiment_concentration":max(exp_counts.values()) if exp_counts else 0,
@@ -465,7 +536,10 @@ rep=["# HUNT ALLOCATOR REPORT","",f"- Generation: **{generation_id}**",
      "## Portfolio mix","",
      "| Work kind | Slots |","|---|---:|"]
 for k,v in sorted(kind_counts.items()): rep.append(f"| {k} | {v} |")
-rep += ["","## Concentration controls","",
+rep += ["","## Stale-work suppression","",
+        f"- Terminal stale semantic work versions suppressed: **{len(suppressed_stale_work_items)}**",
+        f"- Suppressed work IDs: {', '.join(suppressed_stale_work_items) or 'none'}",
+        "","## Concentration controls","",
         f"- Maximum assignments on one capability: **{metrics['max_capability_concentration']}** / allowed {cons['max_assignments_per_capability']}",
         f"- Maximum assignments on one experiment: **{metrics['max_experiment_concentration']}** / allowed {cons['max_assignments_per_experiment']}",
         f"- Maximum assignments using one strategy: **{metrics['max_strategy_concentration']}** / allowed {cons['max_assignments_per_strategy']}",
