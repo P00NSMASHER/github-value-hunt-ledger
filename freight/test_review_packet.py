@@ -94,3 +94,44 @@ def test_markdown_is_human_readable_and_does_not_call_variance_savings():
     assert "verified controlling" in text
     assert "No applicable rule proof was established" in text
     assert "realized savings:**" not in text
+
+
+def test_packet_rejects_rehashed_outer_evidence_with_inconsistent_calculation():
+    batch, _queue, charges, rules = setup()
+    tampered = replace(
+        batch.derivations[0],
+        expected_cents=0,
+        variance_cents=batch.derivations[0].billed_cents,
+    )
+    tampered_batch = replace(
+        batch,
+        derivations=(tampered,) + batch.derivations[1:],
+    )
+    tampered_queue = build_review_queue(tampered_batch)
+    with pytest.raises(ValueError, match="canonical charge/rule calculation"):
+        build_review_packet(tampered_batch, tampered_queue, charges, rules)
+
+
+def test_review_packet_renders_large_integer_cents_exactly():
+    pop = freeze_population(
+        "buyer", "unit", "large",
+        [PopulationRow("big", "s", "customer", "carrier", "USD", "p")],
+    )
+    big = 2**63 - 1
+    charges = (
+        InvoiceCharge(
+            "buyer", "unit", "big", "s", "customer", "carrier", "USD",
+            "big-charge", "DETENTION", "2026-09-10", 1, big, "big-source",
+        ),
+    )
+    rules = (
+        ChargeRule(
+            "buyer", "unit", "customer", "carrier", "USD", "rate",
+            "DETENTION", FIXED, "2026-09-01", "2026-09-30",
+            "r"*64, True, 100, None,
+        ),
+    )
+    batch = derive_batch(pop, charges, rules)
+    packet = build_review_packet(batch, build_review_queue(batch), charges, rules)
+    text = render_review_packet_markdown(packet)
+    assert "USD 92,233,720,368,547,758.07" in text
