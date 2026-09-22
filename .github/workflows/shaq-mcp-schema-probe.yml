@@ -1,0 +1,38 @@
+name: SHAQ MCP Schema Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - production/fmc_tariff_ledger/SHAQ_PROBE_NOW
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: production/fmc_tariff_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/fmc_tariff_ledger/requirements-shaq.txt
+      - run: python -m pip install -r requirements-shaq.txt
+      - name: Discover MCP schema without calling tools
+        env:
+          SHAQ_MCP_URL: https://search.shaq-logistics.com/sse
+          SHAQ_PROBE_OUTPUT: shaq_mcp_schema.json
+        run: python probe_shaq_mcp.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shaq-mcp-schema
+          path: production/fmc_tariff_ledger/shaq_mcp_schema.json
+          retention-days: 30
+          if-no-files-found: error
