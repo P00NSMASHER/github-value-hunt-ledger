@@ -1,0 +1,38 @@
+name: FMC Tariff Ledger Quality
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - production/fmc_tariff_ledger/**
+      - .github/workflows/fmc-tariff-quality.yml
+      - .github/workflows/fmc-tariff-ledger.yml
+      - .github/workflows/fmc-tariff-recover-merge.yml
+  pull_request:
+    paths:
+      - production/fmc_tariff_ledger/**
+      - .github/workflows/fmc-tariff-quality.yml
+      - .github/workflows/fmc-tariff-ledger.yml
+      - .github/workflows/fmc-tariff-recover-merge.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/fmc_tariff_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/fmc_tariff_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest discover -v -p 'test_*.py'
+      - name: Compile production modules
+        run: |
+          python -m py_compile             crawler.py crawler_v2.py currency_terms.py             publisher_adapters.py revalidate.py run.py
