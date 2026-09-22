@@ -12,6 +12,11 @@ RUNS = [x for x in load_jsonl("search_runs.jsonl") if is_discovery_run(x)]
 OBJECTIVES_CFG = json.loads((INTEL / "search_objectives.json").read_text(encoding="utf-8"))
 OBJECTIVE_IDS = {x["search_objective_id"] for x in OBJECTIVES_CFG.get("objectives", [])}
 COVERAGE_GAPS = load_jsonl("exploration_gap_queue.jsonl") if (INTEL / "exploration_gap_queue.jsonl").exists() else []
+LEARNING_CURRICULUM = (
+    json.loads((INTEL / "learning_curriculum.json").read_text(encoding="utf-8"))
+    if (INTEL / "learning_curriculum.json").exists()
+    else {}
+)
 
 SATURATION_BY_CAP = {
     x["label"]: x for x in load_jsonl("research_neighborhoods.jsonl")
@@ -298,15 +303,49 @@ for i,cg in enumerate(COVERAGE_GAPS[:5]):
       "performance":perf[seed_id]
     })
 
-zero=[x for x in POLICY.get("strategy_allocation",[]) if int(x.get("runs") or 0)==0]
-for i,row in enumerate(zero[:3]):
+measurement_recs=list(LEARNING_CURRICULUM.get("recommended_measurements") or [])
+if not measurement_recs:
+    # Backward-compatible fallback if the curriculum has not been generated.
+    zero=[x for x in POLICY.get("strategy_allocation",[]) if int(x.get("runs") or 0)==0]
+    measurement_recs=[
+      {
+        "strategy_id":row["strategy_id"],
+        "phase":"train_measurement",
+        "measurement_priority":60.0,
+        "selection_reason":"legacy_zero_run_fallback",
+        "train":{"runs":0,"deep_inspections":0,"runs_needed":5,"deep_inspections_needed":20},
+        "confirm":{"runs":0,"deep_inspections":0,"runs_needed":2,"deep_inspections_needed":6},
+      }
+      for row in zero[:3]
+    ]
+
+for i,row in enumerate(measurement_recs[:3]):
     if not gaps:
         break
+    sid=row.get("strategy_id")
+    if sid not in STRATS or STRATS[sid].get("status")!="active":
+        continue
     g=gaps[i % len(gaps)]
     target=g["capability_ids"][0] if g["capability_ids"] else g["query_recipe_id"]
-    sid=row["strategy_id"]
+    phase=row.get("phase") or "train_measurement"
     seed_id="SEED:measure:"+slug(sid.replace("STRAT:",""))+"-"+slug(target)
-    priority=max(1,min(82,58+round(100*float(row.get("allocation") or 0))+perf_adjust(seed_id)))
+    evidence_priority=float(row.get("measurement_priority") or 60.0)
+    priority=max(1,min(82,58+round(.24*evidence_priority)))
+    train=row.get("train") or {}
+    confirm=row.get("confirm") or {}
+    if phase=="confirm_measurement":
+        why=(
+          f"{sid} has cleared the train evidence gate but still lacks independent confirm evidence. "
+          f"Run the named strategy on a real authorized gap; the centrally generated assignment "
+          f"will determine train/confirm membership without worker selection."
+        )
+    else:
+        why=(
+          f"{sid} is among the closest strategies to its learning evidence gate: "
+          f"{train.get('runs',0)} train runs / {train.get('deep_inspections',0)} deep inspections, "
+          f"with {train.get('runs_needed',0)} runs and {train.get('deep_inspections_needed',0)} deep inspections still needed. "
+          f"Pair it with {target} so measurement also searches a real gap."
+        )
     seeds.append({
       "seed_id":seed_id,
       "seed_type":"strategy_measurement",
@@ -318,13 +357,21 @@ for i,row in enumerate(zero[:3]):
       "capability_ids":g["capability_ids"],
       "experiment_ids":g["experiment_ids"],
       "source_nodes":[sid]+g.get("source_nodes",[]),
-      "why_now":f"{sid} has no measured runs but receives exploration allocation. Pair it with {target} so the hunt searches a real gap and reduces strategy measurement debt.",
+      "why_now":why,
+      "learning_evidence_phase":phase,
+      "learning_selection_reason":row.get("selection_reason"),
+      "train_evidence":train,
+      "confirm_evidence":confirm,
       "required_signatures":g["required_signatures"],
       "query_templates":g["query_templates"],
       "search_surfaces":g["search_surfaces"],
-      "verification_gate":g["verification_gate"]+" Use the named strategy consistently enough to make the run comparable.",
-      "stop_conditions":g["stop_conditions"]+["Do not turn a measurement run into an unrestricted domain sweep.","A no-find result is valid data; do one recall-rescue pass, then stop."],
-      "authorization_basis":"strategy_measurement_debt",
+      "verification_gate":g["verification_gate"]+" Use the named strategy consistently enough to make the run comparable. Do not calculate or expose the assignment's train/confirm partition before or during execution.",
+      "stop_conditions":g["stop_conditions"]+[
+        "Do not turn a measurement run into an unrestricted domain sweep.",
+        "A no-find result is valid data; do one recall-rescue pass, then stop.",
+        "Never select, release, retry, reroute, or otherwise alter this work based on train/confirm membership. The assignment identity fixes the partition and partition targeting invalidates the measurement."
+      ],
+      "authorization_basis":"learning_evidence_measurement_debt",
       "exclude_domains":g.get("exclude_domains",[]),
       "performance":perf[seed_id]
     })
