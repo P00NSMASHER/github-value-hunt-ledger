@@ -633,3 +633,105 @@ def test_atomic_package_rechecks_reviewed_settlement_after_counter_restores_capa
     assert out.counter_outcomes[0].decision.status==REVERSED
     assert s.realized_cents()==50000
     assert s.event_residual("new")==0
+
+
+def test_full_return_reserves_event_capacity_before_any_allocation(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C(amt=8000))
+    s.ingest_event(E(amt=10000))
+    s.ingest_counter(R(amt=10000))
+    assert s.event_residual("e1") == 0
+    with pytest.raises(ValueError, match="settlement event capacity exceeded"):
+        s.review_allocate(
+            allocation_id="late-a",
+            claim_id="c1",
+            event_id="e1",
+            amount_cents=8000,
+            created_at="2026-09-04T10:00:00Z",
+        )
+    assert s.realized_cents() == 0
+    assert s.fee_eligible_cents() == 0
+
+
+def test_full_return_after_partial_allocation_leaves_no_reusable_event_capacity(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C(amt=8000))
+    s.ingest_event(E(amt=10000))
+    s.review_allocate(
+        allocation_id="a1",
+        claim_id="c1",
+        event_id="e1",
+        amount_cents=8000,
+        created_at="2026-09-02T11:00:00Z",
+    )
+    s.ingest_counter(R(amt=10000))
+    assert s.auto_apply_counter(
+        "r1", created_at="2026-09-03T11:00:00Z"
+    ).status == REVERSED
+    assert s.realized_cents() == 0
+    assert s.event_residual("e1") == 0
+
+
+def test_allocation_created_after_known_return_uses_only_net_event_capacity_and_is_not_reversed_twice(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C(amt=5000))
+    s.ingest_event(E(amt=10000))
+    s.ingest_counter(R(amt=5000))
+    assert s.event_residual("e1") == 5000
+    assert s.review_allocate(
+        allocation_id="net-a",
+        claim_id="c1",
+        event_id="e1",
+        amount_cents=5000,
+        created_at="2026-09-04T10:00:00Z",
+    ) == ALLOCATED
+    assert s.event_residual("e1") == 0
+    assert s.auto_apply_counter(
+        "r1", created_at="2026-09-04T11:00:00Z"
+    ).status == REVIEW
+    with pytest.raises(ValueError, match="counter predates allocation"):
+        s.review_reverse(
+            reversal_id="double-return",
+            counter_id="r1",
+            allocation_id="net-a",
+            amount_cents=5000,
+            created_at="2026-09-04T11:00:00Z",
+        )
+    assert s.realized_cents() == 5000
+
+
+def test_total_counter_evidence_cannot_exceed_original_settlement(tmp_path):
+    s=S(tmp_path)
+    s.ingest_event(E(amt=10000))
+    s.ingest_counter(R(rid="r1", amt=6000))
+    with pytest.raises(ValueError, match="exceed original settlement capacity"):
+        s.ingest_counter(R(rid="r2", amt=5000))
+
+
+def test_sql_allocation_capacity_reserves_unapplied_return_amount(tmp_path):
+    s=S(tmp_path)
+    s.create_claim(C(amt=8000))
+    s.ingest_event(E(amt=10000))
+    s.ingest_counter(R(amt=10000))
+    conn=sqlite3.connect(s.path)
+    conn.execute("PRAGMA foreign_keys=ON")
+    with pytest.raises(sqlite3.IntegrityError, match="settlement event capacity exceeded"):
+        conn.execute("""INSERT INTO allocations
+          (buyer_id,business_unit,allocation_id,claim_id,event_id,amount_cents,mode,fee_eligible_cents,created_at)
+          VALUES('TEST_BUYER','TEST_BU','sql-late','c1','e1',8000,'REVIEW',8000,'2026-09-04T10:00:00Z')""")
+    conn.close()
+
+
+def test_sql_counter_capacity_cannot_exceed_original_settlement(tmp_path):
+    s=S(tmp_path)
+    s.ingest_event(E(amt=10000))
+    conn=sqlite3.connect(s.path)
+    conn.execute("PRAGMA foreign_keys=ON")
+    conn.execute("""INSERT INTO counter_events
+      (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
+      VALUES('TEST_BUYER','TEST_BU','sql-r1','e1','USD',6000,'2026-09-03T10:00:00Z','sql-r1-src','RETURN')""")
+    with pytest.raises(sqlite3.IntegrityError, match="exceed original settlement capacity"):
+        conn.execute("""INSERT INTO counter_events
+          (buyer_id,business_unit,counter_id,original_event_id,currency,amount_cents,observed_at,source_hash,source_kind)
+          VALUES('TEST_BUYER','TEST_BU','sql-r2','e1','USD',5000,'2026-09-03T11:00:00Z','sql-r2-src','RETURN')""")
+    conn.close()
