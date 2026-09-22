@@ -223,6 +223,19 @@ class TrainingEnvironmentTests(unittest.TestCase):
             "excluded",
         )
 
+    def test_pending_partition_blocks_direct_outcome_credit(self):
+        run = search_run("RUN:pending-credit")
+        edges, excluded = build_outcome_credit(
+            [run],
+            [outcome(["RUN:pending-credit"])],
+            split_receipts={},
+        )
+        self.assertEqual(edges, [])
+        self.assertEqual(
+            excluded[0]["reason"],
+            "pending_direct_origin_partition",
+        )
+
     def test_credit_conserves_and_reserves_direct_origin_budget(self):
         config = TrainingEnvironmentConfig(
             confirm_modulus=2,
