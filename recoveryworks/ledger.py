@@ -19,6 +19,7 @@ class LedgerRecord:
     authorization_id: str | None = None
     claim_evidence: EvidenceRef | None = None
     recovery_evidence: EvidenceRef | None = None
+    settlement_total_cents: int | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
     updated_at: str | None = None
@@ -43,7 +44,20 @@ class LedgerRecord:
                 raise ValueError("recovered records require positive recovered cents")
             if self.recovery_evidence is None or not self.recovery_evidence.verified:
                 raise ValueError("recovered records require verified recovery evidence")
-        elif self.recovered_cents or self.fee_cents or self.recovery_evidence is not None:
+            if (
+                type(self.settlement_total_cents) is not int
+                or self.settlement_total_cents <= 0
+                or self.settlement_total_cents < self.recovered_cents
+            ):
+                raise ValueError(
+                    "recovered records require settlement_total_cents >= recovered_cents"
+                )
+        elif (
+            self.recovered_cents
+            or self.fee_cents
+            or self.recovery_evidence is not None
+            or self.settlement_total_cents is not None
+        ):
             raise ValueError("recovery amounts/evidence require RECOVERED state")
 
     @property
@@ -235,14 +249,22 @@ class RecoveryLedger:
         fee_cents: int = 0,
         *,
         recovery_evidence: EvidenceRef,
+        settlement_total_cents: int | None = None,
     ) -> LedgerRecord:
         if not isinstance(recovery_evidence, EvidenceRef) or not recovery_evidence.verified:
             raise ValueError("recovery requires verified settlement/payment evidence")
         record = self.get(finding_id)
+        settlement_total = (
+            recovered_cents if settlement_total_cents is None else settlement_total_cents
+        )
+        if type(settlement_total) is not int or settlement_total <= 0:
+            raise ValueError("settlement_total_cents must be positive integer cents")
+
         if record.case_state is CaseState.RECOVERED:
             if (
                 record.recovered_cents == recovered_cents
                 and record.fee_cents == fee_cents
+                and record.settlement_total_cents == settlement_total
                 and record.recovery_evidence is not None
                 and record.recovery_evidence.proof_hash == recovery_evidence.proof_hash
             ):
@@ -256,10 +278,32 @@ class RecoveryLedger:
             raise ValueError("fee_cents must be between zero and recovered_cents")
         if recovered_cents > record.finding.potential_recovery_cents:
             raise ValueError("recovered amount cannot exceed validated potential recovery")
+
+        allocated_so_far = 0
+        for other in self._records.values():
+            if (
+                other.recovery_evidence is None
+                or other.recovery_evidence.proof_hash != recovery_evidence.proof_hash
+            ):
+                continue
+            if other.finding.finding_id == finding_id:
+                continue
+            if other.finding.client_id != record.finding.client_id:
+                raise ValueError("settlement evidence cannot cross client boundaries")
+            if other.finding.currency != record.finding.currency:
+                raise ValueError("settlement evidence cannot cross currency boundaries")
+            if other.settlement_total_cents != settlement_total:
+                raise ValueError("settlement total conflicts with an existing allocation")
+            allocated_so_far += other.recovered_cents
+
+        if allocated_so_far + recovered_cents > settlement_total:
+            raise ValueError("settlement allocations exceed verified settlement total")
+
         updated = replace(
             record,
             case_state=CaseState.RECOVERED,
             recovery_evidence=recovery_evidence,
+            settlement_total_cents=settlement_total,
             recovered_cents=recovered_cents,
             fee_cents=fee_cents,
             updated_at=self._now(),
@@ -272,6 +316,7 @@ class RecoveryLedger:
             metadata={
                 "recovered_cents": recovered_cents,
                 "fee_cents": fee_cents,
+                "settlement_total_cents": settlement_total,
                 "evidence_id": recovery_evidence.evidence_id,
                 "evidence_proof_hash": recovery_evidence.proof_hash,
                 "source_hash": recovery_evidence.source_hash,
