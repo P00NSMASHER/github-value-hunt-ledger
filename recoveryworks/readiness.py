@@ -754,7 +754,6 @@ def build_seven_figure_readiness(
     external_timestamp: ExternalTimestampEvidence,
     object_lock_receipts: Iterable[ObjectLockVerificationReceipt],
     *,
-    hostile_packet: HostileExaminationPacket,
     artifact_replay: CaseArtifactReplayReceipt,
     calculation_replay: CalculationReplayReceipt,
     proof_seal: ProofSeal,
@@ -768,22 +767,20 @@ def build_seven_figure_readiness(
     if bundle.finding.potential_recovery_cents < SEVEN_FIGURE_CENTS:
         raise ValueError("seven-figure readiness gate only applies to seven-figure findings")
 
-    if hostile_packet_hash(packet) != hostile_packet_hash(hostile_packet):
-        raise ValueError("hostile packet argument mismatch")
     verify_case_artifact_replay(artifact_replay, bundle)
     verify_calculation_replay(calculation_replay, bundle, artifact_replay)
-    if hostile_packet.artifact_replay_receipt_hash != artifact_replay.receipt_hash:
+    if packet.artifact_replay_receipt_hash != artifact_replay.receipt_hash:
         raise ValueError("hostile packet artifact replay receipt mismatch")
     if (
-        hostile_packet.calculation_replay_receipt_hash
+        packet.calculation_replay_receipt_hash
         != calculation_replay.receipt_hash
     ):
         raise ValueError("hostile packet calculation replay receipt mismatch")
-    if hostile_packet.proof_seal_id != proof_seal.seal_id:
+    if packet.proof_seal_id != proof_seal.seal_id:
         raise ValueError("hostile packet proof seal id mismatch")
-    if hostile_packet.proof_seal_signature_hex != proof_seal.signature_hex:
+    if packet.proof_seal_signature_hex != proof_seal.signature_hex:
         raise ValueError("hostile packet proof seal signature mismatch")
-    if hostile_packet.journal_head_hash != journal_head_hash:
+    if packet.journal_head_hash != journal_head_hash:
         raise ValueError("hostile packet journal head mismatch")
     if proof_seal.case_bundle_hash != bundle.bundle_hash:
         raise ValueError("proof seal case bundle mismatch")
@@ -793,7 +790,7 @@ def build_seven_figure_readiness(
         raise ValueError("proof seal journal head mismatch")
     verify_hostile_packet_provider_evidence(
         hostile_packet_verification,
-        hostile_packet,
+        packet,
         proof_seal,
     )
 
@@ -846,7 +843,7 @@ def build_seven_figure_readiness(
             calculation_replay.reproduced_at,
         ),
         _dt("proof_seal.sealed_at", proof_seal.sealed_at),
-        _dt("hostile_packet.assembled_at", hostile_packet.assembled_at),
+        _dt("hostile_packet.assembled_at", packet.assembled_at),
         _dt("signature.verified_at", external_signature.verified_at),
         _dt("timestamp.verified_at", external_timestamp.verified_at),
         *(
@@ -869,7 +866,7 @@ def build_seven_figure_readiness(
         "build_attestation_hash": build.attestation_hash,
         "public_record_hash": public_record.record_hash,
         "journal_head_hash": _required("journal_head_hash", journal_head_hash),
-        "hostile_packet": asdict(hostile_packet),
+        "hostile_packet": asdict(packet),
         "artifact_replay": asdict(artifact_replay),
         "calculation_replay": asdict(calculation_replay),
         "proof_seal": asdict(proof_seal),
@@ -891,7 +888,7 @@ def build_seven_figure_readiness(
         build_attestation_hash=build.attestation_hash,
         public_record_hash=public_record.record_hash,
         journal_head_hash=journal_head_hash,
-        hostile_packet=hostile_packet,
+        hostile_packet=packet,
         artifact_replay=artifact_replay,
         calculation_replay=calculation_replay,
         proof_seal=proof_seal,
@@ -927,6 +924,45 @@ def verify_seven_figure_readiness(
         if package.journal_head_hash != expected_journal_head_hash:
             raise ValueError("readiness package journal head is stale")
 
+    if package.hostile_packet_hash != hostile_packet_hash(package.hostile_packet):
+        raise ValueError("readiness hostile packet hash mismatch")
+    verify_case_artifact_replay(package.artifact_replay, bundle)
+    verify_calculation_replay(
+        package.calculation_replay,
+        bundle,
+        package.artifact_replay,
+    )
+    if (
+        package.hostile_packet.artifact_replay_receipt_hash
+        != package.artifact_replay.receipt_hash
+    ):
+        raise ValueError("readiness hostile packet artifact replay mismatch")
+    if (
+        package.hostile_packet.calculation_replay_receipt_hash
+        != package.calculation_replay.receipt_hash
+    ):
+        raise ValueError("readiness hostile packet calculation replay mismatch")
+    if package.hostile_packet.proof_seal_id != package.proof_seal.seal_id:
+        raise ValueError("readiness hostile packet proof seal id mismatch")
+    if (
+        package.hostile_packet.proof_seal_signature_hex
+        != package.proof_seal.signature_hex
+    ):
+        raise ValueError("readiness hostile packet proof seal signature mismatch")
+    if package.hostile_packet.journal_head_hash != package.journal_head_hash:
+        raise ValueError("readiness hostile packet journal head mismatch")
+    if package.proof_seal.case_bundle_hash != bundle.bundle_hash:
+        raise ValueError("readiness proof seal case bundle mismatch")
+    if package.proof_seal.finding_proof_hash != bundle.finding.proof_hash:
+        raise ValueError("readiness proof seal finding mismatch")
+    if package.proof_seal.journal_head_hash != package.journal_head_hash:
+        raise ValueError("readiness proof seal journal head mismatch")
+    verify_hostile_packet_provider_evidence(
+        package.hostile_packet_verification,
+        package.hostile_packet,
+        package.proof_seal,
+    )
+
     verify_external_signature_evidence(
         package.external_signature,
         expected_payload_hash=package.public_record_hash,
@@ -956,6 +992,17 @@ def verify_seven_figure_readiness(
         raise ValueError("readiness object-lock source set/hash mismatch")
 
     latest_component = max(
+        _dt(
+            "hostile_packet_verification.verified_at",
+            package.hostile_packet_verification.verified_at,
+        ),
+        _dt("artifact_replay.replayed_at", package.artifact_replay.replayed_at),
+        _dt(
+            "calculation_replay.reproduced_at",
+            package.calculation_replay.reproduced_at,
+        ),
+        _dt("proof_seal.sealed_at", package.proof_seal.sealed_at),
+        _dt("hostile_packet.assembled_at", package.hostile_packet.assembled_at),
         _dt("signature.verified_at", package.external_signature.verified_at),
         _dt("timestamp.verified_at", package.external_timestamp.verified_at),
         *(
@@ -982,6 +1029,26 @@ def readiness_from_payload(payload: Mapping[str, Any]) -> SevenFigureReadinessPa
         ObjectLockVerificationReceipt(**dict(item))
         for item in payload.get("object_lock_receipts", [])
     )
+    hostile_packet = HostileExaminationPacket(**dict(payload["hostile_packet"]))
+    artifact_raw = dict(payload["artifact_replay"])
+    artifact_replay = CaseArtifactReplayReceipt(
+        case_bundle_hash=artifact_raw["case_bundle_hash"],
+        finding_proof_hash=artifact_raw["finding_proof_hash"],
+        replayed_at=artifact_raw["replayed_at"],
+        replayed_by=artifact_raw["replayed_by"],
+        entries=tuple(
+            ArtifactReplayEntry(**dict(item))
+            for item in artifact_raw.get("entries", [])
+        ),
+        receipt_hash=artifact_raw["receipt_hash"],
+    )
+    calculation_replay = CalculationReplayReceipt(
+        **dict(payload["calculation_replay"])
+    )
+    proof_seal = ProofSeal(**dict(payload["proof_seal"]))
+    hostile_packet_verification = HostilePacketVerificationEvidence(
+        **dict(payload["hostile_packet_verification"])
+    )
     package = SevenFigureReadinessPackage(
         gate_version=payload["gate_version"],
         case_bundle_hash=payload["case_bundle_hash"],
@@ -992,6 +1059,11 @@ def readiness_from_payload(payload: Mapping[str, Any]) -> SevenFigureReadinessPa
         build_attestation_hash=payload["build_attestation_hash"],
         public_record_hash=payload["public_record_hash"],
         journal_head_hash=payload["journal_head_hash"],
+        hostile_packet=hostile_packet,
+        artifact_replay=artifact_replay,
+        calculation_replay=calculation_replay,
+        proof_seal=proof_seal,
+        hostile_packet_verification=hostile_packet_verification,
         external_signature=signature,
         external_timestamp=timestamp,
         object_lock_receipts=receipts,
@@ -1061,6 +1133,10 @@ def _verify_dossier_components(
         bundle,
         expected_journal_head_hash=journal_head_hash,
     )
+    if hostile_packet_hash(readiness.hostile_packet) != hostile_packet_hash(
+        hostile_packet
+    ):
+        raise ValueError("authorization dossier hostile packet differs from readiness")
     verify_source_retention(retention, bundle, require_immutable=True)
     verify_case_completeness(completeness, bundle)
     verify_build_provenance(build, bundle)
