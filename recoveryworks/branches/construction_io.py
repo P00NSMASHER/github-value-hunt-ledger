@@ -281,6 +281,7 @@ def load_causation_reviews_csv(
             source_locator=f"file://{source.name}#row={row_number}",
             verified=verified,
             qualified_reviewer_id=_optional(row, "Qualified_Reviewer_ID"),
+            qualification_basis=_optional(row, "Qualification_Basis"),
             metadata={"source_file": source.name, "row_number": row_number},
         ))
     return tuple(result)
