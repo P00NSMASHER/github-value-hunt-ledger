@@ -74,11 +74,43 @@ def main() -> int:
             raise SystemExit(f"train evidence mismatch for {row.get('key')}")
         if row.get("confirm_evidence_ready") is not expected_confirm:
             raise SystemExit(f"confirm evidence mismatch for {row.get('key')}")
+        eligible = expected_train and expected_confirm
         if (
             row.get("eligible_for_policy_consideration")
-            is not (expected_train and expected_confirm)
+            is not eligible
         ):
             raise SystemExit(f"policy eligibility mismatch for {row.get('key')}")
+
+        if eligible:
+            expected_status = "confirmed"
+        elif (
+            expected_train
+            and confirm_runs >= min_confirm_runs
+            and confirm_mean < min_confirm_mean
+        ):
+            expected_status = "overfit_signal"
+        elif expected_train:
+            expected_status = "awaiting_confirm"
+        else:
+            expected_status = "gathering_evidence"
+        if row.get("generalization_status") != expected_status:
+            raise SystemExit(
+                f"generalization status mismatch for {row.get('key')}"
+            )
+
+    alerts = data.get("learning_alerts") or []
+    overfit_keys = {
+        row.get("key")
+        for row in records
+        if row.get("generalization_status") == "overfit_signal"
+    }
+    alert_keys = {
+        alert.get("memory_key")
+        for alert in alerts
+        if alert.get("type") == "overfit_signal"
+    }
+    if alert_keys != overfit_keys:
+        raise SystemExit("learning alerts do not match overfit signals")
 
     failure_queue = data.get("failure_queue") or {}
     items = failure_queue.get("items") or []
