@@ -23,9 +23,15 @@ Default columns:
 
 Amounts must be positive. Payment dates, when present, must be ISO `YYYY-MM-DD`.
 
-Duplicate `Payment_Number` values are excluded from recovery math and emitted
-as `DUPLICATE_PAYMENT_ID` exceptions. This prevents a duplicated export row
-from manufacturing a false overpayment.
+Repeated payment lines are deduplicated at the vendor + normalized invoice +
+`Payment_Number` level. This prevents a duplicated export row from manufacturing
+a false overpayment while still allowing one ACH/check number to legitimately
+settle multiple invoices.
+
+If the same vendor/invoice/payment ID repeats with identical material values, one
+line is counted and a `DUPLICATE_PAYMENT_ID` exception records the export issue.
+If those repeated lines conflict on amount/date/source attributes, none of the
+conflicting lines enter recovery math and `CONFLICTING_PAYMENT_ID` is emitted.
 
 ### Obligations / invoice CSV
 
@@ -108,6 +114,18 @@ Quantity columns are required only when the selected tariff uses them:
 - `Billed_Demand_kW`
 - `Billed_rkVA`
 - `Days_Used`
+
+Optional service-period columns:
+
+- `Service_Start`
+- `Service_End`
+
+Supply both or neither. When present, the service period—not the invoice/bill
+date—controls tariff-version selection. If a service period crosses a tariff
+effective-date boundary, the adapter fails closed with
+`SERVICE_PERIOD_SPANS_TARIFF_CHANGE` because interval usage would be required
+to allocate consumption correctly. Partial tariff coverage likewise produces
+`PARTIAL_TARIFF_COVERAGE`.
 
 Time-of-use quantities are discovered from columns beginning with
 `Billed_kWh_`. Examples:
@@ -202,8 +220,10 @@ The adapter deliberately rejects:
 
 It does not use `eval`.
 
-If no effective tariff covers a bill, or overlapping versions both cover it,
-the bill is returned as an exception rather than rated using a guess.
+If no effective tariff covers a bill, overlapping versions both cover it, or a
+service period cannot be represented by one tariff version, the bill is returned
+as an exception rather than rated using a guess. Bill-date selection is used only
+for exports that do not provide a service period.
 
 ### Scan 360 Utility config
 
