@@ -1,0 +1,3 @@
+python -m unittest discover -v -p 'test_*.py'
+python catalog.py --sources sources.json --out output --db hospital_mrf.sqlite
+python quality.py --db output/hospital_mrf.sqlite --json
