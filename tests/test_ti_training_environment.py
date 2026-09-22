@@ -30,6 +30,7 @@ def search_run(
         "work_action": "search",
         "allocation_mode": "generated",
         "routing_mode": "generated",
+        "assignment_id": f"ASSIGN:{run_id}",
         "execution_claim_id": f"CLAIM:{run_id}",
         "strategy_id": "STRAT:x",
         "query_family_id": "QF:x",
@@ -325,7 +326,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         )
         execution["work_action"] = "execute_fixture"
         anchor_split = partition_for_id(
-            execution["execution_claim_id"],
+            execution["assignment_id"],
             config=config,
         )
         support_id = None
@@ -375,6 +376,30 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 config=config,
             ),
             anchor_split,
+        )
+
+    def test_retry_changes_claim_but_not_train_confirm_partition(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=0,
+        )
+        run = search_run("RUN:retry-stable")
+        first = split_for_run(run, config=config)
+        run["execution_claim_id"] = "CLAIM:different-retry"
+        second = split_for_run(run, config=config)
+        self.assertEqual(first, second)
+        environment = build_training_environment(
+            [run],
+            [],
+            config=config,
+        )
+        basis = environment["episodes"][0]["provenance"][
+            "partition_basis"
+        ]
+        self.assertEqual(basis["source"], "assignment_id")
+        self.assertEqual(
+            basis["identifier"],
+            run["assignment_id"],
         )
 
     def test_manual_run_is_train_only_even_if_run_id_hashes_to_confirm(self):
@@ -746,7 +771,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
             if chosen is None:
                 chosen = candidate
                 expected = split
-            fake = f"CLAIM:fake:{index}"
+            fake = f"ASSIGN:fake:{index}"
             if partition_for_id(fake, config=config) != expected:
                 opposite_identifier = fake
                 break
