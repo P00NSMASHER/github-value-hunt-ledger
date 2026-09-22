@@ -212,7 +212,9 @@ def build_review_packet(
 def _money(currency: str, cents: int | None) -> str:
     if cents is None:
         return "Not established"
-    return f"{currency} {cents / 100:,.2f}"
+    sign = "-" if cents < 0 else ""
+    whole, fraction = divmod(abs(cents), 100)
+    return f"{currency} {sign}{whole:,}.{fraction:02d}"
 
 
 def render_review_packet_markdown(packet: ReviewPacket) -> str:
