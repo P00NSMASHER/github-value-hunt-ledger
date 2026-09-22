@@ -35,11 +35,17 @@ python -m recoveryworks.cli authorize /tmp/recoveryworks-ledger.json FINDING_ID 
   --authorization-id customer-auth-1
 
 # This records an action performed elsewhere; it does not submit anything.
-python -m recoveryworks.cli mark-claimed /tmp/recoveryworks-ledger.json FINDING_ID
+python -m recoveryworks.cli mark-claimed /tmp/recoveryworks-ledger.json FINDING_ID \
+  --evidence-id claim-receipt-1 \
+  --source-hash SHA256_OF_SUBMISSION_RECEIPT \
+  --locator file://path/to/submission-receipt
 
 # Record externally verified recovered cash.
 python -m recoveryworks.cli recover /tmp/recoveryworks-ledger.json FINDING_ID \
-  --recovered-cents 1000 --fee-cents 200
+  --recovered-cents 1000 --fee-cents 200 \
+  --evidence-id settlement-receipt-1 \
+  --source-hash SHA256_OF_SETTLEMENT_PROOF \
+  --locator file://path/to/settlement-proof
 ```
 
 For authenticated ledger snapshots, set `RECOVERYWORKS_LEDGER_HMAC_KEY` in the
