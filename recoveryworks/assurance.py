@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 import hashlib
+import hmac
 from typing import Any, Iterable, Mapping
 
 from .journal import finding_from_payload, finding_to_payload
@@ -804,6 +805,155 @@ def verify_external_action(
             raise ValueError("external action artifact size mismatch")
         if _hash_bytes(artifact_bytes) != envelope.artifact_hash:
             raise ValueError("external action artifact hash mismatch")
+
+
+@dataclass(frozen=True)
+class ProofSeal:
+    """Detached integrity seal for a frozen high-value case.
+
+    The secret key is never stored in the seal. Production deployments should
+    perform the HMAC operation with a KMS/HSM-managed key and record key_id.
+    """
+
+    seal_id: str
+    key_id: str
+    case_bundle_hash: str
+    finding_proof_hash: str
+    journal_head_hash: str
+    sealed_at: str
+    signature_hex: str
+    authorization_hash: str | None = None
+    external_action_envelope_hash: str | None = None
+    algorithm: str = "HMAC-SHA256"
+
+    def __post_init__(self) -> None:
+        for name in (
+            "seal_id",
+            "key_id",
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "journal_head_hash",
+            "signature_hex",
+            "algorithm",
+        ):
+            _required(name, getattr(self, name))
+        _iso("sealed_at", self.sealed_at)
+        if self.algorithm != "HMAC-SHA256":
+            raise ValueError("unsupported proof seal algorithm")
+
+    def integrity_body(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "seal_id": self.seal_id,
+            "key_id": self.key_id,
+            "case_bundle_hash": self.case_bundle_hash,
+            "finding_proof_hash": self.finding_proof_hash,
+            "journal_head_hash": self.journal_head_hash,
+            "sealed_at": self.sealed_at,
+            "authorization_hash": self.authorization_hash,
+            "external_action_envelope_hash": self.external_action_envelope_hash,
+            "algorithm": self.algorithm,
+        }
+
+
+def _seal_signature(body: Mapping[str, Any], secret_key: bytes) -> str:
+    if not isinstance(secret_key, (bytes, bytearray)) or len(secret_key) < 32:
+        raise ValueError("proof seal key must contain at least 32 bytes")
+    message = canonical_hash(dict(body)).encode("ascii")
+    return hmac.new(bytes(secret_key), message, hashlib.sha256).hexdigest()
+
+
+def create_proof_seal(
+    bundle: CaseProofBundle,
+    *,
+    seal_id: str,
+    key_id: str,
+    secret_key: bytes,
+    journal_head_hash: str,
+    sealed_at: str,
+    authorization: ClientActionAuthorization | None = None,
+    external_action: ExternalActionEnvelope | None = None,
+) -> ProofSeal:
+    """Seal a frozen case plus optional authorization/action and journal head."""
+    verify_case_bundle(bundle)
+    _required("journal_head_hash", journal_head_hash)
+    _iso("sealed_at", sealed_at)
+
+    authorization_hash = None
+    if authorization is not None:
+        verify_action_authorization(bundle, authorization)
+        authorization_hash = authorization.proof_hash
+
+    action_hash = None
+    if external_action is not None:
+        if authorization is None:
+            raise ValueError("external action seal requires client authorization")
+        verify_external_action(external_action, bundle, authorization)
+        action_hash = external_action.envelope_hash
+
+    body = {
+        "schema": 1,
+        "seal_id": _required("seal_id", seal_id),
+        "key_id": _required("key_id", key_id),
+        "case_bundle_hash": bundle.bundle_hash,
+        "finding_proof_hash": bundle.finding.proof_hash,
+        "journal_head_hash": journal_head_hash,
+        "sealed_at": sealed_at,
+        "authorization_hash": authorization_hash,
+        "external_action_envelope_hash": action_hash,
+        "algorithm": "HMAC-SHA256",
+    }
+    return ProofSeal(
+        seal_id=body["seal_id"],
+        key_id=body["key_id"],
+        case_bundle_hash=body["case_bundle_hash"],
+        finding_proof_hash=body["finding_proof_hash"],
+        journal_head_hash=body["journal_head_hash"],
+        sealed_at=body["sealed_at"],
+        authorization_hash=body["authorization_hash"],
+        external_action_envelope_hash=body["external_action_envelope_hash"],
+        algorithm=body["algorithm"],
+        signature_hex=_seal_signature(body, secret_key),
+    )
+
+
+def verify_proof_seal(
+    seal: ProofSeal,
+    bundle: CaseProofBundle,
+    *,
+    secret_key: bytes,
+    journal_head_hash: str,
+    authorization: ClientActionAuthorization | None = None,
+    external_action: ExternalActionEnvelope | None = None,
+) -> None:
+    """Verify the detached seal and every object it claims to bind."""
+    verify_case_bundle(bundle)
+    if seal.case_bundle_hash != bundle.bundle_hash:
+        raise ValueError("proof seal case bundle mismatch")
+    if seal.finding_proof_hash != bundle.finding.proof_hash:
+        raise ValueError("proof seal finding mismatch")
+    if seal.journal_head_hash != journal_head_hash:
+        raise ValueError("proof seal journal head mismatch")
+
+    expected_authorization_hash = None
+    if authorization is not None:
+        verify_action_authorization(bundle, authorization)
+        expected_authorization_hash = authorization.proof_hash
+    if seal.authorization_hash != expected_authorization_hash:
+        raise ValueError("proof seal authorization mismatch")
+
+    expected_action_hash = None
+    if external_action is not None:
+        if authorization is None:
+            raise ValueError("external action verification requires authorization")
+        verify_external_action(external_action, bundle, authorization)
+        expected_action_hash = external_action.envelope_hash
+    if seal.external_action_envelope_hash != expected_action_hash:
+        raise ValueError("proof seal external action mismatch")
+
+    expected = _seal_signature(seal.integrity_body(), secret_key)
+    if not hmac.compare_digest(expected, seal.signature_hex):
+        raise ValueError("proof seal signature mismatch")
 
 
 def case_bundle_to_payload(bundle: CaseProofBundle) -> dict[str, Any]:
