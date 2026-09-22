@@ -87,6 +87,34 @@ def _safe_ratio(num: Any, den: Any) -> float | None:
     return max(0.0, min(1.0, float(num) / float(den)))
 
 
+def _training_search_moves(
+    run: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Preserve move-level evidence using the schema's stable move_type."""
+    rows: list[dict[str, Any]] = []
+    for move in run.get("search_moves") or []:
+        if not isinstance(move, Mapping):
+            continue
+        move_type = move.get("move_type")
+        result = move.get("result")
+        if not isinstance(move_type, str) or not move_type:
+            continue
+        if not isinstance(result, str) or not result:
+            continue
+        row = {
+            "key": f"MOVE:{move_type}",
+            "move_type": move_type,
+            "result": result,
+            "surface": move.get("surface"),
+            "query_or_action": move.get("query_or_action"),
+            "candidate_count": move.get("candidate_count"),
+            "deep_inspected": move.get("deep_inspected"),
+            "retained_count": move.get("retained_count"),
+        }
+        rows.append(row)
+    return rows
+
+
 def _run_time(run: Mapping[str, Any]) -> str:
     return str(run.get("timestamp") or run.get("date") or "")
 
@@ -946,13 +974,10 @@ def build_training_environment(
                 "search_surfaces": list(
                     run.get("search_surfaces") or []
                 ),
+                "search_moves": _training_search_moves(run),
                 "search_move_ids": [
-                    str(move.get("move_id"))
-                    for move in run.get("search_moves") or []
-                    if (
-                        isinstance(move, Mapping)
-                        and move.get("move_id")
-                    )
+                    move["key"]
+                    for move in _training_search_moves(run)
                 ],
                 "queries": list(
                     run.get("queries") or []
