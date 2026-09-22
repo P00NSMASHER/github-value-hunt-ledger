@@ -17,6 +17,7 @@ DIR=load_jsonl("activation_directives.jsonl")
 PACK=load_jsonl("activation_claim_packets.jsonl")
 HIST=load_jsonl("activation_history.jsonl")
 CLAIM_HISTORY=load_jsonl("execution_claim_history.jsonl") if (INTEL/"execution_claim_history.jsonl").exists() else []
+APPROVAL_HISTORY=load_jsonl("hunter_runtime_approval_history.jsonl") if (INTEL/"hunter_runtime_approval_history.jsonl").exists() else []
 MET=json.loads((INTEL/"activation_metrics.json").read_text(encoding="utf-8"))
 
 scoreboard=(ROOT/"benchmark"/"SCOREBOARD.md").read_text(encoding="utf-8")
@@ -37,7 +38,14 @@ RUNTIME_GATE=evaluate_runtime_activation_gate(
     PREACTIVATION_READINESS,
     MEASUREMENT_PACKETS,
     CLAIM_HISTORY,
+    APPROVAL_HISTORY,
 )
+
+if RUNTIME_GATE.get("errors"):
+    raise SystemExit(
+        "runtime activation gate invalid: "
+        + "; ".join(RUNTIME_GATE.get("errors") or [])
+    )
 
 pres={x["worker_id"]:x for x in PRES}
 if {x["worker_id"] for x in DIR}!={x["worker_id"] for x in PRES}:
@@ -76,6 +84,8 @@ for n,x in enumerate(PACK,1):
         raise SystemExit(f"activation_claim_packets.jsonl:{n}: seed outside current precommitted canary")
     if x.get("runtime_approval_id")!=RUNTIME_GATE.get("approval_id"):
         raise SystemExit(f"activation_claim_packets.jsonl:{n}: runtime approval lineage drift")
+    if x.get("runtime_approval_record_sha256")!=RUNTIME_GATE.get("approval_record_sha256"):
+        raise SystemExit(f"activation_claim_packets.jsonl:{n}: runtime approval record hash drift")
 hist={x.get("activation_id"):x for x in HIST}
 if len(hist)!=len(HIST): raise SystemExit("activation history duplicate IDs")
 for x in PACK:
@@ -95,6 +105,8 @@ if (MET.get("runtime_gate_errors") or [])!=(RUNTIME_GATE.get("errors") or []):
     raise SystemExit("activation metrics runtime errors drift")
 if MET.get("runtime_approval_id")!=RUNTIME_GATE.get("approval_id"):
     raise SystemExit("activation metrics runtime approval drift")
+if MET.get("runtime_approval_record_sha256")!=RUNTIME_GATE.get("approval_record_sha256"):
+    raise SystemExit("activation metrics runtime approval record hash drift")
 if int(MET.get("runtime_maximum_current_activations") or 0)!=int(RUNTIME_GATE.get("maximum_current_activations") or 0):
     raise SystemExit("activation metrics runtime capacity drift")
 for key in (
