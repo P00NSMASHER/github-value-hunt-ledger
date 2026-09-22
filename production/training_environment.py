@@ -9,6 +9,28 @@ from typing import Any, Mapping, Sequence
 
 
 _VALID_RESULTS = {"PASSED", "FAILED", "PARTIAL"}
+_VALID_MOVE_TYPES = {
+    "direct_domain_search",
+    "code_signature_search",
+    "official_source_trace",
+    "organization_graph",
+    "contributor_or_commit_lineage",
+    "paper_to_code_lineage",
+    "package_or_dependency_graph",
+    "adjacent_domain_invariant",
+    "independent_comparator",
+    "history_archaeology",
+    "other",
+}
+_VALID_MOVE_RESULTS = {
+    "qualifying_hit",
+    "useful_hit",
+    "weak_hit",
+    "no_hit",
+    "retrieval_limited",
+    "blocked",
+    "unknown",
+}
 _RETAINED_STATUSES = {
     "strong",
     "strong-component",
@@ -1213,6 +1235,75 @@ def validate_training_environment(
             or not -1.0 <= reward <= 1.0
         ):
             errors.append(f"invalid_reward:{rid}")
+
+        action = episode.get("action") or {}
+        moves = action.get("search_moves") or []
+        move_ids = action.get("search_move_ids") or []
+        expected_move_ids: list[str] = []
+        for move_index, move in enumerate(moves):
+            if not isinstance(move, Mapping):
+                errors.append(
+                    f"invalid_search_move:{rid}:{move_index}"
+                )
+                continue
+            move_type = move.get("move_type")
+            move_result = move.get("result")
+            move_key = move.get("key")
+            if move_type not in _VALID_MOVE_TYPES:
+                errors.append(
+                    f"invalid_move_type:{rid}:{move_index}"
+                )
+            if move_result not in _VALID_MOVE_RESULTS:
+                errors.append(
+                    f"invalid_move_result:{rid}:{move_index}"
+                )
+            if (
+                not isinstance(move_key, str)
+                or move_key != f"MOVE:{move_type}"
+            ):
+                errors.append(
+                    f"invalid_move_key:{rid}:{move_index}"
+                )
+            else:
+                expected_move_ids.append(move_key)
+
+            candidate_count = move.get("candidate_count")
+            deep_count = move.get("deep_inspected")
+            retained_count = move.get("retained_count")
+            for field_name, value in (
+                ("candidate_count", candidate_count),
+                ("deep_inspected", deep_count),
+                ("retained_count", retained_count),
+            ):
+                if (
+                    value is not None
+                    and (
+                        not isinstance(value, int)
+                        or value < 0
+                    )
+                ):
+                    errors.append(
+                        f"invalid_move_{field_name}:{rid}:{move_index}"
+                    )
+            if (
+                isinstance(candidate_count, int)
+                and isinstance(deep_count, int)
+                and deep_count > candidate_count
+            ):
+                errors.append(
+                    f"move_deep_exceeds_candidates:{rid}:{move_index}"
+                )
+            if (
+                isinstance(deep_count, int)
+                and isinstance(retained_count, int)
+                and retained_count > deep_count
+            ):
+                errors.append(
+                    f"move_retained_exceeds_deep:{rid}:{move_index}"
+                )
+
+        if move_ids != expected_move_ids:
+            errors.append(f"search_move_ids_mismatch:{rid}")
 
         expected_sha = _stable_json_sha256(
             {
