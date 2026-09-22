@@ -59,7 +59,38 @@
       "replacement_days_low": null,
       "replacement_days_high": null,
       "duplicate_of": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
-      "first_seen_in_registry": null
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "observed_at": "2026-09-22",
+        "metadata_status": "observed",
+        "stars": null,
+        "forks_count": null,
+        "primary_language": "Rust",
+        "archived": false,
+        "fork": false,
+        "created_at": null,
+        "updated_at": null,
+        "pushed_at": null,
+        "owner_type": "Organization",
+        "topics": [],
+        "license_spdx": "Apache-2.0",
+        "source_type": "company",
+        "package_ecosystems": [
+          "Cargo",
+          "PyPI"
+        ],
+        "protocol_families": [
+          "Thermo RAW",
+          "mzML 1.1"
+        ],
+        "geography_tags": [],
+        "technology_domains": [
+          "mass-spectrometry",
+          "scientific-data-normalization",
+          "instrument-data-migration"
+        ],
+        "profile_source": "GitHub exact-revision source and canonical prior run"
+      }
     }
   ],
   "best_result": "Generated EXP-007 assignment is stale relative to canonical evidence: the entry.scan_event repair was already falsified and both Opentrons simulator ambiguity branches were already executed.",
