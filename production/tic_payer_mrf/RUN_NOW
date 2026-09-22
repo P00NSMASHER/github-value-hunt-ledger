@@ -1,0 +1,5 @@
+run=tic-payer-mrf-catalog-2026-09-22
+mode=catalog-only
+max_list_pages=20
+index_limit=50
+probe_limit=5000
