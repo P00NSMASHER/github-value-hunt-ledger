@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Public landing pages/source registries only. The catalog crawler snapshots what is reachable and records unresolved dynamic portals instead of inventing index URLs.",
+    "Full in-network MRF downloads are intentionally not automatic; they can be enormous. Catalog discovery and selective filtered rate extraction are separate stages."
+  ],
+  "sources": [
+    {
+      "payer_key": "uhc",
+      "display_name": "UnitedHealthcare",
+      "landing_url": "https://transparency-in-coverage.uhc.com/",
+      "source_kind": "payer_landing",
+      "active": true
+    },
+    {
+      "payer_key": "cigna",
+      "display_name": "Cigna",
+      "landing_url": "https://www.cigna.com/legal/compliance/machine-readable-files",
+      "source_kind": "payer_landing",
+      "active": true
+    },
+    {
+      "payer_key": "elevance_anthem",
+      "display_name": "Elevance / Anthem",
+      "landing_url": "https://www.anthem.com/machine-readable-file/search/",
+      "source_kind": "payer_landing",
+      "active": true
+    },
+    {
+      "payer_key": "aetna_cvs",
+      "display_name": "Aetna / CVS Health",
+      "landing_url": "https://health1.aetna.com/app/public/#/one/insurerCode=AETNACVS_I&brandCode=ALICSI/machine-readable-transparency-in-coverage?reportingEntityType=Third%20Party%20Administrator_6644&lock=true",
+      "source_kind": "payer_landing",
+      "active": true
+    },
+    {
+      "payer_key": "bcbs_ca_healthsparq",
+      "display_name": "Blue Shield of California / HealthSparq",
+      "landing_url": "https://web.healthsparq.com/healthsparq/public/#/one/insurerCode=BSCA_I&brandCode=BSCA/machine-readable-transparency-in-coverage",
+      "source_kind": "payer_landing",
+      "active": true
+    }
+  ]
+}
