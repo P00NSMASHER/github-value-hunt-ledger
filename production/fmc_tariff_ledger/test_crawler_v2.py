@@ -98,11 +98,15 @@ class PublisherAdapterTests(unittest.TestCase):
     def test_generic_rule_number_heading_is_not_a_rule(self):
         text = """
         RULE NO. 15
+        RULE PAGE 4
         RULE 15 DEMURRAGE
         Demurrage is USD 100 per day.
         """
         terms = v2.extract_terms_v2(text, "https://example.test/tariff.txt")
-        self.assertFalse(any(t.rule_type.lower() in {"rule:no", "rule:number"} for t in terms))
+        self.assertFalse(any(
+            t.rule_type.lower() in {"rule:no", "rule:number", "rule:page"}
+            for t in terms
+        ))
         self.assertTrue(any(t.rule_type == "rule:15" for t in terms))
 
     def test_known_shared_publishers_are_not_direct(self):
