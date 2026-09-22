@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "presence_generation_id": "PRESENCEGEN:1660606e77e7",
-  "clock_commit_sha": "c16ea0004b2a19c1558d81846e638a6b61bef2b6",
-  "clock_timestamp": "2026-09-22T13:07:05Z",
+  "presence_generation_id": "PRESENCEGEN:0653f3423a87",
+  "clock_commit_sha": "99861267e5057eec5b99658e62c33b4b8ca3b887",
+  "clock_timestamp": "2026-09-22T13:07:48Z",
   "registered_workers": 14,
   "state_counts": {
     "READY_STALE": 9,
