@@ -43,7 +43,9 @@ permissions:
 
 concurrency:
   group: technology-intelligence-${{ github.ref }}
-  cancel-in-progress: false
+  # Superseded PR validation should not block a corrected head. Main push
+  # generation remains non-canceling so durable persistence cannot be cut off.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
