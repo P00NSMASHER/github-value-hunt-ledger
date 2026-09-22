@@ -18,6 +18,7 @@
   "mutate_dev_set_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
   "promotion_test_set_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
   "evaluation_manifest_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "mutator_identity": "MUTATOR:repair-optimizer",
   "evaluator_identity": "VERIFIER:independent-evaluator",
   "evaluation_evidence_refs": [
     "path-or-frozen-evaluation-evidence"
@@ -25,6 +26,7 @@
   "source_failure_ids": [],
   "mutator_saw_promotion_test": false,
   "evaluator_modified": false,
+  "controller_modified": false,
   "sealed_holdout_opened_by_mutator": false,
   "provenance_complete": true,
   "sensitive_material_involved": false,
