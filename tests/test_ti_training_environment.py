@@ -660,6 +660,67 @@ class TrainingEnvironmentTests(unittest.TestCase):
             [],
         )
 
+    def test_validator_rejects_untrusted_confirm_episode(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=0,
+        )
+        confirm_run = None
+        for index in range(100):
+            candidate = search_run(f"RUN:confirm-tamper:{index}")
+            if split_for_run(candidate, config=config) == "confirm":
+                confirm_run = candidate
+                break
+        self.assertIsNotNone(confirm_run)
+        environment = build_training_environment(
+            [confirm_run],
+            [],
+            config=config,
+        )
+        episode = environment["episodes"][0]
+        episode["provenance"]["partition_basis"] = {
+            "trusted": False,
+            "source": "run_id_fallback_train_only",
+            "identifier": episode["run_id"],
+        }
+        errors = validate_training_environment(environment)
+        self.assertIn(
+            f"untrusted_confirm_partition:{episode['run_id']}",
+            errors,
+        )
+
+    def test_validator_rejects_partition_hash_tamper(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=0,
+        )
+        chosen = None
+        opposite_identifier = None
+        for index in range(100):
+            candidate = search_run(f"RUN:partition:{index}")
+            split = split_for_run(candidate, config=config)
+            if chosen is None:
+                chosen = candidate
+                expected = split
+            fake = f"CLAIM:fake:{index}"
+            if partition_for_id(fake, config=config) != expected:
+                opposite_identifier = fake
+                break
+        environment = build_training_environment(
+            [chosen],
+            [],
+            config=config,
+        )
+        episode = environment["episodes"][0]
+        episode["provenance"]["partition_basis"]["identifier"] = (
+            opposite_identifier
+        )
+        errors = validate_training_environment(environment)
+        self.assertIn(
+            f"partition_hash_mismatch:{episode['run_id']}",
+            errors,
+        )
+
     def test_validator_rejects_malformed_move_telemetry(self):
         run = search_run("RUN:bad-move")
         run["search_moves"] = [
