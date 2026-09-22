@@ -1,0 +1,107 @@
+{
+  "historical_catalogs": [
+    {
+      "source_key": "dolthub-uhc-2022",
+      "payer_name": "UnitedHealthcare",
+      "adapter": "github_sqlite",
+      "source_url": "https://raw.githubusercontent.com/dolthub/data-analysis/main/transparency-in-coverage/python/downloaders/uhc_data.db"
+    },
+    {
+      "source_key": "dolthub-aetna-2022",
+      "payer_name": "Aetna/CVS",
+      "adapter": "github_sqlite",
+      "source_url": "https://raw.githubusercontent.com/dolthub/data-analysis/main/transparency-in-coverage/python/downloaders/aetna_data.db"
+    },
+    {
+      "source_key": "dolthub-bcbsnc-2022",
+      "payer_name": "Blue Cross NC",
+      "adapter": "github_sqlite",
+      "source_url": "https://raw.githubusercontent.com/dolthub/data-analysis/main/transparency-in-coverage/python/downloaders/bcbsnc_data.db"
+    },
+    {
+      "source_key": "dolthub-empirebc-2022",
+      "payer_name": "Empire BlueCross",
+      "adapter": "github_sqlite",
+      "source_url": "https://raw.githubusercontent.com/dolthub/data-analysis/main/transparency-in-coverage/python/downloaders/empirebc_data.db"
+    },
+    {
+      "source_key": "dolthub-kaiser-2022",
+      "payer_name": "Kaiser Permanente",
+      "adapter": "github_sqlite",
+      "source_url": "https://raw.githubusercontent.com/dolthub/data-analysis/main/transparency-in-coverage/python/downloaders/kaiser_data.db"
+    },
+    {
+      "source_key": "dolthub-optum-2022",
+      "payer_name": "Optum",
+      "adapter": "github_sqlite",
+      "source_url": "https://raw.githubusercontent.com/dolthub/data-analysis/main/transparency-in-coverage/python/downloaders/optum_data.db"
+    }
+  ],
+  "live_sources": [
+    {
+      "source_key": "uhc-live",
+      "payer_name": "UnitedHealthcare",
+      "adapter": "blob_api",
+      "source_url": "https://transparency-in-coverage.uhc.com/api/v1/uhc/blobs/"
+    },
+    {
+      "source_key": "optum-live",
+      "payer_name": "Optum",
+      "adapter": "blob_api",
+      "source_url": "https://transparency-in-coverage.optum.com/api/v1/oh/blobs/"
+    },
+    {
+      "source_key": "humana-live",
+      "payer_name": "Humana",
+      "adapter": "humana_api",
+      "source_url": "https://developers.humana.com/Resource/GetData"
+    },
+    {
+      "source_key": "aetna-ash-live",
+      "payer_name": "Aetna/CVS",
+      "adapter": "aetna_metadata",
+      "brand_code": "ASH",
+      "source_url": "https://mrf.healthsparq.com/aetnacvs-egress.nophi.kyruushsq.com/prd/mrf/AETNACVS_I/ASH/latest_metadata.json"
+    },
+    {
+      "source_key": "aetna-aetnacvs-live",
+      "payer_name": "Aetna/CVS",
+      "adapter": "aetna_metadata",
+      "brand_code": "AETNACVS",
+      "source_url": "https://mrf.healthsparq.com/aetnacvs-egress.nophi.kyruushsq.com/prd/mrf/AETNACVS_I/AETNACVS/latest_metadata.json"
+    },
+    {
+      "source_key": "aetna-alicunder100-live",
+      "payer_name": "Aetna/CVS",
+      "adapter": "aetna_metadata",
+      "brand_code": "ALICUNDER100",
+      "source_url": "https://mrf.healthsparq.com/aetnacvs-egress.nophi.kyruushsq.com/prd/mrf/AETNACVS_I/ALICUNDER100/latest_metadata.json"
+    },
+    {
+      "source_key": "aetna-alicfi-live",
+      "payer_name": "Aetna/CVS",
+      "adapter": "aetna_metadata",
+      "brand_code": "ALICFI",
+      "source_url": "https://mrf.healthsparq.com/aetnacvs-egress.nophi.kyruushsq.com/prd/mrf/AETNACVS_I/ALICFI/latest_metadata.json"
+    },
+    {
+      "source_key": "aetna-alicsi-live",
+      "payer_name": "Aetna/CVS",
+      "adapter": "aetna_metadata",
+      "brand_code": "ALICSI",
+      "source_url": "https://mrf.healthsparq.com/aetnacvs-egress.nophi.kyruushsq.com/prd/mrf/AETNACVS_I/ALICSI/latest_metadata.json"
+    },
+    {
+      "source_key": "bcbsnc-live",
+      "payer_name": "Blue Cross NC",
+      "adapter": "html_index_links",
+      "source_url": "https://www.bluecrossnc.com/about-us/policies-and-best-practices/transparency-coverage-mrf"
+    },
+    {
+      "source_key": "anthem-live",
+      "payer_name": "Elevance/Anthem",
+      "adapter": "html_index_links",
+      "source_url": "https://www.anthem.com/machine-readable-file/search/"
+    }
+  ]
+}
