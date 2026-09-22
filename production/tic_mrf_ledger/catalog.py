@@ -839,7 +839,13 @@ def run_catalog(args: argparse.Namespace) -> dict[str, Any]:
                WHERE file_type='index'
                  AND historical=0
                  AND file_url LIKE 'http%'
-               ORDER BY id"""
+               ORDER BY
+                 CASE
+                   WHEN parse_status='monthly_template_candidate' THEN 0
+                   WHEN parse_status='curated_master_list_direct_file' THEN 1
+                   ELSE 2
+                 END,
+                 id"""
         ).fetchall()
         if args.max_indexes:
             rows = rows[: args.max_indexes]
