@@ -120,6 +120,12 @@ class RecoveryLedger:
         if not reviewer_id.strip() or not note.strip():
             raise ValueError("reviewer_id and review note are required")
         record = self.get(finding_id)
+        if record.case_state is not CaseState.VALIDATED:
+            raise ValueError("only VALIDATED cases may be approved")
+        if record.reviewer_approved:
+            if record.reviewer_id == reviewer_id.strip() and record.review_note == note.strip():
+                return record
+            raise ValueError("case is already approved")
         assert_claim_authorizable(record.finding, True)
         updated = replace(
             record,
@@ -142,6 +148,12 @@ class RecoveryLedger:
         if not authorization_id.strip():
             raise ValueError("authorization_id is required")
         record = self.get(finding_id)
+        if record.case_state is CaseState.AUTHORIZED:
+            if record.authorization_id == authorization_id.strip():
+                return record
+            raise ValueError("case already has a different authorization")
+        if record.case_state is not CaseState.VALIDATED:
+            raise ValueError("only VALIDATED cases may be authorized")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
         updated = replace(
             record,
