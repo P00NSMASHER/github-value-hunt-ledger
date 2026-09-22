@@ -166,9 +166,15 @@ class RecoveryLedger:
         return tuple(sorted(self._records.values(), key=lambda r: r.finding.finding_id))
 
     def rollup(self) -> dict:
-        branches: dict[str, dict[str, int]] = {}
-        total_discovered = total_potential = total_validated = 0
-        total_authorized = total_claimed = total_recovered = total_fees = total_rejected = 0
+        """Return lifecycle counts plus money partitioned by currency.
+
+        Monetary amounts from different currencies are never summed together.
+        Callers must select the applicable currency bucket explicitly.
+        """
+        branches: dict[str, dict] = {}
+        currencies: dict[str, dict[str, int]] = {}
+        total_rejected = 0
+
         validated_states = {
             CaseState.VALIDATED,
             CaseState.AUTHORIZED,
@@ -178,11 +184,8 @@ class RecoveryLedger:
         authorized_states = {CaseState.AUTHORIZED, CaseState.CLAIMED, CaseState.RECOVERED}
         claimed_states = {CaseState.CLAIMED, CaseState.RECOVERED}
 
-        for record in self.records():
-            key = record.finding.branch.value
-            bucket = branches.setdefault(key, {
-                "cases": 0,
-                "rejected_cases": 0,
+        def empty_money_bucket() -> dict[str, int]:
+            return {
                 "discovered_cents": 0,
                 "potential_cents": 0,
                 "validated_cents": 0,
@@ -190,31 +193,34 @@ class RecoveryLedger:
                 "claimed_cents": 0,
                 "recovered_cents": 0,
                 "fee_cents": 0,
-            })
+            }
+
+        def apply_money(bucket: dict[str, int], record: LedgerRecord) -> None:
             amount = record.finding.potential_recovery_cents
             rejected = record.case_state is CaseState.REJECTED
-            live_potential = 0 if rejected else amount
-            validated = amount if record.case_state in validated_states else 0
-            authorized = amount if record.case_state in authorized_states else 0
-            claimed = amount if record.case_state in claimed_states else 0
-
-            bucket["cases"] += 1
-            bucket["rejected_cases"] += int(rejected)
             bucket["discovered_cents"] += amount
-            bucket["potential_cents"] += live_potential
-            bucket["validated_cents"] += validated
-            bucket["authorized_cents"] += authorized
-            bucket["claimed_cents"] += claimed
+            bucket["potential_cents"] += 0 if rejected else amount
+            bucket["validated_cents"] += amount if record.case_state in validated_states else 0
+            bucket["authorized_cents"] += amount if record.case_state in authorized_states else 0
+            bucket["claimed_cents"] += amount if record.case_state in claimed_states else 0
             bucket["recovered_cents"] += record.recovered_cents
             bucket["fee_cents"] += record.fee_cents
 
-            total_discovered += amount
-            total_potential += live_potential
-            total_validated += validated
-            total_authorized += authorized
-            total_claimed += claimed
-            total_recovered += record.recovered_cents
-            total_fees += record.fee_cents
+        for record in self.records():
+            branch = record.finding.branch.value
+            currency = record.finding.currency
+            rejected = record.case_state is CaseState.REJECTED
+
+            branch_bucket = branches.setdefault(
+                branch,
+                {"cases": 0, "rejected_cases": 0, "currencies": {}},
+            )
+            branch_bucket["cases"] += 1
+            branch_bucket["rejected_cases"] += int(rejected)
+            branch_money = branch_bucket["currencies"].setdefault(currency, empty_money_bucket())
+            global_money = currencies.setdefault(currency, empty_money_bucket())
+            apply_money(branch_money, record)
+            apply_money(global_money, record)
             total_rejected += int(rejected)
 
         return {
@@ -222,12 +228,6 @@ class RecoveryLedger:
             "totals": {
                 "cases": len(self._records),
                 "rejected_cases": total_rejected,
-                "discovered_cents": total_discovered,
-                "potential_cents": total_potential,
-                "validated_cents": total_validated,
-                "authorized_cents": total_authorized,
-                "claimed_cents": total_claimed,
-                "recovered_cents": total_recovered,
-                "fee_cents": total_fees,
             },
+            "currencies": currencies,
         }
