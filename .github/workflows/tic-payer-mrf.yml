@@ -1,0 +1,90 @@
+name: TiC Payer MRF Catalog
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_list_pages:
+        description: Max Azure listing pages per source (5000 blobs/page)
+        required: true
+        default: "20"
+        type: string
+      index_limit:
+        description: Max discovered CMS TOC/index files to expand (0 = all)
+        required: true
+        default: "50"
+        type: string
+      probe_limit:
+        description: Max referenced MRF URLs to HEAD/range probe (0 = all)
+        required: true
+        default: "5000"
+        type: string
+  push:
+    branches: [main, ingest-tic-payer-mrf-universe]
+    paths:
+      - production/tic_payer_mrf/RUN_NOW
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tic-payer-mrf-catalog
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/tic_payer_mrf
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/tic_payer_mrf/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest -v test_ingest.py
+
+  catalog:
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/tic_payer_mrf
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/tic_payer_mrf/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - name: Build payer/index/file universe catalog
+        env:
+          MAX_LIST_PAGES: ${{ inputs.max_list_pages || '20' }}
+          INDEX_LIMIT: ${{ inputs.index_limit || '50' }}
+          PROBE_LIMIT: ${{ inputs.probe_limit || '5000' }}
+        run: |
+          mkdir -p output
+          python ingest.py catalog \
+            --sources sources.json \
+            --out output \
+            --db ledger.sqlite \
+            --max-list-pages "${MAX_LIST_PAGES}" \
+            --expand-indexes \
+            --index-limit "${INDEX_LIMIT}" \
+            --max-index-bytes 2000000000 \
+            --probe \
+            --probe-limit "${PROBE_LIMIT}" \
+            --workers 8
+          python ingest.py summary --db output/ledger.sqlite > output/summary.json
+          python -m json.tool output/summary.json
+      - name: Upload catalog + immutable discovery evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: tic-payer-mrf-catalog
+          path: production/tic_payer_mrf/output/
+          retention-days: 90
+          compression-level: 6
+          if-no-files-found: error
