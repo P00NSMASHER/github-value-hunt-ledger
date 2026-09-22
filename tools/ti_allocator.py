@@ -282,8 +282,21 @@ if not any(c.get("work_kind")=="independent_verification" for c in candidates):
     seed_pool=sorted(seed_pool,key=lambda s:(-(float(s.get("priority") or 0)),s.get("seed_id") or ""))
     if seed_pool:
         s=seed_pool[0]
+        fallback_verification_payload={
+          "work_action":"search",
+          "strategy_id":s.get("strategy_id"),
+          "search_objective_id":s.get("search_objective_id"),
+          "query_recipe_id":s.get("query_recipe_id"),
+          "query_anchors":s.get("query_anchors") or [],
+          "acceptance_target":"A falsifiable claim plus an independent comparator plan; no pre-discovery hypothesis is independently VERIFIED.",
+          "stop_conditions":(s.get("stop_conditions") or [])+["Do not duplicate the discovery agent's inspection path.","Preserve disagreement and uncertainty rather than forcing a PASS."]
+        }
+        fallback_work_item_id,fallback_work_revision=versioned_work_item_id(
+          "verify-seed","VERIFY:"+s["seed_id"],fallback_verification_payload
+        )
         candidates.append({
-          "work_item_id":work_id("verify-seed",s["seed_id"]),
+          "work_item_id":fallback_work_item_id,
+          "work_revision_sha256":fallback_work_revision,
           "work_kind":"independent_verification",
           "work_action":"search",
           "query_recipe_id":None,
