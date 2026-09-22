@@ -271,6 +271,99 @@ class TiCCatalogTests(unittest.TestCase):
             ])
             conn.close()
 
+    def test_healthsparq_fragment_params_and_direct_metadata_url(self):
+        url = (
+            "https://bcbsaz.healthsparq.com/app/public/"
+            "#/one/insurerCode=BCBSAZ_I&brandCode=BCBSAZ/"
+            "machine-readable-transparency-in-coverage"
+        )
+        params = catalog.healthsparq_params(url)
+        self.assertEqual(params["insurerCode"], "BCBSAZ_I")
+        self.assertEqual(params["brandCode"], "BCBSAZ")
+        metadata = catalog.healthsparq_direct_metadata_url(url)
+        self.assertEqual(
+            metadata,
+            "https://mrf.healthsparq.com/"
+            "bcbsaz-egress.nophi.kyruushsq.com/prd/mrf/"
+            "BCBSAZ_I/BCBSAZ/latest_metadata.json",
+        )
+
+    def test_healthsparq_metadata_ingestion_resolves_relative_files_and_plans(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            conn = catalog.init_db(root / "ledger.sqlite")
+            public_url = (
+                "https://bcbsaz.healthsparq.com/app/public/"
+                "#/one/insurerCode=BCBSAZ_I&brandCode=BCBSAZ/"
+            )
+            source = catalog.Source(
+                "hs-test", "BCBS Arizona", "healthsparq_public", public_url
+            )
+            metadata_url = (
+                "https://mrf.healthsparq.com/"
+                "bcbsaz-egress.nophi.kyruushsq.com/prd/mrf/"
+                "BCBSAZ_I/BCBSAZ/latest_metadata.json"
+            )
+            payload = {
+                "files": [{
+                    "filePath": "rates-001.json.gz",
+                    "fileName": "rates-001.json.gz",
+                    "fileSchema": "IN_NETWORK_RATES",
+                    "reportingEntityName": "BCBS Arizona",
+                    "reportingEntityType": "health insurance issuer",
+                    "lastUpdatedOn": "2026-09-01",
+                    "reportingPlans": [{
+                        "planName": "Arizona Gold",
+                        "planIdType": "hios",
+                        "planId": "AZ123",
+                        "planMarketType": "individual",
+                        "issuerName": "BCBS Arizona",
+                    }],
+                }]
+            }
+            raw = json.dumps(payload).encode()
+
+            class FakeResponse:
+                url = metadata_url
+                status_code = 200
+                headers = {"content-type": "application/json", "etag": '"hs"'}
+                content = raw
+                def raise_for_status(self): return None
+                def json(self): return payload
+
+            class FakeSession:
+                def get(self, *args, **kwargs): return FakeResponse()
+
+            with patch.object(
+                catalog,
+                "resolve_healthsparq_metadata_url",
+                return_value=(metadata_url, FakeSession()),
+            ):
+                stats = catalog.ingest_healthsparq_public(
+                    conn, root, source, timeout=1, max_bytes=1_000_000
+                )
+            self.assertEqual(stats["files"], 1)
+            self.assertEqual(stats["plans"], 1)
+            row = conn.execute(
+                "SELECT file_url,file_type,reporting_entity_name,last_updated_on FROM mrf_files"
+            ).fetchone()
+            self.assertEqual(
+                tuple(row),
+                (
+                    "https://mrf.healthsparq.com/"
+                    "bcbsaz-egress.nophi.kyruushsq.com/prd/mrf/"
+                    "BCBSAZ_I/BCBSAZ/rates-001.json.gz",
+                    "in_network",
+                    "BCBS Arizona",
+                    "2026-09-01",
+                ),
+            )
+            plan = conn.execute(
+                "SELECT plan_name,plan_id,plan_id_type,issuer_name FROM plans"
+            ).fetchone()
+            self.assertEqual(tuple(plan), ("Arizona Gold", "AZ123", "hios", "BCBS Arizona"))
+            conn.close()
+
 
 if __name__ == "__main__":
     unittest.main()
