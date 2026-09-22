@@ -144,8 +144,21 @@ def split_for_run(
         return "evaluation_only"
     if quality != "prospective":
         return "excluded"
-    if run.get("work_action") not in (None, "search"):
+    work_action = run.get("work_action")
+    if work_action not in (None, "search"):
         return "excluded"
+    if work_action is None:
+        candidate_count = run.get("candidate_count")
+        deep_inspected = run.get("deep_inspected")
+        legacy_search_evidence = (
+            isinstance(candidate_count, int)
+            and candidate_count > 0
+        ) or (
+            isinstance(deep_inspected, int)
+            and deep_inspected > 0
+        )
+        if not legacy_search_evidence:
+            return "excluded"
     run_id = str(run.get("search_run_id") or "")
     if not run_id:
         return "excluded"
