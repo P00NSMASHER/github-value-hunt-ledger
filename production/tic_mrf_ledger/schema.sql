@@ -71,7 +71,9 @@ CREATE TABLE IF NOT EXISTS plans (
   plan_id_type TEXT,
   plan_id TEXT,
   plan_market_type TEXT,
-  UNIQUE(source_key, plan_name, plan_id_type, plan_id, plan_market_type)
+  issuer_name TEXT,
+  plan_sponsor_name TEXT,
+  UNIQUE(source_key, plan_name, plan_id_type, plan_id, plan_market_type, issuer_name, plan_sponsor_name)
 );
 
 CREATE TABLE IF NOT EXISTS file_plan_links (
