@@ -93,8 +93,7 @@ def render_markdown(state: dict[str, Any]) -> str:
                 + ", ".join(row.get("reasons") or [])
             )
         lines.append("")
-    return "
-".join(lines)
+    return "\n".join(lines)
 
 
 def main() -> int:
