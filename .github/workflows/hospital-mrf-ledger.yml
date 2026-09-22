@@ -1,0 +1,128 @@
+name: Hospital Price Transparency MRF Ledger
+
+on:
+  workflow_dispatch:
+    inputs:
+      fetch_mrfs:
+        description: Fetch a bounded sample of discovered hospital MRFs
+        required: true
+        default: true
+        type: boolean
+      max_mrfs:
+        description: Maximum hospital MRFs to download in this run
+        required: true
+        default: "6"
+        type: string
+      max_mrf_bytes:
+        description: Per-file byte safety ceiling
+        required: true
+        default: "250000000"
+        type: string
+      retention_days:
+        description: Artifact retention
+        required: true
+        default: "90"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - production/hospital_mrf_ledger/RUN_NOW
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hospital-price-transparency-mrf-ledger
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/hospital_mrf_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/hospital_mrf_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - run: python -m unittest discover -v -p 'test_*.py'
+
+  ingest:
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: production/hospital_mrf_ledger
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: production/hospital_mrf_ledger/requirements.txt
+      - run: python -m pip install -r requirements.txt
+      - name: Catalog hospital discovery files and bounded MRF sample
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_FETCH: ${{ inputs.fetch_mrfs }}
+          INPUT_MAX_MRFS: ${{ inputs.max_mrfs }}
+          INPUT_MAX_BYTES: ${{ inputs.max_mrf_bytes }}
+        run: |
+          FETCH=""
+          if [ "$EVENT_NAME" = "push" ]; then
+            FETCH_FLAG="$(awk -F= '$1=="fetch_mrfs"{print $2}' RUN_NOW | tail -1)"
+            MAX_MRFS="$(awk -F= '$1=="max_mrfs"{print $2}' RUN_NOW | tail -1)"
+            MAX_BYTES="$(awk -F= '$1=="max_mrf_bytes"{print $2}' RUN_NOW | tail -1)"
+            if [ "${FETCH_FLAG:-true}" = "true" ]; then FETCH="--fetch-mrfs"; fi
+          else
+            MAX_MRFS="${INPUT_MAX_MRFS:-6}"
+            MAX_BYTES="${INPUT_MAX_BYTES:-250000000}"
+            if [ "$INPUT_FETCH" = "true" ]; then FETCH="--fetch-mrfs"; fi
+          fi
+          MAX_MRFS="${MAX_MRFS:-6}"
+          MAX_BYTES="${MAX_BYTES:-250000000}"
+          echo "hospital MRF run fetch=${FETCH:-catalog-only} max_mrfs=$MAX_MRFS max_bytes=$MAX_BYTES"
+          python catalog.py \
+            --sources sources.json \
+            --out output \
+            --db hospital_mrf.sqlite \
+            $FETCH \
+            --max-mrfs "$MAX_MRFS" \
+            --max-mrf-bytes "$MAX_BYTES"
+          python quality.py --db output/hospital_mrf.sqlite --json > output/quality.json
+          python -m json.tool output/quality.json
+          python - <<'PY'
+          import json, sqlite3
+          from pathlib import Path
+
+          con = sqlite3.connect("output/hospital_mrf.sqlite")
+          con.row_factory = sqlite3.Row
+          summary = {
+              "source_domains": con.execute("SELECT COUNT(*) FROM source_domains").fetchone()[0],
+              "hpt_entries": con.execute("SELECT COUNT(*) FROM hpt_entries").fetchone()[0],
+              "unique_mrf_urls": con.execute("SELECT COUNT(DISTINCT mrf_url) FROM hpt_entries").fetchone()[0],
+              "mrf_snapshots": con.execute("SELECT COUNT(*) FROM mrf_snapshots").fetchone()[0],
+              "hospital_identities": con.execute("SELECT COUNT(*) FROM hospital_identities").fetchone()[0],
+              "errors": con.execute("SELECT COUNT(*) FROM ingestion_errors").fetchone()[0],
+              "errors_by_stage": [
+                  dict(row) for row in con.execute(
+                      "SELECT stage, error_type, COUNT(*) count FROM ingestion_errors GROUP BY stage,error_type ORDER BY count DESC"
+                  )
+              ],
+          }
+          con.close()
+          Path("output/summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+          print(json.dumps(summary, indent=2))
+          PY
+      - name: Upload hospital MRF evidence ledger
+        uses: actions/upload-artifact@v4
+        with:
+          name: hospital-price-transparency-mrf-ledger
+          path: production/hospital_mrf_ledger/output/
+          retention-days: ${{ inputs.retention_days || 90 }}
+          compression-level: 0
+          if-no-files-found: error
