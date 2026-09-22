@@ -200,6 +200,7 @@ CREATE TABLE IF NOT EXISTS registry_sources (
 CREATE TABLE IF NOT EXISTS national_hospital_registry (
   id INTEGER PRIMARY KEY,
   registry_source_id INTEGER NOT NULL REFERENCES registry_sources(id),
+  roster_source_id INTEGER REFERENCES registry_sources(id),
   ccn TEXT NOT NULL,
   hospital_name TEXT NOT NULL,
   address TEXT,
