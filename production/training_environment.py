@@ -1260,6 +1260,20 @@ def validate_training_environment(
         errors.append("policy_effect_must_be_none")
 
     episodes = environment.get("episodes") or []
+    reward_policy = environment.get("reward_policy") or {}
+    try:
+        split_validation_config = TrainingEnvironmentConfig(
+            confirm_modulus=int(
+                reward_policy.get("confirm_modulus", 5)
+            ),
+            confirm_bucket=int(
+                reward_policy.get("confirm_bucket", 0)
+            ),
+        )
+        split_validation_config.validate()
+    except (TypeError, ValueError):
+        errors.append("invalid_split_policy_config")
+        split_validation_config = TrainingEnvironmentConfig()
     seen_ids: set[str] = set()
     for episode in episodes:
         rid = episode.get("run_id")
@@ -1270,12 +1284,45 @@ def validate_training_environment(
             errors.append(f"duplicate_episode:{rid}")
         seen_ids.add(rid)
 
-        if episode.get("split") not in {
+        split = episode.get("split")
+        if split not in {
             "train",
             "confirm",
             "evaluation_only",
         }:
             errors.append(f"invalid_split:{rid}")
+
+        basis = (
+            episode.get("provenance") or {}
+        ).get("partition_basis") or {}
+        if split in {"train", "confirm"}:
+            trusted = basis.get("trusted") is True
+            identifier = basis.get("identifier")
+            if split == "confirm" and not trusted:
+                errors.append(
+                    f"untrusted_confirm_partition:{rid}"
+                )
+            if trusted:
+                if (
+                    not isinstance(identifier, str)
+                    or not identifier
+                ):
+                    errors.append(
+                        f"missing_partition_identifier:{rid}"
+                    )
+                else:
+                    expected_split = partition_for_id(
+                        identifier,
+                        config=split_validation_config,
+                    )
+                    if split != expected_split:
+                        errors.append(
+                            f"partition_hash_mismatch:{rid}"
+                        )
+            elif split != "train":
+                errors.append(
+                    f"untrusted_partition_not_train:{rid}"
+                )
 
         observation = episode.get("observation") or {}
         episode_consistency = telemetry_consistency_errors(observation)
