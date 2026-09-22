@@ -49,10 +49,19 @@ def _iso_date(name: str, value: str) -> str:
     return text
 
 
+def canonical_invoice_number(value: str) -> str:
+    """Canonicalize formatting only; never change the invoice's semantic ID."""
+    return _required("invoice_number", value).upper().replace(" ", "")
+
+
 def normalize_invoice_number(value: str) -> str:
-    """Normalize one known duplicate/reversal suffix without stripping digits."""
-    text = _required("invoice_number", value).upper().replace(" ", "")
-    return _SUFFIX.sub("", text)
+    """Return a heuristic invoice family for duplicate discovery only.
+
+    Known reversal/copy suffixes are stripped so suspicious relationships can be
+    surfaced, but RecoveryOS must not treat this heuristic family as proof that
+    two invoice IDs are the same obligation.
+    """
+    return _SUFFIX.sub("", canonical_invoice_number(value))
 
 
 @dataclass(frozen=True)
@@ -77,11 +86,16 @@ class APPayment:
             raise ValueError("verified must be boolean")
 
     @property
+    def canonical_invoice(self) -> str:
+        return canonical_invoice_number(self.invoice_number)
+
+    @property
     def normalized_invoice(self) -> str:
         return normalize_invoice_number(self.invoice_number)
 
     @property
     def key(self) -> tuple[str, str]:
+        """Heuristic family key used only to discover possible duplicate clusters."""
         return (self.vendor_id, self.normalized_invoice)
 
     def evidence(self) -> EvidenceRef:
@@ -128,18 +142,23 @@ class APObligation:
             raise ValueError("verified must be boolean")
 
     @property
+    def canonical_invoice(self) -> str:
+        return canonical_invoice_number(self.invoice_number)
+
+    @property
     def normalized_invoice(self) -> str:
         return normalize_invoice_number(self.invoice_number)
 
     @property
     def key(self) -> tuple[str, str]:
-        return (self.vendor_id, self.normalized_invoice)
+        """Exact obligation identity; heuristic suffix folding is not authority."""
+        return (self.vendor_id, self.canonical_invoice)
 
     def rule_ref(self) -> RuleRef:
         identity = {
             "schema": 1,
             "vendor_id": self.vendor_id,
-            "invoice_number": self.normalized_invoice,
+            "invoice_number": self.canonical_invoice,
             "expected_cents": self.expected_cents,
             "source_hash": self.source_hash,
             "effective_from": self.effective_from,
@@ -188,18 +207,23 @@ class APVendorStatementLine:
             raise ValueError("verified must be boolean")
 
     @property
+    def canonical_invoice(self) -> str:
+        return canonical_invoice_number(self.invoice_number)
+
+    @property
     def normalized_invoice(self) -> str:
         return normalize_invoice_number(self.invoice_number)
 
     @property
     def key(self) -> tuple[str, str]:
-        return (self.vendor_id, self.normalized_invoice)
+        """Exact vendor-statement invoice identity."""
+        return (self.vendor_id, self.canonical_invoice)
 
     def evidence(self) -> EvidenceRef:
         return EvidenceRef(
             evidence_id="ap-statement:" + canonical_hash({
                 "vendor_id": self.vendor_id,
-                "invoice_number": self.normalized_invoice,
+                "invoice_number": self.canonical_invoice,
                 "statement_date": self.statement_date,
                 "source_hash": self.source_hash,
                 "locator": self.source_locator,
@@ -223,7 +247,7 @@ class APVendorStatementLine:
         identity = {
             "schema": 1,
             "vendor_id": self.vendor_id,
-            "invoice_number": self.normalized_invoice,
+            "invoice_number": self.canonical_invoice,
             "statement_date": self.statement_date,
             "credit_cents": abs(self.balance_cents),
             "source_hash": self.source_hash,
@@ -298,7 +322,7 @@ def _dedupe_payment_ids(
     """
     grouped: dict[tuple[str, str, str], list[APPayment]] = defaultdict(list)
     for payment in payments:
-        grouped[(payment.vendor_id, payment.normalized_invoice, payment.payment_id)].append(payment)
+        grouped[(payment.vendor_id, payment.canonical_invoice, payment.payment_id)].append(payment)
 
     accepted: list[APPayment] = []
     exceptions: list[APRecoveryException] = []
@@ -399,8 +423,23 @@ def audit_ap_recovery(
     for key in sorted(payment_groups):
         vendor_id, normalized_invoice = key
         items = sorted(payment_groups[key], key=lambda p: p.payment_id)
-        obligation = obligation_by_key.get(key)
-        statement = statement_by_key.get(key)
+        canonical_invoices = sorted({p.canonical_invoice for p in items})
+        exact_key = (
+            (vendor_id, canonical_invoices[0])
+            if len(canonical_invoices) == 1
+            else None
+        )
+        obligation = obligation_by_key.get(exact_key) if exact_key else None
+        statement = statement_by_key.get(exact_key) if exact_key else None
+        heuristic_alias_group = len(canonical_invoices) > 1
+        reference_invoice = canonical_invoices[0] if exact_key else normalized_invoice
+
+        if heuristic_alias_group:
+            exceptions.append(APRecoveryException(
+                f"{vendor_id}/{normalized_invoice}",
+                "HEURISTIC_INVOICE_ALIAS",
+                "multiple exact invoice IDs collapse to one duplicate-discovery family; authority matching is disabled",
+            ))
 
         if obligation is not None:
             actual_cents = sum(p.amount_cents for p in items)
@@ -416,13 +455,14 @@ def audit_ap_recovery(
             )
             metadata: dict[str, Any] = {
                 "normalized_invoice": normalized_invoice,
+                "canonical_invoice_numbers": canonical_invoices,
                 "payment_ids": [p.payment_id for p in items],
                 "payment_count": len(items),
                 "detection_basis": "obligation_vs_total_payments",
             }
 
             if statement is not None:
-                represented_statement_keys.add(key)
+                represented_statement_keys.add(statement.key)
                 evidence.append(statement.evidence())
                 metadata["vendor_statement_balance_cents"] = statement.balance_cents
                 metadata["vendor_statement_date"] = statement.statement_date
@@ -452,7 +492,7 @@ def audit_ap_recovery(
                 branch=Branch.AP,
                 client_id=client_id,
                 counterparty_id=vendor_id,
-                reference=normalized_invoice,
+                reference=reference_invoice,
                 currency=currency,
                 expected_cents=obligation.expected_cents,
                 actual_cents=actual_cents,
@@ -482,13 +522,18 @@ def audit_ap_recovery(
             reason = "SUSPECTED_DUPLICATE_PAYMENT"
             metadata: dict[str, Any] = {
                 "normalized_invoice": normalized_invoice,
+                "canonical_invoice_numbers": sorted({p.canonical_invoice for p in duplicates}),
                 "payment_ids": [p.payment_id for p in duplicates],
                 "payment_count": len(duplicates),
                 "duplicate_amount_cents": amount_cents,
                 "detection_basis": "exact_invoice_amount_duplicate",
             }
-            if statement is not None and statement.balance_cents < 0:
-                represented_statement_keys.add(key)
+            if (
+                statement is not None
+                and statement.balance_cents < 0
+                and not heuristic_alias_group
+            ):
+                represented_statement_keys.add(statement.key)
                 evidence.append(statement.evidence())
                 statement_credit = abs(statement.balance_cents)
                 metadata["vendor_statement_date"] = statement.statement_date
@@ -514,7 +559,7 @@ def audit_ap_recovery(
                 branch=Branch.AP,
                 client_id=client_id,
                 counterparty_id=vendor_id,
-                reference=f"{normalized_invoice}:{amount_cents}",
+                reference=f"{reference_invoice}:{amount_cents}",
                 currency=currency,
                 expected_cents=amount_cents,
                 actual_cents=amount_cents * len(duplicates),
@@ -536,7 +581,7 @@ def audit_ap_recovery(
             branch=Branch.AP,
             client_id=client_id,
             counterparty_id=statement.vendor_id,
-            reference=f"{statement.normalized_invoice}:statement-credit",
+            reference=f"{statement.canonical_invoice}:statement-credit",
             currency=currency,
             expected_cents=0,
             actual_cents=credit_cents,
@@ -549,6 +594,7 @@ def audit_ap_recovery(
             ),
             metadata={
                 "normalized_invoice": statement.normalized_invoice,
+                "canonical_invoice_number": statement.canonical_invoice,
                 "statement_date": statement.statement_date,
                 "statement_credit_cents": credit_cents,
                 "detection_basis": "vendor_statement_negative_balance",
