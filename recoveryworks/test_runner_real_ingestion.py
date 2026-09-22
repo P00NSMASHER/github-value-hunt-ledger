@@ -69,6 +69,61 @@ class RealIngestionRunnerTests(unittest.TestCase):
             self.assertEqual(result.report.branches["ap"]["validated_cents"], 10000)
             self.assertEqual(result.report.branches["utility"]["validated_cents"], 1500)
 
+    def test_scan360_uses_service_period_for_tariff_version(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / "Bills.csv").write_text(
+                "Bill_ID,Utility,Account_ID,Service_Class,Bill_Date,Bill_Amount,"
+                "Billed_kWh,Service_Start,Service_End\n"
+                "B-1,Utility A,A-1,SC1,2026-07-10,20.00,100,2026-06-01,2026-06-30\n",
+                encoding="utf-8",
+            )
+            (root / "tariffs.json").write_text(
+                """{
+                  "tariffs": [
+                    {
+                      "sc_code": "SC1",
+                      "effective_date": "2026-01-01",
+                      "effective_to": "2026-06-30",
+                      "logic_steps": [
+                        {"step_name":"Customer","charge_type":"fixed_fee","value":5},
+                        {"step_name":"Energy","charge_type":"per_kwh","value":0.10}
+                      ]
+                    },
+                    {
+                      "sc_code": "SC1",
+                      "effective_date": "2026-07-01",
+                      "logic_steps": [
+                        {"step_name":"Customer","charge_type":"fixed_fee","value":5},
+                        {"step_name":"Energy","charge_type":"per_kwh","value":0.20}
+                      ]
+                    }
+                  ]
+                }""",
+                encoding="utf-8",
+            )
+            config = {
+                "client_id": "client-service-period",
+                "currency": "USD",
+                "utility": {
+                    "bills_csv": "Bills.csv",
+                    "tariffs_json": "tariffs.json",
+                    "utility_id": "Utility A",
+                    "default_effective_from": "2026-01-01",
+                    "bill_source_verified": True,
+                    "tariff_source_verified": True,
+                },
+            }
+            result = run_scan360_config(
+                config,
+                state_path=root / "private" / "ledger.json",
+                base_dir=root,
+            )
+            self.assertEqual(result.exceptions, ())
+            self.assertEqual(len(result.added_finding_ids), 1)
+            self.assertEqual(result.report.totals["validated_cents"], 500)
+            self.assertEqual(result.report.branches["utility"]["validated_cents"], 500)
+
 
 if __name__ == "__main__":
     unittest.main()

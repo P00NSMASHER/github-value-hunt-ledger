@@ -97,7 +97,11 @@ Default obligation headers:
 - `Amount`
 - `Invoice_Date`
 
-Duplicate-looking payments without a verified obligation remain REVIEW.
+Repeated payment export lines are deduplicated per vendor + normalized invoice +
+payment ID. A single ACH/check number may legitimately span several invoices.
+Conflicting repeated lines are quarantined as exceptions. Duplicate-looking
+payments without a verified obligation or corroborating vendor-statement credit
+remain REVIEW.
 
 ## Payer input
 
@@ -144,19 +148,30 @@ Default bill headers:
 - `Billed_kWh`
 - `Billed_Demand_kW`
 - `Billed_rkVA`
+- `Days_Used`
+- optional `Service_Start` + `Service_End`
 
-The current tariff importer accepts scalar `logic_steps` with these charge
-types:
+Time-of-use quantities use `Billed_kWh_<Period>` columns such as
+`Billed_kWh_On_Peak`.
+
+When both service-period columns are supplied, they control tariff-version
+selection. Bill date is only the fallback when service dates are unavailable.
+A service period that crosses a tariff change is returned as an exception rather
+than priced under one version.
+
+The tariff importer supports explicit deterministic `logic_steps` for:
 
 - `fixed_fee`
+- `daily_fixed_fee`
 - `per_kwh` / `energy_charge`
+- `tiered_kwh` with strictly increasing cumulative tiers and a final open tier
+- `tou_kwh` with an explicit period
 - `per_kw` / `demand_charge`
 - `per_rkva` / `reactive_demand_fee`
 - `minimum_charge` / `minimum_bill`
 
-It deliberately rejects conditional expressions, free-form formulas, voltage or
-tier dictionaries, and unknown charge types. Those constructs must be
-implemented explicitly before they can affect expected dollars.
+It deliberately rejects executable conditions, Python/free-form formulas,
+unknown charge types, malformed tiers, and ambiguous unsupported structures.
 
 ## Lifecycle boundary
 
