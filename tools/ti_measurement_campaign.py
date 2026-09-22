@@ -7,7 +7,9 @@ runs=[r for r in load_jsonl("search_runs.jsonl") if is_discovery_run(r)]
 strategies=[s for s in load_jsonl("search_strategies.jsonl") if s.get("status")=="active"]
 cfg=json.loads((INTEL/"strategy_evaluation_sets.json").read_text(encoding="utf-8"))
 measurement=json.loads((INTEL/"measurement_plan.json").read_text(encoding="utf-8")) if (INTEL/"measurement_plan.json").exists() else {"rows":[]}
+curriculum=json.loads((INTEL/"learning_curriculum.json").read_text(encoding="utf-8")) if (INTEL/"learning_curriculum.json").exists() else {"rows":[]}
 debt={x["strategy_id"]:x for x in measurement.get("rows",[])}
+learning_debt={x["strategy_id"]:x for x in curriculum.get("rows",[]) if isinstance(x,dict) and isinstance(x.get("strategy_id"),str)}
 
 task_text=(ROOT/"benchmark"/"BENCHMARK_TASKS.md").read_text(encoding="utf-8")
 task_names={}
@@ -36,6 +38,9 @@ for s in strategies:
     candidates.sort(key=lambda x:(-x[0],x[2],x[1]))
     if candidates:
         overlap,set_id,tid,ev=candidates[0]
+        adaptive=learning_debt.get(sid,{})
+        adaptive_train=adaptive.get("train") or {}
+        adaptive_confirm=adaptive.get("confirm") or {}
         recommendations.append({
           "strategy_id":sid,
           "strategy_name":s.get("name"),
@@ -46,6 +51,19 @@ for s in strategies:
           "matched_strategy_ids":[x for x in ev.get("strategy_ids",[]) if tid not in observed[x]],
           "runs_needed":d.get("runs_needed"),
           "inspections_needed":d.get("inspections_needed"),
+          "observational_runs_needed":d.get("runs_needed"),
+          "observational_inspections_needed":d.get("inspections_needed"),
+          "adaptive_learning_phase":adaptive.get("phase"),
+          "adaptive_train_runs":adaptive_train.get("runs"),
+          "adaptive_train_deep_inspections":adaptive_train.get("deep_inspections"),
+          "adaptive_train_runs_needed":adaptive_train.get("runs_needed"),
+          "adaptive_train_deep_inspections_needed":adaptive_train.get("deep_inspections_needed"),
+          "adaptive_confirm_runs":adaptive_confirm.get("runs"),
+          "adaptive_confirm_deep_inspections":adaptive_confirm.get("deep_inspections"),
+          "adaptive_confirm_runs_needed":adaptive_confirm.get("runs_needed"),
+          "adaptive_confirm_deep_inspections_needed":adaptive_confirm.get("deep_inspections_needed"),
+          "adaptive_policy_eligible":adaptive.get("eligible_for_policy_consideration"),
+          "adaptive_partition_effect":"none",
           "matched_overlap":overlap
         })
 
@@ -68,7 +86,11 @@ for g in groups.values():
 group_rows.sort(key=lambda x:(-len(x["strategy_ids"]),x["benchmark_task_id"],x["comparison_group_id"]))
 
 plan={
-  "schema_version":1,
+  "schema_version":2,
+  "measurement_semantics":"matched_benchmark_observational",
+  "adaptive_learning_authority":"intelligence/learning_curriculum.json",
+  "adaptive_partition_effect":"none",
+  "benchmark_records_are":"evaluation_only",
   "protocol":"benchmark/STRATEGY_MEASUREMENT_PROTOCOL.md",
   "gold_file_prohibited_pre_freeze":"benchmark/BENCHMARK_GOLD.md",
   "recommended_strategy_conditions":recommendations,
@@ -78,10 +100,12 @@ plan={
 
 lines=[
  "# MATCHED STRATEGY MEASUREMENT CAMPAIGN","",
- "This campaign reduces strategy-measurement debt using frozen benchmark tasks. It is deliberately separate from commercial opportunity search.","",
+ "This campaign reduces **matched benchmark comparison debt** using frozen benchmark tasks. It is deliberately separate from commercial opportunity search and from adaptive train/confirm learning.","",
  f"- Active strategies needing more evidence: **{len(recommendations)}**",
  f"- Suggested matched comparison groups: **{len(group_rows)}**",
  "- Protocol: `benchmark/STRATEGY_MEASUREMENT_PROTOCOL.md`",
+ "- Benchmark records are **evaluation_only** and have **no adaptive partition effect**. They cannot satisfy live train/confirm evidence gates.",
+ "- Adaptive-learning authority: `intelligence/LEARNING_CURRICULUM.md`.",
  "- **Do not read `BENCHMARK_GOLD.md` before a result is frozen.**","",
  "## Highest-leverage matched groups","",
  "| Comparison group | Task | Strategies |",
@@ -90,16 +114,19 @@ lines=[
 for g in group_rows[:20]:
     lines.append(f"| {g['comparison_group_id']} | {g['benchmark_task_id']} — {g['task'] or 'task text unavailable'} | {', '.join(g['strategy_ids'])} |")
 if not group_rows: lines.append("| — | — | — |")
-lines += ["","## Per-strategy next measurement","",
-          "| Strategy | More runs needed | More inspections needed | Evaluation set | Suggested task | Comparison group |",
-          "|---|---:|---:|---|---|---|"]
+lines += ["","## Per-strategy next benchmark measurement","",
+          "| Strategy | More obs runs | More obs inspections | Adaptive train | Adaptive confirm | Adaptive phase | Evaluation set | Suggested task | Comparison group |",
+          "|---|---:|---:|---:|---:|---|---|---|---|"]
 for r in recommendations:
-    lines.append(f"| {r['strategy_id']} | {r['runs_needed'] if r['runs_needed'] is not None else '—'} | {r['inspections_needed'] if r['inspections_needed'] is not None else '—'} | {r['evaluation_set_id']} | {r['benchmark_task_id']} | {r['comparison_group_id']} |")
-if not recommendations: lines.append("| — | 0 | 0 | — | — | — |")
+    train=(f"{r['adaptive_train_runs']}/{r['adaptive_train_deep_inspections']}" if r.get("adaptive_train_runs") is not None else "—")
+    confirm=(f"{r['adaptive_confirm_runs']}/{r['adaptive_confirm_deep_inspections']}" if r.get("adaptive_confirm_runs") is not None else "—")
+    lines.append(f"| {r['strategy_id']} | {r['observational_runs_needed'] if r['observational_runs_needed'] is not None else '—'} | {r['observational_inspections_needed'] if r['observational_inspections_needed'] is not None else '—'} | {train} | {confirm} | {r.get('adaptive_learning_phase') or '—'} | {r['evaluation_set_id']} | {r['benchmark_task_id']} | {r['comparison_group_id']} |")
+if not recommendations: lines.append("| — | 0 | 0 | — | — | — | — | — | — |")
 lines += ["","## Why this is stronger than ordinary telemetry","",
           "- The same frozen task is assigned to multiple strategies, reducing domain/task-difficulty confounding.",
           "- Conditions should be run independently and frozen before sibling results are visible.",
           "- No-find and correct reject outcomes count; only returning a candidate is not success.",
-          "- These comparisons estimate search-method performance. Real customer outcomes still decide long-run commercial allocation.",""]
+          "- These comparisons estimate search-method performance. Real customer outcomes still decide long-run commercial allocation.",
+          "- Benchmark comparison progress must never be presented as adaptive train/confirm progress; only canonical eligible live episodes can change that state.",""]
 (INTEL/"MEASUREMENT_CAMPAIGN.md").write_text("\n".join(lines),encoding="utf-8")
 print(json.dumps({"recommendations":len(recommendations),"groups":len(group_rows)}))
