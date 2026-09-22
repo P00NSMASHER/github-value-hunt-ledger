@@ -62,6 +62,11 @@ for r in routes:
         if not p: raise SystemExit(f"routed worker {r['worker_id']} missing claim packet")
         if p["slot_id"]!=r["slot_id"] or p["assignment_id"]!=r["assignment_id"]:
             raise SystemExit(f"claim packet mismatch for {r['worker_id']}")
+        a=alloc_by_slot[r["slot_id"]]
+        if a.get("work_kind")=="learning_measurement":
+            for key in ("learning_measurement_packet_id","learning_measurement_packet_sha256"):
+                if not a.get(key) or p.get(key)!=a.get(key):
+                    raise SystemExit(f"learning measurement packet binding drift for {r['worker_id']}: {key}")
         if p.get("routing_learning_generation_id")!=learn_gen:
             raise SystemExit(f"claim packet learning-generation mismatch for {r['worker_id']}")
         if p.get("activation_response_learning_generation_id")!=resp_gen:
