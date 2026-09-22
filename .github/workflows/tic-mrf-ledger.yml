@@ -80,6 +80,8 @@ jobs:
             --max-index-bytes 2000000000 \
             --snapshot-max-bytes 100000000
           python -m json.tool output/catalog_summary.json
+          python coverage_debt.py --db output/tic_mrf.sqlite --output output/coverage_debt.json > /dev/null
+          python -m json.tool output/coverage_debt.json > /dev/null
       - name: Upload TiC universe ledger
         uses: actions/upload-artifact@v4
         with:
