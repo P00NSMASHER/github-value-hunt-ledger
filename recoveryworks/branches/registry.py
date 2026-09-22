@@ -94,6 +94,30 @@ BRANCHES: dict[Branch, BranchSpec] = {
         "tier-backed rebate underpayment finding",
         ("tier engine", "purchase reconciliation", "settlement evidence"),
     ),
+    Branch.LEASE: BranchSpec(
+        Branch.LEASE,
+        "LeaseRecovery",
+        "rent, CAM, operating-expense, and area-based lease billing leakage",
+        ("landlord charges", "lease rate schedules", "area/allocation snapshots"),
+        "lease-backed billing variance",
+        ("contract billing engine", "lease abstracts", "CAM reconciliation"),
+    ),
+    Branch.TAX: BranchSpec(
+        Branch.TAX,
+        "TaxRecovery",
+        "sales/use-tax and transaction-tax overpayments",
+        ("invoice tax lines", "reviewed expected tax assessments", "rule snapshots"),
+        "professionally reviewed tax overpayment finding",
+        ("tax engine output", "taxability review", "invoice reconciliation"),
+    ),
+    Branch.INSURANCE: BranchSpec(
+        Branch.INSURANCE,
+        "InsuranceRecovery",
+        "commercial/property insurance claim underpayments",
+        ("claim lines", "reviewed policy/coverage assessments", "insurer settlements"),
+        "professionally reviewed insurance underpayment finding",
+        ("coverage review", "claim valuation", "settlement reconciliation"),
+    ),
 }
 
 

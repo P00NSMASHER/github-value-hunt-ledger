@@ -13,6 +13,43 @@ def parse_matched_benchmark_tasks(scoreboard: str) -> int:
     return int(match.group(1)) if match else 0
 
 
+def parse_matched_task_arms(scoreboard: str) -> dict[str, set[str]]:
+    out: dict[str, set[str]] = {}
+    pattern = re.compile(
+        r"^\|\s*(\d{2})\s*\|\s*(CONTROL|EXPERIMENT)\s*\|",
+        re.IGNORECASE | re.MULTILINE,
+    )
+    for match in pattern.finditer(scoreboard):
+        task_id = match.group(1)
+        arm = match.group(2).upper()
+        out.setdefault(task_id, set()).add(arm)
+    return out
+
+
+def unmatched_benchmark_tasks(
+    scoreboard: str,
+    *,
+    expected_tasks: int = 50,
+) -> list[dict[str, Any]]:
+    arms = parse_matched_task_arms(scoreboard)
+    rows: list[dict[str, Any]] = []
+    for index in range(1, expected_tasks + 1):
+        task_id = f"{index:02d}"
+        seen = arms.get(task_id, set())
+        if {"CONTROL", "EXPERIMENT"}.issubset(seen):
+            continue
+        rows.append(
+            {
+                "task_id": task_id,
+                "completed_arms": sorted(seen),
+                "missing_arms": sorted(
+                    {"CONTROL", "EXPERIMENT"} - seen
+                ),
+            }
+        )
+    return rows
+
+
 def count_shadow_runs(text: str) -> int:
     count = 0
     for line in text.splitlines():
@@ -34,6 +71,10 @@ def build_restart_readiness(
     required_shadow_runs: int = 15,
 ) -> dict[str, Any]:
     matched = parse_matched_benchmark_tasks(scoreboard_text)
+    unmatched_tasks = unmatched_benchmark_tasks(
+        scoreboard_text,
+        expected_tasks=required_matched_tasks,
+    )
     shadow_by_lane = {
         lane: count_shadow_runs(text)
         for lane, text in shadow_results.items()
@@ -66,7 +107,10 @@ def build_restart_readiness(
         and not (split_status.get("issues") or [])
         and not (split_status.get("pending_claim_ids") or [])
     )
-    benchmark_ready = matched >= required_matched_tasks
+    benchmark_ready = (
+        matched >= required_matched_tasks
+        and not unmatched_tasks
+    )
     shadow_ready = shadow_total >= required_shadow_runs
     no_current_activations = (
         int(activation_metrics.get("current_activations") or 0) == 0
@@ -127,6 +171,11 @@ def build_restart_readiness(
                 "code": "frozen_benchmark_incomplete",
                 "matched_tasks": matched,
                 "required_matched_tasks": required_matched_tasks,
+                "unmatched_task_ids": [
+                    row["task_id"]
+                    for row in unmatched_tasks
+                ],
+                "unmatched_tasks": unmatched_tasks,
                 "action": (
                     "Finish the remaining frozen benchmark experiment "
                     "conditions in clean contexts before using adaptive "
@@ -187,6 +236,11 @@ def build_restart_readiness(
         "evidence": {
             "matched_benchmark_tasks": matched,
             "required_matched_benchmark_tasks": required_matched_tasks,
+            "unmatched_benchmark_task_ids": [
+                row["task_id"]
+                for row in unmatched_tasks
+            ],
+            "unmatched_benchmark_tasks": unmatched_tasks,
             "shadow_runs_by_lane": shadow_by_lane,
             "shadow_runs_total": shadow_total,
             "required_shadow_runs": required_shadow_runs,
@@ -244,6 +298,11 @@ def validate_restart_readiness(
         if machine_ready
         else "BLOCKED"
     )
+    unmatched = (
+        report.get("evidence") or {}
+    ).get("unmatched_benchmark_task_ids") or []
+    if gates.get("benchmark_complete") is True and unmatched:
+        errors.append("benchmark_complete_with_unmatched_tasks")
     if report.get("state") != expected_state:
         errors.append("restart_state_mismatch")
     if machine_ready and blockers:

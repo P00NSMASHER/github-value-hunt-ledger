@@ -1,0 +1,146 @@
+{
+  "schema_version": 16,
+  "search_run_id": "RUN:20260922T143415Z:hunter13:exp007-stale-assignment-preflight",
+  "timestamp": "2026-09-22T14:34:15.614996Z",
+  "hunter_role": "HUNTER-13",
+  "strategy_id": "STRAT:evaluation-target-independence",
+  "query_family": "EXP-007 duplicate-preflight against canonical prior verification",
+  "query_family_id": "QF:exp-007-duplicate-preflight-against-canonical-prior-verification",
+  "search_objective_id": "OBJ:independent-evaluation",
+  "measurement_quality": "prospective",
+  "work_action": "execute_fixture",
+  "lane_ids": [
+    "LAB-AUTOMATION"
+  ],
+  "seed_nodes": [
+    "CAP-013",
+    "CAP-017",
+    "EXP-007"
+  ],
+  "search_surfaces": [
+    "current HUNT_PLAN",
+    "canonical search_runs.jsonl",
+    "prior immutable search-run submissions",
+    "exact-revision OpenTFRaw source"
+  ],
+  "queries": [
+    "Is the generated entry.scan_event repair still unresolved?",
+    "Is the Opentrons kill/restart ambiguity branch still unexecuted?"
+  ],
+  "candidate_count": 1,
+  "deep_inspected": 1,
+  "retained_count": 0,
+  "master_promoted_count": 0,
+  "elapsed_minutes": null,
+  "tool_calls": null,
+  "recall_rescue_used": false,
+  "stop_reason": "Duplicate preflight found canonical completed evidence that falsifies the current Thermo repair instruction and already executes the Opentrons simulator ambiguity branches; rerun stopped.",
+  "stop_reason_standard": "completed_nonsearch",
+  "new_capability_ids": [],
+  "strengthened_capability_ids": [
+    "CAP-013",
+    "CAP-017"
+  ],
+  "experiment_ids": [
+    "EXP-007"
+  ],
+  "candidate_dispositions": [
+    {
+      "repository": "Sigilweaver/OpenTFRaw",
+      "revision": "63380dff0d25898f5c6e1184087dc590b0d7b6ab",
+      "status": "rejected",
+      "reason_code_standard": "duplicate_or_dominated",
+      "reason_detail": "Current assignment repeats a repair hypothesis already falsified by canonical RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay; prior run isolated LTQ v66 variable-size event parsing instead.",
+      "capability_ids": [
+        "CAP-013"
+      ],
+      "novelty_ordinal": null,
+      "evidence_ordinal": null,
+      "replacement_days_low": null,
+      "replacement_days_high": null,
+      "duplicate_of": "RUN:20260921T040405Z:hunter13:exp007-opentfraw-ltq-repair-replay",
+      "first_seen_in_registry": null,
+      "repository_profile": {
+        "observed_at": "2026-09-22",
+        "metadata_status": "observed",
+        "stars": null,
+        "forks_count": null,
+        "primary_language": "Rust",
+        "archived": false,
+        "fork": false,
+        "created_at": null,
+        "updated_at": null,
+        "pushed_at": null,
+        "owner_type": "Organization",
+        "topics": [],
+        "license_spdx": "Apache-2.0",
+        "source_type": "company",
+        "package_ecosystems": [
+          "Cargo",
+          "PyPI"
+        ],
+        "protocol_families": [
+          "Thermo RAW",
+          "mzML 1.1"
+        ],
+        "geography_tags": [],
+        "technology_domains": [
+          "mass-spectrometry",
+          "scientific-data-normalization",
+          "instrument-data-migration"
+        ],
+        "profile_source": "GitHub exact-revision source and canonical prior run"
+      }
+    }
+  ],
+  "best_result": "Generated EXP-007 assignment is stale relative to canonical evidence: the entry.scan_event repair was already falsified and both Opentrons simulator ambiguity branches were already executed.",
+  "durable_evidence_path": "referrals/hunt13-r28-2026-09-22-exp007-stale-assignment-preflight.md",
+  "notes": "No fixture was repeated. This run documents duplicate avoidance and a central-state reconciliation defect; physical device-in-the-loop evidence remains external.",
+  "benchmark_task_ids": [],
+  "comparison_group_id": null,
+  "evaluation_set_id": null,
+  "seed_mode": "generated",
+  "seed_ids": [],
+  "adjacency_mode": "none",
+  "adjacency_ids": [],
+  "adjacency_types": [],
+  "adjacency_root_nodes": [],
+  "coverage_mode": "none",
+  "coverage_gap_ids": [],
+  "allocation_mode": "generated",
+  "allocator_generation_id": "ALLOCGEN:da63048c7581",
+  "assignment_id": "ASSIGN:da63048c7581:slot-13",
+  "assignment_work_item_id": "WORK:verify:aec101b06ab5",
+  "portfolio_policy_generation_id": "PORTFOLIO:6c1a3e6e5624",
+  "assignment_slot_role": "verification",
+  "assignment_work_kind": "independent_verification",
+  "assignment_source_id": "VERIFY:EXP-007",
+  "assignment_score": 90.8,
+  "execution_claim_id": "CLAIM:be6863fbb5e1",
+  "execution_slot_id": "SLOT-13",
+  "execution_worker_id": "HUNTER-13",
+  "routing_mode": "generated",
+  "routing_generation_id": "ROUTING:a0a57856d600",
+  "worker_profile_generation_id": "WORKERS:70e9f3831b9f",
+  "routing_score": 29.204,
+  "dispatch_ticket_id": "DISPATCH:4fd17f5deba6",
+  "dispatch_generation_id": "DISPATCHGEN:f3eceae5d417",
+  "routing_learning_generation_id": "ROUTELEARN:bc40639ef4db",
+  "route_override_reason": null,
+  "dispatch_kind": "primary",
+  "dispatch_parent_ticket_id": null,
+  "presence_generation_id": "PRESENCEGEN:3a8927cad232",
+  "presence_event_id": "PRESENCE:7b7e34118d87",
+  "activation_id": "ACTIVATE:fe72e6d715b5",
+  "activation_generation_id": "ACTGEN:8720b6b5e914",
+  "coordination_signal_ids": [
+    "SIG:exp007-stale-central-state"
+  ],
+  "consumed_coordination_signal_ids": [],
+  "recall_rescue_type": null,
+  "recall_rescue_found_qualifying_candidate": null,
+  "search_moves": [],
+  "candidate_preflight_checks": 3,
+  "known_candidate_preflight_hits": 3,
+  "duplicate_deep_inspections_avoided": 2
+}

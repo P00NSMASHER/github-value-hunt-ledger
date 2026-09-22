@@ -5,14 +5,15 @@ Seed-level performance becomes meaningful only after hunters record V5 seed_ids.
 | Seed | Runs | Inspected | Retained | MASTER | New-cap runs | Experiment runs | Evidence |
 |---|---:|---:|---:|---:|---:|---:|---|
 | SEED:gap:cap-002 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-001 | 1 | 1 | 1 | 0 | 0 | 1 | insufficient |
 | SEED:gap:cap-012 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-014 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:learn:rule-period-authority-version-audit-abstention-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-008 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-015 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:coverage:language-family-c-cpp:rule-version-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
+| SEED:learn:rule-period-authority-version-audit-abstention-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:dna:gsa-gsa-acquisition-dfars | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:dna:a-jatin-freight-ratecon-extraction | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:dna:accelerationconsortium-helios | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
@@ -24,7 +25,6 @@ Seed-level performance becomes meaningful only after hunters record V5 seed_ids.
 | SEED:gap:cap-007 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-019 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:gap:cap-016 | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
-| SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:coverage:language-family-rust:promotion-control-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:coverage:age-band-one-3y:model-roundtrip-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |
 | SEED:coverage:language-family-go:format-normalization-transfer | 0 | 0 | 0 | 0 | 0 | 0 | insufficient |

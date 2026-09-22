@@ -1,10 +1,11 @@
 # ALLOCATOR LEARNING REPORT
 
-- Portfolio policy: **PORTFOLIO:7d0862b1d1ea**
-- Mode: **baseline_insufficient_evidence**
+- Portfolio policy: **PORTFOLIO:6c1a3e6e5624**
+- Mode: **learning_bootstrap_second_measurement_slot**
 - Attributed assignment runs: **5**
 - Attribution-debt runs: **0**
 - Roles with sufficient evidence: **0**
+- Learning bootstrap active: **true**
 
 V10 changes portfolio capacity only from executed assignment telemetry. Generated plans that were never run receive no learning credit.
 
@@ -23,18 +24,19 @@ V10 changes portfolio capacity only from executed assignment telemetry. Generate
 
 | Role | Baseline slots | Effective slots |
 |---|---:|---:|
-| adjacency | 2 | 2 |
+| adjacency | 2 | 1 |
 | coverage | 3 | 3 |
 | experiment | 6 | 6 |
-| measurement | 1 | 1 |
+| measurement | 1 | 2 |
 | verification | 1 | 1 |
 | wildcard | 1 | 1 |
 
 ## Adaptation decision
 
-- Shift: **none**
+- Shift: **{"automatic_revert_condition": "first strategy-level prior becomes eligible_for_policy_consideration", "blind_confirmation_operational": true, "confirmed_strategy_priors": 0, "from_role": "adjacency", "measurement_recommendations": 3, "reason": "blind_learning_bootstrap_no_confirmed_strategy_priors", "slot_id": "SLOT-11", "to_role": "measurement"}**
 - At most one slot can move per generation.
-- Measurement, verification and wildcard remain protected roles.
-- Experiment, coverage and adjacency cannot move outside configured minimum/maximum slot bounds.
+- Measurement, verification and wildcard remain protected roles during ordinary performance adaptation.
+- During blind-learning bootstrap only, one adjacency/coverage/experiment slot above its configured minimum may temporarily become a second measurement slot; this reverts after the first confirmed strategy prior.
+- Experiment, coverage and adjacency cannot move outside configured minimum slot bounds.
 - Manual overrides are measured separately and never silently treated as generated allocator success.
 - Allocation signal is a scheduling heuristic; realized outcomes remain the strongest downstream evidence.

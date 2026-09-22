@@ -4,6 +4,7 @@ from production.restart_readiness import (
     build_restart_readiness,
     count_shadow_runs,
     parse_matched_benchmark_tasks,
+    unmatched_benchmark_tasks,
     validate_restart_readiness,
 )
 
@@ -52,9 +53,20 @@ def split_status(*, ready):
 
 
 def scoreboard(matched):
+    detail = []
+    for index in range(1, matched + 1):
+        task_id = f"{index:02d}"
+        detail.append(
+            f"| {task_id} | CONTROL | 25 |"
+        )
+        detail.append(
+            f"| {task_id} | EXPERIMENT | 25 |"
+        )
     return (
         "# SCOREBOARD\n"
         f"- Matched tasks scored: **{matched}** — details.\n"
+        + "\n".join(detail)
+        + "\n"
     )
 
 
@@ -83,6 +95,38 @@ class RestartReadinessTests(unittest.TestCase):
                 "## Run 1\nx\n## Shadow Science Run 2\n"
             ),
             2,
+        )
+
+    def test_unmatched_task_parser_reports_missing_arm_only(self):
+        text = (
+            "# SCOREBOARD\n"
+            "- Matched tasks scored: **47** — details.\n"
+            "| 01 | CONTROL | 25 |\n"
+            "| 01 | EXPERIMENT | 25 |\n"
+            "| 06 | CONTROL | 25 |\n"
+            "| 07 | CONTROL | 25 |\n"
+            "| 08 | CONTROL | 25 |\n"
+        )
+        debt = unmatched_benchmark_tasks(
+            text,
+            expected_tasks=8,
+        )
+        by_id = {
+            row["task_id"]: row
+            for row in debt
+        }
+        self.assertNotIn("01", by_id)
+        self.assertEqual(
+            by_id["06"]["missing_arms"],
+            ["EXPERIMENT"],
+        )
+        self.assertEqual(
+            by_id["07"]["missing_arms"],
+            ["EXPERIMENT"],
+        )
+        self.assertEqual(
+            by_id["08"]["missing_arms"],
+            ["EXPERIMENT"],
         )
 
     def test_current_blocker_pattern_is_blocked(self):
@@ -116,6 +160,15 @@ class RestartReadinessTests(unittest.TestCase):
             "frozen_benchmark_incomplete",
             codes,
         )
+        benchmark_blocker = next(
+            row
+            for row in report["blockers"]
+            if row["code"] == "frozen_benchmark_incomplete"
+        )
+        self.assertEqual(
+            benchmark_blocker["unmatched_task_ids"],
+            ["48", "49", "50"],
+        )
         self.assertNotIn(
             "shadow_run_gate_incomplete",
             codes,
@@ -127,6 +180,26 @@ class RestartReadinessTests(unittest.TestCase):
         self.assertEqual(
             validate_restart_readiness(report),
             [],
+        )
+
+    def test_stale_50_of_50_summary_cannot_hide_missing_detail(self):
+        stale = scoreboard(50).replace(
+            "| 06 | EXPERIMENT | 25 |\n",
+            "",
+        )
+        report = build_restart_readiness(
+            split_status=split_status(ready=True),
+            activation_metrics={"current_activations": 0},
+            packets=packets(),
+            scoreboard_text=stale,
+            shadow_results=shadows(5),
+        )
+        self.assertFalse(
+            report["gates"]["benchmark_complete"]
+        )
+        self.assertEqual(
+            report["evidence"]["unmatched_benchmark_task_ids"],
+            ["06"],
         )
 
     def test_all_machine_gates_still_wait_for_user_approval(self):

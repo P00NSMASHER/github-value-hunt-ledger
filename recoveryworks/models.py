@@ -25,6 +25,9 @@ class Branch(str, Enum):
     SAAS = "saas"
     TELECOM = "telecom"
     REBATE = "rebate"
+    LEASE = "lease"
+    TAX = "tax"
+    INSURANCE = "insurance"
 
 
 class RecoveryMode(str, Enum):

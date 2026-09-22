@@ -1,14 +1,15 @@
 {
   "schema_version": 1,
   "slot_count": 14,
-  "event_count": 39,
-  "claim_count": 15,
+  "event_count": 41,
+  "claim_count": 16,
   "status_counts": {
     "RELEASED_AVAILABLE": 4,
-    "AVAILABLE": 8,
-    "EXPIRED_AVAILABLE": 2
+    "AVAILABLE": 7,
+    "EXPIRED_AVAILABLE": 2,
+    "RUNNING": 1
   },
-  "active_claims": 0,
+  "active_claims": 1,
   "complete_claims": 8,
   "telemetry_matched_completions": 8,
   "telemetry_debt_completions": 0

@@ -94,6 +94,18 @@ def main() -> int:
             f"{report['evidence']['required_matched_benchmark_tasks']}**"
         ),
         (
+            "- Unmatched benchmark tasks: **"
+            + (
+                ", ".join(
+                    report["evidence"][
+                        "unmatched_benchmark_task_ids"
+                    ]
+                )
+                or "none"
+            )
+            + "**"
+        ),
+        (
             f"- Shadow runs: **{report['evidence']['shadow_runs_total']}** "
             f"(required {report['evidence']['required_shadow_runs']})"
         ),

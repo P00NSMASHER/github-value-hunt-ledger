@@ -9,14 +9,15 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 | Priority | Seed | Type | Strategy | Capability | Why now |
 |---:|---|---|---|---|---|
 | 81 | SEED:gap:cap-002 | capability_gap | STRAT:capability-conjunction-search-claim-tracing | CAP-002 | CAP-002 is a current high-information gap (gap score 4, prior run attention 1). Saturation: INSUFFICIENT (+0 priority). Missing piece: datasets/customer identities separate. |
-| 79.5 | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | learning_measurement | STRAT:acceptance-path-transition-inspection | cross-domain | STRAT:acceptance-path-transition-inspection is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 4 runs / 10 deep; confirm evidence: 0 runs / 0 deep. Pair it with rule-version- |
 | 79 | SEED:gap:cap-001 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-001 | CAP-001 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: domain calibration and contractual/legal authority remain external. |
 | 79 | SEED:gap:cap-012 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-012 | CAP-012 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: jurisdiction completeness/semantics vary. |
 | 79 | SEED:gap:cap-014 | capability_gap | STRAT:protocol-regression-archaeology-for-pre-fat-systems | CAP-014 | CAP-014 is a current high-information gap (gap score 4, prior run attention 2). Saturation: INSUFFICIENT (+0 priority). Missing piece: secsgem's correction is source and local-test verified, not yet a real raw-HSMS/T3 ca |
-| 78.75 | SEED:learn:rule-period-authority-version-audit-abstention-transfer | learning_measurement | STRAT:rule-period-authority-version-audit | cross-domain | STRAT:rule-period-authority-version-audit is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 4 runs / 9 deep; confirm evidence: 0 runs / 0 deep. Pair it with abstention-trans |
 | 77 | SEED:gap:cap-008 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-008 | CAP-008 is a current high-information gap (gap score 4, prior run attention 3). Saturation: INSUFFICIENT (+0 priority). Missing piece: pin official rule-pack/table bytes, source identity, effective interval, parser/map d |
 | 77 | SEED:gap:cap-015 | capability_gap | STRAT:fail-open-boundary-archaeology | CAP-015 | CAP-015 is a current high-information gap (gap score 4, prior run attention 3). Saturation: INSUFFICIENT (+0 priority). Missing piece: first-party OEDI ZIP digest/bytes remain unresolved in the current evidence chain. Ve |
 | 76 | SEED:coverage:language-family-c-cpp:rule-version-transfer | coverage_gap | STRAT:rule-period-authority-version-audit | cross-domain | Intersect exploration blind spot COV:language-family:c-cpp (C / C++: 1/3) with rule-version-transfer, an authorized anchored search hypothesis. This is coverage correction tied to a valuable technical hypothesis, not div |
+| 75.0 | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | learning_measurement | STRAT:acceptance-path-transition-inspection | cross-domain | STRAT:acceptance-path-transition-inspection is a scheduler-selected adaptive-learning measurement target. Pair it with rule-version-transfer for one bounded comparable search. Scheduler-only learning state is intentional |
+| 75.0 | SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer | learning_measurement | STRAT:bidirectional-money-evidence-invariant-tracing | cross-domain | STRAT:bidirectional-money-evidence-invariant-tracing is a scheduler-selected adaptive-learning measurement target. Pair it with promotion-control-transfer for one bounded comparable search. Scheduler-only learning state  |
+| 75.0 | SEED:learn:rule-period-authority-version-audit-abstention-transfer | learning_measurement | STRAT:rule-period-authority-version-audit | cross-domain | STRAT:rule-period-authority-version-audit is a scheduler-selected adaptive-learning measurement target. Pair it with abstention-transfer for one bounded comparable search. Scheduler-only learning state is intentionally w |
 | 72 | SEED:dna:gsa-gsa-acquisition-dfars | positive_dna_transfer | STRAT:rule-period-authority-version-audit | cross-domain | Transfer the load-bearing implementation DNA of MASTER leader GSA/GSA-Acquisition-DFARS into unrelated verticals. Why it wins: first-party structured supplement authority that directly closes a high-value CaptureBrief ga |
 | 71 | SEED:dna:a-jatin-freight-ratecon-extraction | positive_dna_transfer | STRAT:capability-conjunction-search-claim-tracing | cross-domain | Transfer the load-bearing implementation DNA of MASTER leader A-Jatin/freight-ratecon-extraction into unrelated verticals. Why it wins: treats extraction uncertainty as a gate rather than a confidence decoration. |
 | 71 | SEED:dna:accelerationconsortium-helios | positive_dna_transfer | STRAT:decision-claim-runtime-side-effect-trace | cross-domain | Transfer the load-bearing implementation DNA of MASTER leader AccelerationConsortium/HELIOS into unrelated verticals. Why it wins: provides explicit scientific decision authority and learning/promotion controls. |
@@ -27,7 +28,6 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 | 69 | SEED:coverage:language-family-jvm:abstention-transfer | coverage_gap | STRAT:capability-conjunction-search-claim-tracing | cross-domain | Intersect exploration blind spot COV:language-family:jvm (Java / Kotlin: 1/3) with abstention-transfer, an authorized anchored search hypothesis. This is coverage correction tied to a valuable technical hypothesis, not d |
 | 63 | SEED:gap:cap-007 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-007 | CAP-007 is a current high-information gap (gap score 2, prior run attention 5). Saturation: INSUFFICIENT (+0 priority). Missing piece: unspecified. |
 | 63 | SEED:gap:cap-019 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-019 | CAP-019 is a current high-information gap (gap score 4, prior run attention 10). Saturation: INSUFFICIENT (+0 priority). Missing piece: whole-run completeness and negative authority remain source-specific. Execute the au |
-| 62 | SEED:gap:cap-016 | capability_gap | STRAT:rule-period-authority-version-audit | CAP-016 | CAP-016 is a current high-information gap (gap score 3, prior run attention 8). Saturation: INSUFFICIENT (+0 priority). Missing piece: unspecified. |
 
 ## Seed packets
 
@@ -46,26 +46,6 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 - Verification gate: Record the exact fixture/artifact subject, independent expected result, observed result and blocker. Completion of research is not completion of the acceptance test.
 - Stop conditions: Execute the existing alias/non-match/merge/split corpus before seeking another identity engine.; Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
 - Exclude domains: none
-- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
-
-### SEED:learn:acceptance-path-transition-inspection-rule-version-transfer — priority 79.5
-- Type/action: learning_measurement / search
-- Next action: Run the bounded anchored transfer queries and inspect one connected implementation path.
-- Query recipe: rule-version-transfer
-- Strategy: STRAT:acceptance-path-transition-inspection
-- Objective: OBJ:current-rule-authority
-- Capability/experiment: cross-domain exploration
-- Saturation/status: n/a / adjustment +0 / action n/a
-- Why now: STRAT:acceptance-path-transition-inspection is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 4 runs / 10 deep; confirm evidence: 0 runs / 0 deep. Pair it with rule-version-transfer so the run measures a real bounded search task. The worker must not know or infer whether this run will later be train or confirm.
-- Required signatures: effective rule version, historical evaluation, authority provenance
-- Query templates:
-  - OpenFisca reforms parameter
-  - "tax" "effective_date" path:tests
-  - "benefits" "rule_version"
-- Search surfaces: GitHub code search, low-star/zero-star repository search, archived repository archaeology, author/org adjacency, dependency/consumer adjacency
-- Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.
-- Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a learning-measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one materially different recall-rescue pass, then stop.; Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.
-- Exclude domains: government procurement
 - Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
 
 ### SEED:gap:cap-001 — priority 79
@@ -117,26 +97,6 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 - Verification gate: Record the exact fixture/artifact subject, independent expected result, observed result and blocker. Completion of research is not completion of the acceptance test.
 - Stop conditions: CAP-014 STOP: no third SECS/GEM engine until an actually executed endpoint disagreement needs adjudication. Run the neutral raw-HSMS fixture against both pinned endpoints first.; Reject generic CRUD/wrapper/dashboard matches with no load-bearing invariant.; Stop after repeated capability duplicates unless a new independent implementation, stronger evidence state, or materially different failure mode appears.
 - Exclude domains: none
-- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
-
-### SEED:learn:rule-period-authority-version-audit-abstention-transfer — priority 78.75
-- Type/action: learning_measurement / search
-- Next action: Run the bounded anchored transfer queries and inspect one connected implementation path.
-- Query recipe: abstention-transfer
-- Strategy: STRAT:rule-period-authority-version-audit
-- Objective: OBJ:independent-evaluation
-- Capability/experiment: cross-domain exploration
-- Saturation/status: n/a / adjustment +0 / action n/a
-- Why now: STRAT:rule-period-authority-version-audit is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 4 runs / 9 deep; confirm evidence: 0 runs / 0 deep. Pair it with abstention-transfer so the run measures a real bounded search task. The worker must not know or infer whether this run will later be train or confirm.
-- Required signatures: source span, selective prediction, review threshold
-- Query templates:
-  - "mortgage" "extraction" "abstain"
-  - "insurance" "source_span" "review"
-  - "mortgage" "confidence" path:tests
-- Search surfaces: GitHub code search, low-star/zero-star repository search, archived repository archaeology, author/org adjacency, dependency/consumer adjacency
-- Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.
-- Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a learning-measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one materially different recall-rescue pass, then stop.; Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.
-- Exclude domains: AP, freight
 - Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
 
 ### SEED:gap:cap-008 — priority 77
@@ -192,6 +152,66 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 - Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Coverage membership alone never raises evidence quality.
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; If the coverage qualifier produces only shallow variants, record the no-find and do not lower the evidence bar.
 - Exclude domains: government procurement
+- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
+
+### SEED:learn:acceptance-path-transition-inspection-rule-version-transfer — priority 75.0
+- Type/action: learning_measurement / search
+- Next action: Run the bounded anchored transfer queries and inspect one connected implementation path.
+- Query recipe: rule-version-transfer
+- Strategy: STRAT:acceptance-path-transition-inspection
+- Objective: OBJ:current-rule-authority
+- Capability/experiment: cross-domain exploration
+- Saturation/status: n/a / adjustment +0 / action n/a
+- Why now: STRAT:acceptance-path-transition-inspection is a scheduler-selected adaptive-learning measurement target. Pair it with rule-version-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation.
+- Required signatures: effective rule version, historical evaluation, authority provenance
+- Query templates:
+  - OpenFisca reforms parameter
+  - "tax" "effective_date" path:tests
+  - "benefits" "rule_version"
+- Search surfaces: GitHub code search, low-star/zero-star repository search, archived repository archaeology, author/org adjacency, dependency/consumer adjacency
+- Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.
+- Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a learning-measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one materially different recall-rescue pass, then stop.; Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.; Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result.
+- Exclude domains: government procurement
+- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
+
+### SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer — priority 75.0
+- Type/action: learning_measurement / search
+- Next action: Run the bounded anchored transfer queries and inspect one connected implementation path.
+- Query recipe: promotion-control-transfer
+- Strategy: STRAT:bidirectional-money-evidence-invariant-tracing
+- Objective: OBJ:runtime-side-effect
+- Capability/experiment: cross-domain exploration
+- Saturation/status: n/a / adjustment +0 / action n/a
+- Why now: STRAT:bidirectional-money-evidence-invariant-tracing is a scheduler-selected adaptive-learning measurement target. Pair it with promotion-control-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation.
+- Required signatures: promotion authority, versioned candidate, rollback test
+- Query templates:
+  - MLflow "alias" "rollback"
+  - "model registry" "approval"
+  - MLflow "champion" path:tests
+- Search surfaces: GitHub code search, low-star/zero-star repository search, archived repository archaeology, author/org adjacency, dependency/consumer adjacency
+- Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.
+- Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a learning-measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one materially different recall-rescue pass, then stop.; Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.; Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result.
+- Exclude domains: laboratory orchestration
+- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
+
+### SEED:learn:rule-period-authority-version-audit-abstention-transfer — priority 75.0
+- Type/action: learning_measurement / search
+- Next action: Run the bounded anchored transfer queries and inspect one connected implementation path.
+- Query recipe: abstention-transfer
+- Strategy: STRAT:rule-period-authority-version-audit
+- Objective: OBJ:independent-evaluation
+- Capability/experiment: cross-domain exploration
+- Saturation/status: n/a / adjustment +0 / action n/a
+- Why now: STRAT:rule-period-authority-version-audit is a scheduler-selected adaptive-learning measurement target. Pair it with abstention-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation.
+- Required signatures: source span, selective prediction, review threshold
+- Query templates:
+  - "mortgage" "extraction" "abstain"
+  - "insurance" "source_span" "review"
+  - "mortgage" "confidence" path:tests
+- Search surfaces: GitHub code search, low-star/zero-star repository search, archived repository archaeology, author/org adjacency, dependency/consumer adjacency
+- Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.
+- Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.; Do not turn a learning-measurement run into an unrestricted domain sweep.; A no-find result is valid data; do one materially different recall-rescue pass, then stop.; Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.; Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result.
+- Exclude domains: AP, freight
 - Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
 
 ### SEED:dna:gsa-gsa-acquisition-dfars — priority 72
@@ -292,24 +312,4 @@ Use a seed when it matches an authorized active gap. Record its seed_id in the V
 - Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo.
 - Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.
 - Exclude domains: grid outage datasets
-- Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.
-
-### SEED:dna:kodekinetics79-opstrax-enterprise-build — priority 71
-- Type/action: positive_dna_transfer / search
-- Next action: Run the bounded anchored transfer queries and inspect one connected implementation path.
-- Query recipe: physical-event-transfer
-- Strategy: STRAT:acceptance-path-transition-inspection
-- Objective: OBJ:authority-lineage
-- Capability/experiment: cross-domain exploration
-- Saturation/status: n/a / adjustment +0 / action n/a
-- Why now: Transfer the load-bearing implementation DNA of MASTER leader kodekinetics79/opstrax-enterprise-build into unrelated verticals. Why it wins: cleanly separates physical truth from commercial entitlement and billing.
-- Required signatures: physical event time, effective tariff, billable interval
-- Query templates:
-  - OCPP "transaction" "meterStart"
-  - EVSE "billing" "timestamp"
-  - "parking" "entry" "tariff" path:tests
-- Search surfaces: GitHub code search, low-star/zero-star repository search, archived repository archaeology, author/org adjacency, dependency/consumer adjacency
-- Verification gate: A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo.
-- Stop conditions: Use this named target-domain transfer hypothesis only; do not reopen a source-domain STOP gate.; Retain only a connected implementation plus source/tests for the transferred invariant; popularity and README claims are insufficient.; Do not search the originating vertical merely because its MASTER leader scored highly.; Reject forks/clones that add no independent implementation evidence.
-- Exclude domains: freight
 - Measured seed history: 0 runs / 0 inspections / 0 retained / 0 MASTER promotions.

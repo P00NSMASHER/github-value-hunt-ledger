@@ -14,6 +14,9 @@ calculation, review, and lifecycle layer used by all recovery branches.
 - **SaaSRecovery** — subscription, seat, and contracted-rate billing leakage.
 - **TelecomRecovery** — recurring service and CDR/usage billing leakage.
 - **RebateRecovery** — earned supplier/volume rebates not fully settled.
+- **LeaseRecovery** — rent, CAM, operating-expense, and area-based lease billing leakage.
+- **TaxRecovery** — professionally reviewed sales/use-tax and transaction-tax overpayments.
+- **InsuranceRecovery** — professionally reviewed commercial/property claim underpayments.
 
 ## Non-negotiable invariant
 
@@ -61,3 +64,21 @@ are documented in `recoveryworks/INGESTION_SAAS_TELECOM.md`.
 
 RebateRecovery tier modes, purchase/settlement schemas, and calculation controls
 are documented in `recoveryworks/INGESTION_REBATE.md`.
+
+LeaseRecovery landlord-charge, lease-rate, and area/allocation schemas are
+documented in `recoveryworks/INGESTION_LEASE.md`.
+
+## Portfolio readiness
+
+Operational-vs-foundation status for all RecoveryWorks divisions is tracked in
+`recoveryworks/PORTFOLIO.md`.
+
+ConstructionRecovery entitlement, schedule-version, CPM, event-mapping,
+qualified-causation, and settlement schemas are documented in
+`recoveryworks/INGESTION_CONSTRUCTION.md`.
+
+TaxRecovery invoice-tax, reviewed-assessment, rule-snapshot, and professional-review
+schemas are documented in `recoveryworks/INGESTION_TAX.md`.
+
+InsuranceRecovery claim, policy-assessment, settlement, and qualified-review schemas
+are documented in `recoveryworks/INGESTION_INSURANCE.md`.

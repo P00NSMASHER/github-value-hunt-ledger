@@ -31,14 +31,14 @@
       "manual_work_can_complete_packet": false,
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 79.5,
-      "packet_id": "LMP:18849ec8a55d3f0e",
-      "packet_sha256": "3fcf8418821bc86e1af6e15f3225c22b1078307aa3a4d6c4fa7722a4afe1da5c",
+      "packet_id": "LMP:22b9ba3ee5dc0dc8",
+      "packet_sha256": "0d105ace9a523ba09680d0c16310901b2191a3ba916be42d420e2ffcf89cdd3e",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
       "provenance": {
         "learning_curriculum_sha": "43d6836c032742efd5c797a766e59946a872ef47912907d8e3a3a56c0e806eba",
-        "search_seeds_sha": "5850cb00667842b82c7b10089be5ea1028d8a26e21475a537cf0a3983e44772e"
+        "search_seeds_sha": "fb3cd6f2719b814f1c150d40bc3909f3e4fa13c3b46c552ce1741767af8c5126"
       },
       "requires_generated_claim": true,
       "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
@@ -73,10 +73,11 @@
           "Reject forks/clones that add no independent implementation evidence.",
           "Do not turn a learning-measurement run into an unrestricted domain sweep.",
           "A no-find result is valid data; do one materially different recall-rescue pass, then stop.",
-          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership."
+          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.",
+          "Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result."
         ],
         "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.",
-        "why_now": "STRAT:acceptance-path-transition-inspection is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 4 runs / 10 deep; confirm evidence: 0 runs / 0 deep. Pair it with rule-version-transfer so the run measures a real bounded search task. The worker must not know or infer whether this run will later be train or confirm."
+        "why_now": "STRAT:acceptance-path-transition-inspection is a scheduler-selected adaptive-learning measurement target. Pair it with rule-version-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation."
       },
       "selection_reason": "reduce_train_evidence_deficit",
       "status": "PRECOMMITTED_ADVISORY",
@@ -111,14 +112,14 @@
       "manual_work_can_complete_packet": false,
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 78.75,
-      "packet_id": "LMP:cdd37b84a92a1635",
-      "packet_sha256": "8947f81e17e4fb1e04c6213118ebdcc48e5f2df615ce9e9ef11ed45a9449137a",
+      "packet_id": "LMP:78280f5bc099ca0e",
+      "packet_sha256": "0e21412f83e54aeec0212d01fcbe69b2e10fd91848ac3432f97e5f7987f76c4b",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
       "provenance": {
         "learning_curriculum_sha": "43d6836c032742efd5c797a766e59946a872ef47912907d8e3a3a56c0e806eba",
-        "search_seeds_sha": "5850cb00667842b82c7b10089be5ea1028d8a26e21475a537cf0a3983e44772e"
+        "search_seeds_sha": "fb3cd6f2719b814f1c150d40bc3909f3e4fa13c3b46c552ce1741767af8c5126"
       },
       "requires_generated_claim": true,
       "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
@@ -154,10 +155,11 @@
           "Reject forks/clones that add no independent implementation evidence.",
           "Do not turn a learning-measurement run into an unrestricted domain sweep.",
           "A no-find result is valid data; do one materially different recall-rescue pass, then stop.",
-          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership."
+          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.",
+          "Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result."
         ],
         "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.",
-        "why_now": "STRAT:rule-period-authority-version-audit is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 4 runs / 9 deep; confirm evidence: 0 runs / 0 deep. Pair it with abstention-transfer so the run measures a real bounded search task. The worker must not know or infer whether this run will later be train or confirm."
+        "why_now": "STRAT:rule-period-authority-version-audit is a scheduler-selected adaptive-learning measurement target. Pair it with abstention-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation."
       },
       "selection_reason": "reduce_train_evidence_deficit",
       "status": "PRECOMMITTED_ADVISORY",
@@ -192,14 +194,14 @@
       "manual_work_can_complete_packet": false,
       "measurement_phase": "train_measurement",
       "measurement_priority_audit_only": 60.0,
-      "packet_id": "LMP:785a181aa1ce2da1",
-      "packet_sha256": "593cb76ab636232e5d0a6b18107682e55a6149d9579a043f9d72bbcdf61324c4",
+      "packet_id": "LMP:1dafa60a98e37eb8",
+      "packet_sha256": "7ae8724469df9e63065ad94a6f61d3b5f13e60630eaf42d05f83263a30149080",
       "partition_selection_allowed": false,
       "partition_unknown_until_ingestion": true,
       "policy_effect": "none",
       "provenance": {
         "learning_curriculum_sha": "43d6836c032742efd5c797a766e59946a872ef47912907d8e3a3a56c0e806eba",
-        "search_seeds_sha": "5850cb00667842b82c7b10089be5ea1028d8a26e21475a537cf0a3983e44772e"
+        "search_seeds_sha": "fb3cd6f2719b814f1c150d40bc3909f3e4fa13c3b46c552ce1741767af8c5126"
       },
       "requires_generated_claim": true,
       "retry_rule": "A no-find/failure may be retried only for an independent operational reason, never to seek a different train/confirm partition.",
@@ -234,10 +236,11 @@
           "Reject forks/clones that add no independent implementation evidence.",
           "Do not turn a learning-measurement run into an unrestricted domain sweep.",
           "A no-find result is valid data; do one materially different recall-rescue pass, then stop.",
-          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership."
+          "Never compute, request, infer, retry, release, or alter the work based on train/confirm partition membership.",
+          "Do not inspect LEARNING_CURRICULUM.md, learning_curriculum.json, LEARNING_STATE.json, TRAINING_SPLIT_STATUS.json, or training split receipts before freezing this run's evidence and result."
         ],
         "verification_gate": "A transfer candidate must implement the invariant in executable code and tests; domain naming similarity is irrelevant. Prefer a different vertical or protocol family from the source repo. Use the named strategy consistently enough to make the run comparable; record no-find as valid evidence.",
-        "why_now": "STRAT:bidirectional-money-evidence-invariant-tracing is a curriculum-ranked adaptive-learning measurement target (train_measurement). Train evidence: 0 runs / 0 deep; confirm evidence: 0 runs / 0 deep. Pair it with promotion-control-transfer so the run measures a real bounded search task. The worker must not know or infer whether this run will later be train or confirm."
+        "why_now": "STRAT:bidirectional-money-evidence-invariant-tracing is a scheduler-selected adaptive-learning measurement target. Pair it with promotion-control-transfer for one bounded comparable search. Scheduler-only learning state is intentionally withheld from the worker; apply the named strategy exactly as specified and freeze the observed result before any learning-state reconciliation."
       },
       "selection_reason": "reduce_train_evidence_deficit",
       "status": "PRECOMMITTED_ADVISORY",

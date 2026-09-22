@@ -60,6 +60,24 @@ POLICIES: dict[Branch, BranchPolicy] = {
         RecoveryMode.UNDERPAYMENT,
         "rebate_recovery_reviewer",
     ),
+    Branch.LEASE: BranchPolicy(
+        Branch.LEASE,
+        RecoveryMode.OVERPAYMENT,
+        "lease_recovery_reviewer",
+        professional_review_note="Lease interpretation and CAM/operating-expense entitlement require qualified human review.",
+    ),
+    Branch.TAX: BranchPolicy(
+        Branch.TAX,
+        RecoveryMode.OVERPAYMENT,
+        "tax_recovery_reviewer",
+        professional_review_note="Taxability, refund eligibility, and filing action require qualified tax review.",
+    ),
+    Branch.INSURANCE: BranchPolicy(
+        Branch.INSURANCE,
+        RecoveryMode.UNDERPAYMENT,
+        "insurance_claims_reviewer",
+        professional_review_note="Coverage, valuation, causation, and recovery action require qualified insurance/claims review.",
+    ),
 }
 
 
