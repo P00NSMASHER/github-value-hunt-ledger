@@ -174,6 +174,19 @@ END;
 
 CREATE TRIGGER IF NOT EXISTS allocation_event_capacity BEFORE INSERT ON allocations BEGIN
   SELECT CASE WHEN
+    (SELECT COALESCE(SUM(amount_cents),0) FROM allocations
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+        AND event_id=NEW.event_id)
+    + NEW.amount_cents
+    > (SELECT amount_cents FROM settlement_events
+      WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+        AND event_id=NEW.event_id)
+  THEN RAISE(ABORT,'settlement event capacity exceeded') END;
+END;
+-- New trigger name is intentional. Existing databases may already contain the
+-- older gross-capacity trigger above; CREATE IF NOT EXISTS would not replace it.
+CREATE TRIGGER IF NOT EXISTS allocation_event_net_capacity BEFORE INSERT ON allocations BEGIN
+  SELECT CASE WHEN
     (
       (SELECT COALESCE(SUM(amount_cents),0) FROM allocations
         WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
