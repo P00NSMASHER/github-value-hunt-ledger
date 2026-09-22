@@ -1,6 +1,9 @@
 name: FMC Tariff Ledger Recover and Merge
 
 on:
+  workflow_run:
+    workflows: ["FMC Tariff Rule Ledger"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       source_run_id:
@@ -41,12 +44,21 @@ jobs:
           INPUT_RUN_ID: ${{ inputs.source_run_id }}
           INPUT_SHARDS: ${{ inputs.shard_count }}
           INPUT_RETENTION: ${{ inputs.retention_days }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          WORKFLOW_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
         run: |
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json, os
           from pathlib import Path
 
-          if os.environ.get('EVENT_NAME') == 'workflow_dispatch':
+          event = os.environ.get('EVENT_NAME')
+          if event == 'workflow_run':
+              if os.environ.get('WORKFLOW_RUN_CONCLUSION') != 'success':
+                  raise SystemExit('source FMC workflow did not complete successfully')
+              run_id = os.environ.get('WORKFLOW_RUN_ID', '').strip()
+              shard_count = 12
+              retention = 90
+          elif event == 'workflow_dispatch':
               run_id = os.environ.get('INPUT_RUN_ID', '').strip()
               shard_count = int(os.environ.get('INPUT_SHARDS') or '12')
               retention = int(os.environ.get('INPUT_RETENTION') or '90')
