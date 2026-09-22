@@ -61,3 +61,8 @@ are documented in `recoveryworks/INGESTION_SAAS_TELECOM.md`.
 
 RebateRecovery tier modes, purchase/settlement schemas, and calculation controls
 are documented in `recoveryworks/INGESTION_REBATE.md`.
+
+## Portfolio readiness
+
+Operational-vs-foundation status for all RecoveryWorks divisions is tracked in
+`recoveryworks/PORTFOLIO.md`.
