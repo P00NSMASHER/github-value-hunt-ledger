@@ -1,0 +1,594 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:supporting-components-01",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "source_files": [
+    "COMPONENTS.md",
+    "CAPABILITIES.md"
+  ],
+  "canonical_history_overwritten": false,
+  "typed_roles": [
+    "retained_component",
+    "retained_reference",
+    "watch",
+    "negative_oracle"
+  ],
+  "retained": [
+    {
+      "repository": "opensanctions/nomenklatura",
+      "revision": "844dba09fafc8512dc3ce241f44aa5415b367029",
+      "score": 29,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-002"
+      ],
+      "role": "Durable POSITIVE/NEGATIVE/UNSURE identity judgements and reversible clustering."
+    },
+    {
+      "repository": "ChelseaKR/constituent-reconciler",
+      "revision": "dbc09d25baec026027e65a0f8d21930509e2dd8e",
+      "score": 29,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-002"
+      ],
+      "role": "Evidence-backed human review/writeback pattern for identity correction."
+    },
+    {
+      "repository": "project-minigraf/minigraf",
+      "revision": "ccdc85e2921f4028a9312400fe53ecdd5b2202aa",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "role": "Bitemporal assertion/retraction/replay substrate for known-then vs valid-then."
+    },
+    {
+      "repository": "odoo/odoo",
+      "revision": "c55c82dac6283a77ee747e1e672a29e85180980f",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "role": "AP counter-event oracle: line-scoped vendor credit/cancellation/refund/return semantics."
+    },
+    {
+      "repository": "duke5am/pg-restore-drill",
+      "revision": "e914caddd14ab1604d85ccb7919d4da071a6766c",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "role": "Real PITR with known pre/post-target negative controls."
+    },
+    {
+      "repository": "carabiner-dev/ampel",
+      "revision": "5cf19bc2786cbd73a8423383a966fbf842222d23",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-007",
+        "CAP-010"
+      ],
+      "role": "Proof-admission kernel with signer identity, policy expiry and PASS/FAIL/SKIP semantics."
+    },
+    {
+      "repository": "in-toto/in-toto",
+      "revision": "e352b43ad7cb8915d84c36d791aa61346152a0a3",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-007",
+        "CAP-010"
+      ],
+      "role": "Authorized-functionary thresholds, artifact agreement and layout expiry verification."
+    },
+    {
+      "repository": "nearai/pg-backup",
+      "revision": "6836158bdfd38937a55fd21d72e221192d2a9b59",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "role": "Snapshot-consistent Postgres restore proof and verifier mutation/self-test evidence."
+    },
+    {
+      "repository": "kirilurbonas/FireDrill",
+      "revision": "1e532b17e49e4424f988b29dd338ae6c48dc20f3",
+      "score": 29,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "role": "Multi-engine isolated restore, semantic assertions, RTO/RPO, signed evidence and expected-subject coverage."
+    },
+    {
+      "repository": "snapetech/DuneAwakeningSelfHost",
+      "revision": "8d3bac1df38f45fb13e2c1427216bf5dc384687b",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "role": "Dual-plane PostgreSQL + RabbitMQ/Mnesia coherent-point recovery challenger."
+    },
+    {
+      "repository": "WiseOpsTeam/mneme",
+      "revision": "e595986e6efb3988e1d64ad0bba7d9761f123786",
+      "score": 18,
+      "status": "negative_oracle",
+      "capability_ids": [
+        "CAP-010"
+      ],
+      "role": "False-green oracle where process rc=0 can mask failed semantic verification."
+    },
+    {
+      "repository": "adamleap02/PermitBuild",
+      "revision": "ff795137e0c66e62a87e62956fa351926886255d",
+      "score": 29,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-012"
+      ],
+      "role": "Permit source/version/semantic-QA plane."
+    },
+    {
+      "repository": "slicedearth/contract-delta-au",
+      "revision": "630d1903507e6f5e47adaf1c690c9d6d4363af54",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "role": "Deterministic procurement history hydration/diff/run-failure pattern."
+    },
+    {
+      "repository": "chrisfulcher/orrery",
+      "revision": "89ae2218c031c2c46720783acfb44cea22e48636",
+      "score": 26,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "role": "SAM resourceId/manifest/currentness component preserving restriction/deletion/file metadata."
+    },
+    {
+      "repository": "SemaphoreSolutions/s4-clarity-lib",
+      "revision": "ad577fff3a3c4c93f4bb898940a0b45268c7dbe7",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Clarity workflow-state adapter."
+    },
+    {
+      "repository": "Illumina/interop",
+      "revision": "015a85ec100c7a770ed0e27ce7fadc6230a38208",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Official operational sequencing run-metric parser."
+    },
+    {
+      "repository": "NationalGenomicsInfrastructure/scilifelab_epps",
+      "revision": "fbbe16f9a5ee50d4df610b20908cef501da32bbe",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Clarity-to-run-folder/identity/RunInfo/InterOp/LIMS writeback integration."
+    },
+    {
+      "repository": "chaitanyakasaraneni/samplesheet-parser",
+      "revision": "511b484f59de18ed3f444f064d46e9c930dba630",
+      "score": 26,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Independent V1/V2/AVITI sample-sheet parse/convert/diff/validation gate."
+    },
+    {
+      "repository": "labscript-suite/labscript-suite",
+      "revision": "0ab902d0d8bc681fcd6a3a194d7b0d458c9b5338",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Deterministic mixed-hardware scientific execution family."
+    },
+    {
+      "repository": "labscript-suite/labscript-devices",
+      "revision": "424b9f4b0de931f48fe1b0e5760797f9e5b89ee5",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Device integration half of labscript mixed-hardware execution family."
+    },
+    {
+      "repository": "AD-SDL/MADSci",
+      "revision": "6b1ab6a70ce8b15af7aa8968479c90d9138753d0",
+      "score": 25,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Lost-response/UNKNOWN ambiguity primitive; current SiLA receipt mapping is restart-fragile."
+    },
+    {
+      "repository": "Opentrons/opentrons",
+      "revision": "03b991fb263b97b6bb767ce311ca56e103d635e4",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-017"
+      ],
+      "role": "Vendor-native run_id plus persisted run/action/command state and restart-persistence tests."
+    },
+    {
+      "repository": "Sigilweaver/OpenTFRaw",
+      "revision": "63380dff0d25898f5c6e1184087dc590b0d7b6ab",
+      "score": 27,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-013"
+      ],
+      "role": "Independent Thermo decoder with peak-array agreement but severe metadata disagreement; use as falsifier."
+    },
+    {
+      "repository": "CodeMaru-Dreamine/Dreamine.Gem",
+      "revision": "82604d6f03c1e95e0558de5c757989b27cd4a3d6",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "role": "Stateful SECS/GEM host/equipment over HSMS/TCP."
+    },
+    {
+      "repository": "bparzella/secsgem",
+      "revision": "59a5242d8672dad73367a0acd18088adf461404f",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "role": "Independent SECS/GEM implementation for differential acceptance and all-or-nothing mutation tests."
+    },
+    {
+      "repository": "sudosahil/pmis",
+      "revision": "03d5c47c2a235e12f3c53ed518201476f566fc72",
+      "score": 25,
+      "status": "retained_component",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-030"
+      ],
+      "role": "Exact agreement-BOQ line identity, authoritative agreed-rate reload and certification/quantity-ceiling controls."
+    },
+    {
+      "repository": "Rakesh-7989/Site-Tracker-Pro",
+      "revision": "4cbb87434b7909b39b11d764e29da97174579994",
+      "score": 22,
+      "status": "negative_oracle",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-030"
+      ],
+      "role": "Shows why generic security/tests do not prove construction commercial authority."
+    },
+    {
+      "repository": "prathamesh-git9/effect-broker",
+      "revision": "eb273640a3a8a2d65fc15169ed1f6d335608b23e",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "Crash-safe external-effect identity, durable reservation, OUTCOME_UNKNOWN and reconciliation."
+    },
+    {
+      "repository": "nzebrian/eruofood-ai",
+      "revision": "9c191ece9b27ad6efd7675dd7bf7013e5e1bdf1c",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "Append-only merchant earning/payable with historical economics and compensating reopen."
+    },
+    {
+      "repository": "spree/spree",
+      "revision": "2a419d42e86dea30a69a3c5b7764185cea132b3f",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Claim-before-send, unknown-result hold, reversal-first netting and concurrency protection."
+    },
+    {
+      "repository": "chase-sets/chase-sets",
+      "revision": "32aa260b31c93dc02767efebb1c37877cd4a9f3b",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Durable provider operation identity, stale-state reconciliation and receivable/clawback semantics."
+    },
+    {
+      "repository": "payops-labs/solana-payment-ops",
+      "revision": "7e4d9cc8d137e4d32cdb4b23aa5c0965f3379e94",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-006",
+        "CAP-018"
+      ],
+      "role": "Exact unique settlement-allocation oracle with partial/ambiguous/excess exception handling."
+    },
+    {
+      "repository": "Noone9029/Accounting-App",
+      "revision": "90e0eaa4896a55c1c8cda1c4101f4ab1323a4a61",
+      "score": 25,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-006"
+      ],
+      "role": "Pairwise partial-allocation edges with residual capacity and reversible history."
+    },
+    {
+      "repository": "moov-io/ach",
+      "revision": "f36ebb7ef2e6d678ef95ca6278d2b1f2deae4299",
+      "score": 26,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Nacha Return/Reversal lineage via OriginalTrace."
+    },
+    {
+      "repository": "Modern-Treasury/modern-treasury-python",
+      "revision": "406f354a06a98060df0c9f4c242fe56cc65e1526",
+      "score": 26,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Payment Order/reference to bank-derived Transaction/Return/Reversal bridge."
+    },
+    {
+      "repository": "szapata85/ACHInterbank",
+      "revision": "395a359230eff35e49cc196b49995ed4c49509b9",
+      "score": 25,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Fail-closed Exact/Ambiguous/NotFound return correlation."
+    },
+    {
+      "repository": "NotAbdelrahmanelsayed/paymob_integration",
+      "revision": "8999a6799c5673ad49471224ad0f8012a447495d",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Timeout-safe provider reference, inquiry repair and child-refund delta reversal."
+    },
+    {
+      "repository": "Maxed-OSS/statement-normalizer",
+      "revision": "0963c962a5ab618761ab57b604bad10578d39a0f",
+      "score": 21,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Bank-statement normalization input; not finality authority."
+    },
+    {
+      "repository": "cyber-entrepreneur/wingcaster",
+      "revision": "0d97a4ab8310d68b109e3a11ebdeda5eb3d3c829",
+      "score": 26,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "role": "Effective-contract -> rating -> invoice -> allocation -> reconciliation internal chain; external truth still required."
+    },
+    {
+      "repository": "amrit-kumar/fintechcore",
+      "revision": "b27a22890e8b5173d2a97be512a198a4564ed425",
+      "score": 25,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "Payment/ledger/reconciliation reference; tests deferred, so challenger only."
+    },
+    {
+      "repository": "az-said/Interlock",
+      "revision": "822ec54692b30e1fdce04b55dfab62d0b56a60b2",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "Stripe test-mode post-effect process kill and new-process recovery under one effect identity."
+    },
+    {
+      "repository": "karfalacisse900-alt/Flames-up.com",
+      "revision": "2ba5fa878da26f405bfae1846c8c90f1d0e69c10",
+      "score": 25,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Provider payout terminal-state evidence without crash/replay proof; economic finality only."
+    },
+    {
+      "repository": "ThousandBirdsInc/chidori",
+      "revision": "223bb8779f63822c3e63a9a4347dda7483a02158",
+      "score": 27,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "role": "Mediated side-effect journal/no-live replay/divergence/crash-resume; independent execution evidence still weak."
+    },
+    {
+      "repository": "BlackPigIndustries/threvo-actions",
+      "revision": "f50d568e8d67d1806a122b3151048f038832dcf9",
+      "score": 26,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "Financial-action lifecycle with FAILED_UNKNOWN and authoritative verification; provider cases not exercised."
+    },
+    {
+      "repository": "GiovanniGatti/talos",
+      "revision": "41fae94f941ea36fccddd395e86cd5662002e3cb",
+      "score": 26,
+      "status": "retained_component",
+      "capability_ids": [],
+      "role": "Finite-horizon capacity/revenue policy; synthetic savings are not customer ROI."
+    },
+    {
+      "repository": "oscal-compass/compliance-to-policy-go",
+      "revision": "45bfc1a8947e8b56b7e11391e13f8c1f2136cfaa",
+      "score": 27,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-007"
+      ],
+      "role": "Heterogeneous policy results -> OSCAL findings/observations; collection failure may never become pass."
+    },
+    {
+      "repository": "Payroll-Engine/PayrollEngine",
+      "revision": "2ddb5c770b0a955936562355a1021f06e922886a",
+      "score": 26,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-009",
+        "CAP-019"
+      ],
+      "role": "Bitemporal labor/domain-rule authority substrate; official data artifact closure incomplete."
+    },
+    {
+      "repository": "PayrollEngine.Backend",
+      "revision": "ecd049ee43a64c130981301192a0f8ab36eed1ed",
+      "score": 26,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-009",
+        "CAP-019"
+      ],
+      "role": "Backend half of temporal labor/domain-rule authority substrate."
+    },
+    {
+      "repository": "Jaskeeratr/grid-reliability-analytics",
+      "revision": "24e59a7318db3560b6547ff9b79416119abf6ecb",
+      "score": 28,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-015"
+      ],
+      "role": "Evaluator-QA exposing cross-year event_id reuse and additive-grain inflation."
+    },
+    {
+      "repository": "tonytonycoder11/stripe-connect-reckon",
+      "revision": "deb30aabfed84c7b0b2e5ae28c92cc9f85f79193",
+      "score": 25,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-018"
+      ],
+      "role": "Terminal-state Stripe readback/event-gap sensor independent of local payout state."
+    },
+    {
+      "repository": "intuit/QuickBooks-V3-Java-SDK",
+      "revision": "c4d5dfad23ffebf0302356876d0dc389708513a9",
+      "score": 26,
+      "status": "retained_component",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "Provider request-id behavior proving durable effect identity must live outside SDK lifecycle."
+    },
+    {
+      "repository": "simstudioai/sim",
+      "revision": "a2c9756113a13debfa1c6b5b1503700fae9007d9",
+      "score": null,
+      "status": "retained_reference",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "VendorCredit adapter reference with optional request ID and blind-retry suppression."
+    },
+    {
+      "repository": "manuvarkey/cmbautomiser",
+      "revision": "fea18e164c63dad4526ac59d7a51cfec7cafb860",
+      "score": 21,
+      "status": "negative_oracle",
+      "capability_ids": [],
+      "proposed_capability_ids": [
+        "CAP-030"
+      ],
+      "role": "Historical bill-support mutability falsifier."
+    },
+    {
+      "repository": "awksedgreep/caretaker",
+      "revision": "08b309dd927f7f2c26d4aa42fec4533dceeb7cf1",
+      "score": 22,
+      "status": "negative_oracle",
+      "capability_ids": [],
+      "role": "USP transaction-integrity negative control: required/partial semantics encoded but not enforced."
+    },
+    {
+      "repository": "openfisca/openfisca-france",
+      "revision": "ebcb7782d17058495c6ca33c278e373e167b641b",
+      "score": 24,
+      "status": "watch",
+      "capability_ids": [
+        "CAP-009",
+        "CAP-019"
+      ],
+      "role": "Dated rules-as-code with official references but monthly granularity mismatch for day-effective changes."
+    }
+  ],
+  "exact_revision_debt": [
+    {
+      "repository": "OCA/bank-statement-import",
+      "observed_revision_prefix": "01be32ea",
+      "reason": "COMPONENTS.md stores only abbreviated revision; exact revision required before ingestion."
+    },
+    {
+      "repository": "sebastienrousseau/bankstatementparser",
+      "observed_revision_prefix": "b3309b78",
+      "reason": "COMPONENTS.md stores only abbreviated revision; exact revision required before ingestion."
+    }
+  ],
+  "note": "MASTER-duplicated elite repos were omitted from this supporting batch. Negative oracles are intentionally retained as falsification assets and must not be promoted as production authority."
+}
