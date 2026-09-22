@@ -94,11 +94,18 @@ def run_scan(
     engine: RecoveryEngine | None = None,
 ) -> RecoveryScanBatch:
     normalized = tuple(observations)
+    allowed_hashes = {source.source_hash for source in manifest.sources}
     for observation in normalized:
         if observation.client_id != manifest.client_id:
             raise ValueError("observation client_id does not match frozen scan")
         if observation.branch not in manifest.branches:
             raise ValueError("observation branch is outside frozen scan scope")
+        if observation.rule is not None and observation.rule.source_hash not in allowed_hashes:
+            raise ValueError("observation rule source is outside frozen scan manifest")
+        for ref in observation.evidence:
+            if ref.source_hash not in allowed_hashes:
+                raise ValueError("observation evidence source is outside frozen scan manifest")
+
     findings = (engine or RecoveryEngine()).scan(normalized)
     body = {
         "schema": 1,
