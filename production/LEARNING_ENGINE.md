@@ -195,3 +195,21 @@ Generated artifacts:
 
 The training environment remains `policy_effect=none`. Optimizers may use the train partition to propose variants, but only confirm/evaluation evidence plus the existing held-out/canary/global promotion gates may authorize later policy changes.
 
+### 10. Deterministic repair workbench — implemented
+
+`production/repair_queue.py` and `tools/ti_repair_queue.py` compile the learning layer into an auditable repair queue.
+
+There are only two active states:
+
+- `NEEDS_REPRODUCTION` — produced from train→confirm overfit or hidden-regression signals. This is a falsification task only. It cannot authorize a mutation because a statistical alert is not yet a reproducible defect.
+- `READY_FOR_REPAIR` — produced only from an immutable, non-sensitive, non-benchmark-contaminated learning-failure packet that already contains reproduction steps, evidence refs and a concrete regression-test requirement.
+
+Every repair task is content-hashed and carries an explicit logical mutation scope. Automatic writes, global promotion, verifier/evaluator/controller changes, benchmark/holdout changes, credential access, safety-policy edits and promotion-history mutation are forbidden.
+
+The generated artifacts are:
+
+- `intelligence/REPAIR_QUEUE.json`;
+- `intelligence/REPAIR_QUEUE.md`.
+
+The workbench is advisory. It is not a worker router and does not itself modify a live prompt, skill or harness. A completed candidate repair still must pass `assess_repair_candidate`, then the existing held-out/adversarial/adjacent-domain/canary promotion gates.
+

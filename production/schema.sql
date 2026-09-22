@@ -162,3 +162,22 @@ create table if not exists intel_outcome_credit_edge (
   primary key (outcome_id, run_id)
 );
 
+-- Advisory repair workbench. A row may authorize only a bounded candidate
+-- repair; it never authorizes direct live/global mutation or promotion.
+create table if not exists intel_repair_task (
+  id text primary key,
+  state text not null,
+  priority_score int not null,
+  source_kind text not null,
+  source_id text not null,
+  target_type text not null,
+  target_id text not null,
+  failure_class text not null,
+  evidence_refs jsonb not null default '[]',
+  reproduction_steps jsonb not null default '[]',
+  regression_test_requirement text,
+  mutation_scope jsonb not null,
+  task_sha256 text not null,
+  created_at timestamptz not null default now()
+);
+
