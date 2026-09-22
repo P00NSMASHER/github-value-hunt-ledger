@@ -520,22 +520,22 @@ def fetch_to_temp(
 def persist_plan(conn: sqlite3.Connection, source: Source, p: dict[str, Any]) -> int:
     vals = (
         source.source_key,
-        p.get("plan_name"),
-        p.get("plan_id_type"),
-        str(p.get("plan_id")) if p.get("plan_id") is not None else None,
-        p.get("plan_market_type"),
+        str(p.get("plan_name") or ""),
+        str(p.get("plan_id_type") or ""),
+        str(p.get("plan_id") or ""),
+        str(p.get("plan_market_type") or ""),
+        str(p.get("issuer_name") or ""),
+        str(p.get("plan_sponsor_name") or ""),
     )
     conn.execute(
         """INSERT OR IGNORE INTO plans
-           (source_key,plan_name,plan_id_type,plan_id,plan_market_type)
-           VALUES(?,?,?,?,?)""", vals,
+           (source_key,plan_name,plan_id_type,plan_id,plan_market_type,issuer_name,plan_sponsor_name)
+           VALUES(?,?,?,?,?,?,?)""", vals,
     )
     row = conn.execute(
         """SELECT id FROM plans WHERE source_key=?
-           AND COALESCE(plan_name,'')=COALESCE(?,'')
-           AND COALESCE(plan_id_type,'')=COALESCE(?,'')
-           AND COALESCE(plan_id,'')=COALESCE(?,'')
-           AND COALESCE(plan_market_type,'')=COALESCE(?,'')""",
+           AND plan_name=? AND plan_id_type=? AND plan_id=?
+           AND plan_market_type=? AND issuer_name=? AND plan_sponsor_name=?""",
         vals,
     ).fetchone()
     assert row
@@ -596,7 +596,8 @@ def parse_index_file(
                 plan_count += len(plan_ids)
                 groups: list[tuple[str, list[dict[str, Any]]]] = []
                 groups.append(("in_network", rs.get("in_network_files") or []))
-                groups.append(("allowed_amounts", rs.get("allowed_amount_files") or []))
+                allowed = rs.get("allowed_amount_file")
+                groups.append(("allowed_amounts", [allowed] if isinstance(allowed, dict) else []))
                 for ftype, entries in groups:
                     for f in entries:
                         if not isinstance(f, dict):
