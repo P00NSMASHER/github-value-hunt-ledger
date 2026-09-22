@@ -27,6 +27,8 @@ def search_run(
         "timestamp": "2026-09-20T00:00:00Z",
         "measurement_quality": quality,
         "work_action": "search",
+        "allocation_mode": "generated",
+        "execution_claim_id": f"CLAIM:{run_id}",
         "strategy_id": "STRAT:x",
         "query_family_id": "QF:x",
         "query_family": "x",
@@ -274,8 +276,12 @@ class TrainingEnvironmentTests(unittest.TestCase):
             confirm_bucket=0,
         )
         execution_origin = "RUN:execution-origin"
-        anchor_split = partition_for_id(
+        execution = search_run(
             execution_origin,
+        )
+        execution["work_action"] = "execute_fixture"
+        anchor_split = partition_for_id(
+            execution["execution_claim_id"],
             config=config,
         )
         support_id = None
@@ -292,11 +298,6 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 opposite_id = run_id
             if support_id and opposite_id:
                 break
-
-        execution = search_run(
-            execution_origin,
-        )
-        execution["work_action"] = "execute_fixture"
 
         edges, excluded = build_outcome_credit(
             [
@@ -318,7 +319,7 @@ class TrainingEnvironmentTests(unittest.TestCase):
         )
         self.assertEqual(
             edges[0]["credit_anchor"]["kind"],
-            "excluded_direct_origin_hash",
+            "excluded_direct_origin_precommit",
         )
         self.assertEqual(
             edges[0]["credit_anchor"]["split"],
@@ -330,6 +331,43 @@ class TrainingEnvironmentTests(unittest.TestCase):
                 config=config,
             ),
             anchor_split,
+        )
+
+    def test_manual_run_is_train_only_even_if_run_id_hashes_to_confirm(self):
+        config = TrainingEnvironmentConfig(
+            confirm_modulus=2,
+            confirm_bucket=0,
+        )
+        chosen = None
+        for index in range(100):
+            run_id = f"RUN:manual:{index}"
+            if partition_for_id(run_id, config=config) == "confirm":
+                chosen = search_run(run_id)
+                break
+        self.assertIsNotNone(chosen)
+        chosen["allocation_mode"] = "manual_override"
+        chosen["execution_claim_id"] = None
+        self.assertEqual(
+            split_for_run(chosen, config=config),
+            "train",
+        )
+
+    def test_untrusted_excluded_origin_cannot_anchor_support_credit(self):
+        execution = search_run("RUN:manual-execution")
+        execution["work_action"] = "execute_fixture"
+        execution["allocation_mode"] = "manual_override"
+        execution["execution_claim_id"] = None
+        support = search_run("RUN:generated-support")
+        out = outcome(["RUN:manual-execution"])
+
+        edges, excluded = build_outcome_credit(
+            [execution, support],
+            [out],
+        )
+        self.assertEqual(edges, [])
+        self.assertEqual(
+            excluded[0]["reason"],
+            "untrusted_excluded_direct_origin_partition",
         )
 
     def test_date_only_outcome_does_not_credit_same_day_indirect_support(self):
