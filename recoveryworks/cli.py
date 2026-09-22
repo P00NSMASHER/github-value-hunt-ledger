@@ -105,6 +105,11 @@ def build_parser() -> argparse.ArgumentParser:
     recovered.add_argument("finding_id")
     recovered.add_argument("--recovered-cents", type=int, required=True)
     recovered.add_argument("--fee-cents", type=int, default=0)
+    recovered.add_argument(
+        "--settlement-total-cents",
+        type=int,
+        help="verified total settlement amount; defaults to this case allocation",
+    )
     _add_receipt_args(recovered, "recovery_settlement")
 
     reject = sub.add_parser("reject", help="record reviewer rejection locally")
@@ -210,6 +215,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.recovered_cents,
             args.fee_cents,
             recovery_evidence=_receipt(args),
+            settlement_total_cents=args.settlement_total_cents,
         )
     elif args.command == "reject":
         ledger.reject(args.finding_id, args.reviewer, args.note)
