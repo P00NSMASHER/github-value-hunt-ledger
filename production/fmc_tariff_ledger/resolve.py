@@ -48,6 +48,46 @@ def _authority_key(row: sqlite3.Row) -> tuple[str, str]:
     return version, digest
 
 
+def _semantic_value(value: Any) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
+def _semantic_fingerprint(row: sqlite3.Row) -> tuple[Any, ...]:
+    """Business-semantic fingerprint independent of mirror/source hash.
+
+    Rule text needs normalized excerpt content because it can carry authority
+    even when there is no numeric amount. Numeric/quantity terms rely on their
+    structured fields so harmless mirror formatting differences do not create
+    false conflicts.
+    """
+    excerpt = (
+        _semantic_value(row["evidence_excerpt"])
+        if (row["term_kind"] or "").lower() == "rule_text"
+        else ""
+    )
+    return (
+        _semantic_value(row["rule_type"]),
+        _semantic_value(row["term_kind"]),
+        _semantic_value(row["amount_value"]),
+        _semantic_value(row["currency"]),
+        _semantic_value(row["unit"]),
+        _semantic_value(row["quantity_value"]),
+        _semantic_value(row["effective_from"]),
+        _semantic_value(row["effective_to"]),
+        excerpt,
+    )
+
+
+def _semantics_by_hash(rows: list[sqlite3.Row]) -> dict[str, frozenset[tuple[Any, ...]]]:
+    grouped: dict[str, set[tuple[Any, ...]]] = {}
+    for row in rows:
+        digest = (row["source_sha256"] or "").strip()
+        if not digest:
+            continue
+        grouped.setdefault(digest, set()).add(_semantic_fingerprint(row))
+    return {digest: frozenset(values) for digest, values in grouped.items()}
+
+
 def _rows_to_candidates(rows: list[sqlite3.Row]) -> list[Candidate]:
     seen: set[tuple[Any, ...]] = set()
     out: list[Candidate] = []
@@ -160,9 +200,31 @@ def resolve_rule(
 
     # Multiple explicit versions effective on the same latest date are a hard conflict.
     ambiguous = len(nonempty_versions) > 1
+    conflict_reason = (
+        "MULTIPLE_EXPLICIT_VERSIONS"
+        if ambiguous
+        else None
+    )
+    mirror_hashes_semantically_identical = None
+
     # If version labels are absent, multiple source hashes are not safe to collapse.
     if not nonempty_versions and len(hashes) > 1:
         ambiguous = True
+        conflict_reason = "MULTIPLE_UNVERSIONED_SOURCE_HASHES"
+
+    # A shared version label is not sufficient by itself: publishers can silently
+    # replace content without incrementing a revision. Multiple hashes carrying
+    # the same explicit version are resolved only when extracted business
+    # semantics are identical across every hash.
+    if len(nonempty_versions) == 1 and len(hashes) > 1:
+        semantic_sets = list(_semantics_by_hash(latest).values())
+        mirror_hashes_semantically_identical = (
+            bool(semantic_sets)
+            and all(values == semantic_sets[0] for values in semantic_sets[1:])
+        )
+        if not mirror_hashes_semantically_identical:
+            ambiguous = True
+            conflict_reason = "SAME_VERSION_DIVERGENT_CONTENT"
 
     candidates = _rows_to_candidates(latest)
     return {
@@ -175,6 +237,8 @@ def resolve_rule(
         "selected_effective_from": latest_start,
         "authority_versions": sorted(nonempty_versions),
         "source_hashes": sorted(hashes),
+        "authority_conflict_reason": conflict_reason,
+        "mirror_hashes_semantically_identical": mirror_hashes_semantically_identical,
         "candidates": [asdict(x) for x in candidates],
     }
 
