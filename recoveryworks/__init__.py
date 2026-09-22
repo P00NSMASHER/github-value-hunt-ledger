@@ -1,4 +1,15 @@
 """RecoveryWorks / RecoveryOS shared recovery intelligence layer."""
+from .authorization import (
+    AuthorizationEvaluation,
+    AuthorizationRevocation,
+    AuthorizationState,
+    RecoveryActionAuthorization,
+    RecoveryActionType,
+    assert_action_allowed,
+    evaluate_authorization,
+    issue_authorization,
+    revoke_authorization,
+)
 from .engine import RecoveryEngine, RecoveryObservation
 from .ledger import RecoveryLedger
 from .sqlite_ledger import SQLiteRecoveryLedger
@@ -14,10 +25,15 @@ from .models import (
 )
 
 __all__ = [
+    "AuthorizationEvaluation",
+    "AuthorizationRevocation",
+    "AuthorizationState",
     "Branch",
     "CaseState",
     "EvidenceRef",
     "FindingState",
+    "RecoveryActionAuthorization",
+    "RecoveryActionType",
     "RecoveryEngine",
     "RecoveryFinding",
     "RecoveryLedger",
@@ -28,6 +44,10 @@ __all__ = [
     "RecoveryScanManifest",
     "RuleRef",
     "SourceManifestEntry",
+    "assert_action_allowed",
+    "evaluate_authorization",
     "freeze_scan",
+    "issue_authorization",
+    "revoke_authorization",
     "run_scan",
 ]
