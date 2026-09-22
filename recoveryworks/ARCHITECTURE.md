@@ -40,3 +40,7 @@ The universal client-facing output is the Recovery Ledger:
 - fee eligibility and realized fee
 
 This supports one-time historical audits and continuous monitoring without changing the evidence model.
+
+## Hostile-examination layer
+
+For findings at or above $1,000,000 of validated potential recovery, RecoveryOS adds a mandatory assurance layer above the ordinary branch engines: point-in-time authority snapshots, source authentication attestations, a code/input calculation manifest, two approving reviewers, an independent adverse-evidence challenge, deadline assessment, a frozen CaseProofBundle, explicit client actor authorization, and a hashed exact outbound-action envelope. The durable journal preserves these artifacts for replay. See `recoveryworks/HOSTILE_EXAMINATION_STANDARD.md`.
