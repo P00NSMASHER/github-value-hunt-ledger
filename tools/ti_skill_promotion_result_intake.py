@@ -132,14 +132,12 @@ def main() -> int:
     json_path = Path(args.json_output)
     json_path.parent.mkdir(parents=True, exist_ok=True)
     json_path.write_text(
-        json.dumps(state, indent=2, sort_keys=True) + "
-",
+        json.dumps(state, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     md_path = Path(args.markdown_output)
     md_path.write_text(
-        render_markdown(state) + "
-",
+        render_markdown(state) + "\n",
         encoding="utf-8",
     )
     print(json_path)
