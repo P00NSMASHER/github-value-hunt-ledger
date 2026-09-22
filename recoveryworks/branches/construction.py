@@ -113,6 +113,43 @@ class ScheduleVersion:
                     f"relationship successor {rel.successor_id!r} is missing"
                 )
 
+    @property
+    def version_hash(self) -> str:
+        """Canonical hash of this schedule version independent of container file bytes."""
+        payload = {
+            "schema": 1,
+            "version_id": self.version_id,
+            "project_id": self.project_id,
+            "data_date": self.data_date,
+            "label": self.label,
+            "activities": [
+                {
+                    "activity_id": activity.activity_id,
+                    "name": activity.name,
+                    "duration_days": activity.duration_days,
+                }
+                for activity in sorted(self.activities, key=lambda item: item.activity_id)
+            ],
+            "relationships": [
+                {
+                    "predecessor_id": rel.predecessor_id,
+                    "successor_id": rel.successor_id,
+                    "lag_days": rel.lag_days,
+                    "relationship_type": rel.relationship_type,
+                }
+                for rel in sorted(
+                    self.relationships,
+                    key=lambda item: (
+                        item.predecessor_id,
+                        item.successor_id,
+                        item.relationship_type,
+                        item.lag_days,
+                    ),
+                )
+            ],
+        }
+        return canonical_hash(payload)
+
     def evidence(self) -> EvidenceRef:
         return EvidenceRef(
             evidence_id=f"construction-schedule:{self.version_id}",
@@ -127,6 +164,7 @@ class ScheduleVersion:
                 "label": self.label,
                 "activity_count": len(self.activities),
                 "relationship_count": len(self.relationships),
+                "version_hash": self.version_hash,
                 **dict(self.metadata),
             },
         )
@@ -705,6 +743,19 @@ def audit_construction_recovery(
                 "qualified causation review predates the delay event",
             ))
             continue
+        event_date = _iso_date("event_date", event.event_date)
+        baseline_date = _iso_date("baseline data_date", baseline.data_date)
+        update_date = _iso_date("update data_date", update.data_date)
+        if event_date < baseline_date or event_date > update_date:
+            exceptions.append(ConstructionAuditException(
+                entitlement_id,
+                "EVENT_OUTSIDE_SCHEDULE_WINDOW",
+                (
+                    f"event date {event.event_date} is outside baseline/update "
+                    f"window {baseline.data_date}..{update.data_date}"
+                ),
+            ))
+            continue
 
         try:
             if baseline.version_id not in cpm_cache:
@@ -759,13 +810,25 @@ def audit_construction_recovery(
                 "mapped activity does not show positive earliest-finish delay",
             ))
             continue
-        if review.accepted_delay_days > project_delay_days:
+        if not (baseline_activity.critical or update_activity.critical):
+            exceptions.append(ConstructionAuditException(
+                entitlement_id,
+                "MAPPED_ACTIVITY_NOT_CRITICAL",
+                (
+                    "mapped activity is non-critical in both schedule versions; "
+                    "deterministic CPM does not support attributing project delay to it"
+                ),
+            ))
+            continue
+        supported_delay_days = min(project_delay_days, mapped_finish_delay_days)
+        if review.accepted_delay_days > supported_delay_days:
             exceptions.append(ConstructionAuditException(
                 entitlement_id,
                 "ACCEPTED_DELAY_EXCEEDS_CPM_IMPACT",
                 (
                     f"review accepted {review.accepted_delay_days} days but deterministic "
-                    f"project-duration delta is {project_delay_days} days"
+                    f"mapped/project CPM support is {supported_delay_days} days "
+                    f"(project={project_delay_days}, mapped={mapped_finish_delay_days})"
                 ),
             ))
             continue
@@ -828,9 +891,11 @@ def audit_construction_recovery(
                 "entitlement_basis": entitlement.entitlement_basis,
                 "baseline_version_id": baseline.version_id,
                 "baseline_source_hash": baseline.source_hash,
+                "baseline_version_hash": baseline.version_hash,
                 "baseline_data_date": baseline.data_date,
                 "update_version_id": update.version_id,
                 "update_source_hash": update.source_hash,
+                "update_version_hash": update.version_hash,
                 "update_data_date": update.data_date,
                 "baseline_project_duration_days": baseline_cpm.project_duration_days,
                 "update_project_duration_days": update_cpm.project_duration_days,
@@ -838,6 +903,7 @@ def audit_construction_recovery(
                 "mapped_baseline_activity_id": mapping.baseline_activity_id,
                 "mapped_update_activity_id": mapping.update_activity_id,
                 "mapped_activity_finish_delay_days": mapped_finish_delay_days,
+                "supported_causation_delay_days": supported_delay_days,
                 "baseline_activity_critical": baseline_activity.critical,
                 "update_activity_critical": update_activity.critical,
                 "accepted_delay_days": review.accepted_delay_days,
