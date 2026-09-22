@@ -23,11 +23,13 @@ def search_run(
     deep=2,
 ):
     return {
+        "schema_version": 16,
         "search_run_id": run_id,
         "timestamp": "2026-09-20T00:00:00Z",
         "measurement_quality": quality,
         "work_action": "search",
         "allocation_mode": "generated",
+        "routing_mode": "generated",
         "execution_claim_id": f"CLAIM:{run_id}",
         "strategy_id": "STRAT:x",
         "query_family_id": "QF:x",
