@@ -232,3 +232,22 @@ Generated artifacts:
 
 Automatic writes and automatic global promotion remain disabled.
 
+### 12. Independent skill-evaluation result intake — implemented
+
+`production/skill_eval_intake.py` and `tools/ti_skill_eval_result_intake.py` consume immutable evaluator results only for candidates already present in `SKILL_EVAL_QUEUE.md`.
+
+Every result must bind to the exact current skill-evaluation task hash and candidate-record hash. Mutate-dev and promotion-test sets must have distinct frozen fingerprints; the mutator must attest that it never saw promotion-test data; evaluator mutation and sealed-holdout access by the mutator are blocked.
+
+The positive transition remains narrow:
+
+`READY_FOR_SKILL_EVAL -> independent held-out result -> STAGED_MUTATION`
+
+`STAGED_MUTATION` is **not** live, deployed, canaried or global. It only enters `SKILL_PROMOTION_QUEUE.md`, which preserves the existing requirements: two distinct successes, at least five held-out tasks at 100% pass with zero regressions, adversarial and adjacent-domain passes, curator approval, and a three-hunter zero-regression canary before GLOBAL eligibility.
+
+Generated artifacts:
+
+- `intelligence/SKILL_EVAL_RESULT_INTAKE.json`;
+- `intelligence/SKILL_PROMOTION_QUEUE.md`.
+
+Automatic live writes and automatic global promotion remain disabled.
+
