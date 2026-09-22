@@ -107,6 +107,57 @@ class ValueMemoryTests(unittest.TestCase):
         observation = observed_search_reward(run)
         self.assertLess(observation.reward, 0)
 
+    def test_search_moves_receive_individual_not_whole_run_reward(self):
+        episode = {
+            "run_id": "RUN:moves",
+            "split": "train",
+            "state": {
+                "search_objective_id": "OBJ:test",
+            },
+            "action": {
+                "strategy_id": "STRAT:test",
+                "query_family_id": "QF:test",
+                "search_moves": [
+                    {
+                        "key": "MOVE:code_signature_search",
+                        "move_type": "code_signature_search",
+                        "result": "qualifying_hit",
+                        "deep_inspected": 1,
+                        "retained_count": 1,
+                    },
+                    {
+                        "key": "MOVE:direct_domain_search",
+                        "move_type": "direct_domain_search",
+                        "result": "no_hit",
+                        "deep_inspected": 0,
+                        "retained_count": 0,
+                    },
+                ],
+                "search_move_ids": [
+                    "MOVE:code_signature_search",
+                    "MOVE:direct_domain_search",
+                ],
+            },
+            "reward": {
+                "training_reward": 0.8,
+                "reward_stage": "technical_proxy",
+                "downstream": {"outcome_ids": []},
+            },
+            "provenance": {
+                "timestamp": "2026-09-20T00:00:00Z",
+            },
+        }
+        memory, _ = learn_training_episode_memory(
+            [episode],
+            config=ValueConfig(alpha=1.0, epsilon=0.0),
+        )
+        good = memory.get("MOVE:code_signature_search")
+        weak = memory.get("MOVE:direct_domain_search")
+        self.assertGreater(good.q_value, 0.5)
+        self.assertLess(weak.q_value, 0.0)
+        self.assertNotEqual(good.q_value, 0.8)
+        self.assertNotEqual(weak.q_value, 0.8)
+
     def test_objective_conditioned_memory_separates_opposite_strategy_value(self):
         episodes = [
             {
