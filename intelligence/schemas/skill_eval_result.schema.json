@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hunter Skill Evaluation Result v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "skill_eval_result_id",
+    "skill_eval_id",
+    "skill_eval_sha256",
+    "repair_candidate_id",
+    "candidate_record_sha256",
+    "artifact_id",
+    "baseline_version",
+    "candidate_version",
+    "mutate_dev_examples",
+    "promotion_test_examples",
+    "baseline_dev_score",
+    "candidate_dev_score",
+    "champion_test_score",
+    "candidate_test_score",
+    "hard_regressions",
+    "mutate_dev_set_sha256",
+    "promotion_test_set_sha256",
+    "evaluation_manifest_sha256",
+    "evaluator_identity",
+    "evaluation_evidence_refs",
+    "mutator_saw_promotion_test",
+    "evaluator_modified",
+    "sealed_holdout_opened_by_mutator",
+    "provenance_complete",
+    "sensitive_material_involved",
+    "benchmark_contaminated"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "skill_eval_result_id": {
+      "type": "string",
+      "pattern": "^SEVALRES:[A-Za-z0-9:_-]+$"
+    },
+    "skill_eval_id": {
+      "type": "string",
+      "pattern": "^SKILLEVAL:[A-Za-z0-9:_-]+$"
+    },
+    "skill_eval_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "repair_candidate_id": {
+      "type": "string",
+      "pattern": "^RCAND:[A-Za-z0-9:_-]+$"
+    },
+    "candidate_record_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact_id": {"type": "string", "minLength": 1},
+    "baseline_version": {"type": "string", "minLength": 1},
+    "candidate_version": {"type": "string", "minLength": 1},
+    "mutate_dev_examples": {"type": "integer", "minimum": 0},
+    "promotion_test_examples": {"type": "integer", "minimum": 0},
+    "baseline_dev_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "candidate_dev_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "champion_test_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "candidate_test_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "hard_regressions": {"type": "integer", "minimum": 0},
+    "mutate_dev_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "promotion_test_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evaluation_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evaluator_identity": {"type": "string", "minLength": 1},
+    "evaluation_evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "source_failure_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "mutator_saw_promotion_test": {"type": "boolean"},
+    "evaluator_modified": {"type": "boolean"},
+    "sealed_holdout_opened_by_mutator": {"type": "boolean"},
+    "provenance_complete": {"type": "boolean"},
+    "sensitive_material_involved": {"type": "boolean"},
+    "benchmark_contaminated": {"type": "boolean"},
+    "notes": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}
