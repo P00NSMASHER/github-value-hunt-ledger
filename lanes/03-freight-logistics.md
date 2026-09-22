@@ -586,3 +586,27 @@ Do not collect, reproduce, preserve, or exploit exposed credentials, personal da
 - Integration result: Freight Recovery v12 uses the licensed Trenova semantics alongside independent Opstrax physical truth and Kareya/Qatoto/benchmark comparators. v12 adds cross-document authority graph validation, explicit accessorial rule supersession, incorporated-tariff lineage, partial settlement proof and a final realized-recovery certificate.
 - Validation: v12 core passes **100/100 tests**. Base DET $100 → amendment $125 → billed $150 = $25 validated; later $25 credit memo = $25 realized/fee-eligible with separate authority, calculation, settlement and recovery-certificate hashes.
 - Next action: stop hunting another generic TMS/policy engine. Hunt real external accessorial/addendum acquisition plus real incumbent/settlement adapters and an authorized blind customer population.
+
+
+### bobaoxu2001/solar-logistics-control-tower — fail-closed effective-rate/accessorial audit comparator
+- Repository: https://github.com/bobaoxu2001/solar-logistics-control-tower
+- Commit / revision: 0f5a8c1c79cda6d7767e96b1e668b2e1c70d1063
+- Date discovered: 2026-09-22
+- What it contains: Zero-star MIT Python/SQL logistics control-tower project with a substantive deterministic freight-rating and invoice-control layer. The inspected SQL selects carrier+lane rates by shipment effective-date window, enforces minimum charges, computes fuel, keeps missing/expired rates NULL/unknown instead of converting them into zero-dollar expected charges, includes accessorial amounts only when contractually allowed, supported by documentation and within configured charge bands, detects duplicates/currency/carrier/fuel/material variance, and feeds a PO -> shipment -> invoice three-way match with MATCHED / WARNING / REVIEW / BLOCK / MISSING states. The repository also carries PostgreSQL/SQLite-compatible schema, seeded exception manifests, Excel/Power-BI reporting outputs and a large pytest suite.
+- Why it matters: This is a strong independent falsifier for Freight Recovery's money-state invariants. Its value is not the simulated exposure totals; it is the tested fail-closed behavior around stale/missing authority, effective-date selection, minimum charges, supported accessorials and payment blocking. Those cases can challenge the production engine without becoming part of its authority chain.
+- Commercial possibilities: Use as an independent acceptance-test comparator for a paid blind freight-audit evaluation; reuse generic MIT control patterns only where they do not weaken Freight Recovery's stricter authority/provenance model. Do not promote it into the production stack merely because it agrees with a finding.
+- Build-time savings: Roughly 3-6 weeks of independently designing and testing effective-rate, unrated-invoice, minimum-charge, accessorial-support and three-way-payment-control cases.
+- Evidence inspected: `sql/07_freight_audit.sql`; `sql/08_three_way_match.sql`; `tests/test_phase3.py`; `tests/test_freight_calculation.py`; `documentation/logistics_data_sop.md`; `documentation/project_architecture.md`; repository metadata; MIT LICENSE. Key tests explicitly assert one expected-rate row per shipment, effective-date correctness, minimum-charge enforcement, expected-fuel math, accessorial reconciliation, unrated invoices never becoming zero expectations, duplicate detection and finance-ready three-way statuses.
+- License / rights: MIT for original repository code/documentation. External public shipment data is separately disclosed by the author and is not required for our comparator logic.
+- Reuse classification: **Independent comparator / benchmark donor under current commercialization freeze.** No production integration absent EXP-001 or a concrete paying-customer gap.
+- Important limitations: Carrier/contracts/invoices/accessorials are simulated. SQLite is live-tested; the author's docs say PostgreSQL-compatible SQL was hardened but not live-tested in their environment. Manifest precision is intentionally only 54.94% because the rules surface valid downstream/control interactions beyond the narrow injected truth set, so detections require review and are not customer recovery proof.
+- Scores:
+  - Technical value: 9.2/10
+  - Commercial value: 8.8/10 as acceptance-test infrastructure
+  - Rarity: 9.1/10
+  - Completeness: 9.1/10 as a deterministic comparator
+  - Build-time saved: 8.7/10
+  - Data advantage: 6.5/10 because enterprise financial records are simulated
+  - High-ticket potential: 8.9/10 when used to strengthen buyer-facing independent validation
+- Combination opportunities: Existing Freight Recovery authority/rerating engine remains primary; run this comparator over frozen canonical inputs to test effective-date selection, minimums, accessorial support and unrated-abstention. Compare only semantic outcomes and exact money math; disagreement routes to review/falsification, never majority vote.
+- Next action: Add a compact independently authored regression tier for (1) no applicable rate -> UNKNOWN/$0 asserted, (2) expired rate -> REVIEW/$0 asserted, (3) minimum-charge boundary, (4) allowed+supported accessorial, (5) allowed-but-unsupported accessorial, and (6) duplicate/payment-block. Keep the external repository outside the production authority path.
