@@ -79,18 +79,18 @@ def main() -> int:
         "",
         "## Packets",
         "",
-        "| Packet | Strategy | Phase | Seed | Objective |",
-        "|---|---|---|---|---|",
+        "| Packet | Packet SHA-256 | Strategy | Phase | Seed | Objective |",
+        "|---|---|---|---|---|---|",
     ]
     for packet in bundle["packets"]:
         seed = packet["seed"]
         lines.append(
-            f"| {packet['packet_id']} | {packet['strategy_id']} | "
-            f"{packet['measurement_phase']} | {seed['seed_id']} | "
-            f"{seed.get('search_objective_id') or '—'} |"
+            f"| {packet['packet_id']} | {packet['packet_sha256']} | "
+            f"{packet['strategy_id']} | {packet['measurement_phase']} | "
+            f"{seed['seed_id']} | {seed.get('search_objective_id') or '—'} |"
         )
     if not bundle["packets"]:
-        lines.append("| — | — | — | — | — |")
+        lines.append("| — | — | — | — | — | — |")
 
     lines += [
         "",
@@ -99,8 +99,10 @@ def main() -> int:
         (
             "These packets become executable only after the user explicitly "
             "resumes hunters and the normal generated assignment/claim path "
-            "selects the work. Never select, release, retry, or substitute a "
-            "packet based on its eventual train/confirm partition."
+            "selects the work. For adaptive measurement, packet ID+SHA are "
+            "immutable provenance and become part of work/dispatch identity. "
+            "Never select, release, retry, mutate or substitute a packet based "
+            "on its eventual train/confirm partition."
         ),
         "",
     ]
