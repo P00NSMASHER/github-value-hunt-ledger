@@ -64,6 +64,21 @@ def _fallback(code:str, condition:bool=False)->Action:
     return Action("P1" if condition else "P0","PRODUCT / SECURITY REVIEW","UNMAPPED_REVIEW",code,"Resolve this launch-gate item with source evidence before overriding the gate.",("root-cause description","source evidence/configuration reference","reviewer sign-off if interpretation is required"),"Launch gate can be reevaluated.")
 
 def _lookup(code:str, condition:bool=False)->Action:
+    if code.startswith("rights_evidence:"):
+        return Action(
+            "P0",
+            "OWNER / LEGAL REVIEW",
+            "RIGHTS_DILIGENCE",
+            code,
+            "Verify executed commercial permission for the pinned runtime component.",
+            (
+                "executed permission object in the controlled diligence room",
+                "evidence location and lowercase SHA-256",
+                "ATTACHED_VERIFIED status",
+                "commercial_use scope set to CONFIRMED_ALLOWED after review",
+            ),
+            "The component-rights portion of the pilot launch gate can clear.",
+        )
     if code.startswith("deployment_evidence_invalid:"):
         return Action("P0","FREIGHT RECOVERY SECURITY","DEPLOYMENT_SECURITY",code,"Correct the invalid deployment-security evidence record.",("corrected evidence record","deployment evidence validator passes"),"Current-deployment route can be reevaluated.")
     if code.startswith("separate_environment_evidence_invalid:"):

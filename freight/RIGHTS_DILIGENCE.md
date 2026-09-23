@@ -1,6 +1,6 @@
 # Freight Recovery — Rights Evidence Diligence
 
-Updated: 2026-09-20
+Updated: 2026-09-23
 
 This process separates **what the repository says about component rights** from
 **the executed evidence that supports those statements**.
@@ -59,12 +59,16 @@ scope.
 ## Stage behavior
 
 ### Controlled pilot
-The validator permits the current operational state while emitting explicit
-warnings that executed permission evidence is not attached here.
+Any non-permissively licensed runtime component that relies on separate
+permission requires `ATTACHED_VERIFIED` executed evidence and a
+`CONFIRMED_ALLOWED` commercial-use scope. The current repository manifest is
+therefore **BLOCKED** for a controlled pilot; a private diligence-room manifest
+may clear the gate after verification without committing document bytes.
 
 ### Annual / acquirer diligence
-Commercial-use / hosted-SaaS / change-of-control scope must be resolved through
-verified evidence before the system can represent those rights as cleared.
+Commercial-use must be confirmed allowed. Hosted-SaaS and change-of-control
+scope must be resolved through verified evidence, and an explicitly denied
+required right remains a blocker.
 
 No code path should infer those rights from public visibility or from a generic
 commercial-use statement.

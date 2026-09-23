@@ -62,14 +62,6 @@ class LaunchDecision:
     warnings: tuple[str, ...]
 
 
-def _blocked_route(request: LaunchRequest) -> LaunchRoute:
-    return (
-        LaunchRoute.DEPLOYED_PILOT_BLOCKED
-        if request.data_path is DataPath.CURRENT_DEPLOYMENT
-        else LaunchRoute.SEPARATE_ENVIRONMENT_PENDING
-    )
-
-
 def evaluate_launch(
     *,
     readiness: ReadinessAssessment,
@@ -104,19 +96,10 @@ def evaluate_launch(
         rights_manifest,
         stage="pilot",
     )
-    blockers.extend(registry_errors)
-    blockers.extend(rights_errors)
+    blockers.extend("component_registry:" + error for error in registry_errors)
+    blockers.extend("rights_evidence:" + error for error in rights_errors)
     warnings.extend(registry_warnings)
     warnings.extend(rights_warnings)
-
-    if blockers:
-        return LaunchDecision(
-            LaunchStatus.BLOCKED,
-            _blocked_route(request),
-            tuple(blockers),
-            tuple(conditions),
-            tuple(warnings),
-        )
 
     if request.data_path is DataPath.CURRENT_DEPLOYMENT:
         if deployment_evidence is None:
@@ -133,19 +116,26 @@ def evaluate_launch(
                 )
             )
 
-        if blockers:
-            return LaunchDecision(
-                LaunchStatus.BLOCKED,
-                LaunchRoute.DEPLOYED_PILOT_BLOCKED,
-                tuple(blockers),
-                tuple(conditions),
-                tuple(warnings),
-            )
-
-        access = deployment_evidence.get("access_control") or {}
-        inventory = deployment_evidence.get("deployment_inventory") or {}
-        tenant = deployment_evidence.get("cross_tenant_isolation") or {}
-        parser = deployment_evidence.get("parser_sandbox") or {}
+        access = (
+            deployment_evidence.get("access_control") or {}
+            if isinstance(deployment_evidence, dict)
+            else {}
+        )
+        inventory = (
+            deployment_evidence.get("deployment_inventory") or {}
+            if isinstance(deployment_evidence, dict)
+            else {}
+        )
+        tenant = (
+            deployment_evidence.get("cross_tenant_isolation") or {}
+            if isinstance(deployment_evidence, dict)
+            else {}
+        )
+        parser = (
+            deployment_evidence.get("parser_sandbox") or {}
+            if isinstance(deployment_evidence, dict)
+            else {}
+        )
 
         if access.get("status") != "CONFIG_PROVEN":
             blockers.append("deployment_access_control_not_proven")
@@ -186,9 +176,9 @@ def evaluate_launch(
         if separate_environment_evidence is None:
             conditions.append("separate_environment_evidence_manifest_missing")
             return LaunchDecision(
-                LaunchStatus.CONDITIONAL,
+                LaunchStatus.BLOCKED if blockers else LaunchStatus.CONDITIONAL,
                 LaunchRoute.SEPARATE_ENVIRONMENT_PENDING,
-                (),
+                tuple(blockers),
                 tuple(conditions),
                 tuple(warnings),
             )
@@ -212,17 +202,21 @@ def evaluate_launch(
 
         if environment_conditions:
             return LaunchDecision(
-                LaunchStatus.CONDITIONAL,
+                LaunchStatus.BLOCKED if blockers else LaunchStatus.CONDITIONAL,
                 LaunchRoute.SEPARATE_ENVIRONMENT_PENDING,
-                (),
+                tuple(blockers),
                 tuple(environment_conditions),
                 tuple(warnings),
             )
 
         return LaunchDecision(
-            LaunchStatus.READY,
-            LaunchRoute.CONTROLLED_MANUAL_BLIND_PILOT,
-            (),
+            LaunchStatus.BLOCKED if blockers else LaunchStatus.READY,
+            (
+                LaunchRoute.SEPARATE_ENVIRONMENT_PENDING
+                if blockers
+                else LaunchRoute.CONTROLLED_MANUAL_BLIND_PILOT
+            ),
+            tuple(blockers),
             (),
             tuple(warnings),
         )
@@ -245,6 +239,10 @@ def main() -> None:
     parser.add_argument("--requires-multi-tenant", action="store_true")
     parser.add_argument("--requires-parser", action="store_true")
     parser.add_argument("--separate-evidence-json")
+    parser.add_argument(
+        "--rights-manifest-json",
+        help="Private executed-rights evidence manifest; defaults to the repository manifest",
+    )
     parser.add_argument("--as-of-date")
     parser.add_argument("--expect", choices=("BLOCKED", "CONDITIONAL", "READY"))
     args = parser.parse_args()
@@ -272,7 +270,10 @@ def main() -> None:
     decision = evaluate_launch(
         readiness=readiness,
         component_registry=_load(root / "freight/COMPONENT_RIGHTS_REGISTRY.json"),
-        rights_manifest=_load(root / "freight/RIGHTS_EVIDENCE_MANIFEST.json"),
+        rights_manifest=_load(
+            args.rights_manifest_json
+            or root / "freight/RIGHTS_EVIDENCE_MANIFEST.json"
+        ),
         deployment_evidence=_load(
             root / "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json"
         ),

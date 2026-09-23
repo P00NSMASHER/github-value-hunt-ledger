@@ -8,6 +8,7 @@ EXP-001's internal proof boundary; it is not customer outcome evidence.
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 import time
 from datetime import datetime, timezone
@@ -19,6 +20,8 @@ AUTO, REVIEW = "AUTO", "REVIEW"
 ALLOCATED, ALREADY_ALLOCATED = "ALLOCATED", "ALREADY_ALLOCATED"
 REVERSED, ALREADY_REVERSED = "REVERSED", "ALREADY_REVERSED"
 T = TypeVar("T")
+_SHA256_RE = re.compile(r"[0-9a-f]{64}")
+_CURRENCY_RE = re.compile(r"[A-Z]{3}")
 
 
 @dataclass(frozen=True)
@@ -85,20 +88,123 @@ class SettlementStore:
         self.path = str(path)
         self.buyer_id = self._text("buyer_id", buyer_id)
         self.business_unit = self._text("business_unit", business_unit)
+        if type(busy_timeout_ms) is not int or not 1 <= busy_timeout_ms <= 60_000:
+            raise ValueError("busy_timeout_ms must be an integer from 1 to 60000")
         self.busy_timeout_ms = busy_timeout_ms
         if self.path == ":memory:":
             raise ValueError("file-backed SQLite is required for concurrent connections")
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as conn:
+        # sqlite3.Connection's context manager commits or rolls back but does
+        # not close the connection.  Close explicitly so Windows can delete,
+        # rotate, or restore the database after initialization.
+        conn = self._connect()
+        try:
             conn.execute("PRAGMA journal_mode=WAL")
             conn.executescript(Path(__file__).with_name("settlement_schema.sql").read_text())
             self._assert_scoped_schema(conn)
+        finally:
+            conn.close()
 
     @staticmethod
     def _assert_scoped_schema(conn: sqlite3.Connection) -> None:
+        integrity = conn.execute("PRAGMA integrity_check").fetchone()
+        if integrity is None or integrity[0] != "ok":
+            detail = "unknown" if integrity is None else str(integrity[0])
+            raise RuntimeError(f"settlement database integrity check failed: {detail}")
+        foreign_key_error = conn.execute("PRAGMA foreign_key_check").fetchone()
+        if foreign_key_error is not None:
+            raise RuntimeError(
+                "settlement database contains broken foreign-key evidence; "
+                "migrate or rebuild before use"
+            )
         cols = {row[1] for row in conn.execute("PRAGMA table_info(recovery_claims)")}
         if not {"buyer_id", "business_unit"}.issubset(cols):
             raise RuntimeError("legacy unscoped settlement schema detected; migrate or rebuild before use")
+        timestamp_shape = (
+            "'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T"
+            "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]."
+            "[0-9][0-9][0-9][0-9][0-9][0-9]Z'"
+        )
+        checks = (
+            (
+                "recovery_claims",
+                "length(source_hash)<>64 OR source_hash GLOB '*[^0-9a-f]*' "
+                "OR length(currency)<>3 OR currency GLOB '*[^A-Z]*' "
+                f"OR length(issued_at)<>27 OR issued_at NOT GLOB {timestamp_shape} "
+                "OR julianday(issued_at) IS NULL "
+                "OR strftime('%Y-%m-%dT%H:%M:%S',issued_at)<>substr(issued_at,1,19)",
+            ),
+            (
+                "settlement_events",
+                "length(source_hash)<>64 OR source_hash GLOB '*[^0-9a-f]*' "
+                "OR length(currency)<>3 OR currency GLOB '*[^A-Z]*' "
+                f"OR length(booked_at)<>27 OR booked_at NOT GLOB {timestamp_shape} "
+                "OR julianday(booked_at) IS NULL "
+                "OR strftime('%Y-%m-%dT%H:%M:%S',booked_at)<>substr(booked_at,1,19)",
+            ),
+            (
+                "counter_events",
+                "length(source_hash)<>64 OR source_hash GLOB '*[^0-9a-f]*' "
+                "OR length(currency)<>3 OR currency GLOB '*[^A-Z]*' "
+                f"OR length(observed_at)<>27 OR observed_at NOT GLOB {timestamp_shape} "
+                "OR julianday(observed_at) IS NULL "
+                "OR strftime('%Y-%m-%dT%H:%M:%S',observed_at)<>substr(observed_at,1,19)",
+            ),
+            (
+                "allocations",
+                f"length(created_at)<>27 OR created_at NOT GLOB {timestamp_shape} "
+                "OR julianday(created_at) IS NULL "
+                "OR strftime('%Y-%m-%dT%H:%M:%S',created_at)<>substr(created_at,1,19)",
+            ),
+            (
+                "review_claims",
+                f"length(flagged_at)<>27 OR flagged_at NOT GLOB {timestamp_shape} "
+                "OR julianday(flagged_at) IS NULL "
+                "OR strftime('%Y-%m-%dT%H:%M:%S',flagged_at)<>substr(flagged_at,1,19)",
+            ),
+            (
+                "reversal_edges",
+                f"length(created_at)<>27 OR created_at NOT GLOB {timestamp_shape} "
+                "OR julianday(created_at) IS NULL "
+                "OR strftime('%Y-%m-%dT%H:%M:%S',created_at)<>substr(created_at,1,19)",
+            ),
+        )
+        for table, predicate in checks:
+            if conn.execute(
+                f"SELECT 1 FROM {table} WHERE {predicate} LIMIT 1"
+            ).fetchone():
+                raise RuntimeError(
+                    f"settlement database contains noncanonical {table} evidence; "
+                    "migrate or rebuild before use"
+                )
+
+        chronology_checks = (
+            """SELECT 1 FROM counter_events c JOIN settlement_events e
+               ON e.buyer_id=c.buyer_id AND e.business_unit=c.business_unit
+              AND e.event_id=c.original_event_id
+               WHERE c.observed_at<e.booked_at OR c.currency<>e.currency LIMIT 1""",
+            """SELECT 1 FROM allocations a
+               JOIN settlement_events e ON e.buyer_id=a.buyer_id
+                AND e.business_unit=a.business_unit AND e.event_id=a.event_id
+               JOIN recovery_claims c ON c.buyer_id=a.buyer_id
+                AND c.business_unit=a.business_unit AND c.claim_id=a.claim_id
+               WHERE a.created_at<e.booked_at OR e.booked_at<c.issued_at LIMIT 1""",
+            """SELECT 1 FROM review_claims r
+               JOIN recovery_claims c ON c.buyer_id=r.buyer_id
+                AND c.business_unit=r.business_unit AND c.claim_id=r.claim_id
+               WHERE r.flagged_at<c.issued_at LIMIT 1""",
+            """SELECT 1 FROM reversal_edges r
+               JOIN counter_events c ON c.buyer_id=r.buyer_id
+                AND c.business_unit=r.business_unit AND c.counter_id=r.counter_id
+               JOIN allocations a ON a.buyer_id=r.buyer_id
+                AND a.business_unit=r.business_unit AND a.allocation_id=r.allocation_id
+               WHERE r.created_at<c.observed_at OR r.created_at<a.created_at LIMIT 1""",
+        )
+        if any(conn.execute(query).fetchone() for query in chronology_checks):
+            raise RuntimeError(
+                "settlement database contains chronologically invalid evidence; "
+                "migrate or rebuild before use"
+            )
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.path, timeout=self.busy_timeout_ms / 1000, isolation_level=None)
@@ -143,7 +249,24 @@ class SettlementStore:
     def _text(name: str, value: str) -> str:
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"{name} is required")
-        return value.strip()
+        normalized = value.strip()
+        if any(ord(character) < 32 for character in normalized):
+            raise ValueError(f"{name} cannot contain control characters")
+        return normalized
+
+    @staticmethod
+    def _source_hash(value: str) -> str:
+        normalized = SettlementStore._text("source_hash", value).lower()
+        if _SHA256_RE.fullmatch(normalized) is None:
+            raise ValueError("source_hash must be a 64-character SHA-256 hex digest")
+        return normalized
+
+    @staticmethod
+    def _currency(value: str) -> str:
+        normalized = SettlementStore._text("currency", value).upper()
+        if _CURRENCY_RE.fullmatch(normalized) is None:
+            raise ValueError("currency must be a three-letter code")
+        return normalized
 
     @staticmethod
     def _timestamp(name: str, value: str) -> str:
@@ -187,10 +310,10 @@ class SettlementStore:
             reference=self._text("reference", claim.reference),
             payer_id=self._text("payer_id", claim.payer_id),
             payee_id=self._text("payee_id", claim.payee_id),
-            currency=self._text("currency", claim.currency),
+            currency=self._currency(claim.currency),
             amount_cents=self._positive_cents("claim amount", claim.amount_cents),
             issued_at=self._timestamp("issued_at", claim.issued_at),
-            source_hash=self._text("source_hash", claim.source_hash),
+            source_hash=self._source_hash(claim.source_hash),
             fee_disqualified=int(claim.fee_disqualified),
         )
 
@@ -242,10 +365,10 @@ class SettlementStore:
             reference=self._text("reference", event.reference),
             payer_id=self._text("payer_id", event.payer_id),
             payee_id=self._text("payee_id", event.payee_id),
-            currency=self._text("currency", event.currency),
+            currency=self._currency(event.currency),
             amount_cents=self._positive_cents("settlement amount", event.amount_cents),
             booked_at=self._timestamp("booked_at", event.booked_at),
-            source_hash=self._text("source_hash", event.source_hash),
+            source_hash=self._source_hash(event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
         def op(conn: sqlite3.Connection) -> bool:
@@ -274,10 +397,10 @@ class SettlementStore:
             business_unit=self.business_unit,
             counter_id=self._text("counter_id", event.counter_id),
             original_event_id=self._text("original_event_id", event.original_event_id),
-            currency=self._text("currency", event.currency),
+            currency=self._currency(event.currency),
             amount_cents=self._positive_cents("counter amount", event.amount_cents),
             observed_at=self._timestamp("observed_at", event.observed_at),
-            source_hash=self._text("source_hash", event.source_hash),
+            source_hash=self._source_hash(event.source_hash),
             source_kind=self._text("source_kind", event.source_kind),
         )
         def op(conn: sqlite3.Connection) -> bool:
@@ -334,12 +457,17 @@ class SettlementStore:
         return int(row["residual"])
 
     def claim_residual(self, claim_id: str) -> int:
-        return self._read(lambda c: self._claim_residual(c, claim_id))
+        normalized = self._text("claim_id", claim_id)
+        return self._read(lambda c: self._claim_residual(c, normalized))
 
     def event_residual(self, event_id: str) -> int:
-        return self._read(lambda c: self._event_residual(c, event_id))
+        normalized = self._text("event_id", event_id)
+        return self._read(lambda c: self._event_residual(c, normalized))
 
     def auto_allocate(self, event_id: str, *, created_at: str) -> Decision:
+        event_id = self._text("event_id", event_id)
+        created_at = self._timestamp("created_at", created_at)
+
         def op(conn: sqlite3.Connection) -> Decision:
             event = conn.execute(
                 "SELECT * FROM settlement_events WHERE buyer_id=? AND business_unit=? AND event_id=?",
@@ -347,6 +475,8 @@ class SettlementStore:
             ).fetchone()
             if not event:
                 raise ValueError("unknown settlement event")
+            if created_at < event["booked_at"]:
+                raise ValueError("allocation cannot predate settlement event")
             old = conn.execute(
                 "SELECT allocation_id FROM allocations WHERE buyer_id=? AND business_unit=? AND event_id=? ORDER BY allocation_id",
                 (*self._scope, event_id),
@@ -375,7 +505,11 @@ class SettlementStore:
         return self._write(op)
 
     def review_allocate(self, *, allocation_id: str, claim_id: str, event_id: str, amount_cents: int, created_at: str) -> str:
+        allocation_id = self._text("allocation_id", allocation_id)
+        claim_id = self._text("claim_id", claim_id)
+        event_id = self._text("event_id", event_id)
         amount_cents = self._positive_cents("allocation amount", amount_cents)
+        created_at = self._timestamp("created_at", created_at)
 
         def op(conn: sqlite3.Connection) -> str:
             old = conn.execute(
@@ -403,6 +537,8 @@ class SettlementStore:
                 raise ValueError("allocation payer/payee mismatch")
             if event["booked_at"] < claim["issued_at"]:
                 raise ValueError("settlement event predates issued claim")
+            if created_at < event["booked_at"]:
+                raise ValueError("allocation cannot predate settlement event")
             if amount_cents > self._claim_residual(conn, claim_id):
                 raise ValueError("recovery claim capacity exceeded")
             if amount_cents > self._event_residual(conn, event_id):
@@ -462,6 +598,10 @@ class SettlementStore:
                 )
             if counter["original_event_id"] != allocation["event_id"]:
                 raise ValueError("counter event does not fund allocation")
+            if created_at < counter["observed_at"]:
+                raise ValueError("reversal cannot predate counter event")
+            if created_at < allocation["created_at"]:
+                raise ValueError("reversal cannot predate allocation")
 
             allocation_reversed = int(conn.execute(
                 "SELECT COALESCE(SUM(amount_cents),0) FROM reversal_edges "
@@ -499,6 +639,9 @@ class SettlementStore:
         return self._write(op)
 
     def auto_apply_counter(self, counter_id: str, *, created_at: str) -> Decision:
+        counter_id = self._text("counter_id", counter_id)
+        created_at = self._timestamp("created_at", created_at)
+
         def op(conn: sqlite3.Connection) -> Decision:
             counter = conn.execute(
                 "SELECT * FROM counter_events WHERE buyer_id=? AND business_unit=? AND counter_id=?",
@@ -506,6 +649,8 @@ class SettlementStore:
             ).fetchone()
             if not counter:
                 raise ValueError("unknown counter event")
+            if created_at < counter["observed_at"]:
+                raise ValueError("reversal cannot predate counter event")
             old = conn.execute(
                 "SELECT reversal_id FROM reversal_edges WHERE buyer_id=? AND business_unit=? AND counter_id=? ORDER BY reversal_id",
                 (*self._scope, counter_id),
@@ -524,6 +669,8 @@ class SettlementStore:
             live = [r for r in live if r["live_cents"] > 0]
             if not live:
                 return Decision(REVIEW, reason="original event has no live realized allocation")
+            if any(created_at < row["created_at"] for row in live):
+                raise ValueError("reversal cannot predate allocation")
             total = sum(int(r["live_cents"]) for r in live)
             if counter["amount_cents"] in (event["amount_cents"], total):
                 plan = [(r, int(r["live_cents"])) for r in live]
@@ -543,6 +690,9 @@ class SettlementStore:
         return self._write(op)
 
     def realized_cents(self, claim_id: str | None = None) -> int:
+        if claim_id is not None:
+            claim_id = self._text("claim_id", claim_id)
+
         def op(conn: sqlite3.Connection) -> int:
             params: tuple[object, ...] = self._scope + ((claim_id,) if claim_id else ())
             clause = " AND claim_id=?" if claim_id else ""
@@ -560,6 +710,9 @@ class SettlementStore:
         return self._read(op)
 
     def fee_eligible_cents(self, claim_id: str | None = None) -> int:
+        if claim_id is not None:
+            claim_id = self._text("claim_id", claim_id)
+
         def op(conn: sqlite3.Connection) -> int:
             params: tuple[object, ...] = self._scope + ((claim_id,) if claim_id else ())
             rows = conn.execute(

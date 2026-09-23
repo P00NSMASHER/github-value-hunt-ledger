@@ -1,4 +1,5 @@
 """Synthetic accounting cases for persistent report integration."""
+import hashlib
 import json
 from dataclasses import replace
 
@@ -40,6 +41,10 @@ def case(tmp_path, *, incumbent_ids=(), currency="USD"):
     return truth, incumbent, store
 
 
+def sha(value):
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
 def claim_for(finding, *, disqualified=False):
     return RecoveryClaim(
         "claim-" + finding.finding_id, finding.invoice_id, finding.carrier_id, finding.customer_id,
@@ -56,7 +61,7 @@ def add_claim(store, finding, *, disqualified=False):
 def pay(store, finding, *, event_id="payment-1", cents=2500, payer="carrier", reference=None):
     store.ingest_event(SettlementEventRecord(
         event_id, reference or finding.invoice_id, payer, "customer", finding.currency,
-        cents, "2026-09-02T00:00:00Z", "settlement-source-" + event_id,
+        cents, "2026-09-02T00:00:00Z", sha("settlement-source-" + event_id),
     ))
     store.review_allocate(
         allocation_id="allocation-" + event_id, claim_id="claim-" + finding.finding_id,
@@ -66,7 +71,7 @@ def pay(store, finding, *, event_id="payment-1", cents=2500, payer="carrier", re
 
 def return_payment(store, *, cents=2500, counter_id="return-1", apply=True):
     store.ingest_counter(CounterEventRecord(
-        counter_id, "payment-1", "USD", cents, "2026-09-03T00:00:00Z", "return-source-" + counter_id,
+        counter_id, "payment-1", "USD", cents, "2026-09-03T00:00:00Z", sha("return-source-" + counter_id),
     ))
     if apply:
         return store.auto_apply_counter(counter_id, created_at="2026-09-03T01:00:00Z")
@@ -129,7 +134,7 @@ def test_ambiguous_batch_return_cannot_leave_optimistic_report_totals(tmp_path):
     bindings = tuple(add_claim(store, finding) for finding in truth.findings)
     store.ingest_event(SettlementEventRecord(
         "payment-1", "batch-reference", "carrier", "customer", "USD", 5000,
-        "2026-09-02T00:00:00Z", "batch-source",
+        "2026-09-02T00:00:00Z", sha("batch-source"),
     ))
     for index, binding in enumerate(bindings):
         store.review_allocate(allocation_id=f"allocation-{index}", claim_id=binding.claim_id,
@@ -157,7 +162,7 @@ def test_incumbent_claim_with_fee_eligibility_is_rejected(tmp_path):
 
 
 @pytest.mark.parametrize("change, message", [
-    ({"source_hash": "unrelated-claim-evidence"}, "exact frozen finding proof"),
+    ({"source_hash": sha("unrelated-claim-evidence")}, "exact frozen finding proof"),
     ({"reference": "other-invoice"}, "identity/currency"),
     ({"payer_id": "other-carrier"}, "identity/currency"),
     ({"currency": "EUR"}, "identity/currency"),

@@ -33,7 +33,10 @@ def test_current_release_provenance_is_deterministic():
     assert "freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json" in a["control_file_hashes"]
     assert "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json" in a["control_file_hashes"]
     assert "freight/RIGHTS_EVIDENCE_MANIFEST.json" in a["control_file_hashes"]
+    assert "freight/settlement_schema.sql" in a["control_file_hashes"]
     assert ".github/workflows/technology-intelligence.yml" in a["control_file_hashes"]
+    assert ".github/workflows/recoveryworks.yml" in a["control_file_hashes"]
+    assert ".github/workflows/public-repo-hunter.yml" in a["control_file_hashes"]
 
 
 def test_invalid_component_revision_fails_closed():

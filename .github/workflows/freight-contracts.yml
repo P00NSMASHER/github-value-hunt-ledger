@@ -56,20 +56,20 @@ jobs:
         run: |
           PYTHONPATH=. python -m freight.hunter_bridge --source-ref "$GITHUB_SHA" --format markdown > /tmp/freight-hunter-review.md
           cat /tmp/freight-hunter-review.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Controlled-pilot rights evidence gate
-        run: PYTHONPATH=. python freight/rights_evidence.py --stage pilot
+      - name: Controlled-pilot rights remain blocked pending executed evidence
+        run: PYTHONPATH=. python freight/rights_evidence.py --stage pilot --expect BLOCKED
       - name: Validate collected deployment security evidence
-        run: PYTHONPATH=. python freight/deployment_security_evidence.py --as-of-date 2026-09-20 --expect FRESH
+        run: PYTHONPATH=. python freight/deployment_security_evidence.py --as-of-date "$(date -u +%F)" --expect FRESH
       - name: Canonical freight gap register
         run: PYTHONPATH=. python freight/gap_registry.py --list-active-search
       - name: Ready-pilot diagnostic fixture
         run: PYTHONPATH=. python freight/readiness.py freight/fixtures/readiness_ready.json
       - name: Current deployment customer-data launch remains blocked
-        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path current --as-of-date 2026-09-20 --expect BLOCKED
+        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path current --as-of-date "$(date -u +%F)" --expect BLOCKED
       - name: Generate current launch remediation brief
         shell: bash
         run: |
-          PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path current --as-of-date 2026-09-20 > /tmp/freight-launch-decision.json
+          PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path current --as-of-date "$(date -u +%F)" > /tmp/freight-launch-decision.json
           PYTHONPATH=. python freight/launch_brief.py /tmp/freight-launch-decision.json --format json > /tmp/freight-launch-brief.json
           grep -q '"deployment_team_mfa_not_enforced"' /tmp/freight-launch-brief.json
           grep -q '"customer_data_plane_not_discovered"' /tmp/freight-launch-brief.json
@@ -111,13 +111,13 @@ jobs:
           grep -q '"settlement_processing_allowed": false' /tmp/freight-engagement-state.json
           grep -q '"external_action_authorized": false' /tmp/freight-engagement-state.json
       - name: Validate separate environment evidence template
-        run: PYTHONPATH=. python freight/separate_environment_evidence.py freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --as-of-date 2026-09-20 --expect CONDITIONAL
-      - name: Separate environment remains conditional without evidence
-        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path separate --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --as-of-date 2026-09-20 --expect CONDITIONAL
+        run: PYTHONPATH=. python freight/separate_environment_evidence.py freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --as-of-date "$(date -u +%F)" --expect CONDITIONAL
+      - name: Separate environment remains blocked without rights or environment evidence
+        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path separate --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json --as-of-date "$(date -u +%F)" --expect BLOCKED
       - name: Validate verified separate environment evidence
-        run: PYTHONPATH=. python freight/separate_environment_evidence.py freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json --as-of-date 2026-09-21 --expect VERIFIED
-      - name: Verified separate environment launch route is ready
-        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path separate --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json --as-of-date 2026-09-21 --expect READY
+        run: PYTHONPATH=. python freight/separate_environment_evidence.py freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json --as-of-date "$(date -u +%F)" --expect VERIFIED
+      - name: Verified separate environment remains blocked pending executed rights
+        run: PYTHONPATH=. python freight/pilot_launch_gate.py freight/fixtures/readiness_ready.json --data-path separate --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json --as-of-date "$(date -u +%F)" --expect BLOCKED
       - name: Full synthetic commercial rehearsal
         run: PYTHONPATH=. python freight/synthetic_rehearsal.py
       - name: Generate deterministic release provenance

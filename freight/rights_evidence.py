@@ -121,7 +121,15 @@ def validate_rights_evidence(
 
         scopes = entry.get("scopes") or {}
         if entry.get("evidence_status") != "ATTACHED_VERIFIED":
-            warnings.append(f"{repo}: executed permission evidence not attached/verified")
+            errors.append(
+                f"{repo}: controlled pilot requires attached and verified "
+                "executed permission evidence"
+            )
+
+        if scopes.get("commercial_use") != "CONFIRMED_ALLOWED":
+            errors.append(
+                f"{repo}: commercial_use must be CONFIRMED_ALLOWED for runtime use"
+            )
 
         for scope, registry_field in REGISTRY_FIELDS.items():
             registry_value = component.get(registry_field)
@@ -138,14 +146,17 @@ def validate_rights_evidence(
                 )
 
         if stage == "annual":
-            required = ("commercial_use", "hosted_saas", "change_of_control")
+            required = ("hosted_saas", "change_of_control")
             for scope in required:
-                if scopes.get(scope) not in {
+                state = scopes.get(scope)
+                if state not in {
                     "CONFIRMED_ALLOWED",
                     "CONFIRMED_DENIED",
                     "NOT_APPLICABLE",
                 }:
                     errors.append(f"{repo}: annual diligence leaves {scope} unresolved")
+                elif state == "CONFIRMED_DENIED":
+                    errors.append(f"{repo}: annual diligence denies required {scope} rights")
 
     return errors, warnings
 
@@ -161,6 +172,7 @@ def main() -> None:
         default="freight/RIGHTS_EVIDENCE_MANIFEST.json",
     )
     parser.add_argument("--stage", choices=("pilot", "annual"), default="pilot")
+    parser.add_argument("--expect", choices=("CLEAR", "BLOCKED"))
     args = parser.parse_args()
 
     errors, warnings = validate_rights_evidence(
@@ -168,11 +180,15 @@ def main() -> None:
         load_json(args.manifest),
         stage=args.stage,
     )
+    state = "BLOCKED" if errors else "CLEAR"
     print(json.dumps({
         "stage": args.stage,
+        "state": state,
         "errors": errors,
         "warnings": warnings,
     }, indent=2))
+    if args.expect is not None:
+        raise SystemExit(0 if state == args.expect else 1)
     raise SystemExit(1 if errors else 0)
 
 

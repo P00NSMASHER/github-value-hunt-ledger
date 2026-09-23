@@ -2,6 +2,32 @@
 
 Updated: 2026-09-20
 
+## Unreleased hardening checkpoint - 2026-09-23
+
+This is current working-tree engineering evidence, not a replacement for the
+historical v15.14 release/CI record and not external customer proof.
+
+- Freight settlement evidence now requires canonical SHA-256 source digests,
+  canonical UTC operation times, and chronology enforcement in both service code
+  and direct-SQL triggers. Existing noncanonical stores fail closed on reopen.
+- Freight audit timestamps are canonical and nondecreasing; unsafe SQLite busy
+  timeout values are rejected instead of reaching PRAGMA construction.
+- RecoveryWorks recovered cash now requires verified, hash-bound settlement
+  evidence. Lifecycle approvals/authorizations cannot be rewritten after state
+  progression, nested proof payloads are immutable, and replay preserves
+  authenticated event times.
+- RecoveryWorks local compare-and-swap persistence is now serialized across
+  processes and private-file permissions are verified on POSIX and Windows.
+- All repository workflow actions are immutable SHA pins. Freight deployment
+  freshness checks now use the actual UTC workflow date and will fail when the
+  September 27 deployment snapshot expires unless it is recollected.
+- The composite pilot launch gate now blocks non-permissive runtime components
+  until executed permission evidence is verified and commercial use is
+  confirmed allowed; a private evidence-manifest input supports legitimate
+  clearance without committing executed documents.
+- These changes are locally verified; a new canonical release identity and
+  hosted CI run must be recorded only after the change is committed and CI passes.
+
 ## North-star milestone
 
 The first milestone that materially changes the business is:

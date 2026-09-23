@@ -102,6 +102,113 @@ CREATE TRIGGER IF NOT EXISTS immutable_counter_d BEFORE DELETE ON counter_events
 CREATE TRIGGER IF NOT EXISTS immutable_reverse_u BEFORE UPDATE ON reversal_edges BEGIN SELECT RAISE(ABORT,'reversal edge is immutable'); END;
 CREATE TRIGGER IF NOT EXISTS immutable_reverse_d BEFORE DELETE ON reversal_edges BEGIN SELECT RAISE(ABORT,'reversal edge is immutable'); END;
 
+CREATE TRIGGER IF NOT EXISTS claim_input_guard BEFORE INSERT ON recovery_claims BEGIN
+  SELECT CASE WHEN
+    length(NEW.source_hash)<>64 OR NEW.source_hash GLOB '*[^0-9a-f]*'
+  THEN RAISE(ABORT,'claim source_hash must be lowercase SHA-256') END;
+  SELECT CASE WHEN
+    length(NEW.currency)<>3 OR NEW.currency GLOB '*[^A-Z]*'
+  THEN RAISE(ABORT,'claim currency must be three uppercase letters') END;
+  SELECT CASE WHEN
+    length(NEW.issued_at)<>27 OR NEW.issued_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+    OR julianday(NEW.issued_at) IS NULL
+    OR strftime('%Y-%m-%dT%H:%M:%S',NEW.issued_at)<>substr(NEW.issued_at,1,19)
+  THEN RAISE(ABORT,'claim issued_at must be canonical UTC') END;
+END;
+CREATE TRIGGER IF NOT EXISTS settlement_input_guard BEFORE INSERT ON settlement_events BEGIN
+  SELECT CASE WHEN
+    length(NEW.source_hash)<>64 OR NEW.source_hash GLOB '*[^0-9a-f]*'
+  THEN RAISE(ABORT,'settlement source_hash must be lowercase SHA-256') END;
+  SELECT CASE WHEN
+    length(NEW.currency)<>3 OR NEW.currency GLOB '*[^A-Z]*'
+  THEN RAISE(ABORT,'settlement currency must be three uppercase letters') END;
+  SELECT CASE WHEN
+    length(NEW.booked_at)<>27 OR NEW.booked_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+    OR julianday(NEW.booked_at) IS NULL
+    OR strftime('%Y-%m-%dT%H:%M:%S',NEW.booked_at)<>substr(NEW.booked_at,1,19)
+  THEN RAISE(ABORT,'settlement booked_at must be canonical UTC') END;
+END;
+CREATE TRIGGER IF NOT EXISTS counter_input_guard BEFORE INSERT ON counter_events BEGIN
+  SELECT CASE WHEN
+    length(NEW.source_hash)<>64 OR NEW.source_hash GLOB '*[^0-9a-f]*'
+  THEN RAISE(ABORT,'counter source_hash must be lowercase SHA-256') END;
+  SELECT CASE WHEN
+    length(NEW.currency)<>3 OR NEW.currency GLOB '*[^A-Z]*'
+  THEN RAISE(ABORT,'counter currency must be three uppercase letters') END;
+  SELECT CASE WHEN
+    length(NEW.observed_at)<>27 OR NEW.observed_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+    OR julianday(NEW.observed_at) IS NULL
+    OR strftime('%Y-%m-%dT%H:%M:%S',NEW.observed_at)<>substr(NEW.observed_at,1,19)
+  THEN RAISE(ABORT,'counter observed_at must be canonical UTC') END;
+END;
+CREATE TRIGGER IF NOT EXISTS allocation_input_guard BEFORE INSERT ON allocations BEGIN
+  SELECT CASE WHEN
+    length(NEW.created_at)<>27 OR NEW.created_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+    OR julianday(NEW.created_at) IS NULL
+    OR strftime('%Y-%m-%dT%H:%M:%S',NEW.created_at)<>substr(NEW.created_at,1,19)
+  THEN RAISE(ABORT,'allocation created_at must be canonical UTC') END;
+END;
+CREATE TRIGGER IF NOT EXISTS review_claim_input_guard BEFORE INSERT ON review_claims BEGIN
+  SELECT CASE WHEN
+    length(NEW.flagged_at)<>27 OR NEW.flagged_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+    OR julianday(NEW.flagged_at) IS NULL
+    OR strftime('%Y-%m-%dT%H:%M:%S',NEW.flagged_at)<>substr(NEW.flagged_at,1,19)
+  THEN RAISE(ABORT,'review claim flagged_at must be canonical UTC') END;
+  SELECT CASE WHEN NEW.flagged_at < (
+    SELECT issued_at FROM recovery_claims
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND claim_id=NEW.claim_id
+  ) THEN RAISE(ABORT,'review claim predates issued claim') END;
+END;
+CREATE TRIGGER IF NOT EXISTS reversal_input_guard BEFORE INSERT ON reversal_edges BEGIN
+  SELECT CASE WHEN
+    length(NEW.created_at)<>27 OR NEW.created_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z'
+    OR julianday(NEW.created_at) IS NULL
+    OR strftime('%Y-%m-%dT%H:%M:%S',NEW.created_at)<>substr(NEW.created_at,1,19)
+  THEN RAISE(ABORT,'reversal created_at must be canonical UTC') END;
+END;
+
+CREATE TRIGGER IF NOT EXISTS counter_chronology BEFORE INSERT ON counter_events BEGIN
+  SELECT CASE WHEN NEW.observed_at < (
+    SELECT booked_at FROM settlement_events
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND event_id=NEW.original_event_id
+  ) THEN RAISE(ABORT,'counter event predates original settlement') END;
+  SELECT CASE WHEN NEW.currency <> (
+    SELECT currency FROM settlement_events
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND event_id=NEW.original_event_id
+  ) THEN RAISE(ABORT,'counter currency mismatch') END;
+END;
+CREATE TRIGGER IF NOT EXISTS allocation_chronology BEFORE INSERT ON allocations BEGIN
+  SELECT CASE WHEN NEW.created_at < (
+    SELECT booked_at FROM settlement_events
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND event_id=NEW.event_id
+  ) THEN RAISE(ABORT,'allocation predates settlement event') END;
+  SELECT CASE WHEN (
+    SELECT booked_at FROM settlement_events
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND event_id=NEW.event_id
+  ) < (
+    SELECT issued_at FROM recovery_claims
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND claim_id=NEW.claim_id
+  ) THEN RAISE(ABORT,'settlement event predates issued claim') END;
+END;
+CREATE TRIGGER IF NOT EXISTS reversal_chronology BEFORE INSERT ON reversal_edges BEGIN
+  SELECT CASE WHEN NEW.created_at < (
+    SELECT observed_at FROM counter_events
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND counter_id=NEW.counter_id
+  ) THEN RAISE(ABORT,'reversal predates counter event') END;
+  SELECT CASE WHEN NEW.created_at < (
+    SELECT created_at FROM allocations
+    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+      AND allocation_id=NEW.allocation_id
+  ) THEN RAISE(ABORT,'reversal predates allocation') END;
+END;
+
 CREATE TRIGGER IF NOT EXISTS allocation_event_capacity BEFORE INSERT ON allocations BEGIN
   SELECT CASE WHEN
     (SELECT COALESCE(SUM(amount_cents),0) FROM allocations WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit AND event_id=NEW.event_id)+NEW.amount_cents
