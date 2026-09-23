@@ -5,7 +5,8 @@ Release checkpoint: **v15.14-external-action-authorization-2026-09-21**
 > Historical checkpoint notice (2026-09-23): this manifest remains the
 > canonical record of the v15.14 release and its cited hosted CI runs. The
 > current working tree contains unreleased settlement, audit, RecoveryWorks,
-> workflow-pin, and evidence-freshness hardening described in `ROADMAP.md` and
+> workflow-pin, evidence-freshness, controlled-demo, and public-site release
+> hardening described in `ROADMAP.md` and
 > `RELEASE_AND_SECURITY_GATE.md`. Those changes must not be represented as a new
 > canonical release until they have a source commit and successful hosted CI
 > evidence.

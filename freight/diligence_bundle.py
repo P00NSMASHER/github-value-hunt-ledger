@@ -57,6 +57,7 @@ DOC_PATHS=(
     "freight/SETTLEMENT_REVIEW_WORKFLOW.md",
     "freight/RELEASE_AND_SECURITY_GATE.md",
     "freight/RIGHTS_DILIGENCE.md",
+    "freight/RIGHTS_EVIDENCE_TRANSFER.md",
     "freight/RIGHTS_EVIDENCE_MANIFEST.json",
     "freight/INCIDENT_RESPONSE.md",
     "freight/INCIDENT_TABLETOP_TEMPLATE.md",
@@ -66,6 +67,8 @@ DOC_PATHS=(
     "freight/SBOM_AND_ATTESTATION.md",
     "freight/PERSISTENT_AUDIT_AND_BACKUP.md",
     "freight/BUYER_DILIGENCE_BUNDLE.md",
+    "freight/SYNTHETIC_PILOT_DEMO.md",
+    "freight/site/README.md",
     "freight/COMPONENT_RIGHTS_REGISTRY.json",
     "freight/RELEASE_MANIFEST.md",
 )

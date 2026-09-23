@@ -68,6 +68,33 @@ from freight.settlement_store import (
 
 BUYER = "buyer-synthetic"
 BU = "bu-synthetic"
+SCENARIO_ID = "freight-recovery-controlled-demo-v1"
+
+INVOICE_CSV = (
+    "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,"
+    "charge_code,service_date,quantity_units,billed_cents\n"
+    "inv-1,shp-1,cust,carrier,USD,charge-1,DETENTION,2026-09-15,1,12500\n"
+    "inv-2,shp-2,cust,carrier,USD,charge-2,ACCESSORIAL,2026-09-15,1,12500\n"
+    "inv-3,shp-3,cust,carrier,USD,charge-3,MISC,2026-09-15,1,15000\n"
+).encode("utf-8")
+VERIFIED_RULES_CSV = (
+    "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
+    "DETENTION,FIXED,2026-09-01,2026-09-30,10000,\n"
+    "ACCESSORIAL,FIXED,2026-09-01,2026-09-30,10000,\n"
+).encode("utf-8")
+REVIEW_RULES_CSV = (
+    "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
+    "MISC,FIXED,2026-09-01,2026-09-30,10000,\n"
+).encode("utf-8")
+SETTLEMENT_CSV = (
+    "event_id,reference,payer_id,payee_id,currency,amount_cents,booked_at,source_kind\n"
+    "e-1,inv-1,carrier,cust,USD,2000,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+    "e-2,inv-2,carrier,cust,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
+).encode("utf-8")
+COUNTER_CSV = (
+    "counter_id,original_event_id,currency,amount_cents,observed_at,source_kind\n"
+    "return-1,e-1,USD,500,2026-09-22T10:00:00Z,BANK-RETURN\n"
+).encode("utf-8")
 
 
 def run_rehearsal() -> dict:
@@ -148,32 +175,16 @@ def run_rehearsal() -> dict:
     )
     engagement_resolution = resolve_engagement(operative_charter)
 
-    invoice_csv = (
-        "invoice_id,shipment_id,customer_id,carrier_id,currency,charge_id,"
-        "charge_code,service_date,quantity_units,billed_cents\n"
-        "inv-1,shp-1,cust,carrier,USD,charge-1,DETENTION,2026-09-15,1,12500\n"
-        "inv-2,shp-2,cust,carrier,USD,charge-2,ACCESSORIAL,2026-09-15,1,12500\n"
-        "inv-3,shp-3,cust,carrier,USD,charge-3,MISC,2026-09-15,1,15000\n"
-    ).encode("utf-8")
-    verified_rules_csv = (
-        "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
-        "DETENTION,FIXED,2026-09-01,2026-09-30,10000,\n"
-        "ACCESSORIAL,FIXED,2026-09-01,2026-09-30,10000,\n"
-    ).encode("utf-8")
-    review_rules_csv = (
-        "charge_code,pricing_model,effective_from,effective_to,fixed_cents,unit_rate_cents\n"
-        "MISC,FIXED,2026-09-01,2026-09-30,10000,\n"
-    ).encode("utf-8")
     workflow = run_audit_workflow(
         invoice_filename="synthetic-freight-charges.csv",
-        invoice_data=invoice_csv,
+        invoice_data=INVOICE_CSV,
         buyer_id=BUYER,
         business_unit=BU,
         selection_rule="three synthetic invoices",
         rule_inputs=(
             RuleCSVInput(
                 filename="rate-confirmation-rules.csv",
-                data=verified_rules_csv,
+                data=VERIFIED_RULES_CSV,
                 customer_id="cust",
                 carrier_id="carrier",
                 currency="USD",
@@ -184,7 +195,7 @@ def run_rehearsal() -> dict:
             ),
             RuleCSVInput(
                 filename="candidate-addendum-rules.csv",
-                data=review_rules_csv,
+                data=REVIEW_RULES_CSV,
                 customer_id="cust",
                 carrier_id="carrier",
                 currency="USD",
@@ -340,15 +351,6 @@ def run_rehearsal() -> dict:
         ),
     )
 
-    settlement_csv = (
-        "event_id,reference,payer_id,payee_id,currency,amount_cents,booked_at,source_kind\n"
-        "e-1,inv-1,carrier,cust,USD,2000,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
-        "e-2,inv-2,carrier,cust,USD,2500,2026-09-21T10:00:00Z,CREDIT-MEMO\n"
-    ).encode("utf-8")
-    counter_csv = (
-        "counter_id,original_event_id,currency,amount_cents,observed_at,source_kind\n"
-        "return-1,e-1,USD,500,2026-09-22T10:00:00Z,BANK-RETURN\n"
-    ).encode("utf-8")
     with tempfile.TemporaryDirectory() as td:
         audit_bundle_path = Path(td) / "synthetic-audit-result.zip"
         audit_bundle_receipt = build_audit_result_bundle(workflow, audit_bundle_path)
@@ -364,7 +366,7 @@ def run_rehearsal() -> dict:
             store,
             processed_at="2026-09-21T10:30:00Z",
             settlement_filename="synthetic-settlements.csv",
-            settlement_data=settlement_csv,
+            settlement_data=SETTLEMENT_CSV,
         )
         assert settlement_lifecycle.state == "REVIEW_REQUIRED"
         assert len(settlement_lifecycle.settlement_review_cases) == 1
@@ -388,7 +390,7 @@ def run_rehearsal() -> dict:
             store,
             processed_at="2026-09-22T11:00:00Z",
             counter_filename="synthetic-returns.csv",
-            counter_data=counter_csv,
+            counter_data=COUNTER_CSV,
         )
         assert counter_lifecycle.state == "COMPLETE"
         assert counter_lifecycle.counter_events[0].effective_status == REVERSED
@@ -414,6 +416,7 @@ def run_rehearsal() -> dict:
 
     return {
         "synthetic": True,
+        "scenario_id": SCENARIO_ID,
         "buyer_id": BUYER,
         "business_unit": BU,
         "readiness_status": readiness.status.value,
@@ -472,6 +475,8 @@ def run_rehearsal() -> dict:
         "carrier_action_execution_intent_hash": execution_intent.intent_hash,
         "carrier_action_execution_receipt_hash": execution_receipt.receipt_hash,
         "carrier_action_execution_outcome": execution_receipt.outcome,
+        "carrier_action_external_action_simulated": True,
+        "carrier_action_external_action_performed": False,
         "carrier_action_submitted": execution_receipt.action_submitted,
         "carrier_action_delivery_confirmed": execution_receipt.delivery_confirmed,
         "carrier_action_delivery_receipt_hash": delivery_receipt.delivery_receipt_hash,

@@ -1,6 +1,6 @@
 # Freight Recovery — Buyer / Acquirer Diligence Bundle
 
-Updated: 2026-09-20
+Updated: 2026-09-23
 
 `freight/diligence_bundle.py` creates a deterministic ZIP intended to make
 technical/commercial diligence boring and reproducible.
@@ -13,8 +13,10 @@ The bundle contains:
 - pilot data-room/report/audit-lifecycle documentation;
 - security/data-handling and release/security gates;
 - rights registry + rights evidence manifest/promotion rules + release manifest;
+- rights-evidence transfer checklist for documents held outside the repository;
 - incident-response runbook + tabletop template;
 - deployment-security evidence addendum + completed Netlify-specific tabletop;
+- controlled synthetic pilot demonstration specification and public-site release instructions;
 - deterministic release provenance;
 - exact component inventory;
 - partial CycloneDX 1.6 SBOM;
@@ -34,7 +36,9 @@ The builder does not package:
 - settlement/remittance data;
 - customer identifiers or secrets.
 
-A diligence bundle is therefore not a pilot evidence package.
+A diligence bundle is therefore not a customer pilot evidence package. The
+included controlled-demo specification describes fictional inputs only; the
+separate generated demo ZIP is not embedded in this diligence ZIP.
 
 ## Claim boundary
 

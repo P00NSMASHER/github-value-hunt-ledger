@@ -25,6 +25,8 @@ observation into a transferable buyer/acquirer claim.
 - `freight/COMPONENT_RIGHTS_REGISTRY.json` — operational rights state.
 - `freight/RIGHTS_EVIDENCE_MANIFEST.json` — evidence metadata only.
 - `freight/rights_evidence.py` — fail-closed consistency validator.
+- `freight/RIGHTS_EVIDENCE_TRANSFER.md` — exact transfer checklist for
+  executed evidence held in another account or diligence room.
 
 Executed license/permission document bytes belong in the actual diligence room,
 not this source repository.

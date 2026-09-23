@@ -25,6 +25,14 @@ historical v15.14 release/CI record and not external customer proof.
   until executed permission evidence is verified and commercial use is
   confirmed allowed; a private evidence-manifest input supports legitimate
   clearance without committing executed documents.
+- A buyer-shareable controlled synthetic pilot ZIP now packages exact fictional
+  inputs, current review/report outputs, machine receipts and a hash manifest.
+  Verification replays the scenario byte-for-byte and the public site embeds
+  the generated ZIP digest without claiming customer value or external action.
+- The repaired Freight Recovery sales site now has an exact five-file public
+  build boundary and a SHA-pinned GitHub Pages workflow. Pull requests verify
+  it; main can deploy only after an owner configures a verified public inbox
+  and enables the GitHub Pages environment. No deployment was performed here.
 - These changes are locally verified; a new canonical release identity and
   hosted CI run must be recorded only after the change is committed and CI passes.
 
@@ -134,6 +142,10 @@ The separate/manual route stays **CONDITIONAL** until a VERIFIED environment man
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. **DONE internally:** rights evidence manifest + fail-closed promotion validator. **OPEN externally:** attach/verify the actual executed Trenova/Opstrax permission documents and resolve hosted/SaaS/change-of-control scope.
 5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
+6. **DONE internally:** deterministic buyer-shareable synthetic demo and
+   public-site publication boundary. **OPEN externally:** verify the business
+   inbox, configure repository variables/Pages, merge the reviewed release and
+   inspect the resulting public URL.
 
 ### Deployment-security actions from live evidence
 1. Enable Netlify team MFA before confidential buyer data is accepted.

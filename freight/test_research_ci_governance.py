@@ -5,6 +5,7 @@ import re
 ROOT=Path(__file__).resolve().parents[1]
 WORKFLOW=ROOT/".github/workflows/technology-intelligence.yml"
 WORKFLOWS=ROOT/".github/workflows"
+PAGES_WORKFLOW=WORKFLOWS/"freight-site-pages.yml"
 IMMUTABLE_ACTION=re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+@[0-9a-f]{40}$")
 
 
@@ -54,3 +55,17 @@ def test_freight_deployment_gates_use_the_real_workflow_date():
     assert text.count('"$(date -u +%F)"') >= 7
     assert "--as-of-date 2026-09-20" not in text
     assert "--as-of-date 2026-09-21" not in text
+
+
+def test_freight_pages_deployment_is_main_only_verified_and_config_gated():
+    text=PAGES_WORKFLOW.read_text()
+    assert "permissions:\n  contents: read" in text
+    assert "needs: verify" in text
+    assert "github.event_name != 'pull_request'" in text
+    assert "github.ref == 'refs/heads/main'" in text
+    assert "vars.FREIGHT_CONTACT_VERIFIED == '1'" in text
+    assert "vars.FREIGHT_CONTACT_EMAIL != ''" in text
+    assert "pages: write" in text
+    assert "id-token: write" in text
+    assert "python freight/site/build.py --output /tmp/freight-recovery-public" in text
+    assert "path: /tmp/freight-recovery-public" in text

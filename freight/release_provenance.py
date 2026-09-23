@@ -15,6 +15,7 @@ from pathlib import Path
 
 REVISION_RE = re.compile(r"^[0-9a-f]{40}$")
 CONTROL_PATHS = (
+    ".gitattributes",
     "freight/audit_ledger.py",
     "freight/audit_result_bundle.py",
     "freight/audit_run_manifest.py",
@@ -67,7 +68,13 @@ CONTROL_PATHS = (
     "freight/settlement_schema.sql",
     "freight/settlement_store.py",
     "freight/settlement_report.py",
+    "freight/synthetic_pilot_bundle.py",
     "freight/synthetic_rehearsal.py",
+    "freight/site/build.py",
+    "freight/site/index.html",
+    "freight/site/site.css",
+    "freight/site/site.js",
+    "freight/site/_headers",
     "freight/COMPONENT_RIGHTS_REGISTRY.json",
     "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json",
     "freight/RIGHTS_EVIDENCE_MANIFEST.json",
@@ -82,6 +89,7 @@ CONTROL_PATHS = (
     ".github/workflows/fmc-tariff-recover-merge.yml",
     ".github/workflows/fmc-tariff-tests.yml",
     ".github/workflows/freight-contracts.yml",
+    ".github/workflows/freight-site-pages.yml",
     ".github/workflows/hospital-mrf-ledger.yml",
     ".github/workflows/integrator-sync.yml",
     ".github/workflows/production-contracts.yml",

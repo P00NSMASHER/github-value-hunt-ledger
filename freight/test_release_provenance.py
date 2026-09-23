@@ -23,6 +23,7 @@ def test_current_release_provenance_is_deterministic():
     b = build_release_provenance(ROOT)
     assert a == b
     assert a["provenance_hash"]
+    assert ".gitattributes" in a["control_file_hashes"]
     assert "freight/contracts.py" in a["control_file_hashes"]
     assert "production/requirements-ci.txt" in a["control_file_hashes"]
     assert "freight/rights_evidence.py" in a["control_file_hashes"]
@@ -34,7 +35,10 @@ def test_current_release_provenance_is_deterministic():
     assert "freight/DEPLOYMENT_SECURITY_EVIDENCE_2026-09-20.json" in a["control_file_hashes"]
     assert "freight/RIGHTS_EVIDENCE_MANIFEST.json" in a["control_file_hashes"]
     assert "freight/settlement_schema.sql" in a["control_file_hashes"]
+    assert "freight/synthetic_pilot_bundle.py" in a["control_file_hashes"]
+    assert "freight/site/build.py" in a["control_file_hashes"]
     assert ".github/workflows/technology-intelligence.yml" in a["control_file_hashes"]
+    assert ".github/workflows/freight-site-pages.yml" in a["control_file_hashes"]
     assert ".github/workflows/recoveryworks.yml" in a["control_file_hashes"]
     assert ".github/workflows/public-repo-hunter.yml" in a["control_file_hashes"]
 
