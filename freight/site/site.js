@@ -17,6 +17,15 @@
     for (const item of revealItems) observer.observe(item);
   }
 
+  const checkoutReturn = byId("checkout-return");
+  const returnedFromCheckout =
+    new URLSearchParams(window.location.search).get("checkout") === "complete";
+  if (checkoutReturn && returnedFromCheckout) {
+    checkoutReturn.hidden = false;
+    checkoutReturn.focus({ preventScroll: true });
+    checkoutReturn.scrollIntoView({ block: "center" });
+  }
+
   const service = byId("servicePrice");
   const recovery = byId("recoveryAmount");
   const currency = new Intl.NumberFormat("en-US", {
