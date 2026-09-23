@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+from urllib.parse import urlsplit
 
 SOURCE = Path(__file__).resolve().parent
 REPOSITORY = SOURCE.parent.parent
@@ -62,6 +63,9 @@ PUBLIC_FILES = SOURCE_FILES + (DEMO_FILE,)
 CONTACT_META = '<meta name="freight-contact-email" content="">'
 STATUS_PATTERN = re.compile(r'(<div class="wrap" id="contactStatus">).*?(</div>)')
 DEMO_MARKER = '<!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->'
+READINESS_CHECKOUT = 'data-checkout="readiness" href="#checkout-unavailable"'
+AUDIT_CHECKOUT = 'data-checkout="audit" href="#checkout-unavailable"'
+CONTACT_LINK = 'data-contact-link href="#contact-pending"'
 
 
 def _public_source(name: str) -> Path:
@@ -98,8 +102,53 @@ def validate_contact(value: str, verified: bool) -> str:
     return f"{local}@{domain}"
 
 
-def build(output: Path, contact_email: str, contact_verified: bool) -> Path:
+def validate_checkout_url(value: str, label: str) -> str:
+    """Accept only canonical live Stripe Payment Links."""
+    candidate = value.strip()
+    try:
+        parsed = urlsplit(candidate)
+    except ValueError as error:
+        raise ValueError(f"Set {label} to a valid live Stripe Payment Link.") from error
+    if (parsed.scheme != "https" or parsed.netloc.lower() != "buy.stripe.com"
+            or parsed.query or parsed.fragment):
+        raise ValueError(
+            f"Set {label} to an HTTPS buy.stripe.com Payment Link without query or fragment."
+        )
+    if not re.fullmatch(r"/[A-Za-z0-9_-]{8,200}", parsed.path):
+        raise ValueError(f"Set {label} to a canonical Stripe Payment Link.")
+    if parsed.path.lower().startswith("/test_"):
+        raise ValueError(f"Set {label} to a live Stripe Payment Link, not a test link.")
+    return candidate
+
+
+def validate_checkouts(readiness: str, audit: str, verified: bool) -> tuple[str, str]:
+    """Require two distinct operator-verified live checkout destinations."""
+    if not verified:
+        raise ValueError(
+            "Verify both Freight Recovery Payment Links, then set "
+            "FREIGHT_CHECKOUT_VERIFIED=1."
+        )
+    readiness_url = validate_checkout_url(
+        readiness, "FREIGHT_READINESS_CHECKOUT_URL"
+    )
+    audit_url = validate_checkout_url(audit, "FREIGHT_AUDIT_CHECKOUT_URL")
+    if readiness_url == audit_url:
+        raise ValueError("Readiness and audit checkout URLs must be different.")
+    return readiness_url, audit_url
+
+
+def build(
+    output: Path,
+    contact_email: str,
+    contact_verified: bool,
+    readiness_checkout_url: str,
+    audit_checkout_url: str,
+    checkout_verified: bool,
+) -> Path:
     contact = validate_contact(contact_email, contact_verified)
+    readiness_checkout, audit_checkout = validate_checkouts(
+        readiness_checkout_url, audit_checkout_url, checkout_verified
+    )
     destination = output.expanduser().resolve()
     if (destination == REPOSITORY or REPOSITORY in destination.parents
             or destination in REPOSITORY.parents):
@@ -118,14 +167,31 @@ def build(output: Path, contact_email: str, contact_verified: bool) -> Path:
     }
     if text_bundle["index.html"].count(CONTACT_META) != 1:
         raise ValueError("The source must contain exactly one empty contact configuration.")
+    for marker in (READINESS_CHECKOUT, AUDIT_CHECKOUT, CONTACT_LINK):
+        if text_bundle["index.html"].count(marker) != 1:
+            raise ValueError(f"The source must contain exactly one marker: {marker}")
     safe_contact = html.escape(contact, quote=True)
     page = text_bundle["index.html"].replace(
         CONTACT_META, f'<meta name="freight-contact-email" content="{safe_contact}">'
     )
+    page = page.replace(
+        READINESS_CHECKOUT,
+        'data-checkout="readiness" href="'
+        + html.escape(readiness_checkout, quote=True) + '"',
+    ).replace(
+        AUDIT_CHECKOUT,
+        'data-checkout="audit" href="'
+        + html.escape(audit_checkout, quote=True) + '"',
+    ).replace(
+        CONTACT_LINK,
+        'data-contact-link href="mailto:' + safe_contact
+        + '?subject=Freight%20Recovery%20checkout%20question"',
+    )
     page, count = STATUS_PATTERN.subn(
-        lambda match: match.group(1) + '<strong>Start with a fit discussion.</strong> '
-        + f'Business inquiries: <a href="mailto:{safe_contact}">{safe_contact}</a>. '
-        + 'Please keep freight documents out of the initial inquiry.' + match.group(2), page
+        lambda match: match.group(1) + '<strong>Secure checkout is open.</strong> '
+        + 'Choose a fixed service below. Questions: '
+        + f'<a href="mailto:{safe_contact}">{safe_contact}</a>. '
+        + 'Do not email freight documents.' + match.group(2), page
     )
     if count != 1:
         raise ValueError("The source must contain exactly one contact status banner.")
@@ -166,8 +232,14 @@ def main() -> None:
                         help="New or empty public directory outside the private repository")
     args = parser.parse_args()
     try:
-        output = build(args.output, os.environ.get("FREIGHT_CONTACT_EMAIL", ""),
-                       os.environ.get("FREIGHT_CONTACT_VERIFIED") == "1")
+        output = build(
+            args.output,
+            os.environ.get("FREIGHT_CONTACT_EMAIL", ""),
+            os.environ.get("FREIGHT_CONTACT_VERIFIED") == "1",
+            os.environ.get("FREIGHT_READINESS_CHECKOUT_URL", ""),
+            os.environ.get("FREIGHT_AUDIT_CHECKOUT_URL", ""),
+            os.environ.get("FREIGHT_CHECKOUT_VERIFIED") == "1",
+        )
     except ValueError as error:
         parser.error(str(error))
     print(f"Public bundle prepared: {output}")

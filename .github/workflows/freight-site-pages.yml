@@ -49,6 +49,9 @@ jobs:
         env:
           FREIGHT_CONTACT_EMAIL: sales@freightfixture.com
           FREIGHT_CONTACT_VERIFIED: '1'
+          FREIGHT_READINESS_CHECKOUT_URL: https://buy.stripe.com/readinessFixture123
+          FREIGHT_AUDIT_CHECKOUT_URL: https://buy.stripe.com/auditFixture456
+          FREIGHT_CHECKOUT_VERIFIED: '1'
         run: |
           python freight/site/build.py --output /tmp/freight-recovery-public
           python -m freight.synthetic_pilot_bundle --verify /tmp/freight-recovery-public/synthetic-pilot-demo.zip
@@ -70,7 +73,10 @@ jobs:
       github.event_name != 'pull_request' &&
       github.ref == 'refs/heads/main' &&
       vars.FREIGHT_CONTACT_VERIFIED == '1' &&
-      vars.FREIGHT_CONTACT_EMAIL != ''
+      vars.FREIGHT_CONTACT_EMAIL != '' &&
+      vars.FREIGHT_CHECKOUT_VERIFIED == '1' &&
+      vars.FREIGHT_READINESS_CHECKOUT_URL != '' &&
+      vars.FREIGHT_AUDIT_CHECKOUT_URL != ''
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -91,6 +97,9 @@ jobs:
         env:
           FREIGHT_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
           FREIGHT_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
+          FREIGHT_READINESS_CHECKOUT_URL: ${{ vars.FREIGHT_READINESS_CHECKOUT_URL }}
+          FREIGHT_AUDIT_CHECKOUT_URL: ${{ vars.FREIGHT_AUDIT_CHECKOUT_URL }}
+          FREIGHT_CHECKOUT_VERIFIED: ${{ vars.FREIGHT_CHECKOUT_VERIFIED }}
           RECOVERYOS_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
           RECOVERYOS_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
         run: |

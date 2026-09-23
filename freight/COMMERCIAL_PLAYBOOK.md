@@ -1,6 +1,6 @@
 # Freight Recovery — Commercial Playbook
 
-Updated: 2026-09-21
+Updated: 2026-09-23
 
 Status: internal operating collateral and unsent draft. No customer acceptance, validated price, recurring customer or realized recovery is asserted here. Use with [BUSINESS_MODEL.md](BUSINESS_MODEL.md), the [Pilot Protocol](PILOT_PROTOCOL.md) and the actual route-specific launch decision.
 
@@ -8,9 +8,9 @@ Status: internal operating collateral and unsent draft. No customer acceptance, 
 
 | Finding | Commercial risk | Operating correction |
 |---|---|---|
-| Internal fixed-fee bands differ from the historical free-sample/contingency page | Surprise charges and inconsistent promises | Identify each prospect's offer/version; honor existing terms; reconcile the next offer across catalog, charter and site |
-| Public address returned site-not-found during review | Prospects cannot inspect the service through that address | Restore and verify the entry point before sending traffic; a historical ZIP is not current deployment proof |
-| Historical landing-page CTA has an empty mail recipient | A click can open a blank draft instead of reaching Freight | Configure a verified destination and test the enquiry path before publishing |
+| Internal fixed-fee bands differ from the historical free-sample/contingency page | Surprise charges and inconsistent promises | New standard purchases use exact $5,000 / $15,000 checkout offers; identify and honor any earlier accepted terms |
+| Checkout could point to the wrong payment business | Confusing statement descriptor, disputes and accounting contamination | Deploy only two operator-verified live Payment Links from a Freight Recovery-branded Stripe account; the build fails closed otherwise |
+| A purchase could be mistaken for customer-data or carrier authorization | Payment bypasses security and decision controls | Payment buys the fixed service only; written scope, an approved intake route and separate external-action approval remain mandatory |
 | Dense proof terminology obscures the purchase | Buyer cannot understand the deliverable | Lead with invoices checked, documented report, scope, price and customer decisions |
 | Prices and million-dollar arithmetic lack paid evidence | Building around assumed demand | Treat price/channel counts as experiments; fund expansion from paid evidence |
 | Failed readiness can suggest a diagnostic commercially | A paid diagnostic is mistaken for a data-access exception | Metadata-only qualification until a valid path exists; an offer never authorizes files |
@@ -27,9 +27,20 @@ We compare an agreed set of freight invoices with your rates and shipment record
 
 Your team decides which findings to pursue. We track later credits and refunds separately from discrepancies identified in the report.
 
-**First step:** confirm the scope and whether the required records are available.
+**First step:** choose the $5,000 Readiness Review when records are uncertain, or the $15,000 Base Freight Audit when the base-scope records are ready.
 
-This is draft copy. Do not add guaranteed savings, customer logos, recovery percentages, production-security claims or a turnaround starting before complete inputs and authorized kickoff.
+Do not add guaranteed savings, customer logos, another recovery percentage, production-security claims or a turnaround starting before complete inputs and authorized kickoff. The standard optional managed-recovery split is 80% to the customer / 20% to Freight Recovery on fee-eligible net realized amounts only.
+
+## Standard checkout path
+
+1. The buyer selects the exact fixed service and pays once through the verified Stripe-hosted checkout.
+2. Freight sends the receipt, plain-language terms, written scope confirmation and approved secure intake route. The buyer does not send freight records through checkout or ordinary email.
+3. If the base scope cannot be accepted or a valid intake route cannot be provided, refund the fixed fee before work begins. The buyer may also cancel for a full fixed-fee refund before written scope confirmation.
+4. The delivery clock begins after complete inputs and authorized kickoff, not on the payment date.
+5. The buyer receives the reviewed deliverable and decides what happens next.
+6. Managed recovery is optional and separately authorized after supported findings exist. No carrier contact, dispute or money-moving action is implied by checkout.
+
+Stripe configuration must match the site: one-time USD prices of $5,000 and $15,000; no adjustable quantity, custom amount, subscription, card surcharge or automatic add-on. Any applicable tax must be disclosed before payment. Extra scope requires a separate written price and buyer approval.
 
 ## Qualification conversation: approximately 20 minutes
 
@@ -54,9 +65,9 @@ Disposition: **qualified next step**, **missing input with owner/date**, **futur
 
 Existing tracker records have one-touch statuses. Any future separately authorized outreach must reconcile those states and recent responses first; do not use this playbook to restart contact or send another message automatically.
 
-## Concrete first scope to discuss
+## Standard Base Freight Audit scope
 
-This proposed envelope is not an accepted offer or a claim of implemented coverage:
+The $15,000 checkout price covers this envelope:
 
 - One buyer entity/business unit, one supported domestic mode and one currency.
 - Up to **250 invoices**, **two carriers**, within **90 consecutive historical days**.
@@ -66,7 +77,7 @@ This proposed envelope is not an accepted offer or a claim of implemented covera
 - Additional sources/systems, later monitoring, carrier disputes and recovery administration are separate scope unless expressly included.
 - Missing-source remediation and later settlement observation have agreed owners and deadlines.
 
-Set actual limits only after estimating labor at the selected price. A small population does not automatically justify the historical $15,000–$25,000 band. The buyer must accept the value, and the fee must match the operative offer. Otherwise HOLD or design a prospective offer revision through the controlled catalog process.
+If the requested work exceeds this envelope, do not auto-bill or quietly narrow it. Refund before work begins or offer a separate written scope and price through the controlled catalog process. A small population does not create an automatic discount. The buyer must accept the value and operative terms.
 
 For an existing **20-invoice sample proposal**, preserve its offered terms. Freeze the selection rule, report excluded/missing records, and label the work a feasibility review rather than a representative estimate of annual losses. Customer files still require the valid controlled route.
 
@@ -82,7 +93,7 @@ For an existing **20-invoice sample proposal**, preserve its offered terms. Free
 >
 > **What we need:** the agreed invoices, rates/amendments, required shipment evidence, sealed incumbent output, and named question/decision owners. Later recovery reporting requires separately identifiable credit/refund evidence.
 >
-> **Fee and terms:** [exact fixed fee or previously offered sample terms] tied to [dated offer/version]. [Any separately agreed recovery fee, exact base, exclusions and collection timing.] No unstated combination of fees applies.
+> **Fee and terms:** [$5,000 Readiness Review / $15,000 Base Freight Audit / previously accepted dated offer]. Managed recovery, if later selected, is 20% of uniquely attributable net realized amounts; the customer keeps 80%. The fixed fee is separate. Flags, unpaid claims, incumbent-known, automatic/preexisting, unresolved, duplicate, unsupported and reversed amounts are excluded. No unstated combination of fees applies.
 >
 > **Timing:** [agreed target] after complete inputs, agreed scope and authorized kickoff. Questions requiring new records pause affected work under the agreed process. Carrier response and settlement time are separate.
 >
@@ -90,7 +101,7 @@ For an existing **20-invoice sample proposal**, preserve its offered terms. Free
 >
 > **Your decisions:** carrier contact and any action require your specific approval. We will provide the approved transfer route when the operating prerequisites are complete. Do not send credentials or customer files in response to this draft.
 >
-> **Next step:** confirm objective, scope, offer version, buyer owners and data availability to finalize the engagement documents.
+> **Next step:** after checkout, confirm the objective, scope, buyer owners and data availability before authorized kickoff.
 
 The final Charter and commercial agreement supply operative terms. This draft does not replace them or alter an existing agreement. Leave unknown fields visible rather than inventing a buyer, recipient, fee or date.
 
