@@ -629,12 +629,26 @@ def create_public_verification_record(
     verify_source_retention(retention, bundle)
     verify_case_completeness(completeness, bundle)
     verify_build_provenance(build, bundle)
+
     if packet.case_bundle_hash != bundle.bundle_hash:
         raise ValueError("public record hostile packet case mismatch")
     if packet.finding_proof_hash != bundle.finding.proof_hash:
         raise ValueError("public record hostile packet finding mismatch")
     if packet.journal_head_hash != journal_head_hash:
         raise ValueError("public record journal head mismatch")
+
+    published_at = _iso("published_at", published_at)
+    latest_component_time = max(
+        _dt("packet.assembled_at", packet.assembled_at),
+        _dt("retention.created_at", retention.created_at),
+        _dt("completeness.created_at", completeness.created_at),
+        _dt("build.attested_at", build.attested_at),
+    )
+    if _dt("published_at", published_at) < latest_component_time:
+        raise ValueError(
+            "public verification record cannot predate a committed component"
+        )
+
 
     packet_hash = hostile_packet_hash(packet)
     leaves = (
@@ -658,7 +672,7 @@ def create_public_verification_record(
         "build_attestation_hash": build.attestation_hash,
         "journal_head_hash": _required("journal_head_hash", journal_head_hash),
         "merkle_root_hash": root,
-        "published_at": _iso("published_at", published_at),
+        "published_at": published_at,
         "publisher_id": _required("publisher_id", publisher_id),
     }
     return PublicVerificationRecord(
@@ -683,6 +697,18 @@ def verify_public_verification_record(
     verify_source_retention(retention, bundle)
     verify_case_completeness(completeness, bundle)
     verify_build_provenance(build, bundle)
+
+    latest_component = max(
+        _dt("packet.assembled_at", packet.assembled_at),
+        _dt("retention.created_at", retention.created_at),
+        _dt("completeness.created_at", completeness.created_at),
+        _dt("build.attested_at", build.attested_at),
+    )
+    if _dt("record.published_at", record.published_at) < latest_component:
+        raise ValueError(
+            "public verification record predates a committed component"
+        )
+
     expected_packet_hash = hostile_packet_hash(packet)
     fields = {
         "case_bundle_hash": bundle.bundle_hash,
