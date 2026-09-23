@@ -10,6 +10,7 @@ from recoveryworks import (
     verify_seven_figure_authorization_dossier,
 )
 from recoveryworks.test_seven_figure_readiness import build_readiness_chain
+from recoveryworks.models import canonical_hash
 
 
 def build_dossier_chain():
@@ -238,6 +239,31 @@ class SevenFigureAuthorizationDossierTests(unittest.TestCase):
                 readiness,
                 dossier,
             )
+
+    def test_nested_tamper_fails_even_if_outer_dossier_hash_is_recomputed(self):
+        (
+            _bundle,
+            _ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            _signature,
+            _timestamp,
+            _receipts,
+            _readiness,
+            dossier,
+        ) = build_dossier_chain()
+        payload = authorization_dossier_to_payload(dossier)
+        payload["public_record"]["publisher_id"] = "tampered-publisher"
+        payload["dossier_hash"] = canonical_hash({
+            key: value for key, value in payload.items()
+            if key != "dossier_hash"
+        })
+
+        with self.assertRaises(ValueError):
+            authorization_dossier_from_payload(payload)
 
     def test_dossier_payload_round_trip_is_tamper_evident(self):
         (
