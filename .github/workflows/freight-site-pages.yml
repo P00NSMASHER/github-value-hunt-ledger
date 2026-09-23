@@ -1,15 +1,17 @@
-name: Freight Recovery Public Site
+name: RecoveryOS Public Sites
 
 on:
   pull_request:
     paths:
       - 'freight/**'
+      - 'recoveryworks/site/**'
       - '.github/workflows/freight-site-pages.yml'
   push:
     branches:
       - main
     paths:
       - 'freight/**'
+      - 'recoveryworks/site/**'
       - '.github/workflows/freight-site-pages.yml'
   workflow_dispatch:
 
@@ -38,8 +40,11 @@ jobs:
           freight/test_synthetic_rehearsal.py
           freight/test_synthetic_pilot_bundle.py
           freight/site/test_build.py
+          recoveryworks/test_public_site.py
       - name: Check browser script syntax
-        run: node --check freight/site/site.js
+        run: |
+          node --check freight/site/site.js
+          node --check recoveryworks/site/site.js
       - name: Exercise the exact publication boundary
         env:
           FREIGHT_CONTACT_EMAIL: sales@freightfixture.com
@@ -54,6 +59,14 @@ jobs:
           test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 5
           test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type d | wc -l)" -eq 1
           test "$(find /tmp/freight-recovery-public -type l | wc -l)" -eq 0
+      - name: Exercise the RecoveryOS publication boundary
+        env:
+          RECOVERYOS_CONTACT_EMAIL: sales@recoveryfixture.com
+          RECOVERYOS_CONTACT_VERIFIED: '1'
+        run: |
+          python recoveryworks/site/build.py --output /tmp/recoveryos-public
+          test "$(find /tmp/recoveryos-public -type f | wc -l)" -eq 15
+          test "$(find /tmp/recoveryos-public -type l | wc -l)" -eq 0
 
   deploy:
     if: >-
@@ -87,7 +100,13 @@ jobs:
           FREIGHT_READINESS_CHECKOUT_URL: ${{ vars.FREIGHT_READINESS_CHECKOUT_URL }}
           FREIGHT_AUDIT_CHECKOUT_URL: ${{ vars.FREIGHT_AUDIT_CHECKOUT_URL }}
           FREIGHT_CHECKOUT_VERIFIED: ${{ vars.FREIGHT_CHECKOUT_VERIFIED }}
-        run: python freight/site/build.py --output /tmp/freight-recovery-public
+          RECOVERYOS_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
+          RECOVERYOS_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
+        run: |
+          python freight/site/build.py --output /tmp/freight-recovery-public
+          python recoveryworks/site/build.py --output /tmp/recoveryos-public
+          mkdir /tmp/freight-recovery-public/recoveryos
+          cp -R /tmp/recoveryos-public/. /tmp/freight-recovery-public/recoveryos/
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: /tmp/freight-recovery-public
