@@ -1048,6 +1048,15 @@ def authorization_dossier_from_payload(
     build = BuildProvenanceAttestation(**dict(payload["build"]))
     public_record = PublicVerificationRecord(**dict(payload["public_record"]))
 
+    # Fail closed during deserialization itself. An attacker who tampers with a
+    # nested component and recomputes only the outer dossier hash must not get a
+    # seemingly valid in-memory dossier that requires a later full replay to
+    # expose the nested mutation.
+    retention.verify_integrity()
+    completeness.verify_integrity()
+    build.verify_integrity()
+    public_record.verify_integrity()
+
     dossier = SevenFigureAuthorizationDossier(
         dossier_version=payload["dossier_version"],
         readiness=readiness,
