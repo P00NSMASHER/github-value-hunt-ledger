@@ -94,13 +94,13 @@ jobs:
           RECOVERYOS_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
           RECOVERYOS_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
         run: |
-          python freight/site/build.py --output /tmp/recovery-public
+          python freight/site/build.py --output /tmp/freight-recovery-public
           python recoveryworks/site/build.py --output /tmp/recoveryos-public
-          mkdir /tmp/recovery-public/recoveryos
-          cp -R /tmp/recoveryos-public/. /tmp/recovery-public/recoveryos/
+          mkdir /tmp/freight-recovery-public/recoveryos
+          cp -R /tmp/recoveryos-public/. /tmp/freight-recovery-public/recoveryos/
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
-          path: /tmp/recovery-public
+          path: /tmp/freight-recovery-public
           retention-days: 1
       - name: Deploy to GitHub Pages
         id: deployment
