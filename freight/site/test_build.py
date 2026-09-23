@@ -98,6 +98,8 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Managed recovery fee 20%", page)
             self.assertIn("Total Freight Recovery charges", page)
             self.assertIn("Plain-language checkout terms", page)
+            self.assertIn('id="checkout-return"', page)
+            self.assertIn("We verify the payment separately", page)
             self.assertNotIn("Discuss a pilot", page)
             self.assertNotIn("<form", page.lower())
 
@@ -136,6 +138,8 @@ class PublicBuildTests(unittest.TestCase):
             script = (output / "site.js").read_text()
             self.assertIn('realized * 0.2', script)
             self.assertIn('realized - recoveryFee', script)
+            self.assertIn('get("checkout") === "complete"', script)
+            self.assertIn("checkoutReturn.hidden = false", script)
             for network_or_storage_api in (
                 "fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket",
                 "localStorage", "sessionStorage",

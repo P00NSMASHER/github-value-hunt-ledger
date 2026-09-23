@@ -303,7 +303,12 @@
         <div><span>Fail safe</span><strong>Refund before work</strong><p>If we cannot accept the base scope or provide an approved intake route, the fixed fee is refunded before work begins.</p></div>
       </div>
 
-      <div class="after-checkout">
+      <div class="checkout-return" id="checkout-return" role="status" tabindex="-1" hidden>
+        <span class="checkout-return-mark" aria-hidden="true">&#10003;</span>
+        <div><strong>Checkout return detected.</strong><p>We verify the payment separately. Watch the inbox used at checkout for written scope confirmation and the approved secure intake route. Do not send freight records by email.</p></div>
+      </div>
+
+      <div class="after-checkout" id="next-steps">
         <div class="after-heading"><p class="eyebrow"><span></span> What happens next</p><h3>Paid in minutes.<br><em>Started with care.</em></h3></div>
         <ol class="checkout-steps">
           <li><span>01</span><div><strong>Choose and pay</strong><p>Stripe sends your receipt. Payment is for the fixed service shown above.</p></div></li>
