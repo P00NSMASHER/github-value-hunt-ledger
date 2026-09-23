@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -22,7 +23,7 @@ def line(*, line_id="TL-1", purchaser="client", actual=10000, verified=True,
         tax_category=category,
         taxable_basis_cents=100000,
         actual_tax_cents=actual,
-        source_hash=f"line-{line_id}",
+        source_hash=H(f"line-{line_id}"),
         source_locator=f"file://tax-lines.csv#{line_id}",
         verified=verified,
     )
@@ -39,7 +40,7 @@ def assessment(*, line_id="TL-1", expected=6000, verified=True,
         tax_category=category,
         expected_tax_cents=expected,
         taxability_basis="Reviewed exemption/rate treatment",
-        source_hash=f"assessment-{line_id}",
+        source_hash=H(f"assessment-{line_id}"),
         source_locator=f"file://assessments.csv#{line_id}",
         verified=verified,
         rule_snapshot_date=snapshot,

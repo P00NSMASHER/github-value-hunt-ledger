@@ -3,11 +3,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 from pathlib import Path
-import tempfile
 from typing import Any, Mapping
 
+from .private_io import atomic_private_write
 from .runner import run_scan360_config
 
 
@@ -26,23 +25,7 @@ def write_private_json(path: Path, payload: Mapping[str, Any]) -> None:
         json.dumps(payload, sort_keys=True, indent=2, ensure_ascii=True)
         + "\n"
     ).encode("utf-8")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_name = tempfile.mkstemp(
-        prefix=f".{path.name}.",
-        suffix=".tmp",
-        dir=str(path.parent),
-    )
-    try:
-        os.fchmod(fd, 0o600)
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(raw)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(tmp_name, path)
-        os.chmod(path, 0o600)
-    finally:
-        if os.path.exists(tmp_name):
-            os.unlink(tmp_name)
+    atomic_private_write(path, raw)
 
 
 def build_parser() -> argparse.ArgumentParser:

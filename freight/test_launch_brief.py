@@ -27,6 +27,18 @@ def test_unknown_blocker_never_disappears():
     assert brief.actions[0].code=="future_unknown_blocker"
     assert brief.actions[0].category=="UNMAPPED_REVIEW"
 
+def test_rights_blocker_points_to_executed_permission_evidence():
+    code=(
+        "rights_evidence:emoss08/Trenova: controlled pilot requires attached "
+        "and verified executed permission evidence"
+    )
+    brief=build_brief(D(blockers=(code,)))
+    action=brief.actions[0]
+    assert action.priority=="P0"
+    assert action.category=="RIGHTS_DILIGENCE"
+    assert action.owner=="OWNER / LEGAL REVIEW"
+    assert "ATTACHED_VERIFIED" in " ".join(action.evidence_required)
+
 def test_ready_brief_has_no_actions_and_stable_hash():
     d=D(status="READY",route="CONTROLLED_MANUAL_BLIND_PILOT")
     a=build_brief(d)

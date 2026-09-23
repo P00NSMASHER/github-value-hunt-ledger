@@ -1,7 +1,10 @@
+from recoveryworks.test_support import source_hash as H
+from concurrent.futures import ThreadPoolExecutor
 import json
-import os
 from pathlib import Path
 import tempfile
+import threading
+import time
 import unittest
 
 from recoveryworks import (
@@ -13,6 +16,7 @@ from recoveryworks import (
     RuleRef,
 )
 from recoveryworks.store import BundleIntegrityError, LocalBundleStore, StoreConflictError
+from recoveryworks.private_io import private_permissions_verified
 
 
 def finding():
@@ -26,7 +30,7 @@ def finding():
         actual_cents=12000,
         rule=RuleRef(
             rule_id="rule-1",
-            source_hash="rulehash",
+            source_hash=H("rulehash"),
             effective_from="2026-01-01",
             effective_to=None,
             verified_controlling=True,
@@ -34,7 +38,7 @@ def finding():
         ),
         evidence=(EvidenceRef(
             evidence_id="ev-1",
-            source_hash="evhash",
+            source_hash=H("evhash"),
             locator="source://payment#1",
             kind="payment",
             verified=True,
@@ -58,7 +62,8 @@ class StoreTests(unittest.TestCase):
             restored = store.load()
             self.assertEqual(restored.rollup(), ledger.rollup())
             self.assertEqual(store.current_head_hash(), head)
-            self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
+            self.assertTrue(private_permissions_verified(path))
+            self.assertTrue(private_permissions_verified(store.lock_path))
 
     def test_compare_and_swap_rejects_stale_writer(self):
         with tempfile.TemporaryDirectory() as d:
@@ -91,6 +96,43 @@ class StoreTests(unittest.TestCase):
             second.add(finding())
             with self.assertRaises(StoreConflictError):
                 store.save(second, expected_head_hash=None, enforce_expected=True)
+
+    def test_compare_and_swap_serializes_concurrent_writers(self):
+        class SlowHeadStore(LocalBundleStore):
+            def current_head_hash(self):
+                head = super().current_head_hash()
+                time.sleep(0.1)
+                return head
+
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "recoveryworks.json"
+            initial_store = LocalBundleStore(path)
+            initial = DurableRecoveryLedger()
+            f = finding()
+            initial.add(f)
+            initial_head = initial_store.save(initial)
+
+            first = initial_store.load()
+            second = initial_store.load()
+            first.approve(f.finding_id, "reviewer-1", "verified one")
+            second.approve(f.finding_id, "reviewer-2", "verified two")
+            barrier = threading.Barrier(2)
+
+            def save(ledger):
+                barrier.wait(timeout=2)
+                try:
+                    return SlowHeadStore(path).save(
+                        ledger,
+                        expected_head_hash=initial_head,
+                    )
+                except StoreConflictError:
+                    return "CONFLICT"
+
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                results = list(pool.map(save, (first, second)))
+
+            self.assertEqual(results.count("CONFLICT"), 1)
+            self.assertEqual(len([value for value in results if value != "CONFLICT"]), 1)
 
     def test_bundle_hash_tampering_is_rejected_before_replay(self):
         with tempfile.TemporaryDirectory() as d:

@@ -88,3 +88,24 @@ def test_reordered_chain_is_detected():
         )
     with pytest.raises(ValueError, match="sequence gap|previous_hash"):
         verify_chain(tuple(reversed(records)), buyer_id=BUYER, business_unit=BU)
+
+
+def test_timestamps_are_canonicalized_and_cannot_go_backwards():
+    records = append_record(
+        (),
+        buyer_id=BUYER,
+        business_unit=BU,
+        event_type=AuditEventType.SOURCE_PRESENT,
+        object_id="source-1",
+        occurred_at="2026-09-20T08:00:00-04:00",
+    )
+    assert records[0].occurred_at == "2026-09-20T12:00:00.000000Z"
+    with pytest.raises(ValueError, match="nondecreasing"):
+        append_record(
+            records,
+            buyer_id=BUYER,
+            business_unit=BU,
+            event_type=AuditEventType.TRUTH_FROZEN,
+            object_id="truth-1",
+            occurred_at="2026-09-20T11:59:59Z",
+        )

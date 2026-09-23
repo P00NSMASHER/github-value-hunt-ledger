@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from pathlib import Path
 import tempfile
 import unittest
@@ -24,7 +25,7 @@ def entitlement(*, verified=True, amount=10000):
         entitled_cents=amount,
         effective_date="2026-08-01",
         entitlement_basis="Approved warranty claim/RMA credit",
-        source_hash="entitlement-hash",
+        source_hash=H("entitlement-hash"),
         source_locator="file://entitlements.csv#row=2",
         verified=verified,
         entitlement_reviewer_id="credit-reviewer-1" if verified else None,
@@ -37,7 +38,7 @@ def settlement(*, verified=True, amount=3000, sid="S-1"):
         entitlement_id="E-1",
         amount_received_cents=amount,
         settlement_date="2026-08-20",
-        source_hash=f"settlement-{sid}",
+        source_hash=H(f"settlement-{sid}"),
         source_locator=f"file://settlements.csv#{sid}",
         verified=verified,
         settlement_kind="CREDIT_MEMO",
@@ -81,7 +82,7 @@ class WarrantyCreditRecoveryTests(unittest.TestCase):
                 entitled_cents=100,
                 effective_date="2026-08-01",
                 entitlement_basis="approved return",
-                source_hash="h",
+                source_hash=H("h"),
                 source_locator="file://x",
                 verified=True,
                 entitlement_reviewer_id=None,

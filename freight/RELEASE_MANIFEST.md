@@ -2,6 +2,15 @@
 
 Release checkpoint: **v15.14-external-action-authorization-2026-09-21**
 
+> Historical checkpoint notice (2026-09-23): this manifest remains the
+> canonical record of the v15.14 release and its cited hosted CI runs. The
+> current working tree contains unreleased settlement, audit, RecoveryWorks,
+> workflow-pin, evidence-freshness, controlled-demo, and public-site release
+> hardening described in `ROADMAP.md` and
+> `RELEASE_AND_SECURITY_GATE.md`. Those changes must not be represented as a new
+> canonical release until they have a source commit and successful hosted CI
+> evidence.
+
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
@@ -138,7 +147,10 @@ Current evidence state:
 - **Opstrax:** user-asserted separate commercial permission for the pinned revision remains recorded; executed permission evidence is **NOT_ATTACHED** in this repository; hosted/SaaS/assignment/sublicensing/change-of-control remain unresolved.
 - Permissive public-license components such as MIT/Apache-2.0 do not become artificially dependent on separately asserted evidence when the public license independently supplies the relevant code-use permission.
 
-The pilot evidence gate passes with explicit warnings for missing executed evidence; the annual-diligence gate intentionally remains blocked while required scope is unresolved.
+The pilot evidence gate now blocks runtime use until executed evidence is
+`ATTACHED_VERIFIED` and commercial use is `CONFIRMED_ALLOWED`. The annual-
+diligence gate also remains blocked while required hosted/change-of-control
+scope is unresolved or denied.
 
 This is an operational consistency control, not a legal opinion.
 

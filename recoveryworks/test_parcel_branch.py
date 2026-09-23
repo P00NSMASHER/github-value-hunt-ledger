@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from pathlib import Path
 import tempfile
 import unittest
@@ -25,7 +26,7 @@ def charge(*, verified=True, weight="10", actual=3000):
         zone="5",
         billed_weight=weight,
         actual_total_cents=actual,
-        source_hash="charge-hash",
+        source_hash=H("charge-hash"),
         source_locator="file://charges.csv#row=2",
         verified=verified,
     )
@@ -42,7 +43,7 @@ def assessment(*, verified=True, weight="10", expected=2200):
         billed_weight=weight,
         expected_total_cents=expected,
         rate_basis="Reviewed contract rate + approved accessorial schedule",
-        source_hash="assessment-hash",
+        source_hash=H("assessment-hash"),
         source_locator="file://assessments.csv#row=2",
         verified=verified,
         rate_snapshot_date="2026-08-01" if verified else None,
@@ -87,7 +88,7 @@ class ParcelRecoveryTests(unittest.TestCase):
                 billed_weight="1",
                 expected_total_cents=100,
                 rate_basis="rate",
-                source_hash="h",
+                source_hash=H("h"),
                 source_locator="file://x",
                 verified=True,
             )

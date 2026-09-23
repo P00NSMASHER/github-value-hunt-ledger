@@ -1,6 +1,6 @@
 # Freight Recovery — Rights Evidence Diligence
 
-Updated: 2026-09-20
+Updated: 2026-09-23
 
 This process separates **what the repository says about component rights** from
 **the executed evidence that supports those statements**.
@@ -25,6 +25,8 @@ observation into a transferable buyer/acquirer claim.
 - `freight/COMPONENT_RIGHTS_REGISTRY.json` — operational rights state.
 - `freight/RIGHTS_EVIDENCE_MANIFEST.json` — evidence metadata only.
 - `freight/rights_evidence.py` — fail-closed consistency validator.
+- `freight/RIGHTS_EVIDENCE_TRANSFER.md` — exact transfer checklist for
+  executed evidence held in another account or diligence room.
 
 Executed license/permission document bytes belong in the actual diligence room,
 not this source repository.
@@ -59,12 +61,16 @@ scope.
 ## Stage behavior
 
 ### Controlled pilot
-The validator permits the current operational state while emitting explicit
-warnings that executed permission evidence is not attached here.
+Any non-permissively licensed runtime component that relies on separate
+permission requires `ATTACHED_VERIFIED` executed evidence and a
+`CONFIRMED_ALLOWED` commercial-use scope. The current repository manifest is
+therefore **BLOCKED** for a controlled pilot; a private diligence-room manifest
+may clear the gate after verification without committing document bytes.
 
 ### Annual / acquirer diligence
-Commercial-use / hosted-SaaS / change-of-control scope must be resolved through
-verified evidence before the system can represent those rights as cleared.
+Commercial-use must be confirmed allowed. Hosted-SaaS and change-of-control
+scope must be resolved through verified evidence, and an explicitly denied
+required right remains a blocker.
 
 No code path should infer those rights from public visibility or from a generic
 commercial-use statement.

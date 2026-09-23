@@ -67,11 +67,22 @@ def verified_separate_environment():
     return e
 
 
-def decide(request, *, dep=None, ready=None, separate=None, as_of=AS_OF):
+def verified_rights_manifest():
+    manifest=deepcopy(RIGHTS)
+    for entry in manifest["entries"]:
+        repository=entry["repository"]
+        entry["evidence_status"]="ATTACHED_VERIFIED"
+        entry["evidence_location"]="diligence-room/"+repository
+        entry["evidence_sha256"]=H("rights-"+repository)
+        entry["scopes"]["commercial_use"]="CONFIRMED_ALLOWED"
+    return manifest
+
+
+def decide(request, *, dep=None, ready=None, separate=None, as_of=AS_OF, rights=None):
     return evaluate_launch(
         readiness=ready or readiness(),
         component_registry=REGISTRY,
-        rights_manifest=RIGHTS,
+        rights_manifest=verified_rights_manifest() if rights is None else rights,
         deployment_evidence=dep if dep is not None else DEPLOYMENT,
         request=request,
         separate_environment_evidence=separate,
@@ -85,6 +96,17 @@ def test_buyer_readiness_does_not_override_current_deployment_security():
     assert d.route is LaunchRoute.DEPLOYED_PILOT_BLOCKED
     assert "deployment_team_mfa_not_enforced" in d.blockers
     assert "customer_data_plane_not_discovered" in d.blockers
+
+
+def test_unattached_executed_rights_block_even_verified_separate_environment():
+    d=decide(
+        LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT),
+        separate=verified_separate_environment(),
+        rights=RIGHTS,
+    )
+    assert d.status is LaunchStatus.BLOCKED
+    assert d.route is LaunchRoute.SEPARATE_ENVIRONMENT_PENDING
+    assert any("controlled pilot requires attached and verified" in x for x in d.blockers)
 
 
 def test_stale_current_deployment_evidence_blocks_current_route():

@@ -19,8 +19,11 @@ python -m recoveryworks.cli \
   --report /private/recoveryworks-report.json
 ```
 
-The state and report files are atomically written with mode `0600`. Operational
-state must live on private storage, not in the public repository.
+The state and report files are atomically written with verified private
+permissions: mode `0600` on POSIX, or a current-user plus SYSTEM private DACL on
+Windows. State compare-and-swap writes are serialized by a private cross-process
+lock. Operational state must live on private storage, not in the public
+repository.
 
 ## Example config
 

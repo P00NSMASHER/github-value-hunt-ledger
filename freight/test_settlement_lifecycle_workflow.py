@@ -1,3 +1,4 @@
+import hashlib
 import pytest
 
 from freight.settlement_lifecycle_workflow import (
@@ -34,6 +35,10 @@ def store(tmp_path):
     )
 
 
+def sha(value):
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
 def claim(claim_id, reference, amount, source):
     return RecoveryClaim(
         claim_id=claim_id,
@@ -43,7 +48,7 @@ def claim(claim_id, reference, amount, source):
         currency="USD",
         amount_cents=amount,
         issued_at="2026-09-20T10:00:00Z",
-        source_hash=source,
+        source_hash=sha(source),
     )
 
 
@@ -91,7 +96,7 @@ def test_ambiguous_partial_counter_is_routed_to_counter_review(tmp_path):
     s.create_claim(claim("c2","I2",20000,"claim-2"))
     s.ingest_event(SettlementEventRecord(
         "e1","BATCH","carrier","customer","USD",50000,
-        "2026-09-21T10:00:00Z","settlement-source","CREDIT-MEMO",
+        "2026-09-21T10:00:00Z",sha("settlement-source"),"CREDIT-MEMO",
     ))
     s.review_allocate(
         allocation_id="a1",claim_id="c1",event_id="e1",
@@ -209,7 +214,7 @@ def test_conflicting_existing_settlement_replay_is_preflighted_before_writes(tmp
     s=store(tmp_path)
     existing=SettlementEventRecord(
         "e1","INV-1","carrier","customer","USD",2500,
-        "2026-09-21T10:00:00Z","existing-source","CREDIT-MEMO",
+        "2026-09-21T10:00:00Z",sha("existing-source"),"CREDIT-MEMO",
     )
     s.ingest_event(existing)
     with pytest.raises(ValueError,match="replay conflicts"):

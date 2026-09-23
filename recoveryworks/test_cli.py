@@ -1,10 +1,10 @@
 import json
-import os
 from pathlib import Path
 import tempfile
 import unittest
 
 from recoveryworks.cli import main
+from recoveryworks.private_io import private_permissions_verified
 
 
 class Scan360CliTests(unittest.TestCase):
@@ -47,8 +47,8 @@ class Scan360CliTests(unittest.TestCase):
             self.assertTrue(report.exists())
             payload = json.loads(report.read_text())
             self.assertEqual(payload["report"]["totals"]["validated_cents"], 10000)
-            self.assertEqual(os.stat(state).st_mode & 0o777, 0o600)
-            self.assertEqual(os.stat(report).st_mode & 0o777, 0o600)
+            self.assertTrue(private_permissions_verified(state))
+            self.assertTrue(private_permissions_verified(report))
 
 
 if __name__ == "__main__":

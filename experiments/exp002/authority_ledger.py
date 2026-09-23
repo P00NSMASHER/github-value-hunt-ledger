@@ -591,6 +591,20 @@ class SyntheticTarget:
             "CREATE TABLE IF NOT EXISTS negative_receipts(downstream_key TEXT PRIMARY KEY, reason TEXT NOT NULL)"
         )
 
+    def close(self) -> None:
+        """Release the durable target handle deterministically.
+
+        SQLite files cannot be removed or rotated while a connection is open on
+        Windows, so callers must not depend on garbage collection for cleanup.
+        """
+        self.db.close()
+
+    def __enter__(self) -> "SyntheticTarget":
+        return self
+
+    def __exit__(self, _exc_type, _exc, _traceback) -> None:
+        self.close()
+
     def apply(self, downstream_key: str, payload_hash: str) -> None:
         prior = self.db.execute(
             "SELECT payload_hash FROM applied WHERE downstream_key=?", (downstream_key,)

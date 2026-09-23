@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -14,7 +15,7 @@ def rate(*, verified=True, fixed=100000, unit_rate=2500000):
         fixed_cents=fixed,
         included_units="0",
         unit_rate_micros=unit_rate,
-        source_hash="lease-rate-hash",
+        source_hash=H("lease-rate-hash"),
         source_locator="file://lease_rates.csv#row=2",
         verified=verified,
     )
@@ -28,7 +29,7 @@ def charge(*, verified=True, actual=140000):
         service_id="CAM-2026",
         service_date="2026-08-31",
         actual_cents=actual,
-        source_hash="lease-charge-hash",
+        source_hash=H("lease-charge-hash"),
         source_locator="file://lease_charges.csv#row=2",
         verified=verified,
     )
@@ -38,7 +39,7 @@ def area(*, verified=True, units="100"):
     return UsageRecord(
         charge_id="LEASE-1",
         units=units,
-        source_hash="area-hash",
+        source_hash=H("area-hash"),
         source_locator="file://area.csv#row=2",
         verified=verified,
         metadata={"quantity_kind": "area_sqft"},

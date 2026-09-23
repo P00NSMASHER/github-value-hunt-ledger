@@ -4,16 +4,28 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import os
 from pathlib import Path
 import re
+import sys
+import tempfile
 
 SOURCE = Path(__file__).resolve().parent
 REPOSITORY = SOURCE.parent.parent
-PUBLIC_FILES = ("index.html", "site.css", "site.js", "_headers")
+if str(REPOSITORY) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY))
+
+from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
+
+
+SOURCE_FILES = ("index.html", "site.css", "site.js", "_headers")
+DEMO_FILE = "synthetic-pilot-demo.zip"
+PUBLIC_FILES = SOURCE_FILES + (DEMO_FILE,)
 CONTACT_META = '<meta name="freight-contact-email" content="">'
 STATUS_PATTERN = re.compile(r'(<div class="wrap" id="contactStatus">).*?(</div>)')
+DEMO_MARKER = '<!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->'
 
 
 def validate_contact(value: str, verified: bool) -> str:
@@ -49,7 +61,7 @@ def build(output: Path, contact_email: str, contact_verified: bool) -> Path:
 
     # Exact allowlist: do not recurse, glob, or follow source symlinks.
     bundle = {}
-    for name in PUBLIC_FILES:
+    for name in SOURCE_FILES:
         path = SOURCE / name
         if path.is_symlink() or not path.is_file():
             raise ValueError(f"Missing or non-regular public asset: {name}")
@@ -67,10 +79,28 @@ def build(output: Path, contact_email: str, contact_verified: bool) -> Path:
     )
     if count != 1:
         raise ValueError("The source must contain exactly one contact status banner.")
-    bundle["index.html"] = page
+    if page.count(DEMO_MARKER) != 1:
+        raise ValueError("The source must contain exactly one controlled-demo marker.")
+
+    with tempfile.TemporaryDirectory() as temporary:
+        demo_path = Path(temporary) / DEMO_FILE
+        receipt = build_synthetic_pilot_bundle(demo_path)
+        demo_bytes = demo_path.read_bytes()
+    if hashlib.sha256(demo_bytes).hexdigest() != receipt["bundle_sha256"]:
+        raise ValueError("Controlled-demo digest changed during the public build.")
+    demo_link = (
+        '<a class="btn secondary" href="synthetic-pilot-demo.zip" download>'
+        'Download the controlled demo</a>'
+        '<p class="demo-hash"><strong>SHA-256</strong> '
+        f'<code>{receipt["bundle_sha256"]}</code></p>'
+        '<p class="notice">Fictional data only; no customer result, external action, '
+        'production attestation, or rights attestation.</p>'
+    )
+    bundle["index.html"] = page.replace(DEMO_MARKER, demo_link)
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in bundle.items():
         (destination / name).write_text(content, encoding="utf-8")
+    (destination / DEMO_FILE).write_bytes(demo_bytes)
     return destination
 
 

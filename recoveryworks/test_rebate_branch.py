@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -26,7 +27,7 @@ def program(mode=RebateTierMode.INCREMENTAL, basis=RebateMeasurementBasis.UNITS,
             RebateTier("100", "200", 500),
             RebateTier("200", None, 1000),
         ),
-        source_hash="program-hash",
+        source_hash=H("program-hash"),
         source_locator="file://program.json#0",
         verified=verified,
     )
@@ -40,7 +41,7 @@ def purchase(pid="P-1", *, qty="250", spend=250000, verified=True, when="2026-08
         purchase_date=when,
         quantity=qty,
         net_spend_cents=spend,
-        source_hash=f"purchase-{pid}",
+        source_hash=H(f"purchase-{pid}"),
         source_locator=f"file://purchases.csv#{pid}",
         verified=verified,
     )
@@ -53,7 +54,7 @@ def settlement(amount=7500, *, verified=True, sid="S-1"):
         program_id="2026-Q3",
         amount_received_cents=amount,
         settlement_date="2026-10-15",
-        source_hash=f"settlement-{sid}",
+        source_hash=H(f"settlement-{sid}"),
         source_locator=f"file://settlements.csv#{sid}",
         verified=verified,
     )
@@ -86,7 +87,7 @@ class RebateBranchTests(unittest.TestCase):
                 RebateTier("1000", "2000", 500),
                 RebateTier("2000", None, 1000),
             ),
-            source_hash="program-spend-hash",
+            source_hash=H("program-spend-hash"),
             source_locator="file://program-spend.json#0",
             verified=True,
         )
@@ -171,7 +172,7 @@ class RebateBranchTests(unittest.TestCase):
                     RebateTier("0", "100", 0),
                     RebateTier("101", None, 500),
                 ),
-                source_hash="h",
+                source_hash=H("h"),
                 source_locator="file://x",
                 verified=True,
             )

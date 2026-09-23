@@ -330,9 +330,16 @@ class CustodyProvenanceTests(unittest.TestCase):
         bundle, _ledger, _packet, _retention, _completeness, build, _public = (
             build_custody_chain()
         )
-        tampered = replace(build, code_commit_sha="different-commit")
+        tampered = replace(build, code_commit_sha="f" * 40)
         with self.assertRaises(ValueError):
             verify_build_provenance(tampered, bundle)
+
+    def test_build_attestation_rejects_non_digest_build_hash(self):
+        _bundle, _ledger, _packet, _retention, _completeness, build, _public = (
+            build_custody_chain()
+        )
+        with self.assertRaisesRegex(ValueError, "source_tree_hash must be a 64-character"):
+            replace(build, source_tree_hash="tree")
 
 
 if __name__ == "__main__":

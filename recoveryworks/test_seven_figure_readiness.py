@@ -203,7 +203,7 @@ class SevenFigureReadinessTests(unittest.TestCase):
             receipts,
             _readiness,
         ) = build_readiness_chain()
-        timestamp = timestamp_for(signature, subject_hash="wrong-signature-hash")
+        timestamp = timestamp_for(signature, subject_hash=sha(b"wrong-signature-hash"))
         with self.assertRaises(ValueError):
             build_seven_figure_readiness(
                 bundle,
@@ -237,7 +237,7 @@ class SevenFigureReadinessTests(unittest.TestCase):
         bad = list(receipts)
         bad[0] = replace(
             bad[0],
-            provider_response_hash="wrong-provider-response-hash",
+            provider_response_hash=sha(b"wrong-provider-response-hash"),
         )
         with self.assertRaises(ValueError):
             build_seven_figure_readiness(
@@ -285,10 +285,12 @@ class SevenFigureReadinessTests(unittest.TestCase):
             maximum_amount_cents=100_000_000,
             note="SIMULATION ONLY. Approve frozen seven-figure claim.",
         )
-        ledger.approve(
-            bundle.finding.finding_id,
-            "sim-reviewer-1",
-            "Synthetic approval note changed after readiness evaluation.",
+        ledger.add(
+            replace(
+                bundle.finding,
+                finding_id=f"{bundle.finding.finding_id}:later-case",
+                reference=f"{bundle.finding.reference}:later-case",
+            )
         )
         with self.assertRaises(ValueError):
             ledger.authorize_with_case(

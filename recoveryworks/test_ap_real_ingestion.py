@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from pathlib import Path
 import tempfile
 import unittest
@@ -21,7 +22,7 @@ def payment(pid, amount=10000, *, invoice="INV-1", verified=True):
         vendor_id="Vendor A",
         invoice_number=invoice,
         amount_cents=amount,
-        source_hash=f"pay-{pid}",
+        source_hash=H(f"pay-{pid}"),
         source_locator=f"file://payments.csv#{pid}",
         verified=verified,
         payment_date="2026-08-01",
@@ -33,7 +34,7 @@ def obligation(amount=10000, *, verified=True):
         vendor_id="Vendor A",
         invoice_number="INV-1",
         expected_cents=amount,
-        source_hash="invoice-hash",
+        source_hash=H("invoice-hash"),
         source_locator="file://invoices.csv#INV-1",
         effective_from="2026-07-01",
         verified=verified,
@@ -46,7 +47,7 @@ def statement(balance, *, verified=True, date="2026-08-31"):
         invoice_number="INV-1",
         balance_cents=balance,
         statement_date=date,
-        source_hash="statement-hash",
+        source_hash=H("statement-hash"),
         source_locator="file://statement.csv#INV-1",
         verified=verified,
     )
