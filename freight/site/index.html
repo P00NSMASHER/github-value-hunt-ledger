@@ -20,7 +20,7 @@
 
 <header class="site-header">
   <div class="statusbar">
-    <div class="wrap" id="contactStatus"><strong>Contact channel pending.</strong> This is a source preview. Prepare an inquiry locally; a verified business inbox is required before launch.</div>
+    <div class="wrap" id="contactStatus"><strong>Checkout configuration pending.</strong> This source preview cannot take payment. Verified Freight Recovery Payment Links and a verified business inbox are required before launch.</div>
   </div>
   <div class="wrap">
     <nav class="nav" aria-label="Main navigation">
@@ -31,8 +31,9 @@
       <div class="navlinks">
         <a href="#how">Process</a>
         <a href="#sample">Demo</a>
-        <a href="#offer">Pricing</a>
-        <a class="button button-small button-light" href="#inquiry">Discuss a pilot <span aria-hidden="true">&#8599;</span></a>
+        <a href="#checkout">Pricing</a>
+        <a href="#recovery">Recovery split</a>
+        <a class="button button-small button-light" href="#checkout">Start checkout <span aria-hidden="true">&#8595;</span></a>
       </div>
     </nav>
   </div>
@@ -52,7 +53,7 @@
         <h1 id="hero-title">Know what you <em>should</em> pay.</h1>
         <p class="lead">We compare freight invoices with the rates and records that govern them. You get a clear, reviewed report. You decide what happens next.</p>
         <div class="actions">
-          <a class="button button-cobalt" href="#inquiry">Discuss a pilot <span aria-hidden="true">&#8599;</span></a>
+          <a class="button button-cobalt" href="#checkout">See prices &amp; checkout <span aria-hidden="true">&#8595;</span></a>
           <a class="button button-ghost" href="#sample">See the demo <span aria-hidden="true">&#8595;</span></a>
         </div>
         <ul class="hero-proof" aria-label="Key safeguards">
@@ -248,7 +249,7 @@
     </div>
   </section>
 
-  <section class="section section-porcelain" id="offer" aria-labelledby="offer-title">
+  <section class="section section-porcelain checkout-section" id="checkout" aria-labelledby="offer-title">
     <div class="wrap">
       <div class="offer-hero">
         <figure class="network-image reveal-image">
@@ -259,37 +260,111 @@
           <figcaption>Illustrative route network</figcaption>
         </figure>
         <div class="offer-intro">
-          <p class="eyebrow"><span></span> Current offer framework</p>
-          <h2 id="offer-title">Start with a defined answer.</h2>
-          <p>Pick the route that matches your records. Final scope, fee, access, and timing are agreed in writing.</p>
+          <p class="eyebrow"><span></span> Clear prices. Secure checkout.</p>
+          <h2 id="offer-title">Choose your starting point.</h2>
+          <p>Pay once by card. Then we confirm the written scope and send the approved secure intake route. Never send freight files at checkout.</p>
         </div>
       </div>
 
-      <div class="price-list">
-        <article class="price-row">
-          <span class="price-index">01</span>
-          <div class="price-copy"><p class="route-tag">Readiness route</p><h3>Data Readiness / Authority Diagnostic</h3><p>Find the usable records, missing authority, and best next step. This is not an invoice audit.</p></div>
-          <div class="price-amount"><strong>$5,000&ndash;$7,500</strong><span>fixed starting band</span></div>
+      <div class="checkout-grid">
+        <article class="checkout-card">
+          <div class="checkout-card-top"><span class="price-index">01</span><span class="route-tag">Start here if records are uncertain</span></div>
+          <h3>Readiness Review</h3>
+          <p class="checkout-price"><strong>$5,000</strong><span>one-time fixed fee</span></p>
+          <p class="checkout-summary">We identify which records can support a defensible audit and what is missing.</p>
+          <ul class="included-list">
+            <li>Source and authority inventory</li>
+            <li>Missing-record and risk map</li>
+            <li>Written go / no-go next-step plan</li>
+          </ul>
+          <a class="button button-outline checkout-button" data-checkout="readiness" href="#checkout-unavailable" rel="noopener noreferrer">Checkout &mdash; $5,000 <span aria-hidden="true">&#8599;</span></a>
+          <p class="checkout-note">This review does not include line-by-line invoice auditing or recovery work.</p>
         </article>
-        <article class="price-row featured">
-          <span class="price-index">02</span>
-          <div class="price-copy"><p class="route-tag">Ready-data route</p><h3>Blind Freight Audit Acceptance Test</h3><p>Review a frozen population, reproduce charges, and deliver source-linked findings plus one decision report.</p></div>
-          <div class="price-amount"><strong>$15,000&ndash;$25,000</strong><span>fixed starting band</span></div>
+
+        <article class="checkout-card checkout-card-featured">
+          <div class="checkout-card-top"><span class="price-index">02</span><span class="route-tag">Start here if records are ready</span></div>
+          <h3>Base Freight Audit</h3>
+          <p class="checkout-price"><strong>$15,000</strong><span>one-time fixed fee</span></p>
+          <p class="checkout-summary">We review a frozen invoice set and deliver source-linked findings your team can act on.</p>
+          <ul class="included-list">
+            <li>Up to 250 invoices and two carriers</li>
+            <li>One domestic mode, one currency, 90 days</li>
+            <li>Up to three agreed charge checks</li>
+            <li>One report, review meeting, and correction round</li>
+          </ul>
+          <a class="button button-cobalt checkout-button" data-checkout="audit" href="#checkout-unavailable" rel="noopener noreferrer">Checkout &mdash; $15,000 <span aria-hidden="true">&#8599;</span></a>
+          <p class="checkout-note">Target: 10&ndash;15 business days after complete inputs and authorized kickoff.</p>
         </article>
       </div>
 
-      <div class="deliverables">
-        <p>Designed to deliver</p>
-        <ul>
-          <li>Invoice disposition register</li>
-          <li>Evidence-linked findings</li>
-          <li>Missing-information log</li>
-          <li>Blind comparison, if agreed</li>
-          <li>Separate outcome totals</li>
-          <li>Buyer action queue</li>
-        </ul>
+      <div class="checkout-assurance" aria-label="Checkout assurances">
+        <div><span>USD</span><strong>Exact price shown</strong><p>No setup fee, card surcharge, subscription, or automatic add-on.</p></div>
+        <div><span>Scope first</span><strong>No surprise billing</strong><p>Extra work needs a separate written price and your approval.</p></div>
+        <div><span>Fail safe</span><strong>Refund before work</strong><p>If we cannot accept the base scope or provide an approved intake route, the fixed fee is refunded before work begins.</p></div>
       </div>
-      <p class="commercial-note">Starting bands are not a quote or a savings claim. The acceptance test targets 10&ndash;15 business days after complete inputs and authorized kickoff, subject to scope and reviewer capacity. Existing offers keep their own terms.</p>
+
+      <div class="after-checkout">
+        <div class="after-heading"><p class="eyebrow"><span></span> What happens next</p><h3>Paid in minutes.<br><em>Started with care.</em></h3></div>
+        <ol class="checkout-steps">
+          <li><span>01</span><div><strong>Choose and pay</strong><p>Stripe sends your receipt. Payment is for the fixed service shown above.</p></div></li>
+          <li><span>02</span><div><strong>Confirm scope</strong><p>We email the written scope and approved secure intake route. Do not reply with freight files.</p></div></li>
+          <li><span>03</span><div><strong>Send approved records</strong><p>Work starts only after complete inputs and authorized kickoff.</p></div></li>
+          <li><span>04</span><div><strong>Receive the report</strong><p>You review the evidence and decide whether any action should be taken.</p></div></li>
+        </ol>
+      </div>
+
+      <p class="commercial-note">Paying does not authorize customer-data transfer, carrier contact, a dispute, or money movement. Results and recovery are never guaranteed. <a href="#terms">Read the plain-language terms.</a></p>
+    </div>
+  </section>
+
+  <section class="section section-recovery" id="recovery" aria-labelledby="recovery-title">
+    <div class="wrap recovery-grid">
+      <div class="recovery-copy">
+        <p class="eyebrow light"><span></span> Optional managed recovery</p>
+        <h2 id="recovery-title">You keep <em>80%.</em><br>We earn 20%.</h2>
+        <p class="recovery-lede">After the report, you may separately approve us to manage supported recovery cases. The carrier, vendor, or other payer sends the credit, refund, or remittance to you. We invoice our fee only after the eligible amount is actually realized.</p>
+        <div class="split-bar" role="img" aria-label="Customer keeps 80 percent of each fee-eligible realized recovery. Freight Recovery earns 20 percent.">
+          <div class="customer-share"><strong>80%</strong><span>customer keeps</span></div>
+          <div class="freight-share"><strong>20%</strong><span>our recovery fee</span></div>
+        </div>
+        <div class="recovery-rules">
+          <div><strong>What the 20% pays for</strong><p>Buyer-approved case preparation, recovery administration, follow-up, settlement matching, and reversal tracking.</p></div>
+          <div><strong>What never earns a fee</strong><p>A flag alone, unpaid or unsupported amounts, duplicates, incumbent-known items, automatic or preexisting credits, unresolved cases, and reversed amounts.</p></div>
+        </div>
+      </div>
+
+      <aside class="recovery-calculator" aria-labelledby="calculator-title">
+        <div class="calculator-heading"><span>Recovery calculator</span><h3 id="calculator-title">See every dollar.</h3><p>Illustration only. Enter a fee-eligible recovery actually received by the customer.</p></div>
+        <div class="calculator-controls">
+          <label for="servicePrice">Fixed service selected</label>
+          <select id="servicePrice">
+            <option value="5000">Readiness Review &mdash; $5,000</option>
+            <option value="15000" selected>Base Freight Audit &mdash; $15,000</option>
+          </select>
+          <label for="recoveryAmount">Realized eligible recovery</label>
+          <div class="money-input"><span aria-hidden="true">$</span><input id="recoveryAmount" type="number" min="0" max="1000000000" step="1000" value="50000" inputmode="decimal"></div>
+        </div>
+        <dl class="calculator-results" aria-live="polite">
+          <div class="customer-result"><dt>Customer keeps 80%</dt><dd id="customerShare">$40,000</dd></div>
+          <div><dt>Managed recovery fee 20%</dt><dd id="recoveryFee">$10,000</dd></div>
+          <div><dt>Fixed service fee</dt><dd id="fixedFee">$15,000</dd></div>
+          <div class="total-charge"><dt>Total Freight Recovery charges</dt><dd id="totalCharges">$25,000</dd></div>
+        </dl>
+        <p class="calculator-note" id="calculatorNote">The fixed service fee is separate from the 80/20 split. In this example, the customer receives $50,000, keeps $40,000 of that recovery, and pays $25,000 in total charges: $15,000 fixed plus $10,000 recovery fee.</p>
+      </aside>
+    </div>
+
+    <div class="wrap terms-panel" id="terms">
+      <div class="terms-heading"><span>Plain-language checkout terms</span><h3>Know what you are buying.</h3></div>
+      <div class="terms-grid">
+        <div><span>01</span><strong>Fixed charge</strong><p>The selected $5,000 or $15,000 fee is charged once in USD. There is no recurring charge or separate card-processing fee. Applicable tax, if required, must appear before payment.</p></div>
+        <div><span>02</span><strong>Base scope</strong><p>The price covers only the service and limits shown at checkout. Added sources, systems, monitoring, disputes, or recovery work require separate written approval. Nothing is added automatically.</p></div>
+        <div><span>03</span><strong>Scope confirmation</strong><p>We confirm the buyer, scope, timing, and secure intake route in writing. Payment alone does not authorize data transfer or outside action.</p></div>
+        <div><span>04</span><strong>Cancellation</strong><p>Cancel for a full fixed-fee refund before written scope confirmation. Once scope is confirmed and work begins, the fixed fee is non-refundable except where required by law or agreed in writing.</p></div>
+        <div><span>05</span><strong>Recovery fee</strong><p>Managed recovery is optional and separately authorized. The fee is 20% of uniquely attributable, net realized amounts. It is invoiced after the customer receives or is credited the money.</p></div>
+        <div><span>06</span><strong>Corrections and reversals</strong><p>If a credited amount is later reversed, the eligible recovery and fee are recalculated. Any resulting fee credit or refund is applied to the customer.</p></div>
+      </div>
+      <p class="terms-contact">Questions before paying? <a data-contact-link href="#contact-pending">Email the verified business inbox</a>. Do not send invoices, contracts, credentials, or other confidential records by email.</p>
     </div>
   </section>
 
@@ -302,55 +377,10 @@
     <div class="wrap closing-content">
       <p class="eyebrow light"><span></span> A clearer next move</p>
       <h2 id="closing-title">Clear records.<br><em>Better decisions.</em></h2>
-      <p>Start with one defined question.</p>
-      <a class="button button-light" href="#inquiry">Discuss fit <span aria-hidden="true">&#8595;</span></a>
+      <p>Choose the fixed service that fits your records.</p>
+      <a class="button button-light" href="#checkout">Choose a service <span aria-hidden="true">&#8593;</span></a>
     </div>
     <p class="closing-credit">Illustrative editorial image &middot; no customer environment</p>
-  </section>
-
-  <section class="section section-inquiry" id="inquiry" aria-labelledby="inquiry-title">
-    <div class="wrap inquiry-grid">
-      <div class="inquiry-copy">
-        <p class="eyebrow light"><span></span> Start with fit</p>
-        <h2>What decision do you need to make?</h2>
-        <p>A short discussion can show whether your records support useful work.</p>
-        <ul class="inquiry-points">
-          <li><span>01</span> Freight modes and invoice volume</li>
-          <li><span>02</span> Available rates and records</li>
-          <li><span>03</span> Review bottleneck and desired answer</li>
-        </ul>
-        <div class="privacy-note">
-          <strong>Keep the first message simple.</strong>
-          <p>Do not include invoices, rate terms, passwords, personal information, or other confidential content.</p>
-        </div>
-      </div>
-
-      <div class="formbox">
-        <div class="form-heading"><span>Local draft tool</span><h3 id="inquiry-title">Prepare an inquiry</h3><p>Nothing is uploaded, submitted, or saved by this page.</p></div>
-        <div id="inquiryFields" role="group" aria-labelledby="inquiry-title">
-          <div class="formgrid">
-            <div class="field"><label for="name">Name</label><input id="name" autocomplete="name" maxlength="100" required></div>
-            <div class="field"><label for="company">Company</label><input id="company" autocomplete="organization" maxlength="120" required></div>
-            <div class="field"><label for="email">Work email</label><input id="email" type="email" autocomplete="email" maxlength="254" required></div>
-            <div class="field"><label for="volume">Invoices per month</label><select id="volume"><option>Under 50</option><option>50&ndash;199</option><option>200&ndash;999</option><option>1,000+</option><option>Not sure</option></select></div>
-            <div class="field full"><label for="notes">Freight mix and review goal</label><textarea id="notes" maxlength="1200" placeholder="Example: mostly FTL; reduce time spent checking accessorials. No confidential details."></textarea></div>
-          </div>
-          <button class="button button-cobalt submit" id="prepareDraft" type="button">Prepare local draft <span aria-hidden="true">&#8594;</span></button>
-        </div>
-        <p id="formMessage" class="form-status" role="status" aria-live="polite"></p>
-        <noscript><p class="form-status">Enable JavaScript to prepare a local draft. This page has no submission endpoint.</p></noscript>
-        <div class="draft" id="draftPanel" hidden>
-          <label for="draftText">Your inquiry draft</label>
-          <textarea id="draftText" readonly></textarea>
-          <div class="actions">
-            <button class="button button-outline" id="copyDraft" type="button">Copy</button>
-            <button class="button button-outline" id="downloadDraft" type="button">Download</button>
-            <a class="button button-cobalt" id="emailDraft" hidden>Open email draft</a>
-          </div>
-          <p class="form-status" id="deliveryNote">Contact channel pending. Keep your draft until a verified business contact is available.</p>
-        </div>
-      </div>
-    </div>
   </section>
 
   <section class="section section-bone faq-section" aria-labelledby="faq-title">
@@ -358,28 +388,32 @@
       <div class="faq-heading">
         <p class="eyebrow"><span></span> Questions</p>
         <h2 id="faq-title">Plain answers.</h2>
-        <p>Clear scope. Checkable findings. No hidden automation.</p>
+        <p>Clear prices. Checkable findings. No hidden charges.</p>
       </div>
       <div class="faq">
         <details>
-          <summary><span>01</span> What records could a review need?</summary>
-          <p>Invoices, governing rates or contracts, amendments, and relevant shipment or accessorial evidence. A POD or BOL alone may not prove the right charge.</p>
+          <summary><span>01</span> What does the fixed fee pay for?</summary>
+          <p>The selected readiness review or freight audit, human review, and written deliverables shown above. It does not include ongoing monitoring, carrier disputes, or managed recovery.</p>
         </details>
         <details>
-          <summary><span>02</span> Does a flag mean a refund is owed?</summary>
-          <p>No. A flag may need more evidence or interpretation. We keep reviewed, validated, and realized amounts separate.</p>
+          <summary><span>02</span> When is the 20% recovery fee charged?</summary>
+          <p>Only after separately authorized work produces an eligible credit, refund, or remittance that the customer actually receives or is credited. A finding or claim by itself earns no recovery fee.</p>
         </details>
         <details>
-          <summary><span>03</span> Will you automatically dispute invoices?</summary>
-          <p>No. Your authorized reviewer decides. Any outside action needs separate, specific approval.</p>
+          <summary><span>03</span> How much of a recovery does the customer keep?</summary>
+          <p>The customer keeps 80% of each fee-eligible net realized recovery. Freight Recovery earns 20%. The one-time fixed service fee is separate.</p>
         </details>
         <details>
-          <summary><span>04</span> Are the demo results from a customer?</summary>
+          <summary><span>04</span> What amounts are excluded?</summary>
+          <p>Flags, unpaid claims, unsupported or unresolved amounts, duplicates, incumbent-known findings, automatic or preexisting credits, and reversals are not fee-eligible.</p>
+        </details>
+        <details>
+          <summary><span>05</span> Does checkout authorize a dispute or data upload?</summary>
+          <p>No. Your authorized reviewer decides whether any outside action occurs. Actual records move only after scope, rights, retention, and a controlled intake route are confirmed.</p>
+        </details>
+        <details>
+          <summary><span>06</span> Are the demo results from a customer?</summary>
           <p>No. Every identity, record, approval, money event, and amount is synthetic. The demo shows workflow behavior, not customer value.</p>
-        </details>
-        <details>
-          <summary><span>05</span> How do I share freight documents?</summary>
-          <p>Not through this page or the first inquiry. Actual records move only after scope, rights, access, retention, and a controlled intake route are agreed.</p>
         </details>
       </div>
     </div>
@@ -393,7 +427,7 @@
       <span class="brand-name">Freight <em>Recovery</em></span>
     </a>
     <p>Scoped freight invoice review.<br>Synthetic examples, not verified customer results.</p>
-    <p class="footer-meta">Editorial imagery is illustrative.<br>&copy; 2026 Freight Recovery.</p>
+    <p class="footer-meta"><a href="#terms">Checkout terms</a> &middot; <a href="#recovery">Recovery split</a><br>&copy; 2026 Freight Recovery.</p>
   </div>
 </footer>
 </body>

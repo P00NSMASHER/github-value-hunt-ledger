@@ -17,7 +17,7 @@ Current evidence limits:
 - The structured Hunter outcome ledger records technical rehearsal evidence and **no directly evidenced commercial revenue or customer value**; the structured record's monetary fields are null. Missing commercial evidence is not a measured zero-sales result. This describes that ledger, not every business account.
 - Repository benchmarks and passing tests establish only the behavior they exercise. They do not establish installed customer integrations, production readiness, buyer demand or recovery rates.
 - Confidential customer-data kickoff remains subject to the current route-specific [Pilot Launch Gate](PILOT_LAUNCH_GATE.md). A commercially attractive deal or paid diagnostic cannot override that gate.
-- The previously referenced public address returned site-not-found during the September 21 review. The saved September 18 landing-page artifact is historical, not verified deployed content. Restore and verify the public entry point before directing prospects to it.
+- The public entry point is a static, zero-customer-data sales site. Live checkout must remain fail-closed until both exact-price Payment Links are verified in a Freight Recovery-branded Stripe account and the deployment variables are present.
 - A September 18 sales-tracker snapshot lists 104 prospects, 25 wave-one targets, 10 first touches and zero replies as of that artifact. These are historical records, not a current inbox verification; the universe includes unqualified/removed records. Preserve existing one-touch statuses before any later authorized outreach.
 
 ## First customer and scope
@@ -42,21 +42,25 @@ The [Commercial Playbook](COMMERCIAL_PLAYBOOK.md) contains the bounded pilot env
 
 These bands are **unvalidated commercial hypotheses currently encoded in the internal activation/charter system**, not market-validated pricing or evidence of sales. Earlier $2,500 diagnostic and $3,000/month scenarios are separate planning hypotheses, not active machine-supported pilot offers.
 
-| Internal offer | Current price hypothesis | Buyer receives | Advancement condition |
+| Standard public purchase | Exact public price | Buyer receives | Boundary |
 |---|---:|---|---|
-| Data Readiness / Authority Diagnostic | $5,000–$7,500 fixed | Source inventory, missing-authority report and bounded pilot/remediation plan | Buyer needs the work, scope is profitable and actual-record handling is authorized |
-| Blind Freight Audit Acceptance Test | $15,000–$25,000 fixed | Frozen population, reproduced expected charges, reviewed findings, blind comparison and source-linked report | Readiness/launch pass; exact scope and fee are agreed |
-| Managed Recovery | Optional 15–20% of uniquely attributable realized amounts | Approved case administration and settlement tracking | Separate agreement, approved external actions and independent allocation evidence |
+| Readiness Review | **$5,000 fixed, one time** | Source inventory, missing-authority/risk map and bounded go/no-go plan | Not a line-by-line invoice audit; customer files still require an approved intake route |
+| Base Freight Audit | **$15,000 fixed, one time** | Up to 250 invoices, two carriers, one domestic mode, one currency, 90 consecutive historical days, up to three agreed check families, one source-linked report, one review meeting and one consolidated correction round | Readiness/launch pass; complete inputs and authorized kickoff start the delivery clock |
+| Managed Recovery | **Optional 20% of uniquely attributable net realized amounts** | Buyer-approved case preparation, administration, follow-up, settlement matching and reversal tracking | Separately authorized after findings; customer keeps 80%; external actions require specific approval |
 | Continuous Freight Assurance | Historical planning band: $60,000–$150,000 annual base; larger accounts $150,000–$300,000+ | Agreed recurring checks, exception review, credit tracking and reporting | Paid work demonstrates ongoing value, reviewer capacity and recurring margin |
 
-Large-account bands are future hypotheses, not the initial sales target. Recurring pricing is not enforced by the current pilot activation catalog and needs its own explicit scope, agreement and operating readiness.
+The fixed checkout fee pays for the selected review and is separate from the recovery split; it is not credited against the 20% recovery fee. No setup fee, card surcharge, subscription or automatic add-on applies to either checkout offer. Applicable tax, if legally required, must be shown before payment. Added sources, systems, monitoring, disputes or recovery work require a separate written price and customer approval.
+
+Recovery money is paid or credited to the customer. Freight Recovery invoices its 20% fee separately after the customer has received an independently traceable eligible amount. For a $15,000 Base Freight Audit followed by $50,000 of fee-eligible realized recovery, the customer keeps $40,000 of the recovery, the managed-recovery fee is $10,000, and total Freight Recovery charges are $25,000 ($15,000 fixed + $10,000 variable).
+
+The activation catalog retains controlled price-band validation for previously prepared or custom scoped packets. The public checkout selects the lower-bound standard scope above. Any nonstandard price or scope must be deliberate, written, and validated through the activation/charter process; it is never added after checkout by implication. Large-account bands are future hypotheses, not the initial sales target. Recurring pricing is not enforced by the current activation catalog and needs its own explicit scope, agreement and operating readiness.
 
 ### Reconcile historical offers before quoting
 
 The saved September 18 landing-page artifact describes a free 20-invoice sample and $0 setup plus 20% contingency. That conflicts with the internal fixed-fee ladder. The artifact does not prove what any prospect accepted.
 
 - Identify each prospect's dated proposal/site version and any acceptance. Preserve terms already offered or agreed; do not retroactively charge a previously offered free sample.
-- Confirm the operative offer before a follow-up, quote or invoice. Do not combine fixed and success fees by implication.
+- Confirm the operative dated offer before a follow-up, quote or invoice. For new standard purchases, use the exact checkout offer and disclose that the optional 20% managed-recovery fee is separate from the fixed review fee.
 - A historical/free 20-invoice sample is bounded feasibility work, not proof of annual savings, an error-rate estimate or subscription value.
 - Any new lower-priced pilot requires coordinated changes to the offer definition, activation catalog, charter validation, fixtures and customer-facing copy. Do not bypass fee validation or reuse an existing offer name for materially different terms.
 - Accepted engagement changes follow the existing amendment process.
@@ -79,11 +83,11 @@ Recurring work must solve an ongoing problem: review workload, unresolved credit
 
 Track these separately:
 
-- **Recovery:** uniquely allocated, externally evidenced credits/refunds/remittances, net of known reversals. Never charge success fees on incumbent-known, automatic/preexisting, unresolved, duplicate or unsupported amounts.
+- **Recovery:** uniquely allocated, externally evidenced credits/refunds/remittances actually received or posted to the customer, net of known reversals. The standard managed-recovery fee is 20% and the customer keeps 80%. Never charge the fee on a flag or claim alone, incumbent-known, automatic/preexisting, unresolved, unpaid, duplicate, unsupported or reversed amounts. A later reversal recalculates the eligible base and produces a customer fee credit or refund where required.
 - **Corrected future charges:** observed corrections against agreed authority in an actual later invoice period. Short-sample annualization is not realized savings.
 - **Time savings:** measured hours against a declared comparable baseline and agreed cost basis. Keep this separate from recovered dollars and prevent overlap.
 
-Booked fees, cash collected and recurring contracted revenue are different fields. Recovery money belongs to the customer; only an earned agreed fee is Freight revenue. A clean pilot can support paid assurance value if the buyer wants it, but cannot prove recovery performance.
+Booked fees, cash collected and recurring contracted revenue are different fields. Recovery money belongs to the customer; only an earned agreed fee is Freight revenue. The customer receives the credit/refund/remittance directly and Freight invoices its fee separately. A clean audit can support paid assurance value if the buyer wants it, but cannot prove recovery performance.
 
 Recurring expansion requires a buyer-confirmed ongoing need, accepted priced scope, measured delivery cost, reviewer capacity and an explicit renewal/exit process.
 

@@ -141,20 +141,30 @@ operability, rights-evidence consistency and the chosen data-handling path.
   byte-for-byte replay verification and explicit no-customer-value boundaries;
 - [x] public marketing build uses an exact 33-file allowlist (page, local
   scripts/styles, responsive imagery, licensed local fonts and demo), requires
-  an operator-attested business inbox, embeds the controlled-demo SHA-256 and
-  contains no upload, analytics, backend request or customer-data intake;
+  an operator-attested business inbox plus two distinct operator-attested live
+  Stripe Payment Links, embeds the controlled-demo SHA-256 and contains no
+  upload, analytics, backend request or customer-data intake;
+- [x] checkout configuration accepts only canonical HTTPS `buy.stripe.com`
+  destinations, rejects test links/query/fragment values, requires separate
+  readiness/audit links and leaves deployment fail-closed when configuration is
+  absent;
 - [x] GitHub Pages validation/deployment workflow is least-privilege and pins
   every third-party Action to a full commit; pull requests cannot deploy and
-  main deployment requires owner-configured contact variables;
-- [ ] repository Pages source/environment and a verified public business inbox
-  are configured, followed by an independent public URL/download/contact check;
+  main deployment requires owner-configured contact and checkout variables;
+- [ ] both exact-price live links are created in a Freight Recovery-branded
+  Stripe account, with the correct business identity, one-time prices, receipt,
+  terms/cancellation link and no adjustable quantity/subscription/add-on;
+- [ ] a controlled end-to-end live checkout/refund receipt check is completed
+  against both links without using customer freight data;
+- [ ] the checkout-enabled public URL, download, contact, calculator and both
+  payment destinations are independently checked after deployment;
 - [ ] buyer-specific completed security questionnaire and externally supplied diligence artifacts.
 
 ## Current claim boundary
 
 The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload, a deterministic zero-customer-data diligence bundle, a deterministic controlled synthetic buyer demo, an exact static-site publication boundary, rights evidence consistency gates, a documented fail-closed incident-response decision model, Netlify deployment access-control configuration evidence, and a completed deployment-specific tabletop**.
 
-It does **not** prove executed rights documents have been supplied/reviewed; the launch gate now treats that absence as a blocker. It also does not prove the public site has been deployed, the public inbox works, a customer outcome occurred, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, Netlify team MFA is enforced, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, live on-call/alerting incident operations exist, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
+It does **not** prove executed rights documents have been supplied/reviewed; the launch gate now treats that absence as a blocker. It also does not prove the checkout-enabled site has been deployed, the Payment Links belong to the correct Freight Recovery account, a payment/refund was completed, the public inbox works, a customer outcome occurred, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, Netlify team MFA is enforced, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, live on-call/alerting incident operations exist, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
 
 ## Commercial launch rule
 
