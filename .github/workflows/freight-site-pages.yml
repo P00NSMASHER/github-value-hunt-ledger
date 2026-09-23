@@ -39,6 +39,7 @@ jobs:
           PYTHONPATH=. python -m pytest -q
           freight/test_synthetic_rehearsal.py
           freight/test_synthetic_pilot_bundle.py
+          freight/test_recovery_stack.py
           freight/site/test_build.py
           recoveryworks/test_public_site.py
       - name: Check browser script syntax

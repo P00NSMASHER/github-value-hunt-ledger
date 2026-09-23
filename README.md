@@ -211,6 +211,12 @@ The durable Markdown research record is now paired with a structured empirical-l
 
 For the Freight business, start with the [September 21 business audit](freight/BUSINESS_AUDIT_2026-09-21.md), [commercial playbook](freight/COMMERCIAL_PLAYBOOK.md), and [Hunter connection](freight/HUNTER_CONNECTION.md). The connection maps registry capabilities into reviewed freight applications and a change queue. The [recovered marketing source](freight/site/README.md) requires a verified business inbox and a repaired deployment before public launch; it is separate from customer-data processing.
 
+The [winning-stack integration](freight/WINNING_STACK_INTEGRATION.md) adds pinned,
+hash-bound adapters for contract redlining, independent settlement comparison,
+agent evidence, durable case execution, Fleetbase operational evidence and
+landed-cost intelligence while preserving RecoveryOS as the money-bearing
+authority.
+
 Every materially completed hunt cycle must:
 1. keep the detailed evidence in the appropriate `hunters/*.md` catalog;
 2. submit one immutable prospective record to `intelligence/search_run_spool/` for validated single-writer ingestion into `intelligence/search_runs.jsonl`;

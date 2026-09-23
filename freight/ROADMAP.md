@@ -7,6 +7,13 @@ Updated: 2026-09-20
 This is current working-tree engineering evidence, not a replacement for the
 historical v15.14 release/CI record and not external customer proof.
 
+- A pinned winning-stack integration plane now compiles confirmed RecoveryOS
+  claims into deterministic, idempotent adapter jobs for DOCX redlining,
+  independent SLA settlement comparison, agent evidence, durable workflows,
+  Fleetbase evidence import and landed-cost intelligence. Jobs and transitions
+  are recorded in an append-only hash chain; external components cannot assert
+  recovery, post settlements, send carrier actions or overwrite source contracts.
+
 - Freight settlement evidence now requires canonical SHA-256 source digests,
   canonical UTC operation times, and chronology enforcement in both service code
   and direct-SQL triggers. Existing noncanonical stores fail closed on reopen.

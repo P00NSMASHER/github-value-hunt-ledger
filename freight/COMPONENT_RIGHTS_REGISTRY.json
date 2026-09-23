@@ -132,6 +132,82 @@
       "public_license": "REVIEW_LEDGER_BEFORE_RUNTIME_USE",
       "commercial_use_basis": "BENCHMARK_OR_INDEPENDENT_FALSIFIER",
       "runtime_status": "KEEP_INDEPENDENT"
+    },
+    {
+      "repository": "AnsonLai/docx-redline-js",
+      "revision": "e5bd19e93f85159f0838bcf31cb4ccc3d48c5cab",
+      "role": "strict localized DOCX redline adapter for approved contract amendments",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE",
+      "runtime_status": "PINNED_ISOLATED_ADAPTER",
+      "third_party_caveats": [
+        "customer contract documents",
+        "Microsoft Word rendering compatibility",
+        "pre-1.0 adapter compatibility"
+      ]
+    },
+    {
+      "repository": "kingsleyonoh/sla-penalty-settlement-engine",
+      "revision": "ea66727de51df7ee67a9f03f2549845fa6247b3d",
+      "role": "independent SLA and settlement comparator; never RecoveryOS authority",
+      "public_license": "AGPL-3.0",
+      "commercial_use_basis": "PUBLIC_AGPL_LICENSE_WITH_COMPLIANCE_REQUIRED",
+      "runtime_status": "COMPARATOR_NOT_PRIMARY_RUNTIME",
+      "third_party_caveats": [
+        "network-use source obligations",
+        "deployment topology",
+        "customer contract data"
+      ]
+    },
+    {
+      "repository": "yaogdu/AgentLedger",
+      "revision": "dd966e3b3d9eb54032c51701d30efcfbaa2379b0",
+      "role": "durable agent evidence, replay and side-effect governance adapter",
+      "public_license": "Apache-2.0",
+      "commercial_use_basis": "PUBLIC_LICENSE",
+      "runtime_status": "PINNED_ISOLATED_ADAPTER",
+      "third_party_caveats": [
+        "NOTICE and attribution preservation",
+        "optional storage and sandbox providers"
+      ]
+    },
+    {
+      "repository": "microsoft/duroxide-python",
+      "revision": "0a29c32cdfd322c349fa6a9f480fc45fd78ea3ef",
+      "role": "durable resumable recovery-case workflow adapter",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE",
+      "runtime_status": "PINNED_ISOLATED_ADAPTER",
+      "third_party_caveats": [
+        "Rust runtime packaging",
+        "database provider configuration"
+      ]
+    },
+    {
+      "repository": "fleetbase/fleetbase",
+      "revision": "4ff6980c6db6f3e8103b3ec425a089aa6d251af4",
+      "role": "external read-only shipment, order and proof-of-delivery evidence source",
+      "public_license": "AGPL-3.0",
+      "commercial_use_basis": "PUBLIC_AGPL_LICENSE_WITH_COMPLIANCE_REQUIRED",
+      "runtime_status": "COMPARATOR_NOT_PRIMARY_RUNTIME",
+      "third_party_caveats": [
+        "network-use source obligations",
+        "commercial white-label terms",
+        "customer telematics and driver data"
+      ]
+    },
+    {
+      "repository": "Budget-Lab-Yale/tariff-rate-tracker",
+      "revision": "5a977726af0ead299e7db9cbca018b04dc2cc2e6",
+      "role": "effective-dated tariff exposure and landed-cost intelligence source",
+      "public_license": "MIT",
+      "commercial_use_basis": "PUBLIC_LICENSE",
+      "runtime_status": "PINNED_SOURCE_DATA_ADAPTER",
+      "third_party_caveats": [
+        "upstream government and research data provenance",
+        "classification accuracy",
+        "effective-date validation"
+      ]
     }
   ]
 }

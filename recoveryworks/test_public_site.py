@@ -31,6 +31,8 @@ class RecoveryOSSiteBuildTests(unittest.TestCase):
             index = (output / "index.html").read_text(encoding="utf-8")
             self.assertNotIn(CONTACT_TOKEN, index)
             self.assertIn("owner@recovery.test", index)
+            self.assertIn("Durable jobs keep retries", index)
+            self.assertIn("Unknown adapter outcomes return to review", index)
             self.assertIn("Nothing was uploaded", (output / "site.js").read_text(encoding="utf-8"))
 
     def test_build_requires_verified_contact(self) -> None:

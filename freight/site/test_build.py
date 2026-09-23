@@ -98,6 +98,8 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Managed recovery fee 20%", page)
             self.assertIn("Total Freight Recovery charges", page)
             self.assertIn("Plain-language checkout terms", page)
+            self.assertIn("controlled contract-redline instructions", page)
+            self.assertIn("bind shipment evidence", page)
             self.assertIn('id="checkout-return"', page)
             self.assertIn("We verify the payment separately", page)
             self.assertNotIn("Discuss a pilot", page)
