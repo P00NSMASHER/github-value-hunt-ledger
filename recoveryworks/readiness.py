@@ -66,6 +66,9 @@ REQUIRED_READINESS_CHECKS = (
 )
 
 
+PROVIDER_VERIFICATION_MAX_AGE_SECONDS = 24 * 60 * 60
+
+
 def _required(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{name} is required")
@@ -85,6 +88,41 @@ def _iso(name: str, value: str) -> str:
 
 def _dt(name: str, value: str) -> datetime:
     return datetime.fromisoformat(_iso(name, value).replace("Z", "+00:00"))
+
+
+
+def _assert_provider_verification_freshness(
+    *,
+    evaluated_at: str,
+    signature_verified_at: str,
+    timestamp_verified_at: str,
+    object_lock_checked_at: Iterable[str],
+) -> None:
+    """Reject provider verification receipts older than the readiness freshness SLA."""
+    evaluation = _dt("evaluated_at", evaluated_at)
+    components: list[tuple[str, datetime]] = [
+        (
+            "external signature",
+            _dt("signature.verified_at", signature_verified_at),
+        ),
+        (
+            "external timestamp",
+            _dt("timestamp.verified_at", timestamp_verified_at),
+        ),
+    ]
+    components.extend(
+        (
+            f"object-lock[{index}]",
+            _dt("object_lock.checked_at", checked_at),
+        )
+        for index, checked_at in enumerate(object_lock_checked_at, start=1)
+    )
+    for label, verified_at in components:
+        age_seconds = (evaluation - verified_at).total_seconds()
+        if age_seconds < 0:
+            raise ValueError(f"{label} verification postdates readiness evaluation")
+        if age_seconds > PROVIDER_VERIFICATION_MAX_AGE_SECONDS:
+            raise ValueError(f"{label} provider verification is stale")
 
 
 @dataclass(frozen=True)
@@ -638,6 +676,12 @@ def build_seven_figure_readiness(
     )
     if _dt("evaluated_at", evaluated_at) < latest_component:
         raise ValueError("readiness evaluation predates a mandatory verification")
+    _assert_provider_verification_freshness(
+        evaluated_at=evaluated_at,
+        signature_verified_at=external_signature.verified_at,
+        timestamp_verified_at=external_timestamp.verified_at,
+        object_lock_checked_at=(item.checked_at for item in receipt_tuple),
+    )
 
     checks = tuple(sorted(REQUIRED_READINESS_CHECKS))
     body = {
@@ -737,6 +781,12 @@ def verify_seven_figure_readiness(
     )
     if _dt("package.evaluated_at", package.evaluated_at) < latest_component:
         raise ValueError("readiness evaluation predates mandatory verification")
+    _assert_provider_verification_freshness(
+        evaluated_at=package.evaluated_at,
+        signature_verified_at=package.external_signature.verified_at,
+        timestamp_verified_at=package.external_timestamp.verified_at,
+        object_lock_checked_at=(item.checked_at for item in package.object_lock_receipts),
+    )
 
 
 def readiness_to_payload(package: SevenFigureReadinessPackage) -> dict[str, Any]:
