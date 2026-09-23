@@ -183,6 +183,16 @@ class RecoveryLedger:
                 bundle,
                 expected_journal_head_hash=journal.head_hash,
             )
+            authorized_at = datetime.fromisoformat(
+                authorization.authorized_at.replace("Z", "+00:00")
+            )
+            dossier_assembled_at = datetime.fromisoformat(
+                dossier.assembled_at.replace("Z", "+00:00")
+            )
+            if authorized_at < dossier_assembled_at:
+                raise ValueError(
+                    "client authorization cannot predate completed seven-figure dossier"
+                )
         elif readiness is not None or dossier is not None:
             raise ValueError(
                 "seven-figure assurance artifacts cannot authorize a sub-seven-figure case"
