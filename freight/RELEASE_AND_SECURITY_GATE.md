@@ -139,8 +139,9 @@ operability, rights-evidence consistency and the chosen data-handling path.
 - [x] deterministic controlled synthetic pilot ZIP with exact fictional inputs,
   generated review/report outputs, per-entry SHA-256, duplicate/path rejection,
   byte-for-byte replay verification and explicit no-customer-value boundaries;
-- [x] public marketing build uses an exact five-file allowlist, requires an
-  operator-attested business inbox, embeds the controlled-demo SHA-256 and
+- [x] public marketing build uses an exact 33-file allowlist (page, local
+  scripts/styles, responsive imagery, licensed local fonts and demo), requires
+  an operator-attested business inbox, embeds the controlled-demo SHA-256 and
   contains no upload, analytics, backend request or customer-data intake;
 - [x] GitHub Pages validation/deployment workflow is least-privilege and pins
   every third-party Action to a full commit; pull requests cannot deploy and

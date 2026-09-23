@@ -20,12 +20,60 @@ if str(REPOSITORY) not in sys.path:
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 
 
-SOURCE_FILES = ("index.html", "site.css", "site.js", "_headers")
+TEXT_SOURCE_FILES = (
+    "index.html",
+    "site.css",
+    "site.js",
+    "_headers",
+    "assets/fonts/ATTRIBUTION.json",
+    "assets/fonts/LICENSE-HANKEN-GROTESK.txt",
+    "assets/fonts/LICENSE-INSTRUMENT-SERIF.txt",
+)
+BINARY_SOURCE_FILES = (
+    "assets/fonts/hanken-grotesk-latin.woff2",
+    "assets/fonts/instrument-serif-italic-latin.woff2",
+    "assets/fonts/instrument-serif-latin.woff2",
+    "assets/images/approved-path-800.webp",
+    "assets/images/approved-path.webp",
+    "assets/images/dock-control-800.webp",
+    "assets/images/dock-control.webp",
+    "assets/images/freight-network-800.webp",
+    "assets/images/freight-network.webp",
+    "assets/images/human-review-800.webp",
+    "assets/images/human-review.webp",
+    "assets/images/invoice-evidence-800.webp",
+    "assets/images/invoice-evidence.webp",
+    "assets/images/rail-yard-800.webp",
+    "assets/images/rail-yard.webp",
+    "assets/images/rate-authority-800.webp",
+    "assets/images/rate-authority.webp",
+    "assets/images/terminal-blue-hour-800.webp",
+    "assets/images/terminal-blue-hour.webp",
+    "assets/images/trailer-blue-hour-800.webp",
+    "assets/images/trailer-blue-hour.webp",
+    "assets/images/truck-cab-800.webp",
+    "assets/images/truck-cab.webp",
+    "assets/images/warehouse-handoff-800.webp",
+    "assets/images/warehouse-handoff.webp",
+)
+SOURCE_FILES = TEXT_SOURCE_FILES + BINARY_SOURCE_FILES
 DEMO_FILE = "synthetic-pilot-demo.zip"
 PUBLIC_FILES = SOURCE_FILES + (DEMO_FILE,)
 CONTACT_META = '<meta name="freight-contact-email" content="">'
 STATUS_PATTERN = re.compile(r'(<div class="wrap" id="contactStatus">).*?(</div>)')
 DEMO_MARKER = '<!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->'
+
+
+def _public_source(name: str) -> Path:
+    """Resolve one explicitly allowed file without traversing a source symlink."""
+    path = SOURCE
+    for part in Path(name).parts:
+        path /= part
+        if path.is_symlink():
+            raise ValueError(f"Symlink is not allowed in public asset path: {name}")
+    if not path.is_file():
+        raise ValueError(f"Missing or non-regular public asset: {name}")
+    return path
 
 
 def validate_contact(value: str, verified: bool) -> str:
@@ -60,16 +108,18 @@ def build(output: Path, contact_email: str, contact_verified: bool) -> Path:
         raise ValueError("Choose a new or empty output directory; existing files will not be overwritten.")
 
     # Exact allowlist: do not recurse, glob, or follow source symlinks.
-    bundle = {}
-    for name in SOURCE_FILES:
-        path = SOURCE / name
-        if path.is_symlink() or not path.is_file():
-            raise ValueError(f"Missing or non-regular public asset: {name}")
-        bundle[name] = path.read_text(encoding="utf-8")
-    if bundle["index.html"].count(CONTACT_META) != 1:
+    text_bundle = {
+        name: _public_source(name).read_text(encoding="utf-8")
+        for name in TEXT_SOURCE_FILES
+    }
+    binary_bundle = {
+        name: _public_source(name).read_bytes()
+        for name in BINARY_SOURCE_FILES
+    }
+    if text_bundle["index.html"].count(CONTACT_META) != 1:
         raise ValueError("The source must contain exactly one empty contact configuration.")
     safe_contact = html.escape(contact, quote=True)
-    page = bundle["index.html"].replace(
+    page = text_bundle["index.html"].replace(
         CONTACT_META, f'<meta name="freight-contact-email" content="{safe_contact}">'
     )
     page, count = STATUS_PATTERN.subn(
@@ -89,17 +139,23 @@ def build(output: Path, contact_email: str, contact_verified: bool) -> Path:
     if hashlib.sha256(demo_bytes).hexdigest() != receipt["bundle_sha256"]:
         raise ValueError("Controlled-demo digest changed during the public build.")
     demo_link = (
-        '<a class="btn secondary" href="synthetic-pilot-demo.zip" download>'
+        '<a class="button button-cobalt" href="synthetic-pilot-demo.zip" download>'
         'Download the controlled demo</a>'
         '<p class="demo-hash"><strong>SHA-256</strong> '
         f'<code>{receipt["bundle_sha256"]}</code></p>'
         '<p class="notice">Fictional data only; no customer result, external action, '
         'production attestation, or rights attestation.</p>'
     )
-    bundle["index.html"] = page.replace(DEMO_MARKER, demo_link)
+    text_bundle["index.html"] = page.replace(DEMO_MARKER, demo_link)
     destination.mkdir(parents=True, exist_ok=True)
-    for name, content in bundle.items():
-        (destination / name).write_text(content, encoding="utf-8")
+    for name, content in text_bundle.items():
+        target = destination / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content, encoding="utf-8")
+    for name, content in binary_bundle.items():
+        target = destination / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(content)
     (destination / DEMO_FILE).write_bytes(demo_bytes)
     return destination
 

@@ -47,8 +47,10 @@ jobs:
         run: |
           python freight/site/build.py --output /tmp/freight-recovery-public
           python -m freight.synthetic_pilot_bundle --verify /tmp/freight-recovery-public/synthetic-pilot-demo.zip
-          test "$(find /tmp/freight-recovery-public -maxdepth 1 -type f | wc -l)" -eq 5
-          test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 | wc -l)" -eq 5
+          test "$(find /tmp/freight-recovery-public -type f | wc -l)" -eq 33
+          test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 5
+          test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type d | wc -l)" -eq 1
+          test "$(find /tmp/freight-recovery-public -type l | wc -l)" -eq 0
 
   deploy:
     if: >-
