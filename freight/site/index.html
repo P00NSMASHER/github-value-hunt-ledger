@@ -3,149 +3,342 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Evidence-led freight invoice review for shippers, brokers, and 3PLs. Scope the records, review source-linked findings, and keep payment and dispute decisions with your team.">
+  <meta name="description" content="Clear, source-linked freight invoice review for shippers, brokers, and 3PLs. Your team keeps every payment and dispute decision.">
+  <meta name="theme-color" content="#090a0d">
   <meta name="freight-contact-email" content="">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
-  <title>Freight Recovery &mdash; Evidence for better invoice decisions</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+  <title>Freight Recovery &mdash; Know what you should pay</title>
+  <link rel="preload" href="assets/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="assets/images/terminal-blue-hour.webp" imagesrcset="assets/images/terminal-blue-hour-800.webp 800w, assets/images/terminal-blue-hour.webp 1586w" imagesizes="100vw" fetchpriority="high">
   <link rel="stylesheet" href="site.css">
   <script src="site.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<div class="statusbar"><div class="wrap" id="contactStatus"><strong>Contact channel pending.</strong> This is a source preview. You can prepare an inquiry locally; a verified business inbox is needed before public launch.</div></div>
-<div class="wrap">
-  <nav class="nav" aria-label="Main navigation">
-    <a class="brand" href="#main">Freight <span>Recovery</span> <small>controlled pilot</small></a>
-    <div class="navlinks"><a href="#how">How it works</a><a href="#sample">Controlled demo</a><a href="#offer">Offer</a><a class="btn" href="#inquiry">Discuss fit</a></div>
-  </nav>
-</div>
-<main id="main">
-  <div class="wrap">
-    <section class="hero" aria-labelledby="hero-title">
-      <div>
-        <div class="eyebrow">Freight invoice review for shippers, brokers &amp; 3PLs</div>
-        <h1 id="hero-title">Make freight findings traceable.</h1>
-        <p class="lead">Compare an agreed invoice population with the governing rates and shipment evidence. Receive a reviewed, source-linked report while your team keeps every payment and dispute decision.</p>
-        <div class="actions"><a class="btn" href="#inquiry">Discuss a pilot</a><a class="btn secondary" href="#sample">Inspect the controlled demo</a></div>
-        <p class="micro">Scope, fees, access, and handling are agreed in writing. No recovery is guaranteed.</p>
-      </div>
-      <div class="auditcard">
-        <div class="tag">Synthetic example</div><div class="tag">Not a customer result</div>
-        <h2>Fictional invoice INV-1</h2>
-        <div class="bigmoney">$25</div><div class="audit-subtitle">validated discrepancy in the controlled demo</div>
-        <div class="row"><span>Fictional billed charge</span><strong>$125</strong></div>
-        <div class="row"><span>Supported amount</span><strong>$100</strong></div>
-        <div class="row"><span>Simulated credit</span><strong>$20</strong></div>
-        <div class="row"><span>Simulated later return</span><strong>-$5</strong></div>
-        <div class="row"><span>Settlement-proven net</span><strong class="good">$15</strong></div>
-        <p class="notice">All identities, records, approvals, and money events in this example are fictional. No carrier was contacted and no money moved.</p>
-      </div>
-    </section>
+
+<header class="site-header">
+  <div class="statusbar">
+    <div class="wrap" id="contactStatus"><strong>Contact channel pending.</strong> This is a source preview. Prepare an inquiry locally; a verified business inbox is required before launch.</div>
   </div>
+  <div class="wrap">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="#main" aria-label="Freight Recovery home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="brand-name">Freight <em>Recovery</em></span>
+      </a>
+      <div class="navlinks">
+        <a href="#how">Process</a>
+        <a href="#sample">Demo</a>
+        <a href="#offer">Pricing</a>
+        <a class="button button-small button-light" href="#inquiry">Discuss a pilot <span aria-hidden="true">&#8599;</span></a>
+      </div>
+    </nav>
+  </div>
+</header>
 
-  <section class="section" id="how">
-    <div class="wrap">
-      <div class="eyebrow">A bounded first engagement</div><h2>Agree the proof before moving documents.</h2>
-      <p class="sectionintro">The work starts with the decision you need to improve, the evidence available, and the exact population to review. Unsupported records remain visible instead of becoming assumed savings.</p>
-      <div class="grid3">
-        <div class="tile"><div class="num">1</div><h3>Qualify the evidence</h3><p>Identify invoice exports, controlling rates, amendments, shipment records, and named owners. Confirm a suitable controlled intake route before sharing actual freight files.</p></div>
-        <div class="tile"><div class="num">2</div><h3>Review every finding</h3><p>Reconcile the frozen population, calculate against cited authority, and route ambiguous or missing evidence to a person. A flag is never silently promoted to a recovery.</p></div>
-        <div class="tile"><div class="num">3</div><h3>Separate the outcomes</h3><p>Report reviewed discrepancy, validated findings, and later realized credits separately. Returns and reversals reduce the current settlement total.</p></div>
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-media" aria-hidden="true">
+      <img src="assets/images/terminal-blue-hour.webp"
+           srcset="assets/images/terminal-blue-hour-800.webp 800w, assets/images/terminal-blue-hour.webp 1586w"
+           sizes="100vw" width="1586" height="992" alt="" fetchpriority="high">
+    </div>
+    <div class="hero-wash" aria-hidden="true"></div>
+    <div class="wrap hero-layout">
+      <div class="hero-copy">
+        <p class="eyebrow light"><span></span> Freight invoice review</p>
+        <h1 id="hero-title">Know what you <em>should</em> pay.</h1>
+        <p class="lead">We compare freight invoices with the rates and records that govern them. You get a clear, reviewed report. You decide what happens next.</p>
+        <div class="actions">
+          <a class="button button-cobalt" href="#inquiry">Discuss a pilot <span aria-hidden="true">&#8599;</span></a>
+          <a class="button button-ghost" href="#sample">See the demo <span aria-hidden="true">&#8595;</span></a>
+        </div>
+        <ul class="hero-proof" aria-label="Key safeguards">
+          <li>No black box</li>
+          <li>No automatic disputes</li>
+          <li>No savings promises</li>
+        </ul>
+      </div>
+
+      <aside class="hero-receipt" aria-label="Controlled demo summary">
+        <div class="receipt-topline">
+          <span>Controlled demo</span>
+          <span class="live-dot">Fictional</span>
+        </div>
+        <p class="receipt-kicker">Three sample invoices</p>
+        <div class="receipt-total"><span>$40</span><small>net realized</small></div>
+        <dl class="receipt-rows">
+          <div><dt>Reviewed discrepancy</dt><dd>$100</dd></div>
+          <div><dt>Validated findings</dt><dd>$50</dd></div>
+          <div><dt>Later return</dt><dd>&minus;$5</dd></div>
+        </dl>
+        <p class="receipt-note">Synthetic records only. This is not a customer result.</p>
+      </aside>
+    </div>
+    <div class="hero-caption">Illustrative editorial image <span>&middot;</span> no customer environment</div>
+  </section>
+
+  <section class="statement" aria-label="Service summary">
+    <div class="wrap statement-inner">
+      <p>Every finding points back to a source.</p>
+      <span class="statement-rule" aria-hidden="true"></span>
+      <p>Every decision stays with your team.</p>
+    </div>
+  </section>
+
+  <section class="section section-bone" aria-labelledby="clarity-title">
+    <div class="wrap editorial-split">
+      <figure class="image-frame evidence-image reveal-image">
+        <img src="assets/images/invoice-evidence.webp"
+             srcset="assets/images/invoice-evidence-800.webp 800w, assets/images/invoice-evidence.webp 1448w"
+             sizes="(max-width: 820px) 100vw, 54vw" width="1448" height="1086"
+             alt="Abstract freight paperwork, ruler, binder clips, and cobalt pencil arranged on a glass desk" loading="lazy" decoding="async">
+        <figcaption><span>01</span> Evidence before assumptions</figcaption>
+      </figure>
+      <div class="editorial-copy">
+        <p class="eyebrow"><span></span> The problem</p>
+        <h2 id="clarity-title">Freight bills are dense. Answers shouldn&rsquo;t be.</h2>
+        <p class="lede-small">Rates change. Accessorials stack up. Supporting records arrive in pieces. We turn that mess into a short, reviewable decision queue.</p>
+        <div class="index-list" aria-label="Review principles">
+          <div><span>01</span><strong>One population</strong><p>Agree exactly which invoices are in scope.</p></div>
+          <div><span>02</span><strong>One source chain</strong><p>Show the rate or record behind each finding.</p></div>
+          <div><span>03</span><strong>One clear outcome</strong><p>Keep flags, validated findings, and realized credits separate.</p></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="sample">
+  <section class="section section-ink" id="how" aria-labelledby="process-title">
     <div class="wrap">
-      <div class="eyebrow">Reproducible controlled demo</div><h2>Inspect the workflow with fictional inputs.</h2>
-      <p class="sectionintro">The downloadable bundle contains the exact synthetic invoices, rule files, settlement events, review packet, buyer report, machine-readable receipt, and SHA-256 manifest. Verification replays the current code and compares every archived byte.</p>
-      <div class="report">
-        <div class="report-heading"><div><div class="report-title">Three-invoice controlled scenario</div><div class="muted">Synthetic data &middot; USD &middot; no external action &middot; no customer savings claim</div></div><div><span class="tag dark">Deterministic</span></div></div>
-        <div class="reportgrid">
-          <div class="metric"><span class="muted">Reviewed discrepancy</span><b>$100</b></div>
-          <div class="metric"><span class="muted">Validated findings</span><b>$50</b></div>
-          <div class="metric"><span class="muted">Challenger-only</span><b>$25</b></div>
-          <div class="metric"><span class="muted">Net realized</span><b>$40</b></div>
+      <div class="section-heading section-heading-wide">
+        <div>
+          <p class="eyebrow light"><span></span> A bounded first engagement</p>
+          <h2 id="process-title">One scope.<br><em>Three clear steps.</em></h2>
         </div>
-        <div class="findings">
-          <div class="finding"><strong>INV-1 &middot; validated</strong><span class="muted">Challenger-only</span><strong>$25</strong></div>
-          <div class="finding"><strong>INV-2 &middot; validated</strong><span class="muted">Incumbent-known</span><strong>$25</strong></div>
-          <div class="finding"><strong>INV-3 &middot; reviewed</strong><span class="muted">Candidate authority rejected</span><strong>$0 validated</strong></div>
-          <div class="finding"><strong>Later return</strong><span class="muted">Applied to INV-1 credit</span><strong>-$5</strong></div>
-        </div>
-        <p class="report-note">The $100 reviewed discrepancy, $50 validated findings, and $40 settlement-proven net are intentionally different measures. The bundle does not predict a result for another invoice population.</p>
+        <p>We agree the question, the records, and the rules before work begins. Missing evidence stays visible. A person reviews every material finding.</p>
       </div>
-      <div class="demo-download">
-        <h3>Download and verify</h3>
-        <!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->
+
+      <div class="process-stage">
+        <figure class="image-frame image-frame-dark process-image reveal-image">
+          <img src="assets/images/human-review.webp"
+               srcset="assets/images/human-review-800.webp 800w, assets/images/human-review.webp 1536w"
+               sizes="(max-width: 900px) 100vw, 58vw" width="1536" height="1024"
+               alt="Freight analyst comparing paper records beside two abstract review screens" loading="lazy" decoding="async">
+          <figcaption><span>02</span> Human review stays in the loop</figcaption>
+        </figure>
+
+        <ol class="process-list">
+          <li>
+            <span class="process-number">01</span>
+            <div><h3>Freeze the scope</h3><p>Choose the invoices, rates, shipment records, and question to answer.</p></div>
+          </li>
+          <li>
+            <span class="process-number">02</span>
+            <div><h3>Check every line</h3><p>Recalculate charges, cite the authority, and route gaps to a reviewer.</p></div>
+          </li>
+          <li>
+            <span class="process-number">03</span>
+            <div><h3>Decide with context</h3><p>Receive a clean report. Your team approves every payment or dispute action.</p></div>
+          </li>
+        </ol>
       </div>
     </div>
   </section>
 
-  <section class="section" id="offer">
+  <section class="image-break" aria-label="Controlled freight handling">
+    <img src="assets/images/dock-control.webp"
+         srcset="assets/images/dock-control-800.webp 800w, assets/images/dock-control.webp 1536w"
+         sizes="100vw" width="1536" height="1024"
+         alt="Worker checking an unbranded trailer seal at a loading dock before sunrise" loading="lazy" decoding="async">
+    <div class="image-break-overlay" aria-hidden="true"></div>
+    <div class="wrap image-break-copy">
+      <p class="eyebrow light"><span></span> Controlled by design</p>
+      <p class="image-break-title">No freight files move until the scope, access, and handling route are agreed.</p>
+      <p class="image-credit">Illustrative editorial image &middot; no customer data</p>
+    </div>
+  </section>
+
+  <section class="section section-cobalt" id="sample" aria-labelledby="demo-title">
     <div class="wrap">
-      <div class="eyebrow">Current offer framework</div><h2>Buy a defined answer, not a savings promise.</h2>
-      <p class="sectionintro">These are current starting-point bands, not a quote or market-validated price. The exact population, checks, records, handling route, review effort, fee, and timing must be accepted in writing. Existing offers keep their own terms.</p>
-      <div class="offer-cards">
-        <article class="tile offer-card"><div class="tag">Readiness route</div><h3>Data Readiness / Authority Diagnostic</h3><div class="price">$5,000&ndash;$7,500 <span>fixed starting band</span></div><p>Source inventory, missing-authority report, and a bounded pilot or remediation plan. This is not an invoice audit and does not claim recovery dollars.</p></article>
-        <article class="tile offer-card"><div class="tag">Ready-data route</div><h3>Blind Freight Audit Acceptance Test</h3><div class="price">$15,000&ndash;$25,000 <span>fixed starting band</span></div><p>Frozen population, reproduced expected charges, reviewed source-linked findings, blind comparison, and one report. Target: 10&ndash;15 business days after complete inputs and authorized kickoff, subject to agreed scope and reviewer capacity.</p></article>
+      <div class="section-heading demo-heading">
+        <div>
+          <p class="eyebrow cobalt-light"><span></span> Reproducible controlled demo</p>
+          <h2 id="demo-title">See the proof chain.</h2>
+        </div>
+        <p>Download the exact fictional inputs, outputs, review packet, receipt, and SHA-256 manifest. Replay the workflow and compare every archived byte.</p>
       </div>
+
+      <div class="demo-layout">
+        <figure class="image-frame image-frame-cobalt demo-image reveal-image">
+          <img src="assets/images/approved-path.webp"
+               srcset="assets/images/approved-path-800.webp 800w, assets/images/approved-path.webp 1448w"
+               sizes="(max-width: 900px) 100vw, 46vw" width="1448" height="1086"
+               alt="Abstract invoice grid with an oxblood review overlay, cobalt route cord, and steel approval stamp" loading="lazy" decoding="async">
+          <figcaption><span>03</span> Finding to approved outcome</figcaption>
+        </figure>
+
+        <div class="report" aria-label="Synthetic demo results">
+          <div class="report-top">
+            <div><span class="report-label">Synthetic scenario / USD</span><h3>Three invoices.<br>Four distinct measures.</h3></div>
+            <span class="status-chip">Deterministic</span>
+          </div>
+          <div class="report-grid">
+            <div><span>Reviewed</span><strong>$100</strong></div>
+            <div><span>Validated</span><strong>$50</strong></div>
+            <div><span>Challenger-only</span><strong>$25</strong></div>
+            <div class="accent"><span>Net realized</span><strong>$40</strong></div>
+          </div>
+          <div class="report-lines">
+            <div><span>INV-1</span><span>Validated</span><strong>$25</strong></div>
+            <div><span>INV-2</span><span>Validated</span><strong>$25</strong></div>
+            <div><span>INV-3</span><span>Authority rejected</span><strong>$0</strong></div>
+            <div class="return"><span>Later return</span><span>Applied to INV-1</span><strong>&minus;$5</strong></div>
+          </div>
+          <p class="report-note">These measures are intentionally different. The demo does not predict results for another invoice set.</p>
+        </div>
+      </div>
+
+      <div class="download-panel">
+        <div><span class="download-index">04</span><h3>Download. Verify. Replay.</h3><p>Fictional records, current generated outputs, and a machine-checkable manifest.</p></div>
+        <div class="download-action"><!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD --></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-porcelain" id="offer" aria-labelledby="offer-title">
+    <div class="wrap">
+      <div class="offer-hero">
+        <figure class="network-image reveal-image">
+          <img src="assets/images/freight-network.webp"
+               srcset="assets/images/freight-network-800.webp 800w, assets/images/freight-network.webp 1672w"
+               sizes="(max-width: 900px) 100vw, 56vw" width="1672" height="941"
+               alt="Unbranded freight trucks moving through a wet highway interchange at dawn" loading="lazy" decoding="async">
+          <figcaption>Illustrative route network</figcaption>
+        </figure>
+        <div class="offer-intro">
+          <p class="eyebrow"><span></span> Current offer framework</p>
+          <h2 id="offer-title">Start with a defined answer.</h2>
+          <p>Pick the route that matches your records. Final scope, fee, access, and timing are agreed in writing.</p>
+        </div>
+      </div>
+
+      <div class="price-list">
+        <article class="price-row">
+          <span class="price-index">01</span>
+          <div class="price-copy"><p class="route-tag">Readiness route</p><h3>Data Readiness / Authority Diagnostic</h3><p>Find the usable records, missing authority, and best next step. This is not an invoice audit.</p></div>
+          <div class="price-amount"><strong>$5,000&ndash;$7,500</strong><span>fixed starting band</span></div>
+        </article>
+        <article class="price-row featured">
+          <span class="price-index">02</span>
+          <div class="price-copy"><p class="route-tag">Ready-data route</p><h3>Blind Freight Audit Acceptance Test</h3><p>Review a frozen population, reproduce charges, and deliver source-linked findings plus one decision report.</p></div>
+          <div class="price-amount"><strong>$15,000&ndash;$25,000</strong><span>fixed starting band</span></div>
+        </article>
+      </div>
+
       <div class="deliverables">
-        <h3>What the acceptance test is designed to deliver</h3>
-        <ul class="clean columns"><li>Reconciled invoice disposition register</li><li>Evidence-linked finding packets</li><li>Missing-information and limitation register</li><li>Blind incumbent comparison where agreed</li><li>Separate discrepancy and outcome totals</li><li>Buyer decision and action queue</li></ul>
+        <p>Designed to deliver</p>
+        <ul>
+          <li>Invoice disposition register</li>
+          <li>Evidence-linked findings</li>
+          <li>Missing-information log</li>
+          <li>Blind comparison, if agreed</li>
+          <li>Separate outcome totals</li>
+          <li>Buyer action queue</li>
+        </ul>
+      </div>
+      <p class="commercial-note">Starting bands are not a quote or a savings claim. The acceptance test targets 10&ndash;15 business days after complete inputs and authorized kickoff, subject to scope and reviewer capacity. Existing offers keep their own terms.</p>
+    </div>
+  </section>
+
+  <section class="section section-inquiry" id="inquiry" aria-labelledby="inquiry-title">
+    <div class="wrap inquiry-grid">
+      <div class="inquiry-copy">
+        <p class="eyebrow light"><span></span> Start with fit</p>
+        <h2>Tell us what decision you need to make.</h2>
+        <p>A short discussion can show whether your records support useful work and which route fits.</p>
+        <ul class="inquiry-points">
+          <li><span>01</span> Freight modes and invoice volume</li>
+          <li><span>02</span> Available rates and records</li>
+          <li><span>03</span> Review bottleneck and desired answer</li>
+        </ul>
+        <div class="privacy-note">
+          <strong>Keep the first message simple.</strong>
+          <p>Do not include invoices, rate terms, passwords, personal information, or other confidential content.</p>
+        </div>
+      </div>
+
+      <div class="formbox">
+        <div class="form-heading"><span>Local draft tool</span><h3 id="inquiry-title">Prepare an inquiry</h3><p>Nothing is uploaded, submitted, or saved by this page.</p></div>
+        <div id="inquiryFields" role="group" aria-labelledby="inquiry-title">
+          <div class="formgrid">
+            <div class="field"><label for="name">Name</label><input id="name" autocomplete="name" maxlength="100" required></div>
+            <div class="field"><label for="company">Company</label><input id="company" autocomplete="organization" maxlength="120" required></div>
+            <div class="field"><label for="email">Work email</label><input id="email" type="email" autocomplete="email" maxlength="254" required></div>
+            <div class="field"><label for="volume">Invoices per month</label><select id="volume"><option>Under 50</option><option>50&ndash;199</option><option>200&ndash;999</option><option>1,000+</option><option>Not sure</option></select></div>
+            <div class="field full"><label for="notes">Freight mix and review goal</label><textarea id="notes" maxlength="1200" placeholder="Example: mostly FTL; reduce time spent checking accessorials. No confidential details."></textarea></div>
+          </div>
+          <button class="button button-cobalt submit" id="prepareDraft" type="button">Prepare local draft <span aria-hidden="true">&#8594;</span></button>
+        </div>
+        <p id="formMessage" class="form-status" role="status" aria-live="polite"></p>
+        <noscript><p class="form-status">Enable JavaScript to prepare a local draft. This page has no submission endpoint.</p></noscript>
+        <div class="draft" id="draftPanel" hidden>
+          <label for="draftText">Your inquiry draft</label>
+          <textarea id="draftText" readonly></textarea>
+          <div class="actions">
+            <button class="button button-outline" id="copyDraft" type="button">Copy</button>
+            <button class="button button-outline" id="downloadDraft" type="button">Download</button>
+            <a class="button button-cobalt" id="emailDraft" hidden>Open email draft</a>
+          </div>
+          <p class="form-status" id="deliveryNote">Contact channel pending. Keep your draft until a verified business contact is available.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="inquiry">
-    <div class="wrap">
-      <div class="eyebrow">Start with fit</div><h2>What would a useful review answer?</h2>
-      <div class="offer">
-        <div class="pricebox">
-          <h3>Define the problem and the decision.</h3>
-          <p class="sectionintro">A short fit discussion can establish whether the available records can support meaningful work and which route applies.</p>
-          <ul class="clean"><li>Freight modes and approximate invoice volume</li><li>Access to governing rates and supporting records</li><li>Review bottlenecks and the outcome to measure</li><li>A named reviewer and purchasing decision owner</li></ul>
-          <p>Any diagnostic or pilot requires an agreed scope, fees, and data-handling arrangements. A paid engagement does not override a missing access, security, or rights prerequisite.</p>
-          <p class="notice">This public page does not accept freight documents. Keep invoice details, rate terms, passwords, personal information, and other confidential content out of the initial inquiry.</p>
-        </div>
-        <div class="formbox">
-          <h3 id="inquiry-title">Prepare an inquiry</h3>
-          <div id="inquiryFields" role="group" aria-labelledby="inquiry-title">
-            <div class="formgrid">
-              <div class="field"><label for="name">Name</label><input id="name" autocomplete="name" maxlength="100" required></div>
-              <div class="field"><label for="company">Company</label><input id="company" autocomplete="organization" maxlength="120" required></div>
-              <div class="field"><label for="email">Work email</label><input id="email" type="email" autocomplete="email" maxlength="254" required></div>
-              <div class="field"><label for="volume">Carrier invoices per month</label><select id="volume"><option>Under 50</option><option>50&ndash;199</option><option>200&ndash;999</option><option>1,000+</option><option>Not sure</option></select></div>
-              <div class="field full"><label for="notes">Freight mix and review goal</label><textarea id="notes" maxlength="1200" placeholder="Example: mostly FTL; understand accessorial review time. No confidential details."></textarea></div>
-            </div>
-            <button class="btn submit" id="prepareDraft" type="button">Prepare inquiry draft</button>
-            <p class="notice">This prepares text in your browser. Nothing is submitted, uploaded, or saved by this page.</p>
-          </div>
-          <p id="formMessage" class="notice form-status" role="status" aria-live="polite"></p>
-          <noscript><p class="notice">Enable JavaScript to prepare a local draft. This page has no submission endpoint.</p></noscript>
-          <div class="draft" id="draftPanel" hidden>
-            <label for="draftText">Your inquiry draft</label><textarea id="draftText" readonly></textarea>
-            <div class="actions"><button class="btn secondary" id="copyDraft" type="button">Copy draft</button><button class="btn secondary" id="downloadDraft" type="button">Download text</button><a class="btn" id="emailDraft" hidden>Open email draft</a></div>
-            <p class="notice" id="deliveryNote">Contact channel pending. Keep your draft until a verified business contact is available.</p>
-          </div>
-        </div>
+  <section class="section section-bone faq-section" aria-labelledby="faq-title">
+    <div class="wrap faq-layout">
+      <div class="faq-heading">
+        <p class="eyebrow"><span></span> Questions</p>
+        <h2 id="faq-title">Plain answers.</h2>
+        <p>Clear scope. Checkable findings. No hidden automation.</p>
       </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="wrap faq">
-      <div class="eyebrow">Questions</div><h2>Clear scope. Checkable findings.</h2>
-      <details><summary>What records could a review require?</summary><p>Carrier invoices, the governing rate confirmation or contract, amendments, and relevant delivery or accessorial evidence. A POD or BOL alone may not establish the right to a particular charge.</p></details>
-      <details><summary>Does a flag mean the carrier owes a refund?</summary><p>No. A flag may require more evidence or interpretation. Reviewed discrepancy, validated findings, and later settlement-proven outcomes are tracked separately.</p></details>
-      <details><summary>Will you automatically reject or dispute invoices?</summary><p>No. Your authorized reviewer makes payment and dispute decisions. Any external action requires separate, specific authorization.</p></details>
-      <details><summary>Are the sample results from a customer?</summary><p>No. Every identity, record, approval, money event, and amount in the controlled demo is synthetic. It demonstrates workflow behavior, not customer value.</p></details>
-      <details><summary>How do I share freight documents?</summary><p>Do not upload them to this page or attach them to the initial inquiry. Actual records move only after scope, access, retention, rights, and a suitable controlled intake route are agreed and verified.</p></details>
-      <details><summary>What happens when I prepare an inquiry?</summary><p>The page builds a text draft locally. You can copy it or download it. Once a verified business contact is configured, you can open an email draft and send it yourself. The page cannot confirm sending or delivery.</p></details>
+      <div class="faq">
+        <details>
+          <summary><span>01</span> What records could a review need?</summary>
+          <p>Invoices, governing rates or contracts, amendments, and relevant shipment or accessorial evidence. A POD or BOL alone may not prove the right charge.</p>
+        </details>
+        <details>
+          <summary><span>02</span> Does a flag mean a refund is owed?</summary>
+          <p>No. A flag may need more evidence or interpretation. We keep reviewed, validated, and realized amounts separate.</p>
+        </details>
+        <details>
+          <summary><span>03</span> Will you automatically dispute invoices?</summary>
+          <p>No. Your authorized reviewer decides. Any outside action needs separate, specific approval.</p>
+        </details>
+        <details>
+          <summary><span>04</span> Are the demo results from a customer?</summary>
+          <p>No. Every identity, record, approval, money event, and amount is synthetic. The demo shows workflow behavior, not customer value.</p>
+        </details>
+        <details>
+          <summary><span>05</span> How do I share freight documents?</summary>
+          <p>Not through this page or the first inquiry. Actual records move only after scope, rights, access, retention, and a controlled intake route are agreed.</p>
+        </details>
+      </div>
     </div>
   </section>
 </main>
-<footer class="wrap footer">Freight Recovery offers scoped invoice-review work. &copy; 2026. This page contains synthetic examples, not verified customer results.</footer>
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <a class="brand footer-brand" href="#main" aria-label="Freight Recovery home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-name">Freight <em>Recovery</em></span>
+    </a>
+    <p>Scoped freight invoice review.<br>Synthetic examples, not verified customer results.</p>
+    <p class="footer-meta">Editorial imagery is illustrative.<br>&copy; 2026 Freight Recovery.</p>
+  </div>
+</footer>
 </body>
 </html>

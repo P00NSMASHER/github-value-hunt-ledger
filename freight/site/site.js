@@ -7,13 +7,27 @@
   let subject = "Freight invoice review — fit discussion";
   let draft = "";
 
+  const revealItems = document.querySelectorAll(".reveal-image");
+  if ("IntersectionObserver" in window && revealItems.length) {
+    document.documentElement.classList.add("js");
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      }
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    for (const item of revealItems) observer.observe(item);
+  }
+
   byId("prepareDraft").addEventListener("click", () => {
     for (const field of document.querySelectorAll("#inquiryFields input, #inquiryFields textarea")) {
       if (!field.reportValidity()) return;
     }
     subject = `Freight invoice review — ${byId("company").value.trim()}`;
     draft = [
-      "I would like to discuss fit and readiness for a freight invoice review.",
+      "I would like to discuss fit for a freight invoice review.",
       "",
       `Name: ${byId("name").value.trim()}`,
       `Company: ${byId("company").value.trim()}`,
@@ -21,16 +35,16 @@
       `Carrier invoices per month: ${byId("volume").value}`,
       `Freight mix and review goal: ${byId("notes").value.trim()}`,
       "",
-      "Please confirm the proposed scope, fees, and suitable data-handling arrangements before any freight documents are shared."
+      "Please confirm scope, fees, and a suitable data-handling route before any freight documents are shared."
     ].join("\n");
     byId("draftText").value = draft;
     byId("draftPanel").hidden = false;
     if (contact) {
       byId("emailDraft").href = `mailto:${contact}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(draft)}`;
       byId("emailDraft").hidden = false;
-      byId("deliveryNote").textContent = `Send the draft to ${contact} using your email application. No documents in the initial inquiry. This page cannot confirm delivery.`;
+      byId("deliveryNote").textContent = `Send the draft to ${contact} using your email app. Do not attach documents. This page cannot confirm delivery.`;
     }
-    message.textContent = "Draft prepared. Nothing has been sent. Review the text, then copy, download, or open an email draft if available.";
+    message.textContent = "Draft ready. Nothing has been sent. Review it, then copy, download, or open it in your email app.";
     byId("draftText").focus();
   });
 
@@ -55,10 +69,10 @@
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    message.textContent = "Text download prepared. Nothing has been sent.";
+    message.textContent = "Text download ready. Nothing has been sent.";
   });
 
   byId("emailDraft").addEventListener("click", () => {
-    message.textContent = "Email draft requested in your email application. Review it and send it yourself. This page cannot confirm sending or delivery.";
+    message.textContent = "Email draft opened. Review and send it yourself; this page cannot confirm delivery.";
   });
 })();
