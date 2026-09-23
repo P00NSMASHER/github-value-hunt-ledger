@@ -67,11 +67,13 @@ class PublicBuildTests(unittest.TestCase):
 
             parser = ImageParser()
             parser.feed(page)
-            self.assertEqual(6, len(parser.images))
+            self.assertEqual(11, len(parser.images))
             self.assertTrue(all("alt" in image for image in parser.images))
             self.assertTrue(all(image["src"].startswith("assets/images/")
                                 for image in parser.images))
             self.assertTrue(all("srcset" in image for image in parser.images))
+            self.assertTrue(all("width" in image and "height" in image
+                                for image in parser.images))
 
             stylesheet = (output / "site.css").read_text()
             self.assertIn('@font-face', stylesheet)

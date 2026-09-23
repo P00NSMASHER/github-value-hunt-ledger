@@ -43,7 +43,7 @@ python -m freight.synthetic_pilot_bundle --verify /tmp/freight-recovery-syntheti
 
 The verifier re-runs the current scenario and requires the exact entry set, exact bytes, SHA-256 values, sizes, safe paths, and manifest hash. Duplicate or modified entries fail verification. Fixed ZIP metadata and sorted entries make two builds from the same source byte-identical.
 
-The public-site builder performs the same build, embeds the archive SHA-256 in the page, and publishes it as `synthetic-pilot-demo.zip` inside the exact 23-file public boundary (including the locally served responsive imagery and licensed web fonts).
+The public-site builder performs the same build, embeds the archive SHA-256 in the page, and publishes it as `synthetic-pilot-demo.zip` inside the exact 33-file public boundary (including the locally served responsive imagery and licensed web fonts).
 
 ## Archive contents
 

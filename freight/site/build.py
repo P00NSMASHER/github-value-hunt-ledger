@@ -43,8 +43,18 @@ BINARY_SOURCE_FILES = (
     "assets/images/human-review.webp",
     "assets/images/invoice-evidence-800.webp",
     "assets/images/invoice-evidence.webp",
+    "assets/images/rail-yard-800.webp",
+    "assets/images/rail-yard.webp",
+    "assets/images/rate-authority-800.webp",
+    "assets/images/rate-authority.webp",
     "assets/images/terminal-blue-hour-800.webp",
     "assets/images/terminal-blue-hour.webp",
+    "assets/images/trailer-blue-hour-800.webp",
+    "assets/images/trailer-blue-hour.webp",
+    "assets/images/truck-cab-800.webp",
+    "assets/images/truck-cab.webp",
+    "assets/images/warehouse-handoff-800.webp",
+    "assets/images/warehouse-handoff.webp",
 )
 SOURCE_FILES = TEXT_SOURCE_FILES + BINARY_SOURCE_FILES
 DEMO_FILE = "synthetic-pilot-demo.zip"

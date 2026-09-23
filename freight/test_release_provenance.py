@@ -39,6 +39,7 @@ def test_current_release_provenance_is_deterministic():
     assert "freight/site/build.py" in a["control_file_hashes"]
     assert "freight/site/assets/fonts/ATTRIBUTION.json" in a["control_file_hashes"]
     assert "freight/site/assets/images/terminal-blue-hour.webp" in a["control_file_hashes"]
+    assert "freight/site/assets/images/trailer-blue-hour.webp" in a["control_file_hashes"]
     assert ".github/workflows/technology-intelligence.yml" in a["control_file_hashes"]
     assert ".github/workflows/freight-site-pages.yml" in a["control_file_hashes"]
     assert ".github/workflows/recoveryworks.yml" in a["control_file_hashes"]

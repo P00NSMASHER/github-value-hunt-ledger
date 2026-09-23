@@ -29,8 +29,8 @@ historical v15.14 release/CI record and not external customer proof.
   inputs, current review/report outputs, machine receipts and a hash manifest.
   Verification replays the scenario byte-for-byte and the public site embeds
   the generated ZIP digest without claiming customer value or external action.
-- The redesigned Freight Recovery sales site now has an exact 23-file public
-  build boundary, six responsive editorial images, locally served licensed
+- The redesigned Freight Recovery sales site now has an exact 33-file public
+  build boundary, eleven responsive editorial images, locally served licensed
   fonts, and a SHA-pinned GitHub Pages workflow. Pull requests verify
   it; main can deploy only after an owner configures a verified public inbox
   and enables the GitHub Pages environment. No deployment was performed here.

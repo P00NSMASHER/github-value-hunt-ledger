@@ -2,7 +2,7 @@
 
 This directory is the reviewed source for a static public marketing page. It is not a customer-data application and it is not evidence of a current production deployment.
 
-The page uses the Freight Recovery name, publishes the current offer starting points with explicit qualification, and includes a deterministic controlled synthetic pilot download. Its six responsive editorial images are illustrative and contain no customer data. The demo contains fictional inputs and current generated outputs; it does not claim a customer result, external action, production control, component right, or revenue.
+The page uses the Freight Recovery name, publishes the current offer starting points with explicit qualification, and includes a deterministic controlled synthetic pilot download. Its eleven responsive editorial images are illustrative and contain no customer data. The demo contains fictional inputs and current generated outputs; it does not claim a customer result, external action, production control, component right, or revenue.
 
 The public page is self-contained. Image variants and the Hanken Grotesk / Instrument Serif web fonts are served locally, so the browser does not contact an image CDN, font CDN, analytics service, or other third party. The bundled fonts include their SIL Open Font License 1.1 texts plus a byte-level attribution record.
 
@@ -43,7 +43,7 @@ From the repository root, with a real verified inbox in the environment:
 python freight/site/build.py --output /tmp/freight-recovery-public
 ```
 
-The output directory must be new or empty, outside the private repository, and not one of its parents. The build follows an exact 23-file allowlist and emits only:
+The output directory must be new or empty, outside the private repository, and not one of its parents. The build follows an exact 33-file allowlist and emits only:
 
 - `index.html`
 - `site.css`
@@ -66,8 +66,18 @@ The output directory must be new or empty, outside the private repository, and n
 - `assets/images/human-review-800.webp`
 - `assets/images/invoice-evidence.webp`
 - `assets/images/invoice-evidence-800.webp`
+- `assets/images/rail-yard.webp`
+- `assets/images/rail-yard-800.webp`
+- `assets/images/rate-authority.webp`
+- `assets/images/rate-authority-800.webp`
 - `assets/images/terminal-blue-hour.webp`
 - `assets/images/terminal-blue-hour-800.webp`
+- `assets/images/trailer-blue-hour.webp`
+- `assets/images/trailer-blue-hour-800.webp`
+- `assets/images/truck-cab.webp`
+- `assets/images/truck-cab-800.webp`
+- `assets/images/warehouse-handoff.webp`
+- `assets/images/warehouse-handoff-800.webp`
 
 The ZIP is rebuilt from the current controlled scenario, and its SHA-256 is embedded in the page. Nested asset paths are still copied one-by-one from the explicit allowlist. The build does not recurse through the repository, copy customer data, or follow source symlinks.
 
