@@ -3,6 +3,10 @@
 RecoveryWorks is the umbrella recovery business. RecoveryOS is the shared proof,
 calculation, review, and lifecycle layer used by all recovery branches.
 
+The broader public business site lives in `recoveryworks/site/`. It is built
+from an exact allowlist and published beside the separate Freight Recovery
+microsite.
+
 ## Initial branches
 
 - **FreightRecovery** — carrier overcharges and contract/rate leakage.
