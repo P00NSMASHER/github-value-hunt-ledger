@@ -106,6 +106,7 @@ from .models import (
     RecoveryFinding,
     RecoveryMode,
     RuleRef,
+    SettlementEvidence,
 )
 
 __all__ = [
@@ -166,6 +167,7 @@ __all__ = [
     "SEVEN_FIGURE_CENTS",
     "SevenFigureAuthorizationDossier",
     "SevenFigureReadinessPackage",
+    "SettlementEvidence",
     "SourceRetentionManifest",
     "SourceAttestation",
     "RuleRef",

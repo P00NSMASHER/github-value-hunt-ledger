@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -19,7 +20,7 @@ def entry(*, actual=30000, verified=True, hts="6109.10.00", origin="CN"):
         hts_code=hts,
         origin_country=origin,
         actual_total_cents=actual,
-        source_hash="entry-hash",
+        source_hash=H("entry-hash"),
         source_locator="file://entries.csv#row=2",
         verified=verified,
     )
@@ -44,7 +45,7 @@ def assessment(
         mpf_cents=346,
         hmf_cents=125,
         other_cents=0,
-        source_hash="assessment-hash",
+        source_hash=H("assessment-hash"),
         source_locator="file://assessments.csv#row=2",
         verified=verified,
         schedule_snapshot_date="2026-07-31",

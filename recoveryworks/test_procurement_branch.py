@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from pathlib import Path
 import tempfile
 import unittest
@@ -27,7 +28,7 @@ def line(*, verified=True, actual=10000):
         invoice_date="2026-08-15",
         invoiced_quantity="10",
         actual_line_cents=actual,
-        source_hash="line-hash",
+        source_hash=H("line-hash"),
         source_locator="file://invoice.csv#row=2",
         verified=verified,
     )
@@ -43,7 +44,7 @@ def authority(*, verified=True, price=1000):
         effective_to=None,
         contracted_unit_price_cents=price,
         price_basis="Approved PO line price",
-        source_hash="authority-hash",
+        source_hash=H("authority-hash"),
         source_locator="file://po.csv#row=2",
         verified=verified,
     )
@@ -54,7 +55,7 @@ def quantity(*, verified=True, qty="8"):
         invoice_line_id="L-1",
         approved_billable_quantity=qty,
         quantity_basis="Receiving/3-way-match approved quantity",
-        source_hash="quantity-hash",
+        source_hash=H("quantity-hash"),
         source_locator="file://quantity.csv#row=2",
         verified=verified,
     )

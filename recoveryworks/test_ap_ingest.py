@@ -5,6 +5,7 @@ import unittest
 from recoveryworks import FindingState, RecoveryEngine
 from recoveryworks.branches import ingest_ap_exports
 from recoveryworks.branches.ap import APObligation, APPayment, build_ap_observations
+from recoveryworks.test_support import source_hash as H
 
 
 def p(payment_id, amount, *, invoice="INV-1", locator="row"):
@@ -13,7 +14,7 @@ def p(payment_id, amount, *, invoice="INV-1", locator="row"):
         vendor_id="Vendor A",
         invoice_number=invoice,
         amount_cents=amount,
-        source_hash="same-export-hash",
+        source_hash=H("same-export-hash"),
         source_locator=f"file://payments.csv#{locator}",
         verified=True,
         payment_date="2026-08-01",
@@ -25,7 +26,7 @@ def o(amount=10000):
         vendor_id="Vendor A",
         invoice_number="INV-1",
         expected_cents=amount,
-        source_hash="invoice-export-hash",
+        source_hash=H("invoice-export-hash"),
         source_locator="file://invoices.csv#row=2",
         effective_from="2026-07-01",
         verified=True,
@@ -72,7 +73,7 @@ class APIngestTests(unittest.TestCase):
                     vendor_id="Vendor A",
                     invoice_number="INV-2",
                     expected_cents=20000,
-                    source_hash="invoice-export-hash",
+                    source_hash=H("invoice-export-hash"),
                     source_locator="file://invoices.csv#row=3",
                     effective_from="2026-07-01",
                     verified=True,

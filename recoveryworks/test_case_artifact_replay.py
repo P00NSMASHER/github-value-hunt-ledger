@@ -115,8 +115,8 @@ def frozen_bundle():
     calculation = CalculationManifest(
         calculator_id="recoveryworks.freight.synthetic_hostile_exam",
         calculator_version="1",
-        code_commit_sha="SIMULATED-COMMIT-SHA",
-        input_manifest_hash="SIM-SCAN-BATCH-HASH",
+        code_commit_sha="b01d2470f38e2f48eecb848bb5edd4e0d0f0f33a",
+        input_manifest_hash=sha(b"SIM-SCAN-BATCH-HASH"),
         finding_proof_hash=finding.proof_hash,
         expected_cents=finding.expected_cents,
         actual_cents=finding.actual_cents,

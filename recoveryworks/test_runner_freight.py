@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from dataclasses import asdict
 import json
 from pathlib import Path
@@ -25,7 +26,7 @@ def write_truth(root: Path, *, buyer_id="buyer-1"):
             customer_id="CUST-1",
             carrier_id="Carrier A",
             currency="USD",
-            source_hash="invoice-hash",
+            source_hash=H("invoice-hash"),
         ),),
     )
     authority = AuthorityRef(
@@ -35,7 +36,7 @@ def write_truth(root: Path, *, buyer_id="buyer-1"):
         customer_id="CUST-1",
         carrier_id="Carrier A",
         currency="USD",
-        source_hash="authority-hash",
+        source_hash=H("authority-hash"),
     )
     finding = make_finding(
         finding_id="F-1",

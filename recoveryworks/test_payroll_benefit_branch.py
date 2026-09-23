@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from pathlib import Path
 import tempfile
 import unittest
@@ -17,7 +18,7 @@ def rate(*, verified=True, unit_rate=2_000_000):
         fixed_cents=1000,
         included_units="0",
         unit_rate_micros=unit_rate,
-        source_hash="rate-hash",
+        source_hash=H("rate-hash"),
         source_locator="file://rates.csv#row=2",
         verified=verified,
     )
@@ -31,7 +32,7 @@ def charge(*, verified=True, actual=4000):
         service_id="MED-FAMILY",
         service_date="2026-08-31",
         actual_cents=actual,
-        source_hash="charge-hash",
+        source_hash=H("charge-hash"),
         source_locator="file://charges.csv#row=2",
         verified=verified,
     )

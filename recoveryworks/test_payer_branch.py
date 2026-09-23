@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -28,7 +29,7 @@ def line(
         units=1,
         modifier=modifier,
         place_of_service=pos,
-        source_hash="remit-hash",
+        source_hash=H("remit-hash"),
         source_locator="file://remit.csv#row=2",
         verified=verified,
     )
@@ -50,7 +51,7 @@ def rate(
         effective_to=None,
         modifier=modifier,
         place_of_service=pos,
-        source_hash=source,
+        source_hash=H(source),
         source_locator=f"file://rates.csv#{source}",
         verified=verified,
         jurisdiction="US",
@@ -143,7 +144,7 @@ class PayerBranchTests(unittest.TestCase):
                 billed_procedure="99214",
                 paid_cents=10000,
                 units=1,
-                source_hash="h",
+                source_hash=H("h"),
                 source_locator="file://x",
                 verified=True,
                 metadata={"member_id": "do-not-store-here"},

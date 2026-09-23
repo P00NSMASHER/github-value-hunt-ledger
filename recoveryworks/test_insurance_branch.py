@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -20,7 +21,7 @@ def claim(*, claimed=10000000, verified=True, claimant="client-1",
         loss_date=loss_date,
         coverage_category=category,
         claimed_cents=claimed,
-        source_hash="claim-hash",
+        source_hash=H("claim-hash"),
         source_locator="file://claims.csv#row=2",
         verified=verified,
     )
@@ -41,7 +42,7 @@ def assessment(*, expected=8000000, verified=True, policy="POL-1",
         coverage_basis="Reviewed policy limits, deductible, and covered loss valuation",
         policy_effective_from=start,
         policy_effective_to=end,
-        source_hash="assessment-hash",
+        source_hash=H("assessment-hash"),
         source_locator="file://assessments.csv#row=2",
         verified=verified,
         policy_snapshot_date=snapshot,
@@ -56,7 +57,7 @@ def settlement(*, sid="S-1", amount=5000000, date="2026-09-01", verified=True):
         claim_line_id="CL-1",
         amount_paid_cents=amount,
         payment_date=date,
-        source_hash=f"settlement-{sid}",
+        source_hash=H(f"settlement-{sid}"),
         source_locator=f"file://settlements.csv#{sid}",
         verified=verified,
     )

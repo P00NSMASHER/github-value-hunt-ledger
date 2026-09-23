@@ -11,10 +11,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import tempfile
 from typing import Any, Mapping
 
 from .durable_ledger import DurableRecoveryLedger
+from .private_io import atomic_private_write, private_file_lock
 
 
 class StoreConflictError(RuntimeError):
@@ -45,6 +45,7 @@ class LocalBundleStore:
 
     def __init__(self, path: str | os.PathLike[str]) -> None:
         self.path = Path(path)
+        self.lock_path = self.path.with_name(f".{self.path.name}.lock")
 
     def _read_envelope(self) -> dict[str, Any] | None:
         if not self.path.exists():
@@ -83,36 +84,23 @@ class LocalBundleStore:
         expected_head_hash: str | None = None,
         enforce_expected: bool = False,
     ) -> str | None:
-        existing_head = self.current_head_hash()
-        if (enforce_expected or expected_head_hash is not None) and existing_head != expected_head_hash:
-            raise StoreConflictError(
-                f"stale ledger writer: expected {expected_head_hash!r}, "
-                f"found {existing_head!r}"
-            )
+        with private_file_lock(self.lock_path):
+            existing_head = self.current_head_hash()
+            if (
+                enforce_expected or expected_head_hash is not None
+            ) and existing_head != expected_head_hash:
+                raise StoreConflictError(
+                    f"stale ledger writer: expected {expected_head_hash!r}, "
+                    f"found {existing_head!r}"
+                )
 
-        bundle = ledger.export_bundle()
-        envelope = {
-            "schema": 1,
-            "bundle_hash": hashlib.sha256(_canonical_bytes(bundle)).hexdigest(),
-            "bundle": bundle,
-        }
-        raw = _canonical_bytes(envelope) + b"\n"
+            bundle = ledger.export_bundle()
+            envelope = {
+                "schema": 1,
+                "bundle_hash": hashlib.sha256(_canonical_bytes(bundle)).hexdigest(),
+                "bundle": bundle,
+            }
+            raw = _canonical_bytes(envelope) + b"\n"
 
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        fd, tmp_name = tempfile.mkstemp(
-            prefix=f".{self.path.name}.",
-            suffix=".tmp",
-            dir=str(self.path.parent),
-        )
-        try:
-            os.fchmod(fd, 0o600)
-            with os.fdopen(fd, "wb") as handle:
-                handle.write(raw)
-                handle.flush()
-                os.fsync(handle.fileno())
-            os.replace(tmp_name, self.path)
-            os.chmod(self.path, 0o600)
-        finally:
-            if os.path.exists(tmp_name):
-                os.unlink(tmp_name)
-        return bundle["journal"].get("head_hash")
+            atomic_private_write(self.path, raw)
+            return bundle["journal"].get("head_hash")

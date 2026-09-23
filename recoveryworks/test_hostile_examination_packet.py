@@ -196,7 +196,7 @@ class HostileExaminationPacketTests(unittest.TestCase):
                 artifacts,
                 calculator_id=bundle.calculation.calculator_id,
                 calculator_version=bundle.calculation.calculator_version,
-                code_commit_sha="different-code-commit",
+                code_commit_sha="f" * 40,
                 input_manifest_hash=bundle.calculation.input_manifest_hash,
                 expected_cents=425_000_000,
                 actual_cents=525_000_000,

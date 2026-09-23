@@ -11,7 +11,13 @@ from datetime import datetime
 from typing import Any, Iterable, Mapping
 
 from .assurance import CaseProofBundle, HostileExaminationPacket, verify_case_bundle
-from .models import canonical_hash
+from .models import (
+    canonical_hash,
+    freeze_json,
+    normalize_git_commit_sha,
+    normalize_sha256,
+    normalize_source_hash,
+)
 
 
 def _required(name: str, value: str) -> str:
@@ -72,6 +78,7 @@ class RetainedSourceObject:
             _required(name, getattr(self, name))
         if self.role not in {"authority", "evidence"}:
             raise ValueError("retained source role must be authority or evidence")
+        object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
         _nonnegative_int("size_bytes", self.size_bytes)
         retained = _dt("retained_at", self.retained_at)
         if self.retain_until is not None:
@@ -80,12 +87,20 @@ class RetainedSourceObject:
                 raise ValueError("retain_until cannot precede retained_at")
         if type(self.immutable_storage_verified) is not bool:
             raise ValueError("immutable_storage_verified must be boolean")
+        if self.provider_attestation_hash is not None:
+            object.__setattr__(
+                self,
+                "provider_attestation_hash",
+                normalize_sha256(
+                    "provider_attestation_hash",
+                    self.provider_attestation_hash,
+                ),
+            )
         if self.immutable_storage_verified:
             _required("retention_control_id", self.retention_control_id or "")
-            _required(
-                "provider_attestation_hash",
-                self.provider_attestation_hash or "",
-            )
+            if self.provider_attestation_hash is None:
+                raise ValueError("provider_attestation_hash is required")
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -254,6 +269,18 @@ class PopulationSegment:
         _nonnegative_int("excluded_record_count", self.excluded_record_count)
         if self.included_record_count + self.excluded_record_count != self.record_count:
             raise ValueError("population segment counts do not reconcile")
+        for name in (
+            "source_export_hash",
+            "control_total_hash",
+            "included_ids_hash",
+            "excluded_ids_hash",
+        ):
+            object.__setattr__(
+                self,
+                name,
+                normalize_sha256(name, getattr(self, name)),
+            )
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -281,10 +308,23 @@ class NegativeEvidenceSearch:
             raise ValueError("negative-evidence search resolved must be boolean")
         if not self.searched_source_hashes:
             raise ValueError("negative-evidence search requires searched sources")
-        for value in self.searched_source_hashes:
-            _required("searched_source_hash", value)
-        for value in self.contrary_evidence_hashes:
-            _required("contrary_evidence_hash", value)
+        object.__setattr__(
+            self,
+            "searched_source_hashes",
+            tuple(
+                normalize_sha256("searched_source_hash", value)
+                for value in self.searched_source_hashes
+            ),
+        )
+        object.__setattr__(
+            self,
+            "contrary_evidence_hashes",
+            tuple(
+                normalize_sha256("contrary_evidence_hash", value)
+                for value in self.contrary_evidence_hashes
+            ),
+        )
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -473,6 +513,22 @@ class BuildProvenanceAttestation:
             raise ValueError("build attestation cannot predate build")
         if type(self.tests_passed) is not bool:
             raise ValueError("tests_passed must be boolean")
+        object.__setattr__(
+            self,
+            "code_commit_sha",
+            normalize_git_commit_sha("code_commit_sha", self.code_commit_sha),
+        )
+        for name in (
+            "dependency_lock_hash",
+            "source_tree_hash",
+            "build_artifact_hash",
+            "attestation_hash",
+        ):
+            object.__setattr__(
+                self,
+                name,
+                normalize_sha256(name, getattr(self, name)),
+            )
 
     def integrity_body(self) -> dict[str, Any]:
         return {
@@ -516,9 +572,9 @@ def create_build_provenance_attestation(
         "build_system": _required("build_system", build_system),
         "workflow_identity": _required("workflow_identity", workflow_identity),
         "workflow_run_id": _required("workflow_run_id", workflow_run_id),
-        "dependency_lock_hash": _required("dependency_lock_hash", dependency_lock_hash),
-        "source_tree_hash": _required("source_tree_hash", source_tree_hash),
-        "build_artifact_hash": _required("build_artifact_hash", build_artifact_hash),
+        "dependency_lock_hash": normalize_sha256("dependency_lock_hash", dependency_lock_hash),
+        "source_tree_hash": normalize_sha256("source_tree_hash", source_tree_hash),
+        "build_artifact_hash": normalize_sha256("build_artifact_hash", build_artifact_hash),
         "tests_passed": True,
         "built_at": _iso("built_at", built_at),
         "attested_at": _iso("attested_at", attested_at),

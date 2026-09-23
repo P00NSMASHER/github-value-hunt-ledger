@@ -33,7 +33,12 @@ from .custody import (
     verify_public_verification_record,
     verify_source_retention,
 )
-from .models import canonical_hash
+from .models import (
+    canonical_hash,
+    freeze_json,
+    normalize_sha256,
+    normalize_source_hash,
+)
 
 
 ASYMMETRIC_SIGNATURE_ALGORITHMS = frozenset({
@@ -170,6 +175,15 @@ class ExternalSignatureEvidence:
             raise ValueError("signature verification cannot predate signing")
         if type(self.provider_verified) is not bool:
             raise ValueError("provider_verified must be boolean")
+        for name in (
+            "payload_hash",
+            "public_key_fingerprint",
+            "signature_hash",
+            "verification_receipt_hash",
+            "evidence_hash",
+        ):
+            object.__setattr__(self, name, normalize_sha256(name, getattr(self, name)))
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     def integrity_body(self) -> dict[str, Any]:
         return {
@@ -214,16 +228,16 @@ def record_external_signature_verification(
         "schema": 1,
         "signature_id": _required("signature_id", signature_id),
         "payload_kind": _required("payload_kind", payload_kind),
-        "payload_hash": _required("payload_hash", payload_hash),
+        "payload_hash": normalize_sha256("payload_hash", payload_hash),
         "provider": _required("provider", provider),
         "key_id": _required("key_id", key_id),
         "algorithm": algorithm,
-        "public_key_fingerprint": _required(
+        "public_key_fingerprint": normalize_sha256(
             "public_key_fingerprint", public_key_fingerprint
         ),
-        "signature_hash": _required("signature_hash", signature_hash),
+        "signature_hash": normalize_sha256("signature_hash", signature_hash),
         "provider_request_id": _required("provider_request_id", provider_request_id),
-        "verification_receipt_hash": _required(
+        "verification_receipt_hash": normalize_sha256(
             "verification_receipt_hash", verification_receipt_hash
         ),
         "signed_at": _iso("signed_at", signed_at),
@@ -295,6 +309,14 @@ class ExternalTimestampEvidence:
             raise ValueError("timestamp verification cannot predate trusted timestamp")
         if type(self.provider_verified) is not bool:
             raise ValueError("provider_verified must be boolean")
+        for name in (
+            "subject_hash",
+            "token_hash",
+            "verification_receipt_hash",
+            "evidence_hash",
+        ):
+            object.__setattr__(self, name, normalize_sha256(name, getattr(self, name)))
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     def integrity_body(self) -> dict[str, Any]:
         return {
@@ -333,13 +355,13 @@ def record_external_timestamp_verification(
     body = {
         "schema": 1,
         "timestamp_id": _required("timestamp_id", timestamp_id),
-        "subject_hash": _required("subject_hash", subject_hash),
+        "subject_hash": normalize_sha256("subject_hash", subject_hash),
         "authority": _required("authority", authority),
         "standard": _required("standard", standard),
-        "token_hash": _required("token_hash", token_hash),
+        "token_hash": normalize_sha256("token_hash", token_hash),
         "serial_number": _required("serial_number", serial_number),
         "provider_request_id": _required("provider_request_id", provider_request_id),
-        "verification_receipt_hash": _required(
+        "verification_receipt_hash": normalize_sha256(
             "verification_receipt_hash", verification_receipt_hash
         ),
         "timestamped_at": _iso("timestamped_at", timestamped_at),
@@ -419,6 +441,10 @@ class ObjectLockVerificationReceipt:
             raise ValueError("object-lock retention must extend beyond verification time")
         if type(self.provider_verified) is not bool:
             raise ValueError("provider_verified must be boolean")
+        object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
+        for name in ("provider_response_hash", "receipt_hash"):
+            object.__setattr__(self, name, normalize_sha256(name, getattr(self, name)))
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     def integrity_body(self) -> dict[str, Any]:
         return {
@@ -463,7 +489,7 @@ def record_object_lock_verification(
         "schema": 1,
         "source_id": _required("source_id", source_id),
         "role": _required("role", role),
-        "source_hash": _required("source_hash", source_hash),
+        "source_hash": normalize_source_hash(source_hash),
         "provider": _required("provider", provider),
         "object_version_id": _required("object_version_id", object_version_id),
         "retention_control_id": _required(
@@ -474,7 +500,7 @@ def record_object_lock_verification(
         "legal_hold_status": _required("legal_hold_status", legal_hold_status),
         "checked_at": _iso("checked_at", checked_at),
         "provider_request_id": _required("provider_request_id", provider_request_id),
-        "provider_response_hash": _required(
+        "provider_response_hash": normalize_sha256(
             "provider_response_hash", provider_response_hash
         ),
         "verified_by_adapter": _required("verified_by_adapter", verified_by_adapter),

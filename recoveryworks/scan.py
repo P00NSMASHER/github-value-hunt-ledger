@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass
 from typing import Iterable
 
 from .engine import RecoveryEngine, RecoveryObservation
-from .models import Branch, RecoveryFinding, canonical_hash
+from .models import Branch, RecoveryFinding, canonical_hash, normalize_source_hash
 
 
 @dataclass(frozen=True)
@@ -15,6 +15,17 @@ class SourceManifestEntry:
     source_hash: str
     locator: str
     kind: str
+
+    def __post_init__(self) -> None:
+        for name in ("source_id", "locator", "kind"):
+            object.__setattr__(self, name, _required(name, getattr(self, name)))
+        if not isinstance(self.branch, Branch):
+            raise ValueError("branch must be a Branch")
+        object.__setattr__(
+            self,
+            "source_hash",
+            normalize_source_hash(self.source_hash),
+        )
 
 
 @dataclass(frozen=True)
@@ -37,7 +48,10 @@ class RecoveryScanBatch:
 def _required(name: str, value: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{name} is required")
-    return value.strip()
+    normalized = value.strip()
+    if any(ord(character) < 32 for character in normalized):
+        raise ValueError(f"{name} cannot contain control characters")
+    return normalized
 
 
 def freeze_scan(
@@ -55,11 +69,14 @@ def freeze_scan(
     if not branch_tuple:
         raise ValueError("at least one branch is required")
 
-    source_tuple = tuple(sorted(sources, key=lambda s: (s.branch.value, s.source_id)))
+    supplied_sources = tuple(sources)
+    if not all(isinstance(source, SourceManifestEntry) for source in supplied_sources):
+        raise ValueError("sources must contain only SourceManifestEntry values")
+    source_tuple = tuple(
+        sorted(supplied_sources, key=lambda s: (s.branch.value, s.source_id))
+    )
     seen: set[str] = set()
     for source in source_tuple:
-        for name in ("source_id", "source_hash", "locator", "kind"):
-            _required(name, getattr(source, name))
         if source.source_id in seen:
             raise ValueError(f"duplicate source_id: {source.source_id}")
         seen.add(source.source_id)

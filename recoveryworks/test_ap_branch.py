@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -15,7 +16,7 @@ def payment(pid, vendor, invoice, cents, *, verified=True):
         vendor_id=vendor,
         invoice_number=invoice,
         amount_cents=cents,
-        source_hash=f"hash-{pid}",
+        source_hash=H(f"hash-{pid}"),
         source_locator=f"file://payments.csv#{pid}",
         verified=verified,
         payment_date="2026-08-01",
@@ -27,7 +28,7 @@ def obligation(vendor, invoice, cents, *, verified=True):
         vendor_id=vendor,
         invoice_number=invoice,
         expected_cents=cents,
-        source_hash=f"obligation-{vendor}-{invoice}",
+        source_hash=H(f"obligation-{vendor}-{invoice}"),
         source_locator=f"file://invoices.csv#{invoice}",
         effective_from="2026-01-01",
         verified=verified,

@@ -28,8 +28,11 @@ class LedgerCase(unittest.TestCase):
         self.root = Path(self.tmp.name)
         self.path = self.root / "authority.sqlite"
         self.ledger = AuthorityLedger(self.path)
+        self.targets = []
 
     def tearDown(self):
+        for target in self.targets:
+            target.close()
         self.ledger.close()
         self.tmp.cleanup()
 
@@ -166,6 +169,7 @@ class LedgerCase(unittest.TestCase):
         self.receipt()
         self.allocation()
         target = SyntheticTarget(self.root / "target.sqlite")
+        self.targets.append(target)
         effect = self.ledger.reserve_effect("credit-crash", "A1", "VENDOR_CREDIT", 10_000, 100_00, {"credit": "all"}, valid_at=V1, observed_at=O1)
         dispatch_version, downstream_key, payload_hash = self.ledger.dispatch("credit-crash", expected_version=0)
         target.apply(downstream_key, payload_hash)
@@ -199,6 +203,7 @@ class LedgerCase(unittest.TestCase):
         self.receipt()
         self.allocation()
         target = SyntheticTarget(self.root / "target.sqlite")
+        self.targets.append(target)
         effect = self.ledger.reserve_effect("definite-no", "A1", "VENDOR_CREDIT", 10_000, 100_00, {"credit": "all"}, valid_at=V1, observed_at=O1)
         self.ledger.dispatch("definite-no", expected_version=0)
         self.ledger.recover_abandoned_dispatch("definite-no")

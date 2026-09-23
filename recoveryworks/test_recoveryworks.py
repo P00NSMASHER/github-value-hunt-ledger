@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import hashlib
 import unittest
 
 from recoveryworks import (
@@ -10,18 +11,20 @@ from recoveryworks import (
     RecoveryLedger,
     RecoveryObservation,
     RuleRef,
+    SettlementEvidence,
     SourceManifestEntry,
     freeze_scan,
     run_scan,
 )
 from recoveryworks.branches.freight import from_freight_finding
 from recoveryworks.branches.registry import BRANCHES
+from recoveryworks.test_support import source_hash as H
 
 
 def evidence(verified=True):
     return EvidenceRef(
         evidence_id="ev:1",
-        source_hash="abc123",
+        source_hash=hashlib.sha256(b"evidence-1").hexdigest(),
         locator="source://doc#p1",
         kind="invoice",
         verified=verified,
@@ -31,7 +34,7 @@ def evidence(verified=True):
 def rule(verified=True):
     return RuleRef(
         rule_id="rule:1",
-        source_hash="rulehash",
+        source_hash=hashlib.sha256(b"rule-1").hexdigest(),
         effective_from="2026-01-01",
         effective_to=None,
         verified_controlling=verified,
@@ -39,9 +42,78 @@ def rule(verified=True):
     )
 
 
+def settlement(ledger, finding_id, recovered_cents):
+    return SettlementEvidence(
+        settlement_id="settlement-1",
+        finding_id=finding_id,
+        source_hash=hashlib.sha256(b"settlement-1").hexdigest(),
+        source_locator="bank://remittance/settlement-1",
+        observed_at=ledger.get(finding_id).updated_at,
+        recovered_cents=recovered_cents,
+        currency="USD",
+        verified=True,
+    )
+
+
 class RecoveryWorksTests(unittest.TestCase):
     def test_all_six_branches_registered(self):
         self.assertEqual(set(BRANCHES), set(Branch))
+
+    def test_proof_references_require_real_sha256_source_digests(self):
+        with self.assertRaisesRegex(ValueError, "64-character SHA-256"):
+            EvidenceRef(
+                evidence_id="ev:bad-hash",
+                source_hash="not-a-digest",
+                locator="source://bad-hash",
+                kind="invoice",
+                verified=False,
+            )
+        with self.assertRaisesRegex(ValueError, "64-character SHA-256"):
+            RuleRef(
+                rule_id="rule:bad-hash",
+                source_hash="not-a-digest",
+                effective_from="2026-01-01",
+                effective_to=None,
+                verified_controlling=False,
+                source_locator="source://bad-hash",
+            )
+        with self.assertRaisesRegex(ValueError, "64-character SHA-256"):
+            SourceManifestEntry(
+                "source:bad-hash",
+                Branch.FREIGHT,
+                "not-a-digest",
+                "source://bad-hash",
+                "invoice_export",
+            )
+
+    def test_nested_proof_metadata_is_detached_and_immutable(self):
+        raw_metadata = {"trace": [{"amount_cents": 100}]}
+        reference = EvidenceRef(
+            evidence_id="ev:immutable",
+            source_hash=hashlib.sha256(b"immutable-source").hexdigest(),
+            locator="source://doc#1",
+            kind="invoice",
+            verified=True,
+            metadata=raw_metadata,
+        )
+        proof_hash = reference.proof_hash
+
+        raw_metadata["trace"][0]["amount_cents"] = 999
+        self.assertEqual(reference.metadata["trace"][0]["amount_cents"], 100)
+        self.assertEqual(reference.proof_hash, proof_hash)
+        with self.assertRaises(TypeError):
+            reference.metadata["trace"].append({"amount_cents": 1})
+
+    def test_non_finite_proof_metadata_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "NaN or infinity"):
+            EvidenceRef(
+                evidence_id="ev:nan",
+                source_hash=hashlib.sha256(b"nan-source").hexdigest(),
+                locator="source://doc#1",
+                kind="invoice",
+                verified=True,
+                metadata={"score": float("nan")},
+            )
 
     def test_overpayment_and_underpayment_modes(self):
         engine = RecoveryEngine()
@@ -96,9 +168,71 @@ class RecoveryWorksTests(unittest.TestCase):
         ledger.authorize(finding.finding_id, "customer-auth-1")
         claimed = ledger.mark_claimed(finding.finding_id)
         self.assertIs(claimed.case_state, CaseState.CLAIMED)
-        recovered = ledger.mark_recovered(finding.finding_id, 3000, 600)
+        recovered = ledger.mark_recovered(
+            finding.finding_id,
+            settlement(ledger, finding.finding_id, 3000),
+            600,
+        )
         self.assertIs(recovered.case_state, CaseState.RECOVERED)
         self.assertEqual(ledger.rollup()["totals"]["fee_cents"], 600)
+
+    def test_ledger_actor_fields_are_typed_and_reject_control_characters(self):
+        finding = RecoveryEngine().evaluate(RecoveryObservation(
+            branch=Branch.DUTY, client_id="c", counterparty_id="customs",
+            reference="entry-typed", currency="USD", expected_cents=10000,
+            actual_cents=14000, rule=rule(), evidence=(evidence(),),
+            reason="DUTY_VARIANCE", confidence_basis="verified tariff",
+        ))
+        ledger = RecoveryLedger()
+        ledger.add(finding)
+        with self.assertRaisesRegex(ValueError, "reviewer_id is required"):
+            ledger.approve(finding.finding_id, None, "reviewed")
+        with self.assertRaisesRegex(ValueError, "control characters"):
+            ledger.approve(finding.finding_id, "reviewer\nadmin", "reviewed")
+
+    def test_settlement_evidence_cannot_be_reused_across_findings(self):
+        engine = RecoveryEngine()
+        findings = tuple(
+            engine.evaluate(RecoveryObservation(
+                branch=Branch.FREIGHT,
+                client_id="client-1",
+                counterparty_id="carrier-1",
+                reference=reference,
+                currency="USD",
+                expected_cents=10_000,
+                actual_cents=14_000,
+                rule=rule(),
+                evidence=(evidence(),),
+                reason="OVERCHARGE",
+                confidence_basis="verified contract",
+            ))
+            for reference in ("invoice-1", "invoice-2")
+        )
+        ledger = RecoveryLedger()
+        for index, finding in enumerate(findings, start=1):
+            ledger.add(finding)
+            ledger.approve(finding.finding_id, f"reviewer-{index}", "verified")
+            ledger.authorize(finding.finding_id, f"customer-auth-{index}")
+            ledger.mark_claimed(finding.finding_id)
+
+        first_evidence = settlement(ledger, findings[0].finding_id, 4_000)
+        with self.assertRaisesRegex(ValueError, "finding_id does not match"):
+            ledger.mark_recovered(findings[1].finding_id, first_evidence)
+
+        ledger.mark_recovered(findings[0].finding_id, first_evidence)
+        relabeled_evidence = SettlementEvidence(
+            settlement_id=first_evidence.settlement_id,
+            finding_id=findings[1].finding_id,
+            source_hash=first_evidence.source_hash,
+            source_locator=first_evidence.source_locator,
+            observed_at=ledger.get(findings[1].finding_id).updated_at,
+            recovered_cents=first_evidence.recovered_cents,
+            currency=first_evidence.currency,
+            verified=True,
+        )
+        with self.assertRaisesRegex(ValueError, "already allocated"):
+            ledger.mark_recovered(findings[1].finding_id, relabeled_evidence)
+        self.assertIs(ledger.get(findings[1].finding_id).case_state, CaseState.CLAIMED)
 
     def test_ledger_dedupes_identical_proof(self):
         finding = RecoveryEngine().evaluate(RecoveryObservation(
@@ -115,12 +249,12 @@ class RecoveryWorksTests(unittest.TestCase):
 
     def test_freight_bridge_preserves_authority_gate(self):
         f = SimpleNamespace(
-            finding_id="f1", proof_hash="proof", buyer_id="buyer",
+            finding_id="f1", proof_hash=H("proof"), buyer_id="buyer",
             carrier_id="carrier", invoice_id="inv", currency="USD",
             expected_cents=1000, actual_cents=1500, status="VALIDATED",
             shipment_id="ship", customer_id="customer",
         )
-        authority = SimpleNamespace(authority_id="a1", source_hash="authorityhash")
+        authority = SimpleNamespace(authority_id="a1", source_hash=H("authorityhash"))
         obs = from_freight_finding(f, authority)
         finding = RecoveryEngine().evaluate(obs)
         self.assertIs(finding.state, FindingState.VALIDATED)
@@ -134,8 +268,8 @@ class RecoveryWorksTests(unittest.TestCase):
             branches=(Branch.FREIGHT, Branch.AP),
             selection_rule="all records in supplied historical period",
             sources=(
-                SourceManifestEntry("s1", Branch.FREIGHT, "h1", "file://freight.csv", "invoice_export"),
-                SourceManifestEntry("s2", Branch.AP, "h2", "file://payments.csv", "payment_export"),
+                SourceManifestEntry("s1", Branch.FREIGHT, H("h1"), "file://freight.csv", "invoice_export"),
+                SourceManifestEntry("s2", Branch.AP, H("h2"), "file://payments.csv", "payment_export"),
             ),
         )
         observation = RecoveryObservation(

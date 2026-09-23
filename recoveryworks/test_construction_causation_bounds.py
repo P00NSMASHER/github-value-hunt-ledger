@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import RecoveryEngine
@@ -28,7 +29,7 @@ def schedule(version_id, data_date, *, b_duration, c_duration=None):
         data_date=data_date,
         activities=tuple(activities),
         relationships=tuple(relationships),
-        source_hash=f"schedule-container-{version_id}",
+        source_hash=H(f"schedule-container-{version_id}"),
         source_locator=f"file://schedules.json#{version_id}",
         verified=True,
     )
@@ -45,7 +46,7 @@ def entitlement():
         entitled_cents=10_000_000,
         effective_date="2026-08-10",
         entitlement_basis="Reviewed clause 7.4 and priced change",
-        source_hash="entitlement-hash",
+        source_hash=H("entitlement-hash"),
         source_locator="file://entitlements.csv#row=2",
         verified=True,
         entitlement_reviewer_id="contract-reviewer-1",
@@ -58,7 +59,7 @@ def event(event_date="2026-08-05"):
         project_id="PRJ-1",
         event_date=event_date,
         description="Owner-directed access restriction",
-        source_hash="event-hash",
+        source_hash=H("event-hash"),
         source_locator="file://events.csv#row=2",
         verified=True,
     )
@@ -71,7 +72,7 @@ def mapping():
         baseline_activity_id="B",
         update_activity_id="B",
         mapping_basis="RFI and daily report link the event to activity B",
-        source_hash="mapping-hash",
+        source_hash=H("mapping-hash"),
         source_locator="file://mappings.csv#row=2",
         verified=True,
     )
@@ -87,7 +88,7 @@ def review(days):
         accepted_causation=True,
         accepted_delay_days=days,
         review_date="2026-09-15",
-        source_hash="review-hash",
+        source_hash=H("review-hash"),
         source_locator="file://causation.csv#row=2",
         verified=True,
         qualified_reviewer_id="scheduler-1",
@@ -101,7 +102,7 @@ def settlement():
         entitlement_id="ENT-1",
         amount_received_cents=2_000_000,
         settlement_date="2026-09-20",
-        source_hash="settlement-hash",
+        source_hash=H("settlement-hash"),
         source_locator="file://settlements.csv#row=2",
         verified=True,
     )

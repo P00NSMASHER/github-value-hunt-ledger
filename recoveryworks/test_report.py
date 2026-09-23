@@ -1,3 +1,5 @@
+from recoveryworks.test_support import source_hash as H
+import hashlib
 import unittest
 
 from recoveryworks import (
@@ -7,6 +9,7 @@ from recoveryworks import (
     RecoveryEngine,
     RecoveryObservation,
     RuleRef,
+    SettlementEvidence,
 )
 from recoveryworks.report import build_scan360_report
 
@@ -22,7 +25,7 @@ def make_finding(branch, client_id, expected, actual, *, verified=True, ref="r")
         actual_cents=actual,
         rule=RuleRef(
             rule_id=f"rule-{branch.value}-{ref}",
-            source_hash=f"rulehash-{branch.value}-{ref}",
+            source_hash=H(f"rulehash-{branch.value}-{ref}"),
             effective_from="2026-01-01",
             effective_to=None,
             verified_controlling=verified,
@@ -30,7 +33,7 @@ def make_finding(branch, client_id, expected, actual, *, verified=True, ref="r")
         ),
         evidence=(EvidenceRef(
             evidence_id=f"ev-{branch.value}-{ref}",
-            source_hash=f"evhash-{branch.value}-{ref}",
+            source_hash=H(f"evhash-{branch.value}-{ref}"),
             locator=f"source://evidence/{branch.value}/{ref}",
             kind="source_record",
             verified=verified,
@@ -38,6 +41,19 @@ def make_finding(branch, client_id, expected, actual, *, verified=True, ref="r")
         reason="VARIANCE",
         confidence_basis="verified" if verified else "candidate",
     ))
+
+
+def settlement(ledger, finding_id, recovered_cents):
+    return SettlementEvidence(
+        settlement_id="settlement-1",
+        finding_id=finding_id,
+        source_hash=hashlib.sha256(b"settlement-1").hexdigest(),
+        source_locator="bank://remittance/settlement-1",
+        observed_at=ledger.get(finding_id).updated_at,
+        recovered_cents=recovered_cents,
+        currency="USD",
+        verified=True,
+    )
 
 
 class Scan360ReportTests(unittest.TestCase):
@@ -57,7 +73,11 @@ class Scan360ReportTests(unittest.TestCase):
         ledger.approve(freight.finding_id, "reviewer", "verified freight")
         ledger.authorize(freight.finding_id, "auth-1")
         ledger.mark_claimed(freight.finding_id)
-        ledger.mark_recovered(freight.finding_id, 4000, 800)
+        ledger.mark_recovered(
+            freight.finding_id,
+            settlement(ledger, freight.finding_id, 4000),
+            800,
+        )
 
         ledger.approve(payer.finding_id, "reviewer", "verified payer")
 
@@ -88,12 +108,12 @@ class Scan360ReportTests(unittest.TestCase):
             expected_cents=10000,
             actual_cents=12000,
             rule=RuleRef(
-                rule_id="r-eur", source_hash="h", effective_from="2026-01-01",
+                rule_id="r-eur", source_hash=H("h"), effective_from="2026-01-01",
                 effective_to=None, verified_controlling=True,
                 source_locator="source://eur",
             ),
             evidence=(EvidenceRef(
-                evidence_id="e-eur", source_hash="eh", locator="source://eur",
+                evidence_id="e-eur", source_hash=H("eh"), locator="source://eur",
                 kind="payment", verified=True,
             ),),
             reason="VARIANCE", confidence_basis="verified",
