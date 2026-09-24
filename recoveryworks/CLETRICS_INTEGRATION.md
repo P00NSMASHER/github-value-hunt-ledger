@@ -288,3 +288,22 @@ have equal duration and must fall before/after implementation respectively.
 
 A measurement may calculate an indicative delta while remaining REVIEW, but
 only VERIFIED measurements roll into `realized_savings_cents`.
+
+## Pilot deployment dry-run contract (step 5a)
+
+The first half of the pilot deployment is now executable as a validation-only
+CLI:
+
+`python -m recoveryworks.pilot_deployment --spec pilot.json --base-dir . --dry-run`
+
+The contract currently targets the first AWS pilot and hard-fails unless cloud
+access is declared READ_ONLY, RecoveryOS has no provider write credentials,
+remediation execution is disabled, external actions are disabled, and private
+state is required. All referenced input files must exist before a plan is
+produced.
+
+The dry-run emits deterministic argv for the Cletrics FOCUS exporter and the
+future pilot runner plus private bundle/ledger/receipt/report paths. It does not
+start containers, provision infrastructure, contact AWS, run external recovery
+actions, or mutate cloud resources. Those execution/startup pieces are the
+remaining half of step 5 and stay behind the next approval gate.
