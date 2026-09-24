@@ -177,3 +177,28 @@ The verifier prevents status inflation:
 
 Case-level proceeding status remains separate and cannot automatically upgrade
 the status of any individual transaction.
+
+
+## Step 6 — information events and public-release boundaries
+
+The event layer separates the historical information event from trade rows.
+
+Each `InformationEvent` binds:
+
+- one canonical case and exact case proof;
+- one or more issuers already present in that case;
+- an event type and historical information summary;
+- a required public-release boundary;
+- an optional private-information start boundary;
+- optional tip/transfer boundaries.
+
+Temporal precision is explicit: exact timestamp, date-only, or date range. Coarse
+dates/ranges are not silently promoted to exact times.
+
+Public-release boundaries require a primary public record linked to the case with
+the `PUBLIC_RELEASE` artifact role. New primary source types cover public filings,
+issuer press releases, and public regulatory releases.
+
+Where both sides have exact timestamps (or both are date-only), chronology is
+validated so the private-information boundary cannot follow the public release.
+Cross-precision cases remain coarse rather than being guessed.
