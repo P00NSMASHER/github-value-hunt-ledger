@@ -89,6 +89,9 @@ class FreightReviewCase:
     counterparty_id: str
     load_id: str
     invoice_number: str | None
+    invoice_load_id: str | None
+    rate_confirmation_load_id: str | None
+    pod_load_id: str | None
     invoice_carrier_name: str | None
     origin: str | None
     destination: str | None
@@ -107,6 +110,7 @@ class FreightReviewCase:
     integrity_blockers: tuple[str, ...]
     authority_blockers: tuple[str, ...]
     authority_resolution_hash: str | None
+    matched_authority_rule_hashes: tuple[str, ...]
     external_action_allowed: bool
     realized_recovery_asserted: bool
     case_hash: str
@@ -354,6 +358,9 @@ def _build_case(
         "counterparty_id": finding.counterparty_id,
         "load_id": mapping.load_id,
         "invoice_number": metadata.get("invoice_number"),
+        "invoice_load_id": metadata.get("invoice_load_id"),
+        "rate_confirmation_load_id": metadata.get("rate_confirmation_load_id"),
+        "pod_load_id": metadata.get("pod_load_id"),
         "invoice_carrier_name": metadata.get("invoice_carrier_name"),
         "origin": metadata.get("origin"),
         "destination": metadata.get("destination"),
@@ -376,6 +383,9 @@ def _build_case(
         "integrity_blockers": list(integrity_blockers),
         "authority_blockers": list(authority_blockers),
         "authority_resolution_hash": authority_resolution_hash,
+        "matched_authority_rule_hashes": list(
+            metadata.get("matched_authority_rule_hashes", ())
+        ),
         "external_action_allowed": False,
         "realized_recovery_asserted": False,
     }
@@ -391,6 +401,18 @@ def _build_case(
         invoice_number=(
             str(metadata.get("invoice_number"))
             if metadata.get("invoice_number") is not None else None
+        ),
+        invoice_load_id=(
+            str(metadata.get("invoice_load_id"))
+            if metadata.get("invoice_load_id") is not None else None
+        ),
+        rate_confirmation_load_id=(
+            str(metadata.get("rate_confirmation_load_id"))
+            if metadata.get("rate_confirmation_load_id") is not None else None
+        ),
+        pod_load_id=(
+            str(metadata.get("pod_load_id"))
+            if metadata.get("pod_load_id") is not None else None
         ),
         invoice_carrier_name=(
             str(metadata.get("invoice_carrier_name"))
@@ -424,6 +446,10 @@ def _build_case(
         authority_resolution_hash=(
             str(authority_resolution_hash)
             if authority_resolution_hash is not None else None
+        ),
+        matched_authority_rule_hashes=tuple(
+            str(item)
+            for item in metadata.get("matched_authority_rule_hashes", ())
         ),
         external_action_allowed=False,
         realized_recovery_asserted=False,
@@ -572,7 +598,10 @@ def render_freight_review_packet_markdown(packet: FreightReviewPacket) -> str:
             f"- Finding: `{case.finding_id}`",
             f"- Required action: **{case.action_hint}**",
             f"- Invoice: **{case.invoice_number or 'not established'}**",
-            f"- Load: **{case.load_id}**",
+            f"- Canonical load: **{case.load_id}**",
+            f"- Invoice load ID: **{case.invoice_load_id or 'not established'}**",
+            f"- Rate-confirmation load ID: **{case.rate_confirmation_load_id or 'not established'}**",
+            f"- POD load ID: **{case.pod_load_id or 'not established'}**",
             f"- Carrier: **{case.invoice_carrier_name or case.counterparty_id}**",
             f"- Lane: **{case.origin or 'unknown'} → {case.destination or 'unknown'}**",
             f"- Service date: **{case.service_date or 'not established'}**",
@@ -591,6 +620,11 @@ def render_freight_review_packet_markdown(packet: FreightReviewPacket) -> str:
             lines.append("- Integrity blockers: **" + ", ".join(case.integrity_blockers) + "**")
         if case.authority_blockers:
             lines.append("- Authority blockers: **" + ", ".join(case.authority_blockers) + "**")
+        if case.matched_authority_rule_hashes:
+            lines.append(
+                "- Matched authority rule hashes: "
+                + ", ".join(f"`{item}`" for item in case.matched_authority_rule_hashes)
+            )
 
         lines.extend(["", "### Governing authority"])
         if case.authority is None:
