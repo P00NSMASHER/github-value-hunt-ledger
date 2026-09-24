@@ -42,27 +42,37 @@ relationship history.
 
 ## Step 6 — Runtime governance/control plane
 
-Status: implemented on this branch.
+Status: implemented and merged.
 
 The sixth upgrade inserts a fail-closed authority layer between agent intent and real tool execution:
+typed action classes, explicit permissions, allowlists/denylists, rolling budgets, exact-request
+human approvals, replay protection, per-agent/global kill switches, and SHA-256 audit receipts.
 
-- actions are classified as READ, INTERNAL_WRITE, EXTERNAL_WRITE, PRODUCTION_CHANGE,
-  MONEY_MOVEMENT, DESTRUCTIVE, or POLICY_CHANGE;
-- agents with no governance policy fail closed;
-- policies are versioned and content-addressed;
-- policies can set class permissions, action allowlists, and explicit action denylists;
-- rolling limits can cap action counts, abstract cost units, and money movement;
-- external writes require human approval by default;
-- production changes, money movement, destructive actions, and governance-policy changes can never
-  bypass human approval;
-- approval tickets bind to one exact immutable intent hash and expire;
-- approvals and authorized requests are single-use, preventing replay;
-- budgets and kill switches are rechecked immediately before final authorization;
-- global and per-agent kill switches override normal permissions;
-- every ALLOW, DENY, and REQUIRE_APPROVAL decision emits a SHA-256-bound audit receipt;
-- this layer authorizes actions but does not itself execute tools.
+## Step 7 — Governed autonomous software factory
 
-The first six upgrades establish:
+Status: implemented on this branch.
+
+The seventh upgrade turns approved engineering goals into restart-safe software work:
+
+- each work item is bound to an existing Step-2 acceptance contract;
+- only the contract-bound executor can claim the work;
+- every attempt gets a unique isolated workspace and attempt branch;
+- implementation workers use leases and stale RUNNING attempts can be reclaimed after restart;
+- executor leases stop governing the job once independent audit begins;
+- submissions bind repository, issue, workspace, branch, attempt, commit, tests, and artifacts;
+- READY_FOR_PR requires an independent APPROVED audit of the exact current submission;
+- rejected audits retry in fresh workspaces until the retry limit, then fail closed to BLOCKED;
+- PR creation requires an exact persisted Step-6 EXTERNAL_WRITE authorization;
+- the PR authorization must match work item, repository, branch, base, title, submission hash, and
+  audit hash;
+- governance authorizations are single-use at the factory boundary;
+- merge requires a separate Step-6 PRODUCTION_CHANGE authorization bound to exact PR, head SHA,
+  merge method, and audit hash;
+- production merge therefore remains behind mandatory human approval and active kill switches;
+- the engineering goal becomes COMPLETE only after the governed merge is recorded;
+- lifecycle transitions are retained as content-addressed audit events.
+
+The first seven upgrades establish:
 
 ```
 durable work
@@ -76,6 +86,8 @@ evidence-weighted organizational memory
 provenance-preserving relationship reasoning
    ↓
 bounded operational authority
+   ↓
+governed autonomous software delivery
 ```
 
 ### Run all AI Business OS tests
@@ -88,6 +100,5 @@ python -m unittest discover -s ai_business_os -p "test_*.py"
 
 Memory is evidence, not authority. Completion is not self-asserted. Learning is not deployment.
 Graph connectivity is not proof. Operational power is granted per action under explicit policy,
-budget, approval, and kill-switch controls. HUMAN identity in this reference layer must be bound to
-an authenticated identity/session by the production integration rather than accepted from arbitrary
-user-supplied strings.
+budget, approval, and kill-switch controls. Software automation may prepare and verify work, but
+production authority remains a separate governed decision.
