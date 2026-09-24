@@ -467,6 +467,10 @@ def map_freight_audit_to_recovery(
                         result.match.rate_con.load_id
                         if result.match.rate_con is not None else None
                     ),
+                    "pod_load_id": (
+                        result.match.pod.load_id
+                        if result.match.pod is not None else None
+                    ),
                     "rate_confirmation_broker_name": (
                         result.match.rate_con.broker_name
                         if result.match.rate_con is not None else None
