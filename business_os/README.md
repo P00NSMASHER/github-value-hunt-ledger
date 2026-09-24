@@ -13,11 +13,11 @@ This lives inside the Hunter ledger initially so it inherits version history, CI
 5. ✅ **Knowledge graph** — business/repo/capability/customer/outcome relationship model.
 6. ✅ **Entity canonicalization** — merge aliases/duplicates while retaining provenance.
 7. ✅ **Runtime governance** — tool permissions, budgets, approvals, audit and kill switch.
-8. Autonomous software factory — issue → isolated implementation → tests → PR.
+8. ✅ **Autonomous software factory** — issue → isolated implementation → tests → PR.
 9. Evidence/truth engine — explicit proof obligations and next-best-evidence actions.
 
 ## Completion policy
 
 No upgrade is marked complete merely because documentation exists. Each upgrade must have a concrete implementation, regression tests or deterministic validation, and a failure mode that prevents false success.
 
-Current completed upgrades on this branch: **7/9**.
+Current completed upgrades on this branch: **8/9**.
