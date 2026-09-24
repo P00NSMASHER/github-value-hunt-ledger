@@ -1077,8 +1077,14 @@ class EntityCanonicalizer:
         for field in HARD_IDENTIFIER_FIELDS:
             if field not in left["attributes"] or field not in right["attributes"]:
                 continue
-            left_value = str(left["attributes"][field]).strip().casefold()
-            right_value = str(right["attributes"][field]).strip().casefold()
+            left_raw = left["attributes"][field]
+            right_raw = right["attributes"][field]
+            if left_raw is None or right_raw is None:
+                continue
+            if isinstance(left_raw, (dict, list)) or isinstance(right_raw, (dict, list)):
+                continue
+            left_value = str(left_raw).strip().casefold()
+            right_value = str(right_raw).strip().casefold()
             if not left_value or not right_value:
                 continue
             if left_value == right_value:
@@ -1088,25 +1094,37 @@ class EntityCanonicalizer:
         return matches, conflicts
 
     def _canonical_neighbors(self, node_ids: Sequence[str]) -> List[Dict[str, Any]]:
-        out: List[Dict[str, Any]] = []
-        seen: Set[Tuple[str, str, str]] = set()
+        grouped: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
         for node_id in node_ids:
             for edge in self.graph.neighbors(node_id, direction="both"):
-                key = (
-                    edge["source_node_id"],
-                    edge["edge_type"],
-                    edge["target_node_id"],
-                )
-                if key in seen:
+                canonical_source = self.canonical_node_id(edge["source_node_id"])
+                canonical_target = self.canonical_node_id(edge["target_node_id"])
+                if canonical_source == canonical_target:
                     continue
-                seen.add(key)
-                out.append(
+                key = (
+                    canonical_source,
+                    edge["edge_type"],
+                    canonical_target,
+                )
+                bucket = grouped.setdefault(
+                    key,
+                    {
+                        "canonical_source_node_id": canonical_source,
+                        "edge_type": edge["edge_type"],
+                        "canonical_target_node_id": canonical_target,
+                        "evidence_edges": [],
+                    },
+                )
+                bucket["evidence_edges"].append(
                     {
                         "via_node_id": node_id,
                         "edge": edge,
                     }
                 )
-        return out
+        return [
+            grouped[key]
+            for key in sorted(grouped)
+        ]
 
     def _require_canonicalization(self, canonicalization_id: str):
         row = self.runtime.conn.execute(
