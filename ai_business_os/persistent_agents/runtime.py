@@ -97,6 +97,22 @@ class AgentRuntime:
                 created_at REAL NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS verification_contracts (
+                id TEXT PRIMARY KEY,
+                goal_id TEXT NOT NULL REFERENCES goals(id),
+                manager_agent_id TEXT NOT NULL REFERENCES agents(id),
+                executor_agent_id TEXT NOT NULL REFERENCES agents(id),
+                auditor_agent_id TEXT NOT NULL REFERENCES agents(id),
+                criteria_json TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'DRAFT',
+                attempt INTEGER NOT NULL DEFAULT 0,
+                submission_json TEXT,
+                report_json TEXT,
+                report_hash TEXT,
+                created_at REAL NOT NULL,
+                updated_at REAL NOT NULL
+            );
+
             CREATE INDEX IF NOT EXISTS idx_goals_agent_status ON goals(agent_id, status);
             CREATE INDEX IF NOT EXISTS idx_events_agent_seq ON events(agent_id, seq);
             CREATE INDEX IF NOT EXISTS idx_snapshots_goal_created ON snapshots(goal_id, created_at);
@@ -199,11 +215,19 @@ class AgentRuntime:
         *,
         state_patch: Optional[Dict[str, Any]] = None,
         reason: Optional[str] = None,
+        verification_contract_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         goal = self._require_goal(goal_id)
         current = str(goal["status"])
         if new_status not in GOAL_TRANSITIONS.get(current, set()):
             raise InvalidTransition(f"{current} -> {new_status} is not allowed")
+
+        if new_status == "COMPLETE":
+            self._require_approved_verification(
+                goal_id,
+                str(goal["agent_id"]),
+                verification_contract_id,
+            )
 
         state = json.loads(goal["state_json"])
         if state_patch:
@@ -220,7 +244,13 @@ class AgentRuntime:
         self.append_event(
             str(goal["agent_id"]),
             "GOAL_TRANSITION",
-            {"from": current, "to": new_status, "reason": reason, "state_patch": state_patch or {}},
+            {
+                "from": current,
+                "to": new_status,
+                "reason": reason,
+                "state_patch": state_patch or {},
+                "verification_contract_id": verification_contract_id,
+            },
             goal_id=goal_id,
         )
         return self.get_goal(goal_id)
@@ -380,6 +410,32 @@ class AgentRuntime:
                 (agent_id,),
             ).fetchall()
         return [self.get_goal(str(r["id"])) for r in rows]
+
+    def _require_approved_verification(
+        self,
+        goal_id: str,
+        executor_agent_id: str,
+        verification_contract_id: Optional[str],
+    ) -> sqlite3.Row:
+        if not verification_contract_id:
+            raise InvalidTransition(
+                "VERIFYING -> COMPLETE requires an approved independent verification contract"
+            )
+        row = self.conn.execute(
+            "SELECT * FROM verification_contracts WHERE id = ?",
+            (verification_contract_id,),
+        ).fetchone()
+        if row is None:
+            raise InvalidTransition("verification contract does not exist")
+        if row["goal_id"] != goal_id:
+            raise InvalidTransition("verification contract is bound to a different goal")
+        if row["executor_agent_id"] != executor_agent_id:
+            raise InvalidTransition("verification contract executor does not own this goal")
+        if row["auditor_agent_id"] == executor_agent_id:
+            raise InvalidTransition("executor cannot independently audit its own goal")
+        if row["status"] != "APPROVED" or not row["report_hash"]:
+            raise InvalidTransition("verification contract is not independently approved")
+        return row
 
     def _require_agent(self, agent_id: str) -> sqlite3.Row:
         row = self.conn.execute("SELECT * FROM agents WHERE id = ?", (agent_id,)).fetchone()

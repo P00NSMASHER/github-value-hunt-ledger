@@ -1,21 +1,21 @@
-name: AI Business OS Step 1
+name: AI Business OS CI
 
 on:
   push:
     branches:
-      - ai-business-os-step-1-persistent-agents
+      - "ai-business-os-step-*"
   pull_request:
     paths:
       - "ai_business_os/**"
       - ".github/workflows/ai-business-os-step1.yml"
 
 jobs:
-  persistent-agent-runtime:
+  ai-business-os:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run persistent agent runtime tests
-        run: python -m unittest ai_business_os.persistent_agents.test_runtime
+      - name: Run full AI Business OS test suite
+        run: python -m unittest discover -s ai_business_os -p "test_*.py"
