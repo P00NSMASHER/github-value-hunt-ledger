@@ -11,6 +11,11 @@ from recoveryworks.tenant_isolation import (
     bind_managed_tenant_artifact,
 )
 from recoveryworks.test_pilot_runner import LocalPilotRunnerTests
+from recoveryworks.enterprise_diligence_package import (
+    build_enterprise_diligence_package,
+    write_enterprise_diligence_package,
+)
+from recoveryworks.test_enterprise_diligence_package import control_map
 from recoveryworks.production_observability import (
     ProductionRunHistoryStore,
     build_success_observability,
@@ -85,6 +90,33 @@ class TenantIsolationTests(unittest.TestCase):
             )
             registry.assert_proof_tenant(tenant,backup.proof_hash)
             registry.assert_path_tenant(tenant,root/"private"/"backup.zip")
+
+
+    def test_managed_diligence_can_share_tenant_registry(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            registry=TenantBindingRegistry(
+                root/".recoveryworks-tenant-bindings.json")
+            tenant=TenantIdentity(
+                tenant_id="tenant-a",client_id="client-a",namespace=str(root),
+                created_at="2026-09-24T12:00:00Z")
+            registry.reserve_paths(
+                tenant,artifact_paths={"seed":root/"seed.json"})
+            package=build_enterprise_diligence_package(
+                control_map(),
+                generated_at="2026-09-24T13:00:00Z",
+                tenant_identity=tenant,
+            )
+            json_path=root/"private"/"diligence.json"
+            md_path=root/"private"/"diligence.md"
+            write_enterprise_diligence_package(
+                package,
+                json_path=json_path,
+                markdown_path=md_path,
+                tenant_registry=registry,
+            )
+            registry.assert_path_tenant(tenant,json_path)
+            registry.assert_proof_tenant(tenant,package.proof_hash)
 
     def test_same_proof_cannot_be_bound_to_two_tenants(self):
         with tempfile.TemporaryDirectory() as d:
