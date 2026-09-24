@@ -1,7 +1,9 @@
 import unittest
 
 from historical_mnpi.economic_dedup import (
+    ClusterRegistrationAction,
     DedupMatchState,
+    EconomicClusterRegistry,
     EconomicTransactionSignature,
     build_economic_signature,
     compare_economic_signatures,
@@ -255,6 +257,157 @@ class EconomicDedupTests(unittest.TestCase):
         result = compare_economic_signatures(left, right)
         self.assertEqual(result.state, DedupMatchState.DISTINCT)
         self.assertIn("option_strike", result.differing_fields)
+
+
+    def test_first_signature_creates_standalone_cluster(self):
+        registry = EconomicClusterRegistry()
+        first = registry.register(sig(1))
+        self.assertEqual(
+            first.action,
+            ClusterRegistrationAction.NEW_CLUSTER,
+        )
+        self.assertEqual(len(first.cluster.signatures), 1)
+        self.assertEqual(len(registry.all_clusters()), 1)
+        self.assertEqual(registry.review_candidates(), ())
+        self.assertEqual(len(registry.events()), 1)
+
+    def test_exact_match_auto_joins_and_preserves_both_rows(self):
+        registry = EconomicClusterRegistry()
+        first = registry.register(sig(1))
+        second = registry.register(
+            sig(2, timestamp="2015-08-10T18:31:22Z")
+        )
+        self.assertEqual(
+            second.action,
+            ClusterRegistrationAction.AUTO_JOINED_EXACT,
+        )
+        self.assertEqual(
+            second.cluster.cluster_id,
+            first.cluster.cluster_id,
+        )
+        self.assertEqual(len(second.cluster.signatures), 2)
+        self.assertEqual(
+            second.cluster.normalized_row_hashes,
+            tuple(sorted((
+                sig(1).normalized_row_hash,
+                sig(2).normalized_row_hash,
+            ))),
+        )
+        self.assertEqual(len(registry.all_clusters()), 1)
+        self.assertEqual(len(registry.events()), 2)
+
+    def test_possible_match_stays_separate_and_routes_to_review(self):
+        registry = EconomicClusterRegistry()
+        first = registry.register(sig(1))
+        second = registry.register(sig(
+            2,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        self.assertEqual(
+            second.action,
+            ClusterRegistrationAction.NEW_CLUSTER_REVIEW_REQUIRED,
+        )
+        self.assertNotEqual(
+            second.cluster.cluster_id,
+            first.cluster.cluster_id,
+        )
+        self.assertEqual(len(registry.all_clusters()), 2)
+        self.assertEqual(len(second.review_candidates), 1)
+        self.assertEqual(
+            second.review_candidates[0].reason,
+            "NON_EXACT_MATCH_REQUIRES_REVIEW",
+        )
+
+    def test_insufficient_match_stays_separate_and_routes_to_review(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(
+            1,
+            instrument=InstrumentType.UNKNOWN,
+            side=TradeSide.UNKNOWN,
+            quantity=None,
+            price=None,
+            currency=None,
+        ))
+        second = registry.register(sig(
+            2,
+            instrument=InstrumentType.UNKNOWN,
+            side=TradeSide.UNKNOWN,
+            quantity=None,
+            price=None,
+            currency=None,
+        ))
+        self.assertEqual(
+            second.action,
+            ClusterRegistrationAction.NEW_CLUSTER_REVIEW_REQUIRED,
+        )
+        self.assertEqual(len(registry.all_clusters()), 2)
+        self.assertEqual(len(second.review_candidates), 1)
+
+    def test_distinct_signature_creates_new_cluster_without_review(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(1))
+        second = registry.register(sig(2, quantity="2600"))
+        self.assertEqual(
+            second.action,
+            ClusterRegistrationAction.NEW_CLUSTER,
+        )
+        self.assertEqual(len(registry.all_clusters()), 2)
+        self.assertEqual(second.review_candidates, ())
+
+    def test_partial_exact_cluster_conflict_does_not_auto_join(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(1, currency="USD"))
+        joined = registry.register(sig(2, currency=None))
+        self.assertEqual(
+            joined.action,
+            ClusterRegistrationAction.AUTO_JOINED_EXACT,
+        )
+
+        third = registry.register(sig(3, currency="EUR"))
+        self.assertEqual(
+            third.action,
+            ClusterRegistrationAction.NEW_CLUSTER_REVIEW_REQUIRED,
+        )
+        self.assertEqual(len(registry.all_clusters()), 2)
+        self.assertEqual(len(third.review_candidates), 1)
+        self.assertEqual(
+            third.review_candidates[0].reason,
+            "PARTIAL_EXACT_CLUSTER_CONFLICT",
+        )
+
+    def test_registration_is_idempotent_and_does_not_duplicate_events(self):
+        registry = EconomicClusterRegistry()
+        signature = sig(1)
+        first = registry.register(signature)
+        event_count = len(registry.events())
+        second = registry.register(signature)
+        self.assertEqual(first, second)
+        self.assertEqual(len(registry.events()), event_count)
+        self.assertEqual(len(registry.all_clusters()), 1)
+
+    def test_cluster_lookup_by_signature_retains_source_row_membership(self):
+        registry = EconomicClusterRegistry()
+        first_sig = sig(1)
+        second_sig = sig(2)
+        registry.register(first_sig)
+        registry.register(second_sig)
+        cluster = registry.cluster_for_signature(second_sig.proof_hash)
+        self.assertEqual(len(cluster.signatures), 2)
+        self.assertIn(first_sig.proof_hash, cluster.member_signature_hashes)
+        self.assertIn(second_sig.proof_hash, cluster.member_signature_hashes)
+
+    def test_registry_hash_changes_append_only_with_new_registration(self):
+        registry = EconomicClusterRegistry()
+        before = registry.registry_hash
+        registry.register(sig(1))
+        after_first = registry.registry_hash
+        registry.register(sig(2))
+        after_second = registry.registry_hash
+        self.assertNotEqual(before, after_first)
+        self.assertNotEqual(after_first, after_second)
+        self.assertEqual(len(registry.events()), 2)
+
 
 
 if __name__ == "__main__":
