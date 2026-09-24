@@ -143,7 +143,7 @@ class PaymentReconciliationTests(unittest.TestCase):
             ExternalPaymentSettlementReceipt(
                 receipt_id="recoveryworks-payment-settlement:"+canonical_hash(ident),
                 **{
-                    **ident,
+                    **{k:v for k,v in ident.items() if k!="schema"},
                     "event_type":SettlementEventType.CREDIT,
                 })
 
