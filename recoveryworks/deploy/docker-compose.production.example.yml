@@ -1,0 +1,40 @@
+services:
+  recoveryos-preflight:
+    image: ${RECOVERYWORKS_IMAGE:?set a digest-pinned image}
+    user: "65532:65532"
+    read_only: true
+    network_mode: none
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - ./config:/config:ro
+      - ./inputs:/inputs:ro
+      - ./private/state:/state:rw
+      - ./private/reports:/reports:rw
+    command: ["python","-m","recoveryworks.production_deployment","--manifest","/config/production.json","--base-dir","/workspace","--check","readiness"]
+    restart: "no"
+  recoveryos-pilot:
+    image: ${RECOVERYWORKS_IMAGE:?set a digest-pinned image}
+    user: "65532:65532"
+    read_only: true
+    network_mode: none
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - ./config:/config:ro
+      - ./inputs:/inputs:ro
+      - ./private/state:/state:rw
+      - ./private/reports:/reports:rw
+    command: ["python","-m","recoveryworks.pilot_runner","--spec","/config/pilot.json","--base-dir","/workspace"]
+    depends_on:
+      recoveryos-preflight:
+        condition: service_completed_successfully
+    restart: "no"

@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "pilot_spec": "config/pilot.json",
+  "service": {
+    "image_ref": "registry.example.invalid/recoveryworks@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "user": "65532:65532",
+    "command": [
+      "python",
+      "-m",
+      "recoveryworks.pilot_runner",
+      "--spec",
+      "/config/pilot.json",
+      "--base-dir",
+      "/workspace"
+    ],
+    "read_only_root_filesystem": true,
+    "privileged": false,
+    "host_network": false,
+    "network_disabled": true,
+    "no_new_privileges": true,
+    "cap_drop_all": true,
+    "provider_write_credentials": false,
+    "remediation_execution_enabled": false,
+    "external_actions_enabled": false
+  },
+  "volumes": {
+    "config": {
+      "host_path": "config",
+      "container_path": "/config",
+      "read_only": true,
+      "private_required": false
+    },
+    "inputs": {
+      "host_path": "inputs",
+      "container_path": "/inputs",
+      "read_only": true,
+      "private_required": false
+    },
+    "state": {
+      "host_path": "private/state",
+      "container_path": "/state",
+      "read_only": false,
+      "private_required": true
+    },
+    "reports": {
+      "host_path": "private/reports",
+      "container_path": "/reports",
+      "read_only": false,
+      "private_required": true
+    }
+  }
+}

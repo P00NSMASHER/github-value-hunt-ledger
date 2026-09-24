@@ -415,3 +415,9 @@ The execution result deliberately contains no combined financial totals and perf
 A reviewed executive rollup can now be built only from the verified provider assurance reports emitted by step 11b. It verifies each report proof hash and required financial-boundary controls before reading summary values.
 
 Only a fixed allowlist of same-currency, same-semantic cent categories is aggregated: recovery lifecycle dollars, prospective savings, verified realized savings, anomaly exposure, and reconciliation drift. Case counts, individual findings, rules, evidence packets, recommendations, confidence scores, and resource identities are never merged across providers. Every provider report proof hash and state head remains visible in the rollup.
+
+## Production deployment packaging and preflight (step 13a)
+
+Production packaging now has a hash-bound container/service contract, explicit config/input/state/report volume roles, health/readiness checks, and a Docker Compose batch manifest. The image must be pinned by sha256 digest and run as a numeric non-root user with read-only root filesystem, network disabled, all capabilities dropped, no-new-privileges enabled, and no provider-write/remediation/external-action capability.
+
+Config and input mounts are read-only. State and report mounts must be separate private writable directories; readiness verifies them with private sentinels and revalidates the exact pilot spec and mounted source files. The generated Compose shape runs a preflight job before the pilot batch job and uses network_mode none. Step 13a does not build images, start containers, provision infrastructure, or contact external services.
