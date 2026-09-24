@@ -199,6 +199,15 @@ class CapitalAllocatorTests(unittest.TestCase):
             ranking_id="ranking-1",
         )
 
+    def test_initiative_graph_refs_must_be_typed_and_active(self):
+        with self.assertRaises(CapitalAllocatorError):
+            self.alloc.register_initiative(
+                initiative_id="bad-ref",
+                name="Bad Ref",
+                owner_agent_id=self.owner,
+                business_ref=self.product["id"],
+            )
+
     def test_policy_changes_require_human_principal(self):
         with self.assertRaises(CapitalAllocatorError):
             self.alloc.set_policy(
