@@ -379,3 +379,9 @@ The generated artifacts are deliberately nonbinding: they cannot be marked signe
 A customer onboarding validator now checks the diagnostic authorization, required FOCUS/meter/reviewed-rate files, required CSV columns, diagnostic period, and Cletrics exporter identity. Optional anomaly/reconciliation/savings files are tracked without blocking the base diagnostic.
 
 When structurally ready, it emits the exact diagnostic-intake JSON consumed by step 8. Readiness is explicitly not verification: invoice, meter, and rate verification flags default false and remain separately controlled. Checklist and generated intake outputs use private writes.
+
+## Read-only pilot operations console (step 11a)
+
+The first operations-console layer is a private read-only snapshot rather than an interactive control surface. It shows diagnostic status, active evidence readiness, supersession holds, recovery lifecycle totals, savings/diagnostic totals, and remediation-plan state.
+
+All mutation controls are explicitly false: the console cannot approve findings, authorize recovery, execute remediation, mutate cloud infrastructure, or perform external actions. JSON and Markdown snapshots are written privately for operational review.
