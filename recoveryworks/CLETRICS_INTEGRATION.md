@@ -609,3 +609,9 @@ The capacity matrix now has an executable measured runner rather than only accep
 RecoveryWorks now has a proof-bound commercial prelaunch gate that directly binds the exact internal commercial package, simulated operator rehearsal, customer-safe diligence package, internal service-level snapshot, measured capacity envelope, and proposed capacity demand. READY means only that a buyer-safe prelaunch handoff may be prepared; customer data, kickoff, outreach, cloud mutation, recovery claims, and external actions remain unauthorized.
 
 The derived launch brief stores the authoritative gate id/proof hash and cannot override the gate. Capacity overload, blocked/throttled service state, high diligence gaps, unsupported commercial scope, or failed operator boundaries block the handoff; pressure/medium diligence gaps remain explicit conditions. This avoids the older pattern where a downstream packet could be built from an unproven caller-supplied decision.
+
+## Buyer-safe pilot activation packet (step 32)
+
+A non-blocked authoritative prelaunch decision can now produce a buyer-safe activation packet that binds the exact launch-gate proof, launch-brief proof, and commercial-pilot proof. The packet carries pricing only as the existing hypothesis, exact buyer data requests, buyer/RecoveryWorks responsibilities, pilot stages, report surfaces, and financial integrity invariants.
+
+The packet hard-codes customer_data_authorized=false, kickoff_authorized=false, outreach_authorized=false, external_action_authorized=false, and contract_created=false. Editing or recreating the packet cannot bypass a blocked gate because the packet verifies the authoritative decision/brief proof chain.
