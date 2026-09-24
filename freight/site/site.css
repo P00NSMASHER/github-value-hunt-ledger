@@ -248,7 +248,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid rgba(36,69,232,.18);ou
   html{scroll-padding-top:84px}.wrap{width:calc(100% - 40px)}
   .statusbar{text-align:left}.statusbar .wrap{padding-block:7px}
   .nav-wrap{min-height:68px}.menu-toggle{display:inline-flex;align-items:center}
-  .navlinks{position:fixed;left:0;right:0;top:98px;display:none;flex-direction:column;align-items:stretch;gap:0;padding:12px 20px 24px;background:var(--navy);border-top:1px solid var(--line-dark);box-shadow:0 24px 50px rgba(0,0,0,.35)}
+  .navlinks{position:absolute;left:0;right:0;top:100%;display:none;flex-direction:column;align-items:stretch;gap:0;padding:12px 20px 24px;background:var(--navy);border-top:1px solid var(--line-dark);box-shadow:0 24px 50px rgba(0,0,0,.35)}
   .navlinks.is-open{display:flex}.navlinks>a:not(.button){padding:15px 2px;border-bottom:1px solid var(--line-dark);font-size:.9rem}.navlinks .button{margin-top:14px}
   .section{padding-block:76px}.section-heading{display:block;margin-bottom:38px}.section-heading>p{margin-top:20px}
   .hero{min-height:0}.hero-wash{background:linear-gradient(90deg,rgba(4,13,25,.97),rgba(4,13,25,.67)),linear-gradient(0deg,rgba(4,13,25,.7),transparent)}.hero-layout{grid-template-columns:1fr;min-height:0;padding-block:70px;gap:48px}.hero h1{max-width:11ch}.lead{font-size:1.08rem}.opportunity-card{max-width:620px}
@@ -266,7 +266,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid rgba(36,69,232,.18);ou
 
 @media(max-width:620px){
   body{font-size:15px;padding-bottom:70px}.document-page,.error-page{padding-bottom:0}.wrap{width:calc(100% - 32px)}
-  .statusbar{font-size:.7rem}.statusbar .wrap{white-space:normal}.navlinks{top:100px}.brand-name{font-size:.96rem}
+  .statusbar{font-size:.7rem}.statusbar .wrap{white-space:normal}.brand-name{font-size:.96rem}
   h1{font-size:3.25rem}h2{font-size:2.55rem}.section{padding-block:62px}
   .hero-layout{padding-block:50px}.hero h1{font-size:3.38rem}.lead{font-size:1rem}.actions{display:grid;grid-template-columns:1fr}.actions .button{width:100%}.hero-proof{display:grid;gap:10px}.hero-note{font-size:.75rem}
   .opportunity-card{padding:21px}.opportunity-topline{display:block}.sample-chip{display:inline-block;margin-top:9px}.opportunity-range strong{font-size:2.75rem}

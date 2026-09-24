@@ -186,6 +186,7 @@ class PublicBuildTests(unittest.TestCase):
             stylesheet = (output / "site.css").read_text()
             self.assertIn(".output-copy{min-width:0}", stylesheet)
             self.assertIn("overflow-wrap:anywhere", stylesheet)
+            self.assertIn(".navlinks{position:absolute;left:0;right:0;top:100%", stylesheet)
             for network_or_storage_api in (
                 "fetch(",
                 "XMLHttpRequest",
