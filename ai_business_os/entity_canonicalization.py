@@ -629,6 +629,20 @@ class EntityCanonicalizer:
             raise CanonicalizationError("reversal requires reason and evidence")
         canonical_node_id = row["canonical_node_id"]
 
+        parent_merge = self.runtime.conn.execute(
+            """
+            SELECT c.id FROM entity_canonical_members m
+            JOIN entity_canonicalizations c ON c.id=m.canonicalization_id
+            WHERE m.source_node_id=? AND c.status='ACTIVE' AND c.id<>?
+            LIMIT 1
+            """,
+            (canonical_node_id, canonicalization_id),
+        ).fetchone()
+        if parent_merge is not None:
+            raise CanonicalizationError(
+                "canonical entity is itself part of a newer active canonicalization; reverse the newer merge first"
+            )
+
         active_edges = self.runtime.conn.execute(
             """
             SELECT COUNT(*) AS n FROM graph_edges
@@ -778,17 +792,27 @@ class EntityCanonicalizer:
         return self.get_canonicalization(canonicalization_id)
 
     def canonical_node_id(self, node_id: str) -> str:
-        row = self.runtime.conn.execute(
-            """
-            SELECT c.canonical_node_id
-            FROM entity_canonical_members m
-            JOIN entity_canonicalizations c
-              ON c.id=m.canonicalization_id
-            WHERE m.source_node_id=? AND c.status='ACTIVE'
-            """,
-            (node_id,),
-        ).fetchone()
-        return str(row["canonical_node_id"]) if row else node_id
+        current = node_id
+        visited: Set[str] = set()
+        while True:
+            if current in visited:
+                raise CanonicalizationError("canonicalization cycle detected")
+            visited.add(current)
+            row = self.runtime.conn.execute(
+                """
+                SELECT c.canonical_node_id
+                FROM entity_canonical_members m
+                JOIN entity_canonicalizations c
+                  ON c.id=m.canonicalization_id
+                WHERE m.source_node_id=? AND c.status='ACTIVE'
+                ORDER BY c.created_at DESC
+                LIMIT 1
+                """,
+                (current,),
+            ).fetchone()
+            if row is None:
+                return current
+            current = str(row["canonical_node_id"])
 
     def canonical_view(self, node_id: str) -> Dict[str, Any]:
         canonical_id = self.canonical_node_id(node_id)
@@ -807,20 +831,14 @@ class EntityCanonicalizer:
                 "canonicalization": None,
                 "neighbors": self._canonical_neighbors([canonical_id]),
             }
-        members = self.runtime.conn.execute(
-            """
-            SELECT source_node_id FROM entity_canonical_members
-            WHERE canonicalization_id=?
-            ORDER BY source_node_id
-            """,
-            (row["id"],),
-        ).fetchall()
-        source_ids = [str(item["source_node_id"]) for item in members]
+        lineage_ids = self._lineage_node_ids(canonical_id)
+        leaf_ids = self._leaf_source_ids(canonical_id)
         return {
             "canonical_node": canonical,
-            "source_nodes": [self.graph.get_node(item) for item in source_ids],
+            "source_nodes": [self.graph.get_node(item) for item in leaf_ids],
+            "lineage_nodes": [self.graph.get_node(item) for item in lineage_ids],
             "canonicalization": self.get_canonicalization(str(row["id"])),
-            "neighbors": self._canonical_neighbors([canonical_id, *source_ids]),
+            "neighbors": self._canonical_neighbors([canonical_id, *lineage_ids]),
         }
 
     def get_canonicalization(self, canonicalization_id: str) -> Dict[str, Any]:
@@ -1092,6 +1110,44 @@ class EntityCanonicalizer:
             else:
                 conflicts.add(field)
         return matches, conflicts
+
+    def _lineage_node_ids(self, canonical_node_id: str) -> List[str]:
+        out: Set[str] = set()
+        stack = [canonical_node_id]
+        while stack:
+            current = stack.pop()
+            rows = self.runtime.conn.execute(
+                """
+                SELECT m.source_node_id
+                FROM entity_canonicalizations c
+                JOIN entity_canonical_members m
+                  ON m.canonicalization_id=c.id
+                WHERE c.canonical_node_id=? AND c.status='ACTIVE'
+                ORDER BY m.source_node_id
+                """,
+                (current,),
+            ).fetchall()
+            for row in rows:
+                source_id = str(row["source_node_id"])
+                if source_id in out:
+                    continue
+                out.add(source_id)
+                stack.append(source_id)
+        return sorted(out)
+
+    def _leaf_source_ids(self, canonical_node_id: str) -> List[str]:
+        lineage = set(self._lineage_node_ids(canonical_node_id))
+        parents = {
+            str(row["canonical_node_id"])
+            for row in self.runtime.conn.execute(
+                """
+                SELECT canonical_node_id FROM entity_canonicalizations
+                WHERE status='ACTIVE'
+                """
+            ).fetchall()
+        }
+        leaves = sorted(node_id for node_id in lineage if node_id not in parents)
+        return leaves or [canonical_node_id]
 
     def _canonical_neighbors(self, node_ids: Sequence[str]) -> List[Dict[str, Any]]:
         grouped: Dict[Tuple[str, str, str], Dict[str, Any]] = {}
