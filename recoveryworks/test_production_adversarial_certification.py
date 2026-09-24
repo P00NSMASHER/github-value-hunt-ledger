@@ -101,6 +101,40 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
                 iterations_per_vector=1,
             )
 
+    def test_stale_build_manifest_inputs_are_rejected(self):
+        manifest = build_manifest()
+        object.__setattr__(
+            manifest,
+            "dockerfile_sha256",
+            "f" * 64,
+        )
+        with self.assertRaisesRegex(
+            ValueError, "does not match current production build inputs"
+        ):
+            run_commercial_adversarial_certification(
+                full_chain,
+                build_manifest=manifest,
+                seed=1,
+                iterations_per_vector=1,
+            )
+
+    def test_noncanonical_build_manifest_path_is_rejected(self):
+        manifest = build_manifest()
+        object.__setattr__(
+            manifest,
+            "dockerfile_path",
+            "recoveryworks/deploy/alternate.Dockerfile",
+        )
+        with self.assertRaisesRegex(
+            ValueError, "does not match current production build inputs"
+        ):
+            run_commercial_adversarial_certification(
+                full_chain,
+                build_manifest=manifest,
+                seed=1,
+                iterations_per_vector=1,
+            )
+
     def test_broken_baseline_is_not_certified(self):
         def broken_factory():
             chain = full_chain()
