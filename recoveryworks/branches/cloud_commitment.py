@@ -12,7 +12,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from typing import Any, Iterable, Mapping
 
 from recoveryworks.engine import RecoveryObservation
-from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
+from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash, freeze_json, normalize_source_hash
 from .contract_billing import ContractBillingBatch, ContractBillingException, ContractRate, InvoiceCharge, UsageRecord
 
 
@@ -59,19 +59,23 @@ class CloudCommitmentAuthority:
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        for name in ("counterparty_id","service_id","effective_from","commitment_type","source_hash","source_locator"):
-            _required(name, getattr(self, name))
+        for name in ("counterparty_id", "service_id", "effective_from", "commitment_type", "source_locator"):
+            object.__setattr__(self, name, _required(name, getattr(self, name)))
+        object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
         start = _date("effective_from", self.effective_from)
+        object.__setattr__(self, "effective_from", start.isoformat())
         if self.effective_to is not None:
             end = _date("effective_to", self.effective_to)
             if end < start:
                 raise ValueError("effective_to cannot precede effective_from")
+            object.__setattr__(self, "effective_to", end.isoformat())
         if self.account_id is not None:
-            _required("account_id", self.account_id)
+            object.__setattr__(self, "account_id", _required("account_id", self.account_id))
         if type(self.committed_unit_rate_micros) is not int or self.committed_unit_rate_micros < 0:
             raise ValueError("committed_unit_rate_micros must be a non-negative integer")
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     def covers(self, charge: InvoiceCharge) -> bool:
         when = _date("service_date", charge.service_date)
@@ -100,11 +104,14 @@ class CloudCommitmentAuthority:
             "committed_unit_rate_micros":self.committed_unit_rate_micros,
         }
         digest=canonical_hash(identity)
+        effective_ends = [
+            value for value in (base_rate.effective_to, self.effective_to) if value
+        ]
         return RuleRef(
             rule_id=f"cloud-commitment:{digest}",
             source_hash=digest,
-            effective_from=max(base_rate.effective_from,self.effective_from),
-            effective_to=self.effective_to,
+            effective_from=max(base_rate.effective_from, self.effective_from),
+            effective_to=min(effective_ends) if effective_ends else None,
             verified_controlling=base_rate.verified and self.verified,
             source_locator=f"composite://cloud-commitment/{digest}",
             metadata={
@@ -126,12 +133,13 @@ class CommitmentAllocation:
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        _required("charge_id", self.charge_id)
-        _decimal("entitled_units", self.entitled_units)
-        _required("source_hash", self.source_hash)
-        _required("source_locator", self.source_locator)
+        object.__setattr__(self, "charge_id", _required("charge_id", self.charge_id))
+        object.__setattr__(self, "entitled_units", str(_decimal("entitled_units", self.entitled_units)))
+        object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
+        object.__setattr__(self, "source_locator", _required("source_locator", self.source_locator))
         if type(self.verified) is not bool:
             raise ValueError("verified must be boolean")
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     def evidence(self) -> EvidenceRef:
         identity={

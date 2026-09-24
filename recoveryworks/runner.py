@@ -159,6 +159,16 @@ def run_scan360_config(
         raise ValueError("config must be an object")
     client_id = _required_text("client_id", config.get("client_id"))
     currency = _required_text("currency", config.get("currency", "USD")).upper()
+    cloud_pricing_modes = [
+        name
+        for name in ("cloud", "cloud_discount", "cloud_commitment")
+        if config.get(name)
+    ]
+    if len(cloud_pricing_modes) > 1:
+        raise ValueError(
+            "Scan 360 accepts only one cloud recovery pricing mode per run; "
+            "received " + ", ".join(cloud_pricing_modes)
+        )
     base = Path(base_dir)
 
     store = LocalBundleStore(state_path)
@@ -179,6 +189,21 @@ def run_scan360_config(
             if previous is not None and previous.proof_hash != signal.proof_hash:
                 raise ValueError(f"conflicting cloud signal_id: {signal.signal_id}")
             cloud_signal_index[signal.signal_id] = signal
+
+    def add_cloud_finding(finding) -> None:
+        for record in ledger.records():
+            prior = record.finding
+            if (
+                prior.client_id == finding.client_id
+                and prior.branch.value == "cloud"
+                and prior.reference == finding.reference
+                and prior.finding_id != finding.finding_id
+            ):
+                raise ValueError(
+                    "cloud charge reference already has a different RecoveryOS "
+                    f"finding: {finding.reference}; explicit supersession is required"
+                )
+        ledger.add(finding)
 
     for job_index, job in enumerate(_jobs(config.get("freight"), name="freight")):
         truth_path = job.get("truth_manifest_json")
@@ -624,7 +649,7 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            add_cloud_finding(finding)
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -698,7 +723,7 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            add_cloud_finding(finding)
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
@@ -785,7 +810,7 @@ def run_scan360_config(
             finding = engine.evaluate(observation)
             if finding is None:
                 continue
-            ledger.add(finding)
+            add_cloud_finding(finding)
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 

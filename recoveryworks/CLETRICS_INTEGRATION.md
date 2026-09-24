@@ -93,11 +93,6 @@ Existing CSV mode remains supported. Cletrics mode replaces charges_csv plus met
 
 The manifest client_id and currency must exactly match the surrounding Scan 360 job.
 
-## Deliberately deferred
-
-CloudSignal/anomaly ingestion, contract-discount authority, commitment allocation, continuous bundle ingestion, separate recovery-vs-savings dashboards, and remediation remain later phases. None is silently approximated here.
-
-
 ## Phase 2: signals, discounts, and commitments
 
 Phase 2 adds steps 7-12 without weakening the Phase-1 proof boundary.
@@ -144,3 +139,7 @@ Allocation CSV:
     Charge_ID,Allocation_ID,Entitled_Units
 
 Only min(billable units, independently evidenced entitled units) receives the committed rate. Unused entitlement is recorded as context and is never counted as recoverable money. A committed rate above the reviewed base rate fails closed.
+
+## Still deferred
+
+Continuous bundle scheduling, a reviewed supersession workflow for replacing an existing cloud charge finding, combined discount-plus-commitment pricing, persistent recovery-vs-savings dashboards, and remediation remain later phases. None is silently approximated here.

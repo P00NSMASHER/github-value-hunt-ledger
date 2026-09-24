@@ -211,5 +211,124 @@ class RunnerAuthorityTests(unittest.TestCase):
             self.assertEqual(commitment.report.totals["validated_cents"],1600)
 
 
+class AuthorityProvenanceGuardTests(unittest.TestCase):
+    def test_authority_source_hashes_and_metadata_are_immutable(self):
+        source={"nested":{"value":1}}
+        discount=CloudDiscountAuthority(
+            counterparty_id="AWS",account_id="acct-1",service_id="compute",
+            effective_from="2026-01-01",effective_to=None,discount_bps=1000,
+            applies_to=DiscountAppliesTo.ALL,source_hash=H("discount-frozen"),
+            source_locator="file://discount.csv#row=2",verified=True,metadata=source,
+        )
+        commit=CloudCommitmentAuthority(
+            counterparty_id="AWS",account_id="acct-1",service_id="compute",
+            effective_from="2026-01-01",effective_to=None,commitment_type="savings_plan",
+            committed_unit_rate_micros=1_000_000,source_hash=H("commit-frozen"),
+            source_locator="file://commit.csv#row=2",verified=True,metadata=source,
+        )
+        alloc=CommitmentAllocation(
+            charge_id="C-1",entitled_units="6.0",source_hash=H("alloc-frozen"),
+            source_locator="file://alloc.csv#row=2",verified=True,metadata=source,
+        )
+        source["nested"]["value"]=2
+        self.assertEqual(discount.metadata["nested"]["value"],1)
+        self.assertEqual(commit.metadata["nested"]["value"],1)
+        self.assertEqual(alloc.metadata["nested"]["value"],1)
+        self.assertEqual(alloc.entitled_units,"6.0")
+        with self.assertRaises(TypeError):
+            discount.metadata["new"]=True
+        with self.assertRaises(TypeError):
+            alloc.metadata["new"]=True
+        with self.assertRaises(ValueError):
+            CommitmentAllocation(
+                charge_id="C-1",entitled_units="1",source_hash="not-a-sha256",
+                source_locator="file://bad",verified=True,
+            )
+
+    def test_composite_rule_effective_window_is_intersection(self):
+        bounded_rate=ContractRate(
+            counterparty_id="AWS",service_id="compute",effective_from="2026-01-01",
+            effective_to="2026-09-15",fixed_cents=1000,included_units="0",
+            unit_rate_micros=2_000_000,source_hash=H("bounded-rate"),
+            source_locator="file://rate.csv#row=2",verified=True,
+        )
+        discount=CloudDiscountAuthority(
+            counterparty_id="AWS",account_id="acct-1",service_id="compute",
+            effective_from="2026-02-01",effective_to="2026-09-30",discount_bps=1000,
+            applies_to=DiscountAppliesTo.ALL,source_hash=H("bounded-discount"),
+            source_locator="file://discount.csv#row=2",verified=True,
+        )
+        discount_batch=audit_cloud_discount_billing(
+            client_id="client",charges=(charge(),),rates=(bounded_rate,),
+            discounts=(discount,),usage=(usage(),),
+        )
+        discount_finding=RecoveryEngine().evaluate(discount_batch.observations[0])
+        self.assertEqual(discount_finding.rule.effective_from,"2026-02-01")
+        self.assertEqual(discount_finding.rule.effective_to,"2026-09-15")
+
+        commit=CloudCommitmentAuthority(
+            counterparty_id="AWS",account_id="acct-1",service_id="compute",
+            effective_from="2026-02-01",effective_to="2026-09-30",
+            commitment_type="savings_plan",committed_unit_rate_micros=1_000_000,
+            source_hash=H("bounded-commit"),source_locator="file://commit.csv#row=2",
+            verified=True,
+        )
+        allocation=CommitmentAllocation(
+            charge_id="C-1",entitled_units="6",source_hash=H("bounded-allocation"),
+            source_locator="file://alloc.csv#row=2",verified=True,
+        )
+        commit_batch=audit_cloud_commitment_billing(
+            client_id="client",charges=(charge(),),rates=(bounded_rate,),
+            commitments=(commit,),allocations=(allocation,),usage=(usage(),),
+        )
+        commit_finding=RecoveryEngine().evaluate(commit_batch.observations[0])
+        self.assertEqual(commit_finding.rule.effective_from,"2026-02-01")
+        self.assertEqual(commit_finding.rule.effective_to,"2026-09-15")
+
+
+class RunnerCloudOverlapGuardTests(unittest.TestCase):
+    def test_multiple_cloud_pricing_modes_in_one_run_fail_closed(self):
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError,"only one cloud recovery pricing mode"):
+                run_scan360_config(
+                    {
+                        "client_id":"client-1",
+                        "cloud":{"placeholder":True},
+                        "cloud_discount":{"placeholder":True},
+                    },
+                    state_path=Path(d)/"ledger.json",
+                    base_dir=d,
+                )
+
+    def test_second_different_finding_for_same_cloud_charge_requires_supersession(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d); bundle(root/"cletrics.zip")
+            (root/"rates.csv").write_text(
+                "Counterparty,Service_ID,Effective_From,Effective_To,Fixed_Fee,Included_Units,Unit_Rate\n"
+                "AWS,compute,2026-01-01,,10.00,0,2.00\n",encoding="utf-8")
+            state=root/"ledger.json"
+            first=run_scan360_config(
+                {"client_id":"client-1","currency":"USD","cloud":{
+                    "cletrics_bundle":"cletrics.zip","rates_csv":"rates.csv",
+                    "charge_source_verified":True,"meter_source_verified":True,
+                    "rate_source_verified":True,
+                }},
+                state_path=state,base_dir=root)
+            self.assertEqual(first.report.totals["validated_cents"],1000)
+
+            (root/"discounts.csv").write_text(
+                "Counterparty,Account_ID,Service_ID,Effective_From,Effective_To,Discount_BPS,Applies_To\n"
+                "AWS,acct-1,compute,2026-01-01,,1000,VARIABLE\n",encoding="utf-8")
+            with self.assertRaisesRegex(ValueError,"explicit supersession is required"):
+                run_scan360_config(
+                    {"client_id":"client-1","currency":"USD","cloud_discount":{
+                        "cletrics_bundle":"cletrics.zip","rates_csv":"rates.csv",
+                        "discounts_csv":"discounts.csv","charge_source_verified":True,
+                        "meter_source_verified":True,"rate_source_verified":True,
+                        "discount_source_verified":True,
+                    }},
+                    state_path=state,base_dir=root)
+
+
 if __name__=="__main__":
     unittest.main()
