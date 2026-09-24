@@ -621,3 +621,9 @@ The packet hard-codes customer_data_authorized=false, kickoff_authorized=false, 
 The buyer-safe activation packet can now be bound to a machine-checkable prelaunch charter that freezes the proposed buyer/business-unit scope, population/date range, billing accounts/providers, pricing hypotheses, named operating roles, and explicit acknowledgments. Runtime parsing requires every acknowledgment to be a literal boolean; strings such as false cannot be treated as truthy authorization.
 
 Even PRELAUNCH_ACCEPTED hard-codes customer_data_authorized=false, kickoff_authorized=false, outreach_authorized=false, external_action_authorized=false, and contract_created=false. Fee values must exactly match the activation packet. This half-step is an operational scope-freeze/acknowledgment artifact only; actual customer-data and kickoff authorization remain a later separate proof.
+
+## Verified pilot kickoff authorization (step 33b)
+
+A PRELAUNCH_ACCEPTED charter can now advance only when RecoveryWorks receives a separately verified buyer authorization receipt for the exact frozen engagement, buyer, billing-account/provider/date scope, read-only pilot purpose, authorization window, and retention deadline. The authorization receipt is externally sourced; RecoveryWorks does not manufacture buyer consent.
+
+The resulting kickoff gate can authorize read-only customer-data processing and pilot kickoff, but still hard-codes outreach, external recovery action, provider mutation, invoicing, and payment collection as unauthorized. Scope drift, expired/unverified authorization, or mismatch against the charter fails closed.
