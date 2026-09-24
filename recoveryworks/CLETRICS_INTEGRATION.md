@@ -143,3 +143,39 @@ Only min(billable units, independently evidenced entitled units) receives the co
 ## Still deferred
 
 Continuous bundle scheduling, a reviewed supersession workflow for replacing an existing cloud charge finding, combined discount-plus-commitment pricing, persistent recovery-vs-savings dashboards, and remediation remain later phases. None is silently approximated here.
+
+
+## Phase 3: continuous ingestion, savings, and remediation
+
+### Continuous processing receipts
+
+Use recoveryworks.integrations.cletrics_continuous.run_continuous_cletrics_scan with a private registry_path. The receipt fingerprint binds:
+
+- Cletrics bundle and manifest SHA-256;
+- processing mode (cloud, cloud_discount, or cloud_commitment);
+- reviewed authority-file hashes;
+- verification flags;
+- client and currency scope.
+
+An exact repeat is omitted from financial reprocessing. A changed rate, discount, commitment, allocation, or verification flag produces a new fingerprint and is processed again. The private receipt registry is independently hash-verified and does not modify Recovery Ledger history.
+
+### Separate financial surfaces
+
+Scan 360 now emits financial_surfaces.recovery and financial_surfaces.savings.
+
+Recovery is the existing proof-bound RecoveryOS ledger. Savings only sums explicit savings_signals rows. Anomaly estimated exposure and reconciliation drift remain separate diagnostics and are never included in estimated savings.
+
+Savings signal normalized columns:
+
+    Signal_ID,Detected_At,Provider,Account_ID,Service_ID,Resource_ID,Region,
+    Savings_Category,Estimated_Savings,Confidence,Recommendation,Remediation_Action
+
+realized_savings_cents remains zero in this integration because realized savings require a separate before/after evidence model that is not inferred from recommendations.
+
+### Governed remediation
+
+cloud_remediation.enabled=true creates a DRAFT plan from explicit savings opportunities that contain both Recommendation and Remediation_Action. RecoveryOS does not execute provider changes.
+
+approve_cloud_remediation_plan requires both a reviewer_id and customer_authorization_id and binds the exact plan/action IDs. prepare_cloud_remediation_envelopes produces immutable envelopes whose execution_status is NOT_EXECUTED.
+
+cloud_remediation.execute=true fails closed. Provider mutation belongs in a separately authorized downstream control plane.
