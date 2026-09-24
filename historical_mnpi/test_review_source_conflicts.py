@@ -343,6 +343,55 @@ class ReviewSourceConflictIntegrationTests(unittest.TestCase):
                 artifact_manifest=manifest,
             )
 
+    def test_approval_requires_source_conflict_snapshot(self):
+        (
+            sources,
+            manifest,
+            cases,
+            events,
+            case,
+            event,
+            record,
+            candidate,
+            refs,
+        ) = fixture()
+        entities, crosswalks = durable_identity_context(
+            sources,
+            manifest,
+            cases,
+            case,
+            refs,
+        )
+        review = build_review_item(
+            record,
+            event=event,
+            candidates=(candidate,),
+            cases=cases,
+            events=events,
+            source_registry=sources,
+            artifact_manifest=manifest,
+            created_at="2026-09-24T13:10:00Z",
+            created_by="review-builder",
+            entities=entities,
+            entity_crosswalks=crosswalks,
+        )
+        self.assertIsNone(review.source_conflict_registry_hash)
+        with self.assertRaisesRegex(ValueError, "source-conflict snapshot"):
+            decide_review_item(
+                review,
+                decision=ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH,
+                checks=all_checks(),
+                reviewer_id="reviewer:1",
+                reviewed_at="2026-09-24T13:11:00Z",
+                rationale="Missing conflict snapshot must fail closed.",
+                cases=cases,
+                entities=entities,
+                entity_crosswalks=crosswalks,
+                source_conflicts=SourceConflictRegistry(),
+                source_registry=sources,
+                artifact_manifest=manifest,
+            )
+
     def test_empty_current_registry_is_still_bound_into_approval(self):
         (
             sources,
