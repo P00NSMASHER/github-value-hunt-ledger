@@ -39,6 +39,17 @@ class AdversarialCertificationState(str, Enum):
     FAILED = "FAILED"
 
 
+def _source_revision(value: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError("source_revision must be a Git commit SHA")
+    normalized = value.strip().lower()
+    if len(normalized) not in (40, 64):
+        raise ValueError("source_revision must be a 40- or 64-character Git SHA")
+    if any(ch not in "0123456789abcdef" for ch in normalized):
+        raise ValueError("source_revision must be hexadecimal")
+    return normalized
+
+
 @dataclass(frozen=True)
 class AdversarialCaseResult:
     case_id: str
@@ -118,6 +129,7 @@ class AdversarialCaseResult:
 @dataclass(frozen=True)
 class ProductionAdversarialCertification:
     certification_id: str
+    source_revision: str
     seed: int
     iterations_per_vector: int
     baseline_report_proof_hash: str
@@ -127,6 +139,9 @@ class ProductionAdversarialCertification:
     automatic_repair_performed: bool = False
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "source_revision", _source_revision(self.source_revision)
+        )
         if type(self.seed) is not int or self.seed < 0:
             raise ValueError("seed must be a non-negative integer")
         if type(self.iterations_per_vector) is not int or not 1 <= self.iterations_per_vector <= 100:
@@ -187,6 +202,7 @@ class ProductionAdversarialCertification:
     def _identity(self) -> dict[str, Any]:
         return {
             "schema": 1,
+            "source_revision": self.source_revision,
             "seed": self.seed,
             "iterations_per_vector": self.iterations_per_vector,
             "baseline_report_proof_hash": self.baseline_report_proof_hash,
@@ -367,9 +383,11 @@ def _mutate(
 def run_commercial_adversarial_certification(
     chain_factory: Callable[[], Mapping[str, Any]],
     *,
+    source_revision: str,
     seed: int = 41001,
     iterations_per_vector: int = 8,
 ) -> ProductionAdversarialCertification:
+    source_revision = _source_revision(source_revision)
     if type(seed) is not int or seed < 0:
         raise ValueError("seed must be a non-negative integer")
     if type(iterations_per_vector) is not int or not 1 <= iterations_per_vector <= 100:
@@ -448,6 +466,7 @@ def run_commercial_adversarial_certification(
     )
     identity = {
         "schema": 1,
+        "source_revision": source_revision,
         "seed": seed,
         "iterations_per_vector": iterations_per_vector,
         "baseline_report_proof_hash": baseline.proof_hash,
@@ -459,6 +478,7 @@ def run_commercial_adversarial_certification(
     return ProductionAdversarialCertification(
         certification_id="recoveryworks-adversarial-certification:"
         + canonical_hash(identity),
+        source_revision=source_revision,
         seed=seed,
         iterations_per_vector=iterations_per_vector,
         baseline_report_proof_hash=baseline.proof_hash,
