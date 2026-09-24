@@ -403,3 +403,9 @@ The plan explicitly keeps provider isolation required, cross-provider authority 
 FOCUS provider identity is now canonicalized at the proof boundary: common Amazon Web Services aliases map to AWS, Microsoft/Microsoft Azure aliases map to Azure, and Google/Google Cloud Platform aliases map to GCP. The original FOCUS ProviderName is still preserved on invoice evidence for counterparty/rate matching; only the bundle/provider scope is canonicalized.
 
 The multi-cloud planner now enforces its cross-provider authority-isolation claim in code: provider jobs cannot reuse the same FOCUS, meter, signal, rate, discount, commitment, or allocation input file. Separate provider outputs were already mandatory. This prevents a single reviewed authority file from being silently reused across cloud providers.
+
+## Multi-cloud local execution with isolated truth planes (step 11b)
+
+The multi-cloud orchestrator can now execute the validated AWS/Azure/GCP provider jobs locally through the existing one-command pilot runner. Each provider retains its own evidence bundle, ledger, receipt registry, state head, and assurance report proof hash.
+
+The execution result deliberately contains no combined financial totals and performs no cloud mutation or external action. Provider assurance report hashes are verified after each run and become the only inputs allowed into the later executive-rollup layer.

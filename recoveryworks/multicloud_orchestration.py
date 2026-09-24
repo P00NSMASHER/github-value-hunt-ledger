@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from recoveryworks.models import canonical_hash
+from recoveryworks.pilot_runner import PilotRunResult, run_local_pilot
 from recoveryworks.pilot_deployment import (
     PilotDeploymentPlan,
     build_pilot_deployment_plan,
@@ -295,4 +296,174 @@ def write_multicloud_orchestration_plan(
     atomic_private_write(
         Path(markdown_path),
         (plan.to_markdown() + "\n").encode("utf-8"),
+    )
+
+
+@dataclass(frozen=True)
+class MultiCloudProviderRun:
+    provider: str
+    deployment_id: str
+    deployment_plan_proof_hash: str
+    state_head_hash: str | None
+    assurance_report_path: str
+    assurance_report_proof_hash: str
+    pilot: PilotRunResult
+
+    def __post_init__(self) -> None:
+        if self.provider != self.pilot.export_receipt.provider:
+            raise ValueError("provider run does not match exported provider scope")
+        if self.deployment_plan_proof_hash != self.pilot.deployment_plan_hash:
+            raise ValueError("provider run deployment proof mismatch")
+        if self.assurance_report_path != self.pilot.report_path:
+            raise ValueError("provider run report path mismatch")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "provider": self.provider,
+            "deployment_id": self.deployment_id,
+            "deployment_plan_proof_hash": self.deployment_plan_proof_hash,
+            "state_head_hash": self.state_head_hash,
+            "assurance_report_path": self.assurance_report_path,
+            "assurance_report_proof_hash": self.assurance_report_proof_hash,
+        })
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "provider": self.provider,
+            "deployment_id": self.deployment_id,
+            "deployment_plan_proof_hash": self.deployment_plan_proof_hash,
+            "state_head_hash": self.state_head_hash,
+            "assurance_report_path": self.assurance_report_path,
+            "assurance_report_proof_hash": self.assurance_report_proof_hash,
+            "proof_hash": self.proof_hash,
+        }
+
+
+@dataclass(frozen=True)
+class MultiCloudExecutionResult:
+    orchestration_plan_id: str
+    orchestration_plan_proof_hash: str
+    client_id: str
+    currency: str
+    provider_runs: tuple[MultiCloudProviderRun, ...]
+    provider_isolation_preserved: bool = True
+    combined_financial_rollup_enabled: bool = False
+    cross_provider_authority_reuse_allowed: bool = False
+    cloud_mutation_performed: bool = False
+    external_actions_performed: bool = False
+
+    def __post_init__(self) -> None:
+        if self.provider_isolation_preserved is not True:
+            raise ValueError("multi-cloud execution must preserve provider isolation")
+        for name in (
+            "combined_financial_rollup_enabled",
+            "cross_provider_authority_reuse_allowed",
+            "cloud_mutation_performed",
+            "external_actions_performed",
+        ):
+            if getattr(self, name):
+                raise ValueError(f"{name} must remain false in orchestration 11b")
+        providers = tuple(run.provider for run in self.provider_runs)
+        if len(providers) < 2 or len(set(providers)) != len(providers):
+            raise ValueError("multi-cloud execution requires unique provider runs")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "orchestration_plan_id": self.orchestration_plan_id,
+            "orchestration_plan_proof_hash": self.orchestration_plan_proof_hash,
+            "client_id": self.client_id,
+            "currency": self.currency,
+            "provider_run_hashes": [run.proof_hash for run in self.provider_runs],
+            "provider_isolation_preserved": True,
+            "combined_financial_rollup_enabled": False,
+            "cross_provider_authority_reuse_allowed": False,
+            "cloud_mutation_performed": False,
+            "external_actions_performed": False,
+        })
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "orchestration_plan_id": self.orchestration_plan_id,
+            "orchestration_plan_proof_hash": self.orchestration_plan_proof_hash,
+            "client_id": self.client_id,
+            "currency": self.currency,
+            "provider_runs": [run.as_dict() for run in self.provider_runs],
+            "provider_isolation_preserved": True,
+            "combined_financial_rollup_enabled": False,
+            "cross_provider_authority_reuse_allowed": False,
+            "cloud_mutation_performed": False,
+            "external_actions_performed": False,
+            "proof_hash": self.proof_hash,
+            "state": "PROVIDER_JOBS_COMPLETED_SEPARATELY",
+        }
+
+
+def _load_assurance_report(path: str | Path) -> Mapping[str, Any]:
+    source = Path(path)
+    try:
+        payload = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("provider assurance report is not readable JSON") from exc
+    if not isinstance(payload, Mapping):
+        raise ValueError("provider assurance report must be a JSON object")
+    proof_hash = payload.get("proof_hash")
+    if not isinstance(proof_hash, str) or len(proof_hash) != 64:
+        raise ValueError("provider assurance report proof hash missing")
+    identity = {key: value for key, value in payload.items() if key != "proof_hash"}
+    if canonical_hash(identity) != proof_hash:
+        raise ValueError("provider assurance report proof hash mismatch")
+    return payload
+
+
+def run_multicloud_orchestration(
+    spec: Mapping[str, Any],
+    *,
+    base_dir: str | Path = ".",
+) -> MultiCloudExecutionResult:
+    """Execute local read-only provider pilots without creating a combined ledger."""
+    plan = build_multicloud_orchestration_plan(spec, base_dir=base_dir)
+    jobs = spec.get("jobs")
+    if not isinstance(jobs, list):
+        raise ValueError("jobs must be a list")
+    jobs_by_provider: dict[str, Mapping[str, Any]] = {}
+    for job in jobs:
+        if not isinstance(job, Mapping):
+            raise ValueError("provider job must be an object")
+        deployment = build_pilot_deployment_plan(job, base_dir=base_dir)
+        jobs_by_provider[deployment.provider] = job
+
+    runs: list[MultiCloudProviderRun] = []
+    for provider_plan in plan.provider_plans:
+        job = jobs_by_provider[provider_plan.provider]
+        pilot = run_local_pilot(job, base_dir=base_dir)
+        if pilot.deployment_plan_hash != provider_plan.deployment_plan_proof_hash:
+            raise ValueError(
+                f"{provider_plan.provider} deployment changed after orchestration planning"
+            )
+        report = _load_assurance_report(pilot.report_path)
+        if report.get("client_id") != plan.client_id:
+            raise ValueError("provider assurance report client mismatch")
+        if report.get("currency") != plan.currency:
+            raise ValueError("provider assurance report currency mismatch")
+        runs.append(MultiCloudProviderRun(
+            provider=provider_plan.provider,
+            deployment_id=provider_plan.deployment_id,
+            deployment_plan_proof_hash=provider_plan.deployment_plan_proof_hash,
+            state_head_hash=pilot.continuous_result.scan.state_head_hash,
+            assurance_report_path=pilot.report_path,
+            assurance_report_proof_hash=str(report["proof_hash"]),
+            pilot=pilot,
+        ))
+
+    runs.sort(key=lambda item: item.provider)
+    return MultiCloudExecutionResult(
+        orchestration_plan_id=plan.orchestration_id,
+        orchestration_plan_proof_hash=plan.proof_hash,
+        client_id=plan.client_id,
+        currency=plan.currency,
+        provider_runs=tuple(runs),
     )
