@@ -1,0 +1,29 @@
+name: AI Business OS
+
+on:
+  pull_request:
+    paths:
+      - "business_os/**"
+      - ".github/workflows/ai-business-os.yml"
+  push:
+    branches: [main]
+    paths:
+      - "business_os/**"
+      - ".github/workflows/ai-business-os.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  step-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile
+        run: python -m compileall -q business_os
+      - name: Persistent runtime tests
+        run: python -m unittest business_os.tests.test_persistent_runtime -v
