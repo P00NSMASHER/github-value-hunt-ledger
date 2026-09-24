@@ -615,3 +615,9 @@ The derived launch brief stores the authoritative gate id/proof hash and cannot 
 A non-blocked authoritative prelaunch decision can now produce a buyer-safe activation packet that binds the exact launch-gate proof, launch-brief proof, and commercial-pilot proof. The packet carries pricing only as the existing hypothesis, exact buyer data requests, buyer/RecoveryWorks responsibilities, pilot stages, report surfaces, and financial integrity invariants.
 
 The packet hard-codes customer_data_authorized=false, kickoff_authorized=false, outreach_authorized=false, external_action_authorized=false, and contract_created=false. Editing or recreating the packet cannot bypass a blocked gate because the packet verifies the authoritative decision/brief proof chain.
+
+## Machine-checkable prelaunch charter (step 33a)
+
+The buyer-safe activation packet can now be bound to a machine-checkable prelaunch charter that freezes the proposed buyer/business-unit scope, population/date range, billing accounts/providers, pricing hypotheses, named operating roles, and explicit acknowledgments. Runtime parsing requires every acknowledgment to be a literal boolean; strings such as false cannot be treated as truthy authorization.
+
+Even PRELAUNCH_ACCEPTED hard-codes customer_data_authorized=false, kickoff_authorized=false, outreach_authorized=false, external_action_authorized=false, and contract_created=false. Fee values must exactly match the activation packet. This half-step is an operational scope-freeze/acknowledgment artifact only; actual customer-data and kickoff authorization remain a later separate proof.
