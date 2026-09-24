@@ -13,6 +13,16 @@ from historical_mnpi.case_model import (
     CaseRegistry,
     HistoricalCase,
 )
+from historical_mnpi.entity_resolution import (
+    CaseEntityCrosswalk,
+    CaseEntityCrosswalkRegistry,
+    EntityKind,
+    EntityResolutionRegistry,
+    HistoricalIdentifier,
+    HistoricalIdentifierType,
+    IssuerIdentity,
+    TraderIdentity,
+)
 from historical_mnpi.event_model import EventRegistry, InformationEvent, TemporalBoundary
 from historical_mnpi.extractors import (
     CandidateField,
@@ -283,8 +293,87 @@ def fixture():
     )
 
 
+def durable_identity_context(sources, manifest, cases, case, refs):
+    ref = refs[CaseArtifactRole.COMPLAINT]
+    entities = EntityResolutionRegistry()
+    issuer = IssuerIdentity(
+        entity_id="issuer-entity:review-target",
+        canonical_name="Target Corp.",
+        canonical_name_ref=ref,
+        identifiers=(
+            HistoricalIdentifier(
+                HistoricalIdentifierType.CIK,
+                "123456",
+                ref,
+            ),
+            HistoricalIdentifier(
+                HistoricalIdentifierType.TICKER,
+                "TGT",
+                ref,
+                valid_from="2010-01-01",
+            ),
+        ),
+    )
+    trader = TraderIdentity(
+        entity_id="trader-entity:review-trader",
+        canonical_name="Historical Trader",
+        canonical_name_ref=ref,
+    )
+    entities.register_issuer(
+        issuer,
+        source_registry=sources,
+        artifact_manifest=manifest,
+    )
+    entities.register_trader(
+        trader,
+        source_registry=sources,
+        artifact_manifest=manifest,
+    )
+
+    crosswalks = CaseEntityCrosswalkRegistry()
+    issuer_result = entities.resolve_issuer_identifier(
+        HistoricalIdentifierType.CIK,
+        "123456",
+    )
+    trader_result = entities.resolve_trader_name("Historical Trader")
+    crosswalks.register(
+        CaseEntityCrosswalk(
+            case_id=case.case_id,
+            case_proof_hash=case.proof_hash,
+            entity_kind=EntityKind.ISSUER,
+            local_id="issuer:review:target",
+            durable_entity_id=issuer.entity_id,
+            durable_entity_proof_hash=issuer.proof_hash,
+            resolution=issuer_result,
+        ),
+        cases=cases,
+        entities=entities,
+    )
+    crosswalks.register(
+        CaseEntityCrosswalk(
+            case_id=case.case_id,
+            case_proof_hash=case.proof_hash,
+            entity_kind=EntityKind.TRADER,
+            local_id="party:review:trader",
+            durable_entity_id=trader.entity_id,
+            durable_entity_proof_hash=trader.proof_hash,
+            resolution=trader_result,
+        ),
+        cases=cases,
+        entities=entities,
+    )
+    return entities, crosswalks
+
+
 def clean_item():
     sources, manifest, cases, events, case, event, record, candidate, refs = fixture()
+    entities, crosswalks = durable_identity_context(
+        sources,
+        manifest,
+        cases,
+        case,
+        refs,
+    )
     item = build_review_item(
         record,
         event=event,
@@ -295,6 +384,8 @@ def clean_item():
         artifact_manifest=manifest,
         created_at="2026-09-24T12:03:00Z",
         created_by="review-builder",
+        entities=entities,
+        entity_crosswalks=crosswalks,
     )
     return (
         sources,
@@ -306,6 +397,8 @@ def clean_item():
         record,
         candidate,
         refs,
+        entities,
+        crosswalks,
         item,
     )
 
@@ -322,7 +415,7 @@ def all_checks() -> ReviewChecks:
 
 class ReviewQueueTests(unittest.TestCase):
     def test_clean_item_accepts_candidate_sublocator_and_binds_row_hash(self):
-        *_, record, candidate, _refs, item = clean_item()
+        *_, record, candidate, _refs, _entities, _crosswalks, item = clean_item()
         self.assertNotEqual(
             candidate.source_ref.proof_hash,
             record.source_ref.proof_hash,
@@ -358,7 +451,20 @@ class ReviewQueueTests(unittest.TestCase):
             )
 
     def test_explicit_historical_research_approval_is_hash_bound(self):
-        *_, record, _candidate, _refs, item = clean_item()
+        (
+            _sources,
+            _manifest,
+            cases,
+            _events,
+            _case,
+            _event,
+            record,
+            _candidate,
+            _refs,
+            entities,
+            crosswalks,
+            item,
+        ) = clean_item()
         decision = decide_review_item(
             item,
             decision=ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH,
@@ -366,6 +472,9 @@ class ReviewQueueTests(unittest.TestCase):
             reviewer_id="reviewer:1",
             reviewed_at="2026-09-24T12:04:00Z",
             rationale="Historical public-record row verified.",
+            cases=cases,
+            entities=entities,
+            entity_crosswalks=crosswalks,
         )
         decision.verify_integrity()
         self.assertTrue(decision.research_corpus_eligible)
@@ -698,7 +807,20 @@ class ReviewQueueTests(unittest.TestCase):
         )
 
     def test_append_only_queue_prevents_second_decision(self):
-        *_, item = clean_item()
+        (
+            _sources,
+            _manifest,
+            cases,
+            _events,
+            _case,
+            _event,
+            _record,
+            _candidate,
+            _refs,
+            entities,
+            crosswalks,
+            item,
+        ) = clean_item()
         queue = HistoricalReviewQueue()
         queue.enqueue(item)
         before = queue.queue_hash
@@ -709,6 +831,9 @@ class ReviewQueueTests(unittest.TestCase):
             reviewer_id="reviewer:1",
             reviewed_at="2026-09-24T12:04:00Z",
             rationale="Verified.",
+            cases=cases,
+            entities=entities,
+            entity_crosswalks=crosswalks,
         )
         self.assertNotEqual(queue.queue_hash, before)
         self.assertEqual(
@@ -728,6 +853,123 @@ class ReviewQueueTests(unittest.TestCase):
             queue.approved_normalized_row_hashes(),
             (first.normalized_row_hash,),
         )
+
+
+    def test_approval_requires_durable_identity_snapshot(self):
+        (
+            sources,
+            manifest,
+            cases,
+            events,
+            _case,
+            event,
+            record,
+            candidate,
+            _refs,
+        ) = fixture()
+        item = build_review_item(
+            record,
+            event=event,
+            candidates=(candidate,),
+            cases=cases,
+            events=events,
+            source_registry=sources,
+            artifact_manifest=manifest,
+            created_at="2026-09-24T12:03:00Z",
+            created_by="review-builder",
+        )
+        self.assertIsNone(item.durable_identity)
+        with self.assertRaisesRegex(ValueError, "durable identity crosswalks"):
+            decide_review_item(
+                item,
+                decision=ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH,
+                checks=all_checks(),
+                reviewer_id="reviewer:1",
+                reviewed_at="2026-09-24T12:04:00Z",
+                rationale="Identity context missing.",
+            )
+
+    def test_approval_rejects_crosswalk_that_became_ambiguous(self):
+        (
+            sources,
+            manifest,
+            cases,
+            _events,
+            _case,
+            _event,
+            _record,
+            _candidate,
+            refs,
+            entities,
+            crosswalks,
+            item,
+        ) = clean_item()
+        ref = refs[CaseArtifactRole.COMPLAINT]
+        duplicate = IssuerIdentity(
+            entity_id="issuer-entity:duplicate-target",
+            canonical_name="Duplicate Historical Target",
+            canonical_name_ref=ref,
+            identifiers=(
+                HistoricalIdentifier(
+                    HistoricalIdentifierType.CIK,
+                    "123456",
+                    ref,
+                ),
+            ),
+        )
+        entities.register_issuer(
+            duplicate,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "resolution proof does not recompute|no longer unique",
+        ):
+            decide_review_item(
+                item,
+                decision=ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH,
+                checks=all_checks(),
+                reviewer_id="reviewer:1",
+                reviewed_at="2026-09-24T12:04:00Z",
+                rationale="Stale identity must fail closed.",
+                cases=cases,
+                entities=entities,
+                entity_crosswalks=crosswalks,
+            )
+
+    def test_approved_decision_binds_durable_identity_hash(self):
+        (
+            _sources,
+            _manifest,
+            cases,
+            _events,
+            _case,
+            _event,
+            _record,
+            _candidate,
+            _refs,
+            entities,
+            crosswalks,
+            item,
+        ) = clean_item()
+        decision = decide_review_item(
+            item,
+            decision=ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH,
+            checks=all_checks(),
+            reviewer_id="reviewer:1",
+            reviewed_at="2026-09-24T12:04:00Z",
+            rationale="Durable identities verified.",
+            cases=cases,
+            entities=entities,
+            entity_crosswalks=crosswalks,
+        )
+        self.assertEqual(
+            decision.durable_identity_hash,
+            item.durable_identity.proof_hash,
+        )
+        decision.verify_integrity()
 
     def test_rejected_item_is_not_research_eligible(self):
         *_, item = clean_item()
