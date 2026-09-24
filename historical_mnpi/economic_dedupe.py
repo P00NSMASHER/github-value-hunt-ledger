@@ -70,6 +70,36 @@ class DedupeProposal:
 
 
 @dataclass(frozen=True)
+class DedupeReviewChecks:
+    identity_checked: bool
+    temporal_overlap_checked: bool
+    economic_fields_checked: bool
+    source_evidence_checked: bool
+    duplicate_risk_checked: bool
+
+    def __post_init__(self) -> None:
+        for value in (
+            self.identity_checked,
+            self.temporal_overlap_checked,
+            self.economic_fields_checked,
+            self.source_evidence_checked,
+            self.duplicate_risk_checked,
+        ):
+            if type(value) is not bool:
+                raise ValueError("dedupe review checks must be boolean")
+
+    @property
+    def all_passed(self) -> bool:
+        return all((
+            self.identity_checked,
+            self.temporal_overlap_checked,
+            self.economic_fields_checked,
+            self.source_evidence_checked,
+            self.duplicate_risk_checked,
+        ))
+
+
+@dataclass(frozen=True)
 class DedupeDecision:
     proposal_hash: str
     left_trade_id: str
@@ -79,7 +109,9 @@ class DedupeDecision:
     trader_entity_id: str | None
     issuer_entity_id: str | None
     decision: DedupeDecisionType
+    checks: DedupeReviewChecks
     reviewer_id: str
+    reviewed_at: str
     rationale: str
     decision_hash: str
 
@@ -94,7 +126,9 @@ class DedupeDecision:
             "trader_entity_id": self.trader_entity_id,
             "issuer_entity_id": self.issuer_entity_id,
             "decision": self.decision.value,
+            "checks": self.checks.__dict__,
             "reviewer_id": self.reviewer_id,
+            "reviewed_at": self.reviewed_at,
             "rationale": self.rationale,
         }
 
@@ -450,19 +484,39 @@ def decide_dedupe(
     proposal: DedupeProposal,
     *,
     decision: DedupeDecisionType,
+    checks: DedupeReviewChecks,
     reviewer_id: str,
+    reviewed_at: str,
     rationale: str,
 ) -> DedupeDecision:
     proposal.verify_integrity()
     if not reviewer_id.strip() or not rationale.strip():
         raise ValueError("reviewer_id and rationale are required")
-    if decision is DedupeDecisionType.SAME_TRANSACTION and proposal.relation not in {
-        DedupeRelation.EXACT_SAME,
-        DedupeRelation.POSSIBLE_SAME,
-    }:
-        raise ValueError(
-            "SAME_TRANSACTION requires exact/possible duplicate proposal"
-        )
+    try:
+        reviewed = datetime.fromisoformat(reviewed_at.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError("reviewed_at must be ISO-8601") from exc
+    if reviewed.tzinfo is None:
+        raise ValueError("reviewed_at must include timezone")
+    if decision is DedupeDecisionType.SAME_TRANSACTION:
+        if proposal.relation not in {
+            DedupeRelation.EXACT_SAME,
+            DedupeRelation.POSSIBLE_SAME,
+        }:
+            raise ValueError(
+                "SAME_TRANSACTION requires exact/possible duplicate proposal"
+            )
+        if not checks.all_passed:
+            raise ValueError(
+                "SAME_TRANSACTION requires all dedupe reviewer checks"
+            )
+        if (
+            proposal.trader_entity_id is None
+            or proposal.issuer_entity_id is None
+        ):
+            raise ValueError(
+                "SAME_TRANSACTION requires resolved canonical identities"
+            )
     body = {
         "schema": 1,
         "proposal_hash": proposal.proposal_hash,
@@ -473,7 +527,9 @@ def decide_dedupe(
         "trader_entity_id": proposal.trader_entity_id,
         "issuer_entity_id": proposal.issuer_entity_id,
         "decision": decision.value,
+        "checks": checks.__dict__,
         "reviewer_id": reviewer_id.strip(),
+        "reviewed_at": reviewed_at,
         "rationale": rationale.strip(),
     }
     return DedupeDecision(
@@ -485,7 +541,9 @@ def decide_dedupe(
         trader_entity_id=proposal.trader_entity_id,
         issuer_entity_id=proposal.issuer_entity_id,
         decision=decision,
+        checks=checks,
         reviewer_id=reviewer_id.strip(),
+        reviewed_at=reviewed_at,
         rationale=rationale.strip(),
         decision_hash=canonical_hash(body),
     )
@@ -635,6 +693,7 @@ def build_economic_transaction_cluster(
 __all__ = [
     "DedupeDecision",
     "DedupeDecisionType",
+    "DedupeReviewChecks",
     "DedupeProposal",
     "DedupeRelation",
     "EconomicTransactionCluster",
