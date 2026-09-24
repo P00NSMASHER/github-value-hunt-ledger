@@ -20,39 +20,47 @@ the runtime permits VERIFYING → COMPLETE.
 
 ## Step 3 — Verifier-gated self-improvement
 
+Status: implemented and merged.
+
+The third upgrade lets agents propose better skills and policies while keeping every candidate
+inactive until it passes frozen disjoint development/held-out evaluation, independent verification,
+zero-regression checks, multi-agent canary evidence, and explicit curator promotion.
+
+## Step 4 — Value-weighted memory
+
 Status: implemented on this branch.
 
-The third upgrade lets agents propose better skills/policies without letting them self-authorize
-those changes:
+The fourth upgrade teaches the system which remembered tactics actually produce useful outcomes:
 
-- the current champion remains active while candidates are tested;
-- proposer, verifier, and curator are separate identities;
-- candidate and baseline artifacts are content-addressed by SHA-256;
-- development and held-out evaluation manifests are frozen and disjoint;
-- only frozen tasks can be scored, and results are immutable;
-- incomplete evaluation fails closed;
-- hard regressions quarantine the candidate;
-- candidates must improve on development tasks and clear a minimum held-out improvement delta;
-- VERIFIED candidates still remain inactive;
-- three independent canary agents with zero regressions are required for GLOBAL_ELIGIBLE;
-- only the skill's designated curator can explicitly promote a candidate globally;
-- promotion is rejected if the champion changed after evaluation;
-- known prior champion versions can be explicitly rolled back with evidence.
+- memory items are versioned and content-addressed;
+- outcomes enter as evidence-bearing observations;
+- observers cannot verify their own outcomes;
+- UNVERIFIED and REJECTED observations contribute no learned value;
+- verified rewards are bounded to [-1, 1];
+- credit for one real-world event is conserved across all memories at a maximum total of 1.0;
+- duplicate event credit for the same memory is blocked;
+- objective-specific memories cannot silently generalize into unrelated domains;
+- global memories may transfer with a deliberate discount;
+- recent verified outcomes receive more weight than stale outcomes;
+- confidence rises gradually with verified evidence and never jumps to certainty from one result;
+- positive verified histories raise retrieval priority, negative histories lower it, and untested
+  memories retain a neutral prior;
+- retired memories leave the normal retrieval pool without deleting historical evidence.
 
-The first three upgrades therefore establish a chain of:
+The first four upgrades establish:
 
 ```
 durable work
    ↓
 independent completion verification
    ↓
-measured learning
+controlled self-improvement
    ↓
-independently verified promotion
+evidence-weighted organizational memory
 ```
 
 They still do **not** grant unrestricted production, email, payment, destructive, or other
-consequential permissions. Runtime governance is a later upgrade.
+consequential permissions. Runtime governance remains a later upgrade.
 
 ### Run all AI Business OS tests
 
@@ -63,4 +71,5 @@ python -m unittest discover -s ai_business_os -p "test_*.py"
 ### Design rules
 
 Memory is evidence, not authority. Completion is not self-asserted. Learning is not deployment.
-Every increase in agent autonomy must preserve those boundaries rather than bypass them.
+Past success is a retrieval prior, not proof that a tactic is correct in a new situation. Every
+increase in agent autonomy must preserve those boundaries rather than bypass them.
