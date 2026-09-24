@@ -100,3 +100,27 @@ later metadata reclassification or custody-record change cannot silently alter
 the provenance of a normalized fact.
 
 Step 2 still performs no web retrieval and creates no normalized trade facts.
+
+
+## Step 3 — canonical case layer
+
+The case layer unifies multiple retained public artifacts around one historical
+matter without turning case outcome into transaction truth.
+
+A `HistoricalCase` contains:
+
+- stable case identity and title;
+- event type and information origin;
+- proceeding status;
+- named parties with explicit roles;
+- issuers with optional historical CIK/ticker;
+- exact proof-pinned raw-artifact references;
+- optional complaint/opened and resolution dates.
+
+Discovery-only sources cannot establish case content. Academic sources must remain
+labeled `ACADEMIC_RECONSTRUCTION` and cannot masquerade as SEC/DOJ/court
+artifacts.
+
+Case proceeding status is deliberately separate from the fact status introduced
+in Step 5. A settled or adjudicated case does not automatically prove every
+individual allegation or transaction detail.
