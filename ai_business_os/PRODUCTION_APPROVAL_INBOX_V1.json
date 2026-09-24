@@ -1,0 +1,22 @@
+{
+  "version": "human-approval-inbox-v1",
+  "status": "ACTIVE",
+  "invariants": [
+    "exact action parameters are hashed into intent_hash",
+    "approval and rejection are single-decision states",
+    "approved requests must be consumed by matching intent_hash and execution receipt",
+    "approval does not execute the action",
+    "expired approvals cannot be consumed",
+    "events are SHA-256 content-addressed"
+  ],
+  "current_pending_requests": [
+    {
+      "request_key": "govcon-calibration-300-approval-001",
+      "action_key": "gmail.send",
+      "status": "PENDING",
+      "expected_money_cents": 30000,
+      "intent_hash": "6e339768475c60e58404a9c21061c147298ee9f8ffe31999ccb8ec89cdccd27c"
+    }
+  ],
+  "external_actions_executed": false
+}
