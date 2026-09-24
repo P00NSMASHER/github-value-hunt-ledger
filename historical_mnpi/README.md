@@ -64,3 +64,35 @@ python -m unittest historical_mnpi.test_source_registry -v
 
 Step 2 will retain raw public artifacts separately from normalized facts. No raw
 source documents are downloaded by Step 1.
+
+
+## Step 2 — raw artifact separation
+
+Raw public source bytes are retained separately from every future normalized fact.
+
+`LocalContentAddressedArtifactStore` accepts bytes only when:
+
+- the source already exists in the Step-1 registry;
+- the source is confirmed already public;
+- the exact bytes hash to the registered source SHA-256;
+- acquisition/storage timestamps are timezone-aware and ordered;
+- metadata such as filenames and media types passes validation before any write.
+
+Artifacts are addressed as `sha256:<digest>` and stored under a content-addressed
+layout. Reads re-check byte length and SHA-256. Existing objects are idempotent and
+never overwritten with different content.
+
+The local store reports
+`APPLICATION_ENFORCED_APPEND_ONLY`. It does **not** claim the underlying
+filesystem is provider-level WORM. `PROVIDER_VERIFIED_IMMUTABLE` requires a
+separate provider attestation hash.
+
+A `RawArtifactManifest` binds the exact source-registry hash to exactly one
+retained artifact per registered source. The manifest contains hashes and custody
+metadata only; source bytes are deliberately absent.
+
+Future normalized records should use `SourceArtifactRef` to point to an exact
+artifact and source location such as a page, paragraph, table, CSV row, JSON
+pointer, text range, or archive member.
+
+Step 2 still performs no web retrieval and creates no normalized trade facts.
