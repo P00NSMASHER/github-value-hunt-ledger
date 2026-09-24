@@ -66,7 +66,7 @@ next-best-evidence planning, stale-receipt invalidation, and Step-6-governed evi
 
 ## Step 9 — Reversible entity canonicalization
 
-Status: implemented on this branch.
+Status: implemented and full-regression verified.
 
 The final upgrade gives the Business Brain a clean single view of duplicate real-world identities
 without deleting source provenance:
@@ -131,5 +131,4 @@ budget, approval, and kill-switch controls. Production authority remains separat
 automation. Model confidence is never proof. Canonical identity is never permission to erase source
 history.
 
-When Step 9 passes the full regression suite and merges, the nine-upgrade AI Business OS foundation
-is complete.
+Nine-upgrade foundation status: **9/9 implemented and full-regression verified.**
