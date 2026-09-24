@@ -1,0 +1,170 @@
+{
+  "schema": "ai_business_os_prod",
+  "source": "supabase_migrations.schema_migrations",
+  "exported_from_live_database": true,
+  "latest_version": "20260924230014",
+  "migration_count": 30,
+  "live_schema_fingerprint_sha256": "ea1e6eda0076baf8eb480b8bb1f711e591b937deaf687c2ec77a2e1730068b45",
+  "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
+  "migrations": [
+    {
+      "name": "create_ai_business_os_prod_brain_v1",
+      "sha256": "ba24efafdb23c5bfc28c49522e6a079d34821c4d1c6ea56856fbc073061dd7f8",
+      "version": "20260924211357"
+    },
+    {
+      "name": "add_ai_business_os_prod_fk_indexes_v1",
+      "sha256": "245bbafcd0769868f6143db4cd0a90feff5f18d3b625328f2a2a4d071b557227",
+      "version": "20260924211428"
+    },
+    {
+      "name": "create_ai_business_os_tool_registry_v1",
+      "sha256": "db24b31f69a6c03100a316bd3b95e17db7ac60b797d1f801f889f4ac5ef10c25",
+      "version": "20260924211643"
+    },
+    {
+      "name": "index_ai_business_os_tool_registry_v1",
+      "sha256": "1b544e591ed45d27d23816d90fdb7e84e5c0ff7c18daa5ad4bf74c6f0025b465",
+      "version": "20260924211702"
+    },
+    {
+      "name": "create_ai_business_os_agent_fleet_v1",
+      "sha256": "aa2a3987f99e4d14a72b2eaa3e8d4d2c5a27ba3658e4392f75ac287fcfca92aa",
+      "version": "20260924212038"
+    },
+    {
+      "name": "create_ai_business_os_shadow_mode_v1",
+      "sha256": "f468786d5b59f9ad965d06f760b481cd1b31fa62c3b9c61b82d1b8e39c63559e",
+      "version": "20260924212103"
+    },
+    {
+      "name": "activate_ai_business_os_low_risk_autonomy_v1",
+      "sha256": "6596787e809fb38d09b7894913e4be086acc43c8fc8f9981bb2c919561a96c0d",
+      "version": "20260924212702"
+    },
+    {
+      "name": "create_ai_business_os_human_approval_inbox_v1",
+      "sha256": "5c3d36da5a2e18b6742f4cce40ea5a9429d19435f4c0f681e564c12206e6f02c",
+      "version": "20260924215224"
+    },
+    {
+      "name": "add_ai_business_os_approval_consumption_v1",
+      "sha256": "e84fb7603d57bce2427737de3a7f2f9d6330901be176b303dda7c3a719e78ecd",
+      "version": "20260924215251"
+    },
+    {
+      "name": "fix_ai_business_os_approval_hash_search_path_v1",
+      "sha256": "7dd17449c8407e285e1e25043dd50973d8e542130cb385d2a9b95e3402ce1ea2",
+      "version": "20260924215335"
+    },
+    {
+      "name": "add_ai_business_os_approval_queue_view_v1",
+      "sha256": "3ad983999d6095d6fee4e1970b0a4ab824cb662c2815e4dbdbe974479612b444",
+      "version": "20260924215407"
+    },
+    {
+      "name": "create_ai_business_os_ceo_command_center_v1",
+      "sha256": "c2f8c53c86d6c03ff12e3bcaf8479e447eff3aa2f85dc2203e3b51499b15d8d7",
+      "version": "20260924215624"
+    },
+    {
+      "name": "replace_ai_business_os_command_center_snapshot_function_v1",
+      "sha256": "d7ced08e9a6001072415e4bd9d504dab6f8589916eb17a25b6c0d2a3cbee6b52",
+      "version": "20260924215702"
+    },
+    {
+      "name": "add_ai_business_os_command_center_latest_view_v1",
+      "sha256": "ac0269bd9f71791a3092bfa6cab4e39150cd55252384299c7613dc8705b2a825",
+      "version": "20260924215735"
+    },
+    {
+      "name": "create_ai_business_os_revenue_loop_v1",
+      "sha256": "de2049d000c3ce63a80ae1bc6534affbea54aabb6a9990eb9d12714c4cd011fd",
+      "version": "20260924220147"
+    },
+    {
+      "name": "harden_ai_business_os_revenue_loop_identity_v1",
+      "sha256": "fd9b11fd0b1834211326f75c90363153219c0ecc18dddfcb08e540b9c2b1d0db",
+      "version": "20260924220230"
+    },
+    {
+      "name": "add_ai_business_os_revenue_loop_command_center_v1",
+      "sha256": "e9b8cddc0e8e3e5f9f670f3d3227293cdf95647543825a55392de0641afdbd51",
+      "version": "20260924220522"
+    },
+    {
+      "name": "index_ai_business_os_control_plane_fks_v1",
+      "sha256": "17b1a1fa78cd293225e8108460e1babb2317ec0777b50f1c2c8220afece6ad13",
+      "version": "20260924220542"
+    },
+    {
+      "name": "harden_ai_business_os_revenue_loop_execution_attribution_v1",
+      "sha256": "af5b1935170e5b46df0f42daecf0d5ef349a245730a0461703ee5c57b2aafc84",
+      "version": "20260924220743"
+    },
+    {
+      "name": "create_ai_business_os_portfolio_allocator_v1",
+      "sha256": "3af2b26f97f2a847cedf80c756de9f13629bb4d8d1a5e9dd13c2154e655aa144",
+      "version": "20260924222856"
+    },
+    {
+      "name": "add_ai_business_os_portfolio_scoring_v1",
+      "sha256": "9e822fdc3dcdd02c2da35101867738f5bb6040aee47b29caa4b54ddcdbecd617",
+      "version": "20260924222945"
+    },
+    {
+      "name": "fix_ai_business_os_portfolio_skew_numeric_v1",
+      "sha256": "3499030301158c104dfff212af4c1f23b50ae758d2690846f7c4b3d6d3df4d13",
+      "version": "20260924223042"
+    },
+    {
+      "name": "fix_ai_business_os_portfolio_ranking_upsert_v1",
+      "sha256": "27f092140a45cdea44d35965d9de9742f9e4d8927aa923da7be98fe6b206f2b4",
+      "version": "20260924223145"
+    },
+    {
+      "name": "add_ai_business_os_portfolio_planning_governance_v1",
+      "sha256": "504bfba69ec498db5c9e81ccf49e60511fd11a2696f86969b53b41102edcd0aa",
+      "version": "20260924223256"
+    },
+    {
+      "name": "fix_ai_business_os_portfolio_plan_status_ambiguity_v1",
+      "sha256": "1dac7b649df2e90304d5849fe4b9e1cf3f138026b30da3a67d0170d762463f44",
+      "version": "20260924223355"
+    },
+    {
+      "name": "add_ai_business_os_portfolio_allocator_views_v1",
+      "sha256": "5664f285ada7ccea4c912b13f876a77f51954c05174c1649e26273f0ff7051df",
+      "version": "20260924223435"
+    },
+    {
+      "name": "fix_ai_business_os_portfolio_approval_upsert_v1",
+      "sha256": "3d347eaf060c601ec64e838eb191438f69c978514e9cb4a56bccd7b528e9701c",
+      "version": "20260924223523"
+    },
+    {
+      "name": "integrate_ai_business_os_capital_allocator_command_center_v1",
+      "sha256": "e295e3a5d41215db20222ffad66fb0340e6094b88988b96aa351b27c7babe461",
+      "version": "20260924223706"
+    },
+    {
+      "name": "index_ai_business_os_portfolio_plan_creator_v1",
+      "sha256": "256cd640e632a84d462b51dd26a79ee4850437810f83af9612d0a76e4ee13939",
+      "version": "20260924223746"
+    },
+    {
+      "name": "add_ai_business_os_schema_fingerprint_v1",
+      "sha256": "0fc5088cc96f9dfdd0005334439a60a0b5d05526cce53253160ff0a04820d648",
+      "version": "20260924230014"
+    }
+  ],
+  "public_bootstrap_sanitized": true,
+  "bootstrap_hash_status": "PUBLIC_REDACTED_BOOTSTRAP_HASH_VERIFIED_BY_CI_AT_CHECKOUT",
+  "private_seed_placeholders": [
+    "__PRIVATE_STRIPE_ACCOUNT_ID_1__",
+    "__PRIVATE_STRIPE_ACCOUNT_ID_2__",
+    "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
+  ],
+  "live_statement_hashes_retained": true,
+  "note": "Public bootstrap preserves ordered schema/control migrations but redacts live provider account identifiers. Exact live statement hashes remain in the migration list; private identifiers stay outside Git."
+}

@@ -1,29 +1,33 @@
-name: AI Business OS
+name: AI Business OS Canonical CI
 
 on:
-  pull_request:
-    paths:
-      - "business_os/**"
-      - ".github/workflows/ai-business-os.yml"
   push:
     branches: [main]
     paths:
+      - "ai_business_os/**"
       - "business_os/**"
+      - "supabase/migrations/ai_business_os/**"
+      - ".github/workflows/ai-business-os.yml"
+  pull_request:
+    paths:
+      - "ai_business_os/**"
+      - "business_os/**"
+      - "supabase/migrations/ai_business_os/**"
       - ".github/workflows/ai-business-os.yml"
 
 permissions:
   contents: read
 
 jobs:
-  step-tests:
+  canonical:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
-      - name: Compile
-        run: python -m compileall -q business_os
-      - name: AI Business OS regression suite
-        run: python -m unittest discover -s business_os/tests -v
+      - name: Compile canonical package
+        run: python -m compileall -q ai_business_os
+      - name: Canonical AI Business OS regression suite
+        run: python -m unittest discover -s ai_business_os -p "test_*.py" -v
