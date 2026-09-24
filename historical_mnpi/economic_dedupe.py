@@ -194,6 +194,8 @@ def _economic_values(tx: HistoricalTransaction) -> dict[str, str]:
     if tx.side.value != "UNKNOWN":
         values["side"] = tx.side.value
     for name in (
+        "ticker_at_trade",
+        "currency",
         "quantity",
         "execution_price",
         "trade_amount",
@@ -350,6 +352,9 @@ def propose_transaction_dedupe(
                 "option_expiry",
             }
             strong_matches = strong_anchor_fields.intersection(matching)
+            security_identity_ok = (
+                "ticker_at_trade" in matching
+            )
             exact_anchor_ok = (
                 "quantity" in strong_matches
                 and (
@@ -360,7 +365,10 @@ def propose_transaction_dedupe(
                     "instrument_type" in matching
                     or "side" in matching
                 )
+                and security_identity_ok
             )
+            if not security_identity_ok:
+                reasons.append("SECURITY_IDENTIFIER_NOT_CONFIRMED")
             option_types = {
                 "CALL_OPTION",
                 "PUT_OPTION",
