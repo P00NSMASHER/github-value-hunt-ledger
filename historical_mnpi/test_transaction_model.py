@@ -26,6 +26,7 @@ from historical_mnpi.source_registry import (
     SourceType,
 )
 from historical_mnpi.transaction_model import (
+    FactStatus,
     HistoricalTransaction,
     InstrumentType,
     TimePrecision,
@@ -128,6 +129,8 @@ def sparse_transaction(case, ref):
         trader_party_id="party:trader",
         issuer_id="issuer:target",
         source_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
         trade_date="2015-08-10",
     )
 
@@ -161,6 +164,8 @@ class HistoricalTransactionTests(unittest.TestCase):
             trader_party_id="party:trader",
             issuer_id="issuer:target",
             source_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
             instrument_type=InstrumentType.CALL_OPTION,
             side=TradeSide.BUY,
             trade_timestamp="2015-08-10T14:31:22-04:00",
@@ -187,6 +192,8 @@ class HistoricalTransactionTests(unittest.TestCase):
             trader_party_id="party:trader",
             issuer_id="issuer:target",
             source_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
             trade_date_range_start="2015-08-01",
             trade_date_range_end="2015-08-10",
         )
@@ -203,6 +210,10 @@ class HistoricalTransactionTests(unittest.TestCase):
                 trader_party_id="party:trader",
                 issuer_id="issuer:target",
                 source_ref=ref,
+                fact_status=FactStatus.ALLEGED,
+                status_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
             )
 
     def test_multiple_time_precisions_fail(self):
@@ -215,6 +226,10 @@ class HistoricalTransactionTests(unittest.TestCase):
                 trader_party_id="party:trader",
                 issuer_id="issuer:target",
                 source_ref=ref,
+                fact_status=FactStatus.ALLEGED,
+                status_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
                 trade_date="2015-08-10",
                 trade_timestamp="2015-08-10T14:00:00-04:00",
             )
@@ -229,6 +244,10 @@ class HistoricalTransactionTests(unittest.TestCase):
                 trader_party_id="party:trader",
                 issuer_id="issuer:target",
                 source_ref=ref,
+                fact_status=FactStatus.ALLEGED,
+                status_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
                 instrument_type=InstrumentType.STOCK,
                 trade_date="2015-08-10",
                 option_strike="15",
@@ -244,6 +263,10 @@ class HistoricalTransactionTests(unittest.TestCase):
                 trader_party_id="party:trader",
                 issuer_id="issuer:target",
                 source_ref=ref,
+                fact_status=FactStatus.ALLEGED,
+                status_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
                 trade_date="2015-08-10",
                 quantity="-100",
             )
@@ -255,6 +278,10 @@ class HistoricalTransactionTests(unittest.TestCase):
                 trader_party_id="party:trader",
                 issuer_id="issuer:target",
                 source_ref=ref,
+                fact_status=FactStatus.ALLEGED,
+                status_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
                 trade_date="2015-08-10",
                 execution_price="1e3",
             )
@@ -269,6 +296,8 @@ class HistoricalTransactionTests(unittest.TestCase):
             trader_party_id="party:unknown",
             issuer_id="issuer:target",
             source_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
             trade_date="2015-08-10",
         )
         with self.assertRaisesRegex(ValueError, "not a party"):
@@ -288,6 +317,8 @@ class HistoricalTransactionTests(unittest.TestCase):
             trader_party_id="party:trader",
             issuer_id="issuer:target",
             source_ref=ref,
+        fact_status=FactStatus.ALLEGED,
+        status_ref=ref,
             trade_date="2015-08-10",
         )
         with self.assertRaisesRegex(ValueError, "case proof"):
@@ -316,6 +347,8 @@ class HistoricalTransactionTests(unittest.TestCase):
             trader_party_id="party:trader",
             issuer_id="issuer:target",
             source_ref=altered_ref,
+            fact_status=FactStatus.ALLEGED,
+            status_ref=ref,
             trade_date="2015-08-10",
         )
         with self.assertRaisesRegex(ValueError, "not linked"):
@@ -343,6 +376,8 @@ class HistoricalTransactionTests(unittest.TestCase):
             trader_party_id=first.trader_party_id,
             issuer_id=first.issuer_id,
             source_ref=first.source_ref,
+            fact_status=first.fact_status,
+            status_ref=first.status_ref,
             trade_date="2015-08-09",
         )
         with self.assertRaisesRegex(ValueError, "different content"):
