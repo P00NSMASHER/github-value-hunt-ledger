@@ -432,12 +432,106 @@ def assess_conflicting_claims(
     )
 
 
+class SourceConflictRegistry:
+    """Append-only registry of source claims used for conflict assessment."""
+
+    def __init__(self) -> None:
+        self._claims: dict[str, SourceConflictClaim] = {}
+
+    def register(
+        self,
+        claim: SourceConflictClaim,
+        *,
+        cases: CaseRegistry,
+        source_registry: SourceRegistry,
+        artifact_manifest: RawArtifactManifest,
+    ) -> SourceConflictClaim:
+        verify_conflict_claim(
+            claim,
+            cases=cases,
+            source_registry=source_registry,
+            artifact_manifest=artifact_manifest,
+        )
+        existing = self._claims.get(claim.claim_id)
+        if existing is not None:
+            if existing.proof_hash != claim.proof_hash:
+                raise ValueError(
+                    "claim_id already registered with different content"
+                )
+            return existing
+        self._claims[claim.claim_id] = claim
+        return claim
+
+    def get(self, claim_id: str) -> SourceConflictClaim:
+        try:
+            return self._claims[claim_id]
+        except KeyError as exc:
+            raise KeyError("unknown conflict claim_id: " + claim_id) from exc
+
+    def all(self) -> tuple[SourceConflictClaim, ...]:
+        return tuple(self._claims[key] for key in sorted(self._claims))
+
+    def claims_for(
+        self,
+        case_id: str,
+        field_name: str,
+    ) -> tuple[SourceConflictClaim, ...]:
+        return tuple(sorted(
+            (
+                claim
+                for claim in self._claims.values()
+                if claim.case_id == case_id
+                and claim.field_name == field_name
+            ),
+            key=lambda item: item.proof_hash,
+        ))
+
+    def fields_for_case(self, case_id: str) -> tuple[str, ...]:
+        return tuple(sorted({
+            claim.field_name
+            for claim in self._claims.values()
+            if claim.case_id == case_id
+        }))
+
+    def assess(
+        self,
+        case_id: str,
+        field_name: str,
+        *,
+        cases: CaseRegistry,
+        source_registry: SourceRegistry,
+        artifact_manifest: RawArtifactManifest,
+    ) -> ConflictAssessment:
+        claims = self.claims_for(case_id, field_name)
+        if not claims:
+            raise KeyError(
+                "no source-conflict claims for case/field: "
+                + case_id + "/" + field_name
+            )
+        return assess_conflicting_claims(
+            claims,
+            cases=cases,
+            source_registry=source_registry,
+            artifact_manifest=artifact_manifest,
+        )
+
+    @property
+    def registry_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "claim_hashes": [
+                claim.proof_hash for claim in self.all()
+            ],
+        })
+
+
 __all__ = [
     "AssessedClaim",
     "ClaimAuthority",
     "ConflictAssessment",
     "ConflictResolutionState",
     "SourceConflictClaim",
+    "SourceConflictRegistry",
     "assess_conflicting_claims",
     "claim_authority",
     "verify_conflict_claim",
