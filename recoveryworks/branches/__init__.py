@@ -55,6 +55,17 @@ from .cloud_remediation_handoff import (
     create_cloud_remediation_handoff,
     recheck_cloud_remediation_handoff,
 )
+from .cloud_remediation_handoff import (
+    CloudRemediationExecutionAuthorization,
+    CloudRemediationExecutionHandoff,
+    CloudRemediationExecutionPolicy,
+    CloudRemediationExecutionReceipt,
+    CloudRemediationExecutionStatus,
+    ValidatedCloudRemediationReceipt,
+    authorize_cloud_remediation_execution,
+    prepare_cloud_remediation_execution_handoff,
+    validate_cloud_remediation_execution_receipt,
+)
 from .cloud_remediation_executor import (
     CloudRemediationDryRunPlan,
     CloudRemediationDryRunRequest,
@@ -362,6 +373,15 @@ __all__ = [
     "build_cloud_remediation_execution_receipt",
     "create_cloud_remediation_handoff",
     "recheck_cloud_remediation_handoff",
+    "CloudRemediationExecutionAuthorization",
+    "CloudRemediationExecutionHandoff",
+    "CloudRemediationExecutionPolicy",
+    "CloudRemediationExecutionReceipt",
+    "CloudRemediationExecutionStatus",
+    "ValidatedCloudRemediationReceipt",
+    "authorize_cloud_remediation_execution",
+    "prepare_cloud_remediation_execution_handoff",
+    "validate_cloud_remediation_execution_receipt",
     "CloudRemediationDryRunPlan",
     "CloudRemediationDryRunRequest",
     "CloudRemediationExecutorPolicy",

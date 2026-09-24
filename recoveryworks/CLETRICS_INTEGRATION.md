@@ -349,3 +349,9 @@ Before a downstream executor can consume the handoff, a fresh independently veri
 A customer diagnostic can now be run locally from an explicit intake JSON and customer authorization artifact. Before creating any RecoveryOS state, the runner verifies authorization timing/purposes and preflights every FOCUS row against the authorized provider, billing account, currency, and service period. A mismatch or expired authorization fails before the private diagnostic directory is created.
 
 The command is: python -m recoveryworks.cloud_diagnostic --intake diagnostic.json --base-dir . --run-at <UTC timestamp>. Authorization grants analysis scope only; it never promotes source verification, permits remediation, or permits external recovery actions. Real customer data is not bundled with the repository and must be supplied under authorization.
+
+## Governed remediation handoff and receipt validation (step 7b)
+
+RecoveryOS can now prepare a hash-bound handoff for a separately authorized executor, but it still contains no provider mutation implementation. The handoff requires a second explicit execution authorization that binds the customer authorization, exact dry-run proof, named executor, and expiration window. Immediately before handoff, a fresh independently verified resource snapshot must still match the dry-run resource state and satisfy a configurable maximum age.
+
+Downstream execution receipts are accepted only when they bind the exact handoff, executor, action, before-state hash, execution window, and a verified post-state snapshot. APPLIED receipts must show a changed state and a provider request id; NOOP receipts must show unchanged state. This provides a receipt/proof protocol without giving RecoveryOS any cloud SDK or live mutation path.

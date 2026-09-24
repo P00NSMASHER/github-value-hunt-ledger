@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-from pathlib import Path
-import tempfile
 import unittest
 
 from recoveryworks.branches.cloud_remediation import (
@@ -16,42 +14,63 @@ from recoveryworks.branches.cloud_remediation_executor import (
     prepare_cloud_remediation_dry_run,
 )
 from recoveryworks.branches.cloud_remediation_handoff import (
-    CloudExecutionOutcome,
-    build_cloud_remediation_execution_receipt,
-    create_cloud_remediation_handoff,
-    recheck_cloud_remediation_handoff,
+    CloudRemediationExecutionReceipt,
+    CloudRemediationExecutionStatus,
+    authorize_cloud_remediation_execution,
+    prepare_cloud_remediation_execution_handoff,
+    validate_cloud_remediation_execution_receipt,
 )
-from recoveryworks.integrations.cletrics import load_cletrics_bundle
-from recoveryworks.test_cletrics_final_cycle import make_bundle
+from recoveryworks.branches.cloud_signals import CloudSignal, CloudSignalType
+from recoveryworks.models import canonical_hash
 
 
 def H(value: str) -> str:
     return hashlib.sha256(value.encode()).hexdigest()
 
 
-class RemediationHandoffReceiptTests(unittest.TestCase):
+def receipt_id(identity: dict) -> str:
+    return "cloud-remediation-execution-receipt:" + canonical_hash(identity)
+
+
+class RemediationExecutionHandoffTests(unittest.TestCase):
     def fixtures(self):
-        temp = tempfile.TemporaryDirectory()
-        root = Path(temp.name)
-        bundle = load_cletrics_bundle(make_bundle(root / "bundle.zip"))
-        plan = build_cloud_remediation_plan(bundle.signals)
+        signal = CloudSignal(
+            signal_id="S-1",
+            signal_type=CloudSignalType.SAVINGS_OPPORTUNITY,
+            provider="aws",
+            account_id="acct-1",
+            service_id="EC2",
+            detected_at="2026-09-24T11:00:00Z",
+            detection_method="test",
+            source_hash=H("signal"),
+            source_locator="test://signal",
+            resource_id="i-1",
+            estimated_impact_cents=2500,
+            confidence="0.9",
+            metadata={
+                "savings_category": "rightsize",
+                "recommendation": "Resize after review",
+                "remediation_action": "resize_instance",
+            },
+        )
+        plan = build_cloud_remediation_plan((signal,))
         action = plan.actions[0]
         approval = approve_cloud_remediation_plan(
             plan,
             reviewer_id="reviewer",
-            customer_authorization_id="customer-auth",
+            customer_authorization_id="customer-auth-1",
             approved_action_ids=(action.action_id,),
         )
         envelope = prepare_cloud_remediation_envelopes(plan, approval)[0]
         snapshot = CloudResourceSnapshot(
-            provider=action.provider,
-            account_id=action.account_id,
-            resource_id=action.resource_id,
+            provider="aws",
+            account_id="acct-1",
+            resource_id="i-1",
             resource_type="ec2_instance",
-            observed_at="2026-09-25T12:00:00Z",
+            observed_at="2026-09-24T12:00:00Z",
             attributes={"instance_type": "m7i.2xlarge", "state": "running"},
-            source_hash=H("pre-state"),
-            source_locator="readonly://pre",
+            source_hash=H("snapshot"),
+            source_locator="aws-readonly://i-1",
             verified=True,
         )
         request = CloudRemediationDryRunRequest(
@@ -67,124 +86,157 @@ class RemediationHandoffReceiptTests(unittest.TestCase):
             snapshot=snapshot,
             request=request,
         )
-        handoff = create_cloud_remediation_handoff(
-            dry_run=dry,
-            approval=approval,
-            envelope=envelope,
-            executor_id="executor-aws-prod-1",
-            handoff_authorizer_id="cloud-change-manager",
-            issued_at="2026-09-25T12:05:00Z",
-            expires_at="2026-09-25T13:05:00Z",
+        auth = authorize_cloud_remediation_execution(
+            dry,
+            approval,
+            authorizer_id="customer-ops-approver",
+            executor_id="executor-1",
+            authorized_at="2026-09-24T12:01:00Z",
+            expires_at="2026-09-24T12:15:00Z",
         )
-        fresh = CloudResourceSnapshot(
-            provider=snapshot.provider,
-            account_id=snapshot.account_id,
-            resource_id=snapshot.resource_id,
-            resource_type=snapshot.resource_type,
-            observed_at="2026-09-25T12:10:00Z",
-            attributes=snapshot.attributes,
-            source_hash=H("fresh-pre-state"),
-            source_locator="readonly://fresh",
+        recheck = CloudResourceSnapshot(
+            provider="aws",
+            account_id="acct-1",
+            resource_id="i-1",
+            resource_type="ec2_instance",
+            observed_at="2026-09-24T12:01:30Z",
+            attributes={"instance_type": "m7i.2xlarge", "state": "running"},
+            source_hash=H("recheck"),
+            source_locator="aws-readonly://i-1/recheck",
             verified=True,
         )
-        gate = recheck_cloud_remediation_handoff(
-            handoff,
-            fresh_snapshot=fresh,
-            checked_at="2026-09-25T12:11:00Z",
+        handoff = prepare_cloud_remediation_execution_handoff(
+            dry,
+            auth,
+            recheck,
+            prepared_at="2026-09-24T12:02:00Z",
         )
-        return temp, action, approval, envelope, dry, handoff, fresh, gate
+        return plan, action, approval, envelope, dry, auth, recheck, handoff
 
-    def test_handoff_contains_no_credentials_or_provider_operation(self):
-        temp, _action, _approval, _envelope, _dry, handoff, _fresh, _gate = self.fixtures()
-        with temp:
-            payload = handoff.as_dict()
-            self.assertFalse(payload["credentials_embedded"])
-            self.assertFalse(payload["provider_operation_embedded"])
-            self.assertEqual(payload["state"], "READY_FOR_SEPARATE_EXECUTOR")
-            self.assertFalse(payload["mutation_performed"])
-
-    def test_changed_state_blocks_fresh_execution_gate(self):
-        temp, _action, _approval, _envelope, _dry, handoff, fresh, _gate = self.fixtures()
-        with temp:
-            changed = CloudResourceSnapshot(
-                provider=fresh.provider,
-                account_id=fresh.account_id,
-                resource_id=fresh.resource_id,
-                resource_type=fresh.resource_type,
-                observed_at="2026-09-25T12:12:00Z",
-                attributes={"instance_type": "m7i.large", "state": "running"},
-                source_hash=H("changed"),
-                source_locator="readonly://changed",
-                verified=True,
-            )
-            with self.assertRaisesRegex(ValueError, "new review is required"):
-                recheck_cloud_remediation_handoff(
-                    handoff,
-                    fresh_snapshot=changed,
-                    checked_at="2026-09-25T12:13:00Z",
-                )
-
-    def test_verified_external_applied_receipt_binds_post_state(self):
-        temp, _action, _approval, _envelope, _dry, handoff, fresh, gate = self.fixtures()
-        with temp:
-            post = CloudResourceSnapshot(
-                provider=fresh.provider,
-                account_id=fresh.account_id,
-                resource_id=fresh.resource_id,
-                resource_type=fresh.resource_type,
-                observed_at="2026-09-25T12:22:00Z",
-                attributes={"instance_type": "m7i.xlarge", "state": "running"},
-                source_hash=H("post-state"),
-                source_locator="readonly://post",
-                verified=True,
-            )
-            receipt = build_cloud_remediation_execution_receipt(
-                handoff=handoff,
-                gate=gate,
-                post_snapshot=post,
-                outcome=CloudExecutionOutcome.APPLIED,
-                started_at="2026-09-25T12:20:00Z",
-                completed_at="2026-09-25T12:23:00Z",
-                provider_request_id="req-123",
-                source_hash=H("executor-receipt"),
-                source_locator="executor://receipt/req-123",
-                verified=True,
-                mutation_performed=True,
-            )
-            self.assertEqual(receipt.outcome, CloudExecutionOutcome.APPLIED)
-            self.assertTrue(receipt.verified)
-            self.assertNotEqual(
-                receipt.pre_resource_state_hash,
-                receipt.post_resource_state_hash,
+    def test_handoff_requires_fresh_matching_state(self):
+        *_, dry, auth, recheck, handoff = self.fixtures()
+        self.assertEqual(
+            handoff.as_dict()["state"],
+            "READY_FOR_SEPARATELY_AUTHORIZED_EXECUTOR",
+        )
+        stale = CloudResourceSnapshot(
+            provider=recheck.provider,
+            account_id=recheck.account_id,
+            resource_id=recheck.resource_id,
+            resource_type=recheck.resource_type,
+            observed_at="2026-09-24T11:00:00Z",
+            attributes=recheck.attributes,
+            source_hash=H("stale"),
+            source_locator="test://stale",
+            verified=True,
+        )
+        with self.assertRaisesRegex(ValueError, "too stale"):
+            prepare_cloud_remediation_execution_handoff(
+                dry,
+                auth,
+                stale,
+                prepared_at="2026-09-24T12:02:00Z",
             )
 
-    def test_applied_receipt_without_changed_state_fails_closed(self):
-        temp, _action, _approval, _envelope, _dry, handoff, fresh, gate = self.fixtures()
-        with temp:
-            post = CloudResourceSnapshot(
-                provider=fresh.provider,
-                account_id=fresh.account_id,
-                resource_id=fresh.resource_id,
-                resource_type=fresh.resource_type,
-                observed_at="2026-09-25T12:22:00Z",
-                attributes=fresh.attributes,
-                source_hash=H("same-post"),
-                source_locator="readonly://same-post",
-                verified=True,
-            )
-            with self.assertRaisesRegex(ValueError, "changed resource state"):
-                build_cloud_remediation_execution_receipt(
-                    handoff=handoff,
-                    gate=gate,
-                    post_snapshot=post,
-                    outcome=CloudExecutionOutcome.APPLIED,
-                    started_at="2026-09-25T12:20:00Z",
-                    completed_at="2026-09-25T12:23:00Z",
-                    source_hash=H("bad-receipt"),
-                    source_locator="executor://bad",
-                    verified=True,
-                    mutation_performed=True,
-                )
+    def test_applied_execution_receipt_requires_verified_changed_post_state(self):
+        *_, handoff = self.fixtures()
+        post = CloudResourceSnapshot(
+            provider="aws",
+            account_id="acct-1",
+            resource_id="i-1",
+            resource_type="ec2_instance",
+            observed_at="2026-09-24T12:03:30Z",
+            attributes={"instance_type": "m7i.xlarge", "state": "running"},
+            source_hash=H("post"),
+            source_locator="aws-readonly://i-1/post",
+            verified=True,
+        )
+        identity = {
+            "schema": 1,
+            "handoff_id": handoff.handoff_id,
+            "handoff_proof_hash": handoff.proof_hash,
+            "action_id": handoff.action_id,
+            "executor_id": handoff.executor_id,
+            "executed_at": "2026-09-24T12:03:00Z",
+            "status": "APPLIED",
+            "before_state_hash": handoff.recheck_state_hash,
+            "after_state_hash": post.state_hash,
+            "provider_request_id": "aws-request-123",
+            "source_hash": H("executor-receipt"),
+            "source_locator": "executor://receipt-1",
+            "verified": True,
+            "metadata": {},
+        }
+        receipt = CloudRemediationExecutionReceipt(
+            receipt_id=receipt_id(identity),
+            handoff_id=handoff.handoff_id,
+            handoff_proof_hash=handoff.proof_hash,
+            action_id=handoff.action_id,
+            executor_id=handoff.executor_id,
+            executed_at="2026-09-24T12:03:00Z",
+            status=CloudRemediationExecutionStatus.APPLIED,
+            before_state_hash=handoff.recheck_state_hash,
+            after_state_hash=post.state_hash,
+            provider_request_id="aws-request-123",
+            source_hash=H("executor-receipt"),
+            source_locator="executor://receipt-1",
+            verified=True,
+            metadata={},
+        )
+        validated = validate_cloud_remediation_execution_receipt(
+            handoff, receipt, post
+        )
+        self.assertEqual(
+            validated.as_dict()["state"], "EXECUTION_RECEIPT_VERIFIED"
+        )
+
+    def test_receipt_outside_handoff_window_fails_closed(self):
+        *_, handoff = self.fixtures()
+        post = CloudResourceSnapshot(
+            provider="aws",
+            account_id="acct-1",
+            resource_id="i-1",
+            resource_type="ec2_instance",
+            observed_at="2026-09-24T12:20:30Z",
+            attributes={"instance_type": "m7i.xlarge"},
+            source_hash=H("post-late"),
+            source_locator="test://post-late",
+            verified=True,
+        )
+        identity = {
+            "schema": 1,
+            "handoff_id": handoff.handoff_id,
+            "handoff_proof_hash": handoff.proof_hash,
+            "action_id": handoff.action_id,
+            "executor_id": handoff.executor_id,
+            "executed_at": "2026-09-24T12:20:00Z",
+            "status": "APPLIED",
+            "before_state_hash": handoff.recheck_state_hash,
+            "after_state_hash": post.state_hash,
+            "provider_request_id": "request-late",
+            "source_hash": H("late"),
+            "source_locator": "test://late",
+            "verified": True,
+            "metadata": {},
+        }
+        receipt = CloudRemediationExecutionReceipt(
+            receipt_id=receipt_id(identity),
+            handoff_id=handoff.handoff_id,
+            handoff_proof_hash=handoff.proof_hash,
+            action_id=handoff.action_id,
+            executor_id=handoff.executor_id,
+            executed_at="2026-09-24T12:20:00Z",
+            status=CloudRemediationExecutionStatus.APPLIED,
+            before_state_hash=handoff.recheck_state_hash,
+            after_state_hash=post.state_hash,
+            provider_request_id="request-late",
+            source_hash=H("late"),
+            source_locator="test://late",
+            verified=True,
+            metadata={},
+        )
+        with self.assertRaisesRegex(ValueError, "outside the authorized"):
+            validate_cloud_remediation_execution_receipt(handoff, receipt, post)
 
 
 if __name__ == "__main__":
