@@ -30,8 +30,11 @@ INSUFFICIENT_INDEPENDENCE, CONFLICTED, CONTRADICTED.
 11. Next-evidence planning is counterfactual only; hypothetical evidence is never persisted into the real evidence ledger.
 12. Duplicate independence groups are not recommended as if they were independent corroboration.
 13. Wrong-authority, unavailable, expired, or non-useful acquisition actions are filtered from next-evidence recommendations.
-14. A next-evidence recommendation is bound to the exact truth receipt/evidence snapshot; if real evidence changes, the claim must be re-evaluated.
-15. Evidence acquisition requests pass through Step-6 governance. This engine recommends/authorizes acquisition; it does not bypass permissions or execute external tools.
+14. SUPPORT actions are never recommended as a way to resolve a CONFLICTED or CONTRADICTED obligation.
+15. Conflict-resolution actions must target one exact contradictory evidence item on the same claim and obligation.
+16. Conflict-resolution planning is counterfactual and non-destructive: it never deletes or mutates the real contradictory evidence.
+17. A next-evidence recommendation is bound to the exact truth receipt/evidence snapshot; if real evidence changes, the claim must be re-evaluated.
+18. Evidence acquisition requests pass through Step-6 governance. This engine recommends/authorizes acquisition; it does not bypass permissions or execute external tools.
 
 ## Intended loop
 
@@ -41,3 +44,13 @@ claim -> proof obligations -> real evidence -> truth receipt -> missing blocker 
 This is the layer that lets an agent say not just 'I think this is true,' but exactly which
 requirements are proven, which are contradicted, which remain unknown, and what evidence would
 most efficiently improve the decision.
+
+## Conflict-resolution planning
+
+When a required obligation is CONFLICTED or CONTRADICTED, the planner changes modes. It will not
+rank another supportive source as if accumulating support could erase the contradiction. A
+RESOLVE_CONFLICT action must identify the exact contradictory evidence item to adjudicate.
+
+The counterfactual planner may simulate what would happen if that contradiction were resolved, but
+the persisted evidence ledger remains unchanged. Only a real later adjudication/evidence event may
+change the actual truth state.
