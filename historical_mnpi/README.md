@@ -124,3 +124,26 @@ artifacts.
 Case proceeding status is deliberately separate from the fact status introduced
 in Step 5. A settled or adjudicated case does not automatically prove every
 individual allegation or transaction detail.
+
+
+## Step 4 — sparse transaction schema
+
+Historical transaction rows are deliberately sparse and provenance-bound.
+
+A transaction must point to:
+
+- an existing canonical case and exact case proof hash;
+- a trader/party already present in that case;
+- an issuer already present in that case;
+- an exact retained artifact reference already linked to that case.
+
+Trade timing may be represented as one exact timestamp, one date, or one date
+range. The schema does not collapse ranges into guessed dates.
+
+Price, quantity, profit, side, instrument, ticker, currency, exit data, and
+option terms remain nullable/UNKNOWN when the public record does not establish
+them. Numeric values are preserved as plain decimal strings rather than binary
+floating-point values.
+
+A transaction cannot be registered when its case proof, party, issuer, source
+proof, artifact proof, or case-artifact relationship does not match.
