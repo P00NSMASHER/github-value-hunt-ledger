@@ -505,3 +505,9 @@ A separate verified environment-state discovery binds the current release/image 
 A SIMULATION_ONLY activation can now be converted into a short-lived credential-free handoff for a named separate deployer, but only after a second fresh verified environment discovery proves the environment has not drifted since simulation. The handoff binds the exact simulation, release, ProductionAdmissionGate, credential-scope proof, provider/account/environment, current state, target image/source commit, deployer, and expiry window.
 
 A downstream activation receipt is accepted only when it binds that exact handoff and a verified post-activation environment discovery proves the target release/image. RecoveryWorks still contains no provider deployment operation and stores no credentials; verified completion yields ACTIVATION_VERIFIED.
+
+## Continuous production assurance/currentness (step 22)
+
+A read-only continuous assurance evaluation now checks the admitted release against verified environment state, exact external security evidence and its age, DR rehearsal freshness, private-backup RPO/retention/freshness, tamper-evident run-history integrity/currentness, Cletrics processing-evidence freshness/verification, unresolved incident lifecycle state, and outstanding cloud supersession candidates.
+
+Results are PASS, REVIEW_REQUIRED, or BLOCKED. Release/image drift, stale security/DR/backups/history/cloud evidence, or unresolved incidents block assurance. Unverified cloud evidence, closed-but-unreviewed incidents, and supersession candidates require review. The snapshot is alert-ready and can be written privately as JSON/Markdown, but automatic remediation and external actions remain disabled.
