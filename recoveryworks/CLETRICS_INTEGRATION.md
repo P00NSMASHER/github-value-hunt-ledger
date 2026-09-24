@@ -541,3 +541,9 @@ Provider discovery can be tested through exact request-bound verified replay fix
 Read-only provider discovery can now be handed to a named separate connector runner through a short-lived credential-free artifact that binds the exact connector contract, credential-reference proof, provider/account, request, operation, runner, and expiry window. RecoveryWorks itself still does not call AWS/Azure/GCP.
 
 A returned discovery receipt is accepted only when it is externally verified, binds the exact handoff/request/runner, occurs inside the authorization window, carries a hash-bound response payload and provider request id, and explicitly records that no provider mutation or credential material was returned. Successful verification yields EXTERNAL_READONLY_DISCOVERY_VERIFIED.
+
+## End-to-end tenant binding registry (step 26)
+
+Managed pilot execution now derives a canonical tenant identity from tenant_id (defaulting to client_id), client_id, and the execution namespace. Before any private pilot artifact is written, a shared private tenant registry reserves the bundle, ledger, Cletrics receipt registry, assurance JSON, and assurance Markdown paths. A path already bound to another tenant fails before overwrite.
+
+After execution, the ledger is checked for cross-client findings, the Cletrics registry for cross-client receipts, and the assurance report for exact client/proof integrity. Their semantic/file proofs are then tenant-bound; the same proof cannot be rebound to another tenant. The registry exposes the same binding API for backups, continuous-assurance snapshots, run-history/diligence artifacts, and customer exports so managed production workflows can fail closed on cross-customer path/proof reuse without changing every underlying artifact schema.

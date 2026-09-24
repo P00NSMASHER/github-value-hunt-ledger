@@ -32,6 +32,15 @@ from recoveryworks.pilot_deployment import (
     load_pilot_spec,
 )
 from recoveryworks.store import LocalBundleStore
+from recoveryworks.tenant_isolation import (
+    TenantBindingRegistry,
+    TenantIdentity,
+    bind_managed_tenant_artifact,
+    file_sha256,
+    validate_tenant_assurance_report,
+    validate_tenant_ledger,
+    validate_tenant_receipts,
+)
 from recoveryworks.private_io import (
     atomic_private_write,
     private_permissions_verified,
@@ -41,6 +50,8 @@ from recoveryworks.private_io import (
 @dataclass(frozen=True)
 class PilotRunResult:
     deployment_plan_hash: str
+    tenant_id: str
+    tenant_proof_hash: str
     export_receipt: CletricsExportReceipt
     continuous_result: ContinuousCletricsResult
     report_path: str
@@ -49,6 +60,8 @@ class PilotRunResult:
     def as_dict(self) -> dict[str, Any]:
         return {
             "deployment_plan_hash": self.deployment_plan_hash,
+            "tenant_id": self.tenant_id,
+            "tenant_proof_hash": self.tenant_proof_hash,
             "export_receipt": self.export_receipt.as_dict(),
             "continuous_result": self.continuous_result.as_dict(),
             "report_path": self.report_path,
@@ -119,6 +132,32 @@ def run_local_pilot(
     verification = _mapping("recoveryos.verification", verification)
 
     exported_at = str(period["exported_at"])
+    tenant = TenantIdentity(
+        tenant_id=str(spec.get("tenant_id") or plan.client_id),
+        client_id=plan.client_id,
+        namespace=str(base),
+        created_at=exported_at,
+    )
+    tenant_registry_value = recoveryos.get("tenant_registry_path")
+    tenant_registry_path = (
+        Path(str(tenant_registry_value))
+        if tenant_registry_value
+        else base / ".recoveryworks-tenant-bindings.json"
+    )
+    if not tenant_registry_path.is_absolute():
+        tenant_registry_path = base / tenant_registry_path
+    tenant_registry = TenantBindingRegistry(tenant_registry_path)
+    markdown_target = Path(plan.report_path).with_suffix(".md")
+    tenant_registry.reserve_paths(
+        tenant,
+        artifact_paths={
+            "cletrics_bundle": plan.bundle_path,
+            "recovery_ledger": plan.ledger_path,
+            "cletrics_receipts": plan.receipt_registry_path,
+            "assurance_json": plan.report_path,
+            "assurance_markdown": markdown_target,
+        },
+    )
     export_receipt = export_cletrics_focus_snapshot(
         output_path=plan.bundle_path,
         client_id=plan.client_id,
@@ -213,7 +252,7 @@ def run_local_pilot(
         ledger=ledger,
     )
     report_path = Path(plan.report_path)
-    markdown_path = report_path.with_suffix(".md")
+    markdown_path = markdown_target
     write_cloud_assurance_report(
         assurance,
         json_path=report_path,
@@ -234,8 +273,37 @@ def run_local_pilot(
         if not private_permissions_verified(Path(value)):
             raise PermissionError(f"pilot private permissions missing: {value}")
 
+    ledger_file_hash = validate_tenant_ledger(tenant, plan.ledger_path)
+    receipt_file_hash = validate_tenant_receipts(
+        tenant, plan.receipt_registry_path
+    )
+    assurance_proof = validate_tenant_assurance_report(tenant, report_path)
+    for artifact_type, artifact_key, proof_hash, path in (
+        ("cletrics_bundle", "bundle", export_receipt.bundle_sha256, plan.bundle_path),
+        ("recovery_ledger", "ledger", ledger_file_hash, plan.ledger_path),
+        ("cletrics_receipts", "receipts", receipt_file_hash, plan.receipt_registry_path),
+        ("assurance_json", "assurance", assurance_proof, report_path),
+        (
+            "assurance_markdown",
+            "assurance_markdown",
+            file_sha256(markdown_path),
+            markdown_path,
+        ),
+    ):
+        bind_managed_tenant_artifact(
+            tenant_registry,
+            tenant,
+            artifact_type=artifact_type,
+            artifact_key=artifact_key,
+            proof_hash=proof_hash,
+            path=path,
+            bound_at=exported_at,
+        )
+
     return PilotRunResult(
         deployment_plan_hash=plan.proof_hash,
+        tenant_id=tenant.tenant_id,
+        tenant_proof_hash=tenant.proof_hash,
         export_receipt=export_receipt,
         continuous_result=result,
         report_path=plan.report_path,
