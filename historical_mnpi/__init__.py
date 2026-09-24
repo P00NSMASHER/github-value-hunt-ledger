@@ -55,6 +55,21 @@ from .extractors import (
     extract_sec_pdf_page_text_candidates,
 )
 
+from .review_queue import (
+    HistoricalReviewDecision,
+    HistoricalReviewQueue,
+    ReviewChecks,
+    ReviewConflict,
+    ReviewDecision,
+    ReviewIdentitySnapshot,
+    ReviewQueueItem,
+    ReviewTemporalSnapshot,
+    build_review_item,
+    decide_review_item,
+    detect_candidate_conflicts,
+    render_review_item_markdown,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -65,6 +80,18 @@ from .source_registry import (
 )
 
 __all__ = [
+    "HistoricalReviewDecision",
+    "HistoricalReviewQueue",
+    "ReviewChecks",
+    "ReviewConflict",
+    "ReviewDecision",
+    "ReviewIdentitySnapshot",
+    "ReviewQueueItem",
+    "ReviewTemporalSnapshot",
+    "build_review_item",
+    "decide_review_item",
+    "detect_candidate_conflicts",
+    "render_review_item_markdown",
     "CandidateField",
     "CandidateFieldStatus",
     "CandidateKind",
