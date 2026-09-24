@@ -278,3 +278,60 @@ item has a completed decision, corrections require a new normalized proposal and
 therefore a new review hash. Approved decisions bind the exact normalized row
 hash and remain scoped to `HISTORICAL_RESEARCH_COMPLIANCE_ONLY`; they never
 authorize live trading.
+
+
+
+## Step 9 — durable entity resolution
+
+Case-local party and issuer IDs are no longer treated as durable cross-case
+identities.
+
+The entity-resolution layer now provides:
+
+- durable issuer identities;
+- durable trader identities;
+- provenance-bound names and aliases;
+- historical CIK mappings;
+- historical ticker mappings with optional validity intervals;
+- explicit `RESOLVED`, `AMBIGUOUS`, and `UNRESOLVED` states;
+- proof-pinned crosswalks from case-local `issuer_id` / trader `party_id` values
+  to durable entity IDs.
+
+Ticker reuse is date-sensitive. A ticker crosswalk requires an explicit
+`as_of_date`; the resolver does not invent a date. Reused identifiers or shared
+aliases remain ambiguous unless the supplied historical context uniquely resolves
+them.
+
+Durable identities and crosswalks are established only from admissible retained
+public evidence. Discovery-only sources cannot establish a durable identity.
+
+Crosswalks pin:
+
+- the exact canonical case proof;
+- the exact case-local ID;
+- the exact durable entity proof;
+- the exact resolution proof that produced the unique match.
+
+Mappings are append-only for a given case-local identity. A mapping cannot be
+silently redirected to another durable entity.
+
+### Step-8 approval integration
+
+Sparse transaction objects remain evidence-layer records and therefore continue
+to use case-local IDs. The Step-8 acceptance boundary is stricter:
+
+- a review item may attach a durable issuer/trader identity snapshot;
+- historical-research approval requires both issuer and trader crosswalks;
+- approval requires the current case/entity/crosswalk registries;
+- each crosswalk is recomputed at decision time;
+- a missing, changed, stale, unresolved, or newly ambiguous mapping fails closed;
+- the approval decision binds the durable-identity snapshot hash in addition to
+  the normalized transaction-row hash.
+
+This means a case-local name or ID can still exist in pre-review evidence, but it
+cannot enter the accepted historical research corpus unless both the trader and
+issuer are uniquely resolved to durable identities at approval time.
+
+The entity layer remains historical/public-record only. It does not authorize
+live trading, ingest live confidential information, or turn ambiguous identity
+evidence into a guessed match.
