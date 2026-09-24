@@ -131,6 +131,7 @@ def fixture(resolve_identities=True):
         instrument_type=InstrumentType.STOCK,
         side=TradeSide.BUY,
         trade_date="2015-08-10",
+        ticker_at_trade="TGT",
         quantity="2500",
         execution_price="30.375",
     )
@@ -193,6 +194,70 @@ class EconomicDedupeTests(unittest.TestCase):
             "EXACT_TIMESTAMP_AND_STRONG_ECONOMIC_ANCHORS",
             proposal.reason_codes,
         )
+
+    def test_exact_same_requires_matching_security_identifier(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            **{
+                **left.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": None,
+            }
+        )
+        right = HistoricalTransaction(
+            **{
+                **right.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": None,
+            }
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+        self.assertIn(
+            "SECURITY_IDENTIFIER_NOT_CONFIRMED",
+            proposal.reason_codes,
+        )
+
+    def test_different_tickers_for_same_issuer_are_distinct(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            **{
+                **left.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": "CLASSA",
+            }
+        )
+        right = HistoricalTransaction(
+            **{
+                **right.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": "CLASSB",
+            }
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.DISTINCT)
+        self.assertIn("ticker_at_trade", proposal.conflicting_fields)
+
+    def test_conflicting_currency_is_distinct(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(**{**left.__dict__, "currency": "USD"})
+        right = HistoricalTransaction(**{**right.__dict__, "currency": "CAD"})
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.DISTINCT)
+        self.assertIn("currency", proposal.conflicting_fields)
 
     def test_same_day_identical_economics_never_auto_exact(self):
         sources, manifest, cases, entities, left, right = fixture()
