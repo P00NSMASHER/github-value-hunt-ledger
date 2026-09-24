@@ -263,7 +263,7 @@ class ContinuousIngestionTests(unittest.TestCase):
             self.assertEqual(len(registry.receipts()), 1)
             self.assertEqual(registry.state_hash(), second.registry_hash)
 
-    def test_authority_change_changes_fingerprint_and_reprocesses(self):
+    def test_authority_change_requires_explicit_supersession(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             make_bundle(root / "bundle.zip")
@@ -292,12 +292,17 @@ class ContinuousIngestionTests(unittest.TestCase):
                 registry_path=root / "receipts.json",
                 base_dir=root,
             )
-            self.assertEqual(len(second.new_job_fingerprints), 1)
+            self.assertEqual(second.new_job_fingerprints, ())
+            self.assertEqual(len(second.supersession_required_fingerprints), 1)
             self.assertNotEqual(
                 first.new_job_fingerprints[0],
-                second.new_job_fingerprints[0],
+                second.supersession_required_fingerprints[0],
             )
-            self.assertEqual(len(CletricsReceiptRegistry(root / "receipts.json").receipts()), 2)
+            self.assertEqual(
+                len(CletricsReceiptRegistry(root / "receipts.json").receipts()),
+                1,
+            )
+            self.assertEqual(second.scan.added_finding_ids, ())
 
     def test_registry_tamper_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
