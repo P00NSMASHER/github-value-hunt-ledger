@@ -16,7 +16,11 @@ from typing import Iterable
 from .case_model import CaseRegistry
 from .event_model import EventRegistry, InformationEvent, verify_event_provenance
 from .extractors import CandidateFieldStatus, CandidateKind, CandidateRecord
-from .raw_artifacts import RawArtifactManifest, SourceArtifactRef
+from .raw_artifacts import (
+    RawArtifactManifest,
+    SourceArtifactRef,
+    same_retained_artifact,
+)
 from .source_registry import SourceRegistry, canonical_hash
 from .transaction_model import (
     FactStatus,
@@ -203,14 +207,70 @@ def _dt(value: str) -> datetime:
     return datetime.fromisoformat(_iso(value).replace("Z", "+00:00"))
 
 
-def _same_artifact(left: SourceArtifactRef, right: SourceArtifactRef) -> bool:
-    return (
-        left.source_id == right.source_id
-        and left.source_proof_hash == right.source_proof_hash
-        and left.artifact_id == right.artifact_id
-        and left.artifact_sha256 == right.artifact_sha256
-        and left.artifact_record_proof_hash == right.artifact_record_proof_hash
-    )
+def _normalize_candidate_value(field_name: str, value: str) -> str:
+    if field_name in {"trade_date", "option_expiry"}:
+        for pattern in ("%Y-%m-%d", "%m/%d/%Y"):
+            try:
+                return datetime.strptime(value, pattern).date().isoformat()
+            except ValueError:
+                pass
+    if field_name == "currency":
+        return value.upper()
+    return value
+
+
+def _candidate_support(
+    candidates: tuple[CandidateRecord, ...],
+) -> dict[str, set[str]]:
+    support: dict[str, set[str]] = {}
+    for candidate in candidates:
+        for field in candidate.fields:
+            if field.parsed_value is None:
+                continue
+            value = _normalize_candidate_value(field.name, field.parsed_value)
+            support.setdefault(field.name, set()).add(value)
+            if field.name == "instrument_text":
+                mapped = {
+                    "share": "STOCK",
+                    "shares": "STOCK",
+                    "call": "CALL_OPTION",
+                    "calls": "CALL_OPTION",
+                    "put": "PUT_OPTION",
+                    "puts": "PUT_OPTION",
+                    "contract": "OPTION_OTHER",
+                    "contracts": "OPTION_OTHER",
+                }.get(field.parsed_value.casefold())
+                if mapped is not None:
+                    support.setdefault("instrument_type", set()).add(mapped)
+    return support
+
+
+def _proposed_values(record: HistoricalTransaction) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for field_name in (
+        "trade_timestamp",
+        "trade_date",
+        "trade_date_range_start",
+        "trade_date_range_end",
+        "ticker_at_trade",
+        "currency",
+        "quantity",
+        "execution_price",
+        "trade_amount",
+        "option_strike",
+        "option_expiry",
+        "exit_timestamp",
+        "exit_price",
+        "documented_profit",
+    ):
+        value = getattr(record, field_name)
+        if value is not None:
+            out[field_name] = value
+    if record.instrument_type.value != "UNKNOWN":
+        out["instrument_type"] = record.instrument_type.value
+    if record.side.value != "UNKNOWN":
+        out["side"] = record.side.value
+    return out
 
 
 def detect_candidate_conflicts(
@@ -221,8 +281,12 @@ def detect_candidate_conflicts(
         for field in candidate.fields:
             if field.parsed_value is None:
                 continue
+            normalized = _normalize_candidate_value(
+                field.name,
+                field.parsed_value,
+            )
             by_field.setdefault(field.name, {}).setdefault(
-                field.parsed_value, []
+                normalized, []
             ).append(candidate.proof_hash)
 
     out = []
@@ -246,6 +310,11 @@ def _blockers(
     conflicts: tuple[ReviewConflict, ...],
 ) -> tuple[str, ...]:
     out = {f"CONFLICT:{item.field_name}" for item in conflicts}
+    support = _candidate_support(candidates)
+    for field_name, proposed_value in _proposed_values(record).items():
+        if proposed_value not in support.get(field_name, set()):
+            out.add(f"PROPOSED_VALUE_UNSUPPORTED:{field_name}")
+
     for candidate in candidates:
         for field in candidate.fields:
             if field.status is CandidateFieldStatus.AMBIGUOUS:
@@ -345,7 +414,7 @@ def build_review_item(
             raise ValueError("candidate belongs to different case")
         artifact_manifest.resolve_ref(candidate.source_ref)
         if not any(
-            _same_artifact(candidate.source_ref, case_link.ref)
+            same_retained_artifact(candidate.source_ref, case_link.ref)
             for case_link in case.artifacts
         ):
             raise ValueError(
@@ -353,7 +422,7 @@ def build_review_item(
             )
 
     if not any(
-        _same_artifact(proposed_record.source_ref, candidate.source_ref)
+        same_retained_artifact(proposed_record.source_ref, candidate.source_ref)
         for candidate in candidate_tuple
     ):
         raise ValueError(
@@ -362,7 +431,7 @@ def build_review_item(
         )
 
     if not any(
-        _same_artifact(proposed_record.status_ref, candidate.source_ref)
+        same_retained_artifact(proposed_record.status_ref, candidate.source_ref)
         for candidate in candidate_tuple
     ):
         raise ValueError(
