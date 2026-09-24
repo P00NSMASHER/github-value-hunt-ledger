@@ -262,6 +262,8 @@ class KnowledgeGraph:
     ) -> Dict[str, Any]:
         node = self._require_node(node_id)
         self.runtime._require_agent(created_by_agent_id)
+        if node["status"] != "ACTIVE":
+            raise KnowledgeGraphError("new aliases may only target ACTIVE nodes")
         alias_display = alias.strip()
         alias_norm = _norm(alias)
         if not alias_norm:
@@ -377,6 +379,13 @@ class KnowledgeGraph:
         source = self._require_node(source_node_id)
         target = self._require_node(target_node_id)
         self.runtime._require_agent(created_by_agent_id)
+        if (
+            (source["status"] != "ACTIVE" or target["status"] != "ACTIVE")
+            and supersedes_edge_id is None
+        ):
+            raise KnowledgeGraphError(
+                "new edges may only connect ACTIVE nodes; historical edges may only be superseded"
+            )
         edge_type = edge_type.strip().upper()
         if source_node_id == target_node_id:
             raise KnowledgeGraphError("self edges are not allowed")
