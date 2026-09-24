@@ -27,6 +27,11 @@ from .raw_artifacts import (
     SourceArtifactRef,
     same_retained_artifact,
 )
+from .source_conflicts import (
+    ConflictAssessment,
+    ConflictResolutionState,
+    SourceConflictRegistry,
+)
 from .source_registry import SourceRegistry, canonical_hash
 from .transaction_model import (
     FactStatus,
@@ -148,6 +153,8 @@ class ReviewQueueItem:
     temporal: ReviewTemporalSnapshot
     candidates: tuple[CandidateRecord, ...]
     conflicts: tuple[ReviewConflict, ...]
+    source_conflicts: tuple[ConflictAssessment, ...]
+    source_conflict_registry_hash: str | None
     blockers: tuple[str, ...]
     normalized_row_hash: str
     created_at: str
@@ -171,6 +178,10 @@ class ReviewQueueItem:
             "temporal": self.temporal.__dict__,
             "candidate_hashes": sorted(item.proof_hash for item in self.candidates),
             "conflict_hashes": sorted(item.proof_hash for item in self.conflicts),
+            "source_conflict_hashes": sorted(
+                item.proof_hash for item in self.source_conflicts
+            ),
+            "source_conflict_registry_hash": self.source_conflict_registry_hash,
             "blockers": sorted(self.blockers),
             "normalized_row_hash": self.normalized_row_hash,
             "created_at": self.created_at,
@@ -196,6 +207,7 @@ class HistoricalReviewDecision:
     review_item_hash: str
     normalized_row_hash: str
     durable_identity_hash: str | None
+    source_conflict_hash: str | None
     decision: ReviewDecision
     checks: ReviewChecks
     reviewer_id: str
@@ -213,6 +225,7 @@ class HistoricalReviewDecision:
             "review_item_hash": self.review_item_hash,
             "normalized_row_hash": self.normalized_row_hash,
             "durable_identity_hash": self.durable_identity_hash,
+            "source_conflict_hash": self.source_conflict_hash,
             "decision": self.decision.value,
             "checks": self.checks.__dict__,
             "reviewer_id": self.reviewer_id,
@@ -230,6 +243,10 @@ class HistoricalReviewDecision:
         if self.research_corpus_eligible and self.durable_identity_hash is None:
             raise ValueError(
                 "research-eligible review requires durable identity proof"
+            )
+        if self.research_corpus_eligible and self.source_conflict_hash is None:
+            raise ValueError(
+                "research-eligible review requires source-conflict proof"
             )
 
 
@@ -380,6 +397,101 @@ def _proposed_values(record: HistoricalTransaction) -> dict[str, str]:
     return out
 
 
+def _record_conflict_value(
+    record: HistoricalTransaction,
+    field_name: str,
+) -> str | None:
+    if field_name == "fact_status":
+        return record.fact_status.value
+    return _proposed_values(record).get(field_name)
+
+
+def _source_conflict_snapshot_hash(
+    registry_hash: str,
+    assessments: tuple[ConflictAssessment, ...],
+) -> str:
+    return canonical_hash({
+        "schema": 1,
+        "registry_hash": registry_hash,
+        "assessment_hashes": sorted(
+            item.proof_hash for item in assessments
+        ),
+    })
+
+
+def _build_source_conflict_snapshot(
+    record: HistoricalTransaction,
+    *,
+    source_conflicts: SourceConflictRegistry,
+    cases: CaseRegistry,
+    source_registry: SourceRegistry,
+    artifact_manifest: RawArtifactManifest,
+) -> tuple[tuple[ConflictAssessment, ...], tuple[str, ...]]:
+    relevant_fields = set(_proposed_values(record))
+    relevant_fields.add("fact_status")
+    assessments = []
+    blockers = set()
+
+    for field_name in source_conflicts.fields_for_case(record.case_id):
+        if field_name not in relevant_fields:
+            continue
+        assessment = source_conflicts.assess(
+            record.case_id,
+            field_name,
+            cases=cases,
+            source_registry=source_registry,
+            artifact_manifest=artifact_manifest,
+        )
+        assessments.append(assessment)
+        proposed_value = _record_conflict_value(record, field_name)
+
+        if (
+            assessment.state
+            is ConflictResolutionState.UNRESOLVED_TOP_TIER_CONFLICT
+        ):
+            blockers.add(f"SOURCE_CONFLICT_UNRESOLVED:{field_name}")
+        elif (
+            assessment.state
+            is ConflictResolutionState.NO_CANONICAL_SUPPORT
+        ):
+            blockers.add(f"SOURCE_NO_CANONICAL_SUPPORT:{field_name}")
+        elif assessment.preferred_value != proposed_value:
+            blockers.add(f"SOURCE_PRIORITY_MISMATCH:{field_name}")
+
+    return (
+        tuple(sorted(assessments, key=lambda item: item.field_name)),
+        tuple(sorted(blockers)),
+    )
+
+
+def verify_review_source_conflicts(
+    item: ReviewQueueItem,
+    *,
+    source_conflicts: SourceConflictRegistry,
+    cases: CaseRegistry,
+    source_registry: SourceRegistry,
+    artifact_manifest: RawArtifactManifest,
+) -> None:
+    item.verify_integrity()
+    if item.source_conflict_registry_hash is None:
+        raise ValueError("review item has no source-conflict snapshot")
+    current, _blockers = _build_source_conflict_snapshot(
+        item.proposed_record,
+        source_conflicts=source_conflicts,
+        cases=cases,
+        source_registry=source_registry,
+        artifact_manifest=artifact_manifest,
+    )
+    if tuple(
+        assessment.proof_hash for assessment in current
+    ) != tuple(
+        assessment.proof_hash for assessment in item.source_conflicts
+    ):
+        raise ValueError(
+            "review source-conflict snapshot is stale or changed"
+        )
+
+
 def detect_candidate_conflicts(
     candidates: Iterable[CandidateRecord],
 ) -> tuple[ReviewConflict, ...]:
@@ -481,6 +593,7 @@ def build_review_item(
     created_by: str,
     entities: EntityResolutionRegistry | None = None,
     entity_crosswalks: CaseEntityCrosswalkRegistry | None = None,
+    source_conflicts: SourceConflictRegistry | None = None,
 ) -> ReviewQueueItem:
     created_at = _iso(created_at)
     if not created_by.strip():
@@ -558,6 +671,9 @@ def build_review_item(
             cases=cases,
             entities=entities,
             entity_crosswalks=entity_crosswalks,
+            source_conflicts=source_conflicts,
+            source_registry=source_registry,
+            artifact_manifest=artifact_manifest,
         )
         if entities is not None and entity_crosswalks is not None
         else None
@@ -585,7 +701,41 @@ def build_review_item(
         public_release_boundary_hash=event.public_release.proof_hash,
     )
     conflicts = detect_candidate_conflicts(candidate_tuple)
-    blockers = _blockers(proposed_record, candidate_tuple, conflicts)
+    blocker_set = set(_blockers(proposed_record, candidate_tuple, conflicts))
+    source_conflict_assessments: tuple[ConflictAssessment, ...] = ()
+    source_conflict_registry_hash: str | None = None
+    if source_conflicts is not None:
+        (
+            source_conflict_assessments,
+            source_conflict_blockers,
+        ) = _build_source_conflict_snapshot(
+            proposed_record,
+            source_conflicts=source_conflicts,
+            cases=cases,
+            source_registry=source_registry,
+            artifact_manifest=artifact_manifest,
+        )
+        source_conflict_registry_hash = source_conflicts.registry_hash
+        blocker_set.update(source_conflict_blockers)
+
+        for assessment in source_conflict_assessments:
+            if (
+                assessment.state
+                in {
+                    ConflictResolutionState.NO_CONFLICT,
+                    ConflictResolutionState.PREFERRED_VALUE_WITH_CONTRADICTIONS,
+                }
+                and assessment.preferred_value
+                == _record_conflict_value(
+                    proposed_record,
+                    assessment.field_name,
+                )
+            ):
+                blocker_set.discard(
+                    f"CONFLICT:{assessment.field_name}"
+                )
+
+    blockers = tuple(sorted(blocker_set))
 
     body = {
         "schema": 1,
@@ -606,6 +756,11 @@ def build_review_item(
         "conflict_hashes": sorted(
             conflict.proof_hash for conflict in conflicts
         ),
+        "source_conflict_hashes": sorted(
+            assessment.proof_hash
+            for assessment in source_conflict_assessments
+        ),
+        "source_conflict_registry_hash": source_conflict_registry_hash,
         "blockers": sorted(blockers),
         "normalized_row_hash": proposed_record.proof_hash,
         "created_at": created_at,
@@ -623,6 +778,8 @@ def build_review_item(
         temporal=temporal,
         candidates=candidate_tuple,
         conflicts=conflicts,
+        source_conflicts=source_conflict_assessments,
+        source_conflict_registry_hash=source_conflict_registry_hash,
         blockers=blockers,
         normalized_row_hash=proposed_record.proof_hash,
         created_at=created_at,
@@ -643,6 +800,9 @@ def decide_review_item(
     cases: CaseRegistry | None = None,
     entities: EntityResolutionRegistry | None = None,
     entity_crosswalks: CaseEntityCrosswalkRegistry | None = None,
+    source_conflicts: SourceConflictRegistry | None = None,
+    source_registry: SourceRegistry | None = None,
+    artifact_manifest: RawArtifactManifest | None = None,
 ) -> HistoricalReviewDecision:
     item.verify_integrity()
     if decision is ReviewDecision.PENDING:
@@ -676,6 +836,25 @@ def decide_review_item(
             entities=entities,
             entity_crosswalks=entity_crosswalks,
         )
+        if item.source_conflict_registry_hash is None:
+            raise ValueError(
+                "historical research approval requires source-conflict snapshot"
+            )
+        if (
+            source_conflicts is None
+            or source_registry is None
+            or artifact_manifest is None
+        ):
+            raise ValueError(
+                "historical research approval requires current source-conflict registries"
+            )
+        verify_review_source_conflicts(
+            item,
+            source_conflicts=source_conflicts,
+            cases=cases,
+            source_registry=source_registry,
+            artifact_manifest=artifact_manifest,
+        )
 
     eligible = (
         decision is ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH
@@ -685,6 +864,14 @@ def decide_review_item(
         if item.durable_identity is not None
         else None
     )
+    source_conflict_hash = (
+        _source_conflict_snapshot_hash(
+            item.source_conflict_registry_hash,
+            item.source_conflicts,
+        )
+        if item.source_conflict_registry_hash is not None
+        else None
+    )
     body = {
         "schema": 1,
         "scope": _SCOPE,
@@ -692,6 +879,7 @@ def decide_review_item(
         "review_item_hash": item.review_item_hash,
         "normalized_row_hash": item.normalized_row_hash,
         "durable_identity_hash": durable_identity_hash,
+        "source_conflict_hash": source_conflict_hash,
         "decision": decision.value,
         "checks": checks.__dict__,
         "reviewer_id": reviewer_id.strip(),
@@ -705,6 +893,7 @@ def decide_review_item(
         review_item_hash=item.review_item_hash,
         normalized_row_hash=item.normalized_row_hash,
         durable_identity_hash=durable_identity_hash,
+        source_conflict_hash=source_conflict_hash,
         decision=decision,
         checks=checks,
         reviewer_id=reviewer_id.strip(),
@@ -749,6 +938,9 @@ class HistoricalReviewQueue:
         cases: CaseRegistry | None = None,
         entities: EntityResolutionRegistry | None = None,
         entity_crosswalks: CaseEntityCrosswalkRegistry | None = None,
+        source_conflicts: SourceConflictRegistry | None = None,
+        source_registry: SourceRegistry | None = None,
+        artifact_manifest: RawArtifactManifest | None = None,
     ) -> HistoricalReviewDecision:
         try:
             item = self._items[review_id]
@@ -856,6 +1048,32 @@ def render_review_item_markdown(item: ReviewQueueItem) -> str:
         f"- Status locator: `{item.proposed_record.status_ref.locator}`",
         "- Live trading allowed: **no**",
         "",
+        "## Source-priority assessments",
+        "",
+    ]
+    if item.source_conflicts:
+        for assessment in item.source_conflicts:
+            lines.extend([
+                f"### {assessment.field_name}",
+                f"- State: **{assessment.state.value}**",
+                f"- Preferred value: **{assessment.preferred_value}**",
+                (
+                    "- Top authority: **"
+                    f"{assessment.top_authority.value if assessment.top_authority else 'NONE'}**"
+                ),
+                (
+                    "- Preserved contradictions: "
+                    f"**{len(assessment.contradictory_claim_hashes)}**"
+                ),
+                f"- Assessment hash: `{assessment.proof_hash}`",
+                "",
+            ])
+    else:
+        lines.extend([
+            "- No relevant registered source conflicts.",
+            "",
+        ])
+    lines.extend([
         "## Candidate evidence",
         "",
     ]
@@ -915,4 +1133,5 @@ __all__ = [
     "detect_candidate_conflicts",
     "render_review_item_markdown",
     "verify_review_durable_identity",
+    "verify_review_source_conflicts",
 ]
