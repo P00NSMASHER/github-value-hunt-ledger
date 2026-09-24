@@ -19,6 +19,9 @@ from recoveryworks.commercial_operational_invariants import (
     verify_commercial_operational_invariants,
 )
 from recoveryworks.models import canonical_hash, normalize_sha256
+from recoveryworks.recurring_assurance_lifecycle import (
+    RecurringAssuranceLifecycleState,
+)
 
 
 class AdversarialVector(str, Enum):
@@ -324,18 +327,38 @@ def _mutate(
                 "recurring_activation",
                 "readiness_proof_hash",
                 chain["recurring_authorization"].proof_hash,
+                "RECURRING_LIFECYCLE_BINDING",
             ),
             (
                 "recurring_lifecycle",
                 "activation_receipt_proof_hash",
                 chain["recurring_readiness"].proof_hash,
+                "RECURRING_LIFECYCLE_BINDING",
+            ),
+            (
+                "recurring_lifecycle",
+                "state",
+                RecurringAssuranceLifecycleState.DEACTIVATED,
+                "RECURRING_LIFECYCLE_STATE_INTEGRITY",
+            ),
+            (
+                "recurring_lifecycle",
+                "active_until",
+                "2026-10-15T00:00:00Z",
+                "RECURRING_LIFECYCLE_STATE_INTEGRITY",
+            ),
+            (
+                "recurring_lifecycle",
+                "deactivation_receipt_proof_hash",
+                _junk_hash(seed, vector, iteration, "forged-deactivation"),
+                "RECURRING_LIFECYCLE_STATE_INTEGRITY",
             ),
         )
-        key, field, substituted_hash = rng.choice(targets)
-        object.__setattr__(chain[key], field, substituted_hash)
+        key, field, substituted_value, expected = rng.choice(targets)
+        object.__setattr__(chain[key], field, substituted_value)
         return (
             f"skipped lifecycle state by substituting {key}.{field}",
-            ("RECURRING_LIFECYCLE_BINDING",),
+            (expected,),
         )
 
     raise AssertionError(f"unhandled adversarial vector: {vector.value}")
