@@ -20,17 +20,125 @@ from recoveryworks.release_control import (
     write_release_control_artifacts,
 )
 from recoveryworks.private_io import private_permissions_verified
-from recoveryworks.test_production_deployment import (
-    ProductionDeploymentPackagingTests,
-)
+
+
+def production_spec(root: Path, image_ref: str) -> dict:
+    config = root / "config"
+    inputs = root / "inputs"
+    state = root / "private" / "state"
+    reports = root / "private" / "reports"
+    for path in (config, inputs, state, reports):
+        path.mkdir(parents=True, exist_ok=True)
+    if os.name != "nt":
+        state.chmod(0o700)
+        reports.chmod(0o700)
+    (inputs / "focus.csv").write_text(
+        "ProviderName,BillingAccountId,ServiceName,ChargePeriodStart,"
+        "BilledCost,BillingCurrency,ResourceId\n"
+        "Amazon Web Services,acct-1,EC2,2026-08-31T00:00:00Z,"
+        "40.00,USD,i-1\n",
+        encoding="utf-8",
+    )
+    (inputs / "meter.csv").write_text(
+        "Meter_Record_ID,Usage_Units,ResourceId,ServiceName,UsageDate\n"
+        "M-1,10,i-1,EC2,2026-08-31\n",
+        encoding="utf-8",
+    )
+    (inputs / "rates.csv").write_text(
+        "Counterparty,Service_ID,Effective_From,Effective_To,Fixed_Fee,"
+        "Included_Units,Unit_Rate\n"
+        "Amazon Web Services,EC2,2026-01-01,,10.00,0,2.00\n",
+        encoding="utf-8",
+    )
+    pilot = {
+        "schema": 1,
+        "deployment_id": "release-pilot",
+        "client_id": "client-release",
+        "currency": "USD",
+        "provider": "aws",
+        "security": {
+            "cloud_access_mode": "READ_ONLY",
+            "recoveryos_provider_write_credentials": False,
+            "remediation_execution_enabled": False,
+            "external_actions_enabled": False,
+            "private_state_required": True,
+        },
+        "period": {
+            "start": "2026-08-01",
+            "end": "2026-08-31",
+            "exported_at": "2026-09-01T12:00:00Z",
+        },
+        "cletrics": {
+            "focus_csv": str(inputs / "focus.csv"),
+            "meter_csv": str(inputs / "meter.csv"),
+            "release": "release-test",
+            "commit": "a" * 40,
+        },
+        "recoveryos": {
+            "rates_csv": str(inputs / "rates.csv"),
+            "bundle_path": str(state / "bundle.zip"),
+            "ledger_path": str(state / "ledger.json"),
+            "receipt_registry_path": str(state / "receipts.json"),
+            "report_path": str(reports / "assurance.json"),
+        },
+    }
+    import json
+    (config / "pilot.json").write_text(json.dumps(pilot), encoding="utf-8")
+    return {
+        "schema": 1,
+        "pilot_spec": str(config / "pilot.json"),
+        "service": {
+            "image_ref": image_ref,
+            "user": "65532:65532",
+            "command": [
+                "python","-m","recoveryworks.pilot_runner",
+                "--spec","/config/pilot.json",
+                "--base-dir","/workspace",
+            ],
+            "read_only_root_filesystem": True,
+            "privileged": False,
+            "host_network": False,
+            "network_disabled": True,
+            "no_new_privileges": True,
+            "cap_drop_all": True,
+            "provider_write_credentials": False,
+            "remediation_execution_enabled": False,
+            "external_actions_enabled": False,
+        },
+        "volumes": {
+            "config": {
+                "host_path": str(config),
+                "container_path": "/config",
+                "read_only": True,
+                "private_required": False,
+            },
+            "inputs": {
+                "host_path": str(inputs),
+                "container_path": "/inputs",
+                "read_only": True,
+                "private_required": False,
+            },
+            "state": {
+                "host_path": str(state),
+                "container_path": "/state",
+                "read_only": False,
+                "private_required": True,
+            },
+            "reports": {
+                "host_path": str(reports),
+                "container_path": "/reports",
+                "read_only": False,
+                "private_required": True,
+            },
+        },
+    }
 
 
 class ReleaseControlTests(unittest.TestCase):
     def deployment(self, root: Path, image_ref: str):
-        helper = ProductionDeploymentPackagingTests()
-        spec = helper.setup(root)
-        spec["service"]["image_ref"] = image_ref
-        return build_production_deployment_contract(spec, base_dir=root)
+        return build_production_deployment_contract(
+            production_spec(root, image_ref), base_dir=root
+        )
 
     def build_manifest(self, commit: str):
         return build_container_build_manifest(

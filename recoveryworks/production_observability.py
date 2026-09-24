@@ -79,8 +79,7 @@ class ProductionRunEvent:
     ) -> "ProductionRunEvent":
         if type(sequence) is not int or sequence < 1:
             raise ValueError("event sequence must be positive")
-        body = {
-            "schema": 1,
+        fields = {
             "sequence": sequence,
             "run_id": _text("run_id", run_id),
             "occurred_at": normalize_utc_timestamp("occurred_at", occurred_at),
@@ -91,7 +90,10 @@ class ProductionRunEvent:
             "payload": freeze_json(payload, name="event payload"),
             "previous_hash": previous_hash,
         }
-        return cls(**body | {"event_hash": canonical_hash(body)})
+        return cls(
+            **fields,
+            event_hash=canonical_hash({"schema": 1, **fields}),
+        )
 
     def verify(self, previous_hash: str | None) -> None:
         if self.previous_hash != previous_hash:
@@ -586,8 +588,7 @@ class RunHistoryEntry:
         run_manifest_proof_hash: str,
         previous_hash: str | None,
     ) -> "RunHistoryEntry":
-        body = {
-            "schema": 1,
+        fields = {
             "sequence": sequence,
             "recorded_at": normalize_utc_timestamp(
                 "recorded_at", recorded_at
@@ -598,7 +599,10 @@ class RunHistoryEntry:
             ),
             "previous_hash": previous_hash,
         }
-        return cls(**body | {"entry_hash": canonical_hash(body)})
+        return cls(
+            **fields,
+            entry_hash=canonical_hash({"schema": 1, **fields}),
+        )
 
 
 class ProductionRunHistoryStore:

@@ -13,16 +13,71 @@ from recoveryworks.production_observability import (
     write_observability_bundle,
 )
 from recoveryworks.private_io import private_permissions_verified
-from recoveryworks.test_pilot_runner import LocalPilotRunnerTests
 from recoveryworks.pilot_runner import run_local_pilot
+
+
+def pilot_spec(root: Path) -> dict:
+    inputs = root / "inputs"
+    inputs.mkdir()
+    (inputs / "focus.csv").write_text(
+        "ProviderName,BillingAccountId,ServiceName,ChargePeriodStart,"
+        "BilledCost,BillingCurrency,ResourceId\n"
+        "AWS,acct-1,compute,2026-08-31T00:00:00Z,40.00,USD,i-1\n",
+        encoding="utf-8",
+    )
+    (inputs / "meter.csv").write_text(
+        "Meter_Record_ID,Usage_Units,ResourceId,ServiceName,UsageDate\n"
+        "M-1,10,i-1,compute,2026-08-31\n",
+        encoding="utf-8",
+    )
+    (inputs / "rates.csv").write_text(
+        "Counterparty,Service_ID,Effective_From,Effective_To,Fixed_Fee,"
+        "Included_Units,Unit_Rate\n"
+        "AWS,compute,2026-01-01,,10.00,0,2.00\n",
+        encoding="utf-8",
+    )
+    return {
+        "schema": 1,
+        "deployment_id": "obs-pilot",
+        "client_id": "client-1",
+        "currency": "USD",
+        "provider": "aws",
+        "security": {
+            "cloud_access_mode": "READ_ONLY",
+            "recoveryos_provider_write_credentials": False,
+            "remediation_execution_enabled": False,
+            "external_actions_enabled": False,
+            "private_state_required": True,
+        },
+        "period": {
+            "start": "2026-08-01",
+            "end": "2026-08-31",
+            "exported_at": "2026-09-01T01:00:00Z",
+        },
+        "cletrics": {
+            "focus_csv": "inputs/focus.csv",
+            "meter_csv": "inputs/meter.csv",
+            "release": "test",
+            "commit": "a" * 40,
+        },
+        "recoveryos": {
+            "rates_csv": "inputs/rates.csv",
+            "verification": {
+                "charge_source_verified": True,
+                "meter_source_verified": True,
+                "rate_source_verified": True,
+            },
+            "bundle_path": "private/bundle.zip",
+            "ledger_path": "private/ledger.json",
+            "receipt_registry_path": "private/receipts.json",
+            "report_path": "private/pilot-report.json",
+        },
+    }
 
 
 class ProductionObservabilityTests(unittest.TestCase):
     def pilot(self, root: Path):
-        return run_local_pilot(
-            LocalPilotRunnerTests().build_spec(root),
-            base_dir=root,
-        )
+        return run_local_pilot(pilot_spec(root), base_dir=root)
 
     def test_success_bundle_exposes_metrics_events_and_private_history(self):
         with tempfile.TemporaryDirectory() as d:
