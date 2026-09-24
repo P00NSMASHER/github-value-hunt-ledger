@@ -27,13 +27,13 @@ def decision(**overrides):
 def test_ready_buyer_gets_blind_acceptance_offer_and_incumbent_request():
     p=build_packet(ready_input(),decision())
     assert p.selected_offer=="BLIND_FREIGHT_AUDIT_ACCEPTANCE_TEST"
-    assert p.price_band_usd=="$15,000–$25,000 fixed"
+    assert p.price_band_usd=="Custom — confirmed in writing"
     assert any(r.source_type=="incumbent_output" and r.timing=="NOW" for r in p.buyer_data_requests)
 
 def test_conditional_readiness_routes_to_diagnostic_and_drops_blind_only_request():
     p=build_packet(ready_input(invoice_source_coverage=0.80),decision(status="BLOCKED",route="DATA_READINESS_DIAGNOSTIC",blockers=[],conditions=["invoice_source_coverage_below_95pct"]))
     assert p.selected_offer=="DATA_READINESS_DIAGNOSTIC"
-    assert p.price_band_usd=="$5,000–$7,500 fixed"
+    assert p.price_band_usd=="Custom — confirmed in writing"
     assert not any(r.source_type=="incumbent_output" for r in p.buyer_data_requests)
 
 def test_packet_preserves_launch_remediation_actions():
@@ -54,6 +54,9 @@ def test_packet_has_stable_hash_and_buyer_safe_markdown():
     assert "Pilot Activation Packet" in text
     assert "loaded hourly" not in text.lower()
     assert "gross margin" not in text.lower()
+    assert "$5,000" not in text
+    assert "$15,000" not in text
+    assert "Custom — confirmed in writing" in text
 
 def test_later_settlement_is_not_requested_as_immediate_recovery_proof():
     p=build_packet(ready_input(),decision())
