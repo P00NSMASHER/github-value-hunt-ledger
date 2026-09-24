@@ -458,6 +458,7 @@ class EconomicDedupeTests(unittest.TestCase):
         )
         cluster = build_economic_transaction_cluster(
             (left, right),
+            proposals=(proposal,),
             decisions=(decision,),
             trader_entity_id="person:trader",
             issuer_entity_id="issuer:canonical",
@@ -491,6 +492,7 @@ class EconomicDedupeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "transaction hash"):
             build_economic_transaction_cluster(
                 (left, changed_right),
+                proposals=(proposal,),
                 decisions=(decision,),
                 trader_entity_id="person:trader",
                 issuer_entity_id="issuer:canonical",
@@ -511,6 +513,7 @@ class EconomicDedupeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "canonical entity identity mismatch"):
             build_economic_transaction_cluster(
                 (left, right),
+                proposals=(proposal,),
                 decisions=(decision,),
                 trader_entity_id="person:other",
                 issuer_entity_id="issuer:canonical",
@@ -553,7 +556,40 @@ class EconomicDedupeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "complete pairwise"):
             build_economic_transaction_cluster(
                 (left, right, third),
+                proposals=(p1, p2),
                 decisions=decisions,
+                trader_entity_id="person:trader",
+                issuer_entity_id="issuer:canonical",
+            )
+
+
+    def test_cluster_rejects_decision_not_bound_to_reviewed_proposal(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        decision = decide_dedupe(
+            proposal,
+            decision=DedupeDecisionType.SAME_TRANSACTION,
+            reviewer_id="reviewer:1",
+            rationale="Reviewed pair.",
+        )
+
+        different_right = HistoricalTransaction(
+            **{**right.__dict__, "quantity": "2600"}
+        )
+        different_proposal = propose_transaction_dedupe(
+            left, different_right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(different_proposal.relation, DedupeRelation.DISTINCT)
+
+        with self.assertRaisesRegex(ValueError, "exact/possible duplicate"):
+            build_economic_transaction_cluster(
+                (left, right),
+                proposals=(different_proposal,),
+                decisions=(decision,),
                 trader_entity_id="person:trader",
                 issuer_entity_id="issuer:canonical",
             )
