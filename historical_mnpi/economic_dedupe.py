@@ -228,6 +228,42 @@ def _proposal_body(
     }
 
 
+def _make_proposal(
+    left: HistoricalTransaction,
+    right: HistoricalTransaction,
+    *,
+    trader_entity_id: str | None,
+    issuer_entity_id: str | None,
+    relation: DedupeRelation,
+    matching_fields: tuple[str, ...],
+    conflicting_fields: tuple[str, ...],
+    reason_codes: tuple[str, ...],
+) -> DedupeProposal:
+    body = _proposal_body(
+        left,
+        right,
+        trader_entity_id=trader_entity_id,
+        issuer_entity_id=issuer_entity_id,
+        relation=relation,
+        matching_fields=matching_fields,
+        conflicting_fields=conflicting_fields,
+        reason_codes=reason_codes,
+    )
+    return DedupeProposal(
+        left_trade_id=body["left_trade_id"],
+        left_transaction_hash=body["left_transaction_hash"],
+        right_trade_id=body["right_trade_id"],
+        right_transaction_hash=body["right_transaction_hash"],
+        trader_entity_id=trader_entity_id,
+        issuer_entity_id=issuer_entity_id,
+        relation=relation,
+        matching_fields=tuple(sorted(matching_fields)),
+        conflicting_fields=tuple(sorted(conflicting_fields)),
+        reason_codes=tuple(sorted(reason_codes)),
+        proposal_hash=canonical_hash(body),
+    )
+
+
 def propose_transaction_dedupe(
     left: HistoricalTransaction,
     right: HistoricalTransaction,
@@ -265,8 +301,9 @@ def propose_transaction_dedupe(
     except ValueError:
         relation = DedupeRelation.INSUFFICIENT
         reasons.append("IDENTITY_NOT_RESOLVED")
-        body = _proposal_body(
-            left, right,
+        return _make_proposal(
+            left,
+            right,
             trader_entity_id=None,
             issuer_entity_id=None,
             relation=relation,
@@ -274,9 +311,6 @@ def propose_transaction_dedupe(
             conflicting_fields=(),
             reason_codes=tuple(reasons),
         )
-        return DedupeProposal(**{
-            key: value for key, value in body.items() if key != "schema"
-        }, proposal_hash=canonical_hash(body))
 
     if left_trader.entity_id != right_trader.entity_id:
         relation = DedupeRelation.DISTINCT
@@ -314,8 +348,9 @@ def propose_transaction_dedupe(
                 relation = DedupeRelation.INSUFFICIENT
                 reasons.append("NO_SHARED_ECONOMIC_DISCRIMINATOR")
 
-            body = _proposal_body(
-                left, right,
+            return _make_proposal(
+                left,
+                right,
                 trader_entity_id=left_trader.entity_id,
                 issuer_entity_id=left_issuer.entity_id,
                 relation=relation,
@@ -323,12 +358,10 @@ def propose_transaction_dedupe(
                 conflicting_fields=conflicting,
                 reason_codes=tuple(reasons),
             )
-            return DedupeProposal(**{
-                key: value for key, value in body.items() if key != "schema"
-            }, proposal_hash=canonical_hash(body))
 
-    body = _proposal_body(
-        left, right,
+    return _make_proposal(
+        left,
+        right,
         trader_entity_id=(
             left_trader.entity_id
             if left_trader.entity_id == right_trader.entity_id else None
@@ -342,9 +375,6 @@ def propose_transaction_dedupe(
         conflicting_fields=(),
         reason_codes=tuple(reasons),
     )
-    return DedupeProposal(**{
-        key: value for key, value in body.items() if key != "schema"
-    }, proposal_hash=canonical_hash(body))
 
 
 def decide_dedupe(
