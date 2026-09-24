@@ -397,7 +397,7 @@ class HistoricalTransactionTests(unittest.TestCase):
                 artifact_manifest=manifest,
             )
 
-    def test_transaction_source_must_be_linked_to_case(self):
+    def test_transaction_source_sublocator_on_same_retained_artifact_is_valid(self):
         sources, manifest, cases, case, refs = fixture()
         ref = refs[CaseArtifactRole.COMPLAINT]
         altered_ref = SourceArtifactRef(
@@ -420,13 +420,13 @@ class HistoricalTransactionTests(unittest.TestCase):
             status_ref=ref,
             trade_date="2015-08-10",
         )
-        with self.assertRaisesRegex(ValueError, "not linked"):
-            TransactionRegistry().register(
-                transaction,
-                cases=cases,
-                source_registry=sources,
-                artifact_manifest=manifest,
-            )
+        registered = TransactionRegistry().register(
+            transaction,
+            cases=cases,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+        self.assertEqual(registered.source_ref.locator, "page=99")
 
     def test_complaint_cannot_support_found_liable(self):
         sources, manifest, cases, case, refs = fixture()
