@@ -581,3 +581,9 @@ The internal envelope measures end-to-end runtime, billing-row throughput, peak 
 Capacity evidence can now be combined into an explicit matrix across billing-row, provider-count, and tenant-count dimensions. Every matrix cell requires proof hashes from an actual passing measurement/execution; the derived internal operating envelope uses only observed maxima/minima and records extrapolation_used=false and external_sla_claimed=false.
 
 Admission checks compare requested billing rows/providers/tenants against those measured limits. Requests beyond any measured dimension return ADMISSION_REJECTED_CAPACITY before execution and do not trigger automatic scaling.
+
+## Internal production service-level controls (step 30)
+
+Production job control now has an internal SLO/pressure evaluator over planned tenant jobs and the private lease registry. It measures backlog depth, oldest queued-job age, maximum schedule lateness, missed-schedule count, and utilization of the measured capacity envelope.
+
+The evaluator returns HEALTHY, PRESSURE, THROTTLED, or BLOCKED with proof-bound alerts. Over-capacity demand, excessive backlog/age, or missed schedules block new internal-job admission; high measured utilization can throttle admission before overload. It never performs automatic scaling or external actions.
