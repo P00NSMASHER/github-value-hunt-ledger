@@ -44,6 +44,14 @@ def source(source_id: str, raw: bytes, *, url_suffix: str = "a") -> SourceRecord
     )
 
 
+
+def registry_with(*sources: SourceRecord) -> SourceRegistry:
+    registry = SourceRegistry()
+    for item in sources:
+        registry.register(item)
+    return registry
+
+
 class RawArtifactTests(unittest.TestCase):
     def test_retain_exact_bytes_and_read_back(self):
         raw = b"%PDF-1.7\npublic historical complaint bytes\n"
@@ -52,6 +60,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             record = store.retain(
+                registry_with(src),
                 src,
                 raw,
                 media_type="application/pdf",
@@ -98,6 +107,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             first = store.retain(
+                registry_with(src),
                 src,
                 raw,
                 media_type="text/html",
@@ -105,6 +115,7 @@ class RawArtifactTests(unittest.TestCase):
                 stored_at="2026-09-24T09:31:00Z",
             )
             second = store.retain(
+                registry_with(src),
                 src,
                 raw,
                 media_type="text/html",
@@ -121,6 +132,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             record = store.retain(
+                registry_with(src),
                 src,
                 raw,
                 media_type="application/pdf",
@@ -150,6 +162,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             rec_a = store.retain(
+                registry_with(src_a),
                 src_a,
                 raw_a,
                 media_type="application/pdf",
@@ -157,6 +170,7 @@ class RawArtifactTests(unittest.TestCase):
                 stored_at="2026-09-24T09:31:00Z",
             )
             rec_b = store.retain(
+                registry_with(src_b),
                 src_b,
                 raw_b,
                 media_type="application/pdf",
@@ -186,6 +200,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             rec_a = store.retain(
+                registry_with(src_a),
                 src_a,
                 raw_a,
                 media_type="application/pdf",
@@ -209,6 +224,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             rec = store.retain(
+                registry_with(src),
                 src,
                 raw,
                 media_type="application/pdf",
@@ -235,6 +251,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             rec = store.retain(
+                registry_with(src),
                 src,
                 raw,
                 media_type="application/pdf",
@@ -250,8 +267,10 @@ class RawArtifactTests(unittest.TestCase):
 
         ref = SourceArtifactRef(
             source_id=src.source_id,
+            source_proof_hash=src.proof_hash,
             artifact_id=rec.artifact_id,
             artifact_sha256=rec.sha256,
+            artifact_record_proof_hash=rec.proof_hash,
             locator_kind=SourceLocatorKind.TABLE,
             locator="page=17;table=2;row=4",
             excerpt_sha256=H_bytes(b"row 4"),
@@ -264,6 +283,7 @@ class RawArtifactTests(unittest.TestCase):
         src = source("SEC:RAW:011", raw, url_suffix="raw11")
         base = RawArtifactRecord(
             source_id=src.source_id,
+            source_proof_hash=src.proof_hash,
             artifact_id="sha256:" + src.sha256,
             sha256=src.sha256,
             size_bytes=len(raw),
@@ -311,6 +331,7 @@ class RawArtifactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             store = LocalContentAddressedArtifactStore(root)
             rec = store.retain(
+                registry_with(src),
                 src,
                 raw,
                 media_type="application/pdf",
@@ -327,6 +348,106 @@ class RawArtifactTests(unittest.TestCase):
         tampered = replace(manifest, created_by="different-actor")
         with self.assertRaisesRegex(ValueError, "manifest hash mismatch"):
             tampered.verify_integrity()
+
+
+    def test_unregistered_source_cannot_write_raw_bytes(self):
+        raw = b"registered-source-boundary"
+        src = source("SEC:RAW:014", raw, url_suffix="raw14")
+        empty_registry = SourceRegistry()
+
+        with tempfile.TemporaryDirectory() as root:
+            store = LocalContentAddressedArtifactStore(root)
+            with self.assertRaisesRegex(KeyError, "unknown source_id"):
+                store.retain(
+                    empty_registry,
+                    src,
+                    raw,
+                    media_type="application/pdf",
+                    acquired_at="2026-09-24T09:30:00Z",
+                    stored_at="2026-09-24T09:31:00Z",
+                )
+            self.assertEqual(list(Path(root).rglob("*")), [])
+
+    def test_registered_source_proof_mismatch_fails_before_write(self):
+        raw = b"source-proof-boundary"
+        registered = source("SEC:RAW:015", raw, url_suffix="raw15")
+        registry = registry_with(registered)
+        altered = SourceRecord(
+            source_id=registered.source_id,
+            source_type=registered.source_type,
+            admissibility=registered.admissibility,
+            publisher=registered.publisher,
+            title="Different registered metadata",
+            url=registered.url,
+            publication_date=registered.publication_date,
+            sha256=registered.sha256,
+            retrieved_at=registered.retrieved_at,
+            public_release_confirmed=True,
+            case_id=registered.case_id,
+        )
+
+        with tempfile.TemporaryDirectory() as root:
+            store = LocalContentAddressedArtifactStore(root)
+            with self.assertRaisesRegex(ValueError, "registered source proof"):
+                store.retain(
+                    registry,
+                    altered,
+                    raw,
+                    media_type="application/pdf",
+                    acquired_at="2026-09-24T09:30:00Z",
+                    stored_at="2026-09-24T09:31:00Z",
+                )
+
+    def test_reference_pins_source_and_artifact_record_proofs(self):
+        raw = b"proof-pinned-reference"
+        src = source("SEC:RAW:016", raw, url_suffix="raw16")
+        registry = registry_with(src)
+
+        with tempfile.TemporaryDirectory() as root:
+            store = LocalContentAddressedArtifactStore(root)
+            rec = store.retain(
+                registry,
+                src,
+                raw,
+                media_type="application/pdf",
+                acquired_at="2026-09-24T09:30:00Z",
+                stored_at="2026-09-24T09:31:00Z",
+            )
+            manifest = freeze_raw_artifact_manifest(
+                registry,
+                (rec,),
+                created_at="2026-09-24T09:32:00Z",
+                created_by="historical-corpus-ingest",
+            )
+
+        bad_ref = SourceArtifactRef(
+            source_id=src.source_id,
+            source_proof_hash=H_bytes(b"wrong source proof"),
+            artifact_id=rec.artifact_id,
+            artifact_sha256=rec.sha256,
+            artifact_record_proof_hash=rec.proof_hash,
+            locator_kind=SourceLocatorKind.PAGE,
+            locator="page=1",
+        )
+        with self.assertRaisesRegex(ValueError, "not in manifest"):
+            manifest.resolve_ref(bad_ref)
+
+    def test_storage_uri_must_exactly_match_digest(self):
+        raw = b"storage-uri-binding"
+        src = source("SEC:RAW:017", raw, url_suffix="raw17")
+        with self.assertRaisesRegex(ValueError, "exactly match"):
+            RawArtifactRecord(
+                source_id=src.source_id,
+                source_proof_hash=src.proof_hash,
+                artifact_id="sha256:" + src.sha256,
+                sha256=src.sha256,
+                size_bytes=len(raw),
+                media_type="application/pdf",
+                storage_uri="cas://sha256/ff/" + src.sha256,
+                acquired_at="2026-09-24T09:30:00Z",
+                stored_at="2026-09-24T09:31:00Z",
+                immutability=ArtifactImmutability.APPLICATION_ENFORCED_APPEND_ONLY,
+            )
 
 
 if __name__ == "__main__":
