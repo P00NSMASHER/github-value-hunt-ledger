@@ -15,6 +15,10 @@ from recoveryworks.models import (
     normalize_utc_timestamp,
 )
 from recoveryworks.pilot_runner import PilotRunResult
+from recoveryworks.tenant_isolation import (
+    bind_managed_tenant_artifact,
+    find_tenant_registry,
+)
 from recoveryworks.private_io import atomic_private_write, private_file_lock
 
 
