@@ -569,3 +569,9 @@ The worker calls the existing local assurance evaluator/writer, private backup c
 A deterministic production acceptance suite now injects and verifies six failure/recovery scenarios: stale worker lease recovery, corrupted private job-registry state, atomic write failure, cross-tenant path collision, semantic restore after simulated process loss, and isolated multi-provider jobs. The tests exercise the actual lease registry, private atomic writer failure path, tenant registry, backup/restore verifier, and multi-cloud local execution.
 
 A proof-bound acceptance report can only be created when every required scenario has a passing evidence result and records external_actions_performed=false. Corrupted state, partial-write risk, tenant collisions, or failed semantic restore therefore cannot be papered over by the report layer.
+
+## Internal performance/capacity envelope (step 29a)
+
+A deterministic capacity harness now generates exact FOCUS billing rows, matching independent meter rows, and reviewed contract-rate data, then runs them through the real local Cletrics export and RecoveryOS pilot path. Workload source hashes are deterministic across directories/runs for the same row count.
+
+The internal envelope measures end-to-end runtime, billing-row throughput, peak Python traced memory, evidence-bundle ZIP size, validated recovery cents, and state-head creation. A capacity artifact is emitted only when every configured limit/minimum passes and is explicitly labeled INTERNAL_CAPACITY_ENVELOPE_PASSED with external_sla_claimed=false. This is engineering capacity evidence, not a customer SLA or external performance certification.
