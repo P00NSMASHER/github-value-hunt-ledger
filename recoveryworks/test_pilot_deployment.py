@@ -68,6 +68,21 @@ class PilotDeploymentDryRunTests(unittest.TestCase):
             self.assertIn("--dry-run-contract-only", plan.commands[1].argv)
             self.assertEqual(len(plan.proof_hash), 64)
 
+    def test_azure_and_gcp_specs_use_same_read_only_contract(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            for provider in ("azure", "gcp"):
+                spec = self.setup_spec(root)
+                spec["provider"] = provider
+                spec["deployment_id"] = f"{provider}-pilot-001"
+                plan = build_pilot_deployment_plan(spec, base_dir=root)
+                self.assertEqual(plan.provider, provider)
+                self.assertFalse(plan.provisioning_allowed)
+                self.assertIn(
+                    f"{provider.upper()} access declared READ_ONLY",
+                    plan.security_assertions,
+                )
+
     def test_write_credentials_fail_closed(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

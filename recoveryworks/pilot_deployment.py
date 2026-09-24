@@ -1,7 +1,7 @@
 """Dry-run deployment contract for the Cletrics + RecoveryOS pilot.
 
 This is intentionally the first half of deployment work. It validates an
-AWS/read-only pilot layout and emits the deterministic local commands/paths
+supported-provider read-only pilot layout and emits the deterministic local commands/paths
 that a later launcher will execute. It performs no provisioning, network
 access, container startup, cloud mutation, or external action.
 """
@@ -14,6 +14,9 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from recoveryworks.models import canonical_hash, normalize_git_commit_sha
+
+
+_SUPPORTED_PROVIDERS = {"aws", "azure", "gcp"}
 
 
 @dataclass(frozen=True)
@@ -119,8 +122,11 @@ def build_pilot_deployment_plan(
     deployment_id = _text("deployment_id", spec.get("deployment_id"))
     client_id = _text("client_id", spec.get("client_id"))
     provider = _text("provider", spec.get("provider")).lower()
-    if provider != "aws":
-        raise ValueError("first pilot deployment contract currently supports AWS only")
+    if provider not in _SUPPORTED_PROVIDERS:
+        raise ValueError(
+            "pilot deployment provider must be one of: "
+            + ", ".join(sorted(_SUPPORTED_PROVIDERS))
+        )
 
     security = _mapping("security", spec.get("security"))
     access_mode = _text("security.cloud_access_mode", security.get("cloud_access_mode"))
@@ -244,7 +250,7 @@ def build_pilot_deployment_plan(
         ),
     )
     assertions = (
-        "AWS access declared READ_ONLY",
+        f"{provider.upper()} access declared READ_ONLY",
         "RecoveryOS provider write credentials disabled",
         "remediation execution disabled",
         "external recovery actions disabled",

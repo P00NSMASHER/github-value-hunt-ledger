@@ -1,7 +1,7 @@
 """One-command local pilot launcher for Cletrics -> RecoveryOS.
 
 This launcher executes only local file transformations and RecoveryOS
-calculation/reporting. It does not provision infrastructure, call AWS APIs,
+calculation/reporting. It does not provision infrastructure, call provider APIs,
 start cloud remediation, contact counterparties, or perform external actions.
 """
 from __future__ import annotations
@@ -158,6 +158,12 @@ def run_local_pilot(
         period_start=str(period["start"]),
         period_end=str(period["end"]),
     )
+
+    if export_receipt.provider != plan.provider:
+        raise ValueError(
+            "FOCUS provider does not match declared pilot provider: "
+            f"{export_receipt.provider!r} != {plan.provider!r}"
+        )
 
     bundle_path = Path(plan.bundle_path)
     bundle_raw = bundle_path.read_bytes()

@@ -1,4 +1,4 @@
-"""Authorized AWS real-account diagnostic intake and local execution.
+"""Authorized multi-provider real-account diagnostic intake and local execution.
 
 Exact customer-authorized input bytes are hash-checked, preflighted for scope,
 and snapshotted into private storage before RecoveryOS runs. Permission to
@@ -31,6 +31,7 @@ from recoveryworks.private_io import (
 
 _REQUIRED_INPUTS = ("focus_csv", "meter_csv", "rates_csv")
 _OPTIONAL_INPUTS = ("anomaly_csv", "reconciliation_csv", "savings_csv")
+_SUPPORTED_PROVIDERS = {"aws", "azure", "gcp"}
 
 
 def _text(name: str, value: Any) -> str:
@@ -89,8 +90,11 @@ class CustomerDiagnosticAuthorization:
         ):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
         object.__setattr__(self, "provider", self.provider.lower())
-        if self.provider != "aws":
-            raise ValueError("first real-account diagnostic path supports AWS only")
+        if self.provider not in _SUPPORTED_PROVIDERS:
+            raise ValueError(
+                "diagnostic provider must be one of: "
+                + ", ".join(sorted(_SUPPORTED_PROVIDERS))
+            )
         start = _iso_date("period_start", self.period_start)
         end = _iso_date("period_end", self.period_end)
         if end < start:
@@ -164,6 +168,7 @@ class CustomerDiagnosticAuthorization:
 def build_customer_diagnostic_authorization(
     *,
     client_id: str,
+    provider: str = "aws",
     billing_account_id: str,
     customer_actor_id: str,
     period_start: str,
@@ -178,7 +183,7 @@ def build_customer_diagnostic_authorization(
     identity = {
         "schema": 1,
         "client_id": _text("client_id", client_id),
-        "provider": "aws",
+        "provider": _text("provider", provider).lower(),
         "billing_account_id": _text("billing_account_id", billing_account_id),
         "period_start": _iso_date("period_start", period_start),
         "period_end": _iso_date("period_end", period_end),
@@ -200,7 +205,7 @@ def build_customer_diagnostic_authorization(
         authorization_id="cloud-diagnostic-authorization:"
         + canonical_hash(identity),
         client_id=client_id,
-        provider="aws",
+        provider=provider,
         billing_account_id=billing_account_id,
         period_start=period_start,
         period_end=period_end,
@@ -521,7 +526,7 @@ def run_authorized_cloud_diagnostic(
         "deployment_id": f"diagnostic:{_text('diagnostic_id', diagnostic_id)}",
         "client_id": authorization.client_id,
         "currency": currency,
-        "provider": "aws",
+        "provider": authorization.provider,
         "security": {
             "cloud_access_mode": "READ_ONLY",
             "recoveryos_provider_write_credentials": False,

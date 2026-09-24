@@ -385,3 +385,9 @@ When structurally ready, it emits a diagnostic request that materializes directl
 The first operations-console layer is a private read-only snapshot rather than an interactive control surface. It shows diagnostic status, active evidence readiness, supersession holds, recovery lifecycle totals, savings/diagnostic totals, and remediation-plan state.
 
 All mutation controls are explicitly false: the console cannot approve findings, authorize recovery, execute remediation, mutate cloud infrastructure, or perform external actions. JSON and Markdown snapshots are written privately for operational review.
+
+## Azure and GCP shared FOCUS proof contract (planned step 10)
+
+The Cletrics FOCUS exporter, local pilot deployment contract, and authorized diagnostic boundary now accept AWS, Azure, and GCP. The pilot fails closed if the declared provider does not match the provider normalized from the FOCUS bundle.
+
+Azure and GCP use the same RecoveryOS InvoiceCharge, UsageRecord, ContractRate, discount authority, commitment authority/allocation, verification flags, and expected-vs-actual arithmetic as AWS. Provider-specific rehearsals independently prove the base contracted-rate, reviewed discount, and commitment-benefit paths. Each rehearsal also includes an unsupported service that remains NO_CONTRACT_RATE and a savings signal that stays outside recovery dollars.
