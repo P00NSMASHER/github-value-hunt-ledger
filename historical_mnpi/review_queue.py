@@ -671,9 +671,6 @@ def build_review_item(
             cases=cases,
             entities=entities,
             entity_crosswalks=entity_crosswalks,
-            source_conflicts=source_conflicts,
-            source_registry=source_registry,
-            artifact_manifest=artifact_manifest,
         )
         if entities is not None and entity_crosswalks is not None
         else None
