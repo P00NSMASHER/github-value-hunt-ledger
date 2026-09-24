@@ -44,63 +44,80 @@ relationship history.
 
 Status: implemented and merged.
 
-The sixth upgrade inserts a fail-closed authority layer between agent intent and real tool execution:
-typed action classes, explicit permissions, allowlists/denylists, rolling budgets, exact-request
-human approvals, replay protection, per-agent/global kill switches, and SHA-256 audit receipts.
+A fail-closed authority layer sits between agent intent and real tool execution: typed action
+classes, explicit permissions, allowlists/denylists, rolling budgets, exact-request human approvals,
+replay protection, per-agent/global kill switches, and SHA-256 audit receipts.
 
 ## Step 7 — Governed autonomous software factory
 
 Status: implemented and merged.
 
-The seventh upgrade turns approved engineering goals into restart-safe software work with isolated
-attempt workspaces, retries, exact independent-audit binding, machine-enforced Step-6 PR/merge
-authorization, mandatory human-approved production merge, and goal completion only after the
-governed merge is recorded.
+Approved engineering goals become restart-safe software work with isolated attempt workspaces,
+retries, exact independent-audit binding, machine-enforced Step-6 PR/merge authorization, mandatory
+human-approved production merge, and goal completion only after governed merge.
 
 ## Step 8 — Persistent Evidence / Truth Engine
 
+Status: implemented and merged.
+
+Consequential claims are resolved through explicit proof obligations, typed evidence, authority,
+freshness, source independence, contradiction preservation, exact truth receipts, next-best-evidence
+planning, contradiction-aware adjudication, stale-receipt invalidation, and Step-6-governed evidence
+acquisition.
+
+## Step 9 — Evidence-first portfolio capital allocator
+
 Status: implemented on this branch.
 
-The eighth upgrade makes proof structure explicit and persistent:
+The final upgrade turns the system's evidence into transparent resource-prioritization support:
 
-- claims are content-addressed and bound to explicit proof obligations;
-- each obligation defines allowed authorities and may require freshness, multiple sources, and
-  independent source groups;
-- every evidence item binds a source reference and SHA-256 source identity;
-- evidence is classified as usable, stale, or inadmissible rather than collapsed into one bucket;
-- future-dated evidence cannot prove an earlier claim;
-- wrong-authority or explicitly inadmissible evidence remains visible but cannot satisfy an obligation;
-- contradictory admissible evidence is preserved and produces CONTESTED rather than being averaged away;
-- required proof can resolve to PROVEN, CONTESTED, NOT_PROVEN, or UNKNOWN;
-- UNKNOWN means no relevant evidence exists, not that the claim is false;
-- every truth receipt binds the exact claim hash, evaluation time, findings, and evidence-set hash;
-- next-best-evidence planning uses deterministic counterfactual proof gain, not invented success probabilities;
-- contested obligations switch to explicit conflict-resolution planning instead of accumulating more supportive evidence;
-- conflict-resolution actions must target the exact contradictory artifact they intend to adjudicate;
-- hypothetical planning evidence and simulated conflict resolution never mutate the real evidence ledger;
-- duplicate source-independence groups are not treated as independent corroboration;
-- next-evidence recommendations are invalidated when the real evidence set changes;
-- evidence acquisition requests pass through the Step-6 governance layer before any external action;
-- this engine recommends and authorizes evidence acquisition but never bypasses tool permissions or executes external systems itself.
+- initiatives may bind to Step-5 BUSINESS / PRODUCT identities;
+- policies are human-controlled, versioned, immutable, and content-addressed;
+- metric-specific source rules distinguish realized cash, contracted pipeline, qualified pipeline,
+  operational effort, and softer market/strategy signals;
+- fake or weak realized-cash evidence fails closed;
+- future-dated and stale evidence is rejected;
+- a fixed core metric schema prevents cherry-picked evidence coverage;
+- snapshot-date skew is bounded before initiatives may be compared;
+- monetary magnitude is converted into a dimensionless economic index before mixing with effort,
+  timing, and evidence signals;
+- every ranking exposes realized net cash, economic value, economic index, signal bonus, effort
+  penalty, evidence coverage, raw score, and final decision-support score;
+- low-evidence initiatives become OBSERVE_ONLY instead of receiving false precision;
+- negative economics can surface PAUSE_REVIEW;
+- allocation plans support AI units, engineering hours, human hours, and cash;
+- concentration caps prevent one initiative from consuming an unlimited portfolio share;
+- cash allocation remains integer-exact in cents;
+- newer business data or a newer allocation policy invalidates authorization of an old plan;
+- all real resource allocations pass through Step-6 governance;
+- cash allocation is MONEY_MOVEMENT and therefore remains behind mandatory human approval;
+- kill switches override allocation authority;
+- exact plan/ranking/resource hashes prevent approval replay or substitution;
+- the allocator proposes decisions but never directly moves money or commits resources.
 
-The first eight upgrades establish:
+## Full stack
 
 ```
-durable work
-   ↓
-independent completion verification
-   ↓
-controlled self-improvement
-   ↓
-evidence-weighted organizational memory
-   ↓
-provenance-preserving relationship reasoning
-   ↓
-bounded operational authority
-   ↓
-governed autonomous software delivery
-   ↓
-explicit proof obligations and truth-state reasoning
+persistent workers
+      ↓
+independent acceptance
+      ↓
+verifier-gated learning
+      ↓
+value-weighted memory
+      ↓
+provenance knowledge graph
+      ↓
+runtime governance
+      ↓
+autonomous software factory
+      ↓
+truth / proof engine
+      ↓
+portfolio capital allocator
+      ↓
+measured outcomes
+      └──────────────→ memory + graph + learning loop
 ```
 
 ### Run all AI Business OS tests
@@ -109,10 +126,10 @@ explicit proof obligations and truth-state reasoning
 python -m unittest discover -s ai_business_os -p "test_*.py"
 ```
 
-### Design rules
+### System design rules
 
 Memory is evidence, not authority. Completion is not self-asserted. Learning is not deployment.
 Graph connectivity is not proof. Operational power is granted per action under explicit policy,
 budget, approval, and kill-switch controls. Software automation may prepare and verify work, but
-production authority remains separate. A model's confidence is never proof; consequential claims
-must resolve through explicit evidence obligations.
+production authority remains separate. Model confidence is never proof. Portfolio scores are
+decision support, not predictions or guaranteed returns. Consequential action remains governed.
