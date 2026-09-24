@@ -1,8 +1,8 @@
 """Source-priority and contradiction-preservation policy.
 
-Step 10.1 models conflicting historical public-source claims without overwriting
-lower-priority evidence. A preferred value is advisory for later normalization,
-not a deletion or mutation of contradictory claims.
+Step 10 models conflicting historical public-source claims without overwriting
+lower-priority evidence. Preferred values are bound into the human-review gate;
+they never delete or mutate contradictory claims.
 
 Priority is factual-status aware:
 - court-established / convicted / found-liable / admitted facts;
