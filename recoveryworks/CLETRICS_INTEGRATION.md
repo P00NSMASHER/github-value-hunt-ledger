@@ -307,3 +307,19 @@ future pilot runner plus private bundle/ledger/receipt/report paths. It does not
 start containers, provision infrastructure, contact AWS, run external recovery
 actions, or mutate cloud resources. Those execution/startup pieces are the
 remaining half of step 5 and stay behind the next approval gate.
+
+## Local one-command pilot launcher (step 5b)
+
+The local pilot is now runnable with one command:
+
+`python -m recoveryworks.pilot_runner --spec pilot.json --base-dir .`
+
+The launcher revalidates the step-5a deployment contract, exports the Cletrics
+FOCUS + independent-meter bundle, re-seals that ZIP under verified private
+permissions, runs continuous RecoveryOS ingestion, and writes private ledger,
+receipt-registry, and report JSON files.
+
+Verification remains explicit in `recoveryos.verification`; the launcher never
+promotes rates, invoice rows, or meter rows to verified simply because the
+pipeline ran. It also forces cloud remediation disabled and performs no AWS API
+calls, provisioning, external recovery actions, or cloud mutations.
