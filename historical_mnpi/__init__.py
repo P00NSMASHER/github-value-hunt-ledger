@@ -88,6 +88,19 @@ from .review_queue import (
     detect_candidate_conflicts,
     render_review_item_markdown,
     verify_review_durable_identity,
+    verify_review_source_conflicts,
+)
+
+from .source_conflicts import (
+    AssessedClaim,
+    ClaimAuthority,
+    ConflictAssessment,
+    ConflictResolutionState,
+    SourceConflictClaim,
+    SourceConflictRegistry,
+    assess_conflicting_claims,
+    claim_authority,
+    verify_conflict_claim,
 )
 
 from .source_registry import (
@@ -100,6 +113,15 @@ from .source_registry import (
 )
 
 __all__ = [
+    "AssessedClaim",
+    "ClaimAuthority",
+    "ConflictAssessment",
+    "ConflictResolutionState",
+    "SourceConflictClaim",
+    "SourceConflictRegistry",
+    "assess_conflicting_claims",
+    "claim_authority",
+    "verify_conflict_claim",
     "CaseEntityCrosswalk",
     "CaseEntityCrosswalkRegistry",
     "EntityKind",
@@ -128,6 +150,7 @@ __all__ = [
     "detect_candidate_conflicts",
     "render_review_item_markdown",
     "verify_review_durable_identity",
+    "verify_review_source_conflicts",
     "CandidateField",
     "CandidateFieldStatus",
     "CandidateKind",
