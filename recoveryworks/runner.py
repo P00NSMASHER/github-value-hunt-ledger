@@ -50,6 +50,14 @@ from .branches.contract_billing_csv import (
     load_usage_csv,
 )
 from .branches.cloud import audit_cloud_billing
+from .branches.cloud_signals import CloudSignal
+from .branches.cloud_discount import audit_cloud_discount_billing
+from .branches.cloud_discount_csv import load_cloud_discount_authorities_csv
+from .branches.cloud_commitment import audit_cloud_commitment_billing
+from .branches.cloud_commitment_csv import (
+    load_cloud_commitment_authorities_csv,
+    load_cloud_commitment_allocations_csv,
+)
 from .branches.cloud_csv import load_cloud_meter_csv
 from .integrations.cletrics import load_cletrics_bundle
 from .branches.merchant_fee import audit_merchant_fees
@@ -123,6 +131,7 @@ class Scan360RunResult:
     state_head_hash: str | None
     exceptions: tuple[dict[str, Any], ...]
     report: RecoveryScan360Report
+    cloud_signals: tuple[CloudSignal, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -131,6 +140,7 @@ class Scan360RunResult:
             "state_head_hash": self.state_head_hash,
             "exceptions": [dict(item) for item in self.exceptions],
             "report": self.report.as_dict(),
+            "cloud_signals": [signal.as_dict() for signal in self.cloud_signals],
         }
 
 
@@ -160,7 +170,15 @@ def run_scan360_config(
     before_ids = {record.finding.finding_id for record in ledger.records()}
     added_ids: list[str] = []
     exceptions: list[dict[str, Any]] = []
+    cloud_signal_index: dict[str, CloudSignal] = {}
     engine = RecoveryEngine()
+
+    def add_cloud_signals(signals: tuple[CloudSignal, ...]) -> None:
+        for signal in signals:
+            previous = cloud_signal_index.get(signal.signal_id)
+            if previous is not None and previous.proof_hash != signal.proof_hash:
+                raise ValueError(f"conflicting cloud signal_id: {signal.signal_id}")
+            cloud_signal_index[signal.signal_id] = signal
 
     for job_index, job in enumerate(_jobs(config.get("freight"), name="freight")):
         truth_path = job.get("truth_manifest_json")
@@ -541,6 +559,7 @@ def run_scan360_config(
                 )
             charges = imported.charges
             usage = imported.usage
+            add_cloud_signals(imported.signals)
         else:
             charges = load_invoice_charges_csv(
                 _resolve(
@@ -596,6 +615,167 @@ def run_scan360_config(
         for issue in batch.exceptions:
             exceptions.append({
                 "branch": "cloud",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(
+        _jobs(config.get("cloud_discount"), name="cloud_discount")
+    ):
+        imported = load_cletrics_bundle(
+            _resolve(
+                base,
+                job.get("cletrics_bundle"),
+                name=f"cloud_discount[{job_index}].cletrics_bundle",
+            ),
+            charge_source_verified=_bool_setting(
+                job,
+                "charge_source_verified",
+                context=f"cloud_discount[{job_index}]",
+            ),
+            meter_source_verified=_bool_setting(
+                job,
+                "meter_source_verified",
+                context=f"cloud_discount[{job_index}]",
+            ),
+        )
+        if imported.client_id != client_id or imported.currency != currency:
+            raise ValueError(
+                f"cloud_discount[{job_index}] Cletrics scope does not match Scan 360"
+            )
+        add_cloud_signals(imported.signals)
+        rates = load_contract_rates_csv(
+            _resolve(
+                base,
+                job.get("rates_csv"),
+                name=f"cloud_discount[{job_index}].rates_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "rate_source_verified",
+                context=f"cloud_discount[{job_index}]",
+            ),
+        )
+        discounts = load_cloud_discount_authorities_csv(
+            _resolve(
+                base,
+                job.get("discounts_csv"),
+                name=f"cloud_discount[{job_index}].discounts_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "discount_source_verified",
+                context=f"cloud_discount[{job_index}]",
+            ),
+        )
+        batch = audit_cloud_discount_billing(
+            client_id=client_id,
+            charges=imported.charges,
+            rates=rates,
+            discounts=discounts,
+            usage=imported.usage,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "cloud",
+                "mode": "discount",
+                "job_index": job_index,
+                "reference": issue.reference,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    for job_index, job in enumerate(
+        _jobs(config.get("cloud_commitment"), name="cloud_commitment")
+    ):
+        imported = load_cletrics_bundle(
+            _resolve(
+                base,
+                job.get("cletrics_bundle"),
+                name=f"cloud_commitment[{job_index}].cletrics_bundle",
+            ),
+            charge_source_verified=_bool_setting(
+                job,
+                "charge_source_verified",
+                context=f"cloud_commitment[{job_index}]",
+            ),
+            meter_source_verified=_bool_setting(
+                job,
+                "meter_source_verified",
+                context=f"cloud_commitment[{job_index}]",
+            ),
+        )
+        if imported.client_id != client_id or imported.currency != currency:
+            raise ValueError(
+                f"cloud_commitment[{job_index}] Cletrics scope does not match Scan 360"
+            )
+        add_cloud_signals(imported.signals)
+        rates = load_contract_rates_csv(
+            _resolve(
+                base,
+                job.get("rates_csv"),
+                name=f"cloud_commitment[{job_index}].rates_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "rate_source_verified",
+                context=f"cloud_commitment[{job_index}]",
+            ),
+        )
+        commitments = load_cloud_commitment_authorities_csv(
+            _resolve(
+                base,
+                job.get("commitments_csv"),
+                name=f"cloud_commitment[{job_index}].commitments_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "commitment_source_verified",
+                context=f"cloud_commitment[{job_index}]",
+            ),
+        )
+        allocations = load_cloud_commitment_allocations_csv(
+            _resolve(
+                base,
+                job.get("allocations_csv"),
+                name=f"cloud_commitment[{job_index}].allocations_csv",
+            ),
+            verified=_bool_setting(
+                job,
+                "allocation_source_verified",
+                context=f"cloud_commitment[{job_index}]",
+            ),
+        )
+        batch = audit_cloud_commitment_billing(
+            client_id=client_id,
+            charges=imported.charges,
+            rates=rates,
+            commitments=commitments,
+            allocations=allocations,
+            usage=imported.usage,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "cloud",
+                "mode": "commitment",
                 "job_index": job_index,
                 "reference": issue.reference,
                 "code": issue.code,
@@ -1299,4 +1479,5 @@ def run_scan360_config(
         state_head_hash=head,
         exceptions=tuple(exceptions),
         report=report,
+        cloud_signals=tuple(cloud_signal_index[key] for key in sorted(cloud_signal_index)),
     )
