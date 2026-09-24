@@ -663,3 +663,9 @@ The monthly assurance amount is displayed only as a separately tracked option an
 An unissued billing draft can now be converted into a short-lived credential-free handoff for a named separate billing issuer. The handoff freezes the exact agreement/readiness/draft proofs, line-item proofs, total, currency, and agreed due date while keeping RecoveryWorks unable to issue, send, collect, or embed payment instructions.
 
 Payment due becomes verified only after a separately sourced external billing receipt proves the exact handoff was issued and delivered to the buyer inside the authorization window with the same line items/total/currency/due date. The resulting state is ISSUED_INVOICE_VERIFIED and remains unpaid. RecoveryWorks still performs no invoice sending or payment collection.
+
+## Independent payment settlement reconciliation (step 38)
+
+Issued-invoice payment state now requires separately verified external cash-settlement evidence; an invoice/billing provider's own paid flag is explicitly insufficient. Settlement receipts bind the exact issued invoice/buyer/currency, external settlement reference, observed time, gross amount, merchant fee, net cash, invoice-applied amount, and independent source evidence.
+
+Reconciliation supports partial payments, duplicate-settlement rejection, exact invoice over-allocation prevention, and externally observed reversals/chargebacks that reopen a previously paid balance. Invoice state is UNPAID, PARTIALLY_PAID, or PAID solely from the net applied settlement events. RecoveryWorks does not collect payment and provider_accounting_only receipts fail closed.
