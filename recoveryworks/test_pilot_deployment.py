@@ -11,7 +11,7 @@ from recoveryworks.pilot_deployment import build_pilot_deployment_plan
 class PilotDeploymentDryRunTests(unittest.TestCase):
     def setup_spec(self, root: Path) -> dict:
         inputs = root / "inputs"
-        inputs.mkdir()
+        inputs.mkdir(exist_ok=True)
         for name in (
             "focus.csv",
             "meter.csv",

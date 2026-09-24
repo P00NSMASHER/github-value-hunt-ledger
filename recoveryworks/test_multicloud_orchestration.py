@@ -13,7 +13,7 @@ from recoveryworks.private_io import private_permissions_verified
 
 def provider_job(root: Path, provider: str) -> dict:
     inputs = root / f"inputs-{provider}"
-    inputs.mkdir()
+    inputs.mkdir(exist_ok=True)
     for name in ("focus.csv", "meter.csv", "rates.csv"):
         (inputs / name).write_text("header\n", encoding="utf-8")
     private = root / "private" / provider
