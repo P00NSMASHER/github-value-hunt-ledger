@@ -50,29 +50,38 @@ human approvals, replay protection, per-agent/global kill switches, and SHA-256 
 
 ## Step 7 — Governed autonomous software factory
 
+Status: implemented and merged.
+
+The seventh upgrade turns approved engineering goals into restart-safe software work with isolated
+attempt workspaces, retries, exact independent-audit binding, machine-enforced Step-6 PR/merge
+authorization, mandatory human-approved production merge, and goal completion only after the
+governed merge is recorded.
+
+## Step 8 — Persistent Evidence / Truth Engine
+
 Status: implemented on this branch.
 
-The seventh upgrade turns approved engineering goals into restart-safe software work:
+The eighth upgrade makes proof structure explicit and persistent:
 
-- each work item is bound to an existing Step-2 acceptance contract;
-- only the contract-bound executor can claim the work;
-- every attempt gets a unique isolated workspace and attempt branch;
-- implementation workers use leases and stale RUNNING attempts can be reclaimed after restart;
-- executor leases stop governing the job once independent audit begins;
-- submissions bind repository, issue, workspace, branch, attempt, commit, tests, and artifacts;
-- READY_FOR_PR requires an independent APPROVED audit of the exact current submission;
-- rejected audits retry in fresh workspaces until the retry limit, then fail closed to BLOCKED;
-- PR creation requires an exact persisted Step-6 EXTERNAL_WRITE authorization;
-- the PR authorization must match work item, repository, branch, base, title, submission hash, and
-  audit hash;
-- governance authorizations are single-use at the factory boundary;
-- merge requires a separate Step-6 PRODUCTION_CHANGE authorization bound to exact PR, head SHA,
-  merge method, and audit hash;
-- production merge therefore remains behind mandatory human approval and active kill switches;
-- the engineering goal becomes COMPLETE only after the governed merge is recorded;
-- lifecycle transitions are retained as content-addressed audit events.
+- claims are content-addressed and bound to explicit proof obligations;
+- each obligation defines allowed authorities and may require freshness, multiple sources, and
+  independent source groups;
+- every evidence item binds a source reference and SHA-256 source identity;
+- evidence is classified as usable, stale, or inadmissible rather than collapsed into one bucket;
+- future-dated evidence cannot prove an earlier claim;
+- wrong-authority or explicitly inadmissible evidence remains visible but cannot satisfy an obligation;
+- contradictory admissible evidence is preserved and produces CONTESTED rather than being averaged away;
+- required proof can resolve to PROVEN, CONTESTED, NOT_PROVEN, or UNKNOWN;
+- UNKNOWN means no relevant evidence exists, not that the claim is false;
+- every truth receipt binds the exact claim hash, evaluation time, findings, and evidence-set hash;
+- next-best-evidence planning uses deterministic counterfactual proof gain, not invented success probabilities;
+- hypothetical planning evidence is never inserted into the real evidence ledger;
+- duplicate source-independence groups are not treated as independent corroboration;
+- next-evidence recommendations are invalidated when the real evidence set changes;
+- evidence acquisition requests pass through the Step-6 governance layer before any external action;
+- this engine recommends and authorizes evidence acquisition but never bypasses tool permissions or executes external systems itself.
 
-The first seven upgrades establish:
+The first eight upgrades establish:
 
 ```
 durable work
@@ -88,6 +97,8 @@ provenance-preserving relationship reasoning
 bounded operational authority
    ↓
 governed autonomous software delivery
+   ↓
+explicit proof obligations and truth-state reasoning
 ```
 
 ### Run all AI Business OS tests
@@ -101,4 +112,5 @@ python -m unittest discover -s ai_business_os -p "test_*.py"
 Memory is evidence, not authority. Completion is not self-asserted. Learning is not deployment.
 Graph connectivity is not proof. Operational power is granted per action under explicit policy,
 budget, approval, and kill-switch controls. Software automation may prepare and verify work, but
-production authority remains a separate governed decision.
+production authority remains separate. A model's confidence is never proof; consequential claims
+must resolve through explicit evidence obligations.
