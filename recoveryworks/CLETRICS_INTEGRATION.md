@@ -96,3 +96,51 @@ The manifest client_id and currency must exactly match the surrounding Scan 360 
 ## Deliberately deferred
 
 CloudSignal/anomaly ingestion, contract-discount authority, commitment allocation, continuous bundle ingestion, separate recovery-vs-savings dashboards, and remediation remain later phases. None is silently approximated here.
+
+
+## Phase 2: signals, discounts, and commitments
+
+Phase 2 adds steps 7-12 without weakening the Phase-1 proof boundary.
+
+### Non-money signal roles
+
+Two optional manifest roles are supported: anomaly_signals and reconciliation_signals.
+
+Anomaly normalized columns:
+
+    Signal_ID,Detected_At,Provider,Account_ID,Service_ID,Resource_ID,Region,
+    Severity,Detection_Method,Metric_Name,Z_Score,Baseline_Value,Actual_Value,
+    Estimated_Cost_Impact,Confidence
+
+Reconciliation normalized columns:
+
+    Signal_ID,Detected_At,Provider,Account_ID,Service_ID,SKU_Key,
+    Estimated_Cost,Actual_Cost,Error_Pct,Drift_Direction
+
+These rows become immutable CloudSignal objects. estimated_impact_cents is explicitly non-authoritative. CloudSignal has no conversion path to RecoveryObservation, and Scan 360 returns signals separately from Recovery Ledger/report totals.
+
+### Reviewed contract discount mode
+
+The cloud_discount Scan 360 section requires a Cletrics bundle, reviewed base rates, and reviewed discount authority.
+
+Discount authority CSV columns:
+
+    Counterparty,Account_ID,Service_ID,Effective_From,Effective_To,
+    Discount_BPS,Applies_To
+
+Applies_To is VARIABLE or ALL. A validated discount finding requires the base rate, discount authority, invoice, and load-bearing usage to be verified. Missing or overlapping authority fails closed.
+
+### Reviewed commitment-benefit mode
+
+The cloud_commitment Scan 360 section requires a Cletrics bundle, reviewed base/on-demand rates, reviewed commitment rates, and independently reviewed per-charge allocations.
+
+Commitment authority CSV:
+
+    Counterparty,Account_ID,Service_ID,Effective_From,Effective_To,
+    Commitment_Type,Committed_Unit_Rate
+
+Allocation CSV:
+
+    Charge_ID,Allocation_ID,Entitled_Units
+
+Only min(billable units, independently evidenced entitled units) receives the committed rate. Unused entitlement is recorded as context and is never counted as recoverable money. A committed rate above the reviewed base rate fails closed.
