@@ -234,3 +234,32 @@ verification of the underlying PDF.
 The hacked-earnings adapter explicitly marks its output as academic
 reconstruction, retains the source's timezone ambiguity, and warns that
 `TimeOfFirstTrade` is not complete trade economics.
+
+
+## Step 8 — deterministic human review queue
+
+Parser candidates still do not become corpus truth automatically.
+
+The review queue assembles one human-readable, content-addressed artifact containing:
+
+- canonical case, trader and issuer identities;
+- information-event identity and public-release boundary hash;
+- proposed normalized historical row hash;
+- explicit legal/factual status;
+- source locator and raw public excerpt;
+- extractor ID/version;
+- parsed values with field-level parse state;
+- conflicts and deterministic blockers.
+
+Conflicting candidate values, ambiguous fields, unverified PDF text layers,
+unsupported academic status promotion, and timezone ambiguity for exact timestamps
+produce blockers.
+
+A reviewer may mark an item `APPROVED_FOR_HISTORICAL_RESEARCH`,
+`REJECTED`, or `NEEDS_CORROBORATION`. Approval is hash-bound to the exact
+review artifact and is permitted only when no blocker remains.
+
+Both review items and review decisions hard-code
+`HISTORICAL_RESEARCH_COMPLIANCE_ONLY` scope and
+`live_trading_allowed=false`. This review gate does not authorize live trading,
+orders, or operational use.
