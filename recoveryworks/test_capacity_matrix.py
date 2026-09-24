@@ -3,6 +3,7 @@ import unittest
 from recoveryworks.capacity_matrix import (
     CapacityDimension, build_conservative_operating_envelope,
     enforce_operating_envelope, measured_capacity_cell,
+    measure_capacity_matrix,
 )
 
 class CapacityMatrixTests(unittest.TestCase):
@@ -64,6 +65,39 @@ class CapacityMatrixTests(unittest.TestCase):
         self.assertFalse(decision["admitted"])
         self.assertEqual(decision["state"],"ADMISSION_REJECTED_CAPACITY")
         self.assertEqual(decision["exceeded_dimensions"],["billing_rows"])
+
+    def test_real_multi_axis_matrix_runner_uses_actual_pilots(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as d:
+            matrix = measure_capacity_matrix(
+                Path(d),
+                row_counts=(2, 3),
+                provider_counts=(1, 2),
+                tenant_counts=(1, 2),
+                evidence_row_counts=(2, 4),
+                rows_per_provider=2,
+                rows_per_tenant=2,
+            )
+            self.assertEqual(
+                matrix.as_dict()["state"],
+                "MEASURED_MULTI_AXIS_CAPACITY_MATRIX",
+            )
+            self.assertEqual(
+                {cell.dimension for cell in matrix.cells},
+                set(CapacityDimension),
+            )
+            self.assertFalse(matrix.extrapolation_used)
+            self.assertFalse(matrix.external_sla_claimed)
+            self.assertGreaterEqual(
+                matrix.operating_envelope.max_measured_provider_count, 2
+            )
+            self.assertGreaterEqual(
+                matrix.operating_envelope.max_measured_tenant_count, 2
+            )
+            self.assertGreater(
+                matrix.operating_envelope.max_measured_evidence_bytes, 0
+            )
 
     def test_matrix_requires_every_measured_dimension(self):
         cell=measured_capacity_cell(

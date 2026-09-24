@@ -599,3 +599,7 @@ The rehearsal also emits a private customer-safe diligence index plus an operato
 The measured capacity matrix now requires an explicit EVIDENCE_BYTES dimension in addition to billing rows, provider count, and tenant count. The conservative envelope records the maximum measured evidence bytes separately from the generated bundle size, and admission/service-level utilization accounts for evidence volume as a fourth capacity axis. Requests beyond the measured evidence-size limit fail with ADMISSION_REJECTED_CAPACITY before work begins.
 
 Internal service-level snapshots now have private JSON/Markdown reporting with queue depth, job age, lateness, missed schedules, measured capacity utilization, throttle state, and alert details. The report explicitly identifies itself as an internal engineering control, not a customer SLA, and does not enable autonomous external actions.
+
+### Real multi-axis capacity runner
+
+The capacity matrix now has an executable measured runner rather than only accepting preconstructed matrix cells. It performs real local RecoveryWorks pilots for multiple billing-row counts, AWS/Azure/GCP provider counts, isolated tenant counts, and evidence-size scenarios; each cell records measured runtime, traced peak memory, aggregate evidence/bundle bytes, throughput, and exact pilot deployment proof hashes. The conservative operating envelope is derived only from those observed cells, with measured_only=true, extrapolation_used=false, and external_sla_claimed=false.
