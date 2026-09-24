@@ -6,7 +6,7 @@
   <meta name="description" content="Find out whether freight money may be recoverable with a $0-upfront audit. Freight Recovery earns a fee only from funds successfully recovered under an authorized engagement.">
   <meta name="theme-color" content="#071426">
   <meta name="freight-contact-email" content="">
-  <meta name="site-release" content="free-audit-contingency-v1">
+  <meta name="site-release" content="free-audit-contingency-v3">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
   <title>Freight Recovery | Free Audit. Pay Only on Recovered Funds.</title>
@@ -19,16 +19,20 @@
   <meta property="og:image" content="https://p00nsmasher.github.io/github-value-hunt-ledger/assets/images/terminal-blue-hour.webp">
   <meta property="og:image:alt" content="Freight terminal at blue hour">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Find freight money you may be owed. Free.">
+  <meta name="twitter:description" content="$0 upfront audit. Freight Recovery earns a fee only from eligible funds actually recovered under an authorized engagement.">
+  <meta name="twitter:image" content="https://p00nsmasher.github.io/github-value-hunt-ledger/assets/images/terminal-blue-hour.webp">
+  <meta name="twitter:image:alt" content="Freight terminal at blue hour">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="site.webmanifest">
   <link rel="preload" href="assets/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" as="image" href="assets/images/terminal-blue-hour.webp" imagesrcset="assets/images/terminal-blue-hour-800.webp 800w, assets/images/terminal-blue-hour.webp 1586w" imagesizes="100vw" fetchpriority="high">
-  <link rel="stylesheet" href="site.css?v=free-audit-contingency-v2">
-  <script src="commercial-config.js?v=free-audit-contingency-v2" defer></script>
-  <script src="site.js?v=free-audit-contingency-v2" defer></script>
+  <link rel="stylesheet" href="site.css?v=free-audit-contingency-v3">
+  <script src="commercial-config.js?v=free-audit-contingency-v3" defer></script>
+  <script src="site.js?v=free-audit-contingency-v3" defer></script>
 </head>
-<body>
+<body itemscope itemtype="https://schema.org/WebPage">
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="site-header">
@@ -51,7 +55,11 @@
   </div>
 </header>
 
-<main id="main">
+<main id="main" itemprop="mainEntity" itemscope itemtype="https://schema.org/Service">
+  <meta itemprop="name" content="Freight Recovery">
+  <meta itemprop="serviceType" content="Freight recovery audit and recovery service">
+  <meta itemprop="description" content="A $0-upfront freight recovery audit followed, when authorized, by success-based recovery priced as an agreed share of eligible funds actually recovered.">
+  <meta itemprop="url" content="https://p00nsmasher.github.io/github-value-hunt-ledger/">
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-media" aria-hidden="true">
       <img src="assets/images/terminal-blue-hour.webp"
@@ -242,9 +250,12 @@
     <div class="wrap">
       <div class="section-heading pricing-heading"><div><p class="eyebrow"><span></span> Aligned pricing</p><h2 id="pricing-title">We do well when recovery succeeds.</h2></div><p>The flagship path has no upfront audit charge and no recovery fee merely because an opportunity was estimated, flagged, or approved.</p></div>
       <div class="pricing-grid">
-        <article class="price-card price-card-primary">
+        <article class="price-card price-card-primary" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
           <div class="price-label">Flagship entry point</div>
           <h3>Free Recovery Audit</h3>
+          <meta itemprop="name" content="Free Recovery Audit">
+          <meta itemprop="priceCurrency" content="USD">
+          <meta itemprop="price" content="0">
           <p class="price"><strong>$0</strong><span>upfront audit fee</span></p>
           <ul class="included-list"><li>Initial freight data analysis</li><li>Recovery opportunity identification</li><li>Concise opportunity summary</li><li>No obligation to proceed</li></ul>
           <a class="button button-cobalt button-block" href="#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit</a>
