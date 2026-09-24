@@ -73,7 +73,11 @@ class DedupeProposal:
 class DedupeDecision:
     proposal_hash: str
     left_trade_id: str
+    left_transaction_hash: str
     right_trade_id: str
+    right_transaction_hash: str
+    trader_entity_id: str | None
+    issuer_entity_id: str | None
     decision: DedupeDecisionType
     reviewer_id: str
     rationale: str
@@ -84,7 +88,11 @@ class DedupeDecision:
             "schema": 1,
             "proposal_hash": self.proposal_hash,
             "left_trade_id": self.left_trade_id,
+            "left_transaction_hash": self.left_transaction_hash,
             "right_trade_id": self.right_trade_id,
+            "right_transaction_hash": self.right_transaction_hash,
+            "trader_entity_id": self.trader_entity_id,
+            "issuer_entity_id": self.issuer_entity_id,
             "decision": self.decision.value,
             "reviewer_id": self.reviewer_id,
             "rationale": self.rationale,
@@ -398,7 +406,11 @@ def decide_dedupe(
         "schema": 1,
         "proposal_hash": proposal.proposal_hash,
         "left_trade_id": proposal.left_trade_id,
+        "left_transaction_hash": proposal.left_transaction_hash,
         "right_trade_id": proposal.right_trade_id,
+        "right_transaction_hash": proposal.right_transaction_hash,
+        "trader_entity_id": proposal.trader_entity_id,
+        "issuer_entity_id": proposal.issuer_entity_id,
         "decision": decision.value,
         "reviewer_id": reviewer_id.strip(),
         "rationale": rationale.strip(),
@@ -406,7 +418,11 @@ def decide_dedupe(
     return DedupeDecision(
         proposal_hash=proposal.proposal_hash,
         left_trade_id=proposal.left_trade_id,
+        left_transaction_hash=proposal.left_transaction_hash,
         right_trade_id=proposal.right_trade_id,
+        right_transaction_hash=proposal.right_transaction_hash,
+        trader_entity_id=proposal.trader_entity_id,
+        issuer_entity_id=proposal.issuer_entity_id,
         decision=decision,
         reviewer_id=reviewer_id.strip(),
         rationale=rationale.strip(),
@@ -427,9 +443,31 @@ def build_economic_transaction_cluster(
     if len({tx.trade_id for tx in txs}) != len(txs):
         raise ValueError("duplicate trade_id in economic cluster")
 
+    tx_by_id = {tx.trade_id: tx for tx in txs}
     decision_map = {}
     for decision in decisions:
         decision.verify_integrity()
+        if (
+            decision.left_trade_id not in tx_by_id
+            or decision.right_trade_id not in tx_by_id
+        ):
+            raise ValueError("dedupe decision references trade outside cluster")
+        if (
+            decision.left_transaction_hash
+            != tx_by_id[decision.left_trade_id].proof_hash
+            or decision.right_transaction_hash
+            != tx_by_id[decision.right_trade_id].proof_hash
+        ):
+            raise ValueError(
+                "dedupe decision transaction hash does not match current cluster row"
+            )
+        if (
+            decision.trader_entity_id != trader_entity_id
+            or decision.issuer_entity_id != issuer_entity_id
+        ):
+            raise ValueError(
+                "dedupe decision canonical entity identity mismatch"
+            )
         key = tuple(sorted((decision.left_trade_id, decision.right_trade_id)))
         if key in decision_map:
             raise ValueError("duplicate pairwise dedupe decision")
