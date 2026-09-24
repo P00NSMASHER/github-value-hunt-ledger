@@ -183,6 +183,7 @@ class EconomicDedupeTests(unittest.TestCase):
                 **right.__dict__,
                 "trade_date": None,
                 "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": "TGT",
             }
         )
         proposal = propose_transaction_dedupe(
