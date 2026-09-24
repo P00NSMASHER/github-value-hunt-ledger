@@ -1262,3 +1262,41 @@ def run_scan360_config(
             raise ValueError(
                 f"insurance[{job_index}] Claimant_ID does not match Scan 360 client_id: "
                 + ", ".join(mismatched_claimants)
+            )
+
+        batch = audit_insurance_claims(
+            client_id=client_id,
+            claim_lines=claim_lines,
+            assessments=assessments,
+            settlements=settlements,
+            currency=currency,
+        )
+        for issue in batch.exceptions:
+            exceptions.append({
+                "branch": "insurance",
+                "job_index": job_index,
+                "claim_line_id": issue.claim_line_id,
+                "code": issue.code,
+                "detail": issue.detail,
+            })
+        for observation in batch.observations:
+            finding = engine.evaluate(observation)
+            if finding is None:
+                continue
+            ledger.add(finding)
+            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
+                added_ids.append(finding.finding_id)
+
+    head = store.save(
+        ledger,
+        expected_head_hash=loaded_head,
+        enforce_expected=True,
+    )
+    report = build_scan360_report(ledger, client_id)
+    return Scan360RunResult(
+        client_id=client_id,
+        added_finding_ids=tuple(sorted(added_ids)),
+        state_head_hash=head,
+        exceptions=tuple(exceptions),
+        report=report,
+    )
