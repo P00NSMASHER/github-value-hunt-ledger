@@ -1,0 +1,45 @@
+{
+  "version": "revenue-loop-v1",
+  "status": "ACTIVE_MEASURING",
+  "command_center_snapshot": {
+    "key": "ceo-command-center-v1-revenue-loop",
+    "sha256": "335564a3587b586cea92a43aa3742d8df338ec8988566ef9e59308c47c417034"
+  },
+  "invariants": [
+    "no opportunity probability is invented",
+    "expected opportunity value stays null until buyer-level evidence supports it",
+    "external execution requires consumed approval unless it is explicitly historical observed evidence",
+    "MEASURING cannot advance to ATTRIBUTED without a verified outcome",
+    "ATTRIBUTED cannot advance to LEARNED without verified learning",
+    "model estimates cannot count as collected revenue"
+  ],
+  "loops": [
+    {
+      "loop_key": "capturebrief-outreach-001",
+      "stage": "MEASURING",
+      "buyer_count": 3,
+      "observed_outreach_sent": 3,
+      "observed_external_replies": 0,
+      "pricing": {
+        "status": "VERIFIED_OFFER",
+        "upfront_price_cents": 14900
+      },
+      "next_gate": "WAIT_FOR_VERIFIED_OUTCOME"
+    },
+    {
+      "loop_key": "freightrecovery-pilot-001",
+      "stage": "MEASURING",
+      "buyer_count": 5,
+      "observed_outreach_sent": 5,
+      "observed_external_replies": 0,
+      "pricing": {
+        "status": "PILOT_FREE_PRICING_DEFERRED",
+        "upfront_price_cents": 0,
+        "post_pilot_fee_finalized": false
+      },
+      "next_gate": "WAIT_FOR_VERIFIED_OUTCOME"
+    }
+  ],
+  "autonomous_external_actions_enabled": false,
+  "revenue_loop_external_actions_executed": false
+}
