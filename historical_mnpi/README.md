@@ -218,6 +218,10 @@ Implemented adapters include:
 - a dedicated `hacked_earnings_jfe` `TimeOfFirstTrade.csv` adapter using the
   real public headers `PERMNO,SYMBOL,GVKEY,TimeOfFirstTrade`.
 
+Before extraction, every adapter re-verifies the registered source proof,
+retained artifact proof, expected source family, and exact raw-byte SHA-256.
+Academic ZIP extraction rejects traversal/encrypted/oversized members.
+
 Each candidate preserves:
 
 - exact source/artifact proof chain;
@@ -234,3 +238,43 @@ verification of the underlying PDF.
 The hacked-earnings adapter explicitly marks its output as academic
 reconstruction, retains the source's timezone ambiguity, and warns that
 `TimeOfFirstTrade` is not complete trade economics.
+
+
+## Step 8 — deterministic human review gate
+
+Parser candidates remain non-authoritative until a reviewer approves the exact
+normalized record hash.
+
+A review item freezes:
+
+- canonical case, trader and issuer identities;
+- information-event identity;
+- proposed trade timing and its precision;
+- public-release boundary precision and proof hash;
+- proposed legal/factual status;
+- normalized quantity/price and the exact normalized-row proof hash;
+- every candidate extractor/version, sub-document locator, public-source excerpt
+  hash, parsed value and parse state;
+- deterministic conflicts and blockers.
+
+Candidate sub-locators (for example a PDF page/table row) are validated against
+the same retained artifact as the canonical case link rather than requiring the
+root locator itself to be identical.
+
+Approval requires explicit human confirmation that:
+
+1. source evidence was checked;
+2. party/issuer identity was checked;
+3. temporal precision was checked;
+4. legal/factual status was checked;
+5. conflicts are resolved.
+
+Ambiguous or unparsed fields, conflicting parsed values, unverified PDF text
+layers, unsupported academic promotion, and unresolved timezone/economics issues
+block approval.
+
+`HistoricalReviewQueue` is append-only at the decision level. Once a review
+item has a completed decision, corrections require a new normalized proposal and
+therefore a new review hash. Approved decisions bind the exact normalized row
+hash and remain scoped to `HISTORICAL_RESEARCH_COMPLIANCE_ONLY`; they never
+authorize live trading.
