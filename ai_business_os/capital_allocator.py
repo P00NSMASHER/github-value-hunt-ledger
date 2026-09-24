@@ -72,6 +72,7 @@ DEFAULT_POLICY = {
     "time_to_cash_penalty": 0.20,
     "min_evidence_coverage": 0.60,
     "max_allocation_share": 0.50,
+    "max_snapshot_skew_days": 7.0,
 }
 
 SOURCE_QUALITY = {
@@ -84,6 +85,36 @@ SOURCE_QUALITY = {
     "ANALYTICS": 0.70,
     "MANUAL_RECORD": 0.50,
     "MODEL_ESTIMATE": 0.20,
+}
+
+ALLOWED_SOURCE_TYPES = {
+    "cash_collected_30d": {"BANK", "PAYMENT_PROCESSOR", "GENERAL_LEDGER"},
+    "revenue_recognized_30d": {"GENERAL_LEDGER", "INVOICE"},
+    "cash_costs_30d": {"BANK", "GENERAL_LEDGER", "INVOICE"},
+    "ai_cost_30d": {"INVOICE", "GENERAL_LEDGER", "PAYMENT_PROCESSOR"},
+    "contracted_pipeline_value_90d": {"SIGNED_CONTRACT", "CRM"},
+    "qualified_pipeline_value_90d": {"CRM", "ANALYTICS", "MANUAL_RECORD"},
+    "human_hours_30d": {"ANALYTICS", "MANUAL_RECORD"},
+    "remaining_effort_hours": {"ANALYTICS", "MANUAL_RECORD", "MODEL_ESTIMATE"},
+    "time_to_cash_days": {"ANALYTICS", "MANUAL_RECORD", "MODEL_ESTIMATE"},
+    "retention_signal": {"CRM", "ANALYTICS", "MANUAL_RECORD", "MODEL_ESTIMATE"},
+    "market_evidence_signal": {"CRM", "ANALYTICS", "MANUAL_RECORD", "MODEL_ESTIMATE"},
+    "strategic_reuse_signal": {"ANALYTICS", "MANUAL_RECORD", "MODEL_ESTIMATE"},
+}
+
+MAX_EVIDENCE_AGE_DAYS = {
+    "cash_collected_30d": 45,
+    "revenue_recognized_30d": 45,
+    "cash_costs_30d": 45,
+    "ai_cost_30d": 45,
+    "contracted_pipeline_value_90d": 100,
+    "qualified_pipeline_value_90d": 100,
+    "human_hours_30d": 45,
+    "remaining_effort_hours": 120,
+    "time_to_cash_days": 120,
+    "retention_signal": 120,
+    "market_evidence_signal": 120,
+    "strategic_reuse_signal": 120,
 }
 
 
@@ -274,6 +305,8 @@ class CapitalAllocator:
             raise CapitalAllocatorError("min_evidence_coverage must be within (0, 1]")
         if not 0 < config["max_allocation_share"] <= 1:
             raise CapitalAllocatorError("max_allocation_share must be within (0, 1]")
+        if config["max_snapshot_skew_days"] < 0:
+            raise CapitalAllocatorError("max_snapshot_skew_days cannot be negative")
 
         prior = self.runtime.conn.execute(
             "SELECT MAX(version) AS v FROM portfolio_policies WHERE id LIKE ?",
@@ -386,6 +419,12 @@ class CapitalAllocator:
         if len(initiative_ids) != len(set(initiative_ids)):
             raise CapitalAllocatorError("ranking may include only one snapshot per initiative")
         as_of = max(float(row["as_of"]) for row in snapshots)
+        oldest_as_of = min(float(row["as_of"]) for row in snapshots)
+        max_skew_seconds = float(config["max_snapshot_skew_days"]) * 86400.0
+        if as_of - oldest_as_of > max_skew_seconds + 1e-9:
+            raise CapitalAllocatorError(
+                "snapshot dates are too far apart for a fair portfolio comparison"
+            )
 
         rows = []
         for snapshot in snapshots:
@@ -519,6 +558,7 @@ class CapitalAllocator:
         plan = self.get_plan(plan_id)
         if plan["status"] != "DRAFT":
             raise CapitalAllocatorError("only DRAFT plans may request authorization")
+        self._assert_ranking_current(plan["ranking_id"])
         params = self._plan_parameters(plan)
         if plan["resource_type"] == "CASH_CENTS":
             decision = self.governance.request_action(
@@ -564,6 +604,7 @@ class CapitalAllocator:
         plan = self.get_plan(plan_id)
         if plan["status"] != "DRAFT":
             raise CapitalAllocatorError("plan is not awaiting authorization")
+        self._assert_ranking_current(plan["ranking_id"])
         request = self.runtime.conn.execute(
             "SELECT * FROM governance_action_requests WHERE id=?",
             (governance_request_id,),
@@ -863,6 +904,10 @@ class CapitalAllocator:
             observed_at = float(item.get("observed_at"))
             if source_type not in SOURCE_QUALITY:
                 raise CapitalAllocatorError(f"unsupported source_type: {source_type}")
+            if source_type not in ALLOWED_SOURCE_TYPES[metric]:
+                raise CapitalAllocatorError(
+                    f"{source_type} is not admissible evidence for {metric}"
+                )
             if not source_ref or not _valid_sha256(source_sha256):
                 raise CapitalAllocatorError(
                     "metric evidence requires source_ref and SHA-256 source identity"
@@ -870,6 +915,11 @@ class CapitalAllocator:
             if not math.isfinite(observed_at) or observed_at > as_of:
                 raise CapitalAllocatorError(
                     "metric evidence observed_at must be finite and not after snapshot as_of"
+                )
+            age_days = (as_of - observed_at) / 86400.0
+            if age_days > MAX_EVIDENCE_AGE_DAYS[metric] + 1e-9:
+                raise CapitalAllocatorError(
+                    f"evidence for {metric} is too stale for allocation"
                 )
             out[metric] = {
                 "source_type": source_type,
@@ -958,6 +1008,38 @@ class CapitalAllocator:
             item["share"] = floors[idx] / total_cents
             out.append(item)
         return out
+
+    def _assert_ranking_current(self, ranking_id: str) -> None:
+        ranking = self.get_ranking(ranking_id)
+        policy = self.get_policy(ranking["policy_id"])
+        family = ranking["policy_id"].rsplit("@v", 1)[0]
+        latest = self.runtime.conn.execute(
+            """
+            SELECT id, version FROM portfolio_policies
+            WHERE id LIKE ?
+            ORDER BY version DESC LIMIT 1
+            """,
+            (f"{family}@v%",),
+        ).fetchone()
+        if latest is None or latest["id"] != policy["id"]:
+            raise CapitalAllocatorError(
+                "allocator policy changed after ranking; rebuild the ranking"
+            )
+
+        for row in ranking["rows"]:
+            snapshot = self.get_snapshot(row["snapshot_id"])
+            newer = self.runtime.conn.execute(
+                """
+                SELECT id FROM portfolio_snapshots
+                WHERE initiative_id=? AND as_of > ?
+                ORDER BY as_of DESC LIMIT 1
+                """,
+                (snapshot["initiative_id"], snapshot["as_of"]),
+            ).fetchone()
+            if newer is not None:
+                raise CapitalAllocatorError(
+                    "newer initiative data exists; rebuild ranking before authorization"
+                )
 
     def _plan_parameters(self, plan: Dict[str, Any]) -> Dict[str, Any]:
         ranking = self.get_ranking(plan["ranking_id"])
