@@ -612,6 +612,12 @@ class SoftwareFactory:
             expected_action_class="PRODUCTION_CHANGE",
             expected_parameters=expected,
         )
+        # The code audit authorizes PR readiness; the governance-approved merge is the final
+        # condition that lets the manager accept the engineering goal as COMPLETE.
+        self.verification.complete_goal(
+            item["verification_contract_id"],
+            manager_agent_id=item["manager_agent_id"],
+        )
         self.runtime.conn.execute(
             """
             UPDATE software_factory_items
