@@ -344,6 +344,12 @@ class GovernanceControlPlane:
         approval_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         request = self._require_request(request_id)
+        if request["status"] in {"AUTHORIZED", "DENIED"}:
+            raise GovernanceError("action request is terminal and cannot be replayed")
+        if request["status"] == "PENDING" and approval_id is not None:
+            raise GovernanceError("approval cannot be attached before approval is required")
+        if request["status"] == "AWAITING_APPROVAL" and approval_id is None:
+            raise GovernanceError("action request is awaiting its bound approval")
         policy = self._require_policy(str(request["agent_id"]))
 
         if self._global_killed():
@@ -391,6 +397,8 @@ class GovernanceControlPlane:
         ttl_seconds: float = 3600.0,
     ) -> Dict[str, Any]:
         request = self._require_request(request_id)
+        if request["status"] != "AWAITING_APPROVAL":
+            raise GovernanceError("request is not awaiting approval")
         if approver_kind != "HUMAN":
             raise GovernanceError("high-consequence approvals require a HUMAN principal")
         if not approver_principal.strip() or not evidence:
