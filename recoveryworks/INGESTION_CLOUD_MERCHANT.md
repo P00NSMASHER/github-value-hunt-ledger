@@ -221,7 +221,7 @@ The cloud_commitment Scan 360 section requires separately reviewed commitment te
 
 ### Continuous Cletrics processing
 
-Continuous operation uses a separate private receipt registry keyed by a fingerprint of the exact Cletrics bundle, audit mode, authority-file hashes, verification flags, client, and currency. Exact repeats are skipped; authority or verification changes are reprocessed. The receipt registry is integrity-hashed and does not rewrite the Recovery Ledger.
+Continuous operation uses a separate private receipt registry keyed by a fingerprint of the exact Cletrics bundle, audit mode, authority-file hashes, verification flags, client, and currency. Exact repeats are skipped. Authority, verification, or bundle changes for an already processed provider/account/period/mode are surfaced as supersession_required and are not silently inserted as replacement findings. The receipt registry is integrity-hashed and does not rewrite the Recovery Ledger.
 
 ### Savings opportunities
 
