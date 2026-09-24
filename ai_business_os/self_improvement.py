@@ -62,6 +62,7 @@ class SelfImprovementGate:
                 skill_key TEXT PRIMARY KEY,
                 champion_version TEXT NOT NULL,
                 champion_artifact_hash TEXT NOT NULL,
+                curator_agent_id TEXT NOT NULL REFERENCES agents(id),
                 updated_at REAL NOT NULL
             );
 
@@ -170,10 +171,11 @@ class SelfImprovementGate:
         ts = _now()
         self.runtime.conn.execute(
             """
-            INSERT INTO skill_registry(skill_key, champion_version, champion_artifact_hash, updated_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO skill_registry(
+                skill_key, champion_version, champion_artifact_hash, curator_agent_id, updated_at
+            ) VALUES (?, ?, ?, ?, ?)
             """,
-            (skill_key, version, artifact_hash, ts),
+            (skill_key, version, artifact_hash, curator_agent_id, ts),
         )
         self.runtime.conn.execute(
             """
@@ -225,6 +227,8 @@ class SelfImprovementGate:
             raise SkillPromotionError(
                 "proposer, verifier, and curator must be three distinct agents"
             )
+        if curator_agent_id != champion["curator_agent_id"]:
+            raise SkillPromotionError("candidate must use the skill's designated curator")
         self._validate_skill_identity(skill_key, candidate_version, candidate_artifact_hash)
         if candidate_version == champion["version"]:
             raise SkillPromotionError("candidate version must differ from the champion")
@@ -730,6 +734,8 @@ class SelfImprovementGate:
         if not reason.strip() or not evidence:
             raise SkillPromotionError("rollback requires a reason and evidence")
         current = self.get_active_skill(skill_key)
+        if curator_agent_id != current["curator_agent_id"]:
+            raise SkillPromotionError("only the skill's designated curator may roll it back")
         target = self.runtime.conn.execute(
             """
             SELECT * FROM skill_versions
@@ -815,6 +821,7 @@ class SelfImprovementGate:
             "skill_key": row["skill_key"],
             "version": row["champion_version"],
             "artifact_hash": row["champion_artifact_hash"],
+            "curator_agent_id": row["curator_agent_id"],
             "updated_at": row["updated_at"],
         }
 
