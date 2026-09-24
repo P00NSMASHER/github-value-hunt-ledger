@@ -627,3 +627,9 @@ Even PRELAUNCH_ACCEPTED hard-codes customer_data_authorized=false, kickoff_autho
 A PRELAUNCH_ACCEPTED charter can now advance only when RecoveryWorks receives a separately verified buyer authorization receipt for the exact frozen engagement, buyer, billing-account/provider/date scope, read-only pilot purpose, authorization window, and retention deadline. The authorization receipt is externally sourced; RecoveryWorks does not manufacture buyer consent.
 
 The resulting kickoff gate can authorize read-only customer-data processing and pilot kickoff, but still hard-codes outreach, external recovery action, provider mutation, invoicing, and payment collection as unauthorized. Scope drift, expired/unverified authorization, or mismatch against the charter fails closed.
+
+## Governed pilot execution lifecycle (step 34)
+
+Authorized pilots now have a private tamper-evident execution journal with a fixed internal sequence: KICKOFF_AUTHORIZED, INTAKE_FROZEN, DIAGNOSTIC_COMPLETE, EVIDENCE_REVIEW_COMPLETE, BUYER_REVIEW_READY, CLOSEOUT_READY, and CLOSED. Every transition requires proof hashes and remains bound to the exact kickoff-gate proof and engagement id.
+
+The lifecycle intentionally contains no claim-submission/provider-mutation state. Invalid transition skips, kickoff/scope replacement, sequence gaps, previous-hash breaks, or journal tampering fail closed. This provides pilot-operating accountability without converting internal progress into external-action authorization.
