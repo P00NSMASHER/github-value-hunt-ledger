@@ -198,6 +198,82 @@ class EconomicDedupeTests(unittest.TestCase):
             proposal.reason_codes,
         )
 
+    def test_exact_same_requires_trade_side_confirmation(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            **{
+                **left.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "side": TradeSide.UNKNOWN,
+            }
+        )
+        right = HistoricalTransaction(
+            **{
+                **right.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": "TGT",
+            }
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+        self.assertIn("TRADE_SIDE_NOT_CONFIRMED", proposal.reason_codes)
+
+    def test_exact_same_requires_instrument_type_confirmation(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            **{
+                **left.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "instrument_type": InstrumentType.UNKNOWN,
+            }
+        )
+        right = HistoricalTransaction(
+            **{
+                **right.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": "TGT",
+            }
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+        self.assertIn("INSTRUMENT_TYPE_NOT_CONFIRMED", proposal.reason_codes)
+
+    def test_exact_same_requires_currency_agreement_when_currency_is_present(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            **{
+                **left.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "currency": "USD",
+            }
+        )
+        right = HistoricalTransaction(
+            **{
+                **right.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+                "ticker_at_trade": "TGT",
+                "currency": None,
+            }
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+        self.assertIn("CURRENCY_NOT_CONFIRMED", proposal.reason_codes)
+
     def test_exact_same_requires_matching_security_identifier(self):
         sources, manifest, cases, entities, left, right = fixture()
         left = HistoricalTransaction(
