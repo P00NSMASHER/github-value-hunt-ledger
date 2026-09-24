@@ -378,18 +378,22 @@ class EntityRegistry:
         entity_kind: EntityKind,
     ) -> CanonicalEntity:
         matches = self.resolutions_for_local(case_id, local_id, entity_kind)
-        resolved = tuple(
-            item for item in matches
-            if item.status is ResolutionStatus.RESOLVED
-        )
-        if len(resolved) != 1:
+        if not matches:
+            raise ValueError("local identity has no resolution record")
+        if any(item.status is not ResolutionStatus.RESOLVED for item in matches):
             raise ValueError(
-                "local identity does not have exactly one resolved canonical entity"
+                "local identity has unresolved or ambiguous resolution evidence"
             )
-        entity_id = resolved[0].canonical_entity_id
-        if entity_id is None:
-            raise ValueError("resolved identity is missing canonical entity")
-        return self.get_entity(entity_id)
+        entity_ids = {
+            item.canonical_entity_id
+            for item in matches
+            if item.canonical_entity_id is not None
+        }
+        if len(entity_ids) != 1:
+            raise ValueError(
+                "local identity does not resolve to exactly one canonical entity"
+            )
+        return self.get_entity(next(iter(entity_ids)))
 
     def bindings_for(self, entity_id: str) -> tuple[IdentifierBinding, ...]:
         self.get_entity(entity_id)
