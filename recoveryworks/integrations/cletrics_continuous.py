@@ -32,6 +32,7 @@ class ContinuousCletricsResult:
     scan: Scan360RunResult
     new_job_fingerprints: tuple[str, ...]
     duplicate_job_fingerprints: tuple[str, ...]
+    supersession_required_fingerprints: tuple[str, ...]
     registry_hash: str
     cloud_signals: tuple[CloudSignal, ...]
     savings_report: CloudSavingsReport
@@ -42,6 +43,9 @@ class ContinuousCletricsResult:
             "scan": self.scan.as_dict(),
             "new_job_fingerprints": list(self.new_job_fingerprints),
             "duplicate_job_fingerprints": list(self.duplicate_job_fingerprints),
+            "supersession_required_fingerprints": list(
+                self.supersession_required_fingerprints
+            ),
             "registry_hash": self.registry_hash,
             "cloud_signals": [signal.as_dict() for signal in self.cloud_signals],
             "financial_surfaces": {
@@ -159,11 +163,13 @@ def run_continuous_cletrics_scan(
     currency = str(config.get("currency") or "USD").strip().upper()
     base = Path(base_dir)
     registry = CletricsReceiptRegistry(registry_path)
-    seen = {receipt.job_fingerprint for receipt in registry.receipts()}
+    existing_receipts = registry.receipts()
+    seen = {receipt.job_fingerprint for receipt in existing_receipts}
 
     filtered = dict(config)
     new_fingerprints: list[str] = []
     duplicate_fingerprints: list[str] = []
+    supersession_required: list[str] = []
     pending_receipts: list[tuple[str, str, CletricsCloudBundle, dict[str, str], dict[str, bool]]] = []
     signal_index: dict[str, CloudSignal] = {}
 
@@ -209,6 +215,18 @@ def run_continuous_cletrics_scan(
             )
             if fingerprint in seen or fingerprint in new_fingerprints:
                 duplicate_fingerprints.append(fingerprint)
+                continue
+            prior_scope = [
+                receipt
+                for receipt in existing_receipts
+                if receipt.mode == mode
+                and receipt.provider == bundle.provider
+                and receipt.billing_account_id == bundle.billing_account_id
+                and receipt.period_start == bundle.period_start
+                and receipt.period_end == bundle.period_end
+            ]
+            if prior_scope:
+                supersession_required.append(fingerprint)
                 continue
             new_fingerprints.append(fingerprint)
             keep.append(job)
@@ -288,6 +306,9 @@ def run_continuous_cletrics_scan(
         scan=scan,
         new_job_fingerprints=tuple(sorted(new_fingerprints)),
         duplicate_job_fingerprints=tuple(sorted(duplicate_fingerprints)),
+        supersession_required_fingerprints=tuple(
+            sorted(supersession_required)
+        ),
         registry_hash=registry_hash,
         cloud_signals=combined_signals,
         savings_report=savings_report,
