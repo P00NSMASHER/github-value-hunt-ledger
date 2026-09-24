@@ -18,6 +18,7 @@ from recoveryworks.commercial_operational_invariants import (
     CommercialOperationalInvariantState,
     verify_commercial_operational_invariants,
 )
+from recoveryworks.container_build import ContainerBuildManifest
 from recoveryworks.models import canonical_hash, normalize_sha256
 from recoveryworks.recurring_assurance_lifecycle import (
     RecurringAssuranceLifecycleState,
@@ -130,6 +131,7 @@ class AdversarialCaseResult:
 class ProductionAdversarialCertification:
     certification_id: str
     source_revision: str
+    container_build_manifest_proof_hash: str
     seed: int
     iterations_per_vector: int
     baseline_report_proof_hash: str
@@ -141,6 +143,14 @@ class ProductionAdversarialCertification:
     def __post_init__(self) -> None:
         object.__setattr__(
             self, "source_revision", _source_revision(self.source_revision)
+        )
+        object.__setattr__(
+            self,
+            "container_build_manifest_proof_hash",
+            normalize_sha256(
+                "container_build_manifest_proof_hash",
+                self.container_build_manifest_proof_hash,
+            ),
         )
         if type(self.seed) is not int or self.seed < 0:
             raise ValueError("seed must be a non-negative integer")
@@ -203,6 +213,8 @@ class ProductionAdversarialCertification:
         return {
             "schema": 1,
             "source_revision": self.source_revision,
+            "container_build_manifest_proof_hash":
+                self.container_build_manifest_proof_hash,
             "seed": self.seed,
             "iterations_per_vector": self.iterations_per_vector,
             "baseline_report_proof_hash": self.baseline_report_proof_hash,
@@ -383,11 +395,14 @@ def _mutate(
 def run_commercial_adversarial_certification(
     chain_factory: Callable[[], Mapping[str, Any]],
     *,
-    source_revision: str,
+    build_manifest: ContainerBuildManifest,
     seed: int = 41001,
     iterations_per_vector: int = 8,
 ) -> ProductionAdversarialCertification:
-    source_revision = _source_revision(source_revision)
+    if not isinstance(build_manifest, ContainerBuildManifest):
+        raise ValueError("build_manifest must be ContainerBuildManifest")
+    source_revision = _source_revision(build_manifest.source_commit)
+    build_manifest_proof_hash = build_manifest.proof_hash
     if type(seed) is not int or seed < 0:
         raise ValueError("seed must be a non-negative integer")
     if type(iterations_per_vector) is not int or not 1 <= iterations_per_vector <= 100:
@@ -467,6 +482,7 @@ def run_commercial_adversarial_certification(
     identity = {
         "schema": 1,
         "source_revision": source_revision,
+        "container_build_manifest_proof_hash": build_manifest_proof_hash,
         "seed": seed,
         "iterations_per_vector": iterations_per_vector,
         "baseline_report_proof_hash": baseline.proof_hash,
@@ -479,6 +495,7 @@ def run_commercial_adversarial_certification(
         certification_id="recoveryworks-adversarial-certification:"
         + canonical_hash(identity),
         source_revision=source_revision,
+        container_build_manifest_proof_hash=build_manifest_proof_hash,
         seed=seed,
         iterations_per_vector=iterations_per_vector,
         baseline_report_proof_hash=baseline.proof_hash,
