@@ -310,6 +310,48 @@ class EconomicDedupeTests(unittest.TestCase):
         self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
         self.assertNotEqual(proposal.relation, DedupeRelation.EXACT_SAME)
 
+    def test_option_exact_timestamp_without_contract_identity_is_not_exact(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            trade_id=left.trade_id,
+            case_id=left.case_id,
+            case_proof_hash=left.case_proof_hash,
+            trader_party_id=left.trader_party_id,
+            issuer_id=left.issuer_id,
+            source_ref=left.source_ref,
+            fact_status=left.fact_status,
+            status_ref=left.status_ref,
+            instrument_type=InstrumentType.CALL_OPTION,
+            side=TradeSide.BUY,
+            trade_timestamp="2015-08-10T10:15:30-04:00",
+            quantity="2500",
+            execution_price="30.375",
+        )
+        right = HistoricalTransaction(
+            trade_id=right.trade_id,
+            case_id=right.case_id,
+            case_proof_hash=right.case_proof_hash,
+            trader_party_id=right.trader_party_id,
+            issuer_id=right.issuer_id,
+            source_ref=right.source_ref,
+            fact_status=right.fact_status,
+            status_ref=right.status_ref,
+            instrument_type=InstrumentType.CALL_OPTION,
+            side=TradeSide.BUY,
+            trade_timestamp="2015-08-10T10:15:30-04:00",
+            quantity="2500",
+            execution_price="30.375",
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+        self.assertIn(
+            "OPTION_CONTRACT_NOT_FULLY_IDENTIFIED",
+            proposal.reason_codes,
+        )
+
     def test_unresolved_identity_produces_insufficient_proposal(self):
         sources, manifest, cases, entities, left, right = fixture(resolve_identities=False)
         proposal = propose_transaction_dedupe(
