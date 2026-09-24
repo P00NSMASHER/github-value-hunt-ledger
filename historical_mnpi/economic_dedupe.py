@@ -342,15 +342,38 @@ def propose_transaction_dedupe(
                 name for name in shared
                 if left_values[name] != right_values[name]
             )
+            strong_anchor_fields = {
+                "quantity",
+                "execution_price",
+                "trade_amount",
+                "option_strike",
+                "option_expiry",
+            }
+            strong_matches = strong_anchor_fields.intersection(matching)
+            exact_anchor_ok = (
+                "quantity" in strong_matches
+                and (
+                    "execution_price" in strong_matches
+                    or "trade_amount" in strong_matches
+                )
+                and (
+                    "instrument_type" in matching
+                    or "side" in matching
+                )
+            )
+
             if conflicting:
                 relation = DedupeRelation.DISTINCT
                 reasons.append("CONFLICTING_ECONOMIC_FIELDS")
-            elif exact_time and len(matching) >= 3:
+            elif exact_time and exact_anchor_ok:
                 relation = DedupeRelation.EXACT_SAME
-                reasons.append("EXACT_TIMESTAMP_AND_ECONOMIC_ANCHORS")
-            elif matching:
+                reasons.append("EXACT_TIMESTAMP_AND_STRONG_ECONOMIC_ANCHORS")
+            elif strong_matches:
                 relation = DedupeRelation.POSSIBLE_SAME
-                reasons.append("COMPATIBLE_TIME_AND_PARTIAL_ECONOMIC_MATCH")
+                reasons.append("COMPATIBLE_TIME_AND_STRONG_ECONOMIC_MATCH")
+            elif matching:
+                relation = DedupeRelation.INSUFFICIENT
+                reasons.append("ONLY_GENERIC_ECONOMIC_FIELDS_MATCH")
             else:
                 relation = DedupeRelation.INSUFFICIENT
                 reasons.append("NO_SHARED_ECONOMIC_DISCRIMINATOR")
