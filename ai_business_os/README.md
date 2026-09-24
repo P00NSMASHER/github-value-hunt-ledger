@@ -95,6 +95,39 @@ without deleting source provenance:
 - corporate mergers/acquisitions are not confused with duplicate identity when authoritative legal
   identifiers differ.
 
+
+## Executive extension — Evidence-first portfolio capital allocator
+
+Status: implemented on this branch.
+
+This extension sits above the verified nine-upgrade foundation and turns operating evidence into
+transparent resource-prioritization support without replacing the foundation's human/governance
+boundaries:
+
+- initiatives may bind to canonical Step-5/9 BUSINESS and PRODUCT identities;
+- allocator policies are HUMAN-controlled, immutable, versioned, and content-addressed;
+- metric-specific source rules distinguish realized cash, contracted pipeline, qualified pipeline,
+  operational effort, and softer market/strategy signals;
+- realized cash cannot be sourced from model estimates or generic CRM fields;
+- future-dated and stale evidence is rejected;
+- a fixed core metric schema prevents cherry-picked evidence coverage;
+- snapshots must be temporally comparable before initiatives are ranked;
+- monetary magnitude is converted to a dimensionless economic index before combination with effort,
+  time-to-cash, and evidence signals;
+- every ranking exposes its components instead of hiding them behind an opaque score;
+- low-evidence initiatives become OBSERVE_ONLY rather than receiving false precision;
+- negative economics can surface PAUSE_REVIEW;
+- bounded plans support AI units, engineering hours, human hours, and exact cash cents;
+- concentration caps prevent a single initiative from consuming an unlimited portfolio share;
+- newer business data or a newer allocation policy invalidates old authorization;
+- every real allocation passes through Step-6 governance;
+- cash allocation is MONEY_MOVEMENT and therefore remains behind HUMAN approval;
+- kill switches override allocation authority;
+- exact plan/ranking/resource hashes prevent approval substitution or replay;
+- the allocator proposes decisions but does not transfer funds or commit resources itself.
+
+The allocator is decision support, not a success-probability model or guaranteed-return engine.
+
 ## Complete architecture
 
 ```
@@ -115,6 +148,8 @@ governed autonomous software delivery
 explicit proof obligations and truth-state reasoning
    ↓
 clean, reversible canonical business identity
+   ↓
+evidence-first portfolio prioritization (executive extension)
 ```
 
 ### Run all AI Business OS tests
@@ -132,3 +167,5 @@ automation. Model confidence is never proof. Canonical identity is never permiss
 history.
 
 Nine-upgrade foundation status: **9/9 implemented and full-regression verified.**
+
+Executive capital-allocation extension: **implemented and regression-tested on this branch.**
