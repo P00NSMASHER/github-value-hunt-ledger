@@ -369,8 +369,324 @@ def compare_economic_signatures(
     )
 
 
+class ClusterRegistrationAction(str, Enum):
+    NEW_CLUSTER = "NEW_CLUSTER"
+    AUTO_JOINED_EXACT = "AUTO_JOINED_EXACT"
+    NEW_CLUSTER_REVIEW_REQUIRED = "NEW_CLUSTER_REVIEW_REQUIRED"
+
+
+@dataclass(frozen=True)
+class EconomicTransactionCluster:
+    cluster_id: str
+    signatures: tuple[EconomicTransactionSignature, ...]
+
+    def __post_init__(self) -> None:
+        if not self.cluster_id.startswith("economic:"):
+            raise ValueError("cluster_id must use economic: prefix")
+        if not self.signatures:
+            raise ValueError("economic cluster requires at least one signature")
+        proof_hashes = [item.proof_hash for item in self.signatures]
+        if len(set(proof_hashes)) != len(proof_hashes):
+            raise ValueError("duplicate signature in economic cluster")
+        row_hashes = [item.normalized_row_hash for item in self.signatures]
+        if len(set(row_hashes)) != len(row_hashes):
+            raise ValueError("duplicate normalized row in economic cluster")
+
+    @property
+    def member_signature_hashes(self) -> tuple[str, ...]:
+        return tuple(sorted(item.proof_hash for item in self.signatures))
+
+    @property
+    def normalized_row_hashes(self) -> tuple[str, ...]:
+        return tuple(sorted(item.normalized_row_hash for item in self.signatures))
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "cluster_id": self.cluster_id,
+            "member_signature_hashes": list(self.member_signature_hashes),
+            "normalized_row_hashes": list(self.normalized_row_hashes),
+        })
+
+
+@dataclass(frozen=True)
+class DedupReviewCandidate:
+    candidate_id: str
+    signature_hash: str
+    candidate_cluster_id: str
+    assessments: tuple[EconomicMatchAssessment, ...]
+    reason: str
+
+    def __post_init__(self) -> None:
+        if not self.candidate_id.startswith("dedup-review:"):
+            raise ValueError("candidate_id must use dedup-review: prefix")
+        if not self.candidate_cluster_id.startswith("economic:"):
+            raise ValueError("candidate_cluster_id must use economic: prefix")
+        if not self.assessments:
+            raise ValueError("dedup review candidate requires assessments")
+        if not self.reason.strip():
+            raise ValueError("dedup review candidate requires reason")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "candidate_id": self.candidate_id,
+            "signature_hash": self.signature_hash,
+            "candidate_cluster_id": self.candidate_cluster_id,
+            "assessment_hashes": sorted(
+                item.proof_hash for item in self.assessments
+            ),
+            "reason": self.reason,
+        })
+
+
+@dataclass(frozen=True)
+class EconomicClusterEvent:
+    event_id: str
+    action: ClusterRegistrationAction
+    signature_hash: str
+    cluster_id: str
+    cluster_proof_hash: str
+    review_candidate_hashes: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not self.event_id.startswith("cluster-event:"):
+            raise ValueError("event_id must use cluster-event: prefix")
+        if not self.cluster_id.startswith("economic:"):
+            raise ValueError("cluster_id must use economic: prefix")
+        if tuple(sorted(set(self.review_candidate_hashes))) != self.review_candidate_hashes:
+            raise ValueError("review_candidate_hashes must be unique and sorted")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "event_id": self.event_id,
+            "action": self.action.value,
+            "signature_hash": self.signature_hash,
+            "cluster_id": self.cluster_id,
+            "cluster_proof_hash": self.cluster_proof_hash,
+            "review_candidate_hashes": list(self.review_candidate_hashes),
+        })
+
+
+@dataclass(frozen=True)
+class EconomicClusterRegistration:
+    action: ClusterRegistrationAction
+    cluster: EconomicTransactionCluster
+    event: EconomicClusterEvent
+    review_candidates: tuple[DedupReviewCandidate, ...]
+
+
+def _new_cluster_id(signature: EconomicTransactionSignature) -> str:
+    return "economic:" + canonical_hash({
+        "schema": 1,
+        "seed_signature_hash": signature.proof_hash,
+    })
+
+
+def _review_candidate(
+    signature: EconomicTransactionSignature,
+    cluster: EconomicTransactionCluster,
+    assessments: tuple[EconomicMatchAssessment, ...],
+    *,
+    reason: str,
+) -> DedupReviewCandidate:
+    body = {
+        "schema": 1,
+        "signature_hash": signature.proof_hash,
+        "cluster_id": cluster.cluster_id,
+        "assessment_hashes": sorted(
+            item.proof_hash for item in assessments
+        ),
+        "reason": reason,
+    }
+    return DedupReviewCandidate(
+        candidate_id="dedup-review:" + canonical_hash(body),
+        signature_hash=signature.proof_hash,
+        candidate_cluster_id=cluster.cluster_id,
+        assessments=tuple(sorted(
+            assessments,
+            key=lambda item: item.proof_hash,
+        )),
+        reason=reason,
+    )
+
+
+class EconomicClusterRegistry:
+    """Append-only clustering of approved source rows.
+
+    Signatures remain independent members. Exact matches may be grouped, but no
+    source-backed row is removed. Possible/insufficient matches produce manual
+    review candidates and remain in a separate new cluster.
+    """
+
+    def __init__(self) -> None:
+        self._clusters: dict[str, EconomicTransactionCluster] = {}
+        self._signature_to_cluster: dict[str, str] = {}
+        self._events: list[EconomicClusterEvent] = []
+        self._review_candidates: dict[str, DedupReviewCandidate] = {}
+        self._registrations: dict[str, EconomicClusterRegistration] = {}
+
+    def get_cluster(self, cluster_id: str) -> EconomicTransactionCluster:
+        try:
+            return self._clusters[cluster_id]
+        except KeyError as exc:
+            raise KeyError("unknown economic cluster: " + cluster_id) from exc
+
+    def cluster_for_signature(
+        self,
+        signature_hash: str,
+    ) -> EconomicTransactionCluster:
+        try:
+            cluster_id = self._signature_to_cluster[signature_hash]
+        except KeyError as exc:
+            raise KeyError("unknown economic signature") from exc
+        return self._clusters[cluster_id]
+
+    def all_clusters(self) -> tuple[EconomicTransactionCluster, ...]:
+        return tuple(
+            self._clusters[key] for key in sorted(self._clusters)
+        )
+
+    def review_candidates(self) -> tuple[DedupReviewCandidate, ...]:
+        return tuple(
+            self._review_candidates[key]
+            for key in sorted(self._review_candidates)
+        )
+
+    def events(self) -> tuple[EconomicClusterEvent, ...]:
+        return tuple(self._events)
+
+    def register(
+        self,
+        signature: EconomicTransactionSignature,
+    ) -> EconomicClusterRegistration:
+        existing = self._registrations.get(signature.proof_hash)
+        if existing is not None:
+            return existing
+
+        exact_clusters = []
+        review_candidates = []
+
+        for cluster in self.all_clusters():
+            assessments = tuple(
+                compare_economic_signatures(signature, member)
+                for member in cluster.signatures
+            )
+            states = {item.state for item in assessments}
+            if states == {DedupMatchState.EXACT_MATCH}:
+                exact_clusters.append((cluster, assessments))
+                continue
+
+            if (
+                DedupMatchState.POSSIBLE_MATCH in states
+                or DedupMatchState.INSUFFICIENT_INFORMATION in states
+            ):
+                review_candidates.append(_review_candidate(
+                    signature,
+                    cluster,
+                    assessments,
+                    reason="NON_EXACT_MATCH_REQUIRES_REVIEW",
+                ))
+
+        if len(exact_clusters) == 1:
+            cluster, _assessments = exact_clusters[0]
+            updated = EconomicTransactionCluster(
+                cluster_id=cluster.cluster_id,
+                signatures=tuple(sorted(
+                    cluster.signatures + (signature,),
+                    key=lambda item: item.proof_hash,
+                )),
+            )
+            action = ClusterRegistrationAction.AUTO_JOINED_EXACT
+            self._clusters[cluster.cluster_id] = updated
+            target_cluster = updated
+
+        else:
+            target_cluster = EconomicTransactionCluster(
+                cluster_id=_new_cluster_id(signature),
+                signatures=(signature,),
+            )
+            self._clusters[target_cluster.cluster_id] = target_cluster
+            if len(exact_clusters) > 1:
+                for cluster, assessments in exact_clusters:
+                    review_candidates.append(_review_candidate(
+                        signature,
+                        cluster,
+                        assessments,
+                        reason="MULTIPLE_EXACT_CLUSTERS_REQUIRE_REVIEW",
+                    ))
+                action = ClusterRegistrationAction.NEW_CLUSTER_REVIEW_REQUIRED
+            elif review_candidates:
+                action = ClusterRegistrationAction.NEW_CLUSTER_REVIEW_REQUIRED
+            else:
+                action = ClusterRegistrationAction.NEW_CLUSTER
+
+        self._signature_to_cluster[signature.proof_hash] = target_cluster.cluster_id
+        for candidate in review_candidates:
+            self._review_candidates[candidate.candidate_id] = candidate
+
+        event_body = {
+            "schema": 1,
+            "action": action.value,
+            "signature_hash": signature.proof_hash,
+            "cluster_id": target_cluster.cluster_id,
+            "cluster_proof_hash": target_cluster.proof_hash,
+            "review_candidate_hashes": sorted(
+                item.proof_hash for item in review_candidates
+            ),
+        }
+        event = EconomicClusterEvent(
+            event_id="cluster-event:" + canonical_hash(event_body),
+            action=action,
+            signature_hash=signature.proof_hash,
+            cluster_id=target_cluster.cluster_id,
+            cluster_proof_hash=target_cluster.proof_hash,
+            review_candidate_hashes=tuple(sorted(
+                item.proof_hash for item in review_candidates
+            )),
+        )
+        self._events.append(event)
+
+        registration = EconomicClusterRegistration(
+            action=action,
+            cluster=target_cluster,
+            event=event,
+            review_candidates=tuple(sorted(
+                review_candidates,
+                key=lambda item: item.proof_hash,
+            )),
+        )
+        self._registrations[signature.proof_hash] = registration
+        return registration
+
+    @property
+    def registry_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "cluster_hashes": [
+                item.proof_hash for item in self.all_clusters()
+            ],
+            "event_hashes": [
+                item.proof_hash for item in self._events
+            ],
+            "review_candidate_hashes": [
+                item.proof_hash for item in self.review_candidates()
+            ],
+        })
+
+
 __all__ = [
+    "ClusterRegistrationAction",
     "DedupMatchState",
+    "DedupReviewCandidate",
+    "EconomicClusterEvent",
+    "EconomicClusterRegistration",
+    "EconomicClusterRegistry",
+    "EconomicTransactionCluster",
     "EconomicMatchAssessment",
     "EconomicTransactionSignature",
     "build_economic_signature",
