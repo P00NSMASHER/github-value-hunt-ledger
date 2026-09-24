@@ -23,5 +23,5 @@ jobs:
           python-version: "3.11"
       - name: Compile
         run: python -m compileall -q historical_mnpi
-      - name: Test source registry
-        run: python -m unittest historical_mnpi.test_source_registry -v
+      - name: Test historical MNPI package
+        run: python -m unittest discover -s historical_mnpi -p "test_*.py" -v
