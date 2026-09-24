@@ -18,6 +18,7 @@ from recoveryworks.models import canonical_hash, freeze_json, normalize_sha256, 
 class CloudSignalType(str, Enum):
     ANOMALY = "ANOMALY"
     RECONCILIATION_DRIFT = "RECONCILIATION_DRIFT"
+    SAVINGS_OPPORTUNITY = "SAVINGS_OPPORTUNITY"
 
 
 @dataclass(frozen=True)
