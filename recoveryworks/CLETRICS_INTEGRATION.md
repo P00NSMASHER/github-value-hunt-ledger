@@ -178,3 +178,24 @@ cloud_remediation.execute=true fails closed. Provider mutation belongs in a sepa
 ### Remaining explicit boundaries
 
 Phase 3 is intentionally not a cloud-change executor. Same-period changed authority or bundle scope is surfaced for explicit supersession review rather than replacing a live RecoveryOS case. Combined discount-plus-commitment pricing is not inferred. Realized savings remains zero until a separate before/after evidence model exists. Provider mutations require a separately authorized downstream control plane.
+
+## Operational Cletrics FOCUS exporter
+
+`recoveryworks.integrations.cletrics_exporter` now creates the frozen evidence
+bundle directly from Cletrics-shaped operational exports. The billed-cost side
+is a FOCUS Cost and Usage CSV (`ProviderName`, `BillingAccountId`,
+`ServiceName`, `ChargePeriodStart`, `BilledCost`, `BillingCurrency`).
+Independent quantity evidence remains a separate meter CSV and is never
+silently sourced from the same billing row.
+
+Meter rows may bind by explicit `Charge_ID`, by `FOCUS_Row_Hash`, or by the
+unique resource/service/date natural key. Ambiguous natural-key joins fail
+closed. Optional anomaly, reconciliation, and savings exports are validated and
+carried into their existing non-money signal roles.
+
+The CLI entry point is:
+
+`python -m recoveryworks.integrations.cletrics_exporter --focus ... --meter ... --output ... --client-id ... --cletrics-release ... --cletrics-commit ... --exported-at ... --period-start ... --period-end ...`
+
+The ZIP writer uses deterministic entry metadata so identical source bytes and
+manifest inputs produce identical bundle bytes.
