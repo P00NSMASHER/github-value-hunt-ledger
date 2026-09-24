@@ -231,6 +231,30 @@ class HistoricalCaseTests(unittest.TestCase):
                 ),
             )
 
+    def test_case_artifact_role_cannot_launder_source_priority(self):
+        _source, registry, manifest, ref = build_fixture()
+        case = build_case(ref)
+        mislabeled = HistoricalCase(
+            **{
+                **case.__dict__,
+                "artifacts": (
+                    CaseArtifactLink(
+                        artifact_role=CaseArtifactRole.JUDGMENT,
+                        ref=ref,
+                    ),
+                ),
+            }
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "JUDGMENT.*SEC_COMPLAINT|incompatible",
+        ):
+            CaseRegistry().register(
+                mislabeled,
+                source_registry=registry,
+                artifact_manifest=manifest,
+            )
+
     def test_conflicting_case_id_is_rejected(self):
         _source, registry, manifest, ref = build_fixture()
         first = build_case(ref)
