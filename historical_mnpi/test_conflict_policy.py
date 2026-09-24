@@ -220,6 +220,33 @@ class ConflictPolicyTests(unittest.TestCase):
             SourcePriorityPolicy().proof_hash,
         )
 
+    def test_mismatched_artifact_manifest_and_source_registry_fail_closed(self):
+        sources, manifest, cases, case, refs = fixture()
+        mismatched = SourceRegistry()
+        for item in sources.all():
+            mismatched.register(item)
+        mismatched.register(SourceRecord(
+            source_id="SRC:extra",
+            source_type=SourceType.SEC_COMPLAINT,
+            admissibility=SourceAdmissibility.PRIMARY_PUBLIC_RECORD,
+            publisher="extra",
+            title="extra",
+            url="https://example.org/extra",
+            publication_date="2015-01-02",
+            sha256=H(b"extra"),
+            retrieved_at="2026-09-24T13:23:00Z",
+            public_release_confirmed=True,
+            case_id="CASE-CONFLICT",
+        ))
+        with self.assertRaisesRegex(ValueError, "manifest/source registry mismatch"):
+            resolve_fact_conflict((
+                claim(
+                    case,
+                    refs[CaseArtifactRole.COMPLAINT],
+                    "claim:mismatch",
+                    "2500",
+                ),
+            ), cases=cases, source_registry=mismatched, artifact_manifest=manifest)
 
 if __name__ == "__main__":
     unittest.main()
