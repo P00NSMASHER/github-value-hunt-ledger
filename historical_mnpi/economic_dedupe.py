@@ -483,6 +483,7 @@ def decide_dedupe(
 def build_economic_transaction_cluster(
     transactions: tuple[HistoricalTransaction, ...] | list[HistoricalTransaction],
     *,
+    proposals: tuple[DedupeProposal, ...] | list[DedupeProposal],
     decisions: tuple[DedupeDecision, ...] | list[DedupeDecision],
     trader_entity_id: str,
     issuer_entity_id: str,
@@ -494,6 +495,53 @@ def build_economic_transaction_cluster(
         raise ValueError("duplicate trade_id in economic cluster")
 
     tx_by_id = {tx.trade_id: tx for tx in txs}
+
+    needed_pairs = {
+        tuple(sorted((left.trade_id, right.trade_id)))
+        for left, right in combinations(txs, 2)
+    }
+
+    proposal_map = {}
+    for proposal in proposals:
+        proposal.verify_integrity()
+        if (
+            proposal.left_trade_id not in tx_by_id
+            or proposal.right_trade_id not in tx_by_id
+        ):
+            raise ValueError("dedupe proposal references trade outside cluster")
+        if (
+            proposal.left_transaction_hash
+            != tx_by_id[proposal.left_trade_id].proof_hash
+            or proposal.right_transaction_hash
+            != tx_by_id[proposal.right_trade_id].proof_hash
+        ):
+            raise ValueError(
+                "dedupe proposal transaction hash does not match current cluster row"
+            )
+        if (
+            proposal.trader_entity_id != trader_entity_id
+            or proposal.issuer_entity_id != issuer_entity_id
+        ):
+            raise ValueError(
+                "dedupe proposal canonical entity identity mismatch"
+            )
+        if proposal.relation not in {
+            DedupeRelation.EXACT_SAME,
+            DedupeRelation.POSSIBLE_SAME,
+        }:
+            raise ValueError(
+                "economic cluster proposal must be exact/possible duplicate"
+            )
+        key = tuple(sorted((proposal.left_trade_id, proposal.right_trade_id)))
+        if key in proposal_map:
+            raise ValueError("duplicate pairwise dedupe proposal")
+        proposal_map[key] = proposal
+
+    if set(proposal_map) != needed_pairs:
+        raise ValueError(
+            "economic cluster requires a complete pairwise proposal set"
+        )
+
     decision_map = {}
     for decision in decisions:
         decision.verify_integrity()
@@ -521,12 +569,15 @@ def build_economic_transaction_cluster(
         key = tuple(sorted((decision.left_trade_id, decision.right_trade_id)))
         if key in decision_map:
             raise ValueError("duplicate pairwise dedupe decision")
+        proposal = proposal_map.get(key)
+        if proposal is None:
+            raise ValueError("dedupe decision has no matching reviewed proposal")
+        if decision.proposal_hash != proposal.proposal_hash:
+            raise ValueError(
+                "dedupe decision proposal hash does not match reviewed proposal"
+            )
         decision_map[key] = decision
 
-    needed_pairs = {
-        tuple(sorted((left.trade_id, right.trade_id)))
-        for left, right in combinations(txs, 2)
-    }
     if set(decision_map) != needed_pairs:
         raise ValueError(
             "economic cluster requires a complete pairwise decision set"
