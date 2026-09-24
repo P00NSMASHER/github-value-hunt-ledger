@@ -547,3 +547,9 @@ A returned discovery receipt is accepted only when it is externally verified, bi
 Managed pilot execution now derives a canonical tenant identity from tenant_id (defaulting to client_id), client_id, and the execution namespace. Before any private pilot artifact is written, a shared private tenant registry reserves the bundle, ledger, Cletrics receipt registry, assurance JSON, and assurance Markdown paths. A path already bound to another tenant fails before overwrite.
 
 After execution, the ledger is checked for cross-client findings, the Cletrics registry for cross-client receipts, and the assurance report for exact client/proof integrity. Their semantic/file proofs are then tenant-bound; the same proof cannot be rebound to another tenant. The registry exposes the same binding API for backups, continuous-assurance snapshots, run-history/diligence artifacts, and customer exports so managed production workflows can fail closed on cross-customer path/proof reuse without changing every underlying artifact schema.
+
+## Production job control and dry-run scheduling (step 27a)
+
+Internal production work now has deterministic tenant-bound job schedules and occurrence identities for CONTINUOUS_ASSURANCE, PRIVATE_BACKUP, and CLOUD_DIAGNOSTIC. Schedules support one-time or fixed intervals of at least one hour and explicitly keep execution_enabled=false and external_actions_enabled=false.
+
+A private hash-verified job registry provides leases, active-lease concurrency exclusion, expired-lease retry attempts, and idempotent completion by exact result proof hash. Retry decisions are bounded by max attempts/backoff and only retry transient classes such as rate limiting, timeouts, transient provider errors, state conflicts, or temporary I/O failures; authorization and other permanent failures stop. This half-step plans and coordinates jobs only—no scheduler daemon or autonomous external action is installed.
