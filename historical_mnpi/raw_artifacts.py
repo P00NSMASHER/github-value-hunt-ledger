@@ -312,6 +312,21 @@ class LocalContentAddressedArtifactStore:
                 "raw artifact bytes do not match registered source SHA-256"
             )
 
+        # Validate the full custody record before any filesystem mutation.
+        # A rejected ingestion attempt must not leave bytes behind.
+        record = RawArtifactRecord(
+            source_id=source.source_id,
+            artifact_id="sha256:" + digest,
+            sha256=digest,
+            size_bytes=len(raw_bytes),
+            media_type=media_type,
+            storage_uri=f"cas://sha256/{digest[:2]}/{digest}",
+            acquired_at=_iso("acquired_at", acquired_at),
+            stored_at=_iso("stored_at", stored_at),
+            immutability=ArtifactImmutability.APPLICATION_ENFORCED_APPEND_ONLY,
+            original_filename=original_filename,
+        )
+
         target = self._path(digest)
         target.parent.mkdir(parents=True, exist_ok=True)
 
@@ -340,18 +355,7 @@ class LocalContentAddressedArtifactStore:
                 if os.path.exists(temporary_name):
                     os.unlink(temporary_name)
 
-        return RawArtifactRecord(
-            source_id=source.source_id,
-            artifact_id="sha256:" + digest,
-            sha256=digest,
-            size_bytes=len(raw_bytes),
-            media_type=media_type,
-            storage_uri=f"cas://sha256/{digest[:2]}/{digest}",
-            acquired_at=_iso("acquired_at", acquired_at),
-            stored_at=_iso("stored_at", stored_at),
-            immutability=ArtifactImmutability.APPLICATION_ENFORCED_APPEND_ONLY,
-            original_filename=original_filename,
-        )
+        return record
 
     def read(self, record: RawArtifactRecord) -> bytes:
         path = self._path(record.sha256)
