@@ -2,9 +2,9 @@
   "version": "ceo-command-center-v1",
   "status": "ACTIVE_INTERNAL",
   "live_data_location": "Supabase private schema ai_business_os_prod",
-  "latest_snapshot_key": "ceo-command-center-v1-initial",
-  "latest_snapshot_hash": "a43a52866cbae835aab49ea81a5a7a58589fc565deece44d7bd811e34c08c561",
-  "generated_at": "2026-09-24T21:57:10.695610Z",
+  "latest_snapshot_key": "ceo-command-center-v1-complete",
+  "latest_snapshot_hash": "3a7db5c6f9835298affed99c7e027727dd9cc75114e999bb977be0d061a93f57",
+  "generated_at": "2026-09-24T22:37:16.482789Z",
   "system_summary": {
     "active_agents": 7,
     "low_risk_agents": 6,
@@ -26,7 +26,18 @@
     "ai_business_os_prod.command_center_portfolio_v1",
     "ai_business_os_prod.command_center_agents_v1",
     "ai_business_os_prod.command_center_system_v1",
+    "ai_business_os_prod.command_center_revenue_loops_v1",
+    "ai_business_os_prod.command_center_portfolio_allocator_v1",
     "ai_business_os_prod.command_center_latest_v1",
     "ai_business_os_prod.approval_inbox_queue"
-  ]
+  ],
+  "capital_allocator": {
+    "status": "ACTIVE_FAIL_CLOSED",
+    "allocation_ready_count": 0,
+    "observe_only_count": 4,
+    "blocked_plan_count": 4,
+    "open_data_gaps": 28,
+    "policy_min_evidence_coverage": 0.6,
+    "policy_max_allocation_share": 0.5
+  }
 }
