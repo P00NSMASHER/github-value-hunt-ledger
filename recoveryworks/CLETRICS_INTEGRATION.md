@@ -481,3 +481,9 @@ A configurable DR-age limit prevents an old restore rehearsal from satisfying a 
 Post-deployment incident assessment now requires a verified environment snapshot and detects health/readiness failures plus release, image, source-commit, and deployment-contract drift. A healthy snapshot that matches the expected release does not create an incident artifact.
 
 Rollback uses the already-bound release rollback manifest and target release, then requires distinct approvals (two in production) before producing a credential-free handoff for a separate deployer. RecoveryOS contains no rollback executor. A downstream rollback receipt is accepted only when it binds the exact handoff/target and a verified healthy post-rollback environment snapshot confirms the target release/image/source/deployment proof. Passing yields ROLLBACK_VERIFIED.
+
+## Incident lifecycle and post-incident review (step 19b)
+
+Production incidents now have a private hash-chained lifecycle journal covering DETECTED, ACKNOWLEDGED, ESCALATED, rollback approval/handoff/verification, RECOVERY_CONFIRMED, CLOSED, and REVIEWED states. Invalid transitions, sequence gaps, previous-hash breaks, event tampering, and journal state-hash changes fail closed.
+
+Closure evidence binds the original incident, verified rollback receipt, recovered environment snapshot proof, closing actor/time, and closure reason. A separate post-incident review records root cause, contributing factors, corrective/preventive actions, follow-up owner, and due date while explicitly not claiming that those actions have already been executed.
