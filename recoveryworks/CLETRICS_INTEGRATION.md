@@ -511,3 +511,9 @@ A downstream activation receipt is accepted only when it binds that exact handof
 A read-only continuous assurance evaluation now checks the admitted release against verified environment state, exact external security evidence and its age, DR rehearsal freshness, private-backup RPO/retention/freshness, tamper-evident run-history integrity/currentness, Cletrics processing-evidence freshness/verification, unresolved incident lifecycle state, and outstanding cloud supersession candidates.
 
 Results are PASS, REVIEW_REQUIRED, or BLOCKED. Release/image drift, stale security/DR/backups/history/cloud evidence, or unresolved incidents block assurance. Unverified cloud evidence, closed-but-unreviewed incidents, and supersession candidates require review. The snapshot is alert-ready and can be written privately as JSON/Markdown, but automatic remediation and external actions remain disabled.
+
+## Enterprise control/evidence map (step 23a)
+
+Buyer diligence now has a machine-readable/private control map covering read-only access control, private state/backups, secure SDLC/release admission, software supply chain, DR/continuity, incident response, auditability/continuous assurance, deterministic financial integrity, and separation of authorization from external mutation.
+
+Every internally evidenced control points to exact proof hashes plus explicit limitations. SOC 2 and ISO 27001 labels may appear only as questionnaire/reference mappings; the artifact hard-fails on certification claims and explicitly records third_party_audit_completed=false. It does not claim SOC 2, ISO 27001, PCI DSS, HIPAA, FedRAMP, or other certifications/attestations that have not actually been obtained.
