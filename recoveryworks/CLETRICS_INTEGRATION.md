@@ -475,3 +475,9 @@ The bridge also reuses the exact vulnerability-scan receipt from step 17a. A ver
 Production deployment now has a single admission choke point. The admission gate requires the exact PRODUCTION promotion gate, externally verified release-security evidence, a current passing DR rehearsal, and the exact container-build manifest bound to the release source commit and image digest.
 
 A configurable DR-age limit prevents an old restore rehearsal from satisfying a new production admission. The gate itself cannot deploy anything. Release deployment handoffs now require the production-admission proof in addition to the promotion gate, preventing the older promotion-only path from bypassing security/DR/build controls.
+
+## Governed incident detection and rollback handoff (step 19a)
+
+Post-deployment incident assessment now requires a verified environment snapshot and detects health/readiness failures plus release, image, source-commit, and deployment-contract drift. A healthy snapshot that matches the expected release does not create an incident artifact.
+
+Rollback uses the already-bound release rollback manifest and target release, then requires distinct approvals (two in production) before producing a credential-free handoff for a separate deployer. RecoveryOS contains no rollback executor. A downstream rollback receipt is accepted only when it binds the exact handoff/target and a verified healthy post-rollback environment snapshot confirms the target release/image/source/deployment proof. Passing yields ROLLBACK_VERIFIED.
