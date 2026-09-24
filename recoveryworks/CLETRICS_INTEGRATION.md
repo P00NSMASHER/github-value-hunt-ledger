@@ -199,3 +199,23 @@ The CLI entry point is:
 
 The ZIP writer uses deterministic entry metadata so identical source bytes and
 manifest inputs produce identical bundle bytes.
+
+## AWS end-to-end rehearsal
+
+`recoveryworks.cletrics_aws_rehearsal.run_aws_cletrics_rehearsal()` now
+exercises the complete read-only AWS-shaped path using synthetic FOCUS billing,
+independent meter evidence, reviewed rate authority, discount authority,
+commitment authority/allocation, anomalies, reconciliation drift, and explicit
+savings opportunities.
+
+The rehearsal deliberately proves three independent recovery theories:
+
+- base contracted-rate mismatch: 1000 validated cents;
+- contractual variable-discount omission: 1200 validated cents;
+- commitment-benefit omission: 1600 validated cents.
+
+A second AWS service with no reviewed contract authority produces
+`NO_CONTRACT_RATE` and no recovery case. Two savings recommendations, two
+anomalies, and reconciliation drift remain on the non-money financial surface.
+The acceptance function raises rather than returning success if any signal
+estimate leaks into RecoveryOS validated dollars.
