@@ -562,6 +562,66 @@ def build_freight_review_packet(
     )
 
 
+def verify_freight_review_packet(packet: FreightReviewPacket) -> None:
+    """Recompute every case hash and the outer packet hash."""
+    for case in packet.cases:
+        case_body = {
+            "schema": 1,
+            "finding_id": case.finding_id,
+            "finding_proof_hash": case.finding_proof_hash,
+            "reference": case.reference,
+            "client_id": case.client_id,
+            "counterparty_id": case.counterparty_id,
+            "load_id": case.load_id,
+            "invoice_number": case.invoice_number,
+            "invoice_load_id": case.invoice_load_id,
+            "rate_confirmation_load_id": case.rate_confirmation_load_id,
+            "pod_load_id": case.pod_load_id,
+            "invoice_carrier_name": case.invoice_carrier_name,
+            "origin": case.origin,
+            "destination": case.destination,
+            "service_date": case.service_date,
+            "finding_type": case.finding_type,
+            "normalized_category": case.normalized_category,
+            "state": case.state,
+            "action_hint": case.action_hint,
+            "reason": case.reason,
+            "confidence_basis": case.confidence_basis,
+            "original_engine_message": case.original_engine_message,
+            "original_engine_impact_cents": case.original_engine_impact_cents,
+            "calculation": asdict(case.calculation),
+            "authority": asdict(case.authority) if case.authority else None,
+            "evidence": [asdict(item) for item in case.evidence],
+            "integrity_blockers": list(case.integrity_blockers),
+            "authority_blockers": list(case.authority_blockers),
+            "authority_resolution_hash": case.authority_resolution_hash,
+            "matched_authority_rule_hashes": list(case.matched_authority_rule_hashes),
+            "external_action_allowed": case.external_action_allowed,
+            "realized_recovery_asserted": case.realized_recovery_asserted,
+        }
+        expected_case_hash = canonical_hash(case_body)
+        if expected_case_hash != case.case_hash:
+            raise ValueError("freight review case hash mismatch: " + case.case_id)
+        if case.case_id != "freight-case:" + expected_case_hash:
+            raise ValueError("freight review case id/hash mismatch: " + case.case_id)
+
+    packet_body = {
+        "schema": 1,
+        "engine_id": packet.engine_id,
+        "engine_commit": packet.engine_commit,
+        "load_id": packet.load_id,
+        "case_count": packet.case_count,
+        "supplemental_finding_count": packet.supplemental_finding_count,
+        "candidate_recovery_cents": packet.candidate_recovery_cents,
+        "validated_candidate_cents": packet.validated_candidate_cents,
+        "review_candidate_cents": packet.review_candidate_cents,
+        "cases": [asdict(case) for case in packet.cases],
+        "supplemental_findings": [asdict(item) for item in packet.supplemental_findings],
+    }
+    if canonical_hash(packet_body) != packet.packet_hash:
+        raise ValueError("freight review packet hash mismatch")
+
+
 def freight_review_packet_as_dict(packet: FreightReviewPacket) -> dict[str, Any]:
     return asdict(packet)
 
@@ -679,4 +739,5 @@ __all__ = [
     "build_freight_review_packet",
     "freight_review_packet_as_dict",
     "render_freight_review_packet_markdown",
+    "verify_freight_review_packet",
 ]
