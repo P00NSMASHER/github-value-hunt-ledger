@@ -1,161 +1,190 @@
 # Freight Recovery — Commercial Operating Model
 
-Updated: 2026-09-21
+Updated: 2026-09-23
 
-## Decision and evidence
+## Flagship offer
 
-Build a supervised freight-invoice review service, prove that customers will pay for a useful report, and offer recurring monitoring where continued value and delivery economics are demonstrated. Hunter supplies reusable methods, evidence standards and measured improvements to this workflow.
+Freight Recovery enters the market with a **free recovery audit and a
+success-based recovery engagement**.
 
-The buyer-facing promise is:
+- The initial audit costs the customer **$0 upfront**.
+- The audit determines whether meaningful recovery opportunities appear to
+  exist and whether a recovery engagement is worth considering.
+- The customer receives a concise opportunity summary, not a claim-ready
+  forensic package or the proprietary recovery playbook.
+- If the customer authorizes Freight Recovery to pursue an opportunity, the
+  engagement states the applicable contingency percentage before work begins.
+- Freight Recovery earns a fee only on fee-eligible funds actually recovered
+  for the customer. No recovery means no recovery fee.
+- Recovery is never guaranteed.
 
-> We check a defined set of freight invoices against your agreements and shipment records. You receive a reviewed report showing supported discrepancies, the calculations behind them, and the evidence needed to decide what to do next.
+The working default contingency rate is defined once in
+`freight/commercial_terms.py` as `DEFAULT_CONTINGENCY_RECOVERY_RATE = 0.30`.
+The public build, calculator, proposal workflow, and settlement arithmetic must
+consume that value or an explicit engagement-specific override. It is an
+adjustable commercial assumption, not a permanent promise.
 
-The first product remains the **Blind Freight Audit Acceptance Test**. Its blind comparison measures the incremental result against the customer's existing process. A clean result is a valid report; it is not evidence that money was recovered.
+Optional fixed-fee forensic work remains available by custom written scope for
+buyers who prefer to pay directly and retain all recovered funds. It has no
+public self-checkout and is not the launch offer.
 
-Current evidence limits:
+## What the free audit includes
 
-- The structured Hunter outcome ledger records technical rehearsal evidence and **no directly evidenced commercial revenue or customer value**; the structured record's monetary fields are null. Missing commercial evidence is not a measured zero-sales result. This describes that ledger, not every business account.
-- Repository benchmarks and passing tests establish only the behavior they exercise. They do not establish installed customer integrations, production readiness, buyer demand or recovery rates.
-- Confidential customer-data kickoff remains subject to the current route-specific [Pilot Launch Gate](PILOT_LAUNCH_GATE.md). A commercially attractive deal or paid diagnostic cannot override that gate.
-- The public entry point is a static, zero-customer-data sales site. Live checkout must remain fail-closed until both exact-price Payment Links are verified in a Freight Recovery-branded Stripe account and the deployment variables are present.
-- A September 18 sales-tracker snapshot lists 104 prospects, 25 wave-one targets, 10 first touches and zero replies as of that artifact. These are historical records, not a current inbox verification; the universe includes unqualified/removed records. Preserve existing one-touch statuses before any later authorized outreach.
+The free audit is a bounded qualification and opportunity-assessment service.
+It may communicate:
 
-## First customer and scope
+- records and date range reviewed;
+- detected opportunity categories;
+- number or value of transactions flagged;
+- a supportable potential-recovery range;
+- confidence and important evidence limitations; and
+- the recommended next step.
 
-Prioritize a regional manufacturer or distributor with a named finance/transportation owner, accessible records and a specific billing-control problem. Roughly $5M annual transport spend or 500 invoices/month is a prioritization signal, not proof of fit.
+It does not automatically include every matching rule, exact dispute strategy,
+claim-ready schedule, carrier correspondence, complete evidence packet, or
+recovery operating instructions. Those artifacts are created and used within
+an authorized recovery engagement. This boundary keeps the audit useful while
+preventing unlimited free consulting or circumvention.
 
-Qualification must establish:
+Potential recovery, approved claim value, and actual recovered funds are three
+different states:
 
-1. A buyer with authority to purchase and an owner able to supply records.
-2. A defined business unit, population, carrier/mode scope, currency and period.
-3. Controlling rates/amendments and the shipment evidence needed by selected checks.
-4. An existing audit/payment result that can be sealed for a blind comparison.
-5. A later credit/refund/remittance source if recovery is part of the objective.
-6. An agreed review process, acceptance criteria and value question.
-7. A valid data-handling route before confidential files are accepted.
-
-Start with one mode and currency. Select the mode from accessible records and supported checks; do not advertise every freight mode. Freight consultants and independent auditors are prospective referral partners. Their interest and customer access are hypotheses to test.
-
-The [Commercial Playbook](COMMERCIAL_PLAYBOOK.md) contains the bounded pilot envelope, qualification questions, proposal draft and delivery checklist.
-
-## Offer catalog and version control
-
-These bands are **unvalidated commercial hypotheses currently encoded in the internal activation/charter system**, not market-validated pricing or evidence of sales. Earlier $2,500 diagnostic and $3,000/month scenarios are separate planning hypotheses, not active machine-supported pilot offers.
-
-| Standard public purchase | Exact public price | Buyer receives | Boundary |
-|---|---:|---|---|
-| Readiness Review | **$5,000 fixed, one time** | Source inventory, missing-authority/risk map and bounded go/no-go plan | Not a line-by-line invoice audit; customer files still require an approved intake route |
-| Base Freight Audit | **$15,000 fixed, one time** | Up to 250 invoices, two carriers, one domestic mode, one currency, 90 consecutive historical days, up to three agreed check families, one source-linked report, one review meeting and one consolidated correction round | Readiness/launch pass; complete inputs and authorized kickoff start the delivery clock |
-| Managed Recovery | **Optional 20% of uniquely attributable net realized amounts** | Buyer-approved case preparation, administration, follow-up, settlement matching and reversal tracking | Separately authorized after findings; customer keeps 80%; external actions require specific approval |
-| Continuous Freight Assurance | Historical planning band: $60,000–$150,000 annual base; larger accounts $150,000–$300,000+ | Agreed recurring checks, exception review, credit tracking and reporting | Paid work demonstrates ongoing value, reviewer capacity and recurring margin |
-
-The fixed checkout fee pays for the selected review and is separate from the recovery split; it is not credited against the 20% recovery fee. No setup fee, card surcharge, subscription or automatic add-on applies to either checkout offer. Applicable tax, if legally required, must be shown before payment. Added sources, systems, monitoring, disputes or recovery work require a separate written price and customer approval.
-
-Recovery money is paid or credited to the customer. Freight Recovery invoices its 20% fee separately after the customer has received an independently traceable eligible amount. For a $15,000 Base Freight Audit followed by $50,000 of fee-eligible realized recovery, the customer keeps $40,000 of the recovery, the managed-recovery fee is $10,000, and total Freight Recovery charges are $25,000 ($15,000 fixed + $10,000 variable).
-
-The activation catalog retains controlled price-band validation for previously prepared or custom scoped packets. The public checkout selects the lower-bound standard scope above. Any nonstandard price or scope must be deliberate, written, and validated through the activation/charter process; it is never added after checkout by implication. Large-account bands are future hypotheses, not the initial sales target. Recurring pricing is not enforced by the current activation catalog and needs its own explicit scope, agreement and operating readiness.
-
-### Reconcile historical offers before quoting
-
-The saved September 18 landing-page artifact describes a free 20-invoice sample and $0 setup plus 20% contingency. That conflicts with the internal fixed-fee ladder. The artifact does not prove what any prospect accepted.
-
-- Identify each prospect's dated proposal/site version and any acceptance. Preserve terms already offered or agreed; do not retroactively charge a previously offered free sample.
-- Confirm the operative dated offer before a follow-up, quote or invoice. For new standard purchases, use the exact checkout offer and disclose that the optional 20% managed-recovery fee is separate from the fixed review fee.
-- A historical/free 20-invoice sample is bounded feasibility work, not proof of annual savings, an error-rate estimate or subscription value.
-- Any new lower-priced pilot requires coordinated changes to the offer definition, activation catalog, charter validation, fixtures and customer-facing copy. Do not bypass fee validation or reuse an existing offer name for materially different terms.
-- Accepted engagement changes follow the existing amendment process.
-
-The paid blind-test clock targets **10–15 business days after complete inputs and authorized kickoff**, subject to agreed scope and reviewer capacity. Carrier response and settlement are separate and are not promised within that window.
-
-## The report is the product
-
-Every report contains an executive decision summary, complete invoice disposition register, supported finding packets, unresolved-evidence requests and the blind comparison. Show separate totals for reviewed discrepancies, validated findings, challenger-only validated findings and uniquely attributable realized amounts.
-
-Each supported packet identifies the invoice/shipment, controlling term/effective version, source page/cell/segment, reproducible expected charge, observed charge, exact discrepancy and next decision. Account for clean, unsupported, excluded and unresolved records so a small finding count cannot conceal low coverage.
-
-Review every asserted finding before delivery. Independently review a predeclared sample of non-flagged records to look for missed problems and disclose the sample limits. Missing or ambiguous authority, identity or required evidence remains REVIEW / $0 asserted; uncertain settlement remains $0 realized. Model confidence is never commercial authority. An extractor/rater must not certify its own conclusion without independent review.
-
-Incumbent output remains sealed until buyer-owned truth is frozen. Customer records are read-only during the initial pilot unless a separately approved workflow applies. Carrier contact requires a specific approved action; this model authorizes no external communication or money movement.
-
-## Recurring value and revenue
-
-Recurring work must solve an ongoing problem: review workload, unresolved credits, changing rates, repeat accessorial errors or billing-control gaps. Historical recovery alone does not justify a subscription.
-
-Track these separately:
-
-- **Recovery:** uniquely allocated, externally evidenced credits/refunds/remittances actually received or posted to the customer, net of known reversals. The standard managed-recovery fee is 20% and the customer keeps 80%. Never charge the fee on a flag or claim alone, incumbent-known, automatic/preexisting, unresolved, unpaid, duplicate, unsupported or reversed amounts. A later reversal recalculates the eligible base and produces a customer fee credit or refund where required.
-- **Corrected future charges:** observed corrections against agreed authority in an actual later invoice period. Short-sample annualization is not realized savings.
-- **Time savings:** measured hours against a declared comparable baseline and agreed cost basis. Keep this separate from recovered dollars and prevent overlap.
-
-Booked fees, cash collected and recurring contracted revenue are different fields. Recovery money belongs to the customer; only an earned agreed fee is Freight revenue. The customer receives the credit/refund/remittance directly and Freight invoices its fee separately. A clean audit can support paid assurance value if the buyer wants it, but cannot prove recovery performance.
-
-Recurring expansion requires a buyer-confirmed ongoing need, accepted priced scope, measured delivery cost, reviewer capacity and an explicit renewal/exit process.
-
-## Economics and the million-dollar scenario
-
-Use `freight/deal_economics.py` for fixed-fee qualification. Its commercial route does not authorize data access or launch. A diagnostic handling actual customer records needs a valid controlled-data path; metadata-only qualification does not require uploading those records.
-
-- Preserve the current **50% fixed-fee gross-margin planning target** until evidence supports review.
-- Cost intake, normalization, review, report revisions, support and founder delivery time at a loaded rate. Unpaid founder work is not zero-cost capacity.
-- Measure recurring labor rather than assuming onboarding cost disappears.
-- Deduct referral commissions and acquisition costs separately when assessing contribution and cash needs. Success-fee upside cannot rescue fixed-fee economics.
-- The calculated analyst-hour budget is a scope limit. Narrow scope, revise a prospective offer through the controlled process or HOLD if expected labor exceeds it.
-
-| Scenario, not forecast | Annualized recurring revenue | Status |
-|---|---:|---|
-| 28 retained customers × $3,000/month | $1,008,000 | Exploratory lower-scope model; monthly price is not validated |
-| 14 retained customers × $6,000/month | $1,008,000 | Within historical annual planning band; willingness to pay unproven |
-
-One-time diagnostics and unearned/variable recovery fees are excluded from recurring revenue. Annualized run rate is not first-year booked or recognized revenue, and revenue is not owner profit. Model churn, collection delay, onboarding capacity and concentration before funding growth.
-
-At 28 customers, six delivery hours/customer/month requires 168 hours; 20 hours requires 560. Both are assumptions to test. Founder oversight, selling and technical upkeep are additional. The design requires paid specialist capacity rather than expecting the founder to perform all delivery alongside employment.
-
-## Referral channel
-
-Test one prospective partner after direct paid work establishes a repeatable deliverable. Initially the partner introduces a qualified buyer, Freight contracts directly with that buyer, and attribution is recorded before the proposal.
-
-A **20% share of collected fixed fees for at most the first 12 months** is an internal negotiation hypothesis, not an offer made. The agreement must define attribution, excluded taxes/refunds, duration, payment timing and reversals. Separate compensation for review/delivery work from referral commission.
-
-Buyer agreement governs partner data access. Partners cannot approve their own disputed findings or authorize carrier contact for the customer. Defer white-label software until multiple paying partners require the same workflow.
-
-Measure qualified opportunities, paid conversions, acquisition effort, contribution after commission, quality, retention and concentration. Six partners producing four customers each is not an established channel.
-
-## Hunter connection and learning
-
-Hunter's capability graph and outcome adapter already exist. Connect specific delivery problems to existing research, then record what actually changed.
-
-| Business need | Hunter assets | Acceptance measure |
+| State | Meaning | Fee treatment |
 |---|---|---|
-| Lower intake effort | CAP-001 extraction; CAP-002 identity | Complete-population hours and false accepted facts |
-| Defensible charge review | CAP-003 authority; CAP-004 rerating; CAP-005 shipment evidence | Supported findings, unsupported dollars and adjudication time |
-| Honest recovery reporting | CAP-006 settlement; CAP-016 accounting; CAP-018 later returns | Unique allocation; duplicates/reversals accounted for |
-| Reliable recurring feeds | CAP-007 proof; CAP-019 observation receipts | Missing/failed feeds stay unknown; coverage and freshness |
-| Delivery resilience | Recovery-proof and failure catalogs | Verified recoverability of the approved operating path |
-| Better commercial decisions | Search attribution, outcome adapter and cohort calibration | Paid conversions, full labor costs, contribution and retention |
+| Potential recovery | A screened estimate that still needs validation | Never feeable |
+| Approved claim value | A supported amount authorized for pursuit | Never feeable merely because it was submitted |
+| Actual recovered funds | A traceable credit, refund, remittance, or other agreed realized benefit received by the customer | Feeable only when the engagement makes it eligible |
 
-Scientific/industrial catalogs can supply transferable methods or negative examples; they do not become freight features merely because they exist. A catalog score is not expected customer return.
+## Customer journey
 
-For each adoption record the source revision, named gap, affected check, independent evaluation, integration cost, deployment route, rollback condition and target metric. Customer files and identifying findings stay in their controlled environment; only authorized minimized outcome summaries enter Hunter.
+1. A visitor understands the $0-upfront, success-based offer.
+2. The visitor completes the short qualification form. The public site requests
+   business metadata only and does not accept freight records or credentials.
+3. Freight Recovery reviews fit and issues an approved secure intake route when
+   appropriate.
+4. The customer submits the agreed records through that route.
+5. Freight Recovery performs a bounded audit and produces an opportunity
+   summary.
+6. If no viable opportunity is found, the customer owes nothing.
+7. If a viable opportunity exists, Freight Recovery presents scope,
+   contingency percentage, authorization, data-use, confidentiality,
+   termination, payment-timing, attribution, and anti-circumvention terms.
+8. Only after acceptance does detailed claim preparation and recovery execution
+   begin.
+9. Settlement evidence is reconciled and any recovery fee is calculated only
+   from fee-eligible actual recovered funds.
 
-The existing [gap register](GAP_REGISTER.json) controls new freight searches. Using the corpus does not authorize a new hunt or widen a gap. Record actual results through [OUTCOME_RECORDING.md](OUTCOME_RECORDING.md).
+Checkout links and an upfront purchase are intentionally absent from this
+entry flow.
 
-Preserve the commercial-learning requirement: five unique buyer cohorts, five paid engagements and usable margin evidence from five buyers before automated repricing-review recommendations. Repeated work is collapsed to buyer-level medians; conversion estimates include sample uncertainty. The threshold does not prevent fixing an unsafe workflow, honoring a prior offer or a separately documented prospective offer experiment; none may be labeled empirically validated repricing.
+## Qualification and capacity protection
 
-The current calibrator detects recorded stage co-occurrence within buyer cohorts; it does not establish the chronological order or elapsed time of diagnostic-to-pilot-to-annual conversion. Preserve dated stage events and follow-up windows separately before interpreting those ratios as a timed funnel or forecasting retention.
+The public form collects only the fields needed to route work: contact and
+company, annual freight-spend band, monthly shipment band, modes, carrier
+count, available history, invoice volume, record types, prior-audit status, and
+known or suspected issues.
+
+`freight/lead_qualification.py` maps that metadata to internal states:
+
+- `HIGH_PRIORITY_RECOVERY_CANDIDATE`
+- `QUALIFIED`
+- `NEEDS_REVIEW`
+- `INSUFFICIENT_DATA`
+- `LOW_EXPECTED_RECOVERY`
+
+These are routing signals, not customer promises. Analysts may override them
+with a reason. Do not expose thresholds or a score that enables gaming.
+
+Before substantial manual work, confirm a named economic buyer, an operational
+records owner, a bounded population, accessible invoices and supporting
+records, sufficient history, an approved data route, and available review
+capacity. Use a representative sample or staged intake when the full population
+would create disproportionate cost.
+
+## Fee eligibility and attribution
+
+The recovery-fee base excludes flags, estimates, pending claims, duplicate
+amounts, unsupported amounts, pre-existing or incumbent-known efforts,
+automatic credits, reversals, and any category excluded by the signed
+engagement. `calculate_recovery_fee()` additionally prevents fee-eligible funds
+from exceeding actual recovered funds.
+
+Settlement evidence should independently identify the invoice or shipment,
+amount, date, recovery path, customer receipt or posted credit, attribution,
+and later reversal status. A later reversal requires recalculation and the
+contractually appropriate fee credit or refund.
+
+Recovery money belongs to the customer. Freight Recovery recognizes only its
+earned fee as revenue. Booked fees, invoiced fees, cash collected, potential
+recovery, and customer recovery are separate fields.
+
+## Data, authorization, and evidence controls
+
+The public GitHub Pages site is a static qualification surface. It does not
+upload, transmit, or store customer freight files. Ordinary email is used only
+to send the prepared qualification summary; the customer is told not to attach
+records or credentials. Confidential data may be accepted only through a
+route that has passed the applicable launch and security controls.
+
+Customer data remains read-only during the initial analysis unless a separately
+approved workflow says otherwise. Carrier contact, claim submission, dispute
+activity, settlement acceptance, and money movement each require the authority
+defined for that engagement. A marketing form or opportunity summary grants no
+such authority.
+
+Every asserted finding must retain source lineage and reviewer support. Missing
+or ambiguous authority stays in review and contributes no asserted or feeable
+dollars. Technical tests and synthetic demonstrations prove only the behavior
+they exercise; they do not prove customer demand, production security,
+recovery rate, or revenue.
+
+## Engagement framework
+
+The website describes the commercial workflow but does not fabricate legal
+terms. A future agreement workflow must capture at least:
+
+- parties, scope, covered entities, carriers, modes, dates, and exclusions;
+- contingency rate and the definition of fee-eligible recovered funds;
+- attribution window, pre-existing matters, automatic credits, and reversals;
+- authorization for each external action;
+- confidentiality, data use, retention, and deletion;
+- invoicing, verification, payment timing, and dispute handling;
+- termination and treatment of in-flight or later realized recoveries; and
+- reasonable protection against use of Freight Recovery findings to avoid the
+  agreed fee.
+
+Final language requires qualified legal review. The public engagement framework
+is explanatory and is not itself a contract.
+
+## Measurement and learning
+
+Track the funnel with stable names for landing view, free-audit CTA, form start,
+form completion, secure data route, data submission, qualification, audit
+completion, opportunity identification, engagement start and acceptance, and
+actual recovery. Browser events must represent actions that really occurred;
+operator and backend milestones are recorded only by the systems that know they
+occurred.
+
+For every accepted engagement, measure analyst and reviewer time, direct cost,
+records reviewed, finding quality, claim value, actual recovery, fee-eligible
+recovery, reversals, days to each stage, and contribution after acquisition and
+delivery cost. The free audit must remain economically bounded even when no
+recovery results.
+
+Do not publish recovery statistics, testimonials, logos, case studies, security
+certifications, or carrier relationships without direct permission and
+evidence. The site intentionally reserves a proof area for future verified case
+studies.
 
 ## Advancement and stop rules
 
-1. Reconcile public availability and offer versions; prepare the buyer-safe report and qualification packet.
-2. Complete an authorized bounded feasibility review if the prospect accepts its existing terms.
-3. Deliver three paid pilots to measure demand, input burden, quality and full cost.
-4. Obtain at least two repeat-paying customers for an explicitly scoped ongoing service.
-5. Add one tested referral relationship and enough paid reviewer capacity.
-6. Expand toward ten retained customers after successive reporting periods demonstrate capacity, margins and retention; then evaluate million-dollar scenarios.
+Advance from qualification to audit only when the likely opportunity and
+available evidence justify the review budget. Advance from audit to recovery
+only when supported value, attribution, authorization, capacity, and expected
+contribution justify the work.
 
-These are internal milestones, not automatic production approvals. Pause and repair the offer when inputs remain unavailable, qualified buyers will not pay, work exceeds the priced budget or recurring reports lack value. Repeated objections require revisiting customer/problem/scope rather than promising higher savings.
-
-Any unsupported dollar claim, lost evidence lineage or material data-handling failure stops affected output until reviewed. Do not hide REVIEW/excluded records to improve metrics. Do not build another TMS, generalized OCR engine, payment service or self-service portal without a named customer need and positive expected economics.
-
-Weekly scorecard: qualified prospects and next steps; offer versions; ready/blocked inputs; paid engagements; labor vs budget; evidence quality; customer decisions; specifically approved external actions; cash collected and unpaid costs.
-
-Monthly recurring scorecard: active paying customers; contracted recurring fees; collections; new/lost/renewed accounts; contribution; partner costs; onboarding/review load; source coverage; reversals; customer-confirmed value and concentration. Every commercial claim links to direct evidence.
+Pause or narrow work when sources are unavailable, provenance is lost, scope is
+unbounded, the expected recovery cannot support responsible delivery, the
+customer will not accept attribution terms, or customer-data controls are not
+ready. Never compensate for weak economics with a larger unsupported recovery
+estimate.

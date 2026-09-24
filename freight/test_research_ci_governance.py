@@ -65,9 +65,10 @@ def test_freight_pages_deployment_is_main_only_verified_and_config_gated():
     assert "github.ref == 'refs/heads/main'" in text
     assert "vars.FREIGHT_CONTACT_VERIFIED == '1'" in text
     assert "vars.FREIGHT_CONTACT_EMAIL != ''" in text
-    assert "vars.FREIGHT_CHECKOUT_VERIFIED == '1'" in text
-    assert "vars.FREIGHT_READINESS_CHECKOUT_URL != ''" in text
-    assert "vars.FREIGHT_AUDIT_CHECKOUT_URL != ''" in text
+    assert "FREIGHT_CONTINGENCY_RECOVERY_RATE" in text
+    assert "FREIGHT_CHECKOUT_VERIFIED" not in text
+    assert "FREIGHT_READINESS_CHECKOUT_URL" not in text
+    assert "FREIGHT_AUDIT_CHECKOUT_URL" not in text
     assert "pages: write" in text
     assert "id-token: write" in text
     assert "python freight/site/build.py --output /tmp/freight-recovery-public" in text

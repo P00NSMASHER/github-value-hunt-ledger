@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the public marketing bundle; never copy or publish the private repo."""
+"""Build the public Freight Recovery bundle; never publish the private repo."""
 
 from __future__ import annotations
 
@@ -11,20 +11,37 @@ from pathlib import Path
 import re
 import sys
 import tempfile
-from urllib.parse import urlsplit
 
 SOURCE = Path(__file__).resolve().parent
 REPOSITORY = SOURCE.parent.parent
 if str(REPOSITORY) not in sys.path:
     sys.path.insert(0, str(REPOSITORY))
 
+from freight.commercial_terms import (
+    DEFAULT_CONTINGENCY_RECOVERY_RATE,
+    contingency_rate_label,
+    normalize_contingency_rate,
+)
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 
 
+PUBLIC_CONTACT_PAGES = (
+    "index.html",
+    "privacy.html",
+    "engagement-framework.html",
+)
 TEXT_SOURCE_FILES = (
     "index.html",
+    "privacy.html",
+    "engagement-framework.html",
+    "404.html",
     "site.css",
     "site.js",
+    "commercial-config.js",
+    "favicon.svg",
+    "robots.txt",
+    "sitemap.xml",
+    "site.webmanifest",
     "_headers",
     "assets/fonts/ATTRIBUTION.json",
     "assets/fonts/LICENSE-HANKEN-GROTESK.txt",
@@ -34,38 +51,23 @@ BINARY_SOURCE_FILES = (
     "assets/fonts/hanken-grotesk-latin.woff2",
     "assets/fonts/instrument-serif-italic-latin.woff2",
     "assets/fonts/instrument-serif-latin.woff2",
-    "assets/images/approved-path-800.webp",
-    "assets/images/approved-path.webp",
-    "assets/images/dock-control-800.webp",
-    "assets/images/dock-control.webp",
     "assets/images/freight-network-800.webp",
     "assets/images/freight-network.webp",
-    "assets/images/human-review-800.webp",
-    "assets/images/human-review.webp",
     "assets/images/invoice-evidence-800.webp",
     "assets/images/invoice-evidence.webp",
-    "assets/images/rail-yard-800.webp",
-    "assets/images/rail-yard.webp",
-    "assets/images/rate-authority-800.webp",
-    "assets/images/rate-authority.webp",
     "assets/images/terminal-blue-hour-800.webp",
     "assets/images/terminal-blue-hour.webp",
-    "assets/images/trailer-blue-hour-800.webp",
-    "assets/images/trailer-blue-hour.webp",
-    "assets/images/truck-cab-800.webp",
-    "assets/images/truck-cab.webp",
-    "assets/images/warehouse-handoff-800.webp",
-    "assets/images/warehouse-handoff.webp",
 )
 SOURCE_FILES = TEXT_SOURCE_FILES + BINARY_SOURCE_FILES
 DEMO_FILE = "synthetic-pilot-demo.zip"
 PUBLIC_FILES = SOURCE_FILES + (DEMO_FILE,)
+
 CONTACT_META = '<meta name="freight-contact-email" content="">'
+CONTACT_LINK = 'data-contact-link href="#contact-pending"'
 STATUS_PATTERN = re.compile(r'(<div class="wrap" id="contactStatus">).*?(</div>)')
 DEMO_MARKER = '<!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->'
-READINESS_CHECKOUT = 'data-checkout="readiness" href="#checkout-unavailable"'
-AUDIT_CHECKOUT = 'data-checkout="audit" href="#checkout-unavailable"'
-CONTACT_LINK = 'data-contact-link href="#contact-pending"'
+RATE_TOKEN = "__CONTINGENCY_RECOVERY_RATE__"
+RATE_LABEL_TOKEN = "__CONTINGENCY_RECOVERY_RATE_LABEL__"
 
 
 def _public_source(name: str) -> Path:
@@ -81,14 +83,15 @@ def _public_source(name: str) -> Path:
 
 
 def validate_contact(value: str, verified: bool) -> str:
-    """Require a sensible public mailbox plus an explicit ownership attestation."""
+    """Require a sensible public mailbox plus explicit operator verification."""
     if not verified:
         raise ValueError("Verify the business inbox, then set FREIGHT_CONTACT_VERIFIED=1.")
     email = value.strip()
     if len(email) > 254 or not re.fullmatch(
         r"[A-Za-z0-9][A-Za-z0-9._+\-]{0,63}@"
         r"(?:[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?\.)+"
-        r"[A-Za-z]{2,63}", email
+        r"[A-Za-z]{2,63}",
+        email,
     ):
         raise ValueError("Set FREIGHT_CONTACT_EMAIL to a valid business email address.")
     local, domain = email.rsplit("@", 1)
@@ -102,61 +105,31 @@ def validate_contact(value: str, verified: bool) -> str:
     return f"{local}@{domain}"
 
 
-def validate_checkout_url(value: str, label: str) -> str:
-    """Accept only canonical live Stripe Payment Links."""
-    candidate = value.strip()
-    try:
-        parsed = urlsplit(candidate)
-    except ValueError as error:
-        raise ValueError(f"Set {label} to a valid live Stripe Payment Link.") from error
-    if (parsed.scheme != "https" or parsed.netloc.lower() != "buy.stripe.com"
-            or parsed.query or parsed.fragment):
-        raise ValueError(
-            f"Set {label} to an HTTPS buy.stripe.com Payment Link without query or fragment."
-        )
-    if not re.fullmatch(r"/[A-Za-z0-9_-]{8,200}", parsed.path):
-        raise ValueError(f"Set {label} to a canonical Stripe Payment Link.")
-    if parsed.path.lower().startswith("/test_"):
-        raise ValueError(f"Set {label} to a live Stripe Payment Link, not a test link.")
-    return candidate
-
-
-def validate_checkouts(readiness: str, audit: str, verified: bool) -> tuple[str, str]:
-    """Require two distinct operator-verified live checkout destinations."""
-    if not verified:
-        raise ValueError(
-            "Verify both Freight Recovery Payment Links, then set "
-            "FREIGHT_CHECKOUT_VERIFIED=1."
-        )
-    readiness_url = validate_checkout_url(
-        readiness, "FREIGHT_READINESS_CHECKOUT_URL"
-    )
-    audit_url = validate_checkout_url(audit, "FREIGHT_AUDIT_CHECKOUT_URL")
-    if readiness_url == audit_url:
-        raise ValueError("Readiness and audit checkout URLs must be different.")
-    return readiness_url, audit_url
-
-
 def build(
     output: Path,
     contact_email: str,
     contact_verified: bool,
-    readiness_checkout_url: str,
-    audit_checkout_url: str,
-    checkout_verified: bool,
+    contingency_recovery_rate=DEFAULT_CONTINGENCY_RECOVERY_RATE,
 ) -> Path:
     contact = validate_contact(contact_email, contact_verified)
-    readiness_checkout, audit_checkout = validate_checkouts(
-        readiness_checkout_url, audit_checkout_url, checkout_verified
-    )
+    rate = normalize_contingency_rate(contingency_recovery_rate)
+    rate_label = contingency_rate_label(rate)
     destination = output.expanduser().resolve()
-    if (destination == REPOSITORY or REPOSITORY in destination.parents
-            or destination in REPOSITORY.parents):
-        raise ValueError("Public output must be outside the private repository and its parent directories.")
-    if destination.exists() and (not destination.is_dir() or any(destination.iterdir())):
-        raise ValueError("Choose a new or empty output directory; existing files will not be overwritten.")
+    if (
+        destination == REPOSITORY
+        or REPOSITORY in destination.parents
+        or destination in REPOSITORY.parents
+    ):
+        raise ValueError(
+            "Public output must be outside the private repository and its parent directories."
+        )
+    if destination.exists() and (
+        not destination.is_dir() or any(destination.iterdir())
+    ):
+        raise ValueError(
+            "Choose a new or empty output directory; existing files will not be overwritten."
+        )
 
-    # Exact allowlist: do not recurse, glob, or follow source symlinks.
     text_bundle = {
         name: _public_source(name).read_text(encoding="utf-8")
         for name in TEXT_SOURCE_FILES
@@ -165,39 +138,50 @@ def build(
         name: _public_source(name).read_bytes()
         for name in BINARY_SOURCE_FILES
     }
-    if text_bundle["index.html"].count(CONTACT_META) != 1:
-        raise ValueError("The source must contain exactly one empty contact configuration.")
-    for marker in (READINESS_CHECKOUT, AUDIT_CHECKOUT, CONTACT_LINK):
-        if text_bundle["index.html"].count(marker) != 1:
-            raise ValueError(f"The source must contain exactly one marker: {marker}")
+
     safe_contact = html.escape(contact, quote=True)
-    page = text_bundle["index.html"].replace(
-        CONTACT_META, f'<meta name="freight-contact-email" content="{safe_contact}">'
-    )
-    page = page.replace(
-        READINESS_CHECKOUT,
-        'data-checkout="readiness" href="'
-        + html.escape(readiness_checkout, quote=True) + '"',
-    ).replace(
-        AUDIT_CHECKOUT,
-        'data-checkout="audit" href="'
-        + html.escape(audit_checkout, quote=True) + '"',
-    ).replace(
-        CONTACT_LINK,
-        'data-contact-link href="mailto:' + safe_contact
-        + '?subject=Freight%20Recovery%20checkout%20question"',
-    )
+    for name in PUBLIC_CONTACT_PAGES:
+        page = text_bundle[name]
+        if page.count(CONTACT_META) != 1:
+            raise ValueError(f"{name} must contain exactly one empty contact configuration.")
+        text_bundle[name] = page.replace(
+            CONTACT_META,
+            f'<meta name="freight-contact-email" content="{safe_contact}">',
+        )
+
+    contact_marker_count = sum(page.count(CONTACT_LINK) for page in text_bundle.values())
+    if contact_marker_count < 1:
+        raise ValueError("The public bundle must contain at least one contact-link marker.")
+    for name, page in tuple(text_bundle.items()):
+        text_bundle[name] = page.replace(
+            CONTACT_LINK,
+            'data-contact-link href="mailto:'
+            + safe_contact
+            + '?subject=Freight%20Recovery%20question"',
+        )
+
     page, count = STATUS_PATTERN.subn(
-        lambda match: match.group(1) + '<strong>Secure checkout is open.</strong> '
-        + 'Choose a fixed service below. Questions: '
+        lambda match: match.group(1)
+        + "<strong>Free audit requests are open.</strong> "
+        + "Start with non-sensitive business details. Questions: "
         + f'<a href="mailto:{safe_contact}">{safe_contact}</a>. '
-        + 'Do not email freight documents.' + match.group(2), page
+        + "Do not email freight records."
+        + match.group(2),
+        text_bundle["index.html"],
     )
     if count != 1:
         raise ValueError("The source must contain exactly one contact status banner.")
-    if page.count(DEMO_MARKER) != 1:
-        raise ValueError("The source must contain exactly one controlled-demo marker.")
+    text_bundle["index.html"] = page
 
+    config = text_bundle["commercial-config.js"]
+    if config.count(RATE_TOKEN) != 1 or config.count(RATE_LABEL_TOKEN) != 1:
+        raise ValueError("Commercial configuration must contain one rate and label token.")
+    text_bundle["commercial-config.js"] = config.replace(
+        RATE_TOKEN, format(rate, "f")
+    ).replace(RATE_LABEL_TOKEN, rate_label)
+
+    if text_bundle["index.html"].count(DEMO_MARKER) != 1:
+        raise ValueError("The source must contain exactly one controlled-demo marker.")
     with tempfile.TemporaryDirectory() as temporary:
         demo_path = Path(temporary) / DEMO_FILE
         receipt = build_synthetic_pilot_bundle(demo_path)
@@ -205,14 +189,18 @@ def build(
     if hashlib.sha256(demo_bytes).hexdigest() != receipt["bundle_sha256"]:
         raise ValueError("Controlled-demo digest changed during the public build.")
     demo_link = (
-        '<a class="button button-cobalt" href="synthetic-pilot-demo.zip" download>'
-        'Download the controlled demo</a>'
+        '<a class="text-link text-link-light" href="synthetic-pilot-demo.zip" '
+        'download data-track="controlled_demo_downloaded">'
+        'Download the controlled synthetic demo <span aria-hidden="true">&#8599;</span></a>'
         '<p class="demo-hash"><strong>SHA-256</strong> '
         f'<code>{receipt["bundle_sha256"]}</code></p>'
-        '<p class="notice">Fictional data only; no customer result, external action, '
+        '<p class="microcopy">Fictional data only; no customer result, external action, '
         'production attestation, or rights attestation.</p>'
     )
-    text_bundle["index.html"] = page.replace(DEMO_MARKER, demo_link)
+    text_bundle["index.html"] = text_bundle["index.html"].replace(
+        DEMO_MARKER, demo_link
+    )
+
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():
         target = destination / name
@@ -228,17 +216,22 @@ def build(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", required=True, type=Path,
-                        help="New or empty public directory outside the private repository")
+    parser.add_argument(
+        "--output",
+        required=True,
+        type=Path,
+        help="New or empty public directory outside the private repository",
+    )
     args = parser.parse_args()
     try:
         output = build(
             args.output,
             os.environ.get("FREIGHT_CONTACT_EMAIL", ""),
             os.environ.get("FREIGHT_CONTACT_VERIFIED") == "1",
-            os.environ.get("FREIGHT_READINESS_CHECKOUT_URL", ""),
-            os.environ.get("FREIGHT_AUDIT_CHECKOUT_URL", ""),
-            os.environ.get("FREIGHT_CHECKOUT_VERIFIED") == "1",
+            os.environ.get(
+                "FREIGHT_CONTINGENCY_RECOVERY_RATE",
+                str(DEFAULT_CONTINGENCY_RECOVERY_RATE),
+            ),
         )
     except ValueError as error:
         parser.error(str(error))

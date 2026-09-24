@@ -1,107 +1,74 @@
-# Freight Recovery public sales site
+# Freight Recovery public site
 
-This directory is the reviewed source for a static public marketing page. It is not a customer-data application and it is not evidence of a current production deployment.
+This directory is the allowlisted source for the customer-facing GitHub Pages
+bundle at `https://p00nsmasher.github.io/github-value-hunt-ledger/`.
 
-The page uses the Freight Recovery name, offers two exact one-time checkout prices, explains the optional 80/20 managed-recovery split, and includes a deterministic controlled synthetic pilot download. Its eleven responsive editorial images are illustrative and contain no customer data. The demo contains fictional inputs and current generated outputs; it does not claim a customer result, external action, production control, component right, or revenue.
+## Flagship commercial path
 
-The public page is self-contained. Image variants and the Hanken Grotesk / Instrument Serif web fonts are served locally, so the browser does not contact an image CDN, font CDN, analytics service, or other third party. The bundled fonts include their SIL Open Font License 1.1 texts plus a byte-level attribution record.
+The public offer is:
 
-## Required business and checkout configuration
+1. a **$0-upfront recovery audit**;
+2. a concise opportunity summary rather than a claim-execution package;
+3. a separately authorized recovery engagement; and
+4. a configurable contingency fee charged only against eligible funds actually
+   recovered.
 
-A **verified business contact email** is required before publication. No inbox is invented. The operator must confirm control of the inbox and independently test that it can receive and reply, then set:
+The default working rate is owned by `freight/commercial_terms.py`. The build
+injects that value into `commercial-config.js`, so changing the approved rate
+does not require editing page copy or calculator logic.
+
+Optional fixed-fee forensic work remains available by custom written scope. It
+is deliberately secondary and has no public self-checkout.
+
+## Build
+
+Set a verified public business inbox, then build into a new directory outside
+the repository:
 
 ```text
-FREIGHT_CONTACT_EMAIL=<verified public business inbox>
+FREIGHT_CONTACT_EMAIL=<verified business inbox>
 FREIGHT_CONTACT_VERIFIED=1
+FREIGHT_CONTINGENCY_RECOVERY_RATE=0.30  # optional; defaults to the shared term
+python freight/site/build.py --output <new external directory>
 ```
 
-The build checks syntax and requires the attestation. It cannot prove mailbox ownership or delivery. The unbuilt source visibly says the contact channel is pending.
+The build fails closed when the inbox is missing, malformed, unverified, or a
+placeholder. It also validates that the configured recovery rate is greater
+than zero and less than one.
 
-Two distinct **live Stripe Payment Links belonging to the Freight Recovery business** are also required. Create one one-time USD link for the $5,000 Readiness Review and one for the $15,000 Base Freight Audit, then set:
+## What the public form does
 
-```text
-FREIGHT_READINESS_CHECKOUT_URL=<live $5,000 Stripe Payment Link>
-FREIGHT_AUDIT_CHECKOUT_URL=<live $15,000 Stripe Payment Link>
-FREIGHT_CHECKOUT_VERIFIED=1
-```
+The progressive qualification form runs entirely in the browser. It does not
+upload files, send a network request, or use browser storage. After completion,
+it prepares a non-sensitive email summary. The visitor must review and send the
+email from their own account.
 
-Before attesting, verify the Stripe account's public business name and statement descriptor, each product name and exact price, live mode, one-time billing, receipt behavior, customer support details, and the cancellation/terms link. Adjustable quantity, custom amounts, recurring billing, automatic add-ons, and promotion codes must remain off unless the public offer and tests are deliberately revised. Do not reuse a payment account branded for another business.
+Freight records are accepted only after a human fit review, written scope, and
+an approved secure transfer route. The public site must never claim that an
+upload occurred or that a lead qualified merely because the form was filled.
 
-The build accepts only canonical `https://buy.stripe.com/...` live links, rejects test links, requires the two links to differ, and fails closed when any checkout setting is absent. Nothing is uploaded or stored by the page. No analytics, backend request, confidential intake, tracking pixel, or customer-data route is present. The only external navigation is the operator-verified Stripe-hosted checkout; actual freight records use a separately approved route after written scope confirmation.
+## Publication boundary
 
-## GitHub Pages release path
+`build.py` copies only an explicit allowlist of public HTML, CSS, JavaScript,
+fonts, images, and trust files. It also generates the controlled synthetic demo
+bundle and injects its current digest. It never recurses through or publishes
+the private repository.
 
-The `Freight Recovery Public Site` workflow verifies the site and controlled demo on pull requests. It can deploy only from `main`, only after the verification job passes, and only when all five repository variables above are present. All third-party workflow actions are pinned to full revisions.
+The GitHub Pages workflow deploys only the built directory. The old payment-link
+variables are not deployment gates and are not copied into the site.
 
-Before the first release, the repository owner must:
+## Funnel events
 
-1. Verify the public business inbox outside this repository.
-2. Create and independently review both live Payment Links in the correct Freight Recovery Stripe account.
-3. Add the five contact and checkout values above as repository variables.
-4. In repository Pages settings, select **GitHub Actions** as the source.
-5. Review the `github-pages` environment protection and authorized deployment branch.
-6. Merge the reviewed change to `main` (or manually dispatch the workflow from
-   `main` after adding variables), then inspect the deployed URL and workflow
-   receipt.
+`site.js` exposes `window.FreightRecoveryAnalytics.events` and emits a
+`freight:analytics` custom event. If a future analytics loader provides a
+`dataLayer`, the same names are pushed there. The public page emits only events
+it can truthfully observe. Operational events such as secure data submission,
+qualification, audit completion, engagement acceptance, and actual recovery are
+reserved for the systems that can verify those state changes.
 
-The workflow does not deploy a pull request and preserves the last good live site until every owner-controlled setting is complete. Publishing checkout does not authorize customer-file intake, managed recovery, carrier contact, or clear the separate customer-processing launch gate.
+## Required checks
 
-## Build the exact public boundary locally
-
-From the repository root, with a real verified inbox and both verified live Payment Links in the environment:
-
-```bash
-python freight/site/build.py --output /tmp/freight-recovery-public
-```
-
-The output directory must be new or empty, outside the private repository, and not one of its parents. The build follows an exact 33-file allowlist and emits only:
-
-- `index.html`
-- `site.css`
-- `site.js`
-- `_headers`
-- `synthetic-pilot-demo.zip`
-- `assets/fonts/ATTRIBUTION.json`
-- `assets/fonts/LICENSE-HANKEN-GROTESK.txt`
-- `assets/fonts/LICENSE-INSTRUMENT-SERIF.txt`
-- `assets/fonts/hanken-grotesk-latin.woff2`
-- `assets/fonts/instrument-serif-latin.woff2`
-- `assets/fonts/instrument-serif-italic-latin.woff2`
-- `assets/images/approved-path.webp`
-- `assets/images/approved-path-800.webp`
-- `assets/images/dock-control.webp`
-- `assets/images/dock-control-800.webp`
-- `assets/images/freight-network.webp`
-- `assets/images/freight-network-800.webp`
-- `assets/images/human-review.webp`
-- `assets/images/human-review-800.webp`
-- `assets/images/invoice-evidence.webp`
-- `assets/images/invoice-evidence-800.webp`
-- `assets/images/rail-yard.webp`
-- `assets/images/rail-yard-800.webp`
-- `assets/images/rate-authority.webp`
-- `assets/images/rate-authority-800.webp`
-- `assets/images/terminal-blue-hour.webp`
-- `assets/images/terminal-blue-hour-800.webp`
-- `assets/images/trailer-blue-hour.webp`
-- `assets/images/trailer-blue-hour-800.webp`
-- `assets/images/truck-cab.webp`
-- `assets/images/truck-cab-800.webp`
-- `assets/images/warehouse-handoff.webp`
-- `assets/images/warehouse-handoff-800.webp`
-
-The ZIP is rebuilt from the current controlled scenario, and its SHA-256 is embedded in the page. Nested asset paths are still copied one-by-one from the explicit allowlist. The build does not recurse through the repository, copy customer data, or follow source symlinks.
-
-**Deploy only the generated output directory. Never deploy the repository root, `freight/`, or this source directory.** The source directory contains non-public build documentation and tests.
-
-## Verify locally
-
-```bash
-python -m pytest -q freight/test_synthetic_rehearsal.py freight/test_synthetic_pilot_bundle.py freight/site/test_build.py
-node --check freight/site/site.js
-python -m freight.synthetic_pilot_bundle --verify /tmp/freight-recovery-public/synthetic-pilot-demo.zip
-```
-
-The `_headers` file supplies defensive response headers on hosts that implement that convention. GitHub Pages does not promise to interpret it, so the HTML also contains a restrictive Content Security Policy meta tag. Browser-enforced framing protection still depends on an HTTP `frame-ancestors` or equivalent header; this limitation should remain in the deployment review.
-
-Use only fictional details during preview. Check the configured contact, both checkout destinations and prices, Stripe business identity, desktop/mobile layout, calculator math, keyboard navigation, reduced-motion behavior, controlled-demo digest, and download. A generated bundle or successful workflow is not proof that the public URL, mailbox, payment receipt, or refund flow works; record those observations separately after release.
+Run the site build tests, commercial-term tests, qualification tests, browser
+script syntax checks, and a rendered responsive pass before deployment. Search
+the built public directory for legacy checkout prices and links; none should be
+present.

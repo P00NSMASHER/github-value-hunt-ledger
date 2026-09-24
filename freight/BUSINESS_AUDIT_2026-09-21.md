@@ -1,5 +1,9 @@
 # Freight business audit and upgrade — 21 September 2026
 
+> Historical analysis only. Commercial scenarios and percentages in this
+> dated audit are not current customer-facing pricing. See `BUSINESS_MODEL.md`
+> for the $0-upfront audit and configurable success-based recovery model.
+
 ## Decision
 
 Build a focused, evidence-led freight audit and assurance service. Use Hunter to improve the reliability and delivery economics of that service. The next growth constraint is an accessible customer entry point, a verified delivery environment, and a paid buyer outcome—not the number of repositories collected.

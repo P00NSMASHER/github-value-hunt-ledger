@@ -40,24 +40,26 @@ jobs:
           freight/test_synthetic_rehearsal.py
           freight/test_synthetic_pilot_bundle.py
           freight/test_recovery_stack.py
+          freight/test_commercial_terms.py
+          freight/test_lead_qualification.py
+          freight/test_recovery_engagement.py
           freight/site/test_build.py
           recoveryworks/test_public_site.py
       - name: Check browser script syntax
         run: |
+          node --check freight/site/commercial-config.js
           node --check freight/site/site.js
           node --check recoveryworks/site/site.js
       - name: Exercise the exact publication boundary
         env:
           FREIGHT_CONTACT_EMAIL: sales@freightfixture.com
           FREIGHT_CONTACT_VERIFIED: '1'
-          FREIGHT_READINESS_CHECKOUT_URL: https://buy.stripe.com/readinessFixture123
-          FREIGHT_AUDIT_CHECKOUT_URL: https://buy.stripe.com/auditFixture456
-          FREIGHT_CHECKOUT_VERIFIED: '1'
+          FREIGHT_CONTINGENCY_RECOVERY_RATE: '0.30'
         run: |
           python freight/site/build.py --output /tmp/freight-recovery-public
           python -m freight.synthetic_pilot_bundle --verify /tmp/freight-recovery-public/synthetic-pilot-demo.zip
-          test "$(find /tmp/freight-recovery-public -type f | wc -l)" -eq 33
-          test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 5
+          test "$(find /tmp/freight-recovery-public -type f | wc -l)" -eq 25
+          test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 13
           test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type d | wc -l)" -eq 1
           test "$(find /tmp/freight-recovery-public -type l | wc -l)" -eq 0
       - name: Exercise the RecoveryOS publication boundary
@@ -74,10 +76,7 @@ jobs:
       github.event_name != 'pull_request' &&
       github.ref == 'refs/heads/main' &&
       vars.FREIGHT_CONTACT_VERIFIED == '1' &&
-      vars.FREIGHT_CONTACT_EMAIL != '' &&
-      vars.FREIGHT_CHECKOUT_VERIFIED == '1' &&
-      vars.FREIGHT_READINESS_CHECKOUT_URL != '' &&
-      vars.FREIGHT_AUDIT_CHECKOUT_URL != ''
+      vars.FREIGHT_CONTACT_EMAIL != ''
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -98,9 +97,7 @@ jobs:
         env:
           FREIGHT_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
           FREIGHT_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
-          FREIGHT_READINESS_CHECKOUT_URL: ${{ vars.FREIGHT_READINESS_CHECKOUT_URL }}
-          FREIGHT_AUDIT_CHECKOUT_URL: ${{ vars.FREIGHT_AUDIT_CHECKOUT_URL }}
-          FREIGHT_CHECKOUT_VERIFIED: ${{ vars.FREIGHT_CHECKOUT_VERIFIED }}
+          FREIGHT_CONTINGENCY_RECOVERY_RATE: ${{ vars.FREIGHT_CONTINGENCY_RECOVERY_RATE || '0.30' }}
           RECOVERYOS_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
           RECOVERYOS_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
         run: |

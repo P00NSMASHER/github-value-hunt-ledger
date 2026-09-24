@@ -14,7 +14,13 @@ The public ChatGPT Sites website accepts **business contact details and scope in
 
 Use a 20-minute readiness conversation to establish: buyer/entity and business unit; mode/currency and approximate invoice count; historical period; availability of rates/amendments and shipment evidence; the owners of existing audit results and later credits; and which buyer IT owner can approve the workspace. Discuss availability, not the confidential records themselves.
 
-Record the existing offer/version and the buyer's decision criteria. Preserve the terms of any previously proposed 20-invoice feasibility review. A small feasibility sample does not estimate annual losses or prove recovery. If the fixed-fee activation catalog cannot represent the agreed sample terms, revise the commercial package through its controlled process before kickoff; do not force a false fee into the charter.
+Record the existing offer/version and the buyer's decision criteria. Preserve
+the terms of any previously accepted agreement. A small feasibility sample does
+not estimate annual losses or prove recovery. The current flagship route is a
+bounded free audit followed, when worthwhile, by a separately accepted
+success-based recovery engagement. The legacy fixed-fee activation catalog is
+used only for an expressly requested custom forensic audit; do not force a
+false fee into the charter.
 
 Confirm a qualified freight reviewer and reserve actual delivery hours before promising a completion date. Proposed prices and synthetic demonstrations are not paid-customer evidence.
 

@@ -36,13 +36,12 @@ historical v15.14 release/CI record and not external customer proof.
   inputs, current review/report outputs, machine receipts and a hash manifest.
   Verification replays the scenario byte-for-byte and the public site embeds
   the generated ZIP digest without claiming customer value or external action.
-- The redesigned Freight Recovery sales site now has an exact 33-file public
-  build boundary, eleven responsive editorial images, locally served licensed
-  fonts, exact $5,000 / $15,000 checkout offers, an explicit 80/20 optional
-  recovery split, and a SHA-pinned GitHub Pages workflow. Pull requests verify
-  it; main can deploy the checkout version only after an owner configures a
-  verified public inbox and two distinct live Payment Links from the correct
-  Freight Recovery Stripe account. No checkout deployment was performed here.
+- The redesigned Freight Recovery sales site has a strict public build
+  boundary, locally served licensed fonts, a progressive free-audit
+  qualification flow, centrally configurable success-based pricing, and a
+  SHA-pinned GitHub Pages workflow. It accepts no customer files, credentials,
+  or payment. Deployment requires a verified public inbox; recovery terms are
+  accepted later through the controlled engagement workflow.
 - These changes are locally verified; a new canonical release identity and
   hosted CI run must be recorded only after the change is committed and CI passes.
 
@@ -50,14 +49,16 @@ historical v15.14 release/CI record and not external customer proof.
 
 The first milestone that materially changes the business is:
 
-**paid blind pilot -> challenger-only validated finding -> buyer-approved dispute/action -> issued credit/refund/remittance -> unambiguous settlement -> recovery certificate -> annual assurance contract**
+**free bounded audit -> supported opportunity -> accepted recovery engagement
+-> buyer-approved dispute/action -> issued credit/refund/remittance ->
+unambiguous settlement -> earned recovery fee -> optional assurance contract**
 
 Everything below is prioritized by how directly it moves toward that chain.
 
 ## Current checkpoint — v15.14
 
 Internal commercialization controls now completed:
-- paid offer/ICP/pricing defined;
+- free-audit ICP, qualification, and configurable recovery pricing defined;
 - machine-scored Data Readiness gate;
 - blind population/truth/incumbent ordering enforced;
 - canonical freight gap register with **zero ACTIVE_SEARCH gaps**;
@@ -65,7 +66,7 @@ Internal commercialization controls now completed:
 - settlement deduplication/validated caps;
 - automatic incumbent-known success-fee exclusion;
 - proof-derived buyer pilot metrics/report template;
-- fixed-fee qualification and analyst-hour budget with success-fee upside excluded;
+- qualification and analyst-hour budget with potential recovery excluded;
 - Freight outcome adapter into the global search/outcome learning schema;
 - adaptive v2 domain authorization tied to `freight/GAP_REGISTER.json`, preventing generic capability-gap ranking from reopening blocked Freight search;
 - buyer-cohort commercial calibration with small-sample anti-overfit gates;
@@ -151,13 +152,13 @@ The separate/manual route stays **CONDITIONAL** until a VERIFIED environment man
 2. **DONE:** canonical Freight Recovery v15.14 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. **DONE internally:** rights evidence manifest + fail-closed promotion validator. **OPEN externally:** attach/verify the actual executed Trenova/Opstrax permission documents and resolve hosted/SaaS/change-of-control scope.
-5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
+5. **DONE:** full synthetic readiness → free-audit qualification → blind proof → accepted recovery engagement → evidence-backed settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
 6. **DONE internally:** deterministic buyer-shareable synthetic demo,
-   checkout-ready public-site boundary, link validation, pricing disclosures
-   and calculator. **OPEN externally:** connect the correct Freight Recovery
-   Stripe account, create/review the two live exact-price Payment Links, add the
+   free-audit public-site boundary, link validation, contingency disclosures,
+   progressive qualification form and actual-recovery calculator. **OPEN
+   externally:** verify the business inbox and secure-transfer handoff, set the
    fail-closed repository variables, deploy, and complete a controlled public
-   URL/payment/refund check.
+   URL/intake rehearsal without customer freight data.
 
 ### Deployment-security actions from live evidence
 1. Enable Netlify team MFA before confidential buyer data is accepted.

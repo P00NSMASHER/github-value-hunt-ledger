@@ -1,8 +1,9 @@
-"""Machine-checkable Pilot Charter for Freight Recovery.
+"""Machine-checkable charter for optional fixed-fee Freight Recovery work.
 
 The charter freezes the commercial/delivery handoff around an already-generated
-Pilot Activation Packet. It is an operational acknowledgment record, not an
-e-signature system or legal contract.
+legacy/custom Pilot Activation Packet. The flagship success-based path uses
+``freight.recovery_engagement``. This is an operational acknowledgment record,
+not an e-signature system or legal contract.
 """
 from __future__ import annotations
 
