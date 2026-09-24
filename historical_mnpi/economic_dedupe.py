@@ -164,6 +164,13 @@ def _temporal_relation(
     left: HistoricalTransaction,
     right: HistoricalTransaction,
 ) -> tuple[bool, bool]:
+    """Return (compatible_time, exact_instant_match).
+
+    Date-only or date-range equality is never treated as an exact instant.
+    Multiple economically identical fills can occur on the same trading day,
+    so coarse temporal agreement may support POSSIBLE_SAME but never
+    EXACT_SAME.
+    """
     left_start, left_end = _date_interval(left)
     right_start, right_end = _date_interval(right)
     if left_end < right_start or right_end < left_start:
@@ -175,16 +182,8 @@ def _temporal_relation(
             == datetime.fromisoformat(right.trade_timestamp.replace("Z", "+00:00"))
         )
         return same, same
-    if left.trade_date is not None and right.trade_date is not None:
-        same = left.trade_date == right.trade_date
-        return same, same
-    if (
-        left.trade_date_range_start is not None
-        and right.trade_date_range_start is not None
-        and left.trade_date_range_start == right.trade_date_range_start
-        and left.trade_date_range_end == right.trade_date_range_end
-    ):
-        return True, True
+
+    # Same-day/date-range overlap is compatible, but not an exact trade instant.
     return True, False
 
 
@@ -348,7 +347,7 @@ def propose_transaction_dedupe(
                 reasons.append("CONFLICTING_ECONOMIC_FIELDS")
             elif exact_time and len(matching) >= 3:
                 relation = DedupeRelation.EXACT_SAME
-                reasons.append("EXACT_TIME_AND_ECONOMIC_ANCHORS")
+                reasons.append("EXACT_TIMESTAMP_AND_ECONOMIC_ANCHORS")
             elif matching:
                 relation = DedupeRelation.POSSIBLE_SAME
                 reasons.append("COMPATIBLE_TIME_AND_PARTIAL_ECONOMIC_MATCH")
