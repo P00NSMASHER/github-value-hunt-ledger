@@ -493,3 +493,9 @@ Closure evidence binds the original incident, verified rollback receipt, recover
 A single private launch/readiness dossier now binds the exact release, production admission, externally verified security evidence, passing DR rehearsal, successful production-style observability run, rollback readiness, and commercial pilot package. It presents separate CFO, CTO, security, and operations sections and preserves proof hashes for every upstream control plane.
 
 The CFO section exposes pricing only as the existing internal hypothesis and success-fee basis of verified recovered cash. The dossier explicitly cannot claim a signed customer contract, verified customer revenue/traction, external production deployment, or guaranteed economics. JSON and Markdown outputs use private writes.
+
+## Provider-neutral activation simulation (step 21a)
+
+The external-environment activation boundary now has provider-neutral contracts for AWS, Azure, and GCP. A verified credential-scope attestation records only principal identity, account scope, and read/discovery permissions; credentials themselves cannot be embedded and mutation-capable permissions fail closed.
+
+A separate verified environment-state discovery binds the current release/image and summarized environment state. The adapter supports only DISCOVER_STATE, VALIDATE_CREDENTIAL_SCOPE, and SIMULATE_DEPLOYMENT. It stores no credentials, exposes no mutation operation, and records no provider API call. Simulation compares the discovered state with the exact ProductionAdmissionGate/release and returns SIMULATION_ONLY with the proposed release/image transition; no external environment is changed.
