@@ -2,6 +2,21 @@
 
 Release checkpoint: **v15.14-external-action-authorization-2026-09-21**
 
+> Historical checkpoint notice (2026-09-23): this manifest remains the
+> canonical record of the v15.14 release and its cited hosted CI runs. The
+> current working tree contains unreleased settlement, audit, RecoveryWorks,
+> workflow-pin, evidence-freshness, controlled-demo, and public-site release
+> hardening described in `ROADMAP.md` and
+> `RELEASE_AND_SECURITY_GATE.md`. Those changes must not be represented as a new
+> canonical release until they have a source commit and successful hosted CI
+> evidence.
+>
+> **Commercial packaging notice:** the fixed-fee catalog recorded by this
+> historical manifest is no longer the flagship public offer. The current model
+> is the bounded free audit followed by an optional success-based recovery
+> engagement described in `BUSINESS_MODEL.md`. The older charter machinery is
+> retained for previously accepted or expressly requested fixed-fee work.
+
 ## Freight source identity
 
 - Repository: `P00NSMASHER/github-value-hunt-ledger`
@@ -138,7 +153,10 @@ Current evidence state:
 - **Opstrax:** user-asserted separate commercial permission for the pinned revision remains recorded; executed permission evidence is **NOT_ATTACHED** in this repository; hosted/SaaS/assignment/sublicensing/change-of-control remain unresolved.
 - Permissive public-license components such as MIT/Apache-2.0 do not become artificially dependent on separately asserted evidence when the public license independently supplies the relevant code-use permission.
 
-The pilot evidence gate passes with explicit warnings for missing executed evidence; the annual-diligence gate intentionally remains blocked while required scope is unresolved.
+The pilot evidence gate now blocks runtime use until executed evidence is
+`ATTACHED_VERIFIED` and commercial use is `CONFIRMED_ALLOWED`. The annual-
+diligence gate also remains blocked while required hosted/change-of-control
+scope is unresolved or denied.
 
 This is an operational consistency control, not a legal opinion.
 
@@ -246,12 +264,11 @@ The packet binds:
 
 The packet rejects inconsistent readiness/launch-decision inputs and intentionally excludes internal loaded-hourly-cost, analyst-hour-budget and target-margin assumptions.
 
-For a READY buyer, the current published offer remains:
-- Blind Freight Audit Acceptance Test: **$15,000–$25,000 fixed**
-- target analysis/report turnaround: **10–15 business days after complete inputs**
-
-For a non-ready/conditional buyer, the packet routes to:
-- Data Readiness / Authority Diagnostic: **$5,000–$7,500 fixed**
+At this historical checkpoint, READY and non-ready buyers were routed through
+fixed-fee price bands. Those bands are preserved only as release evidence and
+must not be quoted as the current public offer. Current prospects enter through
+the $0-upfront audit route, and any recovery percentage is confirmed before
+recovery begins.
 
 Settlement evidence is requested as **LATER_OUTCOME** evidence rather than being misrepresented as immediate savings proof.
 

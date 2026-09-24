@@ -1,0 +1,12 @@
+{
+  "name": "Freight Recovery",
+  "short_name": "Freight Recovery",
+  "description": "Free freight recovery audit with success-based recovery pricing.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fffefa",
+  "theme_color": "#071426",
+  "icons": [
+    {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml"}
+  ]
+}

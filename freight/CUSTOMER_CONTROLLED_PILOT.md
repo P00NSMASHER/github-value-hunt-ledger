@@ -14,7 +14,13 @@ The public ChatGPT Sites website accepts **business contact details and scope in
 
 Use a 20-minute readiness conversation to establish: buyer/entity and business unit; mode/currency and approximate invoice count; historical period; availability of rates/amendments and shipment evidence; the owners of existing audit results and later credits; and which buyer IT owner can approve the workspace. Discuss availability, not the confidential records themselves.
 
-Record the existing offer/version and the buyer's decision criteria. Preserve the terms of any previously proposed 20-invoice feasibility review. A small feasibility sample does not estimate annual losses or prove recovery. If the fixed-fee activation catalog cannot represent the agreed sample terms, revise the commercial package through its controlled process before kickoff; do not force a false fee into the charter.
+Record the existing offer/version and the buyer's decision criteria. Preserve
+the terms of any previously accepted agreement. A small feasibility sample does
+not estimate annual losses or prove recovery. The current flagship route is a
+bounded free audit followed, when worthwhile, by a separately accepted
+success-based recovery engagement. The legacy fixed-fee activation catalog is
+used only for an expressly requested custom forensic audit; do not force a
+false fee into the charter.
 
 Confirm a qualified freight reviewer and reserve actual delivery hours before promising a completion date. Proposed prices and synthetic demonstrations are not paid-customer evidence.
 
@@ -52,7 +58,7 @@ Only after the verifier has inspected the receipts may controls become true and 
 
 1. **Metadata fit:** named owners, feasible source availability, compatible existing terms and funded reviewer capacity. Missing items produce an owner and next date, not a document request.
 2. **Verified environment:** actual manifest passes `python -m freight.separate_environment_evidence /approved/private/path/environment.json --expect VERIFIED`. This example path must be replaced inside the approved environment; do not upload evidence here to run it.
-3. **Authorized kickoff:** buyer/data readiness, rights and the separate-environment launch gate all pass; the current activation packet and acknowledged charter reach `KICKOFF_AUTHORIZED`. Environment verification alone is insufficient. Confirm the path with `python -m freight.pilot_launch_gate /approved/private/path/readiness.json --data-path separate --separate-evidence-json /approved/private/path/environment.json --expect READY` before generating the acknowledged charter.
+3. **Authorized kickoff:** buyer/data readiness, rights and the separate-environment launch gate all pass; the current activation packet and acknowledged charter reach `KICKOFF_AUTHORIZED`. Environment verification alone is insufficient. Confirm the path with `python -m freight.pilot_launch_gate /approved/private/path/readiness.json --data-path separate --separate-evidence-json /approved/private/path/environment.json --rights-manifest-json /approved/private/path/rights-evidence.json --expect READY` before generating the acknowledged charter. The repository's default rights manifest is intentionally blocked because executed permission evidence is not attached.
 4. **Accepted report:** every sampled invoice has a disposition; findings have independently reviewed support; totals reconcile; the buyer receives missing-evidence and disagreement lists. A report may contain no supported discrepancy. Track later credits/refunds separately and net observed returns before claiming recovery.
 
 ## Smallest useful record request after authorization

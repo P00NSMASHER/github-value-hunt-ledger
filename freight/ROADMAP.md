@@ -2,18 +2,63 @@
 
 Updated: 2026-09-20
 
+## Unreleased hardening checkpoint - 2026-09-23
+
+This is current working-tree engineering evidence, not a replacement for the
+historical v15.14 release/CI record and not external customer proof.
+
+- A pinned winning-stack integration plane now compiles confirmed RecoveryOS
+  claims into deterministic, idempotent adapter jobs for DOCX redlining,
+  independent SLA settlement comparison, agent evidence, durable workflows,
+  Fleetbase evidence import and landed-cost intelligence. Jobs and transitions
+  are recorded in an append-only hash chain; external components cannot assert
+  recovery, post settlements, send carrier actions or overwrite source contracts.
+
+- Freight settlement evidence now requires canonical SHA-256 source digests,
+  canonical UTC operation times, and chronology enforcement in both service code
+  and direct-SQL triggers. Existing noncanonical stores fail closed on reopen.
+- Freight audit timestamps are canonical and nondecreasing; unsafe SQLite busy
+  timeout values are rejected instead of reaching PRAGMA construction.
+- RecoveryWorks recovered cash now requires verified, hash-bound settlement
+  evidence. Lifecycle approvals/authorizations cannot be rewritten after state
+  progression, nested proof payloads are immutable, and replay preserves
+  authenticated event times.
+- RecoveryWorks local compare-and-swap persistence is now serialized across
+  processes and private-file permissions are verified on POSIX and Windows.
+- All repository workflow actions are immutable SHA pins. Freight deployment
+  freshness checks now use the actual UTC workflow date and will fail when the
+  September 27 deployment snapshot expires unless it is recollected.
+- The composite pilot launch gate now blocks non-permissive runtime components
+  until executed permission evidence is verified and commercial use is
+  confirmed allowed; a private evidence-manifest input supports legitimate
+  clearance without committing executed documents.
+- A buyer-shareable controlled synthetic pilot ZIP now packages exact fictional
+  inputs, current review/report outputs, machine receipts and a hash manifest.
+  Verification replays the scenario byte-for-byte and the public site embeds
+  the generated ZIP digest without claiming customer value or external action.
+- The redesigned Freight Recovery sales site has a strict public build
+  boundary, locally served licensed fonts, a progressive free-audit
+  qualification flow, centrally configurable success-based pricing, and a
+  SHA-pinned GitHub Pages workflow. It accepts no customer files, credentials,
+  or payment. Deployment requires a verified public inbox; recovery terms are
+  accepted later through the controlled engagement workflow.
+- These changes are locally verified; a new canonical release identity and
+  hosted CI run must be recorded only after the change is committed and CI passes.
+
 ## North-star milestone
 
 The first milestone that materially changes the business is:
 
-**paid blind pilot -> challenger-only validated finding -> buyer-approved dispute/action -> issued credit/refund/remittance -> unambiguous settlement -> recovery certificate -> annual assurance contract**
+**free bounded audit -> supported opportunity -> accepted recovery engagement
+-> buyer-approved dispute/action -> issued credit/refund/remittance ->
+unambiguous settlement -> earned recovery fee -> optional assurance contract**
 
 Everything below is prioritized by how directly it moves toward that chain.
 
 ## Current checkpoint — v15.14
 
 Internal commercialization controls now completed:
-- paid offer/ICP/pricing defined;
+- free-audit ICP, qualification, and configurable recovery pricing defined;
 - machine-scored Data Readiness gate;
 - blind population/truth/incumbent ordering enforced;
 - canonical freight gap register with **zero ACTIVE_SEARCH gaps**;
@@ -21,7 +66,7 @@ Internal commercialization controls now completed:
 - settlement deduplication/validated caps;
 - automatic incumbent-known success-fee exclusion;
 - proof-derived buyer pilot metrics/report template;
-- fixed-fee qualification and analyst-hour budget with success-fee upside excluded;
+- qualification and analyst-hour budget with potential recovery excluded;
 - Freight outcome adapter into the global search/outcome learning schema;
 - adaptive v2 domain authorization tied to `freight/GAP_REGISTER.json`, preventing generic capability-gap ranking from reopening blocked Freight search;
 - buyer-cohort commercial calibration with small-sample anti-overfit gates;
@@ -107,7 +152,13 @@ The separate/manual route stays **CONDITIONAL** until a VERIFIED environment man
 2. **DONE:** canonical Freight Recovery v15.14 release identity recorded in `freight/RELEASE_MANIFEST.md`.
 3. **DONE internally:** deterministic control provenance, component inventory, partial CycloneDX 1.6-shaped SBOM and unsigned in-toto/DSSE-shaped attestation are generated/verified in CI. **OPEN externally:** approved signing identity/trusted timestamp and any buyer-required complete transitive deployment SBOM.
 4. **DONE internally:** rights evidence manifest + fail-closed promotion validator. **OPEN externally:** attach/verify the actual executed Trenova/Opstrax permission documents and resolve hosted/SaaS/change-of-control scope.
-5. **DONE:** full synthetic readiness → fixed-fee qualification → blind proof → persistent settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
+5. **DONE:** full synthetic readiness → free-audit qualification → blind proof → accepted recovery engagement → evidence-backed settlement → report rehearsal passed CI and reconciled exactly; this is technical validation only, not external customer proof.
+6. **DONE internally:** deterministic buyer-shareable synthetic demo,
+   free-audit public-site boundary, link validation, contingency disclosures,
+   progressive qualification form and actual-recovery calculator. **OPEN
+   externally:** verify the business inbox and secure-transfer handoff, set the
+   fail-closed repository variables, deploy, and complete a controlled public
+   URL/intake rehearsal without customer freight data.
 
 ### Deployment-security actions from live evidence
 1. Enable Netlify team MFA before confidential buyer data is accepted.

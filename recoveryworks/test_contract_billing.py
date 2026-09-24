@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import Branch, FindingState, RecoveryEngine
@@ -18,7 +19,7 @@ def rate(*, verified=True, start="2026-01-01", end=None, fixed=1000, included="0
         fixed_cents=fixed,
         included_units=included,
         unit_rate_micros=unit,
-        source_hash=f"rate-{start}-{end}",
+        source_hash=H(f"rate-{start}-{end}"),
         source_locator=f"file://rates.csv#{start}",
         verified=verified,
     )
@@ -32,7 +33,7 @@ def charge(cid="C-1", *, actual=4000, verified=True, when="2026-08-31"):
         service_id="svc",
         service_date=when,
         actual_cents=actual,
-        source_hash=f"charge-{cid}",
+        source_hash=H(f"charge-{cid}"),
         source_locator=f"file://charges.csv#{cid}",
         verified=verified,
     )
@@ -42,7 +43,7 @@ def usage(cid="C-1", units="10", *, verified=True):
     return UsageRecord(
         charge_id=cid,
         units=units,
-        source_hash=f"usage-{cid}",
+        source_hash=H(f"usage-{cid}"),
         source_locator=f"file://usage.csv#{cid}",
         verified=verified,
     )

@@ -1,3 +1,4 @@
+import hashlib
 import pytest
 
 from freight.settlement_review_workflow import (
@@ -24,6 +25,10 @@ def store(tmp_path):
     )
 
 
+def sha(value):
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
 def claim(
     *,
     claim_id="c1",
@@ -44,7 +49,7 @@ def claim(
         currency=currency,
         amount_cents=amount,
         issued_at=issued,
-        source_hash=source,
+        source_hash=sha(source),
         fee_disqualified=fee_disqualified,
     )
 
@@ -68,7 +73,7 @@ def event(
         currency=currency,
         amount_cents=amount,
         booked_at=booked,
-        source_hash=source,
+        source_hash=sha(source),
         source_kind="CREDIT-MEMO",
     )
 

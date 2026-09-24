@@ -13,7 +13,17 @@ import hmac
 from typing import Any, Iterable, Mapping
 
 from .journal import finding_from_payload, finding_to_payload
-from .models import EvidenceRef, FindingState, RecoveryFinding, RuleRef, canonical_hash
+from .models import (
+    EvidenceRef,
+    FindingState,
+    RecoveryFinding,
+    RuleRef,
+    canonical_hash,
+    freeze_json,
+    normalize_git_commit_sha,
+    normalize_sha256,
+    normalize_source_hash,
+)
 
 SEVEN_FIGURE_CENTS = 100_000_000
 
@@ -74,9 +84,11 @@ class AuthoritySnapshot:
             "effective_from", "verified_by", "verification_note",
         ):
             _required(name, getattr(self, name))
+        object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
         _iso("acquired_at", self.acquired_at)
         if self.effective_to is not None and self.effective_to < self.effective_from:
             raise ValueError("effective_to cannot precede effective_from")
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -203,9 +215,11 @@ class SourceAttestation:
             "authenticated_by", "authentication_note",
         ):
             _required(name, getattr(self, name))
+        object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
         _iso("acquired_at", self.acquired_at)
         if type(self.verified_source) is not bool:
             raise ValueError("verified_source must be boolean")
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -246,6 +260,27 @@ class CalculationManifest:
         _nonnegative_cents("expected_cents", self.expected_cents)
         _nonnegative_cents("actual_cents", self.actual_cents)
         _nonnegative_cents("potential_recovery_cents", self.potential_recovery_cents)
+        object.__setattr__(
+            self,
+            "code_commit_sha",
+            normalize_git_commit_sha("code_commit_sha", self.code_commit_sha),
+        )
+        object.__setattr__(
+            self,
+            "input_manifest_hash",
+            normalize_sha256("input_manifest_hash", self.input_manifest_hash),
+        )
+        object.__setattr__(
+            self,
+            "finding_proof_hash",
+            normalize_sha256("finding_proof_hash", self.finding_proof_hash),
+        )
+        object.__setattr__(
+            self,
+            "trace_hash",
+            normalize_sha256("trace_hash", self.trace_hash),
+        )
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -283,6 +318,12 @@ class ReviewAttestation:
         _iso("reviewed_at", self.reviewed_at)
         if self.decision not in {"APPROVE", "REJECT"}:
             raise ValueError("decision must be APPROVE or REJECT")
+        object.__setattr__(
+            self,
+            "finding_proof_hash",
+            normalize_sha256("finding_proof_hash", self.finding_proof_hash),
+        )
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -310,8 +351,20 @@ class ChallengeReview:
         _iso("reviewed_at", self.reviewed_at)
         if type(self.resolved) is not bool:
             raise ValueError("resolved must be boolean")
-        for item in self.contrary_evidence_hashes:
-            _required("contrary_evidence_hash", item)
+        object.__setattr__(
+            self,
+            "finding_proof_hash",
+            normalize_sha256("finding_proof_hash", self.finding_proof_hash),
+        )
+        object.__setattr__(
+            self,
+            "contrary_evidence_hashes",
+            tuple(
+                normalize_sha256("contrary_evidence_hash", item)
+                for item in self.contrary_evidence_hashes
+            ),
+        )
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -344,6 +397,17 @@ class DeadlineAssessment:
         _iso("assessed_at", self.assessed_at)
         if self.deadline_at is not None:
             _iso("deadline_at", self.deadline_at)
+        object.__setattr__(
+            self,
+            "finding_proof_hash",
+            normalize_sha256("finding_proof_hash", self.finding_proof_hash),
+        )
+        object.__setattr__(
+            self,
+            "governing_source_hash",
+            normalize_source_hash(self.governing_source_hash),
+        )
+        object.__setattr__(self, "metadata", freeze_json(self.metadata, name="metadata"))
 
     @property
     def proof_hash(self) -> str:
@@ -589,6 +653,7 @@ class ArtifactReplayEntry:
             _required(name, getattr(self, name))
         if self.role not in {"authority", "evidence"}:
             raise ValueError("artifact replay role must be authority or evidence")
+        object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
         if type(self.size_bytes) is not int or self.size_bytes < 0:
             raise ValueError("artifact replay size_bytes must be non-negative integer")
 
@@ -795,6 +860,24 @@ class CalculationReplayReceipt:
         _nonnegative_cents("expected_cents", self.expected_cents)
         _nonnegative_cents("actual_cents", self.actual_cents)
         _nonnegative_cents("potential_recovery_cents", self.potential_recovery_cents)
+        object.__setattr__(
+            self,
+            "code_commit_sha",
+            normalize_git_commit_sha("code_commit_sha", self.code_commit_sha),
+        )
+        for name in (
+            "case_bundle_hash",
+            "finding_proof_hash",
+            "artifact_replay_receipt_hash",
+            "input_manifest_hash",
+            "trace_hash",
+            "receipt_hash",
+        ):
+            object.__setattr__(
+                self,
+                name,
+                normalize_sha256(name, getattr(self, name)),
+            )
 
     def integrity_body(self) -> dict[str, Any]:
         return {
@@ -849,8 +932,8 @@ def replay_case_calculation(
     supplied_identity = {
         "calculator_id": _required("calculator_id", calculator_id),
         "calculator_version": _required("calculator_version", calculator_version),
-        "code_commit_sha": _required("code_commit_sha", code_commit_sha),
-        "input_manifest_hash": _required("input_manifest_hash", input_manifest_hash),
+        "code_commit_sha": normalize_git_commit_sha("code_commit_sha", code_commit_sha),
+        "input_manifest_hash": normalize_sha256("input_manifest_hash", input_manifest_hash),
     }
     frozen_identity = {
         "calculator_id": manifest.calculator_id,
@@ -903,8 +986,8 @@ def replay_case_calculation(
         artifact_replay_receipt_hash=artifact_receipt.receipt_hash,
         calculator_id=calculator_id,
         calculator_version=calculator_version,
-        code_commit_sha=code_commit_sha,
-        input_manifest_hash=input_manifest_hash,
+        code_commit_sha=supplied_identity["code_commit_sha"],
+        input_manifest_hash=supplied_identity["input_manifest_hash"],
         expected_cents=expected_cents,
         actual_cents=actual_cents,
         potential_recovery_cents=reproduced_potential,

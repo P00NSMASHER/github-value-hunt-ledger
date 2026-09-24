@@ -62,7 +62,7 @@
   "calculation": {
     "calculator_id": "recoveryworks.freight.synthetic_hostile_exam",
     "calculator_version": "1",
-    "code_commit_sha": "SIMULATED-COMMIT-SHA",
+    "code_commit_sha": "b01d2470f38e2f48eecb848bb5edd4e0d0f0f33a",
     "created_at": "2026-09-22T16:05:00Z",
     "trace": {
       "contract_cap_cents": 425000000,

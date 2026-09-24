@@ -2,13 +2,14 @@
 
 Updated: 2026-09-20
 
-This is the delivery specification for the **$5,000–$7,500 fixed** first offer.
+This is the delivery specification for the readiness phase of the **free
+recovery audit**. It is a bounded screen, not an open-ended consulting package.
 
 ## Purpose
 
 Determine whether a buyer can support a defensible Blind Freight Audit Acceptance Test before analysis effort is spent inventing missing truth.
 
-The diagnostic is not an audit and does not claim recovery dollars.
+The diagnostic is not a recovery result and does not claim recovery dollars.
 
 ## Machine assessment
 

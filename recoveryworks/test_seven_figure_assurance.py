@@ -1,4 +1,6 @@
+from recoveryworks.test_support import source_hash as H
 import copy
+from dataclasses import replace
 import unittest
 
 from recoveryworks import (
@@ -28,7 +30,7 @@ CREATED = "2026-09-22T16:00:00Z"
 def million_finding():
     rule = RuleRef(
         rule_id="rule:seven-figure",
-        source_hash="authority-source-hash",
+        source_hash=H("authority-source-hash"),
         effective_from="2026-01-01",
         effective_to=None,
         verified_controlling=True,
@@ -37,7 +39,7 @@ def million_finding():
     )
     evidence = EvidenceRef(
         evidence_id="ev:invoice:1",
-        source_hash="invoice-source-hash",
+        source_hash=H("invoice-source-hash"),
         locator="vault://evidence/invoice-1#page=2",
         kind="invoice",
         verified=True,
@@ -61,7 +63,7 @@ def authority():
     return AuthoritySnapshot(
         authority_id="auth:contract-v3",
         authority_kind="executed_contract",
-        source_hash="authority-source-hash",
+        source_hash=H("authority-source-hash"),
         source_locator="vault://authority/contract-v3#section=7.4",
         effective_from="2026-01-01",
         effective_to=None,
@@ -75,7 +77,7 @@ def authority():
 def source_attestation():
     return SourceAttestation(
         evidence_id="ev:invoice:1",
-        source_hash="invoice-source-hash",
+        source_hash=H("invoice-source-hash"),
         locator="vault://evidence/invoice-1#page=2",
         acquisition_method="counterparty_portal_export",
         acquired_at=CREATED,
@@ -89,13 +91,13 @@ def calculation(finding):
     return CalculationManifest(
         calculator_id="recoveryworks.freight",
         calculator_version="3",
-        code_commit_sha="abc123def456",
-        input_manifest_hash="scan-batch-hash",
+        code_commit_sha="b01d2470f38e2f48eecb848bb5edd4e0d0f0f33a",
+        input_manifest_hash=H("scan-batch-hash"),
         finding_proof_hash=finding.proof_hash,
         expected_cents=finding.expected_cents,
         actual_cents=finding.actual_cents,
         potential_recovery_cents=finding.potential_recovery_cents,
-        trace_hash="calculation-trace-hash",
+        trace_hash=H("calculation-trace-hash"),
         created_at=CREATED,
     )
 
@@ -121,7 +123,7 @@ def challenge(finding, reviewer="red-team-reviewer", resolved=True):
         challenge="Identify evidence or amendments that would defeat the finding.",
         conclusion="No superseding amendment, credit, rebill, or contrary shipment fact found.",
         resolved=resolved,
-        contrary_evidence_hashes=("negative-search-manifest-hash",),
+        contrary_evidence_hashes=(H("negative-search-manifest-hash"),),
     )
 
 
@@ -129,7 +131,7 @@ def deadline(finding):
     return DeadlineAssessment(
         assessment_id="deadline:1",
         finding_proof_hash=finding.proof_hash,
-        governing_source_hash="authority-source-hash",
+        governing_source_hash=H("authority-source-hash"),
         source_locator="vault://authority/contract-v3#claims-window",
         trigger="receipt of disputed invoice",
         assessed_at=CREATED,
@@ -159,6 +161,21 @@ def frozen_bundle():
 
 
 class SevenFigureAssuranceTests(unittest.TestCase):
+    def test_calculation_manifest_requires_full_commit_sha(self):
+        finding = million_finding()
+        with self.assertRaisesRegex(ValueError, "full 40-character Git commit SHA"):
+            replace(calculation(finding), code_commit_sha="abc123def456")
+
+    def test_nested_assurance_metadata_is_detached_and_immutable(self):
+        raw = {"review": {"pages": [1, 2]}}
+        snapshot = replace(authority(), metadata=raw)
+        proof_hash = snapshot.proof_hash
+        raw["review"]["pages"].append(3)
+        self.assertEqual(snapshot.metadata["review"]["pages"], [1, 2])
+        self.assertEqual(snapshot.proof_hash, proof_hash)
+        with self.assertRaises(TypeError):
+            snapshot.metadata["review"]["pages"].append(4)
+
     def test_authority_registry_is_content_addressed_and_tamper_evident(self):
         registry = AuthorityRegistry()
         registry.register(authority())
@@ -225,7 +242,7 @@ class SevenFigureAssuranceTests(unittest.TestCase):
         bad_authority = AuthoritySnapshot(
             authority_id="bad",
             authority_kind="executed_contract",
-            source_hash="wrong",
+            source_hash=H("wrong"),
             source_locator="vault://authority/contract-v3#section=7.4",
             effective_from="2026-01-01",
             effective_to=None,

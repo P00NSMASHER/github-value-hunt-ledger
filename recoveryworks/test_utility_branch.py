@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -23,7 +24,7 @@ def bill(*, actual=3000, bill_date="2026-07-15", verified=True, bill_id="b1"):
         billed_kwh="100",
         billed_demand_kw="2",
         billed_reactive_kva="0",
-        source_hash=f"billhash-{bill_id}",
+        source_hash=H(f"billhash-{bill_id}"),
         source_locator=f"file://bills.csv#{bill_id}",
         verified=verified,
     )
@@ -53,7 +54,7 @@ def tariff(
                 rate_micros_per_unit=5_000_000,
             ),
         ),
-        source_hash=f"tariffhash-{effective_from}",
+        source_hash=H(f"tariffhash-{effective_from}"),
         source_locator=f"file://tariff#{effective_from}",
         verified=verified,
         minimum_bill_cents=minimum,

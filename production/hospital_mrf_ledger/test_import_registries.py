@@ -45,6 +45,18 @@ class HospitalRegistryImportTests(unittest.TestCase):
         self.assertEqual(rows[0]["hospital_name"], "Example, Hospital")
         self.assertEqual(rows[0]["evidence"], "cms-hpt.txt found, file opened")
 
+    def test_db_path_does_not_double_prefix_output(self):
+        from pathlib import Path
+        root = Path("output")
+        self.assertEqual(
+            reg.resolve_db_path(root, "output/hospital_mrf.sqlite"),
+            Path("output/hospital_mrf.sqlite"),
+        )
+        self.assertEqual(
+            reg.resolve_db_path(root, "hospital_mrf.sqlite"),
+            Path("output/hospital_mrf.sqlite"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

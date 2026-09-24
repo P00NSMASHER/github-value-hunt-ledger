@@ -1,0 +1,445 @@
+{
+  "schema_version": 1,
+  "batch_id": "INGEST:2026-09-22:lane-local-elite-01",
+  "created_at": "2026-09-22",
+  "posture": "append_only_additive",
+  "selection_rule": "Corrected full-section scan of hunters/01.md..47.md; exact 40-hex revision; local score >=29/30; absent from prior exact-revision ingestion registry; ranked toward current/direct-dollar portfolio leverage.",
+  "canonical_history_overwritten": false,
+  "retained": [
+    {
+      "repository": "dkmobilewash/prova",
+      "revision": "f969900ed3527ce580a5fe986e0f3ecc6e0e8de4",
+      "score": 30,
+      "priority": "A",
+      "source_catalog": "hunters/04.md",
+      "capability_ids": [
+        "CAP-028",
+        "CAP-029",
+        "CAP-030",
+        "CAP-031",
+        "CAP-006"
+      ],
+      "role": "Deep subcontractor commercial operating system linking field proof, T&M, change orders, backcharges, pay apps, retainage, delivery evidence and executed contract versions."
+    },
+    {
+      "repository": "Emmanuelok/procore-ultimate",
+      "revision": "11baa0855c36d484ee52a93091b14fc2f0451a46",
+      "score": 30,
+      "priority": "A",
+      "source_catalog": "hunters/04.md",
+      "capability_ids": [
+        "CAP-007",
+        "CAP-028",
+        "CAP-029",
+        "CAP-030",
+        "CAP-031",
+        "CAP-016"
+      ],
+      "role": "Construction commercial-assurance OS spanning revision authority, variations, notices/time bars, EOT/claims, valuations, payment/retainage and evidence reconciliation."
+    },
+    {
+      "repository": "MakingMofongo/co-ver-change-order-demo",
+      "revision": "5b5df169c42470f245db1c736ca00a3159ff06dd",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/04.md",
+      "capability_ids": [
+        "CAP-030"
+      ],
+      "role": "Deterministic owner-side change-order audit for unit rates, scope, markups, duplicates, arithmetic and estimator review."
+    },
+    {
+      "repository": "danafitkowski/cpp-cpm-engine",
+      "revision": "6d9617d5d55b12372914ca0df08ff6b959048edf",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/04.md",
+      "capability_ids": [
+        "CAP-031"
+      ],
+      "role": "Reproducible CPM/TIA with XER, calendars, fragnets, constraints, diagnostics and schedule-health evidence."
+    },
+    {
+      "repository": "beaconfirepro/LienGuard",
+      "revision": "feefd5d51a16e2d4349dfc7b4c4f3164ce56c2d9",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/04.md",
+      "capability_ids": [
+        "CAP-029"
+      ],
+      "proposed_capability_ids": [
+        "CAP-043"
+      ],
+      "role": "Construction statutory lien/notice/waiver/payment-right preservation with tier, work-month, delivery and cleared-payment evidence."
+    },
+    {
+      "repository": "tahseen137/construction-change-order-permit-os",
+      "revision": "c7872128f13f5b31333e27eebbae3b63eeb267ed",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/04.md",
+      "capability_ids": [
+        "CAP-012",
+        "CAP-030"
+      ],
+      "role": "Permit/RFI/owner-request to linked change event, RFQ, quote, PCO, approval and owner package workflow."
+    },
+    {
+      "repository": "jeremylongshore/cad-ai-agent",
+      "revision": "0866c8e8a5bc8c4f820d4b074bcc09c34d9c85be",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/04.md",
+      "capability_ids": [
+        "CAP-028"
+      ],
+      "role": "DXF/vector-PDF revision alignment, change review, overlays and quantity/takeoff evidence."
+    },
+    {
+      "repository": "davidlarrimore/curatore-v2",
+      "revision": "d4e42ac14450a58f84035c31db11b0399713a653",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/05.md",
+      "capability_ids": [
+        "CAP-011",
+        "CAP-019"
+      ],
+      "role": "Multi-source federal acquisition forecast aggregation with field-level history, change hashes and source-run health."
+    },
+    {
+      "repository": "eyeteamikey/sled-aggregator",
+      "revision": "f04d3a1fb00febe55c139e273207ad491ae24b46",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/05.md",
+      "capability_ids": [
+        "CAP-001",
+        "CAP-019"
+      ],
+      "proposed_capability_ids": [
+        "CAP-044"
+      ],
+      "role": "SLED portal-family acquisition, durable document manifests, safe downloader, provenance-bearing extraction and source/access states."
+    },
+    {
+      "repository": "Nonprofit-Open-Data-Collective/usaspend",
+      "revision": "22aa2c936be4bc21764834bde24193aeb64934d4",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/42.md",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "role": "USAspending modification-ledger accounting for award financial trajectory, corrections/deletions, deobligations and subawards."
+    },
+    {
+      "repository": "civictechdc/spicy-regs",
+      "revision": "1f02a7f8f7ec6ec48ab5a8f13bbeca4042cdf6e1",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/42.md",
+      "capability_ids": [
+        "CAP-011"
+      ],
+      "proposed_capability_ids": [
+        "CAP-049"
+      ],
+      "role": "Federal regulatory/rulemaking data lake joining Regulations.gov, Federal Register and adjacent public sources for change intelligence."
+    },
+    {
+      "repository": "cybertec-postgresql/pg_hardstorage",
+      "revision": "b47541b7e1cea69ce6ec63b26e154eb25fc4ca91",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/43.md",
+      "capability_ids": [
+        "CAP-007",
+        "CAP-010"
+      ],
+      "role": "Postgres physical/WAL backup with real isolated restore verification, official integrity tools and signed verdicts."
+    },
+    {
+      "repository": "recurso-dev/recurso",
+      "revision": "b071318ff9b349e83daa92e6a5e0c5873664421e",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/44.md",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "role": "Usage/subscription billing platform with immutable double-entry accounting and database-backed balance/idempotency invariants."
+    },
+    {
+      "repository": "Etherlabs-dev/multi-processor-reconciliation",
+      "revision": "2f9397fbe56a76abeee42a01a37536ad1811a806",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/27.md",
+      "capability_ids": [
+        "CAP-016",
+        "CAP-018"
+      ],
+      "role": "Cross-processor Stripe/PayPal/Square/ACH reconciliation with split-payment matching, exceptions and optional accounting sync."
+    },
+    {
+      "repository": "kleegr/sales-commission-manager",
+      "revision": "5fe802dba9b3a1c322995d4ccc73cb40922ab34d",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/28.md",
+      "capability_ids": [
+        "CAP-039",
+        "CAP-018"
+      ],
+      "role": "Deterministic plan-snapshot, assignment, sale/referral, refund/cancel reversal and payout-batch commission engine."
+    },
+    {
+      "repository": "geminimir/meterguard",
+      "revision": "9147d6fdf9fd8ee8761d732e956fc0a8c86989bd",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/28.md",
+      "capability_ids": [
+        "CAP-016"
+      ],
+      "proposed_capability_ids": [
+        "CAP-045"
+      ],
+      "role": "Stripe usage-metering parity with idempotent ingest, late replay, local aggregation, reconciliation and pre-invoice zero-drift target."
+    },
+    {
+      "repository": "aldemirkonuk/RestaurantAIAutomation",
+      "revision": "79dfea023658f014248f3c805ebe7d903c7f3974",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/36.md",
+      "capability_ids": [
+        "CAP-006",
+        "CAP-018"
+      ],
+      "role": "Deterministic X12 812 credit/debit settlement parser linking credits to invoices with exact money and review on direction conflicts."
+    },
+    {
+      "repository": "mzhc1/building-permit-scraper",
+      "revision": "9e638ccaef29939434e5f79157083a917e59039e",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/06.md",
+      "capability_ids": [
+        "CAP-012",
+        "CAP-019"
+      ],
+      "role": "Accela WebForms permit ingestion with canonicalization, stable dedupe, fill-rate QA and critical-record rejection."
+    },
+    {
+      "repository": "NatLabRockies/disco",
+      "revision": "d95fa671918f3b19181d76ffff52e53569525462",
+      "score": 30,
+      "priority": "A",
+      "source_catalog": "hunters/11.md",
+      "capability_ids": [
+        "CAP-034"
+      ],
+      "proposed_capability_ids": [
+        "CAP-046"
+      ],
+      "role": "Distribution constraint remediation and upgrade-cost workflow from thermal/voltage violations to equipment changes and costs."
+    },
+    {
+      "repository": "NLR-Distribution-Suite/ditto",
+      "revision": "2e5288f7ffed6ca0aac0b760b4c8735c6799d58b",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/11.md",
+      "capability_ids": [
+        "CAP-033"
+      ],
+      "role": "Grid model interoperability/canonical intermediate representation across CYME/CIM/OpenDSS and related element types."
+    },
+    {
+      "repository": "skortmann/probabilistic-pv-hosting-capacity",
+      "revision": "c7de0e3c16aff26daf5ee1067b3f215bcd2230dd",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/11.md",
+      "capability_ids": [
+        "CAP-034"
+      ],
+      "role": "Chance-constrained/probabilistic hosting capacity with correlated uncertainty, control strategies and risk bounds."
+    },
+    {
+      "repository": "NatLabRockies/REopt.jl",
+      "revision": "97119a8d07ef7761d39456f7e1b4d56ba7420bf4",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/11.md",
+      "proposed_capability_ids": [
+        "CAP-047"
+      ],
+      "role": "DER/microgrid lifecycle-economics, resilience and sizing/dispatch decision engine."
+    },
+    {
+      "repository": "NatLabRockies/reV",
+      "revision": "4dc2251505863ebca8eafac080fa2a10e32dfdc8",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/11.md",
+      "proposed_capability_ids": [
+        "CAP-053"
+      ],
+      "role": "Geospatial techno-economic renewable resource/generation/cost/exclusion/supply-curve engine."
+    },
+    {
+      "repository": "NatLabRockies/reVX",
+      "revision": "a4b3ae246e3f4bd67decb2921e3553e50fcc64cb",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/11.md",
+      "proposed_capability_ids": [
+        "CAP-053"
+      ],
+      "role": "reV companion for transmission routing/cost, exclusions/setbacks, land-use multipliers and planning exports."
+    },
+    {
+      "repository": "prxtxks/credexis",
+      "revision": "de4f350e8b131fd939774f1771d633c0c1be76df",
+      "score": 30,
+      "priority": "B",
+      "source_catalog": "hunters/17.md",
+      "capability_ids": [
+        "CAP-001",
+        "CAP-022"
+      ],
+      "proposed_capability_ids": [
+        "CAP-048"
+      ],
+      "role": "Evidence-grade SBA underwriting with dual extraction consensus, exact-cent reconciliation, blocking validation and page/bbox lineage."
+    },
+    {
+      "repository": "attestwire/en16931",
+      "revision": "09d08e44644305e7ca32f8ee0d3155bd928a3dbb",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/17.md",
+      "capability_ids": [
+        "CAP-008"
+      ],
+      "role": "TypeScript UBL/CII/Factur-X parsing/generation and EN16931/Peppol rule engine with large conformance tests."
+    },
+    {
+      "repository": "eigenpal/openparser",
+      "revision": "29472999c65041991b2ca401b2d44c333e99e652",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/17.md",
+      "capability_ids": [
+        "CAP-001",
+        "CAP-022"
+      ],
+      "role": "Cross-provider document-AI normalization preserving source geometry, lineage, reviews and typed confidence."
+    },
+    {
+      "repository": "markmhendrickson/neotoma",
+      "revision": "53f41510f0ba969f89b76919cffa0e6a1fdd7a08",
+      "score": 29,
+      "priority": "A",
+      "source_catalog": "hunters/18.md",
+      "capability_ids": [
+        "CAP-002",
+        "CAP-022"
+      ],
+      "role": "Immutable observation -> deterministic versioned entity snapshot with field provenance and audited merge/split/correction history."
+    },
+    {
+      "repository": "EnriqueForero/rues-linker_v2",
+      "revision": "4814de97acea18e029b24787a2ac4f3b2d2f56de",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/18.md",
+      "capability_ids": [
+        "CAP-002"
+      ],
+      "role": "Disk-first entity resolution/golden-record pipeline with LSH blocking, evidence features, source-quality weighting and immutable output generations."
+    },
+    {
+      "repository": "cwoodcox/utah-water-rights-mcp",
+      "revision": "24fee4adcb4835a01958e80e12ac7dfd6db02586",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/23.md",
+      "proposed_capability_ids": [
+        "CAP-050"
+      ],
+      "role": "Read-only multi-surface Utah water-right/allocation/application adapter for site diligence and monitoring."
+    },
+    {
+      "repository": "chrisallen12789/ProofLink",
+      "revision": "0ca71e3cddd1d0fb6a9c65b406ef3559a759c9f0",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/41.md",
+      "proposed_capability_ids": [
+        "CAP-051"
+      ],
+      "role": "Hydrovac/liquid-waste service proof-to-cash stack linking jobs, time, manifests, disposal, service contracts, invoices and payments."
+    },
+    {
+      "repository": "ZetriSofu40/odoo-amc-maintenance-management",
+      "revision": "15810b9429a97bc62c2efa1e41ea83c46d0a1daf",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/02.md",
+      "proposed_capability_ids": [
+        "CAP-052"
+      ],
+      "role": "Annual/comprehensive maintenance contract service proof, SLA/reactive work, labor/parts evidence, recurring billing and renewal state."
+    },
+    {
+      "repository": "hamzahossainX/Insaaf",
+      "revision": "8e49980eb14beee2d3ebd319954ee084966a3594",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/02.md",
+      "proposed_capability_ids": [
+        "CAP-054"
+      ],
+      "role": "Industrial-gas cylinder custody/loan/return/refill/payment ledger for returnables proof-to-cash."
+    },
+    {
+      "repository": "industrial-aiops/industrial-aiops",
+      "revision": "a514585b1d46442969796eef286b15dfb8277faa",
+      "score": 29,
+      "priority": "B",
+      "source_catalog": "hunters/12.md",
+      "capability_ids": [
+        "CAP-014"
+      ],
+      "role": "Read-first multi-protocol industrial interoperability diagnostics across OPC UA, Modbus, S7, Sparkplug, SECS/GEM and more."
+    }
+  ],
+  "proposed_capability_definitions": {
+    "CAP-043": "Construction statutory lien/notice/waiver/payment-right preservation evidence",
+    "CAP-044": "SLED procurement portal-family acquisition, packet completeness and source-state evidence",
+    "CAP-045": "Usage-metering parity and pre-invoice reconciliation",
+    "CAP-046": "Distribution constraint remediation and upgrade-cost evidence",
+    "CAP-047": "DER/microgrid techno-economic resilience and sizing/dispatch decision evidence",
+    "CAP-048": "Evidence-grade lending/underwriting document-to-money adjudication with independent extraction consensus",
+    "CAP-049": "Federal regulatory/rulemaking change intelligence linked to procurement/market exposure",
+    "CAP-050": "Site water-rights/allocation diligence and monitoring",
+    "CAP-051": "Field-service / liquid-waste proof-to-cash and compliance evidence",
+    "CAP-052": "Recurring maintenance-contract proof-to-bill / revenue assurance",
+    "CAP-053": "Renewable siting, exclusions, supply-curve and transmission-routing decision evidence",
+    "CAP-054": "Returnable-asset custody, refill, loss/return and receivable proof-to-cash"
+  },
+  "source_level_spot_checks": [
+    "Emmanuelok/procore-ultimate contracts/tests/data-model",
+    "prxtxks/credexis task/test evidence",
+    "davidlarrimore/curatore-v2 forecast integration",
+    "eyeteamikey/sled-aggregator architecture/source coverage",
+    "cybertec-postgresql/pg_hardstorage verifier",
+    "lane-local detailed hunter evidence for remaining records"
+  ],
+  "note": "This batch does not promote every 29/30 catalog finding. It ingests the highest-leverage tranche; lower-priority 29/30 findings remain in a ranked backlog."
+}

@@ -3,125 +3,345 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An evidence-led freight invoice review for brokers and 3PLs. Start with a fit discussion, agree the scope, and review findings before acting.">
+  <meta name="description" content="Find out whether freight money may be recoverable with a $0-upfront audit. Freight Recovery earns a fee only from funds successfully recovered under an authorized engagement.">
+  <meta name="theme-color" content="#071426">
   <meta name="freight-contact-email" content="">
-  <title>FreightLeak Audit — Evidence for better invoice decisions</title>
-  <link rel="stylesheet" href="site.css">
-  <script src="site.js" defer></script>
+  <meta name="site-release" content="free-audit-contingency-v1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+  <title>Freight Recovery | Free Audit. Pay Only on Recovered Funds.</title>
+  <link rel="canonical" href="https://p00nsmasher.github.io/github-value-hunt-ledger/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Freight Recovery">
+  <meta property="og:title" content="Find freight money you may be owed. Free.">
+  <meta property="og:description" content="$0 upfront audit. If Freight Recovery recovers money under an authorized engagement, the fee is a share of actual recovered funds. No recovery means no recovery fee.">
+  <meta property="og:url" content="https://p00nsmasher.github.io/github-value-hunt-ledger/">
+  <meta property="og:image" content="https://p00nsmasher.github.io/github-value-hunt-ledger/assets/images/terminal-blue-hour.webp">
+  <meta property="og:image:alt" content="Freight terminal at blue hour">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preload" href="assets/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="assets/images/terminal-blue-hour.webp" imagesrcset="assets/images/terminal-blue-hour-800.webp 800w, assets/images/terminal-blue-hour.webp 1586w" imagesizes="100vw" fetchpriority="high">
+  <link rel="stylesheet" href="site.css?v=free-audit-contingency-v2">
+  <script src="commercial-config.js?v=free-audit-contingency-v2" defer></script>
+  <script src="site.js?v=free-audit-contingency-v2" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<div class="statusbar"><div class="wrap" id="contactStatus"><strong>Contact channel pending.</strong> This is a source preview. You can prepare an inquiry locally; a verified business inbox is needed before public launch.</div></div>
-<div class="wrap">
-  <nav class="nav" aria-label="Main navigation">
-    <a class="brand" href="#main">Freight<span>Leak</span> Audit <small>pilot</small></a>
-    <div class="navlinks"><a href="#how">How it works</a><a href="#sample">Sample review</a><a class="btn" href="#inquiry">Discuss your fit</a></div>
-  </nav>
-</div>
-<main id="main">
-  <div class="wrap">
-    <section class="hero" aria-labelledby="hero-title">
-      <div>
-        <div class="eyebrow">Freight invoice review for brokers &amp; 3PLs</div>
-        <h1 id="hero-title">Bring evidence to freight invoice decisions.</h1>
-        <p class="lead">Start with a scoped pilot to compare carrier charges with the governing rates and delivery evidence. Review exceptions with a person before deciding what to pay or dispute.</p>
-        <div class="actions"><a class="btn" href="#inquiry">Discuss a pilot</a><a class="btn secondary" href="#sample">View a sample review</a></div>
-        <p class="micro">Scope and fees agreed in writing. Your team retains payment and dispute decisions.</p>
-      </div>
-      <div class="auditcard">
-        <div class="tag">Synthetic example</div><div class="tag">Not a customer result</div>
-        <h2>Illustrative load A-10428</h2>
-        <div class="bigmoney">$425</div><div class="audit-subtitle">potential variance for review</div>
-        <div class="row"><span>Carrier invoice</span><strong>$4,712</strong></div>
-        <div class="row"><span>Example supported amount</span><strong>$4,287</strong></div>
-        <div class="row"><span>Detention exception</span><strong>$250</strong></div>
-        <div class="row"><span>Lumper fee exception</span><strong>$125</strong></div>
-        <div class="row"><span>Duplicate accessorial</span><strong>$50</strong></div>
-        <div class="row"><span>Actual money recovered</span><strong>$0</strong></div>
-        <p class="notice">Illustrative amounts only. A flag is a question to resolve, not a verified saving.</p>
-      </div>
-    </section>
+
+<header class="site-header">
+  <div class="statusbar">
+    <div class="wrap" id="contactStatus"><strong>Free audit requests are open.</strong> Start with non-sensitive business details. Freight records move only through an approved secure route.</div>
   </div>
-  <section class="section" id="how">
+  <div class="wrap nav-wrap">
+    <a class="brand" href="#main" aria-label="Freight Recovery home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-name">Freight <em>Recovery</em></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="mainNav"><span>Menu</span><i aria-hidden="true"></i></button>
+    <nav class="navlinks" id="mainNav" aria-label="Main navigation">
+      <a href="#how">How it works</a>
+      <a href="#audit-output">Audit output</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#security">Security</a>
+      <a class="button button-small button-light" href="#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-media" aria-hidden="true">
+      <img src="assets/images/terminal-blue-hour.webp"
+           srcset="assets/images/terminal-blue-hour-800.webp 800w, assets/images/terminal-blue-hour.webp 1586w"
+           sizes="100vw" width="1586" height="992" alt="" fetchpriority="high">
+    </div>
+    <div class="hero-wash" aria-hidden="true"></div>
+    <div class="wrap hero-layout">
+      <div class="hero-copy">
+        <p class="eyebrow light"><span></span> Free freight recovery audit</p>
+        <h1 id="hero-title">Find freight money you may be owed. <em>Free.</em></h1>
+        <p class="lead">No upfront audit fee. We assess your freight data for credible recovery opportunities. If you authorize us to pursue them, we earn a percentage only from eligible funds actually recovered.</p>
+        <div class="actions">
+          <a class="button button-signal" href="#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit <span aria-hidden="true">&#8595;</span></a>
+          <a class="button button-ghost" href="#how" data-track="how_it_works_clicked">See How It Works</a>
+        </div>
+        <ul class="hero-proof" aria-label="Offer safeguards">
+          <li><strong>$0</strong> upfront audit fee</li>
+          <li><strong>$0</strong> recovery fee if nothing is recovered</li>
+          <li><strong>You approve</strong> recovery work before it starts</li>
+        </ul>
+        <p class="hero-note">Recovery is not guaranteed. Potential recovery, approved claim value, and actual recovered funds are different measures.</p>
+      </div>
+
+      <aside class="opportunity-card" aria-label="Illustrative free audit summary">
+        <div class="opportunity-topline"><span>Illustrative audit summary</span><span class="sample-chip">Not customer results</span></div>
+        <div class="opportunity-range"><small>Potential recovery range</small><strong>$24k&ndash;$38k</strong><span>Estimate, not recovered cash</span></div>
+        <div class="opportunity-grid">
+          <div><span>Records analyzed</span><strong>1,284</strong></div>
+          <div><span>Transactions flagged</span><strong>37</strong></div>
+          <div><span>Opportunity categories</span><strong>3</strong></div>
+          <div><span>Confidence</span><strong>Supported</strong></div>
+        </div>
+        <div class="opportunity-path"><span class="path-dot" aria-hidden="true"></span><div><strong>Recommended path</strong><p>Review engagement terms, then authorize claim preparation and recovery execution.</p></div></div>
+        <p class="opportunity-note">The free summary shows whether a meaningful opportunity appears to exist. Claim-ready evidence and execution detail are reserved for an authorized recovery engagement.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="model-strip" aria-label="Commercial model at a glance">
+    <div class="wrap model-grid">
+      <div><span>01</span><strong>Free audit</strong><p>We review fit and available freight records at no upfront cost.</p></div>
+      <div><span>02</span><strong>Controlled decision</strong><p>You receive a concise opportunity summary before choosing recovery work.</p></div>
+      <div><span>03</span><strong>Success-based fee</strong><p>Our fee is tied to eligible funds actually recovered&mdash;not estimates.</p></div>
+      <div><span>04</span><strong>No recovery, no fee</strong><p>If the engagement recovers nothing, no recovery fee is due.</p></div>
+    </div>
+  </section>
+
+  <section class="section section-paper" id="how" aria-labelledby="how-title">
     <div class="wrap">
-      <div class="eyebrow">A focused first engagement</div><h2>Agree the review before moving documents.</h2>
-      <p class="sectionintro">Begin with the freight mix, invoice volume, and the decision you want to improve. Then define the evidence, review scope, and handling arrangements together.</p>
-      <div class="grid3">
-        <div class="tile"><div class="num">1</div><h3>Check fit and readiness</h3><p>Identify the relevant rate sources, invoice exports, and delivery records. Confirm a suitable, controlled intake route before sharing actual freight documents.</p></div>
-        <div class="tile"><div class="num">2</div><h3>Review the evidence</h3><p>Compare billed charges against applicable terms. Record missing evidence, disputed interpretations, and supported exceptions separately.</p></div>
-        <div class="tile"><div class="num">3</div><h3>Measure the outcome</h3><p>Track review effort and resolved exceptions. Count a recovery or avoided payment only when the agreed evidence supports it.</p></div>
+      <div class="section-heading">
+        <div><p class="eyebrow"><span></span> A lower-risk path to recovery</p><h2 id="how-title">From freight records to recovered funds.</h2></div>
+        <p>The audit answers whether there is a credible opportunity. The detailed claim strategy and execution begin only after a separate recovery engagement.</p>
+      </div>
+      <ol class="journey" aria-label="Freight recovery process">
+        <li><span class="journey-number">01</span><div><strong>Qualify the opportunity</strong><p>Share company, freight-volume, carrier, and record-readiness details. Do not send freight files yet.</p></div><small>$0 upfront</small></li>
+        <li><span class="journey-number">02</span><div><strong>Use the approved intake route</strong><p>If the request is a fit, we confirm scope and provide the approved method for transferring agreed records.</p></div><small>Scope controlled</small></li>
+        <li><span class="journey-number">03</span><div><strong>Receive an opportunity summary</strong><p>See a supportable range, discrepancy categories, confidence, records analyzed, and the recommended next step.</p></div><small>No obligation</small></li>
+        <li><span class="journey-number">04</span><div><strong>Authorize recovery</strong><p>Review the exact contingency rate, scope, recovered-funds definition, authority, and payment timing before work begins.</p></div><small>Separate agreement</small></li>
+        <li><span class="journey-number">05</span><div><strong>Recover and reconcile</strong><p>We prepare and administer approved cases, track settlements and reversals, and invoice only from eligible recovered funds.</p></div><small>Fee after recovery</small></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section-ink" id="boundaries" aria-labelledby="boundary-title">
+    <div class="wrap boundary-layout">
+      <div class="boundary-copy">
+        <p class="eyebrow light"><span></span> Useful without giving away the recovery engine</p>
+        <h2 id="boundary-title">The free audit tells you <em>whether to proceed.</em></h2>
+        <p>It does not hand over the complete claim package, dispute playbook, carrier correspondence, or every proprietary test needed to execute the recovery independently.</p>
+        <div class="boundary-note"><strong>Why this boundary matters</strong><p>It keeps the audit genuinely useful for your decision while aligning our deeper work with recovered results.</p></div>
+      </div>
+      <div class="boundary-table" role="table" aria-label="Free audit and recovery engagement comparison">
+        <div class="boundary-head" role="row"><span role="columnheader">Free audit summary</span><span role="columnheader">Authorized recovery engagement</span></div>
+        <div role="row"><span role="cell">Opportunity appears viable or not</span><span role="cell">Claim-level validation and preparation</span></div>
+        <div role="row"><span role="cell">Approximate range where supportable</span><span role="cell">Detailed evidence package</span></div>
+        <div role="row"><span role="cell">Discrepancy categories</span><span role="cell">Carrier or vendor correspondence</span></div>
+        <div role="row"><span role="cell">Confidence and record coverage</span><span role="cell">Approved dispute and follow-up workflow</span></div>
+        <div role="row"><span role="cell">Recommended next step</span><span role="cell">Settlement matching and reversal tracking</span></div>
       </div>
     </div>
   </section>
-  <section class="section" id="sample">
-    <div class="wrap">
-      <div class="eyebrow">Illustrative output</div><h2>A review your controller can follow.</h2>
-      <p class="sectionintro">Each exception should connect the billed amount, expected amount, governing terms, and supporting records. Missing evidence remains visible.</p>
-      <div class="report">
-        <div class="report-heading"><div><div class="report-title">20-invoice demonstration</div><div class="muted">Synthetic data · USD · no customer savings claim</div></div><div><span class="tag dark">Illustrative only</span></div></div>
-        <div class="reportgrid">
-          <div class="metric"><span class="muted">Example invoices</span><b>20</b></div>
-          <div class="metric"><span class="muted">Example freight charges</span><b>$41,870</b></div>
-          <div class="metric"><span class="muted">Potential variance</span><b>$1,435</b></div>
-          <div class="metric"><span class="muted">Flagged invoices</span><b>6</b></div>
-        </div>
-        <div class="findings">
-          <div class="finding"><strong>Accessorial exceptions</strong><span class="muted">3 findings</span><strong>$745</strong></div>
-          <div class="finding"><strong>Detention mismatch</strong><span class="muted">1 finding</span><strong>$390</strong></div>
-          <div class="finding"><strong>Duplicate charge</strong><span class="muted">1 finding</span><strong>$180</strong></div>
-          <div class="finding"><strong>Rate mismatch</strong><span class="muted">1 finding</span><strong>$120</strong></div>
-        </div>
-        <p class="report-note">These invented numbers explain the format. They do not predict a recovery rate, fee, or result for your business.</p>
+
+  <section class="section section-cobalt" id="audit-output" aria-labelledby="output-title">
+    <div class="wrap output-layout">
+      <div class="output-copy">
+        <p class="eyebrow cobalt-light"><span></span> What the free audit delivers</p>
+        <h2 id="output-title">A decision-ready opportunity summary.</h2>
+        <p>Enough clarity to judge the opportunity, without confusing a flag with a claim or a claim with money received.</p>
+        <ul class="check-list">
+          <li>Estimated potential recovery range, when supportable</li>
+          <li>Relevant discrepancy categories</li>
+          <li>Number and value of transactions flagged</li>
+          <li>Confidence and records-analyzed indicators</li>
+          <li>Recommended recovery path or no-go conclusion</li>
+        </ul>
+        <!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->
+      </div>
+      <div class="measure-stack" aria-label="Recovery measure definitions">
+        <div><span>Potential recovery</span><strong>Estimated</strong><p>A supportable opportunity range. It is not an approved claim and not cash.</p></div>
+        <div><span>Approved claim value</span><strong>Authorized</strong><p>The amount approved for pursuit after evidence and scope review. It may not be recovered.</p></div>
+        <div class="measure-actual"><span>Actual recovered funds</span><strong>Received or posted</strong><p>Eligible cash, refund, remittance, or usable credit actually received or posted, net of known reversals.</p></div>
       </div>
     </div>
   </section>
-  <section class="section" id="inquiry">
-    <div class="wrap">
-      <div class="eyebrow">Start with fit</div><h2>What would a useful pilot answer?</h2>
-      <div class="offer">
-        <div class="pricebox">
-          <h3>Define the problem and the decision.</h3>
-          <p class="sectionintro">A short fit discussion can establish whether the available records can support a meaningful review.</p>
-          <ul class="clean"><li>Freight modes and approximate invoice volume</li><li>Access to governing rates and supporting records</li><li>Review bottlenecks and the outcome to measure</li><li>A named reviewer and decision maker</li></ul>
-          <p>Any diagnostic or pilot requires an agreed scope, fees, and data-handling arrangements. Previously agreed offers remain subject to their own terms.</p>
-          <p class="notice">This public page does not accept freight documents. Keep invoice details, rate terms, passwords, and other confidential information out of your inquiry.</p>
+
+  <section class="section intake-section" id="start-audit" aria-labelledby="intake-title">
+    <div class="wrap intake-layout">
+      <div class="intake-copy">
+        <p class="eyebrow"><span></span> Start your free recovery audit</p>
+        <h2 id="intake-title">First, make sure the opportunity is worth pursuing.</h2>
+        <p>Answer a few business and data-readiness questions. This protects your team from unnecessary file transfer and protects our analysts from open-ended, low-value reviews.</p>
+        <div class="intake-guardrail"><span aria-hidden="true">!</span><div><strong>Do not enter invoice details or attach freight records here.</strong><p>This step uses non-sensitive qualification information only. If the request is a fit, we will confirm an approved secure intake route in writing.</p></div></div>
+        <dl class="format-list">
+          <div><dt>Preferred audit input</dt><dd>Structured invoice exports such as CSV</dd></div>
+          <div><dt>Reviewed before acceptance</dt><dd>Spreadsheet, PDF, and carrier exports</dd></div>
+          <div><dt>Never send here</dt><dd>Credentials, payment-card data, or unrestricted inbox access</dd></div>
+        </dl>
+      </div>
+
+      <div class="form-shell">
+        <div class="form-progress" aria-label="Audit request progress">
+          <span class="is-current" data-progress="1"><i>1</i> Company</span>
+          <span data-progress="2"><i>2</i> Freight profile</span>
+          <span data-progress="3"><i>3</i> Data readiness</span>
         </div>
-        <div class="formbox">
-          <h3 id="inquiry-title">Prepare an inquiry</h3>
-          <div id="inquiryFields" role="group" aria-labelledby="inquiry-title">
-            <div class="formgrid">
-              <div class="field"><label for="name">Name</label><input id="name" autocomplete="name" maxlength="100" required></div>
-              <div class="field"><label for="company">Company</label><input id="company" autocomplete="organization" maxlength="120" required></div>
-              <div class="field"><label for="email">Work email</label><input id="email" type="email" autocomplete="email" maxlength="254" required></div>
-              <div class="field"><label for="volume">Carrier invoices per month</label><select id="volume"><option>Under 50</option><option>50–199</option><option>200–999</option><option>1,000+</option><option>Not sure</option></select></div>
-              <div class="field full"><label for="notes">Freight mix and review goal</label><textarea id="notes" maxlength="1200" placeholder="Example: mostly FTL; understand accessorial review time. No confidential details."></textarea></div>
+        <form id="auditForm" novalidate>
+          <fieldset class="form-step" data-form-step="1">
+            <legend>Tell us who should receive the audit response.</legend>
+            <p class="step-intro">Use a work contact who can confirm freight scope and data access.</p>
+            <div class="field-grid">
+              <label><span>Full name</span><input id="fullName" name="fullName" autocomplete="name" required maxlength="100"></label>
+              <label><span>Work email</span><input id="workEmail" name="workEmail" type="email" autocomplete="email" required maxlength="160"></label>
+              <label><span>Company</span><input id="companyName" name="companyName" autocomplete="organization" required maxlength="140"></label>
+              <label><span>Role</span><select id="role" name="role" required><option value="">Select role</option><option>CFO / finance leader</option><option>Controller / accounting</option><option>Transportation / logistics</option><option>Freight broker / 3PL</option><option>Owner / executive</option><option>Other</option></select></label>
             </div>
-            <button class="btn submit" id="prepareDraft" type="button">Prepare inquiry draft</button>
-            <p class="notice">This prepares text in your browser. Nothing is submitted, uploaded, or saved by this page.</p>
-          </div>
-          <p id="formMessage" class="notice form-status" role="status" aria-live="polite"></p>
-          <noscript><p class="notice">Enable JavaScript to prepare a local draft. This page has no submission endpoint.</p></noscript>
-          <div class="draft" id="draftPanel" hidden>
-            <label for="draftText">Your inquiry draft</label><textarea id="draftText" readonly></textarea>
-            <div class="actions"><button class="btn secondary" id="copyDraft" type="button">Copy draft</button><button class="btn secondary" id="downloadDraft" type="button">Download text</button><a class="btn" id="emailDraft" hidden>Open email draft</a></div>
-            <p class="notice" id="deliveryNote">Contact channel pending. Keep your draft until a verified business contact is available.</p>
-          </div>
+            <p class="step-error" role="alert" aria-live="polite"></p>
+            <div class="form-actions"><span></span><button class="button button-cobalt" type="button" data-next-step="2">Continue</button></div>
+          </fieldset>
+
+          <fieldset class="form-step" data-form-step="2" hidden>
+            <legend>Describe the freight operation.</legend>
+            <p class="step-intro">Ranges are enough. Exact figures are not needed for qualification.</p>
+            <div class="field-grid">
+              <label><span>Approximate annual freight spend</span><select id="annualSpend" name="annualSpend" required><option value="">Select range</option><option>Under $250k</option><option>$250k&ndash;$1M</option><option>$1M&ndash;$5M</option><option>$5M&ndash;$20M</option><option>$20M+</option></select></label>
+              <label><span>Approximate monthly shipments</span><select id="monthlyShipments" name="monthlyShipments" required><option value="">Select range</option><option>Under 50</option><option>50&ndash;249</option><option>250&ndash;999</option><option>1,000+</option></select></label>
+              <label><span>Number of active carriers</span><select id="carrierCount" name="carrierCount" required><option value="">Select range</option><option>1</option><option>2&ndash;5</option><option>6&ndash;15</option><option>16+</option></select></label>
+              <label><span>Major carriers <small>optional</small></span><input id="majorCarriers" name="majorCarriers" maxlength="180" placeholder="Names or carrier types"></label>
+            </div>
+            <fieldset class="choice-group" id="modesGroup"><legend>Freight types used <span>Choose all that apply</span></legend><div class="choice-grid"><label><input type="checkbox" name="modes" value="Parcel"><span>Parcel</span></label><label><input type="checkbox" name="modes" value="LTL"><span>LTL</span></label><label><input type="checkbox" name="modes" value="FTL"><span>FTL</span></label><label><input type="checkbox" name="modes" value="Intermodal"><span>Intermodal</span></label><label><input type="checkbox" name="modes" value="Ocean / air"><span>Ocean / air</span></label><label><input type="checkbox" name="modes" value="Other"><span>Other</span></label></div></fieldset>
+            <p class="step-error" role="alert" aria-live="polite"></p>
+            <div class="form-actions"><button class="button button-quiet" type="button" data-prev-step="1">Back</button><button class="button button-cobalt" type="button" data-next-step="3">Continue</button></div>
+          </fieldset>
+
+          <fieldset class="form-step" data-form-step="3" hidden>
+            <legend>How audit-ready are the records?</legend>
+            <p class="step-intro">This determines the next operational step, not whether you are charged. The audit remains $0 upfront.</p>
+            <div class="field-grid">
+              <label><span>Invoice history available</span><select id="invoiceHistory" name="invoiceHistory" required><option value="">Select range</option><option>Less than 3 months</option><option>3&ndash;5 months</option><option>6&ndash;12 months</option><option>13&ndash;24 months</option><option>More than 24 months</option></select></label>
+              <label><span>Approximate invoice count</span><select id="invoiceCount" name="invoiceCount" required><option value="">Select range</option><option>Under 100</option><option>100&ndash;499</option><option>500&ndash;2,499</option><option>2,500+</option></select></label>
+              <label><span>Have these records been audited?</span><select id="priorAudit" name="priorAudit" required><option value="">Select answer</option><option>No formal audit</option><option>Internal review only</option><option>External audit completed</option><option>Not sure</option></select></label>
+              <label><span>Known disputes or suspected overcharges?</span><select id="suspectedIssues" name="suspectedIssues" required><option value="">Select answer</option><option>Yes</option><option>No</option><option>Not sure</option></select></label>
+            </div>
+            <fieldset class="choice-group" id="recordsGroup"><legend>Records currently available <span>Choose all that apply</span></legend><div class="choice-grid choice-grid-two"><label><input type="checkbox" name="records" value="Invoice export"><span>Invoice export</span></label><label><input type="checkbox" name="records" value="Rate agreements"><span>Rate agreements</span></label><label><input type="checkbox" name="records" value="Shipment records"><span>Shipment records</span></label><label><input type="checkbox" name="records" value="Payment or credit evidence"><span>Payment / credit evidence</span></label></div></fieldset>
+            <label class="field-wide"><span>What prompted the review? <small>optional, no invoice-level detail</small></span><textarea id="issueNotes" name="issueNotes" rows="3" maxlength="500" placeholder="For example: recurring accessorials, duplicate-looking charges, or an unresolved carrier billing question."></textarea><small class="character-count"><span id="noteCount">0</span>/500</small></label>
+            <label class="consent"><input id="safeIntake" name="safeIntake" type="checkbox" required><span>I will not include freight documents, credentials, payment-card data, or other confidential records in this qualification request. I understand a secure intake route must be approved first.</span></label>
+            <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
+            <div class="form-actions"><button class="button button-quiet" type="button" data-prev-step="2">Back</button><button class="button button-signal" type="submit">Prepare My Free Audit Request</button></div>
+          </fieldset>
+        </form>
+
+        <div class="audit-ready" id="auditReady" hidden tabindex="-1">
+          <span class="ready-mark" aria-hidden="true">&#10003;</span>
+          <p class="eyebrow"><span></span> Request ready</p>
+          <h3>Your qualification summary is prepared.</h3>
+          <p>Nothing has been sent yet. Open the prepared email, review the non-sensitive summary, and send it from your own account.</p>
+          <div class="reference-line"><span>Reference</span><strong id="requestReference">&mdash;</strong></div>
+          <a class="button button-cobalt" id="sendAuditRequest" href="#contact-pending">Open Email to Send Request</a>
+          <button class="text-button" id="copyAuditSummary" type="button">Copy request summary</button>
+          <span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span>
+          <ol class="ready-steps"><li><span>1</span>We review fit and data readiness.</li><li><span>2</span>If viable, we confirm scope and an approved secure transfer route.</li><li><span>3</span>After analysis, you receive the free opportunity summary.</li></ol>
         </div>
       </div>
     </div>
   </section>
-  <section class="section">
-    <div class="wrap faq">
-      <div class="eyebrow">Questions</div><h2>Clear scope. Checkable findings.</h2>
-      <details><summary>What records could a review require?</summary><p>Carrier invoices, the governing rate confirmation or contract, and relevant delivery or accessorial evidence. A POD or BOL alone may not establish the right to a particular charge.</p></details>
-      <details><summary>Does a flag mean the carrier owes a refund?</summary><p>No. A flag may require more evidence or interpretation. Confirmed recoveries and avoided payments are tracked separately from potential variances.</p></details>
-      <details><summary>Will you automatically reject or dispute invoices?</summary><p>No. Your authorized reviewer makes payment and dispute decisions. Any external action requires separate authorization.</p></details>
-      <details><summary>Are the sample results from a customer?</summary><p>No. Every amount shown here is synthetic and illustrates a possible review format.</p></details>
-      <details><summary>How do I share freight documents?</summary><p>Do not upload them to this page or attach them to the initial inquiry. A pilot begins only after scope, access, retention, and a suitable controlled intake route are agreed and verified.</p></details>
-      <details><summary>What happens when I prepare an inquiry?</summary><p>The page builds a text draft locally. You can copy it or download it. Once a verified business contact is configured, you can open an email draft and send it yourself. The page cannot confirm delivery.</p></details>
+
+  <section class="section pricing-section" id="pricing" aria-labelledby="pricing-title">
+    <div class="wrap">
+      <div class="section-heading pricing-heading"><div><p class="eyebrow"><span></span> Aligned pricing</p><h2 id="pricing-title">We do well when recovery succeeds.</h2></div><p>The flagship path has no upfront audit charge and no recovery fee merely because an opportunity was estimated, flagged, or approved.</p></div>
+      <div class="pricing-grid">
+        <article class="price-card price-card-primary">
+          <div class="price-label">Flagship entry point</div>
+          <h3>Free Recovery Audit</h3>
+          <p class="price"><strong>$0</strong><span>upfront audit fee</span></p>
+          <ul class="included-list"><li>Initial freight data analysis</li><li>Recovery opportunity identification</li><li>Concise opportunity summary</li><li>No obligation to proceed</li></ul>
+          <a class="button button-cobalt button-block" href="#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit</a>
+        </article>
+        <article class="price-card price-card-dark">
+          <div class="price-label">After you choose to proceed</div>
+          <h3>Recovery Service</h3>
+          <p class="price"><strong data-rate-label>Rate confirmed before engagement</strong><span>of eligible funds actually recovered</span></p>
+          <ul class="included-list"><li>No upfront recovery fee</li><li>No fee on estimates or unpaid claims</li><li>No recovery fee when nothing is recovered</li><li>Exact rate and scope confirmed before work begins</li></ul>
+          <a class="text-link text-link-light" href="engagement-framework.html">Review the engagement framework <span aria-hidden="true">&#8594;</span></a>
+        </article>
+        <article class="price-card price-card-secondary">
+          <div class="price-label">Alternative by request</div>
+          <h3>Fixed-Fee Forensic Audit</h3>
+          <p class="price"><strong>Custom</strong><span>scoped and priced in writing</span></p>
+          <ul class="included-list"><li>For teams that prefer to fund analysis directly</li><li>Customer retains all eligible recoveries</li><li>Scope, deliverables, and price agreed before work</li><li>Not the standard launch offer</li></ul>
+          <a class="text-link" data-contact-link href="#contact-pending">Ask about a fixed-fee scope <span aria-hidden="true">&#8594;</span></a>
+        </article>
+      </div>
+
+      <div class="fee-calculator" id="fee-calculator">
+        <div class="calculator-copy"><p class="eyebrow light"><span></span> Recovery fee illustration</p><h3>Only recovered funds enter the fee calculation.</h3><p>Enter fee-eligible funds actually received or posted to the customer, net of known reversals. The current working rate shown here is configurable and must be confirmed in the engagement.</p><label><span>Actual fee-eligible recovered funds</span><span class="money-input"><i>$</i><input id="actualRecovery" type="number" min="0" max="1000000000" step="1000" value="100000" inputmode="decimal"></span></label></div>
+        <dl class="calculator-results">
+          <div><dt>Actual recovered funds</dt><dd id="actualRecoveredDisplay">$50,000</dd></div>
+          <div><dt>Freight Recovery fee <span data-rate-label></span></dt><dd id="recoveryFeeDisplay">&mdash;</dd></div>
+          <div class="customer-net"><dt>Customer retains after fee</dt><dd id="customerNetDisplay">&mdash;</dd></div>
+          <div class="zero-state"><dt>If actual recovery is $0</dt><dd>Recovery fee is $0</dd></div>
+        </dl>
+      </div>
+      <p class="calculator-disclaimer" id="calculatorDisclaimer">Illustration only. Actual fee eligibility, rate, exclusions, reversals, payment timing, and taxes, if any, are governed by the signed recovery engagement.</p>
     </div>
+  </section>
+
+  <section class="section engagement-section" id="engagement" aria-labelledby="engagement-title">
+    <div class="wrap engagement-layout">
+      <div class="engagement-copy"><p class="eyebrow light"><span></span> Clean audit-to-recovery transition</p><h2 id="engagement-title">An opportunity is not a recovery.</h2><p>If the audit identifies worthwhile opportunities, you decide whether Freight Recovery should pursue them. Nothing is sent to a carrier, vendor, or other outside party without the required authorization.</p><div class="engagement-quote"><span>Illustrative transition</span><p>&ldquo;We identified an estimated recovery range supported by the records reviewed. Authorize Freight Recovery to pursue the agreed cases, and the fee will be <strong data-rate-label>the rate confirmed in your engagement</strong> of eligible funds actually recovered.&rdquo;</p></div></div>
+      <div class="terms-panel">
+        <h3>The engagement workflow is ready to capture:</h3>
+        <ul><li>Contingency percentage and fee-eligible recovery definition</li><li>Scope, claim population, and authority to act</li><li>Payment timing, reversals, and fee adjustments</li><li>Confidentiality, data use, and approved access</li><li>Termination and treatment of in-process recoveries</li><li>Findings-origin and anti-circumvention treatment</li></ul>
+        <p>This is workflow structure, not legal advice or a contract. Final terms require an appropriate signed agreement.</p>
+        <a class="button button-light button-block" href="engagement-framework.html">View Engagement Framework</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section security-section" id="security" aria-labelledby="security-title">
+    <div class="wrap security-layout">
+      <figure class="security-image"><img src="assets/images/invoice-evidence.webp" srcset="assets/images/invoice-evidence-800.webp 800w, assets/images/invoice-evidence.webp 1448w" sizes="(max-width: 900px) 100vw, 44vw" width="1448" height="1086" alt="Abstract freight documents arranged for controlled review" loading="lazy" decoding="async"><figcaption>Illustrative records &middot; no customer data</figcaption></figure>
+      <div class="security-copy"><p class="eyebrow"><span></span> Data handling before data transfer</p><h2 id="security-title">Start with fit. Move files only after approval.</h2><p>The public site does not upload or transmit freight files. Qualification details remain in your browser until you choose to send the prepared email. If the request is accepted, the scope and approved secure transfer route are confirmed before records move.</p><div class="security-grid"><div><strong>Minimize first</strong><p>Qualification uses ranges and record types, not invoice-level data.</p></div><div><strong>Scope access</strong><p>Only agreed records and the approved business purpose should be included.</p></div><div><strong>Human control</strong><p>Material findings and external actions require review and authorization.</p></div><div><strong>Evidence trail</strong><p>Findings, approvals, settlements, and reversals remain distinct and traceable.</p></div></div><p class="security-links"><a href="privacy.html">Read the data &amp; privacy notice</a><span>&middot;</span><a href="#faq">Review common security questions</a></p></div>
+    </div>
+  </section>
+
+  <section class="section proof-section" id="proof" aria-labelledby="proof-title">
+    <div class="wrap proof-layout">
+      <div><p class="eyebrow"><span></span> Proof without fabrication</p><h2 id="proof-title">Real case studies will appear when they are real.</h2><p>We do not publish invented customers, testimonials, recovery totals, carrier partnerships, certifications, or success rates. Until a customer authorizes a verified case study, the controlled synthetic demo is the only public results example.</p></div>
+      <div class="proof-placeholder" aria-label="Future verified case study area"><span>Verified customer proof</span><strong>Reserved for an authorized, evidence-backed recovery case.</strong><p>Future entries can include the reviewed population, opportunity category, approved claim value, actual recovered funds, time to resolution, and customer-approved context.</p></div>
+    </div>
+  </section>
+
+  <section class="section faq-section" id="faq" aria-labelledby="faq-title">
+    <div class="wrap faq-layout">
+      <div class="faq-intro"><p class="eyebrow"><span></span> Straight answers</p><h2 id="faq-title">What finance and freight teams usually ask.</h2><p>Conservative answers now prevent expensive misunderstandings later.</p></div>
+      <div class="faq-list">
+        <details><summary><span>01</span>How much does the audit cost?</summary><p>The initial recovery audit is $0 upfront. It is designed to determine whether a meaningful recovery opportunity appears to exist and what the next step should be.</p></details>
+        <details><summary><span>02</span>What happens if you find nothing?</summary><p>You owe no audit fee. If no viable opportunity is identified, there is no recovery engagement and no recovery fee.</p></details>
+        <details><summary><span>03</span>How does Freight Recovery get paid?</summary><p>If you separately authorize a recovery engagement, Freight Recovery earns the agreed percentage of eligible funds actually recovered. A potential opportunity, flag, or unpaid claim does not by itself earn a fee.</p></details>
+        <details><summary><span>04</span>What percentage do you charge?</summary><p>The current working rate is <strong data-rate-label>confirmed before recovery work begins</strong>. It is a configurable commercial term, not a permanent promise. Your exact rate, scope, exclusions, and payment timing are confirmed in writing before the engagement starts.</p></details>
+        <details><summary><span>05</span>When do I owe a fee?</summary><p>Only after an authorized engagement produces fee-eligible funds actually received or posted to you, subject to the signed terms. Known reversals reduce the eligible amount. If actual eligible recovery is zero, the recovery fee is zero.</p></details>
+        <details><summary><span>06</span>What information do you need?</summary><p>Qualification starts with freight-spend and shipment ranges, modes, carrier count, available history, approximate invoice volume, record types, and whether issues or prior audits are known. Freight files are requested only after scope and a secure transfer route are approved.</p></details>
+        <details><summary><span>07</span>What freight types can you analyze?</summary><p>The qualification flow accepts parcel, LTL, FTL, intermodal, ocean, air, and mixed-mode descriptions. Actual support depends on the available invoices, rate authority, shipment evidence, payment evidence, carrier, geography, and agreed scope. We confirm fit before accepting records.</p></details>
+        <details><summary><span>08</span>How far back can you review?</summary><p>Available history, contractual deadlines, carrier rules, limitation periods, record quality, and the agreed scope all matter. Share the history range during qualification; we confirm the review period before analysis. This is not legal advice.</p></details>
+        <details><summary><span>09</span>What happens after you identify a recovery?</summary><p>You receive a concise opportunity summary. If you want Freight Recovery to proceed, we define the cases, authority, contingency rate, recovered-funds definition, data handling, and payment terms in a separate engagement before detailed claim preparation or outside contact.</p></details>
+        <details><summary><span>10</span>Can we perform the recovery ourselves?</summary><p>You control whether to proceed. The free audit summary supports that decision, but it does not include the full proprietary claim package, detailed execution strategy, carrier correspondence, or operational playbook reserved for the recovery engagement.</p></details>
+        <details><summary><span>11</span>Do I have to sign a long-term contract?</summary><p>Not to request the free audit. Any recovery engagement should define its exact scope, term, termination rights, and treatment of in-process or finding-originated recoveries. No long-term commitment is implied by this site.</p></details>
+        <details><summary><span>12</span>How is our freight data protected?</summary><p>The public form does not accept freight files. We first confirm fit, scope, allowed records, and an approved transfer route. Access and retention requirements are then documented for the engagement. Do not email invoices, credentials, contracts, or payment data.</p></details>
+        <details><summary><span>13</span>What if we prefer a fixed-fee audit?</summary><p>A fixed-fee forensic audit may be available by request for organizations that want to fund the analysis directly and retain all eligible recoveries. It is custom scoped and priced in writing; it is not the primary launch offer.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta" aria-labelledby="final-title">
+    <div class="final-media" aria-hidden="true"><img src="assets/images/freight-network.webp" srcset="assets/images/freight-network-800.webp 800w, assets/images/freight-network.webp 1672w" sizes="100vw" width="1672" height="941" alt="" loading="lazy" decoding="async"></div>
+    <div class="final-wash" aria-hidden="true"></div>
+    <div class="wrap final-inner"><p class="eyebrow light"><span></span> Start with the evidence</p><h2 id="final-title">See whether recoverable freight spend may be hiding in your records.</h2><p>$0 upfront audit. No recovery fee unless eligible funds are actually recovered under an authorized engagement.</p><div class="actions"><a class="button button-signal" href="#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit</a><a class="button button-ghost" href="#pricing">Review Pricing</a></div></div>
   </section>
 </main>
-<footer class="wrap footer">FreightLeak Audit is a working brand for a scoped pilot service. © 2026. This page contains synthetic examples, not verified customer results.</footer>
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div><a class="brand brand-footer" href="#main" aria-label="Freight Recovery home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="brand-name">Freight <em>Recovery</em></span></a><p>Evidence-led freight recovery with no upfront audit fee.</p><span class="footer-disclaimer">No guaranteed recovery. No fabricated customer proof.</span></div>
+    <nav aria-label="Service links"><strong>Service</strong><a href="#how">How it works</a><a href="#audit-output">Audit output</a><a href="#pricing">Pricing</a><a href="#start-audit">Start free audit</a></nav>
+    <nav aria-label="Trust links"><strong>Trust</strong><a href="#security">Data handling</a><a href="privacy.html">Privacy notice</a><a href="engagement-framework.html">Engagement framework</a><a href="synthetic-pilot-demo.zip" download>Controlled demo</a></nav>
+    <div class="footer-contact"><strong>Questions</strong><p>Use email for general and qualification questions only. Do not attach freight records.</p><a data-contact-link href="#contact-pending">Email Freight Recovery</a></div>
+  </div>
+  <div class="wrap footer-bottom"><span>&copy; 2026 Freight Recovery</span><span>Potential recovery &ne; approved claim value &ne; actual recovered funds</span></div>
+</footer>
+
+<a class="mobile-cta" href="#start-audit" data-track="free_audit_cta_clicked"><span><strong>$0 upfront</strong> recovery audit</span><b>Start Free Audit</b></a>
 </body>
 </html>

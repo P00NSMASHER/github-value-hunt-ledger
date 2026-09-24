@@ -1,4 +1,5 @@
 from pathlib import Path
+import hashlib
 
 import pytest
 
@@ -19,6 +20,10 @@ from freight.settlement_store import (
 
 BUYER="BUYER-A"
 BU="OPS"
+
+
+def sha(value):
+    return hashlib.sha256(value.encode()).hexdigest()
 
 
 def populated(tmp_path):
@@ -48,13 +53,13 @@ def populated(tmp_path):
     settlement.create_claim(
         RecoveryClaim(
             "c1","INV-1","carrier","buyer","USD",50000,
-            "2026-09-20T10:00:00Z","claim-src",False,
+            "2026-09-20T10:00:00Z",sha("claim-src"),False,
         )
     )
     settlement.ingest_event(
         SettlementEventRecord(
             "e1","INV-1","carrier","buyer","USD",50000,
-            "2026-09-21T10:00:00Z","settle-src","CREDIT-MEMO",
+            "2026-09-21T10:00:00Z",sha("settle-src"),"CREDIT-MEMO",
         )
     )
     assert settlement.auto_allocate(

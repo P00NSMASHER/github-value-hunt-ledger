@@ -12,7 +12,14 @@ from .assurance import (
     verify_action_authorization,
     verify_case_bundle,
 )
-from .models import CaseState, FindingState, RecoveryFinding, canonical_hash
+from .models import (
+    CaseState,
+    FindingState,
+    RecoveryFinding,
+    SettlementEvidence,
+    canonical_hash,
+    normalize_utc_timestamp,
+)
 from .policies import assert_claim_authorizable
 from .readiness import (
     SevenFigureAuthorizationDossier,
@@ -40,6 +47,9 @@ class LedgerRecord:
     readiness_dossier_hash: str | None = None
     authorization_seal_hash: str | None = None
     external_action_envelope_hash: str | None = None
+    settlement_id: str | None = None
+    settlement_evidence_hash: str | None = None
+    settlement_observed_at: str | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
     updated_at: str | None = None
@@ -58,23 +68,70 @@ class RecoveryLedger:
     def __init__(self) -> None:
         self._records: dict[str, LedgerRecord] = {}
         self._proof_index: dict[str, str] = {}
+        self._settlement_id_index: dict[tuple[str, str], str] = {}
+        self._settlement_source_index: dict[tuple[str, str, str], str] = {}
 
     @staticmethod
     def _now() -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
     @staticmethod
+    def _text(name: str, value: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{name} is required")
+        normalized = value.strip()
+        if any(ord(character) < 32 for character in normalized):
+            raise ValueError(f"{name} cannot contain control characters")
+        return normalized
+
+    @classmethod
+    def _transition_time(
+        cls,
+        record: LedgerRecord | None,
+        occurred_at: str | None,
+    ) -> str:
+        timestamp = (
+            cls._now()
+            if occurred_at is None
+            else normalize_utc_timestamp("occurred_at", occurred_at)
+        )
+        if record is not None and record.updated_at is not None and timestamp < record.updated_at:
+            raise ValueError("lifecycle transition cannot predate the current record state")
+        return timestamp
+
+    @staticmethod
+    def _require_state(
+        record: LedgerRecord,
+        allowed: set[CaseState],
+        action: str,
+    ) -> None:
+        if record.case_state not in allowed:
+            expected = ", ".join(sorted(state.value for state in allowed))
+            raise ValueError(
+                f"{action} requires case state {expected}; found {record.case_state.value}"
+            )
+
+    @staticmethod
     def _high_value(record: LedgerRecord) -> bool:
         return record.finding.potential_recovery_cents >= SEVEN_FIGURE_CENTS
 
-    def add(self, finding: RecoveryFinding) -> LedgerRecord:
+    def add(
+        self,
+        finding: RecoveryFinding,
+        *,
+        occurred_at: str | None = None,
+    ) -> LedgerRecord:
         existing_id = self._proof_index.get(finding.proof_hash)
         if existing_id:
             return self._records[existing_id]
         if finding.finding_id in self._records:
             raise ValueError("finding_id already exists with different proof")
         state = CaseState.VALIDATED if finding.state is FindingState.VALIDATED else CaseState.REVIEW
-        record = LedgerRecord(finding=finding, case_state=state, updated_at=self._now())
+        record = LedgerRecord(
+            finding=finding,
+            case_state=state,
+            updated_at=self._transition_time(None, occurred_at),
+        )
         self._records[finding.finding_id] = record
         self._proof_index[finding.proof_hash] = finding.finding_id
         return record
@@ -85,17 +142,27 @@ class RecoveryLedger:
         except KeyError as exc:
             raise KeyError(f"unknown finding_id: {finding_id}") from exc
 
-    def approve(self, finding_id: str, reviewer_id: str, note: str) -> LedgerRecord:
-        if not reviewer_id.strip() or not note.strip():
-            raise ValueError("reviewer_id and review note are required")
+    def approve(
+        self,
+        finding_id: str,
+        reviewer_id: str,
+        note: str,
+        *,
+        occurred_at: str | None = None,
+    ) -> LedgerRecord:
+        reviewer_id = self._text("reviewer_id", reviewer_id)
+        note = self._text("review note", note)
         record = self.get(finding_id)
+        self._require_state(record, {CaseState.VALIDATED}, "approval")
+        if record.reviewer_approved:
+            raise ValueError("primary review is already approved")
         assert_claim_authorizable(record.finding, True)
         updated = replace(
             record,
             reviewer_approved=True,
-            reviewer_id=reviewer_id.strip(),
-            review_note=note.strip(),
-            updated_at=self._now(),
+            reviewer_id=reviewer_id,
+            review_note=note,
+            updated_at=self._transition_time(record, occurred_at),
         )
         self._records[finding_id] = updated
         return updated
@@ -105,28 +172,39 @@ class RecoveryLedger:
         finding_id: str,
         reviewer_id: str,
         note: str,
+        *,
+        occurred_at: str | None = None,
     ) -> LedgerRecord:
-        if not reviewer_id.strip() or not note.strip():
-            raise ValueError("independent reviewer_id and note are required")
+        reviewer_id = self._text("independent reviewer_id", reviewer_id)
+        note = self._text("independent review note", note)
         record = self.get(finding_id)
+        self._require_state(record, {CaseState.VALIDATED}, "independent approval")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
         if not record.reviewer_id:
             raise ValueError("primary review approval is required first")
-        if reviewer_id.strip() == record.reviewer_id:
+        if reviewer_id == record.reviewer_id:
             raise ValueError("independent reviewer must differ from primary reviewer")
+        if record.independent_reviewer_id:
+            raise ValueError("independent review is already approved")
         updated = replace(
             record,
-            independent_reviewer_id=reviewer_id.strip(),
-            independent_review_note=note.strip(),
-            updated_at=self._now(),
+            independent_reviewer_id=reviewer_id,
+            independent_review_note=note,
+            updated_at=self._transition_time(record, occurred_at),
         )
         self._records[finding_id] = updated
         return updated
 
-    def authorize(self, finding_id: str, authorization_id: str) -> LedgerRecord:
-        if not authorization_id.strip():
-            raise ValueError("authorization_id is required")
+    def authorize(
+        self,
+        finding_id: str,
+        authorization_id: str,
+        *,
+        occurred_at: str | None = None,
+    ) -> LedgerRecord:
+        authorization_id = self._text("authorization_id", authorization_id)
         record = self.get(finding_id)
+        self._require_state(record, {CaseState.VALIDATED}, "authorization")
         if self._high_value(record):
             raise ValueError(
                 "seven-figure finding requires frozen case proof and authorize_with_case"
@@ -135,8 +213,8 @@ class RecoveryLedger:
         updated = replace(
             record,
             case_state=CaseState.AUTHORIZED,
-            authorization_id=authorization_id.strip(),
-            updated_at=self._now(),
+            authorization_id=authorization_id,
+            updated_at=self._transition_time(record, occurred_at),
         )
         self._records[finding_id] = updated
         return updated
@@ -149,8 +227,11 @@ class RecoveryLedger:
         readiness: SevenFigureReadinessPackage | None = None,
         dossier: SevenFigureAuthorizationDossier | None = None,
         authorization_seal: SevenFigureAuthorizationSeal | None = None,
+        *,
+        occurred_at: str | None = None,
     ) -> LedgerRecord:
         record = self.get(finding_id)
+        self._require_state(record, {CaseState.VALIDATED}, "case authorization")
         assert_claim_authorizable(record.finding, record.reviewer_approved)
         verify_case_bundle(bundle)
         verify_action_authorization(bundle, authorization)
@@ -187,6 +268,16 @@ class RecoveryLedger:
                 bundle,
                 expected_journal_head_hash=journal.head_hash,
             )
+            authorized_at = datetime.fromisoformat(
+                authorization.authorized_at.replace("Z", "+00:00")
+            )
+            dossier_assembled_at = datetime.fromisoformat(
+                dossier.assembled_at.replace("Z", "+00:00")
+            )
+            if authorized_at < dossier_assembled_at:
+                raise ValueError(
+                    "client authorization cannot predate completed seven-figure dossier"
+                )
             if authorization_seal is None:
                 raise ValueError(
                     "seven-figure finding requires final authorization seal"
@@ -220,7 +311,7 @@ class RecoveryLedger:
             authorization_seal_hash=(
                 authorization_seal.seal_hash if authorization_seal is not None else None
             ),
-            updated_at=self._now(),
+            updated_at=self._transition_time(record, occurred_at),
         )
         self._records[finding_id] = updated
         return updated
@@ -229,6 +320,8 @@ class RecoveryLedger:
         self,
         finding_id: str,
         action_envelope: ExternalActionEnvelope | None = None,
+        *,
+        occurred_at: str | None = None,
     ) -> LedgerRecord:
         record = self.get(finding_id)
         if record.case_state is not CaseState.AUTHORIZED or not record.authorization_id:
@@ -267,7 +360,7 @@ class RecoveryLedger:
             record,
             case_state=CaseState.CLAIMED,
             external_action_envelope_hash=envelope_hash,
-            updated_at=self._now(),
+            updated_at=self._transition_time(record, occurred_at),
         )
         self._records[finding_id] = updated
         return updated
@@ -275,40 +368,77 @@ class RecoveryLedger:
     def mark_recovered(
         self,
         finding_id: str,
-        recovered_cents: int,
+        settlement: SettlementEvidence,
         fee_cents: int = 0,
+        *,
+        occurred_at: str | None = None,
     ) -> LedgerRecord:
         record = self.get(finding_id)
         if record.case_state is not CaseState.CLAIMED:
             raise ValueError("only CLAIMED cases may be marked recovered")
-        if type(recovered_cents) is not int or recovered_cents < 0:
-            raise ValueError("recovered_cents must be non-negative integer cents")
-        if type(fee_cents) is not int or fee_cents < 0 or fee_cents > recovered_cents:
+        if not isinstance(settlement, SettlementEvidence):
+            raise ValueError("verified SettlementEvidence is required")
+        if not settlement.verified:
+            raise ValueError("settlement evidence must be externally verified")
+        if settlement.finding_id != finding_id:
+            raise ValueError("settlement evidence finding_id does not match the claimed case")
+        if settlement.currency != record.finding.currency:
+            raise ValueError("settlement currency does not match the finding")
+        client_id = record.finding.client_id
+        settlement_key = (client_id, settlement.settlement_id)
+        source_key = (client_id, settlement.source_hash, settlement.source_locator)
+        prior_id_owner = self._settlement_id_index.get(settlement_key)
+        if prior_id_owner is not None and prior_id_owner != finding_id:
+            raise ValueError("settlement_id is already allocated to another finding")
+        prior_source_owner = self._settlement_source_index.get(source_key)
+        if prior_source_owner is not None and prior_source_owner != finding_id:
+            raise ValueError("settlement source line is already allocated to another finding")
+        if record.updated_at is not None and settlement.observed_at < record.updated_at:
+            raise ValueError("settlement evidence cannot predate the claim")
+        transition_time = self._transition_time(record, occurred_at)
+        if transition_time < settlement.observed_at:
+            raise ValueError("recovery transition cannot predate settlement evidence")
+        if type(fee_cents) is not int or fee_cents < 0 or fee_cents > settlement.recovered_cents:
             raise ValueError("fee_cents must be between zero and recovered_cents")
-        if recovered_cents > record.finding.potential_recovery_cents:
+        if settlement.recovered_cents > record.finding.potential_recovery_cents:
             raise ValueError("recovered amount cannot exceed validated potential recovery")
         updated = replace(
             record,
             case_state=CaseState.RECOVERED,
-            recovered_cents=recovered_cents,
+            settlement_id=settlement.settlement_id,
+            settlement_evidence_hash=settlement.proof_hash,
+            settlement_observed_at=settlement.observed_at,
+            recovered_cents=settlement.recovered_cents,
             fee_cents=fee_cents,
-            updated_at=self._now(),
+            updated_at=transition_time,
         )
         self._records[finding_id] = updated
+        self._settlement_id_index[settlement_key] = finding_id
+        self._settlement_source_index[source_key] = finding_id
         return updated
 
-    def reject(self, finding_id: str, reviewer_id: str, note: str) -> LedgerRecord:
-        if not reviewer_id.strip() or not note.strip():
-            raise ValueError("reviewer_id and rejection note are required")
+    def reject(
+        self,
+        finding_id: str,
+        reviewer_id: str,
+        note: str,
+        *,
+        occurred_at: str | None = None,
+    ) -> LedgerRecord:
+        reviewer_id = self._text("reviewer_id", reviewer_id)
+        note = self._text("rejection note", note)
         record = self.get(finding_id)
-        if record.case_state in {CaseState.CLAIMED, CaseState.RECOVERED}:
-            raise ValueError("claimed/recovered cases cannot be rejected")
+        self._require_state(
+            record,
+            {CaseState.REVIEW, CaseState.VALIDATED, CaseState.AUTHORIZED},
+            "rejection",
+        )
         updated = replace(
             record,
             case_state=CaseState.REJECTED,
-            reviewer_id=reviewer_id.strip(),
-            review_note=note.strip(),
-            updated_at=self._now(),
+            reviewer_id=reviewer_id,
+            review_note=note,
+            updated_at=self._transition_time(record, occurred_at),
         )
         self._records[finding_id] = updated
         return updated

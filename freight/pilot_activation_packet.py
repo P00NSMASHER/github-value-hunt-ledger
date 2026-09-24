@@ -1,4 +1,10 @@
-"""Deterministic buyer-safe Pilot Activation Packet for Freight Recovery."""
+"""Legacy/custom fixed-fee Pilot Activation Packet for Freight Recovery.
+
+The flagship commercial path now uses the free-audit qualification flow and
+``freight.recovery_engagement``. This catalog is retained for previously
+accepted terms and optional fixed-fee forensic work so the underlying delivery
+capability is not destroyed.
+"""
 from __future__ import annotations
 
 import argparse
@@ -154,10 +160,10 @@ def build_packet(readiness_input:dict, launch_decision:dict)->ActivationPacket:
     )
 
 def render_markdown(packet:ActivationPacket)->str:
-    lines=["# Freight Recovery — Pilot Activation Packet","",
+    lines=["# Freight Recovery — Optional Fixed-Fee Pilot Activation Packet","",
         f"**Readiness:** {packet.readiness_status} ({packet.readiness_score}/100)",
         f"**Selected offer:** {packet.offer_name}",
-        f"**Published price band:** {packet.price_band_usd}",
+        f"**Custom fixed-fee price band:** {packet.price_band_usd}",
         f"**Launch status:** {packet.launch_status}",
         f"**Launch route:** {packet.launch_route}",
         f"**Activation hash:** `{packet.activation_hash}`",""]

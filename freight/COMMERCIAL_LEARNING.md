@@ -18,12 +18,14 @@ Internal demos, synthetic rehearsals, proposed prices, pipeline estimates and "p
 
 ## Anti-overfit rule
 
-The current fixed-fee price bands and 50% internal margin target remain priors.
+The configurable contingency rate, free-audit qualification thresholds, and
+delivery-cost assumptions remain priors. Optional fixed-fee forensic work is a
+separate cohort.
 
 A repricing/scope review is not unlocked until there are at least:
 - **5 unique buyer cohorts**;
 - **5 paid engagements**; and
-- usable fixed-fee margin evidence from **5 unique buyers**.
+- usable contribution evidence from **5 unique buyers**.
 
 These are internal anti-overfit thresholds aligned with the technology-intelligence system's cautious small-sample policy. They are not claimed industry benchmarks.
 
@@ -38,12 +40,15 @@ Repeated engagements from one buyer are collapsed to buyer-level medians before 
 
 It never changes prices automatically.
 
-Success-fee or realized-recovery upside does **not** rescue fixed-fee economics and is not used to calibrate the fixed-fee margin.
+Potential recovery never rescues free-audit economics. Only evidenced actual
+recovery may enter realized contribution, and it remains separate from the cost
+of audits that do not advance. Optional fixed-fee cohorts are calibrated
+separately.
 
 ## Metrics learned
 
 When direct evidence exists, preserve:
-- fixed fee;
+- commercial model and agreed contingency rate or optional fixed fee;
 - delivery cost;
 - reviewer hours;
 - invoices reviewed;

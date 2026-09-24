@@ -91,6 +91,11 @@ class GeneratedPacketTests(unittest.TestCase):
         cls.tmp = tempfile.TemporaryDirectory(prefix='hunter-action-test-')
         cls.root = Path(cls.tmp.name)
         shutil.copytree(ROOT / 'tools', cls.root / 'tools', ignore=shutil.ignore_patterns('__pycache__'))
+        shutil.copytree(
+            ROOT / 'production' / 'control_plane',
+            cls.root / 'production' / 'control_plane',
+            ignore=shutil.ignore_patterns('__pycache__'),
+        )
         (cls.root / 'intelligence').mkdir()
         for name in ('MASTER.md', 'EXPERIMENTS.md', 'SEARCH_QUEUE.md'):
             shutil.copy(ROOT / name, cls.root / name)
@@ -447,6 +452,52 @@ class GeneratedPacketTests(unittest.TestCase):
             )
         finally:
             candidate_path.write_text(original)
+
+    def test_assignment_projection_hash_binds_full_candidate_contract(self):
+        candidates = {
+            row["work_item_id"]: row
+            for row in self.candidates
+        }
+        for assignment in self.allocations:
+            self.assertRegex(
+                assignment["candidate_projection_sha256"],
+                r"^[a-f0-9]{64}$",
+            )
+            self.assertIn(assignment["work_item_id"], candidates)
+
+    def test_assignment_final_score_tamper_fails_generic_projection(self):
+        allocation_path = (
+            self.root
+            / "intelligence"
+            / "hunt_allocations.jsonl"
+        )
+        original = allocation_path.read_text()
+        try:
+            rows = self.read("hunt_allocations.jsonl")
+            rows[0]["final_score"] = rows[0]["final_score"] + 0.25
+            allocation_path.write_text(
+                "\n".join(json.dumps(row) for row in rows) + "\n"
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        self.root
+                        / "tools"
+                        / "ti_allocator_validate.py"
+                    ),
+                ],
+                cwd=self.root,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(
+                "protected_field_drift:final_score",
+                result.stdout + result.stderr,
+            )
+        finally:
+            allocation_path.write_text(original)
 
     def test_verification_uses_a_frozen_experiment_target(self):
         for c in self.candidates:

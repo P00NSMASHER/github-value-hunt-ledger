@@ -3,6 +3,10 @@
 RecoveryWorks is the umbrella recovery business. RecoveryOS is the shared proof,
 calculation, review, and lifecycle layer used by all recovery branches.
 
+The broader public business site lives in `recoveryworks/site/`. It is built
+from an exact allowlist and published beside the separate Freight Recovery
+microsite.
+
 ## Initial branches
 
 - **FreightRecovery** — carrier overcharges and contract/rate leakage.
@@ -34,6 +38,37 @@ only when the controlling rule and all load-bearing evidence are verified.
 No branch submits a claim, appeal, dispute, demand, or counterparty communication
 automatically. RecoveryLedger requires both human approval and an explicit
 customer authorization ID before a case can become CLAIMED.
+
+RECOVERED is a separate evidence boundary. A case can become RECOVERED only
+from a verified `SettlementEvidence` object that binds positive integer cents,
+currency, an external source locator, a SHA-256 source digest, and an observed
+time that does not predate the claim. The evidence is bound to one finding, and
+the ledger refuses reuse of a settlement ID or source line across findings in
+the same client scope. Fees cannot exceed that evidenced amount.
+
+Proof-bearing source references, scan manifests, calculation inputs/traces, and
+build artifacts require full lowercase SHA-256 digests. High-value calculation
+and build provenance also requires the full 40-hex Git commit identifier;
+abbreviations and descriptive placeholders fail closed.
+
+## Durable-state integrity
+
+Durable-ledger schema 2 authenticates a canonical UTC time on every hash-chained
+lifecycle event and preserves that time during replay. Transitions cannot move
+backward, repeat an approval/authorization, or rewrite review evidence after a
+case progresses. Nested proof metadata and journal payloads are detached and
+immutable after acceptance.
+
+Schema 1 bundles did not authenticate lifecycle times. They are intentionally
+rejected instead of being replayed with a new timestamp that could imply old
+analysis was freshly performed. Recreate them from source evidence or use a
+separately reviewed migration that preserves this limitation.
+
+The local bundle adapter serializes compare-and-swap writes with a private
+cross-process lock. State and report writes use `0600` on POSIX and a private
+current-user plus SYSTEM DACL on Windows, and fail if those permissions cannot
+be independently verified. This is a local reference adapter, not a claim of
+external WORM storage or production database authorization.
 
 ## Universal model
 

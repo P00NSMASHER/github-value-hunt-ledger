@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 import unittest
 
 from recoveryworks import FindingState, RecoveryEngine
@@ -18,7 +19,7 @@ def agreement(*, fixed=1000, markup=20, per_tx=10, verified=True):
         fixed_fee_cents=fixed,
         markup_bps=markup,
         per_transaction_cents=per_tx,
-        source_hash="agreement-hash",
+        source_hash=H("agreement-hash"),
         source_locator="file://agreement.csv#row=2",
         verified=verified,
     )
@@ -32,7 +33,7 @@ def statement(*, actual=25000, verified=True, sid="S-1"):
         fee_plan_id="PLAN-1",
         statement_date="2026-08-31",
         actual_processor_fee_cents=actual,
-        source_hash=f"statement-{sid}",
+        source_hash=H(f"statement-{sid}"),
         source_locator=f"file://statement.csv#{sid}",
         verified=verified,
         scope_reviewer_id="fee-reviewer-1" if verified else None,
@@ -44,7 +45,7 @@ def tx(*, verified=True, sid="S-1", gross=10_000_000, count=100):
         statement_id=sid,
         gross_sales_cents=gross,
         transaction_count=count,
-        source_hash=f"transactions-{sid}",
+        source_hash=H(f"transactions-{sid}"),
         source_locator=f"file://transactions.csv#{sid}",
         verified=verified,
     )
@@ -75,7 +76,7 @@ class MerchantFeeRecoveryTests(unittest.TestCase):
                 fee_plan_id="F",
                 statement_date="2026-08-31",
                 actual_processor_fee_cents=100,
-                source_hash="h",
+                source_hash=H("h"),
                 source_locator="file://x",
                 verified=True,
                 scope_reviewer_id=None,

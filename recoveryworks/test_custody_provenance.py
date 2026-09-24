@@ -22,6 +22,7 @@ from recoveryworks.test_case_artifact_replay import (
     TMS_BYTES,
 )
 from recoveryworks.test_hostile_examination_packet import build_exam
+from recoveryworks.models import canonical_hash
 
 
 def sha(data: bytes) -> str:
@@ -269,6 +270,46 @@ class CustodyProvenanceTests(unittest.TestCase):
         self.assertNotIn("sim-private://", rendered)
         self.assertIn("merkle_root_hash", rendered)
 
+    def test_public_record_cannot_predate_committed_components(self):
+        bundle, ledger, packet, retention, completeness, build, public = (
+            build_custody_chain()
+        )
+
+        with self.assertRaises(ValueError):
+            create_public_verification_record(
+                bundle,
+                packet,
+                retention,
+                completeness,
+                build,
+                journal_head_hash=ledger.journal.head_hash,
+                record_id="SIM-PUBLIC-VERIFY-EARLY",
+                published_at="2026-09-22T16:41:30Z",
+                publisher_id="sim-recoveryworks-transparency-log",
+            )
+
+        internally_consistent_but_early = replace(
+            public,
+            published_at="2026-09-22T16:41:30Z",
+            record_hash="placeholder",
+        )
+        internally_consistent_but_early = replace(
+            internally_consistent_but_early,
+            record_hash=canonical_hash(
+                internally_consistent_but_early.integrity_body()
+            ),
+        )
+        with self.assertRaises(ValueError):
+            verify_public_verification_record(
+                internally_consistent_but_early,
+                bundle,
+                packet,
+                retention,
+                completeness,
+                build,
+                journal_head_hash=ledger.journal.head_hash,
+            )
+
     def test_public_record_tampering_is_detected(self):
         bundle, ledger, packet, retention, completeness, build, public = (
             build_custody_chain()
@@ -289,9 +330,16 @@ class CustodyProvenanceTests(unittest.TestCase):
         bundle, _ledger, _packet, _retention, _completeness, build, _public = (
             build_custody_chain()
         )
-        tampered = replace(build, code_commit_sha="different-commit")
+        tampered = replace(build, code_commit_sha="f" * 40)
         with self.assertRaises(ValueError):
             verify_build_provenance(tampered, bundle)
+
+    def test_build_attestation_rejects_non_digest_build_hash(self):
+        _bundle, _ledger, _packet, _retention, _completeness, build, _public = (
+            build_custody_chain()
+        )
+        with self.assertRaisesRegex(ValueError, "source_tree_hash must be a 64-character"):
+            replace(build, source_tree_hash="tree")
 
 
 if __name__ == "__main__":

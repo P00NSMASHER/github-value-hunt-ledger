@@ -81,6 +81,36 @@ def test_direct_sql_update_and_delete_are_blocked(tmp_path):
     conn.close()
 
 
+def test_direct_sql_insert_rejects_invalid_evidence_time_and_backdating(tmp_path):
+    s=S(tmp_path)
+    s.append(
+        event_type=AuditEventType.SOURCE_PRESENT,
+        object_id="source-1",
+        occurred_at="2026-09-20T12:00:00Z",
+    )
+    conn=sqlite3.connect(s.path)
+    insert="""INSERT INTO audit_events
+      (buyer_id,business_unit,sequence,event_type,object_id,occurred_at,
+       evidence_hash,previous_hash,event_hash)
+      VALUES('BUYER-A','OPS',2,'SOURCE_PRESENT','direct',?,?,?,?)"""
+    with pytest.raises(sqlite3.IntegrityError,match="canonical UTC"):
+        conn.execute(
+            insert,
+            ("2026-02-30T12:01:00.000000Z", None, "x" * 64, "y" * 64),
+        )
+    with pytest.raises(sqlite3.IntegrityError,match="lowercase SHA-256"):
+        conn.execute(
+            insert,
+            ("2026-09-20T12:01:00.000000Z", "not-a-hash", "x" * 64, "y" * 64),
+        )
+    with pytest.raises(sqlite3.IntegrityError,match="nondecreasing"):
+        conn.execute(
+            insert,
+            ("2026-09-20T11:59:59.000000Z", None, "x" * 64, "y" * 64),
+        )
+    conn.close()
+
+
 def test_concurrent_appends_preserve_one_monotonic_chain(tmp_path):
     path=tmp_path/"audit.sqlite3"
     def worker(i):
@@ -88,7 +118,7 @@ def test_concurrent_appends_preserve_one_monotonic_chain(tmp_path):
         return store.append(
             event_type=AuditEventType.SOURCE_PRESENT,
             object_id=f"source-{i}",
-            occurred_at=f"2026-09-20T12:{i:02d}:00Z",
+            occurred_at="2026-09-20T12:00:00Z",
         ).sequence
 
     with ThreadPoolExecutor(max_workers=8) as pool:
@@ -98,3 +128,14 @@ def test_concurrent_appends_preserve_one_monotonic_chain(tmp_path):
     store.verify()
     assert sorted(sequences)==list(range(1,21))
     assert store.count()==20
+
+
+@pytest.mark.parametrize("timeout", [True, False, 0, -1, 60_001, "5000", 5.5])
+def test_busy_timeout_rejects_non_integer_or_unsafe_values(tmp_path, timeout):
+    with pytest.raises(ValueError,match="busy_timeout_ms"):
+        AuditStore(
+            tmp_path/"audit.sqlite3",
+            buyer_id="BUYER-A",
+            business_unit="OPS",
+            busy_timeout_ms=timeout,
+        )

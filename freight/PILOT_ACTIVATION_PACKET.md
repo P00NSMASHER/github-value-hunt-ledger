@@ -9,8 +9,8 @@ It does **not** authorize launch. It packages the already-authoritative decision
 ## What it contains
 
 - readiness status and score;
-- selected published offer;
-- buyer-facing price band;
+- selected audit route;
+- buyer-facing commercial model;
 - launch status and route;
 - prioritized launch-remediation actions;
 - data-room requests split into NOW / CONDITIONAL / LATER_OUTCOME;
@@ -23,11 +23,16 @@ It does **not** authorize launch. It packages the already-authoritative decision
 
 ## Buyer-safe commercial language
 
-- Data Readiness / Authority Diagnostic: **$5,000–$7,500 fixed**.
-- Blind Freight Audit Acceptance Test: **$15,000–$25,000 fixed**.
-- Blind-test target analysis/report turnaround: **10–15 business days after complete inputs**.
+- Data Readiness / Authority Diagnostic: **$0 upfront as part of the free audit**.
+- Blind Freight Audit Acceptance Test: **$0 upfront when approved as the
+  bounded opportunity-assessment scope**.
+- Recovery execution: success-based pricing under a separately accepted
+  engagement; the exact percentage is confirmed before recovery begins.
+- Analysis/report timing is confirmed after complete inputs and capacity review.
 
-The packet intentionally excludes internal analyst-cost, delivery-budget and target-margin assumptions.
+The packet intentionally excludes internal analyst-cost, delivery-budget,
+qualification thresholds, and target-margin assumptions. It does not authorize
+the detailed recovery work or any external action.
 
 ## Data-room timing
 

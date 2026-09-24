@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from pathlib import Path
 import tempfile
 import unittest
@@ -27,7 +28,7 @@ def tariff(start, end, energy_rate):
                 rate_micros_per_unit=energy_rate,
             ),
         ),
-        source_hash=f"tariff-{start}",
+        source_hash=H(f"tariff-{start}"),
         source_locator=f"file://tariff#{start}",
         verified=True,
     )
@@ -44,7 +45,7 @@ def bill(start, end, *, bill_date="2026-07-10", actual=3000):
         service_end=end,
         actual_cents=actual,
         billed_kwh="100",
-        source_hash="bill-hash",
+        source_hash=H("bill-hash"),
         source_locator="file://bill#1",
         verified=True,
     )
@@ -154,7 +155,7 @@ class UtilityIngestTests(unittest.TestCase):
                 service_start="2026-06-01",
                 service_end=None,
                 actual_cents=1000,
-                source_hash="h",
+                source_hash=H("h"),
                 source_locator="file://b",
             )
 

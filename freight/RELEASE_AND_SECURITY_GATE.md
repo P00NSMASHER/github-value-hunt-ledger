@@ -1,6 +1,6 @@
 # Freight Recovery — Release, Security and Diligence Gate
 
-Updated: 2026-09-20
+Updated: 2026-09-23
 
 This checklist separates **research architecture** from a buyer-deployable Freight Recovery release.
 
@@ -54,14 +54,19 @@ operability, rights-evidence consistency and the chosen data-handling path.
 ## P0 — before a paid pilot with confidential buyer data
 
 ### Repository/supply-chain
-- [x] Freight GitHub Actions are pinned to full immutable commit SHAs.
+- [x] Every repository GitHub Action reference is pinned to a full immutable
+  commit SHA, with a repository-wide regression test that rejects floating refs.
 - [x] Technology Intelligence validation workflow uses immutable Action SHAs + read-only contents permission; only the main-only persistence job receives contents:write.
 - [x] Workflow payload writers reject absolute paths and parent traversal.
 - [x] Workflow writers can touch only explicit allowed files/prefixes.
+- [x] Deployment and separate-environment freshness gates evaluate the real UTC
+  workflow date; CI can no longer keep expired evidence green with a frozen date.
 - [x] CI dependencies are version-pinned.
 - [x] Commercial/runtime/comparator components are represented in the rights registry with exact revisions.
-- [x] Rights status promotion is fail-closed: separately licensed components cannot be represented as resolved for hosted/SaaS/assignment/change-of-control without verified diligence-room evidence metadata + SHA-256.
+- [x] Rights status promotion is fail-closed: separately licensed components cannot be used by the pilot launch gate without verified executed evidence, a confirmed-allowed commercial-use scope, diligence-room metadata and SHA-256; hosted/SaaS/assignment/change-of-control claims also require verified scope evidence.
 - [x] Deterministic control-file hashes + component inventory can be regenerated in CI via `freight/release_provenance.py`.
+- [x] Release/evidence text inputs are pinned to LF in `.gitattributes`, so
+  Windows and Linux checkouts hash the same committed bytes.
 - [x] Deterministic CycloneDX 1.6-shaped SBOM is generated for pinned Freight repository components + direct pinned CI Python dependencies.
 - [x] Deterministic unsigned in-toto/DSSE-shaped attestation payload is generated and verified in CI; repository output intentionally contains no signature.
 - [ ] Separate executed permission/license documents are stored in the actual buyer/acquirer diligence room.
@@ -69,7 +74,7 @@ operability, rights-evidence consistency and the chosen data-handling path.
 ### Customer data
 - [ ] Buyer authorization is documented for the actual engagement.
 - [x] Current Netlify customer-data path is machine-classified as **BLOCKED** until deployment security evidence changes.
-- [x] Separate controlled/manual pilot path is machine-classified as **CONDITIONAL** until a separately controlled data environment has verified evidence.
+- [x] Separate controlled/manual pilot path is machine-classified as **BLOCKED** until both executed component-rights evidence and a separately controlled data environment have verified evidence.
 - [x] Separate/manual pilot route cannot be self-attested: launch requires a structured VERIFIED environment manifest with evidence references for all applicable controls.
 - [ ] Netlify team MFA is enforced before confidential buyer data is accepted.
 - [x] Pilot data-room code rejects sources not marked read-only.
@@ -80,7 +85,9 @@ operability, rights-evidence consistency and the chosen data-handling path.
 - [x] CENSUS/SCOPE/PROOF lifecycle entries derive from the source manifest and retention scope.
 - [x] Delete attempts cannot become `DELETE_CONFIRMED` without explicit external confirmation evidence; ambiguous outcomes remain `DELETE_UNKNOWN`.
 - [x] Source observations distinguish `PRESENT`, `VERIFIED_EMPTY`, and `UNAVAILABLE`; `VERIFIED_EMPTY` requires completeness evidence.
-- [x] Buyer/BU-scoped append-only audit records are hash chained and detect mutation/reordering within the supplied record set.
+- [x] Buyer/BU-scoped append-only audit records are hash chained and detect
+  mutation/reordering within the supplied record set; event time is canonical
+  UTC and cannot move backward in the chain.
 - [x] A file-backed scope-bound SQLite audit reference store persists the chain, serializes concurrent appends and blocks direct UPDATE/DELETE mutations.
 - [x] Sources explicitly marked as containing credentials/secrets are rejected from the evidence room.
 
@@ -103,6 +110,9 @@ operability, rights-evidence consistency and the chosen data-handling path.
 - [x] Blind order is enforced: source/data room -> population -> sealed incumbent -> truth -> opened incumbent.
 - [x] Unsupported findings remain REVIEW / $0.
 - [x] Settlement readback has source hash + allocation lineage.
+- [x] Settlement claim/event/counter evidence requires canonical lowercase
+  SHA-256; allocation and reversal times are canonical UTC and chronological at
+  both the application and direct-SQL trigger layers.
 - [x] Duplicate/preexisting/automatic credits cannot become fee-eligible.
 - [x] Recovery certificate cannot exceed validated or realized amounts and remains buyer/BU scoped.
 - [x] Final pilot-package hash binds data-room manifest, population, truth, sealed incumbent and opened incumbent output.
@@ -126,16 +136,36 @@ operability, rights-evidence consistency and the chosen data-handling path.
 - [x] deployment-specific incident tabletop completed against the discovered Netlify Freight deployment;
 - [ ] deployed contact tree/on-call/alerting plus live-environment incident exercise evidence;
 - [x] deterministic zero-customer-data technical/commercial diligence ZIP with per-entry SHA-256 and generated provenance/SBOM/unsigned attestation;
+- [x] deterministic controlled synthetic pilot ZIP with exact fictional inputs,
+  generated review/report outputs, per-entry SHA-256, duplicate/path rejection,
+  byte-for-byte replay verification and explicit no-customer-value boundaries;
+- [x] public marketing build uses an exact 25-file allowlist (pages, local
+  scripts/styles, responsive imagery, licensed local fonts and demo), requires
+  an operator-attested business inbox, embeds the controlled-demo SHA-256 and
+  contains no file upload, backend request or customer-data intake;
+- [x] commercial configuration centralizes the contingency rate, defaults to
+  30%, rejects invalid values and renders the same configured rate in pricing,
+  the fee calculator and recovery-engagement explanation;
+- [x] GitHub Pages validation/deployment workflow is least-privilege and pins
+  every third-party Action to a full commit; pull requests cannot deploy and
+  main deployment requires an owner-configured, verified business contact and
+  accepts one owner-configured contingency-rate variable;
+- [ ] the verified public URL, free-audit form, prepared-email handoff,
+  controlled demo, fee calculator and policy pages are independently checked
+  after deployment;
+- [ ] a controlled end-to-end intake rehearsal confirms that sensitive records
+  are not sent through the public page and that a secure transfer route is
+  issued only after human review;
 - [ ] buyer-specific completed security questionnaire and externally supplied diligence artifacts.
 
 ## Current claim boundary
 
-The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload, a deterministic zero-customer-data diligence bundle, rights evidence consistency gates, a documented fail-closed incident-response decision model, Netlify deployment access-control configuration evidence, and a completed deployment-specific tabletop**.
+The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload, a deterministic zero-customer-data diligence bundle, a deterministic controlled synthetic buyer demo, an exact static-site publication boundary, rights evidence consistency gates, a documented fail-closed incident-response decision model, Netlify deployment access-control configuration evidence, and a completed deployment-specific tabletop**.
 
-It does **not** prove executed rights documents have been supplied/reviewed, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, Netlify team MFA is enforced, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, live on-call/alerting incident operations exist, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
+It does **not** prove executed rights documents have been supplied/reviewed; the launch gate now treats that absence as a blocker. It also does not prove the free-audit site has been deployed, the public inbox or secure-transfer handoff works, an engagement has been executed, a customer outcome or actual recovery occurred, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, Netlify team MFA is enforced, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, live on-call/alerting incident operations exist, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
 
 ## Commercial launch rule
 
-A pilot may be sold before the full enterprise platform exists **only** when it is run as a controlled, read-only, human-reviewed acceptance engagement and every unsupported dollar fails closed.
+A free audit and subsequent recovery engagement may be offered before the full enterprise platform exists **only** when the work is controlled, human-reviewed, bounded by qualification and data-readiness gates, and every unsupported dollar fails closed. A fee may be earned only from fee-eligible actual recovered funds under an accepted engagement.
 
 Do not market the research-agent production architecture as already deployed Freight Recovery infrastructure. They are separate systems until integrated and proven.

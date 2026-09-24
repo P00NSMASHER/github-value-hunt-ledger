@@ -1,39 +1,74 @@
-# FreightLeak marketing source
+# Freight Recovery public site
 
-This is a repaired, reviewable **public marketing page**, recovered from the historical `freightleak-v0.zip` artifact. It is not a copy of a verified current production deployment. At the time of this audit, `https://freightleak-audit.netlify.app/` returned **Site not found**, and the available provider connector could not resolve a deploy. This change does not restore provider access or deploy the site.
+This directory is the allowlisted source for the customer-facing GitHub Pages
+bundle at `https://p00nsmasher.github.io/github-value-hunt-ledger/`.
 
-The teal/slate visual style and clearly synthetic sample have been retained. The historical page's empty `mailto:` recipient and unconditional free-audit/20%-of-savings offer have been replaced with a fit-and-readiness inquiry. Scope and fees are agreed in writing; previously agreed offers retain their own terms. Internal pricing hypotheses remain in the commercial documentation, not in this public bundle.
+## Flagship commercial path
 
-## One missing business configuration
+The public offer is:
 
-A **verified business contact email** is required before launch. No inbox has been invented. An operator must confirm control of the inbox and independently check that it can receive and reply to a message, then configure it as below. The build checks syntax and requires that attestation; it does not prove mailbox ownership or delivery.
+1. a **$0-upfront recovery audit**;
+2. a concise opportunity summary rather than a claim-execution package;
+3. a separately authorized recovery engagement; and
+4. a configurable contingency fee charged only against eligible funds actually
+   recovered.
 
-The unbuilt `index.html` is safe to review locally: it visibly says the contact channel is pending. Its inquiry tool prepares text locally, with copy and text-download fallbacks. When built with an approved inbox, it also offers an email draft. No button claims a lead was submitted or an email delivered. No analytics, upload form, backend request, local storage, or raw Hunter information is included.
+The default working rate is owned by `freight/commercial_terms.py`. The build
+injects that value into `commercial-config.js`, so changing the approved rate
+does not require editing page copy or calculator logic.
 
-## Prepare the public bundle
+Optional fixed-fee forensic work remains available by custom written scope. It
+is deliberately secondary and has no public self-checkout.
 
-From the repository root, after replacing the email value with the real verified address:
+## Build
 
-```bash
-export FREIGHT_CONTACT_EMAIL='REPLACE_WITH_VERIFIED_BUSINESS_EMAIL'
-export FREIGHT_CONTACT_VERIFIED=1
-python freight/site/build.py --output /tmp/freightleak-public
+Set a verified public business inbox, then build into a new directory outside
+the repository:
+
+```text
+FREIGHT_CONTACT_EMAIL=<verified business inbox>
+FREIGHT_CONTACT_VERIFIED=1
+FREIGHT_CONTINGENCY_RECOVERY_RATE=0.30  # optional; defaults to the shared term
+python freight/site/build.py --output <new external directory>
 ```
 
-The output directory must be new or empty, outside the private repository, and not one of its parents. The build fails without the contact configuration. It reads an explicit allowlist and emits only `index.html`, `site.css`, `site.js`, and `_headers`. It does not recurse through the repository, copy customer data, or follow source symlinks. A later rebuild should use a new empty directory.
+The build fails closed when the inbox is missing, malformed, unverified, or a
+placeholder. It also validates that the configured recovery rate is greater
+than zero and less than one.
 
-**Only the generated public output directory may be passed to a deployment tool. Never deploy the repository root, `freight/`, or this source directory.** The source directory also contains non-public build documentation and tests. There is intentionally no automatic deployment workflow or repository-wide publish configuration.
+## What the public form does
 
-Once provider access is restored, first publish this output as a reviewable provider preview. Check the visible contact address, mobile layout, keyboard navigation, synthetic labels, and all inquiry actions. Check the provider's public access settings and applied `_headers`. Production publication and a working public URL must be confirmed separately; generating this bundle proves neither. No confidential intake route is enabled by this page.
+The progressive qualification form runs entirely in the browser. It does not
+upload files, send a network request, or use browser storage. After completion,
+it prepares a non-sensitive email summary. The visitor must review and send the
+email from their own account.
 
-## Verify locally
+Freight records are accepted only after a human fit review, written scope, and
+an approved secure transfer route. The public site must never claim that an
+upload occurred or that a lead qualified merely because the form was filled.
 
-```bash
-python -m unittest discover -s freight/site -p 'test_*.py'
-node --check freight/site/site.js
-python -m http.server 8000 --directory freight/site
-```
+## Publication boundary
 
-Open `http://localhost:8000` to inspect the unconfigured source preview. Use only fictional details. Preparing, copying, or downloading an inquiry must never claim that it was sent. The browser page has no form submission endpoint. The proposed response headers restrict network requests and framing when served by a host that honors `_headers`; a plain local HTTP server does not apply those provider headers.
+`build.py` copies only an explicit allowlist of public HTML, CSS, JavaScript,
+fonts, images, and trust files. It also generates the controlled synthetic demo
+bundle and injects its current digest. It never recurses through or publishes
+the private repository.
 
-This publication work does not authorize sensitive document collection or validate the separate customer-processing environment. Those gates remain in the freight launch and security evidence.
+The GitHub Pages workflow deploys only the built directory. The old payment-link
+variables are not deployment gates and are not copied into the site.
+
+## Funnel events
+
+`site.js` exposes `window.FreightRecoveryAnalytics.events` and emits a
+`freight:analytics` custom event. If a future analytics loader provides a
+`dataLayer`, the same names are pushed there. The public page emits only events
+it can truthfully observe. Operational events such as secure data submission,
+qualification, audit completion, engagement acceptance, and actual recovery are
+reserved for the systems that can verify those state changes.
+
+## Required checks
+
+Run the site build tests, commercial-term tests, qualification tests, browser
+script syntax checks, and a rendered responsive pass before deployment. Search
+the built public directory for legacy checkout prices and links; none should be
+present.

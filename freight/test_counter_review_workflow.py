@@ -1,3 +1,4 @@
+import hashlib
 import pytest
 
 from freight.counter_review_workflow import (
@@ -26,6 +27,10 @@ def store(tmp_path):
     )
 
 
+def sha(value):
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
 def claim(claim_id, reference, amount, source):
     return RecoveryClaim(
         claim_id=claim_id,
@@ -35,7 +40,7 @@ def claim(claim_id, reference, amount, source):
         currency="USD",
         amount_cents=amount,
         issued_at="2026-09-20T10:00:00Z",
-        source_hash=source,
+        source_hash=sha(source),
     )
 
 
@@ -48,7 +53,7 @@ def event(amount=50000):
         currency="USD",
         amount_cents=amount,
         booked_at="2026-09-21T10:00:00Z",
-        source_hash="settlement-source",
+        source_hash=sha("settlement-source"),
         source_kind="CREDIT-MEMO",
     )
 
@@ -60,7 +65,7 @@ def counter(counter_id="r1", amount=10000, observed="2026-09-22T10:00:00Z"):
         currency="USD",
         amount_cents=amount,
         observed_at=observed,
-        source_hash="counter-source-" + counter_id,
+        source_hash=sha("counter-source-" + counter_id),
         source_kind="BANK-RETURN",
     )
 

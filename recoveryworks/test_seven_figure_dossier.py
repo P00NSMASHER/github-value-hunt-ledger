@@ -1,6 +1,8 @@
 from dataclasses import replace
 import unittest
 
+from recoveryworks.models import canonical_hash
+
 from recoveryworks import (
     DurableRecoveryLedger,
     authorize_case_action,
@@ -203,6 +205,64 @@ class SevenFigureAuthorizationDossierTests(unittest.TestCase):
                 mismatched,
                 dossier,
             )
+
+    def test_client_authorization_cannot_predate_completed_dossier(self):
+        (
+            bundle,
+            ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            _signature,
+            _timestamp,
+            _receipts,
+            readiness,
+            dossier,
+        ) = build_dossier_chain()
+        authorization = authorize_case_action(
+            bundle,
+            authorization_id="SIM-CLIENT-AUTH-DOSSIER-EARLY",
+            client_actor_id="sim-client-cfo",
+            approved_action_type="carrier_overcharge_demand",
+            authorized_at="2026-09-22T16:49:00Z",
+            maximum_amount_cents=100_000_000,
+            note="SIMULATION ONLY. Authorization precedes dossier completion.",
+        )
+        with self.assertRaises(ValueError):
+            ledger.authorize_with_case(
+                bundle.finding.finding_id,
+                bundle,
+                authorization,
+                readiness,
+                dossier,
+            )
+
+    def test_nested_tamper_fails_even_if_outer_dossier_hash_is_recomputed(self):
+        (
+            _bundle,
+            _ledger,
+            _packet,
+            _retention,
+            _completeness,
+            _build,
+            _public,
+            _signature,
+            _timestamp,
+            _receipts,
+            _readiness,
+            dossier,
+        ) = build_dossier_chain()
+        payload = authorization_dossier_to_payload(dossier)
+        payload["public_record"]["publisher_id"] = "tampered-publisher"
+        payload["dossier_hash"] = canonical_hash({
+            key: value for key, value in payload.items()
+            if key != "dossier_hash"
+        })
+
+        with self.assertRaises(ValueError):
+            authorization_dossier_from_payload(payload)
 
     def test_dossier_payload_round_trip_is_tamper_evident(self):
         (

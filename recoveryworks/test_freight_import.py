@@ -1,3 +1,4 @@
+from recoveryworks.test_support import source_hash as H
 from dataclasses import asdict
 import hashlib
 import json
@@ -31,7 +32,7 @@ def truth_payload(*, validated=True):
             customer_id="CUST-1",
             carrier_id="Carrier A",
             currency="USD",
-            source_hash="invoice-source",
+            source_hash=H("invoice-source"),
         ),),
     )
     authority = AuthorityRef(
@@ -41,7 +42,7 @@ def truth_payload(*, validated=True):
         customer_id="CUST-1",
         carrier_id="Carrier A",
         currency="USD",
-        source_hash="contract-source",
+        source_hash=H("contract-source"),
     )
     finding = make_finding(
         finding_id="F-1",

@@ -35,11 +35,14 @@ class AuditStore:
         self.path = str(path)
         self.buyer_id = self._text("buyer_id", buyer_id)
         self.business_unit = self._text("business_unit", business_unit)
-        self.busy_timeout_ms = int(busy_timeout_ms)
+        if type(busy_timeout_ms) is not int or not 1 <= busy_timeout_ms <= 60_000:
+            raise ValueError("busy_timeout_ms must be an integer from 1 to 60000")
+        self.busy_timeout_ms = busy_timeout_ms
         if self.path == ":memory:":
             raise ValueError("file-backed SQLite is required")
         Path(self.path).parent.mkdir(parents=True, exist_ok=True)
         self._initialize()
+        self.verify()
 
     def _initialize(self) -> None:
         schema = """
@@ -68,6 +71,26 @@ class AuditStore:
             BEGIN
                 SELECT RAISE(ABORT,'audit event is immutable');
             END;
+
+            CREATE TRIGGER IF NOT EXISTS audit_events_input_guard
+            BEFORE INSERT ON audit_events
+            BEGIN
+                SELECT CASE WHEN
+                    length(NEW.occurred_at)<>27 OR
+                    NEW.occurred_at NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9][0-9][0-9][0-9][0-9]Z' OR
+                    julianday(NEW.occurred_at) IS NULL OR
+                    strftime('%Y-%m-%dT%H:%M:%S',NEW.occurred_at)<>substr(NEW.occurred_at,1,19)
+                THEN RAISE(ABORT,'audit occurred_at must be canonical UTC') END;
+                SELECT CASE WHEN
+                    NEW.evidence_hash IS NOT NULL AND
+                    (length(NEW.evidence_hash)<>64 OR NEW.evidence_hash GLOB '*[^0-9a-f]*')
+                THEN RAISE(ABORT,'audit evidence_hash must be lowercase SHA-256') END;
+                SELECT CASE WHEN NEW.sequence>1 AND NEW.occurred_at < (
+                    SELECT occurred_at FROM audit_events
+                    WHERE buyer_id=NEW.buyer_id AND business_unit=NEW.business_unit
+                      AND sequence=NEW.sequence-1
+                ) THEN RAISE(ABORT,'audit occurred_at values must be nondecreasing') END;
+            END;
         """
         delay = 0.005
         last: Exception | None = None
@@ -94,7 +117,10 @@ class AuditStore:
     def _text(name: str, value: str) -> str:
         if not isinstance(value, str) or not value.strip():
             raise ValueError(name + " is required")
-        return value.strip()
+        normalized = value.strip()
+        if any(ord(character) < 32 for character in normalized):
+            raise ValueError(name + " cannot contain control characters")
+        return normalized
 
     @property
     def _scope(self) -> tuple[str, str]:
