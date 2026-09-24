@@ -220,6 +220,18 @@ class SourceArtifactRef:
             object.__setattr__(self, "excerpt_sha256", excerpt)
 
     @property
+    def artifact_identity_hash(self) -> str:
+        return canonical_hash({
+            "schema": _SCHEMA_VERSION,
+            "usage_scope": USAGE_SCOPE,
+            "source_id": self.source_id,
+            "source_proof_hash": self.source_proof_hash,
+            "artifact_id": self.artifact_id,
+            "artifact_sha256": self.artifact_sha256,
+            "artifact_record_proof_hash": self.artifact_record_proof_hash,
+        })
+
+    @property
     def proof_hash(self) -> str:
         return canonical_hash({
             "schema": _SCHEMA_VERSION,
@@ -233,6 +245,11 @@ class SourceArtifactRef:
             "locator": self.locator,
             "excerpt_sha256": self.excerpt_sha256,
         })
+
+
+def same_retained_artifact(left: SourceArtifactRef, right: SourceArtifactRef) -> bool:
+    """True when two refs point at the same retained bytes/provenance, ignoring locator."""
+    return left.artifact_identity_hash == right.artifact_identity_hash
 
 
 @dataclass(frozen=True)
@@ -504,5 +521,6 @@ __all__ = [
     "SourceArtifactRef",
     "SourceLocatorKind",
     "freeze_raw_artifact_manifest",
+    "same_retained_artifact",
     "verify_raw_artifact_manifest",
 ]
