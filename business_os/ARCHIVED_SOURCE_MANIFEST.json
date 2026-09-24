@@ -1,0 +1,150 @@
+{
+  "package": "business_os",
+  "status": "FROZEN_LEGACY_REFERENCE",
+  "canonical_replacement": "ai_business_os",
+  "frozen_from_commit": "997aa17b81ed4b35ae630ca1ba6757fb51010f7a",
+  "python_file_count": 28,
+  "python_files": [
+    {
+      "path": "business_os/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": null
+    },
+    {
+      "path": "business_os/agents/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": null
+    },
+    {
+      "path": "business_os/agents/persistent_runtime.py",
+      "git_blob_sha": "2118648b08ff53a4eb3add2fc77715fe722f0588",
+      "size": 16402
+    },
+    {
+      "path": "business_os/audit/__init__.py",
+      "git_blob_sha": "980f8fb9c4737517c8fcf7dbb8e32492a7cd1414",
+      "size": 359
+    },
+    {
+      "path": "business_os/audit/acceptance.py",
+      "git_blob_sha": "25ada9f441c6554ad32c595d3f67998b0dce3951",
+      "size": 8521
+    },
+    {
+      "path": "business_os/evidence/__init__.py",
+      "git_blob_sha": "8bb32e3a431a60ea6aa41ae2cbfbff97a0dbf430",
+      "size": 369
+    },
+    {
+      "path": "business_os/evidence/truth_engine.py",
+      "git_blob_sha": "f85c64b8b524dd5ac124d49af6ace632b1f58107",
+      "size": 15634
+    },
+    {
+      "path": "business_os/factory/__init__.py",
+      "git_blob_sha": "b4cd1d633a3d3f3cf68e4ff19fff91819992e7ba",
+      "size": 99
+    },
+    {
+      "path": "business_os/factory/software_factory.py",
+      "git_blob_sha": "2a0545aa487e0cdab0c72180e6a00fd27e52c239",
+      "size": 21997
+    },
+    {
+      "path": "business_os/governance/__init__.py",
+      "git_blob_sha": "fe03142818c1b9ceab12349638532f0c2f38f36f",
+      "size": 143
+    },
+    {
+      "path": "business_os/governance/policy.py",
+      "git_blob_sha": "a26c409a79d7e4bf1422ede45eb6a8d757d7d562",
+      "size": 17613
+    },
+    {
+      "path": "business_os/graph/__init__.py",
+      "git_blob_sha": "932fd6e5fc166cc1d86a3c54d9241047e775293c",
+      "size": 226
+    },
+    {
+      "path": "business_os/graph/canonicalize.py",
+      "git_blob_sha": "3385ddcee515bf147255f23cd2b8fa5fabc9e0d2",
+      "size": 9473
+    },
+    {
+      "path": "business_os/graph/knowledge_graph.py",
+      "git_blob_sha": "eebee3d194366336f37f8d7e26462c972876f9eb",
+      "size": 13441
+    },
+    {
+      "path": "business_os/learning/__init__.py",
+      "git_blob_sha": "225fd50f69897c9257cf594394dfff8887700945",
+      "size": 316
+    },
+    {
+      "path": "business_os/learning/promotion.py",
+      "git_blob_sha": "3a900d06fab4dbf57e22d7ed75786e446714b9c8",
+      "size": 8612
+    },
+    {
+      "path": "business_os/memory/__init__.py",
+      "git_blob_sha": "fda4839b5926160ae76d42f9c86243527ff0a25e",
+      "size": 113
+    },
+    {
+      "path": "business_os/memory/value_memory.py",
+      "git_blob_sha": "4a243afa6fab24b838d32eb5f0603c2c8fd0db4c",
+      "size": 10031
+    },
+    {
+      "path": "business_os/tests/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "size": null
+    },
+    {
+      "path": "business_os/tests/test_entity_canonicalization.py",
+      "git_blob_sha": "97130e34e97740b1b7fac2f095fbc26fedc983d4",
+      "size": 6148
+    },
+    {
+      "path": "business_os/tests/test_independent_auditor.py",
+      "git_blob_sha": "db355fb616be2f7a5bbe396076152cf2ac01367e",
+      "size": 4940
+    },
+    {
+      "path": "business_os/tests/test_knowledge_graph.py",
+      "git_blob_sha": "b37f1f88eadcfca88d5156ebc67fd7965ba56945",
+      "size": 5437
+    },
+    {
+      "path": "business_os/tests/test_persistent_runtime.py",
+      "git_blob_sha": "c38030ee3f4ce525d050f3e600884b511158c9c0",
+      "size": 5123
+    },
+    {
+      "path": "business_os/tests/test_runtime_governance.py",
+      "git_blob_sha": "45f2f71add004ab5098201e4a21862258a681716",
+      "size": 6265
+    },
+    {
+      "path": "business_os/tests/test_skill_promotion.py",
+      "git_blob_sha": "45b1a97552c775c29d3fbf7e53c7b91dd51b8313",
+      "size": 5418
+    },
+    {
+      "path": "business_os/tests/test_software_factory.py",
+      "git_blob_sha": "4e1b15e323172ff7358e337800efba5d510dea26",
+      "size": 6622
+    },
+    {
+      "path": "business_os/tests/test_truth_engine.py",
+      "git_blob_sha": "6ac217d19a523e11a608ce22c9b8d9bba9d1404c",
+      "size": 9165
+    },
+    {
+      "path": "business_os/tests/test_value_memory.py",
+      "git_blob_sha": "2606a43d2d99ceb3ca8d5a542aa768c946fd619b",
+      "size": 4558
+    }
+  ],
+  "rule": "No new implementation work belongs here. Port required behavior to ai_business_os."
+}
