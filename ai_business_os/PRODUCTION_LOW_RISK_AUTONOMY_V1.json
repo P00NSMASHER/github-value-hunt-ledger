@@ -1,0 +1,37 @@
+{
+  "policy_version": "low-risk-autonomy-v1",
+  "promoted_from_shadow_run": "bootstrap-shadow-001",
+  "active_modes": {
+    "chief": "LOW_RISK_AUTONOMY",
+    "research": "LOW_RISK_AUTONOMY",
+    "engineering": "LOW_RISK_AUTONOMY",
+    "product": "LOW_RISK_AUTONOMY",
+    "growth_sales": "LOW_RISK_AUTONOMY",
+    "finance_analytics": "LOW_RISK_AUTONOMY",
+    "auditor_redteam": "SHADOW"
+  },
+  "hard_boundaries": {
+    "live_customer_sends": "DISABLED_AUTONOMOUSLY",
+    "production_merges": "DISABLED_AUTONOMOUSLY",
+    "production_deploys": "DISABLED_AUTONOMOUSLY",
+    "money_movement": "DISABLED_AUTONOMOUSLY",
+    "destructive_actions": "DISABLED_AUTONOMOUSLY",
+    "policy_changes": "DISABLED_AUTONOMOUSLY"
+  },
+  "promoted_internal_writes": [
+    "github.branch.create",
+    "github.file.write",
+    "drive.file.create",
+    "drive.file.update",
+    "gmail.draft.create",
+    "gmail.draft.update"
+  ],
+  "held_back": [
+    "replit.app.update",
+    "stripe account-specific reads without explicit resource binding"
+  ],
+  "protected_git_refs": [
+    "main",
+    "ai-business-os-v1.0-frozen"
+  ]
+}
