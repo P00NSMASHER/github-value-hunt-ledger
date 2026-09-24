@@ -1,0 +1,4 @@
+# RecoveryWorks cloud production runtime dependency lock.
+# Intentionally empty: the current cloud pilot/runtime path uses Python stdlib only.
+# Adding a third-party runtime dependency requires an exact version/hash and a
+# corresponding build-manifest/test update.

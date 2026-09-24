@@ -421,3 +421,9 @@ Only a fixed allowlist of same-currency, same-semantic cent categories is aggreg
 Production packaging now has a hash-bound container/service contract, explicit config/input/state/report volume roles, health/readiness checks, and a Docker Compose batch manifest. The image must be pinned by sha256 digest and run as a numeric non-root user with read-only root filesystem, network disabled, all capabilities dropped, no-new-privileges enabled, and no provider-write/remediation/external-action capability.
 
 Config and input mounts are read-only. State and report mounts must be separate private writable directories; readiness verifies them with private sentinels and revalidates the exact pilot spec and mounted source files. The generated Compose shape runs a preflight job before the pilot batch job and uses network_mode none. Step 13a does not build images, start containers, provision infrastructure, or contact external services.
+
+## Reproducible production container and CI smoke (step 13b)
+
+The production container definition is now pinned to a specific Python 3.12.14 slim-bookworm image digest. RecoveryWorks' current cloud runtime has no third-party Python runtime dependencies, so requirements.production.lock is intentionally empty except for comments; any future dependency requires an exact lock/build-manifest update.
+
+ContainerBuildManifest binds the full Git commit, base-image digest, Dockerfile SHA-256, dependency-lock SHA-256, and runtime dependency list. RecoveryWorks CI now generates that manifest, builds the actual container, verifies the OCI source-revision label, and smoke-runs the image with network disabled, read-only root filesystem, all capabilities dropped, no-new-privileges, and only a tmpfs for /tmp. CI does not publish or deploy the image.

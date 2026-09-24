@@ -1,0 +1,26 @@
+FROM python:3.12.14-slim-bookworm@sha256:f905d62e7e0c7febbe6e95f2e4f7d789811311ef26effaf716fb9008a5f54083
+
+ARG RECOVERYWORKS_VCS_REF
+LABEL org.opencontainers.image.title="RecoveryWorks Cloud Pilot"
+LABEL org.opencontainers.image.revision="${RECOVERYWORKS_VCS_REF}"
+LABEL org.opencontainers.image.base.name="python:3.12.14-slim-bookworm@sha256:f905d62e7e0c7febbe6e95f2e4f7d789811311ef26effaf716fb9008a5f54083"
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=0
+
+WORKDIR /app
+
+COPY recoveryworks/requirements.production.lock /app/recoveryworks/requirements.production.lock
+RUN python -m pip install --no-cache-dir --disable-pip-version-check \
+    -r /app/recoveryworks/requirements.production.lock
+
+COPY recoveryworks /app/recoveryworks
+
+RUN python -m compileall -q /app/recoveryworks \
+    && python -c "import recoveryworks; import recoveryworks.pilot_runner; import recoveryworks.production_deployment"
+
+USER 65532:65532
+
+ENTRYPOINT ["python", "-m", "recoveryworks.pilot_runner"]
+CMD ["--help"]
