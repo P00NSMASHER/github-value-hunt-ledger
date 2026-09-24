@@ -1,0 +1,19 @@
+{
+  "product": "AI Business OS",
+  "release": "v1.0",
+  "status": "FROZEN_FOR_PRODUCTION_BOOTSTRAP",
+  "source_repository": "P00NSMASHER/github-value-hunt-ledger",
+  "source_commit": "15a5b2fdc236110dbbb56fa120483f36d3a4d28a",
+  "frozen_branch": "ai-business-os-v1.0-frozen",
+  "bootstrap_branch": "ai-business-os-production-bootstrap",
+  "foundation_upgrades": 9,
+  "foundation_regression_status": "PASSED",
+  "authority_boundary": {
+    "live_customer_messages": false,
+    "money_movement": false,
+    "production_deploys": false,
+    "destructive_actions": false,
+    "policy_changes_without_human_approval": false
+  },
+  "migration_note": "The connected GitHub API cannot create a brand-new repository. This branch is the migration-ready production boundary until the dedicated private repository is created through an account-specific GitHub surface."
+}
