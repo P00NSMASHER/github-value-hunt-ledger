@@ -360,6 +360,11 @@ A proposal does not itself merge rows. `SAME_TRANSACTION` requires an explicit
 dedupe decision and cannot be recorded for a `DISTINCT` or `INSUFFICIENT`
 proposal.
 
+Even an algorithmic `EXACT_SAME` proposal still requires explicit reviewer
+checks confirming canonical identity, temporal overlap, economic fields, source
+evidence, and duplicate risk. The decision is timestamped and content-addressed;
+free-text rationale alone cannot collapse two rows.
+
 Cluster construction requires the exact reviewed `DedupeProposal` objects as
 well as the resulting decisions. Every proposal must still bind the current
 transaction hashes, canonical trader/issuer identities, and an
