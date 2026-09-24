@@ -6,35 +6,53 @@ This directory is the incremental implementation of the nine-part AI Business OS
 
 Status: implemented and merged.
 
-The first upgrade adds a durable worker substrate with:
-
-- persistent agent identities and roles;
-- durable goals with explicit state transitions;
-- heartbeats and generation numbers for stale-worker recovery;
-- append-only, hash-chained event history;
-- snapshots and rollback-safe state restoration;
-- parent/child agent relationships for delegated workers;
-- process-restart persistence via SQLite;
-- no dependency on an LLM provider or external service.
+The first upgrade adds a durable worker substrate with persistent identities, goals, heartbeats,
+stale-worker recovery, append-only hash-chained events, snapshots, rollback-safe restoration,
+delegation lineage, and process-restart persistence.
 
 ## Step 2 — Independent Auditor brain
 
+Status: implemented and merged.
+
+The second upgrade adds a hard Manager → Executor → Auditor completion contract. Executors submit
+evidence but cannot approve themselves; required acceptance criteria must independently pass before
+the runtime permits VERIFYING → COMPLETE.
+
+## Step 3 — Verifier-gated self-improvement
+
 Status: implemented on this branch.
 
-The second upgrade adds a Manager → Executor → Auditor completion contract:
+The third upgrade lets agents propose better skills/policies without letting them self-authorize
+those changes:
 
-- manager, executor, and auditor must be distinct agent identities;
-- acceptance criteria are frozen before execution;
-- executors submit concrete evidence but cannot approve themselves;
-- auditors record PASS / FAIL / UNKNOWN for every criterion;
-- missing or UNKNOWN required checks fail closed;
-- failed audits return work to ACTIVE for revision;
-- exact audit reports receive SHA-256 identities;
-- the persistent runtime refuses VERIFYING → COMPLETE without an approved independent audit;
-- only the assigned manager can accept the approved result.
+- the current champion remains active while candidates are tested;
+- proposer, verifier, and curator are separate identities;
+- candidate and baseline artifacts are content-addressed by SHA-256;
+- development and held-out evaluation manifests are frozen and disjoint;
+- only frozen tasks can be scored, and results are immutable;
+- incomplete evaluation fails closed;
+- hard regressions quarantine the candidate;
+- candidates must improve on development tasks and clear a minimum held-out improvement delta;
+- VERIFIED candidates still remain inactive;
+- three independent canary agents with zero regressions are required for GLOBAL_ELIGIBLE;
+- only the skill's designated curator can explicitly promote a candidate globally;
+- promotion is rejected if the champion changed after evaluation;
+- known prior champion versions can be explicitly rolled back with evidence.
 
-The runtime remains authority-light. These first two steps coordinate and verify work, but do **not**
-yet grant production, email, payment, merge, destructive, or self-improvement promotion authority.
+The first three upgrades therefore establish a chain of:
+
+```
+durable work
+   ↓
+independent completion verification
+   ↓
+measured learning
+   ↓
+independently verified promotion
+```
+
+They still do **not** grant unrestricted production, email, payment, destructive, or other
+consequential permissions. Runtime governance is a later upgrade.
 
 ### Run all AI Business OS tests
 
@@ -44,7 +62,5 @@ python -m unittest discover -s ai_business_os -p "test_*.py"
 
 ### Design rules
 
-Persistent memory is evidence, not authority. Completion is also not a self-asserted fact: the
-executor's result must cross an independent evidence-backed audit boundary before it can become
-COMPLETE. Later upgrades add value memory, governance, action permissions, and skill promotion
-without weakening these two invariants.
+Memory is evidence, not authority. Completion is not self-asserted. Learning is not deployment.
+Every increase in agent autonomy must preserve those boundaries rather than bypass them.
