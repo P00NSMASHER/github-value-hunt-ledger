@@ -95,6 +95,7 @@ class ConflictResolution:
     conflicting_claim_ids: tuple[str, ...]
     assessments: tuple[ClaimAssessment, ...]
     policy_id: str
+    policy_proof_hash: str
     resolution_hash: str
 
     def verify_integrity(self) -> None:
@@ -112,11 +113,12 @@ class ConflictResolution:
             "conflicting_claim_ids": list(self.conflicting_claim_ids),
             "assessment_hashes": sorted(x.proof_hash for x in self.assessments),
             "policy_id": self.policy_id,
+            "policy_proof_hash": self.policy_proof_hash,
         }
 
 
 class SourcePriorityPolicy:
-    policy_id = "historical-public-record-source-priority-v1"
+    policy_id = "historical-public-record-source-priority-v2"
 
     _DEFAULT = {
         CaseArtifactRole.JUDGMENT: 700,
@@ -132,62 +134,79 @@ class SourcePriorityPolicy:
         CaseArtifactRole.OTHER: 200,
     }
 
+    _OVERRIDES = {
+        FactDomain.PUBLICATION_BOUNDARY: {
+            CaseArtifactRole.PUBLIC_RELEASE: 800,
+            CaseArtifactRole.JUDGMENT: 700,
+            CaseArtifactRole.EXHIBIT: 650,
+            CaseArtifactRole.COMPLAINT: 550,
+            CaseArtifactRole.INDICTMENT: 550,
+            CaseArtifactRole.ACADEMIC_RECONSTRUCTION: 300,
+        },
+        FactDomain.LEGAL_STATUS: {
+            CaseArtifactRole.JUDGMENT: 800,
+            CaseArtifactRole.PLEA_OR_STATEMENT: 775,
+            CaseArtifactRole.ADMIN_ORDER: 725,
+            CaseArtifactRole.LITIGATION_RELEASE: 500,
+            CaseArtifactRole.COMPLAINT: 400,
+            CaseArtifactRole.INDICTMENT: 400,
+            CaseArtifactRole.ACADEMIC_RECONSTRUCTION: 250,
+        },
+        FactDomain.IDENTITY: {
+            CaseArtifactRole.PUBLIC_RELEASE: 650,
+            CaseArtifactRole.JUDGMENT: 700,
+            CaseArtifactRole.EXHIBIT: 675,
+            CaseArtifactRole.COMPLAINT: 650,
+            CaseArtifactRole.INDICTMENT: 650,
+            CaseArtifactRole.ACADEMIC_RECONSTRUCTION: 300,
+        },
+    }
+
     def priority(self, domain: FactDomain, role: CaseArtifactRole) -> int:
-        if domain is FactDomain.PUBLICATION_BOUNDARY:
-            overrides = {
-                CaseArtifactRole.PUBLIC_RELEASE: 800,
-                CaseArtifactRole.JUDGMENT: 700,
-                CaseArtifactRole.EXHIBIT: 650,
-                CaseArtifactRole.COMPLAINT: 550,
-                CaseArtifactRole.INDICTMENT: 550,
-                CaseArtifactRole.ACADEMIC_RECONSTRUCTION: 300,
-            }
-            return overrides.get(role, self._DEFAULT.get(role, 0))
-        if domain is FactDomain.LEGAL_STATUS:
-            overrides = {
-                CaseArtifactRole.JUDGMENT: 800,
-                CaseArtifactRole.PLEA_OR_STATEMENT: 775,
-                CaseArtifactRole.ADMIN_ORDER: 725,
-                CaseArtifactRole.LITIGATION_RELEASE: 500,
-                CaseArtifactRole.COMPLAINT: 400,
-                CaseArtifactRole.INDICTMENT: 400,
-                CaseArtifactRole.ACADEMIC_RECONSTRUCTION: 250,
-            }
-            return overrides.get(role, self._DEFAULT.get(role, 0))
-        if domain is FactDomain.IDENTITY:
-            overrides = {
-                CaseArtifactRole.PUBLIC_RELEASE: 650,
-                CaseArtifactRole.JUDGMENT: 700,
-                CaseArtifactRole.EXHIBIT: 675,
-                CaseArtifactRole.COMPLAINT: 650,
-                CaseArtifactRole.INDICTMENT: 650,
-                CaseArtifactRole.ACADEMIC_RECONSTRUCTION: 300,
-            }
-            return overrides.get(role, self._DEFAULT.get(role, 0))
-        return self._DEFAULT.get(role, 0)
+        return self._OVERRIDES.get(domain, {}).get(
+            role,
+            self._DEFAULT.get(role, 0),
+        )
 
     @property
     def proof_hash(self) -> str:
         return canonical_hash({
-            "schema": 1,
+            "schema": 2,
             "policy_id": self.policy_id,
             "default": {
-                role.value: value for role, value in sorted(
+                role.value: value
+                for role, value in sorted(
                     self._DEFAULT.items(), key=lambda item: item[0].value
+                )
+            },
+            "overrides": {
+                domain.value: {
+                    role.value: value
+                    for role, value in sorted(
+                        mapping.items(), key=lambda item: item[0].value
+                    )
+                }
+                for domain, mapping in sorted(
+                    self._OVERRIDES.items(),
+                    key=lambda item: item[0].value,
                 )
             },
         })
 
 
 def _role_for_claim(claim: FactClaim, case) -> CaseArtifactRole:
-    matches = [
+    matches = {
         link.artifact_role
         for link in case.artifacts
         if same_retained_artifact(link.ref, claim.source_ref)
-    ]
+    }
     if not matches:
         raise ValueError("claim source is not linked to canonical case")
-    return sorted(matches, key=lambda role: role.value)[0]
+    if len(matches) != 1:
+        raise ValueError(
+            "claim source has ambiguous case artifact roles"
+        )
+    return next(iter(matches))
 
 
 def resolve_fact_conflict(
@@ -263,6 +282,7 @@ def resolve_fact_conflict(
         "conflicting_claim_ids": list(conflicting_ids),
         "assessment_hashes": sorted(x.proof_hash for x in assessments),
         "policy_id": selected_policy.policy_id,
+        "policy_proof_hash": selected_policy.proof_hash,
     }
     return ConflictResolution(
         fact_key=first.fact_key,
@@ -273,6 +293,7 @@ def resolve_fact_conflict(
         conflicting_claim_ids=conflicting_ids,
         assessments=tuple(sorted(assessments, key=lambda x: x.claim.claim_id)),
         policy_id=selected_policy.policy_id,
+        policy_proof_hash=selected_policy.proof_hash,
         resolution_hash=canonical_hash(body),
     )
 
