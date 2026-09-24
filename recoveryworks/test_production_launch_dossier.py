@@ -149,15 +149,38 @@ class ProductionLaunchDossierTests(unittest.TestCase):
 
     def test_failed_observability_run_cannot_enter_dossier(self):
         with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
             release,promotion,security,dr,build = ProductionAdmissionTests().fixture(
-                Path(d)
+                root
             )
             from recoveryworks.production_admission import build_production_admission_gate
+            from recoveryworks.production_observability import ProductionFailureCode
+            from recoveryworks.models import canonical_hash
+            from recoveryworks.release_control import build_rollback_manifest
             admission=build_production_admission_gate(
                 release,promotion,security,dr,build,
                 admitted_at="2026-09-24T13:11:00Z")
+            failed_identity = {
+                "schema": 1,
+                "run_id": "run-bad",
+                "deployment_id": "dep",
+                "deployment_plan_proof_hash": "1"*64,
+                "container_build_manifest_proof_hash": build.proof_hash,
+                "client_id": "client",
+                "provider": "aws",
+                "started_at": "2026-09-24T13:12:00Z",
+                "completed_at": "2026-09-24T13:13:00Z",
+                "status": "FAILED",
+                "failure_code": "RUNTIME_FAILURE",
+                "failure_detail": "failed",
+                "state_head_hash": None,
+                "assurance_report_proof_hash": None,
+                "metrics_proof_hash": None,
+                "event_hashes": [],
+                "alert_hashes": [],
+            }
             run=ProductionRunManifest(
-                manifest_id="recoveryworks-production-run:"+"0"*64,
+                manifest_id="recoveryworks-production-run:"+canonical_hash(failed_identity),
                 run_id="run-bad",deployment_id="dep",
                 deployment_plan_proof_hash="1"*64,
                 container_build_manifest_proof_hash=build.proof_hash,
@@ -165,16 +188,27 @@ class ProductionLaunchDossierTests(unittest.TestCase):
                 started_at="2026-09-24T13:12:00Z",
                 completed_at="2026-09-24T13:13:00Z",
                 status=ProductionRunStatus.FAILED,
-                failure_code=__import__(
-                    "recoveryworks.production_observability",
-                    fromlist=["ProductionFailureCode"]
-                ).ProductionFailureCode.RUNTIME_FAILURE,
+                failure_code=ProductionFailureCode.RUNTIME_FAILURE,
                 failure_detail="failed",
                 state_head_hash=None,assurance_report_proof_hash=None,
                 metrics_proof_hash=None,event_hashes=(),alert_hashes=())
-            # Constructor itself validates manifest identity, so a failed run is
-            # sufficient to demonstrate the dossier cannot be built if valid.
-            self.assertIs(run.status, ProductionRunStatus.FAILED)
+            rel2,_,_,_,_ = ProductionAdmissionTests().fixture(root/"second")
+            rollback=build_rollback_manifest(
+                release,rel2,reason="Known good target",
+                created_at="2026-09-24T13:14:00Z")
+            with self.assertRaisesRegex(
+                ValueError, "successful production-style run"
+            ):
+                build_production_launch_dossier(
+                    release=release,
+                    admission=admission,
+                    security_evidence=security,
+                    dr_rehearsal=dr,
+                    observability_run=run,
+                    rollback_manifest=rollback,
+                    commercial_pilot=commercial(),
+                    reviewed_at="2026-09-24T13:15:00Z",
+                )
 
 
 if __name__ == "__main__":
