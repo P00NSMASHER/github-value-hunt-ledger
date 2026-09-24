@@ -11,7 +11,7 @@ from collections import defaultdict
 import csv
 from dataclasses import dataclass
 from datetime import date
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import hashlib
 import io
 import json
@@ -21,6 +21,7 @@ from typing import Any, Mapping
 import zipfile
 
 from recoveryworks.branches.contract_billing import InvoiceCharge, UsageRecord
+from recoveryworks.branches.cloud_signals import CloudSignal, CloudSignalType
 from recoveryworks.branches.contract_billing_csv import dollars_to_cents
 from recoveryworks.models import normalize_sha256, normalize_utc_timestamp
 
@@ -30,7 +31,10 @@ CLETRICS_BUNDLE_SCHEMA = 1
 MANIFEST_PATH = "manifest.json"
 INVOICE_ROLE = "invoice_charges"
 METER_ROLE = "meter_usage"
+ANOMALY_ROLE = "anomaly_signals"
+RECONCILIATION_ROLE = "reconciliation_signals"
 _REQUIRED_ROLES = {INVOICE_ROLE, METER_ROLE}
+_ALLOWED_ROLES = _REQUIRED_ROLES | {ANOMALY_ROLE, RECONCILIATION_ROLE}
 _GIT_SHA1_RE = re.compile(r"[0-9a-f]{40}")
 _IMAGE_DIGEST_RE = re.compile(r"sha256:[0-9a-f]{64}")
 _CURRENCY_RE = re.compile(r"[A-Z]{3}")
@@ -76,6 +80,7 @@ class CletricsCloudBundle:
     entries: tuple[CletricsBundleEntry, ...]
     charges: tuple[InvoiceCharge, ...]
     usage: tuple[UsageRecord, ...]
+    signals: tuple[CloudSignal, ...]
 
 
 def _sha(raw: bytes) -> str:
@@ -209,6 +214,8 @@ def _parse_manifest(
         if not isinstance(row, Mapping):
             raise ValueError(f"entries[{index}] must be an object")
         entry = _entry_from_manifest(row, index=index)
+        if entry.role not in _ALLOWED_ROLES:
+            raise ValueError(f"unsupported Cletrics bundle role: {entry.role}")
         if entry.role in seen_roles:
             raise ValueError(
                 f"duplicate Cletrics bundle role: {entry.role}"
@@ -440,6 +447,219 @@ def _load_meter_usage(
     return tuple(result)
 
 
+
+def _optional_decimal(row: Mapping[str, str], column: str, *, row_number: int) -> Decimal | None:
+    raw = (row.get(column) or "").strip()
+    if not raw:
+        return None
+    try:
+        return Decimal(raw)
+    except (InvalidOperation, ValueError) as exc:
+        raise ValueError(f"row {row_number}: {column} must be numeric") from exc
+
+
+def _signal_timestamp(value: str, *, row_number: int) -> str:
+    raw = value.strip()
+    if len(raw) == 10:
+        raw = raw + "T00:00:00Z"
+    return normalize_utc_timestamp(f"row {row_number} Detected_At", raw)
+
+
+def _signal_id(
+    supplied: str,
+    *,
+    signal_type: CloudSignalType,
+    provider: str,
+    account_id: str,
+    service_id: str,
+    detected_at: str,
+    source_hash: str,
+    row_number: int,
+) -> str:
+    if supplied.strip():
+        return supplied.strip()
+    identity = {
+        "provider": provider,
+        "account_id": account_id,
+        "service_id": service_id,
+        "detected_at": detected_at,
+        "source_hash": source_hash,
+        "row_number": row_number,
+    }
+    return (
+        "cletrics:"
+        + signal_type.value.lower()
+        + ":"
+        + hashlib.sha256(
+            json.dumps(identity, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+    )
+
+
+def _load_anomaly_signals(
+    raw: bytes,
+    *,
+    bundle_name: str,
+    manifest: Mapping[str, Any],
+    entry: CletricsBundleEntry,
+) -> tuple[CloudSignal, ...]:
+    fieldnames, rows = _decode_csv(raw, label=entry.path)
+    required = (
+        "Detected_At",
+        "Provider",
+        "Account_ID",
+        "Service_ID",
+        "Severity",
+        "Detection_Method",
+        "Metric_Name",
+    )
+    _require_columns(fieldnames, required, label=entry.path)
+    result: list[CloudSignal] = []
+    for row_number, row in enumerate(rows, start=2):
+        provider = (row.get("Provider") or "").strip() or str(manifest["provider"])
+        account_id = (row.get("Account_ID") or "").strip() or str(
+            manifest["billing_account_id"]
+        )
+        service_id = _row_value(row, "Service_ID", row_number=row_number)
+        detected_at = _signal_timestamp(
+            _row_value(row, "Detected_At", row_number=row_number),
+            row_number=row_number,
+        )
+        impact = _optional_decimal(
+            row, "Estimated_Cost_Impact", row_number=row_number
+        )
+        if impact is not None and impact < 0:
+            raise ValueError(
+                f"row {row_number}: Estimated_Cost_Impact must be non-negative"
+            )
+        impact_cents = (
+            int((impact * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+            if impact is not None
+            else None
+        )
+        confidence_raw = (row.get("Confidence") or "").strip() or None
+        result.append(
+            CloudSignal(
+                signal_id=_signal_id(
+                    (row.get("Signal_ID") or ""),
+                    signal_type=CloudSignalType.ANOMALY,
+                    provider=provider,
+                    account_id=account_id,
+                    service_id=service_id,
+                    detected_at=detected_at,
+                    source_hash=entry.sha256,
+                    row_number=row_number,
+                ),
+                signal_type=CloudSignalType.ANOMALY,
+                provider=provider,
+                account_id=account_id,
+                service_id=service_id,
+                detected_at=detected_at,
+                detection_method=_row_value(
+                    row, "Detection_Method", row_number=row_number
+                ),
+                source_hash=entry.sha256,
+                source_locator=(
+                    f"bundle://{bundle_name}/{entry.path}#row={row_number}"
+                ),
+                severity=(row.get("Severity") or "").strip() or None,
+                resource_id=(row.get("Resource_ID") or "").strip() or None,
+                region=(row.get("Region") or "").strip() or None,
+                estimated_impact_cents=impact_cents,
+                confidence=confidence_raw,
+                metadata={
+                    "metric_name": _row_value(
+                        row, "Metric_Name", row_number=row_number
+                    ),
+                    "z_score": (row.get("Z_Score") or "").strip() or None,
+                    "baseline_value": (row.get("Baseline_Value") or "").strip()
+                    or None,
+                    "actual_value": (row.get("Actual_Value") or "").strip()
+                    or None,
+                    "cletrics_source_role": ANOMALY_ROLE,
+                    "estimated_amount_is_non_authoritative": True,
+                },
+            )
+        )
+    return tuple(result)
+
+
+def _load_reconciliation_signals(
+    raw: bytes,
+    *,
+    bundle_name: str,
+    manifest: Mapping[str, Any],
+    entry: CletricsBundleEntry,
+) -> tuple[CloudSignal, ...]:
+    fieldnames, rows = _decode_csv(raw, label=entry.path)
+    required = (
+        "Detected_At",
+        "Provider",
+        "Account_ID",
+        "Service_ID",
+        "Estimated_Cost",
+        "Actual_Cost",
+    )
+    _require_columns(fieldnames, required, label=entry.path)
+    result: list[CloudSignal] = []
+    for row_number, row in enumerate(rows, start=2):
+        provider = (row.get("Provider") or "").strip() or str(manifest["provider"])
+        account_id = (row.get("Account_ID") or "").strip() or str(
+            manifest["billing_account_id"]
+        )
+        service_id = _row_value(row, "Service_ID", row_number=row_number)
+        detected_at = _signal_timestamp(
+            _row_value(row, "Detected_At", row_number=row_number),
+            row_number=row_number,
+        )
+        estimated = _optional_decimal(row, "Estimated_Cost", row_number=row_number)
+        actual = _optional_decimal(row, "Actual_Cost", row_number=row_number)
+        if estimated is None or actual is None or estimated < 0 or actual < 0:
+            raise ValueError(
+                f"row {row_number}: reconciliation costs must be non-negative numerics"
+            )
+        impact_cents = int(
+            (abs(actual - estimated) * 100).quantize(
+                Decimal("1"), rounding=ROUND_HALF_UP
+            )
+        )
+        result.append(
+            CloudSignal(
+                signal_id=_signal_id(
+                    (row.get("Signal_ID") or ""),
+                    signal_type=CloudSignalType.RECONCILIATION_DRIFT,
+                    provider=provider,
+                    account_id=account_id,
+                    service_id=service_id,
+                    detected_at=detected_at,
+                    source_hash=entry.sha256,
+                    row_number=row_number,
+                ),
+                signal_type=CloudSignalType.RECONCILIATION_DRIFT,
+                provider=provider,
+                account_id=account_id,
+                service_id=service_id,
+                detected_at=detected_at,
+                detection_method="billing_reconciliation",
+                source_hash=entry.sha256,
+                source_locator=(
+                    f"bundle://{bundle_name}/{entry.path}#row={row_number}"
+                ),
+                estimated_impact_cents=impact_cents,
+                metadata={
+                    "estimated_cost": str(estimated),
+                    "actual_cost": str(actual),
+                    "error_pct": (row.get("Error_Pct") or "").strip() or None,
+                    "drift_direction": (row.get("Drift_Direction") or "").strip()
+                    or None,
+                    "sku_key": (row.get("SKU_Key") or "").strip() or None,
+                    "cletrics_source_role": RECONCILIATION_ROLE,
+                    "estimated_amount_is_non_authoritative": True,
+                },
+            )
+        )
+    return tuple(result)
+
 def load_cletrics_bundle(
     path: str | Path,
     *,
@@ -629,6 +849,34 @@ def load_cletrics_bundle(
             entry=by_role[METER_ROLE],
             verified=meter_source_verified,
         )
+        signal_rows: list[CloudSignal] = []
+        if ANOMALY_ROLE in by_role:
+            signal_rows.extend(
+                _load_anomaly_signals(
+                    entry_raw[ANOMALY_ROLE],
+                    bundle_name=source.name,
+                    manifest=normalized_manifest,
+                    entry=by_role[ANOMALY_ROLE],
+                )
+            )
+        if RECONCILIATION_ROLE in by_role:
+            signal_rows.extend(
+                _load_reconciliation_signals(
+                    entry_raw[RECONCILIATION_ROLE],
+                    bundle_name=source.name,
+                    manifest=normalized_manifest,
+                    entry=by_role[RECONCILIATION_ROLE],
+                )
+            )
+        signal_index: dict[str, CloudSignal] = {}
+        for signal in signal_rows:
+            previous = signal_index.get(signal.signal_id)
+            if previous is not None and previous.proof_hash != signal.proof_hash:
+                raise ValueError(
+                    f"conflicting Cletrics signal_id: {signal.signal_id}"
+                )
+            signal_index[signal.signal_id] = signal
+        signals = tuple(signal_index[key] for key in sorted(signal_index))
 
     return CletricsCloudBundle(
         client_id=client_id,
@@ -646,4 +894,5 @@ def load_cletrics_bundle(
         entries=entries,
         charges=charges,
         usage=usage,
+        signals=signals,
     )
