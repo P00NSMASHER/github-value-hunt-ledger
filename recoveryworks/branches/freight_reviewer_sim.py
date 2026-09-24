@@ -312,6 +312,22 @@ def _review_checks(case: FreightReviewCase) -> tuple[SimulatedReviewerCheck, ...
         if case.integrity_blockers
         else RESOLVE_AUTHORITY
     )
+    load_conflict_visible = True
+    if "load_id_mismatch" in case.integrity_blockers:
+        ids = tuple(
+            value for value in (
+                case.invoice_load_id,
+                case.rate_confirmation_load_id,
+                case.pod_load_id,
+            )
+            if value
+        )
+        load_conflict_visible = len(set(ids)) > 1
+
+    authority_conflict_visible = True
+    if "AMBIGUOUS_APPLICABLE_CHARGE_RULE" in case.authority_blockers:
+        authority_conflict_visible = len(set(case.matched_authority_rule_hashes)) >= 2
+
     return (
         _check(
             "REVIEW_BLOCKER_VISIBLE",
@@ -320,6 +336,24 @@ def _review_checks(case: FreightReviewCase) -> tuple[SimulatedReviewerCheck, ...
                 "Visible blocker(s): " + ", ".join(blockers)
                 if blockers
                 else "No explicit blocker explains why this case is REVIEW."
+            ),
+        ),
+        _check(
+            "REVIEW_LOAD_CONFLICT_PROOF",
+            load_conflict_visible,
+            (
+                "Conflicting load IDs are visible in the packet."
+                if load_conflict_visible
+                else "The packet names a load-ID mismatch without showing conflicting IDs."
+            ),
+        ),
+        _check(
+            "REVIEW_AUTHORITY_CONFLICT_PROOF",
+            authority_conflict_visible,
+            (
+                "Competing authority rule hashes are visible in the packet."
+                if authority_conflict_visible
+                else "The packet names ambiguous authority without showing competing rule proofs."
             ),
         ),
         _check(
