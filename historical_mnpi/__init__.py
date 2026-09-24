@@ -34,6 +34,24 @@ from .transaction_model import (
     verify_transaction_provenance,
 )
 
+
+from .entity_resolution import (
+    CaseEntityCrosswalk,
+    CaseEntityCrosswalkRegistry,
+    EntityKind,
+    EntityResolutionRegistry,
+    EntityResolutionResult,
+    HistoricalIdentifier,
+    HistoricalIdentifierType,
+    IdentityAlias,
+    IssuerIdentity,
+    ResolutionState,
+    TraderIdentity,
+    verify_case_entity_crosswalk,
+    verify_issuer_identity,
+    verify_trader_identity,
+)
+
 from .event_model import (
     BoundaryPrecision,
     EventRegistry,
@@ -61,6 +79,7 @@ from .review_queue import (
     ReviewChecks,
     ReviewConflict,
     ReviewDecision,
+    ReviewDurableIdentitySnapshot,
     ReviewIdentitySnapshot,
     ReviewQueueItem,
     ReviewTemporalSnapshot,
@@ -68,6 +87,7 @@ from .review_queue import (
     decide_review_item,
     detect_candidate_conflicts,
     render_review_item_markdown,
+    verify_review_durable_identity,
 )
 
 from .source_registry import (
@@ -80,11 +100,26 @@ from .source_registry import (
 )
 
 __all__ = [
+    "CaseEntityCrosswalk",
+    "CaseEntityCrosswalkRegistry",
+    "EntityKind",
+    "EntityResolutionRegistry",
+    "EntityResolutionResult",
+    "HistoricalIdentifier",
+    "HistoricalIdentifierType",
+    "IdentityAlias",
+    "IssuerIdentity",
+    "ResolutionState",
+    "TraderIdentity",
+    "verify_case_entity_crosswalk",
+    "verify_issuer_identity",
+    "verify_trader_identity",
     "HistoricalReviewDecision",
     "HistoricalReviewQueue",
     "ReviewChecks",
     "ReviewConflict",
     "ReviewDecision",
+    "ReviewDurableIdentitySnapshot",
     "ReviewIdentitySnapshot",
     "ReviewQueueItem",
     "ReviewTemporalSnapshot",
@@ -92,6 +127,7 @@ __all__ = [
     "decide_review_item",
     "detect_candidate_conflicts",
     "render_review_item_markdown",
+    "verify_review_durable_identity",
     "CandidateField",
     "CandidateFieldStatus",
     "CandidateKind",
