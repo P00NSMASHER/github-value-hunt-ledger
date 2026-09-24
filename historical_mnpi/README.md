@@ -344,9 +344,12 @@ The comparator emits one of:
 
 `EXACT_SAME` requires the same exact timestamp plus a strong anchor set:
 matching security identifier, matching quantity, matching execution price or
-trade amount, and matching instrument or side. Option trades additionally require
+trade amount, **matching instrument type and matching side**, and matching
+currency whenever either row specifies one. Option trades additionally require
 matching option instrument type, strike, and expiry before they can be
-`EXACT_SAME`. Matching only generic fields such as BUY + STOCK is
+`EXACT_SAME`. Missing side, instrument, security identity, or required currency
+downgrades the comparison to at most `POSSIBLE_SAME`. Matching only generic
+fields such as BUY + STOCK is
 `INSUFFICIENT`, not a duplicate proposal. Date-only or overlapping date-range
 records can never be promoted to
 `EXACT_SAME` automatically, even when quantity/price/side/instrument match,
