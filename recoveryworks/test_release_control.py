@@ -27,6 +27,15 @@ from recoveryworks.private_io import private_permissions_verified
 from recoveryworks.test_commercial_operational_invariants import full_chain
 
 
+def production_certification(build):
+    return run_commercial_adversarial_certification(
+        full_chain,
+        build_manifest=build,
+        seed=42001,
+        iterations_per_vector=2,
+    )
+
+
 def production_spec(root: Path, image_ref: str) -> dict:
     config = root / "config"
     inputs = root / "inputs"
@@ -158,12 +167,7 @@ class ReleaseControlTests(unittest.TestCase):
             image = "registry.example/recoveryworks@sha256:" + "c" * 64
             deployment = self.deployment(root, image)
             build = self.build_manifest(current_repository_revision())
-            certification = run_commercial_adversarial_certification(
-                full_chain,
-                build_manifest=build,
-                seed=42001,
-                iterations_per_vector=2,
-            )
+            certification = production_certification(build)
             current = build_release_manifest(
                 version="1.0.0",
                 build_manifest=build,
