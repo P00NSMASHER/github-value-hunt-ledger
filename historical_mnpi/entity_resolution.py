@@ -301,9 +301,14 @@ class EntityRegistry:
 
         party_ids = {item.party_id for item in case.parties}
         issuer_ids = {item.issuer_id for item in case.issuers}
-        if resolution.entity_kind is EntityKind.PERSON:
+        if resolution.entity_kind in {
+            EntityKind.PERSON,
+            EntityKind.ORGANIZATION,
+        }:
             if resolution.local_id not in party_ids:
-                raise ValueError("person resolution local_id is not a case party")
+                raise ValueError(
+                    "person/organization resolution local_id is not a case party"
+                )
         elif resolution.entity_kind is EntityKind.ISSUER:
             if resolution.local_id not in issuer_ids:
                 raise ValueError("issuer resolution local_id is not a case issuer")
