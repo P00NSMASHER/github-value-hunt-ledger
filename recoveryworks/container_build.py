@@ -120,6 +120,7 @@ def build_container_build_manifest(
     required_fragments = (
         "USER 65532:65532",
         "PYTHONHASHSEED=0",
+        "COPY freight /app/freight",
         "python -m compileall",
         'ENTRYPOINT ["python", "-m", "recoveryworks.pilot_runner"]',
     )

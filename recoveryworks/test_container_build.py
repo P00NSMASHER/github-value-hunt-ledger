@@ -26,6 +26,7 @@ class ContainerBuildProvenanceTests(unittest.TestCase):
         first = text.splitlines()[0]
         self.assertRegex(first, r"^FROM .+@sha256:[0-9a-f]{64}$")
         self.assertIn("USER 65532:65532", text)
+        self.assertIn("COPY freight /app/freight", text)
         self.assertIn(
             'ENTRYPOINT ["python", "-m", "recoveryworks.pilot_runner"]',
             text,

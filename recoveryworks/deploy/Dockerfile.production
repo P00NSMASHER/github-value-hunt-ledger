@@ -16,8 +16,9 @@ RUN python -m pip install --no-cache-dir --disable-pip-version-check \
     -r /app/recoveryworks/requirements.production.lock
 
 COPY recoveryworks /app/recoveryworks
+COPY freight /app/freight
 
-RUN python -m compileall -q /app/recoveryworks \
+RUN python -m compileall -q /app/recoveryworks /app/freight \
     && python -c "import recoveryworks; import recoveryworks.pilot_runner; import recoveryworks.production_deployment"
 
 USER 65532:65532
