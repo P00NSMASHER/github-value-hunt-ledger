@@ -21,11 +21,16 @@ from recoveryworks.integrations.cletrics_exporter import (
     CletricsSourceArtifact,
     export_cletrics_focus_snapshot,
 )
+from recoveryworks.cloud_assurance_report import (
+    build_cloud_assurance_report,
+    write_cloud_assurance_report,
+)
 from recoveryworks.pilot_deployment import (
     PilotDeploymentPlan,
     build_pilot_deployment_plan,
     load_pilot_spec,
 )
+from recoveryworks.store import LocalBundleStore
 from recoveryworks.private_io import (
     atomic_private_write,
     private_permissions_verified,
@@ -193,30 +198,20 @@ def run_local_pilot(
         base_dir=base,
     )
 
-    report_payload = {
-        "schema": 1,
-        "deployment_id": plan.deployment_id,
-        "deployment_plan_hash": plan.proof_hash,
-        "export_receipt": export_receipt.as_dict(),
-        "result": result.as_dict(),
-        "controls": {
-            "provider": plan.provider,
-            "cloud_access_mode": "READ_ONLY",
-            "recoveryos_provider_write_credentials": False,
-            "remediation_execution_enabled": False,
-            "external_actions_enabled": False,
-        },
-    }
-    report_raw = (
-        json.dumps(
-            report_payload,
-            sort_keys=True,
-            separators=(",", ":"),
-            ensure_ascii=True,
-        ).encode("utf-8")
-        + b"\n"
+    ledger = LocalBundleStore(plan.ledger_path).load()
+    if ledger is None:
+        raise AssertionError("pilot run did not persist a RecoveryOS ledger")
+    assurance = build_cloud_assurance_report(
+        result=result,
+        ledger=ledger,
     )
-    atomic_private_write(Path(plan.report_path), report_raw)
+    report_path = Path(plan.report_path)
+    markdown_path = report_path.with_suffix(".md")
+    write_cloud_assurance_report(
+        assurance,
+        json_path=report_path,
+        markdown_path=markdown_path,
+    )
 
     private_paths = tuple(
         str(path)
@@ -224,7 +219,8 @@ def run_local_pilot(
             Path(plan.bundle_path),
             Path(plan.ledger_path),
             Path(plan.receipt_registry_path),
-            Path(plan.report_path),
+            report_path,
+            markdown_path,
         )
     )
     for value in private_paths:

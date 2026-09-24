@@ -323,3 +323,11 @@ Verification remains explicit in `recoveryos.verification`; the launcher never
 promotes rates, invoice rows, or meter rows to verified simply because the
 pipeline ran. It also forces cloud remediation disabled and performs no AWS API
 calls, provisioning, external recovery actions, or cloud mutations.
+
+## Customer-facing Cloud Assurance report (step 6)
+
+The pilot now emits private JSON and Markdown Cloud Recovery & Savings Assurance reports. The report keeps five surfaces separate: recoverable cash, prospective savings, verified realized savings, anomaly exposure, and reconciliation drift.
+
+Every active VALIDATED cloud recovery has an evidence packet containing the exact expected-vs-actual calculation, finding proof hash, controlling rule id/hash/source locator/effective dates, every load-bearing evidence hash and locator, verification flags, calculation metadata, and current lifecycle state. SUPERSEDED and REJECTED findings remain historical but are not emitted as active validated recovery packets.
+
+The report itself never authorizes cloud mutation or external recovery action.
