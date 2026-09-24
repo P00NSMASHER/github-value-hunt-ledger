@@ -23,6 +23,7 @@ from historical_mnpi.source_conflicts import (
     ClaimAuthority,
     ConflictResolutionState,
     SourceConflictClaim,
+    SourceConflictRegistry,
     assess_conflicting_claims,
 )
 from historical_mnpi.source_registry import (
@@ -483,6 +484,76 @@ class SourceConflictPolicyTests(unittest.TestCase):
                 source_registry=sources,
                 artifact_manifest=manifest,
             )
+
+
+    def test_conflict_registry_is_append_only_and_assessable(self):
+        sources, manifest, cases, refs = fixture()
+        registry = SourceConflictRegistry()
+        complaint = claim(
+            "claim:registry:one",
+            source_id="SEC:CONFLICT:COMPLAINT",
+            refs=refs,
+            value="2500",
+            role=CaseArtifactRole.COMPLAINT,
+            status=FactStatus.ALLEGED,
+        )
+        registry.register(
+            complaint,
+            cases=cases,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+        self.assertEqual(
+            registry.claims_for("CASE-CONFLICT", "quantity"),
+            (complaint,),
+        )
+        self.assertEqual(
+            registry.fields_for_case("CASE-CONFLICT"),
+            ("quantity",),
+        )
+        assessment = registry.assess(
+            "CASE-CONFLICT",
+            "quantity",
+            cases=cases,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+        self.assertEqual(assessment.preferred_value, "2500")
+        self.assertEqual(len(registry.registry_hash), 64)
+
+    def test_conflict_registry_rejects_claim_id_rewrite(self):
+        sources, manifest, cases, refs = fixture()
+        registry = SourceConflictRegistry()
+        first = claim(
+            "claim:registry:fixed",
+            source_id="SEC:CONFLICT:COMPLAINT",
+            refs=refs,
+            value="2500",
+            role=CaseArtifactRole.COMPLAINT,
+            status=FactStatus.ALLEGED,
+        )
+        registry.register(
+            first,
+            cases=cases,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+        altered = claim(
+            "claim:registry:fixed",
+            source_id="SEC:CONFLICT:COMPLAINT",
+            refs=refs,
+            value="2600",
+            role=CaseArtifactRole.COMPLAINT,
+            status=FactStatus.ALLEGED,
+        )
+        with self.assertRaisesRegex(ValueError, "different content"):
+            registry.register(
+                altered,
+                cases=cases,
+                source_registry=sources,
+                artifact_manifest=manifest,
+            )
+
 
 
 if __name__ == "__main__":
