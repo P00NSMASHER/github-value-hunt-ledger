@@ -40,7 +40,9 @@ from recoveryworks.recurring_assurance_activation import (
     RecurringAssuranceActivationReadiness,
 )
 from recoveryworks.recurring_assurance_lifecycle import (
+    RecurringAssuranceLifecycleState,
     RecurringAssuranceServiceActivationReceipt,
+    RecurringAssuranceServiceDeactivationReceipt,
     RecurringAssuranceServiceLifecycle,
 )
 
@@ -226,6 +228,7 @@ def verify_commercial_operational_invariants(
     recurring_activation: RecurringAssuranceServiceActivationReceipt,
     recurring_lifecycle: RecurringAssuranceServiceLifecycle,
     checked_at: str,
+    recurring_deactivation: RecurringAssuranceServiceDeactivationReceipt | None = None,
 ) -> CommercialOperationalInvariantReport:
     checked_at = normalize_utc_timestamp("checked_at", checked_at)
     checks: list[CommercialOperationalInvariantCheck] = []
@@ -245,6 +248,11 @@ def verify_commercial_operational_invariants(
     recurring_auth_hash = recurring_authorization.proof_hash
     recurring_ready_hash = recurring_readiness.proof_hash
     recurring_activation_hash = recurring_activation.proof_hash
+    recurring_deactivation_hash = (
+        recurring_deactivation.proof_hash
+        if recurring_deactivation is not None
+        else None
+    )
     recurring_lifecycle_hash = recurring_lifecycle.proof_hash
 
     pilot_scope_ok = (
@@ -653,6 +661,16 @@ def verify_commercial_operational_invariants(
             == recurring_activation_hash
         and recurring_lifecycle.engagement_id == charter.engagement_id
         and recurring_lifecycle.buyer_id == charter.buyer_id
+        and recurring_lifecycle.business_unit == recurring_readiness.business_unit
+        and recurring_lifecycle.billing_account_scope
+            == recurring_readiness.billing_account_scope
+        and recurring_lifecycle.provider_scope == recurring_readiness.provider_scope
+        and recurring_lifecycle.currency == recurring_readiness.currency
+        and recurring_lifecycle.monthly_assurance_fee_cents
+            == recurring_readiness.monthly_assurance_fee_cents
+        and recurring_lifecycle.service_start_at == recurring_readiness.service_start_at
+        and recurring_lifecycle.service_end_at == recurring_readiness.service_end_at
+        and recurring_lifecycle.active_from == recurring_activation.activated_at
         and _all_false(
             recurring_activation,
             (
@@ -685,7 +703,80 @@ def verify_commercial_operational_invariants(
         )
     )
 
-    chronology_values = (
+    activation_self_bound = (
+        recurring_activation.receipt_id
+        == "recoveryworks-recurring-assurance-service-activation:"
+        + recurring_activation_hash
+    )
+    lifecycle_self_bound = (
+        recurring_lifecycle.lifecycle_id
+        == "recoveryworks-recurring-assurance-service-lifecycle:"
+        + recurring_lifecycle_hash
+    )
+    lifecycle_state_ok = (
+        activation_self_bound
+        and lifecycle_self_bound
+        and recurring_lifecycle.active_from == recurring_activation.activated_at
+    )
+    if recurring_lifecycle.state is RecurringAssuranceLifecycleState.ACTIVE:
+        lifecycle_state_ok = (
+            lifecycle_state_ok
+            and recurring_deactivation is None
+            and recurring_lifecycle.deactivation_receipt_proof_hash is None
+            and recurring_lifecycle.active_until is None
+        )
+    elif recurring_lifecycle.state is RecurringAssuranceLifecycleState.DEACTIVATED:
+        lifecycle_state_ok = lifecycle_state_ok and recurring_deactivation is not None
+        if recurring_deactivation is not None:
+            deactivation_self_bound = (
+                recurring_deactivation.receipt_id
+                == "recoveryworks-recurring-assurance-service-deactivation:"
+                + recurring_deactivation.proof_hash
+            )
+            lifecycle_state_ok = (
+                lifecycle_state_ok
+                and deactivation_self_bound
+                and recurring_deactivation.activation_receipt_id
+                    == recurring_activation.receipt_id
+                and recurring_deactivation.activation_receipt_proof_hash
+                    == recurring_activation_hash
+                and recurring_deactivation.readiness_proof_hash
+                    == recurring_ready_hash
+                and recurring_deactivation.engagement_id == charter.engagement_id
+                and recurring_deactivation.buyer_id == charter.buyer_id
+                and recurring_lifecycle.deactivation_receipt_proof_hash
+                    == recurring_deactivation.proof_hash
+                and recurring_lifecycle.active_until
+                    == recurring_deactivation.deactivated_at
+                and _all_false(
+                    recurring_deactivation,
+                    (
+                        "automatic_refund_or_credit_enabled",
+                        "provider_mutation_enabled",
+                        "customer_scope_mutation_enabled",
+                        "external_actions_performed",
+                    ),
+                )
+            )
+    else:
+        lifecycle_state_ok = False
+
+    lifecycle_state_hashes = [recurring_ready_hash, recurring_activation_hash]
+    if recurring_deactivation_hash is not None:
+        lifecycle_state_hashes.append(recurring_deactivation_hash)
+    lifecycle_state_hashes.append(recurring_lifecycle_hash)
+    checks.append(
+        _check(
+            "RECURRING_LIFECYCLE_STATE_INTEGRITY",
+            lifecycle_state_ok,
+            "Recurring lifecycle state is self-bound and any deactivation binds the exact activation."
+            if lifecycle_state_ok
+            else "Recurring lifecycle state is skipped, forged, or uses a replayed deactivation receipt.",
+            *lifecycle_state_hashes,
+        )
+    )
+
+    chronology_values = [
         kickoff_authorization.authorized_at,
         kickoff_gate.checked_at,
         closeout.reviewed_at,
@@ -697,8 +788,10 @@ def verify_commercial_operational_invariants(
         invoice_receipt.delivered_at,
         payment_reconciliation.reconciled_at,
         recurring_activation.activated_at,
-        checked_at,
-    )
+    ]
+    if recurring_deactivation is not None:
+        chronology_values.append(recurring_deactivation.deactivated_at)
+    chronology_values.append(checked_at)
     chronology_ok = all(
         _instant(left) <= _instant(right)
         for left, right in zip(chronology_values, chronology_values[1:])
@@ -730,28 +823,29 @@ def verify_commercial_operational_invariants(
         )
     )
 
-    artifact_hashes = tuple(
-        sorted(
-            (
-                ("charter", charter_hash),
-                ("kickoff_authorization", kickoff_auth_hash),
-                ("kickoff_gate", kickoff_hash),
-                ("closeout", closeout_hash),
-                ("closeout_acknowledgment", ack_hash),
-                ("agreement", agreement_hash),
-                ("fee_readiness", readiness_hash),
-                ("billing_draft", draft_hash),
-                ("invoice_handoff", handoff_hash),
-                ("invoice_receipt", invoice_receipt_hash),
-                ("issued_invoice", invoice_hash),
-                ("payment_reconciliation", reconciliation_hash),
-                ("recurring_authorization", recurring_auth_hash),
-                ("recurring_readiness", recurring_ready_hash),
-                ("recurring_activation", recurring_activation_hash),
-                ("recurring_lifecycle", recurring_lifecycle_hash),
-            )
+    artifact_hash_items = [
+        ("charter", charter_hash),
+        ("kickoff_authorization", kickoff_auth_hash),
+        ("kickoff_gate", kickoff_hash),
+        ("closeout", closeout_hash),
+        ("closeout_acknowledgment", ack_hash),
+        ("agreement", agreement_hash),
+        ("fee_readiness", readiness_hash),
+        ("billing_draft", draft_hash),
+        ("invoice_handoff", handoff_hash),
+        ("invoice_receipt", invoice_receipt_hash),
+        ("issued_invoice", invoice_hash),
+        ("payment_reconciliation", reconciliation_hash),
+        ("recurring_authorization", recurring_auth_hash),
+        ("recurring_readiness", recurring_ready_hash),
+        ("recurring_activation", recurring_activation_hash),
+        ("recurring_lifecycle", recurring_lifecycle_hash),
+    ]
+    if recurring_deactivation_hash is not None:
+        artifact_hash_items.append(
+            ("recurring_deactivation", recurring_deactivation_hash)
         )
-    )
+    artifact_hashes = tuple(sorted(artifact_hash_items))
     state = (
         CommercialOperationalInvariantState.PASS
         if all(check.passed for check in checks)
