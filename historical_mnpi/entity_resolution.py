@@ -12,6 +12,7 @@ from datetime import date
 from enum import Enum
 import re
 
+from .case_model import CasePartyRole, CaseRegistry
 from .raw_artifacts import RawArtifactManifest, SourceArtifactRef
 from .source_registry import (
     SourceAdmissibility,
@@ -474,7 +475,202 @@ class EntityResolutionRegistry:
         })
 
 
+@dataclass(frozen=True)
+class CaseEntityCrosswalk:
+    """Proof-pinned mapping from a case-local identity to one durable identity."""
+
+    case_id: str
+    case_proof_hash: str
+    entity_kind: EntityKind
+    local_id: str
+    durable_entity_id: str
+    durable_entity_proof_hash: str
+    resolution: EntityResolutionResult
+
+    def __post_init__(self) -> None:
+        for name in ("case_id", "local_id", "durable_entity_id"):
+            if not _ID_RE.fullmatch(getattr(self, name)):
+                raise ValueError(f"invalid {name}")
+        for name in ("case_proof_hash", "durable_entity_proof_hash"):
+            if not re.fullmatch(r"^[0-9a-f]{64}$", getattr(self, name)):
+                raise ValueError(f"{name} must be SHA-256")
+        if self.resolution.entity_kind is not self.entity_kind:
+            raise ValueError("crosswalk resolution entity kind mismatch")
+        if self.resolution.state is not ResolutionState.RESOLVED:
+            raise ValueError("crosswalk requires one uniquely resolved entity")
+        if self.resolution.resolved_entity_id != self.durable_entity_id:
+            raise ValueError("crosswalk target does not match resolved entity")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "case_id": self.case_id,
+            "case_proof_hash": self.case_proof_hash,
+            "entity_kind": self.entity_kind.value,
+            "local_id": self.local_id,
+            "durable_entity_id": self.durable_entity_id,
+            "durable_entity_proof_hash": self.durable_entity_proof_hash,
+            "resolution_hash": self.resolution.proof_hash,
+        })
+
+
+def verify_case_entity_crosswalk(
+    crosswalk: CaseEntityCrosswalk,
+    *,
+    cases: CaseRegistry,
+    entities: EntityResolutionRegistry,
+) -> None:
+    case = cases.get(crosswalk.case_id)
+    if case.proof_hash != crosswalk.case_proof_hash:
+        raise ValueError("crosswalk case proof mismatch")
+
+    if crosswalk.entity_kind is EntityKind.ISSUER:
+        local = next(
+            (item for item in case.issuers if item.issuer_id == crosswalk.local_id),
+            None,
+        )
+        if local is None:
+            raise ValueError("crosswalk local issuer is not part of the case")
+        durable = entities.issuer(crosswalk.durable_entity_id)
+        if durable.proof_hash != crosswalk.durable_entity_proof_hash:
+            raise ValueError("crosswalk durable issuer proof mismatch")
+
+        if crosswalk.resolution.query_type == HistoricalIdentifierType.CIK.value:
+            if local.cik is None:
+                raise ValueError("case-local issuer has no CIK for this crosswalk")
+            expected = _normalize_identifier(
+                HistoricalIdentifierType.CIK,
+                local.cik,
+            )
+            if crosswalk.resolution.query_value != expected:
+                raise ValueError("crosswalk CIK query does not match case-local issuer")
+            recomputed = entities.resolve_issuer_identifier(
+                HistoricalIdentifierType.CIK,
+                expected,
+                as_of_date=crosswalk.resolution.as_of_date,
+            )
+        elif crosswalk.resolution.query_type == HistoricalIdentifierType.TICKER.value:
+            if local.ticker_at_case is None:
+                raise ValueError("case-local issuer has no ticker for this crosswalk")
+            if crosswalk.resolution.as_of_date is None:
+                raise ValueError("historical ticker crosswalk requires as_of_date")
+            expected = _normalize_identifier(
+                HistoricalIdentifierType.TICKER,
+                local.ticker_at_case,
+            )
+            if crosswalk.resolution.query_value != expected:
+                raise ValueError("crosswalk ticker query does not match case-local issuer")
+            recomputed = entities.resolve_issuer_identifier(
+                HistoricalIdentifierType.TICKER,
+                expected,
+                as_of_date=crosswalk.resolution.as_of_date,
+            )
+        elif crosswalk.resolution.query_type == "NAME_OR_ALIAS":
+            expected = _normalized_name(local.legal_name)
+            if crosswalk.resolution.query_value != expected:
+                raise ValueError("crosswalk name query does not match case-local issuer")
+            if crosswalk.resolution.as_of_date is not None:
+                raise ValueError("issuer name crosswalk cannot carry as_of_date")
+            recomputed = entities.resolve_issuer_name(local.legal_name)
+        else:
+            raise ValueError("unsupported issuer crosswalk query type")
+
+    elif crosswalk.entity_kind is EntityKind.TRADER:
+        local = next(
+            (item for item in case.parties if item.party_id == crosswalk.local_id),
+            None,
+        )
+        if local is None:
+            raise ValueError("crosswalk local party is not part of the case")
+        if CasePartyRole.TRADER not in local.roles:
+            raise ValueError("case-local party is not a trader")
+        durable = entities.trader(crosswalk.durable_entity_id)
+        if durable.proof_hash != crosswalk.durable_entity_proof_hash:
+            raise ValueError("crosswalk durable trader proof mismatch")
+        if crosswalk.resolution.query_type != "NAME_OR_ALIAS":
+            raise ValueError("trader crosswalk requires name/alias resolution")
+        expected = _normalized_name(local.display_name)
+        if crosswalk.resolution.query_value != expected:
+            raise ValueError("crosswalk name query does not match case-local trader")
+        if crosswalk.resolution.as_of_date is not None:
+            raise ValueError("trader name crosswalk cannot carry as_of_date")
+        recomputed = entities.resolve_trader_name(local.display_name)
+    else:
+        raise ValueError("unsupported crosswalk entity kind")
+
+    if recomputed.proof_hash != crosswalk.resolution.proof_hash:
+        raise ValueError("crosswalk resolution proof does not recompute")
+    if recomputed.state is not ResolutionState.RESOLVED:
+        raise ValueError("crosswalk resolution is no longer unique")
+    if recomputed.resolved_entity_id != crosswalk.durable_entity_id:
+        raise ValueError("crosswalk resolution target changed")
+
+
+class CaseEntityCrosswalkRegistry:
+    """Append-only case-local to durable-identity mappings."""
+
+    def __init__(self) -> None:
+        self._by_local: dict[tuple[str, str, str], CaseEntityCrosswalk] = {}
+
+    def register(
+        self,
+        crosswalk: CaseEntityCrosswalk,
+        *,
+        cases: CaseRegistry,
+        entities: EntityResolutionRegistry,
+    ) -> CaseEntityCrosswalk:
+        verify_case_entity_crosswalk(
+            crosswalk,
+            cases=cases,
+            entities=entities,
+        )
+        key = (
+            crosswalk.case_id,
+            crosswalk.entity_kind.value,
+            crosswalk.local_id,
+        )
+        existing = self._by_local.get(key)
+        if existing is not None:
+            if existing.proof_hash != crosswalk.proof_hash:
+                raise ValueError(
+                    "case-local identity already crosswalked with different content"
+                )
+            return existing
+        self._by_local[key] = crosswalk
+        return crosswalk
+
+    def get(
+        self,
+        case_id: str,
+        entity_kind: EntityKind,
+        local_id: str,
+    ) -> CaseEntityCrosswalk:
+        key = (case_id, entity_kind.value, local_id)
+        try:
+            return self._by_local[key]
+        except KeyError as exc:
+            raise KeyError("unknown case-local entity crosswalk") from exc
+
+    def all(self) -> tuple[CaseEntityCrosswalk, ...]:
+        return tuple(
+            self._by_local[key]
+            for key in sorted(self._by_local)
+        )
+
+    @property
+    def registry_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "crosswalk_hashes": [
+                item.proof_hash for item in self.all()
+            ],
+        })
+
+
 __all__ = [
+    "CaseEntityCrosswalk",
+    "CaseEntityCrosswalkRegistry",
     "EntityKind",
     "EntityResolutionRegistry",
     "EntityResolutionResult",
@@ -484,6 +680,7 @@ __all__ = [
     "IssuerIdentity",
     "ResolutionState",
     "TraderIdentity",
+    "verify_case_entity_crosswalk",
     "verify_issuer_identity",
     "verify_trader_identity",
 ]
