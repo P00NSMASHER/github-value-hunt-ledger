@@ -88,6 +88,11 @@ class FreightReviewCase:
     client_id: str
     counterparty_id: str
     load_id: str
+    invoice_number: str | None
+    invoice_carrier_name: str | None
+    origin: str | None
+    destination: str | None
+    service_date: str | None
     finding_type: str
     normalized_category: str | None
     state: str
@@ -348,6 +353,11 @@ def _build_case(
         "client_id": finding.client_id,
         "counterparty_id": finding.counterparty_id,
         "load_id": mapping.load_id,
+        "invoice_number": metadata.get("invoice_number"),
+        "invoice_carrier_name": metadata.get("invoice_carrier_name"),
+        "origin": metadata.get("origin"),
+        "destination": metadata.get("destination"),
+        "service_date": metadata.get("service_date"),
         "finding_type": mapped.finding_type.value,
         "normalized_category": mapped.normalized_category,
         "state": finding.state.value,
@@ -378,6 +388,26 @@ def _build_case(
         client_id=finding.client_id,
         counterparty_id=finding.counterparty_id,
         load_id=mapping.load_id,
+        invoice_number=(
+            str(metadata.get("invoice_number"))
+            if metadata.get("invoice_number") is not None else None
+        ),
+        invoice_carrier_name=(
+            str(metadata.get("invoice_carrier_name"))
+            if metadata.get("invoice_carrier_name") is not None else None
+        ),
+        origin=(
+            str(metadata.get("origin"))
+            if metadata.get("origin") is not None else None
+        ),
+        destination=(
+            str(metadata.get("destination"))
+            if metadata.get("destination") is not None else None
+        ),
+        service_date=(
+            str(metadata.get("service_date"))
+            if metadata.get("service_date") is not None else None
+        ),
         finding_type=mapped.finding_type.value,
         normalized_category=mapped.normalized_category,
         state=finding.state.value,
@@ -541,6 +571,11 @@ def render_freight_review_packet_markdown(packet: FreightReviewPacket) -> str:
             f"- Case: `{case.case_id}`",
             f"- Finding: `{case.finding_id}`",
             f"- Required action: **{case.action_hint}**",
+            f"- Invoice: **{case.invoice_number or 'not established'}**",
+            f"- Load: **{case.load_id}**",
+            f"- Carrier: **{case.invoice_carrier_name or case.counterparty_id}**",
+            f"- Lane: **{case.origin or 'unknown'} → {case.destination or 'unknown'}**",
+            f"- Service date: **{case.service_date or 'not established'}**",
             f"- Category: **{case.normalized_category or 'unclassified'}**",
             f"- Candidate recovery: **{_money(currency, case.calculation.candidate_recovery_cents)}**",
             f"- Component billed: **{_money(currency, case.calculation.component_billed_cents)}**",
