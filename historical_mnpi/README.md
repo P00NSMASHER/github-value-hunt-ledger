@@ -357,10 +357,17 @@ A proposal does not itself merge rows. `SAME_TRANSACTION` requires an explicit
 dedupe decision and cannot be recorded for a `DISTINCT` or `INSUFFICIENT`
 proposal.
 
+Cluster construction requires the exact reviewed `DedupeProposal` objects as
+well as the resulting decisions. Every proposal must still bind the current
+transaction hashes, canonical trader/issuer identities, and an
+`EXACT_SAME`/`POSSIBLE_SAME` relation; every decision must bind the exact
+proposal hash. A self-consistent decision object therefore cannot substitute a
+different or fabricated proposal at clustering time.
+
 An `EconomicTransactionCluster` requires a complete pairwise clique of explicit
-`SAME_TRANSACTION` decisions. This prevents fuzzy transitive closure from
-silently merging A≈B and B≈C when A and C have never been verified as the same
-trade.
+`SAME_TRANSACTION` decisions and their corresponding reviewed proposals. This
+prevents fuzzy transitive closure from silently merging A≈B and B≈C when A and C
+have never been verified as the same trade.
 
 Clusters preserve every member's original transaction hash, source reference,
 status reference, case ID, and fact status. Dedupe therefore removes double
