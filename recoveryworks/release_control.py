@@ -25,6 +25,10 @@ from recoveryworks.production_deployment import (
     ProductionCheckResult,
     ProductionDeploymentContract,
 )
+from recoveryworks.production_adversarial_certification import (
+    AdversarialCertificationState,
+    ProductionAdversarialCertification,
+)
 
 
 _IMAGE_RE = re.compile(r"^[^@\s]+@sha256:([0-9a-f]{64})$")
@@ -353,6 +357,7 @@ class EnvironmentPromotionGate:
     health_check_proof_hash: str
     readiness_check_proof_hash: str
     rollback_manifest_proof_hash: str | None
+    adversarial_certification_proof_hash: str | None
     gate_created_at: str
     promotion_ready: bool
     promotion_execution_enabled: bool = False
@@ -377,6 +382,15 @@ class EnvironmentPromotionGate:
                     self.rollback_manifest_proof_hash,
                 ),
             )
+        if self.adversarial_certification_proof_hash is not None:
+            object.__setattr__(
+                self,
+                "adversarial_certification_proof_hash",
+                normalize_sha256(
+                    "adversarial_certification_proof_hash",
+                    self.adversarial_certification_proof_hash,
+                ),
+            )
         if not isinstance(self.environment, ReleaseEnvironment):
             raise ValueError("environment must be ReleaseEnvironment")
         object.__setattr__(
@@ -397,11 +411,13 @@ class EnvironmentPromotionGate:
             raise ValueError(
                 f"{self.environment.value} promotion requires {required} approval(s)"
             )
-        if (
-            self.environment is ReleaseEnvironment.PRODUCTION
-            and self.rollback_manifest_proof_hash is None
-        ):
-            raise ValueError("production promotion requires a rollback manifest")
+        if self.environment is ReleaseEnvironment.PRODUCTION:
+            if self.rollback_manifest_proof_hash is None:
+                raise ValueError("production promotion requires a rollback manifest")
+            if self.adversarial_certification_proof_hash is None:
+                raise ValueError(
+                    "production promotion requires adversarial certification"
+                )
         expected = "recoveryworks-promotion-gate:" + canonical_hash(
             self._identity()
         )
@@ -419,6 +435,8 @@ class EnvironmentPromotionGate:
             "health_check_proof_hash": self.health_check_proof_hash,
             "readiness_check_proof_hash": self.readiness_check_proof_hash,
             "rollback_manifest_proof_hash": self.rollback_manifest_proof_hash,
+            "adversarial_certification_proof_hash":
+                self.adversarial_certification_proof_hash,
             "gate_created_at": self.gate_created_at,
             "promotion_ready": True,
             "promotion_execution_enabled": False,
@@ -459,6 +477,7 @@ def build_environment_promotion_gate(
     readiness_check: ProductionCheckResult,
     rollback_manifest: ReleaseRollbackManifest | None,
     gate_created_at: str,
+    adversarial_certification: ProductionAdversarialCertification | None = None,
 ) -> EnvironmentPromotionGate:
     for approval in approvals:
         if (
@@ -487,6 +506,47 @@ def build_environment_promotion_gate(
     if environment is ReleaseEnvironment.PRODUCTION and rollback_hash is None:
         raise ValueError("production promotion requires rollback manifest")
 
+    adversarial_certification_hash = None
+    if environment is ReleaseEnvironment.PRODUCTION:
+        if adversarial_certification is None:
+            raise ValueError(
+                "production promotion requires adversarial certification"
+            )
+        if not isinstance(
+            adversarial_certification, ProductionAdversarialCertification
+        ):
+            raise ValueError(
+                "adversarial certification has invalid artifact type"
+            )
+        if (
+            adversarial_certification.state
+            is not AdversarialCertificationState.PASS
+        ):
+            raise ValueError("adversarial certification did not pass")
+        if adversarial_certification.false_negative_count != 0:
+            raise ValueError(
+                "adversarial certification contains false negatives"
+            )
+        if adversarial_certification.source_revision != release.source_commit:
+            raise ValueError(
+                "adversarial certification source revision does not bind release"
+            )
+        if (
+            adversarial_certification.container_build_manifest_proof_hash
+            != release.container_build_manifest_proof_hash
+        ):
+            raise ValueError(
+                "adversarial certification build manifest does not bind release"
+            )
+        if (
+            adversarial_certification.external_actions_performed
+            or adversarial_certification.automatic_repair_performed
+        ):
+            raise ValueError(
+                "adversarial certification must remain read-only"
+            )
+        adversarial_certification_hash = adversarial_certification.proof_hash
+
     health_hash = _check_proof(
         health_check,
         "health",
@@ -507,6 +567,8 @@ def build_environment_promotion_gate(
         "health_check_proof_hash": health_hash,
         "readiness_check_proof_hash": readiness_hash,
         "rollback_manifest_proof_hash": rollback_hash,
+        "adversarial_certification_proof_hash":
+            adversarial_certification_hash,
         "gate_created_at": normalize_utc_timestamp(
             "gate_created_at", gate_created_at
         ),
@@ -524,6 +586,8 @@ def build_environment_promotion_gate(
         health_check_proof_hash=health_hash,
         readiness_check_proof_hash=readiness_hash,
         rollback_manifest_proof_hash=rollback_hash,
+        adversarial_certification_proof_hash=
+            adversarial_certification_hash,
         gate_created_at=gate_created_at,
         promotion_ready=True,
         promotion_execution_enabled=False,
