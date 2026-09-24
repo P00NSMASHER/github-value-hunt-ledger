@@ -494,9 +494,7 @@ class TruthEngine:
         else:
             verdict = "NOT_PROVEN"
 
-        evidence_set_hash = _sha(
-            sorted((row["id"], row["evidence_hash"]) for row in evidence)
-        )
+        evidence_set_hash = self._current_evidence_set_hash(claim_id)
         receipt_payload = {
             "claim_id": claim_id,
             "claim_hash": claim["claim_hash"],
@@ -624,6 +622,11 @@ class TruthEngine:
         claim = self._require_claim(claim_id)
         if receipt["claim_hash"] != claim["claim_hash"]:
             raise TruthEngineError("receipt claim hash no longer matches current claim")
+        current_evidence_hash = self._current_evidence_set_hash(claim_id)
+        if receipt["evidence_set_hash"] != current_evidence_hash:
+            raise TruthEngineError(
+                "truth receipt is stale because the real evidence set changed; re-evaluate first"
+            )
         evaluated_at = float(receipt["evaluated_at"])
         baseline_findings = {f["key"]: f for f in receipt["findings"]}
         obligation_map = {
@@ -1038,6 +1041,10 @@ class TruthEngine:
             """,
             (claim_id,),
         ).fetchall()
+
+    def _current_evidence_set_hash(self, claim_id: str) -> str:
+        rows = self._evidence_rows(claim_id)
+        return _sha(sorted((row["id"], row["evidence_hash"]) for row in rows))
 
     def _evidence_rows(self, claim_id: str):
         return self.runtime.conn.execute(
