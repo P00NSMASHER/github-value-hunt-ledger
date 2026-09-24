@@ -395,9 +395,10 @@ def _evidence_bundle(scenario: FreightAdversarialScenario) -> FreightAuditEviden
     )
 
 
-def run_adversarial_scenario(
+def build_adversarial_packet(
     scenario: FreightAdversarialScenario,
-) -> FreightAdversarialResult:
+):
+    """Build the integrated RecoveryOS packet for one frozen synthetic scenario."""
     domain = FreightAuditDomainAdapter().audit(
         scenario.rate_confirmation,
         scenario.invoice,
@@ -413,6 +414,13 @@ def run_adversarial_scenario(
     )
     findings = RecoveryEngine().scan(mapping.observations)
     packet = build_freight_review_packet(mapping, findings)
+    return mapping, findings, packet
+
+
+def run_adversarial_scenario(
+    scenario: FreightAdversarialScenario,
+) -> FreightAdversarialResult:
+    mapping, findings, packet = build_adversarial_packet(scenario)
 
     actual_states = tuple(sorted(case.state for case in packet.cases))
     actual_supplemental = tuple(
@@ -670,6 +678,7 @@ __all__ = [
     "FreightAdversarialScenario",
     "FreightAdversarialSummary",
     "adversarial_scenarios",
+    "build_adversarial_packet",
     "adversarial_summary_as_dict",
     "render_adversarial_validation_markdown",
     "run_adversarial_scenario",
