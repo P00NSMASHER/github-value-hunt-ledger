@@ -245,6 +245,8 @@ class EntityRegistry:
         source_registry: SourceRegistry,
         artifact_manifest: RawArtifactManifest,
     ) -> IdentifierBinding:
+        if artifact_manifest.source_registry_hash != source_registry.registry_hash:
+            raise ValueError("artifact manifest/source registry mismatch")
         entity = self.get_entity(binding.entity_id)
         if binding.scheme in {IdentifierScheme.CIK, IdentifierScheme.TICKER}:
             if entity.kind is not EntityKind.ISSUER:
@@ -295,6 +297,8 @@ class EntityRegistry:
         source_registry: SourceRegistry,
         artifact_manifest: RawArtifactManifest,
     ) -> CaseEntityResolution:
+        if artifact_manifest.source_registry_hash != source_registry.registry_hash:
+            raise ValueError("artifact manifest/source registry mismatch")
         case = cases.get(resolution.case_id)
         if case.proof_hash != resolution.case_proof_hash:
             raise ValueError("entity resolution case proof mismatch")
