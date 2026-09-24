@@ -80,7 +80,7 @@ jobs:
         run: |
           PYTHONPATH=. python freight/pilot_activation_packet.py freight/fixtures/readiness_ready.json /tmp/freight-launch-decision.json --format json > /tmp/freight-activation-packet.json
           grep -q '"BLIND_FREIGHT_AUDIT_ACCEPTANCE_TEST"' /tmp/freight-activation-packet.json
-          grep -q '"$15,000–$25,000 fixed"' /tmp/freight-activation-packet.json
+          grep -q '"Custom — confirmed in writing"' /tmp/freight-activation-packet.json
           grep -q '"incumbent_output"' /tmp/freight-activation-packet.json
           grep -q '"LATER_OUTCOME"' /tmp/freight-activation-packet.json
       - name: Generate prelaunch Pilot Charter
