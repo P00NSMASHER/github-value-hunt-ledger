@@ -53,6 +53,17 @@ class GovernanceControlPlaneTests(unittest.TestCase):
                 evidence={"attempt": "self-escalation"},
             )
 
+    def test_highest_risk_classes_cannot_bypass_human_approval(self):
+        with self.assertRaises(GovernanceError):
+            self.gov.set_agent_policy(
+                self.agent,
+                allowed_classes=["READ", "MONEY_MOVEMENT"],
+                human_approval_classes=[],
+                updated_by_principal="owner",
+                principal_kind="HUMAN",
+                evidence={"attempt": "unsafe-autonomy"},
+            )
+
     def test_read_action_can_be_authorized_without_approval(self):
         self.policy()
         decision = self.gov.request_action(
