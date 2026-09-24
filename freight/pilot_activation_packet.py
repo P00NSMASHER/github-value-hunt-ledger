@@ -1,9 +1,11 @@
-"""Legacy/custom fixed-fee Pilot Activation Packet for Freight Recovery.
+"""Secondary custom fixed-fee Pilot Activation Packet for Freight Recovery.
 
-The flagship commercial path now uses the free-audit qualification flow and
-``freight.recovery_engagement``. This catalog is retained for previously
-accepted terms and optional fixed-fee forensic work so the underlying delivery
-capability is not destroyed.
+The flagship commercial path uses the free-audit qualification flow and
+``freight.recovery_engagement``. This packet preserves the underlying
+diagnostic and blind-audit capabilities for optional fixed-fee work without
+publishing a universal fixed-price band. The buyer-specific fixed fee is bound
+later in the Charter/governing terms. Historical packets that contain an
+explicit price band remain verifiable by downstream compatibility logic.
 """
 from __future__ import annotations
 
@@ -43,15 +45,17 @@ class ActivationPacket:
     commercial_invariants:tuple[str,...]
     activation_hash:str
 
+CUSTOM_FIXED_FEE_LABEL="Custom — confirmed in writing"
+
 OFFER_CATALOG={
     "DATA_READINESS_DIAGNOSTIC": {
         "name":"Data Readiness / Authority Diagnostic",
-        "price_band_usd":"$5,000–$7,500 fixed",
+        "price_band_usd":CUSTOM_FIXED_FEE_LABEL,
         "turnaround":None,
     },
     "BLIND_FREIGHT_AUDIT_ACCEPTANCE_TEST": {
         "name":"Blind Freight Audit Acceptance Test",
-        "price_band_usd":"$15,000–$25,000 fixed",
+        "price_band_usd":CUSTOM_FIXED_FEE_LABEL,
         "turnaround":"10–15 business days after complete inputs",
     },
 }
@@ -163,7 +167,7 @@ def render_markdown(packet:ActivationPacket)->str:
     lines=["# Freight Recovery — Optional Fixed-Fee Pilot Activation Packet","",
         f"**Readiness:** {packet.readiness_status} ({packet.readiness_score}/100)",
         f"**Selected offer:** {packet.offer_name}",
-        f"**Custom fixed-fee price band:** {packet.price_band_usd}",
+        f"**Fixed-fee pricing:** {packet.price_band_usd}",
         f"**Launch status:** {packet.launch_status}",
         f"**Launch route:** {packet.launch_route}",
         f"**Activation hash:** `{packet.activation_hash}`",""]
