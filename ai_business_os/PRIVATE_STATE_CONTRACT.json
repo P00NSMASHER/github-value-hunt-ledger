@@ -1,0 +1,19 @@
+{
+  "version": "private-state-boundary-v1",
+  "public_repository_role": "source_code_tests_contracts_sanitized_migrations_and_manifests",
+  "private_operating_authority": {
+    "schema": "ai_business_os_prod",
+    "mutable_runtime_state": true
+  },
+  "public_migration_policy": "schema_and_controls_may_be_public; live provider/customer seed identifiers must be placeholders",
+  "prohibited_public_classes": [
+    "credentials",
+    "live_connector_account_identifiers",
+    "customer_or_prospect_pii",
+    "raw_messages",
+    "raw_financial_records",
+    "live_approval_payloads",
+    "customer_documents",
+    "mutable_runtime_databases"
+  ]
+}
