@@ -463,3 +463,9 @@ Release security now has a deterministic component inventory/SBOM over the diges
 A container attestation-input artifact binds the release, image digest, source commit, build proof, and SBOM proof to a SLSA provenance predicate type while explicitly recording that signing and publication have not occurred. A separate external vulnerability-scan receipt contract binds the exact image digest, scanner/version, vulnerability-database identity/digest, scan time, severity counts, and verified source receipt.
 
 The release security gate requires a verified scan for the exact image and enforces configured critical/high severity thresholds. Passing yields SECURITY_GATE_READY while signing_performed, attestation_published, and image_published remain false.
+
+## External security evidence verification bridge (step 17b)
+
+The internal RecoveryWorks component inventory can now be exported as deterministic CycloneDX 1.5 JSON bound to the exact release and SBOM proof. External signature-verification and provenance-verification receipts are modeled as separate verified artifacts and must bind the exact release proof, image digest, source commit, build-manifest proof, and SBOM proof.
+
+The bridge also reuses the exact vulnerability-scan receipt from step 17a. A verified security-evidence bundle is produced only when the security gate, CycloneDX export, vulnerability scan, signature receipt, and SLSA provenance receipt all bind the same release. RecoveryOS does not perform signing, scanning, registry publication, or attestation publication itself.
