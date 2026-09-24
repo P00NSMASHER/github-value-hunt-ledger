@@ -157,7 +157,7 @@ Use recoveryworks.integrations.cletrics_continuous.run_continuous_cletrics_scan 
 - verification flags;
 - client and currency scope.
 
-An exact repeat is omitted from financial reprocessing. A changed rate, discount, commitment, allocation, or verification flag produces a new fingerprint and is processed again. The private receipt registry is independently hash-verified and does not modify Recovery Ledger history.
+An exact repeat is omitted from financial reprocessing. A changed bundle, rate, discount, commitment, allocation, or verification flag produces a new fingerprint. If that fingerprint targets a cloud billing scope already processed for the same provider/account/period/mode, continuous ingestion returns supersession_required instead of silently creating a second finding. The private receipt registry is independently hash-verified and does not modify Recovery Ledger history.
 
 ### Separate financial surfaces
 
