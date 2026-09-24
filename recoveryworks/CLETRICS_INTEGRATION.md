@@ -433,3 +433,9 @@ ContainerBuildManifest binds the full Git commit, base-image digest, Dockerfile 
 Production observability now has structured hash-chained run events, a stable failure taxonomy, provider/job health metrics, recovery/savings/diagnostic metric snapshots, alert-ready records, immutable run manifests, and a private hash-chained run-history store.
 
 Successful pilot observability verifies the assurance-report proof hash before recording it. Alerts are emitted for supersession review, recovery evidence review, and fail-closed scan exceptions; they do not mutate cases or infrastructure. The history store rejects duplicate run ids, sequence gaps, previous-hash breaks, entry tampering, and head-hash mismatches.
+
+## Immutable release and promotion gates (step 15a)
+
+Release control now binds the full source commit, source-build manifest proof, exact digest-pinned container image, and production-deployment proof into one immutable release candidate. A rollback manifest binds the candidate to a previous verified release/image/source commit.
+
+Environment promotion gates require passing health/readiness checks for the exact deployment proof plus release approvals bound to the exact release/environment. Production requires two distinct approvers and a rollback manifest. The resulting gate is READY_FOR_SEPARATE_PROMOTION_ACTION but promotion_execution_enabled and deployment_performed remain false. Private release manifest, approval, rollback, and gate artifacts can be written for a later external promotion workflow.
