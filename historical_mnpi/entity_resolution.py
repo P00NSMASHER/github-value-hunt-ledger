@@ -349,6 +349,48 @@ class EntityRegistry:
         except KeyError as exc:
             raise KeyError("unknown entity_id: " + entity_id) from exc
 
+    def get_resolution(self, resolution_id: str) -> CaseEntityResolution:
+        try:
+            return self._resolutions[resolution_id]
+        except KeyError as exc:
+            raise KeyError("unknown resolution_id: " + resolution_id) from exc
+
+    def resolutions_for_local(
+        self,
+        case_id: str,
+        local_id: str,
+        entity_kind: EntityKind,
+    ) -> tuple[CaseEntityResolution, ...]:
+        return tuple(sorted(
+            (
+                item for item in self._resolutions.values()
+                if item.case_id == case_id
+                and item.local_id == local_id
+                and item.entity_kind is entity_kind
+            ),
+            key=lambda item: item.resolution_id,
+        ))
+
+    def resolved_entity_for(
+        self,
+        case_id: str,
+        local_id: str,
+        entity_kind: EntityKind,
+    ) -> CanonicalEntity:
+        matches = self.resolutions_for_local(case_id, local_id, entity_kind)
+        resolved = tuple(
+            item for item in matches
+            if item.status is ResolutionStatus.RESOLVED
+        )
+        if len(resolved) != 1:
+            raise ValueError(
+                "local identity does not have exactly one resolved canonical entity"
+            )
+        entity_id = resolved[0].canonical_entity_id
+        if entity_id is None:
+            raise ValueError("resolved identity is missing canonical entity")
+        return self.get_entity(entity_id)
+
     def bindings_for(self, entity_id: str) -> tuple[IdentifierBinding, ...]:
         self.get_entity(entity_id)
         return tuple(sorted(
