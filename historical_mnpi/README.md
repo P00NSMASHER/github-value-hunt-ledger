@@ -318,3 +318,36 @@ records every assessed claim and every contradictory claim ID.
 If equal-priority controlling sources disagree, the fact remains
 `AMBIGUOUS` with no selected value. The system therefore cannot resolve a
 top-tier contradiction simply by insertion order.
+
+
+## Step 11 — economic transaction deduplication
+
+Multiple normalized rows may describe one underlying economic trade. Step 11
+compares them conservatively using:
+
+- durable canonical trader identity;
+- durable canonical issuer identity;
+- compatible trade-time windows;
+- shared economic fields such as side, instrument, quantity, execution price,
+  amount, strike, and expiry.
+
+The comparator emits one of:
+
+- `EXACT_SAME`
+- `POSSIBLE_SAME`
+- `DISTINCT`
+- `INSUFFICIENT`
+
+A proposal does not itself merge rows. `SAME_TRANSACTION` requires an explicit
+dedupe decision and cannot be recorded for a `DISTINCT` or `INSUFFICIENT`
+proposal.
+
+An `EconomicTransactionCluster` requires a complete pairwise clique of explicit
+`SAME_TRANSACTION` decisions. This prevents fuzzy transitive closure from
+silently merging A≈B and B≈C when A and C have never been verified as the same
+trade.
+
+Clusters preserve every member's original transaction hash, source reference,
+status reference, case ID, and fact status. Dedupe therefore removes double
+counting without deleting provenance or collapsing complaint/judgment/academic
+evidence into one source.
