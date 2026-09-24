@@ -218,6 +218,8 @@ def resolve_fact_conflict(
     policy: SourcePriorityPolicy | None = None,
 ) -> ConflictResolution:
     claim_tuple = tuple(claims)
+    if artifact_manifest.source_registry_hash != source_registry.registry_hash:
+        raise ValueError("artifact manifest/source registry mismatch")
     if not claim_tuple:
         raise ValueError("at least one fact claim is required")
     first = claim_tuple[0]
