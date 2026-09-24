@@ -136,6 +136,7 @@ class CaseState(str, Enum):
     CLAIMED = "CLAIMED"
     RECOVERED = "RECOVERED"
     REJECTED = "REJECTED"
+    SUPERSEDED = "SUPERSEDED"
 
 
 def canonical_hash(payload: Mapping[str, Any] | list[Any]) -> str:

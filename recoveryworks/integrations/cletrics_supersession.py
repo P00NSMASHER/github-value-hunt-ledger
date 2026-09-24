@@ -14,6 +14,7 @@ from recoveryworks.models import (
     canonical_hash,
     freeze_json,
     normalize_sha256,
+    normalize_utc_timestamp,
 )
 from .cletrics import CletricsCloudBundle
 from .cletrics_registry import CletricsProcessingReceipt
@@ -38,6 +39,8 @@ class CloudSupersessionCandidate:
     billing_account_id: str
     period_start: str
     period_end: str
+    prior_exported_at: str
+    proposed_exported_at: str
     prior_bundle_sha256: str
     proposed_bundle_sha256: str
     prior_manifest_sha256: str
@@ -74,6 +77,16 @@ class CloudSupersessionCandidate:
             raise ValueError("period_end cannot predate period_start")
         object.__setattr__(self, "period_start", start)
         object.__setattr__(self, "period_end", end)
+        object.__setattr__(
+            self,
+            "prior_exported_at",
+            normalize_utc_timestamp("prior_exported_at", self.prior_exported_at),
+        )
+        object.__setattr__(
+            self,
+            "proposed_exported_at",
+            normalize_utc_timestamp("proposed_exported_at", self.proposed_exported_at),
+        )
 
         prior_hashes = {
             str(key): normalize_sha256(f"prior_authority_hashes.{key}", value)
@@ -133,6 +146,8 @@ class CloudSupersessionCandidate:
             "billing_account_id": self.billing_account_id,
             "period_start": self.period_start,
             "period_end": self.period_end,
+            "prior_exported_at": self.prior_exported_at,
+            "proposed_exported_at": self.proposed_exported_at,
             "prior_bundle_sha256": self.prior_bundle_sha256,
             "proposed_bundle_sha256": self.proposed_bundle_sha256,
             "prior_manifest_sha256": self.prior_manifest_sha256,
@@ -196,6 +211,8 @@ def build_cloud_supersession_candidate(
         "billing_account_id": prior.billing_account_id,
         "period_start": prior.period_start,
         "period_end": prior.period_end,
+        "prior_exported_at": prior.exported_at,
+        "proposed_exported_at": proposed_bundle.exported_at,
         "prior_bundle_sha256": prior.bundle_sha256,
         "proposed_bundle_sha256": proposed_bundle.bundle_sha256,
         "prior_manifest_sha256": prior.manifest_sha256,
@@ -216,6 +233,8 @@ def build_cloud_supersession_candidate(
         billing_account_id=prior.billing_account_id,
         period_start=prior.period_start,
         period_end=prior.period_end,
+        prior_exported_at=prior.exported_at,
+        proposed_exported_at=proposed_bundle.exported_at,
         prior_bundle_sha256=prior.bundle_sha256,
         proposed_bundle_sha256=proposed_bundle.bundle_sha256,
         prior_manifest_sha256=prior.manifest_sha256,
@@ -225,4 +244,135 @@ def build_cloud_supersession_candidate(
         prior_verification_flags=prior.verification_flags,
         proposed_verification_flags=proposed_verification_flags,
         change_reasons=tuple(reasons),
+    )
+
+
+@dataclass(frozen=True)
+class CloudSupersessionBinding:
+    reference: str
+    incumbent_finding_id: str | None
+    incumbent_proof_hash: str | None
+    incumbent_case_state: str | None
+    replacement_finding_id: str | None
+    replacement_proof_hash: str | None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.reference, str) or not self.reference.strip():
+            raise ValueError("reference is required")
+        object.__setattr__(self, "reference", self.reference.strip())
+        pairs = (
+            ("incumbent", self.incumbent_finding_id, self.incumbent_proof_hash),
+            ("replacement", self.replacement_finding_id, self.replacement_proof_hash),
+        )
+        present = 0
+        for label, finding_id, proof_hash in pairs:
+            if finding_id is None and proof_hash is None:
+                continue
+            if finding_id is None or proof_hash is None:
+                raise ValueError(f"{label} finding id/proof must be supplied together")
+            if not isinstance(finding_id, str) or not finding_id.strip():
+                raise ValueError(f"{label}_finding_id is required")
+            normalize_sha256(f"{label}_proof_hash", proof_hash)
+            present += 1
+        if present == 0:
+            raise ValueError("supersession binding must contain incumbent or replacement")
+        if self.incumbent_case_state is not None and self.incumbent_finding_id is None:
+            raise ValueError("incumbent_case_state requires an incumbent finding")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({"schema": 1, **asdict(self)})
+
+
+@dataclass(frozen=True)
+class CloudSupersessionApproval:
+    approval_id: str
+    candidate_id: str
+    candidate_proof_hash: str
+    reviewer_id: str
+    review_note: str
+    approved_at: str
+    bindings: tuple[CloudSupersessionBinding, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "candidate_proof_hash",
+            normalize_sha256("candidate_proof_hash", self.candidate_proof_hash),
+        )
+        for name in ("candidate_id", "reviewer_id", "review_note"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} is required")
+            object.__setattr__(self, name, value.strip())
+        object.__setattr__(
+            self,
+            "approved_at",
+            normalize_utc_timestamp("approved_at", self.approved_at),
+        )
+        bindings = tuple(sorted(self.bindings, key=lambda item: item.reference))
+        if len({item.reference for item in bindings}) != len(bindings):
+            raise ValueError("supersession approval has duplicate references")
+        for binding in bindings:
+            if binding.incumbent_case_state not in {None, "REVIEW", "VALIDATED"}:
+                raise ValueError(
+                    "only REVIEW/VALIDATED incumbents may be superseded"
+                )
+        object.__setattr__(self, "bindings", bindings)
+        expected = "cloud-supersession-approval:" + canonical_hash(self._identity())
+        if self.approval_id != expected:
+            raise ValueError("approval_id does not bind the supersession approval")
+
+    def _identity(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "candidate_id": self.candidate_id,
+            "candidate_proof_hash": self.candidate_proof_hash,
+            "reviewer_id": self.reviewer_id,
+            "review_note": self.review_note,
+            "approved_at": self.approved_at,
+            "binding_hashes": [binding.proof_hash for binding in self.bindings],
+        }
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash(self._identity())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            **asdict(self),
+            "proof_hash": self.proof_hash,
+            "decision": "APPROVE",
+        }
+
+
+def approve_cloud_supersession(
+    candidate: CloudSupersessionCandidate,
+    *,
+    bindings: tuple[CloudSupersessionBinding, ...],
+    reviewer_id: str,
+    review_note: str,
+    approved_at: str,
+) -> CloudSupersessionApproval:
+    approved_at = normalize_utc_timestamp("approved_at", approved_at)
+    identity = {
+        "schema": 1,
+        "candidate_id": candidate.candidate_id,
+        "candidate_proof_hash": candidate.proof_hash,
+        "reviewer_id": reviewer_id.strip(),
+        "review_note": review_note.strip(),
+        "approved_at": approved_at,
+        "binding_hashes": [
+            binding.proof_hash
+            for binding in sorted(bindings, key=lambda item: item.reference)
+        ],
+    }
+    return CloudSupersessionApproval(
+        approval_id="cloud-supersession-approval:" + canonical_hash(identity),
+        candidate_id=candidate.candidate_id,
+        candidate_proof_hash=candidate.proof_hash,
+        reviewer_id=reviewer_id,
+        review_note=review_note,
+        approved_at=approved_at,
+        bindings=bindings,
     )

@@ -236,3 +236,17 @@ This is intentionally only the first half of the supersession workflow. No
 candidate can yet reject the incumbent finding, admit a replacement finding,
 or change report counting. Those review/ledger transitions remain behind the
 next approval gate.
+
+## Reviewed supersession workflow (step 3b)
+
+Supersession now preserves historical proof instead of deleting old findings.
+A reviewer approves a hash-bound set of per-charge bindings. Each binding may
+represent incumbent -> replacement, incumbent -> no-longer-recoverable, or
+newly-recoverable -> replacement-only.
+
+Only REVIEW and VALIDATED incumbents are eligible. AUTHORIZED, CLAIMED, and
+RECOVERED cases fail closed and require a separate case-management process.
+Approved incumbents transition to SUPERSEDED with the exact approval hash and
+optional replacement finding id. Recovery Scan 360 excludes SUPERSEDED amounts
+from active potential/validated totals while retaining superseded_cents and the
+historical case record.

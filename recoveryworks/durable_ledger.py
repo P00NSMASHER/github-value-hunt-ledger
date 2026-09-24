@@ -207,6 +207,33 @@ class DurableRecoveryLedger(RecoveryLedger):
         }, occurred_at=record.updated_at)
         return record
 
+    def supersede(
+        self,
+        finding_id: str,
+        *,
+        replacement_finding_id: str | None,
+        approval_hash: str,
+        reviewer_id: str,
+        note: str,
+        occurred_at: str | None = None,
+    ):
+        occurred_at = self._event_time(occurred_at)
+        record = super().supersede(
+            finding_id,
+            replacement_finding_id=replacement_finding_id,
+            approval_hash=approval_hash,
+            reviewer_id=reviewer_id,
+            note=note,
+            occurred_at=occurred_at,
+        )
+        self.journal.append("SUPERSEDE", finding_id, {
+            "replacement_finding_id": record.superseded_by_finding_id,
+            "approval_hash": record.supersession_approval_hash,
+            "reviewer_id": record.reviewer_id,
+            "review_note": record.review_note,
+        }, occurred_at=record.updated_at)
+        return record
+
     def reject(
         self,
         finding_id: str,
@@ -316,6 +343,15 @@ class DurableRecoveryLedger(RecoveryLedger):
                     event.finding_id,
                     settlement_from_payload(data["settlement"]),
                     data.get("fee_cents", 0),
+                    occurred_at=event.occurred_at,
+                )
+            elif action == "SUPERSEDE":
+                ledger.supersede(
+                    event.finding_id,
+                    replacement_finding_id=data.get("replacement_finding_id"),
+                    approval_hash=data["approval_hash"],
+                    reviewer_id=data["reviewer_id"],
+                    note=data["review_note"],
                     occurred_at=event.occurred_at,
                 )
             elif action == "REJECT":

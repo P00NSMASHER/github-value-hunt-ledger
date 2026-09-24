@@ -54,6 +54,7 @@ def build_scan360_report(ledger: RecoveryLedger, client_id: str) -> RecoveryScan
         "recovered_cents": 0,
         "fee_cents": 0,
         "rejected_cents": 0,
+        "superseded_cents": 0,
     }
     branches: dict[str, dict[str, int]] = {}
     case_states: dict[str, dict[str, int]] = {}
@@ -63,12 +64,15 @@ def build_scan360_report(ledger: RecoveryLedger, client_id: str) -> RecoveryScan
         finding = record.finding
         amount = finding.potential_recovery_cents
         totals["cases"] += 1
-        totals["potential_cents"] += amount
-
-        if finding.state is FindingState.REVIEW:
-            totals["review_cents"] += amount
-        elif finding.state is FindingState.VALIDATED:
-            totals["validated_cents"] += amount
+        superseded = record.case_state is CaseState.SUPERSEDED
+        if superseded:
+            totals["superseded_cents"] += amount
+        else:
+            totals["potential_cents"] += amount
+            if finding.state is FindingState.REVIEW:
+                totals["review_cents"] += amount
+            elif finding.state is FindingState.VALIDATED:
+                totals["validated_cents"] += amount
 
         if record.case_state is CaseState.AUTHORIZED:
             totals["authorized_cents"] += amount
@@ -84,13 +88,17 @@ def build_scan360_report(ledger: RecoveryLedger, client_id: str) -> RecoveryScan
             "cases": 0,
             "potential_cents": 0,
             "validated_cents": 0,
+            "superseded_cents": 0,
             "recovered_cents": 0,
             "fee_cents": 0,
         })
         branch["cases"] += 1
-        branch["potential_cents"] += amount
-        if finding.state is FindingState.VALIDATED:
-            branch["validated_cents"] += amount
+        if superseded:
+            branch["superseded_cents"] += amount
+        else:
+            branch["potential_cents"] += amount
+            if finding.state is FindingState.VALIDATED:
+                branch["validated_cents"] += amount
         branch["recovered_cents"] += record.recovered_cents
         branch["fee_cents"] += record.fee_cents
 

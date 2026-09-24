@@ -19,6 +19,7 @@ from .models import (
     SettlementEvidence,
     canonical_hash,
     normalize_utc_timestamp,
+    normalize_sha256,
 )
 from .policies import assert_claim_authorizable
 from .readiness import (
@@ -47,6 +48,8 @@ class LedgerRecord:
     settlement_id: str | None = None
     settlement_evidence_hash: str | None = None
     settlement_observed_at: str | None = None
+    superseded_by_finding_id: str | None = None
+    supersession_approval_hash: str | None = None
     recovered_cents: int = 0
     fee_cents: int = 0
     updated_at: str | None = None
@@ -393,6 +396,44 @@ class RecoveryLedger:
         self._records[finding_id] = updated
         self._settlement_id_index[settlement_key] = finding_id
         self._settlement_source_index[source_key] = finding_id
+        return updated
+
+    def supersede(
+        self,
+        finding_id: str,
+        *,
+        replacement_finding_id: str | None,
+        approval_hash: str,
+        reviewer_id: str,
+        note: str,
+        occurred_at: str | None = None,
+    ) -> LedgerRecord:
+        reviewer_id = self._text("reviewer_id", reviewer_id)
+        note = self._text("supersession note", note)
+        approval_hash = normalize_sha256("approval_hash", approval_hash)
+        replacement = None
+        if replacement_finding_id is not None:
+            replacement = self._text(
+                "replacement_finding_id", replacement_finding_id
+            )
+            if replacement == finding_id:
+                raise ValueError("replacement finding must differ from incumbent")
+        record = self.get(finding_id)
+        self._require_state(
+            record,
+            {CaseState.REVIEW, CaseState.VALIDATED},
+            "supersession",
+        )
+        updated = replace(
+            record,
+            case_state=CaseState.SUPERSEDED,
+            reviewer_id=reviewer_id,
+            review_note=note,
+            superseded_by_finding_id=replacement,
+            supersession_approval_hash=approval_hash,
+            updated_at=self._transition_time(record, occurred_at),
+        )
+        self._records[finding_id] = updated
         return updated
 
     def reject(

@@ -179,6 +179,36 @@ class CletricsReceiptRegistry:
         fingerprint = normalize_sha256("job_fingerprint", job_fingerprint)
         return fingerprint in self._read()[1]
 
+    def replace(
+        self,
+        *,
+        prior_job_fingerprint: str,
+        replacement: CletricsProcessingReceipt,
+    ) -> str:
+        prior = normalize_sha256("prior_job_fingerprint", prior_job_fingerprint)
+        with private_file_lock(self.lock_path):
+            _, current = self._read()
+            if prior not in current:
+                raise ValueError("prior Cletrics processing receipt is missing")
+            if replacement.job_fingerprint in current and replacement.job_fingerprint != prior:
+                raise ValueError("replacement processing receipt already exists")
+            del current[prior]
+            current[replacement.job_fingerprint] = replacement
+            payload = {
+                "receipts": [current[key].as_dict() for key in sorted(current)]
+            }
+            state_hash = hashlib.sha256(_canonical_bytes(payload)).hexdigest()
+            envelope = {
+                "schema": 1,
+                "state_hash": state_hash,
+                "payload": payload,
+            }
+            atomic_private_write(
+                self.path,
+                _canonical_bytes(envelope) + b"\n",
+            )
+            return state_hash
+
     def record(
         self,
         receipts: Iterable[CletricsProcessingReceipt],
