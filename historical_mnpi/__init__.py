@@ -70,6 +70,16 @@ from .review_queue import (
     render_review_item_markdown,
 )
 
+from .entity_resolution import (
+    CanonicalEntity,
+    CaseEntityResolution,
+    EntityKind,
+    EntityRegistry,
+    IdentifierBinding,
+    IdentifierScheme,
+    ResolutionStatus,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -80,6 +90,13 @@ from .source_registry import (
 )
 
 __all__ = [
+    "CanonicalEntity",
+    "CaseEntityResolution",
+    "EntityKind",
+    "EntityRegistry",
+    "IdentifierBinding",
+    "IdentifierScheme",
+    "ResolutionStatus",
     "HistoricalReviewDecision",
     "HistoricalReviewQueue",
     "ReviewChecks",
