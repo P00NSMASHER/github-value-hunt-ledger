@@ -11,6 +11,10 @@ from recoveryworks.production_deployment import (
     check_production_health,
     check_production_readiness,
 )
+from recoveryworks.production_adversarial_certification import (
+    current_repository_revision,
+    run_commercial_adversarial_certification,
+)
 from recoveryworks.release_control import (
     ReleaseEnvironment,
     approve_release,
@@ -20,6 +24,7 @@ from recoveryworks.release_control import (
     write_release_control_artifacts,
 )
 from recoveryworks.private_io import private_permissions_verified
+from recoveryworks.test_commercial_operational_invariants import full_chain
 
 
 def production_spec(root: Path, image_ref: str) -> dict:
@@ -152,7 +157,13 @@ class ReleaseControlTests(unittest.TestCase):
             root = Path(d)
             image = "registry.example/recoveryworks@sha256:" + "c" * 64
             deployment = self.deployment(root, image)
-            build = self.build_manifest("a" * 40)
+            build = self.build_manifest(current_repository_revision())
+            certification = run_commercial_adversarial_certification(
+                full_chain,
+                build_manifest=build,
+                seed=42001,
+                iterations_per_vector=2,
+            )
             current = build_release_manifest(
                 version="1.0.0",
                 build_manifest=build,
@@ -205,10 +216,15 @@ class ReleaseControlTests(unittest.TestCase):
                 readiness_check=check_production_readiness(deployment),
                 rollback_manifest=rollback,
                 gate_created_at="2026-09-24T13:08:00Z",
+                adversarial_certification=certification,
             )
             self.assertTrue(gate.promotion_ready)
             self.assertFalse(gate.promotion_execution_enabled)
             self.assertFalse(gate.deployment_performed)
+            self.assertEqual(
+                gate.adversarial_certification_proof_hash,
+                certification.proof_hash,
+            )
             self.assertEqual(
                 gate.as_dict()["state"],
                 "READY_FOR_SEPARATE_PROMOTION_ACTION",
@@ -252,6 +268,134 @@ class ReleaseControlTests(unittest.TestCase):
                     readiness_check=check_production_readiness(deployment),
                     rollback_manifest=None,
                     gate_created_at="2026-09-24T13:02:00Z",
+                )
+
+    def test_production_gate_fails_without_adversarial_certification(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            image = "registry.example/recoveryworks@sha256:" + "7" * 64
+            deployment = self.deployment(root, image)
+            build = self.build_manifest(current_repository_revision())
+            release = build_release_manifest(
+                version="1.0.0",
+                build_manifest=build,
+                deployment=deployment,
+                container_image_ref=image,
+                created_at="2026-09-24T13:00:00Z",
+            )
+            previous_image = (
+                "registry.example/recoveryworks@sha256:" + "8" * 64
+            )
+            previous = build_release_manifest(
+                version="0.9.0",
+                build_manifest=self.build_manifest("b" * 40),
+                deployment=self.deployment(root / "previous", previous_image),
+                container_image_ref=previous_image,
+                created_at="2026-09-23T13:00:00Z",
+            )
+            rollback = build_rollback_manifest(
+                release,
+                previous,
+                reason="Known-good rollback target.",
+                created_at="2026-09-24T13:05:00Z",
+            )
+            approvals = (
+                approve_release(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approver_id="release-manager",
+                    role="RELEASE_MANAGER",
+                    approved_at="2026-09-24T13:06:00Z",
+                ),
+                approve_release(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approver_id="operations-owner",
+                    role="OPERATIONS_OWNER",
+                    approved_at="2026-09-24T13:07:00Z",
+                ),
+            )
+            with self.assertRaisesRegex(
+                ValueError, "requires adversarial certification"
+            ):
+                build_environment_promotion_gate(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approvals=approvals,
+                    health_check=check_production_health(deployment),
+                    readiness_check=check_production_readiness(deployment),
+                    rollback_manifest=rollback,
+                    gate_created_at="2026-09-24T13:08:00Z",
+                )
+
+    def test_production_gate_rejects_certification_from_other_build(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            image = "registry.example/recoveryworks@sha256:" + "9" * 64
+            deployment = self.deployment(root, image)
+            current_build = self.build_manifest(current_repository_revision())
+            release = build_release_manifest(
+                version="1.0.0",
+                build_manifest=current_build,
+                deployment=deployment,
+                container_image_ref=image,
+                created_at="2026-09-24T13:00:00Z",
+            )
+            certification = run_commercial_adversarial_certification(
+                full_chain,
+                build_manifest=current_build,
+                seed=42002,
+                iterations_per_vector=1,
+            )
+            object.__setattr__(
+                certification,
+                "container_build_manifest_proof_hash",
+                "f" * 64,
+            )
+            previous_image = (
+                "registry.example/recoveryworks@sha256:" + "a" * 64
+            )
+            previous = build_release_manifest(
+                version="0.9.0",
+                build_manifest=self.build_manifest("b" * 40),
+                deployment=self.deployment(root / "previous", previous_image),
+                container_image_ref=previous_image,
+                created_at="2026-09-23T13:00:00Z",
+            )
+            rollback = build_rollback_manifest(
+                release,
+                previous,
+                reason="Known-good rollback target.",
+                created_at="2026-09-24T13:05:00Z",
+            )
+            approvals = (
+                approve_release(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approver_id="release-manager",
+                    role="RELEASE_MANAGER",
+                    approved_at="2026-09-24T13:06:00Z",
+                ),
+                approve_release(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approver_id="operations-owner",
+                    role="OPERATIONS_OWNER",
+                    approved_at="2026-09-24T13:07:00Z",
+                ),
+            )
+            with self.assertRaisesRegex(
+                ValueError, "build manifest does not bind release"
+            ):
+                build_environment_promotion_gate(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approvals=approvals,
+                    health_check=check_production_health(deployment),
+                    readiness_check=check_production_readiness(deployment),
+                    rollback_manifest=rollback,
+                    gate_created_at="2026-09-24T13:08:00Z",
+                    adversarial_certification=certification,
                 )
 
     def test_release_image_must_match_deployment_contract(self):
