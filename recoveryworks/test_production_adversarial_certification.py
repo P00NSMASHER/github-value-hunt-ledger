@@ -19,10 +19,15 @@ from recoveryworks.recurring_assurance_lifecycle import (
 from recoveryworks.test_commercial_operational_invariants import full_chain
 
 
+SOURCE_REVISION = "5" * 40
+OTHER_SOURCE_REVISION = "6" * 40
+
+
 class ProductionAdversarialCertificationTests(unittest.TestCase):
     def test_seeded_property_matrix_covers_all_attack_vectors(self):
         result = run_commercial_adversarial_certification(
             full_chain,
+            source_revision=SOURCE_REVISION,
             seed=41001,
             iterations_per_vector=6,
         )
@@ -40,11 +45,13 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
     def test_same_seed_produces_same_certification_proof(self):
         first = run_commercial_adversarial_certification(
             full_chain,
+            source_revision=SOURCE_REVISION,
             seed=9917,
             iterations_per_vector=2,
         )
         second = run_commercial_adversarial_certification(
             full_chain,
+            source_revision=SOURCE_REVISION,
             seed=9917,
             iterations_per_vector=2,
         )
@@ -53,6 +60,33 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
             [case.mutation for case in first.cases],
             [case.mutation for case in second.cases],
         )
+
+    def test_source_revision_is_proof_bound(self):
+        first = run_commercial_adversarial_certification(
+            full_chain,
+            source_revision=SOURCE_REVISION,
+            seed=9917,
+            iterations_per_vector=1,
+        )
+        second = run_commercial_adversarial_certification(
+            full_chain,
+            source_revision=OTHER_SOURCE_REVISION,
+            seed=9917,
+            iterations_per_vector=1,
+        )
+        self.assertEqual(first.source_revision, SOURCE_REVISION)
+        self.assertEqual(second.source_revision, OTHER_SOURCE_REVISION)
+        self.assertNotEqual(first.proof_hash, second.proof_hash)
+        self.assertNotEqual(first.certification_id, second.certification_id)
+
+    def test_invalid_source_revision_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "source_revision"):
+            run_commercial_adversarial_certification(
+                full_chain,
+                source_revision="not-a-commit",
+                seed=1,
+                iterations_per_vector=1,
+            )
 
     def test_broken_baseline_is_not_certified(self):
         def broken_factory():
@@ -67,6 +101,7 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "baseline chain must pass"):
             run_commercial_adversarial_certification(
                 broken_factory,
+                source_revision=SOURCE_REVISION,
                 seed=5,
                 iterations_per_vector=1,
             )
