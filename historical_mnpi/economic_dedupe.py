@@ -282,6 +282,8 @@ def propose_transaction_dedupe(
     source_registry: SourceRegistry,
     artifact_manifest: RawArtifactManifest,
 ) -> DedupeProposal:
+    if artifact_manifest.source_registry_hash != source_registry.registry_hash:
+        raise ValueError("artifact manifest/source registry mismatch")
     if left.trade_id == right.trade_id:
         raise ValueError("dedupe comparison requires distinct trade_ids")
 
