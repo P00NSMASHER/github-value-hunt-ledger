@@ -66,6 +66,26 @@ meter records cannot inflate expected usage.
 A generic `usage_csv` plus `usage_source_verified` may be used instead of
 `meter_csv`. The two quantity inputs are mutually exclusive.
 
+### Cletrics evidence bundle
+
+CloudRecovery also accepts a hash-bound Cletrics evidence bundle as an alternative to charges_csv plus meter_csv/usage_csv:
+
+```json
+{
+  "cloud": {
+    "cletrics_bundle": "cletrics-export.zip",
+    "rates_csv": "reviewed-cloud-rates.csv",
+    "charge_source_verified": true,
+    "meter_source_verified": true,
+    "rate_source_verified": true
+  }
+}
+```
+
+The bundle imports only provider billing rows and independent meter quantities. Contract rates continue to come from the separately reviewed rates_csv authority path. Bundle integrity/provenance never self-verifies evidence: charge_source_verified and meter_source_verified remain explicit RecoveryOS inputs and default false.
+
+See `recoveryworks/CLETRICS_INTEGRATION.md` for the frozen phase-1 bundle contract.
+
 CloudRecovery does not attempt to reconstruct public on-demand pricing,
 reserved-instance optimization, commitment utilization, tax, credits, or
 provider-specific discount programs unless those commercial terms have first

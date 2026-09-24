@@ -51,6 +51,7 @@ from .branches.contract_billing_csv import (
 )
 from .branches.cloud import audit_cloud_billing
 from .branches.cloud_csv import load_cloud_meter_csv
+from .integrations.cletrics import load_cletrics_bundle
 from .branches.merchant_fee import audit_merchant_fees
 from .branches.merchant_fee_csv import (
     load_merchant_fee_agreements_csv,
@@ -488,39 +489,102 @@ def run_scan360_config(
 
 
     for job_index, job in enumerate(_jobs(config.get("cloud"), name="cloud")):
-        charges = load_invoice_charges_csv(
-            _resolve(base, job.get("charges_csv"), name=f"cloud[{job_index}].charges_csv"),
-            verified=_bool_setting(
-                job, "charge_source_verified", context=f"cloud[{job_index}]"
-            ),
-        )
         rates = load_contract_rates_csv(
             _resolve(base, job.get("rates_csv"), name=f"cloud[{job_index}].rates_csv"),
             verified=_bool_setting(
                 job, "rate_source_verified", context=f"cloud[{job_index}]"
             ),
         )
+
+        cletrics_bundle = job.get("cletrics_bundle")
+        charges_csv = job.get("charges_csv")
+        if bool(cletrics_bundle) == bool(charges_csv):
+            raise ValueError(
+                f"cloud[{job_index}] requires exactly one of "
+                "charges_csv or cletrics_bundle"
+            )
+
         usage_csv = job.get("usage_csv")
         meter_csv = job.get("meter_csv")
-        if usage_csv and meter_csv:
-            raise ValueError(
-                f"cloud[{job_index}] accepts only one of usage_csv or meter_csv"
-            )
-        usage = ()
-        if usage_csv:
-            usage = load_usage_csv(
-                _resolve(base, usage_csv, name=f"cloud[{job_index}].usage_csv"),
-                verified=_bool_setting(
-                    job, "usage_source_verified", context=f"cloud[{job_index}]"
+        if cletrics_bundle:
+            if usage_csv or meter_csv:
+                raise ValueError(
+                    f"cloud[{job_index}] cletrics_bundle cannot be combined with "
+                    "usage_csv or meter_csv"
+                )
+            imported = load_cletrics_bundle(
+                _resolve(
+                    base,
+                    cletrics_bundle,
+                    name=f"cloud[{job_index}].cletrics_bundle",
+                ),
+                charge_source_verified=_bool_setting(
+                    job,
+                    "charge_source_verified",
+                    context=f"cloud[{job_index}]",
+                ),
+                meter_source_verified=_bool_setting(
+                    job,
+                    "meter_source_verified",
+                    context=f"cloud[{job_index}]",
                 ),
             )
-        elif meter_csv:
-            usage = load_cloud_meter_csv(
-                _resolve(base, meter_csv, name=f"cloud[{job_index}].meter_csv"),
+            if imported.client_id != client_id:
+                raise ValueError(
+                    f"cloud[{job_index}] Cletrics client_id does not match "
+                    "Scan 360 client_id"
+                )
+            if imported.currency != currency:
+                raise ValueError(
+                    f"cloud[{job_index}] Cletrics currency does not match "
+                    "Scan 360 currency"
+                )
+            charges = imported.charges
+            usage = imported.usage
+        else:
+            charges = load_invoice_charges_csv(
+                _resolve(
+                    base,
+                    charges_csv,
+                    name=f"cloud[{job_index}].charges_csv",
+                ),
                 verified=_bool_setting(
-                    job, "meter_source_verified", context=f"cloud[{job_index}]"
+                    job,
+                    "charge_source_verified",
+                    context=f"cloud[{job_index}]",
                 ),
             )
+            if usage_csv and meter_csv:
+                raise ValueError(
+                    f"cloud[{job_index}] accepts only one of usage_csv or meter_csv"
+                )
+            usage = ()
+            if usage_csv:
+                usage = load_usage_csv(
+                    _resolve(
+                        base,
+                        usage_csv,
+                        name=f"cloud[{job_index}].usage_csv",
+                    ),
+                    verified=_bool_setting(
+                        job,
+                        "usage_source_verified",
+                        context=f"cloud[{job_index}]",
+                    ),
+                )
+            elif meter_csv:
+                usage = load_cloud_meter_csv(
+                    _resolve(
+                        base,
+                        meter_csv,
+                        name=f"cloud[{job_index}].meter_csv",
+                    ),
+                    verified=_bool_setting(
+                        job,
+                        "meter_source_verified",
+                        context=f"cloud[{job_index}]",
+                    ),
+                )
 
         batch = audit_cloud_billing(
             client_id=client_id,
@@ -1198,41 +1262,3 @@ def run_scan360_config(
             raise ValueError(
                 f"insurance[{job_index}] Claimant_ID does not match Scan 360 client_id: "
                 + ", ".join(mismatched_claimants)
-            )
-
-        batch = audit_insurance_claims(
-            client_id=client_id,
-            claim_lines=claim_lines,
-            assessments=assessments,
-            settlements=settlements,
-            currency=currency,
-        )
-        for issue in batch.exceptions:
-            exceptions.append({
-                "branch": "insurance",
-                "job_index": job_index,
-                "claim_line_id": issue.claim_line_id,
-                "code": issue.code,
-                "detail": issue.detail,
-            })
-        for observation in batch.observations:
-            finding = engine.evaluate(observation)
-            if finding is None:
-                continue
-            ledger.add(finding)
-            if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
-                added_ids.append(finding.finding_id)
-
-    head = store.save(
-        ledger,
-        expected_head_hash=loaded_head,
-        enforce_expected=True,
-    )
-    report = build_scan360_report(ledger, client_id)
-    return Scan360RunResult(
-        client_id=client_id,
-        added_finding_ids=tuple(sorted(added_ids)),
-        state_head_hash=head,
-        exceptions=tuple(exceptions),
-        report=report,
-    )
