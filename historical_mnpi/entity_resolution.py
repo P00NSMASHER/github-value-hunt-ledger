@@ -1,9 +1,9 @@
 """Durable entity-resolution primitives for historical public-record MNPI research.
 
-Step 9.1 introduces cross-case issuer/trader identities without silently resolving
+Step 9 introduces cross-case issuer/trader identities without silently resolving
 ambiguity. Identity evidence remains provenance-bound to retained, already-public
-artifacts. Case-local identity linkage is intentionally deferred to the next
-increment so this module can be tested in isolation.
+artifacts. Case-local identities are connected through proof-pinned crosswalks,
+and ambiguous or stale mappings fail closed.
 """
 from __future__ import annotations
 
