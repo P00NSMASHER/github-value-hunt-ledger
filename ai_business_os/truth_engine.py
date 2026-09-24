@@ -74,6 +74,8 @@ class RankedEvidenceAction:
     action_class: str
     action_parameters: Dict[str, Any]
     cost_units: float
+    planning_mode: str
+    target_evidence_id: Optional[str]
     baseline_verdict: str
     counterfactual_verdict: str
     obligations_improved: int
@@ -176,6 +178,8 @@ class TruthEngine:
                 cost_units REAL NOT NULL DEFAULT 0,
                 available INTEGER NOT NULL DEFAULT 1,
                 deadline_at REAL,
+                planning_mode TEXT NOT NULL DEFAULT 'SUPPORT',
+                target_evidence_id TEXT,
                 created_by_agent_id TEXT NOT NULL REFERENCES agents(id),
                 created_at REAL NOT NULL
             );
@@ -200,6 +204,23 @@ class TruthEngine:
                 ON truth_evidence_actions(claim_id, obligation_key, available);
             """
         )
+        # Forward-compatible migration for databases created before conflict-resolution actions.
+        columns = {
+            row["name"]
+            for row in self.runtime.conn.execute(
+                "PRAGMA table_info(truth_evidence_actions)"
+            ).fetchall()
+        }
+        if "planning_mode" not in columns:
+            self.runtime.conn.execute(
+                "ALTER TABLE truth_evidence_actions "
+                "ADD COLUMN planning_mode TEXT NOT NULL DEFAULT 'SUPPORT'"
+            )
+        if "target_evidence_id" not in columns:
+            self.runtime.conn.execute(
+                "ALTER TABLE truth_evidence_actions "
+                "ADD COLUMN target_evidence_id TEXT"
+            )
         self.runtime.conn.commit()
 
     def register_claim(
@@ -555,6 +576,8 @@ class TruthEngine:
         cost_units: float = 0.0,
         available: bool = True,
         deadline_at: Optional[float] = None,
+        planning_mode: str = "SUPPORT",
+        target_evidence_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         self.runtime._require_agent(created_by_agent_id)
         self._require_claim(claim_id)
@@ -576,6 +599,27 @@ class TruthEngine:
             deadline_at = float(deadline_at)
             if not math.isfinite(deadline_at):
                 raise TruthEngineError("deadline_at must be finite")
+        planning_mode = planning_mode.strip().upper()
+        if planning_mode not in {"SUPPORT", "RESOLVE_CONFLICT"}:
+            raise TruthEngineError("planning_mode must be SUPPORT or RESOLVE_CONFLICT")
+        if planning_mode == "RESOLVE_CONFLICT":
+            if not target_evidence_id:
+                raise TruthEngineError(
+                    "RESOLVE_CONFLICT actions require target_evidence_id"
+                )
+            target = self.get_evidence(target_evidence_id)
+            if target["claim_id"] != claim_id or target["obligation_key"] != obligation_key:
+                raise TruthEngineError(
+                    "conflict-resolution target must belong to this claim/obligation"
+                )
+            if target["stance"] != "CONTRADICTS":
+                raise TruthEngineError(
+                    "conflict-resolution target must be contradictory evidence"
+                )
+        elif target_evidence_id is not None:
+            raise TruthEngineError(
+                "SUPPORT actions cannot specify target_evidence_id"
+            )
 
         try:
             self.runtime.conn.execute(
@@ -584,8 +628,8 @@ class TruthEngine:
                     id, claim_id, obligation_key, description, authority,
                     independence_group, action_key, action_class,
                     action_parameters_json, cost_units, available, deadline_at,
-                    created_by_agent_id, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    planning_mode, target_evidence_id, created_by_agent_id, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     action_id,
@@ -600,6 +644,8 @@ class TruthEngine:
                     cost_units,
                     int(bool(available)),
                     deadline_at,
+                    planning_mode,
+                    target_evidence_id,
                     created_by_agent_id,
                     _now(),
                 ),
@@ -651,30 +697,69 @@ class TruthEngine:
             if action["authority"] not in allowed_authorities:
                 continue
 
-            existing_groups = {
-                row["independence_group"]
-                for row in evidence
-                if row["obligation_key"] == action["obligation_key"]
-                and row["stance"] == "SUPPORTS"
-                and self._evidence_usability(row, obligation, evaluated_at) == "USABLE"
-            }
-            if action["independence_group"] in existing_groups:
-                continue
+            before_finding = baseline_findings[action["obligation_key"]]
+            before = before_finding["status"]
+            mode = str(action["planning_mode"] or "SUPPORT").upper()
 
-            counter_verdict, counter_findings = self._counterfactual_support(
-                claim_id,
-                action,
-                evaluated_at=evaluated_at,
-            )
-            before = baseline_findings[action["obligation_key"]]["status"]
+            if mode == "RESOLVE_CONFLICT":
+                if before not in {"CONFLICTED", "CONTRADICTED"}:
+                    continue
+                target_id = action["target_evidence_id"]
+                if not target_id or target_id not in before_finding["contradicting_evidence_ids"]:
+                    continue
+                counter_verdict, counter_findings = self._counterfactual_resolve_conflict(
+                    claim_id,
+                    action,
+                    evaluated_at=evaluated_at,
+                )
+            else:
+                # More supportive evidence is not a valid conflict-resolution strategy.
+                if before in {"CONFLICTED", "CONTRADICTED"}:
+                    continue
+                existing_groups = {
+                    row["independence_group"]
+                    for row in evidence
+                    if row["obligation_key"] == action["obligation_key"]
+                    and row["stance"] == "SUPPORTS"
+                    and self._evidence_usability(row, obligation, evaluated_at) == "USABLE"
+                }
+                if action["independence_group"] in existing_groups:
+                    continue
+                counter_verdict, counter_findings = self._counterfactual_support(
+                    claim_id,
+                    action,
+                    evaluated_at=evaluated_at,
+                )
+
             after = {f["key"]: f for f in counter_findings}[action["obligation_key"]]["status"]
-            improved = int(before != "SATISFIED" and after == "SATISFIED")
+            improved = int(
+                before != "SATISFIED"
+                and (
+                    after == "SATISFIED"
+                    or (
+                        mode == "RESOLVE_CONFLICT"
+                        and before in {"CONFLICTED", "CONTRADICTED"}
+                        and after not in {"CONFLICTED", "CONTRADICTED"}
+                    )
+                )
+            )
             verdict_gain = max(
                 0,
                 self.VERDICT_RANK[counter_verdict] - self.VERDICT_RANK[receipt["verdict"]],
             )
             required_weight = 2 if bool(obligation["required"]) else 1
-            numerator = verdict_gain * 4 + improved * required_weight
+            # Conflict resolution is useful even when it moves CONTESTED -> NOT_PROVEN,
+            # because it removes an admissible contradiction without pretending the claim is proven.
+            conflict_resolution_gain = int(
+                mode == "RESOLVE_CONFLICT"
+                and before in {"CONFLICTED", "CONTRADICTED"}
+                and after not in {"CONFLICTED", "CONTRADICTED"}
+            )
+            numerator = (
+                verdict_gain * 4
+                + improved * required_weight
+                + conflict_resolution_gain * 3
+            )
             if numerator <= 0:
                 continue
             priority = numerator / (1.0 + float(action["cost_units"]))
@@ -689,6 +774,8 @@ class TruthEngine:
                     action_class=action["action_class"],
                     action_parameters=json.loads(action["action_parameters_json"]),
                     cost_units=float(action["cost_units"]),
+                    planning_mode=mode,
+                    target_evidence_id=action["target_evidence_id"],
                     baseline_verdict=receipt["verdict"],
                     counterfactual_verdict=counter_verdict,
                     obligations_improved=improved,
@@ -858,7 +945,30 @@ class TruthEngine:
             "cost_units": row["cost_units"],
             "available": bool(row["available"]),
             "deadline_at": row["deadline_at"],
+            "planning_mode": row["planning_mode"],
+            "target_evidence_id": row["target_evidence_id"],
         }
+
+    def _counterfactual_resolve_conflict(
+        self,
+        claim_id: str,
+        action,
+        *,
+        evaluated_at: float,
+    ) -> Tuple[str, List[Dict[str, Any]]]:
+        """Simulate resolving one contradictory item without inventing new support.
+
+        This planner does not assert that the contradiction is false. It asks whether independently
+        adjudicating that exact contradictory artifact would remove the conflict blocker. The real
+        ledger is unchanged; only a later evidence/adjudication result can alter truth state.
+        """
+        target_id = action["target_evidence_id"]
+        rows = [
+            dict(row)
+            for row in self._evidence_rows(claim_id)
+            if row["id"] != target_id
+        ]
+        return self._evaluate_rows(claim_id, rows, evaluated_at=evaluated_at)
 
     def _counterfactual_support(
         self,
@@ -888,6 +998,15 @@ class TruthEngine:
                 "evidence_hash": _sha({"hypothetical": action["id"]}),
             }
         )
+        return self._evaluate_rows(claim_id, rows, evaluated_at=evaluated_at)
+
+    def _evaluate_rows(
+        self,
+        claim_id: str,
+        rows: List[Dict[str, Any]],
+        *,
+        evaluated_at: float,
+    ) -> Tuple[str, List[Dict[str, Any]]]:
         obligations = self._obligations(claim_id)
         findings = []
         relevant_total = 0

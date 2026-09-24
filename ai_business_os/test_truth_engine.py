@@ -379,6 +379,121 @@ class TruthEngineTests(unittest.TestCase):
         ).fetchone()["n"]
         self.assertEqual(before, after)
 
+    def test_more_support_is_not_recommended_as_conflict_resolution(self):
+        self.add_contract("support", group="contract")
+        self.add_contract(
+            "contradiction",
+            stance="CONTRADICTS",
+            group="ledger",
+            authority="VERIFIED_LEDGER",
+        )
+        self.add_payment()
+        receipt = self.evaluate()
+        self.assertEqual("CONTESTED", receipt["verdict"])
+
+        self.engine.register_evidence_action(
+            "claim-1",
+            action_id="pile-on-support",
+            obligation_key="contract_rate",
+            description="Get another supportive contract copy",
+            authority="PRIMARY_CONTRACT",
+            independence_group="another-support",
+            action_key="contract.fetch",
+            action_class="READ",
+            action_parameters={"source": "another-support"},
+            created_by_agent_id=self.creator,
+        )
+        ranked = self.engine.rank_next_evidence(
+            "claim-1",
+            receipt_id=receipt["id"],
+        )
+        self.assertNotIn("pile-on-support", [item.action_id for item in ranked])
+
+    def test_conflict_resolution_action_targets_exact_contradiction(self):
+        self.add_contract("support", group="contract")
+        self.add_contract(
+            "contradiction",
+            stance="CONTRADICTS",
+            group="ledger",
+            authority="VERIFIED_LEDGER",
+        )
+        self.add_payment()
+        receipt = self.evaluate()
+        self.engine.register_evidence_action(
+            "claim-1",
+            action_id="adjudicate-ledger",
+            obligation_key="contract_rate",
+            description="Independently adjudicate the contradictory ledger record",
+            authority="VERIFIED_LEDGER",
+            independence_group="adjudicator",
+            action_key="contract.fetch",
+            action_class="READ",
+            action_parameters={"target": "contradiction"},
+            created_by_agent_id=self.creator,
+            planning_mode="RESOLVE_CONFLICT",
+            target_evidence_id="contradiction",
+        )
+        ranked = self.engine.rank_next_evidence(
+            "claim-1",
+            receipt_id=receipt["id"],
+        )
+        self.assertEqual(["adjudicate-ledger"], [item.action_id for item in ranked])
+        self.assertEqual("RESOLVE_CONFLICT", ranked[0].planning_mode)
+        self.assertEqual("contradiction", ranked[0].target_evidence_id)
+        self.assertEqual("PROVEN", ranked[0].counterfactual_verdict)
+
+    def test_conflict_resolution_action_cannot_target_supporting_evidence(self):
+        self.add_contract("support", group="contract")
+        with self.assertRaises(TruthEngineError):
+            self.engine.register_evidence_action(
+                "claim-1",
+                action_id="bad-resolution",
+                obligation_key="contract_rate",
+                description="Pretend supporting evidence is the contradiction",
+                authority="PRIMARY_CONTRACT",
+                independence_group="adjudicator",
+                action_key="contract.fetch",
+                action_class="READ",
+                action_parameters={"target": "support"},
+                created_by_agent_id=self.creator,
+                planning_mode="RESOLVE_CONFLICT",
+                target_evidence_id="support",
+            )
+
+    def test_conflict_resolution_planning_does_not_delete_real_evidence(self):
+        self.add_contract("support", group="contract")
+        self.add_contract(
+            "contradiction",
+            stance="CONTRADICTS",
+            group="ledger",
+            authority="VERIFIED_LEDGER",
+        )
+        self.add_payment()
+        receipt = self.evaluate()
+        self.engine.register_evidence_action(
+            "claim-1",
+            action_id="adjudicate-ledger",
+            obligation_key="contract_rate",
+            description="Adjudicate contradictory ledger evidence",
+            authority="VERIFIED_LEDGER",
+            independence_group="adjudicator",
+            action_key="contract.fetch",
+            action_class="READ",
+            action_parameters={"target": "contradiction"},
+            created_by_agent_id=self.creator,
+            planning_mode="RESOLVE_CONFLICT",
+            target_evidence_id="contradiction",
+        )
+        before = self.runtime.conn.execute(
+            "SELECT COUNT(*) AS n FROM truth_evidence WHERE claim_id='claim-1'"
+        ).fetchone()["n"]
+        self.engine.rank_next_evidence("claim-1", receipt_id=receipt["id"])
+        after = self.runtime.conn.execute(
+            "SELECT COUNT(*) AS n FROM truth_evidence WHERE claim_id='claim-1'"
+        ).fetchone()["n"]
+        self.assertEqual(before, after)
+        self.assertEqual("CONTRADICTS", self.engine.get_evidence("contradiction")["stance"])
+
     def test_governed_evidence_acquisition_requires_step6_authorization(self):
         self.add_contract()
         receipt = self.evaluate()
