@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from enum import Enum
 import hashlib
 import random
+import subprocess
 from typing import Any, Callable, Mapping
 
 from recoveryworks.commercial_operational_invariants import (
@@ -52,6 +53,20 @@ def _source_revision(value: str) -> str:
     if any(ch not in "0123456789abcdef" for ch in normalized):
         raise ValueError("source_revision must be hexadecimal")
     return normalized
+
+
+def current_repository_revision() -> str:
+    try:
+        completed = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise ValueError("cannot verify current repository revision") from exc
+    return _source_revision(completed.stdout)
 
 
 @dataclass(frozen=True)
@@ -405,6 +420,11 @@ def run_commercial_adversarial_certification(
     if not isinstance(build_manifest, ContainerBuildManifest):
         raise ValueError("build_manifest must be ContainerBuildManifest")
     source_revision = _source_revision(build_manifest.source_commit)
+    current_revision = current_repository_revision()
+    if source_revision != current_revision:
+        raise ValueError(
+            "build_manifest source_commit does not match current repository revision"
+        )
     current_build_manifest = build_container_build_manifest(
         source_commit=source_revision,
         dockerfile_path="recoveryworks/deploy/Dockerfile.production",
