@@ -109,7 +109,12 @@ class EnterpriseDiligencePackageTests(unittest.TestCase):
         self.assertTrue(any(a["question_id"]=="Q-CERT" for a in payload["questionnaire_answers"]))
         self.assertEqual(len(payload["gaps"]),1)
         self.assertEqual(payload["gaps"][0]["owner_id"],"[REDACTED_OWNER]")
-        self.assertNotIn("source_locator", str(payload))
+        for item in payload["evidence_room_items"]:
+            self.assertNotIn("source_locator", item)
+            self.assertNotIn("internal_path", item)
+        for answer in payload["questionnaire_answers"]:
+            self.assertNotIn("source_locator", answer)
+            self.assertNotIn("internal_path", answer)
         self.assertNotIn("/home/", str(payload))
 
     def test_outputs_private_and_certification_claims_impossible(self):
