@@ -1,0 +1,54 @@
+{
+  "version": "production-agent-fleet-v1",
+  "agents": [
+    {
+      "id": "agent-chief",
+      "role": "CHIEF_OF_STAFF",
+      "mode": "LOW_RISK_AUTONOMY",
+      "money_budget_cents": 0
+    },
+    {
+      "id": "agent-research",
+      "role": "RESEARCH",
+      "mode": "LOW_RISK_AUTONOMY",
+      "money_budget_cents": 0
+    },
+    {
+      "id": "agent-engineering",
+      "role": "ENGINEERING",
+      "mode": "LOW_RISK_AUTONOMY",
+      "money_budget_cents": 0
+    },
+    {
+      "id": "agent-product",
+      "role": "PRODUCT",
+      "mode": "LOW_RISK_AUTONOMY",
+      "money_budget_cents": 0
+    },
+    {
+      "id": "agent-growth",
+      "role": "GROWTH_SALES",
+      "mode": "LOW_RISK_AUTONOMY",
+      "money_budget_cents": 0
+    },
+    {
+      "id": "agent-finance",
+      "role": "FINANCE_ANALYTICS",
+      "mode": "LOW_RISK_AUTONOMY",
+      "money_budget_cents": 0
+    },
+    {
+      "id": "agent-auditor",
+      "role": "AUDITOR_REDTEAM",
+      "mode": "SHADOW",
+      "money_budget_cents": 0
+    }
+  ],
+  "authority_boundaries": {
+    "external_writes": "HUMAN_APPROVAL",
+    "production_changes": "HUMAN_APPROVAL",
+    "money_movement": "AUTONOMY_DISABLED",
+    "destructive_actions": "AUTONOMY_DISABLED",
+    "policy_changes": "HUMAN_APPROVAL"
+  }
+}
