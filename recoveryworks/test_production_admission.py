@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 from recoveryworks.container_build import build_container_build_manifest
+from recoveryworks.production_adversarial_certification import current_repository_revision
 from recoveryworks.production_admission import (
     ProductionAdmissionPolicy,
     build_production_admission_gate,
@@ -36,7 +37,7 @@ from recoveryworks.release_security_bridge import (
     write_cyclonedx_sbom,
 )
 from recoveryworks.models import canonical_hash
-from recoveryworks.test_release_control import production_spec
+from recoveryworks.test_release_control import production_certification, production_spec
 from recoveryworks.production_deployment import (
     build_production_deployment_contract,
     check_production_health,
@@ -54,7 +55,7 @@ class ProductionAdmissionTests(unittest.TestCase):
         deployment=build_production_deployment_contract(
             production_spec(root,image),base_dir=root)
         build=build_container_build_manifest(
-            source_commit="a"*40,
+            source_commit=current_repository_revision(),
             dockerfile_path="recoveryworks/deploy/Dockerfile.production",
             dependency_lock_path="recoveryworks/requirements.production.lock")
         release=build_release_manifest(
@@ -84,7 +85,8 @@ class ProductionAdmissionTests(unittest.TestCase):
             release,environment=ReleaseEnvironment.PRODUCTION,approvals=approvals,
             health_check=check_production_health(deployment),
             readiness_check=check_production_readiness(deployment),
-            rollback_manifest=rollback,gate_created_at="2026-09-24T13:04:00Z")
+            rollback_manifest=rollback,gate_created_at="2026-09-24T13:04:00Z",
+            adversarial_certification=production_certification(build))
         sbom=build_release_sbom(
             release,build,repository_root=".",generated_at="2026-09-24T13:05:00Z")
         att=build_container_attestation_input(
