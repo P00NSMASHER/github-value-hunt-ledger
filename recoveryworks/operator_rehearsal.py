@@ -107,7 +107,7 @@ def run_simulated_operator_rehearsal(
     root.mkdir(parents=True,exist_ok=True)
     files=_fixture_files(root)
     tenant=TenantIdentity(
-        tenant_id="simulated-tenant",client_id="simulated-client",
+        tenant_id="simulated-client",client_id="simulated-client",
         namespace=str(root),created_at="2026-09-24T12:00:00Z")
     tenant_registry=TenantBindingRegistry(root/".recoveryworks-tenant-bindings.json")
     tenant_registry.reserve_paths(tenant,artifact_paths={"operator_seed":root/"operator-seed.json"})
