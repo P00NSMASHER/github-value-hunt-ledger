@@ -651,3 +651,9 @@ The resulting PILOT_CLOSEOUT_ACKNOWLEDGED artifact may record only a continuatio
 A closeout acknowledgment can now be paired with a separately sourced, externally finalized commercial agreement receipt. The agreement—not the earlier pricing hypothesis—becomes the commercial arithmetic authority and may explicitly differ from the charter hypothesis; any such variance is surfaced in the readiness artifact.
 
 COMMERCIAL_FEE_DRAFT_READY calculates diagnostic and recovered-cash success-fee arithmetic only when those fee types are applicable in the finalized agreement. Success-fee math is recovered_cash_cents × finalized_agreement_bps and cannot use validated/potential recovery, prospective savings, anomaly exposure, or drift. Monthly assurance is separately tracked as accepted/not accepted. The gate allows draft preparation only and hard-codes invoice_issuance_performed=false, payment_due_asserted=false, payment_collected=false, and external_action_performed=false.
+
+## Unissued billing/payment draft (step 37a)
+
+COMMERCIAL_FEE_DRAFT_READY can now produce a private human-review billing draft whose line items are limited to agreement-supported closeout charges: the finalized diagnostic fee and success fee on verified recovered cash. Validated/potential recovery, prospective savings, anomaly exposure, reconciliation drift, and unaccepted monthly assurance cannot become payable line items.
+
+The monthly assurance amount is displayed only as a separately tracked option and is not included in the closeout draft total. The artifact is always DRAFT_NOT_ISSUED and hard-codes issued=false, sent=false, payment_due_asserted=false, payment_received=false, payment_instructions_included=false, and external_commitment_created=false. The proposed due date is informational and only applies if a later separately governed issuance step occurs.
