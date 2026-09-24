@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "onboarding_id": "customer-onboarding-001",
+  "diagnostic_id": "customer-diagnostic-001",
+  "client_id": "customer-1",
+  "provider": "aws",
+  "billing_account_id": "payer-account-id",
+  "currency": "USD",
+  "period": {
+    "start": "2026-01-01",
+    "end": "2026-08-31"
+  },
+  "authorization": {
+    "authorization_id": "customer-auth-id",
+    "customer_actor_id": "customer-finops-owner",
+    "authorized_at": "2026-09-24T12:00:00Z",
+    "expires_at": "2026-10-08T12:00:00Z",
+    "allowed_purposes": [
+      "BILLING_RECOVERY_DIAGNOSTIC",
+      "SAVINGS_ANALYSIS"
+    ],
+    "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": "customer://authorization/id"
+  },
+  "inputs": {
+    "focus_csv": "inputs/focus.csv",
+    "meter_csv": "inputs/meter.csv",
+    "rates_csv": "inputs/reviewed-rates.csv",
+    "anomaly_csv": "inputs/anomalies.csv",
+    "reconciliation_csv": "inputs/reconciliation.csv",
+    "savings_csv": "inputs/savings.csv"
+  },
+  "verification": {
+    "charge_source_verified": false,
+    "meter_source_verified": false,
+    "rate_source_verified": false
+  },
+  "cletrics": {
+    "release": "customer-export",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "exported_at": "2026-09-24T13:00:00Z"
+  },
+  "outputs": {
+    "private_root": "private/diagnostics/customer-diagnostic-001"
+  }
+}

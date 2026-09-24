@@ -373,3 +373,9 @@ After scope and hash checks, the authorized source bytes are copied into verifie
 The commercial package can now render private proposal/SOW-ready Markdown drafts plus a hash-bound manifest. Draft fee scenarios calculate configured diagnostic/success/assurance arithmetic but are explicitly marked as pricing hypotheses and not revenue forecasts.
 
 The generated artifacts are deliberately nonbinding: they cannot be marked signed, accepted, invoiced, paid, or committed. A separately finalized agreement would still be required.
+
+## Customer onboarding and intake readiness (step 10)
+
+A customer onboarding validator now checks the diagnostic authorization, required FOCUS/meter/reviewed-rate files, required CSV columns, diagnostic period, and Cletrics exporter identity. Optional anomaly/reconciliation/savings files are tracked without blocking the base diagnostic.
+
+When structurally ready, it emits the exact diagnostic-intake JSON consumed by step 8. Readiness is explicitly not verification: invoice, meter, and rate verification flags default false and remain separately controlled. Checklist and generated intake outputs use private writes.
