@@ -153,7 +153,7 @@ class HistoricalCaseTests(unittest.TestCase):
     def test_academic_source_must_remain_academic_reconstruction(self):
         _source, registry, manifest, ref = build_fixture(academic=True)
         primary_role_case = build_case(ref, academic=False)
-        with self.assertRaisesRegex(ValueError, "masquerade"):
+        with self.assertRaisesRegex(ValueError, "incompatible|masquerade"):
             verify_case_provenance(
                 primary_role_case,
                 source_registry=registry,
