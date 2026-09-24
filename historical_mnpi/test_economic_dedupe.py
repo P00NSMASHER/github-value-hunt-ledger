@@ -7,8 +7,9 @@ from historical_mnpi.case_model import (
     CasePartyRole, CaseProceedingStatus, CaseRegistry, HistoricalCase,
 )
 from historical_mnpi.economic_dedupe import (
-    DedupeDecisionType, DedupeRelation, build_economic_transaction_cluster,
-    decide_dedupe, propose_transaction_dedupe,
+    DedupeDecisionType, DedupeProposal, DedupeRelation,
+    build_economic_transaction_cluster, decide_dedupe,
+    propose_transaction_dedupe,
 )
 from historical_mnpi.entity_resolution import (
     CanonicalEntity, CaseEntityResolution, EntityKind, EntityRegistry,
@@ -20,6 +21,7 @@ from historical_mnpi.raw_artifacts import (
 )
 from historical_mnpi.source_registry import (
     SourceAdmissibility, SourceRecord, SourceRegistry, SourceType,
+    canonical_hash,
 )
 from historical_mnpi.transaction_model import (
     FactStatus, HistoricalTransaction, InstrumentType, TradeSide,
@@ -576,19 +578,39 @@ class EconomicDedupeTests(unittest.TestCase):
             rationale="Reviewed pair.",
         )
 
-        different_right = HistoricalTransaction(
-            **{**right.__dict__, "quantity": "2600"}
+        alternate_body = {
+            "schema": 1,
+            "left_trade_id": proposal.left_trade_id,
+            "left_transaction_hash": proposal.left_transaction_hash,
+            "right_trade_id": proposal.right_trade_id,
+            "right_transaction_hash": proposal.right_transaction_hash,
+            "trader_entity_id": proposal.trader_entity_id,
+            "issuer_entity_id": proposal.issuer_entity_id,
+            "relation": DedupeRelation.POSSIBLE_SAME.value,
+            "matching_fields": ["quantity"],
+            "conflicting_fields": [],
+            "reason_codes": ["ALTERNATE_REVIEW_THEORY"],
+        }
+        alternate = DedupeProposal(
+            left_trade_id=proposal.left_trade_id,
+            left_transaction_hash=proposal.left_transaction_hash,
+            right_trade_id=proposal.right_trade_id,
+            right_transaction_hash=proposal.right_transaction_hash,
+            trader_entity_id=proposal.trader_entity_id,
+            issuer_entity_id=proposal.issuer_entity_id,
+            relation=DedupeRelation.POSSIBLE_SAME,
+            matching_fields=("quantity",),
+            conflicting_fields=(),
+            reason_codes=("ALTERNATE_REVIEW_THEORY",),
+            proposal_hash=canonical_hash(alternate_body),
         )
-        different_proposal = propose_transaction_dedupe(
-            left, different_right, entities=entities, cases=cases,
-            source_registry=sources, artifact_manifest=manifest,
-        )
-        self.assertEqual(different_proposal.relation, DedupeRelation.DISTINCT)
+        alternate.verify_integrity()
+        self.assertNotEqual(alternate.proposal_hash, proposal.proposal_hash)
 
-        with self.assertRaisesRegex(ValueError, "exact/possible duplicate"):
+        with self.assertRaisesRegex(ValueError, "proposal hash"):
             build_economic_transaction_cluster(
                 (left, right),
-                proposals=(different_proposal,),
+                proposals=(alternate,),
                 decisions=(decision,),
                 trader_entity_id="person:trader",
                 issuer_entity_id="issuer:canonical",
