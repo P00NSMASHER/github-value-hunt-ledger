@@ -9,6 +9,14 @@ from recoveryworks.cletrics_provider_rehearsal import (
 
 
 class AzureGcpCletricsRehearsalTests(unittest.TestCase):
+    def test_realistic_focus_provider_aliases(self):
+        from recoveryworks.cloud_provider import canonical_cloud_provider
+        self.assertEqual(canonical_cloud_provider("Microsoft"), "azure")
+        self.assertEqual(canonical_cloud_provider("Microsoft Azure"), "azure")
+        self.assertEqual(canonical_cloud_provider("Google Cloud"), "gcp")
+        self.assertEqual(canonical_cloud_provider("Google Cloud Platform"), "gcp")
+        self.assertEqual(canonical_cloud_provider("Amazon Web Services"), "aws")
+
     def test_azure_shared_focus_contract(self):
         with tempfile.TemporaryDirectory() as d:
             result = run_azure_cletrics_rehearsal(Path(d))

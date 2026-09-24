@@ -21,6 +21,7 @@ from typing import Any, Mapping
 import zipfile
 
 from recoveryworks.models import canonical_hash, normalize_utc_timestamp
+from recoveryworks.cloud_provider import canonical_cloud_provider
 from .cletrics import (
     ANOMALY_ROLE,
     CLETRICS_BUNDLE_SCHEMA,
@@ -231,7 +232,7 @@ def _normalize_focus_charges(
             else:
                 natural_key_to_charge[key] = charge_id
 
-        providers.add(provider_name)
+        providers.add(canonical_cloud_provider(provider_name))
         accounts.add(account_id)
         currencies.add(currency)
         normalized_rows.append({
@@ -532,7 +533,7 @@ def export_cletrics_focus_snapshot(
         "schema": CLETRICS_BUNDLE_SCHEMA,
         "bundle_type": CLETRICS_BUNDLE_TYPE,
         "client_id": client_id.strip(),
-        "provider": derived_provider.lower(),
+        "provider": derived_provider,
         "billing_account_id": derived_account,
         "currency": derived_currency,
         "period_start": period_start,
@@ -567,7 +568,7 @@ def export_cletrics_focus_snapshot(
         charge_count=len(row_hash_to_charge),
         meter_record_count=meter_record_count,
         signal_roles=tuple(sorted(signal_roles)),
-        provider=derived_provider.lower(),
+        provider=derived_provider,
         billing_account_id=derived_account,
         currency=derived_currency,
         period_start=period_start,

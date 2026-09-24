@@ -112,6 +112,25 @@ class MultiCloudOrchestrationPlanTests(unittest.TestCase):
                     base_dir=root,
                 )
 
+    def test_cross_provider_rate_authority_reuse_fails_closed(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            aws = provider_job(root, "aws")
+            azure = provider_job(root, "azure")
+            azure["recoveryos"]["rates_csv"] = aws["recoveryos"]["rates_csv"]
+            with self.assertRaisesRegex(
+                ValueError, "cannot reuse provider evidence/authority inputs"
+            ):
+                build_multicloud_orchestration_plan(
+                    {
+                        "schema": 1,
+                        "client_id": "client-multi",
+                        "currency": "USD",
+                        "jobs": [aws, azure],
+                    },
+                    base_dir=root,
+                )
+
     def test_mixed_client_or_currency_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

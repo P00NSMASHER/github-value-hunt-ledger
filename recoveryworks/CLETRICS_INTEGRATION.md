@@ -397,3 +397,9 @@ Azure and GCP use the same RecoveryOS InvoiceCharge, UsageRecord, ContractRate, 
 A separate planning-only orchestrator now composes two or three AWS/Azure/GCP pilot deployment plans for one client and currency. It requires unique providers and deployment ids and rejects any shared evidence-bundle, ledger, receipt-registry, or report path.
 
 The plan explicitly keeps provider isolation required, cross-provider authority reuse prohibited, shared ledgers/receipt registries prohibited, combined financial rollup disabled, and execution disabled. This half-step does not run the provider jobs or sum recovery/savings dollars across clouds; it only produces a private hash-bound JSON/Markdown orchestration plan.
+
+### Provider identity and authority-isolation hardening
+
+FOCUS provider identity is now canonicalized at the proof boundary: common Amazon Web Services aliases map to AWS, Microsoft/Microsoft Azure aliases map to Azure, and Google/Google Cloud Platform aliases map to GCP. The original FOCUS ProviderName is still preserved on invoice evidence for counterparty/rate matching; only the bundle/provider scope is canonicalized.
+
+The multi-cloud planner now enforces its cross-provider authority-isolation claim in code: provider jobs cannot reuse the same FOCUS, meter, signal, rate, discount, commitment, or allocation input file. Separate provider outputs were already mandatory. This prevents a single reviewed authority file from being silently reused across cloud providers.

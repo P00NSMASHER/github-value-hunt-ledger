@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from recoveryworks.cloud_provider import canonical_cloud_provider
 from recoveryworks.integrations.cletrics_continuous import (
     ContinuousCletricsResult,
     run_continuous_cletrics_scan,
@@ -159,7 +160,7 @@ def run_local_pilot(
         period_end=str(period["end"]),
     )
 
-    if export_receipt.provider != plan.provider:
+    if canonical_cloud_provider(export_receipt.provider) != plan.provider:
         raise ValueError(
             "FOCUS provider does not match declared pilot provider: "
             f"{export_receipt.provider!r} != {plan.provider!r}"

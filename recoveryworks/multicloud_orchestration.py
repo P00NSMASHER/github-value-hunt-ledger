@@ -177,6 +177,7 @@ def build_multicloud_orchestration_plan(
     seen_providers: set[str] = set()
     seen_deployments: set[str] = set()
     path_roles: dict[str, str] = {}
+    source_input_roles: dict[str, str] = {}
 
     for index, job in enumerate(jobs):
         if not isinstance(job, Mapping):
@@ -199,6 +200,36 @@ def build_multicloud_orchestration_plan(
             )
         seen_providers.add(deployment.provider)
         seen_deployments.add(deployment.deployment_id)
+
+        cletrics = job.get("cletrics")
+        recoveryos = job.get("recoveryos")
+        if not isinstance(cletrics, Mapping) or not isinstance(recoveryos, Mapping):
+            raise ValueError("each provider job requires cletrics and recoveryos objects")
+        for role, value in (
+            ("focus_csv", cletrics.get("focus_csv")),
+            ("meter_csv", cletrics.get("meter_csv")),
+            ("anomaly_csv", cletrics.get("anomaly_csv")),
+            ("reconciliation_csv", cletrics.get("reconciliation_csv")),
+            ("savings_csv", cletrics.get("savings_csv")),
+            ("rates_csv", recoveryos.get("rates_csv")),
+            ("discounts_csv", recoveryos.get("discounts_csv")),
+            ("commitments_csv", recoveryos.get("commitments_csv")),
+            ("allocations_csv", recoveryos.get("allocations_csv")),
+        ):
+            if not value:
+                continue
+            source_path = Path(str(value))
+            if not source_path.is_absolute():
+                source_path = Path(base_dir) / source_path
+            source_key = str(source_path.resolve())
+            previous = source_input_roles.get(source_key)
+            if previous is not None:
+                raise ValueError(
+                    "multi-cloud jobs cannot reuse provider evidence/authority inputs: "
+                    f"{source_key} used by {previous} and "
+                    f"{deployment.provider}.{role}"
+                )
+            source_input_roles[source_key] = f"{deployment.provider}.{role}"
 
         for role, value in (
             ("bundle", deployment.bundle_path),

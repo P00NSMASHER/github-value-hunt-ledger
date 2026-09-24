@@ -15,6 +15,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from recoveryworks.cloud_provider import canonical_cloud_provider
 from recoveryworks.models import (
     canonical_hash,
     freeze_json,
@@ -89,7 +90,9 @@ class CustomerDiagnosticAuthorization:
             "source_locator",
         ):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
-        object.__setattr__(self, "provider", self.provider.lower())
+        object.__setattr__(
+            self, "provider", canonical_cloud_provider(self.provider)
+        )
         if self.provider not in _SUPPORTED_PROVIDERS:
             raise ValueError(
                 "diagnostic provider must be one of: "
@@ -183,7 +186,7 @@ def build_customer_diagnostic_authorization(
     identity = {
         "schema": 1,
         "client_id": _text("client_id", client_id),
-        "provider": _text("provider", provider).lower(),
+        "provider": canonical_cloud_provider(provider),
         "billing_account_id": _text("billing_account_id", billing_account_id),
         "period_start": _iso_date("period_start", period_start),
         "period_end": _iso_date("period_end", period_end),
@@ -441,7 +444,9 @@ def _preflight_focus(
     if not rows:
         raise ValueError("FOCUS preflight requires at least one billing row")
     for row_number, row in enumerate(rows, start=2):
-        provider = str(row.get("ProviderName") or "").strip().lower()
+        provider = canonical_cloud_provider(
+            str(row.get("ProviderName") or "")
+        )
         account = str(row.get("BillingAccountId") or "").strip()
         row_currency = str(row.get("BillingCurrency") or "").strip().upper()
         service_date = _iso_date(
