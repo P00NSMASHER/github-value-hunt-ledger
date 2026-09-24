@@ -1,0 +1,298 @@
+import hashlib
+import tempfile
+import unittest
+
+from historical_mnpi.case_model import (
+    CaseArtifactLink, CaseArtifactRole, CaseEventType, CaseIssuer, CaseParty,
+    CasePartyRole, CaseProceedingStatus, CaseRegistry, HistoricalCase,
+)
+from historical_mnpi.economic_dedupe import (
+    DedupeDecisionType, DedupeRelation, build_economic_transaction_cluster,
+    decide_dedupe, propose_transaction_dedupe,
+)
+from historical_mnpi.entity_resolution import (
+    CanonicalEntity, CaseEntityResolution, EntityKind, EntityRegistry,
+    ResolutionStatus,
+)
+from historical_mnpi.raw_artifacts import (
+    LocalContentAddressedArtifactStore, SourceArtifactRef, SourceLocatorKind,
+    freeze_raw_artifact_manifest,
+)
+from historical_mnpi.source_registry import (
+    SourceAdmissibility, SourceRecord, SourceRegistry, SourceType,
+)
+from historical_mnpi.transaction_model import (
+    FactStatus, HistoricalTransaction, InstrumentType, TradeSide,
+)
+
+
+def H(raw: bytes) -> str:
+    return hashlib.sha256(raw).hexdigest()
+
+
+def fixture(resolve_identities=True):
+    specs = (
+        ("complaint", SourceType.SEC_COMPLAINT, CaseArtifactRole.COMPLAINT, b"complaint"),
+        ("judgment", SourceType.COURT_JUDGMENT, CaseArtifactRole.JUDGMENT, b"judgment"),
+    )
+    sources = SourceRegistry()
+    records = []
+    for name, stype, role, raw in specs:
+        rec = SourceRecord(
+            source_id=f"SRC:{name}",
+            source_type=stype,
+            admissibility=SourceAdmissibility.PRIMARY_PUBLIC_RECORD,
+            publisher=name,
+            title=name,
+            url=f"https://example.org/{name}",
+            publication_date="2015-01-01",
+            sha256=H(raw),
+            retrieved_at="2026-09-24T14:00:00Z",
+            public_release_confirmed=True,
+            case_id="CASE-DEDUPE",
+        )
+        sources.register(rec)
+        records.append((rec, raw, role))
+    refs = {}
+    artifacts = []
+    with tempfile.TemporaryDirectory() as root:
+        store = LocalContentAddressedArtifactStore(root)
+        for rec, raw, role in records:
+            art = store.retain(
+                sources, rec, raw,
+                media_type="application/pdf",
+                acquired_at="2026-09-24T14:00:00Z",
+                stored_at="2026-09-24T14:01:00Z",
+            )
+            artifacts.append(art)
+            refs[role] = SourceArtifactRef(
+                source_id=rec.source_id,
+                source_proof_hash=rec.proof_hash,
+                artifact_id=art.artifact_id,
+                artifact_sha256=art.sha256,
+                artifact_record_proof_hash=art.proof_hash,
+                locator_kind=SourceLocatorKind.TABLE,
+                locator=f"role={role.value};row=1",
+            )
+        manifest = freeze_raw_artifact_manifest(
+            sources, tuple(artifacts),
+            created_at="2026-09-24T14:02:00Z",
+            created_by="test",
+        )
+    case = HistoricalCase(
+        case_id="CASE-DEDUPE",
+        title="Economic dedupe case",
+        event_type=CaseEventType.MERGER_ACQUISITION,
+        information_origin="historical transaction",
+        proceeding_status=CaseProceedingStatus.FINAL_CIVIL_JUDGMENT,
+        parties=(CaseParty("party:trader", "Trader", (CasePartyRole.TRADER,)),),
+        issuers=(CaseIssuer("issuer:target", "Target Corp."),),
+        artifacts=tuple(CaseArtifactLink(role, refs[role]) for _r, _b, role in records),
+    )
+    cases = CaseRegistry()
+    cases.register(case, source_registry=sources, artifact_manifest=manifest)
+
+    entities = EntityRegistry()
+    person = entities.register_entity(
+        CanonicalEntity("person:trader", EntityKind.PERSON, "Trader")
+    )
+    issuer = entities.register_entity(
+        CanonicalEntity("issuer:canonical", EntityKind.ISSUER, "Target Corp.")
+    )
+    if resolve_identities:
+        entities.register_case_resolution(
+            CaseEntityResolution(
+                "resolution:trader", case.case_id, case.proof_hash,
+                "party:trader", EntityKind.PERSON, ResolutionStatus.RESOLVED,
+                (refs[CaseArtifactRole.COMPLAINT],),
+                canonical_entity_id=person.entity_id,
+            ),
+            cases=cases, source_registry=sources, artifact_manifest=manifest,
+        )
+        entities.register_case_resolution(
+            CaseEntityResolution(
+                "resolution:issuer", case.case_id, case.proof_hash,
+                "issuer:target", EntityKind.ISSUER, ResolutionStatus.RESOLVED,
+                (refs[CaseArtifactRole.COMPLAINT],),
+                canonical_entity_id=issuer.entity_id,
+            ),
+            cases=cases, source_registry=sources, artifact_manifest=manifest,
+        )
+
+    left = HistoricalTransaction(
+        trade_id="trade:complaint",
+        case_id=case.case_id,
+        case_proof_hash=case.proof_hash,
+        trader_party_id="party:trader",
+        issuer_id="issuer:target",
+        source_ref=refs[CaseArtifactRole.COMPLAINT],
+        fact_status=FactStatus.ALLEGED,
+        status_ref=refs[CaseArtifactRole.COMPLAINT],
+        instrument_type=InstrumentType.STOCK,
+        side=TradeSide.BUY,
+        trade_date="2015-08-10",
+        quantity="2500",
+        execution_price="30.375",
+    )
+    right = HistoricalTransaction(
+        trade_id="trade:judgment",
+        case_id=case.case_id,
+        case_proof_hash=case.proof_hash,
+        trader_party_id="party:trader",
+        issuer_id="issuer:target",
+        source_ref=refs[CaseArtifactRole.JUDGMENT],
+        fact_status=FactStatus.COURT_ESTABLISHED,
+        status_ref=refs[CaseArtifactRole.JUDGMENT],
+        instrument_type=InstrumentType.STOCK,
+        side=TradeSide.BUY,
+        trade_date="2015-08-10",
+        quantity="2500",
+        execution_price="30.375",
+    )
+    return sources, manifest, cases, entities, left, right
+
+
+class EconomicDedupeTests(unittest.TestCase):
+    def test_matching_trade_across_sources_proposes_exact_same(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.EXACT_SAME)
+        self.assertIn("quantity", proposal.matching_fields)
+        self.assertIn("execution_price", proposal.matching_fields)
+        proposal.verify_integrity()
+
+    def test_conflicting_quantity_is_distinct(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        right = HistoricalTransaction(
+            **{**right.__dict__, "quantity": "2600"}
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.DISTINCT)
+        self.assertIn("quantity", proposal.conflicting_fields)
+
+    def test_sparse_compatible_rows_are_possible_not_automatically_merged(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        right = HistoricalTransaction(
+            trade_id=right.trade_id,
+            case_id=right.case_id,
+            case_proof_hash=right.case_proof_hash,
+            trader_party_id=right.trader_party_id,
+            issuer_id=right.issuer_id,
+            source_ref=right.source_ref,
+            fact_status=right.fact_status,
+            status_ref=right.status_ref,
+            trade_date=right.trade_date,
+            quantity="2500",
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+
+    def test_unresolved_identity_produces_insufficient_proposal(self):
+        sources, manifest, cases, entities, left, right = fixture(resolve_identities=False)
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.INSUFFICIENT)
+        self.assertIn("IDENTITY_NOT_RESOLVED", proposal.reason_codes)
+
+    def test_distinct_or_insufficient_proposal_cannot_be_confirmed_same(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        different = HistoricalTransaction(
+            **{**right.__dict__, "quantity": "9999"}
+        )
+        proposal = propose_transaction_dedupe(
+            left, different, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        with self.assertRaisesRegex(ValueError, "requires exact/possible"):
+            decide_dedupe(
+                proposal,
+                decision=DedupeDecisionType.SAME_TRANSACTION,
+                reviewer_id="reviewer:1",
+                rationale="Should fail.",
+            )
+
+    def test_cluster_requires_explicit_same_decision_and_preserves_sources(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        decision = decide_dedupe(
+            proposal,
+            decision=DedupeDecisionType.SAME_TRANSACTION,
+            reviewer_id="reviewer:1",
+            rationale="Same date, parties, issuer, side, instrument, quantity and price.",
+        )
+        cluster = build_economic_transaction_cluster(
+            (left, right),
+            decisions=(decision,),
+            trader_entity_id="person:trader",
+            issuer_entity_id="issuer:canonical",
+        )
+        cluster.verify_integrity()
+        self.assertEqual(len(cluster.members), 2)
+        self.assertEqual(
+            len({member.source_ref_hash for member in cluster.members}),
+            2,
+        )
+        self.assertEqual(
+            {member.fact_status for member in cluster.members},
+            {"ALLEGED", "COURT_ESTABLISHED"},
+        )
+
+    def test_three_member_cluster_requires_complete_pairwise_clique(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        third = HistoricalTransaction(
+            trade_id="trade:third",
+            case_id=left.case_id,
+            case_proof_hash=left.case_proof_hash,
+            trader_party_id=left.trader_party_id,
+            issuer_id=left.issuer_id,
+            source_ref=left.source_ref,
+            fact_status=left.fact_status,
+            status_ref=left.status_ref,
+            instrument_type=left.instrument_type,
+            side=left.side,
+            trade_date=left.trade_date,
+            quantity=left.quantity,
+            execution_price=left.execution_price,
+        )
+        p1 = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        p2 = propose_transaction_dedupe(
+            left, third, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        decisions = tuple(
+            decide_dedupe(
+                proposal,
+                decision=DedupeDecisionType.SAME_TRANSACTION,
+                reviewer_id="reviewer:1",
+                rationale="Confirmed pair.",
+            )
+            for proposal in (p1, p2)
+        )
+        with self.assertRaisesRegex(ValueError, "complete pairwise"):
+            build_economic_transaction_cluster(
+                (left, right, third),
+                decisions=decisions,
+                trader_entity_id="person:trader",
+                issuer_entity_id="issuer:canonical",
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()
