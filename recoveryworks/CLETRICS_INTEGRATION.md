@@ -250,3 +250,19 @@ Approved incumbents transition to SUPERSEDED with the exact approval hash and
 optional replacement finding id. Recovery Scan 360 excludes SUPERSEDED amounts
 from active potential/validated totals while retaining superseded_cents and the
 historical case record.
+
+### Supersession apply semantics
+
+`prepare_cloud_supersession_preview` recalculates the proposed job in an
+isolated temporary ledger and compares active cloud references in the exact
+provider/account/period scope. Review bindings support replacement, retirement
+with no replacement, and newly recoverable findings.
+
+`approve_cloud_supersession_preview` binds the candidate, every before/after
+finding proof, reviewer, note, and approval time. Only REVIEW/VALIDATED
+incumbents are eligible.
+
+`apply_cloud_supersession` rechecks the live incumbent proofs/states, records
+SUPERSEDE events in the durable journal, admits exact approved replacement
+findings, CAS-saves the ledger, and replaces the old continuous-processing
+receipt with the approved proposed fingerprint.
