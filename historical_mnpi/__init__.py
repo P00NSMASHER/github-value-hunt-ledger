@@ -24,6 +24,15 @@ from .case_model import (
     verify_case_provenance,
 )
 
+from .transaction_model import (
+    HistoricalTransaction,
+    InstrumentType,
+    TimePrecision,
+    TradeSide,
+    TransactionRegistry,
+    verify_transaction_provenance,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -34,6 +43,12 @@ from .source_registry import (
 )
 
 __all__ = [
+    "HistoricalTransaction",
+    "InstrumentType",
+    "TimePrecision",
+    "TradeSide",
+    "TransactionRegistry",
+    "verify_transaction_provenance",
     "CaseArtifactLink",
     "CaseArtifactRole",
     "CaseEventType",
