@@ -251,6 +251,49 @@ class EconomicDedupeTests(unittest.TestCase):
             {"ALLEGED", "COURT_ESTABLISHED"},
         )
 
+    def test_stale_dedupe_decision_cannot_apply_to_changed_row(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        decision = decide_dedupe(
+            proposal,
+            decision=DedupeDecisionType.SAME_TRANSACTION,
+            reviewer_id="reviewer:1",
+            rationale="Reviewed exact rows.",
+        )
+        changed_right = HistoricalTransaction(
+            **{**right.__dict__, "execution_price": "31.000"}
+        )
+        with self.assertRaisesRegex(ValueError, "transaction hash"):
+            build_economic_transaction_cluster(
+                (left, changed_right),
+                decisions=(decision,),
+                trader_entity_id="person:trader",
+                issuer_entity_id="issuer:canonical",
+            )
+
+    def test_cluster_entity_ids_must_match_reviewed_proposal(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        decision = decide_dedupe(
+            proposal,
+            decision=DedupeDecisionType.SAME_TRANSACTION,
+            reviewer_id="reviewer:1",
+            rationale="Reviewed canonical identities.",
+        )
+        with self.assertRaisesRegex(ValueError, "canonical entity identity mismatch"):
+            build_economic_transaction_cluster(
+                (left, right),
+                decisions=(decision,),
+                trader_entity_id="person:other",
+                issuer_entity_id="issuer:canonical",
+            )
+
     def test_three_member_cluster_requires_complete_pairwise_clique(self):
         sources, manifest, cases, entities, left, right = fixture()
         third = HistoricalTransaction(
