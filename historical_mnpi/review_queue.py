@@ -961,6 +961,9 @@ class HistoricalReviewQueue:
             cases=cases,
             entities=entities,
             entity_crosswalks=entity_crosswalks,
+            source_conflicts=source_conflicts,
+            source_registry=source_registry,
+            artifact_manifest=artifact_manifest,
         )
         self._decisions[review_id] = record
         return record
@@ -1076,7 +1079,7 @@ def render_review_item_markdown(item: ReviewQueueItem) -> str:
     lines.extend([
         "## Candidate evidence",
         "",
-    ]
+    ])
     for candidate in item.candidates:
         lines.extend([
             f"### {candidate.candidate_id}",
