@@ -1,28 +1,41 @@
 {
   "version": "revenue-loop-v1",
-  "status": "ACTIVE_MEASURING",
+  "status": "ACTIVE_MEASURING_HARDENED",
   "command_center_snapshot": {
     "key": "ceo-command-center-v1-revenue-loop",
-    "sha256": "335564a3587b586cea92a43aa3742d8df338ec8988566ef9e59308c47c417034"
+    "sha256": "b48b09f5f63c2878108f00608638f419446914e1903c8cbfb29b672beb622be1"
   },
   "invariants": [
     "no opportunity probability is invented",
     "expected opportunity value stays null until buyer-level evidence supports it",
-    "external execution requires consumed approval unless it is explicitly historical observed evidence",
-    "MEASURING cannot advance to ATTRIBUTED without a verified outcome",
-    "ATTRIBUTED cannot advance to LEARNED without verified learning",
+    "historical outreach is labeled HISTORICAL_OBSERVED and never retroactively treated as approved",
+    "future consequential execution requires an APPROVED non-expired exact approval before entering EXECUTING",
+    "approval becomes CONSUMED only after a successful execution receipt is bound",
+    "EXECUTING cannot advance to MEASURING until the receipt is bound and approval is CONSUMED",
+    "verified outcome attribution cannot exceed 1.0 total",
+    "MEASURING cannot advance to ATTRIBUTED until every verified outcome has exactly 1.0 total attribution",
+    "ATTRIBUTED cannot advance to LEARNED without a VERIFIED memory observation",
     "model estimates cannot count as collected revenue"
   ],
+  "canary": {
+    "approval_execution_flow": "PASSED_IN_ROLLED_BACK_TRANSACTION",
+    "over_attribution_rejection": "PASSED_IN_ROLLED_BACK_TRANSACTION",
+    "persistent_canary_rows": 0
+  },
   "loops": [
     {
       "loop_key": "capturebrief-outreach-001",
       "stage": "MEASURING",
       "buyer_count": 3,
-      "observed_outreach_sent": 3,
-      "observed_external_replies": 0,
+      "outreach_sent_count": 3,
+      "external_reply_count": 0,
+      "measurement": "exhaustive within bounded Gmail cohort query as of 2026-09-24",
       "pricing": {
         "status": "VERIFIED_OFFER",
-        "upfront_price_cents": 14900
+        "upfront_price_cents": 14900,
+        "gross_cohort_offer_value_cents": 44700,
+        "expected_pipeline_value_cents": null,
+        "conversion_probability_assigned": false
       },
       "next_gate": "WAIT_FOR_VERIFIED_OUTCOME"
     },
@@ -30,16 +43,22 @@
       "loop_key": "freightrecovery-pilot-001",
       "stage": "MEASURING",
       "buyer_count": 5,
-      "observed_outreach_sent": 5,
-      "observed_external_replies": 0,
+      "outreach_sent_count": 5,
+      "external_reply_count": 0,
+      "measurement": "exhaustive within bounded Gmail cohort query as of 2026-09-24",
       "pricing": {
         "status": "PILOT_FREE_PRICING_DEFERRED",
         "upfront_price_cents": 0,
-        "post_pilot_fee_finalized": false
+        "post_pilot_fee_finalized": false,
+        "expected_pipeline_value_cents": null
       },
       "next_gate": "WAIT_FOR_VERIFIED_OUTCOME"
     }
   ],
+  "measurement_window_end": "2026-10-01T23:59:59Z",
+  "verified_outcomes": 0,
+  "verified_attributions": 0,
+  "verified_learning_items": 0,
   "autonomous_external_actions_enabled": false,
   "revenue_loop_external_actions_executed": false
 }
