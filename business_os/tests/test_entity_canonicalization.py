@@ -95,10 +95,37 @@ class EntityCanonicalizerTests(unittest.TestCase):
         self.assertGreater(ev.score, 0)
 
     def test_review_pair_requires_explicit_approval(self):
-        a = self.add_company("a", "Acme Freight", aliases=["Acme"])
-        b = self.add_company("b", "Acme Logistics", aliases=["Acme"])
+        account = self.g.add_node(
+            "BUSINESS",
+            "Freight Recovery",
+            node_id="review-business",
+            source_ref="review-business",
+            source_sha256=digest("review-business"),
+        )
+        a = self.add_company(
+            "a",
+            "Acme Freight",
+            aliases=["Acme", "Acme Logistics"],
+            description="regional freight logistics carrier",
+        )
+        b = self.add_company(
+            "b",
+            "Acme Logistics",
+            aliases=["Acme", "Acme Freight"],
+            description="regional freight logistics carrier",
+        )
+        for node_id, label in [("a", "review-a"), ("b", "review-b")]:
+            self.g.add_edge(
+                node_id,
+                "CUSTOMER_OF",
+                account.id,
+                source_ref=label,
+                source_sha256=digest(label),
+            )
+
         ev = self.c.compare(a, b)
         self.assertEqual("REVIEW", ev.decision)
+        self.assertGreater(ev.neighbor_overlap, 0)
         with self.assertRaises(PermissionError):
             self.c.merge(a, b, evidence=ev)
 
