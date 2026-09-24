@@ -14,6 +14,12 @@ from enum import Enum
 from typing import Iterable
 
 from .case_model import CaseRegistry
+from .entity_resolution import (
+    CaseEntityCrosswalkRegistry,
+    EntityKind,
+    EntityResolutionRegistry,
+    verify_case_entity_crosswalk,
+)
 from .event_model import EventRegistry, InformationEvent, verify_event_provenance
 from .extractors import CandidateFieldStatus, CandidateKind, CandidateRecord
 from .raw_artifacts import (
@@ -69,6 +75,28 @@ class ReviewIdentitySnapshot:
 
 
 @dataclass(frozen=True)
+class ReviewDurableIdentitySnapshot:
+    trader_entity_id: str
+    trader_entity_proof_hash: str
+    trader_crosswalk_hash: str
+    issuer_entity_id: str
+    issuer_entity_proof_hash: str
+    issuer_crosswalk_hash: str
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "trader_entity_id": self.trader_entity_id,
+            "trader_entity_proof_hash": self.trader_entity_proof_hash,
+            "trader_crosswalk_hash": self.trader_crosswalk_hash,
+            "issuer_entity_id": self.issuer_entity_id,
+            "issuer_entity_proof_hash": self.issuer_entity_proof_hash,
+            "issuer_crosswalk_hash": self.issuer_crosswalk_hash,
+        })
+
+
+@dataclass(frozen=True)
 class ReviewTemporalSnapshot:
     trade_time_precision: str
     trade_timestamp: str | None
@@ -116,6 +144,7 @@ class ReviewQueueItem:
     event_id: str
     event_proof_hash: str
     identity: ReviewIdentitySnapshot
+    durable_identity: ReviewDurableIdentitySnapshot | None
     temporal: ReviewTemporalSnapshot
     candidates: tuple[CandidateRecord, ...]
     conflicts: tuple[ReviewConflict, ...]
@@ -134,6 +163,11 @@ class ReviewQueueItem:
             "event_id": self.event_id,
             "event_proof_hash": self.event_proof_hash,
             "identity": self.identity.__dict__,
+            "durable_identity": (
+                self.durable_identity.__dict__
+                if self.durable_identity is not None
+                else None
+            ),
             "temporal": self.temporal.__dict__,
             "candidate_hashes": sorted(item.proof_hash for item in self.candidates),
             "conflict_hashes": sorted(item.proof_hash for item in self.conflicts),
@@ -161,6 +195,7 @@ class HistoricalReviewDecision:
     review_id: str
     review_item_hash: str
     normalized_row_hash: str
+    durable_identity_hash: str | None
     decision: ReviewDecision
     checks: ReviewChecks
     reviewer_id: str
@@ -177,6 +212,7 @@ class HistoricalReviewDecision:
             "review_id": self.review_id,
             "review_item_hash": self.review_item_hash,
             "normalized_row_hash": self.normalized_row_hash,
+            "durable_identity_hash": self.durable_identity_hash,
             "decision": self.decision.value,
             "checks": self.checks.__dict__,
             "reviewer_id": self.reviewer_id,
@@ -191,6 +227,77 @@ class HistoricalReviewDecision:
             raise ValueError("review decision hash mismatch")
         if self.live_trading_allowed is not False:
             raise ValueError("historical review cannot authorize live trading")
+        if self.research_corpus_eligible and self.durable_identity_hash is None:
+            raise ValueError(
+                "research-eligible review requires durable identity proof"
+            )
+
+
+def _build_durable_identity_snapshot(
+    record: HistoricalTransaction,
+    *,
+    cases: CaseRegistry,
+    entities: EntityResolutionRegistry,
+    entity_crosswalks: CaseEntityCrosswalkRegistry,
+) -> ReviewDurableIdentitySnapshot:
+    try:
+        trader_crosswalk = entity_crosswalks.get(
+            record.case_id,
+            EntityKind.TRADER,
+            record.trader_party_id,
+        )
+    except KeyError as exc:
+        raise ValueError("missing durable trader identity crosswalk") from exc
+    try:
+        issuer_crosswalk = entity_crosswalks.get(
+            record.case_id,
+            EntityKind.ISSUER,
+            record.issuer_id,
+        )
+    except KeyError as exc:
+        raise ValueError("missing durable issuer identity crosswalk") from exc
+
+    verify_case_entity_crosswalk(
+        trader_crosswalk,
+        cases=cases,
+        entities=entities,
+    )
+    verify_case_entity_crosswalk(
+        issuer_crosswalk,
+        cases=cases,
+        entities=entities,
+    )
+
+    trader = entities.trader(trader_crosswalk.durable_entity_id)
+    issuer = entities.issuer(issuer_crosswalk.durable_entity_id)
+    return ReviewDurableIdentitySnapshot(
+        trader_entity_id=trader.entity_id,
+        trader_entity_proof_hash=trader.proof_hash,
+        trader_crosswalk_hash=trader_crosswalk.proof_hash,
+        issuer_entity_id=issuer.entity_id,
+        issuer_entity_proof_hash=issuer.proof_hash,
+        issuer_crosswalk_hash=issuer_crosswalk.proof_hash,
+    )
+
+
+def verify_review_durable_identity(
+    item: ReviewQueueItem,
+    *,
+    cases: CaseRegistry,
+    entities: EntityResolutionRegistry,
+    entity_crosswalks: CaseEntityCrosswalkRegistry,
+) -> None:
+    item.verify_integrity()
+    if item.durable_identity is None:
+        raise ValueError("review item has no durable identity snapshot")
+    current = _build_durable_identity_snapshot(
+        item.proposed_record,
+        cases=cases,
+        entities=entities,
+        entity_crosswalks=entity_crosswalks,
+    )
+    if current.proof_hash != item.durable_identity.proof_hash:
+        raise ValueError("review durable identity snapshot is stale or changed")
 
 
 def _iso(value: str) -> str:
@@ -372,6 +479,8 @@ def build_review_item(
     artifact_manifest: RawArtifactManifest,
     created_at: str,
     created_by: str,
+    entities: EntityResolutionRegistry | None = None,
+    entity_crosswalks: CaseEntityCrosswalkRegistry | None = None,
 ) -> ReviewQueueItem:
     created_at = _iso(created_at)
     if not created_by.strip():
@@ -439,6 +548,21 @@ def build_review_item(
             "by candidate evidence"
         )
 
+    if (entities is None) != (entity_crosswalks is None):
+        raise ValueError(
+            "entities and entity_crosswalks must be supplied together"
+        )
+    durable_identity = (
+        _build_durable_identity_snapshot(
+            proposed_record,
+            cases=cases,
+            entities=entities,
+            entity_crosswalks=entity_crosswalks,
+        )
+        if entities is not None and entity_crosswalks is not None
+        else None
+    )
+
     parties = {item.party_id: item for item in case.parties}
     issuers = {item.issuer_id: item for item in case.issuers}
     identity = ReviewIdentitySnapshot(
@@ -470,6 +594,11 @@ def build_review_item(
         "event_id": event.event_id,
         "event_proof_hash": event.proof_hash,
         "identity": identity.__dict__,
+        "durable_identity": (
+            durable_identity.__dict__
+            if durable_identity is not None
+            else None
+        ),
         "temporal": temporal.__dict__,
         "candidate_hashes": sorted(
             candidate.proof_hash for candidate in candidate_tuple
@@ -490,6 +619,7 @@ def build_review_item(
         event_id=event.event_id,
         event_proof_hash=event.proof_hash,
         identity=identity,
+        durable_identity=durable_identity,
         temporal=temporal,
         candidates=candidate_tuple,
         conflicts=conflicts,
@@ -510,6 +640,9 @@ def decide_review_item(
     reviewer_id: str,
     reviewed_at: str,
     rationale: str,
+    cases: CaseRegistry | None = None,
+    entities: EntityResolutionRegistry | None = None,
+    entity_crosswalks: CaseEntityCrosswalkRegistry | None = None,
 ) -> HistoricalReviewDecision:
     item.verify_integrity()
     if decision is ReviewDecision.PENDING:
@@ -529,9 +662,28 @@ def decide_review_item(
             raise ValueError(
                 "historical research approval requires all reviewer checks"
             )
+        if item.durable_identity is None:
+            raise ValueError(
+                "historical research approval requires durable identity crosswalks"
+            )
+        if cases is None or entities is None or entity_crosswalks is None:
+            raise ValueError(
+                "historical research approval requires current identity registries"
+            )
+        verify_review_durable_identity(
+            item,
+            cases=cases,
+            entities=entities,
+            entity_crosswalks=entity_crosswalks,
+        )
 
     eligible = (
         decision is ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH
+    )
+    durable_identity_hash = (
+        item.durable_identity.proof_hash
+        if item.durable_identity is not None
+        else None
     )
     body = {
         "schema": 1,
@@ -539,6 +691,7 @@ def decide_review_item(
         "review_id": item.review_id,
         "review_item_hash": item.review_item_hash,
         "normalized_row_hash": item.normalized_row_hash,
+        "durable_identity_hash": durable_identity_hash,
         "decision": decision.value,
         "checks": checks.__dict__,
         "reviewer_id": reviewer_id.strip(),
@@ -551,6 +704,7 @@ def decide_review_item(
         review_id=item.review_id,
         review_item_hash=item.review_item_hash,
         normalized_row_hash=item.normalized_row_hash,
+        durable_identity_hash=durable_identity_hash,
         decision=decision,
         checks=checks,
         reviewer_id=reviewer_id.strip(),
@@ -592,6 +746,9 @@ class HistoricalReviewQueue:
         reviewer_id: str,
         reviewed_at: str,
         rationale: str,
+        cases: CaseRegistry | None = None,
+        entities: EntityResolutionRegistry | None = None,
+        entity_crosswalks: CaseEntityCrosswalkRegistry | None = None,
     ) -> HistoricalReviewDecision:
         try:
             item = self._items[review_id]
@@ -609,6 +766,9 @@ class HistoricalReviewQueue:
             reviewer_id=reviewer_id,
             reviewed_at=reviewed_at,
             rationale=rationale,
+            cases=cases,
+            entities=entities,
+            entity_crosswalks=entity_crosswalks,
         )
         self._decisions[review_id] = record
         return record
@@ -650,7 +810,19 @@ def render_review_item_markdown(item: ReviewQueueItem) -> str:
         f"- Normalized row hash: `{item.normalized_row_hash}`",
         f"- Case: **{item.identity.case_title}**",
         f"- Trader identity: **{item.identity.trader_name}**",
+        (
+            "- Durable trader identity: "
+            f"**{item.durable_identity.trader_entity_id}**"
+            if item.durable_identity is not None
+            else "- Durable trader identity: **not attached**"
+        ),
         f"- Issuer identity: **{item.identity.issuer_name}**",
+        (
+            "- Durable issuer identity: "
+            f"**{item.durable_identity.issuer_entity_id}**"
+            if item.durable_identity is not None
+            else "- Durable issuer identity: **not attached**"
+        ),
         f"- Event: **{item.identity.event_summary}**",
         f"- Trade-time precision: **{item.temporal.trade_time_precision}**",
         (
@@ -734,6 +906,7 @@ __all__ = [
     "ReviewChecks",
     "ReviewConflict",
     "ReviewDecision",
+    "ReviewDurableIdentitySnapshot",
     "ReviewIdentitySnapshot",
     "ReviewQueueItem",
     "ReviewTemporalSnapshot",
@@ -741,4 +914,5 @@ __all__ = [
     "decide_review_item",
     "detect_candidate_conflicts",
     "render_review_item_markdown",
+    "verify_review_durable_identity",
 ]
