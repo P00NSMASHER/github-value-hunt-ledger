@@ -6,7 +6,6 @@
   "migration_count": 30,
   "live_schema_fingerprint_sha256": "ea1e6eda0076baf8eb480b8bb1f711e591b937deaf687c2ec77a2e1730068b45",
   "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
-  "bootstrap_sha256": "c49c7e238c6430d5cbfa615a582747edadc2212a51688cb069f62aebdd806257",
   "migrations": [
     {
       "name": "create_ai_business_os_prod_brain_v1",
@@ -158,5 +157,14 @@
       "sha256": "0fc5088cc96f9dfdd0005334439a60a0b5d05526cce53253160ff0a04820d648",
       "version": "20260924230014"
     }
-  ]
+  ],
+  "public_bootstrap_sanitized": true,
+  "bootstrap_hash_status": "PUBLIC_REDACTED_BOOTSTRAP_HASH_VERIFIED_BY_CI_AT_CHECKOUT",
+  "private_seed_placeholders": [
+    "__PRIVATE_STRIPE_ACCOUNT_ID_1__",
+    "__PRIVATE_STRIPE_ACCOUNT_ID_2__",
+    "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
+  ],
+  "live_statement_hashes_retained": true,
+  "note": "Public bootstrap preserves ordered schema/control migrations but redacts live provider account identifiers. Exact live statement hashes remain in the migration list; private identifiers stay outside Git."
 }
