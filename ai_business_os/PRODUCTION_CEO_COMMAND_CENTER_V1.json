@@ -1,0 +1,32 @@
+{
+  "version": "ceo-command-center-v1",
+  "status": "ACTIVE_INTERNAL",
+  "live_data_location": "Supabase private schema ai_business_os_prod",
+  "latest_snapshot_key": "ceo-command-center-v1-initial",
+  "latest_snapshot_hash": "a43a52866cbae835aab49ea81a5a7a58589fc565deece44d7bd811e34c08c561",
+  "generated_at": "2026-09-24T21:57:10.695610Z",
+  "system_summary": {
+    "active_agents": 7,
+    "low_risk_agents": 6,
+    "shadow_agents": 1,
+    "enabled_tool_providers": 7,
+    "disabled_tool_providers": 2,
+    "pending_approvals": 1,
+    "consequential_autonomy_enabled": 0
+  },
+  "portfolio": [
+    "CaptureBrief",
+    "FreightRecovery",
+    "RecoveryOS",
+    "StarBlox"
+  ],
+  "public_repo_safety": "Renderer contains no email body, recipient address, approval intent parameters, or private source payloads. Full data remains in Supabase.",
+  "refresh_function": "ai_business_os_prod.refresh_command_center_snapshot(text)",
+  "live_views": [
+    "ai_business_os_prod.command_center_portfolio_v1",
+    "ai_business_os_prod.command_center_agents_v1",
+    "ai_business_os_prod.command_center_system_v1",
+    "ai_business_os_prod.command_center_latest_v1",
+    "ai_business_os_prod.approval_inbox_queue"
+  ]
+}
