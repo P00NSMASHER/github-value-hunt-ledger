@@ -361,3 +361,9 @@ Downstream execution receipts are accepted only when they bind the exact handoff
 An internal configurable commercial package now defines the initial AWS pilot scope, deliverables, pricing hypotheses, exclusions, assumptions, and customer acceptance criteria. Recovery success fees are explicitly defined against verified recovered cash only; prospective savings and anomaly exposure are not recovery-fee bases.
 
 The package is marked INTERNAL_PILOT_CONFIGURATION and hard-fails if cloud mutation or external recovery actions are put in scope. It also records that pricing is a hypothesis to test. This half-step creates no contract, invoice, outreach, payment request, customer acceptance, or external commitment.
+
+## Authorized real-account diagnostic intake hardening (step 8)
+
+The real-account runner now requires the customer authorization to bind the exact SHA-256 of every focus, meter, rate, and optional signal file before processing. A separate evidence-review object binds the exact money-bearing focus/meter/rate hashes plus the three verification flags. Customer permission to process therefore cannot promote unreviewed evidence to VALIDATED recovery.
+
+After scope and hash checks, the authorized source bytes are copied into verified private snapshots and the pilot runs only from those snapshots. Changed bytes, symlinks, expired/unverified authorization, out-of-scope FOCUS rows, or evidence-review hash mismatches fail before the diagnostic ledger is created.

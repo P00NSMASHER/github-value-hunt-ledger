@@ -1,9 +1,8 @@
-"""Authorized real-account cloud diagnostic intake and local execution path.
+"""Authorized AWS real-account diagnostic intake and local execution.
 
-This module is designed for customer-provided or otherwise explicitly
-authorized exports. It preflights authorization and FOCUS scope before creating
-any RecoveryOS state, then invokes the existing local read-only pilot pipeline.
-It does not connect to AWS, obtain credentials, or perform external actions.
+Exact customer-authorized input bytes are hash-checked, preflighted for scope,
+and snapshotted into private storage before RecoveryOS runs. Permission to
+process is independent from financial evidence verification.
 """
 from __future__ import annotations
 
@@ -18,18 +17,20 @@ from typing import Any, Mapping
 
 from recoveryworks.models import (
     canonical_hash,
+    freeze_json,
     normalize_sha256,
     normalize_source_hash,
     normalize_utc_timestamp,
 )
 from recoveryworks.pilot_runner import PilotRunResult, run_local_pilot
-from recoveryworks.private_io import atomic_private_write
+from recoveryworks.private_io import (
+    atomic_private_write,
+    private_permissions_verified,
+)
 
 
-_REQUIRED_PURPOSES = {
-    "BILLING_RECOVERY_DIAGNOSTIC",
-    "SAVINGS_ANALYSIS",
-}
+_REQUIRED_INPUTS = ("focus_csv", "meter_csv", "rates_csv")
+_OPTIONAL_INPUTS = ("anomaly_csv", "reconciliation_csv", "savings_csv")
 
 
 def _text(name: str, value: Any) -> str:
@@ -41,7 +42,7 @@ def _text(name: str, value: Any) -> str:
     return normalized
 
 
-def _date(name: str, value: Any) -> str:
+def _iso_date(name: str, value: Any) -> str:
     raw = _text(name, value)
     try:
         return date.fromisoformat(raw).isoformat()
@@ -50,7 +51,9 @@ def _date(name: str, value: Any) -> str:
 
 
 def _instant(value: str) -> datetime:
-    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return datetime.fromisoformat(
+        normalize_utc_timestamp("timestamp", value).replace("Z", "+00:00")
+    )
 
 
 def _file_hash(path: Path) -> str:
@@ -68,16 +71,16 @@ class CustomerDiagnosticAuthorization:
     customer_actor_id: str
     authorized_at: str
     expires_at: str
-    allowed_purposes: tuple[str, ...]
+    authorized_input_hashes: Mapping[str, str]
     source_hash: str
     source_locator: str
+    verified: bool
     credentials_embedded: bool = False
     external_actions_allowed: bool = False
     remediation_allowed: bool = False
 
     def __post_init__(self) -> None:
         for name in (
-            "authorization_id",
             "client_id",
             "provider",
             "billing_account_id",
@@ -86,89 +89,272 @@ class CustomerDiagnosticAuthorization:
         ):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
         object.__setattr__(self, "provider", self.provider.lower())
-        start = _date("period_start", self.period_start)
-        end = _date("period_end", self.period_end)
+        if self.provider != "aws":
+            raise ValueError("first real-account diagnostic path supports AWS only")
+        start = _iso_date("period_start", self.period_start)
+        end = _iso_date("period_end", self.period_end)
         if end < start:
             raise ValueError("authorization period_end cannot predate period_start")
         object.__setattr__(self, "period_start", start)
         object.__setattr__(self, "period_end", end)
-        object.__setattr__(
-            self,
-            "authorized_at",
-            normalize_utc_timestamp("authorized_at", self.authorized_at),
-        )
-        object.__setattr__(
-            self,
-            "expires_at",
-            normalize_utc_timestamp("expires_at", self.expires_at),
-        )
-        if _instant(self.expires_at) <= _instant(self.authorized_at):
-            raise ValueError("diagnostic authorization expiry must follow authorization")
-        purposes = tuple(sorted({_text("allowed_purpose", value) for value in self.allowed_purposes}))
-        if not _REQUIRED_PURPOSES.issubset(purposes):
+        authorized = normalize_utc_timestamp("authorized_at", self.authorized_at)
+        expires = normalize_utc_timestamp("expires_at", self.expires_at)
+        if _instant(expires) <= _instant(authorized):
+            raise ValueError("authorization expiry must follow authorization")
+        object.__setattr__(self, "authorized_at", authorized)
+        object.__setattr__(self, "expires_at", expires)
+
+        hashes = {
+            str(key): normalize_sha256(f"authorized_input_hashes.{key}", value)
+            for key, value in self.authorized_input_hashes.items()
+        }
+        if not set(_REQUIRED_INPUTS).issubset(hashes):
+            raise ValueError("authorization must bind focus, meter, and rates inputs")
+        unknown = set(hashes) - set(_REQUIRED_INPUTS) - set(_OPTIONAL_INPUTS)
+        if unknown:
             raise ValueError(
-                "diagnostic authorization must include billing recovery and savings analysis"
+                "authorization contains unsupported input roles: "
+                + ", ".join(sorted(unknown))
             )
-        object.__setattr__(self, "allowed_purposes", purposes)
+        object.__setattr__(
+            self,
+            "authorized_input_hashes",
+            freeze_json(hashes, name="authorized_input_hashes"),
+        )
         object.__setattr__(self, "source_hash", normalize_source_hash(self.source_hash))
+        if type(self.verified) is not bool:
+            raise ValueError("verified must be boolean")
         if self.credentials_embedded:
             raise ValueError("diagnostic authorization must not embed credentials")
         if self.external_actions_allowed:
-            raise ValueError("diagnostic authorization must not allow external actions")
+            raise ValueError("diagnostic authorization cannot allow external actions")
         if self.remediation_allowed:
-            raise ValueError("diagnostic authorization must not allow remediation")
+            raise ValueError("diagnostic authorization cannot allow remediation")
+        expected = "cloud-diagnostic-authorization:" + canonical_hash(
+            self._identity()
+        )
+        if self.authorization_id != expected:
+            raise ValueError("authorization_id does not bind authorization payload")
+
+    def _identity(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "client_id": self.client_id,
+            "provider": self.provider,
+            "billing_account_id": self.billing_account_id,
+            "period_start": self.period_start,
+            "period_end": self.period_end,
+            "customer_actor_id": self.customer_actor_id,
+            "authorized_at": self.authorized_at,
+            "expires_at": self.expires_at,
+            "authorized_input_hashes": dict(self.authorized_input_hashes),
+            "source_hash": self.source_hash,
+            "source_locator": self.source_locator,
+            "verified": self.verified,
+            "credentials_embedded": False,
+            "external_actions_allowed": False,
+            "remediation_allowed": False,
+        }
 
     @property
     def proof_hash(self) -> str:
-        return canonical_hash({
+        return canonical_hash(self._identity())
+
+
+def build_customer_diagnostic_authorization(
+    *,
+    client_id: str,
+    billing_account_id: str,
+    customer_actor_id: str,
+    period_start: str,
+    period_end: str,
+    authorized_at: str,
+    expires_at: str,
+    authorized_input_hashes: Mapping[str, str],
+    source_hash: str,
+    source_locator: str,
+    verified: bool,
+) -> CustomerDiagnosticAuthorization:
+    identity = {
+        "schema": 1,
+        "client_id": _text("client_id", client_id),
+        "provider": "aws",
+        "billing_account_id": _text("billing_account_id", billing_account_id),
+        "period_start": _iso_date("period_start", period_start),
+        "period_end": _iso_date("period_end", period_end),
+        "customer_actor_id": _text("customer_actor_id", customer_actor_id),
+        "authorized_at": normalize_utc_timestamp("authorized_at", authorized_at),
+        "expires_at": normalize_utc_timestamp("expires_at", expires_at),
+        "authorized_input_hashes": {
+            str(key): normalize_sha256(f"authorized_input_hashes.{key}", value)
+            for key, value in authorized_input_hashes.items()
+        },
+        "source_hash": normalize_source_hash(source_hash),
+        "source_locator": _text("source_locator", source_locator),
+        "verified": verified,
+        "credentials_embedded": False,
+        "external_actions_allowed": False,
+        "remediation_allowed": False,
+    }
+    return CustomerDiagnosticAuthorization(
+        authorization_id="cloud-diagnostic-authorization:"
+        + canonical_hash(identity),
+        client_id=client_id,
+        provider="aws",
+        billing_account_id=billing_account_id,
+        period_start=period_start,
+        period_end=period_end,
+        customer_actor_id=customer_actor_id,
+        authorized_at=authorized_at,
+        expires_at=expires_at,
+        authorized_input_hashes=authorized_input_hashes,
+        source_hash=source_hash,
+        source_locator=source_locator,
+        verified=verified,
+    )
+
+
+@dataclass(frozen=True)
+class DiagnosticEvidenceReview:
+    review_id: str
+    reviewer_id: str
+    reviewed_at: str
+    money_source_hashes: Mapping[str, str]
+    charge_source_verified: bool
+    meter_source_verified: bool
+    rate_source_verified: bool
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "reviewer_id", _text("reviewer_id", self.reviewer_id))
+        object.__setattr__(
+            self,
+            "reviewed_at",
+            normalize_utc_timestamp("reviewed_at", self.reviewed_at),
+        )
+        hashes = {
+            str(key): normalize_sha256(f"money_source_hashes.{key}", value)
+            for key, value in self.money_source_hashes.items()
+        }
+        if set(hashes) != set(_REQUIRED_INPUTS):
+            raise ValueError(
+                "evidence review must bind exactly focus, meter, and rates"
+            )
+        object.__setattr__(
+            self,
+            "money_source_hashes",
+            freeze_json(hashes, name="money_source_hashes"),
+        )
+        for name in (
+            "charge_source_verified",
+            "meter_source_verified",
+            "rate_source_verified",
+        ):
+            if type(getattr(self, name)) is not bool:
+                raise ValueError(f"{name} must be boolean")
+        expected = "cloud-diagnostic-evidence-review:" + canonical_hash(
+            self._identity()
+        )
+        if self.review_id != expected:
+            raise ValueError("review_id does not bind evidence review payload")
+
+    def _identity(self) -> dict[str, Any]:
+        return {
             "schema": 1,
-            **asdict(self),
-            "allowed_purposes": list(self.allowed_purposes),
-        })
+            "reviewer_id": self.reviewer_id,
+            "reviewed_at": self.reviewed_at,
+            "money_source_hashes": dict(self.money_source_hashes),
+            "charge_source_verified": self.charge_source_verified,
+            "meter_source_verified": self.meter_source_verified,
+            "rate_source_verified": self.rate_source_verified,
+        }
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash(self._identity())
+
+
+def build_diagnostic_evidence_review(
+    *,
+    reviewer_id: str,
+    reviewed_at: str,
+    money_source_hashes: Mapping[str, str],
+    charge_source_verified: bool,
+    meter_source_verified: bool,
+    rate_source_verified: bool,
+) -> DiagnosticEvidenceReview:
+    identity = {
+        "schema": 1,
+        "reviewer_id": _text("reviewer_id", reviewer_id),
+        "reviewed_at": normalize_utc_timestamp("reviewed_at", reviewed_at),
+        "money_source_hashes": {
+            str(key): normalize_sha256(f"money_source_hashes.{key}", value)
+            for key, value in money_source_hashes.items()
+        },
+        "charge_source_verified": charge_source_verified,
+        "meter_source_verified": meter_source_verified,
+        "rate_source_verified": rate_source_verified,
+    }
+    return DiagnosticEvidenceReview(
+        review_id="cloud-diagnostic-evidence-review:" + canonical_hash(identity),
+        reviewer_id=reviewer_id,
+        reviewed_at=reviewed_at,
+        money_source_hashes=money_source_hashes,
+        charge_source_verified=charge_source_verified,
+        meter_source_verified=meter_source_verified,
+        rate_source_verified=rate_source_verified,
+    )
 
 
 @dataclass(frozen=True)
 class CloudDiagnosticIntakeReceipt:
     diagnostic_id: str
     authorization_proof_hash: str
+    evidence_review_proof_hash: str
     client_id: str
-    provider: str
     billing_account_id: str
     period_start: str
     period_end: str
     input_hashes: Mapping[str, str]
+    private_snapshot_paths: Mapping[str, str]
     pilot_deployment_plan_hash: str
     pilot_report_path: str
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
+        for name in (
             "authorization_proof_hash",
-            normalize_sha256(
-                "authorization_proof_hash", self.authorization_proof_hash
-            ),
-        )
-        object.__setattr__(
-            self,
+            "evidence_review_proof_hash",
             "pilot_deployment_plan_hash",
-            normalize_sha256(
-                "pilot_deployment_plan_hash", self.pilot_deployment_plan_hash
-            ),
-        )
+        ):
+            object.__setattr__(self, name, normalize_sha256(name, getattr(self, name)))
         for name in (
             "diagnostic_id",
             "client_id",
-            "provider",
             "billing_account_id",
             "pilot_report_path",
         ):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
-        normalized_hashes: dict[str, str] = {}
-        for key, value in self.input_hashes.items():
-            normalized_hashes[str(key)] = normalize_sha256(
-                f"input_hashes.{key}", value
-            )
-        object.__setattr__(self, "input_hashes", normalized_hashes)
+        object.__setattr__(
+            self,
+            "input_hashes",
+            freeze_json(
+                {
+                    str(key): normalize_sha256(f"input_hashes.{key}", value)
+                    for key, value in self.input_hashes.items()
+                },
+                name="input_hashes",
+            ),
+        )
+        object.__setattr__(
+            self,
+            "private_snapshot_paths",
+            freeze_json(
+                {
+                    str(key): _text(f"private_snapshot_paths.{key}", value)
+                    for key, value in self.private_snapshot_paths.items()
+                },
+                name="private_snapshot_paths",
+            ),
+        )
 
     @property
     def proof_hash(self) -> str:
@@ -176,12 +362,13 @@ class CloudDiagnosticIntakeReceipt:
             "schema": 1,
             "diagnostic_id": self.diagnostic_id,
             "authorization_proof_hash": self.authorization_proof_hash,
+            "evidence_review_proof_hash": self.evidence_review_proof_hash,
             "client_id": self.client_id,
-            "provider": self.provider,
             "billing_account_id": self.billing_account_id,
             "period_start": self.period_start,
             "period_end": self.period_end,
-            "input_hashes": dict(sorted(self.input_hashes.items())),
+            "input_hashes": dict(self.input_hashes),
+            "private_snapshot_paths": dict(self.private_snapshot_paths),
             "pilot_deployment_plan_hash": self.pilot_deployment_plan_hash,
             "pilot_report_path": self.pilot_report_path,
         })
@@ -190,12 +377,13 @@ class CloudDiagnosticIntakeReceipt:
         return {
             "diagnostic_id": self.diagnostic_id,
             "authorization_proof_hash": self.authorization_proof_hash,
+            "evidence_review_proof_hash": self.evidence_review_proof_hash,
             "client_id": self.client_id,
-            "provider": self.provider,
             "billing_account_id": self.billing_account_id,
             "period_start": self.period_start,
             "period_end": self.period_end,
-            "input_hashes": dict(sorted(self.input_hashes.items())),
+            "input_hashes": dict(self.input_hashes),
+            "private_snapshot_paths": dict(self.private_snapshot_paths),
             "pilot_deployment_plan_hash": self.pilot_deployment_plan_hash,
             "pilot_report_path": self.pilot_report_path,
             "proof_hash": self.proof_hash,
@@ -204,14 +392,12 @@ class CloudDiagnosticIntakeReceipt:
 
 @dataclass(frozen=True)
 class AuthorizedCloudDiagnosticResult:
-    authorization: CustomerDiagnosticAuthorization
     intake_receipt: CloudDiagnosticIntakeReceipt
     pilot: PilotRunResult
     intake_receipt_path: str
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            "authorization_proof_hash": self.authorization.proof_hash,
             "intake_receipt": self.intake_receipt.as_dict(),
             "pilot": self.pilot.as_dict(),
             "intake_receipt_path": self.intake_receipt_path,
@@ -221,8 +407,8 @@ class AuthorizedCloudDiagnosticResult:
 def _resolve(base: Path, value: Any, *, name: str) -> Path:
     raw = Path(_text(name, value))
     path = raw if raw.is_absolute() else base / raw
-    if not path.is_file():
-        raise ValueError(f"{name} does not exist as a file: {path}")
+    if path.is_symlink() or not path.is_file():
+        raise ValueError(f"{name} must be a regular file: {path}")
     return path
 
 
@@ -253,7 +439,7 @@ def _preflight_focus(
         provider = str(row.get("ProviderName") or "").strip().lower()
         account = str(row.get("BillingAccountId") or "").strip()
         row_currency = str(row.get("BillingCurrency") or "").strip().upper()
-        service_date = _date(
+        service_date = _iso_date(
             f"FOCUS row {row_number} ChargePeriodStart",
             str(row.get("ChargePeriodStart") or "")[:10],
         )
@@ -271,121 +457,71 @@ def _preflight_focus(
             )
 
 
-def authorization_from_intake(raw: Mapping[str, Any]) -> CustomerDiagnosticAuthorization:
-    authorization = raw.get("authorization")
-    if not isinstance(authorization, Mapping):
-        raise ValueError("authorization must be an object")
-    return CustomerDiagnosticAuthorization(
-        authorization_id=_text(
-            "authorization.authorization_id", authorization.get("authorization_id")
-        ),
-        client_id=_text("client_id", raw.get("client_id")),
-        provider=_text("provider", raw.get("provider")),
-        billing_account_id=_text(
-            "billing_account_id", raw.get("billing_account_id")
-        ),
-        period_start=_date(
-            "period.start", (raw.get("period") or {}).get("start")
-            if isinstance(raw.get("period"), Mapping)
-            else None,
-        ),
-        period_end=_date(
-            "period.end", (raw.get("period") or {}).get("end")
-            if isinstance(raw.get("period"), Mapping)
-            else None,
-        ),
-        customer_actor_id=_text(
-            "authorization.customer_actor_id", authorization.get("customer_actor_id")
-        ),
-        authorized_at=_text(
-            "authorization.authorized_at", authorization.get("authorized_at")
-        ),
-        expires_at=_text(
-            "authorization.expires_at", authorization.get("expires_at")
-        ),
-        allowed_purposes=tuple(authorization.get("allowed_purposes") or ()),
-        source_hash=_text(
-            "authorization.source_hash", authorization.get("source_hash")
-        ),
-        source_locator=_text(
-            "authorization.source_locator", authorization.get("source_locator")
-        ),
-        credentials_embedded=bool(authorization.get("credentials_embedded", False)),
-        external_actions_allowed=bool(
-            authorization.get("external_actions_allowed", False)
-        ),
-        remediation_allowed=bool(authorization.get("remediation_allowed", False)),
-    )
-
-
 def run_authorized_cloud_diagnostic(
-    intake: Mapping[str, Any],
     *,
+    diagnostic_id: str,
+    authorization: CustomerDiagnosticAuthorization,
+    evidence_review: DiagnosticEvidenceReview,
+    input_paths: Mapping[str, str],
+    cletrics_release: str,
+    cletrics_commit: str,
+    exported_at: str,
+    currency: str = "USD",
+    private_root: str | Path,
     base_dir: str | Path = ".",
     run_at: str,
 ) -> AuthorizedCloudDiagnosticResult:
-    if intake.get("schema") != 1:
-        raise ValueError("unsupported diagnostic intake schema")
     base = Path(base_dir).resolve()
-    authorization = authorization_from_intake(intake)
     checked = normalize_utc_timestamp("run_at", run_at)
+    if not authorization.verified:
+        raise ValueError("customer diagnostic authorization must be verified")
     if _instant(checked) < _instant(authorization.authorized_at):
         raise ValueError("diagnostic run cannot predate customer authorization")
     if _instant(checked) > _instant(authorization.expires_at):
         raise ValueError("customer diagnostic authorization has expired")
 
-    currency = _text("currency", intake.get("currency", "USD")).upper()
-    inputs = intake.get("inputs")
-    if not isinstance(inputs, Mapping):
-        raise ValueError("inputs must be an object")
-    focus = _resolve(base, inputs.get("focus_csv"), name="inputs.focus_csv")
-    meter = _resolve(base, inputs.get("meter_csv"), name="inputs.meter_csv")
-    rates = _resolve(base, inputs.get("rates_csv"), name="inputs.rates_csv")
+    paths: dict[str, Path] = {}
+    for role in _REQUIRED_INPUTS:
+        if role not in input_paths:
+            raise ValueError(f"diagnostic input missing {role}")
+    for role, value in input_paths.items():
+        if role not in set(_REQUIRED_INPUTS) | set(_OPTIONAL_INPUTS):
+            raise ValueError(f"unsupported diagnostic input role: {role}")
+        paths[role] = _resolve(base, value, name=f"inputs.{role}")
+
+    current_hashes = {role: _file_hash(path) for role, path in paths.items()}
+    if current_hashes != dict(authorization.authorized_input_hashes):
+        raise ValueError("diagnostic source bytes do not match customer authorization")
+    money_hashes = {role: current_hashes[role] for role in _REQUIRED_INPUTS}
+    if money_hashes != dict(evidence_review.money_source_hashes):
+        raise ValueError("evidence review does not bind current money-bearing inputs")
+
+    currency = _text("currency", currency).upper()
     _preflight_focus(
-        focus,
+        paths["focus_csv"],
         authorization=authorization,
         currency=currency,
     )
 
-    optional_paths: dict[str, Path] = {}
-    for key in ("anomaly_csv", "reconciliation_csv", "savings_csv"):
-        value = inputs.get(key)
-        if value:
-            optional_paths[key] = _resolve(
-                base, value, name=f"inputs.{key}"
-            )
-
-    verification = intake.get("verification", {})
-    if not isinstance(verification, Mapping):
-        raise ValueError("verification must be an object")
-    for key in (
-        "charge_source_verified",
-        "meter_source_verified",
-        "rate_source_verified",
-    ):
-        if type(verification.get(key, False)) is not bool:
-            raise ValueError(f"verification.{key} must be boolean")
-
-    diagnostic_id = _text("diagnostic_id", intake.get("diagnostic_id"))
-    outputs = intake.get("outputs", {})
-    if not isinstance(outputs, Mapping):
-        raise ValueError("outputs must be an object")
-    private_root_value = outputs.get(
-        "private_root", f"private/diagnostics/{diagnostic_id}"
-    )
-    private_root = Path(_text("outputs.private_root", private_root_value))
+    private_root = Path(private_root)
     if not private_root.is_absolute():
         private_root = base / private_root
+    snapshot_root = private_root / "intake"
+    snapped: dict[str, str] = {}
+    for role in sorted(paths):
+        source = paths[role]
+        target = snapshot_root / f"{role}-{current_hashes[role]}{source.suffix}"
+        atomic_private_write(target, source.read_bytes())
+        if not private_permissions_verified(target):
+            raise PermissionError(f"private input snapshot failed: {role}")
+        snapped[role] = str(target)
 
-    cletrics = intake.get("cletrics")
-    if not isinstance(cletrics, Mapping):
-        raise ValueError("cletrics must be an object")
     pilot_spec: dict[str, Any] = {
         "schema": 1,
-        "deployment_id": f"diagnostic:{diagnostic_id}",
+        "deployment_id": f"diagnostic:{_text('diagnostic_id', diagnostic_id)}",
         "client_id": authorization.client_id,
         "currency": currency,
-        "provider": authorization.provider,
+        "provider": "aws",
         "security": {
             "cloud_access_mode": "READ_ONLY",
             "recoveryos_provider_write_credentials": False,
@@ -396,29 +532,23 @@ def run_authorized_cloud_diagnostic(
         "period": {
             "start": authorization.period_start,
             "end": authorization.period_end,
-            "exported_at": _text(
-                "cletrics.exported_at", cletrics.get("exported_at")
-            ),
+            "exported_at": normalize_utc_timestamp("exported_at", exported_at),
         },
         "cletrics": {
-            "focus_csv": str(focus),
-            "meter_csv": str(meter),
-            "release": _text("cletrics.release", cletrics.get("release")),
-            "commit": cletrics.get("commit"),
-            "image_digest": cletrics.get("image_digest"),
+            "focus_csv": snapped["focus_csv"],
+            "meter_csv": snapped["meter_csv"],
+            "release": _text("cletrics_release", cletrics_release),
+            "commit": _text("cletrics_commit", cletrics_commit),
         },
         "recoveryos": {
-            "rates_csv": str(rates),
+            "rates_csv": snapped["rates_csv"],
             "verification": {
-                "charge_source_verified": verification.get(
-                    "charge_source_verified", False
-                ),
-                "meter_source_verified": verification.get(
-                    "meter_source_verified", False
-                ),
-                "rate_source_verified": verification.get(
-                    "rate_source_verified", False
-                ),
+                "charge_source_verified":
+                    evidence_review.charge_source_verified,
+                "meter_source_verified":
+                    evidence_review.meter_source_verified,
+                "rate_source_verified":
+                    evidence_review.rate_source_verified,
             },
             "bundle_path": str(private_root / "cletrics-bundle.zip"),
             "ledger_path": str(private_root / "ledger.json"),
@@ -426,27 +556,25 @@ def run_authorized_cloud_diagnostic(
             "report_path": str(private_root / "cloud-assurance.json"),
         },
     }
-    for key, path in optional_paths.items():
-        pilot_spec["cletrics"][key] = str(path)
+    for role, spec_key in (
+        ("anomaly_csv", "anomaly_csv"),
+        ("reconciliation_csv", "reconciliation_csv"),
+        ("savings_csv", "savings_csv"),
+    ):
+        if role in snapped:
+            pilot_spec["cletrics"][spec_key] = snapped[role]
 
     pilot = run_local_pilot(pilot_spec, base_dir=base)
-    input_hashes = {
-        "focus_csv": _file_hash(focus),
-        "meter_csv": _file_hash(meter),
-        "rates_csv": _file_hash(rates),
-    }
-    input_hashes.update(
-        {key: _file_hash(path) for key, path in optional_paths.items()}
-    )
     receipt = CloudDiagnosticIntakeReceipt(
         diagnostic_id=diagnostic_id,
         authorization_proof_hash=authorization.proof_hash,
+        evidence_review_proof_hash=evidence_review.proof_hash,
         client_id=authorization.client_id,
-        provider=authorization.provider,
         billing_account_id=authorization.billing_account_id,
         period_start=authorization.period_start,
         period_end=authorization.period_end,
-        input_hashes=input_hashes,
+        input_hashes=current_hashes,
+        private_snapshot_paths=snapped,
         pilot_deployment_plan_hash=pilot.deployment_plan_hash,
         pilot_report_path=pilot.report_path,
     )
@@ -464,38 +592,21 @@ def run_authorized_cloud_diagnostic(
         ).encode("utf-8"),
     )
     return AuthorizedCloudDiagnosticResult(
-        authorization=authorization,
         intake_receipt=receipt,
         pilot=pilot,
         intake_receipt_path=str(receipt_path),
     )
 
 
-def load_diagnostic_intake(path: str | Path) -> Mapping[str, Any]:
-    try:
-        value = json.loads(Path(path).read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise ValueError("diagnostic intake must be readable JSON") from exc
-    if not isinstance(value, Mapping):
-        raise ValueError("diagnostic intake must be a JSON object")
-    return value
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Run an authorized local cloud recovery diagnostic."
+        description="This API is intended to be invoked by an authorized wrapper."
     )
-    parser.add_argument("--intake", required=True)
-    parser.add_argument("--base-dir", default=".")
-    parser.add_argument("--run-at", required=True)
-    args = parser.parse_args(argv)
-    result = run_authorized_cloud_diagnostic(
-        load_diagnostic_intake(args.intake),
-        base_dir=args.base_dir,
-        run_at=args.run_at,
+    parser.error(
+        "construct CustomerDiagnosticAuthorization and DiagnosticEvidenceReview "
+        "in an authorized integration; raw CLI authorization is intentionally unsupported"
     )
-    print(json.dumps(result.as_dict(), sort_keys=True))
-    return 0
+    return 2
 
 
 if __name__ == "__main__":
