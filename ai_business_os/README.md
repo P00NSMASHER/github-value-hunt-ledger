@@ -44,46 +44,58 @@ relationship history.
 
 Status: implemented and merged.
 
-The sixth upgrade inserts a fail-closed authority layer between agent intent and real tool execution:
-typed action classes, explicit permissions, allowlists/denylists, rolling budgets, exact-request
-human approvals, replay protection, per-agent/global kill switches, and SHA-256 audit receipts.
+Fail-closed operational authority using typed action classes, explicit permissions,
+allowlists/denylists, rolling budgets, exact-request human approvals, replay protection,
+per-agent/global kill switches, and SHA-256 audit receipts.
 
 ## Step 7 — Governed autonomous software factory
 
 Status: implemented and merged.
 
-The seventh upgrade turns approved engineering goals into restart-safe software work with isolated
-attempt workspaces, retries, exact independent-audit binding, machine-enforced Step-6 PR/merge
-authorization, mandatory human-approved production merge, and goal completion only after the
-governed merge is recorded.
+Approved engineering work becomes restart-safe isolated implementation attempts, independent audits,
+governance-bound PR creation, mandatory human-approved production merge, retries/reconciliation, and
+goal completion only after the governed merge.
 
 ## Step 8 — Persistent Evidence / Truth Engine
 
+Status: implemented and merged.
+
+Consequential claims resolve through explicit proof obligations, typed source authority, freshness,
+admissibility, independence, contradiction handling, content-addressed truth receipts, deterministic
+next-best-evidence planning, stale-receipt invalidation, and Step-6-governed evidence acquisition.
+
+## Step 9 — Reversible entity canonicalization
+
 Status: implemented on this branch.
 
-The eighth upgrade makes proof structure explicit and persistent:
+The final upgrade gives the Business Brain a clean single view of duplicate real-world identities
+without deleting source provenance:
 
-- claims are content-addressed and bound to explicit proof obligations;
-- each obligation defines allowed authorities and may require freshness, multiple sources, and
-  independent source groups;
-- every evidence item binds a source reference and SHA-256 source identity;
-- evidence is classified as usable, stale, or inadmissible rather than collapsed into one bucket;
-- future-dated evidence cannot prove an earlier claim;
-- wrong-authority or explicitly inadmissible evidence remains visible but cannot satisfy an obligation;
-- contradictory admissible evidence is preserved and produces CONTESTED rather than being averaged away;
-- required proof can resolve to PROVEN, CONTESTED, NOT_PROVEN, or UNKNOWN;
-- UNKNOWN means no relevant evidence exists, not that the claim is false;
-- every truth receipt binds the exact claim hash, evaluation time, findings, and evidence-set hash;
-- next-best-evidence planning uses deterministic counterfactual proof gain, not invented success probabilities;
-- contested obligations switch to explicit conflict-resolution planning instead of accumulating more supportive evidence;
-- conflict-resolution actions must target the exact contradictory artifact they intend to adjudicate;
-- hypothetical planning evidence and simulated conflict resolution never mutate the real evidence ledger;
-- duplicate source-independence groups are not treated as independent corroboration;
-- next-evidence recommendations are invalidated when the real evidence set changes;
-- evidence acquisition requests pass through the Step-6 governance layer before any external action;
-- this engine recommends and authorizes evidence acquisition but never bypasses tool permissions or executes external systems itself.
+- canonicalization applies to repositories, data sources, technologies, products, businesses, and
+  customers;
+- deterministic matching uses normalized names, aliases, description overlap, graph context, and
+  authoritative hard identifiers;
+- conflicting hard identifiers such as EIN/UEI/DUNS/repository IDs force KEEP_SEPARATE;
+- matches resolve to AUTO_MERGE, REVIEW, or KEEP_SEPARATE;
+- ambiguous REVIEW matches require explicit HUMAN review evidence;
+- match evidence is bound to the exact source provenance hashes used during comparison;
+- canonical field survivorship uses explicit positive source weights;
+- all conflicting source values and losing values remain visible in the canonicalization ledger;
+- source records are marked CANONICALIZED rather than deleted;
+- original canonical keys, labels, and aliases resolve to the active canonical entity;
+- new graph writes cannot silently continue attaching to inactive duplicate records;
+- canonical relationship views collapse duplicate semantic edges while preserving every underlying
+  evidence edge;
+- merges are reversible when doing so will not orphan live canonical relationships;
+- reversal restores source statuses and original alias bindings while retaining the derived entity
+  as REVERSED historical evidence;
+- canonical identity resolution is transitive across multi-stage merges;
+- original leaf-source lineage remains visible after nested canonicalization;
+- older merges cannot be reversed underneath a newer active merge;
+- corporate mergers/acquisitions are not confused with duplicate identity when authoritative legal
+  identifiers differ.
 
-The first eight upgrades establish:
+## Complete architecture
 
 ```
 durable work
@@ -101,6 +113,8 @@ bounded operational authority
 governed autonomous software delivery
    ↓
 explicit proof obligations and truth-state reasoning
+   ↓
+clean, reversible canonical business identity
 ```
 
 ### Run all AI Business OS tests
@@ -113,6 +127,9 @@ python -m unittest discover -s ai_business_os -p "test_*.py"
 
 Memory is evidence, not authority. Completion is not self-asserted. Learning is not deployment.
 Graph connectivity is not proof. Operational power is granted per action under explicit policy,
-budget, approval, and kill-switch controls. Software automation may prepare and verify work, but
-production authority remains separate. A model's confidence is never proof; consequential claims
-must resolve through explicit evidence obligations.
+budget, approval, and kill-switch controls. Production authority remains separate from software
+automation. Model confidence is never proof. Canonical identity is never permission to erase source
+history.
+
+When Step 9 passes the full regression suite and merges, the nine-upgrade AI Business OS foundation
+is complete.
