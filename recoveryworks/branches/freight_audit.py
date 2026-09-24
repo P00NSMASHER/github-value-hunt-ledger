@@ -395,12 +395,30 @@ def map_freight_audit_to_recovery(
             verified_sources = proof_complete and all(
                 ref.verified for ref in source_refs
             )
+            authority_evidence: tuple[EvidenceRef, ...] = ()
+            authority_blockers: tuple[str, ...] = ()
+            authority_resolution_hash: str | None = None
+            matched_rule_hashes: tuple[str, ...] = ()
+            resolved_rule: RuleRef | None = controlling_rule
+            if authority_context is not None:
+                authority_resolution = resolve_freight_authority(
+                    authority_context,
+                    finding_type=finding.type,
+                    normalized_category=category,
+                )
+                resolved_rule = authority_resolution.rule
+                authority_evidence = authority_resolution.evidence
+                authority_blockers = authority_resolution.blockers
+                authority_resolution_hash = authority_resolution.authority_hash
+                matched_rule_hashes = authority_resolution.matched_rule_hashes
+
             effective_rule = (
-                controlling_rule
+                resolved_rule
                 if (
-                    controlling_rule is not None
+                    resolved_rule is not None
                     and verified_sources
                     and not integrity
+                    and not authority_blockers
                 )
                 else None
             )
