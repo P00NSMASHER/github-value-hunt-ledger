@@ -487,3 +487,9 @@ Rollback uses the already-bound release rollback manifest and target release, th
 Production incidents now have a private hash-chained lifecycle journal covering DETECTED, ACKNOWLEDGED, ESCALATED, rollback approval/handoff/verification, RECOVERY_CONFIRMED, CLOSED, and REVIEWED states. Invalid transitions, sequence gaps, previous-hash breaks, event tampering, and journal state-hash changes fail closed.
 
 Closure evidence binds the original incident, verified rollback receipt, recovered environment snapshot proof, closing actor/time, and closure reason. A separate post-incident review records root cause, contributing factors, corrective/preventive actions, follow-up owner, and due date while explicitly not claiming that those actions have already been executed.
+
+## Production launch/readiness dossier (step 20)
+
+A single private launch/readiness dossier now binds the exact release, production admission, externally verified security evidence, passing DR rehearsal, successful production-style observability run, rollback readiness, and commercial pilot package. It presents separate CFO, CTO, security, and operations sections and preserves proof hashes for every upstream control plane.
+
+The CFO section exposes pricing only as the existing internal hypothesis and success-fee basis of verified recovered cash. The dossier explicitly cannot claim a signed customer contract, verified customer revenue/traction, external production deployment, or guaranteed economics. JSON and Markdown outputs use private writes.
