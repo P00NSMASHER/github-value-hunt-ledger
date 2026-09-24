@@ -193,7 +193,7 @@ class SimulatedHumanFreightReviewerTests(unittest.TestCase):
             all(item.packet_verdict != NOT_SELF_CONTAINED for item in no_money)
         )
 
-    def test_mutated_scenario_can_drive_gate_to_no_go(self):
+    def test_missing_identity_in_scenario_drives_release_gate_to_no_go(self):
         scenarios = list(adversarial_scenarios())
         bad = scenarios[2]
         from recoveryworks.branches.freight_audit import CarrierInvoice, LineItem
@@ -201,21 +201,17 @@ class SimulatedHumanFreightReviewerTests(unittest.TestCase):
         scenarios[2] = replace(
             bad,
             invoice=CarrierInvoice(
-                "INV-RATE",
+                "",
                 "LOAD-RATE",
                 "carrier",
-                100_000,
-                line_items=[LineItem("Linehaul", 100_000)],
+                120_000,
+                line_items=[LineItem("Linehaul", 120_000)],
             ),
         )
         gate = run_simulated_human_release_gate(scenarios)
-        self.assertEqual(gate.release_gate, GO)
-        # Reviewer self-containment remains GO even if the scenario's economic
-        # golden truth changes; Step 5 owns detection/accuracy correctness.
-        # This test documents that Step 6 is specifically the human-verifiability gate.
-
-        strict_gate = run_simulated_human_release_gate(required_self_contained_rate=1.0)
-        self.assertEqual(strict_gate.release_gate, GO)
+        self.assertEqual(gate.release_gate, NO_GO)
+        self.assertGreater(gate.manual_reconstruction_case_count, 0)
+        self.assertGreater(gate.failed_packet_count, 0)
 
     def test_markdown_states_simulation_not_real_human_signoff(self):
         report = render_simulated_human_gate_markdown(
