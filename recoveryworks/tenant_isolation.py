@@ -219,6 +219,19 @@ class TenantBindingRegistry:
         if row is None or row["tenant_id"] != identity.tenant_id:
             raise ValueError("artifact proof is not bound to tenant")
 
+    def identity_for_tenant_id(self, tenant_id: str) -> TenantIdentity:
+        tenant = _text("tenant_id", tenant_id)
+        payload = self._read()
+        row = payload.get("tenants", {}).get(tenant)
+        if row is None:
+            raise ValueError("tenant_id is not registered")
+        return TenantIdentity(
+            tenant_id=tenant,
+            client_id=row["client_id"],
+            namespace=row["namespace"],
+            created_at=row["created_at"],
+        )
+
     def identity_for_client_id(self, client_id: str) -> TenantIdentity:
         client = _text("client_id", client_id)
         payload = self._read()

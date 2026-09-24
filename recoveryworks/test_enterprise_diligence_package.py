@@ -17,6 +17,10 @@ from recoveryworks.enterprise_diligence_package import (
 )
 from recoveryworks.models import canonical_hash
 from recoveryworks.private_io import private_permissions_verified
+from recoveryworks.tenant_isolation import (
+    TenantBindingRegistry,
+    TenantIdentity,
+)
 
 
 def control_map():
@@ -116,6 +120,29 @@ class EnterpriseDiligencePackageTests(unittest.TestCase):
             self.assertNotIn("source_locator", answer)
             self.assertNotIn("internal_path", answer)
         self.assertNotIn("/home/", str(payload))
+
+
+    def test_tenant_bound_diligence_output_registers_paths(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            tenant=TenantIdentity(
+                tenant_id="tenant-a",client_id="client-a",namespace=str(root),
+                created_at="2026-09-24T13:00:00Z")
+            registry=TenantBindingRegistry(
+                root/".recoveryworks-tenant-bindings.json")
+            registry.reserve_paths(
+                tenant,
+                artifact_paths={"seed": root/"seed.json"})
+            package=build_enterprise_diligence_package(
+                control_map(),generated_at="2026-09-24T14:00:00Z",
+                tenant_identity=tenant)
+            json_path=root/"private"/"diligence.json"
+            md_path=root/"private"/"diligence.md"
+            write_enterprise_diligence_package(
+                package,json_path=json_path,markdown_path=md_path,
+                tenant_registry=registry)
+            registry.assert_path_tenant(tenant,json_path)
+            registry.assert_proof_tenant(tenant,package.proof_hash)
 
     def test_outputs_private_and_certification_claims_impossible(self):
         with tempfile.TemporaryDirectory() as d:

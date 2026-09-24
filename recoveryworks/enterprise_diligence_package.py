@@ -13,6 +13,12 @@ from recoveryworks.enterprise_controls import (
 )
 from recoveryworks.models import canonical_hash, freeze_json, normalize_sha256, normalize_utc_timestamp
 from recoveryworks.private_io import atomic_private_write
+from recoveryworks.tenant_isolation import (
+    TenantBindingRegistry,
+    TenantIdentity,
+    bind_managed_tenant_artifact,
+    file_sha256,
+)
 
 
 class DiligenceGapSeverity(str, Enum):
@@ -142,6 +148,8 @@ class EnterpriseDiligencePackage:
     gaps: tuple[DiligenceGap, ...]
     certifications_claimed: tuple[str, ...] = ()
     externally_shared: bool = False
+    tenant_id: str | None = None
+    tenant_proof_hash: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "control_map_proof_hash", normalize_sha256(
@@ -160,6 +168,14 @@ class EnterpriseDiligencePackage:
         object.__setattr__(self, "questionnaire_answers", answers)
         object.__setattr__(self, "evidence_room_items", evidence)
         object.__setattr__(self, "gaps", gaps)
+        if (self.tenant_id is None) != (self.tenant_proof_hash is None):
+            raise ValueError("tenant_id and tenant_proof_hash must be supplied together")
+        if self.tenant_proof_hash is not None:
+            object.__setattr__(
+                self,
+                "tenant_proof_hash",
+                normalize_sha256("tenant_proof_hash", self.tenant_proof_hash),
+            )
         if self.certifications_claimed:
             raise ValueError("diligence package cannot claim certifications")
         if self.externally_shared:
@@ -180,6 +196,8 @@ class EnterpriseDiligencePackage:
             "gap_hashes": [x.proof_hash for x in self.gaps],
             "certifications_claimed": [],
             "externally_shared": False,
+            "tenant_id": self.tenant_id,
+            "tenant_proof_hash": self.tenant_proof_hash,
         }
 
     @property
@@ -293,6 +311,7 @@ def build_enterprise_diligence_package(
     generated_at: str,
     gap_owners: Mapping[str, str] | None = None,
     gap_due_at: Mapping[str, str] | None = None,
+    tenant_identity: TenantIdentity | None = None,
 ) -> EnterpriseDiligencePackage:
     controls = {c.control_id: c for c in control_map.controls}
     by_topic: dict[str, list[str]] = {}
@@ -407,6 +426,12 @@ def build_enterprise_diligence_package(
         "gap_hashes": [x.proof_hash for x in gaps_sorted],
         "certifications_claimed": [],
         "externally_shared": False,
+        "tenant_id": (
+            None if tenant_identity is None else tenant_identity.tenant_id
+        ),
+        "tenant_proof_hash": (
+            None if tenant_identity is None else tenant_identity.proof_hash
+        ),
     }
     return EnterpriseDiligencePackage(
         package_id="recoveryworks-diligence-package:" + canonical_hash(identity),
@@ -419,6 +444,10 @@ def build_enterprise_diligence_package(
         gaps=gaps_sorted,
         certifications_claimed=(),
         externally_shared=False,
+        tenant_id=None if tenant_identity is None else tenant_identity.tenant_id,
+        tenant_proof_hash=(
+            None if tenant_identity is None else tenant_identity.proof_hash
+        ),
     )
 
 
@@ -427,6 +456,7 @@ def write_enterprise_diligence_package(
     *,
     json_path: str | Path,
     markdown_path: str | Path,
+    tenant_registry: TenantBindingRegistry | None = None,
 ) -> None:
     atomic_private_write(
         Path(json_path),
@@ -443,3 +473,34 @@ def write_enterprise_diligence_package(
         Path(markdown_path),
         (package.to_markdown() + "\n").encode("utf-8"),
     )
+    if package.tenant_id is not None:
+        if tenant_registry is None:
+            raise ValueError("tenant-bound diligence output requires tenant registry")
+        identity = tenant_registry.identity_for_tenant_id(package.tenant_id)
+        if identity.proof_hash != package.tenant_proof_hash:
+            raise ValueError("diligence tenant proof no longer matches registry")
+        tenant_registry.reserve_paths(
+            identity,
+            artifact_paths={
+                "enterprise_diligence_json": json_path,
+                "enterprise_diligence_markdown": markdown_path,
+            },
+        )
+        bind_managed_tenant_artifact(
+            tenant_registry,
+            identity,
+            artifact_type="enterprise_diligence_json",
+            artifact_key=package.package_id,
+            proof_hash=package.proof_hash,
+            path=json_path,
+            bound_at=package.generated_at,
+        )
+        bind_managed_tenant_artifact(
+            tenant_registry,
+            identity,
+            artifact_type="enterprise_diligence_markdown",
+            artifact_key=package.package_id,
+            proof_hash=file_sha256(markdown_path),
+            path=markdown_path,
+            bound_at=package.generated_at,
+        )

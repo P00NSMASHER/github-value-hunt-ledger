@@ -17,6 +17,11 @@ from recoveryworks.integrations.cletrics_registry import CletricsReceiptRegistry
 from recoveryworks.integrations.cletrics_supersession import CloudSupersessionCandidate
 from recoveryworks.models import canonical_hash, normalize_sha256, normalize_utc_timestamp
 from recoveryworks.private_io import atomic_private_write
+from recoveryworks.tenant_isolation import (
+    bind_managed_tenant_artifact,
+    file_sha256,
+    find_tenant_registry,
+)
 from recoveryworks.production_admission import ProductionAdmissionGate
 from recoveryworks.production_observability import ProductionRunHistoryStore
 from recoveryworks.production_resilience import (
@@ -126,6 +131,8 @@ class ContinuousProductionAssurance:
     checks: tuple[ProductionAssuranceCheck, ...]
     automatic_remediation_enabled: bool = False
     external_actions_performed: bool = False
+    tenant_id: str | None = None
+    tenant_proof_hash: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -149,6 +156,14 @@ class ContinuousProductionAssurance:
         if not checks:
             raise ValueError("continuous assurance requires checks")
         object.__setattr__(self, "checks", checks)
+        if (self.tenant_id is None) != (self.tenant_proof_hash is None):
+            raise ValueError("tenant_id and tenant_proof_hash must be supplied together")
+        if self.tenant_proof_hash is not None:
+            object.__setattr__(
+                self,
+                "tenant_proof_hash",
+                normalize_sha256("tenant_proof_hash", self.tenant_proof_hash),
+            )
         if self.automatic_remediation_enabled or self.external_actions_performed:
             raise ValueError("continuous assurance is read-only")
         expected = "recoveryworks-continuous-assurance:" + canonical_hash(
@@ -170,6 +185,8 @@ class ContinuousProductionAssurance:
             "check_hashes": [check.proof_hash for check in self.checks],
             "automatic_remediation_enabled": False,
             "external_actions_performed": False,
+            "tenant_id": self.tenant_id,
+            "tenant_proof_hash": self.tenant_proof_hash,
         }
 
     @property
@@ -251,6 +268,15 @@ def evaluate_continuous_production_assurance(
     checked_at = normalize_utc_timestamp("checked_at", checked_at)
     now = _instant(checked_at)
     checks: list[ProductionAssuranceCheck] = []
+    managed_registry = find_tenant_registry(cletrics_registry.path)
+    managed_identity = None
+    if managed_registry is not None:
+        managed_identity = managed_registry.identity_for_path(
+            cletrics_registry.path
+        )
+        managed_registry.assert_path_tenant(
+            managed_identity, run_history.path
+        )
 
     release_ok = (
         admission.release_id == release.release_id
@@ -452,6 +478,12 @@ def evaluate_continuous_production_assurance(
         "check_hashes": [check.proof_hash for check in checks],
         "automatic_remediation_enabled": False,
         "external_actions_performed": False,
+        "tenant_id": (
+            None if managed_identity is None else managed_identity.tenant_id
+        ),
+        "tenant_proof_hash": (
+            None if managed_identity is None else managed_identity.proof_hash
+        ),
     }
     return ContinuousProductionAssurance(
         assurance_id="recoveryworks-continuous-assurance:"
@@ -465,6 +497,10 @@ def evaluate_continuous_production_assurance(
         checks=tuple(checks),
         automatic_remediation_enabled=False,
         external_actions_performed=False,
+        tenant_id=None if managed_identity is None else managed_identity.tenant_id,
+        tenant_proof_hash=(
+            None if managed_identity is None else managed_identity.proof_hash
+        ),
     )
 
 
@@ -490,3 +526,37 @@ def write_continuous_production_assurance(
         Path(markdown_path),
         (assurance.to_markdown() + "\n").encode("utf-8"),
     )
+    if assurance.tenant_id is not None:
+        registry = find_tenant_registry(json_path)
+        if registry is None:
+            raise ValueError(
+                "tenant-bound assurance output requires tenant registry"
+            )
+        identity = registry.identity_for_tenant_id(assurance.tenant_id)
+        if identity.proof_hash != assurance.tenant_proof_hash:
+            raise ValueError("assurance tenant proof no longer matches registry")
+        registry.reserve_paths(
+            identity,
+            artifact_paths={
+                "continuous_assurance_json": json_path,
+                "continuous_assurance_markdown": markdown_path,
+            },
+        )
+        bind_managed_tenant_artifact(
+            registry,
+            identity,
+            artifact_type="continuous_assurance_json",
+            artifact_key=assurance.assurance_id,
+            proof_hash=assurance.proof_hash,
+            path=json_path,
+            bound_at=assurance.checked_at,
+        )
+        bind_managed_tenant_artifact(
+            registry,
+            identity,
+            artifact_type="continuous_assurance_markdown",
+            artifact_key=assurance.assurance_id,
+            proof_hash=file_sha256(markdown_path),
+            path=markdown_path,
+            bound_at=assurance.checked_at,
+        )
