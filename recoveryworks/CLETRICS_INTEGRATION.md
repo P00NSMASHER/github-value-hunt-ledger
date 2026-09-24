@@ -449,3 +449,9 @@ The reproducible container manifest now records the two source roots required by
 A production-ready promotion gate can now be converted into a credential-free handoff for a named separate deployer. The handoff binds the exact release, promotion-gate proof, environment, digest-pinned image, source commit, deployment proof, deployer identity, and authorization window. RecoveryOS still cannot perform or claim the deployment itself.
 
 A downstream deployment receipt is accepted only when it binds that exact handoff and proves the exact release/image/source/deployment proof within the authorization window. A separately verified post-deployment environment snapshot must confirm the same release plus passing health/readiness receipts. The result is DEPLOYMENT_VERIFIED, not an internal deployment action.
+
+## Production backup/restore and DR rehearsal (step 16)
+
+Production resilience now freezes four private state surfaces into one deterministic private backup archive: the RecoveryOS ledger, Cletrics receipt registry, assurance report, and tamper-evident production run history. The backup manifest binds every artifact hash/size, archive hash, source checkpoint, retention expiry, and configured RPO/RTO objectives.
+
+A restore is not considered DR-valid after extraction alone. The rehearsal reloads the RecoveryOS bundle, verifies the Cletrics registry, re-verifies the assurance report proof hash, replays the production run-history chain, and enforces the configured RPO/RTO. Passing rehearsals emit a hash-bound DR_REHEARSAL_PASSED artifact; archive tampering, incomplete state, stale backups, or slow restores fail closed.
