@@ -1,8 +1,8 @@
-"""Customer onboarding checklist and diagnostic-intake builder.
+"""Customer onboarding checklist mapped to the current diagnostic API.
 
-Readiness means the required information is present and structurally usable.
-It does not mean billing, meter, or commercial-authority evidence has been
-verified. Verification flags are explicit and default false.
+Readiness means required artifacts exist and the authorization/review surfaces
+are structurally complete. It never implies financial evidence verification.
+Customer processing authorization and financial evidence review remain separate.
 """
 from __future__ import annotations
 
@@ -14,6 +14,12 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from recoveryworks.cloud_diagnostic import (
+    CustomerDiagnosticAuthorization,
+    DiagnosticEvidenceReview,
+    build_customer_diagnostic_authorization,
+    build_diagnostic_evidence_review,
+)
 from recoveryworks.models import canonical_hash, normalize_source_hash
 from recoveryworks.private_io import atomic_private_write
 
@@ -60,30 +66,31 @@ class CloudOnboardingReadiness:
     billing_account_id: str
     diagnostic_ready: bool
     checklist: tuple[OnboardingChecklistItem, ...]
-    diagnostic_intake: Mapping[str, Any] | None
+    diagnostic_request: Mapping[str, Any] | None
 
     @property
     def proof_hash(self) -> str:
         return canonical_hash({
-            "schema": 1,
+            "schema": 2,
             "onboarding_id": self.onboarding_id,
             "client_id": self.client_id,
             "provider": self.provider,
             "billing_account_id": self.billing_account_id,
             "diagnostic_ready": self.diagnostic_ready,
             "checklist_hashes": [item.proof_hash for item in self.checklist],
-            "diagnostic_intake": self.diagnostic_intake,
+            "diagnostic_request": self.diagnostic_request,
         })
 
     def as_dict(self) -> dict[str, Any]:
         return {
+            "schema": 2,
             "onboarding_id": self.onboarding_id,
             "client_id": self.client_id,
             "provider": self.provider,
             "billing_account_id": self.billing_account_id,
             "diagnostic_ready": self.diagnostic_ready,
             "checklist": [item.as_dict() for item in self.checklist],
-            "diagnostic_intake": self.diagnostic_intake,
+            "diagnostic_request": self.diagnostic_request,
             "proof_hash": self.proof_hash,
         }
 
@@ -143,10 +150,11 @@ def validate_cloud_onboarding(
     *,
     base_dir: str | Path = ".",
 ) -> CloudOnboardingReadiness:
-    if spec.get("schema") != 1:
+    if spec.get("schema") != 2:
         raise ValueError("unsupported onboarding schema")
     base = Path(base_dir).resolve()
     onboarding_id = _text("onboarding_id", spec.get("onboarding_id"))
+    diagnostic_id = _text("diagnostic_id", spec.get("diagnostic_id"))
     client_id = _text("client_id", spec.get("client_id"))
     provider = _text("provider", spec.get("provider")).lower()
     if provider != "aws":
@@ -157,70 +165,23 @@ def validate_cloud_onboarding(
     currency = _text("currency", spec.get("currency", "USD")).upper()
     period = spec.get("period")
     authorization = spec.get("authorization")
+    review = spec.get("evidence_review")
     inputs = spec.get("inputs")
     cletrics = spec.get("cletrics")
     if not isinstance(period, Mapping):
         raise ValueError("period must be an object")
     if not isinstance(authorization, Mapping):
         raise ValueError("authorization must be an object")
+    if not isinstance(review, Mapping):
+        raise ValueError("evidence_review must be an object")
     if not isinstance(inputs, Mapping):
         raise ValueError("inputs must be an object")
     if not isinstance(cletrics, Mapping):
         raise ValueError("cletrics must be an object")
 
     items: list[OnboardingChecklistItem] = []
-
-    required_auth = (
-        "authorization_id",
-        "customer_actor_id",
-        "authorized_at",
-        "expires_at",
-        "source_hash",
-        "source_locator",
-    )
-    missing_auth = [
-        name for name in required_auth
-        if not isinstance(authorization.get(name), str)
-        or not str(authorization.get(name)).strip()
-    ]
-    purposes = set(authorization.get("allowed_purposes") or ())
-    if missing_auth:
-        items.append(_item(
-            "AUTHORIZATION",
-            "Customer diagnostic authorization",
-            OnboardingItemState.MISSING,
-            "missing fields: " + ", ".join(missing_auth),
-            blocks=True,
-        ))
-    elif not {
-        "BILLING_RECOVERY_DIAGNOSTIC", "SAVINGS_ANALYSIS"
-    }.issubset(purposes):
-        items.append(_item(
-            "AUTHORIZATION",
-            "Customer diagnostic authorization",
-            OnboardingItemState.INVALID,
-            "required diagnostic purposes are not authorized",
-            blocks=True,
-        ))
-    else:
-        try:
-            normalize_source_hash(str(authorization["source_hash"]))
-        except ValueError as exc:
-            items.append(_item(
-                "AUTHORIZATION",
-                "Customer diagnostic authorization",
-                OnboardingItemState.INVALID,
-                str(exc),
-                blocks=True,
-            ))
-        else:
-            items.append(_item(
-                "AUTHORIZATION",
-                "Customer diagnostic authorization",
-                OnboardingItemState.READY,
-                "authorization fields and purposes present",
-                blocks=True,
-            ))
+    resolved_inputs: dict[str, str] = {}
+    input_hashes: dict[str, str] = {}
 
     file_rules = (
         (
@@ -259,17 +220,12 @@ def validate_cloud_onboarding(
             True,
         ),
     )
-    resolved_inputs: dict[str, str] = {}
-    input_hashes: dict[str, str] = {}
     for item_id, label, key, columns, blocks in file_rules:
         path = _resolve(base, inputs.get(key))
         if path is None or not path.is_file():
             items.append(_item(
-                item_id,
-                label,
-                OnboardingItemState.MISSING,
-                "file is required",
-                blocks=blocks,
+                item_id, label, OnboardingItemState.MISSING,
+                "file is required", blocks=blocks,
             ))
             continue
         valid, detail = _csv_has_columns(path, columns)
@@ -292,27 +248,18 @@ def validate_cloud_onboarding(
         path = _resolve(base, inputs.get(key))
         if path is None:
             items.append(_item(
-                key.upper(),
-                label,
-                OnboardingItemState.OPTIONAL,
-                "not supplied",
-                blocks=False,
+                key.upper(), label, OnboardingItemState.OPTIONAL,
+                "not supplied", blocks=False,
             ))
         elif not path.is_file():
             items.append(_item(
-                key.upper(),
-                label,
-                OnboardingItemState.INVALID,
-                "configured optional file does not exist",
-                blocks=False,
+                key.upper(), label, OnboardingItemState.INVALID,
+                "configured optional file does not exist", blocks=False,
             ))
         else:
             items.append(_item(
-                key.upper(),
-                label,
-                OnboardingItemState.READY,
-                "optional file supplied",
-                blocks=False,
+                key.upper(), label, OnboardingItemState.READY,
+                "optional file supplied", blocks=False,
             ))
             resolved_inputs[key] = str(path)
             input_hashes[key] = _hash(path)
@@ -321,39 +268,104 @@ def validate_cloud_onboarding(
     period_end = period.get("end")
     if not isinstance(period_start, str) or not isinstance(period_end, str):
         items.append(_item(
-            "PERIOD",
-            "Diagnostic service period",
-            OnboardingItemState.MISSING,
-            "period.start and period.end are required",
-            blocks=True,
+            "PERIOD", "Diagnostic service period", OnboardingItemState.MISSING,
+            "period.start and period.end are required", blocks=True,
         ))
     else:
         items.append(_item(
-            "PERIOD",
-            "Diagnostic service period",
-            OnboardingItemState.READY,
-            f"{period_start} through {period_end}",
-            blocks=True,
+            "PERIOD", "Diagnostic service period", OnboardingItemState.READY,
+            f"{period_start} through {period_end}", blocks=True,
         ))
 
+    required_auth = (
+        "customer_actor_id",
+        "authorized_at",
+        "expires_at",
+        "source_hash",
+        "source_locator",
+        "verified",
+    )
+    missing_auth = [key for key in required_auth if key not in authorization]
+    auth_valid = not missing_auth
+    if auth_valid:
+        try:
+            normalize_source_hash(str(authorization["source_hash"]))
+        except ValueError:
+            auth_valid = False
+        if type(authorization.get("verified")) is not bool:
+            auth_valid = False
+        elif authorization.get("verified") is not True:
+            auth_valid = False
+    items.append(_item(
+        "AUTHORIZATION",
+        "Customer processing authorization",
+        OnboardingItemState.READY if auth_valid else (
+            OnboardingItemState.MISSING if missing_auth else OnboardingItemState.INVALID
+        ),
+        (
+            "authorization is verified and ready to bind exact input hashes"
+            if auth_valid
+            else (
+                "missing fields: " + ", ".join(missing_auth)
+                if missing_auth
+                else "authorization must contain valid source hash and verified=true"
+            )
+        ),
+        blocks=True,
+    ))
+
+    required_review = (
+        "reviewer_id",
+        "reviewed_at",
+        "charge_source_verified",
+        "meter_source_verified",
+        "rate_source_verified",
+    )
+    missing_review = [key for key in required_review if key not in review]
+    review_valid = not missing_review and all(
+        type(review.get(key)) is bool
+        for key in (
+            "charge_source_verified",
+            "meter_source_verified",
+            "rate_source_verified",
+        )
+    )
+    items.append(_item(
+        "EVIDENCE_REVIEW",
+        "Money-bearing evidence review",
+        OnboardingItemState.READY if review_valid else (
+            OnboardingItemState.MISSING if missing_review else OnboardingItemState.INVALID
+        ),
+        (
+            "reviewer identity and explicit verification decisions present"
+            if review_valid
+            else (
+                "missing fields: " + ", ".join(missing_review)
+                if missing_review
+                else "verification decisions must be boolean"
+            )
+        ),
+        blocks=True,
+    ))
+
     release = cletrics.get("release")
-    identity_present = bool(cletrics.get("commit") or cletrics.get("image_digest"))
-    if not isinstance(release, str) or not release.strip() or not identity_present:
-        items.append(_item(
-            "CLETRICS_IDENTITY",
-            "Cletrics exporter identity",
-            OnboardingItemState.MISSING,
-            "release plus commit or image_digest required",
-            blocks=True,
-        ))
-    else:
-        items.append(_item(
-            "CLETRICS_IDENTITY",
-            "Cletrics exporter identity",
-            OnboardingItemState.READY,
-            "version identity supplied",
-            blocks=True,
-        ))
+    commit = cletrics.get("commit")
+    exported_at = cletrics.get("exported_at")
+    cletrics_valid = all(
+        isinstance(value, str) and value.strip()
+        for value in (release, commit, exported_at)
+    )
+    items.append(_item(
+        "CLETRICS_IDENTITY",
+        "Cletrics exporter identity",
+        OnboardingItemState.READY if cletrics_valid else OnboardingItemState.MISSING,
+        (
+            "release, full commit, and export timestamp supplied"
+            if cletrics_valid
+            else "release, commit, and exported_at are required"
+        ),
+        blocks=True,
+    ))
 
     blockers = [
         item for item in items
@@ -362,74 +374,58 @@ def validate_cloud_onboarding(
     ]
     ready = not blockers
 
-    verification_raw = spec.get("verification", {})
-    if verification_raw is None:
-        verification_raw = {}
-    if not isinstance(verification_raw, Mapping):
-        raise ValueError("verification must be an object")
-    verification: dict[str, bool] = {}
-    for key in (
-        "charge_source_verified",
-        "meter_source_verified",
-        "rate_source_verified",
-    ):
-        value = verification_raw.get(key, False)
-        if type(value) is not bool:
-            raise ValueError(f"verification.{key} must be boolean")
-        verification[key] = value
-
-    diagnostic_intake = None
+    diagnostic_request = None
     if ready:
-        auth = {
-            key: authorization[key]
-            for key in required_auth
+        money_hashes = {
+            role: input_hashes[role]
+            for role in ("focus_csv", "meter_csv", "rates_csv")
         }
-        auth.update({
-            "allowed_purposes": sorted(purposes),
-            "credentials_embedded": False,
-            "external_actions_allowed": False,
-            "remediation_allowed": False,
-        })
-        diagnostic_intake = {
-            "schema": 1,
-            "diagnostic_id": _text(
-                "diagnostic_id",
-                spec.get("diagnostic_id", f"diagnostic:{onboarding_id}"),
-            ),
+        authorization_payload = {
             "client_id": client_id,
-            "provider": provider,
             "billing_account_id": billing_account_id,
+            "customer_actor_id": authorization["customer_actor_id"],
+            "period_start": period_start,
+            "period_end": period_end,
+            "authorized_at": authorization["authorized_at"],
+            "expires_at": authorization["expires_at"],
+            "authorized_input_hashes": dict(sorted(input_hashes.items())),
+            "source_hash": authorization["source_hash"],
+            "source_locator": authorization["source_locator"],
+            "verified": True,
+        }
+        review_payload = {
+            "reviewer_id": review["reviewer_id"],
+            "reviewed_at": review["reviewed_at"],
+            "money_source_hashes": money_hashes,
+            "charge_source_verified": review["charge_source_verified"],
+            "meter_source_verified": review["meter_source_verified"],
+            "rate_source_verified": review["rate_source_verified"],
+        }
+        output_raw = spec.get("outputs", {})
+        if not isinstance(output_raw, Mapping):
+            raise ValueError("outputs must be an object")
+        diagnostic_request = {
+            "diagnostic_id": diagnostic_id,
+            "authorization": authorization_payload,
+            "evidence_review": review_payload,
+            "input_paths": dict(sorted(resolved_inputs.items())),
+            "cletrics_release": release,
+            "cletrics_commit": commit,
+            "exported_at": exported_at,
             "currency": currency,
-            "period": {
-                "start": period_start,
-                "end": period_end,
-            },
-            "authorization": auth,
-            "inputs": resolved_inputs,
-            "verification": verification,
-            "cletrics": {
-                "release": cletrics["release"],
-                "commit": cletrics.get("commit"),
-                "image_digest": cletrics.get("image_digest"),
-                "exported_at": _text(
-                    "cletrics.exported_at", cletrics.get("exported_at")
+            "private_root": _text(
+                "outputs.private_root",
+                output_raw.get(
+                    "private_root",
+                    f"private/diagnostics/{diagnostic_id}",
                 ),
-            },
-            "outputs": {
-                "private_root": _text(
-                    "outputs.private_root",
-                    (spec.get("outputs") or {}).get(
-                        "private_root",
-                        f"private/diagnostics/{onboarding_id}",
-                    )
-                    if isinstance(spec.get("outputs") or {}, Mapping)
-                    else None,
-                )
-            },
+            ),
             "onboarding": {
                 "onboarding_id": onboarding_id,
-                "input_hashes": dict(sorted(input_hashes.items())),
-                "note": "READY means structurally complete, not evidence-verified.",
+                "note": (
+                    "Readiness and processing authorization do not imply "
+                    "financial evidence verification."
+                ),
             },
         }
 
@@ -440,15 +436,40 @@ def validate_cloud_onboarding(
         billing_account_id=billing_account_id,
         diagnostic_ready=ready,
         checklist=tuple(items),
-        diagnostic_intake=diagnostic_intake,
+        diagnostic_request=diagnostic_request,
     )
+
+
+def materialize_cloud_diagnostic_call(
+    readiness: CloudOnboardingReadiness,
+) -> dict[str, Any]:
+    if not readiness.diagnostic_ready or readiness.diagnostic_request is None:
+        raise ValueError("onboarding is not ready for a diagnostic call")
+    request = readiness.diagnostic_request
+    authorization: CustomerDiagnosticAuthorization = (
+        build_customer_diagnostic_authorization(**request["authorization"])
+    )
+    evidence_review: DiagnosticEvidenceReview = build_diagnostic_evidence_review(
+        **request["evidence_review"]
+    )
+    return {
+        "diagnostic_id": request["diagnostic_id"],
+        "authorization": authorization,
+        "evidence_review": evidence_review,
+        "input_paths": request["input_paths"],
+        "cletrics_release": request["cletrics_release"],
+        "cletrics_commit": request["cletrics_commit"],
+        "exported_at": request["exported_at"],
+        "currency": request["currency"],
+        "private_root": request["private_root"],
+    }
 
 
 def write_onboarding_outputs(
     readiness: CloudOnboardingReadiness,
     *,
     checklist_path: str | Path,
-    diagnostic_intake_path: str | Path | None = None,
+    diagnostic_request_path: str | Path | None = None,
 ) -> None:
     atomic_private_write(
         Path(checklist_path),
@@ -462,14 +483,14 @@ def write_onboarding_outputs(
             + "\n"
         ).encode("utf-8"),
     )
-    if diagnostic_intake_path is not None:
-        if readiness.diagnostic_intake is None:
-            raise ValueError("cannot write diagnostic intake until onboarding is ready")
+    if diagnostic_request_path is not None:
+        if readiness.diagnostic_request is None:
+            raise ValueError("cannot write diagnostic request until onboarding is ready")
         atomic_private_write(
-            Path(diagnostic_intake_path),
+            Path(diagnostic_request_path),
             (
                 json.dumps(
-                    readiness.diagnostic_intake,
+                    readiness.diagnostic_request,
                     sort_keys=True,
                     separators=(",", ":"),
                     ensure_ascii=True,

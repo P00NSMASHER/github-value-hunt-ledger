@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "onboarding_id": "customer-onboarding-001",
   "diagnostic_id": "customer-diagnostic-001",
   "client_id": "customer-1",
@@ -11,16 +11,19 @@
     "end": "2026-08-31"
   },
   "authorization": {
-    "authorization_id": "customer-auth-id",
     "customer_actor_id": "customer-finops-owner",
     "authorized_at": "2026-09-24T12:00:00Z",
     "expires_at": "2026-10-08T12:00:00Z",
-    "allowed_purposes": [
-      "BILLING_RECOVERY_DIAGNOSTIC",
-      "SAVINGS_ANALYSIS"
-    ],
     "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "source_locator": "customer://authorization/id"
+    "source_locator": "customer://authorization/id",
+    "verified": true
+  },
+  "evidence_review": {
+    "reviewer_id": "evidence-reviewer",
+    "reviewed_at": "2026-09-24T12:05:00Z",
+    "charge_source_verified": false,
+    "meter_source_verified": false,
+    "rate_source_verified": false
   },
   "inputs": {
     "focus_csv": "inputs/focus.csv",
@@ -29,11 +32,6 @@
     "anomaly_csv": "inputs/anomalies.csv",
     "reconciliation_csv": "inputs/reconciliation.csv",
     "savings_csv": "inputs/savings.csv"
-  },
-  "verification": {
-    "charge_source_verified": false,
-    "meter_source_verified": false,
-    "rate_source_verified": false
   },
   "cletrics": {
     "release": "customer-export",

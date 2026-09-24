@@ -11,14 +11,50 @@ from recoveryworks.commercial_pilot_docs import (
     write_commercial_pilot_drafts,
 )
 from recoveryworks.private_io import private_permissions_verified
-from recoveryworks.test_commercial_pilot import CommercialPilotPackageTests
+
+
+def commercial_spec() -> dict:
+    return {
+        "schema": 1,
+        "offer_name": "Cloud Recovery & Savings Assurance Pilot",
+        "buyer_profile": "AWS-heavy SaaS or mid-market company",
+        "scope": {
+            "provider": "aws",
+            "lookback_months": 12,
+            "max_billing_accounts": 1,
+            "recovery_modes": [
+                "CONTRACT_RATE_MISMATCH",
+                "CONTRACT_DISCOUNT_OMISSION",
+                "COMMITMENT_BENEFIT_OMISSION",
+            ],
+            "include_prospective_savings": True,
+            "include_diagnostics": True,
+            "include_remediation_plan": True,
+            "cloud_mutation_in_scope": False,
+            "external_recovery_actions_in_scope": False,
+        },
+        "pricing": {
+            "currency": "USD",
+            "diagnostic_fee_cents": 1000000,
+            "recovered_cash_success_fee_bps": 2000,
+            "monthly_assurance_fee_cents": 300000,
+            "savings_implementation_fee_cents": 500000,
+            "pricing_is_hypothesis": True,
+        },
+        "deliverables": ["Private assurance report"],
+        "acceptance_criteria": [{
+            "criterion_id": "AC-1",
+            "description": "Evidence boundary preserved.",
+            "required_evidence": "RecoveryOS evidence packets",
+        }],
+        "exclusions": ["Cloud mutation"],
+        "assumptions": ["Customer supplies authorized evidence."],
+    }
 
 
 class CommercialPilotDraftTests(unittest.TestCase):
     def package(self):
-        return build_commercial_pilot_package(
-            CommercialPilotPackageTests().spec()
-        )
+        return build_commercial_pilot_package(commercial_spec())
 
     def test_fee_scenario_is_arithmetic_not_forecast(self):
         package = self.package()

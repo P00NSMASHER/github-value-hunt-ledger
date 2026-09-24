@@ -378,7 +378,7 @@ The generated artifacts are deliberately nonbinding: they cannot be marked signe
 
 A customer onboarding validator now checks the diagnostic authorization, required FOCUS/meter/reviewed-rate files, required CSV columns, diagnostic period, and Cletrics exporter identity. Optional anomaly/reconciliation/savings files are tracked without blocking the base diagnostic.
 
-When structurally ready, it emits the exact diagnostic-intake JSON consumed by step 8. Readiness is explicitly not verification: invoice, meter, and rate verification flags default false and remain separately controlled. Checklist and generated intake outputs use private writes.
+When structurally ready, it emits a diagnostic request that materializes directly into the current step-8 CustomerDiagnosticAuthorization and DiagnosticEvidenceReview API. Processing authorization is bound to exact input hashes, while financial evidence verification remains a separate reviewer decision. Checklist and request outputs use private writes.
 
 ## Read-only pilot operations console (step 11a)
 

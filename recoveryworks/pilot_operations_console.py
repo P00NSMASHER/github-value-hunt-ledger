@@ -140,7 +140,7 @@ def build_pilot_operations_snapshot(
     records = [
         record
         for record in ledger.records()
-        if record.finding.client_id == result.authorization.client_id
+        if record.finding.client_id == result.intake_receipt.client_id
         and record.finding.branch is Branch.CLOUD
         and record.case_state not in {CaseState.REJECTED, CaseState.SUPERSEDED}
     ]
@@ -221,7 +221,7 @@ def build_pilot_operations_snapshot(
     }
     return PilotOperationsSnapshot(
         diagnostic_id=result.intake_receipt.diagnostic_id,
-        client_id=result.authorization.client_id,
+        client_id=result.intake_receipt.client_id,
         diagnostic_status=diagnostic_status,
         evidence_readiness=readiness,
         supersession_holds=holds,
