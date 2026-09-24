@@ -298,6 +298,8 @@ issuer. A CIK likewise cannot be silently bound to two canonical issuers.
 
 Case-local identity resolution must be supported by retained artifacts linked to
 the canonical case. Discovery-only sources cannot establish a durable identity.
+Entity bindings/resolutions also require the raw-artifact manifest to be bound to
+the exact current source-registry hash; stale or mismatched manifests fail closed.
 
 
 ## Step 10 — source priority and contradiction preservation
@@ -317,7 +319,8 @@ records every assessed claim and every contradictory claim ID.
 
 If equal-priority controlling sources disagree, the fact remains
 `AMBIGUOUS` with no selected value. The system therefore cannot resolve a
-top-tier contradiction simply by insertion order.
+top-tier contradiction simply by insertion order. Conflict adjudication also
+requires the artifact manifest and source registry to match exactly.
 
 
 ## Step 11 — economic transaction deduplication
@@ -340,8 +343,10 @@ The comparator emits one of:
 - `INSUFFICIENT`
 
 `EXACT_SAME` requires the same exact timestamp plus a strong anchor set:
-matching quantity, matching execution price or trade amount, and matching
-instrument or side. Matching only generic fields such as BUY + STOCK is
+matching security identifier, matching quantity, matching execution price or
+trade amount, and matching instrument or side. Option trades additionally require
+matching option instrument type, strike, and expiry before they can be
+`EXACT_SAME`. Matching only generic fields such as BUY + STOCK is
 `INSUFFICIENT`, not a duplicate proposal. Date-only or overlapping date-range
 records can never be promoted to
 `EXACT_SAME` automatically, even when quantity/price/side/instrument match,
