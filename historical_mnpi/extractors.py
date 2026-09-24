@@ -113,7 +113,7 @@ class _TextExtractor(HTMLParser):
             self.parts.append(text)
 
     def text(self) -> str:
-        return "\n".join(self.parts)
+        return " ".join(self.parts)
 
 
 _DATE_QTY_PRICE_RE = re.compile(
@@ -126,6 +126,11 @@ _DATE_QTY_PRICE_RE = re.compile(
 
 
 def _ref_at(base: SourceArtifactRef, kind: SourceLocatorKind, locator: str) -> SourceArtifactRef:
+    combined_locator = (
+        f"{base.locator};{locator}"
+        if base.locator and base.locator != locator
+        else locator
+    )
     return SourceArtifactRef(
         source_id=base.source_id,
         source_proof_hash=base.source_proof_hash,
@@ -133,7 +138,7 @@ def _ref_at(base: SourceArtifactRef, kind: SourceLocatorKind, locator: str) -> S
         artifact_sha256=base.artifact_sha256,
         artifact_record_proof_hash=base.artifact_record_proof_hash,
         locator_kind=kind,
-        locator=locator,
+        locator=combined_locator,
     )
 
 
