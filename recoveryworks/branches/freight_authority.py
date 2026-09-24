@@ -317,6 +317,10 @@ def resolve_freight_authority(
         blockers.append("AMBIGUOUS_APPLICABLE_CHARGE_RULE")
     elif not candidates[0].verified_controlling_authority:
         blockers.append("CHARGE_RULE_AUTHORITY_NOT_VERIFIED")
+    elif not _SHA256_RE.fullmatch(
+        str(candidates[0].document_source_hash or "").strip().lower()
+    ):
+        blockers.append("AUTHORITY_DOCUMENT_HASH_INVALID")
 
     fmc_evidence: tuple[EvidenceRef, ...] = ()
     envelope_hash: str | None = None
