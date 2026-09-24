@@ -581,7 +581,14 @@ class EconomicClusterRegistry:
                 exact_clusters.append((cluster, assessments))
                 continue
 
-            if (
+            if DedupMatchState.EXACT_MATCH in states:
+                review_candidates.append(_review_candidate(
+                    signature,
+                    cluster,
+                    assessments,
+                    reason="PARTIAL_EXACT_CLUSTER_CONFLICT",
+                ))
+            elif (
                 DedupMatchState.POSSIBLE_MATCH in states
                 or DedupMatchState.INSUFFICIENT_INFORMATION in states
             ):
