@@ -42,6 +42,19 @@ from .event_model import (
     verify_event_provenance,
 )
 
+from .extractors import (
+    CandidateField,
+    CandidateFieldStatus,
+    CandidateKind,
+    CandidateRecord,
+    extract_academic_csv_candidates,
+    extract_academic_zip_csv_candidates,
+    extract_doj_or_court_page_text_candidates,
+    extract_hacked_earnings_first_trade_candidates,
+    extract_sec_html_candidates,
+    extract_sec_pdf_page_text_candidates,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -52,6 +65,16 @@ from .source_registry import (
 )
 
 __all__ = [
+    "CandidateField",
+    "CandidateFieldStatus",
+    "CandidateKind",
+    "CandidateRecord",
+    "extract_academic_csv_candidates",
+    "extract_academic_zip_csv_candidates",
+    "extract_doj_or_court_page_text_candidates",
+    "extract_hacked_earnings_first_trade_candidates",
+    "extract_sec_html_candidates",
+    "extract_sec_pdf_page_text_candidates",
     "BoundaryPrecision",
     "EventRegistry",
     "InformationEvent",
