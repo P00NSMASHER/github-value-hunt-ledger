@@ -7,7 +7,7 @@ from historical_mnpi.case_model import (
     CasePartyRole, CaseProceedingStatus, CaseRegistry, HistoricalCase,
 )
 from historical_mnpi.economic_dedupe import (
-    DedupeDecisionType, DedupeProposal, DedupeRelation,
+    DedupeDecisionType, DedupeProposal, DedupeRelation, DedupeReviewChecks,
     build_economic_transaction_cluster, decide_dedupe,
     propose_transaction_dedupe,
 )
@@ -30,6 +30,17 @@ from historical_mnpi.transaction_model import (
 
 def H(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
+
+
+
+def all_dedupe_checks() -> DedupeReviewChecks:
+    return DedupeReviewChecks(
+        identity_checked=True,
+        temporal_overlap_checked=True,
+        economic_fields_checked=True,
+        source_evidence_checked=True,
+        duplicate_risk_checked=True,
+    )
 
 
 def fixture(resolve_identities=True):
@@ -518,8 +529,33 @@ class EconomicDedupeTests(unittest.TestCase):
             decide_dedupe(
                 proposal,
                 decision=DedupeDecisionType.SAME_TRANSACTION,
+                checks=all_dedupe_checks(),
                 reviewer_id="reviewer:1",
+                reviewed_at="2026-09-24T15:00:00Z",
                 rationale="Should fail.",
+            )
+
+    def test_same_transaction_requires_explicit_reviewer_checks(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        incomplete = DedupeReviewChecks(
+            identity_checked=True,
+            temporal_overlap_checked=True,
+            economic_fields_checked=False,
+            source_evidence_checked=True,
+            duplicate_risk_checked=True,
+        )
+        with self.assertRaisesRegex(ValueError, "all dedupe reviewer checks"):
+            decide_dedupe(
+                proposal,
+                decision=DedupeDecisionType.SAME_TRANSACTION,
+                checks=incomplete,
+                reviewer_id="reviewer:1",
+                reviewed_at="2026-09-24T15:00:00Z",
+                rationale="Economic fields were not fully checked.",
             )
 
     def test_cluster_requires_explicit_same_decision_and_preserves_sources(self):
@@ -531,7 +567,9 @@ class EconomicDedupeTests(unittest.TestCase):
         decision = decide_dedupe(
             proposal,
             decision=DedupeDecisionType.SAME_TRANSACTION,
+            checks=all_dedupe_checks(),
             reviewer_id="reviewer:1",
+            reviewed_at="2026-09-24T15:00:00Z",
             rationale="Same date, parties, issuer, side, instrument, quantity and price.",
         )
         cluster = build_economic_transaction_cluster(
@@ -561,7 +599,9 @@ class EconomicDedupeTests(unittest.TestCase):
         decision = decide_dedupe(
             proposal,
             decision=DedupeDecisionType.SAME_TRANSACTION,
+            checks=all_dedupe_checks(),
             reviewer_id="reviewer:1",
+            reviewed_at="2026-09-24T15:00:00Z",
             rationale="Reviewed exact rows.",
         )
         changed_right = HistoricalTransaction(
@@ -585,7 +625,9 @@ class EconomicDedupeTests(unittest.TestCase):
         decision = decide_dedupe(
             proposal,
             decision=DedupeDecisionType.SAME_TRANSACTION,
+            checks=all_dedupe_checks(),
             reviewer_id="reviewer:1",
+            reviewed_at="2026-09-24T15:00:00Z",
             rationale="Reviewed canonical identities.",
         )
         with self.assertRaisesRegex(ValueError, "canonical entity identity mismatch"):
@@ -626,7 +668,9 @@ class EconomicDedupeTests(unittest.TestCase):
             decide_dedupe(
                 proposal,
                 decision=DedupeDecisionType.SAME_TRANSACTION,
+                checks=all_dedupe_checks(),
                 reviewer_id="reviewer:1",
+                reviewed_at="2026-09-24T15:00:00Z",
                 rationale="Confirmed pair.",
             )
             for proposal in (p1, p2)
@@ -650,7 +694,9 @@ class EconomicDedupeTests(unittest.TestCase):
         decision = decide_dedupe(
             proposal,
             decision=DedupeDecisionType.SAME_TRANSACTION,
+            checks=all_dedupe_checks(),
             reviewer_id="reviewer:1",
+            reviewed_at="2026-09-24T15:00:00Z",
             rationale="Reviewed pair.",
         )
 
