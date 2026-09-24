@@ -6,58 +6,63 @@ This directory is the incremental implementation of the nine-part AI Business OS
 
 Status: implemented and merged.
 
-The first upgrade adds durable worker identity, goals, heartbeats, stale-worker recovery,
-hash-chained events, snapshots, rollback-safe restoration, delegation lineage, and restart
-persistence.
+Durable worker identity, goals, heartbeats, stale-worker recovery, hash-chained events, snapshots,
+rollback-safe restoration, delegation lineage, and restart persistence.
 
 ## Step 2 — Independent Auditor brain
 
 Status: implemented and merged.
 
-The second upgrade adds a hard Manager → Executor → Auditor completion contract. Executors submit
-evidence but cannot approve themselves; required acceptance criteria must independently pass before
-the runtime permits VERIFYING → COMPLETE.
+Hard Manager → Executor → Auditor completion contracts. Executors submit evidence but cannot approve
+themselves; required acceptance criteria must independently pass before VERIFYING → COMPLETE.
 
 ## Step 3 — Verifier-gated self-improvement
 
 Status: implemented and merged.
 
-The third upgrade allows agents to propose better skills and policies while keeping every candidate
-inactive until it passes frozen disjoint development/held-out evaluation, independent verification,
-zero-regression checks, multi-agent canary evidence, and explicit curator promotion.
+Agents may propose better skills and policies, but candidates stay inactive until frozen disjoint
+development/held-out evaluation, independent verification, zero-regression checks, multi-agent
+canary evidence, and explicit curator promotion all pass.
 
 ## Step 4 — Value-weighted memory
 
 Status: implemented and merged.
 
-The fourth upgrade teaches the system which remembered tactics actually produce useful results.
-Only independently verified outcomes influence learned value; duplicate event credit is blocked,
+Only independently verified outcomes influence learned value. Duplicate event credit is blocked,
 cross-memory attribution is conserved, objective leakage is prevented, recency is modeled, and
 confidence grows gradually with evidence.
 
 ## Step 5 — Provenance-preserving knowledge graph
 
+Status: implemented and merged.
+
+Typed evidence chains connect repositories, data, capabilities, technologies, products, businesses,
+customers, experiments, verified outcomes, and memories while preserving provenance and temporal
+relationship history.
+
+## Step 6 — Runtime governance/control plane
+
 Status: implemented on this branch.
 
-The fifth upgrade connects isolated facts into typed evidence chains:
+The sixth upgrade inserts a fail-closed authority layer between agent intent and real tool execution:
 
-- typed nodes cover repositories, data, capabilities, technologies, products, businesses,
-  customers, experiments, outcomes, and memories;
-- typed edge contracts prevent semantically invalid relationships;
-- every node carries provenance and every edge carries evidence;
-- verified outcomes require an explicit stable business/event identity;
-- forecasts and estimates cannot silently become outcome facts;
-- aliases resolve to canonical identities without destructive merging;
-- ambiguous identity resolution fails closed;
-- active duplicate relationships are blocked;
-- relationship changes use temporal supersession rather than history deletion;
-- historical graph queries can reconstruct prior relationship states;
-- evidence-bearing paths expose a hash over the exact provenance chain;
-- outcome lineage can trace a verified result back through experiments, products, capabilities,
-  repositories, and other upstream evidence;
-- nodes with active relationships cannot be silently retired.
+- actions are classified as READ, INTERNAL_WRITE, EXTERNAL_WRITE, PRODUCTION_CHANGE,
+  MONEY_MOVEMENT, DESTRUCTIVE, or POLICY_CHANGE;
+- agents with no governance policy fail closed;
+- policies are versioned and content-addressed;
+- policies can set class permissions, action allowlists, and explicit action denylists;
+- rolling limits can cap action counts, abstract cost units, and money movement;
+- external writes require human approval by default;
+- production changes, money movement, destructive actions, and governance-policy changes can never
+  bypass human approval;
+- approval tickets bind to one exact immutable intent hash and expire;
+- approvals and authorized requests are single-use, preventing replay;
+- budgets and kill switches are rechecked immediately before final authorization;
+- global and per-agent kill switches override normal permissions;
+- every ALLOW, DENY, and REQUIRE_APPROVAL decision emits a SHA-256-bound audit receipt;
+- this layer authorizes actions but does not itself execute tools.
 
-The first five upgrades establish:
+The first six upgrades establish:
 
 ```
 durable work
@@ -69,10 +74,9 @@ controlled self-improvement
 evidence-weighted organizational memory
    ↓
 provenance-preserving relationship reasoning
+   ↓
+bounded operational authority
 ```
-
-They still do **not** grant unrestricted production, email, payment, destructive, or other
-consequential permissions. Runtime governance remains a later upgrade.
 
 ### Run all AI Business OS tests
 
@@ -83,6 +87,7 @@ python -m unittest discover -s ai_business_os -p "test_*.py"
 ### Design rules
 
 Memory is evidence, not authority. Completion is not self-asserted. Learning is not deployment.
-Past success is a retrieval prior, not proof that a tactic is correct in a new situation. A graph
-edge records an evidence-backed relationship; connectivity alone never upgrades a claim into truth.
-Every increase in agent autonomy must preserve those boundaries rather than bypass them.
+Graph connectivity is not proof. Operational power is granted per action under explicit policy,
+budget, approval, and kill-switch controls. HUMAN identity in this reference layer must be bound to
+an authenticated identity/session by the production integration rather than accepted from arbitrary
+user-supplied strings.
