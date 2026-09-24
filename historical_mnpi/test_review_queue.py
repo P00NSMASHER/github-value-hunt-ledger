@@ -254,6 +254,18 @@ def fixture():
                 "30.375",
                 CandidateFieldStatus.EXACT_TEXT_PARSE,
             ),
+            CandidateField(
+                "instrument_type",
+                "STOCK",
+                "STOCK",
+                CandidateFieldStatus.EXACT_TEXT_PARSE,
+            ),
+            CandidateField(
+                "side",
+                "BUY",
+                "BUY",
+                CandidateFieldStatus.EXACT_TEXT_PARSE,
+            ),
         ),
         raw_excerpt=excerpt,
     )
@@ -584,6 +596,106 @@ class ReviewQueueTests(unittest.TestCase):
             created_by="review-builder",
         )
         self.assertFalse(clean.blockers)
+
+    def test_proposed_value_without_candidate_support_is_blocked(self):
+        (
+            sources,
+            manifest,
+            cases,
+            events,
+            case,
+            event,
+            record,
+            candidate,
+            _refs,
+        ) = fixture()
+        unsupported = HistoricalTransaction(
+            trade_id="trade:review:unsupported",
+            case_id=record.case_id,
+            case_proof_hash=record.case_proof_hash,
+            trader_party_id=record.trader_party_id,
+            issuer_id=record.issuer_id,
+            source_ref=record.source_ref,
+            fact_status=record.fact_status,
+            status_ref=record.status_ref,
+            instrument_type=record.instrument_type,
+            side=record.side,
+            trade_date=record.trade_date,
+            quantity="9999",
+            execution_price=record.execution_price,
+        )
+        item = build_review_item(
+            unsupported,
+            event=event,
+            candidates=(candidate,),
+            cases=cases,
+            events=events,
+            source_registry=sources,
+            artifact_manifest=manifest,
+            created_at="2026-09-24T12:03:00Z",
+            created_by="review-builder",
+        )
+        self.assertIn(
+            "PROPOSED_VALUE_UNSUPPORTED:quantity",
+            item.blockers,
+        )
+        with self.assertRaisesRegex(ValueError, "blocked item"):
+            decide_review_item(
+                item,
+                decision=ReviewDecision.APPROVED_FOR_HISTORICAL_RESEARCH,
+                checks=all_checks(),
+                reviewer_id="reviewer:1",
+                reviewed_at="2026-09-24T12:04:00Z",
+                rationale="Unsupported normalized value.",
+            )
+
+    def test_mmddyyyy_candidate_date_can_support_iso_normalized_date(self):
+        (
+            sources,
+            manifest,
+            cases,
+            events,
+            case,
+            event,
+            record,
+            candidate,
+            _refs,
+        ) = fixture()
+        converted = CandidateRecord(
+            candidate_id="candidate:review:date-normalized",
+            extractor_id="test-extractor",
+            extractor_version="2",
+            kind=CandidateKind.TRANSACTION,
+            source_ref=candidate.source_ref,
+            case_id=case.case_id,
+            fields=tuple(
+                CandidateField(
+                    field.name,
+                    "08/10/2015",
+                    "08/10/2015",
+                    field.status,
+                )
+                if field.name == "trade_date"
+                else field
+                for field in candidate.fields
+            ),
+            raw_excerpt="08/10/2015 | 2,500 shares | $30.375",
+        )
+        item = build_review_item(
+            record,
+            event=event,
+            candidates=(converted,),
+            cases=cases,
+            events=events,
+            source_registry=sources,
+            artifact_manifest=manifest,
+            created_at="2026-09-24T12:03:00Z",
+            created_by="review-builder",
+        )
+        self.assertNotIn(
+            "PROPOSED_VALUE_UNSUPPORTED:trade_date",
+            item.blockers,
+        )
 
     def test_append_only_queue_prevents_second_decision(self):
         *_, item = clean_item()
