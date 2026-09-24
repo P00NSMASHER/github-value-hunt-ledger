@@ -15,7 +15,7 @@ from recoveryworks.private_io import atomic_private_write
 
 _PINNED_BASE_IMAGE = (
     "python:3.12.14-slim-bookworm@sha256:"
-    "f905d62e7e0c7febbe6e95f2e4f7d789811311ef26effaf716fb9008a5f54083"
+    "392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e"
 )
 _IMAGE_RE = re.compile(r"^[^@\s]+@sha256:[0-9a-f]{64}$")
 

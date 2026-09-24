@@ -1,9 +1,9 @@
-FROM python:3.12.14-slim-bookworm@sha256:f905d62e7e0c7febbe6e95f2e4f7d789811311ef26effaf716fb9008a5f54083
+FROM python:3.12.14-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
 
 ARG RECOVERYWORKS_VCS_REF
 LABEL org.opencontainers.image.title="RecoveryWorks Cloud Pilot"
 LABEL org.opencontainers.image.revision="${RECOVERYWORKS_VCS_REF}"
-LABEL org.opencontainers.image.base.name="python:3.12.14-slim-bookworm@sha256:f905d62e7e0c7febbe6e95f2e4f7d789811311ef26effaf716fb9008a5f54083"
+LABEL org.opencontainers.image.base.name="python:3.12.14-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
