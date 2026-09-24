@@ -35,6 +35,16 @@ from .payroll_benefit import audit_payroll_benefit_billing
 from .payroll_benefit_csv import load_payroll_benefit_units_csv
 from .cloud import audit_cloud_billing
 from .cloud_signals import CloudSignal, CloudSignalType
+from .cloud_savings import CloudSavingsReport, build_cloud_savings_report
+from .cloud_remediation import (
+    CloudRemediationAction,
+    CloudRemediationApproval,
+    CloudRemediationEnvelope,
+    CloudRemediationPlan,
+    approve_cloud_remediation_plan,
+    build_cloud_remediation_plan,
+    prepare_cloud_remediation_envelopes,
+)
 from .cloud_discount import CloudDiscountAuthority, DiscountAppliesTo, audit_cloud_discount_billing
 from .cloud_discount_csv import load_cloud_discount_authorities_csv
 from .cloud_commitment import CloudCommitmentAuthority, CommitmentAllocation, audit_cloud_commitment_billing
@@ -309,6 +319,15 @@ __all__ = [
     "audit_cloud_billing",
     "CloudSignal",
     "CloudSignalType",
+    "CloudSavingsReport",
+    "build_cloud_savings_report",
+    "CloudRemediationAction",
+    "CloudRemediationApproval",
+    "CloudRemediationEnvelope",
+    "CloudRemediationPlan",
+    "approve_cloud_remediation_plan",
+    "build_cloud_remediation_plan",
+    "prepare_cloud_remediation_envelopes",
     "CloudDiscountAuthority",
     "DiscountAppliesTo",
     "audit_cloud_discount_billing",
