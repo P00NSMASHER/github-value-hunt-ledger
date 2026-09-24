@@ -73,6 +73,7 @@ Raw public source bytes are retained separately from every future normalized fac
 `LocalContentAddressedArtifactStore` accepts bytes only when:
 
 - the source already exists in the Step-1 registry;
+- the supplied source record's proof hash exactly matches that registered record;
 - the source is confirmed already public;
 - the exact bytes hash to the registered source SHA-256;
 - acquisition/storage timestamps are timezone-aware and ordered;
@@ -93,6 +94,9 @@ metadata only; source bytes are deliberately absent.
 
 Future normalized records should use `SourceArtifactRef` to point to an exact
 artifact and source location such as a page, paragraph, table, CSV row, JSON
-pointer, text range, or archive member.
+pointer, text range, or archive member. Each reference pins both the Step-1
+`SourceRecord.proof_hash` and the Step-2 `RawArtifactRecord.proof_hash`, so a
+later metadata reclassification or custody-record change cannot silently alter
+the provenance of a normalized fact.
 
 Step 2 still performs no web retrieval and creates no normalized trade facts.
