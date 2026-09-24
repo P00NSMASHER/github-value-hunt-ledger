@@ -178,41 +178,28 @@ class ConflictPolicyTests(unittest.TestCase):
         self.assertEqual(result.policy_proof_hash, policy.proof_hash)
         self.assertEqual(len(result.policy_proof_hash), 64)
 
-    def test_same_artifact_with_multiple_case_roles_fails_closed(self):
-        sources, manifest, _cases, case, refs = fixture()
-        duplicated = HistoricalCase(
-            case_id=case.case_id,
-            title=case.title,
-            event_type=case.event_type,
-            information_origin=case.information_origin,
-            proceeding_status=case.proceeding_status,
-            parties=case.parties,
-            issuers=case.issuers,
-            artifacts=case.artifacts + (
-                CaseArtifactLink(
-                    CaseArtifactRole.EXHIBIT,
-                    refs[CaseArtifactRole.COMPLAINT],
+    def test_same_artifact_cannot_be_retyped_to_gain_priority(self):
+        sources, manifest, cases, refs = fixture()
+        base = cases.get("CASE-CONFLICT")
+        complaint_ref = refs[CaseArtifactRole.COMPLAINT]
+        retyped = HistoricalCase(
+            **{
+                **base.__dict__,
+                "artifacts": base.artifacts + (
+                    CaseArtifactLink(
+                        CaseArtifactRole.EXHIBIT,
+                        complaint_ref,
+                    ),
                 ),
-            ),
+            }
         )
-        cases = CaseRegistry()
-        cases.register(
-            duplicated,
-            source_registry=sources,
-            artifact_manifest=manifest,
-        )
-        with self.assertRaisesRegex(ValueError, "ambiguous case artifact roles"):
-            resolve_fact_conflict((
-                FactClaim(
-                    "claim:ambiguous-role",
-                    duplicated.case_id,
-                    duplicated.proof_hash,
-                    "trade:1.quantity",
-                    FactDomain.TRANSACTION_DETAIL,
-                    "2500",
-                    refs[CaseArtifactRole.COMPLAINT],
-                ),
-            ), cases=cases, source_registry=sources, artifact_manifest=manifest)
+        with self.assertRaisesRegex(ValueError, "incompatible"):
+            CaseRegistry().register(
+                retyped,
+                source_registry=sources,
+                artifact_manifest=manifest,
+            )
+
 
     def test_policy_hash_is_deterministic(self):
         self.assertEqual(
