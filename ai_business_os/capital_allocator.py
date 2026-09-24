@@ -49,6 +49,16 @@ SIGNAL_METRICS = {
 
 ALL_METRICS = MONEY_METRICS | EFFORT_METRICS | SIGNAL_METRICS
 
+CORE_METRICS = {
+    "cash_collected_30d",
+    "cash_costs_30d",
+    "ai_cost_30d",
+    "contracted_pipeline_value_90d",
+    "remaining_effort_hours",
+    "time_to_cash_days",
+    "market_evidence_signal",
+}
+
 DEFAULT_POLICY = {
     "realized_net_cash_weight": 1.0,
     "recognized_revenue_weight": 0.25,
@@ -266,8 +276,8 @@ class CapitalAllocator:
             raise CapitalAllocatorError("max_allocation_share must be within (0, 1]")
 
         prior = self.runtime.conn.execute(
-            "SELECT MAX(version) AS v FROM portfolio_policies WHERE id=?",
-            (policy_id,),
+            "SELECT MAX(version) AS v FROM portfolio_policies WHERE id LIKE ?",
+            (f"{policy_id}@v%",),
         ).fetchone()
         version = int(prior["v"] or 0) + 1
         # Policy IDs are immutable rows in this reference implementation. Versioned updates use
@@ -745,25 +755,38 @@ class CapitalAllocator:
         retention = observed("retention_signal")
         market = observed("market_evidence_signal")
         strategic = observed("strategic_reuse_signal")
-        signal_bonus = economic_value * (
-            retention * config["retention_signal_weight"]
-            + market * config["market_evidence_weight"]
-            + strategic * config["strategic_reuse_weight"]
+        # Convert monetary magnitude to a dimensionless index before combining it with
+        # non-monetary signals. This avoids pretending one human hour is literally one dollar.
+        economic_index = math.copysign(
+            math.log1p(abs(economic_value)),
+            economic_value,
+        ) if economic_value != 0 else 0.0
+
+        signal_bonus = (
+            retention * q("retention_signal") * config["retention_signal_weight"]
+            + market * q("market_evidence_signal") * config["market_evidence_weight"]
+            + strategic * q("strategic_reuse_signal") * config["strategic_reuse_weight"]
         )
 
         human_hours = observed("human_hours_30d")
         effort_hours = observed("remaining_effort_hours")
         time_days = observed("time_to_cash_days")
         effort_penalty = (
-            human_hours * config["human_hours_penalty"]
-            + effort_hours * config["remaining_effort_penalty"]
-            + time_days * config["time_to_cash_penalty"]
+            math.log1p(human_hours) * config["human_hours_penalty"]
+            + math.log1p(effort_hours) * config["remaining_effort_penalty"]
+            + math.log1p(time_days) * config["time_to_cash_penalty"]
         )
-        raw_score = economic_value + signal_bonus - effort_penalty
+        raw_score = economic_index + signal_bonus - effort_penalty
 
-        supplied = set(m)
-        evidenced = {metric for metric in supplied if q(metric) > 0}
-        evidence_coverage = len(evidenced) / len(supplied) if supplied else 0.0
+        # Coverage is measured against a fixed core schema plus any optional metrics the
+        # initiative chose to report. Omitting weak metrics therefore cannot inflate coverage.
+        coverage_denominator = CORE_METRICS | set(m)
+        evidenced = {metric for metric in coverage_denominator if q(metric) > 0}
+        evidence_coverage = (
+            len(evidenced) / len(coverage_denominator)
+            if coverage_denominator
+            else 0.0
+        )
         evidence_factor = evidence_coverage ** 2
         decision_support_score = raw_score * evidence_factor
 
@@ -787,6 +810,7 @@ class CapitalAllocator:
             "contracted_pipeline_value": contracted,
             "qualified_pipeline_value": qualified,
             "economic_value_component": economic_value,
+            "economic_index_component": economic_index,
             "signal_bonus_component": signal_bonus,
             "effort_penalty_component": effort_penalty,
             "raw_score": raw_score,
