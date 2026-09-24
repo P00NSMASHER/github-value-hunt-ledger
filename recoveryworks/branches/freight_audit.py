@@ -451,6 +451,42 @@ def map_freight_audit_to_recovery(
                     "engine_id": result.engine_id,
                     "engine_commit": result.engine_commit,
                     "load_id": result.load_id,
+                    "invoice_number": (
+                        result.match.invoice.invoice_number
+                        if result.match.invoice is not None else None
+                    ),
+                    "invoice_load_id": (
+                        result.match.invoice.load_id
+                        if result.match.invoice is not None else None
+                    ),
+                    "invoice_carrier_name": (
+                        result.match.invoice.carrier_name
+                        if result.match.invoice is not None else None
+                    ),
+                    "rate_confirmation_load_id": (
+                        result.match.rate_con.load_id
+                        if result.match.rate_con is not None else None
+                    ),
+                    "rate_confirmation_broker_name": (
+                        result.match.rate_con.broker_name
+                        if result.match.rate_con is not None else None
+                    ),
+                    "rate_confirmation_carrier_name": (
+                        result.match.rate_con.carrier_name
+                        if result.match.rate_con is not None else None
+                    ),
+                    "origin": (
+                        result.match.rate_con.origin
+                        if result.match.rate_con is not None else None
+                    ),
+                    "destination": (
+                        result.match.rate_con.destination
+                        if result.match.rate_con is not None else None
+                    ),
+                    "service_date": (
+                        authority_context.service_date
+                        if authority_context is not None else None
+                    ),
                     "finding_index": index,
                     "finding_type": finding.type.value,
                     "severity": finding.severity.value,
