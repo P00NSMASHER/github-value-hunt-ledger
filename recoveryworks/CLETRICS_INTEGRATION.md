@@ -409,3 +409,9 @@ The multi-cloud planner now enforces its cross-provider authority-isolation clai
 The multi-cloud orchestrator can now execute the validated AWS/Azure/GCP provider jobs locally through the existing one-command pilot runner. Each provider retains its own evidence bundle, ledger, receipt registry, state head, and assurance report proof hash.
 
 The execution result deliberately contains no combined financial totals and performs no cloud mutation or external action. Provider assurance report hashes are verified after each run and become the only inputs allowed into the later executive-rollup layer.
+
+## Proof-bound multi-cloud executive rollup (step 12)
+
+A reviewed executive rollup can now be built only from the verified provider assurance reports emitted by step 11b. It verifies each report proof hash and required financial-boundary controls before reading summary values.
+
+Only a fixed allowlist of same-currency, same-semantic cent categories is aggregated: recovery lifecycle dollars, prospective savings, verified realized savings, anomaly exposure, and reconciliation drift. Case counts, individual findings, rules, evidence packets, recommendations, confidence scores, and resource identities are never merged across providers. Every provider report proof hash and state head remains visible in the rollup.
