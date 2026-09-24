@@ -93,6 +93,7 @@ class RawArtifactTests(unittest.TestCase):
             store = LocalContentAddressedArtifactStore(root)
             with self.assertRaisesRegex(ValueError, "do not match"):
                 store.retain(
+                    registry_with(src),
                     src,
                     b"different bytes",
                     media_type="application/pdf",
@@ -306,6 +307,7 @@ class RawArtifactTests(unittest.TestCase):
             store = LocalContentAddressedArtifactStore(root)
             with self.assertRaisesRegex(ValueError, "basename"):
                 store.retain(
+                    registry_with(src),
                     src,
                     raw,
                     media_type="application/pdf",
@@ -315,6 +317,7 @@ class RawArtifactTests(unittest.TestCase):
                 )
             with self.assertRaisesRegex(ValueError, "precede"):
                 store.retain(
+                    registry_with(src),
                     src,
                     raw,
                     media_type="application/pdf",
