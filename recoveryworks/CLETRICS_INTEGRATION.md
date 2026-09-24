@@ -331,3 +331,9 @@ The pilot now emits private JSON and Markdown Cloud Recovery & Savings Assurance
 Every active VALIDATED cloud recovery has an evidence packet containing the exact expected-vs-actual calculation, finding proof hash, controlling rule id/hash/source locator/effective dates, every load-bearing evidence hash and locator, verification flags, calculation metadata, and current lifecycle state. SUPERSEDED and REJECTED findings remain historical but are not emitted as active validated recovery packets.
 
 The report itself never authorizes cloud mutation or external recovery action.
+
+## Remediation executor dry-run boundary (step 7a)
+
+A separate provider-neutral executor boundary now validates the exact remediation plan, approval, NOT_EXECUTED envelope, verified read-only resource snapshot, expected resource state hash, allowlisted action type, and required action parameters.
+
+The current allowlist defines contracts for resize_instance and remove_idle_resource. The output is a hash-bound DRY_RUN_VALIDATED plan containing no provider API operation, sets live_execution_allowed=false, and records mutation_performed=false. There is no AWS SDK, shell command, provider credential handling, or live mutation function in this half-step.

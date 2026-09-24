@@ -46,6 +46,13 @@ from .cloud_savings_evidence import (
     SavingsNormalizationMode,
     measure_realized_cloud_savings,
 )
+from .cloud_remediation_executor import (
+    CloudRemediationDryRunPlan,
+    CloudRemediationDryRunRequest,
+    CloudRemediationExecutorPolicy,
+    CloudResourceSnapshot,
+    prepare_cloud_remediation_dry_run,
+)
 from .cloud_remediation import (
     CloudRemediationAction,
     CloudRemediationApproval,
@@ -339,6 +346,11 @@ __all__ = [
     "SavingsEvidenceState",
     "SavingsNormalizationMode",
     "measure_realized_cloud_savings",
+    "CloudRemediationDryRunPlan",
+    "CloudRemediationDryRunRequest",
+    "CloudRemediationExecutorPolicy",
+    "CloudResourceSnapshot",
+    "prepare_cloud_remediation_dry_run",
     "CloudRemediationAction",
     "CloudRemediationApproval",
     "CloudRemediationEnvelope",
