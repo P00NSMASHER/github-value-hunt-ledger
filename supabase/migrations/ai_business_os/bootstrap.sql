@@ -1596,20 +1596,20 @@ insert into ai_business_os_prod.metrics(
   business_id,metric_key,metric_value,unit,observed_at,source_ref,source_sha256,metadata
 )
 select b.id,'stripe_available_balance_cents',0,'cents',now(),
-       'stripe:acct_1UItcBRVKNw4DyjZ:balance',
-       encode(extensions.digest('stripe:acct_1UItcBRVKNw4DyjZ:available:0:usd:2026-09-24','sha256'),'hex'),
+       'stripe:__PRIVATE_STRIPE_ACCOUNT_ID_1__:balance',
+       encode(extensions.digest('stripe:__PRIVATE_STRIPE_ACCOUNT_ID_1__:available:0:usd:2026-09-24','sha256'),'hex'),
        '{"currency":"usd","livemode":true}'::jsonb
 from ai_business_os_prod.businesses b where b.slug='capturebrief'
 union all
 select b.id,'stripe_available_balance_cents',0,'cents',now(),
-       'stripe:acct_1UItgVRbdNnNHDOt:balance',
-       encode(extensions.digest('stripe:acct_1UItgVRbdNnNHDOt:available:0:usd:2026-09-24','sha256'),'hex'),
+       'stripe:__PRIVATE_STRIPE_ACCOUNT_ID_2__:balance',
+       encode(extensions.digest('stripe:__PRIVATE_STRIPE_ACCOUNT_ID_2__:available:0:usd:2026-09-24','sha256'),'hex'),
        '{"currency":"usd","livemode":true}'::jsonb
 from ai_business_os_prod.businesses b where b.slug='freightrecovery'
 union all
 select b.id,'stripe_available_balance_cents',0,'cents',now(),
-       'stripe:acct_1UItiURhg2WHIBwi:balance',
-       encode(extensions.digest('stripe:acct_1UItiURhg2WHIBwi:available:0:usd:2026-09-24','sha256'),'hex'),
+       'stripe:__PRIVATE_STRIPE_ACCOUNT_ID_3__:balance',
+       encode(extensions.digest('stripe:__PRIVATE_STRIPE_ACCOUNT_ID_3__:available:0:usd:2026-09-24','sha256'),'hex'),
        '{"currency":"usd","livemode":true}'::jsonb
 from ai_business_os_prod.businesses b where b.slug='recoveryos';
 
@@ -1617,20 +1617,20 @@ insert into ai_business_os_prod.metrics(
   business_id,metric_key,metric_value,unit,observed_at,source_ref,source_sha256,metadata
 )
 select b.id,'stripe_pending_balance_cents',0,'cents',now(),
-       'stripe:acct_1UItcBRVKNw4DyjZ:balance',
-       encode(extensions.digest('stripe:acct_1UItcBRVKNw4DyjZ:pending:0:usd:2026-09-24','sha256'),'hex'),
+       'stripe:__PRIVATE_STRIPE_ACCOUNT_ID_1__:balance',
+       encode(extensions.digest('stripe:__PRIVATE_STRIPE_ACCOUNT_ID_1__:pending:0:usd:2026-09-24','sha256'),'hex'),
        '{"currency":"usd","livemode":true}'::jsonb
 from ai_business_os_prod.businesses b where b.slug='capturebrief'
 union all
 select b.id,'stripe_pending_balance_cents',0,'cents',now(),
-       'stripe:acct_1UItgVRbdNnNHDOt:balance',
-       encode(extensions.digest('stripe:acct_1UItgVRbdNnNHDOt:pending:0:usd:2026-09-24','sha256'),'hex'),
+       'stripe:__PRIVATE_STRIPE_ACCOUNT_ID_2__:balance',
+       encode(extensions.digest('stripe:__PRIVATE_STRIPE_ACCOUNT_ID_2__:pending:0:usd:2026-09-24','sha256'),'hex'),
        '{"currency":"usd","livemode":true}'::jsonb
 from ai_business_os_prod.businesses b where b.slug='freightrecovery'
 union all
 select b.id,'stripe_pending_balance_cents',0,'cents',now(),
-       'stripe:acct_1UItiURhg2WHIBwi:balance',
-       encode(extensions.digest('stripe:acct_1UItiURhg2WHIBwi:pending:0:usd:2026-09-24','sha256'),'hex'),
+       'stripe:__PRIVATE_STRIPE_ACCOUNT_ID_3__:balance',
+       encode(extensions.digest('stripe:__PRIVATE_STRIPE_ACCOUNT_ID_3__:pending:0:usd:2026-09-24','sha256'),'hex'),
        '{"currency":"usd","livemode":true}'::jsonb
 from ai_business_os_prod.businesses b where b.slug='recoveryos';
 
