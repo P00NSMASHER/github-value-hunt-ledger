@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "diagnostic_id": "customer-aws-diagnostic-001",
+  "client_id": "customer-1",
+  "provider": "aws",
+  "billing_account_id": "payer-account-id",
+  "currency": "USD",
+  "period": {
+    "start": "2026-01-01",
+    "end": "2026-08-31"
+  },
+  "authorization": {
+    "authorization_id": "customer-auth-id",
+    "customer_actor_id": "customer-finops-owner",
+    "authorized_at": "2026-09-24T12:00:00Z",
+    "expires_at": "2026-10-08T12:00:00Z",
+    "allowed_purposes": [
+      "BILLING_RECOVERY_DIAGNOSTIC",
+      "SAVINGS_ANALYSIS"
+    ],
+    "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": "customer://authorization/id",
+    "credentials_embedded": false,
+    "external_actions_allowed": false,
+    "remediation_allowed": false
+  },
+  "inputs": {
+    "focus_csv": "inputs/customer-focus.csv",
+    "meter_csv": "inputs/customer-meter.csv",
+    "rates_csv": "inputs/customer-reviewed-rates.csv",
+    "anomaly_csv": "inputs/customer-anomalies.csv",
+    "reconciliation_csv": "inputs/customer-reconciliation.csv",
+    "savings_csv": "inputs/customer-savings.csv"
+  },
+  "verification": {
+    "charge_source_verified": false,
+    "meter_source_verified": false,
+    "rate_source_verified": false
+  },
+  "cletrics": {
+    "release": "customer-cletrics-export",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "exported_at": "2026-09-24T13:00:00Z"
+  },
+  "outputs": {
+    "private_root": "private/diagnostics/customer-aws-diagnostic-001"
+  }
+}

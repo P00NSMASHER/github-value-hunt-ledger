@@ -343,3 +343,9 @@ The current allowlist defines contracts for resize_instance and remove_idle_reso
 The remediation boundary now supports a credential-free handoff to a named separate executor. The handoff binds the exact dry-run plan, remediation approval, customer authorization id, executor id, authorizer id, expected resource-state hash, issuance/expiry window, and mandatory pre-execution recheck. It embeds neither credentials nor provider operations.
 
 Before a downstream executor can consume the handoff, a fresh independently verified resource snapshot must still match the dry-run state. Any drift requires a new review. After an external execution, RecoveryOS can verify a supplied execution receipt against the handoff/gate and a verified post-state snapshot. This repository still contains no provider mutation implementation.
+
+## Authorized real-account diagnostic path (step 8)
+
+A customer diagnostic can now be run locally from an explicit intake JSON and customer authorization artifact. Before creating any RecoveryOS state, the runner verifies authorization timing/purposes and preflights every FOCUS row against the authorized provider, billing account, currency, and service period. A mismatch or expired authorization fails before the private diagnostic directory is created.
+
+The command is: python -m recoveryworks.cloud_diagnostic --intake diagnostic.json --base-dir . --run-at <UTC timestamp>. Authorization grants analysis scope only; it never promotes source verification, permits remediation, or permits external recovery actions. Real customer data is not bundled with the repository and must be supplied under authorization.
