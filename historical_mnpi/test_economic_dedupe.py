@@ -163,7 +163,7 @@ class EconomicDedupeTests(unittest.TestCase):
         self.assertIn("quantity", proposal.matching_fields)
         self.assertIn("execution_price", proposal.matching_fields)
         self.assertIn(
-            "COMPATIBLE_TIME_AND_PARTIAL_ECONOMIC_MATCH",
+            "COMPATIBLE_TIME_AND_STRONG_ECONOMIC_MATCH",
             proposal.reason_codes,
         )
         proposal.verify_integrity()
@@ -190,7 +190,7 @@ class EconomicDedupeTests(unittest.TestCase):
         )
         self.assertEqual(proposal.relation, DedupeRelation.EXACT_SAME)
         self.assertIn(
-            "EXACT_TIMESTAMP_AND_ECONOMIC_ANCHORS",
+            "EXACT_TIMESTAMP_AND_STRONG_ECONOMIC_ANCHORS",
             proposal.reason_codes,
         )
 
@@ -234,6 +234,81 @@ class EconomicDedupeTests(unittest.TestCase):
             source_registry=sources, artifact_manifest=manifest,
         )
         self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+
+    def test_generic_side_and_instrument_match_are_not_enough(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            trade_id=left.trade_id,
+            case_id=left.case_id,
+            case_proof_hash=left.case_proof_hash,
+            trader_party_id=left.trader_party_id,
+            issuer_id=left.issuer_id,
+            source_ref=left.source_ref,
+            fact_status=left.fact_status,
+            status_ref=left.status_ref,
+            instrument_type=InstrumentType.STOCK,
+            side=TradeSide.BUY,
+            trade_date=left.trade_date,
+        )
+        right = HistoricalTransaction(
+            trade_id=right.trade_id,
+            case_id=right.case_id,
+            case_proof_hash=right.case_proof_hash,
+            trader_party_id=right.trader_party_id,
+            issuer_id=right.issuer_id,
+            source_ref=right.source_ref,
+            fact_status=right.fact_status,
+            status_ref=right.status_ref,
+            instrument_type=InstrumentType.STOCK,
+            side=TradeSide.BUY,
+            trade_date=right.trade_date,
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.INSUFFICIENT)
+        self.assertIn(
+            "ONLY_GENERIC_ECONOMIC_FIELDS_MATCH",
+            proposal.reason_codes,
+        )
+
+    def test_exact_timestamp_requires_quantity_plus_price_or_amount(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            trade_id=left.trade_id,
+            case_id=left.case_id,
+            case_proof_hash=left.case_proof_hash,
+            trader_party_id=left.trader_party_id,
+            issuer_id=left.issuer_id,
+            source_ref=left.source_ref,
+            fact_status=left.fact_status,
+            status_ref=left.status_ref,
+            instrument_type=InstrumentType.STOCK,
+            side=TradeSide.BUY,
+            trade_timestamp="2015-08-10T10:15:30-04:00",
+            quantity="2500",
+        )
+        right = HistoricalTransaction(
+            trade_id=right.trade_id,
+            case_id=right.case_id,
+            case_proof_hash=right.case_proof_hash,
+            trader_party_id=right.trader_party_id,
+            issuer_id=right.issuer_id,
+            source_ref=right.source_ref,
+            fact_status=right.fact_status,
+            status_ref=right.status_ref,
+            instrument_type=InstrumentType.STOCK,
+            side=TradeSide.BUY,
+            trade_timestamp="2015-08-10T10:15:30-04:00",
+            quantity="2500",
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
+        self.assertNotEqual(proposal.relation, DedupeRelation.EXACT_SAME)
 
     def test_unresolved_identity_produces_insufficient_proposal(self):
         sources, manifest, cases, entities, left, right = fixture(resolve_identities=False)
