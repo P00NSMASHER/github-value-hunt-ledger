@@ -358,6 +358,8 @@ class ProductionJobRegistry:
             jobs = payload.setdefault("jobs", {})
             row = jobs.get(job.job_id)
             if row is not None:
+                if row.get("cancelled_at") is not None:
+                    raise ValueError("job is cancelled")
                 if row.get("completed_result_proof_hash") is not None:
                     raise ValueError("job is already completed")
                 active_expiry = row.get("lease_expires_at")
@@ -399,6 +401,155 @@ class ProductionJobRegistry:
             self._write(payload)
             return lease
 
+    def renew_lease(
+        self,
+        job: ProductionJobIdentity,
+        lease: ProductionJobLease,
+        *,
+        renewed_at: str,
+        lease_seconds: int = 300,
+    ) -> ProductionJobLease:
+        if type(lease_seconds) is not int or not 1 <= lease_seconds <= 3600:
+            raise ValueError("lease_seconds must be in 1..3600")
+        renewed = normalize_utc_timestamp("renewed_at", renewed_at)
+        expires = (
+            _instant(renewed) + timedelta(seconds=lease_seconds)
+        ).astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        with private_file_lock(self.lock_path):
+            payload = self._read()
+            row = payload.setdefault("jobs", {}).get(job.job_id)
+            if row is None:
+                raise ValueError("job is not registered")
+            if row.get("completed_result_proof_hash") is not None:
+                raise ValueError("completed job lease cannot be renewed")
+            if row.get("cancelled_at") is not None:
+                raise ValueError("cancelled job lease cannot be renewed")
+            if row.get("lease_proof_hash") != lease.proof_hash:
+                raise ValueError("lease renewal does not match active lease")
+            if _instant(lease.expires_at) < _instant(renewed):
+                raise ValueError("expired lease cannot be renewed")
+            identity = {
+                "schema": 1,
+                "job_id": job.job_id,
+                "job_proof_hash": job.proof_hash,
+                "tenant_id": job.tenant_id,
+                "worker_id": lease.worker_id,
+                "attempt": lease.attempt,
+                "acquired_at": lease.acquired_at,
+                "expires_at": expires,
+            }
+            renewed_lease = ProductionJobLease(
+                lease_id="production-job-lease:" + canonical_hash(identity),
+                job_id=job.job_id,
+                job_proof_hash=job.proof_hash,
+                tenant_id=job.tenant_id,
+                worker_id=lease.worker_id,
+                attempt=lease.attempt,
+                acquired_at=lease.acquired_at,
+                expires_at=expires,
+            )
+            row["lease_id"] = renewed_lease.lease_id
+            row["lease_proof_hash"] = renewed_lease.proof_hash
+            row["lease_expires_at"] = renewed_lease.expires_at
+            self._write(payload)
+            return renewed_lease
+
+    def cancel(
+        self,
+        job: ProductionJobIdentity,
+        *,
+        cancelled_at: str,
+        cancelled_by: str,
+        reason: str,
+    ) -> str:
+        cancelled = normalize_utc_timestamp("cancelled_at", cancelled_at)
+        actor = _text("cancelled_by", cancelled_by)
+        detail = _text("reason", reason)
+        with private_file_lock(self.lock_path):
+            payload = self._read()
+            jobs = payload.setdefault("jobs", {})
+            row = jobs.get(job.job_id)
+            if row is not None and row.get("completed_result_proof_hash") is not None:
+                raise ValueError("completed job cannot be cancelled")
+            cancellation = canonical_hash({
+                "schema": 1,
+                "job_id": job.job_id,
+                "job_proof_hash": job.proof_hash,
+                "tenant_id": job.tenant_id,
+                "cancelled_at": cancelled,
+                "cancelled_by": actor,
+                "reason": detail,
+            })
+            if row is None:
+                row = {
+                    "tenant_id": job.tenant_id,
+                    "job_proof_hash": job.proof_hash,
+                    "attempt": 0,
+                    "lease_id": None,
+                    "lease_proof_hash": None,
+                    "lease_worker_id": None,
+                    "lease_expires_at": None,
+                    "completed_result_proof_hash": None,
+                }
+                jobs[job.job_id] = row
+            row["cancelled_at"] = cancelled
+            row["cancelled_by"] = actor
+            row["cancellation_proof_hash"] = cancellation
+            row["lease_expires_at"] = None
+            self._write(payload)
+            return cancellation
+
+    def record_failure(
+        self,
+        job: ProductionJobIdentity,
+        lease: ProductionJobLease,
+        *,
+        failure_code: str,
+        detail: str,
+        failed_at: str,
+    ) -> str:
+        failed = normalize_utc_timestamp("failed_at", failed_at)
+        code = _text("failure_code", failure_code)
+        message = _text("detail", detail)
+        with private_file_lock(self.lock_path):
+            payload = self._read()
+            row = payload.setdefault("jobs", {}).get(job.job_id)
+            if row is None:
+                raise ValueError("job is not registered")
+            if row.get("lease_proof_hash") != lease.proof_hash:
+                raise ValueError("failure receipt lease does not match active lease")
+            receipt = canonical_hash({
+                "schema": 1,
+                "job_id": job.job_id,
+                "job_proof_hash": job.proof_hash,
+                "lease_proof_hash": lease.proof_hash,
+                "attempt": lease.attempt,
+                "failure_code": code,
+                "detail": message,
+                "failed_at": failed,
+            })
+            row["last_failure_code"] = code
+            row["last_failure_detail"] = message
+            row["last_failure_at"] = failed
+            row["failure_receipt_proof_hash"] = receipt
+            row["lease_expires_at"] = None
+            self._write(payload)
+            return receipt
+
+    def recoverable_jobs(self, *, observed_at: str) -> tuple[str, ...]:
+        observed = _instant(normalize_utc_timestamp("observed_at", observed_at))
+        payload = self._read()
+        result = []
+        for job_id, row in payload.get("jobs", {}).items():
+            if row.get("completed_result_proof_hash") is not None:
+                continue
+            if row.get("cancelled_at") is not None:
+                continue
+            expiry = row.get("lease_expires_at")
+            if expiry is not None and _instant(expiry) <= observed:
+                result.append(job_id)
+        return tuple(sorted(result))
+
     def mark_completed(
         self,
         job: ProductionJobIdentity,
@@ -418,6 +569,8 @@ class ProductionJobRegistry:
                 if row["completed_result_proof_hash"] != result:
                     raise ValueError("job already completed with different result")
                 return
+            if row.get("cancelled_at") is not None:
+                raise ValueError("cancelled job cannot be completed")
             row["completed_result_proof_hash"] = result
             row["lease_expires_at"] = None
             self._write(payload)

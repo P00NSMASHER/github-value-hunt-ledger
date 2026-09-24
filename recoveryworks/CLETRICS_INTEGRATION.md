@@ -557,3 +557,9 @@ A private hash-verified job registry provides leases, active-lease concurrency e
 ### Downstream tenant inheritance
 
 The managed tenant registry now propagates beyond pilot execution. Production run-history recording automatically binds the history path/proof to the manifest client tenant when a registry is present. Production backups require every managed source path to resolve to the same tenant before writing, reserve backup archive/manifest paths before creation, and bind both resulting proofs. Customer data exports likewise inherit the customer tenant registry when present and reserve/bind the export archive. Assurance/diligence and other proof artifacts can use bind_existing_tenant_output / bind_managed_tenant_artifact so customer-specific exports cannot reuse another tenant's path or proof.
+
+## Local production job worker execution (step 27b)
+
+The tenant-bound job registry now supports lease heartbeat/renewal, cancellation, structured failure receipts, and restart recovery through later lease attempts. Local execution is implemented only for CONTINUOUS_ASSURANCE, PRIVATE_BACKUP, and previously authorized CLOUD_DIAGNOSTIC jobs; each runtime payload must hash to the preplanned job payload proof before any work begins.
+
+The worker calls the existing local assurance evaluator/writer, private backup creator, or authorized diagnostic runner, records the exact result proof in the job registry, and remains idempotent after completion. It contains no provider API, cloud mutation, claim submission, or other external-action path.
