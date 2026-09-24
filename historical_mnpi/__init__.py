@@ -90,6 +90,18 @@ from .conflict_policy import (
     resolve_fact_conflict,
 )
 
+from .economic_dedupe import (
+    DedupeDecision,
+    DedupeDecisionType,
+    DedupeProposal,
+    DedupeRelation,
+    EconomicTransactionCluster,
+    EconomicTransactionMember,
+    build_economic_transaction_cluster,
+    decide_dedupe,
+    propose_transaction_dedupe,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -100,6 +112,15 @@ from .source_registry import (
 )
 
 __all__ = [
+    "DedupeDecision",
+    "DedupeDecisionType",
+    "DedupeProposal",
+    "DedupeRelation",
+    "EconomicTransactionCluster",
+    "EconomicTransactionMember",
+    "build_economic_transaction_cluster",
+    "decide_dedupe",
+    "propose_transaction_dedupe",
     "ClaimAssessment",
     "ConflictDisposition",
     "ConflictResolution",
