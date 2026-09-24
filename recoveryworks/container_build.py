@@ -35,6 +35,7 @@ class ContainerBuildManifest:
     dependency_lock_path: str
     runtime_dependency_count: int
     third_party_runtime_dependencies: tuple[str, ...]
+    runtime_source_roots: tuple[str, ...]
     reproducible_source_inputs: bool = True
 
     def __post_init__(self) -> None:
@@ -51,6 +52,10 @@ class ContainerBuildManifest:
             value = getattr(self, name)
             if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
                 raise ValueError(f"{name} must be lowercase SHA-256")
+        roots = tuple(self.runtime_source_roots)
+        if roots != ("recoveryworks", "freight"):
+            raise ValueError("unexpected runtime source roots")
+        object.__setattr__(self, "runtime_source_roots", roots)
         if self.runtime_dependency_count != len(self.third_party_runtime_dependencies):
             raise ValueError("runtime dependency count mismatch")
         if self.runtime_dependency_count != 0:
@@ -76,6 +81,7 @@ class ContainerBuildManifest:
             "third_party_runtime_dependencies": list(
                 self.third_party_runtime_dependencies
             ),
+            "runtime_source_roots": list(self.runtime_source_roots),
             "reproducible_source_inputs": True,
         }
 
@@ -123,6 +129,8 @@ def build_container_build_manifest(
         "COPY freight /app/freight",
         "python -m compileall",
         'ENTRYPOINT ["python", "-m", "recoveryworks.pilot_runner"]',
+        "COPY freight /app/freight",
+        "python -m compileall -q /app/recoveryworks /app/freight",
     )
     missing = [value for value in required_fragments if value not in docker_text]
     if missing:
@@ -141,6 +149,7 @@ def build_container_build_manifest(
         "dependency_lock_path": str(lock),
         "runtime_dependency_count": len(dependencies),
         "third_party_runtime_dependencies": list(dependencies),
+        "runtime_source_roots": ["recoveryworks", "freight"],
         "reproducible_source_inputs": True,
     }
     return ContainerBuildManifest(
@@ -153,6 +162,7 @@ def build_container_build_manifest(
         dependency_lock_path=str(lock),
         runtime_dependency_count=len(dependencies),
         third_party_runtime_dependencies=dependencies,
+        runtime_source_roots=("recoveryworks", "freight"),
         reproducible_source_inputs=True,
     )
 

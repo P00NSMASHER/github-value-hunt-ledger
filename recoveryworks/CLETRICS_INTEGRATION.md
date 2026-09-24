@@ -439,3 +439,7 @@ Successful pilot observability verifies the assurance-report proof hash before r
 Release control now binds the full source commit, source-build manifest proof, exact digest-pinned container image, and production-deployment proof into one immutable release candidate. A rollback manifest binds the candidate to a previous verified release/image/source commit.
 
 Environment promotion gates require passing health/readiness checks for the exact deployment proof plus release approvals bound to the exact release/environment. Production requires two distinct approvers and a rollback manifest. The resulting gate is READY_FOR_SEPARATE_PROMOTION_ACTION but promotion_execution_enabled and deployment_performed remain false. Private release manifest, approval, rollback, and gate artifacts can be written for a later external promotion workflow.
+
+### Production runtime closure
+
+The reproducible container manifest now records the two source roots required by the current RecoveryWorks runtime: recoveryworks and freight. The production Dockerfile copies both roots, compiles both, and smoke-imports the pilot, deployment, observability, and release-control entrypoints. The container still has no third-party Python runtime dependencies beyond the digest-pinned Python base image.

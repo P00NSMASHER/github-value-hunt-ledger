@@ -61,4 +61,4 @@ jobs:
             --tmpfs /tmp:rw,noexec,nosuid,size=64m \
             --entrypoint python \
             recoveryworks:ci \
-            -c "import recoveryworks; import recoveryworks.pilot_runner; import recoveryworks.production_deployment; print('recoveryworks-container-smoke-ok')"
+            -c "import recoveryworks; import freight; import recoveryworks.pilot_runner; import recoveryworks.production_deployment; import recoveryworks.production_observability; import recoveryworks.release_control; print('recoveryworks-container-smoke-ok')"

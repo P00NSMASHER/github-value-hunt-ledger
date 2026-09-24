@@ -15,6 +15,10 @@ class ContainerBuildProvenanceTests(unittest.TestCase):
             dependency_lock_path="recoveryworks/requirements.production.lock",
         )
         self.assertEqual(manifest.runtime_dependency_count, 0)
+        self.assertEqual(
+            manifest.runtime_source_roots,
+            ("recoveryworks", "freight"),
+        )
         self.assertEqual(manifest.third_party_runtime_dependencies, ())
         self.assertIn("@sha256:", manifest.base_image_ref)
         self.assertEqual(len(manifest.proof_hash), 64)
@@ -26,6 +30,11 @@ class ContainerBuildProvenanceTests(unittest.TestCase):
         first = text.splitlines()[0]
         self.assertRegex(first, r"^FROM .+@sha256:[0-9a-f]{64}$")
         self.assertIn("USER 65532:65532", text)
+        self.assertIn("COPY freight /app/freight", text)
+        self.assertIn(
+            "python -m compileall -q /app/recoveryworks /app/freight",
+            text,
+        )
         self.assertIn("COPY freight /app/freight", text)
         self.assertIn(
             'ENTRYPOINT ["python", "-m", "recoveryworks.pilot_runner"]',
