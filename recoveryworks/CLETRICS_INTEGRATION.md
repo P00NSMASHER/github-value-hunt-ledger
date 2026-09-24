@@ -523,3 +523,9 @@ Every internally evidenced control points to exact proof hashes plus explicit li
 The enterprise control map can now be packaged into questionnaire-ready customer-safe responses, an evidence-room proof index, and an explicit gap/remediation register with internal owner and due date. Customer exports redact internal actor identifiers and omit internal paths, source locators, and raw metadata while preserving proof hashes, control ids, evidence descriptions, and limitations.
 
 The package includes a direct certification answer stating that no SOC 2, ISO 27001, PCI DSS, HIPAA, FedRAMP, or other third-party certification is claimed. Controls lacking event-specific or external validation evidence become explicit gaps rather than being silently represented as complete.
+
+## Customer data governance controls (step 24)
+
+Managed customer data now has a per-customer private data-space inventory with exact file hashes, classification, allowed purposes, collection time, retention deadline, and source kind. Raw credential/secret material is explicitly rejected. Paths cannot escape the customer root, and customer inventories cannot mix customers.
+
+Purpose-limited access decisions are recorded in a private hash-chained access history, including denied attempts. Customer export creates a deterministic private archive and receipt. Logical deletion validates the exact file hash, retention/early-deletion authorization, and active legal holds before removing the managed file; deletion receipts explicitly state logical_deletion_only=true and never claim forensic secure wipe. Active legal holds override deletion.
