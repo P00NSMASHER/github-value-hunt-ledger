@@ -119,6 +119,7 @@ class TenantBindingRegistry:
         row = {
             "client_id": identity.client_id,
             "namespace": identity.namespace,
+            "created_at": identity.created_at,
             "tenant_proof_hash": identity.proof_hash,
         }
         for other_tenant_id, other in tenants.items():
@@ -233,7 +234,7 @@ class TenantBindingRegistry:
             tenant_id=tenant_id,
             client_id=client,
             namespace=row["namespace"],
-            created_at="1970-01-01T00:00:00Z",
+            created_at=row["created_at"],
         )
 
     def tenant_id_for_path(self, path: str | Path) -> str:
@@ -251,7 +252,7 @@ class TenantBindingRegistry:
             tenant_id=tenant_id,
             client_id=row["client_id"],
             namespace=row["namespace"],
-            created_at="1970-01-01T00:00:00Z",
+            created_at=row["created_at"],
         )
 
     def state_hash(self) -> str | None:
