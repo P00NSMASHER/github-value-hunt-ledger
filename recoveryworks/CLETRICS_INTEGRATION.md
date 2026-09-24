@@ -337,3 +337,9 @@ The report itself never authorizes cloud mutation or external recovery action.
 A separate provider-neutral executor boundary now validates the exact remediation plan, approval, NOT_EXECUTED envelope, verified read-only resource snapshot, expected resource state hash, allowlisted action type, and required action parameters.
 
 The current allowlist defines contracts for resize_instance and remove_idle_resource. The output is a hash-bound DRY_RUN_VALIDATED plan containing no provider API operation, sets live_execution_allowed=false, and records mutation_performed=false. There is no AWS SDK, shell command, provider credential handling, or live mutation function in this half-step.
+
+## Governed remediation handoff and receipt (step 7b)
+
+The remediation boundary now supports a credential-free handoff to a named separate executor. The handoff binds the exact dry-run plan, remediation approval, customer authorization id, executor id, authorizer id, expected resource-state hash, issuance/expiry window, and mandatory pre-execution recheck. It embeds neither credentials nor provider operations.
+
+Before a downstream executor can consume the handoff, a fresh independently verified resource snapshot must still match the dry-run state. Any drift requires a new review. After an external execution, RecoveryOS can verify a supplied execution receipt against the handoff/gate and a verified post-state snapshot. This repository still contains no provider mutation implementation.

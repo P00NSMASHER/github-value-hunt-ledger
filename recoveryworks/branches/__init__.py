@@ -46,6 +46,15 @@ from .cloud_savings_evidence import (
     SavingsNormalizationMode,
     measure_realized_cloud_savings,
 )
+from .cloud_remediation_handoff import (
+    CloudExecutionOutcome,
+    CloudRemediationExecutionGate,
+    CloudRemediationExecutionReceipt,
+    CloudRemediationHandoff,
+    build_cloud_remediation_execution_receipt,
+    create_cloud_remediation_handoff,
+    recheck_cloud_remediation_handoff,
+)
 from .cloud_remediation_executor import (
     CloudRemediationDryRunPlan,
     CloudRemediationDryRunRequest,
@@ -346,6 +355,13 @@ __all__ = [
     "SavingsEvidenceState",
     "SavingsNormalizationMode",
     "measure_realized_cloud_savings",
+    "CloudExecutionOutcome",
+    "CloudRemediationExecutionGate",
+    "CloudRemediationExecutionReceipt",
+    "CloudRemediationHandoff",
+    "build_cloud_remediation_execution_receipt",
+    "create_cloud_remediation_handoff",
+    "recheck_cloud_remediation_handoff",
     "CloudRemediationDryRunPlan",
     "CloudRemediationDryRunRequest",
     "CloudRemediationExecutorPolicy",
