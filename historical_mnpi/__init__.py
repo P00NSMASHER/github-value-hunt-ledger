@@ -25,6 +25,7 @@ from .case_model import (
 )
 
 from .transaction_model import (
+    FactStatus,
     HistoricalTransaction,
     InstrumentType,
     TimePrecision,
@@ -43,6 +44,7 @@ from .source_registry import (
 )
 
 __all__ = [
+    "FactStatus",
     "HistoricalTransaction",
     "InstrumentType",
     "TimePrecision",
