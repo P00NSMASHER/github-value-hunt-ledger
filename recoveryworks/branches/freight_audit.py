@@ -22,6 +22,8 @@ import re
 from recoveryworks.engine import RecoveryObservation
 from recoveryworks.models import Branch, EvidenceRef, RuleRef, canonical_hash
 
+from .freight_authority import FreightAuthorityContext, resolve_freight_authority
+
 from .freight_audit_vendor import (
     CarrierInvoice,
     EngineConfig,
@@ -123,6 +125,9 @@ class MappedFreightAuditFinding:
     disposition: FreightAuditDisposition
     candidate_evidence: EvidenceRef
     source_evidence: tuple[EvidenceRef, ...]
+    authority_evidence: tuple[EvidenceRef, ...]
+    authority_blockers: tuple[str, ...]
+    authority_resolution_hash: str | None
     observation: RecoveryObservation | None
     suppression_reason: str | None = None
 
@@ -350,6 +355,7 @@ def map_freight_audit_to_recovery(
     currency: str,
     evidence: FreightAuditEvidenceBundle,
     controlling_rule: RuleRef | None = None,
+    authority_context: FreightAuthorityContext | None = None,
 ) -> FreightAuditRecoveryMapping:
     """Map pinned engine output into RecoveryOS evidence and observations.
 
@@ -360,6 +366,9 @@ def map_freight_audit_to_recovery(
     actual=allocated candidate cents. Source totals remain in metadata, avoiding
     invented line-level expected values that the upstream Finding does not expose.
     """
+    if controlling_rule is not None and authority_context is not None:
+        raise ValueError("provide controlling_rule or authority_context, not both")
+
     findings = result.findings
     allocations, suppressed = _dedup_allocations(findings)
     integrity = tuple(
@@ -431,7 +440,7 @@ def map_freight_audit_to_recovery(
                 expected_cents=0,
                 actual_cents=amount,
                 rule=effective_rule,
-                evidence=(candidate_ref, *source_refs),
+                evidence=(candidate_ref, *source_refs, *authority_evidence),
                 reason=f"FREIGHT_AUDIT_{finding.type.value.upper()}",
                 confidence_basis=(
                     "pinned deterministic freight-audit engine; "
@@ -457,6 +466,9 @@ def map_freight_audit_to_recovery(
                         if result.match.rate_con is not None else None
                     ),
                     "integrity_blockers": list(integrity),
+                    "authority_blockers": list(authority_blockers),
+                    "authority_resolution_hash": authority_resolution_hash,
+                    "matched_authority_rule_hashes": list(matched_rule_hashes),
                 },
             )
             observations.append(observation)
@@ -472,6 +484,9 @@ def map_freight_audit_to_recovery(
             disposition=disposition,
             candidate_evidence=candidate_ref,
             source_evidence=source_refs,
+            authority_evidence=authority_evidence,
+            authority_blockers=authority_blockers,
+            authority_resolution_hash=authority_resolution_hash,
             observation=observation,
             suppression_reason=suppression_reason,
         ))
@@ -495,6 +510,7 @@ __all__ = [
     "FreightAuditDisposition",
     "FreightAuditDomainAdapter",
     "FreightAuditDomainResult",
+    "FreightAuthorityContext",
     "FreightAuditEvidenceBundle",
     "FreightAuditRecoveryMapping",
     "LineItem",
