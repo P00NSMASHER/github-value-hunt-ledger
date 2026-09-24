@@ -6,7 +6,7 @@
   <meta name="description" content="Find out whether freight money may be recoverable with a $0-upfront audit. Freight Recovery earns a fee only from funds successfully recovered under an authorized engagement.">
   <meta name="theme-color" content="#071426">
   <meta name="freight-contact-email" content="">
-  <meta name="site-release" content="free-audit-contingency-v3">
+  <meta name="site-release" content="free-audit-contingency-v4">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
   <title>Freight Recovery | Free Audit. Pay Only on Recovered Funds.</title>
@@ -28,9 +28,9 @@
   <link rel="preload" href="assets/fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" as="image" href="assets/images/terminal-blue-hour.webp" imagesrcset="assets/images/terminal-blue-hour-800.webp 800w, assets/images/terminal-blue-hour.webp 1586w" imagesizes="100vw" fetchpriority="high">
-  <link rel="stylesheet" href="site.css?v=free-audit-contingency-v3">
-  <script src="commercial-config.js?v=free-audit-contingency-v3" defer></script>
-  <script src="site.js?v=free-audit-contingency-v3" defer></script>
+  <link rel="stylesheet" href="site.css?v=free-audit-contingency-v4">
+  <script src="commercial-config.js?v=free-audit-contingency-v4" defer></script>
+  <script src="site.js?v=free-audit-contingency-v4" defer></script>
 </head>
 <body itemscope itemtype="https://schema.org/WebPage">
 <a class="skip" href="#main">Skip to content</a>
@@ -170,77 +170,63 @@
     <div class="wrap intake-layout">
       <div class="intake-copy">
         <p class="eyebrow"><span></span> Start your free recovery audit</p>
-        <h2 id="intake-title">First, make sure the opportunity is worth pursuing.</h2>
-        <p>Answer a few business and data-readiness questions. This protects your team from unnecessary file transfer and protects our analysts from open-ended, low-value reviews.</p>
-        <div class="intake-guardrail"><span aria-hidden="true">!</span><div><strong>Do not enter invoice details or attach freight records here.</strong><p>This step uses non-sensitive qualification information only. If the request is a fit, we will confirm an approved secure intake route in writing.</p></div></div>
+        <h2 id="intake-title">Start in under a minute.</h2>
+        <p>Five basic details are enough to begin. We can ask for deeper freight and data-readiness details only if they help determine fit.</p>
+        <div class="intake-guardrail"><span aria-hidden="true">!</span><div><strong>Do not attach freight records here.</strong><p>Start with non-sensitive business information. If the request is a fit, we will confirm scope and an approved secure transfer route before any freight files move.</p></div></div>
         <dl class="format-list">
-          <div><dt>Preferred audit input</dt><dd>Structured invoice exports such as CSV</dd></div>
-          <div><dt>Reviewed before acceptance</dt><dd>Spreadsheet, PDF, and carrier exports</dd></div>
+          <div><dt>What we need now</dt><dd>Your contact, company, freight-spend range, and freight type</dd></div>
+          <div><dt>What can wait</dt><dd>Invoice exports, shipment records, rate agreements, and payment evidence</dd></div>
           <div><dt>Never send here</dt><dd>Credentials, payment-card data, or unrestricted inbox access</dd></div>
         </dl>
       </div>
 
       <div class="form-shell">
-        <div class="form-progress" aria-label="Audit request progress">
-          <span class="is-current" data-progress="1"><i>1</i> Company</span>
-          <span data-progress="2"><i>2</i> Freight profile</span>
-          <span data-progress="3"><i>3</i> Data readiness</span>
+        <div class="form-head">
+          <strong>Request the free audit</strong>
+          <p>Five basics. No freight files yet.</p>
         </div>
         <form id="auditForm" novalidate>
-          <fieldset class="form-step" data-form-step="1">
-            <legend>Tell us who should receive the audit response.</legend>
-            <p class="step-intro">Use a work contact who can confirm freight scope and data access.</p>
+          <fieldset class="form-step form-step-simple" data-form-step="1">
+            <legend>Tell us where to start.</legend>
+            <p class="step-intro">Use a work contact who can answer a basic freight question if needed.</p>
             <div class="field-grid">
               <label><span>Full name</span><input id="fullName" name="fullName" autocomplete="name" required maxlength="100"></label>
               <label><span>Work email</span><input id="workEmail" name="workEmail" type="email" autocomplete="email" required maxlength="160"></label>
               <label><span>Company</span><input id="companyName" name="companyName" autocomplete="organization" required maxlength="140"></label>
-              <label><span>Role</span><select id="role" name="role" required><option value="">Select role</option><option>CFO / finance leader</option><option>Controller / accounting</option><option>Transportation / logistics</option><option>Freight broker / 3PL</option><option>Owner / executive</option><option>Other</option></select></label>
-            </div>
-            <p class="step-error" role="alert" aria-live="polite"></p>
-            <div class="form-actions"><span></span><button class="button button-cobalt" type="button" data-next-step="2">Continue</button></div>
-          </fieldset>
-
-          <fieldset class="form-step" data-form-step="2" hidden>
-            <legend>Describe the freight operation.</legend>
-            <p class="step-intro">Ranges are enough. Exact figures are not needed for qualification.</p>
-            <div class="field-grid">
               <label><span>Approximate annual freight spend</span><select id="annualSpend" name="annualSpend" required><option value="">Select range</option><option>Under $250k</option><option>$250k&ndash;$1M</option><option>$1M&ndash;$5M</option><option>$5M&ndash;$20M</option><option>$20M+</option></select></label>
-              <label><span>Approximate monthly shipments</span><select id="monthlyShipments" name="monthlyShipments" required><option value="">Select range</option><option>Under 50</option><option>50&ndash;249</option><option>250&ndash;999</option><option>1,000+</option></select></label>
-              <label><span>Number of active carriers</span><select id="carrierCount" name="carrierCount" required><option value="">Select range</option><option>1</option><option>2&ndash;5</option><option>6&ndash;15</option><option>16+</option></select></label>
-              <label><span>Major carriers <small>optional</small></span><input id="majorCarriers" name="majorCarriers" maxlength="180" placeholder="Names or carrier types"></label>
             </div>
-            <fieldset class="choice-group" id="modesGroup"><legend>Freight types used <span>Choose all that apply</span></legend><div class="choice-grid"><label><input type="checkbox" name="modes" value="Parcel"><span>Parcel</span></label><label><input type="checkbox" name="modes" value="LTL"><span>LTL</span></label><label><input type="checkbox" name="modes" value="FTL"><span>FTL</span></label><label><input type="checkbox" name="modes" value="Intermodal"><span>Intermodal</span></label><label><input type="checkbox" name="modes" value="Ocean / air"><span>Ocean / air</span></label><label><input type="checkbox" name="modes" value="Other"><span>Other</span></label></div></fieldset>
-            <p class="step-error" role="alert" aria-live="polite"></p>
-            <div class="form-actions"><button class="button button-quiet" type="button" data-prev-step="1">Back</button><button class="button button-cobalt" type="button" data-next-step="3">Continue</button></div>
-          </fieldset>
 
-          <fieldset class="form-step" data-form-step="3" hidden>
-            <legend>How audit-ready are the records?</legend>
-            <p class="step-intro">This determines the next operational step, not whether you are charged. The audit remains $0 upfront.</p>
-            <div class="field-grid">
-              <label><span>Invoice history available</span><select id="invoiceHistory" name="invoiceHistory" required><option value="">Select range</option><option>Less than 3 months</option><option>3&ndash;5 months</option><option>6&ndash;12 months</option><option>13&ndash;24 months</option><option>More than 24 months</option></select></label>
-              <label><span>Approximate invoice count</span><select id="invoiceCount" name="invoiceCount" required><option value="">Select range</option><option>Under 100</option><option>100&ndash;499</option><option>500&ndash;2,499</option><option>2,500+</option></select></label>
-              <label><span>Have these records been audited?</span><select id="priorAudit" name="priorAudit" required><option value="">Select answer</option><option>No formal audit</option><option>Internal review only</option><option>External audit completed</option><option>Not sure</option></select></label>
-              <label><span>Known disputes or suspected overcharges?</span><select id="suspectedIssues" name="suspectedIssues" required><option value="">Select answer</option><option>Yes</option><option>No</option><option>Not sure</option></select></label>
-            </div>
-            <fieldset class="choice-group" id="recordsGroup"><legend>Records currently available <span>Choose all that apply</span></legend><div class="choice-grid choice-grid-two"><label><input type="checkbox" name="records" value="Invoice export"><span>Invoice export</span></label><label><input type="checkbox" name="records" value="Rate agreements"><span>Rate agreements</span></label><label><input type="checkbox" name="records" value="Shipment records"><span>Shipment records</span></label><label><input type="checkbox" name="records" value="Payment or credit evidence"><span>Payment / credit evidence</span></label></div></fieldset>
-            <label class="field-wide"><span>What prompted the review? <small>optional, no invoice-level detail</small></span><textarea id="issueNotes" name="issueNotes" rows="3" maxlength="500" placeholder="For example: recurring accessorials, duplicate-looking charges, or an unresolved carrier billing question."></textarea><small class="character-count"><span id="noteCount">0</span>/500</small></label>
-            <label class="consent"><input id="safeIntake" name="safeIntake" type="checkbox" required><span>I will not include freight documents, credentials, payment-card data, or other confidential records in this qualification request. I understand a secure intake route must be approved first.</span></label>
+            <fieldset class="choice-group" id="modesGroup"><legend>Freight types used <span>Choose all that apply</span></legend><div class="choice-grid"><label><input type="checkbox" name="modes" value="Parcel"><span>Parcel</span></label><label><input type="checkbox" name="modes" value="LTL"><span>LTL</span></label><label><input type="checkbox" name="modes" value="FTL"><span>FTL</span></label><label><input type="checkbox" name="modes" value="Intermodal"><span>Intermodal</span></label><label><input type="checkbox" name="modes" value="Ocean / air"><span>Ocean / air</span></label><label><input type="checkbox" name="modes" value="Other"><span>Other</span></label></div></fieldset>
+
+            <details class="qualification-details">
+              <summary>Add optional details to speed up review</summary>
+              <div class="qualification-details-body">
+                <div class="field-grid optional-grid">
+                  <label><span>Approximate monthly shipments <small>optional</small></span><select id="monthlyShipments" name="monthlyShipments"><option value="">Select range</option><option>Under 50</option><option>50&ndash;249</option><option>250&ndash;999</option><option>1,000+</option></select></label>
+                  <label><span>Invoice history available <small>optional</small></span><select id="invoiceHistory" name="invoiceHistory"><option value="">Select range</option><option>Less than 3 months</option><option>3&ndash;5 months</option><option>6&ndash;12 months</option><option>13&ndash;24 months</option><option>More than 24 months</option></select></label>
+                  <label><span>Known disputes or suspected overcharges? <small>optional</small></span><select id="suspectedIssues" name="suspectedIssues"><option value="">Select answer</option><option>Yes</option><option>No</option><option>Not sure</option></select></label>
+                  <label><span>Major carriers <small>optional</small></span><input id="majorCarriers" name="majorCarriers" maxlength="180" placeholder="Names or carrier types"></label>
+                </div>
+                <fieldset class="choice-group compact-choice-group" id="recordsGroup"><legend>Records currently available <span>optional</span></legend><div class="choice-grid choice-grid-two"><label><input type="checkbox" name="records" value="Invoice export"><span>Invoice export</span></label><label><input type="checkbox" name="records" value="Rate agreements"><span>Rate agreements</span></label><label><input type="checkbox" name="records" value="Shipment records"><span>Shipment records</span></label><label><input type="checkbox" name="records" value="Payment or credit evidence"><span>Payment / credit evidence</span></label></div></fieldset>
+                <label class="field-wide"><span>What prompted the review? <small>optional, no invoice-level detail</small></span><textarea id="issueNotes" name="issueNotes" rows="3" maxlength="500" placeholder="For example: recurring accessorials, duplicate-looking charges, or an unresolved carrier billing question."></textarea><small class="character-count"><span id="noteCount">0</span>/500</small></label>
+              </div>
+            </details>
+
+            <div class="safe-note"><strong>Keep this first step non-sensitive.</strong><span>Freight records move only after an approved secure intake route is confirmed.</span></div>
             <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
-            <div class="form-actions"><button class="button button-quiet" type="button" data-prev-step="2">Back</button><button class="button button-signal" type="submit">Prepare My Free Audit Request</button></div>
+            <div class="form-actions form-actions-simple"><button class="button button-signal" type="submit">Open My Free Audit Request</button><small>Your email app opens with a prefilled request. Review it and press Send.</small></div>
           </fieldset>
         </form>
 
         <div class="audit-ready" id="auditReady" hidden tabindex="-1">
           <span class="ready-mark" aria-hidden="true">&#10003;</span>
-          <p class="eyebrow"><span></span> Request ready</p>
-          <h3>Your qualification summary is prepared.</h3>
-          <p>Nothing has been sent yet. Open the prepared email, review the non-sensitive summary, and send it from your own account.</p>
-          <div class="reference-line"><span>Reference</span><strong id="requestReference">&mdash;</strong></div>
-          <a class="button button-cobalt" id="sendAuditRequest" href="#contact-pending">Open Email to Send Request</a>
-          <button class="text-button" id="copyAuditSummary" type="button">Copy request summary</button>
+          <p class="eyebrow"><span></span> Email prepared</p>
+          <h3>Review it, then press Send.</h3>
+          <p>Your email app should open automatically with the short qualification request. No freight records are attached.</p>
+          <a class="button button-cobalt" id="sendAuditRequest" href="#contact-pending">Open Prepared Email Again</a>
+          <button class="text-button" id="copyAuditSummary" type="button">Copy request details instead</button>
           <span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span>
-          <ol class="ready-steps"><li><span>1</span>We review fit and data readiness.</li><li><span>2</span>If viable, we confirm scope and an approved secure transfer route.</li><li><span>3</span>After analysis, you receive the free opportunity summary.</li></ol>
+          <ol class="ready-steps"><li><span>1</span>We review fit and the basic freight profile.</li><li><span>2</span>If viable, we confirm scope and an approved secure transfer route.</li><li><span>3</span>After analysis, you receive the free opportunity summary.</li></ol>
         </div>
       </div>
     </div>
@@ -304,13 +290,13 @@
   <section class="section security-section" id="security" aria-labelledby="security-title">
     <div class="wrap security-layout">
       <figure class="security-image"><img src="assets/images/invoice-evidence.webp" srcset="assets/images/invoice-evidence-800.webp 800w, assets/images/invoice-evidence.webp 1448w" sizes="(max-width: 900px) 100vw, 44vw" width="1448" height="1086" alt="Abstract freight documents arranged for controlled review" loading="lazy" decoding="async"><figcaption>Illustrative records &middot; no customer data</figcaption></figure>
-      <div class="security-copy"><p class="eyebrow"><span></span> Data handling before data transfer</p><h2 id="security-title">Start with fit. Move files only after approval.</h2><p>The public site does not upload or transmit freight files. Qualification details remain in your browser until you choose to send the prepared email. If the request is accepted, the scope and approved secure transfer route are confirmed before records move.</p><div class="security-grid"><div><strong>Minimize first</strong><p>Qualification uses ranges and record types, not invoice-level data.</p></div><div><strong>Scope access</strong><p>Only agreed records and the approved business purpose should be included.</p></div><div><strong>Human control</strong><p>Material findings and external actions require review and authorization.</p></div><div><strong>Evidence trail</strong><p>Findings, approvals, settlements, and reversals remain distinct and traceable.</p></div></div><p class="security-links"><a href="privacy.html">Read the data &amp; privacy notice</a><span>&middot;</span><a href="#faq">Review common security questions</a></p></div>
+      <div class="security-copy"><p class="eyebrow"><span></span> Data handling before data transfer</p><h2 id="security-title">Start with fit. Move files only after approval.</h2><p>The public site does not upload or transmit freight files. The short qualification stays in your browser until you open the prepared email. If the request is accepted, the scope and approved secure transfer route are confirmed before records move.</p><div class="security-grid"><div><strong>Minimize first</strong><p>Qualification uses ranges and record types, not invoice-level data.</p></div><div><strong>Scope access</strong><p>Only agreed records and the approved business purpose should be included.</p></div><div><strong>Human control</strong><p>Material findings and external actions require review and authorization.</p></div><div><strong>Evidence trail</strong><p>Findings, approvals, settlements, and reversals remain distinct and traceable.</p></div></div><p class="security-links"><a href="privacy.html">Read the data &amp; privacy notice</a><span>&middot;</span><a href="#faq">Review common security questions</a></p></div>
     </div>
   </section>
 
   <section class="section proof-section" id="proof" aria-labelledby="proof-title">
     <div class="wrap proof-layout">
-      <div><p class="eyebrow"><span></span> Proof without fabrication</p><h2 id="proof-title">Real case studies will appear when they are real.</h2><p>We do not publish invented customers, testimonials, recovery totals, carrier partnerships, certifications, or success rates. Until a customer authorizes a verified case study, the controlled synthetic demo is the only public results example.</p></div>
+      <div><p class="eyebrow"><span></span> Proof without fabrication</p><h2 id="proof-title">Real case studies will appear when they are real.</h2><p>We do not publish invented customers, testimonials, recovery totals, carrier partnerships, certifications, or success rates. Until a customer authorizes a verified case study, the fictional audit example is the only public results example.</p></div>
       <div class="proof-placeholder" aria-label="Future verified case study area"><span>Verified customer proof</span><strong>Reserved for an authorized, evidence-backed recovery case.</strong><p>Future entries can include the reviewed population, opportunity category, approved claim value, actual recovered funds, time to resolution, and customer-approved context.</p></div>
     </div>
   </section>
@@ -324,7 +310,7 @@
         <details><summary><span>03</span>How does Freight Recovery get paid?</summary><p>If you separately authorize a recovery engagement, Freight Recovery earns the agreed percentage of eligible funds actually recovered. A potential opportunity, flag, or unpaid claim does not by itself earn a fee.</p></details>
         <details><summary><span>04</span>What percentage do you charge?</summary><p>The current working rate is <strong data-rate-label>confirmed before recovery work begins</strong>. It is a configurable commercial term, not a permanent promise. Your exact rate, scope, exclusions, and payment timing are confirmed in writing before the engagement starts.</p></details>
         <details><summary><span>05</span>When do I owe a fee?</summary><p>Only after an authorized engagement produces fee-eligible funds actually received or posted to you, subject to the signed terms. Known reversals reduce the eligible amount. If actual eligible recovery is zero, the recovery fee is zero.</p></details>
-        <details><summary><span>06</span>What information do you need?</summary><p>Qualification starts with freight-spend and shipment ranges, modes, carrier count, available history, approximate invoice volume, record types, and whether issues or prior audits are known. Freight files are requested only after scope and a secure transfer route are approved.</p></details>
+        <details><summary><span>06</span>What information do you need?</summary><p>The first request asks only for your contact, company, annual freight-spend range, and freight types. You can optionally add shipment volume, available history, carrier context, record types, and suspected issues. Freight files are requested only after scope and a secure transfer route are approved.</p></details>
         <details><summary><span>07</span>What freight types can you analyze?</summary><p>The qualification flow accepts parcel, LTL, FTL, intermodal, ocean, air, and mixed-mode descriptions. Actual support depends on the available invoices, rate authority, shipment evidence, payment evidence, carrier, geography, and agreed scope. We confirm fit before accepting records.</p></details>
         <details><summary><span>08</span>How far back can you review?</summary><p>Available history, contractual deadlines, carrier rules, limitation periods, record quality, and the agreed scope all matter. Share the history range during qualification; we confirm the review period before analysis. This is not legal advice.</p></details>
         <details><summary><span>09</span>What happens after you identify a recovery?</summary><p>You receive a concise opportunity summary. If you want Freight Recovery to proceed, we define the cases, authority, contingency rate, recovered-funds definition, data handling, and payment terms in a separate engagement before detailed claim preparation or outside contact.</p></details>
@@ -347,7 +333,7 @@
   <div class="wrap footer-grid">
     <div><a class="brand brand-footer" href="#main" aria-label="Freight Recovery home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="brand-name">Freight <em>Recovery</em></span></a><p>Evidence-led freight recovery with no upfront audit fee.</p><span class="footer-disclaimer">No guaranteed recovery. No fabricated customer proof.</span></div>
     <nav aria-label="Service links"><strong>Service</strong><a href="#how">How it works</a><a href="#audit-output">Audit output</a><a href="#pricing">Pricing</a><a href="#start-audit">Start free audit</a></nav>
-    <nav aria-label="Trust links"><strong>Trust</strong><a href="#security">Data handling</a><a href="privacy.html">Privacy notice</a><a href="engagement-framework.html">Engagement framework</a><a href="synthetic-pilot-demo.zip" download>Controlled demo</a></nav>
+    <nav aria-label="Trust links"><strong>Trust</strong><a href="#security">Data handling</a><a href="privacy.html">Privacy notice</a><a href="engagement-framework.html">Engagement framework</a><a href="synthetic-pilot-demo.zip" download>Fictional audit example</a></nav>
     <div class="footer-contact"><strong>Questions</strong><p>Use email for general and qualification questions only. Do not attach freight records.</p><a data-contact-link href="#contact-pending">Email Freight Recovery</a></div>
   </div>
   <div class="wrap footer-bottom"><span>&copy; 2026 Freight Recovery</span><span>Potential recovery &ne; approved claim value &ne; actual recovered funds</span></div>

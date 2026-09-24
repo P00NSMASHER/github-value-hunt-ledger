@@ -163,9 +163,8 @@ def build(
     page, count = STATUS_PATTERN.subn(
         lambda match: match.group(1)
         + "<strong>Free audit requests are open.</strong> "
-        + "Start with non-sensitive business details. Questions: "
-        + f'<a href="mailto:{safe_contact}">{safe_contact}</a>. '
-        + "Do not email freight records."
+        + "Start with non-sensitive business details. "
+        + "Freight records move only through an approved secure route."
         + match.group(2),
         text_bundle["index.html"],
     )
@@ -191,11 +190,9 @@ def build(
     demo_link = (
         '<a class="text-link text-link-light" href="synthetic-pilot-demo.zip" '
         'download data-track="controlled_demo_downloaded">'
-        'Download the controlled synthetic demo <span aria-hidden="true">&#8599;</span></a>'
-        '<p class="demo-hash"><strong>SHA-256</strong> '
-        f'<code>{receipt["bundle_sha256"]}</code></p>'
-        '<p class="microcopy">Fictional data only; no customer result, external action, '
-        'production attestation, or rights attestation.</p>'
+        'Download a fictional audit example <span aria-hidden="true">&#8599;</span></a>'
+        '<p class="microcopy">Fictional data only. This walkthrough is not a customer '
+        'result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(
         DEMO_MARKER, demo_link

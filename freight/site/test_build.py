@@ -97,8 +97,10 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("no recovery fee", page.lower())
             self.assertIn('id="auditForm"', page)
             self.assertIn('data-form-step="1"', page)
-            self.assertIn('data-form-step="2"', page)
-            self.assertIn('data-form-step="3"', page)
+            self.assertNotIn('data-form-step="2"', page)
+            self.assertNotIn('data-form-step="3"', page)
+            self.assertIn('class="qualification-details"', page)
+            self.assertIn("Open My Free Audit Request", page)
             self.assertIn("approved secure intake route", page)
             self.assertIn("Fixed-Fee Forensic Audit", page)
             self.assertIn("Available", page)
@@ -117,7 +119,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('name="twitter:description"', page)
             self.assertIn('name="twitter:image"', page)
             self.assertIn('id="actualRecoveredDisplay">$100,000</dd>', page)
-            self.assertIn('content="free-audit-contingency-v3"', page)
+            self.assertIn('content="free-audit-contingency-v4"', page)
 
             forbidden = (
                 "$5,000",
@@ -149,6 +151,7 @@ class PublicBuildTests(unittest.TestCase):
                 self.assertNotIn(builder.CONTACT_META, page)
             self.assertIn('href="mailto:sales@freightfixture.com', index)
             self.assertIn('href="mailto:sales@freightfixture.com', privacy)
+            self.assertNotIn(">sales@freightfixture.com</a>", index)
             self.assertNotIn('type="file"', index.lower())
             self.assertIn("form-action 'none'", index)
             self.assertIn("connect-src 'none'", index)
@@ -184,9 +187,9 @@ class PublicBuildTests(unittest.TestCase):
             output = build(Path(temporary) / "public")
             script = (output / "site.js").read_text()
             page = (output / "index.html").read_text()
-            self.assertIn('site.css?v=free-audit-contingency-v3', page)
-            self.assertIn('commercial-config.js?v=free-audit-contingency-v3', page)
-            self.assertIn('site.js?v=free-audit-contingency-v3', page)
+            self.assertIn('site.css?v=free-audit-contingency-v4', page)
+            self.assertIn('commercial-config.js?v=free-audit-contingency-v4', page)
+            self.assertIn('site.js?v=free-audit-contingency-v4', page)
             self.assertIn('id="actualRecovery" type="number" min="0" max="1000000000" step="1000" value="100000"', page)
             self.assertIn('<dd id="actualRecoveredDisplay">$100,000</dd>', page)
             self.assertNotIn('value="50000"', page)
@@ -199,12 +202,13 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("freight_actual_recovery_recorded", script)
             self.assertIn("actual * contingencyRate", script)
             self.assertIn("sendLink.href = `mailto:${contactEmail}", script)
-            self.assertIn("Nothing has been sent yet", page)
+            self.assertIn("window.location.href = sendLink.href", script)
+            self.assertIn("Review it, then press Send.", page)
             stylesheet = (output / "site.css").read_text()
             self.assertIn(".output-copy{min-width:0}", stylesheet)
             self.assertIn(".security-layout>*{min-width:0}", stylesheet)
             self.assertIn(".security-image{width:100%;margin:0;position:relative}", stylesheet)
-            self.assertIn("overflow-wrap:anywhere", stylesheet)
+            self.assertIn(".qualification-details{", stylesheet)
             self.assertIn(".navlinks{position:absolute;left:0;right:0;top:100%", stylesheet)
             for network_or_storage_api in (
                 "fetch(",
@@ -229,7 +233,9 @@ class PublicBuildTests(unittest.TestCase):
             self.assertEqual(
                 hashlib.sha256(demo.read_bytes()).hexdigest(), receipt["bundle_sha256"]
             )
-            self.assertIn(receipt["bundle_sha256"], page)
+            self.assertNotIn(receipt["bundle_sha256"], page)
+            self.assertNotIn("SHA-256", page)
+            self.assertIn("Download a fictional audit example", page)
 
     def test_fonts_and_images_retain_integrity(self):
         with tempfile.TemporaryDirectory() as temporary:

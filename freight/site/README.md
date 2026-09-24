@@ -38,10 +38,13 @@ than zero and less than one.
 
 ## What the public form does
 
-The progressive qualification form runs entirely in the browser. It does not
-upload files, send a network request, or use browser storage. After completion,
-it prepares a non-sensitive email summary. The visitor must review and send the
-email from their own account.
+The short, single-screen qualification form runs entirely in the browser. It
+asks only for contact/company information, an annual freight-spend range, and
+freight type; deeper qualification details are optional and progressively
+disclosed. It does not upload files, send a network request, or use browser
+storage. On submit it prepares a non-sensitive email and opens the visitor's
+email app; the visitor still reviews and sends the message from their own
+account.
 
 Freight records are accepted only after a human fit review, written scope, and
 an approved secure transfer route. The public site must never claim that an
@@ -51,8 +54,9 @@ upload occurred or that a lead qualified merely because the form was filled.
 
 `build.py` copies only an explicit allowlist of public HTML, CSS, JavaScript,
 fonts, images, and trust files. It also generates the controlled synthetic demo
-bundle and injects its current digest. It never recurses through or publishes
-the private repository.
+bundle and verifies its digest internally. The checksum is not exposed in the
+customer-facing page. It never recurses through or publishes the private
+repository.
 
 The GitHub Pages workflow deploys only the built directory. The old payment-link
 variables are not deployment gates and are not copied into the site.

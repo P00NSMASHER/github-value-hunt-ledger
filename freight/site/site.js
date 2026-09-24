@@ -102,11 +102,8 @@
 
   const auditForm = byId("auditForm");
   if (auditForm) {
-    let currentStep = 1;
     let formStarted = false;
     let preparedSummary = "";
-    const steps = all("[data-form-step]", auditForm);
-    const progressItems = all("[data-progress]");
     const formError = byId("formError");
 
     const markStarted = () => {
@@ -116,82 +113,6 @@
     };
     auditForm.addEventListener("input", markStarted, { once: true });
 
-    const showStep = (stepNumber) => {
-      currentStep = stepNumber;
-      for (const step of steps) step.hidden = Number(step.dataset.formStep) !== stepNumber;
-      for (const item of progressItems) {
-        const number = Number(item.dataset.progress);
-        item.classList.toggle("is-current", number === stepNumber);
-        item.classList.toggle("is-complete", number < stepNumber);
-      }
-      const active = steps.find((step) => Number(step.dataset.formStep) === stepNumber);
-      const focusTarget = active?.querySelector("input,select,textarea");
-      if (focusTarget) focusTarget.focus({ preventScroll: true });
-      active?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    };
-
-    const stepError = (step) => step.querySelector(".step-error") || formError;
-    const setError = (step, message) => {
-      const output = stepError(step);
-      if (output) output.textContent = message;
-    };
-    const clearInvalid = (step) => {
-      setError(step, "");
-      for (const field of all("[aria-invalid='true']", step)) field.removeAttribute("aria-invalid");
-    };
-
-    const validateStep = (number) => {
-      const step = steps.find((item) => Number(item.dataset.formStep) === number);
-      if (!step) return false;
-      clearInvalid(step);
-      const requiredFields = all("input[required],select[required],textarea[required]", step);
-      for (const field of requiredFields) {
-        if (!field.checkValidity()) {
-          field.setAttribute("aria-invalid", "true");
-          setError(step, "Complete the required fields before continuing.");
-          field.focus();
-          return false;
-        }
-      }
-      if (number === 2 && !step.querySelector("input[name='modes']:checked")) {
-        setError(step, "Choose at least one freight type.");
-        step.querySelector("#modesGroup")?.scrollIntoView({ block: "center" });
-        return false;
-      }
-      if (number === 3 && !step.querySelector("input[name='records']:checked")) {
-        setError(step, "Choose at least one available record type.");
-        step.querySelector("#recordsGroup")?.scrollIntoView({ block: "center" });
-        return false;
-      }
-      return true;
-    };
-
-    for (const button of all("[data-next-step]", auditForm)) {
-      button.addEventListener("click", () => {
-        if (!validateStep(currentStep)) return;
-        track(EVENTS.auditFormStepCompleted, { step: currentStep });
-        showStep(Number(button.dataset.nextStep));
-      });
-    }
-    for (const button of all("[data-prev-step]", auditForm)) {
-      button.addEventListener("click", () => showStep(Number(button.dataset.prevStep)));
-    }
-
-    for (const field of all("input,select,textarea", auditForm)) {
-      field.addEventListener("input", () => {
-        if (field.checkValidity()) field.removeAttribute("aria-invalid");
-        const containingStep = field.closest("[data-form-step]");
-        if (containingStep) setError(containingStep, "");
-      });
-    }
-
-    const issueNotes = byId("issueNotes");
-    if (issueNotes) {
-      issueNotes.addEventListener("input", () => {
-        byId("noteCount").textContent = String(issueNotes.value.length);
-      });
-    }
-
     const valuesFor = (name) => all(`input[name='${name}']:checked`, auditForm).map((field) => field.value);
     const fieldValue = (id) => byId(id)?.value.trim() || "";
     const makeReference = () => {
@@ -199,75 +120,112 @@
       const random = new Uint32Array(1);
       if (window.crypto?.getRandomValues) window.crypto.getRandomValues(random);
       else random[0] = Date.now() % 0xffffffff;
-      return `FR-${date}-${random[0].toString(16).toUpperCase().padStart(8, "0").slice(0, 8)}`;
+      return `FR-${date}-${random[0].toString(16).toUpperCase().padStart(8, "0").slice(0, 6)}`;
     };
 
+    const setError = (message) => {
+      if (formError) formError.textContent = message;
+    };
+
+    const validate = () => {
+      setError("");
+      for (const field of all("input[required],select[required],textarea[required]", auditForm)) {
+        field.removeAttribute("aria-invalid");
+        if (!field.checkValidity()) {
+          field.setAttribute("aria-invalid", "true");
+          setError("Complete the required fields before continuing.");
+          field.focus();
+          return false;
+        }
+      }
+      if (!auditForm.querySelector("input[name='modes']:checked")) {
+        setError("Choose at least one freight type.");
+        byId("modesGroup")?.scrollIntoView({ block: "center", behavior: "smooth" });
+        return false;
+      }
+      return true;
+    };
+
+    for (const field of all("input,select,textarea", auditForm)) {
+      field.addEventListener("input", () => {
+        if (field.checkValidity()) field.removeAttribute("aria-invalid");
+        setError("");
+      });
+    }
+
+    const issueNotes = byId("issueNotes");
+    if (issueNotes) {
+      issueNotes.addEventListener("input", () => {
+        const count = byId("noteCount");
+        if (count) count.textContent = String(issueNotes.value.length);
+      });
+    }
+
     const buildSummary = (reference) => [
-      "FREE RECOVERY AUDIT QUALIFICATION",
+      "FREE RECOVERY AUDIT REQUEST",
       `Reference: ${reference}`,
       "",
       `Contact: ${fieldValue("fullName")}`,
       `Work email: ${fieldValue("workEmail")}`,
       `Company: ${fieldValue("companyName")}`,
-      `Role: ${fieldValue("role")}`,
       "",
       `Annual freight spend: ${fieldValue("annualSpend")}`,
-      `Monthly shipments: ${fieldValue("monthlyShipments")}`,
       `Freight types: ${valuesFor("modes").join(", ")}`,
-      `Active carriers: ${fieldValue("carrierCount")}`,
+      `Monthly shipments: ${fieldValue("monthlyShipments") || "Not provided"}`,
+      `Invoice history: ${fieldValue("invoiceHistory") || "Not provided"}`,
       `Major carriers/context: ${fieldValue("majorCarriers") || "Not provided"}`,
-      "",
-      `Invoice history: ${fieldValue("invoiceHistory")}`,
-      `Approximate invoice count: ${fieldValue("invoiceCount")}`,
-      `Available records: ${valuesFor("records").join(", ")}`,
-      `Prior audit: ${fieldValue("priorAudit")}`,
-      `Known or suspected issue: ${fieldValue("suspectedIssues")}`,
+      `Available records: ${valuesFor("records").join(", ") || "Not provided"}`,
+      `Known or suspected issue: ${fieldValue("suspectedIssues") || "Not provided"}`,
       `General reason for review: ${fieldValue("issueNotes") || "Not provided"}`,
       "",
-      "I have not attached freight records or credentials. Please review fit and, if appropriate, confirm scope and an approved secure intake route."
+      "No freight records or credentials are attached. Please review fit and, if appropriate, confirm scope and an approved secure intake route."
     ].join("\n");
 
     auditForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      if (!validateStep(3)) return;
-      const reference = makeReference();
-      preparedSummary = buildSummary(reference);
+      if (!validate()) return;
+
       const contactEmail = document.querySelector('meta[name="freight-contact-email"]')?.content.trim() || "";
       const sendLink = byId("sendAuditRequest");
-      if (contactEmail && sendLink) {
-        const subject = encodeURIComponent(`Free Recovery Audit Request — ${fieldValue("companyName")} — ${reference}`);
-        const body = encodeURIComponent(preparedSummary);
-        sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
-        sendLink.removeAttribute("aria-disabled");
-      } else if (sendLink) {
-        sendLink.href = "#contact-pending";
-        sendLink.setAttribute("aria-disabled", "true");
-        sendLink.textContent = "Business inbox configuration pending";
+      if (!contactEmail || !sendLink) {
+        setError("The business inbox is temporarily unavailable. Please try again later.");
+        return;
       }
-      byId("requestReference").textContent = reference;
+
+      const reference = makeReference();
+      preparedSummary = buildSummary(reference);
+      const subject = encodeURIComponent(`Free Recovery Audit Request — ${fieldValue("companyName")} — ${reference}`);
+      const body = encodeURIComponent(preparedSummary);
+      sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+      sendLink.removeAttribute("aria-disabled");
+
       auditForm.hidden = true;
-      document.querySelector(".form-progress").hidden = true;
       const ready = byId("auditReady");
       ready.hidden = false;
       ready.focus({ preventScroll: true });
       ready.scrollIntoView({ block: "center", behavior: "smooth" });
-      track(EVENTS.auditFormCompleted, { completedSteps: 3 });
+
+      track(EVENTS.auditFormCompleted, { completedSteps: 1 });
       track(EVENTS.auditRequestPrepared, { reference });
+      window.setTimeout(() => {
+        window.location.href = sendLink.href;
+      }, 80);
     });
 
     byId("sendAuditRequest")?.addEventListener("click", (event) => {
       if (event.currentTarget.getAttribute("aria-disabled") === "true") event.preventDefault();
-      else track(EVENTS.auditRequestEmailOpened, { reference: byId("requestReference")?.textContent || "" });
+      else track(EVENTS.auditRequestEmailOpened);
     });
 
     byId("copyAuditSummary")?.addEventListener("click", async () => {
       const output = byId("copyStatus");
       try {
         await navigator.clipboard.writeText(preparedSummary);
-        output.textContent = "Request summary copied.";
+        output.textContent = "Request details copied.";
       } catch (_error) {
         output.textContent = "Copy was unavailable. Use the prepared email instead.";
       }
     });
   }
+
 })();
