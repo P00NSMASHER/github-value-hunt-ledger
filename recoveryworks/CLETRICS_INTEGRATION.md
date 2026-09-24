@@ -639,3 +639,9 @@ The lifecycle intentionally contains no claim-submission/provider-mutation state
 A completed diagnostic/buyer-review path can now produce a proof-bound pilot closeout snapshot that keeps recovery, prospective savings, verified realized savings, anomaly exposure, and reconciliation drift on separate surfaces. Commercial arithmetic is derived only from the frozen charter hypotheses.
 
 Recovered-cash success-fee arithmetic uses recovered_cents only; validated/potential recovery, prospective savings, anomaly exposure, and drift cannot increase it. The snapshot is only PILOT_CLOSEOUT_REVIEW_READY and hard-codes continuation_authorized=false, invoice_created=false, payment_due_asserted=false, payment_received=false, and external_action_authorized=false. It is not an invoice, payment claim, or renewal commitment.
+
+## Verified buyer closeout acknowledgment (step 35b)
+
+Pilot closeout can now advance only with a separately sourced, verified buyer receipt that binds the exact closeout/charter/engagement/buyer and repeats the exact recovered cash, validated recovery, prospective savings, realized savings, anomaly exposure, and reconciliation drift surfaces. Any amount drift, unverified receipt, unaccepted outcome surface, or unresolved dispute fails closed.
+
+The resulting PILOT_CLOSEOUT_ACKNOWLEDGED artifact may record only a continuation interest such as REVIEW_MONTHLY_ASSURANCE; it hard-codes continuation_authorized=false, invoice_authorized=false, payment_due_asserted=false, and external_action_authorized=false. Buyer acknowledgment therefore cannot silently become billing or renewal authority.
