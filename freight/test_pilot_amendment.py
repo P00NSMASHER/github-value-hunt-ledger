@@ -3,7 +3,7 @@ import pytest
 from dataclasses import asdict
 
 from freight.pilot_activation_packet import build_packet
-from freight.pilot_charter import build_charter, from_dict as charter_from_dict
+from freight.pilot_charter import _canonical_hash, build_charter, from_dict as charter_from_dict
 from freight.pilot_amendment import AmendmentState, build_amendment, from_dict
 
 def ready_input():
@@ -18,8 +18,14 @@ def charter_request(**overrides):
     d.update(overrides)
     return charter_from_dict(d)
 
-def base_charter():
-    return json.loads(json.dumps(asdict(build_charter(activation(),charter_request()))))
+def historical_activation():
+    p=activation()
+    p["price_band_usd"]="$15,000–$25,000 fixed"
+    p["activation_hash"]=_canonical_hash({k:v for k,v in p.items() if k!="activation_hash"})
+    return p
+
+def base_charter(packet=None):
+    return json.loads(json.dumps(asdict(build_charter(packet or activation(),charter_request()))))
 
 def req(**overrides):
     d={"amendment_id":"AMD-001","reason":"Buyer requested scope update","buyer_acknowledges_change":True,"freight_acknowledges_change":True,"buyer_action_approver_role":"CFO"}
@@ -79,9 +85,16 @@ def test_material_scope_change_can_be_superseded_only_by_new_activation_and_matc
     assert a.requires_new_activation is True
     assert a.customer_data_authorized is True
 
-def test_out_of_band_fee_requires_new_activation_and_price_band():
+def test_custom_fee_change_requires_reacknowledgment_but_not_new_activation():
     a=build_amendment(base_charter(),req(fixed_fee_usd=30000,buyer_action_approver_role=None))
+    assert a.requires_reacknowledgment is True
+    assert a.requires_new_activation is False
+
+
+def test_legacy_out_of_band_fee_still_requires_new_activation_and_band():
+    base=base_charter(historical_activation())
+    a=build_amendment(base,req(fixed_fee_usd=30000,buyer_action_approver_role=None))
     assert a.requires_new_activation is True
-    replacement=json.loads(json.dumps(asdict(build_charter(activation(),charter_request()))))
+    replacement=json.loads(json.dumps(asdict(build_charter(historical_activation(),charter_request()))))
     with pytest.raises(ValueError):
-        build_amendment(base_charter(),req(fixed_fee_usd=30000,buyer_action_approver_role=None),replacement)
+        build_amendment(base,req(fixed_fee_usd=30000,buyer_action_approver_role=None),replacement)
