@@ -6,6 +6,8 @@ from .cletrics import (
     CletricsBundleEntry,
     CletricsCloudBundle,
     load_cletrics_bundle,
+    ANOMALY_ROLE,
+    RECONCILIATION_ROLE,
 )
 
 __all__ = [
@@ -14,4 +16,6 @@ __all__ = [
     "CletricsBundleEntry",
     "CletricsCloudBundle",
     "load_cletrics_bundle",
+    "ANOMALY_ROLE",
+    "RECONCILIATION_ROLE",
 ]
