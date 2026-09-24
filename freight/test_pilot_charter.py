@@ -3,7 +3,7 @@ import pytest
 from dataclasses import asdict
 
 from freight.pilot_activation_packet import build_packet
-from freight.pilot_charter import CharterState, build_charter, from_dict, render_markdown
+from freight.pilot_charter import CharterState, _canonical_hash, build_charter, from_dict, render_markdown
 
 def ready_input():
     return {
@@ -55,9 +55,17 @@ def test_missing_acknowledgment_prevents_acceptance():
     assert c.charter_state==CharterState.PENDING_ACKNOWLEDGMENT.value
     assert c.customer_data_authorized is False
 
-def test_fee_must_stay_inside_activation_packet_band():
+def test_custom_fixed_fee_is_bound_in_buyer_specific_charter():
+    c=build_charter(activation(),request(fixed_fee_usd=30000))
+    assert c.fixed_fee_usd==30000
+
+
+def test_legacy_explicit_price_band_is_still_enforced():
+    packet=activation()
+    packet["price_band_usd"]="$15,000–$25,000 fixed"
+    packet["activation_hash"]=_canonical_hash({k:v for k,v in packet.items() if k!="activation_hash"})
     with pytest.raises(ValueError,match="published price band"):
-        build_charter(activation(),request(fixed_fee_usd=30000))
+        build_charter(packet,request(fixed_fee_usd=30000))
 
 def test_activation_hash_is_verified():
     p=activation()
