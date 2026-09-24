@@ -16,7 +16,11 @@ from enum import Enum
 import re
 
 from .case_model import CaseArtifactRole, CaseRegistry
-from .raw_artifacts import RawArtifactManifest, SourceArtifactRef
+from .raw_artifacts import (
+    RawArtifactManifest,
+    SourceArtifactRef,
+    same_retained_artifact,
+)
 from .source_registry import (
     SourceAdmissibility,
     SourceRegistry,
@@ -339,14 +343,24 @@ def verify_transaction_provenance(
     if status_source.proof_hash != transaction.status_ref.source_proof_hash:
         raise ValueError("transaction status source proof mismatch")
 
-    case_artifact_by_ref = {
-        link.ref.proof_hash: link for link in case.artifacts
-    }
-    if transaction.source_ref.proof_hash not in case_artifact_by_ref:
+    source_link = next(
+        (
+            link for link in case.artifacts
+            if same_retained_artifact(link.ref, transaction.source_ref)
+        ),
+        None,
+    )
+    if source_link is None:
         raise ValueError(
             "transaction source artifact is not linked to the canonical case"
         )
-    status_link = case_artifact_by_ref.get(transaction.status_ref.proof_hash)
+    status_link = next(
+        (
+            link for link in case.artifacts
+            if same_retained_artifact(link.ref, transaction.status_ref)
+        ),
+        None,
+    )
     if status_link is None:
         raise ValueError(
             "transaction status artifact is not linked to the canonical case"
