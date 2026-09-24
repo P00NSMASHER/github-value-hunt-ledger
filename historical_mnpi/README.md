@@ -335,3 +335,93 @@ issuer are uniquely resolved to durable identities at approval time.
 The entity layer remains historical/public-record only. It does not authorize
 live trading, ingest live confidential information, or turn ambiguous identity
 evidence into a guessed match.
+
+
+
+## Step 10 — source priority and conflict preservation
+
+Contradictory public sources are now represented as separate, proof-pinned
+claims instead of being overwritten during normalization.
+
+The source-priority policy distinguishes:
+
+1. court-established, convicted, found-liable, and admitted facts;
+2. official settlement/non-admission status when the field being resolved is
+   itself a legal-status field;
+3. primary allegations in complaints, indictments, releases, orders, and
+   supported exhibits;
+4. primary records that do not establish the underlying fact, including
+   settlement-without-admission evidence used for non-status fields;
+5. published academic reconstructions;
+6. discovery-only secondary sources.
+
+This priority order is field-specific. A settlement without admission can
+establish that the matter was settled without admission, but it cannot upgrade
+an alleged quantity, price, timing, profit, or other trade fact into an
+established fact.
+
+### Contradiction preservation
+
+Every registered claim remains in the conflict assessment, including claims below
+the preferred authority tier.
+
+The assessment records:
+
+- each claim and exact source/artifact proof;
+- its factual/legal status;
+- its authority class and rank;
+- whether it is eligible to establish a canonical value;
+- the preferred value, when one exists;
+- the claim hashes supporting that preferred value;
+- every contradictory claim hash.
+
+A higher-priority source therefore **does not erase** a complaint, academic
+reconstruction, or secondary claim.
+
+If the highest applicable authority tier itself contains different values, the
+result is `UNRESOLVED_TOP_TIER_CONFLICT`. No preferred value is produced.
+
+Discovery-only evidence is retained for audit/discovery context but produces
+`NO_CANONICAL_SUPPORT` when it is the only evidence available.
+
+### Append-only conflict registry
+
+`SourceConflictRegistry` is append-only by claim ID. A registered claim cannot
+be rewritten under the same ID with different content.
+
+The registry supports deterministic per-case/per-field assessments and has its
+own order-independent proof hash.
+
+### Review-gate integration
+
+Step 10 extends the Step-8 acceptance boundary.
+
+For new historical-corpus approvals:
+
+- the review item must contain a source-conflict registry snapshot, even if the
+  registry currently contains no relevant contradictions;
+- relevant registered claims are assessed for every proposed normalized field and
+  for `fact_status`;
+- an unresolved top-tier conflict adds
+  `SOURCE_CONFLICT_UNRESOLVED:<field>`;
+- evidence with no canonical support adds
+  `SOURCE_NO_CANONICAL_SUPPORT:<field>`;
+- a proposed value that differs from the policy-preferred value adds
+  `SOURCE_PRIORITY_MISMATCH:<field>`;
+- a lower-priority contradiction may resolve a parser-level `CONFLICT:<field>`
+  blocker only when the source-priority assessment has a unique preferred value
+  and that value exactly matches the proposed normalized value.
+
+The contradictory claims still remain attached to the review item and rendered
+in the review report.
+
+Approval re-evaluates the current conflict registry. If a new relevant claim was
+registered after review-item creation, or an assessment otherwise changes, the
+old review item fails closed as stale and must be regenerated/reviewed.
+
+Approved decisions bind a source-conflict snapshot hash alongside the normalized
+row hash and durable-identity hash.
+
+As in all earlier steps, this remains limited to historical, already-public
+research/compliance use. It never authorizes live trading or ingestion of live
+confidential information.
