@@ -1,0 +1,72 @@
+{
+  "version": "portfolio-capital-allocator-v1",
+  "status": "ACTIVE_FAIL_CLOSED",
+  "policy": {
+    "key": "portfolio-default",
+    "version": 1,
+    "policy_hash": "29466bbfa5e7452fa97984ba2d465636fdf6733e7cc0473b88a80e9865e80371",
+    "min_evidence_coverage": 0.6,
+    "max_allocation_share": 0.5
+  },
+  "ranking": {
+    "key": "portfolio-ranking-2026-09-24",
+    "ranking_hash": "8be0d5519aadaf0d57d18b12e8148817cf200426d60bac2dbaa3ad881bb6d79e",
+    "allocation_ready_count": 0,
+    "observe_only_count": 4,
+    "interpretation": "Formula rank is a deterministic tie-break only while no initiative is allocation-eligible; it is not a recommendation."
+  },
+  "current_initiatives": [
+    {
+      "key": "capturebrief",
+      "decision_state": "OBSERVE_ONLY",
+      "evidence_coverage": 0,
+      "open_data_gaps": 7
+    },
+    {
+      "key": "freightrecovery",
+      "decision_state": "OBSERVE_ONLY",
+      "evidence_coverage": 0,
+      "open_data_gaps": 7
+    },
+    {
+      "key": "recoveryos",
+      "decision_state": "OBSERVE_ONLY",
+      "evidence_coverage": 0,
+      "open_data_gaps": 7
+    },
+    {
+      "key": "starblox",
+      "decision_state": "OBSERVE_ONLY",
+      "evidence_coverage": 0,
+      "open_data_gaps": 7
+    }
+  ],
+  "blocked_plans": [
+    "portfolio-readiness-ai-cost-2026-09-24",
+    "portfolio-readiness-engineering-2026-09-24",
+    "portfolio-readiness-human-2026-09-24",
+    "portfolio-readiness-cash-2026-09-24"
+  ],
+  "evidence_notes": {
+    "stripe": "CaptureBrief, FreightRecovery, and RecoveryOS live Stripe accounts currently have no balance transactions. This is stored as partial-scope evidence, not proof of total business cash flow.",
+    "outreach": "CaptureBrief and FreightRecovery market signals remain non-allocation-grade until their pre-registered outreach measurement windows close.",
+    "starblox": "No allocation-grade economic/market evidence is connected yet."
+  },
+  "approval_model": {
+    "all_portfolio_allocations": "HUMAN_APPROVAL_REQUIRED",
+    "cash": "MONEY_MOVEMENT",
+    "approval_does_not_execute": true,
+    "autonomous_portfolio_allocation": false
+  },
+  "canary": {
+    "concentration_cap": "PASSED_IN_ROLLED_BACK_TRANSACTION",
+    "reserve_behavior": "PASSED_IN_ROLLED_BACK_TRANSACTION",
+    "internal_resource_approval_packet": "PASSED_IN_ROLLED_BACK_TRANSACTION",
+    "cash_money_movement_classification": "PASSED_IN_ROLLED_BACK_TRANSACTION",
+    "persistent_synthetic_rows": 0
+  },
+  "latest_command_center_snapshot": {
+    "key": "ceo-command-center-v1-complete",
+    "sha256": "3a7db5c6f9835298affed99c7e027727dd9cc75114e999bb977be0d061a93f57"
+  }
+}
