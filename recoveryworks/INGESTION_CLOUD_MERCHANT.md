@@ -217,3 +217,16 @@ The cloud_discount Scan 360 section combines Cletrics invoice/meter evidence wit
 ### Commitment benefit recovery
 
 The cloud_commitment Scan 360 section requires separately reviewed commitment terms and a per-charge allocation file. It detects a missed benefit only on units proven allocated to the charge. Unused commitments, coverage gaps, utilization, recommendations, and Monte Carlo savings remain outside recovery math.
+
+
+### Continuous Cletrics processing
+
+Continuous operation uses a separate private receipt registry keyed by a fingerprint of the exact Cletrics bundle, audit mode, authority-file hashes, verification flags, client, and currency. Exact repeats are skipped; authority or verification changes are reprocessed. The receipt registry is integrity-hashed and does not rewrite the Recovery Ledger.
+
+### Savings opportunities
+
+An optional savings_signals bundle role carries prospective savings estimates and recommended actions. These values are reported only in the savings surface. They never enter expected_cents, actual_cents, potential recovery, validated recovery, or recovered cash.
+
+### Remediation governance
+
+Optional cloud_remediation planning converts explicit savings opportunities into DRAFT actions. Human reviewer and customer authorization are required to create approval-bound envelopes. Envelopes remain NOT_EXECUTED; this repository contains no cloud-provider remediation executor.
