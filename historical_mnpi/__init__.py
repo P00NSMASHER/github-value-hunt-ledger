@@ -11,6 +11,19 @@ from .raw_artifacts import (
     verify_raw_artifact_manifest,
 )
 
+from .case_model import (
+    CaseArtifactLink,
+    CaseArtifactRole,
+    CaseEventType,
+    CaseIssuer,
+    CaseParty,
+    CasePartyRole,
+    CaseProceedingStatus,
+    CaseRegistry,
+    HistoricalCase,
+    verify_case_provenance,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -21,6 +34,16 @@ from .source_registry import (
 )
 
 __all__ = [
+    "CaseArtifactLink",
+    "CaseArtifactRole",
+    "CaseEventType",
+    "CaseIssuer",
+    "CaseParty",
+    "CasePartyRole",
+    "CaseProceedingStatus",
+    "CaseRegistry",
+    "HistoricalCase",
+    "verify_case_provenance",
     "ArtifactImmutability",
     "LocalContentAddressedArtifactStore",
     "RawArtifactManifest",
