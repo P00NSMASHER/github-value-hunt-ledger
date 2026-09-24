@@ -517,3 +517,9 @@ Results are PASS, REVIEW_REQUIRED, or BLOCKED. Release/image drift, stale securi
 Buyer diligence now has a machine-readable/private control map covering read-only access control, private state/backups, secure SDLC/release admission, software supply chain, DR/continuity, incident response, auditability/continuous assurance, deterministic financial integrity, and separation of authorization from external mutation.
 
 Every internally evidenced control points to exact proof hashes plus explicit limitations. SOC 2 and ISO 27001 labels may appear only as questionnaire/reference mappings; the artifact hard-fails on certification claims and explicitly records third_party_audit_completed=false. It does not claim SOC 2, ISO 27001, PCI DSS, HIPAA, FedRAMP, or other certifications/attestations that have not actually been obtained.
+
+## Customer-safe enterprise diligence package (step 23b)
+
+The enterprise control map can now be packaged into questionnaire-ready customer-safe responses, an evidence-room proof index, and an explicit gap/remediation register with internal owner and due date. Customer exports redact internal actor identifiers and omit internal paths, source locators, and raw metadata while preserving proof hashes, control ids, evidence descriptions, and limitations.
+
+The package includes a direct certification answer stating that no SOC 2, ISO 27001, PCI DSS, HIPAA, FedRAMP, or other third-party certification is claimed. Controls lacking event-specific or external validation evidence become explicit gaps rather than being silently represented as complete.
