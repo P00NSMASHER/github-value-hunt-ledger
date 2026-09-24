@@ -328,8 +328,9 @@ compares them conservatively using:
 - durable canonical trader identity;
 - durable canonical issuer identity;
 - compatible trade-time windows;
-- shared economic fields such as side, instrument, quantity, execution price,
-  amount, strike, and expiry.
+- shared transaction-specific economic anchors such as quantity, execution
+  price, amount, strike, and expiry, with side/instrument treated as supporting
+  context rather than sufficient duplicate evidence by themselves.
 
 The comparator emits one of:
 
@@ -338,8 +339,11 @@ The comparator emits one of:
 - `DISTINCT`
 - `INSUFFICIENT`
 
-`EXACT_SAME` requires the same exact timestamp plus multiple matching economic
-anchors. Date-only or overlapping date-range records can never be promoted to
+`EXACT_SAME` requires the same exact timestamp plus a strong anchor set:
+matching quantity, matching execution price or trade amount, and matching
+instrument or side. Matching only generic fields such as BUY + STOCK is
+`INSUFFICIENT`, not a duplicate proposal. Date-only or overlapping date-range
+records can never be promoted to
 `EXACT_SAME` automatically, even when quantity/price/side/instrument match,
 because multiple economically identical fills can occur on the same day. Those
 remain `POSSIBLE_SAME` and require explicit review.
