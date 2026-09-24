@@ -177,6 +177,8 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('site.css?v=free-audit-contingency-v2', page)
             self.assertIn('commercial-config.js?v=free-audit-contingency-v2', page)
             self.assertIn('site.js?v=free-audit-contingency-v2', page)
+            self.assertIn('id="actualRecovery" type="number" min="0" max="1000000000" step="1000" value="100000"', page)
+            self.assertNotIn('value="50000"', page)
             self.assertIn("freight_audit_form_started", script)
             self.assertIn("freight_audit_form_completed", script)
             self.assertIn("freight_data_submitted", script)
