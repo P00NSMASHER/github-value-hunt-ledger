@@ -75,7 +75,14 @@ class ProviderDiscoveryHandoff:
             object.__setattr__(self, name, normalize_sha256(name, getattr(self, name)))
         for name in ("request_id", "provider", "account_id", "runner_id"):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
-        if not isinstance(self.operation, ProviderReadOperation):
+        if isinstance(self.operation, str):
+            try:
+                object.__setattr__(
+                    self, "operation", ProviderReadOperation(self.operation)
+                )
+            except ValueError as exc:
+                raise ValueError("operation must be ProviderReadOperation") from exc
+        elif not isinstance(self.operation, ProviderReadOperation):
             raise ValueError("operation must be ProviderReadOperation")
         object.__setattr__(
             self, "issued_at", normalize_utc_timestamp("issued_at", self.issued_at)
@@ -210,7 +217,14 @@ class ExternalProviderDiscoveryReceipt:
             "provider_request_id", "source_locator",
         ):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
-        if not isinstance(self.operation, ProviderReadOperation):
+        if isinstance(self.operation, str):
+            try:
+                object.__setattr__(
+                    self, "operation", ProviderReadOperation(self.operation)
+                )
+            except ValueError as exc:
+                raise ValueError("operation must be ProviderReadOperation") from exc
+        elif not isinstance(self.operation, ProviderReadOperation):
             raise ValueError("operation must be ProviderReadOperation")
         object.__setattr__(
             self, "observed_at", normalize_utc_timestamp("observed_at", self.observed_at)
