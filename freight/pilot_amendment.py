@@ -79,10 +79,10 @@ def _verify_charter(charter:dict)->None:
     if charter.get("external_action_authorized") is not False:
         raise ValueError("base Charter external_action_authorized must be false")
 
-def _price_band(value:str)->tuple[float,float]:
+def _price_band(value:str)->tuple[float,float]|None:
     m=PRICE_RE.search(value or "")
     if not m:
-        raise ValueError("price band is not parseable")
+        return None
     return float(m.group(1).replace(",","")),float(m.group(2).replace(",",""))
 
 def from_dict(data:dict)->AmendmentRequest:
@@ -136,8 +136,12 @@ def build_amendment(base_charter:dict,request:AmendmentRequest,replacement_chart
     material=bool(MATERIAL_SCOPE_FIELDS.intersection(changed))
     role_change=bool(ROLE_FIELDS.intersection(changed))
     fee_change="fixed_fee_usd" in changed
-    low,high=_price_band(base_charter["price_band_usd"])
-    fee_outside_band=fee_change and not (low<=float(changed["fixed_fee_usd"])<=high)
+    published_band=_price_band(base_charter["price_band_usd"])
+    fee_outside_band=bool(
+        fee_change
+        and published_band is not None
+        and not (published_band[0]<=float(changed["fixed_fee_usd"])<=published_band[1])
+    )
 
     requires_readiness=material
     requires_launch=material
