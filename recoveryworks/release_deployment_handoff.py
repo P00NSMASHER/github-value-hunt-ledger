@@ -17,6 +17,7 @@ from recoveryworks.models import (
     normalize_source_hash,
     normalize_utc_timestamp,
 )
+from recoveryworks.production_admission import ProductionAdmissionGate
 from recoveryworks.release_control import (
     EnvironmentPromotionGate,
     RecoveryWorksReleaseManifest,
@@ -150,6 +151,7 @@ class ReleaseDeploymentHandoff:
 def prepare_release_deployment_handoff(
     release: RecoveryWorksReleaseManifest,
     gate: EnvironmentPromotionGate,
+    admission: ProductionAdmissionGate,
     *,
     deployer_id: str,
     issued_at: str,
@@ -157,6 +159,16 @@ def prepare_release_deployment_handoff(
 ) -> ReleaseDeploymentHandoff:
     if not gate.promotion_ready:
         raise ValueError("promotion gate is not ready")
+    if admission.release_id != release.release_id:
+        raise ValueError("production admission release id mismatch")
+    if admission.release_proof_hash != release.proof_hash:
+        raise ValueError("production admission release proof mismatch")
+    if admission.promotion_gate_proof_hash != gate.proof_hash:
+        raise ValueError("production admission does not bind promotion gate")
+    if admission.container_image_digest != release.container_image_digest:
+        raise ValueError("production admission image digest mismatch")
+    if admission.source_commit != release.source_commit:
+        raise ValueError("production admission source commit mismatch")
     if gate.release_id != release.release_id:
         raise ValueError("promotion gate release id mismatch")
     if gate.release_proof_hash != release.proof_hash:
