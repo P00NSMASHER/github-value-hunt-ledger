@@ -6,6 +6,7 @@ from recoveryworks.commercial_operational_invariants import (
     CommercialOperationalInvariantState,
     verify_commercial_operational_invariants,
 )
+from recoveryworks.container_build import build_container_build_manifest
 from recoveryworks.production_adversarial_certification import (
     AdversarialCertificationState,
     AdversarialVector,
@@ -23,11 +24,19 @@ SOURCE_REVISION = "5" * 40
 OTHER_SOURCE_REVISION = "6" * 40
 
 
+def build_manifest(source_revision: str = SOURCE_REVISION):
+    return build_container_build_manifest(
+        source_commit=source_revision,
+        dockerfile_path="recoveryworks/deploy/Dockerfile.production",
+        dependency_lock_path="recoveryworks/requirements.production.lock",
+    )
+
+
 class ProductionAdversarialCertificationTests(unittest.TestCase):
     def test_seeded_property_matrix_covers_all_attack_vectors(self):
         result = run_commercial_adversarial_certification(
             full_chain,
-            source_revision=SOURCE_REVISION,
+            build_manifest=build_manifest(),
             seed=41001,
             iterations_per_vector=6,
         )
@@ -45,13 +54,13 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
     def test_same_seed_produces_same_certification_proof(self):
         first = run_commercial_adversarial_certification(
             full_chain,
-            source_revision=SOURCE_REVISION,
+            build_manifest=build_manifest(),
             seed=9917,
             iterations_per_vector=2,
         )
         second = run_commercial_adversarial_certification(
             full_chain,
-            source_revision=SOURCE_REVISION,
+            build_manifest=build_manifest(),
             seed=9917,
             iterations_per_vector=2,
         )
@@ -64,26 +73,30 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
     def test_source_revision_is_proof_bound(self):
         first = run_commercial_adversarial_certification(
             full_chain,
-            source_revision=SOURCE_REVISION,
+            build_manifest=build_manifest(),
             seed=9917,
             iterations_per_vector=1,
         )
         second = run_commercial_adversarial_certification(
             full_chain,
-            source_revision=OTHER_SOURCE_REVISION,
+            build_manifest=build_manifest(OTHER_SOURCE_REVISION),
             seed=9917,
             iterations_per_vector=1,
         )
         self.assertEqual(first.source_revision, SOURCE_REVISION)
         self.assertEqual(second.source_revision, OTHER_SOURCE_REVISION)
+        self.assertNotEqual(
+            first.container_build_manifest_proof_hash,
+            second.container_build_manifest_proof_hash,
+        )
         self.assertNotEqual(first.proof_hash, second.proof_hash)
         self.assertNotEqual(first.certification_id, second.certification_id)
 
-    def test_invalid_source_revision_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "source_revision"):
+    def test_unverified_build_manifest_input_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "build_manifest"):
             run_commercial_adversarial_certification(
                 full_chain,
-                source_revision="not-a-commit",
+                build_manifest="not-a-build-manifest",
                 seed=1,
                 iterations_per_vector=1,
             )
@@ -101,7 +114,7 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "baseline chain must pass"):
             run_commercial_adversarial_certification(
                 broken_factory,
-                source_revision=SOURCE_REVISION,
+                build_manifest=build_manifest(),
                 seed=5,
                 iterations_per_vector=1,
             )
