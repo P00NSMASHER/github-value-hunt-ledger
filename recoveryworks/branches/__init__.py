@@ -34,6 +34,11 @@ from .warranty_credit_csv import (
 from .payroll_benefit import audit_payroll_benefit_billing
 from .payroll_benefit_csv import load_payroll_benefit_units_csv
 from .cloud import audit_cloud_billing
+from .cloud_signals import CloudSignal, CloudSignalType
+from .cloud_discount import CloudDiscountAuthority, DiscountAppliesTo, audit_cloud_discount_billing
+from .cloud_discount_csv import load_cloud_discount_authorities_csv
+from .cloud_commitment import CloudCommitmentAuthority, CommitmentAllocation, audit_cloud_commitment_billing
+from .cloud_commitment_csv import load_cloud_commitment_authorities_csv, load_cloud_commitment_allocations_csv
 from .cloud_csv import load_cloud_meter_csv
 from .merchant_fee import (
     MerchantFeeAgreement,
@@ -302,6 +307,17 @@ __all__ = [
     "audit_warranty_credits",
     "audit_payroll_benefit_billing",
     "audit_cloud_billing",
+    "CloudSignal",
+    "CloudSignalType",
+    "CloudDiscountAuthority",
+    "DiscountAppliesTo",
+    "audit_cloud_discount_billing",
+    "load_cloud_discount_authorities_csv",
+    "CloudCommitmentAuthority",
+    "CommitmentAllocation",
+    "audit_cloud_commitment_billing",
+    "load_cloud_commitment_authorities_csv",
+    "load_cloud_commitment_allocations_csv",
     "audit_merchant_fees",
     "audit_insurance_claims",
     "audit_tax_lines",
