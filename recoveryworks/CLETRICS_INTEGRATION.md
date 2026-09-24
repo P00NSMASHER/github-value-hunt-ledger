@@ -587,3 +587,9 @@ Admission checks compare requested billing rows/providers/tenants against those 
 Production job control now has an internal SLO/pressure evaluator over planned tenant jobs and the private lease registry. It measures backlog depth, oldest queued-job age, maximum schedule lateness, missed-schedule count, and utilization of the measured capacity envelope.
 
 The evaluator returns HEALTHY, PRESSURE, THROTTLED, or BLOCKED with proof-bound alerts. Over-capacity demand, excessive backlog/age, or missed schedules block new internal-job admission; high measured utilization can throttle admission before overload. It never performs automatic scaling or external actions.
+
+## Simulated one-command operator rehearsal (step 31a)
+
+A one-command local operator rehearsal now creates an isolated synthetic tenant, synthetic FOCUS/meter/rate inputs, validates onboarding/authorization/evidence-review readiness, materializes the authorized diagnostic call, schedules and executes it through the tenant-bound local job worker, and verifies the resulting private Cloud Assurance output.
+
+The rehearsal also emits a private customer-safe diligence index plus an operator runbook/checklist covering tenant setup, intake validation, job scheduling/lease execution, report verification, review boundaries, and confirmation that no customer contact, provider mutation, claim submission, or external action occurred. The state is SIMULATED_OPERATOR_REHEARSAL_PASSED and is not real customer onboarding.
