@@ -197,6 +197,52 @@ class EntityResolutionTests(unittest.TestCase):
             artifact_manifest=manifest,
         )
 
+    def test_ambiguous_resolution_blocks_older_resolved_identity(self):
+        sources, manifest, cases, case, ref = fixture()
+        registry = EntityRegistry()
+        first = registry.register_entity(
+            CanonicalEntity("person:john:1", EntityKind.PERSON, "John Smith")
+        )
+        registry.register_entity(
+            CanonicalEntity("person:john:2", EntityKind.PERSON, "John Smith")
+        )
+        registry.register_case_resolution(
+            CaseEntityResolution(
+                resolution_id="resolution:resolved:first",
+                case_id=case.case_id,
+                case_proof_hash=case.proof_hash,
+                local_id="party:case:john",
+                entity_kind=EntityKind.PERSON,
+                status=ResolutionStatus.RESOLVED,
+                canonical_entity_id=first.entity_id,
+                evidence_refs=(ref,),
+            ),
+            cases=cases,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+        registry.register_case_resolution(
+            CaseEntityResolution(
+                resolution_id="resolution:later:ambiguous",
+                case_id=case.case_id,
+                case_proof_hash=case.proof_hash,
+                local_id="party:case:john",
+                entity_kind=EntityKind.PERSON,
+                status=ResolutionStatus.AMBIGUOUS,
+                candidate_entity_ids=("person:john:1", "person:john:2"),
+                evidence_refs=(ref,),
+            ),
+            cases=cases,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+        with self.assertRaisesRegex(ValueError, "ambiguous"):
+            registry.resolved_entity_for(
+                case.case_id,
+                "party:case:john",
+                EntityKind.PERSON,
+            )
+
     def test_non_overlapping_ticker_reuse_is_allowed(self):
         sources, manifest, _cases, _case, ref = fixture()
         registry = EntityRegistry()
