@@ -179,8 +179,7 @@ class ConflictPolicyTests(unittest.TestCase):
         self.assertEqual(len(result.policy_proof_hash), 64)
 
     def test_same_artifact_cannot_be_retyped_to_gain_priority(self):
-        sources, manifest, cases, refs = fixture()
-        base = cases.get("CASE-CONFLICT")
+        sources, manifest, cases, base, refs = fixture()
         complaint_ref = refs[CaseArtifactRole.COMPLAINT]
         retyped = HistoricalCase(
             **{
