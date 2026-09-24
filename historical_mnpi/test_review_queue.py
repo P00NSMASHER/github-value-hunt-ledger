@@ -459,8 +459,8 @@ class ReviewQueueTests(unittest.TestCase):
 
     def test_explicit_historical_research_approval_is_hash_bound(self):
         (
-            _sources,
-            _manifest,
+            sources,
+            manifest,
             cases,
             _events,
             _case,
@@ -470,6 +470,7 @@ class ReviewQueueTests(unittest.TestCase):
             _refs,
             entities,
             crosswalks,
+            source_conflicts,
             item,
         ) = clean_item()
         decision = decide_review_item(
@@ -482,6 +483,9 @@ class ReviewQueueTests(unittest.TestCase):
             cases=cases,
             entities=entities,
             entity_crosswalks=crosswalks,
+            source_conflicts=source_conflicts,
+            source_registry=sources,
+            artifact_manifest=manifest,
         )
         decision.verify_integrity()
         self.assertTrue(decision.research_corpus_eligible)
@@ -815,8 +819,8 @@ class ReviewQueueTests(unittest.TestCase):
 
     def test_append_only_queue_prevents_second_decision(self):
         (
-            _sources,
-            _manifest,
+            sources,
+            manifest,
             cases,
             _events,
             _case,
@@ -826,6 +830,7 @@ class ReviewQueueTests(unittest.TestCase):
             _refs,
             entities,
             crosswalks,
+            source_conflicts,
             item,
         ) = clean_item()
         queue = HistoricalReviewQueue()
@@ -841,6 +846,9 @@ class ReviewQueueTests(unittest.TestCase):
             cases=cases,
             entities=entities,
             entity_crosswalks=crosswalks,
+            source_conflicts=source_conflicts,
+            source_registry=sources,
+            artifact_manifest=manifest,
         )
         self.assertNotEqual(queue.queue_hash, before)
         self.assertEqual(
@@ -909,6 +917,7 @@ class ReviewQueueTests(unittest.TestCase):
             refs,
             entities,
             crosswalks,
+            _source_conflicts,
             item,
         ) = clean_item()
         ref = refs[CaseArtifactRole.COMPLAINT]
@@ -948,8 +957,8 @@ class ReviewQueueTests(unittest.TestCase):
 
     def test_approved_decision_binds_durable_identity_hash(self):
         (
-            _sources,
-            _manifest,
+            sources,
+            manifest,
             cases,
             _events,
             _case,
@@ -959,6 +968,7 @@ class ReviewQueueTests(unittest.TestCase):
             _refs,
             entities,
             crosswalks,
+            source_conflicts,
             item,
         ) = clean_item()
         decision = decide_review_item(
@@ -971,6 +981,9 @@ class ReviewQueueTests(unittest.TestCase):
             cases=cases,
             entities=entities,
             entity_crosswalks=crosswalks,
+            source_conflicts=source_conflicts,
+            source_registry=sources,
+            artifact_manifest=manifest,
         )
         self.assertEqual(
             decision.durable_identity_hash,
