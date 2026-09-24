@@ -28,6 +28,7 @@ from .freight_case import (
     RESOLVE_AUTHORITY,
     RESOLVE_SOURCE_INTEGRITY,
     REVIEW_VALIDATED_CANDIDATE,
+    verify_freight_review_packet,
 )
 from .freight_validation import (
     FreightAdversarialScenario,
@@ -446,6 +447,19 @@ def simulate_human_packet_review(
     case_reviews = tuple(simulate_human_case_review(case) for case in packet.cases)
     packet_checks: list[SimulatedReviewerCheck] = []
 
+    try:
+        verify_freight_review_packet(packet)
+        packet_integrity_ok = True
+        packet_integrity_note = "Case hashes and outer packet hash recompute successfully."
+    except ValueError as exc:
+        packet_integrity_ok = False
+        packet_integrity_note = str(exc)
+
+    packet_checks.append(_check(
+        "PACKET_INTEGRITY",
+        packet_integrity_ok,
+        packet_integrity_note,
+    ))
     packet_checks.append(_check(
         "PACKET_HASH",
         _SHA256_RE.fullmatch(packet.packet_hash) is not None,
