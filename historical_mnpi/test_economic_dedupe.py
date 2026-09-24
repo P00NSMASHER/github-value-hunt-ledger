@@ -153,16 +153,55 @@ def fixture(resolve_identities=True):
 
 
 class EconomicDedupeTests(unittest.TestCase):
-    def test_matching_trade_across_sources_proposes_exact_same(self):
+    def test_date_only_matching_trade_stays_possible_same(self):
         sources, manifest, cases, entities, left, right = fixture()
         proposal = propose_transaction_dedupe(
             left, right, entities=entities, cases=cases,
             source_registry=sources, artifact_manifest=manifest,
         )
-        self.assertEqual(proposal.relation, DedupeRelation.EXACT_SAME)
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
         self.assertIn("quantity", proposal.matching_fields)
         self.assertIn("execution_price", proposal.matching_fields)
+        self.assertIn(
+            "COMPATIBLE_TIME_AND_PARTIAL_ECONOMIC_MATCH",
+            proposal.reason_codes,
+        )
         proposal.verify_integrity()
+
+    def test_exact_timestamp_matching_trade_can_propose_exact_same(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        left = HistoricalTransaction(
+            **{
+                **left.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+            }
+        )
+        right = HistoricalTransaction(
+            **{
+                **right.__dict__,
+                "trade_date": None,
+                "trade_timestamp": "2015-08-10T10:15:30-04:00",
+            }
+        )
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertEqual(proposal.relation, DedupeRelation.EXACT_SAME)
+        self.assertIn(
+            "EXACT_TIMESTAMP_AND_ECONOMIC_ANCHORS",
+            proposal.reason_codes,
+        )
+
+    def test_same_day_identical_economics_never_auto_exact(self):
+        sources, manifest, cases, entities, left, right = fixture()
+        proposal = propose_transaction_dedupe(
+            left, right, entities=entities, cases=cases,
+            source_registry=sources, artifact_manifest=manifest,
+        )
+        self.assertNotEqual(proposal.relation, DedupeRelation.EXACT_SAME)
+        self.assertEqual(proposal.relation, DedupeRelation.POSSIBLE_SAME)
 
     def test_conflicting_quantity_is_distinct(self):
         sources, manifest, cases, entities, left, right = fixture()
