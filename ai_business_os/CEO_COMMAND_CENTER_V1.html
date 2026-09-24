@@ -19,15 +19,15 @@
   </div>
   <div class="grid" id="metrics"></div>
   <div class="section"><h2>Portfolio</h2><div class="portfolio" id="portfolio"></div></div>
-  <div class="section"><h2>Agent fleet</h2><div class="agents" id="agents"></div></div>
+  <div class="section"><h2>Capital allocator</h2><div class="grid" id="allocator"></div></div><div class="section"><h2>Agent fleet</h2><div class="agents" id="agents"></div></div>
   <div class="note">This file is a renderer, not a public data endpoint. The live dashboard state stays in the private <strong>ai_business_os_prod</strong> schema. Unknown metrics remain unknown rather than being coerced to zero.</div>
   <div class="footer" id="hash"></div>
 </div>
 <script>
 const fallback={
   sanitized:true,
-  snapshotHash:"a43a52866cbae835aab49ea81a5a7a58589fc565deece44d7bd811e34c08c561",
-  generatedAt:"2026-09-24T21:57:10.695610Z",
+  snapshotHash:"3a7db5c6f9835298affed99c7e027727dd9cc75114e999bb977be0d061a93f57",
+  generatedAt:"2026-09-24T22:37:16.482789Z",
   system:{pending_approvals:1,low_risk_agents:6,shadow_agents:1,enabled_tool_providers:7,consequential_autonomy_enabled:0},
   portfolio:[
     {name:"CaptureBrief",lifecycle:"PILOT",evidence_coverage:.25},
@@ -35,6 +35,7 @@ const fallback={
     {name:"RecoveryOS",lifecycle:"EXPERIMENT",evidence_coverage:.25},
     {name:"StarBlox",lifecycle:"BUILD",evidence_coverage:0}
   ],
+  capital_allocator:{ranking:{allocation_ready_count:0,observe_only_count:4},plans:[{status:"BLOCKED_INSUFFICIENT_EVIDENCE"},{status:"BLOCKED_INSUFFICIENT_EVIDENCE"},{status:"BLOCKED_INSUFFICIENT_EVIDENCE"},{status:"BLOCKED_INSUFFICIENT_EVIDENCE"}]},
   agents:[
     {display_name:"Chief of Staff",mode:"LOW_RISK_AUTONOMY"},
     {display_name:"Research",mode:"LOW_RISK_AUTONOMY"},
@@ -63,6 +64,7 @@ const portfolio=(data.portfolio||[]).map(p=>({
   coverage:Number(p.evidence_coverage||0)
 }));
 document.getElementById("portfolio").innerHTML=portfolio.map(p=>'<div class="card"><div class="row"><div><div class="name">'+p.name+'</div><div class="muted">'+p.lifecycle+'</div></div><div class="muted">'+Math.round(p.coverage*100)+'% evidence</div></div><div class="bar"><div class="fill" style="width:'+Math.max(0,Math.min(100,p.coverage*100))+'%"></div></div></div>').join("");
+const ca=data.capital_allocator||{}; const car=ca.ranking||{}; const blocked=(ca.plans||[]).filter(p=>p.status==="BLOCKED_INSUFFICIENT_EVIDENCE").length; document.getElementById("allocator").innerHTML=[["Allocation-ready",car.allocation_ready_count??"—"],["Observe-only",car.observe_only_count??"—"],["Blocked plans",blocked],["Policy","60% evidence / 50% cap"]].map(([l,v])=>'<div class="card"><div class="label">'+l+'</div><div class="metric">'+v+'</div></div>').join("");
 document.getElementById("agents").innerHTML=(data.agents||[]).map(a=>'<div class="agent"><div class="name">'+a.display_name+'</div><div class="status '+(a.mode==="SHADOW"?"shadow":"ok")+'">'+a.mode+'</div></div>').join("");
 </script>
 </body>
