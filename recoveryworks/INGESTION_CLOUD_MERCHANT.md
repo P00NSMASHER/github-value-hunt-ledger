@@ -204,3 +204,16 @@ The common RecoveryWorks lifecycle remains:
 5. explicit customer authorization
 6. external recovery action
 7. outcome and fee recording
+
+
+### Cletrics signal plane
+
+Optional anomaly_signals and reconciliation_signals bundle roles are returned by Scan 360 as cloud_signals. They do not enter the Recovery Ledger and cannot increase potential, validated, authorized, claimed, recovered, or fee totals.
+
+### Contract discount recovery
+
+The cloud_discount Scan 360 section combines Cletrics invoice/meter evidence with separately reviewed base rates and discount authority. Missing or overlapping discount authority fails closed.
+
+### Commitment benefit recovery
+
+The cloud_commitment Scan 360 section requires separately reviewed commitment terms and a per-charge allocation file. It detects a missed benefit only on units proven allocated to the charge. Unused commitments, coverage gaps, utilization, recommendations, and Monte Carlo savings remain outside recovery math.
