@@ -68,29 +68,28 @@ configuration snapshot is fingerprinted, verifier metadata is present, and the
 evidence is still inside its validity window. Only then may the separate/manual
 route become **READY**.
 
-## Current state — 2026-09-21
+## Current state — verified controlled route
 
-A dedicated single-tenant Google Drive workspace now exists and was observed as
-owner-only / not shared, with no customer data present. The evidence pack records
-provider encryption, access scope, manual/no-parser operation, immutable-source
-handling, retention/deletion rules, and Netlify exclusion.
+The staged Google Drive environment is now **VERIFIED** for the single-tenant,
+manual/no-parser controlled-pilot route.
 
-A Google security alert provides evidence that a passkey was added on
-2026-09-17. That is useful authentication evidence, but it does **not** establish
-that 2-Step Verification is currently enabled/enforced for every permitted
-account sign-in path.
+Current evidence establishes:
+- Google 2-Step Verification/MFA for the observed pilot account;
+- provider encryption at rest and in transit;
+- owner-only access scope at verification time;
+- read-only source-ingestion policy;
+- 30-day default retention plus explicit deletion confirmation;
+- no confidential buyer data in the public/Netlify marketing path;
+- no multi-tenant data plane and no production parser runtime for this route.
 
-Therefore:
-- all base controls except `mfa_enforced` are currently evidenced;
-- `mfa_enforced` remains unproven;
-- the current manifest remains `DRAFT`;
-- the route remains **CONDITIONAL**;
-- no confidential customer data may be accepted yet.
+The canonical manifest is
+`freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json`, with a current
+verification window through **2026-12-20**. Reverify earlier after a material
+configuration or access change.
 
-The final promotion step is to obtain current account-security evidence that
-proves the required MFA posture, hash and record that evidence, set
-`mfa_enforced.value=true`, and change `evidence_status` to `VERIFIED`.
-The gate should then be re-run and must return READY before use.
+This means the environment-control portion of the manual route is no longer the
+launch blocker. Buyer-specific readiness, scope, retention, rights, and engagement
+authorization still have to pass before confidential records are accepted.
 
 Do not place secrets, raw buyer contracts, invoices, credentials, or other
 confidential customer payloads in the evidence manifest or Hunter repository.

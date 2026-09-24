@@ -98,11 +98,17 @@ def test_buyer_readiness_does_not_override_current_deployment_security():
     assert "customer_data_plane_not_discovered" in d.blockers
 
 
-def test_unattached_executed_rights_block_even_verified_separate_environment():
+def test_unattached_rights_block_even_verified_separate_environment():
+    rights=deepcopy(RIGHTS)
+    for entry in rights["entries"]:
+        entry["evidence_status"]="NOT_ATTACHED"
+        entry["evidence_location"]=None
+        entry["evidence_sha256"]=None
+        entry["scopes"]["commercial_use"]="USER_ASSERTED_NOT_ATTACHED"
     d=decide(
         LaunchRequest(DataPath.SEPARATE_CONTROLLED_ENVIRONMENT),
         separate=verified_separate_environment(),
-        rights=RIGHTS,
+        rights=rights,
     )
     assert d.status is LaunchStatus.BLOCKED
     assert d.route is LaunchRoute.SEPARATE_ENVIRONMENT_PENDING

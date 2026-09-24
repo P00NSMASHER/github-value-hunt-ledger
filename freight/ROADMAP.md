@@ -127,7 +127,7 @@ Technology Intelligence workflow now separates read-only validation from main-on
 
 Deployment evidence collected 2026-09-20: Netlify SSO-all is configured, but **Netlify team MFA is not enforced**, no Freight multi-tenant backend/data plane was discovered, and no production parser runtime was discovered. Cross-tenant isolation and parser sandboxing therefore remain **unproven**, not passed. The deployment evidence snapshot expires after **2026-09-27** and must be recollected earlier after relevant control/deployment changes.
 
-Current launch classification: **Netlify deployed customer-data pilot = BLOCKED**; **separate controlled environment = CONDITIONAL pending evidence**. The protected Netlify site is a demo/control shell until those gates change.
+Current launch classification: **Netlify deployed customer-data pilot = BLOCKED**; **separate single-tenant manual environment = VERIFIED**. With a READY buyer/data assessment, clear commercial-use rights evidence, and an authorized engagement, the separate route can return **READY / CONTROLLED_MANUAL_BLIND_PILOT**. The public site remains a lead/qualification surface and does not accept freight files.
 
 Launch Brief now converts that classification into an operator-facing remediation plan; unknown future blockers fail safe into UNMAPPED_REVIEW instead of disappearing.
 
@@ -141,7 +141,7 @@ Engagement State Resolver now prevents downstream workers from guessing which Ch
 
 External Action Authorization now closes the buyer-approved dispute/action boundary: only an ACTIVE engagement with CONFIRMED validated findings can receive a narrow, hash-bound, expiring and revocable carrier-action approval; creating the approval never sends the action.
 
-The separate/manual route stays **CONDITIONAL** until a VERIFIED environment manifest proves MFA, encryption, scoped access, read-only ingestion, retention/deletion, Netlify data exclusion, and any applicable tenant/parser controls with SHA-256 receipts and a <=90-day evidence-validity window.
+The separate/manual environment is **VERIFIED** through 2026-12-20 for the current single-tenant manual/no-parser route. It must be reverified after material changes or expiry; each buyer still needs READY readiness, agreed scope/retention, and engagement authorization before data intake.
 
 **Internal engineering freeze:** no new freight subsystem, UI, parser, rating layer, or repository hunt is justified until EXP-001, a paying customer, security diligence, or rights diligence exposes a named gap.
 

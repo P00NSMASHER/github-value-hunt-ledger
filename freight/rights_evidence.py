@@ -2,7 +2,7 @@
 
 This module does not interpret contracts. It enforces a narrower invariant:
 registry rights may not be represented as resolved unless a separately stored
-executed evidence object is referenced by location and SHA-256.
+commercial-use evidence object is referenced by location and SHA-256.
 """
 from __future__ import annotations
 

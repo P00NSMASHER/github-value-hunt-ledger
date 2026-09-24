@@ -32,51 +32,29 @@ The current Netlify project is therefore a **protected demo/control shell**, not
 an approved confidential-customer-data plane.
 
 ### Separate controlled environment
-**MANUAL/CONTROLLED PILOT: CONDITIONAL — ONE BASE CONTROL REMAINS**
+**MANUAL/CONTROLLED PILOT ENVIRONMENT: VERIFIED**
 
 A dedicated single-tenant Google Drive workspace was staged on 2026-09-21 and
-confirmed owner-only / not shared. It contains no customer data and is explicitly
-separate from the Netlify shell. The current evidence manifest is:
+is now backed by a VERIFIED evidence manifest:
 
 - `freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json`
 - evidence root: `freight/evidence/separate_environment_2026-09-21/`
+- valid through: **2026-12-20**, unless a material configuration change requires earlier reverification.
 
-The evidence pack records:
-- single-tenant workspace scope;
-- Google Drive provider encryption at rest and in transit;
-- owner-only access snapshot;
-- manual/no-parser operating route;
-- immutable-source/read-only-ingestion policy;
-- retention and deletion policy;
-- explicit exclusion of buyer data from Netlify;
-- a redacted Google security alert showing a passkey was added.
+The evidence pack proves the currently used manual route's applicable base
+controls: MFA enforcement, provider encryption at rest and in transit, owner-only
+access scope, read-only source ingestion, retention/deletion policy, and explicit
+exclusion of confidential buyer data from the public/Netlify shell. The route is
+single-tenant and uses no production parser runtime, so multi-tenant isolation
+and parser-sandbox controls are not applicable to this route.
 
-The only unproven base control is **current MFA enforcement on every permitted
-sign-in path**. A passkey exists, but that alone does not prove that Google
-2-Step Verification is enabled/enforced for all account access. Therefore the
-manifest remains `DRAFT` and the route remains **CONDITIONAL**.
+Environment verification does **not** by itself authorize a customer's data.
+Before any buyer records are accepted, the buyer/data readiness assessment must
+be READY, the commercial-use rights gate must be clear, scope/retention must be
+agreed, and the engagement/charter must authorize kickoff.
 
-Only current account-security evidence proving the MFA requirement may promote
-the manifest to `VERIFIED`. No confidential buyer data may enter this workspace
-before that promotion.
-
-The separate route no longer accepts a caller-supplied `verified=True` flag.
-It requires a structured environment evidence manifest governed by:
-- `freight/SEPARATE_ENVIRONMENT_EVIDENCE_TEMPLATE.json`
-- `freight/separate_environment_evidence.py`
-- `freight/SEPARATE_ENVIRONMENT_EVIDENCE.md`
-
-VERIFIED means:
-- evidence references have matching lowercase SHA-256 receipts;
-- the environment has a configuration fingerprint;
-- verifier role + verification date are recorded;
-- the validity window is no more than 90 days;
-- the evidence has not expired at launch time;
-- every required base control is proven.
-
-The separate route is deliberately independent of the current Netlify snapshot:
-an expired Netlify observation blocks the Netlify route, not an independently
-verified separate environment.
+With those buyer-specific conditions satisfied, the machine launch route is
+`CONTROLLED_MANUAL_BLIND_PILOT` / **READY**.
 
 ## Why this improves commercialization
 
@@ -108,16 +86,16 @@ PYTHONPATH=. python freight/pilot_launch_gate.py \
   --expect BLOCKED
 ```
 
-Separate controlled environment using the staged evidence manifest:
+Separate controlled environment using the verified evidence manifest:
 
 ```bash
 PYTHONPATH=. python freight/pilot_launch_gate.py \
   freight/fixtures/readiness_ready.json \
   --data-path separate \
   --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json \
-  --as-of-date 2026-09-21 \
-  --expect CONDITIONAL
+  --as-of-date 2026-09-23 \
+  --expect READY
 ```
 
-The expectation may change to READY only after current MFA enforcement evidence
-is collected, hashed, committed, and the manifest is promoted to VERIFIED.
+READY applies to the controlled manual data path only and still requires a
+buyer-specific READY assessment plus an authorized engagement before records move.

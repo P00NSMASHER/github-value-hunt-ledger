@@ -63,7 +63,7 @@ operability, rights-evidence consistency and the chosen data-handling path.
   workflow date; CI can no longer keep expired evidence green with a frozen date.
 - [x] CI dependencies are version-pinned.
 - [x] Commercial/runtime/comparator components are represented in the rights registry with exact revisions.
-- [x] Rights status promotion is fail-closed: separately licensed components cannot be used by the pilot launch gate without verified executed evidence, a confirmed-allowed commercial-use scope, diligence-room metadata and SHA-256; hosted/SaaS/assignment/change-of-control claims also require verified scope evidence.
+- [x] Rights status promotion is fail-closed: separately licensed components cannot be used by the pilot launch gate without an attached verified commercial-use evidence object, a confirmed-allowed commercial-use scope and SHA-256. The current controlled-pilot commercial-use evidence is an owner/operator attestation; hosted/SaaS/assignment/sublicensing/change-of-control claims remain unresolved unless separately evidenced.
 - [x] Deterministic control-file hashes + component inventory can be regenerated in CI via `freight/release_provenance.py`.
 - [x] Release/evidence text inputs are pinned to LF in `.gitattributes`, so
   Windows and Linux checkouts hash the same committed bytes.
@@ -74,9 +74,9 @@ operability, rights-evidence consistency and the chosen data-handling path.
 ### Customer data
 - [ ] Buyer authorization is documented for the actual engagement.
 - [x] Current Netlify customer-data path is machine-classified as **BLOCKED** until deployment security evidence changes.
-- [x] Separate controlled/manual pilot path is machine-classified as **BLOCKED** until both executed component-rights evidence and a separately controlled data environment have verified evidence.
-- [x] Separate/manual pilot route cannot be self-attested: launch requires a structured VERIFIED environment manifest with evidence references for all applicable controls.
-- [ ] Netlify team MFA is enforced before confidential buyer data is accepted.
+- [x] Separate controlled/manual pilot environment is **VERIFIED**. With buyer readiness READY and an authorized engagement, the machine launch gate can return **READY / CONTROLLED_MANUAL_BLIND_PILOT**.
+- [x] Separate/manual pilot route cannot bypass environment evidence: launch requires a structured VERIFIED environment manifest with evidence references for all applicable controls.
+- [ ] Netlify team MFA is enforced before confidential buyer data is accepted **through the Netlify/current-deployment route**. This is not required for the independently verified separate manual route.
 - [x] Pilot data-room code rejects sources not marked read-only.
 - [x] Buyer/business-unit scope is carried through source manifests, findings, authority, truth, incumbent submission/output, settlement events, recovery certificates and buyer reports.
 - [x] Proof-layer cross-buyer/BU/shipment negative tests exist.
@@ -139,10 +139,10 @@ operability, rights-evidence consistency and the chosen data-handling path.
 - [x] deterministic controlled synthetic pilot ZIP with exact fictional inputs,
   generated review/report outputs, per-entry SHA-256, duplicate/path rejection,
   byte-for-byte replay verification and explicit no-customer-value boundaries;
-- [x] public marketing build uses an exact 25-file allowlist (pages, local
-  scripts/styles, responsive imagery, licensed local fonts and demo), requires
-  an operator-attested business inbox, embeds the controlled-demo SHA-256 and
-  contains no file upload, backend request or customer-data intake;
+- [x] public marketing build uses an exact allowlist (pages, local
+  scripts/styles, responsive imagery, licensed local fonts and fictional demo), requires
+  an operator-attested business inbox, verifies the demo checksum internally without
+  exposing it to customers, and contains no file upload, backend request or customer-data intake;
 - [x] commercial configuration centralizes the contingency rate, defaults to
   30%, rejects invalid values and renders the same configured rate in pricing,
   the fee calculator and recovery-engagement explanation;
@@ -150,9 +150,9 @@ operability, rights-evidence consistency and the chosen data-handling path.
   every third-party Action to a full commit; pull requests cannot deploy and
   main deployment requires an owner-configured, verified business contact and
   accepts one owner-configured contingency-rate variable;
-- [ ] the verified public URL, free-audit form, prepared-email handoff,
-  controlled demo, fee calculator and policy pages are independently checked
-  after deployment;
+- [x] the verified public URL, free-audit form, prepared-email handoff,
+  fictional demo presentation, fee calculator and policy pages were independently
+  checked after deployment on 2026-09-23, including a 390px mobile viewport;
 - [ ] a controlled end-to-end intake rehearsal confirms that sensitive records
   are not sent through the public page and that a secure transfer route is
   issued only after human review;
@@ -162,7 +162,7 @@ operability, rights-evidence consistency and the chosen data-handling path.
 
 The repository now proves **scope-bound proof objects, pre-parser rejection controls, machine-checkable pilot source/package manifests, CENSUS/SCOPE/PROOF lifecycle semantics, persistent tamper-evident reference audit records, semantic reference backup/restore, deterministic release/component provenance, a standards-shaped CycloneDX SBOM, an unsigned in-toto/DSSE payload, a deterministic zero-customer-data diligence bundle, a deterministic controlled synthetic buyer demo, an exact static-site publication boundary, rights evidence consistency gates, a documented fail-closed incident-response decision model, Netlify deployment access-control configuration evidence, and a completed deployment-specific tabletop**.
 
-It does **not** prove executed rights documents have been supplied/reviewed; the launch gate now treats that absence as a blocker. It also does not prove the free-audit site has been deployed, the public inbox or secure-transfer handoff works, an engagement has been executed, a customer outcome or actual recovery occurred, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, Netlify team MFA is enforced, deletion was executed by a real storage provider, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, transport/storage encryption is configured for a specific buyer, live on-call/alerting incident operations exist, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
+It does **not** prove broader hosted/SaaS, assignment, sublicensing, redistribution or change-of-control rights; the current controlled-pilot commercial-use clearance is based on the dated owner/operator attestation. It also does not prove an engagement has been executed, a customer outcome or actual recovery occurred, a deployed shared multi-tenant SaaS is isolated, parser sandboxing is production-grade, Netlify team MFA is enforced for the current-deployment route, deletion was executed for a real buyer, deployed backups meet an RPO/RTO or geographic-redundancy policy, production audit logs have external WORM/alerting controls, live on-call/alerting incident operations exist, provenance is externally signed, the SBOM covers all transitive deployment dependencies, or any external security certification exists.
 
 ## Commercial launch rule
 

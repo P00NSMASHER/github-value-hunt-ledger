@@ -1,35 +1,37 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-20",
-  "notice": "Evidence metadata only. Executed license/permission document bytes are intentionally not stored in this repository. A scope may not be marked resolved without a diligence-room evidence reference and SHA-256.",
+  "updated_at": "2026-09-23",
+  "notice": "Commercial-use permission for the separately-permissioned pilot components is verified from the owner/operator attestation referenced below. This controlled-pilot attestation does not establish hosted/SaaS, assignment, sublicensing, redistribution, or change-of-control rights; those scopes remain UNKNOWN_REVIEW unless separately documented.",
   "entries": [
     {
       "repository": "emoss08/Trenova",
       "revision": "95fcf816562025ad9af864ded4a5fce8a555bd65",
-      "evidence_status": "NOT_ATTACHED",
-      "evidence_location": null,
-      "evidence_sha256": null,
+      "evidence_status": "ATTACHED_VERIFIED",
+      "evidence_location": "freight/RIGHTS_OWNER_ATTESTATION_2026-09-23.md",
+      "evidence_sha256": "ef93b40812bf68f027347cd95fa41550d58c06387c615272dd786fe8fbe57d71",
       "scopes": {
-        "commercial_use": "USER_ASSERTED_NOT_ATTACHED",
+        "commercial_use": "CONFIRMED_ALLOWED",
         "hosted_saas": "UNKNOWN_REVIEW",
         "assignment": "UNKNOWN_REVIEW",
         "sublicensing": "UNKNOWN_REVIEW",
         "change_of_control": "UNKNOWN_REVIEW"
-      }
+      },
+      "evidence_kind": "OWNER_ATTESTATION"
     },
     {
       "repository": "kodekinetics79/opstrax-enterprise-build",
       "revision": "fec2ba1432d6f8b4ba4c48be3d58e7e096819045",
-      "evidence_status": "NOT_ATTACHED",
-      "evidence_location": null,
-      "evidence_sha256": null,
+      "evidence_status": "ATTACHED_VERIFIED",
+      "evidence_location": "freight/RIGHTS_OWNER_ATTESTATION_2026-09-23.md",
+      "evidence_sha256": "ef93b40812bf68f027347cd95fa41550d58c06387c615272dd786fe8fbe57d71",
       "scopes": {
-        "commercial_use": "USER_ASSERTED_NOT_ATTACHED",
+        "commercial_use": "CONFIRMED_ALLOWED",
         "hosted_saas": "UNKNOWN_REVIEW",
         "assignment": "UNKNOWN_REVIEW",
         "sublicensing": "UNKNOWN_REVIEW",
         "change_of_control": "UNKNOWN_REVIEW"
-      }
+      },
+      "evidence_kind": "OWNER_ATTESTATION"
     }
   ]
 }

@@ -1,10 +1,10 @@
 # Customer-controlled freight pilot
 
-Updated: 2026-09-21. **Operating package, not deployment evidence.** The separate-environment route remains CONDITIONAL until the actual buyer environment is verified. No customer records are requested by this document.
+Updated: 2026-09-23. **Operating package, not a substitute for buyer authorization.** A VERIFIED single-tenant manual Google Drive environment now exists for the controlled route. Each buyer still requires a READY data/readiness assessment, agreed scope/retention, and an authorized engagement before confidential records are accepted. No customer records are requested by this document.
 
 ## The practical route
 
-Deliver the first review inside **one buyer-controlled workspace**, using its existing accounts, managed devices and approved document tools. The buyer grants a named Freight reviewer narrowly scoped, read-only access or hosts a controlled screen-sharing session. Keep working papers and reports in that same workspace. Start with manual review; do not deploy automated document ingestion for this first engagement.
+Deliver the first review inside **one approved single-tenant workspace**. Prefer a buyer-controlled workspace when the buyer can provision one; otherwise use the verified Freight-controlled Google Drive environment after buyer-specific authorization. Grant only named, narrowly scoped access, keep source records read-only, and keep working papers/reports in the approved workspace. Start with manual review; do not deploy automated document ingestion for this first engagement.
 
 This removes the need to build shared customer infrastructure before proving that someone will buy the service. Screen sharing still exposes confidential information and must pass the same authorization and applicable environment controls. The buyer must approve the conferencing provider, viewer, reviewer endpoint and any recording/transcription settings. Recording, screenshots, downloads, clipboard transfer and AI meeting assistants stay off unless separately included and approved in scope.
 
@@ -58,7 +58,7 @@ Only after the verifier has inspected the receipts may controls become true and 
 
 1. **Metadata fit:** named owners, feasible source availability, compatible existing terms and funded reviewer capacity. Missing items produce an owner and next date, not a document request.
 2. **Verified environment:** actual manifest passes `python -m freight.separate_environment_evidence /approved/private/path/environment.json --expect VERIFIED`. This example path must be replaced inside the approved environment; do not upload evidence here to run it.
-3. **Authorized kickoff:** buyer/data readiness, rights and the separate-environment launch gate all pass; the current activation packet and acknowledged charter reach `KICKOFF_AUTHORIZED`. Environment verification alone is insufficient. Confirm the path with `python -m freight.pilot_launch_gate /approved/private/path/readiness.json --data-path separate --separate-evidence-json /approved/private/path/environment.json --rights-manifest-json /approved/private/path/rights-evidence.json --expect READY` before generating the acknowledged charter. The repository's default rights manifest is intentionally blocked because executed permission evidence is not attached.
+3. **Authorized kickoff:** buyer/data readiness, rights and the separate-environment launch gate all pass; the current activation packet and acknowledged charter reach `KICKOFF_AUTHORIZED`. Environment verification alone is insufficient. Confirm the path with `python -m freight.pilot_launch_gate /approved/private/path/readiness.json --data-path separate --separate-evidence-json freight/SEPARATE_ENVIRONMENT_EVIDENCE_2026-09-21.json --expect READY` before generating the acknowledged charter.
 4. **Accepted report:** every sampled invoice has a disposition; findings have independently reviewed support; totals reconcile; the buyer receives missing-evidence and disagreement lists. A report may contain no supported discrepancy. Track later credits/refunds separately and net observed returns before claiming recovery.
 
 ## Smallest useful record request after authorization

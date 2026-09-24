@@ -3,7 +3,7 @@
 Updated: 2026-09-23
 
 This process separates **what the repository says about component rights** from
-**the executed evidence that supports those statements**.
+**the evidence object that supports those statements**.
 
 It is an operational diligence control, not a legal opinion.
 
@@ -33,39 +33,37 @@ not this source repository.
 
 ## Evidence promotion rule
 
-A scope can become `CONFIRMED_ALLOWED`, `CONFIRMED_DENIED`, or
-`NOT_APPLICABLE` only when:
-1. the executed evidence object is stored in the diligence room;
-2. its location/reference is recorded;
-3. its SHA-256 is recorded;
-4. the evidence status is `ATTACHED_VERIFIED`;
-5. the operational registry and evidence manifest are reconciled.
+For the controlled-pilot **commercial-use** scope, the owner/operator may supply
+a dated attestation that is stored as an evidence object, fingerprinted by
+SHA-256, and marked `ATTACHED_VERIFIED`. That attestation can support
+`commercial_use=CONFIRMED_ALLOWED` for the pilot gate.
 
-If any of those are absent, the scope stays `UNKNOWN_REVIEW` or
-`USER_ASSERTED_NOT_ATTACHED`.
+Broader rights — hosted/SaaS, assignment, sublicensing, redistribution and
+change-of-control — are **not** inferred from that attestation. Those remain
+`UNKNOWN_REVIEW` until separately documented, and annual/acquirer diligence
+continues to require stronger scope-specific evidence.
 
 ## Current external gaps
 
 ### Trenova
-The repository records the user's separate commercial-use license assertion for
-the pinned revision, but the source repo does **not** currently contain executed
-evidence proving hosted/SaaS, assignment, sublicensing or change-of-control
-scope.
+Commercial use for the pinned revision is now **CONFIRMED_ALLOWED** for the
+controlled-pilot scope based on the owner/operator attestation in
+`freight/RIGHTS_OWNER_ATTESTATION_2026-09-23.md`.
+Hosted/SaaS, assignment, sublicensing and change-of-control remain unresolved.
 
 ### Opstrax
-The repository records the user's separate commercial permission assertion for
-the pinned revision, but the source repo does **not** currently contain executed
-evidence proving hosted/SaaS, assignment, sublicensing or change-of-control
-scope.
+Commercial use for the pinned revision is now **CONFIRMED_ALLOWED** for the
+controlled-pilot scope based on the same owner/operator attestation.
+Hosted/SaaS, assignment, sublicensing and change-of-control remain unresolved.
 
 ## Stage behavior
 
 ### Controlled pilot
 Any non-permissively licensed runtime component that relies on separate
-permission requires `ATTACHED_VERIFIED` executed evidence and a
-`CONFIRMED_ALLOWED` commercial-use scope. The current repository manifest is
-therefore **BLOCKED** for a controlled pilot; a private diligence-room manifest
-may clear the gate after verification without committing document bytes.
+permission requires an `ATTACHED_VERIFIED` commercial-use evidence object and
+a `CONFIRMED_ALLOWED` commercial-use scope. The current repository manifest now
+meets that controlled-pilot requirement through the dated owner/operator
+attestation.
 
 ### Annual / acquirer diligence
 Commercial-use must be confirmed allowed. Hosted-SaaS and change-of-control

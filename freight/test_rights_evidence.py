@@ -21,10 +21,9 @@ def verified_pilot_manifest():
     return manifest
 
 
-def test_current_rights_state_blocks_controlled_pilot():
+def test_current_owner_attested_rights_clear_controlled_pilot():
     errors, warnings = validate_rights_evidence(REGISTRY, MANIFEST, stage="pilot")
-    assert any("Trenova" in x and "attached and verified" in x for x in errors)
-    assert any("opstrax" in x.lower() and "CONFIRMED_ALLOWED" in x for x in errors)
+    assert errors == []
     assert warnings == []
 
 
@@ -45,6 +44,9 @@ def test_current_rights_state_blocks_annual_clearance():
 
 def test_resolved_scope_without_verified_evidence_fails():
     manifest = deepcopy(MANIFEST)
+    manifest["entries"][0]["evidence_status"] = "NOT_ATTACHED"
+    manifest["entries"][0]["evidence_location"] = None
+    manifest["entries"][0]["evidence_sha256"] = None
     manifest["entries"][0]["scopes"]["hosted_saas"] = "CONFIRMED_ALLOWED"
     errors, _ = validate_rights_evidence(REGISTRY, manifest, stage="pilot")
     assert any("resolved scope hosted_saas requires ATTACHED_VERIFIED" in x for x in errors)
