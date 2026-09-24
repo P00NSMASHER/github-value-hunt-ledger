@@ -8,6 +8,7 @@ from .cletrics import (
     load_cletrics_bundle,
     ANOMALY_ROLE,
     RECONCILIATION_ROLE,
+    SAVINGS_ROLE,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "load_cletrics_bundle",
     "ANOMALY_ROLE",
     "RECONCILIATION_ROLE",
+    "SAVINGS_ROLE",
 ]
