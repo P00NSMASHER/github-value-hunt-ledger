@@ -7,13 +7,14 @@ repeats to be skipped without rewriting recovery case history.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from datetime import date
 import hashlib
 import json
 import os
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from recoveryworks.models import normalize_sha256
+from recoveryworks.models import freeze_json, normalize_sha256, normalize_utc_timestamp
 from recoveryworks.private_io import atomic_private_write, private_file_lock
 
 
@@ -58,22 +59,75 @@ class CletricsProcessingReceipt:
             "manifest_sha256",
             normalize_sha256("manifest_sha256", self.manifest_sha256),
         )
-        for name in ("mode", "client_id", "provider", "billing_account_id"):
+
+        mode = str(self.mode).strip()
+        if mode not in {"cloud", "cloud_discount", "cloud_commitment"}:
+            raise ValueError("unsupported Cletrics processing mode")
+        object.__setattr__(self, "mode", mode)
+
+        for name in ("client_id", "provider", "billing_account_id"):
             value = getattr(self, name)
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"{name} is required")
+            normalized = value.strip()
+            if any(ord(character) < 32 for character in normalized):
+                raise ValueError(f"{name} cannot contain control characters")
+            object.__setattr__(self, name, normalized)
+
+        try:
+            start = date.fromisoformat(str(self.period_start).strip()).isoformat()
+            end = date.fromisoformat(str(self.period_end).strip()).isoformat()
+        except ValueError as exc:
+            raise ValueError("receipt periods must be YYYY-MM-DD") from exc
+        if end < start:
+            raise ValueError("period_end cannot predate period_start")
+        object.__setattr__(self, "period_start", start)
+        object.__setattr__(self, "period_end", end)
+        object.__setattr__(
+            self,
+            "exported_at",
+            normalize_utc_timestamp("exported_at", self.exported_at),
+        )
+        if self.scan_head_hash is not None:
+            object.__setattr__(
+                self,
+                "scan_head_hash",
+                normalize_sha256("scan_head_hash", self.scan_head_hash),
+            )
+
+        if not isinstance(self.authority_hashes, Mapping):
+            raise ValueError("authority_hashes must be an object")
         normalized_hashes: dict[str, str] = {}
         for key, value in self.authority_hashes.items():
-            normalized_hashes[str(key)] = normalize_sha256(
-                f"authority_hashes.{key}", value
+            normalized_key = str(key).strip()
+            if not normalized_key:
+                raise ValueError("authority_hashes keys must be non-empty")
+            normalized_hashes[normalized_key] = normalize_sha256(
+                f"authority_hashes.{normalized_key}", value
             )
-        object.__setattr__(self, "authority_hashes", normalized_hashes)
+        object.__setattr__(
+            self,
+            "authority_hashes",
+            freeze_json(normalized_hashes, name="authority_hashes"),
+        )
+
+        if not isinstance(self.verification_flags, Mapping):
+            raise ValueError("verification_flags must be an object")
         normalized_flags: dict[str, bool] = {}
         for key, value in self.verification_flags.items():
+            normalized_key = str(key).strip()
+            if not normalized_key:
+                raise ValueError("verification_flags keys must be non-empty")
             if type(value) is not bool:
-                raise ValueError(f"verification_flags.{key} must be boolean")
-            normalized_flags[str(key)] = value
-        object.__setattr__(self, "verification_flags", normalized_flags)
+                raise ValueError(
+                    f"verification_flags.{normalized_key} must be boolean"
+                )
+            normalized_flags[normalized_key] = value
+        object.__setattr__(
+            self,
+            "verification_flags",
+            freeze_json(normalized_flags, name="verification_flags"),
+        )
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)

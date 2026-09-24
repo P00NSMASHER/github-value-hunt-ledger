@@ -8,6 +8,7 @@ import unittest
 import zipfile
 
 from recoveryworks.branches.cloud_remediation import (
+    CloudRemediationEnvelope,
     approve_cloud_remediation_plan,
     build_cloud_remediation_plan,
     prepare_cloud_remediation_envelopes,
@@ -183,12 +184,33 @@ class RemediationWorkflowTests(unittest.TestCase):
                 reviewer_id="reviewer",
                 customer_authorization_id="auth",
             )
-            altered = plan.__class__(
-                plan_id=plan.plan_id + "-altered",
-                actions=plan.actions,
-            )
+            altered = build_cloud_remediation_plan(())
             with self.assertRaisesRegex(ValueError, "exact plan"):
                 prepare_cloud_remediation_envelopes(altered, approval)
+
+
+    def test_manual_executed_envelope_is_impossible(self):
+        with tempfile.TemporaryDirectory() as d:
+            bundle = load_cletrics_bundle(make_bundle(Path(d) / "bundle.zip"))
+            plan = build_cloud_remediation_plan(bundle.signals)
+            approval = approve_cloud_remediation_plan(
+                plan,
+                reviewer_id="reviewer",
+                customer_authorization_id="auth",
+            )
+            action = plan.actions[0]
+            with self.assertRaisesRegex(ValueError, "must remain NOT_EXECUTED"):
+                CloudRemediationEnvelope(
+                    action_id=action.action_id,
+                    plan_id=plan.plan_id,
+                    approval_hash=approval.proof_hash,
+                    provider=action.provider,
+                    account_id=action.account_id,
+                    resource_id=action.resource_id,
+                    action_type=action.action_type,
+                    proposed_change=action.proposed_change,
+                    execution_status="EXECUTED",
+                )
 
     def test_runner_rejects_execution_request(self):
         with tempfile.TemporaryDirectory() as d:
@@ -303,6 +325,34 @@ class ContinuousIngestionTests(unittest.TestCase):
                 1,
             )
             self.assertEqual(second.scan.added_finding_ids, ())
+
+
+    def test_receipt_fields_are_normalized_and_immutable(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            make_bundle(root / "bundle.zip")
+            write_rates(root / "rates.csv")
+            run_continuous_cletrics_scan(
+                {
+                    "client_id": "client-1",
+                    "cloud": {
+                        "cletrics_bundle": "bundle.zip",
+                        "rates_csv": "rates.csv",
+                    },
+                },
+                state_path=root / "ledger.json",
+                registry_path=root / "receipts.json",
+                base_dir=root,
+            )
+            receipt = CletricsReceiptRegistry(root / "receipts.json").receipts()[0]
+            self.assertEqual(receipt.mode, "cloud")
+            self.assertEqual(receipt.period_start, "2026-08-01")
+            self.assertEqual(receipt.period_end, "2026-08-31")
+            self.assertTrue(receipt.exported_at.endswith("Z"))
+            with self.assertRaises(TypeError):
+                receipt.authority_hashes["other"] = "0" * 64
+            with self.assertRaises(TypeError):
+                receipt.verification_flags["other"] = True
 
     def test_registry_tamper_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:

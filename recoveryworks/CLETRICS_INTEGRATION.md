@@ -140,11 +140,6 @@ Allocation CSV:
 
 Only min(billable units, independently evidenced entitled units) receives the committed rate. Unused entitlement is recorded as context and is never counted as recoverable money. A committed rate above the reviewed base rate fails closed.
 
-## Still deferred
-
-Continuous bundle scheduling, a reviewed supersession workflow for replacing an existing cloud charge finding, combined discount-plus-commitment pricing, persistent recovery-vs-savings dashboards, and remediation remain later phases. None is silently approximated here.
-
-
 ## Phase 3: continuous ingestion, savings, and remediation
 
 ### Continuous processing receipts
@@ -179,3 +174,7 @@ cloud_remediation.enabled=true creates a DRAFT plan from explicit savings opport
 approve_cloud_remediation_plan requires both a reviewer_id and customer_authorization_id and binds the exact plan/action IDs. prepare_cloud_remediation_envelopes produces immutable envelopes whose execution_status is NOT_EXECUTED.
 
 cloud_remediation.execute=true fails closed. Provider mutation belongs in a separately authorized downstream control plane.
+
+### Remaining explicit boundaries
+
+Phase 3 is intentionally not a cloud-change executor. Same-period changed authority or bundle scope is surfaced for explicit supersession review rather than replacing a live RecoveryOS case. Combined discount-plus-commitment pricing is not inferred. Realized savings remains zero until a separate before/after evidence model exists. Provider mutations require a separately authorized downstream control plane.

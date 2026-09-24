@@ -9,8 +9,33 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any, Iterable
 
-from recoveryworks.models import canonical_hash
+from recoveryworks.models import canonical_hash, normalize_sha256
 from .cloud_signals import CloudSignal, CloudSignalType
+
+
+def _text(name: str, value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{name} is required")
+    normalized = value.strip()
+    if any(ord(character) < 32 for character in normalized):
+        raise ValueError(f"{name} cannot contain control characters")
+    return normalized
+
+
+def _expected_action_id(
+    *,
+    signal_id: str,
+    source_signal_hash: str,
+    action_type: str,
+    proposed_change: str,
+) -> str:
+    identity = {
+        "signal_id": signal_id,
+        "source_signal_hash": source_signal_hash,
+        "action_type": action_type,
+        "proposed_change": proposed_change,
+    }
+    return "cloud-remediation:" + canonical_hash(identity)
 
 
 @dataclass(frozen=True)
@@ -26,6 +51,36 @@ class CloudRemediationAction:
     estimated_savings_cents: int
     source_signal_hash: str
 
+    def __post_init__(self) -> None:
+        for name in (
+            "signal_id",
+            "provider",
+            "account_id",
+            "service_id",
+            "action_type",
+            "proposed_change",
+        ):
+            object.__setattr__(self, name, _text(name, getattr(self, name)))
+        if self.resource_id is not None:
+            object.__setattr__(
+                self, "resource_id", _text("resource_id", self.resource_id)
+            )
+        object.__setattr__(
+            self,
+            "source_signal_hash",
+            normalize_sha256("source_signal_hash", self.source_signal_hash),
+        )
+        if type(self.estimated_savings_cents) is not int or self.estimated_savings_cents < 0:
+            raise ValueError("estimated_savings_cents must be a non-negative integer")
+        expected = _expected_action_id(
+            signal_id=self.signal_id,
+            source_signal_hash=self.source_signal_hash,
+            action_type=self.action_type,
+            proposed_change=self.proposed_change,
+        )
+        if self.action_id != expected:
+            raise ValueError("action_id does not bind the remediation action payload")
+
     @property
     def proof_hash(self) -> str:
         return canonical_hash({"schema": 1, **asdict(self)})
@@ -35,6 +90,20 @@ class CloudRemediationAction:
 class CloudRemediationPlan:
     plan_id: str
     actions: tuple[CloudRemediationAction, ...]
+
+    def __post_init__(self) -> None:
+        actions = tuple(self.actions)
+        if not all(isinstance(action, CloudRemediationAction) for action in actions):
+            raise ValueError("actions must contain CloudRemediationAction values")
+        actions = tuple(sorted(actions, key=lambda action: action.action_id))
+        if len({action.action_id for action in actions}) != len(actions):
+            raise ValueError("remediation plan contains duplicate action ids")
+        object.__setattr__(self, "actions", actions)
+        expected = "cloud-remediation-plan:" + canonical_hash({
+            "action_hashes": [action.proof_hash for action in actions],
+        })
+        if self.plan_id != expected:
+            raise ValueError("plan_id does not bind the exact remediation actions")
 
     @property
     def proof_hash(self) -> str:
@@ -65,6 +134,26 @@ class CloudRemediationApproval:
     customer_authorization_id: str
     approved_action_ids: tuple[str, ...]
 
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "plan_id", _text("plan_id", self.plan_id))
+        object.__setattr__(
+            self,
+            "plan_proof_hash",
+            normalize_sha256("plan_proof_hash", self.plan_proof_hash),
+        )
+        object.__setattr__(self, "reviewer_id", _text("reviewer_id", self.reviewer_id))
+        object.__setattr__(
+            self,
+            "customer_authorization_id",
+            _text("customer_authorization_id", self.customer_authorization_id),
+        )
+        selected = tuple(
+            sorted({_text("approved_action_id", value) for value in self.approved_action_ids})
+        )
+        if not selected:
+            raise ValueError("at least one remediation action must be approved")
+        object.__setattr__(self, "approved_action_ids", selected)
+
     @property
     def proof_hash(self) -> str:
         return canonical_hash({"schema": 1, **asdict(self)})
@@ -89,6 +178,30 @@ class CloudRemediationEnvelope:
     proposed_change: str
     execution_status: str = "NOT_EXECUTED"
 
+    def __post_init__(self) -> None:
+        for name in (
+            "action_id",
+            "plan_id",
+            "provider",
+            "account_id",
+            "action_type",
+            "proposed_change",
+        ):
+            object.__setattr__(self, name, _text(name, getattr(self, name)))
+        if self.resource_id is not None:
+            object.__setattr__(
+                self, "resource_id", _text("resource_id", self.resource_id)
+            )
+        object.__setattr__(
+            self,
+            "approval_hash",
+            normalize_sha256("approval_hash", self.approval_hash),
+        )
+        if self.execution_status != "NOT_EXECUTED":
+            raise ValueError(
+                "RecoveryOS remediation envelopes are plan-only and must remain NOT_EXECUTED"
+            )
+
     @property
     def proof_hash(self) -> str:
         return canonical_hash({"schema": 1, **asdict(self)})
@@ -106,14 +219,13 @@ def build_cloud_remediation_plan(
         if not action_type or not proposed_change:
             continue
         amount = signal.estimated_impact_cents or 0
-        identity = {
-            "signal_id": signal.signal_id,
-            "source_signal_hash": signal.proof_hash,
-            "action_type": action_type,
-            "proposed_change": proposed_change,
-        }
         actions.append(CloudRemediationAction(
-            action_id="cloud-remediation:" + canonical_hash(identity),
+            action_id=_expected_action_id(
+                signal_id=signal.signal_id,
+                source_signal_hash=signal.proof_hash,
+                action_type=action_type,
+                proposed_change=proposed_change,
+            ),
             signal_id=signal.signal_id,
             provider=signal.provider,
             account_id=signal.account_id,
