@@ -529,3 +529,9 @@ The package includes a direct certification answer stating that no SOC 2, ISO 27
 Managed customer data now has a per-customer private data-space inventory with exact file hashes, classification, allowed purposes, collection time, retention deadline, and source kind. Raw credential/secret material is explicitly rejected. Paths cannot escape the customer root, and customer inventories cannot mix customers.
 
 Purpose-limited access decisions are recorded in a private hash-chained access history, including denied attempts. Customer export creates a deterministic private archive and receipt. Logical deletion validates the exact file hash, retention/early-deletion authorization, and active legal holds before removing the managed file; deletion receipts explicitly state logical_deletion_only=true and never claim forensic secure wipe. Active legal holds override deletion.
+
+## Provider connector readiness contracts (step 25a)
+
+AWS, Azure, and GCP now have provider-neutral read-only connector contracts using verified credential references (workload identity, managed identity, role reference, or service-account impersonation) rather than persisted credentials. The contract exposes only DESCRIBE_IDENTITY, DISCOVER_BILLING_EXPORTS, and DISCOVER_RESOURCES and records live_calls_enabled=false, write_operations_enabled=false, and secret_persistence_enabled=false.
+
+Provider discovery can be tested through exact request-bound verified replay fixtures for deterministic offline/replay validation. Replay results prove provider/account/operation scope and explicitly record provider_api_called=false and secrets_persisted=false. A stable connector error taxonomy covers RATE_LIMITED, AUTHORIZATION_FAILED, TIMEOUT, TRANSIENT_PROVIDER_ERROR, MALFORMED_RESPONSE, SCOPE_MISMATCH, and FIXTURE_MISS. No live AWS/Azure/GCP calls are implemented in this half-step.
