@@ -147,3 +147,33 @@ floating-point values.
 
 A transaction cannot be registered when its case proof, party, issuer, source
 proof, artifact proof, or case-artifact relationship does not match.
+
+
+## Step 5 — mandatory fact status
+
+Every normalized historical transaction now requires an explicit `FactStatus`:
+
+- `ALLEGED`
+- `ADMITTED`
+- `SETTLED_WITHOUT_ADMISSION`
+- `FOUND_LIABLE`
+- `CONVICTED`
+- `COURT_ESTABLISHED`
+- `ACADEMIC_RECONSTRUCTION`
+
+The status is separately provenance-bound through `status_ref`. This matters
+when the transaction details come from one artifact (for example a complaint
+table) while the legal/factual status is established by another artifact (for
+example a final judgment).
+
+The verifier prevents status inflation:
+
+- complaints/indictments can support allegations, not a `FOUND_LIABLE` label;
+- liability requires a judgment;
+- conviction requires a judgment or plea/statement artifact;
+- court-established facts require court judgment/exhibit evidence;
+- academic reconstructions must remain `ACADEMIC_RECONSTRUCTION`;
+- non-academic legal statuses require a primary public record.
+
+Case-level proceeding status remains separate and cannot automatically upgrade
+the status of any individual transaction.
