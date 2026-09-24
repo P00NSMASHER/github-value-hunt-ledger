@@ -2,10 +2,19 @@ from __future__ import annotations
 
 import unittest
 
+from recoveryworks.commercial_operational_invariants import (
+    CommercialOperationalInvariantState,
+    verify_commercial_operational_invariants,
+)
 from recoveryworks.production_adversarial_certification import (
     AdversarialCertificationState,
     AdversarialVector,
     run_commercial_adversarial_certification,
+)
+from recoveryworks.recurring_assurance_lifecycle import (
+    build_recurring_assurance_service_activation,
+    build_recurring_assurance_service_deactivation,
+    build_recurring_assurance_service_lifecycle,
 )
 from recoveryworks.test_commercial_operational_invariants import full_chain
 
@@ -61,6 +70,68 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
                 seed=5,
                 iterations_per_vector=1,
             )
+
+    def test_exact_deactivated_lifecycle_is_verified_end_to_end(self):
+        chain = full_chain()
+        deactivation = build_recurring_assurance_service_deactivation(
+            chain["recurring_activation"],
+            deactivated_at="2026-11-15T12:00:00Z",
+            operator_id="operator-stop-valid",
+            deactivation_reference="stop-valid",
+            reason="buyer requested service stop",
+            internal_operator_authorized=True,
+        )
+        chain["recurring_deactivation"] = deactivation
+        chain["recurring_lifecycle"] = build_recurring_assurance_service_lifecycle(
+            chain["recurring_readiness"],
+            chain["recurring_activation"],
+            deactivation,
+        )
+        chain["checked_at"] = "2026-11-15T12:01:00Z"
+
+        report = verify_commercial_operational_invariants(**chain)
+        self.assertIs(report.state, CommercialOperationalInvariantState.PASS)
+        self.assertEqual(report.failed_codes, ())
+        self.assertIn(
+            ("recurring_deactivation", deactivation.proof_hash),
+            report.artifact_proof_hashes,
+        )
+        self.assertFalse(report.external_actions_performed)
+        self.assertFalse(report.automatic_repair_performed)
+
+    def test_replayed_deactivation_receipt_is_blocked(self):
+        chain = full_chain()
+        activation_a = chain["recurring_activation"]
+        deactivation_a = build_recurring_assurance_service_deactivation(
+            activation_a,
+            deactivated_at="2026-11-15T12:00:00Z",
+            operator_id="operator-stop-a",
+            deactivation_reference="stop-a",
+            reason="certification replay fixture",
+            internal_operator_authorized=True,
+        )
+        lifecycle_a = build_recurring_assurance_service_lifecycle(
+            chain["recurring_readiness"], activation_a, deactivation_a
+        )
+        activation_b = build_recurring_assurance_service_activation(
+            chain["recurring_readiness"],
+            activated_at=activation_a.activated_at,
+            operator_id="operator-replay-b",
+            activation_reference="activation-b",
+            internal_operator_authorized=True,
+        )
+        chain["recurring_activation"] = activation_b
+        chain["recurring_deactivation"] = deactivation_a
+        chain["recurring_lifecycle"] = lifecycle_a
+        chain["checked_at"] = "2026-11-15T12:01:00Z"
+
+        report = verify_commercial_operational_invariants(**chain)
+        self.assertIs(report.state, CommercialOperationalInvariantState.BLOCKED)
+        self.assertIn(
+            "RECURRING_LIFECYCLE_STATE_INTEGRITY", report.failed_codes
+        )
+        self.assertFalse(report.external_actions_performed)
+        self.assertFalse(report.automatic_repair_performed)
 
 
 if __name__ == "__main__":
