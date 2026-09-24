@@ -15,13 +15,27 @@ from decimal import Decimal, InvalidOperation
 from enum import Enum
 import re
 
-from .case_model import CaseRegistry
+from .case_model import CaseArtifactRole, CaseRegistry
 from .raw_artifacts import RawArtifactManifest, SourceArtifactRef
-from .source_registry import SourceRegistry, canonical_hash
+from .source_registry import (
+    SourceAdmissibility,
+    SourceRegistry,
+    canonical_hash,
+)
 
 
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$")
 _DECIMAL_RE = re.compile(r"^(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$")
+
+
+class FactStatus(str, Enum):
+    ALLEGED = "ALLEGED"
+    ADMITTED = "ADMITTED"
+    SETTLED_WITHOUT_ADMISSION = "SETTLED_WITHOUT_ADMISSION"
+    FOUND_LIABLE = "FOUND_LIABLE"
+    CONVICTED = "CONVICTED"
+    COURT_ESTABLISHED = "COURT_ESTABLISHED"
+    ACADEMIC_RECONSTRUCTION = "ACADEMIC_RECONSTRUCTION"
 
 
 class InstrumentType(str, Enum):
@@ -91,6 +105,8 @@ class HistoricalTransaction:
     trader_party_id: str
     issuer_id: str
     source_ref: SourceArtifactRef
+    fact_status: FactStatus
+    status_ref: SourceArtifactRef
 
     instrument_type: InstrumentType = InstrumentType.UNKNOWN
     side: TradeSide = TradeSide.UNKNOWN
@@ -224,6 +240,8 @@ class HistoricalTransaction:
             "trader_party_id": self.trader_party_id,
             "issuer_id": self.issuer_id,
             "source_ref_proof_hash": self.source_ref.proof_hash,
+            "fact_status": self.fact_status.value,
+            "status_ref_proof_hash": self.status_ref.proof_hash,
             "instrument_type": self.instrument_type.value,
             "side": self.side.value,
             "time_precision": self.time_precision.value,
@@ -316,16 +334,81 @@ def verify_transaction_provenance(
     if source.proof_hash != transaction.source_ref.source_proof_hash:
         raise ValueError("transaction source proof mismatch")
 
-    case_artifact_ref_hashes = {
-        link.ref.proof_hash for link in case.artifacts
+    artifact_manifest.resolve_ref(transaction.status_ref)
+    status_source = source_registry.get(transaction.status_ref.source_id)
+    if status_source.proof_hash != transaction.status_ref.source_proof_hash:
+        raise ValueError("transaction status source proof mismatch")
+
+    case_artifact_by_ref = {
+        link.ref.proof_hash: link for link in case.artifacts
     }
-    if transaction.source_ref.proof_hash not in case_artifact_ref_hashes:
+    if transaction.source_ref.proof_hash not in case_artifact_by_ref:
         raise ValueError(
             "transaction source artifact is not linked to the canonical case"
+        )
+    status_link = case_artifact_by_ref.get(transaction.status_ref.proof_hash)
+    if status_link is None:
+        raise ValueError(
+            "transaction status artifact is not linked to the canonical case"
+        )
+
+    if transaction.fact_status is FactStatus.ACADEMIC_RECONSTRUCTION:
+        if (
+            status_source.admissibility
+            is not SourceAdmissibility.PUBLISHED_RESEARCH_RECONSTRUCTION
+            or status_link.artifact_role
+            is not CaseArtifactRole.ACADEMIC_RECONSTRUCTION
+        ):
+            raise ValueError(
+                "ACADEMIC_RECONSTRUCTION status requires academic reconstruction evidence"
+            )
+        return
+
+    if status_source.admissibility is not SourceAdmissibility.PRIMARY_PUBLIC_RECORD:
+        raise ValueError(
+            "non-academic fact status requires a primary public record"
+        )
+
+    allowed_roles = {
+        FactStatus.ALLEGED: {
+            CaseArtifactRole.COMPLAINT,
+            CaseArtifactRole.INDICTMENT,
+            CaseArtifactRole.LITIGATION_RELEASE,
+            CaseArtifactRole.ADMIN_ORDER,
+            CaseArtifactRole.EXHIBIT,
+            CaseArtifactRole.OTHER,
+        },
+        FactStatus.ADMITTED: {
+            CaseArtifactRole.PLEA_OR_STATEMENT,
+            CaseArtifactRole.JUDGMENT,
+            CaseArtifactRole.ADMIN_ORDER,
+        },
+        FactStatus.SETTLED_WITHOUT_ADMISSION: {
+            CaseArtifactRole.JUDGMENT,
+            CaseArtifactRole.ADMIN_ORDER,
+        },
+        FactStatus.FOUND_LIABLE: {
+            CaseArtifactRole.JUDGMENT,
+        },
+        FactStatus.CONVICTED: {
+            CaseArtifactRole.JUDGMENT,
+            CaseArtifactRole.PLEA_OR_STATEMENT,
+        },
+        FactStatus.COURT_ESTABLISHED: {
+            CaseArtifactRole.JUDGMENT,
+            CaseArtifactRole.EXHIBIT,
+        },
+    }
+    allowed = allowed_roles[transaction.fact_status]
+    if status_link.artifact_role not in allowed:
+        raise ValueError(
+            f"{transaction.fact_status.value} status is not supported by "
+            f"{status_link.artifact_role.value} evidence"
         )
 
 
 __all__ = [
+    "FactStatus",
     "HistoricalTransaction",
     "InstrumentType",
     "TimePrecision",
