@@ -10,7 +10,7 @@ This lives inside the Hunter ledger initially so it inherits version history, CI
 2. ✅ **Independent Auditor brain** — Manager → Executor → Auditor acceptance contracts.
 3. ✅ **Verifier-gated self-improvement** — candidate skills require held-out evidence before promotion.
 4. ✅ **Value-weighted memory** — retrieval uses relevance × observed value × confidence × recency.
-5. Knowledge graph — business/repo/capability/customer/outcome relationship model.
+5. ✅ **Knowledge graph** — business/repo/capability/customer/outcome relationship model.
 6. Entity canonicalization — merge aliases/duplicates while retaining provenance.
 7. Runtime governance — tool permissions, budgets, approvals, audit and kill switch.
 8. Autonomous software factory — issue → isolated implementation → tests → PR.
@@ -20,4 +20,4 @@ This lives inside the Hunter ledger initially so it inherits version history, CI
 
 No upgrade is marked complete merely because documentation exists. Each upgrade must have a concrete implementation, regression tests or deterministic validation, and a failure mode that prevents false success.
 
-Current completed upgrades on this branch: **4/9**.
+Current completed upgrades on this branch: **5/9**.
