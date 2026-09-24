@@ -10,6 +10,7 @@ from recoveryworks.container_build import build_container_build_manifest
 from recoveryworks.production_adversarial_certification import (
     AdversarialCertificationState,
     AdversarialVector,
+    current_repository_revision,
     run_commercial_adversarial_certification,
 )
 from recoveryworks.recurring_assurance_lifecycle import (
@@ -20,7 +21,7 @@ from recoveryworks.recurring_assurance_lifecycle import (
 from recoveryworks.test_commercial_operational_invariants import full_chain
 
 
-SOURCE_REVISION = "5" * 40
+SOURCE_REVISION = current_repository_revision()
 OTHER_SOURCE_REVISION = "6" * 40
 
 
@@ -70,33 +71,32 @@ class ProductionAdversarialCertificationTests(unittest.TestCase):
             [case.mutation for case in second.cases],
         )
 
-    def test_source_revision_is_proof_bound(self):
-        first = run_commercial_adversarial_certification(
+    def test_source_revision_is_current_head_and_proof_bound(self):
+        result = run_commercial_adversarial_certification(
             full_chain,
             build_manifest=build_manifest(),
             seed=9917,
             iterations_per_vector=1,
         )
-        second = run_commercial_adversarial_certification(
-            full_chain,
-            build_manifest=build_manifest(OTHER_SOURCE_REVISION),
-            seed=9917,
-            iterations_per_vector=1,
-        )
-        self.assertEqual(first.source_revision, SOURCE_REVISION)
-        self.assertEqual(second.source_revision, OTHER_SOURCE_REVISION)
-        self.assertNotEqual(
-            first.container_build_manifest_proof_hash,
-            second.container_build_manifest_proof_hash,
-        )
-        self.assertNotEqual(first.proof_hash, second.proof_hash)
-        self.assertNotEqual(first.certification_id, second.certification_id)
+        self.assertEqual(result.source_revision, current_repository_revision())
+        self.assertEqual(result.source_revision, SOURCE_REVISION)
 
     def test_unverified_build_manifest_input_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "build_manifest"):
             run_commercial_adversarial_certification(
                 full_chain,
                 build_manifest="not-a-build-manifest",
+                seed=1,
+                iterations_per_vector=1,
+            )
+
+    def test_noncurrent_source_revision_is_rejected(self):
+        with self.assertRaisesRegex(
+            ValueError, "does not match current repository revision"
+        ):
+            run_commercial_adversarial_certification(
+                full_chain,
+                build_manifest=build_manifest(OTHER_SOURCE_REVISION),
                 seed=1,
                 iterations_per_vector=1,
             )
