@@ -593,3 +593,9 @@ The evaluator returns HEALTHY, PRESSURE, THROTTLED, or BLOCKED with proof-bound 
 A one-command local operator rehearsal now creates an isolated synthetic tenant, synthetic FOCUS/meter/rate inputs, validates onboarding/authorization/evidence-review readiness, materializes the authorized diagnostic call, schedules and executes it through the tenant-bound local job worker, and verifies the resulting private Cloud Assurance output.
 
 The rehearsal also emits a private customer-safe diligence index plus an operator runbook/checklist covering tenant setup, intake validation, job scheduling/lease execution, report verification, review boundaries, and confirmation that no customer contact, provider mutation, claim submission, or external action occurred. The state is SIMULATED_OPERATOR_REHEARSAL_PASSED and is not real customer onboarding.
+
+### Evidence-size capacity axis and internal SLO report
+
+The measured capacity matrix now requires an explicit EVIDENCE_BYTES dimension in addition to billing rows, provider count, and tenant count. The conservative envelope records the maximum measured evidence bytes separately from the generated bundle size, and admission/service-level utilization accounts for evidence volume as a fourth capacity axis. Requests beyond the measured evidence-size limit fail with ADMISSION_REJECTED_CAPACITY before work begins.
+
+Internal service-level snapshots now have private JSON/Markdown reporting with queue depth, job age, lateness, missed schedules, measured capacity utilization, throttle state, and alert details. The report explicitly identifies itself as an internal engineering control, not a customer SLA, and does not enable autonomous external actions.

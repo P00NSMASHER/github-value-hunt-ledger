@@ -11,12 +11,15 @@ from recoveryworks.production_service_levels import (
     InternalCapacityDemand, ServiceLevelPolicy, ServicePressureState,
     admit_internal_job, evaluate_internal_service_levels)
 from recoveryworks.tenant_isolation import TenantIdentity
+from recoveryworks.private_io import private_permissions_verified
+from recoveryworks.production_service_levels import write_internal_service_level_report
 
 def envelope():
     cells=(
         measured_capacity_cell(dimension=CapacityDimension.BILLING_ROWS,billing_rows=1000,provider_count=1,tenant_count=1,bundle_bytes=1,runtime_ms=1,peak_memory_bytes=1,rows_per_second_milli=1,evidence_proof_hashes=("1"*64,)),
         measured_capacity_cell(dimension=CapacityDimension.PROVIDERS,billing_rows=100,provider_count=3,tenant_count=1,bundle_bytes=1,runtime_ms=1,peak_memory_bytes=1,rows_per_second_milli=1,evidence_proof_hashes=("2"*64,)),
         measured_capacity_cell(dimension=CapacityDimension.TENANTS,billing_rows=100,provider_count=1,tenant_count=10,bundle_bytes=1,runtime_ms=1,peak_memory_bytes=1,rows_per_second_milli=1,evidence_proof_hashes=("3"*64,)),
+        measured_capacity_cell(dimension=CapacityDimension.EVIDENCE_BYTES,billing_rows=100,provider_count=1,tenant_count=1,bundle_bytes=1000,evidence_bytes=1000,runtime_ms=1,peak_memory_bytes=1,rows_per_second_milli=1,evidence_proof_hashes=("4"*64,)),
     )
     return build_conservative_operating_envelope(cells)
 
@@ -62,6 +65,24 @@ class ServiceLevelTests(unittest.TestCase):
                 checked_at="2026-09-24T13:00:00Z")
             self.assertIs(pressure.state,ServicePressureState.THROTTLED)
             self.assertTrue(pressure.admission_throttled)
+
+
+    def test_internal_slo_report_is_private_and_not_external_sla(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d); reg=ProductionJobRegistry(root/"jobs.json")
+            snap=evaluate_internal_service_levels(
+                jobs=(),registry=reg,envelope=envelope(),
+                demand=InternalCapacityDemand(100,1,1,100),
+                checked_at="2026-09-24T13:00:00Z")
+            json_path=root/"private"/"slo.json"
+            md_path=root/"private"/"slo.md"
+            write_internal_service_level_report(
+                snap,json_path=json_path,markdown_path=md_path)
+            self.assertTrue(private_permissions_verified(json_path))
+            self.assertTrue(private_permissions_verified(md_path))
+            self.assertIn(
+                "not a customer SLA",
+                md_path.read_text(encoding="utf-8"))
 
     def test_over_capacity_blocks_before_work(self):
         with tempfile.TemporaryDirectory() as d:

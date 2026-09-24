@@ -4,6 +4,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from enum import Enum
+from pathlib import Path
+import json
 from typing import Any, Iterable
 
 from recoveryworks.capacity_matrix import (
@@ -11,6 +13,7 @@ from recoveryworks.capacity_matrix import (
     enforce_operating_envelope,
 )
 from recoveryworks.models import canonical_hash, normalize_utc_timestamp
+from recoveryworks.private_io import atomic_private_write
 from recoveryworks.production_job_control import (
     ProductionJobIdentity,
     ProductionJobRegistry,
@@ -59,9 +62,10 @@ class InternalCapacityDemand:
     billing_rows: int
     provider_count: int
     tenant_count: int
+    evidence_bytes: int = 1
 
     def __post_init__(self) -> None:
-        for name in ("billing_rows","provider_count","tenant_count"):
+        for name in ("billing_rows","provider_count","tenant_count","evidence_bytes"):
             if type(getattr(self,name)) is not int or getattr(self,name) <= 0:
                 raise ValueError(f"{name} must be positive")
 
@@ -128,7 +132,36 @@ class InternalServiceLevelSnapshot:
     def proof_hash(self)->str: return canonical_hash(self._identity())
     def as_dict(self)->dict[str,Any]:
         return {**self._identity(),"snapshot_id":self.snapshot_id,
-                "proof_hash":self.proof_hash}
+                "proof_hash":self.proof_hash,
+                "report_state":"INTERNAL_SERVICE_LEVEL_SNAPSHOT"}
+
+    def to_markdown(self)->str:
+        lines=[
+            "# Internal Production Service-Level Snapshot","",
+            f"State: {self.state.value}",
+            f"Checked at: {self.checked_at}",
+            f"Queue depth: {self.queue_depth}",
+            f"Oldest job age seconds: {self.oldest_job_age_seconds}",
+            f"Schedule lateness seconds: {self.schedule_lateness_seconds}",
+            f"Missed job count: {self.missed_job_count}",
+            f"Measured capacity utilization bps: {self.capacity_utilization_bps}",
+            f"Admission throttled: {str(self.admission_throttled).lower()}","",
+            "## Alerts","",
+        ]
+        if not self.alerts:
+            lines.append("- none")
+        else:
+            for alert in self.alerts:
+                lines.append(
+                    f"- [{alert.severity}] {alert.code}: {alert.detail}"
+                )
+        lines.extend([
+            "",
+            "Internal engineering control only; not a customer SLA.",
+            "Autonomous external actions: disabled",
+            "",
+        ])
+        return "\n".join(lines)
 
 
 def _capacity_utilization_bps(
@@ -139,6 +172,7 @@ def _capacity_utilization_bps(
         demand.billing_rows*10000//envelope.max_measured_billing_rows,
         demand.provider_count*10000//envelope.max_measured_provider_count,
         demand.tenant_count*10000//envelope.max_measured_tenant_count,
+        demand.evidence_bytes*10000//envelope.max_measured_evidence_bytes,
     )
     return max(ratios)
 
@@ -175,7 +209,8 @@ def evaluate_internal_service_levels(
     )
     capacity_decision=enforce_operating_envelope(
         envelope,billing_rows=demand.billing_rows,
-        provider_count=demand.provider_count,tenant_count=demand.tenant_count)
+        provider_count=demand.provider_count,tenant_count=demand.tenant_count,
+        evidence_bytes=demand.evidence_bytes)
     utilization=_capacity_utilization_bps(envelope,demand)
     alerts=[]
     if len(backlog)>policy.max_queue_depth:
@@ -232,3 +267,26 @@ def admit_internal_job(
         "service_level_proof_hash":snapshot.proof_hash,
         "external_actions_performed":False,
     }
+
+
+def write_internal_service_level_report(
+    snapshot: InternalServiceLevelSnapshot,
+    *,
+    json_path: str | Path,
+    markdown_path: str | Path,
+) -> None:
+    atomic_private_write(
+        Path(json_path),
+        (
+            json.dumps(
+                snapshot.as_dict(),
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+            ) + "\n"
+        ).encode("utf-8"),
+    )
+    atomic_private_write(
+        Path(markdown_path),
+        (snapshot.to_markdown() + "\n").encode("utf-8"),
+    )

@@ -13,6 +13,7 @@ class CapacityDimension(str, Enum):
     BILLING_ROWS = "BILLING_ROWS"
     PROVIDERS = "PROVIDERS"
     TENANTS = "TENANTS"
+    EVIDENCE_BYTES = "EVIDENCE_BYTES"
 
 
 @dataclass(frozen=True)
@@ -23,6 +24,7 @@ class CapacityMatrixCell:
     provider_count: int
     tenant_count: int
     bundle_bytes: int
+    evidence_bytes: int
     runtime_ms: int
     peak_memory_bytes: int
     rows_per_second_milli: int
@@ -33,7 +35,7 @@ class CapacityMatrixCell:
         if not isinstance(self.dimension, CapacityDimension):
             raise ValueError("dimension must be CapacityDimension")
         for name in (
-            "billing_rows","provider_count","tenant_count","bundle_bytes",
+            "billing_rows","provider_count","tenant_count","bundle_bytes","evidence_bytes",
             "runtime_ms","peak_memory_bytes","rows_per_second_milli",
         ):
             value=getattr(self,name)
@@ -54,6 +56,7 @@ class CapacityMatrixCell:
             "schema":1,"dimension":self.dimension.value,
             "billing_rows":self.billing_rows,"provider_count":self.provider_count,
             "tenant_count":self.tenant_count,"bundle_bytes":self.bundle_bytes,
+            "evidence_bytes":self.evidence_bytes,
             "runtime_ms":self.runtime_ms,"peak_memory_bytes":self.peak_memory_bytes,
             "rows_per_second_milli":self.rows_per_second_milli,
             "evidence_proof_hashes":list(self.evidence_proof_hashes),"passed":True,
@@ -66,6 +69,7 @@ def row_capacity_cell(measurement: CapacityMeasurement) -> CapacityMatrixCell:
     identity={
         "schema":1,"dimension":"BILLING_ROWS","billing_rows":measurement.row_count,
         "provider_count":1,"tenant_count":1,"bundle_bytes":measurement.bundle_bytes,
+        "evidence_bytes":measurement.bundle_bytes,
         "runtime_ms":measurement.runtime_ms,
         "peak_memory_bytes":measurement.peak_memory_bytes,
         "rows_per_second_milli":measurement.rows_per_second_milli,
@@ -75,6 +79,7 @@ def row_capacity_cell(measurement: CapacityMeasurement) -> CapacityMatrixCell:
         cell_id="recoveryworks-capacity-cell:"+canonical_hash(identity),
         dimension=CapacityDimension.BILLING_ROWS,billing_rows=measurement.row_count,
         provider_count=1,tenant_count=1,bundle_bytes=measurement.bundle_bytes,
+        evidence_bytes=measurement.bundle_bytes,
         runtime_ms=measurement.runtime_ms,peak_memory_bytes=measurement.peak_memory_bytes,
         rows_per_second_milli=measurement.rows_per_second_milli,
         evidence_proof_hashes=(measurement.proof_hash,),passed=True,
@@ -86,11 +91,14 @@ def measured_capacity_cell(
     tenant_count: int, bundle_bytes: int, runtime_ms: int,
     peak_memory_bytes: int, rows_per_second_milli: int,
     evidence_proof_hashes: tuple[str,...],
+    evidence_bytes: int | None = None,
 ) -> CapacityMatrixCell:
+    evidence_size = bundle_bytes if evidence_bytes is None else evidence_bytes
     identity={
         "schema":1,"dimension":dimension.value,"billing_rows":billing_rows,
         "provider_count":provider_count,"tenant_count":tenant_count,
-        "bundle_bytes":bundle_bytes,"runtime_ms":runtime_ms,
+        "bundle_bytes":bundle_bytes,"evidence_bytes":evidence_size,
+        "runtime_ms":runtime_ms,
         "peak_memory_bytes":peak_memory_bytes,
         "rows_per_second_milli":rows_per_second_milli,
         "evidence_proof_hashes":sorted(evidence_proof_hashes),"passed":True,
@@ -98,7 +106,8 @@ def measured_capacity_cell(
     return CapacityMatrixCell(
         cell_id="recoveryworks-capacity-cell:"+canonical_hash(identity),
         dimension=dimension,billing_rows=billing_rows,provider_count=provider_count,
-        tenant_count=tenant_count,bundle_bytes=bundle_bytes,runtime_ms=runtime_ms,
+        tenant_count=tenant_count,bundle_bytes=bundle_bytes,
+        evidence_bytes=evidence_size,runtime_ms=runtime_ms,
         peak_memory_bytes=peak_memory_bytes,
         rows_per_second_milli=rows_per_second_milli,
         evidence_proof_hashes=evidence_proof_hashes,passed=True,
@@ -112,6 +121,7 @@ class ConservativeOperatingEnvelope:
     max_measured_provider_count: int
     max_measured_tenant_count: int
     max_measured_bundle_bytes: int
+    max_measured_evidence_bytes: int
     max_measured_runtime_ms: int
     max_measured_peak_memory_bytes: int
     min_measured_rows_per_second_milli: int
@@ -124,6 +134,7 @@ class ConservativeOperatingEnvelope:
         for name in (
             "max_measured_billing_rows","max_measured_provider_count",
             "max_measured_tenant_count","max_measured_bundle_bytes",
+            "max_measured_evidence_bytes",
             "max_measured_runtime_ms","max_measured_peak_memory_bytes",
             "min_measured_rows_per_second_milli",
         ):
@@ -144,6 +155,7 @@ class ConservativeOperatingEnvelope:
             "max_measured_provider_count":self.max_measured_provider_count,
             "max_measured_tenant_count":self.max_measured_tenant_count,
             "max_measured_bundle_bytes":self.max_measured_bundle_bytes,
+            "max_measured_evidence_bytes":self.max_measured_evidence_bytes,
             "max_measured_runtime_ms":self.max_measured_runtime_ms,
             "max_measured_peak_memory_bytes":self.max_measured_peak_memory_bytes,
             "min_measured_rows_per_second_milli":self.min_measured_rows_per_second_milli,
@@ -163,15 +175,21 @@ def build_conservative_operating_envelope(
     cells=tuple(cells)
     if not cells: raise ValueError("capacity matrix cannot be empty")
     dimensions={cell.dimension for cell in cells}
-    required={CapacityDimension.BILLING_ROWS,CapacityDimension.PROVIDERS,CapacityDimension.TENANTS}
+    required={
+        CapacityDimension.BILLING_ROWS,
+        CapacityDimension.PROVIDERS,
+        CapacityDimension.TENANTS,
+        CapacityDimension.EVIDENCE_BYTES,
+    }
     if not required.issubset(dimensions):
-        raise ValueError("capacity matrix requires measured rows/providers/tenants dimensions")
+        raise ValueError("capacity matrix requires measured rows/providers/tenants/evidence dimensions")
     identity={
         "schema":1,
         "max_measured_billing_rows":max(c.billing_rows for c in cells),
         "max_measured_provider_count":max(c.provider_count for c in cells),
         "max_measured_tenant_count":max(c.tenant_count for c in cells),
         "max_measured_bundle_bytes":max(c.bundle_bytes for c in cells),
+        "max_measured_evidence_bytes":max(c.evidence_bytes for c in cells),
         "max_measured_runtime_ms":max(c.runtime_ms for c in cells),
         "max_measured_peak_memory_bytes":max(c.peak_memory_bytes for c in cells),
         "min_measured_rows_per_second_milli":min(c.rows_per_second_milli for c in cells),
@@ -184,6 +202,7 @@ def build_conservative_operating_envelope(
         max_measured_provider_count=identity["max_measured_provider_count"],
         max_measured_tenant_count=identity["max_measured_tenant_count"],
         max_measured_bundle_bytes=identity["max_measured_bundle_bytes"],
+        max_measured_evidence_bytes=identity["max_measured_evidence_bytes"],
         max_measured_runtime_ms=identity["max_measured_runtime_ms"],
         max_measured_peak_memory_bytes=identity["max_measured_peak_memory_bytes"],
         min_measured_rows_per_second_milli=identity["min_measured_rows_per_second_milli"],
@@ -195,12 +214,19 @@ def build_conservative_operating_envelope(
 def enforce_operating_envelope(
     envelope: ConservativeOperatingEnvelope, *,
     billing_rows: int, provider_count: int, tenant_count: int,
+    evidence_bytes: int = 1,
 ) -> dict[str,Any]:
-    requested={"billing_rows":billing_rows,"provider_count":provider_count,"tenant_count":tenant_count}
+    requested={
+        "billing_rows":billing_rows,
+        "provider_count":provider_count,
+        "tenant_count":tenant_count,
+        "evidence_bytes":evidence_bytes,
+    }
     limits={
         "billing_rows":envelope.max_measured_billing_rows,
         "provider_count":envelope.max_measured_provider_count,
         "tenant_count":envelope.max_measured_tenant_count,
+        "evidence_bytes":envelope.max_measured_evidence_bytes,
     }
     exceeded=tuple(sorted(k for k,v in requested.items() if v>limits[k]))
     return {
