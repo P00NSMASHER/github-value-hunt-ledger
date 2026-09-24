@@ -388,6 +388,42 @@ class EntityResolutionTests(unittest.TestCase):
                 artifact_manifest=manifest,
             )
 
+    def test_mismatched_artifact_manifest_and_source_registry_fail_closed(self):
+        sources, manifest, cases, case, ref = fixture()
+        mismatched = SourceRegistry()
+        for item in sources.all():
+            mismatched.register(item)
+        mismatched.register(SourceRecord(
+            source_id="SEC:ENTITY:EXTRA",
+            source_type=SourceType.SEC_COMPLAINT,
+            admissibility=SourceAdmissibility.PRIMARY_PUBLIC_RECORD,
+            publisher="SEC",
+            title="Extra source",
+            url="https://www.sec.gov/entity-extra.pdf",
+            publication_date="2015-01-02",
+            sha256=H(b"extra-source"),
+            retrieved_at="2026-09-24T13:03:00Z",
+            public_release_confirmed=True,
+            case_id="CASE-ENTITY",
+        ))
+
+        registry = EntityRegistry()
+        entity = registry.register_entity(
+            CanonicalEntity("issuer:canonical:mismatch", EntityKind.ISSUER, "Alpha Corp.")
+        )
+        binding = IdentifierBinding(
+            "binding:mismatch",
+            entity.entity_id,
+            IdentifierScheme.CIK,
+            "123456",
+            ref,
+        )
+        with self.assertRaisesRegex(ValueError, "manifest/source registry mismatch"):
+            registry.register_binding(
+                binding,
+                source_registry=mismatched,
+                artifact_manifest=manifest,
+            )
 
 if __name__ == "__main__":
     unittest.main()
