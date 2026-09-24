@@ -316,6 +316,13 @@ class ContinuousIngestionTests(unittest.TestCase):
             )
             self.assertEqual(second.new_job_fingerprints, ())
             self.assertEqual(len(second.supersession_required_fingerprints), 1)
+            self.assertEqual(len(second.supersession_candidates), 1)
+            candidate = second.supersession_candidates[0]
+            self.assertIn("AUTHORITY_CHANGED", candidate.change_reasons)
+            self.assertEqual(candidate.as_dict()["review_state"], "REVIEW_REQUIRED")
+            self.assertFalse(candidate.as_dict()["ledger_mutation_allowed"])
+            with self.assertRaises(TypeError):
+                candidate.proposed_authority_hashes["new"] = "0" * 64
             self.assertNotEqual(
                 first.new_job_fingerprints[0],
                 second.supersession_required_fingerprints[0],

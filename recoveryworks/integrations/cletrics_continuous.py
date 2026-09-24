@@ -22,6 +22,10 @@ from .cletrics_registry import (
     CletricsProcessingReceipt,
     CletricsReceiptRegistry,
 )
+from .cletrics_supersession import (
+    CloudSupersessionCandidate,
+    build_cloud_supersession_candidate,
+)
 
 
 _CLETRICS_SECTIONS = ("cloud", "cloud_discount", "cloud_commitment")
@@ -33,6 +37,7 @@ class ContinuousCletricsResult:
     new_job_fingerprints: tuple[str, ...]
     duplicate_job_fingerprints: tuple[str, ...]
     supersession_required_fingerprints: tuple[str, ...]
+    supersession_candidates: tuple[CloudSupersessionCandidate, ...]
     registry_hash: str
     cloud_signals: tuple[CloudSignal, ...]
     savings_report: CloudSavingsReport
@@ -46,6 +51,9 @@ class ContinuousCletricsResult:
             "supersession_required_fingerprints": list(
                 self.supersession_required_fingerprints
             ),
+            "supersession_candidates": [
+                candidate.as_dict() for candidate in self.supersession_candidates
+            ],
             "registry_hash": self.registry_hash,
             "cloud_signals": [signal.as_dict() for signal in self.cloud_signals],
             "financial_surfaces": {
@@ -170,6 +178,7 @@ def run_continuous_cletrics_scan(
     new_fingerprints: list[str] = []
     duplicate_fingerprints: list[str] = []
     supersession_required: list[str] = []
+    supersession_candidates: list[CloudSupersessionCandidate] = []
     pending_receipts: list[tuple[str, str, CletricsCloudBundle, dict[str, str], dict[str, bool]]] = []
     signal_index: dict[str, CloudSignal] = {}
 
@@ -226,7 +235,20 @@ def run_continuous_cletrics_scan(
                 and receipt.period_end == bundle.period_end
             ]
             if prior_scope:
+                if len(prior_scope) != 1:
+                    raise ValueError(
+                        f"{mode}[{job_index}] has ambiguous prior processing receipts"
+                    )
                 supersession_required.append(fingerprint)
+                supersession_candidates.append(
+                    build_cloud_supersession_candidate(
+                        prior_scope[0],
+                        proposed_job_fingerprint=fingerprint,
+                        proposed_bundle=bundle,
+                        proposed_authority_hashes=authority_hashes,
+                        proposed_verification_flags=flags,
+                    )
+                )
                 continue
             new_fingerprints.append(fingerprint)
             keep.append(job)
@@ -308,6 +330,9 @@ def run_continuous_cletrics_scan(
         duplicate_job_fingerprints=tuple(sorted(duplicate_fingerprints)),
         supersession_required_fingerprints=tuple(
             sorted(supersession_required)
+        ),
+        supersession_candidates=tuple(
+            sorted(supersession_candidates, key=lambda item: item.candidate_id)
         ),
         registry_hash=registry_hash,
         cloud_signals=combined_signals,

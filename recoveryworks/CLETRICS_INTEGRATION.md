@@ -219,3 +219,20 @@ A second AWS service with no reviewed contract authority produces
 anomalies, and reconciliation drift remain on the non-money financial surface.
 The acceptance function raises rather than returning success if any signal
 estimate leaks into RecoveryOS validated dollars.
+
+## Supersession candidate boundary (step 3a)
+
+Continuous ingestion now materializes a hash-bound
+`CloudSupersessionCandidate` whenever a same-provider/account/period/mode
+scope has already been processed and the bundle, manifest, reviewed authority,
+or verification flags change.
+
+The candidate binds the prior receipt and proposed processing fingerprint and
+records explicit reason codes: `BUNDLE_CHANGED`, `MANIFEST_CHANGED`,
+`AUTHORITY_CHANGED`, and/or `VERIFICATION_CHANGED`. Its review state is
+`REVIEW_REQUIRED` and it explicitly carries `ledger_mutation_allowed=false`.
+
+This is intentionally only the first half of the supersession workflow. No
+candidate can yet reject the incumbent finding, admit a replacement finding,
+or change report counting. Those review/ledger transitions remain behind the
+next approval gate.

@@ -35,3 +35,13 @@ __all__ += [
     "FocusExportMapping",
     "export_cletrics_focus_snapshot",
 ]
+
+from .cletrics_supersession import (
+    CloudSupersessionCandidate,
+    build_cloud_supersession_candidate,
+)
+
+__all__ += [
+    "CloudSupersessionCandidate",
+    "build_cloud_supersession_candidate",
+]
