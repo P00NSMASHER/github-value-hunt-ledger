@@ -44,6 +44,10 @@ from historical_mnpi.review_queue import (
     decide_review_item,
     render_review_item_markdown,
 )
+from historical_mnpi.source_conflicts import (
+    SourceConflictClaim,
+    SourceConflictRegistry,
+)
 from historical_mnpi.source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -374,6 +378,7 @@ def clean_item():
         case,
         refs,
     )
+    source_conflicts = SourceConflictRegistry()
     item = build_review_item(
         record,
         event=event,
@@ -386,6 +391,7 @@ def clean_item():
         created_by="review-builder",
         entities=entities,
         entity_crosswalks=crosswalks,
+        source_conflicts=source_conflicts,
     )
     return (
         sources,
@@ -399,6 +405,7 @@ def clean_item():
         refs,
         entities,
         crosswalks,
+        source_conflicts,
         item,
     )
 
@@ -415,7 +422,7 @@ def all_checks() -> ReviewChecks:
 
 class ReviewQueueTests(unittest.TestCase):
     def test_clean_item_accepts_candidate_sublocator_and_binds_row_hash(self):
-        *_, record, candidate, _refs, _entities, _crosswalks, item = clean_item()
+        *_, record, candidate, _refs, _entities, _crosswalks, _source_conflicts, item = clean_item()
         self.assertNotEqual(
             candidate.source_ref.proof_hash,
             record.source_ref.proof_hash,
