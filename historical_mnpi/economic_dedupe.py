@@ -361,6 +361,24 @@ def propose_transaction_dedupe(
                     or "side" in matching
                 )
             )
+            option_types = {
+                "CALL_OPTION",
+                "PUT_OPTION",
+                "OPTION_OTHER",
+            }
+            option_contract_requires_identity = (
+                left.instrument_type.value in option_types
+                or right.instrument_type.value in option_types
+            )
+            if option_contract_requires_identity:
+                option_contract_identified = (
+                    "instrument_type" in matching
+                    and "option_strike" in matching
+                    and "option_expiry" in matching
+                )
+                if not option_contract_identified:
+                    exact_anchor_ok = False
+                    reasons.append("OPTION_CONTRACT_NOT_FULLY_IDENTIFIED")
 
             if conflicting:
                 relation = DedupeRelation.DISTINCT
