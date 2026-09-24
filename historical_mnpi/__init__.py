@@ -80,6 +80,16 @@ from .entity_resolution import (
     ResolutionStatus,
 )
 
+from .conflict_policy import (
+    ClaimAssessment,
+    ConflictDisposition,
+    ConflictResolution,
+    FactClaim,
+    FactDomain,
+    SourcePriorityPolicy,
+    resolve_fact_conflict,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -90,6 +100,13 @@ from .source_registry import (
 )
 
 __all__ = [
+    "ClaimAssessment",
+    "ConflictDisposition",
+    "ConflictResolution",
+    "FactClaim",
+    "FactDomain",
+    "SourcePriorityPolicy",
+    "resolve_fact_conflict",
     "CanonicalEntity",
     "CaseEntityResolution",
     "EntityKind",
