@@ -380,6 +380,10 @@ def map_freight_audit_to_recovery(
         disposition = FreightAuditDisposition.EVIDENCE_ONLY
         suppression_reason: str | None = None
         observation: RecoveryObservation | None = None
+        authority_evidence: tuple[EvidenceRef, ...] = ()
+        authority_blockers: tuple[str, ...] = ()
+        authority_resolution_hash: str | None = None
+        matched_rule_hashes: tuple[str, ...] = ()
 
         if finding.money_impact_cents < 0:
             disposition = FreightAuditDisposition.OUT_OF_SCOPE_DIRECTION
@@ -395,10 +399,6 @@ def map_freight_audit_to_recovery(
             verified_sources = proof_complete and all(
                 ref.verified for ref in source_refs
             )
-            authority_evidence: tuple[EvidenceRef, ...] = ()
-            authority_blockers: tuple[str, ...] = ()
-            authority_resolution_hash: str | None = None
-            matched_rule_hashes: tuple[str, ...] = ()
             resolved_rule: RuleRef | None = controlling_rule
             if authority_context is not None:
                 authority_resolution = resolve_freight_authority(
