@@ -85,6 +85,7 @@ def _clean_filename(value: str | None) -> str | None:
 @dataclass(frozen=True)
 class RawArtifactRecord:
     source_id: str
+    source_proof_hash: str
     artifact_id: str
     sha256: str
     size_bytes: int
@@ -99,6 +100,10 @@ class RawArtifactRecord:
     def __post_init__(self) -> None:
         if not self.source_id.strip():
             raise ValueError("source_id is required")
+        source_proof = self.source_proof_hash.strip().lower()
+        if not _SHA256_RE.fullmatch(source_proof):
+            raise ValueError("source_proof_hash must be SHA-256")
+        object.__setattr__(self, "source_proof_hash", source_proof)
         digest = self.sha256.strip().lower()
         if not _SHA256_RE.fullmatch(digest):
             raise ValueError("sha256 must be a lowercase 64-character SHA-256")
@@ -111,8 +116,9 @@ class RawArtifactRecord:
             raise ValueError("size_bytes must be a non-negative integer")
         if not _MEDIA_TYPE_RE.fullmatch(self.media_type):
             raise ValueError("media_type must be a valid type/subtype token")
-        if not self.storage_uri.startswith("cas://sha256/"):
-            raise ValueError("storage_uri must use cas://sha256/")
+        expected_storage_uri = f"cas://sha256/{digest[:2]}/{digest}"
+        if self.storage_uri != expected_storage_uri:
+            raise ValueError("storage_uri must exactly match artifact SHA-256")
         acquired = _dt("acquired_at", self.acquired_at)
         stored = _dt("stored_at", self.stored_at)
         if stored < acquired:
@@ -154,6 +160,7 @@ class RawArtifactRecord:
             "schema": _SCHEMA_VERSION,
             "usage_scope": USAGE_SCOPE,
             "source_id": self.source_id,
+            "source_proof_hash": self.source_proof_hash,
             "artifact_id": self.artifact_id,
             "sha256": self.sha256,
             "size_bytes": self.size_bytes,
@@ -175,19 +182,33 @@ class SourceArtifactRef:
     """Reference from a future normalized fact back to exact retained bytes."""
 
     source_id: str
+    source_proof_hash: str
     artifact_id: str
     artifact_sha256: str
+    artifact_record_proof_hash: str
     locator_kind: SourceLocatorKind
     locator: str
     excerpt_sha256: str | None = None
 
     def __post_init__(self) -> None:
+        source_proof = self.source_proof_hash.strip().lower()
+        if not _SHA256_RE.fullmatch(source_proof):
+            raise ValueError("source_proof_hash must be SHA-256")
+        object.__setattr__(self, "source_proof_hash", source_proof)
         digest = self.artifact_sha256.strip().lower()
         if not _SHA256_RE.fullmatch(digest):
             raise ValueError("artifact_sha256 must be SHA-256")
         object.__setattr__(self, "artifact_sha256", digest)
         if self.artifact_id != "sha256:" + digest:
             raise ValueError("artifact_id does not match artifact_sha256")
+        artifact_proof = self.artifact_record_proof_hash.strip().lower()
+        if not _SHA256_RE.fullmatch(artifact_proof):
+            raise ValueError("artifact_record_proof_hash must be SHA-256")
+        object.__setattr__(
+            self,
+            "artifact_record_proof_hash",
+            artifact_proof,
+        )
         if not self.source_id.strip():
             raise ValueError("source_id is required")
         if not self.locator.strip():
@@ -204,8 +225,10 @@ class SourceArtifactRef:
             "schema": _SCHEMA_VERSION,
             "usage_scope": USAGE_SCOPE,
             "source_id": self.source_id,
+            "source_proof_hash": self.source_proof_hash,
             "artifact_id": self.artifact_id,
             "artifact_sha256": self.artifact_sha256,
+            "artifact_record_proof_hash": self.artifact_record_proof_hash,
             "locator_kind": self.locator_kind.value,
             "locator": self.locator,
             "excerpt_sha256": self.excerpt_sha256,
@@ -253,8 +276,10 @@ class RawArtifactManifest:
         for item in self.artifacts:
             if (
                 item.source_id == ref.source_id
+                and item.source_proof_hash == ref.source_proof_hash
                 and item.artifact_id == ref.artifact_id
                 and item.sha256 == ref.artifact_sha256
+                and item.proof_hash == ref.artifact_record_proof_hash
             ):
                 return item
         raise ValueError("source artifact reference is not in manifest")
@@ -293,6 +318,7 @@ class LocalContentAddressedArtifactStore:
 
     def retain(
         self,
+        registry: SourceRegistry,
         source: SourceRecord,
         raw_bytes: bytes,
         *,
@@ -301,6 +327,13 @@ class LocalContentAddressedArtifactStore:
         stored_at: str,
         original_filename: str | None = None,
     ) -> RawArtifactRecord:
+        if not isinstance(registry, SourceRegistry):
+            raise TypeError("registry must be a SourceRegistry")
+        registered = registry.get(source.source_id)
+        if registered.proof_hash != source.proof_hash:
+            raise ValueError(
+                "source record does not match the registered source proof"
+            )
         if not isinstance(raw_bytes, bytes):
             raise TypeError("raw_bytes must be bytes")
         if source.public_release_confirmed is not True:
@@ -316,6 +349,7 @@ class LocalContentAddressedArtifactStore:
         # A rejected ingestion attempt must not leave bytes behind.
         record = RawArtifactRecord(
             source_id=source.source_id,
+            source_proof_hash=source.proof_hash,
             artifact_id="sha256:" + digest,
             sha256=digest,
             size_bytes=len(raw_bytes),
@@ -399,6 +433,8 @@ def freeze_raw_artifact_manifest(
             raise ValueError(
                 "raw artifact references source not present in source registry"
             )
+        if artifact.source_proof_hash != source.proof_hash:
+            raise ValueError("raw artifact source proof does not match source registry")
         if artifact.sha256 != source.sha256:
             raise ValueError("raw artifact hash does not match source registry")
         if _dt("artifact.stored_at", artifact.stored_at) > _dt(
@@ -449,8 +485,12 @@ def verify_raw_artifact_manifest(
             raise ValueError("duplicate source_id in raw artifact manifest")
         seen.add(artifact.source_id)
         source = registered.get(artifact.source_id)
-        if source is None or source.sha256 != artifact.sha256:
-            raise ValueError("raw artifact/source registry hash mismatch")
+        if (
+            source is None
+            or source.proof_hash != artifact.source_proof_hash
+            or source.sha256 != artifact.sha256
+        ):
+            raise ValueError("raw artifact/source registry proof mismatch")
 
     if seen != set(registered):
         raise ValueError("raw artifact manifest source set mismatch")
