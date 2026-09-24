@@ -298,3 +298,23 @@ issuer. A CIK likewise cannot be silently bound to two canonical issuers.
 
 Case-local identity resolution must be supported by retained artifacts linked to
 the canonical case. Discovery-only sources cannot establish a durable identity.
+
+
+## Step 10 — source priority and contradiction preservation
+
+Competing factual claims are retained individually and evaluated with a
+fact-domain-aware source-priority policy.
+
+Examples:
+
+- final judgments and plea/admission records dominate legal-status claims;
+- issuer/public regulatory release artifacts dominate publication-boundary facts;
+- judgments/exhibits outrank complaint allegations for transaction details;
+- primary public records outrank academic reconstructions.
+
+A higher-priority claim does not delete lower-priority claims. The resolution
+records every assessed claim and every contradictory claim ID.
+
+If equal-priority controlling sources disagree, the fact remains
+`AMBIGUOUS` with no selected value. The system therefore cannot resolve a
+top-tier contradiction simply by insertion order.
