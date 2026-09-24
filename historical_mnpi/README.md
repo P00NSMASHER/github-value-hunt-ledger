@@ -202,3 +202,35 @@ issuer press releases, and public regulatory releases.
 Where both sides have exact timestamps (or both are date-only), chronology is
 validated so the private-information boundary cannot follow the public release.
 Cross-precision cases remain coarse rather than being guessed.
+
+
+## Step 7 — source-specific candidate extractors
+
+Extractors are deliberately **candidate-only**. They cannot create canonical
+transactions/events or approve their own output.
+
+Implemented adapters include:
+
+- SEC HTML text extraction;
+- SEC PDF page-text candidate extraction;
+- DOJ/court page-text candidate extraction;
+- academic CSV and ZIP/CSV extraction;
+- a dedicated `hacked_earnings_jfe` `TimeOfFirstTrade.csv` adapter using the
+  real public headers `PERMNO,SYMBOL,GVKEY,TimeOfFirstTrade`.
+
+Each candidate preserves:
+
+- exact source/artifact proof chain;
+- source locator;
+- extractor ID/version;
+- raw excerpt hash;
+- parsed field values and per-field parse state;
+- warnings about important limitations.
+
+PDF adapters consume separately supplied page text and explicitly mark it as
+`PDF_TEXT_LAYER_NOT_RAW_VISUAL_VERIFICATION`; they do not OCR or claim visual
+verification of the underlying PDF.
+
+The hacked-earnings adapter explicitly marks its output as academic
+reconstruction, retains the source's timezone ambiguity, and warns that
+`TimeOfFirstTrade` is not complete trade economics.
