@@ -357,18 +357,29 @@ def propose_transaction_dedupe(
             security_identity_ok = (
                 "ticker_at_trade" in matching
             )
+            currency_required = (
+                left.currency is not None or right.currency is not None
+            )
+            currency_ok = (
+                not currency_required or "currency" in matching
+            )
             exact_anchor_ok = (
                 "quantity" in strong_matches
                 and (
                     "execution_price" in strong_matches
                     or "trade_amount" in strong_matches
                 )
-                and (
-                    "instrument_type" in matching
-                    or "side" in matching
-                )
+                and "instrument_type" in matching
+                and "side" in matching
                 and security_identity_ok
+                and currency_ok
             )
+            if not currency_ok:
+                reasons.append("CURRENCY_NOT_CONFIRMED")
+            if "instrument_type" not in matching:
+                reasons.append("INSTRUMENT_TYPE_NOT_CONFIRMED")
+            if "side" not in matching:
+                reasons.append("TRADE_SIDE_NOT_CONFIRMED")
             if not security_identity_ok:
                 reasons.append("SECURITY_IDENTIFIER_NOT_CONFIRMED")
             option_types = {
