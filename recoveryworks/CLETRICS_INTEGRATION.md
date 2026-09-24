@@ -499,3 +499,9 @@ The CFO section exposes pricing only as the existing internal hypothesis and suc
 The external-environment activation boundary now has provider-neutral contracts for AWS, Azure, and GCP. A verified credential-scope attestation records only principal identity, account scope, and read/discovery permissions; credentials themselves cannot be embedded and mutation-capable permissions fail closed.
 
 A separate verified environment-state discovery binds the current release/image and summarized environment state. The adapter supports only DISCOVER_STATE, VALIDATE_CREDENTIAL_SCOPE, and SIMULATE_DEPLOYMENT. It stores no credentials, exposes no mutation operation, and records no provider API call. Simulation compares the discovered state with the exact ProductionAdmissionGate/release and returns SIMULATION_ONLY with the proposed release/image transition; no external environment is changed.
+
+## External activation handoff and receipt verification (step 21b)
+
+A SIMULATION_ONLY activation can now be converted into a short-lived credential-free handoff for a named separate deployer, but only after a second fresh verified environment discovery proves the environment has not drifted since simulation. The handoff binds the exact simulation, release, ProductionAdmissionGate, credential-scope proof, provider/account/environment, current state, target image/source commit, deployer, and expiry window.
+
+A downstream activation receipt is accepted only when it binds that exact handoff and a verified post-activation environment discovery proves the target release/image. RecoveryWorks still contains no provider deployment operation and stores no credentials; verified completion yields ACTIVATION_VERIFIED.
