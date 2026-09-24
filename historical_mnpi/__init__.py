@@ -34,6 +34,14 @@ from .transaction_model import (
     verify_transaction_provenance,
 )
 
+from .event_model import (
+    BoundaryPrecision,
+    EventRegistry,
+    InformationEvent,
+    TemporalBoundary,
+    verify_event_provenance,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -44,6 +52,11 @@ from .source_registry import (
 )
 
 __all__ = [
+    "BoundaryPrecision",
+    "EventRegistry",
+    "InformationEvent",
+    "TemporalBoundary",
+    "verify_event_provenance",
     "FactStatus",
     "HistoricalTransaction",
     "InstrumentType",
