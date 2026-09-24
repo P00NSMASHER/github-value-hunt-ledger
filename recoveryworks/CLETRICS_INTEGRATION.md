@@ -563,3 +563,9 @@ The managed tenant registry now propagates beyond pilot execution. Production ru
 The tenant-bound job registry now supports lease heartbeat/renewal, cancellation, structured failure receipts, and restart recovery through later lease attempts. Local execution is implemented only for CONTINUOUS_ASSURANCE, PRIVATE_BACKUP, and previously authorized CLOUD_DIAGNOSTIC jobs; each runtime payload must hash to the preplanned job payload proof before any work begins.
 
 The worker calls the existing local assurance evaluator/writer, private backup creator, or authorized diagnostic runner, records the exact result proof in the job registry, and remains idempotent after completion. It contains no provider API, cloud mutation, claim submission, or other external-action path.
+
+## Chaos/recovery production acceptance (step 28)
+
+A deterministic production acceptance suite now injects and verifies six failure/recovery scenarios: stale worker lease recovery, corrupted private job-registry state, atomic write failure, cross-tenant path collision, semantic restore after simulated process loss, and isolated multi-provider jobs. The tests exercise the actual lease registry, private atomic writer failure path, tenant registry, backup/restore verifier, and multi-cloud local execution.
+
+A proof-bound acceptance report can only be created when every required scenario has a passing evidence result and records external_actions_performed=false. Corrupted state, partial-write risk, tenant collisions, or failed semantic restore therefore cannot be papered over by the report layer.
