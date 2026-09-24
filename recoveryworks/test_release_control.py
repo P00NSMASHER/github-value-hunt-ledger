@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -239,8 +240,98 @@ class ReleaseControlTests(unittest.TestCase):
                 rollback=rollback,
                 gate=gate,
                 directory=root / "private" / "release",
+                adversarial_certification=certification,
+            )
+            self.assertEqual(len(paths), 5)
+            self.assertEqual(paths[-1].name, "adversarial-certification.json")
+            persisted = json.loads(paths[-1].read_text(encoding="utf-8"))
+            self.assertEqual(persisted["proof_hash"], certification.proof_hash)
+            self.assertEqual(
+                persisted["source_revision"], current.source_commit
             )
             self.assertTrue(all(private_permissions_verified(path) for path in paths))
+
+    def test_production_release_package_requires_exact_certification_artifact(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            image = "registry.example/recoveryworks@sha256:" + "6" * 64
+            deployment = self.deployment(root, image)
+            build = self.build_manifest(current_repository_revision())
+            certification = production_certification(build)
+            release = build_release_manifest(
+                version="1.0.0",
+                build_manifest=build,
+                deployment=deployment,
+                container_image_ref=image,
+                created_at="2026-09-24T13:00:00Z",
+            )
+            previous_image = "registry.example/recoveryworks@sha256:" + "5" * 64
+            previous = build_release_manifest(
+                version="0.9.0",
+                build_manifest=self.build_manifest("b" * 40),
+                deployment=self.deployment(root / "previous", previous_image),
+                container_image_ref=previous_image,
+                created_at="2026-09-23T13:00:00Z",
+            )
+            rollback = build_rollback_manifest(
+                release,
+                previous,
+                reason="Known-good rollback target.",
+                created_at="2026-09-24T13:05:00Z",
+            )
+            approvals = (
+                approve_release(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approver_id="release-manager",
+                    role="RELEASE_MANAGER",
+                    approved_at="2026-09-24T13:06:00Z",
+                ),
+                approve_release(
+                    release,
+                    environment=ReleaseEnvironment.PRODUCTION,
+                    approver_id="operations-owner",
+                    role="OPERATIONS_OWNER",
+                    approved_at="2026-09-24T13:07:00Z",
+                ),
+            )
+            gate = build_environment_promotion_gate(
+                release,
+                environment=ReleaseEnvironment.PRODUCTION,
+                approvals=approvals,
+                health_check=check_production_health(deployment),
+                readiness_check=check_production_readiness(deployment),
+                rollback_manifest=rollback,
+                gate_created_at="2026-09-24T13:08:00Z",
+                adversarial_certification=certification,
+            )
+            with self.assertRaisesRegex(
+                ValueError, "requires adversarial certification"
+            ):
+                write_release_control_artifacts(
+                    release=release,
+                    approvals=approvals,
+                    rollback=rollback,
+                    gate=gate,
+                    directory=root / "missing-cert",
+                )
+            object.__setattr__(
+                certification,
+                "source_revision",
+                "f" * 40,
+            )
+            with self.assertRaisesRegex(
+                ValueError,
+                "does not bind promotion gate|source revision mismatch",
+            ):
+                write_release_control_artifacts(
+                    release=release,
+                    approvals=approvals,
+                    rollback=rollback,
+                    gate=gate,
+                    directory=root / "mismatched-cert",
+                    adversarial_certification=certification,
+                )
 
     def test_production_gate_fails_without_second_approver_or_rollback(self):
         with tempfile.TemporaryDirectory() as d:
