@@ -33,8 +33,9 @@ INVOICE_ROLE = "invoice_charges"
 METER_ROLE = "meter_usage"
 ANOMALY_ROLE = "anomaly_signals"
 RECONCILIATION_ROLE = "reconciliation_signals"
+SAVINGS_ROLE = "savings_signals"
 _REQUIRED_ROLES = {INVOICE_ROLE, METER_ROLE}
-_ALLOWED_ROLES = _REQUIRED_ROLES | {ANOMALY_ROLE, RECONCILIATION_ROLE}
+_ALLOWED_ROLES = _REQUIRED_ROLES | {ANOMALY_ROLE, RECONCILIATION_ROLE, SAVINGS_ROLE}
 _GIT_SHA1_RE = re.compile(r"[0-9a-f]{40}")
 _IMAGE_DIGEST_RE = re.compile(r"sha256:[0-9a-f]{64}")
 _CURRENCY_RE = re.compile(r"[A-Z]{3}")
@@ -660,6 +661,88 @@ def _load_reconciliation_signals(
         )
     return tuple(result)
 
+
+def _load_savings_signals(
+    raw: bytes,
+    *,
+    bundle_name: str,
+    manifest: Mapping[str, Any],
+    entry: CletricsBundleEntry,
+) -> tuple[CloudSignal, ...]:
+    fieldnames, rows = _decode_csv(raw, label=entry.path)
+    required = (
+        "Detected_At",
+        "Provider",
+        "Account_ID",
+        "Service_ID",
+        "Savings_Category",
+        "Estimated_Savings",
+        "Recommendation",
+        "Remediation_Action",
+    )
+    _require_columns(fieldnames, required, label=entry.path)
+    result: list[CloudSignal] = []
+    for row_number, row in enumerate(rows, start=2):
+        provider = (row.get("Provider") or "").strip() or str(manifest["provider"])
+        account_id = (row.get("Account_ID") or "").strip() or str(
+            manifest["billing_account_id"]
+        )
+        service_id = _row_value(row, "Service_ID", row_number=row_number)
+        detected_at = _signal_timestamp(
+            _row_value(row, "Detected_At", row_number=row_number),
+            row_number=row_number,
+        )
+        amount = _optional_decimal(row, "Estimated_Savings", row_number=row_number)
+        if amount is None or amount < 0:
+            raise ValueError(
+                f"row {row_number}: Estimated_Savings must be a non-negative numeric"
+            )
+        amount_cents = int(
+            (amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+        )
+        result.append(
+            CloudSignal(
+                signal_id=_signal_id(
+                    (row.get("Signal_ID") or ""),
+                    signal_type=CloudSignalType.SAVINGS_OPPORTUNITY,
+                    provider=provider,
+                    account_id=account_id,
+                    service_id=service_id,
+                    detected_at=detected_at,
+                    source_hash=entry.sha256,
+                    row_number=row_number,
+                ),
+                signal_type=CloudSignalType.SAVINGS_OPPORTUNITY,
+                provider=provider,
+                account_id=account_id,
+                service_id=service_id,
+                detected_at=detected_at,
+                detection_method="cletrics_savings_opportunity",
+                source_hash=entry.sha256,
+                source_locator=(
+                    f"bundle://{bundle_name}/{entry.path}#row={row_number}"
+                ),
+                resource_id=(row.get("Resource_ID") or "").strip() or None,
+                region=(row.get("Region") or "").strip() or None,
+                estimated_impact_cents=amount_cents,
+                confidence=(row.get("Confidence") or "").strip() or None,
+                metadata={
+                    "savings_category": _row_value(
+                        row, "Savings_Category", row_number=row_number
+                    ),
+                    "recommendation": _row_value(
+                        row, "Recommendation", row_number=row_number
+                    ),
+                    "remediation_action": _row_value(
+                        row, "Remediation_Action", row_number=row_number
+                    ),
+                    "cletrics_source_role": SAVINGS_ROLE,
+                    "estimated_amount_is_non_authoritative": True,
+                },
+            )
+        )
+    return tuple(result)
+
 def load_cletrics_bundle(
     path: str | Path,
     *,
@@ -866,6 +949,15 @@ def load_cletrics_bundle(
                     bundle_name=source.name,
                     manifest=normalized_manifest,
                     entry=by_role[RECONCILIATION_ROLE],
+                )
+            )
+        if SAVINGS_ROLE in by_role:
+            signal_rows.extend(
+                _load_savings_signals(
+                    entry_raw[SAVINGS_ROLE],
+                    bundle_name=source.name,
+                    manifest=normalized_manifest,
+                    entry=by_role[SAVINGS_ROLE],
                 )
             )
         signal_index: dict[str, CloudSignal] = {}
