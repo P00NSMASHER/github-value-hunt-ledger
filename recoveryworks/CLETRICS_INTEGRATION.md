@@ -443,3 +443,9 @@ Environment promotion gates require passing health/readiness checks for the exac
 ### Production runtime closure
 
 The reproducible container manifest now records the two source roots required by the current RecoveryWorks runtime: recoveryworks and freight. The production Dockerfile copies both roots, compiles both, and smoke-imports the pilot, deployment, observability, and release-control entrypoints. The container still has no third-party Python runtime dependencies beyond the digest-pinned Python base image.
+
+## Governed release deployment handoff (step 15b)
+
+A production-ready promotion gate can now be converted into a credential-free handoff for a named separate deployer. The handoff binds the exact release, promotion-gate proof, environment, digest-pinned image, source commit, deployment proof, deployer identity, and authorization window. RecoveryOS still cannot perform or claim the deployment itself.
+
+A downstream deployment receipt is accepted only when it binds that exact handoff and proves the exact release/image/source/deployment proof within the authorization window. A separately verified post-deployment environment snapshot must confirm the same release plus passing health/readiness receipts. The result is DEPLOYMENT_VERIFIED, not an internal deployment action.
