@@ -58,6 +58,10 @@ def _sha(value: Any) -> str:
     return hashlib.sha256(_json(value).encode("utf-8")).hexdigest()
 
 
+def _alias_key(value: str) -> str:
+    return " ".join(value.casefold().strip().split())
+
+
 def _normalize_name(value: str) -> str:
     return " ".join(
         token
@@ -265,11 +269,11 @@ class EntityCanonicalizer:
             decision = "KEEP_SEPARATE"
         else:
             score = (
-                (0.45 if hard_matches else 0.0)
-                + (0.35 if normalized_equal else 0.0)
-                + 0.20 * alias_overlap
-                + 0.08 * description_overlap
-                + 0.12 * neighbor_overlap
+                (0.82 if hard_matches else 0.0)
+                + (0.45 if normalized_equal else 0.0)
+                + 0.30 * alias_overlap
+                + 0.10 * description_overlap
+                + 0.15 * neighbor_overlap
             )
             score = min(1.0, score)
             if hard_matches:
@@ -983,13 +987,13 @@ class EntityCanonicalizer:
                 *self._alias_displays(node["id"]),
             ):
                 display = str(display).strip()
-                norm = _normalize_name(display)
+                norm = _alias_key(display)
                 if not norm:
                     continue
                 current = aliases.get(norm)
                 if current is None or (len(display), display) > (len(current), current):
                     aliases[norm] = display
-        canonical_norm = _normalize_name(canonical_label)
+        canonical_norm = _alias_key(canonical_label)
         if canonical_norm:
             aliases.setdefault(canonical_norm, canonical_label)
         return aliases
@@ -1025,7 +1029,7 @@ class EntityCanonicalizer:
             for candidate in canonical_rows:
                 if candidate["id"] in member_ids:
                     continue
-                if _normalize_name(candidate["canonical_key"]) == alias_norm:
+                if _alias_key(candidate["canonical_key"]) == alias_norm:
                     raise CanonicalizationError(
                         f"alias {alias_display!r} collides with another canonical key"
                     )
