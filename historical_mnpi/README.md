@@ -338,6 +338,12 @@ The comparator emits one of:
 - `DISTINCT`
 - `INSUFFICIENT`
 
+`EXACT_SAME` requires the same exact timestamp plus multiple matching economic
+anchors. Date-only or overlapping date-range records can never be promoted to
+`EXACT_SAME` automatically, even when quantity/price/side/instrument match,
+because multiple economically identical fills can occur on the same day. Those
+remain `POSSIBLE_SAME` and require explicit review.
+
 A proposal does not itself merge rows. `SAME_TRANSACTION` requires an explicit
 dedupe decision and cannot be recorded for a `DISTINCT` or `INSUFFICIENT`
 proposal.
