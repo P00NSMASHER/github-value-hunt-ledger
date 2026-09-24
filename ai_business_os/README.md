@@ -75,7 +75,9 @@ The eighth upgrade makes proof structure explicit and persistent:
 - UNKNOWN means no relevant evidence exists, not that the claim is false;
 - every truth receipt binds the exact claim hash, evaluation time, findings, and evidence-set hash;
 - next-best-evidence planning uses deterministic counterfactual proof gain, not invented success probabilities;
-- hypothetical planning evidence is never inserted into the real evidence ledger;
+- contested obligations switch to explicit conflict-resolution planning instead of accumulating more supportive evidence;
+- conflict-resolution actions must target the exact contradictory artifact they intend to adjudicate;
+- hypothetical planning evidence and simulated conflict resolution never mutate the real evidence ledger;
 - duplicate source-independence groups are not treated as independent corroboration;
 - next-evidence recommendations are invalidated when the real evidence set changes;
 - evidence acquisition requests pass through the Step-6 governance layer before any external action;
