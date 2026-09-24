@@ -140,18 +140,23 @@ class PilotExecutionJournal:
         previous = None
         events = []
         for index, row in enumerate(envelope.get("events", []), start=1):
-            event = PilotExecutionEvent(
-                sequence=row["sequence"],
-                engagement_id=row["engagement_id"],
-                kickoff_gate_proof_hash=row["kickoff_gate_proof_hash"],
-                state=PilotExecutionState(row["state"]),
-                actor_id=row["actor_id"],
-                occurred_at=row["occurred_at"],
-                evidence_hashes=tuple(row["evidence_hashes"]),
-                note=row["note"],
-                previous_hash=row.get("previous_hash"),
-                event_hash=row["event_hash"],
-            )
+            if not isinstance(row, dict):
+                raise ValueError("pilot execution row is malformed")
+            try:
+                event = PilotExecutionEvent(
+                    sequence=row["sequence"],
+                    engagement_id=row["engagement_id"],
+                    kickoff_gate_proof_hash=row["kickoff_gate_proof_hash"],
+                    state=PilotExecutionState(row["state"]),
+                    actor_id=row["actor_id"],
+                    occurred_at=row["occurred_at"],
+                    evidence_hashes=tuple(row["evidence_hashes"]),
+                    note=row["note"],
+                    previous_hash=row.get("previous_hash"),
+                    event_hash=row["event_hash"],
+                )
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ValueError("pilot execution row is malformed") from exc
             if event.sequence != index:
                 raise ValueError("pilot execution sequence gap")
             event.verify(previous)

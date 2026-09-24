@@ -81,7 +81,7 @@ class PilotExecutionLifecycleTests(unittest.TestCase):
                     evidence_hashes=("b"*64,),note="skip")
             raw=path.read_text(encoding="utf-8").replace("kickoff","tampered")
             path.write_text(raw,encoding="utf-8")
-            with self.assertRaisesRegex(ValueError,"hash|state"):
+            with self.assertRaisesRegex(ValueError,"hash|state|malformed"):
                 journal.events()
 
 
