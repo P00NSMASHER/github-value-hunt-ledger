@@ -15,6 +15,10 @@ from recoveryworks.models import canonical_hash, normalize_sha256, normalize_utc
 from recoveryworks.private_io import atomic_private_write, private_permissions_verified
 from recoveryworks.production_observability import ProductionRunHistoryStore
 from recoveryworks.store import LocalBundleStore
+from recoveryworks.tenant_isolation import (
+    bind_managed_tenant_artifact,
+    find_tenant_registry,
+)
 
 
 _REQUIRED_ROLES = (
@@ -168,6 +172,34 @@ def create_production_backup(
     if rpo_seconds < 0 or rpo_seconds > policy.max_rpo_seconds:
         raise ValueError("backup exceeds configured RPO")
 
+    managed_registry = None
+    managed_identity = None
+    for source_path in sources.values():
+        candidate = find_tenant_registry(source_path)
+        if candidate is None:
+            continue
+        if managed_registry is None:
+            managed_registry = candidate
+        elif candidate.path.resolve() != managed_registry.path.resolve():
+            raise ValueError("backup sources span multiple tenant registries")
+    if managed_registry is not None:
+        tenant_ids = {
+            managed_registry.tenant_id_for_path(source_path)
+            for source_path in sources.values()
+        }
+        if len(tenant_ids) != 1:
+            raise ValueError("backup sources span multiple tenants")
+        managed_identity = managed_registry.identity_for_path(
+            next(iter(sources.values()))
+        )
+        managed_registry.reserve_paths(
+            managed_identity,
+            artifact_paths={
+                "production_backup_archive": archive_path,
+                "production_backup_manifest": manifest_path,
+            },
+        )
+
     payloads: dict[str, bytes] = {}
     artifacts: list[ProductionBackupArtifact] = []
     for role in _REQUIRED_ROLES:
@@ -227,6 +259,25 @@ def create_production_backup(
             + "\n"
         ).encode("utf-8"),
     )
+    if managed_registry is not None and managed_identity is not None:
+        bind_managed_tenant_artifact(
+            managed_registry,
+            managed_identity,
+            artifact_type="production_backup_archive",
+            artifact_key=manifest.backup_id,
+            proof_hash=manifest.archive_sha256,
+            path=archive_path,
+            bound_at=created,
+        )
+        bind_managed_tenant_artifact(
+            managed_registry,
+            managed_identity,
+            artifact_type="production_backup_manifest",
+            artifact_key=manifest.backup_id,
+            proof_hash=manifest.proof_hash,
+            path=manifest_path,
+            bound_at=created,
+        )
     return manifest
 
 

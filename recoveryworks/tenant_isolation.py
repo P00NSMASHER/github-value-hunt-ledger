@@ -121,6 +121,14 @@ class TenantBindingRegistry:
             "namespace": identity.namespace,
             "tenant_proof_hash": identity.proof_hash,
         }
+        for other_tenant_id, other in tenants.items():
+            if (
+                other_tenant_id != identity.tenant_id
+                and other.get("client_id") == identity.client_id
+            ):
+                raise ValueError(
+                    "client_id is already bound to a different tenant identity"
+                )
         if existing is None:
             tenants[identity.tenant_id] = row
             return
@@ -210,6 +218,42 @@ class TenantBindingRegistry:
         if row is None or row["tenant_id"] != identity.tenant_id:
             raise ValueError("artifact proof is not bound to tenant")
 
+    def identity_for_client_id(self, client_id: str) -> TenantIdentity:
+        client = _text("client_id", client_id)
+        payload = self._read()
+        matches = [
+            (tenant_id, row)
+            for tenant_id, row in payload.get("tenants", {}).items()
+            if row.get("client_id") == client
+        ]
+        if len(matches) != 1:
+            raise ValueError("client_id does not resolve to exactly one tenant")
+        tenant_id, row = matches[0]
+        return TenantIdentity(
+            tenant_id=tenant_id,
+            client_id=client,
+            namespace=row["namespace"],
+            created_at="1970-01-01T00:00:00Z",
+        )
+
+    def tenant_id_for_path(self, path: str | Path) -> str:
+        payload = self._read()
+        row = payload.get("paths", {}).get(str(Path(path).resolve()))
+        if row is None:
+            raise ValueError("artifact path is not bound to any tenant")
+        return row["tenant_id"]
+
+    def identity_for_path(self, path: str | Path) -> TenantIdentity:
+        tenant_id = self.tenant_id_for_path(path)
+        payload = self._read()
+        row = payload["tenants"][tenant_id]
+        return TenantIdentity(
+            tenant_id=tenant_id,
+            client_id=row["client_id"],
+            namespace=row["namespace"],
+            created_at="1970-01-01T00:00:00Z",
+        )
+
     def state_hash(self) -> str | None:
         if not self.path.exists():
             return None
@@ -267,5 +311,42 @@ def bind_managed_tenant_artifact(
         artifact_key=artifact_key,
         proof_hash=proof_hash,
         path=path,
+        bound_at=bound_at,
+    )
+
+
+def find_tenant_registry(start: str | Path) -> TenantBindingRegistry | None:
+    path = Path(start).resolve()
+    cursor = path if path.is_dir() else path.parent
+    for parent in (cursor, *cursor.parents):
+        candidate = parent / ".recoveryworks-tenant-bindings.json"
+        if candidate.is_file():
+            return TenantBindingRegistry(candidate)
+    return None
+
+
+def bind_existing_tenant_output(
+    *,
+    source_path: str | Path,
+    output_path: str | Path,
+    artifact_type: str,
+    artifact_key: str,
+    proof_hash: str,
+    bound_at: str,
+) -> TenantArtifactBinding | None:
+    registry = find_tenant_registry(source_path)
+    if registry is None:
+        return None
+    identity = registry.identity_for_path(source_path)
+    registry.reserve_paths(
+        identity,
+        artifact_paths={artifact_type: output_path},
+    )
+    return registry.bind_artifact(
+        identity,
+        artifact_type=artifact_type,
+        artifact_key=artifact_key,
+        proof_hash=proof_hash,
+        path=output_path,
         bound_at=bound_at,
     )

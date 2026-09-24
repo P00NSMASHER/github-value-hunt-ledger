@@ -23,6 +23,10 @@ from recoveryworks.models import (
     normalize_utc_timestamp,
 )
 from recoveryworks.private_io import atomic_private_write, private_file_lock, private_permissions_verified
+from recoveryworks.tenant_isolation import (
+    bind_managed_tenant_artifact,
+    find_tenant_registry,
+)
 
 
 class CustomerDataClassification(str, Enum):
@@ -490,6 +494,16 @@ def export_customer_data(
         info.external_attr = 0o600 << 16
         archive.writestr(info, manifest_raw)
     raw = buffer.getvalue()
+    managed_registry = find_tenant_registry(root)
+    managed_identity = None
+    if managed_registry is not None:
+        managed_identity = managed_registry.identity_for_client_id(
+            inventory.customer_id
+        )
+        managed_registry.reserve_paths(
+            managed_identity,
+            artifact_paths={"customer_data_export": archive_path},
+        )
     atomic_private_write(Path(archive_path), raw)
     exported = normalize_utc_timestamp("exported_at", exported_at)
     archive_hash = hashlib.sha256(raw).hexdigest()
@@ -500,7 +514,7 @@ def export_customer_data(
         "object_ids":[x.object_id for x in inventory.objects],
         "exported_at":exported,"customer_safe":True,
     }
-    return CustomerDataExportReceipt(
+    receipt = CustomerDataExportReceipt(
         export_id="customer-data-export:" + canonical_hash(identity),
         customer_id=inventory.customer_id,
         inventory_proof_hash=inventory.proof_hash,
@@ -509,6 +523,17 @@ def export_customer_data(
         exported_at=exported,
         customer_safe=True,
     )
+    if managed_registry is not None and managed_identity is not None:
+        bind_managed_tenant_artifact(
+            managed_registry,
+            managed_identity,
+            artifact_type="customer_data_export",
+            artifact_key=receipt.export_id,
+            proof_hash=receipt.proof_hash,
+            path=archive_path,
+            bound_at=exported,
+        )
+    return receipt
 
 
 @dataclass(frozen=True)

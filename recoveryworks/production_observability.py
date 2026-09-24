@@ -671,6 +671,13 @@ class ProductionRunHistoryStore:
                 "head_hash": entry.entry_hash,
                 "entries": [asdict(item) for item in current],
             }
+            registry = find_tenant_registry(self.path)
+            if registry is not None:
+                identity = registry.identity_for_client_id(manifest.client_id)
+                registry.reserve_paths(
+                    identity,
+                    artifact_paths={"production_run_history": self.path},
+                )
             atomic_private_write(
                 self.path,
                 (
@@ -683,6 +690,16 @@ class ProductionRunHistoryStore:
                     + "\n"
                 ).encode("utf-8"),
             )
+            if registry is not None:
+                bind_managed_tenant_artifact(
+                    registry,
+                    identity,
+                    artifact_type="production_run_history",
+                    artifact_key=manifest.run_id,
+                    proof_hash=entry.entry_hash,
+                    path=self.path,
+                    bound_at=recorded_at,
+                )
             return entry.entry_hash
 
 
