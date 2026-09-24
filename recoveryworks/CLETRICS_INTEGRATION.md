@@ -603,3 +603,9 @@ Internal service-level snapshots now have private JSON/Markdown reporting with q
 ### Real multi-axis capacity runner
 
 The capacity matrix now has an executable measured runner rather than only accepting preconstructed matrix cells. It performs real local RecoveryWorks pilots for multiple billing-row counts, AWS/Azure/GCP provider counts, isolated tenant counts, and evidence-size scenarios; each cell records measured runtime, traced peak memory, aggregate evidence/bundle bytes, throughput, and exact pilot deployment proof hashes. The conservative operating envelope is derived only from those observed cells, with measured_only=true, extrapolation_used=false, and external_sla_claimed=false.
+
+## Authoritative pilot prelaunch gate and brief (step 31b)
+
+RecoveryWorks now has a proof-bound commercial prelaunch gate that directly binds the exact internal commercial package, simulated operator rehearsal, customer-safe diligence package, internal service-level snapshot, measured capacity envelope, and proposed capacity demand. READY means only that a buyer-safe prelaunch handoff may be prepared; customer data, kickoff, outreach, cloud mutation, recovery claims, and external actions remain unauthorized.
+
+The derived launch brief stores the authoritative gate id/proof hash and cannot override the gate. Capacity overload, blocked/throttled service state, high diligence gaps, unsupported commercial scope, or failed operator boundaries block the handoff; pressure/medium diligence gaps remain explicit conditions. This avoids the older pattern where a downstream packet could be built from an unproven caller-supplied decision.
