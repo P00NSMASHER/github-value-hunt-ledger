@@ -15,7 +15,12 @@ import re
 from typing import Iterable
 
 from .raw_artifacts import RawArtifactManifest, SourceArtifactRef
-from .source_registry import SourceAdmissibility, SourceRegistry, canonical_hash
+from .source_registry import (
+    SourceAdmissibility,
+    SourceRegistry,
+    SourceType,
+    canonical_hash,
+)
 
 
 _ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$")
@@ -65,6 +70,43 @@ class CaseArtifactRole(str, Enum):
     ACADEMIC_RECONSTRUCTION = "ACADEMIC_RECONSTRUCTION"
     PUBLIC_RELEASE = "PUBLIC_RELEASE"
     OTHER = "OTHER"
+
+
+_ROLE_SOURCE_TYPES = {
+    CaseArtifactRole.COMPLAINT: frozenset({SourceType.SEC_COMPLAINT}),
+    CaseArtifactRole.INDICTMENT: frozenset({SourceType.DOJ_INDICTMENT}),
+    CaseArtifactRole.PLEA_OR_STATEMENT: frozenset({
+        SourceType.DOJ_PLEA_OR_STATEMENT,
+    }),
+    CaseArtifactRole.JUDGMENT: frozenset({SourceType.COURT_JUDGMENT}),
+    CaseArtifactRole.EXHIBIT: frozenset({SourceType.COURT_EXHIBIT}),
+    CaseArtifactRole.LITIGATION_RELEASE: frozenset({
+        SourceType.SEC_LITIGATION_RELEASE,
+    }),
+    CaseArtifactRole.ADMIN_ORDER: frozenset({SourceType.SEC_ADMIN_ORDER}),
+    CaseArtifactRole.FOIA_RELEASE: frozenset({SourceType.FOIA_PUBLIC_RELEASE}),
+    CaseArtifactRole.ACADEMIC_RECONSTRUCTION: frozenset({
+        SourceType.ACADEMIC_REPLICATION,
+    }),
+    CaseArtifactRole.PUBLIC_RELEASE: frozenset({
+        SourceType.PUBLIC_FILING,
+        SourceType.PUBLIC_PRESS_RELEASE,
+        SourceType.PUBLIC_REGULATORY_RELEASE,
+    }),
+    CaseArtifactRole.OTHER: frozenset({
+        SourceType.SEC_COMPLAINT,
+        SourceType.SEC_LITIGATION_RELEASE,
+        SourceType.SEC_ADMIN_ORDER,
+        SourceType.DOJ_INDICTMENT,
+        SourceType.DOJ_PLEA_OR_STATEMENT,
+        SourceType.COURT_JUDGMENT,
+        SourceType.COURT_EXHIBIT,
+        SourceType.FOIA_PUBLIC_RELEASE,
+        SourceType.PUBLIC_FILING,
+        SourceType.PUBLIC_PRESS_RELEASE,
+        SourceType.PUBLIC_REGULATORY_RELEASE,
+    }),
+}
 
 
 @dataclass(frozen=True)
@@ -262,6 +304,14 @@ def verify_case_provenance(
             raise ValueError(
                 "discovery-only source cannot establish canonical case content"
             )
+
+        allowed_source_types = _ROLE_SOURCE_TYPES[link.artifact_role]
+        if source.source_type not in allowed_source_types:
+            raise ValueError(
+                f"case artifact role {link.artifact_role.value} is incompatible "
+                f"with source type {source.source_type.value}"
+            )
+
         primary_or_academic += 1
 
         if (
