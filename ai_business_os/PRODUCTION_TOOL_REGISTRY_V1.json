@@ -1,0 +1,119 @@
+{
+  "registry_version": "tool-registry-v1",
+  "production_schema": "ai_business_os_prod",
+  "supabase_project_ref": "bvjtimsalbzkmulyinpg",
+  "frozen_foundation_commit": "15a5b2fdc236110dbbb56fa120483f36d3a4d28a",
+  "default_rules": {
+    "READ": "autonomous_when_provider_enabled",
+    "INTERNAL_WRITE": "autonomous_only_in_scoped_internal_or_development_context",
+    "EXTERNAL_WRITE": "human_approval_required",
+    "PRODUCTION_CHANGE": "human_approval_required",
+    "MONEY_MOVEMENT": "human_approval_required",
+    "DESTRUCTIVE": "human_approval_required",
+    "POLICY_CHANGE": "human_approval_required"
+  },
+  "providers": [
+    {
+      "provider_key": "github",
+      "status": "VERIFIED_CONNECTED",
+      "enabled": true
+    },
+    {
+      "provider_key": "gmail",
+      "status": "VERIFIED_CONNECTED",
+      "enabled": true
+    },
+    {
+      "provider_key": "google_drive",
+      "status": "VERIFIED_CONNECTED",
+      "enabled": true
+    },
+    {
+      "provider_key": "google_calendar",
+      "status": "VERIFIED_CONNECTED",
+      "enabled": true
+    },
+    {
+      "provider_key": "stripe",
+      "status": "VERIFIED_CONNECTED",
+      "enabled": true,
+      "requires_account_selection": true
+    },
+    {
+      "provider_key": "supabase",
+      "status": "VERIFIED_CONNECTED",
+      "enabled": true
+    },
+    {
+      "provider_key": "replit",
+      "status": "VERIFIED_CONNECTED",
+      "enabled": true
+    },
+    {
+      "provider_key": "vercel",
+      "status": "CONNECTED_NO_RESOURCES",
+      "enabled": false
+    },
+    {
+      "provider_key": "apollo",
+      "status": "UNAVAILABLE_ACCOUNT_INACTIVE",
+      "enabled": false
+    }
+  ],
+  "action_keys": [
+    "github.repo.read",
+    "github.pr.read",
+    "github.branch.create",
+    "github.file.write",
+    "github.pr.create",
+    "github.pr.merge",
+    "github.file.delete",
+    "gmail.search",
+    "gmail.read",
+    "gmail.draft.create",
+    "gmail.draft.update",
+    "gmail.send",
+    "gmail.send_draft",
+    "gmail.forward",
+    "gmail.archive",
+    "gmail.delete",
+    "drive.search",
+    "drive.document.read",
+    "drive.sheet.read",
+    "drive.file.create",
+    "drive.file.update",
+    "drive.file.upload",
+    "drive.file.share",
+    "drive.file.delete",
+    "calendar.search",
+    "calendar.availability",
+    "calendar.event.create",
+    "calendar.event.update",
+    "calendar.event.respond",
+    "calendar.event.delete",
+    "stripe.read",
+    "stripe.analytics",
+    "stripe.write",
+    "supabase.tables.read",
+    "supabase.logs.read",
+    "supabase.sql.execute",
+    "supabase.migration.apply",
+    "supabase.edge.deploy",
+    "supabase.project.create",
+    "supabase.branch.create",
+    "replit.apps.list",
+    "replit.app.inspect",
+    "replit.app.update",
+    "replit.app.create",
+    "replit.app.publish",
+    "vercel.projects.list",
+    "vercel.logs.read",
+    "vercel.deploy",
+    "apollo.read",
+    "apollo.write",
+    "apollo.destructive"
+  ],
+  "live_customer_messaging_enabled": false,
+  "money_movement_enabled_without_approval": false,
+  "production_deploy_enabled_without_approval": false
+}
