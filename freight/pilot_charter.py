@@ -78,10 +78,11 @@ def _required(name:str,value:str)->None:
     if not isinstance(value,str) or not value.strip():
         raise ValueError(name+" is required")
 
-def _parse_price_band(value:str)->tuple[float,float]:
+def _parse_price_band(value:str)->tuple[float,float]|None:
+    """Parse legacy explicit bands; new custom-scoped packets intentionally omit one."""
     m=PRICE_RE.search(value or "")
     if not m:
-        raise ValueError("activation packet price band is not parseable")
+        return None
     low=float(m.group(1).replace(",",""))
     high=float(m.group(2).replace(",",""))
     if low<=0 or high<low:
@@ -99,6 +100,7 @@ def _validate_activation_packet(packet:dict)->None:
         raise ValueError("activation packet launch_status invalid")
     _required("selected_offer",packet.get("selected_offer"))
     _required("launch_route",packet.get("launch_route"))
+    _required("price_band_usd",packet.get("price_band_usd"))
 
 def _parse_date(name:str,value:str)->date:
     try:
@@ -133,9 +135,11 @@ def build_charter(activation_packet:dict,request:CharterRequest)->PilotCharter:
         raise ValueError("mode_scope must contain at least one non-empty mode")
     if request.fixed_fee_usd<=0:
         raise ValueError("fixed_fee_usd must be positive")
-    low,high=_parse_price_band(activation_packet["price_band_usd"])
-    if not low<=request.fixed_fee_usd<=high:
-        raise ValueError("fixed_fee_usd outside activation-packet published price band")
+    published_band=_parse_price_band(activation_packet["price_band_usd"])
+    if published_band is not None:
+        low,high=published_band
+        if not low<=request.fixed_fee_usd<=high:
+            raise ValueError("fixed_fee_usd outside activation-packet published price band")
 
     acknowledgments={
         "buyer_acknowledges_scope":request.buyer_acknowledges_scope,
