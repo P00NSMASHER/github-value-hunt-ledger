@@ -1,0 +1,20 @@
+{
+  "run_key": "bootstrap-shadow-001",
+  "status": "COMPLETE",
+  "snapshot_hash": "b245f29807a9d338b1f35ae8264b4a143a2abc7d382597d6afdad6a24952b9bb",
+  "observations": 6,
+  "recommendations": 6,
+  "safe_low_risk": 4,
+  "keep_shadow": 2,
+  "promoted": [
+    "gmail.draft.create/update",
+    "drive.file.create/update for private internal artifacts",
+    "github.branch.create on isolated development branches",
+    "github.file.write on non-production branches"
+  ],
+  "kept_shadow": [
+    "replit.app.update because the read-only inspection timed out",
+    "account-specific Stripe reads until an explicit account/resource is bound"
+  ],
+  "external_effects_executed": false
+}
