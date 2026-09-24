@@ -18,7 +18,10 @@ from recoveryworks.commercial_operational_invariants import (
     CommercialOperationalInvariantState,
     verify_commercial_operational_invariants,
 )
-from recoveryworks.container_build import ContainerBuildManifest
+from recoveryworks.container_build import (
+    ContainerBuildManifest,
+    build_container_build_manifest,
+)
 from recoveryworks.models import canonical_hash, normalize_sha256
 from recoveryworks.recurring_assurance_lifecycle import (
     RecurringAssuranceLifecycleState,
@@ -402,7 +405,16 @@ def run_commercial_adversarial_certification(
     if not isinstance(build_manifest, ContainerBuildManifest):
         raise ValueError("build_manifest must be ContainerBuildManifest")
     source_revision = _source_revision(build_manifest.source_commit)
-    build_manifest_proof_hash = build_manifest.proof_hash
+    current_build_manifest = build_container_build_manifest(
+        source_commit=source_revision,
+        dockerfile_path="recoveryworks/deploy/Dockerfile.production",
+        dependency_lock_path="recoveryworks/requirements.production.lock",
+    )
+    if build_manifest.proof_hash != current_build_manifest.proof_hash:
+        raise ValueError(
+            "build_manifest does not match current production build inputs"
+        )
+    build_manifest_proof_hash = current_build_manifest.proof_hash
     if type(seed) is not int or seed < 0:
         raise ValueError("seed must be a non-negative integer")
     if type(iterations_per_vector) is not int or not 1 <= iterations_per_vector <= 100:
