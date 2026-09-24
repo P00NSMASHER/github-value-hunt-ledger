@@ -254,6 +254,10 @@ class CapitalAllocator:
         name = name.strip()
         if not initiative_id or not name:
             raise CapitalAllocatorError("initiative_id and name are required")
+        if business_ref:
+            self._validate_graph_ref(business_ref, "BUSINESS")
+        if product_ref:
+            self._validate_graph_ref(product_ref, "PRODUCT")
         ts = _now()
         try:
             self.runtime.conn.execute(
@@ -1052,6 +1056,26 @@ class CapitalAllocator:
             "total_units": plan["total_units"],
             "allocations": plan["allocations"],
         }
+
+    def _validate_graph_ref(self, node_id: str, expected_type: str) -> None:
+        try:
+            row = self.runtime.conn.execute(
+                """
+                SELECT node_type, status FROM graph_nodes
+                WHERE id=?
+                """,
+                (node_id,),
+            ).fetchone()
+        except Exception as exc:
+            raise CapitalAllocatorError(
+                "knowledge graph must be initialized before graph references are used"
+            ) from exc
+        if row is None:
+            raise CapitalAllocatorError(f"unknown knowledge-graph node: {node_id}")
+        if row["node_type"] != expected_type or row["status"] != "ACTIVE":
+            raise CapitalAllocatorError(
+                f"graph reference must be an ACTIVE {expected_type} node"
+            )
 
     def _require_initiative(self, initiative_id: str):
         row = self.runtime.conn.execute(
