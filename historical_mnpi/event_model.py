@@ -15,7 +15,11 @@ from enum import Enum
 import re
 
 from .case_model import CaseArtifactRole, CaseEventType, CaseRegistry
-from .raw_artifacts import RawArtifactManifest, SourceArtifactRef
+from .raw_artifacts import (
+    RawArtifactManifest,
+    SourceArtifactRef,
+    same_retained_artifact,
+)
 from .source_registry import SourceAdmissibility, SourceRegistry, canonical_hash
 
 
@@ -245,23 +249,30 @@ def verify_event_provenance(
     if not set(event.issuer_ids).issubset(case_issuer_ids):
         raise ValueError("event issuer is not part of canonical case")
 
-    case_links = {link.ref.proof_hash: link for link in case.artifacts}
-
     all_boundaries = [event.public_release]
     if event.private_information_start is not None:
         all_boundaries.append(event.private_information_start)
     all_boundaries.extend(event.tip_or_transfer_boundaries)
 
+    matched_links = {}
     for boundary in all_boundaries:
         artifact_manifest.resolve_ref(boundary.ref)
         source = source_registry.get(boundary.ref.source_id)
         if source.proof_hash != boundary.ref.source_proof_hash:
             raise ValueError("event boundary source proof mismatch")
-        if boundary.ref.proof_hash not in case_links:
+        link = next(
+            (
+                item for item in case.artifacts
+                if same_retained_artifact(item.ref, boundary.ref)
+            ),
+            None,
+        )
+        if link is None:
             raise ValueError("event boundary artifact is not linked to canonical case")
+        matched_links[boundary.proof_hash] = link
 
     public_source = source_registry.get(event.public_release.ref.source_id)
-    public_link = case_links[event.public_release.ref.proof_hash]
+    public_link = matched_links[event.public_release.proof_hash]
     if public_source.admissibility is not SourceAdmissibility.PRIMARY_PUBLIC_RECORD:
         raise ValueError("public release boundary requires primary public record")
     if public_link.artifact_role is not CaseArtifactRole.PUBLIC_RELEASE:
