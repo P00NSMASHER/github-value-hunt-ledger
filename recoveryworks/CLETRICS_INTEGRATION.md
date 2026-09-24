@@ -645,3 +645,9 @@ Recovered-cash success-fee arithmetic uses recovered_cents only; validated/poten
 Pilot closeout can now advance only with a separately sourced, verified buyer receipt that binds the exact closeout/charter/engagement/buyer and repeats the exact recovered cash, validated recovery, prospective savings, realized savings, anomaly exposure, and reconciliation drift surfaces. Any amount drift, unverified receipt, unaccepted outcome surface, or unresolved dispute fails closed.
 
 The resulting PILOT_CLOSEOUT_ACKNOWLEDGED artifact may record only a continuation interest such as REVIEW_MONTHLY_ASSURANCE; it hard-codes continuation_authorized=false, invoice_authorized=false, payment_due_asserted=false, and external_action_authorized=false. Buyer acknowledgment therefore cannot silently become billing or renewal authority.
+
+## Finalized agreement and fee-draft readiness (step 36)
+
+A closeout acknowledgment can now be paired with a separately sourced, externally finalized commercial agreement receipt. The agreement—not the earlier pricing hypothesis—becomes the commercial arithmetic authority and may explicitly differ from the charter hypothesis; any such variance is surfaced in the readiness artifact.
+
+COMMERCIAL_FEE_DRAFT_READY calculates diagnostic and recovered-cash success-fee arithmetic only when those fee types are applicable in the finalized agreement. Success-fee math is recovered_cash_cents × finalized_agreement_bps and cannot use validated/potential recovery, prospective savings, anomaly exposure, or drift. Monthly assurance is separately tracked as accepted/not accepted. The gate allows draft preparation only and hard-codes invoice_issuance_performed=false, payment_due_asserted=false, payment_collected=false, and external_action_performed=false.
