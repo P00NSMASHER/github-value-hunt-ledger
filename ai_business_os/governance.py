@@ -27,12 +27,16 @@ ACTION_CLASSES = {
     "POLICY_CHANGE",
 }
 
-DEFAULT_HUMAN_APPROVAL_CLASSES = {
-    "EXTERNAL_WRITE",
+MANDATORY_HUMAN_APPROVAL_CLASSES = {
     "PRODUCTION_CHANGE",
     "MONEY_MOVEMENT",
     "DESTRUCTIVE",
     "POLICY_CHANGE",
+}
+
+DEFAULT_HUMAN_APPROVAL_CLASSES = {
+    "EXTERNAL_WRITE",
+    *MANDATORY_HUMAN_APPROVAL_CLASSES,
 }
 
 
@@ -186,6 +190,11 @@ class GovernanceControlPlane:
 
         allowed = self._normalize_classes(allowed_classes)
         approval_classes = self._normalize_classes(human_approval_classes)
+        mandatory_present = allowed & MANDATORY_HUMAN_APPROVAL_CLASSES
+        if not mandatory_present <= approval_classes:
+            raise GovernanceError(
+                "production, money, destructive, and policy actions cannot bypass human approval"
+            )
         if not approval_classes <= allowed:
             raise GovernanceError("approval classes must be a subset of allowed classes")
         denied = sorted({str(x).strip() for x in denied_action_keys if str(x).strip()})
