@@ -243,6 +243,34 @@ class EntityResolutionTests(unittest.TestCase):
                 EntityKind.PERSON,
             )
 
+    def test_organization_resolution_requires_real_case_party(self):
+        sources, manifest, cases, case, ref = fixture()
+        registry = EntityRegistry()
+        organization = registry.register_entity(
+            CanonicalEntity(
+                "organization:firm:1",
+                EntityKind.ORGANIZATION,
+                "Historical Firm",
+            )
+        )
+        resolution = CaseEntityResolution(
+            resolution_id="resolution:organization:bad-local",
+            case_id=case.case_id,
+            case_proof_hash=case.proof_hash,
+            local_id="organization:not-in-case",
+            entity_kind=EntityKind.ORGANIZATION,
+            status=ResolutionStatus.RESOLVED,
+            canonical_entity_id=organization.entity_id,
+            evidence_refs=(ref,),
+        )
+        with self.assertRaisesRegex(ValueError, "not a case party"):
+            registry.register_case_resolution(
+                resolution,
+                cases=cases,
+                source_registry=sources,
+                artifact_manifest=manifest,
+            )
+
     def test_non_overlapping_ticker_reuse_is_allowed(self):
         sources, manifest, _cases, _case, ref = fixture()
         registry = EntityRegistry()
