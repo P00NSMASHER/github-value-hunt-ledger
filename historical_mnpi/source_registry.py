@@ -233,6 +233,10 @@ class SourceRecord:
         if payload.get("usage_scope") != USAGE_SCOPE:
             raise ValueError("source record is outside historical research scope")
 
+        public_release_confirmed = payload.get("public_release_confirmed")
+        if type(public_release_confirmed) is not bool:
+            raise ValueError("public_release_confirmed must be a boolean")
+
         record = cls(
             source_id=str(payload["source_id"]),
             source_type=SourceType(str(payload["source_type"])),
@@ -243,7 +247,7 @@ class SourceRecord:
             publication_date=str(payload["publication_date"]),
             sha256=str(payload["sha256"]),
             retrieved_at=str(payload["retrieved_at"]),
-            public_release_confirmed=bool(payload["public_release_confirmed"]),
+            public_release_confirmed=public_release_confirmed,
             case_id=(
                 str(payload["case_id"])
                 if payload.get("case_id") is not None
