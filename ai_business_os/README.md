@@ -4,7 +4,7 @@ This directory is the incremental implementation of the nine-part AI Business OS
 
 ## Step 1 — Persistent agent runtime
 
-Status: implemented on this branch.
+Status: implemented and merged.
 
 The first upgrade adds a durable worker substrate with:
 
@@ -17,17 +17,34 @@ The first upgrade adds a durable worker substrate with:
 - process-restart persistence via SQLite;
 - no dependency on an LLM provider or external service.
 
-The runtime is intentionally authority-light. It records and coordinates work, but it does **not**
-grant production, email, payment, merge, or destructive permissions. Those are added by later
-governance/approval upgrades.
+## Step 2 — Independent Auditor brain
 
-### Run the self-test
+Status: implemented on this branch.
+
+The second upgrade adds a Manager → Executor → Auditor completion contract:
+
+- manager, executor, and auditor must be distinct agent identities;
+- acceptance criteria are frozen before execution;
+- executors submit concrete evidence but cannot approve themselves;
+- auditors record PASS / FAIL / UNKNOWN for every criterion;
+- missing or UNKNOWN required checks fail closed;
+- failed audits return work to ACTIVE for revision;
+- exact audit reports receive SHA-256 identities;
+- the persistent runtime refuses VERIFYING → COMPLETE without an approved independent audit;
+- only the assigned manager can accept the approved result.
+
+The runtime remains authority-light. These first two steps coordinate and verify work, but do **not**
+yet grant production, email, payment, merge, destructive, or self-improvement promotion authority.
+
+### Run all AI Business OS tests
 
 ```bash
-python -m unittest ai_business_os.persistent_agents.test_runtime
+python -m unittest discover -s ai_business_os -p "test_*.py"
 ```
 
-### Design rule
+### Design rules
 
-Persistent memory is evidence, not authority. A worker can remember prior outcomes, but later
-verification and promotion gates determine whether those lessons become shared policy.
+Persistent memory is evidence, not authority. Completion is also not a self-asserted fact: the
+executor's result must cross an independent evidence-backed audit boundary before it can become
+COMPLETE. Later upgrades add value memory, governance, action permissions, and skill promotion
+without weakening these two invariants.
