@@ -72,7 +72,14 @@ class ReleaseDeploymentHandoff:
             object.__setattr__(
                 self, name, normalize_sha256(name, getattr(self, name))
             )
-        if not isinstance(self.environment, ReleaseEnvironment):
+        if isinstance(self.environment, str):
+            try:
+                object.__setattr__(
+                    self, "environment", ReleaseEnvironment(self.environment)
+                )
+            except ValueError as exc:
+                raise ValueError("environment must be ReleaseEnvironment") from exc
+        elif not isinstance(self.environment, ReleaseEnvironment):
             raise ValueError("environment must be ReleaseEnvironment")
         match = _IMAGE_RE.fullmatch(self.container_image_ref)
         if match is None:
@@ -232,7 +239,14 @@ class ExternalDeploymentReceipt:
             object.__setattr__(
                 self, name, normalize_sha256(name, getattr(self, name))
             )
-        if not isinstance(self.environment, ReleaseEnvironment):
+        if isinstance(self.environment, str):
+            try:
+                object.__setattr__(
+                    self, "environment", ReleaseEnvironment(self.environment)
+                )
+            except ValueError as exc:
+                raise ValueError("environment must be ReleaseEnvironment") from exc
+        elif not isinstance(self.environment, ReleaseEnvironment):
             raise ValueError("environment must be ReleaseEnvironment")
         match = _IMAGE_RE.fullmatch(self.container_image_ref)
         if match is None:
@@ -310,7 +324,14 @@ class DeploymentEnvironmentSnapshot:
     verified: bool
 
     def __post_init__(self) -> None:
-        if not isinstance(self.environment, ReleaseEnvironment):
+        if isinstance(self.environment, str):
+            try:
+                object.__setattr__(
+                    self, "environment", ReleaseEnvironment(self.environment)
+                )
+            except ValueError as exc:
+                raise ValueError("environment must be ReleaseEnvironment") from exc
+        elif not isinstance(self.environment, ReleaseEnvironment):
             raise ValueError("environment must be ReleaseEnvironment")
         for name in ("release_id", "source_locator"):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
