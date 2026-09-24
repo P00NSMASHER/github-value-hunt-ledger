@@ -657,3 +657,9 @@ COMMERCIAL_FEE_DRAFT_READY calculates diagnostic and recovered-cash success-fee 
 COMMERCIAL_FEE_DRAFT_READY can now produce a private human-review billing draft whose line items are limited to agreement-supported closeout charges: the finalized diagnostic fee and success fee on verified recovered cash. Validated/potential recovery, prospective savings, anomaly exposure, reconciliation drift, and unaccepted monthly assurance cannot become payable line items.
 
 The monthly assurance amount is displayed only as a separately tracked option and is not included in the closeout draft total. The artifact is always DRAFT_NOT_ISSUED and hard-codes issued=false, sent=false, payment_due_asserted=false, payment_received=false, payment_instructions_included=false, and external_commitment_created=false. The proposed due date is informational and only applies if a later separately governed issuance step occurs.
+
+## Verified external invoice issuance (step 37b)
+
+An unissued billing draft can now be converted into a short-lived credential-free handoff for a named separate billing issuer. The handoff freezes the exact agreement/readiness/draft proofs, line-item proofs, total, currency, and agreed due date while keeping RecoveryWorks unable to issue, send, collect, or embed payment instructions.
+
+Payment due becomes verified only after a separately sourced external billing receipt proves the exact handoff was issued and delivered to the buyer inside the authorization window with the same line items/total/currency/due date. The resulting state is ISSUED_INVOICE_VERIFIED and remains unpaid. RecoveryWorks still performs no invoice sending or payment collection.
