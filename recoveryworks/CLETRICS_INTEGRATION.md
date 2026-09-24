@@ -535,3 +535,9 @@ Purpose-limited access decisions are recorded in a private hash-chained access h
 AWS, Azure, and GCP now have provider-neutral read-only connector contracts using verified credential references (workload identity, managed identity, role reference, or service-account impersonation) rather than persisted credentials. The contract exposes only DESCRIBE_IDENTITY, DISCOVER_BILLING_EXPORTS, and DISCOVER_RESOURCES and records live_calls_enabled=false, write_operations_enabled=false, and secret_persistence_enabled=false.
 
 Provider discovery can be tested through exact request-bound verified replay fixtures for deterministic offline/replay validation. Replay results prove provider/account/operation scope and explicitly record provider_api_called=false and secrets_persisted=false. A stable connector error taxonomy covers RATE_LIMITED, AUTHORIZATION_FAILED, TIMEOUT, TRANSIENT_PROVIDER_ERROR, MALFORMED_RESPONSE, SCOPE_MISMATCH, and FIXTURE_MISS. No live AWS/Azure/GCP calls are implemented in this half-step.
+
+## Separate-runner provider discovery handoff (step 25b)
+
+Read-only provider discovery can now be handed to a named separate connector runner through a short-lived credential-free artifact that binds the exact connector contract, credential-reference proof, provider/account, request, operation, runner, and expiry window. RecoveryWorks itself still does not call AWS/Azure/GCP.
+
+A returned discovery receipt is accepted only when it is externally verified, binds the exact handoff/request/runner, occurs inside the authorization window, carries a hash-bound response payload and provider request id, and explicitly records that no provider mutation or credential material was returned. Successful verification yields EXTERNAL_READONLY_DISCOVERY_VERIFIED.
