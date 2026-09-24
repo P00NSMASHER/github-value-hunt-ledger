@@ -108,6 +108,16 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Rate confirmed before engagement", page)
             self.assertIn('contingencyRecoveryRate: "0.3"', config)
             self.assertIn('contingencyRecoveryRateLabel: "30%"', config)
+            self.assertIn('itemscope itemtype="https://schema.org/WebPage"', page)
+            self.assertIn('itemprop="mainEntity" itemscope itemtype="https://schema.org/Service"', page)
+            self.assertIn('itemprop="offers" itemscope itemtype="https://schema.org/Offer"', page)
+            self.assertIn('itemprop="priceCurrency" content="USD"', page)
+            self.assertIn('itemprop="price" content="0"', page)
+            self.assertIn('name="twitter:title"', page)
+            self.assertIn('name="twitter:description"', page)
+            self.assertIn('name="twitter:image"', page)
+            self.assertIn('id="actualRecoveredDisplay">$100,000</dd>', page)
+            self.assertIn('content="free-audit-contingency-v3"', page)
 
             forbidden = (
                 "$5,000",
