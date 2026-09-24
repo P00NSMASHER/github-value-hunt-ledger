@@ -162,11 +162,8 @@ class ProductionAdmissionTests(unittest.TestCase):
                     release,promotion,security,dr,build,
                     admitted_at="2026-10-10T13:11:00Z",
                     policy=ProductionAdmissionPolicy(max_dr_age_seconds=3600))
-            wrong=replace(build, source_commit="b"*40)
-            with self.assertRaisesRegex(ValueError,"source commit mismatch|manifest_id"):
-                build_production_admission_gate(
-                    release,promotion,security,dr,wrong,
-                    admitted_at="2026-09-24T13:11:00Z")
+            with self.assertRaisesRegex(ValueError,"manifest_id"):
+                replace(build, source_commit="b"*40)
 
 
 if __name__=="__main__":

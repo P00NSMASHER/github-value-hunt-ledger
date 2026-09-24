@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 import hashlib
 import json
 import os
@@ -9,6 +10,10 @@ import unittest
 
 from recoveryworks.container_build import build_container_build_manifest
 from recoveryworks.models import canonical_hash
+from recoveryworks.production_admission import (
+    ProductionAdmissionGate,
+    ProductionAdmissionPolicy,
+)
 from recoveryworks.production_deployment import (
     build_production_deployment_contract,
     check_production_health,
@@ -131,13 +136,45 @@ class ReleaseDeploymentHandoffTests(unittest.TestCase):
             approvals=approvals, health_check=check_production_health(deployment),
             readiness_check=check_production_readiness(deployment),
             rollback_manifest=rollback, gate_created_at="2026-09-24T13:04:00Z")
-        return release, gate
+        policy = ProductionAdmissionPolicy()
+        admission_identity = {
+            "schema": 1,
+            "release_id": release.release_id,
+            "release_proof_hash": release.proof_hash,
+            "promotion_gate_proof_hash": gate.proof_hash,
+            "security_evidence_proof_hash": "1" * 64,
+            "dr_rehearsal_proof_hash": "2" * 64,
+            "container_build_manifest_proof_hash": build.proof_hash,
+            "container_image_digest": release.container_image_digest,
+            "source_commit": release.source_commit,
+            "admitted_at": "2026-09-24T13:04:30Z",
+            "policy": asdict(policy),
+            "admitted": True,
+            "deployment_execution_enabled": False,
+        }
+        admission = ProductionAdmissionGate(
+            admission_id="recoveryworks-production-admission:"
+            + canonical_hash(admission_identity),
+            release_id=release.release_id,
+            release_proof_hash=release.proof_hash,
+            promotion_gate_proof_hash=gate.proof_hash,
+            security_evidence_proof_hash="1" * 64,
+            dr_rehearsal_proof_hash="2" * 64,
+            container_build_manifest_proof_hash=build.proof_hash,
+            container_image_digest=release.container_image_digest,
+            source_commit=release.source_commit,
+            admitted_at="2026-09-24T13:04:30Z",
+            policy=policy,
+            admitted=True,
+            deployment_execution_enabled=False,
+        )
+        return release, gate, admission
 
     def test_separate_deployer_handoff_and_post_deploy_verification(self):
         with tempfile.TemporaryDirectory() as d:
-            release, gate = self.fixture(Path(d))
+            release, gate, admission = self.fixture(Path(d))
             handoff = prepare_release_deployment_handoff(
-                release, gate, deployer_id="external-deployer",
+                release, gate, admission, deployer_id="external-deployer",
                 issued_at="2026-09-24T13:05:00Z",
                 expires_at="2026-09-24T13:20:00Z")
             self.assertEqual(
@@ -179,9 +216,9 @@ class ReleaseDeploymentHandoffTests(unittest.TestCase):
 
     def test_wrong_image_or_failed_post_health_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
-            release, gate = self.fixture(Path(d))
+            release, gate, admission = self.fixture(Path(d))
             handoff = prepare_release_deployment_handoff(
-                release, gate, deployer_id="external-deployer",
+                release, gate, admission, deployer_id="external-deployer",
                 issued_at="2026-09-24T13:05:00Z",
                 expires_at="2026-09-24T13:20:00Z")
             bad_identity = {
