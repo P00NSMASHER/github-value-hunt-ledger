@@ -367,3 +367,9 @@ The package is marked INTERNAL_PILOT_CONFIGURATION and hard-fails if cloud mutat
 The real-account runner now requires the customer authorization to bind the exact SHA-256 of every focus, meter, rate, and optional signal file before processing. A separate evidence-review object binds the exact money-bearing focus/meter/rate hashes plus the three verification flags. Customer permission to process therefore cannot promote unreviewed evidence to VALIDATED recovery.
 
 After scope and hash checks, the authorized source bytes are copied into verified private snapshots and the pilot runs only from those snapshots. Changed bytes, symlinks, expired/unverified authorization, out-of-scope FOCUS rows, or evidence-review hash mismatches fail before the diagnostic ledger is created.
+
+## Proposal and SOW draft bundle (step 9b)
+
+The commercial package can now render private proposal/SOW-ready Markdown drafts plus a hash-bound manifest. Draft fee scenarios calculate configured diagnostic/success/assurance arithmetic but are explicitly marked as pricing hypotheses and not revenue forecasts.
+
+The generated artifacts are deliberately nonbinding: they cannot be marked signed, accepted, invoiced, paid, or committed. A separately finalized agreement would still be required.
