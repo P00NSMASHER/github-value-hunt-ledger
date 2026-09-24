@@ -169,3 +169,13 @@ history.
 Nine-upgrade foundation status: **9/9 implemented and full-regression verified.**
 
 Executive capital-allocation extension: **implemented and regression-tested on this branch.**
+
+
+## Canonical production boundary — Phase 1
+
+- **Canonical implementation:** `ai_business_os/`
+- **Legacy implementation:** `business_os/` is frozen by Git-blob manifest and is not an active development target.
+- **Public repository:** source/tests/contracts plus sanitized migration source only.
+- **Private operating state:** `ai_business_os_prod`.
+- **Database definition:** `supabase/migrations/ai_business_os/`, with exact live migration statement hashes and a live schema fingerprint.
+- **Canonical CI:** runs on pull requests and pushes to `main`, uses immutable GitHub Action SHAs, and executes the full `ai_business_os` regression suite.
