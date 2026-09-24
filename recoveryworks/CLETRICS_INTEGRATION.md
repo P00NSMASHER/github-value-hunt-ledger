@@ -427,3 +427,9 @@ Config and input mounts are read-only. State and report mounts must be separate 
 The production container definition is now pinned to a specific Python 3.12.14 slim-bookworm image digest. RecoveryWorks' current cloud runtime has no third-party Python runtime dependencies, so requirements.production.lock is intentionally empty except for comments; any future dependency requires an exact lock/build-manifest update.
 
 ContainerBuildManifest binds the full Git commit, base-image digest, Dockerfile SHA-256, dependency-lock SHA-256, and runtime dependency list. RecoveryWorks CI now generates that manifest, builds the actual container, verifies the OCI source-revision label, and smoke-runs the image with network disabled, read-only root filesystem, all capabilities dropped, no-new-privileges, and only a tmpfs for /tmp. CI does not publish or deploy the image.
+
+## Production observability and auditable run history (step 14)
+
+Production observability now has structured hash-chained run events, a stable failure taxonomy, provider/job health metrics, recovery/savings/diagnostic metric snapshots, alert-ready records, immutable run manifests, and a private hash-chained run-history store.
+
+Successful pilot observability verifies the assurance-report proof hash before recording it. Alerts are emitted for supersession review, recovery evidence review, and fail-closed scan exceptions; they do not mutate cases or infrastructure. The history store rejects duplicate run ids, sequence gaps, previous-hash breaks, entry tampering, and head-hash mismatches.
