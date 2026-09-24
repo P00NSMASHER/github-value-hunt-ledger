@@ -11,7 +11,7 @@ from enum import Enum
 import json
 from pathlib import Path
 import re
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from recoveryworks.container_build import ContainerBuildManifest
 from recoveryworks.models import (
@@ -25,10 +25,10 @@ from recoveryworks.production_deployment import (
     ProductionCheckResult,
     ProductionDeploymentContract,
 )
-from recoveryworks.production_adversarial_certification import (
-    AdversarialCertificationState,
-    ProductionAdversarialCertification,
-)
+if TYPE_CHECKING:
+    from recoveryworks.production_adversarial_certification import (
+        ProductionAdversarialCertification,
+    )
 
 
 _IMAGE_RE = re.compile(r"^[^@\s]+@sha256:([0-9a-f]{64})$")
@@ -508,6 +508,10 @@ def build_environment_promotion_gate(
 
     adversarial_certification_hash = None
     if environment is ReleaseEnvironment.PRODUCTION:
+        from recoveryworks.production_adversarial_certification import (
+            AdversarialCertificationState,
+            ProductionAdversarialCertification,
+        )
         if adversarial_certification is None:
             raise ValueError(
                 "production promotion requires adversarial certification"
