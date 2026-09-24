@@ -390,7 +390,7 @@ class SoftwareFactory:
             """
             UPDATE software_factory_items
             SET state='VERIFYING', submission_json=?, submission_hash=?,
-                updated_at=?
+                lease_expires_at=NULL, updated_at=?
             WHERE id=?
             """,
             (_json(submission), submission_hash, ts, work_item_id),
@@ -640,7 +640,7 @@ class SoftwareFactory:
         rows = self.runtime.conn.execute(
             """
             SELECT id FROM software_factory_items
-            WHERE state IN ('RUNNING','VERIFYING')
+            WHERE state='RUNNING'
               AND lease_expires_at IS NOT NULL
               AND lease_expires_at <= ?
             """,
