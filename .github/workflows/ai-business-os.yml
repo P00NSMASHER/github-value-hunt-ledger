@@ -25,5 +25,5 @@ jobs:
           python-version: "3.12"
       - name: Compile
         run: python -m compileall -q business_os
-      - name: Persistent runtime tests
-        run: python -m unittest business_os.tests.test_persistent_runtime -v
+      - name: AI Business OS regression suite
+        run: python -m unittest discover -s business_os/tests -v
