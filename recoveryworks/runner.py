@@ -51,6 +51,8 @@ from .branches.contract_billing_csv import (
 )
 from .branches.cloud import audit_cloud_billing
 from .branches.cloud_signals import CloudSignal
+from .branches.cloud_savings import CloudSavingsReport, build_cloud_savings_report
+from .branches.cloud_remediation import CloudRemediationPlan, build_cloud_remediation_plan
 from .branches.cloud_discount import audit_cloud_discount_billing
 from .branches.cloud_discount_csv import load_cloud_discount_authorities_csv
 from .branches.cloud_commitment import audit_cloud_commitment_billing
@@ -132,6 +134,8 @@ class Scan360RunResult:
     exceptions: tuple[dict[str, Any], ...]
     report: RecoveryScan360Report
     cloud_signals: tuple[CloudSignal, ...] = ()
+    cloud_savings: CloudSavingsReport | None = None
+    remediation_plan: CloudRemediationPlan | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -141,6 +145,19 @@ class Scan360RunResult:
             "exceptions": [dict(item) for item in self.exceptions],
             "report": self.report.as_dict(),
             "cloud_signals": [signal.as_dict() for signal in self.cloud_signals],
+            "financial_surfaces": {
+                "recovery": self.report.as_dict(),
+                "savings": (
+                    self.cloud_savings.as_dict()
+                    if self.cloud_savings is not None
+                    else build_cloud_savings_report(self.cloud_signals).as_dict()
+                ),
+            },
+            "remediation_plan": (
+                self.remediation_plan.as_dict()
+                if self.remediation_plan is not None
+                else None
+            ),
         }
 
 
@@ -1492,6 +1509,28 @@ def run_scan360_config(
             if finding.finding_id not in before_ids and finding.finding_id not in added_ids:
                 added_ids.append(finding.finding_id)
 
+    final_cloud_signals = tuple(
+        cloud_signal_index[key] for key in sorted(cloud_signal_index)
+    )
+    cloud_savings = build_cloud_savings_report(final_cloud_signals)
+    remediation_plan = None
+    remediation_cfg = config.get("cloud_remediation")
+    if remediation_cfg is not None:
+        if not isinstance(remediation_cfg, Mapping):
+            raise ValueError("cloud_remediation must be an object")
+        enabled = remediation_cfg.get("enabled", False)
+        execute = remediation_cfg.get("execute", False)
+        if type(enabled) is not bool:
+            raise ValueError("cloud_remediation.enabled must be boolean")
+        if type(execute) is not bool:
+            raise ValueError("cloud_remediation.execute must be boolean")
+        if execute:
+            raise ValueError(
+                "RecoveryOS remediation integration is plan-only; execution is unsupported"
+            )
+        if enabled:
+            remediation_plan = build_cloud_remediation_plan(final_cloud_signals)
+
     head = store.save(
         ledger,
         expected_head_hash=loaded_head,
@@ -1504,5 +1543,7 @@ def run_scan360_config(
         state_head_hash=head,
         exceptions=tuple(exceptions),
         report=report,
-        cloud_signals=tuple(cloud_signal_index[key] for key in sorted(cloud_signal_index)),
+        cloud_signals=final_cloud_signals,
+        cloud_savings=cloud_savings,
+        remediation_plan=remediation_plan,
     )
