@@ -278,3 +278,23 @@ item has a completed decision, corrections require a new normalized proposal and
 therefore a new review hash. Approved decisions bind the exact normalized row
 hash and remain scoped to `HISTORICAL_RESEARCH_COMPLIANCE_ONLY`; they never
 authorize live trading.
+
+
+## Step 9 — durable entity resolution
+
+Case-local party and issuer IDs are kept separate from durable canonical entities.
+
+The resolution layer supports:
+
+- canonical people, issuers, and organizations;
+- aliases without merging by name alone;
+- source-backed CIK, ticker, GVKEY, PERMNO, LEI, and other identifiers;
+- historical validity windows for identifiers such as tickers;
+- explicit `RESOLVED`, `AMBIGUOUS`, and `UNRESOLVED` outcomes.
+
+Confirmed ticker reuse by different issuers is allowed only when validity windows
+do not overlap. Overlapping ticker claims fail closed instead of selecting an
+issuer. A CIK likewise cannot be silently bound to two canonical issuers.
+
+Case-local identity resolution must be supported by retained artifacts linked to
+the canonical case. Discovery-only sources cannot establish a durable identity.
