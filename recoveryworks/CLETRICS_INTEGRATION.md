@@ -266,3 +266,25 @@ incumbents are eligible.
 SUPERSEDE events in the durable journal, admits exact approved replacement
 findings, CAS-saves the ledger, and replaces the old continuous-processing
 receipt with the approved proposed fingerprint.
+
+## Verified realized-savings evidence (step 4)
+
+Prospective savings and realized savings are now separate proof surfaces.
+`measure_realized_cloud_savings` requires:
+
+1. the exact SAVINGS_OPPORTUNITY signal;
+2. its exact remediation action and plan;
+3. plan approval containing that action;
+4. the exact NOT_EXECUTED authorization envelope;
+5. independent evidence that the approved change was actually implemented;
+6. a verified pre-change cost baseline;
+7. a verified post-change cost observation; and
+8. a reviewed normalization method.
+
+Two normalization modes are supported. `FIXED_SCOPE` requires a reviewer to
+attest the comparison scope is unchanged. `ACTIVITY_RATIO` normalizes
+baseline cost by comparable workload units. Baseline and post windows must
+have equal duration and must fall before/after implementation respectively.
+
+A measurement may calculate an indicative delta while remaining REVIEW, but
+only VERIFIED measurements roll into `realized_savings_cents`.

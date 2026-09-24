@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Any, Iterable
 
 from .cloud_signals import CloudSignal, CloudSignalType
+from .cloud_savings_evidence import CloudSavingsMeasurement, SavingsEvidenceState
 
 
 @dataclass(frozen=True)
@@ -21,6 +22,9 @@ class CloudSavingsReport:
     estimated_anomaly_exposure_cents: int
     reconciliation_drift_count: int
     reconciliation_drift_cents: int
+    realized_savings_cents: int
+    realized_measurement_count: int
+    realized_measurements: tuple[dict[str, Any], ...]
     opportunities: tuple[dict[str, Any], ...]
 
     def as_dict(self) -> dict[str, Any]:
@@ -32,14 +36,16 @@ class CloudSavingsReport:
             "estimated_anomaly_exposure_cents": self.estimated_anomaly_exposure_cents,
             "reconciliation_drift_count": self.reconciliation_drift_count,
             "reconciliation_drift_cents": self.reconciliation_drift_cents,
-            "realized_savings_cents": 0,
-            "realized_savings_evidence": "not implemented by this signal plane",
+            "realized_savings_cents": self.realized_savings_cents,
+            "realized_measurement_count": self.realized_measurement_count,
+            "realized_measurements": [dict(item) for item in self.realized_measurements],
             "opportunities": [dict(item) for item in self.opportunities],
         }
 
 
 def build_cloud_savings_report(
     signals: Iterable[CloudSignal],
+    realized_measurements: Iterable[CloudSavingsMeasurement] = (),
 ) -> CloudSavingsReport:
     rows = tuple(signals)
     opportunity_total = 0
@@ -73,6 +79,28 @@ def build_cloud_savings_report(
             reconciliation_count += 1
             reconciliation_total += amount
 
+    measurement_index: dict[str, CloudSavingsMeasurement] = {}
+    for measurement in realized_measurements:
+        previous = measurement_index.get(measurement.measurement_id)
+        if previous is not None and previous.proof_hash != measurement.proof_hash:
+            raise ValueError("conflicting realized-savings measurement id")
+        measurement_index[measurement.measurement_id] = measurement
+    verified_measurements = [
+        measurement
+        for measurement in measurement_index.values()
+        if measurement.state is SavingsEvidenceState.VERIFIED
+    ]
+    realized_rows = tuple(
+        measurement.as_dict()
+        for measurement in sorted(
+            verified_measurements, key=lambda item: item.measurement_id
+        )
+    )
+    realized_total = sum(
+        measurement.realized_savings_cents
+        for measurement in verified_measurements
+    )
+
     opportunities.sort(
         key=lambda item: (
             -item["estimated_savings_cents"],
@@ -89,5 +117,8 @@ def build_cloud_savings_report(
         estimated_anomaly_exposure_cents=anomaly_total,
         reconciliation_drift_count=reconciliation_count,
         reconciliation_drift_cents=reconciliation_total,
+        realized_savings_cents=realized_total,
+        realized_measurement_count=len(verified_measurements),
+        realized_measurements=realized_rows,
         opportunities=tuple(opportunities),
     )

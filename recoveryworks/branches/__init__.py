@@ -36,6 +36,16 @@ from .payroll_benefit_csv import load_payroll_benefit_units_csv
 from .cloud import audit_cloud_billing
 from .cloud_signals import CloudSignal, CloudSignalType
 from .cloud_savings import CloudSavingsReport, build_cloud_savings_report
+from .cloud_savings_evidence import (
+    CloudSavingsBaseline,
+    CloudSavingsImplementationEvidence,
+    CloudSavingsMeasurement,
+    CloudSavingsNormalizationReview,
+    CloudSavingsPostObservation,
+    SavingsEvidenceState,
+    SavingsNormalizationMode,
+    measure_realized_cloud_savings,
+)
 from .cloud_remediation import (
     CloudRemediationAction,
     CloudRemediationApproval,
@@ -321,6 +331,14 @@ __all__ = [
     "CloudSignalType",
     "CloudSavingsReport",
     "build_cloud_savings_report",
+    "CloudSavingsBaseline",
+    "CloudSavingsImplementationEvidence",
+    "CloudSavingsMeasurement",
+    "CloudSavingsNormalizationReview",
+    "CloudSavingsPostObservation",
+    "SavingsEvidenceState",
+    "SavingsNormalizationMode",
+    "measure_realized_cloud_savings",
     "CloudRemediationAction",
     "CloudRemediationApproval",
     "CloudRemediationEnvelope",
