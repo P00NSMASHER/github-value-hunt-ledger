@@ -575,3 +575,9 @@ A proof-bound acceptance report can only be created when every required scenario
 A deterministic capacity harness now generates exact FOCUS billing rows, matching independent meter rows, and reviewed contract-rate data, then runs them through the real local Cletrics export and RecoveryOS pilot path. Workload source hashes are deterministic across directories/runs for the same row count.
 
 The internal envelope measures end-to-end runtime, billing-row throughput, peak Python traced memory, evidence-bundle ZIP size, validated recovery cents, and state-head creation. A capacity artifact is emitted only when every configured limit/minimum passes and is explicitly labeled INTERNAL_CAPACITY_ENVELOPE_PASSED with external_sla_claimed=false. This is engineering capacity evidence, not a customer SLA or external performance certification.
+
+## Measured multi-dimensional capacity matrix (step 29b)
+
+Capacity evidence can now be combined into an explicit matrix across billing-row, provider-count, and tenant-count dimensions. Every matrix cell requires proof hashes from an actual passing measurement/execution; the derived internal operating envelope uses only observed maxima/minima and records extrapolation_used=false and external_sla_claimed=false.
+
+Admission checks compare requested billing rows/providers/tenants against those measured limits. Requests beyond any measured dimension return ADMISSION_REJECTED_CAPACITY before execution and do not trigger automatic scaling.
