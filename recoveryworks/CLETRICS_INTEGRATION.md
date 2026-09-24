@@ -669,3 +669,9 @@ Payment due becomes verified only after a separately sourced external billing re
 Issued-invoice payment state now requires separately verified external cash-settlement evidence; an invoice/billing provider's own paid flag is explicitly insufficient. Settlement receipts bind the exact issued invoice/buyer/currency, external settlement reference, observed time, gross amount, merchant fee, net cash, invoice-applied amount, and independent source evidence.
 
 Reconciliation supports partial payments, duplicate-settlement rejection, exact invoice over-allocation prevention, and externally observed reversals/chargebacks that reopen a previously paid balance. Invoice state is UNPAID, PARTIALLY_PAID, or PAID solely from the net applied settlement events. RecoveryWorks does not collect payment and provider_accounting_only receipts fail closed.
+
+## Monthly assurance activation readiness (step 39a)
+
+Pilot continuation can now advance toward recurring assurance only when three distinct proofs agree: the buyer closeout acknowledgment expressed REVIEW_MONTHLY_ASSURANCE interest, the externally finalized commercial agreement separately accepted a positive monthly assurance fee, and a fresh externally verified recurring-service authorization binds the exact buyer/business-unit/billing-account/provider scope, fee, currency, service term, and monthly cadence.
+
+The resulting state is MONTHLY_ASSURANCE_ACTIVATION_READY only. It hard-codes service_started=false, invoice_schedule_started=false, provider_calls_started=false, provider_mutation_authorized=false, and external_action_performed=false. Recurring authorization cannot silently expand scope, enable write access, or authorize automatic invoicing.
