@@ -168,6 +168,52 @@ class ConflictPolicyTests(unittest.TestCase):
         self.assertEqual(result.disposition, ConflictDisposition.SELECTED)
         self.assertEqual(result.controlling_claim_ids, ("claim:j1", "claim:j2"))
 
+    def test_resolution_is_bound_to_full_policy_proof(self):
+        sources, manifest, cases, case, refs = fixture()
+        policy = SourcePriorityPolicy()
+        result = resolve_fact_conflict((
+            claim(case, refs[CaseArtifactRole.COMPLAINT], "claim:c", "2500"),
+            claim(case, refs[CaseArtifactRole.JUDGMENT], "claim:j", "2600"),
+        ), cases=cases, source_registry=sources, artifact_manifest=manifest, policy=policy)
+        self.assertEqual(result.policy_proof_hash, policy.proof_hash)
+        self.assertEqual(len(result.policy_proof_hash), 64)
+
+    def test_same_artifact_with_multiple_case_roles_fails_closed(self):
+        sources, manifest, _cases, case, refs = fixture()
+        duplicated = HistoricalCase(
+            case_id=case.case_id,
+            title=case.title,
+            event_type=case.event_type,
+            information_origin=case.information_origin,
+            proceeding_status=case.proceeding_status,
+            parties=case.parties,
+            issuers=case.issuers,
+            artifacts=case.artifacts + (
+                CaseArtifactLink(
+                    CaseArtifactRole.EXHIBIT,
+                    refs[CaseArtifactRole.COMPLAINT],
+                ),
+            ),
+        )
+        cases = CaseRegistry()
+        cases.register(
+            duplicated,
+            source_registry=sources,
+            artifact_manifest=manifest,
+        )
+        with self.assertRaisesRegex(ValueError, "ambiguous case artifact roles"):
+            resolve_fact_conflict((
+                FactClaim(
+                    "claim:ambiguous-role",
+                    duplicated.case_id,
+                    duplicated.proof_hash,
+                    "trade:1.quantity",
+                    FactDomain.TRANSACTION_DETAIL,
+                    "2500",
+                    refs[CaseArtifactRole.COMPLAINT],
+                ),
+            ), cases=cases, source_registry=sources, artifact_manifest=manifest)
+
     def test_policy_hash_is_deterministic(self):
         self.assertEqual(
             SourcePriorityPolicy().proof_hash,
