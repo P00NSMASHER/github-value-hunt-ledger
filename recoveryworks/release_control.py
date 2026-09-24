@@ -606,13 +606,61 @@ def write_release_control_artifacts(
     rollback: ReleaseRollbackManifest | None,
     gate: EnvironmentPromotionGate,
     directory: str | Path,
-) -> tuple[Path, Path, Path, Path]:
+    adversarial_certification: ProductionAdversarialCertification | None = None,
+) -> tuple[Path, ...]:
+    adversarial_payload = None
+    if gate.environment is ReleaseEnvironment.PRODUCTION:
+        from recoveryworks.production_adversarial_certification import (
+            AdversarialCertificationState,
+            ProductionAdversarialCertification,
+        )
+        if adversarial_certification is None:
+            raise ValueError(
+                "production release package requires adversarial certification"
+            )
+        if not isinstance(
+            adversarial_certification, ProductionAdversarialCertification
+        ):
+            raise ValueError(
+                "adversarial certification has invalid artifact type"
+            )
+        if adversarial_certification.state is not AdversarialCertificationState.PASS:
+            raise ValueError("packaged adversarial certification did not pass")
+        if adversarial_certification.false_negative_count != 0:
+            raise ValueError(
+                "packaged adversarial certification contains false negatives"
+            )
+        if (
+            gate.adversarial_certification_proof_hash
+            != adversarial_certification.proof_hash
+        ):
+            raise ValueError(
+                "packaged adversarial certification does not bind promotion gate"
+            )
+        if adversarial_certification.source_revision != release.source_commit:
+            raise ValueError(
+                "packaged adversarial certification source revision mismatch"
+            )
+        if (
+            adversarial_certification.container_build_manifest_proof_hash
+            != release.container_build_manifest_proof_hash
+        ):
+            raise ValueError(
+                "packaged adversarial certification build manifest mismatch"
+            )
+        adversarial_payload = adversarial_certification.as_dict()
+    elif adversarial_certification is not None:
+        raise ValueError(
+            "non-production release package cannot attach production adversarial certification"
+        )
+
     target = Path(directory)
     paths = (
         target / "release-manifest.json",
         target / "release-approvals.json",
         target / "rollback-manifest.json",
         target / "promotion-gate.json",
+        target / "adversarial-certification.json",
     )
     payloads = (
         release.as_dict(),
@@ -634,6 +682,7 @@ def write_release_control_artifacts(
             }
         ),
         gate.as_dict(),
+        adversarial_payload,
     )
     for path, payload in zip(paths, payloads):
         atomic_private_write(
