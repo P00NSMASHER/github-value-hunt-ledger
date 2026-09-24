@@ -64,7 +64,7 @@ class ReviewedCloudSupersessionTests(unittest.TestCase):
                 preview,
                 reviewer_id="reviewer-supersession",
                 review_note="Reviewed amended cloud rate authority.",
-                approved_at="2026-09-24T04:00:00Z",
+                approved_at="2026-09-25T04:00:00Z",
             )
             applied = apply_cloud_supersession(
                 preview,
@@ -119,12 +119,12 @@ class ReviewedCloudSupersessionTests(unittest.TestCase):
                 finding_id,
                 "reviewer",
                 "approved",
-                occurred_at="2026-09-24T03:58:00Z",
+                occurred_at="2026-09-25T03:58:00Z",
             )
             ledger.authorize(
                 finding_id,
                 "auth-1",
-                occurred_at="2026-09-24T03:59:00Z",
+                occurred_at="2026-09-25T03:59:00Z",
             )
             store.save(ledger, expected_head_hash=first.scan.state_head_hash)
 
@@ -148,7 +148,7 @@ class ReviewedCloudSupersessionTests(unittest.TestCase):
                     preview,
                     reviewer_id="reviewer-2",
                     review_note="try replacement",
-                    approved_at="2026-09-24T04:01:00Z",
+                    approved_at="2026-09-25T04:01:00Z",
                 )
 
 
