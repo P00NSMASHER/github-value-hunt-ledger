@@ -105,16 +105,16 @@ class RealCorpusListingTests(unittest.TestCase):
             "cb00a9c2983c5ffb0f37ef3aff84ce8bcf328bd56565664e01abe0dfadde64af",
         )
 
-    def test_verified_intervals_expand_to_current_2024_rows(self):
+    def test_verified_intervals_expand_to_current_2134_rows(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 69)
+        self.assertEqual(len(intervals), 74)
 
         result = expand_listing_intervals(
             expanded_requirements(),
             intervals,
         )
-        self.assertEqual(len(result.resolved), 2024)
-        self.assertEqual(len(result.unresolved), 1804)
+        self.assertEqual(len(result.resolved), 2134)
+        self.assertEqual(len(result.unresolved), 1694)
         self.assertEqual(
             len({item.symbol for item in result.resolved}),
             69,
@@ -138,7 +138,7 @@ class RealCorpusListingTests(unittest.TestCase):
             load_intervals(),
         )
         imported = load_import_bundle()
-        self.assertEqual(len(imported.listings), 2024)
+        self.assertEqual(len(imported.listings), 2134)
 
         expanded_rows = {
             (
@@ -157,11 +157,11 @@ class RealCorpusListingTests(unittest.TestCase):
             for item in imported.listings
         }
         self.assertEqual(imported_rows, expanded_rows)
-        self.assertEqual(len(imported_rows), 2024)
+        self.assertEqual(len(imported_rows), 2134)
 
     def test_interval_evidence_is_public_authorized_and_two_boundary(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 69)
+        self.assertEqual(len(intervals), 74)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith("https://"))
             self.assertTrue(item.end_evidence_url.startswith("https://"))
@@ -181,11 +181,11 @@ class RealCorpusListingTests(unittest.TestCase):
         self.assertEqual(manifest["listing_requirement_total"], 3828)
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
-        self.assertEqual(manifest["listing_metadata_resolved"], 2024)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 1804)
-        self.assertEqual(manifest["listing_intervals_verified"], 69)
-        self.assertEqual(manifest["listing_symbols_resolved"], 69)
-        self.assertEqual(manifest["listing_batches_completed"], 21)
+        self.assertEqual(manifest["listing_metadata_resolved"], 2134)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 1694)
+        self.assertEqual(manifest["listing_intervals_verified"], 74)
+        self.assertEqual(manifest["listing_symbols_resolved"], 74)
+        self.assertEqual(manifest["listing_batches_completed"], 22)
 
 
 if __name__ == "__main__":
