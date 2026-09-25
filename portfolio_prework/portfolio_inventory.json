@@ -1,0 +1,863 @@
+{
+  "schema_version": "1.0.0",
+  "inventory_date": "2026-09-24",
+  "purpose": "Machine-readable baseline inventory for Portfolio Brain reconnaissance and future delta-aware architecture work.",
+  "repositories": [
+    {
+      "id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "default_branch": "main",
+      "language": "Python",
+      "snapshot_sha": "b47f95caa658a9b12536cc9946d81d51f944c6ac",
+      "roles": [
+        "hunter",
+        "technology_intelligence",
+        "ai_business_os",
+        "recoveryworks",
+        "freight",
+        "portfolio_research",
+        "data_ledgers"
+      ]
+    },
+    {
+      "id": "REPO-002",
+      "full_name": "P00NSMASHER/StarBlox",
+      "default_branch": "main",
+      "language": "JavaScript",
+      "snapshot_sha": "8ebe583f6dae6a832bae2f4987c6919db41eaf5e",
+      "roles": [
+        "product",
+        "education",
+        "game"
+      ]
+    },
+    {
+      "id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "default_branch": "main",
+      "language": "JavaScript",
+      "snapshot_sha": "350e8abe07dab633666b91cf26ca5ebf2d1fc406",
+      "roles": [
+        "product",
+        "education",
+        "parent_companion"
+      ]
+    },
+    {
+      "id": "REPO-004",
+      "full_name": "P00NSMASHER/trading-platform",
+      "default_branch": "main",
+      "language": "Python",
+      "snapshot_sha": "579730f1abb595579de199277a95a8c89f733d0f",
+      "roles": [
+        "research",
+        "market_surveillance",
+        "model_validation"
+      ]
+    },
+    {
+      "id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "default_branch": "main",
+      "language": "JavaScript",
+      "snapshot_sha": "7c9a8fc4dd9fa12275d336beb8eb10732718666a",
+      "roles": [
+        "business",
+        "product",
+        "permit_intelligence"
+      ]
+    },
+    {
+      "id": "REPO-006",
+      "full_name": "P00NSMASHER/permitplate-state",
+      "default_branch": "main",
+      "language": null,
+      "snapshot_sha": "c64fe06a22c3826c9ad3a7b85a4f911a6e589c19",
+      "roles": [
+        "private_state_pattern",
+        "operational_ledger"
+      ]
+    },
+    {
+      "id": "REPO-007",
+      "full_name": "P00NSMASHER/capturebrief",
+      "default_branch": "main",
+      "language": "Python",
+      "snapshot_sha": "3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba",
+      "roles": [
+        "business",
+        "product",
+        "govcon",
+        "decision_evidence"
+      ]
+    }
+  ],
+  "businesses": [
+    {
+      "name": "RecoveryWorks",
+      "repo": "REPO-001",
+      "kind": "umbrella_business",
+      "status": "built"
+    },
+    {
+      "name": "RecoveryOS",
+      "repo": "REPO-001",
+      "kind": "shared_recovery_platform",
+      "status": "built"
+    },
+    {
+      "name": "Recovery Scan 360",
+      "repo": "REPO-001",
+      "kind": "multi-branch_offer",
+      "status": "built"
+    },
+    {
+      "name": "FreightRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "PayerRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "UtilityRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "APRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "DutyRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "SaaSRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "TelecomRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "RebateRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "LeaseRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "ConstructionRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "TaxRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "InsuranceRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "CloudRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "MerchantFeeRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "ParcelRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "ProcurementRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "Warranty/CreditRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "Payroll/BenefitBillingRecovery",
+      "repo": "REPO-001",
+      "kind": "recovery_division",
+      "status": "built"
+    },
+    {
+      "name": "Freight Audit Acceptance Test / Recovery",
+      "repo": "REPO-001",
+      "kind": "commercial_offer",
+      "status": "external_validation_blocked"
+    },
+    {
+      "name": "AP Leakage Assurance",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "ready_for_external_validation"
+    },
+    {
+      "name": "Partner / Commission Payout Assurance",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "ready_for_external_validation"
+    },
+    {
+      "name": "Recovery Proof SLA",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "ready"
+    },
+    {
+      "name": "ScopeSignal / Construction Change Leakage Recovery",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "synthetic_ready"
+    },
+    {
+      "name": "Hydrovac / Waste Job-to-Invoice Leakage Audit",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Installed-Base Lab Automation",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "ready"
+    },
+    {
+      "name": "Industrial Pre-FAT / Virtual Commissioning",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "ready"
+    },
+    {
+      "name": "Money-State Integrity / Close Assurance",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "ready"
+    },
+    {
+      "name": "Telecom Revenue Assurance",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Healthcare Revenue Integrity Diagnostic",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Queue Materialization Intelligence",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Utility Revenue Assurance",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Reviewed Identity Registry / Safe Writeback Service",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Risk-Priced Infrastructure Inspection",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "validation_stage"
+    },
+    {
+      "name": "M365 ISO Evidence Refresh",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "validation_stage"
+    },
+    {
+      "name": "SaaS Revenue Integrity Acceptance Test",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "SaaS License True-Up & Renewal Savings Audit",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Biometric Time-to-Payroll Acceptance Audit",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Airline IROPS Decision Assurance",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "shadow_validation"
+    },
+    {
+      "name": "Insurance Subrogation Recovery Diagnostic",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "synthetic_ready"
+    },
+    {
+      "name": "Revenue-to-Receivable Trace Audit",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "opportunity"
+    },
+    {
+      "name": "Measurement-to-Payment Leakage Assurance",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "challenger"
+    },
+    {
+      "name": "Industrial Gas Returnables Proof-to-Cash",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "emerging"
+    },
+    {
+      "name": "Commercial Linen Custody-to-Cash",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "emerging"
+    },
+    {
+      "name": "Facilities Warranty Leakage",
+      "repo": "REPO-001",
+      "kind": "commercial_opportunity",
+      "status": "emerging"
+    },
+    {
+      "name": "PermitPlate",
+      "repo": "REPO-005",
+      "kind": "business",
+      "status": "built"
+    },
+    {
+      "name": "PermitPlate NYC",
+      "repo": "REPO-005",
+      "kind": "subscription_offer",
+      "status": "built"
+    },
+    {
+      "name": "CaptureBrief",
+      "repo": "REPO-007",
+      "kind": "business",
+      "status": "built"
+    },
+    {
+      "name": "CaptureBrief Decision Evidence",
+      "repo": "REPO-007",
+      "kind": "commercial_offer",
+      "status": "built"
+    },
+    {
+      "name": "CaptureBrief 14-Day Targeted Watch",
+      "repo": "REPO-007",
+      "kind": "service_feature",
+      "status": "built"
+    },
+    {
+      "name": "CaptureBrief FAR/DFARS Deviation Intelligence",
+      "repo": "REPO-007",
+      "kind": "decision_intelligence",
+      "status": "built"
+    }
+  ],
+  "products": [
+    {
+      "name": "StarBlox",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Quest Engine",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Learning/Mastery System",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "Star Market",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Avatar/Equipment System",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Home Progression",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Buddy/Bond System",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Parent Learning Pulse",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Question QA System",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "StarBlox Artwork Production Pipeline",
+      "repo": "REPO-002",
+      "status": "built"
+    },
+    {
+      "name": "ABVM Grade 2 Parent Companion",
+      "repo": "REPO-003",
+      "status": "built"
+    },
+    {
+      "name": "ABVM Teacher-Site Refresh Pipeline",
+      "repo": "REPO-003",
+      "status": "built"
+    },
+    {
+      "name": "ABVM School Pack",
+      "repo": "REPO-003",
+      "status": "built"
+    },
+    {
+      "name": "ABVM Uploaded Notice/Flyer System",
+      "repo": "REPO-003",
+      "status": "built"
+    },
+    {
+      "name": "ABVM Offline Last-Good Fallback",
+      "repo": "REPO-003",
+      "status": "built"
+    },
+    {
+      "name": "ABVM Homework Checkoff System",
+      "repo": "REPO-003",
+      "status": "built"
+    },
+    {
+      "name": "PermitPlate public application",
+      "repo": "REPO-005",
+      "status": "built"
+    },
+    {
+      "name": "PermitPlate operational ledgers",
+      "repo": "REPO-006",
+      "status": "built"
+    },
+    {
+      "name": "CaptureBrief delivery bundle",
+      "repo": "REPO-007",
+      "status": "built"
+    }
+  ],
+  "research": [
+    {
+      "name": "Private MNPI / Informed-Trading Surveillance Research Platform",
+      "repo": "REPO-004",
+      "status": "built_research"
+    },
+    {
+      "name": "Historical Event Corpus Builder",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Historical Market Data Adapter",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Point-in-Time Baseline Engine",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Surveillance Feature Engine",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Matched-Control Generator",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Offline Model-Training Harness",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Blind External-Validation Harness",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Private Surveillance Case Database",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Immutable Evidence Generator",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Private Surveillance Dashboard",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Deployment Hardening / DR",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Cross-Event Intelligence Graph",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Graph-Aware Surveillance Features",
+      "repo": "REPO-004",
+      "status": "built"
+    },
+    {
+      "name": "Hunter / GitHub Value Hunt",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "47-Domain Hunter Catalog System",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "MASTER Integrator",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Technology Intelligence Loop",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Search Strategy Learning",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Query-Family Learning",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Search Move Learning",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Worker Routing and Routing Learning",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Saturation Detection",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Blind-Spot Coverage",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Adjacency Expansion",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Unified Hunt Allocator",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Execution Control Plane",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Controlled Routing Exploration",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Offline Training Environment",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Train/Confirm/Evaluation Partitioning",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Repair / Skill Evaluation / Canary Pipeline",
+      "repo": "REPO-001",
+      "status": "built"
+    }
+  ],
+  "experiments": [
+    {
+      "id": "EXP-001",
+      "name": "Freight blind audit to realized settlement",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-002",
+      "name": "AP source-authority + reversible receipt-policy audit",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-003",
+      "name": "Commission plan-to-bank acceptance test",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-004",
+      "name": "Recovery Proof adversarial qualification/admission matrix",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-005",
+      "name": "ScopeSignal authority-to-paid benchmark",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-006",
+      "name": "CaptureBrief 10-solicitation packet/authority benchmark",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-007",
+      "name": "Installed-base sequencing/lab handoff acceptance",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-008",
+      "name": "Industrial virtual pre-FAT differential benchmark",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-009",
+      "name": "Permit intelligence multi-jurisdiction benchmark",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-010",
+      "name": "Money-state integrity common month",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-011",
+      "name": "Subrogation rule-and-quantum fail-closed benchmark",
+      "repo": "REPO-001"
+    },
+    {
+      "id": "EXP-012",
+      "name": "Outcome-priced grid resilience calibration",
+      "repo": "REPO-001"
+    }
+  ],
+  "infrastructure": [
+    {
+      "name": "AI Business OS",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Persistent Agent Runtime",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Independent Auditor Brain",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Verifier-Gated Self-Improvement",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Value-Weighted Memory",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Provenance-Preserving Knowledge Graph",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Runtime Governance / Control Plane",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Governed Autonomous Software Factory",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Evidence / Truth Engine",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Reversible Entity Canonicalization",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Evidence-First Portfolio Capital Allocator",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Business OS",
+      "repo": "REPO-001",
+      "status": "parallel_legacy_architecture"
+    },
+    {
+      "name": "Production Hunter Architecture",
+      "repo": "REPO-001",
+      "status": "staged"
+    },
+    {
+      "name": "Learning Engine",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Learning Curriculum",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Runtime Activation Gate",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Restart Readiness System",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Blind Partition System",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Autonomous Repair Workbench",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Skill Evaluation and Promotion Intake",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "FMC Tariff Rule Ledger",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Hospital Price Transparency MRF Ledger",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Transparency-in-Coverage Payer MRF Ledger",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "OpenEI URDB Utility Rate Ledger",
+      "repo": "REPO-001",
+      "status": "built"
+    },
+    {
+      "name": "Browser Gateway / Mobile Browser Gateway",
+      "repo": "REPO-001",
+      "status": "branch_or_parallel_work"
+    }
+  ],
+  "boundaries": {
+    "trading_platform": "Research/surveillance only; no autonomous trade execution.",
+    "consequential_external_actions": "Human authorization required for deployment, customer contact, claims/disputes, money movement, purchases, sensitive publication, and consequential child-facing experiments.",
+    "portfolio_brain_strategy": "Keep product repositories independent; integrate through registry, events, adapters, evidence, and governed APIs."
+  }
+}
