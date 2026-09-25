@@ -50,6 +50,8 @@ class ReleaseDeploymentHandoff:
     release_proof_hash: str
     promotion_gate_id: str
     promotion_gate_proof_hash: str
+    production_admission_id: str
+    production_admission_proof_hash: str
     environment: ReleaseEnvironment
     container_image_ref: str
     container_image_digest: str
@@ -63,11 +65,17 @@ class ReleaseDeploymentHandoff:
     deployment_performed_by_recoveryos: bool = False
 
     def __post_init__(self) -> None:
-        for name in ("release_id", "promotion_gate_id", "deployer_id"):
+        for name in (
+            "release_id",
+            "promotion_gate_id",
+            "production_admission_id",
+            "deployer_id",
+        ):
             object.__setattr__(self, name, _text(name, getattr(self, name)))
         for name in (
             "release_proof_hash",
             "promotion_gate_proof_hash",
+            "production_admission_proof_hash",
             "production_deployment_proof_hash",
         ):
             object.__setattr__(
@@ -121,6 +129,9 @@ class ReleaseDeploymentHandoff:
             "release_proof_hash": self.release_proof_hash,
             "promotion_gate_id": self.promotion_gate_id,
             "promotion_gate_proof_hash": self.promotion_gate_proof_hash,
+            "production_admission_id": self.production_admission_id,
+            "production_admission_proof_hash":
+                self.production_admission_proof_hash,
             "environment": self.environment.value,
             "container_image_ref": self.container_image_ref,
             "container_image_digest": self.container_image_digest,
@@ -159,6 +170,10 @@ def prepare_release_deployment_handoff(
 ) -> ReleaseDeploymentHandoff:
     if not gate.promotion_ready:
         raise ValueError("promotion gate is not ready")
+    if not admission.admitted:
+        raise ValueError("production admission is not admitted")
+    if admission.deployment_execution_enabled:
+        raise ValueError("production admission cannot pre-execute deployment")
     if admission.release_id != release.release_id:
         raise ValueError("production admission release id mismatch")
     if admission.release_proof_hash != release.proof_hash:
@@ -181,6 +196,8 @@ def prepare_release_deployment_handoff(
         "release_proof_hash": release.proof_hash,
         "promotion_gate_id": gate.gate_id,
         "promotion_gate_proof_hash": gate.proof_hash,
+        "production_admission_id": admission.admission_id,
+        "production_admission_proof_hash": admission.proof_hash,
         "environment": gate.environment.value,
         "container_image_ref": release.container_image_ref,
         "container_image_digest": release.container_image_digest,
@@ -200,6 +217,8 @@ def prepare_release_deployment_handoff(
         release_proof_hash=release.proof_hash,
         promotion_gate_id=gate.gate_id,
         promotion_gate_proof_hash=gate.proof_hash,
+        production_admission_id=admission.admission_id,
+        production_admission_proof_hash=admission.proof_hash,
         environment=gate.environment,
         container_image_ref=release.container_image_ref,
         container_image_digest=release.container_image_digest,
