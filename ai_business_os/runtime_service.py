@@ -537,18 +537,82 @@ def build_server() -> ThreadingHTTPServer:
             self._json(404, {"ok": False, "error": "not_found"})
 
         def do_POST(self) -> None:
+            path = self.path.split("?", 1)[0]
+
+            if path == "/ui/login":
+                if not ui_enabled:
+                    self._json(404, {"ok": False, "error": "ui_disabled"})
+                    return
+                try:
+                    form = self._form_body()
+                    if not access_code_matches(form.get("access_code", ""), ui_access_sha256):
+                        time.sleep(0.25)
+                        self._html(401, render_login(error="Invalid access code."))
+                        return
+                    token = issue_session(ui_session_secret, ui_principal)
+                    self._redirect("/ui", set_cookie=session_cookie(token))
+                except Exception:
+                    self._html(400, render_login(error="Unable to start a secure session."))
+                return
+
+            if path.startswith("/ui/"):
+                token, session = self._ui_session()
+                if session is None:
+                    self._html(401, render_login(error="Your session is missing or expired."))
+                    return
+                try:
+                    form = self._form_body()
+                    if not csrf_matches(token, ui_session_secret, form.get("csrf", "")):
+                        raise ValueError("invalid CSRF token")
+                    if path == "/ui/logout":
+                        self._redirect("/ui", set_cookie=clear_session_cookie())
+                        return
+                    if path == "/ui/objective/propose":
+                        proposal = operator.propose_objective(
+                            form.get("objective", ""),
+                            requested_by=ui_principal,
+                            priority=int(form.get("priority", "80")),
+                        )
+                        self._render_ui(token, proposal=proposal)
+                        return
+                    if path == "/ui/objective/activate":
+                        proposal = json.loads(form.get("proposal_json", ""))
+                        if not isinstance(proposal, dict):
+                            raise ValueError("proposal must be an object")
+                        activated = operator.activate_objective(
+                            proposal,
+                            human_principal=ui_principal,
+                            write_execute=write_execute,
+                        )
+                        goal = activated.get("goal", {})
+                        self._render_ui(
+                            token,
+                            notice=(
+                                "Objective activated as governed PENDING goal "
+                                + str(goal.get("id", ""))
+                            ),
+                        )
+                        return
+                    self._json(404, {"ok": False, "error": "not_found"})
+                except Exception as exc:
+                    try:
+                        self._render_ui(token, error=str(exc), status=400)
+                    except Exception:
+                        self._json(400, {"ok": False, "error": str(exc)})
+                return
+
             if not self._authorized():
                 self._json(401, {"ok": False, "error": "unauthorized"})
                 return
             try:
                 body = self._body()
-                if self.path == "/objective/propose":
+                if path == "/objective/propose":
                     data = operator.propose_objective(
                         str(body.get("objective", "")),
                         requested_by=str(body.get("requested_by", "")),
                         priority=int(body.get("priority", 80)),
                     )
-                elif self.path == "/objective/activate":
+                elif path == "/objective/activate":
                     proposal = body.get("proposal")
                     if not isinstance(proposal, dict):
                         raise ValueError("proposal must be an object")
@@ -557,7 +621,7 @@ def build_server() -> ThreadingHTTPServer:
                         human_principal=str(body.get("human_principal", "")),
                         write_execute=write_execute,
                     )
-                elif self.path == "/approval/decide":
+                elif path == "/approval/decide":
                     data = operator.decide_approval(
                         request_key=str(body.get("request_key", "")),
                         intent_hash=str(body.get("intent_hash", "")),
@@ -589,7 +653,7 @@ def main() -> None:
             {
                 "event": "runtime_started",
                 "port": server.server_address[1],
-                "public_domain_required": False,
+                "public_domain_required": os.environ.get("AIBOS_UI_ENABLED", "0") == "1",
             }
         ),
         flush=True,
