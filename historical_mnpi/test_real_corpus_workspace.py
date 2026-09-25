@@ -94,7 +94,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             imported.counts(),
             {
                 "announcement_rows": 27,
-                "listing_rows": 2244,
+                "listing_rows": 2464,
                 "shares_rows": 0,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
@@ -228,7 +228,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
-        self.assertEqual(manifest["listing_metadata_resolved"], 2244)
+        self.assertEqual(manifest["listing_metadata_resolved"], 2464)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
@@ -585,7 +585,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
 
 
-    def test_g2_current_batches_resolve_2244_listing_observations(self):
+    def test_g2_current_batches_resolve_2464_listing_observations(self):
         import_dir = CORPUS_DIR / "import"
         files = {
             name: (import_dir / name).read_text(encoding="utf-8")
@@ -598,16 +598,16 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         }
         imported = import_real_corpus_metadata(files)
-        self.assertEqual(len(imported.listings), 2244)
+        self.assertEqual(len(imported.listings), 2464)
 
         by_symbol = {}
         for item in imported.listings:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(set(by_symbol), {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GDI", "GILD", "GMCR", "GME", "GNRC", "GNTX", "GORO", "GT", "HAE", "HBI", "HON", "IBKC", "IDTI", "IDXX", "IGT", "ILMN", "INT", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"})
+        self.assertEqual(set(by_symbol), {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GDI", "GILD", "GMCR", "GME", "GNRC", "GNTX", "GORO", "GT", "HAE", "HBI", "HON", "IBKC", "IDTI", "IDXX", "IGT", "ILMN", "INT", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW", "INWK", "ISIL", "ISSI", "JWN", "KELYA", "KOPN", "LRCX", "LSCC", "LSTR", "MAT"})
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
-            {"ACHC": 22, "ACO": 22, "AF": 22, "AGP": 22, "ALGN": 22, "ALNY": 22, "ALSN": 22, "AMD": 22, "AMP": 22, "AMSG": 22, "APC": 22, "ATRC": 22, "AVA": 22, "ADI": 44, "BA": 22, "BCR": 22, "BIO": 22, "BRKR": 22, "BWA": 22, "CA": 44, "CACI": 22, "CAG": 22, "CAKE": 22, "CAMP": 22, "CAT": 22, "CB": 22, "CBT": 22, "CENX": 22, "CGNX": 44, "CLD": 44, "CMP": 22, "CMTL": 22, "CNMD": 22, "COL": 22, "COLM": 44, "CR": 22, "CRL": 22, "CREE": 44, "CSOD": 22, "DEST": 22, "DE": 22, "DGI": 66, "DNDN": 22, "DXCM": 22, "DYN": 22, "EA": 22, "ECHO": 22, "ECOL": 22, "EHTH": 44, "EW": 44, "F": 22, "FL": 22, "FLR": 22, "FLT": 22, "GDI": 22, "GILD": 22, "GMCR": 22, "GME": 22, "GNRC": 22, "GNTX": 22, "GORO": 22, "GT": 22, "HAE": 22, "HBI": 22, "HON": 22, "IBKC": 22, "IDTI": 44, "IDXX": 22, "IGT": 22, "ILMN": 44, "INT": 22, "JNPR": 88, "MDU": 44, "MTH": 44, "MUSA": 44, "NKE": 22, "PNRA": 88, "SBUX": 22, "VMW": 66},
+            {"ACHC": 22, "ACO": 22, "AF": 22, "AGP": 22, "ALGN": 22, "ALNY": 22, "ALSN": 22, "AMD": 22, "AMP": 22, "AMSG": 22, "APC": 22, "ATRC": 22, "AVA": 22, "ADI": 44, "BA": 22, "BCR": 22, "BIO": 22, "BRKR": 22, "BWA": 22, "CA": 44, "CACI": 22, "CAG": 22, "CAKE": 22, "CAMP": 22, "CAT": 22, "CB": 22, "CBT": 22, "CENX": 22, "CGNX": 44, "CLD": 44, "CMP": 22, "CMTL": 22, "CNMD": 22, "COL": 22, "COLM": 44, "CR": 22, "CRL": 22, "CREE": 44, "CSOD": 22, "DEST": 22, "DE": 22, "DGI": 66, "DNDN": 22, "DXCM": 22, "DYN": 22, "EA": 22, "ECHO": 22, "ECOL": 22, "EHTH": 44, "EW": 44, "F": 22, "FL": 22, "FLR": 22, "FLT": 22, "GDI": 22, "GILD": 22, "GMCR": 22, "GME": 22, "GNRC": 22, "GNTX": 22, "GORO": 22, "GT": 22, "HAE": 22, "HBI": 22, "HON": 22, "IBKC": 22, "IDTI": 44, "IDXX": 22, "IGT": 22, "ILMN": 44, "INT": 22, "JNPR": 88, "MDU": 44, "MTH": 44, "MUSA": 44, "NKE": 22, "PNRA": 88, "SBUX": 22, "VMW": 66, "INWK": 22, "ISIL": 22, "ISSI": 22, "JWN": 22, "KELYA": 22, "KOPN": 22, "LRCX": 22, "LSCC": 22, "LSTR": 22, "MAT": 22},
         )
         self.assertEqual(
             {row.primary_exchange for row in by_symbol["CNMD"]},
@@ -880,12 +880,12 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
         self.assertEqual(manifest["listing_metadata_resolved"], 2244)
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_intervals_verified"], 79)
-        self.assertEqual(manifest["listing_symbols_resolved"], 79)
-        self.assertEqual(manifest["listing_batches_completed"], 23)
+        self.assertEqual(manifest["listing_intervals_verified"], 89)
+        self.assertEqual(manifest["listing_symbols_resolved"], 89)
+        self.assertEqual(manifest["listing_batches_completed"], 24)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 1584)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 1364)
 
     def test_listing_requirement_batch_008_is_176_observations(self):
         path = CORPUS_DIR / "listing_requirement_batch_008.csv"
@@ -1028,14 +1028,14 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             for row in rows
         ))
 
-    def test_g2_interval_ledger_has_79_unique_intervals(self):
+    def test_g2_interval_ledger_has_89_unique_intervals(self):
         path = CORPUS_DIR / "listing_interval_evidence.csv"
         with path.open("r", encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
-        self.assertEqual(len(rows), 79)
+        self.assertEqual(len(rows), 89)
         self.assertEqual(
             len({row["interval_id"] for row in rows}),
-            79,
+            89,
         )
         by_symbol = {
             row["symbol"]: row
@@ -1059,6 +1059,17 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(by_symbol["IGT"]["primary_exchange"], "NYSE")
         self.assertEqual(by_symbol["INT"]["primary_exchange"], "NYSE")
 
+        self.assertEqual(by_symbol["INWK"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["ISIL"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["ISSI"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["JWN"]["primary_exchange"], "NYSE")
+        self.assertEqual(by_symbol["KELYA"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["KOPN"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["LRCX"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["LSCC"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["LSTR"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["MAT"]["primary_exchange"], "NASDAQ")
+
 
     def test_listing_requirement_batch_021_is_66_observations(self):
         path = CORPUS_DIR / "listing_requirement_batch_021.csv"
@@ -1071,6 +1082,24 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(
             sum(int(row["requirement_count"]) for row in rows),
             66,
+        )
+        self.assertTrue(all(
+            int(row["requirement_count"]) == 22
+            for row in rows
+        ))
+
+
+    def test_listing_requirement_batch_024_is_220_observations(self):
+        path = CORPUS_DIR / "listing_requirement_batch_024.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(
+            [row["historical_symbol"] for row in rows],
+            ["INWK", "ISIL", "ISSI", "JWN", "KELYA", "KOPN", "LRCX", "LSCC", "LSTR", "MAT"],
+        )
+        self.assertEqual(
+            sum(int(row["requirement_count"]) for row in rows),
+            220,
         )
         self.assertTrue(all(
             int(row["requirement_count"]) == 22
