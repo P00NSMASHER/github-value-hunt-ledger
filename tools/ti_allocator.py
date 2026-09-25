@@ -13,6 +13,7 @@ CFG=json.loads(POLICY_PATH.read_text(encoding="utf-8"))
 PORTFOLIO_POLICY_ID=(CFG.get("learning") or {}).get("portfolio_policy_generation_id") or "PORTFOLIO:000000000000"
 POLICY=json.loads((INTEL/"search_policy.json").read_text(encoding="utf-8"))
 SEEDS=load_jsonl("search_seeds.jsonl")
+BUSINESS_OS_SEEDS=load_jsonl("business_os_hunter_seeds.jsonl") if (INTEL/"business_os_hunter_seeds.jsonl").exists() else []
 ADJ=load_jsonl("adjacency_queue.jsonl")
 MEASURE=json.loads((INTEL/"measurement_plan.json").read_text(encoding="utf-8")) if (INTEL/"measurement_plan.json").exists() else {}
 RUNS=[r for r in load_jsonl("search_runs.jsonl") if r.get("measurement_quality") in {"prospective","benchmark"}]
@@ -170,6 +171,57 @@ for s in SEEDS:
         "verification_gate":s.get("verification_gate"),
         "stop_conditions":s.get("stop_conditions") or []
       }
+    })
+
+
+# AI Business OS portfolio-gap seeds are already fail-closed to public technical sources.
+# They enter the existing allocator but never bypass its slot, routing, activation, or lease lifecycle.
+for s in BUSINESS_OS_SEEDS:
+    if s.get("seed_type") != "business_os_gap":
+        raise SystemExit(f"{s.get('seed_id')}: invalid Business OS Hunter seed type")
+    if s.get("work_action") != "search":
+        raise SystemExit(f"{s.get('seed_id')}: Business OS Hunter work must be search")
+    if s.get("planning_only") is not True or s.get("external_write_allowed") is not False:
+        raise SystemExit(f"{s.get('seed_id')}: Business OS Hunter authority boundary violated")
+    if s.get("human_approval_required_for_external_write") is not True:
+        raise SystemExit(f"{s.get('seed_id')}: Business OS external-write gate missing")
+    score = round(min(120, float(s.get("priority") or 0)), 2)
+    candidates.append({
+      "work_item_id": work_id("bos", s["seed_id"]),
+      "work_kind": "business_os_gap",
+      "work_action": "search",
+      "query_recipe_id": None,
+      "query_anchors": s.get("query_anchors") or [],
+      "required_signatures": [],
+      "exclude_domains": [],
+      "source_id": s["source_id"],
+      "title": s["title"],
+      "measurement_contract_version": None,
+      "authorization_basis": "ai_business_os_portfolio_gap",
+      "final_score": score,
+      "score_components": {"business_os_priority": score},
+      "strategy_id": None,
+      "search_objective_id": None,
+      "capability_ids": [],
+      "experiment_ids": [],
+      "coverage_gap_ids": [],
+      "business_os_plan_hash": s["business_os_plan_hash"],
+      "business_os_work_id": s["business_os_work_id"],
+      "business_os_seed_hash": s["business_os_seed_hash"],
+      "business_os_initiative_key": s["initiative_key"],
+      "business_os_metric_key": s["metric_key"],
+      "business_os_gap_type": s["gap_type"],
+      "business_os_required_source_type": s["required_source_type"],
+      "adjacency_root": None,
+      "instructions": {
+        "work_action": "search",
+        "acceptance_target": s["acceptance_target"],
+        "why_now": (s.get("instructions") or {}).get("why_now"),
+        "queries": s.get("queries") or [],
+        "search_surfaces": (s.get("instructions") or {}).get("search_surfaces") or [],
+        "verification_gate": (s.get("instructions") or {}).get("verification_gate"),
+        "stop_conditions": (s.get("instructions") or {}).get("stop_conditions") or [],
+      },
     })
 
 # Adjacency candidates.
@@ -370,6 +422,7 @@ candidates=[
 fingerprint=json.dumps({
  "policy":POLICY,
  "seeds":SEEDS,
+ "business_os_seeds":BUSINESS_OS_SEEDS,
  "adj_ids":[(x.get("adjacency_id"),x.get("priority")) for x in ADJ],
  "experiments":EXPERIMENTS,
  "candidate_instructions":[(x["work_item_id"],x.get("work_action"),x["instructions"]) for x in candidates],
@@ -420,7 +473,7 @@ for slot in slots:
         # Fallback only within semantically close roles; wildcard remains dedicated.
         fallbacks={
           "experiment":["capability_gap","positive_dna_transfer"],
-          "coverage":["positive_dna_transfer","capability_gap"],
+          "coverage":["positive_dna_transfer","capability_gap","business_os_gap"],
           "adjacency":["positive_dna_transfer"],
           "measurement":["strategy_measurement","capability_gap"],
           "verification":["independent_verification"],

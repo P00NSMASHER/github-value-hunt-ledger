@@ -18,6 +18,7 @@ alloc=load_jsonl("hunt_allocations.jsonl")
 metrics=json.loads((INTEL/"allocator_metrics.json").read_text(encoding="utf-8"))
 runs=load_jsonl("search_runs.jsonl")
 seeds=load_jsonl("search_seeds.jsonl")
+business_os_seeds=load_jsonl("business_os_hunter_seeds.jsonl") if (INTEL/"business_os_hunter_seeds.jsonl").exists() else []
 seed_by_id={
     row.get("seed_id"): row
     for row in seeds
@@ -86,6 +87,23 @@ for n,c in enumerate(cand,1):
             raise SystemExit(f"hunt_candidates.jsonl:{n}: unversioned work unexpectedly carries semantic revision")
         if c.get("work_identity_payload") is not None:
             raise SystemExit(f"hunt_candidates.jsonl:{n}: unversioned work unexpectedly carries identity payload")
+
+    if c.get("work_kind")=="business_os_gap":
+        for field in (
+            "business_os_plan_hash",
+            "business_os_work_id",
+            "business_os_seed_hash",
+            "business_os_initiative_key",
+            "business_os_metric_key",
+            "business_os_gap_type",
+            "business_os_required_source_type",
+        ):
+            if not c.get(field):
+                raise SystemExit(f"hunt_candidates.jsonl:{n}: Business OS candidate missing {field}")
+        if c.get("authorization_basis")!="ai_business_os_portfolio_gap":
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: Business OS authorization basis drift")
+        if c.get("work_action")!="search":
+            raise SystemExit(f"hunt_candidates.jsonl:{n}: Business OS candidate must remain search-only")
     if c.get("work_kind")=="learning_measurement":
         blind_errors=worker_assignment_blinding_errors(c)
         if blind_errors:

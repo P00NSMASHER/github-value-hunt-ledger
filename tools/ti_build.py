@@ -62,6 +62,7 @@ STEPS = (
     ['tools/ti_surface.py'],
     ['tools/ti_allocator_learning.py'],
     ['tools/ti_allocator_learning_validate.py'],
+    ['tools/ti_business_os_bridge_validate.py'],
     ['tools/ti_allocator.py'],
     ['tools/ti_allocator_validate.py'],
     ['tools/ti_execution.py'],
