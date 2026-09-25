@@ -1,0 +1,29 @@
+{
+  "version": "commercial-focus-v1",
+  "status": "ACTIVE",
+  "primary_validation_tracks": [
+    {
+      "business": "FreightRecovery",
+      "loop": "freightrecovery-pilot-001",
+      "owner_agent": "agent-growth",
+      "current_stage": "MEASURING",
+      "buyer_cohort": 5
+    },
+    {
+      "business": "CaptureBrief",
+      "loop": "capturebrief-outreach-001",
+      "owner_agent": "agent-growth",
+      "current_stage": "MEASURING",
+      "buyer_cohort": 3
+    }
+  ],
+  "shared_infrastructure": [
+    {
+      "business": "RecoveryOS",
+      "owner_agent": "agent-engineering"
+    }
+  ],
+  "current_verified_external_outcomes": 0,
+  "next_success_condition": "VERIFIED_EXTERNAL_OUTCOME",
+  "consequential_actions_authorized": false
+}
