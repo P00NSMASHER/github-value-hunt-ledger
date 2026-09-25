@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "repositories": [
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "project_ids": [
+        "PRJ-001",
+        "PRJ-002",
+        "PRJ-008",
+        "PRJ-009",
+        "PRJ-010",
+        "PRJ-011"
+      ]
+    },
+    {
+      "repo_id": "REPO-002",
+      "full_name": "P00NSMASHER/StarBlox",
+      "project_ids": [
+        "PRJ-005"
+      ]
+    },
+    {
+      "repo_id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "project_ids": [
+        "PRJ-006"
+      ]
+    },
+    {
+      "repo_id": "REPO-004",
+      "full_name": "P00NSMASHER/trading-platform",
+      "project_ids": [
+        "PRJ-007"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "project_ids": [
+        "PRJ-003"
+      ]
+    },
+    {
+      "repo_id": "REPO-006",
+      "full_name": "P00NSMASHER/permitplate-state",
+      "project_ids": [
+        "PRJ-003"
+      ]
+    },
+    {
+      "repo_id": "REPO-007",
+      "full_name": "P00NSMASHER/capturebrief",
+      "project_ids": [
+        "PRJ-004"
+      ]
+    }
+  ]
+}
