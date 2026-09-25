@@ -16,9 +16,10 @@ from recoveryworks.test_production_admission import ProductionAdmissionTests
 
 class EnvironmentActivationSimulationTests(unittest.TestCase):
     def release_and_admission(self, root: Path):
-        release,promotion,security,dr,build = ProductionAdmissionTests().fixture(root)
+        fixture = ProductionAdmissionTests()
+        release,promotion,security,dr,build = fixture.fixture(root)
         admission = build_production_admission_gate(
-            release,promotion,security,dr,build,
+            release,promotion,security,dr,build,fixture.package_integrity,
             admitted_at="2026-09-24T13:11:00Z",
         )
         return release,admission
