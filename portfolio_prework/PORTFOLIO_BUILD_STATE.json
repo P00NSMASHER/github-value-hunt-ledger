@@ -4,14 +4,15 @@
   "state_id": "portfolio-parallel-prework",
   "working_branch": "portfolio-parallel-prep",
   "phase": "parallel_prework",
-  "current_step": 7,
+  "current_step": 8,
   "completed_steps": [
     1,
     2,
     3,
     4,
     5,
-    6
+    6,
+    7
   ],
   "repositories": {
     "REPO-001": {
@@ -107,6 +108,16 @@
       "evidence_refs": [
         "portfolio_prework/AUTONOMY_MATRIX.md"
       ]
+    },
+    {
+      "decision_id": "DEC-006",
+      "summary": "Treat existing GitHub workflow write/deploy credentials as capabilities of those workflows, not as blanket authority for Portfolio Brain.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/WORKFLOW_INVENTORY.json",
+        "portfolio_prework/WORKFLOW_INVENTORY.md",
+        "portfolio_prework/AUTONOMY_MATRIX.json"
+      ]
     }
   ],
   "artifacts": [
@@ -163,6 +174,18 @@
       "kind": "autonomy_matrix_documentation",
       "step": 6,
       "commit_sha": "c23409c78cdd8828256ea845c8313e218cd4e050"
+    },
+    {
+      "path": "portfolio_prework/WORKFLOW_INVENTORY.json",
+      "kind": "workflow_inventory",
+      "step": 7,
+      "commit_sha": "8fc8fffd2fb53d2319aa4c16384fb53a69dc31df"
+    },
+    {
+      "path": "portfolio_prework/WORKFLOW_INVENTORY.md",
+      "kind": "workflow_inventory_documentation",
+      "step": 7,
+      "commit_sha": "74f087c8555a32c1fa4ebe5a7fa26128b8eec555"
     }
   ],
   "tests": [
@@ -201,17 +224,23 @@
       "status": "PASS",
       "step": 6,
       "evidence": "Portfolio Prework CI run 36089906402 succeeded."
+    },
+    {
+      "name": "workflow inventory exact snapshot coverage",
+      "status": "PASS",
+      "step": 7,
+      "evidence": "Machine-readable verification: 47 expected workflow paths, 47 inventoried, zero missing, zero extra; no pull_request_target detected."
     }
   ],
   "blockers": [],
   "next_action": {
-    "step": 7,
-    "summary": "Inventory all GitHub Actions workflows across the seven connected repositories, recording triggers, permissions, purpose, and risk-relevant behavior without modifying downstream repositories.",
+    "step": 8,
+    "summary": "Build the test-suite inventory across all seven repositories using the cached repository snapshot and targeted file inspection only where classification requires it.",
     "preconditions": [
       "Read only.",
-      "Do not alter workflow behavior in product repositories.",
-      "Use cached snapshot paths first and inspect only workflow files needed for classification."
+      "Do not run all downstream project test suites merely to inventory them.",
+      "Reuse cached test paths and repository SHAs before deeper inspection."
     ]
   },
-  "updated_at": "2026-09-25T03:20:00Z"
+  "updated_at": "2026-09-25T03:29:00Z"
 }
