@@ -1,12 +1,23 @@
+import csv
 import unittest
+from pathlib import Path
 
 from historical_mnpi.listing_intervals import (
     ListingIntervalEvidence,
     expand_listing_intervals,
+    parse_listing_interval_csv,
+)
+from historical_mnpi.listing_requirements import (
+    expand_listing_requirements,
+    parse_listing_requirement_index,
 )
 from historical_mnpi.metadata_resolver import (
     MetadataDataClass,
 )
+
+
+ROOT = Path(__file__).resolve().parent
+CORPUS_DIR = ROOT / "real_corpus"
 
 
 def interval(
@@ -147,6 +158,101 @@ class ListingIntervalTests(unittest.TestCase):
             row.evidence.source_kind.value,
             "OFFICIAL_LISTING_HISTORY",
         )
+
+
+    def test_real_g2_batch_one_expands_66_of_3828(self):
+        requirements = expand_listing_requirements(
+            parse_listing_requirement_index(
+                (CORPUS_DIR / "listing_requirement_index.csv").read_text(
+                    encoding="utf-8"
+                )
+            )
+        )
+        intervals = parse_listing_interval_csv(
+            (CORPUS_DIR / "listing_intervals.csv").read_text(
+                encoding="utf-8"
+            )
+        )
+        result = expand_listing_intervals(
+            requirements,
+            intervals,
+        )
+
+        self.assertEqual(len(requirements), 3828)
+        self.assertEqual(len(intervals), 3)
+        self.assertEqual(len(result.resolved), 66)
+        self.assertEqual(len(result.unresolved), 3762)
+
+        by_symbol = {}
+        for item in result.resolved:
+            by_symbol.setdefault(item.symbol, []).append(item)
+
+        self.assertEqual(set(by_symbol), {"CAT", "CNMD", "GILD"})
+        self.assertEqual(
+            {symbol: len(rows) for symbol, rows in by_symbol.items()},
+            {"CAT": 22, "CNMD": 22, "GILD": 22},
+        )
+
+    def test_materialized_listing_metadata_matches_interval_expansion(self):
+        requirements = expand_listing_requirements(
+            parse_listing_requirement_index(
+                (CORPUS_DIR / "listing_requirement_index.csv").read_text(
+                    encoding="utf-8"
+                )
+            )
+        )
+        intervals = parse_listing_interval_csv(
+            (CORPUS_DIR / "listing_intervals.csv").read_text(
+                encoding="utf-8"
+            )
+        )
+        expected = expand_listing_intervals(
+            requirements,
+            intervals,
+        ).resolved
+
+        with (
+            CORPUS_DIR / "import" / "listing_metadata.csv"
+        ).open("r", encoding="utf-8", newline="") as handle:
+            actual = list(csv.DictReader(handle))
+
+        self.assertEqual(len(actual), 66)
+        expected_rows = {
+            (
+                item.symbol,
+                item.session_date,
+                item.primary_exchange,
+                item.evidence.evidence_id,
+                item.evidence.source_name,
+            )
+            for item in expected
+        }
+        actual_rows = {
+            (
+                row["symbol"],
+                row["session_date"],
+                row["primary_exchange"],
+                row["evidence_id"],
+                row["source_name"],
+            )
+            for row in actual
+        }
+        self.assertEqual(actual_rows, expected_rows)
+
+    def test_real_interval_evidence_uses_only_sec_boundaries(self):
+        intervals = parse_listing_interval_csv(
+            (CORPUS_DIR / "listing_intervals.csv").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(len(intervals), 3)
+        for item in intervals:
+            self.assertTrue(item.start_evidence_url.startswith(
+                "https://www.sec.gov/"
+            ))
+            self.assertTrue(item.end_evidence_url.startswith(
+                "https://www.sec.gov/"
+            ))
 
 
 if __name__ == "__main__":
