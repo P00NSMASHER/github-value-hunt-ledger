@@ -382,17 +382,112 @@ def build_server() -> ThreadingHTTPServer:
         def log_message(self, fmt: str, *args: Any) -> None:
             print(json.dumps({"event": "http", "message": fmt % args}), flush=True)
 
+        def _common_security_headers(self) -> None:
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("X-Frame-Options", "DENY")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header(
+                "Permissions-Policy",
+                "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+            )
+
         def _json(self, status: int, payload: Mapping[str, Any]) -> None:
             raw = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(raw)))
-            self.send_header("Cache-Control", "no-store")
+            self._common_security_headers()
             self.end_headers()
             try:
                 self.wfile.write(raw)
             except (BrokenPipeError, ConnectionResetError):
                 return
+
+        def _html(self, status: int, document: str, *, set_cookie: str | None = None) -> None:
+            raw = document.encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(raw)))
+            self._common_security_headers()
+            self.send_header(
+                "Content-Security-Policy",
+                "default-src 'self'; script-src 'none'; style-src 'self'; "
+                "img-src 'self' data:; connect-src 'self'; object-src 'none'; "
+                "base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+            )
+            if set_cookie:
+                self.send_header("Set-Cookie", set_cookie)
+            self.end_headers()
+            try:
+                self.wfile.write(raw)
+            except (BrokenPipeError, ConnectionResetError):
+                return
+
+        def _css(self, content: str) -> None:
+            raw = content.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/css; charset=utf-8")
+            self.send_header("Content-Length", str(len(raw)))
+            self.send_header("Cache-Control", "public, max-age=300")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.end_headers()
+            try:
+                self.wfile.write(raw)
+            except (BrokenPipeError, ConnectionResetError):
+                return
+
+        def _redirect(self, location: str, *, set_cookie: str | None = None) -> None:
+            self.send_response(303)
+            self.send_header("Location", location)
+            self._common_security_headers()
+            if set_cookie:
+                self.send_header("Set-Cookie", set_cookie)
+            self.end_headers()
+
+        def _form_body(self) -> dict[str, str]:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > 1_000_000:
+                raise ValueError("invalid form body length")
+            raw = self.rfile.read(length).decode("utf-8")
+            parsed = parse_qs(raw, keep_blank_values=True, max_num_fields=30)
+            return {key: values[-1] if values else "" for key, values in parsed.items()}
+
+        def _ui_session(self) -> tuple[str, dict[str, Any] | None]:
+            token = parse_session_cookie(self.headers.get("Cookie", ""))
+            if not token or not ui_enabled:
+                return token, None
+            return token, validate_session(token, ui_session_secret, ui_principal)
+
+        def _ui_data(self) -> dict[str, Any]:
+            runtime = state.snapshot()
+            runtime["worker"] = worker.snapshot()
+            return {
+                "runtime": runtime,
+                "command_center": operator.dashboard(),
+                "planning_inputs": bridge.planning_inputs(),
+                "worker_status": gateway.call("worker_status"),
+            }
+
+        def _render_ui(
+            self,
+            session_token_value: str,
+            *,
+            proposal: Mapping[str, Any] | None = None,
+            notice: str | None = None,
+            error: str | None = None,
+            status: int = 200,
+        ) -> None:
+            document = render_dashboard(
+                self._ui_data(),
+                principal=ui_principal,
+                session_token=session_token_value,
+                session_secret=ui_session_secret,
+                proposal=proposal,
+                notice=notice,
+                error=error,
+            )
+            self._html(status, document)
 
         def _authorized(self) -> bool:
             supplied = self.headers.get("X-AIBOS-Operator-Token", "")
