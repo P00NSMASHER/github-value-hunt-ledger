@@ -1,0 +1,276 @@
+{
+  "state_schema_version": 1,
+  "architecture_version": "0.1.0-step0",
+  "updated_at": "2026-09-25",
+  "build_id": "portfolio-intelligence-system",
+  "state_host": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "branch": "portfolio-brain/step-0-architecture-baseline",
+    "base_commit": "1ea7fff759ff592734d15e4170a9a393bc87ee4f",
+    "temporary_until_step": 1,
+    "migration_target": "P00NSMASHER/portfolio-brain"
+  },
+  "completed_steps": [],
+  "current_step": 0,
+  "current_step_status": "verification_pending",
+  "relevant_repositories": [
+    {
+      "repository": "P00NSMASHER/github-value-hunt-ledger",
+      "role": [
+        "portfolio-control-substrate",
+        "hunter",
+        "technology-intelligence",
+        "recoveryworks",
+        "freight",
+        "experiments"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "1ea7fff759ff592734d15e4170a9a393bc87ee4f",
+      "source_of_truth_note": "Primary current control/research repository; ai_business_os is canonical, business_os is frozen legacy."
+    },
+    {
+      "repository": "P00NSMASHER/StarBlox",
+      "role": [
+        "product",
+        "learning-system",
+        "game",
+        "project-local-ai-development-factory"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "36f2084eac013853a612892c19646dedab97c204",
+      "source_of_truth_note": "GitHub is a portable mirror; repository documentation declares Replit as authoritative runtime."
+    },
+    {
+      "repository": "P00NSMASHER/abvmschoolstarworld",
+      "role": [
+        "product",
+        "school-information-ingestion",
+        "parent-companion"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+      "source_of_truth_note": "GitHub source plus deployed Pages school-pack verification."
+    },
+    {
+      "repository": "P00NSMASHER/trading-platform",
+      "role": [
+        "research",
+        "historical-market-surveillance"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "a74f06435a6bd668661005403e493f57f29b5d77",
+      "authority_boundary": "Research only. No live trading, brokerage orders, positions, or trade-direction authority."
+    },
+    {
+      "repository": "P00NSMASHER/permitplate-nyc",
+      "role": [
+        "business",
+        "permit-intelligence",
+        "source-observation"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "7c9a8fc4dd9fa12275d336beb8eb10732718666a"
+    },
+    {
+      "repository": "P00NSMASHER/permitplate-state",
+      "role": [
+        "durable-operational-state"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "c64fe06a22c3826c9ad3a7b85a4f911a6e589c19",
+      "security_note": "Repository contract requires private state, but GitHub metadata reported public visibility during Step 0."
+    },
+    {
+      "repository": "P00NSMASHER/capturebrief",
+      "role": [
+        "business",
+        "public-source-pursuit-qa",
+        "decision-evidence"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba"
+    },
+    {
+      "repository": "P00NSMASHER/-character-studio-private",
+      "role": [
+        "auxiliary-product-tool",
+        "model-provider-integration"
+      ],
+      "default_branch": "main",
+      "inspected_commit": "d3e541c89549904f310c0cdbd3f623808a0dfa35"
+    }
+  ],
+  "inspected_commits": {
+    "P00NSMASHER/github-value-hunt-ledger": "1ea7fff759ff592734d15e4170a9a393bc87ee4f",
+    "P00NSMASHER/StarBlox": "36f2084eac013853a612892c19646dedab97c204",
+    "P00NSMASHER/abvmschoolstarworld": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+    "P00NSMASHER/trading-platform": "a74f06435a6bd668661005403e493f57f29b5d77",
+    "P00NSMASHER/permitplate-nyc": "7c9a8fc4dd9fa12275d336beb8eb10732718666a",
+    "P00NSMASHER/permitplate-state": "c64fe06a22c3826c9ad3a7b85a4f911a6e589c19",
+    "P00NSMASHER/capturebrief": "3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba",
+    "P00NSMASHER/-character-studio-private": "d3e541c89549904f310c0cdbd3f623808a0dfa35"
+  },
+  "reconnaissance_method": {
+    "repository_enumeration": "GitHub account-accessible repository list",
+    "source_pin": "Exact main commit SHA",
+    "inventory": "One recursive tree inventory per pinned repository",
+    "deep_reads": "Architecture-critical contracts, workflows, ledgers, governance, learning, evidence and source-of-truth files",
+    "action_evidence": "Selected exact-head GitHub Actions runs and failed step summaries",
+    "rescan_policy": "Compare revision first; inspect deltas only unless a later step requires a previously uninspected contract."
+  },
+  "decisions_made": [
+    {
+      "id": "D0-01",
+      "decision": "Create a dedicated portfolio-brain repository in Step 1; keep project code in independent repositories."
+    },
+    {
+      "id": "D0-02",
+      "decision": "Use immutable normalized events and evidence receipts as the cross-project integration boundary."
+    },
+    {
+      "id": "D0-03",
+      "decision": "Observe repository deltas by exact authoritative revision and skip unchanged sources by default."
+    },
+    {
+      "id": "D0-04",
+      "decision": "Use deterministic code before model reasoning for validation, hashes, state transitions, budgets, deduplication, arithmetic and routine aggregation."
+    },
+    {
+      "id": "D0-05",
+      "decision": "Treat ai_business_os as the canonical donor/reference and business_os as frozen legacy."
+    },
+    {
+      "id": "D0-06",
+      "decision": "Preserve project-native domain semantics and normalize additively through adapters."
+    },
+    {
+      "id": "D0-07",
+      "decision": "Keep generic Portfolio Brain downstream access read-only through Step 15; bounded branch/PR creation begins only at Step 16."
+    },
+    {
+      "id": "D0-08",
+      "decision": "Make autonomous runtime model-provider independent and never dependent on an interactive ChatGPT subscription."
+    },
+    {
+      "id": "D0-09",
+      "decision": "Map OBSERVE/EXPERIMENT/MODIFY/ACT autonomy classes onto lower-level governance action classes rather than replacing governance."
+    },
+    {
+      "id": "D0-10",
+      "decision": "Keep consequential external authority human-bound, including customer contact, money movement, destructive actions, child-facing consequential changes and live trading."
+    }
+  ],
+  "reusable_components": [
+    "ai_business_os truth engine",
+    "ai_business_os value memory",
+    "ai_business_os provenance knowledge graph",
+    "ai_business_os entity canonicalization",
+    "ai_business_os governance/control plane",
+    "ai_business_os persistent worker contracts",
+    "ai_business_os governed software factory",
+    "ai_business_os self-improvement verification gates",
+    "ai_business_os evidence-first allocator",
+    "Hunter search-run/outcome telemetry",
+    "Hunter negative knowledge and duplicate suppression",
+    "Hunter repair/held-out/canary promotion pipeline",
+    "RecoveryOS proof/custody/settlement patterns",
+    "CaptureBrief decision evidence and targeted change watch",
+    "PermitPlate monotonic detection/opportunity ledgers",
+    "ABVM deterministic source refresh/freshness validation",
+    "StarBlox project-local AI development factory",
+    "trading-platform blind/point-in-time research evaluation controls"
+  ],
+  "missing_infrastructure": [
+    "dedicated portfolio-brain repository",
+    "universal project/objective/metric/autonomy registry",
+    "universal event bus and evidence-state schema",
+    "read-only repository delta adapters",
+    "full universal knowledge-graph ontology",
+    "continuous all-project observation runtime",
+    "portfolio-driven autonomous Hunter objective generation",
+    "generalized cross-portfolio learning engine",
+    "highest-value uncertainty engine",
+    "universal experiment engine",
+    "model router/provider abstraction with cost and outcome telemetry",
+    "persistent portfolio agent roles",
+    "portfolio-wide explainable allocator",
+    "cross-repository software-factory orchestrator",
+    "generalized repair/self-improvement orchestration",
+    "measured cross-project intelligence transfer",
+    "persistent portfolio work scheduler",
+    "unified cost governor",
+    "executive portfolio dashboard",
+    "general 24/7 external job queue/worker runtime"
+  ],
+  "created_files": [
+    "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+    "PORTFOLIO_BUILD_STATE.json"
+  ],
+  "test_results": [],
+  "commits": [
+    {
+      "type": "step0_baseline",
+      "repository": "P00NSMASHER/github-value-hunt-ledger",
+      "branch": "portfolio-brain/step-0-architecture-baseline",
+      "commit": "525b330bba94cde732c81676e580e0686a110729",
+      "message": "portfolio: record Step 0 architecture baseline"
+    }
+  ],
+  "unresolved_blockers": [
+    {
+      "id": "B0-01",
+      "severity": "P0",
+      "project": "PermitPlate",
+      "status": "OPEN",
+      "summary": "permitplate-state contract requires private repository state but current GitHub metadata reports public visibility.",
+      "handling": "Do not treat the repository as a private-state boundary until visibility is independently verified private. Step 0 made no product-repository change."
+    },
+    {
+      "id": "B0-02",
+      "severity": "P1",
+      "project": "PermitPlate",
+      "status": "OPEN",
+      "summary": "Scheduled detection-ledger job fails at scored opportunity package construction; exact root cause remains unknown because job logs were unavailable."
+    },
+    {
+      "id": "B0-03",
+      "severity": "P1",
+      "project": "PermitPlate",
+      "status": "OPEN",
+      "summary": "Scheduled scoring-readiness job fails at the no-send scoring promotion canary; exact root cause remains unknown because job logs were unavailable."
+    },
+    {
+      "id": "B0-04",
+      "severity": "P1",
+      "project": "AI Business OS",
+      "status": "OPEN",
+      "summary": "Generic governance module documents HUMAN identity as a trusted caller assertion and requires production identity/session binding."
+    },
+    {
+      "id": "B0-05",
+      "severity": "P1",
+      "project": "StarBlox",
+      "status": "OPEN",
+      "summary": "Repository documentation declares Replit authoritative runtime while GitHub is a mirror; current deployed/source parity is not represented by one portfolio-readable authoritative revision."
+    },
+    {
+      "id": "B0-06",
+      "severity": "P2",
+      "project": "CaptureBrief/ABVM",
+      "status": "OPEN",
+      "summary": "Two independent ABVM school-pack refresh paths create hidden cross-project coupling and should later converge on one shared source/event contract."
+    },
+    {
+      "id": "B0-07",
+      "severity": "P2",
+      "project": "character-studio",
+      "status": "OPEN",
+      "summary": "No CI workflow was present and package scripts referenced check/test paths absent from the inspected tree."
+    }
+  ],
+  "next_exact_step": {
+    "step": 1,
+    "name": "Portfolio Brain foundation",
+    "instruction": "Create P00NSMASHER/portfolio-brain with architecture contract, boundaries, requested directory skeleton, project-registration mechanism, and initial CI. Import Step 0 baseline/state with provenance. Do not add autonomous downstream writes. Commit and stop."
+  }
+}
