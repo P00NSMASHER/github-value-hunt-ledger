@@ -109,7 +109,7 @@ async function workerClaim(payload: Record<string, unknown>) {
   if (!Number.isInteger(leaseSeconds)) throw new Error("lease_seconds must be an integer");
   const rows = await sql`
     select ai_business_os_prod.agent_worker_claim_v1(
-      ${agentId}, ${workerInstanceId}, ${JSON.stringify(goalTypes)}::jsonb, ${leaseSeconds}
+      ${agentId}, ${workerInstanceId}, ${sql.json(goalTypes)}, ${leaseSeconds}
     ) as payload
   `;
   return { claim: rows[0]?.payload ?? null };
