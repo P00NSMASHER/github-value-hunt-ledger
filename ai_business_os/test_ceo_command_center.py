@@ -155,6 +155,25 @@ class CommandCenterOperatorTests(unittest.TestCase):
         self.assertTrue(proposal["requires_human_approval_for_possible_action"])
         self.assertEqual([], self.prod.writes)
 
+    def test_production_evidence_phrase_does_not_imply_production_change(self):
+        proposal = self.operator.propose_objective(
+            "Research current production evidence and identify the highest-priority verification task",
+            requested_by="owner",
+        )
+        self.assertEqual("RESEARCH", proposal["target_role"])
+        self.assertEqual("INTERNAL_WRITE", proposal["possible_action_class"])
+        self.assertFalse(proposal["requires_human_approval_for_possible_action"])
+        self.assertEqual([], self.prod.writes)
+
+    def test_update_production_is_classified_as_production_change(self):
+        proposal = self.operator.propose_objective(
+            "Update the production service configuration",
+            requested_by="owner",
+        )
+        self.assertEqual("PRODUCTION_CHANGE", proposal["possible_action_class"])
+        self.assertTrue(proposal["requires_human_approval_for_possible_action"])
+        self.assertEqual([], self.prod.writes)
+
     def test_ambiguous_objective_routes_to_chief_of_staff(self):
         proposal = self.operator.propose_objective(
             "Figure out what I should focus on next",
