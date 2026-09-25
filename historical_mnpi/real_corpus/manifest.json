@@ -4,7 +4,7 @@
   "derived_backbone_sha256": "5bce35d49bae04a52d45d82e81fb7c640509cfaa8b0d044a4ecbadd408d03b58",
   "event_date_max": "2015-05-20",
   "event_date_min": "2011-04-19",
-  "listing_metadata_resolved": 0,
+  "listing_metadata_resolved": 66,
   "live_use_allowed": false,
   "purpose": "Historical research/compliance corpus backbone only; not a trading signal dataset.",
   "row_count": 174,
@@ -18,5 +18,9 @@
   "unique_symbols": 146,
   "announcement_review_batches_completed": 6,
   "announcement_events_reviewed_in_batch_sequence": 170,
-  "announcement_unresolved_after_batch_review": 147
+  "announcement_unresolved_after_batch_review": 147,
+  "listing_requirement_total": 3828,
+  "listing_intervals_verified": 3,
+  "listing_batches_completed": 1,
+  "listing_full_compact_index_loaded": false
 }
