@@ -45,7 +45,7 @@ class RealCorpusListingTests(unittest.TestCase):
             EXPECTED_EXPANDED_PAIR_SHA256,
         )
 
-    def test_current_intervals_resolve_exactly_1496_observations(self):
+    def test_current_intervals_resolve_exactly_1562_observations(self):
         _, requirements = self._requirements()
         intervals = self._intervals()
         expansion = expand_listing_intervals(
@@ -53,9 +53,9 @@ class RealCorpusListingTests(unittest.TestCase):
             intervals,
         )
 
-        self.assertEqual(len(intervals), 45)
-        self.assertEqual(len(expansion.resolved), 1496)
-        self.assertEqual(len(expansion.unresolved), 2332)
+        self.assertEqual(len(intervals), 48)
+        self.assertEqual(len(expansion.resolved), 1562)
+        self.assertEqual(len(expansion.unresolved), 2266)
 
         new_symbols = {"CLD", "EW", "MTH", "MUSA"}
         new_rows = [
@@ -75,6 +75,29 @@ class RealCorpusListingTests(unittest.TestCase):
                     if row.symbol == symbol
                 },
                 {"NYSE"},
+            )
+
+    def test_batch_fourteen_resolves_cake_camp_cb(self):
+        _, requirements = self._requirements()
+        expansion = expand_listing_intervals(
+            requirements,
+            self._intervals(),
+        )
+
+        expected = {
+            "CAKE": ("NASDAQ", 22),
+            "CAMP": ("NASDAQ", 22),
+            "CB": ("NYSE", 22),
+        }
+        for symbol, (exchange, count) in expected.items():
+            rows = [
+                row for row in expansion.resolved
+                if row.symbol == symbol
+            ]
+            self.assertEqual(len(rows), count)
+            self.assertEqual(
+                {row.primary_exchange for row in rows},
+                {exchange},
             )
 
     def test_materialized_listing_metadata_matches_interval_expansion(self):
@@ -111,8 +134,8 @@ class RealCorpusListingTests(unittest.TestCase):
             for row in materialized
         }
 
-        self.assertEqual(len(materialized), 1496)
-        self.assertEqual(len(actual), 1496)
+        self.assertEqual(len(materialized), 1562)
+        self.assertEqual(len(actual), 1562)
         self.assertEqual(actual, expected)
         self.assertTrue(all(
             row["source_kind"] == "OFFICIAL_LISTING_HISTORY"
@@ -132,15 +155,15 @@ class RealCorpusListingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["listing_intervals_verified"],
-            45,
+            48,
         )
         self.assertEqual(
             manifest["listing_metadata_resolved"],
-            1496,
+            1562,
         )
         self.assertEqual(
             manifest["listing_metadata_unresolved"],
-            2332,
+            2266,
         )
         self.assertEqual(
             manifest["listing_metadata_resolved"]
