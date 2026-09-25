@@ -22,6 +22,60 @@ from ai_business_os.ceo_command_center import (
     CommandCenterOperator,
 )
 
+STARTUP_SMOKE_OBJECTIVE = (
+    "Research the current portfolio evidence gaps and identify the single highest-priority "
+    "verification task. Return evidence and a recommended next step only."
+)
+
+
+def run_startup_smoke(operator: CommandCenterOperator) -> dict[str, Any]:
+    """Run a read-only live Command Center smoke test.
+
+    The smoke test reads the dashboard and creates a proposal object only. It never activates a
+    goal, decides an approval, or invokes a write executor.
+    """
+    dashboard = operator.dashboard()
+    businesses = dashboard.get("businesses", [])
+    approvals = dashboard.get("pending_approvals", [])
+    planning = dashboard.get("planning", {})
+    summary = planning.get("summary", {}) if isinstance(planning, Mapping) else {}
+    proposal = operator.propose_objective(
+        STARTUP_SMOKE_OBJECTIVE,
+        requested_by="production-smoke-test",
+        priority=100,
+    )
+    return {
+        "event": "startup_smoke_passed",
+        "schema_fingerprint": dashboard.get("schema_fingerprint"),
+        "business_count": len(businesses) if isinstance(businesses, list) else None,
+        "businesses": [
+            str(row.get("slug") or row.get("name"))
+            for row in businesses
+            if isinstance(row, Mapping)
+        ] if isinstance(businesses, list) else [],
+        "pending_approval_count": len(approvals) if isinstance(approvals, list) else None,
+        "planning_summary": {
+            "total_work_items": summary.get("total_work_items"),
+            "agent_work_items": summary.get("agent_work_items"),
+            "hunter_work_items": summary.get("hunter_work_items"),
+            "research_items": summary.get("research_items"),
+            "build_items": summary.get("build_items"),
+            "verify_items": summary.get("verify_items"),
+        },
+        "objective": {
+            "status": proposal.get("status"),
+            "objective_hash": proposal.get("objective_hash"),
+            "target_role": proposal.get("target_role"),
+            "target_agent_id": proposal.get("target_agent_id"),
+            "goal_type": proposal.get("goal_type"),
+            "possible_action_class": proposal.get("possible_action_class"),
+            "requires_human_approval_for_possible_action": proposal.get(
+                "requires_human_approval_for_possible_action"
+            ),
+            "business_refs": proposal.get("business_refs"),
+        },
+    }
+
 
 class RuntimeConfigError(RuntimeError):
     pass
@@ -338,6 +392,27 @@ def main() -> None:
         ),
         flush=True,
     )
+    if os.environ.get("AIBOS_STARTUP_SMOKE", "1") == "1":
+        try:
+            smoke_gateway = GatewayClient(
+                _required_env("AIBOS_GATEWAY_URL"),
+                _required_env("AIBOS_RUNTIME_TOKEN"),
+            )
+            smoke_bridge = GatewayProductionBridge(smoke_gateway)
+            smoke_operator = CommandCenterOperator(
+                smoke_bridge,
+                expected_schema_fingerprint=_required_env("AIBOS_SCHEMA_FINGERPRINT"),
+            )
+            print(json.dumps(run_startup_smoke(smoke_operator), separators=(",", ":")), flush=True)
+        except Exception as exc:
+            print(
+                json.dumps(
+                    {"event": "startup_smoke_failed", "error": str(exc)},
+                    separators=(",", ":"),
+                ),
+                flush=True,
+            )
+            raise
     server.serve_forever()
 
 
