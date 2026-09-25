@@ -604,6 +604,7 @@ class EconomicClusterRegistry:
         self._review_candidates: dict[str, DedupReviewCandidate] = {}
         self._review_decisions: dict[str, DedupReviewResolution] = {}
         self._superseded_review_candidates: dict[str, str] = {}
+        self._confirmed_distinct_pairs: dict[str, str] = {}
         self._registrations: dict[str, EconomicClusterRegistration] = {}
 
     def get_cluster(self, cluster_id: str) -> EconomicTransactionCluster:
@@ -763,6 +764,27 @@ class EconomicClusterRegistry:
         self._registrations[signature.proof_hash] = registration
         return registration
 
+    @staticmethod
+    def _pair_key(left_hash: str, right_hash: str) -> str:
+        return "|".join(sorted((left_hash, right_hash)))
+
+    def _clusters_have_confirmed_distinct_pair(
+        self,
+        left: EconomicTransactionCluster,
+        right: EconomicTransactionCluster,
+    ) -> bool:
+        return any(
+            self._pair_key(
+                left_member.proof_hash,
+                right_member.proof_hash,
+            ) in self._confirmed_distinct_pairs
+            for left_member in left.signatures
+            for right_member in right.signatures
+        )
+
+    def confirmed_distinct_pair_keys(self) -> tuple[str, ...]:
+        return tuple(sorted(self._confirmed_distinct_pairs))
+
     def _signature_by_hash(
         self,
         signature_hash: str,
@@ -873,6 +895,13 @@ class EconomicClusterRegistry:
         target_proof_before = target_cluster.proof_hash
 
         if decision is DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION:
+            if self._clusters_have_confirmed_distinct_pair(
+                source_cluster,
+                target_cluster,
+            ):
+                raise ValueError(
+                    "manual merge conflicts with a confirmed-distinct relationship"
+                )
             merged_signatures = tuple(sorted(
                 source_cluster.signatures + target_cluster.signatures,
                 key=lambda item: item.proof_hash,
@@ -916,6 +945,16 @@ class EconomicClusterRegistry:
         )
         self._review_decisions[candidate_id] = resolution
 
+        if decision is DedupReviewDecisionType.CONFIRMED_DISTINCT:
+            for source_member in source_cluster.signatures:
+                for target_member in target_cluster.signatures:
+                    self._confirmed_distinct_pairs[
+                        self._pair_key(
+                            source_member.proof_hash,
+                            target_member.proof_hash,
+                        )
+                    ] = resolution.proof_hash
+
         event_body = {
             "schema": 1,
             "action": action.value,
@@ -935,15 +974,14 @@ class EconomicClusterRegistry:
         )
         self._events.append(event)
 
-        if decision is DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION:
-            self._supersede_related_candidates(
-                {
-                    source_cluster.cluster_id,
-                    target_cluster.cluster_id,
-                },
-                except_candidate_id=candidate.candidate_id,
-                resolution_hash=resolution.proof_hash,
-            )
+        self._supersede_related_candidates(
+            {
+                source_cluster.cluster_id,
+                target_cluster.cluster_id,
+            },
+            except_candidate_id=candidate.candidate_id,
+            resolution_hash=resolution.proof_hash,
+        )
 
         return resolution
 
@@ -966,6 +1004,10 @@ class EconomicClusterRegistry:
             "superseded_review_candidates": {
                 key: self._superseded_review_candidates[key]
                 for key in sorted(self._superseded_review_candidates)
+            },
+            "confirmed_distinct_pairs": {
+                key: self._confirmed_distinct_pairs[key]
+                for key in sorted(self._confirmed_distinct_pairs)
             },
         })
 
