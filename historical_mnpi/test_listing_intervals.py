@@ -179,7 +179,7 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
         self.assertEqual(len(requirements), 3828)
-        self.assertEqual(len(intervals), 85)
+        self.assertEqual(len(intervals), 95)
         self.assertEqual(len(result.resolved), 2618)
         self.assertEqual(len(result.unresolved), 1210)
 
@@ -334,7 +334,7 @@ class ListingIntervalTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(intervals), 85)
+        self.assertEqual(len(intervals), 95)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith(
                 "https://www.sec.gov/"
