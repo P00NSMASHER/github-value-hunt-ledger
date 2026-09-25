@@ -93,7 +93,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(
             imported.counts(),
             {
-                "announcement_rows": 1,
+                "announcement_rows": 2,
                 "listing_rows": 0,
                 "shares_rows": 0,
                 "control_rows": 0,
@@ -103,17 +103,23 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(len(imported.announcements), 1)
-        announcement = imported.announcements[0]
+        self.assertEqual(len(imported.announcements), 2)
+        by_event = {
+            item.event_id: item
+            for item in imported.announcements
+        }
         self.assertEqual(
-            announcement.event_id,
-            "HEJFE-A413A5AC6E515E3C",
-        )
-        self.assertEqual(
-            announcement.timestamp,
+            by_event["HEJFE-A413A5AC6E515E3C"].timestamp,
             "2011-04-28T07:00:00-04:00",
         )
-        self.assertTrue(announcement.proves_first_public_release)
+        self.assertEqual(
+            by_event["HEJFE-F170013A9B3F85E2"].timestamp,
+            "2015-04-22T16:01:00-04:00",
+        )
+        self.assertTrue(all(
+            item.proves_first_public_release
+            for item in imported.announcements
+        ))
 
     def test_manifest_tracks_current_real_readiness(self):
         manifest = json.loads(
@@ -121,7 +127,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(manifest["announcement_exact_resolved"], 1)
+        self.assertEqual(manifest["announcement_exact_resolved"], 2)
         self.assertEqual(manifest["listing_metadata_resolved"], 0)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
