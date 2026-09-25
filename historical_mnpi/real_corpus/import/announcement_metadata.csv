@@ -1,1 +1,2 @@
 event_id,timestamp,evidence_id,source_kind,source_name,proves_first_public_release,data_class
+HEJFE-A413A5AC6E515E3C,2011-04-28T07:00:00-04:00,https://www.sec.gov/Archives/edgar/data/816956/000091431711000622/ex99-1.htm,ISSUER_PUBLIC_RELEASE,CONMED Corporation Q1 2011 issuer press release - FOR RELEASE 7:00 AM Eastern,true,PUBLIC_OR_AUTHORIZED_HISTORICAL
