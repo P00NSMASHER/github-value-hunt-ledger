@@ -160,7 +160,7 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
 
-    def test_real_g2_current_batches_expand_1892_of_3828(self):
+    def test_real_g2_current_batches_expand_1958_of_3828(self):
         requirements = expand_listing_requirements(
             parse_listing_requirement_index(
                 (CORPUS_DIR / "listing_requirement_index.csv").read_text(
@@ -179,9 +179,9 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
         self.assertEqual(len(requirements), 3828)
-        self.assertEqual(len(intervals), 63)
-        self.assertEqual(len(result.resolved), 1892)
-        self.assertEqual(len(result.unresolved), 1936)
+        self.assertEqual(len(intervals), 66)
+        self.assertEqual(len(result.resolved), 1958)
+        self.assertEqual(len(result.unresolved), 1870)
 
         by_symbol = {}
         for item in result.resolved:
@@ -189,7 +189,7 @@ class ListingIntervalTests(unittest.TestCase):
 
         self.assertEqual(
             set(by_symbol),
-            {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "EW", "F", "GILD", "HON", "IDTI", "ILMN", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"},
+            {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GILD", "HON", "IDTI", "ILMN", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"},
         )
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
@@ -244,6 +244,9 @@ class ListingIntervalTests(unittest.TestCase):
                 "ECOL": 22,
                 "EHTH": 44,
                 "EW": 44,
+                "FL": 22,
+                "FLR": 22,
+                "FLT": 22,
                 "F": 22,
                 "GILD": 22,
                 "HON": 22,
@@ -283,7 +286,7 @@ class ListingIntervalTests(unittest.TestCase):
         ).open("r", encoding="utf-8", newline="") as handle:
             actual = list(csv.DictReader(handle))
 
-        self.assertEqual(len(actual), 1892)
+        self.assertEqual(len(actual), 1958)
         expected_rows = {
             (
                 item.symbol,
@@ -312,7 +315,7 @@ class ListingIntervalTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(intervals), 63)
+        self.assertEqual(len(intervals), 66)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith(
                 "https://www.sec.gov/"
