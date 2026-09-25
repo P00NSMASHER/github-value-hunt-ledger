@@ -679,3 +679,143 @@ allowed cutoff.
 Steps 12–15 remain limited to retrospective, already-public compliance research.
 They do not ingest live confidential information, produce live alerts, authorize
 trading, or generate orders.
+
+
+
+## Step 16 — coverage planner and real-data readiness audit
+
+Step 16 converts a historical first-trade event corpus into a deterministic
+XNYS-aware acquisition/import plan without fetching or purchasing any data.
+
+For each event, the planner requires:
+
+- the event trading session; and
+- 21 prior supported XNYS sessions.
+
+Unsupported early-close sessions can be skipped from the baseline window, but the
+planner fails closed if it cannot recover the full requested baseline depth.
+
+The planner deduplicates source-date work while preserving event-to-symbol/date
+requirements. For the previously defined 174-event corpus shape, the contract is
+capable of producing the same:
+
+- 174 announcement timestamp requirements;
+- 3,828 symbol-date observations (174 × 22 before any same-symbol/date
+  deduplication);
+- 72 unique control dates.
+
+The readiness audit tracks five gates:
+
+1. exact first-public announcement timestamp;
+2. required market-file coverage;
+3. historical primary-listing metadata;
+4. effective-dated shares outstanding;
+5. same-day point-in-time matched-control metadata.
+
+The planner emits the same named artifact contract used in the earlier prototype:
+
+- `event_coverage_plan.csv`
+- `symbol_date_requirements.csv`
+- `source_date_requirements.csv`
+- `announcement_timestamp_requirements.csv`
+- `unresolved_gates.csv`
+- `coverage_summary.json`
+- `acquisition_import_plan.json`
+
+The acquisition/import plan explicitly records that no fetch or purchase was
+performed by Step 16 itself.
+
+A fully synthetic fixture closes all readiness gates; real-corpus readiness
+remains fail-closed until genuine public/authorized metadata and market files are
+supplied.
+
+
+## Step 17 — point-in-time metadata resolver
+
+Step 17 resolves the four metadata gates separately from the market-file gate:
+
+- exact first-public announcement timestamp;
+- historical primary listing exchange;
+- effective-dated shares outstanding;
+- same-day point-in-time control-universe metadata.
+
+### Announcement timestamps
+
+EDGAR `ACCEPTANCE-DATETIME` is treated only as a public proxy. It cannot be
+marked as proof of the true first-public release timestamp.
+
+An event resolves only when supplied public/authorized evidence explicitly
+supports the first-public timestamp. Conflicting exact first-public timestamps
+remain `CONFLICT`.
+
+### Historical exchange
+
+Historical exchange metadata may be supplied from a public/authorized official
+listing source or NYSE Daily TAQ Master-style metadata. Conflicting primary
+exchange values fail closed.
+
+### Shares outstanding
+
+Shares facts are effective-dated and also carry the timestamp when the fact became
+publicly available.
+
+A fact cannot be used for a historical session when:
+
+- its effective date is later than the session; or
+- it was filed/published only after the historical session.
+
+Among eligible evidence, the most recent effective date is used only when that
+date has one unambiguous shares value.
+
+NYSE Daily TAQ Master-style daily shares metadata is supported as an authorized
+point-in-time source.
+
+### Control universe
+
+A matched-control universe resolves only when it has:
+
+- a point-in-time availability timestamp no later than the control date; and
+- complete pre-event covariates.
+
+A retrospective source such as `SampleFirms` cannot close the matching gate
+without an availability timestamp. Missing pre-event covariates also leave the
+gate unresolved.
+
+### Safety boundary
+
+Step-17 metadata evidence accepts only
+`PUBLIC_OR_AUTHORIZED_HISTORICAL` data.
+
+The contract explicitly rejects:
+
+- live stolen information;
+- leaked credentials;
+- accidental private disclosures;
+- unauthorized private data.
+
+Credential-like contract fields such as passwords, API keys, refresh/access
+tokens, private keys, and session/auth cookies are also rejected.
+
+The resolver does not scrape, fetch, purchase, or connect to market/broker
+systems.
+
+### Readiness summary
+
+`MetadataResolutionBundle.readiness_summary()` reports resolved/total counts for
+announcements, listings, shares, and control dates.
+
+With no real metadata supplied, the 174-event corpus fixture remains correctly
+blocked at:
+
+- announcements: 0 / 174;
+- historical listing metadata: 0 / 3,828 symbol-date observations;
+- shares outstanding: 0 / 3,828 symbol-date observations;
+- point-in-time control dates: 0 / 72.
+
+A synthetic public/authorized fixture resolves all four metadata gates and can be
+fed back into Step 16. The overall Step-16 plan still remains blocked if required
+market files are absent.
+
+Steps 16–17 remain strictly historical/public-record research infrastructure.
+They do not enable live surveillance, broker execution, order generation, or
+live trading.
