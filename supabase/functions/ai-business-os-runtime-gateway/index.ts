@@ -140,7 +140,7 @@ async function workerSubmit(payload: Record<string, unknown>) {
       ${requireString(payload.run_id,"run_id")}::uuid,
       ${Number(payload.lease_generation)}::bigint,
       ${requireString(payload.output_hash,"output_hash")},
-      ${JSON.stringify(evidence)}::jsonb,
+      ${sql.json(evidence)},
       ${requireString(payload.summary,"summary")}
     ) as payload
   `;
