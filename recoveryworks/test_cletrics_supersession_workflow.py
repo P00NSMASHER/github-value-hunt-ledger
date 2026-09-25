@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from pathlib import Path
 import tempfile
 import unittest
@@ -12,6 +13,12 @@ from recoveryworks.integrations.cletrics_supersession_workflow import (
     prepare_cloud_supersession_preview,
 )
 from recoveryworks.test_cletrics_final_cycle import make_bundle, write_rates
+from recoveryworks.store import LocalBundleStore
+
+
+def _after(timestamp: str, seconds: int = 1) -> str:
+    value = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    return (value + timedelta(seconds=seconds)).isoformat().replace("+00:00", "Z")
 
 
 class ReviewedCloudSupersessionTests(unittest.TestCase):
@@ -60,11 +67,12 @@ class ReviewedCloudSupersessionTests(unittest.TestCase):
             self.assertEqual(preview.bindings[0].incumbent_finding_id, old_id)
             self.assertIsNotNone(preview.bindings[0].replacement_finding_id)
 
+            latest = LocalBundleStore(state).load().journal.events()[-1].occurred_at
             approval = approve_cloud_supersession_preview(
                 preview,
                 reviewer_id="reviewer-supersession",
                 review_note="Reviewed amended cloud rate authority.",
-                approved_at="2026-09-25T04:00:00Z",
+                approved_at=_after(latest),
             )
             applied = apply_cloud_supersession(
                 preview,
@@ -111,20 +119,20 @@ class ReviewedCloudSupersessionTests(unittest.TestCase):
                 registry_path=registry,
                 base_dir=root,
             )
-            from recoveryworks.store import LocalBundleStore
             store = LocalBundleStore(state)
             ledger = store.load()
             finding_id = first.scan.added_finding_ids[0]
+            latest = ledger.journal.events()[-1].occurred_at
             ledger.approve(
                 finding_id,
                 "reviewer",
                 "approved",
-                occurred_at="2026-09-25T03:58:00Z",
+                occurred_at=_after(latest),
             )
             ledger.authorize(
                 finding_id,
                 "auth-1",
-                occurred_at="2026-09-25T03:59:00Z",
+                occurred_at=_after(latest, 2),
             )
             store.save(ledger, expected_head_hash=first.scan.state_head_hash)
 
@@ -148,7 +156,9 @@ class ReviewedCloudSupersessionTests(unittest.TestCase):
                     preview,
                     reviewer_id="reviewer-2",
                     review_note="try replacement",
-                    approved_at="2026-09-25T04:01:00Z",
+                    approved_at=_after(
+                        LocalBundleStore(state).load().journal.events()[-1].occurred_at
+                    ),
                 )
 
 
