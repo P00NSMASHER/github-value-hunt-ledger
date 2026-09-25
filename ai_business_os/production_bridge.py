@@ -39,7 +39,19 @@ limit 1
 """
 
 PENDING_APPROVALS_SQL = """
-select id, request_hash, action_key, action_class, status, created_at, expires_at
+select
+    id,
+    request_key,
+    agent_id,
+    action_key,
+    action_class,
+    title,
+    intent_hash,
+    predicted_risk,
+    expected_money_cents,
+    status,
+    created_at,
+    expires_at
 from ai_business_os_prod.approval_inbox
 where status = %s
 order by created_at
@@ -118,6 +130,8 @@ class ProductionReadBridge:
         for row in rows:
             if row.get("status") != "PENDING":
                 raise ProductionBridgeError("pending-approval query returned a non-pending row")
+            if not row.get("request_key") or not row.get("intent_hash"):
+                raise ProductionBridgeError("pending approval is missing immutable request identity")
         return rows
 
     def portfolio_view(self, *, expected_schema_fingerprint: str | None = None) -> dict[str, Any]:
