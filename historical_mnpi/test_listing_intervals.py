@@ -160,7 +160,7 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
 
-    def test_real_g2_batch_one_expands_66_of_3828(self):
+    def test_real_g2_first_two_batches_expand_132_of_3828(self):
         requirements = expand_listing_requirements(
             parse_listing_requirement_index(
                 (CORPUS_DIR / "listing_requirement_index.csv").read_text(
@@ -179,18 +179,18 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
         self.assertEqual(len(requirements), 3828)
-        self.assertEqual(len(intervals), 3)
-        self.assertEqual(len(result.resolved), 66)
-        self.assertEqual(len(result.unresolved), 3762)
+        self.assertEqual(len(intervals), 6)
+        self.assertEqual(len(result.resolved), 132)
+        self.assertEqual(len(result.unresolved), 3696)
 
         by_symbol = {}
         for item in result.resolved:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(set(by_symbol), {"CAT", "CNMD", "GILD"})
+        self.assertEqual(set(by_symbol), {"CAT", "CNMD", "F", "GILD", "NKE", "SBUX"})
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
-            {"CAT": 22, "CNMD": 22, "GILD": 22},
+            {"CAT": 22, "CNMD": 22, "F": 22, "GILD": 22, "NKE": 22, "SBUX": 22},
         )
 
     def test_materialized_listing_metadata_matches_interval_expansion(self):
@@ -216,7 +216,7 @@ class ListingIntervalTests(unittest.TestCase):
         ).open("r", encoding="utf-8", newline="") as handle:
             actual = list(csv.DictReader(handle))
 
-        self.assertEqual(len(actual), 66)
+        self.assertEqual(len(actual), 132)
         expected_rows = {
             (
                 item.symbol,
@@ -245,7 +245,7 @@ class ListingIntervalTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(intervals), 3)
+        self.assertEqual(len(intervals), 6)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith(
                 "https://www.sec.gov/"
