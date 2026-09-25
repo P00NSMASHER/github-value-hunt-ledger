@@ -88,7 +88,7 @@ async function activateGoal(payload: Record<string, unknown>) {
         evidence_requirements, created_at, updated_at
       ) values (
         ${agentId}, ${goalType}, ${objective}, 'PENDING', ${priority},
-        ${JSON.stringify(constraints)}::jsonb, ${JSON.stringify(evidence)}::jsonb,
+        ${JSON.stringify(constraints)}::jsonb, ${sql.json(evidence)},
         now(), now()
       )
       returning id, agent_id, goal_type, title, status, priority, constraints, evidence_requirements
