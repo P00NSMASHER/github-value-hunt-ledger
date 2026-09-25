@@ -1,0 +1,1046 @@
+{
+  "schema_version": "1.0.0",
+  "scope": "MASTER_STEP_0_RECONNAISSANCE_ONLY",
+  "recorded_at": "2026-09-25T11:14:18.539884Z",
+  "handoff": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "branch": "portfolio-parallel-prep",
+    "commit_sha": "bd169dba2539de9e9fa9338c063b60f453d903de",
+    "tree_sha": "cb84b47000c04a6e82e73758adaaf58cf34d7254"
+  },
+  "attached_handoff_matches_committed_files": true,
+  "verified_source_artifacts": [
+    {
+      "path": "portfolio_prework/portfolio_inventory.json",
+      "blob_sha": "63c896b192182a9edc0bcebb78b3428d803c46bc",
+      "role": "portfolio_scope",
+      "verified_blob_sha": "63c896b192182a9edc0bcebb78b3428d803c46bc"
+    },
+    {
+      "path": "portfolio_prework/PROJECT_ID_REGISTRY.json",
+      "blob_sha": "60c97e366814388d0f10862d1d0737837866361e",
+      "role": "stable_project_identity",
+      "verified_blob_sha": "60c97e366814388d0f10862d1d0737837866361e"
+    },
+    {
+      "path": "portfolio_prework/repository_snapshot.json",
+      "blob_sha": "00f91a4a331e65d6da8fc270ecbcaa74bb40a96b",
+      "role": "repository_structure_cache",
+      "verified_blob_sha": "00f91a4a331e65d6da8fc270ecbcaa74bb40a96b"
+    },
+    {
+      "path": "portfolio_prework/repository_delta.json",
+      "blob_sha": "e878fbc1aa6543fda7b98c52d2cdd778b8e4082f",
+      "role": "change_detection_baseline",
+      "verified_blob_sha": "e878fbc1aa6543fda7b98c52d2cdd778b8e4082f"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_ACTION_TAXONOMY.json",
+      "blob_sha": "8e9f297cb15addfbf3c8344459607bb1d74eaa1f",
+      "role": "global_action_classes",
+      "verified_blob_sha": "8e9f297cb15addfbf3c8344459607bb1d74eaa1f"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_MATRIX.json",
+      "blob_sha": "59efe79e44b2a5f83bbd50dd80fd9622915898c1",
+      "role": "project_authority_boundaries",
+      "verified_blob_sha": "59efe79e44b2a5f83bbd50dd80fd9622915898c1"
+    },
+    {
+      "path": "portfolio_prework/WORKFLOW_INVENTORY.json",
+      "blob_sha": "fda9d147b0eb2c4be064d3f6d5e77d6ffe51d540",
+      "role": "automation_inventory",
+      "verified_blob_sha": "fda9d147b0eb2c4be064d3f6d5e77d6ffe51d540"
+    },
+    {
+      "path": "portfolio_prework/TEST_SUITE_INVENTORY.json",
+      "blob_sha": "1720f3633a5d1ff0b985c58e65490d31b7a7fd69",
+      "role": "test_surface",
+      "verified_blob_sha": "1720f3633a5d1ff0b985c58e65490d31b7a7fd69"
+    },
+    {
+      "path": "portfolio_prework/DEPENDENCY_INVENTORY.json",
+      "blob_sha": "c1c8e0828b2d878250ac01dc49a3969b93181dc0",
+      "role": "dependency_surface",
+      "verified_blob_sha": "c1c8e0828b2d878250ac01dc49a3969b93181dc0"
+    },
+    {
+      "path": "portfolio_prework/PORTFOLIO_BUILD_STATE.json",
+      "blob_sha": "9a5585ca3308ef17122f073b68ef33896826c655",
+      "role": "durable_resume_state",
+      "verified_blob_sha": "9a5585ca3308ef17122f073b68ef33896826c655"
+    }
+  ],
+  "frozen_prework_files": [
+    {
+      "path": "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json",
+      "blob_sha": "b109a5c1984ddecee061804f7668147b1d3da601"
+    },
+    {
+      "path": "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.md",
+      "blob_sha": "ba1be1a64e247caaf60bc6b50895c44a6f9d1546"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_ACTION_TAXONOMY.json",
+      "blob_sha": "8e9f297cb15addfbf3c8344459607bb1d74eaa1f"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_MATRIX.json",
+      "blob_sha": "59efe79e44b2a5f83bbd50dd80fd9622915898c1"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_MATRIX.md",
+      "blob_sha": "cfd6be2916b794c238eb6f3646e641dd3d3c5bee"
+    },
+    {
+      "path": "portfolio_prework/DEPENDENCY_INVENTORY.json",
+      "blob_sha": "c1c8e0828b2d878250ac01dc49a3969b93181dc0"
+    },
+    {
+      "path": "portfolio_prework/DEPENDENCY_INVENTORY.md",
+      "blob_sha": "379001262640fbdee8587c39cbe127cf43bdd09a"
+    },
+    {
+      "path": "portfolio_prework/PARALLEL_PLAN_PROGRESS.md",
+      "blob_sha": "bbe8efc819c866dbf4c4c0d0d6c88edcec98921d"
+    },
+    {
+      "path": "portfolio_prework/PORTFOLIO_BUILD_STATE.json",
+      "blob_sha": "9a5585ca3308ef17122f073b68ef33896826c655"
+    },
+    {
+      "path": "portfolio_prework/PORTFOLIO_BUILD_STATE.schema.json",
+      "blob_sha": "720e2840df5706410ece35f0c67a98f7ad078f92"
+    },
+    {
+      "path": "portfolio_prework/PORTFOLIO_INVENTORY.md",
+      "blob_sha": "4dc5e9baa38f36db492a38be284ffd788f689b02"
+    },
+    {
+      "path": "portfolio_prework/PROJECT_ID_REGISTRY.json",
+      "blob_sha": "60c97e366814388d0f10862d1d0737837866361e"
+    },
+    {
+      "path": "portfolio_prework/PROJECT_ID_REGISTRY.md",
+      "blob_sha": "bb48c4dd24d6d97b366c9af2086c999a9fb77848"
+    },
+    {
+      "path": "portfolio_prework/REPOSITORY_DELTA.md",
+      "blob_sha": "b5e54509e0cfe9203fac2c336179d73d39c451ca"
+    },
+    {
+      "path": "portfolio_prework/REPOSITORY_SNAPSHOT.md",
+      "blob_sha": "2d142b53167248d2ccdf42bbf3e0677479d22346"
+    },
+    {
+      "path": "portfolio_prework/STEP0_RESUME_HANDOFF.md",
+      "blob_sha": "0f9de31ebe278352de08408f543f0c26325c6ca0"
+    },
+    {
+      "path": "portfolio_prework/TEST_SUITE_INVENTORY.json",
+      "blob_sha": "1720f3633a5d1ff0b985c58e65490d31b7a7fd69"
+    },
+    {
+      "path": "portfolio_prework/TEST_SUITE_INVENTORY.md",
+      "blob_sha": "a2b6bbd78bea86609f2366a8ba2f7a8ba75bc812"
+    },
+    {
+      "path": "portfolio_prework/WORKFLOW_INVENTORY.json",
+      "blob_sha": "fda9d147b0eb2c4be064d3f6d5e77d6ffe51d540"
+    },
+    {
+      "path": "portfolio_prework/WORKFLOW_INVENTORY.md",
+      "blob_sha": "4d83c15e15ed1bf88ecd25499ff14fd6226e6559"
+    },
+    {
+      "path": "portfolio_prework/build_portfolio_snapshot.py",
+      "blob_sha": "cb251b6093f71d42b5e9610a738d2aa895a057a7"
+    },
+    {
+      "path": "portfolio_prework/detect_repository_changes.py",
+      "blob_sha": "f8bcc7f36dc7d6a1d9fd1b72af9d44216f541f16"
+    },
+    {
+      "path": "portfolio_prework/portfolio_inventory.json",
+      "blob_sha": "63c896b192182a9edc0bcebb78b3428d803c46bc"
+    },
+    {
+      "path": "portfolio_prework/repository_delta.json",
+      "blob_sha": "e878fbc1aa6543fda7b98c52d2cdd778b8e4082f"
+    },
+    {
+      "path": "portfolio_prework/repository_snapshot.json",
+      "blob_sha": "00f91a4a331e65d6da8fc270ecbcaa74bb40a96b"
+    },
+    {
+      "path": "portfolio_prework/snapshot_repos.json",
+      "blob_sha": "f0d84b942ac29b4e0433cbf54a63f5f6983ee69d"
+    },
+    {
+      "path": "portfolio_prework/test_architecture_evidence_bundle.py",
+      "blob_sha": "0e125ff6d1ce497bd6a419b1197f487a6874818b"
+    },
+    {
+      "path": "portfolio_prework/test_autonomy_action_taxonomy.py",
+      "blob_sha": "ef3680b2a3f3a54382ef21a0e452ebb2d768fcd7"
+    },
+    {
+      "path": "portfolio_prework/test_autonomy_matrix.py",
+      "blob_sha": "50ae4e98f3dcc78440ef6a6cd5e47bc6da618f28"
+    },
+    {
+      "path": "portfolio_prework/test_build_portfolio_snapshot.py",
+      "blob_sha": "1fda32b60070fed31b96f3f53224b2216af2d770"
+    },
+    {
+      "path": "portfolio_prework/test_dependency_inventory.py",
+      "blob_sha": "3d39c076b26f06d5ec823853434411bbb97ad568"
+    },
+    {
+      "path": "portfolio_prework/test_detect_repository_changes.py",
+      "blob_sha": "0e2529f3cf1779f8d959f512023a9e1f0b9f502a"
+    },
+    {
+      "path": "portfolio_prework/test_test_suite_inventory.py",
+      "blob_sha": "a1f9f4073a950f12bebaecf12e6589cddc35b53d"
+    },
+    {
+      "path": "portfolio_prework/test_validate_build_state.py",
+      "blob_sha": "5f5c11957def64b1ff90a90deee7b7c80180737c"
+    },
+    {
+      "path": "portfolio_prework/test_workflow_inventory.py",
+      "blob_sha": "88b28a584781b1c4f19e70e9bc56e0c1cbb9644e"
+    },
+    {
+      "path": "portfolio_prework/validate_build_state.py",
+      "blob_sha": "d305eb29306c2732ad570fd93c0ce1a980d644b6"
+    }
+  ],
+  "refreshed_repository_ids": [
+    "REPO-001",
+    "REPO-003"
+  ],
+  "cached_repository_ids": [
+    "REPO-002",
+    "REPO-004",
+    "REPO-005",
+    "REPO-006",
+    "REPO-007"
+  ],
+  "deltas": [
+    {
+      "repo_id": "REPO-001",
+      "repository": "P00NSMASHER/github-value-hunt-ledger",
+      "baseline_sha": "b47f95caa658a9b12536cc9946d81d51f944c6ac",
+      "inspected_sha": "b7e4a7505f0406b0a80716eab9c09d81df8a2ecb",
+      "ahead_by": 42,
+      "status": "ahead",
+      "files": [
+        {
+          "path": ".github/workflows/public-repo-hunter.yml",
+          "status": "modified",
+          "blob_sha": "5778dee3375d97098d537c0bfb86c211886cc2e2",
+          "changes": 9
+        },
+        {
+          "path": "ai_business_os/CEO_COMMAND_CENTER_CONTRACT.md",
+          "status": "added",
+          "blob_sha": "0afdd164aa5f5ccc773b002bd47759d9fe61f39a",
+          "changes": 93
+        },
+        {
+          "path": "ai_business_os/Dockerfile.runtime",
+          "status": "added",
+          "blob_sha": "548bc9e1e99d8dd89303210d3e1132da8180c4e6",
+          "changes": 11
+        },
+        {
+          "path": "ai_business_os/PORTFOLIO_PLANNING_CONTRACT.md",
+          "status": "added",
+          "blob_sha": "fa3a1bb5482aed3ddf9f13e867b61b88fbb15091",
+          "changes": 66
+        },
+        {
+          "path": "ai_business_os/PRODUCTION_READ_BRIDGE_CONTRACT.md",
+          "status": "added",
+          "blob_sha": "05c8ec4121f01a10a3428098847f190b336bfaad",
+          "changes": 41
+        },
+        {
+          "path": "ai_business_os/README.md",
+          "status": "modified",
+          "blob_sha": "2bd2fbbabc728284ac41fdbb2b7bf0eb7d9d5b18",
+          "changes": 19
+        },
+        {
+          "path": "ai_business_os/RUNTIME_DEPLOYMENT_CONTRACT.md",
+          "status": "added",
+          "blob_sha": "e8762a5afc5fc798e2ea2ae1e1aff5e2153bd274",
+          "changes": 43
+        },
+        {
+          "path": "ai_business_os/ceo_command_center.py",
+          "status": "added",
+          "blob_sha": "be6287b1f65ae7ccdea4b8d9bd8cd042852c7eef",
+          "changes": 335
+        },
+        {
+          "path": "ai_business_os/portfolio_planning.py",
+          "status": "added",
+          "blob_sha": "c7d3394c7389097b8695ae9f06ca07a5b4a260ce",
+          "changes": 225
+        },
+        {
+          "path": "ai_business_os/production_bridge.py",
+          "status": "added",
+          "blob_sha": "8f9253420ecb205745bca6e5d88e9b61bbd00d64",
+          "changes": 203
+        },
+        {
+          "path": "ai_business_os/runtime_service.py",
+          "status": "added",
+          "blob_sha": "7e2f34d9d6b0846c00e534aa12eab7a21973a587",
+          "changes": 496
+        },
+        {
+          "path": "ai_business_os/test_ceo_command_center.py",
+          "status": "added",
+          "blob_sha": "506ceaea2fc8ee55f3821b2d7fc2cebb424ff89d",
+          "changes": 267
+        },
+        {
+          "path": "ai_business_os/test_portfolio_planning.py",
+          "status": "added",
+          "blob_sha": "f56c6f57a1f0c838a511b387e1797087f7c48b8a",
+          "changes": 106
+        },
+        {
+          "path": "ai_business_os/test_production_bridge.py",
+          "status": "added",
+          "blob_sha": "f36f1ec9e3b41fa546120d71377d933822b1bb1b",
+          "changes": 131
+        },
+        {
+          "path": "ai_business_os/test_runtime_service.py",
+          "status": "added",
+          "blob_sha": "89f6000d97e1d330eff5092a4abb16f92c3f0796",
+          "changes": 123
+        },
+        {
+          "path": "automation/SCOUT_DIGEST.md",
+          "status": "added",
+          "blob_sha": "aac58c2e8931a53fd9f7c237f1d0eed4f7863865",
+          "changes": 89
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-01.json",
+          "status": "added",
+          "blob_sha": "aa87d69c7e1ee3cf401933d1624154fc93526dcb",
+          "changes": 695
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-02.json",
+          "status": "added",
+          "blob_sha": "c5f97d851cac253e0a897183fe6d6bfc9410f254",
+          "changes": 615
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-03.json",
+          "status": "added",
+          "blob_sha": "cdbdf574fc323ff00bf62a7faad7abd91a96b21e",
+          "changes": 652
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-04.json",
+          "status": "added",
+          "blob_sha": "f7c046472ea13d8b2033815da071fec21afee00e",
+          "changes": 662
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-05.json",
+          "status": "added",
+          "blob_sha": "0a4f62d2a2de9dbe40da05c1c1192923213c57a0",
+          "changes": 607
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-06.json",
+          "status": "added",
+          "blob_sha": "2eadda504ed0bb08ffc3a619ca12784765221d40",
+          "changes": 656
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-07.json",
+          "status": "added",
+          "blob_sha": "bed739b4e80cce1a5f2ce730798e1e6e7ad4e9d9",
+          "changes": 583
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-08.json",
+          "status": "added",
+          "blob_sha": "f2333fd654353ac4b2f8e6cc9b1277a18b300ef6",
+          "changes": 683
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-09.json",
+          "status": "added",
+          "blob_sha": "9708929cb2aaf5a59492ac7274e68876cae6bd01",
+          "changes": 630
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-10.json",
+          "status": "added",
+          "blob_sha": "e58f196213dd9a332807b4bedb49e34d99441c48",
+          "changes": 605
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-11.json",
+          "status": "added",
+          "blob_sha": "0d559f9223b629bdbcddd1854ecd8ce3207e410c",
+          "changes": 726
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-12.json",
+          "status": "added",
+          "blob_sha": "ba1a74b244c6ab865882da1c8b947d91dc52f004",
+          "changes": 566
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-13.json",
+          "status": "added",
+          "blob_sha": "840d1f4935e3c8ab77d5a93f7acc8dd7da06c7cc",
+          "changes": 620
+        },
+        {
+          "path": "intelligence/scout_queue/HUNTER-14.json",
+          "status": "added",
+          "blob_sha": "ce4e78a4857fb8e0008757328f5291355a86e52c",
+          "changes": 598
+        },
+        {
+          "path": "supabase/functions/ai-business-os-runtime-gateway/index.ts",
+          "status": "added",
+          "blob_sha": "c1535ece735f5e11990f2975f3f7ec1c09711f03",
+          "changes": 143
+        },
+        {
+          "path": "tests/test_public_repo_scout.py",
+          "status": "modified",
+          "blob_sha": "e3ba69a75ac65d0c1d43c6611508670bc1b4bcc5",
+          "changes": 42
+        },
+        {
+          "path": "tools/public_repo_scout.py",
+          "status": "modified",
+          "blob_sha": "e1d8fce7eb07325f84a4cd0cd9f3104c406d57f3",
+          "changes": 87
+        }
+      ],
+      "ci_runs": [],
+      "content_reads": [
+        {
+          "path": ".github/workflows/public-repo-hunter.yml",
+          "blob_sha": "5778dee3375d97098d537c0bfb86c211886cc2e2",
+          "sha256": "a300fb3e4bfbf26525450c08b09a4e58fac23125b23e9bf7437be3c71d567269"
+        },
+        {
+          "path": "ai_business_os/CEO_COMMAND_CENTER_CONTRACT.md",
+          "blob_sha": "0afdd164aa5f5ccc773b002bd47759d9fe61f39a",
+          "sha256": "54b156f457a451c92c7b9c63a0f4866115db7cb81fa439f698d9850017be780f"
+        },
+        {
+          "path": "ai_business_os/Dockerfile.runtime",
+          "blob_sha": "548bc9e1e99d8dd89303210d3e1132da8180c4e6",
+          "sha256": "f498913857853f9190ee1fc4ee02f0e43fb2659d0e223042551df2bbc8fe0deb"
+        },
+        {
+          "path": "ai_business_os/PORTFOLIO_PLANNING_CONTRACT.md",
+          "blob_sha": "fa3a1bb5482aed3ddf9f13e867b61b88fbb15091",
+          "sha256": "8d9223e2ccc981561346b7444829c61f23a6d25e36ce172ce0b8418f7e46b4c4"
+        },
+        {
+          "path": "ai_business_os/PRODUCTION_READ_BRIDGE_CONTRACT.md",
+          "blob_sha": "05c8ec4121f01a10a3428098847f190b336bfaad",
+          "sha256": "7c916a4d6fed788889325a22bdc84dcf7f2d285c4af2c3e6ca61ebd3e649a7c3"
+        },
+        {
+          "path": "ai_business_os/README.md",
+          "blob_sha": "2bd2fbbabc728284ac41fdbb2b7bf0eb7d9d5b18",
+          "sha256": "b59756a7920e1138be23443eccd15e66cf380660fa0b987b0a0a167acd989d2d"
+        },
+        {
+          "path": "ai_business_os/RUNTIME_DEPLOYMENT_CONTRACT.md",
+          "blob_sha": "e8762a5afc5fc798e2ea2ae1e1aff5e2153bd274",
+          "sha256": "2d999044a71202cfba36537b391c297b3658479866f98439c0c8eecd9d51a8e1"
+        },
+        {
+          "path": "ai_business_os/ceo_command_center.py",
+          "blob_sha": "be6287b1f65ae7ccdea4b8d9bd8cd042852c7eef",
+          "sha256": "5571de0167517bd19caaebd6a5be0a374e5f11fc58c2377c3dc01788d15073c3"
+        },
+        {
+          "path": "ai_business_os/portfolio_planning.py",
+          "blob_sha": "c7d3394c7389097b8695ae9f06ca07a5b4a260ce",
+          "sha256": "9784ad33b405190da556bd055cdf11fe3c8d5538168821bb9c8fd2d4881c2377"
+        },
+        {
+          "path": "ai_business_os/production_bridge.py",
+          "blob_sha": "8f9253420ecb205745bca6e5d88e9b61bbd00d64",
+          "sha256": "38777187615a410a1f47c022a33f4a12a0976e4b2dcf0077fbed61de0c311041"
+        },
+        {
+          "path": "ai_business_os/runtime_service.py",
+          "blob_sha": "7e2f34d9d6b0846c00e534aa12eab7a21973a587",
+          "sha256": "11bbaa891158cfefa5478f3fd0278f5724aaabebd4663215c5c28ecd6555dba0"
+        },
+        {
+          "path": "ai_business_os/test_ceo_command_center.py",
+          "blob_sha": "506ceaea2fc8ee55f3821b2d7fc2cebb424ff89d",
+          "sha256": "9f9ad8aa504172c452208492c2801c56f506d58390d40402d2e9352627dd7b6b"
+        },
+        {
+          "path": "ai_business_os/test_portfolio_planning.py",
+          "blob_sha": "f56c6f57a1f0c838a511b387e1797087f7c48b8a",
+          "sha256": "58695c5d3020ac1d57828eecfb7c778d480a3f8ff3bba2fb246b16404658e9d9"
+        },
+        {
+          "path": "ai_business_os/test_production_bridge.py",
+          "blob_sha": "f36f1ec9e3b41fa546120d71377d933822b1bb1b",
+          "sha256": "4d604b3b4928407b202ad00c43dc6dbfa3a6ee4352f25204acf6584b3a72fdc5"
+        },
+        {
+          "path": "ai_business_os/test_runtime_service.py",
+          "blob_sha": "89f6000d97e1d330eff5092a4abb16f92c3f0796",
+          "sha256": "0daad02e36dd9fe74029a023acf8f9159bf5ace167025dec124928f44a00d1ac"
+        },
+        {
+          "path": "automation/SCOUT_DIGEST.md",
+          "blob_sha": "aac58c2e8931a53fd9f7c237f1d0eed4f7863865",
+          "sha256": "134793ef83754094970cfb0c1a0f36ad6ebe1f148ddbcdad69b36df84d0d49ee"
+        },
+        {
+          "path": "supabase/functions/ai-business-os-runtime-gateway/index.ts",
+          "blob_sha": "c1535ece735f5e11990f2975f3f7ec1c09711f03",
+          "sha256": "f2da87d6831338ee18c21555c043cb56371f6ae05e7e13e99d0be3b4376d669a"
+        },
+        {
+          "path": "tests/test_public_repo_scout.py",
+          "blob_sha": "e3ba69a75ac65d0c1d43c6611508670bc1b4bcc5",
+          "sha256": "fdc73f83ebcb0c2cd2ea2bf0510bc8e6a2f3b4371bdd13f2299f5cafc17ff654"
+        },
+        {
+          "path": "tools/public_repo_scout.py",
+          "blob_sha": "e1d8fce7eb07325f84a4cd0cd9f3104c406d57f3",
+          "sha256": "3cfd122bf45ebc68a994f6a51ad7c55fcd14af477ed20e13197ad31f90bf7324"
+        }
+      ],
+      "compare_url": "https://github.com/P00NSMASHER/github-value-hunt-ledger/compare/b47f95caa658a9b12536cc9946d81d51f944c6ac...b7e4a7505f0406b0a80716eab9c09d81df8a2ecb",
+      "source_root": "https://github.com/P00NSMASHER/github-value-hunt-ledger/tree/b7e4a7505f0406b0a80716eab9c09d81df8a2ecb",
+      "files_complete_for_compare": true
+    },
+    {
+      "repo_id": "REPO-003",
+      "repository": "P00NSMASHER/abvmschoolstarworld",
+      "baseline_sha": "2b78aed7695374b35ad207c43bec9d61486d056a",
+      "inspected_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+      "ahead_by": 49,
+      "status": "ahead",
+      "files": [
+        {
+          "path": "package.json",
+          "status": "modified",
+          "blob_sha": "a80837e353cfbc0d0e3a0dfc87ad9cf7e7bd50fb",
+          "changes": 4
+        },
+        {
+          "path": "pages/app.js",
+          "status": "modified",
+          "blob_sha": "7b5d22f8db5f02b0f183b8c1c8f38964c608f7ef",
+          "changes": 575
+        },
+        {
+          "path": "pages/calendar-clean.css",
+          "status": "modified",
+          "blob_sha": "f49a16fb36bd4ce02b732fb243b12049b003f779",
+          "changes": 58
+        },
+        {
+          "path": "pages/colorful-polish.css",
+          "status": "added",
+          "blob_sha": "4c9818454322fc62653dac6f76e159bc34d5c8c4",
+          "changes": 290
+        },
+        {
+          "path": "pages/data/study-pack.json",
+          "status": "modified",
+          "blob_sha": "9db898dbdba7208778ec3f61d25a427bb3dd8b60",
+          "changes": 2
+        },
+        {
+          "path": "pages/family-clean.css",
+          "status": "added",
+          "blob_sha": "87a6563cf4363eec15ec7477feb2742922820d9e",
+          "changes": 193
+        },
+        {
+          "path": "pages/index.html",
+          "status": "modified",
+          "blob_sha": "d1bdb152aca063ec14d6c27faa59446a92701e60",
+          "changes": 25
+        },
+        {
+          "path": "pages/manifest.webmanifest",
+          "status": "modified",
+          "blob_sha": "389866658f89d7b64964b431b156c4f7612f647b",
+          "changes": 4
+        },
+        {
+          "path": "pages/study-clean.css",
+          "status": "added",
+          "blob_sha": "8393cdd864f2a8377d123ee25aa99959be24efa7",
+          "changes": 268
+        },
+        {
+          "path": "pages/styles.css",
+          "status": "modified",
+          "blob_sha": "b90ffd8cf058fb803613bce2f8dc6595c76a799a",
+          "changes": 1717
+        },
+        {
+          "path": "pages/sw.js",
+          "status": "modified",
+          "blob_sha": "b79931449b5e4f72f5e0e976affe621f8884ffe5",
+          "changes": 7
+        },
+        {
+          "path": "pages/today-clean.css",
+          "status": "added",
+          "blob_sha": "3ef0d07af9ac907b27e8e503139f6acee9fdb086",
+          "changes": 278
+        },
+        {
+          "path": "pages/week-clean.css",
+          "status": "added",
+          "blob_sha": "c18379006becfdc31967f08e2180735fc489a9ee",
+          "changes": 244
+        },
+        {
+          "path": "scripts/validate-app.mjs",
+          "status": "modified",
+          "blob_sha": "84b0766e89bebf454f575d84b16bb1dee1f289ab",
+          "changes": 78
+        },
+        {
+          "path": "tests/app.spec.mjs",
+          "status": "modified",
+          "blob_sha": "599c31edfec3e3d827c3051d123dcafc4b2569d0",
+          "changes": 72
+        },
+        {
+          "path": "tests/calendar-edge.spec.mjs",
+          "status": "modified",
+          "blob_sha": "bdd4943486440a2ef412401b8daff3276286f470",
+          "changes": 8
+        },
+        {
+          "path": "tests/gold-standard.spec.mjs",
+          "status": "added",
+          "blob_sha": "642725f4cdcd11e5b5168bd7e544fd31e06ae55a",
+          "changes": 103
+        }
+      ],
+      "ci_runs": [
+        {
+          "id": 36103405216,
+          "name": "ABVM Operational Health Dashboard",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+          "url": "https://github.com/P00NSMASHER/abvmschoolstarworld/actions/runs/36103405216"
+        },
+        {
+          "id": 36103338620,
+          "name": "ABVM Operational Health Dashboard",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+          "url": "https://github.com/P00NSMASHER/abvmschoolstarworld/actions/runs/36103338620"
+        },
+        {
+          "id": 36103280547,
+          "name": "ABVM App QA",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+          "url": "https://github.com/P00NSMASHER/abvmschoolstarworld/actions/runs/36103280547"
+        },
+        {
+          "id": 36103280155,
+          "name": "Deploy ABVM to GitHub Pages",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+          "url": "https://github.com/P00NSMASHER/abvmschoolstarworld/actions/runs/36103280155"
+        }
+      ],
+      "content_reads": [
+        {
+          "path": "package.json",
+          "blob_sha": "a80837e353cfbc0d0e3a0dfc87ad9cf7e7bd50fb",
+          "sha256": "2f92d1daa7632689ab8f5d80050cf80fa3d064f6b93055af9d62391b0a09009f"
+        },
+        {
+          "path": "pages/app.js",
+          "blob_sha": "7b5d22f8db5f02b0f183b8c1c8f38964c608f7ef",
+          "sha256": "2c836c39d81a2b58d7028c7c1b483ab2e0e29cdaa82f0be50c1a229f2e7c8832"
+        },
+        {
+          "path": "pages/sw.js",
+          "blob_sha": "b79931449b5e4f72f5e0e976affe621f8884ffe5",
+          "sha256": "3043af63163289951c522bf5dcd5a1d1ec82c5b02b97a4277a83da69bca652b2"
+        },
+        {
+          "path": "scripts/validate-app.mjs",
+          "blob_sha": "84b0766e89bebf454f575d84b16bb1dee1f289ab",
+          "sha256": "1e32a0b45b649efbde5b26e770584eb766f79cbb18e5c38c3cdb355b5d14b0c8"
+        },
+        {
+          "path": "tests/gold-standard.spec.mjs",
+          "blob_sha": "642725f4cdcd11e5b5168bd7e544fd31e06ae55a",
+          "sha256": "029f7614190cb64c0f4df4282b71d370f5137c91e9e71d6126793033258aaf43"
+        }
+      ],
+      "compare_url": "https://github.com/P00NSMASHER/abvmschoolstarworld/compare/2b78aed7695374b35ad207c43bec9d61486d056a...a15c7c2214a065707123e9b8ab8ac51a42240345",
+      "source_root": "https://github.com/P00NSMASHER/abvmschoolstarworld/tree/a15c7c2214a065707123e9b8ab8ac51a42240345",
+      "files_complete_for_compare": true
+    }
+  ],
+  "scout_queue_summary": [
+    {
+      "path": "intelligence/scout_queue/HUNTER-01.json",
+      "blob_sha": "aa87d69c7e1ee3cf401933d1624154fc93526dcb",
+      "worker_id": "HUNTER-01",
+      "generated_at": "2026-09-25T07:40:42.972426+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 40,
+        "known_revision_skips": 0,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-02.json",
+      "blob_sha": "c5f97d851cac253e0a897183fe6d6bfc9410f254",
+      "worker_id": "HUNTER-02",
+      "generated_at": "2026-09-25T07:45:49.561771+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 57,
+        "known_revision_skips": 2,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-03.json",
+      "blob_sha": "cdbdf574fc323ff00bf62a7faad7abd91a96b21e",
+      "worker_id": "HUNTER-03",
+      "generated_at": "2026-09-25T08:00:46.034302+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 63,
+        "known_revision_skips": 1,
+        "rate_limit_sleeps": 0,
+        "retries": 2,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-04.json",
+      "blob_sha": "f7c046472ea13d8b2033815da071fec21afee00e",
+      "worker_id": "HUNTER-04",
+      "generated_at": "2026-09-25T08:07:09.629251+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 54,
+        "known_revision_skips": 0,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-05.json",
+      "blob_sha": "0a4f62d2a2de9dbe40da05c1c1192923213c57a0",
+      "worker_id": "HUNTER-05",
+      "generated_at": "2026-09-25T08:08:25.256959+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 47,
+        "known_revision_skips": 0,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-06.json",
+      "blob_sha": "2eadda504ed0bb08ffc3a619ca12784765221d40",
+      "worker_id": "HUNTER-06",
+      "generated_at": "2026-09-25T08:11:34.047630+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 42,
+        "known_revision_skips": 0,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-07.json",
+      "blob_sha": "bed739b4e80cce1a5f2ce730798e1e6e7ad4e9d9",
+      "worker_id": "HUNTER-07",
+      "generated_at": "2026-09-25T08:12:36.935301+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 38,
+        "known_revision_skips": 0,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-08.json",
+      "blob_sha": "f2333fd654353ac4b2f8e6cc9b1277a18b300ef6",
+      "worker_id": "HUNTER-08",
+      "generated_at": "2026-09-25T08:28:56.276749+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 52,
+        "known_revision_skips": 0,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 1,
+        "root_cache_hits": 1
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-09.json",
+      "blob_sha": "9708929cb2aaf5a59492ac7274e68876cae6bd01",
+      "worker_id": "HUNTER-09",
+      "generated_at": "2026-09-25T08:46:56.265192+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 38,
+        "known_revision_skips": 2,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-10.json",
+      "blob_sha": "e58f196213dd9a332807b4bedb49e34d99441c48",
+      "worker_id": "HUNTER-10",
+      "generated_at": "2026-09-25T08:56:26.170238+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 42,
+        "known_revision_skips": 1,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-11.json",
+      "blob_sha": "0d559f9223b629bdbcddd1854ecd8ce3207e410c",
+      "worker_id": "HUNTER-11",
+      "generated_at": "2026-09-25T09:00:06.954324+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 67,
+        "known_revision_skips": 1,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-12.json",
+      "blob_sha": "ba1a74b244c6ab865882da1c8b947d91dc52f004",
+      "worker_id": "HUNTER-12",
+      "generated_at": "2026-09-25T09:02:24.698230+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 14,
+      "api_metrics": {
+        "api_requests": 34,
+        "known_revision_skips": 2,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-13.json",
+      "blob_sha": "840d1f4935e3c8ab77d5a93f7acc8dd7da06c7cc",
+      "worker_id": "HUNTER-13",
+      "generated_at": "2026-09-25T09:07:06.008010+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 67,
+        "known_revision_skips": 1,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    },
+    {
+      "path": "intelligence/scout_queue/HUNTER-14.json",
+      "blob_sha": "ce4e78a4857fb8e0008757328f5291355a86e52c",
+      "worker_id": "HUNTER-14",
+      "generated_at": "2026-09-25T09:07:43.407990+00:00",
+      "schema_version": 2,
+      "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
+      "candidate_count": 16,
+      "api_metrics": {
+        "api_requests": 54,
+        "known_revision_skips": 0,
+        "rate_limit_sleeps": 0,
+        "retries": 0,
+        "revision_cache_hits": 0,
+        "root_cache_hits": 0
+      }
+    }
+  ],
+  "scout_queue_candidate_rows_before_deduplication": 222,
+  "baseline_inventory_counts": {
+    "projects": 12,
+    "workflows": 47,
+    "test_paths": 367,
+    "dependency_manifests": 14
+  },
+  "additive_inventory_changes": {
+    "new_test_paths": [
+      "ai_business_os/test_ceo_command_center.py",
+      "ai_business_os/test_portfolio_planning.py",
+      "ai_business_os/test_production_bridge.py",
+      "ai_business_os/test_runtime_service.py",
+      "tests/gold-standard.spec.mjs"
+    ],
+    "current_mixed_snapshot_test_paths": 372,
+    "workflow_path_delta": 0,
+    "dependency_manifest_path_delta": 0,
+    "other_runtime_dependencies": [
+      "REPO-001:ai_business_os/Dockerfile.runtime",
+      "REPO-001:supabase/functions/ai-business-os-runtime-gateway/index.ts"
+    ],
+    "note": "Historical inventories remain unchanged. Changed invocation and runtime dependency semantics are described in the baseline."
+  },
+  "blocked_integrations": [
+    {
+      "repo_id": "REPO-006",
+      "reason": "BLK-001: intended visibility/access posture requires explicit human review",
+      "adapter_enabled": false
+    }
+  ],
+  "validation_runs": [
+    {
+      "name": "prework_and_baseline_tests",
+      "command": "python -m unittest discover -s portfolio_prework -p test_*.py",
+      "source": "local Step 0 candidate plus immutable prework",
+      "python_version": "3.12.14",
+      "status": "PASS",
+      "exit_code": 0,
+      "tests_run": 56,
+      "output_sha256": "7b9ad49fc1dcfeeebabde9c0932dc1ca9091decda2502c3491c6aa3a3a45a26d",
+      "output": "........................................................\n----------------------------------------------------------------------\nRan 56 tests in 0.006s\n\nOK\n",
+      "executed_at": "2026-09-25T11:14:59.063017Z"
+    },
+    {
+      "name": "ai_business_os_delta_tests",
+      "command": "python -m unittest ai_business_os.test_ceo_command_center ai_business_os.test_portfolio_planning ai_business_os.test_production_bridge ai_business_os.test_runtime_service",
+      "source": "b7e4a7505f0406b0a80716eab9c09d81df8a2ecb",
+      "python_version": "3.12.14",
+      "status": "PASS",
+      "exit_code": 0,
+      "tests_run": 32,
+      "output_sha256": "06483ffd5fadbd9d8cece40c5b29e382ea3451749bd852bf879f121c9a3e63ad",
+      "output": "................................\n----------------------------------------------------------------------\nRan 32 tests in 0.004s\n\nOK\n",
+      "executed_at": "2026-09-25T11:14:59.141601Z"
+    },
+    {
+      "name": "scout_delta_tests",
+      "command": "python -m unittest discover -s tests -p test_public_repo_scout.py",
+      "source": "b7e4a7505f0406b0a80716eab9c09d81df8a2ecb",
+      "python_version": "3.12.14",
+      "status": "PASS",
+      "exit_code": 0,
+      "tests_run": 8,
+      "output_sha256": "698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a",
+      "output": "........\n----------------------------------------------------------------------\nRan 8 tests in 0.001s\n\nOK\n",
+      "executed_at": "2026-09-25T11:14:59.210843Z"
+    },
+    {
+      "name": "build_state_invariants",
+      "command": "python portfolio_prework/validate_build_state.py --state PORTFOLIO_BUILD_STATE.json",
+      "source": "local Step 0 candidate plus immutable prework",
+      "python_version": "3.12.14",
+      "status": "PASS",
+      "exit_code": 0,
+      "tests_run": null,
+      "output_sha256": "f589bd23426532229971824585831b5ab219112e4113698bd475b638511f42d8",
+      "output": "valid build state: step=1 completed=1 repos=7\n",
+      "executed_at": "2026-09-25T11:14:59.241908Z"
+    }
+  ],
+  "independent_evidence_limits": [
+    "Existing code tests executed locally by the architect; no independent human/security audit claimed.",
+    "ABVM exact-source GitHub QA success covers its configured narrowed suite.",
+    "No exact-source Hunter GitHub Actions run was returned by the query.",
+    "Supabase gateway was inspected statically; no live access or deployment verification.",
+    "Five cached repositories were not queried during this resumed inspection."
+  ]
+}

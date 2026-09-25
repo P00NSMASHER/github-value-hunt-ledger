@@ -1,0 +1,341 @@
+{
+  "schema_version": "1.0.0",
+  "repositories": {
+    "REPO-001": {
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "last_inspected_sha": "b7e4a7505f0406b0a80716eab9c09d81df8a2ecb",
+      "inspection_status": "INSPECTED",
+      "last_observed_at": "2026-09-25T11:14:18.539884Z",
+      "notes": "Targeted delta inspected from b47f95caa658a9b12536cc9946d81d51f944c6ac: 42 commits, 33 changed paths. See docs/PORTFOLIO_STEP0_EVIDENCE.json; source inspection does not establish live deployment."
+    },
+    "REPO-002": {
+      "full_name": "P00NSMASHER/StarBlox",
+      "last_inspected_sha": "8ebe583f6dae6a832bae2f4987c6919db41eaf5e",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": " Retained from prework; not re-observed in master Step 0 resume."
+    },
+    "REPO-003": {
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "last_inspected_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+      "inspection_status": "INSPECTED",
+      "last_observed_at": "2026-09-25T11:14:18.539884Z",
+      "notes": "Targeted delta inspected from 2b78aed7695374b35ad207c43bec9d61486d056a: 49 commits, 17 changed paths. See docs/PORTFOLIO_STEP0_EVIDENCE.json; source inspection does not establish live deployment."
+    },
+    "REPO-004": {
+      "full_name": "P00NSMASHER/trading-platform",
+      "last_inspected_sha": "579730f1abb595579de199277a95a8c89f733d0f",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": "Research/surveillance only; no autonomous trading authority. Retained from prework; not re-observed in master Step 0 resume."
+    },
+    "REPO-005": {
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "last_inspected_sha": "7c9a8fc4dd9fa12275d336beb8eb10732718666a",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": " Retained from prework; not re-observed in master Step 0 resume."
+    },
+    "REPO-006": {
+      "full_name": "P00NSMASHER/permitplate-state",
+      "last_inspected_sha": "c64fe06a22c3826c9ad3a7b85a4f911a6e589c19",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": "Current GitHub metadata confirms public visibility. Durable architecture treats this repository as sensitive operational state, so visibility/access requires explicit human review before Portfolio Brain integration. Retained from prework; not re-observed in master Step 0 resume."
+    },
+    "REPO-007": {
+      "full_name": "P00NSMASHER/capturebrief",
+      "last_inspected_sha": "3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": " Retained from prework; not re-observed in master Step 0 resume."
+    }
+  },
+  "decisions": [
+    {
+      "decision_id": "DEC-001",
+      "summary": "Keep product repositories independent and build a portfolio-level control plane rather than a source-code monolith.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/PORTFOLIO_INVENTORY.md",
+        "portfolio_prework/PROJECT_ID_REGISTRY.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-002",
+      "summary": "Use exact repository HEAD SHAs as the first cache key and inspect unchanged repositories only when the task specifically requires deeper evidence.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/REPOSITORY_SNAPSHOT.md",
+        "portfolio_prework/REPOSITORY_DELTA.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-003",
+      "summary": "Reserve PRJ-000 for Portfolio Brain and keep stable project identities separate from repository identities.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/PROJECT_ID_REGISTRY.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-004",
+      "summary": "Use four autonomy classes (OBSERVE, EXPERIMENT, MODIFY, ACT) with deny-by-default semantics and the most restrictive applicable rule winning.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/AUTONOMY_ACTION_TAXONOMY.json",
+        "portfolio_prework/AUTONOMY_MATRIX.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-005",
+      "summary": "No project receives unbounded external ACT authority; consequential external actions remain human-gated and market-surveillance live trading/execution remains prohibited.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/AUTONOMY_MATRIX.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-006",
+      "summary": "Treat existing GitHub workflow write/deploy credentials as capabilities of those workflows, not as blanket authority for Portfolio Brain.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/WORKFLOW_INVENTORY.json",
+        "portfolio_prework/WORKFLOW_INVENTORY.md",
+        "portfolio_prework/AUTONOMY_MATRIX.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-007",
+      "summary": "Use changed-path/risk-aware targeted test selection rather than running every downstream repository test suite after every candidate change.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/TEST_SUITE_INVENTORY.json",
+        "portfolio_prework/TEST_SUITE_INVENTORY.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-008",
+      "summary": "Treat dependency manifests and lockfiles as promotion evidence; manifest/lockfile changes should trigger dependency-specific validation rather than relying on one successful install.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/DEPENDENCY_INVENTORY.json",
+        "portfolio_prework/DEPENDENCY_INVENTORY.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-009",
+      "summary": "Use ARCHITECTURE_EVIDENCE_BUNDLE.json plus the current SHA delta as the canonical prework handoff into Portfolio Brain Step 0; do not rescan unchanged repositories by default.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json",
+        "portfolio_prework/STEP0_RESUME_HANDOFF.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-010",
+      "summary": "At architecture handoff, re-inspect only the two repositories whose HEADs diverged from the pinned snapshot (github-value-hunt-ledger and abvmschoolstarworld) before completing master Step 0; keep the other five repositories cached unless a specific architecture question requires them.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/repository_snapshot.json",
+        "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-011",
+      "summary": "Reuse canonical ai_business_os and existing TI controls through pinned interfaces; business_os remains frozen legacy.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-012",
+      "summary": "Reuse the command center, portfolio planner and production read bridge; require separated observation credentials and authenticated human authority before runtime integration.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-013",
+      "summary": "Treat scouts as pre-verification intake; connect findings through existing immutable run/claim/lease/verifier/outcome paths rather than create a competing Hunter control plane.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-014",
+      "summary": "Preserve prework inventories byte-for-byte and append delta evidence; distinguish discovered tests from currently invoked CI tests.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-015",
+      "summary": "GitHub stores code, policy and sanitized evidence receipts; private operating/customer payloads stay in authorized private storage.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-016",
+      "summary": "Minimum budgets, timeouts, retry bounds, idempotency and kill switches are prerequisites for recurring execution before the full Step 20 governor.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-017",
+      "summary": "Root PORTFOLIO_BUILD_STATE.json is now canonical for master steps 0–25; portfolio_prework/PORTFOLIO_BUILD_STATE.json is immutable completed prework history. current_step denotes the next pending step.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-018",
+      "summary": "Record ABVM runtime and test coverage changes explicitly; green narrowed CI is not proof of inherited offline/calendar/persistence coverage.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+        "docs/PORTFOLIO_STEP0_EVIDENCE.json"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "blocker_id": "BLK-001",
+      "summary": "permitplate-state is currently public while durable architecture treats it as sensitive operational state; review intended visibility and access controls before integrating it into Portfolio Brain.",
+      "status": "OPEN",
+      "requires_human_decision": true
+    },
+    {
+      "blocker_id": "BLK-002",
+      "summary": "Production reuse requires live identity, privilege, deployment and independent-verifier evidence. Existing gateway token includes write operations; observers must not inherit it. Blocks integration/activation, not architecture completion.",
+      "status": "DEFERRED",
+      "requires_human_decision": false
+    },
+    {
+      "blocker_id": "BLK-003",
+      "summary": "ABVM active CI excludes retained browser suites and unit invocation; record current coverage/persistence/calendar limitations before future reliance.",
+      "status": "DEFERRED",
+      "requires_human_decision": false
+    },
+    {
+      "blocker_id": "BLK-004",
+      "summary": "No GitHub repository-creation action is exposed in this turn. Recheck capabilities during Step 1; repository creation may require an owner action.",
+      "status": "OPEN",
+      "requires_human_decision": false
+    }
+  ],
+  "architecture_version": "0.1.0",
+  "state_id": "portfolio-brain-master",
+  "working_branch": "portfolio-brain-step0-20260925",
+  "phase": "architecture_build",
+  "current_step": 1,
+  "completed_steps": [
+    0
+  ],
+  "artifacts": [
+    {
+      "path": "portfolio_prework/PORTFOLIO_BUILD_STATE.json",
+      "kind": "immutable_parallel_prework_history",
+      "step": 0,
+      "commit_sha": "bd169dba2539de9e9fa9338c063b60f453d903de"
+    },
+    {
+      "path": "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json",
+      "kind": "immutable_prework_handoff",
+      "step": 0,
+      "commit_sha": "bd169dba2539de9e9fa9338c063b60f453d903de"
+    },
+    {
+      "path": "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
+      "kind": "architecture_baseline",
+      "step": 0,
+      "commit_sha": null
+    },
+    {
+      "path": "docs/PORTFOLIO_STEP0_EVIDENCE.json",
+      "kind": "delta_and_verification_receipt",
+      "step": 0,
+      "commit_sha": null
+    },
+    {
+      "path": "portfolio_prework/test_portfolio_architecture_baseline.py",
+      "kind": "baseline_regression_checks",
+      "step": 0,
+      "commit_sha": null
+    },
+    {
+      "path": "PORTFOLIO_BUILD_STATE.json",
+      "kind": "canonical_master_continuation_state",
+      "step": 0,
+      "commit_sha": null
+    }
+  ],
+  "tests": [
+    {
+      "name": "prework_and_baseline_tests",
+      "status": "PASS",
+      "step": 0,
+      "evidence": "56 tests; exit 0. Command/output/source receipt in docs/PORTFOLIO_STEP0_EVIDENCE.json."
+    },
+    {
+      "name": "ai_business_os_delta_tests",
+      "status": "PASS",
+      "step": 0,
+      "evidence": "32 tests; exit 0. Command/output/source receipt in docs/PORTFOLIO_STEP0_EVIDENCE.json."
+    },
+    {
+      "name": "scout_delta_tests",
+      "status": "PASS",
+      "step": 0,
+      "evidence": "8 tests; exit 0. Command/output/source receipt in docs/PORTFOLIO_STEP0_EVIDENCE.json."
+    },
+    {
+      "name": "build_state_invariants",
+      "status": "PASS",
+      "step": 0,
+      "evidence": "exit 0; schema core invariants checked by preserved validator."
+    },
+    {
+      "name": "prework provenance and immutable inventory checks",
+      "status": "PASS",
+      "step": 0,
+      "evidence": "All ten source-artifact Git blob hashes match the supplied bundle; frozen prework files checked by baseline tests."
+    },
+    {
+      "name": "ABVM exact-source configured CI",
+      "status": "PASS",
+      "step": 0,
+      "evidence": "GitHub run 36103280547 at a15c7c2214a065707123e9b8ab8ac51a42240345; narrowed configured suite only; not rerun locally."
+    }
+  ],
+  "next_action": {
+    "step": 1,
+    "summary": "WAIT FOR CONTINUE. Then create the dedicated Portfolio Brain foundation for PRJ-000: architecture contract, boundaries, skeleton, project registration and initial CI, reusing this baseline. Master Step 1 is pending, not started.",
+    "preconditions": [
+      "Explicit CONTINUE after the Step 0 completion report.",
+      "Read this root PORTFOLIO_BUILD_STATE.json first; prework steps 1–10 belong to a separate completed plan.",
+      "Carry immutable project IDs, autonomy matrix, hard gates, inventories and provenance into the dedicated repository.",
+      "Do not repeat reconnaissance of unchanged source revisions; inspect only relevant changed paths.",
+      "Keep REPO-006 integration disabled until BLK-001 visibility/access review is explicitly resolved.",
+      "Keep runtime/bootstrap and downstream writes disabled; Step 1 creates no autonomous downstream authority.",
+      "Check for an authorized repository-creation capability; if absent, finish the reviewable foundation and request only the missing creation action."
+    ]
+  },
+  "updated_at": "2026-09-25T11:14:59.241939Z"
+}
