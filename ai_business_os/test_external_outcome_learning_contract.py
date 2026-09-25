@@ -38,8 +38,12 @@ class ExternalOutcomeLearningContractTests(unittest.TestCase):
 
     def test_real_state_is_still_fail_closed(self):
         state=self.data["current_real_state"]
-        self.assertEqual(0,state["verified_external_outcomes"])
-        self.assertEqual(0,state["learned_external_outcomes"])
+        self.assertEqual(1,state["verified_external_outcomes"])
+        self.assertEqual(1,state["learned_external_outcomes"])
+        self.assertEqual(1,state["verified_external_outcome_memory_observations"])
+        self.assertEqual("OUTREACH_DELIVERY_FAILURE",self.data["first_real_outcome"]["outcome_type"])
+        self.assertFalse(self.data["first_real_outcome"]["buyer_rejection"])
+        self.assertFalse(self.data["first_real_outcome"]["allocation_changed"])
         for key,value in state.items():
             if key.endswith("_allocation_eligible"):
                 self.assertFalse(value)
@@ -67,8 +71,11 @@ class ExternalOutcomeLearningContractTests(unittest.TestCase):
 
     def test_repository_plan_is_ten_of_ten_without_claiming_commercial_success(self):
         self.assertEqual("COMPLETE_10_OF_10",self.complete["status"])
-        self.assertEqual(0,self.complete["operating_truth"]["real_verified_external_outcomes"])
-        self.assertIn("commercial evidence must now be earned",self.complete["operating_truth"]["statement"])
+        self.assertEqual(1,self.complete["operating_truth"]["real_verified_external_outcomes"])
+        self.assertEqual(0,self.complete["operating_truth"]["current_allocation_changes_from_outcomes"])
+        statement=self.complete["operating_truth"]["statement"].lower()
+        self.assertIn("delivery failure",statement)
+        self.assertNotIn("commercial success",statement)
 
 
 if __name__=="__main__":
