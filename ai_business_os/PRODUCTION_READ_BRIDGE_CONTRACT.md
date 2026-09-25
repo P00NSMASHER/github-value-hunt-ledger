@@ -21,6 +21,8 @@ The bridge is deliberately read-only.
   2. canonical businesses;
   3. latest command-center snapshot;
   4. pending human approvals.
+- Pending approvals are identified by the production `request_key` + `intent_hash` contract;
+  the bridge does not invent or substitute a separate request identity.
 - It does **not** approve requests, create work, dispatch Hunters, open pull requests, send
   messages, move money, deploy code, or write to Supabase.
 
@@ -32,7 +34,16 @@ Credentials and mutable operating data remain outside the public repository.
 Any future write path must go through the existing AI Business OS governance control plane rather
 than being added to this bridge.
 
+## Live contract verification
+
+The production-use verification step must compare the live
+`ai_business_os_prod.schema_fingerprint_v1()` result to
+`manifest.json.live_schema_fingerprint_sha256` before trusting any production snapshot. It must
+also validate the live approval-inbox column contract rather than assuming test-only field names.
+
+No live customer, provider, approval, or operating data is committed to the public repository.
+
 ## Next production-use step
 
-Attach this read-only contract to the private production database, verify the live schema
-fingerprint, and obtain the first real portfolio/command-center read without granting write access.
+Feed the verified read-only portfolio state into the canonical agent/Hunter planning layer without
+granting new write authority.
