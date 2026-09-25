@@ -109,7 +109,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add intelligence/scout_queue automation/SCOUT_DIGEST.md 2>/dev/null || true
+          if [ -d intelligence/scout_queue ]; then
+            git add -A -- intelligence/scout_queue
+          fi
+          if [ -f automation/SCOUT_DIGEST.md ]; then
+            git add -- automation/SCOUT_DIGEST.md
+          fi
           git diff --cached --quiet && exit 0
           git commit -m "automation: refresh ${WORKER} scout state"
           git pull --rebase origin main
