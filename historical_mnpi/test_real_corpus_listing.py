@@ -45,7 +45,7 @@ class RealCorpusListingTests(unittest.TestCase):
             EXPECTED_EXPANDED_PAIR_SHA256,
         )
 
-    def test_current_intervals_resolve_exactly_1166_observations(self):
+    def test_current_intervals_resolve_exactly_1254_observations(self):
         _, requirements = self._requirements()
         intervals = self._intervals()
         expansion = expand_listing_intervals(
@@ -53,9 +53,9 @@ class RealCorpusListingTests(unittest.TestCase):
             intervals,
         )
 
-        self.assertEqual(len(intervals), 30)
-        self.assertEqual(len(expansion.resolved), 1166)
-        self.assertEqual(len(expansion.unresolved), 2662)
+        self.assertEqual(len(intervals), 34)
+        self.assertEqual(len(expansion.resolved), 1254)
+        self.assertEqual(len(expansion.unresolved), 2574)
 
         new_symbols = {"CLD", "EW", "MTH", "MUSA"}
         new_rows = [
@@ -111,8 +111,8 @@ class RealCorpusListingTests(unittest.TestCase):
             for row in materialized
         }
 
-        self.assertEqual(len(materialized), 1166)
-        self.assertEqual(len(actual), 1166)
+        self.assertEqual(len(materialized), 1254)
+        self.assertEqual(len(actual), 1254)
         self.assertEqual(actual, expected)
         self.assertTrue(all(
             row["source_kind"] == "OFFICIAL_LISTING_HISTORY"
@@ -132,15 +132,15 @@ class RealCorpusListingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["listing_intervals_verified"],
-            30,
+            34,
         )
         self.assertEqual(
             manifest["listing_metadata_resolved"],
-            1166,
+            1254,
         )
         self.assertEqual(
             manifest["listing_metadata_unresolved"],
-            2662,
+            2574,
         )
         self.assertEqual(
             manifest["listing_metadata_resolved"]
