@@ -11,7 +11,7 @@ Working branch: `portfolio-parallel-prep`
 | 5 | Durable build-state schema | **COMPLETE** |
 | 6 | Autonomy matrix | **COMPLETE** |
 | 7 | GitHub workflow inventory | **COMPLETE** |
-| 8 | Test-suite inventory | PENDING |
+| 8 | Test-suite inventory | **COMPLETE** |
 | 9 | Dependency inventory | PENDING |
 | 10 | Architecture evidence bundle | PENDING |
 
@@ -83,6 +83,15 @@ Created:
 - `portfolio_prework/test_workflow_inventory.py`
 
 Inventoried all 47 workflow paths present in the pinned Step 3 repository snapshot across all seven repositories. The inventory records triggers, declared permissions, jobs, and risk markers such as schedules, secrets, write permissions, and Pages/deployment behavior. Exact coverage verification found zero missing and zero extra workflows, and no `pull_request_target` use at the pinned SHAs. Existing write/deploy credentials are explicitly treated as workflow capabilities rather than inherited Portfolio Brain authority.
+
+## Step 8 result
+
+Created:
+- `portfolio_prework/TEST_SUITE_INVENTORY.json`
+- `portfolio_prework/TEST_SUITE_INVENTORY.md`
+- `portfolio_prework/test_test_suite_inventory.py`
+
+Inventoried all 367 test paths present in the pinned repository snapshot: 205 in the primary portfolio repo, 43 in StarBlox, 10 in ABVM, 26 in trading-platform, 40 in PermitPlate NYC, 0 in permitplate-state, and 43 in CaptureBrief. The inventory also records test frameworks and CI entrypoints without needlessly executing every downstream suite. Two coverage gaps were surfaced for later architecture work: ABVM defines a qa:unit script that is not invoked by its pinned QA workflow, and the legacy business_os subtree has discovered tests but no matching pinned workflow invocation. Exact coverage validation and focused CI passed.
 
 ## Rule
 
