@@ -21,6 +21,11 @@ from typing import Any, Mapping
 from ai_business_os.ceo_command_center import (
     CommandCenterOperator,
 )
+from ai_business_os.persistent_workers import (
+    PersistentGoalWorker,
+    default_worker_instance_id,
+    system_health_executor,
+)
 
 STARTUP_SMOKE_OBJECTIVE = (
     "Research the current portfolio evidence gaps and identify the single highest-priority "
@@ -345,6 +350,14 @@ def build_server() -> ThreadingHTTPServer:
     write_execute = GatewayWriteExecutor(gateway)
     state = RuntimeState(gateway, expected_fingerprint)
     state.probe()
+    worker = PersistentGoalWorker(
+        gateway,
+        worker_instance_id=default_worker_instance_id(),
+        executors={"SYSTEM_HEALTH_CHECK": system_health_executor(gateway)},
+        lease_seconds=int(os.environ.get("AIBOS_WORKER_LEASE_SECONDS", "180")),
+        heartbeat_seconds=int(os.environ.get("AIBOS_WORKER_HEARTBEAT_SECONDS", "45")),
+        poll_seconds=float(os.environ.get("AIBOS_WORKER_POLL_SECONDS", "15")),
+    )
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "AIBusinessOSRuntime/1.0"
@@ -380,6 +393,7 @@ def build_server() -> ThreadingHTTPServer:
         def do_GET(self) -> None:
             if self.path == "/health":
                 snapshot = state.snapshot()
+                snapshot["worker"] = worker.snapshot()
                 self._json(200 if snapshot["ok"] else 503, snapshot)
                 return
             if not self._authorized():
@@ -432,6 +446,10 @@ def build_server() -> ThreadingHTTPServer:
                 self._json(400, {"ok": False, "error": str(exc)})
 
     threading.Thread(target=_probe_loop, args=(state,), daemon=True).start()
+    if os.environ.get("AIBOS_WORKER_ENABLED", "1") == "1":
+        threading.Thread(target=worker.run_forever, daemon=True, name="aibos-worker").start()
+    else:
+        worker.stop()
     return ThreadingHTTPServer(("0.0.0.0", port), Handler)
 
 
