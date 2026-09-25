@@ -1,20 +1,231 @@
 {
-  "schema_version": 1,
-  "workers": [
-    {"id":"HUNTER-01","catalogs":[1,2,41,44],"mission":"Abandoned SaaS, enterprise workflows, vertical business systems, archived enterprise software","queries":["enterprise workflow engine stars:<5000","vertical ERP workflow stars:<3000","business process state machine stars:<2000","archived enterprise platform archived:true"]},
-    {"id":"HUNTER-02","catalogs":[3,13,34,36],"mission":"Freight, supply chain, routing, fleet and procurement systems","queries":["freight rate engine","transportation management system TMS","warehouse allocation optimization","vehicle routing scheduling engine"]},
-    {"id":"HUNTER-03","catalogs":[4,6,33,38],"mission":"Construction, property, facilities and operations research","queries":["construction change order management","construction estimating engine","facilities maintenance scheduling","constraint programming scheduling optimizer"]},
-    {"id":"HUNTER-04","catalogs":[5,9,31,42],"mission":"GovCon, compliance, tax/regulatory automation and public data","queries":["government procurement parser","FAR DFARS parser","regulatory compliance rules engine","standards parser schema validator stars:<2000"]},
-    {"id":"HUNTER-05","catalogs":[7,28,29,30],"mission":"Finance, revenue operations, pricing, billing and payments","queries":["invoice reconciliation engine","three way match invoice purchase order receipt","pricing optimization revenue management engine","billing settlement reconciliation platform"]},
-    {"id":"HUNTER-06","catalogs":[8,10,37],"mission":"Insurance, healthcare administration and service operations without PHI collection","queries":["insurance claims adjudication engine","healthcare prior authorization workflow","medical billing rules engine","contact center routing workforce platform"]},
-    {"id":"HUNTER-07","catalogs":[11,23,24],"mission":"Energy, utilities, climate/weather and agriculture","queries":["grid operations power flow platform","utility outage management engine","weather data processing pipeline","agriculture decision support system stars:<3000"]},
-    {"id":"HUNTER-08","catalogs":[12,20,21],"mission":"Manufacturing, scientific software, biotech/lab and instrumentation","queries":["manufacturing execution system MES","production planning manufacturing optimizer","laboratory instrument parser","scientific workflow engine reproducible"]},
-    {"id":"HUNTER-09","catalogs":[14,15,35],"mission":"Defensive security, DevOps/reliability and telecom operations","queries":["backup restore verification platform","disaster recovery rehearsal engine","network configuration validation engine","telecom billing mediation platform"]},
-    {"id":"HUNTER-10","catalogs":[16,17,18],"mission":"Data engineering, document intelligence and entity resolution","queries":["data lineage engine open source","document extraction evidence provenance","invoice OCR extraction validation","entity resolution deduplication platform"]},
-    {"id":"HUNTER-11","catalogs":[19,39,40],"mission":"AI tooling, forecasting/anomaly systems and workflow automation","queries":["LLM evaluation harness production","model inference orchestration platform","time series forecasting engine production","workflow orchestration durable execution"]},
-    {"id":"HUNTER-12","catalogs":[22,25,26,27],"mission":"Geospatial, education, games/virtual goods and commerce","queries":["geospatial analysis routing platform","assessment engine education adaptive","game economy virtual goods backend","marketplace matching engine ecommerce"]},
-    {"id":"HUNTER-13","catalogs":[32,43,45],"mission":"Workforce systems, obscure academic prototypes and reference architectures","queries":["workforce scheduling optimization platform","research prototype system implementation stars:<100","academic prototype decision support stars:<100","reference architecture enterprise workflow stars:<200"]},
-    {"id":"HUNTER-14","catalogs":[46,47],"mission":"Rare algorithms, unusual technical methods and wildcard cross-domain opportunities","queries":["rare algorithm implementation stars:<500","novel optimization algorithm implementation stars:<500","deterministic verification engine stars:<500","industrial algorithm prototype stars:<500"]}
+  "schema_version": 2,
+  "focus": "StarBlox native Roblox release using the repository-authorized Brookhaven world structure as the world foundation.",
+  "rules": [
+    "Search only for public, lawful, rights-clean or clean-room-useful technology that can materially accelerate P00NSMASHER/StarBlox.",
+    "Prioritize Roblox/Luau/Studio/Open Cloud/world-conversion/gameplay/testing/performance/education capabilities over unrelated commercial domains.",
+    "Public visibility is not public domain. Record exact revisions and rights constraints; no-license material is reference/clean-room only unless permission exists.",
+    "Never collect credentials, private data, leaked/confidential material, exploit kits, or unauthorized-access techniques."
   ],
-  "integrator":{"id":"HUNTER-15","mission":"Deduplicate exact revisions and rank pre-verification scout candidates; never promote directly to MASTER."}
+  "workers": [
+    {
+      "id": "HUNTER-01",
+      "catalogs": [
+        1,
+        2,
+        41,
+        44
+      ],
+      "mission": "Roblox/Luau production frameworks and dependency/tooling accelerators for StarBlox",
+      "queries": [
+        "Roblox Luau framework Rojo Wally",
+        "Roblox game framework Luau stars:<3000",
+        "Rojo plugin Roblox workflow stars:<3000",
+        "Lune rbx-dom Roblox tooling"
+      ]
+    },
+    {
+      "id": "HUNTER-02",
+      "catalogs": [
+        3,
+        13,
+        34,
+        36
+      ],
+      "mission": "Roblox place/model ingestion, world conversion, scene graph and migration tooling",
+      "queries": [
+        "Roblox rbxl rbxlx rbxmx parser converter",
+        "rbx-dom Roblox model tooling",
+        "Roblox place file migration tooling",
+        "Roblox scene graph serializer Luau"
+      ]
+    },
+    {
+      "id": "HUNTER-03",
+      "catalogs": [
+        4,
+        6,
+        33,
+        38
+      ],
+      "mission": "Large-world/open-world structure, streaming, terrain, spatial partitioning and world optimization",
+      "queries": [
+        "Roblox StreamingEnabled open world",
+        "Roblox terrain streaming system Luau",
+        "Roblox spatial partition octree Luau",
+        "Roblox world optimization large map"
+      ]
+    },
+    {
+      "id": "HUNTER-04",
+      "catalogs": [
+        5,
+        9,
+        31,
+        42
+      ],
+      "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
+      "queries": [
+        "Roblox server authoritative netcode Luau",
+        "Roblox RemoteEvent validation framework",
+        "Roblox networking replication framework Luau",
+        "Roblox anti exploit server validation open source"
+      ]
+    },
+    {
+      "id": "HUNTER-05",
+      "catalogs": [
+        7,
+        28,
+        29,
+        30
+      ],
+      "mission": "Roblox persistence, inventory, economy, ProfileStore-style data safety and exactly-once transaction patterns",
+      "queries": [
+        "Roblox ProfileStore data persistence Luau",
+        "Roblox inventory system server authoritative",
+        "Roblox economy transaction ledger Luau",
+        "Roblox datastore retry session lock framework"
+      ]
+    },
+    {
+      "id": "HUNTER-06",
+      "catalogs": [
+        8,
+        10,
+        37
+      ],
+      "mission": "Roblox UI/mobile/input/accessibility systems and scalable player UX",
+      "queries": [
+        "Roblox responsive UI mobile Luau",
+        "Roblox UI framework Fusion React Lua",
+        "Roblox touch controls input framework",
+        "Roblox accessibility reduced motion UI"
+      ]
+    },
+    {
+      "id": "HUNTER-07",
+      "catalogs": [
+        11,
+        23,
+        24
+      ],
+      "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
+      "queries": [
+        "Roblox Studio automation plugin testing",
+        "Roblox AI coding agent Studio",
+        "Roblox plugin automated instance editing",
+        "Rojo Roblox automated playtest CI"
+      ]
+    },
+    {
+      "id": "HUNTER-08",
+      "catalogs": [
+        12,
+        20,
+        21
+      ],
+      "mission": "Roblox testing, simulation, replay, deterministic verification and CI tooling",
+      "queries": [
+        "Roblox Luau unit test framework",
+        "Roblox automated playtest framework",
+        "Roblox replay simulation deterministic Luau",
+        "Roblox CI testing Rojo Selene Stylua"
+      ]
+    },
+    {
+      "id": "HUNTER-09",
+      "catalogs": [
+        14,
+        15,
+        35
+      ],
+      "mission": "Educational game systems, adaptive assessment, mastery learning and safe question generation useful to StarBlox",
+      "queries": [
+        "adaptive assessment game open source",
+        "mastery learning game engine",
+        "IRT adaptive quiz open source game",
+        "educational game question generator offline"
+      ]
+    },
+    {
+      "id": "HUNTER-10",
+      "catalogs": [
+        16,
+        17,
+        18
+      ],
+      "mission": "Roblox NPCs, pathfinding, vehicles, interactables and open-world activity systems",
+      "queries": [
+        "Roblox NPC pathfinding Luau open source",
+        "Roblox vehicle chassis Luau open source",
+        "Roblox interaction system ProximityPrompt framework",
+        "Roblox house door teleport system Luau"
+      ]
+    },
+    {
+      "id": "HUNTER-11",
+      "catalogs": [
+        19,
+        39,
+        40
+      ],
+      "mission": "Game-asset pipelines, provenance, 3D/2D processing, optimization and content factories for StarBlox",
+      "queries": [
+        "Roblox asset pipeline Blender Rojo",
+        "game asset provenance pipeline open source",
+        "Roblox mesh optimization pipeline",
+        "sprite icon batch generation game assets"
+      ]
+    },
+    {
+      "id": "HUNTER-12",
+      "catalogs": [
+        22,
+        25,
+        26,
+        27
+      ],
+      "mission": "Roblox performance, profiling, memory/network optimization and mobile scalability",
+      "queries": [
+        "Roblox performance profiler Luau",
+        "Roblox memory optimization streaming",
+        "Roblox network optimization replication",
+        "Roblox mobile performance open world"
+      ]
+    },
+    {
+      "id": "HUNTER-13",
+      "catalogs": [
+        32,
+        43,
+        45
+      ],
+      "mission": "Roblox liveops, telemetry, experimentation, privacy-minimized analytics and release observability",
+      "queries": [
+        "Roblox telemetry analytics Luau",
+        "Roblox liveops feature flags open source",
+        "Roblox game analytics privacy",
+        "Roblox observability logging framework Luau"
+      ]
+    },
+    {
+      "id": "HUNTER-14",
+      "catalogs": [
+        46,
+        47
+      ],
+      "mission": "Roblox Open Cloud, publishing, place deployment, release automation and wildcard StarBlox accelerators",
+      "queries": [
+        "Roblox Open Cloud deployment GitHub Actions",
+        "Roblox publish place CI workflow",
+        "Roblox Open Cloud API tooling",
+        "Roblox game deployment automation Rojo"
+      ]
+    }
+  ],
+  "integrator": {
+    "id": "HUNTER-15",
+    "mission": "Deduplicate exact revisions, rank only StarBlox/Roblox-relevant pre-verification candidates, and surface the highest build-time compression opportunities. Never promote directly to MASTER without rights and technical verification."
+  }
 }
