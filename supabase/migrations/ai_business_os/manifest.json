@@ -2,9 +2,9 @@
   "schema": "ai_business_os_prod",
   "source": "supabase_migrations.schema_migrations",
   "exported_from_live_database": true,
-  "latest_version": "20260925145237",
-  "migration_count": 42,
-  "live_schema_fingerprint_sha256": "6efecb862a2dea12ff5f231721be93b35e3bd8683d068a0b36ec559fc2ca2c40",
+  "latest_version": "20260925151646",
+  "migration_count": 43,
+  "live_schema_fingerprint_sha256": "edb8248cd492364ed85745a6b6387db2334ee5db19e6b03a83c2f7d366de1529",
   "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
   "migrations": [
     {
@@ -216,6 +216,11 @@
       "version": "20260925145237",
       "name": "add_ai_business_os_external_outcomes_to_ceo_snapshot_v1",
       "sha256": "b9783b11b5a4d30763ecc8b6edc51df75e5060164581e6e28a68354d6a27d717"
+    },
+    {
+      "version": "20260925151646",
+      "name": "add_ai_business_os_persistent_worker_control_v1",
+      "sha256": "07d7f2fbcc8f7f6d05af696632db33b4a046395560c4936e5e804d653f14f89e"
     }
   ],
   "public_bootstrap_sanitized": true,
@@ -226,5 +231,5 @@
     "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
   ],
   "live_statement_hashes_retained": true,
-  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Verified external outcomes now feed pool-scoped allocator evidence and verified value memory; no real outcome is inferred from repository activity."
+  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Verified external outcomes feed allocator memory; persistent workers use generation-bound leases, stale recovery, and independent-verification submission without self-completion."
 }
