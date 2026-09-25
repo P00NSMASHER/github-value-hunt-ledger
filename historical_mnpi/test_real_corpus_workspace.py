@@ -646,7 +646,9 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(manifest["listing_requirement_total"], 3828)
         self.assertEqual(manifest["listing_intervals_verified"], 3)
         self.assertEqual(manifest["listing_batches_completed"], 1)
-        self.assertFalse(manifest["listing_full_compact_index_loaded"])
+        self.assertTrue(manifest["listing_full_compact_index_loaded"])
+        self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 3762)
 
 
 if __name__ == "__main__":
