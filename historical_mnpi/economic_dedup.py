@@ -1,7 +1,8 @@
 """Conservative economic-transaction deduplication primitives.
 
-Step 11.1 creates source-independent signatures for already-approved historical
-rows. It does not merge, delete, or rewrite source-backed transactions.
+Step 11 creates source-independent signatures and conservative clustering for
+already-approved historical rows. It never deletes or rewrites source-backed
+transactions; every normalized row remains independently auditable.
 
 Exact deduplication is intentionally strict. A row pair is an exact economic
 match only when durable trader/issuer identity, information event, exact trade
@@ -1012,6 +1013,49 @@ class EconomicClusterRegistry:
         })
 
 
+def render_dedup_review_candidate_markdown(
+    candidate: DedupReviewCandidate,
+) -> str:
+    lines = [
+        "# Historical Economic Dedup Review",
+        "",
+        f"- Candidate ID: `{candidate.candidate_id}`",
+        f"- Signature hash: `{candidate.signature_hash}`",
+        f"- Candidate cluster: `{candidate.candidate_cluster_id}`",
+        f"- Reason: **{candidate.reason}**",
+        "",
+        "## Pairwise assessments",
+        "",
+    ]
+    for assessment in candidate.assessments:
+        lines.extend([
+            f"### {assessment.state.value}",
+            f"- Assessment hash: `{assessment.proof_hash}`",
+            "- Agreeing fields: " + (
+                ", ".join(assessment.agreeing_fields)
+                if assessment.agreeing_fields else "none"
+            ),
+            "- Differing fields: " + (
+                ", ".join(assessment.differing_fields)
+                if assessment.differing_fields else "none"
+            ),
+            "- Missing fields: " + (
+                ", ".join(assessment.missing_fields)
+                if assessment.missing_fields else "none"
+            ),
+            "- Reasons: " + (
+                ", ".join(assessment.reasons)
+                if assessment.reasons else "none"
+            ),
+            "",
+        ])
+    lines.append(
+        "No source-backed row is merged unless the registry records an exact "
+        "automatic match or an explicit human same-transaction decision."
+    )
+    return "\n".join(lines)
+
+
 __all__ = [
     "ClusterRegistrationAction",
     "DedupMatchState",
@@ -1026,4 +1070,5 @@ __all__ = [
     "EconomicTransactionSignature",
     "build_economic_signature",
     "compare_economic_signatures",
+    "render_dedup_review_candidate_markdown",
 ]
