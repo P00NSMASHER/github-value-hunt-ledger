@@ -188,20 +188,20 @@ def render_markdown(snapshot: dict[str, Any]) -> str:
     rows = []
     for item in snapshot["repositories"]:
         rows.append(
-            f"| {item.get('repo_id') or '—'} | \`{item['full_name']}\` | "
-            f"\`{item['head_sha']}\` | {item['file_count']} | "
+            f"| {item.get('repo_id') or '—'} | `{item['full_name']}` | "
+            f"`{item['head_sha']}` | {item['file_count']} | "
             f"{len(item['workflow_paths'])} | {len(item['test_paths'])} | "
             f"{len(item['dependency_manifest_paths'])} |"
         )
     error_block = ""
     if snapshot.get("errors"):
         error_lines = "\n".join(
-            f"- \`{item.get('full_name')}\`: {item.get('error')}" for item in snapshot["errors"]
+            f"- `{item.get('full_name')}`: {item.get('error')}" for item in snapshot["errors"]
         )
         error_block = f"\n## Snapshot gaps\n\n{error_lines}\n"
     return (
         "# Portfolio Repository Snapshot\n\n"
-        f"Observed: \`{snapshot['observed_at']}\`\n\n"
+        f"Observed: `{snapshot['observed_at']}`\n\n"
         f"Captured **{snapshot['repository_count_snapshotted']} / "
         f"{snapshot['repository_count_requested']}** configured repositories.\n\n"
         "| ID | Repository | HEAD | Files | Workflows | Test paths | Dependency manifests |\n"
