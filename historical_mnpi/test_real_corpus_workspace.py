@@ -878,14 +878,14 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(manifest["listing_metadata_resolved"], 2244)
+        self.assertEqual(manifest["listing_metadata_resolved"], 2618)
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_intervals_verified"], 89)
-        self.assertEqual(manifest["listing_symbols_resolved"], 89)
-        self.assertEqual(manifest["listing_batches_completed"], 24)
+        self.assertEqual(manifest["listing_intervals_verified"], 95)
+        self.assertEqual(manifest["listing_symbols_resolved"], 95)
+        self.assertEqual(manifest["listing_batches_completed"], 25)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 1364)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 1210)
 
     def test_listing_requirement_batch_008_is_176_observations(self):
         path = CORPUS_DIR / "listing_requirement_batch_008.csv"
