@@ -533,3 +533,149 @@ hiding uncertainty.
 The deduplication layer is historical/public-record research infrastructure only.
 It does not authorize live trading, use live confidential information, or delete
 the original SEC/DOJ/court/academic evidence rows.
+
+
+
+## Step 12 — graph-aware historical surveillance
+
+The accepted historical corpus now has a deterministic relationship graph for
+retrospective compliance/surveillance research.
+
+The graph contains four node classes:
+
+- durable traders;
+- durable issuers;
+- information events;
+- deduplicated economic transactions.
+
+Each economic transaction is connected to its durable trader, issuer, and event.
+Multiple SEC/DOJ/court/academic rows that Step 11 confirmed as one economic
+transaction remain preserved inside that cluster; the graph does not duplicate
+them into separate economic nodes.
+
+The graph exposes deterministic, provenance-preserving relationship features such
+as:
+
+- trader degree;
+- distinct historical event count per trader;
+- distinct trader count per issuer;
+- connected components;
+- source-cluster membership.
+
+Malformed clusters spanning multiple durable traders, issuers, or events fail
+closed rather than being coerced into one graph node.
+
+This graph is historical/public-record only and has no live-feed or trading
+authority.
+
+
+## Step 13 — leakage-conscious surveillance features
+
+Step 13 derives transparent surveillance features from:
+
+- the Step-12 graph;
+- the Step-11 economic cluster;
+- the Step-6 public-release boundary.
+
+The feature vector includes:
+
+- source-row count;
+- repeated historical event count for the durable trader;
+- issuer network breadth;
+- connected-component size;
+- instrument and side;
+- exact or coarse trade timing;
+- public-release timing;
+- exact lead seconds when both trade and release timestamps are exact;
+- conservative lead-day bounds for coarse dates/ranges;
+- consensus currency, quantity, and execution price;
+- deterministic notional when quantity and price agree;
+- multi-source corroboration.
+
+Later outcomes are deliberately excluded. The feature body does **not** include
+conviction, settlement, judgment, proceeding status, later documented profit, or
+other post-event enforcement facts.
+
+When source rows inside a human-confirmed economic cluster disagree on a field,
+that field becomes unknown/nullable in the feature vector rather than being
+silently averaged or guessed.
+
+
+## Step 14 — point-in-time controls and walk-forward windows
+
+Step 14 prevents graph and feature leakage from future historical records.
+
+A point-in-time cutoff can be:
+
+- an exact timestamp; or
+- an end-of-day date.
+
+For an intraday exact cutoff, same-day date-only and date-range rows are excluded
+because their full-day information was not yet safely available at the cutoff.
+
+A cluster is usable only when **all** of its preserved source signatures are
+available by the cutoff.
+
+A `PointInTimeFeatureSnapshot` binds:
+
+- the target cluster;
+- the cutoff;
+- the exact eligible-cluster set;
+- every excluded future cluster;
+- the point-in-time graph hash;
+- the derived Step-13 feature hash.
+
+Walk-forward windows freeze a training cutoff and a later evaluation cutoff.
+Training rows are those available by the training cutoff. Evaluation rows are
+newly available after training and by the evaluation cutoff. The two sets cannot
+overlap.
+
+`PointInTimeControlPlan` supports ordered, deterministic control-date schedules,
+including large historical control-date grids.
+
+
+## Step 15 — retrospective benchmark harness
+
+Step 15 adds a deterministic historical-only scoring and evaluation framework.
+
+`RetrospectiveScoringPolicy` uses transparent signals such as:
+
+- exact pre-publication timing;
+- coarse pre-publication timing;
+- repeated historical trader-event exposure;
+- issuer network breadth;
+- a configurable large-notional threshold.
+
+Every score includes its complete signal breakdown. The policy and receipts
+explicitly keep `live_use_allowed=False`.
+
+Outcome labels are separate from features. Labels may be used for retrospective
+evaluation, but no later legal/enforcement outcome enters the Step-13 feature
+vector.
+
+Threshold fitting is training-only:
+
+1. score the frozen training examples;
+2. evaluate deterministic candidate thresholds;
+3. choose the best training balanced accuracy with a deterministic tie-break;
+4. freeze the threshold in a proof-hashed receipt;
+5. evaluate the untouched holdout set using that frozen threshold.
+
+The holdout evaluation records:
+
+- true positives;
+- true negatives;
+- false positives;
+- false negatives;
+- sensitivity;
+- specificity;
+- precision;
+- balanced accuracy.
+
+The walk-forward benchmark verifies that every training and evaluation example
+belongs to the correct Step-14 partition and that no snapshot reads beyond its
+allowed cutoff.
+
+Steps 12–15 remain limited to retrospective, already-public compliance research.
+They do not ingest live confidential information, produce live alerts, authorize
+trading, or generate orders.
