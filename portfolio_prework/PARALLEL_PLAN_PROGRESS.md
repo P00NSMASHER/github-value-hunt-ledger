@@ -12,7 +12,7 @@ Working branch: `portfolio-parallel-prep`
 | 6 | Autonomy matrix | **COMPLETE** |
 | 7 | GitHub workflow inventory | **COMPLETE** |
 | 8 | Test-suite inventory | **COMPLETE** |
-| 9 | Dependency inventory | PENDING |
+| 9 | Dependency inventory | **COMPLETE** |
 | 10 | Architecture evidence bundle | PENDING |
 
 ## Step 1 result
@@ -92,6 +92,17 @@ Created:
 - `portfolio_prework/test_test_suite_inventory.py`
 
 Inventoried all 367 test paths present in the pinned repository snapshot: 205 in the primary portfolio repo, 43 in StarBlox, 10 in ABVM, 26 in trading-platform, 40 in PermitPlate NYC, 0 in permitplate-state, and 43 in CaptureBrief. The inventory also records test frameworks and CI entrypoints without needlessly executing every downstream suite. Two coverage gaps were surfaced for later architecture work: ABVM defines a qa:unit script that is not invoked by its pinned QA workflow, and the legacy business_os subtree has discovered tests but no matching pinned workflow invocation. Exact coverage validation and focused CI passed.
+
+## Step 9 result
+
+Created:
+- `portfolio_prework/DEPENDENCY_INVENTORY.json`
+- `portfolio_prework/DEPENDENCY_INVENTORY.md`
+- `portfolio_prework/test_dependency_inventory.py`
+
+Inventoried all 14 dependency manifests discovered in the pinned repository snapshot with exact manifest paths and blob SHAs. Four repositories contain explicit dependency manifests and three do not. The inventory records direct dependency constraints, lockfile presence, pinning style, and reproducibility observations without installing any dependencies. Exact coverage validation found zero missing and zero extra manifests, and focused CI passed on run 36091421696.
+
+Key reproducibility findings: ABVM uses floating `latest` dependencies with no discovered npm lockfile; StarBlox exact-pins direct Rust dependencies but has no discovered Cargo/npm lockfiles and uses npm caret ranges; the primary portfolio production requirements mostly use version ranges; trading-platform has exact runtime/dev/optional lock files.
 
 ## Rule
 
