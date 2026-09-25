@@ -93,7 +93,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(
             imported.counts(),
             {
-                "announcement_rows": 11,
+                "announcement_rows": 17,
                 "listing_rows": 0,
                 "shares_rows": 0,
                 "control_rows": 0,
@@ -103,7 +103,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(len(imported.announcements), 11)
+        self.assertEqual(len(imported.announcements), 17)
         by_event = {
             item.event_id: item
             for item in imported.announcements
@@ -187,7 +187,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(manifest["announcement_exact_resolved"], 11)
+        self.assertEqual(manifest["announcement_exact_resolved"], 17)
         self.assertEqual(manifest["listing_metadata_resolved"], 0)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
@@ -248,15 +248,15 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["announcement_review_batches_completed"],
-            2,
+            3,
         )
         self.assertEqual(
             manifest["announcement_events_reviewed_in_batch_sequence"],
-            60,
+            90,
         )
         self.assertEqual(
             manifest["announcement_unresolved_after_batch_review"],
-            53,
+            77,
         )
 
 
@@ -327,7 +327,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
 
 
-    def test_announcement_batch_two_reviews_exactly_30_events(self):
+    def test_announcement_batch_three_reviews_exactly_30_events(self):
         review_path = CORPUS_DIR / "announcement_review_log.csv"
         with review_path.open(
             "r",
@@ -338,7 +338,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
 
         batch = [
             row for row in rows
-            if row["batch_id"] == "G1-BATCH-002"
+            if row["batch_id"] == "G1-BATCH-003"
         ]
         self.assertEqual(len(batch), 30)
         self.assertEqual(
