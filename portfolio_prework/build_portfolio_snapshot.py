@@ -44,14 +44,14 @@ DEPENDENCY_BASENAMES = {
     "composer.lock",
 }
 DEPENDENCY_PATTERNS = (
-    re.compile(r"(^|/)requirements[^/]*(\\.txt|\\.lock)$", re.I),
-    re.compile(r"(^|/)environment[^/]*\\.ya?ml$", re.I),
+    re.compile(r"(^|/)requirements[^/]*(\.txt|\.lock)$", re.I),
+    re.compile(r"(^|/)environment[^/]*\.ya?ml$", re.I),
 )
 TEST_PATTERNS = (
     re.compile(r"(^|/)(tests?|specs?)(/|$)", re.I),
-    re.compile(r"(^|/)test_[^/]+\\.py$", re.I),
-    re.compile(r"(^|/)[^/]+_(test|tests)\\.py$", re.I),
-    re.compile(r"(^|/)[^/]+\\.(test|spec)\\.[^.]+$", re.I),
+    re.compile(r"(^|/)test_[^/]+\.py$", re.I),
+    re.compile(r"(^|/)[^/]+_(test|tests)\.py$", re.I),
+    re.compile(r"(^|/)[^/]+\.(test|spec)\.[^.]+$", re.I),
 )
 
 JsonGetter = Callable[[str, str | None], Any]
