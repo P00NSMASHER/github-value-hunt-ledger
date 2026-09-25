@@ -1,5 +1,5 @@
 {
-  "announcement_exact_resolved": 0,
+  "announcement_exact_resolved": 1,
   "control_dates_resolved": 0,
   "derived_backbone_sha256": "5bce35d49bae04a52d45d82e81fb7c640509cfaa8b0d044a4ecbadd408d03b58",
   "event_date_max": "2015-05-20",
