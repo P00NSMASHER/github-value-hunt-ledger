@@ -145,6 +145,7 @@ class ReleaseDeploymentHandoffTests(unittest.TestCase):
             "release_id": release.release_id,
             "release_proof_hash": release.proof_hash,
             "promotion_gate_proof_hash": gate.proof_hash,
+            "release_package_integrity_proof_hash": "3" * 64,
             "security_evidence_proof_hash": "1" * 64,
             "dr_rehearsal_proof_hash": "2" * 64,
             "container_build_manifest_proof_hash": build.proof_hash,
@@ -161,6 +162,7 @@ class ReleaseDeploymentHandoffTests(unittest.TestCase):
             release_id=release.release_id,
             release_proof_hash=release.proof_hash,
             promotion_gate_proof_hash=gate.proof_hash,
+            release_package_integrity_proof_hash="3" * 64,
             security_evidence_proof_hash="1" * 64,
             dr_rehearsal_proof_hash="2" * 64,
             container_build_manifest_proof_hash=build.proof_hash,
@@ -182,6 +184,10 @@ class ReleaseDeploymentHandoffTests(unittest.TestCase):
                 expires_at="2026-09-24T13:20:00Z")
             self.assertEqual(
                 handoff.as_dict()["state"], "READY_FOR_SEPARATE_DEPLOYER")
+            self.assertEqual(
+                handoff.production_admission_id, admission.admission_id)
+            self.assertEqual(
+                handoff.production_admission_proof_hash, admission.proof_hash)
             receipt_identity = {
                 "schema":1,"handoff_id":handoff.handoff_id,
                 "handoff_proof_hash":handoff.proof_hash,
