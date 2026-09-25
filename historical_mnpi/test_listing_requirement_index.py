@@ -24,7 +24,7 @@ class ListingRequirementIndexTests(unittest.TestCase):
         )
         self.assertEqual(
             hashlib.sha256(INDEX.read_bytes()).hexdigest(),
-            "16a6da821e944ad8b59508d7246e483dd48cacc62fd01e24fd0b7a0713d56645",
+            "b79d87d3ae51022c66f3038e73446188ca956a2187f32803707038d1cbb290b9",
         )
 
         for row in rows:
