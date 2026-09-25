@@ -160,7 +160,7 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
 
-    def test_real_g2_current_batches_expand_2134_of_3828(self):
+    def test_real_g2_current_batches_expand_2244_of_3828(self):
         requirements = expand_listing_requirements(
             parse_listing_requirement_index(
                 (CORPUS_DIR / "listing_requirement_index.csv").read_text(
@@ -179,9 +179,9 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
         self.assertEqual(len(requirements), 3828)
-        self.assertEqual(len(intervals), 74)
-        self.assertEqual(len(result.resolved), 2134)
-        self.assertEqual(len(result.unresolved), 1694)
+        self.assertEqual(len(intervals), 79)
+        self.assertEqual(len(result.resolved), 2244)
+        self.assertEqual(len(result.unresolved), 1584)
 
         by_symbol = {}
         for item in result.resolved:
@@ -189,7 +189,7 @@ class ListingIntervalTests(unittest.TestCase):
 
         self.assertEqual(
             set(by_symbol),
-            {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GDI", "GILD", "GMCR", "GME", "GNRC", "GNTX", "GORO", "GT", "HAE", "HON", "IDTI", "ILMN", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"},
+            {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GDI", "GILD", "GMCR", "GME", "GNRC", "GNTX", "GORO", "GT", "HAE", "HBI", "HON", "IBKC", "IDTI", "IDXX", "IGT", "ILMN", "INT", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"},
         )
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
@@ -257,9 +257,14 @@ class ListingIntervalTests(unittest.TestCase):
                 "GORO": 22,
                 "GT": 22,
                 "HAE": 22,
+                "HBI": 22,
                 "HON": 22,
+                "IBKC": 22,
                 "IDTI": 44,
+                "IDXX": 22,
+                "IGT": 22,
                 "ILMN": 44,
+                "INT": 22,
                 "JNPR": 88,
                 "MDU": 44,
                 "MTH": 44,
@@ -294,7 +299,7 @@ class ListingIntervalTests(unittest.TestCase):
         ).open("r", encoding="utf-8", newline="") as handle:
             actual = list(csv.DictReader(handle))
 
-        self.assertEqual(len(actual), 2134)
+        self.assertEqual(len(actual), 2244)
         expected_rows = {
             (
                 item.symbol,
