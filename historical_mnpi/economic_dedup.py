@@ -373,6 +373,13 @@ class ClusterRegistrationAction(str, Enum):
     NEW_CLUSTER = "NEW_CLUSTER"
     AUTO_JOINED_EXACT = "AUTO_JOINED_EXACT"
     NEW_CLUSTER_REVIEW_REQUIRED = "NEW_CLUSTER_REVIEW_REQUIRED"
+    MANUAL_MERGE_CONFIRMED = "MANUAL_MERGE_CONFIRMED"
+    MANUAL_DISTINCT_CONFIRMED = "MANUAL_DISTINCT_CONFIRMED"
+
+
+class DedupReviewDecisionType(str, Enum):
+    CONFIRMED_SAME_TRANSACTION = "CONFIRMED_SAME_TRANSACTION"
+    CONFIRMED_DISTINCT = "CONFIRMED_DISTINCT"
 
 
 @dataclass(frozen=True)
@@ -439,6 +446,73 @@ class DedupReviewCandidate:
                 item.proof_hash for item in self.assessments
             ),
             "reason": self.reason,
+        })
+
+
+@dataclass(frozen=True)
+class DedupReviewResolution:
+    candidate_id: str
+    candidate_proof_hash: str
+    decision: DedupReviewDecisionType
+    signature_hash: str
+    source_cluster_id: str
+    source_cluster_proof_hash: str
+    target_cluster_id: str
+    target_cluster_proof_hash: str
+    resulting_cluster_id: str
+    resulting_cluster_proof_hash: str
+    reviewer_id: str
+    reviewed_at: str
+    rationale: str
+
+    def __post_init__(self) -> None:
+        if not self.candidate_id.startswith("dedup-review:"):
+            raise ValueError("invalid dedup review candidate_id")
+        for value in (
+            self.candidate_proof_hash,
+            self.signature_hash,
+            self.source_cluster_proof_hash,
+            self.target_cluster_proof_hash,
+            self.resulting_cluster_proof_hash,
+        ):
+            if len(value) != 64:
+                raise ValueError("dedup review proof fields must be SHA-256")
+        if not self.source_cluster_id.startswith("economic:"):
+            raise ValueError("invalid source_cluster_id")
+        if not self.target_cluster_id.startswith("economic:"):
+            raise ValueError("invalid target_cluster_id")
+        if not self.resulting_cluster_id.startswith("economic:"):
+            raise ValueError("invalid resulting_cluster_id")
+        if not self.reviewer_id.strip():
+            raise ValueError("reviewer_id is required")
+        if not self.rationale.strip():
+            raise ValueError("rationale is required")
+        try:
+            parsed = datetime.fromisoformat(
+                self.reviewed_at.replace("Z", "+00:00")
+            )
+        except ValueError as exc:
+            raise ValueError("reviewed_at must be ISO-8601") from exc
+        if parsed.tzinfo is None:
+            raise ValueError("reviewed_at must include timezone")
+
+    @property
+    def proof_hash(self) -> str:
+        return canonical_hash({
+            "schema": 1,
+            "candidate_id": self.candidate_id,
+            "candidate_proof_hash": self.candidate_proof_hash,
+            "decision": self.decision.value,
+            "signature_hash": self.signature_hash,
+            "source_cluster_id": self.source_cluster_id,
+            "source_cluster_proof_hash": self.source_cluster_proof_hash,
+            "target_cluster_id": self.target_cluster_id,
+            "target_cluster_proof_hash": self.target_cluster_proof_hash,
+            "resulting_cluster_id": self.resulting_cluster_id,
+            "resulting_cluster_proof_hash": self.resulting_cluster_proof_hash,
+            "reviewer_id": self.reviewer_id,
+            "reviewed_at": self.reviewed_at,
+            "rationale": self.rationale,
         })
 
 
@@ -528,6 +602,8 @@ class EconomicClusterRegistry:
         self._signature_to_cluster: dict[str, str] = {}
         self._events: list[EconomicClusterEvent] = []
         self._review_candidates: dict[str, DedupReviewCandidate] = {}
+        self._review_decisions: dict[str, DedupReviewResolution] = {}
+        self._superseded_review_candidates: dict[str, str] = {}
         self._registrations: dict[str, EconomicClusterRegistration] = {}
 
     def get_cluster(self, cluster_id: str) -> EconomicTransactionCluster:
@@ -556,6 +632,23 @@ class EconomicClusterRegistry:
             self._review_candidates[key]
             for key in sorted(self._review_candidates)
         )
+
+    def pending_review_candidates(self) -> tuple[DedupReviewCandidate, ...]:
+        return tuple(
+            candidate
+            for candidate in self.review_candidates()
+            if candidate.candidate_id not in self._review_decisions
+            and candidate.candidate_id not in self._superseded_review_candidates
+        )
+
+    def review_decisions(self) -> tuple[DedupReviewResolution, ...]:
+        return tuple(
+            self._review_decisions[key]
+            for key in sorted(self._review_decisions)
+        )
+
+    def superseded_review_candidates(self) -> tuple[str, ...]:
+        return tuple(sorted(self._superseded_review_candidates))
 
     def events(self) -> tuple[EconomicClusterEvent, ...]:
         return tuple(self._events)
@@ -670,6 +763,190 @@ class EconomicClusterRegistry:
         self._registrations[signature.proof_hash] = registration
         return registration
 
+    def _signature_by_hash(
+        self,
+        signature_hash: str,
+    ) -> EconomicTransactionSignature:
+        cluster = self.cluster_for_signature(signature_hash)
+        return next(
+            item
+            for item in cluster.signatures
+            if item.proof_hash == signature_hash
+        )
+
+    def _validate_review_candidate_current(
+        self,
+        candidate: DedupReviewCandidate,
+    ) -> tuple[
+        EconomicTransactionSignature,
+        EconomicTransactionCluster,
+        EconomicTransactionCluster,
+    ]:
+        if candidate.candidate_id in self._superseded_review_candidates:
+            raise ValueError("dedup review candidate was superseded")
+        signature = self._signature_by_hash(candidate.signature_hash)
+        source_cluster = self.cluster_for_signature(candidate.signature_hash)
+        try:
+            target_cluster = self._clusters[candidate.candidate_cluster_id]
+        except KeyError as exc:
+            raise ValueError(
+                "dedup review target cluster is no longer active"
+            ) from exc
+        if source_cluster.cluster_id == target_cluster.cluster_id:
+            raise ValueError(
+                "dedup review candidate no longer links distinct clusters"
+            )
+
+        expected_target_hashes = {
+            item.right_signature_hash
+            for item in candidate.assessments
+            if item.left_signature_hash == candidate.signature_hash
+        }
+        current_target_hashes = set(target_cluster.member_signature_hashes)
+        if expected_target_hashes != current_target_hashes:
+            raise ValueError(
+                "dedup review candidate is stale because target cluster changed"
+            )
+
+        for member in source_cluster.signatures:
+            if member.proof_hash == signature.proof_hash:
+                continue
+            assessment = compare_economic_signatures(signature, member)
+            if assessment.state is not DedupMatchState.EXACT_MATCH:
+                raise ValueError(
+                    "source cluster no longer consists of exact signature matches"
+                )
+        return signature, source_cluster, target_cluster
+
+    def _supersede_related_candidates(
+        self,
+        cluster_ids: set[str],
+        *,
+        except_candidate_id: str,
+        resolution_hash: str,
+    ) -> None:
+        affected_signatures = {
+            signature.proof_hash
+            for cluster_id in cluster_ids
+            for signature in (
+                self._clusters.get(cluster_id).signatures
+                if self._clusters.get(cluster_id) is not None
+                else ()
+            )
+        }
+        for candidate in self.review_candidates():
+            if candidate.candidate_id == except_candidate_id:
+                continue
+            if candidate.candidate_id in self._review_decisions:
+                continue
+            if (
+                candidate.candidate_cluster_id in cluster_ids
+                or candidate.signature_hash in affected_signatures
+            ):
+                self._superseded_review_candidates[
+                    candidate.candidate_id
+                ] = resolution_hash
+
+    def decide_review_candidate(
+        self,
+        candidate_id: str,
+        *,
+        decision: DedupReviewDecisionType,
+        reviewer_id: str,
+        reviewed_at: str,
+        rationale: str,
+    ) -> DedupReviewResolution:
+        try:
+            candidate = self._review_candidates[candidate_id]
+        except KeyError as exc:
+            raise KeyError("unknown dedup review candidate: " + candidate_id) from exc
+        if candidate_id in self._review_decisions:
+            raise ValueError("dedup review candidate already decided")
+
+        (
+            signature,
+            source_cluster,
+            target_cluster,
+        ) = self._validate_review_candidate_current(candidate)
+
+        source_proof_before = source_cluster.proof_hash
+        target_proof_before = target_cluster.proof_hash
+
+        if decision is DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION:
+            merged_signatures = tuple(sorted(
+                source_cluster.signatures + target_cluster.signatures,
+                key=lambda item: item.proof_hash,
+            ))
+            if len({
+                item.proof_hash for item in merged_signatures
+            }) != len(merged_signatures):
+                raise ValueError("manual merge would duplicate a signature")
+
+            resulting_cluster = EconomicTransactionCluster(
+                cluster_id=target_cluster.cluster_id,
+                signatures=merged_signatures,
+            )
+            self._clusters[target_cluster.cluster_id] = resulting_cluster
+            del self._clusters[source_cluster.cluster_id]
+            for member in resulting_cluster.signatures:
+                self._signature_to_cluster[
+                    member.proof_hash
+                ] = resulting_cluster.cluster_id
+            action = ClusterRegistrationAction.MANUAL_MERGE_CONFIRMED
+        elif decision is DedupReviewDecisionType.CONFIRMED_DISTINCT:
+            resulting_cluster = source_cluster
+            action = ClusterRegistrationAction.MANUAL_DISTINCT_CONFIRMED
+        else:
+            raise ValueError("unsupported dedup review decision")
+
+        resolution = DedupReviewResolution(
+            candidate_id=candidate.candidate_id,
+            candidate_proof_hash=candidate.proof_hash,
+            decision=decision,
+            signature_hash=signature.proof_hash,
+            source_cluster_id=source_cluster.cluster_id,
+            source_cluster_proof_hash=source_proof_before,
+            target_cluster_id=target_cluster.cluster_id,
+            target_cluster_proof_hash=target_proof_before,
+            resulting_cluster_id=resulting_cluster.cluster_id,
+            resulting_cluster_proof_hash=resulting_cluster.proof_hash,
+            reviewer_id=reviewer_id.strip(),
+            reviewed_at=reviewed_at,
+            rationale=rationale.strip(),
+        )
+        self._review_decisions[candidate_id] = resolution
+
+        event_body = {
+            "schema": 1,
+            "action": action.value,
+            "signature_hash": signature.proof_hash,
+            "cluster_id": resulting_cluster.cluster_id,
+            "cluster_proof_hash": resulting_cluster.proof_hash,
+            "review_candidate_hashes": [candidate.proof_hash],
+            "resolution_hash": resolution.proof_hash,
+        }
+        event = EconomicClusterEvent(
+            event_id="cluster-event:" + canonical_hash(event_body),
+            action=action,
+            signature_hash=signature.proof_hash,
+            cluster_id=resulting_cluster.cluster_id,
+            cluster_proof_hash=resulting_cluster.proof_hash,
+            review_candidate_hashes=(candidate.proof_hash,),
+        )
+        self._events.append(event)
+
+        if decision is DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION:
+            self._supersede_related_candidates(
+                {
+                    source_cluster.cluster_id,
+                    target_cluster.cluster_id,
+                },
+                except_candidate_id=candidate.candidate_id,
+                resolution_hash=resolution.proof_hash,
+            )
+
+        return resolution
+
     @property
     def registry_hash(self) -> str:
         return canonical_hash({
@@ -683,6 +960,13 @@ class EconomicClusterRegistry:
             "review_candidate_hashes": [
                 item.proof_hash for item in self.review_candidates()
             ],
+            "review_decision_hashes": [
+                item.proof_hash for item in self.review_decisions()
+            ],
+            "superseded_review_candidates": {
+                key: self._superseded_review_candidates[key]
+                for key in sorted(self._superseded_review_candidates)
+            },
         })
 
 
@@ -690,6 +974,8 @@ __all__ = [
     "ClusterRegistrationAction",
     "DedupMatchState",
     "DedupReviewCandidate",
+    "DedupReviewDecisionType",
+    "DedupReviewResolution",
     "EconomicClusterEvent",
     "EconomicClusterRegistration",
     "EconomicClusterRegistry",
