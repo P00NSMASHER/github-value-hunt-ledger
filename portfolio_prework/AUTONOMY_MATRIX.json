@@ -1,0 +1,281 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Project-specific autonomy permissions for Portfolio Brain. Permissions are deny-by-default and must also satisfy the global action taxonomy and hard gates.",
+  "permission_values": [
+    "ALLOW",
+    "ALLOW_BOUNDED",
+    "HUMAN_APPROVAL",
+    "PROHIBITED"
+  ],
+  "inheritance_rule": "The more restrictive rule wins across global gates, project permissions, repository boundaries, and action-specific overrides.",
+  "projects": [
+    {
+      "project_id": "PRJ-000",
+      "name": "Portfolio Brain",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "independent_verifier_for_consequential_changes",
+        "no_direct_main_write"
+      ],
+      "action_overrides": {
+        "production_deployment": "HUMAN_APPROVAL",
+        "external_customer_communication": "HUMAN_APPROVAL",
+        "money_movement_or_purchase": "HUMAN_APPROVAL"
+      }
+    },
+    {
+      "project_id": "PRJ-001",
+      "name": "RecoveryWorks",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "preserve_evidence_and_claim_authority_boundaries"
+      ],
+      "action_overrides": {
+        "send_claim_or_dispute": "HUMAN_APPROVAL",
+        "external_customer_communication": "HUMAN_APPROVAL",
+        "production_deployment": "HUMAN_APPROVAL",
+        "money_movement_or_purchase": "HUMAN_APPROVAL",
+        "mark_recovery_realized_without_settlement_evidence": "PROHIBITED"
+      }
+    },
+    {
+      "project_id": "PRJ-002",
+      "name": "Freight Recovery",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "preserve_external_action_authorization",
+        "preserve_settlement_evidence_rules"
+      ],
+      "action_overrides": {
+        "carrier_contact_or_claim_submission": "HUMAN_APPROVAL",
+        "external_customer_communication": "HUMAN_APPROVAL",
+        "production_deployment": "HUMAN_APPROVAL",
+        "money_movement_or_purchase": "HUMAN_APPROVAL"
+      }
+    },
+    {
+      "project_id": "PRJ-003",
+      "name": "PermitPlate",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "operational_state_files_not_autonomously_mutated",
+        "preserve_public_private_boundary"
+      ],
+      "action_overrides": {
+        "production_deployment": "HUMAN_APPROVAL",
+        "external_customer_communication": "HUMAN_APPROVAL",
+        "change_billing_or_payment_link": "HUMAN_APPROVAL",
+        "mutate_operational_customer_state": "HUMAN_APPROVAL",
+        "publish_sensitive_operational_state": "PROHIBITED"
+      }
+    },
+    {
+      "project_id": "PRJ-004",
+      "name": "CaptureBrief",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "public_non_sensitive_sources_only",
+        "preserve_human_decision_authority"
+      ],
+      "action_overrides": {
+        "deliver_customer_artifact": "HUMAN_APPROVAL",
+        "external_customer_communication": "HUMAN_APPROVAL",
+        "production_deployment": "HUMAN_APPROVAL",
+        "ingest_restricted_or_sensitive_customer_material": "PROHIBITED"
+      }
+    },
+    {
+      "project_id": "PRJ-005",
+      "name": "StarBlox",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "child_safety_rules_preserved",
+        "no_autonomous_live_child_experimentation"
+      ],
+      "action_overrides": {
+        "production_deployment": "HUMAN_APPROVAL",
+        "consequential_child_facing_change_or_experiment": "HUMAN_APPROVAL",
+        "alter_child_privacy_or_public_social_features": "HUMAN_APPROVAL",
+        "introduce_ads_loot_boxes_fomo_or_streak_loss_penalties": "PROHIBITED"
+      }
+    },
+    {
+      "project_id": "PRJ-006",
+      "name": "ABVM Grade 2 Parent Companion",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "source_grounding_preserved",
+        "no_autonomous_consequential_child_or_family_experimentation"
+      ],
+      "action_overrides": {
+        "production_deployment": "HUMAN_APPROVAL",
+        "consequential_child_facing_change_or_experiment": "HUMAN_APPROVAL",
+        "publish_unverified_school_information": "PROHIBITED",
+        "override_last_good_source_validation_fail_closed_behavior": "HUMAN_APPROVAL"
+      }
+    },
+    {
+      "project_id": "PRJ-007",
+      "name": "Market Surveillance Research Platform",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "PROHIBITED"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "research_only_boundary_preserved",
+        "no_trade_direction_generation",
+        "no_brokerage_integration"
+      ],
+      "action_overrides": {
+        "live_market_trading_or_broker_order": "PROHIBITED",
+        "autonomous_investment_positioning": "PROHIBITED",
+        "trade_direction_or_position_sizing_output": "PROHIBITED",
+        "production_deployment_for_trade_execution": "PROHIBITED"
+      }
+    },
+    {
+      "project_id": "PRJ-008",
+      "name": "Hunter / GitHub Value Hunt",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "provenance_required",
+        "negative_knowledge_preserved",
+        "no_direct_main_write"
+      ],
+      "action_overrides": {
+        "public_source_search": "ALLOW_BOUNDED",
+        "create_candidate_research_branch": "ALLOW_BOUNDED",
+        "production_deployment": "HUMAN_APPROVAL",
+        "external_customer_communication": "HUMAN_APPROVAL"
+      }
+    },
+    {
+      "project_id": "PRJ-009",
+      "name": "AI Business OS",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "builder_not_sole_verifier",
+        "self_improvement_requires_held_out_evaluation_and_canary"
+      ],
+      "action_overrides": {
+        "self_modify_candidate_branch": "ALLOW_BOUNDED",
+        "self_promote_to_main": "HUMAN_APPROVAL",
+        "production_deployment": "HUMAN_APPROVAL",
+        "money_movement_or_purchase": "HUMAN_APPROVAL"
+      }
+    },
+    {
+      "project_id": "PRJ-010",
+      "name": "Browser Gateway",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "least_privilege",
+        "no_secret_exfiltration",
+        "no_unbounded_external_side_effects"
+      ],
+      "action_overrides": {
+        "browse_public_web": "ALLOW_BOUNDED",
+        "authenticated_external_write": "HUMAN_APPROVAL",
+        "production_deployment": "HUMAN_APPROVAL",
+        "credential_or_secret_access_outside_explicit_scope": "PROHIBITED"
+      }
+    },
+    {
+      "project_id": "PRJ-011",
+      "name": "Evidence Data Ledgers",
+      "permissions": {
+        "OBSERVE": "ALLOW",
+        "EXPERIMENT": "ALLOW_BOUNDED",
+        "MODIFY": "ALLOW_BOUNDED",
+        "ACT": "HUMAN_APPROVAL"
+      },
+      "modify_constraints": [
+        "isolated_branch_only",
+        "tests_required",
+        "provenance_preserved",
+        "exact_source_bytes_and_hashes_not_rewritten",
+        "applicability_not_inferred_from_benchmark_data"
+      ],
+      "action_overrides": {
+        "ingest_public_authoritative_data": "ALLOW_BOUNDED",
+        "production_deployment": "HUMAN_APPROVAL",
+        "overwrite_immutable_evidence": "PROHIBITED",
+        "assert_account_or_contract_applicability_without_evidence": "PROHIBITED"
+      }
+    }
+  ]
+}
