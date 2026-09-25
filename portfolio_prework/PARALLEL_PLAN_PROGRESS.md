@@ -6,7 +6,7 @@ Working branch: `portfolio-parallel-prep`
 |---:|---|---|
 | 1 | Portfolio inventory | **COMPLETE** |
 | 2 | Stable project IDs | **COMPLETE** |
-| 3 | Repository snapshot generator | PENDING |
+| 3 | Repository snapshot generator | **COMPLETE** |
 | 4 | SHA-based change detector | PENDING |
 | 5 | Durable build-state schema | PENDING |
 | 6 | Autonomy matrix | PENDING |
@@ -30,6 +30,18 @@ Created:
 - `portfolio_prework/PROJECT_ID_REGISTRY.md`
 
 Established immutable top-level project IDs, aliases, parent relationships, repository scope, categories, and hard boundaries. Validation confirms 12 project identities, 12 unique IDs, zero duplicate IDs, and zero alias collisions.
+
+## Step 3 result
+
+Created:
+- `portfolio_prework/snapshot_repos.json`
+- `portfolio_prework/build_portfolio_snapshot.py`
+- `portfolio_prework/test_build_portfolio_snapshot.py`
+- `portfolio_prework/repository_snapshot.json`
+- `portfolio_prework/REPOSITORY_SNAPSHOT.md`
+- `.github/workflows/portfolio-prework-ci.yml`
+
+The snapshot generator uses the GitHub API and Python standard library to capture exact HEAD SHAs, recursive tree structure, workflow paths, test paths, dependency manifests, README locations, file counts and top-level structure without modifying downstream repositories. The generated baseline captured all 7 configured repositories with 0 failures and 0 truncated trees. Focused GitHub Actions CI passed after correcting the test import and regex escaping.
 
 ## Rule
 
