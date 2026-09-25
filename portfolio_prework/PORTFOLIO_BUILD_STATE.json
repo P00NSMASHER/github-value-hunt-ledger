@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "architecture_version": "prework-0.1",
+  "architecture_version": "prework-1.0",
   "state_id": "portfolio-parallel-prework",
   "working_branch": "portfolio-parallel-prep",
   "phase": "parallel_prework",
-  "current_step": 10,
+  "current_step": 11,
   "completed_steps": [
     1,
     2,
@@ -14,7 +14,8 @@
     6,
     7,
     8,
-    9
+    9,
+    10
   ],
   "repositories": {
     "REPO-001": {
@@ -138,6 +139,15 @@
         "portfolio_prework/DEPENDENCY_INVENTORY.json",
         "portfolio_prework/DEPENDENCY_INVENTORY.md"
       ]
+    },
+    {
+      "decision_id": "DEC-009",
+      "summary": "Use ARCHITECTURE_EVIDENCE_BUNDLE.json plus the current SHA delta as the canonical prework handoff into Portfolio Brain Step 0; do not rescan unchanged repositories by default.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json",
+        "portfolio_prework/STEP0_RESUME_HANDOFF.md"
+      ]
     }
   ],
   "artifacts": [
@@ -230,6 +240,24 @@
       "kind": "dependency_inventory_documentation",
       "step": 9,
       "commit_sha": "c88b0a8af7a7e69a6e636b2b283b104673e5bf56"
+    },
+    {
+      "path": "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json",
+      "kind": "architecture_evidence_bundle",
+      "step": 10,
+      "commit_sha": "1f90db4bfdf25e6fc1c299b1c06acb228b753d0c"
+    },
+    {
+      "path": "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.md",
+      "kind": "architecture_evidence_documentation",
+      "step": 10,
+      "commit_sha": "7588a4cf9ae0cf7247e5bceade1078c1df205c0e"
+    },
+    {
+      "path": "portfolio_prework/STEP0_RESUME_HANDOFF.md",
+      "kind": "architecture_resume_handoff",
+      "step": 10,
+      "commit_sha": "0f943e624ecf26facb6f3b47754b40fef4c15813"
     }
   ],
   "tests": [
@@ -286,17 +314,15 @@
       "status": "PASS",
       "step": 9,
       "evidence": "14 expected dependency manifests, 14 inventoried, zero missing/extra; Portfolio Prework CI run 36091421696 succeeded."
+    },
+    {
+      "name": "architecture evidence bundle consistency",
+      "status": "PASS",
+      "step": 10,
+      "evidence": "Portfolio Prework CI run 36091601744 succeeded with bundle consistency tests included."
     }
   ],
   "blockers": [],
-  "next_action": {
-    "step": 10,
-    "summary": "Assemble the architecture evidence bundle from Steps 1-9 into one compact handoff for Step 0 / Portfolio Brain architecture work.",
-    "preconditions": [
-      "Do not rescan unchanged repositories.",
-      "Preserve provenance to the underlying prework artifacts.",
-      "Summarize evidence and unresolved risks without inventing new implementation claims."
-    ]
-  },
-  "updated_at": "2026-09-25T03:42:20Z"
+  "next_action": null,
+  "updated_at": "2026-09-25T03:45:05Z"
 }
