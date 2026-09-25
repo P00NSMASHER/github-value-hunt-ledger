@@ -133,6 +133,30 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             "2015-02-20T07:00:00-05:00",
         )
         self.assertEqual(
+            by_event["HEJFE-7ED8DBD4804E4330"].timestamp,
+            "2015-02-19T13:05:00-08:00",
+        )
+        self.assertEqual(
+            by_event["HEJFE-76DCF0FCA248E814"].timestamp,
+            "2012-01-26T16:03:00-05:00",
+        )
+        self.assertEqual(
+            by_event["HEJFE-D9C52E6CC595C380"].timestamp,
+            "2015-02-17T16:05:00-05:00",
+        )
+        self.assertEqual(
+            by_event["HEJFE-09EB83905864C50A"].timestamp,
+            "2015-05-19T16:00:00-04:00",
+        )
+        self.assertEqual(
+            by_event["HEJFE-824BABBAD988A068"].timestamp,
+            "2012-01-25T16:18:00-05:00",
+        )
+        self.assertEqual(
+            by_event["HEJFE-99CCB9D9BECE4E72"].timestamp,
+            "2012-01-27T07:00:00-05:00",
+        )
+        self.assertEqual(
             by_event["HEJFE-76B03970FA6BDB42"].timestamp,
             "2013-02-20T04:05:00-08:00",
         )
@@ -301,6 +325,50 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             len({row["event_id"] for row in first_two}),
             60,
         )
+
+
+    def test_announcement_batch_two_reviews_exactly_30_events(self):
+        review_path = CORPUS_DIR / "announcement_review_log.csv"
+        with review_path.open(
+            "r",
+            encoding="utf-8",
+            newline="",
+        ) as handle:
+            rows = list(csv.DictReader(handle))
+
+        batch = [
+            row for row in rows
+            if row["batch_id"] == "G1-BATCH-002"
+        ]
+        self.assertEqual(len(batch), 30)
+        self.assertEqual(
+            [int(row["batch_position"]) for row in batch],
+            list(range(1, 31)),
+        )
+        self.assertEqual(len({row["event_id"] for row in batch}), 30)
+
+        resolved = [
+            row for row in batch
+            if row["review_status"] == "RESOLVED_EXACT_PUBLIC_TIME"
+        ]
+        unresolved = [
+            row for row in batch
+            if row["review_status"] == "UNRESOLVED_AFTER_REVIEW"
+        ]
+        self.assertEqual(len(resolved), 6)
+        self.assertEqual(len(unresolved), 24)
+        self.assertEqual(
+            {row["event_id"] for row in resolved},
+            {
+                "HEJFE-7ED8DBD4804E4330",
+                "HEJFE-76DCF0FCA248E814",
+                "HEJFE-D9C52E6CC595C380",
+                "HEJFE-09EB83905864C50A",
+                "HEJFE-824BABBAD988A068",
+                "HEJFE-99CCB9D9BECE4E72",
+            },
+        )
+        self.assertTrue(all(row["reason"] for row in batch))
 
 
 if __name__ == "__main__":
