@@ -94,7 +94,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             imported.counts(),
             {
                 "announcement_rows": 27,
-                "listing_rows": 0,
+                "listing_rows": 66,
                 "shares_rows": 0,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
@@ -228,7 +228,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
-        self.assertEqual(manifest["listing_metadata_resolved"], 0)
+        self.assertEqual(manifest["listing_metadata_resolved"], 66)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
@@ -583,6 +583,70 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             unresolved_reviewed,
             corpus_ids - resolved_ids,
         )
+
+
+    def test_g2_batch_one_resolves_66_listing_observations(self):
+        import_dir = CORPUS_DIR / "import"
+        files = {
+            name: (import_dir / name).read_text(encoding="utf-8")
+            for name in (
+                "announcement_metadata.csv",
+                "listing_metadata.csv",
+                "shares_metadata.csv",
+                "control_metadata.csv",
+                "market_source_dates.csv",
+            )
+        }
+        imported = import_real_corpus_metadata(files)
+        self.assertEqual(len(imported.listings), 66)
+
+        by_symbol = {}
+        for item in imported.listings:
+            by_symbol.setdefault(item.symbol, []).append(item)
+
+        self.assertEqual(set(by_symbol), {"CNMD", "CAT", "GILD"})
+        self.assertEqual(
+            {symbol: len(rows) for symbol, rows in by_symbol.items()},
+            {"CNMD": 22, "CAT": 22, "GILD": 22},
+        )
+        self.assertEqual(
+            {row.primary_exchange for row in by_symbol["CNMD"]},
+            {"NASDAQ"},
+        )
+        self.assertEqual(
+            {row.primary_exchange for row in by_symbol["CAT"]},
+            {"NYSE"},
+        )
+        self.assertEqual(
+            {row.primary_exchange for row in by_symbol["GILD"]},
+            {"NASDAQ"},
+        )
+
+    def test_g2_batch_one_requirement_file_is_exactly_66_dates(self):
+        path = CORPUS_DIR / "listing_requirement_batch_001.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(
+            sum(int(row["requirement_count"]) for row in rows),
+            66,
+        )
+        for row in rows:
+            dates = row["required_dates"].split("|")
+            self.assertEqual(len(dates), 22)
+            self.assertEqual(dates[0], row["first_date"])
+            self.assertEqual(dates[-1], row["last_date"])
+
+    def test_g2_manifest_is_transparent_about_full_compact_index(self):
+        manifest = json.loads(
+            (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(manifest["listing_metadata_resolved"], 66)
+        self.assertEqual(manifest["listing_requirement_total"], 3828)
+        self.assertEqual(manifest["listing_intervals_verified"], 3)
+        self.assertEqual(manifest["listing_batches_completed"], 1)
+        self.assertFalse(manifest["listing_full_compact_index_loaded"])
 
 
 if __name__ == "__main__":
