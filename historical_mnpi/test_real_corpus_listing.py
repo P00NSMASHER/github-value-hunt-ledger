@@ -55,16 +55,16 @@ class RealCorpusListingTests(unittest.TestCase):
             self.assertEqual(dates[0], row["first_date"])
             self.assertEqual(dates[-1], row["last_date"])
 
-    def test_first_listing_batch_resolves_exactly_66_rows(self):
+    def test_first_two_listing_batches_resolve_exactly_132_rows(self):
         expansion = expand_listing_intervals(
             self._requirements(),
             self._intervals(),
         )
-        self.assertEqual(len(expansion.resolved), 66)
-        self.assertEqual(len(expansion.unresolved), 3762)
+        self.assertEqual(len(expansion.resolved), 132)
+        self.assertEqual(len(expansion.unresolved), 3696)
         self.assertEqual(
             {item.symbol for item in expansion.resolved},
-            {"CAT", "CNMD", "GILD"},
+            {"CAT", "CNMD", "F", "GILD", "NKE", "SBUX"},
         )
         self.assertEqual(
             {
@@ -74,7 +74,10 @@ class RealCorpusListingTests(unittest.TestCase):
             {
                 "CAT": "NYSE",
                 "CNMD": "NASDAQ",
+                "F": "NYSE",
                 "GILD": "NASDAQ",
+                "NKE": "NYSE",
+                "SBUX": "NASDAQ",
             },
         )
 
@@ -114,17 +117,17 @@ class RealCorpusListingTests(unittest.TestCase):
             )
             for item in expansion.resolved
         }
-        self.assertEqual(len(committed), 66)
+        self.assertEqual(len(committed), 132)
         self.assertEqual(committed, expected)
 
-    def test_manifest_tracks_g2_batch_one(self):
+    def test_manifest_tracks_g2_first_two_batches(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_metadata_resolved"], 66)
-        self.assertEqual(manifest["listing_intervals_verified"], 3)
-        self.assertEqual(manifest["listing_symbols_resolved"], 3)
+        self.assertEqual(manifest["listing_metadata_resolved"], 132)
+        self.assertEqual(manifest["listing_intervals_verified"], 6)
+        self.assertEqual(manifest["listing_symbols_resolved"], 6)
 
 
 if __name__ == "__main__":
