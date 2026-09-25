@@ -1,0 +1,895 @@
+{
+  "schema_version": "1.0.0",
+  "inventory_basis": {
+    "snapshot_file": "portfolio_prework/repository_snapshot.json",
+    "pinned_to_snapshot_shas": true,
+    "note": "Workflow contents were inspected read-only at the exact repository SHAs in the Step 3 snapshot."
+  },
+  "summary": {
+    "repository_count": 7,
+    "workflow_count": 47,
+    "workflows_by_repository": {
+      "REPO-001": 24,
+      "REPO-002": 1,
+      "REPO-003": 5,
+      "REPO-004": 2,
+      "REPO-005": 12,
+      "REPO-007": 3,
+      "REPO-006": 0
+    },
+    "trigger_counts": {
+      "push": 40,
+      "pull_request": 17,
+      "workflow_dispatch": 31,
+      "workflow_run": 2,
+      "schedule": 9
+    },
+    "risk_marker_counts": {
+      "write_permission": 9,
+      "manual_dispatch": 31,
+      "uses_secrets": 8,
+      "deployment_or_pages": 4,
+      "scheduled": 9
+    },
+    "pull_request_target_count": 0,
+    "write_capable_or_deploy_workflows": 9,
+    "scheduled_workflows": 9,
+    "workflows_using_secrets": 8
+  },
+  "workflows": [
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/ai-business-os.yml",
+      "name": "AI Business OS Canonical CI",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "canonical"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/catalog-append.yml",
+      "name": "Catalog append helper",
+      "triggers": [
+        "push"
+      ],
+      "permissions": "contents: write",
+      "jobs": [
+        "append"
+      ],
+      "risk_markers": [
+        "write_permission"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/exp008-dreamine-real-hsms.yml",
+      "name": "EXP-008 Dreamine real-HSMS atomicity",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "dreamine-atomic-shared"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/fmc-tariff-ledger.yml",
+      "name": "FMC Tariff Rule Ledger",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "test",
+        "matrix",
+        "crawl",
+        "merge"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/fmc-tariff-quality.yml",
+      "name": "FMC Tariff Ledger Quality",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "test"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/fmc-tariff-recover-merge.yml",
+      "name": "FMC Tariff Ledger Recover and Merge",
+      "triggers": [
+        "workflow_run",
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read actions: read",
+      "jobs": [
+        "prepare",
+        "rehydrate",
+        "merge_metadata"
+      ],
+      "risk_markers": [
+        "uses_secrets",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/fmc-tariff-tests.yml",
+      "name": "FMC Tariff Ledger Tests",
+      "triggers": [
+        "pull_request",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "unit"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/freight-contracts.yml",
+      "name": "Freight Commercial Contracts",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "contracts"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/freight-site-pages.yml",
+      "name": "RecoveryOS Public Sites",
+      "triggers": [
+        "pull_request",
+        "push",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read; job-level Pages deployment write permissions present",
+      "jobs": [
+        "verify",
+        "deploy"
+      ],
+      "risk_markers": [
+        "write_permission",
+        "deployment_or_pages",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/hospital-mrf-ledger.yml",
+      "name": "Hospital Price Transparency MRF Ledger",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "test",
+        "ingest"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/integrator-sync.yml",
+      "name": "Integrator sync helper",
+      "triggers": [
+        "push"
+      ],
+      "permissions": "contents: write",
+      "jobs": [
+        "sync"
+      ],
+      "risk_markers": [
+        "write_permission"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/production-contracts.yml",
+      "name": "Production Contract Tests",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "test"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/public-repo-hunter.yml",
+      "name": "Public Repo Hunter Scouts",
+      "triggers": [
+        "workflow_dispatch",
+        "schedule"
+      ],
+      "permissions": "contents: write",
+      "jobs": [
+        "scout"
+      ],
+      "risk_markers": [
+        "write_permission",
+        "uses_secrets",
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/recoveryworks.yml",
+      "name": "RecoveryWorks",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "recoveryworks"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/shaq-detail-probe.yml",
+      "name": "SHAQ Read-Only Detail Probe",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "probe"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/shaq-mcp-sample-probe.yml",
+      "name": "SHAQ MCP Read-Only Sample Probe",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "probe"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/shaq-mcp-schema-probe.yml",
+      "name": "SHAQ MCP Schema Probe",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "probe"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/shaq-route-archive.yml",
+      "name": "SHAQ Public Route Rate Archive",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "matrix",
+        "crawl",
+        "merge"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/shaq-route-pilot.yml",
+      "name": "SHAQ Public Route Crawl Pilot",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "pilot"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/shaq-sitemap-probe.yml",
+      "name": "SHAQ Public Sitemap Probe",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "probe"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/technology-intelligence.yml",
+      "name": "Technology Intelligence System",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read; job-level write path present",
+      "jobs": [
+        "validate",
+        "persist-generated"
+      ],
+      "risk_markers": [
+        "write_permission",
+        "uses_secrets"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/tic-mrf-ledger.yml",
+      "name": "TiC Payer MRF Ledger",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "test",
+        "catalog"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/tic-targeted-extract.yml",
+      "name": "TiC Targeted Rate Extract",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "extract"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "path": ".github/workflows/urdb-ledger.yml",
+      "name": "OpenEI URDB Ledger",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "test",
+        "ingest"
+      ],
+      "risk_markers": [
+        "uses_secrets",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-002",
+      "full_name": "P00NSMASHER/StarBlox",
+      "path": ".github/workflows/ci.yml",
+      "name": "StarBlox CI",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "unspecified",
+      "jobs": [
+        "test-build"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "path": ".github/workflows/health-dashboard.yml",
+      "name": "ABVM Operational Health Dashboard",
+      "triggers": [
+        "workflow_run",
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read actions: read",
+      "jobs": [
+        "dashboard"
+      ],
+      "risk_markers": [
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "path": ".github/workflows/pages.yml",
+      "name": "Deploy ABVM to GitHub Pages",
+      "triggers": [
+        "push",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read pages: write id-token: write",
+      "jobs": [
+        "deploy"
+      ],
+      "risk_markers": [
+        "write_permission",
+        "deployment_or_pages",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "path": ".github/workflows/qa.yml",
+      "name": "ABVM App QA",
+      "triggers": [
+        "pull_request",
+        "push",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "qa"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "path": ".github/workflows/refresh-health.yml",
+      "name": "Monitor ABVM refresh health",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "health"
+      ],
+      "risk_markers": [
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "path": ".github/workflows/sync-study-pack.yml",
+      "name": "Refresh ABVM teacher pages",
+      "triggers": [
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: write pages: write id-token: write",
+      "jobs": [
+        "refresh-and-deploy"
+      ],
+      "risk_markers": [
+        "write_permission",
+        "deployment_or_pages",
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-004",
+      "full_name": "P00NSMASHER/trading-platform",
+      "path": ".github/workflows/pr-ci.yml",
+      "name": "pr-ci",
+      "triggers": [
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "tests",
+        "secret-scan"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-004",
+      "full_name": "P00NSMASHER/trading-platform",
+      "path": ".github/workflows/synthetic-ci.yml",
+      "name": "synthetic-ci",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "tests",
+        "secret-scan"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/category-calibration.yml",
+      "name": "PermitPlate blind category calibration",
+      "triggers": [
+        "workflow_dispatch",
+        "pull_request",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "category-calibration"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/current-graph.yml",
+      "name": "PermitPlate current graph replay",
+      "triggers": [
+        "workflow_dispatch",
+        "schedule",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "current-graph"
+      ],
+      "risk_markers": [
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/detection-ledger.yml",
+      "name": "PermitPlate detection ledger",
+      "triggers": [
+        "workflow_dispatch",
+        "schedule",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "detection-ledger"
+      ],
+      "risk_markers": [
+        "uses_secrets",
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/event-recency.yml",
+      "name": "PermitPlate event-time recency",
+      "triggers": [
+        "pull_request",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "event-recency"
+      ],
+      "risk_markers": [
+        "uses_secrets"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/launch-readiness.yml",
+      "name": "PermitPlate launch readiness",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "launch-readiness"
+      ],
+      "risk_markers": [
+        "uses_secrets",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/material-change.yml",
+      "name": "PermitPlate material-change boundary",
+      "triggers": [
+        "pull_request",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "semantic-regression"
+      ],
+      "risk_markers": [
+        "uses_secrets"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/permitplate-tests.yml",
+      "name": "PermitPlate deterministic regression",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "regression"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/provider-reconciliation.yml",
+      "name": "PermitPlate provider reconciliation",
+      "triggers": [
+        "pull_request",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "reconciliation"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/public-site-build.yml",
+      "name": "PermitPlate GitHub Pages",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read pages: write id-token: write",
+      "jobs": [
+        "build-and-deploy"
+      ],
+      "risk_markers": [
+        "write_permission",
+        "deployment_or_pages",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/scoring-readiness.yml",
+      "name": "PermitPlate scoring readiness",
+      "triggers": [
+        "workflow_dispatch",
+        "schedule",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "readiness"
+      ],
+      "risk_markers": [
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/source-health.yml",
+      "name": "PermitPlate public-source health",
+      "triggers": [
+        "workflow_dispatch",
+        "schedule",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "source-health"
+      ],
+      "risk_markers": [
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "path": ".github/workflows/subscriber-readiness.yml",
+      "name": "PermitPlate subscriber readiness",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "subscriber-readiness"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-007",
+      "full_name": "P00NSMASHER/capturebrief",
+      "path": ".github/workflows/abvm-school-pack.yml",
+      "name": "Refresh ABVM school pack",
+      "triggers": [
+        "push",
+        "schedule",
+        "workflow_dispatch"
+      ],
+      "permissions": "contents: write",
+      "jobs": [
+        "refresh"
+      ],
+      "risk_markers": [
+        "write_permission",
+        "scheduled",
+        "manual_dispatch"
+      ]
+    },
+    {
+      "repo_id": "REPO-007",
+      "full_name": "P00NSMASHER/capturebrief",
+      "path": ".github/workflows/product-core.yml",
+      "name": "Product Core",
+      "triggers": [
+        "push",
+        "pull_request"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "product-contract",
+        "windows-compatibility"
+      ],
+      "risk_markers": []
+    },
+    {
+      "repo_id": "REPO-007",
+      "full_name": "P00NSMASHER/capturebrief",
+      "path": ".github/workflows/public-release.yml",
+      "name": "Public Release Artifact",
+      "triggers": [
+        "workflow_dispatch",
+        "push"
+      ],
+      "permissions": "contents: read",
+      "jobs": [
+        "tested-public-artifact"
+      ],
+      "risk_markers": [
+        "manual_dispatch"
+      ]
+    }
+  ],
+  "architecture_observations": [
+    {
+      "observation_id": "WF-OBS-001",
+      "severity": "INFO",
+      "summary": "Most workflows are CI, validation, ingestion, or read-only probes; write/deploy authority is concentrated in a smaller subset."
+    },
+    {
+      "observation_id": "WF-OBS-002",
+      "severity": "REVIEW",
+      "summary": "Write-capable workflows exist in the primary intelligence repository, ABVM, PermitPlate, and CaptureBrief. Portfolio Brain must not treat existing GitHub workflow write authority as blanket autonomy."
+    },
+    {
+      "observation_id": "WF-OBS-003",
+      "severity": "REVIEW",
+      "summary": "CaptureBrief contains a scheduled write-capable workflow named 'Refresh ABVM school pack', which is cross-project behavior and should remain explicitly represented in architecture boundaries."
+    },
+    {
+      "observation_id": "WF-OBS-004",
+      "severity": "INFO",
+      "summary": "No inspected workflow uses pull_request_target at the pinned snapshot SHAs."
+    },
+    {
+      "observation_id": "WF-OBS-005",
+      "severity": "REVIEW",
+      "summary": "Pages deployment workflows carry write/id-token authority. Future Portfolio Brain automation should invoke or observe them only through explicit deployment gates rather than inheriting their credentials."
+    },
+    {
+      "observation_id": "WF-OBS-006",
+      "severity": "INFO",
+      "summary": "permitplate-state has no GitHub Actions workflows in the pinned snapshot."
+    }
+  ]
+}
