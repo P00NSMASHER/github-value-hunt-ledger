@@ -33,11 +33,19 @@ class CutoffPrecision(str, Enum):
     END_OF_DAY = "END_OF_DAY"
 
 
-def _utc(value: str) -> datetime:
+def _parsed_timestamp(value: str) -> datetime:
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if parsed.tzinfo is None:
         raise ValueError("timestamp must include timezone")
-    return parsed.astimezone(timezone.utc)
+    return parsed
+
+
+def _utc(value: str) -> datetime:
+    return _parsed_timestamp(value).astimezone(timezone.utc)
+
+
+def _local_calendar_date(value: str) -> date:
+    return _parsed_timestamp(value).date()
 
 
 @dataclass(frozen=True)
@@ -63,7 +71,7 @@ class PointInTimeCutoff:
     @property
     def cutoff_date(self) -> date:
         if self.precision is CutoffPrecision.EXACT_TIMESTAMP:
-            return _utc(self.timestamp or "").date()
+            return _local_calendar_date(self.timestamp or "")
         return date.fromisoformat(self.date_value or "")
 
     @property
@@ -100,13 +108,15 @@ def signature_available_by(
         return _utc(signature.trade_timestamp or "") <= instant
 
     # A date-only or date-range row is treated as fully known only after that
-    # calendar day has completed. Same-day inclusion at an intraday cutoff would
-    # create a future-read risk.
+    # calendar day has completed in the cutoff's stated local offset. Using the
+    # UTC calendar date here would incorrectly admit a same-local-day coarse row
+    # whenever a late-evening cutoff crosses midnight in UTC.
+    cutoff_day = cutoff.cutoff_date
     if signature.time_precision is TimePrecision.DATE_ONLY:
-        return date.fromisoformat(signature.trade_date or "") < instant.date()
+        return date.fromisoformat(signature.trade_date or "") < cutoff_day
     return date.fromisoformat(
         signature.trade_date_range_end or ""
-    ) < instant.date()
+    ) < cutoff_day
 
 
 def cluster_available_by(
