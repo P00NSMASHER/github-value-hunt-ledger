@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.0.0",
+  "architecture_version": "prework-0.1",
+  "state_id": "portfolio-parallel-prework",
+  "working_branch": "portfolio-parallel-prep",
+  "phase": "parallel_prework",
+  "current_step": 5,
+  "completed_steps": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "repositories": {
+    "REPO-001": {
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "last_inspected_sha": "b47f95caa658a9b12536cc9946d81d51f944c6ac",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T02:49:30Z",
+      "notes": "Portfolio host repository; prework itself is isolated on portfolio-parallel-prep."
+    },
+    "REPO-002": {
+      "full_name": "P00NSMASHER/StarBlox",
+      "last_inspected_sha": "8ebe583f6dae6a832bae2f4987c6919db41eaf5e",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T02:49:30Z",
+      "notes": null
+    },
+    "REPO-003": {
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "last_inspected_sha": "82beed4848ab38893cacd2f35c1c338029003187",
+      "inspection_status": "CHANGED",
+      "last_observed_at": "2026-09-25T02:49:30Z",
+      "notes": "Changed after repository snapshot baseline; six changed files detected across 13 commits."
+    },
+    "REPO-004": {
+      "full_name": "P00NSMASHER/trading-platform",
+      "last_inspected_sha": "579730f1abb595579de199277a95a8c89f733d0f",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T02:49:30Z",
+      "notes": "Research/surveillance only; no autonomous trading authority."
+    },
+    "REPO-005": {
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "last_inspected_sha": "7c9a8fc4dd9fa12275d336beb8eb10732718666a",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T02:49:30Z",
+      "notes": null
+    },
+    "REPO-006": {
+      "full_name": "P00NSMASHER/permitplate-state",
+      "last_inspected_sha": "c64fe06a22c3826c9ad3a7b85a4f911a6e589c19",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T02:49:30Z",
+      "notes": "Operational-state repository; treat as sensitive operational state even though current GitHub metadata reports public visibility."
+    },
+    "REPO-007": {
+      "full_name": "P00NSMASHER/capturebrief",
+      "last_inspected_sha": "3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba",
+      "inspection_status": "UNCHANGED",
+      "last_observed_at": "2026-09-25T02:49:30Z",
+      "notes": null
+    }
+  },
+  "decisions": [
+    {
+      "decision_id": "DEC-001",
+      "summary": "Keep product repositories independent and build a portfolio-level control plane rather than a source-code monolith.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/PORTFOLIO_INVENTORY.md",
+        "portfolio_prework/PROJECT_ID_REGISTRY.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-002",
+      "summary": "Use exact repository HEAD SHAs as the first cache key and inspect unchanged repositories only when the task specifically requires deeper evidence.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/REPOSITORY_SNAPSHOT.md",
+        "portfolio_prework/REPOSITORY_DELTA.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-003",
+      "summary": "Reserve PRJ-000 for Portfolio Brain and keep stable project identities separate from repository identities.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/PROJECT_ID_REGISTRY.json"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "portfolio_prework/portfolio_inventory.json",
+      "kind": "inventory",
+      "step": 1,
+      "commit_sha": "3d5f6fd11eba08e0518cc9946d81d51f944c6ac"
+    },
+    {
+      "path": "portfolio_prework/PROJECT_ID_REGISTRY.json",
+      "kind": "identity_registry",
+      "step": 2,
+      "commit_sha": "e6dc158f105fcb3bcbc54464f2cafbe395b1ec55"
+    },
+    {
+      "path": "portfolio_prework/build_portfolio_snapshot.py",
+      "kind": "snapshot_generator",
+      "step": 3,
+      "commit_sha": "462dd5654c3535147ba4b492a834be43efb879f0"
+    },
+    {
+      "path": "portfolio_prework/detect_repository_changes.py",
+      "kind": "change_detector",
+      "step": 4,
+      "commit_sha": "6ecf355ea5a0afd3c673caa260e9bae5c3b47a27"
+    }
+  ],
+  "tests": [
+    {
+      "name": "stable project ID uniqueness + alias collision validation",
+      "status": "PASS",
+      "step": 2,
+      "evidence": "12 unique IDs; zero duplicate IDs; zero alias collisions."
+    },
+    {
+      "name": "portfolio prework GitHub Actions CI",
+      "status": "PASS",
+      "step": 3,
+      "evidence": "Workflow run 36087507491 succeeded."
+    },
+    {
+      "name": "snapshot + delta prework unit test discovery",
+      "status": "PASS",
+      "step": 4,
+      "evidence": "Workflow runs 36087792089 and later green prework runs succeeded."
+    }
+  ],
+  "blockers": [],
+  "next_action": {
+    "step": 5,
+    "summary": "Validate and adopt the durable build-state schema and seed state, then mark Step 5 complete.",
+    "preconditions": [
+      "Do not modify product repositories.",
+      "Keep state machine-readable and resumable without rediscovery."
+    ]
+  },
+  "updated_at": "2026-09-25T03:06:00Z"
+}
