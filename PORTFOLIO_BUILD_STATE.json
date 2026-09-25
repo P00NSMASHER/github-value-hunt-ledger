@@ -212,6 +212,15 @@
         "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
         "docs/PORTFOLIO_STEP0_EVIDENCE.json"
       ]
+    },
+    {
+      "decision_id": "DEC-019",
+      "summary": "Stage Step 1 foundation artifacts on an isolated Hunter infrastructure branch until the dedicated PRJ-000 repository can be created; this staging branch grants no downstream authority and will not be treated as the final Portfolio Brain repository.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "docs/PORTFOLIO_BRAIN_ARCHITECTURE_CONTRACT.md",
+        "PORTFOLIO_BUILD_STATE.json"
+      ]
     }
   ],
   "blockers": [
@@ -235,14 +244,14 @@
     },
     {
       "blocker_id": "BLK-004",
-      "summary": "No GitHub repository-creation action is exposed in this turn. Recheck capabilities during Step 1; repository creation may require an owner action.",
+      "summary": "The connected GitHub API exposes no repository-creation action. A browser writer exists but has multiple indistinguishable account links and cannot be selected safely without owner input. Step 1 artifacts may be staged here, but the dedicated P00NSMASHER/portfolio-brain repository still must be created before Step 1 can complete.",
       "status": "OPEN",
-      "requires_human_decision": false
+      "requires_human_decision": true
     }
   ],
-  "architecture_version": "0.1.0",
+  "architecture_version": "0.1.1",
   "state_id": "portfolio-brain-master",
-  "working_branch": "portfolio-brain-step0-20260925",
+  "working_branch": "portfolio-brain-step1-foundation-20260925",
   "phase": "architecture_build",
   "current_step": 1,
   "completed_steps": [
@@ -284,6 +293,12 @@
       "kind": "canonical_master_continuation_state",
       "step": 0,
       "commit_sha": "bb237238c96b272bec5bae91c7358b41e26d6e17"
+    },
+    {
+      "path": "docs/PORTFOLIO_BRAIN_ARCHITECTURE_CONTRACT.md",
+      "kind": "step1_architecture_contract_staging",
+      "step": 1,
+      "commit_sha": "a75148054f57f8388093359a8cb1b67c9a26d646"
     }
   ],
   "tests": [
@@ -322,20 +337,39 @@
       "status": "PASS",
       "step": 0,
       "evidence": "GitHub run 36103280547 at a15c7c2214a065707123e9b8ab8ac51a42240345; narrowed configured suite only; not rerun locally."
+    },
+    {
+      "name": "step1_architecture_contract_invariants",
+      "status": "PASS",
+      "step": 1,
+      "evidence": "Exact staged contract fetched at commit a75148054f57f8388093359a8cb1b67c9a26d646; required repository, evidence, autonomy, builder/verifier, state, model-independence, data and runtime-safety boundaries are present."
     }
   ],
   "next_action": {
     "step": 1,
-    "summary": "WAIT FOR CONTINUE. Then create the dedicated Portfolio Brain foundation for PRJ-000: architecture contract, boundaries, skeleton, project registration and initial CI, reusing this baseline. Master Step 1 is pending, not started.",
+    "summary": "WAIT FOR CONTINUE. Step 1A architecture contract is staged and verified. Next small step: stage the minimal Portfolio Brain directory skeleton and project-registration contract without enabling downstream writes.",
     "preconditions": [
-      "Explicit CONTINUE after the Step 0 completion report.",
-      "Read this root PORTFOLIO_BUILD_STATE.json first; prework steps 1–10 belong to a separate completed plan.",
-      "Carry immutable project IDs, autonomy matrix, hard gates, inventories and provenance into the dedicated repository.",
-      "Do not repeat reconnaissance of unchanged source revisions; inspect only relevant changed paths.",
-      "Keep REPO-006 integration disabled until BLK-001 visibility/access review is explicitly resolved.",
-      "Keep runtime/bootstrap and downstream writes disabled; Step 1 creates no autonomous downstream authority.",
-      "Check for an authorized repository-creation capability; if absent, finish the reviewable foundation and request only the missing creation action."
+      "Read this root PORTFOLIO_BUILD_STATE.json first.",
+      "Do not repeat Step 0 reconnaissance unless a pinned source changed.",
+      "Keep all Step 1 work isolated from product repositories and main branches.",
+      "Do not enable downstream adapters, schedules, model calls or ACT authority.",
+      "Dedicated repository creation remains blocked by BLK-004; staged artifacts are reviewable but are not the final PRJ-000 repository."
     ]
   },
-  "updated_at": "2026-09-25T11:14:59.241939Z"
+  "updated_at": "2026-09-25T14:54:00Z",
+  "step_progress": {
+    "1": {
+      "status": "IN_PROGRESS",
+      "completed_substeps": [
+        "1A_ARCHITECTURE_CONTRACT"
+      ],
+      "pending_substeps": [
+        "1B_DEDICATED_REPOSITORY",
+        "1C_FOUNDATION_SKELETON",
+        "1D_PROJECT_REGISTRATION",
+        "1E_INITIAL_CI"
+      ],
+      "authority_change": "NONE"
+    }
+  }
 }
