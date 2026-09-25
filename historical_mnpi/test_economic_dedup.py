@@ -511,18 +511,17 @@ class EconomicDedupTests(unittest.TestCase):
 
     def test_stale_target_cluster_blocks_old_review_candidate(self):
         registry = EconomicClusterRegistry()
-        registry.register(sig(
-            1,
+        registry.register(sig(1))
+        second = registry.register(sig(
+            2,
             timestamp=None,
             trade_date="2015-08-10",
         ))
-        second = registry.register(sig(2))
         candidate = second.review_candidates[0]
 
         registry.register(sig(
             3,
-            timestamp=None,
-            trade_date="2015-08-10",
+            timestamp="2015-08-10T18:31:22Z",
         ))
 
         with self.assertRaisesRegex(ValueError, "target cluster changed"):
