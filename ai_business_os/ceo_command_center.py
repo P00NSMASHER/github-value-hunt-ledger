@@ -93,12 +93,31 @@ def _route_role(text: str) -> tuple[str, str]:
     return "CHIEF_OF_STAFF", "TRIAGE"
 
 
+def _production_change_intent(text: str) -> bool:
+    if _contains_any(text, ("deploy", "migrate", "migration")):
+        return True
+    words = re.findall(r"[a-z0-9_]+", text.lower())
+    production_positions = [
+        index for index, word in enumerate(words)
+        if word in {"production", "prod"}
+    ]
+    change_positions = [
+        index for index, word in enumerate(words)
+        if word in {"change", "update", "release", "modify", "write", "push", "restart", "rollback", "promote"}
+    ]
+    return any(
+        abs(production_index - change_index) <= 8
+        for production_index in production_positions
+        for change_index in change_positions
+    )
+
+
 def _possible_action_class(text: str) -> str:
     if _contains_any(text, ("delete", "purge", "destroy", "wipe")):
         return "DESTRUCTIVE"
     if _contains_any(text, ("pay", "purchase", "spend", "transfer", "refund")):
         return "MONEY_MOVEMENT"
-    if _contains_any(text, ("deploy", "production", "migrate", "migration")):
+    if _production_change_intent(text):
         return "PRODUCTION_CHANGE"
     if _contains_any(text, ("send", "email", "message", "contact", "publish", "post", "outreach")):
         return "EXTERNAL_WRITE"
