@@ -120,6 +120,50 @@ from .source_conflicts import (
     verify_conflict_claim,
 )
 
+
+from .surveillance_graph import (
+    HistoricalSurveillanceGraph,
+    SurveillanceEdge,
+    SurveillanceEdgeKind,
+    SurveillanceNode,
+    SurveillanceNodeKind,
+    build_historical_surveillance_graph,
+)
+
+from .surveillance_features import (
+    HistoricalSurveillanceFeatures,
+    TradeReleaseRelation,
+    build_feature_set,
+    build_surveillance_features,
+)
+
+from .point_in_time import (
+    CutoffPrecision,
+    PointInTimeControlPlan,
+    PointInTimeCutoff,
+    PointInTimeFeatureSnapshot,
+    WalkForwardWindow,
+    build_point_in_time_snapshot,
+    build_walk_forward_window,
+    cluster_available_by,
+    cutoff_sort_key,
+    signature_available_by,
+)
+
+from .retrospective_benchmark import (
+    HistoricalOutcomeLabel,
+    HoldoutEvaluationReceipt,
+    LabeledHistoricalExample,
+    RetrospectiveScore,
+    RetrospectiveScoringPolicy,
+    ThresholdFitReceipt,
+    WalkForwardBenchmarkReceipt,
+    evaluate_holdout,
+    fit_threshold_on_train,
+    run_walk_forward_benchmark,
+    score_snapshot,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -130,6 +174,37 @@ from .source_registry import (
 )
 
 __all__ = [
+    "HistoricalSurveillanceGraph",
+    "SurveillanceEdge",
+    "SurveillanceEdgeKind",
+    "SurveillanceNode",
+    "SurveillanceNodeKind",
+    "build_historical_surveillance_graph",
+    "HistoricalSurveillanceFeatures",
+    "TradeReleaseRelation",
+    "build_feature_set",
+    "build_surveillance_features",
+    "CutoffPrecision",
+    "PointInTimeControlPlan",
+    "PointInTimeCutoff",
+    "PointInTimeFeatureSnapshot",
+    "WalkForwardWindow",
+    "build_point_in_time_snapshot",
+    "build_walk_forward_window",
+    "cluster_available_by",
+    "cutoff_sort_key",
+    "signature_available_by",
+    "HistoricalOutcomeLabel",
+    "HoldoutEvaluationReceipt",
+    "LabeledHistoricalExample",
+    "RetrospectiveScore",
+    "RetrospectiveScoringPolicy",
+    "ThresholdFitReceipt",
+    "WalkForwardBenchmarkReceipt",
+    "evaluate_holdout",
+    "fit_threshold_on_train",
+    "run_walk_forward_benchmark",
+    "score_snapshot",
     "ClusterRegistrationAction",
     "DedupMatchState",
     "DedupReviewCandidate",
