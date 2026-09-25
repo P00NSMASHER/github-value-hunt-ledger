@@ -22,5 +22,6 @@
   "listing_requirement_total": 3828,
   "listing_intervals_verified": 3,
   "listing_batches_completed": 1,
-  "listing_full_compact_index_loaded": false
+  "listing_full_compact_index_loaded": false,
+  "listing_symbols_resolved": 3
 }
