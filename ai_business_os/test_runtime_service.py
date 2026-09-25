@@ -47,6 +47,8 @@ class FakeGateway:
                     "evidence_requirements": payload["evidence_requirements"],
                 }
             }
+        if action in {"worker_claim", "worker_heartbeat", "worker_submit", "worker_fail"}:
+            return {"claim": None} if action == "worker_claim" else {"ok": True}
         if action == "decide_approval":
             return {
                 "receipt": {
