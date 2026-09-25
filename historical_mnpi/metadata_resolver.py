@@ -663,6 +663,30 @@ class MetadataResolutionBundle:
             ),
         )
 
+    def readiness_summary(self) -> dict:
+        def count_resolved(items) -> int:
+            return sum(
+                item.state is ResolutionState.RESOLVED
+                for item in items
+            )
+
+        return {
+            "scope": USAGE_SCOPE,
+            "coverage_plan_hash": self.coverage_plan_hash,
+            "announcement_resolved": count_resolved(self.announcements),
+            "announcement_total": len(self.announcements),
+            "listing_resolved": count_resolved(self.listings),
+            "listing_total": len(self.listings),
+            "shares_resolved": count_resolved(self.shares),
+            "shares_total": len(self.shares),
+            "control_resolved": count_resolved(self.controls),
+            "control_total": len(self.controls),
+            "market_source_date_count": len(self.market_source_dates),
+            "ready_metadata_gates": self.ready_metadata_gates,
+            "bundle_hash": self.proof_hash,
+            "live_use_allowed": False,
+        }
+
     @property
     def proof_hash(self) -> str:
         return canonical_hash({
