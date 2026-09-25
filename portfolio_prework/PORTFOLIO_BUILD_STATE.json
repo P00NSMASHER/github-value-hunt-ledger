@@ -4,7 +4,7 @@
   "state_id": "portfolio-parallel-prework",
   "working_branch": "portfolio-parallel-prep",
   "phase": "parallel_prework",
-  "current_step": 9,
+  "current_step": 10,
   "completed_steps": [
     1,
     2,
@@ -13,7 +13,8 @@
     5,
     6,
     7,
-    8
+    8,
+    9
   ],
   "repositories": {
     "REPO-001": {
@@ -128,6 +129,15 @@
         "portfolio_prework/TEST_SUITE_INVENTORY.json",
         "portfolio_prework/TEST_SUITE_INVENTORY.md"
       ]
+    },
+    {
+      "decision_id": "DEC-008",
+      "summary": "Treat dependency manifests and lockfiles as promotion evidence; manifest/lockfile changes should trigger dependency-specific validation rather than relying on one successful install.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/DEPENDENCY_INVENTORY.json",
+        "portfolio_prework/DEPENDENCY_INVENTORY.md"
+      ]
     }
   ],
   "artifacts": [
@@ -208,6 +218,18 @@
       "kind": "test_suite_inventory_documentation",
       "step": 8,
       "commit_sha": "f50c0a3bce653c90e8fef4ee5a3ce7734d749666"
+    },
+    {
+      "path": "portfolio_prework/DEPENDENCY_INVENTORY.json",
+      "kind": "dependency_inventory",
+      "step": 9,
+      "commit_sha": "509ad7aa67e4ea5d2f35e142c8387bd90d5a7c79"
+    },
+    {
+      "path": "portfolio_prework/DEPENDENCY_INVENTORY.md",
+      "kind": "dependency_inventory_documentation",
+      "step": 9,
+      "commit_sha": "c88b0a8af7a7e69a6e636b2b283b104673e5bf56"
     }
   ],
   "tests": [
@@ -258,17 +280,23 @@
       "status": "PASS",
       "step": 8,
       "evidence": "367 expected test paths, 367 inventoried, exact coverage; Portfolio Prework CI run 36090667329 succeeded."
+    },
+    {
+      "name": "dependency inventory exact snapshot coverage",
+      "status": "PASS",
+      "step": 9,
+      "evidence": "14 expected dependency manifests, 14 inventoried, zero missing/extra; Portfolio Prework CI run 36091421696 succeeded."
     }
   ],
   "blockers": [],
   "next_action": {
-    "step": 9,
-    "summary": "Build the dependency inventory across all seven repositories from cached manifest paths and targeted manifest inspection.",
+    "step": 10,
+    "summary": "Assemble the architecture evidence bundle from Steps 1-9 into one compact handoff for Step 0 / Portfolio Brain architecture work.",
     "preconditions": [
-      "Read only.",
-      "Do not install dependencies merely to inventory them.",
-      "Prefer lockfiles/manifests and exact pinned repository SHAs."
+      "Do not rescan unchanged repositories.",
+      "Preserve provenance to the underlying prework artifacts.",
+      "Summarize evidence and unresolved risks without inventing new implementation claims."
     ]
   },
-  "updated_at": "2026-09-25T03:31:15Z"
+  "updated_at": "2026-09-25T03:42:20Z"
 }
