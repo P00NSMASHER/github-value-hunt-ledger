@@ -55,16 +55,16 @@ class RealCorpusListingTests(unittest.TestCase):
             self.assertEqual(dates[0], row["first_date"])
             self.assertEqual(dates[-1], row["last_date"])
 
-    def test_first_four_listing_batches_resolve_exactly_396_rows(self):
+    def test_first_five_listing_batches_resolve_exactly_594_rows(self):
         expansion = expand_listing_intervals(
             self._requirements(),
             self._intervals(),
         )
-        self.assertEqual(len(expansion.resolved), 396)
-        self.assertEqual(len(expansion.unresolved), 3432)
+        self.assertEqual(len(expansion.resolved), 594)
+        self.assertEqual(len(expansion.unresolved), 3234)
         self.assertEqual(
             {item.symbol for item in expansion.resolved},
-            {"ADI", "BA", "CAT", "CNMD", "DE", "F", "GILD", "HON", "JNPR", "NKE", "SBUX", "VMW"},
+            {"ADI", "BA", "CA", "CAT", "CNMD", "DE", "DGI", "F", "GILD", "HON", "JNPR", "NKE", "PNRA", "SBUX", "VMW"},
         )
         self.assertEqual(
             {
@@ -74,14 +74,17 @@ class RealCorpusListingTests(unittest.TestCase):
             {
                 "ADI": "NASDAQ",
                 "BA": "NYSE",
+                "CA": "NASDAQ",
                 "CAT": "NYSE",
                 "CNMD": "NASDAQ",
                 "DE": "NYSE",
+                "DGI": "NYSE",
                 "F": "NYSE",
                 "GILD": "NASDAQ",
                 "HON": "NYSE",
                 "JNPR": "NYSE",
                 "NKE": "NYSE",
+                "PNRA": "NASDAQ",
                 "SBUX": "NASDAQ",
                 "VMW": "NYSE",
             },
@@ -124,6 +127,24 @@ class RealCorpusListingTests(unittest.TestCase):
             {"ADI": 44, "JNPR": 88, "VMW": 66},
         )
 
+
+    def test_fifth_listing_batch_is_exactly_198_rows(self):
+        path = CORPUS_DIR / "listing_requirement_batch_005.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(
+            {row["historical_symbol"] for row in rows},
+            {"CA", "DGI", "PNRA"},
+        )
+        self.assertEqual(
+            sum(int(row["requirement_count"]) for row in rows),
+            198,
+        )
+        self.assertEqual(
+            {row["historical_symbol"]: int(row["requirement_count"]) for row in rows},
+            {"CA": 44, "DGI": 66, "PNRA": 88},
+        )
+
     def test_committed_listing_rows_match_interval_expansion(self):
         import_dir = CORPUS_DIR / "import"
         files = {
@@ -160,17 +181,17 @@ class RealCorpusListingTests(unittest.TestCase):
             )
             for item in expansion.resolved
         }
-        self.assertEqual(len(committed), 396)
+        self.assertEqual(len(committed), 594)
         self.assertEqual(committed, expected)
 
-    def test_manifest_tracks_g2_first_four_batches(self):
+    def test_manifest_tracks_g2_first_five_batches(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_metadata_resolved"], 396)
-        self.assertEqual(manifest["listing_intervals_verified"], 12)
-        self.assertEqual(manifest["listing_symbols_resolved"], 12)
+        self.assertEqual(manifest["listing_metadata_resolved"], 594)
+        self.assertEqual(manifest["listing_intervals_verified"], 15)
+        self.assertEqual(manifest["listing_symbols_resolved"], 15)
 
 
 if __name__ == "__main__":
