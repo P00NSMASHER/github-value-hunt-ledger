@@ -1,1 +1,67 @@
 symbol,session_date,primary_exchange,evidence_id,source_kind,source_name,data_class
+CNMD,2011-03-28,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-03-29,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-03-30,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-03-31,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-01,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-04,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-05,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-06,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-07,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-08,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-11,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-12,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-13,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-14,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-15,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-18,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-19,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-20,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-21,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-25,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-26,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CNMD,2011-04-27,NASDAQ,listing-interval:CNMD:2011Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CNMD Nasdaq listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2011-12-22,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2011-12-23,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2011-12-27,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2011-12-28,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2011-12-29,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2011-12-30,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-03,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-04,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-05,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-06,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-09,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-10,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-11,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-12,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-13,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-17,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-18,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-19,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-20,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-23,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-24,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+CAT,2012-01-25,NYSE,listing-interval:CAT:2011Q4-2012Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket CAT New York Stock Exchange listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-02,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-05,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-06,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-07,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-08,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-09,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-12,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-13,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-14,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-15,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-16,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-20,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-21,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-22,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-23,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-26,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-27,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-28,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-29,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-01-30,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-02-02,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
+GILD,2015-02-03,NASDAQ,listing-interval:GILD:2015Q1,OFFICIAL_LISTING_HISTORY,SEC annual reports bracket GILD Nasdaq Global Select Market listing interval,PUBLIC_OR_AUTHORIZED_HISTORICAL
