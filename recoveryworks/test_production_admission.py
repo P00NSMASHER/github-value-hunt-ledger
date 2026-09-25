@@ -157,13 +157,14 @@ class ProductionAdmissionTests(unittest.TestCase):
             rpo_seconds=60,rto_seconds=60,
             restored_artifact_hashes=dr_identity["restored_artifact_hashes"],
             semantic_checks=("ok",),passed=True)
-        return release,promotion,sec_evidence,dr,build,package_integrity
+        self.package_integrity=package_integrity
+        return release,promotion,sec_evidence,dr,build
 
     def test_all_controls_required_for_admission(self):
         with tempfile.TemporaryDirectory() as d:
-            release,promotion,security,dr,build,package_integrity=self.fixture(Path(d))
+            release,promotion,security,dr,build=self.fixture(Path(d))
             gate=build_production_admission_gate(
-                release,promotion,security,dr,build,package_integrity,
+                release,promotion,security,dr,build,self.package_integrity,
                 admitted_at="2026-09-24T13:11:00Z")
             self.assertEqual(
                 gate.as_dict()["state"],"PRODUCTION_ADMISSION_READY")
@@ -171,10 +172,10 @@ class ProductionAdmissionTests(unittest.TestCase):
 
     def test_stale_dr_or_wrong_build_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
-            release,promotion,security,dr,build,package_integrity=self.fixture(Path(d))
+            release,promotion,security,dr,build=self.fixture(Path(d))
             with self.assertRaisesRegex(ValueError,"too old"):
                 build_production_admission_gate(
-                    release,promotion,security,dr,build,package_integrity,
+                    release,promotion,security,dr,build,self.package_integrity,
                     admitted_at="2026-10-10T13:11:00Z",
                     policy=ProductionAdmissionPolicy(max_dr_age_seconds=3600))
             with self.assertRaisesRegex(ValueError,"manifest_id"):
