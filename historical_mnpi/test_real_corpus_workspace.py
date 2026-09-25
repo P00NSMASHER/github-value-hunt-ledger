@@ -93,7 +93,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(
             imported.counts(),
             {
-                "announcement_rows": 20,
+                "announcement_rows": 23,
                 "listing_rows": 0,
                 "shares_rows": 0,
                 "control_rows": 0,
@@ -103,7 +103,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(len(imported.announcements), 20)
+        self.assertEqual(len(imported.announcements), 23)
         by_event = {
             item.event_id: item
             for item in imported.announcements
@@ -188,6 +188,18 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             by_event["HEJFE-2558DC6865781793"].timestamp,
             "2013-04-23T16:05:00-04:00",
         )
+        self.assertEqual(
+            by_event["HEJFE-2C887DA6F617936F"].timestamp,
+            "2013-09-19T16:05:00-04:00",
+        )
+        self.assertEqual(
+            by_event["HEJFE-ED329F780A1085DA"].timestamp,
+            "2013-04-23T16:01:00-04:00",
+        )
+        self.assertEqual(
+            by_event["HEJFE-830337A8564B826E"].timestamp,
+            "2013-10-17T16:00:00-04:00",
+        )
         self.assertTrue(all(
             item.proves_first_public_release
             for item in imported.announcements
@@ -199,7 +211,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(manifest["announcement_exact_resolved"], 20)
+        self.assertEqual(manifest["announcement_exact_resolved"], 23)
         self.assertEqual(manifest["listing_metadata_resolved"], 0)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
@@ -260,15 +272,15 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["announcement_review_batches_completed"],
-            4,
+            5,
         )
         self.assertEqual(
             manifest["announcement_events_reviewed_in_batch_sequence"],
-            120,
+            150,
         )
         self.assertEqual(
             manifest["announcement_unresolved_after_batch_review"],
-            104,
+            131,
         )
 
 
@@ -419,6 +431,47 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
                 "HEJFE-89844B5980EB5339",
                 "HEJFE-56483839E5F0E88F",
                 "HEJFE-2558DC6865781793",
+            },
+        )
+        self.assertTrue(all(row["reason"] for row in batch))
+
+
+    def test_announcement_batch_five_reviews_exactly_30_events(self):
+        review_path = CORPUS_DIR / "announcement_review_log.csv"
+        with review_path.open(
+            "r",
+            encoding="utf-8",
+            newline="",
+        ) as handle:
+            rows = list(csv.DictReader(handle))
+
+        batch = [
+            row for row in rows
+            if row["batch_id"] == "G1-BATCH-005"
+        ]
+        self.assertEqual(len(batch), 30)
+        self.assertEqual(
+            [int(row["batch_position"]) for row in batch],
+            list(range(1, 31)),
+        )
+        self.assertEqual(len({row["event_id"] for row in batch}), 30)
+
+        resolved = [
+            row for row in batch
+            if row["review_status"] == "RESOLVED_EXACT_PUBLIC_TIME"
+        ]
+        unresolved = [
+            row for row in batch
+            if row["review_status"] == "UNRESOLVED_AFTER_REVIEW"
+        ]
+        self.assertEqual(len(resolved), 3)
+        self.assertEqual(len(unresolved), 27)
+        self.assertEqual(
+            {row["event_id"] for row in resolved},
+            {
+                "HEJFE-2C887DA6F617936F",
+                "HEJFE-ED329F780A1085DA",
+                "HEJFE-830337A8564B826E",
             },
         )
         self.assertTrue(all(row["reason"] for row in batch))
