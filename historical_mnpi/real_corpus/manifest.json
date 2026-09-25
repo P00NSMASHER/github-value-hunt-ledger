@@ -1,5 +1,5 @@
 {
-  "announcement_exact_resolved": 11,
+  "announcement_exact_resolved": 12,
   "control_dates_resolved": 0,
   "derived_backbone_sha256": "5bce35d49bae04a52d45d82e81fb7c640509cfaa8b0d044a4ecbadd408d03b58",
   "event_date_max": "2015-05-20",
@@ -18,5 +18,5 @@
   "unique_symbols": 146,
   "announcement_review_batches_completed": 2,
   "announcement_events_reviewed_in_batch_sequence": 60,
-  "announcement_unresolved_after_batch_review": 53
+  "announcement_unresolved_after_batch_review": 52
 }
