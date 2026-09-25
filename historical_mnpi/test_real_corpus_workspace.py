@@ -76,7 +76,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
             self.assertEqual(row["event_id"], expected)
 
-    def test_workspace_metadata_files_are_strict_header_only_inputs(self):
+    def test_workspace_metadata_files_import_current_verified_rows(self):
         import_dir = CORPUS_DIR / "import"
         names = (
             "announcement_metadata.csv",
@@ -93,7 +93,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(
             imported.counts(),
             {
-                "announcement_rows": 0,
+                "announcement_rows": 1,
                 "listing_rows": 0,
                 "shares_rows": 0,
                 "control_rows": 0,
@@ -103,13 +103,25 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             },
         )
 
-    def test_manifest_preserves_current_real_readiness_as_zero(self):
+        self.assertEqual(len(imported.announcements), 1)
+        announcement = imported.announcements[0]
+        self.assertEqual(
+            announcement.event_id,
+            "HEJFE-A413A5AC6E515E3C",
+        )
+        self.assertEqual(
+            announcement.timestamp,
+            "2011-04-28T07:00:00-04:00",
+        )
+        self.assertTrue(announcement.proves_first_public_release)
+
+    def test_manifest_tracks_current_real_readiness(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(
                 encoding="utf-8"
             )
         )
-        self.assertEqual(manifest["announcement_exact_resolved"], 0)
+        self.assertEqual(manifest["announcement_exact_resolved"], 1)
         self.assertEqual(manifest["listing_metadata_resolved"], 0)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
