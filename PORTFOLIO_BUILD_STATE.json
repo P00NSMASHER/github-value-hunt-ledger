@@ -221,6 +221,15 @@
         "docs/PORTFOLIO_BRAIN_ARCHITECTURE_CONTRACT.md",
         "PORTFOLIO_BUILD_STATE.json"
       ]
+    },
+    {
+      "decision_id": "DEC-020",
+      "summary": "Represent the uncreated dedicated repository with a relocatable portfolio_brain_seed manifest. The Step 1 registration mechanism is deny-by-default and grants no authority; Step 2 will expand it into the full project/autonomy/objective/metric schemas.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_brain_seed/FOUNDATION_SKELETON.json",
+        "portfolio_brain_seed/registry/PROJECT_REGISTRATION_CONTRACT.json"
+      ]
     }
   ],
   "blockers": [
@@ -249,7 +258,7 @@
       "requires_human_decision": true
     }
   ],
-  "architecture_version": "0.1.1",
+  "architecture_version": "0.1.2",
   "state_id": "portfolio-brain-master",
   "working_branch": "portfolio-brain-step1-foundation-20260925",
   "phase": "architecture_build",
@@ -299,6 +308,18 @@
       "kind": "step1_architecture_contract_staging",
       "step": 1,
       "commit_sha": "a75148054f57f8388093359a8cb1b67c9a26d646"
+    },
+    {
+      "path": "portfolio_brain_seed/FOUNDATION_SKELETON.json",
+      "kind": "step1_foundation_skeleton_manifest",
+      "step": 1,
+      "commit_sha": "cba39a987e484b328d9b817f6e49798de966f034"
+    },
+    {
+      "path": "portfolio_brain_seed/registry/PROJECT_REGISTRATION_CONTRACT.json",
+      "kind": "step1_project_registration_contract",
+      "step": 1,
+      "commit_sha": "0409a1c42c438b8352f311bb6bf8b943e0ed9740"
     }
   ],
   "tests": [
@@ -343,31 +364,36 @@
       "status": "PASS",
       "step": 1,
       "evidence": "Exact staged contract fetched at commit a75148054f57f8388093359a8cb1b67c9a26d646; required repository, evidence, autonomy, builder/verifier, state, model-independence, data and runtime-safety boundaries are present."
+    },
+    {
+      "name": "step1_skeleton_registration_invariants",
+      "status": "PASS",
+      "step": 1,
+      "evidence": "10 deterministic checks passed against exact staged JSON blobs b828f9f74c509ad9684088feb29e28da9d661856 and bc23c840a258e1f2109fdd378feb56f8fb4bd3bb: required structure, project identity, adapter declarations, deny-by-default settings, stable IDs, autonomy separation and trading prohibition."
     }
   ],
   "next_action": {
     "step": 1,
-    "summary": "WAIT FOR CONTINUE. Step 1A architecture contract is staged and verified. Next small step: stage the minimal Portfolio Brain directory skeleton and project-registration contract without enabling downstream writes.",
+    "summary": "WAIT FOR CONTINUE. Step 1B staged skeleton and deny-by-default project-registration contract are verified. Next small step: add the deterministic foundation validator and initial CI definition to the relocatable seed; do not enable any autonomous or downstream writes.",
     "preconditions": [
       "Read this root PORTFOLIO_BUILD_STATE.json first.",
       "Do not repeat Step 0 reconnaissance unless a pinned source changed.",
-      "Keep all Step 1 work isolated from product repositories and main branches.",
-      "Do not enable downstream adapters, schedules, model calls or ACT authority.",
-      "Dedicated repository creation remains blocked by BLK-004; staged artifacts are reviewable but are not the final PRJ-000 repository."
+      "Use portfolio_brain_seed as relocatable staging only; it is not the final PRJ-000 repository.",
+      "Keep adapters, autonomous scheduling, model calls, deployments, downstream writes and external ACT disabled.",
+      "Dedicated repository creation remains blocked by BLK-004."
     ]
   },
-  "updated_at": "2026-09-25T14:54:00Z",
+  "updated_at": "2026-09-25T15:03:00Z",
   "step_progress": {
     "1": {
       "status": "IN_PROGRESS",
       "completed_substeps": [
-        "1A_ARCHITECTURE_CONTRACT"
+        "1A_ARCHITECTURE_CONTRACT",
+        "1B_STAGED_SKELETON_AND_REGISTRATION_CONTRACT"
       ],
       "pending_substeps": [
-        "1B_DEDICATED_REPOSITORY",
-        "1C_FOUNDATION_SKELETON",
-        "1D_PROJECT_REGISTRATION",
-        "1E_INITIAL_CI"
+        "1C_INITIAL_CI_AND_VALIDATOR",
+        "1D_DEDICATED_REPOSITORY_MATERIALIZATION"
       ],
       "authority_change": "NONE"
     }
