@@ -12,6 +12,8 @@ intervals fail closed.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import csv
+import io
 from datetime import date
 import csv
 import io
@@ -192,6 +194,46 @@ class ListingIntervalExpansion:
         })
 
 
+def parse_listing_intervals_csv(
+    text: str,
+) -> tuple[ListingIntervalEvidence, ...]:
+    reader = csv.DictReader(io.StringIO(text))
+    expected = (
+        "interval_id",
+        "symbol",
+        "primary_exchange",
+        "valid_from",
+        "valid_through",
+        "start_evidence_url",
+        "end_evidence_url",
+        "source_name",
+        "data_class",
+    )
+    if tuple(reader.fieldnames or ()) != expected:
+        raise ValueError("listing interval CSV has unexpected headers")
+
+    result = []
+    for line_number, row in enumerate(reader, start=2):
+        try:
+            data_class = MetadataDataClass(row["data_class"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"invalid data_class at line {line_number}"
+            ) from exc
+        result.append(ListingIntervalEvidence(
+            interval_id=row["interval_id"] or "",
+            symbol=row["symbol"] or "",
+            primary_exchange=row["primary_exchange"] or "",
+            valid_from=row["valid_from"] or "",
+            valid_through=row["valid_through"] or "",
+            start_evidence_url=row["start_evidence_url"] or "",
+            end_evidence_url=row["end_evidence_url"] or "",
+            source_name=row["source_name"] or "",
+            data_class=data_class,
+        ))
+    return tuple(result)
+
+
 def expand_listing_intervals(
     requirements: Iterable[tuple[str, str]],
     intervals: Iterable[ListingIntervalEvidence],
@@ -260,5 +302,6 @@ __all__ = [
     "ListingIntervalEvidence",
     "ListingIntervalExpansion",
     "expand_listing_intervals",
+    "parse_listing_intervals_csv",
     "parse_listing_interval_csv",
 ]
