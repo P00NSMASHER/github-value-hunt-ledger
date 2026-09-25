@@ -1,0 +1,16 @@
+{
+  "version": "commercial-evidence-sprint-v1",
+  "status": "ACTIVE",
+  "architecture_freeze": true,
+  "primary_tracks": [
+    "freightrecovery",
+    "capturebrief"
+  ],
+  "infrastructure_tracks": [
+    "recoveryos"
+  ],
+  "hunter_mode": "NAMED_EVIDENCE_GAP_ONLY",
+  "new_recoveryworks_lane_requires_buyer_evidence": true,
+  "exit_gate": "VERIFIED_EXTERNAL_REVENUE_LOOP_OUTCOME",
+  "consequential_actions_authorized": false
+}
