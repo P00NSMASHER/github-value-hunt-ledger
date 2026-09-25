@@ -60,12 +60,14 @@ def commercial():
 class ProductionLaunchDossierTests(unittest.TestCase):
     def test_dossier_binds_all_readiness_planes_without_claiming_traction(self):
         with tempfile.TemporaryDirectory() as d:
-            release,promotion,security,dr,build = ProductionAdmissionTests().fixture(
+            admission_fixture = ProductionAdmissionTests()
+            release,promotion,security,dr,build = admission_fixture.fixture(
                 Path(d)
             )
             from recoveryworks.production_admission import build_production_admission_gate
             admission = build_production_admission_gate(
                 release,promotion,security,dr,build,
+                admission_fixture.package_integrity,
                 admitted_at="2026-09-24T13:11:00Z",
             )
             run_identity = {
@@ -150,7 +152,8 @@ class ProductionLaunchDossierTests(unittest.TestCase):
     def test_failed_observability_run_cannot_enter_dossier(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
-            release,promotion,security,dr,build = ProductionAdmissionTests().fixture(
+            admission_fixture = ProductionAdmissionTests()
+            release,promotion,security,dr,build = admission_fixture.fixture(
                 root
             )
             from recoveryworks.production_admission import build_production_admission_gate
@@ -159,6 +162,7 @@ class ProductionLaunchDossierTests(unittest.TestCase):
             from recoveryworks.release_control import build_rollback_manifest
             admission=build_production_admission_gate(
                 release,promotion,security,dr,build,
+                admission_fixture.package_integrity,
                 admitted_at="2026-09-24T13:11:00Z")
             failed_identity = {
                 "schema": 1,
