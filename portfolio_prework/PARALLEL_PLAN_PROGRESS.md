@@ -9,7 +9,7 @@ Working branch: `portfolio-parallel-prep`
 | 3 | Repository snapshot generator | **COMPLETE** |
 | 4 | SHA-based change detector | **COMPLETE** |
 | 5 | Durable build-state schema | **COMPLETE** |
-| 6 | Autonomy matrix | PENDING |
+| 6 | Autonomy matrix | **COMPLETE** |
 | 7 | GitHub workflow inventory | PENDING |
 | 8 | Test-suite inventory | PENDING |
 | 9 | Dependency inventory | PENDING |
@@ -63,6 +63,17 @@ Created:
 - `portfolio_prework/test_validate_build_state.py`
 
 The durable state now records architecture/build version, current and completed steps, per-repository inspection SHAs/status, accepted architectural decisions, artifacts, test evidence, blockers and the exact next action. Standard-library validation enforces resumability invariants, including unique completed steps, valid SHAs, valid status enums, unique decision/artifact identities and exact alignment between `current_step` and `next_action.step`. Focused CI passed with the new build-state tests included.
+
+## Step 6 result
+
+Created:
+- `portfolio_prework/AUTONOMY_ACTION_TAXONOMY.json`
+- `portfolio_prework/test_autonomy_action_taxonomy.py`
+- `portfolio_prework/AUTONOMY_MATRIX.json`
+- `portfolio_prework/AUTONOMY_MATRIX.md`
+- `portfolio_prework/test_autonomy_matrix.py`
+
+Step 6 now defines the global autonomy classes and applies them to all 12 canonical projects. OBSERVE is autonomous, EXPERIMENT is bounded to non-consequential work, MODIFY is limited to isolated candidate changes with testing/verification gates, and ACT is never generally autonomous. Recovery/customer/financial/production actions remain human-gated, child-facing consequential changes remain human-gated, and live trading/broker execution is explicitly prohibited. Matrix coverage matches the project registry exactly, and focused CI is green.
 
 ## Rule
 
