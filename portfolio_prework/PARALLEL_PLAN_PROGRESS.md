@@ -8,7 +8,7 @@ Working branch: `portfolio-parallel-prep`
 | 2 | Stable project IDs | **COMPLETE** |
 | 3 | Repository snapshot generator | **COMPLETE** |
 | 4 | SHA-based change detector | **COMPLETE** |
-| 5 | Durable build-state schema | PENDING |
+| 5 | Durable build-state schema | **COMPLETE** |
 | 6 | Autonomy matrix | PENDING |
 | 7 | GitHub workflow inventory | PENDING |
 | 8 | Test-suite inventory | PENDING |
@@ -53,6 +53,16 @@ Created:
 - `portfolio_prework/REPOSITORY_DELTA.md`
 
 The detector performs the cheapest possible first check: current default-branch HEAD versus the cached snapshot SHA. Unchanged repositories stop there and are explicitly marked as not requiring deep inspection. Changed repositories alone receive a compare request and changed-file list. The current baseline found 6 unchanged repositories and 1 changed repository (`abvmschoolstarworld`), with 6 changed files across 13 commits. Focused CI now discovers all prework tests and is green.
+
+## Step 5 result
+
+Created:
+- `portfolio_prework/PORTFOLIO_BUILD_STATE.schema.json`
+- `portfolio_prework/PORTFOLIO_BUILD_STATE.json`
+- `portfolio_prework/validate_build_state.py`
+- `portfolio_prework/test_validate_build_state.py`
+
+The durable state now records architecture/build version, current and completed steps, per-repository inspection SHAs/status, accepted architectural decisions, artifacts, test evidence, blockers and the exact next action. Standard-library validation enforces resumability invariants, including unique completed steps, valid SHAs, valid status enums, unique decision/artifact identities and exact alignment between `current_step` and `next_action.step`. Focused CI passed with the new build-state tests included.
 
 ## Rule
 
