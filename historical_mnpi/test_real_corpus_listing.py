@@ -117,7 +117,7 @@ class RealCorpusListingTests(unittest.TestCase):
         self.assertEqual(len(result.unresolved), 1694)
         self.assertEqual(
             len({item.symbol for item in result.resolved}),
-            69,
+            74,
         )
 
         # Preserve known anchor intervals from the first verified group.
