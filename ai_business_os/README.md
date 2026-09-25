@@ -179,3 +179,22 @@ Executive capital-allocation extension: **implemented and regression-tested on t
 - **Private operating state:** `ai_business_os_prod`.
 - **Database definition:** `supabase/migrations/ai_business_os/`, with exact live migration statement hashes and a live schema fingerprint.
 - **Canonical CI:** runs on pull requests and pushes to `main`, uses immutable GitHub Action SHAs, and executes the full `ai_business_os` regression suite.
+
+
+## Production-use CEO Command Center operator
+
+The production-use bridge adds a human-facing orchestration layer without weakening the existing
+governance model:
+
+- live command-center, portfolio, approval, and planning state is read from `ai_business_os_prod`;
+- ordinary-language objectives become deterministic, content-addressed proposals;
+- proposal creation is read-only;
+- only the requesting HUMAN may activate the exact proposal hash;
+- activation creates a PENDING internal goal and grants no external-write authority;
+- likely external/prod/money/destructive intent is surfaced before execution;
+- human approval decisions are bound to the live `request_key` + `intent_hash` and use the
+  existing production `approval_decide` procedure;
+- the command center never consumes approvals or executes the consequential action itself.
+
+See `CEO_COMMAND_CENTER_CONTRACT.md`, `ceo_command_center.py`, and
+`test_ceo_command_center.py`.
