@@ -88,7 +88,7 @@ async function activateGoal(payload: Record<string, unknown>) {
         evidence_requirements, created_at, updated_at
       ) values (
         ${agentId}, ${goalType}, ${objective}, 'PENDING', ${priority},
-        ${JSON.stringify(constraints)}::jsonb, ${sql.json(evidence)},
+        ${JSON.stringify(constraints)}::jsonb, ${JSON.stringify(evidence)}::jsonb,
         now(), now()
       )
       returning id, agent_id, goal_type, title, status, priority, constraints, evidence_requirements
@@ -140,7 +140,7 @@ async function workerSubmit(payload: Record<string, unknown>) {
       ${requireString(payload.run_id,"run_id")}::uuid,
       ${Number(payload.lease_generation)}::bigint,
       ${requireString(payload.output_hash,"output_hash")},
-      ${JSON.stringify(evidence)}::jsonb,
+      ${sql.json(evidence)},
       ${requireString(payload.summary,"summary")}
     ) as payload
   `;
