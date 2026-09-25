@@ -425,3 +425,111 @@ row hash and durable-identity hash.
 As in all earlier steps, this remains limited to historical, already-public
 research/compliance use. It never authorizes live trading or ingestion of live
 confidential information.
+
+
+
+## Step 11 — economic transaction deduplication
+
+Approved historical source rows can now be compared as possible descriptions of
+the same underlying economic transaction without deleting or collapsing their
+source provenance.
+
+### Source-independent signatures
+
+Only rows already approved for the historical research corpus can produce an
+`EconomicTransactionSignature`.
+
+The signature uses:
+
+- durable trader identity;
+- durable issuer identity;
+- information-event identity;
+- instrument and side;
+- exact timestamp, date, or date-range precision;
+- currency;
+- quantity;
+- execution price;
+- option strike and expiry when present.
+
+Source IDs, artifact references, local trade IDs, and review IDs do not determine
+the source-independent economic key. They remain separately bound in the
+signature proof so the original source rows stay auditable.
+
+Decimal strings are canonicalized for comparison, and exact timestamps are
+compared as UTC instants so equivalent timezone offsets do not create false
+differences.
+
+### Conservative match states
+
+Pairwise comparison returns one of:
+
+- `EXACT_MATCH`;
+- `POSSIBLE_MATCH`;
+- `DISTINCT`;
+- `INSUFFICIENT_INFORMATION`.
+
+An automatic exact match requires:
+
+- the same durable trader;
+- the same durable issuer;
+- the same information event;
+- the same exact trade instant;
+- matching instrument;
+- matching side;
+- matching quantity;
+- matching execution price;
+- no known contradictory economic field.
+
+Coarse date/date-range overlap, missing economics, or unknown values never become
+automatic duplicates.
+
+### Economic cluster registry
+
+`EconomicClusterRegistry` groups approved signatures while preserving every
+normalized row as an individual member.
+
+A new row auto-joins a cluster only when it is `EXACT_MATCH` against **every
+existing member**. This prevents unsafe transitive merging.
+
+Rows that are possible or insufficient matches remain in separate clusters and
+generate deterministic `DedupReviewCandidate` records.
+
+Partial-exact situations, where a new signature exactly matches only some members
+of a cluster, also remain separate and require review.
+
+Every registration and cluster change is proof-hashed and recorded as an event.
+
+### Human dedup resolution
+
+A reviewer may resolve a pending candidate as:
+
+- `CONFIRMED_SAME_TRANSACTION`; or
+- `CONFIRMED_DISTINCT`.
+
+Same-transaction decisions consolidate the two active clusters while retaining
+all source-backed signatures and normalized row hashes.
+
+Distinct decisions leave the clusters separate and record permanent pairwise
+distinct constraints across the reviewed source and target clusters.
+
+Those confirmed-distinct constraints cannot later be bypassed through an indirect
+manual merge.
+
+A dedup candidate cannot be decided twice. Review timestamps must be
+timezone-aware and a rationale/reviewer ID are mandatory.
+
+If the target cluster changed after the candidate was generated, the old review
+candidate fails closed as stale.
+
+Related pending candidates are superseded when a human resolution changes or
+adjudicates the relationship between their clusters.
+
+### Review visibility
+
+`render_dedup_review_candidate_markdown` presents the candidate reason and every
+pairwise assessment, including agreeing, differing, and missing fields, without
+hiding uncertainty.
+
+The deduplication layer is historical/public-record research infrastructure only.
+It does not authorize live trading, use live confidential information, or delete
+the original SEC/DOJ/court/academic evidence rows.
