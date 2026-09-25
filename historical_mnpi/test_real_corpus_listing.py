@@ -4,10 +4,9 @@ import unittest
 from pathlib import Path
 
 from historical_mnpi.listing_intervals import (
-    ListingIntervalEvidence,
     expand_listing_intervals,
+    parse_listing_interval_csv,
 )
-from historical_mnpi.metadata_resolver import MetadataDataClass
 from historical_mnpi.real_corpus_import import (
     import_real_corpus_metadata,
 )
@@ -34,25 +33,10 @@ class RealCorpusListingTests(unittest.TestCase):
         return tuple(pairs)
 
     def _intervals(self):
-        with (CORPUS_DIR / "listing_interval_evidence.csv").open(
-            "r",
-            encoding="utf-8",
-            newline="",
-        ) as handle:
-            rows = list(csv.DictReader(handle))
-        return tuple(
-            ListingIntervalEvidence(
-                interval_id=row["interval_id"],
-                symbol=row["symbol"],
-                primary_exchange=row["primary_exchange"],
-                valid_from=row["valid_from"],
-                valid_through=row["valid_through"],
-                start_evidence_url=row["start_evidence_url"],
-                end_evidence_url=row["end_evidence_url"],
-                source_name=row["source_name"],
-                data_class=MetadataDataClass(row["data_class"]),
+        return parse_listing_interval_csv(
+            (CORPUS_DIR / "listing_intervals.csv").read_text(
+                encoding="utf-8"
             )
-            for row in rows
         )
 
     def test_compact_requirement_index_reconstructs_3828_rows(self):
