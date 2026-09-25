@@ -604,10 +604,10 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         for item in imported.listings:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(set(by_symbol), {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GDI", "GILD", "GMCR", "GME", "HON", "IDTI", "ILMN", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"})
+        self.assertEqual(set(by_symbol), {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GDI", "GILD", "GMCR", "GME", "GNRC", "GNTX", "GORO", "GT", "HAE", "HON", "IDTI", "ILMN", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"})
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
-            {"ACHC": 22, "ACO": 22, "AF": 22, "AGP": 22, "ALGN": 22, "ALNY": 22, "ALSN": 22, "AMD": 22, "AMP": 22, "AMSG": 22, "APC": 22, "ATRC": 22, "AVA": 22, "ADI": 44, "BA": 22, "BCR": 22, "BIO": 22, "BRKR": 22, "BWA": 22, "CA": 44, "CACI": 22, "CAG": 22, "CAKE": 22, "CAMP": 22, "CAT": 22, "CB": 22, "CBT": 22, "CENX": 22, "CGNX": 44, "CLD": 44, "CMP": 22, "CMTL": 22, "CNMD": 22, "COL": 22, "COLM": 44, "CR": 22, "CRL": 22, "CREE": 44, "CSOD": 22, "DEST": 22, "DE": 22, "DGI": 66, "DNDN": 22, "DXCM": 22, "DYN": 22, "EA": 22, "ECHO": 22, "ECOL": 22, "EHTH": 44, "EW": 44, "F": 22, "FL": 22, "FLR": 22, "FLT": 22, "GDI": 22, "GILD": 22, "GMCR": 22, "GME": 22, "HON": 22, "IDTI": 44, "ILMN": 44, "JNPR": 88, "MDU": 44, "MTH": 44, "MUSA": 44, "NKE": 22, "PNRA": 88, "SBUX": 22, "VMW": 66},
+            {"ACHC": 22, "ACO": 22, "AF": 22, "AGP": 22, "ALGN": 22, "ALNY": 22, "ALSN": 22, "AMD": 22, "AMP": 22, "AMSG": 22, "APC": 22, "ATRC": 22, "AVA": 22, "ADI": 44, "BA": 22, "BCR": 22, "BIO": 22, "BRKR": 22, "BWA": 22, "CA": 44, "CACI": 22, "CAG": 22, "CAKE": 22, "CAMP": 22, "CAT": 22, "CB": 22, "CBT": 22, "CENX": 22, "CGNX": 44, "CLD": 44, "CMP": 22, "CMTL": 22, "CNMD": 22, "COL": 22, "COLM": 44, "CR": 22, "CRL": 22, "CREE": 44, "CSOD": 22, "DEST": 22, "DE": 22, "DGI": 66, "DNDN": 22, "DXCM": 22, "DYN": 22, "EA": 22, "ECHO": 22, "ECOL": 22, "EHTH": 44, "EW": 44, "F": 22, "FL": 22, "FLR": 22, "FLT": 22, "GDI": 22, "GILD": 22, "GMCR": 22, "GME": 22, "GNRC": 22, "GNTX": 22, "GORO": 22, "GT": 22, "HAE": 22, "HON": 22, "IDTI": 44, "ILMN": 44, "JNPR": 88, "MDU": 44, "MTH": 44, "MUSA": 44, "NKE": 22, "PNRA": 88, "SBUX": 22, "VMW": 66},
         )
         self.assertEqual(
             {row.primary_exchange for row in by_symbol["CNMD"]},
@@ -1008,14 +1008,14 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             for row in rows
         ))
 
-    def test_g2_interval_ledger_has_69_unique_intervals(self):
+    def test_g2_interval_ledger_has_74_unique_intervals(self):
         path = CORPUS_DIR / "listing_interval_evidence.csv"
         with path.open("r", encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
         self.assertEqual(len(rows), 74)
         self.assertEqual(
             len({row["interval_id"] for row in rows}),
-            69,
+            74,
         )
         by_symbol = {
             row["symbol"]: row
