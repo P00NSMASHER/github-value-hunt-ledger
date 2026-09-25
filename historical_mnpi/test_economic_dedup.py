@@ -589,5 +589,81 @@ class EconomicDedupTests(unittest.TestCase):
 
 
 
+    def test_confirmed_distinct_applies_to_entire_source_target_clusters(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        second = registry.register(sig(2))
+        third = registry.register(sig(
+            3,
+            timestamp="2015-08-10T18:31:22Z",
+        ))
+        self.assertEqual(
+            third.action,
+            ClusterRegistrationAction.AUTO_JOINED_EXACT,
+        )
+        self.assertGreaterEqual(len(registry.pending_review_candidates()), 2)
+
+        resolution = registry.decide_review_candidate(
+            second.review_candidates[0].candidate_id,
+            decision=DedupReviewDecisionType.CONFIRMED_DISTINCT,
+            reviewer_id="reviewer:dedup",
+            reviewed_at="2026-09-25T09:30:00-04:00",
+            rationale="The coarse public record is a distinct execution.",
+        )
+        self.assertEqual(
+            resolution.decision,
+            DedupReviewDecisionType.CONFIRMED_DISTINCT,
+        )
+        self.assertEqual(len(registry.confirmed_distinct_pair_keys()), 2)
+        self.assertTrue(registry.superseded_review_candidates())
+        self.assertEqual(registry.pending_review_candidates(), ())
+
+    def test_prior_confirmed_distinct_blocks_future_indirect_manual_merge(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        second = registry.register(sig(2))
+        registry.register(sig(
+            3,
+            timestamp="2015-08-10T18:31:22Z",
+        ))
+        registry.decide_review_candidate(
+            second.review_candidates[0].candidate_id,
+            decision=DedupReviewDecisionType.CONFIRMED_DISTINCT,
+            reviewer_id="reviewer:dedup",
+            reviewed_at="2026-09-25T09:35:00-04:00",
+            rationale="Confirmed distinct.",
+        )
+
+        fourth = registry.register(sig(
+            4,
+            timestamp="2015-08-10T18:31:22+00:00",
+        ))
+        candidate = next(
+            item
+            for item in fourth.review_candidates
+            if item.reason == "NON_EXACT_MATCH_REQUIRES_REVIEW"
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            "confirmed-distinct relationship",
+        ):
+            registry.decide_review_candidate(
+                candidate.candidate_id,
+                decision=DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION,
+                reviewer_id="reviewer:dedup",
+                reviewed_at="2026-09-25T09:36:00-04:00",
+                rationale="Cannot override prior distinct adjudication indirectly.",
+            )
+
+
+
 if __name__ == "__main__":
     unittest.main()
