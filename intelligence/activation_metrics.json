@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "activation_generation_id": "ACTGEN:b76bad668f75",
-  "clock_commit_sha": "f45e4ec2320b1c9901149412d44ab189021665e3",
-  "clock_timestamp": "2026-09-25T13:18:02Z",
+  "activation_generation_id": "ACTGEN:5b383755967b",
+  "clock_commit_sha": "ba1d30b50f9f2799c314c1a522e224c1c7c04508",
+  "clock_timestamp": "2026-09-25T14:17:49Z",
   "registered_workers": 14,
   "fresh_ready_workers": 0,
   "current_activations": 0,
