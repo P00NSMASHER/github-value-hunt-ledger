@@ -2,9 +2,9 @@
   "schema": "ai_business_os_prod",
   "source": "supabase_migrations.schema_migrations",
   "exported_from_live_database": true,
-  "latest_version": "20260925151646",
-  "migration_count": 43,
-  "live_schema_fingerprint_sha256": "edb8248cd492364ed85745a6b6387db2334ee5db19e6b03a83c2f7d366de1529",
+  "latest_version": "20260925164737",
+  "migration_count": 45,
+  "live_schema_fingerprint_sha256": "9c1ee0f04e9126a1da1a96e6305665d3f8554888b1fe55073009ebec78e2e253",
   "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
   "migrations": [
     {
@@ -221,6 +221,16 @@
       "version": "20260925151646",
       "name": "add_ai_business_os_persistent_worker_control_v1",
       "sha256": "07d7f2fbcc8f7f6d05af696632db33b4a046395560c4936e5e804d653f14f89e"
+    },
+    {
+      "version": "20260925164427",
+      "name": "add_ai_business_os_outreach_delivery_failure_outcome_v1",
+      "sha256": "477647aa84718a7482af1a80de6259c12f8d8c11ef838b1d3149ce8195ca6cd7"
+    },
+    {
+      "version": "20260925164737",
+      "name": "surface_ai_business_os_outreach_delivery_evidence_v1",
+      "sha256": "bf8dda1b7dea9ca19c40ec0d46e1bf82296960d97127ee7d2edde7ba931b864a"
     }
   ],
   "public_bootstrap_sanitized": true,
@@ -231,5 +241,5 @@
     "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
   ],
   "live_statement_hashes_retained": true,
-  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Verified external outcomes feed allocator memory; persistent workers use generation-bound leases, stale recovery, and independent-verification submission without self-completion."
+  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. First real external outcome is an outreach delivery failure; buyer rejection and market demand remain separate signals."
 }
