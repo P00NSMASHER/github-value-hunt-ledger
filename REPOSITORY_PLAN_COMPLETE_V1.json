@@ -1,0 +1,63 @@
+{
+  "plan_version": "repository-consolidation-commercial-evidence-v1",
+  "status": "COMPLETE_10_OF_10",
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Stabilize foundation",
+      "steps": [
+        1,
+        2,
+        3
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "phase": 2,
+      "name": "Clean and harden delivery",
+      "steps": [
+        4,
+        5
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "phase": 3,
+      "name": "Commercial evidence",
+      "steps": [
+        6,
+        7,
+        8
+      ],
+      "status": "COMPLETE"
+    },
+    {
+      "phase": 4,
+      "name": "Close the learning loop",
+      "steps": [
+        9,
+        10
+      ],
+      "status": "COMPLETE"
+    }
+  ],
+  "completed_steps": [
+    "Fix public/private boundary",
+    "Make ai_business_os canonical",
+    "Version production database",
+    "Create unified repository release gate",
+    "Close stale PR backlog and establish cleanup boundary",
+    "Freeze net-new architecture around named evidence gaps",
+    "Focus FreightRecovery and CaptureBrief as primary commercial validation tracks",
+    "Separate StarBlox consumer/R&D economics from B2B cash-flow economics",
+    "Normalize rights/provenance across subsystems",
+    "Make verified external outcomes drive value memory and pool-scoped allocation"
+  ],
+  "operating_truth": {
+    "real_verified_external_outcomes": 0,
+    "current_allocation_changes_from_outcomes": 0,
+    "consequential_autonomy_enabled": 0,
+    "statement": "Infrastructure is complete; commercial evidence must now be earned from real external outcomes."
+  },
+  "final_step_contract": "ai_business_os/EXTERNAL_OUTCOME_LEARNING_V1.json"
+}
