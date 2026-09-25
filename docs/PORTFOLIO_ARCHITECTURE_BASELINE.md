@@ -19,7 +19,7 @@ The pass was intentionally architecture-focused rather than a blind reread of ev
 6. search the main control/research repository for existing equivalents of the requested universal event system, model router, uncertainty engine, repository-delta adapters, and persistent scheduler;
 7. classify existing components as **reuse**, **adapt**, **project-local**, **legacy**, or **missing**.
 
-No product repository was modified during reconnaissance.
+No product repository was modified during reconnaissance.\n\nDuring final verification, `trading-platform/main` advanced by one commit. Only that delta was inspected: the two CI workflows were pinned to Ubuntu 24.04 and pip 26.2.1 and the release-drift allowlist hashes were updated accordingly. No surveillance/research architecture changed, so no repeat tree scan was performed.
 
 ### Evidence standard for this baseline
 
@@ -35,7 +35,7 @@ No product repository was modified during reconnaissance.
 | `P00NSMASHER/github-value-hunt-ledger` | `1ea7fff759ff592734d15e4170a9a393bc87ee4f` | Hunter, Technology Intelligence, AI Business OS, RecoveryWorks/RecoveryOS, Freight, experiments, shared control research | Repository Release Gate and AI Business OS Canonical CI both passed at exact head |
 | `P00NSMASHER/StarBlox` | `36f2084eac013853a612892c19646dedab97c204` | StarBlox product, learning systems, economy/art/runtime, Roblox/AI development factory | StarBlox CI passed at exact head |
 | `P00NSMASHER/abvmschoolstarworld` | `a15c7c2214a065707123e9b8ab8ac51a42240345` | ABVM Grade 2 Parent Companion and teacher-page refresh | App QA, Pages deployment, and operational-health workflows passed at exact head |
-| `P00NSMASHER/trading-platform` | `a74f06435a6bd668661005403e493f57f29b5d77` | Historical market-surveillance research only | Two current-head dependency automation runs passed; no current-head PR CI run was established in this pass |
+| `P00NSMASHER/trading-platform` | `f9be7d5537d38bef24a5b0f99022c5d5885988d1` | Historical market-surveillance research only | No Actions run was present at the final exact head; the one-commit delta was inspected and only pins CI runner/pip inputs plus matching release-drift hashes |
 | `P00NSMASHER/permitplate-nyc` | `7c9a8fc4dd9fa12275d336beb8eb10732718666a` | Permit intelligence, source observation, detection/opportunity ledgers | Deterministic regression, launch readiness, source health, and current graph have passing evidence; scheduled detection/scoring jobs currently fail at known steps |
 | `P00NSMASHER/permitplate-state` | `c64fe06a22c3826c9ad3a7b85a4f911a6e589c19` | PermitPlate durable operational state | Repository contract says private; GitHub metadata currently reports **public** visibility — critical boundary mismatch |
 | `P00NSMASHER/capturebrief` | `3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba` | CaptureBrief public-source pursuit QA, decision evidence, outcome/watch systems | Product Core passed at exact head; scheduled ABVM school-pack refreshes also pass |
