@@ -13,9 +13,9 @@ Advisory packets that freeze **what** to measure before execution. They do not a
 
 | Packet | Strategy | Phase | Seed | Objective |
 |---|---|---|---|---|
-| LMP:22b9ba3ee5dc0dc8 | STRAT:acceptance-path-transition-inspection | train_measurement | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | OBJ:current-rule-authority |
-| LMP:78280f5bc099ca0e | STRAT:rule-period-authority-version-audit | train_measurement | SEED:learn:rule-period-authority-version-audit-abstention-transfer | OBJ:independent-evaluation |
-| LMP:1dafa60a98e37eb8 | STRAT:bidirectional-money-evidence-invariant-tracing | train_measurement | SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer | OBJ:runtime-side-effect |
+| LMP:c6a7aa3d00145786 | STRAT:acceptance-path-transition-inspection | train_measurement | SEED:learn:acceptance-path-transition-inspection-rule-version-transfer | OBJ:current-rule-authority |
+| LMP:d243783ad7d6680b | STRAT:rule-period-authority-version-audit | train_measurement | SEED:learn:rule-period-authority-version-audit-abstention-transfer | OBJ:independent-evaluation |
+| LMP:2a733f0a24b926e4 | STRAT:bidirectional-money-evidence-invariant-tracing | train_measurement | SEED:learn:bidirectional-money-evidence-invariant-tracing-promotion-control-transfer | OBJ:runtime-side-effect |
 
 ## Execution boundary
 

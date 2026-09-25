@@ -1,6 +1,6 @@
 # HUNT ALLOCATOR REPORT
 
-- Generation: **ALLOCGEN:b88db354751e**
+- Generation: **ALLOCGEN:93ef3360cfa9**
 - Candidate work items: **324**
 - Assigned slots: **14 / 14**
 
@@ -40,6 +40,7 @@
 - Manual overrides are measured separately and do not influence automatic portfolio adaptation.
 - Frozen benchmark strategy_measurement and adaptive learning_measurement are distinct work kinds; normal prospective runs may use only learning_measurement.
 - Frozen benchmark strategy_measurement is not a live allocator work kind; adaptive prospective measurement uses learning_measurement only.
+- Business OS portfolio-gap work may occupy only SLOT-09; SLOT-07 and SLOT-08 remain native coverage reserve.
 
 ## Interpretation
 
