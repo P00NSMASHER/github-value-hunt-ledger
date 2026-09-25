@@ -1,5 +1,8 @@
+import json
+import tempfile
 import unittest
-from tools.public_repo_scout import GH, candidate, known, risk_flags, root_score, recency, triage
+from pathlib import Path
+from tools.public_repo_scout import GH, candidate, known, queued_pairs, risk_flags, root_score, recency, triage
 
 class ScoutTests(unittest.TestCase):
     def test_exact_revision_dedupe(self):
@@ -39,6 +42,12 @@ class ScoutTests(unittest.TestCase):
         repo={"full_name":"example/project","default_branch":"main","name":"project","description":"useful engine","topics":[]}
         self.assertIsNone(candidate(gh,repo,"q","example/project abcdef123456","owner/repo"))
         self.assertEqual(0,gh.root_calls)
+
+    def test_persisted_queue_pairs_are_loaded(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            (root/"HUNTER-01.json").write_text(json.dumps({"candidates":[{"repository":"Example/Project","exact_revision":"ABC123"}]}))
+            self.assertIn(("example/project","abc123"),queued_pairs(root))
 
     def test_revision_and_root_cache(self):
         gh=GH("test-token")
