@@ -1,5 +1,5 @@
 {
-  "announcement_exact_resolved": 4,
+  "announcement_exact_resolved": 6,
   "control_dates_resolved": 0,
   "derived_backbone_sha256": "5bce35d49bae04a52d45d82e81fb7c640509cfaa8b0d044a4ecbadd408d03b58",
   "event_date_max": "2015-05-20",
@@ -15,5 +15,8 @@
   "source_repository": "vgreg/hacked_earnings_jfe",
   "unique_event_dates": 72,
   "unique_event_ids": 174,
-  "unique_symbols": 146
+  "unique_symbols": 146,
+  "announcement_review_batches_completed": 1,
+  "announcement_events_reviewed_in_batch_sequence": 30,
+  "announcement_unresolved_after_batch_review": 28
 }
