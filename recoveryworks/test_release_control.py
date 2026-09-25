@@ -16,6 +16,9 @@ from recoveryworks.production_adversarial_certification import (
     current_repository_revision,
     run_commercial_adversarial_certification,
 )
+from recoveryworks.release_package_integrity import (
+    verify_release_control_package,
+)
 from recoveryworks.release_control import (
     ReleaseEnvironment,
     approve_release,
@@ -249,6 +252,23 @@ class ReleaseControlTests(unittest.TestCase):
             self.assertEqual(
                 persisted["source_revision"], current.source_commit
             )
+            receipt = verify_release_control_package(
+                directory=root / "private" / "release",
+                release=current,
+                approvals=approvals,
+                rollback=rollback,
+                gate=gate,
+                adversarial_certification=certification,
+                verified_at="2026-09-24T13:09:00Z",
+            )
+            self.assertEqual(receipt.release_proof_hash, current.proof_hash)
+            self.assertEqual(receipt.promotion_gate_proof_hash, gate.proof_hash)
+            self.assertEqual(
+                receipt.adversarial_certification_proof_hash,
+                certification.proof_hash,
+            )
+            self.assertEqual(len(receipt.artifact_sha256), 5)
+            self.assertFalse(receipt.external_actions_performed)
             self.assertTrue(all(private_permissions_verified(path) for path in paths))
 
     def test_production_release_package_requires_exact_certification_artifact(self):
