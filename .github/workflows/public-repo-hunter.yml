@@ -1,4 +1,4 @@
-name: Public Repo Hunter Scouts
+name: StarBlox Roblox Accelerator Scouts
 
 on:
   workflow_dispatch:
@@ -46,7 +46,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: public-repo-hunter-main-writer
+  group: starblox-roblox-accelerator-main-writer
   cancel-in-progress: false
 
 jobs:
