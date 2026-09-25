@@ -503,15 +503,32 @@ def build_server() -> ThreadingHTTPServer:
             return data
 
         def do_GET(self) -> None:
-            if self.path == "/health":
+            path = self.path.split("?", 1)[0]
+            if path == "/health":
                 snapshot = state.snapshot()
                 snapshot["worker"] = worker.snapshot()
                 self._json(200 if snapshot["ok"] else 503, snapshot)
                 return
+            if path == "/ui/assets/app.css":
+                self._css(APP_CSS)
+                return
+            if path in {"/", "/ui"}:
+                if not ui_enabled:
+                    self._json(404, {"ok": False, "error": "ui_disabled"})
+                    return
+                token, session = self._ui_session()
+                if session is None:
+                    self._html(200, render_login())
+                    return
+                try:
+                    self._render_ui(token)
+                except Exception as exc:
+                    self._html(503, render_login(error=f"Command Center unavailable: {exc}"))
+                return
             if not self._authorized():
                 self._json(401, {"ok": False, "error": "unauthorized"})
                 return
-            if self.path == "/dashboard":
+            if path == "/dashboard":
                 try:
                     self._json(200, {"ok": True, "data": operator.dashboard()})
                 except Exception as exc:
