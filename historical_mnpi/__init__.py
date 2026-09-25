@@ -202,6 +202,12 @@ from .metadata_resolver import (
     validate_metadata_contract_fields,
 )
 
+from .listing_intervals import (
+    ListingIntervalEvidence,
+    ListingIntervalExpansion,
+    expand_listing_intervals,
+)
+
 from .real_corpus_import import (
     ANNOUNCEMENT_HEADERS,
     CONTROL_HEADERS,
@@ -223,6 +229,9 @@ from .source_registry import (
 )
 
 __all__ = [
+    "ListingIntervalEvidence",
+    "ListingIntervalExpansion",
+    "expand_listing_intervals",
     "ANNOUNCEMENT_HEADERS",
     "CONTROL_HEADERS",
     "LISTING_HEADERS",
