@@ -160,7 +160,7 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
 
-    def test_real_g2_first_seven_batches_expand_902_of_3828(self):
+    def test_real_g2_first_eight_batches_expand_1078_of_3828(self):
         requirements = expand_listing_requirements(
             parse_listing_requirement_index(
                 (CORPUS_DIR / "listing_requirement_index.csv").read_text(
@@ -179,9 +179,9 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
         self.assertEqual(len(requirements), 3828)
-        self.assertEqual(len(intervals), 22)
-        self.assertEqual(len(result.resolved), 902)
-        self.assertEqual(len(result.unresolved), 2926)
+        self.assertEqual(len(intervals), 26)
+        self.assertEqual(len(result.resolved), 1078)
+        self.assertEqual(len(result.unresolved), 2750)
 
         by_symbol = {}
         for item in result.resolved:
@@ -189,7 +189,7 @@ class ListingIntervalTests(unittest.TestCase):
 
         self.assertEqual(
             set(by_symbol),
-            {"ADI", "BA", "CA", "CAT", "CGNX", "CNMD", "COLM", "CREE", "DE", "DGI", "EHTH", "F", "GILD", "HON", "IDTI", "ILMN", "JNPR", "MDU", "NKE", "PNRA", "SBUX", "VMW"},
+            {"ADI", "BA", "CA", "CAT", "CGNX", "CLD", "CNMD", "COLM", "CREE", "DE", "DGI", "EHTH", "EW", "F", "GILD", "HON", "IDTI", "ILMN", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"},
         )
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
@@ -199,12 +199,14 @@ class ListingIntervalTests(unittest.TestCase):
                 "CA": 44,
                 "CAT": 22,
                 "CGNX": 44,
+                "CLD": 44,
                 "CNMD": 22,
                 "COLM": 44,
                 "CREE": 44,
                 "DE": 22,
                 "DGI": 66,
                 "EHTH": 44,
+                "EW": 44,
                 "F": 22,
                 "GILD": 22,
                 "HON": 22,
@@ -212,6 +214,8 @@ class ListingIntervalTests(unittest.TestCase):
                 "ILMN": 44,
                 "JNPR": 88,
                 "MDU": 44,
+                "MTH": 44,
+                "MUSA": 44,
                 "NKE": 22,
                 "PNRA": 88,
                 "SBUX": 22,
@@ -242,7 +246,7 @@ class ListingIntervalTests(unittest.TestCase):
         ).open("r", encoding="utf-8", newline="") as handle:
             actual = list(csv.DictReader(handle))
 
-        self.assertEqual(len(actual), 902)
+        self.assertEqual(len(actual), 1078)
         expected_rows = {
             (
                 item.symbol,
