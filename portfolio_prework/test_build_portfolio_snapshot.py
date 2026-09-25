@@ -1,6 +1,6 @@
 import unittest
 
-from build_portfolio_snapshot import build_snapshot, classify_paths, render_markdown, summarize_tree
+from portfolio_prework.build_portfolio_snapshot import build_snapshot, classify_paths, render_markdown, summarize_tree
 
 
 class SnapshotTests(unittest.TestCase):
