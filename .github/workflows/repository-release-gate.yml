@@ -1,0 +1,98 @@
+name: Repository Release Gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-release-gate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ai-business-os:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Compile canonical AI Business OS
+        run: python -m compileall -q ai_business_os
+      - name: Run canonical AI Business OS suite
+        run: python -m unittest discover -s ai_business_os -p "test_*.py" -v
+
+  freight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Compile Freight
+        run: python -m compileall -q freight
+      - name: Run Freight regression suite
+        run: python -m unittest discover -s freight -p "test_*.py" -v
+      - name: Verify pilot rights evidence consistency
+        run: python -m freight.rights_evidence --stage pilot --expect CLEAR
+
+  recoveryworks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Compile RecoveryWorks
+        run: python -m compileall -q recoveryworks
+      - name: Run RecoveryWorks regression suite
+        run: python -m unittest discover -s recoveryworks -p "test_*.py" -v
+
+  technology-intelligence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Run Technology Intelligence regression suite
+        run: python -m unittest discover -s tests -p "test_ti_*.py" -v
+      - name: Validate canonical intelligence ledgers
+        run: python tools/ti_validate.py
+      - name: Check committed text integrity
+        run: git diff --check
+
+  release-gate:
+    if: always()
+    needs:
+      - ai-business-os
+      - freight
+      - recoveryworks
+      - technology-intelligence
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every release lane to pass
+        env:
+          AI_BUSINESS_OS_RESULT: ${{ needs.ai-business-os.result }}
+          FREIGHT_RESULT: ${{ needs.freight.result }}
+          RECOVERYWORKS_RESULT: ${{ needs.recoveryworks.result }}
+          TECHNOLOGY_INTELLIGENCE_RESULT: ${{ needs.technology-intelligence.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$AI_BUSINESS_OS_RESULT" = "success"
+          test "$FREIGHT_RESULT" = "success"
+          test "$RECOVERYWORKS_RESULT" = "success"
+          test "$TECHNOLOGY_INTELLIGENCE_RESULT" = "success"
+          echo "Repository release gate passed."
