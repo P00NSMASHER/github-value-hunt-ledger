@@ -230,6 +230,15 @@
         "portfolio_brain_seed/FOUNDATION_SKELETON.json",
         "portfolio_brain_seed/registry/PROJECT_REGISTRATION_CONTRACT.json"
       ]
+    },
+    {
+      "decision_id": "DEC-021",
+      "summary": "Initial Portfolio Brain CI is deterministic and read-only: standard-library validation only, contents:read permission, five-minute timeout, no schedule, no model/network/install/deploy/write steps.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_brain_seed/tests/validate_foundation.py",
+        "portfolio_brain_seed/.github/workflows/foundation-ci.yml"
+      ]
     }
   ],
   "blockers": [
@@ -253,12 +262,12 @@
     },
     {
       "blocker_id": "BLK-004",
-      "summary": "The connected GitHub API exposes no repository-creation action. A browser writer exists but has multiple indistinguishable account links and cannot be selected safely without owner input. Step 1 artifacts may be staged here, but the dedicated P00NSMASHER/portfolio-brain repository still must be created before Step 1 can complete.",
+      "summary": "Dedicated repository materialization is the only remaining Step 1 blocker. GitHub connector exposes no repository-creation action. Three fail-closed browser routes were attempted on 2026-09-25: one could not reach GitHub (ERR_TUNNEL_CONNECTION_FAILED) and two were not signed in; none made changes. P00NSMASHER/portfolio-brain remains absent (connector 404).",
       "status": "OPEN",
       "requires_human_decision": true
     }
   ],
-  "architecture_version": "0.1.2",
+  "architecture_version": "0.1.3",
   "state_id": "portfolio-brain-master",
   "working_branch": "portfolio-brain-step1-foundation-20260925",
   "phase": "architecture_build",
@@ -320,6 +329,30 @@
       "kind": "step1_project_registration_contract",
       "step": 1,
       "commit_sha": "0409a1c42c438b8352f311bb6bf8b943e0ed9740"
+    },
+    {
+      "path": "portfolio_brain_seed/docs/ARCHITECTURE_CONTRACT.md",
+      "kind": "step1_self_contained_architecture_contract",
+      "step": 1,
+      "commit_sha": "3c973b5393d8b6939ad2cd95c89e715b563f31ce"
+    },
+    {
+      "path": "portfolio_brain_seed/README.md",
+      "kind": "step1_seed_materialization_runbook",
+      "step": 1,
+      "commit_sha": "72c01df8d861fdcc8dc7d1968148495736795449"
+    },
+    {
+      "path": "portfolio_brain_seed/tests/validate_foundation.py",
+      "kind": "step1_foundation_validator",
+      "step": 1,
+      "commit_sha": "ced4122d74307c2638cdb21b4708dedce5a45973"
+    },
+    {
+      "path": "portfolio_brain_seed/.github/workflows/foundation-ci.yml",
+      "kind": "step1_initial_ci",
+      "step": 1,
+      "commit_sha": "c5ef42f56ce32dd437e6f819c153a732bd329b68"
     }
   ],
   "tests": [
@@ -370,29 +403,49 @@
       "status": "PASS",
       "step": 1,
       "evidence": "10 deterministic checks passed against exact staged JSON blobs b828f9f74c509ad9684088feb29e28da9d661856 and bc23c840a258e1f2109fdd378feb56f8fb4bd3bb: required structure, project identity, adapter declarations, deny-by-default settings, stable IDs, autonomy separation and trading prohibition."
+    },
+    {
+      "name": "step1_foundation_remote_invariants",
+      "status": "PASS",
+      "step": 1,
+      "evidence": "11 deterministic checks passed against fetched seed blobs: identity/structure, no authority grant, defaults off, autonomy/evidence enums, standard-library validator, read-only bounded CI, no schedule or external/model/write commands."
+    },
+    {
+      "name": "step1_foundation_validator_execution",
+      "status": "PASS",
+      "step": 1,
+      "evidence": "Python validator compiled and executed successfully in an isolated local fixture: 'portfolio-brain Step 1 foundation: PASS'."
+    },
+    {
+      "name": "step1_dedicated_repository_presence",
+      "status": "FAIL",
+      "step": 1,
+      "evidence": "P00NSMASHER/portfolio-brain returned GitHub 404 after three fail-closed browser attempts; no repository was created."
     }
   ],
   "next_action": {
     "step": 1,
-    "summary": "WAIT FOR CONTINUE. Step 1B staged skeleton and deny-by-default project-registration contract are verified. Next small step: add the deterministic foundation validator and initial CI definition to the relocatable seed; do not enable any autonomous or downstream writes.",
+    "summary": "WAIT FOR CONTINUE. Step 1 foundation is fully staged and verified except dedicated repository materialization. Next exact action: create private P00NSMASHER/portfolio-brain through an authorized signed-in GitHub path, materialize portfolio_brain_seed at repository root, run foundation CI, migrate durable build state, then mark Step 1 complete and advance cursor to Step 2. Do not start Step 2 before this gate passes.",
     "preconditions": [
       "Read this root PORTFOLIO_BUILD_STATE.json first.",
-      "Do not repeat Step 0 reconnaissance unless a pinned source changed.",
-      "Use portfolio_brain_seed as relocatable staging only; it is not the final PRJ-000 repository.",
-      "Keep adapters, autonomous scheduling, model calls, deployments, downstream writes and external ACT disabled.",
-      "Dedicated repository creation remains blocked by BLK-004."
+      "Do not repeat Step 0 reconnaissance or Step 1A-1C.",
+      "Use the exact staged portfolio_brain_seed artifacts; do not regenerate them.",
+      "Require the destination owner to be exactly P00NSMASHER and repository name exactly portfolio-brain.",
+      "Create the destination as private unless the owner explicitly changes that instruction.",
+      "Keep all downstream adapters, scheduling, model calls, deployments, writes and ACT disabled.",
+      "After materialization, require the deterministic foundation validator and initial CI to pass before advancing current_step to 2."
     ]
   },
-  "updated_at": "2026-09-25T15:03:00Z",
+  "updated_at": "2026-09-25T15:18:00Z",
   "step_progress": {
     "1": {
-      "status": "IN_PROGRESS",
+      "status": "BLOCKED",
       "completed_substeps": [
         "1A_ARCHITECTURE_CONTRACT",
-        "1B_STAGED_SKELETON_AND_REGISTRATION_CONTRACT"
+        "1B_STAGED_SKELETON_AND_REGISTRATION_CONTRACT",
+        "1C_INITIAL_CI_AND_VALIDATOR"
       ],
       "pending_substeps": [
-        "1C_INITIAL_CI_AND_VALIDATOR",
         "1D_DEDICATED_REPOSITORY_MATERIALIZATION"
       ],
       "authority_change": "NONE"
