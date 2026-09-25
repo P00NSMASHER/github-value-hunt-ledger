@@ -10,7 +10,7 @@ Working branch: `portfolio-parallel-prep`
 | 4 | SHA-based change detector | **COMPLETE** |
 | 5 | Durable build-state schema | **COMPLETE** |
 | 6 | Autonomy matrix | **COMPLETE** |
-| 7 | GitHub workflow inventory | PENDING |
+| 7 | GitHub workflow inventory | **COMPLETE** |
 | 8 | Test-suite inventory | PENDING |
 | 9 | Dependency inventory | PENDING |
 | 10 | Architecture evidence bundle | PENDING |
@@ -74,6 +74,15 @@ Created:
 - `portfolio_prework/test_autonomy_matrix.py`
 
 Step 6 now defines the global autonomy classes and applies them to all 12 canonical projects. OBSERVE is autonomous, EXPERIMENT is bounded to non-consequential work, MODIFY is limited to isolated candidate changes with testing/verification gates, and ACT is never generally autonomous. Recovery/customer/financial/production actions remain human-gated, child-facing consequential changes remain human-gated, and live trading/broker execution is explicitly prohibited. Matrix coverage matches the project registry exactly, and focused CI is green.
+
+## Step 7 result
+
+Created:
+- `portfolio_prework/WORKFLOW_INVENTORY.json`
+- `portfolio_prework/WORKFLOW_INVENTORY.md`
+- `portfolio_prework/test_workflow_inventory.py`
+
+Inventoried all 47 workflow paths present in the pinned Step 3 repository snapshot across all seven repositories. The inventory records triggers, declared permissions, jobs, and risk markers such as schedules, secrets, write permissions, and Pages/deployment behavior. Exact coverage verification found zero missing and zero extra workflows, and no `pull_request_target` use at the pinned SHAs. Existing write/deploy credentials are explicitly treated as workflow capabilities rather than inherited Portfolio Brain authority.
 
 ## Rule
 
