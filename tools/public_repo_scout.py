@@ -46,18 +46,57 @@ class GH:
     def __init__(self,token):
         if not token: raise ValueError("GITHUB_TOKEN or GH_TOKEN is required")
         self.token=token
+        self.stats={"api_requests":0,"retries":0,"rate_limit_sleeps":0,"revision_cache_hits":0,"root_cache_hits":0}
+        self._revision_cache={}
+        self._root_cache={}
     def get(self,path,q=None):
         url=API+path+("?" + urllib.parse.urlencode(q) if q else "")
         req=urllib.request.Request(url,headers={"Accept":"application/vnd.github+json","Authorization":f"Bearer {self.token}","X-GitHub-Api-Version":"2022-11-28","User-Agent":UA})
-        try:
-            with urllib.request.urlopen(req,timeout=30) as r: return json.loads(r.read().decode())
-        except urllib.error.HTTPError as e:
-            raise RuntimeError(f"GitHub API {e.code}: {e.read().decode(errors='replace')[:300]}") from e
+        for attempt in range(3):
+            self.stats["api_requests"]+=1
+            try:
+                with urllib.request.urlopen(req,timeout=30) as r: return json.loads(r.read().decode())
+            except urllib.error.HTTPError as e:
+                body=e.read().decode(errors="replace")[:300]
+                retryable=e.code in (403,429) or 500<=e.code<600
+                if retryable and attempt<2:
+                    remaining=e.headers.get("X-RateLimit-Remaining")
+                    reset=e.headers.get("X-RateLimit-Reset")
+                    retry_after=e.headers.get("Retry-After")
+                    sleep_s=None
+                    if retry_after:
+                        try: sleep_s=max(0.0,min(float(retry_after),30.0))
+                        except ValueError: pass
+                    if sleep_s is None and remaining=="0" and reset:
+                        try:
+                            wait=float(reset)-time.time()+1.0
+                            if wait>30.0: raise RuntimeError(f"GitHub API {e.code}: rate limit reset is more than 30s away")
+                            sleep_s=max(1.0,wait)
+                        except ValueError: pass
+                    if sleep_s is None: sleep_s=min(2**attempt,8)
+                    self.stats["retries"]+=1
+                    if e.code in (403,429): self.stats["rate_limit_sleeps"]+=1
+                    time.sleep(sleep_s)
+                    continue
+                raise RuntimeError(f"GitHub API {e.code}: {body}") from e
+        raise RuntimeError("GitHub API retry loop exhausted")
     def search(self,q,sort="updated",per_page=8): return list(self.get("/search/repositories",{"q":q,"sort":sort,"order":"desc","per_page":per_page}).get("items") or [])
     def revision(self,full,branch):
-        o,r=full.split("/",1); return self.get(f"/repos/{o}/{r}/commits/{urllib.parse.quote(branch,safe='')}").get("sha")
+        key=(full,branch)
+        if key in self._revision_cache:
+            self.stats["revision_cache_hits"]+=1
+            return self._revision_cache[key]
+        o,r=full.split("/",1); sha=self.get(f"/repos/{o}/{r}/commits/{urllib.parse.quote(branch,safe='')}").get("sha")
+        self._revision_cache[key]=sha
+        return sha
     def root(self,full,branch):
-        o,r=full.split("/",1); x=self.get(f"/repos/{o}/{r}/contents",{"ref":branch}); return [str(i.get("name") or "") for i in x] if isinstance(x,list) else []
+        key=(full,branch)
+        if key in self._root_cache:
+            self.stats["root_cache_hits"]+=1
+            return self._root_cache[key]
+        o,r=full.split("/",1); x=self.get(f"/repos/{o}/{r}/contents",{"ref":branch}); names=[str(i.get("name") or "") for i in x] if isinstance(x,list) else []
+        self._root_cache[key]=names
+        return names
 
 def candidate(gh,repo,q,corp,own):
     full=str(repo.get("full_name") or "")
@@ -65,14 +104,16 @@ def candidate(gh,repo,q,corp,own):
     rf=risk_flags(repo)
     if rf: return {"repository":full,"url":repo.get("html_url"),"status":"RISK_REVIEW_ONLY","risk_flags":rf,"discovery_query":q}
     branch=str(repo.get("default_branch") or "main")
-    try: sha=gh.revision(full,branch); names=gh.root(full,branch)
+    try: sha=gh.revision(full,branch)
     except RuntimeError: return None
     if not sha or known(corp,full,sha): return None
+    try: names=gh.root(full,branch)
+    except RuntimeError: return None
     score,parts,hits=triage(repo,names); lic=(repo.get("license") or {}).get("spdx_id") or "UNKNOWN"
     return {"repository":full,"url":repo.get("html_url"),"exact_revision":sha,"default_branch":branch,"description":repo.get("description"),"primary_language":repo.get("language"),"topics":repo.get("topics") or [],"published_license_spdx":lic,"stars":int(repo.get("stargazers_count") or 0),"forks":int(repo.get("forks_count") or 0),"archived":bool(repo.get("archived")),"pushed_at":repo.get("pushed_at"),"size_kb":int(repo.get("size") or 0),"root_code_signals":hits,"triage_score":score,"triage_components":parts,"discovery_query":q,"status":"PRE_VERIFICATION_CANDIDATE"}
 
 def worker_run(w,gh,corp,own,per_query,max_candidates):
-    seen={}; risks=[]; diag=[]
+    seen={}; risks=[]; diag=[]; before=dict(gh.stats)
     for q in w.get("queries") or []:
         try: repos=gh.search(q,per_page=per_query)
         except RuntimeError as e: diag.append({"query":q,"error":str(e)}); continue
@@ -85,7 +126,8 @@ def worker_run(w,gh,corp,own,per_query,max_candidates):
             if key not in seen or c["triage_score"]>seen[key]["triage_score"]: seen[key]=c
             time.sleep(0.1)
     cs=sorted(seen.values(),key=lambda x:(x["triage_score"],x["stars"]),reverse=True)[:max_candidates]
-    return {"schema_version":1,"generated_at":now().isoformat(),"worker_id":w["id"],"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag}
+    api_metrics={k:int(gh.stats.get(k,0))-int(before.get(k,0)) for k in gh.stats}
+    return {"schema_version":2,"generated_at":now().isoformat(),"worker_id":w["id"],"catalogs":w.get("catalogs") or [],"mission":w.get("mission"),"authority":"PRE_VERIFICATION_DISCOVERY_ONLY","candidate_count":len(cs),"candidates":cs,"risk_review_count":len(risks),"risk_review":risks[:20],"search_diagnostics":diag,"api_metrics":api_metrics}
 
 def integrate(root,out):
     merged={}; workers={}; files=sorted(root.glob("HUNTER-*.json"))
