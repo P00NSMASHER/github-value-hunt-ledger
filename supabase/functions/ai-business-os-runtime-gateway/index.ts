@@ -97,6 +97,71 @@ async function activateGoal(payload: Record<string, unknown>) {
   });
 }
 
+
+async function workerClaim(payload: Record<string, unknown>) {
+  const agentId = requireString(payload.agent_id, "agent_id");
+  const workerInstanceId = requireString(payload.worker_instance_id, "worker_instance_id");
+  const goalTypes = payload.goal_types;
+  const leaseSeconds = Number(payload.lease_seconds);
+  if (!Array.isArray(goalTypes) || goalTypes.length === 0 || !goalTypes.every((x) => typeof x === "string" && x.trim())) {
+    throw new Error("goal_types must be a non-empty string array");
+  }
+  if (!Number.isInteger(leaseSeconds)) throw new Error("lease_seconds must be an integer");
+  const rows = await sql`
+    select ai_business_os_prod.agent_worker_claim_v1(
+      ${agentId}, ${workerInstanceId}, ${JSON.stringify(goalTypes)}::jsonb, ${leaseSeconds}
+    ) as payload
+  `;
+  return { claim: rows[0]?.payload ?? null };
+}
+
+async function workerHeartbeat(payload: Record<string, unknown>) {
+  const rows = await sql`
+    select ai_business_os_prod.agent_worker_heartbeat_v1(
+      ${requireString(payload.agent_id,"agent_id")},
+      ${requireString(payload.worker_instance_id,"worker_instance_id")},
+      ${requireString(payload.goal_id,"goal_id")}::uuid,
+      ${requireString(payload.run_id,"run_id")}::uuid,
+      ${Number(payload.lease_generation)}::bigint,
+      ${Number(payload.extend_seconds)}::integer
+    ) as payload
+  `;
+  return { heartbeat: rows[0]?.payload ?? null };
+}
+
+async function workerSubmit(payload: Record<string, unknown>) {
+  const evidence = payload.evidence_refs;
+  if (!Array.isArray(evidence)) throw new Error("evidence_refs must be an array");
+  const rows = await sql`
+    select ai_business_os_prod.agent_worker_submit_v1(
+      ${requireString(payload.agent_id,"agent_id")},
+      ${requireString(payload.worker_instance_id,"worker_instance_id")},
+      ${requireString(payload.goal_id,"goal_id")}::uuid,
+      ${requireString(payload.run_id,"run_id")}::uuid,
+      ${Number(payload.lease_generation)}::bigint,
+      ${requireString(payload.output_hash,"output_hash")},
+      ${JSON.stringify(evidence)}::jsonb,
+      ${requireString(payload.summary,"summary")}
+    ) as payload
+  `;
+  return { submission: rows[0]?.payload ?? null };
+}
+
+async function workerFail(payload: Record<string, unknown>) {
+  const rows = await sql`
+    select ai_business_os_prod.agent_worker_fail_v1(
+      ${requireString(payload.agent_id,"agent_id")},
+      ${requireString(payload.worker_instance_id,"worker_instance_id")},
+      ${requireString(payload.goal_id,"goal_id")}::uuid,
+      ${requireString(payload.run_id,"run_id")}::uuid,
+      ${Number(payload.lease_generation)}::bigint,
+      ${requireString(payload.error,"error")},
+      ${payload.requeue === true}
+    ) as payload
+  `;
+  return { failure: rows[0]?.payload ?? null };
+}
+
 async function decideApproval(payload: Record<string, unknown>) {
   const requestKey = requireString(payload.request_key, "request_key");
   const intentHash = requireString(payload.intent_hash, "intent_hash");
@@ -133,6 +198,10 @@ Deno.serve(async (req: Request) => {
       case "approval_lookup": data = await approvalLookup(payload); break;
       case "activate_goal": data = await activateGoal(payload); break;
       case "decide_approval": data = await decideApproval(payload); break;
+      case "worker_claim": data = await workerClaim(payload); break;
+      case "worker_heartbeat": data = await workerHeartbeat(payload); break;
+      case "worker_submit": data = await workerSubmit(payload); break;
+      case "worker_fail": data = await workerFail(payload); break;
       default: return json({ ok: false, error: "unsupported_action" }, 400);
     }
     return json({ ok: true, data });
