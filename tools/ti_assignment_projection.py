@@ -40,6 +40,13 @@ TI_ASSIGNMENT_PROJECTION = ProjectionContract(
         "coverage_gap_ids",
         "adjacency_root",
         "instructions",
+        "business_os_plan_hash",
+        "business_os_work_id",
+        "business_os_seed_hash",
+        "business_os_initiative_key",
+        "business_os_metric_key",
+        "business_os_gap_type",
+        "business_os_required_source_type",
     ),
     normalized_list_fields=(
         "query_anchors",
