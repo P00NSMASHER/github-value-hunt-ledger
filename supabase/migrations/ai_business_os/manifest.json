@@ -2,9 +2,9 @@
   "schema": "ai_business_os_prod",
   "source": "supabase_migrations.schema_migrations",
   "exported_from_live_database": true,
-  "latest_version": "20260924230014",
-  "migration_count": 30,
-  "live_schema_fingerprint_sha256": "ea1e6eda0076baf8eb480b8bb1f711e591b937deaf687c2ec77a2e1730068b45",
+  "latest_version": "20260925132548",
+  "migration_count": 31,
+  "live_schema_fingerprint_sha256": "b9e0b218933260945cd3fa9a7c9db37f71c436adbe43b52265340111bdc2bc80",
   "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
   "migrations": [
     {
@@ -156,6 +156,11 @@
       "name": "add_ai_business_os_schema_fingerprint_v1",
       "sha256": "0fc5088cc96f9dfdd0005334439a60a0b5d05526cce53253160ff0a04820d648",
       "version": "20260924230014"
+    },
+    {
+      "version": "20260925132548",
+      "name": "focus_ai_business_os_commercial_tracks_v1",
+      "sha256": "60e4b0494501b8a0238828db60a2df2aeeaf2412fbadcb3a93667a33097e9480"
     }
   ],
   "public_bootstrap_sanitized": true,
@@ -166,5 +171,5 @@
     "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
   ],
   "live_statement_hashes_retained": true,
-  "note": "Public bootstrap preserves ordered schema/control migrations but redacts live provider account identifiers. Exact live statement hashes remain in the migration list; private identifiers stay outside Git."
+  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained; private identifiers stay outside Git. Latest commercial-focus migration is archived separately."
 }
