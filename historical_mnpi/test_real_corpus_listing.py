@@ -45,7 +45,7 @@ class RealCorpusListingTests(unittest.TestCase):
             EXPECTED_EXPANDED_PAIR_SHA256,
         )
 
-    def test_current_intervals_resolve_exactly_902_observations(self):
+    def test_current_intervals_resolve_exactly_1078_observations(self):
         _, requirements = self._requirements()
         intervals = self._intervals()
         expansion = expand_listing_intervals(
@@ -53,11 +53,11 @@ class RealCorpusListingTests(unittest.TestCase):
             intervals,
         )
 
-        self.assertEqual(len(intervals), 22)
-        self.assertEqual(len(expansion.resolved), 902)
-        self.assertEqual(len(expansion.unresolved), 2926)
+        self.assertEqual(len(intervals), 26)
+        self.assertEqual(len(expansion.resolved), 1078)
+        self.assertEqual(len(expansion.unresolved), 2750)
 
-        new_symbols = {"COLM", "CREE", "EHTH", "IDTI"}
+        new_symbols = {"CLD", "EW", "MTH", "MUSA"}
         new_rows = [
             row for row in expansion.resolved
             if row.symbol in new_symbols
@@ -74,7 +74,7 @@ class RealCorpusListingTests(unittest.TestCase):
                     for row in new_rows
                     if row.symbol == symbol
                 },
-                {"NASDAQ"},
+                {"NYSE"},
             )
 
     def test_materialized_listing_metadata_matches_interval_expansion(self):
@@ -111,8 +111,8 @@ class RealCorpusListingTests(unittest.TestCase):
             for row in materialized
         }
 
-        self.assertEqual(len(materialized), 902)
-        self.assertEqual(len(actual), 902)
+        self.assertEqual(len(materialized), 1078)
+        self.assertEqual(len(actual), 1078)
         self.assertEqual(actual, expected)
         self.assertTrue(all(
             row["source_kind"] == "OFFICIAL_LISTING_HISTORY"
@@ -132,15 +132,15 @@ class RealCorpusListingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["listing_intervals_verified"],
-            22,
+            26,
         )
         self.assertEqual(
             manifest["listing_metadata_resolved"],
-            902,
+            1078,
         )
         self.assertEqual(
             manifest["listing_metadata_unresolved"],
-            2926,
+            2750,
         )
         self.assertEqual(
             manifest["listing_metadata_resolved"]
