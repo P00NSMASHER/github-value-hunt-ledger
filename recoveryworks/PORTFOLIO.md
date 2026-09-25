@@ -98,3 +98,14 @@ ConstructionRecovery completes the previously missing lane with:
 The next leverage layer is deeper source automation: direct P6/XER normalization,
 drawing/model revision deltas, quantity takeoff changes, and field-evidence links.
 Those should feed the existing proof model rather than bypass its review gates.
+
+
+## Canonical rights boundary
+
+RecoveryWorks does not inherit commercial permission from Hunter discovery status or repository
+visibility. Any external component promoted from research into a RecoveryWorks runtime must have an
+exact subject/revision in `rights/RIGHTS_REGISTRY.json` and pass the applicable canonical rights
+stage. The standing Hunter owner assertion is provenance only and has no automatic scope effect.
+
+Datasets, model weights, bundled assets, standards, APIs/services, trademarks and patents remain
+separate rights surfaces even when repository code is otherwise usable.

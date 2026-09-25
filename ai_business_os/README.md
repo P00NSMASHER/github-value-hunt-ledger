@@ -198,3 +198,18 @@ governance model:
 
 See `CEO_COMMAND_CENTER_CONTRACT.md`, `ceo_command_center.py`, and
 `test_ceo_command_center.py`.
+
+
+## Canonical rights/provenance boundary
+
+Hunter, Freight, RecoveryWorks and AI Business OS now share one operational rights model:
+
+- public license evidence, owner attestations and executed permissions are distinct evidence classes;
+- every scope is resolved independently;
+- generic assertions never auto-promote a component to runtime readiness;
+- `ALLOWED_WITH_CONDITIONS` stays conditional;
+- missing or denied required scopes fail closed;
+- historical subsystem notes remain provenance, not operating authority.
+
+Public mirror: `rights/RIGHTS_REGISTRY.json`.
+Private operating registry: `ai_business_os_prod.rights_*`.

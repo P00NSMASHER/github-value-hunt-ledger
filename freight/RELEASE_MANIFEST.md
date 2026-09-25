@@ -143,6 +143,14 @@ This reduces the chance that the research system's own supply chain or token sco
 
 ## Rights state
 
+> **Current normalization notice (2026-09-25):** the historical v15.14 text below is retained as
+> release provenance. Current operational rights classification is governed by
+> `rights/RIGHTS_REGISTRY.json` and the private `ai_business_os_prod.rights_*` registry.
+> The 2026-09-23 commercial-use evidence is classified as `OWNER_ATTESTED`, not
+> `EXECUTED_PERMISSION_VERIFIED`. No hosted/SaaS, redistribution, assignment, sublicensing or
+> change-of-control right is inferred from it.
+
+
 The repository now prevents separately licensed rights from being promoted to resolved hosted/SaaS/assignment/sublicensing/change-of-control claims without:
 1. a controlled diligence-room evidence reference;
 2. `ATTACHED_VERIFIED` status; and

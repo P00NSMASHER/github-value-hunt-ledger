@@ -2,9 +2,9 @@
   "schema": "ai_business_os_prod",
   "source": "supabase_migrations.schema_migrations",
   "exported_from_live_database": true,
-  "latest_version": "20260925134039",
-  "migration_count": 34,
-  "live_schema_fingerprint_sha256": "5fca7296cec391902bfb4e973e03e23821e3ed11715ecb43eca406a0f22fde24",
+  "latest_version": "20260925141435",
+  "migration_count": 36,
+  "live_schema_fingerprint_sha256": "793e747070b5fcd0772eec2333d78c96f7c55da2c9c94fdf0198d6113fd8a201",
   "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
   "migrations": [
     {
@@ -176,6 +176,16 @@
       "version": "20260925134039",
       "name": "integrate_ai_business_os_portfolio_pools_command_center_v1",
       "sha256": "fb7e26c57d32df02f7cd264e7ebf9c0589234b10d9466ce9b0292cfaa1f5b462"
+    },
+    {
+      "version": "20260925141123",
+      "name": "normalize_ai_business_os_rights_provenance_v1",
+      "sha256": "b4ddb17087c54fe0d65674c8a59e75dd0919207495cfcc065c172d4eea0d7e63"
+    },
+    {
+      "version": "20260925141435",
+      "name": "harden_ai_business_os_rights_provenance_v1",
+      "sha256": "e83cd6864982e45d0291b9d63d95f0d67632fd5c87890a356696abc8e01a19a6"
     }
   ],
   "public_bootstrap_sanitized": true,
@@ -186,5 +196,5 @@
     "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
   ],
   "live_statement_hashes_retained": true,
-  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Portfolio allocation is pool-scoped: B2B cash-flow and consumer/R&D are never cross-ranked."
+  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Canonical rights/provenance evidence classes and scope-specific readiness now govern Hunter, Freight, RecoveryWorks and AI Business OS."
 }

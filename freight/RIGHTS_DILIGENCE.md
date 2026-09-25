@@ -72,3 +72,25 @@ required right remains a blocker.
 
 No code path should infer those rights from public visibility or from a generic
 commercial-use statement.
+
+
+## Canonical cross-system rights model
+
+Current rights decisions are normalized through `rights/RIGHTS_REGISTRY.json` and the private
+`ai_business_os_prod.rights_*` tables.
+
+Freight's existing registry/evidence files remain source evidence and compatibility inputs, but the
+canonical evidence classes are:
+
+- `PUBLIC_LICENSE_VERIFIED`
+- `OWNER_ATTESTED`
+- `EXECUTED_PERMISSION_VERIFIED`
+- `UNKNOWN_REVIEW`
+- `DENIED`
+
+The 2026-09-23 Freight owner attestation is intentionally classified as
+`OWNER_ATTESTED`, not as proof that an executed third-party agreement was attached. It resolves
+only the commercial-use scope recorded by that attestation. Hosted/SaaS, redistribution,
+assignment, sublicensing and change-of-control remain independently governed.
+
+No broad Hunter standing assertion automatically resolves a Freight runtime scope.
