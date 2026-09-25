@@ -41,7 +41,7 @@ def expanded_requirements():
 
 
 def load_intervals():
-    with (CORPUS_DIR / "listing_interval_evidence.csv").open(
+    with (CORPUS_DIR / "listing_intervals.csv").open(
         "r",
         encoding="utf-8",
         newline="",
