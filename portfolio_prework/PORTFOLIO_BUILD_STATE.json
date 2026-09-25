@@ -4,13 +4,14 @@
   "state_id": "portfolio-parallel-prework",
   "working_branch": "portfolio-parallel-prep",
   "phase": "parallel_prework",
-  "current_step": 6,
+  "current_step": 7,
   "completed_steps": [
     1,
     2,
     3,
     4,
-    5
+    5,
+    6
   ],
   "repositories": {
     "REPO-001": {
@@ -89,6 +90,23 @@
       "evidence_refs": [
         "portfolio_prework/PROJECT_ID_REGISTRY.json"
       ]
+    },
+    {
+      "decision_id": "DEC-004",
+      "summary": "Use four autonomy classes (OBSERVE, EXPERIMENT, MODIFY, ACT) with deny-by-default semantics and the most restrictive applicable rule winning.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/AUTONOMY_ACTION_TAXONOMY.json",
+        "portfolio_prework/AUTONOMY_MATRIX.json"
+      ]
+    },
+    {
+      "decision_id": "DEC-005",
+      "summary": "No project receives unbounded external ACT authority; consequential external actions remain human-gated and market-surveillance live trading/execution remains prohibited.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/AUTONOMY_MATRIX.md"
+      ]
     }
   ],
   "artifacts": [
@@ -127,6 +145,24 @@
       "kind": "build_state_validator",
       "step": 5,
       "commit_sha": "13b43443050257a6cec826ab811511ec9ba1c543"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_ACTION_TAXONOMY.json",
+      "kind": "autonomy_taxonomy",
+      "step": 6,
+      "commit_sha": "67d2b30bf7b27539011d1bb318e050ec284d8541"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_MATRIX.json",
+      "kind": "project_autonomy_matrix",
+      "step": 6,
+      "commit_sha": "398c74592701b30870738184a3732d7ce1a29452"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_MATRIX.md",
+      "kind": "autonomy_matrix_documentation",
+      "step": 6,
+      "commit_sha": "c23409c78cdd8828256ea845c8313e218cd4e050"
     }
   ],
   "tests": [
@@ -153,16 +189,29 @@
       "status": "PASS",
       "step": 5,
       "evidence": "Portfolio Prework CI workflow run 36089147873 succeeded with build-state tests included."
+    },
+    {
+      "name": "autonomy action taxonomy validation",
+      "status": "PASS",
+      "step": 6,
+      "evidence": "Portfolio Prework CI run 36089780390 succeeded."
+    },
+    {
+      "name": "project autonomy matrix coverage and hard-boundary validation",
+      "status": "PASS",
+      "step": 6,
+      "evidence": "Portfolio Prework CI run 36089906402 succeeded."
     }
   ],
   "blockers": [],
   "next_action": {
-    "step": 6,
-    "summary": "Define and validate the portfolio autonomy matrix for each canonical project and action class.",
+    "step": 7,
+    "summary": "Inventory all GitHub Actions workflows across the seven connected repositories, recording triggers, permissions, purpose, and risk-relevant behavior without modifying downstream repositories.",
     "preconditions": [
-      "Preserve existing hard authority boundaries.",
-      "No production deployment, customer contact, money movement, or live trading authority."
+      "Read only.",
+      "Do not alter workflow behavior in product repositories.",
+      "Use cached snapshot paths first and inspect only workflow files needed for classification."
     ]
   },
-  "updated_at": "2026-09-25T03:09:00Z"
+  "updated_at": "2026-09-25T03:20:00Z"
 }
