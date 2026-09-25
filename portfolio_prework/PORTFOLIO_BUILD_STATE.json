@@ -4,12 +4,13 @@
   "state_id": "portfolio-parallel-prework",
   "working_branch": "portfolio-parallel-prep",
   "phase": "parallel_prework",
-  "current_step": 5,
+  "current_step": 6,
   "completed_steps": [
     1,
     2,
     3,
-    4
+    4,
+    5
   ],
   "repositories": {
     "REPO-001": {
@@ -114,6 +115,18 @@
       "kind": "change_detector",
       "step": 4,
       "commit_sha": "6ecf355ea5a0afd3c673caa260e9bae5c3b47a27"
+    },
+    {
+      "path": "portfolio_prework/PORTFOLIO_BUILD_STATE.schema.json",
+      "kind": "build_state_schema",
+      "step": 5,
+      "commit_sha": "01467d081b7780b64d993d162810cca2d9b89065"
+    },
+    {
+      "path": "portfolio_prework/validate_build_state.py",
+      "kind": "build_state_validator",
+      "step": 5,
+      "commit_sha": "13b43443050257a6cec826ab811511ec9ba1c543"
     }
   ],
   "tests": [
@@ -134,16 +147,22 @@
       "status": "PASS",
       "step": 4,
       "evidence": "Workflow runs 36087792089 and later green prework runs succeeded."
+    },
+    {
+      "name": "durable build-state schema/invariant validation",
+      "status": "PASS",
+      "step": 5,
+      "evidence": "Portfolio Prework CI workflow run 36089147873 succeeded with build-state tests included."
     }
   ],
   "blockers": [],
   "next_action": {
-    "step": 5,
-    "summary": "Validate and adopt the durable build-state schema and seed state, then mark Step 5 complete.",
+    "step": 6,
+    "summary": "Define and validate the portfolio autonomy matrix for each canonical project and action class.",
     "preconditions": [
-      "Do not modify product repositories.",
-      "Keep state machine-readable and resumable without rediscovery."
+      "Preserve existing hard authority boundaries.",
+      "No production deployment, customer contact, money movement, or live trading authority."
     ]
   },
-  "updated_at": "2026-09-25T03:06:00Z"
+  "updated_at": "2026-09-25T03:09:00Z"
 }
