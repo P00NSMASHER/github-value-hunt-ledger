@@ -4,7 +4,7 @@
   "state_id": "portfolio-parallel-prework",
   "working_branch": "portfolio-parallel-prep",
   "phase": "parallel_prework",
-  "current_step": 8,
+  "current_step": 9,
   "completed_steps": [
     1,
     2,
@@ -12,7 +12,8 @@
     4,
     5,
     6,
-    7
+    7,
+    8
   ],
   "repositories": {
     "REPO-001": {
@@ -118,6 +119,15 @@
         "portfolio_prework/WORKFLOW_INVENTORY.md",
         "portfolio_prework/AUTONOMY_MATRIX.json"
       ]
+    },
+    {
+      "decision_id": "DEC-007",
+      "summary": "Use changed-path/risk-aware targeted test selection rather than running every downstream repository test suite after every candidate change.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/TEST_SUITE_INVENTORY.json",
+        "portfolio_prework/TEST_SUITE_INVENTORY.md"
+      ]
     }
   ],
   "artifacts": [
@@ -186,6 +196,18 @@
       "kind": "workflow_inventory_documentation",
       "step": 7,
       "commit_sha": "74f087c8555a32c1fa4ebe5a7fa26128b8eec555"
+    },
+    {
+      "path": "portfolio_prework/TEST_SUITE_INVENTORY.json",
+      "kind": "test_suite_inventory",
+      "step": 8,
+      "commit_sha": "cc51be717dee03742ef1d0bff9012bc6de1e079e"
+    },
+    {
+      "path": "portfolio_prework/TEST_SUITE_INVENTORY.md",
+      "kind": "test_suite_inventory_documentation",
+      "step": 8,
+      "commit_sha": "f50c0a3bce653c90e8fef4ee5a3ce7734d749666"
     }
   ],
   "tests": [
@@ -230,17 +252,23 @@
       "status": "PASS",
       "step": 7,
       "evidence": "Machine-readable verification: 47 expected workflow paths, 47 inventoried, zero missing, zero extra; no pull_request_target detected."
+    },
+    {
+      "name": "test-suite inventory exact snapshot coverage",
+      "status": "PASS",
+      "step": 8,
+      "evidence": "367 expected test paths, 367 inventoried, exact coverage; Portfolio Prework CI run 36090667329 succeeded."
     }
   ],
   "blockers": [],
   "next_action": {
-    "step": 8,
-    "summary": "Build the test-suite inventory across all seven repositories using the cached repository snapshot and targeted file inspection only where classification requires it.",
+    "step": 9,
+    "summary": "Build the dependency inventory across all seven repositories from cached manifest paths and targeted manifest inspection.",
     "preconditions": [
       "Read only.",
-      "Do not run all downstream project test suites merely to inventory them.",
-      "Reuse cached test paths and repository SHAs before deeper inspection."
+      "Do not install dependencies merely to inventory them.",
+      "Prefer lockfiles/manifests and exact pinned repository SHAs."
     ]
   },
-  "updated_at": "2026-09-25T03:29:00Z"
+  "updated_at": "2026-09-25T03:31:15Z"
 }
