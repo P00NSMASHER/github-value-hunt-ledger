@@ -436,42 +436,107 @@ class DeploymentEnvironmentSnapshot:
 @dataclass(frozen=True)
 class ValidatedDeploymentReceipt:
     receipt: ExternalDeploymentReceipt
+    handoff_id: str
+    handoff_proof_hash: str
+    production_admission_id: str
+    production_admission_proof_hash: str
+    release_id: str
+    release_proof_hash: str
+    container_image_digest: str
+    source_commit: str
+    production_deployment_proof_hash: str
     environment_snapshot_proof_hash: str
+    health_receipt_hash: str
+    readiness_receipt_hash: str
+    verified: bool = True
+    external_actions_performed: bool = False
 
     def __post_init__(self) -> None:
+        for name in (
+            "handoff_id",
+            "production_admission_id",
+            "release_id",
+        ):
+            object.__setattr__(self, name, _text(name, getattr(self, name)))
+        for name in (
+            "handoff_proof_hash",
+            "production_admission_proof_hash",
+            "release_proof_hash",
+            "container_image_digest",
+            "production_deployment_proof_hash",
+            "environment_snapshot_proof_hash",
+            "health_receipt_hash",
+            "readiness_receipt_hash",
+        ):
+            object.__setattr__(
+                self, name, normalize_sha256(name, getattr(self, name))
+            )
         object.__setattr__(
             self,
-            "environment_snapshot_proof_hash",
-            normalize_sha256(
-                "environment_snapshot_proof_hash",
-                self.environment_snapshot_proof_hash,
-            ),
+            "source_commit",
+            normalize_git_commit_sha("source_commit", self.source_commit),
         )
+        if self.verified is not True or self.external_actions_performed:
+            raise ValueError(
+                "post-deployment verification must be verified and read-only"
+            )
+
+    def _identity(self) -> dict[str, Any]:
+        return {
+            "schema": 1,
+            "deployment_receipt_proof_hash": self.receipt.proof_hash,
+            "handoff_id": self.handoff_id,
+            "handoff_proof_hash": self.handoff_proof_hash,
+            "production_admission_id": self.production_admission_id,
+            "production_admission_proof_hash":
+                self.production_admission_proof_hash,
+            "release_id": self.release_id,
+            "release_proof_hash": self.release_proof_hash,
+            "container_image_digest": self.container_image_digest,
+            "source_commit": self.source_commit,
+            "production_deployment_proof_hash":
+                self.production_deployment_proof_hash,
+            "environment_snapshot_proof_hash":
+                self.environment_snapshot_proof_hash,
+            "health_receipt_hash": self.health_receipt_hash,
+            "readiness_receipt_hash": self.readiness_receipt_hash,
+            "verified": True,
+            "external_actions_performed": False,
+        }
 
     @property
     def proof_hash(self) -> str:
-        return canonical_hash({
-            "schema": 1,
-            "deployment_receipt_proof_hash": self.receipt.proof_hash,
-            "environment_snapshot_proof_hash":
-                self.environment_snapshot_proof_hash,
-        })
+        return canonical_hash(self._identity())
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            "receipt_proof_hash": self.receipt.proof_hash,
-            "environment_snapshot_proof_hash":
-                self.environment_snapshot_proof_hash,
+            **self._identity(),
             "proof_hash": self.proof_hash,
-            "state": "DEPLOYMENT_VERIFIED",
+            "state": "POST_DEPLOYMENT_IDENTITY_VERIFIED",
         }
 
 
 def validate_external_deployment(
     handoff: ReleaseDeploymentHandoff,
+    admission: ProductionAdmissionGate,
     receipt: ExternalDeploymentReceipt,
     snapshot: DeploymentEnvironmentSnapshot,
 ) -> ValidatedDeploymentReceipt:
+    if admission.admission_id != handoff.production_admission_id:
+        raise ValueError("post-deployment admission id mismatch")
+    if admission.proof_hash != handoff.production_admission_proof_hash:
+        raise ValueError("post-deployment admission proof mismatch")
+    if admission.release_id != handoff.release_id:
+        raise ValueError("post-deployment admission release id mismatch")
+    if admission.release_proof_hash != handoff.release_proof_hash:
+        raise ValueError("post-deployment admission release proof mismatch")
+    if admission.container_image_digest != handoff.container_image_digest:
+        raise ValueError("post-deployment admission image digest mismatch")
+    if admission.source_commit != handoff.source_commit:
+        raise ValueError("post-deployment admission source commit mismatch")
+    if not admission.admitted or admission.deployment_execution_enabled:
+        raise ValueError("post-deployment admission is not valid")
+
     if receipt.handoff_id != handoff.handoff_id:
         raise ValueError("deployment receipt handoff id mismatch")
     if receipt.handoff_proof_hash != handoff.proof_hash:
@@ -520,5 +585,19 @@ def validate_external_deployment(
         raise ValueError("post-deployment health/readiness verification failed")
     return ValidatedDeploymentReceipt(
         receipt=receipt,
+        handoff_id=handoff.handoff_id,
+        handoff_proof_hash=handoff.proof_hash,
+        production_admission_id=admission.admission_id,
+        production_admission_proof_hash=admission.proof_hash,
+        release_id=handoff.release_id,
+        release_proof_hash=handoff.release_proof_hash,
+        container_image_digest=handoff.container_image_digest,
+        source_commit=handoff.source_commit,
+        production_deployment_proof_hash=
+            handoff.production_deployment_proof_hash,
         environment_snapshot_proof_hash=snapshot.proof_hash,
+        health_receipt_hash=snapshot.health_receipt_hash,
+        readiness_receipt_hash=snapshot.readiness_receipt_hash,
+        verified=True,
+        external_actions_performed=False,
     )
