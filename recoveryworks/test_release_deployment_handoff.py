@@ -220,8 +220,23 @@ class ReleaseDeploymentHandoffTests(unittest.TestCase):
             snapshot = DeploymentEnvironmentSnapshot(
                 snapshot_id="recoveryworks-environment-snapshot:"+canonical_hash(snapshot_identity),
                 **{k:v for k,v in snapshot_identity.items() if k!="schema"})
-            validated = validate_external_deployment(handoff, receipt, snapshot)
-            self.assertEqual(validated.as_dict()["state"], "DEPLOYMENT_VERIFIED")
+            validated = validate_external_deployment(
+                handoff, admission, receipt, snapshot
+            )
+            self.assertEqual(
+                validated.as_dict()["state"],
+                "POST_DEPLOYMENT_IDENTITY_VERIFIED",
+            )
+            self.assertEqual(
+                validated.production_admission_proof_hash,
+                admission.proof_hash,
+            )
+            self.assertEqual(
+                validated.container_image_digest,
+                release.container_image_digest,
+            )
+            self.assertEqual(validated.source_commit, release.source_commit)
+            self.assertFalse(validated.external_actions_performed)
 
     def test_wrong_image_or_failed_post_health_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
@@ -261,7 +276,9 @@ class ReleaseDeploymentHandoffTests(unittest.TestCase):
                 snapshot_id="recoveryworks-environment-snapshot:"+canonical_hash(snapshot_identity),
                 **{k:v for k,v in snapshot_identity.items() if k!="schema"})
             with self.assertRaisesRegex(ValueError, "container_image_ref mismatch"):
-                validate_external_deployment(handoff, receipt, snapshot)
+                validate_external_deployment(
+                    handoff, admission, receipt, snapshot
+                )
 
 
 if __name__ == "__main__":
