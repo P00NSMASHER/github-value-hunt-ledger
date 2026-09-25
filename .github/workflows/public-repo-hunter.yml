@@ -46,7 +46,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: public-repo-hunter-${{ github.event.schedule || inputs.worker || github.run_id }}
+  group: public-repo-hunter-main-writer
   cancel-in-progress: false
 
 jobs:
