@@ -3,6 +3,7 @@ import unittest
 from historical_mnpi.economic_dedup import (
     ClusterRegistrationAction,
     DedupMatchState,
+    DedupReviewDecisionType,
     EconomicClusterRegistry,
     EconomicTransactionSignature,
     build_economic_signature,
@@ -407,6 +408,185 @@ class EconomicDedupTests(unittest.TestCase):
         self.assertNotEqual(before, after_first)
         self.assertNotEqual(after_first, after_second)
         self.assertEqual(len(registry.events()), 2)
+
+
+
+    def test_human_confirm_same_transaction_merges_clusters_without_losing_rows(self):
+        registry = EconomicClusterRegistry()
+        first = registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        second = registry.register(sig(2))
+        self.assertEqual(
+            second.action,
+            ClusterRegistrationAction.NEW_CLUSTER_REVIEW_REQUIRED,
+        )
+        candidate = second.review_candidates[0]
+        resolution = registry.decide_review_candidate(
+            candidate.candidate_id,
+            decision=DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION,
+            reviewer_id="reviewer:dedup",
+            reviewed_at="2026-09-25T09:00:00-04:00",
+            rationale="Public-source evidence confirms both rows describe one trade.",
+        )
+        self.assertEqual(
+            resolution.decision,
+            DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION,
+        )
+        merged = registry.cluster_for_signature(sig(2).proof_hash)
+        self.assertEqual(
+            merged.cluster_id,
+            first.cluster.cluster_id,
+        )
+        self.assertEqual(len(merged.signatures), 2)
+        self.assertIn(
+            sig(
+                1,
+                timestamp=None,
+                trade_date="2015-08-10",
+            ).normalized_row_hash,
+            merged.normalized_row_hashes,
+        )
+        self.assertIn(sig(2).normalized_row_hash, merged.normalized_row_hashes)
+        self.assertEqual(registry.pending_review_candidates(), ())
+        self.assertEqual(len(registry.review_decisions()), 1)
+
+    def test_human_confirm_distinct_keeps_clusters_separate(self):
+        registry = EconomicClusterRegistry()
+        first = registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        second = registry.register(sig(2))
+        candidate = second.review_candidates[0]
+        resolution = registry.decide_review_candidate(
+            candidate.candidate_id,
+            decision=DedupReviewDecisionType.CONFIRMED_DISTINCT,
+            reviewer_id="reviewer:dedup",
+            reviewed_at="2026-09-25T09:05:00-04:00",
+            rationale="Separate public records establish distinct executions.",
+        )
+        self.assertEqual(
+            resolution.decision,
+            DedupReviewDecisionType.CONFIRMED_DISTINCT,
+        )
+        self.assertEqual(len(registry.all_clusters()), 2)
+        self.assertEqual(
+            registry.cluster_for_signature(sig(2).proof_hash).cluster_id,
+            second.cluster.cluster_id,
+        )
+        self.assertNotEqual(
+            registry.cluster_for_signature(sig(2).proof_hash).cluster_id,
+            first.cluster.cluster_id,
+        )
+        self.assertEqual(registry.pending_review_candidates(), ())
+
+    def test_dedup_review_candidate_cannot_be_decided_twice(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        registration = registry.register(sig(2))
+        candidate = registration.review_candidates[0]
+        registry.decide_review_candidate(
+            candidate.candidate_id,
+            decision=DedupReviewDecisionType.CONFIRMED_DISTINCT,
+            reviewer_id="reviewer:dedup",
+            reviewed_at="2026-09-25T09:10:00-04:00",
+            rationale="Distinct.",
+        )
+        with self.assertRaisesRegex(ValueError, "already decided"):
+            registry.decide_review_candidate(
+                candidate.candidate_id,
+                decision=DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION,
+                reviewer_id="reviewer:dedup",
+                reviewed_at="2026-09-25T09:11:00-04:00",
+                rationale="Second decision must not overwrite.",
+            )
+
+    def test_stale_target_cluster_blocks_old_review_candidate(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        second = registry.register(sig(2))
+        candidate = second.review_candidates[0]
+
+        registry.register(sig(
+            3,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+
+        with self.assertRaisesRegex(ValueError, "target cluster changed"):
+            registry.decide_review_candidate(
+                candidate.candidate_id,
+                decision=DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION,
+                reviewer_id="reviewer:dedup",
+                reviewed_at="2026-09-25T09:15:00-04:00",
+                rationale="Stale candidate must fail closed.",
+            )
+
+    def test_manual_merge_supersedes_related_pending_candidates(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        second = registry.register(sig(2))
+        third = registry.register(sig(
+            3,
+            timestamp=None,
+            trade_date="2015-08-10",
+            quantity=None,
+        ))
+        self.assertGreaterEqual(len(registry.pending_review_candidates()), 2)
+
+        candidate = second.review_candidates[0]
+        resolution = registry.decide_review_candidate(
+            candidate.candidate_id,
+            decision=DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION,
+            reviewer_id="reviewer:dedup",
+            reviewed_at="2026-09-25T09:20:00-04:00",
+            rationale="Confirmed same transaction.",
+        )
+        self.assertEqual(
+            resolution.decision,
+            DedupReviewDecisionType.CONFIRMED_SAME_TRANSACTION,
+        )
+        self.assertTrue(registry.superseded_review_candidates())
+        pending_ids = {
+            item.candidate_id
+            for item in registry.pending_review_candidates()
+        }
+        for superseded_id in registry.superseded_review_candidates():
+            self.assertNotIn(superseded_id, pending_ids)
+
+    def test_review_resolution_requires_timezone_aware_timestamp(self):
+        registry = EconomicClusterRegistry()
+        registry.register(sig(
+            1,
+            timestamp=None,
+            trade_date="2015-08-10",
+        ))
+        second = registry.register(sig(2))
+        candidate = second.review_candidates[0]
+        with self.assertRaisesRegex(ValueError, "timezone"):
+            registry.decide_review_candidate(
+                candidate.candidate_id,
+                decision=DedupReviewDecisionType.CONFIRMED_DISTINCT,
+                reviewer_id="reviewer:dedup",
+                reviewed_at="2026-09-25T09:25:00",
+                rationale="Invalid timestamp.",
+            )
 
 
 
