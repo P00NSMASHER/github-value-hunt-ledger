@@ -604,7 +604,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         for item in imported.listings:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(set(by_symbol), {"ADI", "BA", "CA", "CAT", "CGNX", "CNMD", "COLM", "CREE", "DE", "DGI", "EHTH", "F", "GILD", "HON", "IDTI", "ILMN", "JNPR", "MDU", "NKE", "PNRA", "SBUX", "VMW"})
+        self.assertEqual(set(by_symbol), {"ADI", "BA", "CA", "CAT", "CGNX", "CLD", "CNMD", "COLM", "CREE", "DE", "DGI", "EHTH", "EW", "F", "GILD", "HON", "IDTI", "ILMN", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW"})
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
             {"ADI": 44, "BA": 22, "CA": 44, "CAT": 22, "CGNX": 44, "CLD": 44, "CNMD": 22, "COLM": 44, "CREE": 44, "DE": 22, "DGI": 66, "EHTH": 44, "EW": 44, "F": 22, "GILD": 22, "HON": 22, "IDTI": 44, "ILMN": 44, "JNPR": 88, "MDU": 44, "MTH": 44, "MUSA": 44, "NKE": 22, "PNRA": 88, "SBUX": 22, "VMW": 66},
@@ -822,7 +822,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(manifest["listing_metadata_resolved"], 902)
+        self.assertEqual(manifest["listing_metadata_resolved"], 1078)
         self.assertEqual(manifest["listing_requirement_total"], 3828)
         self.assertEqual(manifest["listing_intervals_verified"], 26)
         self.assertEqual(manifest["listing_batches_completed"], 8)
