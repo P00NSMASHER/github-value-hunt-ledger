@@ -35,9 +35,14 @@ class FakeExecutor:
             return [
                 {
                     "id": "approval-1",
-                    "request_hash": "c" * 64,
+                    "request_key": "approval-001",
+                    "agent_id": "agent-growth",
                     "action_key": "github.pr.create",
                     "action_class": "EXTERNAL_WRITE",
+                    "title": "Approve governed action",
+                    "intent_hash": "c" * 64,
+                    "predicted_risk": "MEDIUM_EXTERNAL_COMMITMENT",
+                    "expected_money_cents": 0,
                     "status": "PENDING",
                     "created_at": "2026-09-24T23:01:00Z",
                     "expires_at": "2026-09-25T00:01:00Z",
@@ -57,6 +62,8 @@ class ProductionReadBridgeTests(unittest.TestCase):
         self.assertEqual(["freight", "starblox"], [row["slug"] for row in view["businesses"]])
         self.assertEqual("freight", view["command_center"]["payload"]["recommended_actions"][0]["business"])
         self.assertEqual("github.pr.create", view["pending_approvals"][0]["action_key"])
+        self.assertEqual("approval-001", view["pending_approvals"][0]["request_key"])
+        self.assertEqual("c" * 64, view["pending_approvals"][0]["intent_hash"])
         self.assertEqual(("PENDING",), self.executor.calls[-1][1])
 
     def test_every_bridge_query_is_a_single_select(self):
@@ -83,6 +90,19 @@ class ProductionReadBridgeTests(unittest.TestCase):
     def test_missing_command_center_snapshot_is_explicit(self):
         self.executor.command_rows = []
         self.assertIsNone(self.bridge.latest_command_center_snapshot())
+
+    def test_pending_approval_requires_request_identity(self):
+        original = self.executor.__call__
+
+        def broken(sql, params):
+            rows = original(sql, params)
+            if "approval_inbox" in sql:
+                rows[0]["intent_hash"] = ""
+            return rows
+
+        self.bridge = ProductionReadBridge(broken)
+        with self.assertRaisesRegex(ProductionBridgeError, "immutable request identity"):
+            self.bridge.pending_approvals()
 
 
 if __name__ == "__main__":
