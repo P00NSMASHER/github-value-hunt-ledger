@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0.0",
+  "bundle_id": "portfolio-prework-architecture-evidence-v1",
+  "branch": "portfolio-parallel-prep",
+  "branch_head_at_bundle_start": "ddbe70c62d7d2de2382b4132f949127a0509c254",
+  "purpose": "Compact, provenance-linked handoff from the 10-step parallel prework plan into Portfolio Brain Step 0 architecture reconnaissance.",
+  "source_artifacts": [
+    {
+      "path": "portfolio_prework/portfolio_inventory.json",
+      "blob_sha": "63c896b192182a9edc0bcebb78b3428d803c46bc",
+      "role": "portfolio_scope"
+    },
+    {
+      "path": "portfolio_prework/PROJECT_ID_REGISTRY.json",
+      "blob_sha": "60c97e366814388d0f10862d1d0737837866361e",
+      "role": "stable_project_identity"
+    },
+    {
+      "path": "portfolio_prework/repository_snapshot.json",
+      "blob_sha": "00f91a4a331e65d6da8fc270ecbcaa74bb40a96b",
+      "role": "repository_structure_cache"
+    },
+    {
+      "path": "portfolio_prework/repository_delta.json",
+      "blob_sha": "e878fbc1aa6543fda7b98c52d2cdd778b8e4082f",
+      "role": "change_detection_baseline"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_ACTION_TAXONOMY.json",
+      "blob_sha": "8e9f297cb15addfbf3c8344459607bb1d74eaa1f",
+      "role": "global_action_classes"
+    },
+    {
+      "path": "portfolio_prework/AUTONOMY_MATRIX.json",
+      "blob_sha": "59efe79e44b2a5f83bbd50dd80fd9622915898c1",
+      "role": "project_authority_boundaries"
+    },
+    {
+      "path": "portfolio_prework/WORKFLOW_INVENTORY.json",
+      "blob_sha": "fda9d147b0eb2c4be064d3f6d5e77d6ffe51d540",
+      "role": "automation_inventory"
+    },
+    {
+      "path": "portfolio_prework/TEST_SUITE_INVENTORY.json",
+      "blob_sha": "1720f3633a5d1ff0b985c58e65490d31b7a7fd69",
+      "role": "test_surface"
+    },
+    {
+      "path": "portfolio_prework/DEPENDENCY_INVENTORY.json",
+      "blob_sha": "c1c8e0828b2d878250ac01dc49a3969b93181dc0",
+      "role": "dependency_surface"
+    },
+    {
+      "path": "portfolio_prework/PORTFOLIO_BUILD_STATE.json",
+      "blob_sha": "46eb0a12571b86b308c0faeca4f05763cc8ec82f",
+      "role": "durable_resume_state"
+    }
+  ],
+  "verified_facts": {
+    "connected_repository_count": 7,
+    "canonical_project_count": 12,
+    "repository_snapshot": {
+      "repository_count": 7,
+      "failed_repository_count": 0,
+      "discovered_file_count": 2499,
+      "workflow_count": 47,
+      "test_path_count": 367,
+      "dependency_manifest_count": 14
+    },
+    "latest_prework_delta": {
+      "unchanged_repository_count": 6,
+      "changed_repository_count": 1,
+      "error_count": 0,
+      "changed_repository": "P00NSMASHER/abvmschoolstarworld",
+      "changed_repository_sha": "82beed4848ab38893cacd2f35c1c338029003187",
+      "changed_file_count": 6
+    },
+    "autonomy": {
+      "classes": [
+        "OBSERVE",
+        "EXPERIMENT",
+        "MODIFY",
+        "ACT"
+      ],
+      "unbounded_act_project_count": 0,
+      "live_trading_or_broker_execution": "PROHIBITED"
+    },
+    "workflows": {
+      "workflow_count": 47,
+      "write_or_deploy_capable_count": 9,
+      "scheduled_count": 9,
+      "secrets_referencing_count": 8,
+      "pull_request_target_count": 0
+    },
+    "tests": {
+      "total_test_paths": 367,
+      "repositories_with_tests": 6,
+      "repositories_without_tests": 1
+    },
+    "dependencies": {
+      "manifest_count": 14,
+      "repositories_with_manifests": 4,
+      "repositories_without_manifests": 3
+    }
+  },
+  "accepted_decisions": [
+    {
+      "decision_id": "DEC-001",
+      "summary": "Keep product repositories independent and use a portfolio-level control plane rather than a source-code monolith."
+    },
+    {
+      "decision_id": "DEC-002",
+      "summary": "Use exact repository HEAD SHAs as the first cache key; unchanged repositories are not re-read unless the task specifically requires deeper evidence."
+    },
+    {
+      "decision_id": "DEC-003",
+      "summary": "Reserve PRJ-000 for Portfolio Brain and keep project identity separate from repository identity."
+    },
+    {
+      "decision_id": "DEC-004",
+      "summary": "Use OBSERVE / EXPERIMENT / MODIFY / ACT with deny-by-default semantics and the most restrictive applicable rule winning."
+    },
+    {
+      "decision_id": "DEC-005",
+      "summary": "No project receives unbounded external ACT authority; consequential actions remain human-gated and market-surveillance live execution remains prohibited."
+    },
+    {
+      "decision_id": "DEC-006",
+      "summary": "Existing GitHub workflow credentials are capabilities of those workflows, not inherited Portfolio Brain authority."
+    },
+    {
+      "decision_id": "DEC-007",
+      "summary": "Prefer changed-path and risk-aware targeted test selection over indiscriminate full-portfolio testing."
+    },
+    {
+      "decision_id": "DEC-008",
+      "summary": "Treat dependency manifests and lockfiles as promotion evidence and trigger dependency-specific validation when they change."
+    }
+  ],
+  "unresolved_risks": [
+    {
+      "risk_id": "RISK-001",
+      "severity": "RECHECK",
+      "summary": "ABVM changed after the Step 3 snapshot baseline. Step 0 should run the SHA delta detector first and inspect only currently changed files/repositories."
+    },
+    {
+      "risk_id": "RISK-002",
+      "severity": "REVIEW",
+      "summary": "Write/deploy authority exists in nine workflows. Portfolio Brain must not inherit those credentials or deployment semantics implicitly."
+    },
+    {
+      "risk_id": "RISK-003",
+      "severity": "REVIEW",
+      "summary": "CaptureBrief contains scheduled cross-project write behavior for an ABVM school-pack refresh. Architecture boundaries should represent and govern cross-project automation explicitly."
+    },
+    {
+      "risk_id": "RISK-004",
+      "severity": "REVIEW",
+      "summary": "ABVM defines qa:unit but its pinned QA workflow does not invoke it; legacy business_os tests also lack a matching pinned workflow invocation."
+    },
+    {
+      "risk_id": "RISK-005",
+      "severity": "REVIEW",
+      "summary": "Dependency reproducibility is uneven: ABVM uses floating latest versions without a discovered lockfile; StarBlox lacks discovered npm/Cargo lockfiles; primary production Python requirements mostly use ranges."
+    },
+    {
+      "risk_id": "RISK-006",
+      "severity": "REVIEW",
+      "summary": "permitplate-state is treated in durable state as sensitive operational state while prior metadata indicated public visibility; access/visibility should be explicitly verified before Portfolio Brain integration."
+    }
+  ],
+  "non_claims_and_scope_limits": [
+    "The prework does not prove commercial traction, revenue, customer validation, or production readiness.",
+    "The prework does not claim that repositories with no discovered dependency manifest are dependency-free.",
+    "The prework does not grant Portfolio Brain production, customer-contact, financial, deployment, or trading authority.",
+    "The prework does not replace Step 0 architecture reasoning; it removes repeat discovery work and supplies evidence."
+  ],
+  "architect_start_sequence": [
+    "Read PORTFOLIO_BUILD_STATE.json.",
+    "Read ARCHITECTURE_EVIDENCE_BUNDLE.json.",
+    "Run the repository delta detector before any broad repository inspection.",
+    "Inspect only repositories/files reported as changed unless a specific architecture question requires more evidence.",
+    "Use PROJECT_ID_REGISTRY.json as canonical project identity.",
+    "Use AUTONOMY_MATRIX.json as the authority boundary.",
+    "Reuse existing Hunter / AI Business OS / evidence / learning capabilities where evidence supports reuse; do not create a duplicate control plane by default.",
+    "Record new architecture decisions and inspected SHAs back into durable state."
+  ],
+  "readiness": {
+    "parallel_prework_complete": true,
+    "ready_for_architecture_step_0": true,
+    "recommended_next_mode": "resume Step 0 using this bundle and current delta rather than rescanning the portfolio"
+  }
+}
