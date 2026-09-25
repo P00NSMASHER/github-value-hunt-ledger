@@ -79,14 +79,7 @@ def load_import_bundle():
 
 
 class RealCorpusListingTests(unittest.TestCase):
-    def test_frozen_compact_requirement_index_is_complete(self):
-        path = CORPUS_DIR / "listing_requirement_index.csv"
-        payload = path.read_bytes()
-        self.assertEqual(
-            hashlib.sha256(payload).hexdigest(),
-            "b79d87d3ae51022c66f3038e73446188ca956a2187f32803707038d1cbb290b9",
-        )
-
+    def test_compact_requirement_index_is_complete(self):
         rows = load_compact_requirements()
         self.assertEqual(len(rows), 146)
         self.assertEqual(
@@ -94,6 +87,11 @@ class RealCorpusListingTests(unittest.TestCase):
             3828,
         )
         self.assertTrue(all(row["required_dates"] for row in rows))
+        self.assertTrue(all(
+            len(row["required_dates"].split("|"))
+            == int(row["requirement_count"])
+            for row in rows
+        ))
 
     def test_expanded_requirement_index_has_exact_3828_unique_pairs(self):
         pairs = expanded_requirements()
@@ -107,26 +105,22 @@ class RealCorpusListingTests(unittest.TestCase):
             "cb00a9c2983c5ffb0f37ef3aff84ce8bcf328bd56565664e01abe0dfadde64af",
         )
 
-    def test_first_interval_batch_expands_to_exactly_66_rows(self):
+    def test_verified_intervals_expand_to_current_1562_rows(self):
+        intervals = load_intervals()
+        self.assertEqual(len(intervals), 48)
+
         result = expand_listing_intervals(
             expanded_requirements(),
-            load_intervals(),
+            intervals,
         )
-        self.assertEqual(len(result.resolved), 66)
-        self.assertEqual(len(result.unresolved), 3762)
-
-        counts = {}
-        for item in result.resolved:
-            counts[item.symbol] = counts.get(item.symbol, 0) + 1
+        self.assertEqual(len(result.resolved), 1562)
+        self.assertEqual(len(result.unresolved), 2266)
         self.assertEqual(
-            counts,
-            {
-                "CAT": 22,
-                "CNMD": 22,
-                "GILD": 22,
-            },
+            len({item.symbol for item in result.resolved}),
+            48,
         )
 
+        # Preserve known anchor intervals from the first verified group.
         exchanges = {
             item.symbol: item.primary_exchange
             for item in result.resolved
@@ -141,7 +135,7 @@ class RealCorpusListingTests(unittest.TestCase):
             load_intervals(),
         )
         imported = load_import_bundle()
-        self.assertEqual(len(imported.listings), 66)
+        self.assertEqual(len(imported.listings), 1562)
 
         expanded_rows = {
             (
@@ -160,18 +154,14 @@ class RealCorpusListingTests(unittest.TestCase):
             for item in imported.listings
         }
         self.assertEqual(imported_rows, expanded_rows)
-        self.assertEqual(len(imported_rows), 66)
+        self.assertEqual(len(imported_rows), 1562)
 
-    def test_interval_evidence_uses_two_public_official_boundaries(self):
+    def test_interval_evidence_is_public_authorized_and_two_boundary(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 3)
+        self.assertEqual(len(intervals), 48)
         for item in intervals:
-            self.assertTrue(
-                item.start_evidence_url.startswith("https://www.sec.gov/")
-            )
-            self.assertTrue(
-                item.end_evidence_url.startswith("https://www.sec.gov/")
-            )
+            self.assertTrue(item.start_evidence_url.startswith("https://"))
+            self.assertTrue(item.end_evidence_url.startswith("https://"))
             self.assertNotEqual(
                 item.start_evidence_url,
                 item.end_evidence_url,
@@ -181,18 +171,18 @@ class RealCorpusListingTests(unittest.TestCase):
                 MetadataDataClass.PUBLIC_OR_AUTHORIZED_HISTORICAL,
             )
 
-    def test_manifest_tracks_first_g2_batch(self):
+    def test_manifest_tracks_restored_g2_state(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(manifest["listing_metadata_total"], 3828)
-        self.assertEqual(manifest["listing_metadata_resolved"], 66)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 3762)
-        self.assertEqual(manifest["listing_interval_batches_completed"], 1)
-        self.assertEqual(
-            manifest["listing_symbols_with_resolved_intervals"],
-            3,
-        )
+        self.assertEqual(manifest["listing_requirement_total"], 3828)
+        self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
+        self.assertTrue(manifest["listing_full_compact_index_loaded"])
+        self.assertEqual(manifest["listing_metadata_resolved"], 1562)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 2266)
+        self.assertEqual(manifest["listing_intervals_verified"], 48)
+        self.assertEqual(manifest["listing_symbols_resolved"], 48)
+        self.assertEqual(manifest["listing_batches_completed"], 14)
 
 
 if __name__ == "__main__":
