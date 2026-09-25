@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "bundle_id": "portfolio-prework-architecture-evidence-v1",
+  "bundle_id": "portfolio-prework-architecture-evidence-v1.1",
   "branch": "portfolio-parallel-prep",
   "branch_head_at_bundle_start": "ddbe70c62d7d2de2382b4132f949127a0509c254",
   "purpose": "Compact, provenance-linked handoff from the 10-step parallel prework plan into Portfolio Brain Step 0 architecture reconnaissance.",
@@ -52,7 +52,7 @@
     },
     {
       "path": "portfolio_prework/PORTFOLIO_BUILD_STATE.json",
-      "blob_sha": "46eb0a12571b86b308c0faeca4f05763cc8ec82f",
+      "blob_sha": "9a5585ca3308ef17122f073b68ef33896826c655",
       "role": "durable_resume_state"
     }
   ],
@@ -68,12 +68,41 @@
       "dependency_manifest_count": 14
     },
     "latest_prework_delta": {
-      "unchanged_repository_count": 6,
-      "changed_repository_count": 1,
+      "unchanged_repository_count": 5,
+      "changed_repository_count": 2,
       "error_count": 0,
-      "changed_repository": "P00NSMASHER/abvmschoolstarworld",
-      "changed_repository_sha": "82beed4848ab38893cacd2f35c1c338029003187",
-      "changed_file_count": 6
+      "changed_repositories": [
+        {
+          "repo_id": "REPO-001",
+          "full_name": "P00NSMASHER/github-value-hunt-ledger",
+          "baseline_sha": "b47f95caa658a9b12536cc9946d81d51f944c6ac",
+          "current_sha": "a13a26f0b3d76caddcafdcb775aac853c3b9ecc1",
+          "ahead_by": 20,
+          "changed_file_count": 20,
+          "architecture_relevance": [
+            "new AI Business OS CEO command center",
+            "new portfolio planning capability",
+            "new production read bridge",
+            "Hunter scout queue expansion",
+            "public repo scout/workflow changes"
+          ]
+        },
+        {
+          "repo_id": "REPO-003",
+          "full_name": "P00NSMASHER/abvmschoolstarworld",
+          "baseline_sha": "2b78aed7695374b35ad207c43bec9d61486d056a",
+          "current_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
+          "ahead_by": 49,
+          "changed_file_count": 17,
+          "architecture_relevance": [
+            "package dependency changes",
+            "application/UI changes",
+            "service worker changes",
+            "validation changes",
+            "test-suite changes"
+          ]
+        }
+      ]
     },
     "autonomy": {
       "classes": [
@@ -135,13 +164,26 @@
     {
       "decision_id": "DEC-008",
       "summary": "Treat dependency manifests and lockfiles as promotion evidence and trigger dependency-specific validation when they change."
+    },
+    {
+      "decision_id": "DEC-009",
+      "summary": "Use ARCHITECTURE_EVIDENCE_BUNDLE.json plus the current SHA delta as the canonical prework handoff into Portfolio Brain Step 0; do not rescan unchanged repositories by default."
+    },
+    {
+      "decision_id": "DEC-010",
+      "summary": "At architecture handoff, re-inspect only github-value-hunt-ledger and abvmschoolstarworld, the two repositories whose HEADs diverged from the pinned snapshot, before completing master Step 0."
     }
   ],
   "unresolved_risks": [
     {
       "risk_id": "RISK-001",
       "severity": "RECHECK",
-      "summary": "ABVM changed after the Step 3 snapshot baseline. Step 0 should run the SHA delta detector first and inspect only currently changed files/repositories."
+      "summary": "Two repositories changed after the pinned Step 3 snapshot. REPO-001 is 20 commits/20 files ahead and contains architecture-relevant AI Business OS/Hunter additions; REPO-003 is 49 commits/17 files ahead and contains package/app/service-worker/test changes. Step 0 should inspect these deltas only before finalizing the architecture baseline."
+    },
+    {
+      "risk_id": "RISK-006",
+      "severity": "HUMAN_REVIEW",
+      "summary": "permitplate-state is currently public according to GitHub metadata while the durable architecture treats it as sensitive operational state. Intended visibility/access controls should be reviewed before Portfolio Brain integration."
     },
     {
       "risk_id": "RISK-002",
@@ -162,11 +204,6 @@
       "risk_id": "RISK-005",
       "severity": "REVIEW",
       "summary": "Dependency reproducibility is uneven: ABVM uses floating latest versions without a discovered lockfile; StarBlox lacks discovered npm/Cargo lockfiles; primary production Python requirements mostly use ranges."
-    },
-    {
-      "risk_id": "RISK-006",
-      "severity": "REVIEW",
-      "summary": "permitplate-state is treated in durable state as sensitive operational state while prior metadata indicated public visibility; access/visibility should be explicitly verified before Portfolio Brain integration."
     }
   ],
   "non_claims_and_scope_limits": [
@@ -178,8 +215,9 @@
   "architect_start_sequence": [
     "Read PORTFOLIO_BUILD_STATE.json.",
     "Read ARCHITECTURE_EVIDENCE_BUNDLE.json.",
-    "Run the repository delta detector before any broad repository inspection.",
-    "Inspect only repositories/files reported as changed unless a specific architecture question requires more evidence.",
+    "Inspect the current REPO-001 delta first because it adds architecture-relevant AI Business OS and Hunter capabilities.",
+    "Inspect the current REPO-003 delta second because package/app/service-worker/test changes make its cached architecture evidence stale.",
+    "Keep REPO-002, REPO-004, REPO-005, REPO-006, and REPO-007 cached unless a specific architecture question requires deeper evidence.",
     "Use PROJECT_ID_REGISTRY.json as canonical project identity.",
     "Use AUTONOMY_MATRIX.json as the authority boundary.",
     "Reuse existing Hunter / AI Business OS / evidence / learning capabilities where evidence supports reuse; do not create a duplicate control plane by default.",
@@ -188,6 +226,19 @@
   "readiness": {
     "parallel_prework_complete": true,
     "ready_for_architecture_step_0": true,
-    "recommended_next_mode": "resume Step 0 using this bundle and current delta rather than rescanning the portfolio"
-  }
+    "changed_repositories_requiring_targeted_refresh": [
+      "REPO-001",
+      "REPO-003"
+    ],
+    "unchanged_repositories_safe_to_cache": [
+      "REPO-002",
+      "REPO-004",
+      "REPO-005",
+      "REPO-006",
+      "REPO-007"
+    ],
+    "recommended_next_mode": "resume master Step 0 with targeted inspection of REPO-001 and REPO-003 only, then finish the architecture baseline"
+  },
+  "refreshed_at": "2026-09-25T08:27:30Z",
+  "branch_head_at_refresh": "87fd87bab6dc3e2685e1e0f6bf22a0d6ca250f3c"
 }
