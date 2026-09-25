@@ -21,4 +21,4 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run portfolio prework unit tests
-        run: python -m unittest portfolio_prework/test_build_portfolio_snapshot.py
+        run: python -m unittest discover -s portfolio_prework -p 'test_*.py'
