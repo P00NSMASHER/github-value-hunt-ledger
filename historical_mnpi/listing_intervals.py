@@ -13,6 +13,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+import csv
+import io
 from typing import Iterable
 
 from .metadata_resolver import (
@@ -116,6 +118,53 @@ class ListingIntervalEvidence:
         )
 
 
+def parse_listing_interval_csv(
+    text: str,
+) -> tuple[ListingIntervalEvidence, ...]:
+    expected = (
+        "interval_id",
+        "symbol",
+        "primary_exchange",
+        "valid_from",
+        "valid_through",
+        "start_evidence_url",
+        "end_evidence_url",
+        "source_name",
+        "data_class",
+    )
+    reader = csv.DictReader(io.StringIO(text))
+    if tuple(reader.fieldnames or ()) != expected:
+        raise ValueError("listing interval CSV has unexpected headers")
+
+    result = []
+    for line_number, row in enumerate(reader, start=2):
+        if None in row:
+            raise ValueError(
+                f"listing interval CSV line {line_number} has extra columns"
+            )
+        try:
+            data_class = MetadataDataClass(row["data_class"])
+        except ValueError as exc:
+            raise ValueError(
+                f"invalid data_class at line {line_number}"
+            ) from exc
+        result.append(ListingIntervalEvidence(
+            interval_id=row["interval_id"],
+            symbol=row["symbol"],
+            primary_exchange=row["primary_exchange"],
+            valid_from=row["valid_from"],
+            valid_through=row["valid_through"],
+            start_evidence_url=row["start_evidence_url"],
+            end_evidence_url=row["end_evidence_url"],
+            source_name=row["source_name"],
+            data_class=data_class,
+        ))
+
+    if not result:
+        raise ValueError("listing interval CSV is empty")
+    return tuple(result)
+
+
 @dataclass(frozen=True)
 class ListingIntervalExpansion:
     resolved: tuple[ListingExchangeEvidence, ...]
@@ -211,4 +260,5 @@ __all__ = [
     "ListingIntervalEvidence",
     "ListingIntervalExpansion",
     "expand_listing_intervals",
+    "parse_listing_interval_csv",
 ]
