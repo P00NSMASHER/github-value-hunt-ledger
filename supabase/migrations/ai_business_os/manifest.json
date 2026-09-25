@@ -2,9 +2,9 @@
   "schema": "ai_business_os_prod",
   "source": "supabase_migrations.schema_migrations",
   "exported_from_live_database": true,
-  "latest_version": "20260925141435",
-  "migration_count": 36,
-  "live_schema_fingerprint_sha256": "793e747070b5fcd0772eec2333d78c96f7c55da2c9c94fdf0198d6113fd8a201",
+  "latest_version": "20260925145237",
+  "migration_count": 42,
+  "live_schema_fingerprint_sha256": "6efecb862a2dea12ff5f231721be93b35e3bd8683d068a0b36ec559fc2ca2c40",
   "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
   "migrations": [
     {
@@ -186,6 +186,36 @@
       "version": "20260925141435",
       "name": "harden_ai_business_os_rights_provenance_v1",
       "sha256": "e83cd6864982e45d0291b9d63d95f0d67632fd5c87890a356696abc8e01a19a6"
+    },
+    {
+      "version": "20260925144434",
+      "name": "create_ai_business_os_verified_external_outcomes_v1",
+      "sha256": "01090df8b1b498e8a2da17b193e3e34bdfb16f939d7731baf2cb8866d67b581a"
+    },
+    {
+      "version": "20260925144636",
+      "name": "wire_ai_business_os_outcomes_to_allocator_memory_v1",
+      "sha256": "e962653d5127c6277b54a1be993c32479594262512950dab7b2aa8e3e8ed4a40"
+    },
+    {
+      "version": "20260925144741",
+      "name": "add_ai_business_os_opportunity_first_contact_v1",
+      "sha256": "a1df9a306d72e65d5e111094b7e5069f7e13d1177e3d0087087be24e485ac31e"
+    },
+    {
+      "version": "20260925145057",
+      "name": "fix_ai_business_os_external_outcome_snapshot_ordering_v1",
+      "sha256": "48452d6865415989203d6b8df49e4a88a0e18c3a1335d0ce4f92cb5175379a70"
+    },
+    {
+      "version": "20260925145220",
+      "name": "integrate_ai_business_os_external_outcomes_command_center_v1",
+      "sha256": "1c21e12677be3ea0694c8823eac67a3bc6f0e7d5a281186c6af95d10962ab003"
+    },
+    {
+      "version": "20260925145237",
+      "name": "add_ai_business_os_external_outcomes_to_ceo_snapshot_v1",
+      "sha256": "b9783b11b5a4d30763ecc8b6edc51df75e5060164581e6e28a68354d6a27d717"
     }
   ],
   "public_bootstrap_sanitized": true,
@@ -196,5 +226,5 @@
     "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
   ],
   "live_statement_hashes_retained": true,
-  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Canonical rights/provenance evidence classes and scope-specific readiness now govern Hunter, Freight, RecoveryWorks and AI Business OS."
+  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Verified external outcomes now feed pool-scoped allocator evidence and verified value memory; no real outcome is inferred from repository activity."
 }
