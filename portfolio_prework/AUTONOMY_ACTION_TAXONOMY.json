@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Canonical action classes for Portfolio Brain autonomy decisions. This is Step 6A only; project-specific permissions are added later.",
+  "default_policy": "DENY_UNLESS_EXPLICITLY_ALLOWED",
+  "classes": [
+    {
+      "autonomy_class": "OBSERVE",
+      "description": "Read, inspect, summarize, measure, compare, and record evidence without modifying downstream systems.",
+      "default_allowed": true,
+      "examples": [
+        "read_repository",
+        "read_workflow_status",
+        "collect_metrics",
+        "build_read_only_snapshot",
+        "update_internal_analysis_state"
+      ]
+    },
+    {
+      "autonomy_class": "EXPERIMENT",
+      "description": "Run bounded synthetic, local, shadow, or otherwise non-consequential tests that cannot alter production/customer/financial state.",
+      "default_allowed": true,
+      "constraints": [
+        "must_be_reversible_or_disposable",
+        "must_not_contact_customers",
+        "must_not_move_money",
+        "must_not_execute_live_trades",
+        "must_not_modify_production_state"
+      ],
+      "examples": [
+        "run_unit_tests",
+        "run_synthetic_benchmark",
+        "run_shadow_evaluation",
+        "generate_candidate_hypothesis"
+      ]
+    },
+    {
+      "autonomy_class": "MODIFY",
+      "description": "Create candidate changes in isolated branches, commits, or pull requests without directly promoting them to consequential production use.",
+      "default_allowed": "PROJECT_SPECIFIC",
+      "constraints": [
+        "isolated_branch_only",
+        "no_direct_main_write",
+        "builder_not_sole_verifier",
+        "tests_required_before_promotion"
+      ],
+      "examples": [
+        "create_branch",
+        "edit_candidate_code",
+        "add_tests",
+        "open_pull_request"
+      ]
+    },
+    {
+      "autonomy_class": "ACT",
+      "description": "Perform an external or consequential action affecting users, customers, money, production, publication, or live markets.",
+      "default_allowed": false,
+      "requires_human_authorization": true,
+      "examples": [
+        "deploy_production",
+        "contact_customer",
+        "send_claim_or_dispute",
+        "purchase_or_change_billing",
+        "move_money",
+        "publish_sensitive_information",
+        "run_consequential_child_facing_experiment",
+        "execute_live_trade_or_broker_order"
+      ]
+    }
+  ],
+  "hard_gates": [
+    {
+      "gate_id": "GATE-001",
+      "action": "production_deployment",
+      "policy": "HUMAN_APPROVAL_REQUIRED"
+    },
+    {
+      "gate_id": "GATE-002",
+      "action": "external_customer_communication",
+      "policy": "HUMAN_APPROVAL_REQUIRED"
+    },
+    {
+      "gate_id": "GATE-003",
+      "action": "money_movement_or_purchase",
+      "policy": "HUMAN_APPROVAL_REQUIRED"
+    },
+    {
+      "gate_id": "GATE-004",
+      "action": "destructive_or_irreversible_data_change",
+      "policy": "HUMAN_APPROVAL_REQUIRED"
+    },
+    {
+      "gate_id": "GATE-005",
+      "action": "consequential_child_facing_change_or_experiment",
+      "policy": "HUMAN_APPROVAL_REQUIRED"
+    },
+    {
+      "gate_id": "GATE-006",
+      "action": "live_market_trading_or_broker_order",
+      "policy": "PROHIBITED"
+    }
+  ]
+}
