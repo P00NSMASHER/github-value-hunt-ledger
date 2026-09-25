@@ -202,6 +202,17 @@ from .metadata_resolver import (
     validate_metadata_contract_fields,
 )
 
+from .real_corpus_import import (
+    ANNOUNCEMENT_HEADERS,
+    CONTROL_HEADERS,
+    LISTING_HEADERS,
+    MARKET_SOURCE_HEADERS,
+    RealCorpusMetadataImport,
+    SHARES_HEADERS,
+    import_real_corpus_metadata,
+    render_real_corpus_metadata_templates,
+)
+
 from .source_registry import (
     SourceAdmissibility,
     SourceRecord,
@@ -212,6 +223,14 @@ from .source_registry import (
 )
 
 __all__ = [
+    "ANNOUNCEMENT_HEADERS",
+    "CONTROL_HEADERS",
+    "LISTING_HEADERS",
+    "MARKET_SOURCE_HEADERS",
+    "RealCorpusMetadataImport",
+    "SHARES_HEADERS",
+    "import_real_corpus_metadata",
+    "render_real_corpus_metadata_templates",
     "BASELINE_SESSIONS",
     "CoverageEvidence",
     "CoverageGate",
