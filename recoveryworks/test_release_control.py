@@ -17,6 +17,7 @@ from recoveryworks.production_adversarial_certification import (
     run_commercial_adversarial_certification,
 )
 from recoveryworks.release_package_integrity import (
+    assert_release_package_subject,
     verify_release_control_package,
 )
 from recoveryworks.release_control import (
@@ -269,6 +270,34 @@ class ReleaseControlTests(unittest.TestCase):
             )
             self.assertEqual(len(receipt.artifact_sha256), 5)
             self.assertFalse(receipt.external_actions_performed)
+            assert_release_package_subject(
+                receipt,
+                release=current,
+                gate=gate,
+                adversarial_certification=certification,
+            )
+            newer_release = build_release_manifest(
+                version="1.0.1",
+                build_manifest=build,
+                deployment=deployment,
+                container_image_ref=image,
+                created_at="2026-09-24T13:10:00Z",
+            )
+            with self.assertRaisesRegex(ValueError, "expected release"):
+                assert_release_package_subject(
+                    receipt,
+                    release=newer_release,
+                    gate=gate,
+                    adversarial_certification=certification,
+                )
+            with self.assertRaisesRegex(ValueError, "already been consumed"):
+                assert_release_package_subject(
+                    receipt,
+                    release=current,
+                    gate=gate,
+                    adversarial_certification=certification,
+                    previously_consumed_receipt_proof_hashes=(receipt.proof_hash,),
+                )
             self.assertTrue(all(private_permissions_verified(path) for path in paths))
 
     def test_production_release_package_requires_exact_certification_artifact(self):
