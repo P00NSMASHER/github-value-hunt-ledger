@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
-  "architecture_version": "prework-1.0",
+  "architecture_version": "prework-1.1",
   "state_id": "portfolio-parallel-prework",
   "working_branch": "portfolio-parallel-prep",
-  "phase": "parallel_prework",
+  "phase": "architecture_build",
   "current_step": 11,
   "completed_steps": [
     1,
@@ -20,51 +20,51 @@
   "repositories": {
     "REPO-001": {
       "full_name": "P00NSMASHER/github-value-hunt-ledger",
-      "last_inspected_sha": "b47f95caa658a9b12536cc9946d81d51f944c6ac",
-      "inspection_status": "UNCHANGED",
-      "last_observed_at": "2026-09-25T02:49:30Z",
-      "notes": "Portfolio host repository; prework itself is isolated on portfolio-parallel-prep."
+      "last_inspected_sha": "a13a26f0b3d76caddcafdcb775aac853c3b9ecc1",
+      "inspection_status": "CHANGED",
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": "Changed since the pinned Step 3 snapshot: 20 commits / 20 files ahead. Delta includes new AI Business OS command-center, portfolio-planning, production-read-bridge, Hunter scout-queue, and public-repo-scout changes. Inspect this delta before finalizing master architecture Step 0."
     },
     "REPO-002": {
       "full_name": "P00NSMASHER/StarBlox",
       "last_inspected_sha": "8ebe583f6dae6a832bae2f4987c6919db41eaf5e",
       "inspection_status": "UNCHANGED",
-      "last_observed_at": "2026-09-25T02:49:30Z",
+      "last_observed_at": "2026-09-25T08:27:30Z",
       "notes": null
     },
     "REPO-003": {
       "full_name": "P00NSMASHER/abvmschoolstarworld",
-      "last_inspected_sha": "82beed4848ab38893cacd2f35c1c338029003187",
+      "last_inspected_sha": "a15c7c2214a065707123e9b8ab8ac51a42240345",
       "inspection_status": "CHANGED",
-      "last_observed_at": "2026-09-25T02:49:30Z",
-      "notes": "Changed after repository snapshot baseline; six changed files detected across 13 commits."
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": "Changed since the pinned Step 3 snapshot: 49 commits / 17 files ahead. Delta includes package, app/UI, service-worker, validation, and test changes. Inspect this delta before finalizing master architecture Step 0."
     },
     "REPO-004": {
       "full_name": "P00NSMASHER/trading-platform",
       "last_inspected_sha": "579730f1abb595579de199277a95a8c89f733d0f",
       "inspection_status": "UNCHANGED",
-      "last_observed_at": "2026-09-25T02:49:30Z",
+      "last_observed_at": "2026-09-25T08:27:30Z",
       "notes": "Research/surveillance only; no autonomous trading authority."
     },
     "REPO-005": {
       "full_name": "P00NSMASHER/permitplate-nyc",
       "last_inspected_sha": "7c9a8fc4dd9fa12275d336beb8eb10732718666a",
       "inspection_status": "UNCHANGED",
-      "last_observed_at": "2026-09-25T02:49:30Z",
+      "last_observed_at": "2026-09-25T08:27:30Z",
       "notes": null
     },
     "REPO-006": {
       "full_name": "P00NSMASHER/permitplate-state",
       "last_inspected_sha": "c64fe06a22c3826c9ad3a7b85a4f911a6e589c19",
       "inspection_status": "UNCHANGED",
-      "last_observed_at": "2026-09-25T02:49:30Z",
-      "notes": "Operational-state repository; treat as sensitive operational state even though current GitHub metadata reports public visibility."
+      "last_observed_at": "2026-09-25T08:27:30Z",
+      "notes": "Current GitHub metadata confirms public visibility. Durable architecture treats this repository as sensitive operational state, so visibility/access requires explicit human review before Portfolio Brain integration."
     },
     "REPO-007": {
       "full_name": "P00NSMASHER/capturebrief",
       "last_inspected_sha": "3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba",
       "inspection_status": "UNCHANGED",
-      "last_observed_at": "2026-09-25T02:49:30Z",
+      "last_observed_at": "2026-09-25T08:27:30Z",
       "notes": null
     }
   },
@@ -147,6 +147,15 @@
       "evidence_refs": [
         "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json",
         "portfolio_prework/STEP0_RESUME_HANDOFF.md"
+      ]
+    },
+    {
+      "decision_id": "DEC-010",
+      "summary": "At architecture handoff, re-inspect only the two repositories whose HEADs diverged from the pinned snapshot (github-value-hunt-ledger and abvmschoolstarworld) before completing master Step 0; keep the other five repositories cached unless a specific architecture question requires them.",
+      "status": "ACCEPTED",
+      "evidence_refs": [
+        "portfolio_prework/repository_snapshot.json",
+        "portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json"
       ]
     }
   ],
@@ -320,9 +329,31 @@
       "status": "PASS",
       "step": 10,
       "evidence": "Portfolio Prework CI run 36091601744 succeeded with bundle consistency tests included."
+    },
+    {
+      "name": "final parallel-prework completion verification",
+      "status": "PASS",
+      "step": 10,
+      "evidence": "Final durable-state CI run 36091633705 and final progress-state CI run 36091636776 both succeeded."
     }
   ],
-  "blockers": [],
-  "next_action": null,
-  "updated_at": "2026-09-25T03:45:05Z"
+  "blockers": [
+    {
+      "blocker_id": "BLK-001",
+      "summary": "permitplate-state is currently public while durable architecture treats it as sensitive operational state; review intended visibility and access controls before integrating it into Portfolio Brain.",
+      "status": "OPEN",
+      "requires_human_decision": true
+    }
+  ],
+  "next_action": {
+    "step": 11,
+    "summary": "Resume the master Portfolio Brain architecture at STEP 0 using the refreshed evidence bundle. Inspect only the current deltas for REPO-001 and REPO-003 first, then complete the architecture baseline without rescanning the five unchanged repositories.",
+    "preconditions": [
+      "Read ARCHITECTURE_EVIDENCE_BUNDLE.json before broad repository inspection.",
+      "Preserve the Step 6 autonomy matrix and hard gates.",
+      "Do not duplicate newly added AI Business OS capabilities without first inspecting the REPO-001 delta.",
+      "Do not integrate permitplate-state until its intended visibility/access posture is reviewed."
+    ]
+  },
+  "updated_at": "2026-09-25T08:27:30Z"
 }
