@@ -41,12 +41,23 @@ def corpus_text(root):
             except OSError: pass
     return "\n".join(chunks)
 def known(corpus,repo,sha): return repo.lower() in corpus and sha.lower() in corpus
+def queued_pairs(root):
+    pairs=set()
+    if not root.exists(): return pairs
+    for p in root.glob("HUNTER-*.json"):
+        try: d=json.loads(p.read_text(encoding="utf-8"))
+        except Exception: continue
+        for c in d.get("candidates") or []:
+            repo=str(c.get("repository") or "").lower()
+            sha=str(c.get("exact_revision") or "").lower()
+            if repo and sha: pairs.add((repo,sha))
+    return pairs
 
 class GH:
     def __init__(self,token):
         if not token: raise ValueError("GITHUB_TOKEN or GH_TOKEN is required")
         self.token=token
-        self.stats={"api_requests":0,"retries":0,"rate_limit_sleeps":0,"revision_cache_hits":0,"root_cache_hits":0}
+        self.stats={"api_requests":0,"retries":0,"rate_limit_sleeps":0,"revision_cache_hits":0,"root_cache_hits":0,"known_revision_skips":0}
         self._revision_cache={}
         self._root_cache={}
     def get(self,path,q=None):
@@ -98,7 +109,7 @@ class GH:
         self._root_cache[key]=names
         return names
 
-def candidate(gh,repo,q,corp,own):
+def candidate(gh,repo,q,corp,own,prior_pairs=None):
     full=str(repo.get("full_name") or "")
     if not full or full.lower()==own.lower(): return None
     rf=risk_flags(repo)
@@ -106,20 +117,24 @@ def candidate(gh,repo,q,corp,own):
     branch=str(repo.get("default_branch") or "main")
     try: sha=gh.revision(full,branch)
     except RuntimeError: return None
-    if not sha or known(corp,full,sha): return None
+    if not sha: return None
+    pair=(full.lower(),sha.lower())
+    if pair in (prior_pairs or set()) or known(corp,full,sha):
+        if hasattr(gh,"stats"): gh.stats["known_revision_skips"]=int(gh.stats.get("known_revision_skips",0))+1
+        return None
     try: names=gh.root(full,branch)
     except RuntimeError: return None
     score,parts,hits=triage(repo,names); lic=(repo.get("license") or {}).get("spdx_id") or "UNKNOWN"
     return {"repository":full,"url":repo.get("html_url"),"exact_revision":sha,"default_branch":branch,"description":repo.get("description"),"primary_language":repo.get("language"),"topics":repo.get("topics") or [],"published_license_spdx":lic,"stars":int(repo.get("stargazers_count") or 0),"forks":int(repo.get("forks_count") or 0),"archived":bool(repo.get("archived")),"pushed_at":repo.get("pushed_at"),"size_kb":int(repo.get("size") or 0),"root_code_signals":hits,"triage_score":score,"triage_components":parts,"discovery_query":q,"status":"PRE_VERIFICATION_CANDIDATE"}
 
-def worker_run(w,gh,corp,own,per_query,max_candidates):
+def worker_run(w,gh,corp,own,per_query,max_candidates,prior_pairs=None):
     seen={}; risks=[]; diag=[]; before=dict(gh.stats)
     for q in w.get("queries") or []:
         try: repos=gh.search(q,per_page=per_query)
         except RuntimeError as e: diag.append({"query":q,"error":str(e)}); continue
         diag.append({"query":q,"returned":len(repos)})
         for r in repos:
-            c=candidate(gh,r,q,corp,own)
+            c=candidate(gh,r,q,corp,own,prior_pairs)
             if not c: continue
             if c.get("status")=="RISK_REVIEW_ONLY": risks.append(c); continue
             key=(c["repository"],c["exact_revision"])
@@ -156,9 +171,9 @@ def main():
     m=json.loads((root/a.manifest).read_text()); ws=m.get("workers") or []
     if a.worker!="ALL": ws=[w for w in ws if w.get("id")==a.worker]
     if not ws: raise SystemExit(f"Unknown worker {a.worker}")
-    gh=GH(os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""); corp=corpus_text(root)
+    gh=GH(os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or ""); corp=corpus_text(root); prior_pairs=queued_pairs(qr)
     for w in ws:
-        d=worker_run(w,gh,corp,a.own_repo,max(1,min(a.per_query,25)),max(1,min(a.max_candidates,100)))
+        d=worker_run(w,gh,corp,a.own_repo,max(1,min(a.per_query,25)),max(1,min(a.max_candidates,100)),prior_pairs)
         p=qr/f"{w['id']}.json"; p.parent.mkdir(parents=True,exist_ok=True); p.write_text(json.dumps(d,indent=2,sort_keys=True)+"\n"); print(f"{w['id']}: {d['candidate_count']} candidates")
 
 if __name__=="__main__": main()
