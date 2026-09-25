@@ -22,9 +22,11 @@ from recoveryworks.test_production_admission import ProductionAdmissionTests
 
 class ExternalActivationHandoffTests(unittest.TestCase):
     def fixture(self, root: Path):
-        release,promotion,security,dr,build = ProductionAdmissionTests().fixture(root)
+        admission_fixture = ProductionAdmissionTests()
+        release,promotion,security,dr,build = admission_fixture.fixture(root)
         admission=build_production_admission_gate(
             release,promotion,security,dr,build,
+            admission_fixture.package_integrity,
             admitted_at="2026-09-24T13:11:00Z")
         credential=build_credential_scope_attestation(
             provider="aws",account_id="acct-1",principal_id="reader",
@@ -85,9 +87,11 @@ class ExternalActivationHandoffTests(unittest.TestCase):
     def test_drifted_fresh_recheck_or_wrong_post_state_fails_closed(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)
-            release,promotion,security,dr,build = ProductionAdmissionTests().fixture(root)
+            admission_fixture = ProductionAdmissionTests()
+            release,promotion,security,dr,build = admission_fixture.fixture(root)
             admission=build_production_admission_gate(
                 release,promotion,security,dr,build,
+                admission_fixture.package_integrity,
                 admitted_at="2026-09-24T13:11:00Z")
             credential=build_credential_scope_attestation(
                 provider="aws",account_id="acct-1",principal_id="reader",
