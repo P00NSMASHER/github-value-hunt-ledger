@@ -93,7 +93,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(
             imported.counts(),
             {
-                "announcement_rows": 2,
+                "announcement_rows": 3,
                 "listing_rows": 0,
                 "shares_rows": 0,
                 "control_rows": 0,
@@ -103,7 +103,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(len(imported.announcements), 2)
+        self.assertEqual(len(imported.announcements), 3)
         by_event = {
             item.event_id: item
             for item in imported.announcements
@@ -116,6 +116,10 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             by_event["HEJFE-F170013A9B3F85E2"].timestamp,
             "2015-04-22T16:01:00-04:00",
         )
+        self.assertEqual(
+            by_event["HEJFE-C4D39B22234902F2"].timestamp,
+            "2015-02-03T16:07:00-05:00",
+        )
         self.assertTrue(all(
             item.proves_first_public_release
             for item in imported.announcements
@@ -127,7 +131,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(manifest["announcement_exact_resolved"], 2)
+        self.assertEqual(manifest["announcement_exact_resolved"], 3)
         self.assertEqual(manifest["listing_metadata_resolved"], 0)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
