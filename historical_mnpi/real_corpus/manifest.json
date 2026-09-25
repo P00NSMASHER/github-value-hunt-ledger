@@ -1,0 +1,19 @@
+{
+  "announcement_exact_resolved": 0,
+  "control_dates_resolved": 0,
+  "derived_backbone_sha256": "5bce35d49bae04a52d45d82e81fb7c640509cfaa8b0d044a4ecbadd408d03b58",
+  "event_date_max": "2015-05-20",
+  "event_date_min": "2011-04-19",
+  "listing_metadata_resolved": 0,
+  "live_use_allowed": false,
+  "purpose": "Historical research/compliance corpus backbone only; not a trading signal dataset.",
+  "row_count": 174,
+  "schema_version": "real-corpus-backbone-v1",
+  "shares_metadata_resolved": 0,
+  "source_file_sha256": "e723e9e2a0e0a616915f3146fdea40ef429d90586ac4699853b047c536568f55",
+  "source_path": "Data/TimeOfFirstTrade.csv",
+  "source_repository": "vgreg/hacked_earnings_jfe",
+  "unique_event_dates": 72,
+  "unique_event_ids": 174,
+  "unique_symbols": 146
+}
