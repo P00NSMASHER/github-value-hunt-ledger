@@ -94,7 +94,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             imported.counts(),
             {
                 "announcement_rows": 27,
-                "listing_rows": 2618,
+                "listing_rows": 2750,
                 "shares_rows": 0,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
@@ -228,7 +228,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
-        self.assertEqual(manifest["listing_metadata_resolved"], 2618)
+        self.assertEqual(manifest["listing_metadata_resolved"], 2750)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
@@ -585,7 +585,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
 
 
-    def test_g2_current_batches_resolve_2618_listing_observations(self):
+    def test_g2_current_batches_resolve_2750_listing_observations(self):
         import_dir = CORPUS_DIR / "import"
         files = {
             name: (import_dir / name).read_text(encoding="utf-8")
@@ -598,145 +598,31 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         }
         imported = import_real_corpus_metadata(files)
-        self.assertEqual(len(imported.listings), 2618)
+        self.assertEqual(len(imported.listings), 2750)
 
         by_symbol = {}
         for item in imported.listings:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(set(by_symbol), {"ACHC", "ACO", "ADI", "AF", "AGP", "ALGN", "ALNY", "ALSN", "AMD", "AMP", "AMSG", "APC", "ATRC", "AVA", "BA", "BCR", "BIO", "BRKR", "BWA", "CA", "CACI", "CAG", "CAKE", "CAMP", "CAT", "CB", "CBT", "CENX", "CGNX", "CLD", "CMP", "CMTL", "CNMD", "COL", "COLM", "CR", "CRL", "CREE", "CSOD", "DEST", "DE", "DGI", "DNDN", "DXCM", "DYN", "EA", "ECHO", "ECOL", "EHTH", "FL", "FLR", "FLT", "EW", "F", "GDI", "GILD", "GMCR", "GME", "GNRC", "GNTX", "GORO", "GT", "HAE", "HBI", "HON", "IBKC", "IDTI", "IDXX", "IGT", "ILMN", "INT", "JNPR", "MDU", "MTH", "MUSA", "NKE", "PNRA", "SBUX", "VMW", "INWK", "ISIL", "ISSI", "JWN", "KELYA", "KOPN", "LRCX", "LSCC", "LSTR", "MAT", "MCRL", "MDP", "MIC", "MKC", "NATI", "NVR"})
-        self.assertEqual(
-            {symbol: len(rows) for symbol, rows in by_symbol.items()},
-            {"ACHC": 22, "ACO": 22, "AF": 22, "AGP": 22, "ALGN": 22, "ALNY": 22, "ALSN": 22, "AMD": 22, "AMP": 22, "AMSG": 22, "APC": 22, "ATRC": 22, "AVA": 22, "ADI": 44, "BA": 22, "BCR": 22, "BIO": 22, "BRKR": 22, "BWA": 22, "CA": 44, "CACI": 22, "CAG": 22, "CAKE": 22, "CAMP": 22, "CAT": 22, "CB": 22, "CBT": 22, "CENX": 22, "CGNX": 44, "CLD": 44, "CMP": 22, "CMTL": 22, "CNMD": 22, "COL": 22, "COLM": 44, "CR": 22, "CRL": 22, "CREE": 44, "CSOD": 22, "DEST": 22, "DE": 22, "DGI": 66, "DNDN": 22, "DXCM": 22, "DYN": 22, "EA": 22, "ECHO": 22, "ECOL": 22, "EHTH": 44, "EW": 44, "F": 22, "FL": 22, "FLR": 22, "FLT": 22, "GDI": 22, "GILD": 22, "GMCR": 22, "GME": 22, "GNRC": 22, "GNTX": 22, "GORO": 22, "GT": 22, "HAE": 22, "HBI": 22, "HON": 22, "IBKC": 22, "IDTI": 44, "IDXX": 22, "IGT": 22, "ILMN": 44, "INT": 22, "JNPR": 88, "MDU": 44, "MTH": 44, "MUSA": 44, "NKE": 22, "PNRA": 88, "SBUX": 22, "VMW": 66, "INWK": 22, "ISIL": 22, "ISSI": 22, "JWN": 22, "KELYA": 22, "KOPN": 22, "LRCX": 22, "LSCC": 22, "LSTR": 22, "MAT": 22, "MCRL": 22, "MDP": 22, "MIC": 22, "MKC": 22, "NATI": 44, "NVR": 22},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["CNMD"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["CAT"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["GILD"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["F"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["NKE"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["SBUX"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["BA"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["DE"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["HON"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["ADI"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["JNPR"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["VMW"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["CA"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["DGI"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["PNRA"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["CGNX"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["ILMN"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["MDU"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["CAKE"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["CAMP"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["CB"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["EA"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["ECHO"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["ECOL"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["FL"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["FLR"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["FLT"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["HBI"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["IBKC"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["IDXX"]},
-            {"NASDAQ"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["IGT"]},
-            {"NYSE"},
-        )
-        self.assertEqual(
-            {row.primary_exchange for row in by_symbol["INT"]},
-            {"NYSE"},
-        )
+        self.assertEqual(len(by_symbol), 100)
+        expected = {
+            "MFRM": ("NASDAQ", 22),
+            "MSCC": ("NASDAQ", 22),
+            "MXIM": ("NASDAQ", 22),
+            "NDSN": ("NASDAQ", 22),
+            "NOW": ("NYSE", 44),
+            "MCRL": ("NASDAQ", 22),
+            "NATI": ("NASDAQ", 44),
+            "CAT": ("NYSE", 22),
+            "CNMD": ("NASDAQ", 22),
+            "GILD": ("NASDAQ", 22),
+        }
+        for symbol, (exchange, count) in expected.items():
+            self.assertEqual(len(by_symbol[symbol]), count)
+            self.assertEqual(
+                {row.primary_exchange for row in by_symbol[symbol]},
+                {exchange},
+            )
 
     def test_g2_batch_one_requirement_file_is_exactly_66_dates(self):
         path = CORPUS_DIR / "listing_requirement_batch_001.csv"
@@ -878,14 +764,14 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(manifest["listing_metadata_resolved"], 2618)
+        self.assertEqual(manifest["listing_metadata_resolved"], 2750)
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_intervals_verified"], 95)
-        self.assertEqual(manifest["listing_symbols_resolved"], 95)
-        self.assertEqual(manifest["listing_batches_completed"], 25)
+        self.assertEqual(manifest["listing_intervals_verified"], 100)
+        self.assertEqual(manifest["listing_symbols_resolved"], 100)
+        self.assertEqual(manifest["listing_batches_completed"], 26)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 1210)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 1078)
 
     def test_listing_requirement_batch_008_is_176_observations(self):
         path = CORPUS_DIR / "listing_requirement_batch_008.csv"
