@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-25",
+  "status": "ACTIVE",
+  "capturebrief": {
+    "sent": 3,
+    "delivered": 2,
+    "delivery_failures": 1,
+    "buyer_replies": 0,
+    "verified_external_outcomes": 1,
+    "learned_external_outcomes": 1,
+    "allocation_changed": false,
+    "note": "The delivery failure is contactability/workflow evidence, not a buyer rejection."
+  },
+  "freightrecovery": {
+    "sent": 5,
+    "buyer_replies": 0,
+    "verified_external_outcomes": 0,
+    "allocation_changed": false
+  },
+  "starblox": {
+    "playtest_harness_present": true,
+    "harness_entry": "?playtest=1",
+    "verified_human_playtest_receipts": 0,
+    "playtest_gap_status": "OPEN",
+    "next_evidence_needed": "actual tester-generated anonymous receipts; no additional telemetry architecture required"
+  },
+  "command_center_snapshot": {
+    "key": "ceo-command-center-v3-first-real-external-outcome",
+    "sha256": "62c18fb0fd1c5a8938eed445bacc5f3102864f9d50b3e2538cbf5f7a4d4404a7"
+  }
+}
