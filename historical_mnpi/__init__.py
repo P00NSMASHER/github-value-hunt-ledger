@@ -52,6 +52,23 @@ from .entity_resolution import (
     verify_trader_identity,
 )
 
+from .economic_dedup import (
+    ClusterRegistrationAction,
+    DedupMatchState,
+    DedupReviewCandidate,
+    DedupReviewDecisionType,
+    DedupReviewResolution,
+    EconomicClusterEvent,
+    EconomicClusterRegistration,
+    EconomicClusterRegistry,
+    EconomicMatchAssessment,
+    EconomicTransactionCluster,
+    EconomicTransactionSignature,
+    build_economic_signature,
+    compare_economic_signatures,
+    render_dedup_review_candidate_markdown,
+)
+
 from .event_model import (
     BoundaryPrecision,
     EventRegistry,
@@ -113,6 +130,20 @@ from .source_registry import (
 )
 
 __all__ = [
+    "ClusterRegistrationAction",
+    "DedupMatchState",
+    "DedupReviewCandidate",
+    "DedupReviewDecisionType",
+    "DedupReviewResolution",
+    "EconomicClusterEvent",
+    "EconomicClusterRegistration",
+    "EconomicClusterRegistry",
+    "EconomicMatchAssessment",
+    "EconomicTransactionCluster",
+    "EconomicTransactionSignature",
+    "build_economic_signature",
+    "compare_economic_signatures",
+    "render_dedup_review_candidate_markdown",
     "AssessedClaim",
     "ClaimAuthority",
     "ConflictAssessment",
