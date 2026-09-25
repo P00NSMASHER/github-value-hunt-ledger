@@ -21,9 +21,9 @@
   "announcement_unresolved_after_batch_review": 147,
   "listing_requirement_total": 3828,
   "listing_intervals_verified": 22,
-  "listing_batches_completed": 6,
+  "listing_batches_completed": 7,
   "listing_full_compact_index_loaded": true,
-  "listing_symbols_resolved": 18,
+  "listing_symbols_resolved": 22,
   "listing_requirement_compact_rows": 146,
   "listing_metadata_unresolved": 2926
 }
