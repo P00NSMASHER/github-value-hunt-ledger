@@ -359,7 +359,10 @@ def build_server() -> ThreadingHTTPServer:
             self.send_header("Content-Length", str(len(raw)))
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
-            self.wfile.write(raw)
+            try:
+                self.wfile.write(raw)
+            except (BrokenPipeError, ConnectionResetError):
+                return
 
         def _authorized(self) -> bool:
             supplied = self.headers.get("X-AIBOS-Operator-Token", "")
