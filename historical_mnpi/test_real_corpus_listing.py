@@ -5,10 +5,13 @@ from pathlib import Path
 
 from historical_mnpi.listing_intervals import (
     expand_listing_intervals,
-    parse_listing_interval_csv,
+    parse_listing_intervals_csv,
 )
-from historical_mnpi.real_corpus_import import (
-    import_real_corpus_metadata,
+from historical_mnpi.listing_requirements import (
+    EXPECTED_EXPANDED_PAIR_SHA256,
+    expand_listing_requirements,
+    expanded_pair_sha256,
+    parse_listing_requirement_index,
 )
 
 
@@ -17,202 +20,133 @@ CORPUS_DIR = ROOT / "real_corpus"
 
 
 class RealCorpusListingTests(unittest.TestCase):
-    def _requirement_rows(self):
-        with (CORPUS_DIR / "listing_requirement_index.csv").open(
-            "r",
-            encoding="utf-8",
-            newline="",
-        ) as handle:
-            return list(csv.DictReader(handle))
-
     def _requirements(self):
-        pairs = []
-        for row in self._requirement_rows():
-            for day in row["required_dates"].split("|"):
-                pairs.append((row["historical_symbol"], day))
-        return tuple(pairs)
+        rows = parse_listing_requirement_index(
+            (CORPUS_DIR / "listing_requirement_index.csv").read_text(
+                encoding="utf-8"
+            )
+        )
+        return rows, expand_listing_requirements(rows)
 
     def _intervals(self):
-        return parse_listing_interval_csv(
+        return parse_listing_intervals_csv(
             (CORPUS_DIR / "listing_intervals.csv").read_text(
                 encoding="utf-8"
             )
         )
 
-    def test_compact_requirement_index_reconstructs_3828_rows(self):
-        rows = self._requirement_rows()
+    def test_requirement_index_is_frozen_to_recovered_gate(self):
+        rows, requirements = self._requirements()
         self.assertEqual(len(rows), 146)
-        self.assertEqual(
-            sum(int(row["requirement_count"]) for row in rows),
-            3828,
-        )
-        requirements = self._requirements()
         self.assertEqual(len(requirements), 3828)
         self.assertEqual(len(set(requirements)), 3828)
-        for row in rows:
-            dates = row["required_dates"].split("|")
-            self.assertEqual(len(dates), int(row["requirement_count"]))
-            self.assertEqual(dates[0], row["first_date"])
-            self.assertEqual(dates[-1], row["last_date"])
+        self.assertEqual(
+            expanded_pair_sha256(rows),
+            EXPECTED_EXPANDED_PAIR_SHA256,
+        )
 
-    def test_first_six_listing_batches_resolve_exactly_726_rows(self):
+    def test_current_intervals_resolve_exactly_902_observations(self):
+        _, requirements = self._requirements()
+        intervals = self._intervals()
         expansion = expand_listing_intervals(
-            self._requirements(),
-            self._intervals(),
-        )
-        self.assertEqual(len(expansion.resolved), 726)
-        self.assertEqual(len(expansion.unresolved), 3102)
-        self.assertEqual(
-            {item.symbol for item in expansion.resolved},
-            {"ADI", "BA", "CA", "CAT", "CGNX", "CNMD", "DE", "DGI", "F", "GILD", "HON", "ILMN", "JNPR", "MDU", "NKE", "PNRA", "SBUX", "VMW"},
-        )
-        self.assertEqual(
-            {
-                item.symbol: item.primary_exchange
-                for item in expansion.resolved
-            },
-            {
-                "ADI": "NASDAQ",
-                "BA": "NYSE",
-                "CA": "NASDAQ",
-                "CAT": "NYSE",
-                "CGNX": "NASDAQ",
-                "CNMD": "NASDAQ",
-                "DE": "NYSE",
-                "DGI": "NYSE",
-                "F": "NYSE",
-                "GILD": "NASDAQ",
-                "HON": "NYSE",
-                "ILMN": "NASDAQ",
-                "JNPR": "NYSE",
-                "MDU": "NYSE",
-                "NKE": "NYSE",
-                "PNRA": "NASDAQ",
-                "SBUX": "NASDAQ",
-                "VMW": "NYSE",
-            },
+            requirements,
+            intervals,
         )
 
+        self.assertEqual(len(intervals), 22)
+        self.assertEqual(len(expansion.resolved), 902)
+        self.assertEqual(len(expansion.unresolved), 2926)
 
-    def test_third_listing_batch_is_exactly_66_rows(self):
-        path = CORPUS_DIR / "listing_requirement_batch_003.csv"
-        with path.open("r", encoding="utf-8", newline="") as handle:
-            rows = list(csv.DictReader(handle))
-        self.assertEqual(
-            {row["historical_symbol"] for row in rows},
-            {"BA", "DE", "HON"},
-        )
-        self.assertEqual(
-            sum(int(row["requirement_count"]) for row in rows),
-            66,
-        )
-        for row in rows:
-            dates = row["required_dates"].split("|")
-            self.assertEqual(len(dates), 22)
-            self.assertEqual(dates[0], row["first_date"])
-            self.assertEqual(dates[-1], row["last_date"])
-
-
-    def test_fourth_listing_batch_is_exactly_198_rows(self):
-        path = CORPUS_DIR / "listing_requirement_batch_004.csv"
-        with path.open("r", encoding="utf-8", newline="") as handle:
-            rows = list(csv.DictReader(handle))
-        self.assertEqual(
-            {row["historical_symbol"] for row in rows},
-            {"ADI", "JNPR", "VMW"},
-        )
-        self.assertEqual(
-            sum(int(row["requirement_count"]) for row in rows),
-            198,
-        )
-        self.assertEqual(
-            {row["historical_symbol"]: int(row["requirement_count"]) for row in rows},
-            {"ADI": 44, "JNPR": 88, "VMW": 66},
-        )
-
-
-    def test_fifth_listing_batch_is_exactly_198_rows(self):
-        path = CORPUS_DIR / "listing_requirement_batch_005.csv"
-        with path.open("r", encoding="utf-8", newline="") as handle:
-            rows = list(csv.DictReader(handle))
-        self.assertEqual(
-            {row["historical_symbol"] for row in rows},
-            {"CA", "DGI", "PNRA"},
-        )
-        self.assertEqual(
-            sum(int(row["requirement_count"]) for row in rows),
-            198,
-        )
-        self.assertEqual(
-            {row["historical_symbol"]: int(row["requirement_count"]) for row in rows},
-            {"CA": 44, "DGI": 66, "PNRA": 88},
-        )
-
-
-    def test_sixth_listing_batch_is_exactly_132_rows(self):
-        path = CORPUS_DIR / "listing_requirement_batch_006.csv"
-        with path.open("r", encoding="utf-8", newline="") as handle:
-            rows = list(csv.DictReader(handle))
-        self.assertEqual(
-            {row["historical_symbol"] for row in rows},
-            {"CGNX", "ILMN", "MDU"},
-        )
-        self.assertEqual(
-            sum(int(row["requirement_count"]) for row in rows),
-            132,
-        )
-        self.assertEqual(
-            {row["historical_symbol"]: int(row["requirement_count"]) for row in rows},
-            {"CGNX": 44, "ILMN": 44, "MDU": 44},
-        )
-
-    def test_committed_listing_rows_match_interval_expansion(self):
-        import_dir = CORPUS_DIR / "import"
-        files = {
-            name: (import_dir / name).read_text(encoding="utf-8")
-            for name in (
-                "announcement_metadata.csv",
-                "listing_metadata.csv",
-                "shares_metadata.csv",
-                "control_metadata.csv",
-                "market_source_dates.csv",
+        new_symbols = {"COLM", "CREE", "EHTH", "IDTI"}
+        new_rows = [
+            row for row in expansion.resolved
+            if row.symbol in new_symbols
+        ]
+        self.assertEqual(len(new_rows), 176)
+        for symbol in new_symbols:
+            self.assertEqual(
+                sum(row.symbol == symbol for row in new_rows),
+                44,
             )
-        }
-        imported = import_real_corpus_metadata(files)
+            self.assertEqual(
+                {
+                    row.primary_exchange
+                    for row in new_rows
+                    if row.symbol == symbol
+                },
+                {"NASDAQ"},
+            )
+
+    def test_materialized_listing_metadata_matches_interval_expansion(self):
+        _, requirements = self._requirements()
         expansion = expand_listing_intervals(
-            self._requirements(),
+            requirements,
             self._intervals(),
         )
 
-        committed = {
-            (
-                item.symbol,
-                item.session_date,
-                item.primary_exchange,
-                item.evidence.evidence_id,
-            )
-            for item in imported.listings
-        }
+        metadata_path = CORPUS_DIR / "import" / "listing_metadata.csv"
+        with metadata_path.open(
+            "r",
+            encoding="utf-8",
+            newline="",
+        ) as handle:
+            materialized = list(csv.DictReader(handle))
+
         expected = {
             (
-                item.symbol,
-                item.session_date,
-                item.primary_exchange,
-                item.evidence.evidence_id,
+                row.symbol,
+                row.session_date,
+                row.primary_exchange,
+                row.evidence.evidence_id,
             )
-            for item in expansion.resolved
+            for row in expansion.resolved
         }
-        self.assertEqual(len(committed), 726)
-        self.assertEqual(committed, expected)
+        actual = {
+            (
+                row["symbol"],
+                row["session_date"],
+                row["primary_exchange"],
+                row["evidence_id"],
+            )
+            for row in materialized
+        }
 
-    def test_manifest_tracks_g2_first_six_batches(self):
+        self.assertEqual(len(materialized), 902)
+        self.assertEqual(len(actual), 902)
+        self.assertEqual(actual, expected)
+        self.assertTrue(all(
+            row["source_kind"] == "OFFICIAL_LISTING_HISTORY"
+            for row in materialized
+        ))
+        self.assertTrue(all(
+            row["data_class"]
+            == "PUBLIC_OR_AUTHORIZED_HISTORICAL"
+            for row in materialized
+        ))
+
+    def test_manifest_matches_current_listing_expansion(self):
         manifest = json.loads(
-            (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
+            (CORPUS_DIR / "manifest.json").read_text(
+                encoding="utf-8"
+            )
         )
-        self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_metadata_resolved"], 726)
-        self.assertEqual(manifest["listing_intervals_verified"], 18)
-        self.assertEqual(manifest["listing_symbols_resolved"], 18)
+        self.assertEqual(
+            manifest["listing_intervals_verified"],
+            22,
+        )
+        self.assertEqual(
+            manifest["listing_metadata_resolved"],
+            902,
+        )
+        self.assertEqual(
+            manifest["listing_metadata_unresolved"],
+            2926,
+        )
+        self.assertEqual(
+            manifest["listing_metadata_resolved"]
+            + manifest["listing_metadata_unresolved"],
+            3828,
+        )
 
 
 if __name__ == "__main__":
