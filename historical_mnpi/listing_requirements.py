@@ -14,6 +14,14 @@ import io
 from .source_registry import USAGE_SCOPE, canonical_hash
 
 
+SOURCE_REQUIREMENTS_SHA256 = (
+    "58e05613603b95b806eedb49ede774fce763f5ca7519487bed66282e4fe0a3fb"
+)
+EXPECTED_EXPANDED_PAIR_SHA256 = (
+    "cb00a9c2983c5ffb0f37ef3aff84ce8bcf328bd56565664e01abe0dfadde64af"
+)
+
+
 @dataclass(frozen=True)
 class CompactListingRequirement:
     historical_symbol: str
@@ -113,6 +121,20 @@ def expand_listing_requirements(
     return result
 
 
+def expanded_pair_sha256(
+    rows: tuple[CompactListingRequirement, ...],
+) -> str:
+    import hashlib
+
+    payload = "".join(
+        f"{symbol},{session_date}\n"
+        for symbol, session_date in sorted(
+            expand_listing_requirements(rows)
+        )
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def listing_requirement_index_hash(
     rows: tuple[CompactListingRequirement, ...],
 ) -> str:
@@ -125,7 +147,10 @@ def listing_requirement_index_hash(
 
 __all__ = [
     "CompactListingRequirement",
+    "EXPECTED_EXPANDED_PAIR_SHA256",
+    "SOURCE_REQUIREMENTS_SHA256",
     "expand_listing_requirements",
+    "expanded_pair_sha256",
     "listing_requirement_index_hash",
     "parse_listing_requirement_index",
 ]
