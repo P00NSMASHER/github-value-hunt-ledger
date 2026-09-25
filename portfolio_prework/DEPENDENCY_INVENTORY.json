@@ -1,0 +1,587 @@
+{
+  "schema_version": "1.0.0",
+  "basis": {
+    "source": "portfolio_prework/repository_snapshot.json",
+    "pinned_to_snapshot_shas": true,
+    "dependency_install_performed": false,
+    "note": "Only dependency manifests discovered in the pinned repository snapshot were inspected. Absence of a manifest is not treated as proof of zero dependencies."
+  },
+  "summary": {
+    "repository_count": 7,
+    "repositories_with_manifests": 4,
+    "repositories_without_manifests": 3,
+    "manifest_count": 14,
+    "manifest_count_by_repository": {
+      "REPO-001": 6,
+      "REPO-002": 3,
+      "REPO-003": 1,
+      "REPO-004": 4,
+      "REPO-005": 0,
+      "REPO-006": 0,
+      "REPO-007": 0
+    }
+  },
+  "repositories": [
+    {
+      "repo_id": "REPO-001",
+      "full_name": "P00NSMASHER/github-value-hunt-ledger",
+      "snapshot_sha": "b47f95caa658a9b12536cc9946d81d51f944c6ac",
+      "ecosystems": [
+        "python-pip"
+      ],
+      "manifests": [
+        {
+          "path": "production/fmc_tariff_ledger/requirements-shaq.txt",
+          "blob_sha": "13cdd49626ef81419f5d11838cdfaeb9bbb61ca2",
+          "kind": "requirements",
+          "dependencies": [
+            {
+              "name": "mcp",
+              "constraint": ">=2,<3",
+              "pinning": "range"
+            }
+          ]
+        },
+        {
+          "path": "production/fmc_tariff_ledger/requirements.txt",
+          "blob_sha": "01009bb3ce0a038dcee024c383e1a235ac2265ce",
+          "kind": "requirements",
+          "dependencies": [
+            {
+              "name": "requests",
+              "constraint": ">=2.32,<3",
+              "pinning": "range"
+            },
+            {
+              "name": "beautifulsoup4",
+              "constraint": ">=4.12,<5",
+              "pinning": "range"
+            },
+            {
+              "name": "pypdf",
+              "constraint": ">=5,<7",
+              "pinning": "range"
+            },
+            {
+              "name": "openpyxl",
+              "constraint": ">=3.1,<4",
+              "pinning": "range"
+            }
+          ]
+        },
+        {
+          "path": "production/hospital_mrf_ledger/requirements.txt",
+          "blob_sha": "60efb2b393b1b5018636fdab9defded189713247",
+          "kind": "requirements",
+          "dependencies": [
+            {
+              "name": "ijson",
+              "constraint": ">=3.3,<4",
+              "pinning": "range"
+            },
+            {
+              "name": "jsonschema",
+              "constraint": ">=4.23,<5",
+              "pinning": "range"
+            },
+            {
+              "name": "requests",
+              "constraint": ">=2.32,<3",
+              "pinning": "range"
+            }
+          ]
+        },
+        {
+          "path": "production/requirements-ci.txt",
+          "blob_sha": "60195cfdd169a8ee4cc6691c4757ce63927d6f9e",
+          "kind": "requirements",
+          "dependencies": [
+            {
+              "name": "pytest",
+              "constraint": "==8.3.5",
+              "pinning": "exact"
+            },
+            {
+              "name": "iniconfig",
+              "constraint": "==2.0.0",
+              "pinning": "exact"
+            },
+            {
+              "name": "packaging",
+              "constraint": "==24.2",
+              "pinning": "exact"
+            },
+            {
+              "name": "pluggy",
+              "constraint": "==1.5.0",
+              "pinning": "exact"
+            }
+          ]
+        },
+        {
+          "path": "production/tic_mrf_ledger/requirements.txt",
+          "blob_sha": "a3d285d68b780db6c062cd9d9a5b14dfcfabd0c9",
+          "kind": "requirements",
+          "dependencies": [
+            {
+              "name": "requests",
+              "constraint": ">=2.32,<3",
+              "pinning": "range"
+            },
+            {
+              "name": "beautifulsoup4",
+              "constraint": ">=4.12,<5",
+              "pinning": "range"
+            },
+            {
+              "name": "ijson",
+              "constraint": ">=3.3,<4",
+              "pinning": "range"
+            }
+          ]
+        },
+        {
+          "path": "production/urdb_ledger/requirements.txt",
+          "blob_sha": "35307a81b14f05e133b82cb8df8ccac78d911c8e",
+          "kind": "requirements",
+          "dependencies": [
+            {
+              "name": "requests",
+              "constraint": ">=2.32,<3",
+              "pinning": "range"
+            },
+            {
+              "name": "pandas",
+              "constraint": ">=2.2,<3",
+              "pinning": "range"
+            },
+            {
+              "name": "pyarrow",
+              "constraint": ">=18,<22",
+              "pinning": "range"
+            }
+          ]
+        }
+      ],
+      "direct_manifest_entries": 18,
+      "unique_declared_packages": 13,
+      "exact_entries": 4,
+      "ranged_or_floating_entries": 14,
+      "lockfile_discovered": false,
+      "observations": [
+        "Production dependency files primarily use compatible ranges; the CI requirements file is exact-pinned.",
+        "No Python lock/constraints file was discovered for these production dependency sets in the pinned snapshot."
+      ]
+    },
+    {
+      "repo_id": "REPO-002",
+      "full_name": "P00NSMASHER/StarBlox",
+      "snapshot_sha": "8ebe583f6dae6a832bae2f4987c6919db41eaf5e",
+      "ecosystems": [
+        "npm",
+        "cargo"
+      ],
+      "manifests": [
+        {
+          "path": "package.json",
+          "blob_sha": "7d4376cb7d646a683dbdf4ceeabd7aee235e7e43",
+          "kind": "npm-package",
+          "dependencies": [
+            {
+              "name": "lucide-react",
+              "constraint": "^0.468.0",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "react",
+              "constraint": "^18.3.1",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "react-dom",
+              "constraint": "^18.3.1",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "@vitejs/plugin-react",
+              "constraint": "^6.1.1",
+              "scope": "dev",
+              "pinning": "range"
+            },
+            {
+              "name": "jsdom",
+              "constraint": "^25.0.1",
+              "scope": "dev",
+              "pinning": "range"
+            },
+            {
+              "name": "vite",
+              "constraint": "^8.3.0",
+              "scope": "dev",
+              "pinning": "range"
+            },
+            {
+              "name": "vitest",
+              "constraint": "^5.0.1",
+              "scope": "dev",
+              "pinning": "range"
+            }
+          ]
+        },
+        {
+          "path": "tools/roblox_catalog_reader/Cargo.toml",
+          "blob_sha": "6e287b44b78bf183c7277fb493810efeae01ba40",
+          "kind": "cargo-manifest",
+          "dependencies": [
+            {
+              "name": "rbx_binary",
+              "constraint": "=3.0.0",
+              "pinning": "exact"
+            },
+            {
+              "name": "rbx_dom_weak",
+              "constraint": "=4.2.0",
+              "pinning": "exact"
+            },
+            {
+              "name": "rbx_xml",
+              "constraint": "=3.0.0",
+              "pinning": "exact"
+            },
+            {
+              "name": "serde_json",
+              "constraint": "=1.0.145",
+              "pinning": "exact"
+            }
+          ]
+        },
+        {
+          "path": "tools/roblox_migration_exporter/Cargo.toml",
+          "blob_sha": "fa90e677143a4650edabe3fee246ce1b71c5f647",
+          "kind": "cargo-manifest",
+          "dependencies": [
+            {
+              "name": "rbx_binary",
+              "constraint": "=3.0.0",
+              "pinning": "exact"
+            },
+            {
+              "name": "rbx_dom_weak",
+              "constraint": "=4.2.0",
+              "pinning": "exact"
+            },
+            {
+              "name": "rbx_xml",
+              "constraint": "=3.0.0",
+              "pinning": "exact"
+            }
+          ]
+        }
+      ],
+      "direct_manifest_entries": 14,
+      "unique_declared_packages": 11,
+      "exact_entries": 7,
+      "ranged_or_floating_entries": 7,
+      "lockfile_discovered": false,
+      "observations": [
+        "Rust direct dependencies are exact-pinned in Cargo.toml.",
+        "npm dependencies use caret ranges.",
+        "No package-lock.json, yarn.lock, pnpm-lock.yaml, or Cargo.lock was discovered in the pinned snapshot, so transitive resolution is not captured by a committed lockfile."
+      ]
+    },
+    {
+      "repo_id": "REPO-003",
+      "full_name": "P00NSMASHER/abvmschoolstarworld",
+      "snapshot_sha": "2b78aed7695374b35ad207c43bec9d61486d056a",
+      "ecosystems": [
+        "npm"
+      ],
+      "manifests": [
+        {
+          "path": "package.json",
+          "blob_sha": "6c714d9e0c0535ca6558adecc8e9e64823a7daa2",
+          "kind": "npm-package",
+          "dependencies": [
+            {
+              "name": "@netlify/blobs",
+              "constraint": "latest",
+              "scope": "runtime",
+              "pinning": "floating"
+            },
+            {
+              "name": "@axe-core/playwright",
+              "constraint": "latest",
+              "scope": "dev",
+              "pinning": "floating"
+            },
+            {
+              "name": "@playwright/test",
+              "constraint": "latest",
+              "scope": "dev",
+              "pinning": "floating"
+            }
+          ]
+        }
+      ],
+      "direct_manifest_entries": 3,
+      "unique_declared_packages": 3,
+      "exact_entries": 0,
+      "ranged_or_floating_entries": 3,
+      "lockfile_discovered": false,
+      "observations": [
+        "All three declared dependencies use the floating `latest` tag.",
+        "No npm lockfile was discovered in the pinned snapshot; reproducibility depends on registry state at install time."
+      ]
+    },
+    {
+      "repo_id": "REPO-004",
+      "full_name": "P00NSMASHER/trading-platform",
+      "snapshot_sha": "579730f1abb595579de199277a95a8c89f733d0f",
+      "ecosystems": [
+        "python-pip"
+      ],
+      "manifests": [
+        {
+          "path": "pyproject.toml",
+          "blob_sha": "fa9bef23f9425d20d0a1ad29e832a6eaafbd7f7f",
+          "kind": "pyproject",
+          "requires_python": ">=3.11",
+          "dependencies": [
+            {
+              "name": "joblib",
+              "constraint": ">=1.3",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "numpy",
+              "constraint": ">=1.26",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "exchange-calendars",
+              "constraint": ">=4.13,<5",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "pandas",
+              "constraint": ">=2.2,<3",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "scikit-learn",
+              "constraint": ">=1.4,<2",
+              "scope": "runtime",
+              "pinning": "range"
+            },
+            {
+              "name": "skops",
+              "constraint": ">=0.14,<0.15",
+              "scope": "optional-safer-model",
+              "pinning": "range"
+            }
+          ]
+        },
+        {
+          "path": "requirements.lock",
+          "blob_sha": "62fbf3dd3c690ed56c4384e1be84c07f67f1b8aa",
+          "kind": "pip-lock",
+          "dependencies": [
+            {
+              "name": "joblib",
+              "constraint": "==1.5.3"
+            },
+            {
+              "name": "numpy",
+              "constraint": "==2.3.5"
+            },
+            {
+              "name": "scipy",
+              "constraint": "==1.17.0"
+            },
+            {
+              "name": "scikit-learn",
+              "constraint": "==1.8.0"
+            },
+            {
+              "name": "threadpoolctl",
+              "constraint": "==3.6.0"
+            },
+            {
+              "name": "exchange-calendars",
+              "constraint": "==4.13.1"
+            },
+            {
+              "name": "pandas",
+              "constraint": "==2.2.3"
+            },
+            {
+              "name": "python-dateutil",
+              "constraint": "==2.9.0.post0"
+            },
+            {
+              "name": "pyluach",
+              "constraint": "==2.3.0"
+            },
+            {
+              "name": "toolz",
+              "constraint": "==1.1.0"
+            },
+            {
+              "name": "tzdata",
+              "constraint": "==2026.2"
+            }
+          ]
+        },
+        {
+          "path": "requirements-dev.lock",
+          "blob_sha": "7adfa126500cd8c0cb90ceae1909cfd795227352",
+          "kind": "pip-lock",
+          "dependencies": [
+            {
+              "name": "iniconfig",
+              "constraint": "==2.3.0"
+            },
+            {
+              "name": "packaging",
+              "constraint": "==25.0"
+            },
+            {
+              "name": "pluggy",
+              "constraint": "==1.6.0"
+            },
+            {
+              "name": "Pygments",
+              "constraint": "==2.20.0"
+            },
+            {
+              "name": "pytest",
+              "constraint": "==9.0.2"
+            },
+            {
+              "name": "exchange-calendars",
+              "constraint": "==4.13.1"
+            },
+            {
+              "name": "pandas",
+              "constraint": "==2.2.3"
+            },
+            {
+              "name": "python-dateutil",
+              "constraint": "==2.9.0.post0"
+            },
+            {
+              "name": "pyluach",
+              "constraint": "==2.3.0"
+            },
+            {
+              "name": "toolz",
+              "constraint": "==1.1.0"
+            },
+            {
+              "name": "tzdata",
+              "constraint": "==2026.2"
+            }
+          ]
+        },
+        {
+          "path": "requirements-skops.lock",
+          "blob_sha": "c25f51e2f6c77a7dd2d3423fa5b7e6e78bad5e81",
+          "kind": "pip-lock",
+          "dependencies": [
+            {
+              "name": "skops",
+              "constraint": "==0.14.0"
+            },
+            {
+              "name": "packaging",
+              "constraint": "==26.3"
+            },
+            {
+              "name": "prettytable",
+              "constraint": "==3.18.0"
+            },
+            {
+              "name": "wcwidth",
+              "constraint": "==0.9.1"
+            }
+          ]
+        }
+      ],
+      "direct_manifest_entries": 6,
+      "locked_entries": 26,
+      "unique_locked_packages": 19,
+      "lockfile_discovered": true,
+      "observations": [
+        "Runtime, development, and optional safer-model environments have exact lock files.",
+        "The optional skops lock intentionally carries its own packaging version and is installed after the core lock according to file comments."
+      ]
+    },
+    {
+      "repo_id": "REPO-005",
+      "full_name": "P00NSMASHER/permitplate-nyc",
+      "snapshot_sha": "7c9a8fc4dd9fa12275d336beb8eb10732718666a",
+      "ecosystems": [],
+      "manifests": [],
+      "lockfile_discovered": false,
+      "observations": [
+        "No dependency manifest or lockfile was discovered by the pinned recursive-tree snapshot. This is recorded as `NO_MANIFEST_DISCOVERED`, not as proof that the code has no dependencies."
+      ]
+    },
+    {
+      "repo_id": "REPO-006",
+      "full_name": "P00NSMASHER/permitplate-state",
+      "snapshot_sha": "c64fe06a22c3826c9ad3a7b85a4f911a6e589c19",
+      "ecosystems": [],
+      "manifests": [],
+      "lockfile_discovered": false,
+      "observations": [
+        "No dependency manifest or lockfile was discovered in the pinned state repository snapshot."
+      ]
+    },
+    {
+      "repo_id": "REPO-007",
+      "full_name": "P00NSMASHER/capturebrief",
+      "snapshot_sha": "3b5867c422cbf9da08d02f1b9c6e7c8afa5b42ba",
+      "ecosystems": [],
+      "manifests": [],
+      "lockfile_discovered": false,
+      "observations": [
+        "No dependency manifest or lockfile was discovered by the pinned recursive-tree snapshot. This is recorded as `NO_MANIFEST_DISCOVERED`, not as proof that the Python application has no dependencies."
+      ]
+    }
+  ],
+  "observations": [
+    {
+      "observation_id": "DEP-OBS-001",
+      "severity": "REVIEW",
+      "summary": "ABVM uses floating `latest` npm dependencies and has no discovered npm lockfile at the pinned snapshot."
+    },
+    {
+      "observation_id": "DEP-OBS-002",
+      "severity": "REVIEW",
+      "summary": "StarBlox exact-pins its direct Rust dependencies but has no discovered Cargo.lock; its npm dependencies use caret ranges and no npm lockfile was discovered."
+    },
+    {
+      "observation_id": "DEP-OBS-003",
+      "severity": "REVIEW",
+      "summary": "Primary portfolio production Python requirements mainly use version ranges; only the shared CI requirements file is exact-pinned."
+    },
+    {
+      "observation_id": "DEP-OBS-004",
+      "severity": "INFO",
+      "summary": "The market-surveillance research repository has exact runtime, dev, and optional safer-model lock files, giving it the strongest explicit dependency reproducibility of the inspected repositories."
+    },
+    {
+      "observation_id": "DEP-OBS-005",
+      "severity": "INFO",
+      "summary": "PermitPlate NYC, permitplate-state, and CaptureBrief have no dependency manifests discovered by the pinned snapshot; the inventory deliberately does not equate that with dependency-free software."
+    }
+  ]
+}
