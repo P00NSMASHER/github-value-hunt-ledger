@@ -94,7 +94,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             imported.counts(),
             {
                 "announcement_rows": 27,
-                "listing_rows": 1760,
+                "listing_rows": 1826,
                 "shares_rows": 0,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
@@ -228,7 +228,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
-        self.assertEqual(manifest["listing_metadata_resolved"], 1760)
+        self.assertEqual(manifest["listing_metadata_resolved"], 1826)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
@@ -836,12 +836,12 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
         self.assertEqual(manifest["listing_metadata_resolved"], 1760)
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_intervals_verified"], 57)
-        self.assertEqual(manifest["listing_symbols_resolved"], 57)
-        self.assertEqual(manifest["listing_batches_completed"], 17)
+        self.assertEqual(manifest["listing_intervals_verified"], 60)
+        self.assertEqual(manifest["listing_symbols_resolved"], 60)
+        self.assertEqual(manifest["listing_batches_completed"], 18)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 2068)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 2002)
 
     def test_listing_requirement_batch_008_is_176_observations(self):
         path = CORPUS_DIR / "listing_requirement_batch_008.csv"
@@ -931,6 +931,41 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             int(row["requirement_count"]) == 22
             for row in rows
         ))
+
+
+    def test_listing_requirement_batch_018_is_66_observations(self):
+        path = CORPUS_DIR / "listing_requirement_batch_018.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(
+            [row["historical_symbol"] for row in rows],
+            ["DNDN", "DXCM", "DYN"],
+        )
+        self.assertEqual(
+            sum(int(row["requirement_count"]) for row in rows),
+            66,
+        )
+        self.assertTrue(all(
+            int(row["requirement_count"]) == 22
+            for row in rows
+        ))
+
+    def test_g2_interval_ledger_has_60_unique_intervals(self):
+        path = CORPUS_DIR / "listing_interval_evidence.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(len(rows), 60)
+        self.assertEqual(
+            len({row["interval_id"] for row in rows}),
+            60,
+        )
+        by_symbol = {
+            row["symbol"]: row
+            for row in rows
+        }
+        self.assertEqual(by_symbol["DNDN"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["DXCM"]["primary_exchange"], "NASDAQ")
+        self.assertEqual(by_symbol["DYN"]["primary_exchange"], "NYSE")
 
 
 if __name__ == "__main__":
