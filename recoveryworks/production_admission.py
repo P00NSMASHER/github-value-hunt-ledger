@@ -8,6 +8,7 @@ from typing import Any
 from recoveryworks.container_build import ContainerBuildManifest
 from recoveryworks.models import canonical_hash, normalize_sha256, normalize_utc_timestamp
 from recoveryworks.production_resilience import DisasterRecoveryRehearsal
+from recoveryworks.release_package_integrity import ReleasePackageIntegrityReceipt
 from recoveryworks.release_control import (
     EnvironmentPromotionGate,
     RecoveryWorksReleaseManifest,
@@ -37,6 +38,7 @@ class ProductionAdmissionGate:
     release_id: str
     release_proof_hash: str
     promotion_gate_proof_hash: str
+    release_package_integrity_proof_hash: str
     security_evidence_proof_hash: str
     dr_rehearsal_proof_hash: str
     container_build_manifest_proof_hash: str
@@ -51,6 +53,7 @@ class ProductionAdmissionGate:
         for name in (
             "release_proof_hash",
             "promotion_gate_proof_hash",
+            "release_package_integrity_proof_hash",
             "security_evidence_proof_hash",
             "dr_rehearsal_proof_hash",
             "container_build_manifest_proof_hash",
@@ -77,6 +80,8 @@ class ProductionAdmissionGate:
             "release_id": self.release_id,
             "release_proof_hash": self.release_proof_hash,
             "promotion_gate_proof_hash": self.promotion_gate_proof_hash,
+            "release_package_integrity_proof_hash":
+                self.release_package_integrity_proof_hash,
             "security_evidence_proof_hash": self.security_evidence_proof_hash,
             "dr_rehearsal_proof_hash": self.dr_rehearsal_proof_hash,
             "container_build_manifest_proof_hash":
@@ -108,6 +113,7 @@ def build_production_admission_gate(
     security_evidence: VerifiedReleaseSecurityEvidence,
     dr_rehearsal: DisasterRecoveryRehearsal,
     build_manifest: ContainerBuildManifest,
+    release_package_integrity: ReleasePackageIntegrityReceipt,
     *,
     admitted_at: str,
     policy: ProductionAdmissionPolicy = ProductionAdmissionPolicy(),
@@ -122,6 +128,29 @@ def build_production_admission_gate(
         or promotion_gate.release_proof_hash != release.proof_hash
     ):
         raise ValueError("promotion gate does not bind release")
+    if not isinstance(release_package_integrity, ReleasePackageIntegrityReceipt):
+        raise ValueError("production admission requires verified release package")
+    if (
+        release_package_integrity.release_id != release.release_id
+        or release_package_integrity.release_proof_hash != release.proof_hash
+    ):
+        raise ValueError("release package integrity does not bind release")
+    if (
+        release_package_integrity.promotion_gate_proof_hash
+        != promotion_gate.proof_hash
+    ):
+        raise ValueError("release package integrity does not bind promotion gate")
+    if (
+        release_package_integrity.adversarial_certification_proof_hash
+        != promotion_gate.adversarial_certification_proof_hash
+    ):
+        raise ValueError("release package integrity certification mismatch")
+    if (
+        not release_package_integrity.verified
+        or release_package_integrity.external_actions_performed
+    ):
+        raise ValueError("release package integrity receipt is not trusted")
+
     if (
         security_evidence.release_id != release.release_id
         or security_evidence.release_proof_hash != release.proof_hash
@@ -150,6 +179,8 @@ def build_production_admission_gate(
         "release_id": release.release_id,
         "release_proof_hash": release.proof_hash,
         "promotion_gate_proof_hash": promotion_gate.proof_hash,
+        "release_package_integrity_proof_hash":
+            release_package_integrity.proof_hash,
         "security_evidence_proof_hash": security_evidence.proof_hash,
         "dr_rehearsal_proof_hash": dr_rehearsal.proof_hash,
         "container_build_manifest_proof_hash": build_manifest.proof_hash,
@@ -165,6 +196,8 @@ def build_production_admission_gate(
         release_id=release.release_id,
         release_proof_hash=release.proof_hash,
         promotion_gate_proof_hash=promotion_gate.proof_hash,
+        release_package_integrity_proof_hash=
+            release_package_integrity.proof_hash,
         security_evidence_proof_hash=security_evidence.proof_hash,
         dr_rehearsal_proof_hash=dr_rehearsal.proof_hash,
         container_build_manifest_proof_hash=build_manifest.proof_hash,
