@@ -848,5 +848,92 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         ))
 
 
+    def test_listing_batch_one_resolves_exactly_66_rows(self):
+        import_dir = CORPUS_DIR / "import"
+        files = {
+            name: (import_dir / name).read_text(encoding="utf-8")
+            for name in (
+                "announcement_metadata.csv",
+                "listing_metadata.csv",
+                "shares_metadata.csv",
+                "control_metadata.csv",
+                "market_source_dates.csv",
+            )
+        }
+        imported = import_real_corpus_metadata(files)
+        listings = imported.listings
+        self.assertEqual(len(listings), 66)
+
+        by_symbol = {}
+        for item in listings:
+            by_symbol.setdefault(item.symbol, []).append(item)
+
+        self.assertEqual(
+            {symbol: len(items) for symbol, items in by_symbol.items()},
+            {
+                "CAT": 22,
+                "CNMD": 22,
+                "GILD": 22,
+            },
+        )
+        self.assertEqual(
+            {item.primary_exchange for item in by_symbol["CAT"]},
+            {"NYSE"},
+        )
+        self.assertEqual(
+            {item.primary_exchange for item in by_symbol["CNMD"]},
+            {"NASDAQ"},
+        )
+        self.assertEqual(
+            {item.primary_exchange for item in by_symbol["GILD"]},
+            {"NASDAQ"},
+        )
+        self.assertTrue(all(
+            item.evidence.source_kind.value == "OFFICIAL_LISTING_HISTORY"
+            for item in listings
+        ))
+
+    def test_listing_interval_batch_one_matches_requirement_index(self):
+        index_path = CORPUS_DIR / "listing_requirement_index.csv"
+        with index_path.open(
+            "r",
+            encoding="utf-8",
+            newline="",
+        ) as handle:
+            index = {
+                row["historical_symbol"]: row
+                for row in csv.DictReader(handle)
+            }
+
+        import_dir = CORPUS_DIR / "import"
+        with (import_dir / "listing_metadata.csv").open(
+            "r",
+            encoding="utf-8",
+            newline="",
+        ) as handle:
+            rows = list(csv.DictReader(handle))
+
+        for symbol in ("CAT", "CNMD", "GILD"):
+            expected_dates = set(
+                index[symbol]["required_dates"].split("|")
+            )
+            actual_dates = {
+                row["session_date"]
+                for row in rows
+                if row["symbol"] == symbol
+            }
+            self.assertEqual(actual_dates, expected_dates)
+
+        manifest = json.loads(
+            (CORPUS_DIR / "manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(manifest["listing_metadata_total"], 3828)
+        self.assertEqual(manifest["listing_metadata_resolved"], 66)
+        self.assertEqual(manifest["listing_batches_completed"], 1)
+        self.assertEqual(manifest["listing_symbols_resolved"], 3)
+
+
 if __name__ == "__main__":
     unittest.main()
