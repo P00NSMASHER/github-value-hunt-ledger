@@ -1,0 +1,1289 @@
+{
+  "schema_version": 1,
+  "status": "CANONICAL",
+  "evidence_classes": [
+    "PUBLIC_LICENSE_VERIFIED",
+    "OWNER_ATTESTED",
+    "EXECUTED_PERMISSION_VERIFIED",
+    "UNKNOWN_REVIEW",
+    "DENIED"
+  ],
+  "scope_statuses": [
+    "ALLOWED",
+    "ALLOWED_WITH_CONDITIONS",
+    "DENIED",
+    "UNKNOWN_REVIEW",
+    "NOT_APPLICABLE"
+  ],
+  "scopes": [
+    "commercial_use",
+    "hosted_saas",
+    "redistribution",
+    "assignment",
+    "sublicensing",
+    "change_of_control",
+    "datasets",
+    "model_weights",
+    "bundled_assets",
+    "trademarks_patents"
+  ],
+  "global_assertions": [
+    {
+      "assertion_key": "hunter-standing-owner-attestation-2026-09-19",
+      "evidence_class": "OWNER_ATTESTED",
+      "subject_selector": "repository_owned_public_code",
+      "statement": "Owner states separate commercial permission exists for repository-owned public GitHub code/content used in the hunt.",
+      "automatic_scope_effect": false,
+      "evidence_location": "MASTER.md",
+      "evidence_sha256": null
+    }
+  ],
+  "subsystem_policy": {
+    "hunter": {
+      "default_stage": "ANALYSIS",
+      "canonical_registry_required": true,
+      "allow_global_assertion_auto_effect": false
+    },
+    "freight": {
+      "default_stage": "CONTROLLED_PILOT",
+      "canonical_registry_required": true,
+      "allow_global_assertion_auto_effect": false
+    },
+    "recoveryworks": {
+      "default_stage": "ANALYSIS",
+      "canonical_registry_required": true,
+      "allow_global_assertion_auto_effect": false
+    },
+    "ai_business_os": {
+      "default_stage": "ANALYSIS",
+      "canonical_registry_required": true,
+      "allow_global_assertion_auto_effect": false
+    }
+  },
+  "subjects": [
+    {
+      "subject_key": "emoss08/Trenova@95fcf816562025ad9af864ded4a5fce8a555bd65",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "emoss08/Trenova",
+      "revision": "95fcf816562025ad9af864ded4a5fce8a555bd65",
+      "public_license": "FSL-1.1-ALv2",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "USER_ASSERTED_SEPARATE_COMMERCIAL_LICENSE_EXACT_REVISION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "OWNER_ATTESTED",
+          "evidence_location": "freight/RIGHTS_OWNER_ATTESTATION_2026-09-23.md",
+          "evidence_sha256": "ef93b40812bf68f027347cd95fa41550d58c06387c615272dd786fe8fbe57d71"
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "kodekinetics79/opstrax-enterprise-build@fec2ba1432d6f8b4ba4c48be3d58e7e096819045",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "kodekinetics79/opstrax-enterprise-build",
+      "revision": "fec2ba1432d6f8b4ba4c48be3d58e7e096819045",
+      "public_license": "NO_PUBLIC_LICENSE_RECORDED",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "USER_ASSERTED_SEPARATE_PERMISSION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "OWNER_ATTESTED",
+          "evidence_location": "freight/RIGHTS_OWNER_ATTESTATION_2026-09-23.md",
+          "evidence_sha256": "ef93b40812bf68f027347cd95fa41550d58c06387c615272dd786fe8fbe57d71"
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "sengtha/Kareya-Silo@a43eedea03add0728eadfc1f8ea35cc3ca6867cc",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "sengtha/Kareya-Silo",
+      "revision": "a43eedea03add0728eadfc1f8ea35cc3ca6867cc",
+      "public_license": "Apache-2.0",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#sengtha/Kareya-Silo@a43eedea03add0728eadfc1f8ea35cc3ca6867cc",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "vidyesh95/qatoto-backend@4f5f270f6ba5ef3ed4b230716997ccea049ce408",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "vidyesh95/qatoto-backend",
+      "revision": "4f5f270f6ba5ef3ed4b230716997ccea049ce408",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#vidyesh95/qatoto-backend@4f5f270f6ba5ef3ed4b230716997ccea049ce408",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "A-Jatin/freight-ratecon-extraction@a3dbbfec7f6b042176880d06c5114f81f29e57eb",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "A-Jatin/freight-ratecon-extraction",
+      "revision": "a3dbbfec7f6b042176880d06c5114f81f29e57eb",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#A-Jatin/freight-ratecon-extraction@a3dbbfec7f6b042176880d06c5114f81f29e57eb",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "OmarFaig/Assay@821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "OmarFaig/Assay",
+      "revision": "821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#OmarFaig/Assay@821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "srthck/trustmesh@5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "srthck/trustmesh",
+      "revision": "5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE_AND_USER_ASSERTED_SEPARATE_COMMERCIAL_LICENSE",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#srthck/trustmesh@5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "mgilbir/formalis@2b3895a0c2c54e4f25ccb46e131d215ad4457eb2",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "mgilbir/formalis",
+      "revision": "2b3895a0c2c54e4f25ccb46e131d215ad4457eb2",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": null,
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#mgilbir/formalis@2b3895a0c2c54e4f25ccb46e131d215ad4457eb2",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "DominicFinn/open_tms@93d8c2b8ff78373ff69bb7ea546743e4703628b1",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "DominicFinn/open_tms",
+      "revision": "93d8c2b8ff78373ff69bb7ea546743e4703628b1",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": "COMPARATOR_NOT_PRIMARY_RUNTIME",
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE_PLUS_USER_STANDING_PERMISSION",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#DominicFinn/open_tms@93d8c2b8ff78373ff69bb7ea546743e4703628b1",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "justicebajaj161/Freight-Audit-Console@c2d4c07310a77e20ee21a74fc96d49df783c2e3a",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "justicebajaj161/Freight-Audit-Console",
+      "revision": "c2d4c07310a77e20ee21a74fc96d49df783c2e3a",
+      "public_license": "REVIEW_LEDGER_BEFORE_RUNTIME_USE",
+      "origin_subsystem": "freight",
+      "runtime_status": "KEEP_INDEPENDENT",
+      "legacy_commercial_use_basis": "BENCHMARK_OR_INDEPENDENT_FALSIFIER",
+      "scopes": {
+        "commercial_use": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": "UNKNOWN_REVIEW",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "WRBriska/InvoiceAudit@bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "WRBriska/InvoiceAudit",
+      "revision": "bd3c0550f7a7f4a7ab9df8a5efc4b7a370c8253c",
+      "public_license": "REVIEW_LEDGER_BEFORE_RUNTIME_USE",
+      "origin_subsystem": "freight",
+      "runtime_status": "KEEP_INDEPENDENT",
+      "legacy_commercial_use_basis": "BENCHMARK_OR_INDEPENDENT_FALSIFIER",
+      "scopes": {
+        "commercial_use": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": "UNKNOWN_REVIEW",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "AnsonLai/docx-redline-js@e5bd19e93f85159f0838bcf31cb4ccc3d48c5cab",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "AnsonLai/docx-redline-js",
+      "revision": "e5bd19e93f85159f0838bcf31cb4ccc3d48c5cab",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": "PINNED_ISOLATED_ADAPTER",
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#AnsonLai/docx-redline-js@e5bd19e93f85159f0838bcf31cb4ccc3d48c5cab",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "kingsleyonoh/sla-penalty-settlement-engine@ea66727de51df7ee67a9f03f2549845fa6247b3d",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "kingsleyonoh/sla-penalty-settlement-engine",
+      "revision": "ea66727de51df7ee67a9f03f2549845fa6247b3d",
+      "public_license": "AGPL-3.0",
+      "origin_subsystem": "freight",
+      "runtime_status": "COMPARATOR_NOT_PRIMARY_RUNTIME",
+      "legacy_commercial_use_basis": "PUBLIC_AGPL_LICENSE_WITH_COMPLIANCE_REQUIRED",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED_WITH_CONDITIONS",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#kingsleyonoh/sla-penalty-settlement-engine@ea66727de51df7ee67a9f03f2549845fa6247b3d",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "yaogdu/AgentLedger@dd966e3b3d9eb54032c51701d30efcfbaa2379b0",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "yaogdu/AgentLedger",
+      "revision": "dd966e3b3d9eb54032c51701d30efcfbaa2379b0",
+      "public_license": "Apache-2.0",
+      "origin_subsystem": "freight",
+      "runtime_status": "PINNED_ISOLATED_ADAPTER",
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#yaogdu/AgentLedger@dd966e3b3d9eb54032c51701d30efcfbaa2379b0",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "microsoft/duroxide-python@0a29c32cdfd322c349fa6a9f480fc45fd78ea3ef",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "microsoft/duroxide-python",
+      "revision": "0a29c32cdfd322c349fa6a9f480fc45fd78ea3ef",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": "PINNED_ISOLATED_ADAPTER",
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#microsoft/duroxide-python@0a29c32cdfd322c349fa6a9f480fc45fd78ea3ef",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "fleetbase/fleetbase@4ff6980c6db6f3e8103b3ec425a089aa6d251af4",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "fleetbase/fleetbase",
+      "revision": "4ff6980c6db6f3e8103b3ec425a089aa6d251af4",
+      "public_license": "AGPL-3.0",
+      "origin_subsystem": "freight",
+      "runtime_status": "COMPARATOR_NOT_PRIMARY_RUNTIME",
+      "legacy_commercial_use_basis": "PUBLIC_AGPL_LICENSE_WITH_COMPLIANCE_REQUIRED",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED_WITH_CONDITIONS",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#fleetbase/fleetbase@4ff6980c6db6f3e8103b3ec425a089aa6d251af4",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    },
+    {
+      "subject_key": "Budget-Lab-Yale/tariff-rate-tracker@5a977726af0ead299e7db9cbca018b04dc2cc2e6",
+      "subject_type": "REPOSITORY_CODE",
+      "source_locator": "Budget-Lab-Yale/tariff-rate-tracker",
+      "revision": "5a977726af0ead299e7db9cbca018b04dc2cc2e6",
+      "public_license": "MIT",
+      "origin_subsystem": "freight",
+      "runtime_status": "PINNED_SOURCE_DATA_ADAPTER",
+      "legacy_commercial_use_basis": "PUBLIC_LICENSE",
+      "scopes": {
+        "commercial_use": {
+          "status": "ALLOWED",
+          "evidence_class": "PUBLIC_LICENSE_VERIFIED",
+          "evidence_location": "freight/COMPONENT_RIGHTS_REGISTRY.json#Budget-Lab-Yale/tariff-rate-tracker@5a977726af0ead299e7db9cbca018b04dc2cc2e6",
+          "evidence_sha256": null
+        },
+        "hosted_saas": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "redistribution": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "assignment": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "sublicensing": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "change_of_control": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "datasets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "model_weights": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "bundled_assets": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        },
+        "trademarks_patents": {
+          "status": "UNKNOWN_REVIEW",
+          "evidence_class": null,
+          "evidence_location": null,
+          "evidence_sha256": null
+        }
+      }
+    }
+  ]
+}
