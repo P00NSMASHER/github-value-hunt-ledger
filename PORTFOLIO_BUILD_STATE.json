@@ -197,7 +197,7 @@
     },
     {
       "decision_id": "DEC-017",
-      "summary": "Root PORTFOLIO_BUILD_STATE.json is now canonical for master steps 0–25; portfolio_prework/PORTFOLIO_BUILD_STATE.json is immutable completed prework history. current_step denotes the next pending step.",
+      "summary": "Root PORTFOLIO_BUILD_STATE.json is now canonical for master steps 0–25; portfolio_prework/PORTFOLIO_BUILD_STATE.json is immutable completed prework history. current_step denotes the next pending step. Artifact commit_sha records the creation checkpoint; the containing state commit is resolved from the isolated branch HEAD to avoid a self-referential Git hash.",
       "status": "ACCEPTED",
       "evidence_refs": [
         "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
@@ -265,25 +265,25 @@
       "path": "docs/PORTFOLIO_ARCHITECTURE_BASELINE.md",
       "kind": "architecture_baseline",
       "step": 0,
-      "commit_sha": null
+      "commit_sha": "bb237238c96b272bec5bae91c7358b41e26d6e17"
     },
     {
       "path": "docs/PORTFOLIO_STEP0_EVIDENCE.json",
       "kind": "delta_and_verification_receipt",
       "step": 0,
-      "commit_sha": null
+      "commit_sha": "bb237238c96b272bec5bae91c7358b41e26d6e17"
     },
     {
       "path": "portfolio_prework/test_portfolio_architecture_baseline.py",
       "kind": "baseline_regression_checks",
       "step": 0,
-      "commit_sha": null
+      "commit_sha": "bb237238c96b272bec5bae91c7358b41e26d6e17"
     },
     {
       "path": "PORTFOLIO_BUILD_STATE.json",
       "kind": "canonical_master_continuation_state",
       "step": 0,
-      "commit_sha": null
+      "commit_sha": "bb237238c96b272bec5bae91c7358b41e26d6e17"
     }
   ],
   "tests": [
