@@ -132,7 +132,7 @@ class RealCorpusListingTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["listing_intervals_verified"],
-            42,
+            45,
         )
         self.assertEqual(
             manifest["listing_metadata_resolved"],
