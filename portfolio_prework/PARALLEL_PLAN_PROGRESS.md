@@ -13,7 +13,7 @@ Working branch: `portfolio-parallel-prep`
 | 7 | GitHub workflow inventory | **COMPLETE** |
 | 8 | Test-suite inventory | **COMPLETE** |
 | 9 | Dependency inventory | **COMPLETE** |
-| 10 | Architecture evidence bundle | PENDING |
+| 10 | Architecture evidence bundle | **COMPLETE** |
 
 ## Step 1 result
 
@@ -103,6 +103,16 @@ Created:
 Inventoried all 14 dependency manifests discovered in the pinned repository snapshot with exact manifest paths and blob SHAs. Four repositories contain explicit dependency manifests and three do not. The inventory records direct dependency constraints, lockfile presence, pinning style, and reproducibility observations without installing any dependencies. Exact coverage validation found zero missing and zero extra manifests, and focused CI passed on run 36091421696.
 
 Key reproducibility findings: ABVM uses floating `latest` dependencies with no discovered npm lockfile; StarBlox exact-pins direct Rust dependencies but has no discovered Cargo/npm lockfiles and uses npm caret ranges; the primary portfolio production requirements mostly use version ranges; trading-platform has exact runtime/dev/optional lock files.
+
+## Step 10 result
+
+Created:
+- `portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.json`
+- `portfolio_prework/ARCHITECTURE_EVIDENCE_BUNDLE.md`
+- `portfolio_prework/STEP0_RESUME_HANDOFF.md`
+- `portfolio_prework/test_architecture_evidence_bundle.py`
+
+The final evidence bundle consolidates Steps 1-9 into a compact, provenance-linked architecture handoff. It records exact source artifact blob SHAs, verified portfolio counts, accepted architecture constraints, unresolved risks, explicit non-claims, and the exact Step 0 start sequence. Focused CI passed on run 36091601744. The parallel prework plan is complete and durable state now records all 10 steps as complete.
 
 ## Rule
 
