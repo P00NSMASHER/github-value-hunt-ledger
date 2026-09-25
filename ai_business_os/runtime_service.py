@@ -15,11 +15,24 @@ import time
 import urllib.error
 import urllib.request
 from http import HTTPStatus
+from urllib.parse import parse_qs
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Mapping
 
 from ai_business_os.ceo_command_center import (
     CommandCenterOperator,
+)
+from ai_business_os.command_center_ui import (
+    APP_CSS,
+    access_code_matches,
+    clear_session_cookie,
+    csrf_matches,
+    issue_session,
+    parse_session_cookie,
+    render_dashboard,
+    render_login,
+    session_cookie,
+    validate_session,
 )
 from ai_business_os.persistent_workers import (
     PersistentGoalWorker,
@@ -339,6 +352,10 @@ def build_server() -> ThreadingHTTPServer:
     )
     operator_token = _required_env("AIBOS_OPERATOR_TOKEN")
     expected_fingerprint = _required_env("AIBOS_SCHEMA_FINGERPRINT")
+    ui_enabled = os.environ.get("AIBOS_UI_ENABLED", "0") == "1"
+    ui_access_sha256 = _required_env("AIBOS_UI_ACCESS_SHA256") if ui_enabled else ""
+    ui_session_secret = _required_env("AIBOS_UI_SESSION_SECRET") if ui_enabled else ""
+    ui_principal = _required_env("AIBOS_UI_PRINCIPAL") if ui_enabled else ""
     port = int(os.environ.get("PORT", "8080"))
 
     bridge = GatewayProductionBridge(gateway)
