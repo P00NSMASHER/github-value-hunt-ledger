@@ -54,10 +54,10 @@
     "Make verified external outcomes drive value memory and pool-scoped allocation"
   ],
   "operating_truth": {
-    "real_verified_external_outcomes": 0,
+    "real_verified_external_outcomes": 1,
     "current_allocation_changes_from_outcomes": 0,
     "consequential_autonomy_enabled": 0,
-    "statement": "Infrastructure is complete; commercial evidence must now be earned from real external outcomes."
+    "statement": "Infrastructure is complete and the first real external outcome has been learned: one outreach delivery failure. No buyer response, revenue, recovery, or real playtest outcome has yet justified allocation movement."
   },
   "final_step_contract": "ai_business_os/EXTERNAL_OUTCOME_LEARNING_V1.json"
 }
