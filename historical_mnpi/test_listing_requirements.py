@@ -2,7 +2,10 @@ import unittest
 from pathlib import Path
 
 from historical_mnpi.listing_requirements import (
+    EXPECTED_EXPANDED_PAIR_SHA256,
+    SOURCE_REQUIREMENTS_SHA256,
     expand_listing_requirements,
+    expanded_pair_sha256,
     listing_requirement_index_hash,
     parse_listing_requirement_index,
 )
@@ -27,6 +30,14 @@ class ListingRequirementIndexTests(unittest.TestCase):
             3828,
         )
         self.assertEqual(len(listing_requirement_index_hash(rows)), 64)
+        self.assertEqual(
+            expanded_pair_sha256(rows),
+            EXPECTED_EXPANDED_PAIR_SHA256,
+        )
+        self.assertEqual(
+            SOURCE_REQUIREMENTS_SHA256,
+            "58e05613603b95b806eedb49ede774fce763f5ca7519487bed66282e4fe0a3fb",
+        )
 
     def test_first_listing_batch_symbols_have_22_requirements_each(self):
         rows = parse_listing_requirement_index(
