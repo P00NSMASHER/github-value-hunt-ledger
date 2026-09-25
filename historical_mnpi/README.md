@@ -819,3 +819,92 @@ market files are absent.
 Steps 16–17 remain strictly historical/public-record research infrastructure.
 They do not enable live surveillance, broker execution, order generation, or
 live trading.
+
+
+
+## Real Corpus Phase 1 — strict metadata file handoff
+
+The real-corpus pipeline now accepts genuine metadata through five explicit CSV
+files instead of requiring Python edits.
+
+All five files must be supplied together:
+
+1. `announcement_metadata.csv`
+2. `listing_metadata.csv`
+3. `shares_metadata.csv`
+4. `control_metadata.csv`
+5. `market_source_dates.csv`
+
+Use `render_real_corpus_metadata_templates()` to generate header-only templates.
+
+### announcement_metadata.csv
+
+Exact columns, in this exact order:
+
+`event_id,timestamp,evidence_id,source_kind,source_name,proves_first_public_release,data_class`
+
+`proves_first_public_release` must be exactly `true` or `false`.
+
+EDGAR `ACCEPTANCE-DATETIME` rows may be imported only as proxy evidence; they
+cannot set `proves_first_public_release=true`.
+
+### listing_metadata.csv
+
+Exact columns:
+
+`symbol,session_date,primary_exchange,evidence_id,source_kind,source_name,data_class`
+
+Historical exchange evidence must satisfy the Step-17 listing-source rules.
+
+### shares_metadata.csv
+
+Exact columns:
+
+`symbol,effective_date,shares_outstanding,public_availability_timestamp,evidence_id,source_kind,source_name,data_class`
+
+Shares must be positive integer text and retain both the effective date and when
+the fact became publicly available.
+
+### control_metadata.csv
+
+Exact columns:
+
+`control_date,universe_id,symbols,availability_timestamp,complete_pre_event_covariates,evidence_id,source_kind,source_name,data_class`
+
+Control-universe symbols are separated by `|`.
+
+`complete_pre_event_covariates` must be exactly `true` or `false`.
+
+### market_source_dates.csv
+
+Exact columns:
+
+`source_family,session_date`
+
+Supported source families are the existing Step-16 families:
+
+- `TAQ_MASTER`
+- `TAQ_TRADES_QUOTES`
+- `OPTIONS`
+- `CONDITIONAL_ITCH`
+
+### Import behavior
+
+`import_real_corpus_metadata()` rejects:
+
+- missing files;
+- unexpected files;
+- reordered, missing, or extra columns;
+- blank rows;
+- blank required values;
+- truthy shorthand such as `yes` or `1`;
+- unknown enum values;
+- prohibited data classes;
+- credential-like contract fields;
+- EDGAR proxy evidence falsely marked as first-public proof.
+
+No values are synthesized or silently defaulted.
+
+The returned `RealCorpusMetadataImport` can be passed directly into
+`resolve_metadata_for_plan()`. The resulting Step-17 coverage evidence can then
+be fed back through Step 16 to determine which real-corpus gates remain open.
