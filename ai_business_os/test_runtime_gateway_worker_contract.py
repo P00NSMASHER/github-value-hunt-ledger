@@ -10,6 +10,8 @@ class RuntimeGatewayWorkerContractTests(unittest.TestCase):
         source = GATEWAY.read_text(encoding="utf-8")
         self.assertIn("sql.json(goalTypes)", source)
         self.assertNotIn("JSON.stringify(goalTypes)}::jsonb", source)
+        self.assertIn("sql.json(evidence)", source)
+        self.assertNotIn("JSON.stringify(evidence)}::jsonb", source)
 
     def test_worker_gateway_remains_named_operation_only(self):
         source = GATEWAY.read_text(encoding="utf-8")
