@@ -1,0 +1,58 @@
+{
+  "version": "portfolio-pools-v1",
+  "status": "ACTIVE",
+  "pools": [
+    {
+      "pool_key": "b2b-cash-flow",
+      "scoring_model": "B2B_CASH_FLOW",
+      "initiatives": [
+        "capturebrief",
+        "freightrecovery",
+        "recoveryos"
+      ],
+      "min_evidence_coverage": 0.6,
+      "allowed_resource_types": [
+        "AI_COST_UNITS",
+        "ENGINEERING_HOURS",
+        "HUMAN_HOURS",
+        "CASH_CENTS"
+      ]
+    },
+    {
+      "pool_key": "consumer-rnd",
+      "scoring_model": "CONSUMER_RND",
+      "initiatives": [
+        "starblox"
+      ],
+      "min_evidence_coverage": 0.67,
+      "allowed_resource_types": [
+        "AI_COST_UNITS",
+        "ENGINEERING_HOURS",
+        "HUMAN_HOURS"
+      ],
+      "cash_allocation_allowed": false
+    }
+  ],
+  "invariants": [
+    "cross-pool ranking is forbidden",
+    "StarBlox cannot use B2B cash-flow metrics",
+    "consumer/R&D cash allocation is forbidden without a separate policy",
+    "revenue is not required as a pre-release consumer/R&D metric",
+    "repository activity is not treated as playtest evidence"
+  ],
+  "current_state": {
+    "b2b_allocation_ready": 0,
+    "consumer_rnd_allocation_ready": 0,
+    "starblox_open_evidence_gaps": 6,
+    "starblox_owner_agent": "agent-product"
+  },
+  "canary": {
+    "consumer_cash_rejected": true,
+    "consumer_b2b_metric_rejected": true,
+    "persistent_synthetic_rows": 0
+  },
+  "latest_command_center_snapshot": {
+    "key": "ceo-command-center-v2-portfolio-pools",
+    "sha256": "b058cfe177a005168af6fa5f25ec7ca0c51bcd2a17b3ccd1ecd60b70fafb8c79"
+  }
+}

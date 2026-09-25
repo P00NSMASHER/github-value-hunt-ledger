@@ -2,9 +2,9 @@
   "schema": "ai_business_os_prod",
   "source": "supabase_migrations.schema_migrations",
   "exported_from_live_database": true,
-  "latest_version": "20260925132548",
-  "migration_count": 31,
-  "live_schema_fingerprint_sha256": "b9e0b218933260945cd3fa9a7c9db37f71c436adbe43b52265340111bdc2bc80",
+  "latest_version": "20260925134039",
+  "migration_count": 34,
+  "live_schema_fingerprint_sha256": "5fca7296cec391902bfb4e973e03e23821e3ed11715ecb43eca406a0f22fde24",
   "bootstrap_file": "supabase/migrations/ai_business_os/bootstrap.sql",
   "migrations": [
     {
@@ -161,6 +161,21 @@
       "version": "20260925132548",
       "name": "focus_ai_business_os_commercial_tracks_v1",
       "sha256": "60e4b0494501b8a0238828db60a2df2aeeaf2412fbadcb3a93667a33097e9480"
+    },
+    {
+      "version": "20260925133718",
+      "name": "separate_ai_business_os_portfolio_pools_v1",
+      "sha256": "9225ea9f335ad24bcae5515dac125edd2d6c263a90802f9782734f33901dfbe1"
+    },
+    {
+      "version": "20260925133954",
+      "name": "add_ai_business_os_pool_scoped_allocator_v1",
+      "sha256": "a7be75665bba767a3b9e7aaac4760b6212686e302df4a4b7168543bc3a9a527b"
+    },
+    {
+      "version": "20260925134039",
+      "name": "integrate_ai_business_os_portfolio_pools_command_center_v1",
+      "sha256": "fb7e26c57d32df02f7cd264e7ebf9c0589234b10d9466ce9b0292cfaa1f5b462"
     }
   ],
   "public_bootstrap_sanitized": true,
@@ -171,5 +186,5 @@
     "__PRIVATE_STRIPE_ACCOUNT_ID_3__"
   ],
   "live_statement_hashes_retained": true,
-  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained; private identifiers stay outside Git. Latest commercial-focus migration is archived separately."
+  "note": "Public bootstrap is sanitized. Exact live statement hashes are retained. Portfolio allocation is pool-scoped: B2B cash-flow and consumer/R&D are never cross-ranked."
 }
