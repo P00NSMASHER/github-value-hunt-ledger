@@ -94,7 +94,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             imported.counts(),
             {
                 "announcement_rows": 27,
-                "listing_rows": 396,
+                "listing_rows": 594,
                 "shares_rows": 0,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
@@ -228,7 +228,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
-        self.assertEqual(manifest["listing_metadata_resolved"], 396)
+        self.assertEqual(manifest["listing_metadata_resolved"], 594)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
@@ -585,7 +585,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
 
 
-    def test_g2_first_four_batches_resolve_396_listing_observations(self):
+    def test_g2_first_five_batches_resolve_594_listing_observations(self):
         import_dir = CORPUS_DIR / "import"
         files = {
             name: (import_dir / name).read_text(encoding="utf-8")
@@ -598,16 +598,16 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         }
         imported = import_real_corpus_metadata(files)
-        self.assertEqual(len(imported.listings), 396)
+        self.assertEqual(len(imported.listings), 594)
 
         by_symbol = {}
         for item in imported.listings:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(set(by_symbol), {"ADI", "BA", "CNMD", "CAT", "DE", "F", "GILD", "HON", "JNPR", "NKE", "SBUX", "VMW"})
+        self.assertEqual(set(by_symbol), {"ADI", "BA", "CA", "CNMD", "CAT", "DE", "DGI", "F", "GILD", "HON", "JNPR", "NKE", "PNRA", "SBUX", "VMW"})
         self.assertEqual(
             {symbol: len(rows) for symbol, rows in by_symbol.items()},
-            {"ADI": 44, "BA": 22, "CNMD": 22, "CAT": 22, "DE": 22, "F": 22, "GILD": 22, "HON": 22, "JNPR": 88, "NKE": 22, "SBUX": 22, "VMW": 66},
+            {"ADI": 44, "BA": 22, "CA": 44, "CNMD": 22, "CAT": 22, "DE": 22, "DGI": 66, "F": 22, "GILD": 22, "HON": 22, "JNPR": 88, "NKE": 22, "PNRA": 88, "SBUX": 22, "VMW": 66},
         )
         self.assertEqual(
             {row.primary_exchange for row in by_symbol["CNMD"]},
@@ -656,6 +656,18 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(
             {row.primary_exchange for row in by_symbol["VMW"]},
             {"NYSE"},
+        )
+        self.assertEqual(
+            {row.primary_exchange for row in by_symbol["CA"]},
+            {"NASDAQ"},
+        )
+        self.assertEqual(
+            {row.primary_exchange for row in by_symbol["DGI"]},
+            {"NYSE"},
+        )
+        self.assertEqual(
+            {row.primary_exchange for row in by_symbol["PNRA"]},
+            {"NASDAQ"},
         )
 
     def test_g2_batch_one_requirement_file_is_exactly_66_dates(self):
@@ -733,17 +745,36 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             {"ADI": 44, "JNPR": 88, "VMW": 66},
         )
 
+
+    def test_g2_batch_five_requirement_file_is_exactly_198_dates(self):
+        path = CORPUS_DIR / "listing_requirement_batch_005.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+
+        self.assertEqual(
+            {row["historical_symbol"] for row in rows},
+            {"CA", "DGI", "PNRA"},
+        )
+        self.assertEqual(
+            sum(int(row["requirement_count"]) for row in rows),
+            198,
+        )
+        self.assertEqual(
+            {row["historical_symbol"]: int(row["requirement_count"]) for row in rows},
+            {"CA": 44, "DGI": 66, "PNRA": 88},
+        )
+
     def test_g2_manifest_is_transparent_about_full_compact_index(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(manifest["listing_metadata_resolved"], 396)
+        self.assertEqual(manifest["listing_metadata_resolved"], 594)
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_intervals_verified"], 12)
-        self.assertEqual(manifest["listing_batches_completed"], 4)
+        self.assertEqual(manifest["listing_intervals_verified"], 15)
+        self.assertEqual(manifest["listing_batches_completed"], 5)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 3432)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 3234)
 
 
 if __name__ == "__main__":
