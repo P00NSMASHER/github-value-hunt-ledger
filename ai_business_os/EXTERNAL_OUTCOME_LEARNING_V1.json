@@ -1,0 +1,87 @@
+{
+  "version": "verified-external-outcome-learning-v1",
+  "status": "ACTIVE",
+  "principle": "Only independently verified external outcomes may change outcome-derived allocator evidence or verified outcome memory.",
+  "verifier_roles": [
+    "AUDITOR_REDTEAM",
+    "FINANCE_ANALYTICS"
+  ],
+  "outcome_types": [
+    "BUYER_POSITIVE_REPLY",
+    "BUYER_NEGATIVE_REPLY",
+    "SIGNED_ENGAGEMENT",
+    "COLLECTED_REVENUE",
+    "RECOVERED_FUNDS",
+    "DELIVERY_HOURS",
+    "DELIVERY_COST_CENTS",
+    "AI_COST_CENTS",
+    "EXPLICIT_NO_VALUE",
+    "PLAYTEST_POSITIVE_SIGNAL",
+    "PLAYTEST_NEGATIVE_SIGNAL",
+    "PLAYTEST_RETENTION_SIGNAL"
+  ],
+  "b2b_allocator_outputs": [
+    "cash_collected_30d",
+    "cash_costs_30d",
+    "ai_cost_30d",
+    "contracted_pipeline_value_90d",
+    "human_hours_30d",
+    "market_evidence_signal",
+    "time_to_cash_days"
+  ],
+  "consumer_allocator_outputs": [
+    "playtest_evidence_signal"
+  ],
+  "hard_invariants": [
+    "creator and verifier must be different active agents",
+    "verified external outcomes require exact SHA-256 source evidence",
+    "repository activity is never an external outcome",
+    "B2B buyer/commercial outcomes require a bound opportunity",
+    "collected revenue requires bank/payment-processor/general-ledger evidence",
+    "market evidence becomes allocation-grade only after at least three verified opportunity dispositions",
+    "consumer playtest evidence becomes allocation-grade only after at least five verified playtest outcomes",
+    "B2B revenue-loop outcomes cannot enter value memory until total attribution equals 1.0",
+    "consumer/R&D outcomes may enter initiative-scoped memory immediately after independent verification",
+    "negative/no-value outcomes are learned rather than discarded",
+    "outcome-derived portfolio snapshots refresh only the affected pool",
+    "real allocator state does not change when no real verified outcome exists"
+  ],
+  "reward_policy": {
+    "COLLECTED_REVENUE": 1,
+    "RECOVERED_FUNDS": 1,
+    "SIGNED_ENGAGEMENT": 0.8,
+    "BUYER_POSITIVE_REPLY": 0.4,
+    "BUYER_NEGATIVE_REPLY": -0.5,
+    "EXPLICIT_NO_VALUE": -1,
+    "PLAYTEST_POSITIVE_SIGNAL": 0.5,
+    "PLAYTEST_NEGATIVE_SIGNAL": -0.5,
+    "DELIVERY_HOURS": 0,
+    "DELIVERY_COST_CENTS": 0,
+    "AI_COST_CENTS": 0,
+    "PLAYTEST_RETENTION_SIGNAL": "2*x-1 bounded to [-1,1]"
+  },
+  "canary": {
+    "self_verification_rejected": true,
+    "pre_attribution_memory_rejected": true,
+    "verified_positive_outcomes_made_capturebrief_allocation_eligible": true,
+    "collected_revenue_flowed_to_allocator": true,
+    "three_buyer_dispositions_produced_market_signal_two_thirds": true,
+    "fully_attributed_collected_revenue_became_verified_positive_memory": true,
+    "persistent_synthetic_outcomes": 0,
+    "persistent_synthetic_memory_observations": 0
+  },
+  "current_real_state": {
+    "verified_external_outcomes": 0,
+    "learned_external_outcomes": 0,
+    "verified_external_outcome_memory_observations": 0,
+    "capturebrief_allocation_eligible": false,
+    "freightrecovery_allocation_eligible": false,
+    "recoveryos_allocation_eligible": false,
+    "starblox_allocation_eligible": false
+  },
+  "latest_command_center_snapshot": {
+    "key": "ceo-command-center-v3-outcome-learning",
+    "sha256": "21da851e3ab7fe34fdbe25e650ef1ae79166590db88822bc20dd86cc52afd6eb"
+  },
+  "live_schema_fingerprint_sha256": "6efecb862a2dea12ff5f231721be93b35e3bd8683d068a0b36ec559fc2ca2c40"
+}

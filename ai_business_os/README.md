@@ -213,3 +213,20 @@ Hunter, Freight, RecoveryWorks and AI Business OS now share one operational righ
 
 Public mirror: `rights/RIGHTS_REGISTRY.json`.
 Private operating registry: `ai_business_os_prod.rights_*`.
+
+
+## Verified external outcomes → memory → allocation
+
+The final repository-plan layer closes the real-world learning loop.
+
+A new external outcome must bind an active initiative, exact evidence source, SHA-256, creator, and
+an independent Finance/Auditor verifier. B2B commercial outcomes may mirror into the revenue loop;
+they cannot enter verified value memory until revenue attribution totals exactly 1.0. Consumer/R&D
+playtest outcomes are directly initiative-attributable after independent verification.
+
+Verified outcomes can refresh only the affected portfolio pool. Outcome-derived allocator metrics
+use the `VERIFIED_OUTCOME_LEDGER` source class. Repository activity, test counts, branch counts,
+and architecture growth are never treated as external outcomes.
+
+Current live state remains fail-closed: there are zero real verified external outcomes, so no
+initiative has become allocation-ready merely because this mechanism was implemented.
