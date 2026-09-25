@@ -269,6 +269,58 @@ class RuntimeState:
             }
 
 
+def activate_bootstrap_objective(
+    operator: CommandCenterOperator,
+    bridge: GatewayProductionBridge,
+    write_execute: GatewayWriteExecutor,
+    *,
+    objective: str,
+    human_principal: str,
+    priority: int = 100,
+) -> dict[str, Any]:
+    """Activate one exact Command Center objective idempotently as a PENDING goal."""
+    proposal = operator.propose_objective(
+        objective,
+        requested_by=human_principal,
+        priority=priority,
+    )
+    objective_hash = str(proposal["objective_hash"])
+    planning_inputs = bridge.planning_inputs()
+    for goal in planning_inputs.get("open_goals", []):
+        if not isinstance(goal, Mapping):
+            continue
+        constraints = goal.get("constraints")
+        if isinstance(constraints, str):
+            try:
+                constraints = json.loads(constraints)
+            except json.JSONDecodeError:
+                constraints = {}
+        if isinstance(constraints, Mapping) and constraints.get("objective_hash") == objective_hash:
+            return {
+                "event": "bootstrap_objective_already_present",
+                "objective_hash": objective_hash,
+                "goal_id": goal.get("id"),
+                "status": goal.get("status"),
+                "target_agent_id": goal.get("agent_id"),
+            }
+
+    activated = operator.activate_objective(
+        proposal,
+        human_principal=human_principal,
+        write_execute=write_execute,
+    )
+    goal = activated["goal"]
+    return {
+        "event": "bootstrap_objective_activated",
+        "objective_hash": objective_hash,
+        "goal_id": goal.get("id"),
+        "status": goal.get("status"),
+        "target_agent_id": goal.get("agent_id"),
+        "goal_type": goal.get("goal_type"),
+        "possible_action_class": proposal.get("possible_action_class"),
+    }
+
+
 def _probe_loop(state: RuntimeState) -> None:
     while True:
         state.probe()
@@ -413,6 +465,27 @@ def main() -> None:
                 flush=True,
             )
             raise
+
+    if os.environ.get("AIBOS_BOOTSTRAP_OBJECTIVE_ENABLED", "0") == "1":
+        bootstrap_gateway = GatewayClient(
+            _required_env("AIBOS_GATEWAY_URL"),
+            _required_env("AIBOS_RUNTIME_TOKEN"),
+        )
+        bootstrap_bridge = GatewayProductionBridge(bootstrap_gateway)
+        bootstrap_operator = CommandCenterOperator(
+            bootstrap_bridge,
+            expected_schema_fingerprint=_required_env("AIBOS_SCHEMA_FINGERPRINT"),
+        )
+        bootstrap_write = GatewayWriteExecutor(bootstrap_gateway)
+        result = activate_bootstrap_objective(
+            bootstrap_operator,
+            bootstrap_bridge,
+            bootstrap_write,
+            objective=_required_env("AIBOS_BOOTSTRAP_OBJECTIVE"),
+            human_principal=_required_env("AIBOS_BOOTSTRAP_PRINCIPAL"),
+            priority=int(os.environ.get("AIBOS_BOOTSTRAP_PRIORITY", "100")),
+        )
+        print(json.dumps(result, separators=(",", ":")), flush=True)
     server.serve_forever()
 
 
