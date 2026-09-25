@@ -1,0 +1,338 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Stable top-level project identity registry for Portfolio Brain. IDs are immutable; display names and aliases may evolve.",
+  "rules": [
+    "Never recycle a project_id.",
+    "Rename by adding/updating aliases; do not change project_id.",
+    "Repository identity and project identity are separate.",
+    "A project may span multiple repositories and one repository may host multiple projects.",
+    "Subproducts, offers, experiments, and infrastructure components inherit a top-level project_id until the later entity schema assigns their own stable entity IDs."
+  ],
+  "projects": [
+    {
+      "project_id": "PRJ-000",
+      "slug": "portfolio-brain",
+      "name": "Portfolio Brain",
+      "status": "reserved_for_build",
+      "parent_project_id": null,
+      "repositories": [],
+      "aliases": [
+        "Portfolio Intelligence System",
+        "Autonomous Portfolio Intelligence System"
+      ],
+      "category": [
+        "portfolio_control_plane"
+      ]
+    },
+    {
+      "project_id": "PRJ-001",
+      "slug": "recoveryworks",
+      "name": "RecoveryWorks",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-001"
+      ],
+      "aliases": [
+        "Recovery Works",
+        "RecoveryOS",
+        "Recovery Scan 360",
+        "PayerRecovery",
+        "UtilityRecovery",
+        "APRecovery",
+        "DutyRecovery",
+        "SaaSRecovery",
+        "TelecomRecovery",
+        "RebateRecovery",
+        "LeaseRecovery",
+        "ConstructionRecovery",
+        "TaxRecovery",
+        "InsuranceRecovery",
+        "CloudRecovery",
+        "MerchantFeeRecovery",
+        "ParcelRecovery",
+        "ProcurementRecovery",
+        "Warranty/CreditRecovery",
+        "Payroll/BenefitBillingRecovery",
+        "AP Leakage Assurance",
+        "Recovery Proof SLA",
+        "Money-State Integrity / Close Assurance",
+        "Telecom Revenue Assurance",
+        "Healthcare Revenue Integrity Diagnostic",
+        "Utility Revenue Assurance",
+        "Insurance Subrogation Recovery Diagnostic"
+      ],
+      "category": [
+        "business",
+        "recovery",
+        "assurance"
+      ]
+    },
+    {
+      "project_id": "PRJ-002",
+      "slug": "freight-recovery",
+      "name": "Freight Recovery",
+      "status": "active",
+      "parent_project_id": "PRJ-001",
+      "repositories": [
+        "REPO-001"
+      ],
+      "aliases": [
+        "FreightRecovery",
+        "Freight Audit Acceptance Test / Recovery",
+        "Freight Audit Acceptance Test"
+      ],
+      "category": [
+        "business",
+        "recovery",
+        "freight"
+      ]
+    },
+    {
+      "project_id": "PRJ-003",
+      "slug": "permitplate",
+      "name": "PermitPlate",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-005",
+        "REPO-006"
+      ],
+      "aliases": [
+        "Permit Plate",
+        "PermitPlate NYC",
+        "PermitPlate public application",
+        "PermitPlate operational ledgers",
+        "Permit-to-Development Opportunity Intelligence"
+      ],
+      "category": [
+        "business",
+        "product",
+        "permit_intelligence"
+      ]
+    },
+    {
+      "project_id": "PRJ-004",
+      "slug": "capturebrief",
+      "name": "CaptureBrief",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-007"
+      ],
+      "aliases": [
+        "Capture Brief",
+        "CaptureBrief Decision Evidence",
+        "CaptureBrief 14-Day Targeted Watch",
+        "CaptureBrief FAR/DFARS Deviation Intelligence",
+        "CaptureBrief FAR-Deviation Readiness"
+      ],
+      "category": [
+        "business",
+        "product",
+        "govcon",
+        "decision_evidence"
+      ]
+    },
+    {
+      "project_id": "PRJ-005",
+      "slug": "starblox",
+      "name": "StarBlox",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-002"
+      ],
+      "aliases": [
+        "Star Blocks",
+        "StarBlox Quest Engine",
+        "StarBlox Learning/Mastery System",
+        "Star Market",
+        "StarBlox Avatar/Equipment System",
+        "StarBlox Home Progression",
+        "StarBlox Buddy/Bond System",
+        "StarBlox Parent Learning Pulse",
+        "StarBlox Question QA System",
+        "StarBlox Artwork Production Pipeline"
+      ],
+      "category": [
+        "product",
+        "education",
+        "game"
+      ]
+    },
+    {
+      "project_id": "PRJ-006",
+      "slug": "abvm-parent-companion",
+      "name": "ABVM Grade 2 Parent Companion",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-003"
+      ],
+      "aliases": [
+        "ABVM",
+        "ABVM app",
+        "ABVM School Star World",
+        "ABVM Teacher-Site Refresh Pipeline",
+        "ABVM School Pack",
+        "ABVM Uploaded Notice/Flyer System",
+        "ABVM Offline Last-Good Fallback",
+        "ABVM Homework Checkoff System"
+      ],
+      "category": [
+        "product",
+        "education",
+        "parent_companion"
+      ]
+    },
+    {
+      "project_id": "PRJ-007",
+      "slug": "market-surveillance-research",
+      "name": "Market Surveillance Research Platform",
+      "status": "active_research_only",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-004"
+      ],
+      "aliases": [
+        "trading-platform",
+        "Trading Platform",
+        "Private MNPI / Informed-Trading Surveillance Research Platform",
+        "Historical Event Corpus Builder",
+        "Historical Market Data Adapter",
+        "Point-in-Time Baseline Engine",
+        "Surveillance Feature Engine",
+        "Matched-Control Generator",
+        "Offline Model-Training Harness",
+        "Blind External-Validation Harness",
+        "Private Surveillance Case Database",
+        "Immutable Evidence Generator",
+        "Private Surveillance Dashboard",
+        "Cross-Event Intelligence Graph",
+        "Graph-Aware Surveillance Features"
+      ],
+      "category": [
+        "research",
+        "market_surveillance",
+        "model_validation"
+      ],
+      "hard_boundaries": [
+        "NO_AUTONOMOUS_TRADING",
+        "NO_BROKER_ORDER_EXECUTION"
+      ]
+    },
+    {
+      "project_id": "PRJ-008",
+      "slug": "hunter",
+      "name": "Hunter / GitHub Value Hunt",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-001"
+      ],
+      "aliases": [
+        "Hunter",
+        "GitHub Value Hunt",
+        "Technology Intelligence Loop",
+        "47-Domain Hunter Catalog System",
+        "MASTER Integrator",
+        "Search Strategy Learning",
+        "Query-Family Learning",
+        "Search Move Learning",
+        "Worker Routing and Routing Learning",
+        "Saturation Detection",
+        "Blind-Spot Coverage",
+        "Adjacency Expansion",
+        "Unified Hunt Allocator",
+        "Execution Control Plane",
+        "Controlled Routing Exploration",
+        "Offline Training Environment",
+        "Train/Confirm/Evaluation Partitioning",
+        "Repair / Skill Evaluation / Canary Pipeline"
+      ],
+      "category": [
+        "research",
+        "technology_intelligence",
+        "continuous_learning"
+      ]
+    },
+    {
+      "project_id": "PRJ-009",
+      "slug": "ai-business-os",
+      "name": "AI Business OS",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-001"
+      ],
+      "aliases": [
+        "Business OS",
+        "Persistent Agent Runtime",
+        "Independent Auditor Brain",
+        "Verifier-Gated Self-Improvement",
+        "Value-Weighted Memory",
+        "Provenance-Preserving Knowledge Graph",
+        "Runtime Governance / Control Plane",
+        "Governed Autonomous Software Factory",
+        "Evidence / Truth Engine",
+        "Reversible Entity Canonicalization",
+        "Evidence-First Portfolio Capital Allocator",
+        "Production Hunter Architecture",
+        "Learning Engine",
+        "Learning Curriculum",
+        "Runtime Activation Gate",
+        "Restart Readiness System",
+        "Blind Partition System",
+        "Autonomous Repair Workbench",
+        "Skill Evaluation and Promotion Intake"
+      ],
+      "category": [
+        "infrastructure",
+        "agents",
+        "governance",
+        "learning"
+      ]
+    },
+    {
+      "project_id": "PRJ-010",
+      "slug": "browser-gateway",
+      "name": "Browser Gateway",
+      "status": "in_development",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-001"
+      ],
+      "aliases": [
+        "Mobile Browser Gateway",
+        "Browser Gateway / Mobile Browser Gateway"
+      ],
+      "category": [
+        "infrastructure",
+        "browser",
+        "agent_tooling"
+      ]
+    },
+    {
+      "project_id": "PRJ-011",
+      "slug": "evidence-data-ledgers",
+      "name": "Evidence Data Ledgers",
+      "status": "active",
+      "parent_project_id": null,
+      "repositories": [
+        "REPO-001"
+      ],
+      "aliases": [
+        "FMC Tariff Rule Ledger",
+        "Hospital Price Transparency MRF Ledger",
+        "Transparency-in-Coverage Payer MRF Ledger",
+        "OpenEI URDB Utility Rate Ledger"
+      ],
+      "category": [
+        "data_infrastructure",
+        "provenance",
+        "recovery_support"
+      ]
+    }
+  ]
+}
