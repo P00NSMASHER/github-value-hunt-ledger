@@ -166,7 +166,7 @@ class RealCorpusListingTests(unittest.TestCase):
 
     def test_interval_evidence_is_public_authorized_and_two_boundary(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 74)
+        self.assertEqual(len(intervals), 79)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith("https://"))
             self.assertTrue(item.end_evidence_url.startswith("https://"))
