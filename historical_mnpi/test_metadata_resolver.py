@@ -375,6 +375,16 @@ class MetadataResolverTests(unittest.TestCase):
             0,
         )
         self.assertFalse(bundle.ready_metadata_gates)
+        summary = bundle.readiness_summary()
+        self.assertEqual(summary["announcement_resolved"], 0)
+        self.assertEqual(summary["announcement_total"], 174)
+        self.assertEqual(summary["listing_resolved"], 0)
+        self.assertEqual(summary["listing_total"], 3828)
+        self.assertEqual(summary["shares_resolved"], 0)
+        self.assertEqual(summary["shares_total"], 3828)
+        self.assertEqual(summary["control_resolved"], 0)
+        self.assertEqual(summary["control_total"], 72)
+        self.assertFalse(summary["ready_metadata_gates"])
 
     def test_synthetic_fixture_closes_four_metadata_gates_and_step16_plan(self):
         calendar = sessions(60)
