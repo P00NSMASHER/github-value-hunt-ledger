@@ -12,6 +12,7 @@ from recoveryworks.production_admission import (
     ProductionAdmissionPolicy,
     build_production_admission_gate,
 )
+from recoveryworks.release_package_integrity import verify_release_control_package
 from recoveryworks.production_resilience import (
     DisasterRecoveryRehearsal,
     ProductionBackupPolicy,
@@ -22,6 +23,7 @@ from recoveryworks.release_control import (
     build_environment_promotion_gate,
     build_release_manifest,
     build_rollback_manifest,
+    write_release_control_artifacts,
 )
 from recoveryworks.release_security import (
     ReleaseSecurityPolicy,
@@ -81,12 +83,23 @@ class ProductionAdmissionTests(unittest.TestCase):
                             approver_id="a2",role="OPERATIONS_OWNER",
                             approved_at="2026-09-24T13:03:00Z"),
         )
+        certification=production_certification(build)
         promotion=build_environment_promotion_gate(
             release,environment=ReleaseEnvironment.PRODUCTION,approvals=approvals,
             health_check=check_production_health(deployment),
             readiness_check=check_production_readiness(deployment),
             rollback_manifest=rollback,gate_created_at="2026-09-24T13:04:00Z",
-            adversarial_certification=production_certification(build))
+            adversarial_certification=certification)
+        package_dir=root/"private"/"release-control"
+        write_release_control_artifacts(
+            release=release,approvals=approvals,rollback=rollback,
+            gate=promotion,directory=package_dir,
+            adversarial_certification=certification)
+        package_integrity=verify_release_control_package(
+            directory=package_dir,release=release,approvals=approvals,
+            rollback=rollback,gate=promotion,
+            adversarial_certification=certification,
+            verified_at="2026-09-24T13:04:30Z")
         sbom=build_release_sbom(
             release,build,repository_root=".",generated_at="2026-09-24T13:05:00Z")
         att=build_container_attestation_input(
