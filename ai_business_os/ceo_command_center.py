@@ -96,12 +96,19 @@ def _route_role(text: str) -> tuple[str, str]:
 def _production_change_intent(text: str) -> bool:
     if _contains_any(text, ("deploy", "migrate", "migration")):
         return True
-    low = text.lower()
-    production = r"\\b(?:production|prod)\\b"
-    change = r"\\b(?:change|update|release|modify|write|push|restart|rollback|promote)\\b"
-    return bool(
-        re.search(rf"{change}.{{0,48}}{production}", low)
-        or re.search(rf"{production}.{{0,48}}{change}", low)
+    words = re.findall(r"[a-z0-9_]+", text.lower())
+    production_positions = [
+        index for index, word in enumerate(words)
+        if word in {"production", "prod"}
+    ]
+    change_positions = [
+        index for index, word in enumerate(words)
+        if word in {"change", "update", "release", "modify", "write", "push", "restart", "rollback", "promote"}
+    ]
+    return any(
+        abs(production_index - change_index) <= 8
+        for production_index in production_positions
+        for change_index in change_positions
     )
 
 
