@@ -1,291 +1,91 @@
 {
   "api_metrics": {
-    "api_requests": 38,
-    "known_revision_skips": 16,
+    "api_requests": 8,
+    "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 9,
+  "candidate_count": 2,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Explainable AI platform for automated government tender evaluation. Extracts eligibility criteria from tender documents, parses bidder submissions (PDFs, scans, photos) using OCR + LLM, and produces criterion-level verdicts with full audit trail. Built for CRPF procurement. FastAPI \u00b7 Claude AI \u00b7 React",
-      "discovery_query": "government procurement parser",
-      "exact_revision": "0ca8bca853cff560bdb59bee8c9d9b1f5b4d8e7d",
-      "forks": 1,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-08-09T09:25:11Z",
-      "repository": "Biku4321/tendersense-ai",
+      "description": "A modular framework for Roblox: boot order, guarded networking, state replication, and player data. Every module works on its own.",
+      "discovery_query": "Roblox networking replication framework Luau",
+      "exact_revision": "fd58df863e9e30da79b21a645bd9708c7adf5f35",
+      "forks": 0,
+      "primary_language": "MDX",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-09-24T17:23:30Z",
+      "repository": "andrian-syh/rblx-twill",
       "root_code_signals": [
-        "docker-compose.yml"
+        ".github"
       ],
-      "size_kb": 212,
+      "size_kb": 547,
       "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 1,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 30,
-      "url": "https://github.com/Biku4321/tendersense-ai"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "ProcureSense is an AI-powered tender evaluation platform for government procurement. It extracts eligibility criteria from tender documents, parses bidder submissions across PDFs/scans/images, evaluates compliance with explainable AI, flags ambiguous cases for human review, and generates audit-ready procurement reports.",
-      "discovery_query": "government procurement parser",
-      "exact_revision": "6476a4346d8d9cfef6f57814f623f9fc46374227",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-05-07T19:30:41Z",
-      "repository": "lucifer-135/ProcureSense---AI-Tender-Evaluation-System",
-      "root_code_signals": [],
-      "size_kb": 134,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 30,
-      "url": "https://github.com/lucifer-135/ProcureSense---AI-Tender-Evaluation-System"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Bharat-Procure AI: An intelligent, agentic platform designed for automated tender evaluation and multimodal eligibility analysis for government procurement (CRPF). Features multi-agent orchestration via n8n, Gemini 1.5 Pro for multimodal parsing of scanned documents, and an evidence-backed human-in-the-loop dashboard.",
-      "discovery_query": "government procurement parser",
-      "exact_revision": "d400e53d49e275b83eb4e6b435ea770543364ce0",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-05-07T16:27:21Z",
-      "repository": "Vaishnavi-08108/bharat-procure-ai",
-      "root_code_signals": [
-        "tests"
+      "topics": [
+        "framework",
+        "game-development",
+        "luau",
+        "roblox",
+        "roblox-development",
+        "roblox-studio"
       ],
-      "size_kb": 100,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 4,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 30,
-      "url": "https://github.com/Vaishnavi-08108/bharat-procure-ai"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "An AI-assisted platform that uses OCR, NLP, and a configurable regulatory rules engine to analyze packaged commodity labels, extract mandatory declarations, identify missing or potentially incorrect information, calculate compliance scores, provide explainable recommendations, and generate compliance reports.",
-      "discovery_query": "regulatory compliance rules engine",
-      "exact_revision": "4e4deb9a4bf1ca3a41036ed59e1e8868f2c61bc3",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-09T16:10:09Z",
-      "repository": "chaitanya-nakhate/Team-Apex",
-      "root_code_signals": [],
-      "size_kb": 87,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
       "triage_components": {
         "activity": 15,
         "description": 4,
         "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 29,
-      "url": "https://github.com/chaitanya-nakhate/Team-Apex"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Reference validator, parser, and format converter for MDES (Mobility Demand Exchange Specification) \u2014 a mode-neutral, open standard for exchanging observed, estimated, modeled, and synthetic mobility demand data. Python library with CLI, JSON Schema validation, and GTFS conversion.",
-      "discovery_query": "standards parser schema validator stars:<2000",
-      "exact_revision": "61678c4c018b9a092ba9c91aceb2d8a5f492b705",
-      "forks": 0,
-      "primary_language": null,
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-08-07T19:16:05Z",
-      "repository": "BennoBock/mdes-validator",
-      "root_code_signals": [],
-      "size_kb": 1,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
         "license_metadata": 5,
         "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 2,
-        "topics": 0
+        "root_code_signals": 2,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
       },
-      "triage_score": 28,
-      "url": "https://github.com/BennoBock/mdes-validator"
+      "triage_score": 41,
+      "url": "https://github.com/andrian-syh/rblx-twill"
     },
     {
       "archived": false,
       "default_branch": "main",
-      "description": "AI-powered tender evaluation and eligibility analysis for government procurement \u2014 Automated criteria extraction, document parsing, and explainable bidder evaluation. PanIIT AI for Bharat Hackathon.",
-      "discovery_query": "government procurement parser",
-      "exact_revision": "4506281e781c003c694e20ef00068d64e31acaa7",
-      "forks": 1,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-05-07T21:04:21Z",
-      "repository": "sridhar7601/tendereval-ai",
-      "root_code_signals": [],
-      "size_kb": 377,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 1,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 27,
-      "url": "https://github.com/sridhar7601/tendereval-ai"
-    },
-    {
-      "archived": true,
-      "default_branch": "master",
-      "description": "A Ruby Gem to parse and manipulate the Federal Acquisition Regulation (FAR) and Defense Federal Acquisition Regulation Supplement (DFARS)",
-      "discovery_query": "FAR DFARS parser",
-      "exact_revision": "0b934ff1987ed671d334b70f5e9d3a11eb7ee429",
+      "description": "server-authoritative visibility replication for roblox shooters. clients only receive positions they can actually see, so wallhacks have nothing to read.",
+      "discovery_query": "Roblox server authoritative netcode Luau",
+      "exact_revision": "58ace7ef35c2d72a66dd774aa81611f580d851f4",
       "forks": 0,
-      "primary_language": "Ruby",
+      "primary_language": "Luau",
       "published_license_spdx": "MIT",
-      "pushed_at": "2015-11-08T16:19:07Z",
-      "repository": "benbalter/so_far_so_good",
+      "pushed_at": "2026-07-16T14:00:15Z",
+      "repository": "debugasync/FogWar",
       "root_code_signals": [
-        "lib",
-        "test"
+        "src"
       ],
-      "size_kb": 1538,
-      "stars": 9,
+      "size_kb": 15,
+      "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
+      "topics": [
+        "anti-cheat",
+        "fog-of-war",
+        "luau",
+        "netcode",
+        "roblox"
+      ],
       "triage_components": {
-        "activity": 2,
+        "activity": 12,
         "description": 4,
         "forks": 0,
         "license_metadata": 5,
-        "not_archived": 2,
-        "root_code_signals": 5,
-        "stars": 4,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 26,
-      "url": "https://github.com/benbalter/so_far_so_good"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Government procurement parser with Google Sheets integration",
-      "discovery_query": "government procurement parser",
-      "exact_revision": "f00d9ed689fe462cdbc1e683612ac33c08172c45",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-04-17T17:43:50Z",
-      "repository": "armenvart777/tru-parser",
-      "root_code_signals": [],
-      "size_kb": 31,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
         "not_archived": 5,
-        "root_code_signals": 0,
+        "root_code_signals": 3,
         "stars": 0,
         "substantive_size": 2,
-        "topics": 0
+        "topics": 5
       },
-      "triage_score": 24,
-      "url": "https://github.com/armenvart777/tru-parser"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "An event-driven DevOps pipeline built in Python that automatically intercepts local repository file changes. It utilizes asynchronous file-system hooks and the Gemini API with strict Pydantic schemas to dynamically parse configurations, validate code types, and enforce structural architectural standards without infrastructure overhead.",
-      "discovery_query": "standards parser schema validator stars:<2000",
-      "exact_revision": "2207c7eb60c13c35b9fa8c4dd4f4f80c9513fc7b",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-05-30T22:56:09Z",
-      "repository": "Voltrexium/schema-guardrail-ci",
-      "root_code_signals": [],
-      "size_kb": 4,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 2,
-        "topics": 0
-      },
-      "triage_score": 24,
-      "url": "https://github.com/Voltrexium/schema-guardrail-ci"
+      "triage_score": 36,
+      "url": "https://github.com/debugasync/FogWar"
     }
   ],
   "catalogs": [
@@ -294,27 +94,27 @@
     31,
     42
   ],
-  "generated_at": "2026-09-25T18:49:32.755741+00:00",
-  "mission": "GovCon, compliance, tax/regulatory automation and public data",
+  "generated_at": "2026-09-26T07:57:02.386055+00:00",
+  "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
   "risk_review": [],
   "risk_review_count": 0,
   "schema_version": 2,
   "search_diagnostics": [
     {
-      "query": "government procurement parser",
-      "returned": 8
-    },
-    {
-      "query": "FAR DFARS parser",
+      "query": "Roblox server authoritative netcode Luau",
       "returned": 1
     },
     {
-      "query": "regulatory compliance rules engine",
-      "returned": 8
+      "query": "Roblox RemoteEvent validation framework",
+      "returned": 0
     },
     {
-      "query": "standards parser schema validator stars:<2000",
-      "returned": 8
+      "query": "Roblox networking replication framework Luau",
+      "returned": 1
+    },
+    {
+      "query": "Roblox anti exploit server validation open source",
+      "returned": 0
     }
   ],
   "worker_id": "HUNTER-04"
