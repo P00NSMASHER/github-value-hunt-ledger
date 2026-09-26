@@ -144,6 +144,23 @@ class RealCorpusControlTests(unittest.TestCase):
             0,
         )
         self.assertEqual(
+            manifest["control_candidate_universe_dates_defined"],
+            72,
+        )
+        self.assertEqual(
+            manifest["control_candidate_memberships_defined"],
+            3254,
+        )
+        self.assertEqual(
+            manifest["control_source_variable_map_rows"],
+            7,
+        )
+        self.assertEqual(
+            manifest["control_acquisition_requirement_rows"],
+            504,
+        )
+        self.assertTrue(manifest["control_acquisition_packet_ready"])
+        self.assertEqual(
             manifest["control_candidate_source_revision"],
             "c23c7d79d067a79d70cf20e31b072d3703497eae",
         )
@@ -152,6 +169,161 @@ class RealCorpusControlTests(unittest.TestCase):
             "bbb68de172f7ab2104714513a72547f3dad3b86c",
         )
         self.assertFalse(manifest["live_use_allowed"])
+
+
+    def test_retrospective_candidate_membership_index_is_complete_definition_only(self):
+        path = CORPUS_DIR / "control_candidate_membership_index.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+
+        self.assertEqual(len(rows), 72)
+        self.assertEqual(
+            len({row["control_date"] for row in rows}),
+            72,
+        )
+        counts = [int(row["candidate_symbol_count"]) for row in rows]
+        self.assertEqual(sum(counts), 3254)
+        self.assertEqual(min(counts), 1)
+        self.assertEqual(max(counts), 180)
+
+        for row in rows:
+            symbols = row["candidate_symbols"].split("|")
+            self.assertEqual(
+                symbols,
+                sorted(set(symbols)),
+            )
+            self.assertEqual(
+                len(symbols),
+                int(row["candidate_symbol_count"]),
+            )
+            self.assertEqual(
+                row["source_revision"],
+                "c23c7d79d067a79d70cf20e31b072d3703497eae",
+            )
+            self.assertEqual(
+                row["source_blob_sha"],
+                "bbb68de172f7ab2104714513a72547f3dad3b86c",
+            )
+            self.assertEqual(
+                row["source_kind"],
+                "RETROSPECTIVE_SAMPLE_FIRMS",
+            )
+            self.assertEqual(
+                row["admissibility_status"],
+                "DEFINITION_ONLY_NOT_POINT_IN_TIME",
+            )
+            self.assertEqual(
+                row["blocking_reason"],
+                "RETROSPECTIVE_SAMPLE_NOT_POINT_IN_TIME",
+            )
+
+    def test_control_source_variable_map_matches_study_contract(self):
+        path = CORPUS_DIR / "control_source_variable_map.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+
+        self.assertEqual(len(rows), 7)
+        by_family = {
+            row["source_family"]: row
+            for row in rows
+        }
+        self.assertEqual(
+            set(by_family),
+            {
+                "CRSP",
+                "IBES",
+                "TAQ",
+                "RAVENPACK",
+                "MARKIT",
+                "OPTIONMETRICS",
+                "THOMSON_REUTERS_13F",
+            },
+        )
+        self.assertEqual(
+            by_family["CRSP"]["required_variable_anchors"],
+            "lnMCAP|Beta_SPY|invPRC",
+        )
+        self.assertEqual(
+            by_family["IBES"]["required_variable_anchors"],
+            "lnnumest",
+        )
+        self.assertEqual(
+            by_family["RAVENPACK"]["required_variable_anchors"],
+            "ln_Story_Count_Relevant",
+        )
+        self.assertEqual(
+            by_family["MARKIT"]["required_variable_anchors"],
+            "DCBS",
+        )
+        self.assertEqual(
+            by_family["THOMSON_REUTERS_13F"]["required_variable_anchors"],
+            "IO",
+        )
+        self.assertEqual(
+            by_family["TAQ"]["required_variable_anchors"],
+            "",
+        )
+        self.assertEqual(
+            by_family["OPTIONMETRICS"]["required_variable_anchors"],
+            "",
+        )
+
+    def test_control_acquisition_packet_is_72_dates_times_7_sources(self):
+        membership_path = (
+            CORPUS_DIR / "control_candidate_membership_index.csv"
+        )
+        with membership_path.open(
+            "r",
+            encoding="utf-8",
+            newline="",
+        ) as handle:
+            membership = list(csv.DictReader(handle))
+        expected_counts = {
+            row["control_date"]: row["candidate_symbol_count"]
+            for row in membership
+        }
+
+        path = CORPUS_DIR / "control_acquisition_requirements.csv"
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+
+        self.assertEqual(len(rows), 504)
+        self.assertEqual(
+            len({row["control_date"] for row in rows}),
+            72,
+        )
+        expected_families = {
+            "CRSP",
+            "IBES",
+            "TAQ",
+            "RAVENPACK",
+            "MARKIT",
+            "OPTIONMETRICS",
+            "THOMSON_REUTERS_13F",
+        }
+        by_date = {}
+        for row in rows:
+            by_date.setdefault(row["control_date"], set()).add(
+                row["source_family"]
+            )
+            self.assertEqual(
+                row["candidate_symbol_count"],
+                expected_counts[row["control_date"]],
+            )
+            self.assertEqual(
+                row["status"],
+                "EXTERNAL_DATA_REQUIRED",
+            )
+            self.assertEqual(
+                row["blocking_reason"],
+                "AUTHORIZED_POINT_IN_TIME_SOURCE_NOT_LOADED",
+            )
+
+        self.assertEqual(set(by_date), set(expected_counts))
+        self.assertTrue(all(
+            families == expected_families
+            for families in by_date.values()
+        ))
 
 
 if __name__ == "__main__":
