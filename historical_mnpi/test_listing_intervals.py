@@ -160,7 +160,7 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
 
-    def test_real_g2_current_batches_expand_2750_of_3828(self):
+    def test_real_g2_current_batches_expand_2904_of_3828(self):
         requirements = expand_listing_requirements(
             parse_listing_requirement_index(
                 (CORPUS_DIR / "listing_requirement_index.csv").read_text(
@@ -179,15 +179,15 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
         self.assertEqual(len(requirements), 3828)
-        self.assertEqual(len(intervals), 100)
-        self.assertEqual(len(result.resolved), 2750)
-        self.assertEqual(len(result.unresolved), 1078)
+        self.assertEqual(len(intervals), 106
+        self.assertEqual(len(result.resolved), 2904)
+        self.assertEqual(len(result.unresolved), 924)
 
         by_symbol = {}
         for item in result.resolved:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(len(by_symbol), 100)
+        self.assertEqual(len(by_symbol), 106)
         self.assertEqual(
             {
                 symbol: len(by_symbol[symbol])
@@ -213,6 +213,12 @@ class ListingIntervalTests(unittest.TestCase):
                 "INWK": 22,
                 "ISSI": 22,
                 "JWN": 22,
+                "NUAN": 22,
+                "OSK": 22,
+                "P": 22,
+                "PAY": 44,
+                "PBI": 22,
+                "PFPT": 22,
             },
         )
 
@@ -240,7 +246,7 @@ class ListingIntervalTests(unittest.TestCase):
         ).open("r", encoding="utf-8", newline="") as handle:
             actual = list(csv.DictReader(handle))
 
-        self.assertEqual(len(actual), 2750)
+        self.assertEqual(len(actual), 2904)
         expected_rows = {
             (
                 item.symbol,
@@ -269,7 +275,7 @@ class ListingIntervalTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(intervals), 100)
+        self.assertEqual(len(intervals), 106
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith(
                 "https://www.sec.gov/"
