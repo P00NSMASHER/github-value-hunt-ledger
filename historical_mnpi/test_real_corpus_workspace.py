@@ -95,7 +95,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             {
                 "announcement_rows": 27,
                 "listing_rows": 3828,
-                "shares_rows": 12,
+                "shares_rows": 61,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
                 "import_hash": imported.proof_hash,
@@ -229,12 +229,12 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
         self.assertEqual(manifest["listing_metadata_resolved"], 3828)
-        self.assertEqual(manifest["shares_metadata_resolved"], 286)
+        self.assertEqual(manifest["shares_metadata_resolved"], 1914)
         self.assertEqual(manifest["shares_requirement_total"], 3828)
-        self.assertEqual(manifest["shares_facts_verified"], 12)
-        self.assertEqual(manifest["shares_batches_completed"], 2)
-        self.assertEqual(manifest["shares_symbols_resolved"], 12)
-        self.assertEqual(manifest["shares_metadata_unresolved"], 3542)
+        self.assertEqual(manifest["shares_facts_verified"], 61)
+        self.assertEqual(manifest["shares_batches_completed"], 5)
+        self.assertEqual(manifest["shares_symbols_resolved"], 61)
+        self.assertEqual(manifest["shares_metadata_unresolved"], 1914)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
         self.assertIn("research/compliance", manifest["purpose"])
