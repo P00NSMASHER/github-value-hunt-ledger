@@ -278,6 +278,18 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertTrue(manifest["control_external_import_contract_ready"])
         self.assertEqual(manifest["control_external_template_file_count"], 3)
         self.assertEqual(manifest["control_external_template_rows_loaded"], 0)
+        self.assertEqual(
+            manifest["control_release_contract_version"],
+            "g4-control-release-v1",
+        )
+        self.assertTrue(manifest["control_release_gate_ready"])
+        self.assertEqual(manifest["control_release_expected_dates"], 72)
+        self.assertTrue(manifest["control_release_requires_all_dates"])
+        self.assertFalse(
+            manifest["control_release_partial_promotion_allowed"]
+        )
+        self.assertFalse(manifest["control_release_current_ready"])
+        self.assertEqual(manifest["control_release_output_rows"], 0)
         self.assertFalse(manifest["live_use_allowed"])
         self.assertIn("research/compliance", manifest["purpose"])
 
