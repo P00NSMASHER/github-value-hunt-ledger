@@ -1,52 +1,21 @@
 {
   "api_metrics": {
-    "api_requests": 6,
-    "known_revision_skips": 0,
+    "api_requests": 5,
+    "known_revision_skips": 1,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 1,
-  "candidates": [
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "An open-source Luau physics and automation framework for Roblox Vehicle Legends. Features custom chassis telemetry tuning, automated checkpoint racing, and local JSON configuration management.",
-      "discovery_query": "Roblox vehicle chassis Luau open source",
-      "exact_revision": "3fa7d5364581b82ef3c47461dd9139baf05e0215",
-      "forks": 0,
-      "primary_language": "CSS",
-      "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-06-22T19:44:12Z",
-      "repository": "vehiclelegends/vehicle-legends",
-      "root_code_signals": [],
-      "size_kb": 15,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 2,
-        "topics": 0
-      },
-      "triage_score": 28,
-      "url": "https://github.com/vehiclelegends/vehicle-legends"
-    }
-  ],
+  "candidate_count": 0,
+  "candidates": [],
   "catalogs": [
     16,
     17,
     18
   ],
-  "generated_at": "2026-09-26T08:42:18.714207+00:00",
+  "generated_at": "2026-09-26T18:38:20.007777+00:00",
   "mission": "Roblox NPCs, pathfinding, vehicles, interactables and open-world activity systems",
   "risk_review": [],
   "risk_review_count": 0,
