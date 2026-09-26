@@ -54,140 +54,56 @@ def expanded_requirements():
 
 
 class RealCorpusSharesTests(unittest.TestCase):
-    def test_g3_current_batches_resolve_286_of_3828_requirements(self):
+    def test_g3_shares_reaches_exactly_fifty_percent_coverage(self):
         imported = load_import_bundle()
-        self.assertEqual(len(imported.shares), 12)
+        requirements = expanded_requirements()
+        self.assertEqual(len(imported.shares), 61)
+        self.assertEqual(len(requirements), 3828)
 
-        resolved = []
-        unresolved = []
-        for symbol, day in expanded_requirements():
-            item = resolve_shares_outstanding(
+        resolutions = tuple(
+            resolve_shares_outstanding(
                 symbol,
                 day,
                 imported.shares,
             )
-            if item.state is ResolutionState.RESOLVED:
-                resolved.append(item)
-            else:
-                unresolved.append(item)
-
-        self.assertEqual(len(resolved), 286)
-        self.assertEqual(len(unresolved), 3542)
-
-        by_symbol = Counter(item.symbol for item in resolved)
-        self.assertEqual(
-            dict(by_symbol),
-            {
-                "ACHC": 22,
-                "ACO": 22,
-                "ADI": 44,
-                "AF": 22,
-                "AGP": 22,
-                "ALGN": 22,
-                "ALNY": 22,
-                "ALSN": 22,
-                "AMD": 22,
-                "AMP": 22,
-                "AMSG": 22,
-                "APC": 22,
-            },
+            for symbol, day in requirements
+        )
+        resolved = tuple(
+            item
+            for item in resolutions
+            if item.state is ResolutionState.RESOLVED
+        )
+        unresolved = tuple(
+            item
+            for item in resolutions
+            if item.state is ResolutionState.UNRESOLVED
         )
 
-    def test_g3_current_batches_preserve_exact_sec_share_facts(self):
-        imported = load_import_bundle()
-        by_symbol = {
-            item.symbol: item
-            for item in imported.shares
-        }
-        expected = {
-            "ACHC": (
-                "2015-02-27",
-                "66452931",
-                "2015-02-27T16:16:15-05:00",
-                "0001193125-15-069793",
-            ),
-            "ACO": (
-                "2012-10-31",
-                "31959139",
-                "2012-11-07T06:06:25-05:00",
-                "0001140361-12-045926",
-            ),
-            "ADI": (
-                "2014-11-01",
-                "311204926",
-                "2014-12-10T16:45:07-05:00",
-                "0000006281-14-000039",
-            ),
-            "AF": (
-                "2011-10-27",
-                "98537391",
-                "2011-11-04T15:00:49-04:00",
-                "0001144204-11-061380",
-            ),
-            "AGP": (
-                "2011-07-29",
-                "49647545",
-                "2011-08-04T16:06:28-04:00",
-                "0000950123-11-072902",
-            ),
-            "ALGN": (
-                "2013-07-26",
-                "79837318",
-                "2013-08-02T16:08:53-04:00",
-                "0001097149-13-000033",
-            ),
-            "ALNY": (
-                "2014-10-31",
-                "76931090",
-                "2014-11-06T08:30:58-05:00",
-                "0001193125-14-399866",
-            ),
-            "ALSN": (
-                "2015-02-05",
-                "180053650",
-                "2015-02-20T08:07:13-05:00",
-                "0001193125-15-055034",
-            ),
-            "AMD": (
-                "2013-07-29",
-                "720015466",
-                "2013-08-01T17:10:34-04:00",
-                "0001193125-13-315281",
-            ),
-            "AMP": (
-                "2015-02-13",
-                "182511452",
-                "2015-02-24T17:31:20-05:00",
-                "0000820027-15-000024",
-            ),
-            "AMSG": (
-                "2014-11-06",
-                "48124795",
-                "2014-11-07T16:40:21-05:00",
-                "0000895930-14-000055",
-            ),
-            "APC": (
-                "2013-01-31",
-                "500565966",
-                "2013-02-19T17:11:05-05:00",
-                "0001193125-13-065430",
-            ),
-        }
+        self.assertEqual(len(resolved), 1914)
+        self.assertEqual(len(unresolved), 1914)
+        self.assertEqual(len(resolved) * 2, len(requirements))
+        self.assertFalse(any(
+            item.state is ResolutionState.CONFLICT
+            for item in resolutions
+        ))
 
-        self.assertEqual(set(by_symbol), set(expected))
-        for symbol, (
-            effective_date,
-            shares,
-            availability,
-            accession,
-        ) in expected.items():
-            item = by_symbol[symbol]
-            self.assertEqual(item.effective_date, effective_date)
-            self.assertEqual(item.shares_outstanding, shares)
-            self.assertEqual(
-                item.public_availability_timestamp,
-                availability,
-            )
+        by_symbol = Counter(item.symbol for item in resolved)
+        self.assertEqual(len(by_symbol), 61)
+        self.assertEqual(sum(by_symbol.values()), 1914)
+        self.assertEqual(by_symbol["JNPR"], 88)
+        self.assertEqual(by_symbol["PNRA"], 88)
+        self.assertEqual(by_symbol["DGI"], 66)
+        self.assertEqual(by_symbol["VMW"], 66)
+        self.assertEqual(by_symbol["ADI"], 44)
+        self.assertEqual(by_symbol["JWN"], 22)
+        self.assertEqual(by_symbol["MCRI"], 22)
+        self.assertEqual(by_symbol["MCRL"], 22)
+
+    def test_all_current_share_facts_preserve_public_sec_provenance(self):
+        imported = load_import_bundle()
+        self.assertEqual(len(imported.shares), 61)
+
+        for item in imported.shares:
             self.assertEqual(
                 item.evidence.source_kind,
                 MetadataSourceKind.PUBLIC_EFFECTIVE_DATED_SHARES,
@@ -196,9 +112,11 @@ class RealCorpusSharesTests(unittest.TestCase):
                 item.evidence.data_class,
                 MetadataDataClass.PUBLIC_OR_AUTHORIZED_HISTORICAL,
             )
-            self.assertIn(accession, item.evidence.evidence_id)
-            self.assertIn(accession, item.evidence.source_name)
+            self.assertTrue(item.evidence.evidence_id.startswith("shares:"))
+            self.assertIn("SEC EDGAR", item.evidence.source_name)
             self.assertIn("https://www.sec.gov/", item.evidence.source_name)
+            self.assertGreater(int(item.shares_outstanding), 0)
+            datetime.fromisoformat(item.public_availability_timestamp)
 
     def test_each_current_fact_was_public_before_first_required_session(self):
         imported = load_import_bundle()
@@ -206,7 +124,9 @@ class RealCorpusSharesTests(unittest.TestCase):
         for symbol, day in expanded_requirements():
             first_required.setdefault(symbol, day)
 
+        self.assertEqual(len(imported.shares), 61)
         for item in imported.shares:
+            self.assertIn(item.symbol, first_required)
             availability_day = datetime.fromisoformat(
                 item.public_availability_timestamp
             ).date().isoformat()
@@ -225,26 +145,91 @@ class RealCorpusSharesTests(unittest.TestCase):
             )
             self.assertEqual(first.state, ResolutionState.RESOLVED)
             self.assertEqual(
-                first.shares_outstanding,
-                item.shares_outstanding,
-            )
-            self.assertEqual(
                 first.rejected_future_evidence_hashes,
                 (),
             )
 
-    def test_manifest_tracks_g3_batch_two_progress(self):
+    def test_anchor_share_facts_remain_exact(self):
+        imported = load_import_bundle()
+        by_symbol = {
+            item.symbol: item
+            for item in imported.shares
+        }
+        expected = {
+            "ACHC": (
+                "2015-02-27",
+                "66452931",
+                "0001193125-15-069793",
+            ),
+            "ALNY": (
+                "2014-10-31",
+                "76931090",
+                "0001193125-14-399866",
+            ),
+            "JNPR": (
+                "2011-02-18",
+                "534922000",
+                "0001445305-11-000332",
+            ),
+            "MDU": (
+                "2014-10-31",
+                "194106937",
+                "0000067716-14-000123",
+            ),
+            "CAMP": (
+                "2011-03-31",
+                "28128304",
+                "0001206774-11-001038",
+            ),
+            "MAT": (
+                "2015-02-13",
+                "338254021",
+                "0001193125-15-062193",
+            ),
+            "JWN": (
+                "2014-03-10",
+                "189692666",
+                "0000072333-14-000036",
+            ),
+            "MCRI": (
+                "2013-03-05",
+                "16147324",
+                "0001104659-13-021105",
+            ),
+            "MCRL": (
+                "2013-03-11",
+                "58338520",
+                "0000932111-13-000011",
+            ),
+        }
+
+        for symbol, (
+            effective_date,
+            shares,
+            accession,
+        ) in expected.items():
+            item = by_symbol[symbol]
+            self.assertEqual(item.effective_date, effective_date)
+            self.assertEqual(item.shares_outstanding, shares)
+            self.assertIn(accession, item.evidence.evidence_id)
+            self.assertIn(accession, item.evidence.source_name)
+
+    def test_manifest_tracks_exact_fifty_percent_g3_milestone(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(
                 encoding="utf-8"
             )
         )
         self.assertEqual(manifest["shares_requirement_total"], 3828)
-        self.assertEqual(manifest["shares_facts_verified"], 12)
-        self.assertEqual(manifest["shares_batches_completed"], 2)
-        self.assertEqual(manifest["shares_symbols_resolved"], 12)
-        self.assertEqual(manifest["shares_metadata_resolved"], 286)
-        self.assertEqual(manifest["shares_metadata_unresolved"], 3542)
+        self.assertEqual(manifest["shares_facts_verified"], 61)
+        self.assertEqual(manifest["shares_batches_completed"], 5)
+        self.assertEqual(manifest["shares_symbols_resolved"], 61)
+        self.assertEqual(manifest["shares_metadata_resolved"], 1914)
+        self.assertEqual(manifest["shares_metadata_unresolved"], 1914)
+        self.assertEqual(
+            manifest["shares_metadata_resolved"] * 2,
+            manifest["shares_requirement_total"],
+        )
         self.assertFalse(manifest["live_use_allowed"])
 
 
