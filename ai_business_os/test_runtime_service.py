@@ -26,6 +26,8 @@ class FakeGateway:
             }
         if action == "planning_inputs":
             return {"agents": [], "initiatives": [], "data_gaps": [], "open_goals": []}
+        if action == "worker_status":
+            return {"heartbeats": [], "leases": [], "recent_runs": []}
         if action == "approval_lookup":
             return {
                 "approval": {

@@ -61,6 +61,32 @@ async function planningInputs() {
   return { agents, initiatives, data_gaps: gaps, open_goals: goals };
 }
 
+
+async function workerStatus() {
+  const [heartbeats, leases, recentRuns] = await Promise.all([
+    sql`
+      select agent_id, last_heartbeat_at, generation, state, updated_at
+      from ai_business_os_prod.agent_heartbeats
+      order by agent_id
+    `,
+    sql`
+      select id, agent_id, goal_type, title, status, priority, lease_generation,
+             lease_expires_at, last_lease_heartbeat_at, claimed_by_worker_id, current_run_id
+      from ai_business_os_prod.agent_goals
+      where status='ACTIVE' and lease_expires_at is not null
+      order by priority desc, created_at asc
+    `,
+    sql`
+      select id, agent_id, role, goal_id, status, outcome, output_hash,
+             worker_instance_id, lease_generation, last_heartbeat_at, started_at, ended_at
+      from ai_business_os_prod.agent_runs
+      order by started_at desc
+      limit 20
+    `,
+  ]);
+  return { heartbeats, leases, recent_runs: recentRuns };
+}
+
 async function approvalLookup(payload: Record<string, unknown>) {
   const requestKey = requireString(payload.request_key, "request_key");
   const rows = await sql`select request_key, agent_id, action_key, action_class, intent_hash, status, expires_at from ai_business_os_prod.approval_inbox where request_key=${requestKey}`;
@@ -195,6 +221,7 @@ Deno.serve(async (req: Request) => {
       case "health": data = await health(); break;
       case "portfolio_view": data = await portfolioView(); break;
       case "planning_inputs": data = await planningInputs(); break;
+      case "worker_status": data = await workerStatus(); break;
       case "approval_lookup": data = await approvalLookup(payload); break;
       case "activate_goal": data = await activateGoal(payload); break;
       case "decide_approval": data = await decideApproval(payload); break;
