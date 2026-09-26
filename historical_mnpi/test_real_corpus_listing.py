@@ -107,7 +107,7 @@ class RealCorpusListingTests(unittest.TestCase):
 
     def test_verified_intervals_expand_to_current_2904_rows(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 106
+        self.assertEqual(len(intervals), 106)
 
         result = expand_listing_intervals(
             expanded_requirements(),
@@ -172,7 +172,7 @@ class RealCorpusListingTests(unittest.TestCase):
 
     def test_interval_evidence_is_public_authorized_and_two_boundary(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 106
+        self.assertEqual(len(intervals), 106)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith("https://"))
             self.assertTrue(item.end_evidence_url.startswith("https://"))
