@@ -86,6 +86,9 @@ class PointInTimeControlMembership:
     data_class: MetadataDataClass = (
         MetadataDataClass.PUBLIC_OR_AUTHORIZED_HISTORICAL
     )
+    source_kind: MetadataSourceKind = (
+        MetadataSourceKind.POINT_IN_TIME_CONTROL_UNIVERSE
+    )
 
     def __post_init__(self) -> None:
         target = date.fromisoformat(self.control_date)
@@ -103,6 +106,13 @@ class PointInTimeControlMembership:
         if not self.source_name.strip():
             raise ValueError("membership source_name is required")
         _require_historical(self.data_class)
+        if (
+            self.source_kind
+            is not MetadataSourceKind.POINT_IN_TIME_CONTROL_UNIVERSE
+        ):
+            raise ValueError(
+                "membership source_kind must be POINT_IN_TIME_CONTROL_UNIVERSE"
+            )
         _aware_timestamp(
             "membership availability_timestamp",
             self.availability_timestamp,
@@ -128,6 +138,7 @@ class PointInTimeControlMembership:
             "evidence_id": self.evidence_id,
             "source_name": self.source_name,
             "data_class": self.data_class.value,
+            "source_kind": self.source_kind.value,
         })
 
 
