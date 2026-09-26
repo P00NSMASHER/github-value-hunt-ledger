@@ -160,7 +160,7 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
 
-    def test_real_g2_current_batches_expand_3740_of_3828(self):
+    def test_real_g2_listing_coverage_is_complete_3828_of_3828(self):
         requirements = expand_listing_requirements(
             parse_listing_requirement_index(
                 (CORPUS_DIR / "listing_requirement_index.csv").read_text(
@@ -179,15 +179,15 @@ class ListingIntervalTests(unittest.TestCase):
         )
 
         self.assertEqual(len(requirements), 3828)
-        self.assertEqual(len(intervals), 142)
-        self.assertEqual(len(result.resolved), 3740)
-        self.assertEqual(len(result.unresolved), 88)
+        self.assertEqual(len(intervals), 146)
+        self.assertEqual(len(result.resolved), 3828)
+        self.assertEqual(len(result.unresolved), 0)
 
         by_symbol = {}
         for item in result.resolved:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(len(by_symbol), 142)
+        self.assertEqual(len(by_symbol), 146)
         self.assertEqual(
             {
                 symbol: len(by_symbol[symbol])
@@ -243,6 +243,10 @@ class ListingIntervalTests(unittest.TestCase):
                     "VDSI",
                     "VEEV",
                     "VRSN",
+                    "WLL",
+                    "WMB",
+                    "WRLD",
+                    "WTS",
                 )
             },
             {
@@ -297,6 +301,10 @@ class ListingIntervalTests(unittest.TestCase):
                 "VDSI": 22,
                 "VEEV": 22,
                 "VRSN": 22,
+                "WLL": 22,
+                "WMB": 22,
+                "WRLD": 22,
+                "WTS": 22,
             },
         )
 
@@ -324,7 +332,7 @@ class ListingIntervalTests(unittest.TestCase):
         ).open("r", encoding="utf-8", newline="") as handle:
             actual = list(csv.DictReader(handle))
 
-        self.assertEqual(len(actual), 3740)
+        self.assertEqual(len(actual), 3828)
         expected_rows = {
             (
                 item.symbol,
@@ -353,7 +361,7 @@ class ListingIntervalTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(len(intervals), 142)
+        self.assertEqual(len(intervals), 146)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith(
                 "https://www.sec.gov/"
