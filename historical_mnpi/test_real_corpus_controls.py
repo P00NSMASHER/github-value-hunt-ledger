@@ -160,6 +160,9 @@ class RealCorpusControlTests(unittest.TestCase):
             504,
         )
         self.assertTrue(manifest["control_acquisition_packet_ready"])
+        self.assertTrue(manifest["control_external_import_contract_ready"])
+        self.assertEqual(manifest["control_external_template_file_count"], 3)
+        self.assertEqual(manifest["control_external_template_rows_loaded"], 0)
         self.assertEqual(
             manifest["control_candidate_source_revision"],
             "c23c7d79d067a79d70cf20e31b072d3703497eae",
