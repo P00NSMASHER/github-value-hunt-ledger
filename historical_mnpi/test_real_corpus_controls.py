@@ -127,6 +127,23 @@ class RealCorpusControlTests(unittest.TestCase):
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertEqual(manifest["control_metadata_unresolved"], 72)
         self.assertEqual(
+            manifest["control_builder_contract_version"],
+            "g4-point-in-time-v1",
+        )
+        self.assertEqual(
+            manifest["control_required_source_family_count"],
+            7,
+        )
+        self.assertEqual(
+            manifest["control_required_variable_anchor_count"],
+            7,
+        )
+        self.assertTrue(manifest["control_builder_ready"])
+        self.assertEqual(
+            manifest["control_external_point_in_time_rows_loaded"],
+            0,
+        )
+        self.assertEqual(
             manifest["control_candidate_source_revision"],
             "c23c7d79d067a79d70cf20e31b072d3703497eae",
         )
