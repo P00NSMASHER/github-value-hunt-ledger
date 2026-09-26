@@ -216,6 +216,15 @@ from .listing_requirements import (
     parse_listing_requirement_index,
 )
 
+from .control_external_import import (
+    COVARIATE_HEADERS as CONTROL_EXTERNAL_COVARIATE_HEADERS,
+    ControlExternalInputImport,
+    EXPECTED_FILES as CONTROL_EXTERNAL_EXPECTED_FILES,
+    MEMBERSHIP_HEADERS as CONTROL_EXTERNAL_MEMBERSHIP_HEADERS,
+    SOURCE_COVERAGE_HEADERS as CONTROL_EXTERNAL_SOURCE_COVERAGE_HEADERS,
+    import_control_external_inputs,
+)
+
 from .real_corpus_import import (
     ANNOUNCEMENT_HEADERS,
     CONTROL_HEADERS,
@@ -253,6 +262,12 @@ __all__ = [
     "SHARES_HEADERS",
     "import_real_corpus_metadata",
     "render_real_corpus_metadata_templates",
+    "CONTROL_EXTERNAL_COVARIATE_HEADERS",
+    "ControlExternalInputImport",
+    "CONTROL_EXTERNAL_EXPECTED_FILES",
+    "CONTROL_EXTERNAL_MEMBERSHIP_HEADERS",
+    "CONTROL_EXTERNAL_SOURCE_COVERAGE_HEADERS",
+    "import_control_external_inputs",
     "BASELINE_SESSIONS",
     "CoverageEvidence",
     "CoverageGate",
