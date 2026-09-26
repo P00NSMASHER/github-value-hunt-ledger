@@ -37,5 +37,10 @@
   "control_review_batches_completed": 1,
   "control_candidate_source_revision": "c23c7d79d067a79d70cf20e31b072d3703497eae",
   "control_candidate_sample_blob_sha": "bbb68de172f7ab2104714513a72547f3dad3b86c",
-  "control_metadata_unresolved": 72
+  "control_metadata_unresolved": 72,
+  "control_builder_contract_version": "g4-point-in-time-v1",
+  "control_required_source_family_count": 7,
+  "control_required_variable_anchor_count": 7,
+  "control_builder_ready": true,
+  "control_external_point_in_time_rows_loaded": 0
 }
