@@ -50,5 +50,12 @@
   "control_acquisition_packet_ready": true,
   "control_external_import_contract_ready": true,
   "control_external_template_file_count": 3,
-  "control_external_template_rows_loaded": 0
+  "control_external_template_rows_loaded": 0,
+  "control_release_contract_version": "g4-control-release-v1",
+  "control_release_gate_ready": true,
+  "control_release_expected_dates": 72,
+  "control_release_requires_all_dates": true,
+  "control_release_partial_promotion_allowed": false,
+  "control_release_current_ready": false,
+  "control_release_output_rows": 0
 }
