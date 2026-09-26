@@ -10,7 +10,12 @@ from historical_mnpi.control_covariates import (
     ControlSourceFamily,
     PointInTimeControlMembership,
 )
-from historical_mnpi.control_external_import import ControlExternalInputImport
+from historical_mnpi.control_external_import import (
+    COVARIATE_HEADERS,
+    MEMBERSHIP_HEADERS,
+    SOURCE_COVERAGE_HEADERS,
+    ControlExternalInputImport,
+)
 from historical_mnpi.control_release import (
     RELEASE_CONTRACT_VERSION,
     build_control_release_from_csv,
@@ -248,16 +253,7 @@ class ControlReleaseTests(unittest.TestCase):
         def write_memberships():
             buffer = io.StringIO(newline="")
             writer = csv.writer(buffer, lineterminator="\n")
-            writer.writerow((
-                "control_date",
-                "universe_id",
-                "symbols",
-                "availability_timestamp",
-                "evidence_id",
-                "source_kind",
-                "source_name",
-                "data_class",
-            ))
+            writer.writerow(MEMBERSHIP_HEADERS)
             for item in base.memberships:
                 writer.writerow((
                     item.control_date,
@@ -265,8 +261,8 @@ class ControlReleaseTests(unittest.TestCase):
                     "|".join(item.symbols),
                     item.availability_timestamp,
                     item.evidence_id,
-                    item.source_kind.value,
                     item.source_name,
+                    item.source_kind.value,
                     item.data_class.value,
                 ))
             return buffer.getvalue()
@@ -274,18 +270,7 @@ class ControlReleaseTests(unittest.TestCase):
         def write_covariates():
             buffer = io.StringIO(newline="")
             writer = csv.writer(buffer, lineterminator="\n")
-            writer.writerow((
-                "control_date",
-                "symbol",
-                "covariate_name",
-                "value",
-                "effective_date",
-                "availability_timestamp",
-                "source_family",
-                "evidence_id",
-                "source_name",
-                "data_class",
-            ))
+            writer.writerow(COVARIATE_HEADERS)
             for item in base.covariates:
                 writer.writerow((
                     item.control_date,
@@ -304,16 +289,7 @@ class ControlReleaseTests(unittest.TestCase):
         def write_coverage():
             buffer = io.StringIO(newline="")
             writer = csv.writer(buffer, lineterminator="\n")
-            writer.writerow((
-                "control_date",
-                "universe_id",
-                "source_family",
-                "availability_timestamp",
-                "complete_for_universe",
-                "evidence_id",
-                "source_name",
-                "data_class",
-            ))
+            writer.writerow(SOURCE_COVERAGE_HEADERS)
             for item in base.source_coverage:
                 writer.writerow((
                     item.control_date,
