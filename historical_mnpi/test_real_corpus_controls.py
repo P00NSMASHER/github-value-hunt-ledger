@@ -3,6 +3,7 @@ import json
 import unittest
 from pathlib import Path
 
+from historical_mnpi.control_release import build_control_release_from_csv
 from historical_mnpi.real_corpus_import import import_real_corpus_metadata
 
 
@@ -111,6 +112,31 @@ class RealCorpusControlTests(unittest.TestCase):
             rows = list(csv.DictReader(handle))
         self.assertEqual(rows, [])
 
+    def test_atomic_release_gate_refuses_committed_empty_external_packet(self):
+        external_dir = CORPUS_DIR / "control_external"
+        files = {
+            name: (external_dir / name).read_text(encoding="utf-8")
+            for name in (
+                "membership.csv",
+                "covariates.csv",
+                "source_coverage.csv",
+            )
+        }
+        result = build_control_release_from_csv(
+            (CORPUS_DIR / "events.csv").read_text(encoding="utf-8"),
+            files,
+        )
+
+        self.assertFalse(result.ready)
+        self.assertIsNone(result.control_metadata_csv)
+        self.assertEqual(result.evidence, ())
+        self.assertEqual(len(result.expected_control_dates), 72)
+        self.assertEqual(len(result.rejection_reasons), 72)
+        self.assertTrue(all(
+            reason.startswith("MISSING_MEMBERSHIP:")
+            for reason in result.rejection_reasons
+        ))
+
     def test_manifest_records_reviewed_but_unresolved_g4_state(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(
@@ -163,6 +189,18 @@ class RealCorpusControlTests(unittest.TestCase):
         self.assertTrue(manifest["control_external_import_contract_ready"])
         self.assertEqual(manifest["control_external_template_file_count"], 3)
         self.assertEqual(manifest["control_external_template_rows_loaded"], 0)
+        self.assertEqual(
+            manifest["control_release_contract_version"],
+            "g4-control-release-v1",
+        )
+        self.assertTrue(manifest["control_release_gate_ready"])
+        self.assertEqual(manifest["control_release_expected_dates"], 72)
+        self.assertTrue(manifest["control_release_requires_all_dates"])
+        self.assertFalse(
+            manifest["control_release_partial_promotion_allowed"]
+        )
+        self.assertFalse(manifest["control_release_current_ready"])
+        self.assertEqual(manifest["control_release_output_rows"], 0)
         self.assertEqual(
             manifest["control_candidate_source_revision"],
             "c23c7d79d067a79d70cf20e31b072d3703497eae",
