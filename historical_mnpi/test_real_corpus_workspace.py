@@ -95,7 +95,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             {
                 "announcement_rows": 27,
                 "listing_rows": 3828,
-                "shares_rows": 0,
+                "shares_rows": 6,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
                 "import_hash": imported.proof_hash,
@@ -229,7 +229,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
         self.assertEqual(manifest["listing_metadata_resolved"], 3828)
-        self.assertEqual(manifest["shares_metadata_resolved"], 0)
+        self.assertEqual(manifest["shares_metadata_resolved"], 154)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
         self.assertIn("research/compliance", manifest["purpose"])
