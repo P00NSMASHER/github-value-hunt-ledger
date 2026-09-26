@@ -1,141 +1,68 @@
 {
   "api_metrics": {
-    "api_requests": 28,
-    "known_revision_skips": 14,
+    "api_requests": 8,
+    "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 5,
+  "candidate_count": 2,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Clicks \u2014 independent third-party profile of a public API surface, by API Evangelist. Clicks (Clicks Health) is an AI-native operations company that deploys AI agents to run complete healthcare back-office workflows. Its agents handle revenue cycle management (eligibility and insurance verification, prior authorization, claim status checking, denial",
-      "discovery_query": "healthcare prior authorization workflow",
-      "exact_revision": "c6cb89d78a9fcf1452e684239b03d6dababa9a87",
+      "description": "A free, read-only Roblox Studio accessibility preflight plugin for UI contrast, text scaling, small text, and reduced-motion checks.",
+      "discovery_query": "Roblox accessibility reduced motion UI",
+      "exact_revision": "2c200d911ce120560aec55395e59466e84583d5a",
       "forks": 0,
-      "primary_language": null,
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-25T18:41:21Z",
-      "repository": "api-evangelist/clicks",
-      "root_code_signals": [],
-      "size_kb": 211,
-      "stars": 0,
+      "primary_language": "Luau",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-09-22T16:20:50Z",
+      "repository": "KSAGlory/KSA-Accessibility-Preflight",
+      "root_code_signals": [
+        "src",
+        "tests"
+      ],
+      "size_kb": 29,
+      "stars": 4,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
-        "ai-agents",
-        "apis-json",
-        "automation",
-        "back-office",
-        "bpo",
-        "company",
-        "health-it",
-        "healthcare",
-        "revenue-cycle-management"
+        "accessibility",
+        "luau",
+        "roblox",
+        "roblox-studio",
+        "studio-plugin"
       ],
       "triage_components": {
         "activity": 15,
         "description": 4,
         "forks": 0,
-        "license_metadata": 1,
+        "license_metadata": 5,
         "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 4,
+        "root_code_signals": 7,
+        "stars": 3,
+        "substantive_size": 2,
         "topics": 5
       },
-      "triage_score": 34,
-      "url": "https://github.com/api-evangelist/clicks"
+      "triage_score": 46,
+      "url": "https://github.com/KSAGlory/KSA-Accessibility-Preflight"
     },
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Bookend AI \u2014 independent third-party profile of a public API surface, by API Evangelist. Bookend AI is a healthcare automation company building a Gastroenterology Practice Automation Platform that combines Payer Policy Intelligence with intelligent workflow automation. Its Universal Policy Library aggregates and interprets prior authorization, elig",
-      "discovery_query": "healthcare prior authorization workflow",
-      "exact_revision": "60d3e6bac314450cf3966bfbac4f47ba2ca087db",
+      "description": "Roblox mutation-crafting prototype in Luau \u2014 data-driven recipe system, server-authoritative gameplay, DataStore persistence, and a responsive mobile-ready UI.",
+      "discovery_query": "Roblox responsive UI mobile Luau",
+      "exact_revision": "2ec4d3e59ef42b59f11345955f21b41b487257d4",
       "forks": 0,
       "primary_language": null,
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-25T17:58:04Z",
-      "repository": "api-evangelist/bookend",
+      "pushed_at": "2026-07-31T17:52:53Z",
+      "repository": "alisavekker59-sys/refactored-fiesta",
       "root_code_signals": [],
-      "size_kb": 153,
+      "size_kb": 0,
       "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "apis-json",
-        "artificial-intelligence",
-        "company",
-        "gastroenterology",
-        "health-tech",
-        "healthcare",
-        "payer-intelligence",
-        "prior-authorization",
-        "revenue-cycle-management",
-        "specialty-pharmacy",
-        "workflow-automation"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 34,
-      "url": "https://github.com/api-evangelist/bookend"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Confidence-scoring advisory engine for Indian life-insurance death claims (demo, synthetic data only)",
-      "discovery_query": "insurance claims adjudication engine",
-      "exact_revision": "4c63bcf6be365e65489b97bd9d4277a1ef9cf82c",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-05T01:18:04Z",
-      "repository": "Ayush-s-dsouza/claim-adjudication-agent",
-      "root_code_signals": [],
-      "size_kb": 15360,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 29,
-      "url": "https://github.com/Ayush-s-dsouza/claim-adjudication-agent"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Adjudica is an AI-powered health insurance claim adjudication platform that automates claim processing using  LLM and a rule-based policy engine. It extracts clinical and billing data from medical documents, validates eligibility, coverage, and policy rules, detects fraud, and generates instant, explainable claim decisions with high efficiency.",
-      "discovery_query": "medical billing rules engine",
-      "exact_revision": "9a775f88849645a46c82ecf3604c6a4aa3b375a1",
-      "forks": 0,
-      "primary_language": "JavaScript",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-06-06T02:46:09Z",
-      "repository": "Revanth363/Adjudica",
-      "root_code_signals": [],
-      "size_kb": 4948,
-      "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
       "triage_components": {
@@ -145,44 +72,12 @@
         "license_metadata": 1,
         "not_archived": 5,
         "root_code_signals": 0,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 27,
-      "url": "https://github.com/Revanth363/Adjudica"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Web application designed to validate medical insurance claims, detect fraud, and ensure healthcare compliance. The system integrates machine learning models, rule-based validation engines, and PDF document processing to automate claim approval decisions with high accuracy and transparency.",
-      "discovery_query": "medical billing rules engine",
-      "exact_revision": "50e823651abf947f551ab07efe38047e36c32c36",
-      "forks": 0,
-      "primary_language": "HTML",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-01-18T06:48:10Z",
-      "repository": "Lalitha-1805/AUTOMATED-MEDICAL-BILLING-SYSTEM-",
-      "root_code_signals": [
-        "app"
-      ],
-      "size_kb": 10816,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 8,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 2,
         "stars": 0,
-        "substantive_size": 4,
+        "substantive_size": 0,
         "topics": 0
       },
-      "triage_score": 24,
-      "url": "https://github.com/Lalitha-1805/AUTOMATED-MEDICAL-BILLING-SYSTEM-"
+      "triage_score": 22,
+      "url": "https://github.com/alisavekker59-sys/refactored-fiesta"
     }
   ],
   "catalogs": [
@@ -190,26 +85,26 @@
     10,
     37
   ],
-  "generated_at": "2026-09-25T18:54:01.231949+00:00",
-  "mission": "Insurance, healthcare administration and service operations without PHI collection",
+  "generated_at": "2026-09-26T08:00:10.523926+00:00",
+  "mission": "Roblox UI/mobile/input/accessibility systems and scalable player UX",
   "risk_review": [],
   "risk_review_count": 0,
   "schema_version": 2,
   "search_diagnostics": [
     {
-      "query": "insurance claims adjudication engine",
-      "returned": 8
+      "query": "Roblox responsive UI mobile Luau",
+      "returned": 1
     },
     {
-      "query": "healthcare prior authorization workflow",
-      "returned": 8
+      "query": "Roblox UI framework Fusion React Lua",
+      "returned": 0
     },
     {
-      "query": "medical billing rules engine",
-      "returned": 2
+      "query": "Roblox touch controls input framework",
+      "returned": 0
     },
     {
-      "query": "contact center routing workforce platform",
+      "query": "Roblox accessibility reduced motion UI",
       "returned": 1
     }
   ],
