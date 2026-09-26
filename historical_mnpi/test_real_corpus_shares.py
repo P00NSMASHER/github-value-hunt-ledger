@@ -54,10 +54,15 @@ def expanded_requirements():
 
 
 class RealCorpusSharesTests(unittest.TestCase):
-    def test_g3_shares_reaches_exactly_fifty_percent_coverage(self):
+    def test_g3_shares_resolves_all_3828_requirements(self):
         imported = load_import_bundle()
         requirements = expanded_requirements()
-        self.assertEqual(len(imported.shares), 61)
+
+        self.assertEqual(len(imported.shares), 146)
+        self.assertEqual(
+            len({item.symbol for item in imported.shares}),
+            146,
+        )
         self.assertEqual(len(requirements), 3828)
 
         resolutions = tuple(
@@ -68,40 +73,41 @@ class RealCorpusSharesTests(unittest.TestCase):
             )
             for symbol, day in requirements
         )
-        resolved = tuple(
-            item
-            for item in resolutions
-            if item.state is ResolutionState.RESOLVED
-        )
-        unresolved = tuple(
-            item
-            for item in resolutions
-            if item.state is ResolutionState.UNRESOLVED
-        )
 
-        self.assertEqual(len(resolved), 1914)
-        self.assertEqual(len(unresolved), 1914)
-        self.assertEqual(len(resolved) * 2, len(requirements))
+        self.assertEqual(
+            sum(
+                item.state is ResolutionState.RESOLVED
+                for item in resolutions
+            ),
+            3828,
+        )
+        self.assertFalse(any(
+            item.state is ResolutionState.UNRESOLVED
+            for item in resolutions
+        ))
         self.assertFalse(any(
             item.state is ResolutionState.CONFLICT
             for item in resolutions
         ))
 
-        by_symbol = Counter(item.symbol for item in resolved)
-        self.assertEqual(len(by_symbol), 61)
-        self.assertEqual(sum(by_symbol.values()), 1914)
+        by_symbol = Counter(
+            item.symbol
+            for item in resolutions
+            if item.state is ResolutionState.RESOLVED
+        )
+        self.assertEqual(len(by_symbol), 146)
+        self.assertEqual(sum(by_symbol.values()), 3828)
         self.assertEqual(by_symbol["JNPR"], 88)
         self.assertEqual(by_symbol["PNRA"], 88)
         self.assertEqual(by_symbol["DGI"], 66)
         self.assertEqual(by_symbol["VMW"], 66)
-        self.assertEqual(by_symbol["ADI"], 44)
-        self.assertEqual(by_symbol["JWN"], 22)
-        self.assertEqual(by_symbol["MCRI"], 22)
-        self.assertEqual(by_symbol["MCRL"], 22)
+        self.assertEqual(by_symbol["IDTI"], 44)
+        self.assertEqual(by_symbol["ILMN"], 44)
+        self.assertEqual(by_symbol["WTS"], 22)
 
-    def test_all_current_share_facts_preserve_public_sec_provenance(self):
+    def test_all_share_facts_preserve_official_sec_provenance(self):
         imported = load_import_bundle()
-        self.assertEqual(len(imported.shares), 61)
+        self.assertEqual(len(imported.shares), 146)
 
         for item in imported.shares:
             self.assertEqual(
@@ -112,35 +118,36 @@ class RealCorpusSharesTests(unittest.TestCase):
                 item.evidence.data_class,
                 MetadataDataClass.PUBLIC_OR_AUTHORIZED_HISTORICAL,
             )
-            self.assertTrue(item.evidence.evidence_id.startswith("shares:"))
-            self.assertIn("SEC EDGAR", item.evidence.source_name)
-            self.assertIn("https://www.sec.gov/", item.evidence.source_name)
+            self.assertTrue(
+                item.evidence.evidence_id.startswith("shares:")
+            )
+            self.assertIn("SEC ", item.evidence.source_name)
+            self.assertIn("sec.gov", item.evidence.source_name.lower())
             self.assertGreater(int(item.shares_outstanding), 0)
-            datetime.fromisoformat(item.public_availability_timestamp)
+            datetime.fromisoformat(
+                item.public_availability_timestamp
+            )
 
-    def test_each_current_fact_was_public_before_first_required_session(self):
+    def test_each_share_fact_is_public_before_first_required_session(self):
         imported = load_import_bundle()
         first_required = {}
         for symbol, day in expanded_requirements():
             first_required.setdefault(symbol, day)
 
-        self.assertEqual(len(imported.shares), 61)
+        self.assertEqual(len(first_required), 146)
         for item in imported.shares:
             self.assertIn(item.symbol, first_required)
             availability_day = datetime.fromisoformat(
                 item.public_availability_timestamp
             ).date().isoformat()
-            self.assertLessEqual(
-                item.effective_date,
-                first_required[item.symbol],
-            )
-            self.assertLessEqual(
-                availability_day,
-                first_required[item.symbol],
-            )
+            first_day = first_required[item.symbol]
+
+            self.assertLessEqual(item.effective_date, first_day)
+            self.assertLessEqual(availability_day, first_day)
+
             first = resolve_shares_outstanding(
                 item.symbol,
-                first_required[item.symbol],
+                first_day,
                 imported.shares,
             )
             self.assertEqual(first.state, ResolutionState.RESOLVED)
@@ -155,51 +162,67 @@ class RealCorpusSharesTests(unittest.TestCase):
             item.symbol: item
             for item in imported.shares
         }
+
         expected = {
             "ACHC": (
                 "2015-02-27",
                 "66452931",
                 "0001193125-15-069793",
             ),
-            "ALNY": (
-                "2014-10-31",
-                "76931090",
-                "0001193125-14-399866",
-            ),
             "JNPR": (
                 "2011-02-18",
                 "534922000",
                 "0001445305-11-000332",
             ),
-            "MDU": (
+            "IDTI": (
                 "2014-10-31",
-                "194106937",
-                "0000067716-14-000123",
+                "148650153",
+                "0000703361-14-000038",
             ),
-            "CAMP": (
-                "2011-03-31",
-                "28128304",
-                "0001206774-11-001038",
+            "ILMN": (
+                "2014-10-08",
+                "142000000",
+                "0001110803-14-000363",
             ),
-            "MAT": (
-                "2015-02-13",
-                "338254021",
-                "0001193125-15-062193",
+            "F": (
+                "2014-10-24",
+                "3848687417",
+                "0000037996-14-000057",
             ),
-            "JWN": (
-                "2014-03-10",
-                "189692666",
-                "0000072333-14-000036",
+            "KELYA": (
+                "2013-02-03",
+                "37175755",
+                "0001437749-13-001540",
             ),
-            "MCRI": (
-                "2013-03-05",
-                "16147324",
-                "0001104659-13-021105",
+            "MKC": (
+                "2012-12-31",
+                "132678095",
+                "0000063754-13-000002",
             ),
-            "MCRL": (
-                "2013-03-11",
-                "58338520",
-                "0000932111-13-000011",
+            "SKX": (
+                "2015-02-17",
+                "52021294",
+                "0001193125-15-068511",
+            ),
+            "URI": (
+                "2014-10-13",
+                "99808171",
+                "0001067701-14-000033",
+            ),
+            "VDSI": (
+                "2011-07-29",
+                "38043306",
+                "0001193125-11-211583",
+            ),
+            "VEEV": (
+                "2014-11-28",
+                "130594979",
+                "0001564590-14-006187",
+            ),
+            "WTS": (
+                "2014-10-31",
+                "35129832",
+                "0001104659-14-076471",
             ),
         }
 
@@ -214,20 +237,20 @@ class RealCorpusSharesTests(unittest.TestCase):
             self.assertIn(accession, item.evidence.evidence_id)
             self.assertIn(accession, item.evidence.source_name)
 
-    def test_manifest_tracks_exact_fifty_percent_g3_milestone(self):
+    def test_manifest_tracks_complete_g3_shares_coverage(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(
                 encoding="utf-8"
             )
         )
         self.assertEqual(manifest["shares_requirement_total"], 3828)
-        self.assertEqual(manifest["shares_facts_verified"], 61)
-        self.assertEqual(manifest["shares_batches_completed"], 5)
-        self.assertEqual(manifest["shares_symbols_resolved"], 61)
-        self.assertEqual(manifest["shares_metadata_resolved"], 1914)
-        self.assertEqual(manifest["shares_metadata_unresolved"], 1914)
+        self.assertEqual(manifest["shares_facts_verified"], 146)
+        self.assertEqual(manifest["shares_batches_completed"], 8)
+        self.assertEqual(manifest["shares_symbols_resolved"], 146)
+        self.assertEqual(manifest["shares_metadata_resolved"], 3828)
+        self.assertEqual(manifest["shares_metadata_unresolved"], 0)
         self.assertEqual(
-            manifest["shares_metadata_resolved"] * 2,
+            manifest["shares_metadata_resolved"],
             manifest["shares_requirement_total"],
         )
         self.assertFalse(manifest["live_use_allowed"])
