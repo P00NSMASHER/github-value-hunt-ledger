@@ -1,0 +1,15 @@
+record_type,name,study_reference,source_family,point_in_time_rule,current_status,notes
+SOURCE_FAMILY,CRSP,hacked_earnings_jfe README Data item 1,CRSP,source coverage and all derived facts must be available by control_date,BLOCKED_EXTERNAL_POINT_IN_TIME_DATA,daily stock observations including price volume and market-cap inputs
+SOURCE_FAMILY,IBES,hacked_earnings_jfe README Data item 2,IBES,source coverage and all derived facts must be available by control_date,BLOCKED_EXTERNAL_POINT_IN_TIME_DATA,analyst forecasts and earnings metadata; companion earnings_news_jar code constructs numest
+SOURCE_FAMILY,TAQ,hacked_earnings_jfe README Data item 3,TAQ,source coverage and all derived facts must be available by control_date,BLOCKED_EXTERNAL_POINT_IN_TIME_DATA,intraday trade and quote observations
+SOURCE_FAMILY,RAVENPACK,hacked_earnings_jfe README Data item 4,RAVENPACK,source coverage and all derived facts must be available by control_date,BLOCKED_EXTERNAL_POINT_IN_TIME_DATA,earnings-news and story-count inputs
+SOURCE_FAMILY,MARKIT,hacked_earnings_jfe README Data item 5,MARKIT,source coverage and all derived facts must be available by control_date,BLOCKED_EXTERNAL_POINT_IN_TIME_DATA,various controls including shorting-related inputs
+SOURCE_FAMILY,OPTIONMETRICS,hacked_earnings_jfe README Data item 5,OPTIONMETRICS,source coverage and all derived facts must be available by control_date,BLOCKED_EXTERNAL_POINT_IN_TIME_DATA,option-market controls
+SOURCE_FAMILY,THOMSON_REUTERS_13F,hacked_earnings_jfe README Data item 5,THOMSON_REUTERS_13F,source coverage and all derived facts must be available by control_date,BLOCKED_EXTERNAL_POINT_IN_TIME_DATA,institutional ownership controls
+VARIABLE_ANCHOR,lnMCAP,Insider Trading Measures.ipynb control_var_names,,effective_date and availability_timestamp must not exceed control_date,CONTRACT_ONLY,study control-variable anchor
+VARIABLE_ANCHOR,Beta_SPY,Main Analysis.ipynb Beta_SPY_Overnight_RET,,effective_date and availability_timestamp must not exceed control_date,CONTRACT_ONLY,canonical G4 anchor for the study SPY beta control
+VARIABLE_ANCHOR,invPRC,Insider Trading Measures.ipynb control_var_names,,effective_date and availability_timestamp must not exceed control_date,CONTRACT_ONLY,study inverse-price control-variable anchor
+VARIABLE_ANCHOR,lnnumest,Insider Trading Measures.ipynb control_var_names,,effective_date and availability_timestamp must not exceed control_date,CONTRACT_ONLY,IBES analyst-count control-variable anchor
+VARIABLE_ANCHOR,ln_Story_Count_Relevant,Insider Trading Measures.ipynb control_var_names,,effective_date and availability_timestamp must not exceed control_date,CONTRACT_ONLY,RavenPack story-count control-variable anchor
+VARIABLE_ANCHOR,DCBS,Insider Trading Measures.ipynb control_var_names,,effective_date and availability_timestamp must not exceed control_date,CONTRACT_ONLY,study shorting-control anchor
+VARIABLE_ANCHOR,IO,Insider Trading Measures.ipynb control_var_names,,effective_date and availability_timestamp must not exceed control_date,CONTRACT_ONLY,study institutional-ownership control anchor
