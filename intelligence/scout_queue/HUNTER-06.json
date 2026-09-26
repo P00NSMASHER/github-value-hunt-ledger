@@ -1,91 +1,21 @@
 {
   "api_metrics": {
-    "api_requests": 8,
-    "known_revision_skips": 0,
+    "api_requests": 6,
+    "known_revision_skips": 2,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 2,
-  "candidates": [
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "A free, read-only Roblox Studio accessibility preflight plugin for UI contrast, text scaling, small text, and reduced-motion checks.",
-      "discovery_query": "Roblox accessibility reduced motion UI",
-      "exact_revision": "2c200d911ce120560aec55395e59466e84583d5a",
-      "forks": 0,
-      "primary_language": "Luau",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-22T16:20:50Z",
-      "repository": "KSAGlory/KSA-Accessibility-Preflight",
-      "root_code_signals": [
-        "src",
-        "tests"
-      ],
-      "size_kb": 29,
-      "stars": 4,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "accessibility",
-        "luau",
-        "roblox",
-        "roblox-studio",
-        "studio-plugin"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 7,
-        "stars": 3,
-        "substantive_size": 2,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/KSAGlory/KSA-Accessibility-Preflight"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Roblox mutation-crafting prototype in Luau \u2014 data-driven recipe system, server-authoritative gameplay, DataStore persistence, and a responsive mobile-ready UI.",
-      "discovery_query": "Roblox responsive UI mobile Luau",
-      "exact_revision": "2ec4d3e59ef42b59f11345955f21b41b487257d4",
-      "forks": 0,
-      "primary_language": null,
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-07-31T17:52:53Z",
-      "repository": "alisavekker59-sys/refactored-fiesta",
-      "root_code_signals": [],
-      "size_kb": 0,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 12,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 0,
-        "topics": 0
-      },
-      "triage_score": 22,
-      "url": "https://github.com/alisavekker59-sys/refactored-fiesta"
-    }
-  ],
+  "candidate_count": 0,
+  "candidates": [],
   "catalogs": [
     8,
     10,
     37
   ],
-  "generated_at": "2026-09-26T08:00:10.523926+00:00",
+  "generated_at": "2026-09-26T18:02:31.937274+00:00",
   "mission": "Roblox UI/mobile/input/accessibility systems and scalable player UX",
   "risk_review": [],
   "risk_review_count": 0,
