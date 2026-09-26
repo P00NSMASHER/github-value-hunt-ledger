@@ -42,5 +42,10 @@
   "control_required_source_family_count": 7,
   "control_required_variable_anchor_count": 7,
   "control_builder_ready": true,
-  "control_external_point_in_time_rows_loaded": 0
+  "control_external_point_in_time_rows_loaded": 0,
+  "control_candidate_universe_dates_defined": 72,
+  "control_candidate_memberships_defined": 3254,
+  "control_source_variable_map_rows": 7,
+  "control_acquisition_requirement_rows": 504,
+  "control_acquisition_packet_ready": true
 }
