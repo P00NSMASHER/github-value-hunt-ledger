@@ -105,19 +105,19 @@ class RealCorpusListingTests(unittest.TestCase):
             "cb00a9c2983c5ffb0f37ef3aff84ce8bcf328bd56565664e01abe0dfadde64af",
         )
 
-    def test_verified_intervals_expand_to_current_3322_rows(self):
+    def test_verified_intervals_expand_to_current_3476_rows(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 124)
+        self.assertEqual(len(intervals), 130)
 
         result = expand_listing_intervals(
             expanded_requirements(),
             intervals,
         )
-        self.assertEqual(len(result.resolved), 3322)
-        self.assertEqual(len(result.unresolved), 506)
+        self.assertEqual(len(result.resolved), 3476)
+        self.assertEqual(len(result.unresolved), 352)
         self.assertEqual(
             len({item.symbol for item in result.resolved}),
-            124,
+            130,
         )
 
         # Preserve known anchor intervals from the first verified group.
@@ -160,6 +160,12 @@ class RealCorpusListingTests(unittest.TestCase):
         self.assertEqual(exchanges["SM"], "NYSE")
         self.assertEqual(exchanges["SNDK"], "NASDAQ")
         self.assertEqual(exchanges["SNX"], "NYSE")
+        self.assertEqual(exchanges["STMP"], "NASDAQ")
+        self.assertEqual(exchanges["STT"], "NYSE")
+        self.assertEqual(exchanges["SWKS"], "NASDAQ")
+        self.assertEqual(exchanges["SYMM"], "NASDAQ")
+        self.assertEqual(exchanges["TER"], "NYSE")
+        self.assertEqual(exchanges["THC"], "NYSE")
 
     def test_listing_import_matches_interval_expansion_exactly(self):
         expansion = expand_listing_intervals(
@@ -167,7 +173,7 @@ class RealCorpusListingTests(unittest.TestCase):
             load_intervals(),
         )
         imported = load_import_bundle()
-        self.assertEqual(len(imported.listings), 3322)
+        self.assertEqual(len(imported.listings), 3476)
 
         expanded_rows = {
             (
@@ -186,11 +192,11 @@ class RealCorpusListingTests(unittest.TestCase):
             for item in imported.listings
         }
         self.assertEqual(imported_rows, expanded_rows)
-        self.assertEqual(len(imported_rows), 3322)
+        self.assertEqual(len(imported_rows), 3476)
 
     def test_interval_evidence_is_public_authorized_and_two_boundary(self):
         intervals = load_intervals()
-        self.assertEqual(len(intervals), 124)
+        self.assertEqual(len(intervals), 130)
         for item in intervals:
             self.assertTrue(item.start_evidence_url.startswith("https://"))
             self.assertTrue(item.end_evidence_url.startswith("https://"))
@@ -210,11 +216,11 @@ class RealCorpusListingTests(unittest.TestCase):
         self.assertEqual(manifest["listing_requirement_total"], 3828)
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
-        self.assertEqual(manifest["listing_metadata_resolved"], 3322)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 506)
-        self.assertEqual(manifest["listing_intervals_verified"], 124)
-        self.assertEqual(manifest["listing_symbols_resolved"], 124)
-        self.assertEqual(manifest["listing_batches_completed"], 30)
+        self.assertEqual(manifest["listing_metadata_resolved"], 3476)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 352)
+        self.assertEqual(manifest["listing_intervals_verified"], 130)
+        self.assertEqual(manifest["listing_symbols_resolved"], 130)
+        self.assertEqual(manifest["listing_batches_completed"], 31)
 
 
     def test_batch_23_receipt_covers_five_22_row_symbols(self):
