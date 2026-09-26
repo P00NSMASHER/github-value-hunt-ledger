@@ -236,6 +236,11 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(manifest["shares_symbols_resolved"], 146)
         self.assertEqual(manifest["shares_metadata_unresolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
+        self.assertEqual(manifest["control_requirement_total"], 72)
+        self.assertEqual(manifest["control_dates_reviewed"], 72)
+        self.assertEqual(manifest["control_dates_blocked"], 72)
+        self.assertEqual(manifest["control_review_batches_completed"], 1)
+        self.assertEqual(manifest["control_metadata_unresolved"], 72)
         self.assertFalse(manifest["live_use_allowed"])
         self.assertIn("research/compliance", manifest["purpose"])
 
