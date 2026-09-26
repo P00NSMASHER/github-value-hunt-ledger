@@ -94,7 +94,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             imported.counts(),
             {
                 "announcement_rows": 27,
-                "listing_rows": 3740,
+                "listing_rows": 3828,
                 "shares_rows": 0,
                 "control_rows": 0,
                 "market_source_date_rows": 0,
@@ -228,7 +228,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         )
         self.assertEqual(manifest["announcement_exact_resolved"], 27)
-        self.assertEqual(manifest["listing_metadata_resolved"], 3740)
+        self.assertEqual(manifest["listing_metadata_resolved"], 3828)
         self.assertEqual(manifest["shares_metadata_resolved"], 0)
         self.assertEqual(manifest["control_dates_resolved"], 0)
         self.assertFalse(manifest["live_use_allowed"])
@@ -585,7 +585,7 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         )
 
 
-    def test_g2_current_batches_resolve_3740_listing_observations(self):
+    def test_g2_listing_coverage_resolves_all_3828_observations(self):
         import_dir = CORPUS_DIR / "import"
         files = {
             name: (import_dir / name).read_text(encoding="utf-8")
@@ -598,13 +598,13 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             )
         }
         imported = import_real_corpus_metadata(files)
-        self.assertEqual(len(imported.listings), 3740)
+        self.assertEqual(len(imported.listings), 3828)
 
         by_symbol = {}
         for item in imported.listings:
             by_symbol.setdefault(item.symbol, []).append(item)
 
-        self.assertEqual(len(by_symbol), 142)
+        self.assertEqual(len(by_symbol), 146)
         expected = {
             "MFRM": ("NASDAQ", 22),
             "MSCC": ("NASDAQ", 22),
@@ -658,6 +658,10 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             "VDSI": ("NASDAQ", 22),
             "VEEV": ("NYSE", 22),
             "VRSN": ("NASDAQ", 22),
+            "WLL": ("NYSE", 22),
+            "WMB": ("NYSE", 22),
+            "WRLD": ("NASDAQ", 22),
+            "WTS": ("NYSE", 22),
         }
         for symbol, (exchange, count) in expected.items():
             self.assertEqual(len(by_symbol[symbol]), count)
@@ -806,14 +810,14 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(manifest["listing_metadata_resolved"], 3740)
+        self.assertEqual(manifest["listing_metadata_resolved"], 3828)
         self.assertEqual(manifest["listing_requirement_total"], 3828)
-        self.assertEqual(manifest["listing_intervals_verified"], 142)
-        self.assertEqual(manifest["listing_symbols_resolved"], 142)
-        self.assertEqual(manifest["listing_batches_completed"], 33)
+        self.assertEqual(manifest["listing_intervals_verified"], 146)
+        self.assertEqual(manifest["listing_symbols_resolved"], 146)
+        self.assertEqual(manifest["listing_batches_completed"], 34)
         self.assertTrue(manifest["listing_full_compact_index_loaded"])
         self.assertEqual(manifest["listing_requirement_compact_rows"], 146)
-        self.assertEqual(manifest["listing_metadata_unresolved"], 88)
+        self.assertEqual(manifest["listing_metadata_unresolved"], 0)
 
     def test_listing_requirement_batch_008_is_176_observations(self):
         path = CORPUS_DIR / "listing_requirement_batch_008.csv"
