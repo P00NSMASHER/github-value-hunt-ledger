@@ -47,5 +47,8 @@
   "control_candidate_memberships_defined": 3254,
   "control_source_variable_map_rows": 7,
   "control_acquisition_requirement_rows": 504,
-  "control_acquisition_packet_ready": true
+  "control_acquisition_packet_ready": true,
+  "control_external_import_contract_ready": true,
+  "control_external_template_file_count": 3,
+  "control_external_template_rows_loaded": 0
 }
