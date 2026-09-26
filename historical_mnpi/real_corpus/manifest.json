@@ -9,7 +9,7 @@
   "purpose": "Historical research/compliance corpus backbone only; not a trading signal dataset.",
   "row_count": 174,
   "schema_version": "real-corpus-backbone-v1",
-  "shares_metadata_resolved": 154,
+  "shares_metadata_resolved": 286,
   "source_file_sha256": "e723e9e2a0e0a616915f3146fdea40ef429d90586ac4699853b047c536568f55",
   "source_path": "Data/TimeOfFirstTrade.csv",
   "source_repository": "vgreg/hacked_earnings_jfe",
@@ -27,8 +27,8 @@
   "listing_requirement_compact_rows": 146,
   "listing_metadata_unresolved": 0,
   "shares_requirement_total": 3828,
-  "shares_facts_verified": 6,
-  "shares_batches_completed": 1,
-  "shares_symbols_resolved": 6,
-  "shares_metadata_unresolved": 3674
+  "shares_facts_verified": 12,
+  "shares_batches_completed": 2,
+  "shares_symbols_resolved": 12,
+  "shares_metadata_unresolved": 3542
 }
