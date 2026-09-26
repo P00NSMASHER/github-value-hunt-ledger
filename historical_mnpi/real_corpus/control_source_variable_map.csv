@@ -1,0 +1,8 @@
+source_family,study_dataset,required_variable_anchors,requirement_role,point_in_time_requirement,study_evidence
+CRSP,CRSP daily stock observations,lnMCAP|Beta_SPY|invPRC,COVARIATE_AND_SOURCE_COVERAGE,must be available by control_date,"README dataset 1; study notebooks use lnMCAP, price-derived invPRC, and SPY beta variants"
+IBES,I/B/E/S earnings/analyst data,lnnumest,COVARIATE_AND_SOURCE_COVERAGE,must be available by control_date,README dataset 2; Insider Trading Measures uses lnnumest
+TAQ,TAQ intraday stock observations,,SOURCE_COVERAGE_ONLY,must be available by control_date,README dataset 3; required by G4 control source contract
+RAVENPACK,RavenPack earnings-news data,ln_Story_Count_Relevant,COVARIATE_AND_SOURCE_COVERAGE,must be available by control_date,README dataset 4; Insider Trading Measures uses ln_Story_Count_Relevant
+MARKIT,Markit controls,DCBS,COVARIATE_AND_SOURCE_COVERAGE,must be available by control_date,README dataset 5; Insider Trading Measures uses DCBS
+OPTIONMETRICS,OptionMetrics controls,,SOURCE_COVERAGE_ONLY,must be available by control_date,README dataset 5; required by G4 control source contract
+THOMSON_REUTERS_13F,Thomson Reuters 13-F controls,IO,COVARIATE_AND_SOURCE_COVERAGE,must be available by control_date,README dataset 5; Insider Trading Measures uses IO
