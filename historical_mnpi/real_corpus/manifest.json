@@ -30,5 +30,12 @@
   "shares_facts_verified": 146,
   "shares_batches_completed": 8,
   "shares_symbols_resolved": 146,
-  "shares_metadata_unresolved": 0
+  "shares_metadata_unresolved": 0,
+  "control_requirement_total": 72,
+  "control_dates_reviewed": 72,
+  "control_dates_blocked": 72,
+  "control_review_batches_completed": 1,
+  "control_candidate_source_revision": "c23c7d79d067a79d70cf20e31b072d3703497eae",
+  "control_candidate_sample_blob_sha": "bbb68de172f7ab2104714513a72547f3dad3b86c",
+  "control_metadata_unresolved": 72
 }
