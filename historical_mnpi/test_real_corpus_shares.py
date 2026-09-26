@@ -54,9 +54,9 @@ def expanded_requirements():
 
 
 class RealCorpusSharesTests(unittest.TestCase):
-    def test_g3_batch_one_resolves_154_of_3828_requirements(self):
+    def test_g3_current_batches_resolve_286_of_3828_requirements(self):
         imported = load_import_bundle()
-        self.assertEqual(len(imported.shares), 6)
+        self.assertEqual(len(imported.shares), 12)
 
         resolved = []
         unresolved = []
@@ -71,8 +71,8 @@ class RealCorpusSharesTests(unittest.TestCase):
             else:
                 unresolved.append(item)
 
-        self.assertEqual(len(resolved), 154)
-        self.assertEqual(len(unresolved), 3674)
+        self.assertEqual(len(resolved), 286)
+        self.assertEqual(len(unresolved), 3542)
 
         by_symbol = Counter(item.symbol for item in resolved)
         self.assertEqual(
@@ -84,10 +84,16 @@ class RealCorpusSharesTests(unittest.TestCase):
                 "AF": 22,
                 "AGP": 22,
                 "ALGN": 22,
+                "ALNY": 22,
+                "ALSN": 22,
+                "AMD": 22,
+                "AMP": 22,
+                "AMSG": 22,
+                "APC": 22,
             },
         )
 
-    def test_g3_batch_one_preserves_exact_sec_share_facts(self):
+    def test_g3_current_batches_preserve_exact_sec_share_facts(self):
         imported = load_import_bundle()
         by_symbol = {
             item.symbol: item
@@ -130,6 +136,42 @@ class RealCorpusSharesTests(unittest.TestCase):
                 "2013-08-02T16:08:53-04:00",
                 "0001097149-13-000033",
             ),
+            "ALNY": (
+                "2014-10-31",
+                "76931090",
+                "2014-11-06T08:30:58-05:00",
+                "0001193125-14-399866",
+            ),
+            "ALSN": (
+                "2015-02-05",
+                "180053650",
+                "2015-02-20T08:07:13-05:00",
+                "0001193125-15-055034",
+            ),
+            "AMD": (
+                "2013-07-29",
+                "720015466",
+                "2013-08-01T17:10:34-04:00",
+                "0001193125-13-315281",
+            ),
+            "AMP": (
+                "2015-02-13",
+                "182511452",
+                "2015-02-24T17:31:20-05:00",
+                "0000820027-15-000024",
+            ),
+            "AMSG": (
+                "2014-11-06",
+                "48124795",
+                "2014-11-07T16:40:21-05:00",
+                "0000895930-14-000055",
+            ),
+            "APC": (
+                "2013-01-31",
+                "500565966",
+                "2013-02-19T17:11:05-05:00",
+                "0001193125-13-065430",
+            ),
         }
 
         self.assertEqual(set(by_symbol), set(expected))
@@ -158,7 +200,7 @@ class RealCorpusSharesTests(unittest.TestCase):
             self.assertIn(accession, item.evidence.source_name)
             self.assertIn("https://www.sec.gov/", item.evidence.source_name)
 
-    def test_each_batch_one_fact_was_public_before_first_required_session(self):
+    def test_each_current_fact_was_public_before_first_required_session(self):
         imported = load_import_bundle()
         first_required = {}
         for symbol, day in expanded_requirements():
@@ -191,18 +233,18 @@ class RealCorpusSharesTests(unittest.TestCase):
                 (),
             )
 
-    def test_manifest_tracks_g3_batch_one_progress(self):
+    def test_manifest_tracks_g3_batch_two_progress(self):
         manifest = json.loads(
             (CORPUS_DIR / "manifest.json").read_text(
                 encoding="utf-8"
             )
         )
         self.assertEqual(manifest["shares_requirement_total"], 3828)
-        self.assertEqual(manifest["shares_facts_verified"], 6)
-        self.assertEqual(manifest["shares_batches_completed"], 1)
-        self.assertEqual(manifest["shares_symbols_resolved"], 6)
-        self.assertEqual(manifest["shares_metadata_resolved"], 154)
-        self.assertEqual(manifest["shares_metadata_unresolved"], 3674)
+        self.assertEqual(manifest["shares_facts_verified"], 12)
+        self.assertEqual(manifest["shares_batches_completed"], 2)
+        self.assertEqual(manifest["shares_symbols_resolved"], 12)
+        self.assertEqual(manifest["shares_metadata_resolved"], 286)
+        self.assertEqual(manifest["shares_metadata_unresolved"], 3542)
         self.assertFalse(manifest["live_use_allowed"])
 
 
