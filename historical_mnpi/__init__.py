@@ -225,6 +225,14 @@ from .control_external_import import (
     import_control_external_inputs,
 )
 
+from .control_release import (
+    ControlReleaseGateResult,
+    RELEASE_CONTRACT_VERSION as CONTROL_RELEASE_CONTRACT_VERSION,
+    build_control_release_from_csv,
+    build_control_release_gate,
+    control_dates_from_events_csv,
+)
+
 from .real_corpus_import import (
     ANNOUNCEMENT_HEADERS,
     CONTROL_HEADERS,
@@ -268,6 +276,11 @@ __all__ = [
     "CONTROL_EXTERNAL_MEMBERSHIP_HEADERS",
     "CONTROL_EXTERNAL_SOURCE_COVERAGE_HEADERS",
     "import_control_external_inputs",
+    "ControlReleaseGateResult",
+    "CONTROL_RELEASE_CONTRACT_VERSION",
+    "build_control_release_from_csv",
+    "build_control_release_gate",
+    "control_dates_from_events_csv",
     "BASELINE_SESSIONS",
     "CoverageEvidence",
     "CoverageGate",
