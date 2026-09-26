@@ -275,6 +275,9 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             504,
         )
         self.assertTrue(manifest["control_acquisition_packet_ready"])
+        self.assertTrue(manifest["control_external_import_contract_ready"])
+        self.assertEqual(manifest["control_external_template_file_count"], 3)
+        self.assertEqual(manifest["control_external_template_rows_loaded"], 0)
         self.assertFalse(manifest["live_use_allowed"])
         self.assertIn("research/compliance", manifest["purpose"])
 
