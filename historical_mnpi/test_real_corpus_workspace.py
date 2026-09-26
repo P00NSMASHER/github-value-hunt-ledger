@@ -258,6 +258,23 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
             manifest["control_external_point_in_time_rows_loaded"],
             0,
         )
+        self.assertEqual(
+            manifest["control_candidate_universe_dates_defined"],
+            72,
+        )
+        self.assertEqual(
+            manifest["control_candidate_memberships_defined"],
+            3254,
+        )
+        self.assertEqual(
+            manifest["control_source_variable_map_rows"],
+            7,
+        )
+        self.assertEqual(
+            manifest["control_acquisition_requirement_rows"],
+            504,
+        )
+        self.assertTrue(manifest["control_acquisition_packet_ready"])
         self.assertFalse(manifest["live_use_allowed"])
         self.assertIn("research/compliance", manifest["purpose"])
 
