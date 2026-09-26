@@ -241,6 +241,23 @@ class RealCorpusWorkspaceTests(unittest.TestCase):
         self.assertEqual(manifest["control_dates_blocked"], 72)
         self.assertEqual(manifest["control_review_batches_completed"], 1)
         self.assertEqual(manifest["control_metadata_unresolved"], 72)
+        self.assertEqual(
+            manifest["control_builder_contract_version"],
+            "g4-point-in-time-v1",
+        )
+        self.assertEqual(
+            manifest["control_required_source_family_count"],
+            7,
+        )
+        self.assertEqual(
+            manifest["control_required_variable_anchor_count"],
+            7,
+        )
+        self.assertTrue(manifest["control_builder_ready"])
+        self.assertEqual(
+            manifest["control_external_point_in_time_rows_loaded"],
+            0,
+        )
         self.assertFalse(manifest["live_use_allowed"])
         self.assertIn("research/compliance", manifest["purpose"])
 
