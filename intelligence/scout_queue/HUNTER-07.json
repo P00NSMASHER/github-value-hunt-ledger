@@ -1,25 +1,25 @@
 {
   "api_metrics": {
-    "api_requests": 24,
-    "known_revision_skips": 0,
+    "api_requests": 17,
+    "known_revision_skips": 7,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 10,
+  "candidate_count": 3,
   "candidates": [
     {
       "archived": false,
       "default_branch": "main",
-      "description": "Free, open-source MCP server for Roblox Studio. 35 tools, a console panel that runs coding agents, editor-safe script edits.",
+      "description": "Free, open-source MCP server for Roblox Studio. 34 tools, a console panel that runs coding agents, editor-safe script edits.",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "4330d191d7c002203b34c536a71aef2794a35010",
+      "exact_revision": "a5cc13b45c336be5eab36bccc41ca6a3529cafd6",
       "forks": 2,
       "primary_language": "Luau",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-24T15:46:12Z",
+      "pushed_at": "2026-09-27T10:57:44Z",
       "repository": "EL4CTEO/rbx-studio-mcp",
       "root_code_signals": [
         ".github",
@@ -27,7 +27,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 1622,
+      "size_kb": 1762,
       "stars": 6,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -63,183 +63,19 @@
     },
     {
       "archived": false,
-      "default_branch": "master",
-      "description": "An agent skill that turns AI coding assistants into Roblox development experts: Luau, engine APIs, architecture, anti-exploit security, and how to drive Studio's built-in MCP server safely. Version-stamped against a specific Studio/Luau release. Works with Claude Code, Antigravity, Codex, and any Skills-format assistant.",
-      "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "d5cfb7290776adedf0c462232f58fa6227837f11",
-      "forks": 3,
-      "primary_language": "PowerShell",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-25T06:38:42Z",
-      "repository": "MSayib/roblox-dev-skill",
-      "root_code_signals": [
-        ".github",
-        "tests"
-      ],
-      "size_kb": 254,
-      "stars": 27,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "ai-skills",
-        "antigravity-ide",
-        "claude-code",
-        "game-development",
-        "luau",
-        "mcp",
-        "roblox",
-        "roblox-studio"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 1,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 6,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 51,
-      "url": "https://github.com/MSayib/roblox-dev-skill"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Open-source desktop app for building Roblox games with AI agents (roblox-ts, Rojo, Studio MCP, Open Cloud, OpenAI, Claude-Code)",
-      "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "d918ed507bd83eb232425a400f95b2b2718fa607",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-12T20:58:56Z",
-      "repository": "Onur45500/blockforge",
-      "root_code_signals": [
-        ".github",
-        "package.json"
-      ],
-      "size_kb": 1162,
-      "stars": 4,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "ai-agents",
-        "claude-code",
-        "desktop-app",
-        "electron",
-        "game-development",
-        "mcp",
-        "open-cloud",
-        "open-source",
-        "roblox",
-        "roblox-studio",
-        "roblox-ts",
-        "rojo",
-        "typescript"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 4,
-        "stars": 3,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 45,
-      "url": "https://github.com/Onur45500/blockforge"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Automated QA and gameplay testing plugin for Roblox Studio.",
-      "discovery_query": "Roblox Studio automation plugin testing",
-      "exact_revision": "f1c28527665d2a8565cf87570155d3272d780768",
-      "forks": 0,
-      "primary_language": "Luau",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-15T23:46:00Z",
-      "repository": "Apisalam/BloxQA",
-      "root_code_signals": [
-        "src"
-      ],
-      "size_kb": 72,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "automation",
-        "game-development",
-        "luau",
-        "qa",
-        "roblox",
-        "roblox-studio",
-        "studio-plugin",
-        "testing"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 3,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 41,
-      "url": "https://github.com/Apisalam/BloxQA"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "TKRS \u2014 an agent skill for Roblox Studio that helps AI coding agents build better games using a searchable library of ready-made assets. Agents can find, select, place, rotate, clone, and reuse assets instead of generating everything from scratch, improving speed, consistency, and visual quality.",
-      "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "86fbbc8f0c1b25fe74aa6e4b1518efa06ab551f3",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-14T21:27:37Z",
-      "repository": "adaybekovt-boop/TKRS",
-      "root_code_signals": [
-        ".github",
-        "schemas",
-        "tests"
-      ],
-      "size_kb": 431237,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 9,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 38,
-      "url": "https://github.com/adaybekovt-boop/TKRS"
-    },
-    {
-      "archived": false,
       "default_branch": "main",
       "description": "Best Roblox Studio QA Automation Plugin 2026: Gameplay Testing Toolkit for Devs",
       "discovery_query": "Roblox Studio automation plugin testing",
-      "exact_revision": "f0c64f19767029b22d3e5c4c350d88cd8a668e0f",
+      "exact_revision": "211704e88ac7276560115c0628b117b8e5c7c015",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-27T02:38:13Z",
+      "pushed_at": "2026-09-27T14:25:40Z",
       "repository": "nahidgaming70/Roblox-QA-Sentinel",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 189,
+      "size_kb": 192,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -271,16 +107,16 @@
       "default_branch": "main",
       "description": "Open Source Roblox Studio AI Coding Agent Tools 2026: 35 MCP Server Scripts for Safe Edits",
       "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "2394fb77acd96ab8254299256366538c7cc7d596",
+      "exact_revision": "aeed0f30f12cb3f3f86547c475fc3f29536860d3",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-27T06:19:19Z",
+      "pushed_at": "2026-09-27T17:33:09Z",
       "repository": "Daniel987654321/roblox-studio-agent-bridge",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 188,
+      "size_kb": 191,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -313,100 +149,6 @@
       },
       "triage_score": 36,
       "url": "https://github.com/Daniel987654321/roblox-studio-agent-bridge"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Local-first BYOK AI agent for Roblox Studio \u2014 Claude-Code-style CLI/TUI that connects directly to Studio. Zero deps, open source.",
-      "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "c9cb198ba55a4a803363bfa6e06bd013d678259d",
-      "forks": 0,
-      "primary_language": "JavaScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-20T19:28:21Z",
-      "repository": "hacvilke/roforge",
-      "root_code_signals": [
-        ".github"
-      ],
-      "size_kb": 1026,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 35,
-      "url": "https://github.com/hacvilke/roforge"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "AI coding assistant for Roblox Studio that explores projects, generates changes and applies them in the editor.",
-      "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "712b22f8b2e34944928e7dfffff8ea1a8cd4e120",
-      "forks": 0,
-      "primary_language": "Lua",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-09-14T12:54:16Z",
-      "repository": "Seryozh/lux-agentic-ai",
-      "root_code_signals": [
-        ".github"
-      ],
-      "size_kb": 166,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 2,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 0
-      },
-      "triage_score": 35,
-      "url": "https://github.com/Seryozh/lux-agentic-ai"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "through Vinegar/Wine. It connects MCP-compatible AI clients and coding agents (such as Cline and other AI IDEs) to Roblox Studio's native `StudioMCP.exe` over stdio, forwarding Linux Python MCP bridge on Roblox Studio running MCP requests and responses between the AI client and Roblox Studio, supporting Vinegar's version Studio installs",
-      "discovery_query": "Roblox AI coding agent Studio",
-      "exact_revision": "579ba62dbb7df0cde36ff9d06fd85ab55bb6ffc4",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-09-19T16:11:57Z",
-      "repository": "HaltingMachine/vinegar-mcp-bridge",
-      "root_code_signals": [],
-      "size_kb": 0,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 1,
-        "not_archived": 5,
-        "root_code_signals": 0,
-        "stars": 0,
-        "substantive_size": 0,
-        "topics": 0
-      },
-      "triage_score": 25,
-      "url": "https://github.com/HaltingMachine/vinegar-mcp-bridge"
     }
   ],
   "catalogs": [
@@ -414,7 +156,7 @@
     23,
     24
   ],
-  "generated_at": "2026-09-27T08:35:24.782370+00:00",
+  "generated_at": "2026-09-27T18:40:36.681352+00:00",
   "mission": "Roblox Studio automation, AI coding factories, deterministic editing and agent test harnesses",
   "risk_review": [],
   "risk_review_count": 0,
