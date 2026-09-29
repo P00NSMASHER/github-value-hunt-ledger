@@ -15,11 +15,24 @@ import time
 import urllib.error
 import urllib.request
 from http import HTTPStatus
+from urllib.parse import parse_qs
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Mapping
 
 from ai_business_os.ceo_command_center import (
     CommandCenterOperator,
+)
+from ai_business_os.command_center_ui import (
+    APP_CSS,
+    access_code_matches,
+    clear_session_cookie,
+    csrf_matches,
+    issue_session,
+    parse_session_cookie,
+    render_dashboard,
+    render_login,
+    session_cookie,
+    validate_session,
 )
 from ai_business_os.persistent_workers import (
     PersistentGoalWorker,
@@ -339,6 +352,10 @@ def build_server() -> ThreadingHTTPServer:
     )
     operator_token = _required_env("AIBOS_OPERATOR_TOKEN")
     expected_fingerprint = _required_env("AIBOS_SCHEMA_FINGERPRINT")
+    ui_enabled = os.environ.get("AIBOS_UI_ENABLED", "0") == "1"
+    ui_access_sha256 = _required_env("AIBOS_UI_ACCESS_SHA256") if ui_enabled else ""
+    ui_session_secret = _required_env("AIBOS_UI_SESSION_SECRET") if ui_enabled else ""
+    ui_principal = _required_env("AIBOS_UI_PRINCIPAL") if ui_enabled else ""
     port = int(os.environ.get("PORT", "8080"))
 
     bridge = GatewayProductionBridge(gateway)
@@ -365,17 +382,112 @@ def build_server() -> ThreadingHTTPServer:
         def log_message(self, fmt: str, *args: Any) -> None:
             print(json.dumps({"event": "http", "message": fmt % args}), flush=True)
 
+        def _common_security_headers(self) -> None:
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("X-Frame-Options", "DENY")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header(
+                "Permissions-Policy",
+                "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+            )
+
         def _json(self, status: int, payload: Mapping[str, Any]) -> None:
             raw = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(raw)))
-            self.send_header("Cache-Control", "no-store")
+            self._common_security_headers()
             self.end_headers()
             try:
                 self.wfile.write(raw)
             except (BrokenPipeError, ConnectionResetError):
                 return
+
+        def _html(self, status: int, document: str, *, set_cookie: str | None = None) -> None:
+            raw = document.encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(raw)))
+            self._common_security_headers()
+            self.send_header(
+                "Content-Security-Policy",
+                "default-src 'self'; script-src 'none'; style-src 'self'; "
+                "img-src 'self' data:; connect-src 'self'; object-src 'none'; "
+                "base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+            )
+            if set_cookie:
+                self.send_header("Set-Cookie", set_cookie)
+            self.end_headers()
+            try:
+                self.wfile.write(raw)
+            except (BrokenPipeError, ConnectionResetError):
+                return
+
+        def _css(self, content: str) -> None:
+            raw = content.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/css; charset=utf-8")
+            self.send_header("Content-Length", str(len(raw)))
+            self.send_header("Cache-Control", "public, max-age=300")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.end_headers()
+            try:
+                self.wfile.write(raw)
+            except (BrokenPipeError, ConnectionResetError):
+                return
+
+        def _redirect(self, location: str, *, set_cookie: str | None = None) -> None:
+            self.send_response(303)
+            self.send_header("Location", location)
+            self._common_security_headers()
+            if set_cookie:
+                self.send_header("Set-Cookie", set_cookie)
+            self.end_headers()
+
+        def _form_body(self) -> dict[str, str]:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > 1_000_000:
+                raise ValueError("invalid form body length")
+            raw = self.rfile.read(length).decode("utf-8")
+            parsed = parse_qs(raw, keep_blank_values=True, max_num_fields=30)
+            return {key: values[-1] if values else "" for key, values in parsed.items()}
+
+        def _ui_session(self) -> tuple[str, dict[str, Any] | None]:
+            token = parse_session_cookie(self.headers.get("Cookie", ""))
+            if not token or not ui_enabled:
+                return token, None
+            return token, validate_session(token, ui_session_secret, ui_principal)
+
+        def _ui_data(self) -> dict[str, Any]:
+            runtime = state.snapshot()
+            runtime["worker"] = worker.snapshot()
+            return {
+                "runtime": runtime,
+                "command_center": operator.dashboard(),
+                "planning_inputs": bridge.planning_inputs(),
+                "worker_status": gateway.call("worker_status"),
+            }
+
+        def _render_ui(
+            self,
+            session_token_value: str,
+            *,
+            proposal: Mapping[str, Any] | None = None,
+            notice: str | None = None,
+            error: str | None = None,
+            status: int = 200,
+        ) -> None:
+            document = render_dashboard(
+                self._ui_data(),
+                principal=ui_principal,
+                session_token=session_token_value,
+                session_secret=ui_session_secret,
+                proposal=proposal,
+                notice=notice,
+                error=error,
+            )
+            self._html(status, document)
 
         def _authorized(self) -> bool:
             supplied = self.headers.get("X-AIBOS-Operator-Token", "")
@@ -391,15 +503,32 @@ def build_server() -> ThreadingHTTPServer:
             return data
 
         def do_GET(self) -> None:
-            if self.path == "/health":
+            path = self.path.split("?", 1)[0]
+            if path == "/health":
                 snapshot = state.snapshot()
                 snapshot["worker"] = worker.snapshot()
                 self._json(200 if snapshot["ok"] else 503, snapshot)
                 return
+            if path == "/ui/assets/app.css":
+                self._css(APP_CSS)
+                return
+            if path in {"/", "/ui"}:
+                if not ui_enabled:
+                    self._json(404, {"ok": False, "error": "ui_disabled"})
+                    return
+                token, session = self._ui_session()
+                if session is None:
+                    self._html(200, render_login())
+                    return
+                try:
+                    self._render_ui(token)
+                except Exception as exc:
+                    self._html(503, render_login(error=f"Command Center unavailable: {exc}"))
+                return
             if not self._authorized():
                 self._json(401, {"ok": False, "error": "unauthorized"})
                 return
-            if self.path == "/dashboard":
+            if path == "/dashboard":
                 try:
                     self._json(200, {"ok": True, "data": operator.dashboard()})
                 except Exception as exc:
@@ -408,18 +537,82 @@ def build_server() -> ThreadingHTTPServer:
             self._json(404, {"ok": False, "error": "not_found"})
 
         def do_POST(self) -> None:
+            path = self.path.split("?", 1)[0]
+
+            if path == "/ui/login":
+                if not ui_enabled:
+                    self._json(404, {"ok": False, "error": "ui_disabled"})
+                    return
+                try:
+                    form = self._form_body()
+                    if not access_code_matches(form.get("access_code", ""), ui_access_sha256):
+                        time.sleep(0.25)
+                        self._html(401, render_login(error="Invalid access code."))
+                        return
+                    token = issue_session(ui_session_secret, ui_principal)
+                    self._redirect("/ui", set_cookie=session_cookie(token))
+                except Exception:
+                    self._html(400, render_login(error="Unable to start a secure session."))
+                return
+
+            if path.startswith("/ui/"):
+                token, session = self._ui_session()
+                if session is None:
+                    self._html(401, render_login(error="Your session is missing or expired."))
+                    return
+                try:
+                    form = self._form_body()
+                    if not csrf_matches(token, ui_session_secret, form.get("csrf", "")):
+                        raise ValueError("invalid CSRF token")
+                    if path == "/ui/logout":
+                        self._redirect("/ui", set_cookie=clear_session_cookie())
+                        return
+                    if path == "/ui/objective/propose":
+                        proposal = operator.propose_objective(
+                            form.get("objective", ""),
+                            requested_by=ui_principal,
+                            priority=int(form.get("priority", "80")),
+                        )
+                        self._render_ui(token, proposal=proposal)
+                        return
+                    if path == "/ui/objective/activate":
+                        proposal = json.loads(form.get("proposal_json", ""))
+                        if not isinstance(proposal, dict):
+                            raise ValueError("proposal must be an object")
+                        activated = operator.activate_objective(
+                            proposal,
+                            human_principal=ui_principal,
+                            write_execute=write_execute,
+                        )
+                        goal = activated.get("goal", {})
+                        self._render_ui(
+                            token,
+                            notice=(
+                                "Objective activated as governed PENDING goal "
+                                + str(goal.get("id", ""))
+                            ),
+                        )
+                        return
+                    self._json(404, {"ok": False, "error": "not_found"})
+                except Exception as exc:
+                    try:
+                        self._render_ui(token, error=str(exc), status=400)
+                    except Exception:
+                        self._json(400, {"ok": False, "error": str(exc)})
+                return
+
             if not self._authorized():
                 self._json(401, {"ok": False, "error": "unauthorized"})
                 return
             try:
                 body = self._body()
-                if self.path == "/objective/propose":
+                if path == "/objective/propose":
                     data = operator.propose_objective(
                         str(body.get("objective", "")),
                         requested_by=str(body.get("requested_by", "")),
                         priority=int(body.get("priority", 80)),
                     )
-                elif self.path == "/objective/activate":
+                elif path == "/objective/activate":
                     proposal = body.get("proposal")
                     if not isinstance(proposal, dict):
                         raise ValueError("proposal must be an object")
@@ -428,7 +621,7 @@ def build_server() -> ThreadingHTTPServer:
                         human_principal=str(body.get("human_principal", "")),
                         write_execute=write_execute,
                     )
-                elif self.path == "/approval/decide":
+                elif path == "/approval/decide":
                     data = operator.decide_approval(
                         request_key=str(body.get("request_key", "")),
                         intent_hash=str(body.get("intent_hash", "")),
@@ -460,7 +653,7 @@ def main() -> None:
             {
                 "event": "runtime_started",
                 "port": server.server_address[1],
-                "public_domain_required": False,
+                "public_domain_required": os.environ.get("AIBOS_UI_ENABLED", "0") == "1",
             }
         ),
         flush=True,
