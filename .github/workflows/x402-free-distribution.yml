@@ -10,54 +10,46 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Retry Market402 and inspect live 402 transport
+      - name: Register live PA x402 routes with x402dash
         shell: python
         run: |
           import json, urllib.request, urllib.error
 
           routes = [
-            ("PA Entity Best Match", "https://pa-entity-x402.floot.app/_api/pa-entity-one?q=OpenAI"),
-            ("PA Business Registry Search", "https://pa-entity-x402.floot.app/_api/pa-business?q=OpenAI&limit=1"),
-            ("PA Vendor Intake Gate", "https://api-v2.appdeploy.ai/app/pa-entity-lookup-x402-4fbm4s/api/vendor-intake-gate?name=OpenAI%20OpCo&address=600%20North%20Second%20Street%2C%20Suite%20401%2C%20Harrisburg%2C%20PA%2017101&domain=openai.com"),
-            ("SEC Recent Filings", "https://api-v2.appdeploy.ai/app/sec-recent-filings-x402-f9qatj/api/sec-filings?ticker=AAPL&form=10-K&limit=1"),
-            ("US Census Address Geocoder", "https://api-v2.appdeploy.ai/app/us-census-address-geocoder-x402-23mj4x/api/us-address-geocode?address=4600%20Silver%20Hill%20Rd%2C%20Washington%2C%20DC%2020233"),
-            ("OFAC SDN Name Screen", "https://api-v2.appdeploy.ai/app/ofac-sdn-name-screen-x402-m9ko96/api/ofac-sdn-screen?name=VLADIMIR%20PUTIN&limit=1&minScore=85"),
-            ("Domain RDAP Lookup", "https://api-v2.appdeploy.ai/app/domain-rdap-lookup-x402-spdfnq/api/domain-rdap?domain=example.com"),
-            ("Treasury Average Interest Rates", "https://api-v2.appdeploy.ai/app/treasury-average-interest-rates-x402-xeqftl/api/treasury-average-rates?security=Total%20Marketable"),
+            {
+              "url": "https://pa-entity-x402.floot.app/_api/pa-entity-one?q=OpenAI",
+              "name": "PA Entity Best Match",
+              "description": "Resolve one best Pennsylvania business-registry match by company name.",
+              "category": "Business Data",
+              "tags": ["pennsylvania","business-registry","entity-resolution","vendor-verification","x402"],
+            },
+            {
+              "url": "https://pa-entity-x402.floot.app/_api/pa-business?q=OpenAI&limit=1",
+              "name": "PA Business Registry Search",
+              "description": "Search Pennsylvania business-registration records by company name.",
+              "category": "Business Data",
+              "tags": ["pennsylvania","business-registry","company-data","due-diligence","x402"],
+            },
           ]
 
-          def post_json(label, url, payload):
+          for route in routes:
+            payload = dict(route)
+            payload["contact"] = "jayp19386@gmail.com"
             req = urllib.request.Request(
-              url,
+              "https://api.x402dash.com/v1/register",
               data=json.dumps(payload).encode("utf-8"),
-              headers={"Content-Type":"application/json","User-Agent":"AgentDataTools-x402-distribution/1.1"},
+              headers={
+                "Content-Type":"application/json",
+                "User-Agent":"AgentDataTools-x402-distribution/1.2",
+              },
               method="POST",
             )
             try:
-              with urllib.request.urlopen(req, timeout=60) as resp:
+              with urllib.request.urlopen(req,timeout=60) as resp:
                 body=resp.read().decode("utf-8","replace")
-                print(f"RECEIPT {label} HTTP {resp.status} {body[:5000]}")
+                print(f"RECEIPT X402DASH {route['name']} HTTP {resp.status} {body[:6000]}")
             except urllib.error.HTTPError as exc:
               body=exc.read().decode("utf-8","replace")
-              print(f"RECEIPT {label} HTTP {exc.code} {body[:5000]}")
+              print(f"RECEIPT X402DASH {route['name']} HTTP {exc.code} {body[:6000]}")
             except Exception as exc:
-              print(f"RECEIPT {label} ERROR {type(exc).__name__}: {exc}")
-
-          def probe(label, url):
-            req=urllib.request.Request(url,headers={"User-Agent":"AgentDataTools-x402-probe/1.0"},method="GET")
-            try:
-              with urllib.request.urlopen(req,timeout=30) as resp:
-                body=resp.read()
-                headers=dict(resp.headers.items())
-                print(f"PROBE {label} HTTP {resp.status} payment-required={headers.get('PAYMENT-REQUIRED') or headers.get('Payment-Required')} content-type={headers.get('Content-Type')} body-bytes={len(body)}")
-            except urllib.error.HTTPError as exc:
-              body=exc.read()
-              headers=dict(exc.headers.items())
-              pr=headers.get("PAYMENT-REQUIRED") or headers.get("Payment-Required") or headers.get("payment-required")
-              print(f"PROBE {label} HTTP {exc.code} payment-required-present={bool(pr)} payment-required-prefix={(pr or '')[:120]} content-type={headers.get('Content-Type')} body-bytes={len(body)} body-prefix={body[:300]!r}")
-            except Exception as exc:
-              print(f"PROBE {label} ERROR {type(exc).__name__}: {exc}")
-
-          for name,url in routes:
-            post_json("MARKET402 "+name, "https://market402.com/submit", {"resource":url})
-            probe(name,url)
+              print(f"RECEIPT X402DASH {route['name']} ERROR {type(exc).__name__}: {exc}")
