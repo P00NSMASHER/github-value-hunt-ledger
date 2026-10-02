@@ -1,0 +1,50 @@
+name: x402 index copy refresh
+on:
+  push:
+    branches:
+      - ops/x402-free-distribution-20261002
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Refresh buyer-facing listing copy
+        shell: python
+        run: |
+          import json, urllib.request, urllib.error
+          rows=[
+            {
+              "url":"https://pa-entity-x402.floot.app/_api/pa-entity-one?q=OpenAI",
+              "name":"PA Business Registry Best Match",
+              "description":"Resolve one best Pennsylvania Department of State legal-entity match by company name for company identity, vendor/customer verification, due diligence, filing-number lookup, and entity resolution. Returns source registry facts; not proof of current good standing.",
+              "price_usd":0.001,
+            },
+            {
+              "url":"https://pa-entity-x402.floot.app/_api/pa-business?q=OpenAI&limit=1",
+              "name":"PA Business Registry Search",
+              "description":"Search Pennsylvania Department of State business-registration records by company name for company identity, vendor/customer verification, due diligence, entity resolution, and lead enrichment, including filing and registered-address facts.",
+              "price_usd":0.005,
+            }
+          ]
+          for row in rows:
+            payload={
+              **row,
+              "protocol":"x402",
+              "http_method":"GET",
+              "payment_asset":"USDC",
+              "payment_network":"Base",
+              "category":"business-data",
+              "provider":"Agent Data Tools x402",
+              "contact_email":"jayp19386@gmail.com"
+            }
+            req=urllib.request.Request(
+              "https://402index.io/api/v1/register",
+              data=json.dumps(payload).encode(),
+              headers={"Content-Type":"application/json","User-Agent":"AgentDataTools-x402-distribution/1.4"},
+              method="POST"
+            )
+            try:
+              with urllib.request.urlopen(req,timeout=60) as resp:
+                print("RECEIPT",row["name"],resp.status,resp.read().decode("utf-8","replace")[:5000])
+            except urllib.error.HTTPError as exc:
+              print("RECEIPT",row["name"],exc.code,exc.read().decode("utf-8","replace")[:5000])
