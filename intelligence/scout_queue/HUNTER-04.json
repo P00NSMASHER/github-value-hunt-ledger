@@ -13,40 +13,41 @@
     {
       "archived": false,
       "default_branch": "main",
-      "description": "server-authoritative visibility replication for roblox shooters. clients only receive positions they can actually see, so wallhacks have nothing to read.",
-      "discovery_query": "Roblox server authoritative netcode Luau",
-      "exact_revision": "58ace7ef35c2d72a66dd774aa81611f580d851f4",
+      "description": "A modular framework for Roblox: boot order, guarded networking, state replication, and player data. Every module works on its own.",
+      "discovery_query": "Roblox networking replication framework Luau",
+      "exact_revision": "df949efe70adaef2e1d9c79b00b6068e85d1aeae",
       "forks": 0,
-      "primary_language": "Luau",
+      "primary_language": "MDX",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-07-16T14:00:15Z",
-      "repository": "debugasync/FogWar",
+      "pushed_at": "2026-10-04T17:55:49Z",
+      "repository": "andrian-syh/rblx-twill",
       "root_code_signals": [
-        "src"
+        ".github"
       ],
-      "size_kb": 15,
-      "stars": 0,
+      "size_kb": 602,
+      "stars": 1,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
-        "anti-cheat",
-        "fog-of-war",
+        "framework",
+        "game-development",
         "luau",
-        "netcode",
-        "roblox"
+        "roblox",
+        "roblox-development",
+        "roblox-studio"
       ],
       "triage_components": {
-        "activity": 12,
+        "activity": 15,
         "description": 4,
         "forks": 0,
         "license_metadata": 5,
         "not_archived": 5,
-        "root_code_signals": 3,
-        "stars": 0,
-        "substantive_size": 2,
+        "root_code_signals": 2,
+        "stars": 1,
+        "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 36,
-      "url": "https://github.com/debugasync/FogWar"
+      "triage_score": 41,
+      "url": "https://github.com/andrian-syh/rblx-twill"
     }
   ],
   "catalogs": [
@@ -55,7 +56,7 @@
     31,
     42
   ],
-  "generated_at": "2026-10-04T08:40:52.943094+00:00",
+  "generated_at": "2026-10-04T18:17:47.016889+00:00",
   "mission": "Server-authoritative Roblox multiplayer, remotes, validation and anti-exploit architecture",
   "risk_review": [],
   "risk_review_count": 0,
