@@ -33,6 +33,7 @@ PUBLIC_CONTACT_PAGES = (
     "freight-invoice-audit.html",
     "freight-overcharge-recovery.html",
     "accessorial-charge-audit.html",
+    "freight-audit-and-payment.html",
 )
 TEXT_SOURCE_FILES = (
     "index.html",
@@ -42,6 +43,7 @@ TEXT_SOURCE_FILES = (
     "freight-invoice-audit.html",
     "freight-overcharge-recovery.html",
     "accessorial-charge-audit.html",
+    "freight-audit-and-payment.html",
     "404.html",
     "site.css",
     "site.js",
@@ -50,6 +52,7 @@ TEXT_SOURCE_FILES = (
     "robots.txt",
     "sitemap.xml",
     "site.webmanifest",
+    "llms.txt",
     "_headers",
     "assets/fonts/ATTRIBUTION.json",
     "assets/fonts/LICENSE-HANKEN-GROTESK.txt",
