@@ -119,7 +119,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('name="twitter:description"', page)
             self.assertIn('name="twitter:image"', page)
             self.assertIn('id="actualRecoveredDisplay">$100,000</dd>', page)
-            self.assertIn('content="free-audit-contingency-v4"', page)
+            self.assertIn('content="free-audit-contingency-v5"', page)
 
             forbidden = (
                 "$5,000",
@@ -187,9 +187,9 @@ class PublicBuildTests(unittest.TestCase):
             output = build(Path(temporary) / "public")
             script = (output / "site.js").read_text()
             page = (output / "index.html").read_text()
-            self.assertIn('site.css?v=free-audit-contingency-v4', page)
-            self.assertIn('commercial-config.js?v=free-audit-contingency-v4', page)
-            self.assertIn('site.js?v=free-audit-contingency-v4', page)
+            self.assertIn('site.css?v=free-audit-contingency-v5', page)
+            self.assertIn('commercial-config.js?v=free-audit-contingency-v5', page)
+            self.assertIn('site.js?v=free-audit-contingency-v5', page)
             self.assertIn('id="actualRecovery" type="number" min="0" max="1000000000" step="1000" value="100000"', page)
             self.assertIn('<dd id="actualRecoveredDisplay">$100,000</dd>', page)
             self.assertNotIn('value="50000"', page)
@@ -203,6 +203,10 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("actual * contingencyRate", script)
             self.assertIn("sendLink.href = `mailto:${contactEmail}", script)
             self.assertIn("window.location.href = sendLink.href", script)
+            self.assertIn("new URLSearchParams(window.location.search)", script)
+            self.assertIn('utm_source: cleanCampaignValue("utm_source")', script)
+            self.assertIn('utm_campaign: cleanCampaignValue("utm_campaign")', script)
+            self.assertIn("Acquisition source:", script)
             self.assertIn("Review it, then press Send.", page)
             stylesheet = (output / "site.css").read_text()
             self.assertIn(".output-copy{min-width:0}", stylesheet)
