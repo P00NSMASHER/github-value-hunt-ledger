@@ -39,6 +39,7 @@ PUBLIC_CONTACT_PAGES = (
     "ltl-freight-audit.html",
     "parcel-audit.html",
     "freight-invoice-audit-checklist.html",
+    "about.html",
 )
 TEXT_SOURCE_FILES = (
     "index.html",
@@ -54,6 +55,7 @@ TEXT_SOURCE_FILES = (
     "ltl-freight-audit.html",
     "parcel-audit.html",
     "freight-invoice-audit-checklist.html",
+    "about.html",
     "404.html",
     "site.css",
     "site.js",
