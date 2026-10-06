@@ -42,6 +42,15 @@ class PageParser(HTMLParser):
 
 
 class PublicBuildTests(unittest.TestCase):
+    def test_google_search_console_verification_file_is_exact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            verification = (output / "google738a4fc9a0997cd0.html").read_text()
+            self.assertEqual(
+                verification,
+                "google-site-verification: google738a4fc9a0997cd0.html\n",
+            )
+
     def test_contact_must_be_present_and_verified(self):
         for email, verified in [
             ("", True),
