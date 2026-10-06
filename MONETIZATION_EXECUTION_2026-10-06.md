@@ -151,7 +151,7 @@ Allowed engineering:
 Current Day-0 acquisition state (2026-10-06):
 - F0: PASSED.
 - ICP universe screened: **545+ current 2026 source-list entries before deduplication**, spanning major distributors, retailers, logistics companies, 3PLs, and cold-chain operators. A new best-100 commercial-priority shortlist was selected with shippers/distributors weighted ahead of 3PL providers.
-- Permitted first touches: 10 sent from the configured business mailbox. The additional screened candidates have not been mass-contacted; outreach remains a separate controlled step.
+- Permitted first touches: 10 sent from the configured business mailbox. The expanded candidate universe has not been mass-contacted; outreach remains a separate controlled step, and prospect identities remain outside the public repository.
 - Substantive responses/conversations: 0 recorded yet.
 - Qualified buyers: 0 recorded yet.
 - Secure-intake-ready buyers: 0 recorded yet.
