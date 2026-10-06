@@ -21,6 +21,10 @@ The sprint is successful only when the outcome ledger contains an independently 
 ## Freight execution sequence
 
 ### Gate F0 — public acquisition surface
+**Status: PASSED 2026-10-06. Day 0 starts 2026-10-06.**
+
+Evidence: main-branch `RecoveryOS Public Sites` run 37475067758 passed verification and deployment; the public site was independently opened at `https://p00nsmasher.github.io/github-value-hunt-ledger/`; its CTA targets `jayp19386@gmail.com`; and a controlled non-sensitive inquiry was delivered to that inbox.
+
 Required:
 - business contact selected: `jayp19386@gmail.com`;
 - `FREIGHT_CONTACT_EMAIL=jayp19386@gmail.com` is already configured in GitHub Actions variables;
@@ -165,9 +169,9 @@ The only headline commercial metrics are external outcomes, realized customer va
 
 ## Immediate blockers
 
-1. `FREIGHT_CONTACT_EMAIL` is already configured as `jayp19386@gmail.com`; verify `FREIGHT_CONTACT_VERIFIED=1` and then validate the deployment path. The current GitHub connector cannot enumerate repository variables directly.
-2. The customer-data route must pass the existing separate-environment gate before confidential intake.
-3. No external buyer outcome is currently recorded in `OUTCOMES.md`.
+1. F0 is closed. The public acquisition surface is live and the controlled contact path is verified.
+2. Buyer-specific authorization is still required before confidential intake, even though the verified separate single-tenant environment is available.
+3. No external buyer outcome is currently recorded in `OUTCOMES.md`; acquisition and qualification are now the active bottleneck.
 
 ## Stop rule
 
