@@ -91,7 +91,11 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             config = (output / "commercial-config.js").read_text()
 
-            self.assertIn("Find freight money you may be owed", page)
+            self.assertIn("Freight recovery <em>you can prove.</em>", page)
+            self.assertIn("Recovery Evidence Pack", page)
+            self.assertIn("Good. We test what the first audit may have missed.", page)
+            self.assertIn("Inspect the method before trusting the number.", page)
+            self.assertNotIn("Real case studies will appear when they are real.", page)
             self.assertIn("Start Free Recovery Audit", page)
             self.assertIn("<strong>$0</strong> upfront audit fee", page)
             self.assertIn("no recovery fee", page.lower())
