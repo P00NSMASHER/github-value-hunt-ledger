@@ -148,6 +148,20 @@ Allowed engineering:
 
 ## Weekly scorecard
 
+Current Day-0 acquisition state (2026-10-06):
+- F0: PASSED.
+- ICP-fit candidates reviewed: 10 initial regional logistics/3PL targets.
+- Permitted first touches: 10 sent from the configured business mailbox.
+- Substantive responses/conversations: 0 recorded yet.
+- Qualified buyers: 0 recorded yet.
+- Secure-intake-ready buyers: 0 recorded yet.
+- Authorized audit populations: 0 recorded yet.
+- Audits completed: 0 external.
+- Realized customer recovery: $0 evidenced.
+- Collected revenue: $0 evidenced.
+
+Prospect identities and raw outbound messages remain outside the public repository; only aggregate operating counts are recorded here.
+
 Track:
 - F0 status;
 - ICP candidates reviewed;
