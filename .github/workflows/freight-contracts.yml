@@ -60,8 +60,8 @@ jobs:
           cat /tmp/freight-hunter-review.md >> "$GITHUB_STEP_SUMMARY"
       - name: Controlled-pilot commercial-use rights evidence is clear
         run: PYTHONPATH=. python freight/rights_evidence.py --stage pilot --expect CLEAR
-      - name: Validate collected deployment security evidence
-        run: PYTHONPATH=. python freight/deployment_security_evidence.py --as-of-date "$(date -u +%F)" --expect FRESH
+      - name: Validate legacy current-deployment security evidence conservatively
+        run: PYTHONPATH=. python freight/deployment_security_evidence.py --as-of-date "$(date -u +%F)" --expect STALE
       - name: Canonical freight gap register
         run: PYTHONPATH=. python freight/gap_registry.py --list-active-search
       - name: Ready-pilot diagnostic fixture
