@@ -22,10 +22,12 @@ The sprint is successful only when the outcome ledger contains an independently 
 
 ### Gate F0 — public acquisition surface
 Required:
-- verified business inbox;
-- repository variables `FREIGHT_CONTACT_EMAIL` and `FREIGHT_CONTACT_VERIFIED=1`;
+- business contact selected: `jayp19386@gmail.com`;
+- repository variables `FREIGHT_CONTACT_EMAIL=jayp19386@gmail.com` and `FREIGHT_CONTACT_VERIFIED=1`;
 - successful `freight-site-pages.yml` verification and deployment;
 - controlled inquiry proving the public CTA reaches the configured inbox.
+
+The contact is owner-approved. The repository variables must still be configured and observed before F0 is considered passed.
 
 Until F0 passes:
 - do not claim the site is live;
@@ -162,7 +164,7 @@ The only headline commercial metrics are external outcomes, realized customer va
 
 ## Immediate blockers
 
-1. A verified business inbox is required for the Freight Pages deployment.
+1. Configure `jayp19386@gmail.com` as `FREIGHT_CONTACT_EMAIL` and set `FREIGHT_CONTACT_VERIFIED=1`; the current GitHub connector does not expose repository-variable writes.
 2. The customer-data route must pass the existing separate-environment gate before confidential intake.
 3. No external buyer outcome is currently recorded in `OUTCOMES.md`.
 
