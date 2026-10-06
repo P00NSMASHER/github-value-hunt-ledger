@@ -40,6 +40,7 @@ PUBLIC_CONTACT_PAGES = (
     "parcel-audit.html",
     "freight-invoice-audit-checklist.html",
     "about.html",
+    "freight-overcharge-dispute-process.html",
 )
 TEXT_SOURCE_FILES = (
     "index.html",
@@ -56,6 +57,7 @@ TEXT_SOURCE_FILES = (
     "parcel-audit.html",
     "freight-invoice-audit-checklist.html",
     "about.html",
+    "freight-overcharge-dispute-process.html",
     "404.html",
     "site.css",
     "site.js",
