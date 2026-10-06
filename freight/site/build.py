@@ -42,6 +42,7 @@ PUBLIC_CONTACT_PAGES = (
     "about.html",
     "freight-overcharge-dispute-process.html",
     "freight-audit-methodology.html",
+    "freight-audit-example.html",
 )
 TEXT_SOURCE_FILES = (
     "index.html",
@@ -60,6 +61,7 @@ TEXT_SOURCE_FILES = (
     "about.html",
     "freight-overcharge-dispute-process.html",
     "freight-audit-methodology.html",
+    "freight-audit-example.html",
     "404.html",
     "site.css",
     "site.js",
