@@ -34,6 +34,11 @@ PUBLIC_CONTACT_PAGES = (
     "freight-overcharge-recovery.html",
     "accessorial-charge-audit.html",
     "freight-audit-and-payment.html",
+    "duplicate-freight-charges.html",
+    "carrier-rate-audit.html",
+    "ltl-freight-audit.html",
+    "parcel-audit.html",
+    "freight-invoice-audit-checklist.html",
 )
 TEXT_SOURCE_FILES = (
     "index.html",
@@ -44,6 +49,11 @@ TEXT_SOURCE_FILES = (
     "freight-overcharge-recovery.html",
     "accessorial-charge-audit.html",
     "freight-audit-and-payment.html",
+    "duplicate-freight-charges.html",
+    "carrier-rate-audit.html",
+    "ltl-freight-audit.html",
+    "parcel-audit.html",
+    "freight-invoice-audit-checklist.html",
     "404.html",
     "site.css",
     "site.js",
