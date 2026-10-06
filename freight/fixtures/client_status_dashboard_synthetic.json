@@ -1,0 +1,27 @@
+{
+  "customer": "Fictional Multi-Site Distributor",
+  "population_id": "SYNTH-DASH-001",
+  "period": "2026-01-01 through 2026-03-31",
+  "updated_at": "2026-10-06 18:10 ET",
+  "synthetic": true,
+  "records_reviewed": 1284,
+  "candidates_flagged": 37,
+  "findings_validated": 14,
+  "claims_authorized": 9,
+  "claims_submitted": 9,
+  "claims_approved": 7,
+  "recoveries_posted": 6,
+  "recoveries_reversed": 1,
+  "candidate_difference_cents": 3825000,
+  "validated_difference_cents": 2410000,
+  "approved_claim_cents": 1765000,
+  "gross_recovered_cents": 1420000,
+  "reversal_cents": 75000,
+  "net_recovered_cents": 1345000,
+  "fee_eligible_recovered_cents": 1180000,
+  "notes": [
+    "All figures are fictional demonstration data.",
+    "One posted recovery was later partially reversed and is reflected in net recovery.",
+    "Pre-existing and incumbent-known findings are excluded from fee-eligible recovery."
+  ]
+}
