@@ -35,3 +35,12 @@ Latest verification at commit b3bed5b846ba289b2c3f2de7cd10df5eea3e8e31:
 - Repository Release Gate: PASS
 - RecoveryOS Public Sites verify: PASS
 - GitHub Pages deploy: PASS
+
+
+## Plan execution update — Steps 10-12
+
+Completed / advanced on 2026-10-06:
+
+- Step 10: Referral partner channel launched. Public referral-partner page and internal partner operating standard are committed. A private starter list of CFO, CPA, TMS, logistics, and distribution advisors was created outside the public repository.
+- Step 11: Search Console tooling is authenticated, but Google Search Console has no verified property for the current GitHub Pages URL. Registration and direct property creation both fail closed until that URL-prefix property is added and verified in Google Search Console. The exact post-verification sitemap, URL-inspection, indexing-tracker, and query-cluster execution path is committed in SEARCH_CONSOLE_INDEXING.md.
+- Step 12: Lightweight client recovery-status dashboard generator, synthetic fixture, fail-closed state tests, and a public fictional dashboard example are committed. Real customer dashboards remain outside the public marketing site.
