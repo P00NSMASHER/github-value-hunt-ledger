@@ -45,6 +45,7 @@ PUBLIC_CONTACT_PAGES = (
     "freight-audit-example.html",
     "freight-audit-pricing.html",
     "second-look-freight-audit.html",
+    "trust.html",
 )
 TEXT_SOURCE_FILES = (
     "index.html",
@@ -66,6 +67,7 @@ TEXT_SOURCE_FILES = (
     "freight-audit-example.html",
     "freight-audit-pricing.html",
     "second-look-freight-audit.html",
+    "trust.html",
     "404.html",
     "site.css",
     "site.js",
