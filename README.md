@@ -2,6 +2,18 @@
 
 Private persistent memory for the GitHub Value Hunt.
 
+## Freight Recovery public service
+
+The current commercial launch is **Freight Recovery**, a $0-upfront freight-audit and recovery service for finance, AP, transportation, and logistics teams.
+
+- Public site: https://p00nsmasher.github.io/github-value-hunt-ledger/
+- Freight audit services: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-services.html
+- Freight invoice audit: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit.html
+- Freight invoice audit checklist: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit-checklist.html
+- Freight overcharge recovery: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-overcharge-recovery.html
+
+The public marketing surface is intentionally separated from confidential customer-data processing. Do not send freight records, credentials, contracts, or payment data through ordinary email.
+
 ## Operating model
 - Start operational runs with [`intelligence/WORKER_RUNBOOK.md`](intelligence/WORKER_RUNBOOK.md). It points to the current assignment, claim, evidence and telemetry contracts. The [2026-09-21 strategy upgrade](intelligence/STRATEGY_UPGRADE_2026-09-21.md) explains the latest changes and their evidence limits.
 - Fifteen scheduled hunter roles are used: **14 research workers plus Hunt 15 / MASTER Integrator**. The 14 research workstreams search across the **47 thematic catalogs** under `hunters/`; catalog numbers are domain indexes, not necessarily one-to-one automation identities.
