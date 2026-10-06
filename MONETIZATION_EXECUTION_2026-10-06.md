@@ -151,7 +151,7 @@ Allowed engineering:
 Current Day-0 acquisition state (2026-10-06):
 - F0: PASSED.
 - ICP universe screened: **545+ current 2026 source-list entries before deduplication**, spanning major distributors, retailers, logistics companies, 3PLs, and cold-chain operators. A new best-100 commercial-priority shortlist was selected with shippers/distributors weighted ahead of 3PL providers.
-- Permitted first touches: 10 sent from the configured business mailbox. The expanded candidate universe has not been mass-contacted; outreach remains a separate controlled step, and prospect identities remain outside the public repository.
+- Permitted first touches: **20 sent today** from the configured business mailbox; **10 are from the current nationwide top-100 list** and 10 were from the earlier regional test cohort.
 - Substantive responses/conversations: 0 recorded yet.
 - Qualified buyers: 0 recorded yet.
 - Secure-intake-ready buyers: 0 recorded yet.
@@ -164,6 +164,7 @@ Prospect identities and raw outbound messages remain outside the public reposito
 
 Track:
 - F0 status;
+- sender postal address: `715 Yorktowne Road, Pottsville, PA 17901`;
 - ICP candidates reviewed;
 - permitted first touches;
 - substantive responses/conversations;
