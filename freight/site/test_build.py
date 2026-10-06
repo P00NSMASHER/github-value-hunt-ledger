@@ -120,6 +120,10 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('name="twitter:image"', page)
             self.assertIn('id="actualRecoveredDisplay">$100,000</dd>', page)
             self.assertIn('content="free-audit-contingency-v5"', page)
+            self.assertIn('href="freight-audit-services.html"', page)
+            self.assertIn('href="freight-invoice-audit.html"', page)
+            self.assertIn('href="freight-overcharge-recovery.html"', page)
+            self.assertIn('href="accessorial-charge-audit.html"', page)
 
             forbidden = (
                 "$5,000",
@@ -146,7 +150,16 @@ class PublicBuildTests(unittest.TestCase):
             index = (output / "index.html").read_text()
             privacy = (output / "privacy.html").read_text()
             engagement = (output / "engagement-framework.html").read_text()
-            for page in (index, privacy, engagement):
+            organic = [
+                (output / name).read_text()
+                for name in (
+                    "freight-audit-services.html",
+                    "freight-invoice-audit.html",
+                    "freight-overcharge-recovery.html",
+                    "accessorial-charge-audit.html",
+                )
+            ]
+            for page in (index, privacy, engagement, *organic):
                 self.assertIn('content="sales@freightfixture.com"', page)
                 self.assertNotIn(builder.CONTACT_META, page)
             self.assertIn('href="mailto:sales@freightfixture.com', index)
@@ -159,7 +172,16 @@ class PublicBuildTests(unittest.TestCase):
     def test_pages_have_unique_ids_and_resolvable_local_links(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
-            for name in ("index.html", "privacy.html", "engagement-framework.html", "404.html"):
+            for name in (
+                "index.html",
+                "privacy.html",
+                "engagement-framework.html",
+                "freight-audit-services.html",
+                "freight-invoice-audit.html",
+                "freight-overcharge-recovery.html",
+                "accessorial-charge-audit.html",
+                "404.html",
+            ):
                 parser = PageParser()
                 parser.feed((output / name).read_text())
                 self.assertEqual(len(parser.ids), len(set(parser.ids)), name)
