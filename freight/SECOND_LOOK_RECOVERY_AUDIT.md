@@ -3,6 +3,8 @@
 Updated: 2026-10-06
 Status: ACTIVE PRODUCT WEDGE
 
+Methodology: Freight Recovery Evidence Standard v1.0.
+
 ## Purpose
 
 Sell an independent post-payment / post-audit review to companies that already have a TMS, freight-payment provider, internal AP controls, carrier reconciliation, 3PL audit service, or incumbent freight-audit vendor.
