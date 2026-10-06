@@ -4,6 +4,22 @@
   const byId = (id) => document.getElementById(id);
   const all = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
+  const campaignParams = new URLSearchParams(window.location.search);
+  const cleanCampaignValue = (name) => {
+    const value = campaignParams.get(name);
+    return value ? value.trim().slice(0, 120) : "";
+  };
+  const campaignContext = Object.freeze({
+    utm_source: cleanCampaignValue("utm_source"),
+    utm_medium: cleanCampaignValue("utm_medium"),
+    utm_campaign: cleanCampaignValue("utm_campaign"),
+    utm_term: cleanCampaignValue("utm_term"),
+    utm_content: cleanCampaignValue("utm_content")
+  });
+  const nonEmptyCampaignContext = Object.freeze(
+    Object.fromEntries(Object.entries(campaignContext).filter(([, value]) => value))
+  );
+
   const EVENTS = Object.freeze({
     landingPageViewed: "freight_landing_page_viewed",
     freeAuditCtaClicked: "freight_free_audit_cta_clicked",
@@ -27,7 +43,7 @@
   const track = (eventName, properties = {}) => {
     const detail = Object.freeze({
       event: eventName,
-      properties: { ...properties },
+      properties: { ...nonEmptyCampaignContext, ...properties },
       occurredAt: new Date().toISOString()
     });
     window.dispatchEvent(new CustomEvent("freight:analytics", { detail }));
@@ -177,6 +193,10 @@
       `Available records: ${valuesFor("records").join(", ") || "Not provided"}`,
       `Known or suspected issue: ${fieldValue("suspectedIssues") || "Not provided"}`,
       `General reason for review: ${fieldValue("issueNotes") || "Not provided"}`,
+      "",
+      Object.keys(nonEmptyCampaignContext).length
+        ? `Acquisition source: ${Object.entries(nonEmptyCampaignContext).map(([key, value]) => `${key}=${value}`).join(", ")}`
+        : "Acquisition source: Direct / untagged",
       "",
       "No freight records or credentials are attached. Please review fit and, if appropriate, confirm scope and an approved secure intake route."
     ].join("\n");
