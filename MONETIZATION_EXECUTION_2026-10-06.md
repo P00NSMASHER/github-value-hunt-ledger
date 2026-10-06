@@ -150,7 +150,7 @@ Allowed engineering:
 
 Current Day-0 acquisition state (2026-10-06):
 - F0: PASSED.
-- ICP-fit candidates reviewed: **120** screened regional logistics/3PL targets (expanded 2026-10-06 across PA/NJ/NY/DE and adjacent Northeast/Mid-Atlantic directories; deduplicated company-level screen).
+- ICP universe screened: **545+ current 2026 source-list entries before deduplication**, spanning major distributors, retailers, logistics companies, 3PLs, and cold-chain operators. A new best-100 commercial-priority shortlist was selected with shippers/distributors weighted ahead of 3PL providers.
 - Permitted first touches: 10 sent from the configured business mailbox. The additional screened candidates have not been mass-contacted; outreach remains a separate controlled step.
 - Substantive responses/conversations: 0 recorded yet.
 - Qualified buyers: 0 recorded yet.
