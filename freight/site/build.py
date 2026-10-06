@@ -72,6 +72,7 @@ TEXT_SOURCE_FILES = (
     "trust.html",
     "founding-program.html",
     "referral-partners.html",
+    "recovery-status-example.html",
     "404.html",
     "site.css",
     "site.js",
