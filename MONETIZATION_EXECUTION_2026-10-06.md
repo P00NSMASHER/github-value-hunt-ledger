@@ -150,8 +150,8 @@ Allowed engineering:
 
 Current Day-0 acquisition state (2026-10-06):
 - F0: PASSED.
-- ICP-fit candidates reviewed: 10 initial regional logistics/3PL targets.
-- Permitted first touches: 10 sent from the configured business mailbox.
+- ICP-fit candidates reviewed: **120** screened regional logistics/3PL targets (expanded 2026-10-06 across PA/NJ/NY/DE and adjacent Northeast/Mid-Atlantic directories; deduplicated company-level screen).
+- Permitted first touches: 10 sent from the configured business mailbox. The additional screened candidates have not been mass-contacted; outreach remains a separate controlled step.
 - Substantive responses/conversations: 0 recorded yet.
 - Qualified buyers: 0 recorded yet.
 - Secure-intake-ready buyers: 0 recorded yet.
