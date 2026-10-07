@@ -50,7 +50,8 @@ Reviewed the freight homepage and supporting-page design system, inquiry flow, p
 ## Verification record
 
 - Freight Pages release: 64 pytest tests and 20 subtests passed locally; outreach guard and reservation integration checks passed; JavaScript syntax checks passed; exact public build allowlist passed.
-- GitHub pull request #265 passed all checks and merged; updated freight homepage and worked example were inspected live after rollout.
-- Additional product-page/template changes are separately verified and released, with live inspection recorded in the final handoff.
+- GitHub pull request #265 passed all checks and merged; updated freight homepage, worked example, Trust Center and sample recovery dashboard were inspected live after rollout.
+- Product-page/template changes passed all pull-request checks and merged in #266. A final review correction makes the product-page status bar readable on navy and keeps assessment limitations prominent in the report template.
 - Portal visual draft typechecked clean. It was checkpointed, not published; authenticated runtime behavior remains unverified.
+- Live calculator verified: $1,000 actual recovery produces a $300 illustrative fee and $700 customer net. The inquiry reached its email-prepared state with synthetic details; browser policy blocked the external mail-app navigation, so email-client handoff and delivery were not verified.
 - No customer records were uploaded, no claims/payments were initiated, and no outbound messages were sent during this audit.

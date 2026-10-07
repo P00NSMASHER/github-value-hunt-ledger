@@ -10,6 +10,8 @@
 
 **Report date:** [date]
 
+**Assessment status:** [complete / missing evidence / method blocked / quality review failed; explain any limit in plain language]
+
 **Recommended next step:** [no further action / request records / authorize defined recovery scope]
 
 **Summary:** [Two sentences explaining what was reviewed, what is supported, and what remains unresolved.]
