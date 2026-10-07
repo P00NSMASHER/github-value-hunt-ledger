@@ -26,6 +26,29 @@ The public site:
 - can prepare a non-sensitive email that the visitor reviews and sends;
 - is not the customer-data environment.
 
+## RecoveryOS customer-data environment
+
+The current authenticated RecoveryOS application is separate from the public
+marketing/qualification site.
+
+Current production application:
+
+- URL: `https://freight-recoveryos.floot.app`;
+- application host/runtime: Floot;
+- persistent data plane: Floot-managed PostgreSQL (identified by Floot as
+  Neon-backed);
+- authentication: application email/password sessions;
+- current second-factor/enterprise-SSO status: not evidenced.
+
+RecoveryOS may accept governed customer data only through its authenticated,
+tenant-scoped application/API boundary and only under the applicable engagement
+authorization. Public marketing forms/pages remain outside this customer-data
+environment.
+
+The production security evidence snapshot and provider register are maintained
+separately. No SOC 2, ISO 27001, penetration-test, provider encryption or
+provider backup/restore claim is implied merely by using a hosted platform.
+
 ## Customer-data intake
 
 Confidential freight records are accepted only after:
