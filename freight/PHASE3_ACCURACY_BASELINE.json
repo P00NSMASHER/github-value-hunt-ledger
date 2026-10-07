@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-10-07",
+  "gold_id": "recoveryos-phase3-accuracy-v1",
+  "gold_fixture_hash": "6da44c566a8e7d495b2e7fce80508529fa598232077b690f60c4b1804b2274a7",
+  "report_hash": "83f642e4448a0c17735efdcb046325ce50a08728298084dc981db3df0fd57ecd",
+  "source": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "commit": "4880899058bd71b0f0f38cbc56886df261bc3ba4",
+    "workflow_run_id": 37575308610,
+    "job_id": 112642756810,
+    "fixture": "freight/fixtures/phase3_accuracy_gold_v1.json"
+  },
+  "scope": {
+    "total_scenarios": 42,
+    "rating_cases": 20,
+    "auto_rateable_rating_cases": 13,
+    "review_required_rating_cases": 7,
+    "authority_resolution_cases": 4,
+    "incumbent_attribution_cases": 8,
+    "payment_lifecycle_cases": 10,
+    "modes": [
+      "PARCEL",
+      "LTL",
+      "TL",
+      "INTERMODAL",
+      "AIR",
+      "OCEAN"
+    ]
+  },
+  "metrics": {
+    "rating": {
+      "true_positive": 7,
+      "true_negative": 6,
+      "false_positive": 0,
+      "false_negative": 0,
+      "precision": 1,
+      "recall": 1,
+      "specificity": 1,
+      "auto_classification_accuracy": 1,
+      "review_routing_accuracy": 1,
+      "exact_expected_amount_accuracy": 1,
+      "exact_variance_accuracy": 1,
+      "exact_financial_state_accuracy": 1,
+      "authority_binding_accuracy": 1
+    },
+    "authority_resolution": {
+      "exact_count": 4,
+      "case_count": 4,
+      "accuracy": 1
+    },
+    "incumbent_attribution": {
+      "exact_count": 8,
+      "case_count": 8,
+      "accuracy": 1,
+      "batch_totals_exact": true,
+      "duplicate_suppression_accuracy": 1,
+      "incumbent_credit_protection_accuracy": 1,
+      "challenger_only_cents": 3000,
+      "incumbent_known_cents": 1700,
+      "review_cents": 4200,
+      "suppressed_cents": 0
+    },
+    "payment_lifecycle": {
+      "valid_case_count": 7,
+      "valid_exact_count": 7,
+      "valid_state_and_money_accuracy": 1,
+      "invalid_case_count": 3,
+      "invalid_rejection_count": 3,
+      "invalid_transition_rejection_accuracy": 1
+    },
+    "evidence_traceability": {
+      "traceable_outputs": 38,
+      "total_outputs": 38,
+      "accuracy": 1
+    }
+  },
+  "external_blind_validation": {
+    "state": "PENDING_EXTERNAL_CUSTOMER_EVIDENCE",
+    "reason": "Synthetic code-adjacent cases cannot estimate real customer false-positive or false-negative rates."
+  },
+  "claim_boundary": [
+    "This is a synthetic, code-adjacent deterministic conformance benchmark, not a statistically representative production sample.",
+    "Zero errors on the small designed gold set do not establish a production false-positive or false-negative rate.",
+    "No OCR/document extraction, messy carrier invoice input, negotiated contract prose interpretation, carrier portal behavior, or externally observed settlement source is tested here.",
+    "The benchmark does not prove that unsupported freight rules are absent; it proves the encoded supported rules match the frozen expected outcomes.",
+    "A buyer-facing production-accuracy claim requires a blind independently adjudicated frozen customer population."
+  ]
+}

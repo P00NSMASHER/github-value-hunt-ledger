@@ -54,3 +54,10 @@ jobs:
           echo '===RECOVERYOS_PHASE3_ACCURACY_REPORT_BEGIN==='
           cat /tmp/recoveryos-phase3-accuracy.json
           echo '===RECOVERYOS_PHASE3_ACCURACY_REPORT_END==='
+
+      - name: Enforce frozen accuracy evidence
+        run: |
+          PYTHONPATH=. python freight/accuracy_evidence.py \
+            --fixture freight/fixtures/phase3_accuracy_gold_v1.json \
+            --baseline freight/PHASE3_ACCURACY_BASELINE.json \
+            --report /tmp/recoveryos-phase3-accuracy.json
