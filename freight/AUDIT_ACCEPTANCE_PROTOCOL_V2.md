@@ -101,11 +101,12 @@ The minimum timing contract is:
 Steps 3-5 may occur in parallel, but both sides remain sealed until joint
 unseal.
 
-The protocol records four explicit blindness assertions:
+The protocol records five explicit blindness assertions:
 
 - truth owner did not see RecoveryOS output before truth freeze;
 - RecoveryOS team did not see truth before output freeze;
 - sample was selected before RecoveryOS output;
+- the dual-review subset was selected before RecoveryOS output;
 - truth owner is independent of the RecoveryOS builder.
 
 A violation makes the study **INVALID_METHOD**, not merely a failed accuracy
@@ -132,6 +133,12 @@ Each case also records:
 Unresolved authority or incomplete source evidence is not converted to a
 negative truth label merely to make metrics easier.
 
+Semantic invariants are machine-enforced:
+
+- POSITIVE truth requires positive truth variance;
+- NEGATIVE truth requires zero truth variance;
+- unresolved authority or incomplete source evidence requires UNRESOLVED truth.
+
 ## 6. RecoveryOS states
 
 RecoveryOS returns one of:
@@ -148,6 +155,14 @@ Each output records:
 - predicted variance in integer cents for automatic decisions;
 - confidence in parts per million;
 - claimed net-new candidate cents.
+
+Output semantics are also enforced:
+
+- POSITIVE automatic decisions require positive predicted variance;
+- NEGATIVE automatic decisions require zero predicted variance;
+- REVIEW carries no asserted variance;
+- non-POSITIVE decisions cannot assert net-new cents;
+- net-new cents cannot exceed the predicted variance.
 
 An automatic positive or negative on unresolved truth, unresolved authority, or
 incomplete evidence is an **unsupported auto-decision**. The acceptance policy
@@ -167,7 +182,14 @@ The report computes:
 - raw agreement;
 - Cohen's kappa.
 
-Current acceptance requires kappa >= 0.70.
+Current acceptance requires:
+
+- at least 10 dual-reviewed positive-truth cases;
+- at least 10 dual-reviewed negative-truth cases;
+- kappa >= 0.70.
+
+This prevents a degenerate all-positive or all-negative agreement sample from
+passing merely because both reviewers repeated the same label.
 
 Every reviewer disagreement requires a documented adjudication note. The truth
 owner may preserve `UNRESOLVED`; adjudication is not permission to manufacture
