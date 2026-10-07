@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "policy_id": "recoveryos-blind-audit-acceptance-v2",
+  "effective_date": "2026-10-07",
+  "thresholds": {
+    "min_adjudicated_cases": 200,
+    "min_positive_cases": 30,
+    "min_negative_cases": 30,
+    "min_dual_review_cases": 50,
+    "min_dual_review_fraction": 0.2,
+    "min_cohen_kappa": 0.7,
+    "min_auto_coverage": 0.6,
+    "min_precision_lower_95": 0.85,
+    "max_false_positive_rate_upper_95": 0.12,
+    "max_false_negative_rate_upper_95": 0.12,
+    "max_false_positive_dollar_share": 0.01,
+    "max_false_negative_dollar_share": 0.05,
+    "max_review_rate": 0.5,
+    "max_ece": 0.1,
+    "max_unsupported_auto_decisions": 0,
+    "max_incumbent_leakage_cents": 0,
+    "max_duplicate_leakage_cents": 0,
+    "min_dual_review_positive_cases": 10,
+    "min_dual_review_negative_cases": 10
+  },
+  "claim_boundary": [
+    "Passing this gate supports only the frozen buyer-authorized population evaluated under this protocol; it is not a universal production-accuracy claim.",
+    "Confidence intervals, abstentions, unresolved truth, reviewer disagreement, false-positive dollars, false-negative dollars, incumbent leakage and duplicate leakage must remain visible rather than being collapsed into a single accuracy percentage.",
+    "AUDIT_QUALITY_PROVEN does not mean realized recovery. Carrier action, settlement, reversal and fee eligibility remain separate externally evidenced states.",
+    "Synthetic fixtures may validate this methodology implementation but may not satisfy the external customer-proof gate."
+  ]
+}

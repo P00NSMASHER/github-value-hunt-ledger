@@ -31,7 +31,16 @@ A real proof package must contain:
 17. net actual recovery;
 18. fee-eligible realized recovery;
 19. final package hash;
-20. buyer acceptance/challenge record.
+20. buyer acceptance/challenge record;
+21. frozen sample-selection plan and stratum table;
+22. sample hash;
+23. RecoveryOS output hash frozen before joint unseal;
+24. dual-review assignments and disagreement adjudication;
+25. Wilson confidence intervals for primary case-error metrics;
+26. calibration report;
+27. dollar-weighted false-positive/false-negative report;
+28. incumbent-credit leakage and duplicate-credit leakage report;
+29. machine output from `freight/audit_acceptance.py`.
 
 ## Blind accuracy rule
 
@@ -41,6 +50,13 @@ truth set is frozen.
 Without that ordering, do not report false-positive or false-negative rates as
 blind validation.
 
+The canonical external methodology is
+`freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md`. A real pilot must validate against
+`freight/AUDIT_ACCEPTANCE_POLICY_V2.json`. Method-design failure returns
+`INVALID_METHOD`; a valid but underpowered or failing population returns
+`INSUFFICIENT_OR_FAILED`. Only the full executable gate may issue
+`AUDIT_QUALITY_PROVEN`.
+
 ## Minimum real-customer metrics
 
 - total frozen invoices/shipments;
@@ -49,11 +65,19 @@ blind validation.
 - unsupported/review rate;
 - false-positive count/dollars;
 - independently discovered false negatives;
-- precision/recall where truth is defensible;
-- exact-dollar error;
+- precision with 95% Wilson interval;
+- false-positive and false-negative case rates with 95% Wilson intervals;
+- auto-decision coverage and review/abstention rate;
+- exact-dollar error, mean absolute dollar error and net dollar bias;
+- confidence calibration (ECE and Brier score);
+- dual-review raw agreement and Cohen's kappa;
 - challenger-only validated dollars;
 - incumbent-known excluded dollars;
 - duplicate/pre-existing/automatic excluded dollars;
+- incumbent-known net-new leakage dollars;
+- duplicate economic-issue net-new leakage dollars;
+- unsupported automatic decisions;
+- stratum-level false positives, false negatives and review counts;
 - reviewer minutes / 1,000 invoices;
 - realized recovery;
 - reversed recovery;
@@ -64,8 +88,10 @@ blind validation.
 ## Success states
 
 ### AUDIT_QUALITY_PROVEN
-Buyer accepts the blinded truth methodology and false-dollar behavior, even if
-the population is clean.
+The buyer-authorized population passes every machine-enforced v2 methodology,
+sample-size, reviewer-agreement, uncertainty, calibration, abstention,
+dollar-error, incumbent-leakage and duplicate-leakage gate. The claim remains
+scoped to that frozen population.
 
 ### INCREMENTAL_FINDING_PROVEN
 At least one independently validated challenger-only finding exists.
