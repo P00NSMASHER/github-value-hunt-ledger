@@ -206,22 +206,31 @@ The correct claim is:
 Production accuracy needs a buyer-authorized **blind frozen population** in which
 the truth labels are adjudicated independently of RecoveryOS output.
 
-At minimum, the external benchmark must measure:
+The external benchmark is now governed by
+`freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md` and the executable
+`freight/audit_acceptance.py` gate.
 
-- invoice/shipment coverage;
-- authority-selection accuracy;
-- supported-rule coverage;
-- false positives;
-- false negatives discovered by independent review;
-- exact-dollar error;
-- review-abstention rate;
-- incumbent-known suppression;
-- duplicate economic-issue suppression;
-- net-new attributable candidate dollars;
-- authorized claims;
-- settled/reversed outcomes;
-- actual net recovered dollars;
-- reviewer minutes per 1,000 invoices.
+In addition to invoice/shipment, authority and supported-rule coverage, it
+requires:
+
+- pre-registered census or stratified-random sampling;
+- frozen sample/truth/RecoveryOS/incumbent hashes;
+- bilateral blindness and distinct truth/reviewer/operator roles;
+- minimum adjudicated positive/negative sample sizes;
+- 95% Wilson intervals for primary case-error rates;
+- explicit REVIEW/abstention coverage;
+- dollar-weighted false-positive and false-negative rates;
+- mean absolute dollar error and net dollar bias;
+- confidence calibration (ECE/Brier);
+- dual-review agreement and Cohen's kappa;
+- unresolved truth preservation;
+- zero unsupported automatic decisions;
+- zero incumbent-known net-new leakage;
+- zero duplicate economic-issue net-new leakage;
+- per-stratum error/review reporting;
+- reviewer minutes per 1,000 invoices;
+- authorized claims, settlement/reversal and actual net recovered dollars as
+  later distinct proof states.
 
 RecoveryOS output must remain hidden from the adjudicator until the truth set is
 frozen. Otherwise the benchmark becomes self-grading, a proud old human
@@ -240,7 +249,12 @@ The repository now contains:
 - `freight/accuracy_evidence.py`;
 - `freight/PHASE3_ACCURACY_BASELINE.json`;
 - `freight/test_phase3_accuracy.py`;
-- dedicated `RecoveryOS Phase 3 Accuracy` CI.
+- dedicated `RecoveryOS Phase 3 Accuracy` CI;
+- `freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md`;
+- `freight/AUDIT_ACCEPTANCE_POLICY_V2.json`;
+- `freight/audit_acceptance.py`;
+- `freight/test_audit_acceptance.py`;
+- dedicated `RecoveryOS Blind Audit Methodology` CI.
 
 The gate freezes both the fixture hash and exact report hash. A code or fixture
 change that alters any expected classification, dollar amount, authority,
