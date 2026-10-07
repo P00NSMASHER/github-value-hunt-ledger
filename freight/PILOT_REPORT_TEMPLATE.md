@@ -4,8 +4,12 @@
 
 **Population:** [buyer / BU / date range / modes / carriers]  
 **Population hash:** [SHA-256]  
+**Sample hash:** [SHA-256]  
 **Truth manifest hash:** [SHA-256]  
-**Incumbent output hash:** [SHA-256]
+**RecoveryOS output hash:** [SHA-256]  
+**Incumbent output hash:** [SHA-256]  
+**Acceptance policy:** recoveryos-blind-audit-acceptance-v2  
+**Method status:** [INVALID_METHOD / INSUFFICIENT_OR_FAILED / AUDIT_QUALITY_PROVEN]
 
 ### Financial totals
 
@@ -19,20 +23,79 @@
 
 Never collapse these rows into one savings number.
 
-## 2. Quality / review metrics
+## 2. Method integrity and sample design
 
-- invoices/shipments in frozen population: —
-- total findings: —
-- validated findings: —
-- challenger-only validated findings: —
-- false-positive findings/dollars: —
-- unresolved findings/dollars: —
-- reviewer touches: —
-- reviewer minutes/hours: —
-- deterministic replay failures: —
-- population/truth/incumbent ordering violations: **0 required**
+- population size: —
+- sample size: —
+- sampling method: [CENSUS / STRATIFIED_RANDOM]
+- frozen random seed when sampled: —
+- declared strata: —
+- strata meeting target: — / —
+- distinct truth owner / reviewer A / reviewer B / RecoveryOS operator: **required**
+- truth owner saw RecoveryOS before truth freeze: **NO required**
+- RecoveryOS team saw truth before output freeze: **NO required**
+- sample selected before RecoveryOS output: **YES required**
+- population/truth/RecoveryOS/incumbent ordering violations: **0 required**
 
-## 3. Finding register
+## 3. Statistical quality / review metrics
+
+Report both point estimates and the required uncertainty bounds:
+
+- adjudicated cases: —
+- positive truth cases: —
+- negative truth cases: —
+- unresolved truth cases: —
+- automatic decisions: —
+- review/abstention decisions: —
+- automatic coverage: —
+- review rate: —
+- true positives / true negatives: —
+- false positives / false negatives: —
+- precision: — ; **95% Wilson interval: —**
+- false-positive case rate: — ; **95% Wilson interval: —**
+- false-negative case rate: — ; **95% Wilson interval: —**
+- auto-decision accuracy: —
+- dual-reviewed cases: —
+- reviewer raw agreement: —
+- reviewer Cohen's kappa: —
+- expected calibration error (ECE): —
+- Brier score: —
+- unsupported automatic decisions: **0 required**
+
+## 4. Dollar-integrity metrics
+
+- predicted-positive dollars: —
+- independently adjudicated positive dollars: —
+- false-positive dollars: —
+- false-negative dollars: —
+- false-positive dollar share: —
+- false-negative dollar share: —
+- truth-positive dollars routed to human review: —
+- auto-decision mean absolute dollar error: —
+- auto-decision net dollar bias: —
+- exact-dollar rate: —
+- incumbent-known dollars incorrectly credited as net-new: **$0 required**
+- duplicate economic-issue dollars incorrectly credited twice: **$0 required**
+
+A small case error with a large dollar impact is not hidden by an attractive
+ordinary accuracy percentage.
+
+## 5. Stratum report
+
+For every pre-registered stratum include:
+
+- population count;
+- sample target;
+- sampled count;
+- adjudicated count;
+- false positives;
+- false negatives;
+- review count.
+
+Do not omit a weak carrier, mode, source type, business unit, or spend band merely
+because the overall metric passes.
+
+## 6. Finding register
 
 For every finding include:
 - finding ID;
@@ -51,7 +114,7 @@ For every finding include:
 - fee-eligible amount;
 - recovery certificate hash.
 
-## 4. Incumbent comparison
+## 7. Incumbent comparison
 
 Report:
 - challenger-only validated;
@@ -63,7 +126,7 @@ Report:
 
 Finding identity must not be inferred from dollar amount alone.
 
-## 5. Settlement readback
+## 8. Settlement readback
 
 A finding is not realized merely because:
 - a dispute was submitted;
@@ -73,7 +136,7 @@ A finding is not realized merely because:
 
 Show buyer-controlled settlement/remittance evidence and exact allocation.
 
-## 6. Limitations
+## 9. Limitations
 
 List:
 - unresolved authority;
@@ -85,7 +148,7 @@ List:
 - manually reviewed rules;
 - any customer-specific assumptions.
 
-## 7. Commercial next step
+## 10. Commercial next step
 
 Choose one:
 - no further action / population appears clean;
