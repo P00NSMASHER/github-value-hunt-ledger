@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-10-07",
+  "environment": {
+    "application": "RecoveryOS",
+    "project_id": "c719b60c-9b3b-4193-a543-0be9d3ceaef2",
+    "data_plane": "Floot-managed PostgreSQL (Neon)",
+    "production_url": "https://freight-recoveryos.floot.app"
+  },
+  "write_path": {
+    "workload": "One bulk SQL INSERT of synthetic recovery_ingress_receipts; each row executes the normal per-tenant append-only audit trigger. Every trial ran inside an explicit transaction and was rolled back.",
+    "audit_chain_head_index": "recovery_audit_chain_head_idx",
+    "exploratory_pre_index": [
+      {
+        "rows": 1000,
+        "insert_ms": 511.12,
+        "records_per_second": 1956.49,
+        "audit_valid": true
+      },
+      {
+        "rows": 5000,
+        "insert_ms": 4309.72,
+        "records_per_second": 1160.17,
+        "audit_valid": true
+      }
+    ],
+    "exploratory_first_post_index": {
+      "rows": 5000,
+      "insert_ms": 3883.576,
+      "records_per_second": 1287.47,
+      "audit_valid": true,
+      "note": "Cold/noisy managed-host run; excluded from steady-state baseline."
+    },
+    "warmed_post_index_10000": {
+      "insert_ms": 1330.278,
+      "records_per_second": 7517.23,
+      "audit_verify_ms": 28.938,
+      "audit_valid": true
+    },
+    "repeated_post_index_10000": [
+      {
+        "trial": 1,
+        "insert_ms": 1283.994,
+        "records_per_second": 7788.2,
+        "audit_verify_ms": 27.58,
+        "invalid_hashes": 0,
+        "broken_links": 0
+      },
+      {
+        "trial": 2,
+        "insert_ms": 1321.074,
+        "records_per_second": 7569.6,
+        "audit_verify_ms": 30.525,
+        "invalid_hashes": 0,
+        "broken_links": 0
+      },
+      {
+        "trial": 3,
+        "insert_ms": 1299.048,
+        "records_per_second": 7697.94,
+        "audit_verify_ms": 27.81,
+        "invalid_hashes": 0,
+        "broken_links": 0
+      }
+    ],
+    "summary": {
+      "median_records_per_second": 7697.94,
+      "min_records_per_second": 7569.6,
+      "max_records_per_second": 7788.2,
+      "median_audit_verify_ms": 27.81,
+      "audit_integrity_failures": 0,
+      "executed_max_rows": 100000
+    },
+    "post_index_100000": {
+      "rows": 100000,
+      "insert_ms": 14170.792,
+      "records_per_second": 7056.77,
+      "audit_verify_ms": 333.871,
+      "invalid_hashes": 0,
+      "broken_links": 0,
+      "transaction_rolled_back": true
+    }
+  },
+  "read_path": {
+    "ten_thousand_records_and_findings": {
+      "total_findings": 10000,
+      "aggregate_totals_ms": 12.972,
+      "unresolved_review_queue_top100_ms": 17.417,
+      "confirmed_count_with_zero_dispositions_ms": 0.542,
+      "prior_simple_top100_ms": 7.909,
+      "grouped_analytics_ms": 15.94,
+      "audit_events": 20001,
+      "invalid_hashes": 0,
+      "broken_links": 0
+    },
+    "ten_thousand_findings_with_eleven_thousand_dispositions": {
+      "findings": 10000,
+      "dispositions": 11000,
+      "expected_latest_confirmed": 9000,
+      "latest_confirmed_count": 9000,
+      "confirmed_count_ms": 9.631,
+      "confirmed_list_top500_ms": 163.681,
+      "audit_events": 31001,
+      "invalid_hashes": 0,
+      "broken_links": 0,
+      "critical_note": "163.681 ms is acceptable for a human-facing query at this synthetic size, but is materially slower than other tested reads and is not evidence of good 100K/1M scaling."
+    }
+  },
+  "application_hardening": [
+    "Dashboard KPIs now aggregate over the full tenant population instead of incorrectly using the limited top-100 review queue.",
+    "Dashboard review queue resolves the latest review state in SQL instead of loading every tenant disposition into application memory.",
+    "Confirmed-findings endpoint resolves latest review state in SQL and caps the response at 500 rows.",
+    "Payments endpoint limits authorization/event reads to the 250 payment instructions actually returned.",
+    "Payment analytics and confirmed-count analytics compute latest state in PostgreSQL instead of materializing entire histories in JavaScript.",
+    "Added review-queue/latest-review/latest-payment/recent-payment indexes."
+  ],
+  "indexes": [
+    "recovery_audit_chain_head_idx ON recovery_audit_events(tenant_id, occurred_at DESC, id DESC)",
+    "recovery_findings_review_queue_idx ON recovery_challenge_findings(tenant_id, variance_cents DESC, id)",
+    "recovery_review_latest_idx ON recovery_review_dispositions(tenant_id, finding_id, created_at DESC, id DESC)",
+    "recovery_payment_event_latest_idx ON recovery_payment_events(tenant_id, instruction_id, occurred_at DESC, created_at DESC, id DESC)",
+    "recovery_payment_instruction_recent_idx ON recovery_payment_instructions(tenant_id, created_at DESC, id DESC)"
+  ],
+  "claim_boundary": [
+    "Database write results are bulk-statement throughput, not HTTP/API requests per second.",
+    "All performance fixtures were synthetic and rolled back; no customer data was used.",
+    "Tests were single-tenant and did not prove concurrent multi-tenant throughput or lock contention behavior.",
+    "A 100K persisted-row transaction was executed and verified, but no 1M persisted database population benchmark has been executed.",
+    "The confirmed-list query is the clearest measured database performance concern and needs 100K/1M read-path testing before any enterprise-latency claim.",
+    "Managed database warmup/cache/scheduling materially affected exploratory timings."
+  ]
+}
