@@ -64,7 +64,6 @@ class PassMetrics:
     latency_p50_ms: float
     latency_p95_ms: float
     latency_p99_ms: float
-    python_peak_heap_mb: float
     process_max_rss_mb: float
     result_digest: str
 
@@ -91,6 +90,15 @@ class FailureInjectionResult:
 
 
 @dataclass(frozen=True)
+class MemoryProbe:
+    record_count: int
+    elapsed_seconds: float
+    python_peak_heap_mb: float
+    process_max_rss_mb: float
+    result_digest: str
+
+
+@dataclass(frozen=True)
 class BenchmarkReport:
     schema_version: int
     generated_at_utc: str
@@ -100,6 +108,7 @@ class BenchmarkReport:
     mode_count: int
     trials: tuple[ScaleTrial, ...]
     failure_injection: FailureInjectionResult
+    memory_probe: MemoryProbe
     claims_boundary: tuple[str, ...]
     report_hash: str
 
@@ -345,7 +354,6 @@ def _run_pass(
     billed = expected = variance = 0
 
     gc.collect()
-    tracemalloc.start()
     start = time.perf_counter()
     for index in range(count):
         missing = (
@@ -373,8 +381,6 @@ def _run_pass(
         variance += result.variance_cents or 0
 
     elapsed = max(time.perf_counter() - start, 1e-12)
-    _, peak = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
     return PassMetrics(
         record_count=count,
         rated_count=rated,
@@ -388,6 +394,39 @@ def _run_pass(
         latency_p50_ms=_percentile(latencies_ms, 0.50),
         latency_p95_ms=_percentile(latencies_ms, 0.95),
         latency_p99_ms=_percentile(latencies_ms, 0.99),
+        process_max_rss_mb=_max_rss_mb(),
+        result_digest=digest.hexdigest(),
+    )
+
+
+def run_memory_probe(
+    count: int = 10_000,
+    *,
+    authority_book: AuthorityBook | None = None,
+) -> MemoryProbe:
+    """Measure Python allocation peak separately so timing is not distorted.
+
+    tracemalloc materially slows allocation-heavy code, so its result must never
+    be used as the throughput measurement. This probe exists only to detect
+    whether the streaming benchmark accidentally starts retaining the population.
+    """
+    if count <= 0:
+        raise ValueError("memory probe count must be positive")
+    authority_book = authority_book or build_authority_book()
+    digest = hashlib.sha256()
+    gc.collect()
+    tracemalloc.start()
+    start = time.perf_counter()
+    for index in range(count):
+        result = rate_record(make_record(index), authority_book)
+        digest.update(result.rating_hash.encode("ascii"))
+        digest.update(b"\n")
+    elapsed = max(time.perf_counter() - start, 1e-12)
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return MemoryProbe(
+        record_count=count,
+        elapsed_seconds=elapsed,
         python_peak_heap_mb=peak / (1024 * 1024),
         process_max_rss_mb=_max_rss_mb(),
         result_digest=digest.hexdigest(),
@@ -497,6 +536,7 @@ def build_report(
     large_trials: int = 1,
     replay_max_count: int = 100_000,
     failure_count: int = 10_000,
+    memory_probe_count: int = 10_000,
 ) -> BenchmarkReport:
     book = build_authority_book()
     trials: list[ScaleTrial] = []
@@ -516,6 +556,7 @@ def build_report(
         )
 
     failure = run_failure_injection(failure_count)
+    memory_probe = run_memory_probe(memory_probe_count, authority_book=book)
     generated = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     boundary = (
         "Synthetic CPU benchmark, not production SLA or customer workload evidence.",
@@ -532,6 +573,7 @@ def build_report(
         "mode_count": len(MODES),
         "trials": [asdict(item) for item in trials],
         "failure_injection": asdict(failure),
+        "memory_probe": asdict(memory_probe),
         "claims_boundary": list(boundary),
     }
     return BenchmarkReport(
@@ -543,6 +585,7 @@ def build_report(
         mode_count=len(MODES),
         trials=tuple(trials),
         failure_injection=failure,
+        memory_probe=memory_probe,
         claims_boundary=boundary,
         report_hash=canonical_hash(body),
     )
@@ -570,6 +613,10 @@ def validate_report(report: BenchmarkReport) -> None:
         != report.failure_injection.expected_review_count
     ):
         raise ValueError("failure-injection review count mismatch")
+    if report.memory_probe.record_count <= 0:
+        raise ValueError("memory probe count must be positive")
+    if report.memory_probe.python_peak_heap_mb <= 0:
+        raise ValueError("memory probe did not capture Python allocations")
 
 
 def report_dict(report: BenchmarkReport) -> dict:
@@ -601,6 +648,7 @@ def _summary(report: BenchmarkReport) -> dict:
         "report_hash": report.report_hash,
         "tiers": tiers,
         "failure_injection": asdict(report.failure_injection),
+        "memory_probe": asdict(report.memory_probe),
         "claims_boundary": list(report.claims_boundary),
     }
 
@@ -613,6 +661,7 @@ def main() -> None:
     parser.add_argument("--large-trials", type=int, default=1)
     parser.add_argument("--replay-max-count", type=int, default=100_000)
     parser.add_argument("--failure-count", type=int, default=10_000)
+    parser.add_argument("--memory-probe-count", type=int, default=10_000)
     parser.add_argument("--output")
     parser.add_argument("--summary", action="store_true")
     args = parser.parse_args()
@@ -624,6 +673,7 @@ def main() -> None:
         large_trials=args.large_trials,
         replay_max_count=args.replay_max_count,
         failure_count=args.failure_count,
+        memory_probe_count=args.memory_probe_count,
     )
     validate_report(report)
     payload = report_dict(report)

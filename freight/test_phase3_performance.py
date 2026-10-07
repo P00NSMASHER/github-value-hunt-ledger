@@ -48,8 +48,11 @@ def test_report_validation_accepts_replayed_small_tiers():
         large_trials=1,
         replay_max_count=120,
         failure_count=60,
+        memory_probe_count=60,
     )
     validate_report(report)
     assert report.mode_count == 6
     assert len(report.trials) == 2
+    assert report.memory_probe.record_count == 60
+    assert report.memory_probe.python_peak_heap_mb > 0
     assert report.report_hash
