@@ -18,6 +18,9 @@ provider or bank to run a controlled pilot.
 
 2. **Ingress boundary**
    - API / SFTP / governed upload / explicit X12 profile;
+   - production private PDF/PNG/JPEG/WebP evidence upload with server-created immutable upload intent;
+   - stored-byte SHA-256 verification before extraction;
+   - append-only source document retention and tenant-scoped deduplication;
    - SHA-256 ingress receipt;
    - file/input guard where applicable;
    - transport metadata never grants commercial authority.
@@ -78,7 +81,7 @@ These values are never collapsed into a single fictional "savings" number.
 - URL: https://freight-recoveryos.floot.app;
 - host/runtime: Floot;
 - persistent data plane: Floot-managed PostgreSQL;
-- authentication: application password sessions;
+- authentication: application password sessions plus Google and Microsoft federated sign-in;
 - natural-language analytics: Floot AI typed routing;
 - source/release engineering: GitHub.
 
@@ -91,9 +94,12 @@ and PostgreSQL rejected the cross-tenant reference.
 ## Trust boundaries
 
 ### AI
-AI may route an analytics question or assist a reviewer. It does not silently
-select commercial authority, certify recovered dollars, authorize carrier
-actions, or move money.
+AI may route an analytics question, assist a reviewer, or extract observable
+facts from a privately retained PDF/image. Document extraction is staged as a
+separate immutable claim with confidence and page/region locators, then routed
+through deterministic checks and human review. AI does not silently select
+commercial authority, certify recovered dollars, authorize carrier actions, or
+move money.
 
 ### Payment providers
 External providers may execute payment/credit movement. RecoveryOS records and
@@ -109,8 +115,8 @@ proof sources in a real pilot.
 
 ## Current architectural gaps
 
-- MFA and enterprise SSO;
-- production OCR/document extraction;
+- MFA, buyer-controlled enterprise SSO, and SCIM lifecycle management;
+- real-customer calibration/accuracy evidence for the production document-extraction path;
 - named ERP/TMS/accounting connectors;
 - direct payment-rail integration;
 - independent security assurance;

@@ -24,18 +24,23 @@ RecoveryOS has strong internal/reproducible evidence for:
 - one-million-record compute replay;
 - 100K audited database bulk-write evidence;
 - frozen synthetic accuracy benchmark;
-- tenant isolation and tamper-evident audit controls.
+- tenant isolation and tamper-evident audit controls;
+- private PDF/image evidence intake with server-bound upload intents and stored-byte SHA-256 verification;
+- append-only source document, AI extraction, and human-review layers;
+- source-locator extraction with deterministic confidence/reconciliation gates;
+- retryable extraction without requiring the customer to re-upload retained source evidence;
+- Google and Microsoft federated sign-in in addition to password sessions.
 
 ## Still not proven
 
-- real-customer false-positive/false-negative rates;
+- real-customer false-positive/false-negative rates, including document-extraction calibration;
 - real realized recovery;
 - willingness to pay;
 - referenceable customer outcomes;
 - SOC 2 Type II / ISO 27001;
 - independent penetration test;
 - provider encryption/backup attestation;
-- MFA / enterprise SSO;
+- MFA, buyer-controlled SAML/OIDC enterprise SSO, and SCIM lifecycle management;
 - named production ERP/TMS connectors;
 - concurrent multi-tenant production SLA;
 - direct banking/payment rails;
