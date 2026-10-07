@@ -147,7 +147,8 @@ def validate_simulation(payload: dict) -> list[str]:
         errors.append("aggregate blocked mismatch")
     if int(expected.get("buyers_with_at_least_one_pilot_approver") or -1) != buyers_with_approver:
         errors.append("aggregate buyers_with_at_least_one_pilot_approver mismatch")
-    if int(expected.get("enterprise_wide_ready_buyers") or -1) != enterprise_ready:
+    enterprise_expected = expected.get("enterprise_wide_ready_buyers")
+    if enterprise_expected is None or int(enterprise_expected) != enterprise_ready:
         errors.append("aggregate enterprise_wide_ready_buyers mismatch")
 
     ordered_blockers = [
