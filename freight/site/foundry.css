@@ -1,0 +1,211 @@
+/* Freight Recovery Foundry Typography System
+   Purpose: make the public website match the premium buyer-kit typography.
+   This file loads after site.css and overrides only presentation rules.
+*/
+
+:root{
+  --fr-ink:#071923;
+  --fr-ink-2:#102530;
+  --fr-mid:#31505c;
+  --fr-muted:#667580;
+  --fr-paper:#f4eddf;
+  --fr-paper-2:#e7dac6;
+  --fr-cream:#fff8ec;
+  --fr-night:#1f0f0d;
+  --fr-wine:#3a1714;
+  --fr-burn:#ff6633;
+  --fr-gold:#d7a451;
+  --fr-mint:#36ddc0;
+  --fr-line:rgba(7,25,35,.18);
+  --fr-display:"Didot","Bodoni 72","Bodoni MT","Instrument",Georgia,serif;
+  --fr-sans:"Hanken","Helvetica Neue","Nimbus Sans",Arial,sans-serif;
+  --fr-narrow:"Arial Narrow","Nimbus Sans Narrow","Hanken","Helvetica Neue",Arial,sans-serif;
+  --fr-mono:"SFMono-Regular","Roboto Mono","IBM Plex Mono","Courier New",monospace;
+}
+
+html{font-size:16px}
+body{
+  background:var(--fr-paper);
+  color:var(--fr-ink);
+  font-family:var(--fr-sans);
+  font-feature-settings:"kern" 1,"liga" 1,"tnum" 1;
+  text-rendering:geometricPrecision;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(255,102,51,.08),transparent 26rem),
+    radial-gradient(circle at 84% 18%,rgba(54,221,192,.08),transparent 30rem),
+    linear-gradient(180deg,rgba(255,248,236,.9),rgba(244,237,223,.98));
+}
+
+h1,h2,h3,.display,.display-title,.hero h1,.document-hero h1{
+  color:var(--fr-ink);
+  text-wrap:balance;
+}
+
+h1,.hero h1,.document-hero h1,.page-title{
+  font-family:var(--fr-display);
+  font-weight:700;
+  letter-spacing:-.066em;
+  line-height:.86;
+  max-width:11.2ch;
+}
+
+h2,.section-heading h2,.document-page h2{
+  font-family:var(--fr-display);
+  font-weight:700;
+  letter-spacing:-.058em;
+  line-height:.9;
+  max-width:14ch;
+}
+
+h3,.document-page h3,.card h3,.model-grid strong,.journey strong{
+  font-family:var(--fr-sans);
+  font-weight:780;
+  letter-spacing:-.046em;
+  line-height:1.02;
+}
+
+h1 em,h2 em,.hero h1 em,.document-hero h1 em{
+  font-family:var(--fr-display);
+  color:var(--fr-burn)!important;
+  font-style:italic;
+  font-weight:400;
+  letter-spacing:-.06em;
+}
+
+p,.lead,.document-page p,.section-heading>p{
+  font-family:var(--fr-sans);
+  letter-spacing:-.012em;
+}
+
+.lead,.hero .lead{
+  max-width:38rem;
+  font-size:clamp(1.06rem,1.45vw,1.36rem);
+  line-height:1.46;
+  color:rgba(255,248,236,.88);
+}
+
+.eyebrow,.kicker,.doc-index,.statusbar,.navlinks>a:not(.button),.button,.text-link,.metric-label,.table-label,th,.opportunity-topline,.sample-chip{
+  font-family:var(--fr-narrow);
+  font-stretch:condensed;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:760;
+}
+
+.site-header{
+  background:rgba(31,15,13,.95);
+  border-bottom:1px solid rgba(255,102,51,.22);
+}
+.statusbar{background:var(--fr-wine);color:#ffd7c8}
+.statusbar strong{color:#fff8ec}
+.brand-mark{background:var(--fr-burn);box-shadow:none}
+.brand-mark i{background:var(--fr-mint)}
+.brand-name{font-weight:760;letter-spacing:-.055em}
+.brand-name em{font-family:var(--fr-display);font-style:italic;color:var(--fr-burn)}
+.navlinks>a:not(.button){color:#ffc9b8;font-size:.76rem;letter-spacing:.11em}
+.navlinks>a:not(.button):hover{color:var(--fr-mint)}
+
+.hero,.section-ink{
+  background:linear-gradient(135deg,#21100e 0%,#351512 56%,#1a0c0a 100%);
+}
+.hero-wash{
+  background:
+    linear-gradient(90deg,rgba(24,10,8,.98) 0%,rgba(42,17,14,.86) 42%,rgba(7,25,35,.35) 70%,rgba(7,25,35,.12)),
+    linear-gradient(0deg,rgba(20,8,7,.56),transparent 55%);
+}
+.hero h1{color:#fff3e7;font-size:clamp(4.1rem,7.7vw,8.7rem)}
+.hero h1 em{color:var(--fr-burn)!important}
+.hero-proof li::before{background:var(--fr-mint)}
+.hero-note{color:rgba(255,248,236,.62)}
+
+.button{
+  border-radius:999px;
+  letter-spacing:.05em;
+  text-transform:none;
+  font-family:var(--fr-sans);
+  font-weight:760;
+}
+.button-signal,.button-cobalt{
+  background:var(--fr-burn);
+  color:#fff8ec;
+  box-shadow:0 16px 36px rgba(255,102,51,.22);
+}
+.button-signal:hover,.button-cobalt:hover{background:#ff7a4f;box-shadow:0 18px 44px rgba(255,102,51,.28)}
+.button-light,.button-quiet{background:#fff8ec;border-color:rgba(7,25,35,.12);color:var(--fr-ink)}
+.button-ghost{border-color:rgba(255,102,51,.45);color:#fff3e7;background:rgba(255,102,51,.07)}
+.text-link{color:var(--fr-burn);letter-spacing:.02em;text-transform:none;font-family:var(--fr-sans)}
+
+.opportunity-card,.card,.proof-card,.quote-card,.contact-panel,.audit-form,.document-card{
+  border-radius:0;
+  border:1px solid rgba(7,25,35,.14);
+  box-shadow:18px 24px 0 rgba(7,25,35,.06),0 22px 70px rgba(7,25,35,.12);
+}
+.opportunity-range strong,.metric-value,.stat strong,.big-number{
+  font-family:var(--fr-display);
+  font-weight:700;
+  letter-spacing:-.055em;
+  color:var(--fr-burn);
+}
+.opportunity-range small,.model-grid span,.journey small,.boundary-head span{
+  font-family:var(--fr-narrow);
+  letter-spacing:.14em;
+}
+
+.model-strip,.section-paper{background:var(--fr-paper)}
+.model-grid>div{border-color:rgba(7,25,35,.14)}
+.model-grid span{color:var(--fr-burn)}
+.model-grid strong{font-size:1.18rem}
+.model-grid p,.journey p{color:var(--fr-mid)}
+
+.section-cobalt{background:#071923;color:#fff3e7}
+.section-cobalt h2,.section-ink h2,.boundary-copy h2{color:#fff3e7}
+.section-cobalt h2 em,.section-ink h2 em,.boundary-copy h2 em{color:var(--fr-burn)!important}
+.boundary-note{border-left-color:var(--fr-burn);background:rgba(255,102,51,.08)}
+.boundary-head span{color:var(--fr-mint)!important}
+
+input,select,textarea{
+  border-radius:0!important;
+  border-color:rgba(7,25,35,.2)!important;
+  background:#fff8ec!important;
+  font-family:var(--fr-sans)!important;
+}
+label,.field-label{font-family:var(--fr-narrow);letter-spacing:.1em;text-transform:uppercase;font-weight:760}
+
+table,.comparison-table,.document-page table{font-variant-numeric:tabular-nums lining-nums}
+th{font-size:.72rem;color:var(--fr-gold);background:var(--fr-ink)!important}
+td{font-family:var(--fr-sans);letter-spacing:-.01em}
+
+.document-page{
+  background:var(--fr-paper);
+  color:var(--fr-ink);
+}
+.document-hero,.doc-hero{
+  background:linear-gradient(135deg,#21100e,#351512 58%,#071923);
+  color:#fff3e7;
+}
+.document-hero h1,.doc-hero h1{color:#fff3e7}
+.document-page .wrap{max-width:1120px}
+.document-page article,.document-body{
+  font-size:1.02rem;
+  line-height:1.54;
+}
+.document-page strong{font-weight:760}
+.doc-index{color:var(--fr-burn)}
+
+.footer,.site-footer{background:#1f0f0d;color:#ffe7dd;border-top:1px solid rgba(255,102,51,.2)}
+.footer a,.site-footer a{color:#fff3e7}
+
+@media (max-width:860px){
+  h1,.hero h1,.document-hero h1{font-size:clamp(3.4rem,17vw,5.8rem);letter-spacing:-.062em}
+  h2,.section-heading h2{font-size:clamp(2.7rem,12vw,4.6rem)}
+  .navlinks{background:#1f0f0d;border-color:rgba(255,102,51,.24)}
+  .lead,.hero .lead{font-size:1.02rem;line-height:1.48}
+}
