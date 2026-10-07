@@ -1,6 +1,6 @@
 # RecoveryOS — Enterprise Pilot Implementation Runbook
 
-Version: 1.0  
+Version: 2.0  
 Prepared: 2026-10-07
 
 ## Goal
@@ -55,29 +55,55 @@ Use the least complex path the buyer can support:
 
 Do not promise a named ERP/TMS connector that has not been built.
 
-## Phase D — freeze
+## Phase D — pre-register, sample and freeze
+
+Use `freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md`.
 
 1. Build source/data-room manifest.
-2. Freeze exact population.
-3. Seal incumbent output hash against buyer/BU/population.
-4. Freeze buyer-owned truth before opening incumbent output.
-5. Verify package ordering/hash chain.
+2. Freeze exact full population and SHA-256.
+3. Pre-register census or stratified-random sampling.
+4. For stratified sampling, freeze the random seed before RecoveryOS output.
+5. Freeze stratum population counts and sample targets.
+6. Assign distinct truth owner, reviewer A, reviewer B and RecoveryOS operator.
+7. Freeze selected case IDs and sample hash before RecoveryOS output exists.
+8. Run and freeze RecoveryOS output without access to truth.
+9. Freeze incumbent output independently.
+10. Independently adjudicate and freeze truth without access to RecoveryOS.
+11. Freeze the truth-manifest hash.
+12. Jointly unseal only after both RecoveryOS and truth artifacts are sealed.
+13. Verify sample/truth/RecoveryOS/incumbent hashes and timing contract.
 
-Any material change creates a new version. No quiet row substitution.
+Any material change creates a new version. No quiet row substitution. A blindness
+or hash-ordering violation makes the study INVALID_METHOD.
 
-## Phase E — audit/review
+## Phase E — audit/review and acceptance scoring
 
 1. Rate against controlling authority.
-2. Route missing/ambiguous cases to review.
-3. Compare against frozen incumbent source.
-4. Review challenger-only findings.
-5. Report:
+2. Route missing/ambiguous/incomplete cases to REVIEW.
+3. Never auto-decide unresolved truth, unresolved authority or incomplete source evidence.
+4. Compare against frozen incumbent source.
+5. Dual-review at least the greater of 50 cases or 20% of adjudicated cases.
+6. Document adjudication of every reviewer disagreement.
+7. Execute `freight/audit_acceptance.py` against the frozen pilot package.
+8. Report:
    - reviewed discrepancy;
    - validated finding;
    - challenger-only validated;
-   - unresolved;
-   - false-positive dollars;
+   - unresolved truth;
+   - auto coverage and review rate;
+   - precision with 95% interval;
+   - false-positive and false-negative rates with 95% intervals;
+   - false-positive and false-negative dollars/shares;
+   - mean absolute dollar error and net dollar bias;
+   - confidence calibration;
+   - reviewer agreement / Cohen's kappa;
+   - incumbent-known leakage;
+   - duplicate economic-issue leakage;
+   - stratum-level errors;
    - reviewer touches/time.
+
+Do not describe audit quality as proven unless the machine status is
+AUDIT_QUALITY_PROVEN.
 
 ## Phase F — action
 
