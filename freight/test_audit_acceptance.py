@@ -168,7 +168,7 @@ def test_false_positive_dollars_can_fail_even_when_case_accuracy_looks_high():
     target["predicted_net_new_cents"] = 100000
     _refresh_hashes(pilot)
     report = build_report(pilot, _policy())
-    assert report["status"] == "INSUFFICIENT_OR_FAILED"
+    assert report["status"] == "QUALITY_GATE_FAILED"
     assert "false_positive_dollars" in report["failed_gates"]
 
 
@@ -181,7 +181,7 @@ def test_large_false_negative_dollar_miss_fails_dollar_gate():
     target["predicted_net_new_cents"] = 0
     _refresh_hashes(pilot)
     report = build_report(pilot, _policy())
-    assert report["status"] == "INSUFFICIENT_OR_FAILED"
+    assert report["status"] == "QUALITY_GATE_FAILED"
     assert "false_negative_dollars" in report["failed_gates"]
 
 
@@ -234,8 +234,23 @@ def test_underpowered_sample_is_not_quality_proven():
         case["stratum_key"] = "LTL|A|MID"
     _refresh_hashes(pilot)
     report = build_report(pilot, _policy())
-    assert report["status"] == "INSUFFICIENT_OR_FAILED"
+    assert report["status"] == "INSUFFICIENT_EVIDENCE"
     assert "sample_adjudicated" in report["failed_gates"]
+
+
+def test_large_population_requires_precision_planned_sample_size():
+    pilot = _pilot()
+    pilot["population"]["population_size"] = 10000
+    pilot["sampling"]["method"] = "STRATIFIED_RANDOM"
+    pilot["sampling"]["seed"] = "frozen-seed-2026-10-07"
+    pilot["sampling"]["strata"][0]["population_count"] = 5000
+    pilot["sampling"]["strata"][1]["population_count"] = 5000
+    pilot["sampling"]["strata"][0]["sample_target"] = 120
+    pilot["sampling"]["strata"][1]["sample_target"] = 120
+    report = build_report(pilot, _policy())
+    assert report["metrics"]["sample"]["required_sample_size_95"] == 370
+    assert report["status"] == "INSUFFICIENT_EVIDENCE"
+    assert "sample_precision_plan" in report["failed_gates"]
 
 
 def test_reviewer_disagreement_requires_documented_adjudication():
@@ -254,7 +269,7 @@ def test_dual_review_must_cover_both_truth_classes():
         pilot["cases"][index]["reviewer_a_label"] = "POSITIVE"
         pilot["cases"][index]["reviewer_b_label"] = "POSITIVE"
     report = build_report(pilot, _policy())
-    assert report["status"] == "INSUFFICIENT_OR_FAILED"
+    assert report["status"] == "QUALITY_GATE_FAILED"
     assert "dual_review_negative" in report["failed_gates"]
 
 
