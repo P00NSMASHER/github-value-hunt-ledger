@@ -2,14 +2,25 @@
 
 ## 1. Executive result
 
-**Population:** [buyer / BU / date range / modes / carriers]  
-**Population hash:** [SHA-256]  
-**Sample hash:** [SHA-256]  
-**Truth manifest hash:** [SHA-256]  
-**RecoveryOS output hash:** [SHA-256]  
-**Incumbent output hash:** [SHA-256]  
-**Acceptance policy:** recoveryos-blind-audit-acceptance-v2  
-**Method status:** [INVALID_METHOD / INSUFFICIENT_EVIDENCE / QUALITY_GATE_FAILED / AUDIT_QUALITY_PROVEN]
+**Population:** [buyer / BU / date range / modes / carriers]
+
+**Prepared for:** [named business owner / title]
+
+**Prepared by:** [reviewer / contact]
+
+**Report date:** [date]
+
+**Recommended next step:** [no further action / request records / authorize defined recovery scope]
+
+**Summary:** [Two sentences explaining what was reviewed, what is supported, and what remains unresolved.]
+
+### Decision at a glance
+
+- Records reviewed: [count and review period].
+- Findings supported by evidence: [count and value; not recovered funds].
+- Funds actually received or credited: [amount, settlement date, and source].
+- Your next action: [specific decision or requested records, owner, and agreed target date].
+
 
 ### Financial totals
 
@@ -167,3 +178,22 @@ Choose one:
 - annual continuous assurance proposal.
 
 Annual assurance should be proposed only after the buyer accepts the integrity and economics of the pilot.
+
+## Appendix — traceability and method status
+
+**Population hash:** [SHA-256]
+
+**Sample hash:** [SHA-256]
+
+**Truth manifest hash:** [SHA-256]
+
+**RecoveryOS output hash:** [SHA-256]
+
+**Incumbent output hash:** [SHA-256]
+
+**Acceptance policy:** recoveryos-blind-audit-acceptance-v2
+
+**Method status:** [INVALID_METHOD / INSUFFICIENT_EVIDENCE / QUALITY_GATE_FAILED / AUDIT_QUALITY_PROVEN]
+
+
+Explain the method status in plain language beside its code. Keep the hashes and acceptance policy available for independent verification. Do not present an incomplete or failed method as proven audit quality.

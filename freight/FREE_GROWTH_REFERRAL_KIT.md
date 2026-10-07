@@ -21,11 +21,11 @@ Subject: Free freight audit resource for your clients
 
 Hi [Name],
 
-I run Freight Recovery, a $0-upfront service that reviews a bounded historical freight population for supportable duplicate charges, rate/accessorial discrepancies, and unsupported billing.
+I run Freight Recovery. We review past freight invoices for duplicate charges, rate differences, unsupported accessorials, and missed credits. The initial audit has no upfront fee.
 
 I’m reaching out because your clients may occasionally have material freight spend but no dedicated freight-audit function.
 
-If you have a client where this is relevant, I’m happy to run an initial fit review and explain the process. No freight records should be sent by ordinary email; if there is a fit, scope and a secure intake route are confirmed first.
+If a client could benefit, I can start with a brief fit conversation. We agree the scope and a secure transfer route before requesting records. Please do not send freight records by ordinary email.
 
 Freight Recovery:
 https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=referral&utm_medium=partner&utm_campaign=advisor_referrals

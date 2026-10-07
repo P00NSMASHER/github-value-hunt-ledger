@@ -1,6 +1,6 @@
 # Freight Recovery Three-Touch Outbound Sequence
 
-Version: 1.1
+Version: 1.2
 Effective: 2026-10-07
 
 ## Rules
@@ -30,9 +30,9 @@ Hi {{first_name_or_company_team}},
 
 {{personalization_sentence}}
 
-I run Freight Recovery. We perform $0-upfront historical freight audits for supportable duplicate charges, rate discrepancies, unsupported accessorials, missed credits, and related billing issues.
+I run Freight Recovery. We review past freight invoices for duplicate charges, rate differences, unsupported accessorials, and missed credits. The initial audit has no upfront fee.
 
-Every validated finding is tied back to its invoice/shipment evidence and controlling commercial authority. If you authorize recovery work, our fee is based only on eligible funds actually recovered.
+Each reviewed finding includes the invoice, shipment records, and applicable rate terms. If you choose to authorize recovery work, our fee applies only to eligible funds actually recovered.
 
 Would you be the right person for freight/AP review, or could you point me to whoever owns it?
 
@@ -50,9 +50,9 @@ Hi {{first_name_or_company_team}},
 
 {{personalization_sentence}}
 
-If {{company}} already audits freight through a TMS, payment provider, or internal process, that is actually the use case I wanted to ask about.
+Does {{company}} already review freight invoices through a TMS, payment provider, or internal team?
 
-Freight Recovery runs a $0-upfront independent second look against a frozen historical population. Existing findings, automatic credits, and incumbent-known claims are excluded before we measure any net-new opportunity.
+Freight Recovery offers an independent second look at an agreed set of historical invoices, with no upfront audit fee. We account for existing findings, automatic credits, and claims already known to your provider before identifying any additional opportunity.
 
 Would you be the right person for that review, or could you point me to whoever owns freight/AP?
 
@@ -70,13 +70,13 @@ Subject: Re: {{original_subject}}
 
 Hi {{first_name_or_company_team}},
 
-Rather than send a generic "checking in" note, here's the standard we use to keep audit numbers honest:
+Here is a short guide to the evidence behind a freight billing review:
 
 {{methodology_url}}
 
 The short version: candidate differences, validated findings, approved claims, and actual recovered funds stay separate, and existing/automatic credits are not counted as ours.
 
-If a bounded historical review would be useful for {{company}}, I can start with a $0-upfront audit. If this belongs with someone else, a pointer is enough.
+Would an independent review of past freight invoices be useful for {{company}}? If another team owns this, I would appreciate a pointer.
 
 Thanks,
 Jamison
