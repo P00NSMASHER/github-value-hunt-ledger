@@ -262,6 +262,11 @@ These thresholds are deliberately looser than the observed benchmark. Shared
 GitHub runners are noisy. The gate is intended to catch large regressions, not
 fail a release because another tenant on an Azure host sneezed.
 
+Pull requests execute 10K and 100K tiers so ordinary review does not waste
+several minutes repeatedly processing the same million-record corpus. Pushes to
+`main` and manual runs execute the full 10K/100K/1M suite. The committed
+one-million baseline is backed by the actual full run above, not extrapolation.
+
 ## Step 2 verdict
 
 **The core rating engine scales linearly through one million synthetic records

@@ -87,15 +87,26 @@ def validate_database_evidence(evidence: dict) -> list[str]:
     return errors
 
 
-def validate_runtime_report(report: dict, baseline: dict) -> list[str]:
+def validate_runtime_report(report: dict, baseline: dict, required_tiers: set[int] | None = None) -> list[str]:
     errors: list[str] = []
     trials = report.get("trials") or []
     grouped: dict[int, list[dict]] = {}
     for trial in trials:
         grouped.setdefault(int(trial.get("count") or 0), []).append(trial)
 
+    required_tiers = required_tiers or {
+        int(row["count"]) for row in baseline["cpu_rating_benchmark"]["tiers"]
+    }
+    known_tiers = {
+        int(row["count"]) for row in baseline["cpu_rating_benchmark"]["tiers"]
+    }
+    unknown = required_tiers - known_tiers
+    if unknown:
+        errors.append("requested runtime tier is not present in baseline: " + ",".join(map(str, sorted(unknown))))
     for tier in baseline["cpu_rating_benchmark"]["tiers"]:
         count = int(tier["count"])
+        if count not in required_tiers:
+            continue
         actual = grouped.get(count) or []
         if not actual:
             errors.append(f"runtime report missing executed tier {count}")
@@ -147,13 +158,15 @@ def main() -> None:
     parser.add_argument("--baseline", default="freight/PHASE3_PERFORMANCE_BASELINE.json")
     parser.add_argument("--database-evidence", default="freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json")
     parser.add_argument("--report")
+    parser.add_argument("--required-tiers", nargs="+", type=int)
     args = parser.parse_args()
 
     baseline = _load(args.baseline)
     database = _load(args.database_evidence)
     errors = validate_baseline(baseline) + validate_database_evidence(database)
     if args.report:
-        errors += validate_runtime_report(_load(args.report), baseline)
+        required = set(args.required_tiers) if args.required_tiers else None
+        errors += validate_runtime_report(_load(args.report), baseline, required)
     result = {
         "state": "PASS" if not errors else "FAIL",
         "errors": errors,

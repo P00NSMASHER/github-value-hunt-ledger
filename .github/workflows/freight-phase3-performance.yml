@@ -51,16 +51,31 @@ jobs:
       - name: Performance harness correctness tests
         run: PYTHONPATH=. python -m pytest -q freight/test_phase3_performance.py
 
-      - name: Execute 10K / 100K / 1M synthetic scale tiers
+      - name: Execute synthetic scale benchmark
+        id: bench
         shell: bash
         run: |
           set -euo pipefail
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COUNTS="10000 100000"
+            SMALL_TRIALS=3
+            MEDIUM_TRIALS=1
+            REPLAY_MAX=100000
+            REQUIRED_TIERS="10000 100000"
+          else
+            COUNTS="10000 100000 1000000"
+            SMALL_TRIALS=5
+            MEDIUM_TRIALS=3
+            REPLAY_MAX=1000000
+            REQUIRED_TIERS="10000 100000 1000000"
+          fi
+
           PYTHONPATH=. python -m freight.performance_benchmark \
-            --counts 10000 100000 1000000 \
-            --small-trials 5 \
-            --medium-trials 3 \
+            --counts $COUNTS \
+            --small-trials $SMALL_TRIALS \
+            --medium-trials $MEDIUM_TRIALS \
             --large-trials 1 \
-            --replay-max-count 1000000 \
+            --replay-max-count $REPLAY_MAX \
             --failure-count 10000 \
             --interruption-count 10000 \
             --interruption-chunk-size 1000 \
@@ -68,6 +83,7 @@ jobs:
             --output /tmp/recoveryos-phase3-performance.json \
             --summary | tee /tmp/recoveryos-phase3-performance-summary.json
 
+          echo "required_tiers=$REQUIRED_TIERS" >> "$GITHUB_OUTPUT"
           echo '### RecoveryOS Phase 3 synthetic benchmark' >> "$GITHUB_STEP_SUMMARY"
           echo '~~~json' >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/recoveryos-phase3-performance-summary.json >> "$GITHUB_STEP_SUMMARY"
@@ -77,6 +93,7 @@ jobs:
         run: |
           PYTHONPATH=. python freight/performance_evidence.py \
             --report /tmp/recoveryos-phase3-performance.json \
+            --required-tiers ${{ steps.bench.outputs.required_tiers }} \
             --baseline freight/PHASE3_PERFORMANCE_BASELINE.json \
             --database-evidence freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json
 
