@@ -185,7 +185,7 @@ BEGIN
     event_id_value:=gen_random_uuid()::text;
     occurred:=clock_timestamp();
     digest_value:=encode(digest(concat_ws('|',
-      NEW.tenant_id,'recovery_api_keys:REVOKE',NEW.id,NEW.key_hash,
+      NEW.tenant_id,'recovery_api_keys',NEW.id,NEW.key_hash,
       COALESCE(previous_hash,''),'SYSTEM','',occurred::text,event_id_value
     ),'sha256'),'hex');
     INSERT INTO recovery_audit_events(

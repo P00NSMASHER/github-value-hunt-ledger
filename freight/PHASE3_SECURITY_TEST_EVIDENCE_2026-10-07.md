@@ -91,6 +91,21 @@ Applied and typechecked:
 - revoked keys cannot be modified back into service;
 - API-key creation/revocation participates in the tenant audit trail.
 
+## API-key revocation audit-chain probe
+
+A separate transaction-scoped probe created a synthetic tenant/API key, revoked
+the key through the database guard, and ran `recovery_verify_audit_chain`.
+
+Observed before rollback:
+
+- events: 2 (create + revoke);
+- invalid hashes: 0;
+- broken links: 0.
+
+Result: **PASS**.
+
+The fixture was rolled back.
+
 ## Payment database controls
 
 Previously implemented payment lifecycle controls remain in force:
