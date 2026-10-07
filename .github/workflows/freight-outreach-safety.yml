@@ -27,6 +27,7 @@ jobs:
           node-version: '22'
       - run: node freight/outreach_guard.test.mjs
       - run: node --check freight/outreach_preflight.mjs
+      - run: node freight/outreach_preflight.test.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
