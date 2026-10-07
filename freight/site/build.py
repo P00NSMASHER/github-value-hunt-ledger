@@ -90,6 +90,7 @@ TEXT_SOURCE_FILES = (
     "llms.txt",
     "_headers",
     "google738a4fc9a0997cd0.html",
+    "freight-audit-provider-scorecard.csv",
     "assets/fonts/ATTRIBUTION.json",
     "assets/fonts/LICENSE-HANKEN-GROTESK.txt",
     "assets/fonts/LICENSE-INSTRUMENT-SERIF.txt",
