@@ -70,6 +70,15 @@ it can truthfully observe. Operational events such as secure data submission,
 qualification, audit completion, engagement acceptance, and actual recovery are
 reserved for the systems that can verify those state changes.
 
+## Search discovery and identity
+
+The homepage includes structured Organization and Service JSON-LD stating that
+Freight Recovery is based in Pottsville and serves U.S. businesses. It does not
+claim a storefront, walk-in hours, map-pack eligibility, or completed platform
+listings. Only add `sameAs` links after verifying ownership and the live
+external company profile; never link a guessed slug or an unrelated business.
+See `freight/FREE_PROFILE_ASSET_PACK.md` for eligibility gates and ready copy.
+
 ## Required checks
 
 Run the site build tests, commercial-term tests, qualification tests, browser
