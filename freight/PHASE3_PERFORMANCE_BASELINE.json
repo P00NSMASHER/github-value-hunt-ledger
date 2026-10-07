@@ -4,10 +4,11 @@
   "source": {
     "repository": "P00NSMASHER/github-value-hunt-ledger",
     "commit": "a68b060550e3f44891bc7603296c141d4d8523e4",
-    "workflow_run_id": 37572870777,
-    "job_id": 112635201539,
+    "workflow_run_id": 37572874306,
+    "job_id": 112635211557,
     "runner": "GitHub-hosted Ubuntu 24.04",
-    "python": "3.11.16"
+    "python": "3.11.17",
+    "selection_reason": "Conservative canonical baseline chosen from the slower of two successful same-commit hosted-runner executions; the faster run is retained as variability evidence, not the regression anchor."
   },
   "cpu_rating_benchmark": {
     "executed_max_records": 1000000,
@@ -17,43 +18,50 @@
         "count": 10000,
         "trials": 5,
         "full_replay_trials": 5,
-        "throughput_median_rps": 8437.958591447268,
-        "throughput_min_rps": 8130.006742702396,
-        "throughput_max_rps": 8573.901997623396,
-        "p99_median_ms": 0.1433549999987349,
-        "max_rss_mb": 21.8046875,
-        "regression_floor_rps": 6000,
-        "regression_p99_ceiling_ms": 0.5,
+        "throughput_median_rps": 4069.043997538433,
+        "throughput_min_rps": 4028.952703595219,
+        "throughput_max_rps": 4075.3488842603915,
+        "p99_median_ms": 0.31311899999764137,
+        "max_rss_mb": 21.76171875,
+        "regression_floor_rps": 3000,
+        "regression_p99_ceiling_ms": 0.75,
         "regression_rss_ceiling_mb": 128
       },
       {
         "count": 100000,
         "trials": 3,
         "full_replay_trials": 3,
-        "throughput_median_rps": 8611.585560413372,
-        "throughput_min_rps": 8511.051707541052,
-        "throughput_max_rps": 8728.995920452344,
-        "p99_median_ms": 0.1432850000000485,
-        "max_rss_mb": 21.8046875,
-        "regression_floor_rps": 6000,
-        "regression_p99_ceiling_ms": 0.5,
+        "throughput_median_rps": 4128.7286328738255,
+        "throughput_min_rps": 4077.970810875474,
+        "throughput_max_rps": 4136.764404726512,
+        "p99_median_ms": 0.3104229999735253,
+        "max_rss_mb": 21.88671875,
+        "regression_floor_rps": 3000,
+        "regression_p99_ceiling_ms": 0.75,
         "regression_rss_ceiling_mb": 128
       },
       {
         "count": 1000000,
         "trials": 1,
         "full_replay_trials": 1,
-        "throughput_median_rps": 8628.156959067623,
-        "throughput_min_rps": 8628.156959067623,
-        "throughput_max_rps": 8628.156959067623,
-        "p99_median_ms": 0.14510900001596383,
-        "max_rss_mb": 21.8046875,
-        "regression_floor_rps": 6000,
-        "regression_p99_ceiling_ms": 0.5,
+        "throughput_median_rps": 4152.91798689354,
+        "throughput_min_rps": 4152.91798689354,
+        "throughput_max_rps": 4152.91798689354,
+        "p99_median_ms": 0.3038010000864233,
+        "max_rss_mb": 21.88671875,
+        "regression_floor_rps": 3000,
+        "regression_p99_ceiling_ms": 0.75,
         "regression_rss_ceiling_mb": 128
       }
     ],
-    "report_hash": "9747e0ceafef65bba41d2755d8183c37adb2a824e0c0c147bfdde7d6a271ff03"
+    "report_hash": "ff7b4e0fe67573b0ba144f79ea308105f1b81dbb1094f8a1e1fb0d1f2cfa147e",
+    "host_variability": {
+      "faster_successful_run_id": 37572870777,
+      "faster_job_id": 112635201539,
+      "faster_1m_rps": 8628.156959067623,
+      "conservative_1m_rps": 4152.91798689354,
+      "conclusion": "Hosted-runner CPU performance varied by roughly 2x across successful runs of the same workload. Regression thresholds therefore use the slower successful run and must not be marketed as hardware-neutral capacity."
+    }
   },
   "reliability": {
     "missing_authority_failure_injection": {
@@ -73,8 +81,8 @@
     },
     "memory_probe": {
       "records": 10000,
-      "python_peak_heap_mb": 0.9098730087280273,
-      "process_max_rss_mb": 22.8046875,
+      "python_peak_heap_mb": 0.9065542221069336,
+      "process_max_rss_mb": 22.88671875,
       "regression_python_heap_ceiling_mb": 16,
       "regression_rss_ceiling_mb": 128
     }
@@ -83,20 +91,21 @@
     {
       "records": 10000000,
       "evidence_type": "PROJECTION_NOT_EXECUTED",
-      "projected_minutes_at_1m_measured_rate": 19.316601153333334,
-      "conservative_minutes_at_slowest_observed_rate": 20.50018799999999
+      "projected_minutes_at_1m_measured_rate": 40.132424283999995,
+      "conservative_minutes_at_slowest_observed_rate": 41.367243283333245
     },
     {
       "records": 100000000,
       "evidence_type": "PROJECTION_NOT_EXECUTED",
-      "projected_hours_at_1m_measured_rate": 3.219433518888889,
-      "conservative_hours_at_slowest_observed_rate": 3.416697799999998
+      "projected_hours_at_1m_measured_rate": 6.688737380666666,
+      "conservative_hours_at_slowest_observed_rate": 6.894540547222209
     }
   ],
   "database_evidence_ref": "freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json",
   "claim_boundary": [
     "Regression thresholds are CI guardrails, not production SLA commitments.",
     "CPU benchmark is a single Python process and does not include network, PostgreSQL, document parsing, carrier APIs, AI, or human-review latency.",
+    "Two successful same-commit hosted-runner executions differed by roughly 2x in CPU throughput; hosted-runner speed is not a stable capacity contract.",
     "10M and 100M figures are projections only; those record counts were not executed.",
     "Production database evidence is synthetic, transaction-scoped, and rolled back.",
     "No concurrency or HTTP request-rate claim is supported by this baseline."

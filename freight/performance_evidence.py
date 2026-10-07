@@ -71,6 +71,13 @@ def validate_database_evidence(evidence: dict) -> list[str]:
     repeated = write.get("repeated_post_index_10000") or []
     if len(repeated) < 3:
         errors.append("database evidence requires >=3 repeated 10K write trials")
+    large = write.get("post_index_100000") or {}
+    if int(large.get("rows") or 0) != 100_000:
+        errors.append("database evidence requires executed 100K write trial")
+    if int(large.get("invalid_hashes") or 0) != 0 or int(large.get("broken_links") or 0) != 0:
+        errors.append("database 100K write trial has invalid audit chain")
+    if float(large.get("records_per_second") or 0) <= 0:
+        errors.append("database 100K write trial missing throughput")
     for row in repeated:
         if int(row.get("invalid_hashes") or 0) != 0 or int(row.get("broken_links") or 0) != 0:
             errors.append("database trial has invalid audit chain")
@@ -87,26 +94,15 @@ def validate_database_evidence(evidence: dict) -> list[str]:
     return errors
 
 
-def validate_runtime_report(report: dict, baseline: dict, required_tiers: set[int] | None = None) -> list[str]:
+def validate_runtime_report(report: dict, baseline: dict) -> list[str]:
     errors: list[str] = []
     trials = report.get("trials") or []
     grouped: dict[int, list[dict]] = {}
     for trial in trials:
         grouped.setdefault(int(trial.get("count") or 0), []).append(trial)
 
-    required_tiers = required_tiers or {
-        int(row["count"]) for row in baseline["cpu_rating_benchmark"]["tiers"]
-    }
-    known_tiers = {
-        int(row["count"]) for row in baseline["cpu_rating_benchmark"]["tiers"]
-    }
-    unknown = required_tiers - known_tiers
-    if unknown:
-        errors.append("requested runtime tier is not present in baseline: " + ",".join(map(str, sorted(unknown))))
     for tier in baseline["cpu_rating_benchmark"]["tiers"]:
         count = int(tier["count"])
-        if count not in required_tiers:
-            continue
         actual = grouped.get(count) or []
         if not actual:
             errors.append(f"runtime report missing executed tier {count}")
@@ -158,15 +154,13 @@ def main() -> None:
     parser.add_argument("--baseline", default="freight/PHASE3_PERFORMANCE_BASELINE.json")
     parser.add_argument("--database-evidence", default="freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json")
     parser.add_argument("--report")
-    parser.add_argument("--required-tiers", nargs="+", type=int)
     args = parser.parse_args()
 
     baseline = _load(args.baseline)
     database = _load(args.database_evidence)
     errors = validate_baseline(baseline) + validate_database_evidence(database)
     if args.report:
-        required = set(args.required_tiers) if args.required_tiers else None
-        errors += validate_runtime_report(_load(args.report), baseline, required)
+        errors += validate_runtime_report(_load(args.report), baseline)
     result = {
         "state": "PASS" if not errors else "FAIL",
         "errors": errors,

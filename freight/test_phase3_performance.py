@@ -94,3 +94,6 @@ def test_committed_performance_evidence_is_conservative_and_valid():
         for row in baseline["projections_not_executed"]
     )
     assert "163.681 ms" in database["read_path"]["ten_thousand_findings_with_eleven_thousand_dispositions"]["critical_note"]
+    assert database["write_path"]["post_index_100000"]["rows"] == 100_000
+    assert database["write_path"]["post_index_100000"]["invalid_hashes"] == 0
+    assert baseline["cpu_rating_benchmark"]["tiers"][0]["regression_floor_rps"] == 3000

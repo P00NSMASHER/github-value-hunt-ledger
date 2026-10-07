@@ -68,7 +68,17 @@
       "min_records_per_second": 7569.6,
       "max_records_per_second": 7788.2,
       "median_audit_verify_ms": 27.81,
-      "audit_integrity_failures": 0
+      "audit_integrity_failures": 0,
+      "executed_max_rows": 100000
+    },
+    "post_index_100000": {
+      "rows": 100000,
+      "insert_ms": 14170.792,
+      "records_per_second": 7056.77,
+      "audit_verify_ms": 333.871,
+      "invalid_hashes": 0,
+      "broken_links": 0,
+      "transaction_rolled_back": true
     }
   },
   "read_path": {
@@ -115,8 +125,8 @@
     "Database write results are bulk-statement throughput, not HTTP/API requests per second.",
     "All performance fixtures were synthetic and rolled back; no customer data was used.",
     "Tests were single-tenant and did not prove concurrent multi-tenant throughput or lock contention behavior.",
-    "No 100K or 1M persisted database population benchmark has been executed.",
-    "The confirmed-list query is the clearest measured database performance concern and needs higher-scale testing before any enterprise-latency claim.",
+    "A 100K persisted-row transaction was executed and verified, but no 1M persisted database population benchmark has been executed.",
+    "The confirmed-list query is the clearest measured database performance concern and needs 100K/1M read-path testing before any enterprise-latency claim.",
     "Managed database warmup/cache/scheduling materially affected exploratory timings."
   ]
 }

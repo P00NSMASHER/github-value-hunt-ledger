@@ -27,29 +27,35 @@ Modes were evenly cycled across:
 Environment:
 
 - GitHub-hosted Ubuntu 24.04 runner;
-- Python 3.11.16;
+- Python 3.11.17;
 - one Python process;
 - no PostgreSQL/network/document-parser/carrier API in the timed path.
 
 Source run:
 
-- workflow run: **37572870777**;
-- job: **112635201539**;
+- canonical conservative workflow run: **37572874306**;
+- canonical job: **112635211557**;
+- a second successful same-commit run was materially faster, which is retained as evidence of hosted-runner variability rather than cherry-picked as the baseline;
 - source commit: `a68b060550e3f44891bc7603296c141d4d8523e4`;
 - report hash:
-  `9747e0ceafef65bba41d2755d8183c37adb2a824e0c0c147bfdde7d6a271ff03`.
+  `ff7b4e0fe67573b0ba144f79ea308105f1b81dbb1094f8a1e1fb0d1f2cfa147e`.
 
 ### Measured results
 
 | Tier | Trials | Median records/s | Slowest | Fastest | Median sampled p99 | Max RSS |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 10,000 | 5 | 8,437.96 | 8,130.01 | 8,573.90 | 0.1434 ms | 21.80 MB |
-| 100,000 | 3 | 8,611.59 | 8,511.05 | 8,729.00 | 0.1433 ms | 21.80 MB |
-| 1,000,000 | 1 | 8,628.16 | 8,628.16 | 8,628.16 | 0.1451 ms | 21.80 MB |
+| 10,000 | 5 | 4,069.04 | 4,028.95 | 4,075.35 | 0.3131 ms | 21.76 MB |
+| 100,000 | 3 | 4,128.73 | 4,077.97 | 4,136.76 | 0.3104 ms | 21.89 MB |
+| 1,000,000 | 1 | 4,152.92 | 4,152.92 | 4,152.92 | 0.3038 ms | 21.89 MB |
 
-The one-million-record primary pass completed in **115.90 seconds**. A complete
-one-million-record replay completed in **114.95 seconds** at **8,699.18
-records/s**.
+The one-million-record primary pass completed in **240.79 seconds**. A complete
+one-million-record replay completed in **240.93 seconds** at **4,150.65 records/s**.
+
+A separate successful same-commit hosted-runner execution produced roughly
+**8,628 records/s** at one million records. That nearly 2× spread is the most
+important performance warning in this section: hosted GitHub runners are not a
+capacity contract. Step 2 therefore anchors regression thresholds to the slower
+successful run rather than publishing the faster run as if hardware did not matter.
 
 Every measured scale trial had:
 
@@ -101,9 +107,9 @@ Timing and memory instrumentation were separated because Python
 The separate 10,000-record memory probe measured:
 
 - Python peak tracked allocations: **0.91 MB**;
-- process maximum RSS: **22.80 MB**.
+- process maximum RSS: **22.89 MB**.
 
-The timed 10K/100K/1M runs remained near **21.80 MB RSS**, consistent with the
+The timed 10K/100K/1M runs remained near **21.9 MB RSS**, consistent with the
 streaming benchmark not retaining the population.
 
 That does not prove the deployed API/database pipeline has the same memory
@@ -132,9 +138,14 @@ After warm-up, three repeated 10,000-row trials measured:
 | 2 | 1,321.074 ms | 7,569.60 | 30.525 ms |
 | 3 | 1,299.048 ms | 7,697.94 | 27.810 ms |
 
-Median bulk-write throughput: **7,697.94 rows/s**.
+Median 10K bulk-write throughput: **7,697.94 rows/s**.
 
-All three produced **0 invalid audit hashes and 0 broken links**.
+A larger **100,000-row** transaction then executed the same audited write path in
+**14,170.792 ms**, or **7,056.77 rows/s**. Full audit-chain verification took
+**333.871 ms** and returned **0 invalid hashes / 0 broken links**. The transaction
+was rolled back after verification.
+
+All measured post-index write trials produced **0 invalid audit hashes and 0 broken links**.
 
 Critical qualification: this is one bulk SQL statement, one tenant, and no HTTP
 round trip per row. Calling it "7,700 API requests per second" would be nonsense.
@@ -219,7 +230,7 @@ tests show nonlinear growth.
 Step 2 does **not** prove:
 
 - 10 million or 100 million records actually processed;
-- 100K/1M rows persisted in the production database;
+- 1M rows persisted in the production database (100K was executed successfully);
 - concurrent writers to the same tenant;
 - concurrent writers across many tenants;
 - end-to-end HTTP requests/second;
@@ -233,11 +244,11 @@ Step 2 does **not** prove:
 
 The CPU-only projection from the actual one-million run is about:
 
-- 10M records: **19.3 minutes** at the measured 1M rate;
-- 100M records: **3.22 hours** at the measured 1M rate.
+- 10M records: **40.1 minutes** at the conservative canonical 1M rate;
+- 100M records: **6.69 hours** at that rate.
 
-Using the slowest observed CPU tier gives roughly **20.5 minutes** and **3.42
-hours**.
+Using the slowest successful observed tier gives roughly **41.4 minutes** and
+**6.89 hours**.
 
 Those are explicitly **projections, not test results**.
 
@@ -250,34 +261,31 @@ CI requires:
 
 - executed 10K / 100K / 1M tiers;
 - full deterministic replay;
-- minimum throughput floor of 6,000 records/s per tier;
-- sampled p99 below 0.5 ms;
+- minimum throughput floor of 3,000 records/s per tier;
+- sampled p99 below 0.75 ms;
 - RSS below 128 MB;
 - exact missing-authority review routing;
 - deterministic interruption recovery;
 - no duplicate aggregate dollars after uncertain-chunk replay;
 - bounded memory probe.
 
-These thresholds are deliberately looser than the observed benchmark. Shared
-GitHub runners are noisy. The gate is intended to catch large regressions, not
+These thresholds are deliberately looser than the slower successful benchmark.
+Two same-commit runs differed by roughly 2×, which makes a 6,000 records/s floor
+actively dishonest as a portability gate. Shared GitHub runners are noisy. The gate is intended to catch large regressions, not
 fail a release because another tenant on an Azure host sneezed.
-
-Pull requests execute 10K and 100K tiers so ordinary review does not waste
-several minutes repeatedly processing the same million-record corpus. Pushes to
-`main` and manual runs execute the full 10K/100K/1M suite. The committed
-one-million baseline is backed by the actual full run above, not extrapolation.
 
 ## Step 2 verdict
 
 **The core rating engine scales linearly through one million synthetic records
 in the tested single-process workload, with deterministic replay and stable
-memory. The production database handles the tested 10K bulk/audit workload
-comfortably after indexing, and the exercise fixed real unbounded-query and
+memory. The production database also completed a 100K audited bulk-write test
+with a valid chain, and the exercise fixed real unbounded-query and
 dashboard-correctness defects.**
 
-But Freight Recovery still does **not** have credible evidence for million-row
-persisted customer workloads, concurrent tenant traffic, or a production HTTP
-SLA.
+But Freight Recovery still does **not** have credible evidence for a million-row
+persisted database workload, concurrent tenant traffic, sustained HTTP throughput,
+or a production SLA. The confirmed-list query is also visibly the weakest measured
+read path and should not be extrapolated beyond the tested 10K finding history.
 
 That is the critical line. Anything stronger would be marketing outrunning the
 evidence.
