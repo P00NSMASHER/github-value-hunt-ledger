@@ -168,6 +168,8 @@ def validate_policy(policy: dict) -> list[str]:
         "min_positive_cases": 1,
         "min_negative_cases": 1,
         "min_dual_review_cases": 1,
+        "min_dual_review_positive_cases": 1,
+        "min_dual_review_negative_cases": 1,
         "max_unsupported_auto_decisions": 0,
         "max_incumbent_leakage_cents": 0,
         "max_duplicate_leakage_cents": 0,
@@ -240,6 +242,7 @@ def validate_pilot(payload: dict, policy: dict) -> list[str]:
         "truth_owner_saw_recoveryos_before_truth_freeze": False,
         "recoveryos_team_saw_truth_before_output_freeze": False,
         "sample_selected_before_recoveryos_output": True,
+        "dual_review_selected_before_recoveryos_output": True,
         "truth_owner_independent_of_recoveryos_builder": True,
     }
     for key, expected in required_blind.items():
@@ -392,6 +395,15 @@ def validate_pilot(payload: dict, policy: dict) -> list[str]:
             errors.append(
                 f"{prefix}: truth_variance_cents must be nonnegative integer"
             )
+        elif truth == "POSITIVE" and truth_cents <= 0:
+            errors.append(f"{prefix}: POSITIVE truth requires positive variance")
+        elif truth == "NEGATIVE" and truth_cents != 0:
+            errors.append(f"{prefix}: NEGATIVE truth requires zero variance")
+        if case.get("authority_state") == "UNRESOLVED" or case.get("source_complete") is False:
+            if truth != "UNRESOLVED":
+                errors.append(
+                    f"{prefix}: unresolved authority/incomplete source requires UNRESOLVED truth"
+                )
         if pred == "REVIEW":
             if pred_cents is not None:
                 errors.append(
@@ -401,10 +413,18 @@ def validate_pilot(payload: dict, policy: dict) -> list[str]:
             errors.append(
                 f"{prefix}: automatic predicted_variance_cents must be nonnegative integer"
             )
+        elif pred == "POSITIVE" and pred_cents <= 0:
+            errors.append(f"{prefix}: POSITIVE prediction requires positive variance")
+        elif pred == "NEGATIVE" and pred_cents != 0:
+            errors.append(f"{prefix}: NEGATIVE prediction requires zero variance")
         if not isinstance(net_new, int) or net_new < 0:
             errors.append(
                 f"{prefix}: predicted_net_new_cents must be nonnegative integer"
             )
+        elif pred != "POSITIVE" and net_new != 0:
+            errors.append(f"{prefix}: non-POSITIVE prediction cannot assert net-new cents")
+        elif pred == "POSITIVE" and isinstance(pred_cents, int) and net_new > pred_cents:
+            errors.append(f"{prefix}: net-new cents cannot exceed predicted variance")
 
         confidence = case.get("confidence_ppm")
         if (
@@ -585,12 +605,20 @@ def build_report(payload: dict, policy: dict) -> dict:
             (case["confidence_ppm"] / 1_000_000, correct)
         )
 
+    dual_review_cases = [
+        case for case in cases if case.get("reviewer_a_label") is not None
+    ]
     pairs = [
         (case["reviewer_a_label"], case["reviewer_b_label"])
-        for case in cases
-        if case.get("reviewer_a_label") is not None
+        for case in dual_review_cases
     ]
     reviewer = _cohen_kappa(pairs)
+    dual_review_positive = sum(
+        case["truth_label"] == "POSITIVE" for case in dual_review_cases
+    )
+    dual_review_negative = sum(
+        case["truth_label"] == "NEGATIVE" for case in dual_review_cases
+    )
 
     incumbent_leakage = sum(
         case["predicted_net_new_cents"]
@@ -691,7 +719,11 @@ def build_report(payload: dict, policy: dict) -> dict:
             "duplicate_net_new_leakage_cents": duplicate_leakage,
         },
         "calibration": calibration,
-        "reviewer_agreement": reviewer,
+        "reviewer_agreement": {
+            **(reviewer or {"cases": 0, "agreement": None, "kappa": None}),
+            "positive_truth_cases": dual_review_positive,
+            "negative_truth_cases": dual_review_negative,
+        },
         "strata": by_stratum,
     }
 
@@ -714,6 +746,12 @@ def build_report(payload: dict, policy: dict) -> dict:
     )
     gates["dual_review_size"] = (
         reviewer is not None and reviewer["cases"] >= required_dual
+    )
+    gates["dual_review_positive"] = (
+        dual_review_positive >= thresholds["min_dual_review_positive_cases"]
+    )
+    gates["dual_review_negative"] = (
+        dual_review_negative >= thresholds["min_dual_review_negative_cases"]
     )
     gates["reviewer_agreement"] = (
         reviewer is not None
