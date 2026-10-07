@@ -99,7 +99,7 @@ def validate_simulation(payload: dict) -> list[str]:
             errors.append(f"{buyer.get('buyer_id')}: requires >=3 buyer bots")
             continue
         has_approve = False
-        buyer_blocked = False
+        all_approve = True
         for bot in bots:
             bot_id = bot.get("bot_id")
             if not isinstance(bot_id, str) or not bot_id:
@@ -115,7 +115,7 @@ def validate_simulation(payload: dict) -> list[str]:
                 continue
             decisions[decision] += 1
             has_approve = has_approve or decision == "APPROVE_PILOT"
-            buyer_blocked = buyer_blocked or decision == "BLOCKED"
+            all_approve = all_approve and decision == "APPROVE_PILOT"
 
             primary = bot.get("primary_blocker")
             if not isinstance(primary, str) or not primary:
@@ -134,7 +134,7 @@ def validate_simulation(payload: dict) -> list[str]:
                 errors.append(f"{bot_id}: conditions_to_approve required")
 
         buyers_with_approver += int(has_approve)
-        enterprise_ready += int(not buyer_blocked)
+        enterprise_ready += int(all_approve)
 
     expected = payload.get("aggregate_expected") or {}
     if int(expected.get("total_bots") or -1) != len(bot_ids):
