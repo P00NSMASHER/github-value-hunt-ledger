@@ -2,42 +2,67 @@
 
 ## Purpose
 
-This runtime makes the merged CEO Command Center continuously available without placing Supabase
-database credentials in the public GitHub repository or in the Railway service.
+This runtime makes the CEO Command Center continuously available without placing Supabase database
+credentials in the public GitHub repository, Railway browser code, or client storage.
 
 ## Credential boundary
 
-Railway stores only:
+Railway stores:
 
-- `AIBOS_RUNTIME_TOKEN`: high-entropy token used to authenticate to the Supabase runtime gateway;
-- `AIBOS_OPERATOR_TOKEN`: independent operator/API token for the future UI;
+- `AIBOS_RUNTIME_TOKEN`: high-entropy server-to-server token for the Supabase runtime gateway;
+- `AIBOS_OPERATOR_TOKEN`: independent token for the existing JSON operator API;
 - `AIBOS_GATEWAY_URL`: non-secret Edge Function URL;
-- `AIBOS_SCHEMA_FINGERPRINT`: canonical non-secret schema fingerprint.
+- `AIBOS_SCHEMA_FINGERPRINT`: canonical non-secret schema fingerprint;
+- `AIBOS_UI_ACCESS_SHA256`: SHA-256 of the separate CEO UI access code;
+- `AIBOS_UI_SESSION_SECRET`: high-entropy server-side session-signing secret;
+- `AIBOS_UI_PRINCIPAL`: human principal bound to CEO UI sessions.
 
-The Supabase Edge Function receives `SUPABASE_DB_URL` from Supabase's built-in server-side secret
-environment and connects directly to Postgres. GitHub contains only the SHA-256 hash of
-`AIBOS_RUNTIME_TOKEN`, never the plaintext token.
+The plaintext CEO access code is not stored in Railway. The browser never receives the runtime token,
+operator token, database URL, or session-signing secret.
 
 ## Gateway surface
 
-Named operations only: health, portfolio view, planning inputs, exact approval lookup, creation of
-one PENDING internal goal, and decision of one exact PENDING approval after intent-hash validation.
-There is no arbitrary SQL operation and no approval-consume operation.
+Named operations only: health, portfolio view, planning inputs, worker status, exact approval lookup,
+creation of one PENDING internal goal, approval decision after exact intent-hash validation, and the
+bounded persistent-worker lease operations. There is no arbitrary SQL operation and no
+approval-consume operation.
 
 ## Railway runtime surface
 
-- `GET /health`
-- `GET /dashboard`
-- `POST /objective/propose`
-- `POST /objective/activate`
-- `POST /approval/decide`
+Machine/API surface:
 
-Every operator route except health requires `AIBOS_OPERATOR_TOKEN`. The process probes the gateway
-every 30 seconds and reports unhealthy when the live schema fingerprint no longer matches the
-canonical fingerprint.
+- `GET /health` — public minimal health only;
+- `GET /dashboard` — operator-token protected JSON;
+- `POST /objective/propose` — operator-token protected;
+- `POST /objective/activate` — operator-token protected;
+- `POST /approval/decide` — operator-token protected.
+
+CEO browser surface:
+
+- `GET /ui` — login or authenticated Command Center;
+- `POST /ui/login` — exchanges the separate access code for a signed HttpOnly session;
+- `POST /ui/logout`;
+- `POST /ui/objective/propose`;
+- `POST /ui/objective/activate`.
+
+Step 4 shows the approval queue read-only. Browser approval decisions are intentionally deferred to
+Step 5.
+
+## Browser security
+
+- session cookie: `HttpOnly; Secure; SameSite=Strict`;
+- session is expiry-bound and principal-bound;
+- UI mutations require a session-bound CSRF token;
+- strict CSP disables browser scripts;
+- responses use no-store, frame denial, no-referrer, and restrictive permissions headers.
+
+## Public-domain boundary
+
+A Railway HTTPS service domain may be enabled only after the authenticated UI is deployed and
+verified. Production data and mutation routes remain authenticated.
 
 ## Explicitly absent
 
-This deployment does not expose a public domain, store a Supabase service/secret key in Railway,
-accept arbitrary SQL, consume approvals, fabricate execution receipts, deploy other services, move
-money, claim Hunter leases, or bypass independent verification/governance.
+The browser cannot access Supabase directly, submit arbitrary SQL, consume approvals, fabricate
+execution receipts, move money, perform destructive operations, or bypass independent verification
+and governance.
