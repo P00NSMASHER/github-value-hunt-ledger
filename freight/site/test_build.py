@@ -137,6 +137,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('href="freight-invoice-audit.html"', page)
             self.assertIn('href="freight-overcharge-recovery.html"', page)
             self.assertIn('href="accessorial-charge-audit.html"', page)
+            self.assertIn('href="freight-audit-companies.html"', page)
 
             forbidden = (
                 "$5,000",
@@ -186,14 +187,7 @@ class PublicBuildTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
             for name in (
-                "index.html",
-                "privacy.html",
-                "engagement-framework.html",
-                "freight-audit-services.html",
-                "freight-invoice-audit.html",
-                "freight-overcharge-recovery.html",
-                "accessorial-charge-audit.html",
-                "404.html",
+                item for item in builder.TEXT_SOURCE_FILES if item.endswith(".html")
             ):
                 parser = PageParser()
                 parser.feed((output / name).read_text())
