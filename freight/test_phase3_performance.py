@@ -1,3 +1,7 @@
+import json
+from pathlib import Path
+
+from freight.performance_evidence import validate_baseline, validate_database_evidence
 from freight.performance_benchmark import (
     MODES,
     build_authority_book,
@@ -74,3 +78,19 @@ def test_report_validation_accepts_replayed_small_tiers():
     assert report.memory_probe.record_count == 60
     assert report.memory_probe.python_peak_heap_mb > 0
     assert report.report_hash
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_committed_performance_evidence_is_conservative_and_valid():
+    baseline = json.loads((ROOT / "freight" / "PHASE3_PERFORMANCE_BASELINE.json").read_text())
+    database = json.loads((ROOT / "freight" / "PHASE3_DATABASE_PERFORMANCE_2026-10-07.json").read_text())
+    assert validate_baseline(baseline) == []
+    assert validate_database_evidence(database) == []
+    assert baseline["cpu_rating_benchmark"]["executed_max_records"] == 1_000_000
+    assert all(
+        row["evidence_type"] == "PROJECTION_NOT_EXECUTED"
+        for row in baseline["projections_not_executed"]
+    )
+    assert "163.681 ms" in database["read_path"]["ten_thousand_findings_with_eleven_thousand_dispositions"]["critical_note"]

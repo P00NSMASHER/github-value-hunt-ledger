@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "collected_at": "2026-10-07",
+  "source": {
+    "repository": "P00NSMASHER/github-value-hunt-ledger",
+    "commit": "a68b060550e3f44891bc7603296c141d4d8523e4",
+    "workflow_run_id": 37572870777,
+    "job_id": 112635201539,
+    "runner": "GitHub-hosted Ubuntu 24.04",
+    "python": "3.11.16"
+  },
+  "cpu_rating_benchmark": {
+    "executed_max_records": 1000000,
+    "mode_count": 6,
+    "tiers": [
+      {
+        "count": 10000,
+        "trials": 5,
+        "full_replay_trials": 5,
+        "throughput_median_rps": 8437.958591447268,
+        "throughput_min_rps": 8130.006742702396,
+        "throughput_max_rps": 8573.901997623396,
+        "p99_median_ms": 0.1433549999987349,
+        "max_rss_mb": 21.8046875,
+        "regression_floor_rps": 6000,
+        "regression_p99_ceiling_ms": 0.5,
+        "regression_rss_ceiling_mb": 128
+      },
+      {
+        "count": 100000,
+        "trials": 3,
+        "full_replay_trials": 3,
+        "throughput_median_rps": 8611.585560413372,
+        "throughput_min_rps": 8511.051707541052,
+        "throughput_max_rps": 8728.995920452344,
+        "p99_median_ms": 0.1432850000000485,
+        "max_rss_mb": 21.8046875,
+        "regression_floor_rps": 6000,
+        "regression_p99_ceiling_ms": 0.5,
+        "regression_rss_ceiling_mb": 128
+      },
+      {
+        "count": 1000000,
+        "trials": 1,
+        "full_replay_trials": 1,
+        "throughput_median_rps": 8628.156959067623,
+        "throughput_min_rps": 8628.156959067623,
+        "throughput_max_rps": 8628.156959067623,
+        "p99_median_ms": 0.14510900001596383,
+        "max_rss_mb": 21.8046875,
+        "regression_floor_rps": 6000,
+        "regression_p99_ceiling_ms": 0.5,
+        "regression_rss_ceiling_mb": 128
+      }
+    ],
+    "report_hash": "9747e0ceafef65bba41d2755d8183c37adb2a824e0c0c147bfdde7d6a271ff03"
+  },
+  "reliability": {
+    "missing_authority_failure_injection": {
+      "records": 10000,
+      "expected_review": 104,
+      "actual_review": 104,
+      "deterministic_replay": true
+    },
+    "interruption_recovery": {
+      "records": 10000,
+      "chunk_size": 1000,
+      "fail_after_chunks": 4,
+      "replayed_uncertain_chunks": 1,
+      "deterministic_resume": true,
+      "no_duplicate_aggregate": true,
+      "variance_cents": 24424145
+    },
+    "memory_probe": {
+      "records": 10000,
+      "python_peak_heap_mb": 0.9098730087280273,
+      "process_max_rss_mb": 22.8046875,
+      "regression_python_heap_ceiling_mb": 16,
+      "regression_rss_ceiling_mb": 128
+    }
+  },
+  "projections_not_executed": [
+    {
+      "records": 10000000,
+      "evidence_type": "PROJECTION_NOT_EXECUTED",
+      "projected_minutes_at_1m_measured_rate": 19.316601153333334,
+      "conservative_minutes_at_slowest_observed_rate": 20.50018799999999
+    },
+    {
+      "records": 100000000,
+      "evidence_type": "PROJECTION_NOT_EXECUTED",
+      "projected_hours_at_1m_measured_rate": 3.219433518888889,
+      "conservative_hours_at_slowest_observed_rate": 3.416697799999998
+    }
+  ],
+  "database_evidence_ref": "freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json",
+  "claim_boundary": [
+    "Regression thresholds are CI guardrails, not production SLA commitments.",
+    "CPU benchmark is a single Python process and does not include network, PostgreSQL, document parsing, carrier APIs, AI, or human-review latency.",
+    "10M and 100M figures are projections only; those record counts were not executed.",
+    "Production database evidence is synthetic, transaction-scoped, and rolled back.",
+    "No concurrency or HTTP request-rate claim is supported by this baseline."
+  ]
+}

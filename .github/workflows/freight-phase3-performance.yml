@@ -2,23 +2,38 @@ name: RecoveryOS Phase 3 Performance
 
 on:
   push:
+    branches: [main]
     paths:
+      - 'freight/canonical_schema.py'
+      - 'freight/rate_authority.py'
+      - 'freight/rating_engine.py'
       - 'freight/performance_benchmark.py'
+      - 'freight/performance_evidence.py'
       - 'freight/test_phase3_performance.py'
       - 'freight/PHASE3_STEP2_PERFORMANCE.md'
       - 'freight/PHASE3_PERFORMANCE_BASELINE.json'
+      - 'freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json'
       - '.github/workflows/freight-phase3-performance.yml'
   pull_request:
     paths:
+      - 'freight/canonical_schema.py'
+      - 'freight/rate_authority.py'
+      - 'freight/rating_engine.py'
       - 'freight/performance_benchmark.py'
+      - 'freight/performance_evidence.py'
       - 'freight/test_phase3_performance.py'
       - 'freight/PHASE3_STEP2_PERFORMANCE.md'
       - 'freight/PHASE3_PERFORMANCE_BASELINE.json'
+      - 'freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json'
       - '.github/workflows/freight-phase3-performance.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: recoveryos-phase3-performance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   benchmark:
@@ -47,14 +62,27 @@ jobs:
             --large-trials 1 \
             --replay-max-count 1000000 \
             --failure-count 10000 \
+            --interruption-count 10000 \
+            --interruption-chunk-size 1000 \
+            --memory-probe-count 10000 \
             --output /tmp/recoveryos-phase3-performance.json \
             --summary | tee /tmp/recoveryos-phase3-performance-summary.json
 
           echo '### RecoveryOS Phase 3 synthetic benchmark' >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          echo '~~~json' >> "$GITHUB_STEP_SUMMARY"
           cat /tmp/recoveryos-phase3-performance-summary.json >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '~~~' >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Enforce performance and reliability regression baseline
+        run: |
+          PYTHONPATH=. python freight/performance_evidence.py \
+            --report /tmp/recoveryos-phase3-performance.json \
+            --baseline freight/PHASE3_PERFORMANCE_BASELINE.json \
+            --database-evidence freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json
+
+      - name: Preserve report in logs
+        shell: bash
+        run: |
           echo '===RECOVERYOS_PHASE3_PERFORMANCE_REPORT_BEGIN==='
           cat /tmp/recoveryos-phase3-performance.json
           echo '===RECOVERYOS_PHASE3_PERFORMANCE_REPORT_END==='
