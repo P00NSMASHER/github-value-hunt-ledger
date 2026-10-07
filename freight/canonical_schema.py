@@ -122,6 +122,9 @@ class ShipmentFacts:
     service_level: str | None = None
     residential: bool = False
     miles: int | None = None
+    equipment_type: str | None = None
+    container_type: str | None = None
+    chassis_days: int | None = None
 
     def __post_init__(self) -> None:
         _text("shipment_id", self.shipment_id)
@@ -137,7 +140,15 @@ class ShipmentFacts:
             raise ValueError("residential must be boolean")
         if self.miles is not None:
             _int("miles", self.miles, minimum=0)
-        for value, name in ((self.freight_class, "freight_class"), (self.zone, "zone"), (self.service_level, "service_level")):
+        if self.chassis_days is not None:
+            _int("chassis_days", self.chassis_days, minimum=0)
+        for value, name in (
+            (self.freight_class, "freight_class"),
+            (self.zone, "zone"),
+            (self.service_level, "service_level"),
+            (self.equipment_type, "equipment_type"),
+            (self.container_type, "container_type"),
+        ):
             if value is not None:
                 _text(name, value)
         if self.packages:
