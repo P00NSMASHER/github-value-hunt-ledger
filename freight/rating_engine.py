@@ -1,4 +1,4 @@
-"""Deterministic LTL and parcel rerating engine for RecoveryOS phase 0."""
+"""Deterministic multi-mode rerating engine for RecoveryOS phase 2."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
@@ -10,6 +10,10 @@ from freight.rate_authority import (
     CompiledAuthority,
     LTLTerms,
     ParcelTerms,
+    TLTerms,
+    IntermodalTerms,
+    AirTerms,
+    OceanTerms,
 )
 
 RATED = "RATED"
@@ -239,6 +243,179 @@ def _rate_parcel(
     return sum(item.expected_cents for item in components), tuple(components), ()
 
 
+def _rate_tl(
+    record: CanonicalFreightRecord,
+    authority: CompiledAuthority,
+) -> tuple[int | None, tuple[RatedComponent, ...], tuple[str, ...]]:
+    terms: TLTerms = authority.tl_terms  # type: ignore[assignment]
+    assert terms is not None
+    blockers: list[str] = []
+    if terms.pricing_model == "FLAT":
+        assert terms.flat_cents is not None
+        linehaul = terms.flat_cents
+        basis = "flat linehaul"
+    else:
+        assert terms.per_mile_cents is not None
+        if record.shipment.miles is None:
+            return None, (), ("MISSING_TL_MILES",)
+        linehaul = terms.per_mile_cents * record.shipment.miles
+        basis = f"{record.shipment.miles} miles"
+    linehaul = max(linehaul, terms.minimum_cents)
+    fuel = _basis_points(linehaul, terms.fuel_bps)
+    components = [
+        RatedComponent("LINEHAUL", linehaul, basis),
+        RatedComponent("FUEL", fuel, f"{terms.fuel_bps} bps of linehaul"),
+    ]
+    extras, extra_blockers = _accessorials(
+        record, terms.accessorials, {"LINEHAUL", "TRANSPORTATION", "FUEL"}
+    )
+    components.extend(extras)
+    blockers.extend(extra_blockers)
+    if blockers:
+        return None, tuple(components), tuple(sorted(set(blockers)))
+    return sum(item.expected_cents for item in components), tuple(components), ()
+
+
+def _rate_intermodal(
+    record: CanonicalFreightRecord,
+    authority: CompiledAuthority,
+) -> tuple[int | None, tuple[RatedComponent, ...], tuple[str, ...]]:
+    terms: IntermodalTerms = authority.intermodal_terms  # type: ignore[assignment]
+    assert terms is not None
+    blockers: list[str] = []
+    miles = record.shipment.miles
+    if terms.per_mile_cents and miles is None:
+        blockers.append("MISSING_INTERMODAL_MILES")
+    linehaul = terms.base_cents + (terms.per_mile_cents * (miles or 0))
+    fuel = _basis_points(linehaul, terms.fuel_bps)
+    chassis = 0
+    if terms.chassis_per_day_cents:
+        if record.shipment.chassis_days is None:
+            blockers.append("MISSING_CHASSIS_DAYS")
+        else:
+            chassis = terms.chassis_per_day_cents * record.shipment.chassis_days
+    components = [
+        RatedComponent("TRANSPORTATION", linehaul, f"base + {miles or 0} miles"),
+        RatedComponent("FUEL", fuel, f"{terms.fuel_bps} bps of transportation"),
+    ]
+    if terms.chassis_per_day_cents:
+        components.append(RatedComponent(
+            "CHASSIS",
+            chassis,
+            f"{record.shipment.chassis_days or 0} chassis days",
+        ))
+    extras, extra_blockers = _accessorials(
+        record, terms.accessorials, {"TRANSPORTATION", "LINEHAUL", "FUEL", "CHASSIS"}
+    )
+    components.extend(extras)
+    blockers.extend(extra_blockers)
+    if blockers:
+        return None, tuple(components), tuple(sorted(set(blockers)))
+    return sum(item.expected_cents for item in components), tuple(components), ()
+
+
+def _air_volumetric_grams(record: CanonicalFreightRecord, divisor: int) -> tuple[int | None, tuple[str, ...]]:
+    if not record.shipment.packages:
+        return None, ("MISSING_AIR_PACKAGE_DIMENSIONS",)
+    total = 0
+    for package in record.shipment.packages:
+        if package.length_mm is None or package.width_mm is None or package.height_mm is None:
+            return None, ("MISSING_AIR_PACKAGE_DIMENSIONS",)
+        cubic_mm = package.length_mm * package.width_mm * package.height_mm
+        total += _ceil_div(cubic_mm, divisor) * package.quantity
+    return total, ()
+
+
+def _rate_air(
+    record: CanonicalFreightRecord,
+    authority: CompiledAuthority,
+) -> tuple[int | None, tuple[RatedComponent, ...], tuple[str, ...]]:
+    terms: AirTerms = authority.air_terms  # type: ignore[assignment]
+    assert terms is not None
+    volumetric_grams, blockers = _air_volumetric_grams(
+        record, terms.volumetric_divisor_cm3_per_kg
+    )
+    if blockers or volumetric_grams is None:
+        return None, (), blockers
+    chargeable_grams = max(record.shipment.actual_weight_grams, volumetric_grams)
+    linehaul = _ceil_div(chargeable_grams * terms.per_kg_cents, 1000)
+    linehaul = max(linehaul, terms.minimum_cents)
+    fuel = _basis_points(linehaul, terms.fuel_bps)
+    security = _ceil_div(chargeable_grams * terms.security_per_kg_cents, 1000)
+    components = [
+        RatedComponent("TRANSPORTATION", linehaul, f"{chargeable_grams} chargeable grams"),
+        RatedComponent("FUEL", fuel, f"{terms.fuel_bps} bps of transportation"),
+    ]
+    if terms.security_per_kg_cents:
+        components.append(RatedComponent(
+            "SECURITY",
+            security,
+            f"{terms.security_per_kg_cents} cents/kg on chargeable weight",
+        ))
+    extras, extra_blockers = _accessorials(
+        record, terms.accessorials, {"TRANSPORTATION", "LINEHAUL", "FUEL", "SECURITY"}
+    )
+    components.extend(extras)
+    if extra_blockers:
+        return None, tuple(components), tuple(sorted(set(extra_blockers)))
+    return sum(item.expected_cents for item in components), tuple(components), ()
+
+
+def _ocean_volume_milli_cbm(record: CanonicalFreightRecord) -> tuple[int | None, tuple[str, ...]]:
+    if not record.shipment.packages:
+        return None, ("MISSING_OCEAN_PACKAGE_DIMENSIONS",)
+    cubic_mm = 0
+    for package in record.shipment.packages:
+        if package.length_mm is None or package.width_mm is None or package.height_mm is None:
+            return None, ("MISSING_OCEAN_PACKAGE_DIMENSIONS",)
+        cubic_mm += (
+            package.length_mm
+            * package.width_mm
+            * package.height_mm
+            * package.quantity
+        )
+    return _ceil_div(cubic_mm, 1_000_000), ()
+
+
+def _rate_ocean(
+    record: CanonicalFreightRecord,
+    authority: CompiledAuthority,
+) -> tuple[int | None, tuple[RatedComponent, ...], tuple[str, ...]]:
+    terms: OceanTerms = authority.ocean_terms  # type: ignore[assignment]
+    assert terms is not None
+    if terms.pricing_model == "CONTAINER":
+        container_type = (record.shipment.container_type or "").upper()
+        if not container_type:
+            return None, (), ("MISSING_OCEAN_CONTAINER_TYPE",)
+        rate = dict(terms.container_rates_cents).get(container_type)
+        if rate is None:
+            return None, (), ("UNMAPPED_OCEAN_CONTAINER_TYPE:" + container_type,)
+        linehaul = max(rate, terms.minimum_cents)
+        basis = "container " + container_type
+    else:
+        assert terms.w_m_per_unit_cents is not None
+        volume_milli, blockers = _ocean_volume_milli_cbm(record)
+        if blockers or volume_milli is None:
+            return None, (), blockers
+        weight_milli = _ceil_div(record.shipment.actual_weight_grams, 1000)
+        chargeable_milli = max(weight_milli, volume_milli)
+        linehaul = _ceil_div(chargeable_milli * terms.w_m_per_unit_cents, 1000)
+        linehaul = max(linehaul, terms.minimum_cents)
+        basis = f"{chargeable_milli} milli W/M units"
+    fuel = _basis_points(linehaul, terms.fuel_bps)
+    components = [
+        RatedComponent("TRANSPORTATION", linehaul, basis),
+        RatedComponent("FUEL", fuel, f"{terms.fuel_bps} bps of transportation"),
+    ]
+    extras, extra_blockers = _accessorials(
+        record, terms.accessorials, {"TRANSPORTATION", "LINEHAUL", "FUEL"}
+    )
+    components.extend(extras)
+    if extra_blockers:
+        return None, tuple(components), tuple(sorted(set(extra_blockers)))
+    return sum(item.expected_cents for item in components), tuple(components), ()
+
+
 def rate_record(record: CanonicalFreightRecord, authority_book: AuthorityBook) -> RatingResult:
     verify_record(record)
     resolution = authority_book.resolve(record)
@@ -257,6 +434,14 @@ def rate_record(record: CanonicalFreightRecord, authority_book: AuthorityBook) -
         expected, components, blockers = _rate_ltl(record, authority)
     elif record.mode == "PARCEL":
         expected, components, blockers = _rate_parcel(record, authority)
+    elif record.mode == "TL":
+        expected, components, blockers = _rate_tl(record, authority)
+    elif record.mode == "INTERMODAL":
+        expected, components, blockers = _rate_intermodal(record, authority)
+    elif record.mode == "AIR":
+        expected, components, blockers = _rate_air(record, authority)
+    elif record.mode == "OCEAN":
+        expected, components, blockers = _rate_ocean(record, authority)
     else:
         return _finish(
             record,
@@ -264,7 +449,7 @@ def rate_record(record: CanonicalFreightRecord, authority_book: AuthorityBook) -
             authority=authority,
             expected=None,
             components=(),
-            blockers=("MODE_NOT_SUPPORTED_IN_PHASE0:" + record.mode,),
+            blockers=("MODE_NOT_SUPPORTED:" + record.mode,),
         )
 
     if not authority.verified:

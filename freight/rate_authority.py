@@ -98,6 +98,45 @@ class ParcelTerms:
 
 
 @dataclass(frozen=True)
+class TLTerms:
+    pricing_model: str
+    flat_cents: int | None
+    per_mile_cents: int | None
+    minimum_cents: int
+    fuel_bps: int
+    accessorials: tuple[tuple[str, str, int | None], ...]
+
+
+@dataclass(frozen=True)
+class IntermodalTerms:
+    base_cents: int
+    per_mile_cents: int
+    fuel_bps: int
+    chassis_per_day_cents: int
+    accessorials: tuple[tuple[str, str, int | None], ...]
+
+
+@dataclass(frozen=True)
+class AirTerms:
+    per_kg_cents: int
+    minimum_cents: int
+    volumetric_divisor_cm3_per_kg: int
+    fuel_bps: int
+    security_per_kg_cents: int
+    accessorials: tuple[tuple[str, str, int | None], ...]
+
+
+@dataclass(frozen=True)
+class OceanTerms:
+    pricing_model: str
+    container_rates_cents: tuple[tuple[str, int], ...]
+    w_m_per_unit_cents: int | None
+    minimum_cents: int
+    fuel_bps: int
+    accessorials: tuple[tuple[str, str, int | None], ...]
+
+
+@dataclass(frozen=True)
 class CompiledAuthority:
     authority_id: str
     buyer_id: str
@@ -113,6 +152,10 @@ class CompiledAuthority:
     verified_controlling_authority: bool
     ltl_terms: LTLTerms | None
     parcel_terms: ParcelTerms | None
+    tl_terms: TLTerms | None
+    intermodal_terms: IntermodalTerms | None
+    air_terms: AirTerms | None
+    ocean_terms: OceanTerms | None
     compiler_version: int
     authority_hash: str
 
@@ -182,6 +225,91 @@ def _compile_parcel(terms: object) -> ParcelTerms:
     )
 
 
+def _compile_tl(terms: object) -> TLTerms:
+    if not isinstance(terms, dict):
+        raise ValueError("TL terms must be an object")
+    model = _text("pricing_model", terms.get("pricing_model", "PER_MILE")).upper()
+    if model not in {"FLAT", "PER_MILE"}:
+        raise ValueError("TL pricing_model must be FLAT or PER_MILE")
+    flat = terms.get("flat_cents")
+    per_mile = terms.get("per_mile_cents")
+    if model == "FLAT":
+        flat_cents = _integer("flat_cents", flat, minimum=0)
+        if per_mile not in (None, ""):
+            raise ValueError("FLAT TL terms cannot define per_mile_cents")
+        per_mile_cents = None
+    else:
+        per_mile_cents = _integer("per_mile_cents", per_mile, minimum=0)
+        if flat not in (None, ""):
+            raise ValueError("PER_MILE TL terms cannot define flat_cents")
+        flat_cents = None
+    return TLTerms(
+        pricing_model=model,
+        flat_cents=flat_cents,
+        per_mile_cents=per_mile_cents,
+        minimum_cents=_integer("minimum_cents", terms.get("minimum_cents", 0), minimum=0),
+        fuel_bps=_bp("fuel_bps", terms.get("fuel_bps", 0), maximum=100000),
+        accessorials=_normalize_accessorials(terms.get("accessorials")),
+    )
+
+
+def _compile_intermodal(terms: object) -> IntermodalTerms:
+    if not isinstance(terms, dict):
+        raise ValueError("INTERMODAL terms must be an object")
+    return IntermodalTerms(
+        base_cents=_integer("base_cents", terms.get("base_cents", 0), minimum=0),
+        per_mile_cents=_integer("per_mile_cents", terms.get("per_mile_cents", 0), minimum=0),
+        fuel_bps=_bp("fuel_bps", terms.get("fuel_bps", 0), maximum=100000),
+        chassis_per_day_cents=_integer("chassis_per_day_cents", terms.get("chassis_per_day_cents", 0), minimum=0),
+        accessorials=_normalize_accessorials(terms.get("accessorials")),
+    )
+
+
+def _compile_air(terms: object) -> AirTerms:
+    if not isinstance(terms, dict):
+        raise ValueError("AIR terms must be an object")
+    return AirTerms(
+        per_kg_cents=_integer("per_kg_cents", terms.get("per_kg_cents"), minimum=0),
+        minimum_cents=_integer("minimum_cents", terms.get("minimum_cents", 0), minimum=0),
+        volumetric_divisor_cm3_per_kg=_integer(
+            "volumetric_divisor_cm3_per_kg",
+            terms.get("volumetric_divisor_cm3_per_kg", 6000),
+            minimum=1,
+        ),
+        fuel_bps=_bp("fuel_bps", terms.get("fuel_bps", 0), maximum=100000),
+        security_per_kg_cents=_integer("security_per_kg_cents", terms.get("security_per_kg_cents", 0), minimum=0),
+        accessorials=_normalize_accessorials(terms.get("accessorials")),
+    )
+
+
+def _compile_ocean(terms: object) -> OceanTerms:
+    if not isinstance(terms, dict):
+        raise ValueError("OCEAN terms must be an object")
+    model = _text("pricing_model", terms.get("pricing_model")).upper()
+    if model not in {"CONTAINER", "W_M"}:
+        raise ValueError("OCEAN pricing_model must be CONTAINER or W_M")
+    rates: tuple[tuple[str, int], ...] = ()
+    w_m: int | None = None
+    if model == "CONTAINER":
+        raw = terms.get("container_rates_cents")
+        if not isinstance(raw, dict) or not raw:
+            raise ValueError("CONTAINER ocean terms require container_rates_cents")
+        rates = tuple(sorted(
+            (_text("container_type", key).upper(), _integer("container rate cents", value, minimum=0))
+            for key, value in raw.items()
+        ))
+    else:
+        w_m = _integer("w_m_per_unit_cents", terms.get("w_m_per_unit_cents"), minimum=0)
+    return OceanTerms(
+        pricing_model=model,
+        container_rates_cents=rates,
+        w_m_per_unit_cents=w_m,
+        minimum_cents=_integer("minimum_cents", terms.get("minimum_cents", 0), minimum=0),
+        fuel_bps=_bp("fuel_bps", terms.get("fuel_bps", 0), maximum=100000),
+        accessorials=_normalize_accessorials(terms.get("accessorials")),
+    )
+
+
 def _authority_body(authority: CompiledAuthority) -> dict:
     body = asdict(authority)
     body.pop("authority_hash", None)
@@ -212,8 +340,8 @@ def compile_authority(
     mode = _text("mode", payload.get("mode")).upper()
     if mode not in MODES:
         raise ValueError("unsupported freight mode")
-    if mode not in {"LTL", "PARCEL"}:
-        raise ValueError("phase-0 authority compiler currently rates LTL and PARCEL")
+    if mode not in {"LTL", "PARCEL", "TL", "INTERMODAL", "AIR", "OCEAN"}:
+        raise ValueError("unsupported RecoveryOS rating mode")
     effective_from = _iso_date("effective_from", payload.get("effective_from"))
     effective_to_raw = payload.get("effective_to")
     effective_to = _iso_date("effective_to", effective_to_raw) if effective_to_raw not in (None, "") else None
@@ -223,6 +351,10 @@ def compile_authority(
     terms = payload.get("terms")
     ltl_terms = _compile_ltl(terms) if mode == "LTL" else None
     parcel_terms = _compile_parcel(terms) if mode == "PARCEL" else None
+    tl_terms = _compile_tl(terms) if mode == "TL" else None
+    intermodal_terms = _compile_intermodal(terms) if mode == "INTERMODAL" else None
+    air_terms = _compile_air(terms) if mode == "AIR" else None
+    ocean_terms = _compile_ocean(terms) if mode == "OCEAN" else None
 
     partial = CompiledAuthority(
         authority_id=authority_id,
@@ -239,7 +371,11 @@ def compile_authority(
         verified_controlling_authority=verified_controlling_authority,
         ltl_terms=ltl_terms,
         parcel_terms=parcel_terms,
-        compiler_version=1,
+        tl_terms=tl_terms,
+        intermodal_terms=intermodal_terms,
+        air_terms=air_terms,
+        ocean_terms=ocean_terms,
+        compiler_version=2,
         authority_hash="",
     )
     digest = canonical_hash(_authority_body(partial))
@@ -258,7 +394,11 @@ def compile_authority(
         verified_controlling_authority=verified_controlling_authority,
         ltl_terms=ltl_terms,
         parcel_terms=parcel_terms,
-        compiler_version=1,
+        tl_terms=tl_terms,
+        intermodal_terms=intermodal_terms,
+        air_terms=air_terms,
+        ocean_terms=ocean_terms,
+        compiler_version=2,
         authority_hash=digest,
     )
 

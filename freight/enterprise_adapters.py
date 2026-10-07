@@ -73,6 +73,9 @@ def canonical_record_from_api(payload: dict) -> CanonicalFreightRecord:
         service_level=shipment_raw.get("service_level"),
         residential=shipment_raw.get("residential", False),
         miles=shipment_raw.get("miles"),
+        equipment_type=shipment_raw.get("equipment_type"),
+        container_type=shipment_raw.get("container_type"),
+        chassis_days=shipment_raw.get("chassis_days"),
     )
 
     charges_raw = payload.get("charges")
