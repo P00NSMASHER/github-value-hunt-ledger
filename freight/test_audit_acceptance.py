@@ -218,7 +218,7 @@ def test_duplicate_economic_issue_cannot_receive_net_new_credit_twice():
     assert "duplicate_leakage" in report["failed_gates"]
 
 
-def test_underpowered_sample_is_not_quality_proven():
+def test_small_population_full_census_can_be_quality_proven():
     pilot = _pilot()
     pilot["cases"] = pilot["cases"][:100]
     pilot["population"]["population_size"] = 100
@@ -234,8 +234,8 @@ def test_underpowered_sample_is_not_quality_proven():
         case["stratum_key"] = "LTL|A|MID"
     _refresh_hashes(pilot)
     report = build_report(pilot, _policy())
-    assert report["status"] == "INSUFFICIENT_EVIDENCE"
-    assert "sample_adjudicated" in report["failed_gates"]
+    assert report["metrics"]["sample"]["required_sample_size_95"] == 80
+    assert report["status"] == "AUDIT_QUALITY_PROVEN"
 
 
 def test_large_population_requires_precision_planned_sample_size():
@@ -269,7 +269,7 @@ def test_dual_review_must_cover_both_truth_classes():
         pilot["cases"][index]["reviewer_a_label"] = "POSITIVE"
         pilot["cases"][index]["reviewer_b_label"] = "POSITIVE"
     report = build_report(pilot, _policy())
-    assert report["status"] == "QUALITY_GATE_FAILED"
+    assert report["status"] == "INSUFFICIENT_EVIDENCE"
     assert "dual_review_negative" in report["failed_gates"]
 
 
@@ -287,3 +287,30 @@ def test_net_new_cannot_exceed_predicted_variance():
     _refresh_hashes(pilot)
     errors = validate_pilot(pilot, _policy())
     assert any("net-new cents cannot exceed predicted variance" in error for error in errors)
+
+
+def test_disproportionate_strata_use_population_design_weights():
+    pilot = _pilot()
+    pilot["population"]["population_size"] = 10000
+    pilot["sampling"]["method"] = "STRATIFIED_RANDOM"
+    pilot["sampling"]["seed"] = "weighted-seed"
+    pilot["sampling"]["strata"][0]["population_count"] = 9000
+    pilot["sampling"]["strata"][1]["population_count"] = 1000
+    pilot["sampling"]["strata"][0]["sample_target"] = 120
+    pilot["sampling"]["strata"][1]["sample_target"] = 120
+    target = next(
+        case
+        for case in pilot["cases"]
+        if case["stratum_key"] == "LTL|A|MID"
+        and case["truth_label"] == "NEGATIVE"
+        and case["predicted_label"] == "NEGATIVE"
+    )
+    target["predicted_label"] = "POSITIVE"
+    target["predicted_variance_cents"] = 1000
+    target["predicted_net_new_cents"] = 1000
+    _refresh_hashes(pilot)
+    report = build_report(pilot, _policy())
+    raw_rate = report["metrics"]["classification"]["false_positive_rate_95"]["point"]
+    weighted_rate = report["metrics"]["population_weighted"]["false_positive_rate"]
+    assert weighted_rate > raw_rate
+    assert report["metrics"]["population_weighted"]["predicted_positive_cents"] > 0
