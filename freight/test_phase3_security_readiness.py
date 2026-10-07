@@ -65,3 +65,10 @@ def test_readiness_file_contains_no_certification_claim():
     assert payload["controls"]["soc2_type2"]["state"] == PENDING_EXTERNAL
     assert payload["controls"]["iso27001"]["state"] == PENDING_EXTERNAL
     assert payload["controls"]["independent_penetration_test"]["state"] == PENDING_EXTERNAL
+
+
+def test_authentication_claim_requires_same_origin_mutation_guard():
+    payload = load_current(ROOT)
+    payload["controls"]["authentication"]["facts"]["same_origin_mutation_guard"] = False
+    errors = validate_security_readiness(payload)
+    assert any("same-origin mutation guard" in error for error in errors)

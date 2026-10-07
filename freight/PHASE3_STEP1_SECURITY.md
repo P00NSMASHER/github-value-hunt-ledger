@@ -14,6 +14,7 @@ evidence package. It intentionally does not counterfeit external evidence.
 - signed session lifetime aligned to 12 hours;
 - database session expiration checked and expired sessions cleaned by `expires_at`;
 - Secure / HttpOnly / SameSite=Lax session cookies retained;
+- same-origin browser mutation guard added across cookie-authenticated RecoveryOS and password-auth POST flows;
 - API keys remain hash-only at rest in the application database;
 - API-key scopes separated into `ingest` and `payment_event`;
 - owner-only API-key metadata listing and revocation;

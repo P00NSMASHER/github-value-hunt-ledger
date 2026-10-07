@@ -74,7 +74,8 @@ Applied and typechecked in RecoveryOS:
 - signed session lifetime aligned to 12 hours;
 - database session expiry is explicitly checked;
 - expired-session cleanup uses `expires_at`;
-- cookies remain `HttpOnly; Secure; SameSite=Lax`.
+- cookies remain `HttpOnly; Secure; SameSite=Lax`;
+- browser mutation requests enforce same-origin `Sec-Fetch-Site` / `Origin` when those headers are present, blocking cross-origin cookie-authenticated mutations.
 
 This is password-authentication hardening. It is **not MFA**.
 

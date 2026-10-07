@@ -82,6 +82,8 @@ def validate_security_readiness(payload: dict) -> list[str]:
             errors.append("PROVEN authentication requires case-insensitive unique email")
         if facts.get("login_rate_limit") is not True:
             errors.append("PROVEN authentication requires login rate limiting")
+        if facts.get("same_origin_mutation_guard") is not True:
+            errors.append("PROVEN authentication requires same-origin mutation guard")
 
     tenant = controls.get("cross_tenant_isolation") or {}
     if tenant.get("state") == PROVEN:
