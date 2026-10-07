@@ -57,6 +57,13 @@ important performance warning in this section: hosted GitHub runners are not a
 capacity contract. Step 2 therefore anchors regression thresholds to the slower
 successful run rather than publishing the faster run as if hardware did not matter.
 
+A third full execution later measured **4,140.67 records/s** at one million,
+with 10K/100K medians of **4,008.11 / 4,101.30 records/s**. That corroborates
+the slower ~4K records/s runner regime rather than the ~8.6K result. The code
+still replayed deterministically. The benchmark is therefore useful for
+**scale shape and correctness**, while absolute shared-runner speed remains a
+terrible thing to put on a sales slide.
+
 Every measured scale trial had:
 
 - zero unexpected review-routed records;
@@ -259,9 +266,12 @@ machine-readable baseline.
 
 CI requires:
 
-- executed 10K / 100K / 1M tiers;
-- full deterministic replay;
-- minimum throughput floor of 3,000 records/s per tier;
+- full main/manual runs at 10K / 100K / 1M;
+- pull-request runs at 10K / 100K to avoid burning several minutes re-proving
+  an unchanged one-million baseline on every edit;
+- full deterministic replay for every executed tier;
+- catastrophic throughput floor of 3,000 records/s per executed tier;
+- adjacent-tier median-throughput ratio between 0.70x and 1.30x;
 - sampled p99 below 0.75 ms;
 - RSS below 128 MB;
 - exact missing-authority review routing;

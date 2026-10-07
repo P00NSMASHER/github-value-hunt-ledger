@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import statistics
 from pathlib import Path
 
 
@@ -49,6 +50,10 @@ def validate_baseline(baseline: dict) -> list[str]:
         errors.append("baseline interruption resume not deterministic")
     if interruption.get("no_duplicate_aggregate") is not True:
         errors.append("baseline interruption replay double-counted aggregate")
+    ratio_min = float(cpu.get("regression_scale_ratio_min") or 0)
+    ratio_max = float(cpu.get("regression_scale_ratio_max") or 0)
+    if not 0 < ratio_min < 1 < ratio_max:
+        errors.append("baseline scale-ratio bounds must straddle 1")
     projections = baseline.get("projections_not_executed") or []
     for row in projections:
         if row.get("evidence_type") != "PROJECTION_NOT_EXECUTED":
@@ -94,15 +99,26 @@ def validate_database_evidence(evidence: dict) -> list[str]:
     return errors
 
 
-def validate_runtime_report(report: dict, baseline: dict) -> list[str]:
+def validate_runtime_report(report: dict, baseline: dict, required_tiers: set[int] | None = None) -> list[str]:
     errors: list[str] = []
     trials = report.get("trials") or []
     grouped: dict[int, list[dict]] = {}
     for trial in trials:
         grouped.setdefault(int(trial.get("count") or 0), []).append(trial)
 
+    required_tiers = required_tiers or {
+        int(row["count"]) for row in baseline["cpu_rating_benchmark"]["tiers"]
+    }
+    known_tiers = {
+        int(row["count"]) for row in baseline["cpu_rating_benchmark"]["tiers"]
+    }
+    unknown = required_tiers - known_tiers
+    if unknown:
+        errors.append("requested runtime tier is not present in baseline: " + ",".join(map(str, sorted(unknown))))
     for tier in baseline["cpu_rating_benchmark"]["tiers"]:
         count = int(tier["count"])
+        if count not in required_tiers:
+            continue
         actual = grouped.get(count) or []
         if not actual:
             errors.append(f"runtime report missing executed tier {count}")
@@ -140,6 +156,24 @@ def validate_runtime_report(report: dict, baseline: dict) -> list[str]:
     if int(interruption.get("replayed_chunk_count") or 0) < 1:
         errors.append("runtime interruption recovery did not replay uncertain work")
 
+    medians: dict[int,float] = {}
+    for count in sorted(required_tiers):
+        actual = grouped.get(count) or []
+        values = [
+            float((trial.get("primary") or {}).get("records_per_second") or 0)
+            for trial in actual
+        ]
+        if values:
+            medians[count] = statistics.median(values)
+    ratio_min = float(baseline["cpu_rating_benchmark"]["regression_scale_ratio_min"])
+    ratio_max = float(baseline["cpu_rating_benchmark"]["regression_scale_ratio_max"])
+    for left,right in zip(sorted(medians), sorted(medians)[1:]):
+        if medians[left] <= 0:
+            continue
+        ratio = medians[right] / medians[left]
+        if not ratio_min <= ratio <= ratio_max:
+            errors.append(f"throughput scale ratio {left}->{right} out of bounds: {ratio:.3f}")
+
     probe = report.get("memory_probe") or {}
     limits = baseline["reliability"]["memory_probe"]
     if float(probe.get("python_peak_heap_mb") or 0) > float(limits["regression_python_heap_ceiling_mb"]):
@@ -154,13 +188,15 @@ def main() -> None:
     parser.add_argument("--baseline", default="freight/PHASE3_PERFORMANCE_BASELINE.json")
     parser.add_argument("--database-evidence", default="freight/PHASE3_DATABASE_PERFORMANCE_2026-10-07.json")
     parser.add_argument("--report")
+    parser.add_argument("--required-tiers", nargs="+", type=int)
     args = parser.parse_args()
 
     baseline = _load(args.baseline)
     database = _load(args.database_evidence)
     errors = validate_baseline(baseline) + validate_database_evidence(database)
     if args.report:
-        errors += validate_runtime_report(_load(args.report), baseline)
+        required = set(args.required_tiers) if args.required_tiers else None
+        errors += validate_runtime_report(_load(args.report), baseline, required)
     result = {
         "state": "PASS" if not errors else "FAIL",
         "errors": errors,
