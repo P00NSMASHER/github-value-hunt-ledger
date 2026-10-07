@@ -59,7 +59,8 @@ jobs:
         shell: bash
         run: |
           PYTHONPATH=. python -m freight.free_growth_engine freight/fixtures/free_growth_day0.json --format markdown > /tmp/free-growth.md
-          grep -q 'HOLD_UNTIL_NEXT_SEND_WINDOW' /tmp/free-growth.md
+          grep -q 'PREP_OUTREACH_SAFETY' /tmp/free-growth.md
+          ! grep -q 'SEND_VERIFIED_FIRST_TOUCHES' /tmp/free-growth.md
           grep -q 'CLAIM_FREE_PROFILES' /tmp/free-growth.md
           grep -q 'BUILD_REFERRAL_CHANNEL' /tmp/free-growth.md
       - name: Controlled-pilot rights gate
