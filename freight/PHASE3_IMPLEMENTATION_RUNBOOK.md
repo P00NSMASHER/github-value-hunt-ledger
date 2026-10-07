@@ -64,14 +64,19 @@ Use `freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md`.
 3. Pre-register census or stratified-random sampling.
 4. For stratified sampling, freeze the random seed before RecoveryOS output.
 5. Freeze stratum population counts and sample targets.
-6. Assign distinct truth owner, reviewer A, reviewer B and RecoveryOS operator.
-7. Freeze selected case IDs and sample hash before RecoveryOS output exists.
-8. Run and freeze RecoveryOS output without access to truth.
-9. Freeze incumbent output independently.
-10. Independently adjudicate and freeze truth without access to RecoveryOS.
-11. Freeze the truth-manifest hash.
-12. Jointly unseal only after both RecoveryOS and truth artifacts are sealed.
-13. Verify sample/truth/RecoveryOS/incumbent hashes and timing contract.
+6. Calculate the finite-population required sample size from the v2 policy
+   before data is unsealed. If the planned sample cannot meet it, classify the
+   pilot as methodologically insufficient before running it.
+7. Record design weights for disproportionate stratified sampling.
+8. Assign distinct truth owner, reviewer A, reviewer B and RecoveryOS operator.
+9. Freeze selected case IDs and sample hash before RecoveryOS output exists.
+10. Freeze the balanced dual-review subset before RecoveryOS output exists.
+11. Run and freeze RecoveryOS output without access to truth.
+12. Freeze incumbent output independently.
+13. Independently adjudicate and freeze truth without access to RecoveryOS.
+14. Freeze the truth-manifest hash.
+15. Jointly unseal only after both RecoveryOS and truth artifacts are sealed.
+16. Verify sample/truth/RecoveryOS/incumbent hashes and timing contract.
 
 Any material change creates a new version. No quiet row substitution. A blindness
 or hash-ordering violation makes the study INVALID_METHOD.
@@ -100,6 +105,7 @@ or hash-ordering violation makes the study INVALID_METHOD.
    - incumbent-known leakage;
    - duplicate economic-issue leakage;
    - stratum-level errors;
+   - population-weighted classification and dollar metrics when sampling fractions differ;
    - reviewer touches/time.
 
 Do not describe audit quality as proven unless the machine status is

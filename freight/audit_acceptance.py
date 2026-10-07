@@ -100,6 +100,14 @@ def _wilson(successes: int, total: int, z: float = 1.959963984540054) -> dict | 
     }
 
 
+def _required_sample_size(population_size: int, margin: float, z: float = 1.959963984540054) -> int:
+    if population_size <= 0:
+        return 0
+    n0 = (z * z * 0.25) / (margin * margin)
+    adjusted = n0 / (1 + ((n0 - 1) / population_size))
+    return min(population_size, math.ceil(adjusted))
+
+
 def _cohen_kappa(pairs: list[tuple[str, str]]) -> dict | None:
     if not pairs:
         return None
@@ -190,11 +198,18 @@ def validate_policy(policy: dict) -> list[str]:
         "max_false_negative_dollar_share",
         "max_review_rate",
         "max_ece",
+        "target_case_rate_margin_95",
+        "min_population_weighted_precision",
+        "max_population_weighted_false_positive_rate",
+        "max_population_weighted_false_negative_rate",
     )
     for key in proportions:
         value = thresholds.get(key)
         if not isinstance(value, (int, float)) or not 0 <= value <= 1:
             errors.append(f"{key} must be between 0 and 1")
+
+    if thresholds.get("target_case_rate_margin_95") == 0:
+        errors.append("target_case_rate_margin_95 must be greater than zero")
 
     if thresholds.get("min_adjudicated_cases", 0) < (
         thresholds.get("min_positive_cases", 0)
@@ -668,14 +683,107 @@ def build_report(payload: dict, policy: dict) -> dict:
             ),
         }
 
+    sample_counts = Counter(case["stratum_key"] for case in cases)
+    population_by_stratum = {
+        item["key"]: item["population_count"] for item in payload["sampling"]["strata"]
+    }
+
+    def design_weight(case: dict) -> float:
+        return population_by_stratum[case["stratum_key"]] / sample_counts[case["stratum_key"]]
+
+    weighted_tp = sum(
+        design_weight(case)
+        for case in adjudicated
+        if case["truth_label"] == "POSITIVE" and case["predicted_label"] == "POSITIVE"
+    )
+    weighted_tn = sum(
+        design_weight(case)
+        for case in adjudicated
+        if case["truth_label"] == "NEGATIVE" and case["predicted_label"] == "NEGATIVE"
+    )
+    weighted_fp = sum(
+        design_weight(case)
+        for case in adjudicated
+        if case["truth_label"] == "NEGATIVE" and case["predicted_label"] == "POSITIVE"
+    )
+    weighted_fn = sum(
+        design_weight(case)
+        for case in adjudicated
+        if case["truth_label"] == "POSITIVE" and case["predicted_label"] == "NEGATIVE"
+    )
+    weighted_adjudicated = sum(design_weight(case) for case in adjudicated)
+    weighted_auto = sum(design_weight(case) for case in auto)
+    weighted_reviews = sum(design_weight(case) for case in reviews)
+    weighted_positive_truth = sum(design_weight(case) for case in positives)
+    weighted_negative_truth = sum(design_weight(case) for case in negatives)
+
+    weighted_predicted_positive_dollars = sum(
+        design_weight(case) * (case["predicted_variance_cents"] or 0)
+        for case in adjudicated
+        if case["predicted_label"] == "POSITIVE"
+    )
+    weighted_truth_positive_dollars = sum(
+        design_weight(case) * case["truth_variance_cents"] for case in positives
+    )
+    weighted_fp_dollars = sum(
+        design_weight(case) * (case["predicted_variance_cents"] or 0)
+        for case in negatives
+        if case["predicted_label"] == "POSITIVE"
+    )
+    weighted_fn_dollars = sum(
+        design_weight(case) * case["truth_variance_cents"]
+        for case in positives
+        if case["predicted_label"] == "NEGATIVE"
+    )
+    weighted_auto_error = sum(
+        design_weight(case)
+        * abs(int(case["predicted_variance_cents"] or 0) - int(case["truth_variance_cents"]))
+        for case in auto
+    )
+    weighted_auto_bias = sum(
+        design_weight(case)
+        * (int(case["predicted_variance_cents"] or 0) - int(case["truth_variance_cents"]))
+        for case in auto
+    )
+    weighted_auto_mass = sum(design_weight(case) for case in auto)
+
+    population_weighted = {
+        "auto_coverage": _ratio(weighted_auto, weighted_adjudicated),
+        "review_rate": _ratio(weighted_reviews, weighted_adjudicated),
+        "precision": _ratio(weighted_tp, weighted_tp + weighted_fp),
+        "false_positive_rate": _ratio(weighted_fp, weighted_negative_truth),
+        "false_negative_rate": _ratio(weighted_fn, weighted_positive_truth),
+        "auto_accuracy": _ratio(weighted_tp + weighted_tn, weighted_auto),
+        "predicted_positive_cents": weighted_predicted_positive_dollars,
+        "truth_positive_cents": weighted_truth_positive_dollars,
+        "false_positive_cents": weighted_fp_dollars,
+        "false_negative_cents": weighted_fn_dollars,
+        "false_positive_dollar_share": (
+            _ratio(weighted_fp_dollars, weighted_predicted_positive_dollars) or 0.0
+        ),
+        "false_negative_dollar_share": (
+            _ratio(weighted_fn_dollars, weighted_truth_positive_dollars) or 0.0
+        ),
+        "auto_mean_absolute_error_cents": (
+            _ratio(weighted_auto_error, weighted_auto_mass)
+        ),
+        "auto_net_bias_cents": weighted_auto_bias,
+    }
+
     precision = _wilson(tp, tp + fp)
     fpr = _wilson(fp, len(negatives))
     fnr = _wilson(fn, len(positives))
     calibration = _calibration(calibration_rows)
 
+    required_sample_size = _required_sample_size(
+        payload["population"]["population_size"],
+        policy["thresholds"]["target_case_rate_margin_95"],
+    )
+
     metrics = {
         "sample": {
             "total_cases": len(cases),
+            "required_sample_size_95": required_sample_size,
             "adjudicated_cases": len(adjudicated),
             "positive_cases": len(positives),
             "negative_cases": len(negatives),
@@ -718,6 +826,7 @@ def build_report(payload: dict, policy: dict) -> dict:
             "incumbent_credit_leakage_cents": incumbent_leakage,
             "duplicate_net_new_leakage_cents": duplicate_leakage,
         },
+        "population_weighted": population_weighted,
         "calibration": calibration,
         "reviewer_agreement": {
             **(reviewer or {"cases": 0, "agreement": None, "kappa": None}),
@@ -729,8 +838,12 @@ def build_report(payload: dict, policy: dict) -> dict:
 
     thresholds = policy["thresholds"]
     gates: dict[str, bool] = {}
+    gates["sample_precision_plan"] = len(cases) >= required_sample_size
     gates["sample_adjudicated"] = (
-        len(adjudicated) >= thresholds["min_adjudicated_cases"]
+        len(adjudicated) >= min(
+            thresholds["min_adjudicated_cases"],
+            payload["population"]["population_size"],
+        )
     )
     gates["sample_positive"] = (
         len(positives) >= thresholds["min_positive_cases"]
@@ -767,6 +880,28 @@ def build_report(payload: dict, policy: dict) -> dict:
         and metrics["sample"]["review_rate"]
         <= thresholds["max_review_rate"]
     )
+    gates["weighted_auto_coverage"] = (
+        population_weighted["auto_coverage"] is not None
+        and population_weighted["auto_coverage"] >= thresholds["min_auto_coverage"]
+    )
+    gates["weighted_review_rate"] = (
+        population_weighted["review_rate"] is not None
+        and population_weighted["review_rate"] <= thresholds["max_review_rate"]
+    )
+    gates["weighted_precision"] = (
+        population_weighted["precision"] is not None
+        and population_weighted["precision"] >= thresholds["min_population_weighted_precision"]
+    )
+    gates["weighted_false_positive_rate"] = (
+        population_weighted["false_positive_rate"] is not None
+        and population_weighted["false_positive_rate"]
+        <= thresholds["max_population_weighted_false_positive_rate"]
+    )
+    gates["weighted_false_negative_rate"] = (
+        population_weighted["false_negative_rate"] is not None
+        and population_weighted["false_negative_rate"]
+        <= thresholds["max_population_weighted_false_negative_rate"]
+    )
     gates["precision"] = (
         precision is not None
         and precision["lower"] >= thresholds["min_precision_lower_95"]
@@ -787,6 +922,14 @@ def build_report(payload: dict, policy: dict) -> dict:
     )
     gates["false_negative_dollars"] = (
         metrics["dollars"]["false_negative_dollar_share"]
+        <= thresholds["max_false_negative_dollar_share"]
+    )
+    gates["weighted_false_positive_dollars"] = (
+        population_weighted["false_positive_dollar_share"]
+        <= thresholds["max_false_positive_dollar_share"]
+    )
+    gates["weighted_false_negative_dollars"] = (
+        population_weighted["false_negative_dollar_share"]
         <= thresholds["max_false_negative_dollar_share"]
     )
     gates["calibration"] = (
@@ -815,11 +958,31 @@ def build_report(payload: dict, policy: dict) -> dict:
         for key, row in by_stratum.items()
     )
 
-    status = (
-        "AUDIT_QUALITY_PROVEN"
-        if all(gates.values())
-        else "INSUFFICIENT_OR_FAILED"
-    )
+    evidence_gates = {
+        "sample_precision_plan",
+        "sample_adjudicated",
+        "sample_positive",
+        "sample_negative",
+        "dual_review_size",
+        "dual_review_positive",
+        "dual_review_negative",
+        "all_strata_targets_met",
+    }
+    hard_integrity_gates = {
+        "unsupported_auto",
+        "incumbent_leakage",
+        "duplicate_leakage",
+    }
+    failed = {name for name, passed in gates.items() if not passed}
+    if not failed:
+        status = "AUDIT_QUALITY_PROVEN"
+    elif failed & hard_integrity_gates:
+        status = "QUALITY_GATE_FAILED"
+    elif failed & evidence_gates:
+        status = "INSUFFICIENT_EVIDENCE"
+    else:
+        status = "QUALITY_GATE_FAILED"
+
     return {
         "protocol_id": payload["protocol_id"],
         "population_hash": payload["population"]["population_hash"],

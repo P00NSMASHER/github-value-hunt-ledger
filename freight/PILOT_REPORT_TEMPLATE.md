@@ -9,7 +9,7 @@
 **RecoveryOS output hash:** [SHA-256]  
 **Incumbent output hash:** [SHA-256]  
 **Acceptance policy:** recoveryos-blind-audit-acceptance-v2  
-**Method status:** [INVALID_METHOD / INSUFFICIENT_OR_FAILED / AUDIT_QUALITY_PROVEN]
+**Method status:** [INVALID_METHOD / INSUFFICIENT_EVIDENCE / QUALITY_GATE_FAILED / AUDIT_QUALITY_PROVEN]
 
 ### Financial totals
 
@@ -27,6 +27,7 @@ Never collapse these rows into one savings number.
 
 - population size: —
 - sample size: —
+- finite-population required sample size at 95% / configured margin: —
 - sampling method: [CENSUS / STRATIFIED_RANDOM]
 - frozen random seed when sampled: —
 - declared strata: —
@@ -49,12 +50,17 @@ Report both point estimates and the required uncertainty bounds:
 - review/abstention decisions: —
 - automatic coverage: —
 - review rate: —
+- population-weighted automatic coverage: —
+- population-weighted review rate: —
 - true positives / true negatives: —
 - false positives / false negatives: —
 - precision: — ; **95% Wilson interval: —**
 - false-positive case rate: — ; **95% Wilson interval: —**
 - false-negative case rate: — ; **95% Wilson interval: —**
 - auto-decision accuracy: —
+- population-weighted precision: —
+- population-weighted false-positive rate: —
+- population-weighted false-negative rate: —
 - dual-reviewed cases: —
 - reviewer raw agreement: —
 - reviewer Cohen's kappa: —
@@ -76,6 +82,10 @@ Report both point estimates and the required uncertainty bounds:
 - exact-dollar rate: —
 - incumbent-known dollars incorrectly credited as net-new: **$0 required**
 - duplicate economic-issue dollars incorrectly credited twice: **$0 required**
+- population-weighted false-positive dollar share: —
+- population-weighted false-negative dollar share: —
+- population-weighted mean absolute dollar error: —
+- population-weighted net dollar bias: —
 
 A small case error with a large dollar impact is not hidden by an attractive
 ordinary accuracy percentage.

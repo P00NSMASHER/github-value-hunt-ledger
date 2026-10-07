@@ -37,7 +37,10 @@ RecoveryOS has strong internal/reproducible evidence for:
 - machine-enforced blind customer-audit protocol with pre-registered stratification and immutable sample/truth/output hashes;
 - 95% uncertainty bounds, selective-classifier coverage, dollar-weighted error and confidence-calibration reporting;
 - dual-review agreement / Cohen's kappa and explicit disagreement adjudication;
-- hard zero-leakage gates for unsupported auto-decisions, incumbent-known value and duplicate economic issues.
+- hard zero-leakage gates for unsupported auto-decisions, incumbent-known value and duplicate economic issues;
+- finite-population sample-size planning rather than a fixed sample-size superstition;
+- separate INSUFFICIENT_EVIDENCE versus QUALITY_GATE_FAILED states;
+- design-weighted population estimates for disproportionate stratified samples.
 
 ## Still not proven
 

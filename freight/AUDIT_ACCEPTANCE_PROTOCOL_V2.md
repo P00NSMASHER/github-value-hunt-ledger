@@ -71,6 +71,19 @@ Every declared stratum has:
 
 Missing a target fails the methodology gate.
 
+The policy also calculates a conservative 95% finite-population sample-size
+requirement using the worst-case binomial variance (p=0.5) and the configured
+margin-of-error target. The current target is +/-5 percentage points. A complete
+small-population census can therefore satisfy the design without an arbitrary
+200-case ritual, while a 10,000-item population requires 370 sampled cases
+before the precision-planning gate passes.
+
+For disproportionate stratified samples, the report applies each stratum's
+design weight (population count / sampled count). Raw sample metrics remain
+visible, but population-weighted precision, false-positive rate,
+false-negative rate, coverage, review rate and dollar metrics are reported and
+gated separately.
+
 ## 3. Four independently frozen evidence objects
 
 The pilot retains separate hashes for:
@@ -207,7 +220,8 @@ The report uses 95% Wilson intervals for:
 
 Current acceptance thresholds include:
 
-- >= 200 adjudicated cases;
+- finite-population sample size sufficient for the +/-5 point 95% planning target;
+- >= 200 adjudicated cases when the population itself contains at least 200 items;
 - >= 30 positive cases;
 - >= 30 negative cases;
 - precision 95% lower bound >= 0.85;
@@ -297,6 +311,10 @@ The first pilot report must show these tables even when the overall gate passes.
 A strong aggregate may not conceal one failing mode, carrier, source type, or
 spend band.
 
+When strata are sampled at different fractions, the report also exposes the
+population-weighted aggregate. This prevents an oversampled rare stratum from
+quietly becoming the buyer-wide error rate.
+
 ## 14. Gate states
 
 ### INVALID_METHOD
@@ -306,13 +324,22 @@ hash, role-separation, sampling, timestamp, or adjudication failures.
 
 Do not publish accuracy metrics as blind validation.
 
-### INSUFFICIENT_OR_FAILED
+### INSUFFICIENT_EVIDENCE
 
-The method is valid, but one or more statistical/economic acceptance gates fail
-or the sample is underpowered.
+The method is valid, but sample precision, event prevalence, balanced
+dual-review coverage, or declared stratum coverage is insufficient to support
+the full quality claim.
 
-Report the failed gates. Do not relabel the result as success because the
-numbers are inconvenient.
+This is not a product failure. It means the study cannot answer the question
+with the required strength.
+
+### QUALITY_GATE_FAILED
+
+The method is valid and enough evidence exists to evaluate at least the
+applicable quality/integrity gates, but one or more product-quality gates fail.
+
+Unsupported automatic decisions, incumbent-known net-new leakage, or duplicate
+net-new leakage are hard integrity failures even in a smaller sample.
 
 ### AUDIT_QUALITY_PROVEN
 

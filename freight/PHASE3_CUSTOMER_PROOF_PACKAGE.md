@@ -52,14 +52,15 @@ blind validation.
 
 The canonical external methodology is
 `freight/AUDIT_ACCEPTANCE_PROTOCOL_V2.md`. A real pilot must validate against
-`freight/AUDIT_ACCEPTANCE_POLICY_V2.json`. Method-design failure returns
-`INVALID_METHOD`; a valid but underpowered or failing population returns
-`INSUFFICIENT_OR_FAILED`. Only the full executable gate may issue
-`AUDIT_QUALITY_PROVEN`.
+`freight/AUDIT_ACCEPTANCE_POLICY_V2.json`. Method-design failure returns `INVALID_METHOD`. A valid but underpowered study
+returns `INSUFFICIENT_EVIDENCE`. A sufficiently evaluable study that violates
+quality or integrity thresholds returns `QUALITY_GATE_FAILED`. Only the full
+executable gate may issue `AUDIT_QUALITY_PROVEN`.
 
 ## Minimum real-customer metrics
 
 - total frozen invoices/shipments;
+- finite-population required sample size and achieved sample size;
 - mode/carrier coverage;
 - authority coverage;
 - unsupported/review rate;
@@ -78,6 +79,7 @@ The canonical external methodology is
 - duplicate economic-issue net-new leakage dollars;
 - unsupported automatic decisions;
 - stratum-level false positives, false negatives and review counts;
+- population design weights and weighted aggregate classification/dollar metrics;
 - reviewer minutes / 1,000 invoices;
 - realized recovery;
 - reversed recovery;
