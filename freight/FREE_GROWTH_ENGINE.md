@@ -28,18 +28,43 @@ Next expansion should be driven by observed query demand, not page-count vanity.
 
 ## 3. Free business profiles and directories
 
-Priority free profiles:
+**Eligibility-first, not citation-count-first (reviewed 2026-10-07).** The
+business is currently presented as remote-first B2B freight auditing. A
+Pottsville postal address does **not** establish face-to-face customer service
+or walk-in hours. Do not invent in-person meetings, storefronts, business
+phones, categories, or customer reviews to qualify for map listings.
 
-1. Google Business Profile
-2. Bing Places
-3. Apple Business Connect
-4. LinkedIn Company Page
+Prioritize, after searching for and claiming any existing matching profile:
 
-Use the same Freight Recovery name, site URL, business email and business address everywhere.
+1. **LinkedIn Company Page — eligible free business page.** Authorized owner
+   must use an authentic individual LinkedIn account. Match the current public
+   offer, national service reach, and Pottsville base. Premium is unnecessary.
+2. **Apple Business — eligible free business/brand registration**, including
+   online-only and remote-service businesses. An Apple Maps *location place
+   card* is not automatically promised merely by creating the brand.
+3. **BBB Business Profile — free claim/request path, subject to BBB review.**
+   A free profile is not BBB Accreditation; do not claim accredited status.
+4. **Clutch Basic — free B2B service-provider profile, subject to service
+   category fit and platform approval.** Do not force a freight auditor into
+   an inaccurate agency/consulting category or purchase Verified.
+5. **Manta Free Company Listing — free plan available, but verify the
+   actual non-storefront service eligibility and address/privacy settings
+   inside the application before submitting.** Lower priority than a
+   relevant B2B profile.
 
-Business address:
-715 Yorktowne Road
-Pottsville, PA 17901
+**Hold/do not create:** Google Business Profile requires in-person customer
+interaction during stated business hours. Bing Places requires an address
+open to customers or employees who travel to customers. Neither is established
+for Freight Recovery today; do not create a pretend service-area profile.
+Yelp explicitly disfavours primarily B2B businesses. The Schuylkill Chamber
+directory requires paid membership, which is not authorized for this free lane.
+
+Search for the exact name **plus Pottsville and postal address** before any
+registration, and claim a matching existing profile rather than duplicate it.
+Public search not finding a listing does not prove none exists in an account
+or pending verification queue. Track **proposed, submitted, verified and live**
+as distinct statuses. See `freight/FREE_PROFILE_ASSET_PACK.md` for copy,
+source policies, channel links, and an application-state checklist.
 
 ## 4. Referral channel
 
