@@ -11,6 +11,9 @@
 - Recovery is not guaranteed.
 
 ## Public resources
+- https://p00nsmasher.github.io/github-value-hunt-ledger/freight-recovery-evidence-standard.html
+- https://p00nsmasher.github.io/github-value-hunt-ledger/post-payment-freight-audit.html
+- https://p00nsmasher.github.io/github-value-hunt-ledger/second-look-freight-audit.html
 - https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-services.html
 - https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit.html
 - https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-and-payment.html
