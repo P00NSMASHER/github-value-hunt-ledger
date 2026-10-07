@@ -188,8 +188,6 @@ def build(
     page, count = STATUS_PATTERN.subn(
         lambda match: match.group(1)
         + "<strong>Free audit requests are open.</strong> "
-        + "Start with non-sensitive business details. "
-        + "Freight records move only through an approved secure route."
         + match.group(2),
         text_bundle["index.html"],
     )

@@ -102,8 +102,8 @@ class PublicBuildTests(unittest.TestCase):
 
             self.assertIn("Freight recovery <em>you can prove.</em>", page)
             self.assertIn("Recovery Evidence Pack", page)
-            self.assertIn("Good. We test what the first audit may have missed.", page)
-            self.assertIn("Inspect the method before trusting the number.", page)
+            self.assertIn('href="second-look-freight-audit.html"', page)
+            self.assertIn('href="freight-recovery-evidence-standard.html"', page)
             self.assertNotIn("Real case studies will appear when they are real.", page)
             self.assertIn("Start Free Recovery Audit", page)
             self.assertIn("<strong>$0</strong> upfront audit fee", page)
