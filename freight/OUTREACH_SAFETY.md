@@ -40,4 +40,4 @@ message: one to address, account_id, subject, channel, touch, text and optional 
 
 ## Validation
 
-Run `node freight/outreach_guard.test.mjs` and `python -m pytest freight/test_free_growth_engine.py`. Fixtures are synthetic. CI runs these checks; no messages are sent. This is a bounded safeguard suite, not a legal compliance certification.
+Run `node freight/outreach_guard.test.mjs`, `node freight/outreach_preflight.test.mjs` and `python -m pytest freight/test_free_growth_engine.py`. Fixtures are synthetic. CI runs these checks; no messages are sent. This is a bounded safeguard suite, not a legal compliance certification.
