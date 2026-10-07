@@ -1,0 +1,30 @@
+name: Freight Synthetic Customer Lifecycle Smoke
+on:
+  pull_request:
+    paths:
+      - 'freight/customer_lifecycle_product_probe.py'
+      - 'freight/test_customer_lifecycle_product_probe.py'
+      - 'freight/CUSTOMER_LIFECYCLE_LAB.md'
+      - '.github/workflows/freight-customer-lifecycle-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-customer-domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout pull request exact head
+        uses: actions/checkout@v4
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Execute real domain payment tests with fictional objects
+        run: python -m unittest -v freight.test_customer_lifecycle_product_probe
+      - name: Explicit scope
+        run: |
+          echo 'Simulation only. No customer data, email, payment, provider calls, or production deployment.'
+          echo 'Tested payment-domain transitions are not a substitute for customer lifecycle staging integration.'
