@@ -36,21 +36,27 @@ phones, categories, or customer reviews to qualify for map listings.
 
 Prioritize, after searching for and claiming any existing matching profile:
 
-1. **LinkedIn Company Page — eligible free business page.** Authorized owner
-   must use an authentic individual LinkedIn account. Match the current public
-   offer, national service reach, and Pottsville base. Premium is unnecessary.
-2. **Apple Business — eligible free business/brand registration**, including
-   online-only and remote-service businesses. An Apple Maps *location place
-   card* is not automatically promised merely by creating the brand.
-3. **BBB Business Profile — free claim/request path, subject to BBB review.**
-   A free profile is not BBB Accreditation; do not claim accredited status.
-4. **Clutch Basic — free B2B service-provider profile, subject to service
-   category fit and platform approval.** Do not force a freight auditor into
-   an inaccurate agency/consulting category or purchase Verified.
-5. **Manta Free Company Listing — free plan available, but verify the
-   actual non-storefront service eligibility and address/privacy settings
-   inside the application before submitting.** Lower priority than a
-   relevant B2B profile.
+1. **LinkedIn Company Page — free, high-fit B2B discoverability.** An
+   authorized individual must manage the company page; skip paid Premium.
+2. **Schuylkill County Online — locally owned directory.** Free claimed
+   listing and Professional Services category available. No exact Freight
+   Recovery match in the current visible 730-entry directory. If the owner is
+   genuinely locally rooted, use its free Suggest Business form then claim
+   after review, never a paid placement.
+3. **SchuylkillPA.com — free county business directory.** Independently
+   operated local-information site advertises free local registration; the
+   Add Listing form is login-gated. Check duplicates, then use free tier only.
+4. **Alignable Guest — free local business network.** An eligible active U.S.
+   business owner/authorized employee can use the free Guest tier for limited
+   connections and referral networking. Do not purchase Basic ($29/month)
+   or import personal contacts by default.
+5. **Apple Business — free online-only business registration**, subject to
+   Apple verification. No guaranteed physical location/Maps place card.
+6. **BBB Business Profile — free claim/request path**, subject to review;
+   not BBB Accreditation.
+7. **Clutch Basic — free conditional** if truthful service taxonomy fits.
+8. **Manta Free Company Listing — free conditional**, verify acceptance of
+   remote-only businesses and address/privacy controls in the form.
 
 **Hold/do not create:** Google Business Profile requires in-person customer
 interaction during stated business hours. Bing Places requires an address
@@ -59,7 +65,7 @@ for Freight Recovery today; do not create a pretend service-area profile.
 Yelp explicitly disfavours primarily B2B businesses. The Schuylkill Chamber
 directory requires paid membership, which is not authorized for this free lane.
 
-Search for the exact name **plus Pottsville and postal address** before any
+Search the provider directory for the exact name **plus Pottsville and postal address** before any
 registration, and claim a matching existing profile rather than duplicate it.
 Public search not finding a listing does not prove none exists in an account
 or pending verification queue. Track **proposed, submitted, verified and live**
