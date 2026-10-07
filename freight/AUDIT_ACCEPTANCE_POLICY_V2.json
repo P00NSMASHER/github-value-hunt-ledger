@@ -21,7 +21,8 @@
     "max_incumbent_leakage_cents": 0,
     "max_duplicate_leakage_cents": 0,
     "min_dual_review_positive_cases": 10,
-    "min_dual_review_negative_cases": 10
+    "min_dual_review_negative_cases": 10,
+    "target_case_rate_margin_95": 0.05
   },
   "claim_boundary": [
     "Passing this gate supports only the frozen buyer-authorized population evaluated under this protocol; it is not a universal production-accuracy claim.",
