@@ -30,6 +30,7 @@ def run(iterations: int = 1000, seed: int = 20261007) -> dict:
     by_mode = Counter()
     failures = []
     calls = 0
+    failure_count = 0
     start = time.perf_counter()
     cases = []
     for case in source_cases:
@@ -53,7 +54,7 @@ def run(iterations: int = 1000, seed: int = 20261007) -> dict:
             by_mode[raw["mode"]] += 1
             expected_variance = (
                 max(0, record.billed_total_cents - original.expected_total_cents)
-                if original.status == RATED else None
+                if original.expected_total_cents is not None else None
             )
             same = (
                 observed.status == original.status and
@@ -64,8 +65,10 @@ def run(iterations: int = 1000, seed: int = 20261007) -> dict:
                 observed.record_hash == record.record_hash and
                 len(observed.rating_hash) == 64
             )
-            if not same and len(failures) < 30:
-                failures.append({
+            if not same:
+                failure_count += 1
+                if len(failures) < 30:
+                    failures.append({
                     "case": case["id"], "iteration": sequence,
                     "expected_status": original.status,
                     "observed_status": observed.status,
@@ -81,7 +84,7 @@ def run(iterations: int = 1000, seed: int = 20261007) -> dict:
         "seed": seed, "iterations_per_case": iterations,
         "base_gold_cases": len(cases), "rated_calls": calls,
         "by_mode": dict(sorted(by_mode.items())),
-        "failures": failures, "failure_count_at_least": len(failures),
+        "failures": failures, "failure_count": failure_count,
         "elapsed_seconds": round(time.perf_counter()-start,3),
         "claim_boundary": (
             "Checks billing-change invariance, not six-mode tariff truth, OCR, "
