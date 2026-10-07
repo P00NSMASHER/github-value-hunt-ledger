@@ -1,81 +1,117 @@
-# Freight Recovery Free Profile Asset Pack
+# Freight Recovery — free business profile asset pack
 
-Status: READY
+Updated: 2026-10-07
+Status: **APPLICATION-READY, NOT PUBLISHED OR VERIFIED**
 
-Use the same business identity across free profile/listing channels. Do not invent phone numbers, certifications, customer counts, or recovery statistics.
+This file is an asset pack and eligibility checklist, not a claim that platform
+profiles have been created. Never invent awards, licenses, carrier partnerships,
+customer results, meeting locations, or business contact details.
 
 ## Canonical identity
 
-Business name: Freight Recovery
+- **Trading name:** Freight Recovery
+- **Website:** https://p00nsmasher.github.io/github-value-hunt-ledger/
+- **Published general-purpose inbox:** jayp19386@gmail.com
+- **Business mailing address on the public site:** 715 Yorktowne Road, Pottsville, PA 17901
+- **Where the service is offered:** United States, via remote-first qualification
+  and a separately scoped historical freight audit and recovery engagement
+- **Primary buyer:** B2B shippers, distributors, manufacturers, finance/AP,
+  transportation, procurement and logistics teams
 
-Website:
-https://p00nsmasher.github.io/github-value-hunt-ledger/
+**Eligibility guard:** A published Pottsville mailing address is not proof of
+public walk-in hours, customer-facing premises, or staff traveling to customers.
+Do not identify this as an open storefront or publish extra residential/phone
+details. If in-person customer service becomes real and regular, re-check the
+precise platform rules before changing map eligibility.
 
-Business email:
-jayp19386@gmail.com
+## Ready-to-use copy
 
-Business address:
-715 Yorktowne Road
-Pottsville, PA 17901
+**Tagline:** Evidence-first freight audit. Recovery you can prove.
 
-Primary service area:
-United States
+**Short (about 300 characters):** Freight Recovery helps U.S. businesses review
+historical carrier invoices for supportable duplicates, rate discrepancies,
+accessorial errors and missed credits. Start with a $0-upfront audit. Recovery
+work is separately authorized; fees depend on eligible funds actually recovered.
 
-## Short description
+**Long:** Freight Recovery is a Pottsville, Pennsylvania-based B2B service for
+shippers, manufacturers, distributors and multi-site operators across the United
+States. We independently review historical parcel, LTL, truckload and related
+freight charges using invoice, shipment and controlling contract/rate evidence.
+Candidate discrepancies, validated findings, authorized claims, settlements,
+reversals and actual recovered funds remain distinct. The initial bounded
+review is $0 upfront. Recovery action requires a separate customer-approved
+engagement; no recovery is guaranteed and no recovery fee applies when eligible
+actual recovery is $0. Start with non-sensitive qualification details. Freight
+records move only through an approved secure intake route.
 
-Freight Recovery provides evidence-led freight invoice review and recovery support for businesses with material freight spend. The initial audit is $0 upfront and reviews a bounded historical freight population for supportable duplicate charges, rate or accessorial discrepancies, and unsupported billing. If a supportable opportunity exists and the customer chooses to proceed, any recovery engagement is separately authorized and success-based.
+**Specialties, only if supported by the platform:** Freight invoice audit;
+post-payment freight audit; freight overcharge review; second-look freight
+audit; duplicate charges; carrier rate review; accessorial charge audit.
 
-## Long description
+## Eligibility and registration shortlist
 
-Freight Recovery helps finance, AP, transportation, logistics, distribution, and procurement teams independently review historical freight billing. The audit looks for supportable issues such as duplicate freight invoices, rate mismatches, unsupported accessorials, detention discrepancies, billing-period errors, and credits or refunds that do not reconcile cleanly.
+| Priority | Platform | Current eligibility conclusion | Free route | Registration state |
+| --- | --- | --- | --- | --- |
+| 1 | LinkedIn Company Page | Eligible for remote B2B organizations; an authorized real-person LinkedIn account is required | https://www.linkedin.com/help/linkedin/answer/a542801 | **NOT CONFIRMED**; search and claim existing first |
+| 2 | Apple Business | Eligible for virtual and online-only business brand registration; a location/Maps place card has separate conditions | https://business.apple.com/ | **NOT CONFIRMED**; search existing presence |
+| 3 | Better Business Bureau | Free Business Profile claim/add request; publication subject to review, not accreditation | https://www.bbb.org/get-listed | **NOT CONFIRMED**; BBB lookup first |
+| 4 | Clutch Basic | Free B2B service-provider profile; only register if offered service taxonomy fits freight auditing honestly | https://clutch.co/get-listed | **CATEGORY FIT PENDING** |
+| 5 | Manta | Free Company Listing, but online-only/non-storefront acceptance must be confirmed at entry | https://www.manta.com/business-listings/free-business-listing | **ELIGIBILITY PENDING** |
+| HOLD | Google Business Profile | **Not eligible based on current remote-only evidence**; must meet customers face to face during stated hours | https://support.google.com/business/answer/13763036 | DO NOT REGISTER without real in-person basis |
+| HOLD | Bing Places for Business | **Not eligible based on current remote-only evidence**; requires customer-facing physical premises OR staff customer visits | https://www.bing.com/forbusiness/help/modernExperience | DO NOT REGISTER without real in-person basis |
+| NO | Yelp | Normally excludes businesses that primarily serve commercial customers | https://www.yelp-support.com/article/What-kinds-of-businesses-are-eligible-for-Yelp?l=en_US | NOT RECOMMENDED |
+| PAID | Schuylkill Chamber | Directory is a paid member-only benefit | https://www.schuylkillchamber.com/ | DEFER; no purchase |
 
-The initial audit is $0 upfront. Potential recovery, validated findings, approved claims, and actual recovered funds are tracked as separate states. No recovery is guaranteed, and no recovery fee applies unless eligible funds are actually recovered under an authorized engagement.
+**Duplicate-screen state, 2026-10-07:** Public web searches for the exact
+business name plus Pottsville and the published street address did not yield a
+reliable matching LinkedIn, BBB, Manta, Bing, Apple or Google business profile;
+structured local-business discovery likewise surfaced unrelated companies.
+This is **NOT FOUND IN PUBLIC SEARCH**, *not* confirmed absence. Authenticated
+account search, pending claims, and provider moderation queues were unavailable.
+Before creating an entry, search within the provider's claim/add flow and stop
+if a matching profile exists.
 
-Freight records are not accepted through the public website. Start with non-sensitive qualification details; if there is a fit, scope and an approved secure intake route are confirmed before records move.
+## Channel-tagged website links
 
-## Profile links with attribution
+Use these only for a new or verified existing free profile; **do not publish
+unverified listings or falsely signal platform approval**.
 
-Google Business Profile:
-https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=google_business_profile&utm_medium=organic&utm_campaign=free_growth_profiles
+- LinkedIn: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=linkedin&utm_medium=organic&utm_campaign=free_growth_profiles
+- Apple Business: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=apple_business&utm_medium=organic&utm_campaign=free_growth_profiles
+- BBB: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=bbb&utm_medium=organic&utm_campaign=free_growth_profiles
+- Clutch: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=clutch&utm_medium=organic&utm_campaign=free_growth_profiles
+- Manta: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=manta&utm_medium=organic&utm_campaign=free_growth_profiles
 
-Bing Places:
-https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=bing_places&utm_medium=organic&utm_campaign=free_growth_profiles
+## Before submission
 
-Apple Business Connect:
-https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=apple_business_connect&utm_medium=organic&utm_campaign=free_growth_profiles
+1. Search by **Freight Recovery**, **Pottsville**, and **715 Yorktowne Road** on
+   the platform. Claim, correct or request access to the original if found.
+2. Confirm company identity, actual service category, ownership authority,
+   disclosure of public business information, and any verification steps.
+3. Confirm the profile is truly free. Reject paid boosts, trials, recurring
+   subscriptions, paid verification and paid directory packages.
+4. Use the identical true brand name, site, locality and remote-service
+   description. Do not invent staffed hours, phone numbers, or reviews.
+5. Record separately: `NOT_FOUND_PUBLICLY` -> `SUBMITTED` -> `VERIFIED`
+   -> `LIVE`, including public URL and evidence only after verification.
+6. Track attributable buyer conversations from each `utm_source`; a listing
+   count or backlink alone is not proof of customer acquisition.
 
-LinkedIn Company Page:
-https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=linkedin&utm_medium=organic&utm_campaign=free_growth_profiles
+## Source checks
 
-## Suggested service phrases
-
-Use only where the platform supports free-form services/categories:
-
-- Freight audit services
-- Freight invoice audit
-- Freight overcharge review
-- Freight billing error review
-- Accessorial charge audit
-- Carrier invoice audit
-- Freight recovery support
-
-Do not claim a platform category exists unless the platform actually offers it.
-
-## Profile image/creative guidance
-
-Until a dedicated brand asset exists:
-- use the existing Freight Recovery name and site visual language;
-- do not use carrier logos;
-- do not imply partnerships with carriers, audit vendors, or accounting firms;
-- do not use fake badges or certifications.
-
-## Verification checklist
-
-- business name matches everywhere;
-- website uses the channel-specific tagged URL;
-- email is jayp19386@gmail.com;
-- postal address matches exactly;
-- descriptions preserve the $0-upfront / success-based distinction;
-- no fabricated testimonials or outcomes;
-- no customer-data upload instructions;
-- profile is marked complete only after the platform verifies it.
+- Google in-person requirement:
+  https://support.google.com/business/answer/13763036
+- Bing physical location / travel requirement:
+  https://www.bing.com/forbusiness/help/modernExperience
+- Apple explicitly includes online-only:
+  https://www.apple.com/newsroom/2024/10/apple-expands-tools-to-help-businesses-connect-with-customers/
+- LinkedIn free Page:
+  https://www.linkedin.com/help/linkedin/answer/a542801
+- BBB free profile:
+  https://www.bbb.org/get-listed
+- Clutch free Basic:
+  https://clutch.co/get-listed
+- Manta free listing:
+  https://www.manta.com/business-listings/free-business-listing
+- Yelp primarily B2B exclusion:
+  https://www.yelp-support.com/article/What-kinds-of-businesses-are-eligible-for-Yelp?l=en_US
