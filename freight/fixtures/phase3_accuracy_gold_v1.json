@@ -1,0 +1,1260 @@
+{
+  "schema_version": 1,
+  "gold_id": "recoveryos-phase3-accuracy-v1",
+  "common": {
+    "buyer_id": "GOLD-BUYER",
+    "business_unit": "GOLD-BU",
+    "customer_id": "GOLD-CUSTOMER",
+    "currency": "USD",
+    "service_date": "2026-10-01",
+    "invoice_date": "2026-10-02"
+  },
+  "authority_profiles": {
+    "parcel_standard": {
+      "authority_id": "AUTH-PARCEL-STANDARD",
+      "mode": "PARCEL",
+      "carrier_id": "CARRIER-PARCEL",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "dimensional_divisor": 139,
+        "fuel_bps": 1000,
+        "residential_cents": 0,
+        "weight_bands": [
+          {
+            "max_billable_lb": 1,
+            "zone_rates_cents": {
+              "2": 800
+            }
+          },
+          {
+            "max_billable_lb": 5,
+            "zone_rates_cents": {
+              "2": 1200
+            }
+          },
+          {
+            "max_billable_lb": 20,
+            "zone_rates_cents": {
+              "2": 2500
+            }
+          }
+        ]
+      }
+    },
+    "ltl_standard": {
+      "authority_id": "AUTH-LTL-STANDARD",
+      "mode": "LTL",
+      "carrier_id": "CARRIER-LTL",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "per_cwt_cents": 9000,
+        "minimum_cents": 10000,
+        "discount_bps": 0,
+        "fuel_bps": 1000,
+        "lane_multiplier_bps": 10000,
+        "class_multipliers_bps": {
+          "70": 10000
+        }
+      }
+    },
+    "tl_standard": {
+      "authority_id": "AUTH-TL-STANDARD",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 200,
+        "minimum_cents": 80000,
+        "fuel_bps": 1000
+      }
+    },
+    "intermodal_standard": {
+      "authority_id": "AUTH-INTERMODAL-STANDARD",
+      "mode": "INTERMODAL",
+      "carrier_id": "CARRIER-INTERMODAL",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "base_cents": 50000,
+        "per_mile_cents": 100,
+        "fuel_bps": 1000,
+        "chassis_per_day_cents": 3000
+      }
+    },
+    "air_standard": {
+      "authority_id": "AUTH-AIR-STANDARD",
+      "mode": "AIR",
+      "carrier_id": "CARRIER-AIR",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "per_kg_cents": 500,
+        "minimum_cents": 1000,
+        "volumetric_divisor_cm3_per_kg": 6000,
+        "fuel_bps": 1000,
+        "security_per_kg_cents": 20
+      }
+    },
+    "ocean_container_standard": {
+      "authority_id": "AUTH-OCEAN-CONTAINER",
+      "mode": "OCEAN",
+      "carrier_id": "CARRIER-OCEAN",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "CONTAINER",
+        "container_rates_cents": {
+          "20GP": 150000,
+          "40HC": 200000
+        },
+        "minimum_cents": 0,
+        "fuel_bps": 1000
+      }
+    },
+    "ocean_wm_standard": {
+      "authority_id": "AUTH-OCEAN-WM",
+      "mode": "OCEAN",
+      "carrier_id": "CARRIER-OCEAN-WM",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "W_M",
+        "w_m_per_unit_cents": 10000,
+        "minimum_cents": 0,
+        "fuel_bps": 0
+      }
+    },
+    "tl_unverified": {
+      "authority_id": "AUTH-TL-UNVERIFIED",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL-UNVERIFIED",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": false,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 200,
+        "minimum_cents": 80000,
+        "fuel_bps": 1000
+      }
+    },
+    "tl_priority_low": {
+      "authority_id": "AUTH-TL-PRIORITY-LOW",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL-AUTH",
+      "effective_from": "2026-01-01",
+      "priority": 5,
+      "verified": true,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 180,
+        "minimum_cents": 0,
+        "fuel_bps": 0
+      }
+    },
+    "tl_priority_high": {
+      "authority_id": "AUTH-TL-PRIORITY-HIGH",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL-AUTH",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 200,
+        "minimum_cents": 0,
+        "fuel_bps": 0
+      }
+    },
+    "tl_old": {
+      "authority_id": "AUTH-TL-OLD",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL-DATE",
+      "effective_from": "2025-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 180,
+        "minimum_cents": 0,
+        "fuel_bps": 0
+      }
+    },
+    "tl_new": {
+      "authority_id": "AUTH-TL-NEW",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL-DATE",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 200,
+        "minimum_cents": 0,
+        "fuel_bps": 0
+      }
+    },
+    "tl_tie_a": {
+      "authority_id": "AUTH-TL-TIE-A",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL-TIE",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 180,
+        "minimum_cents": 0,
+        "fuel_bps": 0
+      }
+    },
+    "tl_tie_b": {
+      "authority_id": "AUTH-TL-TIE-B",
+      "mode": "TL",
+      "carrier_id": "CARRIER-TL-TIE",
+      "effective_from": "2026-01-01",
+      "priority": 10,
+      "verified": true,
+      "terms": {
+        "pricing_model": "PER_MILE",
+        "per_mile_cents": 220,
+        "minimum_cents": 0,
+        "fuel_bps": 0
+      }
+    }
+  },
+  "rating_cases": [
+    {
+      "id": "parcel_positive",
+      "authority_profiles": [
+        "parcel_standard"
+      ],
+      "record": {
+        "mode": "PARCEL",
+        "carrier_id": "CARRIER-PARCEL",
+        "actual_weight_grams": 453,
+        "package_count": 1,
+        "packages": [
+          {
+            "package_id": "P1",
+            "weight_grams": 453,
+            "length_mm": 300,
+            "width_mm": 200,
+            "height_mm": 150
+          }
+        ],
+        "zone": "2",
+        "charges": [
+          [
+            "TRANSPORTATION",
+            1280
+          ],
+          [
+            "FUEL",
+            120
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "POSITIVE",
+        "expected_total_cents": 1320,
+        "variance_cents": 80,
+        "authority_id": "AUTH-PARCEL-STANDARD"
+      }
+    },
+    {
+      "id": "parcel_negative",
+      "authority_profiles": [
+        "parcel_standard"
+      ],
+      "record": {
+        "mode": "PARCEL",
+        "carrier_id": "CARRIER-PARCEL",
+        "actual_weight_grams": 453,
+        "package_count": 1,
+        "packages": [
+          {
+            "package_id": "P1",
+            "weight_grams": 453,
+            "length_mm": 300,
+            "width_mm": 200,
+            "height_mm": 150
+          }
+        ],
+        "zone": "2",
+        "charges": [
+          [
+            "TRANSPORTATION",
+            1200
+          ],
+          [
+            "FUEL",
+            120
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "NEGATIVE",
+        "expected_total_cents": 1320,
+        "variance_cents": 0,
+        "authority_id": "AUTH-PARCEL-STANDARD"
+      }
+    },
+    {
+      "id": "parcel_missing_zone_review",
+      "authority_profiles": [
+        "parcel_standard"
+      ],
+      "record": {
+        "mode": "PARCEL",
+        "carrier_id": "CARRIER-PARCEL",
+        "actual_weight_grams": 453,
+        "package_count": 1,
+        "packages": [
+          {
+            "package_id": "P1",
+            "weight_grams": 453,
+            "length_mm": 300,
+            "width_mm": 200,
+            "height_mm": 150
+          }
+        ],
+        "charges": [
+          [
+            "TRANSPORTATION",
+            1200
+          ],
+          [
+            "FUEL",
+            120
+          ]
+        ]
+      },
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "truth": "REVIEW",
+        "expected_total_cents": null,
+        "variance_cents": null,
+        "authority_id": "AUTH-PARCEL-STANDARD"
+      }
+    },
+    {
+      "id": "ltl_positive",
+      "authority_profiles": [
+        "ltl_standard"
+      ],
+      "record": {
+        "mode": "LTL",
+        "carrier_id": "CARRIER-LTL",
+        "actual_weight_grams": 90000,
+        "package_count": 1,
+        "freight_class": "70",
+        "charges": [
+          [
+            "LINEHAUL",
+            18500
+          ],
+          [
+            "FUEL",
+            1850
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "POSITIVE",
+        "expected_total_cents": 19800,
+        "variance_cents": 550,
+        "authority_id": "AUTH-LTL-STANDARD"
+      }
+    },
+    {
+      "id": "ltl_negative",
+      "authority_profiles": [
+        "ltl_standard"
+      ],
+      "record": {
+        "mode": "LTL",
+        "carrier_id": "CARRIER-LTL",
+        "actual_weight_grams": 90000,
+        "package_count": 1,
+        "freight_class": "70",
+        "charges": [
+          [
+            "LINEHAUL",
+            18000
+          ],
+          [
+            "FUEL",
+            1800
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "NEGATIVE",
+        "expected_total_cents": 19800,
+        "variance_cents": 0,
+        "authority_id": "AUTH-LTL-STANDARD"
+      }
+    },
+    {
+      "id": "ltl_missing_class_review",
+      "authority_profiles": [
+        "ltl_standard"
+      ],
+      "record": {
+        "mode": "LTL",
+        "carrier_id": "CARRIER-LTL",
+        "actual_weight_grams": 90000,
+        "package_count": 1,
+        "charges": [
+          [
+            "LINEHAUL",
+            18000
+          ],
+          [
+            "FUEL",
+            1800
+          ]
+        ]
+      },
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "truth": "REVIEW",
+        "expected_total_cents": null,
+        "variance_cents": null,
+        "authority_id": "AUTH-LTL-STANDARD"
+      }
+    },
+    {
+      "id": "tl_positive",
+      "authority_profiles": [
+        "tl_standard"
+      ],
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-TL",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "miles": 500,
+        "charges": [
+          [
+            "LINEHAUL",
+            105000
+          ],
+          [
+            "FUEL",
+            10500
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "POSITIVE",
+        "expected_total_cents": 110000,
+        "variance_cents": 5500,
+        "authority_id": "AUTH-TL-STANDARD"
+      }
+    },
+    {
+      "id": "tl_negative",
+      "authority_profiles": [
+        "tl_standard"
+      ],
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-TL",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "miles": 500,
+        "charges": [
+          [
+            "LINEHAUL",
+            100000
+          ],
+          [
+            "FUEL",
+            10000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "NEGATIVE",
+        "expected_total_cents": 110000,
+        "variance_cents": 0,
+        "authority_id": "AUTH-TL-STANDARD"
+      }
+    },
+    {
+      "id": "tl_missing_miles_review",
+      "authority_profiles": [
+        "tl_standard"
+      ],
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-TL",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "charges": [
+          [
+            "LINEHAUL",
+            100000
+          ],
+          [
+            "FUEL",
+            10000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "truth": "REVIEW",
+        "expected_total_cents": null,
+        "variance_cents": null,
+        "authority_id": "AUTH-TL-STANDARD"
+      }
+    },
+    {
+      "id": "intermodal_positive",
+      "authority_profiles": [
+        "intermodal_standard"
+      ],
+      "record": {
+        "mode": "INTERMODAL",
+        "carrier_id": "CARRIER-INTERMODAL",
+        "actual_weight_grams": 10000000,
+        "package_count": 1,
+        "miles": 100,
+        "chassis_days": 2,
+        "charges": [
+          [
+            "TRANSPORTATION",
+            62000
+          ],
+          [
+            "FUEL",
+            6200
+          ],
+          [
+            "CHASSIS",
+            6800
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "POSITIVE",
+        "expected_total_cents": 72000,
+        "variance_cents": 3000,
+        "authority_id": "AUTH-INTERMODAL-STANDARD"
+      }
+    },
+    {
+      "id": "intermodal_negative",
+      "authority_profiles": [
+        "intermodal_standard"
+      ],
+      "record": {
+        "mode": "INTERMODAL",
+        "carrier_id": "CARRIER-INTERMODAL",
+        "actual_weight_grams": 10000000,
+        "package_count": 1,
+        "miles": 100,
+        "chassis_days": 2,
+        "charges": [
+          [
+            "TRANSPORTATION",
+            60000
+          ],
+          [
+            "FUEL",
+            6000
+          ],
+          [
+            "CHASSIS",
+            6000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "NEGATIVE",
+        "expected_total_cents": 72000,
+        "variance_cents": 0,
+        "authority_id": "AUTH-INTERMODAL-STANDARD"
+      }
+    },
+    {
+      "id": "intermodal_missing_chassis_review",
+      "authority_profiles": [
+        "intermodal_standard"
+      ],
+      "record": {
+        "mode": "INTERMODAL",
+        "carrier_id": "CARRIER-INTERMODAL",
+        "actual_weight_grams": 10000000,
+        "package_count": 1,
+        "miles": 100,
+        "charges": [
+          [
+            "TRANSPORTATION",
+            60000
+          ],
+          [
+            "FUEL",
+            6000
+          ],
+          [
+            "CHASSIS",
+            6000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "truth": "REVIEW",
+        "expected_total_cents": null,
+        "variance_cents": null,
+        "authority_id": "AUTH-INTERMODAL-STANDARD"
+      }
+    },
+    {
+      "id": "air_positive",
+      "authority_profiles": [
+        "air_standard"
+      ],
+      "record": {
+        "mode": "AIR",
+        "carrier_id": "CARRIER-AIR",
+        "actual_weight_grams": 5000,
+        "package_count": 1,
+        "packages": [
+          {
+            "package_id": "A1",
+            "weight_grams": 5000,
+            "length_mm": 500,
+            "width_mm": 400,
+            "height_mm": 300
+          }
+        ],
+        "charges": [
+          [
+            "TRANSPORTATION",
+            5200
+          ],
+          [
+            "FUEL",
+            550
+          ],
+          [
+            "SECURITY",
+            250
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "POSITIVE",
+        "expected_total_cents": 5700,
+        "variance_cents": 300,
+        "authority_id": "AUTH-AIR-STANDARD"
+      }
+    },
+    {
+      "id": "air_negative",
+      "authority_profiles": [
+        "air_standard"
+      ],
+      "record": {
+        "mode": "AIR",
+        "carrier_id": "CARRIER-AIR",
+        "actual_weight_grams": 5000,
+        "package_count": 1,
+        "packages": [
+          {
+            "package_id": "A1",
+            "weight_grams": 5000,
+            "length_mm": 500,
+            "width_mm": 400,
+            "height_mm": 300
+          }
+        ],
+        "charges": [
+          [
+            "TRANSPORTATION",
+            5000
+          ],
+          [
+            "FUEL",
+            500
+          ],
+          [
+            "SECURITY",
+            200
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "NEGATIVE",
+        "expected_total_cents": 5700,
+        "variance_cents": 0,
+        "authority_id": "AUTH-AIR-STANDARD"
+      }
+    },
+    {
+      "id": "air_missing_dimensions_review",
+      "authority_profiles": [
+        "air_standard"
+      ],
+      "record": {
+        "mode": "AIR",
+        "carrier_id": "CARRIER-AIR",
+        "actual_weight_grams": 5000,
+        "package_count": 1,
+        "packages": [
+          {
+            "package_id": "A1",
+            "weight_grams": 5000
+          }
+        ],
+        "charges": [
+          [
+            "TRANSPORTATION",
+            5000
+          ],
+          [
+            "FUEL",
+            500
+          ],
+          [
+            "SECURITY",
+            200
+          ]
+        ]
+      },
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "truth": "REVIEW",
+        "expected_total_cents": null,
+        "variance_cents": null,
+        "authority_id": "AUTH-AIR-STANDARD"
+      }
+    },
+    {
+      "id": "ocean_positive",
+      "authority_profiles": [
+        "ocean_container_standard"
+      ],
+      "record": {
+        "mode": "OCEAN",
+        "carrier_id": "CARRIER-OCEAN",
+        "actual_weight_grams": 12000000,
+        "package_count": 1,
+        "container_type": "40HC",
+        "charges": [
+          [
+            "TRANSPORTATION",
+            207000
+          ],
+          [
+            "FUEL",
+            23000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "POSITIVE",
+        "expected_total_cents": 220000,
+        "variance_cents": 10000,
+        "authority_id": "AUTH-OCEAN-CONTAINER"
+      }
+    },
+    {
+      "id": "ocean_negative",
+      "authority_profiles": [
+        "ocean_container_standard"
+      ],
+      "record": {
+        "mode": "OCEAN",
+        "carrier_id": "CARRIER-OCEAN",
+        "actual_weight_grams": 12000000,
+        "package_count": 1,
+        "container_type": "40HC",
+        "charges": [
+          [
+            "TRANSPORTATION",
+            200000
+          ],
+          [
+            "FUEL",
+            20000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "NEGATIVE",
+        "expected_total_cents": 220000,
+        "variance_cents": 0,
+        "authority_id": "AUTH-OCEAN-CONTAINER"
+      }
+    },
+    {
+      "id": "ocean_missing_container_review",
+      "authority_profiles": [
+        "ocean_container_standard"
+      ],
+      "record": {
+        "mode": "OCEAN",
+        "carrier_id": "CARRIER-OCEAN",
+        "actual_weight_grams": 12000000,
+        "package_count": 1,
+        "charges": [
+          [
+            "TRANSPORTATION",
+            200000
+          ],
+          [
+            "FUEL",
+            20000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "truth": "REVIEW",
+        "expected_total_cents": null,
+        "variance_cents": null,
+        "authority_id": "AUTH-OCEAN-CONTAINER"
+      }
+    },
+    {
+      "id": "ocean_wm_positive",
+      "authority_profiles": [
+        "ocean_wm_standard"
+      ],
+      "record": {
+        "mode": "OCEAN",
+        "carrier_id": "CARRIER-OCEAN-WM",
+        "actual_weight_grams": 500000,
+        "package_count": 1,
+        "packages": [
+          {
+            "package_id": "O1",
+            "weight_grams": 500000,
+            "length_mm": 1000,
+            "width_mm": 1000,
+            "height_mm": 1000
+          }
+        ],
+        "charges": [
+          [
+            "TRANSPORTATION",
+            12000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "RATED",
+        "truth": "POSITIVE",
+        "expected_total_cents": 10000,
+        "variance_cents": 2000,
+        "authority_id": "AUTH-OCEAN-WM"
+      }
+    },
+    {
+      "id": "tl_unverified_authority_review",
+      "authority_profiles": [
+        "tl_unverified"
+      ],
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-TL-UNVERIFIED",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "miles": 500,
+        "charges": [
+          [
+            "LINEHAUL",
+            100000
+          ],
+          [
+            "FUEL",
+            10000
+          ]
+        ]
+      },
+      "expected": {
+        "status": "REVIEW_REQUIRED",
+        "truth": "REVIEW",
+        "expected_total_cents": 110000,
+        "variance_cents": 0,
+        "authority_id": "AUTH-TL-UNVERIFIED"
+      }
+    }
+  ],
+  "authority_cases": [
+    {
+      "id": "priority_wins",
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-TL-AUTH",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "miles": 500,
+        "charges": [
+          [
+            "LINEHAUL",
+            100000
+          ]
+        ]
+      },
+      "authority_profiles": [
+        "tl_priority_low",
+        "tl_priority_high"
+      ],
+      "expected": {
+        "status": "RESOLVED",
+        "authority_id": "AUTH-TL-PRIORITY-HIGH"
+      }
+    },
+    {
+      "id": "latest_effective_wins",
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-TL-DATE",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "miles": 500,
+        "charges": [
+          [
+            "LINEHAUL",
+            100000
+          ]
+        ]
+      },
+      "authority_profiles": [
+        "tl_old",
+        "tl_new"
+      ],
+      "expected": {
+        "status": "RESOLVED",
+        "authority_id": "AUTH-TL-NEW"
+      }
+    },
+    {
+      "id": "tie_fails_closed",
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-TL-TIE",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "miles": 500,
+        "charges": [
+          [
+            "LINEHAUL",
+            100000
+          ]
+        ]
+      },
+      "authority_profiles": [
+        "tl_tie_a",
+        "tl_tie_b"
+      ],
+      "expected": {
+        "status": "AMBIGUOUS",
+        "authority_id": null
+      }
+    },
+    {
+      "id": "missing_fails_closed",
+      "record": {
+        "mode": "TL",
+        "carrier_id": "CARRIER-NONE",
+        "actual_weight_grams": 8000000,
+        "package_count": 1,
+        "miles": 500,
+        "charges": [
+          [
+            "LINEHAUL",
+            100000
+          ]
+        ]
+      },
+      "authority_profiles": [],
+      "expected": {
+        "status": "MISSING",
+        "authority_id": null
+      }
+    }
+  ],
+  "attribution": {
+    "snapshot": {
+      "buyer_id": "GOLD-BUYER",
+      "business_unit": "GOLD-BU",
+      "population_hash": "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "source_hash": "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+      "matters": [
+        {
+          "matter_id": "M1",
+          "economic_key": "K1",
+          "state": "FINDING",
+          "amount_cents": 500,
+          "source_hash": "1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        {
+          "matter_id": "M2",
+          "economic_key": "K2",
+          "state": "AUTOMATIC_CREDIT",
+          "amount_cents": 200,
+          "source_hash": "2222222222222222222222222222222222222222222222222222222222222222"
+        },
+        {
+          "matter_id": "M3",
+          "economic_key": "K3",
+          "state": "OPEN_CLAIM",
+          "amount_cents": 1000,
+          "source_hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        }
+      ]
+    },
+    "candidates": [
+      {
+        "candidate_id": "C1",
+        "economic_key": "K1",
+        "record_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "category": "FUEL",
+        "billed_cents": 1500,
+        "expected_cents": 1000,
+        "confidence_ppm": 990000,
+        "expected_state": "INCUMBENT_KNOWN",
+        "expected_net_new_cents": 0
+      },
+      {
+        "candidate_id": "C2",
+        "economic_key": "K2",
+        "record_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "category": "ACCESSORIAL",
+        "billed_cents": 1200,
+        "expected_cents": 1000,
+        "confidence_ppm": 990000,
+        "expected_state": "INCUMBENT_KNOWN",
+        "expected_net_new_cents": 0
+      },
+      {
+        "candidate_id": "C3",
+        "economic_key": "K3",
+        "record_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "category": "DETENTION",
+        "billed_cents": 3000,
+        "expected_cents": 2000,
+        "confidence_ppm": 990000,
+        "expected_state": "INCUMBENT_KNOWN",
+        "expected_net_new_cents": 0
+      },
+      {
+        "candidate_id": "C4",
+        "economic_key": "K4",
+        "record_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "category": "DETENTION",
+        "billed_cents": 4000,
+        "expected_cents": 1000,
+        "confidence_ppm": 950000,
+        "expected_state": "CHALLENGER_ONLY",
+        "expected_net_new_cents": 3000
+      },
+      {
+        "candidate_id": "C5",
+        "economic_key": "K5",
+        "record_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "category": "FUEL",
+        "billed_cents": 1000,
+        "expected_cents": 1000,
+        "confidence_ppm": 950000,
+        "expected_state": "SUPPRESSED",
+        "expected_net_new_cents": 0
+      },
+      {
+        "candidate_id": "C6",
+        "economic_key": "K6",
+        "record_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "category": "DOCUMENT",
+        "billed_cents": 3000,
+        "expected_cents": 1000,
+        "confidence_ppm": 800000,
+        "blocker_codes": [
+          "MISSING_DOC"
+        ],
+        "expected_state": "REVIEW",
+        "expected_net_new_cents": 0
+      },
+      {
+        "candidate_id": "C7",
+        "economic_key": "K7",
+        "record_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+        "category": "DUPLICATE",
+        "billed_cents": 2000,
+        "expected_cents": 1000,
+        "confidence_ppm": 900000,
+        "expected_state": "REVIEW",
+        "expected_net_new_cents": 0
+      },
+      {
+        "candidate_id": "C8",
+        "economic_key": "K7",
+        "record_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+        "category": "DUPLICATE",
+        "billed_cents": 2200,
+        "expected_cents": 1000,
+        "confidence_ppm": 900000,
+        "expected_state": "REVIEW",
+        "expected_net_new_cents": 0
+      }
+    ],
+    "expected_totals": {
+      "challenger_only_cents": 3000,
+      "incumbent_known_cents": 1700,
+      "review_cents": 4200,
+      "suppressed_cents": 0
+    }
+  },
+  "payment_cases": [
+    {
+      "id": "prepared_only",
+      "amount_cents": 10000,
+      "authorize": false,
+      "events": [],
+      "expected_state": "PREPARED",
+      "expected_settled_cents": 0,
+      "expected_rejection": false
+    },
+    {
+      "id": "authorized_only",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [],
+      "expected_state": "AUTHORIZED",
+      "expected_settled_cents": 0,
+      "expected_rejection": false
+    },
+    {
+      "id": "submitted",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [
+        "SUBMITTED"
+      ],
+      "expected_state": "SUBMITTED",
+      "expected_settled_cents": 0,
+      "expected_rejection": false
+    },
+    {
+      "id": "accepted",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [
+        "SUBMITTED",
+        "ACCEPTED"
+      ],
+      "expected_state": "ACCEPTED",
+      "expected_settled_cents": 0,
+      "expected_rejection": false
+    },
+    {
+      "id": "settled",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [
+        "SUBMITTED",
+        "ACCEPTED",
+        "SETTLED"
+      ],
+      "expected_state": "SETTLED",
+      "expected_settled_cents": 10000,
+      "expected_rejection": false
+    },
+    {
+      "id": "reversed",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [
+        "SUBMITTED",
+        "ACCEPTED",
+        "SETTLED",
+        "REVERSED"
+      ],
+      "expected_state": "REVERSED",
+      "expected_settled_cents": 0,
+      "expected_rejection": false
+    },
+    {
+      "id": "failed",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [
+        "SUBMITTED",
+        "FAILED"
+      ],
+      "expected_state": "FAILED",
+      "expected_settled_cents": 0,
+      "expected_rejection": false
+    },
+    {
+      "id": "reject_no_authorization",
+      "amount_cents": 10000,
+      "authorize": false,
+      "events": [
+        "SUBMITTED"
+      ],
+      "expected_state": null,
+      "expected_settled_cents": null,
+      "expected_rejection": true
+    },
+    {
+      "id": "reject_invalid_jump",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [
+        "SETTLED"
+      ],
+      "expected_state": null,
+      "expected_settled_cents": null,
+      "expected_rejection": true
+    },
+    {
+      "id": "reject_amount_mismatch",
+      "amount_cents": 10000,
+      "authorize": true,
+      "events": [
+        "SUBMITTED"
+      ],
+      "event_amount_cents": 9999,
+      "expected_state": null,
+      "expected_settled_cents": null,
+      "expected_rejection": true
+    }
+  ],
+  "claim_boundary": [
+    "This is a synthetic, code-adjacent gold set. It measures deterministic conformance, not real-world customer accuracy.",
+    "No OCR, PDF parsing, carrier portal behavior, negotiated contract ambiguity, or external settlement source is represented.",
+    "A perfect score here is a regression signal, not evidence of zero false positives or false negatives in production.",
+    "Real customer accuracy requires a blind independently adjudicated frozen population."
+  ]
+}
