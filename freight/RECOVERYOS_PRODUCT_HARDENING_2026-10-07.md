@@ -72,6 +72,33 @@ RecoveryOS now offers:
 This is not represented as SAML enterprise SSO, MFA, SCIM or buyer-managed
 identity federation. Those remain product gaps.
 
+### Reviewer integrity
+
+The human-review path now fails closed when a deterministic extraction issue is
+marked BLOCK. The backend enforces that rule even if a client bypasses the UI.
+
+Reviewers can open the original retained document through a tenant-scoped,
+short-lived signed URL before approving or correcting the extraction.
+
+Re-extraction creates or selects an immutable extraction claim. Reviews are
+bound to the exact extraction ID rather than being applied generically to the
+document, preventing an older approval/rejection from silently governing a
+newer extraction attempt.
+
+### Security & API operations
+
+Owners now have an in-product Security & API workspace showing:
+
+- audit-chain event count, invalid hashes and broken links;
+- implemented control status;
+- session ceiling;
+- active/revoked scoped API keys;
+- one-time plaintext display for newly created API keys;
+- separate ingest and payment-event scopes;
+- one-way audited key revocation.
+
+The UI explicitly distinguishes implemented controls from external assurance.
+
 ### Mobile operability
 
 The control room now retains workspace navigation on phone-sized layouts rather
