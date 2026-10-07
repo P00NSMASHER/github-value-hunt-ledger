@@ -14,6 +14,8 @@ The current commercial launch is **Freight Recovery**, a $0-upfront freight-audi
 - Freight Recovery Evidence Standard: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-recovery-evidence-standard.html
 - Post-payment freight audit: https://p00nsmasher.github.io/github-value-hunt-ledger/post-payment-freight-audit.html
 - Second-Look Recovery Audit: https://p00nsmasher.github.io/github-value-hunt-ledger/second-look-freight-audit.html
+- Freight audit companies buyer guide: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-companies.html
+- Downloadable provider evaluation scorecard: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-provider-scorecard.csv
 - Trust Center: https://p00nsmasher.github.io/github-value-hunt-ledger/trust.html
 
 The public marketing surface is intentionally separated from confidential customer-data processing. Do not send freight records, credentials, contracts, or payment data through ordinary email.
