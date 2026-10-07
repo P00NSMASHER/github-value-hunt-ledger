@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "scope": "SYNTHETIC_REAL_ENGINE_PROPERTY_ONLY",
+  "code_commit": "5fd5cba339668b49614aa05fde9abcbd2eb626ef",
+  "fixture": "freight/fixtures/phase3_accuracy_gold_v1.json",
+  "base_gold_cases": 20,
+  "properties": [
+    "Billing amount changes must not change contract expected amount",
+    "Authority selection must remain bound",
+    "Review blockers must remain unchanged",
+    "Billed minus expected positive variance must reconcile",
+    "Non-claimable REVIEW_REQUIRED states preserved even with computable variance",
+    "Record and rating hashes remain consistent"
+  ],
+  "runs": [
+    {
+      "seed": 12001,
+      "iterations_per_case": 15000,
+      "calls": 300000,
+      "failures": 0,
+      "by_mode": {
+        "AIR": 45000,
+        "INTERMODAL": 45000,
+        "LTL": 45000,
+        "OCEAN": 60000,
+        "PARCEL": 45000,
+        "TL": 60000
+      },
+      "seconds": 65.39
+    },
+    {
+      "seed": 12002,
+      "iterations_per_case": 15000,
+      "calls": 300000,
+      "failures": 0,
+      "by_mode": {
+        "AIR": 45000,
+        "INTERMODAL": 45000,
+        "LTL": 45000,
+        "OCEAN": 60000,
+        "PARCEL": 45000,
+        "TL": 60000
+      },
+      "seconds": 64.928
+    },
+    {
+      "seed": 12003,
+      "iterations_per_case": 10000,
+      "calls": 200000,
+      "failures": 0,
+      "by_mode": {
+        "AIR": 30000,
+        "INTERMODAL": 30000,
+        "LTL": 30000,
+        "OCEAN": 40000,
+        "PARCEL": 30000,
+        "TL": 40000
+      },
+      "seconds": 43.331
+    },
+    {
+      "seed": 12004,
+      "iterations_per_case": 10000,
+      "calls": 200000,
+      "failures": 0,
+      "by_mode": {
+        "AIR": 30000,
+        "INTERMODAL": 30000,
+        "LTL": 30000,
+        "OCEAN": 40000,
+        "PARCEL": 30000,
+        "TL": 40000
+      },
+      "seconds": 43.585
+    }
+  ],
+  "total_calls": 1000000,
+  "total_invariant_failures": 0,
+  "by_mode": {
+    "AIR": 150000,
+    "INTERMODAL": 150000,
+    "LTL": 150000,
+    "OCEAN": 200000,
+    "PARCEL": 150000,
+    "TL": 200000
+  },
+  "measured_with": "Project VM loaded exact pinned branch commit and invoked actual freight.rating_engine.rate_record",
+  "important_caveats": [
+    "The frozen 20 source gold fixtures are code adjacent; metamorphic transformation tests invariances, not external contract amounts",
+    "No claims of real-customer precision or recall",
+    "No OCR, database/API concurrency, or real settlement used",
+    "A REVIEW_REQUIRED case can expose a numerical variance but is not authorized for claim"
+  ],
+  "deployment": "NO_PRODUCTION_DEPLOYMENT"
+}

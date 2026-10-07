@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-07",
+  "status": "ENGINEERING_SYNTHETIC_ONLY_NOT_CUSTOMER_VALIDATION",
+  "repository": "P00NSMASHER/github-value-hunt-ledger",
+  "scope": "Real freight.rating_engine.rate_record for verified synthetic TL/PER_MILE only; other modes not tested by these batches",
+  "independent_expected_algorithm": "max(per_mile_cents * miles, minimum_cents), integer half-up fuel basis points",
+  "real_engine_runs": [
+    {
+      "seed": 41037,
+      "cases": 250000,
+      "tp": 100000,
+      "tn": 150000,
+      "fp": 0,
+      "fn": 0,
+      "abstentions": 0,
+      "exact_expected": 250000,
+      "exact_variance": 250000,
+      "traceable": 250000,
+      "seconds": 66.508,
+      "p50_ms": 0.12864,
+      "p95_ms": 0.13069
+    },
+    {
+      "seed": 41038,
+      "cases": 250000,
+      "tp": 100000,
+      "tn": 150000,
+      "fp": 0,
+      "fn": 0,
+      "abstentions": 0,
+      "exact_expected": 250000,
+      "exact_variance": 250000,
+      "traceable": 250000,
+      "seconds": 66.476,
+      "p50_ms": 0.12867,
+      "p95_ms": 0.13191
+    },
+    {
+      "seed": 41039,
+      "cases": 250000,
+      "tp": 100000,
+      "tn": 150000,
+      "fp": 0,
+      "fn": 0,
+      "abstentions": 0,
+      "exact_expected": 250000,
+      "exact_variance": 250000,
+      "traceable": 250000,
+      "seconds": 66.357,
+      "p50_ms": 0.12834,
+      "p95_ms": 0.13048
+    },
+    {
+      "seed": 41040,
+      "cases": 250000,
+      "tp": 100000,
+      "tn": 150000,
+      "fp": 0,
+      "fn": 0,
+      "abstentions": 0,
+      "exact_expected": 250000,
+      "exact_variance": 250000,
+      "traceable": 250000,
+      "seconds": 66.497,
+      "p50_ms": 0.12858,
+      "p95_ms": 0.13191
+    }
+  ],
+  "totals": {
+    "cases": 1000000,
+    "tp": 400000,
+    "tn": 600000,
+    "fp": 0,
+    "fn": 0,
+    "abstentions": 0,
+    "exact_expected": 1000000,
+    "exact_variance": 1000000,
+    "traceable": 1000000
+  },
+  "verification": {
+    "repo_probe_unittest": "3/3 passed",
+    "floot_application_tests": "6 spec files passed, 0 failed, two hook specs excluded by default",
+    "floot_typecheck": "clean",
+    "floot_changes": "development only, not published"
+  },
+  "separate_six_mode_generator": {
+    "population": 1000000,
+    "ground_truth_positive": 409456,
+    "ground_truth_negative": 460627,
+    "ground_truth_review": 129917,
+    "independent_oracle_audit_rows": 1000000,
+    "oracle_failures": 0,
+    "artifact": "Downloadable freight_recovery_testing_lab_complete.zip, not included in Git",
+    "is_same_population_as_real_engine_probe": false
+  },
+  "claim_boundary": [
+    "Synthetic perfect score is not production precision/recall",
+    "No actual OCR, end-to-end API, database load, credit recovery or real customer claim",
+    "Engine-only timing does not include source preparation, network, authentication, database or concurrency",
+    "No bank settlement, revenue or production deployment"
+  ]
+}
