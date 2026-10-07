@@ -4,6 +4,7 @@ from freight.performance_benchmark import (
     build_report,
     make_record,
     run_failure_injection,
+    run_interruption_recovery,
     run_trial,
     validate_report,
 )
@@ -40,6 +41,19 @@ def test_failure_injection_routes_exact_missing_authority_count_to_review():
     assert result.deterministic_replay is True
 
 
+def test_interruption_recovery_replays_last_chunk_without_double_counting():
+    result = run_interruption_recovery(
+        count=120,
+        chunk_size=20,
+        fail_after_chunks=3,
+    )
+    assert result.replayed_chunk_count == 1
+    assert result.deterministic_resume is True
+    assert result.no_duplicate_aggregate is True
+    assert result.baseline_digest == result.resumed_digest
+    assert result.baseline_variance_cents == result.resumed_variance_cents
+
+
 def test_report_validation_accepts_replayed_small_tiers():
     report = build_report(
         (60, 120),
@@ -48,11 +62,15 @@ def test_report_validation_accepts_replayed_small_tiers():
         large_trials=1,
         replay_max_count=120,
         failure_count=60,
+        interruption_count=60,
+        interruption_chunk_size=10,
         memory_probe_count=60,
     )
     validate_report(report)
     assert report.mode_count == 6
     assert len(report.trials) == 2
+    assert report.interruption_recovery.deterministic_resume is True
+    assert report.interruption_recovery.no_duplicate_aggregate is True
     assert report.memory_probe.record_count == 60
     assert report.memory_probe.python_peak_heap_mb > 0
     assert report.report_hash

@@ -90,6 +90,33 @@ class FailureInjectionResult:
 
 
 @dataclass(frozen=True)
+class ChunkResult:
+    chunk_index: int
+    start_index: int
+    stop_index: int
+    rated_count: int
+    review_count: int
+    billed_cents: int
+    expected_cents: int
+    variance_cents: int
+    result_digest: str
+
+
+@dataclass(frozen=True)
+class InterruptionRecoveryResult:
+    record_count: int
+    chunk_size: int
+    fail_after_chunks: int
+    replayed_chunk_count: int
+    baseline_digest: str
+    resumed_digest: str
+    baseline_variance_cents: int
+    resumed_variance_cents: int
+    deterministic_resume: bool
+    no_duplicate_aggregate: bool
+
+
+@dataclass(frozen=True)
 class MemoryProbe:
     record_count: int
     elapsed_seconds: float
@@ -108,6 +135,7 @@ class BenchmarkReport:
     mode_count: int
     trials: tuple[ScaleTrial, ...]
     failure_injection: FailureInjectionResult
+    interruption_recovery: InterruptionRecoveryResult
     memory_probe: MemoryProbe
     claims_boundary: tuple[str, ...]
     report_hash: str
@@ -399,6 +427,114 @@ def _run_pass(
     )
 
 
+def _run_chunk(
+    chunk_index: int,
+    start_index: int,
+    stop_index: int,
+    authority_book: AuthorityBook,
+) -> ChunkResult:
+    digest = hashlib.sha256()
+    rated = review = 0
+    billed = expected = variance = 0
+    for index in range(start_index, stop_index):
+        result = rate_record(make_record(index), authority_book)
+        digest.update(result.rating_hash.encode("ascii"))
+        digest.update(b"\n")
+        if result.status == RATED:
+            rated += 1
+        elif result.status == REVIEW_REQUIRED:
+            review += 1
+        else:
+            raise ValueError("unexpected rating status: " + result.status)
+        billed += result.billed_total_cents
+        expected += result.expected_total_cents or 0
+        variance += result.variance_cents or 0
+    return ChunkResult(
+        chunk_index=chunk_index,
+        start_index=start_index,
+        stop_index=stop_index,
+        rated_count=rated,
+        review_count=review,
+        billed_cents=billed,
+        expected_cents=expected,
+        variance_cents=variance,
+        result_digest=digest.hexdigest(),
+    )
+
+
+def _chunk_plan(count: int, chunk_size: int) -> list[tuple[int, int, int]]:
+    if count <= 0 or chunk_size <= 0:
+        raise ValueError("count and chunk_size must be positive")
+    chunks = []
+    for chunk_index, start in enumerate(range(0, count, chunk_size)):
+        chunks.append((chunk_index, start, min(start + chunk_size, count)))
+    return chunks
+
+
+def _chunk_set_digest(chunks: Iterable[ChunkResult]) -> str:
+    ordered = sorted(chunks, key=lambda item: item.chunk_index)
+    return canonical_hash({"schema": 1, "chunks": [asdict(item) for item in ordered]})
+
+
+def run_interruption_recovery(
+    count: int = 10_000,
+    *,
+    chunk_size: int = 1_000,
+    fail_after_chunks: int = 4,
+    authority_book: AuthorityBook | None = None,
+) -> InterruptionRecoveryResult:
+    """Simulate at-least-once restart from the last committed chunk.
+
+    A crash frequently leaves a worker uncertain whether its final chunk was
+    committed. The resume path deliberately replays that chunk. Chunk identity
+    plus deterministic digest prevents the replay from double-counting money.
+    """
+    authority_book = authority_book or build_authority_book()
+    plan = _chunk_plan(count, chunk_size)
+    if not 1 <= fail_after_chunks < len(plan):
+        raise ValueError("fail_after_chunks must split the chunk plan")
+
+    baseline = [
+        _run_chunk(chunk_index, start, stop, authority_book)
+        for chunk_index, start, stop in plan
+    ]
+    committed: dict[int, ChunkResult] = {}
+    for chunk_index, start, stop in plan[:fail_after_chunks]:
+        committed[chunk_index] = _run_chunk(
+            chunk_index, start, stop, authority_book
+        )
+
+    # At-least-once recovery: intentionally replay the last known chunk.
+    replay_start = fail_after_chunks - 1
+    replayed = 0
+    for chunk_index, start, stop in plan[replay_start:]:
+        candidate = _run_chunk(chunk_index, start, stop, authority_book)
+        prior = committed.get(chunk_index)
+        if prior is not None:
+            replayed += 1
+            if prior != candidate:
+                raise ValueError("replayed chunk changed after interruption")
+        committed[chunk_index] = candidate
+
+    resumed = [committed[index] for index in range(len(plan))]
+    baseline_digest = _chunk_set_digest(baseline)
+    resumed_digest = _chunk_set_digest(resumed)
+    baseline_variance = sum(item.variance_cents for item in baseline)
+    resumed_variance = sum(item.variance_cents for item in resumed)
+    return InterruptionRecoveryResult(
+        record_count=count,
+        chunk_size=chunk_size,
+        fail_after_chunks=fail_after_chunks,
+        replayed_chunk_count=replayed,
+        baseline_digest=baseline_digest,
+        resumed_digest=resumed_digest,
+        baseline_variance_cents=baseline_variance,
+        resumed_variance_cents=resumed_variance,
+        deterministic_resume=baseline_digest == resumed_digest,
+        no_duplicate_aggregate=baseline_variance == resumed_variance,
+    )
+
+
 def run_memory_probe(
     count: int = 10_000,
     *,
@@ -536,6 +672,8 @@ def build_report(
     large_trials: int = 1,
     replay_max_count: int = 100_000,
     failure_count: int = 10_000,
+    interruption_count: int = 10_000,
+    interruption_chunk_size: int = 1_000,
     memory_probe_count: int = 10_000,
 ) -> BenchmarkReport:
     book = build_authority_book()
@@ -556,6 +694,11 @@ def build_report(
         )
 
     failure = run_failure_injection(failure_count)
+    interruption = run_interruption_recovery(
+        interruption_count,
+        chunk_size=interruption_chunk_size,
+        authority_book=book,
+    )
     memory_probe = run_memory_probe(memory_probe_count, authority_book=book)
     generated = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     boundary = (
@@ -573,6 +716,7 @@ def build_report(
         "mode_count": len(MODES),
         "trials": [asdict(item) for item in trials],
         "failure_injection": asdict(failure),
+        "interruption_recovery": asdict(interruption),
         "memory_probe": asdict(memory_probe),
         "claims_boundary": list(boundary),
     }
@@ -585,6 +729,7 @@ def build_report(
         mode_count=len(MODES),
         trials=tuple(trials),
         failure_injection=failure,
+        interruption_recovery=interruption,
         memory_probe=memory_probe,
         claims_boundary=boundary,
         report_hash=canonical_hash(body),
@@ -613,6 +758,12 @@ def validate_report(report: BenchmarkReport) -> None:
         != report.failure_injection.expected_review_count
     ):
         raise ValueError("failure-injection review count mismatch")
+    if report.interruption_recovery.deterministic_resume is not True:
+        raise ValueError("interruption recovery digest mismatch")
+    if report.interruption_recovery.no_duplicate_aggregate is not True:
+        raise ValueError("interruption recovery double-counted aggregate value")
+    if report.interruption_recovery.replayed_chunk_count < 1:
+        raise ValueError("interruption recovery did not exercise replay")
     if report.memory_probe.record_count <= 0:
         raise ValueError("memory probe count must be positive")
     if report.memory_probe.python_peak_heap_mb <= 0:
@@ -648,6 +799,7 @@ def _summary(report: BenchmarkReport) -> dict:
         "report_hash": report.report_hash,
         "tiers": tiers,
         "failure_injection": asdict(report.failure_injection),
+        "interruption_recovery": asdict(report.interruption_recovery),
         "memory_probe": asdict(report.memory_probe),
         "claims_boundary": list(report.claims_boundary),
     }
@@ -661,6 +813,8 @@ def main() -> None:
     parser.add_argument("--large-trials", type=int, default=1)
     parser.add_argument("--replay-max-count", type=int, default=100_000)
     parser.add_argument("--failure-count", type=int, default=10_000)
+    parser.add_argument("--interruption-count", type=int, default=10_000)
+    parser.add_argument("--interruption-chunk-size", type=int, default=1_000)
     parser.add_argument("--memory-probe-count", type=int, default=10_000)
     parser.add_argument("--output")
     parser.add_argument("--summary", action="store_true")
@@ -673,6 +827,8 @@ def main() -> None:
         large_trials=args.large_trials,
         replay_max_count=args.replay_max_count,
         failure_count=args.failure_count,
+        interruption_count=args.interruption_count,
+        interruption_chunk_size=args.interruption_chunk_size,
         memory_probe_count=args.memory_probe_count,
     )
     validate_report(report)
