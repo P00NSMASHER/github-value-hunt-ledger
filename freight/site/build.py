@@ -24,7 +24,6 @@ from freight.commercial_terms import (
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
 
-
 PUBLIC_CONTACT_PAGES = (
     "index.html",
     "privacy.html",
@@ -81,6 +80,7 @@ TEXT_SOURCE_FILES = (
     "freight-audit-companies.html",
     "404.html",
     "site.css",
+    "foundry.css",
     "site.js",
     "commercial-config.js",
     "favicon.svg",
@@ -119,7 +119,6 @@ RATE_LABEL_TOKEN = "__CONTINGENCY_RECOVERY_RATE_LABEL__"
 
 
 def _public_source(name: str) -> Path:
-    """Resolve one explicitly allowed file without traversing a source symlink."""
     path = SOURCE
     for part in Path(name).parts:
         path /= part
@@ -131,7 +130,6 @@ def _public_source(name: str) -> Path:
 
 
 def validate_contact(value: str, verified: bool) -> str:
-    """Require a sensible public mailbox plus explicit operator verification."""
     if not verified:
         raise ValueError("Verify the business inbox, then set FREIGHT_CONTACT_VERIFIED=1.")
     email = value.strip()
@@ -163,49 +161,28 @@ def build(
     rate = normalize_contingency_rate(contingency_recovery_rate)
     rate_label = contingency_rate_label(rate)
     destination = output.expanduser().resolve()
-    if (
-        destination == REPOSITORY
-        or REPOSITORY in destination.parents
-        or destination in REPOSITORY.parents
-    ):
-        raise ValueError(
-            "Public output must be outside the private repository and its parent directories."
-        )
-    if destination.exists() and (
-        not destination.is_dir() or any(destination.iterdir())
-    ):
-        raise ValueError(
-            "Choose a new or empty output directory; existing files will not be overwritten."
-        )
+    if destination == REPOSITORY or REPOSITORY in destination.parents or destination in REPOSITORY.parents:
+        raise ValueError("Public output must be outside the private repository and its parent directories.")
+    if destination.exists() and (not destination.is_dir() or any(destination.iterdir())):
+        raise ValueError("Choose a new or empty output directory; existing files will not be overwritten.")
 
-    text_bundle = {
-        name: _public_source(name).read_text(encoding="utf-8")
-        for name in TEXT_SOURCE_FILES
-    }
-    binary_bundle = {
-        name: _public_source(name).read_bytes()
-        for name in BINARY_SOURCE_FILES
-    }
+    text_bundle = {name: _public_source(name).read_text(encoding="utf-8") for name in TEXT_SOURCE_FILES}
+    binary_bundle = {name: _public_source(name).read_bytes() for name in BINARY_SOURCE_FILES}
 
     safe_contact = html.escape(contact, quote=True)
     for name in PUBLIC_CONTACT_PAGES:
         page = text_bundle[name]
         if page.count(CONTACT_META) != 1:
             raise ValueError(f"{name} must contain exactly one empty contact configuration.")
-        text_bundle[name] = page.replace(
-            CONTACT_META,
-            f'<meta name="freight-contact-email" content="{safe_contact}">',
-        )
+        text_bundle[name] = page.replace(CONTACT_META, f'<meta name="freight-contact-email" content="{safe_contact}">')
 
-    contact_marker_count = sum(page.count(CONTACT_LINK) for page in text_bundle.values())
-    if contact_marker_count < 1:
+    marker_count = sum(page.count(CONTACT_LINK) for page in text_bundle.values())
+    if marker_count < 1:
         raise ValueError("The public bundle must contain at least one contact-link marker.")
     for name, page in tuple(text_bundle.items()):
         text_bundle[name] = page.replace(
             CONTACT_LINK,
-            'data-contact-link href="mailto:'
-            + safe_contact
-            + '?subject=Freight%20Recovery%20question"',
+            'data-contact-link href="mailto:' + safe_contact + '?subject=Freight%20Recovery%20question"',
         )
 
     page, count = STATUS_PATTERN.subn(
@@ -223,9 +200,7 @@ def build(
     config = text_bundle["commercial-config.js"]
     if config.count(RATE_TOKEN) != 1 or config.count(RATE_LABEL_TOKEN) != 1:
         raise ValueError("Commercial configuration must contain one rate and label token.")
-    text_bundle["commercial-config.js"] = config.replace(
-        RATE_TOKEN, format(rate, "f")
-    ).replace(RATE_LABEL_TOKEN, rate_label)
+    text_bundle["commercial-config.js"] = config.replace(RATE_TOKEN, format(rate, "f")).replace(RATE_LABEL_TOKEN, rate_label)
 
     if text_bundle["index.html"].count(DEMO_MARKER) != 1:
         raise ValueError("The source must contain exactly one controlled-demo marker.")
@@ -239,12 +214,9 @@ def build(
         '<a class="text-link text-link-light" href="synthetic-pilot-demo.zip" '
         'download data-track="controlled_demo_downloaded">'
         'Download a fictional audit example <span aria-hidden="true">&#8599;</span></a>'
-        '<p class="microcopy">Fictional data only. This walkthrough is not a customer '
-        'result or recovery claim.</p>'
+        '<p class="microcopy">Fictional data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
-    text_bundle["index.html"] = text_bundle["index.html"].replace(
-        DEMO_MARKER, demo_link
-    )
+    text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
 
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():
@@ -273,10 +245,7 @@ def main() -> None:
             args.output,
             os.environ.get("FREIGHT_CONTACT_EMAIL", ""),
             os.environ.get("FREIGHT_CONTACT_VERIFIED") == "1",
-            os.environ.get(
-                "FREIGHT_CONTINGENCY_RECOVERY_RATE",
-                str(DEFAULT_CONTINGENCY_RECOVERY_RATE),
-            ),
+            os.environ.get("FREIGHT_CONTINGENCY_RECOVERY_RATE", str(DEFAULT_CONTINGENCY_RECOVERY_RATE)),
         )
     except ValueError as error:
         parser.error(str(error))
