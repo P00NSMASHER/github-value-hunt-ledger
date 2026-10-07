@@ -4,6 +4,8 @@ on:
     paths:
       - 'freight/customer_lifecycle_product_probe.py'
       - 'freight/test_customer_lifecycle_product_probe.py'
+      - 'freight/customer_scope_recovery_guard.py'
+      - 'freight/test_customer_scope_recovery_guard.py'
       - 'freight/CUSTOMER_LIFECYCLE_LAB.md'
       - '.github/workflows/freight-customer-lifecycle-smoke.yml'
   workflow_dispatch:
@@ -23,7 +25,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Execute real domain payment tests with fictional objects
-        run: python -m unittest -v freight.test_customer_lifecycle_product_probe
+        run: python -m unittest -v freight.test_customer_lifecycle_product_probe freight.test_customer_scope_recovery_guard
       - name: Explicit scope
         run: |
           echo 'Simulation only. No customer data, email, payment, provider calls, or production deployment.'
