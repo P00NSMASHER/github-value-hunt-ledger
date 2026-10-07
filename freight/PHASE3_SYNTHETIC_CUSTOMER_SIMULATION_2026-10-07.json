@@ -1,0 +1,322 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-07T06:35:00Z",
+  "simulation_type": "SYNTHETIC_AI_BUYER_PERSONA_SIMULATION",
+  "generator": {
+    "model_family": "GPT-5.6 Sol",
+    "environment": "ChatGPT conversation",
+    "independent_of_builder": false
+  },
+  "claim_boundary": [
+    "All companies, people, objections, approvals, and comments in this file are fictional AI-simulated buyer personas.",
+    "This is not customer evidence, market demand, revenue, adoption, willingness-to-pay proof, or independent third-party validation.",
+    "The simulation is used to pressure-test procurement, security, finance, logistics, onboarding, and pilot-readiness materials.",
+    "A simulated APPROVE_PILOT decision does not authorize processing any real customer data."
+  ],
+  "buyer_archetypes": [
+    {
+      "buyer_id": "SYN-A",
+      "company_name": "Allegheny Industrial Supply",
+      "fictional": true,
+      "profile": {
+        "revenue_usd": 350000000,
+        "industry": "multi-site industrial distribution",
+        "freight_profile": "LTL + parcel heavy, centralized AP, existing freight-payment/audit provider",
+        "annual_freight_spend_usd": 18000000,
+        "security_posture": "mid-market, pragmatic",
+        "main_problem": "suspects incumbent audit misses accessorial and contract leakage"
+      },
+      "bots": [
+        {
+          "bot_id": "SYN-A-CFO",
+          "role": "CFO",
+          "decision": "CONDITIONAL",
+          "primary_blocker": "REAL_WORLD_PROOF",
+          "blockers": [
+            "REAL_WORLD_PROOF",
+            "COMMERCIAL_ROI"
+          ],
+          "rationale": "Would fund a bounded second-look pilot because the attribution model avoids paying success fees on incumbent-known credits, but wants a blind customer benchmark and a clearly bounded commercial model before expansion.",
+          "questions": [
+            "What percentage of candidate dollars survive human review and become realized recovery?",
+            "How do you prove a recovery was incremental rather than already in our incumbent workflow?",
+            "What is the buyer's downside if the population is clean?"
+          ],
+          "conditions_to_approve": [
+            "Use a no-upfront or tightly capped pilot structure.",
+            "Freeze incumbent output before RecoveryOS attribution.",
+            "Report realized recovery separately from candidate and validated dollars."
+          ]
+        },
+        {
+          "bot_id": "SYN-A-LOGISTICS",
+          "role": "VP Logistics",
+          "decision": "APPROVE_PILOT",
+          "primary_blocker": "NONE",
+          "blockers": [],
+          "rationale": "The second-look positioning avoids replacing the incumbent system and can start with a bounded historical population. Human review is acceptable for the pilot.",
+          "questions": [
+            "Which LTL and parcel charge families are supported today?",
+            "How long from data handoff to first reviewed findings?",
+            "Can the pilot avoid carrier contact until we approve specific findings?"
+          ],
+          "conditions_to_approve": [
+            "Start with LTL and parcel only.",
+            "Keep all carrier contact buyer-approved.",
+            "Provide evidence drill-down for every asserted dollar."
+          ]
+        },
+        {
+          "bot_id": "SYN-A-AP",
+          "role": "Director of Accounts Payable",
+          "decision": "APPROVE_PILOT",
+          "primary_blocker": "NONE",
+          "blockers": [],
+          "rationale": "Read-only historical review and explicit duplicate/pre-existing-credit suppression fit AP controls. Wants reconciliation outputs that can be tied back to invoice IDs.",
+          "questions": [
+            "Can every finding map to invoice, shipment, authority and later credit?",
+            "How are automatic credits and open disputes excluded?",
+            "Can findings be exported for internal reconciliation?"
+          ],
+          "conditions_to_approve": [
+            "Read-only source access.",
+            "No posting or payment change without separate authorization.",
+            "Invoice-level reconciliation register."
+          ]
+        },
+        {
+          "bot_id": "SYN-A-SECURITY",
+          "role": "IT Security Manager",
+          "decision": "CONDITIONAL",
+          "primary_blocker": "SECURITY_ASSURANCE",
+          "blockers": [
+            "SECURITY_ASSURANCE"
+          ],
+          "rationale": "A small single-tenant pilot may be acceptable with minimal data and named access, but current lack of independent penetration-test evidence and provider backup/encryption evidence prevents broad production approval.",
+          "questions": [
+            "Where exactly is customer data stored?",
+            "What provider encryption and backup evidence exists?",
+            "Can we use a buyer-controlled workspace for the first pilot?"
+          ],
+          "conditions_to_approve": [
+            "Buyer-controlled or separately approved single-tenant workspace.",
+            "Document current subprocessor/data-flow boundary.",
+            "No claim of SOC 2 or independent pen test."
+          ]
+        }
+      ]
+    },
+    {
+      "buyer_id": "SYN-B",
+      "company_name": "Great Lakes Manufacturing Group",
+      "fictional": true,
+      "profile": {
+        "revenue_usd": 2500000000,
+        "industry": "industrial manufacturing",
+        "freight_profile": "parcel + LTL + TL + intermodal across multiple business units",
+        "annual_freight_spend_usd": 95000000,
+        "security_posture": "enterprise regulated procurement",
+        "main_problem": "wants measurable independent audit assurance without disrupting existing TMS/AP stack"
+      },
+      "bots": [
+        {
+          "bot_id": "SYN-B-CFO",
+          "role": "CFO",
+          "decision": "CONDITIONAL",
+          "primary_blocker": "REAL_WORLD_PROOF",
+          "blockers": [
+            "REAL_WORLD_PROOF",
+            "COMMERCIAL_ROI"
+          ],
+          "rationale": "The financial-truth model is attractive, but synthetic accuracy evidence is insufficient for enterprise budget approval. Wants a blind pilot with a pre-agreed false-positive ceiling and measured analyst effort.",
+          "questions": [
+            "What is the independently adjudicated false-positive-dollar rate?",
+            "How many reviewer hours are required per 1,000 invoices?",
+            "What is actual realized recovery after reversals?"
+          ],
+          "conditions_to_approve": [
+            "Blind frozen population.",
+            "Buyer-owned truth adjudication.",
+            "Explicit false-positive-dollar ceiling and reviewer-hour reporting."
+          ]
+        },
+        {
+          "bot_id": "SYN-B-CISO",
+          "role": "Chief Information Security Officer",
+          "decision": "BLOCKED",
+          "primary_blocker": "SECURITY_ASSURANCE",
+          "blockers": [
+            "SECURITY_ASSURANCE",
+            "IDENTITY_ACCESS"
+          ],
+          "rationale": "Would not approve enterprise customer-data processing yet because MFA, enterprise SSO, independent penetration testing, SOC 2 Type II/ISO evidence, and provider backup/encryption attestations are not complete.",
+          "questions": [
+            "Where is the independent penetration-test report?",
+            "Can we enforce SAML/OIDC SSO and MFA?",
+            "What is the tested RPO/RTO for the exact production database?"
+          ],
+          "conditions_to_approve": [
+            "MFA and enterprise SSO.",
+            "Independent penetration-test report with retest closure.",
+            "Provider encryption and backup/restore evidence.",
+            "Formal security-assurance package acceptable to enterprise procurement."
+          ]
+        },
+        {
+          "bot_id": "SYN-B-PROCUREMENT",
+          "role": "Strategic Procurement Director",
+          "decision": "BLOCKED",
+          "primary_blocker": "SECURITY_ASSURANCE",
+          "blockers": [
+            "SECURITY_ASSURANCE",
+            "ENTERPRISE_CONTRACTING"
+          ],
+          "rationale": "Commercial wedge is understandable, but enterprise onboarding is incomplete without external security evidence, current DPA/subprocessor package, insurance/contract terms, and a referenceable customer outcome.",
+          "questions": [
+            "Do you have SOC 2 Type II or equivalent?",
+            "What subprocessors receive customer content?",
+            "Can you provide a reference customer with realized recovery?"
+          ],
+          "conditions_to_approve": [
+            "Complete security questionnaire and DPA/subprocessor answers.",
+            "External assurance evidence.",
+            "At least one genuine referenceable customer result or approved blind proof."
+          ]
+        },
+        {
+          "bot_id": "SYN-B-LOGISTICS",
+          "role": "VP Global Logistics",
+          "decision": "CONDITIONAL",
+          "primary_blocker": "INTEGRATION",
+          "blockers": [
+            "INTEGRATION",
+            "GLOBAL_EXECUTION"
+          ],
+          "rationale": "Likes the second-look concept but needs repeatable ERP/TMS integration and multi-business-unit onboarding. Global currency/operational support is not mature enough for enterprise-wide rollout.",
+          "questions": [
+            "Which SAP/Oracle/TMS connectors are production ready?",
+            "How is business-unit isolation enforced?",
+            "Can results reconcile across multiple currencies and regions?"
+          ],
+          "conditions_to_approve": [
+            "Pilot one U.S. business unit first.",
+            "Prove one named ERP/TMS integration path.",
+            "Defer global rollout until currency/regional operations are supported."
+          ]
+        }
+      ]
+    },
+    {
+      "buyer_id": "SYN-C",
+      "company_name": "Pioneer 3PL Services",
+      "fictional": true,
+      "profile": {
+        "revenue_usd": 700000000,
+        "industry": "third-party logistics",
+        "freight_profile": "multi-client LTL/FTL/parcel audit and managed transportation",
+        "annual_freight_spend_usd": 240000000,
+        "security_posture": "technology-forward enterprise",
+        "main_problem": "wants a second-look engine to challenge its own audit process without exposing one client to another"
+      },
+      "bots": [
+        {
+          "bot_id": "SYN-C-COO",
+          "role": "Chief Operating Officer",
+          "decision": "CONDITIONAL",
+          "primary_blocker": "INTEGRATION",
+          "blockers": [
+            "INTEGRATION",
+            "MULTI_TENANT_SCALE"
+          ],
+          "rationale": "RecoveryOS could be valuable as an internal challenger layer, but a 3PL needs repeatable client onboarding, strict isolation, and higher-scale concurrency evidence before embedding it in operations.",
+          "questions": [
+            "Can one client ever see another client's data?",
+            "How many concurrent client populations can be processed?",
+            "Can we automate handoff from our TMS without bespoke work?"
+          ],
+          "conditions_to_approve": [
+            "Pilot with one client and isolated tenant.",
+            "Prove named TMS ingestion.",
+            "Run multi-tenant concurrency test before broader rollout."
+          ]
+        },
+        {
+          "bot_id": "SYN-C-CTO",
+          "role": "Chief Technology Officer",
+          "decision": "BLOCKED",
+          "primary_blocker": "IDENTITY_ACCESS",
+          "blockers": [
+            "IDENTITY_ACCESS",
+            "INTEGRATION",
+            "SCALE_RELIABILITY"
+          ],
+          "rationale": "Architecture is promising but not ready for platform embedding without enterprise SSO/MFA, named integrations, higher-scale HTTP/concurrency evidence, and documented operational SLOs.",
+          "questions": [
+            "What are the API rate limits and availability SLOs?",
+            "Can we federate identity and automate provisioning?",
+            "Where are the load-test results for concurrent tenants?"
+          ],
+          "conditions_to_approve": [
+            "Enterprise SSO/MFA.",
+            "Published API/SLO contract.",
+            "Concurrent multi-tenant load evidence.",
+            "Production TMS connector."
+          ]
+        },
+        {
+          "bot_id": "SYN-C-AUDIT",
+          "role": "Director of Freight Audit",
+          "decision": "APPROVE_PILOT",
+          "primary_blocker": "NONE",
+          "blockers": [],
+          "rationale": "The incumbent-challenge engine is directly aligned with a 3PL audit QA function. Explicit suppression of existing findings and duplicates makes a one-client shadow audit useful immediately.",
+          "questions": [
+            "Can the system ingest our existing audit result as the frozen incumbent source?",
+            "Can reviewers see why a case was marked challenger-only?",
+            "Can we measure miss rate without changing our live payment flow?"
+          ],
+          "conditions_to_approve": [
+            "Shadow mode only.",
+            "No external carrier action.",
+            "Freeze existing audit output before challenge."
+          ]
+        },
+        {
+          "bot_id": "SYN-C-CONTROLLER",
+          "role": "Corporate Controller",
+          "decision": "CONDITIONAL",
+          "primary_blocker": "COST_ALLOCATION",
+          "blockers": [
+            "COST_ALLOCATION",
+            "PAYMENT_RAILS"
+          ],
+          "rationale": "Evidence lineage is attractive, but enterprise accounting needs cost-center/GL allocation and a clear reconciliation path to the actual payment/credit system.",
+          "questions": [
+            "How do findings map to client GL and cost centers?",
+            "How are carrier credits reconciled to our actual payment system?",
+            "Can reversals be posted back into the recovery report automatically?"
+          ],
+          "conditions_to_approve": [
+            "Provide GL/cost-center export or connector.",
+            "Integrate payment/credit reconciliation with an actual provider.",
+            "Keep reversals visible in net realized recovery."
+          ]
+        }
+      ]
+    }
+  ],
+  "aggregate_expected": {
+    "total_bots": 12,
+    "approve_pilot": 3,
+    "conditional": 6,
+    "blocked": 3,
+    "buyers_with_at_least_one_pilot_approver": 2,
+    "enterprise_wide_ready_buyers": 0,
+    "most_common_blockers": [
+      "SECURITY_ASSURANCE",
+      "REAL_WORLD_PROOF",
+      "INTEGRATION"
+    ],
+    "overall_simulated_verdict": "SCOPED_PILOT_SELLABLE_ENTERPRISE_ROLLOUT_NOT_YET_READY"
+  }
+}
