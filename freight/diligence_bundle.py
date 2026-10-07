@@ -70,6 +70,14 @@ DOC_PATHS=(
     "freight/SYNTHETIC_PILOT_DEMO.md",
     "freight/site/README.md",
     "freight/COMPONENT_RIGHTS_REGISTRY.json",
+    "freight/PHASE3_STEP1_SECURITY.md",
+    "freight/PHASE3_SECURITY_READINESS_2026-10-07.json",
+    "freight/PHASE3_SECURITY_TEST_EVIDENCE_2026-10-07.md",
+    "freight/PHASE3_EXTERNAL_ASSURANCE_PLAN.md",
+    "freight/PHASE3_SOC2_CONTROL_MAP.md",
+    "freight/PHASE3_DATA_FLOW_PROVIDER_REGISTER.md",
+    "freight/PHASE3_DISASTER_RECOVERY_RUNBOOK.md",
+    "freight/RECOVERYOS_PHASE3_STEP1_SECURITY.sql",
     "freight/RELEASE_MANIFEST.md",
 )
 
