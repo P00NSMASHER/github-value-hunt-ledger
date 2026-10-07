@@ -19,7 +19,9 @@
     "max_ece": 0.1,
     "max_unsupported_auto_decisions": 0,
     "max_incumbent_leakage_cents": 0,
-    "max_duplicate_leakage_cents": 0
+    "max_duplicate_leakage_cents": 0,
+    "min_dual_review_positive_cases": 10,
+    "min_dual_review_negative_cases": 10
   },
   "claim_boundary": [
     "Passing this gate supports only the frozen buyer-authorized population evaluated under this protocol; it is not a universal production-accuracy claim.",
