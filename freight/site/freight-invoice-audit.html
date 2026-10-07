@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Freight invoice audit for duplicate charges, rate errors, accessorials and unsupported billing. See the records and review workflow.">
+  <meta name="description" content="Freight invoice audit for duplicate charges, rate errors, fuel, accessorials, LTL/parcel adjustments and missed credits. See the evidence-first workflow.">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#071426">
   <meta name="freight-contact-email" content="">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
-  <title>Freight Invoice Audit | Freight Recovery</title>
+  <title>Freight Invoice Audit | Find Carrier Billing Errors</title>
   <link rel="canonical" href="https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit.html">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="site.css?v=free-audit-contingency-v5">
@@ -20,15 +20,74 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header document-header"><div class="wrap nav-wrap"><a class="brand" href="./" aria-label="Freight Recovery home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="brand-name">Freight <em>Recovery</em></span></a><a class="button button-small button-light" href="./#start-audit">Start Free Recovery Audit</a></div></header>
 <main id="main" class="document-main">
-<header class="document-hero"><div class="wrap document-hero-inner"><p class="eyebrow light"><span></span> Freight invoice audit</p><h1>Re-perform the invoice logic, not just the arithmetic.</h1><p>A freight invoice can add up correctly and still be wrong. Independent invoice review compares billed charges with the evidence that should control them.</p></div></header>
-<div class="wrap document-layout"><aside class="document-nav"><strong>On this page</strong><a href="#errors">Errors to test</a><a href="#records">Records to use</a><a href="#workflow">Review workflow</a><a href="#limits">What an audit cannot prove</a><a href="#next">Free audit</a></aside>
+<header class="document-hero"><div class="wrap document-hero-inner"><p class="eyebrow light"><span></span> Freight invoice audit</p><h1>Audit the freight invoice against what actually controlled the charge.</h1><p>A carrier invoice can add up perfectly and still be wrong. A defensible freight invoice audit connects the billed amount to the shipment, the commercial terms in force, and the evidence needed to reproduce the expected charge.</p><p class="document-meta">$0-upfront historical review &middot; Human-reviewed evidence &middot; Post-pay and Second-Look options</p></div></header>
+<div class="wrap document-layout"><aside class="document-nav"><strong>On this page</strong><a href="#definition">Definition</a><a href="#errors">Errors to test</a><a href="#records">Records to use</a><a href="#modes">Mode-specific checks</a><a href="#workflow">Audit workflow</a><a href="#example">Worked example</a><a href="#types">Pre-pay vs post-pay</a><a href="#limits">Limits</a><a href="#faq">FAQ</a><a href="#next">Free audit</a></aside>
 <article class="document-content">
-<section id="errors"><span class="doc-index">01</span><h2>Freight invoice errors worth testing</h2><p>High-value review categories include exact or near-duplicate billing, wrong rate versions, incorrect minimums, unsupported accessorials, quantity or weight mismatches, detention timing errors, incorrect fuel or surcharge application, currency problems and credits that never reach the final account state.</p><p>The important control is evidence. A difference should remain a review item until the controlling source and shipment facts support it.</p></section>
-<section id="records"><span class="doc-index">02</span><h2>Use invoice data plus controlling records</h2><p>Invoice exports are only one plane. Depending on the carrier and mode, review may also need contracts, rate confirmations, tariffs, shipment events, BOL/POD records, appointment or dwell evidence and later credit or payment records. Missing authority is not treated as a zero rate.</p></section>
-<section id="workflow"><span class="doc-index">03</span><h2>A defensible invoice-audit workflow</h2><p>Freeze the invoice population, identify the controlling source, calculate the expected charge independently, compare actual billing, route ambiguous cases to review and keep later settlement separate from the original finding. That sequence prevents one attractive discrepancy from quietly becoming a fake recovery number.</p></section>
-<section id="limits"><span class="doc-index">04</span><h2>What an invoice audit cannot prove by itself</h2><p>An invoice discrepancy is not the same as an approved claim or recovered cash. Existing carrier credits, incumbent-known findings, contractual exceptions, missing documents and later reversals all affect what can legitimately be called recovered.</p></section>
-<section id="next"><span class="doc-index">05</span><h2>Request a free freight invoice audit</h2><p>The initial review is $0 upfront and begins with non-sensitive qualification details.</p><a class="button button-cobalt" href="./#start-audit" data-track="free_audit_cta_clicked">Start Free Recovery Audit</a><p class="doc-small">715 Yorktowne Road, Pottsville, PA 17901.</p></section>
-<section><span class="doc-index">06</span><h2>Related resources</h2><p><a href="freight-audit-services.html">Freight audit services</a> &middot; <a href="freight-overcharge-recovery.html">Freight overcharge recovery</a> &middot; <a href="accessorial-charge-audit.html">Accessorial charge audit</a></p></section>
+<section id="definition"><span class="doc-index">01</span><h2>What is a freight invoice audit?</h2>
+<p>A freight invoice audit is the process of comparing a carrier's billed charges with the shipment facts and commercial terms that should govern those charges. The invoice total is only the starting point. The audit asks whether the shipment identity is correct, the right rate source was used, the rate was effective on the shipment date, the billed service actually occurred, and later credits or adjustments were handled correctly.</p>
+<p>For post-payment work, the audit also asks a second question: if the invoice was overpaid, is the difference still supportable and recoverable under the governing agreement and available evidence?</p>
+</section>
+<section id="errors"><span class="doc-index">02</span><h2>Freight invoice errors worth testing</h2>
+<ul>
+<li><strong>Duplicate billing.</strong> Exact duplicate invoices, duplicate economic charge lines, recycled PRO or tracking references, and corrected invoice chains that only look duplicated.</li>
+<li><strong>Rate errors.</strong> Wrong contract, tariff, rate confirmation, lane, discount, minimum charge, weight break, or rate version.</li>
+<li><strong>Effective-date mistakes.</strong> A current rate applied to a historical shipment, a future amendment used too early, or an expired schedule left in place too long.</li>
+<li><strong>Fuel surcharge errors.</strong> Wrong index, base, percentage, week, date convention, or fuel rule.</li>
+<li><strong>Unsupported accessorials.</strong> Detention, liftgate, residential, inside delivery, limited access, redelivery, appointment, lumper, reweigh, reclassification, and similar charges that lack the required contractual or shipment support.</li>
+<li><strong>Weight, class, and dimensional issues.</strong> Billed weight, dimensional weight, class, density, reweigh, or reclassification that conflicts with shipment evidence.</li>
+<li><strong>Service mismatches.</strong> Billed mode or service level differs from what was ordered, tendered, or delivered.</li>
+<li><strong>Credit leakage.</strong> Approved credits, refunds, remittances, or corrections that never reach the account or are later reversed.</li>
+</ul>
+<p>The goal is not to maximize the number of exceptions. It is to identify findings that can survive finance review and carrier challenge.</p>
+</section>
+<section id="records"><span class="doc-index">03</span><h2>Use invoice data plus controlling records</h2>
+<p>An invoice export rarely proves the whole case by itself. Depending on the mode and issue, a defensible audit may use:</p>
+<ul>
+<li>carrier invoices and invoice-detail exports;</li>
+<li>shipment, BOL, PRO, tracking, load, and delivery records;</li>
+<li>contracts, tariffs, customer-specific rate schedules, rate confirmations, spot quotes, and amendments;</li>
+<li>fuel rules and index references;</li>
+<li>weight, class, dimension, reweigh, reclassification, appointment, dwell, and accessorial evidence;</li>
+<li>prior audit output, open disputes, and automatic credits for Second-Look reviews;</li>
+<li>payment, credit, refund, remittance, and reversal evidence.</li>
+</ul>
+<div class="doc-callout"><strong>Missing commercial authority is an evidence gap, not a free pass to assume a zero-dollar expected charge.</strong><p>If the rate source cannot be resolved, the item stays in review until the missing evidence is obtained or the finding is rejected.</p></div>
+</section>
+<section id="modes"><span class="doc-index">04</span><h2>Mode-specific freight invoice checks</h2>
+<p><strong>LTL:</strong> verify class, weight, reweighs, reclassification, lane authority, minimum charges, fuel, discount structure, and accessorial documentation. <strong>Parcel:</strong> review dimensional weight, service level, residential/remote surcharges, address corrections, duplicate billing, and credits. <strong>Truckload:</strong> compare linehaul and fuel to the applicable rate confirmation or contract and test detention, layover, lumper, stop-off, and other accessorial support. <strong>Ocean, air, and intermodal:</strong> the evidence set can be broader, so the audit should confirm the exact tariff, quote, surcharge basis, shipment milestone, and currency treatment before asserting a monetary difference.</p>
+</section>
+<section id="workflow"><span class="doc-index">05</span><h2>A defensible freight invoice audit workflow</h2>
+<ol>
+<li><strong>Freeze the population.</strong> Define entity, date range, carriers, modes, currencies, invoices, and exclusions before measuring results.</li>
+<li><strong>Resolve invoice and shipment identity.</strong> Make sure the billed record belongs to the shipment or economic obligation being tested.</li>
+<li><strong>Resolve the controlling authority.</strong> Identify the contract, tariff, rate confirmation, quote, schedule, amendment, or rule that applied.</li>
+<li><strong>Recalculate independently.</strong> Rebuild the expected charge from the shipment facts and applicable commercial terms.</li>
+<li><strong>Compare billed vs expected.</strong> Preserve the exact inputs and math behind the difference.</li>
+<li><strong>Human-review ambiguity.</strong> Corrected invoices, conflicting sources, unclear accessorial support, or overlapping findings stay in review.</li>
+<li><strong>Separate known value.</strong> Existing credits, incumbent-known findings, automatic adjustments, and duplicate opportunities are suppressed from new recovery attribution.</li>
+<li><strong>Track authorization and settlement separately.</strong> A validated finding is not an approved claim, and an approved claim is not actual recovered money.</li>
+</ol>
+<p>This sequence follows the <a href="freight-recovery-evidence-standard.html">Freight Recovery Evidence Standard</a>.</p>
+</section>
+<section id="example"><span class="doc-index">06</span><h2>A simple freight invoice audit example</h2>
+<p>Suppose an LTL invoice bills <strong>$1,420</strong>. The shipment record and controlling customer rate schedule support an expected charge of <strong>$1,260</strong>. The initial difference is <strong>$160</strong>.</p>
+<p>That $160 is a candidate difference, not recovered funds. The auditor still needs to confirm shipment identity, rate effective date, fuel basis, accessorial entitlement, and whether a credit or dispute already exists. If the evidence survives review, the item can become a validated finding. Only after customer authorization, carrier resolution, and an eligible credit/refund/remittance posts can any amount be reported as actual recovery.</p>
+<p><a href="freight-audit-example.html">See the longer fictional invoice-to-settlement example.</a></p>
+</section>
+<section id="types"><span class="doc-index">07</span><h2>Pre-pay, post-payment, and Second-Look audits solve different problems</h2>
+<p>A <strong>pre-pay freight audit</strong> is a payment control that asks whether the invoice should be approved before AP pays it. A <a href="post-payment-freight-audit.html"><strong>post-payment freight audit</strong></a> looks backward at historical paid invoices for supportable overpayments. A <a href="second-look-freight-audit.html"><strong>Second-Look Recovery Audit</strong></a> gives an existing TMS, freight-payment provider, internal audit process, or incumbent auditor credit for its own findings and measures only supportable residual value.</p>
+</section>
+<section id="limits"><span class="doc-index">08</span><h2>What an invoice audit cannot prove by itself</h2>
+<p>An invoice discrepancy does not automatically prove carrier liability, claim approval, or recovered cash. Contractual exceptions, filing deadlines, carrier rules, missing evidence, existing credits, incumbent-known claims, negotiated settlements, and later reversals can all change the final outcome. That is why Freight Recovery reports candidate difference, validated finding value, approved claim value, and actual recovered funds separately.</p>
+</section>
+<section id="faq" itemscope itemtype="https://schema.org/FAQPage"><span class="doc-index">09</span><h2>Freight invoice audit FAQ</h2>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">What documents are needed for a freight invoice audit?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">The exact set depends on the mode and issue, but a strong review usually combines carrier invoice data, shipment identity, the controlling contract/rate source, supporting shipment evidence, and payment or credit evidence when actual recovery is being reconciled.</p></div></details>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">Can freight invoices be audited after they are paid?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">Yes. A post-payment freight audit reviews historical paid invoices, subject to the governing commercial terms, deadlines, carrier rules, evidence quality, and agreed scope.</p></div></details>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">What if we already use freight audit software or a provider?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">That can be a good fit for a Second-Look Recovery Audit. Existing findings, automatic credits, and incumbent-known claims are accounted for before Freight Recovery measures any supportable net-new opportunity.</p></div></details>
+<details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"><summary itemprop="name">Does every freight invoice difference become a claim?</summary><div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer"><p itemprop="text">No. Differences can be rejected, remain unresolved, or be suppressed as duplicate or pre-existing value. Only evidence-supported findings should advance.</p></div></details>
+</section>
+<section id="next"><span class="doc-index">10</span><h2>Request a free freight invoice audit</h2><p>The initial bounded historical review is $0 upfront and begins with non-sensitive qualification details. Do not email invoices or contracts until an approved secure intake route is confirmed.</p><a class="button button-cobalt" href="./#start-audit" data-track="free_audit_cta_clicked">Start My Free Freight Audit</a><p class="doc-small">715 Yorktowne Road, Pottsville, PA 17901.</p></section>
+<section><span class="doc-index">11</span><h2>Related freight-audit resources</h2><p><a href="freight-audit-services.html">Freight audit services</a> &middot; <a href="freight-invoice-audit-checklist.html">Freight invoice audit checklist</a> &middot; <a href="freight-overcharge-recovery.html">Freight overcharge recovery</a> &middot; <a href="accessorial-charge-audit.html">Accessorial charge audit</a> &middot; <a href="carrier-rate-audit.html">Carrier rate audit</a></p></section>
 </article></div></main>
 <footer class="site-footer compact-footer"><div class="wrap footer-bottom"><span>&copy; 2026 Freight Recovery</span><span><a href="./">Home</a> &middot; <a href="privacy.html">Privacy</a></span></div></footer>
 </body></html>
