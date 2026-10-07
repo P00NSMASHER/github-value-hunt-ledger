@@ -36,8 +36,8 @@ def _case(index: int, truth: str, prediction: str, stratum: str) -> dict:
         "economic_issue_id": f"issue-{index:04d}",
         "truth_incumbent_known": False,
         "predicted_net_new_cents": 1000 if prediction == "POSITIVE" else 0,
-        "reviewer_a_label": truth if index < 50 else None,
-        "reviewer_b_label": truth if index < 50 else None,
+        "reviewer_a_label": None,
+        "reviewer_b_label": None,
         "adjudication_note": None,
     }
 
@@ -52,6 +52,10 @@ def _pilot() -> dict:
         stratum = "LTL|A|MID" if index < 120 else "PARCEL|B|LOW"
         cases.append(_case(index, truth, prediction, stratum))
 
+    for index in list(range(25)) + list(range(60, 85)):
+        cases[index]["reviewer_a_label"] = cases[index]["truth_label"]
+        cases[index]["reviewer_b_label"] = cases[index]["truth_label"]
+
     return {
         "schema_version": 2,
         "protocol_id": "recoveryos-blind-audit-acceptance-v2",
@@ -65,6 +69,7 @@ def _pilot() -> dict:
             "truth_owner_saw_recoveryos_before_truth_freeze": False,
             "recoveryos_team_saw_truth_before_output_freeze": False,
             "sample_selected_before_recoveryos_output": True,
+            "dual_review_selected_before_recoveryos_output": True,
             "truth_owner_independent_of_recoveryos_builder": True,
         },
         "timeline": {
@@ -183,6 +188,12 @@ def test_large_false_negative_dollar_miss_fails_dollar_gate():
 def test_unresolved_authority_cannot_auto_decide_money():
     pilot = _pilot()
     pilot["cases"][0]["authority_state"] = "UNRESOLVED"
+    pilot["cases"][0]["truth_label"] = "UNRESOLVED"
+    pilot["cases"][0]["truth_variance_cents"] = 0
+    pilot["cases"][0]["reviewer_a_label"] = None
+    pilot["cases"][0]["reviewer_b_label"] = None
+    pilot["cases"][25]["reviewer_a_label"] = "POSITIVE"
+    pilot["cases"][25]["reviewer_b_label"] = "POSITIVE"
     _refresh_hashes(pilot)
     report = build_report(pilot, _policy())
     assert report["metrics"]["sample"]["unsupported_auto_decisions"] == 1
@@ -232,3 +243,32 @@ def test_reviewer_disagreement_requires_documented_adjudication():
     pilot["cases"][0]["reviewer_b_label"] = "NEGATIVE"
     errors = validate_pilot(pilot, _policy())
     assert any("reviewer disagreement requires adjudication_note" in error for error in errors)
+
+
+def test_dual_review_must_cover_both_truth_classes():
+    pilot = _pilot()
+    for case in pilot["cases"]:
+        case["reviewer_a_label"] = None
+        case["reviewer_b_label"] = None
+    for index in range(50):
+        pilot["cases"][index]["reviewer_a_label"] = "POSITIVE"
+        pilot["cases"][index]["reviewer_b_label"] = "POSITIVE"
+    report = build_report(pilot, _policy())
+    assert report["status"] == "INSUFFICIENT_OR_FAILED"
+    assert "dual_review_negative" in report["failed_gates"]
+
+
+def test_truth_semantics_reject_positive_zero_dollar_label():
+    pilot = _pilot()
+    pilot["cases"][0]["truth_variance_cents"] = 0
+    _refresh_hashes(pilot)
+    errors = validate_pilot(pilot, _policy())
+    assert any("POSITIVE truth requires positive variance" in error for error in errors)
+
+
+def test_net_new_cannot_exceed_predicted_variance():
+    pilot = _pilot()
+    pilot["cases"][0]["predicted_net_new_cents"] = 2000
+    _refresh_hashes(pilot)
+    errors = validate_pilot(pilot, _policy())
+    assert any("net-new cents cannot exceed predicted variance" in error for error in errors)
