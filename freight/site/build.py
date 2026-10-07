@@ -49,6 +49,8 @@ PUBLIC_CONTACT_PAGES = (
     "founding-program.html",
     "referral-partners.html",
     "freight-recovery-evidence-standard.html",
+    "post-payment-freight-audit.html",
+    "freight-audit-companies.html",
 )
 TEXT_SOURCE_FILES = (
     "index.html",
@@ -76,6 +78,7 @@ TEXT_SOURCE_FILES = (
     "recovery-status-example.html",
     "post-payment-freight-audit.html",
     "freight-recovery-evidence-standard.html",
+    "freight-audit-companies.html",
     "404.html",
     "site.css",
     "site.js",
