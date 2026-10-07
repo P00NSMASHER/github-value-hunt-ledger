@@ -96,9 +96,11 @@ def validate_security_readiness(payload: dict) -> list[str]:
         facts = audit.get("facts") or {}
         if int(facts.get("synthetic_events_verified") or 0) < 1:
             errors.append("PROVEN audit chain requires verified synthetic events")
-        if int(facts.get("invalid_hashes") or -1) != 0:
+        invalid_hashes = facts.get("invalid_hashes")
+        broken_links = facts.get("broken_links")
+        if invalid_hashes is None or int(invalid_hashes) != 0:
             errors.append("PROVEN audit chain requires zero invalid hashes")
-        if int(facts.get("broken_links") or -1) != 0:
+        if broken_links is None or int(broken_links) != 0:
             errors.append("PROVEN audit chain requires zero broken links")
 
     api_keys = controls.get("api_key_security") or {}
