@@ -29,7 +29,11 @@ RecoveryOS has strong internal/reproducible evidence for:
 - append-only source document, AI extraction, and human-review layers;
 - source-locator extraction with deterministic confidence/reconciliation gates;
 - retryable extraction without requiring the customer to re-upload retained source evidence;
-- Google and Microsoft federated sign-in in addition to password sessions.
+- Google and Microsoft federated sign-in in addition to password sessions;
+- fail-closed BLOCK enforcement before extraction approval;
+- short-lived tenant-scoped access to retained original documents for review;
+- extraction-version-specific review lineage and safe re-extraction;
+- owner-visible audit-chain health and scoped API-key lifecycle controls.
 
 ## Still not proven
 
