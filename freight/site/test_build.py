@@ -158,6 +158,26 @@ class PublicBuildTests(unittest.TestCase):
                 with self.subTest(phrase=phrase):
                     self.assertNotIn(phrase, public_text)
 
+
+    def test_business_structured_data_represents_a_national_b2b_service_not_a_walk_in_shop(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            index = (output / "index.html").read_text()
+            about = (output / "about.html").read_text()
+            self.assertEqual(index.count('<script type="application/ld+json">'), 1)
+            raw_json = index.split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0]
+            graph = json.loads(raw_json)["@graph"]
+            by_type = {node["@type"]: node for node in graph}
+            org = by_type["Organization"]
+            service = by_type["Service"]
+            self.assertEqual(org["name"], "Freight Recovery")
+            self.assertEqual(org["address"]["addressLocality"], "Pottsville")
+            self.assertEqual(org["address"]["addressRegion"], "PA")
+            self.assertEqual(service["provider"]["@id"], org["@id"])
+            self.assertEqual(service["areaServed"]["name"], "United States")
+            self.assertNotIn("LocalBusiness", raw_json)
+            self.assertIn("Start with a remote qualification request", about)
+
     def test_contact_is_injected_without_enabling_file_submission(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
