@@ -33,7 +33,11 @@ RecoveryOS has strong internal/reproducible evidence for:
 - fail-closed BLOCK enforcement before extraction approval;
 - short-lived tenant-scoped access to retained original documents for review;
 - extraction-version-specific review lineage and safe re-extraction;
-- owner-visible audit-chain health and scoped API-key lifecycle controls.
+- owner-visible audit-chain health and scoped API-key lifecycle controls;
+- machine-enforced blind customer-audit protocol with pre-registered stratification and immutable sample/truth/output hashes;
+- 95% uncertainty bounds, selective-classifier coverage, dollar-weighted error and confidence-calibration reporting;
+- dual-review agreement / Cohen's kappa and explicit disagreement adjudication;
+- hard zero-leakage gates for unsupported auto-decisions, incumbent-known value and duplicate economic issues.
 
 ## Still not proven
 
