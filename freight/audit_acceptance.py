@@ -100,6 +100,14 @@ def _wilson(successes: int, total: int, z: float = 1.959963984540054) -> dict | 
     }
 
 
+def _required_sample_size(population_size: int, margin: float, z: float = 1.959963984540054) -> int:
+    if population_size <= 0:
+        return 0
+    n0 = (z * z * 0.25) / (margin * margin)
+    adjusted = n0 / (1 + ((n0 - 1) / population_size))
+    return min(population_size, math.ceil(adjusted))
+
+
 def _cohen_kappa(pairs: list[tuple[str, str]]) -> dict | None:
     if not pairs:
         return None
@@ -190,6 +198,7 @@ def validate_policy(policy: dict) -> list[str]:
         "max_false_negative_dollar_share",
         "max_review_rate",
         "max_ece",
+        "target_case_rate_margin_95",
     )
     for key in proportions:
         value = thresholds.get(key)
@@ -673,9 +682,15 @@ def build_report(payload: dict, policy: dict) -> dict:
     fnr = _wilson(fn, len(positives))
     calibration = _calibration(calibration_rows)
 
+    required_sample_size = _required_sample_size(
+        payload["population"]["population_size"],
+        policy["thresholds"]["target_case_rate_margin_95"],
+    )
+
     metrics = {
         "sample": {
             "total_cases": len(cases),
+            "required_sample_size_95": required_sample_size,
             "adjudicated_cases": len(adjudicated),
             "positive_cases": len(positives),
             "negative_cases": len(negatives),
@@ -729,8 +744,12 @@ def build_report(payload: dict, policy: dict) -> dict:
 
     thresholds = policy["thresholds"]
     gates: dict[str, bool] = {}
+    gates["sample_precision_plan"] = len(cases) >= required_sample_size
     gates["sample_adjudicated"] = (
-        len(adjudicated) >= thresholds["min_adjudicated_cases"]
+        len(adjudicated) >= min(
+            thresholds["min_adjudicated_cases"],
+            payload["population"]["population_size"],
+        )
     )
     gates["sample_positive"] = (
         len(positives) >= thresholds["min_positive_cases"]
@@ -815,11 +834,31 @@ def build_report(payload: dict, policy: dict) -> dict:
         for key, row in by_stratum.items()
     )
 
-    status = (
-        "AUDIT_QUALITY_PROVEN"
-        if all(gates.values())
-        else "INSUFFICIENT_OR_FAILED"
-    )
+    evidence_gates = {
+        "sample_precision_plan",
+        "sample_adjudicated",
+        "sample_positive",
+        "sample_negative",
+        "dual_review_size",
+        "dual_review_positive",
+        "dual_review_negative",
+        "all_strata_targets_met",
+    }
+    hard_integrity_gates = {
+        "unsupported_auto",
+        "incumbent_leakage",
+        "duplicate_leakage",
+    }
+    failed = {name for name, passed in gates.items() if not passed}
+    if not failed:
+        status = "AUDIT_QUALITY_PROVEN"
+    elif failed & hard_integrity_gates:
+        status = "QUALITY_GATE_FAILED"
+    elif failed & evidence_gates:
+        status = "INSUFFICIENT_EVIDENCE"
+    else:
+        status = "QUALITY_GATE_FAILED"
+
     return {
         "protocol_id": payload["protocol_id"],
         "population_hash": payload["population"]["population_hash"],
