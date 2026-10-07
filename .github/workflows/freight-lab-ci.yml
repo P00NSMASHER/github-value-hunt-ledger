@@ -1,0 +1,30 @@
+name: Freight Lab Independent Synthetic Smoke
+on:
+  pull_request:
+    paths:
+      - 'freight/lab/**'
+      - 'freight/test_lab_*.py'
+      - '.github/workflows/freight-lab-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-lab-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact pull request commit
+        uses: actions/checkout@v4
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run real-rating-engine smoke tests, no external data
+        run: |
+          python -m unittest -v freight.test_lab_actual_engine_probe freight.test_lab_six_mode_metamorphic
+      - name: State claim boundary
+        run: |
+          echo 'Synthetic tariff and invariance regression only.'
+          echo 'Not real customer accuracy, OCR, API/database throughput or recovered revenue.'
