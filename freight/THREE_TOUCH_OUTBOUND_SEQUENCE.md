@@ -1,10 +1,13 @@
 # Freight Recovery Three-Touch Outbound Sequence
 
-Version: 1.0
-Effective: 2026-10-06
+Version: 1.1
+Effective: 2026-10-07
 
 ## Rules
 
+- Run the private pre-send gate in OUTREACH_SAFETY.md immediately before every touch. A draft is not a send; reconcile Gmail Sent and replies first.
+- Use one private account ID across recipient aliases. Reserve each recipient/account atomically before sending; unresolved transport results block retry.
+- Include the complete sender identity, postal address, and explicit opt-out in every new plain-text and HTML body, including follow-ups. Quoted history is insufficient.
 - Three touches maximum unless the prospect substantively engages.
 - Day 1, Day 5, Day 12.
 - Stop immediately on opt-out, negative response, hard bounce, or clear no-fit.
@@ -77,6 +80,11 @@ If a bounded historical review would be useful for {{company}}, I can start with
 
 Thanks,
 Jamison
+Freight Recovery
+715 Yorktowne Road
+Pottsville, PA 17901
+
+Reply "no thanks" and I won't follow up.
 
 ## Touch 3 — Day 12 — close the loop
 
@@ -91,6 +99,10 @@ If freight invoice review sits with someone else at {{company}}, I'd appreciate 
 Thanks,
 Jamison
 Freight Recovery
+715 Yorktowne Road
+Pottsville, PA 17901
+
+Reply "no thanks" and I won't follow up.
 
 ## Reply handling
 

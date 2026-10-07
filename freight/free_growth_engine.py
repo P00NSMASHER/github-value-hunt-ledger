@@ -36,8 +36,11 @@ class GrowthSnapshot:
     directory_profiles_live: int
     referral_partners_contacted: int
     organic_posts_published_this_week: int
+    outreach_preflight_ready: bool = False
 
     def __post_init__(self):
+        if type(self.outreach_preflight_ready) is not bool:
+            raise ValueError("outreach_preflight_ready must be a boolean")
         if self.as_of_date < self.launch_date:
             raise ValueError("as_of_date cannot precede launch_date")
         for name in (
@@ -104,6 +107,11 @@ def build_plan(snapshot: GrowthSnapshot) -> tuple[GrowthAction, ...]:
             "PAUSE",
             "0 sends",
             f"Hard-bounce rate is {bounce:.1%}; verify recipients before resuming.",
+        ))
+    elif not snapshot.outreach_preflight_ready:
+        actions.append(GrowthAction(
+            0, Channel.OUTBOUND_EMAIL, "PREP_OUTREACH_SAFETY", "0 sends",
+            "Private mailbox reconciliation, suppression, ICP qualification and per-message reservation gate required.",
         ))
     else:
         remaining = max(0, cap - snapshot.sent_today)
@@ -200,6 +208,7 @@ def _load_snapshot(path: str) -> GrowthSnapshot:
         directory_profiles_live=int(data["directory_profiles_live"]),
         referral_partners_contacted=int(data["referral_partners_contacted"]),
         organic_posts_published_this_week=int(data["organic_posts_published_this_week"]),
+        outreach_preflight_ready=data.get("outreach_preflight_ready", False),
     )
 
 

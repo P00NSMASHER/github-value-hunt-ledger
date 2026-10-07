@@ -24,6 +24,7 @@ def snapshot(**overrides):
         directory_profiles_live=0,
         referral_partners_contacted=0,
         organic_posts_published_this_week=0,
+        outreach_preflight_ready=True,
     )
     base.update(overrides)
     return GrowthSnapshot(**base)
@@ -87,3 +88,24 @@ def test_tagged_url_preserves_query_and_adds_campaign():
 def test_snapshot_rejects_impossible_bounces():
     with pytest.raises(ValueError):
         snapshot(cold_emails_total=2, hard_bounces_total=3)
+
+def test_missing_preflight_defaults_to_prep_without_send():
+    from dataclasses import asdict
+    inputs = asdict(snapshot(sent_today=0))
+    inputs.pop("outreach_preflight_ready")
+    plan = build_plan(GrowthSnapshot(**inputs))
+    email = [a for a in plan if a.channel == Channel.OUTBOUND_EMAIL][0]
+    assert email.action == "PREP_OUTREACH_SAFETY"
+    assert email.target == "0 sends"
+
+
+def test_preflight_readiness_rejects_truthy_strings():
+    with pytest.raises(ValueError):
+        snapshot(outreach_preflight_ready="true")
+
+
+def test_preflight_does_not_override_bounce_hold():
+    s = snapshot(cold_emails_total=100, hard_bounces_total=3,
+                 sent_today=0, outreach_preflight_ready=False)
+    email = [a for a in build_plan(s) if a.channel == Channel.OUTBOUND_EMAIL][0]
+    assert email.action == "PAUSE"
