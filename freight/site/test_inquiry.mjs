@@ -90,6 +90,17 @@ test("server feature is disabled without verified mailbox and explicit release f
   assert.deepEqual(await (await onRequestGet({env:env(mockDb())})).json(),
     {online:true,siteKey:"sitekey-synthetic-123456"});
 });
+test("missing notification delivery credential cannot advertise online acceptance", async () => {
+  const db=mockDb();
+  const e=env(db);
+  delete e.CLOUDFLARE_EMAIL_API_TOKEN;
+  const get=await onRequestGet({env:e});
+  assert.equal(get.status,503);
+  assert.deepEqual(await get.json(),{online:false});
+  const post=await onRequestPost({request:request(),env:e});
+  assert.equal(post.status,503);
+  assert.equal(db.inquiries.size,0);
+});
 test("invalid content type and cross-origin POST fail before any storage", async () => {
   const e=env(mockDb());
   assert.equal((await onRequestPost({request:request(good(),{contentType:"multipart/form-data"}),env:e})).status,415);
