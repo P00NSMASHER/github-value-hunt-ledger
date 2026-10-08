@@ -250,6 +250,8 @@
       }
       const reference = makeReference();
       preparedSummary = buildSummary(reference);
+      const recipient = byId("auditRecipientAddress");
+      if (recipient) recipient.textContent = contactEmail;
       const subject = encodeURIComponent("Free Recovery Audit Request — " + fieldValue("companyName") + " — " + reference);
       const body = encodeURIComponent(preparedSummary);
       sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
@@ -261,7 +263,10 @@
       ready.scrollIntoView({ block: "center", behavior: "smooth" });
       track(EVENTS.auditFormCompleted, { completedSteps: 1, method: "email_draft" });
       track(EVENTS.auditRequestPrepared, { reference });
-      window.setTimeout(() => { window.location.href = sendLink.href; }, 80);
+      // A mailto launch must happen in the same user gesture. Deferring it can
+      // cause mobile browsers to suppress the email app handoff. Keep the
+      // rendered send-again link and copy alternative if no client opens.
+      window.location.href = sendLink.href;
     };
 
     fallbackLink?.addEventListener("click", (event) => {

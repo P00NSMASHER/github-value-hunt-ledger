@@ -73,6 +73,28 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('contingencyRecoveryRate: "0.325"', config)
             self.assertIn('contingencyRecoveryRateLabel: "32.5%"', config)
 
+    def test_free_audit_is_bounded_without_promising_unapproved_work(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text()
+            self.assertIn("up to 20 eligible invoices after a fit and capacity check", page)
+            self.assertIn("our capacity before requesting files", page)
+            self.assertIn("approved secure intake route", page)
+            self.assertNotIn("24-hour guaranteed review", page)
+
+    def test_email_fallback_preserves_direct_user_gesture_and_manual_address(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text()
+            script = (output / "site.js").read_text()
+            self.assertIn('id="sendAuditRequest"', page)
+            self.assertIn('id="copyAuditSummary"', page)
+            self.assertIn('id="auditRecipientAddress"', page)
+            self.assertIn('recipient.textContent = contactEmail', script)
+            self.assertIn('window.location.href = sendLink.href;', script)
+            self.assertNotIn('window.setTimeout(() => { window.location.href = sendLink.href; }, 80)', script)
+            self.assertIn("Review it, then press Send.", page)
+
     def test_private_repository_cannot_be_the_output(self):
         for output in (
             builder.REPOSITORY,
