@@ -29,7 +29,8 @@ class AuditLeadProfile:
     has_rate_authority: bool
     has_shipment_records: bool
     has_payment_evidence: bool
-    previously_audited: bool = False
+    # None means the prior-auditor status has not been verified.
+    previously_audited: bool | None = None
     known_or_suspected_issue: bool = False
 
     def __post_init__(self):
@@ -44,6 +45,17 @@ class AuditLeadProfile:
             value = getattr(self, field)
             if isinstance(value, bool) or not isinstance(value, int) or value < 0:
                 raise ValueError(field + " must be a non-negative integer")
+        # Never interpret text such as "false" as evidence being present.
+        for field in (
+            "has_invoice_export", "has_rate_authority", "has_shipment_records",
+            "has_payment_evidence", "previously_audited",
+            "known_or_suspected_issue",
+        ):
+            value = getattr(self, field)
+            if field == "previously_audited" and value is None:
+                continue  # Unknown stays unqualified until manually resolved.
+            if type(value) is not bool:
+                raise ValueError(field + " must be a boolean")
 
 
 @dataclass(frozen=True)
@@ -69,6 +81,43 @@ def qualify_free_audit(profile: AuditLeadProfile) -> QualificationDecision:
             QualificationState.INSUFFICIENT_DATA,
             tuple(reasons),
             "Request the minimum invoice population and history details before analyst work.",
+        )
+
+    # The standard scale-based routes must not silently override an incumbent
+    # auditor or already-reviewed population. No incremental recovery is
+    # presumed until a human verifies the prior scope and claim entitlement.
+    if profile.previously_audited is not False:
+        reasons.append(
+            "prior_audit_overlap_check" if profile.previously_audited is True
+            else "prior_audit_status_unverified"
+        )
+        if not profile.has_rate_authority:
+            reasons.append("rate_authority_needs_review")
+        if not corroborating_records:
+            reasons.append("supporting_records_need_review")
+        return QualificationDecision(
+            QualificationState.NEEDS_REVIEW,
+            tuple(reasons),
+            "Verify prior audit status, open claims and incumbent rights before substantive work.",
+        )
+
+    # High spending does not identify a claimable shipment. The client must
+    # identify a freight mode and at least one billed carrier before the
+    # economic-scale fast paths can classify a prospect as qualified.
+    scope_reasons = []
+    if profile.mode_count == 0:
+        scope_reasons.append("freight_mode_unidentified")
+    if profile.carrier_count == 0:
+        scope_reasons.append("carrier_identity_unidentified")
+    if scope_reasons:
+        if not profile.has_rate_authority:
+            scope_reasons.append("rate_authority_needs_review")
+        if not corroborating_records:
+            scope_reasons.append("supporting_records_need_review")
+        return QualificationDecision(
+            QualificationState.NEEDS_REVIEW,
+            tuple(scope_reasons),
+            "Identify a freight mode, billed carrier and governing documents before qualifying any pilot.",
         )
 
     scaled = profile.annual_freight_spend_usd >= 1_000_000 or profile.monthly_shipments >= 250
@@ -112,8 +161,6 @@ def qualify_free_audit(profile: AuditLeadProfile) -> QualificationDecision:
         reasons.append("rate_authority_needs_review")
     if not corroborating_records:
         reasons.append("supporting_records_need_review")
-    if profile.previously_audited:
-        reasons.append("prior_audit_overlap_check")
     if not reasons:
         reasons.append("manual_economic_review")
     return QualificationDecision(
