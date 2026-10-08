@@ -113,7 +113,7 @@ def test_direct_dataclass_constructor_cannot_bypass_boolean_checks():
 @pytest.mark.parametrize("name", ["carrier_scope","mode_scope"])
 @pytest.mark.parametrize("bad", ["Carrier ABC", 123, None, {"carrier": True}, [" "]])
 def test_rejects_malformed_scope_including_string_character_iteration(name, bad):
-    with pytest.raises((ValueError, TypeError), match="must be"):
+    with pytest.raises((ValueError, TypeError), match="must (?:be|contain)"):
         request(**{name: bad})
 
 
