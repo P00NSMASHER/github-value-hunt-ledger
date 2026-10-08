@@ -17,7 +17,7 @@ Review hours = analyst + independent reviewer + administrative hours.
 
 Fully loaded exposure = hours × cost per hour + direct delivery costs + potential recovery administration costs. Founder labor **must** have a positive hourly cost. This is a cost budget, not a guaranteed cash payment.
 
-**No-recovery outcome**: customer pays no contingency fee; RETALLY's at-risk delivery cost is the full exposure.
+**No-recovery outcome**: customer pays no contingency fee; RETALLY's at-risk delivery cost is the full exposure. The portfolio gate also considers the **cumulative zero-recovery exposure of all three founding slots**. A single pilot within budget does not automatically justify three simultaneous free reviews.
 
 **Synthetic expected fee (what-if only)**:
 assumed supported opportunity × assumed realized fraction × assumed uniquely attributable fraction × assumed fee-eligibility fraction × hypothetical rate.
@@ -39,7 +39,9 @@ assumed supported opportunity × assumed realized fraction × assumed uniquely a
 | Modeled expected fee, based solely on invented probabilities | $4,680 |
 | Modeled expected contribution, not actual profit | $2,180 |
 | Fee-eligible cash required merely to break even at illustrative rate | **$12,500** |
-| Modeled scope limit | 20 hours and $2,600 loss allowance |
+| Modeled per-pilot scope limit | 20 hours and $2,600 loss allowance |
+| Three-pilot program worst-case loss | **$7,500**, if all three recover nothing |
+| Illustrative aggregate loss ceiling | **$8,000**, internal assumption only |
 | Actual signed rate / buyer scope / secured intake / reviewer | **NOT APPROVED/VERIFIED** |
 | Decision | **HOLD**, not ready to accept work |
 
@@ -68,5 +70,6 @@ python freight/commercial/zero_upfront_underwriting.py freight/commercial/fixtur
 - **Buyer-specific data permissions missing:** buyer IT and RETALLY verifier; a baseline empty workspace isn't automatically ready for a customer's freight records.
 - **Sample's unexplained $1,650:** finance reviewer; preserve UNVERIFIED in customer samples.
 - **No independent reviewer capacity / unlimited founder hours:** operations owner; fail closed rather than assuming free labor.
+- **Three individually bounded reviews can exceed the total founding-program budget:** operations/finance owner; verify both per-engagement and aggregate loss ceilings before authorizing delivery.
 
 **Commercial release remains blocked.** Tests are not buyer acceptance, projections are not results, and a pricing illustration is not a signed contract.
