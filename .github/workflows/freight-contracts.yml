@@ -54,6 +54,7 @@ jobs:
         run: |
           PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_first_customer_gate.py' -v
           PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_zero_upfront_underwriting.py' -v
+          PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_mission2i_integrated_acceptance.py' -v
           PYTHONPATH=. python freight/commercial/first_customer_gate.py > /tmp/retally-first-customer-gates.json
           python - <<'PY'
           import json
