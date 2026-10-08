@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'freight/lab_phase4_director.py'
+      - 'freight/test_lab_phase6_postgres.py'
       - 'freight/test_lab_phase4_director.py'
       - 'freight/lab_phase4_control_center.py'
       - 'freight/lab_phase4_experiments.py'
@@ -10,6 +11,7 @@ on:
       - 'freight/lab_phase4_mock_provider.py'
       - 'freight/test_lab_phase4_mock_provider.py'
       - 'freight/PHASE4_EXECUTION.md'
+      - 'freight/PHASE6_POSTGRESQL_ACCEPTANCE.md'
       - '.github/workflows/freight-phase4.yml'
   workflow_dispatch:
 
@@ -72,3 +74,68 @@ jobs:
         run: |
           echo 'No database/network outside isolated synthetic fixtures.'
           echo 'No Floot production app, external carrier/bank/customer, or scheduled actions.'
+
+  phase6-postgresql-concurrency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: phase6
+          POSTGRES_PASSWORD: phase6_ci_only
+          POSTGRES_DB: phase6_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U phase6 -d phase6_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      RETALLY_PHASE6_TEST_DATABASE_URL: postgresql://phase6:phase6_ci_only@127.0.0.1:5432/phase6_ci
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Install isolated PostgreSQL test driver
+        run: python -m pip install 'psycopg[binary]==3.2.10'
+      - name: Exercise existing Labs 05 06 11 12 against real ephemeral PostgreSQL
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib, subprocess, sys
+          p = subprocess.run([sys.executable, "-m", "unittest", "-v",
+                              "freight.test_lab_phase6_postgres"],
+                             capture_output=True, text=True)
+          transcript = p.stdout + p.stderr
+          pathlib.Path("phase6-postgres.log").write_text(transcript, encoding="utf-8")
+          print(transcript)
+          source = pathlib.Path("freight/test_lab_phase6_postgres.py").read_bytes()
+          result = {"github_sha": os.environ.get("GITHUB_SHA"),
+                    "source_sha256": hashlib.sha256(source).hexdigest(),
+                    "result": "PASS" if p.returncode == 0 else "FAIL",
+                    "scope": "EPHEMERAL_POSTGRESQL_EQUIVALENT_SQL_NOT_HOSTED_FLOOT",
+                    "historical_findings_closed": 0,
+                    "floot_hosted_tested": False,
+                    "actual_recovered_cash_verified": False,
+                    "production_deployment": False}
+          pathlib.Path("phase6-postgres-manifest.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          sys.exit(p.returncode)
+          PY
+      - name: Preserve passing or failing PostgreSQL test transcript
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-phase6-postgresql-receipts
+          path: |
+            phase6-postgres.log
+            phase6-postgres-manifest.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Keep Phase 6 claims within tested scope
+        run: |
+          echo 'Actual ephemeral Postgres transactions, synthetic records only.'
+          echo 'No hosted Floot handler, no production credentials, no external provider operations.'
+          echo 'Do not close any of the 26 historical findings.'
