@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-08",
+  "owner_branch": "fix/retally-labs04-14-source-bound-replay-v2-20261008",
+  "canonical_registry": "PR-279 / freight/research/LAB_FINDINGS_CUMULATIVE.json",
+  "other_chat_active": "PR-286",
+  "semantic_checker_other_chat": "PR-284",
+  "historical_findings": 26,
+  "new_research_gate_findings": 2,
+  "total_ledger_rows": 28,
+  "isolated_offline_patch_tested": 10,
+  "remaining_original_findings_waiting_independent_confirmation": 16,
+  "full_system_verified": false,
+  "all_production_defects_closed": false,
+  "comment": "This is a coordination view, not an edit of the canonical findings registry. Some finding IDs describe overlapping issues; no complete original engine production repair is claimed.",
+  "findings": [
+    {
+      "finding_id": "LAB-P0-01",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "LAB-P0-02",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "LAB-P0-03",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "LAB-P0-04",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "LAB-P1-05",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "LAB-P1-06",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "LAB-P1-07",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "LAB-P2-08",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-01",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-02",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-03",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-04",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-05",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-06",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-07",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "D-08",
+      "owner": "PR-286-ORIGINAL-UNIFIED-REVIEW",
+      "status": "AWAITING_INDEPENDENT_FIX_EVIDENCE",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Fail-first original reproduction, patched-source tests, independently anchored financial replay; cross-PR integration"
+    },
+    {
+      "finding_id": "X-01",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "X-02",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "X-03",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "X-04",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "X-05",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "Y-01",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "Y-02",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "Y-03",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "Y-04",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "Z-01",
+      "owner": "PR-287-ISOLATED-LABS-04-14",
+      "status": "OFFLINE_TOOLKIT_REPAIR_TESTED",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Merge-independent review, source-anchored population regen, production staging tests"
+    },
+    {
+      "finding_id": "GATE-001",
+      "owner": "PR-279-RESEARCH-GATE-EVIDENCE",
+      "status": "FIXED_RESEARCH_GATE_ONLY",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Research proof-checker positive/negative controls; not a hosted financial control"
+    },
+    {
+      "finding_id": "GATE-002",
+      "owner": "PR-279-RESEARCH-GATE-EVIDENCE",
+      "status": "FIXED_RESEARCH_GATE_ONLY",
+      "staging_verified": false,
+      "hosted_product_verified": false,
+      "full_legacy_population_regenerated": false,
+      "verification_required": "Research proof-checker positive/negative controls; not a hosted financial control"
+    }
+  ]
+}
