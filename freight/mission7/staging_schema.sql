@@ -196,5 +196,36 @@ SELECT tenant_id,
     currency,
     sum(amount_cents) AS claimed_reconciled_minor_units
    FROM m7_settlement_attestations
-  WHERE status = 'CASH_RECONCILED'::text
+  WHERE 1=0 -- Fail closed until independent cash reconciliation is implemented
   GROUP BY tenant_id, currency;
+
+-- Database-level conservation also defends against direct INSERT bypassing preparation.
+CREATE OR REPLACE FUNCTION public.m7_allocation_conservation_guard()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE f m7_findings%ROWTYPE; i m7_instructions%ROWTYPE; already numeric;
+BEGIN
+ SELECT * INTO f FROM m7_findings
+ WHERE tenant_id=NEW.tenant_id AND id=NEW.finding_id FOR UPDATE;
+ IF NOT FOUND THEN RAISE EXCEPTION 'allocation finding not found'; END IF;
+ SELECT * INTO i FROM m7_instructions
+ WHERE tenant_id=NEW.tenant_id AND id=NEW.instruction_id;
+ IF NOT FOUND THEN RAISE EXCEPTION 'allocation instruction not found'; END IF;
+ IF NEW.economic_key<>f.economic_key OR NEW.currency<>f.currency OR i.currency<>f.currency
+   THEN RAISE EXCEPTION 'allocation currency/economic scope mismatch'; END IF;
+ IF NOT (f.confirmed AND f.authority_verified AND f.source_verified AND f.buyer_eligibility_verified
+   AND f.attribution_state='CHALLENGER_ONLY' AND f.blockers='[]'::jsonb)
+   THEN RAISE EXCEPTION 'ineligible allocation finding'; END IF;
+ SELECT coalesce(sum(amount_cents),0) INTO already FROM m7_allocations
+ WHERE tenant_id=NEW.tenant_id AND economic_key=NEW.economic_key AND currency=NEW.currency;
+ IF already+NEW.amount_cents>f.net_new_candidate_cents
+   THEN RAISE EXCEPTION 'financial conservation check violated'; END IF;
+ SELECT coalesce(sum(amount_cents),0) INTO already FROM m7_allocations
+ WHERE tenant_id=NEW.tenant_id AND instruction_id=NEW.instruction_id;
+ IF already+NEW.amount_cents>i.amount_cents
+   THEN RAISE EXCEPTION 'instruction allocation overflow'; END IF;
+ RETURN NEW;
+END $function$;
+CREATE TRIGGER m7_allocations_conservation BEFORE INSERT ON m7_allocations FOR EACH ROW EXECUTE FUNCTION public.m7_allocation_conservation_guard();
+CREATE TRIGGER m7_findings_immutable BEFORE UPDATE OR DELETE ON m7_findings FOR EACH ROW EXECUTE FUNCTION public.m7_block_mutation();
