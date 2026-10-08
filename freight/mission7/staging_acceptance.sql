@@ -66,6 +66,12 @@ BEGIN
  EXCEPTION WHEN raise_exception THEN
    IF SQLERRM='economic entitlement mutation accepted' THEN RAISE; END IF;
  END;
+ BEGIN
+   PERFORM m7_prepare_instruction('ACCEPT_T1','accept-key-jpy1',replace(a::text,'"USD"','"JPY"')::jsonb);
+   RAISE EXCEPTION 'unsupported currency accepted';
+ EXCEPTION WHEN raise_exception THEN
+   IF SQLERRM='unsupported currency accepted' THEN RAISE; END IF;
+ END;
  IF (SELECT count(*) FROM m7_reconciled_cash_by_currency)<>0
    THEN RAISE EXCEPTION 'unverified cash was reported'; END IF;
  IF (SELECT sum(amount_cents) FROM m7_allocations WHERE tenant_id='ACCEPT_T1' AND finding_id='USD1')<>100000
