@@ -16,6 +16,7 @@ import unittest
 
 import psycopg
 from psycopg import sql
+from psycopg.types.json import Jsonb
 from psycopg.conninfo import conninfo_to_dict
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding,PublicFormat
