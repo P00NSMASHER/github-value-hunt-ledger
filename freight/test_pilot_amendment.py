@@ -115,7 +115,7 @@ def test_direct_amendment_dataclass_bypass_is_rejected():
 @pytest.mark.parametrize("name", ["carrier_scope","mode_scope"])
 @pytest.mark.parametrize("bad", ["LTL", {"a":1}, 123, [], [" "]])
 def test_amendment_scope_rejects_string_iteration(name, bad):
-    with pytest.raises(ValueError,match="must be"):
+    with pytest.raises(ValueError,match="must (?:be|contain)"):
         req(**{name:bad})
 
 
