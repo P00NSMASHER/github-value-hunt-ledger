@@ -92,7 +92,7 @@ def measure(bundle: Path, output: Path) -> dict:
             launcher_checks = []
             chat_context = browser.new_context(viewport={"width":390,"height":844},
                 is_mobile=True,has_touch=True,reduced_motion="reduce")
-            chat_context.route("**/bubblav.com/**", lambda route: route.abort())
+            chat_context.route("**/*bubblav.com/**", lambda route: route.abort())
             chat_page = chat_context.new_page()
             chat_page.goto(base + "index.html",wait_until="load",timeout=25000)
             chat_btn = chat_page.locator("#retallyChatLauncher")
