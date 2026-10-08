@@ -1,0 +1,15 @@
+--- a/RecoveryOS_Unified_Development_Lab/unified/staging.py
++++ b/RecoveryOS_Unified_Development_Lab/unified/staging.py
+@@ -147,10 +147,10 @@
+         with self.connect() as con:
+             con.execute('BEGIN IMMEDIATE')
+             case=self._case(con,case_id,tenant)
+-            previous=con.execute('SELECT kind,payload_json FROM evidence_events WHERE case_id=? AND idempotency=?',
++            previous=con.execute('SELECT kind,payload_json,actor FROM evidence_events WHERE case_id=? AND idempotency=?',
+                                   (case_id,idempotency)).fetchone()
+             if previous:
+-                if previous['kind']==kind and json.loads(previous['payload_json'])==payload:
++                if previous['kind']==kind and previous['actor']==actor and json.loads(previous['payload_json'])==payload:
+                     return {'status':'IDEMPOTENT_REPLAY','case':self.view(case_id,tenant)}
+                 raise Rejected('IDEMPOTENCY_CONFLICT')
+             state=case['state']; funds=json.loads(case['funds_json'])

@@ -1,0 +1,30 @@
+{
+  "scope": "OFFLINE_ORIGINAL_UNIFIED_LAB_ONLY",
+  "finding": "D-07",
+  "run_date": "2026-10-08",
+  "source_archive_sha256": "2dcfd16296454689a391fb76ac57e4a9282091c25d85134334b3c7eeeeafc93b",
+  "repaired_phase2_archive_sha256": "8e0abb53632b82a6228bbf8fe5dc35da14b52ba9b4e1edfb985f62bf96c02e9d",
+  "original_staging_source_sha256": "36960d9ca245cdd43b61423718aa763102c901cdb8784cd46e5189d9ff7e983c",
+  "patched_staging_source_sha256": "b538c22b428c6547f51a3eeac5c3fdfee4392898905d381faca33a6618a0ae50",
+  "patch_sha256": "a3b1d7792ce8d684e5bbd3f3c578e063ca36fb25627ffbe544899e3fcfc9475e",
+  "before": {
+    "same_actor_retry": "PASS",
+    "cross_actor_retry": "FAILED: unauthorized replay accepted",
+    "test_count": 2
+  },
+  "after": {
+    "same_actor_retry": "PASS",
+    "cross_actor_retry": "PASS: IDEMPOTENCY_CONFLICT",
+    "test_count": 2
+  },
+  "original_phase2_repaired_archive_tests": "2/2 PASS",
+  "legacy_original_suite_on_patched_code": "62/62 PASS",
+  "original_historical_register_status": "OPEN_UNVERIFIED",
+  "status": "REPAIRED_IN_OFFLINE_RESEARCH_ONLY",
+  "product_handler_production_certified": false,
+  "external_actor_identity_verified": false,
+  "caveats": [
+    "Original test executed from user archive in isolated container, not re-run inside Github CI.",
+    "Historical D-07 still requires original-version linkage and independent product controls before formal register closure."
+  ]
+}
