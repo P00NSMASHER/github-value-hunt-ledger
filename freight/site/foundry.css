@@ -60,3 +60,14 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
  .navlinks{background:var(--navy)}
  .brand-name img{width:153px}
 }
+
+/* RETALLY mobile repair: retain the pre-rebrand Hanken/Instrument fonts.
+   Keep complete slogan phrases together without shrinking the whole page.
+   The duplicated fixed audit bar covered content and became illegible under
+   the emerald palette. The original hero/menu CTAs remain accessible. */
+.home-simple .hero h1 .hero-phrase{display:inline-block;white-space:nowrap}
+@media(max-width:620px){
+  .home-simple .hero h1{font-size:clamp(2.1rem,9vw,2.4rem);line-height:1.12;max-width:100%;text-wrap:wrap}
+  body{padding-bottom:0}
+  .mobile-cta{display:none!important}
+}
