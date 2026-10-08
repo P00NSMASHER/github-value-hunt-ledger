@@ -113,34 +113,92 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 .home-simple .intake-section .intake-copy>p{color:#40574d}
 
 
-/* RETALLY restrained-surface pass (brand finishing, 2026-10-08).
-   Keep approved typography, site structure, logos, form and calculator intact.
-   This overrides backgrounds only. Green remains a deliberate action accent. */
+/* Final RETALLY forest/emerald brand layer. Loaded last to prevent navy regression.
+   Hanken and Instrument type, layout, and existing CTA interactions are preserved. */
 :root {
-  --ink:#0e1e29;
-  --navy:#0e1e29;
-  --navy-soft:#19353b;
-  --paper:#f7f9f8;
-  --porcelain:#ffffff;
-  --mist:#eff5f2;
-  --cobalt:#087a50;
-  --cobalt-dark:#07563a;
-  --signal:#b7f0ce;
-  --line:#dce6e0;
+  --ink:#102a25;--navy:#062c26;--navy-soft:#0d4b3b;
+  --paper:#f3f7f4;--porcelain:#ffffff;--mist:#edf5f0;
+  --cobalt:#087a50;--cobalt-dark:#07563a;--signal:#b7f0ce;
+  --signal-ink:#05281f;--muted:#526b61;--line:#d9e6df;
+  --shadow:0 20px 60px rgba(6,44,38,.12);
+  --shadow-soft:0 8px 28px rgba(6,44,38,.06);
 }
-.site-header { background:rgba(14,30,41,.98); border-bottom-color:#2a404a; }
-.statusbar { background:#173d3a; }
-.site-footer,.section-ink,.document-hero { background-color:#0e1e29; }
-.section-cobalt { background-color:#183940; }
-.home-simple .intake-section { background:#f4f7f6; }
-.home-simple .pricing-section { background:#fff; }
-.home-simple .section-paper { background:#f7f9f8; }
-.home-simple .section-ink { background:#0e1e29; }
-.home-simple .hero .hero-proof { color:#dbeae2; }
-.home-simple .button-signal,.home-simple .button-cobalt { background:#087a50; color:#fff; }
-.home-simple .button-signal:hover,.home-simple .button-cobalt:hover { background:#07563a; }
-/* Preserve the checked mobile occlusion repair. */
-@media (max-width:620px) {
-  .home-simple .mobile-cta { display:none!important; }
-  body { padding-bottom:0; }
+.site-header{background:rgba(6,44,38,.98);border-bottom-color:#235446}
+.statusbar{background:#104d3b;color:#f0fff6}
+.site-footer{background:linear-gradient(155deg,#052a24 0%,#0c4034 100%)}
+.section-ink,.home-simple .section-ink{background:#062c26}
+.section-cobalt{background:#105039}
+.document-hero{background:linear-gradient(125deg,#052a24 0%,#0d4b3b 100%)}
+.document-hero-inner>p:not(.eyebrow,.document-meta){color:#d8e9df}
+.document-meta{color:#c1d8cc}
+.navlinks>a:not(.button){color:#e0f3e8}
+.navlinks>a:not(.button):hover{color:#b7f0ce}
+.home-simple .intake-section{background:#f3f7f4}
+.home-simple .pricing-section{background:#fff}
+.home-simple .section-paper{background:#f7f9f8}
+.home-simple .hero-media img{filter:saturate(.88) contrast(1.05)}
+.home-simple .hero-wash{
+ background:
+ linear-gradient(90deg,rgba(2,34,29,.97) 0%,rgba(4,49,39,.87) 43%,rgba(6,65,50,.44) 76%,rgba(6,65,50,.16) 100%),
+ linear-gradient(0deg,rgba(2,31,27,.72),transparent 57%);
+}
+.home-simple .hero .hero-proof,.home-simple .hero .lead{color:#e0f0e6}
+.button-light:hover{background:#e7f5ec}
+:focus-visible{outline-color:#20dda1}
+.sample-chip{background:#e8f6ef;color:#1e5641}
+.document-nav{border-top-color:#087a50}
+.document-content h2,.document-page .doc-index{color:#102f28}
+.document-page .doc-index{color:#087a50}
+.document-page .sample-expected-total{
+ display:block;padding:16px 19px;border-radius:6px;
+ background:#e7f7ee;border:1px solid #c2e6d2;
+ color:#07563a;font-size:1.2rem;
+}
+.sample-report{background:#f3f7f4}
+.sample-report .document-hero{
+ background-image:
+ linear-gradient(90deg,rgba(2,34,29,.96) 0%,rgba(4,49,39,.84) 52%,rgba(6,65,50,.36) 100%),
+ linear-gradient(0deg,rgba(2,31,27,.65),transparent 58%),
+ url("assets/images/terminal-blue-hour.webp");
+ background-color:#062c26;background-size:cover;background-position:center 53%;
+}
+.sample-report .report-header h1{
+ font-size:clamp(1.65rem,3.2vw,2.05rem);
+ line-height:1.15;letter-spacing:-.032em;max-width:26ch;
+ overflow-wrap:normal;white-space:normal;text-wrap:balance;
+}
+.sample-report .report-header p{color:#e2f0e8}
+.sample-report .report-header .meta{color:#c3dfd0}
+.sample-report .report-back{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ color:#102a25;white-space:nowrap;
+}
+.sample-report .report-back img{width:112px;height:auto;display:block}
+.sample-report .report-back:hover{background:#e7f5ec}
+.sample-report .report-card{border-color:#d9e6df}
+.sample-report .report-card.net{border-color:#087a50;background:#e9f8f0}
+.sample-report .report-disclosure{
+ font-size:.875rem;line-height:1.55;color:#526b61;
+ border-top:1px solid #d9e6df;padding:22px 0 30px;
+ margin-top:32px;background:none;
+}
+@media(max-width:860px){
+ .navlinks{background:#062c26}
+ .navlinks a{min-height:44px}
+ .home-simple .hero-wash{
+  background:linear-gradient(90deg,rgba(2,34,29,.94),rgba(5,57,44,.71)),
+   linear-gradient(0deg,rgba(2,31,27,.79),transparent 70%);
+ }
+}
+@media(max-width:620px){
+ .home-simple .hero-media img{object-position:56% center}
+ .sample-report .document-hero{background-position:62% center}
+ .sample-report .report-header h1{font-size:1.7rem;max-width:100%}
+ .sample-report .report-back img{width:106px}
+ .home-simple .mobile-cta{display:none!important}
+ body{padding-bottom:0}
+}
+@media print{
+ .sample-report .document-hero{background:#fff;color:#000}
+ .sample-report .report-header h1,.sample-report .report-header p{color:#000}
 }

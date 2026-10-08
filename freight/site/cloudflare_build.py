@@ -6,6 +6,7 @@ Never publish the repository checkout or any directory outside the exact bundle.
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 import shutil
 import tempfile
@@ -48,6 +49,14 @@ def build(output: Path = OUTPUT_DIR) -> Path:
             raise RuntimeError("Old site canonical remains")
         if rewrites < 1:
             raise RuntimeError("Public URL rewrite did not occur")
+        # Audit every generated public text asset, including RecoveryOS and URL rewrites.
+        # Never log the private value if a check fails.
+        for path in published:
+            if path.suffix.lower() not in {".html", ".txt", ".xml", ".json", ".js", ".css", ".svg", ".csv"}:
+                continue
+            content = path.read_text(encoding="utf-8").lower()
+            if re.search(r"yorktowne|\\b17901\\b|jayp19386\\s*@", content):
+                raise RuntimeError(f"Private contact data in public bundle: {path.relative_to(bundle)}")
         shutil.copytree(bundle, output)
     return output
 
