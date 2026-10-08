@@ -18,5 +18,7 @@
   "actual_rate_approved_in_signed_terms": false,
   "buyer_specific_scope_authorized": false,
   "buyer_data_controls_verified": false,
-  "independent_reviewer_reserved": false
+  "independent_reviewer_reserved": false,
+  "max_founder_program_pilots": 3,
+  "max_program_zero_recovery_loss_usd": "8000.00"
 }
