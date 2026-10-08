@@ -88,6 +88,10 @@ class RecoveryFeeRecord:
     engagement_id: str
     engagement_hash: str
     settlement_evidence_reference: str
+    claim_batch_hash: str
+    settlement_snapshot_hash: str
+    buyer_posting_evidence_reference: str | None
+    billing_authorized: bool
     actual_recovered_cents: int
     fee_eligible_recovered_cents: int
     contingency_rate: str
@@ -217,28 +221,98 @@ def build_recovery_engagement(request: RecoveryEngagementRequest) -> RecoveryEng
 def record_actual_recovery(
     engagement: RecoveryEngagement,
     *,
-    settlement_evidence_reference: str,
-    actual_recovered_cents: int,
-    fee_eligible_recovered_cents: int | None = None,
+    truth,
+    incumbent,
+    review_packet,
+    review_routing,
+    buyer_review,
+    claim_batch,
+    store,
     recorded_at: str,
+    buyer_posting_evidence_reference: str | None = None,
 ) -> RecoveryFeeRecord:
-    """Record an evidence-backed recovery and derive the earned fee."""
+    """Compute a NON-BILLABLE fee record from the actual claim/settlement proof chain.
+
+    The inputs deliberately include no caller-entered recovered dollar amount.
+    The buyer's proof-bound review and claim batch are rebuilt before reading
+    the store's current, immutable settlement/reversal snapshot. This record is
+    NOT an invoice, a signature verifier, or proof of externally posted funds.
+    The buyer's actual credit posting, duplicate-billing controls and commercial
+    rights must be independently accepted before any downstream invoice.
+    """
+    from freight.recovery_claim_workflow import build_recovery_claim_batch
+    from freight.settlement_report import (
+        assert_report_current, build_persistent_pilot_report,
+    )
+
     _verify_engagement_hash(engagement)
     if engagement.state != RecoveryEngagementState.ACCEPTED.value:
         raise ValueError("recovery fees require an accepted engagement")
-    evidence_reference = _reference(
-        "settlement_evidence_reference", settlement_evidence_reference
+    if (engagement.buyer_id, engagement.business_unit) != (
+        truth.buyer_id, truth.business_unit
+    ):
+        raise ValueError("engagement buyer/business-unit scope mismatch")
+    if (store.buyer_id, store.business_unit) != (
+        truth.buyer_id, truth.business_unit
+    ):
+        raise ValueError("settlement store scope mismatch")
+
+    # Rebuild authorization lineage rather than trusting a caller-made hash or
+    # a bare claim ID. Confirmed buyer reviews are checked against frozen truth,
+    # review packet/routing, incumbent exclusions and claim-issuance chronology.
+    independently_derived = build_recovery_claim_batch(
+        truth=truth,
+        incumbent=incumbent,
+        review_packet=review_packet,
+        review_routing=review_routing,
+        buyer_review=buyer_review,
+        issued_at=claim_batch.issued_at,
     )
+    if claim_batch != independently_derived:
+        raise ValueError("recovery claim batch does not match buyer review proofs")
+
+    report = build_persistent_pilot_report(
+        truth, incumbent, store, claim_batch.bindings, buyer_review.finding_reviews,
+    )
+    # A return or another writer may have changed the store after the snapshot.
+    assert_report_current(report, store)
+    fee_eligible = report.metrics.fee_eligible_realized_cents
+    realized = report.metrics.realized_cents
+    if fee_eligible and not buyer_posting_evidence_reference:
+        raise ValueError("positive fee requires a buyer posting evidence reference")
+    posting_reference = (
+        _reference("buyer_posting_evidence_reference", buyer_posting_evidence_reference)
+        if buyer_posting_evidence_reference else None
+    )
+
+    # No phantom claim, incumbent-known credit, or missing settlement provenance
+    # may become billable through the commercial fee arithmetic.
+    confirmed = {item.finding_id: item for item in claim_batch.records}
+    for certificate in report.certificates:
+        if not certificate.fee_eligible_cents:
+            continue
+        claim = confirmed.get(certificate.finding_id)
+        if (
+            claim is None or claim.fee_disqualified
+            or claim.finding_proof_hash != certificate.finding_proof_hash
+            or not certificate.settlement_proof_hashes
+        ):
+            raise ValueError("fee-eligible recovery lacks authorized claim proof")
+
     timestamp = _canonical_timestamp(recorded_at)
     breakdown = calculate_recovery_fee(
-        actual_recovered_cents=actual_recovered_cents,
-        fee_eligible_recovered_cents=fee_eligible_recovered_cents,
+        actual_recovered_cents=realized,
+        fee_eligible_recovered_cents=fee_eligible,
         contingency_rate=engagement.contingency_rate,
     )
     body = {
         "engagement_id": engagement.engagement_id,
         "engagement_hash": engagement.engagement_hash,
-        "settlement_evidence_reference": evidence_reference,
+        "settlement_evidence_reference": "PILOTREPORT:" + report.report_hash,
+        "claim_batch_hash": claim_batch.batch_hash,
+        "settlement_snapshot_hash": report.settlement_snapshot_hash,
+        "buyer_posting_evidence_reference": posting_reference,
+        "billing_authorized": False,
         "actual_recovered_cents": breakdown.actual_recovered_cents,
         "fee_eligible_recovered_cents": breakdown.fee_eligible_recovered_cents,
         "contingency_rate": format(breakdown.contingency_rate, "f"),
