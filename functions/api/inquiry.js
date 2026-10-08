@@ -15,7 +15,6 @@ const RECORDS = new Set(["Invoice export", "Rate agreements", "Shipment records"
 const CAMPAIGN = new Set(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]);
 const HOSTS = new Set(["www.retallyrecovery.com", "retallyrecovery.com"]);
 const MAX_BODY_BYTES = 8192;
-const MAX_AGE_SECONDS = 90 * 86400;
 const SENSITIVE = /\b(?:password|passcode|api[\s_-]?key|access[\s_-]?token|bank[\s_-]?account|routing[\s_-]?number|card[\s_-]?number|cvv|iban|swift[\s_-]?code)\b/i;
 
 function answer(code, body) {
@@ -267,10 +266,12 @@ export async function onRequestPost({ request, env }) {
           .bind(Math.floor(Date.now()/1000),reference).run();
       } catch (_) { /* durable inquiry is intact; reconciliation required */ }
     }
-    // Opportunistic, bounded cleanup; the monthly admin purge runbook remains mandatory.
+    // Incoming inquiries must never be purged as a side effect of accepting
+    // another request. Notification status alone is not evidence of human
+    // follow-up, closure, absence of a legal hold, or authority to delete.
+    // Leave inquiry retention/erasure to a separately reviewed operator flow.
+    // Only expired non-identifying rate-limit buckets are cleaned here.
     try {
-      await db.prepare("DELETE FROM inquiries WHERE accepted_at < ?")
-        .bind(now - MAX_AGE_SECONDS).run();
       await db.prepare("DELETE FROM inquiry_limits WHERE expires_at < ?")
         .bind(now).run();
     } catch (_) { /* cleanup errors cannot roll back the saved inquiry */ }
