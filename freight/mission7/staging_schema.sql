@@ -1,6 +1,5 @@
--- RETALLY RecoveryOS M7. ISOLATED STAGING SCHEMA ONLY. Not a production migration.
--- Reconstructed from a real, successfully provisioned Floot QA PostgreSQL database.
--- All 'm7_' objects are standalone and use synthetic data exclusively.
+-- RETALLY M7 isolated QA. NEVER apply to production; no customer data.
+
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE IF NOT EXISTS m7_tenants (
@@ -189,19 +188,6 @@ BEGIN
   RETURN QUERY SELECT v_instruction,v_hash,false;
 END $function$;
 
-CREATE TRIGGER m7_allocations_immutable BEFORE DELETE OR UPDATE ON m7_allocations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
-CREATE TRIGGER m7_instructions_immutable BEFORE DELETE OR UPDATE ON m7_instructions FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
-CREATE TRIGGER m7_settlement_immutable BEFORE DELETE OR UPDATE ON m7_settlement_attestations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
-
-CREATE OR REPLACE VIEW m7_reconciled_cash_by_currency AS
-SELECT tenant_id,
-    currency,
-    sum(amount_cents) AS claimed_reconciled_minor_units
-   FROM m7_settlement_attestations
-  WHERE 1=0 -- Fail closed until independent cash reconciliation is implemented
-  GROUP BY tenant_id, currency;
-
--- Database-level conservation also defends against direct INSERT bypassing preparation.
 CREATE OR REPLACE FUNCTION public.m7_allocation_conservation_guard()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -229,106 +215,20 @@ BEGIN
    THEN RAISE EXCEPTION 'instruction allocation overflow'; END IF;
  RETURN NEW;
 END $function$;
-CREATE TRIGGER m7_allocations_conservation BEFORE INSERT ON m7_allocations FOR EACH ROW EXECUTE FUNCTION public.m7_allocation_conservation_guard();
-CREATE TRIGGER m7_findings_immutable BEFORE UPDATE OR DELETE ON m7_findings FOR EACH ROW EXECUTE FUNCTION public.m7_block_mutation();
 
-     OR nullif(p_request->>'payerId','') IS NULL OR nullif(p_request->>'payeeId','') IS NULL
-     OR length(coalesce(p_request->>'purpose',''))<3
-    THEN RAISE EXCEPTION 'invalid payment parameters'; END IF;
-  v_hash := encode(digest(p_request::text,'sha256'),'hex');
-  -- Lock by tenant + key before checking for an existing exact replay.
-  PERFORM pg_advisory_xact_lock(hashtextextended('m7:idem:'||p_tenant||':'||p_idempotency_key,0));
-  SELECT * INTO v_existing FROM m7_instructions
-    WHERE tenant_id=p_tenant AND idempotency_key=p_idempotency_key;
-  IF FOUND THEN
-    IF v_existing.request_hash<>v_hash OR v_existing.request_payload<>p_request
-      THEN RAISE EXCEPTION 'conflicting idempotency replay'; END IF;
-    RETURN QUERY SELECT v_existing.id,v_hash,true;
-    RETURN;
-  END IF;
-  -- Sorted row locking enforces conservation even under competing concurrent requests.
-  FOR v_item IN SELECT value FROM jsonb_array_elements(p_request->'allocations') AS t(value)
-                ORDER BY value->>'findingId'
-  LOOP
-    IF jsonb_typeof(v_item)<>'object'
-      OR jsonb_typeof(v_item->'amountCents')<>'number'
-      OR nullif(v_item->>'findingId','') IS NULL
-       THEN RAISE EXCEPTION 'invalid allocation item'; END IF;
-    IF (v_item->>'findingId')=ANY(v_seen)
-      THEN RAISE EXCEPTION 'duplicate finding in one payment'; END IF;
-    v_seen:=array_append(v_seen,v_item->>'findingId');
-    v_item_cents:=(v_item->>'amountCents')::bigint;
-    IF v_item_cents<=0 THEN RAISE EXCEPTION 'allocation amount must be positive'; END IF;
-    SELECT * INTO v_finding FROM m7_findings
-      WHERE tenant_id=p_tenant AND id=v_item->>'findingId' FOR UPDATE;
-    IF NOT FOUND THEN RAISE EXCEPTION 'finding outside tenant or missing'; END IF;
-    IF v_finding.currency<>v_currency THEN RAISE EXCEPTION 'mixed currency allocation'; END IF;
-    IF NOT(v_finding.confirmed AND v_finding.authority_verified AND v_finding.source_verified
-      AND v_finding.buyer_eligibility_verified
-      AND v_finding.attribution_state='CHALLENGER_ONLY'
-      AND v_finding.blockers='[]'::jsonb)
-      THEN RAISE EXCEPTION 'finding not independently eligible'; END IF;
-    SELECT coalesce(sum(a.amount_cents),0) INTO v_allocated
-      FROM m7_allocations a
-      WHERE a.tenant_id=p_tenant AND a.economic_key=v_finding.economic_key AND a.currency=v_currency;
-    IF v_allocated+v_item_cents>v_finding.net_new_candidate_cents
-      THEN RAISE EXCEPTION 'economic recovery allocation capacity exceeded'; END IF;
-    v_alloc_total:=v_alloc_total+v_item_cents;
-    IF v_alloc_total>9223372036854775807
-      THEN RAISE EXCEPTION 'allocation sum overflow'; END IF;
-  END LOOP;
-  IF v_alloc_total<>v_amount THEN RAISE EXCEPTION 'allocated cents do not match payment'; END IF;
-  INSERT INTO m7_instructions
-    (tenant_id,idempotency_key,request_hash,request_payload,payer_id,payee_id,currency,amount_cents,purpose)
-  VALUES(p_tenant,p_idempotency_key,v_hash,p_request,p_request->>'payerId',
-         p_request->>'payeeId',v_currency,v_amount,p_request->>'purpose')
-  RETURNING id INTO v_instruction;
-  INSERT INTO m7_allocations(tenant_id,instruction_id,finding_id,economic_key,currency,amount_cents)
-    SELECT p_tenant,v_instruction,f.id,f.economic_key,f.currency,(item.value->>'amountCents')::bigint
-    FROM jsonb_array_elements(p_request->'allocations') item
-    JOIN m7_findings f ON f.tenant_id=p_tenant AND f.id=item.value->>'findingId';
-  RETURN QUERY SELECT v_instruction,v_hash,false;
-END $function$
+CREATE TRIGGER m7_allocations_conservation BEFORE INSERT ON m7_allocations FOR EACH ROW EXECUTE FUNCTION m7_allocation_conservation_guard();
 
 CREATE TRIGGER m7_allocations_immutable BEFORE DELETE OR UPDATE ON m7_allocations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
+
+CREATE TRIGGER m7_findings_immutable BEFORE DELETE OR UPDATE ON m7_findings FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
+
 CREATE TRIGGER m7_instructions_immutable BEFORE DELETE OR UPDATE ON m7_instructions FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
+
 CREATE TRIGGER m7_settlement_immutable BEFORE DELETE OR UPDATE ON m7_settlement_attestations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
 
-CREATE OR REPLACE VIEW m7_reconciled_cash_by_currency AS
-SELECT tenant_id,
+CREATE OR REPLACE VIEW m7_reconciled_cash_by_currency AS SELECT tenant_id,
     currency,
     sum(amount_cents) AS claimed_reconciled_minor_units
    FROM m7_settlement_attestations
-  WHERE 1=0 -- Fail closed until independent cash reconciliation is implemented
+  WHERE 1 = 0
   GROUP BY tenant_id, currency;
-
--- Database-level conservation also defends against direct INSERT bypassing preparation.
-CREATE OR REPLACE FUNCTION public.m7_allocation_conservation_guard()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-DECLARE f m7_findings%ROWTYPE; i m7_instructions%ROWTYPE; already numeric;
-BEGIN
- SELECT * INTO f FROM m7_findings
- WHERE tenant_id=NEW.tenant_id AND id=NEW.finding_id FOR UPDATE;
- IF NOT FOUND THEN RAISE EXCEPTION 'allocation finding not found'; END IF;
- SELECT * INTO i FROM m7_instructions
- WHERE tenant_id=NEW.tenant_id AND id=NEW.instruction_id;
- IF NOT FOUND THEN RAISE EXCEPTION 'allocation instruction not found'; END IF;
- IF NEW.economic_key<>f.economic_key OR NEW.currency<>f.currency OR i.currency<>f.currency
-   THEN RAISE EXCEPTION 'allocation currency/economic scope mismatch'; END IF;
- IF NOT (f.confirmed AND f.authority_verified AND f.source_verified AND f.buyer_eligibility_verified
-   AND f.attribution_state='CHALLENGER_ONLY' AND f.blockers='[]'::jsonb)
-   THEN RAISE EXCEPTION 'ineligible allocation finding'; END IF;
- SELECT coalesce(sum(amount_cents),0) INTO already FROM m7_allocations
- WHERE tenant_id=NEW.tenant_id AND economic_key=NEW.economic_key AND currency=NEW.currency;
- IF already+NEW.amount_cents>f.net_new_candidate_cents
-   THEN RAISE EXCEPTION 'financial conservation check violated'; END IF;
- SELECT coalesce(sum(amount_cents),0) INTO already FROM m7_allocations
- WHERE tenant_id=NEW.tenant_id AND instruction_id=NEW.instruction_id;
- IF already+NEW.amount_cents>i.amount_cents
-   THEN RAISE EXCEPTION 'instruction allocation overflow'; END IF;
- RETURN NEW;
-END $function$;
-CREATE TRIGGER m7_allocations_conservation BEFORE INSERT ON m7_allocations FOR EACH ROW EXECUTE FUNCTION public.m7_allocation_conservation_guard();
-CREATE TRIGGER m7_findings_immutable BEFORE UPDATE OR DELETE ON m7_findings FOR EACH ROW EXECUTE FUNCTION public.m7_block_mutation();
