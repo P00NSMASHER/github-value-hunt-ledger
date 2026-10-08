@@ -34,9 +34,9 @@ export function readOnlyQueries(asOf) {
       "FROM inquiries GROUP BY notification_status ORDER BY notification_status" },
     { name:"retention_review", sql:
       "SELECT COUNT(*) AS aged_total, "+
-      "SUM(CASE WHEN notification_status='pending' THEN 1 ELSE 0 END) AS aged_pending, "+
-      "SUM(CASE WHEN notification_status='provider_accepted' THEN 1 ELSE 0 END) AS aged_provider, "+
-      "SUM(CASE WHEN notification_status='delivery_verified' THEN 1 ELSE 0 END) AS aged_delivered "+
+      "COALESCE(SUM(CASE WHEN notification_status='pending' THEN 1 ELSE 0 END),0) AS aged_pending, "+
+      "COALESCE(SUM(CASE WHEN notification_status='provider_accepted' THEN 1 ELSE 0 END),0) AS aged_provider, "+
+      "COALESCE(SUM(CASE WHEN notification_status='delivery_verified' THEN 1 ELSE 0 END),0) AS aged_delivered "+
       "FROM inquiries WHERE accepted_at < "+retention },
     { name:"rate_limits", sql:
       "SELECT COUNT(*) AS expired_total FROM inquiry_limits WHERE expires_at < "+asOf }
