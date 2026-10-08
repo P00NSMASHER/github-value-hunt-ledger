@@ -40,7 +40,7 @@ BEGIN
 
  rejected:=false;
  BEGIN
-   PERFORM recovery_prepare_financial_instruction('ci_a',actor,jsonb_set(payload,'{currency}','"EUR"'::jsonb),repeat('d',64));
+   PERFORM recovery_prepare_financial_instruction('ci_a',actor,jsonb_set(jsonb_set(payload,'{currency}','"EUR"'::jsonb),'{idempotency_key}','"ci-alloc-0005"'::jsonb),repeat('d',64));
  EXCEPTION WHEN OTHERS THEN IF position('certified entitlement' in SQLERRM)>0 THEN rejected:=true; ELSE RAISE; END IF; END;
  IF NOT rejected THEN RAISE EXCEPTION 'cross currency claim accepted'; END IF;
 
