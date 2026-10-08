@@ -1,6 +1,7 @@
 import superjson from "superjson";
 import { db } from "../../helpers/db";
 import { requireRecoveryTenant } from "../../helpers/recoveryTenant";
+import { NotAuthenticatedError } from "../../helpers/getSetServerSession";
 import { OutputType, PaymentRow } from "./payments_GET.schema";
 
 function number(value: string | number | bigint): number {
@@ -62,6 +63,9 @@ export async function handle(request: Request) {
     const output: OutputType = {payments};
     return new Response(superjson.stringify(output),{headers:{"Content-Type":"application/json"}});
   } catch (error) {
+    if (error instanceof NotAuthenticatedError) {
+      return new Response(superjson.stringify({error:"Not authenticated"}), {status:401});
+    }
     const message = error instanceof Error ? error.message : "Payment list failed";
     return new Response(superjson.stringify({error:message}),{status:400});
   }
