@@ -1,6 +1,6 @@
 # RETALLY — free business profile asset pack
 
-Updated: 2026-10-07
+Updated: 2026-10-08
 Status: **APPLICATION-READY, NOT PUBLISHED OR VERIFIED**
 
 This file is an asset pack and eligibility checklist, not a claim that platform
@@ -10,15 +10,15 @@ customer results, meeting locations, or business contact details.
 ## Canonical identity
 
 - **Trading name:** RETALLY
-- **Website:** https://p00nsmasher.github.io/github-value-hunt-ledger/
-- **Published general-purpose inbox:** jayp19386@gmail.com
-- **Business mailing address on the public site:** 715 Yorktowne Road, Pottsville, PA 17901
+- **Website:** https://www.retallyrecovery.com/
+- **Published business inbox:** jay@retallyrecovery.com
+- **Public mailing address:** Not published. Do not use a residential address for directory listings; where a platform requires a mailing address, provide an owner-authorized, verified business address or defer the listing.
 - **Where the service is offered:** United States, via remote-first qualification
   and a separately scoped historical freight audit and recovery engagement
 - **Primary buyer:** B2B shippers, distributors, manufacturers, finance/AP,
   transportation, procurement and logistics teams
 
-**Eligibility guard:** A published Pottsville mailing address is not proof of
+**Eligibility guard:** Being based in Pottsville is not proof of
 public walk-in hours, customer-facing premises, or staff traveling to customers.
 Do not identify this as an open storefront or publish extra residential/phone
 details. If in-person customer service becomes real and regular, re-check the
@@ -66,7 +66,7 @@ audit; duplicate charges; carrier rate review; accessorial charge audit.
 | PAID | Schuylkill Chamber | Directory is a paid member-only benefit | https://www.schuylkillchamber.com/ | DEFER; no purchase |
 
 **Duplicate-screen state, 2026-10-07:** The visible 730-entry Schuylkill County Online directory contains no exact `RETALLY` entry (text search). Public web searches for the exact
-business name plus Pottsville and the published street address did not yield a
+business name plus Pottsville and the company domain did not yield a
 reliable matching LinkedIn, BBB, Manta, Bing, Apple or Google business profile;
 structured local-business discovery likewise surfaced unrelated companies.
 This is **NOT FOUND IN PUBLIC SEARCH**, *not* confirmed absence. Authenticated
@@ -79,18 +79,18 @@ if a matching profile exists.
 Use these only for a new or verified existing free profile; **do not publish
 unverified listings or falsely signal platform approval**.
 
-- LinkedIn: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=linkedin&utm_medium=organic&utm_campaign=free_growth_profiles
-- Schuylkill County Online: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=schuylkill_county_online&utm_medium=referral&utm_campaign=free_growth_profiles
-- SchuylkillPA.com: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=schuylkillpa&utm_medium=referral&utm_campaign=free_growth_profiles
-- Alignable Guest: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=alignable&utm_medium=referral&utm_campaign=free_growth_profiles
-- Apple Business: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=apple_business&utm_medium=organic&utm_campaign=free_growth_profiles
-- BBB: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=bbb&utm_medium=organic&utm_campaign=free_growth_profiles
-- Clutch: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=clutch&utm_medium=organic&utm_campaign=free_growth_profiles
-- Manta: https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=manta&utm_medium=organic&utm_campaign=free_growth_profiles
+- LinkedIn: https://www.retallyrecovery.com/?utm_source=linkedin&utm_medium=organic&utm_campaign=free_growth_profiles
+- Schuylkill County Online: https://www.retallyrecovery.com/?utm_source=schuylkill_county_online&utm_medium=referral&utm_campaign=free_growth_profiles
+- SchuylkillPA.com: https://www.retallyrecovery.com/?utm_source=schuylkillpa&utm_medium=referral&utm_campaign=free_growth_profiles
+- Alignable Guest: https://www.retallyrecovery.com/?utm_source=alignable&utm_medium=referral&utm_campaign=free_growth_profiles
+- Apple Business: https://www.retallyrecovery.com/?utm_source=apple_business&utm_medium=organic&utm_campaign=free_growth_profiles
+- BBB: https://www.retallyrecovery.com/?utm_source=bbb&utm_medium=organic&utm_campaign=free_growth_profiles
+- Clutch: https://www.retallyrecovery.com/?utm_source=clutch&utm_medium=organic&utm_campaign=free_growth_profiles
+- Manta: https://www.retallyrecovery.com/?utm_source=manta&utm_medium=organic&utm_campaign=free_growth_profiles
 
 ## Before submission
 
-1. Search by **RETALLY**, **Pottsville**, and **715 Yorktowne Road** on
+1. Search by **RETALLY**, **Pottsville**, and **retallyrecovery.com** on
    the platform. Claim, correct or request access to the original if found.
 2. Confirm company identity, actual service category, ownership authority,
    disclosure of public business information, and any verification steps.
