@@ -169,6 +169,9 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 }
 .sample-report .report-header p{color:#e2f0e8}
 .sample-report .report-header .meta{color:#c3dfd0}
+/* Keep the report date range together on narrow phones; do not strand "31". */
+.sample-report .report-population{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .55em}
+.sample-report .report-population span{white-space:nowrap}
 .sample-report .report-back{
  display:inline-flex;align-items:center;justify-content:center;gap:8px;
  color:#102a25;white-space:nowrap;
