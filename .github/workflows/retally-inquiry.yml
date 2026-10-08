@@ -49,9 +49,19 @@ jobs:
           index = (public / 'index.html').read_text()
           headers = (public / '_headers').read_text()
           legacy = (SOURCE / 'index.html').read_text()
-          assert "connect-src 'self' https://challenges.cloudflare.com" in index
-          assert "frame-src https://challenges.cloudflare.com" in index
-          assert "connect-src 'self' https://challenges.cloudflare.com" in headers
+          # Require the precise existing vendor and Turnstile allowlist. The
+          # BubblaV public-chat integration was merged independently; never
+          # weaken this test by accepting arbitrary script/connect hosts.
+          connect = ("connect-src 'self' https://www.bubblav.com "
+                     "https://bubblav.com https://*.bubblav.com "
+                     "https://challenges.cloudflare.com;")
+          frame = ("frame-src https://www.bubblav.com https://bubblav.com "
+                   "https://*.bubblav.com https://challenges.cloudflare.com;")
+          script = "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;"
+          for published in (index, headers):
+              assert connect in published
+              assert frame in published
+              assert script in published
           assert "connect-src 'none'" in legacy
           assert "script-src 'self';" in legacy
           assert "https://www.retallyrecovery.com/" in index
