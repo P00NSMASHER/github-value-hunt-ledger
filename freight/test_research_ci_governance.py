@@ -64,7 +64,9 @@ def test_freight_pages_deployment_is_main_only_verified_and_config_gated():
     assert "github.event_name != 'pull_request'" in text
     assert "github.ref == 'refs/heads/main'" in text
     assert "vars.FREIGHT_CONTACT_VERIFIED == '1'" in text
-    assert "vars.FREIGHT_CONTACT_EMAIL != ''" in text
+    assert "FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com" in text
+    assert "RECOVERYOS_CONTACT_EMAIL: jay@retallyrecovery.com" in text
+    assert "FREIGHT_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}" not in text
     assert "FREIGHT_CONTINGENCY_RECOVERY_RATE" in text
     assert "FREIGHT_CHECKOUT_VERIFIED" not in text
     assert "FREIGHT_READINESS_CHECKOUT_URL" not in text
