@@ -125,8 +125,9 @@ class Phase5EPostgresAdmission(unittest.TestCase):
         with closing(psycopg.connect(self.dsn,autocommit=True)) as con:
             source=con.execute("""SELECT pg_get_functiondef(
                'phase5c_qa.guard_signed_financial_record()'::regprocedure)""").fetchone()[0]
-            self.assertIn("transaction_timestamp() >= signer.revoked_at",source)
-            self.assertIn("transaction_timestamp() >= signer.expires_at",source)
+            normalized=source.replace(" ","")
+            self.assertIn("transaction_timestamp()>=signer.revoked_at",normalized)
+            self.assertIn("transaction_timestamp()>=signer.expires_at",normalized)
 
 
 if __name__=="__main__":
