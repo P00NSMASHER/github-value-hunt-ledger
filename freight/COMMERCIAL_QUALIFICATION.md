@@ -42,8 +42,10 @@ customer score. Record the reason for a manual override.
 first documenting the population, prior auditor's work, active claims, automatic
 credits, attribution and any fee-entitlement conflicts. A human reviewer must
 record a reasoned decision before any substantive work or recovery agreement.
-An unverified `previously_audited` answer is not permission to treat the
-population as new. Boolean readiness inputs must be actual boolean evidence,
+An absent or unverified `previously_audited` answer (represented as `None`)
+must also route to NEEDS_REVIEW; only an explicitly verified `False` may use
+the ordinary scale-based routing. Never treat missing information as a clean
+prior-audit history. Boolean readiness inputs must be actual boolean evidence,
 not truthy strings such as `"false"`. Routing alone never gives claim authority
 or permits confidential file intake.
 
