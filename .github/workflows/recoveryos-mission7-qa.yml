@@ -1,0 +1,40 @@
+name: RecoveryOS Mission 7 Financial QA
+
+on:
+  pull_request:
+    paths:
+      - "freight/mission7/**"
+      - ".github/workflows/recoveryos-mission7-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: qa-only-no-customer-data
+          POSTGRES_DB: recoveryos_m7_qa
+        options: >-
+          --health-cmd "pg_isready -U postgres -d recoveryos_m7_qa"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Verify clean SQL bootstrap in throwaway database
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -v ON_ERROR_STOP=1 < freight/mission7/staging_schema.sql
+      - name: Adversarial acceptance fixtures (rolled back)
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m7_qa -v ON_ERROR_STOP=1 < freight/mission7/staging_acceptance.sql
