@@ -118,6 +118,38 @@ class PublicBuildTests(unittest.TestCase):
             for name in builder.BINARY_SOURCE_FILES:
                 self.assertEqual((builder.SOURCE / name).read_bytes(), (output / name).read_bytes())
 
+    def test_configured_rate_is_visible_without_javascript(self):
+        for rate, expected in (("0.30", "30%"), ("0.325", "32.5%")):
+            with self.subTest(rate=rate), tempfile.TemporaryDirectory() as temporary:
+                output = build(Path(temporary) / "public", rate=rate)
+                homepage = (output / "index.html").read_text()
+                terms = (output / "engagement-framework.html").read_text()
+                self.assertIn(f"<strong data-rate-label>{expected}</strong>", homepage)
+                self.assertIn(f"<b data-rate-label>{expected}</b>", terms)
+                self.assertNotIn("Rate confirmed before engagement", homepage)
+
+    def test_free_audit_is_bounded_without_promising_unapproved_work(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text()
+            self.assertIn("up to 20 eligible invoices after a fit and capacity check", page)
+            self.assertIn("our capacity before requesting files", page)
+            self.assertIn("approved secure intake route", page)
+            self.assertNotIn("24-hour guaranteed review", page)
+
+    def test_email_fallback_preserves_direct_user_gesture_and_manual_address(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text()
+            script = (output / "site.js").read_text()
+            self.assertIn('id="sendAuditRequest"', page)
+            self.assertIn('id="copyAuditSummary"', page)
+            self.assertIn('id="auditRecipientAddress"', page)
+            self.assertIn('recipient.textContent = contactEmail', script)
+            self.assertIn('window.location.href = sendLink.href;', script)
+            self.assertNotIn('window.setTimeout(() => { window.location.href = sendLink.href; }, 80)', script)
+            self.assertIn("Review it, then press Send.", page)
+
     def test_public_pages_express_the_free_audit_contingency_model(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
@@ -144,7 +176,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Potential recovery", page)
             self.assertIn("Approved claim value", page)
             self.assertIn("Actual recovered funds", page)
-            self.assertIn("Rate confirmed before engagement", page)
+            self.assertIn("<strong data-rate-label>30%</strong>", page)
             self.assertIn('contingencyRecoveryRate: "0.3"', config)
             self.assertIn('contingencyRecoveryRateLabel: "30%"', config)
             self.assertIn('itemscope itemtype="https://schema.org/WebPage"', page)
