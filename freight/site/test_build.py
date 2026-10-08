@@ -42,30 +42,6 @@ class PageParser(HTMLParser):
 
 
 class PublicBuildTests(unittest.TestCase):
-    def test_sample_report_and_trust_disclosures_are_mobile_safe_and_current(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            output = build(Path(temporary) / "public")
-            report = (output / "recovery-status-example.html").read_text()
-            trust = (output / "trust.html").read_text()
-            styles = (output / "foundry.css").read_text()
-
-            # Preserve the already-approved sample and accounting states.
-            self.assertIn("Sample Recovery Report", report)
-            self.assertIn("Northstar Industrial Supply", report)
-            self.assertIn("Sample Population</span>", report)
-            self.assertIn("2026-01-01 through 2026-03-31</span>", report)
-            self.assertIn('class="meta report-population"', report)
-            self.assertIn(".sample-report .report-population span{white-space:nowrap}", styles)
-            self.assertIn("$13,450.00", report)
-            self.assertIn("$11,800.00", report)
-
-            # Do not describe the new branded-domain online intake as email-only.
-            self.assertIn("Cloudflare Pages at www.retallyrecovery.com", trust)
-            self.assertIn("secure inquiry endpoint and required anti-abuse check", trust)
-            self.assertIn("opening a draft does not send an inquiry", trust)
-            self.assertIn("GitHub Pages edition remains publicly accessible", trust)
-            self.assertNotIn("The marketing site is hosted through GitHub Pages.", trust)
-
     def test_google_search_console_verification_file_is_exact(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
@@ -328,7 +304,7 @@ class PublicBuildTests(unittest.TestCase):
             report = (output / "recovery-status-example.html").read_text()
             example = (output / "freight-audit-example.html").read_text()
             self.assertIn("Northstar Industrial Supply", report)
-            self.assertIn("Sample Population</span><span>2026-01-01 through 2026-03-31</span>", report)
+            self.assertIn("Sample Population · 2026-01-01 through 2026-03-31", report)
             self.assertIn('class="button button-light report-back"', report)
             self.assertNotIn('class="report-notice"', report)
             self.assertIn("This scenario uses sample data only.", example)

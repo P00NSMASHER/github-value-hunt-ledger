@@ -23,7 +23,7 @@ For the first three qualified customers:
 - Recovery Evidence Pack included;
 - Second-Look Recovery Audit available when an incumbent audit/TMS/payment process already exists;
 - customer approval required before outside recovery action;
-- contingency rate discounted from the then-current standard commercial rate and confirmed in writing before recovery work;
+- any contingency percentage and genuine founding-program concession must be confirmed in separately approved written engagement terms before recovery work; a discount may only be described relative to an actual approved contemporaneous standard rate; never claim a discount before that comparator and customer-specific terms exist;
 - no recovery fee when eligible actual recovered funds are $0.
 
 ## Qualification

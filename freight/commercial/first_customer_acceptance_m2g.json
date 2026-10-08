@@ -1,0 +1,136 @@
+{
+  "schema_version": "m2g.1",
+  "as_of": "2026-10-08",
+  "company": "RETALLY",
+  "release_policy": "REVIEW_ONLY_NO_CUSTOMER_DATA",
+  "production": {
+    "hostname": "www.retallyrecovery.com",
+    "redirect_from": "retallyrecovery.com",
+    "pages_project": "retally-web",
+    "deployment_id": "f1fc54e1-99bd-4803-8248-35e0e9c7ab19",
+    "deployment_status": "success",
+    "domain_status": "active",
+    "inquiry_get_status": 503,
+    "inquiry_get_body": {
+      "online": false
+    },
+    "public_fallback": "browser_prepared_email_draft",
+    "online_inquiry_status": "DISABLED_BY_POLICY",
+    "inbound_zoho_status": "NOT_VERIFIED",
+    "notes": "Existing email tests are sender-side Gmail SENT, not Zoho recipient-side receipt. No request was submitted during Mission 2G."
+  },
+  "pilot_workspace": {
+    "current_state": "BASELINE_VERIFIED_EMPTY",
+    "provider": "Google Drive",
+    "mode": "single-tenant manual review only",
+    "policy_date": "2026-09-21",
+    "policy_source": "Freight Recovery Controlled Pilot Environment Policy - 2026-09-21",
+    "buyer_specific_permission": "NOT_VERIFIED",
+    "intake_status": "BLOCKED",
+    "notes": "A baseline manual environment does not authorize a buyer, confidential record, parser, API or general public file upload."
+  },
+  "published_synthetic_sample": {
+    "gross_recovered_usd": "14200.00",
+    "reversals_usd": "750.00",
+    "net_recovered_usd": "13450.00",
+    "published_fee_eligible_usd": "11800.00",
+    "unallocated_difference_usd": "1650.00",
+    "evidence_state": "UNVERIFIED",
+    "customer_result": false
+  },
+  "founding_offer": {
+    "max_slots": 3,
+    "available_count": "NOT_VERIFIED",
+    "eligible_initial_audit": "$0 upfront only for agreed bounded scope",
+    "actual_contingency_rate": "NOT_APPROVED",
+    "comparative_discount_claim": "NOT_SUBSTANTIATED",
+    "no_subscription_or_implementation_fee": "PUBLISHED_INTERNAL_PROGRAM_TERMS_NOT_SIGNED",
+    "rate_approval_required": true
+  },
+  "requirements": {
+    "legal_entity": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Business owner / qualified counsel"
+    },
+    "approved_recovery_contract": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Business owner / qualified counsel"
+    },
+    "verified_inbound_mail": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Company mailbox owner"
+    },
+    "confirmed_customer_contact_route": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Website/mail owner"
+    },
+    "approved_buyer_workspace": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Buyer IT + RETALLY verifier"
+    },
+    "buyer_signed_scope_and_confidentiality": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Buyer + RETALLY authorized signer"
+    },
+    "named_independent_reviewer": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "RETALLY operations owner"
+    },
+    "synthetic_fee_eligibility_reconciled": {
+      "status": "PENDING",
+      "evidence_ref": null,
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "owner": "Financial reviewer"
+    }
+  },
+  "readiness_gates": {
+    "contact": [
+      "verified_inbound_mail",
+      "confirmed_customer_contact_route"
+    ],
+    "qualified_proposal": [
+      "legal_entity",
+      "verified_inbound_mail",
+      "confirmed_customer_contact_route"
+    ],
+    "confidential_pilot": [
+      "legal_entity",
+      "approved_recovery_contract",
+      "approved_buyer_workspace",
+      "buyer_signed_scope_and_confidentiality",
+      "named_independent_reviewer"
+    ],
+    "claims_recovery": [
+      "legal_entity",
+      "approved_recovery_contract",
+      "approved_buyer_workspace",
+      "buyer_signed_scope_and_confidentiality",
+      "named_independent_reviewer"
+    ],
+    "sample_publication": [
+      "synthetic_fee_eligibility_reconciled"
+    ]
+  }
+}
