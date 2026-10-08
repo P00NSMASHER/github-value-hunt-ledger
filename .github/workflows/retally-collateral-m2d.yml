@@ -28,7 +28,7 @@ jobs:
           assert not a["synthetic_public_aggregate"]["real_customer_outcome"]
           print("source registers match; published eligibility unverified")
           PY
-          python -m unittest discover -s freight/brand/mission2b -p 'test_collateral_m2c.py' -v
+          python -m unittest discover -s freight/brand/mission2b -p 'test_*m2*.py' -v
   print-and-document-gate:
     needs: finance-and-source
     runs-on: ubuntu-latest
