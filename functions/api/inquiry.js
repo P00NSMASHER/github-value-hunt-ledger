@@ -15,7 +15,6 @@ const RECORDS = new Set(["Invoice export", "Rate agreements", "Shipment records"
 const CAMPAIGN = new Set(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]);
 const HOSTS = new Set(["www.retallyrecovery.com", "retallyrecovery.com"]);
 const MAX_BODY_BYTES = 8192;
-const MAX_AGE_SECONDS = 90 * 86400;
 const SENSITIVE = /\b(?:password|passcode|api[\s_-]?key|access[\s_-]?token|bank[\s_-]?account|routing[\s_-]?number|card[\s_-]?number|cvv|iban|swift[\s_-]?code)\b/i;
 
 function answer(code, body) {
