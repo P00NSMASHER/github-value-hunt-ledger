@@ -1,0 +1,29 @@
+name: Freight Lab Cumulative Audit Integrity
+on:
+  pull_request:
+    paths:
+      - 'freight/lab_integrity/**'
+      - 'freight/test_lab_integrity_registry.py'
+      - '.github/workflows/freight-lab-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-research-ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout immutable commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Verify original findings and donor rights claims
+        run: python -m unittest -v freight.test_lab_integrity_registry
+      - name: State evidence boundary
+        run: |
+          echo 'This is a research inventory check, NOT a product security/financial certification.'
+          echo 'No production RecoveryOS, customer account, external bank or carrier system touched.'
