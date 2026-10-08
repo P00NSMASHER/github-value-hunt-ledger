@@ -160,6 +160,23 @@ class InquiryRetentionTests(unittest.TestCase):
                 (reference,case_state,operator_id,acknowledged_at,legal_hold)
                 VALUES(?,'ACKNOWLEDGED','role:operator-1',?,1)""",(ref,NOW))
 
+    def test_same_operator_cannot_approve_own_purge(self):
+        ref=seed(self.db)
+        disposition(self.db,ref,state="CLOSED",approved=False)
+        with self.assertRaises(sqlite3.IntegrityError):
+            self.db.execute("""UPDATE inquiry_case_dispositions
+                SET purge_approved_at=?,purge_approved_by=operator_id
+                WHERE reference=?""",(NOW-2*DAY,ref))
+        self.assert_blocked(ref)
+
+    def test_future_dated_purge_approval_rejected_by_database_trigger(self):
+        ref=seed(self.db)
+        disposition(self.db,ref,state="CLOSED",approved=False)
+        self.db.execute("""UPDATE inquiry_case_dispositions
+            SET purge_approved_at=?,purge_approved_by=?
+            WHERE reference=?""",(NOW+DAY,"role:approver-2",ref))
+        self.assert_blocked(ref)
+
     def test_migration_is_idempotent(self):
         self.db.executescript(MIGRATION_2)
         self.assert_blocked(seed(self.db))
