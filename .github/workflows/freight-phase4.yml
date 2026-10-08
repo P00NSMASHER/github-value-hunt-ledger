@@ -11,6 +11,7 @@ on:
       - 'freight/lab_phase4_mock_provider.py'
       - 'freight/test_lab_phase4_mock_provider.py'
       - 'freight/PHASE4_EXECUTION.md'
+      - 'freight/PHASE6_POSTGRESQL_ACCEPTANCE.md'
       - '.github/workflows/freight-phase4.yml'
   workflow_dispatch:
 
