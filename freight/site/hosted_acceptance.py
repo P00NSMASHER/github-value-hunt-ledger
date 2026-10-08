@@ -42,7 +42,7 @@ def run(base: str, output: Path, axe_path: Path | None) -> dict:
         for width, height in SIZES:
             context = browser.new_context(viewport={"width": width, "height": height},
                 is_mobile=width <= 390, has_touch=width <= 390,
-                reduced_motion="reduce")
+                reduced_motion="reduce", bypass_csp=True)
             for slug in PAGES:
                 page = context.new_page()
                 js_errors = []
@@ -78,7 +78,9 @@ def run(base: str, output: Path, axe_path: Path | None) -> dict:
                     item.get("menu",{}).get("expanded") != "true" or not item.get("menu",{}).get("visible")):
                     defects.append({"page":name,"width":width,"failure":"mobile_menu"})
                 if axe_path and axe_path.exists() and width in (1440, 390) and slug in ("","trust","recovery-status-example"):
-                    # DevTools evaluation executes the accessibility auditor without\n                    # weakening or altering the site's deployed CSP.\n                    page.evaluate(axe_path.read_text())
+                    # Security policy is bypassed only inside this throwaway QA context.
+                    # No headers or deployed source code are changed.
+                    page.add_script_tag(content=axe_path.read_text())
                     violations = page.evaluate("""async () => {
                       const r=await axe.run(document,{runOnly:{type:'tag',
                         values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}});
