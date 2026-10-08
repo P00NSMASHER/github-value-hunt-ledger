@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS m7_settlement_attestations (
   CHECK ((status = ANY (ARRAY['PROVIDER_REPORTED'::text, 'BUYER_VERIFIED'::text, 'CASH_RECONCILED'::text, 'REVERSED'::text])))
 );
 
-CREATE INDEX m7_allocations_economic_key_idx ON public.m7_allocations USING btree (tenant_id, economic_key, currency);
+CREATE INDEX m7_allocations_economic_key_idx ON m7_allocations USING btree (tenant_id, economic_key, currency);
 
 CREATE OR REPLACE FUNCTION public.m7_block_mutation()
  RETURNS trigger
