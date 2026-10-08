@@ -15,7 +15,7 @@ Adjust large green surfaces toward midnight ink, white and soft mist. Keep emera
 Use consistent headings, margins, source-backed claims and clear status labels in buyer one-pager, scope proposal, sample audit report, letterhead, referral copy and email signature. Fictional figures are never customer results. Do not include unverified names, contacts, storefront information or financial promises.
 
 ## Contact cutover
-The Cloudflare domain retallyrecovery.com was active at review, but the only observed DNS entry was a Zoho verification TXT. Mailbox creation and external delivery have not been verified. Do not replace live contact URLs or configure mail routing from guessed values. Use the separate CONTACT_CUTOVER_CHECKLIST.
+Cloudflare now shows Zoho MX, SPF, DMARC monitoring and `zmail._domainkey.retallyrecovery.com` DKIM TXT, plus ownership-verification TXT. User reports completing the DKIM setup. **DNS configured is not mailbox verified**: live inbound/outbound delivery and message-header SPF/DKIM/DMARC outcomes remain untested; independent business-name clearance and preview deployment are still required. Keep existing customer routes until the CONTACT_CUTOVER_CHECKLIST passes.
 
 ## Release acceptance
 Run GitHub CI against this branch's exact head. Check mobile 320, 353, 375, 390, 428 and desktop 1280/1440 widths. Render document pages and inspect footers. Confirm HTTPS, SEO canonical, real send/receive, mail auth, and lead receipt before new-domain launch. Name and contracting entity clearance are separate gates. No DNS, mailbox or customer messages should change solely because this draft is merged.
