@@ -42,6 +42,8 @@ jobs:
           python -m pip install 'psycopg[binary]==3.2.9' 'cryptography==46.0.4'
       - name: Execute genuine PostgreSQL concurrent callback and evidence tests
         run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_isolated_postgres.py
+      - name: Execute signed synthetic cash, reversal, fee and refund in disposable PostgreSQL
+        run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_phase5c_postgres.py
       - name: Verify Phase 4 laboratory stack and Ed25519 source boundaries
         run: |
           PYTHONPATH=. python -m pytest -q -rs \
