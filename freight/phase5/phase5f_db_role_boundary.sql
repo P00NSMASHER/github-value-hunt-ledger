@@ -52,6 +52,10 @@ GRANT INSERT ON phase5c_qa.documents TO retally_p5f_independent_admission;
 REVOKE UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER
  ON phase5c_qa.documents FROM retally_p5f_independent_admission;
 
--- No GRANT of either NOLOGIN role to any existing principal.
+-- No explicit role membership is granted here. Neon was OBSERVED to auto-create
+-- administrative memberships for neondb_owner with set_option=false and
+-- inherit_option=false. This is provider-managed; do not imply that creating
+-- a role yields an independent credential or that the app can SET ROLE.
 -- CRITICAL: neondb_owner remains table owner and can still bypass Ed25519.
--- This migration alone does not fix the runtime owner-account connection.
+-- The actual app still runs as that owner; this migration alone does not
+-- close the financial admission weakness.
