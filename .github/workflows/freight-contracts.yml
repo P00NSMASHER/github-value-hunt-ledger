@@ -67,6 +67,8 @@ jobs:
           assert not p["gates"]["sample_publication"]["ready"]
           print('Confirmed: no real-customer release, fee authority, or sample proof')
           PY
+      - name: Validate pinned official EIA public diesel reference
+        run: PYTHONPATH=. python -m pytest -q freight/test_retally_eia_reference.py
       - name: Phase 3 security-readiness evidence
         run: PYTHONPATH=. python freight/security_readiness.py
       - name: Phase 3 competitive evidence freshness and matrix
