@@ -48,9 +48,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         from freight.lab_operations_intelligence import JourneyEvent
         events = (
             JourneyEvent("contact-1","CUSTOMER_UPDATED","2026-10-01T00:00:00Z",
-                         "buyer","reference-1","SIMULATED"),
+                         "SIM-BUYER","SIM-BU","INV-100","a"*64,"claim-1",("notice-1",)),
             JourneyEvent("credit-1","CREDIT_ALLOCATED","2026-10-04T00:00:00Z",
-                         "carrier","reference-2","SIMULATED"),
+                         "SIM-BUYER","SIM-BU","INV-100","a"*64,"claim-1",("credit-evidence-1",)),
         )
         person=CustomerPersona("controller",7,3,True)
         result=simulate_customer_reactions(events,person,refund_due_cents=0,as_of="2026-10-15T00:00:00Z")
@@ -68,7 +68,7 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         report=build_accuracy_report(fixture)
         validate_accuracy_report(report)
         try:
-            validate_accuracy_report(replace(report,schema_version=0))
+            validate_accuracy_report(replace(report,rating={**report.rating,"false_positive":1}))
         except (ValueError, AssertionError):
             pass
         else:
