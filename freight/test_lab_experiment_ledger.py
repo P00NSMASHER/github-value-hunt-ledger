@@ -10,7 +10,7 @@ H=lambda t:hashlib.sha256(t.encode()).hexdigest()
 
 def sample(**changes):
     return Experiment(**(dict(experiment_id="LAB-P0-03-REPRO-01",finding_id="LAB-P0-03",
-           source_head_sha=H("old-source"),candidate_head_sha=H("candidate-source"),
+           baseline_artifact_sha256=H("old-source"),candidate_artifact_sha256=H("candidate-source"),
            frozen_input_sha256=H("frozen-fixture"),independent_test_sha256=H("independent-test"),
            original_counterexample_reproduced=True,repaired_counterexample_rejected=True,
            known_good_control_passed=True,measured_runtime_ms=6,
@@ -51,6 +51,12 @@ class ExperimentLedgerTests(unittest.TestCase):
     def test_invalid_hash_rejected(self):
         with self.assertRaises(ValueError):
             self.ledger.append(sample(frozen_input_sha256="broken"))
+    def test_unmeasured_runtime_is_explicitly_null(self):
+        experiment=sample(measured_runtime_ms=None)
+        inserted,receipt=self.ledger.append(experiment)
+        self.assertTrue(inserted)
+        self.assertEqual(len(receipt),64)
+
     def test_successful_second_append_proves_chain(self):
         self.ledger.append(sample())
         self.ledger.append(sample(experiment_id="Y-02-REPRO-02",finding_id="Y-02"))
