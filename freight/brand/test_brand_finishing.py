@@ -7,11 +7,11 @@ SITE = ROOT / "site"
 BRAND = ROOT / "brand"
 
 class RetallyFinishingTests(unittest.TestCase):
-    def test_restrained_colors_preserve_typography_and_mobile_guard(self):
+    def test_emerald_colors_preserve_typography_and_mobile_guard(self):
         css=(SITE / "foundry.css").read_text(encoding="utf-8")
-        self.assertIn("RETALLY restrained-surface pass",css)
-        self.assertIn("--navy:#0e1e29;",css)
-        self.assertIn(".section-cobalt { background-color:#183940; }",css)
+        self.assertIn("RETALLY emerald finishing",css)
+        self.assertIn("--navy:#062c26;",css)
+        self.assertIn(".section-cobalt{background:linear-gradient(125deg,#07543e,#0b694b)}",css)
         self.assertIn("font-family:Instrument,Georgia,serif;",css)
         self.assertIn("font-style:italic;",css)
         self.assertIn(".home-simple .mobile-cta { display:none!important; }",css)

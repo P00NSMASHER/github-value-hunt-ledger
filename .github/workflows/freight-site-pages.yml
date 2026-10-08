@@ -83,6 +83,19 @@ jobs:
           grep -F 'https://www.retallyrecovery.com/' cf-retally-public/index.html
           grep -F 'jay@retallyrecovery.com' cf-retally-public/index.html
 
+      - name: Reject private contact data in generated public bundle
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          forbidden = ("Yorktowne", "17901", "jayp19386@")
+          suffixes = {".html", ".css", ".js", ".txt", ".xml", ".json", ".csv"}
+          for path in Path("cf-retally-public").rglob("*"):
+              if path.is_file() and path.suffix.lower() in suffixes:
+                  data = path.read_text(encoding="utf-8")
+                  if any(token in data for token in forbidden):
+                      raise SystemExit("Public privacy guard failed")
+          PY
+
   deploy:
     if: >-
       github.event_name != 'pull_request' &&

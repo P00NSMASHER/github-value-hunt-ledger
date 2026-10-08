@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import zipfile
 
 from freight.synthetic_pilot_bundle import verify_synthetic_pilot_bundle
 
@@ -171,8 +172,9 @@ class PublicBuildTests(unittest.TestCase):
             org = by_type["Organization"]
             service = by_type["Service"]
             self.assertEqual(org["name"], "RETALLY")
-            self.assertEqual(org["address"]["addressLocality"], "Pottsville")
-            self.assertEqual(org["address"]["addressRegion"], "PA")
+            self.assertNotIn("address", org)
+            self.assertNotIn('itemprop="streetAddress"', index)
+            self.assertNotIn('itemprop="postalCode"', index)
             self.assertEqual(service["provider"]["@id"], org["@id"])
             self.assertEqual(service["areaServed"]["name"], "United States")
             self.assertNotIn("LocalBusiness", raw_json)
@@ -279,7 +281,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             self.assertNotIn(builder.DEMO_MARKER, page)
             self.assertIn('href="synthetic-pilot-demo.zip"', page)
-            self.assertIn("Fictional data only", page)
+            self.assertIn("Sample data only", page)
             demo = output / builder.DEMO_FILE
             receipt = verify_synthetic_pilot_bundle(demo)
             self.assertEqual(11, receipt["entry_count"])
@@ -288,7 +290,46 @@ class PublicBuildTests(unittest.TestCase):
             )
             self.assertNotIn(receipt["bundle_sha256"], page)
             self.assertNotIn("SHA-256", page)
-            self.assertIn("Download a fictional audit example", page)
+            self.assertIn("Download a sample audit example", page)
+
+    def test_emerald_visual_copy_and_generated_public_privacy(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            forbidden = ("Yorktowne", "17901", "jayp19386@", "SYNTH-DASH-001")
+            text_suffixes = {".html", ".css", ".js", ".txt", ".xml", ".json", ".csv"}
+            for path in output.rglob("*"):
+                if not path.is_file() or path.suffix.lower() not in text_suffixes:
+                    continue
+                public_text = path.read_text(encoding="utf-8")
+                for fragment in forbidden:
+                    self.assertNotIn(fragment, public_text, path.name)
+            with zipfile.ZipFile(output / builder.DEMO_FILE) as archive:
+                for member in archive.namelist():
+                    if member.endswith("/"):
+                        continue
+                    payload = archive.read(member)
+                    for fragment in forbidden[:3]:
+                        self.assertNotIn(fragment.encode(), payload, member)
+            report = (output / "recovery-status-example.html").read_text()
+            self.assertIn("SAMPLE RECOVERY REPORT", report)
+            self.assertIn("<h1>Northstar Industrial Supply</h1>", report)
+            self.assertIn("Multi-Site Distributor", report)
+            self.assertIn("Sample Population · 2026-01-01 through 2026-03-31", report)
+            self.assertIn('class="button button-light report-back-link"', report)
+            self.assertIn('src="assets/brand/retally-wordmark.webp"', report)
+            self.assertNotIn('class="report-notice"', report)
+            self.assertIn("Net actual recovered", report)
+            self.assertIn("$13,450.00", report)
+            scenario = (output / "freight-audit-example.html").read_text()
+            self.assertIn("<h2>Sample Scenario</h2>", scenario)
+            self.assertIn("This scenario uses sample data only.", scenario)
+            self.assertIn("sample carrier Blue River Freight", scenario)
+            for amount in ("$1,167.60", "$820.00", "$147.60", "$75.00", "$1,042.60", "$125.00"):
+                self.assertIn(amount, scenario)
+            css = (output / "foundry.css").read_text()
+            self.assertIn("--navy:#062c26;", css)
+            self.assertIn(".home-simple .hero-wash{", css)
+            self.assertIn(".sample-report .document-hero{", css)
 
     def test_fonts_and_images_retain_integrity(self):
         with tempfile.TemporaryDirectory() as temporary:
