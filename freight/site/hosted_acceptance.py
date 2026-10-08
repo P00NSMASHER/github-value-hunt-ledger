@@ -78,7 +78,7 @@ def run(base: str, output: Path, axe_path: Path | None) -> dict:
                     item.get("menu",{}).get("expanded") != "true" or not item.get("menu",{}).get("visible")):
                     defects.append({"page":name,"width":width,"failure":"mobile_menu"})
                 if axe_path and axe_path.exists() and width in (1440, 390) and slug in ("","trust","recovery-status-example"):
-                    page.add_script_tag(content=axe_path.read_text())
+                    # DevTools evaluation executes the accessibility auditor without\n                    # weakening or altering the site's deployed CSP.\n                    page.evaluate(axe_path.read_text())
                     violations = page.evaluate("""async () => {
                       const r=await axe.run(document,{runOnly:{type:'tag',
                         values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}});
