@@ -17,9 +17,9 @@ function env(db) {return {
   INQUIRY_NOTIFY_TO:"jay@retallyrecovery.com",INQUIRY_NOTIFY_FROM:"jay@retallyrecovery.com",INQUIRY_DB:db
 };}
 function mockDb({failInsert=false}={}) {
-  const inquiries=new Map(),limits=new Map();
-  return {inquiries,limits,
-    prepare(sql) {return { bind(...params) {return {
+  const inquiries=new Map(),limits=new Map(),sqlCalls=[];
+  return {inquiries,limits,sqlCalls,
+    prepare(sql) {sqlCalls.push(sql);return { bind(...params) {return {
       async first() {
         if(sql.startsWith("SELECT reference")) return inquiries.get(params[0]) || null;
         if(sql.startsWith("INSERT INTO inquiry_limits")) {
@@ -40,7 +40,12 @@ function mockDb({failInsert=false}={}) {
           for(const r of inquiries.values()) if(r.reference===params[1])r.notification_status="provider_accepted";
           return {success:true};
         }
-        if(sql.startsWith("DELETE FROM")) return {success:true};
+        if(sql.startsWith("DELETE FROM inquiries")) {
+          // Reproduce the original destructive behavior on historical records.
+          for(const [k,v] of inquiries) if(v.accepted_at < params[0]) inquiries.delete(k);
+          return {success:true};
+        }
+        if(sql.startsWith("DELETE FROM inquiry_limits")) return {success:true};
         throw Error("Unexpected run SQL: "+sql);
       }
     };}}; }
@@ -204,6 +209,24 @@ test("burst attempts limited to five per hour and no notification on rejected re
     const rate=await onRequestPost({request:request(),env:e});
     assert.equal(rate.status,429);
     assert.equal(remote.verifications,5);
+  } finally {remote.restore();}
+});
+test("a new inquiry never deletes older pending, provider-only or acknowledged-by-mail inquiries", async () => {
+  const remote=mockRemote({notify:false});
+  try {
+    const db=mockDb();
+    const old=Math.floor(Date.now()/1000)-91*86400;
+    const historical=["pending","provider_accepted","delivery_verified"];
+    for(const state of historical) db.inquiries.set("historical-"+state,{
+      reference:"RA-20260701-"+state, fingerprint:"synthetic",
+      notification_status:state,accepted_at:old
+    });
+    const response=await onRequestPost({request:request(),env:env(db)});
+    assert.equal(response.status,202);
+    assert.equal(db.inquiries.size,4);
+    for(const state of historical) assert.ok(db.inquiries.has("historical-"+state));
+    assert.equal(db.sqlCalls.filter(sql=>/^DELETE\s+FROM\s+inquiries\b/i.test(sql)).length,0);
+    assert.ok(db.sqlCalls.some(sql=>/^DELETE\s+FROM\s+inquiry_limits\b/i.test(sql)));
   } finally {remote.restore();}
 });
 test("email notification is a plain-text contact summary, not an invoice package", () => {
