@@ -305,3 +305,71 @@ def test_valid_fee_requires_a_specific_audit_identity(tmp_path):
     )
     assert record.billing_authorized is False
     assert record.recovery_fee_cents == 150
+
+@pytest.mark.parametrize("field", ["buyer_accepted", "freight_recovery_accepted"])
+@pytest.mark.parametrize("bad", ["false", "true", 0, 1, None, [], {}])
+def test_flagship_consent_must_be_an_actual_boolean(field, bad):
+    values = {
+        "buyer_accepted": True,
+        "freight_recovery_accepted": True,
+        "accepted_at": "2026-09-20T15:00:00Z",
+    }
+    values[field] = bad
+    with pytest.raises(ValueError, match=field + " must be a boolean"):
+        build_recovery_engagement(request(**values))
+
+
+def test_explicit_false_party_keeps_engagement_pending():
+    c = build_recovery_engagement(request(
+        buyer_accepted=False, freight_recovery_accepted=True
+    ))
+    assert c.state == "READY_FOR_ACCEPTANCE"
+    assert c.accepted_at is None
+
+
+@pytest.mark.parametrize("bad", ["AUTO_APPROVE", "GENERAL_CONTACT_ALLOWED"])
+def test_flagship_engagement_cannot_relax_external_action_policy(bad):
+    with pytest.raises(ValueError, match="authorization_policy"):
+        build_recovery_engagement(request(authorization_policy=bad))
+
+
+def _rehashed_engagement(engagement, **changes):
+    from dataclasses import asdict
+    from freight.recovery_engagement import _canonical_hash
+    forged = replace(engagement, **changes)
+    payload = asdict(forged)
+    payload.pop("engagement_hash")
+    return replace(forged, engagement_hash=_canonical_hash(payload))
+
+
+def test_rehashed_false_consent_cannot_create_a_fee_record(tmp_path):
+    proof = proof_case(tmp_path)
+    genuine = accepted_for(proof)
+    forged = _rehashed_engagement(genuine, buyer_accepted="false")
+    with pytest.raises(ValueError, match="buyer_accepted must be a boolean"):
+        record_actual_recovery(forged, **proof)
+
+
+@pytest.mark.parametrize("changes,reason", [
+    ({"buyer_accepted": False}, "acceptance flags contradict state"),
+    ({"external_action_authorized": True}, "cannot authorize external action"),
+    ({"authorization_policy": "AUTO_APPROVE"}, "authorization policy"),
+    ({"approved_claim_value_cents": 500}, "cannot pre-authorize"),
+    ({"actual_recovered_cents": 500}, "cannot pre-authorize"),
+    ({"accepted_at": None}, "requires accepted_at"),
+])
+def test_rehashed_contradictory_engagement_fails_closed(tmp_path, changes, reason):
+    proof = proof_case(tmp_path, cents=0)
+    forged = _rehashed_engagement(accepted_for(proof), **changes)
+    with pytest.raises(ValueError, match=reason):
+        record_actual_recovery(forged, **proof)
+
+
+def test_existing_frozen_audit_and_claim_chronology_tests_remain_enabled():
+    import inspect
+    import freight.recovery_engagement as module
+    source = inspect.getsource(module.record_actual_recovery)
+    assert 'engagement.audit_reference != "TRUTH:" + truth.truth_hash' in source
+    assert "recovery claim issued before engagement acceptance" in source
+    assert "persisted recovery claim does not match authorized issuance" in source
+    assert "billing_authorized" in source
