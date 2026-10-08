@@ -135,6 +135,14 @@ jobs:
           path: freight/mission8/ci_authenticated_handler_receipt.json
           if-no-files-found: warn
           retention-days: 14
+
+  hosted-staging-access-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Negative HTTP authentication against real isolated M8 Floot endpoints
         shell: bash
         env:
