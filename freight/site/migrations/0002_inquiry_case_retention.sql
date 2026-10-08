@@ -55,25 +55,29 @@ CREATE INDEX IF NOT EXISTS inquiry_case_legal_hold_idx
 CREATE TRIGGER IF NOT EXISTS inquiry_require_review_before_delete
 BEFORE DELETE ON inquiries
 BEGIN
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM inquiry_case_dispositions d
-     WHERE d.reference=OLD.reference
-       AND d.case_state='CLOSED'
-       AND d.closed_at IS NOT NULL
-       AND d.legal_hold=0
-       AND d.purge_approved_at IS NOT NULL
-       AND d.purge_approved_at<=CAST(strftime('%s','now') AS INTEGER)
-       AND d.closed_at<=CAST(strftime('%s','now') AS INTEGER)
-       AND d.purge_approved_by IS NOT NULL
-       AND d.retention_until IS NOT NULL
-       AND d.retention_until<=CAST(strftime('%s','now') AS INTEGER)
-       AND OLD.accepted_at <= CAST(strftime('%s','now') AS INTEGER) - 90*86400
-  ) THEN RAISE(ABORT,'inquiry_delete_requires_closed_case_approved_retention_and_no_hold') END;
-
+  -- D1-compatible single statement: insert an approved receipt or abort.
   INSERT INTO inquiry_purge_audit(
     reference,purged_at,approved_at,approved_by,original_accepted_at
   )
   SELECT OLD.reference,CAST(strftime('%s','now') AS INTEGER),
-         d.purge_approved_at,d.purge_approved_by,OLD.accepted_at
-    FROM inquiry_case_dispositions d WHERE d.reference=OLD.reference;
+    COALESCE(
+      (SELECT d.purge_approved_at FROM inquiry_case_dispositions d
+       WHERE d.reference=OLD.reference
+         AND d.case_state='CLOSED'
+         AND d.closed_at IS NOT NULL
+         AND d.legal_hold=0
+         AND d.purge_approved_at IS NOT NULL
+         AND d.purge_approved_at<=CAST(strftime('%s','now') AS INTEGER)
+         AND d.closed_at<=CAST(strftime('%s','now') AS INTEGER)
+         AND d.purge_approved_by IS NOT NULL
+         AND d.purge_approved_by<>d.operator_id
+         AND d.retention_until IS NOT NULL
+         AND d.retention_until<=CAST(strftime('%s','now') AS INTEGER)
+         AND OLD.accepted_at<=CAST(strftime('%s','now') AS INTEGER)-90*86400
+      ),
+      RAISE(ABORT,'inquiry_delete_requires_closed_case_approved_retention_and_no_hold')
+    ),
+    (SELECT d.purge_approved_by FROM inquiry_case_dispositions d
+     WHERE d.reference=OLD.reference),
+    OLD.accepted_at;
 END;
