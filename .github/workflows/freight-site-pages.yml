@@ -71,6 +71,16 @@ jobs:
           python recoveryworks/site/build.py --output /tmp/recoveryos-public
           test "$(find /tmp/recoveryos-public -type f | wc -l)" -eq 15
           test "$(find /tmp/recoveryos-public -type l | wc -l)" -eq 0
+      - name: Validate actual Cloudflare Pages publication bundle
+        env:
+          FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com
+          FREIGHT_CONTACT_VERIFIED: '1'
+        run: |
+          python -m freight.site.cloudflare_build
+          test "$(find cf-retally-public -type f | wc -l)" -eq 69
+          test "$(find cf-retally-public -type l | wc -l)" -eq 0
+          grep -F 'https://www.retallyrecovery.com/' cf-retally-public/index.html
+          grep -F 'jay@retallyrecovery.com' cf-retally-public/index.html
 
   deploy:
     if: >-
