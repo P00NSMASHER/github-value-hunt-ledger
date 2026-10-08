@@ -35,13 +35,13 @@ def stage_policy(stage, *, evidence=False, customer_authorization=False, carrier
     allowed = {'candidate','supported','authorized','carrier_approved','received'}
     require(stage in allowed, 'invalid stage')
     if stage in ('supported','authorized','carrier_approved','received'):
-        require(evidence, 'supported stages require source evidence')
+        require(evidence is True, 'supported stages require source evidence')
     if stage in ('authorized','carrier_approved','received'):
-        require(customer_authorization, 'carrier action requires written authorization')
+        require(customer_authorization is True, 'carrier action requires written authorization')
     if stage in ('carrier_approved','received'):
-        require(carrier_approval, 'carrier acceptance required by sample workflow')
+        require(carrier_approval is True, 'carrier acceptance required by sample workflow')
     if stage == 'received':
-        require(posted, 'carrier approval is not received funds')
+        require(posted is True, 'carrier approval is not received funds')
     return True
 
 def _exact_settlement_amount(value):
@@ -128,7 +128,7 @@ def aggregate_arithmetic(a):
         'aggregate_source_level_verified':bool(a['source_level_aggregate_settlements_available'] and a['source_level_aggregate_invoices_available'])}
 
 def eligible_fee(net, exclusions, rate, *, signed=False, itemization_proven=False):
-    require(signed and itemization_proven, 'do not compute a REAL fee without signed terms and validated attribution')
+    require(signed is True and itemization_proven is True, 'do not compute a REAL fee without signed terms and validated attribution')
     n=cents(D(net)-sum((D(v) for v in exclusions),D('0')))
     require(D('0')<=n<=D(net), 'invalid eligible base')
     require(D('0')<=D(rate)<=D('1'), 'invalid percentage')
