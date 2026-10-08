@@ -8,14 +8,14 @@
 - Uses pre-existing `0001_inquiry.sql` and the Mission 14/15 retention guard `0002_inquiry_case_retention.sql`.
 - New additive, unapplied SQL: `freight/site/migrations/0003_inquiry_verified_case_actions.sql`.
 - New restricted endpoint: `functions/api/internal/inquiry-case.js`.
-- Cloudflare Access signed-identity verification: `functions/api/internal/inquiry_auth.js`.
+- Non-public source (excluded from the static build) for Cloudflare Access verification: `freight/site/operator_access_auth.js`.
 - Regression: `freight/site/test_inquiry_case.mjs`; integrated with the **existing** RETALLY Inquiry CI, not a scheduler.
 
 ## Independent defect and threat model
 
 Before this work, disposition values `operator_id` and `purge_approved_by` were merely database strings. Different strings in a row do not establish independent authorized people. A credential that can write unrestricted D1 SQL can still impersonate operators, forge timestamps or attest unearned evidence.
 
-The new endpoint does not trust user-submitted operator identifiers, `X-Forwarded-Email`, unsigned JWT claims or provider notification status. It requires an **actual RS256 signature-verified Cloudflare Access application JWT** with validated issuer, application audience, time limits, `sub` and `email`. It obtains the public JWKS only from a strictly configured `*.cloudflareaccess.com` team origin, and the signed identity must match an explicit server-side email+subject allowlist for its role.
+The verifier is kept outside the Pages Functions file-based route directory so it cannot be mistaken for a separately public HTTP endpoint. The new endpoint does not trust user-submitted operator identifiers, `X-Forwarded-Email`, unsigned JWT claims or provider notification status. It requires an **actual RS256 signature-verified Cloudflare Access application JWT** with validated issuer, application audience, time limits, `sub` and `email`. It obtains the public JWKS only from a strictly configured `*.cloudflareaccess.com` team origin, and the signed identity must match an explicit server-side email+subject allowlist for its role.
 
 No operator user IDs or sensitive records are exposed in the endpoint response. The caller supplies a 64-hex evidence digest, which is only a reference assertion until the actual source/evidence binding is separately independently verified.
 
