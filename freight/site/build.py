@@ -221,7 +221,7 @@ def build(
     # Fail closed before publishing any source text containing the removed private contact.
     # Log only the filename, never the discovered private value.
     for name, page in text_bundle.items():
-        if re.search(r"yorktowne|\\b17901\\b|jayp19386\\s*@", page, re.IGNORECASE):
+        if any(token in page.lower() for token in ("yorktowne", "17901", "jayp19386@")):
             raise ValueError(f"Nonbusiness contact information in public asset: {name}")
 
     destination.mkdir(parents=True, exist_ok=True)
