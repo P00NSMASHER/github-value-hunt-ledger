@@ -93,7 +93,7 @@ def acceptance()->dict:
              totals["fee_refunded_cents"])==(500,150,100),"SYNTHETIC_CASH_NOT_RECONCILED")
     require(bc["customers"]==2 and bc["simulated_customer_recovered_cents"]==0,
             "B_C_ECONOMIC_STATUS_CHANGED")
-    require(p["qa_cluster"]==QA_CLUSTER and p["production_cluster"]==PRODUCTION_CLUSTER,
+    require(p["hosted_floot_qa_cluster"]==QA_CLUSTER and p["production_cluster"]==PRODUCTION_CLUSTER,
             "CLUSTER_SCOPE_MISMATCH")
     require(p["hosted_floot_runtime_uses_owner"] is True,
             "REVERIFY_ACTUAL_HOSTED_DB_USER")
