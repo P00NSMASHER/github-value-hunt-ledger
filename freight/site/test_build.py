@@ -171,8 +171,7 @@ class PublicBuildTests(unittest.TestCase):
             org = by_type["Organization"]
             service = by_type["Service"]
             self.assertEqual(org["name"], "RETALLY")
-            self.assertEqual(org["address"]["addressLocality"], "Pottsville")
-            self.assertEqual(org["address"]["addressRegion"], "PA")
+            self.assertNotIn("address", org)
             self.assertEqual(service["provider"]["@id"], org["@id"])
             self.assertEqual(service["areaServed"]["name"], "United States")
             self.assertNotIn("LocalBusiness", raw_json)
@@ -279,7 +278,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             self.assertNotIn(builder.DEMO_MARKER, page)
             self.assertIn('href="synthetic-pilot-demo.zip"', page)
-            self.assertIn("Fictional data only", page)
+            self.assertIn("Sample data only", page)
             demo = output / builder.DEMO_FILE
             receipt = verify_synthetic_pilot_bundle(demo)
             self.assertEqual(11, receipt["entry_count"])
@@ -288,7 +287,27 @@ class PublicBuildTests(unittest.TestCase):
             )
             self.assertNotIn(receipt["bundle_sha256"], page)
             self.assertNotIn("SHA-256", page)
-            self.assertIn("Download a fictional audit example", page)
+            self.assertIn("Download a sample audit walkthrough", page)
+
+    def test_public_copy_and_private_address_are_safe(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for name in builder.TEXT_SOURCE_FILES:
+                page = (output / name).read_text(encoding="utf-8")
+                self.assertNotIn("yorktowne", page.lower(), name)
+                self.assertNotIn("17901", page, name)
+                self.assertNotIn("jayp19386@", page.lower(), name)
+            index = (output / "index.html").read_text()
+            report = (output / "recovery-status-example.html").read_text()
+            example = (output / "freight-audit-example.html").read_text()
+            self.assertIn("Northstar Industrial Supply", report)
+            self.assertIn("Sample Population · 2026-01-01 through 2026-03-31", report)
+            self.assertIn('class="button button-light report-back"', report)
+            self.assertNotIn('class="report-notice"', report)
+            self.assertIn("This scenario uses sample data only.", example)
+            self.assertIn("sample carrier Blue River Freight", example)
+            self.assertIn('content="jay@retallyrecovery.com"', index)
+            self.assertIn("Sample data", index)
 
     def test_fonts_and_images_retain_integrity(self):
         with tempfile.TemporaryDirectory() as temporary:

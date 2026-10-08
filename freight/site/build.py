@@ -213,10 +213,16 @@ def build(
     demo_link = (
         '<a class="text-link text-link-light" href="synthetic-pilot-demo.zip" '
         'download data-track="controlled_demo_downloaded">'
-        'Download a fictional audit example <span aria-hidden="true">&#8599;</span></a>'
-        '<p class="microcopy">Fictional data only. This walkthrough is not a customer result or recovery claim.</p>'
+        'Download a sample audit walkthrough <span aria-hidden="true">&#8599;</span></a>'
+        '<p class="microcopy">Sample data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # Fail closed before publishing any source text containing the removed private contact.
+    # Log only the filename, never the discovered private value.
+    for name, page in text_bundle.items():
+        if any(token in page.lower() for token in ("yorktowne", "17901", "jayp19386@")):
+            raise ValueError(f"Nonbusiness contact information in public asset: {name}")
 
     destination.mkdir(parents=True, exist_ok=True)
     for name, content in text_bundle.items():

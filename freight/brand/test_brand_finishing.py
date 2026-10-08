@@ -9,12 +9,16 @@ BRAND = ROOT / "brand"
 class RetallyFinishingTests(unittest.TestCase):
     def test_restrained_colors_preserve_typography_and_mobile_guard(self):
         css=(SITE / "foundry.css").read_text(encoding="utf-8")
-        self.assertIn("RETALLY restrained-surface pass",css)
-        self.assertIn("--navy:#0e1e29;",css)
-        self.assertIn(".section-cobalt { background-color:#183940; }",css)
+        self.assertIn("Final RETALLY forest/emerald brand layer",css)
+        final_brand = css.split("Final RETALLY forest/emerald brand layer", 1)[1]
+        self.assertIn("--navy:#062c26;",final_brand)
+        self.assertIn(".section-cobalt{background:#105039}",final_brand)
+        self.assertIn("rgba(2,34,29,.97)",final_brand)
+        self.assertIn(".sample-report .document-hero{",final_brand)
+        self.assertNotIn("--navy:#0e1e29;",final_brand)
         self.assertIn("font-family:Instrument,Georgia,serif;",css)
         self.assertIn("font-style:italic;",css)
-        self.assertIn(".home-simple .mobile-cta { display:none!important; }",css)
+        self.assertIn(".home-simple .mobile-cta{display:none!important}",css)
 
     def test_site_hero_and_contact_workflow_unchanged(self):
         page=(SITE / "index.html").read_text(encoding="utf-8")

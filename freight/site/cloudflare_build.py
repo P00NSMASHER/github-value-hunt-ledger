@@ -48,6 +48,14 @@ def build(output: Path = OUTPUT_DIR) -> Path:
             raise RuntimeError("Old site canonical remains")
         if rewrites < 1:
             raise RuntimeError("Public URL rewrite did not occur")
+        # Audit every generated public text asset, including RecoveryOS and URL rewrites.
+        # Never log the private value if a check fails.
+        for path in published:
+            if path.suffix.lower() not in {".html", ".txt", ".xml", ".json", ".js", ".css", ".svg", ".csv"}:
+                continue
+            content = path.read_text(encoding="utf-8").lower()
+            if any(token in content for token in ("yorktowne", "17901", "jayp19386@")):
+                raise RuntimeError(f"Private contact data in public bundle: {path.relative_to(bundle)}")
         shutil.copytree(bundle, output)
     return output
 
