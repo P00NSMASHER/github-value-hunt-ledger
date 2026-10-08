@@ -5,7 +5,7 @@
 **Final independent verdict:** **NOT READY FOR LIVE CUSTOMER DATA, CARRIER CLAIMS, COLLECTIONS, OR PRODUCTION RECOVERYOS FINANCIAL OPERATIONS.**  
 **Permitted now:** owner-led market research, nonconfidential discovery preparation, internal synthetic demonstrations, and controlled code review. No customer data is authorized by this file.
 
-This document is RETALLY's **single decision handoff**, not a new platform, dashboard, laboratory, sales campaign, or production change. Use the existing source modules and PRs. Any updated fact requires dated source evidence; a green GitHub check or the word VERIFIED in a self-authored JSON file is not itself external proof.
+This document is a **supplementary operator handoff**. The canonical go/no-go decisions, release owners and current launch gate register are controlled by [RETALLY Final Launch Control](RETALLY_FINAL_LAUNCH_CONTROL_20261008.md). It is not a new platform, dashboard, laboratory, sales campaign, or production change. Use the existing source modules and PRs. Any updated fact requires dated source evidence; a green GitHub check or the word VERIFIED in a self-authored JSON file is not itself external proof.
 
 ## A. Actual business to sell
 
