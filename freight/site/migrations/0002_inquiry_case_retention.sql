@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS inquiry_case_dispositions (
   CHECK (legal_hold=0 OR (hold_reason IS NOT NULL AND purge_approved_at IS NULL)),
   CHECK ((purge_approved_at IS NULL AND purge_approved_by IS NULL) OR
          (purge_approved_at IS NOT NULL AND purge_approved_by IS NOT NULL AND
-          length(trim(purge_approved_by)) >= 3 AND case_state='CLOSED' AND
+          length(trim(purge_approved_by)) >= 3 AND purge_approved_by<>operator_id AND
+          case_state='CLOSED' AND
           legal_hold=0 AND purge_approved_at>=closed_at AND
           retention_until IS NOT NULL))
 );
@@ -48,6 +49,8 @@ BEGIN
        AND d.closed_at IS NOT NULL
        AND d.legal_hold=0
        AND d.purge_approved_at IS NOT NULL
+       AND d.purge_approved_at<=CAST(strftime('%s','now') AS INTEGER)
+       AND d.closed_at<=CAST(strftime('%s','now') AS INTEGER)
        AND d.purge_approved_by IS NOT NULL
        AND d.retention_until IS NOT NULL
        AND d.retention_until<=CAST(strftime('%s','now') AS INTEGER)
