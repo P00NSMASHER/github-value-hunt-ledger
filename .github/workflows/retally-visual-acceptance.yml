@@ -1,6 +1,12 @@
 name: RETALLY Visual Acceptance
 
 on:
+  push:
+    branches:
+      - audit/retally-visual-acceptance-20261008
+    paths:
+      - 'freight/site/**'
+      - '.github/workflows/retally-visual-acceptance.yml'
   pull_request:
     paths:
       - 'freight/site/**'
