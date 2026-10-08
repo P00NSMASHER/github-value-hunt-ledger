@@ -44,6 +44,7 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          freight/site/test_rebase_public_urls.py
           recoveryworks/test_public_site.py
       - name: Check browser script syntax
         run: |
@@ -143,6 +144,7 @@ jobs:
           python recoveryworks/site/build.py --output /tmp/retally-recoveryos-public
           mkdir /tmp/retally-cloudflare-public/recoveryos
           cp -R /tmp/retally-recoveryos-public/. /tmp/retally-cloudflare-public/recoveryos/
+          python freight/site/rebase_public_urls.py /tmp/retally-cloudflare-public
           test "$(find /tmp/retally-cloudflare-public -type l | wc -l)" -eq 0
           test "$(find /tmp/retally-cloudflare-public -type f | wc -l)" -eq 69
       - name: Deploy built assets to Cloudflare Pages only
