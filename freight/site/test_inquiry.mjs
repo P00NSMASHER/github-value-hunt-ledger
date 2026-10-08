@@ -57,7 +57,7 @@ function request(data=good(),{origin="https://www.retallyrecovery.com",host="www
     body:JSON.stringify(data)
   });
 }
-function mockRemote({captcha=true,notify=true,delivery="delivered"}={}) {
+function mockRemote({captcha=true,notify=true,delivery="delivered",providerResponse=null,providerStatus=null}={}) {
   const real=globalThis.fetch;
   let verifications=0,notifications=0;
   globalThis.fetch=async (url) => {
@@ -67,14 +67,17 @@ function mockRemote({captcha=true,notify=true,delivery="delivered"}={}) {
     }
     if(String(url).includes("email/sending/send")) {
       notifications++;
-      const recipient="jay@retallyrecovery.com";
-      const result={delivered:[],queued:[],suppressed_recipients:[],permanent_bounces:[]};
-      if(delivery==="delivered")result.delivered=[recipient];
-      if(delivery==="queued")result.queued=[recipient];
-      if(delivery==="suppressed")result.suppressed_recipients=[recipient];
-      if(delivery==="bounced")result.permanent_bounces=[recipient];
-      if(delivery==="other")result.delivered=["elsewhere@example.org"];
-      return Response.json({success:notify,result},{status:notify?200:503});
+      if(providerResponse==="invalid-json") return new Response("{invalid", {status:200});
+      const target="jay@retallyrecovery.com";
+      const result={delivered:[],queued:[],suppressed_recipients:[],permanent_bounces:[],message_id:"<synthetic@example.invalid>"};
+      if(delivery==="delivered" || delivery==="suppressed_and_delivered") result.delivered=[target];
+      if(delivery==="queued" || delivery==="bounced_and_queued") result.queued=[target];
+      if(delivery==="suppressed" || delivery==="suppressed_and_delivered") result.suppressed_recipients=[target];
+      if(delivery==="bounced" || delivery==="bounced_and_queued") result.permanent_bounces=[target];
+      if(delivery==="other") result.delivered=["other@example.org"];
+      if(delivery==="case_variant") result.delivered=["JAY@RETALLYRECOVERY.COM"];
+      return Response.json(providerResponse ?? {success:notify,result},
+        {status:providerStatus ?? (notify?200:503)});
     }
     throw Error("Unexpected URL");
   };
@@ -102,17 +105,31 @@ test("server feature is disabled without verified mailbox and explicit release f
   assert.deepEqual(await (await onRequestGet({env:env(mockDb())})).json(),
     {online:true,siteKey:"sitekey-synthetic-123456"});
 });
-test("missing notification delivery credential cannot advertise online acceptance", async () => {
-  const db=mockDb();
-  const e=env(db);
-  delete e.CLOUDFLARE_EMAIL_API_TOKEN;
-  const get=await onRequestGet({env:e});
-  assert.equal(get.status,503);
-  assert.deepEqual(await get.json(),{online:false});
-  const post=await onRequestPost({request:request(),env:e});
-  assert.equal(post.status,503);
-  assert.equal(db.inquiries.size,0);
+test("all independent online-intake activation gates fail closed", async () => {
+  const cases = [
+    ["owner has not enabled the service", e => { e.FREIGHT_INQUIRY_ENABLED = "0"; }],
+    ["business mailbox has not been independently verified", e => { e.FREIGHT_INQUIRY_MAILBOX_VERIFIED = "0"; }],
+    ["email-sending API token was never installed", e => { delete e.CLOUDFLARE_EMAIL_API_TOKEN; }],
+    ["durable inquiry database is missing", e => { delete e.INQUIRY_DB; }],
+    ["Turnstile secret is missing", e => { delete e.TURNSTILE_SECRET; }],
+    ["rate limiter secret is missing", e => { delete e.INQUIRY_RATE_SECRET; }],
+    ["business notification recipient does not match", e => { e.INQUIRY_NOTIFY_TO = "other@example.org"; }],
+    ["notification sender does not use the business domain", e => { e.INQUIRY_NOTIFY_FROM = "other@example.org"; }],
+  ];
+  for (const [reason, disable] of cases) {
+    const db = mockDb();
+    const e = env(db);
+    disable(e);
+    const status = await onRequestGet({env:e});
+    assert.equal(status.status, 503, reason);
+    assert.deepEqual(await status.json(), {online:false}, reason);
+    const attemptedPost = await onRequestPost({request:request(),env:e});
+    assert.equal(attemptedPost.status, 503, reason);
+    assert.equal((await attemptedPost.json()).ok, false, reason);
+    assert.equal(db.inquiries.size, 0, reason);
+  }
 });
+
 test("invalid content type and cross-origin POST fail before any storage", async () => {
   const e=env(mockDb());
   assert.equal((await onRequestPost({request:request(good(),{contentType:"multipart/form-data"}),env:e})).status,415);
@@ -152,6 +169,40 @@ test("server stores once and notifies at most once for a duplicate retry", async
     assert.equal(remote.notifications,1);
   } finally {remote.restore();}
 });
+test("provider acknowledgement must explicitly name the intended RETALLY recipient", async () => {
+  const scenarios=[
+    ["delivered recipient", {delivery:"delivered"}, "provider_accepted"],
+    ["queued recipient", {delivery:"queued"}, "provider_accepted"],
+    ["case-insensitive recipient", {delivery:"case_variant"}, "provider_accepted"],
+    ["suppressed recipient", {delivery:"suppressed"}, "pending"],
+    ["permanently bounced recipient", {delivery:"bounced"}, "pending"],
+    ["another recipient accepted instead", {delivery:"other"}, "pending"],
+    ["positive delivered and suppression conflict", {delivery:"suppressed_and_delivered"}, "pending"],
+    ["positive queued and bounce conflict", {delivery:"bounced_and_queued"}, "pending"],
+    ["provider HTTP failure", {notify:false}, "pending"],
+    ["success without result", {providerResponse:{success:true,id:"synthetic"}}, "pending"],
+    ["message ID without success", {providerResponse:{id:"synthetic",result:{delivered:["jay@retallyrecovery.com"],queued:[],suppressed_recipients:[],permanent_bounces:[]}}}, "pending"],
+    ["wrong recipient only", {providerResponse:{success:true,result:{delivered:["different@example.org"],queued:[],suppressed_recipients:[],permanent_bounces:[]}}}, "pending"],
+    ["missing suppression list", {providerResponse:{success:true,result:{delivered:["jay@retallyrecovery.com"],queued:[],permanent_bounces:[]}}}, "pending"],
+    ["invalid suppressed list type", {providerResponse:{success:true,result:{delivered:["jay@retallyrecovery.com"],queued:[],suppressed_recipients:"",permanent_bounces:[]}}}, "pending"],
+    ["false success despite delivered field", {providerResponse:{success:false,result:{delivered:["jay@retallyrecovery.com"],queued:[],suppressed_recipients:[],permanent_bounces:[]}}}, "pending"],
+    ["malformed provider JSON", {providerResponse:"invalid-json"}, "pending"],
+  ];
+  for(const [label,options,expected] of scenarios) {
+    const remote=mockRemote(options);
+    try {
+      const db=mockDb();
+      const e=env(db);
+      const response=await onRequestPost({request:request(),env:e});
+      assert.equal(response.status,202,label+": durable acceptance should not depend on email");
+      assert.equal(db.inquiries.size,1,label);
+      assert.equal([...db.inquiries.values()][0].notification_status,expected,label);
+      assert.equal(remote.notifications,1,label);
+      assert.equal(db.sqlCalls.filter(sql=>sql.startsWith("UPDATE inquiries")).length,
+        expected==="provider_accepted"?1:0,label);
+    } finally {remote.restore();}
+  }
+});
 test("idempotency collisions never overwrite an accepted request", async () => {
   const remote=mockRemote();
   try {
@@ -178,27 +229,6 @@ test("email provider failure leaves a durable pending record for operator reconc
     const r=await onRequestPost({request:request(),env:e});
     assert.equal(r.status,202);
     assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
-  } finally {remote.restore();}
-});
-test("email API success for a suppressed or wrong recipient never counts as accepted delivery", async () => {
-  for(const delivery of ["suppressed","bounced","other","none"]) {
-    const remote=mockRemote({delivery});
-    try {
-      const e=env(mockDb());
-      const response=await onRequestPost({request:request(),env:e});
-      assert.equal(response.status,202);
-      assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
-      assert.equal(remote.notifications,1);
-    } finally {remote.restore();}
-  }
-});
-test("email API queued recipient counts as provider acceptance, not proven inbox delivery", async () => {
-  const remote=mockRemote({delivery:"queued"});
-  try {
-    const e=env(mockDb());
-    const response=await onRequestPost({request:request(),env:e});
-    assert.equal(response.status,202);
-    assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"provider_accepted");
   } finally {remote.restore();}
 });
 test("burst attempts limited to five per hour and no notification on rejected request", async () => {

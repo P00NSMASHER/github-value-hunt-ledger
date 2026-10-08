@@ -58,6 +58,11 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn(".sample-report .report-population span{white-space:nowrap}", styles)
             self.assertIn("$13,450.00", report)
             self.assertIn("$11,800.00", report)
+            # This is a synthetic aggregate, not an itemized source ledger.
+            # Never silently attribute the unexplained fee-eligibility gap.
+            self.assertIn("$1,650.00 difference", report)
+            self.assertIn("unallocated and not independently verified", report)
+            self.assertIn("no fee is established by this example", report)
 
             # Do not describe the new branded-domain online intake as email-only.
             self.assertIn("Cloudflare Pages at www.retallyrecovery.com", trust)
@@ -227,6 +232,12 @@ class PublicBuildTests(unittest.TestCase):
             org = by_type["Organization"]
             service = by_type["Service"]
             self.assertEqual(org["name"], "RETALLY")
+            self.assertEqual(
+                org["logo"]["url"],
+                "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem.webp",
+            )
+            self.assertIn("Freight Invoice Audit &amp; Overcharge Recovery | RETALLY", index)
+            self.assertIn("Freight invoice audit and overcharge recovery for U.S. businesses.", index)
             self.assertNotIn("address", org)
             self.assertEqual(service["provider"]["@id"], org["@id"])
             self.assertEqual(service["areaServed"]["name"], "United States")
@@ -256,7 +267,9 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn(">sales@freightfixture.com</a>", index)
             self.assertNotIn('type="file"', index.lower())
             self.assertIn("form-action 'none'", index)
-            self.assertIn("connect-src 'none'", index)
+            self.assertIn("connect-src https://www.bubblav.com", index)
+            self.assertIn("form-action 'none'", index)
+            self.assertNotIn("connect-src 'self'", index)
 
     def test_pages_have_unique_ids_and_resolvable_local_links(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -418,6 +431,22 @@ class PublicBuildTests(unittest.TestCase):
         self.assertIn('color:#f6faf7;', css)
         self.assertIn('color:#40574d', css)
 
+    def test_manual_email_fallback_preserves_mobile_user_gesture(self):
+        # The fallback is the production contact path while online D1 intake
+        # is disabled. On iOS, a delayed navigation can be gesture-blocked.
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            script = (output / "site.js").read_text(encoding="utf-8")
+            self.assertIn('id="sendAuditRequest"', page)
+            self.assertIn('id="copyAuditSummary"', page)
+            self.assertIn('sendLink.href = `mailto:${contactEmail}', script)
+            self.assertIn('window.location.href = sendLink.href;', script)
+            self.assertNotIn(
+                'window.setTimeout(() => { window.location.href = sendLink.href; }, 80)',
+                script,
+            )
+
     def test_existing_files_are_preserved(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary)
@@ -427,6 +456,122 @@ class PublicBuildTests(unittest.TestCase):
                 build(output)
             self.assertEqual(marker.read_text(), "unchanged")
             self.assertEqual(["keep.txt"], [file.name for file in output.iterdir()])
+
+
+class PublicChatbotTests(unittest.TestCase):
+    """Prevent chat embedding from breaking the audited publication boundary."""
+
+    def test_widget_is_present_once_on_public_marketing_pages(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            expected_script = (
+                '<script src="https://www.bubblav.com/widget.js" '
+                'data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147" defer></script>'
+            )
+            for name in builder.PUBLIC_CONTACT_PAGES:
+                with self.subTest(page=name):
+                    html = (output / name).read_text()
+                    self.assertEqual(html.count(expected_script), 1)
+                    self.assertIn("script-src 'self' https://www.bubblav.com;", html)
+                    self.assertIn("connect-src https://www.bubblav.com", html)
+                    self.assertIn("frame-src https://www.bubblav.com", html)
+            for name in ("404.html", "recovery-status-example.html"):
+                self.assertNotIn(expected_script, (output / name).read_text())
+            self.assertIn("Optional AI chat assistant", (output / "privacy.html").read_text())
+            self.assertIn("https://www.bubblav.com", (output / "_headers").read_text())
+
+    def test_glossy_chat_launcher_keeps_native_widget_and_accessibility(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text()
+            js = (output / "site.js").read_text()
+            for page in builder.PUBLIC_CONTACT_PAGES:
+                html = (output / page).read_text()
+                with self.subTest(page=page):
+                    self.assertEqual(html.count('id="retallyChatLauncher"'), 1)
+                    self.assertIn('type="button" aria-label="Open RETALLY AI chat assistant"', html)
+                    self.assertIn('aria-haspopup="dialog"', html)
+                    self.assertIn('class="retally-chat-orb"', html)
+                    self.assertEqual(html.count('data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147"'), 1)
+                    self.assertLess(html.index('id="retallyChatLauncher"'), html.index('data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147"'))
+            self.assertIn('window.BubblaV', js)
+            self.assertIn('api.open()', js)
+            self.assertIn('retally-chat-fallback', js)
+            self.assertIn('retally-chat-open', js)
+            self.assertIn('window.setInterval(syncRetallyChat, 500)', js)
+            self.assertIn('.retally-chat-launcher:focus-visible', css)
+            self.assertIn('@media(prefers-reduced-motion:reduce)', css)
+            self.assertIn('#bv-chat-frame', css)
+            for name in ("recovery-status-example.html", "404.html"):
+                self.assertNotIn('id="retallyChatLauncher"', (output / name).read_text())
+
+    def test_cloudflare_turnstile_csp_coexists_with_chatbot(self):
+        from freight.site.cloudflare_build import allow_verified_pages_inquiry
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            allow_verified_pages_inquiry(output)
+            for name in ("index.html", "_headers"):
+                content = (output / name).read_text()
+                self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;", content)
+                self.assertIn("connect-src 'self' https://www.bubblav.com", content)
+                self.assertIn("frame-src https://www.bubblav.com", content)
+                self.assertIn("https://challenges.cloudflare.com;", content)
+                self.assertNotIn("connect-src 'none'", content)
+
+
+
+class SignatureFinishTests(unittest.TestCase):
+    """Selective visual tokens without marketing-content or intake changes."""
+
+    def test_white_primary_button_gradient_stops_meet_text_contrast(self):
+        # The button's label is white. Check every base and hover stop,
+        # rather than assuming a branded green is automatically legible.
+        def luminance(hexcolor):
+            channels = [int(hexcolor[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+            linear = [n / 12.92 if n <= 0.04045 else ((n + 0.055) / 1.055) ** 2.4
+                      for n in channels]
+            return sum(a * b for a, b in zip(linear, (0.2126, 0.7152, 0.0722)))
+
+        for color in ("#0b8055", "#086f4b", "#07553a",
+                      "#0c8758", "#087952", "#064b37"):
+            with self.subTest(color=color):
+                self.assertGreaterEqual(1.05 / (luminance(color) + 0.05), 4.5)
+
+
+    def test_premium_surfaces_are_present_and_bounded(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            bundle = build(Path(temporary) / "public")
+            css = (bundle / "foundry.css").read_text(encoding="utf-8")
+            home = (bundle / "index.html").read_text(encoding="utf-8")
+            report = (bundle / "recovery-status-example.html").read_text(encoding="utf-8")
+            self.assertEqual(css.count("RETALLY Signature Finish v1"), 1)
+            for selector in (
+                ".button-signal,.button-cobalt{",
+                ".site-header .navlinks>.button-light{",
+                ".home-simple .opportunity-card{",
+                ".home-simple .price-card-primary{",
+                ".home-simple .price-card-dark{",
+                ".home-simple .form-shell{",
+                ".home-simple .choice-grid input:checked+span{",
+                ".sample-report .report-card.net{",
+                "@media(prefers-reduced-motion:reduce){",
+            ):
+                with self.subTest(selector=selector):
+                    self.assertIn(selector, css)
+            # The published structure and approved claims remain unchanged.
+            self.assertIn('id="auditForm"', home)
+            self.assertIn('id="retallyChatLauncher"', home)
+            self.assertIn("Sample audit", home)
+            self.assertIn("Illustrative only. Not customer results.", home)
+            self.assertIn("No recovery, no recovery fee", home)
+            self.assertIn("Sample Recovery Report", report)
+            self.assertIn("$13,450.00", report)
+            self.assertNotIn("backdrop-filter:blur(", css[css.index("RETALLY Signature Finish v1"):])
+            self.assertNotIn("@keyframes", css[css.index("RETALLY Signature Finish v1"):])
+            self.assertEqual(set(builder.PUBLIC_FILES), {
+                p.relative_to(bundle).as_posix() for p in bundle.rglob("*") if p.is_file()
+            })
 
 
 if __name__ == "__main__":

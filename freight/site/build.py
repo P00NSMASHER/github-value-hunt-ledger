@@ -119,6 +119,69 @@ DEMO_MARKER = '<!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->'
 RATE_TOKEN = "__CONTINGENCY_RECOVERY_RATE__"
 RATE_LABEL_TOKEN = "__CONTINGENCY_RECOVERY_RATE_LABEL__"
 
+# Public site identifier, not an API credential. The widget reads public
+# marketing knowledge only, never customer files or RecoveryOS information.
+BUBBLAV_ID = "b0e3b0a1-8f64-4dcd-ac82-507366428147"
+BUBBLAV_SNIPPET = (
+    '<script src="https://www.bubblav.com/widget.js" '
+    f'data-site-id="{BUBBLAV_ID}" defer></script>'
+)
+
+# The custom button is part of the public marketing artifact, not the vendor iframe.
+# Its click handler uses BubblaV's published window.BubblaV.open() API.
+BUBBLAV_LAUNCHER = (
+    '<button id="retallyChatLauncher" class="retally-chat-launcher" type="button" '
+    'aria-label="Open RETALLY AI chat assistant" aria-haspopup="dialog">'
+    '<span class="retally-chat-orb" aria-hidden="true">'
+    '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">'
+    '<path d="M7 9.8C7 7.15 9.15 5 11.8 5h9.4C23.85 5 26 7.15 26 9.8v9.4'
+    'c0 2.65-2.15 4.8-4.8 4.8h-6.7l-5.25 3.5v-4.17C7.9 22.49 7 21.07 7 19.2V9.8Z" '
+    'stroke="currentColor" stroke-width="2.15" stroke-linejoin="round"/>'
+    '<path d="M12 14.5h9M12 18.5h6" stroke="currentColor" stroke-width="2" '
+    'stroke-linecap="round"/>'
+    '</svg><span class="retally-chat-spark"></span></span>'
+    '<span class="retally-chat-copy"><strong>Ask RETALLY</strong>'
+    '<span>Freight recovery help</span></span></button>'
+)
+BUBBLAV_CONNECT_POLICY = (
+    "https://www.bubblav.com https://bubblav.com https://*.bubblav.com"
+)
+BUBBLAV_POLICY_REPLACEMENTS = (
+    ("script-src 'self';", "script-src 'self' https://www.bubblav.com;"),
+    ("style-src 'self';", "style-src 'self' 'unsafe-inline';"),
+    ("img-src 'self' data:;", "img-src 'self' data: https://www.bubblav.com https://*.bubblav.com;"),
+    (
+        "connect-src 'none';",
+        f"connect-src {BUBBLAV_CONNECT_POLICY}; frame-src {BUBBLAV_CONNECT_POLICY};",
+    ),
+)
+
+
+def _allow_bubblav(content: str, asset: str) -> str:
+    """Allow only the vendor hosts needed by the public chat loader."""
+    for old, new in BUBBLAV_POLICY_REPLACEMENTS:
+        if content.count(old) != 1:
+            raise ValueError(f"Cannot safely update widget CSP: {asset}: {old}")
+        content = content.replace(old, new)
+    # Existing content pages intentionally differ: some allow data: fonts.
+    # Keep that original allowance and add only BubblaV's font origin.
+    font_pattern = r"font-src 'self'( data:)?;"
+    if len(re.findall(font_pattern, content)) != 1:
+        raise ValueError(f"Unexpected font policy: {asset}")
+    content = re.sub(
+        font_pattern,
+        lambda match: f"font-src 'self'{match.group(1) or ''} https://www.bubblav.com;",
+        content,
+    )
+    return content
+
+
+def _embed_bubblav(page: str, asset: str) -> str:
+    if page.count("</body>") != 1 or page.count(BUBBLAV_SNIPPET) != 0:
+        raise ValueError(f"Unexpected widget insertion boundary: {asset}")
+    return _allow_bubblav(page, asset).replace("</body>", BUBBLAV_LAUNCHER + "\n" + BUBBLAV_SNIPPET + "\n</body>")
+
+
 
 def _public_source(name: str) -> Path:
     path = SOURCE
@@ -231,6 +294,13 @@ def build(
         '<p class="microcopy">Sample data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # The marketing chatbot belongs on customer-facing content pages, not
+    # RecoveryOS, the sample accounting report, or the error page. Keep the
+    # original strict policy on all unpublished/private content.
+    for name in PUBLIC_CONTACT_PAGES:
+        text_bundle[name] = _embed_bubblav(text_bundle[name], name)
+    text_bundle["_headers"] = _allow_bubblav(text_bundle["_headers"], "_headers")
 
     # Fail closed before publishing any source text containing the removed private contact.
     # Log only the filename, never the discovered private value.
