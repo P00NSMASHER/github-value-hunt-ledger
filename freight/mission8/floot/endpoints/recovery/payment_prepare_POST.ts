@@ -4,6 +4,7 @@ import { db } from "../../helpers/db";
 import type { JsonValue } from "../../helpers/schema";
 import { recoveryHash } from "../../helpers/recoveryHash";
 import { requireRecoveryTenant, requireReviewPermission } from "../../helpers/recoveryTenant";
+import { NotAuthenticatedError } from "../../helpers/getSetServerSession";
 import { schema, OutputType } from "./payment_prepare_POST.schema";
 
 /** M8 staging: PostgreSQL is authoritative for eligibility and conserved allocation. */
@@ -40,7 +41,11 @@ export async function handle(request: Request) {
     };
     return new Response(superjson.stringify(output),{headers:{"Content-Type":"application/json"}});
   } catch(error) {
+    if(error instanceof NotAuthenticatedError) {
+      return new Response(superjson.stringify({error:"Not authenticated"}),{status:401});
+    }
     const message = error instanceof Error ? error.message : "Financial payment preparation failed";
     return new Response(superjson.stringify({error:message}),{status:400});
   }
 }
+
