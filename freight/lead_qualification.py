@@ -29,7 +29,8 @@ class AuditLeadProfile:
     has_rate_authority: bool
     has_shipment_records: bool
     has_payment_evidence: bool
-    previously_audited: bool = False
+    # None means the prior-auditor status has not been verified.
+    previously_audited: bool | None = None
     known_or_suspected_issue: bool = False
 
     def __post_init__(self):
@@ -50,7 +51,10 @@ class AuditLeadProfile:
             "has_payment_evidence", "previously_audited",
             "known_or_suspected_issue",
         ):
-            if type(getattr(self, field)) is not bool:
+            value = getattr(self, field)
+            if field == "previously_audited" and value is None:
+                continue  # Unknown stays unqualified until manually resolved.
+            if type(value) is not bool:
                 raise ValueError(field + " must be a boolean")
 
 
@@ -82,8 +86,11 @@ def qualify_free_audit(profile: AuditLeadProfile) -> QualificationDecision:
     # The standard scale-based routes must not silently override an incumbent
     # auditor or already-reviewed population. No incremental recovery is
     # presumed until a human verifies the prior scope and claim entitlement.
-    if profile.previously_audited:
-        reasons.append("prior_audit_overlap_check")
+    if profile.previously_audited is not False:
+        reasons.append(
+            "prior_audit_overlap_check" if profile.previously_audited is True
+            else "prior_audit_status_unverified"
+        )
         if not profile.has_rate_authority:
             reasons.append("rate_authority_needs_review")
         if not corroborating_records:
@@ -91,7 +98,7 @@ def qualify_free_audit(profile: AuditLeadProfile) -> QualificationDecision:
         return QualificationDecision(
             QualificationState.NEEDS_REVIEW,
             tuple(reasons),
-            "Reconcile prior audit scope, open claims and incumbent fee rights before substantive work.",
+            "Verify prior audit status, open claims and incumbent rights before substantive work.",
         )
 
     scaled = profile.annual_freight_spend_usd >= 1_000_000 or profile.monthly_shipments >= 250
@@ -135,8 +142,6 @@ def qualify_free_audit(profile: AuditLeadProfile) -> QualificationDecision:
         reasons.append("rate_authority_needs_review")
     if not corroborating_records:
         reasons.append("supporting_records_need_review")
-    if profile.previously_audited:
-        reasons.append("prior_audit_overlap_check")
     if not reasons:
         reasons.append("manual_economic_review")
     return QualificationDecision(
