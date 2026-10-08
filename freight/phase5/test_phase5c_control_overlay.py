@@ -25,7 +25,7 @@ class Phase5CControlAcceptance(unittest.TestCase):
         html=render_dashboard(self.dataset)
         for needle in (
             'id="signed-reconciliation"','OPEN_UNVERIFIED','INCONCLUSIVE',
-            'Zero actual company revenue','Refund','fictional',
+            'Zero actual company revenue','Fee refunded','fictional',
             'NO genuine buyer, carrier or banking attestation',
         ):
             self.assertIn(needle,html)
