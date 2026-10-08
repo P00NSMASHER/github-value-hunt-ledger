@@ -44,9 +44,10 @@ class Phase5GSeparatePrincipal(unittest.TestCase):
             ).fetchone()
             if db!="retally_phase5_ci" or cluster in {QA,PRODUCTION}:
                 raise RuntimeError("REFUSE_PRODUCTION_OR_HOSTED_QA")
-            expected="'retally_phase5_ci'"
             migration=(ROOT/"phase5g_disposable_definer.sql").read_text(encoding="utf8")
-            if migration.count(expected)!=1 or "SECURITY DEFINER" not in migration:
+            if ("current_database() <> 'retally_phase5_ci'" not in migration or
+                "ALTER FUNCTION phase5c_qa.guard_signed_financial_record()" not in migration or
+                "SECURITY DEFINER" not in migration):
                 raise RuntimeError("UNEXPECTED_QA_ONLY_MIGRATION")
             con.execute(migration)
             cls.app_secret=secrets.token_urlsafe(40)
