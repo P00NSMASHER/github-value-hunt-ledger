@@ -82,9 +82,10 @@ permissions, enable production flags, change Zoho MX, or claim provider delivery
    Provider `queued` or `delivered` API disposition is **not** Zoho inbox proof.
    Mark `delivery_verified` only after independent inbox comparison.
 5. Resolve any pending or stale records before the 90-day retention deadline.
-   The current request handler's opportunistic deletion is NOT a substitute for
-   a documented retention/deletion process; it can expire unreconciled records.
-   Escalate missing notifications well before retention. Do not auto-resend
+   Merged PR #330 removed inquiry-row deletion from the POST handler. No new
+   lead submission may silently erase an unresolved or legally held record.
+   Retention/deletion requires a separately reviewed, owner-approved case process.
+   Escalate missing notifications well before a retention review. Do not auto-resend
    pending entries because a prior provider response may have timed out after
    actually sending, and duplicates can harm customers.
 6. If the email app does not open, the prepared form must still display an
@@ -105,7 +106,7 @@ acceptance and ongoing operations.
 ## Retention, access and reconciliation
 - Data owner: RETALLY. Purpose: respond to commercial Free Recovery Audit inquiries, not take freight files or grant collections authority.
 - D1 table stores restricted name, business email, company, broad modes/spend bands, selected optional context, timestamps and delivery state; no file bytes, secrets or raw IP. Cloudflare account administrators only. Do not include raw PII in public access logs or CI artifacts.
-- Normal qualification retention: up to 90 days unless superseded by a documented engagement/legal obligation. The POST handler opportunistically removes rows older than 90 days but this is **not** a guaranteed cron job. Account owner must perform a scheduled monthly purge or add an independently verified scheduled cleanup task before activation. Delete old `inquiry_limits` rows too.
+- Normal qualification retention: target up to 90 days unless superseded by a documented engagement, unresolved case, legal hold or other lawful obligation. The POST handler **does not delete inquiry records**; merged PR #330 removed opportunistic inquiry deletion to prevent silent lead loss. Require a legally reviewed manual/operator workflow with documented case status, retention exception, approved erasure and audit evidence before enabling record deletion. Only expired anonymous `inquiry_limits` buckets are cleaned by new-submission handling. Do not schedule blanket purges of unresolved inquiries.
 - Example operator commands through Cloudflare D1 console (never run from browser): `SELECT reference, accepted_at, notification_status FROM inquiries WHERE notification_status='pending' ORDER BY accepted_at;`; `DELETE FROM inquiries WHERE accepted_at < strftime('%s','now') - 7776000;`; `DELETE FROM inquiry_limits WHERE expires_at < strftime('%s','now');`.
 - Verify actual inbox receipt before marking `delivery_verified`; provider HTTP 200 is insufficient.
 - Customer correction/deletion requests go to `jay@retallyrecovery.com`, with the returned receipt reference. Keep deletion audit evidence without retaining raw request contents.
