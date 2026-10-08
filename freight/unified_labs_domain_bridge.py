@@ -48,7 +48,7 @@ class FictionalReleaseAuthorization:
 def validate_synthetic_authority(a: FictionalReleaseAuthorization) -> None:
     if not re.fullmatch(r"SIM-TENANT-[0-9]+", a.tenant):
         raise ValueError("synthetic tenant required")
-    if not re.fullmatch(r"INV-[A-Za-z0-9-]+", a.source_invoice_id):
+    if not re.fullmatch(r"INV-[A-Za-z0-9_-]+", a.source_invoice_id):
         raise ValueError("invoice identity required")
     if not a.source_customer_id.startswith("FICTIONAL-"):
         raise ValueError("fictional customer identity required")
