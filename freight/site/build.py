@@ -184,7 +184,7 @@ def build(
     for name, page in tuple(text_bundle.items()):
         text_bundle[name] = page.replace(
             CONTACT_LINK,
-            'data-contact-link href="mailto:' + safe_contact + '?subject=Freight%20Recovery%20question"',
+            'data-contact-link href="mailto:' + safe_contact + '?subject=RETALLY%20question"',
         )
 
     page, count = STATUS_PATTERN.subn(
