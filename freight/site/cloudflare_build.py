@@ -23,19 +23,31 @@ EXPECTED_FILES = len(FREIGHT_PUBLIC_FILES) + len(RECOVERY_PUBLIC_FILES)
 def allow_verified_pages_inquiry(bundle: Path) -> None:
     """Enable only Pages' same-origin API and managed Turnstile script/frame.
 
-    The original GitHub Pages bundle intentionally retains connect-src 'none',
-    and can only prepare an email draft. No other site or asset is widened.
+    The original GitHub Pages bundle retains its BubblaV-only connections
+    and prepares email drafts. The Cloudflare build also permits the existing
+    same-origin inquiry API and managed Turnstile challenge.
     """
     for name in ("index.html", "_headers"):
         path = bundle / name
         content = path.read_text(encoding="utf-8")
-        script = "script-src 'self';"
-        connect = "connect-src 'none';"
-        if content.count(script) != 1 or content.count(connect) != 1:
+        script = "script-src 'self' https://www.bubblav.com;"
+        connect = ("connect-src https://www.bubblav.com https://bubblav.com "
+                   "https://*.bubblav.com;")
+        frame = ("frame-src https://www.bubblav.com https://bubblav.com "
+                 "https://*.bubblav.com;")
+        if any(content.count(item) != 1 for item in (script, connect, frame)):
             raise RuntimeError(f"Cloudflare CSP source changed unexpectedly: {name}")
-        content = content.replace(script, "script-src 'self' https://challenges.cloudflare.com;")
-        content = content.replace(connect,
-            "connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com;")
+        content = content.replace(
+            script, "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;"
+        )
+        content = content.replace(
+            connect, "connect-src 'self' https://www.bubblav.com https://bubblav.com "
+            "https://*.bubblav.com https://challenges.cloudflare.com;"
+        )
+        content = content.replace(
+            frame, "frame-src https://www.bubblav.com https://bubblav.com "
+            "https://*.bubblav.com https://challenges.cloudflare.com;"
+        )
         path.write_text(content, encoding="utf-8")
 
 

@@ -224,7 +224,9 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn(">sales@freightfixture.com</a>", index)
             self.assertNotIn('type="file"', index.lower())
             self.assertIn("form-action 'none'", index)
-            self.assertIn("connect-src 'none'", index)
+            self.assertIn("connect-src https://www.bubblav.com", index)
+            self.assertIn("form-action 'none'", index)
+            self.assertNotIn("connect-src 'self'", index)
 
     def test_pages_have_unique_ids_and_resolvable_local_links(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -411,6 +413,43 @@ class PublicBuildTests(unittest.TestCase):
                 build(output)
             self.assertEqual(marker.read_text(), "unchanged")
             self.assertEqual(["keep.txt"], [file.name for file in output.iterdir()])
+
+
+class PublicChatbotTests(unittest.TestCase):
+    """Prevent chat embedding from breaking the audited publication boundary."""
+
+    def test_widget_is_present_once_on_public_marketing_pages(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            expected_script = (
+                '<script src="https://www.bubblav.com/widget.js" '
+                'data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147" defer></script>'
+            )
+            for name in builder.PUBLIC_CONTACT_PAGES:
+                with self.subTest(page=name):
+                    html = (output / name).read_text()
+                    self.assertEqual(html.count(expected_script), 1)
+                    self.assertIn("script-src 'self' https://www.bubblav.com;", html)
+                    self.assertIn("connect-src https://www.bubblav.com", html)
+                    self.assertIn("frame-src https://www.bubblav.com", html)
+            for name in ("404.html", "recovery-status-example.html"):
+                self.assertNotIn(expected_script, (output / name).read_text())
+            self.assertIn("Optional AI chat assistant", (output / "privacy.html").read_text())
+            self.assertIn("https://www.bubblav.com", (output / "_headers").read_text())
+
+    def test_cloudflare_turnstile_csp_coexists_with_chatbot(self):
+        from freight.site.cloudflare_build import allow_verified_pages_inquiry
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            allow_verified_pages_inquiry(output)
+            for name in ("index.html", "_headers"):
+                content = (output / name).read_text()
+                self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;", content)
+                self.assertIn("connect-src 'self' https://www.bubblav.com", content)
+                self.assertIn("frame-src https://www.bubblav.com", content)
+                self.assertIn("https://challenges.cloudflare.com;", content)
+                self.assertNotIn("connect-src 'none'", content)
 
 
 if __name__ == "__main__":
