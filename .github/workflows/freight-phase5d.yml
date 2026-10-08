@@ -8,6 +8,8 @@ on:
       - 'freight/phase5/test_phase5e_*'
       - 'freight/phase5/phase5g_*'
       - 'freight/phase5/test_phase5g_*'
+      - 'freight/phase5/phase5h_*'
+      - 'freight/phase5/test_phase5h_*'
       - '.github/workflows/freight-phase5d.yml'
   workflow_dispatch:
 
@@ -103,6 +105,29 @@ jobs:
           path: |
             /tmp/retally-phase5g/index.html
             /tmp/retally-phase5g/phase5g_executive.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Verify principal-scoped Phase 5H operator report
+        run: |
+          PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_phase5h_control_overlay.py
+          PYTHONPATH=. python -m freight.phase5.phase5h_control_overlay --out /tmp/retally-phase5h
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/retally-phase5h/phase5h_executive.json').read_text())['phase5h']
+          assert x['phase5g_and_phase5h_verifier_tests_passed']==14
+          assert x['hosted_floot_restricted_credential_proven'] is False
+          assert x['stolen_verifier_credential_direct_sql_bypass_fixed'] is False
+          assert x['historical_findings_closed']==0
+          print('Principal tenant RLS verified in disposable CI only; hosted security blocked')
+          PY
+      - name: Preserve Phase 5H read-only executive dashboard
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-phase5h-principal-tenant-isolation-dashboard
+          path: |
+            /tmp/retally-phase5h/index.html
+            /tmp/retally-phase5h/phase5h_executive.json
           if-no-files-found: error
           retention-days: 14
       - name: Enforce release and original-source boundaries

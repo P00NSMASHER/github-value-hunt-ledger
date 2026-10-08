@@ -16,6 +16,7 @@ import unittest
 
 import psycopg
 from psycopg import sql
+from psycopg.types.json import Jsonb
 from psycopg.conninfo import conninfo_to_dict
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding,PublicFormat
@@ -72,6 +73,12 @@ class Phase5GSeparatePrincipal(unittest.TestCase):
                      rolbypassrls FROM pg_roles WHERE rolname=%s""",(principal,)).fetchone()
                 if not privileges or any(privileges):
                     raise RuntimeError("PRINCIPAL_UNEXPECTEDLY_PRIVILEGED")
+            # Phase 5H binds financial RLS to the real DB-authenticated
+            # principal, never a client-provided tenant ID or spoofable GUC.
+            rls=(ROOT/"phase5h_principal_rls.sql").read_text(encoding="utf8")
+            if "current_database()<>'retally_phase5_ci'" not in rls:
+                raise RuntimeError("MISSING_DISPOSABLE_TENANT_RLS_GUARD")
+            con.execute(rls)
         cls.client_args=conninfo_to_dict(cls.admin_dsn)
 
     def connect(self,principal):
@@ -229,6 +236,69 @@ class Phase5GSeparatePrincipal(unittest.TestCase):
             finally:
                 con.rollback()
         self.assertEqual(self.count(),0)
+
+
+    def test_database_tenant_rls_prevents_cross_tenant_read(self):
+        with closing(psycopg.connect(self.admin_dsn,autocommit=True)) as owner:
+            owner.execute("""INSERT INTO phase5c_qa.cases
+                (tenant_id,case_id,customer_id,invoice_id,carrier_id,currency,max_claim_cents)
+                VALUES('SIM-OTHER-TENANT',%s,'SIM-OTHER-CUSTOMER',
+                       'SIM-OTHER-INVOICE','SIM-OTHER-CARRIER','USD',0)""",
+                       (self.case_id,))
+        with closing(self.connect(VERIFIER)) as verifier:
+            rows=verifier.execute("""SELECT case_id FROM phase5c_qa.cases
+                          WHERE tenant_id='SIM-OTHER-TENANT'""").fetchall()
+            self.assertEqual(rows,[])
+            self.assertEqual(verifier.execute("""SELECT count(*) FROM phase5c_qa.issuer_keys
+                          WHERE tenant_id='SIM-OTHER-TENANT'""").fetchone()[0],0)
+
+    def test_database_authenticated_principal_denies_cross_tenant_insert(self):
+        # Even a correctly signed body and previously pinned foreign tenant
+        # root cannot bypass the role's principal->tenant mapping.
+        foreign={**self.payload,"tenantId":"SIM-OTHER-TENANT"}
+        sig=base64.b64encode(self.private.sign(signed_bytes(foreign))).decode()
+        with closing(psycopg.connect(self.admin_dsn,autocommit=True)) as owner:
+            owner.execute("""INSERT INTO phase5c_qa.cases
+                (tenant_id,case_id,customer_id,invoice_id,carrier_id,currency,max_claim_cents)
+                VALUES('SIM-OTHER-TENANT',%s,'SIM-P5G-CLIENT',
+                       'SIM-P5G-INVOICE','SIM-P5G-CARRIER','USD',0)""",(self.case_id,))
+            owner.execute("""INSERT INTO phase5c_qa.issuer_keys
+                (tenant_id,key_id,role,public_key_pem,enabled_from,expires_at)
+                VALUES('SIM-OTHER-TENANT',%s,'BUYER',%s,'2026-09-01','2027-01-01')""",
+                (self.issuer,self.pinned[self.issuer].public_key_pem))
+        with closing(self.connect(VERIFIER)) as verifier:
+            with self.assertRaisesRegex(AdmissionRejected,"INDEPENDENT_CASE_SCOPE_MISMATCH"):
+                admit_fictional_contract(verifier,foreign,sig,
+                    {self.issuer:PinnedIssuer(self.issuer,"SIM-OTHER-TENANT",
+                        "BUYER",self.pinned[self.issuer].public_key_pem)})
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                verifier.execute("""INSERT INTO phase5c_qa.documents(
+                    tenant_id,case_id,record_id,kind,economic_key,reference_id,
+                    amount_cents,fee_bps,currency,occurred_at,source_sha256,
+                    issuer_key_id,body,signature_b64)
+                    VALUES(%s,%s,%s,'CONTRACT',%s,NULL,0,3000,'USD',
+                        '2026-10-03T12:00:00Z',%s,%s,%s,%s)""",
+                    ("SIM-OTHER-TENANT",self.case_id,self.record_id,
+                     self.payload["economicKey"],self.payload["sourceHash"],
+                     self.issuer,Jsonb(foreign),sig))
+            with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                # The verifier cannot edit its principal->tenant mapping.
+                verifier.execute("""UPDATE phase5h_qa.principal_tenants
+                                    SET tenant_id='SIM-OTHER-TENANT'
+                                    WHERE principal_name=%s""",(VERIFIER,))
+        self.assertEqual(self.count(),0)
+
+    def test_principal_bound_rls_is_enabled_on_all_three_tables(self):
+        with closing(psycopg.connect(self.admin_dsn,autocommit=True)) as owner:
+            rows=owner.execute("""SELECT relname,relrowsecurity FROM pg_class
+                          WHERE oid IN ('phase5c_qa.cases'::regclass,
+                                        'phase5c_qa.issuer_keys'::regclass,
+                                        'phase5c_qa.documents'::regclass)""").fetchall()
+            self.assertEqual(len(rows),3)
+            self.assertTrue(all(enabled for _,enabled in rows))
+            assigned=owner.execute("""SELECT tenant_id FROM phase5h_qa.principal_tenants
+                    WHERE principal_name=%s""",(VERIFIER,)).fetchone()[0]
+            self.assertEqual(assigned,"SIM-P5B-HANDLER-TENANT-A")
 
 
 if __name__=="__main__":
