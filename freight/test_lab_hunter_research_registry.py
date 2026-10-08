@@ -27,7 +27,9 @@ def test_cumulative_findings_do_not_silently_disappear():
     assert len(set(identities))==len(identities)
     assert ORIGINAL_IDS.issubset(identities)
     assert findings["entries_total"]==len(rows)
-    assert len(rows)>=26
+    assert len(rows)>=28
+    assert findings["historical_open_findings"]==26
+    assert {r["id"] for r in rows if r["id"].startswith("GATE-")}=={"GATE-001","GATE-002"}
     assert sum(findings["cluster_counts"].values())==len(rows)
 
 def test_research_is_never_marked_production_approved():
@@ -35,7 +37,10 @@ def test_research_is_never_marked_production_approved():
     assert findings["status"]=="RELEASE_FINANCIAL_ASSURANCE_BLOCKED"
     for row in findings["entries"]:
         assert row["customer_or_production_impact"]=="NOT_ESTABLISHED"
-        assert row["remediation"]!="FIXED"
+        if row["id"] in ORIGINAL_IDS:
+            assert row["remediation"]=="OPEN_UNVERIFIED"
+        else:
+            assert row["remediation"]=="FIXED_AND_REGRESSION_TESTED_RESEARCH_GATE_ONLY"
         assert row["customer_or_production_impact"]=="NOT_ESTABLISHED"
 
 def test_donor_reuse_is_review_only_with_exact_revisions():
