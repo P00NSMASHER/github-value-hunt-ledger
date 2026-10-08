@@ -70,6 +70,14 @@ verification path, not another technical subproject or an inferred approval.
   "RETALLY inbound verification | controlled test 2026-10-08" and
   "RETALLY inbox delivery test | October 8". Gmail SENT is sender evidence,
   **not** evidence of Zoho delivery or recipient acknowledgment.
+- **Independent read-only Cloudflare DNS inspection:** active zone
+  `retallyrecovery.com` has Zoho MX records `mx.zoho.com` (priority 10),
+  `mx2.zoho.com` (20) and `mx3.zoho.com` (50); Zoho-containing SPF,
+  a `zmail._domainkey` DKIM TXT selector and a `_dmarc` record
+  are present. This establishes configured mail-routing/authentication
+  DNS records only. It **does not** prove mailbox acceptance, active
+  internal Zoho user provisioning, SPF/DKIM authentication of any sent
+  individual email, or arrival of either test message.
 - The Zoho Mail inbox itself is not connected to an available read-capable
   account tool. A connector-directory lookup surfaced Zoho CRM but no direct
   Zoho Mail inbox connector; other mailbox connectors do not grant access to
