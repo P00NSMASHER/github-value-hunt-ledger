@@ -34,7 +34,7 @@ def test_research_is_never_marked_production_approved():
     findings, _=documents()
     assert findings["status"]=="RELEASE_FINANCIAL_ASSURANCE_BLOCKED"
     for row in findings["entries"]:
-        assert row["scope"] if "scope" in row else row.get("production_or_customer_impact","NOT_ESTABLISHED")!="PRODUCTION_VERIFIED"
+        assert row["customer_or_production_impact"]=="NOT_ESTABLISHED"
         assert row["remediation"]!="FIXED"
         assert row["customer_or_production_impact"]=="NOT_ESTABLISHED"
 
