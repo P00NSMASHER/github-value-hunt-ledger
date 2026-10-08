@@ -361,4 +361,58 @@
     });
   }
 
+
+  // RETALLY's glossy launcher uses BubblaV's public widget.open() API.
+  // Fail open to BubblaV's native launcher if the vendor API does not respond.
+  const retallyChat = byId("retallyChatLauncher");
+  if (retallyChat) {
+    const body = document.body;
+    let pendingOpenAt = 0;
+    let openedAtLeastOnce = false;
+    const fallbackToVendor = () => {
+      pendingOpenAt = 0;
+      body.classList.remove("retally-chat-open");
+      body.classList.add("retally-chat-fallback");
+      retallyChat.hidden = true;
+    };
+    const syncRetallyChat = () => {
+      if (body.classList.contains("retally-chat-fallback")) return;
+      const isOpen = window.BubblaV?.isOpen?.() === true;
+      if (isOpen) {
+        openedAtLeastOnce = true;
+        pendingOpenAt = 0;
+        body.classList.add("retally-chat-open");
+        retallyChat.hidden = true;
+        return;
+      }
+      if (pendingOpenAt && Date.now() - pendingOpenAt < 3200) return;
+      if (pendingOpenAt && !openedAtLeastOnce) {
+        fallbackToVendor();
+        return;
+      }
+      pendingOpenAt = 0;
+      body.classList.remove("retally-chat-open");
+      retallyChat.hidden = false;
+    };
+    body.classList.add("retally-chat-enhanced");
+    retallyChat.addEventListener("click", () => {
+      const api = window.BubblaV;
+      const frame = byId("bv-chat-frame");
+      if (!frame || typeof api?.open !== "function") {
+        fallbackToVendor();
+        return;
+      }
+      pendingOpenAt = Date.now();
+      body.classList.add("retally-chat-open");
+      retallyChat.hidden = true;
+      try {
+        api.open();
+      } catch (_error) {
+        fallbackToVendor();
+      }
+    });
+    window.setInterval(syncRetallyChat, 500);
+    syncRetallyChat();
+  }
+
 })();
