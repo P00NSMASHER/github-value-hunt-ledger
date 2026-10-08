@@ -210,7 +210,16 @@ async function notify(env, reference, p) {
   );
   if (!res.ok) return false;
   const json = await res.json();
-  return json.success === true || !!json.id;
+  // API-level success is not evidence that our intended recipient was accepted.
+  // In particular, a suppressed recipient can yield success:true.
+  // Treat queued as provider-accepted, not as delivered to the actual inbox.
+  if (json?.success !== true || !json.result) return false;
+  const target = env.INQUIRY_NOTIFY_TO.toLowerCase();
+  const delivered = Array.isArray(json.result.delivered) ? json.result.delivered : [];
+  const queued = Array.isArray(json.result.queued) ? json.result.queued : [];
+  const suppressed = Array.isArray(json.result.suppressed_recipients) ? json.result.suppressed_recipients : [];
+  const hasTarget = values => values.some(v => typeof v === "string" && v.toLowerCase() === target);
+  return !hasTarget(suppressed) && (hasTarget(delivered) || hasTarget(queued));
 }
 export async function onRequestPost({ request, env }) {
   // A backend deployment alone does not enable this service for the public.
