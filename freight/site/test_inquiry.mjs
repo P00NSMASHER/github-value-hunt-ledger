@@ -17,9 +17,9 @@ function env(db) {return {
   INQUIRY_NOTIFY_TO:"jay@retallyrecovery.com",INQUIRY_NOTIFY_FROM:"jay@retallyrecovery.com",INQUIRY_DB:db
 };}
 function mockDb({failInsert=false}={}) {
-  const inquiries=new Map(),limits=new Map();
-  return {inquiries,limits,
-    prepare(sql) {return { bind(...params) {return {
+  const inquiries=new Map(),limits=new Map(),sqlCalls=[];
+  return {inquiries,limits,sqlCalls,
+    prepare(sql) {sqlCalls.push(sql);return { bind(...params) {return {
       async first() {
         if(sql.startsWith("SELECT reference")) return inquiries.get(params[0]) || null;
         if(sql.startsWith("INSERT INTO inquiry_limits")) {
@@ -210,4 +210,30 @@ test("email notification is a plain-text contact summary, not an invoice package
   const s=notificationText("RA-20261008-ABCDEF12",normalize(good()));
   assert.match(s,/Contact request only/);
   assert.doesNotMatch(s,/<html>|attachment/);
+});
+
+test("historical pending, provider-only and delivery-verified inquiries never auto-purge on a new submission", async () => {
+  const remote=mockRemote({notify:false});
+  try {
+    const db=mockDb(),e=env(db);
+    const old=Math.floor(Date.now()/1000)-91*86400;
+    for(const state of ["pending","provider_accepted","delivery_verified"]) {
+      db.inquiries.set("old-"+state,{
+        reference:"RA-20260708-"+state,
+        fingerprint:"synthetic",
+        notification_status:state,
+        accepted_at:old
+      });
+    }
+    const result=await onRequestPost({request:request(),env:e});
+    assert.equal(result.status,202);
+    assert.equal(db.inquiries.size,4);
+    for(const state of ["pending","provider_accepted","delivery_verified"]) {
+      assert.ok(db.inquiries.has("old-"+state));
+    }
+    assert.equal(db.sqlCalls.filter(sql => /^DELETE\\s+FROM\\s+inquiries\\b/i.test(sql)).length,0,
+      "Public intake handler must never delete inquiry content or aged unresolved cases");
+    assert.ok(db.sqlCalls.some(sql => sql.startsWith("DELETE FROM inquiry_limits")),
+      "Expiring anonymized rate buckets remains independently permitted");
+  } finally { remote.restore(); }
 });
