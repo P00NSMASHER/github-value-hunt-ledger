@@ -44,6 +44,8 @@ jobs:
         run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_isolated_postgres.py
       - name: Execute signed synthetic cash, reversal, fee and refund in disposable PostgreSQL
         run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_phase5c_postgres.py
+      - name: Reproduce owner-DML signature bypass and assert revoked signer is blocked
+        run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_phase5e_admission_boundary.py
       - name: Verify Phase 4 laboratory stack and Ed25519 source boundaries
         run: |
           PYTHONPATH=. python -m pytest -q -rs \
