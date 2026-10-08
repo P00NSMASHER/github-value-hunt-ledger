@@ -1,9 +1,9 @@
 diff --git a/tests/test_phase2_financial.py b/tests/test_phase2_financial.py
 new file mode 100644
-index 0000000..b8f153f
+index 0000000..667a5e9
 --- /dev/null
 +++ b/tests/test_phase2_financial.py
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,236 @@
 +"""Phase 2 offline original StagingTwin adversarial and positive-path coverage."""
 +from __future__ import annotations
 +import copy
@@ -66,7 +66,10 @@ index 0000000..b8f153f
 +        mutated=dict(self.row)
 +        for name in ('expected_base_cents','expected_fuel_cents','expected_accessorial_cents','truth_state','net_eligible_cents'):
 +            mutated[name] = '99999999' if name!='truth_state' else 'NEGATIVE'
-+        self.assertEqual(baseline_public_candidate(self.row),baseline_public_candidate(mutated))
++        self.assertEqual(baseline_public_candidate(public_invoice(self.row)),
++                         baseline_public_candidate(public_invoice(mutated)))
++        with self.assertRaisesRegex(ValueError,'BLIND_DETECTOR_RECEIVED_GOLD'):
++            baseline_public_candidate(self.row)
 +
 +    def test_02_unique_names_preserve_source_account(self):
 +        names={persona_for({'customer_id':r['customer_id']})['name'] for r in self.rows}
@@ -211,6 +214,13 @@ index 0000000..b8f153f
 +        self.go('finance','REFUND',amount_cents=150,evidence_ref='SIM-EVIDENCE-REFUND')
 +        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
 +
++    def test_18b_post_revocation_collection_of_existing_receivable(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE')
++        self.reconcile(1000,'SIM-CREDIT-ONE');self.invoice_fee()
++        self.go('buyer','REVOKE')
++        self.go('finance','FEE_PAY',amount_cents=200,evidence_ref='SIM-EVIDENCE-PAY')
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
 +    def test_19_tampered_realized_amount_fails_independent_replay(self):
 +        self.settlement();self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
 +        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
@@ -231,7 +241,7 @@ index 0000000..b8f153f
 +
 +if __name__=='__main__':unittest.main()
 diff --git a/tests/test_unified.py b/tests/test_unified.py
-index 59c7951..8fa14da 100644
+index 59c7951..d050225 100644
 --- a/tests/test_unified.py
 +++ b/tests/test_unified.py
 @@ -4,6 +4,7 @@ from pathlib import Path
@@ -267,6 +277,15 @@ index 59c7951..8fa14da 100644
     row=next(r for r in self.rows if int(r['invoice_total_cents'])>1000)
     for i,family in enumerate(ATTACK_FAMILIES):
      report=exercise_attack(twin,row,i,family);self.assertTrue(report['detected'],family)
+@@ -202,7 +203,7 @@ class Customers(unittest.TestCase):
+    self.assertTrue(any('COMMUNICATION_BEFORE_LEDGER_EVENT:OFFER' in e
+                        for r in verdict['failed_cases'] for e in r['errors']))
+  def test_gold_does_not_enter_public_customer_report(self):
+-  row=self.rows[0];p=baseline_public_candidate(row)
++  row=self.rows[0];p=baseline_public_candidate(public_invoice(row))
+   self.assertNotIn('gold_truth',p);self.assertNotIn('net_eligible_cents',p)
+  def test_rehashed_financial_forgery_fails_independent_oracle(self):
+   with tempfile.TemporaryDirectory() as p:
 diff --git a/unified/adaptive.py b/unified/adaptive.py
 index 55dc23c..28c6d34 100644
 --- a/unified/adaptive.py
@@ -336,7 +355,7 @@ index 304d5a2..a0eb963 100644
      from collections import Counter
      return {'count':len(rows),'modes':dict(Counter(r['mode'] for r in rows)),
 diff --git a/unified/customers.py b/unified/customers.py
-index fa40b20..e61c975 100644
+index fa40b20..64f3132 100644
 --- a/unified/customers.py
 +++ b/unified/customers.py
 @@ -10,6 +10,7 @@ from pathlib import Path
@@ -356,7 +375,7 @@ index fa40b20..e61c975 100644
      def person(i):
          return STAFF_FIRST[(h//(31+i*17))%len(STAFF_FIRST)]+' '+STAFF_LAST[(h//(47+i*13))%len(STAFF_LAST)]+' (FICTIONAL)'
      return {**FICTIONAL_BUYER,'name':brand,'logistics_manager':person(0),
-@@ -57,19 +58,29 @@ def assign_customer(row,variant):
+@@ -57,19 +58,35 @@ def assign_customer(row,variant):
  
  
  def baseline_public_candidate(row):
@@ -373,7 +392,13 @@ index fa40b20..e61c975 100644
 +    Only fields visible to public_invoice may influence this predictor.
 +    Ground truth is controlled by the separate oracle process.
 +    """
-+    visible=public_invoice(row)
++    forbidden={'truth_state','net_eligible_cents','estimated_recoverable_cents',
++        'truth_overpayment_cents','expected_base_cents','expected_fuel_cents',
++        'expected_accessorial_cents','scenario','competing_rate_cents',
++        'base_rate_cents','fuel_bps','minimum_cents','duplicate_payment_cents'}
++    if forbidden.intersection(row):
++        raise ValueError('BLIND_DETECTOR_RECEIVED_GOLD_OR_RATE_ANSWER_FIELDS')
++    visible=dict(row)
 +    if visible.get('evidence_state')!='VERIFIED_SYNTHETIC':
 +        return {'label':'REVIEW','candidate_cents':0,'reason':'source evidence incomplete'}
 +    # Explicitly weak hypothesis: outlier charge component is NOT a rate proof.
@@ -395,7 +420,7 @@ index fa40b20..e61c975 100644
      messages=[];t=datetime(2026,10,8,9,0,tzinfo=timezone.utc)
      def msg(sender,to,subject,body,days=1,hours=0):
          nonlocal t
-@@ -94,7 +105,7 @@ def _build_message_messages(row,variant,case_id,decision,offer,fee,persona=FICTI
+@@ -94,7 +111,7 @@ def _build_message_messages(row,variant,case_id,decision,offer,fee,persona=FICTI
          'Any fee depends on separately documented, reconciled and attributable recovery and the signed engagement terms.',0,4)
      msg(ap,'Freight Recovery analyst','Invoice and contract documents',
          f'I uploaded a fictional copy of {invoice} and its rate file. '
@@ -404,11 +429,13 @@ index fa40b20..e61c975 100644
          'please confirm how fuel, accessorials and credits affect any variance.',2)
      msg('Freight Recovery analyst',ap,'Source receipt and freeze',
          f'The fictitious source receipt for {invoice} has been preserved. We will not alter the original evidence. '
-@@ -263,13 +274,13 @@ def simulate_engagement(twin,rows,variant,index):
+@@ -262,14 +279,14 @@ def simulate_engagement(twin,rows,variant,index):
+     if variant not in SCENARIOS:raise ValueError('not a supported fictional outcome')
      row=select_for_variant(rows,variant,index)
      name=f'SIM-CASE-CUSTOMER-{index:05d}';tenant='SIM-TENANT-001'
-     public=baseline_public_candidate(row)
+-    public=baseline_public_candidate(row)
 -    twin.create(row,tenant,name)
++    public=baseline_public_candidate(public_invoice(row))
 +    twin.create(row,tenant,name,issue_id=f"SIM-ENGAGEMENT-{index}")
      def go(actor,kind,data=None):return twin.act(name,tenant,actor,kind,data or {})
      errors=[]
@@ -420,7 +447,7 @@ index fa40b20..e61c975 100644
      go('operator','FREEZE',{'evidence_ref':'SIM-EVIDENCE-FROZEN-POPULATION'})
      candidate=public['candidate_cents']
      if variant in ('MISSED_ERROR_SECOND_REVIEW',):candidate=0
-@@ -342,7 +353,7 @@ def simulate_engagement(twin,rows,variant,index):
+@@ -342,7 +359,7 @@ def simulate_engagement(twin,rows,variant,index):
  def run_customer_campaign(rows,directory,count=120):
      p=Path(directory);p.mkdir(parents=True,exist_ok=True)
      db=p/'customer_staging.sqlite3';db.unlink(missing_ok=True)
@@ -822,7 +849,7 @@ index c39988a..3871692 100644
 +        if matching!=[amount]:failures.append('CREDIT_DB_EVENT_MISMATCH:'+cid)
      return failures
 diff --git a/unified/staging.py b/unified/staging.py
-index 482f7ac..8611616 100644
+index 482f7ac..8ede6c1 100644
 --- a/unified/staging.py
 +++ b/unified/staging.py
 @@ -12,12 +12,13 @@ from datetime import datetime, timedelta, timezone
@@ -1040,7 +1067,7 @@ index 482f7ac..8611616 100644
 -                need({'FEE_INVOICED'});req_note()
 -                if not 0<value<=funds['fee_earned']:raise Rejected('UNAUTHORIZED_FEE_COLLECTION')
 -                funds['fee_collected']=value;state='FEE_PAID'
-+                need({'FEE_INVOICED','FEE_PAID'});req_note()
++                need({'FEE_INVOICED','FEE_PAID','REVIEW_REQUIRED'});req_note()
 +                if not 0<value<=funds['fee_earned']-funds['fee_collected']+funds['fee_refunded']-funds['fee_written_off']:
 +                    raise Rejected('UNAUTHORIZED_FEE_COLLECTION')
 +                funds['fee_collected']+=value;state='FEE_PAID'
