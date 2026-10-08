@@ -57,6 +57,73 @@
 
 **The economic gate is also human:** The zero-upfront model must include founder/analyst/reviewer labor, acquisition, admin time, zero-recovery exposure and three-pilot cumulative downside. The research what-if model and 30% software default are not signed pricing or realized profits. Do not change price or guarantee returns based on simulated margin.
 
+## C1. Final external-gate evidence check (2026-10-08)
+
+**Decision: retain G1 and G2 as NO-GO.** This is the actual owner's shortest
+verification path, not another technical subproject or an inferred approval.
+
+### G1: company email receipts
+
+- A fresh scoped search of the connected Gmail account for
+  `to:jay@retallyrecovery.com after:2026/10/06` returned the two
+  October 8 controlled messages **only with Gmail SENT labels**:
+  "RETALLY inbound verification | controlled test 2026-10-08" and
+  "RETALLY inbox delivery test | October 8". Gmail SENT is sender evidence,
+  **not** evidence of Zoho delivery or recipient acknowledgment.
+- The Zoho Mail inbox itself is not connected to an available read-capable
+  account tool. A connector-directory lookup surfaced Zoho CRM but no direct
+  Zoho Mail inbox connector; other mailbox connectors do not grant access to
+  this business mailbox. Do not change MX, claim actual receipt, or use
+  another mailbox's SENT folder as a substitute.
+- **Owner action:** open the actual Zoho Mail Inbox (and Spam/All Mail)
+  for `jay@retallyrecovery.com`. Locate both subjects and record exact
+  sender, recipient, message ID, received timestamp and delivery header,
+  without exposing message credentials. If neither is present, investigate
+  the existing Zoho mailbox configuration using only the authorized owner
+  interface. After authentic recipient evidence, the site operator still
+  must separately prove API sender permission, stable D1/provider/Zoho
+  reference correlation and mobile/browser experience before setting either
+  direct-online-submission flag to `1`.
+- **Gate remains blocked:** no recipient-side evidence was obtained in this
+  execution. No new test message was sent or online intake enabled.
+
+### G2: legal contracting and brand/trade-name use
+
+- Public official Pennsylvania references:
+  https://www.pa.gov/agencies/dos/programs/business/information-services/record-searches
+  and https://file.dos.pa.gov/search/business .
+  Pennsylvania says its business filing search provides registered entity/file
+  number, precise name, status and filing details. The official
+  automated page returned **HTTP 403** to public web retrieval; an
+  attempted separate public browser lookup was unavailable. Neither
+  an exact-name registered RETALLY entity nor a zero-result name-availability
+  finding was established.
+- The USPTO official mark search is https://tmsearch.uspto.gov/ .
+  No completed live query/result set or confusion assessment was
+  obtained in this execution; absence of search-engine hits is **not**
+  trademark clearance. Similar names, actual commercial use and
+  overlapping services require qualified legal review.
+- **Owner/counsel action:** identify the actual contracting legal entity
+  and supply the authoritative PA entity/file number or formation proof;
+  confirm whether RETALLY is an approved legal name or registered fictitious
+  name; separately perform documented USPTO and state mark clearance and
+  approve the exact customer-facing seller name and signature block.
+  Do not state an entity is registered, a mark is available, or contracts
+  are enforceable without reviewed evidence.
+- **Gate remains blocked:** no new formation, fictitious-name registration,
+  trademark application, paid search/certificate or legal engagement was
+  executed or authorized.
+
+### Stop condition
+
+These evidence gates require **owner, counsel and the actual Zoho recipient**
+to verify records. GitHub source commits, self-reported attestations,
+sample screenshots, generated legal language, DNS configuration and model
+reasoning cannot close them. Leave production inquiry and customer-data
+permissions disabled until their corresponding independent acceptance
+criteria are met. Do not create further parallel missions or software systems
+to substitute for this finite verification.
+
 ## D. One repeatable first-customer operating sequence
 
 1. **Find and discuss, not assume:** Research a business with relevant freight operations. Speak about broad freight spend, carrier modes, existing auditor, buyer authority and document availability using non-sensitive metadata only. Do not equate a researched company with a qualified customer.
