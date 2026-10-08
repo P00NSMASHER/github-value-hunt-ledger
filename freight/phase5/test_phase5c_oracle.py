@@ -95,6 +95,10 @@ class Phase5CIndependentOracleTests(unittest.TestCase):
     def test_cross_tenant_record_rejected_even_if_resigned(self):
         bad=copy.deepcopy(self.fixture)
         bad["documents"][1]["tenant_id"]="SIM-OTHER-TENANT"
+        carrier_key=next(x for x in bad["keys"] if x["role"]=="CARRIER")
+        foreign_key=copy.deepcopy(carrier_key)
+        foreign_key["tenant_id"]="SIM-OTHER-TENANT"
+        bad["keys"].append(foreign_key)
         bad=resigned(bad)
         with self.assertRaisesRegex(IndependentProofRejected,"CROSS_TENANT_CASE_OR_CURRENCY"):
             verify_frozen_finances(bad)
