@@ -14,6 +14,7 @@ import {handle as prepare} from "./floot/endpoints/recovery/payment_prepare_POST
 import {handle as authorize} from "./floot/endpoints/recovery/payment_authorize_POST.ts";
 import {handle as event} from "./floot/endpoints/recovery/payment_event_POST.ts";
 import {handle as payments} from "./floot/endpoints/recovery/payments_GET.ts";
+import {requireRecoveryTenant} from "./floot/helpers/recoveryTenant.tsx";
 
 for(const n of ["FLOOT_DATABASE_URL","JWT_SECRET","RETALLY_TESTED_HEAD_SHA"]) assert(process.env[n],"Missing isolated CI variable: "+n);
 assert(/localhost|127[.]0[.]0[.]1/.test(process.env.FLOOT_DATABASE_URL),"Ephemeral local DB only");
@@ -64,6 +65,12 @@ async function run(){
   try{data=superjson.parse(text)}catch{data={unparsed:text.slice(0,120)}}
   return{status:response.status,data};
  }
+ const diagnosticReq=new Request(base+"/_api/recovery/payment_prepare",{method:"POST",headers:{Cookie:cookie,Origin:base}});
+ const resolvedAccess=await requireRecoveryTenant(diagnosticReq);
+ check("authenticated_tenant_identity_matches_fixture",resolvedAccess.tenantId==="handler_t" && Number(resolvedAccess.userId)===Number(who[0].id),{tenant:resolvedAccess.tenantId,user_id:resolvedAccess.userId});
+ const bodyProbe={schema:1,tenant_id:resolvedAccess.tenantId,payer_id:"SIMULATED",payee_id:"SIMULATED",currency:"USD",amount_cents:10000,purpose:"Synthetic authenticated application acceptance",finding_ids:["handler_finding"],idempotency_key:"m11-local-handler-same-001"};
+ const probe=await db.unsafe("SELECT jsonb_typeof($1::jsonb) AS kind, $1::jsonb ->> 'tenant_id' AS tenant, $2::text AS expected",[JSON.stringify(bodyProbe),resolvedAccess.tenantId]);
+ check("jsonb_parameter_tenant_scope",probe[0].kind==="object" && probe[0].tenant===probe[0].expected,probe[0]);
  const basePayload={payerId:"SIMULATED",payeeId:"SIMULATED",currency:"USD",amountCents:10000,
  purpose:"Synthetic authenticated application acceptance",findingIds:["handler_finding"],
  idempotencyKey:"m11-local-handler-same-001"};
