@@ -30,6 +30,29 @@ class FMCSAReferenceError(ValueError):
     pass
 
 
+
+class _RejectRedirects(urllib.request.HTTPRedirectHandler):
+    """Prevent a redirect from disclosing a requested USDOT to another host."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise FMCSAReferenceError("government API redirects are not permitted")
+
+
+def _bounded_government_opener(request, *, timeout):
+    """Only the fixed FMCSA HTTPS origin is allowed, with redirects disabled."""
+    return urllib.request.build_opener(_RejectRedirects()).open(request, timeout=timeout)
+
+
+def _unique_json_object(pairs):
+    """Refuse ambiguous JSON field duplication instead of silently using last."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise FMCSAReferenceError("duplicate government JSON field")
+        result[key] = value
+    return result
+
+
 @dataclass(frozen=True)
 class CarrierCensusReference:
     usdot_number: str
@@ -126,11 +149,14 @@ def lookup_public_carrier(
         headers={"Accept": "application/json", "User-Agent": "RETALLY-source-reference/1.0"},
         method="GET",
     )
-    reader = opener or urllib.request.urlopen
+    reader = opener or _bounded_government_opener
     try:
         with reader(request, timeout=timeout_seconds) as response:
             if getattr(response, "status", None) != 200:
                 raise FMCSAReferenceError("government API did not return HTTP 200")
+            actual_url = response.geturl() if callable(getattr(response, "geturl", None)) else url
+            if actual_url != url:
+                raise FMCSAReferenceError("government API response origin or query changed")
             raw = response.read(MAX_RESPONSE_BYTES + 1)
     except FMCSAReferenceError:
         raise
@@ -139,7 +165,9 @@ def lookup_public_carrier(
     if len(raw) > MAX_RESPONSE_BYTES:
         raise FMCSAReferenceError("government API response exceeds bounded size")
     try:
-        data = json.loads(raw.decode("utf-8"))
+        data = json.loads(raw.decode("utf-8"), object_pairs_hook=_unique_json_object)
+    except FMCSAReferenceError:
+        raise
     except (UnicodeError, ValueError) as exc:
         raise FMCSAReferenceError("invalid JSON carrier reference") from exc
     observed = retrieved_at_utc or datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
