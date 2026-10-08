@@ -44,6 +44,14 @@ class AuditLeadProfile:
             value = getattr(self, field)
             if isinstance(value, bool) or not isinstance(value, int) or value < 0:
                 raise ValueError(field + " must be a non-negative integer")
+        # Never interpret text such as "false" as evidence being present.
+        for field in (
+            "has_invoice_export", "has_rate_authority", "has_shipment_records",
+            "has_payment_evidence", "previously_audited",
+            "known_or_suspected_issue",
+        ):
+            if type(getattr(self, field)) is not bool:
+                raise ValueError(field + " must be a boolean")
 
 
 @dataclass(frozen=True)
@@ -69,6 +77,21 @@ def qualify_free_audit(profile: AuditLeadProfile) -> QualificationDecision:
             QualificationState.INSUFFICIENT_DATA,
             tuple(reasons),
             "Request the minimum invoice population and history details before analyst work.",
+        )
+
+    # The standard scale-based routes must not silently override an incumbent
+    # auditor or already-reviewed population. No incremental recovery is
+    # presumed until a human verifies the prior scope and claim entitlement.
+    if profile.previously_audited:
+        reasons.append("prior_audit_overlap_check")
+        if not profile.has_rate_authority:
+            reasons.append("rate_authority_needs_review")
+        if not corroborating_records:
+            reasons.append("supporting_records_need_review")
+        return QualificationDecision(
+            QualificationState.NEEDS_REVIEW,
+            tuple(reasons),
+            "Reconcile prior audit scope, open claims and incumbent fee rights before substantive work.",
         )
 
     scaled = profile.annual_freight_spend_usd >= 1_000_000 or profile.monthly_shipments >= 250
