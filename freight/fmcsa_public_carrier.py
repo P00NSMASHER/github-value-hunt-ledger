@@ -23,7 +23,7 @@ MAX_RESPONSE_BYTES = 8192
 MAX_TIMEOUT_SECONDS = 10
 USDOT_PATTERN = re.compile(r"^[1-9][0-9]{0,8}$", re.ASCII)
 INT_PATTERN = re.compile(r"^(0|[1-9][0-9]{0,7})$", re.ASCII)
-ALLOWED_FIELDS = frozenset({"dot_number", "legal_name", "nbr_power_unit"})
+ALLOWED_FIELDS = frozenset({"dot_number", "legal_name", "power_units"})
 
 
 class FMCSAReferenceError(ValueError):
@@ -52,11 +52,16 @@ def validate_usdot(number: str) -> str:
 
 
 def build_query_url(number: str) -> str:
-    """A bounded, explicit-column query; never an unfiltered census scan."""
+    """A bounded, explicit-column query; never an unfiltered census scan.
+
+    Official FMCSA metadata identifies dot_number as numeric, legal_name as
+    text, and power_units as text. The obsolete nbr_power_unit field is absent.
+    Verified with official metadata and zero-record SoQL queries, 2026-10-08.
+    """
     usdot = validate_usdot(number)
     params = urllib.parse.urlencode({
-        "$select": "dot_number,legal_name,nbr_power_unit",
-        "$where": "dot_number='" + usdot + "'",
+        "$select": "dot_number,legal_name,power_units",
+        "$where": "dot_number=" + usdot,
         "$limit": "2",
     })
     return API_URL + "?" + params
@@ -79,7 +84,7 @@ def validate_census_response(number: str, document: object, *, retrieved_at_utc:
         raise FMCSAReferenceError("invalid carrier legal name")
     if name != name.strip() or any(ord(c) < 32 or ord(c) == 127 for c in name):
         raise FMCSAReferenceError("unprintable or poorly normalized carrier name")
-    raw_units = row.get("nbr_power_unit")
+    raw_units = row.get("power_units")
     if raw_units is None or raw_units == "":
         power_units = None
     elif isinstance(raw_units, str) and INT_PATTERN.fullmatch(raw_units):
