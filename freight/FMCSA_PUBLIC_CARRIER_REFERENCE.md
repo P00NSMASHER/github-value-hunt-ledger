@@ -44,6 +44,27 @@ The adapter returns `CarrierCensusReference` marked `PUBLIC_CENSUS_REGISTRATION_
 4. FMCSA carrier existence, corporate name or vehicle count cannot establish a customer's invoice, tariff rate, rate applicability, overcharge, accepted claim, funds received, or contingency fee.
 5. This module performs **no automatic training** and provides no overcharge supervision labels. RETALLY's future supervised overcharge model requires permissioned customer invoices, governing rate contracts, independent reviewer labels and documented rights.
 
+## Bounded redirect and source-response safety (Mission 24)
+
+The fixed HTTPS API URL alone was insufficient: Python's default
+`urllib.request.urlopen` follows HTTP 301/302/307/308 redirects. A provider,
+proxy or unexpected response could otherwise send the supplied USDOT number
+to a different destination. The default reader now uses an explicit
+`HTTPRedirectHandler` that **rejects every redirect before following its
+Location**. The returned response's URL is also compared against the
+original exact official query when that response provides URL metadata.
+
+JSON parsing now refuses duplicate keys, including nested duplicate keys,
+rather than silently interpreting the last value. Both defenses are tested
+using **injected network fakes only**. No real carrier identities, caller
+tracking logs, persistent responses, billing features or customer data were
+added. Source metadata, network TLS and the original publisher must still be
+independently accepted as part of any production decision.
+
+This does not prove an unchanged FMCSA API over time. The adapter remains
+read-only, demand-triggered, privacy-limited and unsuitable for bulk training,
+carrier authority issuance or customer-specific financial claims.
+
 ## Reproducible offline acceptance
 
 ```bash
