@@ -4,7 +4,7 @@ Status: BLOCKED until external mail and legal readiness are independently verifi
 
 ## Read-only observations, 2026-10-08
 - `retallyrecovery.com` is an active Cloudflare zone.
-- The visible DNS listing included a Zoho domain-verification TXT record only; no MX/SPF/DKIM/DMARC were found in that listing.
+- Updated Cloudflare zone inspection: Zoho MX (`mx.zoho.com`, `mx2.zoho.com`, `mx3.zoho.com`), SPF (`v=spf1 include:zohomail.com ~all`), and DMARC (`v=DMARC1; p=none`) records are now present, as well as the Zoho verification TXT. Independent public DNS resolved the three MX values. DKIM was **not visible** in the zone listing; selector and service validation still require Zoho Mail administrator evidence. DNS presence does not establish a working mailbox.
 - Cloudflare Pages project `retally` exists with preview hostname `retally-8kr.pages.dev`; project creation does not prove a deployed production website.
 - Draft PR #282 is a deployment *proposal*, not approval to activate DNS or release new site.
 - Catalyst by Zoho integration is **not** Zoho Mail administration; do not infer mailbox readiness from its presence.
