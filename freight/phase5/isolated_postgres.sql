@@ -90,7 +90,7 @@ BEGIN
       'state',p_state,'amount_cents',p_amount,'source_sha256',p_source_hash,
       'occurred_at',to_char(p_occurred_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'),
       'prior_hash',prior_hash)::text;
- h:=encode(digest(payload,'sha256'),'hex');
+ h:=encode(public.digest(payload,'sha256'),'hex');
  INSERT INTO phase5_qa.events
  (tenant_id,instruction_id,event_seq,provider,provider_reference,actor_id,
   state,amount_cents,source_sha256,occurred_at,prior_hash,event_hash)
