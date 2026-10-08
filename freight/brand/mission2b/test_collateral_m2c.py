@@ -16,23 +16,21 @@ def invoice(w):
     billed=expected+D(w['second_unsupported_liftgate'])
     if expected!=D(w['expected_charge']) or billed!=D(w['billed_charge']) or billed-expected!=D(w['candidate_variance']): raise ValueError('arithmetic mismatch')
     return expected,billed,billed-expected
+# Exercise the exact financial and status helpers used by the collateral builder.
+from freight.brand.mission2b.source.financial_controls import (
+    stage_policy, eligible_fee, unique_settlement_ledger,
+)
+
 def require_stage(stage,evidence=False,authorized=False,approved=False,posted=False):
-    if stage not in ('candidate','supported','authorized','carrier_approved','received'):raise ValueError('stage')
-    if stage in ('supported','authorized','carrier_approved','received') and not evidence:raise ValueError('evidence')
-    if stage in ('authorized','carrier_approved','received') and not authorized:raise ValueError('customer authorization')
-    if stage in ('carrier_approved','received') and not approved:raise ValueError('carrier approval')
-    if stage=='received' and not posted:raise ValueError('posting')
-    return True
-# Execute the actual collateral financial control rather than duplicating
-# a weaker ledger implementation inside the test suite.
-from freight.brand.mission2b.source.financial_controls import unique_settlement_ledger
+    return stage_policy(stage,evidence=evidence,customer_authorization=authorized,
+                        carrier_approval=approved,posted=posted)
 
 def ledger(events):
     return D(unique_settlement_ledger(events)['net'])
 
 def quote_fee(base,rate,*,signed=False,verified=False):
-    if not signed or not verified:raise ValueError('fee base unapproved')
-    return (D(base)*D(rate)).quantize(D('.01'))
+    return eligible_fee(base, (), rate, signed=signed, itemization_proven=verified)
+
 class CollateralControls(unittest.TestCase):
     def test_worked_invoice(self):self.assertEqual(invoice(T['worked_invoice'])[2],D('125'))
     def test_effective_date(self):
@@ -49,7 +47,7 @@ class CollateralControls(unittest.TestCase):
     def test_claim_requires_customer_authorization(self):
         with self.assertRaisesRegex(ValueError,'authorization'):require_stage('authorized',evidence=True)
     def test_approved_claim_is_not_cash(self):
-        with self.assertRaisesRegex(ValueError,'posting'):require_stage('received',evidence=True,authorized=True,approved=True)
+        with self.assertRaisesRegex(ValueError,'received funds'):require_stage('received',evidence=True,authorized=True,approved=True)
     def test_duplicate_event(self):
         e=dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=True)
         with self.assertRaisesRegex(ValueError,'duplicate settlement event'):ledger([e,e])
@@ -60,6 +58,26 @@ class CollateralControls(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'unposted'):ledger([dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=False)])
     def test_credit_reversal(self):
         self.assertEqual(ledger([dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=True),dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='25',posted=True,references_event='CR1')]),D('100'))
+    def test_false_text_flags_cannot_promote_financial_state(self):
+        for flag in ('false','true',1,None):
+            with self.subTest(flag=flag):
+                with self.assertRaisesRegex(ValueError,'source evidence'):
+                    require_stage('supported',evidence=flag)
+                with self.assertRaisesRegex(ValueError,'authorization'):
+                    require_stage('authorized',evidence=True,authorized=flag)
+                with self.assertRaisesRegex(ValueError,'carrier acceptance'):
+                    require_stage('carrier_approved',evidence=True,authorized=True,approved=flag)
+                with self.assertRaisesRegex(ValueError,'received funds'):
+                    require_stage('received',evidence=True,authorized=True,approved=True,posted=flag)
+
+    def test_self_described_false_contract_and_itemization_cannot_compute_fee(self):
+        for flag in ('false','true',1,None):
+            with self.subTest(flag=flag):
+                with self.assertRaisesRegex(ValueError,'signed terms'):
+                    quote_fee('100.00','.30',signed=flag,verified=True)
+                with self.assertRaisesRegex(ValueError,'signed terms'):
+                    quote_fee('100.00','.30',signed=True,verified=flag)
+
     def test_valid_partial_reversals_preserve_exact_net(self):
         events=[
             dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=True),
@@ -137,7 +155,7 @@ class CollateralControls(unittest.TestCase):
         self.assertEqual(T['synthetic_public_aggregate']['eligible_base_verdict'],'UNVERIFIED_UNALLOCATED_DIFFERENCE')
     def test_no_real_client_proof(self):self.assertFalse(T['synthetic_public_aggregate']['real_customer_outcome'])
     def test_no_approved_rate(self):
-        with self.assertRaisesRegex(ValueError,'unapproved'):quote_fee('125','.20')
+        with self.assertRaisesRegex(ValueError,'signed terms'):quote_fee('125','.20')
         self.assertFalse(T['hypothetical_pricing']['approved_retally_rate'])
     def test_stages_counts(self):
         c=T['synthetic_public_aggregate']['counts']
