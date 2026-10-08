@@ -11,10 +11,24 @@
 - **Upstream GitHub discovery:** `gregchedwick/carrier-survival`, `src/carrier_survival/config.py` at blob `e7d70064c6ba92197623fb675b0c42329bb1c45d`. Its code describes current census as a daily snapshot, not a historical training archive. This is a schema/pipeline research citation, **not** original carrier-data provenance, an imported training dataset, or an endorsement.
 - **Other official context:** https://www.fmcsa.dot.gov/registration/fmcsa-data-dissemination-program and the SAFER status definitions https://safer.fmcsa.dot.gov/saferhelp.aspx .
 
+## Verified live FMCSA API metadata and zero-record handshake (October 8, 2026)
+
+Official machine-readable schema: https://data.transportation.gov/api/views/az4n-8mr2/columns.json .
+
+The original FMCSA/Socrata metadata declares:
+- `dot_number`: **number**;
+- `legal_name`: **text**;
+- `power_units`: **text**;
+- **No column named `nbr_power_unit`**.
+
+The previous version of this draft selected `nbr_power_unit`, apparently from an older/alternate census schema. That query returned **HTTP 400** when tested against the official API with `$limit=0`. The verified query with `$select=dot_number,legal_name,power_units&$limit=0` returned HTTP success and an empty JSON array, as required. Both quoted and unquoted USDOT predicates were accepted for zero-record probes; the adapter now uses an unquoted exact-digit predicate to match `dot_number`'s declared numeric type.
+
+This independently proves the **column names and SoQL query syntax**, but does **not** establish that actual returned carrier objects, provider availability during normal requests, historical data, or operating authority have been accepted in production. No personal or identifiable carrier rows were retrieved during this handshake. The regression suite now rejects the previous field and checks the source-verified column names and numeric predicate. The earlier CI pass against fake HTTP responses did not catch the real schema defect.
+
 ## Implemented code and strict scope
 
 The source-only internal module `freight/fmcsa_public_carrier.py` provides:
-- `build_query_url(usdot)`: validates a canonical 1–9 ASCII-digit USDOT number and emits a bounded HTTPS lookup with `$limit=2`, restricted `$where` and only `dot_number`, `legal_name`, and `nbr_power_unit` fields.
+- `build_query_url(usdot)`: validates a canonical 1–9 ASCII-digit USDOT number and emits a bounded HTTPS lookup with `$limit=2`, restricted `$where` and only `dot_number`, `legal_name`, and `power_units` fields.
 - `lookup_public_carrier(usdot)`: **explicit** on-demand read-only lookup with a short timeout, 8 KiB response cap, no repeated paging or persistence; caller should have a legitimate carrier-specific verification purpose. It deliberately has no scheduler, bulk lookup function, exporter or request collector.
 - `validate_census_response`: refuses multiple matches, mismatched DOT ID, unexpected fields, email, phone, addresses, control-character names, invalid fleet counts, malformed documents, and non-UTC retrieval times. A missing fleet count stays **unknown** rather than zero. The record's retrieval time is not the originating census data vintage.
 
