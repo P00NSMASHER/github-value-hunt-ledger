@@ -23,22 +23,13 @@ def require_stage(stage,evidence=False,authorized=False,approved=False,posted=Fa
     if stage in ('carrier_approved','received') and not approved:raise ValueError('carrier approval')
     if stage=='received' and not posted:raise ValueError('posting')
     return True
+# Execute the actual collateral financial control rather than duplicating
+# a weaker ledger implementation inside the test suite.
+from freight.brand.mission2b.source.financial_controls import unique_settlement_ledger
+
 def ledger(events):
-    events_seen=set();opportunities=set();gross=D('0');reversals=D('0')
-    for e in events:
-        if e['currency']!='USD':raise ValueError('currency')
-        if e['id'] in events_seen:raise ValueError('duplicate event')
-        events_seen.add(e['id'])
-        if e['kind']=='credit':
-            if e['allocation'] in opportunities:raise ValueError('duplicate allocation')
-            if not e['posted']:raise ValueError('not posted')
-            opportunities.add(e['allocation']);gross+=D(e['amount'])
-        elif e['kind']=='reversal':
-            if e.get('references_event') not in events_seen or not e['posted']:raise ValueError('bad reversal')
-            reversals+=D(e['amount'])
-        else:raise ValueError('unknown event')
-    if reversals>gross:raise ValueError('over reversal')
-    return gross-reversals
+    return D(unique_settlement_ledger(events)['net'])
+
 def quote_fee(base,rate,*,signed=False,verified=False):
     if not signed or not verified:raise ValueError('fee base unapproved')
     return (D(base)*D(rate)).quantize(D('.01'))
@@ -61,14 +52,84 @@ class CollateralControls(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'posting'):require_stage('received',evidence=True,authorized=True,approved=True)
     def test_duplicate_event(self):
         e=dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=True)
-        with self.assertRaisesRegex(ValueError,'duplicate event'):ledger([e,e])
+        with self.assertRaisesRegex(ValueError,'duplicate settlement event'):ledger([e,e])
     def test_duplicate_allocation(self):
         e=dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=True)
-        with self.assertRaisesRegex(ValueError,'duplicate allocation'):ledger([e,dict(e,id='CR2')])
+        with self.assertRaisesRegex(ValueError,'opportunity allocation'):ledger([e,dict(e,id='CR2')])
     def test_unposted_credit(self):
-        with self.assertRaisesRegex(ValueError,'not posted'):ledger([dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=False)])
+        with self.assertRaisesRegex(ValueError,'unposted'):ledger([dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=False)])
     def test_credit_reversal(self):
         self.assertEqual(ledger([dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='125',posted=True),dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='25',posted=True,references_event='CR1')]),D('100'))
+    def test_valid_partial_reversals_preserve_exact_net(self):
+        events=[
+            dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=True),
+            dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='40.00',posted=True,references_event='CR1'),
+            dict(id='RV2',kind='reversal',allocation='A',currency='USD',amount='60.00',posted=True,references_event='CR1'),
+        ]
+        self.assertEqual(ledger(events),D('0.00'))
+        self.assertEqual(unique_settlement_ledger(events),dict(gross='100.00',reversals='100.00',net='0.00'))
+
+    def test_self_reversals_do_not_launder_credits(self):
+        events=[
+            dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=True),
+            dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='10.00',posted=True,references_event='RV1'),
+        ]
+        with self.assertRaisesRegex(ValueError,'prior original credit'):ledger(events)
+
+    def test_reversal_of_reversal_is_not_a_credit(self):
+        events=[
+            dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=True),
+            dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='20.00',posted=True,references_event='CR1'),
+            dict(id='RV2',kind='reversal',allocation='A',currency='USD',amount='10.00',posted=True,references_event='RV1'),
+        ]
+        with self.assertRaisesRegex(ValueError,'prior original credit'):ledger(events)
+
+    def test_cumulative_returns_cannot_exceed_their_source_credit(self):
+        events=[
+            dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=True),
+            dict(id='CR2',kind='credit',allocation='B',currency='USD',amount='200.00',posted=True),
+            dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='80.00',posted=True,references_event='CR1'),
+            dict(id='RV2',kind='reversal',allocation='A',currency='USD',amount='30.00',posted=True,references_event='CR1'),
+        ]
+        # Gross still exceeds all returns: the original aggregate-only guard failed here.
+        with self.assertRaisesRegex(ValueError,'cumulative reversal exceeds original credit'):ledger(events)
+
+    def test_reversal_cannot_use_another_originals_allocation(self):
+        events=[
+            dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=True),
+            dict(id='CR2',kind='credit',allocation='B',currency='USD',amount='100.00',posted=True),
+            dict(id='RV1',kind='reversal',allocation='B',currency='USD',amount='20.00',posted=True,references_event='CR1'),
+        ]
+        with self.assertRaisesRegex(ValueError,'allocation differs'):ledger(events)
+
+    def test_posting_assertion_must_be_exact_true(self):
+        for bad in (False,'false','true',1,None):
+            with self.subTest(value=bad):
+                c=dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=bad)
+                with self.assertRaisesRegex(ValueError,'unposted'):ledger([c])
+                c['posted']=True
+                r=dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='5.00',posted=bad,references_event='CR1')
+                with self.assertRaisesRegex(ValueError,'unposted'):ledger([c,r])
+
+    def test_settlement_amount_requires_finite_exact_cents(self):
+        for bad in ('NaN','Infinity','-10.00','12.345',0,True,'abc',float('nan')):
+            with self.subTest(value=str(bad)):
+                c=dict(id='CR1',kind='credit',allocation='A',currency='USD',amount=bad,posted=True)
+                with self.assertRaisesRegex(ValueError,'exact-cent'):ledger([c])
+
+    def test_duplicate_reversal_event_never_double_counts(self):
+        c=dict(id='CR1',kind='credit',allocation='A',currency='USD',amount='100.00',posted=True)
+        r=dict(id='RV1',kind='reversal',allocation='A',currency='USD',amount='20.00',posted=True,references_event='CR1')
+        with self.assertRaisesRegex(ValueError,'duplicate settlement event'):ledger([c,r,r])
+
+    def test_aggregate_fee_gap_remains_unverified(self):
+        a=T['synthetic_public_aggregate']
+        v=a['usd']
+        self.assertEqual(D(v['net_posted_recovery'])-D(v['published_fee_eligible']),D('1650.00'))
+        self.assertEqual(a['eligible_base_verdict'],'UNVERIFIED_UNALLOCATED_DIFFERENCE')
+        self.assertFalse(a['source_level_aggregate_settlements_available'])
+        self.assertFalse(a['source_level_aggregate_invoices_available'])
+
     def test_aggregate_net(self):
         v=T['synthetic_public_aggregate']['usd'];self.assertEqual(D(v['gross_posted_recovery'])-D(v['reversals']),D(v['net_posted_recovery']))
     def test_unallocated_eligibility(self):
