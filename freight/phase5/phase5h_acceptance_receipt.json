@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "scope": "DISPOSABLE_POSTGRESQL16_PRINCIPAL_BOUND_TENANT_RLS_ONLY",
+  "observed_date": "2026-10-08",
+  "disposable_acceptance_run_id": 37815872601,
+  "phase5g_and_phase5h_verifier_tests_passed": 14,
+  "new_tenant_isolation_tests_passed": 3,
+  "all_disposable_research_test_batches_passed": 77,
+  "roles_separated_by_distinct_ephemeral_login_credentials": true,
+  "verifier_routing_scope_source": "POSTGRES_AUTHENTICATED_CURRENT_USER_ADMIN_CONTROLLED_MAPPING",
+  "spoofable_custom_guc_used": false,
+  "rls_protected_tables": [
+    "phase5c_qa.cases",
+    "phase5c_qa.issuer_keys",
+    "phase5c_qa.documents"
+  ],
+  "foreign_tenant_document_read_denied": true,
+  "foreign_tenant_direct_insert_denied": true,
+  "verifier_cannot_update_tenant_mapping": true,
+  "original_same_tenant_valid_signed_contract_supported": true,
+  "original_12_request_replay_supported": true,
+  "hosted_floot_qa_cluster": "7694294930552894346",
+  "production_cluster": "7693746749463444100",
+  "hosted_floot_runtime_uses_owner": true,
+  "hosted_floot_restricted_credential_proven": false,
+  "independent_hosted_verifier_service_proven": false,
+  "stolen_verifier_credential_direct_sql_bypass_fixed": false,
+  "actual_customer_revenue_cents": 0,
+  "historical_findings_closed": 0,
+  "historical_findings_open": 26,
+  "final_release_approval": "BLOCKED_HOSTED_CREDENTIAL_AND_EXTERNAL_AUTHORITY"
+}
