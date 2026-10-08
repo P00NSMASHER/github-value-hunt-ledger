@@ -4,6 +4,8 @@ on:
     paths:
       - 'freight/lab_repair_04_14_contract.py'
       - 'freight/test_lab_repair_04_14_contract.py'
+      - 'freight/LAB_REPAIR_CROSS_CHAT_MATRIX.json'
+      - 'freight/test_lab_repair_cross_chat_matrix.py'
       - 'freight/LABS_04_14_REPAIR_HANDOFF_20261008.md'
       - '.github/workflows/retally-labs04-14-repair-scope.yml'
   workflow_dispatch:
@@ -25,7 +27,7 @@ jobs:
       - name: Install pinned test dependencies
         run: python -m pip install -r production/requirements-ci.txt
       - name: Prove synthetic source scope and refuse inflated full-scale claims
-        run: PYTHONPATH=. python -m pytest -q freight/test_lab_repair_04_14_contract.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_lab_repair_04_14_contract.py freight/test_lab_repair_cross_chat_matrix.py
       - name: Explicitly state restrictions
         run: |
           echo 'Lab source repairs isolated to downloaded toolkits; no hosted app deployment.'
