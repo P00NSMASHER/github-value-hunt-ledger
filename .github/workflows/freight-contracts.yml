@@ -53,6 +53,7 @@ jobs:
         shell: bash
         run: |
           PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_first_customer_gate.py' -v
+          PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_zero_upfront_underwriting.py' -v
           PYTHONPATH=. python freight/commercial/first_customer_gate.py > /tmp/retally-first-customer-gates.json
           python - <<'PY'
           import json
@@ -60,6 +61,7 @@ jobs:
           assert result["release_policy"]=="REVIEW_ONLY_NO_CUSTOMER_DATA"
           assert not result["all_customer_pilot_gates_ready"]
           assert not result["gates"]["sample_publication"]["ready"]
+          # Successful synthetic underwriting is never a customer/price approval.
           print("First-customer and sample publication appropriately blocked pending real evidence")
           PY
       - name: Phase 3 security-readiness evidence
