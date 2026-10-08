@@ -48,6 +48,8 @@ jobs:
         run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_phase5e_admission_boundary.py
       - name: Exercise restricted financial database roles and explicit crypto bypass
         run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_phase5f_roles.py
+      - name: Run separately credentialed Ed25519 financial verifier against disposable PostgreSQL
+        run: PYTHONPATH=. python -m pytest -q -rs freight/phase5/test_phase5g_independent_verifier.py
       - name: Verify Phase 4 laboratory stack and Ed25519 source boundaries
         run: |
           PYTHONPATH=. python -m pytest -q -rs \
