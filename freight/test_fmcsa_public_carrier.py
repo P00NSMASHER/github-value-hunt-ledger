@@ -28,7 +28,7 @@ class MockHTTPResponse:
 
 
 def row(**changes):
-    base = {"dot_number": "1234567", "legal_name": "EXAMPLE FREIGHT LLC", "nbr_power_unit": "12"}
+    base = {"dot_number": "1234567", "legal_name": "EXAMPLE FREIGHT LLC", "power_units": "12"}
     base.update(changes)
     return base
 
@@ -53,8 +53,8 @@ def test_exact_source_and_bounded_allowlisted_lookup():
     assert parsed.scheme == "https"
     assert parsed.hostname == "data.transportation.gov"
     assert query == {
-        "$select": ["dot_number,legal_name,nbr_power_unit"],
-        "$where": ["dot_number='1234567'"],
+        "$select": ["dot_number,legal_name,power_units"],
+        "$where": ["dot_number=1234567"],
         "$limit": ["2"],
     }
     assert DATASET_ID in url
@@ -68,6 +68,24 @@ def test_invalid_or_injectable_usdot_values_rejected_before_network(bad):
         validate_usdot(bad)
     with pytest.raises(FMCSAReferenceError, match="USDOT"):
         build_query_url(bad)
+
+
+def test_real_government_schema_contract_does_not_use_obsolete_field():
+    # Verified via the official 2026-10-08 columns.json, and both
+    # zero-record API query probes. The old selected field returned HTTP 400.
+    from freight.fmcsa_public_carrier import ALLOWED_FIELDS
+    assert ALLOWED_FIELDS == frozenset({"dot_number", "legal_name", "power_units"})
+    url = build_query_url("1234567")
+    assert "nbr_power_unit" not in url
+    query = parse_qs(urlparse(url).query)
+    assert query["$select"] == ["dot_number,legal_name,power_units"]
+    assert query["$where"] == ["dot_number=1234567"]
+
+
+def test_obsolete_api_response_field_fails_closed():
+    with pytest.raises(FMCSAReferenceError, match="unexpected"):
+        call([{"dot_number": "1234567", "legal_name": "EXAMPLE FREIGHT LLC",
+               "nbr_power_unit": "12"}])
 
 
 def test_exactly_one_synthetic_record_from_mocked_government_response():
@@ -122,12 +140,12 @@ def test_legal_name_must_be_canonical_and_bounded(name):
 @pytest.mark.parametrize("value", [-1, 2, True, "2.5", "0002", "NaN", "-1", "999999999", [], {}])
 def test_power_unit_count_must_be_bounded_nonnegative_integer_or_unknown(value):
     with pytest.raises(FMCSAReferenceError, match="power unit count"):
-        call([row(nbr_power_unit=value)])
+        call([row(power_units=value)])
 
 
 @pytest.mark.parametrize("missing", [None, ""])
 def test_missing_power_units_stays_unknown_not_zero(missing):
-    result, _ = call([row(nbr_power_unit=missing)])
+    result, _ = call([row(power_units=missing)])
     assert result.power_units is None
 
 
