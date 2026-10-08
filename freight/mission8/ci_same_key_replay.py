@@ -56,6 +56,18 @@ assert expected_head and actual_head == expected_head, (
     f"CI tested unexpected commit {actual_head}, expected {expected_head}"
 )
 
+# Pin to the real isolated M8 Floot PostgreSQL function that was read-only
+# inspected before CI. This validates function-body parity, not HTTP parity.
+FLOOT_M8_STAGING_FUNCTION_SHA256 = "73968369b77b793244e189d5609e31e986bc1545fda394051cae4f573ab618f7"
+actual_function_sha256 = psql(
+    "SELECT encode(digest(prosrc,'sha256'),'hex') FROM pg_proc "
+    "WHERE proname='recovery_prepare_financial_instruction' "
+    "AND pronamespace='public'::regnamespace"
+)
+assert actual_function_sha256 == FLOOT_M8_STAGING_FUNCTION_SHA256, (
+    "Stored SQL function diverged from independently inspected M8 staging"
+)
+
 start = time.monotonic()
 with ThreadPoolExecutor(max_workers=32) as executor:
     submitted = list(executor.map(lambda _: psql(statement()), range(100)))
@@ -98,6 +110,8 @@ receipt = {
     "schema_version": 1,
     "scope": "ACTUAL_M8_POSTGRES_FUNCTION_EPHEMERAL_SYNTHETIC_NOT_HTTP",
     "tested_head_sha": actual_head,
+    "real_m8_function_body_sha256": actual_function_sha256,
+    "isolated_floot_staging_function_body_sha256": FLOOT_M8_STAGING_FUNCTION_SHA256,
     "workflow_event_sha": os.environ.get("GITHUB_SHA"),
     "fixture_sha256": hashlib.sha256(Path("freight/mission8/ci_same_key_setup.sql").read_bytes()).hexdigest(),
     "payload_sha256": hashlib.sha256(BODY.encode()).hexdigest(),
