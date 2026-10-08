@@ -211,8 +211,8 @@ test("a new inquiry never deletes older pending, provider-only or acknowledged-b
     assert.equal(response.status,202);
     assert.equal(db.inquiries.size,4);
     for(const state of historical) assert.ok(db.inquiries.has("historical-"+state));
-    assert.equal(db.sqlCalls.filter(sql=>/^DELETE\\s+FROM\\s+inquiries\\b/i.test(sql)).length,0);
-    assert.ok(db.sqlCalls.some(sql=>/^DELETE\\s+FROM\\s+inquiry_limits\\b/i.test(sql)));
+    assert.equal(db.sqlCalls.filter(sql=>/^DELETE\s+FROM\s+inquiries\b/i.test(sql)).length,0);
+    assert.ok(db.sqlCalls.some(sql=>/^DELETE\s+FROM\s+inquiry_limits\b/i.test(sql)));
   } finally {remote.restore();}
 });
 test("email notification is a plain-text contact summary, not an invoice package", () => {
