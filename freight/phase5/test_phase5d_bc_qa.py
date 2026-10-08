@@ -112,7 +112,7 @@ class Phase5DBCCases(unittest.TestCase):
         cohort=simulated_cohort()["cohort"]
         case=next(x for x in cohort if x["synthetic_customer_id"]=="SIM-INDUSTRIAL-SHIPPER")
         self.assertLess(case["economic_scenario"]["expected_net_margin_cents"],0)
-        self.assertEqual(case["actual_customer_recovery_cents"],0)
+        self.assertEqual(case["observed_real_recovery_cents"],0)
         self.assertEqual(case["simulated_accounting"]["simulated_net_recovered_cents"],0)
 
 
