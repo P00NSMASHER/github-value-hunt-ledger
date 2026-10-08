@@ -1,5 +1,11 @@
 name: RETALLY collateral M2D acceptance
 on:
+  push:
+    branches:
+      - "mission2g/first-customer-gate-20261008"
+    paths:
+      - "freight/brand/mission2b/**"
+      - ".github/workflows/retally-collateral-m2d.yml"
   pull_request:
     paths:
       - "freight/brand/mission2b/**"
