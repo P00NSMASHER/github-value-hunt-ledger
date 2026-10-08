@@ -276,6 +276,8 @@ def verify_settlement(
             _fail("CONTRACT_BINDING_MISMATCH")
         if t.get("source_hash") != claim["source_hash"]:
             _fail("CONTRACT_SOURCE_MISMATCH")
+        _name(t.get("contract_version"),"contract_version")
+        _hash(t.get("agreement_sha256"),"agreement_sha256")
         bps = t.get("fee_bps")
         if type(bps) is not int or bps < 0 or bps > 10_000:
             _fail("INVALID_FEE_RATE")
@@ -294,25 +296,27 @@ def verify_settlement(
         proof = _lookup(by_identity,"CREDIT_RECEIPT",eid)
         p = proof.payload
         for field in ("event_id","reference","payer_id","payee_id","currency",
-                      "amount_cents","source_hash","booked_at"):
+                      "amount_cents","source_hash","booked_at","source_kind"):
             if field == "booked_at":
                 if _utc(p.get(field),"provider_booked_at") != _utc(credit[field],"settlement_booked_at"):
                     _fail("CREDIT_PROVENANCE_MISMATCH")
             elif p.get(field) != credit[field]:
                 _fail("CREDIT_PROVENANCE_MISMATCH")
-        if _utc(proof.issued_at,"credit_proof_time") > verifier.as_of:
-            _fail("CREDIT_PROOF_FUTURE")
+        if _utc(proof.issued_at,"credit_proof_time") < _utc(credit["booked_at"],"credit_booked_at"):
+            _fail("CREDIT_PROOF_PREDATES_BOOKING")
         _money(credit["amount_cents"],"credit_cents",positive=True)
 
     for counter_id, counter in counters.items():
         proof = _lookup(by_identity,"CREDIT_RETURN",counter_id)
         p = proof.payload
-        for field in ("counter_id","original_event_id","amount_cents","currency","source_hash","observed_at"):
+        for field in ("counter_id","original_event_id","amount_cents","currency","source_hash","observed_at","source_kind"):
             if field == "observed_at":
                 if _utc(p.get(field),"provider_return_at") != _utc(counter[field],"counter_observed_at"):
                     _fail("CREDIT_RETURN_PROVENANCE_MISMATCH")
             elif p.get(field) != counter[field]:
                 _fail("CREDIT_RETURN_PROVENANCE_MISMATCH")
+        if _utc(proof.issued_at,"return_proof_time") < _utc(counter["observed_at"],"counter_observed_at"):
+            _fail("RETURN_PROOF_PREDATES_OBSERVATION")
         linked = credits.get(counter["original_event_id"])
         if linked is None or linked["currency"] != counter["currency"]:
             _fail("COUNTER_MISSING_ORIGINAL")
