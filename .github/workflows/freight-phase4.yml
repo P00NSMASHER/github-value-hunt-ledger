@@ -55,6 +55,15 @@ jobs:
           assert MockProviderLedger.__module__=="freight.lab_phase4_mock_provider"
           print("Boun​ded local campaign; mock SQLite only, no provider network calls")
           PY
+      - name: Upload generated research-only dashboard and receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-phase4-research-dashboard
+          path: |
+            /tmp/retally-phase4/index.html
+            /tmp/retally-phase4/phase4_control.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Preserve audit registry and earlier research gates
         run: PYTHONPATH=. python -m pytest -q freight/test_lab_hunter_research_registry.py freight/test_lab_phase2_existing_settlement_bridge.py
       - name: Prevent accidental action claims
