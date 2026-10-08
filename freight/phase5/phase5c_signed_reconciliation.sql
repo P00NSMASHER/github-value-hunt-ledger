@@ -77,6 +77,11 @@ BEGIN
  IF NOT FOUND OR signer.role<>expected_role
  OR NEW.occurred_at<signer.enabled_from OR NEW.occurred_at>=signer.expires_at
  OR (signer.revoked_at IS NOT NULL AND NEW.occurred_at>=signer.revoked_at)
+ -- Historic occurred_at is not a trustworthy signing timestamp.
+ -- A newly inserted record must ALSO be admitted while its issuer is
+ -- currently active, even if the body claims to predate revocation.
+ OR transaction_timestamp()>=signer.expires_at
+ OR (signer.revoked_at IS NOT NULL AND transaction_timestamp()>=signer.revoked_at)
  THEN RAISE EXCEPTION 'INVALID_ISSUER_ROLE_OR_PERIOD'; END IF;
  IF NEW.body->>'tenantId' IS DISTINCT FROM NEW.tenant_id
  OR NEW.body->>'caseId' IS DISTINCT FROM NEW.case_id

@@ -49,6 +49,14 @@ export async function handle(request:Request){
          throw new Error("CONFLICTING_RECORD_REPLAY");
        return {recordId:old.rows[0].record_id??(old.rows[0] as any).recordId,replay:true};
     }
+    // A historic occurrence timestamp is not proof of when a document was
+    // signed or submitted. New admissions require currently active keys.
+    // Previously admitted exact replays above remain read-only/idempotent.
+    const revokedAt=key.revoked_at??(key as any).revokedAt??null;
+    const expiresAt=key.expires_at??(key as any).expiresAt;
+    if((revokedAt!==null && Date.now()>=new Date(revokedAt).getTime()) ||
+        Date.now()>=new Date(expiresAt).getTime())
+      throw new Error("SYNTHETIC_SIGNER_NO_LONGER_TRUSTED_FOR_NEW_ADMISSION");
     const put=await sql<{record_id:string}>`INSERT INTO phase5c_qa.documents
       (tenant_id,case_id,record_id,kind,economic_key,reference_id,amount_cents,fee_bps,
        currency,occurred_at,source_sha256,issuer_key_id,body,signature_b64)
