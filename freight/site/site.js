@@ -368,7 +368,7 @@
   if (retallyChat) {
     const body = document.body;
     let pendingOpenAt = 0;
-    let openedAtLeastOnce = false;
+    let openedThisAttempt = false;
     const fallbackToVendor = () => {
       pendingOpenAt = 0;
       body.classList.remove("retally-chat-open");
@@ -379,14 +379,14 @@
       if (body.classList.contains("retally-chat-fallback")) return;
       const isOpen = window.BubblaV?.isOpen?.() === true;
       if (isOpen) {
-        openedAtLeastOnce = true;
+        openedThisAttempt = true;
         pendingOpenAt = 0;
         body.classList.add("retally-chat-open");
         retallyChat.hidden = true;
         return;
       }
       if (pendingOpenAt && Date.now() - pendingOpenAt < 3200) return;
-      if (pendingOpenAt && !openedAtLeastOnce) {
+      if (pendingOpenAt && !openedThisAttempt) {
         fallbackToVendor();
         return;
       }
@@ -403,6 +403,7 @@
         return;
       }
       pendingOpenAt = Date.now();
+      openedThisAttempt = false;
       body.classList.add("retally-chat-open");
       retallyChat.hidden = true;
       try {
