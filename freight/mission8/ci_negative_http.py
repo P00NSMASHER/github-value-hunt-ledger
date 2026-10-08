@@ -44,17 +44,29 @@ def exercise(method, path, body):
     data = json.dumps({"json": body}).encode() if body is not None else None
     headers = {"Content-Type": "application/json", "Origin": HOST}
     req = Request(HOST + path, data=data, headers=headers, method=method)
-    try:
-        with urlopen(req, timeout=30) as resp:
-            status = resp.status
-            raw = resp.read(4096)
-    except HTTPError as err:
-        status = err.code
-        raw = err.read(4096)
-    try:
-        payload = json.loads(raw)["json"]
-    except (ValueError, KeyError, TypeError):
-        raise AssertionError(f"{path}: response must be Floot JSON") from None
+    # Sandbox builds can briefly return a non-API response while warming.
+    # Retry only unparseable responses. Never count them as passing, and never
+    # treat an incorrect authenticated/authorization status as success.
+    payload = None
+    for attempt in range(3):
+        try:
+            with urlopen(req, timeout=30) as resp:
+                status = resp.status
+                raw = resp.read(4096)
+        except HTTPError as err:
+            status = err.code
+            raw = err.read(4096)
+        try:
+            payload = json.loads(raw)["json"]
+            break
+        except (ValueError, KeyError, TypeError):
+            if attempt == 2:
+                snippet = raw[:100].decode("utf-8", "replace")
+                raise AssertionError(
+                    f"{path}: non-JSON Floot response after 3 attempts "
+                    f"(HTTP {status}, starts {snippet!r})"
+                ) from None
+            time.sleep(0.6)
     assert status == 401, f"{path}: expected 401, received {status}"
     assert payload.get("error") == "Not authenticated", (
         f"{path}: incorrect rejection payload {payload!r}"

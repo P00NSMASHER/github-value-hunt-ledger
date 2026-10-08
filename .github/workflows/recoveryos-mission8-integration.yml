@@ -96,6 +96,24 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Real PostgreSQL original versus corrected authorization concurrency acceptance
+        shell: bash
+        env:
+          M8_POSTGRES_CONTAINER_ID: ${{ job.services.postgres.id }}
+          RETALLY_TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          docker exec -i "$M8_POSTGRES_CONTAINER_ID" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_authorization_atomicity_setup.sql
+          python3 freight/mission8/ci_authorization_atomicity.py
+      - name: Preserve M10 payment-authorization concurrency evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m10-postgresql-authorization
+          path: freight/mission8/ci_authorization_atomicity_receipt.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Negative HTTP authentication against real isolated M8 Floot endpoints
         shell: bash
         env:
