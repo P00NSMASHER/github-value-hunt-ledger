@@ -240,3 +240,30 @@ def test_potential_range_and_reference_validation_fail_closed():
         )
     with pytest.raises(ValueError, match="stable non-secret"):
         build_recovery_engagement(request(governing_agreement_reference="not allowed!"))
+
+
+def test_same_customer_different_audit_cannot_create_fee(tmp_path):
+    """Different frozen truth must not be billable under an unrelated contract."""
+    proof = proof_case(tmp_path)
+    unrelated = accepted(buyer_id="buyer", business_unit="unit")
+    with pytest.raises(ValueError, match="audit reference"):
+        record_actual_recovery(
+            unrelated,
+            buyer_posting_evidence_reference="BUYERPOSTED:CASE-001",
+            **proof,
+        )
+
+
+def test_retroactive_engagement_does_not_authorize_earlier_claim(tmp_path):
+    """A claim issued on September 21 cannot inherit September 23 agreement."""
+    proof = proof_case(tmp_path)
+    late = accepted(
+        buyer_id="buyer", business_unit="unit",
+        audit_reference="TRUTH:" + proof["truth"].truth_hash,
+    )
+    with pytest.raises(ValueError, match="before engagement acceptance"):
+        record_actual_recovery(
+            late,
+            buyer_posting_evidence_reference="BUYERPOSTED:CASE-001",
+            **proof,
+        )
