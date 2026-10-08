@@ -35,9 +35,10 @@ class Phase5PostgresAcceptance(unittest.TestCase):
             con.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto")
             sql = (Path(__file__).with_name("isolated_postgres.sql")
                    .read_text(encoding="utf-8"))
-            if sql.count(QA_IDENTIFIER) != 1:
+            guard_literal = "<> '" + QA_IDENTIFIER + "'"
+            if sql.count(guard_literal) != 1:
                 raise RuntimeError("Unexpected migration guard identity")
-            sql = sql.replace(QA_IDENTIFIER, cls.cluster)
+            sql = sql.replace(guard_literal, "<> '" + cls.cluster + "'")
             con.execute(sql)
 
     def con(self):
