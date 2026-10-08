@@ -48,6 +48,60 @@
 - **Mobile:** test actual iOS Safari portrait focus/keyboard, challenge, submit spinner, no double-tap, error fallback and screen-reader status; also desktop keyboard navigation and responsive layout.
 - **Rollback:** set the single flag `FREIGHT_INQUIRY_ENABLED=0` in Cloudflare Pages production environment and redeploy. The frontend's GET capability check then returns offline and reverts to the established mailto method. Existing receipts remain in D1, so reconcile pending inquiries before any restart. Do not disable hosting, Zoho or other services.
 
+## Mission 11: no-silent-loss acceptance and manual recovery (2026-10-08)
+
+**Operational verdict: NOT ACTIVATED.** Independently rechecked Pages
+production: both online-intake flags are `0`, the sending API credential is
+absent, D1/Turnstile/rate-secret bindings exist, and the D1 notification-state
+census currently contains zero accepted inquiries. Empty D1 does not establish
+that the Zoho mailbox has received no direct email.
+
+**Permission finding:** the connected Cloudflare identity is unauthorized to
+query Email Sending setup (`2036`) and token permission groups (`9109`).
+This is a hard authorization limit. Do not guess a token, bypass Cloudflare
+permissions, enable production flags, change Zoho MX, or claim provider delivery.
+
+**Manual acceptance procedure before enabling online submissions:**
+
+1. Prove sender permission and obtain a scoped **server-side** sending secret
+   through the account's approved credential workflow. Do not log, commit, or
+   expose its value. Independently verify the intended Zoho mailbox can receive.
+2. Run two controlled, non-sensitive sample form submissions **only after** an
+   actual production-like permitted environment is ready. Reconcile each unique
+   `RA-` reference across HTTP, D1, provider disposition, and the exact received
+   message in Zoho. No real buyer or invoice data.
+3. Use the operator-only D1 dashboard/console, never a public endpoint, to run
+   `SELECT notification_status, COUNT(*) AS n FROM inquiries GROUP BY notification_status;`
+   and `SELECT reference, accepted_at, notification_status FROM inquiries WHERE
+   notification_status != 'delivery_verified' ORDER BY accepted_at ASC;`.
+   Review unresolved references against authorized mailbox/provider evidence.
+   Keep personal data out of exported logs and GitHub artifacts.
+4. Before considering launch, name the human operator responsible for reviewing
+   pending inquiries at least at opening and close of each business day. Set
+   explicit limits on who may view records and how follow-up is approved.
+   Provider `queued` or `delivered` API disposition is **not** Zoho inbox proof.
+   Mark `delivery_verified` only after independent inbox comparison.
+5. Resolve any pending or stale records before the 90-day retention deadline.
+   The current request handler's opportunistic deletion is NOT a substitute for
+   a documented retention/deletion process; it can expire unreconciled records.
+   Escalate missing notifications well before retention. Do not auto-resend
+   pending entries because a prior provider response may have timed out after
+   actually sending, and duplicates can harm customers.
+6. If the email app does not open, the prepared form must still display an
+   explicit business recipient, a user-tapped "open again" mailto link and a
+   copy-details alternative. The mailto navigation should occur in the direct
+   user gesture instead of an 80 ms deferred timer. A draft is NOT a sent email.
+   This flow is staged under PR #307 and needs mobile and accessible-browser QA.
+7. After activation, verify rollback by turning `FREIGHT_INQUIRY_ENABLED`
+   back off and confirming mailto fallback, preserving D1 receipts for human
+   reconciliation. Rollback does not constitute deletion or inbox delivery.
+
+**Remaining risk:** while online intake is off, the existing mailto flow
+requires the visitor to actually send from an installed/configured mail app.
+The website cannot prove that happened; RETALLY must never call an email draft
+"received". No promises of zero lost leads without completing delivery
+acceptance and ongoing operations.
+
 ## Retention, access and reconciliation
 - Data owner: RETALLY. Purpose: respond to commercial Free Recovery Audit inquiries, not take freight files or grant collections authority.
 - D1 table stores restricted name, business email, company, broad modes/spend bands, selected optional context, timestamps and delivery state; no file bytes, secrets or raw IP. Cloudflare account administrators only. Do not include raw PII in public access logs or CI artifacts.
