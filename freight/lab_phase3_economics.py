@@ -7,7 +7,7 @@ The optional fixed-fee engagement is modeled elsewhere, never conflated here.
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from decimal import Decimal, ROUND_CEILING
+from decimal import Decimal
 from typing import Mapping
 
 from freight.lab_assurance import digest
@@ -89,26 +89,53 @@ class ContingencyDecision:
     receipt_sha256: str
 
 
+def _fee_components(opportunity_cents: int, a: ContingencyAssumptions) -> tuple[int, int, int]:
+    valid = _mul_bps(opportunity_cents, a.probability_valid_bps)
+    applied = _mul_bps(valid, a.probability_customer_recovery_bps)
+    net_customer = applied - _mul_bps(applied, a.expected_reversal_bps)
+    gross_fee = _mul_bps(net_customer, a.contingency_rate_bps)
+    collected_fee = _mul_bps(gross_fee, a.probability_fee_collection_bps)
+    return net_customer, gross_fee, collected_fee
+
+
+def _exact_break_even(a: ContingencyAssumptions, total_cost_cents: int) -> int | None:
+    # The model's input cap is also the search domain. If no admissible
+    # opportunity can cover costs, never return a misleading theoretical figure.
+    limit = 2**63 - 1
+    if total_cost_cents == 0:
+        return 0
+    if _fee_components(limit, a)[2] < total_cost_cents:
+        return None
+    low, high = 0, limit
+    while low < high:
+        mid = (low + high) // 2
+        if _fee_components(mid, a)[2] >= total_cost_cents:
+            high = mid
+        else:
+            low = mid + 1
+    return low
+
+
 def analyze_contingency(a: ContingencyAssumptions) -> ContingencyDecision:
     if not isinstance(a, ContingencyAssumptions):
         raise EconomicsRejected("INVALID_ASSUMPTIONS")
     # Sequential expected values intentionally disclose that probabilities
     # are conditional assumptions; they are not empirically calibrated.
-    valid_cents = _mul_bps(a.opportunity_cents, a.probability_valid_bps)
-    applied_cents = _mul_bps(valid_cents, a.probability_customer_recovery_bps)
-    net_customer = applied_cents - _mul_bps(applied_cents, a.expected_reversal_bps)
-    gross_fee = _mul_bps(net_customer, a.contingency_rate_bps)
-    collected_fee = _mul_bps(gross_fee, a.probability_fee_collection_bps)
+    net_customer, gross_fee, collected_fee = _fee_components(a.opportunity_cents, a)
     audit_cost = (a.free_audit_minutes * a.loaded_analyst_hourly_cents + 59) // 60
-    expected_recovery_minutes = _mul_bps(a.recovery_work_minutes_if_valid, a.probability_valid_bps)
-    recovery_cost = (expected_recovery_minutes * a.loaded_analyst_hourly_cents + 59) // 60
+    # Multiply before dividing. Flooring expected minutes first silently erases
+    # legitimate fractional-minute labor cost on low-probability engagements.
+    recovery_cost = (
+        a.recovery_work_minutes_if_valid * a.loaded_analyst_hourly_cents
+        * a.probability_valid_bps + 600000 - 1
+    ) // 600000
     other = a.acquisition_cost_cents + a.other_delivery_cost_cents
     total = audit_cost + recovery_cost + other
     net = collected_fee - total
-    factor = (Decimal(a.probability_valid_bps) * a.probability_customer_recovery_bps
-              * (10000-a.expected_reversal_bps) * a.contingency_rate_bps
-              * a.probability_fee_collection_bps) / Decimal(10000**5)
-    break_even = None if factor == 0 else int((Decimal(total)/factor).to_integral_value(rounding=ROUND_CEILING))
+    # A continuous approximate factor understates the true threshold when five
+    # successive cent-level rounding stages are applied. Search the identical
+    # discrete fee path used by the scenario itself.
+    break_even = _exact_break_even(a, total)
     assessment = "REVIEW_ONLY_NOT_A_PROFIT_FORECAST" if net > 0 else "MODELED_UNECONOMIC_HOLD"
     evidence = ("Actual buyer-owned invoice and rate authority",
                 "Real validation and customer recovery rates",
