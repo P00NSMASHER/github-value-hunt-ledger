@@ -73,6 +73,16 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('contingencyRecoveryRate: "0.325"', config)
             self.assertIn('contingencyRecoveryRateLabel: "32.5%"', config)
 
+    def test_configured_rate_is_visible_without_javascript(self):
+        for rate, expected in (("0.30", "30%"), ("0.325", "32.5%")):
+            with self.subTest(rate=rate), tempfile.TemporaryDirectory() as temporary:
+                output = build(Path(temporary) / "public", rate=rate)
+                homepage = (output / "index.html").read_text()
+                terms = (output / "engagement-framework.html").read_text()
+                self.assertIn(f"<strong data-rate-label>{expected}</strong>", homepage)
+                self.assertIn(f"<b data-rate-label>{expected}</b>", terms)
+                self.assertNotIn("Rate confirmed before engagement", homepage)
+
     def test_private_repository_cannot_be_the_output(self):
         for output in (
             builder.REPOSITORY,
@@ -120,7 +130,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Potential recovery", page)
             self.assertIn("Approved claim value", page)
             self.assertIn("Actual recovered funds", page)
-            self.assertIn("Rate confirmed before engagement", page)
+            self.assertIn("<strong data-rate-label>30%</strong>", page)
             self.assertIn('contingencyRecoveryRate: "0.3"', config)
             self.assertIn('contingencyRecoveryRateLabel: "30%"', config)
             self.assertIn('itemscope itemtype="https://schema.org/WebPage"', page)
