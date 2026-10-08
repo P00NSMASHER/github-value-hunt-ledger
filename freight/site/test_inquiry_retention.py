@@ -66,6 +66,17 @@ class InquiryRetentionTests(unittest.TestCase):
         self.assertEqual(self.count(),1)
         self.assertEqual(self.count("inquiry_purge_audit"),0)
 
+    def test_cloudflare_d1_guard_trigger_uses_one_statement(self):
+        """Cloudflare D1's query API rejected the prior two-statement trigger."""
+        marker="CREATE TRIGGER IF NOT EXISTS inquiry_require_review_before_delete"
+        self.assertEqual(MIGRATION_2.count(marker),1)
+        guard=MIGRATION_2.split(marker,1)[1].split("BEGIN",1)[1].rsplit("END;",1)[0]
+        statements=[x.strip() for x in guard.split(";") if x.strip()]
+        self.assertEqual(len(statements),1,
+                         "D1 guard body must remain one SQL statement")
+        self.assertIn("INSERT INTO inquiry_purge_audit",statements[0])
+        self.assertIn("RAISE(ABORT",statements[0])
+
     def test_original_unconditional_cleanup_would_erase_unresolved(self):
         old=connect(False)
         try:
