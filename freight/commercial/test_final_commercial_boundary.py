@@ -79,5 +79,59 @@ class FinalCommercialBoundary(unittest.TestCase):
                          "HUMAN_REVIEW_REQUIRED_NOT_KICKOFF_AUTHORIZED")
 
 
+    def test_public_freight_sources_never_substitute_for_buyer_evidence(self):
+        """Sourced market data and census identity do not clear customer gates."""
+        from freight.bts_public_evaluation import load_observations
+        from freight.fmcsa_public_carrier import validate_census_response
+        from freight.retally_eia_reference import reference_price
+
+        carrier = validate_census_response(
+            "1234567",
+            [{"dot_number": "1234567", "legal_name": "EXAMPLE FREIGHT LLC",
+              "power_units": "12"}],
+            retrieved_at_utc="2026-10-08T18:00:00Z",
+        )
+        fuel = reference_price("2026-10-05", "US")
+        airfreight = load_observations()[0]
+
+        self.assertFalse(carrier.operating_authority_verified)
+        self.assertFalse(carrier.customer_invoice_verified)
+        self.assertFalse(carrier.recovery_fee_authorized)
+        self.assertIn("PUBLIC_MARKET_REFERENCE_ONLY", fuel.role)
+        self.assertIn("NOT_INVOICE_GROUND_TRUTH", airfreight.evidence_class)
+
+        customer = evaluate(EVIDENCE)
+        self.assertFalse(customer["gates"]["confidential_pilot"]["ready"])
+        self.assertFalse(customer["gates"]["claims_recovery"]["ready"])
+        self.assertFalse(customer["all_customer_pilot_gates_ready"])
+
+    def test_identified_public_carrier_does_not_supply_rate_contract_or_invoice(self):
+        """Public carrier existence plus high spending cannot clear missing facts."""
+        from freight.fmcsa_public_carrier import validate_census_response
+
+        carrier = validate_census_response(
+            "1234567",
+            [{"dot_number": "1234567", "legal_name": "EXAMPLE FREIGHT LLC",
+              "power_units": "12"}],
+            retrieved_at_utc="2026-10-08T18:00:00Z",
+        )
+        self.assertFalse(carrier.customer_invoice_verified)
+
+        missing_invoices = qualify_free_audit(self.synthetic_lead(
+            previously_audited=False, carrier_count=1,
+            has_invoice_export=False, has_rate_authority=False,
+            has_shipment_records=False, has_payment_evidence=False,
+        ))
+        self.assertIs(missing_invoices.state, QualificationState.INSUFFICIENT_DATA)
+
+        missing_contract = qualify_free_audit(self.synthetic_lead(
+            previously_audited=False, carrier_count=1,
+            has_rate_authority=False, has_shipment_records=False,
+            has_payment_evidence=False,
+        ))
+        self.assertIs(missing_contract.state, QualificationState.NEEDS_REVIEW)
+        self.assertIn("rate_authority_needs_review", missing_contract.reasons)
+
+
 if __name__=="__main__":
     unittest.main(verbosity=2)
