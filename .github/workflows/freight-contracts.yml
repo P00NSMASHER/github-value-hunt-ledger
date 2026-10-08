@@ -65,6 +65,8 @@ jobs:
           # Successful synthetic underwriting is never a customer/price approval.
           print("First-customer and sample publication appropriately blocked pending real evidence")
           PY
+      - name: Verify RETALLY collateral ledger and source evidence controls
+        run: PYTHONPATH=. python -m unittest discover -s freight/brand/mission2b -p 'test_collateral_m2c.py' -v
       - name: Phase 3 security-readiness evidence
         run: PYTHONPATH=. python freight/security_readiness.py
       - name: Phase 3 competitive evidence freshness and matrix
