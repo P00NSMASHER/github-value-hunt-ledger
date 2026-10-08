@@ -257,6 +257,19 @@ def record_actual_recovery(
     ):
         raise ValueError("settlement store scope mismatch")
 
+    # A buyer-level match is insufficient: bind this commercial agreement to
+    # exactly the frozen audit truth, preventing reuse across engagements.
+    # The TRUTH:<sha256> contract is explicit because a decorative audit label
+    # like AUDIT-001 offers no authenticated link to the evidence population.
+    if engagement.audit_reference != "TRUTH:" + truth.truth_hash:
+        raise ValueError("engagement audit reference does not match frozen truth")
+    if not engagement.accepted_at:
+        raise ValueError("accepted engagement requires an acceptance timestamp")
+    accepted_at = datetime.fromisoformat(engagement.accepted_at.replace("Z", "+00:00"))
+    issued_at = datetime.fromisoformat(claim_batch.issued_at.replace("Z", "+00:00"))
+    if issued_at < accepted_at:
+        raise ValueError("recovery claim issued before engagement acceptance")
+
     # Rebuild authorization lineage rather than trusting a caller-made hash or
     # a bare claim ID. Confirmed buyer reviews are checked against frozen truth,
     # review packet/routing, incumbent exclusions and claim-issuance chronology.
@@ -276,6 +289,29 @@ def record_actual_recovery(
     )
     # A return or another writer may have changed the store after the snapshot.
     assert_report_current(report, store)
+
+    # Also bind the reconstructed claim batch to the claims actually persisted:
+    # recalculating an identical finding with a later issue timestamp must not
+    # retroactively authorize a claim already issued before the agreement.
+    import json
+    persisted_claims = {
+        item["claim_id"]: item
+        for item in json.loads(report.settlement_snapshot_json)["tables"]["recovery_claims"]
+    }
+    for claim in claim_batch.claims:
+        row = persisted_claims.get(claim.claim_id)
+        if row is None or any((
+            row["issued_at"] != claim.issued_at,
+            row["reference"] != claim.reference,
+            row["payer_id"] != claim.payer_id,
+            row["payee_id"] != claim.payee_id,
+            row["currency"] != claim.currency,
+            row["amount_cents"] != claim.amount_cents,
+            row["source_hash"] != claim.source_hash,
+            bool(row["fee_disqualified"]) != claim.fee_disqualified,
+        )):
+            raise ValueError("persisted recovery claim does not match authorized issuance")
+
     fee_eligible = report.metrics.fee_eligible_realized_cents
     realized = report.metrics.realized_cents
     if fee_eligible and not buyer_posting_evidence_reference:
