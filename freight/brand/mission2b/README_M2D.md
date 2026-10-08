@@ -18,6 +18,18 @@ Place the exact reviewed PNGs in **`freight/brand/mission2b/assets/`**, WITHOUT 
 
 The original masters are already in the separate Mission 2C downloadable package. **As long as these bytes are absent from the repository, a clean GitHub checkout cannot rebuild customer PDFs, and the release acceptance job MUST FAIL.** Copying bytes from the exact approved package is allowed after human verification; substituting arbitrary logos is not.
 
+## Verified exact-master import (Mission 2E)
+
+A standalone, offline importer now validates and extracts **only** the approved original master PNG files from the existing `RETALLY_Mission2D_Approved_Master_Transfer.zip`. It matches SHA-256 values against the commercial-truth register, rejects tampering/duplicates, and never substitutes logo derivatives:
+
+```sh
+python freight/brand/mission2b/source/import_approved_masters.py RETALLY_Mission2D_Approved_Master_Transfer.zip --check-only
+python freight/brand/mission2b/source/import_approved_masters.py RETALLY_Mission2D_Approved_Master_Transfer.zip
+python -m unittest discover -s freight/brand/mission2b -p 'test_*m2*.py' -v
+```
+
+This importer **does not automatically upload to GitHub**. The verified binary files still require committing at the two specified repository paths. The PR remains draft and the GitHub `print-and-document-gate` must remain blocked until the real PNG files are present and remote document rendering passes.
+
 ## How to verify locally
 
 From the repository root, after placing the two original master files:
