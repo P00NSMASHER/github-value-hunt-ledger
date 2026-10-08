@@ -251,7 +251,7 @@
       preparedSummary = buildSummary(reference);
       const subject = encodeURIComponent("Free Recovery Audit Request — " + fieldValue("companyName") + " — " + reference);
       const body = encodeURIComponent(preparedSummary);
-      sendLink.href = "mailto:" + contactEmail + "?subject=" + subject + "&body=" + body;
+      sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
       sendLink.removeAttribute("aria-disabled");
       auditForm.hidden = true;
       const ready = byId("auditReady");
