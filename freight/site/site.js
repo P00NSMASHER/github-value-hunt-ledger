@@ -137,6 +137,7 @@
         .then((status) => {
           if (!status?.online || !/^[a-zA-Z0-9_-]{10,}$/.test(status.siteKey)) return;
           serverReady = true;
+          if (fallbackLink) fallbackLink.hidden = false;
           if (submitButton) submitButton.textContent = "Submit My Free Audit Request";
           if (submitHint) submitHint.textContent = "Submitted securely to RETALLY. No freight files or credentials, please.";
           const widget = document.createElement("div");
@@ -277,7 +278,8 @@
       }
       const turnstileToken = auditForm.querySelector('[name="cf-turnstile-response"]')?.value || "";
       if (!turnstileToken) {
-        setError("Complete the security verification before submitting.");
+        setError("Complete the security verification, or use the email option instead.");
+        if (fallbackLink) fallbackLink.hidden = false;
         return;
       }
       pendingRequestKey ||= window.crypto?.randomUUID?.();
@@ -296,13 +298,18 @@
         idempotencyKey: pendingRequestKey, turnstileToken
       };
       sending = true;
-      if (submitButton) submitButton.disabled = true;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting securely…";
+      }
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 12000);
       setError("");
       try {
         const response = await fetch("/api/inquiry", {
           method: "POST", cache: "no-store", credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload), signal: controller.signal
         });
         const result = await response.json();
         if (!response.ok || !result.received || !/^RA-[0-9]{8}-[A-F0-9]{8}$/.test(result.reference || "")) {
@@ -327,8 +334,12 @@
         if (fallbackLink) fallbackLink.hidden = false;
         window.turnstile?.reset?.();
       } finally {
+        window.clearTimeout(timeout);
         sending = false;
-        if (submitButton) submitButton.disabled = false;
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit My Free Audit Request";
+        }
       }
     });
 
