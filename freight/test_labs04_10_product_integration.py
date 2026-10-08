@@ -198,5 +198,9 @@ def test_lab10_real_rating_engine_does_not_promote_review_to_cash():
     assert all(x['actual_status']=='REVIEW_REQUIRED' for x in review)
 
 
-def test_no_test_uses_a_real_recipient_or_bank():
-    assert 'FICTIONAL' in FICTIONAL_HASH.replace('a'*64,'FICTIONAL')
+def test_fictional_payment_intents_never_contain_real_parties():
+    instruction,_=_payment()
+    assert instruction.buyer_id.startswith('FICTIONAL-')
+    assert instruction.payer_id.startswith('FICTIONAL-')
+    assert instruction.payee_id.startswith('FICTIONAL-')
+    assert instruction.purpose=='FICTIONAL-TEST-NO-BANK'
