@@ -58,6 +58,11 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn(".sample-report .report-population span{white-space:nowrap}", styles)
             self.assertIn("$13,450.00", report)
             self.assertIn("$11,800.00", report)
+            # This is a synthetic aggregate, not an itemized source ledger.
+            # Never silently attribute the unexplained fee-eligibility gap.
+            self.assertIn("$1,650.00 difference", report)
+            self.assertIn("unallocated and not independently verified", report)
+            self.assertIn("no fee is established by this example", report)
 
             # Do not describe the new branded-domain online intake as email-only.
             self.assertIn("Cloudflare Pages at www.retallyrecovery.com", trust)
