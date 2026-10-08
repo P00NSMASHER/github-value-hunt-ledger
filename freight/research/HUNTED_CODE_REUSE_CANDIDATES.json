@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-08",
+  "source_catalog": [
+    "COMPONENTS.md",
+    "CAPABILITIES.md",
+    "intelligence/repository_profiles.jsonl",
+    "intelligence/search_runs.jsonl",
+    "rights/RIGHTS_REGISTRY.json",
+    "freight/HUNTER_FREIGHT_MAP.json"
+  ],
+  "ranked": [
+    {
+      "rank": 1,
+      "id": "EFFECT_BROKER",
+      "repository": "prathamesh-git9/effect-broker",
+      "revision": "eb273640a3a8a2d65fc15169ed1f6d335608b23e",
+      "license": "MIT",
+      "language": "Python",
+      "inspected_source": "https://github.com/prathamesh-git9/effect-broker/blob/eb273640a3a8a2d65fc15169ed1f6d335608b23e/src/effect_broker/statemachine.py",
+      "benefit": "Crash-safe external operation identity, OUTCOME_UNKNOWN handling, bounded retries and zombie-worker fencing",
+      "addresses": [
+        "D-07",
+        "D-08",
+        "LAB-P1-06"
+      ],
+      "acceptance_test": "Run worker-death-after-external-commit, verify exactly one target effect and manual hold on unprobeable outcome.",
+      "integration_posture": "DIRECT_EVALUATION_AFTER_ISOLATION",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 2,
+      "id": "TRUSTMESH",
+      "repository": "srthck/trustmesh",
+      "revision": "5a93d70b37aafecaf61a5bc0296eaf831e5504ac",
+      "license": "MIT",
+      "language": "Python",
+      "inspected_source": "https://github.com/srthck/trustmesh/blob/5a93d70b37aafecaf61a5bc0296eaf831e5504ac/trustmesh/engine",
+      "benefit": "Evidence admission with authority, independence, timestamp eligibility and contradictions",
+      "addresses": [
+        "LAB-P0-02",
+        "LAB-P0-04",
+        "D-04",
+        "Y-01",
+        "Y-04",
+        "X-03"
+      ],
+      "acceptance_test": "Provide two incorrect source IDs and a rehashed false proof; missing external authority must remain NOT_PROVEN.",
+      "integration_posture": "ADAPT_PROOF_RULES",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 3,
+      "id": "CANON",
+      "repository": "cmdrvl/canon",
+      "revision": "45e9702ba7f3874c073134c1a6fb74500232b6a1",
+      "license": "MIT",
+      "language": "Rust",
+      "inspected_source": "https://github.com/cmdrvl/canon/blob/45e9702ba7f3874c073134c1a6fb74500232b6a1/src/identity_scope.rs",
+      "benefit": "Tenant, source system and canonical entity namespace binding",
+      "addresses": [
+        "D-01",
+        "D-02",
+        "LAB-P0-02",
+        "Y-04"
+      ],
+      "acceptance_test": "Reject cross-tenant invoice/source reuse absent explicit source-owner authority, preserve merge/split corrections.",
+      "integration_posture": "PATTERN_ONLY_CROSS_LANGUAGE",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 4,
+      "id": "PAYOPS",
+      "repository": "payops-labs/solana-payment-ops",
+      "revision": "7e4d9cc8d137e4d32cdb4b23aa5c0965f3379e94",
+      "license": "Apache-2.0",
+      "language": "TypeScript",
+      "inspected_source": "https://github.com/payops-labs/solana-payment-ops/blob/7e4d9cc8d137e4d32cdb4b23aa5c0965f3379e94/packages/reconciliation/src/engine/reconcile-event.ts",
+      "benefit": "Independent exact matching and partial/ambiguous settlement exception handling",
+      "addresses": [
+        "LAB-P0-01",
+        "LAB-P0-03",
+        "LAB-P1-07",
+        "D-01",
+        "D-05",
+        "D-06",
+        "Y-02",
+        "Y-03",
+        "X-01"
+      ],
+      "acceptance_test": "Reconstruct money and fee from event postings, reject phantom cash and duplicate allocations; test partial credits and later reversals.",
+      "integration_posture": "PATTERN_ONLY_CHAIN_ABSTRACTIONS_EXCLUDED",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 5,
+      "id": "FIREDRILL",
+      "repository": "kirilurbonas/FireDrill",
+      "revision": "1e532b17e49e4424f988b29dd338ae6c48dc20f3",
+      "license": "Apache-2.0",
+      "language": "Go",
+      "inspected_source": "https://github.com/kirilurbonas/FireDrill/blob/1e532b17e49e4424f988b29dd338ae6c48dc20f3/cmd/firedrill/main.go",
+      "benefit": "Expected-workload census before recovery, isolated restore and application-level proof",
+      "addresses": [
+        "Z-01"
+      ],
+      "acceptance_test": "Empty/missing archive, changed source, vanished tenant and stale backup must not return VERIFIED.",
+      "integration_posture": "SIDECAR_AFTER_STAGING_APPROVAL",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 6,
+      "id": "IN_TOTO",
+      "repository": "in-toto/in-toto",
+      "revision": "e352b43ad7cb8915d84c36d791aa61346152a0a3",
+      "license": "Apache-2.0",
+      "language": "Python",
+      "inspected_source": "https://github.com/in-toto/in-toto/blob/e352b43ad7cb8915d84c36d791aa61346152a0a3/in_toto/verifylib.py",
+      "benefit": "Authorized functionary threshold, artifact comparison and signed-receipt evidence",
+      "addresses": [
+        "Y-01",
+        "X-03",
+        "Z-01"
+      ],
+      "acceptance_test": "Wrong signer, stale policy and rehashed manifest should fail; external signing authority required.",
+      "integration_posture": "DIRECT_EVALUATION_NO_AUTOMATIC_TRUST",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 7,
+      "id": "MINIGRAF",
+      "repository": "project-minigraf/minigraf",
+      "revision": "ccdc85e2921f4028a9312400fe53ecdd5b2202aa",
+      "license": "MIT OR Apache-2.0",
+      "language": "Rust",
+      "inspected_source": "https://github.com/project-minigraf/minigraf/blob/ccdc85e2921f4028a9312400fe53ecdd5b2202aa/src/temporal.rs",
+      "benefit": "Bitemporal rate and consent terms: valid-when vs known-when",
+      "addresses": [
+        "LAB-P1-05",
+        "LAB-P1-06",
+        "D-03"
+      ],
+      "acceptance_test": "Backdated signed amendment must not change already frozen historical fee unless explicit correction exists.",
+      "integration_posture": "PATTERN_ONLY_CROSS_LANGUAGE",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 8,
+      "id": "BCAPPS",
+      "repository": "microsoft/BCApps",
+      "revision": "dc691ba9c2b7a61ee4dcc7d3b7a99c1a1140dadd",
+      "license": "MIT",
+      "language": "AL",
+      "inspected_source": "https://github.com/microsoft/BCApps/blob/dc691ba9c2b7a61ee4dcc7d3b7a99c1a1140dadd/src/Apps",
+      "benefit": "Purchase/invoice/receipt exact line allocation and capacity conservation",
+      "addresses": [
+        "D-01",
+        "Y-02",
+        "D-05"
+      ],
+      "acceptance_test": "Independent invoice/credit caps with persisted-edge check, full pre-save revalidation and no wrong-line allocation.",
+      "integration_posture": "PATTERN_ONLY_ERP_RUNTIME_NOT_PORTABLE",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    },
+    {
+      "rank": 9,
+      "id": "ASSAY",
+      "repository": "OmarFaig/Assay",
+      "revision": "821303935ef2855908a9a9bd1efd4c33f9cd39d2",
+      "license": "MIT",
+      "language": "Python",
+      "inspected_source": "https://github.com/OmarFaig/Assay/blob/821303935ef2855908a9a9bd1efd4c33f9cd39d2/README.md",
+      "benefit": "Source-spanned extraction and safe financial abstention",
+      "addresses": [
+        "LAB-P0-04",
+        "D-04"
+      ],
+      "acceptance_test": "Predictor cannot access expected tariff or synthetic truth; independent scorer catches incorrect auto-accept.",
+      "integration_posture": "ADAPT_EXTRACTION_TESTS",
+      "code_copied": false,
+      "package_installed": false,
+      "staging_product_equivalence": "NOT_TESTED",
+      "rights_review": "PUBLISHED_ROOT_LICENSE_OBSERVED; TRANSITIVE_DEPENDENCIES_BUNDLED_DATA_SAAS_AND_VENDOR_TERMS_NOT_CLEARED"
+    }
+  ],
+  "exclusions": [
+    {
+      "repository": "emoss08/Trenova",
+      "reason": "license/hosted rights not fully cleared; no copying for RecoveryOS commercial laboratory"
+    },
+    {
+      "repository": "OCA/purchase-workflow",
+      "reason": "AGPL-3.0 reciprocal license review required before proprietary combination"
+    },
+    {
+      "repository": "wazuh/wazuh",
+      "reason": "GPL-2.0-only plus high operational coupling; not a lightweight donor"
+    },
+    {
+      "repository": "Noone9029/Accounting-App",
+      "reason": "Root license not verified; conceptual reference only"
+    }
+  ],
+  "adoption_policy": "Proposed code reuse only; exact revision security review, dependency inventory, rights, source attestation, fail-first fixes and integration tests required. No production adoption asserted.",
+  "research_status": "9_PINNED_DONOR_CANDIDATES_INSPECTED"
+}
