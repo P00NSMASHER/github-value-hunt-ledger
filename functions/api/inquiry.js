@@ -277,10 +277,13 @@ export async function onRequestPost({ request, env }) {
           .bind(Math.floor(Date.now()/1000),reference).run();
       } catch (_) { /* durable inquiry is intact; reconciliation required */ }
     }
-    // Opportunistic, bounded cleanup; the monthly admin purge runbook remains mandatory.
+    // Privacy and case-retention safety:
+    // Never purge inquiry records from the public request handler. Notification
+    // success is NOT human follow-up, and an unresolved request may be old.
+    // Customer-data deletion is an explicit, separately authorized operator act
+    // protected by case disposition and legal-hold checks (migration 0002).
+    // Short-lived hashed rate-limit buckets contain no inquiry documents.
     try {
-      await db.prepare("DELETE FROM inquiries WHERE accepted_at < ?")
-        .bind(now - MAX_AGE_SECONDS).run();
       await db.prepare("DELETE FROM inquiry_limits WHERE expires_at < ?")
         .bind(now).run();
     } catch (_) { /* cleanup errors cannot roll back the saved inquiry */ }
