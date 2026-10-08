@@ -61,6 +61,16 @@ jobs:
         run: python after/freight/site/visual_acceptance.py --site bundle-before --out evidence/before
       - name: Capture and validate 35 candidate screenshots at five widths
         run: python after/freight/site/visual_acceptance.py --site bundle-after --out evidence/after --fail-on-issues
+      - name: Install pinned accessibility rules
+        if: github.head_ref == 'audit/retally-visual-acceptance-20261008' || github.ref_name == 'audit/retally-visual-acceptance-20261008'
+        run: npm install --no-save --ignore-scripts --prefix qa_node axe-core@4.10.3
+      - name: Independently test hosted staging pages, mobile form and WCAG rules
+        if: github.head_ref == 'audit/retally-visual-acceptance-20261008' || github.ref_name == 'audit/retally-visual-acceptance-20261008'
+        run: |
+          python after/freight/site/hosted_acceptance.py \
+            --base-url https://789f9877.retally-web.pages.dev/ \
+            --out evidence/hosted \
+            --axe-js qa_node/node_modules/axe-core/axe.min.js
       - name: Upload before and after evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
