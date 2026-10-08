@@ -100,7 +100,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             config = (output / "commercial-config.js").read_text()
 
-            self.assertIn('<span class="hero-phrase">Find it.</span> <em class="hero-phrase">Prove it.</em> <em class="hero-phrase">Recover it.</em>', page)
+            self.assertIn('<span class="hero-phrase">Find it.</span> <span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em>', page)
             self.assertIn("Recovery Evidence Pack", page)
             self.assertIn('href="second-look-freight-audit.html"', page)
             self.assertIn('href="freight-recovery-evidence-standard.html"', page)
