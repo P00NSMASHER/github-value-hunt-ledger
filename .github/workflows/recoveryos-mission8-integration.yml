@@ -1,0 +1,67 @@
+name: RecoveryOS M8 Staging Financial Integration
+
+on:
+  pull_request:
+    paths:
+      - "freight/mission8/**"
+      - ".github/workflows/recoveryos-mission8-integration.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  financial-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: synthetic-ci-only
+          POSTGRES_DB: recoveryos_m8
+        options: >-
+          --health-cmd "pg_isready -U postgres -d recoveryos_m8"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install authentic RecoveryOS schema and M8 candidate in clean database
+        shell: bash
+        run: |
+          set -euo pipefail
+          cid="${{ job.services.postgres.id }}"
+          for path in freight/mission8/ci_auth_stub.sql freight/RECOVERYOS_PHASE1_DATA_PLANE.sql freight/RECOVERYOS_PHASE2_PAYMENT_SCHEMA.sql freight/RECOVERYOS_PHASE3_STEP1_SECURITY.sql freight/mission8/production_representative_staging.sql; do
+            docker exec -i "$cid" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < "$path"
+          done
+      - name: Run financial correctness and replay adversarial tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_acceptance.sql
+      - name: Twenty concurrent PostgreSQL instruction requests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cid="${{ job.services.postgres.id }}"
+          docker exec -i "$cid" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_race_setup.sql
+          pids=()
+          for i in $(seq 1 20); do
+            key=$(printf 'm8-ci-race-%03d' "$i")
+            hash=$(printf '%064x' "$i")
+            payload=$(printf '{"schema":1,"tenant_id":"race_t","payer_id":"PAYER","payee_id":"PAYEE","currency":"USD","amount_cents":10000,"purpose":"Twenty way staged contention","finding_ids":["race_finding"],"idempotency_key":"%s"}' "$key")
+            docker exec "$cid" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 -c "SELECT * FROM recovery_prepare_financial_instruction('race_t',(SELECT id FROM users WHERE email='race.owner@example.invalid'),'$payload'::jsonb,'$hash')" > "/tmp/m8-race-$i.log" 2>&1 &
+            pids+=("$!")
+          done
+          succeeded=0
+          failed=0
+          for pid in "${pids[@]}"; do
+            if wait "$pid"; then succeeded=$((succeeded+1)); else failed=$((failed+1)); fi
+          done
+          echo "20 concurrent attempts: $succeeded committed and $failed denied"
+          [[ "$succeeded" == "10" && "$failed" == "10" ]]
+          total=$(docker exec "$cid" psql -U postgres -d recoveryos_m8 -A -t -c "SELECT coalesce(sum(amount_cents),0) FROM recovery_value_allocations WHERE tenant_id='race_t' AND economic_key='RACE_ECON'")
+          echo "Allocated minor units: $total"
+          [[ "$total" == "100000" ]]
