@@ -11,7 +11,7 @@ import shutil
 import tempfile
 
 from freight.site.build import PUBLIC_FILES as FREIGHT_PUBLIC_FILES, build as build_freight
-from freight.site.rebase_public_urls import OLD_BASE, rebase
+from freight.site.rebase_public_urls import OLD_BASE, rebase, validate_cloudflare_seo
 from recoveryworks.site.build import PUBLIC_FILES as RECOVERY_PUBLIC_FILES, build as build_recoveryos
 
 REPO = Path(__file__).resolve().parents[2]
@@ -39,6 +39,9 @@ def build(output: Path = OUTPUT_DIR) -> Path:
         build_recoveryos(root / "recoveryos")
         shutil.copytree(root / "recoveryos", bundle / "recoveryos")
         rewrites = rebase(bundle)
+        validated_sitemap_urls = validate_cloudflare_seo(bundle)
+        if validated_sitemap_urls < 1:
+            raise RuntimeError("Production sitemap cannot be empty")
         published = [path for path in bundle.rglob("*") if path.is_file()]
         if any(path.is_symlink() for path in bundle.rglob("*")):
             raise RuntimeError("Symlinks are forbidden in the public bundle")
