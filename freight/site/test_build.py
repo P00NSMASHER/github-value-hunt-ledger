@@ -488,5 +488,44 @@ class PublicChatbotTests(unittest.TestCase):
                 self.assertNotIn("connect-src 'none'", content)
 
 
+
+class SignatureFinishTests(unittest.TestCase):
+    """Selective visual tokens without marketing-content or intake changes."""
+
+    def test_premium_surfaces_are_present_and_bounded(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            bundle = build(Path(temporary) / "public")
+            css = (bundle / "foundry.css").read_text(encoding="utf-8")
+            home = (bundle / "index.html").read_text(encoding="utf-8")
+            report = (bundle / "recovery-status-example.html").read_text(encoding="utf-8")
+            self.assertEqual(css.count("RETALLY Signature Finish v1"), 1)
+            for selector in (
+                ".button-signal,.button-cobalt{",
+                ".site-header .navlinks>.button-light{",
+                ".home-simple .opportunity-card{",
+                ".home-simple .price-card-primary{",
+                ".home-simple .price-card-dark{",
+                ".home-simple .form-shell{",
+                ".home-simple .choice-grid input:checked+span{",
+                ".sample-report .report-card.net{",
+                "@media(prefers-reduced-motion:reduce){",
+            ):
+                with self.subTest(selector=selector):
+                    self.assertIn(selector, css)
+            # The published structure and approved claims remain unchanged.
+            self.assertIn('id="auditForm"', home)
+            self.assertIn('id="retallyChatLauncher"', home)
+            self.assertIn("Sample audit", home)
+            self.assertIn("Illustrative only. Not customer results.", home)
+            self.assertIn("No recovery, no recovery fee", home)
+            self.assertIn("Sample Recovery Report", report)
+            self.assertIn("$13,450.00", report)
+            self.assertNotIn("backdrop-filter:blur(", css[css.index("RETALLY Signature Finish v1"):])
+            self.assertNotIn("@keyframes", css[css.index("RETALLY Signature Finish v1"):])
+            self.assertEqual(set(builder.PUBLIC_FILES), {
+                p.relative_to(bundle).as_posix() for p in bundle.rglob("*") if p.is_file()
+            })
+
+
 if __name__ == "__main__":
     unittest.main()
