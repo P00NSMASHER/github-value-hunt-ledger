@@ -45,3 +45,5 @@ This is a tested **staging financial kernel**, not a patch automatically wired i
 
 ### Current security limit
 The staging project has an isolated database containing only artificial records. The current function is NOT ready to accept live customer records. A service-role grant boundary, verified source/authority enrollment, historical entitlement backfill, reviewer/buyer sign-off, evidence-backed reversals and full HTTP authentication tests are required for production.
+
+Minor-unit policy: only explicitly configured 2-decimal currencies (USD/EUR/GBP/CAD/AUD/CHF/NZD) enter the staging ledger. JPY (zero decimals), KWD (three decimals), and unrecognized currencies fail closed until distinct minor-unit adapters and reviewed conversions are implemented.
