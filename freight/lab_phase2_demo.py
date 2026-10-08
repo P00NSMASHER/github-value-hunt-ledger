@@ -41,14 +41,14 @@ def build_demo():
         illustrative=Experiment(
             experiment_id="PHASE2-SYNTHETIC-CLAIMS-01",
             finding_id="LAB-P1-07",
-            source_head_sha=digest({"fixture":"original baseline before partial credit repair"}),
-            candidate_head_sha=digest({"fixture":"phase2 patched lab test"}),
+            baseline_artifact_sha256=digest({"fixture":"original baseline before partial credit repair"}),
+            candidate_artifact_sha256=digest({"fixture":"phase2 patched lab test"}),
             frozen_input_sha256=digest({"fixture":"synthetic two credit and return"}),
             independent_test_sha256=digest({"fixture":"separate finance verifier"}),
-            original_counterexample_reproduced=True,
+            original_counterexample_reproduced=False,
             repaired_counterexample_rejected=True,
             known_good_control_passed=True,
-            measured_runtime_ms=0,
+            measured_runtime_ms=None,
             execution_scope="SYNTHETIC_OFFLINE",
         )
         ledger.append(illustrative)
