@@ -26,6 +26,45 @@ class EconomicsTests(unittest.TestCase):
         self.assertGreater(r.break_even_potential_recovery_cents,150000)
         self.assertEqual(r.scope,"UNCALIBRATED_SIMULATED_CONTINGENCY_MODEL")
 
+    def test_reported_break_even_is_exact_at_cent_level(self):
+        # The old continuous-rate approximation said 320,217 cents was enough,
+        # but the same model's discrete fee path collected only 20,749 cents.
+        under = analyze_contingency(assumption(opportunity_cents=320217))
+        self.assertEqual(under.expected_net_margin_cents, -1)
+        threshold = under.break_even_potential_recovery_cents
+        self.assertEqual(threshold, 320220)
+        below = analyze_contingency(assumption(opportunity_cents=threshold - 1))
+        at = analyze_contingency(assumption(opportunity_cents=threshold))
+        self.assertLess(below.expected_net_margin_cents, 0)
+        self.assertGreaterEqual(at.expected_net_margin_cents, 0)
+
+    def test_fractional_expected_recovery_labor_is_not_rounded_away(self):
+        a = assumption(
+            opportunity_cents=0, free_audit_minutes=0,
+            recovery_work_minutes_if_valid=1, probability_valid_bps=5000,
+            loaded_analyst_hourly_cents=6000,
+            acquisition_cost_cents=0, other_delivery_cost_cents=0,
+        )
+        decision = analyze_contingency(a)
+        self.assertEqual(decision.expected_recovery_work_cost_cents, 50)
+        self.assertEqual(decision.expected_net_margin_cents, -50)
+
+    def test_breakeven_unreachable_within_supported_input_cap(self):
+        a = assumption(acquisition_cost_cents=2**63 - 1)
+        decision = analyze_contingency(a)
+        self.assertIsNone(decision.break_even_potential_recovery_cents)
+        self.assertEqual(decision.assessment, "MODELED_UNECONOMIC_HOLD")
+
+    def test_break_even_is_zero_when_no_cost_at_all(self):
+        a = assumption(
+            free_audit_minutes=0, recovery_work_minutes_if_valid=0,
+            loaded_analyst_hourly_cents=0, acquisition_cost_cents=0,
+            other_delivery_cost_cents=0,
+        )
+        decision = analyze_contingency(a)
+        self.assertEqual(decision.break_even_potential_recovery_cents, 0)
+        self.assertEqual(decision.expected_net_margin_cents, decision.expected_collected_fee_cents)
+
     def test_default_rate_matches_existing_commercial_terms(self):
         self.assertEqual(fixed_default_contingency_bps(),3000)
 
