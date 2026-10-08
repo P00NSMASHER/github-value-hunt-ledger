@@ -1,0 +1,16 @@
+{
+  "name": "retally-m11-recoveryos-qa",
+  "private": true,
+  "type": "module",
+  "description": "Exact Floot M8 handlers in ephemeral CI only. No deployment.",
+  "dependencies": {
+    "jose": "6.2.12",
+    "kysely": "0.26.3",
+    "kysely-postgres-js": "5.0.1",
+    "nanoid": "6.0.2",
+    "postgres": "3.4.9",
+    "superjson": "2.2.2",
+    "zod": "3.25.76",
+    "tsx": "4.20.6"
+  }
+}
