@@ -187,7 +187,7 @@ BEGIN
     FROM jsonb_array_elements(p_request->'allocations') item
     JOIN m7_findings f ON f.tenant_id=p_tenant AND f.id=item.value->>'findingId';
   RETURN QUERY SELECT v_instruction,v_hash,false;
-END $function$
+END $function$;
 
 CREATE TRIGGER m7_allocations_immutable BEFORE DELETE OR UPDATE ON m7_allocations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
 CREATE TRIGGER m7_instructions_immutable BEFORE DELETE OR UPDATE ON m7_instructions FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
