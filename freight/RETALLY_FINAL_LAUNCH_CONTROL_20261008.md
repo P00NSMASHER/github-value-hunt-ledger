@@ -2,7 +2,7 @@
 
 **Evidence date:** 2026-10-08. **Decision authority:** Business owner, buyer-specific authorized reviewers and appropriately qualified counsel. **Status: LIMITED MARKETING READINESS; NO-GO for confidential customer intake, carrier recovery and recovery-fee invoicing.**
 
-**This is the final consolidation document.** Reuse this existing source and release candidate, not additional laboratories, CRMs, questionnaires, parallel release branches or automatic customer-payment systems. Update evidence here when an independent owner actually closes a gate. Repository CI and synthetically rehashed evidence cannot certify external signatures, bank postings, legal registration or customer outcomes.
+**This is the authoritative release-decision register.** The companion `RETALLY_FINAL_LAUNCH_HANDOFF_20261008.md` supplies operator context but does not independently authorize customer activity. Final decision evidence and GO/NO-GO gates in this file take precedence over stale draft assumptions. Reuse this existing source and release candidate, not additional laboratories, CRMs, questionnaires, parallel release branches or automatic customer-payment systems. Update evidence here when an independent owner actually closes a gate. Repository CI and synthetically rehashed evidence cannot certify external signatures, bank postings, legal registration or customer outcomes.
 
 ## A. Confirmed live facts, not future promises
 
@@ -26,6 +26,7 @@
 - PR #320: optional fixed-fee Charter, Amendment and engagement resolution rejecting false-string consent, unsupported states and spoofed authority.
 - PRs #317 and #326: actual 30% contingency engagement requiring valid buyer/RETALLY consent, frozen audit identity and claim chronology; settlement proof computes a **nonbillable** candidate record with billing_authorized=false.
 - PR #305: configurable rate included in statically built HTML, including no-JavaScript and search previews.
+- **Merged PR #330:** preserves unresolved inquiry records by removing request-time automatic deletion. This integration explicitly reconciles that already-merged hotfix with PR #307's safer provider-recipient acknowledgement. Do not reintroduce unconditional 90-day row purges. Separate PRs #321 and #332 contain draft retention/case operator security changes that are NOT production-approved and are not automatically merged here.
 - PR #307: proposed **up-to-20 eligible invoice** free-audit copy, bounded staff time, verified-recipient notification handling, email fallback, and regression tests. The provider token and production flags remain OFF.
 - Mission 2G/2H evidence and zero-upfront cost models already present in this integration branch: reusable **internal synthetic HOLD** models only. Hypothetical 20% rate examples in that research are NOT the working 30% customer rate or a real discount.
 
