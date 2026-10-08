@@ -1,4 +1,4 @@
-# Freight Recovery Referral Partner Program
+# RETALLY Referral Partner Program
 
 Version: 1.0
 Effective: 2026-10-06
@@ -21,7 +21,7 @@ Priority partner types:
 
 ## Partner proposition
 
-Freight Recovery provides an evidence-first historical freight audit for the partner's client.
+RETALLY provides an evidence-first historical freight audit for the partner's client.
 
 - $0 upfront audit;
 - no subscription required;
@@ -41,7 +41,7 @@ Use:
 Do not:
 - promise a recovery;
 - imply a referral fee exists before written terms;
-- imply the partner endorses Freight Recovery before it does;
+- imply the partner endorses RETALLY before it does;
 - use the partner's logo without permission;
 - ask the partner to send customer freight files by ordinary email.
 
@@ -87,7 +87,7 @@ Hi {{name_or_team}},
 
 I noticed your firm works with {{specific_client_type_or_service}}.
 
-I run Freight Recovery. We perform $0-upfront historical freight audits for distributors and multi-site shippers, with every validated finding tied back to the invoice, shipment evidence, and controlling commercial authority.
+I run RETALLY. We perform $0-upfront historical freight audits for distributors and multi-site shippers, with every validated finding tied back to the invoice, shipment evidence, and controlling commercial authority.
 
 If a client already audits freight, our Second-Look review is designed to test what existing controls may have missed without taking credit for known findings or automatic credits.
 
@@ -95,7 +95,7 @@ Would this be relevant for any of the finance or distribution clients you advise
 
 Thanks,
 Jamison
-Freight Recovery
+RETALLY
 715 Yorktowne Road
 Pottsville, PA 17901
 
@@ -103,7 +103,7 @@ Reply "no thanks" and I won't follow up.
 
 ### Touch 2 — useful resource
 
-Share the Freight Recovery methodology / audit checklist instead of sending a generic check-in.
+Share the RETALLY methodology / audit checklist instead of sending a generic check-in.
 
 ### Touch 3 — close loop
 
@@ -115,7 +115,7 @@ Do not publish or promise a referral commission until a written referral agreeme
 
 The initial channel may operate without commissions:
 - partner introduces qualified client;
-- Freight Recovery handles audit/recovery;
+- RETALLY handles audit/recovery;
 - partner remains the trusted advisor;
 - no fee is owed to the partner unless separately agreed.
 

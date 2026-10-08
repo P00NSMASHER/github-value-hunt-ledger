@@ -1,4 +1,4 @@
-# Freight Recovery Three-Touch Outbound Sequence
+# RETALLY Three-Touch Outbound Sequence
 
 Version: 1.2
 Effective: 2026-10-07
@@ -30,7 +30,7 @@ Hi {{first_name_or_company_team}},
 
 {{personalization_sentence}}
 
-I run Freight Recovery. We review past freight invoices for duplicate charges, rate differences, unsupported accessorials, and missed credits. The initial audit has no upfront fee.
+I run RETALLY. We review past freight invoices for duplicate charges, rate differences, unsupported accessorials, and missed credits. The initial audit has no upfront fee.
 
 Each reviewed finding includes the invoice, shipment records, and applicable rate terms. If you choose to authorize recovery work, our fee applies only to eligible funds actually recovered.
 
@@ -38,7 +38,7 @@ Would you be the right person for freight/AP review, or could you point me to wh
 
 Thanks,
 Jamison
-Freight Recovery
+RETALLY
 715 Yorktowne Road
 Pottsville, PA 17901
 
@@ -52,13 +52,13 @@ Hi {{first_name_or_company_team}},
 
 Does {{company}} already review freight invoices through a TMS, payment provider, or internal team?
 
-Freight Recovery offers an independent second look at an agreed set of historical invoices, with no upfront audit fee. We account for existing findings, automatic credits, and claims already known to your provider before identifying any additional opportunity.
+RETALLY offers an independent second look at an agreed set of historical invoices, with no upfront audit fee. We account for existing findings, automatic credits, and claims already known to your provider before identifying any additional opportunity.
 
 Would you be the right person for that review, or could you point me to whoever owns freight/AP?
 
 Thanks,
 Jamison
-Freight Recovery
+RETALLY
 715 Yorktowne Road
 Pottsville, PA 17901
 
@@ -80,7 +80,7 @@ Would an independent review of past freight invoices be useful for {{company}}? 
 
 Thanks,
 Jamison
-Freight Recovery
+RETALLY
 715 Yorktowne Road
 Pottsville, PA 17901
 
@@ -98,7 +98,7 @@ If freight invoice review sits with someone else at {{company}}, I'd appreciate 
 
 Thanks,
 Jamison
-Freight Recovery
+RETALLY
 715 Yorktowne Road
 Pottsville, PA 17901
 

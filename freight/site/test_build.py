@@ -170,7 +170,7 @@ class PublicBuildTests(unittest.TestCase):
             by_type = {node["@type"]: node for node in graph}
             org = by_type["Organization"]
             service = by_type["Service"]
-            self.assertEqual(org["name"], "Freight Recovery")
+            self.assertEqual(org["name"], "RETALLY")
             self.assertEqual(org["address"]["addressLocality"], "Pottsville")
             self.assertEqual(org["address"]["addressRegion"], "PA")
             self.assertEqual(service["provider"]["@id"], org["@id"])

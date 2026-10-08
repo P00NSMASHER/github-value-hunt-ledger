@@ -1,4 +1,4 @@
-# Freight Recovery — free business profile asset pack
+# RETALLY — free business profile asset pack
 
 Updated: 2026-10-07
 Status: **APPLICATION-READY, NOT PUBLISHED OR VERIFIED**
@@ -9,7 +9,7 @@ customer results, meeting locations, or business contact details.
 
 ## Canonical identity
 
-- **Trading name:** Freight Recovery
+- **Trading name:** RETALLY
 - **Website:** https://p00nsmasher.github.io/github-value-hunt-ledger/
 - **Published general-purpose inbox:** jayp19386@gmail.com
 - **Business mailing address on the public site:** 715 Yorktowne Road, Pottsville, PA 17901
@@ -28,12 +28,12 @@ precise platform rules before changing map eligibility.
 
 **Tagline:** Evidence-first freight audit. Recovery you can prove.
 
-**Short (about 300 characters):** Freight Recovery helps U.S. businesses review
+**Short (about 300 characters):** RETALLY helps U.S. businesses review
 historical carrier invoices for supportable duplicates, rate discrepancies,
 accessorial errors and missed credits. Start with a $0-upfront audit. Recovery
 work is separately authorized; fees depend on eligible funds actually recovered.
 
-**Long:** Freight Recovery is a Pottsville, Pennsylvania-based B2B service for
+**Long:** RETALLY is a Pottsville, Pennsylvania-based B2B service for
 shippers, manufacturers, distributors and multi-site operators across the United
 States. We independently review historical parcel, LTL, truckload and related
 freight charges using invoice, shipment and controlling contract/rate evidence.
@@ -65,7 +65,7 @@ audit; duplicate charges; carrier rate review; accessorial charge audit.
 | NO | Yelp | Normally excludes businesses that primarily serve commercial customers | https://www.yelp-support.com/article/What-kinds-of-businesses-are-eligible-for-Yelp?l=en_US | NOT RECOMMENDED |
 | PAID | Schuylkill Chamber | Directory is a paid member-only benefit | https://www.schuylkillchamber.com/ | DEFER; no purchase |
 
-**Duplicate-screen state, 2026-10-07:** The visible 730-entry Schuylkill County Online directory contains no exact `Freight Recovery` entry (text search). Public web searches for the exact
+**Duplicate-screen state, 2026-10-07:** The visible 730-entry Schuylkill County Online directory contains no exact `RETALLY` entry (text search). Public web searches for the exact
 business name plus Pottsville and the published street address did not yield a
 reliable matching LinkedIn, BBB, Manta, Bing, Apple or Google business profile;
 structured local-business discovery likewise surfaced unrelated companies.
@@ -90,7 +90,7 @@ unverified listings or falsely signal platform approval**.
 
 ## Before submission
 
-1. Search by **Freight Recovery**, **Pottsville**, and **715 Yorktowne Road** on
+1. Search by **RETALLY**, **Pottsville**, and **715 Yorktowne Road** on
    the platform. Claim, correct or request access to the original if found.
 2. Confirm company identity, actual service category, ownership authority,
    disclosure of public business information, and any verification steps.
