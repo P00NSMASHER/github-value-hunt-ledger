@@ -50,6 +50,12 @@ def statement(body=BODY, digest=FIXED_HASH):
     )
 
 
+expected_head = os.environ.get("RETALLY_TESTED_HEAD_SHA")
+actual_head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+assert expected_head and actual_head == expected_head, (
+    f"CI tested unexpected commit {actual_head}, expected {expected_head}"
+)
+
 start = time.monotonic()
 with ThreadPoolExecutor(max_workers=32) as executor:
     submitted = list(executor.map(lambda _: psql(statement()), range(100)))
@@ -91,7 +97,8 @@ assert psql("SELECT count(*) FROM recovery_payment_instructions WHERE tenant_id=
 receipt = {
     "schema_version": 1,
     "scope": "ACTUAL_M8_POSTGRES_FUNCTION_EPHEMERAL_SYNTHETIC_NOT_HTTP",
-    "github_sha": os.environ.get("GITHUB_SHA"),
+    "tested_head_sha": actual_head,
+    "workflow_event_sha": os.environ.get("GITHUB_SHA"),
     "fixture_sha256": hashlib.sha256(Path("freight/mission8/ci_same_key_setup.sql").read_bytes()).hexdigest(),
     "payload_sha256": hashlib.sha256(BODY.encode()).hexdigest(),
     "attempts": 100, "max_parallel_workers": 32,
