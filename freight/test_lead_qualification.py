@@ -107,6 +107,49 @@ def test_boolean_evidence_cannot_be_satisfied_by_truthy_strings_or_numbers(field
         profile(**{field: bad})
 
 
+@pytest.mark.parametrize("missing", [
+    {"carrier_count": 0},
+    {"mode_count": 0},
+    {"carrier_count": 0, "mode_count": 0},
+])
+@pytest.mark.parametrize("high_value", [
+    {"annual_freight_spend_usd": 2_000_000, "monthly_shipments": 400},
+    {"annual_freight_spend_usd": 8_000_000, "known_or_suspected_issue": True},
+])
+def test_spending_cannot_qualify_missing_freight_scope(missing, high_value):
+    decision = qualify_free_audit(profile(**missing, **high_value))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    if "carrier_count" in missing:
+        assert "carrier_identity_unidentified" in decision.reasons
+    if "mode_count" in missing:
+        assert "freight_mode_unidentified" in decision.reasons
+
+
+def test_missing_freight_scope_does_not_hide_lack_of_rate_authority():
+    decision = qualify_free_audit(profile(
+        mode_count=0, carrier_count=0,
+        has_rate_authority=False, has_shipment_records=False,
+        has_payment_evidence=False,
+    ))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert set(decision.reasons) == {
+        "freight_mode_unidentified", "carrier_identity_unidentified",
+        "rate_authority_needs_review", "supporting_records_need_review",
+    }
+
+
+def test_missing_invoice_population_still_has_first_precedence():
+    decision = qualify_free_audit(profile(invoice_count=0, carrier_count=0, mode_count=0))
+    assert decision.state is QualificationState.INSUFFICIENT_DATA
+    assert "no_invoice_population" in decision.reasons
+
+
+def test_incumbent_overlap_still_precedes_missing_freight_scope():
+    decision = qualify_free_audit(profile(previously_audited=True, mode_count=0, carrier_count=0))
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert "prior_audit_overlap_check" in decision.reasons
+
+
 def test_unreviewed_high_priority_candidate_still_routes_as_before():
     decision = qualify_free_audit(profile(
         annual_freight_spend_usd=8_000_000,
