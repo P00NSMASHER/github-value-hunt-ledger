@@ -145,6 +145,31 @@ def _verify_engagement_hash(engagement: RecoveryEngagement) -> None:
     supplied_hash = body.pop("engagement_hash")
     if supplied_hash != _canonical_hash(body):
         raise ValueError("engagement hash does not match the engagement record")
+    # A consistent unkeyed digest does not independently establish consent.
+    # Reject false authority even after someone recomputes the digest.
+    for name in ("buyer_accepted", "freight_recovery_accepted"):
+        if type(getattr(engagement, name)) is not bool:
+            raise ValueError(name + " must be a boolean")
+    if engagement.external_action_authorized is not False:
+        raise ValueError("engagement cannot authorize external action")
+    if engagement.authorization_policy != "SEPARATE_ACTION_APPROVAL_REQUIRED":
+        raise ValueError("engagement authorization policy is invalid")
+    if engagement.approved_claim_value_cents != 0 or engagement.actual_recovered_cents != 0:
+        raise ValueError("engagement cannot pre-authorize claimed or recovered amounts")
+    accepted = engagement.buyer_accepted is True and engagement.freight_recovery_accepted is True
+    expected_state = (
+        RecoveryEngagementState.ACCEPTED.value
+        if accepted else RecoveryEngagementState.READY_FOR_ACCEPTANCE.value
+    )
+    if engagement.state != expected_state:
+        raise ValueError("engagement acceptance flags contradict state")
+    if accepted:
+        if not isinstance(engagement.accepted_at, str) or not engagement.accepted_at:
+            raise ValueError("accepted engagement requires accepted_at")
+        if engagement.accepted_at != _canonical_timestamp(engagement.accepted_at):
+            raise ValueError("engagement accepted_at must be canonical")
+    elif engagement.accepted_at is not None:
+        raise ValueError("unaccepted engagement must not have accepted_at")
 
 
 def build_recovery_engagement(request: RecoveryEngagementRequest) -> RecoveryEngagement:
@@ -176,8 +201,13 @@ def build_recovery_engagement(request: RecoveryEngagementRequest) -> RecoveryEng
             _reference(field, value) if field.endswith("_reference") else _required(field, value)
         )
     authorization_policy = _required("authorization_policy", request.authorization_policy)
+    if authorization_policy != "SEPARATE_ACTION_APPROVAL_REQUIRED":
+        raise ValueError("authorization_policy must require separate action approval")
+    for name in ("buyer_accepted", "freight_recovery_accepted"):
+        if type(getattr(request, name)) is not bool:
+            raise ValueError(name + " must be a boolean")
 
-    accepted = request.buyer_accepted and request.freight_recovery_accepted
+    accepted = request.buyer_accepted is True and request.freight_recovery_accepted is True
     if accepted and not request.accepted_at:
         raise ValueError("accepted_at is required when both parties have accepted")
     if request.accepted_at and not accepted:
