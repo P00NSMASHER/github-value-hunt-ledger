@@ -14,7 +14,7 @@
 | Email draft | Public browser supports a user-prepared email to the RETALLY business address, and integrated PR #329 improves mobile fallback and displays recipient | That the visitor sent mail, that Zoho received it or that an inbox was reviewed |
 | Commercial rate | freight/commercial_terms.py has a **30% standard working default**; draft public site renders it without JavaScript and shows it to buyers | A signed, buyer-specific rate, exclusion schedule, legal identity or earned receivable |
 | Source safeguards | This branch integrates qualified lead routing, prior-auditor suppression, correct freight scope, strict consent, proof-bound nonbillable recovery-fee calculations | The security, quality or accuracy of the live Floot application or buyer/accounting authenticity |
-| Collateral | Separate PR #300 has generated visually reviewed source-controlled PDF/DOCX materials, but commercial publication remains on hold | That its synthetic scenario can be presented as a real recovery or has independently reconciled every amount |
+| Collateral | Original PR #300 was closed without merge after its assets and source were consolidated in still-open draft PR #327. PDF/DOCX tests and visual review do not clear customer publication. | That the inherited synthetic scenario is a verified customer recovery or that every dollar is allocated |
 | Financial software | Staging kernel PR #299 and later isolated PostgreSQL/QA acceptance work exist | That guarded transactions are wired to production RecoveryOS or that SETTLED equals cash received |
 
 **Precise meaning of 'ready':** RETALLY may display accurate, non-sensitive marketing and have founder-led discovery conversations. A lead, signed engagement, confirmed recovery and paid customer are four different states. None of the last three may be claimed without evidence.
@@ -32,7 +32,7 @@
 
 **Other dependent work remains separate:**
 - PR #298: merged visual/trust updates. Do not overwrite its current-main changes.
-- PR #300: collateral production and QA candidate; commercial release held for sample reconciliation, approved identities and public-distribution signoff.
+- PR #300: closed without merge and superseded by open draft PR #327 for collateral and commercial acceptance. Financial sample reconciliation, approved legal identity and customer-facing distribution signoff remain blocked. PR #327 is not merged and its collateral should not be confused with the first-customer gate files copied into PR #329.
 - PR #303: earlier customer-readiness register. Its 25-invoice initial hypothesis does not override the latest proposed **20-invoice cap** in the current integration offer.
 - PR #312 (and research ancestors): exact-cent profitability model, **not** real recovery probability, operating budget approval or customer revenue.
 - PR #299 (plus related staged database work): independent financial integrity staging, **not** a production DB migration, cash attestation, or authority to issue an invoice.
@@ -53,7 +53,7 @@
 | G7 | Billing / live financial automation | G2–G6; exact once-only invoice ledger and contractual fee approval, posted-cash source attestation, production-representative concurrency/integration QA, explicit owner release | **NO-GO**; source fee record explicitly billing_authorized=false | Finance owner + engineering release authority |
 | G8 | Customer collateral publication | Independent arithmetic and attribution validation, original approved brand assets, permissioned actual outcomes if any; sample plainly labeled illustrative; signed distribution release | **NO-GO** for unapproved financial claims | Brand lead + CFO/controller |
 
-**Financial sample blocker:** PR #300's illustrative scenario shows $14,200 gross less $750 reversal = $13,450 net, while $11,800 is designated fee-eligible, leaving an **unexplained $1,650**. Until a source-bound allocation explains the gap, keep that fee-eligibility claim out of external materials. Arithmetic consistency does not certify attribution.
+**Financial sample blocker:** The illustrative scenario originating in closed PR #300 and carried into open draft PR #327 shows $14,200 gross less $750 reversal = $13,450 net, while $11,800 is designated fee-eligible, leaving an **unexplained $1,650**. Until a source-bound allocation explains the gap, keep that fee-eligibility claim out of external materials. Arithmetic consistency does not certify attribution.
 
 **The economic gate is also human:** The zero-upfront model must include founder/analyst/reviewer labor, acquisition, admin time, zero-recovery exposure and three-pilot cumulative downside. The research what-if model and 30% software default are not signed pricing or realized profits. Do not change price or guarantee returns based on simulated margin.
 
@@ -72,7 +72,7 @@
 
 ## E. Finite implementation and release sequence; no more missions
 
-**Step 1: Exact integrated-head CI.** Complete current PR #329 checks: Freight Commercial Contracts, RecoveryOS Public Sites, RETALLY Inquiry CI, Visual Acceptance, Repository Release Gate. Record failures and repair only independently reproduced regressions. Confirm no production deployment job ran on pull-request tests.
+**Step 1: Exact integrated-head CI.** Five PR #329 workflows have already passed at `c7c1c29e87e194872098479ecc970445939dc73b`: Freight Commercial Contracts, RecoveryOS Public Sites, RETALLY Inquiry CI, Visual Acceptance, and Repository Release Gate. The visual job explicitly skipped hosted staging, live iOS Safari submission, and WCAG rule checks, so these remain separate gates. Any subsequent commit needs new exact-head CI before code acceptance. No production deployment was performed from the draft.
 
 **Step 2: Independent source & visual acceptance.** Compare final PR against current main, especially merged #298, and independently inspect mobile/desktop browser behavior. Review consent invariants and security of any contract/fee code. Approve only if all checks pass; preserve the default 30% fee and sample disclaimers.
 
