@@ -122,6 +122,44 @@
     let preparedSummary = "";
     const formError = byId("formError");
 
+    let serverReady = false;
+    let pendingRequestKey = null;
+    let sending = false;
+    const fallbackLink = byId("auditEmailFallback");
+    const submitButton = auditForm.querySelector("button[type='submit']");
+    const submitHint = auditForm.querySelector(".form-actions small");
+
+    // Default remains the established email fallback. Only the verified backend
+    // can opt a client into direct submission, and disabling it rolls clients back.
+    if (["www.retallyrecovery.com", "retallyrecovery.com"].includes(window.location.hostname)) {
+      fetch("/api/inquiry", { cache: "no-store", credentials: "same-origin" })
+        .then(async (response) => response.ok ? response.json() : null)
+        .then((status) => {
+          if (!status?.online || !/^[a-zA-Z0-9_-]{10,}$/.test(status.siteKey)) return;
+          serverReady = true;
+          if (submitButton) submitButton.textContent = "Submit My Free Audit Request";
+          if (submitHint) submitHint.textContent = "Submitted securely to RETALLY. No freight files or credentials, please.";
+          const widget = document.createElement("div");
+          widget.id = "auditTurnstile";
+          widget.className = "cf-turnstile";
+          widget.dataset.sitekey = status.siteKey;
+          widget.dataset.action = "retally_audit";
+          widget.dataset.theme = "light";
+          formError?.before(widget);
+          const script = document.createElement("script");
+          script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+          script.async = true;
+          script.defer = true;
+          script.addEventListener("error", () => {
+            serverReady = false;
+            if (submitButton) submitButton.textContent = "Open My Free Audit Request";
+            if (submitHint) submitHint.textContent = "Opens an email draft. Review it and press Send.";
+          });
+          document.head.appendChild(script);
+        })
+        .catch(() => { /* Offline/unconfigured: preserve working mailto method. */ });
+    }
+
     const markStarted = () => {
       if (formStarted) return;
       formStarted = true;
@@ -165,6 +203,7 @@
     for (const field of all("input,select,textarea", auditForm)) {
       field.addEventListener("input", () => {
         if (field.checkValidity()) field.removeAttribute("aria-invalid");
+        pendingRequestKey = null;
         setError("");
       });
     }
@@ -201,35 +240,96 @@
       "No freight records or credentials are attached. Please review fit and, if appropriate, confirm scope and an approved secure intake route."
     ].join("\n");
 
-    auditForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!validate()) return;
-
+    const prepareEmailDraft = () => {
       const contactEmail = document.querySelector('meta[name="freight-contact-email"]')?.content.trim() || "";
       const sendLink = byId("sendAuditRequest");
       if (!contactEmail || !sendLink) {
         setError("The business inbox is temporarily unavailable. Please try again later.");
         return;
       }
-
       const reference = makeReference();
       preparedSummary = buildSummary(reference);
-      const subject = encodeURIComponent(`Free Recovery Audit Request — ${fieldValue("companyName")} — ${reference}`);
+      const subject = encodeURIComponent("Free Recovery Audit Request — " + fieldValue("companyName") + " — " + reference);
       const body = encodeURIComponent(preparedSummary);
-      sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
+      sendLink.href = "mailto:" + contactEmail + "?subject=" + subject + "&body=" + body;
       sendLink.removeAttribute("aria-disabled");
-
       auditForm.hidden = true;
       const ready = byId("auditReady");
       ready.hidden = false;
       ready.focus({ preventScroll: true });
       ready.scrollIntoView({ block: "center", behavior: "smooth" });
-
-      track(EVENTS.auditFormCompleted, { completedSteps: 1 });
+      track(EVENTS.auditFormCompleted, { completedSteps: 1, method: "email_draft" });
       track(EVENTS.auditRequestPrepared, { reference });
-      window.setTimeout(() => {
-        window.location.href = sendLink.href;
-      }, 80);
+      window.setTimeout(() => { window.location.href = sendLink.href; }, 80);
+    };
+
+    fallbackLink?.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (validate()) prepareEmailDraft();
+    });
+
+    auditForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (sending || !validate()) return;
+      if (!serverReady) {
+        prepareEmailDraft();
+        return;
+      }
+      const turnstileToken = auditForm.querySelector('[name="cf-turnstile-response"]')?.value || "";
+      if (!turnstileToken) {
+        setError("Complete the security verification before submitting.");
+        return;
+      }
+      pendingRequestKey ||= window.crypto?.randomUUID?.();
+      if (!pendingRequestKey) {
+        setError("Secure submission is unavailable on this device. Use the email option.");
+        if (fallbackLink) fallbackLink.hidden = false;
+        return;
+      }
+      const payload = {
+        fullName: fieldValue("fullName"), workEmail: fieldValue("workEmail"),
+        companyName: fieldValue("companyName"), annualSpend: fieldValue("annualSpend"),
+        modes: valuesFor("modes"), monthlyShipments: fieldValue("monthlyShipments"),
+        invoiceHistory: fieldValue("invoiceHistory"), suspectedIssues: fieldValue("suspectedIssues"),
+        majorCarriers: fieldValue("majorCarriers"), records: valuesFor("records"),
+        issueNotes: fieldValue("issueNotes"), campaign: nonEmptyCampaignContext,
+        idempotencyKey: pendingRequestKey, turnstileToken
+      };
+      sending = true;
+      if (submitButton) submitButton.disabled = true;
+      setError("");
+      try {
+        const response = await fetch("/api/inquiry", {
+          method: "POST", cache: "no-store", credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!response.ok || !result.received || !/^RA-[0-9]{8}-[A-F0-9]{8}$/.test(result.reference || "")) {
+          throw new Error(result.error || "We could not confirm receipt.");
+        }
+        // This screen is shown ONLY after Cloudflare confirms durable D1 acceptance.
+        auditForm.hidden = true;
+        const ready = byId("auditReady");
+        ready.querySelector(".eyebrow").textContent = "Request received";
+        ready.querySelector("h3").textContent = "RETALLY has received your request.";
+        ready.querySelector("p:not(.eyebrow)").textContent = "Reference " + result.reference +
+          ". No freight files were submitted. We will review the business details you provided.";
+        byId("sendAuditRequest").hidden = true;
+        byId("copyAuditSummary").hidden = true;
+        ready.hidden = false;
+        ready.focus({ preventScroll: true });
+        ready.scrollIntoView({ block: "center", behavior: "smooth" });
+        track(EVENTS.auditFormCompleted, { completedSteps: 1, method: "durable_intake" });
+      } catch (error) {
+        setError((error.message || "Unable to confirm receipt.") +
+          " Your form has not shown a confirmation. You can use the email method instead.");
+        if (fallbackLink) fallbackLink.hidden = false;
+        window.turnstile?.reset?.();
+      } finally {
+        sending = false;
+        if (submitButton) submitButton.disabled = false;
+      }
     });
 
     byId("sendAuditRequest")?.addEventListener("click", (event) => {
