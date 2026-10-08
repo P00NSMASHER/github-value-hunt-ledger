@@ -52,7 +52,7 @@ function request(data=good(),{origin="https://www.retallyrecovery.com",host="www
     body:JSON.stringify(data)
   });
 }
-function mockRemote({captcha=true,notify=true}={}) {
+function mockRemote({captcha=true,notify=true,delivery="delivered"}={}) {
   const real=globalThis.fetch;
   let verifications=0,notifications=0;
   globalThis.fetch=async (url) => {
@@ -62,7 +62,13 @@ function mockRemote({captcha=true,notify=true}={}) {
     }
     if(String(url).includes("email/sending/send")) {
       notifications++;
-      return Response.json({success:notify},{status:notify?200:503});
+      const recipient="jay@retallyrecovery.com";
+      const result={delivered:[],queued:[],suppressed_recipients:[]};
+      if(delivery==="delivered")result.delivered=[recipient];
+      if(delivery==="queued")result.queued=[recipient];
+      if(delivery==="suppressed")result.suppressed_recipients=[recipient];
+      if(delivery==="other")result.delivered=["elsewhere@example.org"];
+      return Response.json({success:notify,result},{status:notify?200:503});
     }
     throw Error("Unexpected URL");
   };
@@ -166,6 +172,27 @@ test("email provider failure leaves a durable pending record for operator reconc
     const r=await onRequestPost({request:request(),env:e});
     assert.equal(r.status,202);
     assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
+  } finally {remote.restore();}
+});
+test("email API success for a suppressed or wrong recipient never counts as accepted delivery", async () => {
+  for(const delivery of ["suppressed","other","none"]) {
+    const remote=mockRemote({delivery});
+    try {
+      const e=env(mockDb());
+      const response=await onRequestPost({request:request(),env:e});
+      assert.equal(response.status,202);
+      assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"pending");
+      assert.equal(remote.notifications,1);
+    } finally {remote.restore();}
+  }
+});
+test("email API queued recipient counts as provider acceptance, not proven inbox delivery", async () => {
+  const remote=mockRemote({delivery:"queued"});
+  try {
+    const e=env(mockDb());
+    const response=await onRequestPost({request:request(),env:e});
+    assert.equal(response.status,202);
+    assert.equal([...e.INQUIRY_DB.inquiries.values()][0].notification_status,"provider_accepted");
   } finally {remote.restore();}
 });
 test("burst attempts limited to five per hour and no notification on rejected request", async () => {
