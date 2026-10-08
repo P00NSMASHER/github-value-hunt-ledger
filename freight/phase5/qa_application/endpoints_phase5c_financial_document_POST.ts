@@ -6,6 +6,7 @@ import { sql } from "kysely";
 import { db } from "../../helpers/db";
 import { requireRecoveryScopedAccess } from "../../helpers/recoveryTenant";
 import { financePayload,verifySyntheticFinancialEnvelope } from "../../helpers/phase5cFinancialEvidence";
+import { recoveryHash } from "../../helpers/recoveryHash";
 import {z} from "zod";
 const schema=z.object({payload:financePayload,signatureB64:z.string().min(80).max(1000)}).strict();
 type CaseRow={customer_id:string;invoice_id:string;currency:string};
@@ -44,7 +45,7 @@ export async function handle(request:Request){
     const old=await sql<OldRow>`SELECT record_id,body,signature_b64 FROM phase5c_qa.documents
       WHERE tenant_id=${payload.tenantId} AND record_id=${payload.recordId}`.execute(trx);
     if(old.rows.length){
-       if(JSON.stringify(old.rows[0].body)!==JSON.stringify(payload)||(old.rows[0].signature_b64??(old.rows[0] as any).signatureB64)!==signatureB64)
+       if(recoveryHash(old.rows[0].body as any)!==recoveryHash(payload as any)||(old.rows[0].signature_b64??(old.rows[0] as any).signatureB64)!==signatureB64)
          throw new Error("CONFLICTING_RECORD_REPLAY");
        return {recordId:old.rows[0].record_id??(old.rows[0] as any).recordId,replay:true};
     }
