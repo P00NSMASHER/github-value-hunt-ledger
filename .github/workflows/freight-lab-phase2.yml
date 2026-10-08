@@ -42,7 +42,7 @@ jobs:
           assert receipt['five_original_audit_repro_after']
           assert sum(receipt['five_original_audit_repro_before'].values())==5
           assert sum(receipt['five_original_audit_repro_after'].values())==0
-          assert receipt['total_test_suite_passed']==88
+          assert receipt['total_test_suite_passed']==89
           print('Receipt and patch match; external offline archive regression must be independently repeated.')
           PY
       - name: Claim boundary
