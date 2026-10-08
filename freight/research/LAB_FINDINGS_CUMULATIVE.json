@@ -2,7 +2,7 @@
   "schema_version": 1,
   "recorded_at": "2026-10-08",
   "scope": "SYNTHETIC_LAB_AND_REUSABLE_RESEARCH_ONLY",
-  "entries_total": 26,
+  "entries_total": 28,
   "first_audit_entries": 8,
   "second_audit_entries": 18,
   "notable_prior_count_correction": "Earlier conversational summary said 25; eight separately indexed first-audit findings plus 18 second-audit findings totals 26 row IDs. Related root causes overlap; do not describe as 26 separate remotely exploitable vulnerabilities.",
@@ -25,7 +25,8 @@
     "external-effect-idempotency": 2,
     "model-metric-integrity": 2,
     "evidence-source-admission": 1,
-    "release-completeness": 1
+    "release-completeness": 1,
+    "release-gate-signal-integrity": 2
   },
   "entries": [
     {
@@ -388,7 +389,40 @@
         "IN_TOTO"
       ],
       "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "GATE-001",
+      "severity": "HIGH",
+      "root_cause_cluster": "release-gate-signal-integrity",
+      "summary": "New standalone proof CLI initially returned exit code 0 despite a semantic FAIL verdict; changed to nonzero semantic failure and tested exact process exit behavior.",
+      "evidence": "REPRODUCED_AND_REPAIRED_IN_STANDALONE_RESEARCH_GATE",
+      "remediation": "FIXED_AND_REGRESSION_TESTED_RESEARCH_GATE_ONLY",
+      "source_audit": "standalone proof_gate/run_validation.py negative control and unittest",
+      "candidate_sources": [
+        "FIREDRILL",
+        "IN_TOTO"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED",
+      "fix_evidence": "test_failed_semantic_proof_must_have_failed_process_exit_code; test_unknown_frozen_source_has_invalid_input_exit_code"
+    },
+    {
+      "id": "GATE-002",
+      "severity": "HIGH",
+      "root_cause_cluster": "release-gate-signal-integrity",
+      "summary": "New standalone proof gate's malformed event dispatch could produce unrelated structural failures while negative-only tests passed; fixed event dispatch and required clean known-good positive control.",
+      "evidence": "REPRODUCED_AND_REPAIRED_IN_STANDALONE_RESEARCH_GATE",
+      "remediation": "FIXED_AND_REGRESSION_TESTED_RESEARCH_GATE_ONLY",
+      "source_audit": "standalone proof_gate.py and positive/negative unittest fixtures",
+      "candidate_sources": [
+        "TRUSTMESH",
+        "FIREDRILL"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED",
+      "fix_evidence": "test_baseline_does_not_accidentally_report_unrelated_structural_defects; test_clean_fictional_intake_is_accepted_as_synthetic_only"
     }
   ],
-  "change_policy": "Append new findings; never silently erase, renumber or mark fixed without failing pre-fix and passing post-fix tests, exact code revision and independent evidence."
+  "change_policy": "Never silently renumber or remove IDs. Original 26 OPEN_UNVERIFIED. GATE-001/002 fixed only in standalone research tool, not RecoveryOS.",
+  "new_research_gate_findings": 2,
+  "historical_open_findings": 26,
+  "historical_count_correction": "26 earlier indexed offline findings, 2 newly discovered and independently corrected flaws in new research gate = 28 total. The original 26 remain OPEN_UNVERIFIED."
 }
