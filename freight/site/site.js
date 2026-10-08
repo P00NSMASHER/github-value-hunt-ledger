@@ -361,4 +361,37 @@
     });
   }
 
+
+  // BubblaV's collapsed mobile iframe spans the full bottom of the screen.
+  // Lift it clear of the existing sticky audit CTA without touching open chat.
+  const auditMobileCta = document.querySelector(".mobile-cta");
+  if (auditMobileCta && typeof MutationObserver !== "undefined") {
+    let chatFrame = null;
+    const alignChatLauncher = () => {
+      if (!chatFrame?.isConnected) return;
+      const small = window.matchMedia("(max-width: 620px)").matches;
+      const chatOpen = window.BubblaVLoader?.isOpen || chatFrame.style.top === "0px";
+      if (!small || chatOpen) return;
+      const desired = Math.ceil(auditMobileCta.getBoundingClientRect().height) + 20 + "px";
+      if (chatFrame.style.getPropertyValue("bottom") !== desired ||
+          chatFrame.style.getPropertyPriority("bottom") !== "important") {
+        chatFrame.style.setProperty("bottom", desired, "important");
+      }
+    };
+    const findChatFrame = () => {
+      const found = document.getElementById("bv-chat-frame");
+      if (!found || chatFrame === found) return;
+      chatFrame = found;
+      new MutationObserver(alignChatLauncher).observe(chatFrame, {
+        attributes: true, attributeFilter: ["style"]
+      });
+      alignChatLauncher();
+    };
+    const insertionObserver = new MutationObserver(findChatFrame);
+    insertionObserver.observe(document.body, { childList: true });
+    findChatFrame();
+    window.addEventListener("resize", alignChatLauncher);
+  }
+
+
 })();
