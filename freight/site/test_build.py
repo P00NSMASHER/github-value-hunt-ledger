@@ -224,7 +224,9 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn(">sales@freightfixture.com</a>", index)
             self.assertNotIn('type="file"', index.lower())
             self.assertIn("form-action 'none'", index)
-            self.assertIn("connect-src 'none'", index)
+            self.assertIn("connect-src https://www.bubblav.com", index)
+            self.assertIn("form-action 'none'", index)
+            self.assertNotIn("connect-src 'self'", index)
 
     def test_pages_have_unique_ids_and_resolvable_local_links(self):
         with tempfile.TemporaryDirectory() as temporary:
