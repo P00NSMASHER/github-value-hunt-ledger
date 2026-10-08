@@ -136,6 +136,19 @@ class InquiryRetentionTests(unittest.TestCase):
         self.assertEqual(rows[0][1],"role:approver-2")
         self.assertNotIn("example@example.org",str(rows))
 
+    def test_purge_receipt_cannot_be_edited_or_deleted(self):
+        ref=seed(self.db)
+        disposition(self.db,ref,approved=True)
+        self.delete(ref)
+        with self.assertRaisesRegex(sqlite3.IntegrityError,
+                                    "inquiry_purge_audit_immutable"):
+            self.db.execute("""UPDATE inquiry_purge_audit
+                SET approved_by='forged' WHERE reference=?""",(ref,))
+        with self.assertRaisesRegex(sqlite3.IntegrityError,
+                                    "inquiry_purge_audit_immutable"):
+            self.db.execute("DELETE FROM inquiry_purge_audit WHERE reference=?",(ref,))
+        self.assertEqual(self.count("inquiry_purge_audit"),1)
+
     def test_duplicate_purge_approval_and_audit_replay_fail_closed(self):
         ref=seed(self.db)
         disposition(self.db,ref,approved=True)
