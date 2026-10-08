@@ -207,5 +207,85 @@ def test_census_records_are_never_claim_or_operating_authority_labels():
     assert not any("overcharge" in attr or "claim" in attr for attr in record.__dataclass_fields__)
 
 
+
+def test_redirect_handler_rejects_all_location_targets_without_following_them():
+    import urllib.request
+    from freight.fmcsa_public_carrier import _RejectRedirects
+
+    request = urllib.request.Request(build_query_url("1234567"))
+    for code, url in [
+        (301, "https://elsewhere.example/collect?dot=1234567"),
+        (302, "https://data.transportation.gov/another-api"),
+        (307, "http://data.transportation.gov/resource/az4n-8mr2.json"),
+        (308, "https://elsewhere.example/collect"),
+    ]:
+        with pytest.raises(FMCSAReferenceError, match="redirects are not permitted"):
+            _RejectRedirects().redirect_request(request, None, code, "redirect", {}, url)
+
+
+def test_default_network_path_installs_redirect_denial_without_live_network(monkeypatch):
+    import urllib.request
+    from freight.fmcsa_public_carrier import _RejectRedirects
+
+    checks = []
+
+    class FakeOpener:
+        def open(self, request, *, timeout):
+            checks.append(("request", request.get_method(), timeout))
+            return MockHTTPResponse([row()])
+
+    def fake_build_opener(*handlers):
+        checks.append(("handler", tuple(type(h) for h in handlers)))
+        return FakeOpener()
+
+    monkeypatch.setattr(urllib.request, "build_opener", fake_build_opener)
+    result = lookup_public_carrier(
+        "1234567", retrieved_at_utc="2026-10-08T18:00:00Z"
+    )
+    assert result.usdot_number == "1234567"
+    assert checks == [
+        ("handler", (_RejectRedirects,)),
+        ("request", "GET", 5),
+    ]
+
+
+def test_unexpected_final_response_url_rejected_without_reading_data():
+    class WrongOriginResponse(MockHTTPResponse):
+        def geturl(self):
+            return "https://not-fmcsa.example/resource/az4n-8mr2.json"
+
+        def read(self, size=-1):
+            raise AssertionError("should not read redirected response")
+
+    def opener(request, *, timeout):
+        return WrongOriginResponse([row()])
+
+    with pytest.raises(FMCSAReferenceError, match="response origin or query changed"):
+        lookup_public_carrier("1234567", opener=opener)
+
+
+def test_same_host_different_query_is_not_source_identical():
+    class WrongQueryResponse(MockHTTPResponse):
+        def geturl(self):
+            return "https://data.transportation.gov/resource/az4n-8mr2.json?$limit=99999"
+
+    with pytest.raises(FMCSAReferenceError, match="response origin or query changed"):
+        lookup_public_carrier("1234567", opener=lambda request, *, timeout: WrongQueryResponse([row()]))
+
+
+@pytest.mark.parametrize("payload", [
+    b'[{"dot_number":"1234567","dot_number":"1234567","legal_name":"EXAMPLE FREIGHT LLC","power_units":"12"}]',
+    b'[{"dot_number":"1234567","legal_name":"EXAMPLE FREIGHT LLC","power_units":"12","power_units":"999"}]',
+    b'[{"dot_number":"1234567","legal_name":"EXAMPLE FREIGHT LLC","power_units":"12","nested":{"x":1,"x":2}}]',
+])
+def test_duplicate_json_keys_rejected_even_if_last_value_looks_valid(payload):
+    def opener(request, *, timeout):
+        return MockHTTPResponse(None, raw=payload)
+
+    with pytest.raises(FMCSAReferenceError, match="duplicate government JSON field"):
+        lookup_public_carrier("1234567", opener=opener)
+
+
+
 def test_empty_lookup_does_not_pretend_carrier_is_out_of_service():
     assert validate_census_response("1234567", [], retrieved_at_utc="2026-10-08T18:00:00Z") is None
