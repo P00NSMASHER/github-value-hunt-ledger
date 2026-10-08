@@ -18,8 +18,17 @@
       "head_sha": "8abbac599fc6261a8b61aebb6acda53bba46c64b",
       "staging_only": true
     },
-    "mission9_audit_chain_extension_latest_run": 37818742406,
-    "mission9_audit_chain_extension_verdict": "PENDING_AT_DOCUMENT_CREATION"
+    "mission9_audit_chain_extension_latest_run": 37819080335,
+    "mission9_audit_chain_extension_verdict": "PASS",
+    "mission9_github_acceptance_sha": "3b916401e79342d4716d5daf11d1157c4b402f6d",
+    "mission9_passed_steps": [
+      "clean PostgreSQL schema install",
+      "idempotent M8 SQL reapplication",
+      "financial audit-trigger install",
+      "adversarial allocation acceptance",
+      "legacy immutable payment hold",
+      "20 simultaneous SQL payment requests"
+    ]
   },
   "source_snapshots": {
     "git_main_observed_sha": "2edd47a8e20e95e562905d9e28494e82e5463624",

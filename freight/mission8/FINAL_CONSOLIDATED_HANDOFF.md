@@ -22,7 +22,7 @@ The deployed Floot app, repository Python engine, and M8 PostgreSQL staging inte
 2. M8 actual-table integration and multi-session financial acceptance: [GitHub Actions 37795153892](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/37795153892).
 3. M8 clean PostgreSQL tests included both synthetic legacy hold behavior and 20 competing payment instructions. Observed outcome: 10 committed, 10 rejected, no more than 100,000 synthetic minor units allocated.
 4. Isolated staging helper tests: 3 recovery files passed at the earlier snapshot, and isolated staging typecheck was clean at that time.
-5. Staging tenant `rt_m8_a`: 23 audit events verified, 0 invalid hashes, 0 broken links (read-only query). The financial certification/allocation audit triggers are newly added to the review branch and require independent latest-head CI confirmation.
+5. Staging tenant `rt_m8_a`: 23 audit events verified, 0 invalid hashes, 0 broken links (read-only query). The financial certification/allocation audit triggers passed independent clean-room CI at [run 37819080335](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/37819080335), together with audit-chain fixtures.
 6. Synthetic mixed currencies returned separate USD/EUR/GBP groups, not one blended monetary total.
 7. The project intentionally returns *zero* certified recovered cash without trusted settlement evidence. Provider-reported SETTLED is NOT buyer-reconciled funds.
 8. Read-only production aggregate inspection returned 0 payment instructions, 0 payment events and 0 findings at the time of inspection. This is not a universal claim about all data or future rows.
@@ -55,7 +55,7 @@ The deployed Floot app, repository Python engine, and M8 PostgreSQL staging inte
 **P2:** Full matching Python/TypeScript/SQL conformance fixture coverage is incomplete; rate-authority rule coverage still requires blind real-customer adjudication.
 
 ## F. Latest staging test limitation
-The Floot account hit its daily build-action cap when re-running current-source typecheck and helpers after the prior successes. Those later calls failed for quota, NOT because the code failed its tests. Therefore the latest Floot source snapshot is **not freshly accepted** until that retest is executed successfully. Earlier passes remain bounded to their actual versions.
+GitHub's latest-head financial integration acceptance passed at [run 37819080335](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/37819080335). The Floot account hit its daily build-action cap when re-running current-source typecheck and helpers after the prior successes. Those later calls failed for quota, NOT because the code failed its tests. Therefore the latest Floot source snapshot is **not freshly accepted** until that retest is executed successfully. Earlier passes remain bounded to their actual versions.
 
 ## G. Safe deployment handoff (not authorization)
 1. Keep PRs #299 and #306 as review artifacts. Use #299 for original isolated kernel reference, #306 for the application integration; do NOT merge both as independent competing financial systems.
