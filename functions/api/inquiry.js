@@ -209,7 +209,22 @@ async function notify(env, reference, p) {
   );
   if (!res.ok) return false;
   const json = await res.json();
-  return json.success === true || !!json.id;
+  // Cloudflare API success or a message ID is not proof the intended inbox
+  // accepted this notification. The provider can suppress a recipient even
+  // when the overall call succeeds. Queueing is not mailbox delivery.
+  if (json?.success !== true || !json.result ||
+      typeof json.result !== "object" || Array.isArray(json.result)) return false;
+  const { delivered, queued, suppressed_recipients, permanent_bounces } = json.result;
+  // All four recipient arrays are required by the Cloudflare Sending contract.
+  // Missing or malformed lists must not silently mean "no suppressions".
+  if (![delivered, queued, suppressed_recipients, permanent_bounces]
+      .every(Array.isArray)) return false;
+  const target = env.INQUIRY_NOTIFY_TO.toLowerCase();
+  const includesTarget = list => list.some(value =>
+    typeof value === "string" && value.toLowerCase() === target);
+  return !includesTarget(suppressed_recipients) &&
+    !includesTarget(permanent_bounces) &&
+    (includesTarget(delivered) || includesTarget(queued));
 }
 export async function onRequestPost({ request, env }) {
   // A backend deployment alone does not enable this service for the public.
