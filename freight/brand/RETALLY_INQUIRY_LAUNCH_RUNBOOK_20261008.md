@@ -17,8 +17,28 @@
 2. Mandatory real Turnstile verification on the server, action `retally_audit`, approved hostname, short-lived single-use token; no Turnstile bypass in production.
 3. D1 atomic per-IP keyed-hash bucket limits (5/hour and 20/day) and SHA-256 content fingerprint; no raw client IP stored. Browser holds an unpredictable idempotency UUID; replay with same fields returns its prior reference, changed fields return HTTP 409. No second email is attempted for the duplicate.
 4. The server generates an `RA-YYYYMMDD-XXXXXXXX` reference and writes the record to D1 before answering `202 received:true`. Database failure never yields success.
-5. Notification then attempts a *server-side* Cloudflare Email Service send to the fixed RETALLY mailbox; provider acceptance is stored as `provider_accepted`. A provider error leaves `pending` for manual operator reconciliation. **Provider acceptance is not proof that Zoho delivered the message.**
+5. Notification then attempts a *server-side* Cloudflare Email Service send to the fixed RETALLY mailbox. Mark `provider_accepted` **only** if the API positively identifies the intended mailbox in `result.delivered` or `result.queued` and does not identify that mailbox in `result.permanent_bounces` or `result.suppressed_recipients`. An API-level `success:true` alone is insufficient. Missing/mismatched/negative acknowledgement leaves `pending` for manual operator reconciliation. **Provider acceptance is not proof that Zoho delivered the message.**
 6. No public endpoint reads the inquiry table. The site never claims a lead is qualified, an audit accepted, or carrier authority granted.
+
+## Mission 10 verification (2026-10-08; read-only production inspection)
+
+- Cloudflare Pages production has `FREIGHT_INQUIRY_ENABLED=0` and
+  `FREIGHT_INQUIRY_MAILBOX_VERIFIED=0`, and **does not have**
+  `CLOUDFLARE_EMAIL_API_TOKEN` configured. D1 binding and Turnstile/rate-limit
+  secrets are configured; their values were not read or exposed. The public
+  browser email-draft fallback is therefore correct. Do not enable online
+  submission merely because the pages deploy and mocked tests pass.
+- An independent attempt to read the Cloudflare Email Sending subdomain
+  listing returned API error `2036 Unauthorized`. This does not prove that
+  no sender domain exists, only that the connected identity cannot verify
+  onboarding/status through that operation.
+- The existing Cloudflare Email Sending API schema confirms that a
+  `success:true` response may list a recipient under
+  `suppressed_recipients` or `permanent_bounces`, as well as under
+  `queued` or `delivered`. The implementation now checks the intended
+  recipient explicitly, and has mocked negative/positive regressions.
+- No production endpoint change, sending token creation, provider transmission,
+  customer data processing or live activation was performed in Mission 10.
 
 ## Remaining activation gates (do not skip)
 - **Inbound Zoho proof:** open the actual Zoho mailbox and independently match a controlled message's subject, timestamp, sender and body. A sender-side Gmail SENT copy or no bounce is insufficient.
