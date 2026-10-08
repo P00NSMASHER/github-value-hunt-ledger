@@ -44,25 +44,79 @@ def stage_policy(stage, *, evidence=False, customer_authorization=False, carrier
         require(posted, 'carrier approval is not received funds')
     return True
 
+def _exact_settlement_amount(value):
+    """Accept only finite, positive exact-cent amounts; never silently round."""
+    from decimal import InvalidOperation
+
+    if isinstance(value, bool) or not isinstance(value, (str, int, Decimal)):
+        raise ValueError('settlement amount must be a positive exact-cent value')
+    try:
+        amount = D(value)
+        if not amount.is_finite() or amount <= 0 or amount != amount.quantize(CENT):
+            raise ValueError('settlement amount must be a positive exact-cent value')
+        return amount.quantize(CENT)
+    except (InvalidOperation, ValueError, TypeError) as exc:
+        raise ValueError('settlement amount must be a positive exact-cent value') from exc
+
+
 def unique_settlement_ledger(events):
-    unique = set(); gross=D('0.00'); reversals=D('0.00'); allocations=set()
-    for e in events:
-        require(e['currency'] == 'USD', 'cannot combine currencies')
-        require(e['id'] not in unique, 'duplicate settlement event ID')
-        unique.add(e['id'])
-        require(e['allocation'] not in allocations or e['kind']=='reversal','duplicated opportunity allocation')
-        allocations.add(e['allocation'])
-        amount=cents(e['amount']); require(amount>0,'nonpositive event')
-        if e['kind']=='credit':
-            require(bool(e.get('posted')), 'unposted credit cannot be recovered funds')
+    """Reconcile a synthetic ledger with credit-bound, cumulative reversal caps.
+
+    This demonstrates financial controls only; it does not authenticate the
+    posted flags, independent buyer cash, carrier identity, or entitlement.
+    """
+    require(isinstance(events, (list, tuple)), 'settlement events must be a sequence')
+    seen = set()
+    original_credits = {}
+    credited_allocations = set()
+    reversals_by_credit = {}
+    gross = D('0.00')
+    reversals = D('0.00')
+
+    for event in events:
+        require(isinstance(event, dict), 'settlement event must be a record')
+        require(event.get('currency') == 'USD', 'cannot combine currencies')
+        eid = event.get('id')
+        allocation = event.get('allocation')
+        require(isinstance(eid, str) and 0 < len(eid) <= 200
+                and eid.strip() == eid, 'invalid settlement event ID')
+        require(eid not in seen, 'duplicate settlement event ID')
+        require(isinstance(allocation, str) and 0 < len(allocation) <= 200
+                and allocation.strip() == allocation, 'invalid opportunity allocation')
+        require(event.get('posted') is True, 'unposted settlement event cannot be booked')
+        amount = _exact_settlement_amount(event.get('amount'))
+
+        if event.get('kind') == 'credit':
+            require(allocation not in credited_allocations, 'duplicated opportunity allocation')
+            require(event.get('references_event') is None,
+                    'credit cannot reference an earlier settlement event')
+            credited_allocations.add(allocation)
+            original_credits[eid] = (allocation, amount)
             gross += amount
-        elif e['kind']=='reversal':
-            require(bool(e.get('posted')), 'unposted reversal cannot be booked')
-            require(e.get('references_event') in unique, 'reversal without prior original settlement')
+        elif event.get('kind') == 'reversal':
+            original = event.get('references_event')
+            # Check only the original posted credits, not all seen event IDs.
+            # This forbids self-reference, reversal-of-reversal and forward links.
+            require(isinstance(original, str) and original in original_credits,
+                    'reversal without prior original credit')
+            expected_allocation, credited = original_credits[original]
+            require(allocation == expected_allocation,
+                    'reversal allocation differs from original credit')
+            prior_reversals = reversals_by_credit.get(original, D('0.00'))
+            require(prior_reversals + amount <= credited,
+                    'cumulative reversal exceeds original credit')
+            reversals_by_credit[original] = prior_reversals + amount
             reversals += amount
-        else: raise ValueError('unrecognized financial event')
-    require(gross>=reversals,'reversal exceeds gross')
-    return {'gross':str(gross),'reversals':str(reversals),'net':str(cents(gross-reversals))}
+        else:
+            raise ValueError('unrecognized financial event')
+        seen.add(eid)
+
+    require(reversals <= gross, 'reversal exceeds gross')
+    return {
+        'gross': str(gross.quantize(CENT)),
+        'reversals': str(reversals.quantize(CENT)),
+        'net': str((gross - reversals).quantize(CENT)),
+    }
 
 def aggregate_arithmetic(a):
     m=a['usd']; gross=D(m['gross_posted_recovery']); rev=D(m['reversals'])
