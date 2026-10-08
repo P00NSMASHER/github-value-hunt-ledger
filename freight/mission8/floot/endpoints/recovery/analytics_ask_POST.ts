@@ -27,7 +27,9 @@ function number(value: string | number | bigint | null | undefined): number {
 }
 
 function money(cents: number, currency?: string): string {
-  if (!currency) return String(cents) + " minor units (currency unspecified)";
+  if (!currency || !["USD","EUR","GBP","CAD","AUD","CHF","NZD"].includes(currency)) {
+    return String(cents) + " raw minor units (scale unverified" + (currency ? " for "+currency : "") + ")";
+  }
   return new Intl.NumberFormat("en-US",{style:"currency",currency}).format(cents/100);
 }
 function summarize(intent: Intent, rows: AnalyticsRow[]): string {
