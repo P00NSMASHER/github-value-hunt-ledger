@@ -120,7 +120,7 @@ jobs:
                     "actual_recovered_cash_verified": False,
                     "production_deployment": False}
           pathlib.Path("phase6-postgres-manifest.json").write_text(
-              json.dumps(result, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+              json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           sys.exit(p.returncode)
           PY
       - name: Preserve passing or failing PostgreSQL test transcript
