@@ -36,11 +36,21 @@ jobs:
           for path in freight/mission8/ci_auth_stub.sql freight/RECOVERYOS_PHASE1_DATA_PLANE.sql freight/RECOVERYOS_PHASE2_PAYMENT_SCHEMA.sql freight/RECOVERYOS_PHASE3_STEP1_SECURITY.sql freight/RECOVERYOS_PHASE3_STEP2_PERFORMANCE.sql freight/mission8/production_representative_staging.sql; do
             docker exec -i "$cid" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < "$path"
           done
+      - name: Reapply forward-only M8 schema idempotently
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/production_representative_staging.sql
       - name: Run financial correctness and replay adversarial tests
         shell: bash
         run: |
           set -euo pipefail
           docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_acceptance.sql
+      - name: Historical immutable commitments must fail closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker exec -i "${{ job.services.postgres.id }}" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_legacy_hold.sql
       - name: Twenty concurrent PostgreSQL instruction requests
         shell: bash
         run: |
