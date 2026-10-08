@@ -205,3 +205,92 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
  .sample-report .document-hero{background:#fff;color:#000}
  .sample-report .report-header h1,.sample-report .report-header p{color:#000}
 }
+
+
+/* RETALLY premium chat launcher: one semantic button, separate from vendor UI.
+   The vendor iframe remains available on failure and is not restyled inside. */
+.retally-chat-launcher {
+ position:fixed;right:24px;bottom:26px;z-index:2147483000;
+ display:inline-flex;align-items:center;gap:11px;
+ width:auto;min-height:70px;padding:7px 20px 7px 7px;
+ border-radius:999px;border:1px solid rgba(189,255,218,.62);
+ color:#f5fff9;cursor:pointer;
+ background:linear-gradient(152deg,#309a70 0%,#128053 24%,#06553e 56%,#063829 100%);
+ box-shadow:inset 0 2px 2px rgba(255,255,255,.52),
+  inset 0 -3px 8px rgba(0,31,25,.5),
+  0 0 0 4px rgba(4,93,59,.16),
+  0 16px 38px rgba(2,31,25,.37),0 6px 14px rgba(0,0,0,.18);
+ font-family:Hanken,system-ui,sans-serif;text-align:left;line-height:1;
+ -webkit-tap-highlight-color:transparent;isolation:isolate;
+ transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.retally-chat-launcher::before {
+ content:"";position:absolute;inset:2px 3px auto;height:43%;
+ border-radius:100px 100px 44px 44px;
+ background:linear-gradient(180deg,rgba(255,255,255,.31),rgba(255,255,255,.11) 52%,transparent);
+ pointer-events:none;z-index:-1;
+}
+.retally-chat-launcher::after {
+ content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ box-shadow:inset 0 0 0 1px rgba(245,255,248,.1),inset 0 -1px 0 rgba(0,20,17,.5);
+}
+.retally-chat-orb {
+ width:56px;height:56px;flex:none;border-radius:50%;
+ display:grid;place-items:center;position:relative;
+ background:radial-gradient(circle at 36% 21%,#53c991 0%,#159566 37%,#056442 71%,#043a2f 100%);
+ box-shadow:inset 0 2px 3px rgba(255,255,255,.48),
+  inset 0 -4px 6px rgba(1,28,21,.5),0 2px 8px rgba(0,26,18,.35);
+ border:1px solid rgba(229,255,241,.42);
+}
+.retally-chat-orb::before {
+ content:"";position:absolute;left:13%;right:13%;top:8%;height:34%;
+ border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.55),transparent);
+ filter:blur(2px);pointer-events:none;
+}
+.retally-chat-orb svg {
+ width:30px;height:30px;color:#fff;position:relative;z-index:1;
+ filter:drop-shadow(0 1px 1px rgba(2,48,31,.52));
+}
+.retally-chat-spark {
+ position:absolute;top:9px;right:9px;width:7px;height:7px;
+ border-radius:50%;background:#e7fff1;z-index:2;
+ box-shadow:0 0 0 2px rgba(210,255,223,.15),0 0 9px 2px rgba(185,255,217,.72);
+}
+.retally-chat-copy {display:flex;flex-direction:column;gap:5px;white-space:nowrap;position:relative;z-index:1}
+.retally-chat-copy strong {font-size:15px;letter-spacing:.015em;font-weight:700}
+.retally-chat-copy>span {font-size:10.5px;letter-spacing:.02em;color:#cff6dc}
+.retally-chat-launcher:hover {
+ transform:translateY(-3px);filter:saturate(1.1);
+ box-shadow:inset 0 2px 2px rgba(255,255,255,.52),inset 0 -3px 8px rgba(0,31,25,.5),
+  0 0 0 5px rgba(4,93,59,.18),0 20px 44px rgba(2,31,25,.42);
+}
+.retally-chat-launcher:active {transform:translateY(1px) scale(.985)}
+.retally-chat-launcher:focus-visible {
+ outline:3px solid #b9ffda;outline-offset:5px;
+}
+.retally-chat-launcher[hidden],.retally-chat-fallback .retally-chat-launcher {display:none!important}
+/* Hide only the native collapsed launcher. Opening restores the original
+   BubblaV iframe, including its own chat, close and keyboard UI. */
+.retally-chat-enhanced:not(.retally-chat-open):not(.retally-chat-fallback) #bv-chat-frame {
+ visibility:hidden!important;opacity:0!important;
+}
+.retally-chat-enhanced.retally-chat-open #bv-chat-frame,
+.retally-chat-enhanced.retally-chat-fallback #bv-chat-frame {
+ visibility:visible!important;opacity:1!important;
+}
+@media(max-width:620px){
+ .retally-chat-launcher {
+  width:68px;height:68px;min-height:68px;padding:5px;justify-content:center;
+  right:17px;bottom:calc(19px + env(safe-area-inset-bottom, 0px));
+  border-radius:50%;box-shadow:inset 0 2px 2px rgba(255,255,255,.55),
+   inset 0 -4px 8px rgba(1,33,25,.5),0 0 0 4px rgba(4,93,59,.13),
+   0 14px 30px rgba(3,43,31,.4);
+ }
+ .retally-chat-orb {width:56px;height:56px}
+ .retally-chat-copy {display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .retally-chat-launcher {transition:none}
+ .retally-chat-launcher:hover,.retally-chat-launcher:active {transform:none}
+}
+@media print{.retally-chat-launcher {display:none!important}}

@@ -448,6 +448,31 @@ class PublicChatbotTests(unittest.TestCase):
             self.assertIn("Optional AI chat assistant", (output / "privacy.html").read_text())
             self.assertIn("https://www.bubblav.com", (output / "_headers").read_text())
 
+    def test_glossy_chat_launcher_keeps_native_widget_and_accessibility(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text()
+            js = (output / "site.js").read_text()
+            for page in builder.PUBLIC_CONTACT_PAGES:
+                html = (output / page).read_text()
+                with self.subTest(page=page):
+                    self.assertEqual(html.count('id="retallyChatLauncher"'), 1)
+                    self.assertIn('type="button" aria-label="Open RETALLY AI chat assistant"', html)
+                    self.assertIn('aria-haspopup="dialog"', html)
+                    self.assertIn('class="retally-chat-orb"', html)
+                    self.assertEqual(html.count('data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147"'), 1)
+                    self.assertLess(html.index('id="retallyChatLauncher"'), html.index('data-site-id="b0e3b0a1-8f64-4dcd-ac82-507366428147"'))
+            self.assertIn('window.BubblaV', js)
+            self.assertIn('api.open()', js)
+            self.assertIn('retally-chat-fallback', js)
+            self.assertIn('retally-chat-open', js)
+            self.assertIn('window.setInterval(syncRetallyChat, 500)', js)
+            self.assertIn('.retally-chat-launcher:focus-visible', css)
+            self.assertIn('@media(prefers-reduced-motion:reduce)', css)
+            self.assertIn('#bv-chat-frame', css)
+            for name in ("recovery-status-example.html", "404.html"):
+                self.assertNotIn('id="retallyChatLauncher"', (output / name).read_text())
+
     def test_cloudflare_turnstile_csp_coexists_with_chatbot(self):
         from freight.site.cloudflare_build import allow_verified_pages_inquiry
 

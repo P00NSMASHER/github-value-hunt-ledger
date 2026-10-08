@@ -126,6 +126,23 @@ BUBBLAV_SNIPPET = (
     '<script src="https://www.bubblav.com/widget.js" '
     f'data-site-id="{BUBBLAV_ID}" defer></script>'
 )
+
+# The custom button is part of the public marketing artifact, not the vendor iframe.
+# Its click handler uses BubblaV's published window.BubblaV.open() API.
+BUBBLAV_LAUNCHER = (
+    '<button id="retallyChatLauncher" class="retally-chat-launcher" type="button" '
+    'aria-label="Open RETALLY AI chat assistant" aria-haspopup="dialog">'
+    '<span class="retally-chat-orb" aria-hidden="true">'
+    '<svg viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">'
+    '<path d="M7 9.8C7 7.15 9.15 5 11.8 5h9.4C23.85 5 26 7.15 26 9.8v9.4'
+    'c0 2.65-2.15 4.8-4.8 4.8h-6.7l-5.25 3.5v-4.17C7.9 22.49 7 21.07 7 19.2V9.8Z" '
+    'stroke="currentColor" stroke-width="2.15" stroke-linejoin="round"/>'
+    '<path d="M12 14.5h9M12 18.5h6" stroke="currentColor" stroke-width="2" '
+    'stroke-linecap="round"/>'
+    '</svg><span class="retally-chat-spark"></span></span>'
+    '<span class="retally-chat-copy"><strong>Ask RETALLY</strong>'
+    '<span>Freight recovery help</span></span></button>'
+)
 BUBBLAV_CONNECT_POLICY = (
     "https://www.bubblav.com https://bubblav.com https://*.bubblav.com"
 )
@@ -162,7 +179,7 @@ def _allow_bubblav(content: str, asset: str) -> str:
 def _embed_bubblav(page: str, asset: str) -> str:
     if page.count("</body>") != 1 or page.count(BUBBLAV_SNIPPET) != 0:
         raise ValueError(f"Unexpected widget insertion boundary: {asset}")
-    return _allow_bubblav(page, asset).replace("</body>", BUBBLAV_SNIPPET + "\n</body>")
+    return _allow_bubblav(page, asset).replace("</body>", BUBBLAV_LAUNCHER + "\n" + BUBBLAV_SNIPPET + "\n</body>")
 
 
 
