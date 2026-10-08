@@ -1,5 +1,34 @@
 # RETALLY search-indexing domain transition: evidence ledger
 
+## October 8 continuation: new-domain Google Search Console property VERIFIED and sitemap submitted
+
+**Evidence time:** 2026-10-08 12:48–12:55 UTC. This section supersedes the *earlier-in-the-day* "currently blocked" status further below, which is retained as a historical record of the migration process. Do not retroactively rewrite the October 7 baseline.
+
+- The Google account already authorized for Search Console now returns **siteOwner** for the verified **Domain property** `sc-domain:retallyrecovery.com` (covers www and apex).
+- Added the verified property to the connected GSC Wizard dashboard. Original URL-prefix GitHub Pages property remains registered, active, and unchanged.
+- Submitted the exact already-published `https://www.retallyrecovery.com/sitemap.xml` under the Domain property. The Google Search Console API confirmed **accepted/submitted**, timestamp **2026-10-08T12:50:47.112Z**; **pending download/processing**, reported warnings=0/errors=0 *at submission time*. This is not evidence of indexing or successful Google download.
+- Registered all **26** production sitemap URLs in a separate new-domain Indexing Tracker. ID `ec6987bb-919e-42f0-9aa4-b6cbfca72a90`, active with automatic checks and email digest enabled.
+- Independently called **Google URL Inspection** on all **26** `www.retallyrecovery.com` final extensionless production URLs, including the homepage and all original nine priority commercial pages. Result: **26/26 successful API inspections, 0 inspection API errors**. Google's verdict for every URL: `NEUTRAL`; coverage: `URL is unknown to Google`; last crawl: absent; indexing state: unspecified. **No new-domain URLs are confirmed indexed at this checkpoint.** These are normal initial discovery-stage observations; do not call them robots-blocked or failed crawls.
+- Ran immediate tracked-URL checks for each of the 26 URLs so the new tracker reflects **0 indexed, 26 not indexed (unknown to Google), 0 pending, 0 errors**. Most recent tracker check: **2026-10-08T12:55:49.555Z**. Hourly future tracker checks are built into the connected service; no separate ChatGPT task was created.
+- The new domain's recent Search Console performance endpoint returned no settled-through data boundary or usable query/page rows. **Do not report zero traffic as a confirmed settled historical metric**, and do not infer rankings from the lack of early Search Console rows.
+- Previous independent production HTTP audit (after Cloudflare deployment of main `2cd91eaf076a6f3415ee3f8a1c551dd920376b0c`) established that all **26** sitemap URLs load directly, are self-canonical, and show no explicit `noindex` or legacy-host/`.html` internal links. Apex-to-www 301 and legacy GitHub Pages fallback were verified; those are **live-site tests**, separate from Google indexing evidence.
+
+**Side-by-side checkpoints:**
+
+| Measure | October 7 old-host baseline | October 8 old-host follow-up | October 8 new-domain checkpoint |
+| --- | --- | --- | --- |
+| Google property | Verified URL prefix | Verified, retained | **Verified Domain property**, `siteOwner` |
+| Sitemap | Accepted, pending | Old sitemap still pending | **New sitemap accepted, pending download** |
+| Inspection | Homepage indexed; nine initial commercial URLs unknown | Separate 26-URL tracker | **26/26 Google URL Inspection complete**, all unknown |
+| Tracked URLs | Ten initial priority URLs | 26 tracked | 26 tracked |
+| Confirmed indexed among tracked | Homepage confirmed indexed | **4/26 indexed, 22 not indexed** | **0/26 currently reported indexed**, 26 unknown |
+| Errors, penalties or disallowed robots | Not established for unknown URLs | No tracker errors | No tracker errors; unknown means Google's crawl/robots verdict is not yet available |
+| Organic impressions, clicks and positions | No initial query evidence | Historical baseline preserved | Settled performance not yet established |
+
+**Remaining external/search-engine actions:** Google must discover, download, crawl, choose its canonical, and index URLs on its own timetable. Recheck new sitemap after download for genuine warnings and submitted/indexed counts. Indexing requests via Google's Search Console UI are not equivalent to successful indexing; the URL Inspection API does not provide a general-purpose request-indexing action for ordinary service pages. Avoid repeatedly resubmitting the same sitemap or inventing new indexes. Do not decommission the original host or property based only on new sitemap acceptance.
+
+---
+
 **Opened:** 2026-10-08 UTC. **Status:** Cloudflare serves company-owned hosts; an independent live-browser audit exposed mismatched commercial canonicals and sitemap URLs. The fix is developed separately for the Cloudflare-only build. The Google Search Console property for the new domain has **not** yet been confirmed as verified, and the production sitemap has **not** yet been submitted to that property.
 
 ## Scope and hard boundaries
