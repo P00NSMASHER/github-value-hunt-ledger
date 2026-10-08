@@ -101,7 +101,38 @@ jobs:
       - name: Install isolated PostgreSQL test driver
         run: python -m pip install 'psycopg[binary]==3.2.10'
       - name: Exercise existing Labs 05 06 11 12 against real ephemeral PostgreSQL
-        run: python -m unittest -v freight.test_lab_phase6_postgres
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib, subprocess, sys
+          p = subprocess.run([sys.executable, "-m", "unittest", "-v",
+                              "freight.test_lab_phase6_postgres"],
+                             capture_output=True, text=True)
+          transcript = p.stdout + p.stderr
+          pathlib.Path("phase6-postgres.log").write_text(transcript, encoding="utf-8")
+          print(transcript)
+          source = pathlib.Path("freight/test_lab_phase6_postgres.py").read_bytes()
+          result = {"github_sha": os.environ.get("GITHUB_SHA"),
+                    "source_sha256": hashlib.sha256(source).hexdigest(),
+                    "result": "PASS" if p.returncode == 0 else "FAIL",
+                    "scope": "EPHEMERAL_POSTGRESQL_EQUIVALENT_SQL_NOT_HOSTED_FLOOT",
+                    "historical_findings_closed": 0,
+                    "floot_hosted_tested": False,
+                    "actual_recovered_cash_verified": False,
+                    "production_deployment": False}
+          pathlib.Path("phase6-postgres-manifest.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+          sys.exit(p.returncode)
+          PY
+      - name: Preserve passing or failing PostgreSQL test transcript
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-phase6-postgresql-receipts
+          path: |
+            phase6-postgres.log
+            phase6-postgres-manifest.json
+          if-no-files-found: warn
+          retention-days: 14
       - name: Keep Phase 6 claims within tested scope
         run: |
           echo 'Actual ephemeral Postgres transactions, synthetic records only.'
