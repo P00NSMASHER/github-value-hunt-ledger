@@ -87,17 +87,66 @@ def measure(bundle: Path, output: Path) -> dict:
                     results.append(info)
                     page.close()
                 context.close()
+            # Assert the real public site's click-to-open lifecycle with an
+            # isolated fake widget. Never send a message to an actual chatbot.
+            launcher_checks = []
+            chat_context = browser.new_context(viewport={"width":390,"height":844},
+                is_mobile=True,has_touch=True,reduced_motion="reduce")
+            chat_context.route("**/bubblav.com/**", lambda route: route.abort())
+            chat_page = chat_context.new_page()
+            chat_page.goto(base + "index.html",wait_until="load",timeout=25000)
+            chat_btn = chat_page.locator("#retallyChatLauncher")
+            if chat_btn.count():
+                chat_page.evaluate("""() => {
+                    const frame = document.createElement('iframe');
+                    frame.id = 'bv-chat-frame';
+                    document.body.appendChild(frame);
+                    window.__retallyMockOpen = false;
+                    window.BubblaV = {
+                        open: () => { window.__retallyMockOpen = true; },
+                        isOpen: () => window.__retallyMockOpen
+                    };
+                }""")
+                chat_btn.click()
+                chat_page.wait_for_timeout(650)
+                opened = chat_page.evaluate("""() => ({
+                    invoked: window.__retallyMockOpen === true,
+                    classPresent: document.body.classList.contains('retally-chat-open'),
+                    nativeVisible: getComputedStyle(document.getElementById('bv-chat-frame')).visibility === 'visible'
+                })""")
+                chat_page.evaluate("window.__retallyMockOpen = false")
+                chat_page.wait_for_timeout(650)
+                closed = chat_page.evaluate("""() => ({
+                    buttonVisible: !document.getElementById('retallyChatLauncher').hidden,
+                    nativeHidden: getComputedStyle(document.getElementById('bv-chat-frame')).visibility === 'hidden',
+                    classRemoved: !document.body.classList.contains('retally-chat-open')
+                })""")
+                chat_page.evaluate("window.BubblaV = null")
+                chat_btn.click()
+                fallback = chat_page.evaluate("""() => ({
+                    nativeRestored: document.body.classList.contains('retally-chat-fallback')
+                        && getComputedStyle(document.getElementById('bv-chat-frame')).visibility === 'visible',
+                    customHidden: document.getElementById('retallyChatLauncher').hidden
+                })""")
+                launcher_checks = [{"open":opened,"closed":closed,"fallback":fallback}]
+            chat_context.close()
             browser.close()
     finally:
         server.shutdown()
         server.server_close()
+    if launcher_checks:
+        verified = launcher_checks[0]
+        if not all(verified["open"].values()) or not all(verified["closed"].values()) or not all(verified["fallback"].values()):
+            results.append({"page":"chat-launcher","viewport":"390x844","overflow":0,
+                "missingImages":[],"jsErrors":["Launcher open/close/fallback contract failed"],
+                "requiredLabels":[],"httpStatus":200,"screenshot":"n/a"})
     summary = {"screenshots":len(results),
       "screens":[r["screenshot"] for r in results],
       "issues":[r for r in results if r["overflow"]>1 or r["missingImages"]
                 or r["jsErrors"] or r["requiredLabels"] or r["httpStatus"]!=200
                 or ("menuExpanded" in r and
                     (r["menuExpanded"]!="true" or not r["menuVisible"]))],
-      "results":results}
+      "results":results,"chatLauncher":launcher_checks}
     (output / "manifest.json").write_text(json.dumps(summary,indent=2)+"\n")
     return summary
 
