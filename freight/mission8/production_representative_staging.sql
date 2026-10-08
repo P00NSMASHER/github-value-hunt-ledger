@@ -51,10 +51,6 @@ BEGIN
  WHERE d.tenant_id=NEW.tenant_id AND d.finding_id=f.id
  ORDER BY d.created_at DESC,d.id DESC LIMIT 1;
  IF decision IS DISTINCT FROM 'CONFIRM' THEN RAISE EXCEPTION 'finding not most recently confirmed'; END IF;
- IF NEW.source_hash=finding_hash THEN
-   -- No semantic equality required; source and finding hashes are separate objects.
-   NULL;
- END IF;
  RETURN NEW;
 END $$;
 DROP TRIGGER IF EXISTS recovery_eligibility_guard_t ON recovery_eligibility_certifications;
@@ -172,7 +168,6 @@ BEGIN
  remaining:=amt;
  FOREACH item IN ARRAY sorted_ids LOOP
    IF remaining=0 THEN EXIT; END IF;
-   SELECT f.economic_key INTO f FROM recovery_challenge_findings f WHERE f.tenant_id=p_tenant AND f.id=item;
    SELECT * INTO cert FROM recovery_eligibility_certifications
      WHERE tenant_id=p_tenant AND canonical_finding_id=item;
    SELECT coalesce(sum(a.amount_cents),0) INTO consumed FROM recovery_value_allocations a
