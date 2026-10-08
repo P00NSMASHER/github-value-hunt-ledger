@@ -1,0 +1,1139 @@
+diff --git a/tests/test_phase2_financial.py b/tests/test_phase2_financial.py
+new file mode 100644
+index 0000000..b8f153f
+--- /dev/null
++++ b/tests/test_phase2_financial.py
+@@ -0,0 +1,226 @@
++"""Phase 2 offline original StagingTwin adversarial and positive-path coverage."""
++from __future__ import annotations
++import copy
++import sqlite3
++import tempfile
++import unittest
++from pathlib import Path
++from unified.core import load_source,public_invoice
++from unified.customers import baseline_public_candidate,persona_for
++from unified.demo_fixtures import fictional_consent,SIMULATED_ISSUER_KEY
++from unified.fee_authority import create_fixture_terms
++from unified.staging import Rejected,StagingTwin
++
++
++class Phase2FinancialTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.rows=load_source(2000)
++
++    def setUp(self):
++        self.tmp=tempfile.TemporaryDirectory()
++        self.addCleanup(self.tmp.cleanup)
++        self.db=Path(self.tmp.name)/'phase2.sqlite'
++        self.tw=StagingTwin(self.db,fee_verifier_key=SIMULATED_ISSUER_KEY)
++        self.row=next(r for r in self.rows if int(r['invoice_total_cents'])>1500)
++        self.tenant='SIM-TENANT-001'
++        self.cid='SIM-CASE-PHASE2-1'
++        self.tw.create(self.row,self.tenant,self.cid)
++
++    def go(self,actor,kind,**payload):
++        return self.tw.act(self.cid,self.tenant,actor,kind,payload)
++
++    def state(self):return self.tw.view(self.cid,self.tenant)['funds']
++
++    def settlement(self,total=1000,consent=None):
++        self.go('buyer','CONSENT',**(consent or fictional_consent(self.row,self.tenant)))
++        self.go('operator','FREEZE',evidence_ref='SIM-EVIDENCE-FREEZE')
++        self.go('operator','CANDIDATE',amount_cents=total)
++        self.go('reviewer','REVIEW',amount_cents=total,evidence_ref='SIM-EVIDENCE-REVIEW')
++        self.go('buyer','AUTHORIZE',amount_cents=total,evidence_ref='SIM-EVIDENCE-APPROVE')
++        self.go('operator','SUBMIT')
++        self.go('carrier_mock','ACKNOWLEDGE')
++        self.go('carrier_mock','OFFER',amount_cents=total)
++        self.go('carrier_mock','SETTLE',amount_cents=total,evidence_ref='SIM-EVIDENCE-SETTLE')
++
++    def credit(self,amount,ref):
++        self.go('finance','CREDIT',amount_cents=amount,provider_ref=ref,evidence_ref='SIM-EVIDENCE-CREDIT')
++
++    def reconcile(self,amount,ref):
++        self.go('finance','RECONCILE',amount_cents=amount,credit_ref=ref,evidence_ref='SIM-EVIDENCE-RECONCILED')
++
++    def invoice_fee(self,rate=2000):
++        self.go('finance','FEE_INVOICE',fee_bps=rate,evidence_ref='SIM-EVIDENCE-FEE')
++
++    def test_01_blind_invoice_never_exposes_derived_answers(self):
++        view=public_invoice(self.row)
++        banned=('truth_state','expected_base_cents','expected_fuel_cents','expected_accessorial_cents',
++                'scenario','competing_rate_cents','duplicate_payment_cents','net_eligible_cents','base_rate_cents')
++        for name in banned:self.assertNotIn(name,view)
++        mutated=dict(self.row)
++        for name in ('expected_base_cents','expected_fuel_cents','expected_accessorial_cents','truth_state','net_eligible_cents'):
++            mutated[name] = '99999999' if name!='truth_state' else 'NEGATIVE'
++        self.assertEqual(baseline_public_candidate(self.row),baseline_public_candidate(mutated))
++
++    def test_02_unique_names_preserve_source_account(self):
++        names={persona_for({'customer_id':r['customer_id']})['name'] for r in self.rows}
++        self.assertEqual(len(names),len({r['customer_id'] for r in self.rows}))
++
++    def test_03_duplicate_economic_issue_blocked_but_distinct_issue_accepted(self):
++        with self.assertRaisesRegex(Rejected,'DUPLICATE_ECONOMIC_ISSUE'):
++            self.tw.create(self.row,self.tenant,'SIM-CASE-PHASE2-2')
++        self.tw.create(self.row,self.tenant,'SIM-CASE-PHASE2-3',issue_id='FUEL_DISCREPANCY')
++
++    def test_04_cross_tenant_source_owner_collision_rejected(self):
++        with self.assertRaisesRegex(Rejected,'SOURCE_ALREADY_SCOPED_TO_ANOTHER_TENANT'):
++            self.tw.create(self.row,'SIM-TENANT-002','SIM-CASE-FOREIGN')
++        wrong=dict(self.row);wrong['synthetic_source_sha256']='0'*64
++        with self.assertRaisesRegex(Rejected,'SOURCE_VERSION_BINDING_CHANGED'):
++            self.tw.create(wrong,self.tenant,'SIM-CASE-SOURCE-CHANGE',issue_id='OTHER_ISSUE')
++
++    def test_05_unbound_fee_and_false_signature_rejected(self):
++        self.settlement(consent={'scope_signed':True})
++        self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
++        with self.assertRaisesRegex(Rejected,'MISSING_VERSIONED_CONTRACT_TERMS'):
++            self.invoice_fee(5000)
++        self.assertEqual(self.state()['fee_earned'],0)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_06_tampered_fee_terms_or_wrong_signer_fails_at_consent(self):
++        consent=fictional_consent(self.row,self.tenant)
++        consent['terms']['fee_bps']=5000
++        with self.assertRaisesRegex(Rejected,'CONTRACT_SIGNATURE_MISMATCH'):
++            self.go('buyer','CONSENT',**consent)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_07_fee_rate_cannot_override_signed_fee(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
++        with self.assertRaisesRegex(Rejected,'FEE_RATE_NOT_CONTRACT_BOUND'):
++            self.invoice_fee(5000)
++        self.invoice_fee(2000)
++        self.assertEqual(self.state()['fee_earned'],200)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_08_expired_fee_terms_fail_closed(self):
++        terms=create_fixture_terms(signing_key=SIMULATED_ISSUER_KEY,tenant=self.tenant,
++            source_customer_id=self.row['customer_id'],fee_bps=2000,
++            valid_through='2026-02-01T00:00:00Z')
++        with self.assertRaisesRegex(Rejected,'CONTRACT_NOT_EFFECTIVE'):
++            self.go('buyer','CONSENT',scope_signed=True,terms=terms)
++
++    def test_09_two_partial_credits_reconcile_exactly(self):
++        self.settlement()
++        self.credit(400,'SIM-CREDIT-ONE')
++        self.reconcile(400,'SIM-CREDIT-ONE')
++        self.credit(600,'SIM-CREDIT-TWO')
++        self.reconcile(600,'SIM-CREDIT-TWO')
++        self.invoice_fee()
++        self.assertEqual(self.state()['received'],1000)
++        self.assertEqual(self.state()['realized'],1000)
++        self.assertEqual(self.state()['fee_earned'],200)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++        with self.assertRaisesRegex(Rejected,'CUMULATIVE_RECEIPT_EXCEEDS_SETTLEMENT'):
++            self.credit(1,'SIM-CREDIT-THREE')
++
++    def test_10_one_credit_in_multiple_remittance_instalments(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE')
++        self.reconcile(400,'SIM-CREDIT-ONE')
++        self.reconcile(600,'SIM-CREDIT-ONE')
++        self.assertEqual(self.state()['realized'],1000)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_11_duplicate_credit_reference_rejected(self):
++        self.settlement();self.credit(400,'SIM-CREDIT-ONE')
++        with self.assertRaisesRegex(Rejected,'DUPLICATE_CREDIT_REFERENCE'):
++            self.credit(600,'SIM-CREDIT-ONE')
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_12_revoked_authorization_must_allow_corrective_refund(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
++        self.invoice_fee();self.go('finance','FEE_PAY',amount_cents=200,evidence_ref='SIM-EVIDENCE-PAY')
++        self.go('buyer','REVOKE')
++        self.go('finance','REVERSE',amount_cents=1000,credit_ref='SIM-CREDIT-ONE',evidence_ref='SIM-EVIDENCE-REVERSAL')
++        self.assertEqual(self.state()['fee_earned'],0)
++        self.assertEqual(self.state()['fee_refund_due'],200)
++        self.go('finance','REFUND',amount_cents=200,evidence_ref='SIM-EVIDENCE-REFUND')
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++        self.assertEqual(self.state()['realized'],0)
++        self.assertEqual(self.state()['fee_refund_due'],0)
++
++    def test_13_reverse_before_fee_collection_undoes_receivable(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
++        self.invoice_fee()
++        self.go('buyer','REVOKE')
++        self.go('finance','REVERSE',amount_cents=1000,credit_ref='SIM-CREDIT-ONE',evidence_ref='SIM-EVIDENCE-REVERSAL')
++        self.assertEqual(self.state()['fee_earned'],0)
++        self.assertEqual(self.state()['fee_refund_due'],0)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_14_delayed_partial_reversal_after_two_credits_and_partial_fee(self):
++        self.settlement();self.credit(400,'SIM-CREDIT-ONE');self.reconcile(400,'SIM-CREDIT-ONE')
++        self.credit(600,'SIM-CREDIT-TWO');self.reconcile(600,'SIM-CREDIT-TWO')
++        self.invoice_fee();self.go('finance','FEE_PAY',amount_cents=150,evidence_ref='SIM-EVIDENCE-PAY')
++        self.go('buyer','REVOKE')
++        self.go('finance','REVERSE',amount_cents=500,credit_ref='SIM-CREDIT-TWO',evidence_ref='SIM-EVIDENCE-REVERSAL')
++        self.assertEqual(self.state()['realized'],500)
++        self.assertEqual(self.state()['fee_earned'],100)
++        self.assertEqual(self.state()['fee_refund_due'],50)
++        self.go('finance','REFUND',amount_cents=50,evidence_ref='SIM-EVIDENCE-REFUND')
++        self.assertEqual(self.state()['fee_collected']-self.state()['fee_refunded'],100)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_15_reverse_pending_credit_does_not_erase_other_realized(self):
++        self.settlement();self.credit(500,'SIM-CREDIT-ONE');self.reconcile(500,'SIM-CREDIT-ONE')
++        self.credit(500,'SIM-CREDIT-TWO')
++        self.go('finance','REVERSE',amount_cents=250,credit_ref='SIM-CREDIT-TWO',evidence_ref='SIM-EVIDENCE-REVERSAL')
++        self.assertEqual(self.state()['realized'],500)
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_16_reversal_must_not_steal_credit_from_another_reference(self):
++        self.settlement();self.credit(600,'SIM-CREDIT-ONE');self.credit(400,'SIM-CREDIT-TWO')
++        with self.assertRaisesRegex(Rejected,'REVERSAL_ABOVE_ORIGINAL_CREDIT'):
++            self.go('finance','REVERSE',amount_cents=650,credit_ref='SIM-CREDIT-ONE',evidence_ref='SIM-EVIDENCE-REVERSAL')
++        with self.assertRaisesRegex(Rejected,'REVERSAL_REFERENCE_REQUIRED'):
++            self.go('finance','REVERSE',amount_cents=1,evidence_ref='SIM-EVIDENCE-REVERSAL')
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_17_close_blocked_until_fee_paid_or_written_off(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
++        self.invoice_fee()
++        with self.assertRaisesRegex(Rejected,'UNRESOLVED_FEE_RECEIVABLE'):
++            self.go('buyer','CLOSE')
++        with self.assertRaisesRegex(Rejected,'WRITE_OFF_REQUIRES_FINANCE_APPROVAL'):
++            self.go('finance','FEE_WRITE_OFF',amount_cents=200,evidence_ref='SIM-EVIDENCE-WRITEOFF')
++        self.go('finance','FEE_WRITE_OFF',amount_cents=200,evidence_ref='SIM-EVIDENCE-WRITEOFF',approved=True,approver='SIM-CONTROLLER')
++        self.go('buyer','CLOSE')
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_18_written_off_fee_then_reversal_releases_writeoff(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
++        self.invoice_fee();self.go('finance','FEE_PAY',amount_cents=150,evidence_ref='SIM-EVIDENCE-PAY')
++        self.go('finance','FEE_WRITE_OFF',amount_cents=50,evidence_ref='SIM-EVIDENCE-WRITEOFF',approved=True,approver='SIM-CONTROLLER')
++        self.go('finance','REVERSE',amount_cents=1000,credit_ref='SIM-CREDIT-ONE',evidence_ref='SIM-EVIDENCE-REVERSAL')
++        self.assertEqual(self.state()['fee_written_off'],0)
++        self.assertEqual(self.state()['fee_refund_due'],150)
++        self.go('finance','REFUND',amount_cents=150,evidence_ref='SIM-EVIDENCE-REFUND')
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++
++    def test_19_tampered_realized_amount_fails_independent_replay(self):
++        self.settlement();self.credit(1000,'SIM-CREDIT-ONE');self.reconcile(1000,'SIM-CREDIT-ONE')
++        self.assertEqual(self.tw.verify()['status'],'PASS_SYNTHETIC_ONLY')
++        with sqlite3.connect(self.db) as con:
++            import json
++            funds=json.loads(con.execute('SELECT funds_json FROM simulated_cases WHERE case_id=?',(self.cid,)).fetchone()[0])
++            funds['realized']+=500000
++            con.execute('UPDATE simulated_cases SET funds_json=? WHERE case_id=?',(json.dumps(funds),self.cid))
++        res=self.tw.verify()
++        self.assertEqual(res['status'],'FAIL')
++        self.assertTrue(any('FUND_REPLAY_MISMATCH' in x for x in res['errors']))
++
++    def test_20_wrong_currency_prohibited(self):
++        self.settlement()
++        with self.assertRaisesRegex(Rejected,'CURRENCY_SCOPE_MISMATCH'):
++            self.go('finance','CREDIT',amount_cents=1000,provider_ref='SIM-CREDIT-ONE',currency='EUR',evidence_ref='SIM-EVIDENCE-CREDIT')
++
++
++if __name__=='__main__':unittest.main()
+diff --git a/tests/test_unified.py b/tests/test_unified.py
+index 59c7951..8fa14da 100644
+--- a/tests/test_unified.py
++++ b/tests/test_unified.py
+@@ -4,6 +4,7 @@ from pathlib import Path
+ from unified.core import load_source,source_inventory,public_invoice,verify_source_row,sha
+ from unified.catalog import bind_fictional_invoice,verify_binding,build_catalog
+ from unified.staging import StagingTwin,Rejected
++from unified.demo_fixtures import fictional_consent,SIMULATED_ISSUER_KEY
+ from unified.api import start_local_http
+ from unified.fixer import run_pipeline,INJECTED_DEFECTS
+ from unified.adaptive import exercise_attack,ATTACK_FAMILIES,run_guided
+@@ -36,13 +37,13 @@ class TwinTests(unittest.TestCase):
+  def setUpClass(cls):cls.rows=load_source(900)
+  def setUp(self):
+   self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+-  self.twin=StagingTwin(Path(self.temp.name)/'stage.sqlite3')
++  self.twin=StagingTwin(Path(self.temp.name)/'stage.sqlite3',fee_verifier_key=SIMULATED_ISSUER_KEY)
+   self.row=next(r for r in self.rows if int(r['net_eligible_cents'])>=1000 and int(r['invoice_total_cents'])>1000)
+   self.tenant='SIM-TENANT-001';self.case='SIM-CASE-1'
+   self.twin.create(self.row,self.tenant,self.case)
+  def go(self,actor,kind,payload=None,**kw):return self.twin.act(self.case,self.tenant,actor,kind,payload or {},**kw)
+  def reach(self,stage):
+-  if stage>=1:self.go('buyer','CONSENT',{'scope_signed':True})
++  if stage>=1:self.go('buyer','CONSENT',fictional_consent(self.row,self.tenant))
+   if stage>=2:self.go('operator','FREEZE',{'evidence_ref':'SIM-EVIDENCE-FREEZE'})
+   if stage>=3:self.go('operator','CANDIDATE',{'amount_cents':1000})
+   if stage>=4:self.go('reviewer','REVIEW',{'amount_cents':1000,'evidence_ref':'SIM-EVIDENCE-REVIEW'})
+@@ -160,7 +161,7 @@ class AdaptiveTests(unittest.TestCase):
+  def setUpClass(cls):cls.rows=load_source(600)
+  def test_every_fault_family_is_rejected(self):
+   with tempfile.TemporaryDirectory() as p:
+-   twin=StagingTwin(Path(p)/'attacks.sqlite3')
++   twin=StagingTwin(Path(p)/'attacks.sqlite3',fee_verifier_key=SIMULATED_ISSUER_KEY)
+    row=next(r for r in self.rows if int(r['invoice_total_cents'])>1000)
+    for i,family in enumerate(ATTACK_FAMILIES):
+     report=exercise_attack(twin,row,i,family);self.assertTrue(report['detected'],family)
+diff --git a/unified/adaptive.py b/unified/adaptive.py
+index 55dc23c..28c6d34 100644
+--- a/unified/adaptive.py
++++ b/unified/adaptive.py
+@@ -9,6 +9,7 @@ from collections import Counter
+ from pathlib import Path
+ from .staging import StagingTwin,Rejected
+ from .core import sha
++from .demo_fixtures import fictional_consent,SIMULATED_ISSUER_KEY
+ 
+ ATTACK_FAMILIES=(
+  'CROSS_TENANT_LOOKUP','BUYER_PRETENDS_FINANCE','CLAIM_BEFORE_AUTHORIZATION',
+@@ -26,10 +27,10 @@ class InjectedAttackNotRejected(AssertionError):pass
+ 
+ def _setup(twin,row,index,stage):
+     tenant='SIM-TENANT-001';case_id=f'SIM-CASE-ATTACK-{index:06d}'
+-    twin.create(row,tenant,case_id)
++    twin.create(row,tenant,case_id,issue_id=f"SIM-ATTACK-{index}")
+     def go(actor,kind,payload=None):return twin.act(case_id,tenant,actor,kind,payload or {})
+     if stage==0:return tenant,case_id,go
+-    go('buyer','CONSENT',{'scope_signed':True})
++    go('buyer','CONSENT',fictional_consent(row,tenant))
+     if stage==1:return tenant,case_id,go
+     go('operator','FREEZE',{'evidence_ref':'SIM-EVIDENCE-FREEZE'})
+     if stage==2:return tenant,case_id,go
+@@ -99,7 +100,7 @@ def exercise_attack(twin,row,index,family):
+             key='SIM-SAME-KEY';go('operator','CANDIDATE',{'amount_cents':1})
+             # Use same key but distinct payload; first event must exist with that key.
+             # This action is intentionally two-stage, done explicitly below.
+-            twin.act(case_id,tenant,'operator','CANDIDATE',{'amount_cents':2},idempotency=sha([case_id,'operator','CANDIDATE',{'amount_cents':1}])[:32])
++            twin.act(case_id,tenant,'operator','CANDIDATE',{'amount_cents':2},idempotency=sha([tenant,case_id,'operator','CANDIDATE',{'amount_cents':1}])[:32])
+         elif family=='SKIP_PROVIDER_ACKNOWLEDGMENT':go('carrier_mock','OFFER',{'amount_cents':200})
+         elif family=='MISSING_SIGNED_CONTRACT':go('buyer','CONSENT',{'scope_signed':False})
+         elif family=='FORGED_CREDIT_REFERENCE':go('finance','CREDIT',{'amount_cents':100,'evidence_ref':'SIM-EVIDENCE-CREDIT','provider_ref':'EXTERNAL-IBAN'})
+@@ -118,7 +119,7 @@ def run_guided(rows,output_dir,rounds=900,seed=20261007):
+     if not rows:raise ValueError('source required')
+     output=Path(output_dir);output.mkdir(parents=True,exist_ok=True)
+     path=output/'adaptive.sqlite3';path.unlink(missing_ok=True)
+-    twin=StagingTwin(path)
++    twin=StagingTwin(path,fee_verifier_key=SIMULATED_ISSUER_KEY)
+     import random
+     rng=random.Random(seed)
+     candidates=[row for row in rows if int(row['invoice_total_cents'])>=600]
+diff --git a/unified/core.py b/unified/core.py
+index 304d5a2..a0eb963 100644
+--- a/unified/core.py
++++ b/unified/core.py
+@@ -60,10 +60,19 @@ def verify_source_row(row):
+ 
+ def public_invoice(row):
+     # Source gold truth and eligibility are deliberately withheld from the simulated app.
+-    forbidden=('truth_state','truth_overpayment_cents','net_eligible_cents','estimated_recoverable_cents')
++    # Never send synthetic gold, derived expected charges, competitor answers,
++    # latent scenario labels or precomputed tariff terms into detector input.
++    forbidden = {
++        'truth_state', 'truth_overpayment_cents', 'net_eligible_cents',
++        'estimated_recoverable_cents', 'expected_base_cents',
++        'expected_fuel_cents', 'expected_accessorial_cents',
++        'scenario', 'competing_rate_cents', 'duplicate_payment_cents',
++        'base_rate_cents', 'fuel_bps', 'minimum_cents',
++    }
+     return {k:v for k,v in row.items() if k not in forbidden}
+ 
+ 
++
+ def source_inventory(rows):
+     from collections import Counter
+     return {'count':len(rows),'modes':dict(Counter(r['mode'] for r in rows)),
+diff --git a/unified/customers.py b/unified/customers.py
+index fa40b20..e61c975 100644
+--- a/unified/customers.py
++++ b/unified/customers.py
+@@ -10,6 +10,7 @@ from pathlib import Path
+ from collections import Counter
+ from .core import sha, public_invoice
+ from .staging import StagingTwin,Rejected
++from .demo_fixtures import fictional_consent,SIMULATED_ISSUER_KEY
+ 
+ FICTIONAL_BUYER={
+  'name':'Northbridge Industrial Parts (FICTIONAL)',
+@@ -29,7 +30,7 @@ STAFF_LAST=("Ellis","Nakamura","Rivera","Sutton","Bennett","Cruz","Mercer","Haye
+ def persona_for(row):
+     """Stable fictional corporate identity for the same upstream source account."""
+     key=row['customer_id'];h=int(sha(key)[:12],16)
+-    brand=COMPANY_ROOTS[h%len(COMPANY_ROOTS)]+' '+COMPANY_ENDINGS[(h//19)%len(COMPANY_ENDINGS)]+' (FICTIONAL)'
++    brand=(COMPANY_ROOTS[h%len(COMPANY_ROOTS)]+' '+COMPANY_ENDINGS[(h//19)%len(COMPANY_ENDINGS)]+' ['+key+'] (FICTIONAL)')
+     def person(i):
+         return STAFF_FIRST[(h//(31+i*17))%len(STAFF_FIRST)]+' '+STAFF_LAST[(h//(47+i*13))%len(STAFF_LAST)]+' (FICTIONAL)'
+     return {**FICTIONAL_BUYER,'name':brand,'logistics_manager':person(0),
+@@ -57,19 +58,29 @@ def assign_customer(row,variant):
+ 
+ 
+ def baseline_public_candidate(row):
+-    """Weak observational arithmetic baseline, NEVER the sealed gold oracle."""
+-    base=max(0,int(row['invoiced_base_cents'])-int(row['expected_base_cents']))
+-    fuel=max(0,int(row['invoiced_fuel_cents'])-int(row['expected_fuel_cents']))
+-    extras=max(0,int(row['invoiced_accessorial_cents'])-int(row['expected_accessorial_cents']))
+-    net=max(0,base+fuel+extras-int(row['prior_credit_cents']))
+-    if row['evidence_state']!='VERIFIED_SYNTHETIC':return {'label':'REVIEW','candidate_cents':0,'reason':'incomplete or conflicting evidence'}
+-    return {'label':'POSITIVE' if net>0 else 'NEGATIVE','candidate_cents':net,
+-            'reason':'arithmetic discrepancy against fictional contract details'}
++    """Weak blind heuristic; NEVER a tariff calculation or verified claim.
++
++    Only fields visible to public_invoice may influence this predictor.
++    Ground truth is controlled by the separate oracle process.
++    """
++    visible=public_invoice(row)
++    if visible.get('evidence_state')!='VERIFIED_SYNTHETIC':
++        return {'label':'REVIEW','candidate_cents':0,'reason':'source evidence incomplete'}
++    # Explicitly weak hypothesis: outlier charge component is NOT a rate proof.
++    base=int(visible['invoiced_base_cents'])
++    fuel=int(visible['invoiced_fuel_cents'])
++    extras=int(visible['invoiced_accessorial_cents'])
++    estimated=max(0, (fuel+extras)//12+base//300-int(visible.get('prior_credit_cents',0))//10)
++    estimated=min(estimated,int(visible['invoice_total_cents']))
++    return {'label':'POSITIVE' if estimated else 'NEGATIVE',
++            'candidate_cents':estimated,
++            'reason':'WEAK_BLIND_HEURISTIC_NOT_RATE_AUTHORITY'}
++
+ 
+ 
+ def _build_message_messages(row,variant,case_id,decision,offer,fee,persona=FICTIONAL_BUYER,events=None):
+     invoice=row['invoice_id'];carrier=row['carrier_id'];amount=money(int(row['invoice_total_cents']))
+-    predicted=money(decision['candidate_cents']);base=money(int(row['expected_base_cents']))
++    predicted=money(decision['candidate_cents']);base=money(int(row['invoiced_base_cents']))
+     messages=[];t=datetime(2026,10,8,9,0,tzinfo=timezone.utc)
+     def msg(sender,to,subject,body,days=1,hours=0):
+         nonlocal t
+@@ -94,7 +105,7 @@ def _build_message_messages(row,variant,case_id,decision,offer,fee,persona=FICTI
+         'Any fee depends on separately documented, reconciled and attributable recovery and the signed engagement terms.',0,4)
+     msg(ap,'Freight Recovery analyst','Invoice and contract documents',
+         f'I uploaded a fictional copy of {invoice} and its rate file. '
+-        f'Our internal paid amount is {amount}. The source records indicate contract base {base}; '
++        f'Our internal paid amount is {amount}. The invoice lists a base component of {base}; '
+         'please confirm how fuel, accessorials and credits affect any variance.',2)
+     msg('Freight Recovery analyst',ap,'Source receipt and freeze',
+         f'The fictitious source receipt for {invoice} has been preserved. We will not alter the original evidence. '
+@@ -263,13 +274,13 @@ def simulate_engagement(twin,rows,variant,index):
+     row=select_for_variant(rows,variant,index)
+     name=f'SIM-CASE-CUSTOMER-{index:05d}';tenant='SIM-TENANT-001'
+     public=baseline_public_candidate(row)
+-    twin.create(row,tenant,name)
++    twin.create(row,tenant,name,issue_id=f"SIM-ENGAGEMENT-{index}")
+     def go(actor,kind,data=None):return twin.act(name,tenant,actor,kind,data or {})
+     errors=[]
+     messages=[]
+     go('buyer','MESSAGE',{'message':'Fictional customer asks for a limited freight audit'})
+     go('operator','MESSAGE',{'message':'Audit request and contingency fee scope explained; no recovery guarantee'})
+-    go('buyer','CONSENT',{'scope_signed':True})
++    go('buyer','CONSENT',fictional_consent(row,tenant))
+     go('operator','FREEZE',{'evidence_ref':'SIM-EVIDENCE-FROZEN-POPULATION'})
+     candidate=public['candidate_cents']
+     if variant in ('MISSED_ERROR_SECOND_REVIEW',):candidate=0
+@@ -342,7 +353,7 @@ def simulate_engagement(twin,rows,variant,index):
+ def run_customer_campaign(rows,directory,count=120):
+     p=Path(directory);p.mkdir(parents=True,exist_ok=True)
+     db=p/'customer_staging.sqlite3';db.unlink(missing_ok=True)
+-    twin=StagingTwin(db)
++    twin=StagingTwin(db,fee_verifier_key=SIMULATED_ISSUER_KEY)
+     cases=[];gold=[]
+     for i in range(count):
+         variant=SCENARIOS[i%len(SCENARIOS)]
+diff --git a/unified/demo_fixtures.py b/unified/demo_fixtures.py
+new file mode 100644
+index 0000000..fc6a810
+--- /dev/null
++++ b/unified/demo_fixtures.py
+@@ -0,0 +1,10 @@
++"""PUBLIC AND UNTRUSTED OFFLINE TEST-ONLY fixture issuer, NEVER production authority."""
++from .fee_authority import create_fixture_terms
++
++SIMULATED_ISSUER_KEY = b'NOT_A_REAL_BUYER_SIGNATURE_TEST_ONLY_2026_10_08'
++
++
++def fictional_consent(row, tenant='SIM-TENANT-001', fee_bps=2000):
++    return {'scope_signed': True, 'terms': create_fixture_terms(
++        signing_key=SIMULATED_ISSUER_KEY, tenant=tenant,
++        source_customer_id=row['customer_id'], fee_bps=fee_bps)}
+diff --git a/unified/fee_authority.py b/unified/fee_authority.py
+new file mode 100644
+index 0000000..3533402
+--- /dev/null
++++ b/unified/fee_authority.py
+@@ -0,0 +1,63 @@
++"""Synthetic verifier-key-bound contract terms. NOT real electronic signatures.
++
++An issuer-held verification key must be injected, never stored in the SQLite lab.
++Independent third-party identity / customer consent remain unestablished.
++"""
++from __future__ import annotations
++import hashlib
++import hmac
++import json
++from datetime import datetime, timezone
++
++FIELDS = ('tenant', 'source_customer_id', 'agreement_id', 'version',
++          'fee_bps', 'currency', 'effective_from', 'valid_through', 'signer')
++
++
++def canonical(value):
++    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()
++
++
++def utc(value):
++    if not isinstance(value, str):
++        raise ValueError('INVALID_TERM_DATE')
++    try:
++        when = datetime.fromisoformat(value.replace('Z', '+00:00'))
++    except ValueError as exc:
++        raise ValueError('INVALID_TERM_DATE') from exc
++    if not when.tzinfo or when.utcoffset() is None:
++        raise ValueError('INVALID_TERM_DATE')
++    return when.astimezone(timezone.utc)
++
++
++def create_fixture_terms(*, signing_key, tenant, source_customer_id, fee_bps=2000,
++                         agreement_id='SIM-CONTRACT-1', version=1,
++                         effective_from='2026-01-01T00:00:00Z',
++                         valid_through='2027-01-01T00:00:00Z', signer='SIM-EXTERNAL-ISSUER'):
++    """For deterministic offline testing only. Not a real buyer signature."""
++    body = dict(tenant=tenant, source_customer_id=source_customer_id,
++                agreement_id=agreement_id, version=version, fee_bps=fee_bps,
++                currency='USD', effective_from=effective_from,
++                valid_through=valid_through, signer=signer)
++    return {**body, 'signature': hmac.new(signing_key, canonical(body), hashlib.sha256).hexdigest()}
++
++
++def check_terms(terms, *, verifier_key, tenant, source_customer_id,
++                currency='USD', as_of='2026-10-08T00:00:00Z'):
++    if not verifier_key or not isinstance(verifier_key, bytes) or len(verifier_key) < 16:
++        raise ValueError('NO_SEPARATE_CONTRACT_VERIFICATION_KEY')
++    if not isinstance(terms, dict) or set(terms) != set(FIELDS) | {'signature'}:
++        raise ValueError('MISSING_VERSIONED_CONTRACT_TERMS')
++    if (terms['tenant'], terms['source_customer_id'], terms['currency']) != (tenant, source_customer_id, currency):
++        raise ValueError('CONTRACT_SCOPE_MISMATCH')
++    if type(terms['fee_bps']) is not int or not 0 <= terms['fee_bps'] <= 5000:
++        raise ValueError('INVALID_AUTHORIZED_FEE_RATE')
++    if type(terms['version']) is not int or terms['version'] < 1:
++        raise ValueError('INVALID_CONTRACT_VERSION')
++    if not all(isinstance(terms[k], str) and terms[k].startswith('SIM-') for k in ('agreement_id', 'signer')):
++        raise ValueError('UNVERIFIED_CONTRACT_IDENTITY')
++    if not utc(terms['effective_from']) <= utc(as_of) < utc(terms['valid_through']):
++        raise ValueError('CONTRACT_NOT_EFFECTIVE')
++    expected = hmac.new(verifier_key, canonical({k: terms[k] for k in FIELDS}), hashlib.sha256).hexdigest()
++    if not isinstance(terms['signature'], str) or not hmac.compare_digest(expected, terms['signature']):
++        raise ValueError('CONTRACT_SIGNATURE_MISMATCH')
++    return terms['fee_bps']
+diff --git a/unified/oracle.py b/unified/oracle.py
+index 90bf8a8..5ab0812 100644
+--- a/unified/oracle.py
++++ b/unified/oracle.py
+@@ -31,7 +31,10 @@ def adjudicate_visible_case(case, sealed):
+         history.append(x['kind'])
+         last_seq=x['seq'];previous=x['hash'];last_time=x['time']
+         if x['kind'] in ('CANDIDATE','REVIEW','AUTHORIZE','OFFER','SETTLE','CREDIT','RECONCILE','FEE_PAY','REVERSE','REFUND'):
+-            observed[x['kind']]=x['payload'].get('amount_cents',0)
++            if x['kind'] in ('CREDIT','RECONCILE','FEE_PAY','REVERSE','REFUND'):
++                observed[x['kind']]=observed.get(x['kind'],0)+x['payload'].get('amount_cents',0)
++            else:
++                observed[x['kind']]=x['payload'].get('amount_cents',0)
+         if x['kind']=='FEE_INVOICE':observed['FEE_BPS']=x['payload'].get('fee_bps',-1)
+     funds=case['staging_finance']
+     mapping={'CANDIDATE':'candidate','REVIEW':'validated','AUTHORIZE':'authorized_limit',
+@@ -59,8 +62,10 @@ def adjudicate_visible_case(case, sealed):
+         problems.append('OVER_CREDIT_OR_UNAUTHORIZED_SETTLEMENT')
+     if funds['reversed']>funds['received'] or funds['reconciled']>funds['received']:
+         problems.append('WRONG_RECONCILIATION_AMOUNT')
+-    if funds['fee_earned']>funds['reconciled'] or funds['fee_collected']>funds['fee_earned']:
++    if funds['fee_earned']>funds['realized'] or funds['fee_collected']-funds['fee_refunded']>funds['fee_earned']+funds['fee_refund_due']:
+         problems.append('FEE_EARNED_TOO_EARLY')
++    if sealed['ground_truth'] in ('NEGATIVE','REVIEW') and funds['realized']>0:
++        problems.append('WRONGFUL_RECOVERY_AGAINST_SEPARATE_SYNTHETIC_TRUTH')
+     if funds['fee_refunded']>funds['fee_collected']:
+         problems.append('OVER_REFUND')
+     if case.get('simulated_collection_cents')!=funds['reconciled']:
+diff --git a/unified/semantic_verify.py b/unified/semantic_verify.py
+index c39988a..3871692 100644
+--- a/unified/semantic_verify.py
++++ b/unified/semantic_verify.py
+@@ -1,128 +1,183 @@
+-"""Independent, read-only replay of the *fictional* legacy StagingTwin event semantics.
++"""Independent read-only interpretation of synthetic lab financial events.
+ 
+-This deliberately does not import StagingTwin.act or trust funds_json/journal
+-as authoritative. Does not authenticate third-party source ownership, signed
+-fee terms, the physical carrier credit, or production RecoveryOS behavior.
++No StagingTwin imports, no trust in funds_json or journal postings, and no
++claim that HMAC fixtures authenticate an actual customer, bank or carrier.
+ """
+ from collections import Counter
+ import json
+ from .core import sha
++from .fee_authority import check_terms
+ 
+-FIELDS = (
+- 'candidate','validated','authorized_limit','offer','settled','received',
+- 'reconciled','reversed','fee_earned','fee_collected','fee_refund_due','fee_refunded',
+-)
++FIELDS = ('candidate','validated','authorized_limit','offer','settled','received',
++          'reconciled','reversed','realized','fee_earned','fee_collected',
++          'fee_refund_due','fee_refunded','fee_written_off')
+ 
+ 
+-def replay_event_money(events):
+-    f={x:0 for x in FIELDS}
+-    state='INTAKE'
+-    consent=False;revoked=False
+-    journal=[]
+-    for position,x in enumerate(events,1):
+-        if x['seq'] != position:
+-            raise ValueError('EVENT_SEQUENCE_GAP')
+-        kind=x['kind']; p=json.loads(x['payload_json'])
+-        if not isinstance(p,dict):raise ValueError('BAD_EVENT_PAYLOAD')
+-        value=p.get('amount_cents',0)
+-        if type(value) is not int or value<0:raise ValueError('BAD_EVENT_CENTS')
+-        seq=x['seq']
+-        def post(dr,cr,amount):
+-            if amount:
+-                journal.append((seq,dr,cr,amount))
++def replay_event_money(events, *, verifier_key=None, tenant='', source_customer_id='', currency='USD'):
++    f={key:0 for key in FIELDS}
++    positions={}
++    refund_liabilities=0
++    snapshots=[]
++    consent=False; revoked=False; state='INTAKE'; signed=None
++    observed_refs={}
++    expected_journal=Counter()
++
++    def post(seq, debit, credit, cents):
++        if cents:
++            if cents < 0:raise ValueError('NEGATIVE_JOURNAL')
++            expected_journal[(seq,debit,credit,cents)]+=1
++
++    for idx,e in enumerate(events,1):
++        seq=e['seq']
++        if type(seq) is not int or idx!=seq:raise ValueError('EVENT_SEQUENCE_GAP')
++        kind=e['kind']
++        p=json.loads(e['payload_json'])
++        if not isinstance(p,dict):raise ValueError('MALFORMED_EVENT_PAYLOAD')
++        cents=p.get('amount_cents',0)
++        if type(cents) is not int or cents < 0:raise ValueError('INVALID_EVENT_CENTS')
+         if kind=='INTAKE':
+-            if position != 1 or value != 0:raise ValueError('INVALID_INTAKE')
++            if idx!=1 or cents or p.get('provider_ref'):raise ValueError('INTAKE_WITH_MONEY')
+         elif kind=='CONSENT':
+-            if p.get('scope_signed') is not True:raise ValueError('UNSIGNED_EVENT')
+-            consent=True;revoked=False;state='CONSENTED'
+-        elif kind=='REVOKE':
+-            revoked=True;state='REVIEW_REQUIRED'
++            if p.get('scope_signed') is not True:raise ValueError('MISSING_CONSENT')
++            consent=True;revoked=False;state='CONSENTED';signed=p.get('terms')
++            if signed is not None:
++                check_terms(signed,verifier_key=verifier_key,tenant=tenant,
++                            source_customer_id=source_customer_id,currency=currency)
++        elif kind=='REVOKE':revoked=True;state='REVIEW_REQUIRED'
+         elif kind=='FREEZE':state='FROZEN'
+-        elif kind=='CANDIDATE':f['candidate']=value;state='REVIEW_REQUIRED'
+-        elif kind=='REVIEW':f['validated']=value;state='VALIDATED' if value else 'NO_FINDING'
+-        elif kind=='AUTHORIZE':f['authorized_limit']=value;state='AUTHORIZED'
++        elif kind=='CANDIDATE':f['candidate']=cents;state='REVIEW_REQUIRED'
++        elif kind=='REVIEW':f['validated']=cents;state='VALIDATED' if cents else 'NO_FINDING'
++        elif kind=='AUTHORIZE':f['authorized_limit']=cents;state='AUTHORIZED'
+         elif kind=='SUBMIT':state='SUBMITTED'
+         elif kind=='ACKNOWLEDGE':state='ACKNOWLEDGED'
+-        elif kind=='OFFER':f['offer']=value;state='CARRIER_OFFER'
+-        elif kind=='SETTLE':f['settled']=value;state='SETTLED'
++        elif kind=='OFFER':f['offer']=cents;state='CARRIER_OFFER'
++        elif kind=='SETTLE':f['settled']=cents;state='SETTLED'
+         elif kind=='CREDIT':
+-            f['received']=value;state='RECEIVED'
+-            post('customer_credit_pending','carrier_credit_receivable',value)
++            ref=p.get('provider_ref')
++            if not isinstance(ref,str) or not ref.startswith('SIM-CREDIT-') or ref in observed_refs:
++                raise ValueError('DUPLICATE_OR_MISSING_CREDIT_REFERENCE')
++            observed_refs[ref]={'issued':cents,'reconciled':0,'reversed':0}
++            f['received']+=cents;state='RECEIVED'
++            if f['received']>f['settled']:raise ValueError('EXCESS_CUMULATIVE_CREDIT')
++            post(seq,'customer_credit_pending','carrier_credit_receivable',cents)
+         elif kind=='RECONCILE':
+-            f['reconciled']=value;state='RECONCILED'
+-            post('customer_credit_reconciled','customer_credit_pending',value)
++            ref=p.get('credit_ref')
++            if ref not in observed_refs:raise ValueError('RECONCILIATION_UNBOUND_TO_CREDIT')
++            receipt=observed_refs[ref]
++            if not 0<cents<=receipt['issued']-receipt['reconciled']-max(0,receipt['reversed']-receipt['reconciled']):
++                raise ValueError('EXCESS_PER_RECEIPT_RECONCILIATION')
++            receipt['reconciled']+=cents
++            f['reconciled']+=cents;f['realized']+=cents;state='RECONCILED'
++            post(seq,'customer_credit_reconciled','customer_credit_pending',cents)
+         elif kind=='FEE_INVOICE':
+-            bps=p.get('fee_bps')
+-            if type(bps) is not int or not 0<=bps<=5000:
+-                raise ValueError('BAD_EVENT_FEE_RATE')
+-            earned=f['reconciled']*bps//10000
+-            f['fee_earned']=earned;state='FEE_INVOICED'
+-            post('fee_receivable','recovery_fee_revenue_simulated',earned)
++            if signed is None:raise ValueError('INDEPENDENT_FEE_TERMS_ABSENT')
++            authorized_bps=check_terms(signed,verifier_key=verifier_key,
++                    tenant=tenant,source_customer_id=source_customer_id,currency=currency)
++            if p.get('fee_bps')!=authorized_bps:raise ValueError('FEE_RATE_NOT_SIGNED')
++            new_net=f['realized']*authorized_bps//10000
++            posted=new_net-f['fee_earned']
++            if posted < 0:raise ValueError('NEGATIVE_NEW_FEE_ACCRUAL')
++            f['fee_earned']=new_net;state='FEE_INVOICED'
++            post(seq,'fee_receivable','recovery_fee_revenue_simulated',posted)
+         elif kind=='FEE_PAY':
+-            f['fee_collected']=value;state='FEE_PAID'
+-            post('simulated_cash','fee_receivable',value)
++            f['fee_collected']+=cents;state='FEE_PAID'
++            if f['fee_collected']-f['fee_refunded']+f['fee_written_off']>f['fee_earned']:
++                raise ValueError('UNBACKED_FEE_CASH')
++            post(seq,'simulated_cash','fee_receivable',cents)
+         elif kind=='REVERSE':
+-            f['reversed']+=value
+-            remaining=max(0,f['reconciled']-f['reversed'])
++            ref=p.get('credit_ref')
++            if ref not in observed_refs:raise ValueError('REVERSAL_NO_CREDIT_REFERENCE')
++            receipt=observed_refs[ref]
++            if not 0<cents<=receipt['issued']-receipt['reversed']:
++                raise ValueError('EXCESS_OR_UNSUPPORTED_REVERSAL')
++            previously_reversed=receipt['reversed']
++            credited_before=receipt['reconciled']
++            recognized=max(0,min(cents,credited_before-previously_reversed))
++            unrecognized=cents-recognized
++            receipt['reversed']+=cents
++            f['reversed']+=cents;f['realized']-=recognized
++            post(seq,'reversal_expense','customer_credit_reconciled',recognized)
++            post(seq,'reversal_expense','customer_credit_pending',unrecognized)
+             if f['fee_earned']:
+-                bps=p.get('original_fee_bps')
+-                if type(bps) is not int or not 0<=bps<=5000:
+-                    raise ValueError('BAD_REVERSAL_FEE_RATE')
+-                f['fee_refund_due']=max(0,f['fee_collected']-remaining*bps//10000-f['fee_refunded'])
++                if signed is None:raise ValueError('MISSING_ORIGINAL_SIGNED_RATE')
++                bps=check_terms(signed,verifier_key=verifier_key,
++                                tenant=tenant,source_customer_id=source_customer_id,currency=currency)
++                if p.get('original_fee_bps',bps)!=bps:raise ValueError('REVERSAL_RATE_NOT_AUTHORIZED')
++                corrected_fee=f['realized']*bps//10000
++                old_earned=f['fee_earned']
++                old_written_off=f['fee_written_off']
++                net_cash=f['fee_collected']-f['fee_refunded']
++                old_receivable=max(0,old_earned-net_cash-old_written_off)
++                new_written_off=min(old_written_off,max(0,corrected_fee-net_cash))
++                new_receivable=max(0,corrected_fee-net_cash-new_written_off)
++                receivable_reduction=old_receivable-new_receivable
++                if receivable_reduction<0:raise ValueError('NEGATIVE_RECEIVABLE_ADJUSTMENT')
++                writeoff_reversal=old_written_off-new_written_off
++                due_after=max(0,net_cash-corrected_fee)
++                due_increase=due_after-f['fee_refund_due']
++                if due_increase<0:raise ValueError('BAD_REFUND_ADJUSTMENT')
++                f['fee_earned']=corrected_fee
++                f['fee_written_off']=new_written_off
++                f['fee_refund_due']=due_after
++                post(seq,'recovery_fee_revenue_simulated','fee_receivable',receivable_reduction)
++                post(seq,'recovery_fee_revenue_simulated','fee_writeoff_expense',writeoff_reversal)
++                post(seq,'recovery_fee_revenue_simulated','fee_refund_liability',due_increase)
+             state='REVERSED'
+-            post('reversal_expense','customer_credit_reconciled',value)
+-            post('fee_refund_expense','fee_refund_liability',f['fee_refund_due'])
+         elif kind=='REFUND':
+-            f['fee_refund_due']-=value
+-            f['fee_refunded']+=value
+-            state='REVERSED'
+-            post('fee_refund_liability','simulated_cash',value)
+-        elif kind=='CLOSE':state='CLOSED'
++            if not 0<cents<=f['fee_refund_due']:raise ValueError('EXCESS_FEE_REFUND')
++            f['fee_refund_due']-=cents;f['fee_refunded']+=cents;state='REVERSED'
++            post(seq,'fee_refund_liability','simulated_cash',cents)
++        elif kind=='FEE_WRITE_OFF':
++            if p.get('approved') is not True or not str(p.get('approver','')).startswith('SIM-'):
++                raise ValueError('UNAPPROVED_FEE_WRITEOFF')
++            outstanding=f['fee_earned']-(f['fee_collected']-f['fee_refunded'])-f['fee_written_off']
++            if not 0<cents<=outstanding:raise ValueError('EXCESS_FEE_WRITEOFF')
++            f['fee_written_off']+=cents
++            post(seq,'fee_writeoff_expense','fee_receivable',cents)
++        elif kind=='CLOSE':
++            if f['fee_refund_due'] or f['fee_earned']-f['fee_collected']+f['fee_refunded']-f['fee_written_off']>0:
++                raise ValueError('FINANCIAL_OBLIGATIONS_OPEN')
++            state='CLOSED'
+         elif kind in ('COMPLAIN','MESSAGE'):
+             pass
+-        else:raise ValueError('UNEXPECTED_EVENT_KIND')
+-    return f,state,consent,revoked,Counter(journal)
++        else:raise ValueError('UNHANDLED_EVENT_KIND:'+str(kind))
++    return f,state,consent,revoked,expected_journal
+ 
+ 
+ def verify_case_source_binding(case):
+-    p=json.loads(case['public_invoice_json'])
+-    if not isinstance(p,dict):return False
+-    if case['source_customer_id']!=p.get('customer_id') or case['invoice_id']!=p.get('invoice_id'):
++    invoice=json.loads(case['public_invoice_json'])
++    if not isinstance(invoice,dict):return False
++    if invoice.get('customer_id')!=case['source_customer_id'] or invoice.get('invoice_id')!=case['invoice_id']:
+         return False
+-    body={
+-      'tenant_id':case['tenant'],
+-      'source_customer_id':case['source_customer_id'],
+-      'invoice_id':case['invoice_id'],
+-      'source_sha256':case['source_sha256'],
+-      'case_id':case['case_id'],
+-      'invoice_public_hash':sha(p),
+-      'simulated_consent':False,
+-    }
++    body={'tenant_id':case['tenant'],'source_customer_id':case['source_customer_id'],
++          'invoice_id':case['invoice_id'],'source_sha256':case['source_sha256'],
++          'case_id':case['case_id'],'invoice_public_hash':sha(invoice),'simulated_consent':False}
+     return sha(body)==case['binding_hash']
+ 
+ 
+-def verify_case_replay(con,case):
++def verify_case_replay(con,case,verifier_key=None):
+     cid=case['case_id']
+     events=list(con.execute('SELECT * FROM evidence_events WHERE case_id=? ORDER BY seq',(cid,)))
+     try:
+-        expected,state,consent,revoked,expected_journal=replay_event_money(events)
+-        actual=json.loads(case['funds_json'])
+-    except (ValueError,TypeError,KeyError,OverflowError) as e:
+-        return ['UNREPLAYABLE_CASE:'+cid+':'+type(e).__name__]
++        expected,state,consent,revoked,expected_postings=replay_event_money(
++            events,verifier_key=verifier_key,tenant=case['tenant'],
++            source_customer_id=case['source_customer_id'],currency=case['currency'])
++        stored=json.loads(case['funds_json'])
++    except (ValueError,KeyError,TypeError,OverflowError) as exc:
++        return ['UNREPLAYABLE_CASE:'+cid+':'+str(exc)]
+     failures=[]
+-    if actual != expected:
+-        failures.append('FUND_REPLAY_MISMATCH:'+cid)
+-    if case['state']!=state:
+-        failures.append('STATE_REPLAY_MISMATCH:'+cid)
+-    if case['consent']!=int(consent) or case['revoked']!=int(revoked):
++    if expected!=stored:failures.append('FUND_REPLAY_MISMATCH:'+cid)
++    if state!=case['state']:failures.append('STATE_REPLAY_MISMATCH:'+cid)
++    if bool(case['consent'])!=consent or bool(case['revoked'])!=revoked:
+         failures.append('CONSENT_REPLAY_MISMATCH:'+cid)
+-    actual_journal=Counter((x['seq'],x['debit_account'],x['credit_account'],x['amount_cents'])
+-           for x in con.execute('SELECT * FROM journal WHERE case_id=?',(cid,)))
+-    if actual_journal!=expected_journal:
+-        failures.append('JOURNAL_EVENT_MISMATCH:'+cid)
++    journal=Counter((x['seq'],x['debit_account'],x['credit_account'],x['amount_cents'])
++                    for x in con.execute('SELECT * FROM journal WHERE case_id=?',(cid,)))
++    if journal!=expected_postings:failures.append('JOURNAL_EVENT_MISMATCH:'+cid)
+     try:
+-        if not verify_case_source_binding(case):
+-            failures.append('SOURCE_BINDING_TAMPER:'+cid)
+-    except (ValueError,TypeError,KeyError):
+-        failures.append('SOURCE_BINDING_TAMPER:'+cid)
++        if not verify_case_source_binding(case):failures.append('SOURCE_BINDING_TAMPER:'+cid)
++    except (ValueError,KeyError,TypeError):failures.append('SOURCE_BINDING_TAMPER:'+cid)
++    for ref,amount in con.execute('SELECT provider_ref,amount_cents FROM credited_references WHERE case_id=?',(cid,)):
++        matching=[json.loads(e['payload_json']).get('amount_cents') for e in events
++                  if e['kind']=='CREDIT' and json.loads(e['payload_json']).get('provider_ref')==ref]
++        if matching!=[amount]:failures.append('CREDIT_DB_EVENT_MISMATCH:'+cid)
+     return failures
+diff --git a/unified/staging.py b/unified/staging.py
+index 482f7ac..8611616 100644
+--- a/unified/staging.py
++++ b/unified/staging.py
+@@ -12,12 +12,13 @@ from datetime import datetime, timedelta, timezone
+ from .core import sha, public_invoice, verify_source_row
+ from .catalog import bind_fictional_invoice, verify_binding
+ from .semantic_verify import verify_case_replay
++from .fee_authority import check_terms
+ 
+ class Rejected(Exception):
+     """Typed governance violation; no partial database write."""
+ 
+ MONEY_FIELDS=('candidate','validated','authorized_limit','offer','settled','received',
+-              'reconciled','reversed','fee_earned','fee_collected','fee_refund_due','fee_refunded')
++              'reconciled','reversed','realized','fee_earned','fee_collected','fee_refund_due','fee_refunded','fee_written_off')
+ STATES={'INTAKE','CONSENTED','FROZEN','REVIEW_REQUIRED','NO_FINDING','VALIDATED',
+         'AUTHORIZED','SUBMITTED','ACKNOWLEDGED','CARRIER_OFFER','SETTLED',
+         'RECEIVED','RECONCILED','FEE_INVOICED','FEE_PAID','REVERSED','CLOSED'}
+@@ -26,14 +27,17 @@ ROLE_RIGHTS={
+  'reviewer':{'REVIEW','CONFIRM_SOURCE'},
+  'operator':{'FREEZE','CANDIDATE','SUBMIT','MESSAGE','CLOSE'},
+  'carrier_mock':{'ACKNOWLEDGE','OFFER','SETTLE'},
+- 'finance':{'CREDIT','RECONCILE','FEE_INVOICE','FEE_PAY','REVERSE','REFUND'},
++ 'finance':{'CREDIT','RECONCILE','FEE_INVOICE','FEE_PAY','REVERSE','REFUND','FEE_WRITE_OFF'},
+  'system':{'INTAKE'}
+ }
+ 
+ def initial_finance():return {key:0 for key in MONEY_FIELDS}
+ 
+ class StagingTwin:
+-    def __init__(self, path):
++    def __init__(self, path, fee_verifier_key=None):
++        # This key is supplied by independent *synthetic* test authority.
++        # No key means fee accrual fails closed. No live buyer authority implied.
++        self.fee_verifier_key=fee_verifier_key
+         self.path=str(path)
+         if self.path==':memory:':
+             raise ValueError('File-backed isolated staging database required')
+@@ -47,7 +51,7 @@ class StagingTwin:
+                 state TEXT NOT NULL, consent INTEGER NOT NULL DEFAULT 0,
+                 revoked INTEGER NOT NULL DEFAULT 0,
+                 currency TEXT NOT NULL DEFAULT 'USD',
+-                funds_json TEXT NOT NULL,provider_ref TEXT UNIQUE,
++                funds_json TEXT NOT NULL,provider_ref TEXT,
+                 lock_version INTEGER NOT NULL DEFAULT 0,
+                 created_at TEXT NOT NULL
+               );
+@@ -66,6 +70,19 @@ class StagingTwin:
+                 FOREIGN KEY(case_id,seq) REFERENCES evidence_events(case_id,seq)
+               );
+               CREATE INDEX IF NOT EXISTS idx_tenant_cases ON simulated_cases(tenant,invoice_id);
++              CREATE TABLE IF NOT EXISTS credited_references (
++                tenant TEXT NOT NULL,provider_ref TEXT NOT NULL,
++                case_id TEXT NOT NULL,source_customer_id TEXT NOT NULL,
++                currency TEXT NOT NULL,amount_cents INTEGER NOT NULL CHECK(amount_cents>0),
++                PRIMARY KEY(tenant,provider_ref));
++              CREATE TABLE IF NOT EXISTS economic_issues (
++                tenant TEXT NOT NULL,source_customer_id TEXT NOT NULL,
++                invoice_id TEXT NOT NULL,issue_id TEXT NOT NULL,case_id TEXT UNIQUE,
++                PRIMARY KEY(tenant,source_customer_id,invoice_id,issue_id));
++              CREATE TABLE IF NOT EXISTS source_scope_registry (
++                source_customer_id TEXT NOT NULL,invoice_id TEXT NOT NULL,
++                source_sha256 TEXT NOT NULL,tenant TEXT NOT NULL,
++                PRIMARY KEY(source_customer_id,invoice_id));
+               CREATE TRIGGER IF NOT EXISTS immutable_event_update BEFORE UPDATE ON evidence_events
+               BEGIN SELECT RAISE(ABORT, 'APPEND_ONLY_EVENT'); END;
+               CREATE TRIGGER IF NOT EXISTS immutable_event_delete BEFORE DELETE ON evidence_events
+@@ -93,13 +110,26 @@ class StagingTwin:
+         if r is None:raise Rejected('NOT_FOUND_OR_WRONG_TENANT')
+         return dict(r)
+ 
+-    def create(self,row,tenant,case_id,idempotency=None):
++    def create(self,row,tenant,case_id,idempotency=None,issue_id="INVOICE_GENERAL"):
++        if not isinstance(issue_id,str) or not issue_id or len(issue_id)>128:
++            raise Rejected("INVALID_ECONOMIC_ISSUE_ID")
+         verify_source_row(row)
+         binding=bind_fictional_invoice(row,tenant,case_id)
+         verify_binding(binding,row,tenant,case_id)
+         with self.connect() as con:
+             if con.execute('SELECT 1 FROM simulated_cases WHERE case_id=?',(case_id,)).fetchone():
+                 raise Rejected('DUPLICATE_CASE_ID')
++            # First observed tenant ownership prevents accidental cross-tenant
++            # import, but is NOT independent proof of buyer source entitlement.
++            owner=con.execute('SELECT tenant,source_sha256 FROM source_scope_registry WHERE source_customer_id=? AND invoice_id=?',
++                    (row['customer_id'],row['invoice_id'])).fetchone()
++            if owner and owner['tenant']!=tenant:
++                raise Rejected('SOURCE_ALREADY_SCOPED_TO_ANOTHER_TENANT')
++            if owner and owner['source_sha256']!=row['synthetic_source_sha256']:
++                raise Rejected('SOURCE_VERSION_BINDING_CHANGED')
++            conflict=con.execute('SELECT 1 FROM economic_issues WHERE tenant=? AND source_customer_id=? AND invoice_id=? AND issue_id=?',
++                    (tenant,row['customer_id'],row['invoice_id'],issue_id)).fetchone()
++            if conflict:raise Rejected('DUPLICATE_ECONOMIC_ISSUE')
+             created='2026-10-07T00:00:00Z'
+             con.execute('''INSERT INTO simulated_cases
+                 (case_id,tenant,invoice_id,source_customer_id,source_sha256,public_invoice_json,
+@@ -108,6 +138,10 @@ class StagingTwin:
+                 (case_id,tenant,row['invoice_id'],row['customer_id'],
+                  row['synthetic_source_sha256'],json.dumps(public_invoice(row)),
+                  binding['binding_hash'],'INTAKE',0,0,json.dumps(initial_finance()),created))
++            con.execute('INSERT OR IGNORE INTO source_scope_registry VALUES(?,?,?,?)',
++                    (row['customer_id'],row['invoice_id'],row['synthetic_source_sha256'],tenant))
++            con.execute('INSERT INTO economic_issues VALUES(?,?,?,?,?)',
++                    (tenant,row['customer_id'],row['invoice_id'],issue_id,case_id))
+             self._event(con,case_id,tenant,'system','INTAKE',{'source_hash':binding['binding_hash']},
+                         idempotency or f'intake:{case_id}')
+         return case_id
+@@ -140,18 +174,43 @@ class StagingTwin:
+                         (case_id,seq,debit,credit,money))
+         return seq,digest
+ 
++    @staticmethod
++    def _ref_balances(con, case_id):
++        refs={}
++        for x in con.execute('SELECT kind,payload_json FROM evidence_events WHERE case_id=? ORDER BY seq',(case_id,)):
++            k=x['kind'];p=json.loads(x['payload_json'])
++            if k=='CREDIT':
++                ref=p['provider_ref']
++                refs.setdefault(ref,{'issued':0,'reconciled':0,'reversed':0})['issued']+=p['amount_cents']
++            elif k in ('RECONCILE','REVERSE'):
++                ref=p.get('credit_ref')
++                if not ref or ref not in refs:raise Rejected('MISSING_CAUSAL_CREDIT_REFERENCE')
++                refs[ref]['reconciled' if k=='RECONCILE' else 'reversed']+=p['amount_cents']
++        return refs
++
++    def _authorized_fee_bps(self,con,case):
++        row=con.execute("SELECT payload_json FROM evidence_events WHERE case_id=? AND kind='CONSENT' ORDER BY seq LIMIT 1",(case['case_id'],)).fetchone()
++        if row is None:raise Rejected('MISSING_BUYER_CONSENT')
++        terms=json.loads(row['payload_json']).get('terms')
++        try:
++            return check_terms(terms,verifier_key=self.fee_verifier_key,
++                               tenant=case['tenant'],source_customer_id=case['source_customer_id'],
++                               currency=case['currency'])
++        except ValueError as e:
++            raise Rejected(str(e)) from e
++
+     def act(self,case_id,tenant,actor,kind,payload=None,idempotency=None):
+         payload=dict(payload or {})
+         if kind not in ROLE_RIGHTS.get(actor,()):raise Rejected('ROLE_NOT_AUTHORIZED')
+         # Must bind unique idempotency keys to the exact action and payload.
+-        idempotency=idempotency or sha([case_id,actor,kind,payload])[:32]
++        idempotency=idempotency or sha([tenant,case_id,actor,kind,payload])[:32]
+         with self.connect() as con:
+             con.execute('BEGIN IMMEDIATE')
+             case=self._case(con,case_id,tenant)
+-            previous=con.execute('SELECT kind,payload_json FROM evidence_events WHERE case_id=? AND idempotency=?',
++            previous=con.execute('SELECT kind,payload_json,actor FROM evidence_events WHERE case_id=? AND idempotency=?',
+                                   (case_id,idempotency)).fetchone()
+             if previous:
+-                if previous['kind']==kind and json.loads(previous['payload_json'])==payload:
++                if previous['kind']==kind and previous['actor']==actor and json.loads(previous['payload_json'])==payload:
+                     return {'status':'IDEMPOTENT_REPLAY','case':self.view(case_id,tenant)}
+                 raise Rejected('IDEMPOTENCY_CONFLICT')
+             state=case['state']; funds=json.loads(case['funds_json'])
+@@ -172,6 +231,12 @@ class StagingTwin:
+             if kind=='CONSENT':
+                 need({'INTAKE'});consent=True;revoked=False;state='CONSENTED'
+                 if payload.get('scope_signed') is not True:raise Rejected('UNSIGNED_CONTRACT')
++                # Terms are optional for case review; without authenticated terms,
++                # fee accrual is expressly blocked later.
++                if 'terms' in payload:
++                    try:check_terms(payload['terms'],verifier_key=self.fee_verifier_key,
++                                    tenant=tenant,source_customer_id=case['source_customer_id'],currency=case['currency'])
++                    except ValueError as e:raise Rejected(str(e)) from e
+             elif kind=='REVOKE':
+                 if not consent:raise Rejected('NEVER_CONSENTED')
+                 revoked=True;state='REVIEW_REQUIRED'
+@@ -203,55 +268,109 @@ class StagingTwin:
+                 if not 0<value<=funds['offer']:raise Rejected('SETTLEMENT_OUT_OF_BOUNDS')
+                 funds['settled']=value;state='SETTLED'
+             elif kind=='CREDIT':
+-                need({'SETTLED'});req_note()
++                need({'SETTLED','RECEIVED','RECONCILED','FEE_INVOICED','FEE_PAID'});req_note()
+                 provider_ref=payload.get('provider_ref')
+                 if not isinstance(provider_ref,str) or not provider_ref.startswith('SIM-CREDIT-'):
+                     raise Rejected('CREDIT_REFERENCE_REQUIRED')
+-                if not 0<value<=funds['settled']:raise Rejected('RECEIPT_ABOVE_SETTLED')
++                if not 0<value<=funds['settled']-funds['received']:
++                    raise Rejected('CUMULATIVE_RECEIPT_EXCEEDS_SETTLEMENT')
++                if con.execute('SELECT 1 FROM credited_references WHERE tenant=? AND provider_ref=?',(tenant,provider_ref)).fetchone():
++                    raise Rejected('DUPLICATE_CREDIT_REFERENCE')
++                con.execute('INSERT INTO credited_references VALUES(?,?,?,?,?,?)',
++                    (tenant,provider_ref,case_id,case['source_customer_id'],case['currency'],value))
+                 case['provider_ref']=provider_ref
+-                funds['received']=value;state='RECEIVED'
++                funds['received']+=value;state='RECEIVED'
+                 journal.append(('customer_credit_pending','carrier_credit_receivable',value))
+             elif kind=='RECONCILE':
+-                need({'RECEIVED'});req_note()
+-                if not 0<value<=funds['received']:raise Rejected('RECONCILE_ABOVE_RECEIPT')
+-                funds['reconciled']=value;state='RECONCILED'
++                need({'RECEIVED','RECONCILED'});req_note()
++                refs=self._ref_balances(con,case_id)
++                ref=payload.get('credit_ref')
++                if not ref and len(refs)==1:ref=next(iter(refs))
++                if ref not in refs:raise Rejected('RECONCILE_REFERENCE_REQUIRED')
++                available=refs[ref]['issued']-refs[ref]['reconciled']-max(0,refs[ref]['reversed']-refs[ref]['reconciled'])
++                if not 0<value<=available:raise Rejected('RECONCILE_ABOVE_UNAPPLIED_RECEIPT')
++                payload['credit_ref']=ref
++                funds['reconciled']+=value;funds['realized']+=value;state='RECONCILED'
+                 journal.append(('customer_credit_reconciled','customer_credit_pending',value))
+             elif kind=='FEE_INVOICE':
+                 need({'RECONCILED'});authority();req_note()
+-                bps=payload.get('fee_bps')
+-                if type(bps) is not int or not 0<=bps<=5000:raise Rejected('INVALID_FEE_TERMS')
+-                earned=(funds['reconciled']*bps)//10000
++                bps=self._authorized_fee_bps(con,case)
++                if payload.get('fee_bps')!=bps:raise Rejected('FEE_RATE_NOT_CONTRACT_BOUND')
++                earned=(funds['realized']*bps)//10000
++                delta=earned-funds['fee_earned']
++                if delta<0:raise Rejected('FEE_ACCRUAL_MUST_USE_REVERSAL')
+                 funds['fee_earned']=earned
+                 state='FEE_INVOICED'
+-                if earned:journal.append(('fee_receivable','recovery_fee_revenue_simulated',earned))
++                if delta:journal.append(('fee_receivable','recovery_fee_revenue_simulated',delta))
+             elif kind=='FEE_PAY':
+-                need({'FEE_INVOICED'});req_note()
+-                if not 0<value<=funds['fee_earned']:raise Rejected('UNAUTHORIZED_FEE_COLLECTION')
+-                funds['fee_collected']=value;state='FEE_PAID'
++                need({'FEE_INVOICED','FEE_PAID'});req_note()
++                if not 0<value<=funds['fee_earned']-funds['fee_collected']+funds['fee_refunded']-funds['fee_written_off']:
++                    raise Rejected('UNAUTHORIZED_FEE_COLLECTION')
++                funds['fee_collected']+=value;state='FEE_PAID'
+                 journal.append(('simulated_cash','fee_receivable',value))
+             elif kind=='REVERSE':
+-                need({'RECEIVED','RECONCILED','FEE_INVOICED','FEE_PAID'});req_note()
+-                if not 0<value<=funds['received']-funds['reversed']:raise Rejected('REVERSAL_ABOVE_RECEIPT')
++                # Financial corrections must remain available after revocation.
++                req_note()
++                refs=self._ref_balances(con,case_id)
++                ref=payload.get('credit_ref')
++                if not ref and len(refs)==1:ref=next(iter(refs))
++                if ref not in refs:raise Rejected('REVERSAL_REFERENCE_REQUIRED')
++                remaining=refs[ref]['issued']-refs[ref]['reversed']
++                if not 0<value<=remaining:raise Rejected('REVERSAL_ABOVE_ORIGINAL_CREDIT')
++                payload['credit_ref']=ref
++                # First reverse recognized customer recovery, then remaining
++                # pending (not-yet-reconciled) carrier credit for this reference.
++                realized_reverse=min(value,max(0,refs[ref]['reconciled']-refs[ref]['reversed']))
++                pending_reverse=value-realized_reverse
+                 funds['reversed']+=value
+-                remaining=max(0,funds['reconciled']-funds['reversed'])
++                funds['realized']-=realized_reverse
++                if realized_reverse:journal.append(('reversal_expense','customer_credit_reconciled',realized_reverse))
++                if pending_reverse:journal.append(('reversal_expense','customer_credit_pending',pending_reverse))
+                 if funds['fee_earned']:
+-                    bps=payload.get('original_fee_bps')
+-                    if type(bps) is not int or not 0<=bps<=5000:raise Rejected('REVERSAL_REQUIRES_FEE_TERMS')
+-                    funds['fee_refund_due']=max(0,funds['fee_collected']-(remaining*bps//10000)-funds['fee_refunded'])
+-                state='REVERSED';journal.append(('reversal_expense','customer_credit_reconciled',value))
+-                if funds['fee_refund_due']:
+-                    journal.append(('fee_refund_expense','fee_refund_liability',funds['fee_refund_due']))
++                    bps=self._authorized_fee_bps(con,case)
++                    if payload.get('original_fee_bps',bps)!=bps:raise Rejected('REVERSAL_FEE_RATE_MISMATCH')
++                    new_earned=(funds['realized']*bps)//10000
++                    old_earned=funds['fee_earned']
++                    old_written_off=funds['fee_written_off']
++                    net_cash=funds['fee_collected']-funds['fee_refunded']
++                    old_receivable=max(0,old_earned-net_cash-old_written_off)
++                    new_writeoff=min(old_written_off,max(0,new_earned-net_cash))
++                    new_receivable=max(0,new_earned-net_cash-new_writeoff)
++                    recv_reduction=old_receivable-new_receivable
++                    if recv_reduction < 0:raise Rejected('NEGATIVE_FEE_REVERSAL')
++                    writeoff_release=old_written_off-new_writeoff
++                    new_refund_due=max(0,net_cash-new_earned)
++                    liability_increase=new_refund_due-funds['fee_refund_due']
++                    if liability_increase < 0:raise Rejected('NEGATIVE_REFUND_ADJUSTMENT')
++                    funds['fee_earned']=new_earned
++                    funds['fee_written_off']=new_writeoff
++                    funds['fee_refund_due']=new_refund_due
++                    if recv_reduction:journal.append(('recovery_fee_revenue_simulated','fee_receivable',recv_reduction))
++                    if writeoff_release:journal.append(('recovery_fee_revenue_simulated','fee_writeoff_expense',writeoff_release))
++                    if liability_increase:journal.append(('recovery_fee_revenue_simulated','fee_refund_liability',liability_increase))
++                state='REVERSED'
+             elif kind=='REFUND':
+-                need({'REVERSED'});req_note()
++                need({'REVERSED','REVIEW_REQUIRED'});req_note()
+                 if not 0<value<=funds['fee_refund_due']:raise Rejected('OVER_REFUND')
+                 funds['fee_refund_due']-=value;funds['fee_refunded']+=value
++                state='REVERSED'
+                 journal.append(('fee_refund_liability','simulated_cash',value))
++            elif kind=='FEE_WRITE_OFF':
++                need({'FEE_INVOICED','FEE_PAID','REVERSED','REVIEW_REQUIRED'});req_note()
++                if payload.get('approved') is not True or not isinstance(payload.get('approver'),str) or not payload['approver'].startswith('SIM-'):
++                    raise Rejected('WRITE_OFF_REQUIRES_FINANCE_APPROVAL')
++                outstanding=funds['fee_earned']-(funds['fee_collected']-funds['fee_refunded'])-funds['fee_written_off']
++                if not 0<value<=outstanding:raise Rejected('WRITE_OFF_ABOVE_RECEIVABLE')
++                funds['fee_written_off']+=value
++                journal.append(('fee_writeoff_expense','fee_receivable',value))
+             elif kind=='COMPLAIN':
+                 if not isinstance(payload.get('message'),str) or not payload['message'].strip():raise Rejected('EMPTY_COMPLAINT')
+             elif kind=='MESSAGE':
+                 if not isinstance(payload.get('message'),str) or not payload['message'].strip():raise Rejected('EMPTY_MESSAGE')
+             elif kind=='CLOSE':
+                 if funds['fee_refund_due']:raise Rejected('UNRESOLVED_REFUND_LIABILITY')
++                if funds['fee_earned']-(funds['fee_collected']-funds['fee_refunded'])-funds['fee_written_off']>0:
++                    raise Rejected('UNRESOLVED_FEE_RECEIVABLE')
+                 state='CLOSED'
+             else:
+                 raise Rejected('UNSUPPORTED_ACTION')
+@@ -295,13 +414,13 @@ class StagingTwin:
+                     prev=x['event_hash'];lasttime=x['timestamp']
+                 if finance['reconciled']>finance['received'] or finance['received']>finance['settled'] or finance['settled']>finance['authorized_limit']:
+                     failures.append(f'BAD_CASH_CHAIN:{c["case_id"]}')
+-                if finance['fee_collected']>finance['fee_earned'] or finance['fee_refunded']>finance['fee_collected']:
++                if finance['fee_collected']-finance['fee_refunded']>finance['fee_earned']+finance['fee_refund_due'] or finance['fee_refunded']>finance['fee_collected']:
+                     failures.append(f'BAD_FEES:{c["case_id"]}')
+                 if finance['reversed']>finance['received'] or any(type(v) is not int or v<0 for v in finance.values()):
+                     failures.append(f'BAD_REVERSAL:{c["case_id"]}')
+                 # Independently rebuild the source binding, financial snapshot, and
+                 # per-event account postings instead of trusting their own hashes.
+-                failures.extend(verify_case_replay(con,c))
++                failures.extend(verify_case_replay(con,c,self.fee_verifier_key))
+             for x in con.execute('SELECT * FROM journal'):
+                 totals['journal_rows']+=1
+                 if not x['amount_cents']>0 or x['debit_account']==x['credit_account']:
