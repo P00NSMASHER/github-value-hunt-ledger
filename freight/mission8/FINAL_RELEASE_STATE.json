@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-08",
+  "product": "RETALLY RecoveryOS",
+  "canonical_repo": "P00NSMASHER/github-value-hunt-ledger",
+  "production_floot_id": "c719b60c-9b3b-4193-a543-0be9d3ceaef2",
+  "production_url": "https://freight-recoveryos.floot.app",
+  "integrated_staging_floot_id": "41bb5a26-a38a-4a93-ae8d-a07f9e11f77b",
+  "mission7_pr": "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/299",
+  "mission8_consolidation_pr": "https://github.com/P00NSMASHER/github-value-hunt-ledger/pull/306",
+  "independently_observed_ci": {
+    "mission7_postgres_clean_pass": {
+      "run": 37790241733,
+      "staging_only": true
+    },
+    "mission8_postgres_clean_pass": {
+      "run": 37795153892,
+      "head_sha": "8abbac599fc6261a8b61aebb6acda53bba46c64b",
+      "staging_only": true
+    },
+    "mission9_audit_chain_extension_latest_run": 37818742406,
+    "mission9_audit_chain_extension_verdict": "PENDING_AT_DOCUMENT_CREATION"
+  },
+  "source_snapshots": {
+    "git_main_observed_sha": "2edd47a8e20e95e562905d9e28494e82e5463624",
+    "production_floot_editor_version": "1791471075963",
+    "staging_floot_editor_version": "1791480923295"
+  },
+  "verified_tests": {
+    "separate_floot_staging_typecheck_prior_to_quota": "PASS",
+    "staged_recovery_replay_and_hash_unit_tests_prior_to_quota": "3_FILES_PASSED",
+    "mission8_github_postgres_20way_race": {
+      "committed": 10,
+      "rejected": 10,
+      "allocated_minor_units": 100000,
+      "entitlement_minor_units": 100000
+    },
+    "staging_tenant_a_audit_chain": {
+      "total_events": 23,
+      "invalid_hashes": 0,
+      "broken_links": 0
+    },
+    "staging_multi_currency_grouping": {
+      "currency_codes": [
+        "USD",
+        "EUR",
+        "GBP"
+      ]
+    },
+    "production_schema_aggregate_count_at_observation": {
+      "findings": 0,
+      "payment_instructions": 0,
+      "payment_events": 0
+    },
+    "authenticated_end_to_end_customer_pilot": "NOT_PROVEN",
+    "third_party_penetration_test": "NOT_PERFORMED"
+  },
+  "isolation": {
+    "real_customer_data_used_as_test_fixture": false,
+    "production_data_mutated_by_this_mission": false,
+    "production_app_published_during_this_mission": false,
+    "customer_mail_or_funds_transmitted": false
+  },
+  "release_requirements": {
+    "source_provenance_and_contract_authority_independently_verified": false,
+    "owner_buyer_authorized_real_data": false,
+    "fee_eligibility_contract_reconciled": false,
+    "realized_cash_immutable_buyer_evidence_reconciled": false,
+    "full_actual_runtime_staging_parity": false,
+    "authenticated_two_tenant_http_negative_test": false,
+    "production_migration_and_rollback_rehearsed": false,
+    "database_backup_restore_and_security_assurance": false,
+    "currency_safe_frontend_rendering_confirmed": false,
+    "explicit_production_deployment_authorization": false
+  },
+  "verdict": {
+    "internal_synthetic_staging": "GO",
+    "controlled_manual_pilot": "CONDITIONAL_WITH_SEPARATE_ENVIRONMENT_AND_AUTHORIZATION",
+    "real_customer_processing_in_current_recoveryos": "NO_GO",
+    "unrestricted_production": "NO_GO"
+  },
+  "no_go_is_intentional": true,
+  "expiry": "Verdict must be reassessed on any new production source, schema, provider, or permission change"
+}
