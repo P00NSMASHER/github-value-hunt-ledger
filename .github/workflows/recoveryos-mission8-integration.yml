@@ -28,6 +28,8 @@ jobs:
           --health-retries 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install authentic RecoveryOS schema and M8 candidate in clean database
         shell: bash
         run: |
@@ -80,6 +82,7 @@ jobs:
         shell: bash
         env:
           M8_POSTGRES_CONTAINER_ID: ${{ job.services.postgres.id }}
+          RETALLY_TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
           docker exec -i "$M8_POSTGRES_CONTAINER_ID" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_same_key_setup.sql
