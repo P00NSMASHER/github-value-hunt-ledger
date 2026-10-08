@@ -492,6 +492,21 @@ class PublicChatbotTests(unittest.TestCase):
 class SignatureFinishTests(unittest.TestCase):
     """Selective visual tokens without marketing-content or intake changes."""
 
+    def test_white_primary_button_gradient_stops_meet_text_contrast(self):
+        # The button's label is white. Check every base and hover stop,
+        # rather than assuming a branded green is automatically legible.
+        def luminance(hexcolor):
+            channels = [int(hexcolor[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+            linear = [n / 12.92 if n <= 0.04045 else ((n + 0.055) / 1.055) ** 2.4
+                      for n in channels]
+            return sum(a * b for a, b in zip(linear, (0.2126, 0.7152, 0.0722)))
+
+        for color in ("#0b8055", "#086f4b", "#07553a",
+                      "#0c8758", "#087952", "#064b37"):
+            with self.subTest(color=color):
+                self.assertGreaterEqual(1.05 / (luminance(color) + 0.05), 4.5)
+
+
     def test_premium_surfaces_are_present_and_bounded(self):
         with tempfile.TemporaryDirectory() as temporary:
             bundle = build(Path(temporary) / "public")
