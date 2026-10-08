@@ -3,6 +3,8 @@
 Version: 1.2
 Effective: 2026-10-07
 
+**Send gate:** Email drafts contain a required postal-address placeholder, not a deliverable address. Do not send without a verified authorized business mailing address and applicable legal/opt-out checks.
+
 ## Rules
 
 - Run the private pre-send gate in OUTREACH_SAFETY.md immediately before every touch. A draft is not a send; reconcile Gmail Sent and replies first.
@@ -39,8 +41,7 @@ Would you be the right person for freight/AP review, or could you point me to wh
 Thanks,
 Jamison
 RETALLY
-715 Yorktowne Road
-Pottsville, PA 17901
+[VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND]
 
 Reply "no thanks" and I won't follow up.
 
@@ -59,8 +60,7 @@ Would you be the right person for that review, or could you point me to whoever 
 Thanks,
 Jamison
 RETALLY
-715 Yorktowne Road
-Pottsville, PA 17901
+[VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND]
 
 Reply "no thanks" and I won't follow up.
 
@@ -81,8 +81,7 @@ Would an independent review of past freight invoices be useful for {{company}}? 
 Thanks,
 Jamison
 RETALLY
-715 Yorktowne Road
-Pottsville, PA 17901
+[VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND]
 
 Reply "no thanks" and I won't follow up.
 
@@ -99,8 +98,7 @@ If freight invoice review sits with someone else at {{company}}, I'd appreciate 
 Thanks,
 Jamison
 RETALLY
-715 Yorktowne Road
-Pottsville, PA 17901
+[VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND]
 
 Reply "no thanks" and I won't follow up.
 
