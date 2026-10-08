@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "scope": "TWO_ADDITIONAL_FICTIONAL_QA_CUSTOMERS",
+  "truth_boundary": "Signed contract valid at test role, no customer posting, no valid carrier event or bank evidence, commercial probability model is assumed.",
+  "accepted_external_customer_count": 0,
+  "actual_customer_recovery_cents": 0,
+  "actual_company_revenue_cents": 0,
+  "cases": [
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-B",
+      "case_id": "SIM-P5D-CASE-B",
+      "customer_id": "SIM-P5D-CUSTOMER-B",
+      "invoice_id": "SIM-P5D-INVOICE-B",
+      "carrier_id": "SIM-P5D-CARRIER-B",
+      "currency": "USD",
+      "max_claim_cents": "0"
+    },
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-C",
+      "case_id": "SIM-P5D-CASE-C",
+      "customer_id": "SIM-P5D-CUSTOMER-C",
+      "invoice_id": "SIM-P5D-INVOICE-C",
+      "carrier_id": "SIM-P5D-CARRIER-C",
+      "currency": "USD",
+      "max_claim_cents": "80000"
+    }
+  ],
+  "documents": [
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-B",
+      "case_id": "SIM-P5D-CASE-B",
+      "record_id": "SIM-P5D-B-CONTRACT",
+      "kind": "CONTRACT",
+      "economic_key": "SIM-P5D-ECON-B-CONTRACT",
+      "reference_id": null,
+      "amount_cents": "0",
+      "fee_bps": 3000,
+      "currency": "USD",
+      "occurred_at": "2026-10-09T14:00:00.000Z",
+      "source_sha256": "da7c60b205914163e27f4a1689a9bedc096b11d05612b872be7e7dd48cb0c000",
+      "issuer_key_id": "SIM-P5D-ISSUER-B-BUYER",
+      "body": {
+        "kind": "CONTRACT",
+        "caseId": "SIM-P5D-CASE-B",
+        "feeBps": 3000,
+        "currency": "USD",
+        "recordId": "SIM-P5D-B-CONTRACT",
+        "tenantId": "SIM-P5B-HANDLER-TENANT-B",
+        "invoiceId": "SIM-P5D-INVOICE-B",
+        "customerId": "SIM-P5D-CUSTOMER-B",
+        "occurredAt": "2026-10-09T14:00:00Z",
+        "sourceHash": "da7c60b205914163e27f4a1689a9bedc096b11d05612b872be7e7dd48cb0c000",
+        "amountCents": 0,
+        "economicKey": "SIM-P5D-ECON-B-CONTRACT",
+        "issuerKeyId": "SIM-P5D-ISSUER-B-BUYER",
+        "referenceId": null,
+        "contractVersion": "SIM-V1",
+        "providerEventId": null
+      },
+      "signature_b64": "eXjv1knWNmxJBKreBb8K8AHokFntYF2NDIywKZ2fWz7OEGkRpfyUqDnWN5DC/Zm7RmB50FUuZyWjf6InC02PAQ=="
+    },
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-C",
+      "case_id": "SIM-P5D-CASE-C",
+      "record_id": "SIM-P5D-C-CONTRACT",
+      "kind": "CONTRACT",
+      "economic_key": "SIM-P5D-ECON-C-CONTRACT",
+      "reference_id": null,
+      "amount_cents": "0",
+      "fee_bps": 3000,
+      "currency": "USD",
+      "occurred_at": "2026-10-09T14:00:00.000Z",
+      "source_sha256": "a217659b479bc2487b3773bc82d01e5aaa19f3165263730a79d4702411af77d3",
+      "issuer_key_id": "SIM-P5D-ISSUER-C-BUYER",
+      "body": {
+        "kind": "CONTRACT",
+        "caseId": "SIM-P5D-CASE-C",
+        "feeBps": 3000,
+        "currency": "USD",
+        "recordId": "SIM-P5D-C-CONTRACT",
+        "tenantId": "SIM-P5B-HANDLER-TENANT-C",
+        "invoiceId": "SIM-P5D-INVOICE-C",
+        "customerId": "SIM-P5D-CUSTOMER-C",
+        "occurredAt": "2026-10-09T14:00:00Z",
+        "sourceHash": "a217659b479bc2487b3773bc82d01e5aaa19f3165263730a79d4702411af77d3",
+        "amountCents": 0,
+        "economicKey": "SIM-P5D-ECON-C-CONTRACT",
+        "issuerKeyId": "SIM-P5D-ISSUER-C-BUYER",
+        "referenceId": null,
+        "contractVersion": "SIM-V1",
+        "providerEventId": null
+      },
+      "signature_b64": "KJx6h0nYV2Y9WHiU8yoigTNOETa88rmSwyJzGrIbcc23qvfPgz66QPtTrqZwwi3fEo4/wKxX+BZwQJuIxNtdCg=="
+    }
+  ],
+  "keys": [
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-B",
+      "key_id": "SIM-P5D-ISSUER-B-BUYER",
+      "role": "BUYER",
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEADShHy87z+9WVFWG7OlhAryHhWxpbd6AFir6dKm5GOZI=\n-----END PUBLIC KEY-----\n",
+      "enabled_from": "2026-09-01T00:00:00.000Z",
+      "expires_at": "2027-01-01T00:00:00.000Z",
+      "revoked_at": null
+    },
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-C",
+      "key_id": "SIM-P5D-ISSUER-C-BUYER",
+      "role": "BUYER",
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAJ0M9aR5brnxR9R8y0b9ovOkw64Q5RejA/my8BCARO+Q=\n-----END PUBLIC KEY-----\n",
+      "enabled_from": "2026-09-01T00:00:00.000Z",
+      "expires_at": "2027-01-01T00:00:00.000Z",
+      "revoked_at": null
+    }
+  ],
+  "summary": [
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-B",
+      "case_id": "SIM-P5D-CASE-B",
+      "customer_id": "SIM-P5D-CUSTOMER-B",
+      "invoice_id": "SIM-P5D-INVOICE-B",
+      "currency": "USD",
+      "max_claim_cents": "0",
+      "carrier_credits_cents": "0",
+      "customer_posted_cents": "0",
+      "reversed_cents": "0",
+      "invoiced_cents": "0",
+      "credited_fee_cents": "0",
+      "gross_fee_collected_cents": "0",
+      "fee_refunded_cents": "0",
+      "fee_bps": 3000
+    },
+    {
+      "tenant_id": "SIM-P5B-HANDLER-TENANT-C",
+      "case_id": "SIM-P5D-CASE-C",
+      "customer_id": "SIM-P5D-CUSTOMER-C",
+      "invoice_id": "SIM-P5D-INVOICE-C",
+      "currency": "USD",
+      "max_claim_cents": "80000",
+      "carrier_credits_cents": "0",
+      "customer_posted_cents": "0",
+      "reversed_cents": "0",
+      "invoiced_cents": "0",
+      "credited_fee_cents": "0",
+      "gross_fee_collected_cents": "0",
+      "fee_refunded_cents": "0",
+      "fee_bps": 3000
+    }
+  ],
+  "negative_count": [
+    {
+      "stored_negative_docs": "0"
+    }
+  ],
+  "cluster": [
+    {
+      "sysid": "7694294930552894346"
+    }
+  ],
+  "observed_requests": [
+    {
+      "case_id": "SIM-P5D-CASE-B",
+      "request": "CARRIER_CREDIT",
+      "result": "REJECTED_NO_SETTLEMENT_EVENT",
+      "http_status": 400
+    },
+    {
+      "case_id": "SIM-P5D-CASE-C",
+      "request": "CARRIER_CREDIT",
+      "result": "REJECTED_NO_SETTLEMENT_EVENT",
+      "http_status": 400
+    },
+    {
+      "case_id": "SIM-P5D-CASE-B",
+      "request": "FEE_INVOICE",
+      "result": "REJECTED_UNAUTHORIZED_FEE_INVOICE",
+      "http_status": 400
+    },
+    {
+      "case_id": "SIM-P5D-CASE-C",
+      "request": "FEE_INVOICE",
+      "result": "REJECTED_UNAUTHORIZED_FEE_INVOICE",
+      "http_status": 400
+    }
+  ]
+}
