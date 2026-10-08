@@ -314,7 +314,7 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
  border:1px solid rgba(193,255,219,.48);
  border-radius:9px;color:#fff;
  background:linear-gradient(166deg,rgba(255,255,255,.21),transparent 48%),
-            linear-gradient(128deg,#139d6a 0%,#087d53 45%,#075d41 100%);
+            linear-gradient(128deg,#0b8055 0%,#086f4b 45%,#07553a 100%);
  box-shadow:inset 0 1px 1px rgba(255,255,255,.42),
             inset 0 -2px 3px rgba(2,49,36,.22),
             var(--retally-sf-control-shadow);
@@ -330,7 +330,7 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 .button-signal:hover,.button-cobalt:hover{
  color:#fff;border-color:rgba(218,255,230,.7);
  background:linear-gradient(160deg,rgba(255,255,255,.23),transparent 49%),
-            linear-gradient(128deg,#19a875 0%,#09825a 48%,#075a40 100%);
+            linear-gradient(128deg,#0c8758 0%,#087952 48%,#064b37 100%);
  box-shadow:inset 0 1px 1px rgba(255,255,255,.5),
             inset 0 -2px 3px rgba(2,49,36,.25),
             0 15px 28px rgba(3,61,42,.26),0 4px 9px rgba(2,31,23,.14);
