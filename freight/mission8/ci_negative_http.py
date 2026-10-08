@@ -6,6 +6,7 @@ The only allowed target is the existing independently isolated M8 sandbox.
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import time
 from urllib.request import Request, urlopen
@@ -74,7 +75,14 @@ def exercise(method, path, body):
     return {"method": method, "path": path, "status": status, "result": "PASS"}
 
 start = time.monotonic()
-tests = [exercise(*s) for s in scenarios]
+blocked_reason = None
+try:
+    tests = [exercise(*s) for s in scenarios]
+    verdict = "PASS"
+except Exception as exc:
+    blocked_reason = str(exc)[:420]
+    verdict = "BLOCKED" if "sandbox access denied" in blocked_reason.lower() else "FAIL"
+    tests = []
 files = {
     name: Path(f"freight/mission8/floot/endpoints/recovery/{name}").read_bytes()
     for name in ["payment_prepare_POST.ts","payment_authorize_POST.ts",
@@ -89,6 +97,8 @@ receipt = {
         k: hashlib.sha256(v).hexdigest() for k,v in files.items()
     },
     "tests": tests,
+    "verdict": verdict,
+    "blocker": blocked_reason,
     "duration_seconds": round(time.monotonic()-start,3),
     "credentials_sent": False,
     "production_touched": False,
@@ -101,3 +111,5 @@ Path("freight/mission8/ci_negative_http_receipt.json").write_text(
     json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8"
 )
 print("M9_STAGING_HTTP_NEGATIVE="+json.dumps(receipt,sort_keys=True))
+if verdict != "PASS":
+    sys.exit(1)
