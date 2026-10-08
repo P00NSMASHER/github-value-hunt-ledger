@@ -138,7 +138,7 @@ function validEnv(env) {
   return env.FREIGHT_INQUIRY_ENABLED === "1" &&
     env.FREIGHT_INQUIRY_MAILBOX_VERIFIED === "1" &&
     env.INQUIRY_DB?.prepare &&
-    env.TURNSTILE_SECRET &&
+    env.TURNSTILE_SECRET && env.TURNSTILE_SITEKEY &&
     env.INQUIRY_RATE_SECRET &&
     env.CLOUDFLARE_EMAIL_API_TOKEN &&
     env.CLOUDFLARE_ACCOUNT_ID &&
@@ -280,6 +280,7 @@ export async function onRequestPost({ request, env }) {
     return answer(503, { ok: false, error: "We could not confirm receipt. Please use the email contact option." });
   }
 }
-export function onRequestGet() {
-  return answer(405, { ok:false, error:"Method not allowed" });
+export function onRequestGet({ env }) {
+  if (!validEnv(env)) return answer(503, { online: false });
+  return answer(200, { online: true, siteKey: env.TURNSTILE_SITEKEY });
 }
