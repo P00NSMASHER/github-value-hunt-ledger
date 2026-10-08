@@ -1,8 +1,8 @@
 # RETALLY | Reliable public inquiry acceptance (implementation contract)
 
-The current public form **prepares a browser email draft**; it is not a server-received inquiry. Do not label it as successfully delivered merely because a visitor clicks the CTA. Preserve the existing functioning mailto fallback until the replacement passes all gates.
+**As observed on 2026-10-08:** the same-origin Pages Function exists but intentionally advertises `HTTP 503` / `{"online":false}` on the live `www.retallyrecovery.com` domain. The visitor remains in the browser-prepared email-draft fallback. Neither an email draft nor a sender-side Gmail `SENT` record proves RETALLY received an inquiry. Keep the fallback until verified business inbox receipt and durable online submission are independently established.
 
-## Proposed implementation
+## Implemented design and activation requirements
 
 - **Client:** name, work email, company, annual freight-spend band, transport modes and optional high-level non-sensitive context. No invoice upload, carrier rate sheets, contracts, logins or payment details.
 - **API:** same-origin Cloudflare Pages Function `POST /api/inquiry`, behind explicit deployment flag. Keep total JSON body size and per-field lengths bounded; reject unsupported keys, invalid email and missing required values.
@@ -20,4 +20,4 @@ The current public form **prepares a browser email draft**; it is not a server-r
 5. Publish a rollback route that restores the existing mailto flow in one configuration change.
 6. Verify live mobile keyboard/focus and desktop interaction end to end.
 
-**Current state:** Specified, not implemented. Requires configured provider, permission, policy approval and actual end-to-end proof before activating.
+**Current state:** Code implemented, D1 and Turnstile infrastructure documented, production online inquiry intentionally DISABLED by flags. Email-provider permissions, Zoho inbound receipt and end-to-end production delivery are not verified. The current GET capability probe returns `503 {"online":false}`; do not interpret disabled-by-policy as a malformed form or enable it without signed operator acceptance. See `freight/site/INQUIRY_PRODUCTION_READINESS.md` and `freight/brand/RETALLY_INQUIRY_LAUNCH_RUNBOOK_20261008.md`.
