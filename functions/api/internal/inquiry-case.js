@@ -1,4 +1,4 @@
-import {verifyAccessJWT,hasRole} from "./inquiry_auth.js";
+import {verifyAccessJWT,hasRole} from "../../../freight/site/operator_access_auth.js";
 // Disabled by default. Only signed Cloudflare Access actor identities authorize changes.
 // No endpoint for raw inquiry reads or actual deletions.
 const CODES=new Set(["ACKNOWLEDGE","CLOSE","SET_HOLD","RELEASE_HOLD","APPROVE_PURGE"]);
