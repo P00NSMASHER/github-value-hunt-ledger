@@ -96,22 +96,6 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Negative HTTP authentication against real isolated M8 Floot endpoints
-        shell: bash
-        env:
-          RETALLY_TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          set -euo pipefail
-          python3 freight/mission8/ci_negative_http.py
-      - name: Preserve M9 negative-HTTP evidence on success or failure
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: retally-m9-real-staging-http-negative
-          path: freight/mission8/ci_negative_http_receipt.json
-          if-no-files-found: warn
-          retention-days: 14
-
       - name: Real PostgreSQL original versus corrected authorization concurrency acceptance
         shell: bash
         env:
@@ -127,5 +111,21 @@ jobs:
         with:
           name: retally-m10-postgresql-authorization
           path: freight/mission8/ci_authorization_atomicity_receipt.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Negative HTTP authentication against real isolated M8 Floot endpoints
+        shell: bash
+        env:
+          RETALLY_TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          python3 freight/mission8/ci_negative_http.py
+      - name: Preserve M9 negative-HTTP evidence on success or failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m9-real-staging-http-negative
+          path: freight/mission8/ci_negative_http_receipt.json
           if-no-files-found: warn
           retention-days: 14
