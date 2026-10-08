@@ -145,6 +145,31 @@ def _verify_engagement_hash(engagement: RecoveryEngagement) -> None:
     supplied_hash = body.pop("engagement_hash")
     if supplied_hash != _canonical_hash(body):
         raise ValueError("engagement hash does not match the engagement record")
+    # A bare SHA-256 checksum only establishes consistency of this data.
+    # Reject internally false authority even if the record was rehashed.
+    for name in ("buyer_accepted", "freight_recovery_accepted"):
+        if type(getattr(engagement, name)) is not bool:
+            raise ValueError(name + " must be a boolean")
+    if engagement.external_action_authorized is not False:
+        raise ValueError("engagement cannot authorize external action")
+    if engagement.authorization_policy != "SEPARATE_ACTION_APPROVAL_REQUIRED":
+        raise ValueError("engagement authorization policy is invalid")
+    if engagement.approved_claim_value_cents != 0 or engagement.actual_recovered_cents != 0:
+        raise ValueError("engagement cannot pre-authorize claimed or recovered amounts")
+    accepted = engagement.buyer_accepted is True and engagement.freight_recovery_accepted is True
+    expected_state = (
+        RecoveryEngagementState.ACCEPTED.value
+        if accepted else RecoveryEngagementState.READY_FOR_ACCEPTANCE.value
+    )
+    if engagement.state != expected_state:
+        raise ValueError("engagement acceptance flags contradict state")
+    if accepted:
+        if not isinstance(engagement.accepted_at, str) or not engagement.accepted_at:
+            raise ValueError("accepted engagement requires accepted_at")
+        if engagement.accepted_at != _canonical_timestamp(engagement.accepted_at):
+            raise ValueError("engagement accepted_at must be canonical")
+    elif engagement.accepted_at is not None:
+        raise ValueError("unaccepted engagement must not have accepted_at")
 
 
 def build_recovery_engagement(request: RecoveryEngagementRequest) -> RecoveryEngagement:
@@ -176,8 +201,13 @@ def build_recovery_engagement(request: RecoveryEngagementRequest) -> RecoveryEng
             _reference(field, value) if field.endswith("_reference") else _required(field, value)
         )
     authorization_policy = _required("authorization_policy", request.authorization_policy)
+    if authorization_policy != "SEPARATE_ACTION_APPROVAL_REQUIRED":
+        raise ValueError("authorization_policy must require separate action approval")
+    for name in ("buyer_accepted", "freight_recovery_accepted"):
+        if type(getattr(request, name)) is not bool:
+            raise ValueError(name + " must be a boolean")
 
-    accepted = request.buyer_accepted and request.freight_recovery_accepted
+    accepted = request.buyer_accepted is True and request.freight_recovery_accepted is True
     if accepted and not request.accepted_at:
         raise ValueError("accepted_at is required when both parties have accepted")
     if request.accepted_at and not accepted:
@@ -256,6 +286,15 @@ def record_actual_recovery(
         truth.buyer_id, truth.business_unit
     ):
         raise ValueError("settlement store scope mismatch")
+    # An accepted agreement applies only to its frozen audit population.
+    # A matching buyer is not enough: the same buyer may have several audits.
+    if engagement.audit_reference != "TRUTH:" + truth.truth_hash:
+        raise ValueError("engagement audit reference does not match frozen truth")
+    # Retroactively dating acceptance cannot authorize claims already issued.
+    if _canonical_timestamp(engagement.accepted_at) > _canonical_timestamp(claim_batch.issued_at):
+        raise ValueError("recovery claim issued before engagement acceptance")
+    if _canonical_timestamp(recorded_at) < _canonical_timestamp(claim_batch.issued_at):
+        raise ValueError("recovery record cannot precede claim issuance")
 
     # Rebuild authorization lineage rather than trusting a caller-made hash or
     # a bare claim ID. Confirmed buyer reviews are checked against frozen truth,
