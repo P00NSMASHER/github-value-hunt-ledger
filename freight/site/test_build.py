@@ -42,6 +42,35 @@ class PageParser(HTMLParser):
 
 
 class PublicBuildTests(unittest.TestCase):
+    def test_live_growth_materials_use_canonical_domain_without_legacy_private_contacts(self):
+        """Current acquisition copy must not promote the GitHub Pages fallback or old residential contact."""
+        active = (
+            "README.md",
+            "freight/FREE_PROFILE_ASSET_PACK.md",
+            "freight/FREE_GROWTH_CONTENT_BANK.md",
+            "freight/FREE_GROWTH_REFERRAL_KIT.md",
+            "freight/REFERRAL_PARTNER_PROGRAM.md",
+            "freight/THREE_TOUCH_OUTBOUND_SEQUENCE.md",
+        )
+        for relative in active:
+            with self.subTest(file=relative):
+                content = (builder.REPOSITORY / relative).read_text(encoding="utf-8")
+                self.assertNotIn("https://p00nsmasher.github.io/github-value-hunt-ledger/", content)
+                self.assertNotIn("715 Yorktowne Road", content)
+                self.assertNotIn("jayp19386@gmail.com", content)
+        for relative in active[:4]:
+            with self.subTest(canonical=relative):
+                content = (builder.REPOSITORY / relative).read_text(encoding="utf-8")
+                self.assertIn("https://www.retallyrecovery.com/", content)
+        profile = (builder.REPOSITORY / "freight/FREE_PROFILE_ASSET_PACK.md").read_text(encoding="utf-8")
+        self.assertIn("jay@retallyrecovery.com", profile)
+        self.assertNotIn("Google Business Profile updates", (builder.REPOSITORY / "freight/FREE_GROWTH_CONTENT_BANK.md").read_text(encoding="utf-8"))
+        for relative in active[3:]:
+            self.assertIn(
+                "VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND",
+                (builder.REPOSITORY / relative).read_text(encoding="utf-8"),
+            )
+
     def test_sample_report_and_trust_disclosures_are_mobile_safe_and_current(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
