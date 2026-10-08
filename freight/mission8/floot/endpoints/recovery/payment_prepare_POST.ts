@@ -28,7 +28,7 @@ export async function handle(request: Request) {
       instruction_id:string;instruction_hash:string;replayed:boolean;
     }>`SELECT * FROM recovery_prepare_financial_instruction(
         ${access.tenantId}::text,${access.userId}::bigint,
-        ${JSON.stringify(body)}::jsonb,${instructionHash}::text
+        ${body}::jsonb,${instructionHash}::text
       )`.execute(db);
     const entry = result.rows[0];
     if (!entry || entry.instruction_hash!==instructionHash) {
