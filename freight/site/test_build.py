@@ -100,7 +100,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             config = (output / "commercial-config.js").read_text()
 
-            self.assertIn('<span class="hero-phrase">Find it.</span> <em class="hero-phrase">Prove it.</em> <em class="hero-phrase">Recover it.</em>', page)
+            self.assertIn('<span class="hero-phrase">Find it.</span> <span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em>', page)
             self.assertIn("Recovery Evidence Pack", page)
             self.assertIn('href="second-look-freight-audit.html"', page)
             self.assertIn('href="freight-recovery-evidence-standard.html"', page)
@@ -325,9 +325,20 @@ class PublicBuildTests(unittest.TestCase):
         self.assertIn("font-size:clamp(2.1rem,9vw,2.4rem)", css)
         # Retain the approved type assets and primary conversion route.
         self.assertIn('hanken-grotesk-latin.woff2', page)
-        self.assertIn('instrument-serif-latin.woff2', page)
+        self.assertIn('instrument-serif-italic-latin.woff2', page)
         self.assertIn('class="button button-signal" href="#start-audit"', page)
-        self.assertIn('foundry.css?v=retally-mobile-20261008b', page)
+        self.assertIn('foundry.css?v=retally-type-20261008', page)
+        # Approved type hierarchy: one italic mint hero phrase, serif accents
+        # on dark and light sections, and legible light/dark body colors.
+        self.assertIn('<span class="hero-phrase">Prove it.</span> <em class="hero-phrase">Recover it.</em>', page)
+        self.assertIn('<h2 id="output-title">See what you <em>get.</em></h2>', page)
+        self.assertIn('<h2 id="pricing-title">Simple <em>pricing.</em></h2>', page)
+        self.assertIn('.home-simple .hero h1 em.hero-phrase{', css)
+        self.assertIn('font-family:Instrument,Georgia,serif;', css)
+        self.assertIn('color:#b7f0ce;', css)
+        self.assertIn('color:#087a50;', css)
+        self.assertIn('color:#f6faf7;', css)
+        self.assertIn('color:#40574d', css)
 
     def test_existing_files_are_preserved(self):
         with tempfile.TemporaryDirectory() as temporary:

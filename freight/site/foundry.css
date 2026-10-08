@@ -71,3 +71,43 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
   body{padding-bottom:0}
   .mobile-cta{display:none!important}
 }
+
+/* Approved RETALLY type: the homepage alone receives the editorial treatment.
+   Preserve existing logo art, layout, mobile hero sizing, and form geometry. */
+.home-simple .hero h1{
+  font-family:Hanken,system-ui,sans-serif;
+  font-weight:700;
+  letter-spacing:-.038em;
+  color:#f6faf7;
+  text-shadow:0 2px 14px rgba(0,0,0,.18);
+}
+.home-simple .hero h1 em.hero-phrase{
+  font-family:Instrument,Georgia,serif;
+  font-weight:400;
+  font-style:italic;
+  letter-spacing:-.025em;
+  color:#b7f0ce;
+}
+.home-simple .hero .lead,.home-simple .hero .hero-proof{color:#dbeae2}
+.home-simple .section-heading h2,.home-simple .intake-copy h2{
+  font-family:Hanken,system-ui,sans-serif;
+  font-weight:700;
+  letter-spacing:-.032em;
+  color:#0e2925;
+}
+.home-simple .section-ink h2 em{
+  font-family:Instrument,Georgia,serif;
+  font-weight:400;
+  font-style:italic;
+  letter-spacing:-.025em;
+  color:#b7f0ce;
+}
+.home-simple .pricing-section .section-heading h2 em{
+  font-family:Instrument,Georgia,serif;
+  font-weight:400;
+  font-style:italic;
+  letter-spacing:-.025em;
+  color:#087a50;
+}
+.home-simple .section-paper .simple-steps p,
+.home-simple .intake-section .intake-copy>p{color:#40574d}
