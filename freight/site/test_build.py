@@ -82,6 +82,19 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("approved secure intake route", page)
             self.assertNotIn("24-hour guaranteed review", page)
 
+    def test_email_fallback_preserves_direct_user_gesture_and_manual_address(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text()
+            script = (output / "site.js").read_text()
+            self.assertIn('id="sendAuditRequest"', page)
+            self.assertIn('id="copyAuditSummary"', page)
+            self.assertIn('id="auditRecipientAddress"', page)
+            self.assertIn('recipient.textContent = contactEmail', script)
+            self.assertIn('window.location.href = sendLink.href;', script)
+            self.assertNotIn('window.setTimeout(() => { window.location.href = sendLink.href; }, 80)', script)
+            self.assertIn("Review it, then press Send.", page)
+
     def test_private_repository_cannot_be_the_output(self):
         for output in (
             builder.REPOSITORY,
