@@ -24,14 +24,14 @@ _SHA = re.compile(r"[a-f0-9]{64}\Z")
 class Experiment:
     experiment_id: str
     finding_id: str
-    source_head_sha: str
-    candidate_head_sha: str
+    baseline_artifact_sha256: str
+    candidate_artifact_sha256: str
     frozen_input_sha256: str
     independent_test_sha256: str
     original_counterexample_reproduced: bool
     repaired_counterexample_rejected: bool
     known_good_control_passed: bool
-    measured_runtime_ms: int
+    measured_runtime_ms: int | None
     execution_scope: str
 
 
@@ -40,14 +40,14 @@ def _validate(run: Experiment):
         value=getattr(run,key)
         if type(value) is not str or not value or len(value)>128 or any(ord(x)<32 for x in value):
             raise ValueError("invalid "+key)
-    for key in ("source_head_sha","candidate_head_sha","frozen_input_sha256","independent_test_sha256"):
+    for key in ("baseline_artifact_sha256","candidate_artifact_sha256","frozen_input_sha256","independent_test_sha256"):
         value=getattr(run,key)
         if type(value) is not str or _SHA.fullmatch(value) is None:
             raise ValueError("invalid "+key)
     for key in ("original_counterexample_reproduced","repaired_counterexample_rejected","known_good_control_passed"):
         if type(getattr(run,key)) is not bool:
             raise ValueError("invalid "+key)
-    if type(run.measured_runtime_ms) is not int or run.measured_runtime_ms<0:
+    if run.measured_runtime_ms is not None and (type(run.measured_runtime_ms) is not int or run.measured_runtime_ms<0):
         raise ValueError("runtime must be measured nonnegative milliseconds")
     if run.execution_scope not in {"SYNTHETIC_OFFLINE","REAL_CODE_MOCKED_PROVIDERS","HOSTED_ISOLATED_STAGING"}:
         raise ValueError("unsupported experiment scope")
