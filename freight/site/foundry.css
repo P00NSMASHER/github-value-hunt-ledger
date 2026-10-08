@@ -111,3 +111,36 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 }
 .home-simple .section-paper .simple-steps p,
 .home-simple .intake-section .intake-copy>p{color:#40574d}
+
+
+/* RETALLY restrained-surface pass (brand finishing, 2026-10-08).
+   Keep approved typography, site structure, logos, form and calculator intact.
+   This overrides backgrounds only. Green remains a deliberate action accent. */
+:root {
+  --ink:#0e1e29;
+  --navy:#0e1e29;
+  --navy-soft:#19353b;
+  --paper:#f7f9f8;
+  --porcelain:#ffffff;
+  --mist:#eff5f2;
+  --cobalt:#087a50;
+  --cobalt-dark:#07563a;
+  --signal:#b7f0ce;
+  --line:#dce6e0;
+}
+.site-header { background:rgba(14,30,41,.98); border-bottom-color:#2a404a; }
+.statusbar { background:#173d3a; }
+.site-footer,.section-ink,.document-hero { background-color:#0e1e29; }
+.section-cobalt { background-color:#183940; }
+.home-simple .intake-section { background:#f4f7f6; }
+.home-simple .pricing-section { background:#fff; }
+.home-simple .section-paper { background:#f7f9f8; }
+.home-simple .section-ink { background:#0e1e29; }
+.home-simple .hero .hero-proof { color:#dbeae2; }
+.home-simple .button-signal,.home-simple .button-cobalt { background:#087a50; color:#fff; }
+.home-simple .button-signal:hover,.home-simple .button-cobalt:hover { background:#07563a; }
+/* Preserve the checked mobile occlusion repair. */
+@media (max-width:620px) {
+  .home-simple .mobile-cta { display:none!important; }
+  body { padding-bottom:0; }
+}
