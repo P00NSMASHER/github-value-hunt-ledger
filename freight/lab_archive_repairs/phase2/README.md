@@ -18,12 +18,12 @@ python phase2_audit_probe.py .
 ```
 
 `tests.test_unified` includes legacy synthetic scenarios; the patched suite adds
-20 targeted financial/authorization probes.
+21 targeted financial/authorization probes.
 
 ## Repair coverage
 
 * Removed derived expected tariff figures and synthetic truth clues from the
-  public invoice surface. The weak model no longer accesses expected charges;
+  public invoice surface. The detector now refuses any inputs containing hidden answer fields, and the weak model no longer accesses expected charges;
   it remains uncalibrated and should not automatically submit claims.
 * Introduced independently injected **synthetic test** contract HMAC keys,
   versioned historical fee percentages and signed terms, scoped to tenant and
@@ -41,7 +41,7 @@ python phase2_audit_probe.py .
 
 The five previously reproduced weak behaviors were present in the Phase 1
 baseline and absent in the isolated Phase 2 code (see `before_five.json` and
-`after_five.json`). Phase 2 adds 20 targeted tests while the 68 earlier tests
+`after_five.json`). Phase 2 adds 21 targeted tests while the 68 earlier tests
 continue passing. Test counts are engineering evidence, not product certification.
 
 The new source-scoping table is *first-writer-bound*, NOT a buyer-owned identity
