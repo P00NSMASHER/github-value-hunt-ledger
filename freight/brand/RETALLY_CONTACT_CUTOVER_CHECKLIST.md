@@ -5,6 +5,7 @@ Status: BLOCKED until external mail and legal readiness are independently verifi
 ## Read-only observations, 2026-10-08
 - `retallyrecovery.com` is an active Cloudflare zone.
 - Updated Cloudflare inspection (2026-10-08): all three Zoho MX entries (`mx.zoho.com`, `mx2.zoho.com`, `mx3.zoho.com`), SPF (`v=spf1 include:zohomail.com ~all`), DMARC (`v=DMARC1; p=none`), Zoho verification TXT, and **DKIM public-key TXT** at `zmail._domainkey.retallyrecovery.com` are present. The user reports completing the Zoho DKIM setup. An actual outgoing test from `jay@retallyrecovery.com` reached Gmail on October 8. Gmail `Authentication-Results` showed **SPF=pass, DKIM=pass (selector zmail), and DMARC=pass** for the company domain. This establishes authenticated outbound delivery to Gmail. **Incoming delivery to Zoho and production website contact requests have not been verified**.
+- Gmail has sent a controlled, non-sensitive test to `jay@retallyrecovery.com` (subject: `RETALLY inbox delivery test | October 8`). Gmail recorded the message in **SENT**; successful **receipt inside Zoho remains unconfirmed** and must not be marked PASS on the basis of sending alone.
 - Cloudflare Pages project `retally` exists with preview hostname `retally-8kr.pages.dev`; project creation does not prove a deployed production website.
 - Draft PR #282 is a deployment *proposal*, not approval to activate DNS or release new site.
 - Catalyst by Zoho integration is **not** Zoho Mail administration; do not infer mailbox readiness from its presence.
