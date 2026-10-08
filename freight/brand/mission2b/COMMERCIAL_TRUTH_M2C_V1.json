@@ -1,71 +1,85 @@
 {
   "version": "M2C-2026-10-08-v1",
-  "status": "DRAFT_NOT_CUSTOMER_APPROVED",
-  "brand": {
+  "authority_level": "controlled_draft_not_signed_terms",
+  "approved_brand": {
     "name": "RETALLY",
     "tagline": "Find it. Prove it. Recover it.",
     "positioning": "We find freight billing errors, document the evidence, and help recover overpayments.",
     "wordmark_sha256": "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd",
     "emblem_sha256": "bb02ab4a468762f597c241199baeff61b485dd793f8fb746140ad33670b68043"
   },
-  "financial_public_synthetic": {
-    "period": "2026-01-01/2026-03-31",
-    "reviewed": 1284,
-    "candidates": 37,
-    "supported": 14,
-    "authorized": 9,
-    "submitted": 9,
-    "approved": 7,
-    "posted": 6,
-    "reversed": 1,
-    "candidate_diff_usd": "38250.00",
-    "validated_diff_usd": "24100.00",
-    "approved_claim_usd": "17650.00",
-    "gross_recovered_usd": "14200.00",
-    "reversal_usd": "750.00",
-    "net_recovered_usd": "13450.00",
-    "published_fee_eligible_usd": "11800.00",
-    "difference_unallocated_usd": "1650.00",
-    "source_level_verified": false,
-    "real_customer_result": false,
-    "fee_eligibility_status": "UNVERIFIED"
+  "verified_documentary_facts": {
+    "initial_scope_copy": "$0 upfront for mutually agreed eligible and bounded initial review; eligibility and scope must be confirmed",
+    "outside_claims": "Written, claim-specific customer authorization is required before carrier outreach",
+    "actual_recovery_definition": "Only uniquely attributable, posted cash or carrier credit net of reversals can be reported as net recovered",
+    "contact_form_behavior": "Public contact route has historically prepared an email draft; successful delivery and inbound mailbox receipt require independent verification",
+    "website": "https://retallyrecovery.com",
+    "finance_signoff_status": "NOT VERIFIED",
+    "business_name_registration": "NOT VERIFIED",
+    "secure_intake_operational_acceptance": "NOT VERIFIED"
   },
-  "worked_invoice_synthetic": {
-    "shipment": "FR-1001",
-    "invoice": "INV-FR-1001",
-    "rate_source": "RATE-FR-2026-A",
-    "shipment_evidence": "POD-FR-1001",
-    "date": "2026-02-17",
-    "rate_effective_from": "2026-01-01",
-    "rate_effective_to": "2026-12-31",
+  "synthetic_public_aggregate": {
+    "sample_only": true,
+    "customer_descriptor": "Northstar Industrial Supply (synthetic)",
+    "period": "2026-01-01/2026-03-31",
+    "counts": {
+      "records_reviewed": 1284,
+      "candidates": 37,
+      "supported": 14,
+      "authorized": 9,
+      "submitted": 9,
+      "carrier_approved": 7,
+      "posted_events": 6,
+      "reversed_events": 1
+    },
+    "usd": {
+      "candidate_difference": "38250.00",
+      "validated_difference": "24100.00",
+      "approved_claim_value": "17650.00",
+      "gross_posted_recovery": "14200.00",
+      "reversals": "750.00",
+      "net_posted_recovery": "13450.00",
+      "published_fee_eligible": "11800.00",
+      "eligibility_difference_unallocated": "1650.00"
+    },
+    "eligible_base_verdict": "UNVERIFIED_UNALLOCATED_DIFFERENCE",
+    "source_level_aggregate_invoices_available": false,
+    "source_level_aggregate_settlements_available": false,
+    "real_customer_outcome": false
+  },
+  "worked_invoice": {
+    "sample_only": true,
+    "independent_from_public_aggregate": true,
     "currency": "USD",
-    "base": "820.00",
-    "fuel_percentage": "0.18",
+    "shipment_id": "FR-1001",
+    "rate_source_id": "RATE-FR-2026-A",
+    "contract_effective_start": "2026-01-01",
+    "contract_effective_end": "2026-12-31",
+    "shipment_date": "2026-02-17",
+    "invoice_id": "INV-FR-1001",
+    "authorized_service_source_id": "POD-FR-1001",
+    "base_charge": "820.00",
+    "fuel_rate": "0.18",
     "authorized_liftgate": "75.00",
     "second_unsupported_liftgate": "125.00",
-    "expected_total": "1042.60",
-    "billed_total": "1167.60",
-    "difference": "125.00",
-    "source_ids_are_examples_not_evidence": true
+    "expected_charge": "1042.60",
+    "billed_charge": "1167.60",
+    "candidate_variance": "125.00",
+    "all_references_are_synthetic_placeholders": true
   },
-  "commercial_policy": {
-    "initial_review": "$0 upfront only for mutually agreed bounded eligible scope",
-    "claim_authority": "Separate written customer authorization before any carrier-facing action",
-    "fee_base": "Only uniquely allocated, posted eligible receipts net of reversals, under separately signed terms",
-    "actual_fee_percentage": "UNAPPROVED",
-    "contracting_legal_entity": "UNVERIFIED",
-    "secure_transfer": "NOT OPERATIONALLY VERIFIED",
-    "mail_inbound": "NOT VERIFIED",
-    "public_website": "https://retallyrecovery.com",
-    "contact_behavior": "Existing customer inquiry requires an actual outbound send and verified receipt; draft preparation alone is not delivery"
+  "hypothetical_pricing": {
+    "sample_only": true,
+    "rate": "0.20",
+    "approved_retally_rate": false,
+    "applicable_only_if_signed": true
   },
-  "required_approvals": [
-    "legal entity and trade name",
-    "binding rates and fee terms",
-    "signed customer scope",
-    "secure document transfer, retention and access",
-    "real inbound contact receipt",
-    "financial eligibility source ledger",
-    "customer publication approval"
-  ]
+  "unresolved_gates": {
+    "contracting_identity": "Legal or qualified business counsel and owner",
+    "actual_contingency_percentage_and_fee_terms": "Owner and legal counsel",
+    "customer_data_transfer_and_retention": "Security/data owner",
+    "inbound_mail_and_customer_contact_flow": "Mail and website owner",
+    "published_sample_fee_eligibility": "Financial reviewer with actual settlement and exclusion ledger",
+    "customer_case_study": "Customer permission and verified real-case evidence",
+    "document_distribution": "Commercial owner per artifact"
+  }
 }
