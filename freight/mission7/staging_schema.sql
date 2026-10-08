@@ -128,7 +128,53 @@ BEGIN
     THEN RAISE EXCEPTION 'invalid allocation count'; END IF;
   v_amount := (p_request->>'amountCents')::bigint;
   v_currency := p_request->>'currency';
-  IF v_amount<=0 OR v_currency IS NULL OR v_currency !~ '^[A-Z]{3}$'
+  IF v_currency NOT IN ('USD','EUR','GBP','CAD','AUD','CHF','NZD')
+    THEN RAISE EXCEPTION 'unsupported currency minor-unit convention'; END IF;
+  IF v_amount<=0 OR v_currency IS NULL OR v_currency !~ '^[A-Z]{3}
+
+CREATE TRIGGER m7_allocations_immutable BEFORE DELETE OR UPDATE ON m7_allocations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
+CREATE TRIGGER m7_instructions_immutable BEFORE DELETE OR UPDATE ON m7_instructions FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
+CREATE TRIGGER m7_settlement_immutable BEFORE DELETE OR UPDATE ON m7_settlement_attestations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
+
+CREATE OR REPLACE VIEW m7_reconciled_cash_by_currency AS
+SELECT tenant_id,
+    currency,
+    sum(amount_cents) AS claimed_reconciled_minor_units
+   FROM m7_settlement_attestations
+  WHERE 1=0 -- Fail closed until independent cash reconciliation is implemented
+  GROUP BY tenant_id, currency;
+
+-- Database-level conservation also defends against direct INSERT bypassing preparation.
+CREATE OR REPLACE FUNCTION public.m7_allocation_conservation_guard()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+DECLARE f m7_findings%ROWTYPE; i m7_instructions%ROWTYPE; already numeric;
+BEGIN
+ SELECT * INTO f FROM m7_findings
+ WHERE tenant_id=NEW.tenant_id AND id=NEW.finding_id FOR UPDATE;
+ IF NOT FOUND THEN RAISE EXCEPTION 'allocation finding not found'; END IF;
+ SELECT * INTO i FROM m7_instructions
+ WHERE tenant_id=NEW.tenant_id AND id=NEW.instruction_id;
+ IF NOT FOUND THEN RAISE EXCEPTION 'allocation instruction not found'; END IF;
+ IF NEW.economic_key<>f.economic_key OR NEW.currency<>f.currency OR i.currency<>f.currency
+   THEN RAISE EXCEPTION 'allocation currency/economic scope mismatch'; END IF;
+ IF NOT (f.confirmed AND f.authority_verified AND f.source_verified AND f.buyer_eligibility_verified
+   AND f.attribution_state='CHALLENGER_ONLY' AND f.blockers='[]'::jsonb)
+   THEN RAISE EXCEPTION 'ineligible allocation finding'; END IF;
+ SELECT coalesce(sum(amount_cents),0) INTO already FROM m7_allocations
+ WHERE tenant_id=NEW.tenant_id AND economic_key=NEW.economic_key AND currency=NEW.currency;
+ IF already+NEW.amount_cents>f.net_new_candidate_cents
+   THEN RAISE EXCEPTION 'financial conservation check violated'; END IF;
+ SELECT coalesce(sum(amount_cents),0) INTO already FROM m7_allocations
+ WHERE tenant_id=NEW.tenant_id AND instruction_id=NEW.instruction_id;
+ IF already+NEW.amount_cents>i.amount_cents
+   THEN RAISE EXCEPTION 'instruction allocation overflow'; END IF;
+ RETURN NEW;
+END $function$;
+CREATE TRIGGER m7_allocations_conservation BEFORE INSERT ON m7_allocations FOR EACH ROW EXECUTE FUNCTION public.m7_allocation_conservation_guard();
+CREATE TRIGGER m7_findings_immutable BEFORE UPDATE OR DELETE ON m7_findings FOR EACH ROW EXECUTE FUNCTION public.m7_block_mutation();
+
      OR nullif(p_request->>'payerId','') IS NULL OR nullif(p_request->>'payeeId','') IS NULL
      OR length(coalesce(p_request->>'purpose',''))<3
     THEN RAISE EXCEPTION 'invalid payment parameters'; END IF;
@@ -185,7 +231,7 @@ BEGIN
     FROM jsonb_array_elements(p_request->'allocations') item
     JOIN m7_findings f ON f.tenant_id=p_tenant AND f.id=item.value->>'findingId';
   RETURN QUERY SELECT v_instruction,v_hash,false;
-END $function$;
+END $function$
 
 CREATE TRIGGER m7_allocations_immutable BEFORE DELETE OR UPDATE ON m7_allocations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
 CREATE TRIGGER m7_instructions_immutable BEFORE DELETE OR UPDATE ON m7_instructions FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
