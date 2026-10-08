@@ -386,6 +386,22 @@ class PublicBuildTests(unittest.TestCase):
         self.assertIn('color:#f6faf7;', css)
         self.assertIn('color:#40574d', css)
 
+    def test_manual_email_fallback_preserves_mobile_user_gesture(self):
+        # The fallback is the production contact path while online D1 intake
+        # is disabled. On iOS, a delayed navigation can be gesture-blocked.
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            script = (output / "site.js").read_text(encoding="utf-8")
+            self.assertIn('id="sendAuditRequest"', page)
+            self.assertIn('id="copyAuditSummary"', page)
+            self.assertIn('sendLink.href = `mailto:${contactEmail}', script)
+            self.assertIn('window.location.href = sendLink.href;', script)
+            self.assertNotIn(
+                'window.setTimeout(() => { window.location.href = sendLink.href; }, 80)',
+                script,
+            )
+
     def test_existing_files_are_preserved(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary)
