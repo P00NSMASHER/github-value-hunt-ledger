@@ -195,6 +195,12 @@ class PublicBuildTests(unittest.TestCase):
             org = by_type["Organization"]
             service = by_type["Service"]
             self.assertEqual(org["name"], "RETALLY")
+            self.assertEqual(
+                org["logo"]["url"],
+                "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem.webp",
+            )
+            self.assertIn("Freight Invoice Audit &amp; Overcharge Recovery | RETALLY", index)
+            self.assertIn("Freight invoice audit and overcharge recovery for U.S. businesses.", index)
             self.assertNotIn("address", org)
             self.assertEqual(service["provider"]["@id"], org["@id"])
             self.assertEqual(service["areaServed"]["name"], "United States")
