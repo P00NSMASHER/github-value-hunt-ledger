@@ -31,6 +31,12 @@ The published Northstar Industrial Supply sample is an illustrative multi-site d
 
 Published aggregate amounts are not independently reproducible from source invoice/settlement entries. The arithmetical difference of 1,650 may not be labeled a specific exclusion without underlying evidence and agreed fee definitions. No actual RETALLY contingency rate, fee, customer remainder or ROI is established by this example.
 
+### Illustrative settlement-ledger safety requirements
+
+The supporting internal financial-control function now binds every reversal to an **earlier posted original credit**, enforces its original opportunity allocation, and caps the sum of partial reversals to that credit's amount. Event IDs cannot replay, credits cannot reuse the same opportunity allocation, and reversals cannot point at themselves or other reversal events. A booking requires `posted is True` rather than a nonempty text assertion; posted amounts must be finite, positive and exact to the cent. The training tests exercise that actual function, not a weaker separately duplicated implementation.
+
+**These are simulated bookkeeping invariants, not authentication of a bank statement, third-party carrier payment, buyer consent, legal agreement or actual customer cash.** The separate $1,650 synthetic eligibility gap stays **UNVERIFIED** and every buyer-facing outcome or fee claim remains held until genuine itemized records and independent approvals exist.
+
 ## Separate reproducible worked scenario (NOT INCLUDED IN AGGREGATE)
 All identifying data and source IDs are invented solely for teaching the calculation:
 - Northstar Industrial Supply; Blue River Freight; shipment FR-1001.
