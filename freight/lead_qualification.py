@@ -101,6 +101,25 @@ def qualify_free_audit(profile: AuditLeadProfile) -> QualificationDecision:
             "Verify prior audit status, open claims and incumbent rights before substantive work.",
         )
 
+    # High spending does not identify a claimable shipment. The client must
+    # identify a freight mode and at least one billed carrier before the
+    # economic-scale fast paths can classify a prospect as qualified.
+    scope_reasons = []
+    if profile.mode_count == 0:
+        scope_reasons.append("freight_mode_unidentified")
+    if profile.carrier_count == 0:
+        scope_reasons.append("carrier_identity_unidentified")
+    if scope_reasons:
+        if not profile.has_rate_authority:
+            scope_reasons.append("rate_authority_needs_review")
+        if not corroborating_records:
+            scope_reasons.append("supporting_records_need_review")
+        return QualificationDecision(
+            QualificationState.NEEDS_REVIEW,
+            tuple(scope_reasons),
+            "Identify a freight mode, billed carrier and governing documents before qualifying any pilot.",
+        )
+
     scaled = profile.annual_freight_spend_usd >= 1_000_000 or profile.monthly_shipments >= 250
     large_scale = (
         profile.annual_freight_spend_usd >= 5_000_000
