@@ -261,7 +261,9 @@
       ready.scrollIntoView({ block: "center", behavior: "smooth" });
       track(EVENTS.auditFormCompleted, { completedSteps: 1, method: "email_draft" });
       track(EVENTS.auditRequestPrepared, { reference });
-      window.setTimeout(() => { window.location.href = sendLink.href; }, 80);
+      // Keep the mail app handoff inside the visitor's click/submit gesture.
+      // Mobile browsers may suppress deferred mailto navigation.
+      window.location.href = sendLink.href;
     };
 
     fallbackLink?.addEventListener("click", (event) => {
