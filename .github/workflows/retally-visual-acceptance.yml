@@ -1,0 +1,65 @@
+name: RETALLY Visual Acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'freight/site/**'
+      - '.github/workflows/retally-visual-acceptance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout proposed website
+        uses: actions/checkout@v4
+        with:
+          path: after
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Checkout original website baseline
+        uses: actions/checkout@v4
+        with:
+          path: before
+          ref: ${{ github.event.pull_request.base.sha || 'main' }}
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install headless Chromium and Playwright
+        run: |
+          python -m pip install 'playwright==1.56.0'
+          python -m playwright install --with-deps chromium
+      - name: Build isolated public-only before bundle
+        working-directory: before
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          from pathlib import Path
+          from freight.site.build import build
+          build(Path('../bundle-before'), 'sales@freightfixture.com', True)
+          PY
+      - name: Build isolated public-only after bundle
+        working-directory: after
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          from pathlib import Path
+          from freight.site.build import build
+          build(Path('../bundle-after'), 'sales@freightfixture.com', True)
+          PY
+      - name: Capture 35 baseline screenshots at five widths
+        run: python after/freight/site/visual_acceptance.py --site bundle-before --out evidence/before
+      - name: Capture and validate 35 candidate screenshots at five widths
+        run: python after/freight/site/visual_acceptance.py --site bundle-after --out evidence/after --fail-on-issues
+      - name: Upload before and after evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: retally-visual-acceptance-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 14
