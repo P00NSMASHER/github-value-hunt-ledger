@@ -75,3 +75,20 @@ jobs:
           total=$(docker exec "$cid" psql -U postgres -d recoveryos_m8 -A -t -c "SELECT coalesce(sum(amount_cents),0) FROM recovery_value_allocations WHERE tenant_id='race_t' AND economic_key='RACE_ECON'")
           echo "Allocated minor units: $total"
           [[ "$total" == "100000" ]]
+
+      - name: One hundred concurrent exact-key requests against actual M8 Postgres function
+        shell: bash
+        env:
+          M8_POSTGRES_CONTAINER_ID: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          docker exec -i "$M8_POSTGRES_CONTAINER_ID" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_same_key_setup.sql
+          python3 freight/mission8/ci_same_key_replay.py
+      - name: Preserve source-pinned same-key replay receipt, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m8-real-postgres-exact-replay
+          path: freight/mission8/ci_same_key_receipt.json
+          if-no-files-found: warn
+          retention-days: 14
