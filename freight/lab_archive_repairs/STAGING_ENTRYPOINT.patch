@@ -1,0 +1,31 @@
+--- a/unified/staging.py
++++ b/unified/staging.py
+@@ -11,6 +11,7 @@
+ from datetime import datetime, timedelta, timezone
+ from .core import sha, public_invoice, verify_source_row
+ from .catalog import bind_fictional_invoice, verify_binding
++from .semantic_verify import verify_case_replay
+ 
+ class Rejected(Exception):
+     """Typed governance violation; no partial database write."""
+@@ -170,7 +171,7 @@
+                     raise Rejected('INDEPENDENT_EVIDENCE_REFERENCE_REQUIRED')
+             if kind=='CONSENT':
+                 need({'INTAKE'});consent=True;revoked=False;state='CONSENTED'
+-                if not payload.get('scope_signed'):raise Rejected('UNSIGNED_CONTRACT')
++                if payload.get('scope_signed') is not True:raise Rejected('UNSIGNED_CONTRACT')
+             elif kind=='REVOKE':
+                 if not consent:raise Rejected('NEVER_CONSENTED')
+                 revoked=True;state='REVIEW_REQUIRED'
+@@ -298,8 +299,9 @@
+                     failures.append(f'BAD_FEES:{c["case_id"]}')
+                 if finance['reversed']>finance['received'] or any(type(v) is not int or v<0 for v in finance.values()):
+                     failures.append(f'BAD_REVERSAL:{c["case_id"]}')
+-                if c['source_customer_id'] != json.loads(c['public_invoice_json'])['customer_id']:
+-                    failures.append('SOURCE_BINDING_TAMPER')
++                # Independently rebuild the source binding, financial snapshot, and
++                # per-event account postings instead of trusting their own hashes.
++                failures.extend(verify_case_replay(con,c))
+             for x in con.execute('SELECT * FROM journal'):
+                 totals['journal_rows']+=1
+                 if not x['amount_cents']>0 or x['debit_account']==x['credit_account']:
