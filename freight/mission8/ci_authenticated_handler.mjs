@@ -69,8 +69,10 @@ async function run(){
  const resolvedAccess=await requireRecoveryTenant(diagnosticReq);
  check("authenticated_tenant_identity_matches_fixture",resolvedAccess.tenantId==="handler_t" && Number(resolvedAccess.userId)===Number(who[0].id),{tenant:resolvedAccess.tenantId,user_id:resolvedAccess.userId});
  const bodyProbe={schema:1,tenant_id:resolvedAccess.tenantId,payer_id:"SIMULATED",payee_id:"SIMULATED",currency:"USD",amount_cents:10000,purpose:"Synthetic authenticated application acceptance",finding_ids:["handler_finding"],idempotency_key:"m11-local-handler-same-001"};
- const probe=await db.unsafe("SELECT jsonb_typeof($1::jsonb) AS kind, $1::jsonb ->> 'tenant_id' AS tenant, $2::text AS expected",[JSON.stringify(bodyProbe),resolvedAccess.tenantId]);
- check("jsonb_parameter_tenant_scope",probe[0].kind==="object" && probe[0].tenant===probe[0].expected,probe[0]);
+ const probeString=await db.unsafe("SELECT jsonb_typeof($1::jsonb) AS kind",[JSON.stringify(bodyProbe)]);
+ check("original_JSON_string_double_encoded",probeString[0].kind==="string",probeString[0]);
+ const probeObject=await db.unsafe("SELECT jsonb_typeof($1::jsonb) AS kind, $1::jsonb ->> 'tenant_id' AS tenant, $2::text AS expected",[bodyProbe,resolvedAccess.tenantId]);
+ check("correct_JSON_object_parameter",probeObject[0].kind==="object" && probeObject[0].tenant===probeObject[0].expected,probeObject[0]);
  const basePayload={payerId:"SIMULATED",payeeId:"SIMULATED",currency:"USD",amountCents:10000,
  purpose:"Synthetic authenticated application acceptance",findingIds:["handler_finding"],
  idempotencyKey:"m11-local-handler-same-001"};
