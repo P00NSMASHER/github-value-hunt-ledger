@@ -19,6 +19,7 @@ def profile(**overrides):
         has_rate_authority=True,
         has_shipment_records=True,
         has_payment_evidence=True,
+        previously_audited=False,  # Explicitly known not to have an incumbent audit.
     )
     values.update(overrides)
     return AuditLeadProfile(**values)
@@ -100,7 +101,7 @@ def test_prior_audit_flags_missing_authority_and_supporting_sources():
     "has_invoice_export", "has_rate_authority", "has_shipment_records",
     "has_payment_evidence", "previously_audited", "known_or_suspected_issue",
 ])
-@pytest.mark.parametrize("bad", ["false", "true", 0, 1, None])
+@pytest.mark.parametrize("bad", ["false", "true", 0, 1])
 def test_boolean_evidence_cannot_be_satisfied_by_truthy_strings_or_numbers(field, bad):
     with pytest.raises(ValueError, match="must be a boolean"):
         profile(**{field: bad})
@@ -113,3 +114,23 @@ def test_unreviewed_high_priority_candidate_still_routes_as_before():
         previously_audited=False,
     ))
     assert decision.state is QualificationState.HIGH_PRIORITY_RECOVERY_CANDIDATE
+
+
+def test_omitted_prior_audit_status_requires_human_review():
+    """Unknown must never become an implicit 'not previously audited'."""
+    fields = vars(profile()).copy()
+    fields.pop("previously_audited")
+    candidate = AuditLeadProfile(**fields)
+    assert candidate.previously_audited is None
+    decision = qualify_free_audit(candidate)
+    assert decision.state is QualificationState.NEEDS_REVIEW
+    assert "prior_audit_status_unverified" in decision.reasons
+
+
+@pytest.mark.parametrize("field", [
+    "has_invoice_export", "has_rate_authority", "has_shipment_records",
+    "has_payment_evidence", "known_or_suspected_issue",
+])
+def test_missing_required_evidence_booleans_are_invalid(field):
+    with pytest.raises(ValueError, match="must be a boolean"):
+        profile(**{field: None})
