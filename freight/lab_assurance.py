@@ -259,7 +259,7 @@ def verify_settlement(
             if p.get(local) != signed: _fail("SOURCE_OWNER_BINDING_MISMATCH")
         if p.get("payer_id") != claim["payer_id"] or p.get("payee_id") != claim["payee_id"]:
             _fail("SOURCE_OWNER_COUNTERPARTY_MISMATCH")
-        if p.get("issued_at") != claim["issued_at"]:
+        if _utc(p.get("issued_at"),"owner_claim_issued_at") != _utc(claim["issued_at"],"claim_issued_at"):
             _fail("SOURCE_OWNER_TIME_MISMATCH")
         issue_key = (buyer_id, business_unit, claim["reference"],
                      _name(p.get("economic_issue_id"), "economic_issue_id"))
@@ -295,7 +295,11 @@ def verify_settlement(
         p = proof.payload
         for field in ("event_id","reference","payer_id","payee_id","currency",
                       "amount_cents","source_hash","booked_at"):
-            if p.get(field) != credit[field]: _fail("CREDIT_PROVENANCE_MISMATCH")
+            if field == "booked_at":
+                if _utc(p.get(field),"provider_booked_at") != _utc(credit[field],"settlement_booked_at"):
+                    _fail("CREDIT_PROVENANCE_MISMATCH")
+            elif p.get(field) != credit[field]:
+                _fail("CREDIT_PROVENANCE_MISMATCH")
         if _utc(proof.issued_at,"credit_proof_time") > verifier.as_of:
             _fail("CREDIT_PROOF_FUTURE")
         _money(credit["amount_cents"],"credit_cents",positive=True)
@@ -304,7 +308,11 @@ def verify_settlement(
         proof = _lookup(by_identity,"CREDIT_RETURN",counter_id)
         p = proof.payload
         for field in ("counter_id","original_event_id","amount_cents","currency","source_hash","observed_at"):
-            if p.get(field) != counter[field]: _fail("CREDIT_RETURN_PROVENANCE_MISMATCH")
+            if field == "observed_at":
+                if _utc(p.get(field),"provider_return_at") != _utc(counter[field],"counter_observed_at"):
+                    _fail("CREDIT_RETURN_PROVENANCE_MISMATCH")
+            elif p.get(field) != counter[field]:
+                _fail("CREDIT_RETURN_PROVENANCE_MISMATCH")
         linked = credits.get(counter["original_event_id"])
         if linked is None or linked["currency"] != counter["currency"]:
             _fail("COUNTER_MISSING_ORIGINAL")
