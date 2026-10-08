@@ -74,4 +74,14 @@ BEGIN
  IF (SELECT count(*) FROM recovery_m8_verified_cash_by_currency)<>0
  THEN RAISE EXCEPTION 'unverified cash represented as realized'; END IF;
 END $m8$;
+DO $chain$
+DECLARE v record;
+BEGIN
+ SELECT * INTO v FROM recovery_verify_audit_chain('ci_a');
+ IF v.total_events < 2 OR v.invalid_hashes<>0 OR v.broken_links<>0
+ THEN RAISE EXCEPTION 'financial audit-chain acceptance failed'; END IF;
+ IF (SELECT count(*) FROM recovery_audit_events WHERE tenant_id='ci_a'
+ AND source_table IN ('recovery_eligibility_certifications','recovery_value_allocations'))<2
+ THEN RAISE EXCEPTION 'financial certification/allocation missing from audit chain'; END IF;
+END $chain$;
 ROLLBACK;
