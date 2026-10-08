@@ -213,8 +213,8 @@ def build(
     demo_link = (
         '<a class="text-link text-link-light" href="synthetic-pilot-demo.zip" '
         'download data-track="controlled_demo_downloaded">'
-        'Download a fictional audit example <span aria-hidden="true">&#8599;</span></a>'
-        '<p class="microcopy">Fictional data only. This walkthrough is not a customer result or recovery claim.</p>'
+        'Download a sample audit example <span aria-hidden="true">&#8599;</span></a>'
+        '<p class="microcopy">Sample data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
 

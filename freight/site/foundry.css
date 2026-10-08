@@ -113,34 +113,74 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 .home-simple .intake-section .intake-copy>p{color:#40574d}
 
 
-/* RETALLY restrained-surface pass (brand finishing, 2026-10-08).
-   Keep approved typography, site structure, logos, form and calculator intact.
-   This overrides backgrounds only. Green remains a deliberate action accent. */
-:root {
-  --ink:#0e1e29;
-  --navy:#0e1e29;
-  --navy-soft:#19353b;
-  --paper:#f7f9f8;
-  --porcelain:#ffffff;
-  --mist:#eff5f2;
-  --cobalt:#087a50;
-  --cobalt-dark:#07563a;
-  --signal:#b7f0ce;
-  --line:#dce6e0;
+/* RETALLY emerald finishing (2026-10-08).
+   Final layer keeps the approved Hanken/Instrument typography and layouts. */
+:root{
+ --ink:#0e2925;--navy:#062c26;--navy-soft:#0d4539;
+ --paper:#f3f8f5;--porcelain:#fff;--mist:#eaf5ef;
+ --cobalt:#087a50;--cobalt-dark:#07563a;--signal:#b7f0ce;
+ --signal-ink:#05281f;--muted:#52685f;--line:#d9e6df;
+ --line-dark:rgba(211,249,227,.17);
+ --shadow:0 20px 60px rgba(4,46,38,.13);
+ --shadow-soft:0 8px 28px rgba(4,46,38,.07);
 }
-.site-header { background:rgba(14,30,41,.98); border-bottom-color:#2a404a; }
-.statusbar { background:#173d3a; }
-.site-footer,.section-ink,.document-hero { background-color:#0e1e29; }
-.section-cobalt { background-color:#183940; }
-.home-simple .intake-section { background:#f4f7f6; }
-.home-simple .pricing-section { background:#fff; }
-.home-simple .section-paper { background:#f7f9f8; }
-.home-simple .section-ink { background:#0e1e29; }
-.home-simple .hero .hero-proof { color:#dbeae2; }
-.home-simple .button-signal,.home-simple .button-cobalt { background:#087a50; color:#fff; }
-.home-simple .button-signal:hover,.home-simple .button-cobalt:hover { background:#07563a; }
-/* Preserve the checked mobile occlusion repair. */
-@media (max-width:620px) {
-  .home-simple .mobile-cta { display:none!important; }
-  body { padding-bottom:0; }
+.site-header{background:rgba(5,43,36,.98);border-bottom-color:#245447}
+.statusbar{background:#104b3c;color:#f0fff6}
+.site-footer,.section-ink,.document-hero{
+ background:linear-gradient(125deg,#052b24 0%,#083e34 63%,#105542 100%);
+}
+.section-cobalt{background:linear-gradient(125deg,#07543e,#0b694b)}
+.home-simple .section-ink{background:linear-gradient(125deg,#052b24,#0b4539)}
+.home-simple .intake-section{background:#f3f8f5}
+.home-simple .pricing-section{background:#fff}
+.home-simple .section-paper{background:#f3f8f5}
+.home-simple .hero .hero-proof{color:#dbeae2}
+.home-simple .button-signal,.home-simple .button-cobalt{background:#087a50;color:#fff}
+.home-simple .button-signal:hover,.home-simple .button-cobalt:hover{background:#07563a}
+.home-simple .hero-wash{
+ background:linear-gradient(90deg,rgba(4,45,37,.98) 0%,rgba(5,53,44,.9) 40%,rgba(8,66,53,.55) 73%,rgba(9,71,58,.24) 100%),
+            linear-gradient(0deg,rgba(4,45,37,.7),transparent 65%);
+}
+.document-hero-inner>p:not(.eyebrow,.document-meta){color:#dcf0e5}
+.document-meta,.report-header p{color:#d8ece2}
+.eyebrow.light,.eyebrow.cobalt-light{color:#b7f0ce}
+.button-light:hover{background:#ebf9f1}
+.sample-chip,.report-notice{background:#e8f6ef;color:#1e5641;border-color:#b8dcca}
+.report-card.net{border-color:#087a50;background:#e9f8f0}
+.sample-report{background:#f3f8f5}
+.sample-report .document-hero{
+ background:linear-gradient(90deg,rgba(4,43,36,.97),rgba(5,56,45,.87) 52%,rgba(8,69,53,.54)),
+            linear-gradient(0deg,rgba(4,40,34,.52),transparent 75%),
+            url("assets/images/terminal-blue-hour.webp") center 57%/cover no-repeat;
+}
+.sample-report .report-header h1{
+ font-size:clamp(1.72rem,3.8vw,2.08rem);
+ line-height:1.13;max-width:33ch;overflow-wrap:normal;text-wrap:balance;
+}
+.sample-report .report-header .meta{font-size:.92rem;line-height:1.5}
+.report-back-link{display:inline-flex;align-items:center;gap:8px;font-size:.9375rem;white-space:nowrap}
+.report-back-link img{display:block;width:111px;height:auto;max-width:42vw}
+.report-disclosure{margin-top:32px;padding:16px 0;border-top:1px solid #cee0d4;color:#52685f;font-size:.8125rem;line-height:1.55}
+.document-content .expected-amount{display:inline-block;background:#e8f6ef;color:#0b533e;border:1px solid #c9e8d6;border-radius:5px;padding:11px 15px;font-variant-numeric:tabular-nums}
+@media(max-width:860px){
+ .navlinks{background:linear-gradient(155deg,#06372f,#0b5141);border-top-color:rgba(211,249,227,.2)}
+ .navlinks>a:not(.button){min-height:44px;color:#ecfff3}
+ .home-simple .hero-wash{
+  background:linear-gradient(90deg,rgba(3,42,36,.96),rgba(7,65,52,.68)),
+             linear-gradient(0deg,rgba(3,38,32,.73),transparent 67%);
+ }
+}
+@media(max-width:620px){
+ .home-simple .mobile-cta{display:none!important}
+ .home-simple .hero-wash{
+  background:linear-gradient(105deg,rgba(3,44,37,.94),rgba(5,55,46,.82) 58%,rgba(5,65,51,.56)),
+             linear-gradient(0deg,rgba(2,35,30,.7),transparent 70%);
+ }
+ body{padding-bottom:0}
+ .sample-report .report-header h1{font-size:clamp(1.48rem,6.5vw,1.86rem)}
+ .report-back-link img{width:103px}
+}
+@media print{
+ .sample-report .document-hero{background:#fff!important}
+ .sample-report .report-header h1,.sample-report .report-header p{color:#000}
 }
