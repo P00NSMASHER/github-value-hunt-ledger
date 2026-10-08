@@ -33,6 +33,19 @@ CREATE TABLE IF NOT EXISTS inquiry_purge_audit (
   original_accepted_at INTEGER NOT NULL
 );
 
+-- Once a purge has committed, its pseudonymous receipt cannot be silently
+-- edited or deleted by a routine data-management query.
+CREATE TRIGGER IF NOT EXISTS inquiry_purge_audit_immutable_update
+BEFORE UPDATE ON inquiry_purge_audit
+BEGIN
+  SELECT RAISE(ABORT,'inquiry_purge_audit_immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS inquiry_purge_audit_immutable_delete
+BEFORE DELETE ON inquiry_purge_audit
+BEGIN
+  SELECT RAISE(ABORT,'inquiry_purge_audit_immutable');
+END;
+
 CREATE INDEX IF NOT EXISTS inquiry_case_legal_hold_idx
   ON inquiry_case_dispositions(legal_hold,case_state);
 
