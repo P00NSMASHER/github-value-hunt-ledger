@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-08. **Source repo:** P00NSMASHER/github-value-hunt-ledger. **Source package:** RETALLY_Brand_System_v4_2026-10-08.zip.
 
-Mission 2B rebuilt **12 matching DOCX/PDF pairs** from the approved source logos. The full PDF/DOCX files and creation/QA scripts are retained as separate **review artifacts in the original ChatGPT deliverable**, not asserted to be stored in this repository or publicly deployed by this pull request.
+Mission 2B rebuilt **12 matching DOCX/PDF pairs** from the approved source logos. Missions 2D–2F subsequently committed the exact two approved original PNG masters, document generator, and QA scripts to this repository. GitHub Actions [run #37812262203](https://github.com/P00NSMASHER/github-value-hunt-ledger/actions/runs/37812262203) regenerated all 12 document pairs (23 pages) from the GitHub branch and uploaded them as **temporary internal review artifacts**, not customer-approved published PDFs. The documents themselves are generated, not committed as binary release files.
 
 ## Source artwork
 - Wordmark SHA-256 `08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd`
