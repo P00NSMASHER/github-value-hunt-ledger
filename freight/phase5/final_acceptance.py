@@ -113,7 +113,7 @@ def acceptance()->dict:
        "release_decision":"DO_NOT_RELEASE_FINANCIAL_PRODUCTION",
        "pr_chain":list(PR_CHAIN),
        "source_branch":"research/retally-phase5h-principal-tenant-rls-20261008",
-       "ci_head":os.getenv("GITHUB_SHA","LOCAL_REPRODUCIBLE_NOT_CI_ATTESTED"),
+       "ci_head":os.getenv("RETALLY_CANDIDATE_SHA","LOCAL_REPRODUCIBLE_NOT_CI_ATTESTED"),
        "frozen_source_git_blobs":hashes,
        "qa_postgres_system_id":QA_CLUSTER,"prod_postgres_system_id":PRODUCTION_CLUSTER,
        "hosted_qa_db_principal":"neondb_owner",
