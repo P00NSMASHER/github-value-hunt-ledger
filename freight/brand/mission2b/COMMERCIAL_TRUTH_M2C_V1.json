@@ -1,0 +1,71 @@
+{
+  "version": "M2C-2026-10-08-v1",
+  "status": "DRAFT_NOT_CUSTOMER_APPROVED",
+  "brand": {
+    "name": "RETALLY",
+    "tagline": "Find it. Prove it. Recover it.",
+    "positioning": "We find freight billing errors, document the evidence, and help recover overpayments.",
+    "wordmark_sha256": "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd",
+    "emblem_sha256": "bb02ab4a468762f597c241199baeff61b485dd793f8fb746140ad33670b68043"
+  },
+  "financial_public_synthetic": {
+    "period": "2026-01-01/2026-03-31",
+    "reviewed": 1284,
+    "candidates": 37,
+    "supported": 14,
+    "authorized": 9,
+    "submitted": 9,
+    "approved": 7,
+    "posted": 6,
+    "reversed": 1,
+    "candidate_diff_usd": "38250.00",
+    "validated_diff_usd": "24100.00",
+    "approved_claim_usd": "17650.00",
+    "gross_recovered_usd": "14200.00",
+    "reversal_usd": "750.00",
+    "net_recovered_usd": "13450.00",
+    "published_fee_eligible_usd": "11800.00",
+    "difference_unallocated_usd": "1650.00",
+    "source_level_verified": false,
+    "real_customer_result": false,
+    "fee_eligibility_status": "UNVERIFIED"
+  },
+  "worked_invoice_synthetic": {
+    "shipment": "FR-1001",
+    "invoice": "INV-FR-1001",
+    "rate_source": "RATE-FR-2026-A",
+    "shipment_evidence": "POD-FR-1001",
+    "date": "2026-02-17",
+    "rate_effective_from": "2026-01-01",
+    "rate_effective_to": "2026-12-31",
+    "currency": "USD",
+    "base": "820.00",
+    "fuel_percentage": "0.18",
+    "authorized_liftgate": "75.00",
+    "second_unsupported_liftgate": "125.00",
+    "expected_total": "1042.60",
+    "billed_total": "1167.60",
+    "difference": "125.00",
+    "source_ids_are_examples_not_evidence": true
+  },
+  "commercial_policy": {
+    "initial_review": "$0 upfront only for mutually agreed bounded eligible scope",
+    "claim_authority": "Separate written customer authorization before any carrier-facing action",
+    "fee_base": "Only uniquely allocated, posted eligible receipts net of reversals, under separately signed terms",
+    "actual_fee_percentage": "UNAPPROVED",
+    "contracting_legal_entity": "UNVERIFIED",
+    "secure_transfer": "NOT OPERATIONALLY VERIFIED",
+    "mail_inbound": "NOT VERIFIED",
+    "public_website": "https://retallyrecovery.com",
+    "contact_behavior": "Existing customer inquiry requires an actual outbound send and verified receipt; draft preparation alone is not delivery"
+  },
+  "required_approvals": [
+    "legal entity and trade name",
+    "binding rates and fee terms",
+    "signed customer scope",
+    "secure document transfer, retention and access",
+    "real inbound contact receipt",
+    "financial eligibility source ledger",
+    "customer publication approval"
+  ]
+}
