@@ -119,6 +119,43 @@ DEMO_MARKER = '<!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->'
 RATE_TOKEN = "__CONTINGENCY_RECOVERY_RATE__"
 RATE_LABEL_TOKEN = "__CONTINGENCY_RECOVERY_RATE_LABEL__"
 
+# Public site identifier, not an API credential. The widget reads public
+# marketing knowledge only, never customer files or RecoveryOS information.
+BUBBLAV_ID = "b0e3b0a1-8f64-4dcd-ac82-507366428147"
+BUBBLAV_SNIPPET = (
+    '<script src="https://www.bubblav.com/widget.js" '
+    f'data-site-id="{BUBBLAV_ID}" defer></script>'
+)
+BUBBLAV_CONNECT_POLICY = (
+    "https://www.bubblav.com https://bubblav.com https://*.bubblav.com"
+)
+BUBBLAV_POLICY_REPLACEMENTS = (
+    ("script-src 'self';", "script-src 'self' https://www.bubblav.com;"),
+    ("style-src 'self';", "style-src 'self' 'unsafe-inline';"),
+    ("font-src 'self';", "font-src 'self' https://www.bubblav.com;"),
+    ("img-src 'self' data:;", "img-src 'self' data: https://www.bubblav.com https://*.bubblav.com;"),
+    (
+        "connect-src 'none';",
+        f"connect-src {BUBBLAV_CONNECT_POLICY}; frame-src {BUBBLAV_CONNECT_POLICY};",
+    ),
+)
+
+
+def _allow_bubblav(content: str, asset: str) -> str:
+    """Allow only the vendor hosts needed by the public chat loader."""
+    for old, new in BUBBLAV_POLICY_REPLACEMENTS:
+        if content.count(old) != 1:
+            raise ValueError(f"Cannot safely update widget CSP: {asset}: {old}")
+        content = content.replace(old, new)
+    return content
+
+
+def _embed_bubblav(page: str, asset: str) -> str:
+    if page.count("</body>") != 1 or page.count(BUBBLAV_SNIPPET) != 0:
+        raise ValueError(f"Unexpected widget insertion boundary: {asset}")
+    return _allow_bubblav(page, asset).replace("</body>", BUBBLAV_SNIPPET + "\n</body>")
+
+
 
 def _public_source(name: str) -> Path:
     path = SOURCE
@@ -217,6 +254,13 @@ def build(
         '<p class="microcopy">Sample data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # The marketing chatbot belongs on customer-facing content pages, not
+    # RecoveryOS, the sample accounting report, or the error page. Keep the
+    # original strict policy on all unpublished/private content.
+    for name in PUBLIC_CONTACT_PAGES:
+        text_bundle[name] = _embed_bubblav(text_bundle[name], name)
+    text_bundle["_headers"] = _allow_bubblav(text_bundle["_headers"], "_headers")
 
     # Fail closed before publishing any source text containing the removed private contact.
     # Log only the filename, never the discovered private value.
