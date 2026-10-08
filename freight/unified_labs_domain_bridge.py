@@ -90,6 +90,12 @@ def run_actual_domain_shadow(
         raise ValueError("unknown frozen rating fixture")
     case = cases[rating_case_id]
     record = _build_record(case["id"], case["record"], fixture["common"])
+    if authorization.source_invoice_id != record.invoice_id:
+        raise ValueError("synthetic invoice ID not bound to source record")
+    if authorization.source_sha256 != record.sources[0].sha256:
+        raise ValueError("synthetic source proof hash mismatch")
+    if authorization.source_customer_id != "FICTIONAL-" + record.customer_id:
+        raise ValueError("synthetic customer scope is not bound to the canonical record")
     observed = rate_record(record, _book(case["authority_profiles"], fixture))
     amount = observed.variance_cents or 0
     reason = "REVIEW_OR_NO_POSITIVE_VARIANCE"
