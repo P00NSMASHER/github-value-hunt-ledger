@@ -1,12 +1,12 @@
 {
-  "name": "Freight Recovery",
-  "short_name": "Freight Recovery",
+  "name": "RETALLY",
+  "short_name": "RETALLY",
   "description": "Free freight recovery audit with success-based recovery pricing.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fffefa",
-  "theme_color": "#071426",
+  "theme_color": "#062c26",
   "icons": [
-    {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml"}
+    {"src": "assets/brand/retally-emblem.webp", "sizes": "110x106", "type": "image/webp"}
   ]
 }

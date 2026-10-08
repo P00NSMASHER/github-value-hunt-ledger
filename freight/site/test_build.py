@@ -100,7 +100,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             config = (output / "commercial-config.js").read_text()
 
-            self.assertIn("Freight recovery <em>you can prove.</em>", page)
+            self.assertIn("Find it. <em>Prove it. Recover it.</em>", page)
             self.assertIn("Recovery Evidence Pack", page)
             self.assertIn('href="second-look-freight-audit.html"', page)
             self.assertIn('href="freight-recovery-evidence-standard.html"', page)
@@ -170,7 +170,7 @@ class PublicBuildTests(unittest.TestCase):
             by_type = {node["@type"]: node for node in graph}
             org = by_type["Organization"]
             service = by_type["Service"]
-            self.assertEqual(org["name"], "Freight Recovery")
+            self.assertEqual(org["name"], "RETALLY")
             self.assertEqual(org["address"]["addressLocality"], "Pottsville")
             self.assertEqual(org["address"]["addressRegion"], "PA")
             self.assertEqual(service["provider"]["@id"], org["@id"])

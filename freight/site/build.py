@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the public Freight Recovery bundle; never publish the private repo."""
+"""Build the public RETALLY freight bundle; never publish the private repo."""
 
 from __future__ import annotations
 
@@ -105,6 +105,8 @@ BINARY_SOURCE_FILES = (
     "assets/images/invoice-evidence.webp",
     "assets/images/terminal-blue-hour-800.webp",
     "assets/images/terminal-blue-hour.webp",
+    "assets/brand/retally-wordmark.webp",
+    "assets/brand/retally-emblem.webp",
 )
 SOURCE_FILES = TEXT_SOURCE_FILES + BINARY_SOURCE_FILES
 DEMO_FILE = "synthetic-pilot-demo.zip"
@@ -182,7 +184,7 @@ def build(
     for name, page in tuple(text_bundle.items()):
         text_bundle[name] = page.replace(
             CONTACT_LINK,
-            'data-contact-link href="mailto:' + safe_contact + '?subject=Freight%20Recovery%20question"',
+            'data-contact-link href="mailto:' + safe_contact + '?subject=RETALLY%20question"',
         )
 
     page, count = STATUS_PATTERN.subn(

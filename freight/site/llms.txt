@@ -1,4 +1,4 @@
-# Freight Recovery
+# RETALLY
 
 > Independent freight audit and recovery service for finance, accounts-payable, transportation and logistics teams.
 

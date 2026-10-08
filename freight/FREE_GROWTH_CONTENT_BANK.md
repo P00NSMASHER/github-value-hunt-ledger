@@ -1,4 +1,4 @@
-# Freight Recovery Free Growth Content Bank
+# RETALLY Free Growth Content Bank
 
 Status: READY TO PUBLISH
 
@@ -16,7 +16,7 @@ Before calling a charge valid, finance/AP teams should be able to answer:
 - Has the carrier already issued an automatic credit?
 - Is the discrepancy genuinely new, or already known to an incumbent auditor?
 
-Freight Recovery offers a $0-upfront audit of a bounded historical population. No recovery fee applies unless eligible funds are actually recovered under an authorized engagement.
+RETALLY offers a $0-upfront audit of a bounded historical population. No recovery fee applies unless eligible funds are actually recovered under an authorized engagement.
 
 Read more:
 https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-services.html?utm_source=linkedin&utm_medium=organic&utm_campaign=freight_audit_launch&utm_content=checklist_post
@@ -41,7 +41,7 @@ https://p00nsmasher.github.io/github-value-hunt-ledger/accessorial-charge-audit.
 
 **Hook:** A $25,000 billing discrepancy is not automatically a $25,000 recovery.
 
-Freight Recovery separates:
+RETALLY separates:
 - potential recovery;
 - validated finding;
 - approved claim;

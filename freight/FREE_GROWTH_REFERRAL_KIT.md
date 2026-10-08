@@ -1,4 +1,4 @@
-# Freight Recovery Referral Kit
+# RETALLY Referral Kit
 
 Status: READY
 
@@ -21,18 +21,18 @@ Subject: Free freight audit resource for your clients
 
 Hi [Name],
 
-I run Freight Recovery. We review past freight invoices for duplicate charges, rate differences, unsupported accessorials, and missed credits. The initial audit has no upfront fee.
+I run RETALLY. We review past freight invoices for duplicate charges, rate differences, unsupported accessorials, and missed credits. The initial audit has no upfront fee.
 
 I’m reaching out because your clients may occasionally have material freight spend but no dedicated freight-audit function.
 
 If a client could benefit, I can start with a brief fit conversation. We agree the scope and a secure transfer route before requesting records. Please do not send freight records by ordinary email.
 
-Freight Recovery:
+RETALLY:
 https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=referral&utm_medium=partner&utm_campaign=advisor_referrals
 
 Thanks,
 Jamison
-Freight Recovery
+RETALLY
 715 Yorktowne Road
 Pottsville, PA 17901
 
