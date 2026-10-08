@@ -542,5 +542,23 @@ class SignatureFinishTests(unittest.TestCase):
             })
 
 
+class PremiumFinishV2Tests(unittest.TestCase):
+    def test_footer_contact_has_distinct_layout_and_measured_qa(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text()
+            html = (output / "index.html").read_text()
+            visual = Path(__file__).with_name("visual_acceptance.py").read_text()
+
+            self.assertEqual(html.count('data-contact-link href="mailto:'), 1)
+            self.assertIn("RETALLY Premium Finish V2: customer contact clarity", css)
+            self.assertIn(".home-simple .simple-footer > div:first-child{", css)
+            self.assertIn("flex-direction:column;", css[css.index("RETALLY Premium Finish V2:"):])
+            self.assertIn("min-height:44px;", css[css.index("RETALLY Premium Finish V2:"):])
+            self.assertIn("touchHeightPx", visual)
+            self.assertIn("nonOverlapping", visual)
+            self.assertIn("footerContact", visual)
+
+
 if __name__ == "__main__":
     unittest.main()
