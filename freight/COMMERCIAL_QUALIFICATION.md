@@ -37,6 +37,16 @@ credentials, rates, or payment records as ordinary email attachments.
 The thresholds are internal operating assumptions and should not be shown as a
 customer score. Record the reason for a manual override.
 
+**Prior auditor/claim overlap is a hard manual-review routing condition.**
+`previously_audited=True` must never yield QUALIFIED or HIGH_PRIORITY without
+first documenting the population, prior auditor's work, active claims, automatic
+credits, attribution and any fee-entitlement conflicts. A human reviewer must
+record a reasoned decision before any substantive work or recovery agreement.
+An unverified `previously_audited` answer is not permission to treat the
+population as new. Boolean readiness inputs must be actual boolean evidence,
+not truthy strings such as `"false"`. Routing alone never gives claim authority
+or permits confidential file intake.
+
 ## Minimum evidence before substantive work
 
 - a real business and reachable work contact;
