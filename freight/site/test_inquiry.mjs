@@ -63,10 +63,11 @@ function mockRemote({captcha=true,notify=true,delivery="delivered"}={}) {
     if(String(url).includes("email/sending/send")) {
       notifications++;
       const recipient="jay@retallyrecovery.com";
-      const result={delivered:[],queued:[],suppressed_recipients:[]};
+      const result={delivered:[],queued:[],suppressed_recipients:[],permanent_bounces:[]};
       if(delivery==="delivered")result.delivered=[recipient];
       if(delivery==="queued")result.queued=[recipient];
       if(delivery==="suppressed")result.suppressed_recipients=[recipient];
+      if(delivery==="bounced")result.permanent_bounces=[recipient];
       if(delivery==="other")result.delivered=["elsewhere@example.org"];
       return Response.json({success:notify,result},{status:notify?200:503});
     }
@@ -175,7 +176,7 @@ test("email provider failure leaves a durable pending record for operator reconc
   } finally {remote.restore();}
 });
 test("email API success for a suppressed or wrong recipient never counts as accepted delivery", async () => {
-  for(const delivery of ["suppressed","other","none"]) {
+  for(const delivery of ["suppressed","bounced","other","none"]) {
     const remote=mockRemote({delivery});
     try {
       const e=env(mockDb());
