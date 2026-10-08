@@ -25,7 +25,9 @@ IMPORTANT PROVIDER DETAIL: Neon automatically granted administrative membership 
 
 PostgreSQL pgcrypto does not verify Ed25519 signatures, and the QA database has no supported Ed25519 extension available. The existing QA TypeScript endpoint checks signatures; the phase5c_qa INSERT trigger checks financial conservation, issuer role, record scope and admission-time revocation, but does not cryptographically verify signature_b64.
 
-Disposable PostgreSQL testing therefore deliberately submits a forged signature-shaped CONTRACT through the prospective admission role and observes that the database accepts it, then rolls the transaction back. That is an OPEN_UNMITIGATED exposure, not a passing security guard.
+Disposable PostgreSQL testing attempted to insert a forged signature-shaped CONTRACT under the prospective admission role. PostgreSQL correctly **denied** the attempt before any signature check: the financial trigger performs SELECT ... FOR UPDATE on the parent case, and that requires privileges the NOLOGIN admission role does not possess. This role therefore cannot currently insert legitimate or forged documents. We intentionally did NOT grant broad UPDATE permission on cases to make it work.
+
+The prior Phase 5E test independently reproduced forged signature-shaped records being accepted under the unrestricted **table-owner** connection. That owner-level signature-verification bypass remains OPEN_UNMITIGATED. The Phase 5F restricted-role test proves a fail-closed boundary, not a production-ready verifier.
 
 The unrestricted table owner can still bypass application checks. No role grant or SQL policy prevents the table owner from editing its own schema. A secure implementation requires the real application to use restricted database credentials, and a separate independently controlled Ed25519 verifier to be the only service authorized to insert signed financial evidence. Signed event authority and case ownership must be verified outside the general financial writer. No spoofable boolean, arbitrary GUC, or self-attested HMAC is an acceptable substitute.
 
