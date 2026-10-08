@@ -18,6 +18,15 @@ CREATE TABLE IF NOT EXISTS phase5_qa.instructions (
  authorized boolean NOT NULL DEFAULT false,
  PRIMARY KEY (tenant_id,instruction_id)
 );
+CREATE TABLE IF NOT EXISTS phase5_qa.actors (
+ tenant_id text NOT NULL CHECK (tenant_id LIKE 'SIM-%'),
+ provider text NOT NULL CHECK (provider LIKE 'SIM-%'),
+ actor_id text NOT NULL CHECK (actor_id LIKE 'SIM-%'),
+ role text NOT NULL CHECK (role='MOCK_PROVIDER'),
+ authorized boolean NOT NULL,
+ revoked_at timestamptz,
+ PRIMARY KEY (tenant_id,provider,actor_id)
+);
 CREATE TABLE IF NOT EXISTS phase5_qa.events (
  event_id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
  tenant_id text NOT NULL,
@@ -53,6 +62,11 @@ BEGIN
  OR p_source_hash IS NULL OR p_source_hash !~ '^[0-9a-f]{64}$'
  OR p_occurred_at IS NULL OR p_state NOT IN ('SUBMITTED','ACCEPTED','SETTLED','FAILED','REVERSED','OUTCOME_UNKNOWN')
  THEN RAISE EXCEPTION 'INVALID_SYNTHETIC_PROVIDER_EVENT'; END IF;
+ -- This is mock staging authorization, NOT authentication of real carriers.
+ IF NOT EXISTS (SELECT 1 FROM phase5_qa.actors
+    WHERE tenant_id=p_tenant AND provider=p_provider AND actor_id=p_actor
+      AND role='MOCK_PROVIDER' AND authorized=true AND revoked_at IS NULL)
+ THEN RAISE EXCEPTION 'MOCK_PROVIDER_ACTOR_UNAUTHORIZED'; END IF;
  -- Entire transition, replay lookup and INSERT are serialized per scoped instruction.
  PERFORM pg_advisory_xact_lock(hashtextextended(p_tenant||':'||p_instruction,3491));
  SELECT * INTO inst FROM phase5_qa.instructions
