@@ -24,11 +24,14 @@ class RetallyFinishingTests(unittest.TestCase):
         self.assertIn("mailto:",script)
         self.assertIn('id="fee-calculator"',page)
 
-    def test_signature_cannot_claim_unverified_mailbox(self):
+    def test_signature_uses_company_domain_and_no_fabricated_credentials(self):
         html=(BRAND / "RETALLY_EMAIL_SIGNATURE.html").read_text(encoding="utf-8")
-        self.assertIn("[Verified company email]",html)
-        self.assertIn("[Verified sender name]",html)
-        self.assertNotIn("mailto:sales@retallyrecovery.com",html)
+        self.assertIn('mailto:jay@retallyrecovery.com',html)
+        self.assertIn("https://www.retallyrecovery.com/",html)
+        self.assertIn("RETALLY",html)
+        self.assertNotIn("jayp19386@gmail.com",html)
+        self.assertNotIn("guaranteed",html.lower())
+        self.assertNotIn("certified",html.lower())
 
     def test_report_preserves_settlement_statuses(self):
         report=(BRAND / "RETALLY_AUDIT_REPORT_TEMPLATE.md").read_text(encoding="utf-8")
