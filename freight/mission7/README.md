@@ -35,3 +35,13 @@ This is a tested **staging financial kernel**, not a patch automatically wired i
 
 ## Proposed acceptance gate
 `staging_acceptance.sql` runs synthetic DB-boundary tests under a transaction and rolls them back. A separate multi-session concurrency test is required: the single-transaction SQL cannot establish cross-connection isolation. Production acceptance remains **NO-GO**.
+
+## Additional defense-in-depth verified in isolated staging
+- A BEFORE INSERT conservation trigger rejects raw allocation inserts even if they bypass the controlled preparation function.
+- Finding entitlements cannot be updated or deleted after creation. Adjustments require an independently designed append-only revision protocol.
+- The recovered-cash reporting view is intentionally empty: a free-text verifier name or untrusted provider event is **not** independent proof of funds.
+- Clean-bootstrap CI ran successfully on PostgreSQL 16 for revision `a4a9ebd086fed4e89403474055f624a480c5be3c`.
+- A separate two-connection concurrent transaction race is now in CI and must be accepted independently; this is distinct from the sequential transaction fixtures.
+
+### Current security limit
+The staging project has an isolated database containing only artificial records. The current function is NOT ready to accept live customer records. A service-role grant boundary, verified source/authority enrollment, historical entitlement backfill, reviewer/buyer sign-off, evidence-backed reversals and full HTTP authentication tests are required for production.
