@@ -3,6 +3,8 @@ on:
   push:
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/internal/**"
+      - "freight/site/test_inquiry_case.mjs"
       - "freight/site/site.js"
       - "freight/site/index.html"
       - "freight/site/_headers"
@@ -13,6 +15,8 @@ on:
   pull_request:
     paths:
       - "functions/api/inquiry.js"
+      - "functions/api/internal/**"
+      - "freight/site/test_inquiry_case.mjs"
       - "freight/site/site.js"
       - "freight/site/index.html"
       - "freight/site/_headers"
@@ -40,6 +44,8 @@ jobs:
         run: node --experimental-default-type=module --test freight/site/test_inquiry.mjs
       - name: Real SQLite inquiry retention and legal-hold regressions
         run: python freight/site/test_inquiry_retention.py
+      - name: Verified Access operator and SQLite transition tests
+        run: node --experimental-default-type=module --test freight/site/test_inquiry_case.mjs
       - name: Verify generated Cloudflare-only API Content Security Policy
         env:
           FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com
