@@ -8,6 +8,7 @@ ALTER TABLE inquiry_case_dispositions ADD COLUMN last_actor_sub TEXT;
 ALTER TABLE inquiry_case_dispositions ADD COLUMN last_evidence_digest TEXT;
 ALTER TABLE inquiry_case_dispositions ADD COLUMN last_action_at INTEGER;
 ALTER TABLE inquiry_case_dispositions ADD COLUMN closed_by TEXT;
+ALTER TABLE inquiry_case_dispositions ADD COLUMN hold_by TEXT;
 
 CREATE TABLE IF NOT EXISTS inquiry_case_action_audit (
   action_id TEXT PRIMARY KEY,
