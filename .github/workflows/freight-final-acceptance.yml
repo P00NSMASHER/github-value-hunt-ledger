@@ -15,9 +15,15 @@ jobs:
   exact-head-final-review:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      RETALLY_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Checkout exact proposed head
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Assert actual checked-out source is exact proposed head
+        run: test "$(git rev-parse HEAD)" = "$RETALLY_CANDIDATE_SHA"
       - name: Use Python 3.11
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
@@ -47,7 +53,7 @@ jobs:
           from pathlib import Path
           root=Path('/tmp/retally-final')
           data=json.loads((root/'final_acceptance.json').read_text())
-          assert data['ci_head']==__import__('os').environ['GITHUB_SHA'], 'SOURCE_SHA_MISMATCH'
+          assert data['ci_head']==__import__('os').environ['RETALLY_CANDIDATE_SHA'], 'SOURCE_SHA_MISMATCH'
           assert len(data['pr_chain'])==14
           assert len(data['frozen_source_git_blobs'])==5
           assert len(data['release_gates'])==12
