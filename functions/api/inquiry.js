@@ -218,8 +218,9 @@ async function notify(env, reference, p) {
   const delivered = Array.isArray(json.result.delivered) ? json.result.delivered : [];
   const queued = Array.isArray(json.result.queued) ? json.result.queued : [];
   const suppressed = Array.isArray(json.result.suppressed_recipients) ? json.result.suppressed_recipients : [];
+  const bounced = Array.isArray(json.result.permanent_bounces) ? json.result.permanent_bounces : [];
   const hasTarget = values => values.some(v => typeof v === "string" && v.toLowerCase() === target);
-  return !hasTarget(suppressed) && (hasTarget(delivered) || hasTarget(queued));
+  return !hasTarget(suppressed) && !hasTarget(bounced) && (hasTarget(delivered) || hasTarget(queued));
 }
 export async function onRequestPost({ request, env }) {
   // A backend deployment alone does not enable this service for the public.
