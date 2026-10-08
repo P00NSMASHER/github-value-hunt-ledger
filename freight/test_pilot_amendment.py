@@ -1,6 +1,6 @@
 import json
 import pytest
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 from freight.pilot_activation_packet import build_packet
 from freight.pilot_charter import _canonical_hash, build_charter, from_dict as charter_from_dict
@@ -98,3 +98,36 @@ def test_legacy_out_of_band_fee_still_requires_new_activation_and_band():
     replacement=json.loads(json.dumps(asdict(build_charter(historical_activation(),charter_request()))))
     with pytest.raises(ValueError):
         build_amendment(base,req(fixed_fee_usd=30000,buyer_action_approver_role=None),replacement)
+
+@pytest.mark.parametrize("name", ["buyer_acknowledges_change", "freight_acknowledges_change"])
+@pytest.mark.parametrize("forged", ["false","true",0,1,None,[],{}])
+def test_amendment_acknowledgments_reject_truthy_values(name, forged):
+    with pytest.raises(ValueError,match="must be a boolean"):
+        req(**{name: forged})
+
+
+def test_direct_amendment_dataclass_bypass_is_rejected():
+    forged=replace(req(), buyer_acknowledges_change="false")
+    with pytest.raises(ValueError,match="must be a boolean"):
+        build_amendment(base_charter(),forged)
+
+
+@pytest.mark.parametrize("name", ["carrier_scope","mode_scope"])
+@pytest.mark.parametrize("bad", ["LTL", {"a":1}, 123, [], [" "]])
+def test_amendment_scope_rejects_string_iteration(name, bad):
+    with pytest.raises(ValueError,match="must (?:be|contain)"):
+        req(**{name:bad})
+
+
+@pytest.mark.parametrize("bad", ["100", True, False, float("nan"), float("inf"), -1, 0])
+def test_amendment_fee_rejects_invalid_values(bad):
+    with pytest.raises(ValueError,match="fixed_fee_usd"):
+        req(fixed_fee_usd=bad, buyer_action_approver_role=None)
+
+
+def test_amendment_rejects_rehashed_false_string_in_base_authorization():
+    base=base_charter()
+    base["customer_data_authorized"]="false"
+    base["charter_hash"]=_canonical_hash({k:v for k,v in base.items() if k!="charter_hash"})
+    with pytest.raises(ValueError,match="must be a boolean"):
+        build_amendment(base,req())
