@@ -132,7 +132,6 @@ BUBBLAV_CONNECT_POLICY = (
 BUBBLAV_POLICY_REPLACEMENTS = (
     ("script-src 'self';", "script-src 'self' https://www.bubblav.com;"),
     ("style-src 'self';", "style-src 'self' 'unsafe-inline';"),
-    ("font-src 'self';", "font-src 'self' https://www.bubblav.com;"),
     ("img-src 'self' data:;", "img-src 'self' data: https://www.bubblav.com https://*.bubblav.com;"),
     (
         "connect-src 'none';",
@@ -147,6 +146,16 @@ def _allow_bubblav(content: str, asset: str) -> str:
         if content.count(old) != 1:
             raise ValueError(f"Cannot safely update widget CSP: {asset}: {old}")
         content = content.replace(old, new)
+    # Existing content pages intentionally differ: some allow data: fonts.
+    # Keep that original allowance and add only BubblaV's font origin.
+    font_pattern = r"font-src 'self'( data:)?;"
+    if len(re.findall(font_pattern, content)) != 1:
+        raise ValueError(f"Unexpected font policy: {asset}")
+    content = re.sub(
+        font_pattern,
+        lambda match: f"font-src 'self'{match.group(1) or ''} https://www.bubblav.com;",
+        content,
+    )
     return content
 
 
