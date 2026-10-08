@@ -5,7 +5,7 @@ from dataclasses import asdict
 from freight.pilot_activation_packet import build_packet
 from freight.pilot_charter import build_charter, from_dict as charter_from_dict
 from freight.pilot_amendment import build_amendment, from_dict as amendment_from_dict
-from freight.engagement_state import EngagementState, resolve_engagement
+from freight.engagement_state import EngagementState, resolve_engagement, _hash
 
 def ready_input():
     return {"authorization_documented":True,"read_only_access":True,"population_reproducible":True,"incumbent_output_sealable":True,"settlement_observable":True,"material_authority_reconstructable":True,"customer_identity_stable":True,"carrier_identity_stable":True,"retention_defined":True,"deletion_defined":True,"invoice_source_coverage":1.0,"authority_source_coverage":1.0,"shipment_evidence_coverage":1.0}
@@ -107,3 +107,66 @@ def test_tampered_amendment_hash_is_rejected():
     a["kickoff_suspended"]=False
     with pytest.raises(ValueError,match="Amendment hash mismatch"):
         resolve_engagement(c,[a])
+
+def _rehash_charter(c):
+    c["charter_hash"]=_hash({k:v for k,v in c.items() if k!="charter_hash"})
+    return c
+
+
+@pytest.mark.parametrize("bad", ["false","true",0,1,None,[],{}])
+def test_resolver_rejects_rehashed_false_string_authorization(bad):
+    c=charter(status="BLOCKED",route="DEPLOYED_PILOT_BLOCKED")
+    c["customer_data_authorized"]=bad
+    with pytest.raises(ValueError,match="must be a boolean"):
+        resolve_engagement(_rehash_charter(c))
+
+
+def test_resolver_rejects_rehashed_approval_without_acknowledgment():
+    c=charter()
+    c["acknowledgments"]["buyer_acknowledges_scope"]="false"
+    with pytest.raises(ValueError,match="must be booleans"):
+        resolve_engagement(_rehash_charter(c))
+
+
+def test_resolver_rejects_rehashed_active_state_without_ready_launch():
+    c=charter()
+    c["launch_status"]="BLOCKED"
+    with pytest.raises(ValueError,match="READY launch status"):
+        resolve_engagement(_rehash_charter(c))
+
+
+def test_resolver_rejects_rehashed_unauthorized_active_state():
+    c=charter()
+    c["customer_data_authorized"]=False
+    with pytest.raises(ValueError,match="contradicts state"):
+        resolve_engagement(_rehash_charter(c))
+
+
+def test_resolver_rejects_rehashed_prelaunch_state_claiming_authorization():
+    c=charter(status="BLOCKED",route="DEPLOYED_PILOT_BLOCKED")
+    c["customer_data_authorized"]=True
+    with pytest.raises(ValueError,match="contradicts state"):
+        resolve_engagement(_rehash_charter(c))
+
+
+def test_resolver_rejects_rehashed_wrong_external_action_policy():
+    c=charter()
+    c["external_action_policy"]="AUTO_APPROVE"
+    with pytest.raises(ValueError,match="external action policy"):
+        resolve_engagement(_rehash_charter(c))
+
+
+def test_resolver_rejects_rehashed_amendment_with_forged_boolean():
+    c=charter()
+    a=amendment(c)
+    a["kickoff_suspended"]="false"
+    a["amendment_hash"]=_hash({k:v for k,v in a.items() if k!="amendment_hash"})
+    with pytest.raises(ValueError,match="must be a boolean"):
+        resolve_engagement(c,[a])
+
+
+def test_valid_explicit_false_acknowledgment_stays_prelaunch():
+    c=charter(buyer_acknowledges_scope=False)
+    r=resolve_engagement(c)
+    assert r.engagement_state==EngagementState.PRELAUNCH.value
+    assert r.customer_data_authorized is False
