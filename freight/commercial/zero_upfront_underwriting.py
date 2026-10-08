@@ -22,6 +22,7 @@ REQUIRED_MONEY = (
     "other_delivery_cost_usd",
     "recovery_administration_cost_usd",
     "max_authorized_loss_usd",
+    "max_program_zero_recovery_loss_usd",
 )
 REQUIRED_HOURS = ("analyst_hours", "independent_reviewer_hours", "administrative_hours", "max_authorized_hours")
 REQUIRED_FRACTIONS = (
@@ -37,7 +38,7 @@ REQUIRED_FLAGS = (
     "buyer_data_controls_verified",
     "independent_reviewer_reserved",
 )
-REQUIRED = {"scenario_label", "is_synthetic", *REQUIRED_MONEY, *REQUIRED_HOURS,
+REQUIRED = {"scenario_label", "is_synthetic", "max_founder_program_pilots", *REQUIRED_MONEY, *REQUIRED_HOURS,
             *REQUIRED_FRACTIONS, *REQUIRED_FLAGS}
 
 
@@ -71,6 +72,8 @@ def model_scenario(data: dict) -> dict:
         raise ValueError("real customer inputs prohibited in this public scenario model")
     if not isinstance(data["scenario_label"], str) or not data["scenario_label"].strip():
         raise ValueError("scenario_label required")
+    if type(data["max_founder_program_pilots"]) is not int or not 1 <= data["max_founder_program_pilots"] <= 3:
+        raise ValueError("max_founder_program_pilots must be an integer within [1,3]")
     for flag in REQUIRED_FLAGS:
         if type(data[flag]) is not bool:
             raise ValueError(flag + " must be a boolean")
@@ -87,6 +90,7 @@ def model_scenario(data: dict) -> dict:
     hours = sum((v[name] for name in REQUIRED_HOURS[:3]), ZERO)
     # Exclude the cap itself from the consumed-hours sum.
     costs = hours * v["loaded_hourly_cost_usd"] + v["other_delivery_cost_usd"] + v["recovery_administration_cost_usd"]
+    program_zero_recovery_loss = costs * data["max_founder_program_pilots"]
     # These fractions are hypotheses, not estimated customer recoveries.
     expected_eligible = (v["supported_opportunity_usd"] * v["realization_fraction"]
                          * v["unique_attribution_fraction"] * v["fee_eligibility_fraction"])
@@ -102,6 +106,8 @@ def model_scenario(data: dict) -> dict:
         reasons.append("planned_hours_exceed_cap")
     if costs > v["max_authorized_loss_usd"]:
         reasons.append("zero_recovery_cash_loss_exceeds_cap")
+    if program_zero_recovery_loss > v["max_program_zero_recovery_loss_usd"]:
+        reasons.append("program_zero_recovery_loss_exceeds_cap")
     if expected_fee <= ZERO:
         reasons.append("no_probability_adjusted_fee")
     elif margin < v["target_expected_gross_margin"]:
@@ -119,6 +125,9 @@ def model_scenario(data: dict) -> dict:
             "zero_recovery_loss_usd": dollar(costs),
             "authorized_hour_cap": str(v["max_authorized_hours"]),
             "authorized_loss_cap_usd": dollar(v["max_authorized_loss_usd"]),
+            "founder_program_pilot_slots": data["max_founder_program_pilots"],
+            "program_zero_recovery_loss_usd": dollar(program_zero_recovery_loss),
+            "program_maximum_loss_cap_usd": dollar(v["max_program_zero_recovery_loss_usd"]),
         },
         "illustrative_only": {
             "modeled_supported_opportunity_usd": dollar(v["supported_opportunity_usd"]),
