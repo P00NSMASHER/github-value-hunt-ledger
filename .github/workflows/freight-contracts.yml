@@ -55,6 +55,7 @@ jobs:
           set -euo pipefail
           PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_first_customer_gate.py' -v
           PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_zero_upfront_underwriting.py' -v
+          PYTHONPATH=. python -m unittest discover -s freight/commercial -p 'test_final_commercial_boundary.py' -v
           PYTHONPATH=. python freight/commercial/first_customer_gate.py > /tmp/retally-final-first-customer-gates.json
           python - <<'PY'
           import json
