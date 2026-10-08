@@ -125,7 +125,7 @@ jobs:
           set -euo pipefail
           cid="${{ job.services.postgres.id }}"
           docker exec -i "$cid" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_handler_setup.sql
-          npm install --no-audit --no-fund --ignore-scripts --prefix freight/mission8
+          npm install --no-audit --no-fund --ignore-scripts --legacy-peer-deps --prefix freight/mission8
           ./freight/mission8/node_modules/.bin/tsx freight/mission8/ci_authenticated_handler.mjs
       - name: Preserve authenticated handler integration receipts, including failures
         if: always()
