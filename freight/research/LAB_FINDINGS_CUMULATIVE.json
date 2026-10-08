@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-08",
+  "scope": "SYNTHETIC_LAB_AND_REUSABLE_RESEARCH_ONLY",
+  "entries_total": 26,
+  "first_audit_entries": 8,
+  "second_audit_entries": 18,
+  "notable_prior_count_correction": "Earlier conversational summary said 25; eight separately indexed first-audit findings plus 18 second-audit findings totals 26 row IDs. Related root causes overlap; do not describe as 26 separate remotely exploitable vulnerabilities.",
+  "status": "RELEASE_FINANCIAL_ASSURANCE_BLOCKED",
+  "source_audits": [
+    {
+      "file": "Freight_Laboratories_Independent_Code_Audit.md"
+    },
+    {
+      "file": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md"
+    }
+  ],
+  "cluster_counts": {
+    "state-journal-replay": 4,
+    "source-entitlement": 4,
+    "blind-prediction-oracle": 3,
+    "authorization-fee-terms": 3,
+    "partial-allocations-reversals": 5,
+    "identity-display-namespace": 1,
+    "external-effect-idempotency": 2,
+    "model-metric-integrity": 2,
+    "evidence-source-admission": 1,
+    "release-completeness": 1
+  },
+  "entries": [
+    {
+      "id": "LAB-P0-01",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "state-journal-replay",
+      "summary": "Unbacked candidate balance accepted after direct DB edit",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "LAB-P0-02",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "source-entitlement",
+      "summary": "Changed invoice total not checked against frozen source",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "CANON",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "LAB-P0-03",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "state-journal-replay",
+      "summary": "Phantom cash posting on intake event accepted",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "LAB-P0-04",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "blind-prediction-oracle",
+      "summary": "Expected tariff totals exposed to tested detector",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "TRUSTMESH",
+        "ASSAY"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "LAB-P1-05",
+      "severity": "HIGH",
+      "root_cause_cluster": "authorization-fee-terms",
+      "summary": "Unbound fee percentage accepted without signed terms",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "MINIGRAF",
+        "CANON"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "LAB-P1-06",
+      "severity": "HIGH",
+      "root_cause_cluster": "authorization-fee-terms",
+      "summary": "Revocation blocks later financial correction",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "MINIGRAF",
+        "CANON"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "LAB-P1-07",
+      "severity": "HIGH",
+      "root_cause_cluster": "partial-allocations-reversals",
+      "summary": "Second partial credit rejected after first receipt",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "BCAPPS"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "LAB-P2-08",
+      "severity": "MEDIUM",
+      "root_cause_cluster": "identity-display-namespace",
+      "summary": "Display-name collisions hide distinct customer identities",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Independent_Code_Audit.md",
+      "candidate_sources": [
+        "CANON"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-01",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "partial-allocations-reversals",
+      "summary": "Same invoice recovered in two cases without issue deduplication",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "BCAPPS"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-02",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "source-entitlement",
+      "summary": "Same source imported under two unrelated tenant identities",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "CANON",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-03",
+      "severity": "HIGH",
+      "root_cause_cluster": "authorization-fee-terms",
+      "summary": "String false accepted as contractual consent",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "MINIGRAF",
+        "CANON"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-04",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "blind-prediction-oracle",
+      "summary": "Negative truth invoice still collects modeled fee",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "TRUSTMESH",
+        "ASSAY"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-05",
+      "severity": "HIGH",
+      "root_cause_cluster": "partial-allocations-reversals",
+      "summary": "Customer case closes with outstanding fee",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "BCAPPS"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-06",
+      "severity": "HIGH",
+      "root_cause_cluster": "partial-allocations-reversals",
+      "summary": "Unpaid earned fee survives full credit reversal",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "BCAPPS"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-07",
+      "severity": "MEDIUM",
+      "root_cause_cluster": "external-effect-idempotency",
+      "summary": "Idempotency replay ignores attempted actor identity",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "EFFECT_BROKER"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "D-08",
+      "severity": "HIGH",
+      "root_cause_cluster": "external-effect-idempotency",
+      "summary": "Provider reference collision surfaces raw SQLite integrity error",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "EFFECT_BROKER"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "X-01",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "state-journal-replay",
+      "summary": "Rehashed contradictory event money passes semantic verifier",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "X-02",
+      "severity": "HIGH",
+      "root_cause_cluster": "model-metric-integrity",
+      "summary": "Negative one-million-millisecond modeled latency passes",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "X-03",
+      "severity": "HIGH",
+      "root_cause_cluster": "evidence-source-admission",
+      "summary": "Fabricated HTTPS competitor source passes provenance check",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "TRUSTMESH",
+        "IN_TOTO"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "X-04",
+      "severity": "HIGH",
+      "root_cause_cluster": "model-metric-integrity",
+      "summary": "Negative modeled savings suppressed by zero floor",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "X-05",
+      "severity": "MEDIUM",
+      "root_cause_cluster": "blind-prediction-oracle",
+      "summary": "Contradictory fraud truth flag not detected",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "TRUSTMESH",
+        "ASSAY"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "Y-01",
+      "severity": "HIGH",
+      "root_cause_cluster": "source-entitlement",
+      "summary": "Rehashed forged source digest passes case oracle",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "CANON",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "Y-02",
+      "severity": "CRITICAL",
+      "root_cause_cluster": "state-journal-replay",
+      "summary": "Rehashed $1.2M reconciliation event conflicts with summary",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "Y-03",
+      "severity": "HIGH",
+      "root_cause_cluster": "partial-allocations-reversals",
+      "summary": "Reversal scenario lacks reversal event",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "PAYOPS",
+        "BCAPPS"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "Y-04",
+      "severity": "HIGH",
+      "root_cause_cluster": "source-entitlement",
+      "summary": "Seven copies of forged source identity satisfy cross-lab gate",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "CANON",
+        "TRUSTMESH"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    },
+    {
+      "id": "Z-01",
+      "severity": "HIGH",
+      "root_cause_cluster": "release-completeness",
+      "summary": "Installer reports verified after restoring zero files",
+      "evidence": "REPRODUCED_OFFLINE_PRIOR_AUDIT",
+      "remediation": "OPEN_UNVERIFIED",
+      "source_audit": "Freight_Laboratories_Hidden_Bug_Audit_2026-10-07.md",
+      "candidate_sources": [
+        "FIREDRILL",
+        "IN_TOTO"
+      ],
+      "customer_or_production_impact": "NOT_ESTABLISHED"
+    }
+  ],
+  "change_policy": "Append new findings; never silently erase, renumber or mark fixed without failing pre-fix and passing post-fix tests, exact code revision and independent evidence."
+}
