@@ -130,7 +130,64 @@ BEGIN
   v_currency := p_request->>'currency';
   IF v_currency NOT IN ('USD','EUR','GBP','CAD','AUD','CHF','NZD')
     THEN RAISE EXCEPTION 'unsupported currency minor-unit convention'; END IF;
-  IF v_amount<=0 OR v_currency IS NULL OR v_currency !~ '^[A-Z]{3}
+  IF v_amount<=0 OR v_currency IS NULL OR v_currency !~ '^[A-Z]{3}$'
+     OR nullif(p_request->>'payerId','') IS NULL OR nullif(p_request->>'payeeId','') IS NULL
+     OR length(coalesce(p_request->>'purpose',''))<3
+    THEN RAISE EXCEPTION 'invalid payment parameters'; END IF;
+  v_hash := encode(digest(p_request::text,'sha256'),'hex');
+  -- Lock by tenant + key before checking for an existing exact replay.
+  PERFORM pg_advisory_xact_lock(hashtextextended('m7:idem:'||p_tenant||':'||p_idempotency_key,0));
+  SELECT * INTO v_existing FROM m7_instructions
+    WHERE tenant_id=p_tenant AND idempotency_key=p_idempotency_key;
+  IF FOUND THEN
+    IF v_existing.request_hash<>v_hash OR v_existing.request_payload<>p_request
+      THEN RAISE EXCEPTION 'conflicting idempotency replay'; END IF;
+    RETURN QUERY SELECT v_existing.id,v_hash,true;
+    RETURN;
+  END IF;
+  -- Sorted row locking enforces conservation even under competing concurrent requests.
+  FOR v_item IN SELECT value FROM jsonb_array_elements(p_request->'allocations') AS t(value)
+                ORDER BY value->>'findingId'
+  LOOP
+    IF jsonb_typeof(v_item)<>'object'
+      OR jsonb_typeof(v_item->'amountCents')<>'number'
+      OR nullif(v_item->>'findingId','') IS NULL
+       THEN RAISE EXCEPTION 'invalid allocation item'; END IF;
+    IF (v_item->>'findingId')=ANY(v_seen)
+      THEN RAISE EXCEPTION 'duplicate finding in one payment'; END IF;
+    v_seen:=array_append(v_seen,v_item->>'findingId');
+    v_item_cents:=(v_item->>'amountCents')::bigint;
+    IF v_item_cents<=0 THEN RAISE EXCEPTION 'allocation amount must be positive'; END IF;
+    SELECT * INTO v_finding FROM m7_findings
+      WHERE tenant_id=p_tenant AND id=v_item->>'findingId' FOR UPDATE;
+    IF NOT FOUND THEN RAISE EXCEPTION 'finding outside tenant or missing'; END IF;
+    IF v_finding.currency<>v_currency THEN RAISE EXCEPTION 'mixed currency allocation'; END IF;
+    IF NOT(v_finding.confirmed AND v_finding.authority_verified AND v_finding.source_verified
+      AND v_finding.buyer_eligibility_verified
+      AND v_finding.attribution_state='CHALLENGER_ONLY'
+      AND v_finding.blockers='[]'::jsonb)
+      THEN RAISE EXCEPTION 'finding not independently eligible'; END IF;
+    SELECT coalesce(sum(a.amount_cents),0) INTO v_allocated
+      FROM m7_allocations a
+      WHERE a.tenant_id=p_tenant AND a.economic_key=v_finding.economic_key AND a.currency=v_currency;
+    IF v_allocated+v_item_cents>v_finding.net_new_candidate_cents
+      THEN RAISE EXCEPTION 'economic recovery allocation capacity exceeded'; END IF;
+    v_alloc_total:=v_alloc_total+v_item_cents;
+    IF v_alloc_total>9223372036854775807
+      THEN RAISE EXCEPTION 'allocation sum overflow'; END IF;
+  END LOOP;
+  IF v_alloc_total<>v_amount THEN RAISE EXCEPTION 'allocated cents do not match payment'; END IF;
+  INSERT INTO m7_instructions
+    (tenant_id,idempotency_key,request_hash,request_payload,payer_id,payee_id,currency,amount_cents,purpose)
+  VALUES(p_tenant,p_idempotency_key,v_hash,p_request,p_request->>'payerId',
+         p_request->>'payeeId',v_currency,v_amount,p_request->>'purpose')
+  RETURNING id INTO v_instruction;
+  INSERT INTO m7_allocations(tenant_id,instruction_id,finding_id,economic_key,currency,amount_cents)
+    SELECT p_tenant,v_instruction,f.id,f.economic_key,f.currency,(item.value->>'amountCents')::bigint
+    FROM jsonb_array_elements(p_request->'allocations') item
+    JOIN m7_findings f ON f.tenant_id=p_tenant AND f.id=item.value->>'findingId';
+  RETURN QUERY SELECT v_instruction,v_hash,false;
+END $function$
 
 CREATE TRIGGER m7_allocations_immutable BEFORE DELETE OR UPDATE ON m7_allocations FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
 CREATE TRIGGER m7_instructions_immutable BEFORE DELETE OR UPDATE ON m7_instructions FOR EACH ROW EXECUTE FUNCTION m7_block_mutation();
