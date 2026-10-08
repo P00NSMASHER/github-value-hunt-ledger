@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "scope": "PHASE5_SYNTHETIC_INTEGRATION_EVIDENCE_ONLY",
+  "recorded_at": "2026-10-08",
+  "production_project_id": "c719b60c-9b3b-4193-a543-0be9d3ceaef2",
+  "qa_project_id": "7257eaf3-a4d7-43db-9136-fe81e5df35bf",
+  "production_pg_system_identifier": "7693746749463444100",
+  "qa_pg_system_identifier": "7694294930552894346",
+  "separate_database_cluster_observed": true,
+  "qa_project_published": false,
+  "qa_created_in_this_mission": false,
+  "production_database_writes": 0,
+  "isolated_qa_schema": "phase5_qa",
+  "migration_initial_digest_bug": "restricted search_path prevented unqualified pgcrypto digest, repaired to public.digest",
+  "isolated_qa_concurrency": {
+    "requests": 20,
+    "successful": 20,
+    "created": 1,
+    "idempotent_replays": 19,
+    "distinct_event_ids": 1
+  },
+  "isolated_qa_lifecycle": {
+    "passed_expected_outcomes": 11,
+    "recorded_alpha_events": 4,
+    "recorded_alpha_unknown_events": 2,
+    "recorded_beta_events_before_actor_extension": 1,
+    "provider_reversal_not_bank_recovery": true
+  },
+  "actor_scope_tests": {
+    "unauthorized_actor_denied": true,
+    "authorized_actor_accepted": true,
+    "exact_historical_replay_after_reversal": true,
+    "direct_update_mutation_tested_by_database": false,
+    "direct_update_blocked_by_vm_policy": true
+  },
+  "original_archive": {
+    "sha256": "2dcfd16296454689a391fb76ac57e4a9282091c25d85134334b3c7eeeeafc93b",
+    "original_reproduced_weaknesses": 7,
+    "original_weaknesses_tested": 7
+  },
+  "repaired_archive": {
+    "sha256": "8e0abb53632b82a6228bbf8fe5dc35da14b52ba9b4e1edfb985f62bf96c02e9d",
+    "remaining_five_weaknesses_reproduced": 0,
+    "repaired_total_tests": 89,
+    "sqlite_resource_cleanup_warnings": true
+  },
+  "original_historical_findings_open": 26,
+  "historical_findings_closed": 0,
+  "hosted_production_recoveryos_application_parity_proven": false,
+  "external_bank_carrier_buyer_authority_proven": false,
+  "actual_retally_revenue_cents": 0,
+  "actual_customer_recovery_cents": 0,
+  "existing_phase4_python_labs": 14,
+  "qa_database_transactional_payment_contract_tested": true,
+  "qa_signed_external_provenance": false,
+  "release_readiness": "BLOCKED_NEEDS_REAL_EXTERNAL_AUTHORITY_AND_HOSTED_APPLICATION_PARITY"
+}
