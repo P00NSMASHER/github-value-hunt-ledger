@@ -53,6 +53,21 @@ BEGIN
  EXCEPTION WHEN raise_exception THEN
    IF SQLERRM='cross tenant allocated' THEN RAISE; END IF;
  END;
+ BEGIN
+   INSERT INTO m7_allocations(tenant_id,instruction_id,finding_id,economic_key,currency,amount_cents)
+   VALUES('ACCEPT_T1',v,'USD1','U1','USD',1);
+   RAISE EXCEPTION 'direct allocation overflow accepted';
+ EXCEPTION WHEN raise_exception THEN
+   IF SQLERRM='direct allocation overflow accepted' THEN RAISE; END IF;
+ END;
+ BEGIN
+   UPDATE m7_findings SET net_new_candidate_cents=1 WHERE tenant_id='ACCEPT_T1' AND id='USD1';
+   RAISE EXCEPTION 'economic entitlement mutation accepted';
+ EXCEPTION WHEN raise_exception THEN
+   IF SQLERRM='economic entitlement mutation accepted' THEN RAISE; END IF;
+ END;
+ IF (SELECT count(*) FROM m7_reconciled_cash_by_currency)<>0
+   THEN RAISE EXCEPTION 'unverified cash was reported'; END IF;
  IF (SELECT sum(amount_cents) FROM m7_allocations WHERE tenant_id='ACCEPT_T1' AND finding_id='USD1')<>100000
    THEN RAISE EXCEPTION 'conservation failed'; END IF;
 END $m7$;
