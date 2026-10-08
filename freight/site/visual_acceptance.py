@@ -35,11 +35,24 @@ MEASURE = """() => {
          right:Math.round(e.getBoundingClientRect().right),
          left:Math.round(e.getBoundingClientRect().left)}));
  const date=document.querySelector('.report-population span:last-child');
+ const footerBrand=document.querySelector('.home-simple .simple-footer > div:first-child > a.brand');
+ const footerEmail=document.querySelector('.home-simple .simple-footer > div:first-child > a[data-contact-link]');
+ let footerContact=null;
+ if(footerBrand&&footerEmail){
+   const b=footerBrand.getBoundingClientRect(),e=footerEmail.getBoundingClientRect();
+   footerContact={
+     gapPx:Math.round((e.top-b.bottom)*10)/10,
+     touchHeightPx:Math.round(e.height*10)/10,
+     withinViewport:e.left>=-1&&e.right<=innerWidth+1,
+     nonOverlapping:e.top>=b.bottom+12,
+     emailReadable:getComputedStyle(footerEmail).visibility==='visible'
+   };
+ }
  return {innerWidth,documentWidth:doc.scrollWidth,bodyWidth:body.scrollWidth,
    overflow:Math.max(doc.scrollWidth,body.scrollWidth)-innerWidth,offenders:extents,
    dateWidth:date?Math.round(date.getBoundingClientRect().width):null,
    dateUnbroken:date?getComputedStyle(date).whiteSpace==='nowrap':null,
-   title:document.title,
+   title:document.title,footerContact,
    requiredLabels:[...document.querySelectorAll('input[required],select[required]')]
      .filter(e=>!e.labels?.length && !e.getAttribute('aria-label')).map(e=>e.name||e.id)
   };
@@ -140,6 +153,15 @@ def measure(bundle: Path, output: Path) -> dict:
             results.append({"page":"chat-launcher","viewport":"390x844","overflow":0,
                 "missingImages":[],"jsErrors":["Launcher open/close/fallback contract failed"],
                 "requiredLabels":[],"httpStatus":200,"screenshot":"n/a"})
+    # The footer has its own acceptance gate because contact links can collide
+    # without causing overflow or a JavaScript error.
+    for record in results:
+        if record["page"] == "home":
+            footer = record.get("footerContact")
+            if not footer or footer["gapPx"] < 12 or footer["touchHeightPx"] < 44 \
+                    or not footer["nonOverlapping"] or not footer["withinViewport"] \
+                    or not footer["emailReadable"]:
+                record["jsErrors"].append("Footer logo/contact spacing or touch-target failure")
     summary = {"screenshots":len(results),
       "screens":[r["screenshot"] for r in results],
       "issues":[r for r in results if r["overflow"]>1 or r["missingImages"]
@@ -163,7 +185,7 @@ def main() -> int:
       "issues":[{"page":r["page"],"viewport":r["viewport"],
                  "overflow":r["overflow"],"missingImages":r["missingImages"],
                  "jsErrors":r["jsErrors"],"requiredLabels":r["requiredLabels"],
-                 "menuExpanded":r.get("menuExpanded")} for r in result["issues"]]
+                 "menuExpanded":r.get("menuExpanded"),"footerContact":r.get("footerContact")} for r in result["issues"]]
     },indent=2))
     return int(args.fail_on_issues and bool(result["issues"]))
 
