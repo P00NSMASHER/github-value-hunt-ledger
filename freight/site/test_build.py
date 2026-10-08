@@ -328,7 +328,7 @@ class PublicBuildTests(unittest.TestCase):
             report = (output / "recovery-status-example.html").read_text()
             example = (output / "freight-audit-example.html").read_text()
             self.assertIn("Northstar Industrial Supply", report)
-            self.assertIn("Sample Population · 2026-01-01 through 2026-03-31", report)
+            self.assertIn("Sample Population</span><span>2026-01-01 through 2026-03-31</span>", report)
             self.assertIn('class="button button-light report-back"', report)
             self.assertNotIn('class="report-notice"', report)
             self.assertIn("This scenario uses sample data only.", example)
