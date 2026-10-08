@@ -24,7 +24,7 @@ SOURCE_SAMPLE_URL = (
 BTS_FIELD_REFERENCE = "https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=GEE"
 # Exact Git blob of the curated 20-row fixture. This pins integrity of the file,
 # not official BTS authentication or permission to use a full dataset for ML.
-PINNED_FIXTURE_BLOB = "e49629f7754186f33e4c95e95546e6a599d36254"
+PINNED_FIXTURE_BLOB = "90de471b78ad61fced14d4436b33f392b533ee83"
 COLUMNS = (
     "source_row", "year", "month", "carrier_code", "origin", "destination",
     "freight_pounds", "mail_pounds", "distance_miles",
