@@ -90,6 +90,31 @@ test("server feature is disabled without verified mailbox and explicit release f
   assert.deepEqual(await (await onRequestGet({env:env(mockDb())})).json(),
     {online:true,siteKey:"sitekey-synthetic-123456"});
 });
+test("all independent online-intake activation gates fail closed", async () => {
+  const cases = [
+    ["owner has not enabled the service", e => { e.FREIGHT_INQUIRY_ENABLED = "0"; }],
+    ["business mailbox has not been independently verified", e => { e.FREIGHT_INQUIRY_MAILBOX_VERIFIED = "0"; }],
+    ["email-sending API token was never installed", e => { delete e.CLOUDFLARE_EMAIL_API_TOKEN; }],
+    ["durable inquiry database is missing", e => { delete e.INQUIRY_DB; }],
+    ["Turnstile secret is missing", e => { delete e.TURNSTILE_SECRET; }],
+    ["rate limiter secret is missing", e => { delete e.INQUIRY_RATE_SECRET; }],
+    ["business notification recipient does not match", e => { e.INQUIRY_NOTIFY_TO = "other@example.org"; }],
+    ["notification sender does not use the business domain", e => { e.INQUIRY_NOTIFY_FROM = "other@example.org"; }],
+  ];
+  for (const [reason, disable] of cases) {
+    const db = mockDb();
+    const e = env(db);
+    disable(e);
+    const status = await onRequestGet({env:e});
+    assert.equal(status.status, 503, reason);
+    assert.deepEqual(await status.json(), {online:false}, reason);
+    const attemptedPost = await onRequestPost({request:request(),env:e});
+    assert.equal(attemptedPost.status, 503, reason);
+    assert.equal((await attemptedPost.json()).ok, false, reason);
+    assert.equal(db.inquiries.size, 0, reason);
+  }
+});
+
 test("invalid content type and cross-origin POST fail before any storage", async () => {
   const e=env(mockDb());
   assert.equal((await onRequestPost({request:request(good(),{contentType:"multipart/form-data"}),env:e})).status,415);
