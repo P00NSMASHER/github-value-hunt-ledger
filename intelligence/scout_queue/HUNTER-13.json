@@ -15,17 +15,17 @@
       "default_branch": "main",
       "description": "Roblox Remote Event Monitor 2026: Best Networking Analytics Tool for Developers",
       "discovery_query": "Roblox telemetry analytics Luau",
-      "exact_revision": "f7a7eaf9bf1b7482b08bc2d3a69a7ae91a4743e2",
+      "exact_revision": "5e5a2ab2db3e0f9121dfe5ee8c505c4feb8f5a07",
       "forks": 0,
       "primary_language": "HTML",
       "published_license_spdx": "UNKNOWN",
-      "pushed_at": "2026-10-08T07:03:40Z",
+      "pushed_at": "2026-10-08T15:18:55Z",
       "repository": "manindesguise-source/net-lens-telemetry",
       "root_code_signals": [
         ".github"
       ],
-      "size_kb": 222,
-      "stars": 0,
+      "size_kb": 224,
+      "stars": 70,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "luau",
@@ -42,11 +42,11 @@
         "license_metadata": 1,
         "not_archived": 5,
         "root_code_signals": 2,
-        "stars": 0,
+        "stars": 7,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 36,
+      "triage_score": 43,
       "url": "https://github.com/manindesguise-source/net-lens-telemetry"
     }
   ],
@@ -55,7 +55,7 @@
     43,
     45
   ],
-  "generated_at": "2026-10-08T10:56:20.832170+00:00",
+  "generated_at": "2026-10-08T20:49:30.258260+00:00",
   "mission": "Roblox liveops, telemetry, experimentation, privacy-minimized analytics and release observability",
   "risk_review": [],
   "risk_review_count": 0,

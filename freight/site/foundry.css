@@ -294,3 +294,220 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
  .retally-chat-launcher:hover,.retally-chat-launcher:active {transform:none}
 }
 @media print{.retally-chat-launcher {display:none!important}}
+
+
+/* RETALLY Signature Finish v1.
+   Selected commercial surfaces only: conversion controls, sample audit,
+   pricing, and first-contact form. The reference is the approved chat orb.
+   No changes to typography, site geometry, legal/technical prose or data. */
+:root{
+ --retally-sf-edge:rgba(182,249,207,.48);
+ --retally-sf-highlight:rgba(255,255,255,.33);
+ --retally-sf-control-shadow:0 10px 22px rgba(3,61,42,.22),0 3px 7px rgba(2,31,23,.18);
+ --retally-sf-card-shadow:0 22px 48px rgba(4,44,32,.11),0 5px 14px rgba(4,44,32,.045);
+ --retally-sf-focus:#097b51;
+}
+
+/* Key CTAs carry the polished emerald finish; ordinary content links stay flat. */
+.button-signal,.button-cobalt{
+ position:relative;isolation:isolate;overflow:hidden;
+ border:1px solid rgba(193,255,219,.48);
+ border-radius:9px;color:#fff;
+ background:linear-gradient(166deg,rgba(255,255,255,.21),transparent 48%),
+            linear-gradient(128deg,#0b8055 0%,#086f4b 45%,#07553a 100%);
+ box-shadow:inset 0 1px 1px rgba(255,255,255,.42),
+            inset 0 -2px 3px rgba(2,49,36,.22),
+            var(--retally-sf-control-shadow);
+ text-shadow:0 1px 1px rgba(1,40,25,.2);
+ transition:transform .18s ease,box-shadow .18s ease,filter .18s ease,border-color .18s ease;
+}
+.button-signal::before,.button-cobalt::before{
+ content:"";position:absolute;inset:1px 2px auto;height:43%;
+ border-radius:8px 8px 45% 45%;
+ background:linear-gradient(180deg,var(--retally-sf-highlight),rgba(255,255,255,.06) 75%,transparent);
+ pointer-events:none;
+}
+.button-signal:hover,.button-cobalt:hover{
+ color:#fff;border-color:rgba(218,255,230,.7);
+ background:linear-gradient(160deg,rgba(255,255,255,.23),transparent 49%),
+            linear-gradient(128deg,#0c8758 0%,#087952 48%,#064b37 100%);
+ box-shadow:inset 0 1px 1px rgba(255,255,255,.5),
+            inset 0 -2px 3px rgba(2,49,36,.25),
+            0 15px 28px rgba(3,61,42,.26),0 4px 9px rgba(2,31,23,.14);
+ transform:translateY(-2px);
+}
+.button-signal:active,.button-cobalt:active{
+ transform:translateY(0);filter:brightness(.97);
+ box-shadow:inset 0 2px 6px rgba(0,30,21,.26),0 3px 8px rgba(3,61,42,.16);
+}
+.button-signal:focus-visible,.button-cobalt:focus-visible{
+ outline:3px solid #b6ffdd;outline-offset:3px;
+}
+.button-signal:disabled,.button-cobalt:disabled{
+ cursor:not-allowed;opacity:.66;transform:none;filter:none;
+}
+.site-header{
+ background:linear-gradient(180deg,rgba(12,66,49,.99),rgba(5,43,36,.98));
+ border-bottom:1px solid rgba(174,250,206,.17);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 3px 14px rgba(3,38,30,.10);
+}
+.site-header .navlinks>.button-light{
+ border:1px solid rgba(255,255,255,.7);
+ background:linear-gradient(180deg,#fff,#eaf7ef);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 5px 16px rgba(0,27,19,.17);
+ color:#0c4333;
+}
+.site-header .navlinks>.button-light:hover{
+ color:#093f2e;background:linear-gradient(180deg,#fff,#e0f5e8);
+ box-shadow:inset 0 1px 0 #fff,0 7px 18px rgba(0,27,19,.19);
+}
+.site-header .menu-toggle{
+ border-color:rgba(209,253,224,.39);border-radius:9px;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+}
+.home-simple .hero-wash{
+ background:
+  radial-gradient(ellipse at 86% 28%,rgba(50,154,105,.19),transparent 52%),
+  linear-gradient(90deg,rgba(2,34,29,.97) 0%,rgba(4,49,39,.87) 43%,rgba(6,65,50,.44) 76%,rgba(6,65,50,.16) 100%),
+  linear-gradient(0deg,rgba(2,31,27,.72),transparent 57%);
+}
+
+/* This is an illustrative audit preview, not a customer-results dashboard. */
+.home-simple .opportunity-card{
+ position:relative;isolation:isolate;
+ border:1px solid rgba(224,255,237,.94);border-radius:14px;
+ background:linear-gradient(157deg,#fff 0%,#fafefa 55%,#edf8f1 100%);
+ box-shadow:inset 0 2px 0 rgba(255,255,255,.98),
+            inset 0 -1px 0 rgba(17,105,68,.08),
+            0 26px 56px rgba(0,24,19,.29),0 7px 17px rgba(0,27,22,.14);
+}
+.home-simple .opportunity-card::before{
+ content:"";pointer-events:none;position:absolute;
+ inset:0 0 auto;height:5px;border-radius:14px 14px 0 0;
+ background:linear-gradient(90deg,rgba(11,113,73,.13),rgba(255,255,255,.8) 55%,rgba(11,113,73,.13));
+}
+.home-simple .opportunity-grid strong{
+ color:#143b30;font-variant-numeric:tabular-nums;
+ letter-spacing:-.025em;
+}
+.home-simple .opportunity-topline>strong{color:#153d31}
+.home-simple .sample-chip{
+ border:1px solid #ccead7;border-radius:6px;
+ background:linear-gradient(180deg,#f2fff7,#e5f5eb);
+ color:#1c6144;box-shadow:inset 0 1px 0 #fff;
+}
+.home-simple .opportunity-note{color:#49665a}
+
+/* One luminous audit offer, one restrained dark recovery card. */
+.home-simple .price-card{
+ position:relative;isolation:isolate;overflow:hidden;border-radius:14px;
+}
+.home-simple .price-card-primary{
+ border:1px solid #c8e7d5;border-top:5px solid #0b9562;
+ background:linear-gradient(160deg,#fff 0%,#fbfffc 45%,#edf8f1 100%);
+ box-shadow:inset 0 2px 0 rgba(255,255,255,.97),var(--retally-sf-card-shadow);
+}
+.home-simple .price-card-primary::before{
+ content:"";pointer-events:none;position:absolute;top:0;right:0;
+ width:52%;height:55%;
+ background:radial-gradient(circle at 100% 0%,rgba(108,205,155,.12),transparent 72%);
+}
+.home-simple .price-card-primary .price strong{color:#08573c}
+.home-simple .price-card-dark{
+ border:1px solid #1c5a43;border-top:5px solid #79d7a2;
+ background:radial-gradient(ellipse at 94% 4%,rgba(86,183,125,.23),transparent 55%),
+            linear-gradient(150deg,#104c3a 0%,#07362b 51%,#052821 100%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.16),
+            0 14px 34px rgba(3,44,32,.18);
+}
+.home-simple .price-card-dark::before{
+ content:"";pointer-events:none;position:absolute;
+ left:20px;right:20px;top:1px;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(226,255,234,.44),transparent);
+}
+.home-simple .price-card-dark h3,
+.home-simple .price-card-dark .price strong{color:#fff}
+.home-simple .price-card-dark .price span{color:#d0e8da}
+
+/* Public qualification is deliberately clean, not an imitation banking portal. */
+.home-simple .form-shell{
+ border:1px solid #c8e0d2;border-radius:14px;
+ background:linear-gradient(180deg,#fff,#fcfffd);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.94),
+            0 22px 48px rgba(7,61,43,.10),0 5px 12px rgba(7,61,43,.045);
+}
+.home-simple .field-grid input,
+.home-simple .field-grid select,
+.home-simple .qualification-details input,
+.home-simple .qualification-details select,
+.home-simple .qualification-details textarea{
+ border-radius:8px;border:1px solid #b5cbbf;
+ box-shadow:inset 0 1px 3px rgba(15,62,42,.045);
+ background-color:#fff;
+ transition:border-color .16s ease,box-shadow .16s ease;
+}
+.home-simple .field-grid input:hover,
+.home-simple .field-grid select:hover,
+.home-simple .qualification-details input:hover,
+.home-simple .qualification-details select:hover,
+.home-simple .qualification-details textarea:hover{
+ border-color:#6d9c84;
+}
+.home-simple .field-grid input:focus,
+.home-simple .field-grid select:focus,
+.home-simple .qualification-details input:focus,
+.home-simple .qualification-details select:focus,
+.home-simple .qualification-details textarea:focus{
+ border-color:var(--retally-sf-focus);
+ outline:2px solid rgba(16,154,96,.19);outline-offset:1px;
+ box-shadow:0 0 0 4px rgba(12,136,81,.09);
+}
+.home-simple .choice-grid span{
+ border-radius:8px;border-color:#c7dacf;
+ background:#f9fcfa;
+ transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.home-simple .choice-grid input:checked+span{
+ border-color:#0b7e54;background:#e3f5ea;color:#07543b;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+}
+.home-simple .choice-grid input:focus-visible+span{
+ outline:3px solid #087a50;outline-offset:3px;
+}
+.home-simple .qualification-details{
+ background:#f8fcf9;border-color:#cfe4d6;border-radius:9px;
+}
+.home-simple .audit-ready .ready-mark{
+ background:linear-gradient(160deg,#e9fff0,#d1f2dd);
+ box-shadow:inset 0 1px 0 #fff,0 6px 15px rgba(5,92,57,.10);
+}
+/* Financial reporting stays quiet; only the actual-net-recovery sample state is highlighted. */
+.sample-report .report-card.net{
+ border-color:#0b8054;
+ background:linear-gradient(153deg,#f7fffa,#e8f6ed);
+ box-shadow:inset 0 1px 0 #fff,0 9px 22px rgba(6,67,44,.07);
+}
+.sample-report .report-card.net strong{color:#07553a}
+
+/* No continuous motion, expensive blurred overlays or print decoration. */
+@media(max-width:860px){
+ .home-simple .hero-wash{
+  background:radial-gradient(ellipse at 90% 15%,rgba(45,141,97,.13),transparent 57%),
+             linear-gradient(90deg,rgba(2,34,29,.94),rgba(5,57,44,.71)),
+             linear-gradient(0deg,rgba(2,31,27,.79),transparent 70%);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .button-signal,.button-cobalt,
+ .home-simple .field-grid input,.home-simple .field-grid select,
+ .home-simple .qualification-details input,.home-simple .qualification-details select,
+ .home-simple .qualification-details textarea,.home-simple .choice-grid span{transition:none}
+ .button-signal:hover,.button-cobalt:hover,.button-signal:active,.button-cobalt:active{transform:none}
+}
+@media print{
+ .button-signal,.button-cobalt,.home-simple .price-card,
+ .home-simple .opportunity-card,.home-simple .form-shell,
+ .sample-report .report-card.net{
+  box-shadow:none!important;background:#fff!important;color:#000!important;
+ }
+}
