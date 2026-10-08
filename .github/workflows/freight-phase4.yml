@@ -5,6 +5,10 @@ on:
       - 'freight/lab_phase4_director.py'
       - 'freight/test_lab_phase4_director.py'
       - 'freight/lab_phase4_control_center.py'
+      - 'freight/lab_phase4_experiments.py'
+      - 'freight/test_lab_phase4_experiments.py'
+      - 'freight/lab_phase4_mock_provider.py'
+      - 'freight/test_lab_phase4_mock_provider.py'
       - 'freight/PHASE4_EXECUTION.md'
       - '.github/workflows/freight-phase4.yml'
   workflow_dispatch:
@@ -24,7 +28,7 @@ jobs:
       - name: Install pinned project test dependencies
         run: python -m pip install -r production/requirements-ci.txt
       - name: Test fourteen laboratory actual-code callsites and original domain chain
-        run: PYTHONPATH=. python -m pytest -q freight/test_lab_phase4_director.py freight/test_lab_phase3_real_chain.py freight/test_lab_phase3_economics.py freight/test_lab_phase3_simulated_pilot.py freight/test_lab_phase3_trust.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_lab_phase4_director.py freight/test_lab_phase4_experiments.py freight/test_lab_phase4_mock_provider.py freight/test_lab_phase3_real_chain.py freight/test_lab_phase3_economics.py freight/test_lab_phase3_simulated_pilot.py freight/test_lab_phase3_trust.py
       - name: Produce bounded synthetic execution report
         run: |
           PYTHONPATH=. python -m freight.lab_phase4_control_center --out /tmp/retally-phase4
@@ -41,6 +45,15 @@ jobs:
           print('Scope: synthetic Python modules, NOT production or bank evidence')
           print('Executed labs:',d['executed_labs'])
           print('Blocked labs:',d['failed_or_blocked_labs'])
+          PY
+      - name: Confirm no external payment provider or hosted customer impact
+        run: |
+          python - <<'PY'
+          from freight.lab_phase4_mock_provider import MockProviderLedger
+          from freight.lab_phase4_experiments import load_findings,select_experiments
+          assert len(select_experiments(load_findings(),max_experiments=4))==4
+          assert MockProviderLedger.__module__=="freight.lab_phase4_mock_provider"
+          print("Boun​ded local campaign; mock SQLite only, no provider network calls")
           PY
       - name: Preserve audit registry and earlier research gates
         run: PYTHONPATH=. python -m pytest -q freight/test_lab_hunter_research_registry.py freight/test_lab_phase2_existing_settlement_bridge.py
