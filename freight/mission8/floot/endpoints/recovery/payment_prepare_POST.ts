@@ -24,19 +24,21 @@ export async function handle(request: Request) {
       finding_ids:orderedIds, idempotency_key:input.idempotencyKey,
     };
     const instructionHash = recoveryHash(body);
+    // Floot's Kysely CamelCasePlugin normalizes returned PostgreSQL field names.
+    // A financial DB commit must not be misreported as an HTTP failure.
     const result = await sql<{
-      instruction_id:string;instruction_hash:string;replayed:boolean;
+      instructionId:string;instructionHash:string;replayed:boolean;
     }>`SELECT * FROM recovery_prepare_financial_instruction(
         ${access.tenantId}::text,${access.userId}::bigint,
         ${body}::jsonb,${instructionHash}::text
       )`.execute(db);
     const entry = result.rows[0];
-    if (!entry || entry.instruction_hash!==instructionHash) {
+    if (!entry || entry.instructionHash!==instructionHash) {
       throw new Error("Financial allocation reconciliation failed");
     }
     const output: OutputType = {
-      instructionId:entry.instruction_id,
-      instructionHash:entry.instruction_hash,
+      instructionId:entry.instructionId,
+      instructionHash:entry.instructionHash,
       status:"PREPARED",
     };
     return new Response(superjson.stringify(output),{headers:{"Content-Type":"application/json"}});
@@ -48,4 +50,3 @@ export async function handle(request: Request) {
     return new Response(superjson.stringify({error:message}),{status:400});
   }
 }
-
