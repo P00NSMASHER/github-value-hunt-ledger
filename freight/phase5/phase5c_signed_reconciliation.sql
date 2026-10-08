@@ -51,6 +51,9 @@ CREATE TABLE IF NOT EXISTS phase5c_qa.documents (
  CHECK ((kind='CONTRACT' AND amount_cents=0 AND fee_bps BETWEEN 1 AND 9999)
       OR (kind<>'CONTRACT' AND fee_bps IS NULL AND amount_cents>0))
 );
+-- An external document may not be relabeled with a fresh record ID to count twice.
+CREATE UNIQUE INDEX IF NOT EXISTS phase5c_one_artifact_per_economic_kind
+ ON phase5c_qa.documents(tenant_id,case_id,kind,source_sha256);
 CREATE OR REPLACE FUNCTION phase5c_qa.guard_signed_financial_record()
 RETURNS trigger LANGUAGE plpgsql SET search_path=pg_catalog,phase5c_qa AS $body$
 DECLARE c record; signer record; predecessor record; cap bigint; used bigint; earned bigint;
@@ -113,10 +116,11 @@ BEGIN
  ELSIF NEW.kind='CUSTOMER_REVERSAL' THEN
    SELECT * INTO predecessor FROM phase5c_qa.documents
    WHERE tenant_id=NEW.tenant_id AND case_id=NEW.case_id AND record_id=NEW.reference_id AND kind='CUSTOMER_POST';
+   IF NOT FOUND THEN RAISE EXCEPTION 'UNBACKED_EXCESSIVE_REVERSAL'; END IF;
    SELECT COALESCE(sum(amount_cents),0) INTO used FROM phase5c_qa.documents
    WHERE tenant_id=NEW.tenant_id AND case_id=NEW.case_id AND kind='CUSTOMER_REVERSAL'
      AND reference_id=NEW.reference_id;
-   IF NOT FOUND OR predecessor.occurred_at>NEW.occurred_at
+   IF predecessor.occurred_at>NEW.occurred_at
     OR NEW.amount_cents+used>predecessor.amount_cents
    THEN RAISE EXCEPTION 'UNBACKED_EXCESSIVE_REVERSAL'; END IF;
  ELSE
@@ -137,7 +141,8 @@ BEGIN
       OR invoice_total-invoice_credits-NEW.amount_cents>earned)
    THEN RAISE EXCEPTION 'INCORRECT_FEE_CREDIT'; END IF;
    IF NEW.kind='FEE_REFUND' AND (refunded+NEW.amount_cents>collected
-      OR NEW.amount_cents>collected-refunded-earned)
+      OR NEW.amount_cents>collected-refunded-earned
+      OR invoice_total-invoice_credits<>earned)
    THEN RAISE EXCEPTION 'REFUND_NOT_DUE_OR_DUPLICATE'; END IF;
  END IF;
  RETURN NEW;
