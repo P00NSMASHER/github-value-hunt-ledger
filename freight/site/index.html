@@ -9,7 +9,7 @@
   <meta name="freight-contact-email" content="">
   <meta name="site-release" content="free-audit-contingency-v5">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
   <title>RETALLY | Freight Recovery & Audit Services</title>
   <link rel="canonical" href="https://p00nsmasher.github.io/github-value-hunt-ledger/">
   <meta property="og:type" content="website">
@@ -205,6 +205,7 @@
             </details>
 
             <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
+            <a class="text-button" id="auditEmailFallback" href="#contact-pending" hidden>Use the email option instead</a>
             <div class="form-actions form-actions-simple"><button class="button button-signal" type="submit">Open My Free Audit Request</button><small>Opens an email draft. Review it and press Send.</small></div>
           </fieldset>
         </form>
