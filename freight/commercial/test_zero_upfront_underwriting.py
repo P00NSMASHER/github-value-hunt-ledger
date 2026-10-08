@@ -63,6 +63,22 @@ class NoUpfrontUnderwriting(unittest.TestCase):
         self.assertIn("no_probability_adjusted_fee",r["blocking_reasons"])
         self.assertEqual(r["illustrative_only"]["break_even_supported_opportunity_usd"],None)
 
+    def test_three_pilot_downside_is_counted(self):
+        r=model_scenario(self.scenario())
+        self.assertEqual(r["cost"]["founder_program_pilot_slots"],3)
+        self.assertEqual(r["cost"]["program_zero_recovery_loss_usd"],"7500.00")
+        self.assertEqual(r["cost"]["program_maximum_loss_cap_usd"],"8000.00")
+
+    def test_portfolio_cap_blocks_even_if_individual_cap_passes(self):
+        r=model_scenario(self.scenario(max_program_zero_recovery_loss_usd="7000.00"))
+        self.assertIn("program_zero_recovery_loss_exceeds_cap",r["blocking_reasons"])
+        self.assertNotIn("zero_recovery_cash_loss_exceeds_cap",r["blocking_reasons"])
+
+    def test_founder_slots_are_bounded_to_three(self):
+        for val in (0, 4, "3", True):
+            with self.subTest(val=val), self.assertRaisesRegex(ValueError,"max_founder_program_pilots"):
+                model_scenario(self.scenario(max_founder_program_pilots=val))
+
     def test_owner_labor_cannot_be_free(self):
         with self.assertRaisesRegex(ValueError,"founder/reviewer"):
             model_scenario(self.scenario(loaded_hourly_cost_usd="0"))
