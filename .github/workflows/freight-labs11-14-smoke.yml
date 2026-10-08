@@ -4,6 +4,7 @@ on:
     paths:
       - 'freight/labs11_14.py'
       - 'freight/test_labs11_14.py'
+      - 'freight/test_labs11_14_actual_domain.py'
       - 'freight/LABS11_14_EVIDENCE.md'
       - '.github/workflows/freight-labs11-14-smoke.yml'
   workflow_dispatch:
@@ -24,6 +25,10 @@ jobs:
           python-version: '3.11'
       - name: Execute isolated synthetic tests
         run: python -m unittest -v freight.test_labs11_14
+      - name: Install repository test dependencies
+        run: python -m pip install -r production/requirements-ci.txt
+      - name: Probe actual repository domains with fictional evidence
+        run: PYTHONPATH=. python -m pytest -q freight/test_labs11_14_actual_domain.py
       - name: State claim boundary
         run: |
           echo 'Offline synthetic-only simulation. NO customer outcome, SOC2, penetration test, or bank transfer proved.'
