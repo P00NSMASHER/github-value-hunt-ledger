@@ -96,11 +96,12 @@ class Phase5FPrivilegeBoundary(unittest.TestCase):
             self.assertTrue(con.execute("SELECT has_table_privilege(%s,'phase5c_qa.documents','INSERT')",
                                        (ADMISSION,)).fetchone()[0])
 
-    def test_proposed_admission_role_still_cannot_verify_signatures_known_gap(self):
-        """A forged Ed25519 signature-shaped field persists under an authorized
-        admission INSERT, proving this role is not itself a cryptographic guard.
-        Everything is rolled back. A real isolated signer verifier must control
-        access to this role via a distinct LOGIN principal, not the Floot owner.
+    def test_admission_role_denied_by_parent_case_row_lock_fail_closed(self):
+        """INSERT grant alone cannot bypass the parent-case FOR UPDATE lock.
+        This role currently cannot admit ANY document, even a legitimate one.
+        Never grant broad UPDATE privilege to make this artificial test pass.
+        An independent verifier service must own a narrowly controlled writer
+        path and Ed25519 admission before the role is made operational.
         """
         with closing(self.con()) as con:
             con.execute("BEGIN")
@@ -126,18 +127,15 @@ class Phase5FPrivilegeBoundary(unittest.TestCase):
                 }
                 con.execute("SET LOCAL ROLE retally_p5f_independent_admission")
                 self.assertEqual(con.execute("SELECT current_user").fetchone()[0],ADMISSION)
-                con.execute("""INSERT INTO phase5c_qa.documents(
-                  tenant_id,case_id,record_id,kind,economic_key,reference_id,
-                  amount_cents,fee_bps,currency,occurred_at,source_sha256,issuer_key_id,
-                  body,signature_b64) VALUES(%s,%s,%s,'CONTRACT',%s,NULL,0,3000,
-                  'USD','2026-10-03T12:00:00Z',%s,%s,%s,%s)""",
-                  (tenant,case,"SIM-P5F-FAKE-SIGNATURE","SIM-P5F-FAKE-ECO",
-                   "a"*64,kid,Jsonb(document),"A"*88))
-                row=con.execute("""SELECT signature_b64 FROM phase5c_qa.documents
-                    WHERE tenant_id=%s AND record_id='SIM-P5F-FAKE-SIGNATURE'""",
-                    (tenant,)).fetchone()
-                self.assertIsNotNone(row)
-                self.assertEqual(row[0],"A"*88)
+                with self.assertRaisesRegex(psycopg.errors.InsufficientPrivilege,
+                                            "permission denied for table cases"):
+                    con.execute("""INSERT INTO phase5c_qa.documents(
+                      tenant_id,case_id,record_id,kind,economic_key,reference_id,
+                      amount_cents,fee_bps,currency,occurred_at,source_sha256,issuer_key_id,
+                      body,signature_b64) VALUES(%s,%s,%s,'CONTRACT',%s,NULL,0,3000,
+                      'USD','2026-10-03T12:00:00Z',%s,%s,%s,%s)""",
+                      (tenant,case,"SIM-P5F-FAKE-SIGNATURE","SIM-P5F-FAKE-ECO",
+                       "a"*64,kid,Jsonb(document),"A"*88))
             finally:
                 con.rollback()
 
