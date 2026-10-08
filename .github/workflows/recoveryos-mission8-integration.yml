@@ -21,6 +21,8 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: synthetic-ci-only
           POSTGRES_DB: recoveryos_m8
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U postgres -d recoveryos_m8"
           --health-interval 5s
@@ -127,5 +129,25 @@ jobs:
         with:
           name: retally-m9-real-staging-http-negative
           path: freight/mission8/ci_negative_http_receipt.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Exact Floot TypeScript handlers with synthetic authenticated localhost HTTP
+        shell: bash
+        env:
+          FLOOT_DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:5432/recoveryos_m8
+          JWT_SECRET: retally-m11-ephemeral-synthetic-cookie-secret-do-not-reuse
+          RETALLY_TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          cid="${{ job.services.postgres.id }}"
+          docker exec -i "$cid" psql -U postgres -d recoveryos_m8 -v ON_ERROR_STOP=1 < freight/mission8/ci_handler_setup.sql
+          npm install --no-audit --no-fund --ignore-scripts --prefix freight/mission8
+          ./freight/mission8/node_modules/.bin/tsx freight/mission8/ci_authenticated_handler.mjs
+      - name: Preserve authenticated handler integration receipts, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retally-m11-authenticated-handler-postgres
+          path: freight/mission8/ci_authenticated_handler_receipt.json
           if-no-files-found: warn
           retention-days: 14
