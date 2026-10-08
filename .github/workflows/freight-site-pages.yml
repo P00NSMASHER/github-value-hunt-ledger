@@ -87,8 +87,7 @@ jobs:
     if: >-
       github.event_name != 'pull_request' &&
       github.ref == 'refs/heads/main' &&
-      vars.FREIGHT_CONTACT_VERIFIED == '1' &&
-      vars.FREIGHT_CONTACT_EMAIL != ''
+      vars.FREIGHT_CONTACT_VERIFIED == '1'
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -107,10 +106,10 @@ jobs:
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b
       - name: Build the public-only site
         env:
-          FREIGHT_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
+          FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com
           FREIGHT_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
           FREIGHT_CONTINGENCY_RECOVERY_RATE: ${{ vars.FREIGHT_CONTINGENCY_RECOVERY_RATE || '0.30' }}
-          RECOVERYOS_CONTACT_EMAIL: ${{ vars.FREIGHT_CONTACT_EMAIL }}
+          RECOVERYOS_CONTACT_EMAIL: jay@retallyrecovery.com
           RECOVERYOS_CONTACT_VERIFIED: ${{ vars.FREIGHT_CONTACT_VERIFIED }}
         run: |
           python freight/site/build.py --output /tmp/freight-recovery-public
