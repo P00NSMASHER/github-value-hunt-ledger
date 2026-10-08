@@ -19,6 +19,26 @@ OUTPUT_DIR = REPO / "cf-retally-public"
 EXPECTED_FILES = len(FREIGHT_PUBLIC_FILES) + len(RECOVERY_PUBLIC_FILES)
 
 
+
+def allow_verified_pages_inquiry(bundle: Path) -> None:
+    """Enable only Pages' same-origin API and managed Turnstile script/frame.
+
+    The original GitHub Pages bundle intentionally retains connect-src 'none',
+    and can only prepare an email draft. No other site or asset is widened.
+    """
+    for name in ("index.html", "_headers"):
+        path = bundle / name
+        content = path.read_text(encoding="utf-8")
+        script = "script-src 'self';"
+        connect = "connect-src 'none';"
+        if content.count(script) != 1 or content.count(connect) != 1:
+            raise RuntimeError(f"Cloudflare CSP source changed unexpectedly: {name}")
+        content = content.replace(script, "script-src 'self' https://challenges.cloudflare.com;")
+        content = content.replace(connect,
+            "connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com;")
+        path.write_text(content, encoding="utf-8")
+
+
 def build(output: Path = OUTPUT_DIR) -> Path:
     contact = os.environ.get("FREIGHT_CONTACT_EMAIL", "").strip().lower()
     verified = os.environ.get("FREIGHT_CONTACT_VERIFIED") == "1"
@@ -34,6 +54,7 @@ def build(output: Path = OUTPUT_DIR) -> Path:
         root = Path(workspace)
         bundle = root / "public"
         build_freight(bundle, contact, True)
+        allow_verified_pages_inquiry(bundle)
         os.environ["RECOVERYOS_CONTACT_EMAIL"] = contact
         os.environ["RECOVERYOS_CONTACT_VERIFIED"] = "1"
         build_recoveryos(root / "recoveryos")

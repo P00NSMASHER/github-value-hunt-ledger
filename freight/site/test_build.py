@@ -262,8 +262,11 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn(".security-image{width:100%;margin:0;position:relative}", stylesheet)
             self.assertIn(".qualification-details{", stylesheet)
             self.assertIn(".navlinks{position:absolute;left:0;right:0;top:100%", stylesheet)
+            # The same JS is shipped to legacy GitHub Pages, whose strict CSP
+            # denies connections; network use is gated to the RETALLY host.
+            self.assertIn('["www.retallyrecovery.com", "retallyrecovery.com"].includes(window.location.hostname)', script)
+            self.assertIn('fetch("/api/inquiry"', script)
             for network_or_storage_api in (
-                "fetch(",
                 "XMLHttpRequest",
                 "sendBeacon",
                 "WebSocket",

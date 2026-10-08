@@ -1,0 +1,59 @@
+name: RETALLY Inquiry CI
+on:
+  push:
+    paths:
+      - "functions/api/inquiry.js"
+      - "freight/site/site.js"
+      - "freight/site/index.html"
+      - "freight/site/_headers"
+      - "freight/site/test_inquiry.mjs"
+      - "freight/site/migrations/**"
+      - ".github/workflows/retally-inquiry.yml"
+  pull_request:
+    paths:
+      - "functions/api/inquiry.js"
+      - "freight/site/site.js"
+      - "freight/site/index.html"
+      - "freight/site/_headers"
+      - "freight/site/test_inquiry.mjs"
+      - "freight/site/migrations/**"
+      - ".github/workflows/retally-inquiry.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  intake-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - name: Browser JavaScript syntax
+        run: node --check freight/site/site.js
+      - name: Pages API JavaScript syntax
+        run: node --experimental-default-type=module --check functions/api/inquiry.js
+      - name: Secure inquiry unit and mocked integration tests
+        run: node --experimental-default-type=module --test freight/site/test_inquiry.mjs
+      - name: Verify generated Cloudflare-only API Content Security Policy
+        env:
+          FREIGHT_CONTACT_EMAIL: jay@retallyrecovery.com
+          FREIGHT_CONTACT_VERIFIED: "1"
+        run: |
+          python -m freight.site.cloudflare_build
+          python - <<'PY'
+          from pathlib import Path
+          from freight.site.build import SOURCE
+          public = Path('cf-retally-public')
+          index = (public / 'index.html').read_text()
+          headers = (public / '_headers').read_text()
+          legacy = (SOURCE / 'index.html').read_text()
+          assert "connect-src 'self' https://challenges.cloudflare.com" in index
+          assert "frame-src https://challenges.cloudflare.com" in index
+          assert "connect-src 'self' https://challenges.cloudflare.com" in headers
+          assert "connect-src 'none'" in legacy
+          assert "script-src 'self';" in legacy
+          assert "https://www.retallyrecovery.com/" in index
+          assert len([x for x in public.rglob('*') if x.is_file()]) == 69
+          PY
