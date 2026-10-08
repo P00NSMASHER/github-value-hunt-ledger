@@ -100,7 +100,7 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             config = (output / "commercial-config.js").read_text()
 
-            self.assertIn("Find it. <em>Prove it. Recover it.</em>", page)
+            self.assertIn('<span class="hero-phrase">Find it.</span> <em class="hero-phrase">Prove it.</em> <em class="hero-phrase">Recover it.</em>', page)
             self.assertIn("Recovery Evidence Pack", page)
             self.assertIn('href="second-look-freight-audit.html"', page)
             self.assertIn('href="freight-recovery-evidence-standard.html"', page)
@@ -313,6 +313,21 @@ class PublicBuildTests(unittest.TestCase):
                 font = output / "assets/fonts" / item["file"]
                 self.assertEqual(item["sha256"], hashlib.sha256(font.read_bytes()).hexdigest())
                 self.assertEqual("SIL Open Font License 1.1", item["license"])
+
+    def test_retally_mobile_brand_presentation_does_not_occlude_content(self):
+        css = (builder.SOURCE / "foundry.css").read_text(encoding="utf-8")
+        page = (builder.SOURCE / "index.html").read_text(encoding="utf-8")
+        # Explicit mobile regression guard: the former fixed CTA hid page
+        # content and inherited unreadable dark-green-on-dark-green colors.
+        self.assertIn(".mobile-cta{display:none!important}", css)
+        self.assertIn("body{padding-bottom:0}", css)
+        self.assertIn(".hero-phrase{display:inline-block;white-space:nowrap}", css)
+        self.assertIn("font-size:clamp(2.1rem,9vw,2.4rem)", css)
+        # Retain the approved type assets and primary conversion route.
+        self.assertIn('hanken-grotesk-latin.woff2', page)
+        self.assertIn('instrument-serif-latin.woff2', page)
+        self.assertIn('class="button button-signal" href="#start-audit"', page)
+        self.assertIn('foundry.css?v=retally-mobile-20261008b', page)
 
     def test_existing_files_are_preserved(self):
         with tempfile.TemporaryDirectory() as temporary:
