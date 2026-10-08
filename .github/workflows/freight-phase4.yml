@@ -28,7 +28,7 @@ jobs:
       - name: Install pinned project test dependencies
         run: python -m pip install -r production/requirements-ci.txt
       - name: Test fourteen laboratory actual-code callsites and original domain chain
-        run: PYTHONPATH=. python -m pytest -q freight/test_lab_phase4_director.py freight/test_lab_phase4_experiments.py freight/test_lab_phase4_mock_provider.py freight/test_lab_phase3_real_chain.py freight/test_lab_phase3_economics.py freight/test_lab_phase3_simulated_pilot.py freight/test_lab_phase3_trust.py
+        run: PYTHONPATH=. python -m pytest -q -rs freight/test_lab_phase4_director.py freight/test_lab_phase4_experiments.py freight/test_lab_phase4_mock_provider.py freight/test_lab_phase3_real_chain.py freight/test_lab_phase3_economics.py freight/test_lab_phase3_simulated_pilot.py freight/test_lab_phase3_trust.py
       - name: Produce bounded synthetic execution report
         run: |
           PYTHONPATH=. python -m freight.lab_phase4_control_center --out /tmp/retally-phase4
