@@ -1,0 +1,62 @@
+name: RETALLY one-time approved master admission
+on:
+  pull_request:
+    paths:
+      - .github/workflows/retally-approved-master-admission.yml
+permissions:
+  contents: write
+jobs:
+  copy-exact-masters:
+    if: >-
+      github.event.pull_request.head.repo.full_name == 'P00NSMASHER/github-value-hunt-ledger'
+      && github.event.pull_request.head.ref == 'mission2b/customer-collateral-financial-proof-v1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the exact authorized internal PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: mission2b/customer-collateral-financial-proof-v1
+          persist-credentials: true
+      - name: Download and admit only exact approved RETALLY PNG masters
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="freight/brand/mission2b/assets"
+          mkdir -p "$base"
+          wordmark="$base/retally-wordmark-approved.png"
+          emblem="$base/retally-emblem-approved.png"
+          if [[ ! -f "$wordmark" ]]; then
+            curl --fail --silent --show-error --location --retry 2 --max-time 60 \
+              "https://freight-recoveryos.floot.app/_cdn/static/2f845cf7-9296-4a60-9adc-eedb453aeeb5-retally-wordmark-approved.png" -o "$wordmark"
+          fi
+          if [[ ! -f "$emblem" ]]; then
+            curl --fail --silent --show-error --location --retry 2 --max-time 60 \
+              "https://freight-recoveryos.floot.app/_cdn/static/adc6678f-9e9d-4544-8e53-6aaf6d6a2117-retally-emblem-approved.png" -o "$emblem"
+          fi
+          printf '%s  %s\n' \
+            "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd" "$wordmark" \
+            "bb02ab4a468762f597c241199baeff61b485dd793f8fb746140ad33670b68043" "$emblem" | sha256sum --check --status
+          test "$(wc -c < "$wordmark")" -eq 293909
+          test "$(wc -c < "$emblem")" -eq 484377
+          python - <<'PY'
+          import json,hashlib,pathlib
+          p=pathlib.Path('freight/brand/mission2b')
+          t=json.loads((p/'source/commercial_truth.json').read_text())
+          for k in ('wordmark','emblem'):
+              data=(p/'assets'/f'retally-{k}-approved.png').read_bytes()
+              assert hashlib.sha256(data).hexdigest()==t['approved_brand'][k+'_sha256']
+          print("Both approved original PNG masters verified against immutable values and canonical registry")
+          PY
+      - name: Commit only the approved binary masters to this PR branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- freight/brand/mission2b/assets/retally-wordmark-approved.png freight/brand/mission2b/assets/retally-emblem-approved.png
+          if git diff --cached --quiet; then
+            echo "No change: both approved masters already committed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "assets(retally): commit exact approved original logo masters"
+          git push origin HEAD:refs/heads/mission2b/customer-collateral-financial-proof-v1
