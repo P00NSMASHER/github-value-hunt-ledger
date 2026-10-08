@@ -6,6 +6,7 @@ on:
       - 'freight/test_lab_intelligence.py'
       - 'freight/lab_intelligence_runner.py'
       - 'freight/test_lab_intelligence_runner.py'
+      - 'freight/lab_archive_repairs/**'
       - 'freight/LAB_INTELLIGENCE_V1.md'
       - '.github/workflows/freight-lab-intelligence.yml'
   workflow_dispatch:
@@ -26,6 +27,8 @@ jobs:
           python-version: '3.11'
       - name: Independent semantic regression and triage tests
         run: PYTHONPATH=. python -W error::ResourceWarning -m unittest -v freight.test_lab_intelligence freight.test_lab_intelligence_runner
+      - name: Syntax check transplanted standalone repair modules
+        run: python -m py_compile freight/lab_archive_repairs/unified/semantic_verify.py freight/lab_archive_repairs/tests/test_semantic_repair.py
       - name: Exercise actual cumulative 28-finding register
         run: PYTHONPATH=. python -m freight.lab_intelligence_runner --limit 5
       - name: Prevent accidental certification
