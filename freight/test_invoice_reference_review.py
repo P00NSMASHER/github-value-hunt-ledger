@@ -39,12 +39,13 @@ def make_population(*rows):
 
 
 def second(**changes):
-    return make_charge(
+    overrides = dict(
         shipment_id="LOAD-2",
         charge_id="CH-2",
         source_hash="synthetic-doc-hash-2",
-        **changes,
     )
+    overrides.update(changes)
+    return make_charge(**overrides)
 
 
 class InvoiceReferenceReviewTests(unittest.TestCase):
@@ -115,10 +116,10 @@ class InvoiceReferenceReviewTests(unittest.TestCase):
         )
 
     def test_grouping_preserves_three_shipments_without_monetary_aggregation(self):
-        pop = make_population(
+        pop = make_population(*(
             PopulationRow("INV-5", f"LOAD-{i}", "fictional-customer", "fictional-carrier", "USD", f"source-{i}")
             for i in (1, 2, 3)
-        )
+        ))
         rows = tuple(
             make_charge(
                 shipment_id=f"LOAD-{i}", charge_id=f"CH-{i}",
