@@ -52,8 +52,12 @@ def verify(site: Path, out: Path) -> dict:
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True, args=["--no-sandbox"])
+        # The public-only build deliberately embeds connect-src 'none' for
+        # GitHub Pages. Bypass it ONLY in this isolated intercepted browser:
+        # Cloudflare's production-specific CSP is untouched, and all outside
+        # requests are blocked by intercept().
         context = browser.new_context(viewport={"width": 390, "height": 844},
-            is_mobile=True, has_touch=True, reduced_motion="reduce")
+            is_mobile=True, has_touch=True, reduced_motion="reduce", bypass_csp=True)
         context.route("**/*", intercept)
         page = context.new_page()
         errors = []
