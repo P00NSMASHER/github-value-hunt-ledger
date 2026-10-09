@@ -45,6 +45,7 @@ jobs:
           freight/test_recovery_engagement.py
           freight/site/test_build.py
           freight/site/test_asset_integrity.py
+          freight/site/test_verify_production_site.py
           freight/site/test_public_repo_privacy.py
           freight/site/test_rebase_public_urls.py
           freight/brand/test_brand_finishing.py
