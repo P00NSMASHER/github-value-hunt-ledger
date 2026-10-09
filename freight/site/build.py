@@ -83,9 +83,6 @@ TEXT_SOURCE_FILES = (
     "foundry.css",
     "site.js",
     "commercial-config.js",
-    "favicon.svg",
-    "assets/brand/retally-wordmark.svg",
-    "assets/brand/retally-emblem.svg",
     "robots.txt",
     "sitemap.xml",
     "site.webmanifest",
@@ -108,6 +105,8 @@ BINARY_SOURCE_FILES = (
     "assets/images/terminal-blue-hour-800.webp",
     "assets/images/terminal-blue-hour.webp",
     "assets/brand/retally-wordmark.webp",
+    "assets/brand/retally-wordmark-approved.png",
+    "assets/brand/retally-emblem-approved.png",
 )
 SOURCE_FILES = TEXT_SOURCE_FILES + BINARY_SOURCE_FILES
 DEMO_FILE = "synthetic-pilot-demo.zip"

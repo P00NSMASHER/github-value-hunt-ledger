@@ -231,7 +231,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertEqual(org["name"], "RETALLY")
             self.assertEqual(
                 org["logo"]["url"],
-                "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem.svg",
+                "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem-approved.png",
             )
             self.assertIn("Freight Invoice Audit &amp; Overcharge Recovery | RETALLY", index)
             self.assertIn("Freight invoice audit and overcharge recovery for U.S. businesses.", index)
@@ -590,39 +590,47 @@ class PremiumFinishV2Tests(unittest.TestCase):
 
 
 
-class RetallyBrandAssetTests(unittest.TestCase):
-    """Reject bitmap brand regressions and corrupted app-identity references."""
 
-    def test_public_brand_logos_are_real_vectors(self):
-        import xml.etree.ElementTree as ET
+class RetallyApprovedBrandAssetTests(unittest.TestCase):
+    """The website must serve the exact binary master artwork approved by RETALLY."""
 
-        viewboxes = {
-            "assets/brand/retally-wordmark.svg": "0 0 760 120",
-            "assets/brand/retally-emblem.svg": "0 0 256 256",
-            "favicon.svg": "0 0 64 64",
+    def test_exact_approved_master_hashes_and_no_unapproved_logo(self):
+        import hashlib
+        import struct
+
+        # SHA-256 values registered in freight/brand/RETALLY_ASSET_REGISTER_V4.md.
+        approved = {
+            "assets/brand/retally-wordmark-approved.png": (
+                "08421ccd7e8b1db752002f7ea177e76c83b6ee1cae40cf8b459368ade0c4eadd", (1619, 257)),
+            "assets/brand/retally-emblem-approved.png": (
+                "bb02ab4a468762f597c241199baeff61b485dd793f8fb746140ad33670b68043", (805, 776)),
         }
-        ns = "{http://www.w3.org/2000/svg}"
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
-            for relative, vb in viewboxes.items():
+            for relative, (digest, dimensions) in approved.items():
                 with self.subTest(asset=relative):
-                    source = (output / relative).read_text(encoding="utf-8")
-                    root = ET.fromstring(source)
-                    self.assertEqual(root.tag, ns + "svg")
-                    self.assertEqual(root.attrib["viewBox"], vb)
-                    self.assertTrue(any(e.tag == ns + "path" for e in root.iter()))
-                    self.assertFalse(any(e.tag in {ns+"image", ns+"script", ns+"foreignObject"} for e in root.iter()))
-                    self.assertNotIn("data:image/", source)
+                    data = (output / relative).read_bytes()
+                    self.assertEqual(hashlib.sha256(data).hexdigest(), digest)
+                    self.assertTrue(data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"))
+                    self.assertEqual(struct.unpack(">II", data[16:24]), dimensions)
             manifest = json.loads((output / "site.webmanifest").read_text())
-            self.assertTrue(manifest["icons"])
-            self.assertTrue(all(i["type"] == "image/svg+xml" and i["sizes"] == "any" for i in manifest["icons"]))
+            self.assertEqual(manifest["icons"], [{
+                "src": "assets/brand/retally-emblem-approved.png",
+                "sizes": "805x776", "type": "image/png", "purpose": "any"}])
             self.assertFalse((output / "assets/brand/retally-emblem.webp").exists())
+            for rejected in ("assets/brand/retally-wordmark.svg",
+                             "assets/brand/retally-emblem.svg", "favicon.svg"):
+                self.assertFalse((output / rejected).exists())
             for page in builder.TEXT_SOURCE_FILES:
                 if page.endswith(".html"):
-                    html = (output / page).read_text()
+                    html = (output / page).read_text(encoding="utf-8")
                     self.assertNotIn("assets/brand/retally-emblem.webp", html)
                     self.assertNotIn("assets/brand/retally-wordmark.webp", html)
-            self.assertIn("assets/brand/retally-emblem.svg", (output / "index.html").read_text())
+                    self.assertNotIn("assets/brand/retally-wordmark.svg", html)
+                    self.assertNotIn("assets/brand/retally-emblem.svg", html)
+            index = (output / "index.html").read_text()
+            self.assertIn("assets/brand/retally-wordmark-approved.png", index)
+            self.assertIn("assets/brand/retally-emblem-approved.png", index)
 
 if __name__ == "__main__":
     unittest.main()

@@ -8,15 +8,9 @@
   "theme_color": "#062c26",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/brand/retally-emblem.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "assets/brand/retally-emblem-approved.png",
+      "sizes": "805x776",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
