@@ -33,7 +33,7 @@ class RetallyFinishingTests(unittest.TestCase):
         self.assertIn('mailto:jay@retallyrecovery.com',html)
         self.assertIn("https://www.retallyrecovery.com/",html)
         self.assertIn("RETALLY",html)
-        self.assertNotIn("jayp19386@gmail.com",html)
+        self.assertNotIn("jayp19386@",html)
         self.assertNotIn("guaranteed",html.lower())
         self.assertNotIn("certified",html.lower())
 

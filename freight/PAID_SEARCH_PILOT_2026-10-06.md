@@ -140,7 +140,7 @@ Use LinkedIn organically for targeted decision-maker outreach before paid Linked
 ## Current commercial state
 
 - Freight Recovery site: live.
-- Business contact: jayp19386@gmail.com.
-- Business postal address: 715 Yorktowne Road, Pottsville, PA 17901.
+- Business contact: [redacted historical personal inbox].
+- Business postal address: [residential business mailing address withheld from public repository].
 - Cold prospect emails sent on 2026-10-06: 20.
 - Current response signal: one automated acknowledgement from Global Industrial; no substantive buyer reply yet at time of this plan.

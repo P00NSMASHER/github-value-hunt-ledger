@@ -23,11 +23,11 @@ The sprint is successful only when the outcome ledger contains an independently 
 ### Gate F0 — public acquisition surface
 **Status: PASSED 2026-10-06. Day 0 starts 2026-10-06.**
 
-Evidence: main-branch `RecoveryOS Public Sites` run 37475067758 passed verification and deployment; the public site was independently opened at `https://p00nsmasher.github.io/github-value-hunt-ledger/`; its CTA targets `jayp19386@gmail.com`; and a controlled non-sensitive inquiry was delivered to that inbox.
+Evidence: main-branch `RecoveryOS Public Sites` run 37475067758 passed verification and deployment; the public site was independently opened at `https://p00nsmasher.github.io/github-value-hunt-ledger/`; its CTA targets `[redacted historical personal inbox]`; and a controlled non-sensitive inquiry was delivered to that inbox.
 
 Required:
-- business contact selected: `jayp19386@gmail.com`;
-- `FREIGHT_CONTACT_EMAIL=jayp19386@gmail.com` is already configured in GitHub Actions variables;
+- business contact selected: `[redacted historical personal inbox]`;
+- `FREIGHT_CONTACT_EMAIL=[redacted historical personal inbox]` is already configured in GitHub Actions variables;
 - confirm `FREIGHT_CONTACT_VERIFIED=1` is present;
 - successful `freight-site-pages.yml` verification and deployment;
 - controlled inquiry proving the public CTA reaches the configured inbox.
@@ -164,7 +164,7 @@ Prospect identities and raw outbound messages remain outside the public reposito
 
 Track:
 - F0 status;
-- sender postal address: `715 Yorktowne Road, Pottsville, PA 17901`;
+- sender postal address: `[residential business mailing address withheld from public repository]`;
 - ICP candidates reviewed;
 - permitted first touches;
 - substantive responses/conversations;

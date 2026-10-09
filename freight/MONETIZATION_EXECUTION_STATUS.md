@@ -5,7 +5,7 @@ Updated: 2026-10-06
 ## Current execution state
 
 - Primary commercialization lane: Freight Recovery.
-- Business contact: `jayp19386@gmail.com`.
+- Business contact: `[redacted historical personal inbox]`.
 - GitHub Actions repository variables `FREIGHT_CONTACT_EMAIL` and `FREIGHT_CONTACT_VERIFIED` already exist in repository settings.
 - Public-site verification/deployment is the next operational gate.
 - Confidential customer records remain blocked from ordinary email and from any unverified customer-data environment.

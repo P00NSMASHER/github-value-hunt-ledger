@@ -56,8 +56,8 @@ class PublicBuildTests(unittest.TestCase):
             with self.subTest(file=relative):
                 content = (builder.REPOSITORY / relative).read_text(encoding="utf-8")
                 self.assertNotIn("https://p00nsmasher.github.io/github-value-hunt-ledger/", content)
-                self.assertNotIn("715 Yorktowne Road", content)
-                self.assertNotIn("jayp19386@gmail.com", content)
+                self.assertNotIn("yorktowne", content.lower())
+                self.assertNotIn("jayp19386@", content.lower())
         for relative in active[:4]:
             with self.subTest(canonical=relative):
                 content = (builder.REPOSITORY / relative).read_text(encoding="utf-8")
