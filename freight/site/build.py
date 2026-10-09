@@ -23,6 +23,7 @@ from freight.commercial_terms import (
     normalize_contingency_rate,
 )
 from freight.synthetic_pilot_bundle import build_synthetic_pilot_bundle
+from freight.site.asset_integrity import validate_freight_media
 
 PUBLIC_CONTACT_PAGES = (
     "index.html",
@@ -233,6 +234,7 @@ def build(
 
     text_bundle = {name: _public_source(name).read_text(encoding="utf-8") for name in TEXT_SOURCE_FILES}
     binary_bundle = {name: _public_source(name).read_bytes() for name in BINARY_SOURCE_FILES}
+    validate_freight_media(SOURCE)
 
     safe_contact = html.escape(contact, quote=True)
     for name in PUBLIC_CONTACT_PAGES:
