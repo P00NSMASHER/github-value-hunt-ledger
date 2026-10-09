@@ -366,6 +366,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Email prepared — not sent", page)
             self.assertIn('id="auditRecipient" href="#contact-pending"', page)
             self.assertIn('id="copyAuditEmail" type="button"', page)
+            self.assertIn('id="editAuditRequest" type="button"', page)
             self.assertIn("Your request has not been sent yet.", page)
             self.assertIn('recipient.href = `mailto:${contactEmail}`', script)
             self.assertIn('byId("copyAuditEmail")?.addEventListener', script)
@@ -396,13 +397,19 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text(encoding="utf-8")
             receipt = script.split('if (!response.ok || !result.received', 1)[1].split('} catch (error)', 1)[0]
             self.assertIn('ready.querySelector(".eyebrow").textContent = "Request received"', receipt)
-            self.assertIn('["sendAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]', receipt)
+            self.assertIn('["sendAuditRequest", "editAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]', receipt)
             self.assertIn("if (emailOnly) emailOnly.hidden = true;", receipt)
             self.assertIn('ready.querySelector(".audit-manual-fallback")', receipt)
             self.assertIn("if (fallbackInstructions) fallbackInstructions.hidden = true;", receipt)
             # The original manual email-draft path must remain available.
             draft = script.split("const prepareEmailDraft = () => {", 1)[1].split("fallbackLink?.addEventListener", 1)[0]
             self.assertIn("window.location.href = sendLink.href;", draft)
+            self.assertIn('track(EVENTS.auditRequestPrepared, { reference, deliveryConfirmed: false });', draft)
+            self.assertNotIn("track(EVENTS.auditFormCompleted", draft)
+            self.assertIn('method: "durable_intake"', receipt)
+            self.assertIn('byId("editAuditRequest")?.addEventListener("click"', script)
+            self.assertIn('sendLink.setAttribute("aria-disabled", "true")', script)
+            self.assertIn('if (ready) ready.hidden = true;', script)
             self.assertIn('id="copyAuditEmail"', page)
             self.assertIn("Email prepared — not sent", page)
 
