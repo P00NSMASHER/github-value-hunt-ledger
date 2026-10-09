@@ -3,6 +3,8 @@
 Version: 1.0
 Effective: 2026-10-06
 
+**Send gate:** This is a draft, not send-ready copy. Replace the required-address placeholder with a legitimate, authorized postal address and pass applicable outreach compliance checks before any commercial email.
+
 ## Objective
 
 Build a repeatable referral channel through advisors who already serve freight-heavy distributors, manufacturers, logistics operators, and multi-site shippers.
@@ -96,8 +98,7 @@ Would this be relevant for any of the finance or distribution clients you advise
 Thanks,
 Jamison
 RETALLY
-715 Yorktowne Road
-Pottsville, PA 17901
+[VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND]
 
 Reply "no thanks" and I won't follow up.
 

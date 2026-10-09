@@ -511,3 +511,37 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
   box-shadow:none!important;background:#fff!important;color:#000!important;
  }
 }
+
+/* RETALLY Premium Finish V2: customer contact clarity.
+   The inline logo/email in the main footer visually collided at 320-1440px.
+   Keep existing assets and links; stack them with a real touch target. */
+.home-simple .simple-footer > div:first-child{
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ gap:14px;
+ min-width:0;
+}
+.home-simple .simple-footer > div:first-child > a.brand{
+ display:inline-flex;
+ flex:none;
+}
+.home-simple .simple-footer > div:first-child > a[data-contact-link]{
+ display:inline-flex;
+ align-items:center;
+ min-height:44px;
+ max-width:100%;
+ padding:4px 0;
+ color:#dcf3e7;
+ text-decoration:underline;
+ text-underline-offset:4px;
+ overflow-wrap:anywhere;
+}
+.home-simple .simple-footer > div:first-child > a[data-contact-link]:hover{
+ color:#fff;
+}
+@media print{
+ .home-simple .simple-footer > div:first-child{
+  display:block;
+ }
+}

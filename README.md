@@ -2,21 +2,21 @@
 
 Private persistent memory for the GitHub Value Hunt.
 
-## Freight Recovery public service
+## RETALLY public freight audit and recovery service
 
-The current commercial launch is **Freight Recovery**, a $0-upfront freight-audit and recovery service for finance, AP, transportation, and logistics teams.
+The current commercial launch is **RETALLY**, a $0-upfront freight-audit and recovery service for finance, AP, transportation, and logistics teams.
 
-- Public site: https://p00nsmasher.github.io/github-value-hunt-ledger/
-- Freight audit services: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-services.html
-- Freight invoice audit: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit.html
-- Freight invoice audit checklist: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-invoice-audit-checklist.html
-- Freight overcharge recovery: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-overcharge-recovery.html
-- Freight Recovery Evidence Standard: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-recovery-evidence-standard.html
-- Post-payment freight audit: https://p00nsmasher.github.io/github-value-hunt-ledger/post-payment-freight-audit.html
-- Second-Look Recovery Audit: https://p00nsmasher.github.io/github-value-hunt-ledger/second-look-freight-audit.html
-- Freight audit companies buyer guide: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-companies.html
-- Downloadable provider evaluation scorecard: https://p00nsmasher.github.io/github-value-hunt-ledger/freight-audit-provider-scorecard.csv
-- Trust Center: https://p00nsmasher.github.io/github-value-hunt-ledger/trust.html
+- Public site: https://www.retallyrecovery.com/
+- Freight audit services: https://www.retallyrecovery.com/freight-audit-services
+- Freight invoice audit: https://www.retallyrecovery.com/freight-invoice-audit
+- Freight invoice audit checklist: https://www.retallyrecovery.com/freight-invoice-audit-checklist
+- Freight overcharge recovery: https://www.retallyrecovery.com/freight-overcharge-recovery
+- Freight Recovery Evidence Standard: https://www.retallyrecovery.com/freight-recovery-evidence-standard
+- Post-payment freight audit: https://www.retallyrecovery.com/post-payment-freight-audit
+- Second-Look Recovery Audit: https://www.retallyrecovery.com/second-look-freight-audit
+- Freight audit companies buyer guide: https://www.retallyrecovery.com/freight-audit-companies
+- Downloadable provider evaluation scorecard: https://www.retallyrecovery.com/freight-audit-provider-scorecard.csv
+- Trust Center: https://www.retallyrecovery.com/trust
 
 The public marketing surface is intentionally separated from confidential customer-data processing. Do not send freight records, credentials, contracts, or payment data through ordinary email.
 

@@ -1,6 +1,6 @@
 # RETALLY Referral Kit
 
-Status: READY
+Status: DRAFT; no commercial email may be sent until a truthful, authorized business mailing address is supplied and all send/opt-out checks pass.
 
 ## Best referral partners
 
@@ -28,13 +28,12 @@ I’m reaching out because your clients may occasionally have material freight s
 If a client could benefit, I can start with a brief fit conversation. We agree the scope and a secure transfer route before requesting records. Please do not send freight records by ordinary email.
 
 RETALLY:
-https://p00nsmasher.github.io/github-value-hunt-ledger/?utm_source=referral&utm_medium=partner&utm_campaign=advisor_referrals
+https://www.retallyrecovery.com/?utm_source=referral&utm_medium=partner&utm_campaign=advisor_referrals
 
 Thanks,
 Jamison
 RETALLY
-715 Yorktowne Road
-Pottsville, PA 17901
+[VERIFIED BUSINESS MAILING ADDRESS REQUIRED BEFORE SEND]
 
 Reply “no thanks” and I won’t follow up.
 
