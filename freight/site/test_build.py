@@ -229,6 +229,10 @@ class PublicBuildTests(unittest.TestCase):
             org = by_type["Organization"]
             service = by_type["Service"]
             self.assertEqual(org["name"], "RETALLY")
+            self.assertEqual(org.get("sameAs"), ["https://www.instagram.com/retallyrecovery/"])
+            self.assertEqual(index.count('href="https://www.instagram.com/retallyrecovery/"'), 1)
+            self.assertIn('target="_blank" rel="noopener noreferrer">Instagram @retallyrecovery</a>', index)
+            self.assertNotIn("amuhricaaa", index)
             self.assertEqual(
                 org["logo"]["url"],
                 "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem-approved.png",
