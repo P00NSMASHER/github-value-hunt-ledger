@@ -1,5 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Freight Recovery">
-  <rect width="64" height="64" rx="15" fill="#071426"/>
-  <path d="M16 45V27h8v18zm12 0V19h8v26zm12 0V11h8v34z" fill="#ffffff"/>
-  <path d="M13 50h38" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="favicon-title">
+  <title id="favicon-title">RETALLY</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#30ed9f"/><stop offset=".56" stop-color="#078454"/><stop offset="1" stop-color="#006744"/></linearGradient>
+    <linearGradient id="k" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#34454b"/><stop offset="1" stop-color="#0d1920"/></linearGradient>
+  </defs>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="13" fill="#ffffff" stroke="#b4d9c8" stroke-width="1.5"/>
+  <g transform="translate(2.5 2) scale(.229)">
+    <path d="M28 35h115c49 0 81 34 81 75 0 27-14 47-38 58l-26-28c17-7 25-16 25-29 0-21-16-35-42-35H72z" fill="url(#g)" stroke="#07573a" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M55 123 90 107l111 112h-54z" fill="url(#k)"/>
+    <path d="M116 153h45l66 66h-49z" fill="url(#g)"/>
+  </g>
 </svg>

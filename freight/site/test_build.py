@@ -231,7 +231,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertEqual(org["name"], "RETALLY")
             self.assertEqual(
                 org["logo"]["url"],
-                "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem.webp",
+                "https://p00nsmasher.github.io/github-value-hunt-ledger/assets/brand/retally-emblem.svg",
             )
             self.assertIn("Freight Invoice Audit &amp; Overcharge Recovery | RETALLY", index)
             self.assertIn("Freight invoice audit and overcharge recovery for U.S. businesses.", index)
@@ -588,6 +588,41 @@ class PremiumFinishV2Tests(unittest.TestCase):
             self.assertIn("nonOverlapping", visual)
             self.assertIn("footerContact", visual)
 
+
+
+class RetallyBrandAssetTests(unittest.TestCase):
+    """Reject bitmap brand regressions and corrupted app-identity references."""
+
+    def test_public_brand_logos_are_real_vectors(self):
+        import xml.etree.ElementTree as ET
+
+        viewboxes = {
+            "assets/brand/retally-wordmark.svg": "0 0 760 120",
+            "assets/brand/retally-emblem.svg": "0 0 256 256",
+            "favicon.svg": "0 0 64 64",
+        }
+        ns = "{http://www.w3.org/2000/svg}"
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            for relative, vb in viewboxes.items():
+                with self.subTest(asset=relative):
+                    source = (output / relative).read_text(encoding="utf-8")
+                    root = ET.fromstring(source)
+                    self.assertEqual(root.tag, ns + "svg")
+                    self.assertEqual(root.attrib["viewBox"], vb)
+                    self.assertTrue(any(e.tag == ns + "path" for e in root.iter()))
+                    self.assertFalse(any(e.tag in {ns+"image", ns+"script", ns+"foreignObject"} for e in root.iter()))
+                    self.assertNotIn("data:image/", source)
+            manifest = json.loads((output / "site.webmanifest").read_text())
+            self.assertTrue(manifest["icons"])
+            self.assertTrue(all(i["type"] == "image/svg+xml" and i["sizes"] == "any" for i in manifest["icons"]))
+            self.assertFalse((output / "assets/brand/retally-emblem.webp").exists())
+            for page in builder.TEXT_SOURCE_FILES:
+                if page.endswith(".html"):
+                    html = (output / page).read_text()
+                    self.assertNotIn("assets/brand/retally-emblem.webp", html)
+                    self.assertNotIn("assets/brand/retally-wordmark.webp", html)
+            self.assertIn("assets/brand/retally-emblem.svg", (output / "index.html").read_text())
 
 if __name__ == "__main__":
     unittest.main()

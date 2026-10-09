@@ -7,6 +7,17 @@
   "background_color": "#fffefa",
   "theme_color": "#062c26",
   "icons": [
-    {"src": "assets/brand/retally-emblem.webp", "sizes": "110x106", "type": "image/webp"}
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/retally-emblem.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }

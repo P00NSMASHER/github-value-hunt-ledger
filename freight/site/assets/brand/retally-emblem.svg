@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">RETALLY R emblem</title>
+  <defs>
+    <linearGradient id="emerald" x1=".03" y1="0" x2=".98" y2=".9">
+      <stop offset="0" stop-color="#6dffcb"/>
+      <stop offset=".17" stop-color="#1eeca2"/>
+      <stop offset=".45" stop-color="#078b60"/>
+      <stop offset=".72" stop-color="#005b3e"/>
+      <stop offset="1" stop-color="#0cc381"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e0ffef" stop-opacity=".75"/>
+      <stop offset=".4" stop-color="#38eea2" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#003d2d" stop-opacity=".12"/>
+    </linearGradient>
+    <linearGradient id="charcoal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#46535b"/>
+      <stop offset=".19" stop-color="#1b262f"/>
+      <stop offset=".65" stop-color="#10191f"/>
+      <stop offset="1" stop-color="#05090f"/>
+    </linearGradient>
+    <linearGradient id="rleg" x1=".1" y1="0" x2=".92" y2="1">
+      <stop offset="0" stop-color="#5dffbd"/>
+      <stop offset=".4" stop-color="#08bd78"/>
+      <stop offset=".74" stop-color="#006b46"/>
+      <stop offset="1" stop-color="#1ceba0"/>
+    </linearGradient>
+  </defs>
+  <!-- Deliberate ribbon R silhouette: single upper bowl, two separated legs. -->
+  <path d="M28 35h115c49 0 81 34 81 75 0 27-14 47-38 58l-26-28c17-7 25-16 25-29 0-21-16-35-42-35H72z" fill="url(#emerald)" stroke="#035238" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M32 39h111c47 0 76 33 77 68" stroke="url(#edge)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M72 74h73c28 0 43 16 43 36 0 21-15 35-40 35h-36l-24-29h55c8 0 13-5 13-10s-5-10-13-10H91z" fill="none" opacity="0"/>
+  <path d="M55 123 90 107l111 112h-54z" fill="url(#charcoal)" stroke="#10191d" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M116 153h45l66 66h-49z" fill="url(#rleg)" stroke="#075c42" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M119 155h40l65 62" stroke="#8cffce" stroke-width="2.5" stroke-linecap="round" opacity=".6" fill="none"/>
+  <path d="M55 123 90 107l109 111" fill="none" stroke="#61777b" stroke-width="1.1" opacity=".45"/>
+</svg>
