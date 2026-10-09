@@ -59,6 +59,138 @@ MEASURE = """() => {
 }"""
 
 
+
+def verify_email_handoff(browser, base: str) -> list[dict]:
+    """Exercise the actual mailto fallback without sending mail or a server POST.
+
+    Synthetic values are confined to the isolated browser; the QA receipt saves
+    only boolean assertions, not test addresses, references or request bodies.
+    """
+    from urllib.parse import parse_qs, urlparse
+
+    campaign = ("utm_source=facebook&utm_medium=organic_social&"
+                "utm_campaign=retally_oct2026_launch&"
+                "utm_content=oct14_evidence")
+    outcomes = []
+    for width, height, via_guide in ((390, 844, True), (1440, 900, False)):
+        context = browser.new_context(
+            viewport={"width": width, "height": height},
+            device_scale_factor=1, is_mobile=width <= 390, has_touch=width <= 390,
+            reduced_motion="reduce",
+        )
+        page = context.new_page()
+        errors, api_posts = [], []
+        page.on("pageerror", lambda err: errors.append(str(err)[:160]))
+        page.on("request", lambda req: api_posts.append(True)
+                if req.method == "POST" and "/api/inquiry" in req.url else None)
+        state = {"viewport": f"{width}x{height}", "checks": {}, "errors": errors}
+        outcomes.append(state)
+        try:
+            # The mobile journey starts at a tagged educational link; desktop
+            # uses the tagged homepage. Both must preserve origin attribution.
+            start = ("freight-audit-methodology.html" if via_guide else "index.html")
+            page.goto(base + start + "?" + campaign,
+                      wait_until="load", timeout=25000)
+            if via_guide:
+                page.locator('#next a[href*="start-audit"]').first.click()
+                page.wait_for_url("**/*#start-audit", timeout=15000)
+            check = state["checks"]
+            check["utmRetained"] = all(
+                page.url.find(piece) >= 0 for piece in
+                ("utm_source=facebook", "utm_campaign=retally_oct2026_launch",
+                 "utm_content=oct14_evidence")
+            )
+            check["startsInEmailMode"] = (
+                "Open My Free Audit Request"
+                in page.locator('#auditForm button[type="submit"]').inner_text()
+            )
+
+            # Required fields must fail before any mailto draft is prepared.
+            page.locator('#auditForm button[type="submit"]').click()
+            check["emptyFormRejected"] = (
+                bool(page.locator("#formError").inner_text().strip())
+                and not page.locator("#auditReady").is_visible()
+            )
+
+            page.locator("#fullName").fill("Synthetic QA Person")
+            page.locator("#workEmail").fill("qa-buyer@example.invalid")
+            page.locator("#companyName").fill("SYNTHETIC QA ONLY")
+            page.locator("#annualSpend").select_option(label="$250k–$1M")
+            page.locator('input[name="modes"][value="LTL"]').check()
+
+            # An intercepted clipboard is deterministic even in headless
+            # Chromium. It neither sends mail nor grants OS clipboard access.
+            page.evaluate("""() => {
+              window.__retallyCopied = [];
+              Object.defineProperty(navigator, "clipboard", {
+                configurable: true,
+                value: {writeText: async value => {
+                  window.__retallyCopied.push(String(value));
+                }}
+              });
+            }""")
+            page.locator('#auditForm button[type="submit"]').click()
+            page.locator("#auditReady").wait_for(state="visible", timeout=15000)
+
+            recipient = page.locator(
+                'meta[name="freight-contact-email"]').get_attribute("content")
+            href = page.locator("#sendAuditRequest").get_attribute("href") or ""
+            parsed = urlparse(href)
+            parameters = parse_qs(parsed.query)
+            body = parameters.get("body", [""])[0]
+            ready_text = page.locator("#auditReady").inner_text()
+            check["preparedStateVisible"] = (
+                page.locator("#auditReady").is_visible()
+                and not page.locator("#auditForm").is_visible()
+            )
+            # .inner_text() reflects CSS text-transform:uppercase on
+            # .eyebrow; check the actual status-label source text instead.
+            check["explicitlyNotReceived"] = (
+                page.locator("#auditReady .eyebrow").text_content().strip()
+                    == "Email prepared — not sent"
+                and "Your request has not been sent yet." in
+                    page.locator("#auditReady .audit-manual-fallback").text_content()
+                and page.locator("#auditReady h3").inner_text().strip()
+                    == "Review it, then press Send."
+                and "RETALLY has received your request" not in ready_text
+            )
+            check["mailtoAddressCorrect"] = (
+                bool(recipient) and parsed.scheme == "mailto"
+                and parsed.path == recipient
+                and page.locator("#auditRecipient").inner_text() == recipient
+                and page.locator("#auditRecipient").is_visible()
+            )
+            check["mailtoIncludesSyntheticDetails"] = (
+                "Synthetic QA Person" in body
+                and "qa-buyer@example.invalid" in body
+                and "SYNTHETIC QA ONLY" in body
+                and "Free Recovery Audit Request" in parameters.get("subject", [""])[0]
+            )
+            check["mailtoIncludesCampaign"] = (
+                "Acquisition source:" in body
+                and "utm_source=facebook" in body
+                and "utm_campaign=retally_oct2026_launch" in body
+                and "utm_content=oct14_evidence" in body
+            )
+            page.locator("#copyAuditEmail").click()
+            page.locator("#copyAuditSummary").click()
+            copied = page.evaluate("window.__retallyCopied")
+            check["copyRecipientWorks"] = (
+                len(copied) == 2 and copied[0] == recipient
+            )
+            check["copySummaryWorks"] = (
+                len(copied) == 2 and copied[1] == body
+            )
+            check["noOnlineInquiryPost"] = not api_posts
+            check["noBrowserErrors"] = not errors
+        except Exception as exc:
+            # Persist only a bounded diagnostic in visual QA artifacts.
+            state["errors"].append(type(exc).__name__ + ": " + str(exc)[:200])
+        finally:
+            context.close()
+    return outcomes
+
+
 def measure(bundle: Path, output: Path) -> dict:
     bundle = bundle.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -67,6 +199,7 @@ def measure(bundle: Path, output: Path) -> dict:
     Thread(target=server.serve_forever, daemon=True).start()
     base = f"http://127.0.0.1:{server.server_port}/"
     results = []
+    handoff_checks = []
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
@@ -143,6 +276,7 @@ def measure(bundle: Path, output: Path) -> dict:
                 })""")
                 launcher_checks = [{"open":opened,"closed":closed,"fallback":fallback}]
             chat_context.close()
+            handoff_checks = verify_email_handoff(browser, base)
             browser.close()
     finally:
         server.shutdown()
@@ -169,6 +303,23 @@ def measure(bundle: Path, output: Path) -> dict:
                 or ("menuExpanded" in r and
                     (r["menuExpanded"]!="true" or not r["menuVisible"]))],
       "results":results,"chatLauncher":launcher_checks}
+    summary["emailFallback"] = handoff_checks
+    for item in handoff_checks:
+        broken = [name for name, passed in item["checks"].items() if not passed]
+        if item["errors"] or broken:
+            summary["issues"].append({
+                "page": "email-fallback", "viewport": item["viewport"],
+                "overflow": 0, "missingImages": [], "requiredLabels": [],
+                "jsErrors": item["errors"] + ["Failed: " + ", ".join(broken)],
+                "httpStatus": 200, "screenshot": "n/a",
+            })
+    if len(handoff_checks) != 2:
+        summary["issues"].append({
+            "page": "email-fallback", "viewport": "missing",
+            "overflow": 0, "missingImages": [], "requiredLabels": [],
+            "jsErrors": ["Expected both mobile and desktop journey checks"],
+            "httpStatus": 200, "screenshot": "n/a",
+        })
     (output / "manifest.json").write_text(json.dumps(summary,indent=2)+"\n")
     return summary
 
