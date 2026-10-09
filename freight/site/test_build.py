@@ -229,8 +229,12 @@ class PublicBuildTests(unittest.TestCase):
             org = by_type["Organization"]
             service = by_type["Service"]
             self.assertEqual(org["name"], "RETALLY")
-            self.assertEqual(org.get("sameAs"), ["https://www.instagram.com/retallyrecovery/"])
+            # Both links have been matched to live business profiles:
+            # Windsor.ai's connected Facebook Page and Instagram owner account.
+            self.assertEqual(org.get("sameAs"), ["https://www.facebook.com/p/Retally-61595467040747/", "https://www.instagram.com/retallyrecovery/"])
+            self.assertEqual(index.count('href="https://www.facebook.com/p/Retally-61595467040747/"'), 1)
             self.assertEqual(index.count('href="https://www.instagram.com/retallyrecovery/"'), 1)
+            self.assertIn('target="_blank" rel="noopener noreferrer">Facebook RETALLY</a>', index)
             self.assertIn('target="_blank" rel="noopener noreferrer">Instagram @retallyrecovery</a>', index)
             self.assertNotIn("amuhricaaa", index)
             self.assertEqual(
