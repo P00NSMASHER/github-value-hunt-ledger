@@ -45,6 +45,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           from freight.site.build import SOURCE
+          from freight.site.cloudflare_build import EXPECTED_FILES
           public = Path('cf-retally-public')
           index = (public / 'index.html').read_text()
           headers = (public / '_headers').read_text()
@@ -65,5 +66,5 @@ jobs:
           assert "connect-src 'none'" in legacy
           assert "script-src 'self';" in legacy
           assert "https://www.retallyrecovery.com/" in index
-          assert len([x for x in public.rglob('*') if x.is_file()]) == 69
+          assert len([x for x in public.rglob('*') if x.is_file()]) == EXPECTED_FILES
           PY

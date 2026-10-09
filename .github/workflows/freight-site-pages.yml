@@ -60,7 +60,7 @@ jobs:
         run: |
           python freight/site/build.py --output /tmp/freight-recovery-public
           python -m freight.synthetic_pilot_bundle --verify /tmp/freight-recovery-public/synthetic-pilot-demo.zip
-          test "$(find /tmp/freight-recovery-public -type f | wc -l)" -eq 54
+          test "$(find /tmp/freight-recovery-public -type f | wc -l)" -eq "$(python -c 'from freight.site.build import PUBLIC_FILES;print(len(PUBLIC_FILES))')"
           test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type f | wc -l)" -eq 40
           test "$(find /tmp/freight-recovery-public -mindepth 1 -maxdepth 1 -type d | wc -l)" -eq 1
           test "$(find /tmp/freight-recovery-public -type l | wc -l)" -eq 0
@@ -78,7 +78,7 @@ jobs:
           FREIGHT_CONTACT_VERIFIED: '1'
         run: |
           python -m freight.site.cloudflare_build
-          test "$(find cf-retally-public -type f | wc -l)" -eq 69
+          test "$(find cf-retally-public -type f | wc -l)" -eq "$(python -c 'from freight.site.cloudflare_build import EXPECTED_FILES;print(EXPECTED_FILES)')"
           test "$(find cf-retally-public -type l | wc -l)" -eq 0
           grep -F 'https://www.retallyrecovery.com/' cf-retally-public/index.html
           grep -F 'jay@retallyrecovery.com' cf-retally-public/index.html
