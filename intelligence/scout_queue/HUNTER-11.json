@@ -1,21 +1,65 @@
 {
   "api_metrics": {
-    "api_requests": 5,
-    "known_revision_skips": 1,
+    "api_requests": 6,
+    "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
     "revision_cache_hits": 0,
     "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
-  "candidate_count": 0,
-  "candidates": [],
+  "candidate_count": 1,
+  "candidates": [
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Roblox tycoon in Luau: Rojo live-sync, selene + StyLua, Lune offline tests enforced by a pre-commit hook, and a headless Blender asset pipeline.",
+      "discovery_query": "Roblox asset pipeline Blender Rojo",
+      "exact_revision": "2b6156b00f173ff86afe4b50a4833a0fd29ab0f9",
+      "forks": 0,
+      "primary_language": "Lua",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-10-04T22:39:52Z",
+      "repository": "itwillystyle/build-a-startup",
+      "root_code_signals": [
+        ".github",
+        "src",
+        "tests"
+      ],
+      "size_kb": 1270,
+      "stars": 0,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "blender",
+        "game-development",
+        "luau",
+        "lune",
+        "roblox",
+        "rojo",
+        "selene",
+        "tycoon"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 9,
+        "stars": 0,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 43,
+      "url": "https://github.com/itwillystyle/build-a-startup"
+    }
+  ],
   "catalogs": [
     19,
     39,
     40
   ],
-  "generated_at": "2026-10-08T20:45:13.490589+00:00",
+  "generated_at": "2026-10-09T10:48:05.712432+00:00",
   "mission": "Game-asset pipelines, provenance, 3D/2D processing, optimization and content factories for StarBlox",
   "risk_review": [],
   "risk_review_count": 0,
