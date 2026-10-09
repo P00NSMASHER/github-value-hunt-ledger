@@ -20,6 +20,31 @@
     Object.fromEntries(Object.entries(campaignContext).filter(([, value]) => value))
   );
 
+  // Preserve acquisition attribution when a visitor follows a first-party
+  // educational-page link to the free-audit form. Never tag offsite links or
+  // downloads, and never overwrite a destination's existing campaign value.
+  if (Object.keys(nonEmptyCampaignContext).length) {
+    for (const anchor of all("a[href]")) {
+      if (anchor.hasAttribute("download")) continue;
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#")) continue;
+      let target;
+      try { target = new URL(href, window.location.href); }
+      catch (_error) { continue; }
+      if (target.origin !== window.location.origin ||
+          !["http:", "https:"].includes(target.protocol) ||
+          /\.(?:pdf|zip|csv|xlsx?|png|jpe?g|gif|webp|svg|js|css)$/i.test(target.pathname)) continue;
+      let updated = false;
+      for (const [key, value] of Object.entries(nonEmptyCampaignContext)) {
+        if (!target.searchParams.has(key)) {
+          target.searchParams.set(key, value);
+          updated = true;
+        }
+      }
+      if (updated) anchor.setAttribute("href", target.href);
+    }
+  }
+
   const EVENTS = Object.freeze({
     landingPageViewed: "freight_landing_page_viewed",
     freeAuditCtaClicked: "freight_free_audit_cta_clicked",
@@ -48,7 +73,7 @@
     });
     window.dispatchEvent(new CustomEvent("freight:analytics", { detail }));
     if (Array.isArray(window.dataLayer)) {
-      window.dataLayer.push({ event: eventName, ...properties });
+      window.dataLayer.push({ event: eventName, ...nonEmptyCampaignContext, ...properties });
     }
   };
 
