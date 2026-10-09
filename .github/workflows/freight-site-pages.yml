@@ -44,6 +44,7 @@ jobs:
           freight/test_lead_qualification.py
           freight/test_recovery_engagement.py
           freight/site/test_build.py
+          freight/site/test_public_repo_privacy.py
           freight/site/test_rebase_public_urls.py
           freight/brand/test_brand_finishing.py
           recoveryworks/test_public_site.py
