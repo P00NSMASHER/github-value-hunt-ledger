@@ -143,10 +143,15 @@ def verify_email_handoff(browser, base: str) -> list[dict]:
                 page.locator("#auditReady").is_visible()
                 and not page.locator("#auditForm").is_visible()
             )
+            # .inner_text() reflects CSS text-transform:uppercase on
+            # .eyebrow; check the actual status-label source text instead.
             check["explicitlyNotReceived"] = (
-                "Email prepared — not sent" in ready_text
-                and "Your request has not been sent yet." in ready_text
-                and "Review it, then press Send." in ready_text
+                page.locator("#auditReady .eyebrow").text_content().strip()
+                    == "Email prepared — not sent"
+                and "Your request has not been sent yet." in
+                    page.locator("#auditReady .audit-manual-fallback").text_content()
+                and page.locator("#auditReady h3").inner_text().strip()
+                    == "Review it, then press Send."
                 and "RETALLY has received your request" not in ready_text
             )
             check["mailtoAddressCorrect"] = (
