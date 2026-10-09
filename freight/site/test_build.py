@@ -611,7 +611,7 @@ class RetallyApprovedBrandAssetTests(unittest.TestCase):
                 with self.subTest(asset=relative):
                     data = (output / relative).read_bytes()
                     self.assertEqual(hashlib.sha256(data).hexdigest(), digest)
-                    self.assertTrue(data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"))
+                    self.assertTrue(data.startswith(b"\x89PNG\r\n\x1a\n"))
                     self.assertEqual(struct.unpack(">II", data[16:24]), dimensions)
             manifest = json.loads((output / "site.webmanifest").read_text())
             self.assertEqual(manifest["icons"], [{
