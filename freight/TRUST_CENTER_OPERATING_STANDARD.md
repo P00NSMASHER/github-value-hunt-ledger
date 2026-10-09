@@ -10,8 +10,8 @@ This document defines the claims Freight Recovery may make publicly about trust,
 ## Public business identity
 
 - Brand: Freight Recovery
-- Business contact: jayp19386@gmail.com
-- Business address: 715 Yorktowne Road, Pottsville, PA 17901
+- Business contact: [redacted historical personal inbox]
+- Business address: [residential business mailing address withheld from public repository]
 - Service area: United States
 - Public website: GitHub Pages deployment controlled by the repository public-build allowlist.
 
