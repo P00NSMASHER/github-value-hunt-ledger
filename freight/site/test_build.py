@@ -347,6 +347,24 @@ class PublicBuildTests(unittest.TestCase):
             ):
                 self.assertNotIn(network_or_storage_api, script)
 
+    def test_durable_receipt_hides_mail_only_actions(self):
+        """An accepted online request must not invite an email re-submission."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            script = (output / "site.js").read_text(encoding="utf-8")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            receipt = script.split('if (!response.ok || !result.received', 1)[1].split('} catch (error)', 1)[0]
+            self.assertIn('ready.querySelector(".eyebrow").textContent = "Request received"', receipt)
+            self.assertIn('["sendAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]', receipt)
+            self.assertIn("if (emailOnly) emailOnly.hidden = true;", receipt)
+            self.assertIn('ready.querySelector(".audit-manual-fallback")', receipt)
+            self.assertIn("if (fallbackInstructions) fallbackInstructions.hidden = true;", receipt)
+            # The original manual email-draft path must remain available.
+            draft = script.split("const prepareEmailDraft = () => {", 1)[1].split("fallbackLink?.addEventListener", 1)[0]
+            self.assertIn("window.location.href = sendLink.href;", draft)
+            self.assertIn('id="copyAuditEmail"', page)
+            self.assertIn("Email prepared — not sent", page)
+
     def test_controlled_demo_is_current_and_clearly_synthetic(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")

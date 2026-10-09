@@ -354,8 +354,14 @@
         ready.querySelector("h3").textContent = "RETALLY has received your request.";
         ready.querySelector("p:not(.eyebrow)").textContent = "Reference " + result.reference +
           ". No freight files were submitted. We will review the business details you provided.";
-        byId("sendAuditRequest").hidden = true;
-        byId("copyAuditSummary").hidden = true;
+        // A durable receipt replaces the draft-email workflow. Keeping the
+        // manual fallback visible here could prompt duplicate requests.
+        for (const id of ["sendAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]) {
+          const emailOnly = byId(id);
+          if (emailOnly) emailOnly.hidden = true;
+        }
+        const fallbackInstructions = ready.querySelector(".audit-manual-fallback");
+        if (fallbackInstructions) fallbackInstructions.hidden = true;
         ready.hidden = false;
         ready.focus({ preventScroll: true });
         ready.scrollIntoView({ block: "center", behavior: "smooth" });
