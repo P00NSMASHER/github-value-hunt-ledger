@@ -245,6 +245,39 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn("LocalBusiness", raw_json)
             self.assertIn("Start with a remote qualification request", about)
 
+    def test_retally_social_share_metadata_is_branded_on_both_public_hosts(self):
+        """Social share cards must identify the actual brand and public host."""
+        from freight.site.rebase_public_urls import NEW_BASE, OLD_BASE, rebase
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            legacy = (output / "index.html").read_text(encoding="utf-8")
+            expected_title = "RETALLY | Freight Invoice Audit &amp; Recovery"
+            self.assertIn(
+                f'<meta property="og:title" content="{expected_title}">', legacy
+            )
+            self.assertIn(
+                f'<meta name="twitter:title" content="{expected_title}">', legacy
+            )
+            self.assertIn('<meta property="og:site_name" content="RETALLY">', legacy)
+            self.assertIn(f'<meta property="og:url" content="{OLD_BASE}">', legacy)
+
+            # The production Cloudflare build rebases only its generated public
+            # bundle; the legacy GitHub Pages site retains its original URLs.
+            self.assertGreater(rebase(output), 0)
+            production = (output / "index.html").read_text(encoding="utf-8")
+            self.assertIn(f'<link rel="canonical" href="{NEW_BASE}">', production)
+            self.assertIn(f'<meta property="og:url" content="{NEW_BASE}">', production)
+            image = NEW_BASE + "assets/images/terminal-blue-hour.webp"
+            self.assertIn(f'<meta property="og:image" content="{image}">', production)
+            self.assertIn(f'<meta name="twitter:image" content="{image}">', production)
+            self.assertTrue((output / "assets/images/terminal-blue-hour.webp").is_file())
+            self.assertNotIn(OLD_BASE, production)
+            # Public identity was verified against the connected Instagram
+            # account, not inferred from the former personal-facing handle.
+            self.assertIn('https://www.instagram.com/retallyrecovery/', production)
+            self.assertNotIn("amuhricaaa", production)
+
     def test_contact_is_injected_without_enabling_file_submission(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = build(Path(temporary) / "public")
