@@ -1,6 +1,6 @@
 import json
 import pytest
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 from freight.pilot_activation_packet import build_packet
 from freight.pilot_charter import CharterState, _canonical_hash, build_charter, from_dict, render_markdown
@@ -90,3 +90,43 @@ def test_charter_hash_is_deterministic_and_markdown_preserves_boundary():
     text=render_markdown(a)
     assert "Carrier/vendor contact or money-moving action authorized by this charter: **false**" in text
     assert "not an e-signature system" in text
+
+@pytest.mark.parametrize("name", [
+    "buyer_acknowledges_scope",
+    "buyer_acknowledges_blind_protocol",
+    "buyer_acknowledges_report_totals_separate",
+    "buyer_acknowledges_no_guaranteed_recovery",
+    "freight_acknowledges_no_external_action_without_buyer_approval",
+])
+@pytest.mark.parametrize("forged", ["false", "true", 0, 1, None, [], {}])
+def test_truthy_acknowledgments_never_authorize(name, forged):
+    with pytest.raises(ValueError, match="must be a boolean"):
+        request(**{name: forged})
+
+
+def test_direct_dataclass_constructor_cannot_bypass_boolean_checks():
+    forged=replace(request(), buyer_acknowledges_scope="false")
+    with pytest.raises(ValueError, match="must be a boolean"):
+        build_charter(activation("READY","CONTROLLED_MANUAL_BLIND_PILOT"), forged)
+
+
+@pytest.mark.parametrize("name", ["carrier_scope","mode_scope"])
+@pytest.mark.parametrize("bad", ["Carrier ABC", 123, None, {"carrier": True}, [" "]])
+def test_rejects_malformed_scope_including_string_character_iteration(name, bad):
+    with pytest.raises((ValueError, TypeError), match="must (?:be|contain)"):
+        request(**{name: bad})
+
+
+@pytest.mark.parametrize("bad", ["20000", True, False, float("nan"), float("inf"), float("-inf"), -1, 0])
+def test_contract_fee_must_be_positive_finite_number(bad):
+    with pytest.raises(ValueError, match="fixed_fee_usd"):
+        request(fixed_fee_usd=bad)
+
+
+def test_explicit_false_acknowledgment_stays_pending_on_ready_packet():
+    item=build_charter(
+        activation("READY","CONTROLLED_MANUAL_BLIND_PILOT"),
+        request(buyer_acknowledges_scope=False),
+    )
+    assert item.charter_state==CharterState.PENDING_ACKNOWLEDGMENT.value
+    assert item.customer_data_authorized is False

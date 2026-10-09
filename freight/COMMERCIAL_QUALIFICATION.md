@@ -37,6 +37,35 @@ credentials, rates, or payment records as ordinary email attachments.
 The thresholds are internal operating assumptions and should not be shown as a
 customer score. Record the reason for a manual override.
 
+**Prior auditor/claim overlap is a hard manual-review routing condition.**
+`previously_audited=True` must never yield QUALIFIED or HIGH_PRIORITY without
+first documenting the population, prior auditor's work, active claims, automatic
+credits, attribution and any fee-entitlement conflicts. A human reviewer must
+record a reasoned decision before any substantive work or recovery agreement.
+An absent or unverified `previously_audited` answer (represented as `None`)
+must also route to NEEDS_REVIEW; only an explicitly verified `False` may use
+the ordinary scale-based routing. Never treat missing information as a clean
+prior-audit history. Boolean readiness inputs must be actual boolean evidence,
+not truthy strings such as `"false"`. Routing alone never gives claim authority
+or permits confidential file intake.
+
+**Scope identity is a qualification gate, not a revenue estimate.**
+A profile with zero identified freight modes or zero billed carriers cannot
+receive QUALIFIED or HIGH_PRIORITY routing, even when claimed spend is large,
+rate documents are reported available, or a suspected issue is flagged.
+Flag missing carrier/mode scope as NEEDS_REVIEW and resolve the actual billed
+carrier and applicable mode before proposing a bounded audit. A customer
+estimate of annual spend or model-predicted recovery is not carrier identity,
+valid rate authority, proof of realized recovery, or permission to act.
+
+**Economic approval remains separate.** Lead-routing results only rank the
+readiness conversation. The 30% contingency fee is earned only from eligible
+customer-received funds under an accepted agreement. Research economics in
+the staged Phase 3 / PR #312 branch are hypothetical and cannot authorize a
+customer pilot, confidential intake or claim submission. Record real loaded
+labor and acquisition costs and obtain explicit human sign-off before
+proceeding past the free-audit scope gate.
+
 ## Minimum evidence before substantive work
 
 - a real business and reachable work contact;

@@ -38,6 +38,32 @@ There is no public checkout in this path. An optional fixed-fee forensic audit
 may be proposed by written custom scope when the customer wants a complete
 analysis deliverable and to retain all recoveries.
 
+## First-customer bounded free-audit operating envelope (Mission 9)
+
+Offer a **maximum of 20 eligible invoices** from one selected freight mode and
+normally no more than two carriers in an agreed historical period. This is an
+initial proposal subject to fit, analyst availability, governing rate sources,
+security readiness and a human-approved population freeze; it is **not** a
+promise that every applicant receives 20 reviews, nor a service-level guarantee.
+
+- Reserve an initial 2–3 reviewer/analyst hours per qualified free audit.
+  If the evidence or complexity exceeds that budget, stop, request additional
+  source information, narrow scope or escalate for explicit written approval.
+- Obtain the controlling rates or agreements and at least one independent
+  shipment/payment corroboration source before asserting a rate discrepancy.
+- Mark absent or conflicting authority as **unverified**, not an overcharge.
+- Report reviewed invoice count, period, modes, issue categories, confidence,
+  limitations and recommendation; no feeable dollars arise at this stage.
+- No source documents through marketing forms or ordinary email; an approved
+  secure intake and a records owner are prerequisites for any files.
+- Do not open a live customer audit when the delivery/security gate is blocked.
+- Track founder time at a loaded rate, including no-recovery engagements, and
+  separately assess prospective recovery economics before paid claim work.
+
+This envelope is a conversion and capacity constraint, not a new contractual
+entitlement and not an automatic eligibility/approval rule. The operative
+signed engagement and approved intake terms control.
+
 ## Qualification conversation
 
 Ask only what changes the routing decision:

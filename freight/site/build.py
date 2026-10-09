@@ -265,6 +265,20 @@ def build(
         raise ValueError("Commercial configuration must contain one rate and label token.")
     text_bundle["commercial-config.js"] = config.replace(RATE_TOKEN, format(rate, "f")).replace(RATE_LABEL_TOKEN, rate_label)
 
+    # Server-render the configured commercial rate for search engines, previews,
+    # and visitors without JavaScript. Keep the signed engagement authoritative.
+    rate_fallbacks = {
+        "index.html": '<strong data-rate-label>Rate confirmed before engagement</strong>',
+        "engagement-framework.html": '<b data-rate-label>Rate confirmed in writing</b>',
+    }
+    for name, placeholder in rate_fallbacks.items():
+        if text_bundle[name].count(placeholder) != 1:
+            raise ValueError(f"Expected exactly one commercial-rate placeholder in {name}")
+        text_bundle[name] = text_bundle[name].replace(
+            placeholder,
+            placeholder.replace(placeholder.split(">")[1].split("<")[0], html.escape(rate_label)),
+        )
+
     if text_bundle["index.html"].count(DEMO_MARKER) != 1:
         raise ValueError("The source must contain exactly one controlled-demo marker.")
     with tempfile.TemporaryDirectory() as temporary:

@@ -275,6 +275,8 @@
       }
       const reference = makeReference();
       preparedSummary = buildSummary(reference);
+      const recipient = byId("auditRecipientAddress");
+      if (recipient) recipient.textContent = contactEmail;
       const subject = encodeURIComponent("Free Recovery Audit Request — " + fieldValue("companyName") + " — " + reference);
       const body = encodeURIComponent(preparedSummary);
       sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
