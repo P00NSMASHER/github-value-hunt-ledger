@@ -289,12 +289,32 @@
       ready.hidden = false;
       ready.focus({ preventScroll: true });
       ready.scrollIntoView({ block: "center", behavior: "smooth" });
-      track(EVENTS.auditFormCompleted, { completedSteps: 1, method: "email_draft" });
-      track(EVENTS.auditRequestPrepared, { reference });
+      // An email draft is not a received lead. Only durable D1 acceptance may
+      // emit the form-completed conversion event.
+      track(EVENTS.auditRequestPrepared, { reference, deliveryConfirmed: false });
       // Keep the mail app handoff inside the visitor's click/submit gesture.
       // Mobile browsers may suppress deferred mailto navigation.
       window.location.href = sendLink.href;
     };
+
+    byId("editAuditRequest")?.addEventListener("click", () => {
+      // Keep the visitor's inputs when their email app did not open, or when
+      // they notice an error in the prepared draft. Nothing was submitted.
+      preparedSummary = "";
+      const ready = byId("auditReady");
+      if (ready) ready.hidden = true;
+      auditForm.hidden = false;
+      const sendLink = byId("sendAuditRequest");
+      if (sendLink) {
+        sendLink.href = "#contact-pending";
+        sendLink.setAttribute("aria-disabled", "true");
+      }
+      const copyStatus = byId("copyStatus");
+      if (copyStatus) copyStatus.textContent = "";
+      setError("");
+      byId("fullName")?.focus({ preventScroll: true });
+      auditForm.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
 
     fallbackLink?.addEventListener("click", (event) => {
       event.preventDefault();
@@ -356,7 +376,7 @@
           ". No freight files were submitted. We will review the business details you provided.";
         // A durable receipt replaces the draft-email workflow. Keeping the
         // manual fallback visible here could prompt duplicate requests.
-        for (const id of ["sendAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]) {
+        for (const id of ["sendAuditRequest", "editAuditRequest", "copyAuditSummary", "copyAuditEmail", "copyStatus"]) {
           const emailOnly = byId(id);
           if (emailOnly) emailOnly.hidden = true;
         }

@@ -105,6 +105,14 @@ def verify_email_handoff(browser, base: str) -> list[dict]:
                 in page.locator('#auditForm button[type="submit"]').inner_text()
             )
 
+            # Capture *public event names only*; never persist visitor data.
+            page.evaluate("""() => {
+              window.__retallyQaEvents = [];
+              window.addEventListener("freight:analytics", e => {
+                if (["freight_audit_form_completed", "freight_audit_request_prepared"]
+                      .includes(e.detail?.event)) window.__retallyQaEvents.push(e.detail.event);
+              });
+            }""")
             # Required fields must fail before any mailto draft is prepared.
             page.locator('#auditForm button[type="submit"]').click()
             check["emptyFormRejected"] = (
@@ -181,6 +189,37 @@ def verify_email_handoff(browser, base: str) -> list[dict]:
             check["copySummaryWorks"] = (
                 len(copied) == 2 and copied[1] == body
             )
+            # A prepared email is an *attempt*, never a recorded customer lead.
+            check["preparedDraftHasNoFalseConversion"] = page.evaluate("""() =>
+              window.__retallyQaEvents.filter(n =>
+                n === "freight_audit_form_completed").length === 0 &&
+              window.__retallyQaEvents.filter(n =>
+                n === "freight_audit_request_prepared").length === 1
+            """)
+            page.locator("#editAuditRequest").click()
+            check["editRestoresPopulatedForm"] = (
+                page.locator("#auditForm").is_visible()
+                and not page.locator("#auditReady").is_visible()
+                and page.locator("#companyName").input_value() == "SYNTHETIC QA ONLY"
+                and page.locator("#sendAuditRequest").get_attribute("aria-disabled") == "true"
+            )
+            page.locator("#companyName").fill("SYNTHETIC QA REVISED")
+            page.locator('#auditForm button[type="submit"]').click()
+            page.locator("#auditReady").wait_for(state="visible", timeout=15000)
+            amended = page.locator("#sendAuditRequest").get_attribute("href") or ""
+            amended_params = parse_qs(urlparse(amended).query)
+            amended_body = amended_params.get("body", [""])[0]
+            check["editedDraftReplacesStaleDetails"] = (
+                amended != href and "SYNTHETIC QA REVISED" in amended_body
+                and "Company: SYNTHETIC QA ONLY" not in amended_body
+                and "SYNTHETIC QA REVISED" in amended_params.get("subject", [""])[0]
+            )
+            check["editAndReprepareNeverSignalReceivedLead"] = page.evaluate("""() =>
+              window.__retallyQaEvents.filter(n =>
+                n === "freight_audit_form_completed").length === 0 &&
+              window.__retallyQaEvents.filter(n =>
+                n === "freight_audit_request_prepared").length === 2
+            """)
             check["noOnlineInquiryPost"] = not api_posts
             check["noBrowserErrors"] = not errors
         except Exception as exc:
