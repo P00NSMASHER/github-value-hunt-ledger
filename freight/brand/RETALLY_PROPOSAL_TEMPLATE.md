@@ -1,4 +1,4 @@
-![RETALLY wordmark](../site/assets/brand/retally-wordmark.svg)
+![RETALLY wordmark](../site/assets/brand/retally-wordmark-approved.png)
 
 # Freight billing review & recovery support
 
