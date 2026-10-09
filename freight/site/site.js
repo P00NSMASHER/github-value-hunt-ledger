@@ -279,6 +279,11 @@
       const body = encodeURIComponent(preparedSummary);
       sendLink.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
       sendLink.removeAttribute("aria-disabled");
+      const recipient = byId("auditRecipient");
+      if (recipient) {
+        recipient.href = `mailto:${contactEmail}`;
+        recipient.textContent = contactEmail;
+      }
       auditForm.hidden = true;
       const ready = byId("auditReady");
       ready.hidden = false;
@@ -382,6 +387,18 @@
         output.textContent = "Request details copied.";
       } catch (_error) {
         output.textContent = "Copy was unavailable. Use the prepared email instead.";
+      }
+    });
+
+    byId("copyAuditEmail")?.addEventListener("click", async () => {
+      const output = byId("copyStatus");
+      const email = byId("auditRecipient")?.textContent || "";
+      if (!email || !output) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        output.textContent = "Recipient email address copied.";
+      } catch (_error) {
+        output.textContent = "Copy was unavailable. Select the visible email address instead.";
       }
     });
   }
