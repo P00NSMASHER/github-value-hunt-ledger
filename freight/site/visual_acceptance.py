@@ -48,8 +48,18 @@ MEASURE = """() => {
      emailReadable:getComputedStyle(footerEmail).visibility==='visible'
    };
  }
+ const buttonSurfaces=[...document.querySelectorAll('.button,.text-button,.menu-toggle,.retally-social__button,.retally-chat-launcher')]
+   .filter(el=>{const st=getComputedStyle(el),r=el.getBoundingClientRect();
+     return st.display!=='none'&&st.visibility!=='hidden'&&r.width>0&&r.height>0
+       && !el.disabled && el.getAttribute('aria-disabled')!=='true';})
+   .map(el=>{const st=getComputedStyle(el),r=el.getBoundingClientRect();
+     return {tag:el.tagName,selector:String(el.className).slice(0,90),
+       width:Math.round(r.width),height:Math.round(r.height),
+       onScreen:r.left>=-1&&r.right<=innerWidth+1,
+       hasDepth:st.boxShadow!=='none',hasFocusLabel:!!(el.textContent.trim()||el.getAttribute('aria-label'))};});
  return {innerWidth,documentWidth:doc.scrollWidth,bodyWidth:body.scrollWidth,
    overflow:Math.max(doc.scrollWidth,body.scrollWidth)-innerWidth,offenders:extents,
+   buttonSurfaces,
    dateWidth:date?Math.round(date.getBoundingClientRect().width):null,
    dateUnbroken:date?getComputedStyle(date).whiteSpace==='nowrap':null,
    title:document.title,footerContact,
@@ -326,6 +336,15 @@ def measure(bundle: Path, output: Path) -> dict:
             results.append({"page":"chat-launcher","viewport":"390x844","overflow":0,
                 "missingImages":[],"jsErrors":["Launcher open/close/fallback contract failed"],
                 "requiredLabels":[],"httpStatus":200,"screenshot":"n/a"})
+    # Every visible first-party CTA must retain 44px tap height, non-clipped
+    # geometry, a readable label and a dimensional rendered surface.
+    for record in results:
+        for button in record.get("buttonSurfaces", []):
+            if button["height"] < 44 or not button["onScreen"] or not button["hasDepth"] or not button["hasFocusLabel"]:
+                record["jsErrors"].append(
+                    "3D button acceptance failure: " + button["selector"]
+                )
+                break
     # The footer has its own acceptance gate because contact links can collide
     # without causing overflow or a JavaScript error.
     for record in results:
