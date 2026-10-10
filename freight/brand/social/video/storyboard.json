@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "status": "preproduction-not-approved",
+  "project": "RETALLY — Evidence First Presenter Film",
+  "reference": "Owner-provided Reel is a stylistic reference only; never reuse its presenter likeness, original audio, footage or graphics",
+  "pronunciation": {
+    "written": "RETALLY",
+    "spoken": "re-tally",
+    "tts_hint": "ree-TAL-ee",
+    "must_be_listened_to": true
+  },
+  "deliverable": {
+    "width": 1080,
+    "height": 1920,
+    "min_fps": 25,
+    "max_fps": 60,
+    "duration_range_seconds": [
+      28,
+      32
+    ],
+    "auto_publish": false
+  },
+  "hypothetical": {
+    "arrival": "08:30",
+    "departure": "11:00",
+    "dwell_minutes": 150,
+    "contract_free_minutes": 120,
+    "billed_minutes": 90,
+    "excess_minutes": 30,
+    "candidate_variance_minutes": 60,
+    "disclaimer": "ILLUSTRATIVE EXAMPLE — NOT ACTUAL CUSTOMER RESULTS"
+  },
+  "scenes": [
+    {
+      "start": 0,
+      "end": 3,
+      "frame": "original presenter direct to camera",
+      "subtitle": "BILLED: 90 MIN"
+    },
+    {
+      "start": 3,
+      "end": 7,
+      "frame": "presenter with gate record",
+      "subtitle": "08:30 IN → 11:00 OUT"
+    },
+    {
+      "start": 7,
+      "end": 11,
+      "frame": "presenter lower half; actual moving gate footage above",
+      "subtitle": "150 MIN TOTAL"
+    },
+    {
+      "start": 11,
+      "end": 15,
+      "frame": "presenter + clearly illustrative contract term",
+      "subtitle": "120 MIN FREE"
+    },
+    {
+      "start": 15,
+      "end": 19,
+      "frame": "proof bar graphics over moving logistics scene",
+      "subtitle": "30 MIN BEYOND FREE TIME"
+    },
+    {
+      "start": 19,
+      "end": 23.5,
+      "frame": "presenter with candidate variance",
+      "subtitle": "60-MINUTE CANDIDATE VARIANCE"
+    },
+    {
+      "start": 23.5,
+      "end": 26.5,
+      "frame": "evidence check cutaways",
+      "subtitle": "VERIFY BEFORE RECOVERY"
+    },
+    {
+      "start": 26.5,
+      "end": 29.5,
+      "frame": "approved unaltered RETALLY wordmark on white",
+      "subtitle": "Find it. Prove it. Recover it."
+    }
+  ],
+  "human_release_gates": [
+    "presenter lip sync original and credible",
+    "full phone visual/audio listening",
+    "correct spoken re-tally",
+    "no generic centered title-card look",
+    "mathematics 150-120=30 and 90-30=60 correct",
+    "example disclaimer legible",
+    "licensed media documentation",
+    "actual original logo unaltered",
+    "captions accurate not occluding evidence",
+    "owner explicitly approves final MP4"
+  ]
+}
