@@ -1,0 +1,49 @@
+name: RETALLY Facebook brand assets
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'freight/brand/social/build_facebook_cover.py'
+      - 'freight/brand/social/test_build_facebook_cover.py'
+      - 'freight/brand/social/FACEBOOK_LAUNCH.md'
+      - 'freight/site/assets/brand/retally-wordmark-approved.png'
+      - '.github/workflows/retally-facebook-assets.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  facebook-cover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check 'Pillow==12.3.0'
+      - name: Validate existing wordmark and unit gates
+        run: |
+          python -m unittest discover -s freight/brand/social -p 'test_build_facebook_cover.py' -v
+      - name: Generate branded cover without replacing master artwork
+        run: |
+          python freight/brand/social/build_facebook_cover.py \
+            --output "$RUNNER_TEMP/retally-facebook-cover-1640x624.png"
+          python - <<'PY'
+          import hashlib, os
+          from PIL import Image
+          p = os.path.join(os.environ['RUNNER_TEMP'], 'retally-facebook-cover-1640x624.png')
+          with Image.open(p) as image:
+              assert image.size == (1640, 624) and image.mode == 'RGB'
+          print('Output SHA256:', hashlib.sha256(open(p, 'rb').read()).hexdigest())
+          PY
+      - name: Publish download-only assets for human Facebook Page upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: retally-facebook-profile-and-cover
+          retention-days: 30
+          if-no-files-found: error
+          path: |
+            freight/brand/social/retally-facebook-avatar-1024.png
+            ${{ runner.temp }}/retally-facebook-cover-1640x624.png
