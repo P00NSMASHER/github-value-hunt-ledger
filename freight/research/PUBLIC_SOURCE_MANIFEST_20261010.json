@@ -45,10 +45,10 @@
       "url": "https://usc-cdn.house.gov/view.xhtml?edition=prelim&num=0&req=granuleid%3AUSC-prelim-title49-section13710"
     },
     {
-      "id": "ecfr.3788",
-      "publisher": "Electronic Code of Federal Regulations",
+      "id": "govinfo.3788",
+      "publisher": "Federal Register (U.S. Government Publishing Office)",
       "lane": "carrier_regulatory",
-      "url": "https://www.ecfr.gov/current/title-49/part-378/section-378.8"
+      "url": "https://www.govinfo.gov/content/pkg/FR-2018-04-16/html/2018-07749.htm"
     },
     {
       "id": "estes.tariff",
