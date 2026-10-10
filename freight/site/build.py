@@ -120,6 +120,46 @@ DEMO_MARKER = '<!-- CONTROLLED_SYNTHETIC_DEMO_DOWNLOAD -->'
 RATE_TOKEN = "__CONTINGENCY_RECOVERY_RATE__"
 RATE_LABEL_TOKEN = "__CONTINGENCY_RECOVERY_RATE_LABEL__"
 
+
+# The verified public social destinations live in one build-time component.
+# Keep links visible without JavaScript; no tracking, authentication or SDKs.
+# LinkedIn will be added only after an official RETALLY Company Page exists.
+SOCIAL_CHANNELS = (
+    ("Facebook", "https://www.facebook.com/p/Retally-61595467040747/",
+     '<path fill="currentColor" d="M14.1 21v-7.3h2.5l.4-3.1h-2.9V8.7c0-.9.3-1.5 1.6-1.5H17V4.5c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v1.9H7.8v3.1h2.5V21z"/>'),
+    ("Instagram", "https://www.instagram.com/retallyrecovery/",
+     '<rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/>'
+     '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/>'
+     '<circle cx="17.3" cy="6.8" r="1.1" fill="currentColor"/>'),
+    ("YouTube", "https://www.youtube.com/channel/UCnS99gTJFScnA2gy4wKU_JQ",
+     '<rect x="2.5" y="5" width="19" height="14" rx="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/>'
+     '<path d="m10 9 6 3-6 3Z" fill="currentColor"/>'),
+)
+
+def _social_nav() -> str:
+    links = "".join(
+        '<a href="' + url + '" target="_blank" rel="noopener noreferrer" '
+        'aria-label="RETALLY on ' + name + ' (opens in a new tab)">'
+        '<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" focusable="false">'
+        + icon + '</svg><span>' + name + '</span></a>'
+        for name, url, icon in SOCIAL_CHANNELS
+    )
+    return (
+        '<nav class="wrap retally-social" aria-label="RETALLY social media">'
+        '<span class="retally-social__title">Follow RETALLY</span>'
+        '<div class="retally-social__links">' + links + '</div></nav>'
+    )
+
+
+def _embed_social_nav(page: str, asset: str) -> str:
+    footer_bottom = '<div class="wrap footer-bottom">'
+    if (page.count(footer_bottom) != 1 or page.count("</footer>") != 1
+            or "class=\"wrap retally-social\"" in page
+            or page.index("<footer") >= page.index(footer_bottom)):
+        raise ValueError(f"Unexpected social footer boundary: {asset}")
+    return page.replace(footer_bottom, _social_nav() + "\n  " + footer_bottom, 1)
+
+
 # Public site identifier, not an API credential. The widget reads public
 # marketing knowledge only, never customer files or RecoveryOS information.
 BUBBLAV_ID = "b0e3b0a1-8f64-4dcd-ac82-507366428147"
@@ -282,6 +322,11 @@ def build(
         '<p class="microcopy">Sample data only. This walkthrough is not a customer result or recovery claim.</p>'
     )
     text_bundle["index.html"] = text_bundle["index.html"].replace(DEMO_MARKER, demo_link)
+
+    # Social profiles are informational, read-only outbound links. Inject the
+    # same accessible component on every public marketing page at build time.
+    for name in PUBLIC_CONTACT_PAGES:
+        text_bundle[name] = _embed_social_nav(text_bundle[name], name)
 
     # The marketing chatbot belongs on customer-facing content pages, not
     # RecoveryOS, the sample accounting report, or the error page. Keep the

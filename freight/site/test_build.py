@@ -229,13 +229,18 @@ class PublicBuildTests(unittest.TestCase):
             org = by_type["Organization"]
             service = by_type["Service"]
             self.assertEqual(org["name"], "RETALLY")
-            # Both links have been matched to live business profiles:
-            # Windsor.ai's connected Facebook Page and Instagram owner account.
-            self.assertEqual(org.get("sameAs"), ["https://www.facebook.com/p/Retally-61595467040747/", "https://www.instagram.com/retallyrecovery/"])
-            self.assertEqual(index.count('href="https://www.facebook.com/p/Retally-61595467040747/"'), 1)
-            self.assertEqual(index.count('href="https://www.instagram.com/retallyrecovery/"'), 1)
-            self.assertIn('target="_blank" rel="noopener noreferrer">Facebook RETALLY</a>', index)
-            self.assertIn('target="_blank" rel="noopener noreferrer">Instagram @retallyrecovery</a>', index)
+            # Confirmed Facebook and Instagram owner accounts, plus the
+            # RETALLY YouTube channel ID from connected Metricool/YouTube.
+            social = [
+                "https://www.facebook.com/p/Retally-61595467040747/",
+                "https://www.instagram.com/retallyrecovery/",
+                "https://www.youtube.com/channel/UCnS99gTJFScnA2gy4wKU_JQ",
+            ]
+            self.assertEqual(org.get("sameAs"), social)
+            for url in social:
+                self.assertEqual(index.count('href="' + url + '"'), 1)
+            for name in ("Facebook", "Instagram", "YouTube"):
+                self.assertIn('aria-label="RETALLY on ' + name + ' (opens in a new tab)"', index)
             self.assertNotIn("amuhricaaa", index)
             self.assertEqual(
                 org["logo"]["url"],
@@ -703,6 +708,51 @@ class RetallyApprovedBrandAssetTests(unittest.TestCase):
             index = (output / "index.html").read_text()
             self.assertIn("assets/brand/retally-wordmark-approved.png", index)
             self.assertIn("assets/brand/retally-emblem-approved.png", index)
+
+
+
+class RetallySocialFooterTests(unittest.TestCase):
+    """Official social links are site-wide, keyboard-usable and never duplicated."""
+
+    def test_verified_social_navigation_on_each_marketing_page(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            verified = (
+                "https://www.facebook.com/p/Retally-61595467040747/",
+                "https://www.instagram.com/retallyrecovery/",
+                "https://www.youtube.com/channel/UCnS99gTJFScnA2gy4wKU_JQ",
+            )
+            for name in builder.PUBLIC_CONTACT_PAGES:
+                with self.subTest(page=name):
+                    page = (output / name).read_text(encoding="utf-8")
+                    self.assertEqual(page.count('aria-label="RETALLY social media"'), 1)
+                    self.assertIn("Follow RETALLY", page)
+                    self.assertEqual(page.count('class="retally-social__links"'), 1)
+                    for url in verified:
+                        self.assertEqual(page.count('href="' + url + '"'), 1)
+                    for network in ("Facebook", "Instagram", "YouTube"):
+                        self.assertIn(
+                            'aria-label="RETALLY on ' + network
+                            + ' (opens in a new tab)"', page
+                        )
+                    social = page.split('<nav class="wrap retally-social"', 1)[1].split("</nav>", 1)[0]
+                    self.assertEqual(social.count('target="_blank" rel="noopener noreferrer"'), 3)
+                    self.assertEqual(social.count('focusable="false"'), 3)
+                    self.assertNotIn("linkedin.com/company/retally", page.lower())
+
+    def test_mobile_and_keyboard_presentation_are_not_icon_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            css = (output / "foundry.css").read_text(encoding="utf-8")
+            for needle in (
+                "RETALLY social footer v1",
+                ".site-footer .retally-social__links a:focus-visible",
+                "@media(max-width:620px)",
+                "grid-template-columns:repeat(3,minmax(0,1fr))",
+                "min-height:44px;min-width:44px",
+                "@media(prefers-reduced-motion:reduce)",
+            ):
+                self.assertIn(needle, css)
 
 if __name__ == "__main__":
     unittest.main()
