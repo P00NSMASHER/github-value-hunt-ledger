@@ -184,6 +184,14 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
         forged["anchors"][0]["quote"]+=" FORGED"
         _must(bool(validate_anchor_book(forged,registry,as_of=today)),
               "TAMPERED_EXTERNAL_SOURCE_QUOTE_ACCEPTED")
+        from freight.research_change_impact import build_refresh_queue
+        queue=build_refresh_queue(
+            registry=registry, proof=proof, decisions=opposition, as_of=today
+        )
+        _must(queue["source_count"]>=12,"RESEARCH_SOURCE_CENSUS_INCOMPLETE")
+        _must(queue["automatic_fetch_or_schedule"] is False,"UNAPPROVED_AUTOMATIC_RESEARCH")
+        _must(not queue["any_sources_independently_fact_checked"],
+              "SOURCE_FRESHNESS_MISLABELED_AS_FACT_CHECKING")
         return {"competitors":len(evidence["competitors"]),
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
@@ -196,7 +204,9 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "evidence_receipt_sha256":proof["receipt_sha256"],
                 "strategic_decisions":len(opposition["decisions"]),
                 "opposition_receipt_sha256":opposition["receipt_sha256"],
-                "source_refresh_automated":False},"STALE_VENDOR_AND_TAMPERED_EXTERNAL_SOURCE_REJECTED"
+                "refresh_queue_sources":queue["source_count"],
+                "refresh_queue_receipt_sha256":queue["receipt_sha256"],
+                "source_refresh_automated":False},"STALE_AND_TAMPERED_SOURCE_ASSERTIONS_REJECTED"
     raise ValueError("UNSUPPORTED_LAB")
 
 
