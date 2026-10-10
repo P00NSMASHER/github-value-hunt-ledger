@@ -172,8 +172,16 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
             raise ValueError("TAMPERED_PUBLIC_SOURCE_ACCEPTED")
         from freight.research_evidence_gate import run_mission, validate_anchor_book
         proof,opposition=run_mission(as_of=today)
-        _must(proof["anchor_count"]==13,"INCOMPLETE_SOURCE_ANCHOR_REVIEW")
+        _must(proof["anchor_count"]==14,"INCOMPLETE_SOURCE_ANCHOR_REVIEW")
         _must(proof["anchored_claim_count"]>=18,"CLAIM_ANCHOR_COVERAGE_REGRESSION")
+        response_review=next(
+            a for a in proof["assessments"]
+            if a["claim_id"]=="campaign.carrier.response"
+        )
+        _must(response_review["review_status"]=="CURRENT_ECFR_TEXT_OBSERVED_LEGAL_REVIEW_PENDING",
+              "CURRENT_PRIMARY_DISPOSITION_AUTHORITY_MISSING")
+        _must(response_review["client_specific_legal_applicability_established"] is False,
+              "PUBLISHED_RULE_TEXT_WRONGLY_CERTIFIED_FOR_CUSTOMER")
         _must(len(opposition["decisions"])==6,"INCOMPLETE_OPPOSITION_DECISIONS")
         _must(all(not x["public_marketing_permitted"] for x in proof["assessments"]),
               "UNREVIEWED_RESEARCH_PROMOTED_TO_MARKETING")
@@ -196,7 +204,7 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
                 "source_status":"DATED_PUBLIC_SUMMARIES_NOT_INDEPENDENTLY_AUDITED",
                 "research_lanes":len(brief["lanes"]),
                 "source_records":brief["source_register_count"],
-                "public_campaign_sources":12,
+                "public_campaign_sources":13,
                 "opposition_findings":brief["opposition_findings"],
                 "research_receipt_sha256":brief["receipt_sha256"],
                 "source_quote_anchors":proof["anchor_count"],
