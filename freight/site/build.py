@@ -163,14 +163,6 @@ def _embed_social_nav(page: str, asset: str) -> str:
             or page.index("<footer") >= page.index(footer_bottom)):
         raise ValueError(f"Unexpected social footer boundary: {asset}")
     page = page.replace(footer_bottom, _social_nav() + "\n  " + footer_bottom, 1)
-    # Bust stale glossy CSS across ALL public marketing pages, not just home.
-    page, count = re.subn(
-        r'foundry\.css\?v=[\w-]+',
-        'foundry.css?v=retally-social-gloss-20261010',
-        page,
-    )
-    if count != 1:
-        raise ValueError(f"Unexpected social stylesheet boundary: {asset}")
     return page
 
 
@@ -342,6 +334,20 @@ def build(
     # same accessible component on every public marketing page at build time.
     for name in PUBLIC_CONTACT_PAGES:
         text_bundle[name] = _embed_social_nav(text_bundle[name], name)
+
+    # All HTML pages—including standalone reports and the 404 page—must
+    # request the new shared button stylesheet. Never re-publish a stale
+    # cached visual system merely because a page lacks the social footer.
+    button_css = "foundry.css?v=retally-all-buttons-3d-20261010"
+    for name in TEXT_SOURCE_FILES:
+        if not name.endswith(".html") or "foundry.css?v=" not in text_bundle[name]:
+            continue
+        updated, count = re.subn(
+            r'foundry\.css\?v=[\w-]+', button_css, text_bundle[name]
+        )
+        if count != 1:
+            raise ValueError(f"Unexpected button stylesheet reference: {name}")
+        text_bundle[name] = updated
 
     # The marketing chatbot belongs on customer-facing content pages, not
     # RecoveryOS, the sample accounting report, or the error page. Keep the
