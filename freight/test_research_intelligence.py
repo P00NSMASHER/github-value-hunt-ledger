@@ -128,6 +128,33 @@ class ResearchIntelligenceTests(unittest.TestCase):
         self.assertIn("No automated searches performed", html)
         self.assertNotIn("API_KEY", html)
 
+    def test_operator_collected_market_source_enters_public_review_not_fact(self):
+        data = seeded()
+        excerpt = "A prospective public study requires independent review of its sample."
+        sid = "public.market.study.001"
+        data["sources"].append({
+            "id": sid, "type": "INDEPENDENT_REPORT",
+            "url": "https://example.org/market-study",
+            "publisher": "Demonstration public source",
+            "captured_at": "2026-10-10", "valid_until": "2026-11-10",
+            "excerpt": excerpt, "excerpt_sha256": digest(excerpt),
+        })
+        data["claims"].append({
+            "id": "market.study.001", "lane": "market",
+            "issue_key": "market-sample-unknown", "subject": "Illustrative study",
+            "stance": "CHALLENGE",
+            "statement": "The sample may not support a market-wide extrapolation.",
+            "classification": "PUBLIC_REPORT", "source_ids": [sid],
+            "importance": 4,
+            "next_test": "Independently reproduce the dataset and sampling method.",
+        })
+        r = compile_brief(data, as_of=date(2026, 10, 10))
+        market = next(row for row in r["lanes"] if row["lane"] == "market")
+        finding = next(row for row in r["prioritized_findings"] if row["id"] == "market.study.001")
+        self.assertEqual(market["sourced_observations"], 1)
+        self.assertEqual(finding["evidence_status"], "PUBLIC_SOURCE_NOT_FACT_CHECKED")
+        self.assertFalse(finding["can_publish_as_verified"])
+
     def test_no_unauthorized_scope(self):
         data = seeded()
         data["scope"] = "LIVE_CARRIER_COLLECTION"
