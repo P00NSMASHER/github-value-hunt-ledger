@@ -146,7 +146,7 @@ def _run_extension(lab: int, *, record, authority_book, assumptions) -> tuple[di
     if lab == 14:
         from freight.competitive_matrix import validate_competitor_evidence
         evidence=_read("PHASE3_COMPETITOR_EVIDENCE_2026-10-07.json")
-        today=date(2026,10,8)
+        today=date.today()  # Old vendor snapshot must eventually expire, not become evergreen.
         issues=validate_competitor_evidence(evidence,as_of=today)
         _must(not issues,"COMPETITOR_BASELINE_INVALID:"+",".join(issues[:3]))
         bad=copy.deepcopy(evidence);bad["valid_until"]="2025-01-01"
