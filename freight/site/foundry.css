@@ -819,6 +819,8 @@ h1,h2,h3{font-family:Hanken,system-ui,sans-serif;font-weight:650;letter-spacing:
 .text-button:active:not(:disabled){transform:translateY(1px);box-shadow:inset 0 1px 4px rgba(0,39,20,.14);}
 .text-button:focus-visible{outline:3px solid #087a50;outline-offset:3px;}
 .text-button:disabled{opacity:.55;cursor:not-allowed;box-shadow:none;}
+/* Author display rules must never reveal a fallback marked hidden. */
+.button[hidden],.text-button[hidden],.menu-toggle[hidden]{display:none;}
 /* The menu is a functional button, without changing its show/hide rules. */
 .site-header .menu-toggle{
  border:1px solid rgba(203,254,225,.65);
