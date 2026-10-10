@@ -20,7 +20,7 @@ from urllib.request import (
     HTTPRedirectHandler, Request, build_opener,
 )
 
-MAX_SOURCES = 12
+MAX_SOURCES = 13
 MAX_BYTES = 256_000
 MAX_EXCERPT_CHARS = 950
 TIMEOUT_SECONDS = 8
