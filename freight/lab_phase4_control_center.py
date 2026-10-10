@@ -15,6 +15,7 @@ from freight.lab_phase4_director import execute_all_labs, priority_actions
 from freight.lab_phase4_experiments import conduct_experiments, load_findings
 from freight.research_intelligence import render_html as render_research_html
 from freight.research_public_campaign import campaign_brief
+from freight.research_evidence_gate import run_mission, render_html as render_opposition_html
 from freight.test_lab_phase3_real_chain import rating_fixture, funded_store, scenario
 from freight.test_lab_assurance import assertions_and_fees, verifier
 
@@ -33,6 +34,9 @@ def snapshot(max_labs: int=14) -> dict:
             verifier=verifier(),contingency=scenario())
         result["experiment_campaign"]=campaign
         result["research_intelligence"]=campaign_brief(as_of=date.today())
+        proof, decisions=run_mission(as_of=date.today())
+        result["research_evidence_fidelity"]=proof
+        result["opposition_register"]=decisions
         result["recommended_next_actions"]=priority_actions(result)
         result["source_context"]={
             "revision_scope":"REPOSITORY_PYTHON_MODULES",
@@ -61,6 +65,13 @@ def render(data: dict) -> str:
         f'<tr><th>{escape(row["lane"])}</th><td>{row["sourced_observations"]}</td>'
         f'<td>{escape(row["state"])}</td></tr>'
         for row in research["lanes"]
+    )
+    proof=data["research_evidence_fidelity"]
+    opposition=data["opposition_register"]
+    decision_rows="".join(
+        f'<tr><th>{escape(row["id"])}</th>'
+        f'<td>{escape(row["subject"])}</td><td>{row["priority_score_ordinal_not_forecast"]}</td></tr>'
+        for row in opposition["decisions"]
     )
     cohort=data["three_customer_pilot"]
     rows="".join(f'<tr><th>{escape(x["synthetic_customer_id"])}</th><td>{escape(x["state"])}</td><td>{x["simulated_accounting"]["simulated_net_recovered_cents"]/100:,.2f}</td><td>{x["economic_scenario"]["expected_net_margin_cents"]/100:,.2f}</td></tr>' for x in cohort["cohort"])
@@ -102,6 +113,12 @@ footer{margin-top:40px;border-top:1px solid var(--line);padding-top:22px;font-si
 <p>Eight research disciplines, imported vendor claims, internal counterarguments and dated source records. Read-only, not an independent fact check.</p>
 <a href="research.html">Open Research Intelligence Workbench ↗</a>
 <table><thead><tr><th>Research discipline</th><th>Source-linked items</th><th>Evidence state</th></tr></thead><tbody>"""+research_rows+"""</tbody></table></section>
+<section class="panel"><h2>Evidence fidelity and oppositional decisions</h2>
+<p>Short source excerpts are not independent authentication. Unanchored and stale claims remain held. Priority scores are internal ordinal triage, never predicted ROI.</p>
+<p>""" +str(proof["anchor_count"])+""" source snippets · """+str(proof["anchored_claim_count"])+""" anchored observations · """+str(len(opposition["decisions"]))+""" open strategic experiments.</p>
+<a href="opposition.html">Open Evidence &amp; Opposition War Room ↗</a>
+<table><thead><tr><th>Decision</th><th>Research question</th><th>Internal priority</th></tr></thead>
+<tbody>"""+decision_rows+"""</tbody></table></section>
 <section class="panel"><h2>Prioritized next actions</h2><ol>"""+actions+"""</ol></section>
 <footer>Data boundary: repository Python under isolated test fixtures; no live Floot API, real bank documents, buyer approval, external carrier operations or deployment. Receipt SHA-256: """+escape(data["receipt_sha256"])+"""</footer></main></body></html>"""
 
@@ -120,6 +137,18 @@ def main():
     )
     (args.out/"research.html").write_text(
         render_research_html(data["research_intelligence"]),encoding="utf-8"
+    )
+    (args.out/"evidence_fidelity.json").write_text(
+        json.dumps(data["research_evidence_fidelity"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"opposition_decisions.json").write_text(
+        json.dumps(data["opposition_register"],sort_keys=True,indent=2)+"\n",
+        encoding="utf-8"
+    )
+    (args.out/"opposition.html").write_text(
+        render_opposition_html(data["research_evidence_fidelity"],data["opposition_register"]),
+        encoding="utf-8"
     )
     print(json.dumps({"executed":data["executed_labs"],
                       "blocked":data["failed_or_blocked_labs"],
