@@ -52,6 +52,10 @@ SOURCE_META = {
         "PUBLIC_PRIMARY", "2018-04-16", "2026-11-10",
         "The 2018 Federal Register published a 49 CFR 378.8 provision calling for disposition of written overcharge claims within 60 days, subject to a written extension; current applicability still needs verification."
     ),
+    "ecfr.current.3788": (
+        "PUBLIC_PRIMARY", None, "2026-11-10",
+        "Direct eCFR page displays 49 CFR 378.8 as part of Title 49 current through October 1, 2026; the text describes written claim disposition within 60 days and a specific written-extension exception. Whether it governs an individual client dispute remains unestablished."
+    ),
     "estes.tariff": (
         "PUBLIC_PRIMARY", "2026-08-03", "2026-11-10",
         "Estes posts an August 3, 2026 rules-tariff update and notes that specific customer pricing agreements or contracts may provide exceptions."
@@ -125,8 +129,8 @@ CLAIMS = [
      "Have transportation counsel verify scope, claim type, waiver and contractual exceptions before setting client deadlines."),
     ("campaign.carrier.response", "carrier_regulatory", "carrier:claims:response-clock",
      "49 CFR 378.8", "SUPPORT",
-     "The 2018 published text of 49 CFR 378.8 describes a 60-day written-claim disposition requirement and a written-extension exception.",
-     "PUBLIC_REPORT", ["govinfo.3788"], 5,
+     "The October 1, 2026 eCFR text of 49 CFR 378.8 describes a 60-day written-claim disposition requirement and a specific written-extension exception; the 2018 publication remains a historical reference.",
+     "PUBLIC_REPORT", ["govinfo.3788", "ecfr.current.3788"], 5,
      "Distinguish processing deadlines from filing windows, credit realization, contractual exceptions and litigation limitations."),
     ("campaign.carrier.contract", "carrier_regulatory", "carrier:estes:contract-override",
      "Estes public tariff", "SUPPORT",
