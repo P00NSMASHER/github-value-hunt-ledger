@@ -8,6 +8,10 @@ on:
       - 'freight/test_research_public_campaign.py'
       - 'freight/research_source_acquisition.py'
       - 'freight/test_research_source_acquisition.py'
+      - 'freight/research_evidence_gate.py'
+      - 'freight/test_research_evidence_gate.py'
+      - 'freight/research/SOURCE_ANCHORS_20261010.json'
+      - 'freight/RESEARCH_EVIDENCE_OPPOSITION.md'
       - 'freight/research/PUBLIC_SOURCE_MANIFEST_20261010.json'
       - 'freight/RESEARCH_SOURCE_ACQUISITION.md'
       - 'freight/lab_phase4_director.py'
@@ -35,7 +39,7 @@ jobs:
           python -m pip install -r production/requirements-ci.txt
           python -m pip install cryptography==46.0.4
       - name: Verify evidence integrity and adversarial cases
-        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_lab_phase4_director.py
+        run: PYTHONPATH=. python -m pytest -q freight/test_research_intelligence.py freight/test_research_public_campaign.py freight/test_research_source_acquisition.py freight/test_research_evidence_gate.py freight/test_lab_phase4_director.py
       - name: Generate read-only research intelligence output
         run: |
           PYTHONPATH=. python -m freight.research_intelligence --include-public-campaign --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
@@ -57,6 +61,30 @@ jobs:
           assert len(r['receipt_sha256'])==64
           print('Eight sourced research lanes; unresolved pricing opposition; NO live fetch or production actions')
           PY
+      - name: Generate independently bounded source-fidelity and opposition review artifacts
+        run: |
+          PYTHONPATH=. python -m freight.research_evidence_gate --as-of-date "$(date -u +%F)" --out /tmp/retally-research-intelligence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/retally-research-intelligence')
+          proof=json.loads((p/'evidence_fidelity.json').read_text())
+          d=json.loads((p/'opposition_decisions.json').read_text())
+          assert proof['scope']=='RESEARCH_ONLY_NO_VERIFICATION_PROMOTION'
+          assert proof['anchor_count']==13
+          assert proof['anchored_claim_count']>=18
+          assert len(d['decisions'])==6
+          assert d['zero_automated_corporate_actions'] is True
+          assert all(row['public_marketing_permitted'] is False
+                     for row in proof['assessments'])
+          assert all(row['external_actions_allowed'] is False
+                     for row in d['decisions'])
+          assert len(proof['receipt_sha256'])==64
+          assert len(d['receipt_sha256'])==64
+          html=(p/'opposition.html').read_text()
+          assert 'What could prove us wrong?' in html
+          print('All quote receipts and oppositional choices are internal research only.')
+          PY
       - name: Preserve evidence reports for independent review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -64,5 +92,8 @@ jobs:
           path: |
             /tmp/retally-research-intelligence/research.html
             /tmp/retally-research-intelligence/research_intelligence.json
+            /tmp/retally-research-intelligence/evidence_fidelity.json
+            /tmp/retally-research-intelligence/opposition_decisions.json
+            /tmp/retally-research-intelligence/opposition.html
           if-no-files-found: error
           retention-days: 14
