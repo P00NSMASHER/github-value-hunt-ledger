@@ -27,10 +27,10 @@ def fixtures():
 class EvidenceGateTests(unittest.TestCase):
     def test_source_quotes_are_bounded_and_referenced_without_truth_promotion(self):
         registry, book = fixtures()
-        self.assertEqual(len(book["anchors"]), 13)
+        self.assertEqual(len(book["anchors"]), 14)
         self.assertEqual(validate_anchor_book(book, registry, as_of=DATE), [])
         result = review_evidence(registry, book, as_of=DATE)
-        self.assertEqual(result["anchor_count"], 13)
+        self.assertEqual(result["anchor_count"], 14)
         self.assertEqual(result["anchored_claim_count"], 18)
         self.assertGreater(result["claim_count"], result["anchored_claim_count"])
         self.assertTrue(all(a["vendor_or_internal_claim_verified"] is False
@@ -60,9 +60,41 @@ class EvidenceGateTests(unittest.TestCase):
         self.assertTrue(any("search snippet cannot" in x for x in
                             validate_anchor_book(book, registry, as_of=DATE)))
 
-    def test_historical_rule_requires_independent_current_law_review(self):
+    def test_current_codification_observed_but_legal_applicability_unproven(self):
         registry, book = fixtures()
         result = review_evidence(registry, book, as_of=DATE)
+        row = next(a for a in result["assessments"]
+                   if a["claim_id"] == "campaign.carrier.response")
+        self.assertEqual(row["review_status"], "CURRENT_ECFR_TEXT_OBSERVED_LEGAL_REVIEW_PENDING")
+        self.assertEqual(row["current_codification_as_of"], "2026-10-01")
+        self.assertFalse(row["client_specific_legal_applicability_established"])
+        self.assertFalse(row["public_marketing_permitted"])
+        self.assertIn("source.govinfo.3788.historical", row["source_quote_ids"])
+        self.assertIn("source.ecfr.3788.current", row["source_quote_ids"])
+
+    def test_current_codification_cannot_be_forged_or_backdated(self):
+        registry, book = fixtures()
+        original = next(a for a in book["anchors"] if a["id"] == "source.ecfr.3788.current")
+        for key, wrong in (
+            ("regulatory_applicability_established", True),
+            ("codification_as_of", "2026-10-11"),
+            ("method", "SEARCH_RESULT_ONLY"),
+            ("support_scope", "HISTORICAL_TEXT"),
+        ):
+            modified = deepcopy(book)
+            anchor = next(a for a in modified["anchors"] if a["id"] == original["id"])
+            anchor[key] = wrong
+            errors = validate_anchor_book(modified, registry, as_of=DATE)
+            self.assertTrue(errors, f"{key} was not rejected")
+            with self.assertRaises(ValueError):
+                review_evidence(registry, modified, as_of=DATE)
+
+    def test_current_ecfr_cannot_be_silently_replaced_by_historical_anchor(self):
+        registry, book = fixtures()
+        modified = deepcopy(book)
+        modified["anchors"] = [a for a in modified["anchors"]
+                               if a["id"] != "source.ecfr.3788.current"]
+        result = review_evidence(registry, modified, as_of=DATE)
         row = next(a for a in result["assessments"]
                    if a["claim_id"] == "campaign.carrier.response")
         self.assertEqual(row["review_status"], "CONTEXT_OR_HISTORICAL_REVIEW")
