@@ -15,7 +15,7 @@ from pathlib import Path
 import re
 
 from freight.research_source_acquisition import (
-    MAX_BYTES, MAX_EXCERPT_CHARS, SAFE_MIME, canonical_sha,
+    MAX_BYTES, MAX_EXCERPT_CHARS, MAX_SOURCES, SAFE_MIME, canonical_sha,
     sha_hex, validate_manifest,
 )
 from freight.research_intelligence import iso
@@ -85,7 +85,7 @@ def validate_capture_receipt(receipt: object, manifest: dict, *,
     if receipt.get("no_claim_verification") is not True:
         errors.append("CAPTURE_CANNOT_VERIFY_CLAIMS")
     captures = receipt.get("captures")
-    if not isinstance(captures, list) or not 1 <= len(captures) <= 12:
+    if not isinstance(captures, list) or not 1 <= len(captures) <= MAX_SOURCES:
         return errors + ["CAPTURES_MUST_BE_BOUNDED_NONEMPTY_LIST"]
     rows = {s["id"]: s for s in manifest["sources"]}
     seen: set[str] = set()
