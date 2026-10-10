@@ -138,6 +138,24 @@ def validate_anchor_book(book: dict, registry: dict, *, as_of: date) -> list[str
                     errors.append(f"{ident}: future rule misrepresented as currently effective")
             except ValueError as exc:
                 errors.append(str(exc))
+        # Current codification observation establishes page contents, not legal
+        # applicability to any carrier, contract, shipment or recovery claim.
+        codified_as_of = row.get("codification_as_of")
+        if source["id"] == "20261010.ecfr.current.3788" or codified_as_of is not None:
+            if (source["id"] != "20261010.ecfr.current.3788"
+                    or source["url"] !=
+                    "https://www.ecfr.gov/current/title-49/subtitle-B/chapter-III/subchapter-B/part-378/section-378.8"
+                    or method != "PUBLIC_WEB_VIEW"
+                    or strength != "DIRECT_SCOPE"):
+                errors.append(f"{ident}: current codification requires approved direct eCFR authority")
+            if row.get("regulatory_applicability_established") is not False:
+                errors.append(f"{ident}: published text cannot prove client legal applicability")
+            try:
+                codified = iso(codified_as_of, f"{ident}.codification_as_of")
+                if codified > as_of or codified > iso(row.get("observed_at"), f"{ident}.observed_at"):
+                    errors.append(f"{ident}: codification date after observation")
+            except ValueError as exc:
+                errors.append(str(exc))
     return errors
 
 
@@ -161,10 +179,14 @@ def review_evidence(registry: dict, book: dict, *, as_of: date) -> dict:
                   and iso(a["effective_on"], "effective_on") > as_of]
         stale = any(iso(sources[sid]["valid_until"], "valid_until") < as_of
                     for sid in claim["source_ids"])
+        codifications = [a["codification_as_of"] for a in anchors_source
+                         if a.get("codification_as_of") is not None]
         if stale:
             state = "EXPIRED_SOURCE_HOLD"
         elif future:
             state = "FUTURE_EFFECTIVE_RULE_HOLD"
+        elif codifications:
+            state = "CURRENT_ECFR_TEXT_OBSERVED_LEGAL_REVIEW_PENDING"
         elif not anchors:
             state = "NO_ORIGINAL_SOURCE_ANCHOR"
         elif not anchors_source:
@@ -179,6 +201,8 @@ def review_evidence(registry: dict, book: dict, *, as_of: date) -> dict:
             "classification": claim["classification"],
             "review_status": state,
             "source_quote_ids": [a["id"] for a in anchors],
+            "current_codification_as_of": max(codifications) if codifications else None,
+            "client_specific_legal_applicability_established": False,
             "vendor_or_internal_claim_verified": False,
             "independent_real_world_proof": False,
             "public_marketing_permitted": False,
@@ -201,6 +225,7 @@ def review_evidence(registry: dict, book: dict, *, as_of: date) -> dict:
                 "url": a["url"], "observed_at": a["observed_at"],
                 "method": a["method"], "support_scope": a["support_scope"],
                 "effective_on": a.get("effective_on"),
+                "codification_as_of": a.get("codification_as_of"),
                 "quote_sha256": a["quote_sha256"],
                 "limitation": a["limitation"],
             } for a in book["anchors"]
