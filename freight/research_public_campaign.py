@@ -48,9 +48,9 @@ SOURCE_META = {
         "PUBLIC_PRIMARY", None, "2027-01-10",
         "49 U.S.C. 13710(a)(3)(B) says a shipper must contest an original or subsequent motor-carrier bill within 180 days of receipt to retain that specified contest right."
     ),
-    "ecfr.3788": (
-        "PUBLIC_PRIMARY", None, "2027-01-10",
-        "49 CFR 378.8 says the processing carrier shall pay, decline or settle a written claim within 60 days except for a qualifying written extension."
+    "govinfo.3788": (
+        "PUBLIC_PRIMARY", "2018-04-16", "2026-11-10",
+        "The 2018 Federal Register published a 49 CFR 378.8 provision calling for disposition of written overcharge claims within 60 days, subject to a written extension; current applicability still needs verification."
     ),
     "estes.tariff": (
         "PUBLIC_PRIMARY", "2026-08-03", "2026-11-10",
@@ -125,8 +125,8 @@ CLAIMS = [
      "Have transportation counsel verify scope, claim type, waiver and contractual exceptions before setting client deadlines."),
     ("campaign.carrier.response", "carrier_regulatory", "carrier:claims:response-clock",
      "49 CFR 378.8", "SUPPORT",
-     "Section 378.8 describes a 60-day disposition requirement for written claims with an exception for a qualifying written extension.",
-     "PUBLIC_REPORT", ["ecfr.3788"], 5,
+     "The 2018 published text of 49 CFR 378.8 describes a 60-day written-claim disposition requirement and a written-extension exception.",
+     "PUBLIC_REPORT", ["govinfo.3788"], 5,
      "Distinguish processing deadlines from filing windows, credit realization, contractual exceptions and litigation limitations."),
     ("campaign.carrier.contract", "carrier_regulatory", "carrier:estes:contract-override",
      "Estes public tariff", "SUPPORT",
